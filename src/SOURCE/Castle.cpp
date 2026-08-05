@@ -183,7 +183,11 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    sprintf(icnName, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
+    sprintf(
+        icnName,
+        DATA_COMPGEN(0x004f0a8c, castleIconNameFormat, "cstl%s.icn"),
+        cHeroTypeShortName[IDX(m_town->m_type)]
+    );
     msg.payload.widget.data.text = icnName;
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         msg.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slotNum;
@@ -196,7 +200,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
-                "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2",
+                DATA_COMPGEN(
+                    0x004f0a98,
+                    castleMageGuildFloorFormat,
+                    "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2"
+                    /* "%d этаж Гильдии магов" */
+                ),
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
             );
@@ -265,7 +274,11 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     msg.payload.widget.id = CONTROL_CAPTAIN_ICON;
     msg.payload.widget.data.value = captainQuarters != 0;
     casWin->BroadcastMessage(msg);
-    sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[IDX(m_town->m_type)]);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x004f0ab0, castleCaptainIconNameFormat, "CSTLCAP%c.ICN"),
+        cHeroTypeInitial[IDX(m_town->m_type)]
+    );
     msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
     msg.payload.widget.id = CONTROL_CAPTAIN_ICON;
     msg.payload.widget.data.text = gText;
@@ -288,14 +301,22 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         msg.payload.widget.data.text = gText;
         sprintf(gText, "");
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
-            sprintf(captainStatLine, "%s\n", gStatNames[slotNum]);
+            sprintf(
+                captainStatLine,
+                DATA_COMPGEN(0x004f0ac0, castleCaptainStatNameFormat, "%s\n"),
+                gStatNames[slotNum]
+            );
             strcat(gText, captainStatLine);
         }
         msg.payload.widget.id = CONTROL_CAPTAIN_STATS;
         casWin->BroadcastMessage(msg);
         sprintf(gText, "");
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
-            sprintf(captainStatLine, "%d\n", captainStats[IDX(m_town->m_type)][slotNum]);
+            sprintf(
+                captainStatLine,
+                DATA_COMPGEN(0x004f0ac4, castleCaptainStatValueFormat, "%d\n"),
+                captainStats[IDX(m_town->m_type)][slotNum]
+            );
             strcat(gText, captainStatLine);
         }
         msg.payload.widget.id = CONTROL_CAPTAIN_VALUES;
@@ -359,7 +380,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
         sprintf(
             icnName,
-            "port%04d.icn",
+            DATA_COMPGEN(0x004f0ac8, castleHeroPortraitIconNameFormat, "port%04d.icn"),
             IDX(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slotNum)].m_portrait)
         );
         msg.payload.widget.data.text = icnName;
@@ -386,7 +407,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
-                    "objntwba.icn",
+                    DATA_COMPGEN(0x004f0ad8, castleBackgroundAnimatedIconName, "objntwba.icn"),
                     static_cast<i16>(terrainIconFrame + backFrame),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
@@ -412,7 +433,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
-                    "objntown.icn",
+                    DATA_COMPGEN(0x004f0ae8, castleBackgroundIconName, "objntown.icn"),
                     static_cast<i16>(raceBase + backFrame),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
@@ -431,7 +452,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 EXPANSION_OVERLAY_Y,
                 EXPANSION_OVERLAY_WIDTH,
                 EXPANSION_OVERLAY_HEIGHT,
-                "caslxtra.icn",
+                DATA_COMPGEN(0x004f0af8, castleExpansionOverlayIconName, "caslxtra.icn"),
                 0,
                 ICON_DRAW_NORMAL,
                 TOWN_WIDGET_ID_NONE,
@@ -560,7 +581,16 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
             case BUILDING_SLOT_SPECIAL_THIRTY:
                 if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
-                    sprintf(gText, "Cannot build.  Already built here this turn.");
+                    sprintf(
+                        gText,
+                        DATA_COMPGEN(
+                            0x004f0b08,
+                            castleAlreadyBuiltThisTurn,
+                            "\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc. \xc2\xfb \xf3\xe6\xe5 "
+                            "\xf1\xf2\xf0\xee\xe8\xeb\xe8 \xe7\xe4\xe5\xf1\xfc \xe2 \xfd\xf2\xee\xec \xf5\xee\xe4\xf3."
+                            /* "Нельзя построить. Вы уже строили здесь в этом ходу." */
+                        )
+                    );
                 } else if (gpTownManager->m_town->m_buildings & BIT(whichBuilding)) {
                     sprintf(
                         gText,
@@ -671,9 +701,21 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                         if (quickFlag) {
                             NormalDialog(
-                                "{Spread Formation}\n\n'Spread' combat formation spreads your "
-                                "armies from the top to the bottom of the battlefield, with at "
-                                "least one empty space between each army.",
+                                DATA_COMPGEN(
+                                    0x004f0b3c,
+                                    castleSpreadFormationHelp,
+                                    "{\xd8\xe8\xf0\xee\xea\xe8\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
+                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
+                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xe2\xe0\xf8\xe5 \xe2\xee\xe9"
+                                    "\xf1\xea\xee \xe7\xe0\xed\xe8\xec\xe0\xe5\xf2 \xef\xee\xe7"
+                                    "\xe8\xf6\xe8\xe8 \xef\xee \xe2\xf1\xe5\xe9 \xf8\xe8\xf0"
+                                    "\xe8\xed\xe5 \xef\xee\xeb\xff \xe1\xee\xff \xe8 \xec\xe5"
+                                    "\xe6\xe4\xf3 \xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8 \xee\xf2"
+                                    "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
+                                    "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
+                                    "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
+                                    /* "{Широкие ряды}\n\nПри таком боевом порядке ваше войско занимает позиции по всей ширине поля боя и между соседними отрядами имеется хотя бы одна пустая клетка." */
+                                ),
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -694,8 +736,19 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                         if (quickFlag) {
                             NormalDialog(
-                                "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
-                                "army together in the center of your side of the battlefield.",
+                                DATA_COMPGEN(
+                                    0x004f0bdc,
+                                    castleGroupedFormationHelp,
+                                    "{\xcf\xeb\xee\xf2\xed\xfb\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
+                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
+                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xf0\xff\xe4\xfb \xe2\xe0\xf8"
+                                    "\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xf1\xec\xfb\xea\xe0\xfe\xf2"
+                                    "\xf1\xff \xe2\xee\xea\xf0\xf3\xe3 \xf6\xe5\xed\xf2\xf0\xe0"
+                                    "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
+                                    " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
+                                    "\xe1\xee\xff."
+                                    /* "{Плотные ряды}\n\nПри таком боевом порядке ряды вашей армии смыкаются вокруг центрального отряда на вашем краю поля боя." */
+                                ),
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,

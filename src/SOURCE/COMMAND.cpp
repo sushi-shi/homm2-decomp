@@ -1018,7 +1018,13 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            "\xc8\xb5P",
+                            DATA_COMPGEN(
+                                0x004f0fc8,
+                                combatNoHeroForSpellcasting,
+                                "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe3\xe5\xf0\xee\xe5\xe2, \xf7\xf2\xee\xe1\xfb "
+                                "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff."
+                                /* "У вас нет героев, чтобы направлять заклинания." */
+                            ),
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -2451,8 +2457,15 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
-        "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
-        "for the price of %d gold.\"",
+        DATA_COMPGEN(
+            0x004f1438,
+            combatSurrenderOfferFormat,
+            "%s \xe3\xee\xe2\xee\xf0\xe8\xf2:\n\n\"\xdf \xef\xf0\xe8\xec\xf3 \xe2\xe0\xf8\xf3 "
+            "\xea\xe0\xef\xe8\xf2\xf3\xeb\xff\xf6\xe8\xfe \xe8 \xef\xee\xe7\xe2\xee\xeb\xfe \xe2\xe0\xec \xe8 "
+            "\xe2\xe0\xf8\xe8\xec \xe2\xee\xe8\xed\xe0\xec \xf3\xe9\xf2\xe8 \xf1 \xec\xe8\xf0\xee\xec \xe7\xe0 "
+            "%d \xe7\xee\xeb\xee\xf2\xfb\xf5.\""
+            /* "%s говорит:\n\n\"Я приму вашу капитуляцию и позволю вам и вашим воинам уйти с миром за %d золотых.\"" */
+        ),
         m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
     );

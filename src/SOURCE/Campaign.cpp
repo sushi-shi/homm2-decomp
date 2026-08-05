@@ -790,8 +790,14 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 }
                             } else {
                                 NormalDialog(
-                                    "The currently selected map is not a valid choice for your "
-                                    "next scenario.",
+                                    DATA_COMPGEN(
+                                        0x004f0a08,
+                                        campaignHandlerSelectedMapInvalid,
+                                        "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xea\xe0\xf0\xf2\xe0 - "
+                                        "\xef\xeb\xee\xf5\xee\xe9 \xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff \xe2\xe0\xf8\xe5\xe3\xee "
+                                        "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee \xf1\xf6\xe5\xed\xe0\xf0\xe8\xff."
+                                        /* "Выбранная карта - плохой выбор для вашего следующего сценария." */
+                                    ),
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_RESOURCE,
                                     NORMAL_DIALOG_NO_RESOURCE,

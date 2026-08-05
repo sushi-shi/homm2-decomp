@@ -126,7 +126,7 @@ void PlayAudiereMusic(
         filename,
         "%s%s%02d-AudioTrack %02d.ogg",
         gcRegCDRomPath,
-        "\\TRACKS2\\",
+        gcMusicPath,
         track,
         track
     );

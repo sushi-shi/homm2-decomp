@@ -82,50 +82,6 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     return extraCount - EXTRA_ALLOCATION_STEP;
 }
 
-VA(0x0047266d, 0x8c)
-void fullMap::Write(i32 handle) {
-    write(handle, &width, sizeof(width));
-    write(handle, &height, sizeof(height));
-    write(handle, cells, width * height * sizeof(mapCell));
-    write(handle, &extraCount, sizeof(extraCount));
-    write(handle, extras, extraCount * sizeof(mapCellExtra));
-}
-
-VA(0x004726f9, 0x258)
-void fullMap::Read(i32 handle, i32 convert) {
-    i32 nb;
-    oldMapCell* tmp1;
-    i32 x, y;
-    oldMapCellExtra* tmp2;
-
-    read(handle, &width, sizeof(width));
-    read(handle, &height, sizeof(height));
-    Init(width, height);
-    if (convert) {
-        tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
-        read(handle, tmp1, width * height * sizeof(oldMapCell));
-        for (x = 0; x < width; x++)
-            for (y = 0; y < height; y++)
-                memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
-        delete tmp1;
-    } else {
-        read(handle, cells, width * height * sizeof(mapCell));
-    }
-    read(handle, &extraCount, sizeof(extraCount));
-    if (extras)
-        delete extras;
-    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
-    if (convert) {
-        tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
-        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
-        for (nb = 0; nb < extraCount; nb++)
-            memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
-        delete tmp2;
-    } else {
-        read(handle, extras, extraCount * sizeof(mapCellExtra));
-    }
-}
-
 VA(0x004723a3, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
     mapCellExtra* node;
@@ -183,6 +139,50 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
                 node = Extra(node->nextIndex);
             }
         }
+    }
+}
+
+VA(0x0047266d, 0x8c)
+void fullMap::Write(i32 handle) {
+    write(handle, &width, sizeof(width));
+    write(handle, &height, sizeof(height));
+    write(handle, cells, width * height * sizeof(mapCell));
+    write(handle, &extraCount, sizeof(extraCount));
+    write(handle, extras, extraCount * sizeof(mapCellExtra));
+}
+
+VA(0x004726f9, 0x258)
+void fullMap::Read(i32 handle, i32 convert) {
+    i32 nb;
+    oldMapCell* tmp1;
+    i32 x, y;
+    oldMapCellExtra* tmp2;
+
+    read(handle, &width, sizeof(width));
+    read(handle, &height, sizeof(height));
+    Init(width, height);
+    if (convert) {
+        tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        read(handle, tmp1, width * height * sizeof(oldMapCell));
+        for (x = 0; x < width; x++)
+            for (y = 0; y < height; y++)
+                memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
+        delete tmp1;
+    } else {
+        read(handle, cells, width * height * sizeof(mapCell));
+    }
+    read(handle, &extraCount, sizeof(extraCount));
+    if (extras)
+        delete extras;
+    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
+    if (convert) {
+        tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
+        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
+        for (nb = 0; nb < extraCount; nb++)
+            memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
+        delete tmp2;
+    } else {
+        read(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
 

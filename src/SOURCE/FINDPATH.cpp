@@ -10,7 +10,6 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/FINDPATH.h>
-#include <SOURCE/FINDPATH_TYPES.h>
 #include <SOURCE/CMBTMGR.h>
 #include <EDITOR/mapcell.h>
 #include <stdlib.h>
@@ -20,8 +19,6 @@ namespace {
 
 H2_ENUM_BEGIN(FindPathConstant)
     ATTACK_MASK_SURROUNDED         = 0xff,
-    ALLOCATION_SOURCE_LINE         = 20,
-    DESTRUCTION_SOURCE_LINE        = 26,
     DISTANCE_MINOR_DIVISOR         = 2,
     BINARY_SEARCH_MIDPOINT_DIVISOR = 2,
     DRAWBRIDGE_MOAT_INDEX          = 4,
@@ -43,15 +40,6 @@ DATA(0x005245d0) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain;
 DATA(0x005245dc) static searchNode* gSearchQueueNode;
 DATA(0x005245d4) static i32 gSearchMiddle;
 DATA(0x005245e0) static i32 gSearchHigh;
-
-static SFindPathSourceLocation gSearchAllocationSource = {
-    {ALLOCATION_SOURCE_LINE, 0},
-    FINDPATH_SOURCE_FILE
-};
-static SFindPathSourceLocation gSearchDestructionSource = {
-    {DESTRUCTION_SOURCE_LINE, 0},
-    FINDPATH_SOURCE_FILE
-};
 
 VA(0x00449c30, 0x25)
 searchArray::searchArray(void) {

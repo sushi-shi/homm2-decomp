@@ -215,7 +215,14 @@ void highScoreManager::Update(void) {
         if (highScore.score != HIGH_SCORE_EMPTY)
             sprintf(gText, highScore.playerName);
         if (highScore.cheated)
-            strcat(gText, "\n(Cheater)");
+            strcat(
+                gText,
+                DATA_COMPGEN(
+                    0x004f9120,
+                    highScoreCheaterSuffix,
+                    "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Читер)" */
+                )
+            );
         m_window->BroadcastMessage(hsMessage);
 
         sprintf(gText, "");

@@ -342,8 +342,6 @@ namespace {
     (reinterpret_cast<combatRemoteHeroFragment*>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
 #define EVENTS_HERO_BUFFER(buffer) (reinterpret_cast<combatRemoteHeroFragment*>(buffer))
 
-DATA(0x004f3cd4) static char s_twoStringFormat[] = "%s %s";
-
 VA(0x0043b640, 0x5fc9)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     char eventText_b[EVENT_TEXT_BUFFER_SIZE];
@@ -1808,7 +1806,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventValue1 = cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET;
                         sprintf(
                             gText,
-                            s_twoStringFormat,
+                            DATA_COMPGEN(
+                                0x004f3cd4,
+                                eventSkeletonArtifactRewardFormat,
+                                "%s %s"
+                            ),
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
                         );
@@ -6192,7 +6194,14 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             || gbThisNetHumanPlayer[destinationHero->m_owner]) {
                             sprintf(
                                 gText,
-                                "As you reach for the %s, it mysteriously disappears.",
+                                DATA_COMPGEN(
+                                    0x004f7ee0,
+                                    eventArtifactDisappearsFormat,
+                                    "\xdd\xf2\xee %s! \xc5\xe4\xe2\xe0 \xe2\xfb \xe4\xee\xe1\xf0\xe0\xeb\xe8\xf1\xfc \xe4\xee "
+                                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0, \xea\xe0\xea \xef\xf0\xe5\xe4\xec\xe5\xf2 "
+                                    "\xec\xe8\xf1\xf2\xe8\xf7\xe5\xf1\xea\xe8\xec \xee\xe1\xf0\xe0\xe7\xee\xec \xe8\xf1\xf7\xe5\xe7."
+                                    /* "Это %s! Едва вы добрались до артефакта, как предмет мистическим образом исчез." */
+                                ),
                                 gArtifactNames[IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
                             NormalDialog(
@@ -8421,9 +8430,16 @@ CombatResult advManager::DoCombat(
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
-                "\xe3\xee\xf0\xee\xe4",
+                DATA_COMPGEN(
+                    0x004f84f0,
+                    eventCombatAttackedFormat,
+                    "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
+                    /* "%s, ваш %s атакован!" */
+                ),
                 cPlayerNames[secondPlayer8],
-                combatTown ? "\xe3\xe5\xf0\xee\xe9" : "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
+                combatTown
+                    ? DATA_COMPGEN(0x004f84e0, eventCombatTownType, "\xe3\xee\xf0\xee\xe4" /* "город" */)
+                    : DATA_COMPGEN(0x004f84e8, eventCombatHeroType, "\xe3\xe5\xf0\xee\xe9" /* "герой" */)
             );
             gpGame->WaitForPlayer(gText, secondPlayer8);
         }
@@ -8871,4 +8887,3 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
 }
 
 DATA(0x005244b4) b32 gbNoShowCombat = false;
-

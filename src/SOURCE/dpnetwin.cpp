@@ -94,19 +94,34 @@ i16 dpnet_init(void) {
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(
+                0x004f1bd8,
+                directPlayLoadFailureCreate,
+                "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
+                /* "Невозможно загрузить 'DPLAYX.DLL'" */
+            ));
         createFunction = NULL;
         dpEnumerate = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayCreate")
         );
         if (createFunction == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(
+                0x004f1c10,
+                directPlayLoadFailureEnumerateLookup,
+                "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
+                /* "Невозможно загрузить 'DPLAYX.DLL'" */
+            ));
         dpEnumerate = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
         if (dpEnumerate == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(
+                0x004f1c4c,
+                directPlayLoadFailureEnumerate,
+                "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
+                /* "Невозможно загрузить 'DPLAYX.DLL'" */
+            ));
         dpEnumerate(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
@@ -123,7 +138,17 @@ i16 dpnet_init(void) {
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
-            sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
+            sprintf(
+                gText,
+                DATA_COMPGEN(
+                    0x004f1ca8,
+                    directPlayWaitingForGuest,
+                    "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
+                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
+                    "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
+                    /* "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение." */
+                )
+            );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
@@ -154,7 +179,16 @@ i16 dpnet_init(void) {
             }
         } else {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
-            sprintf(gText, "Waiting for other remote player to set up game.");
+            sprintf(
+                gText,
+                DATA_COMPGEN(
+                    0x004f1d44,
+                    directPlayWaitingForPlayer,
+                    "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff \xed\xe0\xf7\xe0\xeb\xe0 "
+                    "\xe8\xe3\xf0\xfb."
+                    /* "Ожидаю игрока для начала игры." */
+                )
+            );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);

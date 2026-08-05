@@ -517,14 +517,6 @@ H2_ENUM_BEGIN(GameRumourConstant)
 H2_ENUM_END(GameRumourConstant)
 
 DATA(0x0052499c) b32 gbGameOver = false;
-static i16 gSaveSourceLine = 0x294;
-static i16 gLoadSourceLine = 0x44f;
-static i16 gMapSourceLine = 0xaf4;
-static i16 gTransmitSourceLine = 0x1a4e;
-static i16 gReceiveSourceLine = 0x1b2d;
-static i16 gDiffSourceLine = 0x1d66;
-static i16 gCompressTest2SourceLine = 0x1f72;
-static i16 gCompressTestSourceLine = 0x1f95;
 
 H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT          = 10000,
@@ -1182,8 +1174,26 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(savePath, "%s%s", ".\\DATA\\", genName);
     } else {
         sprintf(savePath, "%s%s", gcGamePath, genName);
-        if (strnicmp(genName, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
-            && strnicmp(genName, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
+        if (strnicmp(
+                genName,
+                DATA_COMPGEN(
+                    0x004f85a4,
+                    gameAutosaveName,
+                    "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */
+                ),
+                sizeof("AUTOSAVE") - 1
+            )
+                != 0
+            && strnicmp(
+                   genName,
+                   DATA_COMPGEN(
+                       0x004f85b4,
+                       gamePlayerExitName,
+                       "\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb" /* "Игрок Вышел" */
+                   ),
+                   sizeof("PLYREXIT") - 1
+               )
+                != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
@@ -1931,12 +1941,26 @@ void game::NewMap(char* filename) {
                 if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    strcpy(m_heroRecs[awardHero].m_name, "Sister Eliza");
+                    strcpy(
+                        m_heroRecs[awardHero].m_name,
+                        DATA_COMPGEN(
+                            0x004f8608,
+                            gameCampaignHeroElizaName,
+                            "\xd1\xe5\xf1\xf2\xf0\xe0 \xdd\xeb\xe8\xe7\xe0" /* "Сестра Элиза" */
+                        )
+                    );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    strcpy(m_heroRecs[awardHero].m_name, "Brother Brax");
+                    strcpy(
+                        m_heroRecs[awardHero].m_name,
+                        DATA_COMPGEN(
+                            0x004f8618,
+                            gameCampaignHeroBraxName,
+                            "\xc1\xf0\xe0\xf2 \xc1\xf0\xe0\xea\xf1" /* "Брат Бракс" */
+                        )
+                    );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player].m_availableHeroIds[0] = static_cast<char>(awardHero);
@@ -3491,8 +3515,15 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 > viewSpellsHero->m_spellPoints) {
                                 sprintf(
                                     gText,
-                                    "That spell costs %d mana.  You only have %d mana, so you "
-                                    "can't cast the spell.",
+                                    DATA_COMPGEN(
+                                        0x004f8668,
+                                        gameInsufficientSpellPointsFormat,
+                                        "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf2\xee\xe8\xf2 %d \xee\xf7. "
+                                        "\xec\xe0\xe3\xe8\xe8. \xd3 \xe2\xe0\xf1 \xf2\xee\xeb\xfc\xea\xee %d \xee\xf7. "
+                                        "\xec\xe0\xe3\xe8\xe8. \xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc "
+                                        "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
+                                        /* "Заклинание стоит %d оч. магии. У вас только %d оч. магии. Вы не можете направить заклинание." */
+                                    ),
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
@@ -8011,4 +8042,3 @@ i8* gbNGColor;
 DATA(0x00524942) i16 giUARadius;
 i8* gbNGPlayerPos;
 DATA(0x00524930) i32 viewArmyFacingWIPXMod;
-

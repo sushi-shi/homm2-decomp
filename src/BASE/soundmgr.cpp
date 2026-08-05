@@ -49,22 +49,6 @@ DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat;
 DATA(0x005348f0) bool gSoundDisabled = false;
 DATA(0x005348f1) bool gSoundBackendsReady = false;
 
-VA(0x004b59b0, 0x123)
-bool soundManager::CDStartup(void) {
-    if (m_backend == SOUND_BACKEND_AUDIERE)
-        return true;
-
-    ShutdownSoundBackends();
-    if (gSoundDisabled)
-        return false;
-
-    m_backend = SOUND_BACKEND_AUDIERE;
-    m_audiereDevice = audiere::OpenDevice("winmm");
-    if (m_audiereDevice != NULL)
-        return StartupAudiereMusic(m_audiereDevice);
-    return false;
-}
-
 VA(0x004b5710, 0x101)
 void soundManager::ShutdownSoundBackends(void) {
     if (IsMilesBackend(this)) {
@@ -135,6 +119,22 @@ bool soundManager::StartupMilesBackend(void) {
     StartupMilesSamples(m_digitalDriver);
     gSoundBackendsReady = true;
     return MIDIStartup();
+}
+
+VA(0x004b59b0, 0x123)
+bool soundManager::CDStartup(void) {
+    if (m_backend == SOUND_BACKEND_AUDIERE)
+        return true;
+
+    ShutdownSoundBackends();
+    if (gSoundDisabled)
+        return false;
+
+    m_backend = SOUND_BACKEND_AUDIERE;
+    m_audiereDevice = audiere::OpenDevice("winmm");
+    if (m_audiereDevice != NULL)
+        return StartupAudiereMusic(m_audiereDevice);
+    return false;
 }
 
 VA(0x004b5ae0, 0xb1)

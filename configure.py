@@ -94,10 +94,13 @@ def main():
                    "/NOLOGO /MACHINE:IX86 /BASE:0x400000 "
                    "/SUBSYSTEM:WINDOWS,4.0 /STACK:66112,4096 "
                    "/HEAP:1048576,4096 /INCREMENTAL:NO /OPT:NOREF "
+                   "/DEBUG /PDB:build/link/HMM2PL.pdb "
                    "/LIBPATH:build/toolchain/msvc/lib "
-                   "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe "
+                   "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe $in "
                    "KERNEL32.LIB USER32.LIB GDI32.LIB WSOCK32.LIB "
-                   "NETAPI32.LIB WINMM.LIB ADVAPI32.LIB $in"))
+                   "build/link/wing32.lib NETAPI32.LIB build/link/mss32.lib "
+                   "build/link/smackw32.lib WINMM.LIB ADVAPI32.LIB "
+                   "build/link/audiere.lib"))
         w.rule("link_resources",
                command=(f"{PY} -m homm2.build.extract_resources "
                         "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
@@ -196,7 +199,7 @@ def main():
                 sys.maxsize))
         link_outputs = ["build/link/HMM2PL.exe", "build/link/HMM2PL.map"]
         w.build(link_outputs, "link_exe",
-                inputs=link_objects + import_outputs + [resource_output])
+                inputs=link_objects + [resource_output], implicit=import_outputs)
         w.build("link", "phony", inputs="build/link/HMM2PL.exe")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)

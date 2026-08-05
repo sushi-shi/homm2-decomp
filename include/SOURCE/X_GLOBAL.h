@@ -159,9 +159,9 @@ H2_ENUM_END(GroundTableConstant)
 
 H2_ENUM_BEGIN(KbControlTableConstant)
     MOVEMENT_FRAME_FLIP_COUNT          = 16,
-    CASTLE_RESOURCE_SLOT_COUNT         = 8,
+    CASTLE_RESOURCE_SLOT_COUNT         = 4,
     CASTLE_AMOUNT_COUNT                = 4,
-    VESA_MODE_VALUE_COUNT              = 8,
+    VESA_MODE_VALUE_COUNT              = 6,
     NORMAL_DIRECTION_COUNT             = 8,
     RESOURCE_VALUE_COUNT               = 7,
     STARTING_RESOURCE_DIFFICULTY_COUNT = 5,
@@ -226,12 +226,12 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_HERO_SCREEN_TEXT_COUNT           = 25,
     KB_CASTLE_INFO_TEXT_COUNT           = 16,
     KB_LUCK_INFO_TEXT_COUNT             = 21,
-    KB_IQ_NAME_COUNT                    = 6,
+    KB_IQ_NAME_COUNT                    = 5,
     KB_SPELL_HELP_TEXT_COUNT            = 9,
     KB_SPEED_TEXT_COUNT                 = 10,
     KB_ARMY_DETAIL_TEXT_COUNT           = 9,
     KB_WELL_DETAIL_TEXT_COUNT           = 9,
-    KB_KINGDOM_OVERVIEW_TEXT_COUNT      = 4,
+    KB_KINGDOM_OVERVIEW_TEXT_COUNT      = 3,
     KB_NEW_TURN_TEXT_COUNT              = 7,
     KB_VIEW_GENERAL_LABEL_COUNT         = 7,
     KB_VIEW_GENERAL_HELP_COUNT          = 7,
@@ -258,9 +258,9 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_DIFFICULTY_TEXT_COUNT            = 5,
     KB_START_DIFFICULTY_TEXT_COUNT      = 4,
     KB_CAMPAIGN_LEADER_TEXT_COUNT       = 4,
-    KB_WIN_TEXT_COUNT                   = 6,
-    KB_HUMAN_DIFFICULTY_TEXT_COUNT      = 6,
-    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6,
+    KB_WIN_TEXT_COUNT                   = 5,
+    KB_HUMAN_DIFFICULTY_TEXT_COUNT      = 5,
+    KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 5,
     KB_MUSIC_QUALITY_TEXT_COUNT         = 3,
     KB_SPELL_TEXT_COUNT                 = IDX(SPELL_COUNT),
     KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = IDX(HERO_SKILL_LEVEL_COUNT) - 1,
@@ -332,6 +332,7 @@ extern char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT]
 extern char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern char gcGamePath[GLOBAL_GAME_PATH_SIZE];
 extern char gcMapPath[GLOBAL_MAP_PATH_SIZE];
+extern char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbDontTryRedbook;
 extern b32 gbDontTryMIDI;
 extern b32 gbDontTryDigital;

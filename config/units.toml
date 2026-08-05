@@ -293,7 +293,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/CMBTMGR"
 source = "src/SOURCE/CMBTMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/COMMAND"
@@ -303,22 +303,22 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/CURSOR"
 source = "src/SOURCE/CURSOR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Campaign"
 source = "src/SOURCE/Campaign.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Castle"
 source = "src/SOURCE/Castle.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/DRAWING"
 source = "src/SOURCE/DRAWING.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/EVENTS"
@@ -353,7 +353,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/HISCORE"
 source = "src/SOURCE/HISCORE.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/KB"
@@ -488,7 +488,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/dpnetwin"
 source = "src/SOURCE/dpnetwin.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/kbwin"

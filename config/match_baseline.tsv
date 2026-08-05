@@ -16,7 +16,7 @@ BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
 BASE/AudiereMusic	?AudiereMusicAvailable@@YI_NXZ	100.0000	1001bd3a24bb
 BASE/AudiereMusic	?AudiereMusicPlaying@@YI_NXZ	100.0000	d80e2edbabe9
-BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	d68e21d76067
+BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	35d8bbfe6878
 BASE/AudiereMusic	?ResetAudiereMusic@@YIXXZ	100.0000	28d0e39d5071
 BASE/AudiereMusic	?SetAudiereMusicVolume@@YIXHH@Z	100.0000	bbc82415fb66
 BASE/AudiereMusic	?StartupAudiereMusic@@YI_NV?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	6695b12b4972
@@ -653,7 +653,7 @@ SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	d9de47dae8d0
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	dba6f232c7b1
 SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	100.0000	fd5fef4e5e72
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	100.0000	278ec0ed1bd4
-SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	9b2fbce5e05e
+SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	fdbb39ea5a83
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	100.0000	450489476607
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	100.0000	ebf85bd4fd71
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	100.0000	888e7a6e17f9
@@ -670,7 +670,7 @@ SOURCE/COMMAND	?ClearWinLoseBottom@combatManager@@QAEXPAVheroWindow@@@Z	100.0000
 SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	100.0000	aeba045beccf
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	6044b0b8106f
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	34273057dac9
-SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	75bc26aa2816
+SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	c550d9025e6e
 SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	100.0000	10284471513d
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	100.0000	12c2467028e6
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	dcac6e7285e6
@@ -678,7 +678,7 @@ SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	a03f1c829007
 SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	100.0000	38a6774f174c
 SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	946f5d2fb32f
 SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	cd550672d44f
-SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	100.0000	7cd76cc6bf0d
+SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	100.0000	77dd1f6d91b1
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	100.0000	59cf19b9a8b2
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	f3a420664740
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	100.0000	536e66479341
@@ -705,7 +705,7 @@ SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	5010f7a
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	100.0000	b1b04e9180a0
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	990b0069ba45
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	2d97387a6433
-SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	3dd1626b5a90
+SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	27910c147f11
 SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	100.0000	03e4ea519edd
 SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	7b1e6d9ed3f3
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	52b3e2a82986
@@ -714,15 +714,15 @@ SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	869b82bf0188
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	c06973c72312
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	aaa53673ce78
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	922522c2da1d
-SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	f655711930b8
+SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	100.0000	32ad5f7c1330
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	100.0000	fc9c994942e2
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	32df4ef318ee
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	100.0000	8ae3a29202d8
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	7b252f8765d3
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	b7b2d086bffc
-SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	2067870f5a65
-SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	acf010eefffa
+SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	f37878a0f2d4
+SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	9fe015fe88ca
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	1be488f25406
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	e589a808d4bb
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	b4ff5848f0bf
@@ -742,8 +742,8 @@ SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	4a3
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	100.0000	4f7d654eef24
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	100.0000	72b6e755618d
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	e28be69fb51a
-SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	1eade3b02110
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	1d72160cad80
+SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	4fe200c60cb8
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	3506169739dc
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	709a4079a808
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	646574654745
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	cda7f47224c7
@@ -776,7 +776,7 @@ SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	c747c89a433d
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	100.0000	7a50d91a6f10
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	bd373fd74950
-SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	100.0000	e380b7c0716b
+SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	100.0000	19c5f4ab912c
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	5df14c8e4798
 SOURCE/FINDPATH	??0searchArray@@QAE@XZ	100.0000	448864c181fa
 SOURCE/FINDPATH	??1searchArray@@QAE@XZ	100.0000	72baa8869646
@@ -846,7 +846,7 @@ SOURCE/GAME	?LoadGame@game@@QAEXPADHH@Z	100.0000	51ad681898a9
 SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	100.0000	53422393c3f5
 SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	100.0000	e483da07ff9d
 SOURCE/GAME	?MineTypesOwned@game@@QAEHHH@Z	100.0000	8295dae196bd
-SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	100.0000	a8b25325ed9b
+SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	100.0000	bc487c8e2015
 SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	100.0000	7aa5ceb9f4f5
 SOURCE/GAME	?NextPlayer@game@@QAEXXZ	100.0000	e2868d712df2
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	100.0000	c6b5c84a4dcc
@@ -866,7 +866,7 @@ SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	100.0000	ac4ad0eaeff2
 SOURCE/GAME	?Read@playerData@@QAEXH@Z	100.0000	ee05eb7a2db2
 SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	100.0000	a4854b551f9b
 SOURCE/GAME	?RestoreCell@game@@QAEXHHHHPAVmapCell@@H@Z	100.0000	193446d089a6
-SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	100.0000	523082c923e9
+SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	100.0000	55f66f4328c9
 SOURCE/GAME	?Scan@game@@QAEHPACHH@Z	100.0000	9113e6b4951a
 SOURCE/GAME	?SetMapSize@game@@QAEXHH@Z	100.0000	822668df33ce
 SOURCE/GAME	?SetRandomHeroArmies@game@@QAEXHH@Z	100.0000	7e4f1bdfdfa3
@@ -887,7 +887,7 @@ SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@
 SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	100.0000	b95850474f65
 SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	100.0000	f5e1d2324645
 SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	7a6d0d783734
-SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	100.0000	70cd230b1d35
+SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	100.0000	36eeabac20ee
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	100.0000	17de3fca216e
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	e99d589ef4ed
 SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	100.0000	dd59f9bf48c0
@@ -904,7 +904,7 @@ SOURCE/HERO	?CreatureTypeCount@hero@@QAEHH@Z	100.0000	0020bc68ca87
 SOURCE/HERO	?Deallocate@hero@@QAEXH@Z	100.0000	a78c5bdc9428
 SOURCE/HERO	?Dismiss@hero@@QAEHXZ	100.0000	73734347d732
 SOURCE/HERO	?DoHeroSplit@@YIXHH@Z	100.0000	a9daa94da494
-SOURCE/HERO	?DoSSLevelDialog@hero@@QAEXHH@Z	100.0000	c183930510e5
+SOURCE/HERO	?DoSSLevelDialog@hero@@QAEXHH@Z	100.0000	50b19ebe9eec
 SOURCE/HERO	?GetArmyStrengths@hero@@QAEXQAK@Z	100.0000	ca02f289ef36
 SOURCE/HERO	?GetExperience@hero@@QAEHH@Z	100.0000	2af12997113d
 SOURCE/HERO	?GetLevel@hero@@QAEHH@Z	100.0000	27b97bc814d5
@@ -946,7 +946,7 @@ SOURCE/HISCORE	??0highScoreManager@@QAE@XZ	100.0000	23b581f35398
 SOURCE/HISCORE	?Close@highScoreManager@@UAEXXZ	100.0000	0d6162ab55b8
 SOURCE/HISCORE	?Main@highScoreManager@@UAEHAAUtag_message@@@Z	100.0000	14d04f8d4b1e
 SOURCE/HISCORE	?Open@highScoreManager@@UAEHH@Z	100.0000	e9a02a3db999
-SOURCE/HISCORE	?Update@highScoreManager@@QAEXXZ	100.0000	6394c5928d50
+SOURCE/HISCORE	?Update@highScoreManager@@QAEXXZ	100.0000	ad08a68788d7
 SOURCE/KB	??1game@@QAE@XZ	100.0000	46d57328b60e
 SOURCE/KB	?AddNetBoxLine@@YIXPADD@Z	100.0000	82253d1b46d6
 SOURCE/KB	?AddScoreToHighScore@@YIHHHHHPAD@Z	100.0000	88425955bbac
@@ -1412,7 +1412,7 @@ SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	f3ed8ed65911
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	71b109f775c2
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	ca90a1803d20
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	d8764fec945e
-SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	e07adc451219
+SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	3c70051f3360
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	c7e2ae01e357
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	2a0579c07e7b
 SOURCE/dpnetwin	?dpnet_snd@@YIHHHPAX@Z	100.0000	8fce1e272026

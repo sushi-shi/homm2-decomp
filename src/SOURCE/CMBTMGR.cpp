@@ -347,7 +347,14 @@ void combatManager::SetupCombat(
                 static_cast<i32>(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
-            strcpy(m_captain.m_name, "Captain");
+            strcpy(
+                m_captain.m_name,
+                DATA_COMPGEN(
+                    0x004f0c5c,
+                    combatCaptainName,
+                    "\xca\xe0\xef\xe8\xf2\xe0\xed" /* "Капитан" */
+                )
+            );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
             for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++)
