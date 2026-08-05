@@ -47,7 +47,7 @@ public:
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind
     );
-    __declspec(dllexport) virtual inline ~button() OVERRIDE;
+    virtual inline ~button() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);

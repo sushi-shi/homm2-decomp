@@ -10,7 +10,7 @@ class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
     sample(char*);
-    __declspec(dllexport) virtual inline ~sample() OVERRIDE;
+    virtual inline ~sample() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(sample, 0x34);

@@ -12,7 +12,7 @@ public:
     u16 m_tileHeight;
     char* m_data;
     tileset(u32l);
-    __declspec(dllexport) virtual inline ~tileset();
+    virtual inline ~tileset();
 };
 #pragma pack(pop)
 SIZE(tileset, 0x1a);

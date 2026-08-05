@@ -19,7 +19,7 @@ public:
     i16 m_frameCount;
     u8* m_data;
     icon(u32l id);
-    __declspec(dllexport) virtual inline ~icon();
+    virtual inline ~icon();
     void DrawToBuffer(
         i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
     );

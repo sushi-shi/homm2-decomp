@@ -41,7 +41,7 @@ public:
         H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 fillColor
     );
-    __declspec(dllexport) virtual inline ~iconWidget() OVERRIDE;
+    virtual inline ~iconWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);

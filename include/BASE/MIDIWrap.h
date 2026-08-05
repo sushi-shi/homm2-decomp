@@ -9,7 +9,7 @@ class MIDIWrap : public resource {
 public:
     char* m_data;
     MIDIWrap(char*);
-    __declspec(dllexport) virtual inline ~MIDIWrap() OVERRIDE;
+    virtual inline ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(MIDIWrap, 0x14);

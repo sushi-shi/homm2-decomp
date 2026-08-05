@@ -21,7 +21,7 @@ public:
     i8* m_data;
     palette(void);
     palette(u32l id);
-    __declspec(dllexport) virtual inline ~palette();
+    virtual inline ~palette();
     i8* Data(void);
 };
 #pragma pack(pop)
