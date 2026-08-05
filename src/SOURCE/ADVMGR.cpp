@@ -962,6 +962,10 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
+// The route-overlay byte at (column, row), read through this->m_visibilityMap.
+// Same grouping rule as MAP_EXTRA_AT in <SOURCE/KB.h>: retail adds the base and
+// the column term as a unit, so `column` splices unparenthesised on purpose.
+#define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
 static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
@@ -3405,8 +3409,8 @@ void advManager::DrawCell(
                         0
                     );
                 }
-            } else if (m_visibilityMapValid && *(m_visibilityMap + mapX + mapY * MAP_WIDTH) != 0) {
-                if ((*(m_visibilityMap + mapX + mapY * MAP_WIDTH)
+            } else if (m_visibilityMapValid && ADVMGR_VISIBILITY_AT(mapX, mapY) != 0) {
+                if ((ADVMGR_VISIBILITY_AT(mapX, mapY)
                      & ROUTE_BEYOND_MOBILITY_FLAG)
                     != 0) {
                     IconToBitmapColorTable(
@@ -3414,7 +3418,7 @@ void advManager::DrawCell(
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
-                        (*(m_visibilityMap + mapX + mapY * MAP_WIDTH) - 1) & ROUTE_FRAME_MASK,
+                        (ADVMGR_VISIBILITY_AT(mapX, mapY) - 1) & ROUTE_FRAME_MASK,
                         ICON_DRAW_CLIP,
                         0,
                         0,
@@ -3430,7 +3434,7 @@ void advManager::DrawCell(
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
-                        (*(m_visibilityMap + mapX + mapY * MAP_WIDTH) - 1) & ROUTE_FRAME_MASK,
+                        (ADVMGR_VISIBILITY_AT(mapX, mapY) - 1) & ROUTE_FRAME_MASK,
                         ICON_DRAW_CLIP,
                         0,
                         0,
@@ -7625,10 +7629,10 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     || tileY > MAP_HEIGHT - COMBO_FAR_NEIGHBOR_OFFSET) {
                     continue;
                 }
-                if (*(m_visibilityMap + tileX + tileY * MAP_WIDTH) != 0) {
+                if (ADVMGR_VISIBILITY_AT(tileX, tileY) != 0) {
                     ++bComboDraw[drawX][drawY + 1];
                 }
-                if (*(m_visibilityMap + tileX + (tileY - 1) * MAP_WIDTH) != 0) {
+                if (ADVMGR_VISIBILITY_AT(tileX, tileY - 1) != 0) {
                     ++bComboDraw[drawX][drawY - 1];
                 }
             }
