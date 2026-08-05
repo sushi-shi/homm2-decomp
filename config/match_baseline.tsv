@@ -6,7 +6,7 @@ BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	5561b56c68f0
 BASE/AudiereEffects	?AudiereSamplePlaying@@YI_NPAVsample@@@Z	100.0000	5ae38b433ee8
 BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	71e05d7fe65d
 BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	64f87f82c508
-BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	4.1304	9733ba51555a
+BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	100.0000	17ca3c1d5aa1
 BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	af9a47dcc636
 BASE/AudiereEffects	?PurgeFinishedAudiereSamples@@YIXXZ	100.0000	96434c35e788
 BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	100.0000	c5bce4cf8033
@@ -226,7 +226,7 @@ BASE/Midi	?MIDISetVolume@@YIXAAH@Z	93.4694	79202ccca2c0
 BASE/Midi	?MIDIShutdown@@YIXXZ	100.0000	58e21c77d0a8
 BASE/Midi	?MIDIStartup@@YI_NXZ	100.0000	31e5699efee0
 BASE/Midi	?MIDIStop@@YIXAAH@Z	100.0000	b292663e2d17
-BASE/MilesSound	?AdjustMilesSampleVolumes@@YIXXZ	73.7879	44d0ee3c92f5
+BASE/MilesSound	?AdjustMilesSampleVolumes@@YIXXZ	100.0000	d6bb613fe7f6
 BASE/MilesSound	?AllocateMilesSampleHandles@@YIXPAU_DIG_DRIVER@@@Z	100.0000	7a5fefc5eaf6
 BASE/MilesSound	?MilesSamplePlaying@@YI_NPAVsample@@@Z	100.0000	4105daab0413
 BASE/MilesSound	?PlayMilesSample@@YIXPAVsample@@@Z	100.0000	d9ce63086313

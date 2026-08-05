@@ -47,14 +47,11 @@ void PurgeFinishedAudiereSamples(void) {
 
 VA(0x004cc8b0, 0x3a)
 AudiereSampleNode* FindAudiereSample(class sample* sampleResource) {
-    AudiereSampleNode* node = gAudiereSampleList;
-    for (;;) {
-        if (node == NULL)
-            return NULL;
+    for (AudiereSampleNode* node = gAudiereSampleList; node != NULL; node = node->next) {
         if (node->sampleResource == sampleResource)
             return node;
-        node = node->next;
     }
+    return NULL;
 }
 
 VA(0x004cc8f0, 0x39c)

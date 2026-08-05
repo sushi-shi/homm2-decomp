@@ -188,10 +188,11 @@ VA(0x004cdfd0, 0x6d)
 void AdjustMilesSampleVolumes(void) {
     for (i32 index = 1; index < gMilesSampleHandleCount; ++index) {
         struct _SAMPLE* sampleHandle = gMilesSampleHandles[index];
-        if (gConfig.soundVolume == CONFIG_VOLUME_MUTED) {
+        if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
+            if (AIL_sample_status(sampleHandle) == MILES_SAMPLE_STATUS_PLAYING)
+                SetMilesSampleHandleVolume(sampleHandle, gMilesSampleVolumes[index]);
+        } else {
             SetMilesSampleHandleVolume(sampleHandle, 0);
-        } else if (AIL_sample_status(sampleHandle) == MILES_SAMPLE_STATUS_PLAYING) {
-            SetMilesSampleHandleVolume(sampleHandle, gMilesSampleVolumes[index]);
         }
     }
 }
