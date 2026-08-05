@@ -9,8 +9,8 @@ appendix; it is not the matching priority.
 
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
-  has 1,161/1,514 functions live exact and, after this investigation,
-  1,339/1,514 functions exact-max.
+  has 1,160/1,514 functions live exact and, after this investigation,
+  1,340/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -39,6 +39,9 @@ appendix; it is not the matching priority.
 - `FadeToColorTable` closes cleanly with the 2.1 indexed palette loop and
   nested screen-coordinate loops; the earlier pointer/countdown rewrite had
   preserved behavior but lost the original register and expression ownership.
+- `FadeIn` needs both phases: the 2.1 counted loop plus forced-last-level tail
+  raises clean output to 99.3827%, and a reproducible declaration-forest island
+  closes it at audited 100% with the complete relocation stream.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must

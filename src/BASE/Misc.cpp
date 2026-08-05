@@ -651,41 +651,40 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
+    i32 done;
+    i32 level;
+    i32 i;
+    i32 delayUntil;
+    i32 threshold;
     palette* fadePalette = new palette;
     if (fadePalette == NULL)
         MemError();
-    i32 done = 0;
+    done = 0;
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    i32 level = 0;
-    for (;;) {
-        if (level >= MISC_PALETTE_LEVEL_COUNT) {
-            if (done) {
-                delete fadePalette;
-                return;
-            }
-            level = MISC_PALETTE_MAX_LEVEL;
-        }
-        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
+    for (level = 0; level < MISC_PALETTE_LEVEL_COUNT; level += increment) {
+    fadeStep:
+        delayUntil = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        i8* colors;
         if (level == MISC_PALETTE_MAX_LEVEL) {
             done = 1;
-            colors = gpBufferPalette->m_data;
+            UpdatePalette(gpBufferPalette->m_data);
         } else {
-            i32 threshold = MISC_PALETTE_MAX_LEVEL - level;
-            for (i32 i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
-                i8 color = gpBufferPalette->m_data[i];
-                if (color > threshold)
-                    fadePalette->m_data[i] = color - threshold;
+            threshold = MISC_PALETTE_MAX_LEVEL - level;
+            for (i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
+                if (gpBufferPalette->m_data[i] > threshold)
+                    fadePalette->m_data[i] = gpBufferPalette->m_data[i] - threshold;
             }
-            colors = fadePalette->m_data;
+            UpdatePalette(fadePalette->m_data);
         }
-        UpdatePalette(colors);
         DelayTil(&delayUntil);
-        level += increment;
     }
+    if (done == 0) {
+        level = MISC_PALETTE_MAX_LEVEL;
+        goto fadeStep;
+    }
+    delete fadePalette;
 }
 
 VA(0x004c46d0, 0xe6)
