@@ -1,0 +1,12 @@
+LIBRARY smackw32.DLL
+EXPORTS
+    _SmackSoundUseDirectSound@4 @38 NONAME
+    _SmackSoundUseMSS@4 @33 NONAME
+    _SmackNextFrame@4 @21 NONAME
+    _SmackToBufferRect@8 @28 NONAME
+    _SmackDoFrame@4 @19 NONAME
+    _SmackToBuffer@28 @23 NONAME
+    _SmackClose@4 @18 NONAME
+    _SmackOpen@12 @14 NONAME
+    _SmackWait@4 @32 NONAME
+    _SmackSummary@8 @20 NONAME

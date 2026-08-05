@@ -67,15 +67,51 @@ def main():
                         "--unit $unit --base $base --target $in --output $out "
                         "--symbols build/gen/symbol_names.csv"),
                description="normalize-relocs $unit")
-        w.rule("link_exe",
+        w.rule("prepare_link",
                command=(f"{PY} -m homm2.build.link_exe --out $exe "
                         "--order build/link/objects.rsp "
                         "--resource build/link/HEROES2W.res "
                         "--imports build/link/vendor-imports-smack.lib "
                         "--imports build/link/vendor-imports-mss.lib "
                         "--imports build/link/vendor-imports-wing.lib "
-                        "--imports build/link/system-imports-advapi.lib"),
-               description="link HEROES2W.EXE")
+                        "--imports build/link/system-imports-advapi.lib "
+                        "--base-archive build/link/basewin.lib "
+                        "--vendor-force-profile base-archive "
+                        "--runtime-order-profile oldnames-libcmt "
+                        "--prepare-response $out"),
+               description="prepare LINK response")
+        w.rule("prepare_base_archive",
+               command=(f"{PY} -m homm2.build.link_exe --out $exe "
+                        "--order build/link/objects.rsp "
+                        "--resource build/link/HEROES2W.res "
+                        "--imports build/link/vendor-imports-smack.lib "
+                        "--imports build/link/vendor-imports-mss.lib "
+                        "--imports build/link/vendor-imports-wing.lib "
+                        "--imports build/link/system-imports-advapi.lib "
+                        "--base-archive build/link/basewin.lib "
+                        "--prepare-base-archive-response $out"),
+               description="prepare LIB response")
+        w.rule("lib_exe",
+               command=('wine "$$MSVC_DIR/bin/LIB.EXE" @build/link/basewin.rsp '
+                        '> build/link/basewin.lib.log 2>&1'),
+               description="LIB.EXE @basewin.rsp")
+        w.rule("link_exe",
+               command=('wine "$$HOMM2_LINK_EXE" @build/link/HEROES2W.rsp '
+                        '> build/link/HEROES2W.link.log 2>&1'),
+               description="LINK.EXE @HEROES2W.rsp")
+        w.rule("link_audit",
+               command=(f"{PY} -m homm2.build.link_exe --out build/link/HEROES2W.EXE "
+                        "--order build/link/objects.rsp "
+                        "--resource build/link/HEROES2W.res "
+                        "--imports build/link/vendor-imports-smack.lib "
+                        "--imports build/link/vendor-imports-mss.lib "
+                        "--imports build/link/vendor-imports-wing.lib "
+                        "--imports build/link/system-imports-advapi.lib "
+                        "--base-archive build/link/basewin.lib "
+                        "--vendor-force-profile base-archive "
+                        "--runtime-order-profile oldnames-libcmt "
+                        "--audit-existing"),
+               description="audit linked HEROES2W.EXE")
         w.rule("link_order",
                command=f"{PY} -m homm2.build.link_exe --write-order $out",
                description="link-order objects.rsp")
@@ -150,17 +186,24 @@ def main():
         import_outputs = ["build/link/vendor-imports-mss.lib",
                           "build/link/vendor-imports-smack.lib",
                           "build/link/vendor-imports-wing.lib",
-                          "build/link/system-imports-advapi.lib"]
+                          "build/link/system-imports-advapi.lib",
+                          "build/link/system-imports-kernel32.lib",
+                          "build/link/system-imports-user32.lib",
+                          "build/link/system-imports-gdi32.lib",
+                          "build/link/system-imports-wsock32.lib",
+                          "build/link/system-imports-netapi32.lib",
+                          "build/link/system-imports-winmm.lib"]
         w.build(import_outputs, "link_imports",
-                inputs="scripts/homm2/build/gen_vendor_imports.py")
+                inputs=["scripts/homm2/build/gen_vendor_imports.py",
+                        "imports/pol/mss32.def", "imports/pol/smackw32.def",
+                        "imports/pol/wing32.def", "imports/pol/advapi32.def",
+                        "imports/pol/system-imports.tsv"])
         resource_output = "build/link/HEROES2W.res"
         w.build([resource_output, "build/link/HEROES2W.resources.json"], "link_resources",
                 inputs=["build/orig/HEROES2W.EXE",
                         "scripts/homm2/build/extract_resources.py"])
-        link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
-                        "build/link/HEROES2W.link.json",
-                        "build/link/HEROES2W.missing-data.tsv"]
-        w.build(link_outputs, "link_exe",
+        base_archive_response = "build/link/basewin.rsp"
+        w.build(base_archive_response, "prepare_base_archive",
                 inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
                 implicit=objs + ["build/orig/HEROES2W.EXE",
                                  "config/required_initialized_storage.tsv",
@@ -168,12 +211,32 @@ def main():
                                  "scripts/homm2/build/retopologize_data.py",
                                  "scripts/homm2/build/link_exe.py"],
                 variables={"exe": "build/link/HEROES2W.EXE"})
-        w.build("link", "phony", inputs="build/link/HEROES2W.EXE")
+        base_archive_outputs = ["build/link/basewin.lib",
+                                "build/link/basewin.lib.log"]
+        w.build(base_archive_outputs, "lib_exe", inputs=base_archive_response)
+        response_output = "build/link/HEROES2W.rsp"
+        w.build(response_output, "prepare_link",
+                inputs=["build/link/objects.rsp", "build/link/basewin.lib"]
+                + import_outputs + [resource_output],
+                implicit=objs + ["build/orig/HEROES2W.EXE",
+                                 "config/required_initialized_storage.tsv",
+                                 "scripts/homm2/build/build_libcmt_gfy.py",
+                                 "scripts/homm2/build/retopologize_data.py",
+                                 "scripts/homm2/build/link_exe.py"],
+                variables={"exe": "build/link/HEROES2W.EXE"})
+        native_link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
+                               "build/link/HEROES2W.link.log"]
+        w.build(native_link_outputs, "link_exe", inputs=response_output)
+        audit_outputs = ["build/link/HEROES2W.link.json",
+                         "build/link/HEROES2W.missing-data.tsv"]
+        w.build(audit_outputs, "link_audit", inputs=native_link_outputs,
+                implicit=[response_output, "config/required_initialized_storage.tsv",
+                          "scripts/homm2/build/link_exe.py"])
+        w.build("link", "phony", inputs=audit_outputs)
         w.build("link-order", "phony", inputs="build/link/objects.rsp")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)
-        w.build("link-map", "phony",
-                inputs=["build/link/HEROES2W.map", "build/link/HEROES2W.link.json"])
+        w.build("link-map", "phony", inputs=audit_outputs)
         w.default("all")
 
     units_j = []

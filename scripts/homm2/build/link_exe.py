@@ -24,7 +24,11 @@ from homm2.build.extract_resources import read_pe_resources
 from homm2.build.build_libcmt_gfy import (
     archive_entries, build_library as build_gfy_libcmt, expected_retail_literals,
 )
-from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
+from homm2.build.gen_vendor_imports import (
+    ADVAPI_IMPORTS, LINK300_FORCED_VENDOR_IMPORTS, LINK300_FORCE_MSS_IMPORTS,
+    LINK300_FORCE_SMACK_IMPORTS, MSS_IMPORTS, SMACK_IMPORTS, SYSTEM_DLLS,
+    WING_IMPORTS, system_import_specs,
+)
 from homm2.build.retopologize_data import (
     RetailDataTopology,
     rewrite_coff_data_topology,
@@ -71,6 +75,12 @@ RETAIL_LINK_FLAGS = (
     "/INCREMENTAL:NO",
     "/OPT:NOREF",
 )
+LINK_FLAG_PROFILES = {
+    "retail": RETAIL_LINK_FLAGS,
+    "nodefaultlib": RETAIL_LINK_FLAGS + ("/NODEFAULTLIB",),
+    "default-align": tuple(flag for flag in RETAIL_LINK_FLAGS
+                           if not flag.startswith("/ALIGN:")),
+}
 SYSTEM_LIBS_BEFORE_VENDOR = (
     "KERNEL32.LIB",
     "USER32.LIB",
@@ -82,24 +92,137 @@ SYSTEM_LIBS_AFTER_VENDOR = (
     "WINMM.LIB",
     "ADVAPI32.LIB",
 )
+GENERATED_SYSTEM_IMPORTS = {
+    "KERNEL32.LIB": "system-imports-kernel32.lib",
+    "USER32.LIB": "system-imports-user32.lib",
+    "GDI32.LIB": "system-imports-gdi32.lib",
+    "WSOCK32.LIB": "system-imports-wsock32.lib",
+    "NETAPI32.LIB": "system-imports-netapi32.lib",
+    "WINMM.LIB": "system-imports-winmm.lib",
+    "ADVAPI32.LIB": "system-imports-advapi.lib",
+}
+INPUT_PROFILES = {
+    "retail-projected": {
+        "project_game_objects": True,
+        "project_runtime_archive": True,
+    },
+    "raw-objects": {
+        "project_game_objects": False,
+        "project_runtime_archive": True,
+    },
+    "raw-crt": {
+        "project_game_objects": True,
+        "project_runtime_archive": False,
+    },
+    "raw": {
+        "project_game_objects": False,
+        "project_runtime_archive": False,
+    },
+}
+WING_RETAIL_IMPORT_ORDER = tuple(symbol for symbol, _hint, _lookup in WING_IMPORTS)
+
+
+def forced_retail_import_order(symbols):
+    """Invert LINK 3.00's rotate-left(reverse(roots)) member ordering."""
+    symbols = tuple(symbols)
+    return tuple(reversed(symbols[:-1])) + symbols[-1:]
+
+
+SYSTEM_IMPORT_SPECS = system_import_specs()
+LINK300_FORCE_SYSTEM_IMPORTS = tuple(
+    symbol
+    for dll in SYSTEM_DLLS
+    for symbol in forced_retail_import_order(
+        spec.symbol for spec in SYSTEM_IMPORT_SPECS if spec.dll == dll)
+)
+VENDOR_FORCE_PROFILES = {
+    "direct-objects": LINK300_FORCED_VENDOR_IMPORTS,
+    "wing-retail": WING_RETAIL_IMPORT_ORDER + LINK300_FORCED_VENDOR_IMPORTS[6:],
+    "wing-retail-reverse": tuple(reversed(WING_RETAIL_IMPORT_ORDER))
+    + LINK300_FORCED_VENDOR_IMPORTS[6:],
+    "wing-createdc": ("_WinGCreateDC@0",),
+    "wing-createdc-bitmap": ("_WinGCreateDC@0", "_WinGCreateBitmap@12"),
+    "wing-bitmap-createdc": ("_WinGCreateBitmap@12", "_WinGCreateDC@0"),
+    "wing-createdc-vendor": (
+        ("_WinGCreateDC@0",) + LINK300_FORCE_SMACK_IMPORTS + LINK300_FORCE_MSS_IMPORTS),
+    "wing-createdc-bitmap-vendor": (
+        ("_WinGCreateDC@0", "_WinGCreateBitmap@12")
+        + LINK300_FORCE_SMACK_IMPORTS + LINK300_FORCE_MSS_IMPORTS),
+    # With a BASE archive, LINK 3.00 emits these forced WinG members as a
+    # one-place rotation of their reverse.  This sequence yields retail IAT order.
+    "base-archive": (
+        ("_WinGStretchBlt@40", "_WinGSetDIBColorTable@16",
+         "_WinGRecommendDIBFormat@4", "_WinGCreateBitmap@12",
+         "_WinGCreateDC@0", "_WinGBitBlt@32")
+        + LINK300_FORCE_SMACK_IMPORTS + LINK300_FORCE_MSS_IMPORTS),
+    "base-archive-system": (
+        ("_WinGStretchBlt@40", "_WinGSetDIBColorTable@16",
+         "_WinGRecommendDIBFormat@4", "_WinGCreateBitmap@12",
+         "_WinGCreateDC@0", "_WinGBitBlt@32")
+        + LINK300_FORCE_SMACK_IMPORTS + LINK300_FORCE_MSS_IMPORTS
+        + LINK300_FORCE_SYSTEM_IMPORTS),
+    "none": (),
+}
 
 
 def build_link_command(link_exe, map_path, output, object_paths, import_libraries,
-                       resource_path, definition_path=None):
+                       resource_path, definition_path=None,
+                       system_libraries_before_vendor=SYSTEM_LIBS_BEFORE_VENDOR,
+                       system_libraries_after_vendor=SYSTEM_LIBS_AFTER_VENDOR,
+                       runtime_libraries=(),
+                       forced_vendor_imports=LINK300_FORCED_VENDOR_IMPORTS,
+                       ordered_inputs=None, link_flags=RETAIL_LINK_FLAGS):
     """Compose the proven LINK 3.00 input and forced-import order."""
     command = [
-        "wine", str(link_exe), *RETAIL_LINK_FLAGS,
-        *("/INCLUDE:" + symbol for symbol in LINK300_FORCED_VENDOR_IMPORTS),
+        "wine", str(link_exe), *link_flags,
+        *("/INCLUDE:" + symbol for symbol in forced_vendor_imports),
         "/MAP:" + str(map_path),
         "/OUT:" + str(output),
-        *SYSTEM_LIBS_BEFORE_VENDOR,
-        *map(str, import_libraries),
-        *SYSTEM_LIBS_AFTER_VENDOR,
-        *map(str, object_paths),
+        *(map(str, ordered_inputs) if ordered_inputs is not None else (
+            *map(str, system_libraries_before_vendor),
+            *map(str, import_libraries),
+            *map(str, system_libraries_after_vendor),
+            *map(str, object_paths),
+            *map(str, runtime_libraries),
+        )),
         *(["/DEF:" + str(definition_path)] if definition_path else []),
         str(resource_path),
     ]
     return command
+
+
+def write_link_response(path, command):
+    """Write the arguments of a prepared LINK command as a response file."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    arguments = list(command)
+    if len(arguments) >= 2 and Path(arguments[0]).name.lower() == "wine":
+        arguments = arguments[2:]
+
+    def quote(argument):
+        argument = str(argument)
+        if not re.search(r'\s|"', argument):
+            return argument
+        return '"' + argument.replace('"', '\\"') + '"'
+
+    path.write_text("\n".join(quote(argument) for argument in arguments) + "\n",
+                    encoding="ascii")
+    return path
+
+
+def write_archive_response(path, library, object_paths):
+    """Write a VC4 LIB response while preserving the requested member order.
+
+    The period librarian prepends each input member.  Reversing the command-line
+    inputs makes the resulting archive scan in retail contribution order.
+    """
+    command = [
+        "/NOLOGO",
+        "/MACHINE:IX86",
+        "/OUT:" + winepath_w(library),
+        *reversed(winepaths_w(object_paths)),
+    ]
+    return write_link_response(path, command)
 
 
 def strip_coff_export_directives(source, destination):
@@ -269,6 +392,21 @@ def winepaths_w(paths):
     if len(output) != len(paths):
         raise RuntimeError("winepath returned %d paths for %d inputs" % (len(output), len(paths)))
     return output
+
+
+def wine_link_arguments(arguments):
+    """Convert Path inputs while preserving inline LINK switches."""
+    paths = list(dict.fromkeys(argument for argument in arguments
+                               if isinstance(argument, Path)))
+    converted = {}
+    external = []
+    for path in paths:
+        try:
+            converted[path] = str(path.resolve().relative_to(REPO)).replace("/", "\\")
+        except ValueError:
+            external.append(path)
+    converted.update(zip(external, winepaths_w(external)))
+    return [converted.get(argument, str(argument)) for argument in arguments]
 
 
 def read_nb09_module_contributions(path, executable_only=True):
@@ -1692,7 +1830,12 @@ def read_order_response(path):
 
 
 def run_link(output, order_response, imports_libraries, resource_path, linker_override=None,
-             required_initialized_path=None):
+             required_initialized_path=None, prepare_response=None, audit_existing=False,
+             input_profile="retail-projected", allow_mismatch=False,
+             prepare_base_archive_response=None, base_archive=None,
+             vendor_force_profile="direct-objects", link_layout_profile="libraries-first",
+             runtime_order_profile="libcmt-oldnames", link_flag_profile="retail",
+             system_import_profile="sdk"):
     output = Path(output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     report_path = output.with_suffix(".link.json")
@@ -1724,52 +1867,232 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     expected_objects = [row["object"].resolve() for row in order]
     if response_objects != expected_objects:
         raise RuntimeError("link-order response does not match current NB09 contribution order")
-    for stale in (output, map_path, missing_data_path):
-        stale.unlink(missing_ok=True)
-    original_libcmt = find_ci(toolchain / "lib", "LIBCMT.LIB")
-    if original_libcmt is None:
-        raise RuntimeError("LIBCMT.LIB is missing from the VC4.2 toolchain")
-    derived_crt_dir = output.parent / "crt"
-    derived_libcmt = derived_crt_dir / "LIBCMT.LIB"
-    fallback_runtime_library = build_gfy_libcmt(
-        original_libcmt, derived_libcmt,
-        derived_crt_dir / "LIBCMT.gfy.json")
+    if not audit_existing:
+        for stale in (output, map_path, missing_data_path, log_path):
+            stale.unlink(missing_ok=True)
     vc40_lib_dir = link_exe.parent.parent / "lib"
     vc40_libcmt = find_ci(vc40_lib_dir, "LIBCMT.LIB") if vc40_lib_dir.is_dir() else None
     if vc40_libcmt is None or hashlib.sha256(
             vc40_libcmt.read_bytes()).hexdigest() != PINNED_VC40_LIBCMT_SHA256:
         raise RuntimeError("pinned VC 4.0 LIBCMT.LIB is missing beside LINK.EXE")
-    ordered_crt_dir = output.parent / "crt-retail-order"
-    runtime_data_order = build_retail_runtime_data_library(
-        vc40_libcmt, ordered_crt_dir / "LIBCMT.LIB")
-    search_directories = [
-        ordered_crt_dir, vc40_lib_dir, derived_crt_dir, toolchain / "lib"]
+    try:
+        profile = INPUT_PROFILES[input_profile]
+    except KeyError:
+        raise ValueError("unknown final-link input profile: %s" % input_profile)
+    forced_vendor_imports = VENDOR_FORCE_PROFILES[vendor_force_profile]
+    link_flags = LINK_FLAG_PROFILES[link_flag_profile]
+    if profile["project_runtime_archive"]:
+        original_libcmt = find_ci(toolchain / "lib", "LIBCMT.LIB")
+        if original_libcmt is None:
+            raise RuntimeError("LIBCMT.LIB is missing from the VC4.2 toolchain")
+        derived_crt_dir = output.parent / "crt"
+        derived_libcmt = derived_crt_dir / "LIBCMT.LIB"
+        fallback_runtime_library = build_gfy_libcmt(
+            original_libcmt, derived_libcmt,
+            derived_crt_dir / "LIBCMT.gfy.json")
+        ordered_crt_dir = output.parent / "crt-retail-order"
+        runtime_data_order = build_retail_runtime_data_library(
+            vc40_libcmt, ordered_crt_dir / "LIBCMT.LIB")
+        search_directories = [
+            ordered_crt_dir, vc40_lib_dir, derived_crt_dir, toolchain / "lib"]
+        selected_runtime_library = ordered_crt_dir / "LIBCMT.LIB"
+    else:
+        fallback_runtime_library = None
+        runtime_data_order = {
+            "source": str(vc40_libcmt.resolve()),
+            "output": str(vc40_libcmt.resolve()),
+            "order_evidence": "unmodified pinned VC 4.0 archive",
+            "renamed_sections": 0,
+        }
+        search_directories = [vc40_lib_dir, toolchain / "lib"]
+        selected_runtime_library = vc40_libcmt
     library_path = ";".join(winepaths_w(search_directories))
-    data_topology = RetailDataTopology(
-        DATA_MANIFEST, DATA_SECTIONS, DATA_CONTRIBUTIONS, RETAIL_EXE)
-    link_objects, stripped_export_objects, rebuilt_writable_sections = final_link_objects(
-        response_objects, [row["unit"] for row in order],
-        output.parent / "objects-final", data_topology)
+
+    def resolve_library(name):
+        resolved = next(
+            (candidate for directory in search_directories
+             if (candidate := find_ci(directory, name)) is not None), None)
+        if resolved is None:
+            raise RuntimeError("required link library is missing: %s" % name)
+        return resolved
+
+    middleware_import_libraries = [
+        path for path in imports_libraries
+        if path.name.lower().startswith("vendor-imports-")]
+    generated_imports = {path.name.lower(): path for path in imports_libraries
+                         if path.name.lower().startswith("system-imports-")}
+    custom_advapi = generated_imports.get("system-imports-advapi.lib")
+    if custom_advapi is None:
+        raise RuntimeError("generated ADVAPI import library is missing")
+    if system_import_profile == "retail-generated":
+        missing_generated = [
+            archive for archive in GENERATED_SYSTEM_IMPORTS.values()
+            if archive.lower() not in generated_imports]
+        if missing_generated:
+            raise RuntimeError("generated system import libraries are missing: %s" %
+                               ", ".join(missing_generated))
+        selected_system = {
+            library: generated_imports[archive.lower()]
+            for library, archive in GENERATED_SYSTEM_IMPORTS.items()}
+    elif system_import_profile == "sdk":
+        selected_system = {
+            library: (custom_advapi if library == "ADVAPI32.LIB"
+                      else resolve_library(library))
+            for library in (*SYSTEM_LIBS_BEFORE_VENDOR, *SYSTEM_LIBS_AFTER_VENDOR)}
+    else:
+        raise ValueError("unknown system import profile: %s" % system_import_profile)
+    system_libraries_before_vendor = [
+        selected_system[name] for name in SYSTEM_LIBS_BEFORE_VENDOR]
+    system_libraries_after_vendor = [
+        selected_system[name] for name in SYSTEM_LIBS_AFTER_VENDOR]
+    oldnames_library = resolve_library("OLDNAMES.LIB")
+    if runtime_order_profile == "libcmt-oldnames":
+        runtime_libraries = [selected_runtime_library, oldnames_library]
+    elif runtime_order_profile == "oldnames-libcmt":
+        runtime_libraries = [oldnames_library, selected_runtime_library]
+    else:
+        raise ValueError("unknown runtime order profile: %s" % runtime_order_profile)
+    if profile["project_game_objects"]:
+        data_topology = RetailDataTopology(
+            DATA_MANIFEST, DATA_SECTIONS, DATA_CONTRIBUTIONS, RETAIL_EXE)
+        link_objects, stripped_export_objects, rebuilt_writable_sections = final_link_objects(
+            response_objects, [row["unit"] for row in order],
+            output.parent / "objects-final", data_topology)
+    else:
+        link_objects = response_objects
+        stripped_export_objects = 0
+        rebuilt_writable_sections = 0
+    base_object_indices = [
+        index for index, row in enumerate(order) if row["unit"].startswith("BASE/")]
+    if base_object_indices != list(range(base_object_indices[0], len(order))):
+        raise RuntimeError("retail BASE contributions are not one contiguous archive suffix")
+    if prepare_base_archive_response:
+        if base_archive is None:
+            raise ValueError("--prepare-base-archive-response requires --base-archive")
+        # LIB.EXE updates an existing archive.  This archive is a disposable
+        # projection, so always rebuild it from exactly the current member set.
+        Path(base_archive).unlink(missing_ok=True)
+        response_path = write_archive_response(
+            prepare_base_archive_response, base_archive,
+            [link_objects[index] for index in base_object_indices])
+        print("base archive response: %d members -> %s" %
+              (len(base_object_indices), response_path))
+        return 0
+    actual_link_inputs = list(link_objects)
+    if base_archive is not None:
+        base_archive = Path(base_archive).resolve()
+        if not base_archive.exists():
+            raise RuntimeError("prepared BASE archive missing: %s" % base_archive)
+        first_base = base_object_indices[0]
+        actual_link_inputs = link_objects[:first_base] + [base_archive]
+    ordered_inputs = None
+    if link_layout_profile in ("interleaved-imports", "grouped-imports"):
+        if system_import_profile != "retail-generated":
+            raise ValueError("grouped import layouts require retail-generated system imports")
+        vendor_by_name = {path.name.lower(): path for path in imports_libraries}
+        import_groups = [
+            *( (selected_system[dll.removesuffix(".dll").upper() + ".LIB"],
+                [spec.symbol for spec in SYSTEM_IMPORT_SPECS if spec.dll == dll])
+               for dll in SYSTEM_DLLS[:4]),
+            (vendor_by_name["vendor-imports-smack.lib"],
+             [symbol for symbol, _ordinal in SMACK_IMPORTS]),
+            (vendor_by_name["vendor-imports-mss.lib"],
+             [symbol for symbol, _hint in MSS_IMPORTS]),
+            (vendor_by_name["vendor-imports-wing.lib"],
+             [symbol for symbol, _hint, _lookup in WING_IMPORTS]),
+            (selected_system["NETAPI32.LIB"],
+             [spec.symbol for spec in SYSTEM_IMPORT_SPECS
+              if spec.dll == "NETAPI32.dll"]),
+            (selected_system["WINMM.LIB"],
+             [spec.symbol for spec in SYSTEM_IMPORT_SPECS if spec.dll == "WINMM.dll"]),
+            (selected_system["ADVAPI32.LIB"],
+             [symbol for symbol, _hint, _lookup in ADVAPI_IMPORTS]),
+        ]
+        ordered_inputs = []
+        for library, symbols in import_groups:
+            ordered_inputs.extend("/INCLUDE:" + symbol for symbol in symbols)
+            if link_layout_profile == "interleaved-imports":
+                expanded = []
+                for option in ordered_inputs[-len(symbols):]:
+                    expanded.extend((option, library))
+                del ordered_inputs[-len(symbols):]
+                ordered_inputs.extend(expanded)
+            else:
+                ordered_inputs.append(library)
+        ordered_inputs.extend(actual_link_inputs + runtime_libraries)
+    elif link_layout_profile == "buka-double-libs":
+        if base_archive is None:
+            raise ValueError("buka-double-libs requires --base-archive")
+        vendor_by_name = {
+            path.name.lower(): path for path in imports_libraries
+        }
+        required_vendor_names = (
+            "vendor-imports-wing.lib", "vendor-imports-mss.lib",
+            "vendor-imports-smack.lib", "system-imports-advapi.lib")
+        missing_vendor_names = [
+            name for name in required_vendor_names if name not in vendor_by_name]
+        if missing_vendor_names:
+            raise RuntimeError("buka link layout is missing: %s" %
+                               ", ".join(missing_vendor_names))
+        repeated_libraries = [
+            *(selected_system[name] for name in
+              ("KERNEL32.LIB", "USER32.LIB", "GDI32.LIB", "WSOCK32.LIB")),
+            vendor_by_name["vendor-imports-wing.lib"],
+            selected_system["NETAPI32.LIB"],
+            vendor_by_name["vendor-imports-mss.lib"],
+            vendor_by_name["vendor-imports-smack.lib"],
+            selected_system["WINMM.LIB"],
+            selected_system["ADVAPI32.LIB"],
+        ]
+        ordered_inputs = (
+            actual_link_inputs[:-1] + repeated_libraries + actual_link_inputs[-1:]
+            + repeated_libraries + runtime_libraries)
+    elif link_layout_profile != "libraries-first":
+        raise ValueError("unknown link layout profile: %s" % link_layout_profile)
     definition_path = write_module_definition(output.parent / "HEROES2W.def")
     command = build_link_command(
         link_exe,
         winepath_w(map_path),
         winepath_w(output),
-        winepaths_w(link_objects),
-        winepaths_w(imports_libraries),
+        winepaths_w(actual_link_inputs),
+        winepaths_w(middleware_import_libraries),
         winepath_w(resource_path),
         winepath_w(definition_path),
+        winepaths_w(system_libraries_before_vendor),
+        winepaths_w(system_libraries_after_vendor),
+        winepaths_w(runtime_libraries),
+        forced_vendor_imports=forced_vendor_imports,
+        ordered_inputs=(wine_link_arguments(ordered_inputs)
+                        if ordered_inputs is not None else None),
+        link_flags=link_flags,
     )
-    run = subprocess.run(command, cwd=output.parent,
-                         env=link_environment(library_path, link_exe.parent), text=True,
-                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    log_path.write_text(run.stdout, encoding="utf-8")
+    if prepare_response:
+        response_path = write_link_response(prepare_response, command)
+        print("link response: %d arguments -> %s" % (len(command) - 2, response_path))
+        return 0
+    if audit_existing:
+        if not output.exists() or not map_path.exists() or not log_path.exists():
+            raise RuntimeError("prepared LINK outputs are incomplete; run the native link rule")
+        run = subprocess.CompletedProcess(
+            command, 0, stdout=log_path.read_text(encoding="utf-8"))
+    else:
+        # Prepared response paths are repository-relative so native LINK can be
+        # invoked directly from the build root.  Keep the convenience A/B path
+        # on the same working-directory contract.
+        run = subprocess.run(command, cwd=REPO,
+                             env=link_environment(library_path, link_exe.parent), text=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        log_path.write_text(run.stdout, encoding="utf-8")
 
     unresolved = parse_unresolved(run.stdout)
     retail = read_pe(RETAIL_EXE)
     candidate = read_pe(output) if output.exists() else None
     retail_imports = read_imports(RETAIL_EXE)
     candidate_imports = read_imports(output) if candidate else []
+    import_descriptor_order_match = (
+        [entry["dll"] for entry in candidate_imports] ==
+        [entry["dll"] for entry in retail_imports] if candidate else False)
+    complete_import_table_match = candidate_imports == retail_imports if candidate else False
     vendor_import_order_match = (vendor_imports(candidate_imports) == vendor_imports(retail_imports)
                                  if candidate else False)
     vendor_import_abi_match = (
@@ -1815,20 +2138,34 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                 candidate and candidate["linker_version"] == retail["linker_version"]),
         },
         "order_source": "NB09 sstModule executable contribution order",
-        "link_flags": list(RETAIL_LINK_FLAGS),
-        "forced_vendor_imports": list(LINK300_FORCED_VENDOR_IMPORTS),
+        "input_profile": input_profile,
+        "input_profile_features": profile,
+        "base_archive": str(base_archive) if base_archive is not None else None,
+        "link_layout_profile": link_layout_profile,
+        "runtime_order_profile": runtime_order_profile,
+        "system_import_profile": system_import_profile,
+        "link_flag_profile": link_flag_profile,
+        "link_flags": list(link_flags),
+        "vendor_force_profile": vendor_force_profile,
+        "forced_vendor_imports": list(forced_vendor_imports),
         "stripped_source_export_objects": stripped_export_objects,
         "retopologized_writable_sections": rebuilt_writable_sections,
         "runtime_data_order": runtime_data_order,
         "module_definition": str(definition_path),
         "link_input_order": {
-            "system_libraries_before_vendor": list(SYSTEM_LIBS_BEFORE_VENDOR),
-            "vendor_import_libraries": [str(path) for path in imports_libraries],
-            "system_libraries_after_vendor": list(SYSTEM_LIBS_AFTER_VENDOR),
-            "objects": [str(path) for path in response_objects],
+            "system_libraries_before_vendor": [
+                str(path) for path in system_libraries_before_vendor],
+            "vendor_import_libraries": [str(path) for path in middleware_import_libraries],
+            "system_libraries_after_vendor": [
+                str(path) for path in system_libraries_after_vendor],
+            "objects": [str(path) for path in actual_link_inputs],
+            "runtime_libraries": [str(path) for path in runtime_libraries],
             "resource": str(resource_path),
         },
-        "library_search": {"mechanism": "LIB environment", "path": library_path},
+        "library_search": {
+            "mechanism": "explicit archive paths; LIB fallback for legacy driver",
+            "path": library_path,
+        },
         "runtime_library": {
             "selected": runtime_data_order,
             "fallback_vc42_gfy": fallback_runtime_library,
@@ -1847,12 +2184,18 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         "imports": {
             "retail": retail_imports,
             "candidate": candidate_imports,
+            "descriptor_order_matches_retail": import_descriptor_order_match,
+            "complete_table_matches_retail": complete_import_table_match,
             "vendor_abi_matches_retail": vendor_import_abi_match,
             "vendor_iat_order_matches_retail": vendor_import_order_match,
             "advapi_abi_matches_retail": advapi_import_abi_match,
         },
         "units": [],
     }
+    if (run.returncode == 0 and candidate and vendor_import_abi_match and
+            vendor_import_order_match and advapi_import_abi_match and resource_match and
+            not import_descriptor_order_match):
+        report["status"] = "import-descriptor-order-mismatch"
     required_storage_ok = True
     if report["static_storage"]:
         report["static_storage"]["section_bytes"] = {
@@ -1900,7 +2243,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     if report["static_storage"]:
         write_missing_data_report(missing_data_path, report["static_storage"]["public_symbols"])
 
-    if run.stdout.strip():
+    if run.stdout.strip() and not audit_existing:
         print(run.stdout.rstrip())
     if candidate:
         missing_anchors = sum(1 for unit in report["units"] if unit["delta"] is None)
@@ -1967,15 +2310,6 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                   (violation["name"], violation["unit"], violation["status"],
                    violation["retail_storage_class"],
                    violation["candidate_storage_class"]))
-        for verified in required_storage["symbols"]:
-            if verified["status"] != "verified":
-                continue
-            payload = verified["retail_payload"]
-            print("link audit: required initialized storage OK %s: candidate normalized bytes "
-                  "and targets match; retail %d/%d nonzero bytes, %d HIGHLOW relocations, "
-                  "sha256 %s" %
-                  (verified["name"], payload["nonzero_byte_count"], payload["size"],
-                   payload["highlow_base_relocation_count"], payload["sha256"]))
         if public_summary["missing_root_cause_counts"]:
             print("link audit: missing public-data causes: %s" % ", ".join(
                 "%s=%d" % item
@@ -1997,6 +2331,9 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                "matches retail" if vendor_import_order_match else "differs"))
         print("link audit: ADVAPI import ABI %s" %
               ("matches retail" if advapi_import_abi_match else "DIFFERS FROM RETAIL"))
+        print("link audit: complete import descriptor order %s retail; full table %s" %
+              ("matches" if import_descriptor_order_match else "DIFFERS FROM",
+               "matches retail" if complete_import_table_match else "differs"))
         print("link audit: resources %s; %d leaves; .rsrc raw/virtual %d/%d, RVA delta %+d" %
               ("match retail" if resource_match else "DIFFER FROM RETAIL",
                len(resources["candidate"]),
@@ -2009,10 +2346,11 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                                                for key, value in unresolved["classes"].items())))
     print("link audit: %s" % report_path)
     print("link audit: %s" % missing_data_path)
-    return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
-            vendor_import_order_match and advapi_import_abi_match and resource_match and
-            required_storage_ok and runtime_literals_ok else
-            (run.returncode or 1))
+    passed = (run.returncode == 0 and output.exists() and vendor_import_abi_match and
+              vendor_import_order_match and advapi_import_abi_match and
+              import_descriptor_order_match and resource_match and
+              required_storage_ok and runtime_literals_ok)
+    return 0 if passed or allow_mismatch else (run.returncode or 1)
 
 
 def main(argv=None):
@@ -2022,6 +2360,36 @@ def main(argv=None):
     parser.add_argument("--imports", action="append")
     parser.add_argument("--resource", default=str(REPO / "build/link/HEROES2W.res"))
     parser.add_argument("--linker", help="alternate LINK.EXE for an isolated A/B link")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--prepare-response", metavar="PATH",
+                       help="prepare final-link inputs and write a complete LINK response file")
+    modes.add_argument("--audit-existing", action="store_true",
+                       help="audit an executable produced by the prepared native LINK rule")
+    modes.add_argument("--prepare-base-archive-response", metavar="PATH",
+                       help="prepare projected BASE members and write a LIB.EXE response")
+    parser.add_argument("--base-archive", metavar="PATH",
+                        help="replace the retail BASE object suffix with this native archive")
+    parser.add_argument("--vendor-force-profile", choices=tuple(VENDOR_FORCE_PROFILES),
+                        default="direct-objects",
+                        help="select the forced vendor-member extraction sequence")
+    parser.add_argument("--link-layout-profile",
+                        choices=("libraries-first", "buka-double-libs",
+                                 "interleaved-imports", "grouped-imports"),
+                        default="libraries-first",
+                        help="select the ordered LINK input structure")
+    parser.add_argument("--runtime-order-profile",
+                        choices=("libcmt-oldnames", "oldnames-libcmt"),
+                        default="libcmt-oldnames",
+                        help="select explicit runtime archive order")
+    parser.add_argument("--link-flag-profile", choices=tuple(LINK_FLAG_PROFILES),
+                        default="retail", help="select an evidence-backed LINK flag A/B")
+    parser.add_argument("--system-import-profile", choices=("sdk", "retail-generated"),
+                        default="sdk", help="select SDK or retail-manifest system imports")
+    parser.add_argument("--input-profile", choices=tuple(INPUT_PROFILES),
+                        default="retail-projected",
+                        help="independently select projected game objects and runtime archive")
+    parser.add_argument("--allow-mismatch", action="store_true",
+                        help="write diagnostics but do not fail for retail audit mismatches")
     parser.add_argument(
         "--required-initialized", default=str(REQUIRED_INITIALIZED_STORAGE),
         help="checked TSV enrollment of reviewed globals that must retain retail storage class")
@@ -2037,7 +2405,12 @@ def main(argv=None):
             str(REPO / "build/link/system-imports-advapi.lib"),
         ]
         return run_link(args.out, args.order, imports, args.resource, args.linker,
-                        args.required_initialized)
+                        args.required_initialized, args.prepare_response,
+                        args.audit_existing, args.input_profile, args.allow_mismatch,
+                        args.prepare_base_archive_response, args.base_archive,
+                        args.vendor_force_profile, args.link_layout_profile,
+                        args.runtime_order_profile, args.link_flag_profile,
+                        args.system_import_profile)
     except (OSError, ValueError, RuntimeError) as exc:
         return die(str(exc))
 

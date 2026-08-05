@@ -94,8 +94,11 @@ homm2 format --check           # verify header and enum formatting
 ```
 
 The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`
-(NB09 `sstModule` object order), `link-imports` (exact middleware import archive), `link`, and
-`link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
+(NB09 `sstModule` object order), `link-imports` (exact middleware import archives), a direct
+VC 4.2 `LIB.EXE` BASE-archive rule, a direct pinned `LINK.EXE` response rule, and `link-map`
+(PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics). The preparation
+boundary and measured link-order experiments are documented in
+[`docs/native-link-pipeline.md`](docs/native-link-pipeline.md).
 
 `homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
 `DATA`, `DATA_COMPGEN`, `DATA_COMPGEN_GUARD`, `VTBL`, or `VTBL2` identity, run

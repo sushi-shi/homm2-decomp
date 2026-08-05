@@ -3,20 +3,31 @@ import unittest
 
 from homm2.build.gen_vendor_imports import (
     ADVAPI_IMPORTS,
+    IMPORT_DEFINITIONS,
     LINK300_FORCED_VENDOR_IMPORTS,
     LINK300_FORCE_MSS_IMPORTS,
     LINK300_FORCE_SMACK_IMPORTS,
     LINK300_FORCE_WING_IMPORTS,
     MSS_IMPORTS,
     SMACK_IMPORTS,
+    SYSTEM_DLLS,
     WING_IMPORTS,
     _patch_linker_names,
     import_specs,
     parse_archive_members,
+    system_import_specs,
 )
 
 
 class VendorImportTests(unittest.TestCase):
+    def test_committed_definitions_cover_every_import(self):
+        for dll, path in IMPORT_DEFINITIONS.items():
+            lines = [line.strip() for line in path.read_text().splitlines()
+                     if line.strip() and not line.startswith("LIBRARY")
+                     and line.strip() != "EXPORTS"]
+            expected = [spec for spec in import_specs() if spec.dll == dll]
+            self.assertEqual(len(lines), len(expected), dll)
+
     def test_retail_import_inventory(self):
         self.assertEqual(len(MSS_IMPORTS), 33)
         self.assertEqual({ordinal for _, ordinal in SMACK_IMPORTS},
@@ -27,6 +38,10 @@ class VendorImportTests(unittest.TestCase):
             ["RegOpenKeyExA", "RegSetValueExA", "RegCreateKeyA",
              "RegQueryValueExA", "RegCloseKey"],
         )
+        system = system_import_specs()
+        self.assertEqual(len(system), 171)
+        self.assertEqual({spec.dll for spec in system}, set(SYSTEM_DLLS))
+        self.assertEqual(sum(spec.noname for spec in system), 15)
 
     def test_link300_force_order_covers_every_vendor_import_once(self):
         expected = ({symbol for symbol, _ in MSS_IMPORTS}

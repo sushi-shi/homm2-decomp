@@ -11,6 +11,7 @@ retail ABI before combining them with VC 4.2 LIB.EXE.
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 import shutil
 import struct
@@ -22,6 +23,19 @@ from pathlib import Path
 from homm2.build.cc_wrap import HOMM2_DIR, ensure_wineserver, find_ci, msvc_dir, winepath_w
 
 
+IMPORT_DEFINITIONS = {
+    "mss32.dll": HOMM2_DIR / "imports/pol/mss32.def",
+    "smackw32.DLL": HOMM2_DIR / "imports/pol/smackw32.def",
+    "WING32.dll": HOMM2_DIR / "imports/pol/wing32.def",
+    "ADVAPI32.dll": HOMM2_DIR / "imports/pol/advapi32.def",
+}
+SYSTEM_IMPORT_MANIFEST = HOMM2_DIR / "imports/pol/system-imports.tsv"
+SYSTEM_DLLS = (
+    "KERNEL32.dll", "USER32.dll", "GDI32.dll",
+    "WSOCK32.dll", "NETAPI32.dll", "WINMM.dll",
+)
+
+
 @dataclass(frozen=True)
 class ImportSpec:
     dll: str
@@ -29,6 +43,19 @@ class ImportSpec:
     ordinal_or_hint: int
     noname: bool = False
     lookup_name: str | None = None
+
+
+def system_import_specs(path: Path = SYSTEM_IMPORT_MANIFEST) -> tuple[ImportSpec, ...]:
+    with path.open(newline="") as stream:
+        rows = list(csv.DictReader(stream, delimiter="\t"))
+    specs = tuple(ImportSpec(
+        row["dll"], row["symbol"], int(row["ordinal_or_hint"]),
+        noname=row["noname"] == "1", lookup_name=row["lookup_name"] or None)
+        for row in rows)
+    unknown = sorted({spec.dll for spec in specs} - set(SYSTEM_DLLS))
+    if unknown:
+        raise ValueError(f"unknown system import DLLs: {unknown}")
+    return specs
 
 
 # Preserve retail IAT order and hint values.  Hints are advisory to the loader,
@@ -148,6 +175,7 @@ def import_specs() -> tuple[ImportSpec, ...]:
         ImportSpec("ADVAPI32.dll", symbol, hint, lookup_name=lookup)
         for symbol, hint, lookup in ADVAPI_IMPORTS
     )
+    specs.extend(system_import_specs())
     return tuple(specs)
 
 
@@ -409,14 +437,6 @@ def patch_import_archive(archive: bytes, specs: tuple[ImportSpec, ...]) -> bytes
     return bytes(data)
 
 
-def _write_def(path: Path, dll: str, specs: tuple[ImportSpec, ...]) -> None:
-    lines = [f"LIBRARY {dll}", "EXPORTS"]
-    for spec in specs:
-        suffix = f" @{spec.ordinal_or_hint} NONAME" if spec.noname else ""
-        lines.append(f"    {spec.symbol}{suffix}")
-    path.write_text("\n".join(lines) + "\n", encoding="ascii")
-
-
 def _run_lib(lib_exe: Path, args: list[str]) -> None:
     subprocess.run(["wine", str(lib_exe), "/NOLOGO", *args], check=True)
 
@@ -435,29 +455,45 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, ...]:
     out_dir = out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     specs = import_specs()
+    dll_order = (
+        "mss32.dll", "smackw32.DLL", "WING32.dll", "ADVAPI32.dll",
+        *SYSTEM_DLLS,
+    )
     by_dll = {dll: tuple(spec for spec in specs if spec.dll == dll)
-              for dll in ("mss32.dll", "smackw32.DLL", "WING32.dll", "ADVAPI32.dll")}
+              for dll in dll_order}
+    output_names = {
+        "mss32.dll": "vendor-imports-mss.lib",
+        "smackw32.DLL": "vendor-imports-smack.lib",
+        "WING32.dll": "vendor-imports-wing.lib",
+        "ADVAPI32.dll": "system-imports-advapi.lib",
+        **{dll: "system-imports-%s.lib" % dll.removesuffix(".dll").lower()
+           for dll in SYSTEM_DLLS},
+    }
 
     with tempfile.TemporaryDirectory(prefix="homm2-vendor-imports-") as temp_name:
         temp = Path(temp_name)
         outputs = []
         for dll_index, (dll, dll_specs) in enumerate(by_dll.items()):
             stem = f"vendor-{dll_index}"
-            def_path = temp / f"{stem}.def"
+            def_path = IMPORT_DEFINITIONS.get(dll)
+            if def_path is None:
+                def_path = temp / f"{stem}.def"
+                lines = [f"LIBRARY {dll}", "EXPORTS"]
+                lines.extend(
+                    "    %s%s" % (
+                        spec.symbol,
+                        f" @{spec.ordinal_or_hint} NONAME" if spec.noname else "")
+                    for spec in dll_specs)
+                def_path.write_text("\n".join(lines) + "\n", encoding="ascii")
+            if not def_path.is_file():
+                raise RuntimeError(f"import definition is missing: {def_path}")
             lib_path = temp / f"{stem}.lib"
-            _write_def(def_path, dll, dll_specs)
             _run_lib(
                 lib_exe,
                 ["/MACHINE:IX86", f"/DEF:{winepath_w(def_path)}",
                  f"/OUT:{winepath_w(lib_path)}"],
             )
-            output_name = (
-                "vendor-imports-mss.lib",
-                "vendor-imports-smack.lib",
-                "vendor-imports-wing.lib",
-                "system-imports-advapi.lib",
-            )[dll_index]
-            output = out_dir / output_name
+            output = out_dir / output_names[dll]
             output.write_bytes(patch_import_archive(lib_path.read_bytes(), dll_specs))
             outputs.append(output)
         return tuple(outputs)
@@ -471,7 +507,8 @@ def main() -> None:
     print(
         f"generated {', '.join(str(path) for path in outputs)}: "
         f"{len(MSS_IMPORTS)} Miles, {len(SMACK_IMPORTS)} Smacker, "
-        f"{len(WING_IMPORTS)} WinG, {len(ADVAPI_IMPORTS)} ADVAPI imports"
+        f"{len(WING_IMPORTS)} WinG, {len(ADVAPI_IMPORTS)} ADVAPI, "
+        f"{len(system_import_specs())} Windows imports"
     )
 
 

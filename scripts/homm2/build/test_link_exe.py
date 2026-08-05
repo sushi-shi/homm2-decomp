@@ -6,8 +6,10 @@ from pathlib import Path
 from unittest import mock
 
 from homm2.build.link_exe import (
-    LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
-    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, build_retail_runtime_data_library,
+    INPUT_PROFILES, LINK300_FORCED_VENDOR_IMPORTS, LINK_FLAG_PROFILES, RETAIL_LINK_FLAGS,
+    SYSTEM_LIBS_AFTER_VENDOR,
+    SYSTEM_LIBS_BEFORE_VENDOR, LINK300_FORCE_SYSTEM_IMPORTS, SYSTEM_IMPORT_SPECS,
+    build_link_command, build_retail_runtime_data_library, forced_retail_import_order,
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
     compare_pe_section_bytes, decode_s_compile_banner, load_required_initialized_storage,
@@ -16,11 +18,59 @@ from homm2.build.link_exe import (
     parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
-    sibling_tool_identities, static_symbol_diagnostics)
+    sibling_tool_identities, static_symbol_diagnostics, VENDOR_FORCE_PROFILES)
 from homm2.build.link_exe import strip_coff_export_directives, write_module_definition
+from homm2.build.link_exe import write_archive_response, write_link_response
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_input_profiles_cover_independent_object_and_crt_axes(self):
+        self.assertEqual(
+            {(row["project_game_objects"], row["project_runtime_archive"])
+             for row in INPUT_PROFILES.values()},
+            {(False, False), (False, True), (True, False), (True, True)})
+
+    def test_vendor_force_profiles_keep_non_wing_roots_constant(self):
+        baseline = VENDOR_FORCE_PROFILES["direct-objects"]
+        self.assertEqual(VENDOR_FORCE_PROFILES["wing-retail"][6:], baseline[6:])
+        self.assertEqual(VENDOR_FORCE_PROFILES["wing-retail-reverse"][6:], baseline[6:])
+
+    def test_link_flag_profiles_only_add_or_remove_reviewed_axes(self):
+        self.assertEqual(LINK_FLAG_PROFILES["retail"], RETAIL_LINK_FLAGS)
+        self.assertEqual(LINK_FLAG_PROFILES["nodefaultlib"][:-1], RETAIL_LINK_FLAGS)
+        self.assertNotIn("/ALIGN:0x1000", LINK_FLAG_PROFILES["default-align"])
+
+    def test_system_force_roots_cover_manifest_and_invert_link300_order(self):
+        self.assertEqual(len(LINK300_FORCE_SYSTEM_IMPORTS), len(SYSTEM_IMPORT_SPECS))
+        self.assertEqual(set(LINK300_FORCE_SYSTEM_IMPORTS),
+                         {spec.symbol for spec in SYSTEM_IMPORT_SPECS})
+        desired = ("dc", "bitmap", "recommend", "colors", "stretch", "bitblt")
+        roots = forced_retail_import_order(desired)
+        self.assertEqual(tuple(reversed(roots))[1:] + tuple(reversed(roots))[:1], desired)
+
+    def test_link_response_omits_wine_driver_and_linker_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "game.rsp"
+            write_link_response(path, [
+                "wine", "/tool/LINK.EXE", "/NOLOGO",
+                r"/OUT:Z:\out dir\game.exe", r"Z:\obj\one.obj",
+            ])
+            self.assertEqual(path.read_text(),
+                             '/NOLOGO\n"/OUT:Z:\\out dir\\game.exe"\n'
+                             'Z:\\obj\\one.obj\n')
+
+    @mock.patch("homm2.build.link_exe.winepaths_w")
+    @mock.patch("homm2.build.link_exe.winepath_w")
+    def test_archive_response_reverses_inputs_for_vc4_member_order(
+            self, winepath, winepaths):
+        winepath.return_value = r"Z:\out\basewin.lib"
+        winepaths.return_value = [r"Z:\obj\one.obj", r"Z:\obj\two.obj"]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "basewin.rsp"
+            write_archive_response(path, "/out/basewin.lib", ["one.obj", "two.obj"])
+            lines = path.read_text().splitlines()
+        self.assertEqual(lines[-2:], [r"Z:\obj\two.obj", r"Z:\obj\one.obj"])
+
     def test_runtime_library_ranks_retained_data_sections_from_nb09(self):
         raw_offset = 60
         symbol_offset = raw_offset + 4

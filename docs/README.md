@@ -23,6 +23,8 @@ one-run progress summaries belong under `build/`, not here.
   `delinker-contribution-manifest.md` define candidate/target object reconstruction.
 - `relocation-canonicalization.md`, `static-storage-link-audit.md`,
   and `missing-public-data-audit.md` define the final-link checks.
+- `native-link-pipeline.md` defines the direct `LIB.EXE`/`LINK.EXE` graph, records the 2.1
+  structural comparison, and retains measured flag, archive, and library-order experiments.
 - `rdata-contribution-audit.md` records the resolved readonly-layout investigation and retains
   older contribution measurements as explicitly labeled historical evidence; current offsets
   come from the link report.
