@@ -27,20 +27,15 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
     i32 destinationX,
     i32 destinationY
 ) {
-    if (gpWindowManager->m_screen != sourceBitmap) {
-        i32 row = 0;
-        if (height > row) {
-            i32 destinationOffset = destinationY * VESA_SCREEN_WIDTH;
-            do {
-                memcpy(
-                    gpWindowManager->m_screen->m_pixels + destinationX + destinationOffset,
-                    sourceBitmap->m_pixels + sourceX + (sourceY + row) * sourceBitmap->m_width,
-                    width
-                );
-                destinationOffset += VESA_SCREEN_WIDTH;
-                ++row;
-            } while (row < height);
-        }
+    if (sourceBitmap != gpWindowManager->m_screen) {
+        i32 row;
+        for (row = 0; row < height; row++)
+            memcpy(
+                gpWindowManager->m_screen->m_pixels
+                    + (destinationY + row) * VESA_SCREEN_WIDTH + destinationX,
+                sourceBitmap->m_pixels + (row + sourceY) * sourceBitmap->m_width + sourceX,
+                width
+            );
     }
 
     if (gbEnlargeScreenBlit != 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {

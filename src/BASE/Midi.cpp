@@ -146,9 +146,9 @@ void MIDISetVolume(i32& fadeSteps) {
     i32 volume = MAX_VOLUME;
     if (fadeSteps > 0) {
         if (fadeSteps <= VOLUME_FADE_SPLIT)
-            volume = ((VOLUME_LOW_RANGE - fadeSteps) * volume) / VOLUME_LOW_RANGE;
+            volume = (volume * (VOLUME_LOW_RANGE - fadeSteps)) / VOLUME_LOW_RANGE;
         else
-            volume = ((fadeSteps - VOLUME_FADE_SPLIT) * volume) / VOLUME_HIGH_RANGE;
+            volume = (volume * (fadeSteps - VOLUME_FADE_SPLIT)) / VOLUME_HIGH_RANGE;
     }
     volume = gpSoundManager->ConvertVolume(volume, SOUND_VOLUME_MUSIC);
     AIL_set_XMIDI_master_volume(hMDI, volume);

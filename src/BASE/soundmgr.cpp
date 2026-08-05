@@ -761,9 +761,9 @@ void soundManager::PlayAmbientMusic(i32 track) {
 
     if (IsAudiereBackend(this)) {
         PlayAudiereMusic(
+            m_audiereDevice,
             m_musicTrack,
             m_musicFadeSteps,
-            m_audiereDevice,
             track
         );
     } else if (IsMilesBackend(this)) {
