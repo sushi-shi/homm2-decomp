@@ -53,38 +53,37 @@ bitmap::~bitmap() {
 
 VA(0x004c5f30, 0x154)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
-    i32 width;
-    i32 destinationY;
-    i32 height;
-    i32 destinationX;
+    i32 destX;
+    i32 destY;
+    i32 clipWidth;
+    i32 clipHeight;
 
     if (x >= 0 && x + m_width <= gpWindowManager->m_screen->m_width && y >= 0
         && y + m_height <= gpWindowManager->m_screen->m_height) {
         DrawToBuffer(x, y);
         return;
     }
-    width = m_width;
-    height = m_height;
+    clipWidth = m_width;
+    clipHeight = m_height;
     if (x < 0) {
-        width += x;
-        destinationX = 0;
+        clipWidth += x;
+        destX = 0;
     } else {
-        destinationX = x;
+        destX = x;
     }
     if (y < 0) {
-        height += y;
-        destinationY = 0;
+        clipHeight += y;
+        destY = 0;
     } else {
-        destinationY = y;
+        destY = y;
     }
-    if (destinationX + width > gpWindowManager->m_screen->m_width)
-        width = gpWindowManager->m_screen->m_width - destinationX;
-    if (destinationY + height > gpWindowManager->m_screen->m_height)
-        height = gpWindowManager->m_screen->m_height - destinationY;
-    if (width >= 0 && height >= 0)
-        BlitBitmap(
-            this, 0, 0, width, height, gpWindowManager->m_screen, destinationX, destinationY
-        );
+    if (destX + clipWidth > gpWindowManager->m_screen->m_width)
+        clipWidth = gpWindowManager->m_screen->m_width - destX;
+    if (destY + clipHeight > gpWindowManager->m_screen->m_height)
+        clipHeight = gpWindowManager->m_screen->m_height - destY;
+    if (clipWidth < 0 || clipHeight < 0)
+        return;
+    BlitBitmap(this, 0, 0, clipWidth, clipHeight, gpWindowManager->m_screen, destX, destY);
 }
 
 VA(0x004c6090, 0x47)
@@ -115,33 +114,34 @@ VA(0x004c6190, 0x12f)
 void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     i32 sourceX;
     i32 sourceY;
-    i32 height;
-    i32 width;
+    i32 clipWidth;
+    i32 clipHeight;
 
     if (x >= 0 && x + m_width <= source->m_width && y >= 0 && y + m_height <= source->m_height) {
         GrabBitmap(source, x, y);
         return;
     }
-    width = m_width;
-    height = m_height;
+    clipWidth = m_width;
+    clipHeight = m_height;
     if (x < 0) {
-        width += x;
+        clipWidth += x;
         sourceX = 0;
     } else {
         sourceX = x;
     }
     if (y < 0) {
-        height += y;
+        clipHeight += y;
         sourceY = 0;
     } else {
         sourceY = y;
     }
-    if (sourceX + width > source->m_width)
-        width = source->m_width - sourceX;
-    if (sourceY + height > source->m_height)
-        height = source->m_height - sourceY;
-    if (width >= 0 && height >= 0)
-        BlitBitmap(source, sourceX, sourceY, width, height, this, 0, 0);
+    if (sourceX + clipWidth > source->m_width)
+        clipWidth = source->m_width - sourceX;
+    if (sourceY + clipHeight > source->m_height)
+        clipHeight = source->m_height - sourceY;
+    if (clipWidth < 0 || clipHeight < 0)
+        return;
+    BlitBitmap(source, sourceX, sourceY, clipWidth, clipHeight, this, 0, 0);
 }
 
 VA(0x004c62c0, 0xb6)
