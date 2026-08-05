@@ -79,6 +79,23 @@ u16 lookup =
  *   build/fizzle-forward-staged-lookup-axes-20260727.json
  *   build/fizzle-forward-staged-lookup-manifest-20260727.json
  *   build/match-variants/fizzle-forward-staged-lookup-20260727/
+ *
+ * Current-hash follow-up, 2026-08-05:
+ *
+ * A fresh seed-20260805 forest/top census completed 50 trials and emitted 24
+ * distinct states. Its best state was 99.490135%, retail size, exact 34-block
+ * topology, and 33/33 relocations, below the durable historical MAX:
+ *
+ *   build/fizzle-forward-seed-20260805-state-summary.json
+ *   build/tu-state-noise/fizzle-forward-seed-20260805/
+ *
+ * Re-generating the default-seed trial 32 named by the older dossier no longer
+ * reproduced that historical island under the current TU state; it measured
+ * 92.684210%. The 99.720400% MAX remains durable evidence, but the stale probe
+ * cannot serve as a reproducible second-layer parent for the current hash:
+ *
+ *   build/fizzle-forward-default-trial32-state-summary.json
+ *   build/tu-state-noise/fizzle-forward-default-trial32/
  */
 
 void FizzleForward_local_ownership_attempts() {

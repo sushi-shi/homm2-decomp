@@ -56,6 +56,17 @@ advance the durable MAX:
   build/mouse-message-clean-top-states-manifest-20260727.json
   build/match-variants/mouse-message-clean-top-states-20260727/results.json
 
+Two independent current-hash expansions on 2026-08-05 each completed 50
+additional forest/top trials. Seed 20260805 emitted only the 99.957630% and
+99.533900% states; seed 20260806 additionally reproduced the lower
+99.788140% state once. Neither expansion produced the required reversed
+global-load ownership or an audited exact closure:
+
+  build/mouse-message-seed-20260805-state-summary.json
+  build/tu-state-noise/mouse-message-seed-20260805/
+  build/mouse-message-seed-20260806-state-summary.json
+  build/tu-state-noise/mouse-message-seed-20260806/
+
 Disposition: reject the helper declarations and calls. They contribute no
 semantic or emitted structural distinction, so the reconstructed source stays
 direct. Preserve the durable hash-scoped MAX 99.9576; the runner's lower raw

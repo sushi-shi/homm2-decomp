@@ -20,6 +20,16 @@
  * Disposition: retain the exact donor loop and pointer ownership; preserve
  * trial 2 as paired clue evidence. The one-byte compiler encoding residual
  * remains live.
+ *
+ * A fresh seed-20260805 expansion completed 50 trials and reproduced the same
+ * one-byte 99.655174% state at trials 7, 17, 29, and 45. A second 50-state
+ * seed-20260806 layer over trial 7 again emitted only the same three known
+ * target encodings and no audited exact closure:
+ *
+ *   build/find-token-seed-20260805-state-summary.json
+ *   build/tu-state-noise/find-token-seed-20260805/
+ *   build/find-token-layer2-seed-20260806-state-summary.json
+ *   build/tu-state-noise/find-token-layer2-seed-20260806/
  */
 
 char* FindToken(char* text, char token) {

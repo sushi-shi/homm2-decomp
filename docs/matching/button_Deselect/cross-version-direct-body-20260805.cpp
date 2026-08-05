@@ -19,6 +19,13 @@
  * schedule residual. Disposition: retain the stronger mainline standalone
  * ownership; the residual remains live and the tested spelling surface is
  * exhausted for this structural parent.
+ *
+ * An independent seed-20260806 expansion completed another 50 forest/top
+ * trials and emitted one identical state in all 51 baseline/trial cells. It
+ * therefore found no target-local exact closure:
+ *
+ *   build/button-deselect-seed-20260806-state-summary.json
+ *   build/tu-state-noise/button-deselect-seed-20260806/
  */
 
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(tag_message& msg) {
