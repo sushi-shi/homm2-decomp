@@ -56,3 +56,19 @@ buf[0] = ch;
 **Closes.** `advManager::DoEvent`: three sites (`MAP_OBJECT_CAMPFIRE`,
 `ARTIFACT_EVENT_MODE_RESOURCE_3`, `ARTIFACT_EVENT_MODE_RESOURCE_5`), ~120
 instructions.
+
+## Open-coded local or inline helper is a per-site question
+
+The instruction stream is identical either way; only the fold variable's frame
+slot differs, so the *frame band* decides:
+
+* **Named local** (function scope) - `UpdateTradingPost` (`SOURCE/tradpost`,
+  `chr1`/`chr2`) and `SetupRecruitWin` (`SOURCE/RECRUIT`), both exact.
+* **File-static `inline` with a named local inside it** - `advManager::DoEvent`
+  (three sites), `game::ViewArmy`, `townManager::SetupThievesGuild`. Here the
+  fold variable sits among the front-end temps, which no named local can reach;
+  see `inline-expansion-slots-after-expression-temps.md`.
+* **File-static `inline` with early `return`s** (no local at all) -
+  `SOURCE/ARMY`'s `ToLowerCp1251`/`ToUpperCp1251`, which allocate no slot.
+
+Do not convert a site that is already exact.

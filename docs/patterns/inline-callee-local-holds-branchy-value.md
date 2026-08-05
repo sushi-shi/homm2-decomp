@@ -108,6 +108,29 @@ inline i32 CannotRecruitHero(void) {
 and `gpTownManager->RecruitHero(heroChoiceIndex, CannotRecruitHero());`.
 `CastleHandler` 99.94% -> EXACT.
 
+## Case 3 - three expansions in one frame (`advManager::DoEvent` 0x3b640)
+
+The same CP1251 fold, three times in the largest function in the tree, is what
+pinned the *ordering* rule for this region. Written as block-scope `char`
+locals the three landed in the named-local region and rotated the whole
+front-end band by four slots (34 differing displacement bytes, 99.995%);
+converting all three sites to one file-static `ToLowerCp1251` put them exactly
+where retail has them - **after** the function's `new`/`delete` expression
+temps, and in body order among the inlined map-accessor return temps:
+
+```
+ours (block-scope char locals)             retail
+------------------------------------------ ------------------------------------------
+2b97 88 85 ec fc ff ff  movb %al,-0x314    2b97 88 85 e0 fc ff ff  movb %al,-0x320
+3b98 89 85 dc fc ff ff  movl %eax,-0x324   3b98 89 85 e8 fc ff ff  movl %eax,-0x318
+48de 88 8d e8 fc ff ff  movb %cl,-0x318    48de 88 8d cc fc ff ff  movb %cl,-0x334
+```
+
+`DoEvent` 99.995% -> EXACT. The general rule (expression temps are all handed
+out before the first inline-expansion slot, so an inlined callee's local near
+the top of a function still slots below a temp created near the bottom) is
+written up in `inline-expansion-slots-after-expression-temps.md`.
+
 ## Diagnosis rule
 
 Read the `this`/param spill depth first. If retail's spill is deeper than ours

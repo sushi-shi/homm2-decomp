@@ -980,9 +980,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   resource pickup, and the `ARTIFACT_EVENT_MODE_RESOURCE_3` and `_RESOURCE_5`
   leprechaun offers. Buka replaced each with the range chain
   `'A'..'Z' -> +0x20`, `0xc0..0xdf -> +0x20`, `0xa8 -> 0xb8`, else unchanged,
-  through a `char` variable, byte-identical to the already exact
-  `SetupRecruitWin` (`SOURCE/RECRUIT.cpp`). See
-  `docs/patterns/cp1251-fold-first-letter.md`.
+  through a `char` variable. In this TU the three sites are one file-static
+  `ToLowerCp1251` inline, not three open-coded chains: the fold variable's frame
+  slot lands among `DoEvent`'s front-end temps, which only an inlined callee's
+  local can reach (`SetupRecruitWin` and `UpdateTradingPost` keep the
+  open-coded form). See `docs/patterns/cp1251-fold-first-letter.md` and
+  `docs/patterns/inline-expansion-slots-after-expression-temps.md`.
 - **[unclassified] `advManager::DoEvent` obelisk bookkeeping is 1-based.**
   Retail reads and writes `gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1]`
   (displacement 0x634c, one byte below the array base), matching the already

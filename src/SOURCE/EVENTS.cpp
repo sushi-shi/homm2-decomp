@@ -307,6 +307,30 @@ namespace {
         MINE_CENTER_GOLD_FRAME = 4
     H2_ENUM_END(AbandonedMineConversionConstant)
 
+    H2_ENUM_BEGIN(Cp1251Letter)
+        CP1251_CAPITAL_YO = 0xa8,
+        CP1251_SMALL_YO = 0xb8,
+        CP1251_CAPITAL_A = 0xc0,
+        CP1251_CAPITAL_YA = 0xdf,
+        CP1251_CASE_STEP = 0x20
+    H2_ENUM_END(Cp1251Letter)
+
+    // The localised build folds the leading letter of a resource name through
+    // the CP1251 alphabet, not through a bare +32 on the Latin range.
+    inline char ToLowerCp1251(u8 letter) {
+        char smallLetter;
+
+        if (letter >= 'A' && letter <= 'Z')
+            smallLetter = letter + CP1251_CASE_STEP;
+        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
+            smallLetter = letter + CP1251_CASE_STEP;
+        else if (letter == CP1251_CAPITAL_YO)
+            smallLetter = CP1251_SMALL_YO;
+        else
+            smallLetter = letter;
+        return smallLetter;
+    }
+
 }
 
 #define TRADING_POST_EFFICIENCY 0.2f
@@ -2120,21 +2144,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType_a)]);
-            {
-                char resourceInitial;
-
-                if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
-                    && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
-                    resourceInitial = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
-                         && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
-                    resourceInitial = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
-                    resourceInitial = static_cast<char>(0xb8);
-                else
-                    resourceInitial = sphinxAnswer_a[0];
-                sphinxAnswer_a[0] = resourceInitial;
-            }
+            sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
@@ -3185,21 +3195,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
-                        {
-                            char artifactInitial3;
-
-                            if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
-                                && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
-                                artifactInitial3 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                            else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
-                                     && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
-                                artifactInitial3 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                            else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
-                                artifactInitial3 = static_cast<char>(0xb8);
-                            else
-                                artifactInitial3 = sphinxAnswer_a[0];
-                            sphinxAnswer_a[0] = artifactInitial3;
-                        }
+                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
@@ -3272,21 +3268,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
-                        {
-                            char artifactInitial5;
-
-                            if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
-                                && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
-                                artifactInitial5 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                            else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
-                                     && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
-                                artifactInitial5 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
-                            else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
-                                artifactInitial5 = static_cast<char>(0xb8);
-                            else
-                                artifactInitial5 = sphinxAnswer_a[0];
-                            sphinxAnswer_a[0] = artifactInitial5;
-                        }
+                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
