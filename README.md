@@ -61,7 +61,7 @@ _**Functions exact** = byte-identical now. **Functions exact-max** = observed at
 
 | Module   | Units |      Functions exact |  Functions exact-max |  Fuzzy | Fuzzy-max | Data exact |    Data bytes |
 | :------- | ----: | -------------------: | -------------------: | -----: | --------: | ---------: | ------------: |
-| `SOURCE` |    50 | 1153 / 1153 (100.0%) | 1153 / 1153 (100.0%) | 100.0% |    100.0% |      0 / 0 | 0 / 0 (0.00%) |
+| `SOURCE` |    49 | 1153 / 1153 (100.0%) | 1153 / 1153 (100.0%) | 100.0% |    100.0% |      0 / 0 | 0 / 0 (0.00%) |
 | `BASE`   |    48 |   561 / 561 (100.0%) |   561 / 561 (100.0%) | 100.0% |    100.0% |      0 / 0 | 0 / 0 (0.00%) |
 | `EDITOR` |     1 |     13 / 13 (100.0%) |     13 / 13 (100.0%) | 100.0% |    100.0% |      0 / 0 | 0 / 0 (0.00%) |
 
@@ -100,15 +100,15 @@ nix develop .#build            # VC6 SP5 under wine + the tools
 homm2 init                     # ONE-TIME: toolchain fetch -> source markers -> PDB -> delink -> configure
 homm2 redelink [--force]       # EXPLICIT: refresh all delinker inputs and atomically rebuild the target
 homm2 build                    # compile src (wine cl) -> comparisons + hard gates -> refresh status
-homm2 link                     # strict final link + section/RVA audit in build/link/
+homm2 link                     # direct VC6 LINK.EXE build in build/link/
 homm2 status                   # per-unit + overall match %
 homm2 format --check           # verify header and enum formatting
 ```
 
-The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`
-(`config/units.toml` manifest object order, audited against source anchors), `link-imports`
-(middleware import archives - recalibration for VC6 LIB is open work), `link`, and
-`link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
+The final link is opt-in, so object matching stays fast. Ninja generates ordinary import
+libraries from the module-definition files under `imports/`, extracts the retail resources,
+and invokes the pinned VC6 `LINK.EXE` once. The candidate and MAP are written to
+`build/link/HMM2PL.exe` and `build/link/HMM2PL.map`; comparison is a separate step.
 
 `homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
 `DATA`, `DATA_COMPGEN`, `DATA_COMPGEN_GUARD`, `VTBL`, or `VTBL2` identity, run

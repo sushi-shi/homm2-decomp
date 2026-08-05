@@ -44,6 +44,16 @@ def main():
                     (line for line in stream if not line.lstrip().startswith("#")),
                     delimiter="\t"):
                 reviewed_units.add(row["unit"])
+    first_function_rva = {}
+    symbols = REPO / "build/gen/symbol_names.csv"
+    if symbols.exists():
+        with symbols.open() as stream:
+            for row in csv.DictReader(stream):
+                if row["kind"] != "func" or row["provenance"] != "source-annotation":
+                    continue
+                rva = int(row["rva"], 0)
+                first_function_rva[row["unit"]] = min(
+                    rva, first_function_rva.get(row["unit"], rva))
 
     with open(REPO / "build.ninja", "w") as f:
         w = ninja_syntax.Writer(f)
@@ -72,21 +82,22 @@ def main():
                         "--unit $unit --base $base --target $in --output $out "
                         "--symbols build/gen/symbol_names.csv"),
                description="normalize-relocs $unit")
+        w.rule("implib",
+               command=('wine "$$MSVC_DIR/bin/LIB.EXE" /NOLOGO /MACHINE:IX86 '
+                        '/DEF:$in /OUT:$out'),
+               description="lib $out")
         w.rule("link_exe",
-               command=(f"{PY} -m homm2.build.link_exe --out $exe "
-                        "--order build/link/objects.rsp "
-                        "--resource build/link/HMM2PL.res "
-                        "--imports build/link/vendor-imports-smack.lib "
-                        "--imports build/link/vendor-imports-mss.lib "
-                        "--imports build/link/vendor-imports-wing.lib "
-                        "--imports build/link/system-imports-advapi.lib"),
-               description="link HMM2PL.exe")
-        w.rule("link_order",
-               command=f"{PY} -m homm2.build.link_exe --write-order $out",
-               description="link-order objects.rsp")
-        w.rule("link_imports",
-               command=f"{PY} -m homm2.build.gen_vendor_imports --out-dir build/link",
-               description="link-imports middleware libraries")
+               command='wine "$$MSVC_DIR/bin/LINK.EXE" @build/link/HMM2PL.rsp',
+               description="link HMM2PL.exe",
+               rspfile="build/link/HMM2PL.rsp",
+               rspfile_content=(
+                   "/NOLOGO /MACHINE:IX86 /BASE:0x400000 "
+                   "/SUBSYSTEM:WINDOWS,4.0 /STACK:66112,4096 "
+                   "/HEAP:1048576,4096 /INCREMENTAL:NO /OPT:NOREF "
+                   "/LIBPATH:build/toolchain/msvc/lib "
+                   "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe "
+                   "KERNEL32.LIB USER32.LIB GDI32.LIB WSOCK32.LIB "
+                   "NETAPI32.LIB WINMM.LIB ADVAPI32.LIB $in"))
         w.rule("link_resources",
                command=(f"{PY} -m homm2.build.extract_resources "
                         "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
@@ -169,34 +180,27 @@ def main():
             )
         w.build("all", "phony", inputs=comparison_inputs)
         w.build("base", "phony", inputs=objs)
-        order_inputs = ["config/units.toml", "build/gen/symbol_names.csv",
-                        "build/orig/HMM2PL.exe", "scripts/homm2/build/link_exe.py"]
-        w.build("build/link/objects.rsp", "link_order", inputs=order_inputs)
-        import_outputs = ["build/link/vendor-imports-mss.lib",
-                          "build/link/vendor-imports-smack.lib",
-                          "build/link/vendor-imports-wing.lib",
-                          "build/link/system-imports-advapi.lib"]
-        w.build(import_outputs, "link_imports",
-                inputs="scripts/homm2/build/gen_vendor_imports.py")
+        import_outputs = []
+        for name in ("audiere", "mss32", "smackw32", "wing32"):
+            output = f"build/link/{name}.lib"
+            w.build(output, "implib", inputs=f"imports/{name}.def")
+            import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
                 inputs=["build/orig/HMM2PL.exe",
                         "scripts/homm2/build/extract_resources.py"])
-        link_outputs = ["build/link/HMM2PL.exe", "build/link/HMM2PL.map",
-                        "build/link/HMM2PL.link.json",
-                        "build/link/HMM2PL.missing-data.tsv"]
+        link_objects = sorted(
+            objs,
+            key=lambda obj: first_function_rva.get(
+                obj.removeprefix("build/objdiff/base/").removesuffix(".obj"),
+                sys.maxsize))
+        link_outputs = ["build/link/HMM2PL.exe", "build/link/HMM2PL.map"]
         w.build(link_outputs, "link_exe",
-                inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
-                implicit=objs + ["build/orig/HMM2PL.exe",
-                                 "config/required_initialized_storage.tsv",
-                                 "scripts/homm2/build/link_exe.py"],
-                variables={"exe": "build/link/HMM2PL.exe"})
+                inputs=link_objects + import_outputs + [resource_output])
         w.build("link", "phony", inputs="build/link/HMM2PL.exe")
-        w.build("link-order", "phony", inputs="build/link/objects.rsp")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)
-        w.build("link-map", "phony",
-                inputs=["build/link/HMM2PL.map", "build/link/HMM2PL.link.json"])
+        w.build("link-map", "phony", inputs="build/link/HMM2PL.map")
         w.default("all")
 
     units_j = []

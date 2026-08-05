@@ -1,0 +1,4 @@
+LIBRARY audiere.dll
+EXPORTS
+    AdrOpenDevice@8
+    AdrOpenSampleSource@4
