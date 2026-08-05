@@ -1923,7 +1923,7 @@ i32 philAI::DetermineTargetPosition(
         0,
         0
     );
-    gpSearchArray->GetNode(gpCurAIHero->m_x | 0, gpCurAIHero->m_y).visited = 0;
+    gpSearchArray->GetNode(gpCurAIHero->m_x, gpCurAIHero->m_y).visited = 0;
 
     colCnt = -1;
     leftX = gpCurAIHero->m_x - 25;

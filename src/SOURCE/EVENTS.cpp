@@ -3731,7 +3731,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     i32 unused_m[ERASE_COORDINATE_COUNT];
     i32 cellX_l;
     i32 cellY_o;
-    volatile i32 changed_f;
+    i32 changed_f;
 
     for (i_g = 0; i_g < NEIGHBOR_COUNT; i_g++) {
         cells_h[i_g] = NULL;
@@ -4824,7 +4824,7 @@ void advManager::RecruitEvent(
         MemError();
     gpExec->DoDialog(recruitWindow);
     delete recruitWindow;
-    cell->m_objectMetadata = static_cast<u16>(availableCount + 0);
+    cell->m_objectMetadata = static_cast<u16>(availableCount);
 }
 
 VA(0x0044368d, 0x232)

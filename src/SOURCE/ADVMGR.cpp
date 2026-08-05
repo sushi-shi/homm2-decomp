@@ -8714,7 +8714,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 fromDir =
                     static_cast<u8>(gpSearchArray->m_storage.path.directions[index]);
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = static_cast<u16>(
-                    frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir | 0]
+                    frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir]
                     + ROUTE_ARROW_FRAME_OFFSET
                 );
             }
