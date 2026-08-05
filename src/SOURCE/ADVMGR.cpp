@@ -4972,8 +4972,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s",
-                            gResourceNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
-                                                   .resourceType)]
+                            gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
+                                               .resourceType)]
                         );
                     quick_info_guarded:
                         sprintf(
@@ -4991,8 +4991,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s",
-                            gResourceNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
-                                                   .resourceType)]
+                            gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
+                                               .resourceType)]
                         );
                     }
                     break;
@@ -10606,3 +10606,6 @@ DATA(0x00523f98) i32 giLimitUpdMinY;
 DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
 struct tag_message CDMsg;
 DATA(0x00523de8) i32 iLastAnimFrame;
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(advManager, 0x004ea42c)

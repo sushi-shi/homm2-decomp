@@ -159,10 +159,6 @@ H2_ENUM_END(Cp1251Letter)
 #define DAMAGE_HALF_DIVISOR 2.0f
 #define DAMAGE_ROUNDING_OFFSET 0.5
 
-// Scratch copy of the defending creature's name, case-folded for the middle of
-// a combat sentence.
-char gTargetName[TARGET_NAME_SIZE];
-
 // The localised build case-shifts the leading letter of a combat message
 // through the CP1251 alphabet, not through a bare +/- 32.
 inline char ToLowerCp1251(u8 letter) {
@@ -192,6 +188,12 @@ inline char ToUpperCp1251(u8 letter) {
 }
 
 }
+
+// Scratch copy of the defending creature's name, case-folded for the middle of
+// a combat sentence. File-static rather than unnamed-namespace: VC6 decorates
+// an unnamed-namespace object with the absolute source path plus a per-
+// compilation cookie, so the claim could never name one stable symbol.
+DATA(0x00524038) static char gTargetName[TARGET_NAME_SIZE];
 
 VA(0x00418650, 0xc2)
 army::army(void) {
@@ -3667,5 +3669,5 @@ i32 army::GetPowBaseY(void) {
     return y;
 }
 
-i32 bSecondAttack = 0;
+DATA(0x005240a0) i32 bSecondAttack = 0;
 DATA(0x0052409c) b32 gbGenieHalf;

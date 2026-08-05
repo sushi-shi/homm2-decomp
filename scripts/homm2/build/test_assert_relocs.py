@@ -7,17 +7,26 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from homm2.build.assert_relocs import (
+    _BODY_CACHE,
     _PARSE_CACHE,
     _classify_candidate_excess,
+    _function_bytes,
     _maximum_data_identity_matching,
     _unique_report_functions,
+    apply_folded_symbols,
+    check_fn,
+    check_ordinal_locals,
     check_owner_offset_multisets,
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
     check_linked_pe_data_targets,
     check_pe_data_targets,
     compare_function_reloc_addends,
+    delinked_self_references,
+    folded_comdat_symbols,
+    is_ordinal_local,
     load_canonical_data_names,
+    ordinal_local_relocs,
     parse_obj,
     relocation_addend_map,
 )
@@ -403,6 +412,224 @@ Disassembly of section .text:
                 second = parse_obj(str(path), with_sites=True)
         self.assertEqual(first, second)
         self.assertEqual(run.call_count, 1)
+
+
+GTARGET_SYMBOL = "_gTargetName"
+STREAM_SYMBOL = "?stream@AudiereMusicState@@2V?$RefPtr@VOutputStream@audiere@@@audiere@@A"
+SOURCE_SYMBOL = "?source@AudiereMusicState@@2V?$RefPtr@VSampleSource@audiere@@@audiere@@A"
+
+
+def _one_text_object(payload):
+    """A minimal COFF wrapper holding one .text section with ``payload``."""
+    header = 20 + 40
+    data = bytearray(header + len(payload))
+    struct.pack_into("<HHIIIHH", data, 0, 0x14C, 1, 0, 0, 0, 0, 0)
+    data[20:28] = b".text\0\0\0"
+    struct.pack_into("<II", data, 20 + 16, len(payload), header)
+    data[header:] = payload
+    return bytes(data)
+
+
+class OrdinalLocalTest(unittest.TestCase):
+    """MSVC counter-named thunks have no identity across two compilations."""
+
+    def test_counter_names_are_recognised(self):
+        self.assertTrue(is_ordinal_local("_$E16"))
+        self.assertTrue(is_ordinal_local("$S18"))
+        self.assertFalse(is_ordinal_local("_atexit"))
+        self.assertFalse(is_ordinal_local("$SG59945"))
+        self.assertFalse(is_ordinal_local(STREAM_SYMBOL))
+
+    def test_references_between_counter_symbols_are_dropped(self):
+        functions = {
+            "_$E19": [("REL32", "_$E17", 0), ("REL32", "_atexit", 0)],
+            "?Real@@YIXXZ": [("DIR32", STREAM_SYMBOL, 0)],
+        }
+        self.assertEqual(ordinal_local_relocs(functions),
+                         [("REL32", "_atexit", 0)])
+
+    def test_renumbered_group_with_the_same_targets_passes(self):
+        sym = {"_atexit": 0xD7548, STREAM_SYMBOL: 0x1395E0, SOURCE_SYMBOL: 0x1395DC}
+        dups = {name: {rva} for name, rva in sym.items()}
+        base = {
+            "_$E16": [("DIR32", STREAM_SYMBOL, 0)],
+            "_$E19": [("REL32", "_$E17", 0), ("REL32", "_atexit", 0)],
+            "_$E22": [("DIR32", SOURCE_SYMBOL, 0)],
+        }
+        target = {                                # retail numbers the same thunks lower
+            "_$E14": [("DIR32", STREAM_SYMBOL, 0)],
+            "_$E16": [("REL32", "_$E15", 0), ("REL32", "_atexit", 0)],
+            "_$E19": [("DIR32", SOURCE_SYMBOL, 0)],
+        }
+        self.assertEqual(
+            check_ordinal_locals(sym, {}, dups, "BASE/AudiereMusic", base, target), [])
+
+    def test_group_still_reports_a_global_retail_never_touches(self):
+        sym = {STREAM_SYMBOL: 0x1395E0, SOURCE_SYMBOL: 0x1395DC}
+        dups = {name: {rva} for name, rva in sym.items()}
+        base = {"_$E16": [("DIR32", STREAM_SYMBOL, 0), ("DIR32", SOURCE_SYMBOL, 0)]}
+        target = {"_$E14": [("DIR32", STREAM_SYMBOL, 0)]}
+        problems = check_ordinal_locals(sym, {}, dups, "BASE/AudiereMusic", base, target)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("0x1395dc", problems[0])
+
+
+class DelinkedSelfReferenceTest(unittest.TestCase):
+    """A recursive call stays inside the carved span, so the delinker relocates nothing."""
+
+    def setUp(self):
+        _BODY_CACHE.clear()
+        self.addCleanup(_BODY_CACHE.clear)
+
+    def _target(self, displacement):
+        # push ebp; mov ebp,esp; call <disp32>; ret -> the call field sits at +4.
+        field = struct.pack("<i", displacement)
+        body = b"\x55\x8b\xec\xe8" + field + b"\xc3"
+        call = " ".join("%02x" % byte for byte in b"\xe8" + field)
+        dump = ("Disassembly of section .text:\n"
+                "00000530 <?Recurse@@YIXXZ>:\n"
+                "     530: 55                           \tpushl\t%ebp\n"
+                "     531: 8b ec                        \tmovl\t%esp, %ebp\n"
+                "     533: " + call + "               \tcalll\t0x530\n"
+                "     538: c3                           \tretl\n")
+        return body, dump
+
+    def _count(self, displacement, base_sites, target_sites):
+        body, dump = self._target(displacement)
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "target.c.obj"
+            path.write_bytes(_one_text_object(body))
+            with patch("homm2.build.assert_relocs.subprocess.run",
+                       return_value=SimpleNamespace(stdout=dump, returncode=0)):
+                return delinked_self_references(
+                    str(path), "?Recurse@@YIXXZ", 0x98CBC, base_sites, target_sites)
+
+    def test_self_call_without_a_target_relocation_is_agreement(self):
+        base = [(4, "REL32", "?Recurse@@YIXXZ", 0)]
+        self.assertEqual(self._count(-8, base, []), Counter({0x98CBC: 1}))
+
+    def test_a_call_that_leaves_the_function_is_not_counted(self):
+        base = [(4, "REL32", "?Recurse@@YIXXZ", 0)]
+        self.assertEqual(self._count(0x40, base, []), Counter())
+
+    def test_a_relocated_target_site_is_not_counted(self):
+        base = [(4, "REL32", "?Recurse@@YIXXZ", 0)]
+        target = [(4, "REL32", "?Elsewhere@@YIXXZ", 0)]
+        self.assertEqual(self._count(-8, base, target), Counter())
+
+    def test_a_call_to_another_function_is_not_counted(self):
+        base = [(4, "REL32", "?Elsewhere@@YIXXZ", 0)]
+        self.assertEqual(self._count(-8, base, []), Counter())
+
+
+class FoldedComdatTest(unittest.TestCase):
+    """VC6 merges identical COMDATs, so two instantiations share one retail address."""
+
+    OURS = "??4?$RefPtr@VSampleSource@audiere@@@audiere@@QAEAAV01@PAVSampleSource@1@@Z"
+    THEIRS = "??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z"
+
+    def setUp(self):
+        _BODY_CACHE.clear()
+        self.addCleanup(_BODY_CACHE.clear)
+
+    def _folded(self, second_body, base_sites, target_sites):
+        dump = ("Disassembly of section .text:\n"
+                "00000000 <%s>:\n"
+                "       0: 55                           \tpushl\t%%ebp\n"
+                "       1: c3                           \tretl\n"
+                "Disassembly of section .text:\n"
+                "00000000 <%s>:\n"
+                "%s"
+                % (self.THEIRS, self.OURS, second_body))
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "base.obj"
+            path.write_bytes(_one_text_object(b"\x55\xc3"))
+            with patch("homm2.build.assert_relocs.subprocess.run",
+                       return_value=SimpleNamespace(stdout=dump, returncode=0)):
+                return folded_comdat_symbols(
+                    str(path), {self.THEIRS: 0xCCFA0}, {}, base_sites, target_sites)
+
+    IDENTICAL = ("       0: 55                           \tpushl\t%ebp\n"
+                 "       1: c3                           \tretl\n")
+    DIFFERENT = ("       0: 90                           \tnop\n"
+                 "       1: c3                           \tretl\n")
+
+    def test_identical_bodies_named_at_the_same_site_fold(self):
+        folded = self._folded(
+            self.IDENTICAL,
+            [(0x131, "REL32", self.OURS, 0)],
+            [(0x131, "REL32", self.THEIRS, 0)])
+        self.assertEqual(folded, {self.OURS: self.THEIRS})
+        self.assertEqual(
+            apply_folded_symbols([("REL32", self.OURS, 0)], folded),
+            [("REL32", self.THEIRS, 0)])
+
+    def test_different_bodies_never_fold(self):
+        self.assertEqual(
+            self._folded(
+                self.DIFFERENT,
+                [(0x131, "REL32", self.OURS, 0)],
+                [(0x131, "REL32", self.THEIRS, 0)]),
+            {})
+
+    def test_folding_needs_retail_to_name_the_partner_at_that_site(self):
+        self.assertEqual(
+            self._folded(self.IDENTICAL, [(0x131, "REL32", self.OURS, 0)], []),
+            {})
+
+    def test_a_resolvable_symbol_is_never_rewritten(self):
+        self.assertEqual(
+            self._folded(
+                self.IDENTICAL,
+                [(0x131, "REL32", self.THEIRS, 0)],
+                [(0x131, "REL32", self.OURS, 0)]),
+            {})
+
+
+class FunctionBytesTest(unittest.TestCase):
+    def setUp(self):
+        _BODY_CACHE.clear()
+        self.addCleanup(_BODY_CACHE.clear)
+
+    def test_a_maximal_length_instruction_keeps_its_last_byte(self):
+        # llvm-objdump leaves no space between the tenth byte and the mnemonic tab.
+        dump = ("Disassembly of section .text:\n"
+                "00001330 <?Wide@@YIXXZ>:\n"
+                "    1330: c7 05 00 00 00 00 01 00 00 00\tmovl\t$0x1, 0x0\n"
+                "    133a: c3                           \tretl\n")
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "wide.obj"
+            path.write_bytes(_one_text_object(b"\0" * 11))
+            with patch("homm2.build.assert_relocs.subprocess.run",
+                       return_value=SimpleNamespace(stdout=dump, returncode=0)):
+                bodies = _function_bytes(str(path))
+        self.assertEqual(
+            bodies["?Wide@@YIXXZ"],
+            bytes.fromhex("c7050000000001000000") + b"\xc3")
+
+
+class WrongTargetStillFailsTest(unittest.TestCase):
+    """The reconciliations above must not blunt the ordinary wrong-global check."""
+
+    def test_a_wrong_global_is_still_reported(self):
+        sym = {"?gArmyNames@@3PAPADA": 0xFDDC8, "?gArmyNamesPlural@@3PAPADA": 0xFDED0}
+        dups = {name: {rva} for name, rva in sym.items()}
+        problems = check_fn(
+            sym, {}, dups, "SOURCE/TOWNMGR", "?SplitArmy@townManager@@QAEXXZ",
+            [("DIR32", "?gArmyNames@@3PAPADA", 0)],
+            [("DIR32", "?gArmyNamesPlural@@3PAPADA", 0)])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("0xfddc8", problems[0])
+
+    def test_an_extra_target_address_is_not_invented_by_tgt_extra(self):
+        sym = {"?Recurse@@YIXXZ": 0x98CBC, "?gArmyNames@@3PAPADA": 0xFDDC8}
+        dups = {name: {rva} for name, rva in sym.items()}
+        problems = check_fn(
+            sym, {}, dups, "SOURCE/SPELLS", "?Recurse@@YIXXZ",
+            [("REL32", "?Recurse@@YIXXZ", 0), ("DIR32", "?gArmyNames@@3PAPADA", 0)],
+            [], Counter({0x98CBC: 1}))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("0xfddc8", problems[0])
 
 
 if __name__ == "__main__":

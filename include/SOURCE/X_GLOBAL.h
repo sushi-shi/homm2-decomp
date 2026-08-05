@@ -208,6 +208,7 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_TRADING_POST_EFFICIENCY_COUNT    = 11,
     KB_MOAT_CELL_COUNT                  = 9,
     KB_ALIGNMENT_NAME_COUNT             = IDX(FACTION_COUNT) + 2,
+    KB_MINE_NAME_COUNT                  = 7,
     KB_QUICK_VIEW_TEXT_COUNT            = 124,
     KB_EVENT_TEXT_TABLE_COUNT           = 96,
     KB_CONTROL_PANEL_HELP_COUNT         = 6,
@@ -439,6 +440,7 @@ extern char* gStatDesc[HERO_PRIMARY_STAT_COUNT];
 extern char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
 extern char* gTerrainNames[KB_TERRAIN_TYPE_COUNT];
 extern char* gResourceNames[RESOURCE_VALUE_COUNT];
+extern char* gMineNames[KB_MINE_NAME_COUNT];
 extern char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT];
 extern char* gEventText[KB_EVENT_TEXT_TABLE_COUNT];
 extern char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT];

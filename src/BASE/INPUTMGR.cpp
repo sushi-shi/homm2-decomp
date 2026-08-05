@@ -537,11 +537,12 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
             bLastMouseOffscreen = 0;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
         }
-        if (gbColorMice != bLastOnscreenMouseColor)
+        if (bLastOnscreenMouseColor != gbColorMice)
             gpMouseManager->SetColorMice(1);
     } else if (bLastMouseOffscreen == 0) {
         bLastMouseOffscreen = 1;
-        if ((bLastOnscreenMouseColor = gbColorMice) != 0)
+        bLastOnscreenMouseColor = gbColorMice;
+        if (gbColorMice != 0)
             gpMouseManager->SetColorMice(0);
     }
     bInCheckChangeCursor = 0;
@@ -574,3 +575,6 @@ void inputManager::ForceMouseMove(void) {
 
 
 DATA(0x00536074) i32 iLastBWOnScreenCheck;
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(inputManager, 0x004ea990)

@@ -975,7 +975,7 @@ void swapManager::SplitMons(void) {
         sprintf(
             gText,
             "Move how many %s troops from %s to %s?",
-            gArmyNames[IDX(selectedArmy->m_creatureTypes[m_selectedSlot])],
+            gArmyNamesPlural[IDX(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[IDX(m_selectedSide)]->m_name,
             m_heroes[IDX(m_targetSide)]->m_name
         );
@@ -1015,3 +1015,6 @@ void swapManager::SplitMons(void) {
             selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(swapManager, 0x004ea86c)

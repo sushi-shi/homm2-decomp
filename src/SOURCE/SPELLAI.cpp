@@ -7,11 +7,13 @@
 #include <SOURCE/hero.h>
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
-static const float COMBAT_SPELL_AI_BLIND_MODIFIER = -0.4f;
-static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = -0.55f;
-static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = -0.5f;
-static const float COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER = -0.65f;
-static const float COMBAT_SPELL_AI_PETRIFIED_MODIFIER = -0.25f;
+// The disabling spells score positive here, unlike PoL 2.0 where the same five
+// cells hold the negated value; see docs/version-changes.md.
+DATA(0x004ea80c) static const float COMBAT_SPELL_AI_BLIND_MODIFIER = 0.4f;
+DATA(0x004ea810) static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = 0.55f;
+DATA(0x004ea814) static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = 0.5f;
+DATA(0x004ea818) static const float COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER = 0.65f;
+DATA(0x004ea81c) static const float COMBAT_SPELL_AI_PETRIFIED_MODIFIER = 0.25f;
 DATA(0x004ea820) static const float COMBAT_SPELL_AI_BLOODLUST_MODIFIER = 0.14f;
 DATA(0x004ea824) static const float COMBAT_SPELL_AI_STONE_SKIN_MODIFIER = 0.16f;
 DATA(0x004ea830) static const float COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER = 0.28f;

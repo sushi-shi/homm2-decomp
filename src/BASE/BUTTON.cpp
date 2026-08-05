@@ -272,3 +272,6 @@ void button::Draw(void) {
 
 
 DATA(0x00539760) MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(button, 0x004eaa10)

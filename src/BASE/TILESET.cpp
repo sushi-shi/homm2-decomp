@@ -21,6 +21,5 @@ inline tileset::~tileset() {
     H2_FREE(m_data);
 }
 
-
-
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(tileset, 0x004ea9d4)

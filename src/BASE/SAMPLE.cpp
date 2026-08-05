@@ -99,3 +99,7 @@ inline MIDIWrap::~MIDIWrap() {
     H2_FREE(m_data);
     m_data = NULL;
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(sample, 0x004ea9d8)
+VTBL(MIDIWrap, 0x004ea9dc)

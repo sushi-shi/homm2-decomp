@@ -355,5 +355,5 @@ void icon::DimToBuffer(
     );
 }
 
-
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(icon, 0x004ea99c)

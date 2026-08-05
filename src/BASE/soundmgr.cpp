@@ -924,3 +924,5 @@ u32l nMCIError;
 i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
 char CommandString[MCI_COMMAND_CAPACITY];
 
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(soundManager, 0x004ea954)

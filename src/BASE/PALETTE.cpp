@@ -31,4 +31,5 @@ i8* palette::Data(void) {
     return m_data;
 }
 
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(palette, 0x004ea9c0)

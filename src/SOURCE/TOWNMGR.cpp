@@ -1013,7 +1013,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
         sprintf(
             m_statusText,
             cTownCommand[IDX(TEXT_VIEW_ARMY)],
-            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
+            gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
         );
         m_command = ARMY_COMMAND_VIEW;
     } else {
@@ -1026,7 +1026,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 sprintf(
                     m_statusText,
                     cTownCommand[IDX(TEXT_REDISTRIBUTE_ARMY)],
-                    gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
+                    gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
                 );
                 m_command = ARMY_COMMAND_SPLIT;
             } else if (cantMoveLastArmy) {
@@ -1036,7 +1036,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 sprintf(
                     m_statusText,
                     cTownCommand[IDX(TEXT_COMBINE_ARMIES)],
-                    gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
+                    gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
                 );
                 m_command = ARMY_COMMAND_MERGE;
             }
@@ -1045,7 +1045,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
-                gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
+                gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
             );
             m_command = ARMY_COMMAND_SPLIT;
         }
@@ -1061,7 +1061,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_MOVE_ARMY)],
-                gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
+                gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
             );
             m_command = ARMY_COMMAND_SWAP;
         }
@@ -1069,8 +1069,8 @@ void townManager::SetArmyCommand(i32 qualifier) {
         sprintf(
             m_statusText,
             cTownCommand[IDX(TEXT_EXCHANGE_ARMIES)],
-            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
-            gArmyNames[IDX(m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])]
+            gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
+            gArmyNamesPlural[IDX(m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])]
         );
         m_command = ARMY_COMMAND_SWAP;
     }
@@ -1223,7 +1223,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_RECRUIT)],
-                gArmyNames[IDX(
+                gArmyNamesPlural[IDX(
                     gDwellingType[IDX(m_town->m_type)][objectId - IDX(TOWN_OBJECT_DWELLING_1)]
                 )]
             );
@@ -2004,7 +2004,7 @@ void townManager::SplitArmy(void) {
         sprintf(
             gText,
             "\xca\xe0\xea \xec\xed\xee\xe3\xee %s \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8 \xe8\xe7 \xe0\xf0\xec\xe8\xe8 %s \xe2 \xe0\xf0\xec\xe8\xfe %s?" /* "Как много %s перенести из армии %s в армию %s?" */,
-            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
+            gArmyNamesPlural[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
             m_swapStrip == m_heroStrip ? "\xe3\xe5\xf0\xee\xff" /* "героя" */ : "\xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe0" /* "гарнизона" */,
             m_pendingStrip == m_heroStrip ? "\xe3\xe5\xf0\xee\xff" /* "героя" */ : "\xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe0" /* "гарнизона" */
         );
@@ -3092,8 +3092,7 @@ void townManager::SetupWell(heroWindow* window) {
         message_i.payload.widget.id = dwellingResult_a + TOWN_WELL_FIRST_CREATURE_CONTROL;
         strcpy(
             gText,
-            gArmyNamesPlural
-                [IDX(gDwellingType[IDX(m_town->m_type)][dwellingTypes_c[dwellingResult_a]])]
+            gArmyNames[IDX(gDwellingType[IDX(m_town->m_type)][dwellingTypes_c[dwellingResult_a]])]
         );
         char upperFirst;
         if (static_cast<u8>(gText[0]) >= 'a' && static_cast<u8>(gText[0]) <= 'z')
@@ -3625,3 +3624,6 @@ void SortStats(i32l* const stats, i8* const order) {
         }
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(townManager, 0x004ea938)

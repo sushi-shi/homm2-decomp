@@ -88,6 +88,15 @@ def _source_name(symbol):
 
 
 def owners_from_rows(rows, definitions, extents):
+    # A reviewed extent that names an address the source claim contradicts is a stale
+    # row, not a missing owner: it silently switches the owner-extent rule off for the
+    # one symbol it was written for. Say so instead of degrading quietly.
+    for name, (rva, _size) in sorted(extents.items()):
+        claimed = definitions.get(name)
+        if claimed is not None and claimed != rva:
+            raise ValueError(
+                "%s records %s at 0x%x, but its DATA() definition claims 0x%x"
+                % (OWNER_EXTENTS, name, rva, claimed))
     owners = []
     for row in rows:
         if row.get("kind") != "data":

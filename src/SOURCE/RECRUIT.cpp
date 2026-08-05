@@ -453,3 +453,6 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
 }
 
 DATA(0x00533204) HMENU hmnuRecruitSave;
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(recruitUnit, 0x004ea7f4)

@@ -7090,7 +7090,7 @@ void game::DoNewTurn(void) {
                     u8 lowerFirst;
                     strcpy(
                         reinterpret_cast<char*>(lowerName19),
-                        gArmyNames[giMonthTypeExtra]
+                        gArmyNamesPlural[giMonthTypeExtra]
                     );
                     if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
                         lowerFirst = lowerName19[0] + ('a' - 'A');
@@ -7105,7 +7105,7 @@ void game::DoNewTurn(void) {
                     sprintf(
                         gText,
                         cNewTurn[NEW_MONTH_CREATURE_TEXT],
-                        gArmyNames[giMonthTypeExtra],
+                        gArmyNamesPlural[giMonthTypeExtra],
                         reinterpret_cast<char*>(lowerName19)
                     );
                 } else {
@@ -7120,7 +7120,7 @@ void game::DoNewTurn(void) {
                     u8 lowerFirst;
                     strcpy(
                         reinterpret_cast<char*>(lowerName19),
-                        gArmyNames[giWeekTypeExtra]
+                        gArmyNamesPlural[giWeekTypeExtra]
                     );
                     if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
                         lowerFirst = lowerName19[0] + ('a' - 'A');
@@ -7135,7 +7135,7 @@ void game::DoNewTurn(void) {
                     sprintf(
                         gText,
                         cNewTurn[NEW_WEEK_CREATURE_TEXT],
-                        gArmyNames[giWeekTypeExtra],
+                        gArmyNamesPlural[giWeekTypeExtra],
                         reinterpret_cast<char*>(lowerName19)
                     );
                 }

@@ -468,3 +468,6 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
         }
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(textEntryWidget, 0x004ea9f8)

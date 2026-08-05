@@ -206,5 +206,5 @@ void bitmap::CopyToCareful(
     }
 }
 
-
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(bitmap, 0x004ea9b0)

@@ -1,3 +1,3 @@
 # Public DATA extents proven independently of the provisional next-public size.
 # source name	RVA	size	evidence
-gConfig	0x128d20	0x1a0	include/SOURCE/CONFIG_TYPES.h SIZE(configStruct, CONFIG_STRUCT_SIZE)
+gConfig	0x1261e0	0x1a0	include/SOURCE/CONFIG_TYPES.h SIZE(configStruct, CONFIG_STRUCT_SIZE)

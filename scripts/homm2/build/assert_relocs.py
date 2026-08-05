@@ -851,17 +851,143 @@ def _tvas(sym, data, dups, tgt_relocs):
             tvas[v] += 1
     return tvas
 
-def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs):
+# MSVC names every compiler-generated static-initializer thunk and its guard with one
+# per-compilation counter: `_$E12` is the twelfth internal symbol of THAT compilation, not
+# an identity. The delinked object carries retail's counter values and the candidate carries
+# ours, so the same name can denote two unrelated bodies (BASE/AudiereMusic's numbering runs
+# two ahead of retail's, SOURCE/PHILAI's ctype guard pair is $E18/$E19 here and $E3/$E19
+# there). Pairing them by name is meaningless, so they are audited as one per-unit group.
+ORDINAL_LOCAL = re.compile(r'^_?\$[ES]\d+$')
+ORDINAL_LOCAL_GROUP = "(compiler-generated static init/term thunks)"
+
+def is_ordinal_local(name):
+    """True for an MSVC compiler-generated symbol named by a per-compilation counter."""
+    return bool(ORDINAL_LOCAL.match(name))
+
+def ordinal_local_relocs(functions):
+    """Every counter-named thunk's relocations, minus references between counter symbols.
+
+    A reference from one counter symbol to another cannot be compared: resolving it by
+    name would read the retail address of a differently-numbered thunk. What remains —
+    the real globals and CRT entry points those thunks touch — still has to agree.
+    """
+    return [reloc for name, relocs in sorted(functions.items())
+            if is_ordinal_local(name)
+            for reloc in relocs if not is_ordinal_local(reloc[1])]
+
+def check_ordinal_locals(sym, data, dups, unit, base, target):
+    """One wrong-target check over a unit's counter-named compiler-generated thunks."""
+    return check_fn(sym, data, dups, unit, ORDINAL_LOCAL_GROUP,
+                    ordinal_local_relocs(base), ordinal_local_relocs(target))
+
+
+_BODY_CACHE = {}
+
+def _function_bytes(obj):
+    """Every .text function symbol's raw bytes, keyed by name."""
+    cached = _BODY_CACHE.get(obj)
+    if cached is not None:
+        return cached
+    run = subprocess.run(["llvm-objdump", "-d", obj], capture_output=True, text=True)
+    bodies, current = {}, None
+    for line in run.stdout.splitlines() if run.returncode == 0 else []:
+        title = re.match(r'^[0-9a-f]+ <(.+?)>:', line)
+        if title:
+            name = title.group(1)
+            # MSVC emits block labels as COFF symbols inside a function COMDAT; their
+            # bytes still belong to the containing function.
+            if not (name.startswith('$') and current is not None):
+                current = name
+                bodies.setdefault(current, bytearray())
+            continue
+        # The byte column is everything before the first tab; a maximal-length
+        # instruction leaves no space between its last byte and that tab, so the
+        # bytes cannot be matched by "pair followed by a space" alone.
+        payload = re.match(r'^\s*[0-9a-f]+:\s+((?:[0-9a-f]{2}\s+)*[0-9a-f]{2}\s*)',
+                           line.split('\t', 1)[0])
+        if payload is not None and current is not None:
+            bodies[current] += bytes.fromhex(''.join(payload.group(1).split()))
+    bodies = {name: bytes(body) for name, body in bodies.items()}
+    _BODY_CACHE[obj] = bodies
+    return bodies
+
+
+def delinked_self_references(target_obj, name, function_rva, base_sites, target_sites):
+    """Addresses retail reaches without a relocation because they are inside this function.
+
+    A recursive call keeps its destination inside the function's own delinked span, so the
+    delinker writes the final displacement and emits no COFF relocation. MSVC has no such
+    freedom: it relocates every REL32 against the function symbol. Without this the audit
+    reads the candidate's `call self` as a reference retail never makes.
+    """
+    body = _function_bytes(target_obj).get(name)
+    if body is None or function_rva is None:
+        return Counter()
+    relocated = {site for site, _typ, _symbol, _addend in target_sites}
+    extra = Counter()
+    for site, typ, symbol, _addend in base_sites:
+        if typ != 'REL32' or symbol != name or site in relocated:
+            continue
+        if site < 0 or site + 4 > len(body):
+            continue
+        # A REL32 field is relative to the end of its own instruction; landing on the
+        # function entry means site + 4 + displacement == 0 in function-relative terms.
+        if struct.unpack_from("<i", body, site)[0] + site + 4 == 0:
+            extra[function_rva] += 1
+    return extra
+
+
+def folded_comdat_symbols(base_obj, sym, data, base_sites, target_sites):
+    """Candidate symbol -> the retail symbol VC6's linker folded it with.
+
+    Identical COMDATs are merged at link time, so two template instantiations that lower to
+    the same bytes share one retail address and only one of them can be a claimed name. A
+    rename is accepted only when the candidate defines both COMDATs with identical bytes AND
+    retail names the other one at the very same relocation site.
+    """
+    bodies = _function_bytes(base_obj)
+    by_site = {site: (typ, symbol, addend)
+               for site, typ, symbol, addend in target_sites}
+    folded = {}
+    for site, typ, symbol, addend in base_sites:
+        if resolve(sym, data, typ, symbol, addend) is not None:
+            continue
+        theirs = by_site.get(site)
+        if theirs is None or theirs[0] != typ or theirs[1] == symbol:
+            continue
+        if resolve(sym, data, *theirs) is None:
+            continue
+        ours_body, their_body = bodies.get(symbol), bodies.get(theirs[1])
+        if ours_body is None or not ours_body or ours_body != their_body:
+            continue
+        folded[symbol] = theirs[1]
+    return folded
+
+
+def apply_folded_symbols(relocs, folded):
+    """Rewrite candidate relocations onto their proven identical-COMDAT partners."""
+    if not folded:
+        return relocs
+    return [(typ, folded.get(symbol, symbol), addend)
+            for typ, symbol, addend in relocs]
+
+
+def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs, tgt_extra=None):
     """Order-INDEPENDENT MULTISET reloc-target check. We flag `only_base`: an address the BASE
     references MORE times than retail does — a wrong global/const/field/fn (multiset, not set, so an
     injected wrong ref is caught even when that address is ALSO referenced elsewhere in the same fn).
     Plus a FAKE check for unresolvable base '?'-symbols. Factoring/near-wall reorder no longer false-
-    positive here: they're fixed at the resolve layer (signed addend, const_<rva>, dup names)."""
+    positive here: they're fixed at the resolve layer (signed addend, const_<rva>, dup names).
+
+    ``tgt_extra`` carries addresses retail references without a COFF relocation, which only the
+    delinked object's own bytes can prove; see ``delinked_self_references``."""
     probs = []
     for r in base_relocs:                        # (1) fabricated function/data symbol
         if is_fake(sym, data, r[1]) and (unit, name, r[1]) not in ALLOWLIST:
             probs.append("FAKE call/ref '%s' — exists in neither the inventory nor a DATA() global" % r[1])
     tvas = _tvas(sym, data, dups, tgt_relocs)
+    if tgt_extra:
+        tvas.update(tgt_extra)
     bvas, va_sym = Counter(), {}
     for r in base_relocs:
         v = resolve(sym, data, *r)
@@ -1636,7 +1762,14 @@ def main():
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
         normalized_base = normalized_target = None
+        # Counter-named thunks have no cross-compilation identity, so they are audited as
+        # one group per unit instead of by name.
+        if any(is_ordinal_local(name) for name in near_exact_audited):
+            for p in check_ordinal_locals(sym, data, dups, unit, bf, tf):
+                bad.append((unit, ORDINAL_LOCAL_GROUP, p))
         for name in sorted(near_exact_audited):
+            if is_ordinal_local(name):
+                continue
             selected_base = bf
             selected_target = tf
             if (name.startswith("__h2cg$") and
@@ -1650,9 +1783,32 @@ def main():
                 selected_target = normalized_target
             if name not in selected_base or name not in selected_target:
                 continue
-            for p in check_fn(
+            problems = check_fn(
+                sym, data, dups, unit, name,
+                selected_base[name], selected_target[name])
+            if problems:
+                # Second pass, paid for only by a function that already looks wrong: two
+                # delinker-side facts a relocation list alone cannot express — a self-call
+                # retail resolved inside its own span, and a COMDAT the linker folded onto
+                # another symbol's address.
+                base_obj_used = base_obj
+                target_obj_used = tgt_obj
+                if selected_base is normalized_base:
+                    base_obj_used = "build/objdiff/normalized/base/%s.obj" % unit
+                    target_obj_used = "build/objdiff/normalized/target/%s.c.obj" % unit
+                base_sites = parse_obj(base_obj_used, with_sites=True).get(name, [])
+                target_sites = parse_obj(target_obj_used, with_sites=True).get(name, [])
+                problems = check_fn(
                     sym, data, dups, unit, name,
-                    selected_base[name], selected_target[name]):
+                    apply_folded_symbols(
+                        selected_base[name],
+                        folded_comdat_symbols(
+                            base_obj_used, sym, data, base_sites, target_sites)),
+                    selected_target[name],
+                    delinked_self_references(
+                        target_obj_used, name, sym.get(name),
+                        base_sites, target_sites))
+            for p in problems:
                 bad.append((unit, name, p))
     for unit, name, p in bad:
         print("  %s  %s: %s" % (unit, name, p))

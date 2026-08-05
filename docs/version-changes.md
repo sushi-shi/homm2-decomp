@@ -156,6 +156,17 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[Buka] User-declared empty destructors** `game::~game` and
   `soundManager::~soundManager`, defined at the tail of `SOURCE/KB` — PoL
   relied on the implicit destructors.
+- **[Buka] `gMineNames` (`SOURCE/KB`, 0x4fe018)** — a seven-entry table of
+  mine names (`Лесопилка`, `Лаборатория алхимика`, `Рудная шахта`,
+  `Серная шахта`, `Кристальная шахта`, `Самоцветная шахта`,
+  `Золотая шахта`) sitting between `gResourceNames` and `gQuickViewText`.
+  `advManager::QuickInfo`'s two `MAP_OBJECT_MINE` arms read it; PoL 2.0 and
+  the English Gold 2.1 GOG build have no such table and read
+  `gResourceNames` there (in both of those images `gResourceNames` is eight
+  cells, seven names plus the trailing NULL, and `gQuickViewText` follows
+  immediately — 0x4f5e58..0x4f5e78 in GOG 2.1). Buka's `gResourceNames` lost
+  the NULL cell to make room. Naming a resource where the object is a
+  building reads acceptably in English ("Ore"); Russian needs the building.
 
 ## Changed
 
@@ -1135,6 +1146,32 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `(volume * (fadeSteps - VOLUME_FADE_SPLIT)) / VOLUME_HIGH_RANGE`, which is
   what emits `mov ecx,-0x4(%ebp); imull %ecx,%eax` instead of folding the local
   into `imull -0x4(%ebp),%eax`. Byte-exact.
+
+- **[Buka] The plural creature name replaces the singular in 14 message
+  sites.** `townManager::SetArmyCommand` (7), `townManager::SetCommandAndText`
+  (the `TEXT_RECRUIT` dwelling arm), `townManager::SplitArmy`,
+  `game::DoNewTurn` (4, both the month and the week creature texts) and
+  `swapManager::SplitMons` read `gArmyNamesPlural` where PoL 2.0 reads
+  `gArmyNames`; `townManager::SetupWell` moves the other way and reads the
+  singular. Whole-image reference counts settle the classification: PoL 2.0
+  and the **English Gold 2.1 GOG build agree exactly** (56 `.text` references
+  to `gArmyNames`, 48 to `gArmyNamesPlural`), while Buka reads 26 and 72. The
+  Russian sentences take the genitive plural ("Как много %s перенести"),
+  where English reads acceptably with the singular ("Move how many %s
+  troops"). Invisible to objdiff — the relocation targets move but the
+  instruction bytes do not; see
+  `docs/patterns/byte-identical-wrong-global.md`.
+
+- **[2.1] The five disabling-spell AI modifiers are stored positive.**
+  `COMBAT_SPELL_AI_BLIND/BERSERK/PARALYZE/HYPNOTIZE/PETRIFIED_MODIFIER`
+  (`SOURCE/SPELLAI` `.rdata` 0x4ea80c..0x4ea81c) hold `+0.4f`, `+0.55f`,
+  `+0.5f`, `+0.65f`, `+0.25f`; PoL 2.0 holds the same magnitudes negated
+  (0x4eb798..0x4eb7a8: `becccccd`, `bf0ccccd`, `bf000000`, `bf266666`,
+  `be800000`). The English Gold 2.1 GOG build already carries the positive
+  run, so the sign change is upstream, not localisation. No use site negates:
+  `combatManager::RawEffectSpellInfluence` multiplies `worth` by the constant
+  directly, so this is a real scoring change, and it is invisible in code
+  bytes because the constant is reached through a relocation.
 
 ## Reconstruction infrastructure notes (not version deltas)
 

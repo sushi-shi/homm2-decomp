@@ -675,5 +675,5 @@ void CreateColorTables(void) {}
 VA(0x004b7e80, 0x5)
 void CreateColorLookupTables(void) {}
 
-
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(heroWindowManager, 0x004ea960)
