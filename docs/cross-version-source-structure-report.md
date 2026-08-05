@@ -1,0 +1,414 @@
+# PoL 2.0 and Gold 2.1/Buka source-structure report
+
+Investigation date: 2026-08-05. The primary goal is to use the exact
+`decomp-gold-2.1-buka` reconstruction as evidence for improving
+`decomp-pol-2.0`. The functional-change inventory is included as a secondary
+appendix; it is not the matching priority.
+
+## Outcome
+
+- The later branch is a strong source-structure witness. It is exact for all
+  1,727 classified game functions under VC6 SP5, while the current PoL branch
+  has 1,154/1,514 functions live exact and, after this investigation,
+  1,330/1,514 functions exact-max.
+- It must not be copied mechanically. Buka uses a different compiler and build
+  state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
+  target.
+- One exact shared structure was recovered immediately:
+  `MapExtraPosAndAdjacentsSet` moved from a 99.8591% historical maximum to an
+  audited 100.0000% maximum for its new source hash.
+- One real semantic reconstruction bug was corrected:
+  `philAI::TurnCostResource` computed the reciprocal of the retail resource
+  factor. The corrected 2.1 form reached audited 100.0000% in a focused replay,
+  with retail size, exact bytes and CFG, and the complete ordered relocation
+  stream.
+- The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
+  itself. For example, PoL retail really tests Bless twice in
+  `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
+  remain in this byte-matching branch.
+
+## Why the later tree is useful
+
+The available images name four source trees:
+
+| build | source lineage | compiler/build evidence |
+|---|---|---|
+| Heroes II 1.0 | `D:\heroes2\Source`, `D:\heroes2\Base` | original mainline |
+| PoL 2.0 | `I:\Projects\Heroes\Prog\SOURCE`, `...\BASE` | expansion fork, VC4.2 |
+| Gold 2.1 | `F:\h2xsrc\Source`, `F:\h2xsrc\Base` | return to mainline |
+| Buka | `e:\Users\igorl\VSS\HMM\HMM2\Source\...` | later VSS checkout, VC6 SP5 |
+
+The cross-version frame census found:
+
+| comparison | identical | slot-only | body changed |
+|---|---:|---:|---:|
+| PoL 2.0 → Gold 2.1 | 855 | 258 | 594 |
+| PoL 2.0 → Heroes II 1.0 | 743 | 120 | 860 |
+| PoL 2.0 → demo | 764 | 119 | 839 |
+
+Across 811 functions decidable in both 1.0 and 2.1:
+
+| relationship | functions |
+|---|---:|
+| all three builds identical | 699 |
+| 1.0 == 2.1, while PoL 2.0 differs | 112 |
+| 1.0 == PoL 2.0, while 2.1 differs | 0 |
+| PoL 2.0 == 2.1, while 1.0 differs | 0 |
+
+This is strong evidence that Gold/Buka often preserves the mainline source
+shape and PoL is the fork. It does not make Gold/Buka authoritative for PoL
+semantics: the 594 changed bodies include genuine feature work and bug fixes.
+
+The divergence is concentrated where an expansion fork would be expected:
+
+| layer | identical | slot-only | body changed | slot-only rate |
+|---|---:|---:|---:|---:|
+| BASE engine | 216 | 16 | 158 | 7% |
+| SOURCE game logic | 458 | 239 | 308 | 34% |
+| EDITOR | 7 | 3 | 0 | 30% |
+| CRT/runtime | 174 | 0 | 128 | 0% |
+
+## What exact VC6 matching proves—and what it does not
+
+An exact Buka function proves that its retained source is sufficient to produce
+that Buka retail body under VC6. It provides unusually strong evidence for:
+
+- semantic phase order;
+- loop, guard, shared-tail and switch-body structure;
+- real helper and inline-accessor boundaries;
+- declaration scopes and meaningful locals;
+- operand and expression ownership when VC6 makes them observable;
+- external call and global-data ownership.
+
+It does not prove that the same spelling will compile identically under VC4.2.
+The largest reasons are:
+
+- Buka compiles almost the whole image `/Od`; PoL has roughly 40 optimized TUs.
+- Buka enables `/GX`; PoL has no exception state.
+- Buka disables `/QIfdiv`; PoL wraps floating division with adjustment helpers.
+- Buka uses VC6 `bool`, STL headers and different TU declaration state.
+- PoL and Buka have different data layouts, middleware and literal ownership.
+- More than one C++ spelling can be byte-equivalent under either compiler.
+
+### Identifier warning
+
+Both VC4.2 and VC6 `/Od` assign stack slots from the same 16-bucket hash of the
+identifier spelling. The measured order is:
+
+```text
+bucket = msvc_identifier_hash(name) & 0xf
+frame order = bucket ascending, then same-bucket declarations newest first
+```
+
+Therefore a Gold/Buka local name is useful evidence about the mainline tree but
+is often wrong for matching the PoL fork. Transfer structure first; retain or
+solve PoL-specific names from PoL stack displacements.
+
+## Transfer protocol for this branch
+
+For each Buka exact donor:
+
+1. Confirm that the PoL and Buka functions have the same intended semantics.
+2. Inspect PoL `rva`, callees, strings, instruction diff, block diff, frame and
+   ordered relocations before editing.
+3. Build a complete structural matrix containing the current PoL source, the
+   exact Buka structure, and any evidence-backed hybrid.
+4. Keep small spelling axes independent from the structural axis and run each
+   surviving source shape in the clean state and all requested TU states.
+5. Select by retail size, exact bytes, ordered relocation identity and CFG—not
+   fuzzy score alone.
+6. Retain only ordinary semantic source. Generated declarations remain
+   disposable.
+7. If an exact island appears, replay it against the retained clean source,
+   bank the maximum, and harvest the replay evidence.
+
+## Changes landed by this investigation
+
+### `MapExtraPosAndAdjacentsSet`: shared structure, exact closure
+
+The previous PoL source used row-first array syntax and a nested empty `if`:
+
+```cpp
+mapExtra[MAP_WIDTH * y + x]
+if (checkY >= 0) {
+    if (MAP_HEIGHT <= checkY) {
+    } else {
+        // ...
+    }
+}
+```
+
+The exact Buka source uses pointer-form column-first addition and guard-clause
+loops. In PoL the candidate already had 18/20 exact blocks and 6/6 relocations.
+A three-arm structural matrix found the exact Buka arm under the same forest
+state where the old source stopped at 99.85915%.
+
+Focused replay evidence:
+
+| property | result |
+|---|---|
+| PoL RVA | `0x0006a0e7` |
+| retained source hash | `715ac9bad32c` |
+| clean score | 91.549290% |
+| exact state | seed 1213156658, forest/top trial 14 |
+| size | 246 / 246 |
+| byte delta | 0 |
+| CFG | 20/20 blocks, exact edges/pred/flow/targets |
+| relocations | complete ordered 6/6 stream |
+| result | audited MAX 100.0000% |
+
+Evidence lives in
+`docs/matching/MapExtraPosAndAdjacentsSet/`,
+`docs/matching-matrices/max-observations.tsv`, and the harvested assembly under
+`docs/matching-matrices/max-asm/`.
+
+### `philAI::TurnCostResource`: semantic bug fixed, exact closure
+
+The previous source calculated:
+
+```cpp
+(fraction / 2.0f + 0.5) / gResourceBaseValue[resource]
+```
+
+PoL retail uses `fdivrp`; Buka's exact source spells the opposite ratio:
+
+```cpp
+gResourceBaseValue[resource] / (fraction / 2.0f + 0.5)
+```
+
+This changes AI resource weighting and is a reconstruction bug, not a cosmetic
+source difference. The full matrix tested two resource-value product orders,
+two ratio orders, and 51 clean/state shapes: 204/204 variants in 150 seconds.
+Its best mixed arm reached 99.863640%. A focused replay against the retained
+Buka base-first product form then closed exactly in forest/top trial 1.
+
+| property | result |
+|---|---|
+| PoL RVA | `0x0003fb8c` |
+| old-source matrix baseline | 96.390910% |
+| retained-source clean score | 97.081820% |
+| exact state | seed 1213156658, forest/top trial 1 |
+| audited maximum | 100.0000% |
+| size | 384 / 384 |
+| byte delta | 0 |
+| CFG | 19/19 blocks, exact edges/pred/flow/targets |
+| relocations | complete ordered 16/16 stream |
+| retained source hash | `7ff4172edb65` |
+
+The two multiplication orders were byte-identical under VC4.2. The Buka
+base-first form is retained because it is exact in the mainline witness and
+agrees with the PoL target's desired evaluation ownership. The replay evidence
+and harvested assembly are recorded with the other matching artifacts. See
+`docs/matching/TurnCostResource/`.
+
+## Bugs and bug candidates exposed by the exact branch
+
+### Confirmed reconstruction bug
+
+- `philAI::TurnCostResource`: final resource ratio inverted. Corrected here.
+
+### Confirmed PoL bugs or later behavior changes—preserve for PoL matching
+
+- `army::DamageEnemy`: PoL retail tests Bless in both branches, so cursed
+  stacks take the random-damage path. Buka tests Curse in the second branch.
+- `ValidHex`: PoL accepts 0..125; the later build uses the 117-cell combat
+  count.
+- `TransferArtifacts`: PoL's upper artifact bound differs from the later
+  ultimate/Golden-Goose exclusion.
+- `combatManager::DoVictory`: later necromancy excludes Skeleton rather than
+  Ghost.
+- `advManager::InsertSound` and `army::LoadResources`: loop-count constants
+  changed in opposite directions between the images.
+- `advManager::DoVisions`: later code removes the doubled diplomacy fee and
+  changes precision/operand order.
+- `game::GetLuck`: the Rainbow bonus moved before the clamps in the later
+  build.
+
+These are useful for a playable bug-fix branch, but applying them here without
+PoL byte evidence would violate the reconstruction objective.
+
+### High-value reconstruction-bug candidates requiring PoL audit
+
+The exact Buka source corrected the following inherited source. They are not
+landed here until PoL's own bytes confirm them:
+
+- `DetermineEffectOfSpell`: Cold Ray is absent from the first
+  `SPELL_AI_ENEMY` classification even though its later damage arm exists.
+- `DetermineTargetPosition` and `StrategicValueOfPosition`: rival-hero tests
+  use current `m_x/m_y` rather than intended `m_destinationX/m_destinationY`.
+- `StrategicValueOfPosition`: a friendly-town test uses the sixth-dwelling
+  upgrade flag (`0x40000000`) where Buka uses Castle (`0x40`).
+- `searchArray::SeedCombatPosition`: Buka tests shooter `shots`, while the PoL
+  reconstruction tests `speed`.
+- `CampaignHandler`: one campaign map-enable write reverses the array indices.
+- `advManager::DoEvent`: obelisk metadata may need the 1-based `-1` index;
+  Dragon City may compare a 1-based scenario value.
+- `MoveHero`: one south-west deferred-draw expression uses X where the later
+  exact source uses Y; runtime values coincide in that arm.
+- `CombatSpecialHandler`: the later exact body lacks the inherited
+  `ConvertToHover` call.
+
+## Priority donor queue
+
+These live current-hash residuals have exact Buka structures and high retained
+PoL maxima. They are the best next cross-version matrices, ordered roughly by
+payoff and audit cost:
+
+| PoL function | retained MAX before new work | donor clue |
+|---|---:|---|
+| `CatAttack` | 99.9977% | exact Buka phase/loop structure; large function |
+| `MirrorImage` | 99.9806% | six exact Buka self-body exclusion guards |
+| `LoadIcons` | 99.9774% | declaration scope and dead-slot layout |
+| `DecodePacket` | 99.9733% | small, near-exact source donor |
+| `ComputerMonsterInteract` | 99.9684% | if/else combat tail and flee return |
+| `HeroInteractionAtTown` | 99.9663% | PHILAI structural/name donor |
+| `RVOfPosition` | 99.9294% | map access and semantic phase order |
+| `FightValueOfStack` | 99.9139% | exact Buka arithmetic ownership |
+| `SaveGame` | 99.9084% | exact Buka large-body reference |
+| `SmackManagerMain` | 99.8963% | removed speed-test/low-memory branches |
+| `HeroQuickView` | 99.8681% | low-memory and quick-info structure |
+| `InitMenuHandler` | 99.8268% | exact Buka menu CFG |
+| `ControlPanel` | 99.8089% | small, high-confidence donor |
+| `ViewSpellsHandler` | 99.7841% | refresh path changed/clarified |
+| `CastSpell` | 99.7599% | literal-true Magic Arrow case guard |
+| `FizzleForward` | 99.7204% | save/restore update flags; row recomputation |
+| `Armageddon` | 99.6871% | shake-pointer expression ownership |
+| `DoVictory` | 99.6867% | compare order plus known semantic delta |
+| `SetCombatDirections` | 99.6679% | exact Buka phase order |
+| `SpecialAttack` | 99.6240% | frame/name donor; localized body differs |
+
+Large optimized functions should use Buka only for semantic CFG families;
+their VC6 `/Od` allocation is not a compiler-state donor for PoL `/O2`.
+
+## Secondary appendix: known functional-change inventory
+
+This inventory summarizes all feature-level changes recorded by the exact
+Gold/Buka campaign. `[2.1]` means checked against the English Gold 2.1 image,
+`[Buka]` means localization/rebuild-specific, and `[open]` means Gold-vs-Buka
+provenance is not yet classified. This attribution is secondary to the
+structure-mining work above.
+
+### Build and runtime
+
+- `[Buka]` Whole-image `/Od` except optimized `BASE/BITS`; PoL uses mixed
+  `/Od` and `/O2` profiles.
+- `[Buka]` VC6 SP5, global `/GX`, no `/Gi` line statics and no `/QIfdiv`.
+- `[Buka]` Most allocations bypass the PoL debug allocation layer.
+- `[Buka]` Asserts survive only in MOUSEMGR, RESMGR, netwin, dpnetwin and
+  wingraph; MIDI trace strings are removed.
+- `[Buka]` VC6 STL/ctype guard stubs enter most TUs through the Audiere include
+  chain.
+- `[Buka/build]` String pooling is enabled for most TUs and disabled for a
+  small per-TU set.
+
+### Audio, video and media
+
+- `[Buka]` Audiere effects/music backends and refactored Miles wrappers are
+  added.
+- `[Buka]` MCI/redbook CD-audio methods, the `x_cdtest` TU and `MIDIPoll` are
+  removed; OGG tracks replace CD audio probing.
+- `[Buka]` `soundManager` shrinks from `0x6ae` to `0x52` and gains a compact
+  backend-state head; many fields become globals or disappear.
+- `[Buka]` MIDI entry points become free fastcall functions; a new
+  `MusicFlags` TU owns MIDI state.
+- `[Buka]` Miles wave-driver setup is inlined into backend startup.
+- `[Buka]` `sample` grows for an Audiere handle, while its constructor becomes
+  single-argument and hardcodes playback defaults.
+- `[Buka]` `oldmain` plays additional intro/credit videos; the Smacker speed
+  test and low-memory term are removed.
+- `[Buka/open]` Cursor footstep sample bookkeeping and timer/CD shutdown calls
+  are removed or simplified.
+
+### Localization and text
+
+- `[Buka]` In-code UI, combat, network, end-game, campaign, requester and town
+  strings are translated to CP1251 Russian.
+- `[Buka]` Window class/title strings and registry keys move to the Buka
+  Platinum namespace.
+- `[Buka]` A Cyrillic font remapper, line extractor, wrapping and hyphenation
+  engine are added; glyph selection becomes CP1251-aware.
+- `[Buka]` Keyboard input gains Polish/CP1251 remap tables and special Enter
+  scan-code handling.
+- `[Buka]` Save filenames, campaign autosave prefixes and player-exit save
+  names become localized.
+- `[Buka]` Creature-name grammar changes many message sites from singular to
+  plural and adds CP1251 upper/lower first-letter helpers.
+- `[Buka]` `gMineNames`, plural-monster lookup and localized campaign bonus
+  tables are added.
+- `[Buka]` Combat text buffers and several quick-info buffers grow to 800
+  bytes; resource-manager filename storage grows from 60 to 1000 bytes.
+
+### Adventure map, campaigns and game rules
+
+- `[open]` Environment-sound loop counts change; `DoVisions` no longer doubles
+  joining cost and changes floating precision.
+- `[Buka]` Low-memory environment-origin, video-refusal, replay-button and hero
+  art paths are removed from several dialogs/actions.
+- `[Buka/open]` `RandomizeEvents` reorders guardian arrays and expands castle
+  metadata one row upward.
+- `[Buka]` Random artifact selection permits the Anduran set outside expansion
+  campaigns; shrine counting recognizes a town hidden under a hero.
+- `[Buka]` Ultimate-artifact rumours gain a missing-artifact fallback.
+- `[Buka]` Spell widgets are always refreshed/enabled and restamp message type
+  before each broadcast.
+- `[Buka/open]` Hero recruitment retains Sirens/Arena visit flags; campaign
+  map-enable indexing and remote player matching differ.
+- `[Buka]` Town UI gains calendar text, CP1251 capitalization and a MIDI settle
+  delay during town changes.
+- `[Buka]` Expansion campaign panels, bonus labels, resource format order and
+  replay/restart behavior are localized/reworked.
+- `[open]` `QuickInfo` gains terrain dig annotations, corrected barrier/tent,
+  mine/resource and large-buffer paths.
+
+### Combat, spells and AI
+
+- `[2.1]` Five disabling-spell AI modifiers change from negative to positive.
+- `[Buka/open]` Necromancy excludes Skeleton rather than Ghost; combat-hex and
+  artifact-transfer bounds are tightened.
+- `[Buka/open]` Rainbow luck applies before clamps; several combat arithmetic
+  products and switch-body orders change.
+- `[open]` `MirrorImage` skips six source-body hex combinations.
+- `[open]` `SeedCombatPosition` gates on shots instead of speed.
+- `[open]` `ShowSpellMessage` and combat command messages use plural names and
+  add shoot-through-wall handling.
+- `[open]` Magic Arrow retains a literal-true case guard; Chain Lightning keeps
+  identical-arm angle ternaries.
+- `[open]` combat drawing copies messages through a file-static scratch and
+  several animation loops move from running offsets to indexed `for` loops.
+- `[Buka]` combat damage messages, case folding, Russian grammar and buffer
+  ownership are substantially rewritten.
+- `[open]` PHILAI target selection, resource conversion/order, local naming and
+  stack layouts differ throughout the PoL fork.
+
+### UI, widgets, graphics and input
+
+- `[2.1]` `heroWindow` reads six additional widget record types: two text-entry
+  variants, drop list, two inset variants and list box.
+- `[open]` Widget dispatch stops snapshotting flags; `widget::Dim` owns the
+  un-dimmable-kind test.
+- `[open]` Button deselection moves into `button::Deselect`; drag completion
+  returns the forwarding result literally and hotkey guards change shape.
+- `[open]` Border/icon/button reads, constructor store order and local caching
+  differ.
+- `[open]` Bitmap copy, careful copy, VESA blit, palette cycling and fizzle
+  paths use indexed loops, `memset`, or recomputed row pointers.
+- `[open]` File requester accepts Cyrillic, fixes filename buffer width and
+  swaps knob/gutter dispatch ownership.
+- `[open]` Setup-network-game checks for `DPLAYX.DLL`; several palette entry
+  points use `__cdecl`.
+
+### Data-model and ownership changes
+
+- `[Buka]` `SAMPLE2` becomes one pointer and `NULL_SAMPLE2` disappears.
+- `[Buka]` Four drop-list flags and several global cycle flags narrow to `u8`.
+- `[Buka]` `EveryOther`, `gbEveryOtherCycle`, message fields and selected
+  accessors change width or return type.
+- `[Buka/open]` Several static/global owners move between TUs; compiler-generated
+  destructors and STL init funclets are newly emitted.
+- `[Buka]` Buka-only tables and scratch buffers are added for mine names,
+  Cyrillic combat text, input maps and audio state.
+
+The appendix deliberately groups translation literals and repeated call sites
+as features rather than treating each address as a separate feature. For
+matching work, every individual site still remains discoverable from the exact
+Buka source and its version-delta history.

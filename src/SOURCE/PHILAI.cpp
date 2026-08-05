@@ -3608,16 +3608,16 @@ void philAI::TurnCostResource(i32 player) {
     total = 0;
     for (nb = 0; nb < AI_PURCHASE_RESOURCE_COUNT; nb++) {
         cost[nb] = (i32)(
-            ((double)(kn->m_income[nb] * 5) * DATA_COMPGEN(0x004eb308, turnCostResourceConstant, 0.7)
-             + (double)gpGame->m_players[player].m_resources[nb])
-            * (double)gResourceBaseValue[nb]
+            (double)gResourceBaseValue[nb]
+            * ((double)(kn->m_income[nb] * 5) * DATA_COMPGEN(0x004eb308, turnCostResourceConstant, 0.7)
+               + (double)gpGame->m_players[player].m_resources[nb])
         );
         total += cost[nb];
     }
     idx = (float)(total / AI_PURCHASE_RESOURCE_COUNT);
     for (nb = 0; nb < AI_PURCHASE_RESOURCE_COUNT; nb++) {
         jb[nb] = (float)cost[nb] / idx;
-        gafAITurnCostResource[nb] = (float)((jb[nb] / 2.0f + 0.5) / gResourceBaseValue[nb]);
+        gafAITurnCostResource[nb] = (float)(gResourceBaseValue[nb] / (jb[nb] / 2.0f + 0.5));
     }
 }
 // NOLINTEND(readability-magic-numbers)

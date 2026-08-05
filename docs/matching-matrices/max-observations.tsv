@@ -115,3 +115,5 @@ recorded_utc	unit	symbol	src_hash	score	seed	trial	family	insertion	tag	run_dir
 2026-07-29T06:35:17+00:00	SOURCE/PHILAI	?CheckForCreatureUpgrades@philAI@@QAEXXZ	3cc449312877	99.5516	1414	2	forest	top	00000586-0002-8d6e71e4	philai-cfcu
 2026-07-29T09:15:03+00:00	SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	4fca16d8e274	100.0000	7272	7	forest	top	00001c68-0007-cd02d027	spellai-cure
 2026-07-29T13:13:45+00:00	SOURCE/GAME	?CreateJoinFile@@YIXPAD00@Z	95ca3550856b	100.0000	1213156658	8	forest	top	484f4d32-0008-a46e452f	create-join-file-trial8
+2026-08-05T17:38:12+00:00	SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	715ac9bad32c	100.0000	1213156658	14	forest	top	484f4d32-0014-ae7dae2f	mapextra-cross-version-exact
+2026-08-05T17:49:38+00:00	SOURCE/PHILAI	?TurnCostResource@philAI@@QAEXH@Z	7ff4172edb65	100.0000	1213156658	1	forest	top	484f4d32-0001-76e1c088	turn-cost-cross-version-best
