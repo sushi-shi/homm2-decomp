@@ -12,8 +12,8 @@ H2_ENUM_BEGIN(TileBlitConstant)
     PIXELS_PER_COPY_GROUP_SHIFT = 3
 H2_ENUM_END(TileBlitConstant)
 
-static u32 gTileMode;
-static i32 gTileRowCtr;
+DATA(0x0051f2ec) static u32 gTileMode;
+DATA(0x0051f2f0) static i32 gTileRowCtr;
 
 #ifdef __clang__
 // clang rejects parameter references inside a naked function's __asm block,

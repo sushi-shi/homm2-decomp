@@ -1564,18 +1564,18 @@ void SendMapChange(
     );
 }
 
-i32 bMoveSoundMade = 1;
-i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
-i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
+DATA(0x004f19f0) i32 bMoveSoundMade = 1;
+DATA(0x004f19f4) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
+DATA(0x004f1a08) i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
 class sample* hOldWalkSample = NULL;
 class sample* hNewWalkSample = NULL;
-u8 EveryOther = 0;
-i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
-i32 S1cursorCycle;
-i32 S1cursorFrameCount;
-i32 S1cursorTurning;
-i32 S1cursorBaseFrame;
-H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
-SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
+DATA(0x00524260) u8 EveryOther = 0;
+DATA(0x004f1a1c) i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
+DATA(0x00524258) i32 S1cursorCycle;
+DATA(0x00524220) i32 S1cursorFrameCount;
+DATA(0x0052425c) i32 S1cursorTurning;
+DATA(0x00524224) i32 S1cursorBaseFrame;
+DATA(0x00524254) H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
+DATA(0x00524228) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 #undef SLOW_TURN_DELAY_SCALE

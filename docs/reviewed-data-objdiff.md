@@ -1,5 +1,91 @@
 # Reviewed public-data targets
 
+## The source `DATA()` claim channel
+
+`include/va.h` defines `DATA(addr)` beside `VA(addr, size)`: an absolute VA
+(`RVA + 0x400000`, eight hex digits) written in front of the global's
+**definition** in its owner `.cpp`. Under the compiler it expands to nothing;
+under Clang it expands to an `annotate` attribute, purely so a marker written
+where an attribute cannot go is a parse error instead of a silently dropped
+claim. It is audit and delinker metadata, never a placement directive.
+
+Codegen neutrality is measured, not assumed: adding the macro and then 1,018
+markers left all 99 compiled objects byte-identical to the unmarked build apart
+from the COFF `TimeDateStamp` (and `SOURCE/ARMY`'s per-compilation unnamed-
+namespace cookie, which rerolls on any recompile), and all 2,473 objdiff
+function rows unchanged.
+
+`homm2.build.source_symbols.symbols_for_file` walks both marker families in one
+parse: `VA` cursors become `kind=func` rows, and every `DATA()` marker is bound
+to its `VarDecl` by `homm2.build.annotated_data.definitions_for_file` (the same
+binding the data-topology and link audits already use) and emitted as a
+`kind=data` row carrying the decorated linker name Clang's MS mangler produces —
+`?name@@3<type>A` for external linkage, `_name` for internal. Both families
+share one discipline: a marker that cannot produce a symbol raises rather than
+being dropped, because the delinker would otherwise carve a span nothing can be
+matched to. `collect` additionally refuses a claim whose address contradicts a
+donated owner name, which would put one symbol at two addresses.
+
+A claimed address stops being a synthetic `const_<RVA>` alias and stops needing
+a donation vote; the delinked retail object names the real global, and
+`assert_relocs` can resolve it.
+
+### Evidence rules used for the first tranche
+
+Every address came from the donation evidence transposed per symbol: in a
+function whose compiled bytes are masked-identical to retail, each `DIR32` site
+pairs our `(symbol, addend)` with the retail dword, so `target - addend` votes
+for that symbol's linked address. A claim was written only when
+
+- the symbol has exactly one file-scope definition, in the unit that defines it
+  in COFF, and its identifier is not shared with another definition;
+- the winning address has a clear majority (at least twice the runner-up and at
+  least half of all votes) — balanced operand transpositions such as
+  `MAP_WIDTH * MAP_HEIGHT` make the *unanimity* donation requires unreachable
+  for the most-referenced globals;
+- the retail payload agrees, with the object's own pointer fields masked: an
+  initialized allocation must match byte for byte, a `.bss`/common allocation
+  must land on zero storage, and a `.rdata` allocation must land in `.rdata`;
+- no other claim wants the same address.
+
+1,016 claims were derived that way and two more (`bLastOnscreenMouseColor`,
+`gArmyNames`) resolved by review where votes tied or split: `gbColorMice` owns
+`0x4f9b1c` because that cell holds its `= true` initializer, so the `= 0`
+`.bss` neighbour `bLastOnscreenMouseColor` owns the loader-zero `0x536080`
+between its two already-claimed neighbours. `assert_relocs` fell from 3,058
+rows to 52, and 514 addresses stopped being `const_<RVA>`.
+
+### Open queue
+
+- **Reconstructed arrays that are one element too long.** For 70 claims the next
+  claimed address proves retail's allocation is exactly four bytes shorter than
+  ours (two more are one byte shorter), so the reconstruction carries a trailing
+  zero/NULL element retail does not have — `giPixelsPerStep` `{2,4,6,8,16,0}`
+  against retail's five entries, `gfStatPower[42]` against 41, `iMouseOffset[4]`
+  against three, `gResourceBaseValue[8]` against seven, and 58 more in
+  `SOURCE/KB`. These do not affect code bytes but they do move every later
+  allocation in the final link.
+- **Payload contradictions left unclaimed**: `szAppName`/`szTitle` (Russian in
+  retail, see `docs/version-changes.md`), `_gMidiText`, `_smackMasterVolumes`,
+  `gMineCharacteristics`, `gMapColors`, `cCombatBkgNames`,
+  `xRecruitmentSiteNames`, and the five `COMBAT_SPELL_AI_*_MODIFIER` `.rdata`
+  floats whose retail sign is positive where the reconstruction stores a
+  negative.
+- **`_gMouseManagerStrings`** votes for four distinct owner addresses: the
+  single reconstructed aggregate stands where retail has separate allocations.
+- **`SOURCE/ARMY`'s unnamed namespace.** `gTargetName` mangles as
+  `?gTargetName@?%<absolute source path>ARMY.cpp<cookie>@@3PADA`, where the
+  cookie changes on every compile. It cannot be claimed, it is 22 of the 52
+  remaining `assert_relocs` rows, and it is the only source of non-determinism
+  in the compiled objects.
+- **Vtables.** Four of the remaining rows are `??_7<class>@@6B@` targets.
+  `homm2.build.annotated_vtables` and `collect` already consume `VTBL`/`VTBL2`
+  markers; only the `va.h` macros and the source markers are missing.
+- **`config/reloc_data_owners.tsv` records `gConfig` at `0x128d20`**, but 523
+  unanimous votes and the donation inventory both place it at `0x1261e0`
+  (claimed there now). The stale row silently disables the only owner-extent
+  rule instead of failing.
+
 The native objdiff 3.7.1 report exposes data at section granularity. It does not
 produce one report row per COFF data symbol, and no debug records carry allocation
 lengths on this target (the image is stripped); the reviewed ledgers below are the

@@ -43,19 +43,19 @@ H2_ENUM_CLASS_END(RemoteSetupCommand)
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
 
-i32 iInOrderCtr = 0;
-i32 iCurLastID = 0;
-i32 giLastConfirm = -1;
-H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode = REMOTE_GAME_NONE;
-i32l lLastHeartbeatSend = 0;
-b32 gbInRemoteMain = false;
-b32 gbInRemoteCleanup = false;
-i32 iIDCtr = 0;
-i32 iTimesDropped = 0;
-b8 gbInNetSetup = false;
-i32 bUseDirectPlay = 0;
-i32 bUseWinsock = 0;
-i8 bInTimeoutFail = 0;
+DATA(0x00533d44) i32 iInOrderCtr = 0;
+DATA(0x00533d48) i32 iCurLastID = 0;
+DATA(0x005167b0) i32 giLastConfirm = -1;
+DATA(0x00533d4c) H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode = REMOTE_GAME_NONE;
+DATA(0x00533d50) i32l lLastHeartbeatSend = 0;
+DATA(0x00533d54) b32 gbInRemoteMain = false;
+DATA(0x00533d58) b32 gbInRemoteCleanup = false;
+DATA(0x00533d5c) i32 iIDCtr = 0;
+DATA(0x00533d60) i32 iTimesDropped = 0;
+DATA(0x00533d64) b8 gbInNetSetup = false;
+DATA(0x00533d68) i32 bUseDirectPlay = 0;
+DATA(0x00533d6c) i32 bUseWinsock = 0;
+DATA(0x00533d70) i8 bInTimeoutFail = 0;
 i32
     iBaud[REMOTE_BAUD_RATE_COUNT] = {300, 1200, 2400, 9600, 19200, 38400, 57600, 0};
 i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
@@ -861,19 +861,19 @@ transmitComplete:
     return result;
 }
 
-char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
-i32 iLastIds[REMOTE_RECENT_ID_COUNT];
-char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
-char gbUseDiffCompression;
-char gbUseRegularCompression;
-i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
-char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
+DATA(0x00533c38) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
+DATA(0x00533ba0) i32 iLastIds[REMOTE_RECENT_ID_COUNT];
+DATA(0x00533760) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
+DATA(0x005332fc) char gbUseDiffCompression;
+DATA(0x00533428) char gbUseRegularCompression;
+DATA(0x0053342c) i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
+DATA(0x00533654) char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 char gcThisNetName[REMOTE_NET_NAME_SIZE];
-i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
-char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
-SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
-char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
-char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-i32 bGotGameType;
-SNetPlayerInfo gsThisNetPlayerInfo;
+DATA(0x00533300) i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+DATA(0x00533318) char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
+DATA(0x00533230) SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
+DATA(0x0053386c) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
+DATA(0x00533978) char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
+DATA(0x00533424) i32 bGotGameType;
+DATA(0x00533208) SNetPlayerInfo gsThisNetPlayerInfo;
 

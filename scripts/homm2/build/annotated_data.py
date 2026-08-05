@@ -19,7 +19,7 @@ from homm2.clang_options import ClangMode
 IMAGE_BASE = 0x400000
 DATA_TOKEN = re.compile(rb"\bDATA\s*\(\s*(0x[0-9a-fA-F]+)\s*\)")
 INCLUDE_TOKEN = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
-INVENTORY_CACHE_SCHEMA = 1
+INVENTORY_CACHE_SCHEMA = 2
 
 
 @dataclass(frozen=True, order=True)
@@ -31,6 +31,11 @@ class AnnotatedDataDefinition:
     size: int
     location: str
     is_static: bool
+    # The decorated linker name. The image is stripped, so a claim is only
+    # usable by the delinker and the relocation audits when it carries the
+    # spelling the compiler actually emits; MSVC decorates an internal-linkage
+    # object as ``_name`` and an external one with the full ``?name@@3...``.
+    symbol: str = ""
 
 
 def configure_libclang() -> None:
@@ -159,7 +164,14 @@ def _qualified_name(cursor) -> str:
     return "::".join([*reversed(owners), cursor.spelling])
 
 
-def definitions_for_file(path: Path, source_root: Path, repo: Path) -> list[AnnotatedDataDefinition]:
+def definitions_for_file(path: Path, source_root: Path, repo: Path,
+                         translation=None) -> list[AnnotatedDataDefinition]:
+    """Bind every ``DATA()`` marker in one file to the object it defines.
+
+    ``translation`` lets a caller that has already parsed the file hand its
+    translation unit over instead of paying for a second parse; the marker
+    binding below is the same either way.
+    """
     path = path.resolve()
     blob = path.read_bytes()
     masked = _mask_lexical_noise(blob)
@@ -167,14 +179,16 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path) -> list[Anno
                for match in DATA_TOKEN.finditer(masked)]
     if not markers:
         return []
-    configure_libclang()
-    index = ci.Index.create()
-    # libclang offsets are UTF-8 byte offsets. Decoding as latin-1 would
-    # re-encode non-ASCII comments and shift every later cursor.
-    text = blob.decode("utf-8")
-    tu = index.parse(
-        str(path),
-        args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
+    tu = translation
+    if tu is None:
+        configure_libclang()
+        index = ci.Index.create()
+        # libclang offsets are UTF-8 byte offsets. Decoding as latin-1 would
+        # re-encode non-ASCII comments and shift every later cursor.
+        text = blob.decode("utf-8")
+        tu = index.parse(
+            str(path),
+            args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
                      unsaved_files=[(str(path), text)],
                      options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
     variables = []
@@ -207,6 +221,7 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path) -> list[Anno
             int(marker.group(1), 16) - IMAGE_BASE, size,
             f"{display.as_posix()}:{marker_line}",
             cursor.storage_class == ci.StorageClass.STATIC,
+            cursor.mangled_name,
         ))
     return rows
 

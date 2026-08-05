@@ -37,7 +37,7 @@ H2_ENUM_BEGIN(ComSerialConstant)
 H2_ENUM_END(ComSerialConstant)
 
 
-static ComPortState s_comPorts[PORT_COUNT];
+DATA(0x00524160) static ComPortState s_comPorts[PORT_COUNT];
 
 
 VA(0x00432760, 0x5f)

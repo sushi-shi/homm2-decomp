@@ -26,9 +26,9 @@ H2_ENUM_BEGIN(MidiConstant)
     MIDI_FILENAME_CAPACITY = 16
 H2_ENUM_END(MidiConstant)
 
-struct _MDI_DRIVER* hMDI = NULL;
-i32 CurrentMidiFile = MIDI_NO_TRACK;
-u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+DATA(0x00536384) struct _MDI_DRIVER* hMDI = NULL;
+DATA(0x0051f554) i32 CurrentMidiFile = MIDI_NO_TRACK;
+DATA(0x0051f558) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                                   1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -157,5 +157,5 @@ void MIDISetVolume(i32& fadeSteps) {
 // @remove
 void MIDIPoll(void) {}
 
-class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
-struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
+DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
+DATA(0x005361a0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];

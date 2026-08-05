@@ -522,17 +522,17 @@ i32 wsWaitForHost(void) {
     return 0;
 }
 
-i32 bHostFound = 0;
-u32 sd_dg = INVALID_SOCKET;
-i32 iWSLastMsgNumHumanPlayers = 1;
-i32 iWSAttempts = 0;
-i32 iWSNextTickCount = 0;
-i32 iWSWaitForHostStatus = 0;
-i32 iRc;
-char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
-struct sockaddr_in saddr_loc;
-u16 wVer;
-struct WSAData wsadata;
-struct in_addr gIn_addrIP;
+DATA(0x005347b0) i32 bHostFound = 0;
+DATA(0x0051aa9c) u32 sd_dg = INVALID_SOCKET;
+DATA(0x0051aaa0) i32 iWSLastMsgNumHumanPlayers = 1;
+DATA(0x005347b4) i32 iWSAttempts = 0;
+DATA(0x005347b8) i32 iWSNextTickCount = 0;
+DATA(0x005347bc) i32 iWSWaitForHostStatus = 0;
+DATA(0x005344e8) i32 iRc;
+DATA(0x0053469c) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
+DATA(0x00534688) struct sockaddr_in saddr_loc;
+DATA(0x00534698) u16 wVer;
+DATA(0x005344f8) struct WSAData wsadata;
+DATA(0x005344f0) struct in_addr gIn_addrIP;
 struct sockaddr_in saddr_remote;
 i32 iAddrLen;

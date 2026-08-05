@@ -25,7 +25,7 @@ static i32 s_clipB;
 static u8* s_src;
 static i32 s_dimLen;
 static i32 s_loopCount;
-static u8* s_literalSource;
+DATA(0x00536110) static u8* s_literalSource;
 static i32 s_pitch;
 
 VA(0x004c0ca0, 0x7cf)

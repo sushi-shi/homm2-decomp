@@ -5555,7 +5555,7 @@ game::~game() {}
         GROUND_REPEAT_4(5), GROUND_REPEAT_4(6), GROUND_REPEAT_4(7), GROUND_REPEAT_4(8), 10, 11,    \
         12, 13, 14, 15, GROUND_REPEAT_8(0)
 
-H2_ENUM_STORAGE(TerrainType, u8)
+DATA(0x004f8138) H2_ENUM_STORAGE(TerrainType, u8)
 giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_16(TERRAIN_WATER),
     GROUND_REPEAT_8(TERRAIN_WATER),
@@ -5593,7 +5593,7 @@ giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_16(TERRAIN_BEACH),
     TERRAIN_BEACH
 };
-u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
+DATA(0x004f82e8) u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(16),
     GROUND_REPEAT_2(1),
     GROUND_REPEAT_4(2),
@@ -5637,7 +5637,7 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
 
-u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8498) u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
     0xd3, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
@@ -5655,7 +5655,7 @@ u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xc6, 0xc8, 0xcb, 0xcc, 0xcf, 0xd0, 0xd1, 0xc9, 0xcb, 0xcf, 0xd1, 0xce, 0xd1, 0xd0, 0xc6, 0xc6,
     0xcf, 0xd5, 0xc6, 0xc9, 0xce, 0xd0, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5
 };
-u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8598) u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x0a, 0x0b, 0x0c, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x12,
@@ -5673,7 +5673,7 @@ u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x14, 0x15, 0x16, 0x17, 0x19, 0x1a, 0x1b, 0x1b, 0x18, 0x15, 0x16, 0x1a, 0x1a, 0x1b, 0x24, 0x0c,
     0x12, 0x19, 0x13, 0x15, 0x18, 0x1a, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24
 };
-u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8698) u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x73, 0x73, 0x74, 0x75, 0x75,
     0x76, 0x77, 0x77, 0x78, 0x79, 0x79, 0x7a, 0x7b, 0x7b, 0x7c, 0x7d, 0x7d, 0x7e, 0x7f, 0x7f, 0x80,
     0x81, 0x81, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5691,7 +5691,7 @@ u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8798) u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5709,7 +5709,7 @@ u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8898) u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
     0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24,
     0x24, 0x24, 0x24, 0x24, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5727,7 +5727,7 @@ u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8998) u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb6, 0xb8, 0xba, 0xd0, 0xd1,
     0xd2, 0xd2, 0xd3, 0xd3, 0xd4, 0xd5, 0xd5, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb4, 0xb6, 0xb6, 0xb8, 0xba, 0xd0, 0xd1, 0xd1, 0xd2, 0xd2,
@@ -5745,7 +5745,7 @@ u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc0, 0xc1, 0xc2, 0xd5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xd3, 0xc5, 0xd3, 0xd4, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5
 };
-u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8a98) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
     0x32, 0x2a, 0x2a, 0x2a, 0x2a, 0x32, 0x32, 0x32, 0x32, 0x35, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d,
     0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
     0x3c, 0x3e, 0x3e, 0x3e, 0x3e, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -5763,20 +5763,20 @@ u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
     0x32, 0x33, 0x34, 0x35, 0x37, 0x38, 0x3a, 0x33, 0x34, 0x37, 0x39, 0x36, 0x39, 0x38, 0x2c, 0x30,
     0x36, 0x3e, 0x31, 0x33, 0x36, 0x39, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x2a
 };
-i32 MAP_WIDTH = MAP_DIMENSION_MEDIUM;
-i32 MAP_HEIGHT = MAP_DIMENSION_MEDIUM;
-u8* mapExtra = NULL;
-b32 gbClosingApp = false;
-b32 gbForegroundApp = false;
-i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
-i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
-i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
+DATA(0x004f8b98) i32 MAP_WIDTH = MAP_DIMENSION_MEDIUM;
+DATA(0x004f8b9c) i32 MAP_HEIGHT = MAP_DIMENSION_MEDIUM;
+DATA(0x005265dc) u8* mapExtra = NULL;
+DATA(0x005265e0) b32 gbClosingApp = false;
+DATA(0x005265e4) b32 gbForegroundApp = false;
+DATA(0x004f8ba0) i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
+DATA(0x004f8ba4) i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
+DATA(0x004f8ba8) i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
 u32l glMilliCounter = 0;
-u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
+DATA(0x004f8bac) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
-u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
-char* gTilesetFiles[IDX(TILESET_COUNT)] = {
+DATA(0x004f8bc8) u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
+DATA(0x004f8bd0) char* gTilesetFiles[IDX(TILESET_COUNT)] = {
     "",
     "",
     "",
@@ -5842,13 +5842,13 @@ char* gTilesetFiles[IDX(TILESET_COUNT)] = {
     "x_loc2.icn",
     "x_loc3.icn"
 };
-u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
+DATA(0x004f8cd0) u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
 };
-u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8d10) u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
     {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
       0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
       0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
@@ -6066,7 +6066,7 @@ u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COU
       0x00, 0x4b, 0xf2, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x0a}}
 };
-u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f9910) u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0b,
     0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b,
     0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x25, 0x25, 0x25, 0x25, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
@@ -6084,7 +6084,7 @@ u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0xdf, 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xee,
     0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
-u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f9a10) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -6102,16 +6102,16 @@ u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45,
     0x45, 0x45, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
-font* smallFont = NULL;
-font* bigFont = NULL;
-b32 gbReturnAfterComputeExtent = false;
-b32 gbAllowTextEntryEscape = true;
-WindowColorCycleMode giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-i32 giScreenScroll = 1;
-i32 giMenuCommand = -1;
-b32 gbSendMouseMoveMessages = false;
-b32 gbColorMice = true;
-u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
+DATA(0x005265e8) font* smallFont = NULL;
+DATA(0x005265ec) font* bigFont = NULL;
+DATA(0x005265f0) b32 gbReturnAfterComputeExtent = false;
+DATA(0x004f9b10) b32 gbAllowTextEntryEscape = true;
+DATA(0x005265f4) WindowColorCycleMode giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
+DATA(0x004f9b14) i32 giScreenScroll = 1;
+DATA(0x004f9b18) i32 giMenuCommand = -1;
+DATA(0x005265f8) b32 gbSendMouseMoveMessages = false;
+DATA(0x004f9b1c) b32 gbColorMice = true;
+DATA(0x004f9b20) u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
     TOWN_ELIGIBLE_BUILD_SORCERESS_MASK,
@@ -6119,10 +6119,10 @@ u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
     TOWN_ELIGIBLE_BUILD_WIZARD_MASK,
     TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK
 };
-u8 giMapSizes[KB_MAP_SIZE_COUNT] =
+DATA(0x004f9b38) u8 giMapSizes[KB_MAP_SIZE_COUNT] =
     {MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE, MAP_DIMENSION_XLARGE};
-b32 gbUseEvilInterface = false;
-char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
+DATA(0x005265fc) b32 gbUseEvilInterface = false;
+DATA(0x004f9b3c) char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {"advbord.icn", "advborde.icn"},  {"heroextg.icn", "heroexte.icn"},
     {"buybuild.icn", "buybuile.icn"}, {"advbtns.icn", "advebtns.icn"},
     {"herologo.icn", "herologe.icn"}, {"sunmoon.icn", "sunmoone.icn"},
@@ -6144,24 +6144,24 @@ char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {"campxtrg.ICN", "campxtre.ICN"}
 };
 char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\HEROES2\\ANIM\\";
-char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
-char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
-b32 gbPutzingWithMouseCtr = false;
+DATA(0x004f9dc4) char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
+DATA(0x004f9dd8) char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
+DATA(0x00526600) b32 gbPutzingWithMouseCtr = false;
 b32 gbDontTryRedbook = false;
 b32 gbDontTryMIDI = false;
 b32 gbDontTryDigital = false;
-float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
-icon* gShingleAnim = NULL;
-i32 iNextShingleAnim = 0;
-i32 giDialogTimeout = 0;
-i32 giNewMonsterCycleFrame = 0;
-b32 gbNoCDRom = false;
-b32 gbLeaveNetBoxAlone = false;
-b32 gbDrawWindowBackground = true;
-b32 gbCheatMenus = false;
-b32 gbUseWaveout = false;
+DATA(0x004f9f4c) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
+DATA(0x00526604) icon* gShingleAnim = NULL;
+DATA(0x00526608) i32 iNextShingleAnim = 0;
+DATA(0x0052660c) i32 giDialogTimeout = 0;
+DATA(0x00526610) i32 giNewMonsterCycleFrame = 0;
+DATA(0x00526614) b32 gbNoCDRom = false;
+DATA(0x00526618) b32 gbLeaveNetBoxAlone = false;
+DATA(0x004f9f58) b32 gbDrawWindowBackground = true;
+DATA(0x0052661c) b32 gbCheatMenus = false;
+DATA(0x00526620) b32 gbUseWaveout = false;
 b32 gbShowAllMaps = false;
-char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+DATA(0x004f9f5c) char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6195,16 +6195,16 @@ char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "stonskin.icn",
     "stelskin.icn"
 };
-i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
+DATA(0x004f9fdc) i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55};
-i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
+DATA(0x004f9ffc) i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137};
 i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] = {IDX(RES_WOOD), IDX(RES_ORE), -1, -1, 0, 0, 0, 0};
 i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
-i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
+DATA(0x004fa028) i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
     {640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0, 0, 0};
-tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fa038) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {0, -1, 16},
     {1, -1, 16},
     {1, 0, 16},
@@ -6214,23 +6214,23 @@ tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {-1, 0, 16},
     {-1, -1, 16}
 };
-i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1, 0};
-i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+DATA(0x004fa058) i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1, 0};
+DATA(0x004fa074) i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
     {30, 10, 30, 10, 10, 10, 10000},
     {20, 5, 20, 5, 5, 5, 7500},
     {10, 2, 10, 2, 2, 2, 5000},
     {5, 0, 5, 0, 0, 0, 2500},
     {0, 0, 0, 0, 0, 0, 0}
 };
-i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+DATA(0x004fa100) i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
     {20, 5, 20, 5, 5, 5, 7500},
     {20, 5, 20, 5, 5, 5, 7500},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000}
 };
-i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000, 0};
-i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+DATA(0x004fa18c) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000, 0};
+DATA(0x004fa1a8) i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {400, 750, 1000},
     {200, 450, 850},
     {450, 1000, 1675},
@@ -6246,7 +6246,7 @@ i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {100, 450, 950},
     {445, 950, 1500}
 };
-H2_ENUM_STORAGE(ArtifactLevelMask, u8)
+DATA(0x004fa250) H2_ENUM_STORAGE(ArtifactLevelMask, u8)
 gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x04, 0x04, 0x02, 0x08, 0x08, 0x08,
     0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x02, 0x02,
@@ -6256,7 +6256,7 @@ gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x10, 0x20, 0x20, 0x20, 0x20, 0x02, 0x08, 0x02, 0x08,
     0x02, 0x02, 0x08, 0x08, 0x02, 0x02, 0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x04, 0x00
 };
-i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
+DATA(0x004fa2b8) i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
     13600, 22000, 18000, 14000, 19000, 18500, 22200, 25000, 6000,  4000, 4000,  5600,  1200,
     1200,  1200,  1200,  -1200, 2000,  1800,  1800,  2000,  1000,  3600, 5600,  4000,  5040,
     3060,  4420,  5610,  6630,  7000,  6000,  4000,  4500,  2250,  1200, 1200,  1200,  1200,
@@ -6266,10 +6266,10 @@ i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
     7600,  3700,  7400,  0,     0,     0,     0,     0,     2500,  4800, 9000,  -3250, 36200,
     2000,  -1050, -1050, 10000, 10000, 15000, 720,   7500,  10000, 9200, 10000, 1500
 };
-i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
-i32 giDebugLevel = 0;
-i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
-tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
+DATA(0x004fa454) i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
+DATA(0x00526628) i32 giDebugLevel = 0;
+DATA(0x004fa458) i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
+DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
     {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
     {{200, 463}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
@@ -6613,30 +6613,30 @@ tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{500, 1501}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
     {{500, 1690}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MONSTER_FLAGS_NONE}
 };
-float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
+DATA(0x004fab14) float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
                                           0.58f, 0.6f,  0.62f, 0.64f, 0.67f, 0.7f,  0.74f,
                                           0.77f, 0.8f,  0.84f, 0.88f, 0.92f, 0.96f, 1.0f,
                                           1.04f, 1.08f, 1.12f, 1.16f, 1.2f,  1.24f, 1.28f,
                                           1.32f, 1.36f, 1.4f,  1.44f, 1.48f, 1.52f, 1.56f,
                                           1.6f,  1.64f, 1.68f, 1.72f, 1.76f, 1.8f,  0.0f};
-float gfBattleStat[KB_STAT_POWER_COUNT] = {
+DATA(0x004fabb8) float gfBattleStat[KB_STAT_POWER_COUNT] = {
     0.2f, 0.2f,  0.2f, 0.2f,  0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.55f, 0.6f, 0.65f,
     0.7f, 0.75f, 0.8f, 0.85f, 0.9f, 0.95f, 1.0f, 1.1f,  1.2f, 1.3f,  1.4f, 1.5f,  1.6f, 1.7f,
     1.8f, 1.9f,  2.0f, 2.1f,  2.2f, 2.3f,  2.4f, 2.5f,  2.6f, 2.7f,  2.8f, 2.9f,  3.0f, 0.0f
 };
-i8 gSpellLimits[KB_SPELL_LIMIT_COUNT] = {3, 3, 2, 2, 1};
-float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT] =
+DATA(0x004fac5c) i8 gSpellLimits[KB_SPELL_LIMIT_COUNT] = {3, 3, 2, 2, 1};
+DATA(0x004fac64) float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT] =
     {0.27f, 0.4f, 0.48f, 0.56f, 0.64f, 0.73f, 0.81f, 0.88f, 0.93f, 0.97f, 1.0f, 0.0f};
-float gfSpellCastNumMod[KB_SPELL_MOD_COUNT] =
+DATA(0x004fac90) float gfSpellCastNumMod[KB_SPELL_MOD_COUNT] =
     {0.0f, 1.0f, 1.75f, 2.35f, 2.85f, 3.35f, 3.7f, 4.0f, 4.26f, 4.5f, 4.7f, 0.0f};
-float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT] =
+DATA(0x004facbc) float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT] =
     {0.0f, 1.0f, 1.75f, 2.5f, 3.1f, 3.5f, 4.0f, 4.5f, 5.4f, 5.75f, 6.15f, 0.0f};
-float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
+DATA(0x004face8) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
     {0.0f, 0.4f, 0.65f, 0.8f, 1.0f, 1.16f, 1.3f, 1.43f, 1.54f, 1.64f, 1.74f, 0.0f};
-float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
+DATA(0x004fad14) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
-b32 gbDrawSavedCursor = false;
-b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+DATA(0x0052662c) b32 gbDrawSavedCursor = false;
+DATA(0x004fad30) b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     {8, 0, 0, 0, 8, 16, 16, 16},
     {17, 9, 1, 1, 1, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -6646,7 +6646,7 @@ b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     {6, 6, 14, 22, 22, 22, 14, 6},
     {7, 7, 7, 15, 23, 23, 23, 15}
 };
-u8 giCloudType[KB_CLOUD_MASK_COUNT] = {
+DATA(0x004fad70) u8 giCloudType[KB_CLOUD_MASK_COUNT] = {
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x22, 0x16,
     0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x1d, 0x1e, 0x83, 0x1c, 0x85, 0x22, 0x78,
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x7d, 0x79,
@@ -6664,7 +6664,7 @@ u8 giCloudType[KB_CLOUD_MASK_COUNT] = {
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x0d, 0x1e, 0x1f, 0x0e, 0x03, 0x01, 0x10,
     0x0b, 0x07, 0x08, 0x73, 0x09, 0x0a, 0x72, 0x67, 0x6c, 0x0f, 0x1e, 0x05, 0x0e, 0x03, 0x01, 0x00
 };
-i16 giScoreMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
+DATA(0x004fae70) i16 giScoreMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {0, 0},    {4, 11},   {8, 20},   {12, 38},  {16, 29},  {20, 57},  {24, 47},  {28, 12},
     {32, 48},  {36, 1},   {40, 2},   {44, 39},  {48, 21},  {52, 49},  {56, 13},  {60, 23},
     {64, 30},  {68, 3},   {72, 24},  {76, 22},  {80, 58},  {84, 4},   {88, 14},  {92, 50},
@@ -6675,7 +6675,7 @@ i16 giScoreMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {201, 60}, {204, 10}, {207, 19}, {210, 45}, {213, 28}, {216, 56}, {219, 35}, {222, 36},
     {225, 46}, {228, 37}
 };
-i16 giScoreCampaignMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
+DATA(0x004faf78) i16 giScoreCampaignMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {9999, 0},  {5800, 11}, {5600, 20}, {5400, 38}, {5200, 29}, {5000, 57}, {4800, 47}, {4600, 12},
     {4400, 48}, {4200, 1},  {4000, 2},  {3800, 39}, {3600, 21}, {3400, 49}, {3200, 13}, {3000, 23},
     {2800, 30}, {2600, 3},  {2400, 24}, {2200, 22}, {2000, 58}, {1900, 4},  {1800, 14}, {1700, 50},
@@ -6686,7 +6686,7 @@ i16 giScoreCampaignMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {480, 60},  {460, 10},  {440, 19},  {420, 45},  {400, 28},  {380, 56},  {360, 35},  {340, 36},
     {320, 46},  {300, 37}
 };
-i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
+DATA(0x004fb080) i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
     IDX(TOWN_MUSIC_KNIGHT),
     IDX(TOWN_MUSIC_BARBARIAN),
     IDX(TOWN_MUSIC_WARLOCK),
@@ -6696,7 +6696,7 @@ i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
     IDX(TOWN_MUSIC_NONE),
     IDX(TOWN_MUSIC_NONE)
 };
-i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+DATA(0x004fb088) i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
     {{35, 45, 10, 10}, {25, 25, 25, 25}},
     {{55, 35, 5, 5}, {25, 25, 25, 25}},
     {{10, 10, 30, 50}, {20, 20, 30, 30}},
@@ -6704,15 +6704,15 @@ i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_ST
     {{10, 10, 40, 40}, {20, 20, 30, 30}},
     {{15, 15, 35, 35}, {25, 25, 25, 25}}
 };
-b32 gbLoadingMonoIcon = false;
-i32 giMonoIconSkip = -1;
-i32 giScrollX = 0;
-i32 giScrollY = 0;
-b32 gbNoBorder = false;
-b32 gbEnlargeScreenBlit = true;
-ConfigExecutable giCurExe = CONFIG_EXECUTABLE_GAME;
-b32 gbInDialog = false;
-struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
+DATA(0x00526630) b32 gbLoadingMonoIcon = false;
+DATA(0x004fb0b8) i32 giMonoIconSkip = -1;
+DATA(0x00526634) i32 giScrollX = 0;
+DATA(0x00526638) i32 giScrollY = 0;
+DATA(0x0052663c) b32 gbNoBorder = false;
+DATA(0x004fb0bc) b32 gbEnlargeScreenBlit = true;
+DATA(0x00526640) ConfigExecutable giCurExe = CONFIG_EXECUTABLE_GAME;
+DATA(0x00526644) b32 gbInDialog = false;
+DATA(0x004fb0c0) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {IDX(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
     {IDX(KBWIN_MENU_SIZE_800_600), 1, 1, 0},
@@ -6784,18 +6784,18 @@ struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
-b32 gbInSetupDialog = false;
-b32 gbMinimized = false;
-b32 gbHeroMoving = false;
-b32 gbInSmackMgr = false;
+DATA(0x00526648) b32 gbInSetupDialog = false;
+DATA(0x0052664c) b32 gbMinimized = false;
+DATA(0x00526650) b32 gbHeroMoving = false;
+DATA(0x00526654) b32 gbInSmackMgr = false;
 i32 glBottomRefresh = 0;
 b32 gbBothMachinesWin95 = false;
-b32 gbGotFirstHeartbeat = false;
-HMENU hmnuDflt = NULL;
-HMENU hmnuCmbt = NULL;
-HMENU hmnuAdv = NULL;
-HMENU hmnuTown = NULL;
-char* cMonFilename[IDX(CREATURE_COUNT)] = {
+DATA(0x00526660) b32 gbGotFirstHeartbeat = false;
+DATA(0x00526664) HMENU hmnuDflt = NULL;
+DATA(0x00526668) HMENU hmnuCmbt = NULL;
+DATA(0x0052666c) HMENU hmnuAdv = NULL;
+DATA(0x00526670) HMENU hmnuTown = NULL;
+DATA(0x004fb2ac) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",
     "orc.icn",      "orc2.icn",     "wolf.icn",     "ogre.icn",     "ogre2.icn",    "troll.icn",
@@ -6808,10 +6808,10 @@ char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "lich.icn",     "lich2.icn",    "dragbone.icn", "rogue.icn",    "nomad.icn",    "ghost.icn",
     "genie.icn",    "medusa.icn",   "eelem.icn",    "aelem.icn",    "felem.icn",    "welem.icn"
 };
-b32 gbProcessingCombatAction = false;
-RemoteNetworkProtocol iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
-i32 iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
-SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
+DATA(0x00526674) b32 gbProcessingCombatAction = false;
+DATA(0x00526678) RemoteNetworkProtocol iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
+DATA(0x004fb3b4) i32 iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
+DATA(0x004fb3b8) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"fireball",
      3,
      8,
@@ -7179,7 +7179,7 @@ SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
 };
-char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
+DATA(0x004fb950) char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
     "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin", "pikmnfrm.bin", "swrdsfrm.bin",
     "swrdsfrm.bin", "cvlryfrm.bin", "cvlr2frm.bin", "paladfrm.bin", "paladfrm.bin", "goblnfrm.bin",
     "orc__frm.bin", "orc__frm.bin", "wolf_frm.bin", "ogre_frm.bin", "ogre_frm.bin", "trollfrm.bin",
@@ -7210,7 +7210,7 @@ u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x0a,
     0x00
 };
-u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+DATA(0x004fba68) u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x09,
     0x0b,
     0x0d,
@@ -7228,11 +7228,11 @@ u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x11,
     0x00
 };
-u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
+DATA(0x004fba78) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
                                             10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
-SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
-i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
+DATA(0x004fba98) SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
+DATA(0x004fba9c) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
 char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
                                                      "CBKGGRTR.icn", "CBKGGRMT.icn",
                                                      "CBKGSNTR.icn", "CBKGSNMT.icn",
@@ -7243,7 +7243,7 @@ char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
                                                      "CBKGCRCK.icn", "",
                                                      "CBKGBEAC.icn", "",
                                                      "CBKGGRAV.icn", NULL};
-struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
+DATA(0x004fbaf0) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
     {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000042, 3, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000001, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000000, 2, 2, {0, 1, 0, 0, 0, 0, 0, 0}}, {0x0000014a, 2, 2, {0, 1, 0, 0, 0, 0, 0, 0}},
@@ -7261,13 +7261,13 @@ struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
     {0x00000002, 3, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000010, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000000, 1, 2, {0, 1, 0, 0, 0, 0, 0, 0}}, {0x00000010, 2, 2, {0, 1, 0, 0, 0, 0, 0, 0}}
 };
-i32 gEstatesGoldLevel[IDX(HERO_SKILL_LEVEL_COUNT)] = {0, 100, 250, 500};
-float gfSSLogisticsMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.2f, 1.3f};
-float gfSSNavigationMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.33f, 1.66f, 2.0f};
-float gfSSArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.25f, 1.5f};
-float gfSSAIArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.04f, 1.1f, 1.2f};
-i8 giVisRange[IDX(HERO_SKILL_LEVEL_COUNT)] = {4, 5, 6, 7};
-u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
+DATA(0x004fbcb0) i32 gEstatesGoldLevel[IDX(HERO_SKILL_LEVEL_COUNT)] = {0, 100, 250, 500};
+DATA(0x004fbcc0) float gfSSLogisticsMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.2f, 1.3f};
+DATA(0x004fbcd0) float gfSSNavigationMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.33f, 1.66f, 2.0f};
+DATA(0x004fbce0) float gfSSArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.25f, 1.5f};
+DATA(0x004fbcf0) float gfSSAIArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.04f, 1.1f, 1.2f};
+DATA(0x004fbd00) i8 giVisRange[IDX(HERO_SKILL_LEVEL_COUNT)] = {4, 5, 6, 7};
+DATA(0x004fbd04) u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
     {2, 2, 1, 1, 1},
     {3, 1, 1, 1, 1},
     {0, 0, 2, 3, 1},
@@ -7275,7 +7275,7 @@ u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
     {0, 1, 2, 2, 1},
     {1, 0, 2, 2, 1}
 };
-i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
+DATA(0x004fbd24) i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
     {{{100, 150}, {100, 150}, {100, 150}, {100, 150}},
      {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
      {{150, 225}, {125, 187}, {100, 150}, {100, 150}},
@@ -7286,19 +7286,19 @@ i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN
      {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
      {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
      {{75, 112}, {75, 112}, {75, 112}, {75, 112}}};
-u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
+DATA(0x004fbe64) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-char* gTownPrefixNames[IDX(FACTION_COUNT)] = {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
-char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+DATA(0x004fbee0) char* gTownPrefixNames[IDX(FACTION_COUNT)] = {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
+DATA(0x004fbef8) char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage", "thie", "tvrn", "dock", "well", "tent", "cstl", "stat", "ltur", "rtur", "mark",
     "wel2", "moat", "spec", "boat", "capt", "ext0", "ext1", "ext2", "dw_0", "dw_1", "dw_2",
     "dw_3", "dw_4", "dw_5", "up_1", "up_2", "up_3", "up_4", "up_5", "up5b", "ext3"
 };
-H2_ENUM_STORAGE(CreatureType, i8)
+DATA(0x004fbf78) H2_ENUM_STORAGE(CreatureType, i8)
 gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {IDX(CREATURE_PEASANT),
      IDX(CREATURE_ARCHER),
@@ -7373,7 +7373,7 @@ gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      ARMY_GROUP_EMPTY_SLOT,
      ARMY_GROUP_EMPTY_SLOT}
 };
-i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fbfc0) i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     {0, 0, 0, 0, 0, 0, 0},
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 4, 5, 4, 4, 4, 1000},
@@ -7381,7 +7381,7 @@ i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = 
     {5, 8, 5, 8, 8, 8, 1000},
     {5, 10, 5, 10, 10, 10, 1000}
 };
-i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc068) i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 0, 15, 0, 0, 0, 1500},
     {10, 0, 10, 0, 0, 0, 2000},
     {0, 0, 0, 0, 10, 0, 1500},
@@ -7389,7 +7389,7 @@ i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 5, 5, 5, 5, 5, 1500},
     {0, 10, 0, 10, 0, 0, 1000}
 };
-i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc110) i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 0, 5, 0, 0, 0, 2000},
     {5, 0, 0, 0, 0, 0, 750},
     {5, 0, 0, 0, 0, 0, 500},
@@ -7407,12 +7407,12 @@ i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT]
     {0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 500}
 };
-i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
-i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST) + 1] = {
+DATA(0x004fc2d0) i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
+DATA(0x004fc2e8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST) + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0, 0
 };
-i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
-i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fc334) i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
+DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
@@ -7420,7 +7420,7 @@ i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
-i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fc46c) i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     {{0, 0, 0, 0, 0, 0, 200},
      {0, 0, 0, 0, 0, 0, 1000},
      {0, 0, 5, 0, 0, 0, 1000},
@@ -7494,7 +7494,7 @@ i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOU
      {0, 0, 0, 0, 0, 0, 0},
      {0, 0, 0, 0, 0, 0, 0}}
 };
-u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -7568,14 +7568,14 @@ u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      0xffffffffUL,
      0xffffffffUL}
 };
-i32 giDebugBuildingToBuild = -1;
-u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr"};
-char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
-i32 giDeferObjDrawX = -1;
-i32 giDeferObjDrawY = -1;
-class heroWindow* gpInitWin = NULL;
-u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)] = {
+DATA(0x004fcd6c) i32 giDebugBuildingToBuild = -1;
+DATA(0x004fcd70) u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
+DATA(0x004fcd7c) char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr"};
+DATA(0x004fcd94) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
+DATA(0x004fcd9c) i32 giDeferObjDrawX = -1;
+DATA(0x004fcda0) i32 giDeferObjDrawY = -1;
+DATA(0x0052667c) class heroWindow* gpInitWin = NULL;
+DATA(0x004fcda4) u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)] = {
     {3, 4, 2, 2, 2, 3},
     {2, 3, 3, 1, 1, 1},
     {3, 3, 2, 2, 2, 2},
@@ -7591,7 +7591,7 @@ u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)] = {
     {0, 0, 0, 1, 0, 7},
     {3, 2, 2, 2, 2, 2}
 };
-struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
+DATA(0x004fcdf8) struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
     {{18, 8},
      {-61, -49},
      2,
@@ -7785,16 +7785,16 @@ struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
       {9, 10, -1, -1, -1, -1, -1, -1, -1},
       {-1, -1, -1, -1, -1, -1, -1, -1, -1}}}
 };
-u8 iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {9, 34, 86, 113};
-u8 iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {22, 47, 73, 100};
-u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
+DATA(0x004fd404) u8 iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {9, 34, 86, 113};
+DATA(0x004fd408) u8 iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {22, 47, 73, 100};
+DATA(0x004fd40c) u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
     {{468, 58}, {421, 128}, {417, 291}, {498, 402}};
-u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
+DATA(0x004fd41c) u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
     {{441, 61}, {398, 147}, {398, 233}, {441, 316}};
-u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {{393, 192}, {348, 262}};
-float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] =
+DATA(0x004fd42c) u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {{393, 192}, {348, 262}};
+DATA(0x004fd434) float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] =
     {0.0f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.5f};
-struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
+DATA(0x004fd460) struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
     {0x0000, {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {30, 31, 32, 33, 47, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0002, {56, 57, 58, 59, 60, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}},
@@ -7821,16 +7821,16 @@ struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
     {0x0080, {43, 30, 18, 84, 85, 73, 60, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0080, {21, 34, 48, 70, 83, 97, 98, -1, -1, -1, -1, -1, -1, -1, -1}}
 };
-i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT] =
+DATA(0x004fd60c) i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT] =
     {{1, 1, 1, 1}, {1, 1, 1, 1}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}};
-b32 gbDrawingPuzzle = false;
-i32 giWalkingFrom = -1;
-i32 giWalkingFrom2 = -1;
-i32 giWalkingTo = -1;
-i32 giWalkingTo2 = -1;
-i32 giWalkingYMod = 0;
-u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
-SCampaignChoice
+DATA(0x00526680) b32 gbDrawingPuzzle = false;
+DATA(0x004fd624) i32 giWalkingFrom = -1;
+DATA(0x004fd628) i32 giWalkingFrom2 = -1;
+DATA(0x004fd62c) i32 giWalkingTo = -1;
+DATA(0x004fd630) i32 giWalkingTo2 = -1;
+DATA(0x00526684) i32 giWalkingYMod = 0;
+DATA(0x004fd634) u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
+DATA(0x004fd641) SCampaignChoice
     campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
         {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
           {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
@@ -7905,8 +7905,8 @@ SCampaignChoice
           {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
           {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
-char* congratsText = NULL;
-char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x00526688) char* congratsText = NULL;
+DATA(0x004fd7ac) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
     "Ultimate Book of Knowledge",
     "Ultimate Sword of Dominion",
     "Ultimate Cloak of Protection",
@@ -8012,7 +8012,7 @@ char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
     "Spade of Necromancy",
     NULL
 };
-char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004fd948) char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
     "{Ultimate Book\n(+12 Knowledge)}\n\nThe Ultimate Book of Knowledge increases your knowledge "
     "by 12.",
     "{Ultimate Sword\n(+12 Attack)}\n\nThe Ultimate Sword of Dominion increases your attack skill "
@@ -8152,7 +8152,7 @@ char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
     "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill.",
     NULL
 };
-char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004fdae4) char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "",
     "",
     "",
@@ -8401,16 +8401,16 @@ char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "to be the enchanted shovel of the Gravediggers, long thought lost by mortals.",
     NULL
 };
-char* gStatNames[HERO_PRIMARY_STAT_COUNT] =
+DATA(0x004fdc80) char* gStatNames[HERO_PRIMARY_STAT_COUNT] =
     {"Attack Skill", "Defense Skill", "Spell Power", "Knowledge"};
-char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
+DATA(0x004fdc90) char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
     "{Attack Skill}\n\nYour attack skill is a bonus added to each creature's attack skill.",
     "{Defense Skill}\n\nYour defense skill is a bonus added to each creature's defense skill.",
     "{Spell Power}\n\nYour spell power determines the length or power of a spell.",
     "{Knowledge}\n\nYour knowledge determines how many spell points your hero may have.  Under "
     "normal cirumstances, a hero is limited to 10 spell points per level of knowledge."
 };
-char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] =
+DATA(0x004fdca0) char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] =
     {"Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer", "Multiple", "Random"};
 char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
     "peasn", "archr", "arch2", "pikmn", "pikm2", "swman", "swma2", "cvlry", "cvlr2", "paldn",
@@ -8421,7 +8421,7 @@ char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
     "Mummy", "mumm2", "vampr", "vamp2", "lich_", "lich2", "boned", "Rogue", "Nomad", "Ghost",
     "Genie", "medus", "eleme", "elema", "elemf", "elemw"
 };
-char* gArmyNames[IDX(CREATURE_COUNT)] = {
+DATA(0x004fddc8) char* gArmyNames[IDX(CREATURE_COUNT)] = {
     "peasant",
     "archer",
     "ranger",
@@ -8489,7 +8489,7 @@ char* gArmyNames[IDX(CREATURE_COUNT)] = {
     "fire elemental",
     "water elemental"
 };
-char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
+DATA(0x004fded0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "peasants",
     "archers",
     "rangers",
@@ -8557,11 +8557,11 @@ char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "fire elementals",
     "water elementals"
 };
-char* gTerrainNames[KB_TERRAIN_TYPE_COUNT] =
+DATA(0x004fdfd8) char* gTerrainNames[KB_TERRAIN_TYPE_COUNT] =
     {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach", NULL};
-char* gResourceNames[RESOURCE_VALUE_COUNT] =
+DATA(0x004fdffc) char* gResourceNames[RESOURCE_VALUE_COUNT] =
     {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold", NULL};
-char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
+DATA(0x004fe034) char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "",
     "Alchemist Lab",
     "Sign",
@@ -8687,7 +8687,7 @@ char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "%s",
     "Jail"
 };
-char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
+DATA(0x004fe224) char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "{Alchemist}\n\nYou have taken control of the local Alchemist shop. It will provide you with "
     "one unit of Mercury per day.",
     "{Signpost}\n\nA signpost reads:}\n\n%s is near.",
@@ -8826,7 +8826,7 @@ char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "tattered clothing, you find ",
     NULL
 };
-char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
+DATA(0x004fe3a0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Start a single or multi-player game.",
     "Load a previously saved game.",
     "Save the current game.",
@@ -8834,7 +8834,7 @@ char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Exit this menu without doing anything.",
     NULL
 };
-char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
+DATA(0x004fe3b4) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
     "{Speed}\n\nSet the speed of combat actions and animations.",
     "{Monster Info}\n\nToggle the monster info window, which shows information on the active and "
@@ -8852,7 +8852,7 @@ char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "performance cost, most noticeable on 486 computers.",
     NULL
 };
-char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
+DATA(0x004fe3d0) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "View the entire world.",
     "View the obelisk puzzle.",
     "View information on the scenario you are currently playing.",
@@ -8860,7 +8860,7 @@ char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "Exit this menu without doing anything.",
     NULL
 };
-char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
+DATA(0x004fe3e4) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{New Game}\n\nStart a single or multi-player game.",
     "{Load Game}\n\nLoad a previously saved game.",
     "{High Scores}\n\nView the high score screen.",
@@ -8868,7 +8868,7 @@ char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{Quit}\n\nQuit Heroes of Might and Magic and return to the operating system.",
     NULL
 };
-char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
+DATA(0x004fe3f8) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Next Hero}\n\nSelect the next Hero.",
     "{Continue Movement}\n\nContinue the Hero's movement along the current path.",
     "{Kingdom Summary}\n\nView a summary of your kingdom.",
@@ -8878,11 +8878,11 @@ char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{System Options}\n\nBring up the system options menu, allowing you to customize your game.",
     "{Cast Spell}\n\nCast an adventure spell."
 };
-char* gLuckText[KB_LUCK_TEXT_COUNT] =
+DATA(0x004fe418) char* gLuckText[KB_LUCK_TEXT_COUNT] =
     {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish", NULL};
-char* gMoraleText[KB_MORALE_TEXT_COUNT] =
+DATA(0x004fe434) char* gMoraleText[KB_MORALE_TEXT_COUNT] =
     {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!", NULL};
-char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
+DATA(0x004fe450) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "Off",
     "On",
     "On\nVolume 9",
@@ -8896,9 +8896,9 @@ char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "On\nVolume 1",
     NULL
 };
-char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
-char* gColors[IDX(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
-char* gMonthNames[KB_MONTH_NAME_COUNT] = {
+DATA(0x004fe47c) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
+DATA(0x004fe490) char* gColors[IDX(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
+DATA(0x004fe4c0) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Grasshopper",
     "Ant",
     "Dragonfly",
@@ -8910,7 +8910,7 @@ char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Hornet",
     "Beetle"
 };
-char* gWeekNames[KB_WEEK_NAME_COUNT] = {
+DATA(0x004fe4e8) char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Squirrel",
     "Rabbit",
     "Gopher",
@@ -8928,7 +8928,7 @@ char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Condor",
     NULL
 };
-char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+DATA(0x004fe524) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Kingdom Overview",
     "View %s Info",
     "Additional hero characteristics",
@@ -8956,7 +8956,7 @@ char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Set army combat formation to 'Grouped'",
     NULL
 };
-char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+DATA(0x004fe588) char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Build Mage Guild",
     "Mage Guild is at highest level.",
     "Cannot afford next level.",
@@ -8974,7 +8974,7 @@ char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Set garrison combat formation to 'Grouped'",
     "Set garrison combat formation to 'Spread'"
 };
-char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+DATA(0x004fe5c8) char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "{Good Luck}\n\nGood luck sometimes lets your armies get lucky attacks (double strength) in "
     "combat.",
     "{Neutral Luck}\n\nNeutral luck means your armies will never get lucky or unlucky attacks on "
@@ -9002,7 +9002,7 @@ char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     NULL
 };
 char* IQnames[KB_IQ_NAME_COUNT] = {"None", "Dumb", "Average", "Smart", "Genius", NULL};
-char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+DATA(0x004fe630) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View previous page",
     "View next page",
     "View adventure Spells",
@@ -9014,7 +9014,7 @@ char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "Your hero has %d spell points remaining",
     NULL
 };
-char* speedText[KB_SPEED_TEXT_COUNT] = {
+DATA(0x004fe654) char* speedText[KB_SPEED_TEXT_COUNT] = {
     "",
     "Crawling",
     "Very slow",
@@ -9026,7 +9026,7 @@ char* speedText[KB_SPEED_TEXT_COUNT] = {
     "Blazing",
     "Instant"
 };
-char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+DATA(0x004fe67c) char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Attack Skill: ",
     "Defense Skill: ",
     "Shots left: ",
@@ -9038,7 +9038,7 @@ char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Shots: ",
     NULL
 };
-char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+DATA(0x004fe6a0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Attack: ",
     "Defense: ",
     "Shots: ",
@@ -9056,7 +9056,7 @@ char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
     "You own the Lighthouse.",
     NULL
 };
-char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+DATA(0x004fe6d0) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "%s, you only have %d days left to capture a town, or you will be banished from this land.",
     "%s, this is your last day to capture a town, or you will be banished from this land.",
     "Astrologers proclaim month of the %s.\n\nAll dwellings increase population.",
@@ -9067,7 +9067,7 @@ char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population.",
     NULL
 };
-char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+DATA(0x004fe6ec) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Attack: ",
     "Defense: ",
     "Spell Power: ",
@@ -9077,7 +9077,7 @@ char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Spell Points: ",
     NULL
 };
-char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+DATA(0x004fe708) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Stop Catapult",
     "Cast Spell",
     "Retreat",
@@ -9087,7 +9087,7 @@ char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Captain's Options",
     NULL
 };
-char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+DATA(0x004fe724) char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "{Cast Spell}\n\nCast a magical spell.  You may only cast one spell per combat round.  The "
     "round is reset when every creature has had a turn.",
     "{Retreat}\n\nRetreat your hero, abandoning your creatures.  Your hero will be available for "
@@ -9096,7 +9096,7 @@ char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "his or her surviving creatures will be available to recruit again.",
     "{Cancel}\n\nReturn to the battle."
 };
-char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+DATA(0x004fe734) char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "",
     "Move %s here.",
     "Fly %s here.",
@@ -9110,9 +9110,9 @@ char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "View Opposing Captain",
     "View Ballista Info"
 };
-char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
+DATA(0x004fe764) char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
     {"%s has gained", " a level.\n", " %d levels.\n", NULL};
-char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+DATA(0x004fe770) char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     "Wait for other units to go.",
     "Skip this unit",
     "Auto combat",
@@ -9120,7 +9120,7 @@ char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     "",
     NULL
 };
-char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+DATA(0x004fe784) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Wait}\n\nHave the current creature wait to take its turn until all the other creatures have "
     "gone.  The creature does not lose its turn.",
     "{Skip}\n\nSkips the current creature.  The current creature loses its turn and does not get "
@@ -9130,7 +9130,7 @@ char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Message Bar}\n\nShows the results of individual monster's actions.",
     NULL
 };
-char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
+DATA(0x004fe798) char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Redistribute %s army",
     "Cannot combine hero's last army",
     "Combine %s armies",
@@ -9160,7 +9160,7 @@ char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Marketplace",
     "Captain's Quarters"
 };
-char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+DATA(0x004fe808) char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     "Lord Kilburn", "Sir Gallant", "Ector",    "Gwenneth", "Tyro",    "Ambrose",   "Ruby",
     "Maximus",      "Dimitri",     "Thundax",  "Fineous",  "Jojosh",  "Crag Hack", "Jezebel",
     "Jaclyn",       "Ergon",       "Tsabu",    "Atlas",    "Astra",   "Natasha",   "Troyan",
@@ -9170,7 +9170,7 @@ char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     "Sarakin",      "Kalindra",    "Mandigal", "Zom",      "Darlana", "Zam",       "Ranloo",
     "Charity",      "Rialdo",      "Roxana",   "Sandro",   "Celia"
 };
-char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+DATA(0x004fe8e0) char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     "{Game Difficulty}\n\nThis lets you change the starting difficulty at which you will play.  "
     "Higher difficulty levels start you off with fewer resources, and at the higher settings, give "
     "extra resources to the computer.",
@@ -9189,7 +9189,7 @@ char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     "{OK}\n\nClick to accept these settings and start a new game.",
     "{Cancel}\n\nClick to return to the main menu."
 };
-char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+DATA(0x004fe900) char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: For a 14400 baud modem, use the "
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
     "{9600 Baud}\n\nUse a 9600 baud connection speed. \n\nNote: For a 14400 baud modem, use the "
@@ -9201,7 +9201,7 @@ char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+DATA(0x004fe914) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the modem connection.",
     "{COM 2}\n\nUse COM Port 2 for the modem connection.",
     "{COM 3}\n\nUse COM Port 3 for the modem connection.",
@@ -9209,7 +9209,7 @@ char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+DATA(0x004fe928) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: In general, computers with the "
     "older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip "
     "should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try "
@@ -9229,7 +9229,7 @@ char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+DATA(0x004fe93c) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the direct connection.",
     "{COM 2}\n\nUse COM Port 2 for the direct connection.",
     "{COM 3}\n\nUse COM Port 3 for the direct connection.",
@@ -9237,7 +9237,7 @@ char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+DATA(0x004fe950) char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{2 Players}\n\nPlay with 2 human players, and optionally, up to 4 additional computer "
     "players.",
     "{3 Players}\n\nPlay with 3 human players, and optionally, up to 3 additional computer "
@@ -9248,19 +9248,19 @@ char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{6 Players}\n\nPlay with 6 human players.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+DATA(0x004fe968) char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options, chooses the number to dial, and places the call.",
     "{Guest}\n\nThe guest waits for the host to call and set up the game.",
     "{Config}\n\nChange your modem configuration.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+DATA(0x004fe978) char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.",
     "{Guest}\n\nThe guest waits for the host to set up the game.",
     "{Config}\n\nChange your direct connect port configuration.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+DATA(0x004fe988) char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
     "{Hot Seat}\n\nPlay a Hot Seat game, where 2 to 4 players play around the same computer, "
     "switching into the 'Hot Seat' when it is their turn.",
     "{Network}\n\nPlay a network game, where 2 players use their own computers connected through a "
@@ -9272,14 +9272,14 @@ char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+DATA(0x004fe99c) char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.  There can only be one host per network game.",
     "{Guest}\n\nThe guest waits for the host to set up the game, then is automatically added in.  "
     "There can be multiple guests for TCP/IP and IPX games, but only 1 guest for NetBIOS games.",
     "{Cancel}\n\nCancel back to the main menu.",
     NULL
 };
-char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+DATA(0x004fe9a8) char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "{IPX}\n\nIPX networking is the most commonly used form of network in Windows 95.  Up to 6 "
     "players can play using IPX.  Only the Windows 95 version of Heroes II supports IPX "
     "networking.",
@@ -9293,14 +9293,14 @@ char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "networking is recommended.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+DATA(0x004fe9b8) char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
     "{Standard Game}\n\nA single player game playing out a single map.",
     "{Campaign Game}\n\nA single player game playing through a series of maps.",
     "{Multi-Player Game}\n\nA multi-player game, with several human players competing against each "
     "other on a single map.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+DATA(0x004fe9c8) char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "The enemy has surrendered!",
     "The enemy has fled!",
     "A glorious victory!",
@@ -9314,7 +9314,7 @@ char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s).",
     NULL
 };
-char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+DATA(0x004fe9f4) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "{Good Morale}\n\nGood morale may give your armies extra attacks in combat.",
     "{Neutral Morale}\n\nNeutral morale means your armies will never be blessed with extra attacks "
     "or freeze in combat.",
@@ -9349,8 +9349,8 @@ char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "\nMasthead bonus at sea +1",
     "\nBattle Garb of Anduran gives you maximum morale."
 };
-char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
-char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004fea74) char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
+DATA(0x004fea84) char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
     {"Easy", "Normal", "Hard", "Expert", "Impossible", NULL};
 char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
 char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
@@ -9361,9 +9361,9 @@ char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
     {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert", NULL};
 char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert", NULL};
-char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
+DATA(0x004feaf4) char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera", NULL};
-char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004feb00) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
     "{Fireblast}\n\nAn improved version of fireball, fireblast affects two hexes around the center "
@@ -9448,7 +9448,7 @@ char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies.",
     NULL
 };
-char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004fec04) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Fireball",
     "Fireblast",
     "Lightning Bolt",
@@ -9516,9 +9516,9 @@ char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Set Water Guardian",
     NULL
 };
-char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
+DATA(0x004fed08) char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {"Basic", "Advanced", "Expert", NULL};
-char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+DATA(0x004fed14) char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Pathfinding",
     "Archery",
     "Logistics",
@@ -9534,7 +9534,7 @@ char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Necromancy",
     "Estates"
 };
-char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+DATA(0x004fed4c) char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "Mage Guild",
     "Thieves' Guild",
     "Tavern",
@@ -9556,7 +9556,7 @@ char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "",
     NULL
 };
-char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+DATA(0x004fed98) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Farm",
     "Garbage Heap",
     "Crystal Garden",
@@ -9566,9 +9566,9 @@ char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "1st Lvl Growth",
     NULL
 };
-char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
+DATA(0x004fedb4) char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", NULL};
-char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fedd0) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
      "Blacksmith",
@@ -9642,7 +9642,7 @@ char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      "",
      ""}
 };
-char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+DATA(0x004feef0) char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
      "terrain by 25 percent.",
      "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for "
@@ -9721,7 +9721,7 @@ char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = 
      "{Grand Estates}\n\nYour hero produces 500 gold pieces per turn as tax revenue from "
      "estates."}
 };
-char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+DATA(0x004fef98) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "The Mage Guild allows heroes to learn spells and replenish their spell points.",
     "The Thieves' Guild provides information on enemy players.  Thieves' Guilds can also provide "
     "scouting information on enemy towns.  Additional Guilds provide more information.",
@@ -9748,7 +9748,7 @@ char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "",
     NULL
 };
-char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+DATA(0x004fefe4) char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     "The Fortifications increase the toughness of the walls, increasing the number of turns it "
     "takes to knock them down.",
     "The Coliseum provides inspiring spectacles to defending troops, raising their morale by two "
@@ -9758,7 +9758,7 @@ char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     "The Library increases the number of spells in the Guild by one for each level of the guild.",
     "The Storm adds +2 to the power of spells of a defending spell caster."
 };
-char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
+DATA(0x004feffc) char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "northern",
     "northeastern",
     "eastern",
@@ -9770,7 +9770,7 @@ char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "central",
     NULL
 };
-char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+DATA(0x004ff020) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "in the murky depths of the ocean.",
     "on a grassy plain.",
     "in the driven snow.",
@@ -9782,11 +9782,11 @@ char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "buried on a beach.",
     NULL
 };
-char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil", NULL};
-char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
-char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast", NULL};
-char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full", NULL};
-char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+DATA(0x004ff044) char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil", NULL};
+DATA(0x004ff050) char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
+DATA(0x004ff058) char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast", NULL};
+DATA(0x004ff064) char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full", NULL};
+DATA(0x004ff070) char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n\n\n***Command Line Help***\n",
     "\n",
     "/D0 - disable digital sound\n",
@@ -9802,9 +9802,9 @@ char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "Starts the DOS version of Heroes2 with redbook\n",
     "sound disabled and the intro skipped.\n"
 };
-char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
+DATA(0x004ff0a8) char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
     {"Hero/Stats", "Skills", "Artifacts", "Town/Castle", "Garrison", "Available"};
-char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+DATA(0x004ff0c0) char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "Communications error on function '%s'\n\nWin95 Error Code: %d\nWin95 Error Meaning: %s\n\n",
     "Suggested solutions:",
     "\n  1) Make sure all cables are firmly connected.",
@@ -9813,9 +9813,9 @@ char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "down on the screen where you choose Host or Guest.)",
     "\n  4) Consider lowering the BAUD rate in 'CONFIG' to 19200 or 9600."
 };
-char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
+DATA(0x004ff0d8) char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
     {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots", NULL};
-char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+DATA(0x004ff0fc) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "{Small Maps}\n\nView only maps of size small (36 x 36).",
     "{Medium Maps}\n\nView only maps of size medium (72 x 72).",
     "{Large Maps}\n\nView only maps of size large (108 x 108).",
@@ -9844,8 +9844,8 @@ char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "human player.",
     NULL
 };
-char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
-char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+DATA(0x004ff138) char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
+DATA(0x004ff148) char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
     {"Few", "A few", "a few"},
     {"Several", "Several", "several"},
     {"Pack", "A pack of", "a pack of"},
@@ -9856,7 +9856,7 @@ char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] =
     {"Zounds", "Zounds...", "zounds of"},
     {"Legion", "A Legion of", "a legion of"}
 };
-char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+DATA(0x004ff1b4) char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
     "The truth is out there.",
     "The dark side is stronger.",
     "The end of the world is near.",
@@ -9866,9 +9866,9 @@ char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
     "He told her \"Yada yada yada\"...  and then she said \"Blah, blah, blah...\"",
     "There once was a man from Nantucket..."
 };
-char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
+DATA(0x004ff1d4) char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
     {"See Rock City", "This space for rent", "Next sign 50 miles", "Burma shave"};
-char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+DATA(0x004ff1e4) char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     "Dwarven alliance",
     "Sorceress guild",
     "Roland strengthened",
@@ -9882,7 +9882,7 @@ char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     "Ultimate crown",
     "Carry over forces"
 };
-char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ff214) char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Force of Arms",
      "Annexation",
      "Save the Dwarves",
@@ -9908,7 +9908,7 @@ char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
      "Apocalypse",
      "Betrayal"}
 };
-char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ff274) char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Roland needs you to defeat the lords near his castle to begin his war of "
      "rebellion against his brother.  They are not allied with each other, so "
      "they will spend most of their time fighting with one another.  Victory is "
@@ -9984,11 +9984,11 @@ char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
      "Switching sides leaves you with three castles against the enemy's one.  This "
      "battle will be the easiest one you will face for the rest of the war...traitor."}
 };
-char* cOutOfMemory =
+DATA(0x004ff2d4) char* cOutOfMemory =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) "
     "and\n480K of Conventional Memory\n\n";
-char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {"Normal", "Interlaced"};
-char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+DATA(0x004ff2d8) char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {"Normal", "Interlaced"};
+DATA(0x004ff2e0) char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
     "{Music}\n\nToggle ambient music level.\n\n(Note: When using CD Stereo music in DOS, the music "
     "may only be turned on or off - the level has no effect.)",
@@ -10012,9 +10012,9 @@ char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{Mouse Cursor}\n\nToggle color cursors on/off.  Color cursors look nicer, but sometimes don't "
     "move as smoothly as black and white ones."
 };
-char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
+DATA(0x004ff308) char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
     {"aqua", "blue", "brown", "gold", "green", "orange", "purple", "red"};
-char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+DATA(0x004ff328) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Alchemist's Tower",
     "Arena",
     "Hut of the Magi",
@@ -10032,7 +10032,7 @@ char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Water Summoning Altar",
     NULL
 };
-SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
+DATA(0x004ff358) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {0, 100, "Build improvement:"},
     {1, 100, "Speed"},
     {1, 101, "Monster Info"},
@@ -10107,38 +10107,38 @@ SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {23, 606, "Victory\nConditions"},
     {23, 607, "Loss\nConditions"}
 };
-b32 gbHeroWindShowing = false;
-b32 gbFullCombatScreenDrawn = true;
-b32 gbLimitedCombatUpdatePalette = false;
-b32 gbFirstTimeThrough = false;
-b32 gbSkipIntro = false;
-b32 gbDoMemCheck = true;
-b32 gbAllBlack = false;
-b32 gbInCombat = false;
-b32 gbDirectConnect = false;
-i32 giForceSwitchMusic = -1;
-b32 gbComputeExtent = false;
-b32 gbSaveBiggestExtent = false;
-b32 gbLimitToExtent = false;
-b32 gbCurrArmyDrawn = true;
-AdventureDisposeLevel gAdvDisposeLevel = ADV_DISPOSE_NONE;
-b32 gbRemoteOn = false;
-b32 gbGameInitialized = false;
-i32 giHighScoreRank = -1;
-HighScoreType giHighScoreType = HIGH_SCORE_STANDARD;
-b32 gbShowHighScore = false;
+DATA(0x0052668c) b32 gbHeroWindShowing = false;
+DATA(0x004ff558) b32 gbFullCombatScreenDrawn = true;
+DATA(0x00526690) b32 gbLimitedCombatUpdatePalette = false;
+DATA(0x00526694) b32 gbFirstTimeThrough = false;
+DATA(0x00526698) b32 gbSkipIntro = false;
+DATA(0x004ff55c) b32 gbDoMemCheck = true;
+DATA(0x0052669c) b32 gbAllBlack = false;
+DATA(0x005266a0) b32 gbInCombat = false;
+DATA(0x005266a4) b32 gbDirectConnect = false;
+DATA(0x004ff560) i32 giForceSwitchMusic = -1;
+DATA(0x005266a8) b32 gbComputeExtent = false;
+DATA(0x005266ac) b32 gbSaveBiggestExtent = false;
+DATA(0x005266b0) b32 gbLimitToExtent = false;
+DATA(0x004ff564) b32 gbCurrArmyDrawn = true;
+DATA(0x005266b4) AdventureDisposeLevel gAdvDisposeLevel = ADV_DISPOSE_NONE;
+DATA(0x005266b8) b32 gbRemoteOn = false;
+DATA(0x005266bc) b32 gbGameInitialized = false;
+DATA(0x004ff568) i32 giHighScoreRank = -1;
+DATA(0x004ff56c) HighScoreType giHighScoreType = HIGH_SCORE_STANDARD;
+DATA(0x005266c0) b32 gbShowHighScore = false;
 b32 gbLowMemory = false;
-i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
+DATA(0x004ff570) i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
 void* gLowPage = NULL;
 b32 gbLowPageGrabbed = false;
 i8 xSmackFromNetwork = 0;
-b32 gbInPollSound = false;
-H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr = CD_ROM_READY;
-i32 bEarlySetupDone = 0;
-i32 bKBDone = 0;
+DATA(0x005266cc) b32 gbInPollSound = false;
+DATA(0x005266d0) H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr = CD_ROM_READY;
+DATA(0x005266d4) i32 bEarlySetupDone = 0;
+DATA(0x005266d8) i32 bKBDone = 0;
 struct _REDBOOK* hRedbookz = NULL;
-i32 bForceCheckTimeEvent = 0;
-u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
+DATA(0x005266e0) i32 bForceCheckTimeEvent = 0;
+DATA(0x004ff574) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
     {194, 179, 82, 79},
     {412, 105, 75, 76},
@@ -10146,138 +10146,138 @@ u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] =
     {0, 389, 86, 90}
 };
 
-i32 lastIMHoverID = -1;
-i32 bInCheckEndGame = 0;
-i32 bInShutDown = 0;
-b32 gbInMemError = false;
-i32 iShingleAnimFrame = 0;
-b32 gbHumanPlayer[IDX(GAME_PLAYER_COUNT)];
-b32 gbHitEvent;
-i32 giMaxExtentX;
-i32 giMaxExtentY;
+DATA(0x004ff59c) i32 lastIMHoverID = -1;
+DATA(0x005266e4) i32 bInCheckEndGame = 0;
+DATA(0x005266e8) i32 bInShutDown = 0;
+DATA(0x005266ec) b32 gbInMemError = false;
+DATA(0x005266f0) i32 iShingleAnimFrame = 0;
+DATA(0x005261b0) b32 gbHumanPlayer[IDX(GAME_PLAYER_COUNT)];
+DATA(0x00525884) b32 gbHitEvent;
+DATA(0x005260e0) i32 giMaxExtentX;
+DATA(0x005260e4) i32 giMaxExtentY;
 i32 giRandomClouds;
 char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
-i32 giBottomViewOverrideEndTime;
-i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
-H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
-b32 gbInCampaign;
-i32 giResExtra1;
-i32 giResExtra2;
-i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
-i32 giSeedingValid;
-i32 giLimitPlayer;
+DATA(0x00526140) i32 giBottomViewOverrideEndTime;
+DATA(0x005265b0) i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
+DATA(0x005258bc) H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
+DATA(0x00524e04) b32 gbInCampaign;
+DATA(0x00526130) i32 giResExtra1;
+DATA(0x00526138) i32 giResExtra2;
+DATA(0x00524de4) i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
+DATA(0x00526164) i32 giSeedingValid;
+DATA(0x0052613c) i32 giLimitPlayer;
 i32 giShowClouds;
-i32 bDoColorCycle;
-inputManager* gpInputManager;
-i32 iMaxMapExtra;
-palette* gPalette;
-resourceManager* gpResourceManager;
+DATA(0x005263fc) i32 bDoColorCycle;
+DATA(0x00526100) inputManager* gpInputManager;
+DATA(0x00525a58) i32 iMaxMapExtra;
+DATA(0x00525be4) palette* gPalette;
+DATA(0x005258d0) resourceManager* gpResourceManager;
 char gcBotViewText[GLOBAL_BOTTOM_VIEW_TEXT_SIZE];
-i32 bSpecialHideCursor;
-searchArray* gpSearchArray;
-i32 giResType1;
-b32 gbBlackoutPlayer;
-i32 giResType2;
-char cNetBoxLine[BOX_LINE_COUNT][NET_BOX_LINE_SIZE];
+DATA(0x005258c4) i32 bSpecialHideCursor;
+DATA(0x005258a0) searchArray* gpSearchArray;
+DATA(0x00525bd8) i32 giResType1;
+DATA(0x005260e8) b32 gbBlackoutPlayer;
+DATA(0x00525be0) i32 giResType2;
+DATA(0x00525bec) char cNetBoxLine[BOX_LINE_COUNT][NET_BOX_LINE_SIZE];
 i32 gIndex;
-i32 giWeekTypeExtra;
-philAI* gpPhilAI;
-i32 giTCPType;
-H2_ENUM_STORAGE(CombatEffectType, i32) gCurLoadedSpellEffect;
-class mouseManager* gpMouseManager;
-i32 giCurTempMobility;
-OverviewReturnAction giOverviewReturnAction;
+DATA(0x005258c8) i32 giWeekTypeExtra;
+DATA(0x005258d8) philAI* gpPhilAI;
+DATA(0x00525898) i32 giTCPType;
+DATA(0x00524e00) H2_ENUM_STORAGE(CombatEffectType, i32) gCurLoadedSpellEffect;
+DATA(0x00524acc) class mouseManager* gpMouseManager;
+DATA(0x0052610c) i32 giCurTempMobility;
+DATA(0x00525be8) OverviewReturnAction giOverviewReturnAction;
 char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
-icon* gSystemIcons;
-b8 gbCombatSurrender;
-heroWindow* pNormalDialogWindow;
-i32 giTCPHostStatus;
-char gMapName[GLOBAL_SHORT_MAP_NAME_SIZE];
-i32 giMinExtentX;
-i32 giMinExtentY;
-MultiplayerBaseType iMPBaseType;
-b32 gbTCPFirstTime;
-i16* pwSizeOfMapExtra;
-i32 giHeroScreenSrcIndex;
-CalendarPeriodType giWeekType;
-char gText[GLOBAL_TEXT_BUFFER_SIZE];
-b32 gbInNewGameSetup;
-class palette* gpBufferPalette;
-H2_ENUM_STORAGE(CampaignSide, i32) gbCampaignSideChoice;
-char cNetBoxColor[BOX_LINE_COUNT];
-i32 giMonthTypeExtra;
-H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;
-i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
-char gFullMapName[GLOBAL_MAP_NAME_SIZE];
-char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
-i32 giShowIntro;
-i32 glTimers[GLOBAL_TIMER_COUNT];
-i32 giScore;
-armyGroup* gpMonGroup;
-configStruct gConfig;
-char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x00526150) icon* gSystemIcons;
+DATA(0x00524e10) b8 gbCombatSurrender;
+DATA(0x005249d8) heroWindow* pNormalDialogWindow;
+DATA(0x00524dd4) i32 giTCPHostStatus;
+DATA(0x005260ec) char gMapName[GLOBAL_SHORT_MAP_NAME_SIZE];
+DATA(0x00526390) i32 giMinExtentX;
+DATA(0x00526394) i32 giMinExtentY;
+DATA(0x00526120) MultiplayerBaseType iMPBaseType;
+DATA(0x00526578) b32 gbTCPFirstTime;
+DATA(0x0052638c) i16* pwSizeOfMapExtra;
+DATA(0x00524dec) i32 giHeroScreenSrcIndex;
+DATA(0x00524e08) CalendarPeriodType giWeekType;
+DATA(0x00524ad0) char gText[GLOBAL_TEXT_BUFFER_SIZE];
+DATA(0x005258d4) b32 gbInNewGameSetup;
+DATA(0x00525bdc) class palette* gpBufferPalette;
+DATA(0x0052615c) H2_ENUM_STORAGE(CampaignSide, i32) gbCampaignSideChoice;
+DATA(0x005265d8) char cNetBoxColor[BOX_LINE_COUNT];
+DATA(0x00524dfc) i32 giMonthTypeExtra;
+DATA(0x00525890) H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;
+DATA(0x00525bd0) i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
+DATA(0x005258a8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
+DATA(0x005261c8) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
+DATA(0x00525a50) i32 giShowIntro;
+DATA(0x00526580) i32 glTimers[GLOBAL_TIMER_COUNT];
+DATA(0x00526154) i32 giScore;
+DATA(0x00526160) armyGroup* gpMonGroup;
+DATA(0x005261e0) configStruct gConfig;
+DATA(0x00525f7c) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 u32l gTimeMark;
-char* EXPANSION_AGGREGATE_NAME;
-char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
-game* gpGame;
-b8 gbRetreatWin;
-DialogWaitType giWaitType;
-class icon* gCurLoadedSpellIcon;
-u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
-H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
-char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
-u8 giSetupGameType;
-char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
-i32 giFullySeeded;
-icon* gBuyBuildIcons;
+DATA(0x00524e0c) char* EXPANSION_AGGREGATE_NAME;
+DATA(0x00524f98) char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+DATA(0x00526124) game* gpGame;
+DATA(0x00525bc3) b8 gbRetreatWin;
+DATA(0x005260fc) DialogWaitType giWaitType;
+DATA(0x005258a4) class icon* gCurLoadedSpellIcon;
+DATA(0x005249f4) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+DATA(0x00525a10) H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
+DATA(0x00524f74) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
+DATA(0x005249dc) u8 giSetupGameType;
+DATA(0x00525a64) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x005261ac) i32 giFullySeeded;
+DATA(0x00524de0) icon* gBuyBuildIcons;
 b32 gbNoSound;
-i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
-char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
-b32 gbMoveShown;
-void** ppMapExtra;
-char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
-i32 giThisNetPos;
-b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
-char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
-class heroWindow* heroWin;
-i32 giOverviewReturnActionExtra;
-H2_ENUM_STORAGE(CombatSide, i32) giCurGeneral;
-i32 giThisGamePos;
-i32 giNumHumanPlayers;
+DATA(0x00524df0) i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
+DATA(0x00524e14) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x0052614c) b32 gbMoveShown;
+DATA(0x0052612c) void** ppMapExtra;
+DATA(0x0052639c) char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
+DATA(0x005258cc) i32 giThisNetPos;
+DATA(0x005258dc) b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+DATA(0x00526418) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x00525a54) class heroWindow* heroWin;
+DATA(0x00526158) i32 giOverviewReturnActionExtra;
+DATA(0x0052657c) H2_ENUM_STORAGE(CombatSide, i32) giCurGeneral;
+DATA(0x005260dc) i32 giThisGamePos;
+DATA(0x00524f90) i32 giNumHumanPlayers;
 b32 gbIconClipOn;
-b32 gbRemoteGameOpen;
-combatManager* gpCombatManager;
-i32 giTCPNumPlayers;
-executive* gpExec;
+DATA(0x00526408) b32 gbRemoteGameOpen;
+DATA(0x00525bcc) combatManager* gpCombatManager;
+DATA(0x00524dd8) i32 giTCPNumPlayers;
+DATA(0x005263f8) executive* gpExec;
 void* hMainWindow;
-i32 giCurWindowsStyleFlags;
-i32 gGameCommand;
-CalendarPeriodType giMonthType;
-char* DEFAULT_AGGREGATE_NAME;
-i32 gCurSpellEffectFrame;
-b8 gbThisNetHumanPlayer[RADAR_OWNER_COLOR_COUNT];
-char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
-class highScoreManager* gpHighScoreManager;
-b32 gbFunctionComplete;
-b32 gbIAmGreatest;
-b32 gbTextEntryEscaped;
-i32 giTotalHighMem;
-i32 gMapX;
-i32 gMapY;
-char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
-i32 bFreshSave;
-i32 bShowIt;
+DATA(0x0052640c) i32 giCurWindowsStyleFlags;
+DATA(0x00524dd0) i32 gGameCommand;
+DATA(0x00526410) CalendarPeriodType giMonthType;
+DATA(0x00524f8c) char* DEFAULT_AGGREGATE_NAME;
+DATA(0x00526400) i32 gCurSpellEffectFrame;
+DATA(0x00526104) b8 gbThisNetHumanPlayer[RADAR_OWNER_COLOR_COUNT];
+DATA(0x00525e1c) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x00525a60) class highScoreManager* gpHighScoreManager;
+DATA(0x005249f0) b32 gbFunctionComplete;
+DATA(0x00526134) b32 gbIAmGreatest;
+DATA(0x00525888) b32 gbTextEntryEscaped;
+DATA(0x00526128) i32 giTotalHighMem;
+DATA(0x00525bc4) i32 gMapX;
+DATA(0x00525bc8) i32 gMapY;
+DATA(0x005258e4) char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
+DATA(0x00524f94) i32 bFreshSave;
+DATA(0x005265ac) i32 bShowIt;
 i32 gLowPageScreenSelector;
-class heroWindowManager* gpWindowManager;
-i32 giCurWatchPlayer;
-char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
-i32 giBottomViewResourceQty;
-soundManager* gpSoundManager;
-b32 gbThisNetGotAdventureControl;
-i32 giMapChangeCtr;
-SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
-b32 gbWaitForRemoteReceive;
-u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
-townManager* gpTownManager;
-advManager* gpAdvManager;
-b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+DATA(0x0052589c) class heroWindowManager* gpWindowManager;
+DATA(0x00525894) i32 giCurWatchPlayer;
+DATA(0x0052616c) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
+DATA(0x00526384) i32 giBottomViewResourceQty;
+DATA(0x00525a5c) soundManager* gpSoundManager;
+DATA(0x0052588c) b32 gbThisNetGotAdventureControl;
+DATA(0x00526414) i32 giMapChangeCtr;
+DATA(0x00525018) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
+DATA(0x005258c0) b32 gbWaitForRemoteReceive;
+DATA(0x00525a14) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+DATA(0x00526168) townManager* gpTownManager;
+DATA(0x00524df8) advManager* gpAdvManager;
+DATA(0x00526144) b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

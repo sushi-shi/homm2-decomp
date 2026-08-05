@@ -36,7 +36,9 @@ import clang.cindex as ci
 from homm2.build.annotated_functions import (
     IMAGE_BASE, VA_TOKEN, _annotation, configure_libclang,
 )
-from homm2.build.annotated_data import ClangMode, _clang_args
+from homm2.build.annotated_data import (
+    DATA_TOKEN, ClangMode, _clang_args, definitions_for_file,
+)
 from homm2.build.annotated_vtables import source_vtables
 from homm2.core.paths import REPO
 
@@ -64,8 +66,9 @@ class SourceSymbol:
 
 
 def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSymbol]:
-    """Every VA-annotated definition in one translation unit."""
-    if not VA_TOKEN.search(path.read_bytes()):
+    """Every VA- or DATA-annotated definition in one translation unit."""
+    blob = path.read_bytes()
+    if not VA_TOKEN.search(blob) and not DATA_TOKEN.search(blob):
         return []
     configure_libclang()
     translation = ci.Index.create().parse(
@@ -107,6 +110,21 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSy
         rows.append(SourceSymbol(
             rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor), unit=unit,
             size=size, kind="func", provenance="source-annotation"))
+
+    # DATA() names a global definition. The marker binding, the one-VarDecl-per-
+    # marker rule and the complete-type rule all live in annotated_data, which
+    # the data-topology and link audits already read; reusing it keeps one
+    # meaning for a marker instead of two parsers that can drift apart.
+    for definition in definitions_for_file(path, source_root, repo, translation):
+        # Same discipline as the VA case: a marker that cannot produce a symbol
+        # is a source defect, not a row to drop quietly.
+        if not definition.symbol or definition.rva < 0:
+            raise ValueError(
+                f"{definition.location}: unusable DATA marker on "
+                f"{definition.name!r}")
+        rows.append(SourceSymbol(
+            rva=definition.rva, name=definition.symbol, unit=definition.unit,
+            size=definition.size, kind="data", provenance="source-annotation"))
     return rows
 
 
@@ -202,7 +220,17 @@ def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
     # Donation evidence names data owners: every masked-identical function's
     # relocations vote (symbol, addend) per target, and target - addend pins
     # the owner's linked address. Unanimous owners become real data rows.
+    claimed_names = {row.name: row.rva for row in seen.values()
+                     if row.kind == "data" and
+                     row.provenance == "source-annotation"}
     for rva, name in _donated_owner_names(repo):
+        # Donation and a written claim disagreeing about one name means the
+        # claim's address is wrong; keeping both would put one symbol at two
+        # addresses and let the delinker pick either.
+        if claimed_names.get(name, rva) != rva:
+            raise ValueError(
+                f"{name} is claimed by DATA() at 0x{claimed_names[name]:x} "
+                f"but donated at 0x{rva:x}")
         if rva not in seen:
             seen[rva] = SourceSymbol(
                 rva=rva, name=name, unit="_data",

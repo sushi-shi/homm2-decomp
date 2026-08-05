@@ -7,13 +7,13 @@
 
 SIZE(AudiereSampleNode, 0xc);
 
-static void* gAudiereEffectBuffer;
-static i32 gAudiereEffectFrameCount;
-static i32 gAudiereEffectChannelCount;
-static i32 gAudiereEffectSampleRate;
-static audiere::SampleFormat gAudiereEffectSampleFormat;
-static AudiereSampleNode* gAudiereSampleList;
-static i32 gAudiereSampleIterationDepth;
+DATA(0x005395c0) static void* gAudiereEffectBuffer;
+DATA(0x005395c4) static i32 gAudiereEffectFrameCount;
+DATA(0x005395c8) static i32 gAudiereEffectChannelCount;
+DATA(0x005395cc) static i32 gAudiereEffectSampleRate;
+DATA(0x005395d0) static audiere::SampleFormat gAudiereEffectSampleFormat;
+DATA(0x005395d4) static AudiereSampleNode* gAudiereSampleList;
+DATA(0x005395d8) static i32 gAudiereSampleIterationDepth;
 
 VA(0x004cc740, 0x162)
 void PurgeFinishedAudiereSamples(void) {

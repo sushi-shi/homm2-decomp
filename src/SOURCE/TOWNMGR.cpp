@@ -303,7 +303,7 @@ namespace {
 
 } // namespace
 
-static const H2_ENUM_STORAGE(
+DATA(0x004ea878) static const H2_ENUM_STORAGE(
     BuildingSlotType,
     i8
 ) gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
@@ -501,7 +501,7 @@ static const H2_ENUM_STORAGE(
      TOWN_OBJECT_NONE}
 };
 
-SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
+DATA(0x00518be0) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {{0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
      {0, 188, 214, 39, 42},  {0, 69, 108, 67, 55},   {5, 0, 49, 286, 116},   {0, 478, 193, 46, 63},
      {5, 7, 33, 0, 0},       {5, 134, 37, 0, 0},     {0, 219, 138, 120, 30}, {0, 286, 102, 88, 22},

@@ -8,15 +8,15 @@ H2_ENUM_BEGIN(BitmapDimConstant)
     DIM_PALETTE_LEVEL_STRIDE = 256
 H2_ENUM_END(BitmapDimConstant)
 
-static i32 gFillRow;
-static u8* gFillPtr;
-static i32 gDimRow;
-static i32 gDimCol;
-static u8* gDimPtr;
-static u8* gDimNext;
-static u8* gBlitSrc;
-static u8* gBlitDst;
-static i32 gBlitRow;
+DATA(0x00536388) static i32 gFillRow;
+DATA(0x0053638c) static u8* gFillPtr;
+DATA(0x00536390) static i32 gDimRow;
+DATA(0x00536398) static i32 gDimCol;
+DATA(0x00536394) static u8* gDimPtr;
+DATA(0x005363a0) static u8* gDimNext;
+DATA(0x005363a4) static u8* gBlitSrc;
+DATA(0x005363a8) static u8* gBlitDst;
+DATA(0x0053639c) static i32 gBlitRow;
 
 VA(0x004c6450, 0x82)
 void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {

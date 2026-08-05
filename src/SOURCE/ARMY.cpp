@@ -3668,4 +3668,4 @@ i32 army::GetPowBaseY(void) {
 }
 
 i32 bSecondAttack = 0;
-b32 gbGenieHalf;
+DATA(0x0052409c) b32 gbGenieHalf;

@@ -813,23 +813,23 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
+DATA(0x00519af4) i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
             [IDX(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
                                               4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
                                               7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
-ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
-i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
-b32 gbInViewWorld = false;
-class icon* pVWMisc;
-class icon* pVWLetters;
-i32 iVWYPixelOffset;
-class icon* pVWGround;
-i32 iVWViewableCells;
-class icon* pVWFlags;
-i32 iVWDrawAllTerrains;
-H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
-i32 iVWDrawAllObjs;
-i32 iVWMapOriginX;
-i32 iVWMapOriginY;
-i32 iVWCenterOffset;
-i32 iVWXPixelOffset;
+DATA(0x00519b18) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
+DATA(0x00519b1c) i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
+DATA(0x00533fb4) b32 gbInViewWorld = false;
+DATA(0x00533fa0) class icon* pVWMisc;
+DATA(0x00533f80) class icon* pVWLetters;
+DATA(0x00533f98) i32 iVWYPixelOffset;
+DATA(0x00533f90) class icon* pVWGround;
+DATA(0x00533fb0) i32 iVWViewableCells;
+DATA(0x00533f9c) class icon* pVWFlags;
+DATA(0x00533f8c) i32 iVWDrawAllTerrains;
+DATA(0x00533f84) H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
+DATA(0x00533f88) i32 iVWDrawAllObjs;
+DATA(0x00533fa4) i32 iVWMapOriginX;
+DATA(0x00533fa8) i32 iVWMapOriginY;
+DATA(0x00533fac) i32 iVWCenterOffset;
+DATA(0x00533f94) i32 iVWXPixelOffset;

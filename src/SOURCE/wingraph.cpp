@@ -22,11 +22,11 @@ H2_ENUM_BEGIN(WingraphPaletteConstant)
     SYSTEM_PALETTE_REGION_COUNT = 2
 H2_ENUM_END(WingraphPaletteConstant)
 
-static RECT gDDSourceRect;
-static RECT gDDClientRect;
-static RECT gDDDestinationRect;
-static HRESULT gDDResult;
-static DDSURFACEDESC gDDSurfaceDesc;
+DATA(0x00534470) static RECT gDDSourceRect;
+DATA(0x00533fb8) static RECT gDDClientRect;
+DATA(0x00534488) static RECT gDDDestinationRect;
+DATA(0x00533fc8) static HRESULT gDDResult;
+DATA(0x00533fd0) static DDSURFACEDESC gDDSurfaceDesc;
 
 VA(0x004afbe0, 0x3a)
 void DDRestoreDisplayMode(void) {
@@ -1014,28 +1014,28 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     return 1;
 }
 
-b32 gbWinGAttached = true;
-b32 gbDDrawAttached = false;
-WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;
-i32l Orientation = 1;
-struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
-void* lpInitWin = NULL;
+DATA(0x00519bc0) b32 gbWinGAttached = true;
+DATA(0x00534498) b32 gbDDrawAttached = false;
+DATA(0x00519bc4) WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;
+DATA(0x00519bc8) i32l Orientation = 1;
+DATA(0x00519bd0) struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
+DATA(0x0053449c) void* lpInitWin = NULL;
 i32 bPaletteInitialized = 0;
-i32 giTtlBlts = 0;
-b32 gbWinGraphBusy = false;
-DirectDrawCreateProc lpDirectDrawCreate = NULL;
-struct IDirectDraw* lpDD = NULL;
-struct IDirectDrawSurface* lpDDSPrimary = NULL;
-struct IDirectDrawSurface* lpDDSOne = NULL;
-struct IDirectDrawClipper* lpClipper = NULL;
-struct IDirectDrawPalette* lpDDPal = NULL;
-i32 iBusyRetry = 0;
-i32 bInDDSD = 0;
-HDC hdcImage = NULL;
-HBITMAP gbmOldMonoBitmap = NULL;
-HPALETTE hpalApp = NULL;
+DATA(0x005344a4) i32 giTtlBlts = 0;
+DATA(0x005344a8) b32 gbWinGraphBusy = false;
+DATA(0x005344ac) DirectDrawCreateProc lpDirectDrawCreate = NULL;
+DATA(0x005344b0) struct IDirectDraw* lpDD = NULL;
+DATA(0x005344b4) struct IDirectDrawSurface* lpDDSPrimary = NULL;
+DATA(0x005344b8) struct IDirectDrawSurface* lpDDSOne = NULL;
+DATA(0x005344bc) struct IDirectDrawClipper* lpClipper = NULL;
+DATA(0x005344c0) struct IDirectDrawPalette* lpDDPal = NULL;
+DATA(0x005344c4) i32 iBusyRetry = 0;
+DATA(0x005344c8) i32 bInDDSD = 0;
+DATA(0x005344cc) HDC hdcImage = NULL;
+DATA(0x005344d0) HBITMAP gbmOldMonoBitmap = NULL;
+DATA(0x005344d4) HPALETTE hpalApp = NULL;
 HINSTANCE hWinGLibrary = NULL;
-HINSTANCE hDDrawLibrary = NULL;
+DATA(0x005344dc) HINSTANCE hDDrawLibrary = NULL;
 i32l lDelayRefresh = 0;
-i32l lPaintStart;
-struct _IMAGE screenImage;
+DATA(0x00534480) i32l lPaintStart;
+DATA(0x00534040) struct _IMAGE screenImage;

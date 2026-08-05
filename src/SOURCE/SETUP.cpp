@@ -1169,4 +1169,4 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-b32 gbDoModemConfig = false;
+DATA(0x00533e2c) b32 gbDoModemConfig = false;

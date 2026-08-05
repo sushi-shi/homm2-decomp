@@ -271,4 +271,4 @@ void button::Draw(void) {
 
 
 
-MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;
+DATA(0x00539760) MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;

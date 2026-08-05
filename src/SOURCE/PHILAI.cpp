@@ -187,16 +187,16 @@
 #define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_STEP 0.02
 #define AI_TOWN_PRIMARY_SKILL_SHARE_BASE 0.33
 #define AI_TOWN_PRIMARY_SKILL_SHARE_STEP 0.01
-static const float AI_TARGET_HUMAN_VALUE_FACTOR = 1.5f;
+DATA(0x004ea658) static const float AI_TARGET_HUMAN_VALUE_FACTOR = 1.5f;
 #define AI_EVENT_HUMAN_VALUE_FACTOR 1.5
-static const float AI_STRATEGIC_POSITION_SCORE_FACTOR = 1.25f;
-static const float AI_CREATURE_SAME_RACE_FACTOR = 1.1f;
-static const float AI_FUTURE_DEFLATION_RATE = 0.15f;
-static const float AI_HERO_PURCHASE_SAME_RACE_FACTOR = 0.16f;
-static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
+DATA(0x004ea65c) static const float AI_STRATEGIC_POSITION_SCORE_FACTOR = 1.25f;
+DATA(0x004ea660) static const float AI_CREATURE_SAME_RACE_FACTOR = 1.1f;
+DATA(0x004ea664) static const float AI_FUTURE_DEFLATION_RATE = 0.15f;
+DATA(0x004ea668) static const float AI_HERO_PURCHASE_SAME_RACE_FACTOR = 0.16f;
+DATA(0x004ea66c) static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
 #define AI_HERO_PURCHASE_CLASS_DIVISOR 2.0f
 #define AI_HERO_PURCHASE_IDENTITY 1.0
-static const float AI_ATTENTION_IDENTITY = 1.0f;
+DATA(0x004ea670) static const float AI_ATTENTION_IDENTITY = 1.0f;
 #define AI_ATTENTION_PLAYER_CENTER 3.0
 #define AI_ATTENTION_NORMALIZER 4.0
 #define AI_ATTENTION_UPPER_BOUND 5.0
@@ -6687,54 +6687,54 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
     return eventVal;
 }
 
-float fFirstWeekTownFV = 0.0f;
+DATA(0x005331c8) float fFirstWeekTownFV = 0.0f;
 i32 iVepCacheHits = 0;
 i32 iTotalVepHits = 0;
-i32 giShowComputerRoute = 0;
-i16* gaiLiveChanceOfPos = NULL;
-i16* gaiHeroStrategicRVOfPos = NULL;
-i16* gaiHeroEventStratRVOfPos = NULL;
-i8* gaiTurnValueOfMine = NULL;
-i8* gaiEnemyHeroReachable = NULL;
+DATA(0x005331d4) i32 giShowComputerRoute = 0;
+DATA(0x005331d8) i16* gaiLiveChanceOfPos = NULL;
+DATA(0x005331dc) i16* gaiHeroStrategicRVOfPos = NULL;
+DATA(0x005331e0) i16* gaiHeroEventStratRVOfPos = NULL;
+DATA(0x005331e4) i8* gaiTurnValueOfMine = NULL;
+DATA(0x005331e8) i8* gaiEnemyHeroReachable = NULL;
 i32l glLastStartTick = 0;
 i32l glCurTicks = 0;
 i32l glTotalTicks = 0;
-hero* gpCurAIHero = NULL;
-float gfAttackHumanBonus = 2.0f;
-float gfAttackComputerBonus = 0.8f;
-i32 iLastFrameRateTimer = 0;
-i32 bSVSearchArrayInUse = 0;
-i32 bEvaluatingTravelGates = 1;
-b32 gbReduceByBerserk;
-float fBerserkFactor;
-i32 giCurPlayer;
-i8 giBuildShipyard[AI_PLAYER_COUNT];
-i32 giMaxHeroesForThisPlayer;
-i8 giBuildBoat[AI_PLAYER_COUNT];
-float fReduceFactor;
-u8 giCurPlayerBit;
-i32 giBestShipyardDist;
-i32 bHeroBuiltThisTurn;
-i16 gaiHeroLiveChance[GAME_HERO_COUNT];
-i32 giHumanTownConquered;
-i32 giCurTurn;
-i32 costTemp[AI_PURCHASE_RESOURCE_COUNT];
-i32 iAlphaMale;
-i32 iDummy;
-b32 gbPossibleShipyardFound;
-float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
-i32 iCurPlaceToVisit;
-i32 giBestShipyardId;
-b32 gbActualBoatFound;
-u8 giCurWatchPlayerBit;
-playerData* gpCurPlayer;
-float gfHeroInteractionBonus[GAME_HERO_COUNT];
-b32 gbBerserk;
-i32 giCurAIHeroMorale;
-i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
-i32 iPlacesVisited[ADVMGR_PLACE_VISIT_COUNT][ADVMGR_PLACE_COORDINATE_COUNT];
-b32 gbReduceByReload;
-b32 gbTroopReload;
-i32 giCurAIHeroLuck;
-b32 gbActualShipyardFound;
+DATA(0x005331f8) hero* gpCurAIHero = NULL;
+DATA(0x00516458) float gfAttackHumanBonus = 2.0f;
+DATA(0x0051645c) float gfAttackComputerBonus = 0.8f;
+DATA(0x005331fc) i32 iLastFrameRateTimer = 0;
+DATA(0x00533200) i32 bSVSearchArrayInUse = 0;
+DATA(0x00516460) i32 bEvaluatingTravelGates = 1;
+DATA(0x005331a8) b32 gbReduceByBerserk;
+DATA(0x00530bc0) float fBerserkFactor;
+DATA(0x00530abc) i32 giCurPlayer;
+DATA(0x005331b0) i8 giBuildShipyard[AI_PLAYER_COUNT];
+DATA(0x005331bc) i32 giMaxHeroesForThisPlayer;
+DATA(0x00530bb0) i8 giBuildBoat[AI_PLAYER_COUNT];
+DATA(0x00530aac) float fReduceFactor;
+DATA(0x00533134) u8 giCurPlayerBit;
+DATA(0x005309d0) i32 giBestShipyardDist;
+DATA(0x00533130) i32 bHeroBuiltThisTurn;
+DATA(0x00533138) i16 gaiHeroLiveChance[GAME_HERO_COUNT];
+DATA(0x00530ab0) i32 giHumanTownConquered;
+DATA(0x0053312c) i32 giCurTurn;
+DATA(0x00530bd4) i32 costTemp[AI_PURCHASE_RESOURCE_COUNT];
+DATA(0x00530c0c) i32 iAlphaMale;
+DATA(0x00530ab4) i32 iDummy;
+DATA(0x00530bc8) b32 gbPossibleShipyardFound;
+DATA(0x00530bf0) float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
+DATA(0x005331b8) i32 iCurPlaceToVisit;
+DATA(0x00530ab8) i32 giBestShipyardId;
+DATA(0x005331c4) b32 gbActualBoatFound;
+DATA(0x00530bd2) u8 giCurWatchPlayerBit;
+DATA(0x00530bb8) playerData* gpCurPlayer;
+DATA(0x005309d4) float gfHeroInteractionBonus[GAME_HERO_COUNT];
+DATA(0x005331a4) b32 gbBerserk;
+DATA(0x00530bc4) i32 giCurAIHeroMorale;
+DATA(0x00530bcc) i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
+DATA(0x00530ac0) i32 iPlacesVisited[ADVMGR_PLACE_VISIT_COUNT][ADVMGR_PLACE_COORDINATE_COUNT];
+DATA(0x005331ac) b32 gbReduceByReload;
+DATA(0x00533128) b32 gbTroopReload;
+DATA(0x00530bbc) i32 giCurAIHeroLuck;
+DATA(0x005331c0) b32 gbActualShipyardFound;
 

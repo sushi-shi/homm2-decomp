@@ -34,15 +34,15 @@
 #define smallB 26
 #define smallF 18
 
-u32 globalCrc;
-i32 bsInUse;
-BitStream aBitStreamBuffer;
-i32 bytesOut;
-UInt32 bigL;
-UInt32 bigR;
-UInt32 bigD;
-UInt32 bitsOutstanding;
-Model bogusModel;
+DATA(0x0053958c) u32 globalCrc;
+DATA(0x00539588) i32 bsInUse;
+DATA(0x00539598) BitStream aBitStreamBuffer;
+DATA(0x0053683c) i32 bytesOut;
+DATA(0x00536c4c) UInt32 bigL;
+DATA(0x00536c50) UInt32 bigR;
+DATA(0x00536c48) UInt32 bigD;
+DATA(0x0053640c) UInt32 bitsOutstanding;
+DATA(0x00536410) Model bogusModel;
 
 #define BASIS 0
 #define MODEL_2_3 1
@@ -52,7 +52,7 @@ Model bogusModel;
 #define MODEL_32_63 5
 #define MODEL_64_127 6
 #define MODEL_128_255 7
-Model models[8];
+DATA(0x00537460) Model models[8];
 
 #define VAL_RUNA 1
 #define VAL_RUNB 2
@@ -72,7 +72,7 @@ Model models[8];
 
 #define NUM_FULLGT_UNROLLINGS 4
 #define MAX_DENORM_OFFSET (4 * NUM_FULLGT_UNROLLINGS)
-UInt32 crc32Table[256] = {
+DATA(0x0051f5a4) UInt32 crc32Table[256] = {
     0x00000000U, 0x04c11db7U, 0x09823b6eU, 0x0d4326d9U, 0x130476dcU, 0x17c56b6bU, 0x1a864db2U,
     0x1e475005U, 0x2608edb8U, 0x22c9f00fU, 0x2f8ad6d6U, 0x2b4bcb61U, 0x350c9b64U, 0x31cd86d3U,
     0x3c8ea00aU, 0x384fbdbdU, 0x4c11db70U, 0x48d0c6c7U, 0x4593e01eU, 0x4152fda9U, 0x5f15adacU,
@@ -111,21 +111,21 @@ UInt32 crc32Table[256] = {
     0x9e7d9662U, 0x933eb0bbU, 0x97ffad0cU, 0xafb010b1U, 0xab710d06U, 0xa6322bdfU, 0xa2f33668U,
     0xbcb4666dU, 0xb8757bdaU, 0xb5365d03U, 0xb1f740b4U
 };
-UInt32* words = NULL;
-Int32* zptr = NULL;
-Int32* ftab = NULL;
-UChar* block = NULL;
-UChar* ll = NULL;
-Int32 last;
-Int32 lastPP;
-Int32 origPtr;
-Int32 blockSize100k;
-Int32 veryVerbose;
-Char* progName;
-Int32 compressing;
-Int32 bytesIn;
-Int32 verbose;
-FILE* outputHandleJustInCase;
+DATA(0x005395a8) UInt32* words = NULL;
+DATA(0x005395ac) Int32* zptr = NULL;
+DATA(0x005395b0) Int32* ftab = NULL;
+DATA(0x005395b4) UChar* block = NULL;
+DATA(0x005395b8) UChar* ll = NULL;
+DATA(0x00536404) Int32 last;
+DATA(0x00536400) Int32 lastPP;
+DATA(0x00539590) Int32 origPtr;
+DATA(0x00539594) Int32 blockSize100k;
+DATA(0x00539580) Int32 veryVerbose;
+DATA(0x00537454) Char* progName;
+DATA(0x00536834) Int32 compressing;
+DATA(0x00536408) Int32 bytesIn;
+DATA(0x00537458) Int32 verbose;
+DATA(0x00536840) FILE* outputHandleJustInCase;
 
 #define MY_EOF 257
 #define UPDATE_CRC(crcVar, cha)                                                                    \
@@ -1946,8 +1946,8 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
 
 i32 longestFileName;
 i32 opMode;
-char inName[1024];
-char outName[1024];
+DATA(0x00537054) char inName[1024];
+DATA(0x00536c54) char outName[1024];
 char progNameReally[0x400];
 i32 keepInputFiles;
 

@@ -452,4 +452,4 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     gpWindowManager->RemoveWindow(recruitWindow);
 }
 
-HMENU hmnuRecruitSave;
+DATA(0x00533204) HMENU hmnuRecruitSave;

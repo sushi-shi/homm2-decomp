@@ -967,33 +967,33 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 // the column term as a unit, so `column` splices unparenthesised on purpose.
 #define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
-static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
+DATA(0x004ea40c) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
-static u16 s_drawGroundTile;
+DATA(0x00523e3c) static u16 s_drawGroundTile;
 static i32 s_adjacentMonsterX;
 static i32 s_drawPixelY;
-static mapCellExtra* s_drawExtra;
-static i32 s_adjacentMonsterY;
-static i32 s_adjacentMonsterMinX;
-static i32 s_adjacentMonsterMinY;
-static i32 s_drawMonsterFrame;
-static i32 s_drawCloudFrame;
-static i32 s_drawStoneTile;
-static mapCell* s_drawCell;
-static mineRecord* s_drawMine;
-static hero* s_drawHero;
-static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType;
-static i32 s_drawCovered;
-static mapCell* s_drawAdjacentCell;
-static i32 s_drawHasHero;
-static i32 s_adjacentMonsterEndY;
-static i32 s_drawFlipCloud;
-static i32 s_drawHeroFrame;
-static i32 s_drawPixelX;
-static i32 s_drawPlayerColor;
-static i32 s_adjacentMonsterEndX;
-static i32 s_drawAnimationLength;
-static i32 s_drawHeroYOffset;
+DATA(0x00523e14) static mapCellExtra* s_drawExtra;
+DATA(0x00523e38) static i32 s_adjacentMonsterY;
+DATA(0x00523fa0) static i32 s_adjacentMonsterMinX;
+DATA(0x00523ff8) static i32 s_adjacentMonsterMinY;
+DATA(0x00523de4) static i32 s_drawMonsterFrame;
+DATA(0x00523fa4) static i32 s_drawCloudFrame;
+DATA(0x00523e24) static i32 s_drawStoneTile;
+DATA(0x00523e28) static mapCell* s_drawCell;
+DATA(0x00523f9c) static mineRecord* s_drawMine;
+DATA(0x00523fd8) static hero* s_drawHero;
+DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType;
+DATA(0x00523f94) static i32 s_drawCovered;
+DATA(0x00523e34) static mapCell* s_drawAdjacentCell;
+DATA(0x00523fe0) static i32 s_drawHasHero;
+DATA(0x00523e18) static i32 s_adjacentMonsterEndY;
+DATA(0x00523e1c) static i32 s_drawFlipCloud;
+DATA(0x00523e20) static i32 s_drawHeroFrame;
+DATA(0x00523fe8) static i32 s_drawPixelX;
+DATA(0x00523fa8) static i32 s_drawPlayerColor;
+DATA(0x00523e30) static i32 s_adjacentMonsterEndX;
+DATA(0x00523fe4) static i32 s_drawAnimationLength;
+DATA(0x00523fd0) static i32 s_drawHeroYOffset;
 H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
 H2_ENUM_END(AdvVisitMetadata)
@@ -10573,36 +10573,36 @@ u8 StopOnTrigger(class mapCell* cell) {
     return 0;
 }
 
-i32 giLimitUpdMinX = -1;
-i32 iLastScrollTime = 0;
-i32 iSandAnim = 0;
-i32 giLastHourGlassUpdateTime = 0;
-i32 TrigX = 0;
-i32 TrigY = 0;
-BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
-i32 iCurBottomViewEnemy = -1;
-i32 iCurHourGlassPhase = 0;
-i32 iLastHourGlassPhase = 1;
-b32 gbForceUpdate = false;
-i32 giCheatSeq = 0;
+DATA(0x004ef1d0) i32 giLimitUpdMinX = -1;
+DATA(0x00524004) i32 iLastScrollTime = 0;
+DATA(0x00524008) i32 iSandAnim = 0;
+DATA(0x0052400c) i32 giLastHourGlassUpdateTime = 0;
+DATA(0x00524010) i32 TrigX = 0;
+DATA(0x00524014) i32 TrigY = 0;
+DATA(0x00524018) BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
+DATA(0x004ef1d4) i32 iCurBottomViewEnemy = -1;
+DATA(0x0052401c) i32 iCurHourGlassPhase = 0;
+DATA(0x004ef1d8) i32 iLastHourGlassPhase = 1;
+DATA(0x00524020) b32 gbForceUpdate = false;
+DATA(0x00524024) i32 giCheatSeq = 0;
 i32 iQWE = 0;
-u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
+DATA(0x004ef1dc) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
-i32 iLastSandAnimTime = 0;
-i32 iLastNewSandAnimTime = 0;
-i32 giFrameCount = 0;
-class heroWindow* cPanel;
+DATA(0x0052402c) i32 iLastSandAnimTime = 0;
+DATA(0x00524030) i32 iLastNewSandAnimTime = 0;
+DATA(0x00524034) i32 giFrameCount = 0;
+DATA(0x00523fcc) class heroWindow* cPanel;
 i32 iThisMaxY;
-i32 giTownPortalChoice;
+DATA(0x00523e4c) i32 giTownPortalChoice;
 i32 iThisMinY;
-class heroWindow* townPortalWin;
+DATA(0x00523fdc) class heroWindow* townPortalWin;
 struct tag_message USMsg;
-i32 giFrameStep;
-char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
-i32 giLimitUpdMaxX;
-i32 giLimitUpdMaxY;
-i32 bPrefsChanged;
-i32 giLimitUpdMinY;
-i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
+DATA(0x00523dec) i32 giFrameStep;
+DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
+DATA(0x00523e40) i32 giLimitUpdMaxX;
+DATA(0x00523e44) i32 giLimitUpdMaxY;
+DATA(0x00523e48) i32 bPrefsChanged;
+DATA(0x00523f98) i32 giLimitUpdMinY;
+DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
 struct tag_message CDMsg;
-i32 iLastAnimFrame;
+DATA(0x00523de8) i32 iLastAnimFrame;

@@ -412,4 +412,4 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     }
 }
 
-H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;
+DATA(0x00533f7c) H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;

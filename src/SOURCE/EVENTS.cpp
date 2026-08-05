@@ -342,7 +342,7 @@ namespace {
     (reinterpret_cast<combatRemoteHeroFragment*>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
 #define EVENTS_HERO_BUFFER(buffer) (reinterpret_cast<combatRemoteHeroFragment*>(buffer))
 
-static char s_twoStringFormat[] = "%s %s";
+DATA(0x004f3cd4) static char s_twoStringFormat[] = "%s %s";
 
 VA(0x0043b640, 0x5fc9)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
@@ -8870,5 +8870,5 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
     return strcmpi(expectedPrefix, answerPrefix) == 0;
 }
 
-b32 gbNoShowCombat = false;
+DATA(0x005244b4) b32 gbNoShowCombat = false;
 

@@ -12,12 +12,12 @@ static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = -0.55f;
 static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = -0.5f;
 static const float COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER = -0.65f;
 static const float COMBAT_SPELL_AI_PETRIFIED_MODIFIER = -0.25f;
-static const float COMBAT_SPELL_AI_BLOODLUST_MODIFIER = 0.14f;
-static const float COMBAT_SPELL_AI_STONE_SKIN_MODIFIER = 0.16f;
-static const float COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER = 0.28f;
-static const float COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER = 0.2f;
-static const float COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER = 0.28f;
-static const float COMBAT_SPELL_AI_SHIELD_MODIFIER = 0.45f;
+DATA(0x004ea820) static const float COMBAT_SPELL_AI_BLOODLUST_MODIFIER = 0.14f;
+DATA(0x004ea824) static const float COMBAT_SPELL_AI_STONE_SKIN_MODIFIER = 0.16f;
+DATA(0x004ea830) static const float COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER = 0.28f;
+DATA(0x004ea82c) static const float COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER = 0.2f;
+DATA(0x004ea828) static const float COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER = 0.28f;
+DATA(0x004ea834) static const float COMBAT_SPELL_AI_SHIELD_MODIFIER = 0.45f;
 #define COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER 1.0f
 #define COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER
 #define COMBAT_SPELL_AI_MIRROR_POWER_ONE_MODIFIER 0.16f
@@ -1470,8 +1470,8 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);
 }
 
-float gfDurationMods[COMBAT_DURATION_MOD_COUNT] =
+DATA(0x005182d8) float gfDurationMods[COMBAT_DURATION_MOD_COUNT] =
     {0.0f, 0.33f, 0.55f, 0.72f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f, 0.0f};
-float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT] =
+DATA(0x00518304) float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT] =
     {0.0f, 0.5f, 0.65f, 0.78f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f};
-i32 giCurrSpellGroup;
+DATA(0x00533eb4) i32 giCurrSpellGroup;

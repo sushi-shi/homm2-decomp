@@ -223,9 +223,9 @@ i32 nbnet_init(void) {
     return 0;
 }
 
-H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetHostStatus = SETUP_INITIALIZE;
-H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetGuestStatus = SETUP_INITIALIZE;
-i32 iNameRetryCount = 0;
-H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForHostStatus = WAIT_START;
-H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForGuestStatus = WAIT_START;
-i32 iLastBroadcastTime = 0;
+DATA(0x0052863c) H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetHostStatus = SETUP_INITIALIZE;
+DATA(0x0052863d) H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetGuestStatus = SETUP_INITIALIZE;
+DATA(0x00528640) i32 iNameRetryCount = 0;
+DATA(0x00528644) H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForHostStatus = WAIT_START;
+DATA(0x00528645) H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForGuestStatus = WAIT_START;
+DATA(0x00528648) i32 iLastBroadcastTime = 0;

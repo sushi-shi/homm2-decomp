@@ -2113,9 +2113,9 @@ void hero::CheckAnduranPieces(i32 showDialog) {
     }
 }
 
-class hero* gpHVHero = NULL;
-class heroWindow* gheroWin = NULL;
-i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
+DATA(0x005249b4) class hero* gpHVHero = NULL;
+DATA(0x005249b8) class heroWindow* gheroWin = NULL;
+DATA(0x004f7c64) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
     {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
-i32 iOrigHeroViewID;
-b32 gbNoDismiss;
+DATA(0x005249ac) i32 iOrigHeroViewID;
+DATA(0x005249b0) b32 gbNoDismiss;

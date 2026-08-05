@@ -1,9 +1,9 @@
 #include <va.h>
 #include <BASE/MusicFlags.h>
 
-u8 gMusicFlagA;
-u8 gMusicFlagB;
-u8 gMusicFeatureEnabled = 1;
+DATA(0x00536380) u8 gMusicFlagA;
+DATA(0x00536381) u8 gMusicFlagB;
+DATA(0x0051f550) u8 gMusicFeatureEnabled = 1;
 
 VA(0x004c5770, 0xa)
 u8 GetMusicFlagA(void) {

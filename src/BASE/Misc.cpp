@@ -182,20 +182,20 @@ H2_ENUM_END(FileIdHashConstant)
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-static i32 giFindMid;
+DATA(0x00536088) static i32 giFindMid;
 
-static i32 gBlitRight;
-static i32 gBlitBottom;
+DATA(0x0053609c) static i32 gBlitRight;
+DATA(0x00536098) static i32 gBlitBottom;
 
-i32 iMemEntries = 0;
-MemEntry* gpMemEntry = NULL;
-i32 giTotalMemAllocated = 0;
-static char* gcCDTrackName = "\\Tracks2\\02-AudioTrack 02.ogg";
-u8
+DATA(0x005360ac) i32 iMemEntries = 0;
+DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
+DATA(0x005360b4) i32 giTotalMemAllocated = 0;
+DATA(0x0051e5dc) static char* gcCDTrackName = "\\Tracks2\\02-AudioTrack 02.ogg";
+DATA(0x0051e5e0) u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-i32 iLastSeed = INITIAL_SEED;
-static char gMemEntryTag[sizeof("IME")] = "IME";
+DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
+DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 H2_ENUM_BEGIN(StatusBarLayout)
     STATUS_BAR_WIDTH   = 640,
@@ -2136,9 +2136,9 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     return EventWindowHandler(message);
 }
 
-class heroWindow* DataEntryWin;
-char* cDEDest;
-i32 iDEMaxLen;
-H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
-i32 inBoxX;
-i32 inBoxY;
+DATA(0x005360a0) class heroWindow* DataEntryWin;
+DATA(0x005360a4) char* cDEDest;
+DATA(0x005360a8) i32 iDEMaxLen;
+DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
+DATA(0x00536094) i32 inBoxX;
+DATA(0x00536090) i32 inBoxY;
