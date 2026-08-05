@@ -66,13 +66,13 @@ void font::DrawStringExecute(
     i32 clipR,
     i32 clipB
 ) {
-    char c = 0;
+    i32 c = 0;
     i32 pos = x;
     i32 i = 0;
     while (str[i] != 0) {
-        c = str[i];
+        c = static_cast<u8>(str[i]);
         if (c == FONT_SPACER_CHAR) {
-            pos += GetCharacterWidth(static_cast<u8>(str[i]));
+            pos += GetCharacterWidth(c);
             goto next;
         }
         if (c == '{') {
@@ -83,9 +83,15 @@ void font::DrawStringExecute(
             m_suppressDraw = 0;
             goto next;
         }
-        c -= 'a' - 'A';
-        if (c < 0 || c > FONT_GLYPH_FALLBACK)
-            c = FONT_GLYPH_FALLBACK;
+        // The same glyph remap GetCharacterWidth performs, open-coded: the
+        // codes stay numeric so the byte compares zero-extend (see
+        // RemapCyrillicCharacter).
+        if (c < ' ' || (c > 0x7f && c < 0xc0 && c != 0xb8 && c != 0xa8)) {
+            c = 0x7f;
+        } else if (c > 0x7f) {
+            c = RemapCyrillicCharacter(c);
+        }
+        c -= ' ';
         if (c != 0) {
             if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
                 IconToBitmap(
@@ -151,7 +157,7 @@ void font::DrawStringExecute(
                     1
                 );
         }
-        pos += GetCharacterWidth(static_cast<u8>(str[i]));
+        pos += GetCharacterWidth(str[i]);
     next:
         i++;
     }
@@ -199,6 +205,10 @@ static inline bool IsVowel(u8 c) {
         || c == 0xdf /* Я */;
 }
 
+static inline bool IsHyphen(u8 c) {
+    return c == '-';
+}
+
 VA(0x004c3b20, 0x1044)
 void font::ExtractLine(
     char* text,
@@ -209,106 +219,104 @@ void font::ExtractLine(
     u8 lastLine
 ) {
     i32 width = 0;
-    i32 pos = *position;
-    i32 wordStart = *position;
-    i32 wordWidth;
-    i32 lineEnd;
-    i32 lineEndWidth;
+    i32 curPos = *position;
+    i32 wStart = *position;
+    i32 savedWidth;
+    i32 lastEnd;
+    i32 lastWidth;
 
     if (lastLine != 0) {
-        while (text[pos] != '\n' && text[pos] != 0) {
-            width += GetCharacterWidth(text[pos]);
-            line[pos - *position] = text[pos];
-            pos++;
+        while (text[curPos] != '\n' && text[curPos] != 0) {
+            width += GetCharacterWidth(text[curPos]);
+            line[curPos - *position] = text[curPos];
+            curPos++;
         }
-        if (text[pos] == '\n') {
-            line[pos - *position] = 0;
-            *position = pos + 1;
+        if (text[curPos] == '\n') {
+            line[curPos - *position] = 0;
+            *position = curPos + 1;
             *lineWidth = width;
             return;
         }
-        if (text[pos] == 0) {
-            line[pos - *position] = 0;
-            *position = pos;
+        if (text[curPos] == 0) {
+            line[curPos - *position] = 0;
+            *position = curPos;
             *lineWidth = width;
             return;
         }
     }
 
     while (1) {
-        wordStart = pos;
-        wordWidth = width;
-        while (text[pos] != ' ' && text[pos] != '\n' && text[pos] != 0) {
-            width += GetCharacterWidth(text[pos]);
-            line[pos - *position] = text[pos];
-            pos++;
+        wStart = curPos;
+        savedWidth = width;
+        while (text[curPos] != ' ' && text[curPos] != '\n' && text[curPos] != 0) {
+            width += GetCharacterWidth(text[curPos]);
+            line[curPos - *position] = text[curPos];
+            curPos++;
         }
-        if (maxWidth < width) {
-            if (wordStart != *position) {
-                if (line[wordStart - *position - 1] == ' ')
-                    *lineWidth = wordWidth - GetCharacterWidth(' ');
+        if (width > maxWidth) {
+            if (wStart != *position) {
+                if (line[wStart - *position - 1] == ' ')
+                    *lineWidth = savedWidth - GetCharacterWidth(' ');
                 else
-                    *lineWidth = wordWidth;
-                line[wordStart - *position - 1] = 0;
-                *position = wordStart;
+                    *lineWidth = savedWidth;
+                line[wStart - *position - 1] = 0;
+                *position = wStart;
                 return;
             }
-            lineEnd = pos;
-            lineEndWidth = width;
-            pos = pos - 2;
+            lastEnd = curPos;
+            lastWidth = width;
+            curPos = curPos - 2;
             while (width >= maxWidth
-                   || (pos > wordStart + 1
-                       && !IsVowel(text[pos])
-                       && !((!IsVowel(text[pos + 1]) && text[pos] == text[pos + 1])
-                            || text[pos] == '-'))) {
-                width -= GetCharacterWidth(text[pos]);
-                pos--;
+                   || (curPos > wStart + 1
+                       && !IsVowel(text[curPos])
+                       && !((!IsVowel(text[curPos + 1]) && text[curPos] == text[curPos + 1])
+                            || IsHyphen(text[curPos])))) {
+                width -= GetCharacterWidth(text[curPos]);
+                curPos--;
             }
-            if (pos <= wordStart + 1) {
-                line[lineEnd - *position] = 0;
-                *position = lineEnd + 1;
-                *lineWidth = lineEndWidth;
+            if (curPos <= wStart + 1) {
+                line[lastEnd - *position] = 0;
+                *position = lastEnd + 1;
+                *lineWidth = lastWidth;
                 return;
             }
-            if (IsVowel(text[pos])) {
-                line[pos + 1 - *position] = '-';
-                line[pos + 2 - *position] = 0;
+            if (IsVowel(text[curPos])) {
+                line[curPos - *position + 1] = '-';
+                line[curPos - *position + 2] = 0;
                 *lineWidth = width;
-                *position = pos + 1;
+                *position = curPos + 1;
                 return;
             }
-            if (text[pos] == '-') {
-                line[pos + 1 - *position] = 0;
+            if (IsHyphen(text[curPos])) {
+                line[curPos - *position + 1] = 0;
                 *lineWidth = width;
-                *position = pos + 1;
+                *position = curPos + 1;
                 return;
             }
-            wordStart = pos;
-            wordWidth = width;
-            if (!IsVowel(text[pos])) {
-                if (!IsVowel(text[pos + 1]) && text[pos] == text[pos + 1]) {
-                    line[pos + 1 - *position] = '-';
-                    line[pos + 2 - *position] = 0;
+            if (!IsVowel(text[curPos])) {
+                if (!IsVowel(text[curPos + 1]) && text[curPos] == text[curPos + 1]) {
+                    line[curPos - *position + 1] = '-';
+                    line[curPos - *position + 2] = 0;
                     *lineWidth = width;
-                    *position = pos + 1;
+                    *position = curPos + 1;
                     return;
                 }
             }
         } else {
-            if (text[pos] == '\n') {
-                line[pos - *position] = 0;
-                *position = pos + 1;
+            if (text[curPos] == '\n') {
+                line[curPos - *position] = 0;
+                *position = curPos + 1;
                 *lineWidth = width;
                 return;
             }
-            if (text[pos] == ' ') {
-                line[pos - *position] = ' ';
+            if (text[curPos] == ' ') {
+                line[curPos - *position] = ' ';
                 width += GetCharacterWidth(' ');
-                pos++;
+                curPos++;
             }
-            if (text[pos] == 0) {
-                line[pos - *position] = 0;
-                *position = pos;
+            if (text[curPos] == 0) {
+                line[curPos - *position] = 0;
+                *position = curPos;
                 *lineWidth = width;
                 return;
             }
@@ -326,14 +334,20 @@ void font::DrawBoundedString(
     FontDrawMode mode,
     FontAlignment align
 ) {
-    i32 size = strlen(str);
-    char space = ' ';
+    // blank, lastPos, spaceWidth, wordWidth and prevPos are leftovers of the
+    // line-breaking block this function shares with LineLength; retail keeps
+    // their frame slots (lastPos never even gets a store) and their zero
+    // initializers, so the declarations are load-bearing.
+    i32 len = strlen(str);
+    char blank = ' ';
+    i32 lastPos;
     i32 xPosition = 0;
-    i32 yOffset = 0;
+    i32 yPosition = 0;
     i32 pos = 0;
-    i32 wordBreak = 0;
-    i32 lineWidth = 0;
-    i32 savedWidth = 0;
+    i32 spaceWidth = 0;
+    i32 wordWidth = 0;
+    i32 lw = 0;
+    i32 prevPos = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     strcpy(line, str);
     FontDrawMode drawMode = mode;
@@ -342,23 +356,28 @@ void font::DrawBoundedString(
         i32 lineCount = LineLength(str, w);
         i32 totalH = lineCount * m_height;
         if (totalH < h)
-            yOffset = (h - totalH) / CENTER_DIVISOR;
+            yPosition = (h - totalH) / CENTER_DIVISOR;
     }
     m_suppressDraw = 0;
-    for (; size > pos && line[pos] != 0 && (yOffset + m_height <= h || yOffset == 0);
-         yOffset += m_height) {
-        if (h < yOffset + m_height * WRAP_HEIGHT_LINE_COUNT)
-            ExtractLine(str, line, &pos, w, &lineWidth, 1);
+    while (pos < len && line[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
+        if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
+            ExtractLine(str, line, &pos, w, &lw, 1);
         else
-            ExtractLine(str, line, &pos, w, &lineWidth, 0);
-        if (align == FONT_ALIGN_LEFT)
+            ExtractLine(str, line, &pos, w, &lw, 0);
+        switch (align) {
+        case FONT_ALIGN_LEFT:
             xPosition = 0;
-        else if (align == FONT_ALIGN_CENTER)
-            xPosition = (w - lineWidth) / CENTER_DIVISOR + 1;
-        else if (align == FONT_ALIGN_RIGHT)
-            xPosition = w - lineWidth;
-        DrawStringExecute(line, xPosition + x, yOffset + y, drawMode, x, y, w, h);
-        lineWidth = 0;
+            break;
+        case FONT_ALIGN_CENTER:
+            xPosition = (w - lw) / CENTER_DIVISOR + 1;
+            break;
+        case FONT_ALIGN_RIGHT:
+            xPosition = w - lw;
+            break;
+        }
+        DrawStringExecute(line, xPosition + x, yPosition + y, drawMode, x, y, w, h);
+        yPosition += m_height;
+        lw = 0;
     }
     H2_FREE(line);
 }
@@ -368,18 +387,22 @@ void font::DrawBoundedString(
 
 VA(0x004c4d70, 0xc7)
 i32 font::LineLength(char* str, i32 maxW) {
-    i32 size = strlen(str);
-    char space = ' ';
+    // Same shared line-breaking declaration block as DrawBoundedString: blank,
+    // spaceWidth, wordWidth and prevPos are unused here but hold retail frame
+    // slots and emit their initializers.
+    i32 len = strlen(str);
+    char blank = ' ';
     i32 count = 0;
     i32 pos = 0;
-    i32 wordBreak = 0;
-    i32 lineWidth = 0;
-    i32 savedWidth = 0;
+    i32 spaceWidth = 0;
+    i32 wordWidth = 0;
+    i32 lw = 0;
+    i32 prevPos = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
-    while (pos < size && str[pos] != 0) {
-        ExtractLine(str, line, &pos, maxW, &lineWidth, 0);
+    while (pos < len && str[pos] != 0) {
+        ExtractLine(str, line, &pos, maxW, &lw, 0);
         count++;
-        lineWidth = 0;
+        lw = 0;
     }
     H2_FREE(line);
     return count;

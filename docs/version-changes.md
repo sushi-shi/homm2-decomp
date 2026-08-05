@@ -353,6 +353,25 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   glyphs - to the 0x7f fallback. It also measures `'.'` (0x2e) as the
   underscore glyph where the draw path still uses `FONT_SPACER_CHAR`
   (0x1f). Both functions byte-exact 2026-08-03.
+- **[Buka] `font::DrawStringExecute` glyph selection is the Cyrillic
+  remap, not an upper-case fold.** PoL 2.0 mapped the character with
+  `c -= 'a' - 'A'; if (c < 0 || c > 0x5f) c = 0x5f;` - a single
+  subtract-and-clamp that folds lower case onto the upper-case glyph
+  row. The 2.1 body open-codes exactly `GetCharacterWidth`'s selection
+  instead: `if (c < ' ' || (c > 0x7f && c < 0xc0 && c != 0xb8 && c !=
+  0xa8)) c = 0x7f; else if (c > 0x7f) c = RemapCyrillicCharacter(c);`
+  followed by `c -= ' '`. Consequences: lower-case Latin now draws its
+  own glyphs rather than the upper-case ones, and CP1251 codes reach
+  the Cyrillic glyph range. The local also widened `char` -> `int`
+  (`movl $0x0` init, `cmpl` against 0xc0 with the imm32 form) and is
+  loaded zero-extended (`c = (u8)str[i]`), so codes above 0x7f compare
+  as 128..255 instead of negative. Byte-exact 2026-08-05.
+- **[Buka] `font::ExtractLine` has no word-boundary re-snapshot before
+  the double-consonant break.** After the vowel and `'-'` tests fail,
+  2.1 falls directly into `if (!IsVowel(text[curPos]))`; there is no
+  `wordStart = curPos; wordWidth = width;` pair (retail's frame shows
+  exactly two stores to the word-start slot and one to the word-width
+  slot). Byte-exact 2026-08-05, whole function 0/4164 bytes differing.
 - **[Buka] Rainbow luck bonus applies before the clamps.**
   `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
   MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
