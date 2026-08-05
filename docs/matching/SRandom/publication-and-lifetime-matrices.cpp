@@ -51,6 +51,21 @@ Artifacts:
 
 Disposition: retain the current scalar source and existing MAX. No generated
 source shape or declaration-forest probe is retained.
+
+Cross-version follow-up, 2026-08-05:
+
+The exact Gold/Buka reconstruction delegates to SIncRandomize and SGenRand.
+A complete 2 x 51 structure/state matrix tested that body against the current
+PoL inline body.  It completed 102/102.  The Gold body compiled as two real
+calls here (31.933332% at best, size 66, 4 relocations), while PoL retail has
+no direct call and is size 184.  The current inline body remained best at
+92.000000%.  This is a genuine version-specific ownership change, not a
+missing PoL helper boundary.
+
+Artifacts:
+  build/srandom-cross-version-axes.json
+  build/srandom-cross-version-manifest.json
+  build/source-variant-batch/srandom-cross-version/results.json
 */
 
 #if 0

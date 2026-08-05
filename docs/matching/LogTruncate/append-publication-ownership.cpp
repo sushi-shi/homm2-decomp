@@ -40,6 +40,19 @@ Disposition: retain the direct source and durable MAX 92.5. Do not retain
 helpers or compiler probes. A future attempt must change the actual string-end
 mechanism or expose a different TU-state orbit; further local spellings of the
 same strlen-plus-word assignment are exhausted.
+
+Cross-version follow-up, 2026-08-05:
+
+The full exact Gold/Buka guard-clause plus strcat structure was tested as a
+separate structural parent across clean plus 50 states.  The complete 102/102
+matrix confirmed that it belongs to a different compiler/version orbit: every
+Gold arm was size 196 and 70.785710%, while every retained direct-word arm was
+size 169 and 92.500000%.  PoL retail is size 166.  No Gold source is retained.
+
+Artifacts:
+  build/logtruncate-cross-version-axes.json
+  build/logtruncate-cross-version-manifest.json
+  build/source-variant-batch/logtruncate-cross-version/results.json
 */
 
 #if 0

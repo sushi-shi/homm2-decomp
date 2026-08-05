@@ -19,11 +19,12 @@ H2_ENUM_BEGIN(DataEntryLayout)
     PROMPT_WIDTH                = 240,
     PROMPT_LINE_HEIGHT          = 16,
     CANCEL_PROMPT_HEIGHT        = 39,
-    ROW_ROUNDING_BIAS           = 15,
+    ROW_TOP_MARGIN              = 40,
+    ROW_ROUNDING_BIAS           = 25,
     ROW_HEIGHT                  = 45,
     MAX_ROW_COUNT               = 6,
     CANCEL_Y_OFFSET             = 30,
-    ENTRY_BASE_Y                = 95,
+    ENTRY_BASE_Y                = 50,
     WINDOW_NAME_CAPACITY        = 16,
     TEXT_BUFFER_CAPACITY        = 100,
     TEXT_FIELD_X                = 35,
@@ -2301,17 +2302,18 @@ void SRand(i32 seed) {
 
 VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
-    i32 result = 0;
+    i32 bitMask;
+    i32 ret = 0;
     iLastSeed &= RANDOM_SEED_MASK;
-    i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
-    mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
+    iLastSeed *= RANDOM_MIX_MULTIPLIER;
+    iLastSeed += (iLastSeed & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
     for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
-        if (mix & (1 << i)) {
-            result |= 1 << i;
+        bitMask = 1 << i;
+        if (iLastSeed & bitMask) {
+            ret |= 1 << i;
         }
     }
-    iLastSeed = mix;
-    return result;
+    return ret;
 }
 
 VA(0x004c6ab0, 0x6)
@@ -2337,13 +2339,16 @@ void GetDataEntry(
     iDEMaxLen = maximumLength;
     strcpy(destination, gMiscText.dataEntry.destinationDefault.text);
 
-    i32 rows = bigFont->LineLength(prompt, PROMPT_WIDTH) * PROMPT_LINE_HEIGHT;
+    i32 textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
+    i32 height = textLines * PROMPT_LINE_HEIGHT;
     if (showCancel != 0)
-        rows += CANCEL_PROMPT_HEIGHT;
-    rows = (rows + ROW_ROUNDING_BIAS) / ROW_HEIGHT;
+        height += CANCEL_PROMPT_HEIGHT;
+    height += ROW_TOP_MARGIN;
+    i32 rows = (height - ROW_ROUNDING_BIAS) / ROW_HEIGHT;
     if (rows > MAX_ROW_COUNT)
         rows = MAX_ROW_COUNT;
-    i32 entryY = rows * ROW_HEIGHT - (showCancel != 0 ? CANCEL_Y_OFFSET : 0) + ENTRY_BASE_Y;
+    i32 entryY = (rows + 1) * ROW_HEIGHT + ENTRY_BASE_Y
+        - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
 
     char windowName[WINDOW_NAME_CAPACITY];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
@@ -2359,9 +2364,10 @@ void GetDataEntry(
     DataEntryWin->BroadcastMessage(message);
 
     char entryText[TEXT_BUFFER_CAPACITY];
-    if (initialText == NULL)
-        initialText = gMiscText.dataEntry.initialTextDefault.text;
-    strcpy(entryText, initialText);
+    if (initialText != NULL)
+        strcpy(entryText, initialText);
+    else
+        strcpy(entryText, gMiscText.dataEntry.initialTextDefault.text);
     message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.data.text = entryText;
     DataEntryWin->BroadcastMessage(message);

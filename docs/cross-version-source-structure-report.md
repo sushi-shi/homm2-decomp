@@ -1,7 +1,7 @@
 # PoL 2.0 and Gold 2.1/Buka source-structure report
 
 Investigation date: 2026-08-05. The primary goal is to use the exact
-`decomp-gold-2.1-buka` reconstruction as evidence for improving
+  `decomp-gold-2.1-buka` reconstruction as evidence for improving
 `decomp-pol-2.0`. The functional-change inventory is included as a secondary
 appendix; it is not the matching priority.
 
@@ -10,7 +10,7 @@ appendix; it is not the matching priority.
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
   has 1,159/1,514 functions live exact and, after this investigation,
-  1,335/1,514 functions exact-max.
+  1,337/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -25,6 +25,11 @@ appendix; it is not the matching priority.
 - A focused BASE follow-up closed `heroWindowManager::AddWindow` live at
   100.0000%. Retail proves the exact mainline direct-`zOrder`, compact loop,
   and tail-owned first-insertion structure.
+- The same structure-first comparison closed two more BASE functions cleanly.
+  `SGenRand` mutates `iLastSeed` in place and names the shifted `bitMask`;
+  `GetDataEntry` preserves the staged row-layout algebra and owns the initial
+  text copy in the null/non-null branches. Both remain exact across their
+  complete clean-plus-50-state matrices.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
