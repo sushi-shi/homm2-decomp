@@ -905,73 +905,73 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
 VA(0x0041a1d9, 0x165f)
 void army::SpecialAttack(void) {
     char combatText[ARMY_COMBAT_TEXT_SIZE];
-    i32 missileDelay_2;
-    i32 minY_1;
-    i32 oldX_16;
-    char targetColumn_2;
-    i32 minX_1;
-    float angle_2;
-    i32 missileHalfHeight_1;
-    char sourceColumn_8;
-    i32 attackDirection_3;
-    CombatEffectType effectType_1;
-    i32 initialXDistance_6;
-    i32 yStep_6;
-    i32 currentMissileY_7;
-    i32 xStep_29;
-    i32 currentMissileX_7;
-    i32 effectY_28;
+    i32 missileDelay;
+    i32 minY;
+    i32 oldX;
+    char targetColumn;
+    i32 minX;
+    float angle;
+    i32 missileHalfHeight;
+    char sourceColumn;
+    i32 attackDirection;
+    CombatEffectType effectType;
+    i32 initialXDistance;
+    i32 yStep;
+    i32 currentMissileY;
+    i32 xStep;
+    i32 currentMissileX;
+    i32 effectY;
     char sourceRow;
-    i32 missileSteps_7;
-    i32 oldY_9;
-    i32 effectX_2;
-    char targetRow_1;
+    i32 missileSteps;
+    i32 oldY;
+    i32 effectX;
+    char targetRow;
     H2_ENUM_STORAGE(IconDrawOrientation, char) reverseMissile;
-    i32 distance_6;
-    ArmyFacing originalFacing_6;
-    i32 initialYDistance_8;
-    i32 backgroundX_4;
-    i32 maxX_3;
-    i32 xDistance_7;
-    i32 maxY_3;
+    i32 distance;
+    ArmyFacing originalFacing;
+    i32 initialYDistance;
+    i32 backgroundX;
+    i32 maxX;
+    i32 xDistance;
+    i32 maxY;
     bitmap* missileBackground;
-    i32 backgroundY_6;
+    i32 backgroundY;
     i32 originalAttack;
     i32 direction;
     i32 missileHalfWidth;
-    i32 sourceY_1;
-    i32 targetY_1;
-    i32 missileSpacing_1;
-    i32 missileY_7;
-    i32 endX_36;
-    i32 yDistance_16;
-    i32 sourceX_1;
-    i32 targetX_1;
-    i32 missileX_7;
+    i32 sourceY;
+    i32 targetY;
+    i32 missileSpacing;
+    i32 missileY;
+    i32 endX;
+    i32 yDistance;
+    i32 sourceX;
+    i32 targetX;
+    i32 missileX;
     i32 damage;
     float slope;
-    i32 directionFrame_2;
-    i32 endY_19;
-    i32 killed_13;
-    army* target_1;
+    i32 directionFrame;
+    i32 endY;
+    i32 killed;
+    army* target;
 
     damage = 0;
-    killed_13 = 0;
-    originalFacing_6 = m_facing;
+    killed = 0;
+    originalFacing = m_facing;
     m_palette = NULL;
-    target_1 = m_targetIndex + gpCombatManager->m_armies[IDX(m_targetSide)];
-    targetColumn_2 = target_1->m_hex % ARMY_HEX_COLUMNS;
-    targetRow_1 = target_1->m_hex / ARMY_HEX_COLUMNS;
-    sourceColumn_8 = m_hex % ARMY_HEX_COLUMNS;
+    target = m_targetIndex + gpCombatManager->m_armies[IDX(m_targetSide)];
+    targetColumn = target->m_hex % ARMY_HEX_COLUMNS;
+    targetRow = target->m_hex / ARMY_HEX_COLUMNS;
+    sourceColumn = m_hex % ARMY_HEX_COLUMNS;
     sourceRow = m_hex / ARMY_HEX_COLUMNS;
-    originalFacing_6 = m_facing;
-    if (!(targetColumn_2 <= sourceColumn_8)
-        || (!(sourceRow & 1) && targetColumn_2 == sourceColumn_8)) {
+    originalFacing = m_facing;
+    if (!(targetColumn <= sourceColumn)
+        || (!(sourceRow & 1) && targetColumn == sourceColumn)) {
         m_facing = ARMY_FACING_RIGHT;
     } else {
         m_facing = ARMY_FACING_LEFT;
     }
-    if (m_facing != originalFacing_6) {
+    if (m_facing != originalFacing) {
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
             if (m_facing == ARMY_FACING_RIGHT) {
                 m_hex--;
@@ -988,38 +988,38 @@ void army::SpecialAttack(void) {
     gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
 
-    targetX_1 = target_1->MidX();
-    targetY_1 = target_1->MidY();
+    targetX = target->MidX();
+    targetY = target->MidY();
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-        targetX_1 = gpCombatManager->m_hexCells[target_1->m_hex].m_x;
-        targetY_1 =
-            gpCombatManager->m_hexCells[target_1->m_hex].m_y - PROJECTILE_TARGET_Y_OFFSET;
+        targetX = gpCombatManager->m_hexCells[target->m_hex].m_x;
+        targetY =
+            gpCombatManager->m_hexCells[target->m_hex].m_y - PROJECTILE_TARGET_Y_OFFSET;
     }
     if (m_facing == ARMY_FACING_RIGHT) {
-        sourceX_1 = gpCombatManager->m_hexCells[m_hex].m_x + m_frameInfo.missileOffsets[1].x;
+        sourceX = gpCombatManager->m_hexCells[m_hex].m_x + m_frameInfo.missileOffsets[1].x;
     } else {
-        sourceX_1 = gpCombatManager->m_hexCells[m_hex].m_x - m_frameInfo.missileOffsets[1].x;
+        sourceX = gpCombatManager->m_hexCells[m_hex].m_x - m_frameInfo.missileOffsets[1].x;
     }
-    sourceY_1 = gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[1].y;
-    initialXDistance_6 = targetX_1 - sourceX_1;
+    sourceY = gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[1].y;
+    initialXDistance = targetX - sourceX;
     reverseMissile = ICON_DRAW_NORMAL;
-    if (initialXDistance_6 < 0) {
+    if (initialXDistance < 0) {
         reverseMissile = ICON_DRAW_FLIPPED;
-        initialXDistance_6 = -initialXDistance_6;
+        initialXDistance = -initialXDistance;
     }
-    initialYDistance_8 = targetY_1 - sourceY_1;
-    if (initialXDistance_6 == 0) {
-        directionFrame_2 =
-            initialYDistance_8 > 0 ? m_frameInfo.projectileDirectionCount - 1 : 0;
-        angle_2 = static_cast<float>(
-            initialYDistance_8 > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
+    initialYDistance = targetY - sourceY;
+    if (initialXDistance == 0) {
+        directionFrame =
+            initialYDistance > 0 ? m_frameInfo.projectileDirectionCount - 1 : 0;
+        angle = static_cast<float>(
+            initialYDistance > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
         );
     } else {
         /* The parenthesised divisor cast keeps both operands on the x87 stack;
            without it VC6 folds the divisor into a single `fidiv`. */
-        slope = static_cast<float>(-initialYDistance_8)
-                / (static_cast<float>(initialXDistance_6));
-        angle_2 = static_cast<float>(
+        slope = static_cast<float>(-initialYDistance)
+                / (static_cast<float>(initialXDistance));
+        angle = static_cast<float>(
             atan(static_cast<double>(slope)) * PROJECTILE_HALF_TURN_DEGREES_FLOAT
             / ARMY_PROJECTILE_PI
         );
@@ -1027,25 +1027,25 @@ void army::SpecialAttack(void) {
             if ((m_frameInfo.projectileAngles[direction]
                  + m_frameInfo.projectileAngles[direction - 1])
                     / PROJECTILE_DIRECTION_MIDPOINT_DIVISOR
-                < angle_2) {
+                < angle) {
                 break;
             }
         }
         if (direction < m_frameInfo.projectileDirectionCount) {
-            directionFrame_2 = direction - 1;
+            directionFrame = direction - 1;
         } else {
-            directionFrame_2 = m_frameInfo.projectileDirectionCount - 1;
+            directionFrame = m_frameInfo.projectileDirectionCount - 1;
         }
     }
-    if (angle_2 > ARMY_SHOOT_UP_MIN_ANGLE) {
+    if (angle > ARMY_SHOOT_UP_MIN_ANGLE) {
         m_animationSequence = ARMY_ANIMATION_SHOOT_UP;
-        attackDirection_3 = IDX(PROJECTILE_ATTACK_UP);
-    } else if (angle_2 > ARMY_SHOOT_FORWARD_MIN_ANGLE) {
+        attackDirection = IDX(PROJECTILE_ATTACK_UP);
+    } else if (angle > ARMY_SHOOT_FORWARD_MIN_ANGLE) {
         m_animationSequence = ARMY_ANIMATION_SHOOT_FORWARD;
-        attackDirection_3 = IDX(PROJECTILE_ATTACK_FORWARD);
+        attackDirection = IDX(PROJECTILE_ATTACK_FORWARD);
     } else {
         m_animationSequence = ARMY_ANIMATION_SHOOT_DOWN;
-        attackDirection_3 = IDX(PROJECTILE_ATTACK_DOWN);
+        attackDirection = IDX(PROJECTILE_ATTACK_DOWN);
     }
     for (m_animationFrame = 0;
          m_animationFrame < m_frameInfo.animationFrameCount[IDX(m_animationSequence)];
@@ -1064,36 +1064,36 @@ void army::SpecialAttack(void) {
     m_animationFrame = m_frameInfo.animationFrameCount[IDX(m_animationSequence)] - 1;
 
     missileHalfWidth = DEFAULT_MISSILE_HALF_WIDTH;
-    missileHalfHeight_1 = DEFAULT_MISSILE_HALF_HEIGHT;
-    missileSpacing_1 = DEFAULT_MISSILE_SPACING;
-    missileDelay_2 = DEFAULT_MISSILE_DELAY;
+    missileHalfHeight = DEFAULT_MISSILE_HALF_HEIGHT;
+    missileSpacing = DEFAULT_MISSILE_SPACING;
+    missileDelay = DEFAULT_MISSILE_DELAY;
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-        missileSpacing_1 = LICH_MISSILE_SPACING;
-        missileDelay_2 = LICH_MISSILE_DELAY;
+        missileSpacing = LICH_MISSILE_SPACING;
+        missileDelay = LICH_MISSILE_DELAY;
         missileHalfWidth = LICH_MISSILE_HALF_WIDTH;
-        missileHalfHeight_1 = LICH_MISSILE_HALF_HEIGHT;
+        missileHalfHeight = LICH_MISSILE_HALF_HEIGHT;
     }
-    maxX_3 = 0;
-    minX_1 = ARMY_COMBAT_MAX_X;
-    maxY_3 = 0;
-    minY_1 = ARMY_PROJECTILE_CLIP_HEIGHT - 1;
+    maxX = 0;
+    minX = ARMY_COMBAT_MAX_X;
+    maxY = 0;
+    minY = ARMY_PROJECTILE_CLIP_HEIGHT - 1;
     if (m_facing == ARMY_FACING_RIGHT) {
-        missileX_7 = gpCombatManager->m_hexCells[m_hex].m_x
-                     + m_frameInfo.missileOffsets[attackDirection_3].x;
+        missileX = gpCombatManager->m_hexCells[m_hex].m_x
+                     + m_frameInfo.missileOffsets[attackDirection].x;
     } else {
-        missileX_7 = gpCombatManager->m_hexCells[m_hex].m_x
-                     - m_frameInfo.missileOffsets[attackDirection_3].x;
+        missileX = gpCombatManager->m_hexCells[m_hex].m_x
+                     - m_frameInfo.missileOffsets[attackDirection].x;
     }
-    missileY_7 =
-        gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[attackDirection_3].y;
-    endX_36 = target_1->MidX();
-    endY_19 = target_1->MidY();
-    xDistance_7 = endX_36 - missileX_7;
-    yDistance_16 = endY_19 - missileY_7;
-    distance_6 = static_cast<i32>(
-        sqrt(static_cast<double>(xDistance_7 * xDistance_7 + yDistance_16 * yDistance_16))
+    missileY =
+        gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[attackDirection].y;
+    endX = target->MidX();
+    endY = target->MidY();
+    xDistance = endX - missileX;
+    yDistance = endY - missileY;
+    distance = static_cast<i32>(
+        sqrt(static_cast<double>(xDistance * xDistance + yDistance * yDistance))
     );
-    missileSteps_7 = (distance_6 + (missileSpacing_1 >> 1)) / missileSpacing_1;
+    missileSteps = (distance + (missileSpacing >> 1)) / missileSpacing;
 
     if (m_monsterType == CREATURE_MAGE || m_monsterType == CREATURE_ARCHMAGE) {
         gpWindowManager->UpdateScreenRegion(
@@ -1110,10 +1110,10 @@ void army::SpecialAttack(void) {
         );
         gpCombatManager->DoBolt(
             1,
-            missileX_7,
-            missileY_7,
-            endX_36,
-            endY_19,
+            missileX,
+            missileY,
+            endX,
+            endY,
             0,
             0,
             MAGE_BOLT_START_WIDTH,
@@ -1121,93 +1121,93 @@ void army::SpecialAttack(void) {
             BOLT_COLOR_RED_BEAM,
             0,
             0,
-            distance_6 / MAGE_BOLT_ANGLE_DISTANCE_DIVISOR + MAGE_BOLT_ANGLE_DISTANCE_BASE,
+            distance / MAGE_BOLT_ANGLE_DISTANCE_DIVISOR + MAGE_BOLT_ANGLE_DISTANCE_BASE,
             1,
             0,
             MAGE_BOLT_FRAME_DELAY,
             0
         );
     } else {
-        if (missileSteps_7 > 1) {
-            xStep_29 = xDistance_7 / (missileSteps_7 - 1);
-            yStep_6 = yDistance_16 / (missileSteps_7 - 1);
+        if (missileSteps > 1) {
+            xStep = xDistance / (missileSteps - 1);
+            yStep = yDistance / (missileSteps - 1);
         } else {
-            xStep_29 = xDistance_7;
-            yStep_6 = yDistance_16;
+            xStep = xDistance;
+            yStep = yDistance;
         }
-        currentMissileX_7 = missileX_7;
-        currentMissileY_7 = missileY_7;
+        currentMissileX = missileX;
+        currentMissileY = missileY;
         missileBackground = new bitmap(
             BITMAP_TYPE_MEMORY,
             static_cast<i16>(missileHalfWidth * MISSILE_DIAMETER_MULTIPLIER),
-            static_cast<i16>(missileHalfHeight_1 * MISSILE_DIAMETER_MULTIPLIER)
+            static_cast<i16>(missileHalfHeight * MISSILE_DIAMETER_MULTIPLIER)
         );
         missileBackground->GrabBitmapCareful(
             gpWindowManager->m_screen,
-            static_cast<i16>(currentMissileX_7 - missileHalfWidth),
-            static_cast<i16>(currentMissileY_7 - missileHalfHeight_1)
+            static_cast<i16>(currentMissileX - missileHalfWidth),
+            static_cast<i16>(currentMissileY - missileHalfHeight)
         );
-        oldX_16 = currentMissileX_7;
-        oldY_9 = currentMissileY_7;
-        backgroundX_4 = 0;
-        backgroundY_6 = 0;
-        for (direction = 0; direction < missileSteps_7; direction++) {
-            if (oldX_16 - missileHalfWidth < minX_1) {
-                minX_1 = oldX_16 - missileHalfWidth;
+        oldX = currentMissileX;
+        oldY = currentMissileY;
+        backgroundX = 0;
+        backgroundY = 0;
+        for (direction = 0; direction < missileSteps; direction++) {
+            if (oldX - missileHalfWidth < minX) {
+                minX = oldX - missileHalfWidth;
             }
-            if (minX_1 < 0)
-                minX_1 = 0;
-            if (oldX_16 + missileHalfWidth > maxX_3) {
-                maxX_3 = oldX_16 + missileHalfWidth;
+            if (minX < 0)
+                minX = 0;
+            if (oldX + missileHalfWidth > maxX) {
+                maxX = oldX + missileHalfWidth;
             }
-            if (maxX_3 > ARMY_COMBAT_MAX_X)
-                maxX_3 = ARMY_COMBAT_MAX_X;
-            if (oldY_9 - missileHalfHeight_1 < minY_1) {
-                minY_1 = oldY_9 - missileHalfHeight_1;
+            if (maxX > ARMY_COMBAT_MAX_X)
+                maxX = ARMY_COMBAT_MAX_X;
+            if (oldY - missileHalfHeight < minY) {
+                minY = oldY - missileHalfHeight;
             }
-            if (minY_1 < 0)
-                minY_1 = 0;
-            if (oldY_9 + missileHalfHeight_1 > maxY_3) {
-                maxY_3 = oldY_9 + missileHalfHeight_1;
+            if (minY < 0)
+                minY = 0;
+            if (oldY + missileHalfHeight > maxY) {
+                maxY = oldY + missileHalfHeight;
             }
-            if (maxY_3 > ARMY_COMBAT_MAX_Y)
-                maxY_3 = ARMY_COMBAT_MAX_Y;
+            if (maxY > ARMY_COMBAT_MAX_Y)
+                maxY = ARMY_COMBAT_MAX_Y;
             if (direction != 0) {
                 missileBackground->DrawToBufferCareful(
-                    static_cast<i16>(backgroundX_4),
-                    static_cast<i16>(backgroundY_6)
+                    static_cast<i16>(backgroundX),
+                    static_cast<i16>(backgroundY)
                 );
             } else {
-                if (minX_1 < giMinExtentX)
-                    giMinExtentX = minX_1;
-                if (maxX_3 > giMaxExtentX)
-                    giMaxExtentX = maxX_3;
-                if (minY_1 < giMinExtentY)
-                    giMinExtentY = minY_1;
-                if (maxY_3 > giMaxExtentY)
-                    giMaxExtentY = maxY_3;
+                if (minX < giMinExtentX)
+                    giMinExtentX = minX;
+                if (maxX > giMaxExtentX)
+                    giMaxExtentX = maxX;
+                if (minY < giMinExtentY)
+                    giMinExtentY = minY;
+                if (maxY > giMaxExtentY)
+                    giMaxExtentY = maxY;
             }
-            backgroundX_4 = currentMissileX_7 - missileHalfWidth;
-            if (backgroundX_4 < 0)
-                backgroundX_4 = 0;
-            if (backgroundX_4 + missileBackground->m_width > ARMY_COMBAT_WIDTH) {
-                backgroundX_4 = ARMY_COMBAT_WIDTH - missileBackground->m_width;
+            backgroundX = currentMissileX - missileHalfWidth;
+            if (backgroundX < 0)
+                backgroundX = 0;
+            if (backgroundX + missileBackground->m_width > ARMY_COMBAT_WIDTH) {
+                backgroundX = ARMY_COMBAT_WIDTH - missileBackground->m_width;
             }
-            backgroundY_6 = currentMissileY_7 - missileHalfHeight_1;
-            if (backgroundY_6 < 0)
-                backgroundY_6 = 0;
-            if (backgroundY_6 + missileBackground->m_height > ARMY_COMBAT_WIDTH) {
-                backgroundY_6 = ARMY_COMBAT_WIDTH - missileBackground->m_height;
+            backgroundY = currentMissileY - missileHalfHeight;
+            if (backgroundY < 0)
+                backgroundY = 0;
+            if (backgroundY + missileBackground->m_height > ARMY_COMBAT_WIDTH) {
+                backgroundY = ARMY_COMBAT_WIDTH - missileBackground->m_height;
             }
             missileBackground->GrabBitmapCareful(
                 gpWindowManager->m_screen,
-                static_cast<i16>(backgroundX_4),
-                static_cast<i16>(backgroundY_6)
+                static_cast<i16>(backgroundX),
+                static_cast<i16>(backgroundY)
             );
             m_missileIcon->DrawToBuffer(
-                currentMissileX_7,
-                currentMissileY_7,
-                directionFrame_2,
+                currentMissileX,
+                currentMissileY,
+                directionFrame,
                 reverseMissile
             );
             if (direction == 0) {
@@ -1220,29 +1220,29 @@ void army::SpecialAttack(void) {
             } else {
                 DelayTil(glTimers);
                 gpWindowManager
-                    ->UpdateScreenRegion(minX_1, minY_1, maxX_3 - minX_1 + 1, maxY_3 - minY_1 + 1);
+                    ->UpdateScreenRegion(minX, minY, maxX - minX + 1, maxY - minY + 1);
             }
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + missileDelay_2 * gfCombatSpeedMod[gConfig.combatSpeed]
+                KBTickCount() + missileDelay * gfCombatSpeedMod[gConfig.combatSpeed]
             );
-            oldX_16 = currentMissileX_7;
-            oldY_9 = currentMissileY_7;
-            currentMissileX_7 += xStep_29;
-            currentMissileY_7 += yStep_6;
-            minX_1 = currentMissileX_7 - missileHalfWidth;
-            maxX_3 = currentMissileX_7 + missileHalfWidth;
-            minY_1 = currentMissileY_7 - missileHalfHeight_1;
-            maxY_3 = currentMissileY_7 + missileHalfHeight_1;
+            oldX = currentMissileX;
+            oldY = currentMissileY;
+            currentMissileX += xStep;
+            currentMissileY += yStep;
+            minX = currentMissileX - missileHalfWidth;
+            maxX = currentMissileX + missileHalfWidth;
+            minY = currentMissileY - missileHalfHeight;
+            maxY = currentMissileY + missileHalfHeight;
         }
         missileBackground->DrawToBuffer(
-            static_cast<i16>(backgroundX_4),
-            static_cast<i16>(backgroundY_6)
+            static_cast<i16>(backgroundX),
+            static_cast<i16>(backgroundY)
         );
         gpWindowManager->UpdateScreenRegion(
-            oldX_16 - missileHalfWidth,
-            oldY_9 - missileHalfHeight_1,
+            oldX - missileHalfWidth,
+            oldY - missileHalfHeight,
             missileHalfWidth * MISSILE_DIAMETER_MULTIPLIER,
-            missileHalfHeight_1 * MISSILE_DIAMETER_MULTIPLIER
+            missileHalfHeight * MISSILE_DIAMETER_MULTIPLIER
         );
         delete missileBackground;
         if (!gpCombatManager->m_heroes[IDX(m_side)]
@@ -1252,9 +1252,9 @@ void army::SpecialAttack(void) {
     }
 
     originalAttack = m_monster.attack;
-    effectType_1 = COMBAT_EFFECT_INVALID;
-    effectX_2 = -1;
-    effectY_28 = -1;
+    effectType = COMBAT_EFFECT_INVALID;
+    effectX = -1;
+    effectY = -1;
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
         i32 adjacentHex;
         army* splashTarget;
@@ -1262,12 +1262,12 @@ void army::SpecialAttack(void) {
         gpCombatManager->ClearEffects();
         for (direction = 0; direction < LICH_SPLASH_DIRECTION_COUNT; direction++) {
             if (direction < COMBAT_DIRECTION_ADJACENT_COUNT) {
-                adjacentHex = target_1->GetAdjacentCellIndex(
-                    target_1->m_hex,
+                adjacentHex = target->GetAdjacentCellIndex(
+                    target->m_hex,
                     static_cast<CombatHexDirection>(direction)
                 );
             } else {
-                adjacentHex = target_1->m_hex;
+                adjacentHex = target->m_hex;
             }
             if (adjacentHex == -1) {
                 continue;
@@ -1278,27 +1278,27 @@ void army::SpecialAttack(void) {
                          ->m_armies[IDX(gpCombatManager->m_hexCells[adjacentHex].m_occupantSide)]
                                    [gpCombatManager->m_hexCells[adjacentHex].m_occupantIndex];
                 if (!gArmyEffected[IDX(splashTarget->m_side)][splashTarget->m_index]
-                    && (target_1 != splashTarget || direction == LICH_SPLASH_CENTER_DIRECTION)) {
+                    && (target != splashTarget || direction == LICH_SPLASH_CENTER_DIRECTION)) {
                     gArmyEffected[IDX(splashTarget->m_side)][splashTarget->m_index] = 1;
-                    DamageEnemy(splashTarget, &damage, &killed_13, 1, 0);
+                    DamageEnemy(splashTarget, &damage, &killed, 1, 0);
                 }
             }
         }
         m_spellEffectYOffset = 0;
-        effectType_1 = COMBAT_EFFECT_LICH_CLOUD;
-        effectX_2 = gpCombatManager->m_hexCells[adjacentHex].m_x;
-        effectY_28 = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
+        effectType = COMBAT_EFFECT_LICH_CLOUD;
+        effectX = gpCombatManager->m_hexCells[adjacentHex].m_x;
+        effectY = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
     } else {
-        DamageEnemy(target_1, &damage, &killed_13, 1, 0);
+        DamageEnemy(target, &damage, &killed, 1, 0);
     }
     m_monster.attack = originalAttack;
 
-    if (killed_13 > 0) {
+    if (killed > 0) {
         if (damage == -1) {
             sprintf(gText, "\xd4\xe0\xed\xf2\xee\xec \xe2\xee\xe8\xed\xe0 \xf3\xed\xe8\xf7\xf2\xee\xe6\xe5\xed!!");
         } else {
-            strcpy(gTargetName, gArmyNames[IDX(target_1->m_monsterType)]);
+            strcpy(gTargetName, gArmyNames[IDX(target->m_monsterType)]);
             gTargetName[0] = ToLowerCp1251(gTargetName[0]);
             sprintf(
                 gText,
@@ -1308,9 +1308,9 @@ void army::SpecialAttack(void) {
                 "\xed\xe0\xed\xee\xf1\xe8\xf2",
                 damage,
                 "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
-                killed_13,
-                killed_13 <= 1 ? gTargetName : gArmyNamesPlural[IDX(target_1->m_monsterType)],
-                killed_13 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+                killed,
+                killed <= 1 ? gTargetName : gArmyNamesPlural[IDX(target->m_monsterType)],
+                killed <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
             );
             gText[0] = ToUpperCp1251(gText[0]);
         }
@@ -1329,17 +1329,17 @@ void army::SpecialAttack(void) {
     strcpy(combatText, gText);
     switch (m_monsterType) {
         case CREATURE_ARCHMAGE:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE && target_1
-                && target_1->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
-                target_1->m_spellEffect = CREATURE_SPELL_DISPEL;
+            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE && target
+                && target->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
+                target->m_spellEffect = CREATURE_SPELL_DISPEL;
             }
             break;
     }
-    PowEffect(effectType_1, 0, effectX_2, effectY_28);
+    PowEffect(effectType, 0, effectX, effectY);
     gpCombatManager->CombatMessage(combatText, 1, 1, 0);
     WaitSample(ARMY_SAMPLE_SHOT);
 
-    if (m_facing != originalFacing_6) {
+    if (m_facing != originalFacing) {
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
             if (m_facing == ARMY_FACING_RIGHT) {
                 m_hex++;
@@ -1347,12 +1347,12 @@ void army::SpecialAttack(void) {
                 m_hex--;
             }
         }
-        m_facing = originalFacing_6;
+        m_facing = originalFacing;
     }
     if (!bSecondAttack
         && (m_monsterType == CREATURE_ELF || m_monsterType == CREATURE_GRAND_ELF
             || m_monsterType == CREATURE_RANGER)
-        && target_1->m_quantity > 0) {
+        && target->m_quantity > 0) {
         bSecondAttack = 1;
         SpecialAttack();
         bSecondAttack = 0;

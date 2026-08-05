@@ -209,9 +209,9 @@ extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
 VA(0x00474372, 0x4c7)
 extern "C" u16 __cdecl
 nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
-    i32 oldSess;
+    i32 oldsess;
     i32 destinationSession;
-    i32 detachFlag;
+    i32 detach;
     NetbiosControlBlock controlBlock;
     char* peer;
     va_list args;
@@ -274,25 +274,25 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
             break;
 
         case NETBIOS_SESSION_MOVE:
-            oldSess = va_arg(args, i32);
+            oldsess = va_arg(args, i32);
             destinationSession = va_arg(args, i32);
-            detachFlag = va_arg(args, i32);
-            if (oldSess == gNbMaxSess)
+            detach = va_arg(args, i32);
+            if (oldsess == gNbMaxSess)
                 gNbMaxSess = static_cast<u8>(destinationSession);
-            if (gNbSessLsn[oldSess] == NETBIOS_INVALID_ID)
+            if (gNbSessLsn[oldsess] == NETBIOS_INVALID_ID)
                 return 0;
-            gNbSessLsn[destinationSession] = gNbSessLsn[oldSess];
-            gNetStatus[destinationSession] = gNetStatus[oldSess];
+            gNbSessLsn[destinationSession] = gNbSessLsn[oldsess];
+            gNetStatus[destinationSession] = gNetStatus[oldsess];
             memcpy(
                 gNbNameBuf[destinationSession].bytes,
-                gNbNameBuf[oldSess].bytes,
+                gNbNameBuf[oldsess].bytes,
                 NETBIOS_NAME_SIZE
             );
             nb_arm_recv(destinationSession);
-            if (detachFlag != 0) {
-                gNbSessLsn[oldSess] = NETBIOS_INVALID_ID;
-                gNetStatus[oldSess] = 0;
-                memset(gNbNameBuf[oldSess].bytes, 0, NETBIOS_NAME_SIZE);
+            if (detach != 0) {
+                gNbSessLsn[oldsess] = NETBIOS_INVALID_ID;
+                gNetStatus[oldsess] = 0;
+                memset(gNbNameBuf[oldsess].bytes, 0, NETBIOS_NAME_SIZE);
             }
             rc = 0;
             break;

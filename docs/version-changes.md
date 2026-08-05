@@ -944,6 +944,36 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   of caching a `heroWindow* win`. `iconWidget::Draw` (0xbbd70) likewise has no
   `widgetWidth`/`iconWidth` pair - a 0x14 frame with only `x`, `y`, the
   `IconEntry*`, `this` and the switch temp.
+- **[unclassified] `baseManager::Activate` takes a `bool`.** PoL 2.0's
+  `swapManager::Close` is byte-exact from an inline `void Activate(void) {
+  m_active = true; }` — 2.0's retail folds the store (`c7 40 32 01 00 00 00`).
+  Buka's retail emits `b8 01 00 00 00 / 8b 4d dc / 89 41 32`, the shape VC6
+  only produces when the value crosses the inline boundary as a `bool`. The
+  minimal 2.1 edit that reproduces it with the call site unchanged is
+  `void Activate(bool on = true) { m_active = on; }`. Thirty-four `int`-typed
+  spellings were probed and every one folds; see
+  `docs/patterns/bool-value-defeats-constant-fold.md`.
+- **[unclassified] `combatManager::RawEffectSpellInfluence` army-value
+  product operand order swapped.** PoL 2.0 emits `mov eax,[eax+0xbc]; imul
+  eax,[ecx+0x96]` (fightValue on the left); Buka emits `mov ecx,[edx+0x96];
+  imul ecx,[eax+0xbc]` — the source reads
+  `target->m_quantity * target->m_monster.fightValue` in 2.1.
+- **[unclassified] `combatManager::RawEffectSpellInfluence` switch-arm order.**
+  The dispatch table proves 2.1 lists `STONESKIN`, `STEELSKIN`, `ANTI_MAGIC`
+  in that source order (entries 12/13/14 point at bodies +0x31d/+0x2f1/+0x307,
+  and the three arms reference the 0.16 / 0.28 / 0.2 modifiers in address
+  order). The PoL 2.0 reconstruction has ANTI_MAGIC first.
+- **[unclassified] `combatManager::RawEffectSpellInfluence` declaration
+  shape.** Both retail frames (2.0 and 2.1) interleave what the PoL
+  reconstruction declares in per-case blocks, so BOTH versions declared all
+  twenty locals at function scope, with ONE shared `float` modifier used by
+  the DRAGON_SLAYER and SHIELD arms and three declared-but-unused 4-byte
+  locals. The 2.1 frame is 0x78 (30 slots, 3 unreferenced); the 2.0 frame is
+  0xb0 with exactly the same 17-live/3-dead named census.
+- **[unclassified] `philAI::ValueOfEventAtPosition` MAP_OBJECT_SKELETON arm.**
+  Retail assigns the value in an `if`/`else` (no join temp); the PoL-style
+  `?:` costs a frame slot, a store-and-reload at the join, and a `push ebx`
+  for the rest of the function.
 
 ## Reconstruction infrastructure notes (not version deltas)
 
