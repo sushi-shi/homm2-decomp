@@ -721,7 +721,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
             kn = gpCurAIHero->m_x + normalDirTable[IDX(dirIdx)].x;
             nb = gpCurAIHero->m_y + normalDirTable[IDX(dirIdx)].y;
             if (HAS(gpAdvManager->GetCell(kn, nb)->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-                && !(*(mapExtra + kn + nb * MAP_WIDTH) & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+                && !(MAP_EXTRA_AT(kn, nb) & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_STONE_LITHS)
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)

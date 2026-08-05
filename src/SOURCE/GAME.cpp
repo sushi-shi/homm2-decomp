@@ -5724,9 +5724,9 @@ void game::SetupAdjacentMons(void) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             if (gpAdvManager->FindAdjacentMonster(x, y, &col2, &row13, -1, -1))
-                *(mapExtra + x + y * MAP_WIDTH) |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
+                MAP_EXTRA_AT(x, y) |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
             else
-                *(mapExtra + x + y * MAP_WIDTH) &= IDX(mask);
+                MAP_EXTRA_AT(x, y) &= IDX(mask);
         }
     }
 }
