@@ -18,9 +18,6 @@ class icon : public resource {
 public:
     i16 m_frameCount;
     u8* m_data;
-    struct IconEntry* Entries(void) {
-        return reinterpret_cast<struct IconEntry*>(m_data);
-    }
     icon(u32l id);
     __declspec(dllexport) virtual inline ~icon();
     void DrawToBuffer(
