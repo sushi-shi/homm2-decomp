@@ -11,14 +11,9 @@ H2_ENUM_BEGIN(MidiTrackConstant)
 H2_ENUM_END(MidiTrackConstant)
 
 H2_ENUM_BEGIN(SoundStorageConstant)
-    SOUND_SAMPLE_HANDLE_CAPACITY  = 14,
     SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
     DIGITAL_DRIVER_NAME_COUNT     = 14,
-    SOUND_CHANNEL_TYPE_COUNT      = 4,
-    CD_POSITION_CAPACITY          = 15,
-    MCI_RESULT_CAPACITY           = 0x100,
-    SAVED_SAMPLE_VOLUME_CAPACITY  = 0x20,
-    MCI_COMMAND_CAPACITY          = 0x100
+    SOUND_CHANNEL_TYPE_COUNT      = 4
 H2_ENUM_END(SoundStorageConstant)
 
 H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
@@ -70,35 +65,24 @@ public:
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void ValidatePreviousPosition(i32);
-    void CDStop(void);
-    i32 CDIsPlaying(void);
     bool CDStartup(void);
-    void CDShutdown(void);
-    void CDSetVolume(i32, i32);
-    void CDPlay(i32, i32, i32, i32);
-    void CDPoll(void);
     void ShutdownSoundBackends(void);
     bool StartupMilesBackend(void);
     void SaveBackend(void);
     void RestoreBackend(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
     float ConvertVolumeFloat(i32, SoundVolumeConversionMode);
-    void AllocateSampleHandles(void);
-    struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
     void StopSample(class sample*);
     void ModifySample(class sample*, i32);
     bool DigitalReport(class sample*);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
-    void ForcePollSound(void);
     void SetMusicQuality(i32);
     void PlayAmbientMusic(i32);
     void PollSound(void);
     void SwitchAmbientMusic(i32);
     void MemorySample(class sample*);
-    void GetNumberCDDrives(void);
     void ServiceSound(void);
     i32 MusicPlaying(void);
 };
@@ -146,18 +130,9 @@ inline void soundManager::RestoreBackend(void) {
 
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
-extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];
-extern i32 CDWaiting;
-extern i32 CDPlaying;
-extern i32 iCalibrateLoop;
 extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
-extern i32l lLastMIDIPollTickCount;
-extern char lpszReturnString[MCI_RESULT_CAPACITY];
-extern u32l nMCIError;
-extern i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
-extern char CommandString[MCI_COMMAND_CAPACITY];
 extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 

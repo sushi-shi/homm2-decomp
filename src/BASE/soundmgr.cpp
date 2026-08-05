@@ -4,7 +4,6 @@
 #include <BASE/soundBackends.h>
 #include <BASE/Midi.h>
 #include <BASE/MusicFlags.h>
-#include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
@@ -26,18 +25,8 @@ H2_ENUM_BEGIN(SoundConstant)
     FADE_HOLD_STEPS              = 10,
     FADE_TOTAL_STEPS             = IDX(CONFIG_VOLUME_MAX) + 1,
     FADE_SAMPLE_RISE_STEPS       = 6,
-    AUX_VOLUME_LEVEL_COUNT       = 12,
-    AUX_VOLUME_LEVEL_SHIFT       = 12,
-    AUX_STEREO_CHANNEL_SHIFT     = 16,
-    MCI_RETURN_CHARACTER_LIMIT   = MCI_RESULT_CAPACITY - 1,
-    CD_POSITION_BUFFER_CAPACITY  = 20,
-    CD_SINGLE_TRACK              = 43,
-    CD_FADE_DELAY_TICKS          = 480,
-    CD_POLL_INTERVAL_TICKS       = 3000,
     AMBIENT_FADE_DELAY_TICKS     = 900,
-    SOUND_TIMER_INTERVAL         = 16,
     AIL_WAVEOUT_PREFERENCE       = 15,
-    PCM_BITS_PER_BYTE_SHIFT      = 3,
     DEFAULT_SAMPLE_RATE          = 22050,
     DEFAULT_SAMPLE_BITS          = 8,
     DEFAULT_SAMPLE_CHANNELS      = 1,
@@ -60,97 +49,6 @@ DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat;
 DATA(0x005348f0) bool gSoundDisabled = false;
 DATA(0x005348f1) bool gSoundBackendsReady = false;
 
-// State of the removed MCI/redbook CD path and of the removed Miles sample
-// handle pool: the `@remove` bodies below are the PoL 2.0 sources kept as the
-// removed-body record, and this is the state they read. Nothing retail
-// references it, so none of it is a soundManager member.
-static i32 gCDReady;
-static i32 gCDTrack;
-static i32 gCDPlayFrame;
-static i32 gCDPollTimer;
-static i16 gAuxDevice;
-static i32 gPollRequested;
-static i32 gPollDue;
-static i32 gPollToggle;
-static struct _SAMPLE* gSampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
-static i32 gNumSampleHandles;
-
-// @remove
-void HandleMCIError(i32 errorCode, char* commandString) {
-    mciGetErrorStringA(errorCode, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT);
-    sprintf(
-        gText,
-        "CD MUSIC ERROR\n\n"
-        "Description '%s'\n\n"
-        "Command '%s'\n\n\n"
-        "Because of this problem running with CD stereo music, Heroes II has been "
-        "configured to run with MIDI music in the future.  You can always manually "
-        "change this setting in the control panel within the game.",
-        lpszReturnString,
-        commandString
-    );
-    gConfig.mciError = 1;
-    gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
-    WritePrefs();
-    ShutDown(gText);
-}
-
-// @remove
-void soundManager::ValidatePreviousPosition(i32 track) {
-    char buf[CD_POSITION_BUFFER_CAPACITY];
-    char* cur;
-    H2_ASSERT(
-        track >= 0 && track < MIDI_TRACK_COUNT,
-        NULL,
-        66
-    );
-    if (CDPreviousPosition[track][0] == 0)
-        return;
-    strcpy(buf, CDPreviousPosition[track]);
-    cur = FindToken(buf, ':');
-    if (cur != NULL)
-        *cur = 0;
-    if (atoi(buf) != track)
-        CDPreviousPosition[track][0] = 0;
-}
-
-// @remove
-void soundManager::CDStop(void) {
-    char position[CD_POSITION_BUFFER_CAPACITY];
-    if (gbNoSound != 0)
-        return;
-    if (gCDReady == 0)
-        return;
-    wsprintfA(CommandString, "stop CD wait");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-    if (strcmpi(lpszReturnString, "stopped") != 0 && m_musicTrack >= 0) {
-        wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString, position, sizeof(position), NULL);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-        strcpy(CDPreviousPosition[m_musicTrack], position);
-        ValidatePreviousPosition(m_musicTrack);
-    }
-    CDPlaying = 0;
-}
-
-// @remove
-i32 soundManager::CDIsPlaying(void) {
-    if (gbNoSound != 0)
-        return 0;
-    if (gCDReady == 0)
-        return 0;
-    wsprintfA(CommandString, "status CD mode");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-    return strcmpi(lpszReturnString, "playing") == 0;
-}
-
 VA(0x004b59b0, 0x123)
 bool soundManager::CDStartup(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
@@ -165,180 +63,6 @@ bool soundManager::CDStartup(void) {
     if (m_audiereDevice != NULL)
         return StartupAudiereMusic(m_audiereDevice);
     return false;
-}
-
-// @remove
-void soundManager::CDShutdown(void) {
-    if (gbNoSound != 0)
-        return;
-    if (gCDReady == 0)
-        return;
-    wsprintfA(CommandString, "stop CD");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-    wsprintfA(CommandString, "close CD");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-}
-
-// @remove
-void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
-    i32 local_c;
-    u32l local_8;
-    if (gbNoSound != 0)
-        return;
-    if (gCDReady == 0)
-        return;
-    if (gAuxDevice == -1)
-        return;
-    if (volume == -1)
-        local_c = IDX(gConfig.musicVolume);
-    else
-        local_c = volume;
-    if (local_c != 0) {
-        i32 local_10;
-        if (fadeScale != 0)
-            local_10 = AUX_VOLUME_LEVEL_COUNT
-                       - (FADE_TOTAL_STEPS - local_c / AUX_VOLUME_LEVEL_COUNT);
-        else
-            local_10 = AUX_VOLUME_LEVEL_COUNT - local_c;
-        local_10 <<= AUX_VOLUME_LEVEL_SHIFT;
-        local_8 = local_10 << AUX_STEREO_CHANNEL_SHIFT | local_10;
-    } else {
-        local_8 = 0;
-    }
-    auxSetVolume(gAuxDevice, local_8);
-}
-
-// @remove
-void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
-    i32l t1;
-    i32l t2;
-    i32l t3;
-    char buffer[CD_POSITION_BUFFER_CAPACITY];
-    i32 notify;
-    HWND wnd;
-    HWND wndn;
-    if (gbNoSound != 0)
-        return;
-    if (gCDReady == 0)
-        return;
-    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
-        return;
-    if (track == -1) {
-        CDStop();
-        return;
-    }
-    if (m_musicTrack == track && CDPlaying != 0 && restart == 0)
-        return;
-    gCDTrack = track;
-    gCDPlayFrame = volume;
-    Process1WindowsMessage();
-    ServiceSound();
-    t1 = KBTickCount();
-    wsprintfA(CommandString, "set CD time format tmsf");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-    wsprintfA(CommandString, "status CD mode");
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0)
-        HandleMCIError(nMCIError, CommandString);
-    if (strcmpi(lpszReturnString, "stopped") != 0) {
-        wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString, buffer, CD_POSITION_BUFFER_CAPACITY, NULL);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-        strcpy(CDPreviousPosition[m_musicTrack], buffer);
-        ValidatePreviousPosition(m_musicTrack);
-    }
-    t2 = KBTickCount();
-    notify = bMusicIsLooping[track];
-    Process1WindowsMessage();
-    ServiceSound();
-    if (restart == 0 && resume != 0 && CDPreviousPosition[track][0] != 0) {
-        if (track == CD_SINGLE_TRACK)
-            wsprintfA(
-                CommandString,
-                "play CD from %s %s",
-                CDPreviousPosition[track],
-                notify ? " notify" : ""
-            );
-        else
-            wsprintfA(
-                CommandString,
-                "play CD from %s to %d%s",
-                CDPreviousPosition[track],
-                track + 1,
-                notify ? " notify" : ""
-            );
-        if (notify != 0)
-            wnd = hwndApp;
-        else
-            wnd = NULL;
-        nMCIError =
-            mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, wnd);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-    } else {
-        if (track == CD_SINGLE_TRACK)
-            wsprintfA(CommandString, "play CD from %d %s", track, notify ? " notify" : "");
-        else
-            wsprintfA(
-                CommandString,
-                "play CD from %d to %d%s",
-                track,
-                track + 1,
-                notify ? " notify" : ""
-            );
-        if (notify != 0)
-            wndn = hwndApp;
-        else
-            wndn = NULL;
-        nMCIError =
-            mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, wndn);
-        if (nMCIError != 0)
-            HandleMCIError(nMCIError, CommandString);
-    }
-    t3 = KBTickCount();
-    CDPlaying = 1;
-    Process1WindowsMessage();
-    ServiceSound();
-    if (m_musicFadeSteps > 0) {
-        m_musicFadeSteps = FADE_TOTAL_STEPS;
-        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + CD_FADE_DELAY_TICKS;
-        CDSetVolume(IDX(CONFIG_VOLUME_MAX), 0);
-    } else {
-        CDSetVolume(volume, 0);
-    }
-    m_musicTrack = static_cast<char>(track);
-}
-
-// @remove
-void soundManager::CDPoll(void) {
-    if (gbNoSound != 0)
-        return;
-    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
-        return;
-    if (gCDReady == 0)
-        return;
-    if (CDPlaying == 0 || m_musicTrack < 0)
-        return;
-    {
-        if (bMusicIsLooping[m_musicTrack] == 0)
-            return;
-        if (KBTickCount() < gCDPollTimer + CD_POLL_INTERVAL_TICKS)
-            return;
-        gCDPollTimer = KBTickCount();
-        if (CDIsPlaying() == 0)
-            CDPlay(gCDTrack, 0, gCDPlayFrame, 1);
-    }
 }
 
 VA(0x004b5710, 0x101)
@@ -445,22 +169,6 @@ float soundManager::ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode sou
 
 #undef NORMALIZED_VOLUME_MAX
 
-// @remove
-void __stdcall SetReady2Poll(u32l) {
-    if (gpSoundManager == NULL)
-        return;
-    gPollToggle ^= 1;
-    if (gPollToggle != 0)
-        gPollDue = 1;
-}
-
-// @remove
-void __stdcall UpdateTimers(u32l) {
-    iCalibrateLoop++;
-    glMilliCounter += SOUND_TIMER_INTERVAL;
-    SetReady2Poll(0);
-}
-
 VA(0x004b5bd0, 0x146)
 soundManager::soundManager(void) : baseManager() {
     m_backend = SOUND_BACKEND_NONE;
@@ -472,52 +180,6 @@ soundManager::soundManager(void) : baseManager() {
     m_musicFadeTargetTrack = MIDI_NO_TRACK;
     m_musicFadeSteps = 0;
     m_musicTrack = MIDI_NO_TRACK;
-}
-
-// @remove
-struct _DIG_DRIVER*
-WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showErrors) {
-    u32 numDevs;
-    struct _DIG_DRIVER* drvr;
-    WAVEOUTCAPSA caps;
-    i32 rc;
-    numDevs = waveOutGetNumDevs();
-    if (numDevs == 0) {
-        drvr = NULL;
-        return NULL;
-    }
-    if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
-        MessageBoxA(
-            hwndApp,
-            "Sound initialization error!  No wave devices found.",
-            "Startup Error",
-            0
-        );
-        drvr = NULL;
-        return NULL;
-    }
-    if (gbUseWaveout != 0)
-        AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
-    gWaveFormat.wf.wFormatTag = 1;
-    gWaveFormat.wf.nChannels = channels;
-    gWaveFormat.wf.nSamplesPerSec = sampleRate;
-    gWaveFormat.wf.nAvgBytesPerSec =
-        (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels * sampleRate;
-    gWaveFormat.wf.nBlockAlign = (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels;
-    gWaveFormat.wBitsPerSample = bitsPerSample;
-    rc = AIL_waveOutOpen(&drvr, NULL, 0, &gWaveFormat.wf);
-    if (rc != 0) {
-        if (showErrors != 0)
-            MessageBoxA(
-                hwndApp,
-                AIL_last_error(),
-                "Sound initialization error!",
-                0
-            );
-        drvr = NULL;
-        return NULL;
-    }
-    return drvr;
 }
 
 VA(0x004b5d20, 0x2df)
@@ -609,22 +271,6 @@ i32 soundManager::Open(i32) {
     return 0;
 }
 
-// @remove
-void soundManager::AllocateSampleHandles(void) {
-    i32 local_8;
-    if (gbNoSound != 0)
-        return;
-    if (m_digitalDriver == NULL)
-        return;
-    for (local_8 = 0; local_8 < SOUND_SAMPLE_HANDLE_CAPACITY; local_8++) {
-        gSampleHandles[local_8] =
-            AIL_allocate_sample_handle(m_digitalDriver);
-        if (gSampleHandles[local_8] == NULL)
-            break;
-    }
-    gNumSampleHandles = local_8;
-}
-
 VA(0x004b6000, 0x28)
 void soundManager::Close(void) {
     if (m_active != 1)
@@ -636,11 +282,6 @@ void soundManager::Close(void) {
 VA(0x004b6030, 0xf)
 MessageDispatchResult soundManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
-}
-
-// @remove
-struct _SAMPLE* soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32l) {
-    return NULL;
 }
 
 VA(0x004b6040, 0xcb)
@@ -714,14 +355,6 @@ void soundManager::AdjustMusicVolumes(void) {
         SetAudiereMusicVolume(-1, false);
     else if (IsMilesBackend(this))
         MIDISetVolume(m_musicFadeSteps);
-}
-
-// @remove
-void soundManager::ForcePollSound(void) {
-    if (gbNoSound != 0)
-        return;
-    gPollRequested = 1;
-    PollSound();
 }
 
 VA(0x004b63e0, 0xef)
@@ -874,9 +507,6 @@ void soundManager::MemorySample(class sample* sampleResource) {
     }
 }
 
-// @remove
-void soundManager::GetNumberCDDrives(void) {}
-
 VA(0x004b69f0, 0x41)
 void soundManager::ServiceSound(void) {
     if (IsMilesBackend(this))
@@ -915,14 +545,6 @@ char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT] = {
     NULL
 };
 DATA(0x00520188) SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {{0, 1, 0}, {1, 2, 1}, {2, 6, 2}, {6, 16, 6}};
-char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY] = {0};
-i32 CDWaiting = -1;
-i32 CDPlaying = 0;
-i32 iCalibrateLoop = 0;
-char lpszReturnString[MCI_RESULT_CAPACITY];
-u32l nMCIError;
-i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
-char CommandString[MCI_COMMAND_CAPACITY];
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(soundManager, 0x004ea954)

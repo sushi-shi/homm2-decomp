@@ -31,7 +31,6 @@ DATA(0x0051f558) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 
                                                   1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-i32l lLastMIDIPollTickCount = 0;
 DATA(0x0051f594) static char gMidiFilenameFormat[] = "MIDI%04d.XMI";
 
 VA(0x004c57d0, 0x51)
@@ -151,9 +150,6 @@ void MIDISetVolume(i32& fadeSteps) {
     volume = gpSoundManager->ConvertVolume(volume, SOUND_VOLUME_MUSIC);
     AIL_set_XMIDI_master_volume(hMDI, volume);
 }
-
-// @remove
-void MIDIPoll(void) {}
 
 DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x005361a0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];

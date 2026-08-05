@@ -66,15 +66,15 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 ## Removed (present in PoL 2.0, absent from this image)
 
 - **[Buka] The MCI/redbook CD-audio subsystem** — replaced by the Audiere
-  layer. `src/BASE/soundmgr.cpp` keeps the PoL bodies under `// @remove`:
-  `HandleMCIError`, `soundManager::{ValidatePreviousPosition, CDStop,
-  CDIsPlaying, CDShutdown, CDSetVolume, CDPlay, CDPoll, AllocateSampleHandles,
-  StartSample, ForcePollSound, GetNumberCDDrives}`, `SetReady2Poll`,
-  `UpdateTimers`, and the Miles `WAVE_init_driver` sample path.
+  layer. The PoL bodies are not part of the Buka source: `HandleMCIError`,
+  `soundManager::{ValidatePreviousPosition, CDStop, CDIsPlaying, CDShutdown,
+  CDSetVolume, CDPlay, CDPoll, AllocateSampleHandles, StartSample,
+  ForcePollSound, GetNumberCDDrives}`, `SetReady2Poll`, `UpdateTimers`, and the
+  Miles `WAVE_init_driver` sample path.
 - **[Buka] The CD verification TU** — all six `CDTest_*` functions of
   `SOURCE/x_cdtest` (`Init`, `Cleanup`, `VerifyCDQuick`, `VerifyCDThorough`,
-  `VerifyTrack`, `GenerateTable`). The TU still links, contributing only its
-  STL init tail.
+  `VerifyTrack`, `GenerateTable`). The TU has no Buka target object and is not
+  part of the 2.1 link.
 - **[Buka] `soundManager::MIDIPoll`** (`src/BASE/Midi.cpp`) — the empty MCI
   poll body.
 - **[Buka] `soundManager` shrank from 0x6ae to 0x52 bytes** — everything the
@@ -87,8 +87,8 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `m_currentTrack`/`m_fadeSteps` were never separate from `m_musicTrack`
   (`+0x4e`) and `m_musicFadeSteps` (`+0x4a`); `m_midiReady`/`m_midiStarted`
   became the `BASE/MusicFlags` trio and `m_cdReady`/`m_cdStarted` collapsed
-  into `CDStartup()`'s bool result; the rest is read only by the `@remove`
-  CD bodies and is parked as file statics in `src/BASE/soundmgr.cpp`.
+  into `CDStartup()`'s bool result; the remaining PoL-only state was removed
+  with the absent CD bodies.
 - **[Buka] The `MIDI*` entry points are free `__fastcall` functions**
   (`include/BASE/Midi.h`), not `soundManager` methods: `MIDIPlay(i32&
   currentTrack, i32& fadeSteps, i32 track)`, `MIDIStop(i32& currentTrack)`,
@@ -1231,5 +1231,5 @@ that class as display artifacts, not residuals.
 - The 36 no-PoL-counterpart functions harvested from the attempt-1 remap are
   enumerated in `docs/buka-va-queue.tsv` (empty `pol_va` column); the
   additions above cover all of them plus this branch's own recoveries.
-- `// @remove` markers in `src/` are the authoritative removed-body list;
-  the bitmap ctors left that list when their rewritten forms were recovered.
+- The removed-body list is recorded in the release sections above; PoL-only
+  definitions are not retained in the Buka source tree.

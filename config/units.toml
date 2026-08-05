@@ -514,8 +514,3 @@ flags = "base_nogf"
 unit = "SOURCE/x_arena"
 source = "src/SOURCE/x_arena.cpp"
 flags = "base"
-
-[[unit]]
-unit = "SOURCE/x_cdtest"
-source = "src/SOURCE/x_cdtest.cpp"
-flags = "base"

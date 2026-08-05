@@ -12,6 +12,5 @@ void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 track);
 void MIDIStop(i32& currentTrack);
 bool MIDIIsPlaying(void);
 void MIDISetVolume(i32& fadeSteps);
-void MIDIPoll(void);
 
 #endif
