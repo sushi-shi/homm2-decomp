@@ -19,11 +19,11 @@ static i32 gTileRowCtr;
 // clang rejects parameter references inside a naked function's __asm block,
 // so the analysis parse gets a stub definition carrying the same annotation;
 // only MSVC ever compiles the real blitter below.
-VA(0x004c2554, 0x18a)
+VA(0x004c2554, 0x18f)
 extern "C" void __cdecl
 TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {}
 #else
-VA(0x004c2554, 0x18a)
+VA(0x004c2554, 0x18f)
 extern "C" __declspec(naked) void __cdecl
 TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
     __asm {

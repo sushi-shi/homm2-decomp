@@ -135,7 +135,7 @@ void PlayAudiereMusic(
         audiere::OutputStreamPtr stream = device->openStream(source.get());
         if (stream) {
             i32 repeatMusic = bMusicIsLooping[track];
-            stream->setRepeat(repeatMusic != 0);
+            stream->setRepeat(repeatMusic != 0 ? true : false);
             stream->setVolume(gAudiereMusicVolume);
             stream->play();
             AudiereMusicState::source = source;

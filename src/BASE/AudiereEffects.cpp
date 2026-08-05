@@ -108,7 +108,7 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
         );
         gAudiereSampleList->stream->setVolume(convertedVolume);
         gAudiereSampleList->stream->setRepeat(
-            sampleResource->m_playbackData.loopCount != 0
+            sampleResource->m_playbackData.loopCount != 0 ? true : false
         );
         gAudiereSampleList->stream->play();
     }
