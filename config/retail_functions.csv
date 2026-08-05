@@ -1712,7 +1712,7 @@ entry_rva,byte_size,name,thunk,chunks,max_gap,total_gap,extent
 0xd1d50,428,FUN_004d1d50,0,1,0,0,428
 0xd1f00,91,FUN_004d1f00,0,1,0,0,91
 0xd1f60,821,FUN_004d1f60,0,1,0,0,821
-0xd22a0,2693,FUN_004d22a0,0,1,0,0,2693
+0xd22a0,2844,FUN_004d22a0,0,1,0,0,2844
 0xd2dc0,595,FUN_004d2dc0,0,1,0,0,595
 0xd3020,666,FUN_004d3020,0,1,0,0,666
 0xd32c0,39,FUN_004d32c0,0,1,0,0,39
