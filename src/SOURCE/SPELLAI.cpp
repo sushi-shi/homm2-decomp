@@ -769,148 +769,156 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 VA(0x0049716f, 0x5b5)
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
-    army* otherArmy_1 = NULL;
-    float workChance_8 =
+    float damageDelta;
+    i32 unused38_h;
+    i32 newSpd;
+    i32 unused30_j;
+    army* other = NULL;
+    float castChance =
         target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[IDX(influence)]));
-    if (workChance_8 <= COMBAT_SPELL_AI_ZERO_EFFECT)
+    if (castChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
-    i32 armyValue_4 = target->m_monster.fightValue * target->m_quantity;
-    i32 newSpeed_5;
-    float averageDamage;
-    float damageEffect;
+    i32 cnt;
+    i32 worth = target->m_quantity * target->m_monster.fightValue;
+    i32 columnIndex;
+    float avgDmg;
+    float factor;
+    i32 distance;
+    float afterTurns;
+    float beforeTurns;
+    i32 unused48_e;
+    i32 shooters;
     i32 adjacent;
-    i32 dragonCount;
-    i32 i;
-    float dragonMod;
-    i32 shooterCount;
-    float shooterMod;
+    i32 dragonCounter;
+    i32 attackMask;
     switch (influence) {
         case ARMY_SPELL_INFLUENCE_SLOW:
-            newSpeed_5 = (target->m_monster.speed + 1) >> 1;
+            newSpd = (target->m_monster.speed + 1) >> 1;
             goto hasteSlowCommon;
         case ARMY_SPELL_INFLUENCE_HASTE:
-            newSpeed_5 = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
+            newSpd = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
             if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_FLYING))
                 return 0;
-        hasteSlowCommon: {
+        hasteSlowCommon:
             if (m_inCastleCombat && target->m_side == COMBAT_DEFENDER_SIDE)
                 return 0;
             if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                 return 0;
-            i32 attackMask =
-                target->GetAttackMask(
-                    target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
-                );
+            attackMask =
+                target->GetAttackMask(target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
             if (attackMask != COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS)
                 return 0;
 
-            i32 column = target->m_hex % ARMY_HEX_COLUMNS;
-            i32 distance = m_currentSide == COMBAT_ATTACKER_SIDE
-                               ? column - COMBAT_SPELL_AI_MINIMUM_DISTANCE
-                               : COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - column;
+            columnIndex = target->m_hex % ARMY_HEX_COLUMNS;
+            distance = m_currentSide == COMBAT_ATTACKER_SIDE
+                           ? columnIndex - COMBAT_SPELL_AI_MINIMUM_DISTANCE
+                           : COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - columnIndex;
             if (distance < 0)
                 distance = 0;
             distance += COMBAT_SPELL_AI_MINIMUM_DISTANCE;
             if (m_inCastleCombat)
                 distance += COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS;
 
-            float oldTurns_1;
             if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_FLYING))
-                oldTurns_1 = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+                beforeTurns = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
-                oldTurns_1 = static_cast<float>(distance)
-                           / (static_cast<float>(target->m_monster.speed));
-            float newTurns_2 = static_cast<float>(distance) / (static_cast<float>(newSpeed_5));
-            if (newTurns_2 > COMBAT_SPELL_AI_TURN_CAP)
-                newTurns_2 = COMBAT_SPELL_AI_TURN_CAP;
-            if (oldTurns_1 > COMBAT_SPELL_AI_TURN_CAP)
-                oldTurns_1 = COMBAT_SPELL_AI_TURN_CAP;
-            effect =
-                static_cast<i32>((oldTurns_1 - newTurns_2) / COMBAT_SPELL_AI_TURN_DIVISOR * armyValue_4);
+                beforeTurns =
+                    static_cast<float>(distance) / (static_cast<float>(target->m_monster.speed));
+            afterTurns = static_cast<float>(distance) / (static_cast<float>(newSpd));
+            if (afterTurns > COMBAT_SPELL_AI_TURN_CAP)
+                afterTurns = COMBAT_SPELL_AI_TURN_CAP;
+            if (beforeTurns > COMBAT_SPELL_AI_TURN_CAP)
+                beforeTurns = COMBAT_SPELL_AI_TURN_CAP;
+            effect = static_cast<i32>(
+                (beforeTurns - afterTurns) / COMBAT_SPELL_AI_TURN_DIVISOR * worth
+            );
             break;
-        }
         case ARMY_SPELL_INFLUENCE_BLESS:
         case ARMY_SPELL_INFLUENCE_CURSE:
-            averageDamage = (static_cast<float>(target->m_monster.damageMax)
-                                   + (static_cast<float>(target->m_monster.damageMin)))
-                                  * COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
-            damageEffect = static_cast<float>(
-                (target->m_monster.damageMax - averageDamage) / averageDamage * armyValue_4
+            avgDmg = (static_cast<float>(target->m_monster.damageMax)
+                      + (static_cast<float>(target->m_monster.damageMin)))
+                   * COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
+            damageDelta = static_cast<float>(
+                (target->m_monster.damageMax - avgDmg) / avgDmg * worth
                 * COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER
             );
             effect = static_cast<i32>(
-                influence == ARMY_SPELL_INFLUENCE_BLESS ? damageEffect : -damageEffect
+                influence == ARMY_SPELL_INFLUENCE_BLESS ? damageDelta : -damageDelta
             );
             break;
         case ARMY_SPELL_INFLUENCE_BLIND:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_BLIND_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_BLIND_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_BERSERK:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_BERSERK_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_BERSERK_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_PARALYZE:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_PARALYZE_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_PARALYZE_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_BLOODLUST:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_PETRIFIED:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
-            break;
-        case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_STONESKIN:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_STEELSKIN:
-            effect = static_cast<i32>(armyValue_4 * COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
+            break;
+        case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+            effect = static_cast<i32>(worth * COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
             adjacent = 0;
-            dragonCount = adjacent;
-            for (i = 0; i < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; i++) {
-                otherArmy_1 = &m_armies[IDX(target->m_side)][i];
-                if (otherArmy_1->m_monsterType == CREATURE_GREEN_DRAGON
-                    || otherArmy_1->m_monsterType == CREATURE_RED_DRAGON
-                    || otherArmy_1->m_monsterType == CREATURE_BLACK_DRAGON
-                    || otherArmy_1->m_monsterType == CREATURE_BONE_DRAGON) {
-                    dragonCount++;
-                    if (target->OtherArmyAdjacent(otherArmy_1->m_side, otherArmy_1->m_index))
+            dragonCounter = adjacent;
+            for (cnt = 0; cnt < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; cnt++) {
+                other = &m_armies[IDX(target->m_side)][cnt];
+                if (other->m_monsterType == CREATURE_GREEN_DRAGON
+                    || other->m_monsterType == CREATURE_RED_DRAGON
+                    || other->m_monsterType == CREATURE_BLACK_DRAGON
+                    || other->m_monsterType == CREATURE_BONE_DRAGON) {
+                    dragonCounter++;
+                    if (target->OtherArmyAdjacent(other->m_side, other->m_index))
                         adjacent = 1;
                 }
             }
             if (adjacent)
-                dragonMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+                factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
-                dragonMod = static_cast<float>(dragonCount / m_armyCount[IDX(OppositeCombatSide(target->m_side))]);
-            effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * dragonMod);
+                factor = static_cast<float>(
+                    dragonCounter / m_armyCount[IDX(OppositeCombatSide(target->m_side))]
+                );
+            effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * factor);
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
-            shooterCount = 0;
-            for (i = 0; i < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; i++) {
-                otherArmy_1 = &m_armies[IDX(target->m_side)][i];
-                if (HAS(otherArmy_1->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
-                    shooterCount++;
+            shooters = 0;
+            for (cnt = 0; cnt < m_armyCount[IDX(OppositeCombatSide(target->m_side))]; cnt++) {
+                other = &m_armies[IDX(target->m_side)][cnt];
+                if (HAS(other->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
+                    shooters++;
             }
-            shooterMod = static_cast<float>(shooterCount / m_armyCount[IDX(OppositeCombatSide(target->m_side))]);
+            factor = static_cast<float>(
+                shooters / m_armyCount[IDX(OppositeCombatSide(target->m_side))]
+            );
             if (target->m_side == COMBAT_ATTACKER_SIDE && m_inCastleCombat) {
-                shooterMod = static_cast<float>(shooterMod + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
-                if (shooterMod > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
-                    shooterMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+                factor = static_cast<float>(factor + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
+                if (factor > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
+                    factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             }
-            effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * shooterMod);
+            effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * factor);
             break;
         default:
             effect = 0;
             break;
     }
 
-    effect = static_cast<i32>(effect * workChance_8);
+    effect = static_cast<i32>(effect * castChance);
     if ((target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
          || target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
         && influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)

@@ -5280,33 +5280,33 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
 
 VA(0x0048911d, 0x19b2)
 i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance) {
-    mapCell* cell_k;
-    i32 cellState_m;
-    i32 creatureFlag_k;
-    i32 purchaseCost_j;
+    mapCell* cell;
+    i32 cellState;
+    i32 creatureFlag;
+    i32 purchaseCost;
     i32 creaturePurchaseState[9];
     H2_ENUM_STORAGE(ResourceType, i32) resource;
-    i32 resourceState_a[3];
-    i32 purchaseValue_n;
-    i32 index_k;
-    i32 amount_j;
-    i32 battleWon_p;
-    i32 rewardState_a[2];
-    i32 eventState_l;
-    i32 value_h;
-    i32 battleValue_b;
-    i32 combatState_k[4];
+    i32 resourceState[3];
+    i32 purchaseValue;
+    i32 index;
+    i32 amount;
+    i32 battleWon;
+    i32 rewardState[2];
+    i32 eventState;
+    i32 value;
+    i32 battleValue;
+    i32 combatState[4];
     CreatureType creature;
-    i32 exitY_p;
-    i32 exitX_p;
-    i32 routeLiveChance_e[4];
-    i32 currentValue_h;
-    mapCell* otherCell_j;
-    i32 exitValue_i;
-    i32 bestExitValue_l;
-    i32 bestExitY_c;
-    i32 bestExitX_c;
-    i32 resources_e[AI_PURCHASE_RESOURCE_COUNT];
+    i32 exitY;
+    i32 exitX;
+    i32 routeLiveChance[4];
+    i32 currentValue;
+    mapCell* otherCell;
+    i32 exitValue;
+    i32 bestExitValue;
+    i32 bestExitY;
+    i32 bestExitX;
+    i32 resources[AI_PURCHASE_RESOURCE_COUNT];
 
     if (!immediate && *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) != RV_UNSET)
         return *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH);
@@ -5314,50 +5314,50 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     gbReduceByReload = true;
     gbReduceByBerserk = true;
     *liveChance = POSITION_FULL_CHANCE;
-    value_h = 0;
-    cell_k = gpAdvManager->GetCell(x, y);
+    value = 0;
+    cell = gpAdvManager->GetCell(x, y);
 
     if (gpCurPlayer->m_ultimateArtifactHintChance > 15 && gpCurPlayer->m_ultimateArtifactHintX == x
         && gpCurPlayer->m_ultimateArtifactHintY == y) {
-        value_h = gUltArtifactAvgValue * (gpCurPlayer->m_ultimateArtifactHintChance - 15) / 100;
-    } else if (HAS(cell_k->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
-        switch (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+        value = gUltArtifactAvgValue * (gpCurPlayer->m_ultimateArtifactHintChance - 15) / 100;
+    } else if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+        switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_MONSTER:
-                value_h = EvaluateMonsterEvent(
-                    CreatureType(cell_k->m_objectIndex),
-                    cell_k->m_objectMetadata,
+                value = EvaluateMonsterEvent(
+                    CreatureType(cell->m_objectIndex),
+                    cell->m_objectMetadata,
                     liveChance
                 );
                 break;
             case MAP_OBJECT_RESOURCE:
-                resource = cell_k->m_objectIndex >> 1;
+                resource = cell->m_objectIndex >> 1;
                 switch (resource) {
                     case RES_GOLD:
-                        value_h = static_cast<i32>(
+                        value = static_cast<i32>(
                             gafAITurnCostResource[IDX(resource)]
-                            * (cell_k->m_objectMetadata * AI_GOLD_RESOURCE_MULTIPLIER)
+                            * (cell->m_objectMetadata * AI_GOLD_RESOURCE_MULTIPLIER)
                         );
                         break;
                     default:
-                        value_h = static_cast<i32>(
-                            gafAITurnCostResource[IDX(resource)] * cell_k->m_objectMetadata
+                        value = static_cast<i32>(
+                            gafAITurnCostResource[IDX(resource)] * cell->m_objectMetadata
                         );
                         break;
                 }
                 break;
             case MAP_OBJECT_TREASURE_CHEST:
-                value_h = static_cast<i32>(
+                value = static_cast<i32>(
                     gafAITurnCostResource[IDX(RES_GOLD)] * AI_TREASURE_CHEST_GOLD_AMOUNT
                 );
                 break;
             case MAP_OBJECT_HERO_INTERACTION:
-                value_h = EvaluateHeroEvent(cell_k->m_objectMetadata, x, y, immediate, liveChance);
+                value = EvaluateHeroEvent(cell->m_objectMetadata, x, y, immediate, liveChance);
                 break;
             case MAP_OBJECT_CASTLE:
-                value_h = EvaluateTownEvent(cell_k->m_objectMetadata, x, y, immediate, liveChance);
+                value = EvaluateTownEvent(cell->m_objectMetadata, x, y, immediate, liveChance);
                 break;
             case MAP_OBJECT_CAMPFIRE:
-                value_h = static_cast<i32>(
+                value = static_cast<i32>(
                     ((((((gafAITurnCostResource[IDX(RES_GEMS)]
                           + gafAITurnCostResource[IDX(RES_MERCURY)])
                          + gafAITurnCostResource[IDX(RES_ORE)])
@@ -5369,58 +5369,58 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 );
                 break;
             case MAP_OBJECT_ARTIFACT:
-                value_h = EvaluateArtifactEvent(
-                    ArtifactType(cell_k->m_objectIndex >> 1),
-                    IDX(cell_k->m_objectMetadata)
+                value = EvaluateArtifactEvent(
+                    ArtifactType(cell->m_objectIndex >> 1),
+                    IDX(cell->m_objectMetadata)
                 );
                 break;
             case MAP_OBJECT_ALCHEMIST_LAB:
             case MAP_OBJECT_MINE:
             case MAP_OBJECT_SAWMILL:
-                value_h = EvaluateMineEvent(cell_k->m_objectMetadata, x, y, liveChance);
+                value = EvaluateMineEvent(cell->m_objectMetadata, x, y, liveChance);
                 break;
             case MAP_OBJECT_OBELISK:
-                if (gpGame->m_obeliskVisitors[cell_k->m_objectMetadata - 1] & giCurPlayerBit)
-                    value_h = 0;
+                if (gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1] & giCurPlayerBit)
+                    value = 0;
                 else
-                    value_h = gpCurPlayer->m_aiData.m_obeliskValue;
+                    value = gpCurPlayer->m_aiData.m_obeliskValue;
                 break;
             case MAP_OBJECT_OASIS:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_OASIS))
-                    value_h = static_cast<i32>(AI_OASIS_VALUE_FACTOR * gpCurAIHero->m_aiFightValue);
+                    value = static_cast<i32>(AI_OASIS_VALUE_FACTOR * gpCurAIHero->m_aiFightValue);
                 break;
             case MAP_OBJECT_BUOY:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_BUOY)
                     && giCurAIHeroMorale < ARMY_GROUP_MORALE_MAX)
-                    value_h = static_cast<i32>(AI_MORALE_LUCK_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue);
+                    value = static_cast<i32>(AI_MORALE_LUCK_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue);
                 break;
             case MAP_OBJECT_TEMPLE:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_TEMPLE) && giCurAIHeroMorale < 3)
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_TEMPLE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_FAERIE_RING:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_FAERIE_RING) && giCurAIHeroLuck < 3)
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_MORALE_LUCK_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_IDOL:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_IDOL) && giCurAIHeroLuck < 3)
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_MORALE_LUCK_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_FOUNTAIN:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_FOUNTAIN) && giCurAIHeroLuck < 3)
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_MORALE_LUCK_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_WATERING_HOLE:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_WATERING_HOLE))
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_WATERING_HOLE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
@@ -5429,15 +5429,15 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
                 if (gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE) > 0
                     && gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
-                    && !gpCurAIHero->HasSpell(SpellType(cell_k->m_objectMetadata - 1))) {
-                    if (IDX(gsSpellInfo[cell_k->m_objectMetadata - 1].level)
+                    && !gpCurAIHero->HasSpell(SpellType(cell->m_objectMetadata - 1))) {
+                    if (IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
                         <= IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                                + WISDOM_SPELL_LEVEL_BONUS) {
-                        value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;
-                        if (HAS(gsSpellInfo[cell_k->m_objectMetadata - 1].attributes,
+                        value = gsSpellInfo[cell->m_objectMetadata - 1].aiValue;
+                        if (HAS(gsSpellInfo[cell->m_objectMetadata - 1].attributes,
                                 SPELL_INFO_ATTRIBUTE_POWER)) {
-                            value_h = static_cast<i32>(
-                                value_h
+                            value = static_cast<i32>(
+                                value
                                 * (gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                                            <= AI_BATTLE_STAT_MAX
                                        ? gfStatPower[gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE)]
@@ -5446,33 +5446,33 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         }
                     }
                 } else
-                    value_h = 0;
+                    value = 0;
                 break;
             case MAP_OBJECT_GAZEBO:
-                if (gpCurAIHero->m_gazeboVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_gazeboVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else
-                    value_h =
+                    value =
                         static_cast<i32>(AI_GAZEBO_VALUE_FACTOR * gpCurAIHero->m_aiFightValue);
                 break;
             case MAP_OBJECT_TREE_OF_KNOWLEDGE:
-                value_h = 0;
+                value = 0;
                 if (!(gpCurAIHero->m_treeKnowledgeVisits
-                      & (1U << (cell_k->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))) {
-                    switch (cell_k->m_objectMetadata >> 6) {
+                      & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))) {
+                    switch (cell->m_objectMetadata >> 6) {
                         case 1:
-                            value_h = static_cast<i32>(
+                            value = static_cast<i32>(
                                 AI_TREE_KNOWLEDGE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                             );
                             break;
                         case 2:
                             if (gpCurPlayer->m_resources[IDX(RES_GOLD)]
                                 >= static_cast<i32>(AI_TREE_KNOWLEDGE_GOLD_COST)) {
-                                value_h = static_cast<i32>(
+                                value = static_cast<i32>(
                                     AI_TREE_KNOWLEDGE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                                 );
-                                value_h = static_cast<i32>(
-                                    value_h
+                                value = static_cast<i32>(
+                                    value
                                     - gafAITurnCostResource[IDX(RES_GOLD)]
                                           * AI_TREE_KNOWLEDGE_GOLD_COST
                                 );
@@ -5481,198 +5481,200 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         case 3:
                             if (gpCurPlayer->m_resources[IDX(RES_GEMS)]
                                 >= static_cast<i32>(AI_TREE_KNOWLEDGE_GEM_COST)) {
-                                value_h = static_cast<i32>(
+                                value = static_cast<i32>(
                                     AI_TREE_KNOWLEDGE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                                 );
-                                value_h = static_cast<i32>(
-                                    value_h
+                                value = static_cast<i32>(
+                                    value
                                     - gafAITurnCostResource[IDX(RES_GEMS)]
                                           * AI_TREE_KNOWLEDGE_GEM_COST
                                 );
                             }
                             break;
                     }
-                    if (value_h < 0)
-                        value_h = 0;
+                    if (value < 0)
+                        value = 0;
                 }
                 break;
             case MAP_OBJECT_WINDMILL:
-                if (cell_k->m_objectMetadata == 99) {
-                    value_h = 0;
+                if (cell->m_objectMetadata == 99) {
+                    value = 0;
                 } else {
-                    memset(resources_e, 0, sizeof(resources_e));
-                    resources_e[cell_k->m_objectMetadata] = 2;
-                    value_h = RVConversion(resources_e);
+                    memset(resources, 0, sizeof(resources));
+                    resources[cell->m_objectMetadata] = 2;
+                    value = RVConversion(resources);
                 }
                 break;
             case MAP_OBJECT_MAGIC_GARDEN:
-                if (!cell_k->m_objectMetadata)
-                    value_h = 0;
-                else if (cell_k->m_objectMetadata - 1 == IDX(RES_GOLD))
-                    value_h = static_cast<i32>(
+                if (!cell->m_objectMetadata)
+                    value = 0;
+                else if (cell->m_objectMetadata - 1 == IDX(RES_GOLD))
+                    value = static_cast<i32>(
                         gafAITurnCostResource[IDX(RES_GOLD)] * AI_MAGIC_GARDEN_GOLD_AMOUNT
                     );
                 else
-                    value_h =
+                    value =
                         static_cast<i32>(
-                            gafAITurnCostResource[cell_k->m_objectMetadata - 1] * 5.0f
+                            gafAITurnCostResource[cell->m_objectMetadata - 1] * 5.0f
                         );
                 break;
             case MAP_OBJECT_FLOTSAM:
-                value_h =
+                value =
                     static_cast<i32>(gafAITurnCostResource[IDX(RES_GOLD)] * AI_FLOTSAM_GOLD_AMOUNT);
-                value_h =
+                value =
                     static_cast<i32>(gafAITurnCostResource[IDX(RES_WOOD)] * AI_FLOTSAM_WOOD_AMOUNT);
                 break;
             case MAP_OBJECT_SEA_CHEST:
-                if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG)
-                    value_h = static_cast<i32>(
+                if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG)
+                    value = static_cast<i32>(
                         gafAITurnCostResource[IDX(RES_GOLD)] * AI_SEA_CHEST_ARTIFACT_GOLD_AMOUNT
-                        + gArtifactBaseRV[cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_ID_MASK]
+                        + gArtifactBaseRV[cell->m_objectMetadata & MAP_EVENT_ARTIFACT_ID_MASK]
                     );
-                else if (cell_k->m_objectMetadata == 1)
-                    value_h = static_cast<i32>(
+                else if (cell->m_objectMetadata == 1)
+                    value = static_cast<i32>(
                         gafAITurnCostResource[IDX(RES_GOLD)] * AI_SEA_CHEST_LARGE_GOLD_AMOUNT
                     );
                 else
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         gafAITurnCostResource[IDX(RES_GOLD)] * AI_SEA_CHEST_SMALL_GOLD_AMOUNT
                     );
-                if (value_h <= 0)
-                    value_h = AI_SEA_CHEST_MINIMUM_VALUE;
+                if (value <= 0)
+                    value = AI_SEA_CHEST_MINIMUM_VALUE;
                 break;
             case MAP_OBJECT_WAGON:
             case MAP_OBJECT_LEAN_TO:
-                if (!cell_k->m_objectMetadata)
-                    value_h = 0;
-                else if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_FLAG) {
-                    value_h = gArtifactBaseRV
-                        [cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
+                if (!cell->m_objectMetadata)
+                    value = 0;
+                else if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_FLAG) {
+                    value = gArtifactBaseRV
+                        [cell->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
                 } else {
-                    resource = (cell_k->m_objectMetadata & AI_EVENT_RESOURCE_TYPE_MASK) - 1;
-                    amount_j =
-                        (cell_k->m_objectMetadata & AI_ARTIFACT_EVENT_RESOURCE_MASK)
+                    resource = (cell->m_objectMetadata & AI_EVENT_RESOURCE_TYPE_MASK) - 1;
+                    amount =
+                        (cell->m_objectMetadata & AI_ARTIFACT_EVENT_RESOURCE_MASK)
                         >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT;
-                    value_h = static_cast<i32>(gafAITurnCostResource[IDX(resource)] * amount_j);
+                    value = static_cast<i32>(gafAITurnCostResource[IDX(resource)] * amount);
                 }
                 break;
             case MAP_OBJECT_ANCIENT_LAMP:
                 creature = CREATURE_GENIE;
-                creatureFlag_k = 0;
+                creatureFlag = 0;
                 goto creature_purchase;
             case MAP_OBJECT_TREE_CITY:
                 creature = CREATURE_SPRITE;
-                creatureFlag_k = 0;
+                creatureFlag = 0;
                 goto creature_purchase;
             case MAP_OBJECT_WATCH_TOWER:
                 creature = CREATURE_ORC;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_TREE_HOUSE:
                 creature = CREATURE_SPRITE;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_EXCAVATION:
                 creature = CREATURE_SKELETON;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_HALFLING_HOLE:
                 creature = CREATURE_HALFLING;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_RUINS:
                 creature = CREATURE_MEDUSA;
-                creatureFlag_k = 0;
+                creatureFlag = 0;
                 goto creature_purchase;
             case MAP_OBJECT_TROLL_BRIDGE:
-                if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
-                    value_h = 0;
+                if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
+                    value = 0;
                 } else {
                     creature = CREATURE_TROLL;
-                    creatureFlag_k = 0;
+                    creatureFlag = 0;
                     goto creature_purchase;
                 }
                 break;
             case MAP_OBJECT_DRAGON_CITY:
-                if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
-                    value_h = 0;
+                if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
+                    value = 0;
                 } else {
                     creature = CREATURE_RED_DRAGON;
-                    creatureFlag_k = 0;
+                    creatureFlag = 0;
                     goto creature_purchase;
                 }
                 break;
             case MAP_OBJECT_CITY_OF_DEAD:
-                if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
-                    value_h = 0;
+                if (cell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
+                    value = 0;
                 } else {
                     creature = CREATURE_POWER_LICH;
-                    creatureFlag_k = 0;
+                    creatureFlag = 0;
                     goto creature_purchase;
                 }
                 break;
             case MAP_OBJECT_CAVE:
                 creature = CREATURE_CENTAUR;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_ARCHER_HOUSE:
                 creature = CREATURE_ARCHER;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_GOBLIN_HUT:
                 creature = CREATURE_GOBLIN;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_PEASANT_HUT:
                 creature = CREATURE_PEASANT;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_DWARF_COTTAGE:
             case MAP_OBJECT_SIRENS:
                 creature = CREATURE_DWARF;
-                creatureFlag_k = 1;
+                creatureFlag = 1;
                 goto creature_purchase;
             case MAP_OBJECT_DESERT_TENT:
                 creature = CREATURE_NOMAD;
-                creatureFlag_k = 0;
+                creatureFlag = 0;
                 goto creature_purchase;
             case MAP_OBJECT_WAGON_CAMP:
                 creature = CREATURE_ROGUE;
-                creatureFlag_k = 0;
+                creatureFlag = 0;
             creature_purchase:
                 EvaluateOneTimeCreaturePurchase(
                     creature,
-                    cell_k->m_objectMetadata,
-                    creatureFlag_k,
-                    purchaseCost_j,
-                    value_h,
-                    purchaseValue_n
+                    cell->m_objectMetadata,
+                    creatureFlag,
+                    purchaseCost,
+                    value,
+                    purchaseValue
                 );
                 gbReduceByReload = false;
                 break;
             case MAP_OBJECT_SHIPWRECK_SURVIVOR:
-                value_h = gArtifactBaseRV[cell_k->m_objectMetadata];
-                if (value_h < 125)
-                    value_h = 125;
+                value = gArtifactBaseRV[cell->m_objectMetadata];
+                if (value < 125)
+                    value = 125;
                 break;
             case MAP_OBJECT_SKELETON:
-                value_h = cell_k->m_objectMetadata == 1
-                    ? 0
-                    : gArtifactBaseRV[cell_k->m_objectMetadata - SKELETON_ARTIFACT_METADATA_OFFSET];
+                if (cell->m_objectMetadata == 1)
+                    value = 0;
+                else
+                    value =
+                        gArtifactBaseRV[cell->m_objectMetadata - SKELETON_ARTIFACT_METADATA_OFFSET];
                 break;
             case MAP_OBJECT_GRAVEYARD:
             case MAP_OBJECT_SHIPWRECK:
             case MAP_OBJECT_DERELICT_SHIP:
-                value_h = FightEvent(gpCurAIHero, cell_k, 1);
+                value = FightEvent(gpCurAIHero, cell, 1);
                 break;
             case MAP_OBJECT_PYRAMID:
-                if (!cell_k->m_objectMetadata) {
-                    value_h = 0;
+                if (!cell->m_objectMetadata) {
+                    value = 0;
                 } else {
-                    index_k = cell_k->m_objectMetadata - 1;
-                    battleValue_b = static_cast<i32>(
-                        gsSpellInfo[index_k].aiValue
-                        * (HAS(gsSpellInfo[index_k].attributes, SPELL_INFO_ATTRIBUTE_POWER)
+                    index = cell->m_objectMetadata - 1;
+                    battleValue = static_cast<i32>(
+                        gsSpellInfo[index].aiValue
+                        * (HAS(gsSpellInfo[index].attributes, SPELL_INFO_ATTRIBUTE_POWER)
                                ? (gpCurAIHero->Stats(HERO_PRIMARY_SPELL_POWER)
                                           <= AI_BATTLE_STAT_MAX
                                       ? gfBattleStat[gpCurAIHero->Stats(HERO_PRIMARY_SPELL_POWER)]
@@ -5680,9 +5682,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                                : 1.0f)
                         * gpCurPlayer->m_aiData.m_upgradeValueWeight
                     );
-                    for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
-                        gpMonGroup->m_creatureTypes[index_k] = CREATURE_ROYAL_MUMMY;
-                        gpMonGroup->m_quantities[index_k] = 10;
+                    for (index = 0; index < AI_TOWN_ARMY_SLOTS; index++) {
+                        gpMonGroup->m_creatureTypes[index] = CREATURE_ROYAL_MUMMY;
+                        gpMonGroup->m_quantities[index] = 10;
                     }
                     ChooseEvaluateBattle(
                         &gpCurAIHero->m_army,
@@ -5691,19 +5693,19 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         NULL,
                         0,
                         0,
-                        battleValue_b,
-                        battleWon_p,
-                        value_h
+                        battleValue,
+                        battleWon,
+                        value
                     );
-                    if (!battleWon_p)
-                        value_h = -50;
+                    if (!battleWon)
+                        value = -50;
                 }
                 break;
             case MAP_OBJECT_DAEMON_CAVE:
-                if (cell_k->m_objectMetadata == 1)
-                    value_h = 0;
+                if (cell->m_objectMetadata == 1)
+                    value = 0;
                 else {
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         (gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_SHARE
                              * AI_EVENT_VALUE_SCALE
                          + gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_SHARE
@@ -5714,21 +5716,21 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         + AI_DAEMON_GOLD_VALUE_FACTOR * gafAITurnCostResource[IDX(RES_GOLD)]
                         + gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_PENALTY
                     );
-                    if (cell_k->m_objectMetadata == 5
+                    if (cell->m_objectMetadata == 5
                         && gpCurPlayer->m_resources[IDX(RES_GOLD)] < AI_DAEMON_CAVE_GOLD_REQUIRED)
-                        value_h = -100;
+                        value = -100;
                 }
                 break;
             case MAP_OBJECT_ABANDONED_MINE:
-                battleValue_b = static_cast<i32>(
+                battleValue = static_cast<i32>(
                     static_cast<float>(gaiTurnValueOfMine[MAP_WIDTH * y + x])
                     * gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]
                 );
-                for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
-                    gpMonGroup->m_creatureTypes[index_k] =
-                        gpGame->m_mines[cell_k->m_objectMetadata].guardianType;
-                    gpMonGroup->m_quantities[index_k] = static_cast<i16>(
-                        gpGame->m_mines[cell_k->m_objectMetadata].guardianCount / 5
+                for (index = 0; index < AI_TOWN_ARMY_SLOTS; index++) {
+                    gpMonGroup->m_creatureTypes[index] =
+                        gpGame->m_mines[cell->m_objectMetadata].guardianType;
+                    gpMonGroup->m_quantities[index] = static_cast<i16>(
+                        gpGame->m_mines[cell->m_objectMetadata].guardianCount / 5
                     );
                 }
                 ChooseEvaluateBattle(
@@ -5738,156 +5740,156 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     NULL,
                     0,
                     0,
-                    battleValue_b,
-                    battleWon_p,
-                    value_h
+                    battleValue,
+                    battleWon,
+                    value
                 );
-                if (!battleWon_p)
-                    value_h = -50;
+                if (!battleWon)
+                    value = -50;
                 break;
             case MAP_OBJECT_STONE_LITHS:
             case MAP_OBJECT_WHIRLPOOL:
                 if (!bEvaluatingTravelGates) {
-                    value_h = 0;
+                    value = 0;
                     break;
                 }
                 bEvaluatingTravelGates = 0;
-                bestExitValue_l = AI_TRAVEL_GATE_INITIAL_VALUE;
-                for (exitY_p = 0; MAP_HEIGHT > exitY_p; exitY_p++) {
-                    for (exitX_p = 0; exitX_p < MAP_WIDTH; exitX_p++) {
-                        otherCell_j = gpAdvManager->GetCell(exitX_p, exitY_p);
-                        if (cell_k->m_triggerType == otherCell_j->m_triggerType
-                            && cell_k->m_objectIndex == otherCell_j->m_objectIndex
-                            && abs(x - exitX_p) + abs(y - exitY_p)
+                bestExitValue = AI_TRAVEL_GATE_INITIAL_VALUE;
+                for (exitY = 0; MAP_HEIGHT > exitY; exitY++) {
+                    for (exitX = 0; exitX < MAP_WIDTH; exitX++) {
+                        otherCell = gpAdvManager->GetCell(exitX, exitY);
+                        if (cell->m_triggerType == otherCell->m_triggerType
+                            && cell->m_objectIndex == otherCell->m_objectIndex
+                            && abs(x - exitX) + abs(y - exitY)
                                    > AI_TRAVEL_GATE_EXIT_RADIUS) {
-                            exitValue_i = StrategicValueOfPosition(
-                                exitX_p,
-                                exitY_p,
+                            exitValue = StrategicValueOfPosition(
+                                exitX,
+                                exitY,
                                 0,
                                 0,
-                                routeLiveChance_e,
+                                routeLiveChance,
                                 AI_TRAVEL_GATE_EXIT_DEPTH
                             );
-                            exitValue_i = static_cast<i32>(exitValue_i * AI_TRAVEL_GATE_EXIT_SCALE);
-                            if (exitValue_i > bestExitValue_l) {
-                                bestExitValue_l = exitValue_i;
-                                bestExitX_c = exitX_p;
-                                bestExitY_c = exitY_p;
+                            exitValue = static_cast<i32>(exitValue * AI_TRAVEL_GATE_EXIT_SCALE);
+                            if (exitValue > bestExitValue) {
+                                bestExitValue = exitValue;
+                                bestExitX = exitX;
+                                bestExitY = exitY;
                             }
                         }
                     }
                 }
-                currentValue_h = StrategicValueOfPosition(
+                currentValue = StrategicValueOfPosition(
                     gpCurAIHero->m_x,
                     gpCurAIHero->m_y,
                     0,
                     0,
-                    routeLiveChance_e,
+                    routeLiveChance,
                     AI_TRAVEL_GATE_CURRENT_DEPTH
                 );
-                if (bestExitValue_l > currentValue_h + AI_TRAVEL_GATE_PENALTY)
-                    value_h = bestExitValue_l - currentValue_h - AI_TRAVEL_GATE_PENALTY;
+                if (bestExitValue > currentValue + AI_TRAVEL_GATE_PENALTY)
+                    value = bestExitValue - currentValue - AI_TRAVEL_GATE_PENALTY;
                 else if (!immediate)
-                    value_h = 0;
+                    value = 0;
                 else
-                    value_h = -AI_TRAVEL_GATE_PENALTY;
+                    value = -AI_TRAVEL_GATE_PENALTY;
                 bEvaluatingTravelGates = 1;
                 gbReduceByReload = false;
                 break;
             case MAP_OBJECT_FORT:
-                if (gpCurAIHero->m_fortVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_fortVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_TRAINING_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_WITCH_DOCTOR_HUT:
-                if (gpCurAIHero->m_witchDoctorVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_witchDoctorVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_TRAINING_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_STANDING_STONES:
-                if (gpCurAIHero->m_standingStoneVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_standingStoneVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_TRAINING_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_MERCENARY_CAMP:
-                if (gpCurAIHero->m_mercenaryCampVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_mercenaryCampVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else
-                    value_h = static_cast<i32>(
+                    value = static_cast<i32>(
                         AI_TRAINING_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                     );
                 break;
             case MAP_OBJECT_XANADU:
-                if (gpCurAIHero->m_xanaduVisits & (1U << cell_k->m_objectMetadata))
-                    value_h = 0;
+                if (gpCurAIHero->m_xanaduVisits & (1U << cell->m_objectMetadata))
+                    value = 0;
                 else {
                     if (gpCurAIHero->m_level
                                 + IDX(gpCurAIHero->m_secondarySkills
                                           [IDX(HERO_SKILL_DIPLOMACY)])
                                       * 2
                             >= 10)
-                        value_h =
+                        value =
                             static_cast<i32>(
                                 AI_TRAINING_SITE_VALUE_FACTOR * gpCurAIHero->m_aiFightValue
                                 * AI_XANADU_VALUE_MULTIPLE
                             );
                     else
-                        value_h = 0;
+                        value = 0;
                 }
                 break;
             case MAP_OBJECT_LIGHTHOUSE:
-                if (gpGame->m_mines[cell_k->m_objectMetadata].owner == gpCurAIHero->m_owner
-                    || OnMySide(gpGame->m_mines[cell_k->m_objectMetadata].owner))
-                    value_h = 0;
+                if (gpGame->m_mines[cell->m_objectMetadata].owner == gpCurAIHero->m_owner
+                    || OnMySide(gpGame->m_mines[cell->m_objectMetadata].owner))
+                    value = 0;
                 else
-                    value_h = 1000;
+                    value = 1000;
                 break;
             case MAP_OBJECT_WATER_WHEEL:
-                value_h = static_cast<i32>(
-                    cell_k->m_objectMetadata * AI_WATER_WHEEL_GOLD_AMOUNT
+                value = static_cast<i32>(
+                    cell->m_objectMetadata * AI_WATER_WHEEL_GOLD_AMOUNT
                     * gafAITurnCostResource[IDX(RES_GOLD)]
                 );
                 break;
             case MAP_OBJECT_BOAT:
                 gbActualBoatFound = true;
-                value_h = 90;
+                value = 90;
                 break;
             case MAP_OBJECT_BOTTLE:
-                value_h = 105;
+                value = 105;
                 break;
             case MAP_OBJECT_HILL_FORT:
-                value_h = ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF)
+                value = ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF)
                           + ComputeUpgradeValue(CREATURE_ORC, CREATURE_ORC_CHIEF)
                           + ComputeUpgradeValue(CREATURE_OGRE, CREATURE_OGRE_LORD);
                 break;
             case MAP_OBJECT_FREEMANS_FOUNDRY:
-                value_h =
+                value =
                     ComputeUpgradeValue(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN)
                     + ComputeUpgradeValue(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN)
                     + ComputeUpgradeValue(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
                 break;
             case MAP_OBJECT_MAGIC_WELL:
-                value_h = ManaRefreshValue(gpCurAIHero, 1);
+                value = ManaRefreshValue(gpCurAIHero, 1);
                 break;
             case MAP_OBJECT_ARTESIAN_SPRING:
-                if (!cell_k->m_objectMetadata)
-                    value_h = 0;
+                if (!cell->m_objectMetadata)
+                    value = 0;
                 else
-                    value_h = ManaRefreshValue(gpCurAIHero, 2);
+                    value = ManaRefreshValue(gpCurAIHero, 2);
                 break;
             case MAP_OBJECT_WITCH_HUT:
-                value_h = ComputeValueOfFreeSS(
+                value = ComputeValueOfFreeSS(
                     gpCurAIHero,
-                    static_cast<HeroSecondarySkill>(cell_k->m_objectMetadata)
+                    static_cast<HeroSecondarySkill>(cell->m_objectMetadata)
                 );
                 break;
             case MAP_OBJECT_SIGN:
@@ -5897,57 +5899,57 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_TAR_PIT:
             case MAP_OBJECT_MAGELLAN_MAPS:
             case MAP_OBJECT_OBSERVATION_TOWER:
-                value_h = 0;
+                value = 0;
                 break;
             case MAP_OBJECT_EXPANSION_OBJECT:
-                value_h = EvaluateGenericSite(cell_k);
+                value = EvaluateGenericSite(cell);
                 break;
             case MAP_OBJECT_BARRIER:
-                value_h = EvaluateBarrier(cell_k);
+                value = EvaluateBarrier(cell);
                 break;
             case MAP_OBJECT_TRAVELER_TENT:
-                value_h = EvaluatePassword(cell_k);
+                value = EvaluatePassword(cell);
                 break;
             case MAP_OBJECT_EXPANSION_DWELLING:
-                value_h = EvaluateRecruitSite(cell_k);
+                value = EvaluateRecruitSite(cell);
                 break;
             case MAP_OBJECT_JAIL:
-                value_h = EvaluateJail(cell_k);
+                value = EvaluateJail(cell);
                 break;
             default:
                 sprintf(
                     gText,
                     "AI encountered object type %d and doesn't know how to deal with it.   Tell "
                     "Phil",
-                    cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-                value_h = 0;
+                value = 0;
                 break;
         }
-    } else if (!(giCurPlayerBit & mapExtra[MAP_WIDTH * y + x])) {
-        value_h = 5;
+    } else if (!(*(mapExtra + x + MAP_WIDTH * y) & giCurPlayerBit)) {
+        value = 5;
     }
 
     if (gbTroopReload && gbReduceByReload)
-        value_h = static_cast<i32>(value_h * fReduceFactor);
+        value = static_cast<i32>(value * fReduceFactor);
     if (gbBerserk && gbReduceByBerserk)
-        value_h = static_cast<i32>(value_h * fBerserkFactor);
+        value = static_cast<i32>(value * fBerserkFactor);
     if (!immediate) {
-        if (value_h > 0 && (mapExtra[MAP_WIDTH * y + x] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
-            && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
-            value_h = 0;
-        if (value_h < 0
-            && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_HERO_INTERACTION)
-            value_h = 0;
-        else if (value_h > 32000)
-            value_h = 32000;
-        else if (value_h < -32000)
-            value_h = -32000;
+        if (value > 0 && (mapExtra[MAP_WIDTH * y + x] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+            && (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
+            value = 0;
+        if (value < 0
+            && (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_HERO_INTERACTION)
+            value = 0;
+        else if (value > 32000)
+            value = 32000;
+        else if (value < -32000)
+            value = -32000;
         *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) =
-            static_cast<i16>(value_h);
+            static_cast<i16>(value);
     }
-    return value_h;
+    return value;
 }
 
 

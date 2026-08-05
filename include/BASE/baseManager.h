@@ -41,8 +41,8 @@ public:
     char m_name[BASE_MANAGER_NAME_CAPACITY];
     b32 m_active;
     baseManager(void);
-    void Activate(void) {
-        m_active = true;
+    void Activate(bool on = true) {
+        m_active = on;
     }
     virtual i32 Open(i32) = 0;
     virtual void Close(void) = 0;
