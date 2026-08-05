@@ -10,7 +10,7 @@ appendix; it is not the matching priority.
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
   has 1,160/1,514 functions live exact and, after this investigation,
-  1,341/1,514 functions exact-max.
+  1,342/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -52,6 +52,11 @@ appendix; it is not the matching priority.
   residual. `PrintMemoryLeaks` also requires the inlined logging body: the
   direct 2.1 call is structurally contradictory, while an explicit inline
   helper compiles identically to the retained open body in all 51 states.
+- `font::DrawBoundedString` demonstrates why low fuzzy score does not imply bad
+  structure under `/Od`. Its retained PoL algorithm already had retail size,
+  the exact 39-block CFG, and all relocations; forest/top trial 1 changed its
+  apparent 72.3836% live score into an audited byte-exact 100% island without
+  any source edit.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
