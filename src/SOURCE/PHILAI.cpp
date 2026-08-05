@@ -5927,7 +5927,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 value = 0;
                 break;
         }
-    } else if (!(*(mapExtra + x + MAP_WIDTH * y) & giCurPlayerBit)) {
+    } else if (!(MAP_EXTRA_AT_WFIRST(x, y) & giCurPlayerBit)) {
         value = 5;
     }
 
@@ -6568,7 +6568,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
         if (result > 0
             && giCurTurn < EVENT_EARLY_TURN_BASE
                                - IDX(gpGame->m_difficulty) * EVENT_EARLY_TURN_DIFFICULTY_STEP
-            && !(*(mapExtra + x + MAP_WIDTH * y) & giCurPlayerBit)) {
+            && !(MAP_EXTRA_AT_WFIRST(x, y) & giCurPlayerBit)) {
             result = 0;
         }
     }
@@ -6616,7 +6616,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
     } else if (gpGame->m_difficulty < DIFFICULTY_EXPERT
                && giCurTurn < TOWN_EARLY_TURN_BASE
                                   - IDX(gpGame->m_difficulty) * TOWN_EARLY_TURN_DIFFICULTY_STEP
-               && !(*(mapExtra + x + MAP_WIDTH * y) & giCurPlayerBit)) {
+               && !(MAP_EXTRA_AT_WFIRST(x, y) & giCurPlayerBit)) {
         eventVal = 0;
     } else {
         townValue = ValueOfTown(pTownRec);

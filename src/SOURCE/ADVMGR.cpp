@@ -2779,7 +2779,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
             if (m_commandTargetX < 0 || m_commandTargetY < 0 || m_commandTargetX > MAP_WIDTH - 1
                 || m_commandTargetY > MAP_HEIGHT - 1
-                || !(*(mapExtra + m_commandTargetX + MAP_WIDTH * m_commandTargetY)
+                || !(MAP_EXTRA_AT_WFIRST(m_commandTargetX, m_commandTargetY)
                      & giCurPlayerBit)) {
                 gpMouseManager->SetPointer(POINTER_DEFAULT);
                 return MESSAGE_DISPATCH_CONSUME;
@@ -3336,7 +3336,7 @@ void advManager::DrawCell(
     } else {
 
         if (!(((gbAllBlack == 0
-                && (*(mapExtra + mapX + MAP_WIDTH * mapY) & giCurWatchPlayerBit) != 0)
+                && (MAP_EXTRA_AT_WFIRST(mapX, mapY) & giCurWatchPlayerBit) != 0)
                || gbDrawingPuzzle != 0))) {
             s_drawCovered = 1;
             if (gbAllBlack != 0) {
@@ -4433,7 +4433,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         }
 
         for (i = minx; i <= xhi; ++i) {
-            if (gbAllBlack != 0 || (*(mapExtra + i + MAP_WIDTH * j) & giCurPlayerBit) == 0) {
+            if (gbAllBlack != 0 || (MAP_EXTRA_AT_WFIRST(i, j) & giCurPlayerBit) == 0) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
                 cell = m_mapData->GetCell(i, j);
@@ -4772,7 +4772,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         sprintf(gText, "%s", "\xc3\xf0\xe0\xed\xe8\xf6\xe0");
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
-        if ((*(mapExtra + (m_mapOriginX + cellX) + MAP_WIDTH * (m_mapOriginY + cellY))
+        if ((MAP_EXTRA_AT_WFIRST((m_mapOriginX + cellX), m_mapOriginY + cellY)
              & giCurPlayerBit)
             == 0) {
             sprintf(gText, "%s", "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff");
@@ -9474,7 +9474,7 @@ void ComputeAdvNetControl(void) {
 
 VA(0x00413b4d, 0xda)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
-    if (*(mapExtra + x + MAP_WIDTH * y) & mask) {
+    if (MAP_EXTRA_AT_WFIRST(x, y) & mask) {
         return 1;
     }
     for (i32 checkX = x - 1; checkX <= x + 1; ++checkX) {
@@ -9485,7 +9485,7 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
             if (checkY < 0 || checkY >= MAP_HEIGHT) {
                 continue;
             }
-            if (*(mapExtra + checkX + MAP_WIDTH * checkY) & mask) {
+            if (MAP_EXTRA_AT_WFIRST(checkX, checkY) & mask) {
                 return 1;
             }
         }
