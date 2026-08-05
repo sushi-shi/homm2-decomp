@@ -5601,7 +5601,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
                     sqrt(static_cast<double>((y - j) * (y - j) + (x - i) * (x - i)))
                 );
                 if (distance < radius) {
-                    *(mapExtra + i + MAP_WIDTH * j) |= mask;
+                    MAP_EXTRA_AT_WFIRST(i, j) |= mask;
                 }
             }
         }
@@ -5611,7 +5611,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
                 vis = radius - abs(y - j) + radius - abs(x - i);
                 if (vis >= cutoff && i >= 0 && j >= 0 && i < MAP_WIDTH
                     && j < MAP_HEIGHT) {
-                    *(mapExtra + i + MAP_WIDTH * j) |= mask;
+                    MAP_EXTRA_AT_WFIRST(i, j) |= mask;
                 }
             }
         }
@@ -5628,7 +5628,7 @@ void game::MakeAllWaterVisible(i32 player) {
             fullMap* map = WORLDMAP;
             if (giGroundToTerrain[map->Column(x)[y * map->width].m_terrainImageIndex]
                 == TERRAIN_WATER)
-                *(mapExtra + x + MAP_WIDTH * y) |= mask;
+                MAP_EXTRA_AT_WFIRST(x, y) |= mask;
         }
     }
 }

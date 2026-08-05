@@ -254,7 +254,7 @@ void advManager::VWCompleteDraw(void) {
     for (cellY = iVWMapOriginY; cellY < iVWMapOriginY + iVWViewableCells; cellY++) {
         for (cellX = iVWMapOriginX; cellX < iVWMapOriginX + iVWViewableCells; cellX++) {
             cell = GetCell(cellX, cellY);
-            if ((*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit) || iVWDrawAllTerrains
+            if ((MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit) || iVWDrawAllTerrains
                 || (iVWWhatToDraw == SPELL_VIEW_TOWNS
                     && (((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE)
                         || (cell->m_triggerType
@@ -321,7 +321,7 @@ void advManager::VWCompleteDraw(void) {
                     frame0 += GROUND_FRAME_OFFSET;
                 frame0 += IDX(giGroundToTerrain[cell->m_terrainImageIndex])
                                  * WORLD_TERRAIN_FRAME_STRIDE;
-                if ((*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit) || iVWDrawAllTerrains) {
+                if ((MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit) || iVWDrawAllTerrains) {
                     pVWGround->DrawToBuffer(
                         screenX
                             + (orientation1 == ICON_DRAW_FLIPPED ? IDX(giViewWorldScale) - 1 : 0),
@@ -488,7 +488,7 @@ void advManager::VWCompleteDraw(void) {
                       + (IDX(giViewWorldScale) >> 1);
 
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
-                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
+                && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_ARTIFACTS)) {
                 IconToBitmap(
                     pVWMisc,
@@ -509,7 +509,7 @@ void advManager::VWCompleteDraw(void) {
                  || (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                      && gpGame->m_heroRecs[cell->m_objectMetadata].m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)))
-                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
+                && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_TOWNS)) {
                 if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
                     color0 = gpGame->m_castleOwners[cell->m_objectMetadata];
@@ -565,7 +565,7 @@ void advManager::VWCompleteDraw(void) {
                 heroHere0 = 0;
             if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                  || heroHere0)
-                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
+                && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_HEROES)) {
                 if (heroHere0)
                     color0 = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
@@ -591,7 +591,7 @@ void advManager::VWCompleteDraw(void) {
             }
 
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE)
-                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
+                && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_RESOURCES)) {
                 frame0 = cell->m_objectIndex / 2;
                 IconToBitmap(
@@ -625,7 +625,7 @@ void advManager::VWCompleteDraw(void) {
             if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
                  || cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL)
                  || cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
-                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
+                && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_MINES)) {
                 color0 = gpGame->m_mineOwners[cell->m_objectMetadata];
                 frame0 = color0 < 0 ? WORLD_NO_OWNER_COLOR

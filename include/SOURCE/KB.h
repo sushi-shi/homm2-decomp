@@ -705,7 +705,14 @@ extern u8* mapExtra;
 //
 // An inline accessor cannot replace this macro: the inline boundary never
 // folds into the address computation, whatever its arity.
-#define MAP_EXTRA_AT(column, row) (*(mapExtra + column + (row) * MAP_WIDTH))
+//
+// The two spellings below index the same cell and differ ONLY in which side
+// of the row multiply MAP_WIDTH sits on. That is byte-visible: swapping every
+// site to one order cost 11 exact functions when measured. They are NOT
+// interchangeable, so each name spells the operand order it emits. Match the
+// site you are converting; never pick one for tidiness.
+#define MAP_EXTRA_AT(column, row)        (*(mapExtra + column + (row) * MAP_WIDTH))
+#define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
 extern tag_tilePoint normalDirTable[];
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
