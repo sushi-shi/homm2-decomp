@@ -553,8 +553,9 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
 
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void) {
-    i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;
-    if (mouseMessageActive != 0)
+    if (gpInputManager->m_mouseMessageActive != 0)
+        return;
+    if (gpInputManager->m_mouseMessageActive != 0)
         return;
     gpInputManager->m_mouseMessageActive = 1;
 

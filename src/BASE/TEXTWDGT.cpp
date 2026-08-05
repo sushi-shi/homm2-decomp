@@ -22,10 +22,10 @@ H2_ENUM_END(TextWidgetConstant)
 
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
-    m_color = FONT_DRAW_DEFAULT;
-    m_alignment = FONT_ALIGN_CENTER;
     m_font = NULL;
     m_text = NULL;
+    m_color = FONT_DRAW_DEFAULT;
+    m_alignment = FONT_ALIGN_CENTER;
     m_kind = WIDGET_KIND_TEXT;
 }
 

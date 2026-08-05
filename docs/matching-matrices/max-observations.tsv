@@ -117,3 +117,5 @@ recorded_utc	unit	symbol	src_hash	score	seed	trial	family	insertion	tag	run_dir
 2026-07-29T13:13:45+00:00	SOURCE/GAME	?CreateJoinFile@@YIXPAD00@Z	95ca3550856b	100.0000	1213156658	8	forest	top	484f4d32-0008-a46e452f	create-join-file-trial8
 2026-08-05T17:38:12+00:00	SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	715ac9bad32c	100.0000	1213156658	14	forest	top	484f4d32-0014-ae7dae2f	mapextra-cross-version-exact
 2026-08-05T17:49:38+00:00	SOURCE/PHILAI	?TurnCostResource@philAI@@QAEXH@Z	7ff4172edb65	100.0000	1213156658	1	forest	top	484f4d32-0001-76e1c088	turn-cost-cross-version-best
+2026-08-05T19:00:03+00:00	BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	c6baaffbe8c9	100.0000	1213156658	3	forest	top	484f4d32-0003-acb2ec2e	find-index-cross-version-exact
+2026-08-05T18:55:39+00:00	BASE/Misc	?FindToken@@YIPADPADD@Z	ca404ff868df	99.6552	1213156658	2	forest	top	484f4d32-0002-e2d06adb	find-token-cross-version

@@ -627,24 +627,23 @@ u32l MAKEFILEID(char* text) {
 VA(0x004c4540, 0x95)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
-    while (high - low > 1) {
-        i32 value = entries[giFindMid].key;
-        if (value > key) {
-            high = giFindMid;
+    while (1) {
+        if (high - low > 1) {
+            if (key < entries[giFindMid].key)
+                high = giFindMid;
+            else if (key > entries[giFindMid].key)
+                low = giFindMid;
+            else
+                return entries[giFindMid].value;
         } else {
-            low = giFindMid;
-            if (value >= key)
+            if (key == entries[low].key)
                 return entries[low].value;
+            if (key == entries[high].key)
+                return entries[high].value;
+            return INDEX_NOT_FOUND;
         }
         giFindMid = (low + high) >> 1;
     }
-    if (entries[low].key == key) {
-        return entries[low].value;
-    }
-    if (entries[high].key == key) {
-        return entries[high].value;
-    }
-    return INDEX_NOT_FOUND;
 }
 
 #include <BASE/MiscGraphicsConstants.h>
@@ -767,13 +766,9 @@ char* FindStringInString(char* text, char* pattern) {
 VA(0x004c48c0, 0x31)
 char* FindToken(char* text, char token) {
     i32 len = strlen(text);
-    i32 i = 0;
-    if (len > 0) {
-        do {
-            if (text[i] == token)
-                return text + i;
-            ++i;
-        } while (len > i);
+    for (i32 i = 0; i < len; ++i) {
+        if (*(text + i) == token)
+            return text + i;
     }
     return NULL;
 }

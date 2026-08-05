@@ -9,8 +9,8 @@ appendix; it is not the matching priority.
 
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
-  has 1,155/1,514 functions live exact and, after this investigation,
-  1,331/1,514 functions exact-max.
+  has 1,159/1,514 functions live exact and, after this investigation,
+  1,335/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -223,6 +223,24 @@ The same BASE sweep retained two byte-neutral exact-donor structures:
 and 51-state matrices respectively left their existing two-byte residuals
 unchanged. `executive::DoDialog` was also censused across 50 states; its PoL
 layout is already correct and no exact register-allocation island appeared.
+
+### Continued BASE island batch
+
+Applying the structure-first, island-second method to additional BASE
+residuals produced four more live closures and one exact disposable island:
+
+| function | donor structure | result |
+|---|---|---:|
+| `inputManager::ForceMouseMove` | repeated mainline re-entrancy guard | live 100% |
+| `textWidget::textWidget()` | pointer fields before color/alignment | live 100% |
+| parameterized `textEntryWidget` ctor | direct field publication | live 100% |
+| `FindIndex` | single-comparison three-way loop | MAX 100% at forest/top trial 3 |
+| `FindToken` | counted pointer-form loop | MAX 99.6552% at trial 2 |
+
+The legitimate Misc source changes also moved unchanged `FadeTo` back onto its
+previously audited live-exact compiler-state island. `FindToken` remains one
+SIB byte from retail; a complete commutative pointer-addition matrix proved the
+two source orders byte-identical in every requested state.
 
 ## Bugs and bug candidates exposed by the exact branch
 
