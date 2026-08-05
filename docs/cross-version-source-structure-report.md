@@ -10,7 +10,7 @@ appendix; it is not the matching priority.
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
   has 1,160/1,514 functions live exact and, after this investigation,
-  1,340/1,514 functions exact-max.
+  1,341/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -42,6 +42,10 @@ appendix; it is not the matching priority.
 - `FadeIn` needs both phases: the 2.1 counted loop plus forced-last-level tail
   raises clean output to 99.3827%, and a reproducible declaration-forest island
   closes it at audited 100% with the complete relocation stream.
+- `BlitBitmapToScreen` likewise confirms the structure-then-island pattern. The
+  2.1 negative no-overlap branch, direct `sourceX` mutation, and repeated mouse
+  field reads restore retail size and all 24 relocations; forest/top trial 3
+  then closes the remaining two clean-state bytes exactly.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
@@ -258,6 +262,34 @@ The legitimate Misc source changes also moved unchanged `FadeTo` back onto its
 previously audited live-exact compiler-state island. `FindToken` remains one
 SIB byte from retail; a complete commutative pointer-addition matrix proved the
 two source orders byte-identical in every requested state.
+
+### `BlitBitmapToScreen`: cursor-overlap ownership and exact island
+
+The earlier PoL reconstruction introduced `blitSourceX`, rewrote the main
+condition as a positive overlap test, cached the saved mouse coordinates, and
+returned from the overlap arm. Although semantically close, that source emitted
+392 rather than 395 bytes and only 23 of the target's 24 ordered relocations.
+
+The exact 2.1 donor instead mutates `sourceX`, makes the ordinary blit the
+negative no-overlap arm, and reads the mouse-manager fields directly when
+repairing cursor pixels. A complete 2 x 51 structure/state matrix finished all
+102 cells. The donor clean state reached 99.481480%, retail size 395, an exact
+18-block CFG, and all 24 ordered relocations. Forest/top trial 3 closed the
+remaining two-byte compiler-state residual exactly.
+
+| property | result |
+|---|---|
+| PoL RVA | `0x000c5ee0` |
+| old source | 98.214810%, 392 bytes, 23/24 relocations |
+| retained source clean | 99.481480%, 395 bytes, 24/24 relocations |
+| exact state | seed 1213156658, forest/top trial 3 |
+| audited maximum | 100.0000% |
+| CFG | exact 18/18 blocks and topology |
+| retained source hash | `0ab236af3f96` |
+
+The focused replay is reproducible from the retained ordinary source; no
+generated declaration is retained. See
+`docs/matching/BlitBitmapToScreen/cross-version-cursor-overlap.cpp`.
 
 ## Bugs and bug candidates exposed by the exact branch
 

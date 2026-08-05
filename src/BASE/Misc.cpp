@@ -1867,60 +1867,48 @@ void BlitBitmapToScreen(
     i32 destinationX,
     i32 destinationY
 ) {
-    i32 blitSourceX = sourceX;
     if (gbColorMice == 0) {
         BlitBitmapToScreenVesa(
-            bmp,
-            blitSourceX,
-            sourceY,
-            width,
-            height,
-            destinationX,
-            destinationY
+            bmp, sourceX, sourceY, width, height, destinationX, destinationY
         );
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        blitSourceX = giScrollX + BLIT_SCROLL_OFFSET;
+        sourceX = giScrollX + BLIT_SCROLL_OFFSET;
         width = BLIT_SCROLL_EXTENT;
         sourceY = giScrollY + BLIT_SCROLL_OFFSET;
         height = BLIT_SCROLL_EXTENT;
     }
-    gBlitRight = width + destinationX - 1;
-    gBlitBottom = height + destinationY - 1;
-    if (gpMouseManager->IsVis() != 0 && gBlitRight >= gpMouseManager->m_savedLeft
-        && gpMouseManager->m_cursorRight >= destinationX
-        && gBlitBottom >= gpMouseManager->m_savedTop
-        && gpMouseManager->m_cursorBottom >= destinationY) {
+    gBlitRight = destinationX + width - 1;
+    gBlitBottom = destinationY + height - 1;
+    if (gpMouseManager->IsVis() == 0 || gBlitRight < gpMouseManager->m_savedLeft
+        || destinationX > gpMouseManager->m_cursorRight
+        || gBlitBottom < gpMouseManager->m_savedTop
+        || destinationY > gpMouseManager->m_cursorBottom) {
+        BlitBitmapToScreenVesa(
+            bmp, sourceX, sourceY, width, height, destinationX, destinationY
+        );
+    } else {
         gpMouseManager->SaveAndDraw();
         BlitBitmapToScreenVesa(
-            bmp,
-            blitSourceX,
-            sourceY,
-            width,
-            height,
-            destinationX,
-            destinationY
+            bmp, sourceX, sourceY, width, height, destinationX, destinationY
         );
-        if (gpMouseManager->m_cursorRight > gBlitRight || gpMouseManager->m_savedLeft < destinationX
-            || gpMouseManager->m_cursorBottom > gBlitBottom
-            || gpMouseManager->m_savedTop < destinationY) {
-            i32 savedY = gpMouseManager->m_savedTop;
-            i32 savedX = gpMouseManager->m_savedLeft;
+        if (gBlitRight < gpMouseManager->m_cursorRight
+            || destinationX > gpMouseManager->m_savedLeft
+            || gBlitBottom < gpMouseManager->m_cursorBottom
+            || destinationY > gpMouseManager->m_savedTop) {
             BlitBitmapToScreenVesa(
                 bmp,
-                savedX,
-                savedY,
-                gpMouseManager->m_cursorRight - savedX + 1,
-                gpMouseManager->m_cursorBottom - savedY + 1,
-                savedX,
-                savedY
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop,
+                gpMouseManager->m_cursorRight - gpMouseManager->m_savedLeft + 1,
+                gpMouseManager->m_cursorBottom - gpMouseManager->m_savedTop + 1,
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop
             );
         }
         gpMouseManager->RestoreUnderlying();
-        return;
     }
-    BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height, destinationX, destinationY);
 }
 VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
