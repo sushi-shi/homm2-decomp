@@ -1,0 +1,311 @@
+
+GREETINGS!
+
+   This is the README for BZIP, my block-sorting file compressor,
+   version 0.21.  
+
+   BZIP is distributed under the GNU General Public License version 2;
+   for details, see the file LICENSE.  Pointers to the algorithms used
+   are in ALGORITHMS.  Instructions for use are in bzip.1.preformatted.
+
+   Please read this file carefully.
+
+
+
+HOW TO BUILD
+
+   -- for UNIX:
+
+        Type `make'.     (tough, huh? :-)
+
+        This creates binaries "bzip", and "bunzip",
+        which is a symbolic link to "bzip".
+
+        It also runs four compress-decompress tests to make sure
+        things are working properly.  If all goes well, you should be up &
+        running.  Please be sure to read the output from `make'
+        just to be sure that the tests went ok.
+
+        To install bzip properly:
+
+           -- Copy the binary "bzip" to a publically visible place,
+              possibly /usr/bin, /usr/common/bin or /usr/local/bin.
+
+           -- In that directory, make "bunzip" be a symbolic link
+              to "bzip".
+
+           -- Copy the manual page, bzip.1, to the relevant place.
+              Probably the right place is /usr/man/man1/.
+   
+   -- for Windows 95 and NT: 
+
+        For a start, do you *really* want to recompile bzip?  
+        The standard distribution includes a pre-compiled version
+        for Windows 95 and NT, `BZIP.EXE'.
+
+        Assuming you do, compilation is less straightforward than for
+        Unix platforms.  You can compile either with Microsoft Visual C++ 2.0 
+        or later, or with Borland C++ 5.0 or later.  
+
+        NOTE [THIS IS IMPORTANT] that it would *appear* that
+        MS VC++ 2.0's optimising compiler has a bug which, at maximum
+        optimisation, gives an executable which produces garbage 
+        compressed files.  Proceed with caution.  I do not know whether
+        or not this happens with later versions of VC++.
+
+        Edit the defines starting at line 86 of bzip.c to select your
+        platform/compiler combination, and then compile.  Then check that
+        the resulting executable (assumed to be called BZIP.EXE) works
+        correctly, using the SELFTEST.BAT file.  Bearing in mind the 
+        previous paragraph, the self-test is important.
+
+   A manual page is supplied, unformatted (bzip.1),
+   preformatted (bzip.1.preformatted), and preformatted
+   and sanitised for MS-DOS (bzip1.txt).
+
+   
+
+COMPILATION NOTES
+
+   bzip should work on any 32-bit machine.  It is known to work
+   [meaning: it has compiled and passed self-tests] on the 
+   following platform-os combinations:
+
+      Intel i386/i486        running Linux 1.2.13 and Linux 2.0.0
+      Sun Sparcs (various)   running SunOS 4.1.3 and Solaris 2.5
+      SGI Indy R3000         running Irix 5.3
+      HP 9000/700            running HPUX 9.03
+      HP 9000/300            running NetBSD 1.1
+      Acorn R260             running RISC iX (a BSD 4.? derivative)
+
+      Intel i386/i486        running Windows 95
+
+   I have also heard, but have not myself verified, that bzip works
+   on the following machines:
+
+      Intel i486             running Windows NT 3.51
+      IBM 3090 clone         running OSF/1
+      Dec Alpha              running ?????
+
+   The #defines starting at around line 86 of bzip.c supply some
+   degree of platform-independance.  If you configure bzip for some
+   new far-out platform, please send me the relevant definitions.
+
+   I recommend GNU C for compilation.  The code is standard ANSI C,
+   except for the Unix-specific file handling, so any ANSI C compiler
+   should work.  Note however that the many routines marked INLINE
+   should be inlined by your compiler, else performance will be very
+   poor.  Asking your compiler to unroll loops might give some
+   small improvement too; for gcc, the relevant flag is
+   -funroll-loops.
+
+   On a 386/486 machines, I'd recommend giving gcc the
+   -fomit-frame-pointer flag; this liberates another register for
+   allocation, which measurably improves performance.
+
+   On SPARCs (and, I guess, on many low-range RISC machines) there is no
+   hardware implementation of integer multiply and divide.  This can
+   mean poor decompression performance.  It also means it is important
+   to generate code for the version of the SPARC instruction set you
+   intend to use.  gcc -mcypress (for older sparcs) and gcc
+   -msupersparc (for newer ones) give binaries which run at strikingly
+   different speeds on different flavours of SPARCs.  If you are
+   interested in performance figures, try both.
+
+   If you compile bzip on a new platform or with a new compiler,
+   please be sure to run the four compress-decompress tests, either
+   using the Makefile, or with the test.bat (MSDOS) or test.cmd (OS/2)
+   files.  Some compilers have been seen to introduce subtle bugs
+   when optimising, so this check is important.  Ideally you should
+   then go on to test bzip on a file several megabytes or even
+   tens of megabytes long, just to be 110% sure.  ``Professional
+   programmers are paranoid programmers.'' (anon).
+
+
+
+MAKING IT GO FASTER
+
+   After 0.15 was released, various people asked whether it would
+   be possible to make it compress faster.  The answer falls in
+   three parts:
+
+   1.  Yes, and 0.21 compresses substantially faster than 0.15.
+
+   2.  You can probably compress somewhat faster, even, than 0.21,
+       by tinkering with the sorting algorithms.  However, it is
+       easy to fall into the trap of speeding up the average
+       case a little whilst at the same time imposing a giant
+       (25 times) slowdown on the worst-but-not-uncommon case,
+       files which are highly repetitive.  Beware!
+
+   3.  Are you solving the right problem?  In many situations,
+       it is the *de*compression speed which is the limiting factor
+       on overall usefulness of bzip.  If you want to do some
+       serious hacking on bzip, your hacking could be useful if
+       you could speed up decompression.
+
+       I appreciate that the arithmetic-coding back end imposes a 
+       fairly serious restriction on decompression speed.  A possible
+       future option would be to make a variant of bzip which
+       used Huffman-coding (or some such) instead; this would reduce
+       the compression ratio but greatly accelerate decompression.
+       Experimental results welcomed!
+
+
+
+VALIDATION
+
+   Correct operation, in the sense that a compressed file can always be
+   decompressed to reproduce the original, is obviously of paramount
+   importance.  To validate bzip, I used a modified version of 
+   Mark Nelson's churn program.  Churn is an automated test driver
+   which recursively traverses a directory structure, using bzip to
+   compress and then decompress each file it encounters, and checking
+   that the decompressed data is the same as the original.  As test 
+   material, I used the entirety of my Linux filesystem, constituting
+   390 megabytes in 20,440 files.  The largest file was about seventeen
+   megabytes long.  Included in this filesystem was a directory containing
+   39 specially constructed test files, designed to break the sorting
+   phase of compression, the most elaborate part of the machinery.
+   This included files of zero length, various long, highly repetitive 
+   files, and some files which generate blocks with all values the same.
+
+   Validation of version 0.15
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   There were actually six test runs on this filesystem, taking about
+   50 CPU hours on an Intel 486DX4-100 machine:
+
+      One with the block size set to 900k (ie, with the -9 flag, the default).
+
+      One with the block size set to 500k (ie, with -5).
+
+      One with the block size set to 100k (ie, with -1).
+
+      One where the parameters for the arithmetic coder were
+      set to smallB == 14 and smallF == 11, rather than the
+      usual values of 26 and 18.  This was intended to expose 
+      possible boundary-case problems with the arithmetic coder;
+      in particular, setting smallB == 14 keeps the coding values
+      all below or equal to 8192.  Doing this, I hoped that the
+      values actually would hit their endpoints from time to time,
+      so I'd see problems if any lurked.  With smallB = 26, the 
+      range of values goes up to 2^26 (64 million), which makes
+      potential bugs associated with endpoint effects vastly less
+      likely to be detected.
+
+      One where the block size was set to a trivial value, 173,
+      so as to invoke the blocking/unblocking machinery tens of
+      thousands of times over the run, and expose any potential
+      problem there.
+
+      One with normal settings, the block size set 900k, but
+      compiled with the symbol DEBUG set to 1, which turns on
+      many assertion-checks in the compressor.
+
+   None of these test runs exposed any problems.
+
+   In addition, earlier versions of bzip have been in informal use
+   for a while without difficulties.  The largest file I have tried
+   so far is a log file from a chip-simulator, 52 megabytes long, 
+   and that decompressed correctly.
+   
+   The distribution does four tests after building bzip.  These tests
+   include test decompressions of pre-supplied compressed files, so
+   they not only test that bzip works correctly on the machine it was
+   built on, but can also decompress files compressed on a different
+   machine.  This guards against unforseen interoperability problems.
+
+   Validation of version 0.21
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   0.21 differs radically from 0.15 in the sorting phase which 
+   constitutes the bulk of the work during compression, and in
+   several other non-cosmetic ways, so there was considerable
+   emphasis on trying to break it before release.  100% compatibility
+   with 0.15 was also an issue.  On the other hand, the arithmetic
+   coder is unchanged, so I didn't put special effort into trying
+   to break that.  Testing was done on two filesystems, a Linux
+   filesystem with about 21000 files in 400 megabytes, and a 
+   Windows 95 filesystem with 14900 files in about 610 megabytes.
+   The test runs were:
+
+      Linux FS, blocksize = 900k, 0.15 compressing, 0.21 decompressing
+      Linux FS, blocksize = 900k, 0.21 compressing, 0.15 decompressing
+
+      Linux FS, blocksize = 900k, -DDEBUG=1
+      Linux FS, blocksize = 500k, -DDEBUG=1
+      Linux FS, blocksize = 100k, -DDEBUG=1
+
+      Linux FS, blocksize = 900k
+
+      Win95 FS, blocksize = 900k
+
+      A single text file 186 megabytes long.
+
+      My Win95 disk read by Linux as a single entity -- 425 Megabytes.
+
+      Misc other anecdotal tests, incl some on a Sparc box (as a check
+      for endian issues), covering another 140 megabytes of new data.
+
+      Misc tests with Purify 3.0.1 snooping on the proceedings,
+      to check for subscript range errors, &c.
+
+   Overall, the quantity of original files in this validation
+   run is about 1760 megabytes.  Not Bad.
+
+
+Please read and be aware of the following:
+
+COMMERCIAL USE:
+
+   This program may or may not infringe certain US patents
+   pertaining to arithmetic coding and to the block-sorting
+   transformation itself.  Opinions differ as to the precise
+   legal status of some of the algorithms used.  Nevertheless,
+   you should be aware that commercial use of this program
+   could render you liable to unfriendly legal action.
+
+
+WARNING:
+
+   This program (attempts to) compress data by performing several
+   non-trivial transformations on it.  Unless you are 100% familiar
+   with *all* the algorithms contained herein, and with the
+   consequences of modifying them, you should NOT meddle with the
+   compression or decompression machinery.  Incorrect changes can and
+   very likely *will* lead to disastrous loss of data.
+
+
+DISCLAIMER:
+
+   I TAKE NO RESPONSIBILITY FOR ANY LOSS OF DATA ARISING FROM THE
+   USE OF THIS PROGRAM, HOWSOEVER CAUSED.
+
+   Every compression of a file implies an assumption that the
+   compressed file can be decompressed to reproduce the original.
+   Great efforts in design, coding and testing have been made to
+   ensure that this program works correctly.  However, the complexity
+   of the algorithms, and, in particular, the presence of various
+   special cases in the code which occur with very low but non-zero
+   probability make it impossible to rule out the possibility of bugs
+   remaining in the program.  DO NOT COMPRESS ANY DATA WITH THIS
+   PROGRAM UNLESS YOU ARE PREPARED TO ACCEPT THE POSSIBILITY, HOWEVER
+   SMALL, THAT THE DATA WILL NOT BE RECOVERABLE.
+
+   That is not to say this program is inherently unreliable.  Indeed,
+   I very much hope the opposite is true.  BZIP has been carefully
+   constructed and extensively tested.
+
+End of nasty legalities.
+
+
+I hope you find bzip useful.  Feel free to contact me at
+   sewardj@cs.man.ac.uk
+if you have any suggestions or queries.  Many people mailed me with
+comments, suggestions and patches after the release of 0.15, and the
+changes in 0.21 are largely a result of this feedback.
+
+Julian Seward
+Manchester, UK
+18 July 1996 (version 0.15)
+25 August 1996 (version 0.21)
+

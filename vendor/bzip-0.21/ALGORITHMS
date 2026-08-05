@@ -1,0 +1,37 @@
+
+Bzip is not research work, in the sense that it doesn't present any
+new ideas.  Rather, it's an engineering exercise based on existing
+ideas.
+
+Three documents describe essentially all the ideas behind bzip:
+ 
+   Michael Burrows and D. J. Wheeler:
+     "A block-sorting lossless data compression algorithm"
+      10th May 1994. 
+      Digital SRC Research Report 124.
+      ftp://ftp.digital.com/pub/DEC/SRC/research-reports/SRC-124.ps.gz
+
+   Peter Fenwick:
+      Block Sorting Text Compression
+      Proceedings of the 19th Australasian Computer Science Conference,
+        Melbourne, Australia.  Jan 31 - Feb 2, 1996.
+      ftp://ftp.cs.auckland.ac.nz/pub/peter-f/ACSC96paper.ps
+      
+   Alistair Moffat, Radford Neal and Ian Witten:
+     "Arithmetic Coding Revisited"
+        originally presented at the 1995 IEEE Data Compression
+       Conference, Snowbird, Utah, USA in March 1995.
+
+     The paper has evolved somewhat since then.  This implementation
+     pertains to the June 1996 version of the paper.  There isn't an
+     electronic version available; perhaps email the authors to get
+     a copy.  Alistair Moffat can be contacted as alistair@cs.mu.oz.au,
+     and has a URL of http://www.cs.mu.oz.au/~alistair.
+
+All three are well written, and make fascinating reading.  If you want
+to modify bzip in any non-trivial way, I strongly suggest you obtain,
+read and understand these papers.
+
+I am much indebted to the various authors for their help, support and
+advice.
+
