@@ -57,80 +57,69 @@ void border::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    H2_ENUM_STORAGE(WidgetKind, i16) kind = gpResourceManager->ReadWord();
+    m_kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
-    m_kind = kind;
-    char resourceName[RESOURCE_NAME_CAPACITY];
-    if (kind == WIDGET_KIND_BITMAP) {
-        gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    if (m_kind == WIDGET_KIND_BITMAP) {
+        char bitmapName[RESOURCE_NAME_CAPACITY];
+        gpResourceManager->Read13(reinterpret_cast<i8*>(bitmapName));
         gpResourceManager->SavePosition();
-        m_backgroundBitmap = gpResourceManager->GetBitmap(resourceName);
+        m_backgroundBitmap = gpResourceManager->GetBitmap(bitmapName);
         gpResourceManager->RestorePosition();
         return;
     }
-    if (kind == WIDGET_KIND_ICON) {
-        gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    if (m_kind == WIDGET_KIND_ICON) {
+        char iconName[RESOURCE_NAME_CAPACITY];
+        gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
         gpResourceManager->SavePosition();
-        m_backgroundIcon = gpResourceManager->GetIcon(resourceName);
+        m_backgroundIcon = gpResourceManager->GetIcon(iconName);
         gpResourceManager->RestorePosition();
         return;
     }
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-VA(0x004cb390, 0x199)
+VA(0x004cb390, 0x1de)
 MessageDispatchResult border::Main(struct tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
+    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
     }
-    MessageType type = msg.type;
-    switch (type) {
-        default:
-            goto normalEvent;
+
+    switch (msg.type) {
         case MESSAGE_LEFT_BUTTON_DOWN:
-        case MESSAGE_RIGHT_BUTTON_DOWN:
-            goto hoverEvent;
+        case MESSAGE_RIGHT_BUTTON_DOWN: {
+            i16 x = msg.payload.mouse.x - m_owner->m_posX;
+            i16 y = msg.payload.mouse.y - m_owner->m_posY;
+            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                } else {
+                    m_flags |= WIDGET_FLAG_SELECTED;
+                    msg.payload.widget.command = WIDGET_COMMAND_SELECT;
+                }
+                msg.type = MESSAGE_WIDGET;
+                msg.payload.widget.id = m_id;
+                return MESSAGE_DISPATCH_FORWARD;
+            }
+            return MESSAGE_DISPATCH_CONTINUE;
+        }
+
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            goto leaveEvent;
+            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                m_flags &= ~WIDGET_FLAG_SELECTED;
+                msg.type = MESSAGE_WIDGET;
+                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+                msg.payload.widget.id = m_id;
+                return MESSAGE_DISPATCH_FORWARD;
+            }
+            return MESSAGE_DISPATCH_CONTINUE;
     }
 
-normalEvent:
     return widget::Main(msg);
-
-hoverEvent: {
-    i16 mx = static_cast<i16>(msg.payload.mouse.x);
-    heroWindow* window = m_owner;
-    mx -= static_cast<i16>(window->m_posX);
-    i16 my = static_cast<i16>(msg.payload.mouse.y) - window->m_posY;
-    if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
-        if (type == MESSAGE_RIGHT_BUTTON_DOWN) {
-            msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-            msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-        } else {
-            m_flags = flags | WIDGET_FLAG_SELECTED;
-            msg.payload.widget.command = WIDGET_COMMAND_SELECT;
-        }
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.id = m_id;
-        return MESSAGE_DISPATCH_FORWARD;
-    }
-    return MESSAGE_DISPATCH_CONTINUE;
-}
-
-leaveEvent:
-    if (HAS(flags, WIDGET_FLAG_SELECTED)) {
-        m_flags = flags & ~WIDGET_FLAG_SELECTED;
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-        msg.payload.widget.id = m_id;
-        return MESSAGE_DISPATCH_FORWARD;
-    }
-    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004cb570, 0xec)
