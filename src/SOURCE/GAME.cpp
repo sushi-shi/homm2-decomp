@@ -881,7 +881,7 @@ void ComputeUALoc(i32 playerIndex) {
             i32 heading = 0;
             i32 triesCount = 0;
             while (
-                !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
+                !(x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT
                   && gpGame->m_worldMap.GetCell(x, y)->m_triggerType == MAP_OBJECT_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
                   && gpGame->m_worldMap.GetCell(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE
@@ -949,7 +949,7 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 tries;
     i32 fallbackNum;
     i32 i;
-    for (i = 0; (&i)[0] < pieceCount; i++) {
+    for (i = 0; i < pieceCount; i++) {
         for (targetPiece = 0;
              targetPiece < PUZZLE_PIECE_COUNT;
              targetPiece += SRandom(1, PUZZLE_RANDOM_STEP_MAXIMUM)) {
@@ -1322,7 +1322,7 @@ void game::SetupOrigData(void) {
     i32 j;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         strcpy(m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE, "");
-        if (i < (&giNumHumanPlayers)[0]) {
+        if (i < giNumHumanPlayers) {
             if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 gbThisNetHumanPlayer[i] = 1;
             else
@@ -1517,7 +1517,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
 
     read(fd, isHuman, GAME_PLAYER_COUNT);
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
-        if (isHuman[ndx] && numHumans < (&giNumHumanPlayers)[0]) {
+        if (isHuman[ndx] && numHumans < giNumHumanPlayers) {
             numHumans++;
             gbHumanPlayer[ndx] = 1;
         } else {
@@ -1526,7 +1526,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     }
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
         if (gbHumanPlayer[ndx]) {
-            if (!gbRemoteOn || (&ndx)[0] == giThisGamePos)
+            if (!gbRemoteOn || ndx == giThisGamePos)
                 gbThisNetHumanPlayer[ndx] = 1;
             else
                 gbThisNetHumanPlayer[ndx] = 0;
@@ -1586,7 +1586,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
-    for (ndx = 1; (&ndx)[0] < iMaxMapExtra; ndx++) {
+    for (ndx = 1; ndx < iMaxMapExtra; ndx++) {
         read(fd, chunkTag, sizeof(i32));
         read(fd, pwSizeOfMapExtra + ndx, sizeof(pwSizeOfMapExtra[ndx]));
         ppMapExtra[ndx] = H2_ALLOC(pwSizeOfMapExtra[ndx]);
@@ -2845,7 +2845,7 @@ void game::RandomizeBarrier(mapCell* cell) {
     index &= PASSWORD_INDEX_MASK;
     i32 p = xPasswordStringsIndex[index];
     i32 color = (p << PASSWORD_COLOR_SHIFT) | index;
-    cell->m_objectMetadata = color | 0;
+    cell->m_objectMetadata = color;
 }
 
 VA(0x00453b85, 0x19)
@@ -2928,7 +2928,7 @@ i32 game::LoadMap(char* filename) {
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
-    for (i = 1; (&i)[0] < iMaxMapExtra; i++) {
+    for (i = 1; i < iMaxMapExtra; i++) {
         read(handle, pwSizeOfMapExtra + i, sizeof(pwSizeOfMapExtra[0]));
         ppMapExtra[i] = H2_ALLOC(pwSizeOfMapExtra[i]);
         read(handle, ppMapExtra[i], pwSizeOfMapExtra[i]);
@@ -4767,7 +4767,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
     value = (recruitCount << WEEKLY_RECRUIT_COUNT_SHIFT) | type;
-    cell->m_objectMetadata = value | 0;
+    cell->m_objectMetadata = value;
 }
 
 VA(0x00459ab8, 0x61)
@@ -5431,13 +5431,13 @@ void game::ProcessRandomObjects(void) {
                     switch (randomType8) {
                         case 0:
                         case 2:
-                            cell->m_objectMetadata = Random(8, 16) | 0;
+                            cell->m_objectMetadata = Random(8, 16);
                             break;
                         case 6:
-                            cell->m_objectMetadata = Random(5, 10) | 0;
+                            cell->m_objectMetadata = Random(5, 10);
                             break;
                         default:
-                            cell->m_objectMetadata = Random(3, 7) | 0;
+                            cell->m_objectMetadata = Random(3, 7);
                             break;
                     }
                     break;
