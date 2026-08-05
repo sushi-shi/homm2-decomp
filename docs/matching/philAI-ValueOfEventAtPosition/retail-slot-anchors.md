@@ -1,57 +1,100 @@
-# `philAI::ValueOfEventAtPosition` (RVA 0x0008911d) — residual evidence
+# `philAI::ValueOfEventAtPosition` (RVA 0x0008911d, 0x19b2) — closed EXACT
 
-Two structural divergences were closed in this pass:
+The function is byte-identical to retail. This is the record of what the bytes
+proved, kept because the frame table is the specification for the thirty locals
+and the operand-order census is reusable evidence.
+
+## What earlier passes had already closed
 
 1. **MAP_OBJECT_SKELETON arm** — retail assigns through an `if`/`else`, not a
    `?:`. The ternary's join temp cost a frame slot, a store-and-reload at the
-   join (`mov [tmp],edx; mov eax,[tmp]; mov [value],eax` where retail has
-   `mov [value],edx`), and — because the extra temp exhausted the
-   `eax/ecx/edx` rotation — a `push ebx`/`pop ebx` pair plus a one-register
-   shift through the rest of the function (visible as B166's ours-27i vs
-   retail-28i).
+   join, and a `push ebx`/`pop ebx` pair.
 2. **Player-bit test** — retail reads the map byte as the LEFT operand of the
-   `&` and keeps the pointer form:
-   `!(*(mapExtra + x + MAP_WIDTH * y) & giCurPlayerBit)`. Ours had
-   `!(giCurPlayerBit & mapExtra[MAP_WIDTH * y + x])`, which evaluates the
-   global bit first and folds the row product before the base.
+   `&` and keeps the pointer form (`MAP_EXTRA_AT_WFIRST(x, y) & giCurPlayerBit`).
 
-After both, `homm2 sema disasm 0x8911d --blocks --diff --lite` reports every
-code block flow-exact and size-exact (only the two trailing jump-table data
-"blocks" differ), the frame is `0xf8` on both sides, and the saved-register
-set is `esi` on both.
+## What this pass found
 
-## Remaining residual: named-local slot order
+Everything below was invisible to `homm2 sema disasm --diff` (which renders
+`-0xN(%ebp)` as `<addr>`) *and* to a raw `llvm-objdump -d` comparison (the
+opcodes and lengths agree). It only appears once each relocation is resolved to
+an absolute RVA — see `reloc-target-order-names-float-operands.md`.
 
-27 locals, all in one function-scope group, `this` at `-0xcc`. The /Od model
-in `scripts/homm2/core/od_slots.py` reproduces OUR frame exactly (verified
-name-for-name against `homm2 sema frames SOURCE/PHILAI ValueOfEventAtPosition`),
-so this is a solve, not a search.
+**Fifteen float products had their operands the wrong way round.** Retail's
+per-site orders:
 
-Anchors recovered from a 1:1 alignment of the two disassemblies
-(`build/scratch-m4/slotmap.py`, retail slot -> our local):
+| arm | retail spelling |
+| :-- | :-- |
+| `TREASURE_CHEST` | `AI_TREASURE_CHEST_GOLD_AMOUNT * gafAITurnCostResource[GOLD]` |
+| `CAMPFIRE` | `AI_CAMPFIRE_GOLD_AMOUNT * gafAITurnCostResource[GOLD]` FIRST, then the six-resource average; the sum runs WOOD, ORE, CRYSTAL, SULFUR, MERCURY, GEMS |
+| `GAZEBO`, `TREE_OF_KNOWLEDGE` 1/2/3, `FORT`, `WITCH_DOCTOR_HUT`, `STANDING_STONES`, `MERCENARY_CAMP`, `XANADU` | `gpCurAIHero->m_aiFightValue * AI_..._FACTOR` |
+| `TREE_OF_KNOWLEDGE` 2/3 costs | `AI_TREE_KNOWLEDGE_GOLD_COST * gafAITurnCostResource[GOLD]` (and the gem twin) |
+| `MAGIC_GARDEN`, `FLOTSAM` x2, `SEA_CHEST` x3 | `<amount> * gafAITurnCostResource[...]` |
+| `OASIS`, `BUOY`, `TEMPLE`, `FAERIE_RING`, `IDOL`, `FOUNTAIN`, `WATERING_HOLE` | already correct as `AI_..._FACTOR * m_aiFightValue` — the family is NOT uniform |
 
-| retail | local | retail | local |
-|---|---|---|---|
-| -0x4  | amount        | -0x64 | index |
-| -0x14 | battleValue   | -0x8c | exitX |
-| -0x18 | resource      | -0x90 | exitY |
-| -0x28 | creatureFlag  | -0x94 | exitValue |
-| -0x38 | purchaseValue | -0x98 | otherCell |
-| -0x40 | cell          | -0x9c | bestExitY (low confidence) |
-| -0x44 | value         | -0xa0 | bestExitX (low confidence) |
-| -0x4c | creature      | -0xa4 | bestExitValue |
-| -0x54 | purchaseCost  | -0xa8 | routeLiveChance (low confidence) |
-| -0x5c | battleWon     | -0xac | currentValue |
-|       |               | -0xc8 | resources |
+Six more structural facts:
 
-The unanchored six (`cellState`, `eventState`, `creaturePurchaseState[9]`,
-`resourceState[3]`, `rewardState[2]`, `combatState[4]`) fill the gaps; the
-36-byte `creaturePurchaseState` is pinned to `-0x88` by the only 0x24-wide
-gap (`[-0x88, -0x64)`), and the 12-byte `resourceState` to `-0x10` by the
-`[-0x10, -0x4)` gap. The three low-confidence rows above (1-2 aligned hits
-each) conflict with `routeLiveChance` being 16 bytes and must be re-derived
-before a bucket solve is attempted.
+- **`DAEMON_CAVE` grouping.** Retail is `A + (B + artifactValue) + (C + goldTerm)
+  + penalty`, i.e. each daemon-cave outcome is its own parenthesised sum. Ours
+  had one flat left-associated chain; the `faddp` positions name the grouping.
+- **`ABANDONED_MINE`.** `gMineCharacteristics[GOLD] * gafAITurnCostResource[GOLD]
+  * *(gaiTurnValueOfMine + x + y * MAP_WIDTH)` — the two per-resource factors
+  multiply first (`fildl`/`fmuls`), the map byte last (`fimull`), and the index
+  is the pointer form with the row product on the right.
+- **Travel-gate scan.** `for (gateY = 0; gateY < MAP_HEIGHT; gateY++)`, not
+  `MAP_HEIGHT > gateY`: retail loads the counter and `jge`s.
+- **The two equality guards** read the scanned cell first:
+  `exitCell->m_triggerType == theCell->m_triggerType`.
+- **`HILL_FORT` / `FREEMANS_FOUNDRY` addend order.** The pushed creature ids
+  give retail's order as ORC, OGRE, DWARF and IRON_GOLEM, PIKEMAN, SWORDSMAN.
+- **Final adjacent-monster read** is `MAP_EXTRA_AT(x, y)` (base + column first),
+  not the `MAP_WIDTH * y + x` subscript.
 
-The `_x` disambiguation suffixes a previous lane had introduced were removed
-in this pass (97.91% -> 97.83%, readable source); the score difference is
-noise between two equally-wrong permutations.
+## The frame
+
+Thirty function-scope locals, `this` at `-0xcc`, nothing between the deepest
+local and the spill — so this function has **no** front-end expression or
+inline-expansion slots and every one of the thirty is in the bucket sort.
+`routeLiveChance` is a scalar in retail, not an array: `lea -0xa8(%ebp)` is
+immediately followed by `bestExitValue` at `-0xa4`.
+
+Nine of the thirty are declared-but-unused (`dead-local-frame-gap`): three
+`i32[3]`, five `i32` and one `i32[9]`, filling 92 bytes of holes whose extents
+are pinned by the used slots either side.
+
+| retail | role | name | b | retail | role | name | b |
+| :-- | :-- | :-- | --: | :-- | :-- | :-- | --: |
+| -0x4 | resource amount | `amount` | 4 | -0x5c | battle-won flag | `bBattleWon` | 8 |
+| -0x10 | dead[3] | `purchaseState` | 4 | -0x60 | dead | `pyramidState` | 8 |
+| -0x14 | ChooseEvaluateBattle prize | `prize` | 6 | -0x64 | loop index | `i` | 9 |
+| -0x18 | ResourceType | `res` | 6 | -0x88 | dead[9] | `townState` | 9 |
+| -0x24 | dead[3] | `cellState` | 6 | -0x8c | scan column | `gateX` | 10 |
+| -0x28 | free-join flag | `freeFlag` | 6 | -0x90 | scan row | `gateY` | 11 |
+| -0x34 | dead[3] | `artifactState` | 6 | -0x94 | exit value | `exitRV` | 11 |
+| -0x38 | replacement slot | `armySlot` | 6 | -0x98 | scanned cell | `exitCell` | 11 |
+| -0x3c | dead | `oracleState` | 6 | -0x9c | best row | `chosenExitY` | 12 |
+| -0x40 | event cell | `theCell` | 6 | -0xa0 | best column | `chosenExitX` | 13 |
+| -0x44 | accumulator | `eventRV` | 8 | -0xa4 | best value | `bestRV` | 15 |
+| -0x48 | dead | `combatState` | 8 | -0xa8 | live-chance out | `exitLiveChance` | 15 |
+| -0x4c | creature to buy | `buyCreature` | 8 | -0xac | current position value | `positionValue` | 15 |
+| -0x50 | dead | `lampState` | 8 | -0xc8 | RVConversion vector[7] | `costList` | 15 |
+| -0x54 | purchase count | `numToBuy` | 8 | | | | |
+
+Buckets are non-decreasing down that list and declaration order is the reverse
+of the slot order **within each equal-bucket run**; across runs it is free, so
+the source groups them by purpose. The three roles that gave up their obvious
+name (`cell`, `value`, `creature`) could not keep it: `bucket(cell) = 14` and
+`bucket(value) = 1`, but retail needs `bucket(cell) <= bucket(value)`, and no
+spelling of `value` reaches 14 without stranding the fourteen roles below it.
+The names chosen instead come from the callees' own vocabulary — `numToBuy` and
+`armySlot` are `EvaluateOneTimeCreaturePurchase`'s purchase count and
+replacement army slot, `prize` is `ChooseEvaluateBattle`'s prize argument, and
+`eventRV`/`exitRV`/`bestRV` follow the file's own RV convention
+(`gaiHeroEventStratRVOfPos`, `gArtifactBaseRV`, `RVConversion`).
+
+## Reproduce
+
+```sh
+python3 build/scratch-m4/sxs.py SOURCE/PHILAI \
+    '?ValueOfEventAtPosition@philAI@@QAEHHHHPAH@Z' 0x19b2   # rows + resolved relocs
+python3 build/scratch-m4/layout_check.py                    # frame model vs retail
+```
