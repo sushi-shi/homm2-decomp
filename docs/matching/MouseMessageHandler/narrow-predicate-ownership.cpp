@@ -67,6 +67,23 @@ global-load ownership or an audited exact closure:
   build/mouse-message-seed-20260806-state-summary.json
   build/tu-state-noise/mouse-message-seed-20260806/
 
+Cross-version capture-result ownership, 2026-08-05:
+
+Gold/Buka declares `captureReleased` before the event object and assigns both
+ReleaseCapture results through it. A complete three-axis matrix independently
+tested that declaration and the two assigned-call sites against clean plus 50
+forest/top states. All 8 x 51 requested cells were processed; combinations
+that assigned the missing local failed as expected, while every valid paired
+structure/state combination compiled. The later local entered the known lower
+99.364410% clean orbit and sometimes rejoined 99.788140% under state probes,
+but never reproduced the historical 99.9576% load-order island or exact bytes:
+
+  build/mouse-message-cross-version-capture-owner-axes.json
+  build/mouse-message-cross-version-capture-owner-clean-manifest.json
+  build/source-variant-batch/mouse-message-cross-version-capture-owner-clean/results.json
+  build/mouse-message-cross-version-capture-owner-states-manifest.json
+  build/source-variant-batch/mouse-message-cross-version-capture-owner-states/results.json
+
 Disposition: reject the helper declarations and calls. They contribute no
 semantic or emitted structural distinction, so the reconstructed source stays
 direct. Preserve the durable hash-scoped MAX 99.9576; the runner's lower raw

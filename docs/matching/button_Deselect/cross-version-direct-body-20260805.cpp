@@ -26,6 +26,22 @@
  *
  *   build/button-deselect-seed-20260806-state-summary.json
  *   build/tu-state-noise/button-deselect-seed-20260806/
+ *
+ * Later-to-current subtraction also identified a surviving source-only
+ * distinction in the redraw tail: Gold/Buka spells both coordinate sums as
+ * owner-position plus widget-position, while PoL currently spells them in the
+ * opposite operand order. A complete four-arm matrix tested both paired
+ * spellings and each mixed coordinate against clean plus 50 forest/top states:
+ *
+ *   build/button-deselect-cross-version-coordinate-order-axes.json
+ *   build/button-deselect-cross-version-coordinate-order-manifest.json
+ *   build/source-variant-batch/button-deselect-cross-version-coordinate-order/results.json
+ *
+ * All 204/204 cells completed and were byte-identical at 99.777780%, size
+ * 131, exact 3/3 topology, and 4/4 ordered relocations. The coordinate operand
+ * order is therefore erased in this structural parent and cannot account for
+ * the two-byte scheduling residual. Disposition: retain the current spelling;
+ * do not expand state trials for this invariant axis.
  */
 
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(tag_message& msg) {
