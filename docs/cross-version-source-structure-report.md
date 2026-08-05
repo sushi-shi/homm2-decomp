@@ -10,7 +10,7 @@ appendix; it is not the matching priority.
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
   has 1,160/1,514 functions live exact and, after this investigation,
-  1,342/1,514 functions exact-max.
+  1,343/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -57,6 +57,10 @@ appendix; it is not the matching priority.
   the exact 39-block CFG, and all relocations; forest/top trial 1 changed its
   apparent 72.3836% live score into an audited byte-exact 100% island without
   any source edit.
+- A justified fresh-seed expansion also closed `sortIt`. Its prior best was
+  only three bytes from retail at 99.99363%; forest/top seed 20260805 trial 2
+  reached target-local exact bytes and all 68 relocations. Sibling changes in
+  that disposable state were deliberately non-gating.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must

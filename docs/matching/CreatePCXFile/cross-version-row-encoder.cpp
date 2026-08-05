@@ -37,6 +37,19 @@ Disposition: retain the exact cross-version row-encoder structure with scoped
 locals.  Preserve the 99.425674% unchanged-source island and 99.662160%
 alternate-order island as clue artifacts only.  No generated declarations or
 metric-only counter reorder is retained.
+
+Follow-up, 2026-08-05: accepted changes elsewhere in optimized Misc changed
+the ambient TU state, so the earlier trial-22 coordinate no longer reproduced.
+A fresh 50-state census found the same 99.425674% orbit at trial 13.  A complete
+second forest layer over that representative found no new target state and
+again peaked at 99.425674% (layer trial 42).  This closes the justified layered
+island expansion without changing source.
+
+Follow-up artifacts:
+  build/createpcxfile-current-state-summary.json
+  build/tu-state-noise/createpcxfile-current/
+  build/createpcxfile-layer2-state-summary.json
+  build/tu-state-noise/createpcxfile-layer2/
 */
 
 #if 0

@@ -50,4 +50,18 @@
  * Disposition: preserve the three-byte paired object as exact-local clue
  * evidence.  The source is restored, generated states are absent, and the
  * 99.993630% MAX remains unchanged.
+ *
+ * Follow-up, 2026-08-05: because the retained clue was only three raw bytes
+ * from retail, a fresh 50-trial expansion was justified.  Forest/top seed
+ * 20260805 reached 99.993630% at trial 1 and audited target-local exact closure
+ * at trial 2.  Focused replay proved retail size 1076, exact bytes, and the
+ * complete ordered 68/68 relocation stream for unchanged source hash
+ * 527cf020d7cf.  Sibling perturbations were diagnostic only and did not gate
+ * the target MAX.  The recorded hash-scoped MAX is now 100.000000%.
+ *
+ * Follow-up artifacts:
+ *   build/sortit-seed-20260805-state-summary.json
+ *   build/tu-state-noise/sortit-seed-20260805/
+ *   build/sortit-exact-replay-summary.json
+ *   build/tu-state-noise/sortit-exact-replay/
  */
