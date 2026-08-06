@@ -113,7 +113,7 @@ def main():
                    "/NOLOGO /MACHINE:IX86 /BASE:0x400000 "
                    "/SUBSYSTEM:WINDOWS,4.0 /STACK:66112,4096 "
                    "/HEAP:1048576,4096 /INCREMENTAL:NO /OPT:NOREF "
-                   "/DEBUG /PDB:build/link/HMM2PL.pdb "
+                   "/DEBUG /PDB:build/HMM2PL.pdb "
                    "/LIBPATH:build/toolchain/msvc/lib "
                    "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe "
                    "$link_args"))
