@@ -184,6 +184,14 @@ underlying types match `include/Ints.h` so both can appear in one TU (the retail
 
 **Header:** `vendor/wing-1.0/wing.h` (reconstructed).
 
+**Import library evidence:** the original Microsoft WinG 1.0 SDK library was inspected
+from `WING32.LI_` in `WING10.EXE` (installer SHA-1
+`f27081b91fabd8202ec48eb32e17c0a1dd3a0e84`; expanded library SHA-256
+`c71def88227f517ab6ede7bf2f3e0f06fc45d2758e38ca53dad9201e06f0aef1`).  It is not
+stored in this repository.  `imports/wing32.def` records all ten exports and their
+zero-based PE hints; `llvm-dlltool -k` generates the build library with decorated
+`__stdcall` caller symbols and undecorated DLL lookup names.
+
 **Version evidence.** WinG shipped in exactly one version. The period `WING32.dll`
 VS_VERSION resource reads `WinG Version 1.0`, `FILEVERSION 1.0.0.37`, copyright
 `Microsoft Corp. 1993-1994`.
@@ -214,6 +222,13 @@ The full documented API surface (incl. the non-imported `WinGGetDIBPointer`,
 This makes `#include <mss.h>`, `#include <smack.h>` and `#include <wing.h>` resolve like the
 original toolchain's SDK dirs. These are **headers only** — never build units, and not in
 `config/units.toml`. `smack.h`'s `#include "rad.h"` resolves within the same vendor dir.
+
+The proprietary SDK import libraries are not stored in the repository.  The complete
+named-export surfaces needed for the retail hints live in `imports/audiere.def` and
+`imports/mss32.def`.  The build generates C definitions for those exports, links a
+throwaway DLL with VC6 `LINK.EXE`, and retains only its generated `.lib` as a build
+product.  Thus the checked-in definition files are the durable inputs; the filler DLL,
+object, source, `.exp`, and `.lib` are all reproducible and disposable.
 
 **Verification.** A scratch TU including all three headers alongside `Ints.h` and
 `win/windows.h` compiles cleanly under the pinned MSVC (no typedef clashes, all signatures parse)

@@ -4,8 +4,9 @@
 ``LIB /DEF`` cannot represent an already-decorated DLL export faithfully: using
 the retail spelling adds an extra underscore to the public import symbol, while
 dropping that underscore changes the name stored in ``.idata$6``.  Compile real
-stub exports instead and keep the import library emitted by VC6 LINK.EXE.  The
-stub DLL, EXP, object, and generated C source are disposable build products.
+stub exports from reviewed module-definition files instead and keep the import
+library emitted by VC6 LINK.EXE.  The stub DLL, EXP, object, and generated C
+source are disposable build products.
 """
 
 from __future__ import annotations
@@ -46,6 +47,68 @@ def imported_names(exe: Path, dll: str) -> list[str]:
     return [row["name"] for row in entry["symbols"]]
 
 
+def export_names(path: Path, dll: str | None = None) -> list[str]:
+    """Read the complete named-export surface from a strict module definition."""
+    library = None
+    in_exports = False
+    names = []
+    for number, raw_line in enumerate(
+        path.read_text(encoding="ascii").splitlines(), start=1
+    ):
+        line = raw_line.split(";", 1)[0].strip()
+        if not line:
+            continue
+        keyword, _, value = line.partition(" ")
+        if keyword.upper() == "LIBRARY":
+            if library is not None or not value.strip():
+                raise ValueError(f"{path}:{number}: invalid LIBRARY directive")
+            library = value.strip()
+            continue
+        if keyword.upper() == "EXPORTS" and not value.strip():
+            in_exports = True
+            continue
+        if not in_exports:
+            raise ValueError(f"{path}:{number}: expected LIBRARY or EXPORTS")
+        if len(line.split()) != 1 or "=" in line:
+            raise ValueError(
+                f"{path}:{number}: only one literal export name is supported"
+            )
+        names.append(line)
+
+    if library is None:
+        raise ValueError(f"{path} has no LIBRARY directive")
+    if dll is not None and library.lower() != dll.lower():
+        raise ValueError(f"{path} defines {library}, expected {dll}")
+    if not in_exports or not names:
+        raise ValueError(f"{path} has no named EXPORTS")
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        raise ValueError(f"{path} contains duplicate exports: {duplicates}")
+    return names
+
+
+def validate_export_hints(exe: Path, dll: str, exports: list[str]) -> None:
+    """Prove that a complete export table reproduces retail's named hints."""
+    imports = read_imports(exe)
+    entry = next((row for row in imports if row["dll"].lower() == dll.lower()), None)
+    if entry is None:
+        raise ValueError(f"{dll} is absent from the retail import table")
+    indices = {name: index for index, name in enumerate(sorted(exports))}
+    mismatches = []
+    for row in entry["symbols"]:
+        if "name" not in row:
+            continue
+        actual = indices.get(row["name"])
+        if actual != row["hint"]:
+            mismatches.append((row["name"], row["hint"], actual))
+    if mismatches:
+        details = ", ".join(
+            f"{name}: retail {expected}, table {actual}"
+            for name, expected, actual in mismatches
+        )
+        raise ValueError(f"{dll} export table does not reproduce retail hints: {details}")
+
+
 def stub_source(dll: str, names: list[str]) -> str:
     """Generate C definitions whose VC6 export decoration equals retail."""
     lines = [
@@ -79,11 +142,23 @@ def _run(command: list[str], expected: Path, label: str) -> None:
         raise RuntimeError(f"{label} failed\n{tail}")
 
 
-def synthesize(exe: Path, dll: str, output: Path) -> Path:
+def synthesize(
+    exe: Path,
+    dll: str,
+    output: Path,
+    definition_path: Path | None = None,
+) -> Path:
     """Create ``output`` via VC6's linker-generated import library."""
     exe = exe.resolve()
     output = output.resolve()
-    names = imported_names(exe, dll)
+    imports = imported_names(exe, dll)
+    names = (
+        export_names(definition_path, dll)
+        if definition_path is not None
+        else imports
+    )
+    if definition_path is not None:
+        validate_export_hints(exe, dll, names)
     toolchain = msvc_dir()
     compiler = find_ci(toolchain / "bin", "cl.exe")
     linker = find_ci(toolchain / "bin", "link.exe")
@@ -133,7 +208,10 @@ def synthesize(exe: Path, dll: str, output: Path) -> Path:
             f"{dll} stub link",
         )
         output.write_bytes(implib.read_bytes())
-    print(f"[import-lib] {dll}: {len(names)} retail exports -> {output}")
+    print(
+        f"[import-lib] {dll}: {len(imports)} retail imports, "
+        f"{len(names)} stub exports -> {output}"
+    )
     return output
 
 
@@ -142,9 +220,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--exe", type=Path, default=RETAIL_EXE)
     parser.add_argument("--dll", required=True)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument(
+        "--definition",
+        type=Path,
+        help="reviewed complete module definition used to reproduce retail hints",
+    )
     args = parser.parse_args(argv)
     try:
-        synthesize(args.exe, args.dll, args.out)
+        synthesize(args.exe, args.dll, args.out, args.definition)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"[import-lib] ERROR: {error}", file=sys.stderr)
         return 1

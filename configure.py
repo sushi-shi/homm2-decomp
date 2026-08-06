@@ -94,8 +94,12 @@ def main():
                description="lib $out")
         w.rule("implib_stub",
                command=(f"{PY} -m homm2.build.import_lib --exe $in "
-                        "--dll $dll --out $out"),
+                        "--dll $dll --definition $definition --out $out"),
                description="stub-implib $dll")
+        w.rule("implib_killat",
+               command=("llvm-dlltool -m i386 -D $dll -d $in "
+                        "-l $out -k"),
+               description="killat-implib $dll")
         w.rule("archive",
                command='wine "$$MSVC_DIR/bin/LIB.EXE" @$out.rsp',
                rspfile="$out.rsp",
@@ -212,14 +216,25 @@ def main():
                     "scripts/homm2/build/import_lib.py",
                     "scripts/homm2/build/link_exe.py",
                     "scripts/homm2/build/cc_wrap.py",
+                    f"imports/{name}.def",
                 ],
-                variables={"dll": f"{name}.dll"},
+                variables={
+                    "dll": f"{name}.dll",
+                    "definition": f"imports/{name}.def",
+                },
             )
             import_outputs.append(output)
-        for name in ("smackw32", "wing32"):
-            output = f"build/link/{name}.lib"
-            w.build(output, "implib_def", inputs=f"imports/{name}.def")
-            import_outputs.append(output)
+        output = "build/link/smackw32.lib"
+        w.build(output, "implib_def", inputs="imports/smackw32.def")
+        import_outputs.append(output)
+        output = "build/link/wing32.lib"
+        w.build(
+            output,
+            "implib_killat",
+            inputs="imports/wing32.def",
+            variables={"dll": "WING32.dll"},
+        )
+        import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
                 inputs=["build/orig/HMM2PL.exe",
