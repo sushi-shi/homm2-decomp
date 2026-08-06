@@ -96,10 +96,10 @@ def main():
                command=(f"{PY} -m homm2.build.import_lib --exe $in "
                         "--dll $dll --definition $definition --out $out"),
                description="stub-implib $dll")
-        w.rule("implib_killat",
-               command=("llvm-dlltool -m i386 -D $dll -d $in "
-                        "-l $out -k"),
-               description="killat-implib $dll")
+        w.rule("legacy_implib",
+               command=(f"{PY} -m homm2.build.legacy_import_lib "
+                        "--definition $in --out $out"),
+               description="legacy-implib WING32.dll")
         w.rule("archive",
                command='wine "$$MSVC_DIR/bin/LIB.EXE" @$out.rsp',
                rspfile="$out.rsp",
@@ -230,9 +230,9 @@ def main():
         output = "build/link/wing32.lib"
         w.build(
             output,
-            "implib_killat",
+            "legacy_implib",
             inputs="imports/wing32.def",
-            variables={"dll": "WING32.dll"},
+            implicit="scripts/homm2/build/legacy_import_lib.py",
         )
         import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"

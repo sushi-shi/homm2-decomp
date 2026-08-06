@@ -189,8 +189,13 @@ from `WING32.LI_` in `WING10.EXE` (installer SHA-1
 `f27081b91fabd8202ec48eb32e17c0a1dd3a0e84`; expanded library SHA-256
 `c71def88227f517ab6ede7bf2f3e0f06fc45d2758e38ca53dad9201e06f0aef1`).  It is not
 stored in this repository.  `imports/wing32.def` records all ten exports and their
-zero-based PE hints; `llvm-dlltool -k` generates the build library with decorated
-`__stdcall` caller symbols and undecorated DLL lookup names.
+true one-based export ordinals.  `homm2.build.legacy_import_lib` derives the PE
+hints by sorting that complete export surface and generates the pre-VC6 regular
+COFF import members used by the final link.  Every generated archive member is
+named `wing32.def`, which is the legacy marker VC6 LINK uses for retail-compatible
+IAT ordering.  Four export members are not referenced by the game; retaining the
+full surface is still necessary to recover the used imports' hints and vendor
+declaration order.  No original SDK library is stored or consumed by the build.
 
 **Version evidence.** WinG shipped in exactly one version. The period `WING32.dll`
 VS_VERSION resource reads `WinG Version 1.0`, `FILEVERSION 1.0.0.37`, copyright
