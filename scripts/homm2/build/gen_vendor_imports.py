@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """Generate retail-ABI import libraries for the final link.
 
-The retail image imports the vendor middleware with old-style import members
-whose names LIB ``/DEF`` alone cannot express (WinG's decorated local thunk
-plus undecorated DLL lookup, and already-decorated exports).  The generator
-runs LIB ``/DEF`` and rewrites the emitted members' COFF symbol/string
-payloads to the exact retail ABI.  The rewriting half predates the VC6
-toolchain and fails cleanly until it is recalibrated - see
-generate_import_libraries.
+The retail image imports some APIs with combinations that LIB ``/DEF`` alone
+cannot express: a decorated caller symbol together with an undecorated DLL
+lookup, or an already-decorated DLL export.  The generator runs ordinary LIB
+``/DEF`` and rewrites its regular or short import member to the reviewed ABI.
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import re
 import shutil
 import struct
 import subprocess
@@ -313,8 +311,69 @@ def _patch_descriptor_dll_name(data: bytearray, dll: str) -> bool:
     raise ValueError(f"import descriptor for {dll!r} has no .idata$6 section")
 
 
+def _patch_short_import_member(
+    member: bytes, specs: tuple[ImportSpec, ...]
+) -> tuple[bytes, bool] | None:
+    """Patch a Microsoft short import object, or return ``None`` for COFF.
+
+    ``LIB /DEF`` prefixes an extra underscore when the DLL's real exported
+    name is already decorated.  A short import object can still express the
+    required ABI: its archive symbol is the caller spelling, while the
+    ``IMPORT_NAME_UNDECORATE`` mode derives the undecorated DLL lookup name.
+    """
+    if len(member) < 20:
+        return None
+    signature1, signature2 = struct.unpack_from("<HH", member, 0)
+    if (signature1, signature2) != (0, 0xFFFF):
+        return None
+
+    size_of_data = struct.unpack_from("<I", member, 12)[0]
+    if 20 + size_of_data > len(member):
+        raise ValueError("truncated short import object")
+    payload = member[20 : 20 + size_of_data]
+    first_end = payload.find(b"\0")
+    second_end = payload.find(b"\0", first_end + 1)
+    if first_end < 0 or second_end < 0:
+        raise ValueError("invalid short import object strings")
+    symbol = payload[:first_end].decode("ascii")
+    dll = payload[first_end + 1 : second_end].decode("ascii")
+
+    for spec in specs:
+        generated = "_" + spec.symbol
+        if symbol != generated:
+            continue
+        lookup = spec.lookup_name or spec.symbol
+        undecorated = re.sub(r"@\d+$", "", spec.symbol.lstrip("_"))
+        if lookup == spec.symbol:
+            name_type = 1  # IMPORT_NAME
+        elif lookup == undecorated:
+            name_type = 3  # IMPORT_NAME_UNDECORATE
+        else:
+            raise ValueError(
+                f"short import object cannot derive {lookup!r} from {spec.symbol!r}"
+            )
+
+        replacement = spec.symbol.encode("ascii") + b"\0"
+        replacement += dll.encode("ascii") + b"\0"
+        if len(replacement) > size_of_data:
+            raise ValueError("patched short import strings grew")
+        data = bytearray(member)
+        struct.pack_into("<I", data, 8, 0)
+        struct.pack_into("<I", data, 12, len(replacement))
+        struct.pack_into("<H", data, 16, spec.ordinal_or_hint)
+        type_info = struct.unpack_from("<H", data, 18)[0]
+        type_info = (type_info & ~0x1C) | (name_type << 2)
+        struct.pack_into("<H", data, 18, type_info)
+        data[20 : 20 + size_of_data] = replacement.ljust(size_of_data, b"\0")
+        return bytes(data), True
+    return member, False
+
+
 def patch_import_member(member: bytes, specs: tuple[ImportSpec, ...]) -> tuple[bytes, bool]:
     """Correct a generated import member; return (bytes, is_function_member)."""
+    short = _patch_short_import_member(member, specs)
+    if short is not None:
+        return short
     data = bytearray(member)
     names = {name for _, _, name in _coff_names(data)[0]}
     for spec in specs:
@@ -475,10 +534,60 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, ...]:
         return tuple(outputs)
 
 
+def generate_patched_import_library(
+    definition: Path, output: Path, spec: ImportSpec
+) -> Path:
+    """Generate one import library from ``definition`` and patch its ABI facts."""
+    if shutil.which("wine") is None or shutil.which("winepath") is None:
+        raise RuntimeError("wine/winepath not found; run inside `nix develop .#build`")
+    lib_exe = find_ci(msvc_dir() / "bin", "lib.exe")
+    if lib_exe is None:
+        raise RuntimeError("LIB.EXE not found; run inside `nix develop .#build`")
+    if not Path(os.environ.get("WINEPREFIX", "")).is_dir():
+        os.environ["WINEPREFIX"] = str(HOMM2_DIR / "build/wineprefix")
+    os.environ.setdefault("WINEDEBUG", "fixme-all,err-kerberos")
+    ensure_wineserver()
+
+    definition = definition.resolve()
+    output = output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="homm2-import-lib-") as temp_name:
+        raw = Path(temp_name) / output.name
+        _run_lib(
+            lib_exe,
+            ["/MACHINE:IX86", f"/DEF:{winepath_w(definition)}",
+             f"/OUT:{winepath_w(raw)}"],
+        )
+        output.write_bytes(patch_import_archive(raw.read_bytes(), (spec,)))
+    return output
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument("--out-dir", type=Path)
+    parser.add_argument("--definition", type=Path)
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--dll")
+    parser.add_argument("--symbol")
+    parser.add_argument("--lookup")
+    parser.add_argument("--hint", type=int)
     args = parser.parse_args()
+    single = (args.definition, args.out, args.dll, args.symbol, args.lookup, args.hint)
+    if any(value is not None for value in single):
+        if not all(value is not None for value in single):
+            parser.error(
+                "--definition, --out, --dll, --symbol, --lookup, and --hint "
+                "must be supplied together"
+            )
+        output = generate_patched_import_library(
+            args.definition,
+            args.out,
+            ImportSpec(args.dll, args.symbol, args.hint, lookup_name=args.lookup),
+        )
+        print(f"generated {output}: {args.symbol} -> {args.lookup}, hint {args.hint}")
+        return
+    if args.out_dir is None:
+        parser.error("--out-dir is required unless generating one patched library")
     outputs = generate_import_libraries(args.out_dir)
     print(
         f"generated {', '.join(str(path) for path in outputs)}: "

@@ -61,7 +61,8 @@ def main():
         w = ninja_syntax.Writer(f)
         link_libraries = [
             "KERNEL32.LIB", "USER32.LIB", "GDI32.LIB", "WSOCK32.LIB",
-            "build/link/wing32.lib", "NETAPI32.LIB", "build/link/mss32.lib",
+            "build/link/wing32.lib", "build/link/netapi32.lib",
+            "build/link/mss32.lib",
             "build/link/smackw32.lib", "WINMM.LIB", "ADVAPI32.LIB",
             "build/link/audiere.lib",
         ]
@@ -100,6 +101,11 @@ def main():
                command=(f"{PY} -m homm2.build.legacy_import_lib "
                         "--definition $in --out $out"),
                description="legacy-implib WING32.dll")
+        w.rule("patched_implib",
+               command=(f"{PY} -m homm2.build.gen_vendor_imports "
+                        "--definition $in --out $out --dll $dll "
+                        "--symbol $symbol --lookup $lookup --hint $hint"),
+               description="patched-implib $dll")
         w.rule("archive",
                command='wine "$$MSVC_DIR/bin/LIB.EXE" @$out.rsp',
                rspfile="$out.rsp",
@@ -226,6 +232,20 @@ def main():
             import_outputs.append(output)
         output = "build/link/smackw32.lib"
         w.build(output, "implib_def", inputs="imports/smackw32.def")
+        import_outputs.append(output)
+        output = "build/link/netapi32.lib"
+        w.build(
+            output,
+            "patched_implib",
+            inputs="imports/netapi32.def",
+            implicit="scripts/homm2/build/gen_vendor_imports.py",
+            variables={
+                "dll": "NETAPI32.dll",
+                "symbol": "_Netbios@4",
+                "lookup": "Netbios",
+                "hint": "180",
+            },
+        )
         import_outputs.append(output)
         output = "build/link/wing32.lib"
         w.build(

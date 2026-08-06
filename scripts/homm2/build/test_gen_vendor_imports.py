@@ -11,6 +11,8 @@ from homm2.build.gen_vendor_imports import (
     SMACK_IMPORTS,
     WING_IMPORTS,
     _patch_linker_names,
+    _patch_short_import_member,
+    ImportSpec,
     import_specs,
     parse_archive_members,
 )
@@ -85,6 +87,24 @@ class VendorImportTests(unittest.TestCase):
         self.assertEqual(patched_names,
                          ["_SmackOpen@12", "__IMPORT_DESCRIPTOR_smackw32",
                           "__imp__SmackOpen@12"])
+
+    def test_short_import_member_preserves_caller_and_undecorates_lookup(self):
+        payload = b"__Netbios@4\0NETAPI32.dll\0"
+        member = struct.pack(
+            "<HHHHIIHH", 0, 0xFFFF, 0, 0x14C, 1234, len(payload), 0, 8
+        ) + payload
+        patched, is_function = _patch_short_import_member(
+            member,
+            (ImportSpec("NETAPI32.dll", "_Netbios@4", 180,
+                        lookup_name="Netbios"),),
+        )
+        self.assertTrue(is_function)
+        self.assertEqual(struct.unpack_from("<I", patched, 8)[0], 0)
+        self.assertEqual(struct.unpack_from("<H", patched, 16)[0], 180)
+        self.assertEqual((struct.unpack_from("<H", patched, 18)[0] >> 2) & 7, 3)
+        size = struct.unpack_from("<I", patched, 12)[0]
+        self.assertEqual(patched[20 : 20 + size],
+                         b"_Netbios@4\0NETAPI32.dll\0")
 
 
 if __name__ == "__main__":
