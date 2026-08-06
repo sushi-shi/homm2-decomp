@@ -82,10 +82,14 @@ def main():
                         "--unit $unit --base $base --target $in --output $out "
                         "--symbols build/gen/symbol_names.csv"),
                description="normalize-relocs $unit")
-        w.rule("implib",
+        w.rule("implib_def",
                command=('wine "$$MSVC_DIR/bin/LIB.EXE" /NOLOGO /MACHINE:IX86 '
                         '/DEF:$in /OUT:$out'),
                description="lib $out")
+        w.rule("implib_stub",
+               command=(f"{PY} -m homm2.build.import_lib --exe $in "
+                        "--dll $dll --out $out"),
+               description="stub-implib $dll")
         w.rule("link_exe",
                command='wine "$$MSVC_DIR/bin/LINK.EXE" @build/link/HMM2PL.rsp',
                description="link HMM2PL.exe",
@@ -184,9 +188,23 @@ def main():
         w.build("all", "phony", inputs=comparison_inputs)
         w.build("base", "phony", inputs=objs)
         import_outputs = []
-        for name in ("audiere", "mss32", "smackw32", "wing32"):
+        for name in ("audiere", "mss32"):
             output = f"build/link/{name}.lib"
-            w.build(output, "implib", inputs=f"imports/{name}.def")
+            w.build(
+                output,
+                "implib_stub",
+                inputs="build/orig/HMM2PL.exe",
+                implicit=[
+                    "scripts/homm2/build/import_lib.py",
+                    "scripts/homm2/build/link_exe.py",
+                    "scripts/homm2/build/cc_wrap.py",
+                ],
+                variables={"dll": f"{name}.dll"},
+            )
+            import_outputs.append(output)
+        for name in ("smackw32", "wing32"):
+            output = f"build/link/{name}.lib"
+            w.build(output, "implib_def", inputs=f"imports/{name}.def")
             import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
