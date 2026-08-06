@@ -30,8 +30,8 @@ DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_CO
     0.05f,
     0.0f
 };
-audiere::OutputStreamPtr AudiereMusicState::stream;
-audiere::SampleSourcePtr AudiereMusicState::source;
+DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusicState::stream;
+DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusicState::source;
 DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
 
 VA(0x004cd260, 0x133)
