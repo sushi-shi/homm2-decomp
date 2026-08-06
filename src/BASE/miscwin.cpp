@@ -17,6 +17,9 @@ H2_ENUM_BEGIN(VesaBlitConstant)
     NET_BOX_TOP          = 411
 H2_ENUM_END(VesaBlitConstant)
 
+DATA(0x005201b8) static char gInvalidateRectFailedText[] = "InvalidateRect Failed";
+DATA(0x005201d0) static char gUpdateWindowFailedText[] = "UpdateWindow Failed";
+
 VA(0x004d4610, 0x1e6)
 extern "C" void __cdecl BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
@@ -73,9 +76,9 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
 
     if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
-        LogStr("InvalidateRect Failed");
+        LogStr(gInvalidateRectFailedText);
     if (UpdateWindow(hwndApp) == 0)
-        LogStr("UpdateWindow Failed");
+        LogStr(gUpdateWindowFailedText);
 }
 
 VA(0x004d4800, 0x8)

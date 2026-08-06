@@ -20,7 +20,11 @@ from pathlib import Path
 
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.annotated_vtables import source_vtables as annotated_source_vtables
-from homm2.build.data_manifest_adapter import SYMBOL_HEADER, validate_symbol_rows
+from homm2.build.data_manifest_adapter import (
+    DELINK_HEADER,
+    SYMBOL_HEADER,
+    validate_symbol_rows,
+)
 
 
 COFF_HEADER = struct.Struct("<HHIIIHH")
@@ -574,6 +578,31 @@ def _row_tuple(row: dict) -> tuple[str, ...]:
     return tuple(row[key] for key in SYMBOL_HEADER)
 
 
+def _load_delinker_manifest(
+        path: Path, label: str, diagnostics: list[dict]) -> list[dict]:
+    if not path.is_file():
+        diagnostics.append({
+            "kind": "missing-data-manifest", "manifest": label, "path": str(path),
+        })
+        return []
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines()
+             if line and not line.lstrip().startswith("#")]
+    reader = csv.DictReader(io.StringIO("\n".join(lines)), delimiter="\t")
+    if tuple(reader.fieldnames or ()) != DELINK_HEADER:
+        diagnostics.append({
+            "kind": "invalid-data-manifest-header", "manifest": label,
+            "expected": list(DELINK_HEADER), "actual": reader.fieldnames,
+        })
+        return []
+    return list(reader)
+
+
+def _delinker_row_tuple(row: dict) -> tuple[str, ...]:
+    return tuple(
+        "-" if key in ("section_ordinal", "section_offset") else row[key]
+        for key in DELINK_HEADER)
+
+
 def _unit_from_object(value: str) -> str:
     return value.replace("\\", "/").removesuffix(".c")
 
@@ -593,13 +622,14 @@ def load_homm2_provenance(root: Path) -> dict:
     source_path = root / "build" / "gen" / "delink_data_from_source.tsv"
     merged_path = root / "build" / "gen" / "delink_data_manifest.tsv"
     source_rows = _load_symbol_manifest(source_path, "source annotations", diagnostics)
-    merged_rows = _load_symbol_manifest(merged_path, "merged", diagnostics)
+    merged_rows = _load_delinker_manifest(
+        merged_path, "delinker placements", diagnostics)
 
-    expected_merged = Counter(map(_row_tuple, source_rows))
-    actual_merged = Counter(map(_row_tuple, merged_rows))
+    expected_merged = Counter(map(_delinker_row_tuple, source_rows))
+    actual_merged = Counter(map(_delinker_row_tuple, merged_rows))
     if actual_merged != expected_merged:
         diagnostics.append({
-            "kind": "merged-manifest-not-exact-union",
+            "kind": "delinker-manifest-not-source-projection",
             "missing": [list(row) for row in sorted((expected_merged - actual_merged).elements())],
             "extra": [list(row) for row in sorted((actual_merged - expected_merged).elements())],
         })
@@ -665,7 +695,7 @@ def load_homm2_provenance(root: Path) -> dict:
 
     anchors_by_unit: dict[str, dict[str, dict]] = {}
     external_by_name: dict[str, list[dict]] = {}
-    for row in merged_rows:
+    for row in source_rows:
         unit = _unit_from_object(row["object"])
         anchor = {
             "symbol": row["name"], "unit": unit, "rva": int(row["rva"], 0),

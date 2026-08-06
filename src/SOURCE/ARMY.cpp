@@ -38,7 +38,8 @@
 #define ARMY_RANGER_ATTACK_DURATION_SCALE 0.78
 #define ARMY_DURATION_BASE_SCALE 1.0
 #define ARMY_ATTACK_DURATION_SPEED_SCALE 0.08
-#define ARMY_WALK_DURATION_SPEED_SCALE 0.12
+#define ARMY_WALK_DURATION_SPEED_SCALE                                             \
+    DATA_COMPGEN(0x004ea528, armyWalkDurationSpeedScale, 0.12)
 
 namespace {
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from homm2.build.data_manifest_adapter import SYMBOL_HEADER
+from homm2.build.data_manifest_adapter import DELINK_HEADER
 from homm2.build.reviewed_data import (
     _expected_delink_objects,
     data_manifest_stub_bytes,
@@ -58,6 +58,7 @@ class Fixture:
         self.owner_extents = self._file("reloc_data_owners.tsv", b"# none\n")
         self.manifest = root / "gen/reviewed_delink_data.tsv"
         self.data_manifest = root / "gen/delink_data_manifest.tsv"
+        self.source_data_manifest = root / "gen/delink_data_from_source.tsv"
         self.target = root / "delink"
         self.stamp = self.target / ".reviewed-data-stamp.json"
         self.delinker = write_fake_delinker(root / "vostok-delinker")
@@ -82,6 +83,7 @@ class Fixture:
             mock.patch(f"{module}.OWNER_EXTENTS", self.owner_extents),
             mock.patch(f"{module}.MANIFEST", self.manifest),
             mock.patch(f"{module}.DATA_MANIFEST", self.data_manifest),
+            mock.patch(f"{module}.SOURCE_DATA_MANIFEST", self.source_data_manifest),
             mock.patch(f"{module}.TARGET", self.target),
             mock.patch(f"{module}.STAMP", self.stamp),
             mock.patch(f"{module}.load_definition_rvas", return_value={}),
@@ -91,6 +93,12 @@ class Fixture:
             # time; the fixture wants a hermetic, deterministic manifest.
             mock.patch(f"{module}.reviewed_manifest_bytes",
                        return_value=b"# fixture manifest\n"),
+            mock.patch(f"{module}.source_manifest_rows",
+                       return_value=([], [])),
+            mock.patch(f"{module}.render_source_manifest",
+                       return_value=b"# fixture source data\n"),
+            mock.patch(f"{module}.delinker_manifest_bytes",
+                       return_value=b"# fixture delinker data\n"),
         )
 
     def run(self, action, *args, **kwargs):
@@ -160,7 +168,7 @@ class ReviewedDataTest(unittest.TestCase):
 
     def test_data_manifest_stub_carries_the_adapter_header(self):
         lines = data_manifest_stub_bytes().decode().splitlines()
-        self.assertEqual(lines[-1], "\t".join(SYMBOL_HEADER))
+        self.assertEqual(lines[-1], "\t".join(DELINK_HEADER))
         self.assertTrue(all(line.startswith("#") for line in lines[:-1]))
 
     def test_expected_objects_derive_claimed_units_and_unmatched(self):
@@ -200,13 +208,15 @@ class ReviewedDataTest(unittest.TestCase):
             self.assertTrue((fixture.target / "(unmatched).c.obj").is_file())
             self.assertTrue(fixture.manifest.is_file())
             self.assertTrue(fixture.data_manifest.is_file())
+            self.assertTrue(fixture.source_data_manifest.is_file())
             stamp = json.loads(fixture.stamp.read_text())
             self.assertEqual(sorted(stamp), [
+                "data_adapter_sha256", "data_manifest_sha256",
                 "delinker_sha256", "exe_sha256", "generator_sha256",
                 "ledger_sha256", "manifest_sha256", "owner_definitions_sha256",
                 "owner_extents_sha256", "pdb_sha256", "reloc_aliases_sha256",
                 "reloc_manifest_sha256", "retail_functions_sha256",
-                "schema", "symbols_sha256"])
+                "schema", "source_data_manifest_sha256", "symbols_sha256"])
             self.assertFalse(
                 fixture.run(ensure_reviewed_targets, delinker=fixture.delinker))
 

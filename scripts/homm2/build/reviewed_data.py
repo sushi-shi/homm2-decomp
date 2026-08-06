@@ -18,7 +18,12 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from homm2.build.data_manifest_adapter import SYMBOL_HEADER
+from homm2.build.data_manifest_adapter import (
+    DELINK_HEADER,
+    delinker_manifest_bytes,
+    render_source_manifest,
+    source_manifest_rows,
+)
 from homm2.build.link_exe import (
     classify_pe_storage,
     load_required_initialized_storage,
@@ -41,8 +46,10 @@ RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
 RELOC_ALIASES = REPO / "config/delink_reloc_aliases.tsv"
 MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
+SOURCE_DATA_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
 TARGET = REPO / "build/delink"
 STAMP = TARGET / ".reviewed-data-stamp.json"
+DATA_ADAPTER = Path(__file__).with_name("data_manifest_adapter.py")
 
 
 def _digest(path):
@@ -135,7 +142,7 @@ def data_manifest_stub_bytes():
     """
     return ("# No reviewed data identities yet; rows appear when the data "
             "campaign binds DATA() markers to candidate COFF topology.\n"
-            + "\t".join(SYMBOL_HEADER) + "\n").encode("utf-8")
+            + "\t".join(DELINK_HEADER) + "\n").encode("utf-8")
 
 
 def _identity_inputs(delinker):
@@ -144,7 +151,7 @@ def _identity_inputs(delinker):
         "%s=0x%x" % (name, definitions.get(name, -1))
         for name in sorted(load_explicit_extents()))
     return {
-        "schema": 10,
+        "schema": 11,
         "exe_sha256": _digest(EXE),
         "pdb_sha256": _digest(PDB),
         "symbols_sha256": _digest(SYMBOLS),
@@ -156,14 +163,18 @@ def _identity_inputs(delinker):
         "owner_definitions_sha256": hashlib.sha256(
             owner_definitions.encode("utf-8")).hexdigest(),
         "manifest_sha256": hashlib.sha256(reviewed_manifest_bytes()).hexdigest(),
+        "source_data_manifest_sha256": _digest(SOURCE_DATA_MANIFEST),
+        "data_manifest_sha256": _digest(DATA_MANIFEST),
         "delinker_sha256": _digest(delinker),
         "generator_sha256": _digest(__file__),
+        "data_adapter_sha256": _digest(DATA_ADAPTER),
     }
 
 
 def _identity_input_files():
     return (EXE, PDB, SYMBOLS, RETAIL_FUNCTIONS, RELOC_MANIFEST, RELOC_ALIASES,
-            LEDGER, REPO / OWNER_EXTENTS)
+            LEDGER, REPO / OWNER_EXTENTS, SOURCE_DATA_MANIFEST, DATA_MANIFEST,
+            )
 
 
 def _resolve_delinker(delinker=None):
@@ -212,13 +223,21 @@ def _atomic_write(path, payload):
 
 def regenerate_targets(delinker=None, force=False):
     """Delink the retail image into target objects and replace them atomically."""
-    missing = [path for path in _identity_input_files() if not path.is_file()]
+    generation_inputs = (
+        EXE, PDB, SYMBOLS, RETAIL_FUNCTIONS, RELOC_MANIFEST, RELOC_ALIASES,
+        LEDGER, REPO / OWNER_EXTENTS,
+    )
+    missing = [path for path in generation_inputs if not path.is_file()]
     if missing:
         raise RuntimeError("delink regeneration requires %s" %
                            ", ".join(str(path) for path in missing))
     delinker = _resolve_delinker(delinker)
     _atomic_write(MANIFEST, reviewed_manifest_bytes())
-    _atomic_write(DATA_MANIFEST, data_manifest_stub_bytes())
+    source_rows, diagnostics = source_manifest_rows(strict=False)
+    _atomic_write(SOURCE_DATA_MANIFEST, render_source_manifest(source_rows))
+    _atomic_write(DATA_MANIFEST, delinker_manifest_bytes(source_rows))
+    for diagnostic in diagnostics:
+        print(f"[reviewed-data] OPEN {diagnostic}")
     identity = _identity_inputs(delinker)
     if not force:
         try:
@@ -238,6 +257,7 @@ def regenerate_targets(delinker=None, force=False):
         subprocess.run([
             str(delinker), "--pdb-path", str(PDB), "--exe-path", str(EXE),
             "--output-path", str(temporary), "--engine-path", "c:\\proj\\",
+            "--data-manifest", str(DATA_MANIFEST),
             "--reloc-manifest", str(RELOC_MANIFEST),
             "--reloc-alias-manifest", str(RELOC_ALIASES),
         ], cwd=REPO, check=True)

@@ -427,9 +427,23 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     indexToCastOn = NO_SELECTION;
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
-                        gpCombatManager->CombatMessage("Invalid Teleport Destination", 1, 0, 0);
+                        gpCombatManager->CombatMessage(
+                            /* Недопустимое место для телепортации */ DATA_COMPGEN(
+                                0x0051854c,
+                                castSpellInvalidTeleportDestination,
+                                "\xcd\xe5\xe4\xee\xef\xf3\xf1\xf2\xe8\xec\xee\xe5\x20\xec\xe5\xf1\xf2\xee\x20\xe4\xeb\xff\x20\xf2\xe5\xeb\xe5\xef\xee\xf0\xf2\xe0\xf6\xe8\xe8\x20"
+                            ),
+                            1, 0, 0
+                        );
                     } else {
-                        gpCombatManager->CombatMessage("Select Spell Target", 1, 0, 0);
+                        gpCombatManager->CombatMessage(
+                            /* Выберите цель для заклинания */ DATA_COMPGEN(
+                                0x00518574,
+                                castSpellSelectTargetPrompt,
+                                "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5\x20\xf6\xe5\xeb\xfc\x20\xe4\xeb\xff\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff"
+                            ),
+                            1, 0, 0
+                        );
                     }
                 } else {
                     indexToCastOn = hex;
@@ -454,7 +468,14 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.x = message.payload.mouse.screenX;
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
-                        gpCombatManager->CombatMessage("Select teleport destination.", 1, 0, 0);
+                        gpCombatManager->CombatMessage(
+                            /* Выберите место назначения телепортации. */ DATA_COMPGEN(
+                                0x00518594,
+                                castSpellSelectTeleportDestinationPrompt,
+                                "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5\x20\xec\xe5\xf1\xf2\xee\x20\xed\xe0\xe7\xed\xe0\xf7\xe5\xed\xe8\xff\x20\xf2\xe5\xeb\xe5\xef\xee\xf0\xf2\xe0\xf6\xe8\xe8\x2e"
+                            ),
+                            1, 0, 0
+                        );
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
@@ -642,11 +663,26 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            sprintf(gText, "Cast %s", gSpellNames[IDX(spell)]);
+            sprintf(
+                gText,
+                /* Направить '%s' */ DATA_COMPGEN(
+                    0x005185bc,
+                    spellMessageCastSpellFormat,
+                    "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\x27\x25\x73\x27"
+                ),
+                gSpellNames[IDX(spell)]
+            );
             break;
         case SPELL_TELEPORT:
             if (bInTeleportGetDest) {
-                sprintf(gText, "Teleport Here");
+                sprintf(
+                    gText,
+                    /* Перенестись сюда */ DATA_COMPGEN(
+                        0x005185cc,
+                        spellMessageTeleportHere,
+                        "\xcf\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc\x20\xf1\xfe\xe4\xe0"
+                    )
+                );
                 break;
             }
             goto occupied_target;
@@ -661,7 +697,17 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             target =
                 &m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex];
         format_target:
-            sprintf(gText, "Cast %s on %s", gSpellNames[IDX(spell)], (target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)] : gArmyNamesPlural[IDX(target->m_monsterType)]));
+            sprintf(
+                gText,
+                /* Направить '%s' на %s */ DATA_COMPGEN(
+                    0x005185e0,
+                    spellMessageCastOnTargetFormat,
+                    "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\x27\x25\x73\x27\x20\xed\xe0\x20\x25\x73"
+                ),
+                gSpellNames[IDX(spell)],
+                target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
+                                        : gArmyNamesPlural[IDX(target->m_monsterType)]
+            );
             break;
     }
 
@@ -934,7 +980,8 @@ void combatManager::CastSpell(
                 target3->m_monster.defense = SPELL_MINIMUM_DEFENSE;
             sprintf(
                 gText,
-                "The disrupting ray reduces defense by %d.",
+                DATA_COMPGEN(0x0051860c, disruptingRayDamageMessage,
+                    "\xd0\xe0\xe7\xf0\xf3\xf8\xe8\xf2\xe5\xeb\xfc\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xf3\xec\xe5\xed\xfc\xf8\xe0\xe5\xf2\x20\xe7\xe0\xf9\xe8\xf2\xf3\x20\xed\xe0\x20\x25\x64\x20\xe5\xe4\x2e"),
                 oldDefense - target3->m_monster.defense
             );
             CombatMessage(gText, 1, 1, 0);
@@ -959,7 +1006,8 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "The cold ray does %d\n damage to the %s.",
+                DATA_COMPGEN(0x0051863c, coldRayDamageMessage,
+                    "\xd5\xeb\xe0\xe4\xed\xfb\xe9\x20\xeb\xf3\xf7\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e"),
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                     ? gArmyNames[IDX(target3->m_monsterType)]
@@ -988,7 +1036,8 @@ void combatManager::CastSpell(
                 );
                 sprintf(
                     gText,
-                    "The magic arrow does %d\n damage to the %s.",
+                    DATA_COMPGEN(0x0051866c, magicArrowDamageMessage,
+                        "\xc2\xee\xeb\xf8\xe5\xe1\xed\xe0\xff\x20\xf1\xf2\xf0\xe5\xeb\xe0\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e"),
                     damage1,
                     target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                         ? gArmyNames[IDX(target3->m_monsterType)]
@@ -1033,7 +1082,8 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "The lightning bolt does %d\n damage to the %s.",
+                DATA_COMPGEN(0x005186ac, lightningBoltDamageMessage,
+                    "\xd0\xe0\xe7\xf0\xff\xe4\x20\xec\xee\xeb\xed\xe8\xe8\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x0a\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x20\xee\xf2\xf0\xff\xe4\xf3\x20\x25\x73\x2e"),
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                     ? gArmyNames[IDX(target3->m_monsterType)]
@@ -1578,7 +1628,12 @@ void combatManager::ElementalStorm(void) {
         }
     }
     if (hit) {
-        sprintf(gText, "The elemental storm does %d damage.", baseDam);
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x00518790, elementalStormDamageMessage,
+                "\xc1\xf3\xf0\xff\x20\xf1\xf2\xe8\xf5\xe8\xe9\x20\xed\xe0\xed\xee\xf1\xe8\xf2\x20\x25\x64\x20\xe5\xe4\x2e\x20\xf3\xf0\xee\xed\xe0\x2e"),
+            baseDam
+        );
         CombatMessage(gText, 1, 1, 0);
         stack->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -3836,15 +3891,20 @@ void combatManager::ShowSpellMessage(
         sprintf(targetName, gArmyNamesPlural[IDX(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, "The %s are paralyzed by the Cyclopes!", targetName);
+            sprintf(message, DATA_COMPGEN(0x0051894c, cyclopesParalyzeMessage,
+                "\x25\x73\x20\xef\xe0\xf0\xe0\xeb\xe8\xe7\xee\xe2\xe0\xed\xfb\x20\xf6\xe8\xea\xeb\xee\xef\xe0\xec\xe8\x21"), targetName);
         else if (spell == SPELL_BLIND)
-            sprintf(message, "The Unicorns' attack blinds the %s!", targetName);
+            sprintf(message, DATA_COMPGEN(0x00518968, unicornBlindMessage,
+                "\x25\x73\x20\xee\xf1\xeb\xe5\xef\xeb\xe5\xed\xfb\x20\xe0\xf2\xe0\xea\xee\xe9\x20\xe5\xe4\xe8\xed\xee\xf0\xee\xe3\xee\xe2\x21"), targetName);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message, "The Medusas' gaze turns the %s to stone!", targetName);
+            sprintf(message, DATA_COMPGEN(0x00518988, medusaPetrifyMessage,
+                "\x25\x73\x20\xee\xe1\xf0\xe0\xf9\xe5\xed\xfb\x20\xe2\xe7\xee\xf0\xee\xec\x20\xec\xe5\xe4\xf3\xe7\xfb\x20\xe2\x20\xea\xe0\xec\xe5\xed\xfc\x21"), targetName);
         else if (spell == SPELL_CURSE)
-            sprintf(message, "The Mummies' curse falls upon the %s!", targetName);
+            sprintf(message, DATA_COMPGEN(0x005189ac, mummyCurseMessage,
+                "\x25\x73\x20\xef\xf0\xee\xea\xeb\xff\xf2\xfb\x20\xec\xf3\xec\xe8\xff\xec\xe8\x21"), targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message, "The Archmages dispel all good spells\non your %s!", targetName);
+            sprintf(message, DATA_COMPGEN(0x005189c4, archmageDispelMessage,
+                "\x25\x73\x20\xeb\xe8\xf8\xe8\xeb\xe8\xf1\xfc\x20\xed\xe0\xeb\xee\xe6\xe5\xed\xed\xfb\xf5\x20\xed\xe0\x20\xed\xe8\xf5\x20\xf7\xe0\xf0\x0a\xe8\xe7\x2d\xe7\xe0\x20\xe0\xf0\xf5\xe8\xec\xe0\xe3\xee\xe2\x21"), targetName);
         else {
             unhandledSpell5 = 0;
             ++unhandledSpell5;
@@ -3854,25 +3914,29 @@ void combatManager::ShowSpellMessage(
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
                 sprintf(
                     message,
-                    "The captain casts '%s' on the %s.",
+                    DATA_COMPGEN(0x005189f8, captainCastsOnTargetMessage,
+                        "\xca\xe0\xef\xe8\xf2\xe0\xed\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\x0a\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27\x20\xed\xe0\x20\xee\xf2\xf0\xff\xe4\x20\x25\x73\x2e"),
                     gSpellNames[IDX(spell)],
                     targetName
                 );
             else
                 sprintf(
                     message,
-                    "%s casts '%s' on the %s.",
+                    DATA_COMPGEN(0x00518a2c, heroCastsOnTargetMessage,
+                        "\x25\x73\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\x27\x25\x73\x27\x20\xed\xe0\x20\x25\x73"),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)],
                     targetName
                 );
         } else {
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
-                sprintf(message, "The captain casts '%s'.", gSpellNames[IDX(spell)]);
+                sprintf(message, DATA_COMPGEN(0x00518a48, captainCastsMessage,
+                    "\xca\xe0\xef\xe8\xf2\xe0\xed\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27"), gSpellNames[IDX(spell)]);
             else
                 sprintf(
                     message,
-                    "%s casts '%s'.",
+                    DATA_COMPGEN(0x00518a6c, heroCastsMessage,
+                        "\x25\x73\x20\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xe5\xf2\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\x27\x25\x73\x27"),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)]
                 );

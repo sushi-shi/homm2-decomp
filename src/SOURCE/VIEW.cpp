@@ -144,11 +144,18 @@ i32 combatManager::ViewGeneral(
     generalWindow26->BroadcastMessage(message16);
 
     if (m_heroes[IDX(side)]->m_isCaptain != 0)
-        sprintf(gText, "Captain");
+        sprintf(
+            gText,
+            /* Капитан */ DATA_COMPGEN(
+                0x00519abc,
+                viewGeneralCaptainTitle,
+                "\xca\xe0\xef\xe8\xf2\xe0\xed"
+            )
+        );
     else
         sprintf(
             gText,
-            "%s the %s",
+            DATA_COMPGEN(0x00519ac4, viewGeneralHeroTitleFormat, "%s - %s"),
             m_heroes[IDX(side)]->m_name,
             gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
         );

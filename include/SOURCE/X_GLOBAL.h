@@ -84,7 +84,7 @@ H2_ENUM_BEGIN(GlobalConstant)
     X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT = 11,
     X_GLOBAL_EXPANSION_HERO_NAME_COUNT      = 6,
     X_GLOBAL_SHORT_SKILL_LEVEL_COUNT        = 3,
-    X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT       = 16,
+    X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT       = 12,
     X_GLOBAL_PASSWORD_STRING_INDEX_COUNT    = 8,
     X_GLOBAL_PLAYER_COUNT                   = 6,
     GLOBAL_MAP_NAME_SIZE                    = 0x14,
@@ -311,7 +311,6 @@ extern u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT];
 extern u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT];
 extern i32 giMainVideoModeWidth;
 extern i32 giMainVideoModeHeight;
-extern u32l glMilliCounter;
 extern u8 gMapColors[RADAR_MAP_COLOR_COUNT];
 extern u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT];
@@ -333,9 +332,6 @@ extern char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern char gcGamePath[GLOBAL_GAME_PATH_SIZE];
 extern char gcMapPath[GLOBAL_MAP_PATH_SIZE];
 extern char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE];
-extern b32 gbDontTryRedbook;
-extern b32 gbDontTryMIDI;
-extern b32 gbDontTryDigital;
 extern float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT];
 extern i32 giDialogTimeout;
 extern i32 giNewMonsterCycleFrame;
@@ -545,8 +541,6 @@ extern HighScoreType giHighScoreType;
 extern b32 gbShowHighScore;
 extern b32 gbLowMemory;
 extern void* gLowPage;
-extern b32 gbLowPageGrabbed;
-extern i8 xSmackFromNetwork;
 extern i32 bKBDone;
 extern struct _REDBOOK* hRedbookz;
 extern i32 bForceCheckTimeEvent;

@@ -22,11 +22,28 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     MSG message;
 
     hInstApp = instance;
-    gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
+    gEventHandle = CreateEventA(
+        NULL,
+        0,
+        0,
+        DATA_COMPGEN(0x00515804, winMainEventNameHeroesII, "\xc3\xe5\xf0\xee\xe8\x20\x49\x49")
+    ); /* "Герои II" */
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
-        sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
-        MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x00515828, winMainOnlyOneCopyFormat,
+                "\xd2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xed\xe0\x20\xea\xee\xef\xe8\xff\x20\x25\x73\x20\xec\xee\xe6\xe5\xf2\x20\xe1\xfb\xf2\xfc\x20\xe7\xe0\xef\xf3\xf9\xe5\xed\xe0\x20\xee\xe4\xed\xee\xe2\xf0\xe5\xec\xe5\xed\xed\xee"),
+            DATA_COMPGEN(0x00515810, winMainGameTitleHeroesOfMightAndMagicII,
+                "\xc3\xe5\xf0\xee\xe8\x20\xcc\xe5\xf7\xe0\x20\xe8\x20\xcc\xe0\xe3\xe8\xe8\x20\x49\x49")
+        ); /* "Только одна копия %s может быть запущена одновременно", "Герои Меча и Магии II" */
+        MessageBoxA(
+            NULL,
+            gText,
+            DATA_COMPGEN(0x00515860, winMainStartupErrorTitle,
+                "\xce\xf8\xe8\xe1\xea\xe0\x20\xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8"),
+            MB_ICONHAND
+        ); /* "Ошибка загрузки" */
         return 0;
     }
 
@@ -59,7 +76,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     WNDCLASSA appClass;
 
     LogInt(
-        "hInstApp",
+        DATA_COMPGEN(0x00515870, appInitLogNameHInstApp, "hInstApp"),
         reinterpret_cast<i32>(hInstApp),
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -95,7 +112,11 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
 
     if (previousInstance == NULL) {
         appClass.hCursor = NULL;
-        appClass.hIcon = LoadIconA(instance, "Heroes II");
+        appClass.hIcon = LoadIconA(
+            instance,
+            DATA_COMPGEN(0x0051587c, appInitIconNameHeroesII,
+                "\xc3\xe5\xf0\xee\xe8\x20\x49\x49")
+        ); /* "Герои II" */
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
         appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
@@ -135,7 +156,10 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
             hwndApp,
             WM_SETICON,
             ICON_SMALL,
-            reinterpret_cast<LPARAM>(LoadIconA(instance, "Heroes"))
+            reinterpret_cast<LPARAM>(LoadIconA(
+                instance,
+                DATA_COMPGEN(0x00515888, appInitSmallIconNameHeroes, "Heroes")
+            ))
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
@@ -252,7 +276,8 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (window == hwndApp) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
+                        DATA_COMPGEN(0x00515890, appWndProcConfirmExit,
+                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"),
                         NORMAL_DIALOG_CONFIRM,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -368,10 +393,22 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     switch (static_cast<KbWinMenuCommand>(command)) {
         case KBWIN_MENU_ABOUT:
             lpfnDlgProc = reinterpret_cast<DLGPROC>(AppAbout);
-            DialogBoxParamA(hInstApp, "HEROES", window, lpfnDlgProc, 0);
+            DialogBoxParamA(
+                hInstApp,
+                DATA_COMPGEN(0x005158b0, appCommandAboutDialogResource, "HEROES"),
+                window,
+                lpfnDlgProc,
+                0
+            );
             break;
         case KBWIN_MENU_HELP:
-            WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
+            WinHelpA(
+                hwndApp,
+                DATA_COMPGEN(0x005158b8, appCommandHelpFile,
+                    ".\\HELP\\HEROES2.HLP"),
+                HELP_FINDER,
+                0
+            );
             break;
         case KBWIN_MENU_SIZE_640_480:
             ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);

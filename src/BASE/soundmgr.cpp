@@ -81,10 +81,20 @@ bool soundManager::StartupMilesBackend(void) {
     if (waveOutGetDevCapsA(0, &gWaveOutCaps, sizeof(gWaveOutCaps)) != 0) {
         MessageBoxA(
             hwndApp,
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-            "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
-            "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee.",
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+            /* Ошибка инициализации звука!  Не найдено устройство. */
+            DATA_COMPGEN(
+                0x0051df7c,
+                soundStartupMissingDevice,
+                "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
+                "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
+                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee."
+            ),
+            /* Ошибка загрузки */
+            DATA_COMPGEN(
+                0x0051df6c,
+                soundStartupLoadError,
+                "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8"
+            ),
             0
         );
         m_digitalDriver = NULL;
@@ -107,8 +117,13 @@ bool soundManager::StartupMilesBackend(void) {
         MessageBoxA(
             hwndApp,
             AIL_last_error(),
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-            "\xe7\xe2\xf3\xea\xe0!",
+            /* Ошибка инициализации звука! */
+            DATA_COMPGEN(
+                0x0051dfb0,
+                soundStartupInitializationError,
+                "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
+                "\xe7\xe2\xf3\xea\xe0!"
+            ),
             0
         );
         m_digitalDriver = NULL;
@@ -131,7 +146,9 @@ bool soundManager::CDStartup(void) {
         return false;
 
     m_backend = SOUND_BACKEND_AUDIERE;
-    m_audiereDevice = audiere::OpenDevice("winmm");
+    m_audiereDevice = audiere::OpenDevice(
+        DATA_COMPGEN(0x0051dfcc, soundAudiereDeviceName, "winmm")
+    );
     if (m_audiereDevice != NULL)
         return StartupAudiereMusic(m_audiereDevice);
     return false;
@@ -267,7 +284,7 @@ i32 soundManager::Open(i32) {
     m_messageMask = BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP;
     m_priority = SOUND_MANAGER_PRIORITY;
     m_active = true;
-    strcpy(m_name, "soundManager");
+    strcpy(m_name, DATA_COMPGEN(0x0051dfd4, soundManagerName, "soundManager"));
     return 0;
 }
 
@@ -527,24 +544,6 @@ i32 soundManager::MusicPlaying(void) {
 
 
 
-
-char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT] = {
-    "",
-    "ultra.dig",
-    "sndsys.dig",
-    "sndscape.dig",
-    "jammer.dig",
-    "audiodrv.dig",
-    "proaudio.dig",
-    "rap10.dig",
-    "iwav.dig",
-    "nvdig.dig",
-    "sb16.dig",
-    "sbpro.dig",
-    "sblaster.dig",
-    NULL
-};
-DATA(0x00520188) SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {{0, 1, 0}, {1, 2, 1}, {2, 6, 2}, {6, 16, 6}};
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(soundManager, 0x004ea954)

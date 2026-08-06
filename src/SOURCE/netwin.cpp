@@ -27,8 +27,10 @@ DATA(0x0053093b) static u8 gNbShutdown = 0;
 DATA(0x00515c44) static u8 gNbMaxSess = NETBIOS_INVALID_ID;
 DATA(0x0053093c) static u8 gNbLocalNum = 0;
 DATA(0x00530940) static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
-DATA(0x00515c48) static char* gNbGroupName = "Empire Too ";
-DATA(0x00515c4c) static char* gNbListenName = "*";
+DATA(0x00515c48) static char* gNbGroupName =
+    DATA_COMPGEN(0x00515c50, nbGroupNameEmpireToo, "Empire Too ");
+DATA(0x00515c4c) static char* gNbListenName =
+    DATA_COMPGEN(0x00515c5c, nbListenNameWildcard, "*");
 
 
 DATA(0x00528650) static tag_Anchor gNbFreeQueueRuntime;
@@ -385,7 +387,7 @@ void nb_thr_ctl(void) {
                             case NETBIOS_RESULT_PENDING:
                                 ProcessAssert(
                                     0,
-                                    RETAIL_FILE,
+                                    DATA_COMPGEN(0x00515c60, nbSendThreadAssertFile, RETAIL_FILE),
                                     495
                                 );
                                 break;
@@ -430,7 +432,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(
         ncb == &gNbSessNcb[gNbMaxSess],
-        RETAIL_FILE,
+        DATA_COMPGEN(0x00515c94, nbAddNameDoneAssertFile, RETAIL_FILE),
         537
     );
     switch (ncb->returnCode) {
@@ -454,7 +456,11 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
         case NETBIOS_RESULT_CANCELLED:
             break;
         default:
-            sprintf(gText, "Add Name Error %02x\n", IDX(ncb->returnCode));
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x00515cc8, nbAddNameErrorFormat, "Add Name Error %02x\n"),
+                IDX(ncb->returnCode)
+            );
             ShutDown(gText);
             gNetStatus[gNbMaxSess] |= NETBIOS_SESSION_ERROR;
             break;
@@ -565,7 +571,7 @@ static void __fastcall nb_arm_recv(i32 session) {
     while (1) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
-            RETAIL_FILE,
+            DATA_COMPGEN(0x00515ce0, nbArmRecvAssertFile, RETAIL_FILE),
             715
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
@@ -651,4 +657,3 @@ static void __fastcall nb_format_name(char* src, u8* dst) {
     for (; i < NETBIOS_NAME_SIZE - 1; i++)
         dst[i] = ' ';
 }
-

@@ -16,7 +16,8 @@ diagnostics. Linker-sorted `.CRT$...` subsections are assigned only from an unam
 physical retail contribution of the same owner, domain, and size.
 
 Candidate discovery is not a canonical naming source. Counter spellings such as
-`$SG39045`, `$T40070`, and `name$S123` are compiler state, not semantic identities.
+`$SG39045`, `$T40070`, and `name$S123`, and value-derived floating-literal spellings
+such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities.
 The generated Vostok manifest comes only from source annotations:
 
 - `DATA(rva)` marks an ordinary named definition. Clang supplies its declaration name,
@@ -83,8 +84,13 @@ iterative work can continue. Strict assembly fails. It never guesses an identity
 
 `homm2 data-topology assemble` writes both
 `build/gen/delink_data_from_source.tsv` and
-`build/gen/delink_data_manifest.tsv`. They must be byte-for-byte equivalent row sets:
-there is no versioned private-data supplement and no second naming ledger. The section,
+`build/gen/delink_data_manifest.tsv`. The former retains semantic names and source
+provenance for comparison tooling; the latter is its Vostok eight-column projection.
+The pinned Vostok release cannot emit COMDAT topology, so its projection deliberately
+leaves section ordinal/offset unassigned while preserving object, RVA, logical size,
+storage, alignment, and scope. Exact candidate coordinates remain in the semantic
+manifest and are audited independently. There is no versioned private-data supplement
+and no second naming ledger. The section,
 breakpoint, contribution, and coverage manifests under `build/gen` retain the physical
 candidate model and retail placement evidence used by Vostok.
 

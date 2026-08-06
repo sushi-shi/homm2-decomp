@@ -32,7 +32,8 @@ i8 InitNetHost(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
+                ShutDown(DATA_COMPGEN(0x00515a9c, initNetHostNetbiosNotLoaded,
+                    "NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0."));
             else {
                 iInitNetHostStatus++;
                 gbRemoteOn = true;
@@ -50,14 +51,19 @@ i8 InitNetHost(void) {
                 return 1;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
-            sprintf(localName, "H2H%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
+            sprintf(
+                localName,
+                DATA_COMPGEN(0x00515ab4, initNetHostLocalNameFormat, "H2H%d"),
+                Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX)
+            );
             if (static_cast<NetbiosResult>(
                     static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
                 )
                 == NETBIOS_RESULT_SUCCESS)
                 iInitNetHostStatus++;
             else
-                ShutDown("\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
+                ShutDown(DATA_COMPGEN(0x00515abc, initNetHostNetworkInitError,
+                    "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8."));
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
@@ -79,7 +85,8 @@ i8 InitNetGuest(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
+                ShutDown(DATA_COMPGEN(0x00515ad8, initNetGuestNetbiosNotLoaded,
+                    "NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0."));
             else {
                 gbRemoteOn = true;
                 iInitNetGuestStatus++;
@@ -95,7 +102,11 @@ i8 InitNetGuest(void) {
                 iInitNetGuestStatus++;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
-            sprintf(localName, "H2G%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
+            sprintf(
+                localName,
+                DATA_COMPGEN(0x00515af0, initNetGuestLocalNameFormat, "H2G%d"),
+                Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX)
+            );
             if (static_cast<NetbiosResult>(
                     static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
                 )
@@ -125,7 +136,8 @@ i8 InitNetGuest(void) {
                     )
                 )
                 != NETBIOS_RESULT_SUCCESS) {
-                sprintf(gText, "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
+                sprintf(gText, DATA_COMPGEN(0x00515af8, initNetGuestNetworkInitError,
+                    "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8."));
                 ShutDown(gText);
             }
             return 1;
@@ -189,37 +201,49 @@ VA(0x00473bd6, 0x18c)
 i32 nbnet_init(void) {
     i32 unused;
 
-    LogStr("GUON1");
+    LogStr(DATA_COMPGEN(0x00515b14, nbnetInitLogGuon1, "GUON1"));
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
-            sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x00515b1c, nbnetInitHostInitializingNetwork,
+                "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
+                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
+                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
-            sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
-            LogStr("GUON2");
+            sprintf(gText, DATA_COMPGEN(0x00515b60, nbnetInitWaitingOnGuest,
+                "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
+                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
+                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."));
+            LogStr(DATA_COMPGEN(0x00515ba0, nbnetInitLogGuon2, "GUON2"));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
-            LogStr("GUON3");
+            LogStr(DATA_COMPGEN(0x00515ba8, nbnetInitLogGuon3, "GUON3"));
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
-            LogStr("GUON4");
+            LogStr(DATA_COMPGEN(0x00515bb0, nbnetInitLogGuon4, "GUON4"));
             break;
         case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
-            sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x00515bb8, nbnetInitGuestInitializingNetwork,
+                "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
+                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
+                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
-            sprintf(gText, "Waiting On Host.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x00515bfc, nbnetInitWaitingOnHost,
+                "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xf5\xee\xf1\xf2\xe0.\n\n  "
+                "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
+                "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             break;
     }
-    LogStr("GUON5");
+    LogStr(DATA_COMPGEN(0x00515c3c, nbnetInitLogGuon5, "GUON5"));
     return 0;
 }
 

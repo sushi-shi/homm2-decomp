@@ -382,7 +382,14 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, "File to Save:");
+        sprintf(
+            gText,
+            /* Сохранить файл: */ DATA_COMPGEN(
+                0x00516b38,
+                fileRequesterSaveFileLabel,
+                "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+            )
+        );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
@@ -409,7 +416,14 @@ i32 fileRequester::Open(i32 id) {
             }
         }
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, "File to Load:");
+        sprintf(
+            gText,
+            /* Загрузить файл: */ DATA_COMPGEN(
+                0x00516b48,
+                fileRequesterLoadFileLabel,
+                "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+            )
+        );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
@@ -427,7 +441,16 @@ i32 fileRequester::Open(i32 id) {
     if (m_fileCount == 0) {
         enabled = 0;
     }
-    if (m_mode == FILE_REQUESTER_SAVE_GAME && strcmpi(m_filename, "NEWGAME") == 0
+    if (m_mode == FILE_REQUESTER_SAVE_GAME
+        && strcmpi(
+               m_filename,
+               /* НОВАЯ ИГРА */ DATA_COMPGEN(
+                   0x00516b58,
+                   fileRequesterDefaultNewGameName,
+                   "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
+               )
+           )
+               == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
         enabled = 1;
     }

@@ -6,9 +6,11 @@ and are not stable identities. Comparing those names directly makes equivalent
 data and code relocations look different.
 
 `scripts/homm2/build/canonicalize_data_symbols.py` rewrites those names in
-disposable COFF copies under `build/objdiff/normalized/`. This anonymous-data
-pass processes each object independently and uses no source, manifest, retail
-RVA, or paired-object information. `objdiff.json` points at the normalized
+disposable COFF copies under `build/objdiff/normalized/`. The generic
+anonymous-data pass processes each object independently and uses no source,
+manifest, retail RVA, or paired-object information. Reviewed `DATA_COMPGEN`
+identities are a separate pass over the same disposable copy. `objdiff.json`
+points at the normalized
 copies. Compilation, linking, disassembly, and hard gates continue to use the
 original objects in `build/objdiff/base/` and `build/delink/`.
 
@@ -35,6 +37,15 @@ names; only the disposable comparison target receives the candidate spelling.
 Thus neither a compiler-private counter nor an alternate external alias is
 itself matching evidence: resolved identity, addend, payload, occurrence, and
 topology are the evidence.
+
+VC6 floating literals use external COMDAT names such as
+`__real@8@3ffeb333333333333000`. Once one physical owner is bound to a semantic
+`DATA_COMPGEN` identity, the normalizer derives the original `__real@...` name
+from that owner's reviewed section coordinate and applies the same identity to
+same-spelled COMDAT definitions and references in other objects. It validates
+each present definition against the IEEE payload encoded by the VC6 spelling
+and fails if one spelling is claimed by multiple semantic identities. This is
+linker-wide COMDAT identity propagation, not content-only pairing.
 
 The paired target also receives a local `$fnpad@<offset>` boundary symbol after
 each function whose delinked `.text` span runs past the reviewed retail size in

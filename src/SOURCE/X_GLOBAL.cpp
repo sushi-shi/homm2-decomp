@@ -4,214 +4,1043 @@
 
 
 DATA(0x0051b62c) char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
-    "{Original Campaign}\n\nEither Roland's or Archibald's campaign from the original Heroes of "
-    "Might and Magic II.",
-    "{Expansion Campaign}\n\nOne of the four new campaigns from the Price of Loyalty expansion "
-    "set.",
-    "{Cancel}\n\nCancel back to the main menu."
+    /* {Старая кампания}
+
+       Одна из двух кампаний за Роланда или Арчибальда из оригинальной игры Герои Меча и Магии II. */
+    DATA_COMPGEN(
+        0x0051bb80,
+        xSetupCampaignGameHelpOriginal,
+        "{\xd1\xf2\xe0\xf0\xe0\xff \xea\xe0\xec\xef\xe0\xed\xe8\xff}\n\n"
+        "\xce\xe4\xed\xe0 \xe8\xe7 \xe4\xe2\xf3\xf5 \xea\xe0\xec\xef\xe0\xed\xe8\xe9 \xe7\xe0 "
+        "\xd0\xee\xeb\xe0\xed\xe4\xe0 \xe8\xeb\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
+        "\xe8\xe7 \xee\xf0\xe8\xe3\xe8\xed\xe0\xeb\xfc\xed\xee\xe9 \xe8\xe3\xf0\xfb "
+        "\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II."
+    ),
+    /* {Новая кампания}
+
+       Одна из четырех кампаний Цены Верности. */
+    DATA_COMPGEN(
+        0x0051bbf0,
+        xSetupCampaignGameHelpExpansion,
+        "{\xcd\xee\xe2\xe0\xff \xea\xe0\xec\xef\xe0\xed\xe8\xff}\n\n"
+        "\xce\xe4\xed\xe0 \xe8\xe7 \xf7\xe5\xf2\xfb\xf0\xe5\xf5 \xea\xe0\xec\xef\xe0\xed\xe8\xe9 "
+        "\xd6\xe5\xed\xfb \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8."
+    ),
+    /* {Отменить}
+
+       Отменить и вернуться в главное меню. */
+    DATA_COMPGEN(
+        0x0051bc2c,
+        xSetupCampaignGameHelpCancel,
+        "{\xce\xf2\xec\xe5\xed\xe8\xf2\xfc}\n\n"
+        "\xce\xf2\xec\xe5\xed\xe8\xf2\xfc \xe8 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
+        "\xe3\xeb\xe0\xe2\xed\xee\xe5 \xec\xe5\xed\xfe."
+    )
 };
 DATA(0x0051b638) char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
-    "{Original Map}\n\nSelects a game from the original Heroes of Might and Magic II.",
-    "{Expansion Map}\n\nSelects a game from the Price of Loyalty expansion set.",
-    "{Cancel}\n\nCancel back to main menu."
+    /* {Старая карта}
+
+       Выбрать для игры карты старого формата Героев Меча и Магии II. */
+    DATA_COMPGEN(
+        0x0051bc60,
+        xSetupStandardGameHelpOriginal,
+        "{\xd1\xf2\xe0\xf0\xe0\xff \xea\xe0\xf0\xf2\xe0}\n\n"
+        "\xc2\xfb\xe1\xf0\xe0\xf2\xfc \xe4\xeb\xff \xe8\xe3\xf0\xfb \xea\xe0\xf0\xf2\xfb "
+        "\xf1\xf2\xe0\xf0\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 "
+        "\xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II."
+    ),
+    /* {Новая карта}
+
+       Выбрать для игры карты нового формата Цены Верности. */
+    DATA_COMPGEN(
+        0x0051bcb0,
+        xSetupStandardGameHelpExpansion,
+        "{\xcd\xee\xe2\xe0\xff \xea\xe0\xf0\xf2\xe0}\n\n"
+        "\xc2\xfb\xe1\xf0\xe0\xf2\xfc \xe4\xeb\xff \xe8\xe3\xf0\xfb \xea\xe0\xf0\xf2\xfb "
+        "\xed\xee\xe2\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xd6\xe5\xed\xfb "
+        "\xc2\xe5\xf0\xed\xee\xf1\xf2\xe8."
+    ),
+    /* {Отменить}
+
+       Отменить и вернуться в главное меню. */
+    DATA_COMPGEN(
+        0x0051bcf4,
+        xSetupStandardGameHelpCancel,
+        "{\xce\xf2\xec\xe5\xed\xe8\xf2\xfc}\n\n"
+        "\xce\xf2\xec\xe5\xed\xe8\xf2\xfc \xe8 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
+        "\xe3\xeb\xe0\xe2\xed\xee\xe5 \xec\xe5\xed\xfe."
+    )
 };
 DATA(0x0051b644) char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
-    "Elven alliance",
-    "Breastplate",
-    "Wood bonus",
-    "Helmet",
-    "Kraeger Defeated",
-    "Battle Garb",
-    "Wayward son",
-    "Uncle Ivan",
-    "Legendary Sceptre",
-    "Guardian Spell",
-    "Sphere of Negation"
+    /* Союз эльфов */ DATA_COMPGEN(
+        0x0051bd28,
+        xCampaignAwardElvenAlliance,
+        "\xd1\xee\xfe\xe7 \xfd\xeb\xfc\xf4\xee\xe2"
+    ),
+    /* Доспех */ DATA_COMPGEN(
+        0x0051bd34,
+        xCampaignAwardBreastplate,
+        "\xc4\xee\xf1\xef\xe5\xf5"
+    ),
+    /* Древесина */ DATA_COMPGEN(
+        0x0051bd3c,
+        xCampaignAwardWoodBonus,
+        "\xc4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xe0"
+    ),
+    /* Шлем */ DATA_COMPGEN(0x0051bd48, xCampaignAwardHelmet, "\xd8\xeb\xe5\xec"),
+    /* Поражение Крегера */ DATA_COMPGEN(
+        0x0051bd50,
+        xCampaignAwardKraegerDefeated,
+        "\xcf\xee\xf0\xe0\xe6\xe5\xed\xe8\xe5 \xca\xf0\xe5\xe3\xe5\xf0\xe0"
+    ),
+    /* Боевое одеяние */ DATA_COMPGEN(
+        0x0051bd64,
+        xCampaignAwardBattleGarb,
+        "\xc1\xee\xe5\xe2\xee\xe5 \xee\xe4\xe5\xff\xed\xe8\xe5"
+    ),
+    /* Своенравный сын */ DATA_COMPGEN(
+        0x0051bd74,
+        xCampaignAwardWaywardSon,
+        "\xd1\xe2\xee\xe5\xed\xf0\xe0\xe2\xed\xfb\xe9 \xf1\xfb\xed"
+    ),
+    /* Дядя Иван */ DATA_COMPGEN(
+        0x0051bd84,
+        xCampaignAwardUncleIvan,
+        "\xc4\xff\xe4\xff \xc8\xe2\xe0\xed"
+    ),
+    /* Легендарный скипетр */ DATA_COMPGEN(
+        0x0051bd90,
+        xCampaignAwardLegendarySceptre,
+        "\xcb\xe5\xe3\xe5\xed\xe4\xe0\xf0\xed\xfb\xe9 \xf1\xea\xe8\xef\xe5\xf2\xf0"
+    ),
+    /* Ангел-хранитель */ DATA_COMPGEN(
+        0x0051bda4,
+        xCampaignAwardGuardianSpell,
+        "\xc0\xed\xe3\xe5\xeb-\xf5\xf0\xe0\xed\xe8\xf2\xe5\xeb\xfc"
+    ),
+    /* Сфера антимагии */ DATA_COMPGEN(
+        0x0051bdb4,
+        xCampaignAwardSphereOfNegation,
+        "\xd1\xf4\xe5\xf0\xe0 \xe0\xed\xf2\xe8\xec\xe0\xe3\xe8\xe8"
+    )
 };
 DATA(0x0051b670) char*
     xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
-        {"Uprising",
-         "Island of Chaos",
-         "Arrow's Flight",
-         "The Abyss",
-         "The Giant's Pass",
-         "Aurora Borealis",
-         "Betrayal's End",
-         "Corruption's Heart"},
-        {"Conquer and Unify",
-         "Border Towns",
-         "The Wayward Son",
-         "Crazy Uncle Ivan",
-         "The Southern War",
-         "Ivory Gates",
-         "The Elven Lands",
-         "The Epic Battle"},
-        {"The Shrouded Isles",
-         "The Eternal Scrolls",
-         "Power's End",
-         "Fount of Wizardry",
-         "",
-         "",
-         "",
-         ""},
-        {"Stranded", "Pirate Isles", "King and Country", "Blood is Thicker", "", "", "", ""}
+        {/* Мятеж */ DATA_COMPGEN(0x0051bdc4, xScenarioNamePol0, "\xcc\xff\xf2\xe5\xe6"),
+         /* Земля Хаоса */ DATA_COMPGEN(
+             0x0051bdcc,
+             xScenarioNamePol1,
+             "\xc7\xe5\xec\xeb\xff \xd5\xe0\xee\xf1\xe0"
+         ),
+         /* Полет стрелы */ DATA_COMPGEN(
+             0x0051bdd8,
+             xScenarioNamePol2,
+             "\xcf\xee\xeb\xe5\xf2 \xf1\xf2\xf0\xe5\xeb\xfb"
+         ),
+         /* Бездна */ DATA_COMPGEN(0x0051bde8, xScenarioNamePol3, "\xc1\xe5\xe7\xe4\xed\xe0"),
+         /* Ущелье гиганта */ DATA_COMPGEN(
+             0x0051bdf0,
+             xScenarioNamePol4,
+             "\xd3\xf9\xe5\xeb\xfc\xe5 \xe3\xe8\xe3\xe0\xed\xf2\xe0"
+         ),
+         /* Аврора */ DATA_COMPGEN(0x0051be00, xScenarioNamePol5, "\xc0\xe2\xf0\xee\xf0\xe0"),
+         /* Смерть предателя */ DATA_COMPGEN(
+             0x0051be08,
+             xScenarioNamePol6,
+             "\xd1\xec\xe5\xf0\xf2\xfc \xef\xf0\xe5\xe4\xe0\xf2\xe5\xeb\xff"
+         ),
+         /* Сердце порчи */ DATA_COMPGEN(
+             0x0051be1c,
+             xScenarioNamePol7,
+             "\xd1\xe5\xf0\xe4\xf6\xe5 \xef\xee\xf0\xf7\xe8"
+         )},
+        {/* Завоевание */ DATA_COMPGEN(
+             0x0051be2c,
+             xScenarioNameDescendants0,
+             "\xc7\xe0\xe2\xee\xe5\xe2\xe0\xed\xe8\xe5"
+         ),
+         /* Граничные города */ DATA_COMPGEN(
+             0x0051be38,
+             xScenarioNameDescendants1,
+             "\xc3\xf0\xe0\xed\xe8\xf7\xed\xfb\xe5 \xe3\xee\xf0\xee\xe4\xe0"
+         ),
+         /* Своенравный сын */ DATA_COMPGEN(
+             0x0051be4c,
+             xScenarioNameDescendants2,
+             "\xd1\xe2\xee\xe5\xed\xf0\xe0\xe2\xed\xfb\xe9 \xf1\xfb\xed"
+         ),
+         /* Чокнутый дядя Иван */ DATA_COMPGEN(
+             0x0051be5c,
+             xScenarioNameDescendants3,
+             "\xd7\xee\xea\xed\xf3\xf2\xfb\xe9 \xe4\xff\xe4\xff \xc8\xe2\xe0\xed"
+         ),
+         /* Южная война */ DATA_COMPGEN(
+             0x0051be70,
+             xScenarioNameDescendants4,
+             "\xde\xe6\xed\xe0\xff \xe2\xee\xe9\xed\xe0"
+         ),
+         /* Бивень */ DATA_COMPGEN(
+             0x0051be7c,
+             xScenarioNameDescendants5,
+             "\xc1\xe8\xe2\xe5\xed\xfc"
+         ),
+         /* Земли эльфов */ DATA_COMPGEN(
+             0x0051be84,
+             xScenarioNameDescendants6,
+             "\xc7\xe5\xec\xeb\xe8 \xfd\xeb\xfc\xf4\xee\xe2"
+         ),
+         /* Эпическая битва */ DATA_COMPGEN(
+             0x0051be94,
+             xScenarioNameDescendants7,
+             "\xdd\xef\xe8\xf7\xe5\xf1\xea\xe0\xff \xe1\xe8\xf2\xe2\xe0"
+         )},
+        {/* Тайные острова */ DATA_COMPGEN(
+             0x0051bea4,
+             xScenarioNameWizard0,
+             "\xd2\xe0\xe9\xed\xfb\xe5 \xee\xf1\xf2\xf0\xee\xe2\xe0"
+         ),
+         /* Свитки вечности */ DATA_COMPGEN(
+             0x0051beb4,
+             xScenarioNameWizard1,
+             "\xd1\xe2\xe8\xf2\xea\xe8 \xe2\xe5\xf7\xed\xee\xf1\xf2\xe8"
+         ),
+         /* Нет власти */ DATA_COMPGEN(
+             0x0051bec4,
+             xScenarioNameWizard2,
+             "\xcd\xe5\xf2 \xe2\xeb\xe0\xf1\xf2\xe8"
+         ),
+         /* Источник Силы */ DATA_COMPGEN(
+             0x0051bed0,
+             xScenarioNameWizard3,
+             "\xc8\xf1\xf2\xee\xf7\xed\xe8\xea \xd1\xe8\xeb\xfb"
+         ),
+         DATA_COMPGEN(0x00534864, xScenarioNameWizardUnused4, ""),
+         DATA_COMPGEN(0x00534868, xScenarioNameWizardUnused5, ""),
+         DATA_COMPGEN(0x0053486c, xScenarioNameWizardUnused6, ""),
+         DATA_COMPGEN(0x00534870, xScenarioNameWizardUnused7, "")},
+        {/* На мели */ DATA_COMPGEN(
+             0x0051bee0,
+             xScenarioNameVoyage0,
+             "\xcd\xe0 \xec\xe5\xeb\xe8"
+         ),
+         /* Острова пиратов */ DATA_COMPGEN(
+             0x0051bee8,
+             xScenarioNameVoyage1,
+             "\xce\xf1\xf2\xf0\xee\xe2\xe0 \xef\xe8\xf0\xe0\xf2\xee\xe2"
+         ),
+         /* Король и страна */ DATA_COMPGEN(
+             0x0051bef8,
+             xScenarioNameVoyage2,
+             "\xca\xee\xf0\xee\xeb\xfc \xe8 \xf1\xf2\xf0\xe0\xed\xe0"
+         ),
+         /* Густая кровь */ DATA_COMPGEN(
+             0x0051bf08,
+             xScenarioNameVoyage3,
+             "\xc3\xf3\xf1\xf2\xe0\xff \xea\xf0\xee\xe2\xfc"
+         ),
+         DATA_COMPGEN(0x00534874, xScenarioNameVoyageUnused4, ""),
+         DATA_COMPGEN(0x00534878, xScenarioNameVoyageUnused5, ""),
+         DATA_COMPGEN(0x0053487c, xScenarioNameVoyageUnused6, ""),
+         DATA_COMPGEN(0x00534880, xScenarioNameVoyageUnused7, "")}
 };
 DATA(0x0051b6f0) char*
     xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
-        {{"Subdue the unruly local lords in order to provide the Empire with facilities to operate "
-          "in this region.",
-          "Eliminate all oposition in this area. Then the first piece of the artifact will be "
-          "yours.",
-          "The sorceresses to the northeast are rebelling! For the good of the empire you must "
-          "quash their feeble uprising on your way to the mountains.",
-          "Having prepared for your arrival, Kraeger has arranged for a force of necromancers to "
-          "thwart your quest. You must capture the castle of Scabsdale before the first day of the "
-          "third week, or the Necromancers will be too strong for you.",
-          "The barbarian despot in this area is, as yet, ignorant of your presence. Quickly, build "
-          "up your forces before you are discovered and attacked! Secure the region by subduing "
-          "all enemy forces.",
-          "The Empire is weak in this region. You will be unable to completely subdue all forces "
-          "in this area, so take what you can before reprisal strikes. Remember, your true goal is "
-          "to claim the Helmet of Anduran.",
-          "For the good of the Empire, eliminate Kraeger.",
-          "At last, you have the opportunity and the facilities to rid the Empire of the "
-          "necromancer's evil. Eradicate them completely, and you will be sung as a hero for all "
-          "time."},
-         {"Conquer and unite all the enemy tribes. Don't lose the hero Jarkonas, the forefather of "
-          "all descendants.",
-          "Your rival, the kingdom of Harondale, is attacking weak towns on your border! Recover "
-          "from their first strike and crush them completely!",
-          "Find your wayward son Joseph who is rumored to be living in the desolate lands. Do it "
-          "before the first day of the third month or it will be of no help to your family.",
-          "Rescue your crazy uncle Ivan. Find him before the first day of the fourth month or it "
-          "will be no help to your kingdom.",
-          "Destroy the barbarians who are attacking the southern border of your kingdom! Recover "
-          "your fallen towns, and then invade the jungle kingdom. Leave no enemy standing.",
-          "Retake the castle of Ivory Gates, which has fallen due to treachery.",
-          "Gain the favor of the elves. They will not allow trees to be chopped down, so we will "
-          "send you wood every 2 weeks. You must complete your mission before the first day of the "
-          "seventh month, or the kingdom will surely fall.",
-          "This is the final battle against your rival kingdom of Harondale. Eliminate everyone, "
-          "and don't lose the hero Jarkonas VI."},
-         {"Your mission is to vanquish the warring mages in the magical Shrouded Isles. The "
-          "completion of this task will give you a fighting chance against your rivals.",
-          "The location of the great library has been discovered! You must make your way to it, "
-          "and reclaim the city of Chronos in which it lies.",
-          "Find the Orb of negation, which is said to be buried in this land. There are clues "
-          "inscribed on stone obelisks which will help lead you to your prize. Find the Orb before "
-          "the first day of the sixth month, or your rivals will surely have gotten to the fount "
-          "before you.",
-          "You must take control of the castle of Magic, where the fount of wizardry lies. Do this "
-          "and your victory will be supreme.",
-          "",
-          "",
-          "",
-          ""},
-         {"Capture the town on the island off the southeast shore in order to construct a boat and "
-          "travel back towards the mainland. Do not lose the hero Gallavant.",
-          "Find and defeat Martine, the pirate leader, who resides in Pirates Cove. Do not lose "
-          "Gallavant or your quest will be over.",
-          "Eliminate all the other forces who oppose the rule of Lord Alberon. Gallavant must not "
-          "die.",
-          "Overthrow the entrenched monarchy of Lord Alberon, and claim all the land in your name. "
-          "Gallavant must not die.",
-          "",
-          "",
-          "",
-          ""}};
-DATA(0x0051b770) char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] =
-    {"POL", "DES", "WIZ", "VOY"};
-DATA(0x0051b780) char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] =
-    {"Price of Loyalty", "Descendants", "Wizard's Isle", "Voyage Home"};
+        {
+            {
+                /* Усмирите непокорных местных баронов и тем самым создайте плацдарм, с которого Империя начнет экспансию в этом регионе. */ DATA_COMPGEN(
+                    0x0051bf18,
+                    xScenarioDescriptionPol0,
+                    "\xd3\xf1\xec\xe8\xf0\xe8\xf2\xe5\x20\xed\xe5\xef\xee\xea\xee\xf0\xed\xfb\xf5\x20\xec\xe5\xf1\xf2"
+                    "\xed\xfb\xf5\x20\xe1\xe0\xf0\xee\xed\xee\xe2\x20\xe8\x20\xf2\xe5\xec\x20\xf1\xe0\xec\xfb\xec\x20"
+                    "\xf1\xee\xe7\xe4\xe0\xe9\xf2\xe5\x20\xef\xeb\xe0\xf6\xe4\xe0\xf0\xec\x2c\x20\xf1\x20\xea\xee\xf2"
+                    "\xee\xf0\xee\xe3\xee\x20\xc8\xec\xef\xe5\xf0\xe8\xff\x20\xed\xe0\xf7\xed\xe5\xf2\x20\xfd\xea\xf1"
+                    "\xef\xe0\xed\xf1\xe8\xfe\x20\xe2\x20\xfd\xf2\xee\xec\x20\xf0\xe5\xe3\xe8\xee\xed\xe5\x2e"
+                ),
+                /* Подавите любое сопротивление в окрестных землях. Только после этого первая часть артефакта станет вашей. */ DATA_COMPGEN(
+                    0x0051bf90,
+                    xScenarioDescriptionPol1,
+                    "\xcf\xee\xe4\xe0\xe2\xe8\xf2\xe5\x20\xeb\xfe\xe1\xee\xe5\x20\xf1\xee\xef\xf0\xee\xf2\xe8\xe2\xeb"
+                    "\xe5\xed\xe8\xe5\x20\xe2\x20\xee\xea\xf0\xe5\xf1\xf2\xed\xfb\xf5\x20\xe7\xe5\xec\xeb\xff\xf5\x2e"
+                    "\x20\xd2\xee\xeb\xfc\xea\xee\x20\xef\xee\xf1\xeb\xe5\x20\xfd\xf2\xee\xe3\xee\x20\xef\xe5\xf0\xe2"
+                    "\xe0\xff\x20\xf7\xe0\xf1\xf2\xfc\x20\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0\x20\xf1\xf2\xe0\xed\xe5"
+                    "\xf2\x20\xe2\xe0\xf8\xe5\xe9\x2e"
+                ),
+                /* Волшебницы подняли восстание на северо-востоке! По дороге в горы вы должны для блага Империи подавить их жалкий бунт. */ DATA_COMPGEN(
+                    0x0051bffc,
+                    xScenarioDescriptionPol2,
+                    "\xc2\xee\xeb\xf8\xe5\xe1\xed\xe8\xf6\xfb\x20\xef\xee\xe4\xed\xff\xeb\xe8\x20\xe2\xee\xf1\xf1\xf2"
+                    "\xe0\xed\xe8\xe5\x20\xed\xe0\x20\xf1\xe5\xe2\xe5\xf0\xee\x2d\xe2\xee\xf1\xf2\xee\xea\xe5\x21\x20"
+                    "\xcf\xee\x20\xe4\xee\xf0\xee\xe3\xe5\x20\xe2\x20\xe3\xee\xf0\xfb\x20\xe2\xfb\x20\xe4\xee\xeb\xe6"
+                    "\xed\xfb\x20\xe4\xeb\xff\x20\xe1\xeb\xe0\xe3\xe0\x20\xc8\xec\xef\xe5\xf0\xe8\xe8\x20\xef\xee\xe4"
+                    "\xe0\xe2\xe8\xf2\xfc\x20\xe8\xf5\x20\xe6\xe0\xeb\xea\xe8\xe9\x20\xe1\xf3\xed\xf2\x2e"
+                ),
+                /* Готовясь к вашему прибытию, Крегер собрал вокруг себя некромантов и приказал им преградить вам путь к заветной цели. Вы должны захватить замок Скабсдейл до начала третьей недели, иначе некроманты усилятся настолько, что станут вам не по зубам. */ DATA_COMPGEN(
+                    0x0051c074,
+                    xScenarioDescriptionPol3,
+                    "\xc3\xee\xf2\xee\xe2\xff\xf1\xfc\x20\xea\x20\xe2\xe0\xf8\xe5\xec\xf3\x20\xef\xf0\xe8\xe1\xfb\xf2"
+                    "\xe8\xfe\x2c\x20\xca\xf0\xe5\xe3\xe5\xf0\x20\xf1\xee\xe1\xf0\xe0\xeb\x20\xe2\xee\xea\xf0\xf3\xe3"
+                    "\x20\xf1\xe5\xe1\xff\x20\xed\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xee\xe2\x20\xe8\x20\xef\xf0\xe8\xea"
+                    "\xe0\xe7\xe0\xeb\x20\xe8\xec\x20\xef\xf0\xe5\xe3\xf0\xe0\xe4\xe8\xf2\xfc\x20\xe2\xe0\xec\x20\xef"
+                    "\xf3\xf2\xfc\x20\xea\x20\xe7\xe0\xe2\xe5\xf2\xed\xee\xe9\x20\xf6\xe5\xeb\xe8\x2e\x20\xc2\xfb\x20"
+                    "\xe4\xee\xeb\xe6\xed\xfb\x20\xe7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc\x20\xe7\xe0\xec\xee\xea\x20\xd1"
+                    "\xea\xe0\xe1\xf1\xe4\xe5\xe9\xeb\x20\xe4\xee\x20\xed\xe0\xf7\xe0\xeb\xe0\x20\xf2\xf0\xe5\xf2\xfc"
+                    "\xe5\xe9\x20\xed\xe5\xe4\xe5\xeb\xe8\x2c\x20\xe8\xed\xe0\xf7\xe5\x20\xed\xe5\xea\xf0\xee\xec\xe0"
+                    "\xed\xf2\xfb\x20\xf3\xf1\xe8\xeb\xff\xf2\xf1\xff\x20\xed\xe0\xf1\xf2\xee\xeb\xfc\xea\xee\x2c\x20"
+                    "\xf7\xf2\xee\x20\xf1\xf2\xe0\xed\xf3\xf2\x20\xe2\xe0\xec\x20\xed\xe5\x20\xef\xee\x20\xe7\xf3\xe1"
+                    "\xe0\xec\x2e"
+                ),
+                /* Вождь варваров, который безраздельно правит в этих землях, пока еще не подозревает о вашем присутствии. Не теряя времени, наращивайте свои силы, прежде чем он прознает о вас и бросится в атаку! Уничтожьте всех врагов и утвердите свою власть в этой стране. */ DATA_COMPGEN(
+                    0x0051c168,
+                    xScenarioDescriptionPol4,
+                    "\xc2\xee\xe6\xe4\xfc\x20\xe2\xe0\xf0\xe2\xe0\xf0\xee\xe2\x2c\x20\xea\xee\xf2\xee\xf0\xfb\xe9\x20"
+                    "\xe1\xe5\xe7\xf0\xe0\xe7\xe4\xe5\xeb\xfc\xed\xee\x20\xef\xf0\xe0\xe2\xe8\xf2\x20\xe2\x20\xfd\xf2"
+                    "\xe8\xf5\x20\xe7\xe5\xec\xeb\xff\xf5\x2c\x20\xef\xee\xea\xe0\x20\xe5\xf9\xe5\x20\xed\xe5\x20\xef"
+                    "\xee\xe4\xee\xe7\xf0\xe5\xe2\xe0\xe5\xf2\x20\xee\x20\xe2\xe0\xf8\xe5\xec\x20\xef\xf0\xe8\xf1\xf3"
+                    "\xf2\xf1\xf2\xe2\xe8\xe8\x2e\x20\xcd\xe5\x20\xf2\xe5\xf0\xff\xff\x20\xe2\xf0\xe5\xec\xe5\xed\xe8"
+                    "\x2c\x20\xed\xe0\xf0\xe0\xf9\xe8\xe2\xe0\xe9\xf2\xe5\x20\xf1\xe2\xee\xe8\x20\xf1\xe8\xeb\xfb\x2c"
+                    "\x20\xef\xf0\xe5\xe6\xe4\xe5\x20\xf7\xe5\xec\x20\xee\xed\x20\xef\xf0\xee\xe7\xed\xe0\xe5\xf2\x20"
+                    "\xee\x20\xe2\xe0\xf1\x20\xe8\x20\xe1\xf0\xee\xf1\xe8\xf2\xf1\xff\x20\xe2\x20\xe0\xf2\xe0\xea\xf3"
+                    "\x21\x20\xd3\xed\xe8\xf7\xf2\xee\xe6\xfc\xf2\xe5\x20\xe2\xf1\xe5\xf5\x20\xe2\xf0\xe0\xe3\xee\xe2"
+                    "\x20\xe8\x20\xf3\xf2\xe2\xe5\xf0\xe4\xe8\xf2\xe5\x20\xf1\xe2\xee\xfe\x20\xe2\xeb\xe0\xf1\xf2\xfc"
+                    "\x20\xe2\x20\xfd\xf2\xee\xe9\x20\xf1\xf2\xf0\xe0\xed\xe5\x2e"
+                ),
+                /* В этом регионе силы Империи невелики. Вам все равно не удастся одержать верх над всеми, кто обитает в этих землях, поэтому прибирайте к рукам, что сможете, пока не настал час расплаты. Помните, что ваша главная цель – заполучить Шлем Андурана. */ DATA_COMPGEN(
+                    0x0051c268,
+                    xScenarioDescriptionPol5,
+                    "\xc2\x20\xfd\xf2\xee\xec\x20\xf0\xe5\xe3\xe8\xee\xed\xe5\x20\xf1\xe8\xeb\xfb\x20\xc8\xec\xef\xe5"
+                    "\xf0\xe8\xe8\x20\xed\xe5\xe2\xe5\xeb\xe8\xea\xe8\x2e\x20\xc2\xe0\xec\x20\xe2\xf1\xe5\x20\xf0\xe0"
+                    "\xe2\xed\xee\x20\xed\xe5\x20\xf3\xe4\xe0\xf1\xf2\xf1\xff\x20\xee\xe4\xe5\xf0\xe6\xe0\xf2\xfc\x20"
+                    "\xe2\xe5\xf0\xf5\x20\xed\xe0\xe4\x20\xe2\xf1\xe5\xec\xe8\x2c\x20\xea\xf2\xee\x20\xee\xe1\xe8\xf2"
+                    "\xe0\xe5\xf2\x20\xe2\x20\xfd\xf2\xe8\xf5\x20\xe7\xe5\xec\xeb\xff\xf5\x2c\x20\xef\xee\xfd\xf2\xee"
+                    "\xec\xf3\x20\xef\xf0\xe8\xe1\xe8\xf0\xe0\xe9\xf2\xe5\x20\xea\x20\xf0\xf3\xea\xe0\xec\x2c\x20\xf7"
+                    "\xf2\xee\x20\xf1\xec\xee\xe6\xe5\xf2\xe5\x2c\x20\xef\xee\xea\xe0\x20\xed\xe5\x20\xed\xe0\xf1\xf2"
+                    "\xe0\xeb\x20\xf7\xe0\xf1\x20\xf0\xe0\xf1\xef\xeb\xe0\xf2\xfb\x2e\x20\xcf\xee\xec\xed\xe8\xf2\xe5"
+                    "\x2c\x20\xf7\xf2\xee\x20\xe2\xe0\xf8\xe0\x20\xe3\xeb\xe0\xe2\xed\xe0\xff\x20\xf6\xe5\xeb\xfc\x20"
+                    "\x96\x20\xe7\xe0\xef\xee\xeb\xf3\xf7\xe8\xf2\xfc\x20\xd8\xeb\xe5\xec\x20\xc0\xed\xe4\xf3\xf0\xe0"
+                    "\xed\xe0\x2e"
+                ),
+                /* Для блага Империи вы должны уничтожить Крегера. */ DATA_COMPGEN(
+                    0x0051c35c,
+                    xScenarioDescriptionPol6,
+                    "\xc4\xeb\xff\x20\xe1\xeb\xe0\xe3\xe0\x20\xc8\xec\xef\xe5\xf0\xe8\xe8\x20\xe2\xfb\x20\xe4\xee\xeb"
+                    "\xe6\xed\xfb\x20\xf3\xed\xe8\xf7\xf2\xee\xe6\xe8\xf2\xfc\x20\xca\xf0\xe5\xe3\xe5\xf0\xe0\x2e"
+                ),
+                /* Наконец-то у вас есть и возможности, и средства для того, чтобы навсегда избавить Империю от некромантов. Уничтожьте их всех до единого, и ваше имя будет прославлено в веках. */ DATA_COMPGEN(
+                    0x0051c38c,
+                    xScenarioDescriptionPol7,
+                    "\xcd\xe0\xea\xee\xed\xe5\xf6\x2d\xf2\xee\x20\xf3\x20\xe2\xe0\xf1\x20\xe5\xf1\xf2\xfc\x20\xe8\x20"
+                    "\xe2\xee\xe7\xec\xee\xe6\xed\xee\xf1\xf2\xe8\x2c\x20\xe8\x20\xf1\xf0\xe5\xe4\xf1\xf2\xe2\xe0\x20"
+                    "\xe4\xeb\xff\x20\xf2\xee\xe3\xee\x2c\x20\xf7\xf2\xee\xe1\xfb\x20\xed\xe0\xe2\xf1\xe5\xe3\xe4\xe0"
+                    "\x20\xe8\xe7\xe1\xe0\xe2\xe8\xf2\xfc\x20\xc8\xec\xef\xe5\xf0\xe8\xfe\x20\xee\xf2\x20\xed\xe5\xea"
+                    "\xf0\xee\xec\xe0\xed\xf2\xee\xe2\x2e\x20\xd3\xed\xe8\xf7\xf2\xee\xe6\xfc\xf2\xe5\x20\xe8\xf5\x20"
+                    "\xe2\xf1\xe5\xf5\x20\xe4\xee\x20\xe5\xe4\xe8\xed\xee\xe3\xee\x2c\x20\xe8\x20\xe2\xe0\xf8\xe5\x20"
+                    "\xe8\xec\xff\x20\xe1\xf3\xe4\xe5\xf2\x20\xef\xf0\xee\xf1\xeb\xe0\xe2\xeb\xe5\xed\xee\x20\xe2\x20"
+                    "\xe2\xe5\xea\xe0\xf5\x2e"
+                )
+            },
+            {
+                /* Покорите и объедините под своей властью все враждующие племена. Герой Жаркон, предок многих славных правителей, должен остаться в живых. */ DATA_COMPGEN(
+                    0x0051c43c,
+                    xScenarioDescriptionDescendants0,
+                    "\xcf\xee\xea\xee\xf0\xe8\xf2\xe5\x20\xe8\x20\xee\xe1\xfa\xe5\xe4\xe8\xed\xe8\xf2\xe5\x20\xef\xee"
+                    "\xe4\x20\xf1\xe2\xee\xe5\xe9\x20\xe2\xeb\xe0\xf1\xf2\xfc\xfe\x20\xe2\xf1\xe5\x20\xe2\xf0\xe0\xe6"
+                    "\xe4\xf3\xfe\xf9\xe8\xe5\x20\xef\xeb\xe5\xec\xe5\xed\xe0\x2e\x20\xc3\xe5\xf0\xee\xe9\x20\xc6\xe0"
+                    "\xf0\xea\xee\xed\x2c\x20\xef\xf0\xe5\xe4\xee\xea\x20\xec\xed\xee\xe3\xe8\xf5\x20\xf1\xeb\xe0\xe2"
+                    "\xed\xfb\xf5\x20\xef\xf0\xe0\xe2\xe8\xf2\xe5\xeb\xe5\xe9\x2c\x20\xe4\xee\xeb\xe6\xe5\xed\x20\xee"
+                    "\xf1\xf2\xe0\xf2\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5\x2e"
+                ),
+                /* Ваш соперник, король Гарондейла подло нападает на неукрепленные пограничные поселения! Оправьтесь от первых ударов врага, соберитесь с силами и сотрите его с лица земли! */ DATA_COMPGEN(
+                    0x0051c4c8,
+                    xScenarioDescriptionDescendants1,
+                    "\xc2\xe0\xf8\x20\xf1\xee\xef\xe5\xf0\xed\xe8\xea\x2c\x20\xea\xee\xf0\xee\xeb\xfc\x20\xc3\xe0\xf0"
+                    "\xee\xed\xe4\xe5\xe9\xeb\xe0\x20\xef\xee\xe4\xeb\xee\x20\xed\xe0\xef\xe0\xe4\xe0\xe5\xf2\x20\xed"
+                    "\xe0\x20\xed\xe5\xf3\xea\xf0\xe5\xef\xeb\xe5\xed\xed\xfb\xe5\x20\xef\xee\xe3\xf0\xe0\xed\xe8\xf7"
+                    "\xed\xfb\xe5\x20\xef\xee\xf1\xe5\xeb\xe5\xed\xe8\xff\x21\x20\xce\xef\xf0\xe0\xe2\xfc\xf2\xe5\xf1"
+                    "\xfc\x20\xee\xf2\x20\xef\xe5\xf0\xe2\xfb\xf5\x20\xf3\xe4\xe0\xf0\xee\xe2\x20\xe2\xf0\xe0\xe3\xe0"
+                    "\x2c\x20\xf1\xee\xe1\xe5\xf0\xe8\xf2\xe5\xf1\xfc\x20\xf1\x20\xf1\xe8\xeb\xe0\xec\xe8\x20\xe8\x20"
+                    "\xf1\xee\xf2\xf0\xe8\xf2\xe5\x20\xe5\xe3\xee\x20\xf1\x20\xeb\xe8\xf6\xe0\x20\xe7\xe5\xec\xeb\xe8"
+                    "\x21"
+                ),
+                /* Найдите своего блудного сына Жозефа, который, по слухам, скрывается в дальних землях. Вы должны отыскать его до начала третьего месяца, иначе династии не будет от него никакой пользы. */ DATA_COMPGEN(
+                    0x0051c574,
+                    xScenarioDescriptionDescendants2,
+                    "\xcd\xe0\xe9\xe4\xe8\xf2\xe5\x20\xf1\xe2\xee\xe5\xe3\xee\x20\xe1\xeb\xf3\xe4\xed\xee\xe3\xee\x20"
+                    "\xf1\xfb\xed\xe0\x20\xc6\xee\xe7\xe5\xf4\xe0\x2c\x20\xea\xee\xf2\xee\xf0\xfb\xe9\x2c\x20\xef\xee"
+                    "\x20\xf1\xeb\xf3\xf5\xe0\xec\x2c\x20\xf1\xea\xf0\xfb\xe2\xe0\xe5\xf2\xf1\xff\x20\xe2\x20\xe4\xe0"
+                    "\xeb\xfc\xed\xe8\xf5\x20\xe7\xe5\xec\xeb\xff\xf5\x2e\x20\xc2\xfb\x20\xe4\xee\xeb\xe6\xed\xfb\x20"
+                    "\xee\xf2\xfb\xf1\xea\xe0\xf2\xfc\x20\xe5\xe3\xee\x20\xe4\xee\x20\xed\xe0\xf7\xe0\xeb\xe0\x20\xf2"
+                    "\xf0\xe5\xf2\xfc\xe5\xe3\xee\x20\xec\xe5\xf1\xff\xf6\xe0\x2c\x20\xe8\xed\xe0\xf7\xe5\x20\xe4\xe8"
+                    "\xed\xe0\xf1\xf2\xe8\xe8\x20\xed\xe5\x20\xe1\xf3\xe4\xe5\xf2\x20\xee\xf2\x20\xed\xe5\xe3\xee\x20"
+                    "\xed\xe8\xea\xe0\xea\xee\xe9\x20\xef\xee\xeb\xfc\xe7\xfb\x2e"
+                ),
+                /* Выручите из беды своего безумного дядюшку Ивана. Вы должны найти его до начала четвертого месяца, иначе королевству не будет от него никакой пользы. */ DATA_COMPGEN(
+                    0x0051c62c,
+                    xScenarioDescriptionDescendants3,
+                    "\xc2\xfb\xf0\xf3\xf7\xe8\xf2\xe5\x20\xe8\xe7\x20\xe1\xe5\xe4\xfb\x20\xf1\xe2\xee\xe5\xe3\xee\x20"
+                    "\xe1\xe5\xe7\xf3\xec\xed\xee\xe3\xee\x20\xe4\xff\xe4\xfe\xf8\xea\xf3\x20\xc8\xe2\xe0\xed\xe0\x2e"
+                    "\x20\xc2\xfb\x20\xe4\xee\xeb\xe6\xed\xfb\x20\xed\xe0\xe9\xf2\xe8\x20\xe5\xe3\xee\x20\xe4\xee\x20"
+                    "\xed\xe0\xf7\xe0\xeb\xe0\x20\xf7\xe5\xf2\xe2\xe5\xf0\xf2\xee\xe3\xee\x20\xec\xe5\xf1\xff\xf6\xe0"
+                    "\x2c\x20\xe8\xed\xe0\xf7\xe5\x20\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xf3\x20\xed\xe5\x20\xe1"
+                    "\xf3\xe4\xe5\xf2\x20\xee\xf2\x20\xed\xe5\xe3\xee\x20\xed\xe8\xea\xe0\xea\xee\xe9\x20\xef\xee\xeb"
+                    "\xfc\xe7\xfb\x2e"
+                ),
+                /* Разгромите варваров, которые совершают набеги на южные рубежи вашего королевства! Для начала отбейте захваченные ими города, а затем вторгнитесь в их царство, спрятанное в самом сердце джунглей. Ни один враг не должен уйти живым. */ DATA_COMPGEN(
+                    0x0051c6c4,
+                    xScenarioDescriptionDescendants4,
+                    "\xd0\xe0\xe7\xe3\xf0\xee\xec\xe8\xf2\xe5\x20\xe2\xe0\xf0\xe2\xe0\xf0\xee\xe2\x2c\x20\xea\xee\xf2"
+                    "\xee\xf0\xfb\xe5\x20\xf1\xee\xe2\xe5\xf0\xf8\xe0\xfe\xf2\x20\xed\xe0\xe1\xe5\xe3\xe8\x20\xed\xe0"
+                    "\x20\xfe\xe6\xed\xfb\xe5\x20\xf0\xf3\xe1\xe5\xe6\xe8\x20\xe2\xe0\xf8\xe5\xe3\xee\x20\xea\xee\xf0"
+                    "\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0\x21\x20\xc4\xeb\xff\x20\xed\xe0\xf7\xe0\xeb\xe0\x20\xee\xf2\xe1"
+                    "\xe5\xe9\xf2\xe5\x20\xe7\xe0\xf5\xe2\xe0\xf7\xe5\xed\xed\xfb\xe5\x20\xe8\xec\xe8\x20\xe3\xee\xf0"
+                    "\xee\xe4\xe0\x2c\x20\xe0\x20\xe7\xe0\xf2\xe5\xec\x20\xe2\xf2\xee\xf0\xe3\xed\xe8\xf2\xe5\xf1\xfc"
+                    "\x20\xe2\x20\xe8\xf5\x20\xf6\xe0\xf0\xf1\xf2\xe2\xee\x2c\x20\xf1\xef\xf0\xff\xf2\xe0\xed\xed\xee"
+                    "\xe5\x20\xe2\x20\xf1\xe0\xec\xee\xec\x20\xf1\xe5\xf0\xe4\xf6\xe5\x20\xe4\xe6\xf3\xed\xe3\xeb\xe5"
+                    "\xe9\x2e\x20\xcd\xe8\x20\xee\xe4\xe8\xed\x20\xe2\xf0\xe0\xe3\x20\xed\xe5\x20\xe4\xee\xeb\xe6\xe5"
+                    "\xed\x20\xf3\xe9\xf2\xe8\x20\xe6\xe8\xe2\xfb\xec\x2e"
+                ),
+                /* Отбейте у врага замок Бивень, который пал, преданный изменником. */ DATA_COMPGEN(
+                    0x0051c7ac,
+                    xScenarioDescriptionDescendants5,
+                    "\xce\xf2\xe1\xe5\xe9\xf2\xe5\x20\xf3\x20\xe2\xf0\xe0\xe3\xe0\x20\xe7\xe0\xec\xee\xea\x20\xc1\xe8"
+                    "\xe2\xe5\xed\xfc\x2c\x20\xea\xee\xf2\xee\xf0\xfb\xe9\x20\xef\xe0\xeb\x2c\x20\xef\xf0\xe5\xe4\xe0"
+                    "\xed\xed\xfb\xe9\x20\xe8\xe7\xec\xe5\xed\xed\xe8\xea\xee\xec\x2e"
+                ),
+                /* Заслужите благосклонность эльфов. Они не позволят рубить деревья, поэтому каждые 2 недели мы будем посылать вам древесину. Вы должны выполнить задание до начала седьмого месяца, иначе королевство обратится в руины. */ DATA_COMPGEN(
+                    0x0051c7f0,
+                    xScenarioDescriptionDescendants6,
+                    "\xc7\xe0\xf1\xeb\xf3\xe6\xe8\xf2\xe5\x20\xe1\xeb\xe0\xe3\xee\xf1\xea\xeb\xee\xed\xed\xee\xf1\xf2"
+                    "\xfc\x20\xfd\xeb\xfc\xf4\xee\xe2\x2e\x20\xce\xed\xe8\x20\xed\xe5\x20\xef\xee\xe7\xe2\xee\xeb\xff"
+                    "\xf2\x20\xf0\xf3\xe1\xe8\xf2\xfc\x20\xe4\xe5\xf0\xe5\xe2\xfc\xff\x2c\x20\xef\xee\xfd\xf2\xee\xec"
+                    "\xf3\x20\xea\xe0\xe6\xe4\xfb\xe5\x20\x32\x20\xed\xe5\xe4\xe5\xeb\xe8\x20\xec\xfb\x20\xe1\xf3\xe4"
+                    "\xe5\xec\x20\xef\xee\xf1\xfb\xeb\xe0\xf2\xfc\x20\xe2\xe0\xec\x20\xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed"
+                    "\xf3\x2e\x20\xc2\xfb\x20\xe4\xee\xeb\xe6\xed\xfb\x20\xe2\xfb\xef\xee\xeb\xed\xe8\xf2\xfc\x20\xe7"
+                    "\xe0\xe4\xe0\xed\xe8\xe5\x20\xe4\xee\x20\xed\xe0\xf7\xe0\xeb\xe0\x20\xf1\xe5\xe4\xfc\xec\xee\xe3"
+                    "\xee\x20\xec\xe5\xf1\xff\xf6\xe0\x2c\x20\xe8\xed\xe0\xf7\xe5\x20\xea\xee\xf0\xee\xeb\xe5\xe2\xf1"
+                    "\xf2\xe2\xee\x20\xee\xe1\xf0\xe0\xf2\xe8\xf2\xf1\xff\x20\xe2\x20\xf0\xf3\xe8\xed\xfb\x2e"
+                ),
+                /* Грядет последняя и решительная битва с вашим извечным соперником – королевством Гарондейл! Пусть враг умоется кровью, но ваш герой Жаркон VI должен остаться в живых. */ DATA_COMPGEN(
+                    0x0051c8c8,
+                    xScenarioDescriptionDescendants7,
+                    "\xc3\xf0\xff\xe4\xe5\xf2\x20\xef\xee\xf1\xeb\xe5\xe4\xed\xff\xff\x20\xe8\x20\xf0\xe5\xf8\xe8\xf2"
+                    "\xe5\xeb\xfc\xed\xe0\xff\x20\xe1\xe8\xf2\xe2\xe0\x20\xf1\x20\xe2\xe0\xf8\xe8\xec\x20\xe8\xe7\xe2"
+                    "\xe5\xf7\xed\xfb\xec\x20\xf1\xee\xef\xe5\xf0\xed\xe8\xea\xee\xec\x20\x96\x20\xea\xee\xf0\xee\xeb"
+                    "\xe5\xe2\xf1\xf2\xe2\xee\xec\x20\xc3\xe0\xf0\xee\xed\xe4\xe5\xe9\xeb\x21\x20\xcf\xf3\xf1\xf2\xfc"
+                    "\x20\xe2\xf0\xe0\xe3\x20\xf3\xec\xee\xe5\xf2\xf1\xff\x20\xea\xf0\xee\xe2\xfc\xfe\x2c\x20\xed\xee"
+                    "\x20\xe2\xe0\xf8\x20\xe3\xe5\xf0\xee\xe9\x20\xc6\xe0\xf0\xea\xee\xed\x20\x56\x49\x20\xe4\xee\xeb"
+                    "\xe6\xe5\xed\x20\xee\xf1\xf2\xe0\xf2\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5\x2e"
+                )
+            },
+            {
+                /* Вам необходимо одержать верх над воинственными магами, обитающими на волшебных Сокрытых Островах. Победа даст вам шанс выстоять в грядущих битвах с врагами. */ DATA_COMPGEN(
+                    0x0051c970,
+                    xScenarioDescriptionWizard0,
+                    "\xc2\xe0\xec\x20\xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xee\x20\xee\xe4\xe5\xf0\xe6\xe0\xf2\xfc\x20"
+                    "\xe2\xe5\xf0\xf5\x20\xed\xe0\xe4\x20\xe2\xee\xe8\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xec\xe8\x20\xec"
+                    "\xe0\xe3\xe0\xec\xe8\x2c\x20\xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xec\xe8\x20\xed\xe0\x20\xe2\xee\xeb"
+                    "\xf8\xe5\xe1\xed\xfb\xf5\x20\xd1\xee\xea\xf0\xfb\xf2\xfb\xf5\x20\xce\xf1\xf2\xf0\xee\xe2\xe0\xf5"
+                    "\x2e\x20\xcf\xee\xe1\xe5\xe4\xe0\x20\xe4\xe0\xf1\xf2\x20\xe2\xe0\xec\x20\xf8\xe0\xed\xf1\x20\xe2"
+                    "\xfb\xf1\xf2\xee\xff\xf2\xfc\x20\xe2\x20\xe3\xf0\xff\xe4\xf3\xf9\xe8\xf5\x20\xe1\xe8\xf2\xe2\xe0"
+                    "\xf5\x20\xf1\x20\xe2\xf0\xe0\xe3\xe0\xec\xe8\x2e"
+                ),
+                /* Теперь вы знаете, где находится Великая Библиотека! Смело идите вперед и возьмите штурмом город Хронос, в котором стоит это хранилище древней мудрости. */ DATA_COMPGEN(
+                    0x0051ca10,
+                    xScenarioDescriptionWizard1,
+                    "\xd2\xe5\xef\xe5\xf0\xfc\x20\xe2\xfb\x20\xe7\xed\xe0\xe5\xf2\xe5\x2c\x20\xe3\xe4\xe5\x20\xed\xe0"
+                    "\xf5\xee\xe4\xe8\xf2\xf1\xff\x20\xc2\xe5\xeb\xe8\xea\xe0\xff\x20\xc1\xe8\xe1\xeb\xe8\xee\xf2\xe5"
+                    "\xea\xe0\x21\x20\xd1\xec\xe5\xeb\xee\x20\xe8\xe4\xe8\xf2\xe5\x20\xe2\xef\xe5\xf0\xe5\xe4\x20\xe8"
+                    "\x20\xe2\xee\xe7\xfc\xec\xe8\xf2\xe5\x20\xf8\xf2\xf3\xf0\xec\xee\xec\x20\xe3\xee\xf0\xee\xe4\x20"
+                    "\xd5\xf0\xee\xed\xee\xf1\x2c\x20\xe2\x20\xea\xee\xf2\xee\xf0\xee\xec\x20\xf1\xf2\xee\xe8\xf2\x20"
+                    "\xfd\xf2\xee\x20\xf5\xf0\xe0\xed\xe8\xeb\xe8\xf9\xe5\x20\xe4\xf0\xe5\xe2\xed\xe5\xe9\x20\xec\xf3"
+                    "\xe4\xf0\xee\xf1\xf2\xe8\x2e"
+                ),
+                /* Найдите Сферу Забвения, которая, по слухам, сокрыта где-то в этих землях. Надписи на обелисках помогут вам в ваших поисках. Отыщите Сферу до начала шестого месяца, иначе ваши соперники доберутся до Источника раньше вас. */ DATA_COMPGEN(
+                    0x0051caa8,
+                    xScenarioDescriptionWizard2,
+                    "\xcd\xe0\xe9\xe4\xe8\xf2\xe5\x20\xd1\xf4\xe5\xf0\xf3\x20\xc7\xe0\xe1\xe2\xe5\xed\xe8\xff\x2c\x20"
+                    "\xea\xee\xf2\xee\xf0\xe0\xff\x2c\x20\xef\xee\x20\xf1\xeb\xf3\xf5\xe0\xec\x2c\x20\xf1\xee\xea\xf0"
+                    "\xfb\xf2\xe0\x20\xe3\xe4\xe5\x2d\xf2\xee\x20\xe2\x20\xfd\xf2\xe8\xf5\x20\xe7\xe5\xec\xeb\xff\xf5"
+                    "\x2e\x20\xcd\xe0\xe4\xef\xe8\xf1\xe8\x20\xed\xe0\x20\xee\xe1\xe5\xeb\xe8\xf1\xea\xe0\xf5\x20\xef"
+                    "\xee\xec\xee\xe3\xf3\xf2\x20\xe2\xe0\xec\x20\xe2\x20\xe2\xe0\xf8\xe8\xf5\x20\xef\xee\xe8\xf1\xea"
+                    "\xe0\xf5\x2e\x20\xce\xf2\xfb\xf9\xe8\xf2\xe5\x20\xd1\xf4\xe5\xf0\xf3\x20\xe4\xee\x20\xed\xe0\xf7"
+                    "\xe0\xeb\xe0\x20\xf8\xe5\xf1\xf2\xee\xe3\xee\x20\xec\xe5\xf1\xff\xf6\xe0\x2c\x20\xe8\xed\xe0\xf7"
+                    "\xe5\x20\xe2\xe0\xf8\xe8\x20\xf1\xee\xef\xe5\xf0\xed\xe8\xea\xe8\x20\xe4\xee\xe1\xe5\xf0\xf3\xf2"
+                    "\xf1\xff\x20\xe4\xee\x20\xc8\xf1\xf2\xee\xf7\xed\xe8\xea\xe0\x20\xf0\xe0\xed\xfc\xf8\xe5\x20\xe2"
+                    "\xe0\xf1\x2e"
+                ),
+                /* Вы должны захватить замок чародеев, в котором находится Колдовской Источник. С падением замка ваша победа станет окончательной. */ DATA_COMPGEN(
+                    0x0051cb84,
+                    xScenarioDescriptionWizard3,
+                    "\xc2\xfb\x20\xe4\xee\xeb\xe6\xed\xfb\x20\xe7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc\x20\xe7\xe0\xec\xee"
+                    "\xea\x20\xf7\xe0\xf0\xee\xe4\xe5\xe5\xe2\x2c\x20\xe2\x20\xea\xee\xf2\xee\xf0\xee\xec\x20\xed\xe0"
+                    "\xf5\xee\xe4\xe8\xf2\xf1\xff\x20\xca\xee\xeb\xe4\xee\xe2\xf1\xea\xee\xe9\x20\xc8\xf1\xf2\xee\xf7"
+                    "\xed\xe8\xea\x2e\x20\xd1\x20\xef\xe0\xe4\xe5\xed\xe8\xe5\xec\x20\xe7\xe0\xec\xea\xe0\x20\xe2\xe0"
+                    "\xf8\xe0\x20\xef\xee\xe1\xe5\xe4\xe0\x20\xf1\xf2\xe0\xed\xe5\xf2\x20\xee\xea\xee\xed\xf7\xe0\xf2"
+                    "\xe5\xeb\xfc\xed\xee\xe9\x2e"
+                ),
+                DATA_COMPGEN(0x00534884, xScenarioDescriptionWizard4, ""),
+                DATA_COMPGEN(0x00534888, xScenarioDescriptionWizard5, ""),
+                DATA_COMPGEN(0x0053488c, xScenarioDescriptionWizard6, ""),
+                DATA_COMPGEN(0x00534890, xScenarioDescriptionWizard7, "")
+            },
+            {
+                /* Чтобы построить корабль и добраться до материка, вам надо захватить город на острове у северо-восточного побережья. Герой Галлавант должен остаться в живых. */ DATA_COMPGEN(
+                    0x0051cc04,
+                    xScenarioDescriptionVoyage0,
+                    "\xd7\xf2\xee\xe1\xfb\x20\xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc\x20\xea\xee\xf0\xe0\xe1\xeb\xfc\x20"
+                    "\xe8\x20\xe4\xee\xe1\xf0\xe0\xf2\xfc\xf1\xff\x20\xe4\xee\x20\xec\xe0\xf2\xe5\xf0\xe8\xea\xe0\x2c"
+                    "\x20\xe2\xe0\xec\x20\xed\xe0\xe4\xee\x20\xe7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc\x20\xe3\xee\xf0\xee"
+                    "\xe4\x20\xed\xe0\x20\xee\xf1\xf2\xf0\xee\xe2\xe5\x20\xf3\x20\xf1\xe5\xe2\xe5\xf0\xee\x2d\xe2\xee"
+                    "\xf1\xf2\xee\xf7\xed\xee\xe3\xee\x20\xef\xee\xe1\xe5\xf0\xe5\xe6\xfc\xff\x2e\x20\xc3\xe5\xf0\xee"
+                    "\xe9\x20\xc3\xe0\xeb\xeb\xe0\xe2\xe0\xed\xf2\x20\xe4\xee\xeb\xe6\xe5\xed\x20\xee\xf1\xf2\xe0\xf2"
+                    "\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5\x2e"
+                ),
+                /* Найдите и разгромите Мартина, предводителя пиратов, обосновавшегося в Пиратской Бухте. Галлавант должен остаться в живых, иначе все будет потеряно. */ DATA_COMPGEN(
+                    0x0051cca4,
+                    xScenarioDescriptionVoyage1,
+                    "\xcd\xe0\xe9\xe4\xe8\xf2\xe5\x20\xe8\x20\xf0\xe0\xe7\xe3\xf0\xee\xec\xe8\xf2\xe5\x20\xcc\xe0\xf0"
+                    "\xf2\xe8\xed\xe0\x2c\x20\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xff\x20\xef\xe8\xf0\xe0\xf2"
+                    "\xee\xe2\x2c\x20\xee\xe1\xee\xf1\xed\xee\xe2\xe0\xe2\xf8\xe5\xe3\xee\xf1\xff\x20\xe2\x20\xcf\xe8"
+                    "\xf0\xe0\xf2\xf1\xea\xee\xe9\x20\xc1\xf3\xf5\xf2\xe5\x2e\x20\xc3\xe0\xeb\xeb\xe0\xe2\xe0\xed\xf2"
+                    "\x20\xe4\xee\xeb\xe6\xe5\xed\x20\xee\xf1\xf2\xe0\xf2\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5"
+                    "\x2c\x20\xe8\xed\xe0\xf7\xe5\x20\xe2\xf1\xe5\x20\xe1\xf3\xe4\xe5\xf2\x20\xef\xee\xf2\xe5\xf0\xff"
+                    "\xed\xee\x2e"
+                ),
+                /* Уничтожьте всех, кто не признает власти Лорда Альберона. Галлавант должен остаться в живых. */ DATA_COMPGEN(
+                    0x0051cd38,
+                    xScenarioDescriptionVoyage2,
+                    "\xd3\xed\xe8\xf7\xf2\xee\xe6\xfc\xf2\xe5\x20\xe2\xf1\xe5\xf5\x2c\x20\xea\xf2\xee\x20\xed\xe5\x20"
+                    "\xef\xf0\xe8\xe7\xed\xe0\xe5\xf2\x20\xe2\xeb\xe0\xf1\xf2\xe8\x20\xcb\xee\xf0\xe4\xe0\x20\xc0\xeb"
+                    "\xfc\xe1\xe5\xf0\xee\xed\xe0\x2e\x20\xc3\xe0\xeb\xeb\xe0\xe2\xe0\xed\xf2\x20\xe4\xee\xeb\xe6\xe5"
+                    "\xed\x20\xee\xf1\xf2\xe0\xf2\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5\x2e"
+                ),
+                /* Положите конец самовластью Лорда Альберона и захватите все принадлежащие ему земли. Галлавант должен остаться в живых. */ DATA_COMPGEN(
+                    0x0051cd94,
+                    xScenarioDescriptionVoyage3,
+                    "\xcf\xee\xeb\xee\xe6\xe8\xf2\xe5\x20\xea\xee\xed\xe5\xf6\x20\xf1\xe0\xec\xee\xe2\xeb\xe0\xf1\xf2"
+                    "\xfc\xfe\x20\xcb\xee\xf0\xe4\xe0\x20\xc0\xeb\xfc\xe1\xe5\xf0\xee\xed\xe0\x20\xe8\x20\xe7\xe0\xf5"
+                    "\xe2\xe0\xf2\xe8\xf2\xe5\x20\xe2\xf1\xe5\x20\xef\xf0\xe8\xed\xe0\xe4\xeb\xe5\xe6\xe0\xf9\xe8\xe5"
+                    "\x20\xe5\xec\xf3\x20\xe7\xe5\xec\xeb\xe8\x2e\x20\xc3\xe0\xeb\xeb\xe0\xe2\xe0\xed\xf2\x20\xe4\xee"
+                    "\xeb\xe6\xe5\xed\x20\xee\xf1\xf2\xe0\xf2\xfc\xf1\xff\x20\xe2\x20\xe6\xe8\xe2\xfb\xf5\x2e"
+                ),
+                DATA_COMPGEN(0x00534894, xScenarioDescriptionVoyage4, ""),
+                DATA_COMPGEN(0x00534898, xScenarioDescriptionVoyage5, ""),
+                DATA_COMPGEN(0x0053489c, xScenarioDescriptionVoyage6, ""),
+                DATA_COMPGEN(0x005348a0, xScenarioDescriptionVoyage7, "")
+            }
+        };
+DATA(0x0051b770) char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+    /* ЦВ */ DATA_COMPGEN(
+        0x0051ce0c,
+        xShortCampaignNamePol,
+        "\xd6\xc2"
+    ),
+    /* НАС */ DATA_COMPGEN(
+        0x0051ce10,
+        xShortCampaignNameDescendants,
+        "\xcd\xc0\xd1"
+    ),
+    /* ЧАР */ DATA_COMPGEN(
+        0x0051ce14,
+        xShortCampaignNameWizard,
+        "\xd7\xc0\xd0"
+    ),
+    /* ДОМ */ DATA_COMPGEN(
+        0x0051ce18,
+        xShortCampaignNameVoyage,
+        "\xc4\xce\xcc"
+    )
+};
+DATA(0x0051b780) char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+    /* Цена верности  */ DATA_COMPGEN(
+        0x0051ce1c,
+        xHSCampaignNamePriceOfLoyalty,
+        "\xd6\xe5\xed\xe0\x20\xe2\xe5\xf0\xed\xee\xf1\xf2\xe8\x20"
+    ),
+    /* Наследники */ DATA_COMPGEN(
+        0x0051ce2c,
+        xHSCampaignNameDescendants,
+        "\xcd\xe0\xf1\xeb\xe5\xe4\xed\xe8\xea\xe8"
+    ),
+    /* Остров чародеев */ DATA_COMPGEN(
+        0x0051ce38,
+        xHSCampaignNameWizardsIsle,
+        "\xce\xf1\xf2\xf0\xee\xe2\x20\xf7\xe0\xf0\xee\xe4\xe5\xe5\xe2"
+    ),
+    /* Дорога домой */ DATA_COMPGEN(
+        0x0051ce48,
+        xHSCampaignNameVoyageHome,
+        "\xc4\xee\xf0\xee\xe3\xe0\x20\xe4\xee\xec\xee\xe9"
+    )
+};
 DATA(0x0051b790) char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
-    "This burial site is deathly still.",
-    "The pit of mud bubbles for a minute and then lies still.",
-    "You enter the structure of white stone pillars, and find nothing.",
-    "No Fire Elementals approach you from the lava pool.",
-    "A face forms in the water for a moment, and then is gone."
+    /* Это захоронение таит смертельную тишину. */ DATA_COMPGEN(
+        0x0051ce58,
+        xRecruitEmptyBurial,
+        "\xdd\xf2\xee\x20\xe7\xe0\xf5\xee\xf0\xee\xed\xe5\xed\xe8\xe5\x20\xf2\xe0\xe8\xf2\x20\xf1\xec\xe5"
+        "\xf0\xf2\xe5\xeb\xfc\xed\xf3\xfe\x20\xf2\xe8\xf8\xe8\xed\xf3\x2e"
+    ),
+    /* Яма клокочущей грязи всколыхнулась и успокоилась. */ DATA_COMPGEN(
+        0x0051ce84,
+        xRecruitEmptyEarth,
+        "\xdf\xec\xe0\x20\xea\xeb\xee\xea\xee\xf7\xf3\xf9\xe5\xe9\x20\xe3\xf0\xff\xe7\xe8\x20\xe2\xf1\xea"
+        "\xee\xeb\xfb\xf5\xed\xf3\xeb\xe0\xf1\xfc\x20\xe8\x20\xf3\xf1\xef\xee\xea\xee\xe8\xeb\xe0\xf1\xfc"
+        "\x2e"
+    ),
+    /* Вы вошли в здание из огромных белых камней и ничего не нашли внутри. */ DATA_COMPGEN(
+        0x0051ceb8,
+        xRecruitEmptyAir,
+        "\xc2\xfb\x20\xe2\xee\xf8\xeb\xe8\x20\xe2\x20\xe7\xe4\xe0\xed\xe8\xe5\x20\xe8\xe7\x20\xee\xe3\xf0"
+        "\xee\xec\xed\xfb\xf5\x20\xe1\xe5\xeb\xfb\xf5\x20\xea\xe0\xec\xed\xe5\xe9\x20\xe8\x20\xed\xe8\xf7"
+        "\xe5\xe3\xee\x20\xed\xe5\x20\xed\xe0\xf8\xeb\xe8\x20\xe2\xed\xf3\xf2\xf0\xe8\x2e"
+    ),
+    /* Ни один из огненных элементалов не вышел вам навстречу из огненного бассейна. */ DATA_COMPGEN(
+        0x0051cf00,
+        xRecruitEmptyFire,
+        "\xcd\xe8\x20\xee\xe4\xe8\xed\x20\xe8\xe7\x20\xee\xe3\xed\xe5\xed\xed\xfb\xf5\x20\xfd\xeb\xe5\xec"
+        "\xe5\xed\xf2\xe0\xeb\xee\xe2\x20\xed\xe5\x20\xe2\xfb\xf8\xe5\xeb\x20\xe2\xe0\xec\x20\xed\xe0\xe2"
+        "\xf1\xf2\xf0\xe5\xf7\xf3\x20\xe8\xe7\x20\xee\xe3\xed\xe5\xed\xed\xee\xe3\xee\x20\xe1\xe0\xf1\xf1"
+        "\xe5\xe9\xed\xe0\x2e"
+    ),
+    /* На мгновение в воде мелькнули черты чьих-то лиц и исчезли. */ DATA_COMPGEN(
+        0x0051cf50,
+        xRecruitEmptyWater,
+        "\xcd\xe0\x20\xec\xe3\xed\xee\xe2\xe5\xed\xe8\xe5\x20\xe2\x20\xe2\xee\xe4\xe5\x20\xec\xe5\xeb\xfc"
+        "\xea\xed\xf3\xeb\xe8\x20\xf7\xe5\xf0\xf2\xfb\x20\xf7\xfc\xe8\xf5\x2d\xf2\xee\x20\xeb\xe8\xf6\x20"
+        "\xe8\x20\xe8\xf1\xf7\xe5\xe7\xeb\xe8\x2e"
+    )
 };
 DATA(0x0051b7a4) char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
-    "Restless spirits of long dead warriors seeking their final resting place offer to join you in "
-    "hopes of finding peace.  Do you wish to recruit ghosts?",
-    "As you approach the bubbling pit of mud, creatures begin to climb out and position themselves "
-    "around it.  In unison they say: \"Mother Earth would like to offer you a few of her troops.  "
-    "Do you want to recruit Earth Elementals?\"",
-    "White stone pillars support a roof that rises up to the sky.  As you enter the structure, the "
-    "dead air of the outside gives way to a whirling gust that almost pushes you back out.  The "
-    "air current materializes into a barely visible form.  The creature asks, in what can only be "
-    "described as a loud whisper: \"Why have you come?  Are you here to call upon the forces of "
-    "the air?\"",
-    "Beneath a structure that serves to hold in heat, Fire Elementals move about in a fiery pool "
-    "of molten lava.  A group of them approach you and offer their services.  Would you like to "
-    "recruit Fire Elementals?",
-    "Crystalline structures cast shadows over a small reflective pool of water.  You peer into the "
-    "pool, and a face that is not your own peers back.  It asks: \"Would you like to call upon the "
-    "powers of water?\""
+    /* Неупокоенные духи давно погибших воинов ищут успокоения и соглашаются вступить в вашу армию в надеже найти упокоение. Желаете нанять призраков? */ DATA_COMPGEN(
+        0x0051cf8c,
+        xRecruitBuyGhosts,
+        "\xcd\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xe5\x20\xe4\xf3\xf5\xe8\x20\xe4\xe0\xe2\xed\xee\x20"
+        "\xef\xee\xe3\xe8\xe1\xf8\xe8\xf5\x20\xe2\xee\xe8\xed\xee\xe2\x20\xe8\xf9\xf3\xf2\x20\xf3\xf1\xef"
+        "\xee\xea\xee\xe5\xed\xe8\xff\x20\xe8\x20\xf1\xee\xe3\xeb\xe0\xf8\xe0\xfe\xf2\xf1\xff\x20\xe2\xf1"
+        "\xf2\xf3\xef\xe8\xf2\xfc\x20\xe2\x20\xe2\xe0\xf8\xf3\x20\xe0\xf0\xec\xe8\xfe\x20\xe2\x20\xed\xe0"
+        "\xe4\xe5\xe6\xe5\x20\xed\xe0\xe9\xf2\xe8\x20\xf3\xef\xee\xea\xee\xe5\xed\xe8\xe5\x2e\x20\xc6\xe5"
+        "\xeb\xe0\xe5\xf2\xe5\x20\xed\xe0\xed\xff\xf2\xfc\x20\xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2\x3f"
+    ),
+    /* Как только вы подошли к яме клокочущей грязи из нее начали выползать существа. Встав вокруг ямы, они в унисон обратились к вам: "Мать Земля желает предложить вам нескольких своих воинов. Желаете нанять земных элементалов?" */ DATA_COMPGEN(
+        0x0051d01c,
+        xRecruitBuyEarthElementals,
+        "\xca\xe0\xea\x20\xf2\xee\xeb\xfc\xea\xee\x20\xe2\xfb\x20\xef\xee\xe4\xee\xf8\xeb\xe8\x20\xea\x20"
+        "\xff\xec\xe5\x20\xea\xeb\xee\xea\xee\xf7\xf3\xf9\xe5\xe9\x20\xe3\xf0\xff\xe7\xe8\x20\xe8\xe7\x20"
+        "\xed\xe5\xe5\x20\xed\xe0\xf7\xe0\xeb\xe8\x20\xe2\xfb\xef\xee\xeb\xe7\xe0\xf2\xfc\x20\xf1\xf3\xf9"
+        "\xe5\xf1\xf2\xe2\xe0\x2e\x20\xc2\xf1\xf2\xe0\xe2\x20\xe2\xee\xea\xf0\xf3\xe3\x20\xff\xec\xfb\x2c"
+        "\x20\xee\xed\xe8\x20\xe2\x20\xf3\xed\xe8\xf1\xee\xed\x20\xee\xe1\xf0\xe0\xf2\xe8\xeb\xe8\xf1\xfc"
+        "\x20\xea\x20\xe2\xe0\xec\x3a\x20\x22\xcc\xe0\xf2\xfc\x20\xc7\xe5\xec\xeb\xff\x20\xe6\xe5\xeb\xe0"
+        "\xe5\xf2\x20\xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xf2\xfc\x20\xe2\xe0\xec\x20\xed\xe5\xf1\xea\xee\xeb"
+        "\xfc\xea\xe8\xf5\x20\xf1\xe2\xee\xe8\xf5\x20\xe2\xee\xe8\xed\xee\xe2\x2e\x20\xc6\xe5\xeb\xe0\xe5"
+        "\xf2\xe5\x20\xed\xe0\xed\xff\xf2\xfc\x20\xe7\xe5\xec\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2"
+        "\xe0\xeb\xee\xe2\x3f\x22"
+    ),
+    /* Белокаменные колонны подпирают крышу, уходящую в небеса. Едва вы вошли внутрь, как спокойный воздух превратился в мощный поток ветра, едва не вытолкнувший вас наружу. Воздух сгустился в едва различимые формы. Существо обратилось вам едва слышимым шепотом: "Зачем ты явился сюда? Ты пришел сюда искать помощи сил воздуха?" */ DATA_COMPGEN(
+        0x0051d0fc,
+        xRecruitBuyAirElementals,
+        "\xc1\xe5\xeb\xee\xea\xe0\xec\xe5\xed\xed\xfb\xe5\x20\xea\xee\xeb\xee\xed\xed\xfb\x20\xef\xee\xe4"
+        "\xef\xe8\xf0\xe0\xfe\xf2\x20\xea\xf0\xfb\xf8\xf3\x2c\x20\xf3\xf5\xee\xe4\xff\xf9\xf3\xfe\x20\xe2"
+        "\x20\xed\xe5\xe1\xe5\xf1\xe0\x2e\x20\xc5\xe4\xe2\xe0\x20\xe2\xfb\x20\xe2\xee\xf8\xeb\xe8\x20\xe2"
+        "\xed\xf3\xf2\xf0\xfc\x2c\x20\xea\xe0\xea\x20\xf1\xef\xee\xea\xee\xe9\xed\xfb\xe9\x20\xe2\xee\xe7"
+        "\xe4\xf3\xf5\x20\xef\xf0\xe5\xe2\xf0\xe0\xf2\xe8\xeb\xf1\xff\x20\xe2\x20\xec\xee\xf9\xed\xfb\xe9"
+        "\x20\xef\xee\xf2\xee\xea\x20\xe2\xe5\xf2\xf0\xe0\x2c\x20\xe5\xe4\xe2\xe0\x20\xed\xe5\x20\xe2\xfb"
+        "\xf2\xee\xeb\xea\xed\xf3\xe2\xf8\xe8\xe9\x20\xe2\xe0\xf1\x20\xed\xe0\xf0\xf3\xe6\xf3\x2e\x20\xc2"
+        "\xee\xe7\xe4\xf3\xf5\x20\xf1\xe3\xf3\xf1\xf2\xe8\xeb\xf1\xff\x20\xe2\x20\xe5\xe4\xe2\xe0\x20\xf0"
+        "\xe0\xe7\xeb\xe8\xf7\xe8\xec\xfb\xe5\x20\xf4\xee\xf0\xec\xfb\x2e\x20\xd1\xf3\xf9\xe5\xf1\xf2\xe2"
+        "\xee\x20\xee\xe1\xf0\xe0\xf2\xe8\xeb\xee\xf1\xfc\x20\xe2\xe0\xec\x20\xe5\xe4\xe2\xe0\x20\xf1\xeb"
+        "\xfb\xf8\xe8\xec\xfb\xec\x20\xf8\xe5\xef\xee\xf2\xee\xec\x3a\x20\x22\xc7\xe0\xf7\xe5\xec\x20\xf2"
+        "\xfb\x20\xff\xe2\xe8\xeb\xf1\xff\x20\xf1\xfe\xe4\xe0\x3f\x20\xd2\xfb\x20\xef\xf0\xe8\xf8\xe5\xeb"
+        "\x20\xf1\xfe\xe4\xe0\x20\xe8\xf1\xea\xe0\xf2\xfc\x20\xef\xee\xec\xee\xf9\xe8\x20\xf1\xe8\xeb\x20"
+        "\xe2\xee\xe7\xe4\xf3\xf5\xe0\x3f\x22"
+    ),
+    /* В постройке, удерживающей раскаленную лаву вы видите огненных элементалов, движущихся в потоках раскаленной лавы. Несколько из них подошли к вам и предложили вам свою службу. Желаете нанять огненных элементалов? */ DATA_COMPGEN(
+        0x0051d240,
+        xRecruitBuyFireElementals,
+        "\xc2\x20\xef\xee\xf1\xf2\xf0\xee\xe9\xea\xe5\x2c\x20\xf3\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xfe\xf9\xe5"
+        "\xe9\x20\xf0\xe0\xf1\xea\xe0\xeb\xe5\xed\xed\xf3\xfe\x20\xeb\xe0\xe2\xf3\x20\xe2\xfb\x20\xe2\xe8"
+        "\xe4\xe8\xf2\xe5\x20\xee\xe3\xed\xe5\xed\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee"
+        "\xe2\x2c\x20\xe4\xe2\xe8\xe6\xf3\xf9\xe8\xf5\xf1\xff\x20\xe2\x20\xef\xee\xf2\xee\xea\xe0\xf5\x20"
+        "\xf0\xe0\xf1\xea\xe0\xeb\xe5\xed\xed\xee\xe9\x20\xeb\xe0\xe2\xfb\x2e\x20\xcd\xe5\xf1\xea\xee\xeb"
+        "\xfc\xea\xee\x20\xe8\xe7\x20\xed\xe8\xf5\x20\xef\xee\xe4\xee\xf8\xeb\xe8\x20\xea\x20\xe2\xe0\xec"
+        "\x20\xe8\x20\xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8\x20\xe2\xe0\xec\x20\xf1\xe2\xee\xfe\x20\xf1"
+        "\xeb\xf3\xe6\xe1\xf3\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xed\xe0\xed\xff\xf2\xfc\x20\xee\xe3"
+        "\xed\xe5\xed\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2\x3f"
+    ),
+    /* Хрустальные постройки отбрасывают зыбкие тени на небольшой сверкающий бассейн. В воде появилось лицо, не ваше отражение, которое обратилось к вам со словами: "Желаешь обратиться за помощью к силам воды?" */ DATA_COMPGEN(
+        0x0051d314,
+        xRecruitBuyWaterElementals,
+        "\xd5\xf0\xf3\xf1\xf2\xe0\xeb\xfc\xed\xfb\xe5\x20\xef\xee\xf1\xf2\xf0\xee\xe9\xea\xe8\x20\xee\xf2"
+        "\xe1\xf0\xe0\xf1\xfb\xe2\xe0\xfe\xf2\x20\xe7\xfb\xe1\xea\xe8\xe5\x20\xf2\xe5\xed\xe8\x20\xed\xe0"
+        "\x20\xed\xe5\xe1\xee\xeb\xfc\xf8\xee\xe9\x20\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9\x20\xe1\xe0"
+        "\xf1\xf1\xe5\xe9\xed\x2e\x20\xc2\x20\xe2\xee\xe4\xe5\x20\xef\xee\xff\xe2\xe8\xeb\xee\xf1\xfc\x20"
+        "\xeb\xe8\xf6\xee\x2c\x20\xed\xe5\x20\xe2\xe0\xf8\xe5\x20\xee\xf2\xf0\xe0\xe6\xe5\xed\xe8\xe5\x2c"
+        "\x20\xea\xee\xf2\xee\xf0\xee\xe5\x20\xee\xe1\xf0\xe0\xf2\xe8\xeb\xee\xf1\xfc\x20\xea\x20\xe2\xe0"
+        "\xec\x20\xf1\xee\x20\xf1\xeb\xee\xe2\xe0\xec\xe8\x3a\x20\x22\xc6\xe5\xeb\xe0\xe5\xf8\xfc\x20\xee"
+        "\xe1\xf0\xe0\xf2\xe8\xf2\xfc\xf1\xff\x20\xe7\xe0\x20\xef\xee\xec\xee\xf9\xfc\xfe\x20\xea\x20\xf1"
+        "\xe8\xeb\xe0\xec\x20\xe2\xee\xe4\xfb\x3f\x22"
+    )
 };
-DATA(0x0051b7b8) char* xNecromancerShrine = "Shrine";
+DATA(0x0051b7b8) char* xNecromancerShrine =
+    /* Темная святыня */ DATA_COMPGEN(
+        0x0051d3e0,
+        xNecromancerShrineTitle,
+        "\xd2\xe5\xec\xed\xe0\xff\x20\xf1\xe2\xff\xf2\xfb\xed\xff"
+    );
 DATA(0x0051b7bc) char* xNecromancerShrineDesc =
-    "The Shrine increases the necromancy skill of all your necromancers by 10 percent.";
+    /* Увеличивает уровень навыка Некромантии каждого вашего некроманта на 10 процентов. */ DATA_COMPGEN(
+        0x0051d3f0,
+        xNecromancerShrineDescription,
+        "\xd3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xed\xe0\xe2\xfb"
+        "\xea\xe0\x20\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xe8\x20\xea\xe0\xe6\xe4\xee\xe3\xee\x20\xe2"
+        "\xe0\xf8\xe5\xe3\xee\x20\xed\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe0\x20\xed\xe0\x20\x31\x30\x20\xef"
+        "\xf0\xee\xf6\xe5\xed\xf2\xee\xe2\x2e"
+    );
 DATA(0x0051b7c0) char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
-    "The head groom approaches you and speaks, \"You already have a fine horse, and have no "
-    "inexperienced cavalry which might make use of our trained war horses.\"",
-    "As you approach the stables, the head groom appears, leading a fine looking war horse. \"This "
-    "steed will help speed you in your travels. Alas, his endurance will wane with a lot of heavy "
-    "riding, and you must return for a fresh mount in a week. We also have many fine war horses "
-    "which could benefit mounted soldiers, but you have none we can help.\"",
-    "The head groom speaks to you, \"That is a fine looking horse you have. I am afraid we can "
-    "give you no better, but the horses your cavalry are riding look to be of poor breeding stock. "
-    "We have many trained war horses which would aid your riders greatly. I insist you take "
-    "them.\"",
-    "As you approach the stables, the head groom appears, leading a fine looking war horse. \"This "
-    "steed will help speed you in your travels. Alas, he will grow tired in a week. You must also "
-    "let me give better horses to your mounted soldiers, their horses look shoddy and weak.\""
+    /* Старший конюх подошел к вам со словами: "У вас отличный конь под седлом и в вашей армии нет неопытных всадников, кого мы могли бы обучить искусству управления боевыми скакунами." */ DATA_COMPGEN(
+        0x0051d444,
+        xStableText0,
+        "\xd1\xf2\xe0\xf0\xf8\xe8\xe9\x20\xea\xee\xed\xfe\xf5\x20\xef\xee\xe4\xee\xf8\xe5\xeb\x20\xea\x20"
+        "\xe2\xe0\xec\x20\xf1\xee\x20\xf1\xeb\xee\xe2\xe0\xec\xe8\x3a\x20\x22\xd3\x20\xe2\xe0\xf1\x20\xee"
+        "\xf2\xeb\xe8\xf7\xed\xfb\xe9\x20\xea\xee\xed\xfc\x20\xef\xee\xe4\x20\xf1\xe5\xe4\xeb\xee\xec\x20"
+        "\xe8\x20\xe2\x20\xe2\xe0\xf8\xe5\xe9\x20\xe0\xf0\xec\xe8\xe8\x20\xed\xe5\xf2\x20\xed\xe5\xee\xef"
+        "\xfb\xf2\xed\xfb\xf5\x20\xe2\xf1\xe0\xe4\xed\xe8\xea\xee\xe2\x2c\x20\xea\xee\xe3\xee\x20\xec\xfb"
+        "\x20\xec\xee\xe3\xeb\xe8\x20\xe1\xfb\x20\xee\xe1\xf3\xf7\xe8\xf2\xfc\x20\xe8\xf1\xea\xf3\xf1\xf1"
+        "\xf2\xe2\xf3\x20\xf3\xef\xf0\xe0\xe2\xeb\xe5\xed\xe8\xff\x20\xe1\xee\xe5\xe2\xfb\xec\xe8\x20\xf1"
+        "\xea\xe0\xea\xf3\xed\xe0\xec\xe8\x2e\x22"
+    ),
+    /* Появился старший конюх, ведущий отличного боевого скакуна. "Этот конь поможет вам быстрее добраться до нужного места. Но его выносливости хватит на неделю. У нас есть еще такие кони, но у вас нет всадников." */ DATA_COMPGEN(
+        0x0051d4f8,
+        xStableText1,
+        "\xcf\xee\xff\xe2\xe8\xeb\xf1\xff\x20\xf1\xf2\xe0\xf0\xf8\xe8\xe9\x20\xea\xee\xed\xfe\xf5\x2c\x20"
+        "\xe2\xe5\xe4\xf3\xf9\xe8\xe9\x20\xee\xf2\xeb\xe8\xf7\xed\xee\xe3\xee\x20\xe1\xee\xe5\xe2\xee\xe3"
+        "\xee\x20\xf1\xea\xe0\xea\xf3\xed\xe0\x2e\x20\x22\xdd\xf2\xee\xf2\x20\xea\xee\xed\xfc\x20\xef\xee"
+        "\xec\xee\xe6\xe5\xf2\x20\xe2\xe0\xec\x20\xe1\xfb\xf1\xf2\xf0\xe5\xe5\x20\xe4\xee\xe1\xf0\xe0\xf2"
+        "\xfc\xf1\xff\x20\xe4\xee\x20\xed\xf3\xe6\xed\xee\xe3\xee\x20\xec\xe5\xf1\xf2\xe0\x2e\x20\xcd\xee"
+        "\x20\xe5\xe3\xee\x20\xe2\xfb\xed\xee\xf1\xeb\xe8\xe2\xee\xf1\xf2\xe8\x20\xf5\xe2\xe0\xf2\xe8\xf2"
+        "\x20\xed\xe0\x20\xed\xe5\xe4\xe5\xeb\xfe\x2e\x20\xd3\x20\xed\xe0\xf1\x20\xe5\xf1\xf2\xfc\x20\xe5"
+        "\xf9\xe5\x20\xf2\xe0\xea\xe8\xe5\x20\xea\xee\xed\xe8\x2c\x20\xed\xee\x20\xf3\x20\xe2\xe0\xf1\x20"
+        "\xed\xe5\xf2\x20\xe2\xf1\xe0\xe4\xed\xe8\xea\xee\xe2\x2e\x22"
+    ),
+    /* Старший конюх сказал вам: "У вас превосходный конь. Мы не можем помочь вам. Но у ваших всадников не породистые кони. У нас есть отличные боевые скакуны для них." */ DATA_COMPGEN(
+        0x0051d5c8,
+        xStableText2,
+        "\xd1\xf2\xe0\xf0\xf8\xe8\xe9\x20\xea\xee\xed\xfe\xf5\x20\xf1\xea\xe0\xe7\xe0\xeb\x20\xe2\xe0\xec"
+        "\x3a\x20\x22\xd3\x20\xe2\xe0\xf1\x20\xef\xf0\xe5\xe2\xee\xf1\xf5\xee\xe4\xed\xfb\xe9\x20\xea\xee"
+        "\xed\xfc\x2e\x20\xcc\xfb\x20\xed\xe5\x20\xec\xee\xe6\xe5\xec\x20\xef\xee\xec\xee\xf7\xfc\x20\xe2"
+        "\xe0\xec\x2e\x20\xcd\xee\x20\xf3\x20\xe2\xe0\xf8\xe8\xf5\x20\xe2\xf1\xe0\xe4\xed\xe8\xea\xee\xe2"
+        "\x20\xed\xe5\x20\xef\xee\xf0\xee\xe4\xe8\xf1\xf2\xfb\xe5\x20\xea\xee\xed\xe8\x2e\x20\xd3\x20\xed"
+        "\xe0\xf1\x20\xe5\xf1\xf2\xfc\x20\xee\xf2\xeb\xe8\xf7\xed\xfb\xe5\x20\xe1\xee\xe5\xe2\xfb\xe5\x20"
+        "\xf1\xea\xe0\xea\xf3\xed\xfb\x20\xe4\xeb\xff\x20\xed\xe8\xf5\x2e\x22"
+    ),
+    /* Появился старший конюх, ведущий отличных боевых скакунов. "Этот конь поможет вам быстрее добраться до нужного места, но его сил хватит на 7 дней. К тому же, мы можем дать новых коней и вашим всадникам." */ DATA_COMPGEN(
+        0x0051d66c,
+        xStableText3,
+        "\xcf\xee\xff\xe2\xe8\xeb\xf1\xff\x20\xf1\xf2\xe0\xf0\xf8\xe8\xe9\x20\xea\xee\xed\xfe\xf5\x2c\x20"
+        "\xe2\xe5\xe4\xf3\xf9\xe8\xe9\x20\xee\xf2\xeb\xe8\xf7\xed\xfb\xf5\x20\xe1\xee\xe5\xe2\xfb\xf5\x20"
+        "\xf1\xea\xe0\xea\xf3\xed\xee\xe2\x2e\x20\x22\xdd\xf2\xee\xf2\x20\xea\xee\xed\xfc\x20\xef\xee\xec"
+        "\xee\xe6\xe5\xf2\x20\xe2\xe0\xec\x20\xe1\xfb\xf1\xf2\xf0\xe5\xe5\x20\xe4\xee\xe1\xf0\xe0\xf2\xfc"
+        "\xf1\xff\x20\xe4\xee\x20\xed\xf3\xe6\xed\xee\xe3\xee\x20\xec\xe5\xf1\xf2\xe0\x2c\x20\xed\xee\x20"
+        "\xe5\xe3\xee\x20\xf1\xe8\xeb\x20\xf5\xe2\xe0\xf2\xe8\xf2\x20\xed\xe0\x20\x37\x20\xe4\xed\xe5\xe9"
+        "\x2e\x20\xca\x20\xf2\xee\xec\xf3\x20\xe6\xe5\x2c\x20\xec\xfb\x20\xec\xee\xe6\xe5\xec\x20\xe4\xe0"
+        "\xf2\xfc\x20\xed\xee\xe2\xfb\xf5\x20\xea\xee\xed\xe5\xe9\x20\xe8\x20\xe2\xe0\xf8\xe8\xec\x20\xe2"
+        "\xf1\xe0\xe4\xed\xe8\xea\xe0\xec\x2e\x22"
+    )
 };
-DATA(0x0051b7d0) char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] =
-    {"Joseph", "Joseph II", "Joseph III", "Joseph IV", "Joseph V", "Joseph VI"};
-DATA(0x0051b7e8) char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] =
-    {"Uncle Ivan", "Ivan II", "Ivan III", "Ivan IV", "Ivan V", "Ivan VI"};
-DATA(0x0051b800) char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] =
-    {"Bas.", "Adv.", "Exp."};
+DATA(0x0051b7d0) char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+    /* Джозеф */ DATA_COMPGEN(
+        0x0051d738,
+        xJosephName0,
+        "\xc4\xe6\xee\xe7\xe5\xf4"
+    ),
+    /* Джозеф II */ DATA_COMPGEN(
+        0x0051d740,
+        xJosephName1,
+        "\xc4\xe6\xee\xe7\xe5\xf4\x20\x49\x49"
+    ),
+    /* Джозеф III */ DATA_COMPGEN(
+        0x0051d74c,
+        xJosephName2,
+        "\xc4\xe6\xee\xe7\xe5\xf4\x20\x49\x49\x49"
+    ),
+    /* Джозеф IV */ DATA_COMPGEN(
+        0x0051d758,
+        xJosephName3,
+        "\xc4\xe6\xee\xe7\xe5\xf4\x20\x49\x56"
+    ),
+    /* Джозеф V */ DATA_COMPGEN(
+        0x0051d764,
+        xJosephName4,
+        "\xc4\xe6\xee\xe7\xe5\xf4\x20\x56"
+    ),
+    /* Джозеф VI */ DATA_COMPGEN(
+        0x0051d770,
+        xJosephName5,
+        "\xc4\xe6\xee\xe7\xe5\xf4\x20\x56\x49"
+    )
+};
+DATA(0x0051b7e8) char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+    /* Дядя Иван */ DATA_COMPGEN(
+        0x0051d77c,
+        xUncleIvanName0,
+        "\xc4\xff\xe4\xff\x20\xc8\xe2\xe0\xed"
+    ),
+    /* Иван II */ DATA_COMPGEN(
+        0x0051d788,
+        xUncleIvanName1,
+        "\xc8\xe2\xe0\xed\x20\x49\x49"
+    ),
+    /* Иван III */ DATA_COMPGEN(
+        0x0051d790,
+        xUncleIvanName2,
+        "\xc8\xe2\xe0\xed\x20\x49\x49\x49"
+    ),
+    /* Иван IV */ DATA_COMPGEN(
+        0x0051d79c,
+        xUncleIvanName3,
+        "\xc8\xe2\xe0\xed\x20\x49\x56"
+    ),
+    /* Иван V */ DATA_COMPGEN(
+        0x0051d7a4,
+        xUncleIvanName4,
+        "\xc8\xe2\xe0\xed\x20\x56"
+    ),
+    /* Иван VI */ DATA_COMPGEN(
+        0x0051d7ac,
+        xUncleIvanName5,
+        "\xc8\xe2\xe0\xed\x20\x56\x49"
+    )
+};
+DATA(0x0051b800) char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+    /* 1 ступ. */ DATA_COMPGEN(
+        0x0051d7b4,
+        xShortSSLevelBasic,
+        "\x31\x20\xf1\xf2\xf3\xef\x2e"
+    ),
+    /* 2 ступ. */ DATA_COMPGEN(
+        0x0051d7bc,
+        xShortSSLevelAdvanced,
+        "\x32\x20\xf1\xf2\xf3\xef\x2e"
+    ),
+    /* 3 ступ. */ DATA_COMPGEN(
+        0x0051d7c4,
+        xShortSSLevelExpert,
+        "\x33\x20\xf1\xf2\xf3\xef\x2e"
+    )
+};
 DATA(0x0051b80c) char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
-    "Advance",    "Advent",      "Adventure",  "Animate",     "Archer",     "Arena",
-    "Armor",      "Army",        "Arrow",      "Artifact",    "Attraction", "Backstab",
-    "Barbarian",  "Baron",       "Battle",     "Berserk",     "Blacksmith", "Blade",
-    "Bless",      "Blind",       "Boots",      "Breastplate", "Buckler",    "Captain",
-    "Castle",     "Catapult",    "Cathedral",  "Cauldron",    "Cavalry",    "Centaur",
-    "Champion",   "Charm",       "Cloak",      "Coffin",      "Command",    "Control",
-    "Cower",      "Create",      "Crest",      "Crossbow",    "Crush",      "Crypt",
-    "Crystal",    "Curse",       "Cyclops",    "Dagger",      "Damage",     "Darkness",
-    "Death",      "Decimate",    "Decisive",   "Defeat",      "Demon",      "Desert",
-    "Destroy",    "Devastation", "Deviate",    "Dimension",   "Diplomacy",  "Discover",
-    "Disruption", "Distance",    "Dragon",     "Druid",       "Dungeon",    "Dwarven",
-    "Dwelling",   "Earthquake",  "Elemental",  "Elixir",      "Elven",      "Emblem",
-    "Engage",     "Enrage",      "Entertain",  "Evil",        "Fear",       "Fire",
-    "Fireball",   "Flail",       "Flask",      "Flood",       "Follower",   "Fortunate",
-    "Fortune",    "Gargoyle",    "Gauntlets",  "Gems",        "Genie",      "Ghost",
-    "Giants",     "Gloves",      "Goblin",     "Gold",        "Golem",      "Graveyard",
-    "Gravity",    "Guard",       "Guild",      "Halberd",     "Hammer",     "Harp",
-    "Haunt",      "Helm",        "Heroic",     "Honor",       "Hope",       "Horde",
-    "Horse",      "Horseshoe",   "Hydra",      "Identify",    "Ignite",     "Illusion",
-    "Invisible",  "Kingdom",     "Knife",      "Knighthood",  "Lance",      "Lantern",
-    "Leadership", "Leather",     "Library",    "Liege",       "Life",       "Lightning",
-    "Lord",       "Mace",        "Mage",       "Magic",       "Majesty",    "Malevolent",
-    "Medusa",     "Meteor",      "Might",      "Minotaur",    "Minutemen",  "Missile",
-    "Monster",    "Mummy",       "Navigation", "Necromancy",  "Noho",       "Ogre",
-    "Ointment",   "Paladin",     "Paralyze",   "Parry",       "Partake",    "Phoenix",
-    "Portal",     "Potion",      "Pouch",      "Powder",      "Power",      "Pyramid",
-    "Quest",      "Rainbow",     "Ranger",     "Recruit",     "Rescue",     "Resurrect",
-    "Retreat",    "Righteous",   "Robe",       "Rogue",       "Rope",       "Scabbard",
-    "Scarab",     "Scimitar",    "Scroll",     "Shield",      "Shout",      "Shrine",
-    "Siege",      "Skeleton",    "Skill",      "Slayer",      "Sling",      "Sorceress",
-    "Speed",      "Staff",       "Statue",     "Storm",       "Sulfur",     "Summon",
-    "Swamp",      "Sword",       "Telepathy",  "Terror",      "Thunder",    "Torch",
-    "Tower",      "Travesty",    "Treaty",     "Trident",     "Troll",      "Unicorn",
-    "Vampire",    "Venom",       "Victory",    "Volcano",     "Vulnerable", "Wand",
-    "Warfare",    "Warlock",     "Weapon",     "Wings",       "Wizardry",   "Wolf",
-    "Zombie"
+    /* Продвижение */ DATA_COMPGEN(0x0051d7cc, xPasswordAdvance, "\xcf\xf0\xee\xe4\xe2\xe8\xe6\xe5\xed\xe8\xe5"),
+    /* Наступление */ DATA_COMPGEN(0x0051d7d8, xPasswordAdvent, "\xcd\xe0\xf1\xf2\xf3\xef\xeb\xe5\xed\xe8\xe5"),
+    /* Странствие */ DATA_COMPGEN(0x0051d7e4, xPasswordAdventure, "\xd1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe8\xe5"),
+    /* Живой */ DATA_COMPGEN(0x0051d7f0, xPasswordAnimate, "\xc6\xe8\xe2\xee\xe9"),
+    /* Стрелок */ DATA_COMPGEN(0x0051d7f8, xPasswordArcher, "\xd1\xf2\xf0\xe5\xeb\xee\xea"),
+    /* Арена */ DATA_COMPGEN(0x0051d800, xPasswordArena, "\xc0\xf0\xe5\xed\xe0"),
+    /* Броня */ DATA_COMPGEN(0x0051d808, xPasswordArmor, "\xc1\xf0\xee\xed\xff"),
+    /* Армия */ DATA_COMPGEN(0x0051d810, xPasswordArmy, "\xc0\xf0\xec\xe8\xff"),
+    /* Стрела */ DATA_COMPGEN(0x0051d818, xPasswordArrow, "\xd1\xf2\xf0\xe5\xeb\xe0"),
+    /* Артефакт */ DATA_COMPGEN(0x0051d820, xPasswordArtifact, "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"),
+    /* Влечение */ DATA_COMPGEN(0x0051d82c, xPasswordAttraction, "\xc2\xeb\xe5\xf7\xe5\xed\xe8\xe5"),
+    /* Тайный */ DATA_COMPGEN(0x0051d838, xPasswordBackstab, "\xd2\xe0\xe9\xed\xfb\xe9"),
+    /* Варвар */ DATA_COMPGEN(0x0051d840, xPasswordBarbarian, "\xc2\xe0\xf0\xe2\xe0\xf0"),
+    /* Барон */ DATA_COMPGEN(0x0051d848, xPasswordBaron, "\xc1\xe0\xf0\xee\xed"),
+    /* Битва */ DATA_COMPGEN(0x0051d850, xPasswordBattle, "\xc1\xe8\xf2\xe2\xe0"),
+    /* Берсерк */ DATA_COMPGEN(0x0051d858, xPasswordBerserk, "\xc1\xe5\xf0\xf1\xe5\xf0\xea"),
+    /* Кузница */ DATA_COMPGEN(0x0051d860, xPasswordBlacksmith, "\xca\xf3\xe7\xed\xe8\xf6\xe0"),
+    /* Клинок */ DATA_COMPGEN(0x0051d868, xPasswordBlade, "\xca\xeb\xe8\xed\xee\xea"),
+    /* Благословение */ DATA_COMPGEN(0x0051d870, xPasswordBless, "\xc1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xe5\xed\xe8\xe5"),
+    /* Ослепление */ DATA_COMPGEN(0x0051d880, xPasswordBlind, "\xce\xf1\xeb\xe5\xef\xeb\xe5\xed\xe8\xe5"),
+    /* Башмаки */ DATA_COMPGEN(0x0051d88c, xPasswordBoots, "\xc1\xe0\xf8\xec\xe0\xea\xe8"),
+    /* Доспех */ DATA_COMPGEN(0x0051d894, xPasswordBreastplate, "\xc4\xee\xf1\xef\xe5\xf5"),
+    /* Защищать */ DATA_COMPGEN(0x0051d89c, xPasswordBuckler, "\xc7\xe0\xf9\xe8\xf9\xe0\xf2\xfc"),
+    /* Капитан */ DATA_COMPGEN(0x0051d8a8, xPasswordCaptain, "\xca\xe0\xef\xe8\xf2\xe0\xed"),
+    /* Замок */ DATA_COMPGEN(0x0051d8b0, xPasswordCastle, "\xc7\xe0\xec\xee\xea"),
+    /* Катапульта */ DATA_COMPGEN(0x0051d8b8, xPasswordCatapult, "\xca\xe0\xf2\xe0\xef\xf3\xeb\xfc\xf2\xe0"),
+    /* Собор */ DATA_COMPGEN(0x0051d8c4, xPasswordCathedral, "\xd1\xee\xe1\xee\xf0"),
+    /* Котел */ DATA_COMPGEN(0x0051d8cc, xPasswordCauldron, "\xca\xee\xf2\xe5\xeb"),
+    /* Кавалерия */ DATA_COMPGEN(0x0051d8d4, xPasswordCavalry, "\xca\xe0\xe2\xe0\xeb\xe5\xf0\xe8\xff"),
+    /* Кентавр */ DATA_COMPGEN(0x0051d8e0, xPasswordCentaur, "\xca\xe5\xed\xf2\xe0\xe2\xf0"),
+    /* Чемпион */ DATA_COMPGEN(0x0051d8e8, xPasswordChampion, "\xd7\xe5\xec\xef\xe8\xee\xed"),
+    /* Чары */ DATA_COMPGEN(0x0051d8f0, xPasswordCharm, "\xd7\xe0\xf0\xfb"),
+    /* Накидка */ DATA_COMPGEN(0x0051d8f8, xPasswordCloak, "\xcd\xe0\xea\xe8\xe4\xea\xe0"),
+    /* Гроб */ DATA_COMPGEN(0x0051d900, xPasswordCoffin, "\xc3\xf0\xee\xe1"),
+    /* Приказ */ DATA_COMPGEN(0x0051d908, xPasswordCommand, "\xcf\xf0\xe8\xea\xe0\xe7"),
+    /* Управление */ DATA_COMPGEN(0x0051d910, xPasswordControl, "\xd3\xef\xf0\xe0\xe2\xeb\xe5\xed\xe8\xe5"),
+    /* Прятаться */ DATA_COMPGEN(0x0051d91c, xPasswordCower, "\xcf\xf0\xff\xf2\xe0\xf2\xfc\xf1\xff"),
+    /* Производить */ DATA_COMPGEN(0x0051d928, xPasswordCreate, "\xcf\xf0\xee\xe8\xe7\xe2\xee\xe4\xe8\xf2\xfc"),
+    /* Герб */ DATA_COMPGEN(0x0051d934, xPasswordCrest, "\xc3\xe5\xf0\xe1"),
+    /* Арбалет */ DATA_COMPGEN(0x0051d93c, xPasswordCrossbow, "\xc0\xf0\xe1\xe0\xeb\xe5\xf2"),
+    /* Толпа */ DATA_COMPGEN(0x0051d944, xPasswordCrush, "\xd2\xee\xeb\xef\xe0"),
+    /* Крипта */ DATA_COMPGEN(0x0051d94c, xPasswordCrypt, "\xca\xf0\xe8\xef\xf2\xe0"),
+    /* Кристалл */ DATA_COMPGEN(0x0051d954, xPasswordCrystal, "\xca\xf0\xe8\xf1\xf2\xe0\xeb\xeb"),
+    /* Проклятие */ DATA_COMPGEN(0x0051d960, xPasswordCurse, "\xcf\xf0\xee\xea\xeb\xff\xf2\xe8\xe5"),
+    /* Циклоп */ DATA_COMPGEN(0x0051d96c, xPasswordCyclops, "\xd6\xe8\xea\xeb\xee\xef"),
+    /* Кинжал */ DATA_COMPGEN(0x0051d974, xPasswordDagger, "\xca\xe8\xed\xe6\xe0\xeb"),
+    /* Урон */ DATA_COMPGEN(0x0051d97c, xPasswordDamage, "\xd3\xf0\xee\xed"),
+    /* Тьма */ DATA_COMPGEN(0x0051d984, xPasswordDarkness, "\xd2\xfc\xec\xe0"),
+    /* Смерть */ DATA_COMPGEN(0x0051d98c, xPasswordDeath, "\xd1\xec\xe5\xf0\xf2\xfc"),
+    /* Десятина */ DATA_COMPGEN(0x0051d994, xPasswordDecimate, "\xc4\xe5\xf1\xff\xf2\xe8\xed\xe0"),
+    /* Твердый */ DATA_COMPGEN(0x0051d9a0, xPasswordDecisive, "\xd2\xe2\xe5\xf0\xe4\xfb\xe9"),
+    /* Поражение */ DATA_COMPGEN(0x0051d9a8, xPasswordDefeat, "\xcf\xee\xf0\xe0\xe6\xe5\xed\xe8\xe5"),
+    /* Демон */ DATA_COMPGEN(0x0051d9b4, xPasswordDemon, "\xc4\xe5\xec\xee\xed"),
+    /* Пустыня */ DATA_COMPGEN(0x0051d9bc, xPasswordDesert, "\xcf\xf3\xf1\xf2\xfb\xed\xff"),
+    /* Уничтожить */ DATA_COMPGEN(0x0051d9c4, xPasswordDestroy, "\xd3\xed\xe8\xf7\xf2\xee\xe6\xe8\xf2\xfc"),
+    /* Разрушение */ DATA_COMPGEN(0x0051d9d0, xPasswordDevastation, "\xd0\xe0\xe7\xf0\xf3\xf8\xe5\xed\xe8\xe5"),
+    /* Отступить */ DATA_COMPGEN(0x0051d9dc, xPasswordDeviate, "\xce\xf2\xf1\xf2\xf3\xef\xe8\xf2\xfc"),
+    /* Измерение */ DATA_COMPGEN(0x0051d9e8, xPasswordDimension, "\xc8\xe7\xec\xe5\xf0\xe5\xed\xe8\xe5"),
+    /* Дипломатия */ DATA_COMPGEN(0x0051d9f4, xPasswordDiplomacy, "\xc4\xe8\xef\xeb\xee\xec\xe0\xf2\xe8\xff"),
+    /* Открыть */ DATA_COMPGEN(0x0051da00, xPasswordDiscover, "\xce\xf2\xea\xf0\xfb\xf2\xfc"),
+    /* Разрушение */ DATA_COMPGEN(0x0051da08, xPasswordDisruption, "\xd0\xe0\xe7\xf0\xf3\xf8\xe5\xed\xe8\xe5"),
+    /* Дистанция */ DATA_COMPGEN(0x0051da14, xPasswordDistance, "\xc4\xe8\xf1\xf2\xe0\xed\xf6\xe8\xff"),
+    /* Дракон */ DATA_COMPGEN(0x0051da20, xPasswordDragon, "\xc4\xf0\xe0\xea\xee\xed"),
+    /* Друид */ DATA_COMPGEN(0x0051da28, xPasswordDruid, "\xc4\xf0\xf3\xe8\xe4"),
+    /* Подземелье */ DATA_COMPGEN(0x0051da30, xPasswordDungeon, "\xcf\xee\xe4\xe7\xe5\xec\xe5\xeb\xfc\xe5"),
+    /* Гном */ DATA_COMPGEN(0x0051da3c, xPasswordDwarven, "\xc3\xed\xee\xec"),
+    /* Жилище */ DATA_COMPGEN(0x0051da44, xPasswordDwelling, "\xc6\xe8\xeb\xe8\xf9\xe5"),
+    /* Землетрясение */ DATA_COMPGEN(0x0051da4c, xPasswordEarthquake, "\xc7\xe5\xec\xeb\xe5\xf2\xf0\xff\xf1\xe5\xed\xe8\xe5"),
+    /* Элементал */ DATA_COMPGEN(0x0051da5c, xPasswordElemental, "\xdd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb"),
+    /* Эликсир */ DATA_COMPGEN(0x0051da68, xPasswordElixir, "\xdd\xeb\xe8\xea\xf1\xe8\xf0"),
+    /* Elven */ DATA_COMPGEN(0x0051da70, xPasswordElven, "\x45\x6c\x76\x65\x6e"),
+    /* Символ */ DATA_COMPGEN(0x0051da78, xPasswordEmblem, "\xd1\xe8\xec\xe2\xee\xeb"),
+    /* Атаковать */ DATA_COMPGEN(0x0051da80, xPasswordEngage, "\xc0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc"),
+    /* Ярость */ DATA_COMPGEN(0x0051da8c, xPasswordEnrage, "\xdf\xf0\xee\xf1\xf2\xfc"),
+    /* Угощать */ DATA_COMPGEN(0x0051da94, xPasswordEntertain, "\xd3\xe3\xee\xf9\xe0\xf2\xfc"),
+    /* Зло */ DATA_COMPGEN(0x0051da9c, xPasswordEvil, "\xc7\xeb\xee"),
+    /* Страх */ DATA_COMPGEN(0x0051daa0, xPasswordFear, "\xd1\xf2\xf0\xe0\xf5"),
+    /* Огонь */ DATA_COMPGEN(0x0051daa8, xPasswordFire, "\xce\xe3\xee\xed\xfc"),
+    /* БУКА */ DATA_COMPGEN(0x0051dab0, xPasswordFireball, "\xc1\xd3\xca\xc0"),
+    /* Цеп */ DATA_COMPGEN(0x0051dab8, xPasswordFlail, "\xd6\xe5\xef"),
+    /* Фляга */ DATA_COMPGEN(0x0051dabc, xPasswordFlask, "\xd4\xeb\xff\xe3\xe0"),
+    /* Наводнение */ DATA_COMPGEN(0x0051dac4, xPasswordFlood, "\xcd\xe0\xe2\xee\xe4\xed\xe5\xed\xe8\xe5"),
+    /* Цветок */ DATA_COMPGEN(0x0051dad0, xPasswordFollower, "\xd6\xe2\xe5\xf2\xee\xea"),
+    /* Фонтан */ DATA_COMPGEN(0x0051dad8, xPasswordFortunate, "\xd4\xee\xed\xf2\xe0\xed"),
+    /* Удача */ DATA_COMPGEN(0x0051dae0, xPasswordFortune, "\xd3\xe4\xe0\xf7\xe0"),
+    /* Горгулья */ DATA_COMPGEN(0x0051dae8, xPasswordGargoyle, "\xc3\xee\xf0\xe3\xf3\xeb\xfc\xff"),
+    /* Перчатка */ DATA_COMPGEN(0x0051daf4, xPasswordGauntlets, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe0"),
+    /* Самоцвет */ DATA_COMPGEN(0x0051db00, xPasswordGems, "\xd1\xe0\xec\xee\xf6\xe2\xe5\xf2"),
+    /* Джинн */ DATA_COMPGEN(0x0051db0c, xPasswordGenie, "\xc4\xe6\xe8\xed\xed"),
+    /* Призрак */ DATA_COMPGEN(0x0051db14, xPasswordGhost, "\xcf\xf0\xe8\xe7\xf0\xe0\xea"),
+    /* Гигант */ DATA_COMPGEN(0x0051db1c, xPasswordGiants, "\xc3\xe8\xe3\xe0\xed\xf2"),
+    /* Перчатки */ DATA_COMPGEN(0x0051db24, xPasswordGloves, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8"),
+    /* Гоблин */ DATA_COMPGEN(0x0051db30, xPasswordGoblin, "\xc3\xee\xe1\xeb\xe8\xed"),
+    /* Золото */ DATA_COMPGEN(0x0051db38, xPasswordGold, "\xc7\xee\xeb\xee\xf2\xee"),
+    /* Голем */ DATA_COMPGEN(0x0051db40, xPasswordGolem, "\xc3\xee\xeb\xe5\xec"),
+    /* Кладбище */ DATA_COMPGEN(0x0051db48, xPasswordGraveyard, "\xca\xeb\xe0\xe4\xe1\xe8\xf9\xe5"),
+    /* Опасность */ DATA_COMPGEN(0x0051db54, xPasswordGravity, "\xce\xef\xe0\xf1\xed\xee\xf1\xf2\xfc"),
+    /* Стража */ DATA_COMPGEN(0x0051db60, xPasswordGuard, "\xd1\xf2\xf0\xe0\xe6\xe0"),
+    /* Гильдия */ DATA_COMPGEN(0x0051db68, xPasswordGuild, "\xc3\xe8\xeb\xfc\xe4\xe8\xff"),
+    /* Алебарда */ DATA_COMPGEN(0x0051db70, xPasswordHalberd, "\xc0\xeb\xe5\xe1\xe0\xf0\xe4\xe0"),
+    /* Молот */ DATA_COMPGEN(0x0051db7c, xPasswordHammer, "\xcc\xee\xeb\xee\xf2"),
+    /* Арфа */ DATA_COMPGEN(0x0051db84, xPasswordHarp, "\xc0\xf0\xf4\xe0"),
+    /* Запустение */ DATA_COMPGEN(0x0051db8c, xPasswordHaunt, "\xc7\xe0\xef\xf3\xf1\xf2\xe5\xed\xe8\xe5"),
+    /* Шлем */ DATA_COMPGEN(0x0051db98, xPasswordHelm, "\xd8\xeb\xe5\xec"),
+    /* Герой */ DATA_COMPGEN(0x0051dba0, xPasswordHeroic, "\xc3\xe5\xf0\xee\xe9"),
+    /* Честь */ DATA_COMPGEN(0x0051dba8, xPasswordHonor, "\xd7\xe5\xf1\xf2\xfc"),
+    /* Надежда */ DATA_COMPGEN(0x0051dbb0, xPasswordHope, "\xcd\xe0\xe4\xe5\xe6\xe4\xe0"),
+    /* Орда */ DATA_COMPGEN(0x0051dbb8, xPasswordHorde, "\xce\xf0\xe4\xe0"),
+    /* Лошадь */ DATA_COMPGEN(0x0051dbc0, xPasswordHorse, "\xcb\xee\xf8\xe0\xe4\xfc"),
+    /* Подкова */ DATA_COMPGEN(0x0051dbc8, xPasswordHorseshoe, "\xcf\xee\xe4\xea\xee\xe2\xe0"),
+    /* Гидра */ DATA_COMPGEN(0x0051dbd0, xPasswordHydra, "\xc3\xe8\xe4\xf0\xe0"),
+    /* Опознать */ DATA_COMPGEN(0x0051dbd8, xPasswordIdentify, "\xce\xef\xee\xe7\xed\xe0\xf2\xfc"),
+    /* Зажигать */ DATA_COMPGEN(0x0051dbe4, xPasswordIgnite, "\xc7\xe0\xe6\xe8\xe3\xe0\xf2\xfc"),
+    /* Иллюзия */ DATA_COMPGEN(0x0051dbf0, xPasswordIllusion, "\xc8\xeb\xeb\xfe\xe7\xe8\xff"),
+    /* Невидимость */ DATA_COMPGEN(0x0051dbf8, xPasswordInvisible, "\xcd\xe5\xe2\xe8\xe4\xe8\xec\xee\xf1\xf2\xfc"),
+    /* Королевство */ DATA_COMPGEN(0x0051dc04, xPasswordKingdom, "\xca\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xee"),
+    /* Нож */ DATA_COMPGEN(0x0051dc10, xPasswordKnife, "\xcd\xee\xe6"),
+    /* Рыцарство */ DATA_COMPGEN(0x0051dc14, xPasswordKnighthood, "\xd0\xfb\xf6\xe0\xf0\xf1\xf2\xe2\xee"),
+    /* Ланс */ DATA_COMPGEN(0x0051dc20, xPasswordLance, "\xcb\xe0\xed\xf1"),
+    /* Фонарь */ DATA_COMPGEN(0x0051dc28, xPasswordLantern, "\xd4\xee\xed\xe0\xf0\xfc"),
+    /* Лидерство */ DATA_COMPGEN(0x0051dc30, xPasswordLeadership, "\xcb\xe8\xe4\xe5\xf0\xf1\xf2\xe2\xee"),
+    /* Кожа */ DATA_COMPGEN(0x0051dc3c, xPasswordLeather, "\xca\xee\xe6\xe0"),
+    /* Независимость */ DATA_COMPGEN(0x0051dc44, xPasswordLibrary, "\xcd\xe5\xe7\xe0\xe2\xe8\xf1\xe8\xec\xee\xf1\xf2\xfc"),
+    /* Ленник */ DATA_COMPGEN(0x0051dc54, xPasswordLiege, "\xcb\xe5\xed\xed\xe8\xea"),
+    /* Жизнь */ DATA_COMPGEN(0x0051dc5c, xPasswordLife, "\xc6\xe8\xe7\xed\xfc"),
+    /* Молния */ DATA_COMPGEN(0x0051dc64, xPasswordLightning, "\xcc\xee\xeb\xed\xe8\xff"),
+    /* Лорд */ DATA_COMPGEN(0x0051dc6c, xPasswordLord, "\xcb\xee\xf0\xe4"),
+    /* Палица */ DATA_COMPGEN(0x0051dc74, xPasswordMace, "\xcf\xe0\xeb\xe8\xf6\xe0"),
+    /* Маг */ DATA_COMPGEN(0x0051dc7c, xPasswordMage, "\xcc\xe0\xe3"),
+    /* Магия */ DATA_COMPGEN(0x0051dc80, xPasswordMagic, "\xcc\xe0\xe3\xe8\xff"),
+    /* Величество */ DATA_COMPGEN(0x0051dc88, xPasswordMajesty, "\xc2\xe5\xeb\xe8\xf7\xe5\xf1\xf2\xe2\xee"),
+    /* Злоба */ DATA_COMPGEN(0x0051dc94, xPasswordMalevolent, "\xc7\xeb\xee\xe1\xe0"),
+    /* Медуза */ DATA_COMPGEN(0x0051dc9c, xPasswordMedusa, "\xcc\xe5\xe4\xf3\xe7\xe0"),
+    /* Метеорит */ DATA_COMPGEN(0x0051dca4, xPasswordMeteor, "\xcc\xe5\xf2\xe5\xee\xf0\xe8\xf2"),
+    /* Сила */ DATA_COMPGEN(0x0051dcb0, xPasswordMight, "\xd1\xe8\xeb\xe0"),
+    /* Минотавр */ DATA_COMPGEN(0x0051dcb8, xPasswordMinotaur, "\xcc\xe8\xed\xee\xf2\xe0\xe2\xf0"),
+    /* Ежеминутный */ DATA_COMPGEN(0x0051dcc4, xPasswordMinutemen, "\xc5\xe6\xe5\xec\xe8\xed\xf3\xf2\xed\xfb\xe9"),
+    /* Стрелка */ DATA_COMPGEN(0x0051dcd0, xPasswordMissile, "\xd1\xf2\xf0\xe5\xeb\xea\xe0"),
+    /* Монстр */ DATA_COMPGEN(0x0051dcd8, xPasswordMonster, "\xcc\xee\xed\xf1\xf2\xf0"),
+    /* Мумия */ DATA_COMPGEN(0x0051dce0, xPasswordMummy, "\xcc\xf3\xec\xe8\xff"),
+    /* Навигация */ DATA_COMPGEN(0x0051dce8, xPasswordNavigation, "\xcd\xe0\xe2\xe8\xe3\xe0\xf6\xe8\xff"),
+    /* Некромантия */ DATA_COMPGEN(0x0051dcf4, xPasswordNecromancy, "\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff"),
+    /* Ничего */ DATA_COMPGEN(0x0051dd00, xPasswordNoho, "\xcd\xe8\xf7\xe5\xe3\xee"),
+    /* Огр */ DATA_COMPGEN(0x0051dd08, xPasswordOgre, "\xce\xe3\xf0"),
+    /* Мазь */ DATA_COMPGEN(0x0051dd0c, xPasswordOintment, "\xcc\xe0\xe7\xfc"),
+    /* Паладин */ DATA_COMPGEN(0x0051dd14, xPasswordPaladin, "\xcf\xe0\xeb\xe0\xe4\xe8\xed"),
+    /* Паралич */ DATA_COMPGEN(0x0051dd1c, xPasswordParalyze, "\xcf\xe0\xf0\xe0\xeb\xe8\xf7"),
+    /* Отбитие */ DATA_COMPGEN(0x0051dd24, xPasswordParry, "\xce\xf2\xe1\xe8\xf2\xe8\xe5"),
+    /* Разделять */ DATA_COMPGEN(0x0051dd2c, xPasswordPartake, "\xd0\xe0\xe7\xe4\xe5\xeb\xff\xf2\xfc"),
+    /* Феникс */ DATA_COMPGEN(0x0051dd38, xPasswordPhoenix, "\xd4\xe5\xed\xe8\xea\xf1"),
+    /* Портал */ DATA_COMPGEN(0x0051dd40, xPasswordPortal, "\xcf\xee\xf0\xf2\xe0\xeb"),
+    /* Напиток */ DATA_COMPGEN(0x0051dd48, xPasswordPotion, "\xcd\xe0\xef\xe8\xf2\xee\xea"),
+    /* Кошель */ DATA_COMPGEN(0x0051dd50, xPasswordPouch, "\xca\xee\xf8\xe5\xeb\xfc"),
+    /* Сумка */ DATA_COMPGEN(0x0051dd58, xPasswordPowder, "\xd1\xf3\xec\xea\xe0"),
+    /* Власть */ DATA_COMPGEN(0x0051dd60, xPasswordPower, "\xc2\xeb\xe0\xf1\xf2\xfc"),
+    /* Пирамида */ DATA_COMPGEN(0x0051dd68, xPasswordPyramid, "\xcf\xe8\xf0\xe0\xec\xe8\xe4\xe0"),
+    /* Задание */ DATA_COMPGEN(0x0051dd74, xPasswordQuest, "\xc7\xe0\xe4\xe0\xed\xe8\xe5"),
+    /* Радуга */ DATA_COMPGEN(0x0051dd7c, xPasswordRainbow, "\xd0\xe0\xe4\xf3\xe3\xe0"),
+    /* Рейнджер */ DATA_COMPGEN(0x0051dd84, xPasswordRanger, "\xd0\xe5\xe9\xed\xe4\xe6\xe5\xf0"),
+    /* Нанять */ DATA_COMPGEN(0x0051dd90, xPasswordRecruit, "\xcd\xe0\xed\xff\xf2\xfc"),
+    /* Спасти */ DATA_COMPGEN(0x0051dd98, xPasswordRescue, "\xd1\xef\xe0\xf1\xf2\xe8"),
+    /* Воскрешение */ DATA_COMPGEN(0x0051dda0, xPasswordResurrect, "\xc2\xee\xf1\xea\xf0\xe5\xf8\xe5\xed\xe8\xe5"),
+    /* Отступить */ DATA_COMPGEN(0x0051ddac, xPasswordRetreat, "\xce\xf2\xf1\xf2\xf3\xef\xe8\xf2\xfc"),
+    /* Праведность */ DATA_COMPGEN(0x0051ddb8, xPasswordRighteous, "\xcf\xf0\xe0\xe2\xe5\xe4\xed\xee\xf1\xf2\xfc"),
+    /* Халат */ DATA_COMPGEN(0x0051ddc4, xPasswordRobe, "\xd5\xe0\xeb\xe0\xf2"),
+    /* Разбойник */ DATA_COMPGEN(0x0051ddcc, xPasswordRogue, "\xd0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea"),
+    /* Веревка */ DATA_COMPGEN(0x0051ddd8, xPasswordRope, "\xc2\xe5\xf0\xe5\xe2\xea\xe0"),
+    /* Ножны */ DATA_COMPGEN(0x0051dde0, xPasswordScabbard, "\xcd\xee\xe6\xed\xfb"),
+    /* Скарабей */ DATA_COMPGEN(0x0051dde8, xPasswordScarab, "\xd1\xea\xe0\xf0\xe0\xe1\xe5\xe9"),
+    /* Сабля */ DATA_COMPGEN(0x0051ddf4, xPasswordScimitar, "\xd1\xe0\xe1\xeb\xff"),
+    /* Свиток */ DATA_COMPGEN(0x0051ddfc, xPasswordScroll, "\xd1\xe2\xe8\xf2\xee\xea"),
+    /* Щит */ DATA_COMPGEN(0x0051de04, xPasswordShield, "\xd9\xe8\xf2"),
+    /* Глас */ DATA_COMPGEN(0x0051de08, xPasswordShout, "\xc3\xeb\xe0\xf1"),
+    /* Святилище */ DATA_COMPGEN(0x0051de10, xPasswordShrine, "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5"),
+    /* Осада */ DATA_COMPGEN(0x0051de1c, xPasswordSiege, "\xce\xf1\xe0\xe4\xe0"),
+    /* Скелет */ DATA_COMPGEN(0x0051de24, xPasswordSkeleton, "\xd1\xea\xe5\xeb\xe5\xf2"),
+    /* Навык */ DATA_COMPGEN(0x0051de2c, xPasswordSkill, "\xcd\xe0\xe2\xfb\xea"),
+    /* Убийца */ DATA_COMPGEN(0x0051de34, xPasswordSlayer, "\xd3\xe1\xe8\xe9\xf6\xe0"),
+    /* Праща */ DATA_COMPGEN(0x0051de3c, xPasswordSling, "\xcf\xf0\xe0\xf9\xe0"),
+    /* Колдунья */ DATA_COMPGEN(0x0051de44, xPasswordSorceress, "\xca\xee\xeb\xe4\xf3\xed\xfc\xff"),
+    /* Скорость */ DATA_COMPGEN(0x0051de50, xPasswordSpeed, "\xd1\xea\xee\xf0\xee\xf1\xf2\xfc"),
+    /* Посох */ DATA_COMPGEN(0x0051de5c, xPasswordStaff, "\xcf\xee\xf1\xee\xf5"),
+    /* Статуя */ DATA_COMPGEN(0x0051de64, xPasswordStatue, "\xd1\xf2\xe0\xf2\xf3\xff"),
+    /* Шторм */ DATA_COMPGEN(0x0051de6c, xPasswordStorm, "\xd8\xf2\xee\xf0\xec"),
+    /* Сера */ DATA_COMPGEN(0x0051de74, xPasswordSulfur, "\xd1\xe5\xf0\xe0"),
+    /* Вызвать */ DATA_COMPGEN(0x0051de7c, xPasswordSummon, "\xc2\xfb\xe7\xe2\xe0\xf2\xfc"),
+    /* Болото */ DATA_COMPGEN(0x0051de84, xPasswordSwamp, "\xc1\xee\xeb\xee\xf2\xee"),
+    /* Меч */ DATA_COMPGEN(0x0051de8c, xPasswordSword, "\xcc\xe5\xf7"),
+    /* Телепатия */ DATA_COMPGEN(0x0051de90, xPasswordTelepathy, "\xd2\xe5\xeb\xe5\xef\xe0\xf2\xe8\xff"),
+    /* Страх */ DATA_COMPGEN(0x0051de9c, xPasswordTerror, "\xd1\xf2\xf0\xe0\xf5"),
+    /* Гром */ DATA_COMPGEN(0x0051dea4, xPasswordThunder, "\xc3\xf0\xee\xec"),
+    /* Факел */ DATA_COMPGEN(0x0051deac, xPasswordTorch, "\xd4\xe0\xea\xe5\xeb"),
+    /* Башня */ DATA_COMPGEN(0x0051deb4, xPasswordTower, "\xc1\xe0\xf8\xed\xff"),
+    /* Пародия */ DATA_COMPGEN(0x0051debc, xPasswordTravesty, "\xcf\xe0\xf0\xee\xe4\xe8\xff"),
+    /* Соглашение */ DATA_COMPGEN(0x0051dec4, xPasswordTreaty, "\xd1\xee\xe3\xeb\xe0\xf8\xe5\xed\xe8\xe5"),
+    /* Трезубец */ DATA_COMPGEN(0x0051ded0, xPasswordTrident, "\xd2\xf0\xe5\xe7\xf3\xe1\xe5\xf6"),
+    /* Тролль */ DATA_COMPGEN(0x0051dedc, xPasswordTroll, "\xd2\xf0\xee\xeb\xeb\xfc"),
+    /* Единорог */ DATA_COMPGEN(0x0051dee4, xPasswordUnicorn, "\xc5\xe4\xe8\xed\xee\xf0\xee\xe3"),
+    /* Вампир */ DATA_COMPGEN(0x0051def0, xPasswordVampire, "\xc2\xe0\xec\xef\xe8\xf0"),
+    /* Яд */ DATA_COMPGEN(0x0051def8, xPasswordVenom, "\xdf\xe4"),
+    /* Победа */ DATA_COMPGEN(0x0051defc, xPasswordVictory, "\xcf\xee\xe1\xe5\xe4\xe0"),
+    /* Вулкан */ DATA_COMPGEN(0x0051df04, xPasswordVolcano, "\xc2\xf3\xeb\xea\xe0\xed"),
+    /* Уязвимость */ DATA_COMPGEN(0x0051df0c, xPasswordVulnerable, "\xd3\xff\xe7\xe2\xe8\xec\xee\xf1\xf2\xfc"),
+    /* Жезл */ DATA_COMPGEN(0x0051df18, xPasswordWand, "\xc6\xe5\xe7\xeb"),
+    /* Война */ DATA_COMPGEN(0x0051df20, xPasswordWarfare, "\xc2\xee\xe9\xed\xe0"),
+    /* Чернокнижник */ DATA_COMPGEN(0x0051df28, xPasswordWarlock, "\xd7\xe5\xf0\xed\xee\xea\xed\xe8\xe6\xed\xe8\xea"),
+    /* Оружие */ DATA_COMPGEN(0x0051df38, xPasswordWeapon, "\xce\xf0\xf3\xe6\xe8\xe5"),
+    /* Крылья */ DATA_COMPGEN(0x0051df40, xPasswordWings, "\xca\xf0\xfb\xeb\xfc\xff"),
+    /* Волшебство */ DATA_COMPGEN(0x0051df48, xPasswordWizardry, "\xc2\xee\xeb\xf8\xe5\xe1\xf1\xf2\xe2\xee"),
+    /* Волк */ DATA_COMPGEN(0x0051df54, xPasswordWolf, "\xc2\xee\xeb\xea"),
+    /* Зомби */ DATA_COMPGEN(0x0051df5c, xPasswordZombie, "\xc7\xee\xec\xe1\xe8")
 };
 DATA(0x00534860) i8 xNetHasOldPlayers = 0;
-u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
+DATA(0x0051bb58) u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     IDX(FACTION_KNIGHT),
     IDX(FACTION_KNIGHT),
     IDX(FACTION_NECROMANCER),
@@ -223,10 +1052,6 @@ u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     IDX(FACTION_NECROMANCER),
     IDX(FACTION_BARBARIAN),
     IDX(FACTION_WARLOCK),
-    IDX(FACTION_KNIGHT),
-    IDX(FACTION_KNIGHT),
-    IDX(FACTION_KNIGHT),
-    IDX(FACTION_KNIGHT),
     IDX(FACTION_KNIGHT)
 };
 DATA(0x0051bb64) i32

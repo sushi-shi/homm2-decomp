@@ -128,7 +128,6 @@ inline void soundManager::RestoreBackend(void) {
         CDStartup();
 }
 
-extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;

@@ -51,6 +51,26 @@ class AnnotatedCompgenDataTest(unittest.TestCase):
                 (0x1008, "defaultName", "STRING_LITERAL", 8),
             ])
 
+    def test_lexical_string_allows_readable_translation_comments(self):
+        with TemporaryDirectory(dir=REPO / "build") as directory:
+            source = Path(directory) / "SOURCE"
+            source.mkdir()
+            (source / "Literal.cpp").write_text(
+                '#include <va.h>\n'
+                'const char *first = DATA_COMPGEN('
+                '0x00401000, captainName, "\\xca\\xe0\\xef\\xe8\\xf2\\xe0\\xed" '
+                '/* "Капитан" */);\n'
+                'const char *second = DATA_COMPGEN('
+                '0x00401008, joinedName, "cap" /* readable */ "tain");\n')
+            rows = source_compgen_data(Path(directory), REPO)
+
+        self.assertEqual(
+            [(row.rva, row.semantic_name, row.kind, row.size) for row in rows],
+            [
+                (0x1000, "captainName", "STRING_LITERAL", 8),
+                (0x1008, "joinedName", "STRING_LITERAL", 8),
+            ])
+
     def test_rejects_duplicate_semantic_identity(self):
         with TemporaryDirectory(dir=REPO / "build") as directory:
             source = Path(directory) / "SOURCE"

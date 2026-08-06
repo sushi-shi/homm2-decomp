@@ -141,7 +141,11 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     sprintf(
         gText,
-        "%s meets %s",
+        /* Встречаются %s и %s */ DATA_COMPGEN(
+            0x00518afc,
+            swapManagerHeroesMeetFormat,
+            "\xc2\xf1\xf2\xf0\xe5\xf7\xe0\xfe\xf2\xf1\xff\x20\x25\x73\x20\xe8\x20\x25\x73"
+        ),
         m_heroes[IDX(SWAP_SIDE_LEFT)]->m_name,
         m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_name
     );
@@ -439,7 +443,11 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    "This item can't be traded.",
+                                    /* Нельзя передать этот предмет. */ DATA_COMPGEN(
+                                        0x00518b2c,
+                                        swapManagerLeftItemCannotBeTraded,
+                                        "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e"
+                                    ),
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -514,7 +522,11 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    "This item can't be traded.",
+                                    /* Нельзя передать этот предмет. */ DATA_COMPGEN(
+                                        0x00518b4c,
+                                        swapManagerRightItemCannotBeTraded,
+                                        "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e"
+                                    ),
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -970,11 +982,22 @@ void swapManager::SplitMons(void) {
 
     message.type = MESSAGE_WIDGET;
     if (m_selectedSide == m_targetSide) {
-        sprintf(gText, "Move how many troops?");
+        sprintf(
+            gText,
+            /* Сколько воинов перенести? */ DATA_COMPGEN(
+                0x00518b90,
+                splitMonsCountPrompt,
+                "\xd1\xea\xee\xeb\xfc\xea\xee\x20\xe2\xee\xe8\xed\xee\xe2\x20\xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\x3f"
+            )
+        );
     } else {
         sprintf(
             gText,
-            "Move how many %s troops from %s to %s?",
+            /* Сколько %s перенести из армии %s в армию %s? */ DATA_COMPGEN(
+                0x00518bac,
+                splitMonsCountBetweenArmiesPrompt,
+                "\xd1\xea\xee\xeb\xfc\xea\xee\x20\x25\x73\x20\xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\x20\xe8\xe7\x20\xe0\xf0\xec\xe8\xe8\x20\x25\x73\x20\xe2\x20\xe0\xf0\xec\xe8\xfe\x20\x25\x73\x3f"
+            ),
             gArmyNamesPlural[IDX(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[IDX(m_selectedSide)]->m_name,
             m_heroes[IDX(m_targetSide)]->m_name

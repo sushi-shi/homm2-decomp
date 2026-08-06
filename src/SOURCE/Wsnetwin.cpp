@@ -35,10 +35,20 @@ i16 wsnet_init(void) {
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         sprintf(
             gText,
-            "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode "
-            "to windowed mode, so that any Windows 95 generated dialog boxes can be seen.\n\nWhen "
-            "the connection is successfully made, you can return to full screen mode by pressing "
-            "'F4'."
+            /* Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы
+               получили доступ к диалоговым окнам Windows.
+
+               Когда соединение будет установлено, вы сможете вернуться в полноэкранный режим
+               нажав 'F4'. */
+            DATA_COMPGEN(
+                0x0051aaa4,
+                wsnetInitTcpConnectionNotice,
+                "\xce\xe1 \xe8\xed\xe8\xf6\xe8\xe8\xf0\xee\xe2\xe0\xed\xe8\xe8 TCP/IP \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff. "
+                "\xc3\xe5\xf0\xee\xe8 II \xef\xe5\xf0\xe5\xea\xeb\xfe\xf7\xe0\xf2\xf1\xff \xe2 \xee\xea\xee\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec, \xf7\xf2\xee\xe1\xfb \xe2\xfb "
+                "\xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 \xe4\xee\xf1\xf2\xf3\xef \xea \xe4\xe8\xe0\xeb\xee\xe3\xee\xe2\xfb\xec \xee\xea\xed\xe0\xec Windows.\n\n"
+                "\xca\xee\xe3\xe4\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5 \xe1\xf3\xe4\xe5\xf2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xeb\xe5\xed\xee, \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
+                "\xef\xee\xeb\xed\xee\xfd\xea\xf0\xe0\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec \xed\xe0\xe6\xe0\xe2 'F4'."
+            )
         );
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         SetFullScreenStatus(0);
@@ -90,9 +100,18 @@ i16 wsnet_init(void) {
         if (giTCPHostStatus != -1) {
             sprintf(
                 cWSTextBuffer,
-                "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
-                "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional "
-                "guests.",
+                /* Создание игры по адресу %s.
+
+                   У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
+                   игру, не дожидаясь  остальных гостей. */
+                DATA_COMPGEN(
+                    0x0051ac18,
+                    wsnetInitHostExpectedGuestsStatus,
+                    "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
+                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
+                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
+                    "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9."
+                ),
                 inet_ntoa(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
@@ -101,7 +120,18 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                "Hosting game at %s\n\nWaiting On Guest(s).\n\n  Press 'CANCEL' to abort.",
+                /* Открытие игры на %s
+
+                   Ожидание гостя(ей).
+
+                     Нажмите 'ОТМЕНА', чтобы прервать соединение. */
+                DATA_COMPGEN(
+                    0x0051aca8,
+                    wsnetInitWaitingForGuestsStatus,
+                    "\xce\xf2\xea\xf0\xfb\xf2\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s\n\n"
+                    "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff(\xe5\xe9).\n\n  "
+                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
+                ),
                 inet_ntoa(gIn_addrIP)
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -114,9 +144,18 @@ i16 wsnet_init(void) {
             if (giTCPNumPlayers > EXTRA_GUEST_PLAYER_THRESHOLD) {
                 sprintf(
                     cWSTextBuffer,
-                    "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
-                    "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for "
-                    "additional guests.",
+                    /* Создание игры по адресу %s.
+
+                       У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
+                       игру, не дожидаясь  остальных гостей. */
+                    DATA_COMPGEN(
+                        0x0051ad04,
+                        wsnetInitUpdatedExpectedGuestsStatus,
+                        "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
+                        "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
+                        "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
+                        "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9."
+                    ),
                     inet_ntoa(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
@@ -126,14 +165,16 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n\xd3 "
-                "\xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 "
-                "'\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Создание игры на %s.
+                /* Создание игры на %s.
 
-У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков." */
-                ,
+                   У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
+                DATA_COMPGEN(
+                    0x0051ad94,
+                    wsnetInitHostGuestsStatus,
+                    "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
+                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
+                    "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2."
+                ),
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
@@ -158,7 +199,14 @@ i16 wsnet_init(void) {
             strcpy(gcTCPAddress, "");
         } else {
             GetDataEntry(
-                "Enter the host IP address.\n(i.e. 220.415.119.223)",
+                /* Введите IP адрес сервера.
+                   (Например: 220.415.119.223) */
+                DATA_COMPGEN(
+                    0x0051adf8,
+                    wsnetInitEnterHostAddressPrompt,
+                    "\xc2\xe2\xe5\xe4\xe8\xf2\xe5 IP \xe0\xe4\xf0\xe5\xf1 \xf1\xe5\xf0\xe2\xe5\xf0\xe0.\n"
+                    "(\xcd\xe0\xef\xf0\xe8\xec\xe5\xf0: 220.415.119.223)"
+                ),
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
@@ -169,7 +217,13 @@ i16 wsnet_init(void) {
         giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
         if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
             NormalDialog(
-                "Error in IP Address, please try again.",
+                /* Неправильный IP адрес. Попробуйте еще раз. */
+                DATA_COMPGEN(
+                    0x0051ae30,
+                    wsnetInitInvalidAddressMessage,
+                    "\xcd\xe5\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xfb\xe9 IP \xe0\xe4\xf0\xe5\xf1. "
+                    "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe5\xf9\xe5 \xf0\xe0\xe7."
+                ),
                 NORMAL_DIALOG_WAIT_FIRST,
                 -1,
                 -1,
@@ -183,7 +237,14 @@ i16 wsnet_init(void) {
             goto retryAddress;
         }
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
-        sprintf(cWSTextBuffer, "Searching for host.");
+        sprintf(
+            cWSTextBuffer,
+            /* Поиск сервера. */ DATA_COMPGEN(
+                0x0051ae5c,
+                wsnetInitSearchingForHostMessage,
+                "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
+            )
+        );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -465,14 +526,16 @@ i32 wsWaitForExtraGuests(void) {
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             cWSTextBuffer,
-            "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n\xd3 \xe2\xe0\xf1 "
-            "%d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', "
-            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
-            "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-            "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Создание игры на %s.
+            /* Создание игры на %s.
 
-У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков." */
-            ,
+               У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
+            DATA_COMPGEN(
+                0x0051af48,
+                wsnetUpdatedHostGuestsStatus,
+                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
+                "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
+                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2."
+            ),
             inet_ntoa(gIn_addrIP),
             giNumHumanPlayers - 1
         );
@@ -506,7 +569,15 @@ i32 wsWaitForHost(void) {
             iWSNextTickCount = KBTickCount() + WS_TRANSPORT_HOST_RETRY_DELAY;
             iWSAttempts++;
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
-                sprintf(cWSTextBuffer, "The Host is not responding.  Keep waiting?");
+                sprintf(
+                    cWSTextBuffer,
+                    /* Сервер не отвечает. Продолжить ожидание? */ DATA_COMPGEN(
+                        0x0051afac,
+                        wsnetHostNotRespondingPrompt,
+                        "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
+                        "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xee\xe6\xe8\xe4\xe0\xed\xe8\xe5? "
+                    )
+                );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(NULL);

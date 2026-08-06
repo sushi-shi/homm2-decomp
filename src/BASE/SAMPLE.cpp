@@ -1,7 +1,6 @@
 #include <va.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
-#include <BASE/SAMPLE_TYPES.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
@@ -12,9 +11,6 @@ H2_ENUM_BEGIN(SampleConstant)
     FILENAME_CAPACITY    = 32,
     FORMAT_SUFFIX_LENGTH = 3
 H2_ENUM_END(SampleConstant)
-
-static SSampleSourceFiles gSampleSourceFiles =
-    {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
 VA(0x004ce250, 0x210)
 sample::sample(char* name)

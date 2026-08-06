@@ -39,7 +39,8 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 
-#define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
+#define GENERIC_SITE_SIREN_ARMY_REMAINDER                                          \
+    DATA_COMPGEN(0x004ea5a8, genericSiteSirenArmyRemainder, 0.7)
 #define MONSTER_NECROMANCY_FRACTION 0.1
 #define MONSTER_AI_JOIN_COST_FRACTION 0.75
 
@@ -6195,7 +6196,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             sprintf(
                                 gText,
                                 DATA_COMPGEN(
-                                    0x004f7ee0,
+                                    0x004f6ee0,
                                     eventArtifactDisappearsFormat,
                                     "\xdd\xf2\xee %s! \xc5\xe4\xe2\xe0 \xe2\xfb \xe4\xee\xe1\xf0\xe0\xeb\xe8\xf1\xfc \xe4\xee "
                                     "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0, \xea\xe0\xea \xef\xf0\xe5\xe4\xec\xe5\xf2 "
@@ -8431,15 +8432,15 @@ CombatResult advManager::DoCombat(
             sprintf(
                 gText,
                 DATA_COMPGEN(
-                    0x004f84f0,
+                    0x004f74f0,
                     eventCombatAttackedFormat,
                     "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
                     /* "%s, ваш %s атакован!" */
                 ),
                 cPlayerNames[secondPlayer8],
                 combatTown
-                    ? DATA_COMPGEN(0x004f84e0, eventCombatTownType, "\xe3\xee\xf0\xee\xe4" /* "город" */)
-                    : DATA_COMPGEN(0x004f84e8, eventCombatHeroType, "\xe3\xe5\xf0\xee\xe9" /* "герой" */)
+                    ? DATA_COMPGEN(0x004f74e0, eventCombatTownType, "\xe3\xee\xf0\xee\xe4" /* "город" */)
+                    : DATA_COMPGEN(0x004f74e8, eventCombatHeroType, "\xe3\xe5\xf0\xee\xe9" /* "герой" */)
             );
             gpGame->WaitForPlayer(gText, secondPlayer8);
         }

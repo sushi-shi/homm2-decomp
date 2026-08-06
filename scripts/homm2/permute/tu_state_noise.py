@@ -1310,7 +1310,7 @@ def load_pairing_context(root: Path, unit: str) -> dict:
             root / "build/gen/compiler_generated_functions.csv", unit
         ),
         "compgen_data": load_compgen_data_claims(
-            root / "build/gen/delink_data_manifest.tsv", unit
+            root / "build/gen/delink_data_from_source.tsv", unit
         ),
     }
 

@@ -27,6 +27,9 @@ nothing else will.
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ProcessPoolExecutor
+import gc
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,11 +42,24 @@ from homm2.build.annotated_functions import (
 from homm2.build.annotated_data import (
     DATA_TOKEN, ClangMode, _clang_args, definitions_for_file,
 )
+from homm2.build.annotated_compgen_data import (
+    compgen_data_symbol_name,
+    source_compgen_data,
+)
 from homm2.build.annotated_vtables import source_vtables
 from homm2.core.paths import REPO
 
 OUTPUT = REPO / "build/gen/symbol_names.csv"
+COMPGEN_OUTPUT = REPO / "build/gen/compiler_generated_functions.csv"
 HEADER = "rva,name,unit,size,kind,provenance\n"
+COMPGEN_HEADER = "rva,name,unit,size,kind,owner,source,line\n"
+COMPGEN_MARKER = re.compile(
+    r"^\s*VA_COMPGEN\(\s*(0x[0-9a-fA-F]+)\s*,\s*"
+    r"(0x[0-9a-fA-F]+|[0-9]+)\s*,\s*([A-Z][A-Z0-9_]*)\s*,\s*"
+    r"([A-Za-z_]\w*)\s*\)\s*$")
+COMPGEN_KINDS = {
+    "STATIC_INIT_DISPATCH", "STATIC_ATEXIT", "STATIC_DTOR", "STATIC_CTOR",
+}
 
 # Every cursor kind that can carry a VA marker and produce a linker symbol.
 DEFINITION_KINDS = (
@@ -65,13 +81,66 @@ class SourceSymbol:
     provenance: str
 
 
-def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSymbol]:
+@dataclass(frozen=True, order=True)
+class SourceCompgenFunction:
+    rva: int
+    name: str
+    unit: str
+    size: int
+    kind: str
+    owner: str
+    source: str
+    line: int
+
+
+def compgen_functions_for_file(
+        path: Path, source_root: Path, repo: Path) -> list[SourceCompgenFunction]:
+    """Read semantic identities for bodies emitted by the compiler itself."""
+    unit = path.relative_to(source_root).with_suffix("").as_posix()
+    rows = []
+    for line_number, line in enumerate(
+            path.read_text(encoding="latin-1").splitlines(), 1):
+        match = COMPGEN_MARKER.match(line)
+        if match is None:
+            continue
+        va, size = int(match.group(1), 16), int(match.group(2), 0)
+        kind, owner = match.group(3), match.group(4)
+        if va < IMAGE_BASE or size <= 0 or kind not in COMPGEN_KINDS:
+            raise ValueError(f"{path}:{line_number}: invalid VA_COMPGEN marker")
+        name = "__h2cg$%s$%s$%s" % (
+            unit.replace("/", "$"), kind.lower(), owner)
+        rows.append(SourceCompgenFunction(
+            rva=va - IMAGE_BASE, name=name, unit=unit, size=size,
+            kind=kind, owner=owner,
+            source=path.relative_to(repo).as_posix(), line=line_number))
+    return rows
+
+
+def source_compgen_functions(
+        source_root: Path, repo: Path) -> list[SourceCompgenFunction]:
+    rows = []
+    for path in sorted(source_root.rglob("*.cpp")):
+        rows.extend(compgen_functions_for_file(path.resolve(), source_root, repo))
+    names = set()
+    rvas = set()
+    for row in sorted(rows):
+        if row.name in names:
+            raise ValueError(f"duplicate VA_COMPGEN semantic identity: {row.name}")
+        if row.rva in rvas:
+            raise ValueError(f"duplicate VA_COMPGEN RVA: 0x{row.rva:x}")
+        names.add(row.name)
+        rvas.add(row.rva)
+    return sorted(rows)
+
+
+def symbols_for_file(path: Path, source_root: Path, repo: Path,
+                     index=None) -> list[SourceSymbol]:
     """Every VA- or DATA-annotated definition in one translation unit."""
     blob = path.read_bytes()
     if not VA_TOKEN.search(blob) and not DATA_TOKEN.search(blob):
         return []
     configure_libclang()
-    translation = ci.Index.create().parse(
+    translation = (index or ci.Index.create()).parse(
         str(path), args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS))
     # An error in one of OUR files can silently drop a marker, so it is fatal.
     # Errors confined to system or vendor headers (VC6's pre-standard STL does
@@ -125,6 +194,28 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSy
         rows.append(SourceSymbol(
             rva=definition.rva, name=definition.symbol, unit=definition.unit,
             size=definition.size, kind="data", provenance="source-annotation"))
+    # libclang translation units retain large cursor graphs.  This scanner
+    # processes the whole project in one process, so relying on cyclic GC can
+    # exhaust libclang state after a few dozen TUs and terminate the process.
+    del translation
+    gc.collect()
+    return rows
+
+
+def _symbols_for_files_worker(
+        arguments: tuple[list[Path], Path, Path]) -> list[SourceSymbol]:
+    """Parse a bounded TU batch in a disposable process.
+
+    libclang retains native state after Python releases a translation unit.  A
+    full-tree scan eventually exhausts the host process, so real project scans
+    recycle workers before that accumulated state becomes material.
+    """
+    paths, source_root, repo = arguments
+    configure_libclang()
+    index = ci.Index.create()
+    rows = []
+    for path in paths:
+        rows.extend(symbols_for_file(path, source_root, repo, index=index))
     return rows
 
 
@@ -180,12 +271,41 @@ def reviewed_claims(repo: Path) -> list[SourceSymbol]:
 
 def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
     rows: list[SourceSymbol] = []
-    for path in sorted(source_root.rglob("*.cpp")):
-        rows.extend(symbols_for_file(path.resolve(), source_root, repo))
+    paths = [path.resolve() for path in sorted(source_root.rglob("*.cpp"))]
+    if len(paths) <= 1:
+        # Keep the small-fixture path direct so failures are easy to debug and
+        # callers can substitute the parser in unit tests.
+        for path in paths:
+            rows.extend(symbols_for_file(path, source_root, repo))
+    else:
+        # ProcessPoolExecutor's max_tasks_per_child recycler can deadlock after
+        # every worker reaches its cap.  Explicit 16-TU pools give each of two
+        # processes at most eight translations and make lifetime unambiguous.
+        for start in range(0, len(paths), 16):
+            batch = paths[start:start + 16]
+            worker_paths = [batch[::2], batch[1::2]]
+            arguments = [
+                (owned, source_root, repo)
+                for owned in worker_paths if owned
+            ]
+            with ProcessPoolExecutor(max_workers=len(arguments)) as executor:
+                for file_rows in executor.map(
+                        _symbols_for_files_worker, arguments):
+                    rows.extend(file_rows)
     for vtable in source_vtables(source_root, repo):
         rows.append(SourceSymbol(
             rva=vtable.rva, name=vtable.mangled_name, unit=vtable.unit,
             size=0, kind="data", provenance="source-vtable"))
+    for claim in source_compgen_data(source_root, repo):
+        rows.append(SourceSymbol(
+            rva=claim.rva,
+            name=compgen_data_symbol_name(claim.unit, claim.semantic_name),
+            unit=claim.unit, size=claim.size, kind="data",
+            provenance=f"source-DATA_COMPGEN:{claim.location}"))
+    for claim in source_compgen_functions(source_root, repo):
+        rows.append(SourceSymbol(
+            rva=claim.rva, name=claim.name, unit=claim.unit, size=claim.size,
+            kind="func", provenance=f"source-VA_COMPGEN:{claim.kind}"))
 
     seen: dict[int, SourceSymbol] = {}
     for row in sorted(rows):
@@ -311,15 +431,27 @@ def render(rows) -> str:
     return "".join(lines)
 
 
+def render_compgen(rows: list[SourceCompgenFunction]) -> str:
+    lines = [COMPGEN_HEADER]
+    for row in rows:
+        lines.append(
+            f"0x{row.rva:x},{row.name},{row.unit},0x{row.size:x},"
+            f"{row.kind},{row.owner},{row.source},{row.line}\n")
+    return "".join(lines)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--source", type=Path, default=REPO / "src")
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--compgen-output", type=Path, default=COMPGEN_OUTPUT)
     parser.add_argument("--check", action="store_true",
                         help="report what would be written and write nothing")
     args = parser.parse_args(argv)
 
-    rows = collect(args.source.resolve(), REPO)
+    source_root = args.source.resolve()
+    compgen = source_compgen_functions(source_root, REPO)
+    rows = collect(source_root, REPO)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")
@@ -329,11 +461,18 @@ def main(argv=None) -> int:
         return 0
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render(rows))
+    args.compgen_output.parent.mkdir(parents=True, exist_ok=True)
+    args.compgen_output.write_text(render_compgen(compgen))
     try:
         shown = args.output.relative_to(REPO)
     except ValueError:                      # --output may point outside the tree
         shown = args.output
     print(f"[source-symbols] -> {shown}")
+    try:
+        compgen_shown = args.compgen_output.relative_to(REPO)
+    except ValueError:
+        compgen_shown = args.compgen_output
+    print(f"[source-symbols] -> {compgen_shown} ({len(compgen)} semantic compiler functions)")
     return 0
 
 

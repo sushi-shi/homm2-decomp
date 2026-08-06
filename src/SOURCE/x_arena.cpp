@@ -75,10 +75,15 @@ i32 DoArenaDialog(void) {
 
     strcpy(
         gText,
-        "You enter the arena and face a pack of vicious lions.  You handily "
-        "defeat them, to the wild cheers of the crowd.  Impressed by your "
-        "skill, the aged trainer of gladiators agrees to train you in a "
-        "skill of your choice."
+        /* Вы вошли на арену и сразились со сворой свирепых львов. Впечатленный вашим мастерством
+           тренер гладиаторов согласился научить вас одному навыку на ваш выбор. */
+        DATA_COMPGEN(
+            0x0051afe8,
+            arenaVisitMessage,
+            "\xc2\xfb \xe2\xee\xf8\xeb\xe8 \xed\xe0 \xe0\xf0\xe5\xed\xf3 \xe8 \xf1\xf0\xe0\xe7\xe8\xeb\xe8\xf1\xfc \xf1\xee \xf1\xe2\xee\xf0\xee\xe9 \xf1\xe2\xe8\xf0\xe5\xef\xfb\xf5 \xeb\xfc\xe2\xee\xe2. "
+            "\xc2\xef\xe5\xf7\xe0\xf2\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xec\xe0\xf1\xf2\xe5\xf0\xf1\xf2\xe2\xee\xec \xf2\xf0\xe5\xed\xe5\xf0 \xe3\xeb\xe0\xe4\xe8\xe0\xf2\xee\xf0\xee\xe2 "
+            "\xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xf1\xff \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xee\xe4\xed\xee\xec\xf3 \xed\xe0\xe2\xfb\xea\xf3 \xed\xe0 \xe2\xe0\xf8 \xe2\xfb\xe1\xee\xf0."
+        )
     );
     lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
     textHeight4 = lineCount11 << TEXT_LINE_SHIFT;

@@ -197,6 +197,27 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
         )
         self.assertEqual(result.rows[0].proof, "source-DATA_COMPGEN")
 
+    def test_reviewed_real_literal_identity_applies_to_duplicate_comdat(self):
+        original = "__real@8@3ffeb333333333333000"
+        semantic = "__h2cg$SOURCE$EVENTS$data$sirenArmyRemainder"
+        payload = struct.pack("<d", 0.7)
+        obj = make_coff([
+            SectionSpec(".text", bytes(4), TEXT, ((0, 1, DIR32),)),
+            SectionSpec(".rdata", payload, RDATA),
+        ], [
+            ("consumer", 0, 1, 0x20, 2),
+            (original, 0, 2, 0, 2),
+        ])
+        result = canonicalize_coff(
+            obj, real_literal_references={original: semantic})
+        normalized = CoffObject(result.data)
+        self.assertEqual(normalized.symbols[1].name, semantic)
+        self.assertEqual(normalized.section_bytes(normalized.sections[1]), payload)
+        self.assertEqual(normalized.relocations[0].symbol_index, 1)
+        self.assertEqual(
+            result.rows[0].proof,
+            "source-DATA_COMPGEN-external-COMDAT")
+
     def test_source_compgen_data_binding_overrides_generic_private_name(self):
         obj = make_coff([
             SectionSpec(".data", b"rb\0\0", DATA),
@@ -212,6 +233,22 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
         self.assertEqual(result.rows[0].canonical_name, semantic)
         self.assertEqual(result.rows[0].physical_size, 4)
         self.assertEqual(result.rows[0].meaningful_size, 3)
+
+    def test_delinked_compgen_data_uses_existing_semantic_name(self):
+        semantic = "__h2cg$BASE$TEST$data$name"
+        obj = make_coff([
+            SectionSpec(".data", b"rb\0\0", DATA),
+        ], [
+            (semantic, 0, 1, 0, 3),
+        ])
+        result = canonicalize_coff(obj, compgen_data=(
+            # Candidate coordinates deliberately differ from Vostok's
+            # synthesized retail section; the PDB identity is authoritative.
+            CompgenDataClaim(semantic, 7, 0x24, 3, "data", "local"),
+        ))
+        self.assertEqual(CoffObject(result.data).symbols[0].name, semantic)
+        self.assertEqual(
+            result.rows[0].proof, "source-DATA_COMPGEN-existing-name")
 
     def test_compiler_function_names_come_from_semantic_relocation_roles(self):
         payload = compiler_function_graph()

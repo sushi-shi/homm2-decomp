@@ -17,8 +17,6 @@
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 
-#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
-
 H2_ENUM_BEGIN(ResourceConstant)
     INVALID_FILE            = -1,
     LOAD_SUCCESS            = 0,
@@ -267,7 +265,7 @@ i32 resourceManager::Open(i32 priority) {
     m_messageMask = BASE_MANAGER_ACCEPT_RESOURCE;
     m_priority = priority;
     m_active = true;
-    strcpy(m_name, "resourceManager");
+    strcpy(m_name, DATA_COMPGEN(0x0051e01c, resourceManagerName, "resourceManager"));
     m_resourceListHead = NULL;
     return LOAD_SUCCESS;
 }
@@ -314,13 +312,30 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
-        sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
+        sprintf(
+            gText,
+            DATA_COMPGEN(
+                0x0051e02c,
+                aggregateLimitError,
+                "Only %d .AGG files can be used at once."
+            ),
+            RESOURCE_MANAGER_AGGREGATE_LIMIT
+        );
         ShutDown(gText);
         return LOAD_ERROR;
     }
     aggregateFp = open(aggregateName, BINARY_OPEN_MODE);
     if (aggregateFp == INVALID_FILE) {
-        sprintf(gText, "Can't open file: %s", aggregateName);
+        sprintf(
+            gText,
+            /* Не могу открыть файл: %s */
+            DATA_COMPGEN(
+                0x0051e054,
+                aggregateOpenError,
+                "\xcd\xe5 \xec\xee\xe3\xf3 \xee\xf2\xea\xf0\xfb\xf2\xfc \xf4\xe0\xe9\xeb: %s"
+            ),
+            aggregateName
+        );
         ShutDown(gText);
         return LOAD_ERROR;
     }
@@ -358,7 +373,11 @@ void resourceManager::PointToFile(u32l fileId) {
     if (!found) {
         sprintf(
             gText,
-            "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+            DATA_COMPGEN(
+                0x0051e070,
+                pointToFileFailure,
+                "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s"
+            ),
             fileId,
             m_lastFileId,
             m_lastFileName
@@ -393,7 +412,11 @@ u32l resourceManager::GetFileSize(u32l fileId) {
     if (!found) {
         sprintf(
             gText,
-            "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+            DATA_COMPGEN(
+                0x0051e0bc,
+                getFileSizePointToFileFailure,
+                "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s"
+            ),
             fileId,
             m_lastFileId,
             m_lastFileName
@@ -419,7 +442,15 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004b8d80, 0x59)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 675);
+    H2_ASSERT(
+        m_aggregateFd[m_curAggregate] != INVALID_FILE,
+        DATA_COMPGEN(
+            0x0051e108,
+            readByteSourceFile,
+            "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
+        ),
+        675
+    );
     i8 value = 0;
     i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
@@ -427,7 +458,15 @@ i8 resourceManager::ReadByte(void) {
 
 VA(0x004b8de0, 0x5c)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 700);
+    H2_ASSERT(
+        m_aggregateFd[m_curAggregate] != INVALID_FILE,
+        DATA_COMPGEN(
+            0x0051e13c,
+            readWordSourceFile,
+            "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
+        ),
+        700
+    );
     i16 value = 0;
     i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
@@ -435,7 +474,15 @@ i16 resourceManager::ReadWord(void) {
 
 VA(0x004b8e40, 0x5c)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 723);
+    H2_ASSERT(
+        m_aggregateFd[m_curAggregate] != INVALID_FILE,
+        DATA_COMPGEN(
+            0x0051e170,
+            readLongSourceFile,
+            "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
+        ),
+        723
+    );
     i32l value = 0;
     i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
@@ -463,13 +510,25 @@ void resourceManager::Read13(i8* destination) {
 
 VA(0x004b8f60, 0x9b)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 775);
+    H2_ASSERT(
+        m_aggregateFd[m_curAggregate] != INVALID_FILE,
+        DATA_COMPGEN(
+            0x0051e1a4,
+            readBlockSourceFile,
+            "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
+        ),
+        775
+    );
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
         sprintf(
             gText,
-            "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
+            DATA_COMPGEN(
+                0x0051e1d8,
+                readBlockFileError,
+                "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'"
+            ),
             bytesRead,
             size,
             errno,

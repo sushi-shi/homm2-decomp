@@ -9,11 +9,16 @@ H2_ENUM_BEGIN(TileBlitConstant)
     TILE_PIXELS_OFFSET          = 0x16,
     PIXELS_PER_DWORD_SHIFT      = 2,
     FORWARD_ROW_BATCH           = 16,
-    PIXELS_PER_COPY_GROUP_SHIFT = 3
+    PIXELS_PER_COPY_GROUP_SHIFT = 3,
+    TILE_MODE_STORAGE_OFFSET    = 0,
+    TILE_ROW_STORAGE_OFFSET     = 4,
+    TILE_SCRATCH_WORD_COUNT     = 2
 H2_ENUM_END(TileBlitConstant)
 
-DATA(0x0051f2ec) static u32 gTileMode;
-DATA(0x0051f2f0) static i32 gTileRowCtr;
+#pragma data_seg(".data")
+DATA(0x0051f2ec) __declspec(allocate(".data"))
+static u32 gTileScratchWords[TILE_SCRATCH_WORD_COUNT];
+#pragma data_seg()
 
 #ifdef __clang__
 // clang rejects parameter references inside a naked function's __asm block,
@@ -39,7 +44,7 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         mov     edi, [edi+BITMAP_PIXELS_OFFSET]
         add     edi, eax
         mov     eax, flags
-        mov     gTileMode, eax
+        mov     gTileScratchWords[TILE_MODE_STORAGE_OFFSET], eax
         and     eax, TILE_INDEX_MASK
         mov     flags, eax
         mov     esi, src
@@ -53,10 +58,10 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         mov     dx, word ptr [esi+TILE_HEIGHT_OFFSET]
         mov     esi, [esi+TILE_PIXELS_OFFSET]
         add     esi, eax
-        mov     eax, gTileMode
+        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
         and     eax, TILE_FLIP_HORIZONTAL
         jne     path_h
-        mov     eax, gTileMode
+        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
         and     eax, TILE_FLIP_VERTICAL
         jne     path_v
         mov     eax, ecx
@@ -139,12 +144,12 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         jmp     epi
         nop
     path_h:
-        mov     eax, gTileMode
+        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
         and     eax, TILE_FLIP_VERTICAL
         jne     path_hv
         add     edi, ecx
         dec     edi
-        mov     gTileRowCtr, edx
+        mov     gTileScratchWords[TILE_ROW_STORAGE_OFFSET], edx
         mov     edx, ecx
         add     ebx, edx
         add     ebx, edx
@@ -178,7 +183,7 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         dec edi
         loop    h_inner
         add     edi, ebx
-        dec     gTileRowCtr
+        dec     gTileScratchWords[TILE_ROW_STORAGE_OFFSET]
         jne     h_outer
         jmp     epi
         xchg    ebx, ebx
@@ -190,7 +195,7 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         std
         mov     edx, ecx
         shr     edx, PIXELS_PER_COPY_GROUP_SHIFT
-        mov     gTileRowCtr, ecx
+        mov     gTileScratchWords[TILE_ROW_STORAGE_OFFSET], ecx
     hv_outer:
         mov     ecx, edx
     hv_inner:
@@ -220,7 +225,7 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
         inc edi
         loop    hv_inner
         add     edi, ebx
-        dec     gTileRowCtr
+        dec     gTileScratchWords[TILE_ROW_STORAGE_OFFSET]
         jne     hv_outer
         cld
         jmp     epi

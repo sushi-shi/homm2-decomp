@@ -15,6 +15,7 @@ import os
 import re
 import struct
 import tempfile
+import tomllib
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass
@@ -24,7 +25,10 @@ from homm2.build.annotated_data import (
     AnnotatedDataDefinition as SourceDefinition,
     source_definitions as annotated_source_definitions,
 )
-from homm2.build.annotated_compgen_data import source_compgen_data
+from homm2.build.annotated_compgen_data import (
+    compgen_data_symbol_name,
+    source_compgen_data,
+)
 from homm2.build.annotated_vtables import source_vtables
 from homm2.build.canonicalize_relocs import CoffFile
 from homm2.build.data_topology_census import (
@@ -49,7 +53,17 @@ SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",
     "section_ordinal", "section_offset", "scope", "provenance",
 )
+DELINK_HEADER = (
+    "object", "rva", "size", "storage", "alignment",
+    "section_ordinal", "section_offset", "scope",
+)
+SECTION_HEADER = (
+    "object", "ordinal", "name", "rva", "size", "alignment",
+    "characteristics", "checksum", "comdat_selection",
+    "associative_ordinal", "storage",
+)
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
+REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
 
 
 @dataclass(frozen=True)
@@ -80,6 +94,7 @@ class CandidateSection:
     alignment: int
     characteristics: int
     storage: str | None
+    checksum: int
     comdat_selection: int
     associative_ordinal: int | None
 
@@ -122,6 +137,7 @@ def candidate_topology(path: Path, unit: str) -> tuple[list[CandidateDefinition]
         definitions = _section_definition_symbols(coff, section)
         selection = definitions[0].aux[0].selection if definitions else 0
         associative = definitions[0].aux[0].associative_parent if definitions else None
+        checksum = definitions[0].aux[0].checksum if definitions else 0
         storage = _storage(section.name, characteristics) if _is_data_section(
             section.name, characteristics) else None
         if storage is not None:
@@ -130,7 +146,8 @@ def candidate_topology(path: Path, unit: str) -> tuple[list[CandidateDefinition]
             stream_cursors[storage] = cursor + section.raw_size
         sections.append(CandidateSection(
             unit, unit.replace("/", "\\") + ".c", section.index, section.name,
-            section.raw_size, alignment, characteristics, storage, selection, associative,
+            section.raw_size, alignment, characteristics, storage, checksum,
+            selection, associative,
         ))
 
     rows = []
@@ -263,7 +280,8 @@ def _candidate_bytes(coff: CoffFile, candidate: CandidateDefinition,
 def _compgen_candidate_kind(candidate: CandidateDefinition) -> str | None:
     if candidate.symbol.startswith(("$SG", "??_C@")):
         return "STRING_LITERAL"
-    if candidate.symbol.startswith("$T"):
+    if candidate.symbol.startswith("$T") or REAL_LITERAL.fullmatch(
+            candidate.symbol):
         return "FLOAT_LITERAL"
     if candidate.symbol.startswith("_$S5$"):
         return "STATIC_INIT_GUARD"
@@ -277,6 +295,31 @@ def _retail_storage_name(pe, rva: int) -> str | None:
         "data-initialized": "data",
         "data-loader-zero-tail": "bss",
     }.get(storage)
+
+
+def _interior_compgen_aliases(claims):
+    """Return claims whose retail extent is contained by another claim.
+
+    A stripped PE can prove that two relocation targets share bytes, but one
+    candidate definition cannot be invented for an interior alias.  Keep the
+    owning allocation and leave the alias unresolved until source models the
+    shared object and owner-relative addend explicitly.
+    """
+    aliases = {}
+    ordered = sorted(claims, key=lambda row: (row.rva, -row.size,
+                                               row.semantic_name))
+    for index, claim in enumerate(ordered):
+        start, end = claim.rva, claim.rva + claim.size
+        owners = [
+            owner for owner in ordered[:index]
+            if owner.rva <= start and end <= owner.rva + owner.size
+            and (owner.rva, owner.size) != (claim.rva, claim.size)
+        ]
+        if owners:
+            aliases[claim] = min(
+                owners, key=lambda owner: (owner.size, owner.rva,
+                                            owner.semantic_name))
+    return aliases
 
 
 def _maximum_claim_matching(edges, claims, forbidden=None):
@@ -402,6 +445,18 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
         derived_by_rva[(allocation.unit, allocation.rva)].append(allocation.name)
 
     for unit, unit_claims in sorted(claims_by_unit.items()):
+        interior_aliases = _interior_compgen_aliases(unit_claims)
+        for claim, owner in sorted(
+                interior_aliases.items(), key=lambda item: item[0].rva):
+            diagnostics.append(
+                f"{unit}: compiler-generated retail claim "
+                f"{claim.semantic_name} at 0x{claim.rva:x}+0x{claim.size:x} "
+                f"aliases the interior of {owner.semantic_name} at "
+                f"0x{owner.rva:x}+0x{owner.size:x}; source must model one "
+                "shared object and an owner-relative addend")
+        active_claims = [
+            claim for claim in unit_claims if claim not in interior_aliases
+        ]
         candidates = [
             candidate
             for candidate in topology_by_unit.get(unit, ([], []))[0]
@@ -411,11 +466,18 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
         coff = coff_by_unit.setdefault(
             unit, CoffFile(Path(base_root) / f"{unit}.obj"))
         requested_sizes = defaultdict(set)
-        for claim in unit_claims:
+        for claim in active_claims:
             expected_kind = ("FLOAT_LITERAL" if claim.kind.startswith("FLOAT")
                              else claim.kind)
-            requested_sizes[(expected_kind,
-                             _retail_storage_name(pe, claim.rva))].add(claim.size)
+            retail_storage = _retail_storage_name(pe, claim.rva)
+            requested_sizes[(expected_kind, retail_storage)].add(claim.size)
+            # A PE merges input .data and .bss into one output section.  A
+            # zero-filled .bss contribution can therefore lie inside the
+            # output section's raw span when initialized contributions follow
+            # it.  The final image cannot distinguish that case; candidate
+            # COFF retains the physical input-section evidence.
+            if retail_storage == "data":
+                requested_sizes[(expected_kind, "bss")].add(claim.size)
         candidates_by_payload = defaultdict(list)
         for candidate_index_value, candidate in enumerate(candidates):
             candidate_kind = _compgen_candidate_kind(candidate)
@@ -427,7 +489,12 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
                         _candidate_bytes(coff, candidate, size)
                     )].append(candidate_index_value)
         edges = {}
-        for index, claim in enumerate(unit_claims):
+        active_indexes = [
+            index for index, claim in enumerate(unit_claims)
+            if claim not in interior_aliases
+        ]
+        for index in active_indexes:
+            claim = unit_claims[index]
             claim_storage = _retail_storage_name(pe, claim.rva)
             expected_kind = ("FLOAT_LITERAL" if claim.kind.startswith("FLOAT")
                              else claim.kind)
@@ -437,8 +504,15 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
                     offset = site - claim.rva
                     retail_payload[offset:offset + 4] = b"\0\0\0\0"
             retail_payload = bytes(retail_payload)
-            payload_edges = set(candidates_by_payload.get(
-                (expected_kind, claim_storage, claim.size, retail_payload), ()))
+            storage_options = [claim_storage]
+            if claim_storage == "data" and not any(retail_payload):
+                storage_options.append("bss")
+            payload_edges = {
+                candidate_index_value
+                for storage in storage_options
+                for candidate_index_value in candidates_by_payload.get(
+                    (expected_kind, storage, claim.size, retail_payload), ())
+            }
             placed_names = set(derived_by_rva.get((unit, claim.rva), ()))
             placed_edges = {
                 candidate_index_value
@@ -482,13 +556,152 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
     return resolved, diagnostics
 
 
+def source_manifest_rows(source_root: Path = SOURCE_ROOT,
+                         base_root: Path = BASE_ROOT,
+                         exe: Path = EXE, strict=False):
+    """Assemble source DATA/DATA_COMPGEN/vtable claims over candidate COFF."""
+    source_root = Path(source_root)
+    base_root = Path(base_root)
+    repo = source_root.parent
+    definitions = source_definitions(source_root, base_root)
+    compgen = source_compgen_data(source_root, repo)
+    vtables = source_vtables(source_root, repo)
+    units = sorted({row.unit for row in [*definitions, *compgen, *vtables]})
+    missing = [base_root / f"{unit}.obj" for unit in units
+               if not (base_root / f"{unit}.obj").is_file()]
+    if missing:
+        raise FileNotFoundError(
+            "candidate objects are missing: "
+            + ", ".join(str(path) for path in missing[:8]))
+    topology = {
+        unit: candidate_topology(base_root / f"{unit}.obj", unit)
+        for unit in units
+    }
+    public_by_rva, _public_by_symbol, _global_rvas = _load_public_data()
+    ordinary = resolve_source_definitions(
+        definitions, topology, public_by_rva)
+    compiler_generated, diagnostics = resolve_compgen_definitions(
+        compgen, topology, base_root, Path(exe), strict=strict)
+    table_rows = resolve_vtable_definitions(
+        vtables, topology, public_by_rva)
+    rows = [
+        *(_symbol_row(source, candidate, None)
+          for source, candidate in ordinary),
+        *(_compgen_row(source, candidate)
+          for source, candidate in compiler_generated),
+        *(_vtable_row(source, candidate)
+          for source, candidate in table_rows),
+    ]
+    _mark_vtable_aliases(rows)
+    validate_symbol_rows(rows, "source data manifest")
+    return _sorted_symbol_rows(rows), diagnostics
+
+
+def render_source_manifest(rows):
+    """Serialize semantic source identities used by comparison tooling."""
+    lines = [
+        "# Source DATA, DATA_COMPGEN, VTBL, and VTBL2 identities bound to "
+        "candidate COFF topology.",
+        "\t".join(SYMBOL_HEADER),
+    ]
+    for row in rows:
+        lines.append("\t".join(row[key] for key in SYMBOL_HEADER))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def delinker_manifest_bytes(rows):
+    """Serialize Vostok's physical placement schema.
+
+    Vostok obtains symbol identities from the synthetic PDB.  Its manifest
+    intentionally carries only object ownership and physical COFF placement;
+    semantic DATA_COMPGEN names remain in the source manifest consumed by the
+    comparison normalizer.
+    """
+    lines = [
+        "# Physical placements projected from the reviewed source data model.",
+        "\t".join(DELINK_HEADER),
+    ]
+    for row in rows:
+        # The pinned Vostok release cannot emit COMDAT section topology.  Keep
+        # exact candidate coordinates in the semantic source manifest, but do
+        # not claim that its synthesized target sections reproduce them.
+        projected = dict(row, section_ordinal="-", section_offset="-")
+        lines.append("\t".join(projected[key] for key in DELINK_HEADER))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def source_manifest_bytes(source_root: Path = SOURCE_ROOT,
+                          base_root: Path = BASE_ROOT,
+                          exe: Path = EXE, strict=False):
+    rows, diagnostics = source_manifest_rows(
+        source_root, base_root, exe, strict=strict)
+    return render_source_manifest(rows), diagnostics
+
+
+def candidate_section_manifest_bytes(base_root: Path = BASE_ROOT,
+                                     units: Path = UNITS):
+    """Serialize candidate data-section and COMDAT topology for Vostok."""
+    base_root = Path(base_root)
+    document = tomllib.loads(Path(units).read_text())
+    unit_names = [row["unit"] for row in document.get("unit", ())]
+    if len(unit_names) != len(set(unit_names)):
+        raise ValueError("duplicate units in candidate section manifest")
+    rows = []
+    for unit in unit_names:
+        path = base_root / f"{unit}.obj"
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"candidate object is missing for section manifest: {path}")
+        _definitions, sections = candidate_topology(path, unit)
+        for section in sections:
+            # Vostok's reviewed data topology covers the linker output domains
+            # .data/.rdata/.bss and sorted .CRT contributions.  Associative
+            # .xdata$x COMDATs are exception metadata owned by code sections,
+            # not reconstructed C++ data objects.  Every section still appears
+            # so candidate ordinals and associative COMDAT parents remain exact.
+            modeled_storage = (
+                section.storage
+                if (section.name in (".data", ".rdata", ".bss")
+                    or section.name.startswith(".CRT$"))
+                else None
+            )
+            rows.append({
+                "object": section.object_name,
+                "ordinal": str(section.ordinal),
+                "name": section.name,
+                # Definitions carry independently reviewed retail RVAs.  A
+                # non-affine section is replayed in candidate shape and gaps
+                # remain padding, never synthetic symbols.
+                "rva": "-",
+                "size": f"0x{section.size:x}",
+                "alignment": f"0x{section.alignment:x}",
+                "characteristics": f"0x{section.characteristics:x}",
+                "checksum": f"0x{section.checksum:x}",
+                "comdat_selection": str(section.comdat_selection),
+                "associative_ordinal": (
+                    "-" if section.associative_ordinal is None
+                    else str(section.associative_ordinal)),
+                "storage": modeled_storage or "-",
+            })
+    identities = [(row["object"], row["ordinal"]) for row in rows]
+    if len(identities) != len(set(identities)):
+        raise ValueError("duplicate candidate data section identity")
+    lines = [
+        "# Candidate COFF data-section topology; definition RVAs come from "
+        "the source data manifest.",
+        "\t".join(SECTION_HEADER),
+    ]
+    for row in rows:
+        lines.append("\t".join(row[key] for key in SECTION_HEADER))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
 def _compgen_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
     if claim.size <= 0 or claim.size > candidate.size:
         raise ValueError(
             f"logical compiler-generated size 0x{claim.size:x} exceeds candidate "
             f"span 0x{candidate.size:x} at {claim.location}")
-    semantic = "__h2cg$" + candidate.unit.replace("/", "$")
-    semantic += "$data$" + claim.semantic_name
+    semantic = compgen_data_symbol_name(candidate.unit, claim.semantic_name)
     return {
         "name": semantic,
         "object": candidate.unit.replace("/", "\\") + ".c",

@@ -85,6 +85,17 @@ def write_manifest(path: Path, rows: list[dict[str, str]]) -> None:
         writer.writerows(rows)
 
 
+def write_delinker_manifest(path: Path, rows: list[dict[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=topology.DELINK_HEADER,
+                                delimiter="\t", lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(
+            {key: row[key] for key in topology.DELINK_HEADER}
+            for row in rows)
+
+
 class CoffRelocationTopologyTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -251,8 +262,9 @@ class CoffRelocationTopologyTests(unittest.TestCase):
         ]
         write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
                        [source, *compgen])
-        write_manifest(self.root / "build/gen/delink_data_manifest.tsv",
-                       [*compgen, source])
+        write_delinker_manifest(
+            self.root / "build/gen/delink_data_manifest.tsv",
+            [*compgen, source])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,
@@ -301,7 +313,8 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:11")
         write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
                        [source, compgen])
-        write_manifest(self.root / "build/gen/delink_data_manifest.tsv", [source])
+        write_delinker_manifest(
+            self.root / "build/gen/delink_data_manifest.tsv", [source])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,
@@ -311,9 +324,10 @@ class CoffRelocationTopologyTests(unittest.TestCase):
                                return_value=definitions):
             provenance = topology.load_homm2_provenance(self.root)
 
-        diagnostic = next(row for row in provenance["diagnostics"]
-                          if row["kind"] == "merged-manifest-not-exact-union")
-        self.assertEqual(compgen["name"], diagnostic["missing"][0][0])
+        diagnostic = next(
+            row for row in provenance["diagnostics"]
+            if row["kind"] == "delinker-manifest-not-source-projection")
+        self.assertEqual(compgen["object"], diagnostic["missing"][0][0])
 
     def test_generated_manifest_rejects_union_with_overlapping_allocations(self):
         source = manifest_row(
@@ -325,8 +339,9 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:11")
         write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
                        [source, compgen])
-        write_manifest(self.root / "build/gen/delink_data_manifest.tsv",
-                       [source, compgen])
+        write_delinker_manifest(
+            self.root / "build/gen/delink_data_manifest.tsv",
+            [source, compgen])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,

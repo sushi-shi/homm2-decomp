@@ -58,6 +58,7 @@ extern i32 bSmackSound;
 extern class icon* brotherIcon;
 extern class icon* backImage;
 extern struct SSmackOptions SmackOptions[];
+extern i32 smackMasterVolumes[];
 extern i32 bTesting;
 extern Smack* smk1;
 extern Smack* smk2;

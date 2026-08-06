@@ -10,7 +10,6 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
-#include <BASE/INPUTMGR_TYPES.h>
 #include <BASE/message.h>
 
 H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
@@ -36,8 +35,6 @@ i32 iCurSwapPalette = 0;
 DATA(0x0053607c) i32 bLastMouseOffscreen = 0;
 DATA(0x00536080) i32 bLastOnscreenMouseColor = 0;
 DATA(0x00536084) i32 bInCheckChangeCursor = 0;
-DATA(0x0051e59c) static SInputManagerText gInputManagerText =
-    {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
 DATA(0x0051e51c) static u8 gInputCharacterMapCp1251[0x80] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
@@ -185,13 +182,25 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->type = MESSAGE_LEFT_BUTTON_UP;
             captureReleased = ReleaseCapture();
             if (captureReleased == 0)
-                LogStr(gInputManagerText.leftReleaseCaptureFailure);
+                LogStr(
+                    DATA_COMPGEN(
+                        0x0051e59c,
+                        inputLeftReleaseCaptureFailure,
+                        "ReleaseCapture Failed"
+                    )
+                );
             goto mouseCoordinates;
         case WM_RBUTTONUP:
             event->type = MESSAGE_RIGHT_BUTTON_UP;
             captureReleased = ReleaseCapture();
             if (captureReleased == 0)
-                LogStr(gInputManagerText.rightReleaseCaptureFailure);
+                LogStr(
+                    DATA_COMPGEN(
+                        0x0051e5b4,
+                        inputRightReleaseCaptureFailure,
+                        "ReleaseCapture Failed"
+                    )
+                );
         mouseCoordinates:
             event->payload.mouse.x =
                 (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
@@ -262,7 +271,10 @@ i32 inputManager::Open(i32 priority) {
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
     m_priority = INPUT_MANAGER_PRIORITY;
     m_active = true;
-    strcpy(m_name, gInputManagerText.managerName);
+    strcpy(
+        m_name,
+        DATA_COMPGEN(0x0051e5cc, inputManagerName, "inputManager")
+    );
     return 0;
 }
 

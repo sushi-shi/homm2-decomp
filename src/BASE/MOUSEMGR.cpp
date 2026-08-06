@@ -1,5 +1,4 @@
 #include <va.h>
-#include <BASE/MOUSEMGR_TYPES.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,8 +15,12 @@
 #include <BASE/INPUTMGR.h>
 
 #define MOUSE_CURSOR_MASK_SHIFT 3
+#define MOUSE_MANAGER_SOURCE_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\MOUSEMGR.CPP"
+#define MOUSE_MANAGER_NAME "mouseManager"
+#define MOUSE_MANAGER_ADVENTURE_ICON "ADVMCO.ICN"
 #define MOUSE_MANAGER_SPELL_ICON "SPELCO.ICN"
 #define MOUSE_MANAGER_COMBAT_ICON "CMSECO.ICN"
+#define MOUSE_MANAGER_ADVENTURE_BITMAP "ADVMBW%02d.BMP"
 #define MOUSE_MANAGER_SPELL_BITMAP "SPELBW%02d.BMP"
 #define MOUSE_MANAGER_COMBAT_BITMAP "CMSEBW%02d.BMP"
 
@@ -71,25 +74,6 @@ DATA(0x0051e2f0) i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
 DATA(0x00536068) b32 gbInSetPointer = false;
 DATA(0x0053606c) i32 bInNewMouseUpdate = 0;
 
-static SMouseManagerStrings gMouseManagerStrings = {
-    {MOUSE_MANAGER_NAME},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_ADVENTURE_ICON},
-    {MOUSE_MANAGER_SPELL_ICON},
-    {MOUSE_MANAGER_COMBAT_ICON},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_ADVENTURE_BITMAP},
-    {MOUSE_MANAGER_SPELL_BITMAP},
-    {MOUSE_MANAGER_COMBAT_BITMAP},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    {MOUSE_MANAGER_SOURCE_FILE},
-    ""
-};
-
 
 VA(0x004b9050, 0x12e)
 mouseManager::mouseManager(void) : baseManager() {
@@ -97,7 +81,10 @@ mouseManager::mouseManager(void) : baseManager() {
     m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     m_savedUnderlying = NULL;
     m_active = false;
-    strcpy(m_name, gMouseManagerStrings.managerName.text);
+    strcpy(
+        m_name,
+        DATA_COMPGEN(0x0051e3b0, mouseManagerName, MOUSE_MANAGER_NAME)
+    );
     m_cursorFrame = 0;
     m_cursorIcon = NULL;
     m_cursorReady = 1;
@@ -198,15 +185,32 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[RESOURCE_NAME_CAPACITY];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-                sprintf(local_10, gMouseManagerStrings.adventureIcon.text);
+                sprintf(
+                    local_10,
+                    DATA_COMPGEN(
+                        0x0051e3c0,
+                        mouseAdventureIconName,
+                        MOUSE_MANAGER_ADVENTURE_ICON
+                    )
+                );
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
-                sprintf(local_10, gMouseManagerStrings.spellIcon.text);
+                sprintf(
+                    local_10,
+                    DATA_COMPGEN(0x0051e3cc, mouseSpellIconName, MOUSE_MANAGER_SPELL_ICON)
+                );
             else
-                sprintf(local_10, gMouseManagerStrings.combatIcon.text);
+                sprintf(
+                    local_10,
+                    DATA_COMPGEN(0x0051e3d8, mouseCombatIconName, MOUSE_MANAGER_COMBAT_ICON)
+                );
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
             H2_ASSERT(
                 frame != MOUSE_KEEP_CURRENT_FRAME,
-                gMouseManagerStrings.cursorFrameAssertion.text,
+                DATA_COMPGEN(
+                    0x0051e3e4,
+                    mouseCursorFrameSourceFile,
+                    MOUSE_MANAGER_SOURCE_FILE
+                ),
                 398
             );
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
@@ -243,7 +247,11 @@ void mouseManager::SetPointer(i32 frame) {
     m_cursorSizeIndex = frame + iMouseOffset[IDX(m_cursorType)];
     H2_ASSERT(
         m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT,
-        gMouseManagerStrings.cursorSizeAssertion.text,
+        DATA_COMPGEN(
+            0x0051e41c,
+            mouseCursorSizeSourceFile,
+            MOUSE_MANAGER_SOURCE_FILE
+        ),
         446
     );
 
@@ -257,11 +265,35 @@ void mouseManager::SetPointer(i32 frame) {
 
         char filename[RESOURCE_NAME_CAPACITY];
         if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-            sprintf(filename, gMouseManagerStrings.adventureBitmap.text, frame + 1);
+            sprintf(
+                filename,
+                DATA_COMPGEN(
+                    0x0051e454,
+                    mouseAdventureBitmapName,
+                    MOUSE_MANAGER_ADVENTURE_BITMAP
+                ),
+                frame + 1
+            );
         else if (m_cursorType == MOUSE_CURSOR_SPELL)
-            sprintf(filename, gMouseManagerStrings.spellBitmap.text, frame);
+            sprintf(
+                filename,
+                DATA_COMPGEN(
+                    0x0051e464,
+                    mouseSpellBitmapName,
+                    MOUSE_MANAGER_SPELL_BITMAP
+                ),
+                frame
+            );
         else
-            sprintf(filename, gMouseManagerStrings.combatBitmap.text, frame + 1);
+            sprintf(
+                filename,
+                DATA_COMPGEN(
+                    0x0051e474,
+                    mouseCombatBitmapName,
+                    MOUSE_MANAGER_COMBAT_BITMAP
+                ),
+                frame + 1
+            );
 
         gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
         gpResourceManager->ReadBlock(
@@ -311,7 +343,11 @@ void mouseManager::SetPointer(i32 frame) {
         hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
         H2_ASSERT(
             reinterpret_cast<i32>(hbmpAndMask[m_cursorSizeIndex]),
-            gMouseManagerStrings.bitmapAssertion.text,
+            DATA_COMPGEN(
+                0x0051e484,
+                mouseBitmapSourceFile,
+                MOUSE_MANAGER_SOURCE_FILE
+            ),
             501
         );
 
@@ -330,7 +366,11 @@ void mouseManager::SetPointer(i32 frame) {
         hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
         H2_ASSERT(
             reinterpret_cast<i32>(hMouseCursor[m_cursorSizeIndex]),
-            gMouseManagerStrings.cursorAssertion.text,
+            DATA_COMPGEN(
+                0x0051e4bc,
+                mouseCursorSourceFile,
+                MOUSE_MANAGER_SOURCE_FILE
+            ),
             520
         );
     }
@@ -623,7 +663,11 @@ void mouseManager::SetColorMice(i32 enabled) {
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
         m_forcePointerUpdate = 0;
-        SetPointer(gMouseManagerStrings.defaultCursorName, savedX, oldType);
+        SetPointer(
+            DATA_COMPGEN(0x00536070, mouseDefaultCursorName, ""),
+            savedX,
+            oldType
+        );
         m_forcePointerUpdate = saved7e;
         m_cursorReady = 1;
         ReallyShowPointer();

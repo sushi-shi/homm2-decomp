@@ -172,7 +172,10 @@ void highScoreManager::Update(void) {
 
         if (highScore.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[rank] = 0;
-            sprintf(gText, "");
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x005249bc, highScoreEmptyEntryText, "")
+            );
         } else {
             m_monsterTypes[rank] = GetMonType(
                 highScore.score,
@@ -209,7 +212,10 @@ void highScoreManager::Update(void) {
 
         hsMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         hsMessage.payload.widget.data.text = gText;
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005249c0, highScorePlayerNameEmpty, "")
+        );
         hsMessage.payload.widget.id =
             rank * HIGH_SCORE_TEXT_WIDGET_STRIDE + HIGH_SCORE_FIRST_TEXT_WIDGET;
         if (highScore.score != HIGH_SCORE_EMPTY)
@@ -218,14 +224,17 @@ void highScoreManager::Update(void) {
             strcat(
                 gText,
                 DATA_COMPGEN(
-                    0x004f9120,
+                    0x004f8120,
                     highScoreCheaterSuffix,
                     "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Читер)" */
                 )
             );
         m_window->BroadcastMessage(hsMessage);
 
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005249c4, highScoreScenarioNameEmpty, "")
+        );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCENARIO_OFFSET;
@@ -233,7 +242,10 @@ void highScoreManager::Update(void) {
             sprintf(gText, highScore.scenarioName);
         m_window->BroadcastMessage(hsMessage);
 
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005249c8, highScoreRatingEmpty, "")
+        );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_RATING_OFFSET;
@@ -245,11 +257,17 @@ void highScoreManager::Update(void) {
         }
         m_window->BroadcastMessage(hsMessage);
 
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005249cc, highScoreScoreTextEmpty, "")
+        );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCORE_OFFSET;
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005249d0, highScoreScoreValueEmpty, "")
+        );
         if (m_showCampaignScores == 0 && highScore.score != HIGH_SCORE_EMPTY)
             sprintf(gText, "%d", highScore.score);
         m_window->BroadcastMessage(hsMessage);

@@ -39,6 +39,7 @@ VOLATILE_T = re.compile(r"^\$T[0-9]+$")
 NAMED_STATIC = re.compile(r"^(?P<prefix>.+\$S)[0-9]+$")
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 COMPGEN_PREFIX = "__h2cg$"
+REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
 
 INITIALIZED_DATA = 0x00000040
 UNINITIALIZED_DATA = 0x00000080
@@ -555,6 +556,7 @@ def _compgen_data_renames(
     if not claims:
         return {}, ()
     by_location = defaultdict(list)
+    by_name = defaultdict(list)
     for definition in definitions:
         by_location[(
             definition.section.index,
@@ -563,6 +565,7 @@ def _compgen_data_renames(
             "external" if definition.symbol.storage_class == EXTERNAL_STORAGE
             else "local",
         )].append(definition)
+        by_name[definition.symbol.name].append(definition)
     renames = {}
     rows = []
     claimed_names = set()
@@ -577,12 +580,25 @@ def _compgen_data_renames(
             claim.storage,
             claim.scope,
         )
-        matches = by_location.get(key, ())
+        named = by_name.get(claim.name, ())
+        if len(named) > 1:
+            raise ValueError(
+                f"{claim.name} has {len(named)} existing semantic definitions")
+        matches = named or by_location.get(key, ())
         if len(matches) != 1:
             raise ValueError(
                 f"{claim.name} has {len(matches)} candidate definitions at "
                 f"section {claim.section}+0x{claim.offset:x}")
         definition = matches[0]
+        definition_scope = (
+            "external" if definition.symbol.storage_class == EXTERNAL_STORAGE
+            else "local")
+        if (definition.storage, definition_scope) != (
+                claim.storage, claim.scope):
+            raise ValueError(
+                f"{claim.name} existing definition has "
+                f"{definition.storage}/{definition_scope}, expected "
+                f"{claim.storage}/{claim.scope}")
         physical_size = definition.end - definition.start
         if not 0 < claim.size <= physical_size:
             raise ValueError(
@@ -611,8 +627,69 @@ def _compgen_data_renames(
             claim.size,
             0,
             hashlib.sha256(meaningful).hexdigest(),
-            "source-DATA_COMPGEN",
+            ("source-DATA_COMPGEN-existing-name" if named
+             else "source-DATA_COMPGEN"),
             _escaped_preview(meaningful),
+        ))
+    return renames, tuple(rows)
+
+
+def _real_literal_reference_renames(
+        coff: CoffObject,
+        definitions: tuple[Definition, ...],
+        semantic_by_symbol: dict[str, str]):
+    """Apply one reviewed identity to every copy of an external VC6 real COMDAT."""
+    if not semantic_by_symbol:
+        return {}, ()
+    from homm2.build.canonicalize_relocs import real_literal_bytes
+
+    definition_by_index = {
+        definition.symbol.index: definition for definition in definitions
+    }
+    renames = {}
+    rows = []
+    for symbol in sorted(coff.symbols.values(), key=lambda row: row.index):
+        semantic = semantic_by_symbol.get(symbol.name)
+        if semantic is None:
+            continue
+        if (REAL_LITERAL.fullmatch(symbol.name) is None or
+                symbol.storage_class != EXTERNAL_STORAGE):
+            raise ValueError(
+                f"invalid reviewed real-literal reference identity: {symbol.name}")
+        definition = definition_by_index.get(symbol.index)
+        if definition is not None:
+            expected = real_literal_bytes(symbol.name)
+            assert expected is not None
+            actual = coff.section_bytes(definition.section)[
+                definition.start:definition.start + len(expected)]
+            if actual != expected:
+                raise ValueError(
+                    f"{symbol.name} COMDAT payload contradicts its VC6 spelling")
+            storage = definition.storage
+            section = definition.section.index
+            offset = definition.start
+            physical_size = definition.end - definition.start
+            meaningful_size = len(expected)
+            preview = _escaped_preview(expected)
+        else:
+            storage = "undefined"
+            section = 0
+            offset = 0
+            physical_size = 0
+            meaningful_size = 0
+            preview = ""
+        collision = next((
+            other for other in coff.symbols.values()
+            if other.name == semantic and other.index != symbol.index
+        ), None)
+        if collision is not None:
+            raise ValueError(
+                f"reviewed real-literal identity collides with {semantic}")
+        renames[symbol.index] = semantic
+        rows.append(CanonicalRow(
+            symbol.name, semantic, "semantic-real-comdat", storage, section,
+            offset, physical_size, meaningful_size, 0, "-",
+            "source-DATA_COMPGEN-external-COMDAT", preview,
         ))
     return renames, tuple(rows)
 
@@ -855,6 +932,7 @@ def defer_data_comparison(payload: bytes) -> bytes:
 def canonicalize_coff(payload: bytes,
                       compgen: tuple[CompgenClaim, ...] = (),
                       compgen_data: tuple[CompgenDataClaim, ...] = (),
+                      real_literal_references: dict[str, str] | None = None,
                       ) -> CanonicalizedObject:
     """Return a normalized comparison copy and its readable rename records."""
     coff = CoffObject(payload)
@@ -1075,6 +1153,21 @@ def canonicalize_coff(payload: bytes,
         renames.update(compgen_data_rename)
         rows.extend(compgen_data_rows)
 
+    real_reference_rename, real_reference_rows = _real_literal_reference_renames(
+        coff, definitions, real_literal_references or {})
+    for index, name in real_reference_rename.items():
+        existing = renames.get(index)
+        if existing is not None and existing != name:
+            raise ValueError(
+                f"conflicting semantic identities for {coff.symbols[index].name}")
+        renames[index] = name
+    rows.extend(
+        row for row in real_reference_rows
+        if not any(existing.original_name == row.original_name
+                   and existing.canonical_name == row.canonical_name
+                   for existing in rows)
+    )
+
     compgen_rename, compgen_rows = _compgen_renames(coff, compgen)
     overlap = set(renames) & set(compgen_rename)
     if overlap:
@@ -1220,6 +1313,53 @@ def load_compgen_data_claims(path: Path | None, unit: str | None):
         return tuple(claims)
 
 
+def load_real_literal_reference_renames(
+        path: Path | None, base_root: Path | None) -> dict[str, str]:
+    """Derive global VC6 real-COMDAT aliases from reviewed owner coordinates."""
+    if path is None or base_root is None:
+        return {}
+    coff_by_unit = {}
+    aliases = {}
+    with path.open(newline="") as stream:
+        rows = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        for row in rows:
+            if (not row["provenance"].startswith("source-DATA_COMPGEN:") or
+                    row["scope"] != "external"):
+                continue
+            object_unit = row["object"].replace("\\", "/")
+            if object_unit.lower().endswith(".c"):
+                object_unit = object_unit[:-2]
+            coff = coff_by_unit.get(object_unit)
+            if coff is None:
+                coff = CoffObject(
+                    (Path(base_root) / f"{object_unit}.obj").read_bytes())
+                coff_by_unit[object_unit] = coff
+            section = int(row["section_ordinal"], 0)
+            offset = int(row["section_offset"], 0)
+            matches = [
+                symbol for symbol in coff.symbols.values()
+                if (symbol.section == section and symbol.value == offset and
+                    symbol.typ == 0 and
+                    symbol.storage_class == EXTERNAL_STORAGE)
+            ]
+            if len(matches) != 1:
+                raise ValueError(
+                    f"{row['name']} has {len(matches)} external owner symbols at "
+                    f"{object_unit}:{section}+0x{offset:x}")
+            original = matches[0].name
+            if REAL_LITERAL.fullmatch(original) is None:
+                continue
+            previous = aliases.get(original)
+            if previous is not None and previous != row["name"]:
+                raise ValueError(
+                    f"{original} has conflicting semantic identities: "
+                    f"{previous}, {row['name']}")
+            aliases[original] = row["name"]
+    return aliases
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path)
@@ -1228,6 +1368,7 @@ def main(argv=None):
     parser.add_argument("--unit")
     parser.add_argument("--compgen-manifest", type=Path)
     parser.add_argument("--data-manifest", type=Path)
+    parser.add_argument("--data-base-root", type=Path)
     parser.add_argument("--defer-data", action="store_true",
                         help="drop data sections/symbols from the comparison "
                              "copy until the data campaign models storage")
@@ -1253,7 +1394,11 @@ def main(argv=None):
         parser.error("input, output, and sidecar paths must be distinct")
     claims = load_compgen_claims(args.compgen_manifest, args.unit)
     data_claims = load_compgen_data_claims(args.data_manifest, args.unit)
-    result = canonicalize_coff(args.input.read_bytes(), claims, data_claims)
+    real_literal_references = load_real_literal_reference_renames(
+        args.data_manifest, args.data_base_root)
+    result = canonicalize_coff(
+        args.input.read_bytes(), claims, data_claims,
+        real_literal_references)
     payload = result.data
     if args.defer_data:
         payload = defer_data_comparison(payload)

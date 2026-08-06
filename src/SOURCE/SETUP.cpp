@@ -184,12 +184,27 @@ i32 game::SetupHotSeatGame(void) {
         strcpy(cPlayerNames[i], "");
 
     if (giSetupGameType == 0) {
-        sprintf(gText, "Do you wish to enter each player's name?");
+        sprintf(
+            gText,
+            /* Желаете задать имена каждому игроку? */ DATA_COMPGEN(
+                0x00516e10,
+                setupHotSeatEnterPlayerNamesPrompt,
+                "\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xe7\xe0\xe4\xe0\xf2\xfc\x20\xe8\xec\xe5\xed\xe0\x20\xea\xe0\xe6\xe4\xee\xec\xf3\x20\xe8\xe3\xf0\xee\xea\xf3\x3f"
+            )
+        );
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
                 strcpy(name, "");
-                sprintf(gText, "Enter player %d's name.", i + 1);
+                sprintf(
+                    gText,
+                    /* %d игрок: Ввести имя. */ DATA_COMPGEN(
+                        0x00516e38,
+                        setupHotSeatPlayerNamePrompt,
+                        "\x25\x64\x20\xe8\xe3\xf0\xee\xea\x3a\x20\xc2\xe2\xe5\xf1\xf2\xe8\x20\xe8\xec\xff\x2e"
+                    ),
+                    i + 1
+                );
                 GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
             }
         }
@@ -634,8 +649,12 @@ i32 game::PickLoadGame(void) {
         sprintf(fileMask, "*.GXC");
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
-            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 II."
-            "to choose from original Heroes II games.",
+            /* Как минимум у одного игрока нет Героев II: Цена Верности. Вы можете выбрать карту только стандартного формата Героев II. */
+            DATA_COMPGEN(
+                0x00517020,
+                pickLoadGameExpansionCompatibilityWarning,
+                "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 II."
+            ),
             NORMAL_DIALOG_INFO,
             -1,
             -1,

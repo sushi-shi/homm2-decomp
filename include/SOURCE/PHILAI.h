@@ -86,6 +86,7 @@ extern u8 giCurWatchPlayerBit;
 extern i32 iAlphaMale;
 extern i32 iDummy;
 extern i32 iLastFrameRateTimer;
+extern searchArray SVSearchArray;
 
 extern b32 gbGameOver;
 extern i8 giMonType[];

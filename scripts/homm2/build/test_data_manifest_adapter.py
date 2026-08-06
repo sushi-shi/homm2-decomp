@@ -8,6 +8,8 @@ from homm2.build.data_manifest_adapter import (
     CandidateDefinition,
     CandidateSection,
     _bind_compgen_edges,
+    _compgen_candidate_kind,
+    _interior_compgen_aliases,
     candidate_topology,
     resolve_compgen_definitions,
     resolve_vtable_definitions,
@@ -40,12 +42,35 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
     name = name or (".bss" if storage == "bss" else ".data")
     return CandidateSection(
         unit, unit + ".c", ordinal, name, size, alignment, DATA_FLAGS,
-        storage, selection, None)
+        storage, 0, selection, None)
 
 
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_compgen_recognizes_vc6_real_literal_symbols(self):
+        self.assertEqual(
+            _compgen_candidate_kind(candidate(
+                "A", "__real@4@4012f424000000000000")),
+            "FLOAT_LITERAL")
+        self.assertEqual(
+            _compgen_candidate_kind(candidate(
+                "A", "__real@8@3ff8a3d70a3d70a3d800")),
+            "FLOAT_LITERAL")
+        self.assertIsNone(
+            _compgen_candidate_kind(candidate("A", "__real@8@invalid")))
+
+    def test_compgen_interior_alias_keeps_the_owning_allocation(self):
+        owner = CompgenDataClaim(
+            "A", 0x100, "sourceFile", "STRING_LITERAL", 8,
+            "A.cpp:1", "A.cpp:1", ())
+        alias = CompgenDataClaim(
+            "A", 0x107, "emptySuffix", "STRING_LITERAL", 1,
+            "A.cpp:2", "A.cpp:2", ())
+        self.assertEqual(_interior_compgen_aliases([alias, owner]), {
+            alias: owner,
+        })
+
     def test_compgen_binder_accepts_only_unique_or_ordered_bindings(self):
         assignments, failures = _bind_compgen_edges(
             {0: {0, 1}}, [0], [0, 1])
@@ -93,6 +118,32 @@ class DataManifestAdapterTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "ambiguous.*message"):
                 resolve_compgen_definitions(
                     [claim], topology, Path("base"), Path("game.exe"), strict=True)
+
+    def test_zero_payload_in_raw_pe_data_can_bind_candidate_bss(self):
+        claim = CompgenDataClaim(
+            "A", 0x100, "empty", "STRING_LITERAL", 1,
+            "A.cpp:1", "A.cpp:1", ())
+        definition = replace(
+            candidate("A", "$SG1"), section_name=".bss", storage="bss")
+        topology = {"A": ([definition], [])}
+        patches = (
+            mock.patch("homm2.build.data_manifest_adapter.read_pe", return_value={}),
+            mock.patch("homm2.build.data_manifest_adapter._pe_layout",
+                       return_value=(0, set(), None,
+                                     lambda _rva, size: b"\0" * size)),
+            mock.patch("homm2.build.data_manifest_adapter._retail_storage_name",
+                       return_value="data"),
+            mock.patch("homm2.build.data_manifest_adapter._candidate_bytes",
+                       return_value=b"\0"),
+            mock.patch("homm2.build.data_manifest_adapter.CoffFile"),
+            mock.patch("homm2.build.data_manifest_adapter.derive_allocations",
+                       return_value=([], mock.Mock(), [])),
+        )
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[5]:
+            resolved, diagnostics = resolve_compgen_definitions(
+                [claim], topology, Path("base"), Path("game.exe"))
+        self.assertEqual(resolved, [(claim, definition)])
+        self.assertEqual(diagnostics, [])
 
     def test_source_vtables_bind_exact_candidate_and_allow_proved_aliases(self):
         primary = AnnotatedVtable(

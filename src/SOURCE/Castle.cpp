@@ -299,7 +299,10 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     if (captainQuarters != 0) {
         msg.payload.widget.command = CASTLE_WIDGET_TEXT;
         msg.payload.widget.data.text = gText;
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005240d4, castleCaptainStatsTextEmpty, "")
+        );
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
             sprintf(
                 captainStatLine,
@@ -310,7 +313,10 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         }
         msg.payload.widget.id = CONTROL_CAPTAIN_STATS;
         casWin->BroadcastMessage(msg);
-        sprintf(gText, "");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x005240d8, castleCaptainStatsValuesEmpty, "")
+        );
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
             sprintf(
                 captainStatLine,

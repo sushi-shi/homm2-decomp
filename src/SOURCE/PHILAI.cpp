@@ -47,26 +47,33 @@
 #define AI_HERO_VALUE_SCALE 0.00004
 #define AI_HERO_VALUE_BASE 0.4
 #define AI_ARTIFACT_POOL_DIVISOR 33.0
-#define AI_BATTLE_TOWN_DEFENDER_FACTOR 1.11
-#define AI_BATTLE_DIFFICULTY_STEP 0.15
+#define AI_BATTLE_TOWN_DEFENDER_FACTOR                                             \
+    DATA_COMPGEN(0x004ea6f0, aiBattleTownDefenderFactor, 1.11)
+#define AI_BATTLE_DIFFICULTY_STEP                                                  \
+    DATA_COMPGEN(0x004ea6e8, aiBattleDifficultyStep, 0.15)
 #define AI_BATTLE_BASE_STRENGTH_FACTOR 0.7
-#define AI_BATTLE_EASY_STRENGTH_FACTOR 1.08
-#define AI_BATTLE_HUMAN_DEFENDER_FACTOR 1.14
+#define AI_BATTLE_EASY_STRENGTH_FACTOR                                             \
+    DATA_COMPGEN(0x004ea6e0, aiBattleEasyStrengthFactor, 1.08)
+#define AI_BATTLE_HUMAN_DEFENDER_FACTOR                                            \
+    DATA_COMPGEN(0x004ea6d8, aiBattleHumanDefenderFactor, 1.14)
 #define AI_BATTLE_MINIMUM_STRENGTH 1.0f
 #define AI_BATTLE_FULL_CHANCE 1.0f
-#define AI_BATTLE_LARGE_STRENGTH 1000000.0f
+#define AI_BATTLE_LARGE_STRENGTH                                                   \
+    DATA_COMPGEN(0x004ea6d0, aiBattleLargeStrength, 1000000.0f)
 #define AI_BATTLE_NORMAL_POWER 2.75f
 #define AI_BATTLE_LARGE_POWER 2.0f
 #define AI_BATTLE_ZERO_CHANCE 0.08
 #define AI_BATTLE_LOW_CHANCE 0.12
-#define AI_BATTLE_LOW_PENALTY 0.07
+#define AI_BATTLE_LOW_PENALTY                                                      \
+    DATA_COMPGEN(0x004ea688, aiBattleLowPenalty, 0.07)
 #define AI_BATTLE_MEDIUM_CHANCE 0.2
 #define AI_BATTLE_MEDIUM_PENALTY 0.05
 #define AI_BATTLE_HIGH_CHANCE 0.3
 #define AI_BATTLE_HIGH_PENALTY 0.04
 #define AI_BATTLE_TOP_CHANCE 0.4
 #define AI_BATTLE_TOP_PENALTY 0.02
-#define AI_BATTLE_LOSS_FACTOR_BASE 1.33
+#define AI_BATTLE_LOSS_FACTOR_BASE                                                 \
+    DATA_COMPGEN(0x004ea6c8, aiBattleLossFactorBase, 1.33)
 #define AI_BATTLE_PLAYER_FACTOR_BASE 0.66
 #define AI_BATTLE_HERO_EXPERIENCE_FACTOR 0.8
 #define AI_BATTLE_PERCENT_SCALE 100.0f
@@ -402,6 +409,12 @@ H2_ENUM_BEGIN(AITownEvaluationConstant)
     TOWN_EARLY_TURN_BASE            = 40,
     TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
 H2_ENUM_END(AITownEvaluationConstant)
+
+VA_COMPGEN(0x0047e1b0, 0xf, STATIC_INIT_DISPATCH, SVSearchArray)
+VA_COMPGEN(0x0047e1bf, 0xf, STATIC_CTOR, SVSearchArray)
+VA_COMPGEN(0x0047e1ce, 0x12, STATIC_ATEXIT, SVSearchArray)
+VA_COMPGEN(0x0047e1e0, 0xf, STATIC_DTOR, SVSearchArray)
+DATA(0x00530c10) searchArray SVSearchArray;
 
 VA(0x0047e1ef, 0x187)
 void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
@@ -2314,7 +2327,7 @@ void philAI::ProbableOutcomeOfBattle(
 
     if (giDebugLevel >= AI_BATTLE_DEBUG_LEVEL) {
         LogInt(
-            "POBA",
+            DATA_COMPGEN(0x00516534, aiBattleDebugAttackerTag, "POBA"),
             static_cast<i32>(attStr),
             static_cast<i32>(defStrong),
             static_cast<i32>(
@@ -2326,7 +2339,7 @@ void philAI::ProbableOutcomeOfBattle(
             static_cast<i32>(gpCurPlayer->m_aiData.m_upgradeValueWeight)
         );
         LogInt(
-            "POB",
+            DATA_COMPGEN(0x0051653c, aiBattleDebugOutcomeTag, "POB"),
             static_cast<i32>(attFight),
             static_cast<i32>(defenderFight),
             static_cast<i32>(winChance * AI_BATTLE_PERCENT_SCALE),
@@ -6737,4 +6750,3 @@ DATA(0x005331ac) b32 gbReduceByReload;
 DATA(0x00533128) b32 gbTroopReload;
 DATA(0x00530bbc) i32 giCurAIHeroLuck;
 DATA(0x005331c0) b32 gbActualShipyardFound;
-

@@ -99,7 +99,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/INPUTMGR"
 source = "src/BASE/INPUTMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/Icon2b"
@@ -134,7 +134,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/MOUSEMGR"
 source = "src/BASE/MOUSEMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/MusicFlags"
@@ -158,7 +158,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/RESMGR"
 source = "src/BASE/RESMGR.cpp"
-flags = "base_gf"
+flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/RESOURCE"
@@ -263,7 +263,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/soundmgr"
 source = "src/BASE/soundmgr.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/mapcell"
@@ -373,17 +373,17 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/Netbios"
 source = "src/SOURCE/Netbios.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Newgame"
 source = "src/SOURCE/Newgame.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Overview"
 source = "src/SOURCE/Overview.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/PATH"
@@ -393,22 +393,22 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/PHILAI"
 source = "src/SOURCE/PHILAI.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/RECRUIT"
 source = "src/SOURCE/RECRUIT.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/REMOTE"
 source = "src/SOURCE/REMOTE.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/REQUEST"
 source = "src/SOURCE/REQUEST.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/SEARCH"
@@ -423,7 +423,7 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/SMACKMGR"
 source = "src/SOURCE/SMACKMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/SPELLAI"
@@ -438,12 +438,12 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/STRIP"
 source = "src/SOURCE/STRIP.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/SWAPMGR"
 source = "src/SOURCE/SWAPMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/TOWN"
@@ -453,37 +453,37 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/TOWNMGR"
 source = "src/SOURCE/TOWNMGR.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/VIEW"
 source = "src/SOURCE/VIEW.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Viewwrld"
 source = "src/SOURCE/Viewwrld.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/Wsnetwin"
 source = "src/SOURCE/Wsnetwin.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/X_CAMPGN"
 source = "src/SOURCE/X_CAMPGN.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/X_GLOBAL"
 source = "src/SOURCE/X_GLOBAL.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/comwin"
 source = "src/SOURCE/comwin.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/dpnetwin"
@@ -493,17 +493,17 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/kbwin"
 source = "src/SOURCE/kbwin.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/netwin"
 source = "src/SOURCE/netwin.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/tradpost"
 source = "src/SOURCE/tradpost.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/wingraph"
@@ -513,4 +513,4 @@ flags = "base_nogf"
 [[unit]]
 unit = "SOURCE/x_arena"
 source = "src/SOURCE/x_arena.cpp"
-flags = "base"
+flags = "base_nogf"

@@ -971,7 +971,7 @@ DATA(0x004ea40c) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] =
 
 DATA(0x00523e3c) static u16 s_drawGroundTile;
 DATA(0x00523e2c) static i32 s_adjacentMonsterX;
-static i32 s_drawPixelY;
+DATA(0x00523fd0) static i32 s_drawPixelY;
 DATA(0x00523e14) static mapCellExtra* s_drawExtra;
 DATA(0x00523e38) static i32 s_adjacentMonsterY;
 DATA(0x00523fa0) static i32 s_adjacentMonsterMinX;
@@ -993,7 +993,7 @@ DATA(0x00523fe8) static i32 s_drawPixelX;
 DATA(0x00523fa8) static i32 s_drawPlayerColor;
 DATA(0x00523e30) static i32 s_adjacentMonsterEndX;
 DATA(0x00523fe4) static i32 s_drawAnimationLength;
-DATA(0x00523fd0) static i32 s_drawHeroYOffset;
+DATA(0x00523e0c) static i32 s_drawHeroYOffset;
 H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
 H2_ENUM_END(AdvVisitMetadata)
@@ -10585,18 +10585,18 @@ DATA(0x0052401c) i32 iCurHourGlassPhase = 0;
 DATA(0x004ef1d8) i32 iLastHourGlassPhase = 1;
 DATA(0x00524020) b32 gbForceUpdate = false;
 DATA(0x00524024) i32 giCheatSeq = 0;
-i32 iQWE = 0;
+DATA(0x00524028) i32 iQWE = 0;
 DATA(0x004ef1dc) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
 DATA(0x0052402c) i32 iLastSandAnimTime = 0;
 DATA(0x00524030) i32 iLastNewSandAnimTime = 0;
 DATA(0x00524034) i32 giFrameCount = 0;
 DATA(0x00523fcc) class heroWindow* cPanel;
-i32 iThisMaxY;
+DATA(0x00523de0) i32 iThisMaxY;
 DATA(0x00523e4c) i32 giTownPortalChoice;
-i32 iThisMinY;
+DATA(0x00523e10) i32 iThisMinY;
 DATA(0x00523fdc) class heroWindow* townPortalWin;
-struct tag_message USMsg;
+DATA(0x00523fac) struct tag_message USMsg;
 DATA(0x00523dec) i32 giFrameStep;
 DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
 DATA(0x00523e40) i32 giLimitUpdMaxX;
@@ -10604,7 +10604,7 @@ DATA(0x00523e44) i32 giLimitUpdMaxY;
 DATA(0x00523e48) i32 bPrefsChanged;
 DATA(0x00523f98) i32 giLimitUpdMinY;
 DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
-struct tag_message CDMsg;
+DATA(0x00523df0) struct tag_message CDMsg;
 DATA(0x00523de8) i32 iLastAnimFrame;
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.

@@ -160,7 +160,6 @@ public:
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
-    ~game(void);
     void SetupDynamicStuff(i32, i32, i32);
     void SetupNewOverviewType(OverviewType, i32);
     void SetupResources(void);

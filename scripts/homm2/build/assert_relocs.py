@@ -136,7 +136,7 @@ def load_symbols():
                 # name (e.g. two "!" literals). Record every address per name so an ambiguous target
                 # reloc can match ANY of them (they're value-identical), not just the last one loaded.
                 sym.setdefault(k, v); dups.setdefault(k, set()).add(v)
-    manifest = Path("build/gen/delink_data_manifest.tsv")
+    manifest = Path("build/gen/delink_data_from_source.tsv")
     if manifest.is_file():
         with manifest.open(newline="", encoding="latin-1") as stream:
             rows = csv.DictReader(
@@ -361,7 +361,7 @@ def compare_function_reloc_addends(base_relocs, target_relocs,
 
 def load_canonical_data_names(
         symbols_path="build/gen/symbol_names.csv",
-        manifest_path="build/gen/delink_data_manifest.tsv"):
+        manifest_path="build/gen/delink_data_from_source.tsv"):
     names = set()
     if os.path.isfile(symbols_path):
         with open(symbols_path, encoding="latin-1", newline="") as stream:

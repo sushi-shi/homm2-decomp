@@ -65,9 +65,9 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7f2f,34,_rand,rand.obj,libcmt.lib,masked-exact,
 0xd7f60,56,_strncmp,strncmp.obj,libcmt.lib,masked-exact,
 0xd7fa0,172,_memcmp,memcmp.obj,libcmt.lib,masked-exact,
-0xd8050,25,_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,two-operand fp wrapper
-0xd8069,9,$alt_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
-0xd8072,78,$body_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,exponent-mask fmod body
+0xd8050,25,__CIpow,pow.obj,libcmt.lib,reviewed-linked-bytes,two-operand pow intrinsic wrapper
+0xd8069,9,_pow,pow.obj,libcmt.lib,reviewed-linked-bytes,ordinary two-double-argument pow entry
+0xd8072,78,$body_pow,pow.obj,libcmt.lib,reviewed-linked-bytes,pow exponent and domain handling body
 0xd826d,139,_atol,atox.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd82f8,11,_atoi,atox.obj,libcmt.lib,masked-exact,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
 0xd83c0,10,_exp,87ctran.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 8 candidates: libcmt.lib:..\build\intel\mt_obj\87ctran.obj!_exp|libcmt.lib:..\build\intel\mt_obj\87ctran.obj!__CIexp|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!_atan2|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!__CIatan2

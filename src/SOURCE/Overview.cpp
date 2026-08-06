@@ -270,7 +270,8 @@ H2_ENUM_END(OverviewDialogConstant)
 
 #define OVERVIEW_SCROLL_KNOB_RANGE_FLOAT 303.0
 #define OVERVIEW_SCROLL_MIN_Y_FLOAT 18.0f
-#define OVERVIEW_SCROLL_ROUNDING_OFFSET 0.4
+#define OVERVIEW_SCROLL_ROUNDING_OFFSET                                            \
+    DATA_COMPGEN(0x004ea640, overviewScrollRoundingOffset, 0.4)
 
 #define OVERVIEW_TEXT_WIDGET(row, item)                                                            \
     (*(textWidgetDynamic + (row) * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + (item)))
@@ -279,7 +280,6 @@ H2_ENUM_END(OverviewDialogConstant)
 
 VA(0x00479ba0, 0x1e46)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
-    static i16 overviewDynamicSourceLine = 116;
     i32 rowIndex;
     i32 i;
     i32 texts;
@@ -974,7 +974,6 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
 VA(0x0047b9e6, 0x344)
 void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
-    static i16 overviewSetupSourceLine = 698;
     i32 col;
     tag_message message;
     char* titleText;
@@ -1060,7 +1059,6 @@ void game::SetupResources(void) {
 
 VA(0x0047bda1, 0x4b2)
 void game::Overview(void) {
-    static i16 overviewDialogSourceLine = 778;
     char mineCounts[OVERVIEW_MINE_COUNT_CAPACITY];
     i32 lighthouseCount;
     i32 mine;

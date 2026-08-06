@@ -19,6 +19,13 @@ H2_ENUM_BEGIN(MilesSampleConstant)
     MILES_VOLUME_CONVERSION_MODE      = 100
 H2_ENUM_END(MilesSampleConstant)
 
+DATA(0x00520188) SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {
+    {0, 1, 0},
+    {1, 2, 1},
+    {2, 6, 2},
+    {6, 16, 6}
+};
+
 DATA(0x005396d8) static i32 gMilesSamplesReady;
 DATA(0x005396dc) static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
 DATA(0x0053971c) static i32 gMilesSampleHandleCount;

@@ -127,21 +127,31 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
 
-    sprintf(gText, "viewlgnd.bin");
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x00519b20, viewWorldLegendResource, "viewlgnd.bin")
+    );
     window = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
     if (window == NULL)
         MemError();
 
-    iconNames[LEGEND_MINES] = "MINE";
-    iconNames[LEGEND_RESOURCES] = "RSRC";
-    iconNames[LEGEND_ARTIFACTS] = "RTFX";
-    iconNames[LEGEND_TOWNS] = "TWNS";
-    iconNames[LEGEND_HEROES] = "HROS";
-    iconNames[LEGEND_ALL] = "_ALL";
-    iconNames[LEGEND_WORLD] = "WRLD";
+    iconNames[LEGEND_MINES] =
+        DATA_COMPGEN(0x00519b30, viewWorldMinesIconStem, "MINE");
+    iconNames[LEGEND_RESOURCES] =
+        DATA_COMPGEN(0x00519b38, viewWorldResourcesIconStem, "RSRC");
+    iconNames[LEGEND_ARTIFACTS] =
+        DATA_COMPGEN(0x00519b40, viewWorldArtifactsIconStem, "RTFX");
+    iconNames[LEGEND_TOWNS] =
+        DATA_COMPGEN(0x00519b48, viewWorldTownsIconStem, "TWNS");
+    iconNames[LEGEND_HEROES] =
+        DATA_COMPGEN(0x00519b50, viewWorldHeroesIconStem, "HROS");
+    iconNames[LEGEND_ALL] =
+        DATA_COMPGEN(0x00519b58, viewWorldAllIconStem, "_ALL");
+    iconNames[LEGEND_WORLD] =
+        DATA_COMPGEN(0x00519b60, viewWorldWorldIconStem, "WRLD");
     sprintf(
         gText,
-        "view%s.icn",
+        DATA_COMPGEN(0x00519b68, viewWorldIconNameFormat, "view%s.icn"),
         iconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
                           ? LEGEND_WORLD
                           : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
@@ -202,14 +212,34 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 
     iVWXPixelOffset = (WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
-    gpMouseManager->SetPointer("advmice.mse", WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
-    sprintf(gText, "ground%d.icn", giViewWorldScale);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x00519b74, viewWorldMouseResource, "advmice.mse"),
+        WORLD_POINTER_FRAME,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x00519b80, viewWorldGroundIconFormat, "ground%d.icn"),
+        giViewWorldScale
+    );
     pVWGround = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "vwflag%d.icn", giViewWorldScale);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x00519b90, viewWorldFlagIconFormat, "vwflag%d.icn"),
+        giViewWorldScale
+    );
     pVWFlags = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "misc%d.icn", giViewWorldScale);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x00519ba0, viewWorldMiscIconFormat, "misc%d.icn"),
+        giViewWorldScale
+    );
     pVWMisc = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "letter%d.icn", giViewWorldScale);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x00519bac, viewWorldLetterIconFormat, "letter%d.icn"),
+        giViewWorldScale
+    );
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
 }

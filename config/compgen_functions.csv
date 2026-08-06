@@ -45,6 +45,7 @@ entry_rva,size,symbol,unit,source_object,evidence
 0x65bd2,18,_$E18,SOURCE/HISCORE,BASE/AudiereEffects,masked-exact
 0x70d8a,39,_$E19,SOURCE/KB,SOURCE/KB,masked-exact
 0x70db1,18,_$E18,SOURCE/KB,SOURCE/KB,masked-exact
+0x70dd0,25,??1game@@QAE@XZ,SOURCE/KB,SOURCE/KB,masked-exact
 0x70df0,55,??1soundManager@@QAE@XZ,SOURCE/KB,SOURCE/KB,masked-exact
 0x72008,39,_$E19,SOURCE/kbwin,SOURCE/kbwin,masked-exact
 0x7202f,18,_$E18,SOURCE/kbwin,SOURCE/kbwin,masked-exact
@@ -64,10 +65,6 @@ entry_rva,size,symbol,unit,source_object,evidence
 0x7ce7d,18,_$E18,SOURCE/Overview,BASE/AudiereEffects,masked-exact
 0x7e16a,39,_$E24,SOURCE/PATH,SOURCE/PATH,masked-exact
 0x7e191,18,_$E23,SOURCE/PATH,SOURCE/PATH,masked-exact
-0x7e1b0,15,_$E17,SOURCE/PATH,BASE/AudiereMusic,masked-exact
-0x7e1bf,15,_$E14,SOURCE/PATH,SOURCE/PATH,masked-exact
-0x7e1ce,18,_$E16,SOURCE/PATH,SOURCE/PATH,masked-exact
-0x7e1e0,15,_$E15,SOURCE/PATH,SOURCE/PATH,masked-exact
 0x8c2f1,39,_$E19,SOURCE/PHILAI,BASE/AudiereEffects,masked-exact
 0x8c318,18,_$E3,SOURCE/PHILAI,SOURCE/PHILAI,masked-exact
 0x8d00b,39,_$E19,SOURCE/RECRUIT,BASE/AudiereEffects,masked-exact

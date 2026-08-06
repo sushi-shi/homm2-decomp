@@ -5,7 +5,13 @@ from unittest import mock
 
 from homm2.build import source_symbols as mod
 from homm2.build.annotated_data import AnnotatedDataDefinition
-from homm2.build.source_symbols import SourceSymbol, collect, render
+from homm2.build.source_symbols import (
+    SourceSymbol,
+    collect,
+    compgen_functions_for_file,
+    render,
+    render_compgen,
+)
 
 
 def sym(rva, name, unit="BASE/X", size=0x10, kind="func", prov="source-annotation"):
@@ -33,6 +39,36 @@ class RenderTests(unittest.TestCase):
         # An empty inventory is the correct state before anything is marked, and
         # synth_pdb must still find a well-formed file.
         self.assertEqual(render([]), "rva,name,unit,size,kind,provenance\n")
+
+
+class CompgenMarkerTests(unittest.TestCase):
+    def test_marker_uses_semantic_role_instead_of_volatile_coff_counter(self):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_root = repo / "src"
+            path = source_root / "SOURCE" / "PHILAI.cpp"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                "VA_COMPGEN(0x0047e1bf, 0xf, STATIC_CTOR, SVSearchArray)\n")
+            rows = compgen_functions_for_file(path, source_root, repo)
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(
+            rows[0].name,
+            "__h2cg$SOURCE$PHILAI$static_ctor$SVSearchArray")
+        self.assertEqual(rows[0].rva, 0x7e1bf)
+        self.assertNotIn("_$E", render_compgen(rows))
+
+    def test_unknown_semantic_role_is_rejected(self):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_root = repo / "src"
+            path = source_root / "SOURCE" / "PHILAI.cpp"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                "VA_COMPGEN(0x0047e1bf, 0xf, UNKNOWN_ROLE, SVSearchArray)\n")
+            with self.assertRaisesRegex(ValueError, "invalid VA_COMPGEN"):
+                compgen_functions_for_file(path, source_root, repo)
 
 
 class CollectTests(unittest.TestCase):
@@ -66,6 +102,25 @@ class CollectTests(unittest.TestCase):
         out = self._collect([], [vtable])
         self.assertEqual([(r.name, r.kind, r.provenance) for r in out],
                          [("??_7baseManager@@6B@", "data", "source-vtable")])
+
+    def test_compgen_data_gets_a_stable_pdb_identity(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "a.cpp").write_text("")
+            claim = mock.Mock(
+                rva=0x11405c, unit="SOURCE/KB",
+                semantic_name="gWinSetupBuildImprovement0", size=0xb,
+                location="src/SOURCE/KB.cpp:11174")
+            with mock.patch.object(mod, "symbols_for_file", return_value=[]), \
+                    mock.patch.object(mod, "source_vtables", return_value=[]), \
+                    mock.patch.object(mod, "source_compgen_data",
+                                      return_value=[claim]):
+                out = collect(root, root)
+        self.assertEqual(len(out), 1)
+        self.assertEqual(
+            out[0].name,
+            "__h2cg$SOURCE$KB$data$gWinSetupBuildImprovement0")
+        self.assertEqual((out[0].rva, out[0].kind), (0x11405c, "data"))
 
 
 class DataMarkerTests(unittest.TestCase):

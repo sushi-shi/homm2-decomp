@@ -51,6 +51,11 @@ class CompgenDataClaim:
     owners: tuple[str, ...]
 
 
+def compgen_data_symbol_name(unit: str, semantic_name: str) -> str:
+    """Stable COFF/PDB identity for one source DATA_COMPGEN claim."""
+    return "__h2cg$%s$data$%s" % (unit.replace("/", "$"), semantic_name)
+
+
 @dataclass(frozen=True)
 class _Invocation:
     offset: int
@@ -252,6 +257,54 @@ def _macro_definitions(blob: bytes) -> dict[bytes, bytes]:
     }
 
 
+def _strip_comments(expression: bytes) -> bytes:
+    """Remove comments without interpreting comment markers inside literals."""
+    out = bytearray(expression)
+    index = 0
+    state = "code"
+    quote = 0
+    while index < len(expression):
+        byte = expression[index]
+        following = expression[index + 1] if index + 1 < len(expression) else 0
+        if state == "code":
+            if byte == 47 and following == 47:
+                out[index:index + 2] = b"  "
+                index += 2
+                state = "line"
+                continue
+            if byte == 47 and following == 42:
+                out[index:index + 2] = b"  "
+                index += 2
+                state = "block"
+                continue
+            if byte in (34, 39):
+                quote = byte
+                state = "literal"
+        elif state == "line":
+            if byte == 10:
+                state = "code"
+            else:
+                out[index] = 32
+        elif state == "block":
+            if byte == 42 and following == 47:
+                out[index:index + 2] = b"  "
+                index += 2
+                state = "code"
+                continue
+            if byte != 10:
+                out[index] = 32
+        else:
+            if byte == 92 and index + 1 < len(expression):
+                index += 2
+                continue
+            if byte == quote:
+                state = "code"
+        index += 1
+    if state == "block":
+        raise ValueError("unterminated source comment")
+    return bytes(out)
+
+
 def _string_size(expression: bytes, blob: bytes,
                  definitions: dict[bytes, bytes] | None = None) -> int | None:
     definitions = definitions if definitions is not None else _macro_definitions(blob)
@@ -293,7 +346,7 @@ def _string_size(expression: bytes, blob: bytes,
 def _lexical_expression(expression: bytes, blob: bytes,
                         seen: frozenset[bytes] = frozenset(),
                         definitions: dict[bytes, bytes] | None = None):
-    expression = expression.strip()
+    expression = _strip_comments(expression).strip()
     definitions = definitions if definitions is not None else _macro_definitions(blob)
     string_size = _string_size(expression, blob, definitions)
     if string_size is not None:

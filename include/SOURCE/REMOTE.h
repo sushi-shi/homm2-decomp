@@ -21,7 +21,7 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_BROADCAST_PLAYER              = 0x7f,
     REMOTE_RETRY_COUNT                   = 25,
     REMOTE_CONFIRM_POLL_COUNT            = 50,
-    REMOTE_BAUD_RATE_COUNT               = 8,
+    REMOTE_BAUD_RATE_COUNT               = 7,
     REMOTE_IRQ_COUNT                     = 7,
     REMOTE_CONFIRM_POLL_DELAY            = 20,
     REMOTE_SEND_RETRY_DELAY              = 1000,

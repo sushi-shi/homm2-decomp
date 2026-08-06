@@ -2055,7 +2055,7 @@ void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 qui
         sprintf(
             gText,
             DATA_COMPGEN(
-                0x004f8fe0,
+                0x004f7fe0,
                 heroNecromancyDescriptionFormat,
                 "{%s \xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d)}\n\n%s "
                 "\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d) \xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2 \xe2\xe5\xf0\xed\xf3\xf2\xfc "

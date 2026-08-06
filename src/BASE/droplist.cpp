@@ -1,5 +1,4 @@
 #include <va.h>
-#include <BASE/DROPLIST_TYPES.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -49,20 +48,6 @@ H2_ENUM_BEGIN(DropListLayoutConstant)
     SCROLL_THUMB_CENTER_DIVISOR = 2,
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
 H2_ENUM_END(DropListLayoutConstant)
-
-static SDropListSourceFiles gDropListSourceFiles = {
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE},
-    {DROPLIST_SOURCE_FILE}
-};
 
 VA(0x004cfdb0, 0x54)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {

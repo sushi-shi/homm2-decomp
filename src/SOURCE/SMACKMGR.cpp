@@ -141,11 +141,6 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         SmackNextFrame(smack);
 }
 
-// Miles digital master volume the movie player runs at, indexed by the
-// configured sound level.
-DATA(0x00517e18) static i32 smackMasterVolumes[IDX(CONFIG_VOLUME_LEVEL_COUNT)] =
-    {0, 127, 97, 75, 52, 40, 30, 20, 15, 10, 5};
-
 VA(0x00494769, 0x117d)
 void SmackManagerMain(void) {
     i32 soundFlags4;
@@ -220,7 +215,7 @@ void SmackManagerMain(void) {
     if (bSmackNum == EXPANSION_CAMPAIGN)
         strcpy(path7, ".\\DATA\\");
     else
-        sprintf(path7, "%s%s", gcRegCDRomPath, "\\ANIM2\\");
+        sprintf(path7, "%s%s", gcRegCDRomPath, gcAnimPath);
 
     if (gConfig.slowVideo)
         sprintf(gText, "%s%s.SMK", path7, SmackOptions[bSmackNum].slowFileName);
@@ -816,6 +811,11 @@ DATA(0x005170e8) SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
     {"BUKA", "", "BUKA", "", 1, 1, 0, 0, 0, 0, 0},
     {"BUKACRED", "", "BUKACRED", "", 1, 0, 1, 0, 0, 0, 0}
 };
+
+// Miles digital master volume the movie player runs at, indexed by the
+// configured sound level.
+DATA(0x00517e18) i32 smackMasterVolumes[IDX(CONFIG_VOLUME_LEVEL_COUNT)] =
+    {0, 127, 97, 75, 52, 40, 30, 20, 15, 10, 5};
 DATA(0x00533ea8) i32 bTesting = 0;
 DATA(0x00533eac) Smack* smk1 = NULL;
 DATA(0x00533eb0) Smack* smk2 = NULL;
