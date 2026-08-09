@@ -8910,7 +8910,11 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 joiningCost = static_cast<i32>(
                     gMonsterDatabase[IDX(monsterType)].cost
                     * creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                    * MONSTER_AI_JOIN_COST_FRACTION
+                    * DATA_COMPGEN(
+                        0x004ea5b0,
+                        computerMonsterJoinCostFraction,
+                        0.75 /* MONSTER_AI_JOIN_COST_FRACTION */
+                    )
                 );
                 if (joiningCost
                     > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
@@ -8958,7 +8962,11 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 CREATURE_SKELETON,
                 static_cast<i32>(
                     static_cast<double>(creatureCount[MONSTER_COMBAT_REMAINING_COUNT])
-                    * MONSTER_NECROMANCY_FRACTION
+                    * DATA_COMPGEN(
+                        0x004ea4c0,
+                        computerMonsterNecromancyFraction,
+                        0.1 /* MONSTER_NECROMANCY_FRACTION */
+                    )
                     * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
                 ),
                 -1
