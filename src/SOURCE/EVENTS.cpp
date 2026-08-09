@@ -3032,13 +3032,24 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ORACLE:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(EVENT_TEXT_ORACLE, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
-            oracleWindow_o = new heroWindow(0, 0, "thiefwin.bin");
+            oracleWindow_o = new heroWindow(
+                0,
+                0,
+                DATA_COMPGEN(0x004f4f88, doEventOracleWindowResourceName, "thiefwin.bin")
+            );
             if (oracleWindow_o == NULL)
                 MemError();
             SetWinText(oracleWindow_o, ORACLE_WINDOW_TEXT_ID);
             gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
-            strcpy(gText, "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
-                          "\xe8\xe3\xf0\xee\xea\xe0\xf5");
+            strcpy(
+                gText,
+                DATA_COMPGEN(
+                    0x004f4f98,
+                    doEventOraclePlayerInformationTitle,
+                    "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
+                    "\xe8\xe3\xf0\xee\xea\xe0\xf5"
+                )
+            );
             oracleMessage_o.type = MESSAGE_WIDGET;
             oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             oracleMessage_o.payload.widget.id = 0;
@@ -3052,13 +3063,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 1-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                DATA_COMPGEN(0x004f505c, doEventShrineFirstCircleFormat, "%s'%s'.  "),
+                DATA_COMPGEN(
+                    0x004f4fbc,
+                    doEventShrineFirstCircleMessage,
+                    "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 1-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
                 "\xed\xe0 \xec\xe0\xeb\xe5\xed\xfc\xea\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
                 "\xf1\xeb\xf3\xe6\xe0\xf2 \xec\xee\xeb\xee\xe4\xfb\xe5 \xef\xee\xf1\xeb\xf3\xf8\xed\xe8\xea\xe8."
                 "  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
                 "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xee\xf1\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
-                "- ",
+                    "- "
+                ),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -3066,13 +3081,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 2-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                DATA_COMPGEN(0x004f5118, doEventShrineSecondCircleFormat, "%s'%s'.  "),
+                DATA_COMPGEN(
+                    0x004f5068,
+                    doEventShrineSecondCircleMessage,
+                    "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 2-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
                 "\xed\xe0 \xe1\xee\xe3\xe0\xf2\xee \xf0\xe0\xf1\xef\xe8\xf1\xe0\xed\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5,"
                 " \xe3\xe4\xe5 \xf1\xeb\xf3\xe6\xe0\xf2 \xef\xee\xeb\xed\xee\xef\xf0\xe0\xe2\xed\xfb\xe5 "
                 "\xe1\xf0\xe0\xf2\xfc\xff \xe2\xe5\xf0\xfb.  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 "
                 "\xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 "
-                "\xed\xee\xe2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe - ",
+                    "\xed\xee\xe2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe - "
+                ),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -3080,13 +3099,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 3-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                DATA_COMPGEN(0x004f51c0, doEventShrineThirdCircleFormat, "%s'%s'.  "),
+                DATA_COMPGEN(
+                    0x004f5124,
+                    doEventShrineThirdCircleMessage,
+                    "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 3-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
                 "\xed\xe0 \xf0\xee\xf1\xea\xee\xf8\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
                 "\xf1\xeb\xf3\xe6\xe0\xf2 \xe2\xfb\xf1\xf8\xe8\xe5 \xe6\xf0\xe5\xf6\xfb.  \xc2 \xee\xe1\xec\xe5\xed "
                 "\xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
                 "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xe5\xec\xf3\xe4\xf0\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
-                "- ",
+                    "- "
+                ),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
@@ -3112,16 +3135,27 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     strcat(
                         gText,
-                        "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5 \xf5\xe2\xe0\xf2\xe0\xe5\xf2 "
-                        "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
-                        " \xe8 \xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                        DATA_COMPGEN(
+                            0x004f51cc,
+                            doEventShrineInsufficientWisdomMessage,
+                            "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5 \xf5\xe2\xe0\xf2\xe0\xe5\xf2 "
+                            "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
+                            " \xe8 \xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                        )
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
-                strcat(gText, "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
-                              "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
-                              "\xe2 \xed\xe5\xe5.");
+                strcat(
+                    gText,
+                    DATA_COMPGEN(
+                        0x004f522c,
+                        doEventShrineNoMagicBookMessage,
+                        "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
+                        "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
+                        "\xe2 \xed\xe5\xe5."
+                    )
+                );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
             break;
@@ -4109,7 +4143,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventHero2->CheckLevel();
                                     sprintf(
                             eventText_b,
-                            "%s'%s'.  ",
+                            DATA_COMPGEN(
+                                0x004f637c,
+                                doEventPyramidSpellFormat,
+                                "%s'%s'.  "
+                            ),
                             "\xce\xe4\xee\xeb\xe5\xe2 \xf7\xf3\xe4\xee\xe2\xe8\xf9, \xe2\xfb \xf0\xe0\xf1\xf8\xe8\xf4\xf0\xee\xe2\xe0\xeb\xe8 "
                             "\xe8\xe5\xf0\xee\xe3\xeb\xe8\xf4\xfb \xed\xe0 \xf1\xf2\xe5\xed\xe5, \xf1\xee\xee\xe1\xf9\xe0\xfe\xf9\xe8\xe5 "
                             "\xf1\xe5\xea\xf0\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff - ",
