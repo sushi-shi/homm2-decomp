@@ -5624,7 +5624,11 @@ void advManager::EventWindow(
     else if (eventId == MAP_EVENT_REWARD_NONE)
         sprintf(eventText, text);
     else
-        sprintf(eventText, "Event ID %d", eventId);
+        sprintf(
+            eventText,
+            DATA_COMPGEN(0x004f6ec4, eventWindowUnknownIdFormat, "Event ID %d"),
+            eventId
+        );
 
     NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
 }
@@ -6031,7 +6035,11 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(
+                    gText,
+                    DATA_COMPGEN(0x004f6ed0, ghostEventSmallTextFormat, "%s"),
+                    text
+                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -6066,7 +6074,11 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(
+                    gText,
+                    DATA_COMPGEN(0x004f6ed4, ghostEventMediumTextFormat, "%s"),
+                    text
+                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -6101,7 +6113,11 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(
+                    gText,
+                    DATA_COMPGEN(0x004f6ed8, ghostEventLargeTextFormat, "%s"),
+                    text
+                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -6137,7 +6153,11 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 )
                 == COMBAT_RESULT_ATTACKER) {
                 artifactId = GiveRandomArtifact(eventHero);
-                sprintf(gText, "%s", text);
+                sprintf(
+                    gText,
+                    DATA_COMPGEN(0x004f6edc, ghostEventHugeTextFormat, "%s"),
+                    text
+                );
                 if (artifactId != ARTIFACT_NONE)
                     EventWindow(
                         -1,

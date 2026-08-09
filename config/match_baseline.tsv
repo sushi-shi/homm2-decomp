@@ -748,12 +748,12 @@ SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	709a4079a808
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	646574654745
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	cda7f47224c7
 SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAPAVsample@@@Z	100.0000	4397172ef81c
-SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	86a7cf0c5b7f
+SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	e50eaed1bef1
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	646d175f2b9a
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	33fc49aad35f
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	a08549a2930c
 SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	9cca821fd848
-SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	f9bb8d76fb9d
+SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	acd465b04fa7
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	af9774f40a82
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	100.0000	9c84a6bdaef7
 SOURCE/EVENTS	?GiveRandomArtifact@advManager@@QAEHPAVhero@@@Z	100.0000	7df407c42bab
