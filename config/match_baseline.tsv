@@ -752,7 +752,7 @@ SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	86a7cf0c5b7f
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	646d175f2b9a
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	33fc49aad35f
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	a08549a2930c
-SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	64836cc1756f
+SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	9cca821fd848
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	f9bb8d76fb9d
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	af9774f40a82
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	100.0000	9c84a6bdaef7
