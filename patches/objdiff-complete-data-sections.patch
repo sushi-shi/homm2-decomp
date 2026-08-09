@@ -1,0 +1,242 @@
+diff --git a/objdiff-core/src/diff/data.rs b/objdiff-core/src/diff/data.rs
+--- a/objdiff-core/src/diff/data.rs
++++ b/objdiff-core/src/diff/data.rs
+@@ -230,40 +230,47 @@
+ pub fn diff_data_section(
+     left_obj: &Object,
+     right_obj: &Object,
+-    left_diff: &ObjectDiff,
+-    right_diff: &ObjectDiff,
++    _left_diff: &ObjectDiff,
++    _right_diff: &ObjectDiff,
+     left_section_idx: usize,
+     right_section_idx: usize,
+ ) -> Result<(SectionDiff, SectionDiff)> {
+     let left_section = &left_obj.sections[left_section_idx];
+     let right_section = &right_obj.sections[right_section_idx];
+-    let left_max = symbols_matching_section(&left_obj.symbols, left_section_idx)
+-        .filter_map(|(_, s)| s.address.checked_sub(left_section.address).map(|a| a + s.size))
+-        .max()
+-        .unwrap_or(0)
+-        .min(left_section.size);
+-    let right_max = symbols_matching_section(&right_obj.symbols, right_section_idx)
+-        .filter_map(|(_, s)| s.address.checked_sub(right_section.address).map(|a| a + s.size))
+-        .max()
+-        .unwrap_or(0)
+-        .min(right_section.size);
+-    let left_data = &left_section.data[..left_max as usize];
+-    let right_data = &right_section.data[..right_max as usize];
++    let left_data = left_section.data.as_slice();
++    let right_data = right_section.data.as_slice();
+ 
+     let (bytes_match_ratio, left_data_diff, right_data_diff) =
+         diff_data_range(left_data, right_data);
+-    let match_percent = bytes_match_ratio * 100.0;
+ 
+     let mut left_reloc_diffs = Vec::new();
+     let mut right_reloc_diffs = Vec::new();
++    let mut total_reloc_bytes = 0;
++    let mut matching_reloc_bytes = 0;
+     for (diff_kind, left_reloc, right_reloc) in diff_data_relocs_for_range(
+         left_obj,
+         right_obj,
+         left_section_idx,
+         right_section_idx,
+-        0..left_max as usize,
+-        0..right_max as usize,
++        0..left_section.size as usize,
++        0..right_section.size as usize,
+     ) {
++        let reloc_diff_len = match (left_reloc, right_reloc) {
++            (None, None) => unreachable!(),
++            (None, Some(right_reloc)) => {
++                right_obj.arch.data_reloc_size(right_reloc.relocation.flags)
++            }
++            (Some(left_reloc), None) => left_obj.arch.data_reloc_size(left_reloc.relocation.flags),
++            (Some(left_reloc), Some(right_reloc)) => left_obj
++                .arch
++                .data_reloc_size(left_reloc.relocation.flags)
++                .max(right_obj.arch.data_reloc_size(right_reloc.relocation.flags)),
++        };
++        total_reloc_bytes += reloc_diff_len;
++        if diff_kind == DataDiffKind::None {
++            matching_reloc_bytes += reloc_diff_len;
++        }
++
+         if let Some(left_reloc) = left_reloc {
+             let len = left_obj.arch.data_reloc_size(left_reloc.relocation.flags);
+             let range = left_reloc.relocation.address..left_reloc.relocation.address + len as u64;
+@@ -284,29 +291,32 @@
+         }
+     }
+ 
+-    let (mut left_section_diff, mut right_section_diff) = diff_generic_section(
+-        left_obj,
+-        right_obj,
+-        left_diff,
+-        right_diff,
+-        left_section_idx,
+-        right_section_idx,
+-    )?;
+-    let all_left_relocs_match = left_reloc_diffs.iter().all(|d| d.kind == DataDiffKind::None);
+-    left_section_diff.data_diff = left_data_diff;
+-    right_section_diff.data_diff = right_data_diff;
+-    left_section_diff.reloc_diff = left_reloc_diffs;
+-    right_section_diff.reloc_diff = right_reloc_diffs;
+-    if all_left_relocs_match {
+-        // Use the highest match percent between two options:
+-        // - Left symbols matching right symbols by name
+-        // - Diff of the data itself
+-        // We only do this when all relocations on the left side match.
+-        if left_section_diff.match_percent.unwrap_or(-1.0) < match_percent {
+-            left_section_diff.match_percent = Some(match_percent);
+-        }
+-    }
+-    Ok((left_section_diff, right_section_diff))
++    left_reloc_diffs
++        .sort_by(|a, b| a.range.start.cmp(&b.range.start).then(a.range.end.cmp(&b.range.end)));
++    right_reloc_diffs
++        .sort_by(|a, b| a.range.start.cmp(&b.range.start).then(a.range.end.cmp(&b.range.end)));
++
++    let byte_weight = left_data.len().max(right_data.len());
++    let match_ratio = if total_reloc_bytes == 0 {
++        bytes_match_ratio
++    } else {
++        ((bytes_match_ratio * byte_weight as f32) + matching_reloc_bytes as f32)
++            / (byte_weight + total_reloc_bytes) as f32
++    };
++    let match_percent = if match_ratio == 1.0 { 100.0 } else { match_ratio * 100.0 };
++
++    Ok((
++        SectionDiff {
++            match_percent: Some(match_percent),
++            data_diff: left_data_diff,
++            reloc_diff: left_reloc_diffs,
++        },
++        SectionDiff {
++            match_percent: None,
++            data_diff: right_data_diff,
++            reloc_diff: right_reloc_diffs,
++        },
++    ))
+ }
+ 
+ pub fn no_diff_data_symbol(obj: &Object, symbol_index: usize) -> Result<SymbolDiff> {
+diff --git a/objdiff-core/tests/arch_x86.rs b/objdiff-core/tests/arch_x86.rs
+--- a/objdiff-core/tests/arch_x86.rs
++++ b/objdiff-core/tests/arch_x86.rs
+@@ -36,6 +36,114 @@
+ 
+ #[test]
+ #[cfg(feature = "x86")]
++fn diff_symbol_less_data_section_bytes() {
++    let diff_config = diff::DiffObjConfig {
++        combine_data_sections: true,
++        combine_text_sections: true,
++        ..Default::default()
++    };
++    let mut target = obj::read::parse(
++        include_object!("data/x86/rtest.obj"),
++        &diff_config,
++        diff::DiffSide::Target,
++    )
++    .unwrap();
++    let mut base =
++        obj::read::parse(include_object!("data/x86/rtest.obj"), &diff_config, diff::DiffSide::Base)
++            .unwrap();
++    let target_section_idx = target
++        .sections
++        .iter()
++        .position(|s| s.name == ".data" && s.kind == obj::SectionKind::Data)
++        .unwrap();
++    let base_section_idx = base
++        .sections
++        .iter()
++        .position(|s| s.name == ".data" && s.kind == obj::SectionKind::Data)
++        .unwrap();
++
++    for symbol in &mut target.symbols {
++        if symbol.section == Some(target_section_idx) {
++            symbol.flags |= obj::SymbolFlag::Hidden;
++        }
++    }
++    for symbol in &mut base.symbols {
++        if symbol.section == Some(base_section_idx) {
++            symbol.flags |= obj::SymbolFlag::Hidden;
++        }
++    }
++    target.sections[target_section_idx].relocations.clear();
++    base.sections[base_section_idx].relocations.clear();
++    *base.sections[base_section_idx].data.0.last_mut().unwrap() ^= 1;
++
++    let result = diff::diff_objs(
++        Some(&target),
++        Some(&base),
++        None,
++        &diff_config,
++        &diff::MappingConfig::default(),
++    )
++    .unwrap();
++    let section_diff = &result.left.unwrap().sections[target_section_idx];
++    assert!(section_diff.match_percent.unwrap() < 100.0);
++    assert!(section_diff.data_diff.iter().any(|d| d.kind != diff::DataDiffKind::None));
++}
++
++#[test]
++#[cfg(feature = "x86")]
++fn diff_symbol_less_data_section_relocations() {
++    let diff_config = diff::DiffObjConfig {
++        combine_data_sections: true,
++        combine_text_sections: true,
++        ..Default::default()
++    };
++    let mut target = obj::read::parse(
++        include_object!("data/x86/rtest.obj"),
++        &diff_config,
++        diff::DiffSide::Target,
++    )
++    .unwrap();
++    let mut base =
++        obj::read::parse(include_object!("data/x86/rtest.obj"), &diff_config, diff::DiffSide::Base)
++            .unwrap();
++    let target_section_idx = target
++        .sections
++        .iter()
++        .position(|s| s.name == ".data" && s.kind == obj::SectionKind::Data)
++        .unwrap();
++    let base_section_idx = base
++        .sections
++        .iter()
++        .position(|s| s.name == ".data" && s.kind == obj::SectionKind::Data)
++        .unwrap();
++
++    for symbol in &mut target.symbols {
++        if symbol.section == Some(target_section_idx) {
++            symbol.flags |= obj::SymbolFlag::Hidden;
++        }
++    }
++    for symbol in &mut base.symbols {
++        if symbol.section == Some(base_section_idx) {
++            symbol.flags |= obj::SymbolFlag::Hidden;
++        }
++    }
++    base.sections[base_section_idx].relocations.remove(0);
++
++    let result = diff::diff_objs(
++        Some(&target),
++        Some(&base),
++        None,
++        &diff_config,
++        &diff::MappingConfig::default(),
++    )
++    .unwrap();
++    let section_diff = &result.left.unwrap().sections[target_section_idx];
++    assert!(section_diff.match_percent.unwrap() < 100.0);
++    assert!(section_diff.reloc_diff.iter().any(|d| d.kind == diff::DataDiffKind::Delete));
++}
++
++#[test]
++#[cfg(feature = "x86")]
+ fn read_x86_64() {
+     let diff_config = diff::DiffObjConfig::default();
+     let obj = obj::read::parse(
