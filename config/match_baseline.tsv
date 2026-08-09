@@ -738,7 +738,7 @@ SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	100.0000	0622bc9e6962
 SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	100.0000	7ec96ac8c546
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	01ba9589fdd1
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	9038ac811ece
-SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	4a33fde8fb61
+SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	2c7d89899e31
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	100.0000	4f7d654eef24
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	100.0000	72b6e755618d
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	e28be69fb51a
@@ -765,7 +765,7 @@ SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	100.0000	e51a5
 SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	15252259061b
 SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	1ea3cbe35e0f
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	b059f74433da
-SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	e18679069f54
+SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	47888e488341
 SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	100.0000	949316207299
 SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	100.0000	b2fb11c47219
 SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	100.0000	a433ae66fb60
