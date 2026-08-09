@@ -1073,7 +1073,11 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_adventureWindow == NULL) {
-        m_adventureWindow = new heroWindow(0, 0, "adv_wind.bin");
+        m_adventureWindow = new heroWindow(
+            0,
+            0,
+            DATA_COMPGEN(0x004ef1f0, adventureWindowFilename, "adv_wind.bin")
+        );
         if (m_adventureWindow == NULL) {
             MemError();
         }
@@ -1082,7 +1086,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            "scroll.icn",
+            DATA_COMPGEN(0x004ef200, scrollLeftIconFilename, "scroll.icn"),
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_LEFT_ID,
@@ -1098,7 +1102,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            "scroll.icn",
+            DATA_COMPGEN(0x004ef20c, scrollRightIconFilename, "scroll.icn"),
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_RIGHT_ID,
@@ -1112,9 +1116,17 @@ i32 advManager::Open(i32 id) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(
+            DATA_COMPGEN(0x004ef218, openHumanAdventureCursorFilename, "advmice.mse"),
+            0,
+            MOUSE_AUTO_CURSOR_TYPE
+        );
     } else {
-        gpMouseManager->SetPointer("advmice.mse", 1, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(
+            DATA_COMPGEN(0x004ef224, openComputerAdventureCursorFilename, "advmice.mse"),
+            1,
+            MOUSE_AUTO_CURSOR_TYPE
+        );
     }
 
     if (m_visibilityMap == NULL) {
@@ -7264,7 +7276,11 @@ i32 SaveGame(void) {
     i32 ok = 0;
     i32 nPlayers = 0;
     gpAdvManager->DisableButtons();
-    gpMouseManager->SetPointer("advmice.mse", SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x004efed8, saveGameAdventureCursorFilename, "advmice.mse"),
+        SAVE_POINTER_FRAME,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     i32 i;
     for (i = 0; i < SAVE_PLAYER_COUNT; ++i) {
         if (!gpGame->m_playerDead[i] && gbHumanPlayer[i]) {
@@ -7331,7 +7347,11 @@ void advManager::CheckCastSpell(void) {
         MobilizeCurrHero(0);
         CompleteDraw(0);
         UpdateScreen(0, 0);
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(
+            DATA_COMPGEN(0x004eff3c, checkCastSpellAdventureCursorFilename, "advmice.mse"),
+            POINTER_DEFAULT,
+            MOUSE_AUTO_CURSOR_TYPE
+        );
         CastSpell(gpGame->ViewSpells(
             gpGame->GetHero(gpCurPlayer->m_currentHero),
             SPELL_TYPE_ADVENTURE,
@@ -9052,7 +9072,11 @@ void advManager::SetInitialMapOrigin(void) {
 VA(0x00412c7a, 0x212)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(
+            DATA_COMPGEN(0x004f00b4, loadRemoteAdventureCursorFilename, "advmice.mse"),
+            POINTER_DEFAULT,
+            MOUSE_AUTO_CURSOR_TYPE
+        );
     }
 
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -9514,7 +9538,11 @@ void advManager::ViewPuzzle(void) {
     visibleCount = 0;
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x004f0134, viewPuzzleAdventureCursorFilename, "advmice.mse"),
+        POINTER_DEFAULT,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     puzzleIcn = gpResourceManager->GetIcon("puzzle.icn");
     i32 j;
     for (j = 0; j < PUZZLE_PIECE_COUNT; ++j) {
@@ -9640,7 +9668,11 @@ void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(
+            DATA_COMPGEN(0x004f015c, adventurePanelCursorFilename, "advmice.mse"),
+            POINTER_DEFAULT,
+            MOUSE_AUTO_CURSOR_TYPE
+        );
         i32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
@@ -9784,7 +9816,11 @@ i32 advManager::ControlPanel(void) {
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x004f0174, controlPanelCursorFilename, "advmice.mse"),
+        POINTER_DEFAULT,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
@@ -9956,7 +9992,11 @@ void advManager::SystemOptions(void) {
     i32 n;
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x004f0238, systemOptionsCursorFilename, "advmice.mse"),
+        POINTER_DEFAULT,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     prevWalkSpeed = gConfig.walkSpeed;
     oldInterfaceMode = gConfig.evilInterfaceUsage;
     heroMobile = m_heroContextLocked;
