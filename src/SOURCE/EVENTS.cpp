@@ -1406,7 +1406,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
                     + MINE_RESOURCE_ICON_OFFSET,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x005244b8, doEventMineCapturedEmptyText, ""),
                 IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
                 -resourceAmount_o,
                 -1,
@@ -1422,7 +1422,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 EVENT_TEXT_ALCHEMIST_CAPTURED,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x005244bc, doEventAlchemistCapturedEmptyText, ""),
                 IDX(RES_MERCURY),
                 NORMAL_DIALOG_NO_VALUE,
                 -1,
@@ -1438,7 +1438,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 EVENT_TEXT_SAWMILL_CAPTURED,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x005244c0, doEventSawmillCapturedEmptyText, ""),
                 IDX(RES_WOOD),
                 -MINE_ORE_INCOME,
                 -1,
@@ -1457,7 +1457,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 EVENT_TEXT_LIGHTHOUSE_CAPTURED,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x005244c4, doEventLighthouseCapturedEmptyText, ""),
                 -1,
                 0,
                 -1,
@@ -1543,7 +1543,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_BUOY:
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_BUOY)) {
-                EventWindow(EVENT_TEXT_BUOY_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_BUOY_VISITED,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x005244c8, doEventBuoyVisitedEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
@@ -1553,7 +1562,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_BUOY_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244cc, doEventBuoyRewardEmptyText, ""),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1568,7 +1577,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_VISITED,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244d0, doEventFaerieRingVisitedEmptyText, ""),
                     -1,
                     0,
                     -1,
@@ -1584,7 +1593,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244d4, doEventFaerieRingRewardEmptyText, ""),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1642,7 +1651,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_FOUNTAIN:
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_FOUNTAIN)) {
-                EventWindow(EVENT_TEXT_FOUNTAIN_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_FOUNTAIN_VISITED,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x005244d8, doEventFountainVisitedEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
@@ -1652,7 +1670,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FOUNTAIN_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244dc, doEventFountainRewardEmptyText, ""),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1934,7 +1952,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         EVENT_TEXT_SKELETON_EMPTY,
                         NORMAL_DIALOG_INFO,
-                        "",
+                        DATA_COMPGEN(0x005244e0, doEventSkeletonEmptyText, ""),
                         -1,
                         0,
                         -1,
@@ -1999,7 +2017,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 EVENT_TEXT_CAMPFIRE,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x005244e4, doEventCampfireEmptyText, ""),
                 IDX(RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
                 cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
@@ -2294,13 +2312,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_GAZEBO:
             if (eventHero2->m_gazeboVisits & (1 << cell->m_objectMetadata)) {
-                EventWindow(EVENT_TEXT_GAZEBO_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_GAZEBO_VISITED,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x005244e8, doEventGazeboVisitedEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_GAZEBO_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244ec, doEventGazeboRewardEmptyText, ""),
                     NORMAL_DIALOG_EXPERIENCE,
                     GAZEBO_EXPERIENCE,
                     -1,
@@ -2315,13 +2342,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_WATER_WHEEL:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_WATER_WHEEL_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_WATER_WHEEL_EMPTY,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x005244f0, doEventWaterWheelEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_WATER_WHEEL_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244f4, doEventWaterWheelRewardEmptyText, ""),
                     IDX(RES_GOLD),
                     cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT,
                     -1,
@@ -2360,7 +2396,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_WINDMILL_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005244f8, doEventWindmillRewardEmptyText, ""),
                     cell->m_objectMetadata,
                     WINDMILL_RESOURCE_AMOUNT,
                     -1,
@@ -2374,13 +2410,31 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 cell->m_objectMetadata = WINDMILL_EMPTY;
             } else {
-                EventWindow(EVENT_TEXT_WINDMILL_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_WINDMILL_EMPTY,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x005244fc, doEventWindmillEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             }
             break;
 
         case MAP_OBJECT_ANCIENT_LAMP:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_GENIE_LAMP, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+            EventWindow(
+                EVENT_TEXT_GENIE_LAMP,
+                NORMAL_DIALOG_CONFIRM,
+                DATA_COMPGEN(0x00524500, doEventGenieLampEmptyText, ""),
+                -1,
+                0,
+                -1,
+                0,
+                -1
+            );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
@@ -2802,10 +2856,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_WAGON_CAMP:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_WAGON_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_WAGON_EMPTY,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x00524504, doEventWagonEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(EVENT_TEXT_WAGON_RECRUIT, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_WAGON_RECRUIT,
+                    NORMAL_DIALOG_CONFIRM,
+                    DATA_COMPGEN(0x00524508, doEventWagonRecruitEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
             }
@@ -2813,13 +2885,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_DESERT_TENT:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_DESERT_TENT_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_DESERT_TENT_EMPTY,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x0052450c, doEventDesertTentEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_DESERT_TENT_RECRUIT,
                     NORMAL_DIALOG_CONFIRM,
-                    "",
+                    DATA_COMPGEN(0x00524510, doEventDesertTentRecruitEmptyText, ""),
                     -1,
                     0,
                     -1,
@@ -2856,10 +2937,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                   & (1 << eventHero2->m_owner))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1] |= 1 << eventHero2->m_owner;
-                EventWindow(EVENT_TEXT_OBELISK_REWARD, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_OBELISK_REWARD,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x00524514, doEventObeliskRewardEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
                 ViewPuzzle();
             } else {
-                EventWindow(EVENT_TEXT_OBELISK_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_OBELISK_VISITED,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x00524518, doEventObeliskVisitedEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
             }
             break;
 
@@ -3031,7 +3130,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_ORACLE:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_ORACLE, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+            EventWindow(
+                EVENT_TEXT_ORACLE,
+                NORMAL_DIALOG_INFO,
+                DATA_COMPGEN(0x0052451c, doEventOracleEmptyText, ""),
+                -1,
+                0,
+                -1,
+                0,
+                -1
+            );
             oracleWindow_o = new heroWindow(
                 0,
                 0,
@@ -4095,14 +4203,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_GRAVEYARD: {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_GRAVEYARD_PROMPT, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+            EventWindow(
+                EVENT_TEXT_GRAVEYARD_PROMPT,
+                NORMAL_DIALOG_CONFIRM,
+                DATA_COMPGEN(0x00524520, doEventGraveyardPromptEmptyText, ""),
+                -1,
+                0,
+                -1,
+                0,
+                -1
+            );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
                             EVENT_TEXT_GRAVEYARD_EMPTY,
                             NORMAL_DIALOG_INFO,
-                            "",
+                            DATA_COMPGEN(0x00524524, doEventGraveyardEmptyText, ""),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -5404,7 +5521,10 @@ void advManager::EventSound(
     const i32 pickupSound = SOUND_PICKUP;
     const i32 mineSound = SOUND_MINE;
     char trackName[SOUND_FILENAME_LENGTH];
-    strcpy(trackName, "");
+    strcpy(
+        trackName,
+        DATA_COMPGEN(0x00524528, eventSoundEmptyFilename, "")
+    );
     i32 musicTrack = SOUND_NONE;
 
     switch (eventType) {
@@ -6232,7 +6352,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
         EventWindow(
             IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
             NORMAL_DIALOG_INFO,
-            "",
+            DATA_COMPGEN(0x0052452c, houseEventEmptyText, ""),
             -1,
             0,
             -1,
@@ -6254,7 +6374,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
         EventWindow(
             IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
             NORMAL_DIALOG_CONFIRM,
-            "",
+            DATA_COMPGEN(0x00524530, houseEventRecruitEmptyText, ""),
             -1,
             0,
             -1,
@@ -6271,7 +6391,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
                 EventWindow(
                     IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x00524534, houseEventArmyFullEmptyText, ""),
                     -1,
                     0,
                     -1,
@@ -8548,7 +8668,16 @@ void advManager::PlayerMonsterInteract(
                 *handled = 1;
                 return;
             } else {
-                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_MONSTER_REFUSAL,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x00524538, playerMonsterForcedRefusalEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
                 goto fightMonsters;
             }
         } else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
@@ -8655,7 +8784,16 @@ void advManager::PlayerMonsterInteract(
                 gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
                 return;
             } else {
-                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(
+                    EVENT_TEXT_MONSTER_REFUSAL,
+                    NORMAL_DIALOG_INFO,
+                    DATA_COMPGEN(0x0052453c, playerMonsterDiplomacyRefusalEmptyText, ""),
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
                 goto fightMonsters;
             }
         }
@@ -9104,7 +9242,11 @@ CombatResult advManager::DoCombat(
     } else if (giHighMemBuffer > COMBAT_LOW_MEMORY_LIMIT)
         gAdvDisposeLevel = ADV_DISPOSE_PARTIAL;
     gpExec->CallManager(gpCombatManager);
-    gpMouseManager->SetPointer(const_cast<char*>("advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        const_cast<char*>(DATA_COMPGEN(0x004f7508, adventureMouseCursorFilename, "advmice.mse")),
+        0,
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
 
 combatFinished:
@@ -9375,7 +9517,11 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                const_cast<char*>(DATA_COMPGEN(
+                    0x004f7514,
+                    receiveCombatDataErrorPrompt,
+                    "\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"
+                )),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -9389,7 +9535,11 @@ void advManager::ReceiveHeroTownData(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();
             else
-                ShutDown(const_cast<char*>("\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."));
+                ShutDown(const_cast<char*>(DATA_COMPGEN(
+                    0x004f7540,
+                    receiveCombatDataGameEndedMessage,
+                    "\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."
+                )));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
