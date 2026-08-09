@@ -612,21 +612,17 @@ def render_source_manifest(rows):
 def delinker_manifest_bytes(rows):
     """Serialize Vostok's physical placement schema.
 
-    Vostok obtains symbol identities from the synthetic PDB.  Its manifest
-    intentionally carries only object ownership and physical COFF placement;
-    semantic DATA_COMPGEN names remain in the source manifest consumed by the
-    comparison normalizer.
+    Vostok obtains symbol identities from the synthetic PDB. Semantic
+    DATA_COMPGEN names remain in the source manifest consumed by the comparison
+    normalizer, while reviewed candidate section coordinates select the exact
+    physical COFF allocation that Vostok must emit.
     """
     lines = [
         "# Physical placements projected from the reviewed source data model.",
         "\t".join(DELINK_HEADER),
     ]
     for row in rows:
-        # The pinned Vostok release cannot emit COMDAT section topology.  Keep
-        # exact candidate coordinates in the semantic source manifest, but do
-        # not claim that its synthesized target sections reproduce them.
-        projected = dict(row, section_ordinal="-", section_offset="-")
-        lines.append("\t".join(projected[key] for key in DELINK_HEADER))
+        lines.append("\t".join(row[key] for key in DELINK_HEADER))
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 

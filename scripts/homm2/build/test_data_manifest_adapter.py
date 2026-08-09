@@ -11,6 +11,7 @@ from homm2.build.data_manifest_adapter import (
     _compgen_candidate_kind,
     _interior_compgen_aliases,
     candidate_topology,
+    delinker_manifest_bytes,
     resolve_compgen_definitions,
     resolve_vtable_definitions,
     resolve_source_definitions,
@@ -48,6 +49,20 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_delinker_manifest_retains_candidate_section_coordinates(self):
+        row = {
+            "object": "SOURCE\\Test.c",
+            "rva": "0x1234",
+            "size": "0x4",
+            "storage": "rdata",
+            "alignment": "0x4",
+            "section_ordinal": "7",
+            "section_offset": "0xc",
+            "scope": "local",
+        }
+        fields = delinker_manifest_bytes([row]).decode().splitlines()[-1].split("\t")
+        self.assertEqual(fields[5:7], ["7", "0xc"])
+
     def test_compgen_recognizes_vc6_real_literal_symbols(self):
         self.assertEqual(
             _compgen_candidate_kind(candidate(

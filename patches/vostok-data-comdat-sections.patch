@@ -1,0 +1,68 @@
+diff --git a/src/object_files.rs b/src/object_files.rs
+index 72c5d82..22d80a1 100644
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -15,8 +15,8 @@ use iced_x86::{Decoder, DecoderOptions, FlowControl, Instruction, OpKind, Regis
+ 
+ use pdb2::{FallibleIterator, RawString};
+ 
+-use object::write::SymbolId;
+-use object::{SectionFlags, SectionKind};
++use object::write::{Comdat, SymbolId};
++use object::{ComdatKind, SectionFlags, SectionKind};
+ 
+ pub struct ObjectFiles<'a> {
+     pub objects: HashMap<&'a [u8], ObjectFile>,
+@@ -438,13 +438,6 @@ impl ObjectFile {
+                 size: section.size,
+             });
+ 
+-            if section.comdat_selection != ComdatSelection::None {
+-                anyhow::bail!(
+-                    "candidate data COMDAT section {} is not yet emitted",
+-                    section.ordinal
+-                );
+-            }
+-
+             match section.storage {
+                 Some(SectionStorage::Data) if data_section_id.is_none() => {
+                     data_section_id = Some(id)
+@@ -463,6 +456,38 @@ impl ObjectFile {
+             }
+         }
+ 
++        for (leader_index, leader) in sections.iter().enumerate() {
++            let kind = match leader.comdat_selection {
++                ComdatSelection::None | ComdatSelection::Associative => continue,
++                ComdatSelection::NoDuplicates => ComdatKind::NoDuplicates,
++                ComdatSelection::Any => ComdatKind::Any,
++                ComdatSelection::SameSize => ComdatKind::SameSize,
++                ComdatSelection::ExactMatch => ComdatKind::ExactMatch,
++                ComdatSelection::Largest => ComdatKind::Largest,
++                ComdatSelection::Newest => ComdatKind::Newest,
++            };
++            let leader_id = topology_sections[leader_index].id;
++            let symbol = object.section_symbol(leader_id);
++            let group_sections = sections
++                .iter()
++                .enumerate()
++                .filter_map(|(index, section)| {
++                    if index == leader_index
++                        || section.associative_ordinal == Some(leader.ordinal)
++                    {
++                        Some(topology_sections[index].id)
++                    } else {
++                        None
++                    }
++                })
++                .collect();
++            object.add_comdat(Comdat {
++                kind,
++                symbol,
++                sections: group_sections,
++            });
++        }
++
+         if pad_rdata && let Some(rdata_section_id) = rdata_section_id {
+             object.append_section_data(rdata_section_id, &0_u32.to_le_bytes(), 4);
+         }

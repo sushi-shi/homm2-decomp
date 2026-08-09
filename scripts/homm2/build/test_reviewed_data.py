@@ -18,10 +18,15 @@ from homm2.build.reviewed_data import (
 
 FAKE_DELINKER = """#!/bin/sh
 out=""
+data_sections=""
 while [ $# -gt 0 ]; do
-    case "$1" in --output-path) out="$2";; esac
+    case "$1" in
+        --output-path) out="$2";;
+        --data-section-manifest) data_sections="$2";;
+    esac
     shift
 done
+[ -f "$data_sections" ] || exit 3
 %s
 touch "$out/(unmatched).c.obj"
 """
@@ -59,6 +64,7 @@ class Fixture:
         self.manifest = root / "gen/reviewed_delink_data.tsv"
         self.data_manifest = root / "gen/delink_data_manifest.tsv"
         self.source_data_manifest = root / "gen/delink_data_from_source.tsv"
+        self.data_section_manifest = root / "gen/delink_data_sections.tsv"
         self.target = root / "delink"
         self.stamp = self.target / ".reviewed-data-stamp.json"
         self.delinker = write_fake_delinker(root / "vostok-delinker")
@@ -84,6 +90,7 @@ class Fixture:
             mock.patch(f"{module}.MANIFEST", self.manifest),
             mock.patch(f"{module}.DATA_MANIFEST", self.data_manifest),
             mock.patch(f"{module}.SOURCE_DATA_MANIFEST", self.source_data_manifest),
+            mock.patch(f"{module}.DATA_SECTION_MANIFEST", self.data_section_manifest),
             mock.patch(f"{module}.TARGET", self.target),
             mock.patch(f"{module}.STAMP", self.stamp),
             mock.patch(f"{module}.load_definition_rvas", return_value={}),
@@ -99,6 +106,8 @@ class Fixture:
                        return_value=b"# fixture source data\n"),
             mock.patch(f"{module}.delinker_manifest_bytes",
                        return_value=b"# fixture delinker data\n"),
+            mock.patch(f"{module}.candidate_section_manifest_bytes",
+                       return_value=b"# fixture candidate sections\n"),
         )
 
     def run(self, action, *args, **kwargs):
@@ -209,9 +218,11 @@ class ReviewedDataTest(unittest.TestCase):
             self.assertTrue(fixture.manifest.is_file())
             self.assertTrue(fixture.data_manifest.is_file())
             self.assertTrue(fixture.source_data_manifest.is_file())
+            self.assertTrue(fixture.data_section_manifest.is_file())
             stamp = json.loads(fixture.stamp.read_text())
             self.assertEqual(sorted(stamp), [
                 "data_adapter_sha256", "data_manifest_sha256",
+                "data_section_manifest_sha256",
                 "delinker_sha256", "exe_sha256", "generator_sha256",
                 "ledger_sha256", "manifest_sha256", "owner_definitions_sha256",
                 "owner_extents_sha256", "pdb_sha256", "reloc_aliases_sha256",
