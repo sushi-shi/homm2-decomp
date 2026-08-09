@@ -1139,16 +1139,24 @@ i32 advManager::Open(i32 id) {
     gpWindowManager->AddWindow(m_adventureWindow, 0, 1);
 
     if (m_groundTiles == NULL) {
-        m_groundTiles = gpResourceManager->GetTileset("ground32.til");
+        m_groundTiles = gpResourceManager->GetTileset(
+            DATA_COMPGEN(0x004ef230, adventureGroundTilesetFilename, "ground32.til")
+        );
     }
     if (m_cloudTiles == NULL) {
-        m_cloudTiles = gpResourceManager->GetTileset("clof32.til");
+        m_cloudTiles = gpResourceManager->GetTileset(
+            DATA_COMPGEN(0x004ef240, adventureCloudTilesetFilename, "clof32.til")
+        );
     }
     if (m_stoneTiles == NULL) {
-        m_stoneTiles = gpResourceManager->GetTileset("ston.til");
+        m_stoneTiles = gpResourceManager->GetTileset(
+            DATA_COMPGEN(0x004ef24c, adventureStoneTilesetFilename, "ston.til")
+        );
     }
     if (m_cloudOverlayIcon == NULL) {
-        m_cloudOverlayIcon = gpResourceManager->GetIcon("clop32.icn");
+        m_cloudOverlayIcon = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef258, adventureCloudOverlayIconFilename, "clop32.icn")
+        );
     }
 
     for (i = 0; i < OBJECT_ICON_COUNT; ++i) {
@@ -1159,79 +1167,125 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
-        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon("kngt32.icn");
+        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef264, knightHeroIconFilename, "kngt32.icn")
+        );
     }
     if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
-        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon("barb32.icn");
+        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef270, barbarianHeroIconFilename, "barb32.icn")
+        );
     }
     if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
-        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon("sorc32.icn");
+        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef27c, sorceressHeroIconFilename, "sorc32.icn")
+        );
     }
     if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
-        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon("wrlk32.icn");
+        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef288, warlockHeroIconFilename, "wrlk32.icn")
+        );
     }
     if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
-        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon("wzrd32.icn");
+        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef294, wizardHeroIconFilename, "wzrd32.icn")
+        );
     }
     if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
-        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon("necr32.icn");
+        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2a0, necromancerHeroIconFilename, "necr32.icn")
+        );
     }
     if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
-        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon("boat32.icn");
+        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2ac, boatHeroIconFilename, "boat32.icn")
+        );
     }
     if (m_heroIcons[HERO_ICON_FROTH] == NULL) {
-        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon("froth.icn");
+        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2b8, boatFrothIconFilename, "froth.icn")
+        );
     }
 
     gbLoadingMonoIcon = true;
     if (m_shadowIcon == NULL) {
-        m_shadowIcon = gpResourceManager->GetIcon("shadow32.icn");
+        m_shadowIcon = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2c4, adventureShadowIconFilename, "shadow32.icn")
+        );
     }
     if (m_boatShadowIcon == NULL) {
-        m_boatShadowIcon = gpResourceManager->GetIcon("boatshad.icn");
+        m_boatShadowIcon = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2d4, boatShadowIconFilename, "boatshad.icn")
+        );
     }
     gbLoadingMonoIcon = false;
 
     if (m_flagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2e4, blueFlagIconFilename, "b-flag32.icn")
+        );
     }
     if (m_flagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef2f4, greenFlagIconFilename, "g-flag32.icn")
+        );
     }
     if (m_flagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef304, redFlagIconFilename, "r-flag32.icn")
+        );
     }
     if (m_flagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef314, yellowFlagIconFilename, "y-flag32.icn")
+        );
     }
     if (m_flagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef324, orangeFlagIconFilename, "o-flag32.icn")
+        );
     }
     if (m_flagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef334, purpleFlagIconFilename, "p-flag32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef344, blueBoatFlagIconFilename, "b-bflg32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef354, greenBoatFlagIconFilename, "g-bflg32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef364, redBoatFlagIconFilename, "r-bflg32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef374, yellowBoatFlagIconFilename, "y-bflg32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef384, orangeBoatFlagIconFilename, "o-bflg32.icn")
+        );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef394, purpleBoatFlagIconFilename, "p-bflg32.icn")
+        );
     }
 
     gbLoadingMonoIcon = true;
     if (m_puzzleIcon == NULL) {
-        m_puzzleIcon = gpResourceManager->GetIcon("radar.icn");
+        m_puzzleIcon = gpResourceManager->GetIcon(
+            DATA_COMPGEN(0x004ef3a4, puzzleRadarIconFilename, "radar.icn")
+        );
     }
     gbLoadingMonoIcon = false;
 
