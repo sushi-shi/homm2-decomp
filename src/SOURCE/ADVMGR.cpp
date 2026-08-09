@@ -5238,10 +5238,19 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     sprintf(
                         gText,
-                        "%s\n%s",
+                        DATA_COMPGEN(0x004efa5c, quickInfoDigStatusFormat, "%s\n%s"),
                         gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])],
-                        blocked ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
-                                : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
+                        blocked
+                            ? DATA_COMPGEN(
+                                  0x004efa3c,
+                                  quickInfoCannotDigText,
+                                  "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
+                              )
+                            : DATA_COMPGEN(
+                                  0x004efa4c,
+                                  quickInfoCanDigText,
+                                  "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
+                              )
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
@@ -5263,7 +5272,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     quick_info_guarded:
                         sprintf(
                             guardStr,
-                            "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s",
+                            DATA_COMPGEN(
+                                0x004efa6c,
+                                quickInfoMineGuardFormat,
+                                "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s"
+                            ),
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
@@ -5296,14 +5309,18 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         )) {
                         sprintf(
                             gText,
-                            "%d %s",
+                            DATA_COMPGEN(0x004efa88, quickInfoExactMonsterFormat, "%d %s"),
                             currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
                         sprintf(
                             gText,
-                            "%s %s",
+                            DATA_COMPGEN(
+                                0x004efa90,
+                                quickInfoApproximateMonsterFormat,
+                                "%s %s"
+                            ),
                             GetArmySizeName(
                                 currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                                 ARMY_SIZE_NAME_SENTENCE
@@ -5386,12 +5403,22 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
-                        sprintf(gText, "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee");
+                        sprintf(
+                            gText,
+                            DATA_COMPGEN(
+                                0x004efa9c,
+                                quickInfoUnknownExpansionSiteText,
+                                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            )
+                        );
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
                     }
                     if (pHero != NULL && visitedMaskValue != HERO_EVENT_NONE) {
-                        strcat(gText, "\n\n");
+                        strcat(
+                            gText,
+                            DATA_COMPGEN(0x004efaa8, quickInfoVisitSeparator, "\n\n")
+                        );
                         strcat(
                             gText,
                             HAS(pHero->m_eventFlags, visitedMaskValue)
@@ -5438,7 +5465,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
-                        sprintf(gText, "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee");
+                        sprintf(
+                            gText,
+                            DATA_COMPGEN(
+                                0x004efad8,
+                                quickInfoUnknownRecruitmentSiteText,
+                                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            )
+                        );
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
                     }
@@ -5446,7 +5480,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 }
                 case MAP_OBJECT_ROCK:
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
-                        sprintf(gText, "\xd0\xe8\xf4\xfb");
+                        sprintf(
+                            gText,
+                            DATA_COMPGEN(
+                                0x004efae4,
+                                quickInfoReefsText,
+                                "\xd0\xe8\xf4\xfb"
+                            )
+                        );
                     } else {
                         goto quick_info_default;
                     }
@@ -5491,7 +5532,11 @@ quick_info_ready:
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
             gText,
-            "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
+            DATA_COMPGEN(
+                0x004efb24,
+                quickInfoDebugFormat,
+                "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d"
+            ),
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
@@ -6914,7 +6959,14 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN || creatureCount == 0) {
         blankLabel = static_cast<char*>(H2_ALLOC(TOWN_QUICK_EMPTY_LABEL_CAPACITY));
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
-            sprintf(blankLabel, "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee");
+            sprintf(
+                blankLabel,
+                DATA_COMPGEN(
+                    0x004efd70,
+                    townQuickUnknownText,
+                    "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                )
+            );
         } else {
             sprintf(blankLabel, "\xcd\xe5\xf2");
         }
