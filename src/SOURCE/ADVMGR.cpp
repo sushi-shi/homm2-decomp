@@ -6101,7 +6101,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_WEEK_TEXT_HEIGHT,
         week,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004efbdc, bottomNewTurnSmallFontFilename, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6189,7 +6189,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_WIDTH,
         RESOURCE_VIEW_TEXT_HEIGHT,
         messageText,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004efc18, bottomResourceMessageFontFilename, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6227,14 +6227,18 @@ i32 advManager::UpdBottomViewResMsg(void) {
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
         countString = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
-        sprintf(countString, "%d", giBottomViewResourceQty);
+        sprintf(
+            countString,
+            DATA_COMPGEN(0x004efc38, bottomResourceCountFormat, "%d"),
+            giBottomViewResourceQty
+        );
         m_bottomViewAllTexts[1] = new textWidget(
             RESOURCE_VIEW_COUNT_X,
             RESOURCE_VIEW_COUNT_Y,
             RESOURCE_VIEW_COUNT_WIDTH,
             RESOURCE_VIEW_COUNT_HEIGHT,
             countString,
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004efc3c, bottomResourceCountFontFilename, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
             WIDGET_KIND_TEXT,
@@ -6331,11 +6335,23 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (i = 0; i < KINGDOM_VIEW_ENTRY_COUNT; ++i) {
         countText[i] = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         if (i < KINGDOM_VIEW_RESOURCE_COUNT) {
-            sprintf(countText[i], "%d", gpCurPlayer->m_resources[i]);
+            sprintf(
+                countText[i],
+                DATA_COMPGEN(0x004efc6c, bottomKingdomResourceCountFormat, "%d"),
+                gpCurPlayer->m_resources[i]
+            );
         } else if (i == KINGDOM_VIEW_CASTLE_ENTRY) {
-            sprintf(countText[i], "%d", nCastles);
+            sprintf(
+                countText[i],
+                DATA_COMPGEN(0x004efc70, bottomKingdomCastleCountFormat, "%d"),
+                nCastles
+            );
         } else {
-            sprintf(countText[i], "%d", numVillage);
+            sprintf(
+                countText[i],
+                DATA_COMPGEN(0x004efc74, bottomKingdomVillageCountFormat, "%d"),
+                numVillage
+            );
         }
 
         m_bottomViewAllTexts[i] = new textWidget(
@@ -6344,7 +6360,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
             KINGDOM_VIEW_TEXT_WIDTH,
             KINGDOM_VIEW_TEXT_HEIGHT,
             countText[i],
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004efc78, bottomKingdomFontFilename, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             i + BOTTOM_VIEW_TEXT_ID,
             WIDGET_KIND_TEXT,
@@ -6413,7 +6429,11 @@ i32 advManager::UpdBottomViewHero(void) {
 
     if (usedCount != 0) {
         displayIndex = 0;
-        creatureIcons = gpResourceManager->GetIcon("mons32.icn");
+        creatureIcons = gpResourceManager->GetIcon(DATA_COMPGEN(
+            0x004efc98,
+            bottomHeroCreatureResourceFilename,
+            "mons32.icn"
+        ));
         for (slotNumber = 0; slotNumber < BOTTOM_HERO_ARMY_SLOTS; ++slotNumber) {
             creature = IDX(targetHero->m_army.m_creatureTypes[slotNumber]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
@@ -6438,7 +6458,7 @@ i32 advManager::UpdBottomViewHero(void) {
                 } else {
                     sprintf(
                         armyCountLabelsResult[displayIndex],
-                        "%d",
+                        DATA_COMPGEN(0x004efca8, bottomHeroCountFormat, "%d"),
                         targetHero->m_army.m_creatureCounts[slotNumber]
                     );
                 }
@@ -6472,7 +6492,11 @@ i32 advManager::UpdBottomViewHero(void) {
                     iconY + BOTTOM_HERO_PANEL_Y,
                     BOTTOM_HERO_ICON_WIDTH,
                     BOTTOM_HERO_ICON_HEIGHT,
-                    "mons32.icn",
+                    DATA_COMPGEN(
+                        0x004efcac,
+                        bottomHeroCreatureIconFilename,
+                        "mons32.icn"
+                    ),
                     creature,
                     ICON_DRAW_NORMAL,
                     displayIndex + BOTTOM_HERO_FIRST_ICON_ID,
@@ -6493,7 +6517,7 @@ i32 advManager::UpdBottomViewHero(void) {
                                : 0),
                     BOTTOM_HERO_LABEL_HEIGHT,
                     armyCountLabelsResult[displayIndex],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(0x004efcb8, bottomHeroFontFilename, "smalfont.fnt"),
                     FONT_DRAW_DEFAULT,
                     displayIndex + BOTTOM_HERO_FIRST_TEXT_ID,
                     WIDGET_KIND_TEXT,
@@ -6542,7 +6566,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    iconRef = gpResourceManager->GetIcon("mons32.icn");
+    iconRef = gpResourceManager->GetIcon(DATA_COMPGEN(
+        0x004efcc8,
+        heroQuickCreatureResourceFilename,
+        "mons32.icn"
+    ));
     targetHero = gpGame->GetHero(heroId);
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
@@ -6602,14 +6630,18 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
         for (ii = 0; ii < HERO_PRIMARY_STAT_COUNT; ++ii) {
-            sprintf(gText, "%d", targetHero->Stats(HeroPrimaryStat(ii)));
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004efcf0, heroQuickPrimaryStatFormat, "%d"),
+                targetHero->Stats(HeroPrimaryStat(ii))
+            );
             msg.payload.widget.id = ii + HERO_QUICK_PRIMARY_STAT_WIDGET;
             msg.payload.widget.data.text = gText;
             win->BroadcastMessage(msg);
         }
         sprintf(
             gText,
-            "%d/%d",
+            DATA_COMPGEN(0x004efcf4, heroQuickManaFormat, "%d/%d"),
             targetHero->m_spellPoints,
             targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
         );
@@ -6646,7 +6678,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_ICON_SIZE,
-                        "mons32.icn",
+                        DATA_COMPGEN(
+                            0x004efcfc,
+                            heroQuickExactCreatureIconFilename,
+                            "mons32.icn"
+                        ),
                         static_cast<i16>(monster),
                         ICON_DRAW_NORMAL,
                         -1,
@@ -6660,7 +6696,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         static_cast<char*>(H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY));
                     sprintf(
                         labels[ii],
-                        "%d",
+                        DATA_COMPGEN(0x004efd08, heroQuickExactCreatureCountFormat, "%d"),
                         targetHero->m_army.m_creatureCounts[idx]
                     );
                     sizeWidgets[ii] = new textWidget(
@@ -6671,7 +6707,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
                         labels[ii],
-                        "smalfont.fnt",
+                        DATA_COMPGEN(
+                            0x004efd0c,
+                            heroQuickExactCreatureFontFilename,
+                            "smalfont.fnt"
+                        ),
                         FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
@@ -6732,7 +6772,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                "mons32.icn",
+                DATA_COMPGEN(
+                    0x004efd1c,
+                    heroQuickVagueTopCreatureIconFilename,
+                    "mons32.icn"
+                ),
                 static_cast<i16>(monster),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6756,7 +6800,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 stride,
                 ARMY_QUICK_LABEL_HEIGHT,
                 labels[ii],
-                "smalfont.fnt",
+                DATA_COMPGEN(
+                    0x004efd28,
+                    heroQuickVagueTopCreatureFontFilename,
+                    "smalfont.fnt"
+                ),
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6796,7 +6844,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    "mons32.icn",
+                    DATA_COMPGEN(
+                        0x004efd38,
+                        heroQuickVagueBottomCreatureIconFilename,
+                        "mons32.icn"
+                    ),
                     static_cast<i16>(monster),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6823,7 +6875,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     stride,
                     ARMY_QUICK_LABEL_HEIGHT,
                     labels[ii],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(
+                        0x004efd44,
+                        heroQuickVagueBottomCreatureFontFilename,
+                        "smalfont.fnt"
+                    ),
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -6863,7 +6919,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 VA(0x0040d11d, 0xdc)
 char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar) {
     if (giDebugLevel > 0) {
-        sprintf(cArmySizeName, "%d", armySize);
+        sprintf(
+            cArmySizeName,
+            DATA_COMPGEN(0x004efd54, armySizeDebugFormat, "%d"),
+            armySize
+        );
         return cArmySizeName;
     }
     if (armySize < ARMY_FEW_LIMIT) {
@@ -6927,13 +6987,21 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    creatureIcon = gpResourceManager->GetIcon("mons32.icn");
+    creatureIcon = gpResourceManager->GetIcon(DATA_COMPGEN(
+        0x004efd58,
+        townQuickCreatureResourceFilename,
+        "mons32.icn"
+    ));
     townPtr = gpGame->GetTown(townId);
     if (windowX == -1) {
         windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
         windowY = TOWN_QUICK_DEFAULT_WINDOW_Y;
     }
-    window = new heroWindow(windowX, windowY, "qtown1.bin");
+    window = new heroWindow(
+        windowX,
+        windowY,
+        DATA_COMPGEN(0x004efd64, townQuickWindowFilename, "qtown1.bin")
+    );
     if (window == NULL) {
         MemError();
     }
@@ -7013,7 +7081,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 )
             );
         } else {
-            sprintf(blankLabel, "\xcd\xe5\xf2");
+            sprintf(
+                blankLabel,
+                DATA_COMPGEN(0x004efd7c, townQuickNoArmyText, "\xcd\xe5\xf2")
+            );
         }
         noArmyText = new textWidget(
             TOWN_QUICK_EMPTY_LABEL_X,
@@ -7021,7 +7092,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             TOWN_QUICK_EMPTY_LABEL_WIDTH,
             ARMY_QUICK_LABEL_HEIGHT,
             blankLabel,
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004efd80, townQuickNoArmyFontFilename, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             -1,
             WIDGET_KIND_TEXT,
@@ -7095,7 +7166,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                "mons32.icn",
+                DATA_COMPGEN(
+                    0x004efd90,
+                    townQuickTopCreatureIconFilename,
+                    "mons32.icn"
+                ),
                 static_cast<i16>(monster),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -7110,7 +7185,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     troopNames[wIndex],
-                    "%d",
+                    DATA_COMPGEN(0x004efd9c, townQuickTopCreatureCountFormat, "%d"),
                     townPtr->m_army.m_creatureCounts[creatureSlot]
                 );
             } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -7122,7 +7197,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     )
                 );
             } else {
-                strcpy(troopNames[wIndex], "???");
+                strcpy(
+                    troopNames[wIndex],
+                    DATA_COMPGEN(0x004efda0, townQuickTopUnknownCountText, "???")
+                );
             }
             sizeWidgets[wIndex] = new textWidget(
                 static_cast<i16>(
@@ -7133,7 +7211,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ARMY_QUICK_TEXT_WIDTH,
                 ARMY_QUICK_LABEL_HEIGHT,
                 troopNames[wIndex],
-                "smalfont.fnt",
+                DATA_COMPGEN(0x004efda4, townQuickTopCreatureFontFilename, "smalfont.fnt"),
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -7174,7 +7252,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    "mons32.icn",
+                    DATA_COMPGEN(
+                        0x004efdb4,
+                        townQuickBottomCreatureIconFilename,
+                        "mons32.icn"
+                    ),
                     static_cast<i16>(monster),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -7189,7 +7271,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         troopNames[wIndex],
-                        "%d",
+                        DATA_COMPGEN(
+                            0x004efdc0,
+                            townQuickBottomCreatureCountFormat,
+                            "%d"
+                        ),
                         townPtr->m_army.m_creatureCounts[creatureSlot]
                     );
                 } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -7201,7 +7287,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                         )
                     );
                 } else {
-                    strcpy(troopNames[wIndex], "???");
+                    strcpy(
+                        troopNames[wIndex],
+                        DATA_COMPGEN(0x004efdc4, townQuickBottomUnknownCountText, "???")
+                    );
                 }
                 sizeWidgets[wIndex] = new textWidget(
                     static_cast<i16>(
@@ -7212,7 +7301,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ARMY_QUICK_TEXT_WIDTH,
                     ARMY_QUICK_LABEL_HEIGHT,
                     troopNames[wIndex],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(
+                        0x004efdc8,
+                        townQuickBottomCreatureFontFilename,
+                        "smalfont.fnt"
+                    ),
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -7255,7 +7348,11 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     if (!bShowIt) {
         return;
     }
-    gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop(
+        DATA_COMPGEN(0x004efdd8, redrawAdventureBorderFilename, "advbord.icn"),
+        gpWindowManager->m_screen,
+        1
+    );
     if (freeBorder) {
         H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
