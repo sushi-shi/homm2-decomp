@@ -62,6 +62,7 @@ SECTION_HEADER = (
     "characteristics", "checksum", "comdat_selection",
     "associative_ordinal", "storage",
 )
+COMMON_HEADER = ("object", "name", "size")
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
 
@@ -689,6 +690,49 @@ def candidate_section_manifest_bytes(base_root: Path = BASE_ROOT,
     ]
     for row in rows:
         lines.append("\t".join(row[key] for key in SECTION_HEADER))
+    return ("\n".join(lines) + "\n").encode("utf-8")
+
+
+def candidate_common_manifest_bytes(base_root: Path = BASE_ROOT,
+                                    units: Path = UNITS):
+    """Serialize candidate COFF COMMON definitions for Vostok.
+
+    COMMON symbols have no section allocation or retail RVA: their non-zero
+    COFF value is the requested allocation size.  Their externally linked
+    spelling and per-object multiplicity are physical candidate topology, not
+    anonymous compiler-counter identities.
+    """
+    base_root = Path(base_root)
+    document = tomllib.loads(Path(units).read_text())
+    unit_names = [row["unit"] for row in document.get("unit", ())]
+    if len(unit_names) != len(set(unit_names)):
+        raise ValueError("duplicate units in candidate COMMON manifest")
+    rows = []
+    for unit in unit_names:
+        path = base_root / f"{unit}.obj"
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"candidate object is missing for COMMON manifest: {path}")
+        coff = CoffFile(path)
+        for symbol in coff.symbols.values():
+            symbol_type, storage_class = _coff_symbol_fields(coff, symbol)
+            if (symbol.section != 0 or symbol.value == 0 or
+                    symbol_type != 0 or storage_class != 2):
+                continue
+            rows.append({
+                "object": unit.replace("/", "\\") + ".c",
+                "name": symbol.name,
+                "size": f"0x{symbol.value:x}",
+            })
+    identities = [(row["object"], row["name"]) for row in rows]
+    if len(identities) != len(set(identities)):
+        raise ValueError("duplicate candidate COMMON identity in one object")
+    lines = [
+        "# Candidate COFF COMMON definitions; value is allocation size.",
+        "\t".join(COMMON_HEADER),
+    ]
+    for row in rows:
+        lines.append("\t".join(row[key] for key in COMMON_HEADER))
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 

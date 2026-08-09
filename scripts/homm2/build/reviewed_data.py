@@ -20,6 +20,7 @@ from pathlib import Path
 
 from homm2.build.data_manifest_adapter import (
     DELINK_HEADER,
+    candidate_common_manifest_bytes,
     candidate_section_manifest_bytes,
     delinker_manifest_bytes,
     render_source_manifest,
@@ -49,6 +50,7 @@ MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 SOURCE_DATA_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
 DATA_SECTION_MANIFEST = REPO / "build/gen/delink_data_sections.tsv"
+COMMON_MANIFEST = REPO / "build/gen/delink_common_symbols.tsv"
 TARGET = REPO / "build/delink"
 STAMP = TARGET / ".reviewed-data-stamp.json"
 DATA_ADAPTER = Path(__file__).with_name("data_manifest_adapter.py")
@@ -153,7 +155,7 @@ def _identity_inputs(delinker):
         "%s=0x%x" % (name, definitions.get(name, -1))
         for name in sorted(load_explicit_extents()))
     return {
-        "schema": 12,
+        "schema": 13,
         "exe_sha256": _digest(EXE),
         "pdb_sha256": _digest(PDB),
         "symbols_sha256": _digest(SYMBOLS),
@@ -168,6 +170,7 @@ def _identity_inputs(delinker):
         "source_data_manifest_sha256": _digest(SOURCE_DATA_MANIFEST),
         "data_manifest_sha256": _digest(DATA_MANIFEST),
         "data_section_manifest_sha256": _digest(DATA_SECTION_MANIFEST),
+        "common_manifest_sha256": _digest(COMMON_MANIFEST),
         "delinker_sha256": _digest(delinker),
         "generator_sha256": _digest(__file__),
         "data_adapter_sha256": _digest(DATA_ADAPTER),
@@ -178,6 +181,7 @@ def _identity_input_files():
     return (EXE, PDB, SYMBOLS, RETAIL_FUNCTIONS, RELOC_MANIFEST, RELOC_ALIASES,
             LEDGER, REPO / OWNER_EXTENTS, SOURCE_DATA_MANIFEST, DATA_MANIFEST,
             DATA_SECTION_MANIFEST,
+            COMMON_MANIFEST,
             )
 
 
@@ -241,6 +245,7 @@ def regenerate_targets(delinker=None, force=False):
     _atomic_write(SOURCE_DATA_MANIFEST, render_source_manifest(source_rows))
     _atomic_write(DATA_MANIFEST, delinker_manifest_bytes(source_rows))
     _atomic_write(DATA_SECTION_MANIFEST, candidate_section_manifest_bytes())
+    _atomic_write(COMMON_MANIFEST, candidate_common_manifest_bytes())
     for diagnostic in diagnostics:
         print(f"[reviewed-data] OPEN {diagnostic}")
     identity = _identity_inputs(delinker)
@@ -264,6 +269,7 @@ def regenerate_targets(delinker=None, force=False):
             "--output-path", str(temporary), "--engine-path", "c:\\proj\\",
             "--data-manifest", str(DATA_MANIFEST),
             "--data-section-manifest", str(DATA_SECTION_MANIFEST),
+            "--common-symbol-manifest", str(COMMON_MANIFEST),
             "--reloc-manifest", str(RELOC_MANIFEST),
             "--reloc-alias-manifest", str(RELOC_ALIASES),
         ], cwd=REPO, check=True)

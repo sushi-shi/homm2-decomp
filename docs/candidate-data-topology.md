@@ -87,6 +87,10 @@ iterative work can continue. Strict assembly fails. It never guesses an identity
 `build/gen/delink_data_from_source.tsv` and
 `build/gen/delink_data_manifest.tsv`. The former retains semantic names and source
 provenance for comparison tooling; the latter is its Vostok eight-column projection.
+`build/gen/delink_common_symbols.tsv` separately carries externally linked COFF
+COMMON definitions. COMMON has no section bytes or retail RVA; candidate COFF supplies
+its per-object identity and allocation size, while Vostok preserves that symbol state
+instead of inventing a private `.data` definition.
 The pinned Vostok source is built with the repository's reviewed COMDAT-emission
 patch, so the physical projection retains candidate section ordinal/offset together
 with object, RVA, logical size, storage, alignment, and scope. There is no versioned

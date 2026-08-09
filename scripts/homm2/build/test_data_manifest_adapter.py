@@ -11,6 +11,7 @@ from homm2.build.data_manifest_adapter import (
     _compgen_candidate_kind,
     _interior_compgen_aliases,
     candidate_topology,
+    candidate_common_manifest_bytes,
     delinker_manifest_bytes,
     resolve_compgen_definitions,
     resolve_vtable_definitions,
@@ -62,6 +63,20 @@ class DataManifestAdapterTest(unittest.TestCase):
         }
         fields = delinker_manifest_bytes([row]).decode().splitlines()[-1].split("\t")
         self.assertEqual(fields[5:7], ["7", "0xc"])
+
+    def test_candidate_common_manifest_retains_per_object_size(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            base = root / "base"
+            units = root / "units.toml"
+            units.write_text('[[unit]]\nunit = "SOURCE/Test"\n')
+            _coff(base / "SOURCE/Test.obj", [(".data", 4, DATA_FLAGS)], [
+                ("?ordinary@@3HA", 0, 1, 0, 2),
+                ("??_Bguard", 1, 0, 0, 2),
+                ("undefined", 0, 0, 0, 2),
+            ])
+            rows = candidate_common_manifest_bytes(base, units).decode().splitlines()
+        self.assertEqual(rows[-1], "SOURCE\\Test.c\t??_Bguard\t0x1")
 
     def test_compgen_recognizes_vc6_real_literal_symbols(self):
         self.assertEqual(

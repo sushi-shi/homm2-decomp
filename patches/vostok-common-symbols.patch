@@ -1,0 +1,382 @@
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -1,5 +1,6 @@
+ #![feature(os_string_truncate)]
+ 
++mod common_symbol_manifest;
+ mod data_manifest;
+ mod data_section_manifest;
+ mod object_files;
+@@ -60,6 +61,10 @@
+     #[arg(long, value_hint = clap::ValueHint::FilePath)]
+     pub data_section_manifest: Option<std::path::PathBuf>,
+ 
++    /// Project-supplied per-object COFF COMMON symbol identities and sizes.
++    #[arg(long, value_hint = clap::ValueHint::FilePath)]
++    pub common_symbol_manifest: Option<std::path::PathBuf>,
++
+     /// Reviewed function/target/site selections whose data or function
+     /// relocations use a specific existing PDB owner symbol and addend.
+     #[arg(long, value_hint = clap::ValueHint::FilePath)]
+@@ -139,6 +144,7 @@
+         read_symbol_map,
+         data_manifest,
+         data_section_manifest,
++        common_symbol_manifest,
+         reloc_alias_manifest,
+         strict,
+         reloc_manifest,
+@@ -174,6 +180,7 @@
+         read_symbol_map.as_deref(),
+         data_manifest.as_deref(),
+         data_section_manifest.as_deref(),
++        common_symbol_manifest.as_deref(),
+         reloc_alias_manifest.as_deref(),
+         manifest_coverage,
+         reloc_manifest.as_deref(),
+@@ -194,6 +201,7 @@
+     read_symbol_map: Option<&std::path::Path>,
+     data_manifest_path: Option<&std::path::Path>,
+     data_section_manifest_path: Option<&std::path::Path>,
++    common_symbol_manifest_path: Option<&std::path::Path>,
+     reloc_alias_manifest_path: Option<&std::path::Path>,
+     manifest_coverage: relocs::ManifestCoverage,
+     reloc_manifest_path: Option<&std::path::Path>,
+@@ -207,6 +215,8 @@
+     let reloc_manifest = reloc_manifest::RelocManifest::load(reloc_manifest_path)?;
+     let data_section_manifest =
+         data_section_manifest::DataSectionManifest::load(data_section_manifest_path)?;
++    let common_symbol_manifest =
++        common_symbol_manifest::CommonSymbolManifest::load(common_symbol_manifest_path)?;
+     let reloc_alias_manifest =
+         reloc_alias_manifest::RelocAliasManifest::load(reloc_alias_manifest_path)?;
+     reloc_alias_manifest.validate_site_membership(&pdb_symbols)?;
+@@ -270,6 +280,7 @@
+         &matcher,
+         &data_manifest,
+         &data_section_manifest,
++        &common_symbol_manifest,
+         &reloc_alias_manifest,
+         &mut observed_aliases,
+         manifest_coverage,
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -1,4 +1,5 @@
+ use crate::Env;
++use crate::common_symbol_manifest::CommonSymbolManifest;
+ use crate::data_manifest::{DataDefinition, DataManifest, DataScope, DataStorage};
+ use crate::data_section_manifest::{
+     ComdatSelection, DataSection, DataSectionManifest, SectionStorage, SectionTopology,
+@@ -32,6 +33,7 @@
+     pub bss_section_id: Option<object::write::SectionId>,
+     pub text_section_id: Option<object::write::SectionId>,
+     undefined_symbols: HashMap<Vec<u8>, SymbolId>,
++    common_symbols: HashSet<Vec<u8>>,
+     topology_sections: Vec<EmittedTopologySection>,
+     definition_ranges: Vec<Vec<(usize, usize)>>,
+     reviewed_section_checksums: Vec<([u8; 8], u32)>,
+@@ -99,6 +101,7 @@
+         matcher: &SymbolMatcher,
+         data_manifest: &DataManifest,
+         data_section_manifest: &DataSectionManifest,
++        common_symbol_manifest: &CommonSymbolManifest,
+         reloc_aliases: &RelocAliasManifest,
+         observed_aliases: &mut RelocAliasObservations,
+         manifest_coverage: ManifestCoverage,
+@@ -133,6 +136,14 @@
+             );
+         }
+ 
++        for symbol in common_symbol_manifest.symbols() {
++            let object_file = this
++                .objects
++                .entry(symbol.object)
++                .or_insert_with(empty_object);
++            object_file.add_common_symbol(symbol.name, symbol.size)?;
++        }
++
+         let definitions = data_manifest.definitions_in_emission_order();
+ 
+         for definition in &definitions {
+@@ -343,6 +354,7 @@
+             bss_section_id: None,
+             text_section_id,
+             undefined_symbols: HashMap::new(),
++            common_symbols: HashSet::new(),
+             topology_sections: Vec::new(),
+             definition_ranges: Vec::new(),
+             reviewed_section_checksums: Vec::new(),
+@@ -496,6 +508,7 @@
+             bss_section_id,
+             text_section_id,
+             undefined_symbols: HashMap::new(),
++            common_symbols: HashSet::new(),
+             topology_sections,
+             definition_ranges: vec![Vec::new(); sections.len()],
+             reviewed_section_checksums,
+@@ -770,6 +783,27 @@
+ }
+ 
+ impl ObjectFile {
++    fn add_common_symbol(&mut self, name: &[u8], size: u64) -> anyhow::Result<()> {
++        if self.object.symbol_id(name).is_some() || self.common_symbols.contains(name) {
++            anyhow::bail!(
++                "duplicate COMMON symbol {} in owner object",
++                String::from_utf8_lossy(name)
++            );
++        }
++        self.object.add_symbol(object::write::Symbol {
++            name: name.to_vec(),
++            value: 0,
++            size,
++            kind: object::SymbolKind::Data,
++            scope: object::SymbolScope::Linkage,
++            weak: false,
++            section: object::write::SymbolSection::Common,
++            flags: object::SymbolFlags::None,
++        });
++        self.common_symbols.insert(name.to_vec());
++        Ok(())
++    }
++
+     fn add_relocation_at(
+         &mut self,
+         reloc_kind: RelocKind,
+@@ -785,6 +819,18 @@
+         let reloc_name = reloc_kind.get_name(matcher);
+         let reloc_name = reloc_name.as_raw_string();
+ 
++        if matches!(reloc_kind, RelocKind::ConjuredStatic { .. })
++            && self.common_symbols.contains(reloc_name.as_bytes())
++        {
++            self.add_relocation(
++                reloc_name,
++                ObjectLocation::Extern(object::SymbolKind::Data),
++                reloc_offset,
++                RelocationEncoding::Absolute,
++            )?;
++            return Ok(());
++        }
++
+         // `Function` and `ReviewedData` reference a real definition elsewhere; a
+         // `Conjured*` target is materialized as a private per-TU copy, unless the
+         // caller only wants a reference.
+@@ -1792,6 +1838,48 @@
+     }
+ 
+     #[test]
++    fn common_relocation_reuses_common_symbol_without_materializing_data() {
++        let mut output = ObjectFile::empty_with_topology(false, SectionTopology::Synthesized);
++        output.add_common_symbol(b"guard", 1).unwrap();
++        let text_section_id = output.text_section();
++        let field = output.append_section_data(text_section_id, &[0; 4], 0x90);
++        output
++            .add_relocation_at(
++                RelocKind::ConjuredStatic {
++                    symbol: RawString::from(&b"guard"[..]),
++                    target_rva: 0x100,
++                },
++                field,
++                &SymbolMatcher::off(),
++                &[],
++                &BTreeMap::new(),
++                &mut HashSet::new(),
++                TargetMaterialization::Materialize,
++            )
++            .unwrap();
++
++        let bytes = output.object.write().unwrap();
++        let parsed = object::File::parse(bytes.as_slice()).unwrap();
++        assert_eq!(parsed.section_by_name(".data").unwrap().size(), 0);
++        let symbol = parsed
++            .symbols()
++            .find(|symbol| symbol.name() == Ok("guard"))
++            .unwrap();
++        assert_eq!(symbol.section(), object::SymbolSection::Common);
++        assert_eq!(symbol.size(), 1);
++        let relocation = parsed
++            .section_by_name(".text")
++            .unwrap()
++            .relocations()
++            .next()
++            .unwrap();
++        let object::RelocationTarget::Symbol(index) = relocation.1.target() else {
++            panic!("COMMON relocation must target a symbol");
++        };
++        assert_eq!(parsed.symbol_by_index(index).unwrap().name(), Ok("guard"));
++    }
++
++    #[test]
+     fn absolute_function_reference_uses_coff_function_type() {
+         let mut object = ObjectFile::empty_with_topology(false, SectionTopology::Synthesized);
+         let text_section_id = object.text_section();
+--- /dev/null
++++ b/src/common_symbol_manifest.rs
+@@ -0,0 +1,167 @@
++use std::collections::HashSet;
++use std::path::Path;
++
++const HEADER: &str = "object\tname\tsize";
++
++#[derive(Clone, Copy, Debug)]
++pub struct CommonSymbol {
++    pub object: &'static [u8],
++    pub name: &'static [u8],
++    pub size: u64,
++}
++
++#[derive(Default)]
++pub struct CommonSymbolManifest {
++    symbols: Vec<CommonSymbol>,
++}
++
++impl CommonSymbolManifest {
++    pub fn load(path: Option<&Path>) -> anyhow::Result<Self> {
++        let Some(path) = path else {
++            return Ok(Self::default());
++        };
++        Self::parse(&std::fs::read(path)?, path)
++    }
++
++    fn parse(bytes: &[u8], path: &Path) -> anyhow::Result<Self> {
++        let text = std::str::from_utf8(bytes)?;
++        let mut symbols = Vec::new();
++        let mut seen = HashSet::new();
++        let mut saw_header = false;
++        for (line_index, line) in text.lines().enumerate() {
++            let line_number = line_index + 1;
++            if line.is_empty() || line.starts_with('#') {
++                continue;
++            }
++            if !saw_header {
++                if line != HEADER {
++                    anyhow::bail!(
++                        "{}:{}: invalid COMMON symbol manifest header",
++                        path.display(),
++                        line_number
++                    );
++                }
++                saw_header = true;
++                continue;
++            }
++            if line == HEADER {
++                anyhow::bail!(
++                    "{}:{}: duplicate COMMON symbol manifest header",
++                    path.display(),
++                    line_number
++                );
++            }
++            let fields = line.split('\t').collect::<Vec<_>>();
++            if fields.len() != 3 {
++                anyhow::bail!(
++                    "{}:{}: expected exactly three tab-separated columns",
++                    path.display(),
++                    line_number
++                );
++            }
++            let object = normalize_object(fields[0], path, line_number)?;
++            let name = fields[1].as_bytes();
++            if name.is_empty() || name.iter().any(|byte| byte.is_ascii_control()) {
++                anyhow::bail!(
++                    "{}:{}: COMMON symbol name must be non-empty and printable",
++                    path.display(),
++                    line_number
++                );
++            }
++            let size = parse_number(fields[2])?;
++            if size == 0 {
++                anyhow::bail!(
++                    "{}:{}: COMMON symbol size must be non-zero",
++                    path.display(),
++                    line_number
++                );
++            }
++            let name = name.to_vec().leak();
++            if !seen.insert((object, &*name)) {
++                anyhow::bail!(
++                    "{}:{}: duplicate COMMON identity in object",
++                    path.display(),
++                    line_number
++                );
++            }
++            symbols.push(CommonSymbol {
++                object,
++                name,
++                size: size as u64,
++            });
++        }
++        if !saw_header {
++            anyhow::bail!("{}: missing COMMON symbol manifest header", path.display());
++        }
++        symbols.sort_unstable_by(|left, right| {
++            (left.object, left.name).cmp(&(right.object, right.name))
++        });
++        Ok(Self { symbols })
++    }
++
++    pub fn symbols(&self) -> &[CommonSymbol] {
++        &self.symbols
++    }
++}
++
++fn normalize_object(
++    value: &str,
++    path: &Path,
++    line_number: usize,
++) -> anyhow::Result<&'static [u8]> {
++    let object = value.replace('/', "\\");
++    if object.contains(':')
++        || object
++            .split('\\')
++            .any(|part| part.is_empty() || part == "." || part == "..")
++    {
++        anyhow::bail!(
++            "{}:{}: object path must be relative and normalized",
++            path.display(),
++            line_number
++        );
++    }
++    Ok(object.into_bytes().leak())
++}
++
++fn parse_number(value: &str) -> anyhow::Result<usize> {
++    Ok(match value
++        .strip_prefix("0x")
++        .or_else(|| value.strip_prefix("0X"))
++    {
++        Some(hex) => usize::from_str_radix(hex, 16),
++        None => value.parse(),
++    }?)
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn parses_per_object_common_symbols() {
++        let manifest = CommonSymbolManifest::parse(
++            b"object\tname\tsize\nSOURCE/Test.c\t??_Bguard\t0x1\n",
++            Path::new("test.tsv"),
++        )
++        .unwrap();
++        let symbol = manifest.symbols()[0];
++        assert_eq!(symbol.object, b"SOURCE\\Test.c");
++        assert_eq!(symbol.name, b"??_Bguard");
++        assert_eq!(symbol.size, 1);
++    }
++
++    #[test]
++    fn rejects_zero_size_and_duplicate_identity() {
++        assert!(CommonSymbolManifest::parse(
++            b"object\tname\tsize\nA.c\tguard\t0\n",
++            Path::new("test.tsv"),
++        )
++        .is_err());
++        assert!(CommonSymbolManifest::parse(
++            b"object\tname\tsize\nA.c\tguard\t1\nA.c\tguard\t1\n",
++            Path::new("test.tsv"),
++        )
++        .is_err());
++    }
++}
