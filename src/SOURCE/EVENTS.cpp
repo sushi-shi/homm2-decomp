@@ -5550,22 +5550,40 @@ void advManager::EventSound(
     if (musicTrack != SOUND_NONE) {
         switch (musicTrack) {
             case SOUND_TREASURE:
-                strcpy(trackName, "treasure.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6e68, eventSoundTreasureFilename, "treasure.82m")
+                );
                 break;
             case SOUND_EXPERIENCE:
-                strcpy(trackName, "expernce.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6e78, eventSoundExperienceFilename, "expernce.82m")
+                );
                 break;
             case SOUND_MORALE:
-                strcpy(trackName, "goodmrle.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6e88, eventSoundMoraleFilename, "goodmrle.82m")
+                );
                 break;
             case SOUND_LUCK:
-                strcpy(trackName, "goodluck.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6e98, eventSoundLuckFilename, "goodluck.82m")
+                );
                 break;
             case SOUND_PICKUP:
-                strcpy(trackName, "pickup01.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6ea8, eventSoundPickupFilename, "pickup01.82m")
+                );
                 break;
             case SOUND_MINE:
-                strcpy(trackName, "h2mine.82m");
+                strcpy(
+                    trackName,
+                    DATA_COMPGEN(0x004f6eb8, eventSoundMineFilename, "h2mine.82m")
+                );
                 break;
             default:
                 gpSoundManager->SwitchAmbientMusic(musicTrack);
