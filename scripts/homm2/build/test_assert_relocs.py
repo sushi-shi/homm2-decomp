@@ -21,6 +21,7 @@ from homm2.build.assert_relocs import (
     check_ordered_reloc_addresses,
     check_linked_pe_data_targets,
     check_pe_data_targets,
+    classify_identity_transpositions,
     compare_function_reloc_addends,
     delinked_self_references,
     folded_comdat_symbols,
@@ -29,12 +30,39 @@ from homm2.build.assert_relocs import (
     ordinal_local_relocs,
     parse_obj,
     relocation_addend_map,
+    RelocAddressMismatch,
+    UnresolvedCandidateReloc,
 )
 from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_from_rows
 
 
 GCONFIG_SYMBOL = "?gConfig@@3UconfigStruct@@A"
 GMONSTER_DATABASE_SYMBOL = "?gMonsterDatabase@@3PAUtag_monsterInfo@@A"
+
+
+class DataIdentityTranspositionTest(unittest.TestCase):
+    def test_unresolved_identity_remains_unpaired_without_crashing(self):
+        records = [
+            ("SOURCE/GAME", "?Run@@YIXXZ",
+             UnresolvedCandidateReloc(0x10, 0xEB100, "$T1")),
+            ("SOURCE/GAME", "?Run@@YIXXZ",
+             RelocAddressMismatch(0x20, 0xEB104, 0xEB108, "$T2", "$T3")),
+        ]
+        transpositions, unmatched = classify_identity_transpositions(records)
+        self.assertEqual(transpositions, [])
+        self.assertEqual(unmatched, {0, 1})
+
+    def test_concrete_address_swap_is_classified(self):
+        records = [
+            ("SOURCE/GAME", "?Run@@YIXXZ",
+             RelocAddressMismatch(0x10, 0xEB100, 0xEB104, "$T1", "$T2")),
+            ("SOURCE/GAME", "?Run@@YIXXZ",
+             RelocAddressMismatch(0x20, 0xEB104, 0xEB100, "$T2", "$T1")),
+        ]
+        transpositions, unmatched = classify_identity_transpositions(records)
+        self.assertEqual(len(transpositions), 1)
+        self.assertEqual(transpositions[0]["sites"], [0x10, 0x20])
+        self.assertEqual(unmatched, set())
 
 
 class RelocOwnerTest(unittest.TestCase):

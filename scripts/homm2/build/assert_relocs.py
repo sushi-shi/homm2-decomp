@@ -639,6 +639,35 @@ def check_pe_data_targets(sym, data, dups, local_rvas, unit, function_rva,
     return problems
 
 
+def classify_identity_transpositions(identity_bad):
+    """Pair only concrete address swaps, leaving unresolved identities unpaired."""
+    transpositions = []
+    unmatched = set(range(len(identity_bad)))
+    for first_index, (first_unit, first_name, first_problem) in enumerate(identity_bad):
+        if (first_index not in unmatched or
+                not isinstance(first_problem, RelocAddressMismatch)):
+            continue
+        for second_index in sorted(unmatched):
+            if second_index <= first_index:
+                continue
+            second_unit, second_name, second_problem = identity_bad[second_index]
+            if (not isinstance(second_problem, RelocAddressMismatch) or
+                    first_unit != second_unit or first_name != second_name):
+                continue
+            if (first_problem.expected == second_problem.actual and
+                    first_problem.actual == second_problem.expected):
+                transpositions.append({
+                    "unit": first_unit,
+                    "function": first_name,
+                    "sites": [first_problem.site, second_problem.site],
+                    "retail_rvas": [first_problem.expected, second_problem.expected],
+                })
+                unmatched.remove(first_index)
+                unmatched.remove(second_index)
+                break
+    return transpositions, unmatched
+
+
 def _direct_image_data_sites(image, function_rva, relocations,
                              names=(".rdata", ".data")):
     """Read every DIR32 destination in selected sections from a linked image.
@@ -1370,27 +1399,8 @@ def review_pe_data_targets():
                 bad.append((unit, name, problem))
             for problem in identity_problems:
                 identity_bad.append((unit, name, problem))
-    identity_transpositions = []
-    unmatched_identity = set(range(len(identity_bad)))
-    for first_index, (first_unit, first_name, first_problem) in enumerate(identity_bad):
-        if first_index not in unmatched_identity:
-            continue
-        for second_index in sorted(unmatched_identity):
-            if second_index <= first_index:
-                continue
-            second_unit, second_name, second_problem = identity_bad[second_index]
-            if (first_unit == second_unit and first_name == second_name and
-                    first_problem.expected == second_problem.actual and
-                    first_problem.actual == second_problem.expected):
-                identity_transpositions.append({
-                    "unit": first_unit,
-                    "function": first_name,
-                    "sites": [first_problem.site, second_problem.site],
-                    "retail_rvas": [first_problem.expected, second_problem.expected],
-                })
-                unmatched_identity.remove(first_index)
-                unmatched_identity.remove(second_index)
-                break
+    identity_transpositions, unmatched_identity = classify_identity_transpositions(
+        identity_bad)
 
     output = {
         "schema": 5,
