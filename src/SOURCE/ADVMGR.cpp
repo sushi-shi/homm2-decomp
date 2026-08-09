@@ -9659,7 +9659,14 @@ void advManager::LoadRemote(void) {
         static i32 cheatWarned = 0;
         if (!cheatWarned) {
             cheatWarned = 1;
-            sprintf(gText, "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n");
+            sprintf(
+                gText,
+                DATA_COMPGEN(
+                    0x004f00c0,
+                    loadRemoteCheatWarningText,
+                    "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
+                )
+            );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
@@ -9667,7 +9674,14 @@ void advManager::LoadRemote(void) {
         static i32 debugWarned = 0;
         if (!debugWarned) {
             debugWarned = 1;
-            sprintf(gText, "Someone has their debug level set!\n");
+            sprintf(
+                gText,
+                DATA_COMPGEN(
+                    0x004f00d8,
+                    loadRemoteDebugWarningText,
+                    "Someone has their debug level set!\n"
+                )
+            );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
@@ -9719,12 +9733,20 @@ char* advManager::CheckHandleNet(void) {
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
-                LogStr("Receive Remote Player Exit");
+                LogStr(DATA_COMPGEN(
+                    0x004f00fc,
+                    remotePlayerExitLogText,
+                    "Receive Remote Player Exit"
+                ));
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
-                LogStr("Host Reports Player Exit");
+                LogStr(DATA_COMPGEN(
+                    0x004f0118,
+                    hostPlayerExitLogText,
+                    "Host Reports Player Exit"
+                ));
                 ReceiveHostReportsPlayerExit(
                     packet9->sender,
                     ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
@@ -10091,7 +10113,11 @@ void advManager::ViewPuzzle(void) {
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    puzzleIcn = gpResourceManager->GetIcon("puzzle.icn");
+    puzzleIcn = gpResourceManager->GetIcon(DATA_COMPGEN(
+        0x004f0140,
+        puzzleIconFilename,
+        "puzzle.icn"
+    ));
     i32 j;
     for (j = 0; j < PUZZLE_PIECE_COUNT; ++j) {
         puzzleIcn->DrawToBuffer(0, 0, j, ICON_DRAW_NORMAL);
@@ -10109,7 +10135,11 @@ void advManager::ViewPuzzle(void) {
         PUZZLE_VIEW_SIZE,
         PUZZLE_VIEW_SIZE
     );
-    pWin = new heroWindow(PUZZLE_WINDOW_X, PUZZLE_WINDOW_Y, "viewpuzl.bin");
+    pWin = new heroWindow(
+        PUZZLE_WINDOW_X,
+        PUZZLE_WINDOW_Y,
+        DATA_COMPGEN(0x004f014c, puzzleWindowFilename, "viewpuzl.bin")
+    );
     if (pWin == NULL) {
         MemError();
     }
@@ -10225,7 +10255,11 @@ void advManager::AdvPanel(void) {
         tag_message message;
         DemobilizeCurrHero();
 
-        adventurePanel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "apanel.bin");
+        adventurePanel = new heroWindow(
+            PANEL_WINDOW_X,
+            PANEL_WINDOW_Y,
+            DATA_COMPGEN(0x004f0168, adventurePanelWindowFilename, "apanel.bin")
+        );
         if (adventurePanel == NULL) {
             MemError();
         }
@@ -10372,7 +10406,11 @@ i32 advManager::ControlPanel(void) {
     i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
-    heroWindow* panel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "cpanel.bin");
+    heroWindow* panel = new heroWindow(
+        PANEL_WINDOW_X,
+        PANEL_WINDOW_Y,
+        DATA_COMPGEN(0x004f0180, controlPanelWindowFilename, "cpanel.bin")
+    );
     if (panel == NULL) {
         MemError();
     }
@@ -10566,7 +10604,7 @@ void advManager::SystemOptions(void) {
     cPanel = new heroWindow(
         ADVMGR_SYSTEM_OPTIONS_WINDOW_X,
         ADVMGR_SYSTEM_OPTIONS_WINDOW_Y,
-        "spanel.bin"
+        DATA_COMPGEN(0x004f0244, systemOptionsWindowFilename, "spanel.bin")
     );
     if (cPanel == NULL) {
         MemError();
@@ -10671,7 +10709,11 @@ void UpdateSystemOptions(i32 initialDraw) {
     msg.payload.widget.id =
         IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc";
+        msg.payload.widget.data.text = DATA_COMPGEN(
+            0x004f0250,
+            systemOptionsDoNotShowText,
+            "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc"
+        );
     } else {
         msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     }
@@ -10783,10 +10825,14 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
-                                    "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
-                                    "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
-                                    "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
-                                    /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */,
+                                    DATA_COMPGEN(
+                                        0x004f0260,
+                                        systemOptionsNoMusicText,
+                                        "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
+                                        "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
+                                        "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
+                                        /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */
+                                    ),
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10812,10 +10858,14 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {
                                 NormalDialog(
-                                    "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
-                                    "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
-                                    "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
-                                    /* "Цифровая музыка не доступна в этой системе." */,
+                                    DATA_COMPGEN(
+                                        0x004f029c,
+                                        systemOptionsNoDigitalAudioText,
+                                        "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
+                                        "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
+                                        "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
+                                        /* "Цифровая музыка не доступна в этой системе." */
+                                    ),
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10859,18 +10909,22 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
-                                        "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
-                                        "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
-                                        "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
-                                        " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
-                                        "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
-                                        "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
-                                        "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
-                                        "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
-                                        "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
-                                        "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
-                                        "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
-                                        /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */,
+                                        DATA_COMPGEN(
+                                            0x004f02c8,
+                                            systemOptionsCdStartupFailureText,
+                                            "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
+                                            "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
+                                            "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
+                                            " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
+                                            "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
+                                            "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
+                                            "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
+                                            "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
+                                            "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
+                                            "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
+                                            "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
+                                            /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */
+                                        ),
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
                                         OPTION_DIALOG_NONE,
@@ -11025,8 +11079,12 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
-            /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */,
+            DATA_COMPGEN(
+                0x004f0374,
+                visionsNoNearbyMonsterText,
+                "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
+                /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */
+            ),
             1,
             -1,
             -1,
@@ -11044,7 +11102,12 @@ i32 advManager::DoVisions(hero* visionHero) {
     type = static_cast<CreatureType>(spot->m_objectIndex);
     isForced = spot->m_objectMetadata & MONSTER_JOIN_FORCED;
     count = spot->m_objectMetadata & MONSTER_COUNT_MASK;
-    sprintf(gText, "{%d %s}\n\n", count, gArmyNamesPlural[IDX(type)]);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x004f03d0, visionsMonsterHeaderFormat, "{%d %s}\n\n"),
+        count,
+        gArmyNamesPlural[IDX(type)]
+    );
     fRatio = static_cast<double>(
                  gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)
              )
@@ -11057,8 +11120,12 @@ i32 advManager::DoVisions(hero* visionHero) {
         if (isForced) {
             sprintf(
                 msg,
-                "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
-                /* Существа хотят вступить в вашу армию! */
+                DATA_COMPGEN(
+                    0x004f03dc,
+                    visionsForcedJoinText,
+                    "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
+                    /* Существа хотят вступить в вашу армию! */
+                )
             );
             strcat(gText, msg);
             goto showVision;
@@ -11090,17 +11157,25 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinNum == count) {
                 sprintf(
                     msg,
-                    "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                    /* "Все существа вступят в нашу армию... / за плату в размере %d
-                       золотых." */,
+                    DATA_COMPGEN(
+                        0x004f0404,
+                        visionsAllJoinFeeFormat,
+                        "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                        /* "Все существа вступят в нашу армию... / за плату в размере %d
+                           золотых." */
+                    ),
                     joinFee
                 );
             } else {
                 sprintf(
                     msg,
-                    "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                    /* "%d существ присоединятся к нам... / за плату в размере %d
-                       золотых." */,
+                    DATA_COMPGEN(
+                        0x004f044c,
+                        visionsSomeJoinFeeFormat,
+                        "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                        /* "%d существ присоединятся к нам... / за плату в размере %d
+                           золотых." */
+                    ),
                     count,
                     joinFee
                 );
@@ -11114,8 +11189,12 @@ i32 advManager::DoVisions(hero* visionHero) {
     creaturesFlee:
         sprintf(
             msg,
-            "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
-            /* Эти слабые твари определенно побегут, едва завидев нас. */
+            DATA_COMPGEN(
+                0x004f0490,
+                visionsCreaturesFleeText,
+                "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
+                /* Эти слабые твари определенно побегут, едва завидев нас. */
+            )
         );
         strcat(gText, msg);
         goto showVision;
@@ -11123,8 +11202,12 @@ i32 advManager::DoVisions(hero* visionHero) {
 creaturesFight:
     sprintf(
         msg,
-        "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
-        /* Боюсь, эти создания в отвратительном настроении и будут сражаться. */
+        DATA_COMPGEN(
+            0x004f04c8,
+            visionsCreaturesFightText,
+            "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
+            /* Боюсь, эти создания в отвратительном настроении и будут сражаться. */
+        )
     );
     strcat(gText, msg);
     goto showVision;
