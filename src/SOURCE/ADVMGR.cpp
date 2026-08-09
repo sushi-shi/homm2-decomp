@@ -4930,7 +4930,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         posY = QUICK_INFO_BOTTOM_Y;
     }
 
-    pWin = new heroWindow(posX, posY, "qwikinfo.bin");
+    pWin = new heroWindow(
+        posX,
+        posY,
+        DATA_COMPGEN(0x004ef854, quickInfoWindowFilename, "qwikinfo.bin")
+    );
     if (pWin == NULL) {
         MemError();
     }
@@ -4938,30 +4942,62 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
-        sprintf(gText, "%s", "\xc3\xf0\xe0\xed\xe8\xf6\xe0");
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x004ef86c, quickInfoBoundaryFormat, "%s"),
+            DATA_COMPGEN(0x004ef864, quickInfoBoundaryText, "\xc3\xf0\xe0\xed\xe8\xf6\xe0")
+        );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
         if ((MAP_EXTRA_AT_WFIRST((m_mapOriginX + cellX), m_mapOriginY + cellY)
              & giCurPlayerBit)
             == 0) {
-            sprintf(gText, "%s", "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff");
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004ef888, quickInfoUnexploredFormat, "%s"),
+                DATA_COMPGEN(
+                    0x004ef870,
+                    quickInfoUnexploredText,
+                    "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff"
+                )
+            );
         } else {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case MAP_OBJECT_ARTIFACT:
-                    sprintf(gText, "%s", "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2");
+                    sprintf(
+                        gText,
+                        DATA_COMPGEN(0x004ef898, quickInfoArtifactFormat, "%s"),
+                        DATA_COMPGEN(
+                            0x004ef88c,
+                            quickInfoArtifactText,
+                            "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                        )
+                    );
                     break;
                 case MAP_OBJECT_OBELISK:
                     if HAS (currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef8c8,
+                                quickInfoObeliskVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef89c,
+                                      quickInfoObeliskVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef8ac,
+                                      quickInfoObeliskUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -4972,12 +5008,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef8fc,
+                                quickInfoGazeboVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef8d0,
+                                      quickInfoGazeboVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef8e0,
+                                      quickInfoGazeboUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -4988,12 +5036,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef930,
+                                quickInfoFortVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef904,
+                                      quickInfoFortVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef914,
+                                      quickInfoFortUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5004,12 +5064,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef964,
+                                quickInfoWitchDoctorVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef938,
+                                      quickInfoWitchDoctorVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef948,
+                                      quickInfoWitchDoctorUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5020,12 +5092,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef998,
+                                quickInfoMercenaryCampVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef96c,
+                                      quickInfoMercenaryCampVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef97c,
+                                      quickInfoMercenaryCampUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5036,12 +5120,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004ef9cc,
+                                quickInfoStandingStonesVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef9a0,
+                                      quickInfoStandingStonesVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef9b0,
+                                      quickInfoStandingStonesUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5052,12 +5148,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004efa00,
+                                quickInfoTreeOfKnowledgeVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004ef9d4,
+                                      quickInfoTreeOfKnowledgeVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004ef9e4,
+                                      quickInfoTreeOfKnowledgeUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5068,12 +5176,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004efa34,
+                                quickInfoXanaduVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? DATA_COMPGEN(
+                                      0x004efa08,
+                                      quickInfoXanaduVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004efa18,
+                                      quickInfoXanaduUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         goto quick_info_default;
@@ -5127,7 +5247,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(
                         gText,
-                        "%s",
+                        DATA_COMPGEN(0x004efa64, quickInfoAbandonedMineFormat, "%s"),
                         gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
                     goto quick_info_guarded;
@@ -5136,7 +5256,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         != CREATURE_NONE) {
                         sprintf(
                             gText,
-                            "%s",
+                            DATA_COMPGEN(0x004efa68, quickInfoGuardedMineNameFormat, "%s"),
                             gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
@@ -5155,7 +5275,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(
                             gText,
-                            "%s",
+                            DATA_COMPGEN(0x004efa80, quickInfoMineNameFormat, "%s"),
                             gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
@@ -5164,7 +5284,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_RESOURCE:
                     sprintf(
                         gText,
-                        "%s",
+                        DATA_COMPGEN(0x004efa84, quickInfoResourceNameFormat, "%s"),
                         gResourceNames[currentCell->m_objectIndex / RESOURCE_FRAME_PAIR_STRIDE]
                     );
                     break;
@@ -5207,7 +5327,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(
                             gText,
-                            "%s",
+                            DATA_COMPGEN(0x004efa98, quickInfoTerrainNameFormat, "%s"),
                             gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])]
                         );
                     }
@@ -5274,8 +5394,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         strcat(gText, "\n\n");
                         strcat(
                             gText,
-                            HAS(pHero->m_eventFlags, visitedMaskValue) ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                                                           : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                            HAS(pHero->m_eventFlags, visitedMaskValue)
+                                ? DATA_COMPGEN(
+                                      0x004efaac,
+                                      quickInfoExpansionSiteVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004efabc,
+                                      quickInfoExpansionSiteUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     }
                     break;
@@ -5327,15 +5456,28 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (visitedMaskValue != HERO_EVENT_NONE && pHero != NULL) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(
+                                0x004efb18,
+                                quickInfoDefaultVisitFormat,
+                                "%s\n\n%s"
+                            ),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
-                            HAS(pHero->m_eventFlags, visitedMaskValue) ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                                                           : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                            HAS(pHero->m_eventFlags, visitedMaskValue)
+                                ? DATA_COMPGEN(
+                                      0x004efaec,
+                                      quickInfoDefaultVisitedText,
+                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
+                                : DATA_COMPGEN(
+                                      0x004efafc,
+                                      quickInfoDefaultUnvisitedText,
+                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                  )
                         );
                     } else {
                         sprintf(
                             gText,
-                            "%s",
+                            DATA_COMPGEN(0x004efb20, quickInfoDefaultNameFormat, "%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                         );
                     }
@@ -6350,7 +6492,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     ++msg.payload.widget.id;
     ++msg.payload.widget.data.value;
     win->BroadcastMessage(msg);
-    sprintf(gText, "%s", targetHero->m_name);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x004efcec, heroQuickNameFormat, "%s"),
+        targetHero->m_name
+    );
     msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     msg.payload.widget.id = HERO_QUICK_NAME_WIDGET;
     msg.payload.widget.data.text = gText;
