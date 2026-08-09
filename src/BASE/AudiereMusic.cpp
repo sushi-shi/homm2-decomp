@@ -34,6 +34,9 @@ DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusicState::stream;
 DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusicState::source;
 DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
 
+VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::stream)
+VA_COMPGEN(0x004cd170, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::source)
+
 VA(0x004cd260, 0x133)
 void StopAudiereMusic(i32& currentTrack) {
     if (AudiereMusicState::stream) {
@@ -151,3 +154,5 @@ void PlayAudiereMusic(
     }
     currentTrack = track;
 }
+
+VA_COMPGEN(0x004cdae0, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)

@@ -15,6 +15,17 @@ placements. Ambiguity, overlap, missing definitions, and uncovered references re
 diagnostics. Linker-sorted `.CRT$...` subsections are assigned only from an unambiguous
 physical retail contribution of the same owner, domain, and size.
 
+For a `.CRT$...` contribution, candidate COFF must contain one `DIR32`
+relocation at every pointer cell. Stable target spellings bind by compiland and
+name. A volatile `$E` target instead admits only same-compiland reviewed
+compiler functions compatible with its complete physical extent; the counter
+itself is not identity. The complete ordered pointer-choice sequence must then
+occur exactly once at contiguous reviewed DIR32 sites in retail initialized
+data with the candidate section's alignment. This binds the whole section or
+leaves it non-affine; individual cells are never guessed. These cells are
+compiler/linker topology rather than source value expressions, so they are not
+given artificial `DATA_COMPGEN` occurrences.
+
 Candidate discovery is not a canonical naming source. Counter spellings such as
 `$SG39045`, `$T40070`, and `name$S123`, and value-derived floating-literal spellings
 such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities.

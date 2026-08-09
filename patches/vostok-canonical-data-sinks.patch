@@ -1,0 +1,106 @@
+diff --git a/src/object_files.rs b/src/object_files.rs
+index 22d80a1..b27f109 100644
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -446,13 +446,25 @@ impl ObjectFile {
+             }
+ 
+             match section.storage {
+-                Some(SectionStorage::Data) if data_section_id.is_none() => {
++                Some(SectionStorage::Data)
++                    if section.name == b".data"
++                        && section.comdat_selection == ComdatSelection::None
++                        && data_section_id.is_none() =>
++                {
+                     data_section_id = Some(id)
+                 }
+-                Some(SectionStorage::Rdata) if rdata_section_id.is_none() => {
++                Some(SectionStorage::Rdata)
++                    if section.name == b".rdata"
++                        && section.comdat_selection == ComdatSelection::None
++                        && rdata_section_id.is_none() =>
++                {
+                     rdata_section_id = Some(id)
+                 }
+-                Some(SectionStorage::Bss) if bss_section_id.is_none() => bss_section_id = Some(id),
++                Some(SectionStorage::Bss)
++                    if section.name == b".bss" && bss_section_id.is_none() =>
++                {
++                    bss_section_id = Some(id)
++                }
+                 None if section.name == b".text" && text_section_id.is_none() => {
+                     text_section_id = Some(id)
+                 }
+@@ -1987,6 +1999,72 @@ mod tests {
+         assert_eq!(parsed_sections[2].data().unwrap(), b"fold");
+     }
+ 
++    #[test]
++    fn generic_data_does_not_append_to_crt_topology_section() {
++        let sections = [
++            DataSection {
++                object: b"fixture.c",
++                ordinal: 1,
++                name: b".CRT$XCU",
++                rva: Some(0x10),
++                size: 4,
++                alignment: 4,
++                characteristics: 0xc030_0040,
++                checksum: 0,
++                comdat_selection: ComdatSelection::None,
++                associative_ordinal: None,
++                storage: Some(SectionStorage::Data),
++            },
++            DataSection {
++                object: b"fixture.c",
++                ordinal: 2,
++                name: b".data",
++                rva: Some(0x20),
++                size: 4,
++                alignment: 4,
++                characteristics: 0xc030_0040,
++                checksum: 0,
++                comdat_selection: ComdatSelection::None,
++                associative_ordinal: None,
++                storage: Some(SectionStorage::Data),
++            },
++        ];
++        let mut image = vec![0_u8; 0x30];
++        image[0x10..0x14].copy_from_slice(b"crt!");
++        image[0x20..0x24].copy_from_slice(b"data");
++        let empty = crate::SecInfo {
++            rva: 0,
++            va: 0,
++            size: 0,
++            id: 2,
++            data: &[],
++        };
++        let data = crate::SecInfo {
++            rva: 0,
++            va: 0,
++            size: image.len(),
++            id: 3,
++            data: &image,
++        };
++        let mut output =
++            ObjectFile::with_sections(&sections, empty, data, &image, false).unwrap();
++        let data_section_id = output.data_section();
++        output
++            .object
++            .append_section_data(data_section_id, b"tail", 1);
++
++        let bytes = output.object.write().unwrap();
++        let object = object::File::parse(bytes.as_slice()).unwrap();
++        assert_eq!(
++            object.section_by_name(".CRT$XCU").unwrap().data().unwrap(),
++            b"crt!"
++        );
++        assert_eq!(
++            object.section_by_name(".data").unwrap().data().unwrap(),
++            b"datatail"
++        );
++    }
++
+     #[test]
+     fn exact_topology_does_not_invent_empty_sections() {
+         let sections = [DataSection {

@@ -41,6 +41,7 @@ from homm2.build.data_topology_census import (
 )
 from homm2.build.link_exe import classify_pe_storage, read_pe
 from homm2.build.candidate_data_manifest import _pe_layout, derive_allocations
+from homm2.build.reloc_owners import load_reviewed_highlow_sites
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -49,6 +50,8 @@ BASE_ROOT = REPO / "build/objdiff/base"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNITS = REPO / "config/units.toml"
 EXE = REPO / "build/orig/HMM2PL.exe"
+RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
+IMAGE_REL_I386_DIR32 = 0x0006
 SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",
     "section_ordinal", "section_offset", "scope", "provenance",
@@ -65,6 +68,9 @@ SECTION_HEADER = (
 COMMON_HEADER = ("object", "name", "size")
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
+VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
+FUNCTION_TYPE = 0x0020
+MEM_EXECUTE = 0x20000000
 
 
 @dataclass(frozen=True)
@@ -98,6 +104,13 @@ class CandidateSection:
     checksum: int
     comdat_selection: int
     associative_ordinal: int | None
+
+
+@dataclass(frozen=True)
+class RetailFunction:
+    rva: int
+    size: int
+    provenance: str
 
 
 def source_definitions(source_root: Path = SOURCE_ROOT,
@@ -210,6 +223,32 @@ def _load_public_data(path: Path = SYMBOLS) -> tuple[
         name: tuple(sorted(rvas)) for name, rvas in global_by_symbol.items()
     }
     return by_rva, by_symbol, global_rvas
+
+
+def _load_function_claims(path: Path = SYMBOLS):
+    """Return reviewed function claims by identity and by owning compiland.
+
+    CRT input sections point at compiler-generated initializer functions.  The
+    candidate relocation supplies the owning compiland and physical function
+    extent; this inventory supplies possible retail placements.  Compiler
+    counter spellings are never treated as semantic identity.
+    """
+    by_identity = defaultdict(list)
+    by_unit = defaultdict(list)
+    with Path(path).open(newline="", encoding="latin-1") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("kind") == "func":
+                claim = RetailFunction(
+                    int(row["rva"], 0), int(row.get("size") or "0", 0),
+                    row.get("provenance") or "")
+                by_identity[(row["unit"], row["name"])].append(claim)
+                by_unit[row["unit"]].append(claim)
+    return (
+        {identity: tuple(sorted(rows, key=lambda row: row.rva))
+         for identity, rows in by_identity.items()},
+        {unit: tuple(sorted(rows, key=lambda row: row.rva))
+         for unit, rows in by_unit.items()},
+    )
 
 
 def resolve_source_definitions(definitions, topology_by_unit, public_by_rva) -> list[tuple[SourceDefinition, CandidateDefinition]]:
@@ -635,14 +674,172 @@ def source_manifest_bytes(source_root: Path = SOURCE_ROOT,
     return render_source_manifest(rows), diagnostics
 
 
+def _unique_reviewed_pointer_sequence_rva(values, reviewed_cells,
+                                          alignment: int) -> int | None:
+    """Locate one complete pointer sequence in reviewed retail DIR32 cells.
+
+    Every dword must be a reviewed relocation site.  Matching pointer-looking
+    bytes outside that inventory are not placement evidence, and two matching
+    sequences are deliberately left ambiguous.
+    """
+    if not values or alignment <= 0 or alignment & (alignment - 1):
+        return None
+    choices = tuple(
+        value if isinstance(value, (tuple, list, set, frozenset)) else (value,)
+        for value in values)
+    matches = []
+    for start, first_value in reviewed_cells.items():
+        if start % alignment or first_value not in choices[0]:
+            continue
+        if all(reviewed_cells.get(start + offset * 4) in value_choices
+               for offset, value_choices in enumerate(choices)):
+            matches.append(start)
+            if len(matches) > 1:
+                return None
+    return matches[0] if matches else None
+
+
+def _candidate_function_claims(coff: CoffFile, symbol, unit: str,
+                               functions_by_identity, functions_by_unit):
+    """Return retail claims compatible with one candidate function extent."""
+    if symbol.section <= 0:
+        return ()
+    typ, _storage_class = _coff_symbol_fields(coff, symbol)
+    section = coff.sections[symbol.section - 1]
+    characteristics = _section_characteristics(coff, symbol.section)
+    if typ != FUNCTION_TYPE or not characteristics & MEM_EXECUTE:
+        return ()
+    peers = []
+    for other in coff.symbols.values():
+        if other.section != symbol.section or other.value <= symbol.value:
+            continue
+        other_type, _other_storage = _coff_symbol_fields(coff, other)
+        if other_type == FUNCTION_TYPE:
+            peers.append(other.value)
+    end = min(peers, default=section.raw_size)
+    if not symbol.value < end <= section.raw_size or section.raw_offset == 0:
+        return ()
+    physical = bytes(coff.data[
+        section.raw_offset + symbol.value:section.raw_offset + end])
+
+    def compatible(claim):
+        return (0 < claim.size <= len(physical)
+                and all(byte in (0x90, 0xCC) for byte in physical[claim.size:]))
+
+    exact = tuple(
+        claim for claim in functions_by_identity.get((unit, symbol.name), ())
+        if compatible(claim))
+    if not VOLATILE_E_FUNCTION.fullmatch(symbol.name):
+        return exact
+    # $E counters are unstable across otherwise equivalent TUs.  The set is
+    # therefore based on owner, reviewed compiler-function provenance, and
+    # physical extent; the complete CRT pointer sequence resolves the member.
+    compiler_claims = tuple(
+        claim for claim in functions_by_unit.get(unit, ())
+        if claim.provenance.startswith(("reviewed-compgen", "source-VA_COMPGEN:"))
+        and compatible(claim))
+    return tuple(sorted(set((*exact, *compiler_claims)), key=lambda row: row.rva))
+
+
+def _candidate_crt_pointer_values(coff: CoffFile, section,
+                                  unit: str, functions_by_identity,
+                                  functions_by_unit,
+                                  image_base: int):
+    """Resolve each candidate CRT cell to reviewed linked-pointer choices."""
+    if (section.raw_size <= 0 or section.raw_size % 4
+            or section.raw_offset == 0):
+        return None
+    section_relocs = {
+        site: relocation
+        for (section_index, site), relocation in coff.relocations.items()
+        if section_index == section.index
+    }
+    if set(section_relocs) != set(range(0, section.raw_size, 4)):
+        return None
+    values = []
+    for offset in range(0, section.raw_size, 4):
+        relocation = section_relocs[offset]
+        if relocation.typ != IMAGE_REL_I386_DIR32:
+            return None
+        symbol = coff.symbols.get(relocation.symbol_index)
+        if symbol is None:
+            return None
+        claims = _candidate_function_claims(
+            coff, symbol, unit, functions_by_identity, functions_by_unit)
+        if not claims:
+            return None
+        addend = struct.unpack_from(
+            "<I", coff.data, section.raw_offset + offset)[0]
+        values.append(frozenset(
+            (image_base + claim.rva + addend) & 0xFFFFFFFF
+            for claim in claims))
+    return tuple(values)
+
+
+def _derive_crt_section_rvas(base_root: Path, unit_names,
+                             symbols: Path, exe: Path,
+                             reloc_manifest: Path):
+    """Bind compiler-emitted CRT contributions to unique retail spans.
+
+    This is physical section topology, not a source-level data identity: the
+    compiler creates each pointer cell for a global initializer.  Candidate
+    COFF proves owner/order/relocation spelling, while the reviewed function
+    inventory and reviewed retail DIR32 sites prove its final placement.
+    """
+    pe = read_pe(exe)
+    image_base, _highlow, read_u32, _read_bytes = _pe_layout(exe)
+    functions_by_identity, functions_by_unit = _load_function_claims(symbols)
+    reviewed_cells = {}
+    for site in load_reviewed_highlow_sites(reloc_manifest):
+        if classify_pe_storage(pe, site)["class"] != "data-initialized":
+            continue
+        reviewed_cells[site] = read_u32(site)
+
+    placements = {}
+    occupied = {}
+    for unit in unit_names:
+        coff = CoffFile(Path(base_root) / f"{unit}.obj")
+        for section in coff.sections:
+            if not section.name.startswith(".CRT$"):
+                continue
+            values = _candidate_crt_pointer_values(
+                coff, section, unit, functions_by_identity,
+                functions_by_unit, image_base)
+            if values is None:
+                continue
+            characteristics = _section_characteristics(coff, section.index)
+            alignment = _section_alignment(characteristics)
+            rva = _unique_reviewed_pointer_sequence_rva(
+                values, reviewed_cells, alignment)
+            if rva is None:
+                continue
+            if classify_pe_storage(
+                    pe, rva + section.raw_size - 1)["class"] != "data-initialized":
+                continue
+            extent = (rva, rva + section.raw_size)
+            previous = occupied.get(extent)
+            if previous is not None:
+                raise ValueError(
+                    f"candidate CRT sections {previous} and {unit}:{section.index} "
+                    f"both map to retail extent 0x{rva:x}+0x{section.raw_size:x}")
+            occupied[extent] = f"{unit}:{section.index}"
+            placements[(unit, section.index)] = rva
+    return placements
+
+
 def candidate_section_manifest_bytes(base_root: Path = BASE_ROOT,
-                                     units: Path = UNITS):
+                                     units: Path = UNITS,
+                                     symbols: Path = SYMBOLS,
+                                     exe: Path = EXE,
+                                     reloc_manifest: Path = RELOC_MANIFEST):
     """Serialize candidate data-section and COMDAT topology for Vostok."""
     base_root = Path(base_root)
     document = tomllib.loads(Path(units).read_text())
     unit_names = [row["unit"] for row in document.get("unit", ())]
     if len(unit_names) != len(set(unit_names)):
         raise ValueError("duplicate units in candidate section manifest")
+    crt_rvas = _derive_crt_section_rvas(
+        base_root, unit_names, Path(symbols), Path(exe), Path(reloc_manifest))
     rows = []
     for unit in unit_names:
         path = base_root / f"{unit}.obj"
@@ -669,7 +866,9 @@ def candidate_section_manifest_bytes(base_root: Path = BASE_ROOT,
                 # Definitions carry independently reviewed retail RVAs.  A
                 # non-affine section is replayed in candidate shape and gaps
                 # remain padding, never synthetic symbols.
-                "rva": "-",
+                "rva": (
+                    f"0x{crt_rvas[(unit, section.ordinal)]:x}"
+                    if (unit, section.ordinal) in crt_rvas else "-"),
                 "size": f"0x{section.size:x}",
                 "alignment": f"0x{section.alignment:x}",
                 "characteristics": f"0x{section.characteristics:x}",

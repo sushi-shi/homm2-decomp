@@ -70,6 +70,23 @@ class CompgenMarkerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "invalid VA_COMPGEN"):
                 compgen_functions_for_file(path, source_root, repo)
 
+    def test_qualified_static_owner_has_a_stable_semantic_name(self):
+        with TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_root = repo / "src"
+            path = source_root / "BASE" / "AudiereMusic.cpp"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                "VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, "
+                "AudiereMusicState::stream)\n")
+            rows = compgen_functions_for_file(path, source_root, repo)
+
+        self.assertEqual(
+            rows[0].name,
+            "__h2cg$BASE$AudiereMusic$static_init_dispatch$"
+            "AudiereMusicState$stream")
+        self.assertEqual(rows[0].owner, "AudiereMusicState::stream")
+
 
 class CollectTests(unittest.TestCase):
     def _collect(self, rows, vtables=()):

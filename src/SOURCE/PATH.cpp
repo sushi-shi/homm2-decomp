@@ -633,3 +633,5 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     }
     return COMBAT_DIRECTION_INVALID;
 }
+
+VA_COMPGEN(0x0047e16a, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)

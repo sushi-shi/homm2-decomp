@@ -124,7 +124,7 @@ def army_style_jump_table(canonical=False, unequal_destination=False):
     ])
 
 
-def compiler_function_graph():
+def compiler_function_graph(owner_symbol="_Widget"):
     return make_coff([SectionSpec(
         ".text", bytes(0x6B), TEXT, (
             (0x04, 1, REL32), (0x0C, 2, REL32),
@@ -137,9 +137,42 @@ def compiler_function_graph():
         ("_$E12", 0x1A, 1, 0x20, 3),
         ("_$E73", 0x34, 1, 0x20, 3),
         ("_$E44", 0x51, 1, 0x20, 3),
-        ("_Widget", 0, 0, 0, 2),
+        (owner_symbol, 0, 0, 0, 2),
         ("??0Widget@@QAE@XZ", 0, 0, 0x20, 2),
         ("??1Widget@@QAE@XZ", 0, 0, 0x20, 2),
+        ("_atexit", 0, 0, 0x20, 2),
+    ])
+
+
+def locale_facet_id_graph():
+    return make_coff([SectionSpec(
+        ".text", bytes(0x39), TEXT, (
+            (0x06, 2, DIR32), (0x13, 2, DIR32), (0x1C, 2, DIR32),
+            (0x21, 1, REL32), (0x2B, 3, DIR32), (0x30, 4, REL32),
+        ),
+    )], [
+        ("_$E32", 0x00, 1, 0x20, 3),
+        ("_$E31", 0x27, 1, 0x20, 3),
+        ("??_B?1???id@?$ctype@G@std@@$D@@9@51", 0, 0, 0, 2),
+        ("?id@?$ctype@G@std@@$E", 0, 0, 0, 2),
+        ("_atexit", 0, 0, 0x20, 2),
+    ])
+
+
+def inline_static_member_graph(owner_symbol):
+    return make_coff([SectionSpec(
+        ".text", bytes(0x8E), TEXT, (
+            (0x04, 1, REL32), (0x09, 2, REL32),
+            (0x20, 4, DIR32),
+            (0x70, 3, DIR32), (0x78, 5, REL32),
+            (0x82, 4, DIR32),
+        ),
+    )], [
+        ("_$E20", 0x00, 1, 0x20, 3),
+        ("_$E16", 0x0F, 1, 0x20, 3),
+        ("_$E19", 0x70, 1, 0x20, 3),
+        ("_$E17", 0x82, 1, 0x20, 3),
+        (owner_symbol, 0, 0, 0, 2),
         ("_atexit", 0, 0, 0x20, 2),
     ])
 
@@ -297,6 +330,39 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
             [parsed.symbols[index].name for index in (1, 2, 3)],
             ["_$E12", "_$E73", "_$E44"],
         )
+
+    def test_qualified_static_owner_matches_msvc_member_spelling(self):
+        claim = CompgenClaim(
+            "__h2cg$MODULE$static_init_dispatch$AudiereMusicState$stream",
+            "STATIC_INIT_DISPATCH", "AudiereMusicState::stream", 0x1A)
+        payload = compiler_function_graph(
+            "?stream@AudiereMusicState@@2VRefPtr@@A")
+
+        result = canonicalize_coff(payload, (claim,))
+
+        self.assertEqual(CoffObject(result.data).symbols[0].name, claim.name)
+
+    def test_qualified_static_owner_matches_inlined_refptr_helpers(self):
+        claim = CompgenClaim(
+            "__h2cg$MODULE$static_init_dispatch$AudiereMusicState$stream",
+            "STATIC_INIT_DISPATCH", "AudiereMusicState::stream", 0x0F)
+        payload = inline_static_member_graph(
+            "?stream@AudiereMusicState@@2VRefPtr@@A")
+
+        result = canonicalize_coff(payload, (claim,))
+
+        self.assertEqual(CoffObject(result.data).symbols[0].name, claim.name)
+
+    def test_locale_facet_id_initializer_has_a_semantic_role(self):
+        claim = CompgenClaim(
+            "__h2cg$MODULE$locale_facet_id_init$WCharCtypeId",
+            "LOCALE_FACET_ID_INIT", "WCharCtypeId", 0x27)
+
+        result = canonicalize_coff(locale_facet_id_graph(), (claim,))
+
+        self.assertEqual(CoffObject(result.data).symbols[0].name, claim.name)
+        self.assertEqual(result.rows[0].preview,
+                         "LOCALE_FACET_ID_INIT:WCharCtypeId")
 
     def test_unresolved_compiler_function_claim_warns_without_renaming(self):
         payload = make_coff([

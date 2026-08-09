@@ -56,9 +56,10 @@ COMPGEN_HEADER = "rva,name,unit,size,kind,owner,source,line\n"
 COMPGEN_MARKER = re.compile(
     r"^\s*VA_COMPGEN\(\s*(0x[0-9a-fA-F]+)\s*,\s*"
     r"(0x[0-9a-fA-F]+|[0-9]+)\s*,\s*([A-Z][A-Z0-9_]*)\s*,\s*"
-    r"([A-Za-z_]\w*)\s*\)\s*$")
+    r"([A-Za-z_]\w*(?:::[A-Za-z_]\w*)*)\s*\)\s*$")
 COMPGEN_KINDS = {
     "STATIC_INIT_DISPATCH", "STATIC_ATEXIT", "STATIC_DTOR", "STATIC_CTOR",
+    "LOCALE_FACET_ID_INIT",
 }
 
 # Every cursor kind that can carry a VA marker and produce a linker symbol.
@@ -108,7 +109,7 @@ def compgen_functions_for_file(
         if va < IMAGE_BASE or size <= 0 or kind not in COMPGEN_KINDS:
             raise ValueError(f"{path}:{line_number}: invalid VA_COMPGEN marker")
         name = "__h2cg$%s$%s$%s" % (
-            unit.replace("/", "$"), kind.lower(), owner)
+            unit.replace("/", "$"), kind.lower(), owner.replace("::", "$"))
         rows.append(SourceCompgenFunction(
             rva=va - IMAGE_BASE, name=name, unit=unit, size=size,
             kind=kind, owner=owner,

@@ -10,6 +10,7 @@ from homm2.build.data_manifest_adapter import (
     _bind_compgen_edges,
     _compgen_candidate_kind,
     _interior_compgen_aliases,
+    _unique_reviewed_pointer_sequence_rva,
     candidate_topology,
     candidate_common_manifest_bytes,
     delinker_manifest_bytes,
@@ -50,6 +51,43 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_crt_pointer_sequence_requires_one_complete_reviewed_span(self):
+        values = (0x401000, 0x402000)
+        reviewed = {
+            0x100: 0x401000,
+            0x104: 0x402000,
+            # A matching first pointer without a reviewed adjacent relocation
+            # is not a second sequence.
+            0x200: 0x401000,
+        }
+        self.assertEqual(
+            _unique_reviewed_pointer_sequence_rva(values, reviewed, 4), 0x100)
+
+        reviewed[0x204] = 0x402000
+        self.assertIsNone(
+            _unique_reviewed_pointer_sequence_rva(values, reviewed, 4))
+
+    def test_crt_pointer_sequence_respects_candidate_alignment(self):
+        self.assertEqual(
+            _unique_reviewed_pointer_sequence_rva(
+                (0x401000,), {0x104: 0x401000, 0x108: 0x402000}, 8),
+            None)
+
+    def test_crt_whole_sequence_resolves_unstable_function_counters(self):
+        # Either 15-byte dispatcher is physically compatible with the first
+        # cell, but only one complete ordered sequence exists in retail.
+        values = ({0x401000, 0x402000}, {0x403000}, {0x404000})
+        reviewed = {
+            0x100: 0x402000,
+            0x104: 0x403000,
+            0x108: 0x404000,
+            0x200: 0x401000,
+            0x204: 0x405000,
+            0x208: 0x404000,
+        }
+        self.assertEqual(
+            _unique_reviewed_pointer_sequence_rva(values, reviewed, 4), 0x100)
+
     def test_delinker_manifest_retains_candidate_section_coordinates(self):
         row = {
             "object": "SOURCE\\Test.c",

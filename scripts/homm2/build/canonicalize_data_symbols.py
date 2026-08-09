@@ -493,19 +493,32 @@ def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
         return {coff.symbols[target].name for target in outgoing[index]}
 
     def owner_present(names, owner):
-        return any(name == "_" + owner or name.startswith("?" + owner + "@@")
-                   for name in names)
+        parts = owner.split("::")
+        mangled_prefix = "?" + "@".join(reversed(parts)) + "@@"
+        return any(
+            (len(parts) == 1 and name == "_" + owner)
+            or name.startswith(mangled_prefix)
+            for name in names)
 
     def is_special_member(index, owner, prefix):
         names = target_names(index)
         return (owner_present(names, owner) and
                 any(name.startswith(prefix) for name in names))
 
+    def is_inline_static_member_helper(index, owner):
+        return "::" in owner and owner_present(target_names(index), owner)
+
     def is_atexit(index, owner):
         return ("_atexit" in target_names(index) and
                 any(target in volatile and
-                    is_special_member(target, owner, "??1")
+                    (is_special_member(target, owner, "??1") or
+                     is_inline_static_member_helper(target, owner))
                     for target in outgoing[index]))
+
+    def is_locale_facet_id_atexit(index):
+        names = target_names(index)
+        return ("_atexit" in names and
+                any(name.startswith("?id@?$ctype@") for name in names))
 
     def has_role(index, claim):
         if claim.kind == "STATIC_CTOR":
@@ -517,10 +530,17 @@ def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
         if claim.kind == "STATIC_INIT_DISPATCH":
             targets = outgoing[index]
             return (any(target in volatile and
-                        is_special_member(target, claim.owner, "??0")
+                        (is_special_member(target, claim.owner, "??0") or
+                         is_inline_static_member_helper(target, claim.owner))
                         for target in targets) and
                     any(target in volatile and is_atexit(target, claim.owner)
                         for target in targets))
+        if claim.kind == "LOCALE_FACET_ID_INIT":
+            names = target_names(index)
+            return (any(name.startswith("??_B?1???id@?$ctype@")
+                        for name in names) and
+                    any(target in volatile and is_locale_facet_id_atexit(target)
+                        for target in outgoing[index]))
         return False
 
     assigned = {}

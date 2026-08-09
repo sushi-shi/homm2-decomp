@@ -16,7 +16,7 @@ BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
 BASE/AudiereMusic	?AudiereMusicAvailable@@YI_NXZ	100.0000	1001bd3a24bb
 BASE/AudiereMusic	?AudiereMusicPlaying@@YI_NXZ	100.0000	d80e2edbabe9
-BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	35d8bbfe6878
+BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	7ea5dc5c5252
 BASE/AudiereMusic	?ResetAudiereMusic@@YIXXZ	100.0000	28d0e39d5071
 BASE/AudiereMusic	?SetAudiereMusicVolume@@YIXHH@Z	100.0000	bbc82415fb66
 BASE/AudiereMusic	?StartupAudiereMusic@@YI_NV?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	6695b12b4972
@@ -1065,7 +1065,7 @@ SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	382378ada9ac
 SOURCE/PATH	?GetAdjacentCellIndex@army@@QAEHHH@Z	100.0000	cf39e064e548
 SOURCE/PATH	?GetAdjacentCellIndexNoArmy@@YIHHH@Z	100.0000	60e237eed612
 SOURCE/PATH	?GetAttackMask@army@@QAEHHHH@Z	100.0000	70b0a150318d
-SOURCE/PATH	?GetBestDirection@army@@QAEHHHH@Z	100.0000	7bd845ad0f9a
+SOURCE/PATH	?GetBestDirection@army@@QAEHHHH@Z	100.0000	238493ba0ec8
 SOURCE/PATH	?GetMoveMask@army@@QAEHH@Z	100.0000	eb77d458a42b
 SOURCE/PATH	?OppositeDirection@@YIHH@Z	100.0000	4f407926cd69
 SOURCE/PATH	?ValidAttack@army@@QAEHHHHHPAH@Z	100.0000	f3641621533a
@@ -1112,7 +1112,7 @@ SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	100.0000	2189a17ebe20
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	ee048dcb1719
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	1c55c01ebd4e
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	100.0000	7bc8cb8bebe9
-SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	100.0000	7dab95e3d40a
+SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	100.0000	cc40a9c009ea
 SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	100.0000	0ce84487d0b3
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	100.0000	a2d8cb9eddb8
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	6cd6cede4987
