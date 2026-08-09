@@ -507,9 +507,9 @@ SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	100.0000	58fbf54c80dc
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	367f9621bc52
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	001c91f6647b
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	18bb2ee6a97c
-SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	d1fb7b882975
+SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	0b7b13bd8d5f
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	100.0000	f2ab048d4661
-SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	9117f39b5e9c
+SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	7ceec52cd282
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	100.0000	513e31cce36a
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	100.0000	69591000557a
 SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	100.0000	22d94a6b35ea
