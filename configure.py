@@ -317,11 +317,11 @@ def main():
     (od / "objdiff.json").write_text(json.dumps({
         "$schema": "https://raw.githubusercontent.com/encounter/objdiff/main/config.schema.json",
         "build_base": False, "build_target": False,
-        # This branch does not model static data yet: there is not one source DATA()
-        # claim, so every global is spelled `const_<RVA>` in the delinked target and
-        # objdiff's `data_value` strictness scores a data model that does not exist.
-        # Compare instructions only until data claims land.
-        "options": {"functionRelocDiffs": "none"},
+        # Relocation-masked instruction bytes are not sufficient proof: two globals
+        # can generate identical opcodes while naming different storage.  Keep the
+        # strictest objdiff relocation-value comparison visible in the normal report;
+        # the owner/addend gates provide the stronger project-specific proof.
+        "options": {"functionRelocDiffs": "data_value"},
         "watch_patterns": ["*.obj"], "units": units_j,
     }, indent=2) + "\n")
     print(f"configure: {len(units)} units -> build.ninja + build/objdiff/objdiff.json")

@@ -187,6 +187,7 @@ class LiveStatusTest(unittest.TestCase):
 
     def test_status_prints_live_and_max_exact_counts(self):
         self.maxima.write_text(
+            f"# scoring-policy: {status.MAXIMA_POLICY}\n"
             "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
             "SOURCE/UNIT\tpartial\t100.0000\thash-partial\n")
         with mock.patch("builtins.print") as output:
@@ -215,6 +216,7 @@ class LiveStatusTest(unittest.TestCase):
 
     def test_recording_never_lowers_maximum_for_same_hash(self):
         self.maxima.write_text(
+            f"# scoring-policy: {status.MAXIMA_POLICY}\n"
             "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
             "SOURCE/UNIT\tpartial\t99.0000\thash-partial\n")
         maxima = status.record_maxima(self.report())
@@ -226,9 +228,21 @@ class LiveStatusTest(unittest.TestCase):
 
     def test_changed_hash_resets_maximum_without_rejecting_regression(self):
         self.maxima.write_text(
+            f"# scoring-policy: {status.MAXIMA_POLICY}\n"
             "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
             "SOURCE/UNIT\tpartial\t99.0000\told-hash\n")
         maxima = status.record_maxima(self.report())
+        self.assertEqual(maxima[("SOURCE/UNIT", "partial")],
+                         (97.0, "hash-partial"))
+
+    def test_changed_scoring_policy_resets_all_maxima(self):
+        self.maxima.write_text(
+            "# scoring-policy: function-relocs-none-v1\n"
+            "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
+            "SOURCE/UNIT\tpartial\t100.0000\thash-partial\n")
+        maxima = status.record_maxima(self.report())
+        self.assertEqual(maxima[("SOURCE/UNIT", "exact")],
+                         (100.0, "hash-exact"))
         self.assertEqual(maxima[("SOURCE/UNIT", "partial")],
                          (97.0, "hash-partial"))
 

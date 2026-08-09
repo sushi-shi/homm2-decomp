@@ -17,6 +17,7 @@ RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
 REPORT_CACHE_SCHEMA = 1
 REPORT_STAMP = "report.stamp.json"
 MAXIMA = REPO / "config/match_baseline.tsv"
+MAXIMA_POLICY = "function-relocs-data-value-v1"
 EXACT_MATCH_PERCENT = 100.0
 
 
@@ -330,7 +331,15 @@ def load_maxima():
     maxima = {}
     if not MAXIMA.exists():
         return maxima
-    for line in MAXIMA.read_text().splitlines():
+    lines = MAXIMA.read_text().splitlines()
+    policy = next(
+        (line.split(":", 1)[1].strip()
+         for line in lines if line.startswith("# scoring-policy:")),
+        None,
+    )
+    if policy != MAXIMA_POLICY:
+        return maxima
+    for line in lines:
         if not line or line.startswith("#"):
             continue
         fields = line.split("\t")
@@ -369,6 +378,7 @@ def _updated_maxima(data, maxima, hashes):
 def write_maxima(maxima):
     lines = [
         "# homm2 retained match maxima by normalized effective-source hash.",
+        f"# scoring-policy: {MAXIMA_POLICY}",
         "# Observational only; never an enforcement baseline.",
         "# Updated by `homm2 status update` and `homm2 build`; do not hand-edit.",
         "# unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash",

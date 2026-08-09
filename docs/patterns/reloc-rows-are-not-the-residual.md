@@ -5,11 +5,12 @@ retail names `const_00123e50` / `$anon_str_<hash>_7` where we name the real
 global, or retail carries `const_00118be1` where we carry `owner + 0x1`. It
 looks like the whole residual, and it is not: those rows never scored.
 
-**Rule (measured, this tree).** `build/objdiff/objdiff.json` sets
-`"functionRelocDiffs": "none"`. objdiff compares the masked instruction text
-only, so a differing relocation symbol *or addend* contributes exactly zero to
-`fuzzy_match_percent` and to `functions-exact`. Naming the owner with a source
-`DATA()` claim is an audit fix, not a score fix.
+**Rule (historical measurement).** At the time of this measurement,
+`build/objdiff/objdiff.json` set `"functionRelocDiffs": "none"`. Objdiff compared
+the masked instruction text only, so a differing relocation symbol *or addend*
+contributed exactly zero to `fuzzy_match_percent` and to `functions-exact`.
+The project now uses `data_value`; the byte-level diagnostic below remains useful,
+but the current score deliberately exposes relocation-value disagreements.
 
 **Evidence.** `advManager::ComboDraw` (0xf30a). `homm2 sema disasm --diff`
 before the claim was 1256 lines, 570 of them relocation rows:
