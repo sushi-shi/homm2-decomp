@@ -7669,7 +7669,11 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
+                    DATA_COMPGEN(
+                        0x004efde4,
+                        castSpellMineGuardianLocationText,
+                        "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
+                    ),
                     1,
                     -1,
                     -1,
@@ -7705,7 +7709,11 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb.",
+                DATA_COMPGEN(
+                    0x004efe54,
+                    castSpellIdentifyHeroesText,
+                    "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb."
+                ),
                 1,
                 -1,
                 -1,
@@ -7725,7 +7733,11 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
+                    DATA_COMPGEN(
+                        0x004efe84,
+                        castSpellTravelExhaustedText,
+                        "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0."
+                    ),
                     1,
                     -1,
                     -1,
@@ -7784,17 +7796,17 @@ i32 SaveGame(void) {
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(suffix, ".GMC");
-        sprintf(pattern, "*.GMC");
+        sprintf(suffix, DATA_COMPGEN(0x004efee4, saveGameCampaignSuffix, ".GMC"));
+        sprintf(pattern, DATA_COMPGEN(0x004efeec, saveGameCampaignPattern, "*.GMC"));
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(suffix, ".GXC");
-        sprintf(pattern, "*.GXC");
+        sprintf(suffix, DATA_COMPGEN(0x004efef4, saveGameExpansionCampaignSuffix, ".GXC"));
+        sprintf(pattern, DATA_COMPGEN(0x004efefc, saveGameExpansionCampaignPattern, "*.GXC"));
     } else if (xIsExpansionMap) {
-        sprintf(suffix, ".GX%d", nPlayers);
-        sprintf(pattern, "*.GX%d", nPlayers);
+        sprintf(suffix, DATA_COMPGEN(0x004eff04, saveGameExpansionSuffixFormat, ".GX%d"), nPlayers);
+        sprintf(pattern, DATA_COMPGEN(0x004eff0c, saveGameExpansionPatternFormat, "*.GX%d"), nPlayers);
     } else {
-        sprintf(suffix, ".GM%d", nPlayers);
-        sprintf(pattern, "*.GM%d", nPlayers);
+        sprintf(suffix, DATA_COMPGEN(0x004eff14, saveGameSuffixFormat, ".GM%d"), nPlayers);
+        sprintf(pattern, DATA_COMPGEN(0x004eff1c, saveGamePatternFormat, "*.GM%d"), nPlayers);
     }
 
     fileRequester* req = new fileRequester(
@@ -7815,8 +7827,12 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
-                /* "Игра успешно сохранена." */,
+                DATA_COMPGEN(
+                    0x004eff24,
+                    saveGameSuccessText,
+                    "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
+                    /* "Игра успешно сохранена." */
+                ),
                 1,
                 -1,
                 -1,
@@ -8424,7 +8440,11 @@ VA(0x004108a1, 0x5a)
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        sprintf(gText, "loop%04d.82M", index);
+        sprintf(
+            gText,
+            DATA_COMPGEN(0x004eff48, environmentLoopSampleFilenameFormat, "loop%04d.82M"),
+            index
+        );
         m_loopingSamples[index] = gpResourceManager->GetSample(gText);
     }
 }
@@ -8755,7 +8775,11 @@ void advManager::DimensionDoor(void) {
     i32 newY;
     mapCell* targetCell;
 
-    window = new heroWindow(0, 0, "dimdoor.bin");
+    window = new heroWindow(
+        0,
+        0,
+        DATA_COMPGEN(0x004eff58, dimensionDoorWindowFilename, "dimdoor.bin")
+    );
     if (window == NULL) {
         MemError();
     }
@@ -8772,7 +8796,11 @@ void advManager::DimensionDoor(void) {
             || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!",
+                DATA_COMPGEN(
+                    0x004eff64,
+                    dimensionDoorInvalidDestinationText,
+                    "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!"
+                ),
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8847,7 +8875,11 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            DATA_COMPGEN(
+                0x004eff94,
+                townGateNoAvailableTownText,
+                "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!"
+            ),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8862,7 +8894,11 @@ void advManager::TownGate(SpellType spellId) {
     }
     if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         NormalDialog(
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
+            DATA_COMPGEN(
+                0x004effc4,
+                townGateMustBeOnLandText,
+                "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee."
+            ),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8877,8 +8913,19 @@ void advManager::TownGate(SpellType spellId) {
     }
 
     if (spellId == SPELL_TOWN_PORTAL) {
-        townPortalWin = new heroWindow(TOWN_PORTAL_WINDOW_X, TOWN_PORTAL_WINDOW_Y, "townport.bin");
-        sprintf(gText, "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:");
+        townPortalWin = new heroWindow(
+            TOWN_PORTAL_WINDOW_X,
+            TOWN_PORTAL_WINDOW_Y,
+            DATA_COMPGEN(0x004f0014, townPortalWindowFilename, "townport.bin")
+        );
+        sprintf(
+            gText,
+            DATA_COMPGEN(
+                0x004f0024,
+                townPortalPromptText,
+                "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
+            )
+        );
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
         message.payload.widget.id = TOWN_PORTAL_TITLE_WIDGET;
@@ -8923,7 +8970,11 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            DATA_COMPGEN(
+                0x004f0060,
+                townGateOccupiedTownText,
+                "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!"
+            ),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -9103,9 +9154,13 @@ summon_done:
     Reseed(0, 0);
     if (!foundBoat) {
         NormalDialog(
-            "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
-            "\xf0\xe0\xe1\xeb\xfc!!!"
-            /* "Не удалось призвать корабль!!!" */,
+            DATA_COMPGEN(
+                0x004f0094,
+                summonBoatFailureText,
+                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
+                "\xf0\xe0\xe1\xeb\xfc!!!"
+                /* "Не удалось призвать корабль!!!" */
+            ),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
