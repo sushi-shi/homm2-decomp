@@ -6873,12 +6873,19 @@ void advManager::FizzleCenter(i32 fizzleType) {
     {
         switch (fizzleType) {
             case EVENT_FIZZLE_HERO_LOSS:
-                sprintf(gText, "killfade.82M");
+                sprintf(
+                    gText,
+                    DATA_COMPGEN(0x004f6f30, fizzleHeroLossFilename, "killfade.82M")
+                );
                 break;
             case EVENT_FIZZLE_ARTIFACT:
                 sprintf(
                     gText,
-                    "pickup%02d.82M",
+                    DATA_COMPGEN(
+                        0x004f6f40,
+                        fizzleArtifactFilenameFormat,
+                        "pickup%02d.82M"
+                    ),
                     Random(ARTIFACT_PICKUP_SOUND_FIRST, ARTIFACT_PICKUP_SOUND_LAST)
                 );
                 break;
