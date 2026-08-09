@@ -482,8 +482,8 @@ SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	9fab46e0fa00
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	100.0000	420dd0120836
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	ceeae97e2c72
 SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	100.0000	68fe469b96ca
-SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	100.0000	af27982dbb79
-SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	100.0000	451495831cfd
+SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	100.0000	11fa5ebebb36
+SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	100.0000	621aa27eb5ec
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	f0d7bb922a74
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	c273239b9bef
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	45ac9e4971b6
@@ -540,11 +540,11 @@ SOURCE/ADVMGR	?UpdBottomViewKingdom@advManager@@QAEHXZ	100.0000	9d6731492eb1
 SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	100.0000	912dd47cfe02
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	658fc92751f2
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	100.0000	627e2dd7ab18
-SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	1120b06ed666
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	100.0000	efb52d0d5f4a
+SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	1639c004dcf4
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	100.0000	d9eadc16b2b7
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	100.0000	b382d2a59535
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	100.0000	2b20f4c776e5
-SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	c591bf1af666
+SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	41bb8f26b909
 SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	100.0000	14d14a615e69
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	100.0000	d293c70ec5b8
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	100.0000	e1228c950620

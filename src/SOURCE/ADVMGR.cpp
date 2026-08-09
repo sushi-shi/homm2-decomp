@@ -961,6 +961,16 @@ H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
 H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
+#define ADVMGR_RADAR_LEFT_FLOAT \
+    DATA_COMPGEN(0x004ea43c, radarLeftFloat, static_cast<float>(RADAR_LEFT))
+#define ADVMGR_RADAR_TOP_FLOAT \
+    DATA_COMPGEN(0x004ea438, radarTopFloat, static_cast<float>(RADAR_TOP))
+#define ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE \
+    DATA_COMPGEN(0x004ea440, locatorScrollBaseYDouble, static_cast<double>(LOCATOR_SCROLL_BASE_Y))
+#define ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE \
+    DATA_COMPGEN(0x004ea448, locatorHeroScrollSpanDouble, static_cast<double>(LOCATOR_HERO_SCROLL_SPAN))
+#define ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE \
+    DATA_COMPGEN(0x004ea450, locatorTownScrollSpanDouble, static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN))
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 // The route-overlay byte at (column, row), read through this->m_visibilityMap.
 // Same grouping rule as MAP_EXTRA_AT in <SOURCE/KB.h>: retail adds the base and
@@ -4846,8 +4856,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (bNoFrame == 0) {
         if (gbInViewWorld != 0) {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(iVWMapOriginX * fScale + IDX(RADAR_LEFT)),
-                static_cast<i32>(iVWMapOriginY * fScale + IDX(RADAR_TOP)),
+                static_cast<i32>(iVWMapOriginX * fScale + ADVMGR_RADAR_LEFT_FLOAT),
+                static_cast<i32>(iVWMapOriginY * fScale + ADVMGR_RADAR_TOP_FLOAT),
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4858,8 +4868,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(m_mapOriginX * fScale + IDX(RADAR_LEFT)),
-                static_cast<i32>(m_mapOriginY * fScale + IDX(RADAR_TOP)),
+                static_cast<i32>(m_mapOriginX * fScale + ADVMGR_RADAR_LEFT_FLOAT),
+                static_cast<i32>(m_mapOriginY * fScale + ADVMGR_RADAR_TOP_FLOAT),
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4874,8 +4884,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<i32>(minx * fScale + IDX(RADAR_LEFT)),
-                static_cast<i32>(miny * fScale + IDX(RADAR_TOP)),
+                static_cast<i32>(minx * fScale + ADVMGR_RADAR_LEFT_FLOAT),
+                static_cast<i32>(miny * fScale + ADVMGR_RADAR_TOP_FLOAT),
                 static_cast<i32>((xhi - minx + 1) * fScale),
                 static_cast<i32>((yhi - miny + 1) * fScale)
             );
@@ -5679,11 +5689,11 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_heroCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollLeftButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        scrollStep = static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
+        scrollStep = ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE
 
                      / (gpCurPlayer->m_heroCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollLeftButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_heroLocatorPage * scrollStep + IDX(LOCATOR_SCROLL_BASE_Y)
+            gpCurPlayer->m_heroLocatorPage * scrollStep + ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE
         );
     }
     if (drawWindow) {
@@ -5753,11 +5763,11 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_townCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollRightButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        step = static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
+        step = ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE
 
                      / (gpCurPlayer->m_townCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollRightButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_townLocatorPage * step + IDX(LOCATOR_SCROLL_BASE_Y)
+            gpCurPlayer->m_townLocatorPage * step + ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE
         );
     }
     if (drawWindow) {
@@ -7543,8 +7553,7 @@ void advManager::DoHeroKnob(void) {
     i32 prevPage = gpCurPlayer->m_heroLocatorPage;
     i32 count = gpCurPlayer->m_heroCount;
     i32 pageIndex;
-    double scale =
-        static_cast<double>(LOCATOR_HERO_SCROLL_SPAN) / (count - LOCATOR_VISIBLE_COUNT);
+    double scale = ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE / (count - LOCATOR_VISIBLE_COUNT);
     i32 x;
     i32 y;
     gpMouseManager->MouseCoords(x, y);
@@ -7592,8 +7601,7 @@ void advManager::DoTownKnob(void) {
     i32 prevPage = gpCurPlayer->m_townLocatorPage;
     i32 count = gpCurPlayer->m_townCount;
     i32 pageIndex;
-    double scale =
-        static_cast<double>(LOCATOR_HERO_SCROLL_SPAN) / (count - LOCATOR_VISIBLE_COUNT);
+    double scale = ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE / (count - LOCATOR_VISIBLE_COUNT);
     i32 x;
     i32 y;
     gpMouseManager->MouseCoords(x, y);
