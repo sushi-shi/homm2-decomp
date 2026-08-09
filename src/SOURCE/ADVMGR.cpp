@@ -1335,7 +1335,7 @@ i32 advManager::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, "advManager");
+    strcpy(m_name, DATA_COMPGEN(0x004ef3b0, adventureManagerName, "advManager"));
     return 0;
 }
 
@@ -1425,7 +1425,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
-            "wsnd%1d%1d.82M",
+            DATA_COMPGEN(0x004ef3bc, cursorWalkSoundFilenameFormat, "wsnd%1d%1d.82M"),
 #if H2_STRICT_ENUMS
             IDX(cursorSampleSet),
 #else
@@ -1934,7 +1934,11 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
                             sprintf(
                                 gText,
-                                "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
+                                DATA_COMPGEN(
+                                    0x004ef3cc,
+                                    cheatCoordinatesFormat,
+                                    "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d"
+                                ),
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
@@ -2023,19 +2027,34 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 'e';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            DATA_COMPGEN(
+                                0x004ef408,
+                                restartGameConfirmationText,
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            )
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            DATA_COMPGEN(
+                                0x004ef44c,
+                                loadGameConfirmationText,
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            )
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
-                        strcpy(gText, "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?");
+                        strcpy(
+                            gText,
+                            DATA_COMPGEN(
+                                0x004ef494,
+                                quitGameConfirmationText,
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
+                            )
+                        );
                         goto confirm_game_command;
                     confirm_game_command:
                         quit = 1;
@@ -9972,29 +9991,41 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0"
-                                "\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4"
-                                "\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                /* "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)" */
+                                DATA_COMPGEN(
+                                    0x004f018c,
+                                    controlPanelRestartConfirmationText,
+                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0"
+                                    "\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4"
+                                    "\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                                    /* "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)" */
+                                )
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                "\xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc "
-                                "\xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0"
-                                "\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                /* "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)" */
+                                DATA_COMPGEN(
+                                    0x004f01d0,
+                                    controlPanelNewGameConfirmationText,
+                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc "
+                                    "\xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0"
+                                    "\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                                    /* "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)" */
+                                )
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
-                                /* "Вы действительно хотите выйти?" */
+                                DATA_COMPGEN(
+                                    0x004f0218,
+                                    controlPanelMainMenuConfirmationText,
+                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
+                                    /* "Вы действительно хотите выйти?" */
+                                )
                             );
                         confirm_reset:
                             handled = 1;
