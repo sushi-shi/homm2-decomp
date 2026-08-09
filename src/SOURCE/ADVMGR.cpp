@@ -5862,7 +5862,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_BACKGROUND_Y,
             ENEMY_TURN_BACKGROUND_WIDTH,
             ENEMY_TURN_BACKGROUND_HEIGHT,
-            "stonback.icn",
+            DATA_COMPGEN(
+                0x004efb54,
+                bottomEnemyTurnBackgroundFilename,
+                "stonback.icn"
+            ),
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_BACKGROUND_ID,
@@ -5879,7 +5883,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_HOURGLASS_Y,
             ENEMY_TURN_HOURGLASS_WIDTH,
             ENEMY_TURN_HOURGLASS_HEIGHT,
-            "hourglas.icn",
+            DATA_COMPGEN(
+                0x004efb64,
+                bottomEnemyTurnHourglassBackgroundFilename,
+                "hourglas.icn"
+            ),
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_HOURGLASS_ID,
@@ -5914,7 +5922,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
                     ENEMY_TURN_ANIMATION_HEIGHT,
-                    "hourglas.icn",
+                    DATA_COMPGEN(
+                        0x004efb74,
+                        bottomEnemyTurnAnimationFilename,
+                        "hourglas.icn"
+                    ),
                     iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET,
                     ICON_DRAW_NORMAL,
                     ENEMY_TURN_SAND_ID,
@@ -5950,7 +5962,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                "brcrest.icn",
+                DATA_COMPGEN(
+                    0x004efb84,
+                    bottomEnemyTurnCrestFilename,
+                    "brcrest.icn"
+                ),
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_CREST_ID,
@@ -5984,7 +6000,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                "hourglas.icn",
+                DATA_COMPGEN(
+                    0x004efb90,
+                    bottomEnemyTurnPhaseFilename,
+                    "hourglas.icn"
+                ),
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_PHASE_ID,
@@ -6029,7 +6049,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004efba0, bottomNewTurnBackgroundFilename, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6046,7 +6066,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_ICON_Y,
         NEW_TURN_DATE_ICON_WIDTH,
         NEW_TURN_DATE_ICON_HEIGHT,
-        "sunmoon.icn",
+        DATA_COMPGEN(0x004efbb0, bottomNewTurnDateIconFilename, "sunmoon.icn"),
         frameIndex,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6061,10 +6081,18 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     week = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
     sprintf(
         week,
-        "%s: %d  %s: %d",
-        "\xcc\xe5\xf1\xff\xf6" /* "Месяц" */,
+        DATA_COMPGEN(0x004efbcc, bottomNewTurnDateFormat, "%s: %d  %s: %d"),
+        DATA_COMPGEN(
+            0x004efbc4,
+            bottomNewTurnMonthText,
+            "\xcc\xe5\xf1\xff\xf6" /* "Месяц" */
+        ),
         gpGame->m_month,
-        "\xcd\xe5\xe4\xe5\xeb\xff" /* "Неделя" */,
+        DATA_COMPGEN(
+            0x004efbbc,
+            bottomNewTurnWeekText,
+            "\xcd\xe5\xe4\xe5\xeb\xff" /* "Неделя" */
+        ),
         gpGame->m_week
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -6085,14 +6113,23 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     day = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
-    sprintf(day, "%s: %d", "\xc4\xe5\xed\xfc" /* "День" */, gpGame->m_day);
+    sprintf(
+        day,
+        DATA_COMPGEN(0x004efbf4, bottomNewTurnDayFormat, "%s: %d"),
+        DATA_COMPGEN(
+            0x004efbec,
+            bottomNewTurnDayText,
+            "\xc4\xe5\xed\xfc" /* "День" */
+        ),
+        gpGame->m_day
+    );
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_DAY_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_DAY_TEXT_HEIGHT,
         day,
-        "bigfont.fnt",
+        DATA_COMPGEN(0x004efbfc, bottomNewTurnFontFilename, "bigfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6126,7 +6163,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004efc08, bottomResourceBackgroundFilename, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6177,7 +6214,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             RESOURCE_VIEW_ICON_BOTTOM - iconHeight - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
             iconWidth,
             iconHeight,
-            "resource.icn",
+            DATA_COMPGEN(0x004efc28, bottomResourceIconFilename, "resource.icn"),
             IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
@@ -6253,7 +6290,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004efc4c, bottomKingdomBackgroundFilename, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6270,7 +6307,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         KINGDOM_VIEW_ICON_Y,
         BOTTOM_VIEW_PANEL_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "ressmall.icn",
+        DATA_COMPGEN(0x004efc5c, bottomKingdomIconFilename, "ressmall.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6356,7 +6393,7 @@ i32 advManager::UpdBottomViewHero(void) {
         BOTTOM_HERO_PANEL_Y,
         BOTTOM_HERO_PANEL_WIDTH,
         BOTTOM_HERO_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004efc88, bottomHeroBackgroundFilename, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FIRST_MESSAGE,
@@ -6395,7 +6432,7 @@ i32 advManager::UpdBottomViewHero(void) {
                 if (targetHero->m_army.m_creatureCounts[slotNumber] > BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
                         armyCountLabelsResult[displayIndex],
-                        "%dk",
+                        DATA_COMPGEN(0x004efca4, bottomHeroAbbreviatedCountFormat, "%dk"),
                         targetHero->m_army.m_creatureCounts[slotNumber] / BOTTOM_HERO_COUNT_DIVISOR
                     );
                 } else {
@@ -6513,13 +6550,21 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             windowX = HERO_QUICK_DEFAULT_WINDOW_X;
             windowY = locatorSlot * HERO_QUICK_LOCATOR_ROW_HEIGHT + HERO_QUICK_LOCATOR_BASE_Y;
         }
-        win = new heroWindow(windowX, windowY, "qhero0.bin");
+        win = new heroWindow(
+            windowX,
+            windowY,
+            DATA_COMPGEN(0x004efcd4, heroQuickFreeWindowFilename, "qhero0.bin")
+        );
         if (win == NULL) {
             MemError();
         }
         SetWinText(win, HERO_QUICK_WINDOW_TEXT);
     } else {
-        win = new heroWindow(windowX, windowY, "qhero1.bin");
+        win = new heroWindow(
+            windowX,
+            windowY,
+            DATA_COMPGEN(0x004efce0, heroQuickLocatorWindowFilename, "qhero1.bin")
+        );
         if (win == NULL) {
             MemError();
         }
