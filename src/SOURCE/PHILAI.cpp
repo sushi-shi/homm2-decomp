@@ -6134,13 +6134,13 @@ VA(0x0048aee1, 0xc5)
 void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
+    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
     gaiHeroStrategicRVOfPos =
-        static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
+        static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
     gaiHeroEventStratRVOfPos =
-        static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
-    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT));
-    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT));
+        static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
+    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
+    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
 }
 
 VA(0x0048afa6, 0xda)
