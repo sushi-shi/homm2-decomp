@@ -726,7 +726,7 @@ SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	f37878a0f2d4
 SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	c5f56ecc3186
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	99.7826	1be488f25406
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	99.7115	e589a808d4bb
-SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	99.9780	b4ff5848f0bf
+SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	142e217461ad
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	99.9302	2c05237aafcf
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	8f4e1ff156cd
 SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	100.0000	39ffaa1b8172

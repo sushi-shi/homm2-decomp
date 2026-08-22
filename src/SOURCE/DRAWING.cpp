@@ -316,7 +316,14 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                         gArmyNames[IDX(actingMonsterType)]
                     );
                 else
-                    sprintf(gText, "");
+                    sprintf(
+                        gText,
+                        DATA_COMPGEN(
+                            0x005244b0,
+                            combatViewInfoEmptyMessage,
+                            ""
+                        )
+                    );
             }
             break;
     }
