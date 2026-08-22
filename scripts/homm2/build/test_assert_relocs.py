@@ -31,6 +31,7 @@ from homm2.build.assert_relocs import (
     parse_obj,
     relocation_addend_map,
     RelocAddressMismatch,
+    semantic_import_rvas,
     UnresolvedCandidateReloc,
 )
 from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_from_rows
@@ -63,6 +64,33 @@ class DataIdentityTranspositionTest(unittest.TestCase):
         self.assertEqual(len(transpositions), 1)
         self.assertEqual(transpositions[0]["sites"], [0x10, 0x20])
         self.assertEqual(unmatched, set())
+
+
+class SemanticImportIdentityTest(unittest.TestCase):
+    def test_iat_slots_match_by_dll_and_name_despite_order(self):
+        first = ("kernel32.dll", "name", "FindFirstFileA")
+        close = ("kernel32.dll", "name", "FindClose")
+        retail = {0xEA070: close, 0xEA078: first}
+        candidate = {0xEA080: first, 0xEA084: close}
+        records = [
+            {"name": "__imp__FindFirstFileA@8", "va": 0x4EA080},
+            {"name": "__imp__FindClose@4", "va": 0x4EA084},
+        ]
+        self.assertEqual(semantic_import_rvas(
+            retail, candidate, records, 0x400000), {
+                "__imp__FindFirstFileA@8": {0xEA078},
+                "__imp__FindClose@4": {0xEA070},
+            })
+
+    def test_ordinal_import_uses_dll_scoped_semantic_identity(self):
+        smack_open = ("smackw32.dll", "ordinal", 14)
+        retail = {0xEA3C8: smack_open}
+        candidate = {0xEA390: smack_open}
+        records = [{"name": "__imp__SmackOpen@12", "va": 0x4EA390}]
+        self.assertEqual(semantic_import_rvas(
+            retail, candidate, records, 0x400000), {
+                "__imp__SmackOpen@12": {0xEA3C8},
+            })
 
 
 class RelocOwnerTest(unittest.TestCase):

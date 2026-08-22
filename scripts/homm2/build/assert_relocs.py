@@ -428,14 +428,23 @@ def load_candidate_local_rvas(
     return result
 
 
-def candidate_reloc_rvas(sym, data, dups, local_rvas, unit, reloc):
-    """Resolve a candidate relocation, including reviewed TU-local storage."""
+def candidate_reloc_rvas(sym, data, dups, local_rvas, unit, reloc,
+                         import_rvas=None):
+    """Resolve a candidate relocation, including local and import storage.
+
+    Import symbols denote IAT slots, whose final RVA is link-order-sensitive.
+    ``import_rvas`` maps their candidate COFF spellings to the retail slots with
+    the same DLL/name-or-ordinal identity.
+    """
     typ, symbol, addend = reloc
     candidates = _resolved_reloc_candidates(sym, data, dups, reloc)
     if typ == "DIR32":
         candidates.update(
             (rva + addend) & 0xFFFFFFFF
             for rva in local_rvas.get((unit, symbol), ()))
+        candidates.update(
+            (rva + addend) & 0xFFFFFFFF
+            for rva in (import_rvas or {}).get(symbol, ()))
     return candidates
 
 
@@ -509,6 +518,85 @@ def _load_pe_image(path):
         sections.append((name, rva, rva + max(virtual_size, raw_size),
                          raw_offset, raw_size))
     return payload, image_base, sections
+
+
+def _pe_import_iat_identities(path):
+    """Map each IAT slot RVA to its semantic DLL/name-or-ordinal identity."""
+    image = _load_pe_image(path)
+    payload = image[0]
+    pe = struct.unpack_from("<L", payload, 0x3c)[0]
+    optional = pe + 24
+    if struct.unpack_from("<H", payload, optional)[0] != 0x10B:
+        raise ValueError("expected PE32 image: %s" % path)
+    directory_count = struct.unpack_from("<I", payload, optional + 92)[0]
+    if directory_count <= 1:
+        return {}
+    import_rva = struct.unpack_from("<I", payload, optional + 96 + 8)[0]
+    if not import_rva:
+        return {}
+
+    def read(rva, size):
+        value = _image_read_rva(image, rva, size)
+        if value is None or len(value) != size:
+            raise ValueError(
+                "import RVA 0x%x is outside raw PE sections in %s" %
+                (rva, path))
+        return value
+
+    def c_string(rva):
+        value = bytearray()
+        while True:
+            byte = read(rva + len(value), 1)[0]
+            if byte == 0:
+                return value.decode("ascii", "replace")
+            value.append(byte)
+
+    result = {}
+    for descriptor_index in range(4096):
+        descriptor_rva = import_rva + descriptor_index * 20
+        descriptor = struct.unpack("<IIIII", read(descriptor_rva, 20))
+        if not any(descriptor):
+            return result
+        lookup_rva, _timestamp, _forwarder, name_rva, address_rva = descriptor
+        dll = c_string(name_rva).lower()
+        lookup_rva = lookup_rva or address_rva
+        for thunk_index in range(65536):
+            value = struct.unpack(
+                "<I", read(lookup_rva + thunk_index * 4, 4))[0]
+            if value == 0:
+                break
+            if value & 0x80000000:
+                identity = (dll, "ordinal", value & 0xFFFF)
+            else:
+                identity = (dll, "name", c_string(value + 2))
+            result[address_rva + thunk_index * 4] = identity
+        else:
+            raise ValueError("unterminated import thunk table in %s" % path)
+    raise ValueError("unterminated import descriptor table in %s" % path)
+
+
+def semantic_import_rvas(retail_iat, candidate_iat, map_records,
+                         candidate_image_base):
+    """Map candidate ``__imp__`` spellings to retail semantic IAT RVAs.
+
+    MAP records establish which candidate IAT slot a COFF symbol denotes.  The
+    two PE import directories then pair slots by stable DLL/name-or-ordinal
+    identity, independent of each link's intra-DLL resolution-history order.
+    """
+    retail_by_identity = {}
+    for rva, identity in retail_iat.items():
+        retail_by_identity.setdefault(identity, set()).add(rva)
+    result = {}
+    for record in map_records:
+        name = record.get("name", "")
+        if not name.startswith("__imp__"):
+            continue
+        candidate_rva = record["va"] - candidate_image_base
+        identity = candidate_iat.get(candidate_rva)
+        retail_rvas = retail_by_identity.get(identity, ())
+        if retail_rvas:
+            result.setdefault(name, set()).update(retail_rvas)
+    return result
 
 
 def _image_read_rva(image, rva, size):
@@ -606,7 +694,8 @@ def check_linked_pe_data_targets(base_sites, target_sites, retail_function_rva,
 
 
 def check_pe_data_targets(sym, data, dups, local_rvas, unit, function_rva,
-                          base_sites, target_sites, section_ranges, pe_read=_pe_read):
+                          base_sites, target_sites, section_ranges,
+                          pe_read=_pe_read, import_rvas=None):
     """Compare aligned candidate DIR32 destinations with raw retail PE operands.
 
     Delinked target symbols are useful topology, but the linked retail operand is
@@ -629,7 +718,7 @@ def check_pe_data_targets(sym, data, dups, local_rvas, unit, function_rva,
             continue
         actual = candidate_reloc_rvas(
             sym, data, dups, local_rvas, unit,
-            (base_type, base_symbol, base_addend))
+            (base_type, base_symbol, base_addend), import_rvas)
         if not actual:
             problems.append(UnresolvedCandidateReloc(
                 site, expected, base_symbol))
@@ -796,7 +885,7 @@ def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
                                   candidate_function_rva,
                                   base_sites, target_sites,
                                   retail_image, candidate_image,
-                                  retail_section_ranges):
+                                  retail_section_ranges, import_rvas=None):
     """Compare every linked data-target identity without assuming site alignment.
 
     This is the exhaustive complement to the ordered context pass.  Retail
@@ -813,7 +902,7 @@ def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
     for record in candidate:
         relocation = base_by_site[record["site"]]
         identities = candidate_reloc_rvas(
-            sym, data, dups, local_rvas, unit, relocation[1:])
+            sym, data, dups, local_rvas, unit, relocation[1:], import_rvas)
         record["identities"] = sorted(
             rva for rva in identities
             if any(start <= rva < end
@@ -1253,6 +1342,15 @@ def review_pe_data_targets():
     local_rvas = load_candidate_local_rvas()
     section_ranges = _pe_named_section_ranges()
     map_records = parse_map_symbol_records("build/link/HMM2PL.map")
+    retail_import_iat = _pe_import_iat_identities("build/orig/HMM2PL.exe")
+    candidate_import_iat = _pe_import_iat_identities("build/link/HMM2PL.exe")
+    import_rvas = semantic_import_rvas(
+        retail_import_iat, candidate_import_iat, map_records,
+        candidate_image[1])
+    candidate_map_imports = {
+        record["name"] for record in map_records
+        if record.get("name", "").startswith("__imp__")
+    }
     candidate_functions = {}
     for record in map_records:
         candidate_functions.setdefault(record["name"], []).append(record)
@@ -1335,7 +1433,7 @@ def review_pe_data_targets():
                 sym, data, dups, local_rvas, unit, function_rva,
                 candidate_function_rva, base_functions[name],
                 target_functions[name], retail_image, candidate_image,
-                section_ranges)
+                section_ranges, import_rvas)
             audit_stats["retail_multiset_sites"] += multiset["expected_count"]
             audit_stats["candidate_multiset_sites"] += multiset["candidate_count"]
             audit_stats["multiset_matched_sites"] += multiset["matched_count"]
@@ -1392,7 +1490,8 @@ def review_pe_data_targets():
             if multiset["expected_count"] == multiset["candidate_count"]:
                 identity_problems = check_pe_data_targets(
                     sym, data, dups, local_rvas, unit, function_rva,
-                    aligned_base, target_functions[name], section_ranges)
+                    aligned_base, target_functions[name], section_ranges,
+                    import_rvas=import_rvas)
             checked_sites += sum(
                 relocation[1] == "DIR32" for relocation in base_functions[name])
             for problem in problems:
@@ -1403,7 +1502,7 @@ def review_pe_data_targets():
         identity_bad)
 
     output = {
-        "schema": 5,
+        "schema": 6,
         "scope": "all configured functions with retail and candidate linked owners",
         "ordered_identity_scope": (
             "equal data-target count and matching linked instruction context"),
@@ -1414,6 +1513,14 @@ def review_pe_data_targets():
         "skipped_functions": skipped_functions,
         "unavailable_functions": unavailable_functions,
         "duplicate_report_records": duplicate_report_records,
+        "semantic_imports": {
+            "retail_iat_slots": len(retail_import_iat),
+            "candidate_iat_slots": len(candidate_import_iat),
+            "candidate_map_symbols": len(candidate_map_imports),
+            "mapped_candidate_symbols": len(import_rvas),
+            "unmapped_candidate_symbols": sorted(
+                candidate_map_imports - set(import_rvas)),
+        },
         "compared_data_sites": audit_stats["compared_section_sites"],
         "compared_rdata_sites": audit_stats["compared_rdata_sites"],
         "compared_writable_data_sites": audit_stats["compared_writable_data_sites"],

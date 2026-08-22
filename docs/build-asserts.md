@@ -161,7 +161,10 @@ it is a floating-point type.
   site alignment, so a shifted instruction or payload-equivalent compiler local
   at another address cannot hide a substitution. A separate context-aligned pass
   records final section-offset drift and ordered identity transpositions in
-  `build/gen/linked_data_relocs.json`. Unequal relocation counts remain explicit
+  `build/gen/linked_data_relocs.json`. IAT slots are paired semantically through
+  each PE import directory by DLL plus imported name or ordinal; differing
+  resolution-history order therefore needs no manual `__imp__` address claims.
+  Unequal relocation counts remain explicit
   structural residuals, with candidate over-publications and identities absent
   from the corresponding retail function reported separately. This prevents a
   shape mismatch from suppressing a private-owner mapping error.
