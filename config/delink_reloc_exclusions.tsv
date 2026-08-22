@@ -4,3 +4,10 @@
 site_rva	reason
 0xfa654	packed-gMonsterDatabase-fields-form-image-va
 0xff580	packed-IMHotSpots-fields-form-image-va
+0x118c0c	packed-sBuildingInfo-fields-form-image-va
+0x118c10	packed-sBuildingInfo-fields-form-image-va
+0x118cb4	packed-sBuildingInfo-fields-form-image-va
+0x118d44	packed-sBuildingInfo-fields-form-image-va
+0x118dc0	packed-sBuildingInfo-fields-form-image-va
+0x118fc8	packed-sBuildingInfo-fields-form-image-va
+0x119038	packed-sBuildingInfo-fields-form-image-va
