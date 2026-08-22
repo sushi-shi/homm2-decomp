@@ -128,6 +128,13 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertIsNone(
             _compgen_candidate_kind(candidate("A", "__real@8@invalid")))
 
+    def test_compgen_recognizes_plain_vc6_ordinal_bss_guard(self):
+        guard = replace(
+            candidate("A", "_$S18"), section_name=".bss", storage="bss"
+        )
+        self.assertEqual(_compgen_candidate_kind(guard), "STATIC_INIT_GUARD")
+        self.assertIsNone(_compgen_candidate_kind(candidate("A", "_$S18")))
+
     def test_compgen_interior_alias_keeps_the_owning_allocation(self):
         owner = CompgenDataClaim(
             "A", 0x100, "sourceFile", "STRING_LITERAL", 8,

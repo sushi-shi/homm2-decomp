@@ -32,6 +32,9 @@ DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_CO
 };
 DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusicState::stream;
 DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusicState::source;
+DATA_COMPGEN_GUARD(
+    0x005395e4, audiereMusicStateInitializationGuard, AudiereMusicState
+)
 DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
 
 VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::stream)

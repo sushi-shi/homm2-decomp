@@ -69,6 +69,7 @@ COMMON_HEADER = ("object", "name", "size")
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
+ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
 
@@ -330,6 +331,9 @@ def _compgen_candidate_kind(candidate: CandidateDefinition) -> str | None:
             candidate.symbol):
         return "FLOAT_LITERAL"
     if candidate.symbol.startswith("_$S5$"):
+        return "STATIC_INIT_GUARD"
+    if (candidate.storage == "bss"
+            and ORDINAL_STATIC_GUARD.fullmatch(candidate.symbol)):
         return "STATIC_INIT_GUARD"
     return None
 
