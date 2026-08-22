@@ -2438,7 +2438,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
 
 DATA(0x005240e8) i32 bInHighMoraleBonus = 0;
 DATA(0x004f0c54) i32 giSeed = 1;
-u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
+DATA(0x004f0c58) u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
 DATA(0x005240e4) i32 bMouseWasVis;
 DATA(0x005240e0) class heroWindow* CSPanel;
 DATA(0x005240dc) i32 bCPrefsChanged;
