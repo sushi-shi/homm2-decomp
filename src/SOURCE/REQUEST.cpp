@@ -987,9 +987,9 @@ void fileRequester::DoKnob(void) {
                 knobMessage.payload.mouse.y = static_cast<i32>(knobOffset + fGutterMinY);
             }
             if (static_cast<float>(knobMessage.payload.mouse.y)
-                > knobOffset + fGutterTravelLength + fGutterMinY) {
+                > knobOffset + fGutterMinY + fGutterTravelLength) {
                 knobMessage.payload.mouse.y =
-                    static_cast<i32>(knobOffset + fGutterTravelLength + fGutterMinY);
+                    static_cast<i32>(knobOffset + fGutterMinY + fGutterTravelLength);
             }
             gpMouseManager->Main(knobMessage);
             m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;

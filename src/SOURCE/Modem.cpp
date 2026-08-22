@@ -262,7 +262,7 @@ void Connect(void) {
         }
 
         stime = KBTickCount();
-        if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
+        if (stime / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
@@ -305,7 +305,7 @@ i32 WaitForDirectConnect(void) {
                 oldsec = -1;
             }
             stime = KBTickCount();
-            if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
+            if (stime / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
                 oldsec = stime;
                 sprintf(idMessage, "ID%s_%i", idstr, localstage);
                 WriteModemPacket(idMessage, strlen(idMessage));
