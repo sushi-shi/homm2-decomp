@@ -3114,7 +3114,7 @@ void townManager::SetupWell(heroWindow* window) {
         )];
         strcpy(
             gText,
-            DATA_COMPGEN(0x00533ed0, townWellDetailEmpty, "")
+            ""
         );
         sprintf(detailText_i, "%s%d", cWellDetail[WELL_DETAIL_ATTACK], monsterInfo_f.attack);
         strcat(gText, detailText_i);
@@ -3369,7 +3369,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x00533ed4, thievesGuildPrimaryStatsEmpty, "")
+                        ""
                     );
                     for (heroPosition_d = 0;
                          heroPosition_d < TOWN_THIEVES_PRIMARY_STAT_COUNT;

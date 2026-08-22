@@ -33,7 +33,7 @@
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
 #define COMBAT_CATAPULT_DISTANCE_ARC_SCALE                                         \
-    DATA_COMPGEN(0x004ea568, combatCatapultDistanceArcScale, 0.3)
+    0.3
 #define COMBAT_CATAPULT_TARGET_ARC_SCALE 0.35
 #define COMBAT_MISSILE_DEGREES_PER_RADIAN 180.0
 #define COMBAT_MISSILE_PI 3.14159
@@ -203,9 +203,9 @@ combatManager::combatManager(void) {
     m_mouseGridHex = -1;
     m_combatWindowOpen = 0;
     strcpy(m_previousCombatMessage,
-           DATA_COMPGEN(0x005240ec, combatManagerPreviousMessageEmpty, ""));
+           "");
     strcpy(m_currentCombatMessage,
-           DATA_COMPGEN(0x005240f0, combatManagerCurrentMessageEmpty, ""));
+           "");
 }
 
 VA(0x00425f8f, 0xfa)
@@ -352,11 +352,7 @@ void combatManager::SetupCombat(
             );
             strcpy(
                 m_captain.m_name,
-                DATA_COMPGEN(
-                    0x004f0c5c,
-                    combatCaptainName,
-                    "\xca\xe0\xef\xe8\xf2\xe0\xed" /* "Капитан" */
-                )
+                "\xca\xe0\xef\xe8\xf2\xe0\xed" /* "Капитан" */
             );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
@@ -523,7 +519,7 @@ i32 combatManager::Open(i32 openFlags) {
     glTimers[0] = KBTickCount();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
-    CombatMessage(DATA_COMPGEN(0x005240f4, combatOpenEmptyMessage, ""), 1, 1, 0);
+    CombatMessage("", 1, 1, 0);
     gConfig.showCombatMouseHex = savedMouseHex;
     if (gpBufferPalette->m_data != m_combatPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);

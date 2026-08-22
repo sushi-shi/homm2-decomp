@@ -271,7 +271,7 @@ H2_ENUM_END(OverviewDialogConstant)
 #define OVERVIEW_SCROLL_KNOB_RANGE_FLOAT 303.0
 #define OVERVIEW_SCROLL_MIN_Y_FLOAT 18.0f
 #define OVERVIEW_SCROLL_ROUNDING_OFFSET                                            \
-    DATA_COMPGEN(0x004ea640, overviewScrollRoundingOffset, 0.4)
+    0.4
 
 #define OVERVIEW_TEXT_WIDGET(row, item)                                                            \
     (*(textWidgetDynamic + (row) * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + (item)))

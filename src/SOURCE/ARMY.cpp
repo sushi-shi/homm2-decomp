@@ -29,7 +29,7 @@
 #define ARMY_HASTE_WALK_DURATION_SCALE 0.65
 #define ARMY_SLOW_WALK_DURATION_SCALE 1.5
 #define ARMY_PROJECTILE_PI \
-    DATA_COMPGEN(0x004ea4e8, projectilePi, 3.14159)
+    3.14159
 #define ARMY_SHOOT_UP_MIN_ANGLE 25.0f
 #define ARMY_SHOOT_FORWARD_MIN_ANGLE -25.0f
 #define ARMY_SPELL_CHANCE_NONE 0.0f
@@ -40,7 +40,7 @@
 #define ARMY_DURATION_BASE_SCALE 1.0
 #define ARMY_ATTACK_DURATION_SPEED_SCALE 0.08
 #define ARMY_WALK_DURATION_SPEED_SCALE                                             \
-    DATA_COMPGEN(0x004ea528, armyWalkDurationSpeedScale, 0.12)
+    0.12
 
 namespace {
 

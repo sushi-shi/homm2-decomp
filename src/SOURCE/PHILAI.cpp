@@ -27,16 +27,16 @@
 #include <BASE/mouseManager.h>
 
 #define AI_SECONDARY_SKILL_FIGHT_SCALE                                             \
-    DATA_COMPGEN(0x004ea7a8, aiSecondarySkillFightScale, 2500.0f)
+    2500.0f
 #define AI_SECONDARY_SKILL_BASE_FACTOR                                             \
-    DATA_COMPGEN(0x004ea500, aiSecondarySkillBaseFactor, 0.5)
+    0.5
 #define AI_SECONDARY_SKILL_NAVIGATION_FACTOR 1.3
 #define AI_SECONDARY_SKILL_ARCHERY_SHARE 0.2
 #define AI_SECONDARY_SKILL_ARCHERY_BASE                                            \
-    DATA_COMPGEN(0x004ea5a0, aiSecondarySkillArcheryBase, 0.25)
+    0.25
 #define AI_GENERIC_SITE_ARENA_VALUE 1000.0f
 #define AI_GENERIC_SITE_MERMAID_VALUE                                              \
-    DATA_COMPGEN(0x004ea720, aiGenericSiteMermaidValue, 200.0f)
+    200.0f
 #define AI_GENERIC_SITE_DAY_VALUE 200
 #define AI_MINIMUM_FIGHT_VALUE 100
 #define AI_FRAME_THROTTLE_TICKS 15
@@ -44,36 +44,36 @@
 #define AI_MINIMUM_SITE_MOBILITY 75
 #define AI_HERO_PURCHASE_GOLD_FLOOR 2500
 #define AI_BERSERK_THRESHOLD 30000
-#define AI_ZERO_FLOAT DATA_COMPGEN(0x004ea520, aiZeroFloat, 0.0f)
-#define AI_RELOAD_BASE DATA_COMPGEN(0x004ea4e4, aiReloadBase, 2.0f)
+#define AI_ZERO_FLOAT 0.0f
+#define AI_RELOAD_BASE 2.0f
 #define AI_RELOAD_NUMERATOR 3.0f
 #define AI_EASY_STRENGTH_FACTOR                                                    \
-    DATA_COMPGEN(0x004ea678, aiEasyStrengthFactor, 1.15)
+    1.15
 #define AI_BERSERK_FACTOR 0.75
-#define AI_HERO_VALUE_SCALE DATA_COMPGEN(0x004ea698, aiHeroValueScale, 0.00004)
+#define AI_HERO_VALUE_SCALE 0.00004
 #define AI_HERO_VALUE_BASE 0.4
 #define AI_ARTIFACT_POOL_DIVISOR                                                   \
-    DATA_COMPGEN(0x004ea690, aiArtifactPoolDivisor, 33.0)
+    33.0
 #define AI_BATTLE_TOWN_DEFENDER_FACTOR                                             \
-    DATA_COMPGEN(0x004ea6f0, aiBattleTownDefenderFactor, 1.11)
+    1.11
 #define AI_BATTLE_DIFFICULTY_STEP                                                  \
-    DATA_COMPGEN(0x004ea6e8, aiBattleDifficultyStep, 0.15)
+    0.15
 #define AI_BATTLE_BASE_STRENGTH_FACTOR 0.7
 #define AI_BATTLE_EASY_STRENGTH_FACTOR                                             \
-    DATA_COMPGEN(0x004ea6e0, aiBattleEasyStrengthFactor, 1.08)
+    1.08
 #define AI_BATTLE_HUMAN_DEFENDER_FACTOR                                            \
-    DATA_COMPGEN(0x004ea6d8, aiBattleHumanDefenderFactor, 1.14)
+    1.14
 #define AI_BATTLE_MINIMUM_STRENGTH                                                 \
-    DATA_COMPGEN(0x004ea518, aiBattleMinimumStrength, 1.0f)
+    1.0f
 #define AI_BATTLE_FULL_CHANCE 1.0f
 #define AI_BATTLE_LARGE_STRENGTH                                                   \
-    DATA_COMPGEN(0x004ea6d0, aiBattleLargeStrength, 1000000.0f)
+    1000000.0f
 #define AI_BATTLE_NORMAL_POWER 2.75f
 #define AI_BATTLE_LARGE_POWER 2.0f
 #define AI_BATTLE_ZERO_CHANCE 0.08
 #define AI_BATTLE_LOW_CHANCE 0.12
 #define AI_BATTLE_LOW_PENALTY                                                      \
-    DATA_COMPGEN(0x004ea688, aiBattleLowPenalty, 0.07)
+    0.07
 #define AI_BATTLE_MEDIUM_CHANCE 0.2
 #define AI_BATTLE_MEDIUM_PENALTY 0.05
 #define AI_BATTLE_HIGH_CHANCE 0.3
@@ -81,35 +81,35 @@
 #define AI_BATTLE_TOP_CHANCE 0.4
 #define AI_BATTLE_TOP_PENALTY 0.02
 #define AI_BATTLE_LOSS_FACTOR_BASE                                                 \
-    DATA_COMPGEN(0x004ea6c8, aiBattleLossFactorBase, 1.33)
+    1.33
 #define AI_BATTLE_PLAYER_FACTOR_BASE 0.66
 #define AI_BATTLE_HERO_EXPERIENCE_FACTOR 0.8
 #define AI_BATTLE_PERCENT_SCALE                                                    \
-    DATA_COMPGEN(0x004ea4c8, aiBattlePercentScale, 100.0f)
+    100.0f
 #define AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP 0.12
 #define AI_QUICK_COMBAT_WIN_BONUS_THRESHOLD                                       \
-    DATA_COMPGEN(0x004ea618, aiQuickCombatWinBonusThreshold, 0.6)
+    0.6
 #define AI_QUICK_COMBAT_WIN_BONUS                                                  \
-    DATA_COMPGEN(0x004ea510, aiQuickCombatWinBonus, 0.65)
+    0.65
 #define AI_QUICK_COMBAT_HIGH_WIN_CHANCE 0.8
 #define AI_QUICK_COMBAT_MINIMUM_CASUALTY 0.2
 #define AI_QUICK_COMBAT_CASUALTY_CAP_CHANCE 0.96
 #define AI_QUICK_COMBAT_CASUALTY_DIVISOR 2.0f
 #define AI_QUICK_COMBAT_DAMAGE_PENALTY_LOW 0.6
 #define AI_QUICK_COMBAT_DAMAGE_PENALTY_HIGH                                       \
-    DATA_COMPGEN(0x004ea778, aiQuickCombatDamagePenaltyHigh, 0.99)
+    0.99
 #define AI_QUICK_COMBAT_DAMAGE_PENALTY 0.1
 #define AI_QUICK_COMBAT_DEFEAT_THRESHOLD 0.99
 #define AI_QUICK_COMBAT_NECROMANCY_THRESHOLD                                      \
-    DATA_COMPGEN(0x004ea538, aiQuickCombatNecromancyThreshold, 0.999)
+    0.999
 #define AI_QUICK_COMBAT_NECROMANCY_FACTOR 0.12
 #define AI_TOWN_DEFENSE_THRESHOLD 0.7
 #define AI_TOWN_ARCHER_OVERWHELMING_FACTOR                                        \
-    DATA_COMPGEN(0x004ea6c0, aiTownArcherOverwhelmingFactor, 1.25)
+    1.25
 #define AI_TOWN_ARCHER_ADVANTAGE_FACTOR                                            \
-    DATA_COMPGEN(0x004ea6b8, aiTownArcherAdvantageFactor, 0.9)
+    0.9
 #define AI_UPGRADE_EXISTING_STACK_FACTOR                                           \
-    DATA_COMPGEN(0x004ea4b0, aiUpgradeExistingStackFactor, 1.2)
+    1.2
 #define AI_HERO_INTERACTION_ALPHA_SHARE 0.6
 #define AI_HERO_INTERACTION_TARGET_SHARE 0.7f
 #define AI_HERO_INTERACTION_MINIMUM_TRANSFER 0.15
@@ -117,32 +117,32 @@
 #define AI_PURCHASE_RANDOM_DIVISOR 100.0
 #define AI_CREATURE_BALANCE_BASE 0.66
 #define AI_CREATURE_VISITING_HERO_FACTOR                                           \
-    DATA_COMPGEN(0x004ea4a8, aiCreatureVisitingHeroFactor, 1.1)
+    1.1
 #define AI_CREATURE_RANGED_BASE_FACTOR                                             \
-    DATA_COMPGEN(0x004ea718, aiCreatureRangedBaseFactor, 1.18)
+    1.18
 #define AI_CREATURE_RANGED_STACK_FACTOR                                            \
-    DATA_COMPGEN(0x004ea4a0, aiCreatureRangedStackFactor, 0.06)
+    0.06
 #define AI_CREATURE_DANGER_BASE                                                    \
-    DATA_COMPGEN(0x004ea710, aiCreatureDangerBase, 0.96)
+    0.96
 #define AI_CREATURE_EASY_COST_FACTOR 1.3
 #define AI_CREATURE_RANDOM_BASE 90
 #define AI_HERO_PURCHASE_BONUS 500.0f
 #define AI_HERO_PURCHASE_FACTOR 1.3
 #define AI_FIGHT_EVENT_REWARD_500_VALUE                                           \
-    DATA_COMPGEN(0x004ea6a0, aiFightEventReward500Value, 500.0f)
+    500.0f
 #define AI_FIGHT_EVENT_REWARD_1000_VALUE                                          \
-    DATA_COMPGEN(0x004ea7a4, aiFightEventReward1000Value, 1000.0f)
+    1000.0f
 #define AI_FIGHT_EVENT_REWARD_2000_VALUE                                          \
-    DATA_COMPGEN(0x004ea79c, aiFightEventReward2000Value, 2000.0f)
+    2000.0f
 #define AI_FIGHT_EVENT_REWARD_3000_VALUE                                          \
-    DATA_COMPGEN(0x004ea7a0, aiFightEventReward3000Value, 3000.0f)
+    3000.0f
 #define AI_FIGHT_EVENT_REWARD_5000_VALUE                                          \
-    DATA_COMPGEN(0x004ea798, aiFightEventReward5000Value, 5000.0f)
+    5000.0f
 #define AI_HERO_PURCHASE_GOLD_COST 2500
 #define AI_HERO_PURCHASE_EXPERIENCE_BASE 2000
 #define AI_HERO_PURCHASE_CELL_PENALTY 200.0f
 #define AI_HERO_PURCHASE_RANDOM_BASE                                               \
-    DATA_COMPGEN(0x004ea728, aiHeroPurchaseRandomBase, 90.0)
+    90.0
 #define AI_PURCHASE_INITIAL_VALUE -99.0f
 #define AI_MINIMUM_PURCHASE_VALUE 0.02
 #define AI_DIMENSION_DOOR_SPELL_POINTS 30
@@ -166,15 +166,15 @@
 #define AI_STRONGER_ARMY_TRANSFER_FACTOR 0.13f
 #define AI_TOWN_TRANSFER_CURVE_OFFSET 1.0f
 #define AI_TOWN_TRANSFER_CURVE_CENTER                                              \
-    DATA_COMPGEN(0x004ea780, aiTownTransferCurveCenter, 0.22)
+    0.22
 #define AI_PATHFINDING_DESERT_MOBILITY_FACTOR                                      \
-    DATA_COMPGEN(0x004ea5b8, aiPathfindingDesertMobilityFactor, 1.35)
+    1.35
 #define AI_LARGE_MAP_MOBILITY_FACTOR                                               \
-    DATA_COMPGEN(0x004ea6b0, aiLargeMapMobilityFactor, 1.05)
+    1.05
 #define AI_MAGE_GUILD_LATE_FACTOR                                                  \
-    DATA_COMPGEN(0x004ea708, aiMageGuildLateFactor, 0.55)
+    0.55
 #define AI_EARLY_DWELLING_FACTOR_BASE                                              \
-    DATA_COMPGEN(0x004ea700, aiEarlyDwellingFactorBase, 1.66)
+    1.66
 #define AI_CONQUERED_HERO_MOBILITY_LIMIT 20
 #define AI_UNGUARDED_TOWN_VALUE 500
 #define AI_TROOP_EMPTY_SLOT -1
@@ -187,32 +187,32 @@
 #define AI_TROOP_REDISTRIBUTION_BUDGET_FACTOR 1.2
 #define AI_CREATURE_SELECTION_WORST_VALUE 1000000000.0f
 #define AI_CREATURE_OFF_RACE_FACTOR                                                \
-    DATA_COMPGEN(0x004ea560, aiCreatureOffRaceFactor, 0.35)
+    0.35
 #define AI_CREATURE_SELECTION_BASE_VALUE                                           \
-    DATA_COMPGEN(0x004ea740, aiCreatureSelectionBaseValue, 500.0)
+    500.0
 #define AI_DWELLING_LEVELS 12
 #define AI_GOLD_RESOURCE_MULTIPLIER 100
 #define AI_CAMPFIRE_RESOURCE_AMOUNT 5.0f
 #define AI_CAMPFIRE_GOLD_AMOUNT 500.0f
 #define AI_CAMPFIRE_AVERAGE_DIVISOR                                                \
-    DATA_COMPGEN(0x004ea7d4, aiCampfireAverageDivisor, 6.0f)
-#define AI_OASIS_VALUE_FACTOR DATA_COMPGEN(0x004ea7d0, aiOasisValueFactor, 350.0f)
+    6.0f
+#define AI_OASIS_VALUE_FACTOR 350.0f
 #define AI_TREASURE_CHEST_GOLD_AMOUNT                                              \
-    DATA_COMPGEN(0x004ea7d8, aiTreasureChestGoldAmount, 1600.0f)
-#define AI_TEMPLE_VALUE_FACTOR DATA_COMPGEN(0x004ea7cc, aiTempleValueFactor, 400.0f)
+    1600.0f
+#define AI_TEMPLE_VALUE_FACTOR 400.0f
 #define AI_MORALE_LUCK_SITE_VALUE_FACTOR 200.0f
 #define AI_WATERING_HOLE_VALUE_FACTOR                                              \
-    DATA_COMPGEN(0x004ea7c8, aiWateringHoleValueFactor, 300.0f)
+    300.0f
 #define AI_GAZEBO_VALUE_FACTOR 1000.0f
 #define AI_TRAINING_SITE_VALUE_FACTOR 1000.0f
 #define AI_TREE_KNOWLEDGE_VALUE_FACTOR 1500.0f
 #define AI_TREE_KNOWLEDGE_GOLD_COST 2000.0f
 #define AI_TREE_KNOWLEDGE_GEM_COST                                                 \
-    DATA_COMPGEN(0x004ea570, aiTreeKnowledgeGemCost, 10.0f)
-#define AI_XANADU_VALUE_MULTIPLE DATA_COMPGEN(0x004ea7ac, aiXanaduValueMultiple, 8.0f)
+    10.0f
+#define AI_XANADU_VALUE_MULTIPLE 8.0f
 #define AI_TRAVEL_GATE_INITIAL_VALUE -9999
 #define AI_TRAVEL_GATE_EXIT_SCALE                                                  \
-    DATA_COMPGEN(0x004ea5c0, aiTravelGateExitScale, 0.85)
+    0.85
 #define AI_TRAVEL_GATE_EXIT_RADIUS 3
 #define AI_TRAVEL_GATE_EXIT_DEPTH 700
 #define AI_TRAVEL_GATE_CURRENT_DEPTH 500
@@ -221,39 +221,39 @@
 #define AI_POSITION_DISTANCE_BASE 0.2
 #define AI_POSITION_STRATEGIC_DISTANCE_BASE 1.0f
 #define AI_STRATEGIC_DISTANCE_OFFSET                                               \
-    DATA_COMPGEN(0x004ea758, aiStrategicDistanceOffset, 50.0)
+    50.0
 #define AI_POSITION_EMBARKED_DISTANCE_FACTOR 0.5
 #define AI_POSITION_LAND_DISTANCE_1 1.0f
 #define AI_POSITION_LAND_DISTANCE_2                                                \
-    DATA_COMPGEN(0x004ea508, aiPositionLandDistance2, 1.5)
+    1.5
 #define AI_POSITION_LAND_DISTANCE_3 2.0f
 #define AI_POSITION_LAND_DISTANCE_4                                                \
-    DATA_COMPGEN(0x004ea674, aiPositionLandDistance4, 3.0f)
+    3.0f
 #define AI_POSITION_LAND_DISTANCE_5                                                \
-    DATA_COMPGEN(0x004ea750, aiPositionLandDistance5, 4.0f)
+    4.0f
 #define AI_POSITION_LAND_DISTANCE_6                                                \
-    DATA_COMPGEN(0x004ea754, aiPositionLandDistance6, 5.0f)
+    5.0f
 #define AI_POSITION_LAND_FACTOR_2 1.2
 #define AI_POSITION_LAND_FACTOR_3                                                  \
-    DATA_COMPGEN(0x004ea608, aiPositionLandFactor3, 1.4)
+    1.4
 #define AI_POSITION_LAND_FACTOR_4                                                  \
-    DATA_COMPGEN(0x004ea680, aiPositionLandFactor4, 1.7)
+    1.7
 #define AI_POSITION_LAND_FACTOR_5 2.0
 #define AI_POSITION_LAND_FACTOR_6                                                  \
-    DATA_COMPGEN(0x004ea748, aiPositionLandFactor6, 2.5)
+    2.5
 #define AI_POSITION_LAND_FACTOR_FAR 3.0f
 #define AI_ATTENTION_RANDOM_DIVISOR 500.0
 #define AI_ATTENTION_RANDOM_BASE                                                   \
-    DATA_COMPGEN(0x004ea738, aiAttentionRandomBase, 0.23)
+    0.23
 #define AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR 0.07
 #define AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR 0.15
 #define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_BASE                                    \
-    DATA_COMPGEN(0x004ea790, aiTownCastlePrimarySkillShareBase, 0.54)
+    0.54
 #define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_STEP 0.02
 #define AI_TOWN_PRIMARY_SKILL_SHARE_BASE                                           \
-    DATA_COMPGEN(0x004ea628, aiTownPrimarySkillShareBase, 0.33)
+    0.33
 #define AI_TOWN_PRIMARY_SKILL_SHARE_STEP                                           \
-    DATA_COMPGEN(0x004ea788, aiTownPrimarySkillShareStep, 0.01)
+    0.01
 DATA(0x004ea658) static const float AI_TARGET_HUMAN_VALUE_FACTOR = 1.5f;
 #define AI_EVENT_HUMAN_VALUE_FACTOR 1.5
 DATA(0x004ea65c) static const float AI_STRATEGIC_POSITION_SCORE_FACTOR = 1.25f;
@@ -265,16 +265,16 @@ DATA(0x004ea66c) static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
 #define AI_HERO_PURCHASE_IDENTITY 1.0
 DATA(0x004ea670) static const float AI_ATTENTION_IDENTITY = 1.0f;
 #define AI_ATTENTION_PLAYER_CENTER                                                \
-    DATA_COMPGEN(0x004ea6f8, aiAttentionPlayerCenter, 3.0)
+    3.0
 #define AI_ATTENTION_NORMALIZER                                                   \
-    DATA_COMPGEN(0x004ea730, aiAttentionNormalizer, 4.0)
+    4.0
 #define AI_ATTENTION_UPPER_BOUND 5.0
 #define AI_MONSTER_JOIN_RATIO 2.0f
 #define AI_MONSTER_OVERWHELMING_RATIO 5.0f
 #define AI_MONSTER_JOIN_CHANCE_SCALE                                              \
-    DATA_COMPGEN(0x004ea7e0, aiMonsterJoinChanceScale, 60.0f)
+    60.0f
 #define AI_MONSTER_JOIN_CHANCE_BASE                                               \
-    DATA_COMPGEN(0x004ea7dc, aiMonsterJoinChanceBase, 40.0f)
+    40.0f
 #define AI_MONSTER_FIGHT_CHANCE_SCALE 100.0f
 #define AI_MONSTER_JOIN_PURCHASE_WEIGHT 0.6
 #define AI_MONSTER_JOIN_OUTCOME_WEIGHT 0.4
@@ -282,7 +282,7 @@ DATA(0x004ea670) static const float AI_ATTENTION_IDENTITY = 1.0f;
 #define AI_EVENT_VALUE_BASE_FACTOR 1.0
 #define AI_TOWN_EVENT_VALUE_BASE_FACTOR 0.9
 #define AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR                                         \
-    DATA_COMPGEN(0x004ea5c8, aiTownPrimaryHumanValueFactor, 1.6)
+    1.6
 #define AI_TOWN_OTHER_HUMAN_VALUE_FACTOR 1.3
 #define AI_EVENT_CERTAIN_ODDS 0.75
 #define AI_EVENT_HIGH_ODDS 0.5
@@ -291,38 +291,38 @@ DATA(0x004ea670) static const float AI_ATTENTION_IDENTITY = 1.0f;
 #define AI_EVENT_BAD_ODDS 0.2
 #define AI_EVENT_CERTAIN_CHANCE 100.0f
 #define AI_EVENT_HIGH_CHANCE_SCALE                                                 \
-    DATA_COMPGEN(0x004ea7f0, aiEventHighChanceScale, 136.0f)
+    136.0f
 #define AI_EVENT_GOOD_CHANCE_SCALE                                                 \
-    DATA_COMPGEN(0x004ea7ec, aiEventGoodChanceScale, 130.0f)
+    130.0f
 #define AI_EVENT_POOR_CHANCE_SCALE                                                 \
-    DATA_COMPGEN(0x004ea7e8, aiEventPoorChanceScale, 125.0f)
+    125.0f
 #define AI_EVENT_BAD_CHANCE_SCALE                                                  \
-    DATA_COMPGEN(0x004ea7e4, aiEventBadChanceScale, 113.0f)
+    113.0f
 #define AI_DAEMON_FIGHT_VALUE_SHARE 0.3
 #define AI_DAEMON_SECONDARY_FIGHT_VALUE_SHARE 0.1
-#define AI_EVENT_VALUE_SCALE DATA_COMPGEN(0x004ea7b8, aiEventValueScale, 1000.0)
+#define AI_EVENT_VALUE_SCALE 1000.0
 #define AI_DAEMON_GOLD_VALUE_FACTOR 2500.0f
 #define AI_DAEMON_GOLD_PENALTY                                                     \
-    DATA_COMPGEN(0x004ea7b0, aiDaemonGoldPenalty, -750.0)
+    -750.0
 #define AI_DAEMON_CAVE_GOLD_REQUIRED 2500
 #define AI_MAGIC_GARDEN_GOLD_AMOUNT 500.0f
 #define AI_FLOTSAM_GOLD_AMOUNT                                                     \
-    DATA_COMPGEN(0x004ea7c0, aiFlotsamGoldAmount, 175.0f)
+    175.0f
 #define AI_FLOTSAM_WOOD_AMOUNT 5.0f
 #define AI_SEA_CHEST_ARTIFACT_GOLD_AMOUNT 1000.0f
 #define AI_SEA_CHEST_LARGE_GOLD_AMOUNT                                             \
-    DATA_COMPGEN(0x004ea7c4, aiSeaChestLargeGoldAmount, 1500.0f)
+    1500.0f
 #define AI_SEA_CHEST_SMALL_GOLD_AMOUNT 200.0f
 #define AI_SEA_CHEST_MINIMUM_VALUE 150
 #define AI_WATER_WHEEL_GOLD_AMOUNT 500
 #define AI_GOLD_TURN_VALUE_SCALE                                                   \
-    DATA_COMPGEN(0x004ea760, aiGoldTurnValueScale, 250.0f)
+    250.0f
 #define AI_OBELISK_VISITOR_COUNT_FLOAT                                             \
-    DATA_COMPGEN(0x004ea764, aiObeliskVisitorCountFloat, 48.0f)
+    48.0f
 #define AI_FUTURE_MINIMUM_VALUE                                                    \
-    DATA_COMPGEN(0x004ea768, aiFutureMinimumValue, 0.0)
+    0.0
 #define AI_TOWN_FLYING_CREATURE_FACTOR                                             \
-    DATA_COMPGEN(0x004ea770, aiTownFlyingCreatureFactor, 0.95)
+    0.95
 
 H2_ENUM_BEGIN(AIResourceValue)
     RV_UNSET      = -32001,
@@ -690,7 +690,7 @@ void philAI::CheckBuyStuff(void) {
             && gpCurPlayer->m_heroCount == 0))
         return;
     LogInt(
-        DATA_COMPGEN(0x00516464, aiCheckBuyStartText, "CheckBuy Start"),
+        "CheckBuy Start",
         gpCurPlayer->m_resources[IDX(RES_GOLD)],
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -771,7 +771,7 @@ void philAI::CheckBuyStuff(void) {
     }
     DoAllHeroInteractions();
     LogInt(
-        DATA_COMPGEN(0x00516474, aiCheckBuyEndText, "CheckBuy End  "),
+        "CheckBuy End  ",
         gpCurPlayer->m_resources[IDX(RES_GOLD)],
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -1214,7 +1214,7 @@ void philAI::DoAI(i32 player) {
     MapDirection specialDirection6;
 
     LogInt(
-        DATA_COMPGEN(0x00516484, aiDoTurnStartText, "DO AI 1"),
+        "DO AI 1",
         player,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -1231,7 +1231,7 @@ void philAI::DoAI(i32 player) {
             goto aiCleanup;
     }
     LogInt(
-        DATA_COMPGEN(0x0051648c, aiDoTurnText, "DO AI"),
+        "DO AI",
         player,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -1253,7 +1253,7 @@ void philAI::DoAI(i32 player) {
     for (pathIndex0 = 0; pathIndex0 < IDX(RES_COUNT); pathIndex0++) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x00516494, aiResourceLogFormat, "RES - %15s  %d  %d"),
+            "RES - %15s  %d  %d",
             gResourceNames[pathIndex0],
             gpCurPlayer->m_resources[pathIndex0],
             gpCurPlayer->m_aiData.m_income[pathIndex0]
@@ -1279,14 +1279,10 @@ void philAI::DoAI(i32 player) {
         if (gbGameOver != 0)
             goto aiCleanup;
 
-        LogStr(DATA_COMPGEN(0x005164a8, aiTurnLogSeparator, "\n\n\n\n"));
-        LogStr(DATA_COMPGEN(
-            0x005164b0,
-            aiTurnLogRule,
-            "==================================="
-        ));
+        LogStr("\n\n\n\n");
+        LogStr("===================================");
         LogInt(
-            DATA_COMPGEN(0x005164d4, aiHeroToMoveText, "Player with HeroTOMOVE"),
+            "Player with HeroTOMOVE",
             player,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -1296,7 +1292,7 @@ void philAI::DoAI(i32 player) {
             LOG_UNUSED_VALUE
         );
         LogStr(gpCurAIHero->m_name);
-        LogStr(DATA_COMPGEN(0x005164ec, aiTurnLogNewline, "\n"));
+        LogStr("\n");
         CheckReload();
         CheckBerserk();
         giShowComputerRoute = 0;
@@ -1832,7 +1828,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
     for (townNo = 0; townNo < gpCurPlayer->m_townCount; townNo++) {
         curTown = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[townNo]];
         LogInt(
-            DATA_COMPGEN(0x005164f0, aiTurnsOwnedText, "Turns Owned"),
+            "Turns Owned",
             curTown->m_turnsOwned,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -1897,7 +1893,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
         }
     }
     LogInt(
-        DATA_COMPGEN(0x005164fc, aiBestPurchaseText, "BestBHC "),
+        "BestBHC ",
         IDX(best.type),
         static_cast<i32>(topVal * 100.0f),
         best.what,
@@ -2223,11 +2219,7 @@ i32 philAI::DetermineTargetPosition(
         targetY = static_cast<u8>(gpCurAIHero->m_boatDestY);
     }
     LogInt(
-        DATA_COMPGEN(
-            0x00516508,
-            aiHeroTargetPositionText,
-            "Hero, Best RV target XY  current XY"
-        ),
+        "Hero, Best RV target XY  current XY",
         gpCurAIHero->m_owner,
         bestRV,
         targetX,
@@ -2236,7 +2228,7 @@ i32 philAI::DetermineTargetPosition(
         gpCurAIHero->m_y,
         LOG_UNUSED_VALUE
     );
-    LogStr(DATA_COMPGEN(0x0051652c, aiHeroTargetLogSeparator, "\n\n****"));
+    LogStr("\n\n****");
     return bestRV;
 }
 
@@ -2415,7 +2407,7 @@ void philAI::ProbableOutcomeOfBattle(
 
     if (giDebugLevel >= AI_BATTLE_DEBUG_LEVEL) {
         LogInt(
-            DATA_COMPGEN(0x00516534, aiBattleDebugAttackerTag, "POBA"),
+            "POBA",
             static_cast<i32>(attStr),
             static_cast<i32>(defStrong),
             static_cast<i32>(
@@ -2427,7 +2419,7 @@ void philAI::ProbableOutcomeOfBattle(
             static_cast<i32>(gpCurPlayer->m_aiData.m_upgradeValueWeight)
         );
         LogInt(
-            DATA_COMPGEN(0x0051653c, aiBattleDebugOutcomeTag, "POB"),
+            "POB",
             static_cast<i32>(attFight),
             static_cast<i32>(defenderFight),
             static_cast<i32>(winChance * AI_BATTLE_PERCENT_SCALE),
@@ -2711,11 +2703,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                 if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(
-                            0x00516540,
-                            aiBuildingPurchaseLogFormat,
-                            "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f."
-                        ),
+                        "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
                         GetBuildingName(t->m_type, node),
                         idx,
@@ -2912,11 +2900,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                     if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x00516580,
-                                aiCreaturePurchaseLogFormat,
-                                "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f."
-                            ),
+                            "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                             townPtr->m_id,
                             GetMonsterName(candidateMonster),
                             unrandomizedValue0,
@@ -3058,11 +3042,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
         if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
             sprintf(
                 gText,
-                DATA_COMPGEN(
-                    0x005165c0,
-                    aiHeroPurchaseLogFormat,
-                    "Town:%2d  Hero    : % 15i   Raw BC = %8.2f,  RandBC = %8.2f."
-                ),
+                "Town:%2d  Hero    : % 15i   Raw BC = %8.2f,  RandBC = %8.2f.",
                 townPtr->m_id,
                 heroIndex,
                 benefitCost9,
@@ -3342,11 +3322,11 @@ i32 philAI::RVOfPosition(
         debugObjectType0 = triggerType7 & MAP_TRIGGER_TYPE_MASK;
         sprintf(
             debugText1,
-            DATA_COMPGEN(0x00516604, aiPositionDebugFormat, "FUN U :% 15s"),
+            "FUN U :% 15s",
             (debugObjectType0 > MAP_OBJECT_NONE
              && IDX(debugObjectType0) < POSITION_OBJECT_NAME_COUNT)
                 ? gQuickViewText[IDX(debugObjectType0)]
-                : DATA_COMPGEN(0x00516600, aiPositionUnknownObjectText, " ")
+                : " "
         );
         LogInt(
             debugText1,
@@ -3909,7 +3889,7 @@ i32 philAI::FightValueOfStack(
         castleValue = static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
     if (giDebugLevel == AI_BATTLE_DEBUG_LEVEL)
         LogInt(
-            DATA_COMPGEN(0x00516614, aiFightValueDebugText, "FV3"),
+            "FV3",
             armyValue,
             magicTotal,
             castleValue,
@@ -4762,11 +4742,7 @@ void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) buildin
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x00516618,
-            aiBuiltBuildingLogFormat,
-            "Player %d built %s in town %d.\n"
-        ),
+        "Player %d built %s in town %d.\n",
         giCurPlayer,
         GetBuildingName(t->m_type, building),
         t->m_id
@@ -4791,11 +4767,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
 
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x00516638,
-            aiBuiltHeroLogFormat,
-            "Player %d built hero in town %d.\n"
-        ),
+        "Player %d built hero in town %d.\n",
         giCurPlayer,
         townPtr->m_id
     );
@@ -4866,11 +4838,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
 
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x0051665c,
-            aiBuiltCreatureLogFormat,
-            "Player %d built %d %s in town %d.\n"
-        ),
+        "Player %d built %d %s in town %d.\n",
         giCurPlayer,
         purchaseCount,
         GetMonsterName(gDwellingType[IDX(townPtr->m_type)][dwelling]),
@@ -6069,12 +6037,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             default:
                 sprintf(
                     gText,
-                    DATA_COMPGEN(
-                        0x00516680,
-                        aiUnknownObjectDialogFormat,
-                        "AI encountered object type %d and doesn't know how to deal with it.   "
-                        "Tell Phil"
-                    ),
+                    "AI encountered object type %d and doesn't know how to deal with it.   "
+                        "Tell Phil",
                     theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);

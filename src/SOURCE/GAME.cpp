@@ -48,12 +48,12 @@
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \
-    DATA_COMPGEN(0x004ea610, gameScoreLargeDayScale, 0.8)
+    0.8
 #define GAME_SCORE_MEDIUM_DAY_SCALE 1.0
 #define GAME_SCORE_SMALL_DAY_SCALE 1.4
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
-    DATA_COMPGEN(0x004ea620, gameUltimateArtifactTwoThirds, 0.66)
+    0.66
 
 H2_ENUM_BEGIN(MapTilesetConstant)
     WAGON_CAMP_ACTIVE_FRAME = 129
@@ -1159,14 +1159,14 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
                 genName,
                 "%s.%s",
                 filename,
-                DATA_COMPGEN(0x004f7560, saveGameCampaignExtension, "GMC")
+                "GMC"
             );
         } else if (xIsPlayingExpansionCampaign) {
             sprintf(
                 genName,
                 "%s.%s",
                 filename,
-                DATA_COMPGEN(0x004f756c, saveGameExpansionCampaignExtension, "GXC")
+                "GXC"
             );
         } else {
             nHuman = 0;
@@ -1189,21 +1189,13 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(savePath, "%s%s", gcGamePath, genName);
         if (_strnicmp(
                 genName,
-                DATA_COMPGEN(
-                    0x004f75a4,
-                    gameAutosaveName,
-                    "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */
-                ),
+                "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */,
                 sizeof("AUTOSAVE") - 1
             )
                 != 0
             && _strnicmp(
                    genName,
-                   DATA_COMPGEN(
-                       0x004f75b4,
-                       gamePlayerExitName,
-                       "\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb" /* "Игрок Вышел" */
-                   ),
+                   "\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb" /* "Игрок Вышел" */,
                    sizeof("PLYREXIT") - 1
                )
                 != 0)
@@ -1346,7 +1338,7 @@ void game::SetupOrigData(void) {
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         strcpy(
             m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE,
-            DATA_COMPGEN(0x005249a4, gameDefaultPlayerNameEmpty, "")
+            ""
         );
         if (i < giNumHumanPlayers) {
             if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
@@ -1959,11 +1951,7 @@ void game::NewMap(char* filename) {
                     m_heroRecs[awardHero].CheckLevel();
                     strcpy(
                         m_heroRecs[awardHero].m_name,
-                        DATA_COMPGEN(
-                            0x004f7608,
-                            gameCampaignHeroElizaName,
-                            "\xd1\xe5\xf1\xf2\xf0\xe0 \xdd\xeb\xe8\xe7\xe0" /* "Сестра Элиза" */
-                        )
+                        "\xd1\xe5\xf1\xf2\xf0\xe0 \xdd\xeb\xe8\xe7\xe0" /* "Сестра Элиза" */
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
@@ -1971,11 +1959,7 @@ void game::NewMap(char* filename) {
                     m_heroRecs[awardHero].CheckLevel();
                     strcpy(
                         m_heroRecs[awardHero].m_name,
-                        DATA_COMPGEN(
-                            0x004f7618,
-                            gameCampaignHeroBraxName,
-                            "\xc1\xf0\xe0\xf2 \xc1\xf0\xe0\xea\xf1" /* "Брат Бракс" */
-                        )
+                        "\xc1\xf0\xe0\xf2 \xc1\xf0\xe0\xea\xf1" /* "Брат Бракс" */
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
@@ -3531,15 +3515,11 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 > viewSpellsHero->m_spellPoints) {
                                 sprintf(
                                     gText,
-                                    DATA_COMPGEN(
-                                        0x004f7668,
-                                        gameInsufficientSpellPointsFormat,
-                                        "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf2\xee\xe8\xf2 %d \xee\xf7. "
+                                    "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf2\xee\xe8\xf2 %d \xee\xf7. "
                                         "\xec\xe0\xe3\xe8\xe8. \xd3 \xe2\xe0\xf1 \xf2\xee\xeb\xfc\xea\xee %d \xee\xf7. "
                                         "\xec\xe0\xe3\xe8\xe8. \xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc "
                                         "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
-                                        /* "Заклинание стоит %d оч. магии. У вас только %d оч. магии. Вы не можете направить заклинание." */
-                                    ),
+                                        /* "Заклинание стоит %d оч. магии. У вас только %d оч. магии. Вы не можете направить заклинание." */,
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
@@ -3750,7 +3730,7 @@ void game::ViewArmy(
 
     sprintf(
         details0,
-        DATA_COMPGEN(0x005249a8, gameViewArmyDetailsEmpty, "")
+        ""
     );
     modifier14 = 0;
     sprintf(
@@ -4247,11 +4227,7 @@ void game::NextPlayer(void) {
                 humansAlive++;
         }
         SaveGame(
-            const_cast<char*>(DATA_COMPGEN(
-                0x004f7810,
-                gameNextPlayerAutosaveName,
-                "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */
-            )),
+            const_cast<char*>("\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */),
             1,
             0
         );

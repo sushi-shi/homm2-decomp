@@ -39,7 +39,11 @@ from homm2.build.data_topology_census import (
     _storage,
 )
 from homm2.build.link_exe import classify_pe_storage, read_pe
-from homm2.build.candidate_data_manifest import _pe_layout, derive_allocations
+from homm2.build.candidate_data_manifest import (
+    CandidateAllocation,
+    _pe_layout,
+    derive_allocations,
+)
 from homm2.build.reloc_owners import load_reviewed_highlow_sites
 
 
@@ -72,8 +76,14 @@ VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
-AUTO_STRING_DIRECT_PROOFS = frozenset(("aligned-relocation-addend",))
-AUTO_REAL_DIRECT_PROOFS = frozenset(("aligned-relocation-addend",))
+AUTO_STRING_DIRECT_PROOFS = frozenset((
+    "aligned-relocation-addend",
+    "source-data-relocation-addend",
+))
+AUTO_REAL_DIRECT_PROOFS = frozenset((
+    "aligned-relocation-addend",
+    "source-data-relocation-addend",
+))
 
 
 @dataclass(frozen=True)
@@ -324,6 +334,107 @@ def _candidate_bytes(coff: CoffFile, candidate: CandidateDefinition,
         return b"\0" * size
     start = section.raw_offset + candidate.section_value
     return bytes(coff.data[start:start + size])
+
+
+def source_data_relocation_allocations(
+        ordinary, topology_by_unit, base_root: Path, exe: Path):
+    """Place compiler literals referenced by reviewed source data owners.
+
+    Function-relative DIR32 pairing already places most compiler literals.  A
+    source ``DATA`` owner supplies the same proof on the data side: its exact
+    retail RVA and logical extent pair a candidate COFF relocation site with
+    the reviewed PE relocation at the same owner-relative offset.  The
+    candidate relocation names the physical compiler allocation; the retail
+    pointer supplies its RVA.  This is especially important for repeated empty
+    strings, whose payload alone can never select one compiler-local cell.
+    """
+    pe = read_pe(exe)
+    image_base, highlow, read_u32, read_bytes = _pe_layout(exe)
+    highlow = set(highlow)
+    ordinary_by_unit = defaultdict(list)
+    for source, candidate in ordinary:
+        ordinary_by_unit[source.unit].append((source, candidate))
+
+    placements = {}
+    for unit, owners in sorted(ordinary_by_unit.items()):
+        definitions = topology_by_unit.get(unit, ((), ()))[0]
+        definitions_by_section = defaultdict(list)
+        for definition in definitions:
+            definitions_by_section[definition.section_ordinal].append(definition)
+        coff = CoffFile(Path(base_root) / f"{unit}.obj")
+        for source, owner in owners:
+            owner_end = owner.section_value + source.size
+            for (section_index, site), relocation in coff.relocations.items():
+                if (section_index != owner.section_ordinal
+                        or not owner.section_value <= site
+                        or site + 4 > owner_end
+                        or relocation.typ != IMAGE_REL_I386_DIR32):
+                    continue
+                retail_site = source.rva + site - owner.section_value
+                if retail_site not in highlow:
+                    continue
+                referent = coff.symbols[relocation.symbol_index]
+                if referent.section <= 0:
+                    continue
+                owner_section = coff.sections[section_index - 1]
+                if owner_section.raw_offset == 0:
+                    continue
+                raw = int.from_bytes(
+                    coff.data[
+                        owner_section.raw_offset + site:
+                        owner_section.raw_offset + site + 4
+                    ],
+                    "little",
+                )
+                addend = raw if raw < 0x80000000 else raw - 0x100000000
+                resolved_offset = referent.value + addend
+                targets = [
+                    candidate for candidate in definitions_by_section[
+                        referent.section]
+                    if (candidate.section_value <= resolved_offset
+                        < candidate.section_value + candidate.size)
+                ]
+                if len(targets) != 1:
+                    continue
+                target = targets[0]
+                if _compgen_candidate_kind(target) is None:
+                    continue
+                owner_addend = resolved_offset - target.section_value
+                retail_target = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
+                rva = retail_target - owner_addend
+                logical_size = (
+                    len(_string_payload(coff, target) or b"")
+                    if _compgen_candidate_kind(target) == "STRING_LITERAL"
+                    else target.size
+                )
+                if logical_size <= 0:
+                    continue
+                retail_storage = _retail_storage_name(pe, rva)
+                storage_compatible = (
+                    retail_storage == target.storage
+                    or (target.storage == "bss" and retail_storage == "data"
+                        and not any(read_bytes(rva, logical_size)))
+                )
+                if (not storage_compatible
+                        or _candidate_bytes(coff, target, logical_size)
+                        != read_bytes(rva, logical_size)):
+                    continue
+                key = _candidate_location(target)
+                placement = CandidateAllocation(
+                    unit, unit.replace("/", "\\") + ".c", target.symbol,
+                    target.storage, target.stream_offset, target.size,
+                    target.alignment, rva, 1,
+                    "external" if target.storage_class == 2 else "local",
+                    "source-data-relocation-addend",
+                )
+                previous = placements.get(key)
+                if previous is not None and previous.rva != placement.rva:
+                    raise ValueError(
+                        f"compiler datum {unit}:{target.symbol} has conflicting "
+                        f"source-data relocation placements 0x{previous.rva:x} "
+                        f"and 0x{placement.rva:x}")
+                placements[key] = placement
+    return list(placements.values())
 
 
 def _compgen_candidate_kind(candidate: CandidateDefinition) -> str | None:
@@ -1018,6 +1129,8 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
         *(allocation for diagnostic in derivation_diagnostics
           for allocation in diagnostic.proposed_allocations),
     ]
+    placement_evidence.extend(source_data_relocation_allocations(
+        ordinary, topology, base_root, Path(exe)))
     compiler_generated, diagnostics = resolve_compgen_definitions(
         compgen, topology, base_root, Path(exe), strict=strict,
         placement_evidence=placement_evidence)

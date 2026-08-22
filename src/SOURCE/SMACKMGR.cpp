@@ -167,7 +167,7 @@ void SmackManagerMain(void) {
         i32 initialMouseX3;
 
         brotherIcon = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x00517e44, brothersIconName, "brothers.icn")
+            "brothers.icn"
         );
         gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
         if (initialMouseX3 < CAMPAIGN_DIVIDER_X)
@@ -215,11 +215,11 @@ void SmackManagerMain(void) {
     }
 
     if (bSmackNum == EXPANSION_CAMPAIGN)
-        strcpy(path7, DATA_COMPGEN(0x00517e54, expansionMoviePath, ".\\DATA\\"));
+        strcpy(path7, ".\\DATA\\");
     else
         sprintf(
             path7,
-            DATA_COMPGEN(0x00517e5c, moviePathFormat, "%s%s"),
+            "%s%s",
             gcRegCDRomPath,
             gcAnimPath
         );
@@ -227,14 +227,14 @@ void SmackManagerMain(void) {
     if (gConfig.slowVideo)
         sprintf(
             gText,
-            DATA_COMPGEN(0x00517e64, slowMovieFileFormat, "%s%s.SMK"),
+            "%s%s.SMK",
             path7,
             SmackOptions[bSmackNum].slowFileName
         );
     else
         sprintf(
             gText,
-            DATA_COMPGEN(0x00517e70, movieFileFormat, "%s%s.SMK"),
+            "%s%s.SMK",
             path7,
             SmackOptions[bSmackNum].fileName
         );
@@ -248,12 +248,8 @@ void SmackManagerMain(void) {
             if (!smk1) {
                 gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x00517e7c,
-                        diskReadRetryText,
-                        "\xce\xf8\xe8\xe1\xea\xe0 \xf7\xf2\xe5\xed\xe8\xff \xe4\xe8\xf1\xea\xe0 "
+                    "\xce\xf8\xe8\xe1\xea\xe0 \xf7\xf2\xe5\xed\xe8\xff \xe4\xe8\xf1\xea\xe0 "
                         "\xc3\xe5\xf0\xee\xe5\xe2 2. \xcf\xee\xe2\xf2\xee\xf0\xe8\xf2\xfc?"
-                    )
                     /* "Ошибка чтения диска Героев 2. Повторить?" */,
                     NORMAL_DIALOG_CONFIRM,
                     -1,
@@ -266,11 +262,7 @@ void SmackManagerMain(void) {
                     0
                 );
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SIX)
-                    ShutDown(DATA_COMPGEN(
-                        0x00517ea8,
-                        cdromDriveErrorText,
-                        "CDROM drive error.  Exiting."
-                    ));
+                    ShutDown("CDROM drive error.  Exiting.");
             }
         }
         SmackToBuffer(
@@ -288,14 +280,14 @@ void SmackManagerMain(void) {
         if (gConfig.slowVideo)
             sprintf(
                 gText,
-                DATA_COMPGEN(0x00517ec8, slowCompanionMovieFileFormat, "%s%s.SMK"),
+                "%s%s.SMK",
                 path7,
                 SmackOptions[bSmackNum].slowCompanionFileName
             );
         else
             sprintf(
                 gText,
-                DATA_COMPGEN(0x00517ed4, companionMovieFileFormat, "%s%s.SMK"),
+                "%s%s.SMK",
                 path7,
                 SmackOptions[bSmackNum].companionFileName
             );
@@ -341,14 +333,14 @@ void SmackManagerMain(void) {
         if (bSmackNum == EXPANSION_CAMPAIGN) {
             if (!primaryStarted7) {
                 gpMouseManager->SetPointer(
-                    DATA_COMPGEN(0x00517ee0, expansionMouseCursorName, "advmice.mse"),
+                    "advmice.mse",
                     POINTER_ID,
                     MOUSE_AUTO_CURSOR_TYPE
                 );
                 gpMouseManager->ReallyShowPointer();
                 gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 backImage = gpResourceManager->GetIcon(
-                    DATA_COMPGEN(0x00517eec, expansionBackgroundIconName, "x_ivy.icn")
+                    "x_ivy.icn"
                 );
                 if (!backImage)
                     MemError();
@@ -371,7 +363,7 @@ void SmackManagerMain(void) {
                 if (!primaryStarted7) {
                     if (bSmackNum == CHOOSE_CAMPAIGN) {
                         gpMouseManager->SetPointer(
-                            DATA_COMPGEN(0x00517ef8, campaignMouseCursorName, "advmice.mse"),
+                            "advmice.mse",
                             POINTER_ID,
                             MOUSE_AUTO_CURSOR_TYPE
                         );
@@ -480,11 +472,7 @@ void SmackManagerMain(void) {
                                 static_cast<i8>(expansionChoice0 + EXPANSION_FIRST_MOVIE);
                             sprintf(
                                 gText,
-                                DATA_COMPGEN(
-                                    0x00517f04,
-                                    expansionCampaignMovieFileFormat,
-                                    "%s%s.SMK"
-                                ),
+                                "%s%s.SMK",
                                 path7,
                                 SmackOptions[bExpansionSmackNum].fileName
                             );
@@ -549,7 +537,7 @@ playbackDone:
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         gpMouseManager->HideColorPointer();
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x00517f10, defaultMouseCursorName, "advmice.mse"),
+            "advmice.mse",
             POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
@@ -700,11 +688,7 @@ VA(0x00495b18, 0x243)
 void PrintSummaryInfo(SmackSum* summary) {
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x00517f1c,
-            summaryMovieNameFormat,
-            "                                              Name - %s"
-        ),
+        "                                              Name - %s",
         SmackOptions[bSmackNum].fileName
     );
     LogStr(gText);
@@ -712,123 +696,63 @@ void PrintSummaryInfo(SmackSum* summary) {
     sprintf(gText, format, value);                                                                 \
     LogStr(gText)
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00517f54,
-            summaryTotalTimeFormat,
-            "                                        total time - %8d"
-        ),
+        "                                        total time - %8d",
         summary->TotalTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00517f90,
-            summaryFrameRateFormat,
-            "MS*100 per frame (100000/MS100PerFrame=Frames/Sec) - %8d"
-        ),
+        "MS*100 per frame (100000/MS100PerFrame=Frames/Sec) - %8d",
         summary->MS100PerFrame
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00517fcc,
-            summaryOpenTimeFormat,
-            "        Time to open and prepare for decompression - %8d"
-        ),
+        "        Time to open and prepare for decompression - %8d",
         summary->TotalOpenTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518008,
-            summaryTotalFramesFormat,
-            "                            Total Frames displayed - %8d"
-        ),
+        "                            Total Frames displayed - %8d",
         summary->TotalFrames
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518044,
-            summarySkippedFramesFormat,
-            "                    Total number of skipped frames - %8d"
-        ),
+        "                    Total number of skipped frames - %8d",
         summary->SkippedFrames
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518080,
-            summaryBlitTimeFormat,
-            "                         Total time spent blitting - %8d"
-        ),
+        "                         Total time spent blitting - %8d",
         summary->TotalBlitTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x005180bc,
-            summaryReadTimeFormat,
-            "                          Total time spent reading - %8d"
-        ),
+        "                          Total time spent reading - %8d",
         summary->TotalReadTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x005180f8,
-            summaryDecompressionTimeFormat,
-            "                    Total time spent decompressing - %8d"
-        ),
+        "                    Total time spent decompressing - %8d",
         summary->TotalDecompTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518134,
-            summaryIoSpeedFormat,
-            "                     Total io speed (sbytes/second) - %8d"
-        ),
+        "                     Total io speed (sbytes/second) - %8d",
         summary->TotalReadSpeed
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518170,
-            summarySlowestFrameTimeFormat,
-            "                         Slowest single frame time - %8d"
-        ),
+        "                         Slowest single frame time - %8d",
         summary->SlowestFrameTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x005181ac,
-            summarySecondSlowestFrameTimeFormat,
-            "                  Second slowest single frame time - %8d"
-        ),
+        "                  Second slowest single frame time - %8d",
         summary->Slowest2FrameTime
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x005181e8,
-            summarySlowestFrameNumberFormat,
-            "                       Slowest single frame number - %8d"
-        ),
+        "                       Slowest single frame number - %8d",
         summary->SlowestFrameNum
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518224,
-            summarySecondSlowestFrameNumberFormat,
-            "                Second slowest single frame number - %8d"
-        ),
+        "                Second slowest single frame number - %8d",
         summary->Slowest2FrameNum
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x00518260,
-            summaryAverageFrameSizeFormat,
-            "                         Average size of the frame - %8d"
-        ),
+        "                         Average size of the frame - %8d",
         summary->AverageFrameSize
     );
     LOG_SUMMARY_VALUE(
-        DATA_COMPGEN(
-            0x0051829c,
-            summaryPeakMemoryFormat,
-            "                Highest amount of memory allocated - %8d"
-        ),
+        "                Highest amount of memory allocated - %8d",
         summary->HighestExtraUsed
     );
 #undef LOG_SUMMARY_VALUE

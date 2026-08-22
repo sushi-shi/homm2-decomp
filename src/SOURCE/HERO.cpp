@@ -2054,15 +2054,11 @@ void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 qui
         skillText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
         sprintf(
             gText,
-            DATA_COMPGEN(
-                0x004f7fe0,
-                heroNecromancyDescriptionFormat,
-                "{%s \xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d)}\n\n%s "
+            "{%s \xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d)}\n\n%s "
                 "\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d) \xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2 \xe2\xe5\xf0\xed\xf3\xf2\xfc "
                 "%d \xef\xf0\xee\xf6\xe5\xed\xf2\xee\xe2 \xef\xee\xe3\xe8\xe1\xf8\xe8\xf5 \xe2 \xe1\xee\xfe \xe2\xee\xe8\xed\xee\xe2 \xe2 "
                 "\xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe2 \xe2\xe8\xe4\xe5 \xf1\xea\xe5\xeb\xe5\xf2\xee\xe2."
-                /* "{%s Некромантия (+%d)}\n\n%s Некромантия (+%d) позволяет вернуть %d процентов погибших в бою воинов в вашу армию в виде скелетов." */
-            ),
+                /* "{%s Некромантия (+%d)}\n\n%s Некромантия (+%d) позволяет вернуть %d процентов погибших в бою воинов в вашу армию в виде скелетов." */,
             skillText,
             skillBonusValue,
             skillText,

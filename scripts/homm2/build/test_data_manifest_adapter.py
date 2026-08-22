@@ -19,6 +19,7 @@ from homm2.build.data_manifest_adapter import (
     resolve_compgen_definitions,
     resolve_vtable_definitions,
     resolve_source_definitions,
+    source_data_relocation_allocations,
     source_definitions,
     validate_symbol_rows,
     _mark_vtable_aliases,
@@ -55,6 +56,45 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_source_data_relocation_places_ambiguous_empty_string(self):
+        owner = candidate("A", "?owner@@3PADA", ordinal=1, value=0)
+        literal = replace(
+            candidate("A", "$SG1", ordinal=2, value=0),
+            section_name=".bss", stream_offset=4, storage="bss",
+        )
+        source = SimpleNamespace(unit="A", rva=0x100, size=4)
+        coff = SimpleNamespace(
+            data=bytearray(8),
+            sections=(SimpleNamespace(raw_offset=4),
+                      SimpleNamespace(raw_offset=0)),
+            symbols={7: SimpleNamespace(section=2, value=0)},
+            relocations={(1, 0): SimpleNamespace(
+                typ=0x0006, symbol_index=7)},
+        )
+        with mock.patch(
+                "homm2.build.data_manifest_adapter.CoffFile",
+                return_value=coff), mock.patch(
+                    "homm2.build.data_manifest_adapter.read_pe",
+                    return_value={}), mock.patch(
+                        "homm2.build.data_manifest_adapter._retail_storage_name",
+                        return_value="data"), mock.patch(
+                            "homm2.build.data_manifest_adapter._pe_layout",
+                            return_value=(
+                                0x400000, (0x100,),
+                                lambda _site: 0x400200,
+                                lambda _rva, size: b"\0" * size,
+                            )):
+            rows = source_data_relocation_allocations(
+                [(source, owner)], {"A": ([owner, literal], [])},
+                Path("base"), Path("game.exe"))
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].name, "$SG1")
+        self.assertEqual(rows[0].rva, 0x200)
+        self.assertEqual(rows[0].section_offset, 4)
+        self.assertEqual(rows[0].provenance,
+                         "source-data-relocation-addend")
+
     def test_automatic_reals_preserve_width_and_fold_exact_comdats(self):
         symbol = "__real@8@4002c800000000000000"
         owner = CandidateDefinition(

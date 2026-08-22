@@ -14,7 +14,7 @@
 #include <SOURCE/X_GLOBAL.h>
 
 #define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE \
-    DATA_COMPGEN(0x004ea4d0, armyFlightDurationScale, 1.3)
+    1.3
 
 namespace {
 

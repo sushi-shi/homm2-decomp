@@ -121,16 +121,16 @@ void combatManager::ClearCombatMessages(i32 force) {
     if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
         strcpy(
             m_previousCombatMessage,
-            DATA_COMPGEN(0x00524494, clearCombatPreviousMessageEmpty, "")
+            ""
         );
         strcpy(
             m_currentCombatMessage,
-            DATA_COMPGEN(0x00524498, clearCombatCurrentMessageEmpty, "")
+            ""
         );
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = 0;
         CombatMessage(
-            DATA_COMPGEN(0x0052449c, clearCombatDisplayEmpty, ""),
+            "",
             1,
             0,
             0
@@ -143,7 +143,7 @@ void combatManager::CheckUpdateCombatMessages(void) {
     if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0
         && m_combatMessageExpiration < KBTickCount())
         CombatMessage(
-            DATA_COMPGEN(0x005244a0, checkUpdateCombatMessagesEmptyText, ""),
+            "",
             1,
             0,
             1
@@ -177,7 +177,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
     if (clear != 0) {
         strcpy(
             m_previousCombatMessage,
-            DATA_COMPGEN(0x005244a4, combatMessageClearPreviousText, "")
+            ""
         );
         strcpy(m_currentCombatMessage, gCombatMessageText);
         m_previousCombatMessageExpiration = 0;
@@ -190,7 +190,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             } else {
                 strcpy(
                     m_previousCombatMessage,
-                    DATA_COMPGEN(0x005244a8, combatMessageExpiredPreviousText, "")
+                    ""
                 );
                 m_previousCombatMessageExpiration = 0;
                 m_combatMessageExpiration = 0;
@@ -201,7 +201,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             else
                 strcpy(
                     m_previousCombatMessage,
-                    DATA_COMPGEN(0x005244ac, combatMessageMissingPreviousText, "")
+                    ""
                 );
             m_previousCombatMessageExpiration = m_combatMessageExpiration;
             m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
@@ -343,11 +343,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 else
                     sprintf(
                         gText,
-                        DATA_COMPGEN(
-                            0x005244b0,
-                            combatViewInfoEmptyMessage,
-                            ""
-                        )
+                        ""
                     );
             }
             break;

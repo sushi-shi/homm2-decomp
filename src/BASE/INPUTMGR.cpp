@@ -183,11 +183,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             captureReleased = ReleaseCapture();
             if (captureReleased == 0)
                 LogStr(
-                    DATA_COMPGEN(
-                        0x0051e59c,
-                        inputLeftReleaseCaptureFailure,
-                        "ReleaseCapture Failed"
-                    )
+                    "ReleaseCapture Failed"
                 );
             goto mouseCoordinates;
         case WM_RBUTTONUP:
@@ -195,11 +191,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             captureReleased = ReleaseCapture();
             if (captureReleased == 0)
                 LogStr(
-                    DATA_COMPGEN(
-                        0x0051e5b4,
-                        inputRightReleaseCaptureFailure,
-                        "ReleaseCapture Failed"
-                    )
+                    "ReleaseCapture Failed"
                 );
         mouseCoordinates:
             event->payload.mouse.x =
@@ -273,7 +265,7 @@ i32 inputManager::Open(i32 priority) {
     m_active = true;
     strcpy(
         m_name,
-        DATA_COMPGEN(0x0051e5cc, inputManagerName, "inputManager")
+        "inputManager"
     );
     return 0;
 }

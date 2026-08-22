@@ -183,11 +183,11 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     for (indexData5 = 0; indexData5 < m_fileCount; ++indexData5) {
         strcpy(
             m_fileNames[indexData5].text,
-            DATA_COMPGEN(0x00533d84, fileRequesterFileNameEmptyText, "")
+            ""
         );
         strcpy(
             m_extensions[indexData5].text,
-            DATA_COMPGEN(0x00533d88, fileRequesterExtensionEmptyText, "")
+            ""
         );
     }
 
@@ -340,7 +340,7 @@ VA(0x0048f275, 0x44b)
 i32 fileRequester::Open(i32 id) {
     strcpy(
         gLastFilename,
-        DATA_COMPGEN(0x00533d8c, fileRequesterLastFilenameEmptyText, "")
+        ""
     );
     m_previousMenu = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
@@ -393,11 +393,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Сохранить файл: */ DATA_COMPGEN(
-                0x00516b38,
-                fileRequesterSaveFileLabel,
-                "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
-            )
+            /* Сохранить файл: */ "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -427,11 +423,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Загрузить файл: */ DATA_COMPGEN(
-                0x00516b48,
-                fileRequesterLoadFileLabel,
-                "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
-            )
+            /* Загрузить файл: */ "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -453,11 +445,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-               /* НОВАЯ ИГРА */ DATA_COMPGEN(
-                   0x00516b58,
-                   fileRequesterDefaultNewGameName,
-                   "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
-               )
+               /* НОВАЯ ИГРА */ "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -509,7 +497,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     } else {
                         strcpy(
                             cycleNameBuffer,
-                            DATA_COMPGEN(0x00533d90, fileRequesterCycleNameEmptyText, "")
+                            ""
                         );
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
@@ -744,11 +732,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 } else {
                                     strcpy(
                                         filteredNameMap,
-                                        DATA_COMPGEN(
-                                            0x00533d94,
-                                            fileRequesterFilteredMapNameEmptyText,
-                                            ""
-                                        )
+                                        ""
                                     );
                                 }
                                 SetupFiles();
@@ -1254,8 +1238,7 @@ char* fileRequester::GetFilename(void) {
 
 
 DATA(0x00516adc) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-DATA(0x00516ae0) char* cFRDummy =
-    DATA_COMPGEN(0x00533d98, fileRequesterDummyEmptyText, "");
+DATA(0x00516ae0) char* cFRDummy = "";
 DATA(0x00533d78) float fGutterMinY;
 DATA(0x00533d7c) float fGutterTravelLength;
 DATA(0x00533d80) i32 iMaxListSize;

@@ -30,7 +30,7 @@
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
 #define COMBAT_SURRENDER_BASE_FACTOR 0.5
 #define COMBAT_SURRENDER_DIPLOMACY_FACTOR                                          \
-    DATA_COMPGEN(0x004ea598, combatSurrenderDiplomacyFactor, 0.2)
+    0.2
 #define COMBAT_IDLE_ROLL_DIVISOR 100.0f
 #define COMBAT_STAND_DELAY_BASE_FACTOR 0.25
 #define COMBAT_STAND_DELAY_RANDOM_FACTOR 0.5
@@ -1019,13 +1019,9 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            DATA_COMPGEN(
-                                0x004f0fc8,
-                                combatNoHeroForSpellcasting,
-                                "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe3\xe5\xf0\xee\xe5\xe2, \xf7\xf2\xee\xe1\xfb "
+                            "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe3\xe5\xf0\xee\xe5\xe2, \xf7\xf2\xee\xe1\xfb "
                                 "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff."
-                                /* "У вас нет героев, чтобы направлять заклинания." */
-                            ),
+                                /* "У вас нет героев, чтобы направлять заклинания." */,
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -2145,7 +2141,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 
     m_nonVisualCombat = 1;
     FreeArmies();
-    CombatMessage(DATA_COMPGEN(0x0052414c, combatVictoryEmptyMessage, ""), 1, 1, 0);
+    CombatMessage("", 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     numFades = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
@@ -2458,15 +2454,11 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x004f1438,
-            combatSurrenderOfferFormat,
-            "%s \xe3\xee\xe2\xee\xf0\xe8\xf2:\n\n\"\xdf \xef\xf0\xe8\xec\xf3 \xe2\xe0\xf8\xf3 "
+        "%s \xe3\xee\xe2\xee\xf0\xe8\xf2:\n\n\"\xdf \xef\xf0\xe8\xec\xf3 \xe2\xe0\xf8\xf3 "
             "\xea\xe0\xef\xe8\xf2\xf3\xeb\xff\xf6\xe8\xfe \xe8 \xef\xee\xe7\xe2\xee\xeb\xfe \xe2\xe0\xec \xe8 "
             "\xe2\xe0\xf8\xe8\xec \xe2\xee\xe8\xed\xe0\xec \xf3\xe9\xf2\xe8 \xf1 \xec\xe8\xf0\xee\xec \xe7\xe0 "
             "%d \xe7\xee\xeb\xee\xf2\xfb\xf5.\""
-            /* "%s говорит:\n\n\"Я приму вашу капитуляцию и позволю вам и вашим воинам уйти с миром за %d золотых.\"" */
-        ),
+            /* "%s говорит:\n\n\"Я приму вашу капитуляцию и позволю вам и вашим воинам уйти с миром за %d золотых.\"" */,
         m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
     );
@@ -3130,7 +3122,7 @@ void combatManager::ViewBallista(i32 quickView) {
     sprintf(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0" /* "Баллиста" */);
     strcpy(
         description,
-        DATA_COMPGEN(0x00524150, combatBallistaEmptyDescription, "")
+        ""
     );
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
         sprintf(
@@ -3163,7 +3155,7 @@ void combatManager::ViewBallista(i32 quickView) {
 
     strcpy(
         description,
-        DATA_COMPGEN(0x00524154, combatLeftTowerEmptyDescription, "")
+        ""
     );
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
         != 0) {
@@ -3205,7 +3197,7 @@ void combatManager::ViewBallista(i32 quickView) {
         != 0) {
         strcpy(
             description,
-            DATA_COMPGEN(0x00524158, combatRightTowerEmptyDescription, "")
+            ""
         );
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(

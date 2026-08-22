@@ -37,7 +37,7 @@ void DDRestoreDisplayMode(void) {
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x00519fd4, ddRestoreDisplayModeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 52
             );
     }
@@ -62,7 +62,7 @@ void CreatePrimary(void) {
     if (lpClipper != NULL) {
         result = lpDDSPrimary->SetClipper(NULL);
         if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
-            DDSD(result, DATA_COMPGEN(0x0051a00c, ddCreatePrimarySourceFile, RETAIL_FILE), 77);
+            DDSD(result, RETAIL_FILE, 77);
         lpClipper->Release();
         lpClipper = NULL;
     }
@@ -77,21 +77,21 @@ void SetupClipper(void) {
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a044, ddSetupClipperCreateSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 95
             );
         result = lpClipper->SetHWnd(0, hwndApp);
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a07c, ddSetupClipperWindowSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 100
             );
         result = lpDDSPrimary->SetClipper(lpClipper);
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a0b4, ddSetupClipperSurfaceSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 105
             );
     }
@@ -107,7 +107,7 @@ void DDInitGraphics(void) {
     if (result != DD_OK)
         DDSD(
             result,
-            DATA_COMPGEN(0x0051a0ec, ddInitCreateSourceFile, RETAIL_FILE),
+            RETAIL_FILE,
             118
         );
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
@@ -119,14 +119,14 @@ void DDInitGraphics(void) {
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a124, ddInitCooperativeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 130
             );
         result = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a15c, ddInitDisplayModeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 134
             );
     } else {
@@ -134,7 +134,7 @@ void DDInitGraphics(void) {
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a194, ddInitNormalModeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 141
             );
     }
@@ -198,7 +198,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDResult != DD_OK)
             DDSD(
                 gDDResult,
-                DATA_COMPGEN(0x0051a1cc, ddPaintUnlockSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 228
             );
 
@@ -218,24 +218,20 @@ i32 DDAppPaint(void* window, void* paintDC) {
             if (gDDResult == DDERR_SURFACELOST) {
                 gDDResult = lpDDSPrimary->Restore();
                 if (gDDResult == DDERR_WRONGMODE) {
-                    LogStr(DATA_COMPGEN(
-                        0x0051a204,
-                        ddPaintResetDisplayModeText,
-                        "ResetDisplayMode"
-                    ));
+                    LogStr("ResetDisplayMode");
                     gDDResult =
                         lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
                     if (gDDResult != DD_OK)
                         DDSD(
                             gDDResult,
-                            DATA_COMPGEN(0x0051a218, ddPaintRestoreSourceFile, RETAIL_FILE),
+                            RETAIL_FILE,
                             248
                         );
                     gDDResult = lpDDSPrimary->Restore();
                     if (gDDResult != DD_OK)
                         DDSD(
                             gDDResult,
-                            DATA_COMPGEN(0x0051a250, ddPaintRelockSourceFile, RETAIL_FILE),
+                            RETAIL_FILE,
                             252
                         );
                     gDDDestinationRect = gDDSourceRect;
@@ -243,7 +239,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
                 if (gDDResult != DD_OK)
                     DDSD(
                         gDDResult,
-                        DATA_COMPGEN(0x0051a288, ddPaintBltSourceFile, RETAIL_FILE),
+                        RETAIL_FILE,
                         260
                     );
             } else if (gDDResult == DDERR_SURFACEBUSY
@@ -252,7 +248,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
             } else if (gDDResult != DD_OK) {
                 DDSD(
                     gDDResult,
-                    DATA_COMPGEN(0x0051a2c0, ddPaintStillDrawingSourceFile, RETAIL_FILE),
+                    RETAIL_FILE,
                     265
                 );
             } else {
@@ -266,7 +262,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDResult != DD_OK)
             DDSD(
                 gDDResult,
-                DATA_COMPGEN(0x0051a2f8, ddPaintFinalLockSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 275
             );
         if (gpWindowManager->m_screen != NULL) {
@@ -278,7 +274,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDResult != DD_OK)
             DDSD(
                 gDDResult,
-                DATA_COMPGEN(0x0051a330, ddPaintFinalUnlockSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 286
             );
         EndPaint(reinterpret_cast<HWND>(window), &paint7);
@@ -322,7 +318,7 @@ void DDInitializePalette(void) {
         if (rr != DD_OK)
             DDSD(
                 rr,
-                DATA_COMPGEN(0x0051a368, ddInitializePaletteSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 359
             );
         SetPalette();
@@ -343,7 +339,7 @@ i32 DDSetPalette(void) {
     if (result != DD_OK)
         DDSD(
             result,
-            DATA_COMPGEN(0x0051a3a0, ddSetPaletteSourceFile, RETAIL_FILE),
+            RETAIL_FILE,
             383
         );
     return 0;
@@ -373,7 +369,7 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     if (rv != DD_OK)
         DDSD(
             rv,
-            DATA_COMPGEN(0x0051a3d8, ddCreateSurfaceCreateSourceFile, RETAIL_FILE),
+            RETAIL_FILE,
             421
         );
     if (primary == 0) {
@@ -381,7 +377,7 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
         if (rv != DD_OK)
             DDSD(
                 rv,
-                DATA_COMPGEN(0x0051a410, ddCreateSurfaceLockSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 429
             );
         if (gpWindowManager->m_screen != NULL) {
@@ -409,120 +405,91 @@ void DDSD(i32 error, char* file, i32 line) {
         case DD_OK:
             return;
         case DDERR_GENERIC:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a448, ddErrorGenericText, "DDERR_GENERIC            "));
+            strcpy(errorMessage, "DDERR_GENERIC            ");
             break;
         case DDERR_INVALIDCLIPLIST:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a464, ddErrorInvalidClipListText, "DDERR_INVALIDCLIPLIST\t   "));
+            strcpy(errorMessage, "DDERR_INVALIDCLIPLIST\t   ");
             break;
         case DDERR_INVALIDOBJECT:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a480, ddErrorInvalidObjectText, "DDERR_INVALIDOBJECT      "));
+            strcpy(errorMessage, "DDERR_INVALIDOBJECT      ");
             break;
         case DDERR_INVALIDPARAMS:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a49c, ddErrorInvalidParamsText, "DDERR_INVALIDPARAMS\t   "));
+            strcpy(errorMessage, "DDERR_INVALIDPARAMS\t   ");
             break;
         case DDERR_INVALIDRECT:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a4b4, ddErrorInvalidRectText, "DDERR_INVALIDRECT\t      "));
+            strcpy(errorMessage, "DDERR_INVALIDRECT\t      ");
             break;
         case DDERR_NOALPHAHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a4d0, ddErrorNoAlphaHardwareText, "DDERR_NOALPHAHW          "));
+            strcpy(errorMessage, "DDERR_NOALPHAHW          ");
             break;
         case DDERR_NOBLTHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a4ec, ddErrorNoBltHardwareText, "DDERR_NOBLTHW\t         "));
+            strcpy(errorMessage, "DDERR_NOBLTHW\t         ");
             break;
         case DDERR_NOCLIPLIST:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a504, ddErrorNoClipListText, "DDERR_NOCLIPLIST         "));
+            strcpy(errorMessage, "DDERR_NOCLIPLIST         ");
             break;
         case DDERR_NODDROPSHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a520, ddErrorNoDropShadowHardwareText, "DDERR_NODDROPSHW\t      "));
+            strcpy(errorMessage, "DDERR_NODDROPSHW\t      ");
             break;
         case DDERR_SURFACELOST:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a538, ddErrorSurfaceLostText, "DDERR_SURFACELOST        "));
+            strcpy(errorMessage, "DDERR_SURFACELOST        ");
             break;
         case DDERR_UNSUPPORTED:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a554, ddErrorUnsupportedText, "DDERR_UNSUPPORTED\t      "));
+            strcpy(errorMessage, "DDERR_UNSUPPORTED\t      ");
             break;
         case DDERR_NOMIRRORHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a570, ddErrorNoMirrorHardwareText, "DDERR_NOMIRRORHW         "));
+            strcpy(errorMessage, "DDERR_NOMIRRORHW         ");
             break;
         case DDERR_NORASTEROPHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a58c, ddErrorNoRasterOpHardwareText, "DDERR_NORASTEROPHW\t      "));
+            strcpy(errorMessage, "DDERR_NORASTEROPHW\t      ");
             break;
         case DDERR_NOROTATIONHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a5a8, ddErrorNoRotationHardwareText, "DDERR_NOROTATIONHW       "));
+            strcpy(errorMessage, "DDERR_NOROTATIONHW       ");
             break;
         case DDERR_NOSTRETCHHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a5c4, ddErrorNoStretchHardwareText, "DDERR_NOSTRETCHHW\t      "));
+            strcpy(errorMessage, "DDERR_NOSTRETCHHW\t      ");
             break;
         case DDERR_SURFACEBUSY:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a5e0, ddErrorSurfaceBusyText, "DDERR_SURFACEBUSY        "));
+            strcpy(errorMessage, "DDERR_SURFACEBUSY        ");
             break;
         case DDERR_NOZBUFFERHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a5fc, ddErrorNoZBufferHardwareText, "DDERR_NOZBUFFERHW        "));
+            strcpy(errorMessage, "DDERR_NOZBUFFERHW        ");
             break;
         case DDERR_OUTOFMEMORY:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a618, ddErrorOutOfMemoryText, "DDERR_OUTOFMEMORY\t      "));
+            strcpy(errorMessage, "DDERR_OUTOFMEMORY\t      ");
             break;
         case DDERR_CLIPPERISUSINGHWND:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a634, ddErrorClipperUsingWindowText, "DDERR_CLIPPERISUSINGHWND "));
+            strcpy(errorMessage, "DDERR_CLIPPERISUSINGHWND ");
             break;
         case DDERR_NOEXCLUSIVEMODE:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a650, ddErrorNoExclusiveModeText, "DDERR_NOEXCLUSIVEMODE\t   "));
+            strcpy(errorMessage, "DDERR_NOEXCLUSIVEMODE\t   ");
             break;
         case DDERR_NOT8BITCOLOR:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a66c, ddErrorNotEightBitColorText, "DDERR_NOT8BITCOLOR       "));
+            strcpy(errorMessage, "DDERR_NOT8BITCOLOR       ");
             break;
         case DDERR_NOPALETTEATTACHED:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a688, ddErrorNoPaletteAttachedText, "DDERR_NOPALETTEATTACHED  "));
+            strcpy(errorMessage, "DDERR_NOPALETTEATTACHED  ");
             break;
         case DDERR_NOPALETTEHW:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a6a4, ddErrorNoPaletteHardwareText, "DDERR_NOPALETTEHW\t      "));
+            strcpy(errorMessage, "DDERR_NOPALETTEHW\t      ");
             break;
         case DDERR_LOCKEDSURFACES:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a6c0, ddErrorLockedSurfacesText, "DDERR_LOCKEDSURFACES     "));
+            strcpy(errorMessage, "DDERR_LOCKEDSURFACES     ");
             break;
         case DDERR_IMPLICITLYCREATED:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a6dc, ddErrorImplicitlyCreatedText, "DDERR_IMPLICITLYCREATED  "));
+            strcpy(errorMessage, "DDERR_IMPLICITLYCREATED  ");
             break;
         case DDERR_WRONGMODE:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a6f8, ddErrorWrongModeText, "DDERR_WRONGMODE          "));
+            strcpy(errorMessage, "DDERR_WRONGMODE          ");
             break;
         case DDERR_INCOMPATIBLEPRIMARY:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a714, ddErrorIncompatiblePrimaryText, "DDERR_INCOMPATIBLEPRIMARY"));
+            strcpy(errorMessage, "DDERR_INCOMPATIBLEPRIMARY");
             break;
         case DDERR_NOCLIPPERATTACHED:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a730, ddErrorNoClipperAttachedText, "DDERR_NOCLIPPERATTACHED  "));
+            strcpy(errorMessage, "DDERR_NOCLIPPERATTACHED  ");
             break;
         default:
-            strcpy(errorMessage, DATA_COMPGEN(
-                0x0051a74c, ddErrorUnknownText, "Error type unknown"));
+            strcpy(errorMessage, "Error type unknown");
             break;
     }
     MessageBeep(0);
@@ -530,11 +497,7 @@ void DDSD(i32 error, char* file, i32 line) {
     MessageBeep(0);
     sprintf(
         gText,
-        DATA_COMPGEN(
-            0x0051a760,
-            ddErrorDialogFormat,
-            "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d"
-        ),
+        "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d",
         errorMessage,
         file,
         line
@@ -568,7 +531,7 @@ void __cdecl DDUpdatePalette(i8* paletteData) {
     }
     ProcessAssert(
         reinterpret_cast<i32>(lpDDPal),
-        DATA_COMPGEN(0x0051a794, ddUpdatePaletteAssertSourceFile, RETAIL_FILE),
+        RETAIL_FILE,
         518
     );
     result0 = lpDDPal->SetEntries(
@@ -580,7 +543,7 @@ void __cdecl DDUpdatePalette(i8* paletteData) {
     if (result0 != DD_OK)
         DDSD(
             result0,
-            DATA_COMPGEN(0x0051a7cc, ddUpdatePaletteSetSourceFile, RETAIL_FILE),
+            RETAIL_FILE,
             522
         );
 }
@@ -598,7 +561,7 @@ void DDCleanUpWinGraphics(void) {
                 if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
                     DDSD(
                         result,
-                        DATA_COMPGEN(0x0051a804, ddCleanupClipperSourceFile, RETAIL_FILE),
+                        RETAIL_FILE,
                         540
                     );
             }
@@ -621,7 +584,7 @@ void DDCleanUpWinGraphics(void) {
         if (result != DD_OK)
             DDSD(
                 result,
-                DATA_COMPGEN(0x0051a83c, ddCleanupCooperativeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 564
             );
         lpDD->Release();
@@ -658,7 +621,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         if (hres != DD_OK)
             DDSD(
                 hres,
-                DATA_COMPGEN(0x0051a874, ddFullscreenCooperativeSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 593
             );
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
@@ -666,7 +629,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             if (hres != DD_OK)
                 DDSD(
                     hres,
-                    DATA_COMPGEN(0x0051a8ac, ddFullscreenDisplayModeSourceFile, RETAIL_FILE),
+                    RETAIL_FILE,
                     599
                 );
         } else {
@@ -674,14 +637,14 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             if (hres != DD_OK)
                 DDSD(
                     hres,
-                    DATA_COMPGEN(0x0051a8e4, ddWindowedRestoreSourceFile, RETAIL_FILE),
+                    RETAIL_FILE,
                     606
                 );
             hres = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
             if (hres != DD_OK)
                 DDSD(
                     hres,
-                    DATA_COMPGEN(0x0051a91c, ddWindowedCooperativeSourceFile, RETAIL_FILE),
+                    RETAIL_FILE,
                     611
                 );
         }
@@ -694,7 +657,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         if (hres != DD_OK)
             DDSD(
                 hres,
-                DATA_COMPGEN(0x0051a954, ddFullscreenPaletteSourceFile, RETAIL_FILE),
+                RETAIL_FILE,
                 623
             );
         WritePrefs();
@@ -967,13 +930,12 @@ void WGCleanUpWinGraphics(void) {
 
 VA(0x004b17fa, 0x66)
 void ConnectToDLLs(void) {
-    hDDrawLibrary = LoadLibraryA(DATA_COMPGEN(
-        0x0051a98c, directDrawLibraryName, "DDRAW.DLL"));
+    hDDrawLibrary = LoadLibraryA("DDRAW.DLL");
     if (reinterpret_cast<u32l>(hDDrawLibrary) >= WINGRAPH_LOAD_LIBRARY_SUCCESS) {
         lpDirectDrawCreate = reinterpret_cast<DirectDrawCreateProc>(
             GetProcAddress(
                 hDDrawLibrary,
-                DATA_COMPGEN(0x0051a998, directDrawCreateProcName, "DirectDrawCreate")
+                "DirectDrawCreate"
             )
         );
     }
@@ -1021,10 +983,7 @@ void GetGraphicsInfo(void) {
         ReleaseDC(NULL, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
             ShutDown(
-                DATA_COMPGEN(
-                    0x0051a9ac,
-                    insufficientColorDepthText,
-                    "\xc4\xeb\xff \xc3\xe5\xf0\xee\xe5\xe2 II \xf2\xf0\xe5\xe1\xf3\xe5\xf2\xf1\xff "
+                "\xc4\xeb\xff \xc3\xe5\xf0\xee\xe5\xe2 II \xf2\xf0\xe5\xe1\xf3\xe5\xf2\xf1\xff "
                     "\xf0\xe5\xe6\xe8\xec \xe2 256 \xf6\xe2\xe5\xf2\xee\xe2 \xe8\xeb\xe8 "
                     "\xe1\xee\xeb\xfc\xf8\xe5.\n\n\xd7\xf2\xee\xe1\xfb "
                     "\xe8\xe7\xec\xe5\xed\xe8\xf2\xfc \xf0\xe5\xe6\xe8\xec "
@@ -1034,8 +993,7 @@ void GetGraphicsInfo(void) {
                     "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 'Properties'/\xd1\xe2\xee\xe9\xf1\xf2\xe2\xe0'. "
                     "\xc7\xe0\xf2\xe5\xec \xe2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0\xf5 "
                     "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xeb\xf3\xe1\xe8\xed\xf3 "
-                    "\xf6\xe2\xe5\xf2\xe0."
-                ) /* "Для Героев II требуется режим в 256 цветов или больше.
+                    "\xf6\xe2\xe5\xf2\xe0." /* "Для Героев II требуется режим в 256 цветов или больше.
 
 Чтобы изменить режим цветности, щелкните правой кнопкой по рабочему столу Windows и выберите 'Properties'/Свойства'. Затем в установках выберите глубину цвета." */
             );
@@ -1044,21 +1002,21 @@ void GetGraphicsInfo(void) {
 
 VA(0x004b1911, 0x82)
 void InitGraphics(void) {
-    LogStr(DATA_COMPGEN(0x0051aa84, initGraphicsStageOneText, "IG1"));
+    LogStr("IG1");
     ConnectToDLLs();
-    LogStr(DATA_COMPGEN(0x0051aa88, initGraphicsStageTwoText, "IG2"));
+    LogStr("IG2");
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
         giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
     else
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
-        LogStr(DATA_COMPGEN(0x0051aa8c, initGraphicsStageThreeText, "IG3"));
+        LogStr("IG3");
         WGInitGraphics();
-        LogStr(DATA_COMPGEN(0x0051aa90, initGraphicsStageFourText, "IG4"));
+        LogStr("IG4");
     } else {
-        LogStr(DATA_COMPGEN(0x0051aa94, initGraphicsStageFiveText, "IG5"));
+        LogStr("IG5");
         DDInitGraphics();
-        LogStr(DATA_COMPGEN(0x0051aa98, initGraphicsStageSixText, "IG6"));
+        LogStr("IG6");
     }
 }
 

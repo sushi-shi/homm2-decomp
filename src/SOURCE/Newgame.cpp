@@ -241,7 +241,7 @@ void game::GetMap(void) {
     strcpy(savedName, gMapName);
     strcpy(
         gcCurMapName,
-        DATA_COMPGEN(0x0053096c, getMapCurrentNameEmpty, "")
+        ""
     );
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
@@ -456,13 +456,13 @@ i32 game::NewGame(void) {
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
         strcpy(
             cTextReceivedBuffer[textBufferIndex],
-            DATA_COMPGEN(0x00530970, newGameChatLineEmpty, "")
+            ""
         );
     }
     cNGKPCore = static_cast<char*>(H2_ALLOC(GAME_KEY_BUFFER_SIZE));
     cNGKPDisplay = static_cast<char*>(H2_ALLOC(GAME_KEY_BUFFER_SIZE));
-    strcpy(cNGKPCore, DATA_COMPGEN(0x00530974, newGameKeyCoreEmpty, ""));
-    strcpy(cNGKPDisplay, DATA_COMPGEN(0x00530978, newGameKeyDisplayEmpty, ""));
+    strcpy(cNGKPCore, "");
+    strcpy(cNGKPDisplay, "");
     NGKPcursorIndex = 0;
     NGKPBkg = gpResourceManager->GetIcon("ngextra.icn");
 
@@ -919,7 +919,7 @@ cleanup:
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER) {
                 sprintf(
                     gText,
-                    DATA_COMPGEN(0x0053097c, updateNewGameComputerPlayerNameEmpty, "")
+                    ""
                 );
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
                 sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
@@ -1137,11 +1137,11 @@ cleanup:
             strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
             strcpy(
                 cNGKPCore,
-                DATA_COMPGEN(0x00530980, newGameHandlerKeyCoreEmpty, "")
+                ""
             );
             strcpy(
                 cNGKPDisplay,
-                DATA_COMPGEN(0x00530984, newGameHandlerKeyDisplayEmpty, "")
+                ""
             );
             NGKPcursorIndex = 0;
             sendResult = TransmitRemoteData(
@@ -1572,7 +1572,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 break;
             strcpy(
                 cNGKPCore,
-                DATA_COMPGEN(0x00530988, processNewGameEscapeKeyCoreEmpty, "")
+                ""
             );
             break;
 
@@ -1990,7 +1990,7 @@ void game::ShowScenInfo(void) {
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER) {
             sprintf(
                 gText,
-                DATA_COMPGEN(0x0053098c, showScenarioComputerPlayerNameEmpty, "")
+                ""
             );
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);

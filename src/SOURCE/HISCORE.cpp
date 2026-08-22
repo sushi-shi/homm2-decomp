@@ -174,7 +174,7 @@ void highScoreManager::Update(void) {
             m_monsterTypes[rank] = 0;
             sprintf(
                 gText,
-                DATA_COMPGEN(0x005249bc, highScoreEmptyEntryText, "")
+                ""
             );
         } else {
             m_monsterTypes[rank] = GetMonType(
@@ -214,7 +214,7 @@ void highScoreManager::Update(void) {
         hsMessage.payload.widget.data.text = gText;
         sprintf(
             gText,
-            DATA_COMPGEN(0x005249c0, highScorePlayerNameEmpty, "")
+            ""
         );
         hsMessage.payload.widget.id =
             rank * HIGH_SCORE_TEXT_WIDGET_STRIDE + HIGH_SCORE_FIRST_TEXT_WIDGET;
@@ -223,17 +223,13 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                DATA_COMPGEN(
-                    0x004f8120,
-                    highScoreCheaterSuffix,
-                    "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Читер)" */
-                )
+                "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Читер)" */
             );
         m_window->BroadcastMessage(hsMessage);
 
         sprintf(
             gText,
-            DATA_COMPGEN(0x005249c4, highScoreScenarioNameEmpty, "")
+            ""
         );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
@@ -244,7 +240,7 @@ void highScoreManager::Update(void) {
 
         sprintf(
             gText,
-            DATA_COMPGEN(0x005249c8, highScoreRatingEmpty, "")
+            ""
         );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
@@ -259,14 +255,14 @@ void highScoreManager::Update(void) {
 
         sprintf(
             gText,
-            DATA_COMPGEN(0x005249cc, highScoreScoreTextEmpty, "")
+            ""
         );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCORE_OFFSET;
         sprintf(
             gText,
-            DATA_COMPGEN(0x005249d0, highScoreScoreValueEmpty, "")
+            ""
         );
         if (m_showCampaignScores == 0 && highScore.score != HIGH_SCORE_EMPTY)
             sprintf(gText, "%d", highScore.score);

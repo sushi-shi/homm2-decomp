@@ -62,16 +62,16 @@ DATA(0x005167d0) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 
 VA(0x0048d050, 0x15c)
 void RemoteCleanup(void) {
-    LogStr(DATA_COMPGEN(0x005167ec, remoteCleanupLogStart, "RC1"));
+    LogStr("RC1");
     if (gbRemoteOn == 0)
         return;
-    LogStr(DATA_COMPGEN(0x005167f0, remoteCleanupLogRemoteOff, "RC2"));
+    LogStr("RC2");
     if (gbInRemoteMain != 0)
         return;
     if (gbInRemoteCleanup != 0)
         return;
     gbInRemoteCleanup = true;
-    LogStr(DATA_COMPGEN(0x005167f4, remoteCleanupLogUnloadDriver, "RC3"));
+    LogStr("RC3");
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
@@ -120,25 +120,21 @@ void RemoteMain(RemoteGameMode gameMode) {
 
     gbInRemoteMain = true;
     bGotGameType = 0;
-    LogStr(DATA_COMPGEN(0x005167f8, remoteMainLogEnter, "In Remote Main"));
-    LogStr(DATA_COMPGEN(0x00516808, remoteMainLogInitializePlayers, "RM 1"));
+    LogStr("In Remote Main");
+    LogStr("RM 1");
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
         sprintf(
             gsNetPlayerInfo[player].name,
-            /* Игрок %d */ DATA_COMPGEN(
-                0x00516810,
-                remoteMainDefaultPlayerNameFormat,
-                "\xc8\xe3\xf0\xee\xea\x20\x25\x64"
-            ),
+            /* Игрок %d */ "\xc8\xe3\xf0\xee\xea\x20\x25\x64",
             player + 1
         );
     }
-    LogStr(DATA_COMPGEN(0x0051681c, remoteMainLogConfigureMouse, "RM 2"));
+    LogStr("RM 2");
     gbRemoteGameOpen = true;
     savedColorMice = bLastMouseOffscreen != 0 ? bLastOnscreenMouseColor : gbColorMice;
     gpMouseManager->SetColorMice(0);
-    LogStr(DATA_COMPGEN(0x00516824, remoteMainLogSelectProtocol, "RM 3"));
+    LogStr("RM 3");
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
         bUseDirectPlay = 1;
@@ -148,17 +144,17 @@ void RemoteMain(RemoteGameMode gameMode) {
         bUseWinsock = 0;
         bUseDirectPlay = bUseWinsock;
     }
-    LogStr(DATA_COMPGEN(0x0051682c, remoteMainLogClearQueue, "RM 4"));
+    LogStr("RM 4");
     memset(sMapChangeQueue, 0, sizeof(sMapChangeQueue));
     for (player = 0; player < REMOTE_QUEUE_CAPACITY; player++)
         rcvBuf[player] = NULL;
-    LogStr(DATA_COMPGEN(0x00516834, remoteMainLogClearRecentIds, "RM 5"));
+    LogStr("RM 5");
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
     GameMode = gameMode;
-    LogStr(DATA_COMPGEN(0x0051683c, remoteMainLogClearPlayerInfo, "RM 6"));
+    LogStr("RM 6");
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
-    LogStr(DATA_COMPGEN(0x00516844, remoteMainLogChooseLocalName, "RM 7"));
+    LogStr("RM 7");
     if (giTCPHostStatus != -1) {
         if (strlen(gcTCPName) > 0)
             strcpy(gsThisNetPlayerInfo.name, gcTCPName);
@@ -167,11 +163,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     } else {
         GetDataEntry(
             /* Пожалуйста, введите имя, под которым вы будете известны. */
-            DATA_COMPGEN(
-                0x0051684c,
-                remoteMainEnterPlayerNamePrompt,
-                "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 \xe8\xec\xff, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec \xe2\xfb \xe1\xf3\xe4\xe5\xf2\xe5 \xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb."
-            ),
+            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 \xe8\xec\xff, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec \xe2\xfb \xe1\xf3\xe4\xe5\xf2\xe5 \xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb.",
             gsThisNetPlayerInfo.name,
             NET_NAME_INPUT_LIMIT,
             gConfig.networkDefaultName,
@@ -208,12 +200,12 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
             break;
                     case REMOTE_GAME_MODEM_HOST:
-            LogStr(DATA_COMPGEN(0x00516888, remoteMainLogModemHostStart, "MH1"));
+            LogStr("MH1");
             gbRemoteOn = true;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
             ModemSetup(IDX(gameMode));
-            LogStr(DATA_COMPGEN(0x0051688c, remoteMainLogModemHostReady, "MH2"));
+            LogStr("MH2");
             break;
                     case REMOTE_GAME_MODEM_GUEST:
             gbRemoteOn = true;
@@ -228,15 +220,15 @@ void RemoteMain(RemoteGameMode gameMode) {
     gpMouseManager->SetColorMice(savedColorMice);
 
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
-        LogStr(DATA_COMPGEN(0x00516890, remoteMainLogWaitForPlayers, "RM 2"));
+        LogStr("RM 2");
         if (giThisNetPos == 0) {
             pending = 1;
             memset(gotPlayers, 0, REMOTE_PLAYER_COUNT);
             while (pending != 0) {
                 PollSound();
-                LogStr(DATA_COMPGEN(0x00516898, remoteMainLogPollPlayerInfo, "RM 3"));
+                LogStr("RM 3");
                 recvData = GetRemoteData(1);
-                LogStr(DATA_COMPGEN(0x005168a0, remoteMainLogReceivePlayerInfo, "RM 4"));
+                LogStr("RM 4");
                 if (recvData != NULL
                     && REMOTE_MESSAGE(recvData)->type == REMOTE_MESSAGE_RELIABLE) {
                     switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(recvData)->command)) {
@@ -257,7 +249,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 }
             }
         } else {
-            LogStr(DATA_COMPGEN(0x005168a8, remoteMainLogSendPlayerInfo, "RM 5"));
+            LogStr("RM 5");
             TransmitRemoteData(
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
@@ -267,7 +259,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 1,
                 REMOTE_MESSAGE_DEFAULT
             );
-            LogStr(DATA_COMPGEN(0x005168b0, remoteMainLogFinishPlayerSetup, "RM 6"));
+            LogStr("RM 6");
         }
     }
     gameMsg = NULL;
@@ -308,7 +300,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
         }
     }
-    LogStr(DATA_COMPGEN(0x005168b8, remoteMainLogExit, "Out Remote Main"));
+    LogStr("Out Remote Main");
     gbInRemoteMain = false;
 }
 
@@ -387,7 +379,7 @@ i32 DecodePacket(u8* data, i32) {
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
         sprintf(
             text,
-            DATA_COMPGEN(0x005168c8, decodePacketWrongDestinationFormat, "not mine %d\n"),
+            "not mine %d\n",
             REMOTE_PACKET(packet)->destination
         );
         LogStr(text);
@@ -400,11 +392,7 @@ i32 DecodePacket(u8* data, i32) {
     if (crc != crc2[0]) {
         sprintf(
             text,
-            DATA_COMPGEN(
-                0x005168d8,
-                decodePacketCrcFailureFormat,
-                "CRC Check Failed CRC 1 %d CRC 2 %d\n"
-            ),
+            "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             crc,
             crc2[0]
         );
@@ -447,11 +435,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                     );
                     if (sendStatus != 0) {
                         LogInt(
-                            DATA_COMPGEN(
-                                0x005168fc,
-                                sendRemoteDataFailureLog,
-                                "Bad return on Send Data"
-                            ),
+                            "Bad return on Send Data",
                             destination,
                             sendStatus,
                             size,
@@ -569,11 +553,7 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && tries == REMOTE_RETRY_COUNT && rv == 0) {
             NormalDialog(
-                /* Ошибка пересылки данных. Продолжить? */ DATA_COMPGEN(
-                    0x00516914,
-                    sendRemoteMessageRetryPrompt,
-                    "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f"
-                ),
+                /* Ошибка пересылки данных. Продолжить? */ "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -683,11 +663,7 @@ void PollRemote(void) {
                 sprintf(
                     gText,
                     /* Компьютер '%s' не отвечает на запросы. Желаете продолжить ожидание ответа? */
-                    DATA_COMPGEN(
-                        0x0051693c,
-                        remoteTimeoutHostPlayerPrompt,
-                        "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f"
-                    ),
+                    "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f",
                     gsNetPlayerInfo[queueIndex].name
                 );
                 NormalDialog(
@@ -718,22 +694,14 @@ void PollRemote(void) {
                 sprintf(
                     gText,
                     /* Компьютер '%s' не отвечает на запросы. Желаете продолжить ожидание ответа? */
-                    DATA_COMPGEN(
-                        0x00516988,
-                        remoteTimeoutGuestPlayerPrompt,
-                        "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f"
-                    ),
+                    "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f",
                     gsNetPlayerInfo[0].name
                 );
             } else {
                 sprintf(
                     gText,
                     /* Удаленное соединение с другими игроками прервано. Желаете продолжить ожидание ответа? */
-                    DATA_COMPGEN(
-                        0x005169d4,
-                        remoteTimeoutConnectionBrokenPrompt,
-                        "\xd3\xe4\xe0\xeb\xe5\xed\xed\xee\xe5\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5\x20\xf1\x20\xe4\xf0\xf3\xe3\xe8\xec\xe8\x20\xe8\xe3\xf0\xee\xea\xe0\xec\xe8\x20\xef\xf0\xe5\xf0\xe2\xe0\xed\xee\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f"
-                    )
+                    "\xd3\xe4\xe0\xeb\xe5\xed\xed\xee\xe5\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5\x20\xf1\x20\xe4\xf0\xf3\xe3\xe8\xec\xe8\x20\xe8\xe3\xf0\xee\xea\xe0\xec\xe8\x20\xef\xf0\xe5\xf0\xe2\xe0\xed\xee\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f"
                 );
             }
             NormalDialog(
@@ -750,22 +718,14 @@ void PollRemote(void) {
                 ReceiveRemotePlayerExit(guestExit);
             } else {
                 gpGame->SaveGame(
-                    /* Игрок Вышел */ DATA_COMPGEN(
-                        0x00516a2c,
-                        remoteTimeoutSaveName,
-                        "\xc8\xe3\xf0\xee\xea\x20\xc2\xfb\xf8\xe5\xeb"
-                    ),
+                    /* Игрок Вышел */ "\xc8\xe3\xf0\xee\xea\x20\xc2\xfb\xf8\xe5\xeb",
                     1,
                     0
                 );
                 sprintf(
                     gText,
                     /* Данная игра сохранена под названием 'Игрок вышел'. Желаете продолжить игру, где компьютер займет место выбывших игроков? */
-                    DATA_COMPGEN(
-                        0x00516a38,
-                        remoteTimeoutSavedGamePrompt,
-                        "\xc4\xe0\xed\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x20\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0\x20\xef\xee\xe4\x20\xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec\x20\x27\xc8\xe3\xf0\xee\xea\x20\xe2\xfb\xf8\xe5\xeb\x27\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xe8\xe3\xf0\xf3\x2c\x20\xe3\xe4\xe5\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\xe7\xe0\xe9\xec\xe5\xf2\x20\xec\xe5\xf1\xf2\xee\x20\xe2\xfb\xe1\xfb\xe2\xf8\xe8\xf5\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x3f"
-                    )
+                    "\xc4\xe0\xed\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x20\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0\x20\xef\xee\xe4\x20\xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec\x20\x27\xc8\xe3\xf0\xee\xea\x20\xe2\xfb\xf8\xe5\xeb\x27\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xe8\xe3\xf0\xf3\x2c\x20\xe3\xe4\xe5\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\xe7\xe0\xe9\xec\xe5\xf2\x20\xec\xe5\xf1\xf2\xee\x20\xe2\xfb\xe1\xfb\xe2\xf8\xe8\xf5\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x3f"
                 );
                 NormalDialog(
                     gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
@@ -773,7 +733,7 @@ void PollRemote(void) {
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                     DropDownToOnePlayer();
                 else
-                    ShutDown(DATA_COMPGEN(0x00533d74, remoteShutdownEmptyMessage, ""));
+                    ShutDown("");
             }
             gbInPollSound = oldInPoll;
             bInTimeoutFail = 1;
@@ -881,11 +841,7 @@ i32 TransmitAndWait(
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                /* Ошибка пересылки данных. Продолжить? */ DATA_COMPGEN(
-                    0x00516ab4,
-                    transmitRemoteDataRetryPrompt,
-                    "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f"
-                ),
+                /* Ошибка пересылки данных. Продолжить? */ "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,

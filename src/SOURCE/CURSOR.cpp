@@ -1356,11 +1356,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                DATA_COMPGEN(
-                    0x004f1b78,
-                    cursorPlayerVanquishedFormat,
-                    "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!" /* "%s сокрушен!" */
-                ),
+                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!" /* "%s сокрушен!" */,
                 cPlayerNames[change.id]
             );
             NormalDialog(

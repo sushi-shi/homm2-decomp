@@ -243,7 +243,7 @@ void UpdateTradingPost(i32 draw) {
                 } else {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x00533f78, tradingPostResourceEmptyText, "")
+                        ""
                     );
                 }
             }

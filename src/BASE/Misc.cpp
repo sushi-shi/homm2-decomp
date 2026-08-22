@@ -191,11 +191,7 @@ DATA(0x005360ac) i32 iMemEntries = 0;
 DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
 DATA(0x005360b4) i32 giTotalMemAllocated = 0;
 DATA(0x0051e5dc) static char* gcCDTrackName =
-    DATA_COMPGEN(
-        0x0051f120,
-        cdTrackProbeName,
-        "\\Tracks2\\02-AudioTrack 02.ogg"
-    );
+    "\\Tracks2\\02-AudioTrack 02.ogg";
 DATA(0x0051e5e0) u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
@@ -563,18 +559,10 @@ void SetGameDefaults(void) {
     // Неизвестный герой
     strcpy(
         gConfig.networkDefaultName,
-        DATA_COMPGEN(
-            0x0051e728,
-            networkDefaultHeroName,
-            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb\xe9 \xe3\xe5\xf0\xee\xe9"
-        )
+        "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb\xe9 \xe3\xe5\xf0\xee\xe9"
     );
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
-    alpha = DATA_COMPGEN(
-        0x0051e73c,
-        uniqueIdAlphabet,
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    );
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
     seed = 0;
     seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
@@ -612,11 +600,11 @@ void ReadPrefsFromFile(void) {
     }
     strcpy(
         gcRegCDRomPath,
-        DATA_COMPGEN(0x005360b8, readPrefsCDRomPathEmpty, "")
+        ""
     );
     strcpy(
         gcRegAppPath,
-        DATA_COMPGEN(0x005360bc, readPrefsAppPathEmpty, "")
+        ""
     );
 }
 
@@ -1027,7 +1015,7 @@ void ReadPrefsFromRegistry(void) {
             != 0)
             strcpy(
                 gcRegAppPath,
-                DATA_COMPGEN(0x005360c0, missingRegistryAppPath, "")
+                ""
             );
         if (RegQueryValueExA(
                 hKey,
@@ -1040,7 +1028,7 @@ void ReadPrefsFromRegistry(void) {
             != 0)
             strcpy(
                 gcRegCDRomPath,
-                DATA_COMPGEN(0x005360c4, missingRegistryCDRomPath, "")
+                ""
             );
         RegCloseKey(hKey);
         if (gConfig.gfx[IDX(giCurExe)].width <= 0)
@@ -2025,7 +2013,7 @@ void GetDataEntry(
     iDEMaxLen = maximumLength;
     strcpy(
         cDEDest,
-        DATA_COMPGEN(0x005360c8, dataEntryEmptyDestination, "")
+        ""
     );
 
     textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
@@ -2054,7 +2042,7 @@ void GetDataEntry(
     else
         strcpy(
             cBuf,
-            DATA_COMPGEN(0x005360cc, dataEntryEmptyInitialText, "")
+            ""
         );
     msg.payload.widget.id = ENTRY_TEXT_WIDGET;
     msg.payload.widget.data.text = cBuf;
@@ -2110,7 +2098,7 @@ void GetDataEntry(
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
     gpMouseManager->SetPointer(
-        DATA_COMPGEN(0x005360d0, dataEntryEmptyCursorFilename, ""),
+        "",
         nFrame,
         savedCursorType
     );

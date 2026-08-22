@@ -962,15 +962,15 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_RADAR_LEFT_FLOAT \
-    DATA_COMPGEN(0x004ea43c, radarLeftFloat, static_cast<float>(RADAR_LEFT))
+    static_cast<float>(RADAR_LEFT)
 #define ADVMGR_RADAR_TOP_FLOAT \
-    DATA_COMPGEN(0x004ea438, radarTopFloat, static_cast<float>(RADAR_TOP))
+    static_cast<float>(RADAR_TOP)
 #define ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE \
-    DATA_COMPGEN(0x004ea440, locatorScrollBaseYDouble, static_cast<double>(LOCATOR_SCROLL_BASE_Y))
+    static_cast<double>(LOCATOR_SCROLL_BASE_Y)
 #define ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE \
-    DATA_COMPGEN(0x004ea448, locatorHeroScrollSpanDouble, static_cast<double>(LOCATOR_HERO_SCROLL_SPAN))
+    static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
 #define ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE \
-    DATA_COMPGEN(0x004ea450, locatorTownScrollSpanDouble, static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN))
+    static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 // The route-overlay byte at (column, row), read through this->m_visibilityMap.
 // Same grouping rule as MAP_EXTRA_AT in <SOURCE/KB.h>: retail adds the base and
@@ -1086,7 +1086,7 @@ i32 advManager::Open(i32 id) {
         m_adventureWindow = new heroWindow(
             0,
             0,
-            DATA_COMPGEN(0x004ef1f0, adventureWindowFilename, "adv_wind.bin")
+            "adv_wind.bin"
         );
         if (m_adventureWindow == NULL) {
             MemError();
@@ -1096,7 +1096,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            DATA_COMPGEN(0x004ef200, scrollLeftIconFilename, "scroll.icn"),
+            "scroll.icn",
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_LEFT_ID,
@@ -1112,7 +1112,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            DATA_COMPGEN(0x004ef20c, scrollRightIconFilename, "scroll.icn"),
+            "scroll.icn",
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_RIGHT_ID,
@@ -1127,13 +1127,13 @@ i32 advManager::Open(i32 id) {
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x004ef218, openHumanAdventureCursorFilename, "advmice.mse"),
+            "advmice.mse",
             0,
             MOUSE_AUTO_CURSOR_TYPE
         );
     } else {
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x004ef224, openComputerAdventureCursorFilename, "advmice.mse"),
+            "advmice.mse",
             1,
             MOUSE_AUTO_CURSOR_TYPE
         );
@@ -1150,22 +1150,22 @@ i32 advManager::Open(i32 id) {
 
     if (m_groundTiles == NULL) {
         m_groundTiles = gpResourceManager->GetTileset(
-            DATA_COMPGEN(0x004ef230, adventureGroundTilesetFilename, "ground32.til")
+            "ground32.til"
         );
     }
     if (m_cloudTiles == NULL) {
         m_cloudTiles = gpResourceManager->GetTileset(
-            DATA_COMPGEN(0x004ef240, adventureCloudTilesetFilename, "clof32.til")
+            "clof32.til"
         );
     }
     if (m_stoneTiles == NULL) {
         m_stoneTiles = gpResourceManager->GetTileset(
-            DATA_COMPGEN(0x004ef24c, adventureStoneTilesetFilename, "ston.til")
+            "ston.til"
         );
     }
     if (m_cloudOverlayIcon == NULL) {
         m_cloudOverlayIcon = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef258, adventureCloudOverlayIconFilename, "clop32.icn")
+            "clop32.icn"
         );
     }
 
@@ -1178,123 +1178,123 @@ i32 advManager::Open(i32 id) {
 
     if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
         m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef264, knightHeroIconFilename, "kngt32.icn")
+            "kngt32.icn"
         );
     }
     if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
         m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef270, barbarianHeroIconFilename, "barb32.icn")
+            "barb32.icn"
         );
     }
     if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
         m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef27c, sorceressHeroIconFilename, "sorc32.icn")
+            "sorc32.icn"
         );
     }
     if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
         m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef288, warlockHeroIconFilename, "wrlk32.icn")
+            "wrlk32.icn"
         );
     }
     if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
         m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef294, wizardHeroIconFilename, "wzrd32.icn")
+            "wzrd32.icn"
         );
     }
     if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
         m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2a0, necromancerHeroIconFilename, "necr32.icn")
+            "necr32.icn"
         );
     }
     if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
         m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2ac, boatHeroIconFilename, "boat32.icn")
+            "boat32.icn"
         );
     }
     if (m_heroIcons[HERO_ICON_FROTH] == NULL) {
         m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2b8, boatFrothIconFilename, "froth.icn")
+            "froth.icn"
         );
     }
 
     gbLoadingMonoIcon = true;
     if (m_shadowIcon == NULL) {
         m_shadowIcon = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2c4, adventureShadowIconFilename, "shadow32.icn")
+            "shadow32.icn"
         );
     }
     if (m_boatShadowIcon == NULL) {
         m_boatShadowIcon = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2d4, boatShadowIconFilename, "boatshad.icn")
+            "boatshad.icn"
         );
     }
     gbLoadingMonoIcon = false;
 
     if (m_flagIcons[PLAYER_COLOR_BLUE] == NULL) {
         m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2e4, blueFlagIconFilename, "b-flag32.icn")
+            "b-flag32.icn"
         );
     }
     if (m_flagIcons[PLAYER_COLOR_GREEN] == NULL) {
         m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef2f4, greenFlagIconFilename, "g-flag32.icn")
+            "g-flag32.icn"
         );
     }
     if (m_flagIcons[PLAYER_COLOR_RED] == NULL) {
         m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef304, redFlagIconFilename, "r-flag32.icn")
+            "r-flag32.icn"
         );
     }
     if (m_flagIcons[PLAYER_COLOR_YELLOW] == NULL) {
         m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef314, yellowFlagIconFilename, "y-flag32.icn")
+            "y-flag32.icn"
         );
     }
     if (m_flagIcons[PLAYER_COLOR_ORANGE] == NULL) {
         m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef324, orangeFlagIconFilename, "o-flag32.icn")
+            "o-flag32.icn"
         );
     }
     if (m_flagIcons[PLAYER_COLOR_PURPLE] == NULL) {
         m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef334, purpleFlagIconFilename, "p-flag32.icn")
+            "p-flag32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_BLUE] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef344, blueBoatFlagIconFilename, "b-bflg32.icn")
+            "b-bflg32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_GREEN] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef354, greenBoatFlagIconFilename, "g-bflg32.icn")
+            "g-bflg32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_RED] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef364, redBoatFlagIconFilename, "r-bflg32.icn")
+            "r-bflg32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_YELLOW] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef374, yellowBoatFlagIconFilename, "y-bflg32.icn")
+            "y-bflg32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_ORANGE] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef384, orangeBoatFlagIconFilename, "o-bflg32.icn")
+            "o-bflg32.icn"
         );
     }
     if (m_boatFlagIcons[PLAYER_COLOR_PURPLE] == NULL) {
         m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef394, purpleBoatFlagIconFilename, "p-bflg32.icn")
+            "p-bflg32.icn"
         );
     }
 
     gbLoadingMonoIcon = true;
     if (m_puzzleIcon == NULL) {
         m_puzzleIcon = gpResourceManager->GetIcon(
-            DATA_COMPGEN(0x004ef3a4, puzzleRadarIconFilename, "radar.icn")
+            "radar.icn"
         );
     }
     gbLoadingMonoIcon = false;
@@ -1345,7 +1345,7 @@ i32 advManager::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, DATA_COMPGEN(0x004ef3b0, adventureManagerName, "advManager"));
+    strcpy(m_name, "advManager");
     return 0;
 }
 
@@ -1435,7 +1435,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004ef3bc, cursorWalkSoundFilenameFormat, "wsnd%1d%1d.82M"),
+            "wsnd%1d%1d.82M",
 #if H2_STRICT_ENUMS
             IDX(cursorSampleSet),
 #else
@@ -1944,11 +1944,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
                             sprintf(
                                 gText,
-                                DATA_COMPGEN(
-                                    0x004ef3cc,
-                                    cheatCoordinatesFormat,
-                                    "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d"
-                                ),
+                                "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
@@ -2037,33 +2033,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 'e';
                         strcpy(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef408,
-                                restartGameConfirmationText,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                            )
+                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
                         strcpy(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef44c,
-                                loadGameConfirmationText,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                            )
+                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
                         strcpy(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef494,
-                                quitGameConfirmationText,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
-                            )
+                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
                         );
                         goto confirm_game_command;
                     confirm_game_command:
@@ -2430,12 +2414,8 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         case PANEL_RADAR:
             if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x004ef4b4,
-                        radarQuickViewHelpText,
-                        "{\xca\xe0\xf0\xf2\xe0 \xec\xe8\xf0\xe0}\n\n"
-                        "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee \xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec."
-                    ),
+                    "{\xca\xe0\xf0\xf2\xe0 \xec\xe8\xf0\xe0}\n\n"
+                        "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee \xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec.",
                     NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
@@ -2541,13 +2521,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef508,
-                bottomStatusQuickViewHelpText,
-                "{\xce\xea\xed\xee \xf1\xf2\xe0\xf2\xf3\xf1\xe0}\n\n"
+            "{\xce\xea\xed\xee \xf1\xf2\xe0\xf2\xf3\xf1\xe0}\n\n"
                 "\xdd\xf2\xee \xee\xea\xed\xee \xf1\xee\xee\xe1\xf9\xe0\xe5\xf2 \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe \xee \xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe3\xe5\xf0\xee\xff \xe8\xeb\xe8 \xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0, \xe0 \xf2\xe0\xea\xe6\xe5, \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xe5\xf2 \xea\xe0\xeb\xe5\xed\xe4\xe0\xf0\xfc. "
-                "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 \xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec \xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec."
-            ),
+                "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 \xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec \xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec.",
             NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
@@ -2603,11 +2579,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x004ef5cc,
-                        endTurnMobileHeroesConfirmationText,
-                        "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 \xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?"
-                    ),
+                    "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 \xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -2701,12 +2673,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef624,
-                artifactDigRequiresFullDayText,
-                "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, \xe7\xe0\xe2\xf2\xf0\xe0."
-                /* "Раскопки артефакта занимают целый день." */
-            ),
+            "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, \xe7\xe0\xe2\xf2\xf0\xe0."
+                /* "Раскопки артефакта занимают целый день." */,
             1,
             -1,
             -1,
@@ -2724,11 +2692,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef668,
-                ultimateArtifactInventoryFullText,
-                "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 \xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, \xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. \xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff \xe7\xe0\xed\xff\xf2."
-            ),
+            "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 \xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, \xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. \xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff \xe7\xe0\xed\xff\xf2.",
             1,
             -1,
             -1,
@@ -2757,11 +2721,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef70c,
-                searchClearGroundText,
-                "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5."
-            ),
+            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5.",
             1,
             -1,
             -1,
@@ -2779,11 +2739,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef730,
-                searchDryLandText,
-                "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5!!!"
-            ),
+            "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5!!!",
             1,
             -1,
             -1,
@@ -2799,7 +2755,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
 
     if (gbHumanPlayer[giCurPlayer]) {
         sample = LoadPlaySample(
-            DATA_COMPGEN(0x004ef750, artifactDigSoundFilename, "DIGSOUND.82M")
+            "DIGSOUND.82M"
         );
     }
     if (cellPtr->m_objectIndex == MAPCELL_SPRITE_NONE
@@ -2818,11 +2774,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (hero->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x004ef760,
-                        noRoomForAnotherArtifactText,
-                        "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 \xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!"
-                    ),
+                    "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 \xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!",
                     1,
                     -1,
                     -1,
@@ -2844,23 +2796,15 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 if (special) {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004ef7d4, specialArtifactFoundFormat, "%s%s"),
-                        DATA_COMPGEN(
-                            0x004ef78c,
-                            specialArtifactFoundPrefix,
-                            "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: "
-                        ),
+                        "%s%s",
+                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
                         gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004ef824, ultimateArtifactFoundFormat, "%s%s"),
-                        DATA_COMPGEN(
-                            0x004ef7dc,
-                            ultimateArtifactFoundPrefix,
-                            "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: "
-                        ),
+                        "%s%s",
+                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
                         gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
@@ -2882,11 +2826,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004ef82c,
-                ultimateArtifactNotFoundText,
-                "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee \xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?"
-            ),
+            "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee \xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?",
             1,
             -1,
             -1,
@@ -4943,7 +4883,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     pWin = new heroWindow(
         posX,
         posY,
-        DATA_COMPGEN(0x004ef854, quickInfoWindowFilename, "qwikinfo.bin")
+        "qwikinfo.bin"
     );
     if (pWin == NULL) {
         MemError();
@@ -4954,8 +4894,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004ef86c, quickInfoBoundaryFormat, "%s"),
-            DATA_COMPGEN(0x004ef864, quickInfoBoundaryText, "\xc3\xf0\xe0\xed\xe8\xf6\xe0")
+            "%s",
+            "\xc3\xf0\xe0\xed\xe8\xf6\xe0"
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
@@ -4964,12 +4904,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             == 0) {
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004ef888, quickInfoUnexploredFormat, "%s"),
-                DATA_COMPGEN(
-                    0x004ef870,
-                    quickInfoUnexploredText,
-                    "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff"
-                )
+                "%s",
+                "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff"
             );
         } else {
 
@@ -4977,37 +4913,21 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_ARTIFACT:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004ef898, quickInfoArtifactFormat, "%s"),
-                        DATA_COMPGEN(
-                            0x004ef88c,
-                            quickInfoArtifactText,
-                            "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
-                        )
+                        "%s",
+                        "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
                     );
                     break;
                 case MAP_OBJECT_OBELISK:
                     if HAS (currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef8c8,
-                                quickInfoObeliskVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? DATA_COMPGEN(
-                                      0x004ef89c,
-                                      quickInfoObeliskVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef8ac,
-                                      quickInfoObeliskUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5018,24 +4938,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef8fc,
-                                quickInfoGazeboVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef8d0,
-                                      quickInfoGazeboVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef8e0,
-                                      quickInfoGazeboUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5046,24 +4954,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef930,
-                                quickInfoFortVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef904,
-                                      quickInfoFortVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef914,
-                                      quickInfoFortUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5074,24 +4970,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef964,
-                                quickInfoWitchDoctorVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef938,
-                                      quickInfoWitchDoctorVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef948,
-                                      quickInfoWitchDoctorUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5102,24 +4986,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef998,
-                                quickInfoMercenaryCampVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef96c,
-                                      quickInfoMercenaryCampVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef97c,
-                                      quickInfoMercenaryCampUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5130,24 +5002,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004ef9cc,
-                                quickInfoStandingStonesVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef9a0,
-                                      quickInfoStandingStonesVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef9b0,
-                                      quickInfoStandingStonesUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5158,24 +5018,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efa00,
-                                quickInfoTreeOfKnowledgeVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004ef9d4,
-                                      quickInfoTreeOfKnowledgeVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004ef9e4,
-                                      quickInfoTreeOfKnowledgeUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5186,24 +5034,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efa34,
-                                quickInfoXanaduVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(
-                                      0x004efa08,
-                                      quickInfoXanaduVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004efa18,
-                                      quickInfoXanaduUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5248,25 +5084,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004efa5c, quickInfoDigStatusFormat, "%s\n%s"),
+                        "%s\n%s",
                         gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])],
                         blocked
-                            ? DATA_COMPGEN(
-                                  0x004efa3c,
-                                  quickInfoCannotDigText,
-                                  "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
-                              )
-                            : DATA_COMPGEN(
-                                  0x004efa4c,
-                                  quickInfoCanDigText,
-                                  "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
-                              )
+                            ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
+                            : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004efa64, quickInfoAbandonedMineFormat, "%s"),
+                        "%s",
                         gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
                     goto quick_info_guarded;
@@ -5275,18 +5103,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         != CREATURE_NONE) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004efa68, quickInfoGuardedMineNameFormat, "%s"),
+                            "%s",
                             gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
                     quick_info_guarded:
                         sprintf(
                             guardStr,
-                            DATA_COMPGEN(
-                                0x004efa6c,
-                                quickInfoMineGuardFormat,
-                                "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s"
-                            ),
+                            "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s",
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
@@ -5298,7 +5122,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004efa80, quickInfoMineNameFormat, "%s"),
+                            "%s",
                             gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
@@ -5307,7 +5131,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_RESOURCE:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004efa84, quickInfoResourceNameFormat, "%s"),
+                        "%s",
                         gResourceNames[currentCell->m_objectIndex / RESOURCE_FRAME_PAIR_STRIDE]
                     );
                     break;
@@ -5319,18 +5143,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         )) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004efa88, quickInfoExactMonsterFormat, "%d %s"),
+                            "%d %s",
                             currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efa90,
-                                quickInfoApproximateMonsterFormat,
-                                "%s %s"
-                            ),
+                            "%s %s",
                             GetArmySizeName(
                                 currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                                 ARMY_SIZE_NAME_SENTENCE
@@ -5354,7 +5174,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004efa98, quickInfoTerrainNameFormat, "%s"),
+                            "%s",
                             gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])]
                         );
                     }
@@ -5415,11 +5235,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efa9c,
-                                quickInfoUnknownExpansionSiteText,
-                                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
-                            )
+                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
                         );
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
@@ -5427,21 +5243,13 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (pHero != NULL && visitedMaskValue != HERO_EVENT_NONE) {
                         strcat(
                             gText,
-                            DATA_COMPGEN(0x004efaa8, quickInfoVisitSeparator, "\n\n")
+                            "\n\n"
                         );
                         strcat(
                             gText,
                             HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? DATA_COMPGEN(
-                                      0x004efaac,
-                                      quickInfoExpansionSiteVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004efabc,
-                                      quickInfoExpansionSiteUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     }
                     break;
@@ -5477,11 +5285,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efad8,
-                                quickInfoUnknownRecruitmentSiteText,
-                                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
-                            )
+                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
                         );
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
@@ -5492,11 +5296,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efae4,
-                                quickInfoReefsText,
-                                "\xd0\xe8\xf4\xfb"
-                            )
+                            "\xd0\xe8\xf4\xfb"
                         );
                     } else {
                         goto quick_info_default;
@@ -5507,28 +5307,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (visitedMaskValue != HERO_EVENT_NONE && pHero != NULL) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(
-                                0x004efb18,
-                                quickInfoDefaultVisitFormat,
-                                "%s\n\n%s"
-                            ),
+                            "%s\n\n%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? DATA_COMPGEN(
-                                      0x004efaec,
-                                      quickInfoDefaultVisitedText,
-                                      "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
-                                : DATA_COMPGEN(
-                                      0x004efafc,
-                                      quickInfoDefaultUnvisitedText,
-                                      "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                  )
+                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
                         );
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004efb20, quickInfoDefaultNameFormat, "%s"),
+                            "%s",
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                         );
                     }
@@ -5542,11 +5330,7 @@ quick_info_ready:
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
             gText,
-            DATA_COMPGEN(
-                0x004efb24,
-                quickInfoDebugFormat,
-                "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d"
-            ),
+            "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
@@ -5872,11 +5656,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_BACKGROUND_Y,
             ENEMY_TURN_BACKGROUND_WIDTH,
             ENEMY_TURN_BACKGROUND_HEIGHT,
-            DATA_COMPGEN(
-                0x004efb54,
-                bottomEnemyTurnBackgroundFilename,
-                "stonback.icn"
-            ),
+            "stonback.icn",
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_BACKGROUND_ID,
@@ -5893,11 +5673,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_HOURGLASS_Y,
             ENEMY_TURN_HOURGLASS_WIDTH,
             ENEMY_TURN_HOURGLASS_HEIGHT,
-            DATA_COMPGEN(
-                0x004efb64,
-                bottomEnemyTurnHourglassBackgroundFilename,
-                "hourglas.icn"
-            ),
+            "hourglas.icn",
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_HOURGLASS_ID,
@@ -5932,11 +5708,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
                     ENEMY_TURN_ANIMATION_HEIGHT,
-                    DATA_COMPGEN(
-                        0x004efb74,
-                        bottomEnemyTurnAnimationFilename,
-                        "hourglas.icn"
-                    ),
+                    "hourglas.icn",
                     iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET,
                     ICON_DRAW_NORMAL,
                     ENEMY_TURN_SAND_ID,
@@ -5972,11 +5744,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                DATA_COMPGEN(
-                    0x004efb84,
-                    bottomEnemyTurnCrestFilename,
-                    "brcrest.icn"
-                ),
+                "brcrest.icn",
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_CREST_ID,
@@ -6010,11 +5778,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                DATA_COMPGEN(
-                    0x004efb90,
-                    bottomEnemyTurnPhaseFilename,
-                    "hourglas.icn"
-                ),
+                "hourglas.icn",
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_PHASE_ID,
@@ -6059,7 +5823,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004efba0, bottomNewTurnBackgroundFilename, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6076,7 +5840,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_ICON_Y,
         NEW_TURN_DATE_ICON_WIDTH,
         NEW_TURN_DATE_ICON_HEIGHT,
-        DATA_COMPGEN(0x004efbb0, bottomNewTurnDateIconFilename, "sunmoon.icn"),
+        "sunmoon.icn",
         frameIndex,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6091,18 +5855,10 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     week = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
     sprintf(
         week,
-        DATA_COMPGEN(0x004efbcc, bottomNewTurnDateFormat, "%s: %d  %s: %d"),
-        DATA_COMPGEN(
-            0x004efbc4,
-            bottomNewTurnMonthText,
-            "\xcc\xe5\xf1\xff\xf6" /* "Месяц" */
-        ),
+        "%s: %d  %s: %d",
+        "\xcc\xe5\xf1\xff\xf6" /* "Месяц" */,
         gpGame->m_month,
-        DATA_COMPGEN(
-            0x004efbbc,
-            bottomNewTurnWeekText,
-            "\xcd\xe5\xe4\xe5\xeb\xff" /* "Неделя" */
-        ),
+        "\xcd\xe5\xe4\xe5\xeb\xff" /* "Неделя" */,
         gpGame->m_week
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -6111,7 +5867,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_WEEK_TEXT_HEIGHT,
         week,
-        DATA_COMPGEN(0x004efbdc, bottomNewTurnSmallFontFilename, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6125,12 +5881,8 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     day = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
     sprintf(
         day,
-        DATA_COMPGEN(0x004efbf4, bottomNewTurnDayFormat, "%s: %d"),
-        DATA_COMPGEN(
-            0x004efbec,
-            bottomNewTurnDayText,
-            "\xc4\xe5\xed\xfc" /* "День" */
-        ),
+        "%s: %d",
+        "\xc4\xe5\xed\xfc" /* "День" */,
         gpGame->m_day
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -6139,7 +5891,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_DAY_TEXT_HEIGHT,
         day,
-        DATA_COMPGEN(0x004efbfc, bottomNewTurnFontFilename, "bigfont.fnt"),
+        "bigfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6173,7 +5925,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004efc08, bottomResourceBackgroundFilename, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6199,7 +5951,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_WIDTH,
         RESOURCE_VIEW_TEXT_HEIGHT,
         messageText,
-        DATA_COMPGEN(0x004efc18, bottomResourceMessageFontFilename, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -6224,7 +5976,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             RESOURCE_VIEW_ICON_BOTTOM - iconHeight - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
             iconWidth,
             iconHeight,
-            DATA_COMPGEN(0x004efc28, bottomResourceIconFilename, "resource.icn"),
+            "resource.icn",
             IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
@@ -6239,7 +5991,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         countString = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         sprintf(
             countString,
-            DATA_COMPGEN(0x004efc38, bottomResourceCountFormat, "%d"),
+            "%d",
             giBottomViewResourceQty
         );
         m_bottomViewAllTexts[1] = new textWidget(
@@ -6248,7 +6000,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             RESOURCE_VIEW_COUNT_WIDTH,
             RESOURCE_VIEW_COUNT_HEIGHT,
             countString,
-            DATA_COMPGEN(0x004efc3c, bottomResourceCountFontFilename, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
             WIDGET_KIND_TEXT,
@@ -6304,7 +6056,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004efc4c, bottomKingdomBackgroundFilename, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6321,7 +6073,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         KINGDOM_VIEW_ICON_Y,
         BOTTOM_VIEW_PANEL_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004efc5c, bottomKingdomIconFilename, "ressmall.icn"),
+        "ressmall.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6347,19 +6099,19 @@ i32 advManager::UpdBottomViewKingdom(void) {
         if (i < KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(
                 countText[i],
-                DATA_COMPGEN(0x004efc6c, bottomKingdomResourceCountFormat, "%d"),
+                "%d",
                 gpCurPlayer->m_resources[i]
             );
         } else if (i == KINGDOM_VIEW_CASTLE_ENTRY) {
             sprintf(
                 countText[i],
-                DATA_COMPGEN(0x004efc70, bottomKingdomCastleCountFormat, "%d"),
+                "%d",
                 nCastles
             );
         } else {
             sprintf(
                 countText[i],
-                DATA_COMPGEN(0x004efc74, bottomKingdomVillageCountFormat, "%d"),
+                "%d",
                 numVillage
             );
         }
@@ -6370,7 +6122,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
             KINGDOM_VIEW_TEXT_WIDTH,
             KINGDOM_VIEW_TEXT_HEIGHT,
             countText[i],
-            DATA_COMPGEN(0x004efc78, bottomKingdomFontFilename, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             i + BOTTOM_VIEW_TEXT_ID,
             WIDGET_KIND_TEXT,
@@ -6419,7 +6171,7 @@ i32 advManager::UpdBottomViewHero(void) {
         BOTTOM_HERO_PANEL_Y,
         BOTTOM_HERO_PANEL_WIDTH,
         BOTTOM_HERO_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004efc88, bottomHeroBackgroundFilename, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FIRST_MESSAGE,
@@ -6439,11 +6191,7 @@ i32 advManager::UpdBottomViewHero(void) {
 
     if (usedCount != 0) {
         displayIndex = 0;
-        creatureIcons = gpResourceManager->GetIcon(DATA_COMPGEN(
-            0x004efc98,
-            bottomHeroCreatureResourceFilename,
-            "mons32.icn"
-        ));
+        creatureIcons = gpResourceManager->GetIcon("mons32.icn");
         for (slotNumber = 0; slotNumber < BOTTOM_HERO_ARMY_SLOTS; ++slotNumber) {
             creature = IDX(targetHero->m_army.m_creatureTypes[slotNumber]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
@@ -6462,13 +6210,13 @@ i32 advManager::UpdBottomViewHero(void) {
                 if (targetHero->m_army.m_creatureCounts[slotNumber] > BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
                         armyCountLabelsResult[displayIndex],
-                        DATA_COMPGEN(0x004efca4, bottomHeroAbbreviatedCountFormat, "%dk"),
+                        "%dk",
                         targetHero->m_army.m_creatureCounts[slotNumber] / BOTTOM_HERO_COUNT_DIVISOR
                     );
                 } else {
                     sprintf(
                         armyCountLabelsResult[displayIndex],
-                        DATA_COMPGEN(0x004efca8, bottomHeroCountFormat, "%d"),
+                        "%d",
                         targetHero->m_army.m_creatureCounts[slotNumber]
                     );
                 }
@@ -6502,11 +6250,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     iconY + BOTTOM_HERO_PANEL_Y,
                     BOTTOM_HERO_ICON_WIDTH,
                     BOTTOM_HERO_ICON_HEIGHT,
-                    DATA_COMPGEN(
-                        0x004efcac,
-                        bottomHeroCreatureIconFilename,
-                        "mons32.icn"
-                    ),
+                    "mons32.icn",
                     creature,
                     ICON_DRAW_NORMAL,
                     displayIndex + BOTTOM_HERO_FIRST_ICON_ID,
@@ -6527,7 +6271,7 @@ i32 advManager::UpdBottomViewHero(void) {
                                : 0),
                     BOTTOM_HERO_LABEL_HEIGHT,
                     armyCountLabelsResult[displayIndex],
-                    DATA_COMPGEN(0x004efcb8, bottomHeroFontFilename, "smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     displayIndex + BOTTOM_HERO_FIRST_TEXT_ID,
                     WIDGET_KIND_TEXT,
@@ -6576,11 +6320,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    iconRef = gpResourceManager->GetIcon(DATA_COMPGEN(
-        0x004efcc8,
-        heroQuickCreatureResourceFilename,
-        "mons32.icn"
-    ));
+    iconRef = gpResourceManager->GetIcon("mons32.icn");
     targetHero = gpGame->GetHero(heroId);
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
@@ -6591,7 +6331,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         win = new heroWindow(
             windowX,
             windowY,
-            DATA_COMPGEN(0x004efcd4, heroQuickFreeWindowFilename, "qhero0.bin")
+            "qhero0.bin"
         );
         if (win == NULL) {
             MemError();
@@ -6601,7 +6341,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         win = new heroWindow(
             windowX,
             windowY,
-            DATA_COMPGEN(0x004efce0, heroQuickLocatorWindowFilename, "qhero1.bin")
+            "qhero1.bin"
         );
         if (win == NULL) {
             MemError();
@@ -6622,7 +6362,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     win->BroadcastMessage(msg);
     sprintf(
         gText,
-        DATA_COMPGEN(0x004efcec, heroQuickNameFormat, "%s"),
+        "%s",
         targetHero->m_name
     );
     msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -6642,7 +6382,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         for (ii = 0; ii < HERO_PRIMARY_STAT_COUNT; ++ii) {
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004efcf0, heroQuickPrimaryStatFormat, "%d"),
+                "%d",
                 targetHero->Stats(HeroPrimaryStat(ii))
             );
             msg.payload.widget.id = ii + HERO_QUICK_PRIMARY_STAT_WIDGET;
@@ -6651,7 +6391,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         }
         sprintf(
             gText,
-            DATA_COMPGEN(0x004efcf4, heroQuickManaFormat, "%d/%d"),
+            "%d/%d",
             targetHero->m_spellPoints,
             targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
         );
@@ -6688,11 +6428,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_ICON_SIZE,
-                        DATA_COMPGEN(
-                            0x004efcfc,
-                            heroQuickExactCreatureIconFilename,
-                            "mons32.icn"
-                        ),
+                        "mons32.icn",
                         static_cast<i16>(monster),
                         ICON_DRAW_NORMAL,
                         -1,
@@ -6706,7 +6442,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         static_cast<char*>(H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY));
                     sprintf(
                         labels[ii],
-                        DATA_COMPGEN(0x004efd08, heroQuickExactCreatureCountFormat, "%d"),
+                        "%d",
                         targetHero->m_army.m_creatureCounts[idx]
                     );
                     sizeWidgets[ii] = new textWidget(
@@ -6717,11 +6453,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
                         labels[ii],
-                        DATA_COMPGEN(
-                            0x004efd0c,
-                            heroQuickExactCreatureFontFilename,
-                            "smalfont.fnt"
-                        ),
+                        "smalfont.fnt",
                         FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
@@ -6782,11 +6514,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                DATA_COMPGEN(
-                    0x004efd1c,
-                    heroQuickVagueTopCreatureIconFilename,
-                    "mons32.icn"
-                ),
+                "mons32.icn",
                 static_cast<i16>(monster),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6810,11 +6538,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 stride,
                 ARMY_QUICK_LABEL_HEIGHT,
                 labels[ii],
-                DATA_COMPGEN(
-                    0x004efd28,
-                    heroQuickVagueTopCreatureFontFilename,
-                    "smalfont.fnt"
-                ),
+                "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6854,11 +6578,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    DATA_COMPGEN(
-                        0x004efd38,
-                        heroQuickVagueBottomCreatureIconFilename,
-                        "mons32.icn"
-                    ),
+                    "mons32.icn",
                     static_cast<i16>(monster),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6885,11 +6605,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     stride,
                     ARMY_QUICK_LABEL_HEIGHT,
                     labels[ii],
-                    DATA_COMPGEN(
-                        0x004efd44,
-                        heroQuickVagueBottomCreatureFontFilename,
-                        "smalfont.fnt"
-                    ),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -6931,7 +6647,7 @@ char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVarian
     if (giDebugLevel > 0) {
         sprintf(
             cArmySizeName,
-            DATA_COMPGEN(0x004efd54, armySizeDebugFormat, "%d"),
+            "%d",
             armySize
         );
         return cArmySizeName;
@@ -6997,11 +6713,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    creatureIcon = gpResourceManager->GetIcon(DATA_COMPGEN(
-        0x004efd58,
-        townQuickCreatureResourceFilename,
-        "mons32.icn"
-    ));
+    creatureIcon = gpResourceManager->GetIcon("mons32.icn");
     townPtr = gpGame->GetTown(townId);
     if (windowX == -1) {
         windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
@@ -7010,7 +6722,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     window = new heroWindow(
         windowX,
         windowY,
-        DATA_COMPGEN(0x004efd64, townQuickWindowFilename, "qtown1.bin")
+        "qtown1.bin"
     );
     if (window == NULL) {
         MemError();
@@ -7084,16 +6796,12 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(
                 blankLabel,
-                DATA_COMPGEN(
-                    0x004efd70,
-                    townQuickUnknownText,
-                    "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
-                )
+                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
             );
         } else {
             sprintf(
                 blankLabel,
-                DATA_COMPGEN(0x004efd7c, townQuickNoArmyText, "\xcd\xe5\xf2")
+                "\xcd\xe5\xf2"
             );
         }
         noArmyText = new textWidget(
@@ -7102,7 +6810,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             TOWN_QUICK_EMPTY_LABEL_WIDTH,
             ARMY_QUICK_LABEL_HEIGHT,
             blankLabel,
-            DATA_COMPGEN(0x004efd80, townQuickNoArmyFontFilename, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             -1,
             WIDGET_KIND_TEXT,
@@ -7176,11 +6884,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                DATA_COMPGEN(
-                    0x004efd90,
-                    townQuickTopCreatureIconFilename,
-                    "mons32.icn"
-                ),
+                "mons32.icn",
                 static_cast<i16>(monster),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -7195,7 +6899,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     troopNames[wIndex],
-                    DATA_COMPGEN(0x004efd9c, townQuickTopCreatureCountFormat, "%d"),
+                    "%d",
                     townPtr->m_army.m_creatureCounts[creatureSlot]
                 );
             } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -7209,7 +6913,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             } else {
                 strcpy(
                     troopNames[wIndex],
-                    DATA_COMPGEN(0x004efda0, townQuickTopUnknownCountText, "???")
+                    "???"
                 );
             }
             sizeWidgets[wIndex] = new textWidget(
@@ -7221,7 +6925,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ARMY_QUICK_TEXT_WIDTH,
                 ARMY_QUICK_LABEL_HEIGHT,
                 troopNames[wIndex],
-                DATA_COMPGEN(0x004efda4, townQuickTopCreatureFontFilename, "smalfont.fnt"),
+                "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -7262,11 +6966,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    DATA_COMPGEN(
-                        0x004efdb4,
-                        townQuickBottomCreatureIconFilename,
-                        "mons32.icn"
-                    ),
+                    "mons32.icn",
                     static_cast<i16>(monster),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -7281,11 +6981,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         troopNames[wIndex],
-                        DATA_COMPGEN(
-                            0x004efdc0,
-                            townQuickBottomCreatureCountFormat,
-                            "%d"
-                        ),
+                        "%d",
                         townPtr->m_army.m_creatureCounts[creatureSlot]
                     );
                 } else if (scouting == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -7299,7 +6995,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 } else {
                     strcpy(
                         troopNames[wIndex],
-                        DATA_COMPGEN(0x004efdc4, townQuickBottomUnknownCountText, "???")
+                        "???"
                     );
                 }
                 sizeWidgets[wIndex] = new textWidget(
@@ -7311,11 +7007,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ARMY_QUICK_TEXT_WIDTH,
                     ARMY_QUICK_LABEL_HEIGHT,
                     troopNames[wIndex],
-                    DATA_COMPGEN(
-                        0x004efdc8,
-                        townQuickBottomCreatureFontFilename,
-                        "smalfont.fnt"
-                    ),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -7359,7 +7051,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
         return;
     }
     gpResourceManager->GetBackdrop(
-        DATA_COMPGEN(0x004efdd8, redrawAdventureBorderFilename, "advbord.icn"),
+        "advbord.icn",
         gpWindowManager->m_screen,
         1
     );
@@ -7677,11 +7369,7 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x004efde4,
-                        castSpellMineGuardianLocationText,
-                        "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
-                    ),
+                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
                     1,
                     -1,
                     -1,
@@ -7717,11 +7405,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                DATA_COMPGEN(
-                    0x004efe54,
-                    castSpellIdentifyHeroesText,
-                    "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb."
-                ),
+                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb.",
                 1,
                 -1,
                 -1,
@@ -7741,11 +7425,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    DATA_COMPGEN(
-                        0x004efe84,
-                        castSpellTravelExhaustedText,
-                        "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0."
-                    ),
+                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
                     1,
                     -1,
                     -1,
@@ -7790,7 +7470,7 @@ i32 SaveGame(void) {
     i32 nPlayers = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer(
-        DATA_COMPGEN(0x004efed8, saveGameAdventureCursorFilename, "advmice.mse"),
+        "advmice.mse",
         SAVE_POINTER_FRAME,
         MOUSE_AUTO_CURSOR_TYPE
     );
@@ -7804,17 +7484,17 @@ i32 SaveGame(void) {
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(suffix, DATA_COMPGEN(0x004efee4, saveGameCampaignSuffix, ".GMC"));
-        sprintf(pattern, DATA_COMPGEN(0x004efeec, saveGameCampaignPattern, "*.GMC"));
+        sprintf(suffix, ".GMC");
+        sprintf(pattern, "*.GMC");
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(suffix, DATA_COMPGEN(0x004efef4, saveGameExpansionCampaignSuffix, ".GXC"));
-        sprintf(pattern, DATA_COMPGEN(0x004efefc, saveGameExpansionCampaignPattern, "*.GXC"));
+        sprintf(suffix, ".GXC");
+        sprintf(pattern, "*.GXC");
     } else if (xIsExpansionMap) {
-        sprintf(suffix, DATA_COMPGEN(0x004eff04, saveGameExpansionSuffixFormat, ".GX%d"), nPlayers);
-        sprintf(pattern, DATA_COMPGEN(0x004eff0c, saveGameExpansionPatternFormat, "*.GX%d"), nPlayers);
+        sprintf(suffix, ".GX%d", nPlayers);
+        sprintf(pattern, "*.GX%d", nPlayers);
     } else {
-        sprintf(suffix, DATA_COMPGEN(0x004eff14, saveGameSuffixFormat, ".GM%d"), nPlayers);
-        sprintf(pattern, DATA_COMPGEN(0x004eff1c, saveGamePatternFormat, "*.GM%d"), nPlayers);
+        sprintf(suffix, ".GM%d", nPlayers);
+        sprintf(pattern, "*.GM%d", nPlayers);
     }
 
     fileRequester* req = new fileRequester(
@@ -7835,12 +7515,8 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                DATA_COMPGEN(
-                    0x004eff24,
-                    saveGameSuccessText,
-                    "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
-                    /* "Игра успешно сохранена." */
-                ),
+                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
+                    /* "Игра успешно сохранена." */,
                 1,
                 -1,
                 -1,
@@ -7865,7 +7541,7 @@ void advManager::CheckCastSpell(void) {
         CompleteDraw(0);
         UpdateScreen(0, 0);
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x004eff3c, checkCastSpellAdventureCursorFilename, "advmice.mse"),
+            "advmice.mse",
             POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
@@ -8450,7 +8126,7 @@ void advManager::CheckLoadSample(i32 index) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
         sprintf(
             gText,
-            DATA_COMPGEN(0x004eff48, environmentLoopSampleFilenameFormat, "loop%04d.82M"),
+            "loop%04d.82M",
             index
         );
         m_loopingSamples[index] = gpResourceManager->GetSample(gText);
@@ -8784,7 +8460,7 @@ void advManager::DimensionDoor(void) {
     window = new heroWindow(
         0,
         0,
-        DATA_COMPGEN(0x004eff58, dimensionDoorWindowFilename, "dimdoor.bin")
+        "dimdoor.bin"
     );
     if (window == NULL) {
         MemError();
@@ -8802,11 +8478,7 @@ void advManager::DimensionDoor(void) {
             || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                DATA_COMPGEN(
-                    0x004eff64,
-                    dimensionDoorInvalidDestinationText,
-                    "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!"
-                ),
+                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!",
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8881,11 +8553,7 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004eff94,
-                townGateNoAvailableTownText,
-                "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!"
-            ),
+            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8900,11 +8568,7 @@ void advManager::TownGate(SpellType spellId) {
     }
     if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004effc4,
-                townGateMustBeOnLandText,
-                "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee."
-            ),
+            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8922,15 +8586,11 @@ void advManager::TownGate(SpellType spellId) {
         townPortalWin = new heroWindow(
             TOWN_PORTAL_WINDOW_X,
             TOWN_PORTAL_WINDOW_Y,
-            DATA_COMPGEN(0x004f0014, townPortalWindowFilename, "townport.bin")
+            "townport.bin"
         );
         sprintf(
             gText,
-            DATA_COMPGEN(
-                0x004f0024,
-                townPortalPromptText,
-                "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
-            )
+            "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
         );
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
@@ -8976,11 +8636,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004f0060,
-                townGateOccupiedTownText,
-                "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!"
-            ),
+            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -9160,13 +8816,9 @@ summon_done:
     Reseed(0, 0);
     if (!foundBoat) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004f0094,
-                summonBoatFailureText,
-                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
+            "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
                 "\xf0\xe0\xe1\xeb\xfc!!!"
-                /* "Не удалось призвать корабль!!!" */
-            ),
+                /* "Не удалось призвать корабль!!!" */,
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -9627,7 +9279,7 @@ VA(0x00412c7a, 0x212)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x004f00b4, loadRemoteAdventureCursorFilename, "advmice.mse"),
+            "advmice.mse",
             POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
@@ -9667,11 +9319,7 @@ void advManager::LoadRemote(void) {
             cheatWarned = 1;
             sprintf(
                 gText,
-                DATA_COMPGEN(
-                    0x004f00c0,
-                    loadRemoteCheatWarningText,
-                    "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
-                )
+                "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -9682,11 +9330,7 @@ void advManager::LoadRemote(void) {
             debugWarned = 1;
             sprintf(
                 gText,
-                DATA_COMPGEN(
-                    0x004f00d8,
-                    loadRemoteDebugWarningText,
-                    "Someone has their debug level set!\n"
-                )
+                "Someone has their debug level set!\n"
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -9739,20 +9383,12 @@ char* advManager::CheckHandleNet(void) {
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
-                LogStr(DATA_COMPGEN(
-                    0x004f00fc,
-                    remotePlayerExitLogText,
-                    "Receive Remote Player Exit"
-                ));
+                LogStr("Receive Remote Player Exit");
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
-                LogStr(DATA_COMPGEN(
-                    0x004f0118,
-                    hostPlayerExitLogText,
-                    "Host Reports Player Exit"
-                ));
+                LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
                     packet9->sender,
                     ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
@@ -10115,15 +9751,11 @@ void advManager::ViewPuzzle(void) {
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
     gpMouseManager->SetPointer(
-        DATA_COMPGEN(0x004f0134, viewPuzzleAdventureCursorFilename, "advmice.mse"),
+        "advmice.mse",
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    puzzleIcn = gpResourceManager->GetIcon(DATA_COMPGEN(
-        0x004f0140,
-        puzzleIconFilename,
-        "puzzle.icn"
-    ));
+    puzzleIcn = gpResourceManager->GetIcon("puzzle.icn");
     i32 j;
     for (j = 0; j < PUZZLE_PIECE_COUNT; ++j) {
         puzzleIcn->DrawToBuffer(0, 0, j, ICON_DRAW_NORMAL);
@@ -10144,7 +9776,7 @@ void advManager::ViewPuzzle(void) {
     pWin = new heroWindow(
         PUZZLE_WINDOW_X,
         PUZZLE_WINDOW_Y,
-        DATA_COMPGEN(0x004f014c, puzzleWindowFilename, "viewpuzl.bin")
+        "viewpuzl.bin"
     );
     if (pWin == NULL) {
         MemError();
@@ -10253,7 +9885,7 @@ void advManager::AdvPanel(void) {
     {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
         gpMouseManager->SetPointer(
-            DATA_COMPGEN(0x004f015c, adventurePanelCursorFilename, "advmice.mse"),
+            "advmice.mse",
             POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
@@ -10264,7 +9896,7 @@ void advManager::AdvPanel(void) {
         adventurePanel = new heroWindow(
             PANEL_WINDOW_X,
             PANEL_WINDOW_Y,
-            DATA_COMPGEN(0x004f0168, adventurePanelWindowFilename, "apanel.bin")
+            "apanel.bin"
         );
         if (adventurePanel == NULL) {
             MemError();
@@ -10405,7 +10037,7 @@ i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
     gpMouseManager->SetPointer(
-        DATA_COMPGEN(0x004f0174, controlPanelCursorFilename, "advmice.mse"),
+        "advmice.mse",
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
@@ -10415,7 +10047,7 @@ i32 advManager::ControlPanel(void) {
     heroWindow* panel = new heroWindow(
         PANEL_WINDOW_X,
         PANEL_WINDOW_Y,
-        DATA_COMPGEN(0x004f0180, controlPanelWindowFilename, "cpanel.bin")
+        "cpanel.bin"
     );
     if (panel == NULL) {
         MemError();
@@ -10510,41 +10142,29 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 question,
-                                DATA_COMPGEN(
-                                    0x004f018c,
-                                    controlPanelRestartConfirmationText,
-                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
                                     "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0"
                                     "\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4"
                                     "\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
                                     /* "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)" */
-                                )
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 question,
-                                DATA_COMPGEN(
-                                    0x004f01d0,
-                                    controlPanelNewGameConfirmationText,
-                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
                                     "\xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc "
                                     "\xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0"
                                     "\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
                                     /* "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)" */
-                                )
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
                             strcpy(
                                 question,
-                                DATA_COMPGEN(
-                                    0x004f0218,
-                                    controlPanelMainMenuConfirmationText,
-                                    "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
                                     "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
                                     /* "Вы действительно хотите выйти?" */
-                                )
                             );
                         confirm_reset:
                             handled = 1;
@@ -10597,7 +10217,7 @@ void advManager::SystemOptions(void) {
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     gpMouseManager->SetPointer(
-        DATA_COMPGEN(0x004f0238, systemOptionsCursorFilename, "advmice.mse"),
+        "advmice.mse",
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
@@ -10610,7 +10230,7 @@ void advManager::SystemOptions(void) {
     cPanel = new heroWindow(
         ADVMGR_SYSTEM_OPTIONS_WINDOW_X,
         ADVMGR_SYSTEM_OPTIONS_WINDOW_Y,
-        DATA_COMPGEN(0x004f0244, systemOptionsWindowFilename, "spanel.bin")
+        "spanel.bin"
     );
     if (cPanel == NULL) {
         MemError();
@@ -10715,11 +10335,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     msg.payload.widget.id =
         IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = DATA_COMPGEN(
-            0x004f0250,
-            systemOptionsDoNotShowText,
-            "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc"
-        );
+        msg.payload.widget.data.text = "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc";
     } else {
         msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     }
@@ -10831,14 +10447,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
-                                    DATA_COMPGEN(
-                                        0x004f0260,
-                                        systemOptionsNoMusicText,
-                                        "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
+                                    "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
                                         "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
                                         "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
-                                        /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */
-                                    ),
+                                        /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10864,14 +10476,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {
                                 NormalDialog(
-                                    DATA_COMPGEN(
-                                        0x004f029c,
-                                        systemOptionsNoDigitalAudioText,
-                                        "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
+                                    "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
                                         "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
                                         "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
-                                        /* "Цифровая музыка не доступна в этой системе." */
-                                    ),
+                                        /* "Цифровая музыка не доступна в этой системе." */,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10915,10 +10523,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
-                                        DATA_COMPGEN(
-                                            0x004f02c8,
-                                            systemOptionsCdStartupFailureText,
-                                            "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
+                                        "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
                                             "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
                                             "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
                                             " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
@@ -10929,8 +10534,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                             "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
                                             "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
                                             "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
-                                            /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */
-                                        ),
+                                            /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */,
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
                                         OPTION_DIALOG_NONE,
@@ -11085,12 +10689,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            DATA_COMPGEN(
-                0x004f0374,
-                visionsNoNearbyMonsterText,
-                "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
-                /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */
-            ),
+            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
+                /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */,
             1,
             -1,
             -1,
@@ -11110,7 +10710,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     count = spot->m_objectMetadata & MONSTER_COUNT_MASK;
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f03d0, visionsMonsterHeaderFormat, "{%d %s}\n\n"),
+        "{%d %s}\n\n",
         count,
         gArmyNamesPlural[IDX(type)]
     );
@@ -11126,12 +10726,8 @@ i32 advManager::DoVisions(hero* visionHero) {
         if (isForced) {
             sprintf(
                 msg,
-                DATA_COMPGEN(
-                    0x004f03dc,
-                    visionsForcedJoinText,
-                    "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
+                "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
                     /* Существа хотят вступить в вашу армию! */
-                )
             );
             strcat(gText, msg);
             goto showVision;
@@ -11163,25 +10759,17 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinNum == count) {
                 sprintf(
                     msg,
-                    DATA_COMPGEN(
-                        0x004f0404,
-                        visionsAllJoinFeeFormat,
-                        "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                    "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
                         /* "Все существа вступят в нашу армию... / за плату в размере %d
-                           золотых." */
-                    ),
+                           золотых." */,
                     joinFee
                 );
             } else {
                 sprintf(
                     msg,
-                    DATA_COMPGEN(
-                        0x004f044c,
-                        visionsSomeJoinFeeFormat,
-                        "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                    "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
                         /* "%d существ присоединятся к нам... / за плату в размере %d
-                           золотых." */
-                    ),
+                           золотых." */,
                     count,
                     joinFee
                 );
@@ -11195,12 +10783,8 @@ i32 advManager::DoVisions(hero* visionHero) {
     creaturesFlee:
         sprintf(
             msg,
-            DATA_COMPGEN(
-                0x004f0490,
-                visionsCreaturesFleeText,
-                "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
+            "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
                 /* Эти слабые твари определенно побегут, едва завидев нас. */
-            )
         );
         strcat(gText, msg);
         goto showVision;
@@ -11208,12 +10792,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 creaturesFight:
     sprintf(
         msg,
-        DATA_COMPGEN(
-            0x004f04c8,
-            visionsCreaturesFightText,
-            "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
+        "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
             /* Боюсь, эти создания в отвратительном настроении и будут сражаться. */
-        )
     );
     strcat(gText, msg);
     goto showVision;
