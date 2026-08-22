@@ -8586,9 +8586,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
 
-    // Retail checks x against MAP_HEIGHT and mapY against MAP_WIDTH - the
-    // axes are swapped (harmless on square maps, byte-pinned).
-    if (x < 0 || mapY < 0 || x >= MAP_HEIGHT || mapY >= MAP_WIDTH) {
+    if (x < 0 || mapY < 0 || x >= MAP_WIDTH || mapY >= MAP_HEIGHT) {
         return;
     }
 
