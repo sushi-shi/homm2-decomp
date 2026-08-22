@@ -36,7 +36,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd70bb,11,_abs,abs.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\abs.obj!_abs|libcmt.lib:build\intel\mt_obj\labs.obj!_labs
 0xd70d0,664,_memcpy,memcpy.obj,libcmt.lib,reviewed-sandwich,prefix-24 twin pair; 28 game callers
 0xd7410,20,_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
-0xd7424,9,$alt_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd7424,9,_sqrt,sqrt.obj,libcmt.lib,reviewed-archive-public-entry,VC6 sqrt.obj exports _sqrt at section offset 0x14; wrapper dispatch entry
 0xd742d,157,$body_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,sqrt body; negative-operand check
 0xd74ca,126,__onexit,onexit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7548,18,_atexit,onexit.obj,libcmt.lib,masked-exact,
