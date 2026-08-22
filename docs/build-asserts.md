@@ -183,5 +183,9 @@ it is a floating-point type.
   order only when their relocation-masked bodies and relocation site/type shapes
   agree; the numeric suffix is never treated as a cross-build identity. The
   current census maps all 197 such helpers, including eight whose suffix changed,
-  and leaves no missing or ambiguous project function. See
+  and leaves no missing or ambiguous project function. Stripped EH funclets have
+  no MAP-visible names; the audit instead requires every project `.text$x` COFF
+  section signature to occur in the linked band, then accepts the uniform band
+  shift only when every remaining byte difference is a decoded REL32 operand.
+  This currently maps all 311 reviewed funclets without inventing labels. See
   `docs/linked-function-placement-walls.md` for the independent raw-RVA ledger.

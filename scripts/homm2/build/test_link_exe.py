@@ -18,7 +18,7 @@ from homm2.build.link_exe import (
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics,
-    _pair_volatile_function_rows)
+    _pair_volatile_function_rows, _shifted_rel32_diagnostics)
 from homm2.build.link_exe import strip_coff_export_directives, write_order_response
 
 
@@ -218,6 +218,48 @@ class LinkExeTest(unittest.TestCase):
         })
         candidate[1]["signature"] = (b"different", ())
         self.assertEqual(_pair_volatile_function_rows(retail, candidate), {})
+
+    def test_shifted_rel32_diagnostics_preserves_absolute_target(self):
+        target = 0x2000
+        candidate_va = 0x1000
+        retail_va = 0x1100
+
+        def body(base):
+            site_after_operand = base + 1 + 5
+            return (b"\x90\xe8" + struct.pack("<i", target - site_after_operand) +
+                    b"\xc3")
+
+        result = _shifted_rel32_diagnostics(
+            body(retail_va), body(candidate_va), retail_va, candidate_va)
+        self.assertTrue(result["relocation_masked_bytes_exact"])
+        self.assertEqual(result["mismatch_runs"], 1)
+        self.assertEqual(result["classified_rel32_fields"], 1)
+        self.assertEqual(result["same_absolute_target_fields"], 1)
+        self.assertEqual(result["different_absolute_targets"], [])
+
+    def test_shifted_rel32_diagnostics_rejects_an_opcode_difference(self):
+        result = _shifted_rel32_diagnostics(b"\x90", b"\x91", 0x1100, 0x1000)
+        self.assertFalse(result["relocation_masked_bytes_exact"])
+        self.assertEqual(result["unclassified_runs"], [{
+            "offset": 0, "size": 1, "candidate_fields": [],
+        }])
+
+    def test_function_placement_uses_proved_shifted_funclet_band(self):
+        candidate = {"image_base": 0x400000}
+        symbol = {
+            "name": "Unwind@00401234", "unit": "(funclets)",
+            "rva": 0x1234, "size": 0x0B, "provenance": "reviewed-funclet",
+        }
+        placements = {((symbol["unit"], symbol["name"], symbol["rva"])): 0x1224}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text("")
+            result = function_placement_diagnostics(
+                candidate, path, [symbol], {}, {}, placements)
+        self.assertEqual(result["summary"]["displaced_rva"], 1)
+        self.assertEqual(result["functions"][0]["delta"], -0x10)
+        self.assertEqual(result["functions"][0]["match_evidence"],
+                         "shifted-text-x-rel32-proof")
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),

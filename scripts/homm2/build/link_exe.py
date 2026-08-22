@@ -18,7 +18,7 @@ import struct
 import subprocess
 import sys
 import tomllib
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
@@ -923,8 +923,199 @@ def load_volatile_function_aliases(retail_symbols=None, base_root=None,
     return aliases
 
 
+def _shifted_rel32_diagnostics(retail, candidate, retail_va, candidate_va):
+    """Classify shifted-span byte differences that are only x86 REL32 fields."""
+    if len(retail) != len(candidate):
+        raise ValueError("shifted REL32 spans must have equal lengths")
+    differing = [index for index, pair in enumerate(zip(retail, candidate))
+                 if pair[0] != pair[1]]
+    runs = []
+    for index in differing:
+        if not runs or index != runs[-1][1]:
+            runs.append([index, index + 1])
+        else:
+            runs[-1][1] = index + 1
+
+    fields = []
+    unclassified = []
+    for start, end in runs:
+        candidates = []
+        for field in range(max(1, start - 3), start + 1):
+            if (field + 4 > len(candidate) or
+                    candidate[field - 1] not in (0xE8, 0xE9) or end > field + 4):
+                continue
+            candidate_target = (candidate_va + field + 4 +
+                                struct.unpack_from("<i", candidate, field)[0])
+            retail_target = (retail_va + field + 4 +
+                             struct.unpack_from("<i", retail, field)[0])
+            candidates.append({
+                "field_offset": field,
+                "opcode": candidate[field - 1],
+                "candidate_target": candidate_target,
+                "retail_target": retail_target,
+            })
+        same_target = [row for row in candidates
+                       if row["candidate_target"] == row["retail_target"]]
+        selected = (same_target[0] if len(same_target) == 1 else
+                    candidates[0] if len(candidates) == 1 else None)
+        if selected is None:
+            unclassified.append({
+                "offset": start,
+                "size": end - start,
+                "candidate_fields": [row["field_offset"] for row in candidates],
+            })
+        else:
+            fields.append(selected)
+
+    unique_fields = len({row["field_offset"] for row in fields}) == len(fields)
+    different_targets = [{
+        "field_offset": row["field_offset"],
+        "opcode": "call" if row["opcode"] == 0xE8 else "jump",
+        "retail_target": "0x%x" % row["retail_target"],
+        "candidate_target": "0x%x" % row["candidate_target"],
+    } for row in fields if row["candidate_target"] != row["retail_target"]]
+    return {
+        "span_size": len(retail),
+        "matched_bytes_after_shift": len(retail) - len(differing),
+        "mismatched_bytes_after_shift": len(differing),
+        "mismatch_runs": len(runs),
+        "classified_rel32_fields": len(fields),
+        "same_absolute_target_fields": len(fields) - len(different_targets),
+        "different_absolute_targets": different_targets,
+        "unclassified_runs": unclassified,
+        "unique_rel32_fields": unique_fields,
+        "relocation_masked_bytes_exact": not unclassified and unique_fields,
+    }
+
+
+def _candidate_text_x_census(candidate_band, candidate_band_rva):
+    """Prove every project `.text$x` COFF shape occurs in the linked band."""
+    from homm2.build.canonicalize_data_symbols import (
+        CoffObject,
+        RELOCATION_WIDTHS,
+    )
+
+    section_count = 0
+    unit_count = 0
+    matching_sections = 0
+    raw_bytes = 0
+    relocation_counts = Counter()
+    unsupported_relocations = 0
+    for row in load_link_order():
+        coff = CoffObject(row["object"].read_bytes())
+        if any(section.name == ".text$x" for section in coff.sections):
+            unit_count += 1
+        for section in coff.sections:
+            if section.name != ".text$x":
+                continue
+            section_count += 1
+            raw_bytes += section.raw_size
+            body = coff.data[section.raw_offset:section.raw_offset + section.raw_size]
+            masked = set()
+            for relocation in coff.relocations:
+                if relocation.section != section.index:
+                    continue
+                width = RELOCATION_WIDTHS.get(relocation.typ)
+                if width is None:
+                    unsupported_relocations += 1
+                    continue
+                relocation_counts[relocation.typ] += 1
+                masked.update(range(relocation.site, relocation.site + width))
+            anchors = [index for index in range(len(body)) if index not in masked]
+            alignment_bits = (section.characteristics & IMAGE_SCN_ALIGN_MASK) >> 20
+            alignment = 1 if alignment_bits == 0 else 1 << (alignment_bits - 1)
+            first = (-candidate_band_rva) % alignment
+            found = any(
+                all(body[index] == candidate_band[offset + index] for index in anchors)
+                for offset in range(first, len(candidate_band) - len(body) + 1, alignment)
+            )
+            matching_sections += found
+    return {
+        "project_units_with_text_x": unit_count,
+        "project_text_x_sections": section_count,
+        "matching_section_signatures": matching_sections,
+        "all_section_signatures_present": (
+            matching_sections == section_count and unsupported_relocations == 0),
+        "candidate_section_raw_bytes": raw_bytes,
+        "candidate_linked_band_bytes": len(candidate_band),
+        "relocations": {
+            "REL32": relocation_counts[0x14],
+            "DIR32": relocation_counts[0x06],
+            "other": sum(count for typ, count in relocation_counts.items()
+                         if typ not in (0x14, 0x06)),
+        },
+        "unsupported_relocations": unsupported_relocations,
+    }
+
+
+def funclet_band_diagnostics(retail_path, candidate_path, candidate, map_path,
+                             retail_symbols):
+    """Map stripped EH funclets through their shifted, COFF-proved `.text$x` band."""
+    funclets = sorted(
+        (row for row in retail_symbols if row["provenance"] == "reviewed-funclet"),
+        key=lambda row: row["rva"])
+    contributions = [row for row in parse_map_contributions(map_path)
+                     if row["name"] == ".text$x"]
+    if not funclets or len(contributions) != 1:
+        return ({
+            "proved": False,
+            "reason": "requires funclet claims and exactly one candidate .text$x band",
+        }, {})
+
+    contribution = contributions[0]
+    retail_pe = read_pe(retail_path)
+    retail_text = read_pe_section_payload(retail_path, ".text")
+    candidate_text = read_pe_section_payload(candidate_path, ".text")
+    candidate_band_rva = candidate["sections"][".text"]["rva"] + contribution["offset"]
+    retail_band_rva = funclets[0]["rva"]
+    delta = candidate_band_rva - retail_band_rva
+    size = contribution["size"]
+    candidate_start = contribution["offset"]
+    retail_start = retail_band_rva - retail_pe["sections"][".text"]["rva"]
+    candidate_band = candidate_text[candidate_start:candidate_start + size]
+    retail_band = retail_text[retail_start:retail_start + size]
+    if len(candidate_band) != size or len(retail_band) != size:
+        return ({
+            "proved": False,
+            "reason": "shifted .text$x band lies outside one PE raw section",
+        }, {})
+
+    shifted = _shifted_rel32_diagnostics(
+        retail_band, candidate_band,
+        retail_pe["image_base"] + retail_band_rva,
+        candidate["image_base"] + candidate_band_rva)
+    coff = _candidate_text_x_census(candidate_band, candidate_band_rva)
+    in_band = all(
+        retail_band_rva <= row["rva"] and
+        row["rva"] + row["size"] <= retail_band_rva + size
+        for row in funclets)
+    proved = (
+        shifted["relocation_masked_bytes_exact"] and
+        shifted["classified_rel32_fields"] == coff["relocations"]["REL32"] and
+        coff["all_section_signatures_present"] and in_band)
+    placements = ({
+        (row["unit"], row["name"], row["rva"]): row["rva"] + delta
+        for row in funclets
+    } if proved else {})
+    return ({
+        "proved": proved,
+        "retail_rva": "0x%x" % retail_band_rva,
+        "candidate_rva": "0x%x" % candidate_band_rva,
+        "delta": delta,
+        "size": size,
+        "mapped_funclets": len(placements),
+        "coff": coff,
+        "shifted_bytes": shifted,
+        "interpretation": (
+            "Every project COFF .text$x shape occurs in the candidate linked band. After the "
+            "uniform RVA shift, all byte differences are REL32 operands; differing absolute "
+            "targets remain listed separately for semantic owner review."),
+    }, placements)
+
+
 def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
-                                   compgen_aliases=None, volatile_aliases=None):
+                                   compgen_aliases=None, volatile_aliases=None,
+                                   funclet_placements=None):
     """Join every recovered function to the candidate MAP by semantic identity."""
     retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
@@ -934,6 +1125,7 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
         volatile_aliases = (load_volatile_function_aliases(retail_symbols)
                             if any(VOLATILE_COMPGEN_FUNCTION.fullmatch(row["name"])
                                    for row in retail_symbols) else {})
+    funclet_placements = funclet_placements or {}
     candidate_records = defaultdict(list)
     for record in parse_map_symbol_records(map_path):
         candidate_records[record["name"]].append(record)
@@ -946,8 +1138,14 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
     for symbol in retail_symbols:
         candidate_name = symbol["name"]
         records = ()
+        direct_matches = None
         evidence = "exact-linker-name"
-        if VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol["name"]):
+        funclet_rva = funclet_placements.get(
+            (symbol["unit"], symbol["name"], symbol["rva"]))
+        if funclet_rva is not None:
+            direct_matches = [funclet_rva]
+            evidence = "shifted-text-x-rel32-proof"
+        elif VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol["name"]):
             alias = volatile_aliases.get((symbol["unit"], symbol["name"]))
             if alias is not None:
                 candidate_name = alias
@@ -968,8 +1166,8 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
                      if unit_record(record, symbol["unit"])]
             if owned:
                 records = owned
-        matches = sorted(set(
-            record["va"] - candidate["image_base"] for record in records))
+        matches = (direct_matches if direct_matches is not None else sorted(set(
+            record["va"] - candidate["image_base"] for record in records)))
         candidate_rva = matches[0] if len(matches) == 1 else None
         delta = candidate_rva - symbol["rva"] if candidate_rva is not None else None
         rows.append({
@@ -1016,7 +1214,9 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
             "Candidate addresses use owner-scoped decorated-name MAP joins. Duplicate MAP rows "
             "at one RVA are collapsed. Semantic compiler functions join through relocation-role "
             "proof; volatile $E counters join by normalized per-TU order only when masked body "
-            "bytes and relocation shape agree."),
+            "bytes and relocation shape agree. Stripped EH funclets join through the uniformly "
+            "shifted .text$x band only after every non-REL32 byte and every project COFF section "
+            "signature agrees."),
     }
 
 
@@ -1726,7 +1926,13 @@ def audit_existing_link(output, map_path=None, report_path=None,
     subbands = linked_subband_diagnostics(
         RETAIL_EXE, output, candidate, map_path)
     file_bytes = compare_file_bytes(RETAIL_EXE, output)
-    functions = function_placement_diagnostics(candidate, map_path)
+    retail_symbols = load_claimed_function_symbols()
+    funclet_band, funclet_placements = funclet_band_diagnostics(
+        RETAIL_EXE, output, candidate, map_path, retail_symbols)
+    functions = function_placement_diagnostics(
+        candidate, map_path, retail_symbols=retail_symbols,
+        funclet_placements=funclet_placements)
+    functions["funclet_band"] = funclet_band
     closure = {
         "file_bytes_exact": file_bytes["exact"],
         "section_geometry_exact": all(

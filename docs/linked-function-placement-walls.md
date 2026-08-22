@@ -95,6 +95,27 @@ No tested authentic source or compiler-state arm emits the complete retail order
 The source therefore retains the semantically correct form; no `/ORDER` file,
 synthetic root, padding function, or vtable patch is used.
 
+## Project EH funclets
+
+The stripped final MAP contains no names for the 311 reviewed unwind funclets, so
+an exact-name join incorrectly reported every one missing. All funclet code comes
+from 75 `.text$x` sections emitted by 50 reconstructed project TUs; no `LIBCMT`
+member contributes to this band. The candidate band begins at RVA `0xe7f50`, while
+retail begins at `0xe7f60`, a uniform −16 candidate displacement.
+
+Every relocation-masked candidate COFF section signature occurs in the 5,811-byte
+linked band. The input sections carry 445 REL32 and 134 DIR32 relocations. Comparing
+candidate bytes with retail shifted by 16 yields 5,341 identical bytes and 470
+differing bytes in exactly 445 runs. Every run decodes as one `call` or `jump` REL32
+operand; no opcode, stack displacement, immediate, or other body byte differs.
+
+Of those calls/jumps, 443 resolve to the same absolute target. The other two call
+candidate `0x4ccfa0` where retail calls `0x4ccf70`; both destinations are the same
+48-byte `RefPtr<OutputStream>` destructor body, byte-for-byte, selected at different
+Audiere COMDAT positions. The funclet bodies and semantic targets are therefore
+closed, while all 311 raw funclet RVAs remain displaced by −16. The final-link JSON
+retains the section census, every exceptional target pair, and the raw byte result.
+
 ## Closure rule
 
 These are bounded raw-placement walls, not byte-exact executable closure. They may
