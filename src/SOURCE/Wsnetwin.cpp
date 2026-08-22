@@ -196,7 +196,10 @@ i16 wsnet_init(void) {
     retryAddress:
         if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
             strcpy(cWSTextBuffer, gcTCPAddress);
-            strcpy(gcTCPAddress, "");
+            strcpy(
+                gcTCPAddress,
+                DATA_COMPGEN(0x005347c0, wsnetInitClearTcpAddressEmpty, "")
+            );
         } else {
             GetDataEntry(
                 /* Введите IP адрес сервера.
