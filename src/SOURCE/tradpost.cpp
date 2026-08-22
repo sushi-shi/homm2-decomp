@@ -459,4 +459,4 @@ DATA(0x00533edc) i32 bLeftDenominated;
 DATA(0x00533f70) class heroWindow* tpWindow;
 DATA(0x00533f64) i32 rightResource;
 DATA(0x00533ee4) i32 iMaxUnitsToTrade;
-i32 maxUnitsToTrade;
+DATA(0x00533f68) i32 maxUnitsToTrade;
