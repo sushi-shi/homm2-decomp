@@ -2,6 +2,7 @@
 # Each site is proven to be ordinary retail payload despite its dword value
 # falling inside the image. `homm2 audit reloc-sweep` subtracts these sites.
 site_rva	reason
+0xf1bbc	compiler-string-TCP-forms-image-va
 0xfa654	packed-gMonsterDatabase-fields-form-image-va
 0xff580	packed-IMHotSpots-fields-form-image-va
 0x118c0c	packed-sBuildingInfo-fields-form-image-va
