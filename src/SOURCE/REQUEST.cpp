@@ -181,8 +181,14 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     for (indexData5 = 0; indexData5 < m_fileCount; ++indexData5) {
-        strcpy(m_fileNames[indexData5].text, "");
-        strcpy(m_extensions[indexData5].text, "");
+        strcpy(
+            m_fileNames[indexData5].text,
+            DATA_COMPGEN(0x00533d84, fileRequesterFileNameEmptyText, "")
+        );
+        strcpy(
+            m_extensions[indexData5].text,
+            DATA_COMPGEN(0x00533d88, fileRequesterExtensionEmptyText, "")
+        );
     }
 
     insertCount = 0;
@@ -332,7 +338,10 @@ void fileRequester::Close(void) {
 
 VA(0x0048f275, 0x44b)
 i32 fileRequester::Open(i32 id) {
-    strcpy(gLastFilename, "");
+    strcpy(
+        gLastFilename,
+        DATA_COMPGEN(0x00533d8c, fileRequesterLastFilenameEmptyText, "")
+    );
     m_previousMenu = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
 
@@ -498,7 +507,10 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
-                        strcpy(cycleNameBuffer, "");
+                        strcpy(
+                            cycleNameBuffer,
+                            DATA_COMPGEN(0x00533d90, fileRequesterCycleNameEmptyText, "")
+                        );
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
                         (IDX(giMapSizeFilter) + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
@@ -730,7 +742,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                     strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                 } else {
-                                    strcpy(filteredNameMap, "");
+                                    strcpy(
+                                        filteredNameMap,
+                                        DATA_COMPGEN(
+                                            0x00533d94,
+                                            fileRequesterFilteredMapNameEmptyText,
+                                            ""
+                                        )
+                                    );
                                 }
                                 SetupFiles();
                                 if (strlen(filteredNameMap) != 0) {
@@ -1235,7 +1254,8 @@ char* fileRequester::GetFilename(void) {
 
 
 DATA(0x00516adc) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-DATA(0x00516ae0) char* cFRDummy = "";
+DATA(0x00516ae0) char* cFRDummy =
+    DATA_COMPGEN(0x00533d98, fileRequesterDummyEmptyText, "");
 DATA(0x00533d78) float fGutterMinY;
 DATA(0x00533d7c) float fGutterTravelLength;
 DATA(0x00533d80) i32 iMaxListSize;
