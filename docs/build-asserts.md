@@ -190,5 +190,8 @@ it is a floating-point type.
   This currently maps all 311 reviewed funclets without inventing labels.
   Six-byte import thunks are paired by the DLL plus name-or-ordinal identity of
   their encoded IAT slot, which maps all 23 reviewed thunks even when the retail
-  and candidate linker spellings differ. See
+  and candidate linker spellings differ. Reviewed static-runtime functions are
+  grouped by relocation-masked linked body and paired only with complete monotone
+  multiplicity; weaker linked-shape groups and unmatched internal fragments stay
+  explicitly bounded rather than falling back to decorated names. See
   `docs/linked-function-placement-walls.md` for the independent raw-RVA ledger.

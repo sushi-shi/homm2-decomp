@@ -132,6 +132,40 @@ runtime-library band. The six WinG MAP rows omit the optional function flag, so 
 proof deliberately relies on executable thunk shape and IAT identity rather than
 that presentation detail. No reviewed thunk is missing or ambiguous.
 
+## Static runtime bodies
+
+The 414-row CRT inventory cannot use raw decorated-name placement as its primary
+oracle. Archive members contain repeated masked bodies, ABI spellings differ, and
+LINK may select an identical implementation from a different member or runtime
+archive. A name-first join originally reported 36 exact RVAs, 330 displaced rows,
+46 missing rows, and two ambiguous rows; it also silently paired several stale
+analysis labels with the wrong same-named body.
+
+The final-link audit now compares every reviewed CRT body against every linked
+`LIBCMT`/`LIBCPMT` function start after masking reviewed DIR32 fields and aligned
+REL32 operands. A group is accepted only when the complete retail and candidate
+multiplicities pair monotonically. An unbalanced collision additionally requires
+one unique reviewed archive member or exact symbol name. Raw MAP names never
+override the body group.
+
+This produces three evidence tiers:
+
+- All 343 rows already identified as `masked-exact` against the pinned archive
+  map to a candidate address; none is missing or ambiguous.
+- Of the 71 rows previously supported only by sandwich, callgraph, prefix, order,
+  or linked-byte evidence, 52 form complete linked-body groups. These are bounded
+  shape/placement results because their complete ordered relocation identities
+  have not yet been audited against the archive objects.
+- Nineteen rows have no complete linked candidate group and remain explicit
+  bounded residuals: five internal floating-point bodies, ten cleanup fragments,
+  two dispatch fragments, one exception-filter entry, and one locale body.
+
+The semantic pass also corrected durable stale labels exposed by unique body
+groups, including `__heap_alloc`, `___FrameUnwindToState`, `terminate`,
+`_inconsistency`, `_realloc`, `__msize`, `_calloc`, the `___crtGet*` helpers,
+and `___crtCompareStringA`. These are inventory corrections, not synthetic linker
+aliases. The JSON retains every nontrivial candidate set and all nineteen residuals.
+
 ## Closure rule
 
 These are bounded raw-placement walls, not byte-exact executable closure. They may

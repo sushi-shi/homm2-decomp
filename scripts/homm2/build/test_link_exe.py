@@ -18,7 +18,8 @@ from homm2.build.link_exe import (
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics,
-    _import_slot_identities, _pair_volatile_function_rows,
+    _import_slot_identities, _linked_masked_code_equal,
+    _ordered_candidate_group_placements, _pair_volatile_function_rows,
     _shifted_rel32_diagnostics)
 from homm2.build.link_exe import strip_coff_export_directives, write_order_response
 
@@ -278,6 +279,55 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(result["functions"][0]["delta"], 0x64)
         self.assertEqual(result["functions"][0]["match_evidence"],
                          "semantic-import-iat-target")
+
+    def test_function_placement_does_not_fall_back_to_name_for_bounded_crt(self):
+        candidate = {"image_base": 0x400000}
+        symbol = {
+            "name": "_provisional", "unit": "(libcmt)",
+            "rva": 0x1234, "size": 8, "provenance": "reviewed-crt",
+        }
+        identity = {(symbol["unit"], symbol["name"], symbol["rva"])}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(" 0001:00001234 _provisional 00401234 f LIBCMT:x.obj\n")
+            result = function_placement_diagnostics(
+                candidate, path, [symbol], {}, {}, {}, {}, {}, identity)
+        self.assertEqual(result["summary"]["missing"], 1)
+        self.assertIsNone(result["functions"][0]["match_evidence"])
+
+    def test_masked_crt_code_ignores_only_reviewed_and_aligned_fields(self):
+        retail = b"\x90\xe8\x01\x02\x03\x04\xa1\x10\x20\x30\x40\xc3"
+        candidate = b"\x90\xe8\x05\x06\x07\x08\xa1\x50\x60\x70\x80\xc3"
+        self.assertTrue(_linked_masked_code_equal(
+            retail, candidate, [7], [2], [2]))
+        self.assertFalse(_linked_masked_code_equal(
+            retail, candidate, [7], [2], []))
+        self.assertFalse(_linked_masked_code_equal(retail, candidate, []))
+        self.assertFalse(_linked_masked_code_equal(
+            retail, candidate[:-1] + b"\x90", [7], [2], [2]))
+
+    def test_crt_body_groups_pair_complete_multiplicity_monotonically(self):
+        retail = {
+            0x1000: (7, (0x2000, 0x2007, 0x200E)),
+            0x1007: (7, (0x2000, 0x2007, 0x200E)),
+            0x100E: (7, (0x2000, 0x2007, 0x200E)),
+        }
+        self.assertEqual(_ordered_candidate_group_placements(retail), {
+            0x1000: 0x2000,
+            0x1007: 0x2007,
+            0x100E: 0x200E,
+        })
+
+    def test_crt_unbalanced_body_group_requires_unique_archive_owner(self):
+        retail = {0x1000: (3, (0x2000, 0x3000))}
+        claims = {0x1000: {"member": "wanted.obj"}}
+        records = {
+            0x2000: {"object": "LIBCMT:wanted.obj"},
+            0x3000: {"object": "LIBCMT:other.obj"},
+        }
+        self.assertEqual(
+            _ordered_candidate_group_placements(retail, claims, records),
+            {0x1000: 0x2000})
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),

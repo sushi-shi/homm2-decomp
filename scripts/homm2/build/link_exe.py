@@ -29,6 +29,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
 RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
+CRT_FUNCTIONS = REPO / "config/crt_functions.csv"
 REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
 IMAGE_BASE = 0x400000
 PE32_MAGIC = 0x10B
@@ -764,6 +765,218 @@ def import_thunk_diagnostics(retail_path, candidate_path, candidate, map_path,
     }, placements)
 
 
+def _linked_rel32_sites(path, image_base):
+    """Return RVA sites of instruction-aligned direct near-call/jump operands."""
+    output = subprocess.run(
+        ["llvm-objdump", "-d", str(path)], capture_output=True,
+        text=True, check=True).stdout
+    sites = set()
+    for line in output.splitlines():
+        match = re.match(
+            r"^\s*([0-9a-fA-F]+):\s+((?:[0-9a-fA-F]{2} )+)", line)
+        if not match:
+            continue
+        rva = int(match.group(1), 16) - image_base
+        raw = bytes.fromhex(match.group(2))
+        if len(raw) == 5 and raw[0] in (0xE8, 0xE9):
+            sites.add(rva + 1)
+    return sites
+
+
+def _linked_masked_code_equal(retail, candidate, dir32_offsets,
+                              retail_rel32_offsets=(),
+                              candidate_rel32_offsets=()):
+    """Compare linked code after masking reviewed DIR32 and decoded REL32 fields."""
+    if len(retail) != len(candidate):
+        return False
+    masked = set()
+    for offset in dir32_offsets:
+        masked.update(range(offset, min(offset + 4, len(retail))))
+    for offset in set(retail_rel32_offsets) & set(candidate_rel32_offsets):
+        if (0 < offset and offset + 4 <= len(retail) and
+                retail[offset - 1] in (0xE8, 0xE9) and
+                candidate[offset - 1] == retail[offset - 1]):
+            masked.update(range(offset, offset + 4))
+    return all(left == right or offset in masked
+               for offset, (left, right) in enumerate(zip(retail, candidate)))
+
+
+def _ordered_candidate_group_placements(retail_candidates, claims=None,
+                                        candidate_records=None):
+    """Pair complete repeated-body groups monotonically, then by unique archive owner."""
+    groups = defaultdict(list)
+    for retail_rva, (size, candidates) in retail_candidates.items():
+        groups[(size, tuple(candidates))].append(retail_rva)
+
+    placements = {}
+    for (_size, candidates), retail_rvas in groups.items():
+        if not candidates:
+            continue
+        retail_rvas = sorted(retail_rvas)
+        if len(retail_rvas) != len(candidates):
+            if claims is None or candidate_records is None:
+                continue
+            remaining = set(candidates)
+            owner_pairs = {}
+            for retail_rva in retail_rvas:
+                member = claims[retail_rva]["member"].lower()
+                owned = [
+                    candidate_rva for candidate_rva in remaining
+                    if (candidate_records[candidate_rva].get("object") or "").lower().endswith(
+                        ":" + member)
+                ]
+                if len(owned) != 1:
+                    owner_pairs = {}
+                    break
+                owner_pairs[retail_rva] = owned[0]
+                remaining.remove(owned[0])
+            if owner_pairs:
+                placements.update(owner_pairs)
+                continue
+            remaining = set(candidates)
+            name_pairs = {}
+            for retail_rva in retail_rvas:
+                name = claims[retail_rva]["symbol"]
+                named = [candidate_rva for candidate_rva in remaining
+                         if candidate_records[candidate_rva]["name"] == name]
+                if len(named) != 1:
+                    name_pairs = {}
+                    break
+                name_pairs[retail_rva] = named[0]
+                remaining.remove(named[0])
+            placements.update(name_pairs)
+            continue
+        placements.update(zip(retail_rvas, candidates))
+    return placements
+
+
+def crt_function_diagnostics(retail_path, candidate_path, candidate, map_path,
+                             functions, config_path=None):
+    """Pair CRT bodies by complete linked shape groups, retaining evidence tiers."""
+    config_path = Path(config_path or CRT_FUNCTIONS)
+    with config_path.open(newline="") as stream:
+        claims = {
+            int(row["entry_rva"], 0): row
+            for row in csv.DictReader(
+                line for line in stream if not line.lstrip().startswith("#"))
+        }
+    crt_rows = [
+        row for row in functions["functions"]
+        if row["provenance"] == "reviewed-crt"
+    ]
+
+    retail_pe = read_pe(retail_path)
+    retail_text = read_pe_section_payload(retail_path, ".text")
+    candidate_text = read_pe_section_payload(candidate_path, ".text")
+    retail_text_rva = retail_pe["sections"][".text"]["rva"]
+    candidate_text_rva = candidate["sections"][".text"]["rva"]
+    reviewed_dir32 = sorted(load_reviewed_highlow_sites(RELOC_MANIFEST))
+    retail_rel32 = _linked_rel32_sites(retail_path, retail_pe["image_base"])
+    candidate_rel32 = _linked_rel32_sites(candidate_path, candidate["image_base"])
+    candidate_records = {}
+    for record in parse_map_symbol_records(map_path):
+        owner = (record.get("object") or "").lower()
+        rva = record["va"] - candidate["image_base"]
+        library = owner.split(":", 1)[0]
+        if (record["flag"] == "f" and library in ("libcmt", "libcpmt") and
+                candidate_text_rva <= rva < candidate_text_rva + len(candidate_text)):
+            candidate_records.setdefault(rva, record)
+
+    retail_candidates = {}
+    for row in crt_rows:
+        retail_rva = row["rva"]
+        size = row["size"]
+        retail_offset = retail_rva - retail_text_rva
+        retail_body = retail_text[retail_offset:retail_offset + size]
+        dir32_offsets = [
+            site - retail_rva for site in reviewed_dir32
+            if retail_rva <= site < retail_rva + size
+        ]
+        retail_rel32_offsets = {
+            site - retail_rva for site in retail_rel32
+            if retail_rva <= site < retail_rva + size
+        }
+        matches = []
+        for candidate_rva in candidate_records:
+            candidate_offset = candidate_rva - candidate_text_rva
+            candidate_body = candidate_text[candidate_offset:candidate_offset + size]
+            candidate_rel32_offsets = {
+                offset for offset in retail_rel32_offsets
+                if candidate_rva + offset in candidate_rel32
+            }
+            if _linked_masked_code_equal(
+                    retail_body, candidate_body, dir32_offsets,
+                    retail_rel32_offsets, candidate_rel32_offsets):
+                matches.append(candidate_rva)
+        retail_candidates[retail_rva] = (size, tuple(sorted(matches)))
+
+    archive_exact_rvas = {
+        row["rva"] for row in crt_rows
+        if claims[row["rva"]]["evidence"] == "masked-exact"
+    }
+    linked_shape_rvas = set(retail_candidates) - archive_exact_rvas
+    archive_exact = _ordered_candidate_group_placements(
+        {rva: retail_candidates[rva] for rva in archive_exact_rvas},
+        claims, candidate_records)
+    linked_shape = _ordered_candidate_group_placements(
+        {rva: retail_candidates[rva] for rva in linked_shape_rvas},
+        claims, candidate_records)
+    by_rva = {**archive_exact, **linked_shape}
+    placements = {}
+    rows = []
+    for row in crt_rows:
+        candidate_rva = by_rva.get(row["rva"])
+        matches = retail_candidates[row["rva"]][1]
+        record = candidate_records.get(candidate_rva)
+        if candidate_rva is not None:
+            tier = ("ordered-masked-crt-archive-body"
+                    if row["rva"] in archive_exact_rvas else
+                    "ordered-linked-crt-body-shape")
+            placements[(row["unit"], row["name"], row["rva"])] = (
+                candidate_rva, tier)
+        rows.append({
+            "name": row["name"],
+            "retail_rva": row["retail_rva"],
+            "candidate_rva": "0x%x" % candidate_rva if candidate_rva is not None else None,
+            "candidate_name": record["name"] if record else None,
+            "candidate_owner": record["object"] if record else None,
+            "claim_evidence": claims[row["rva"]]["evidence"],
+            "masked_body_candidates": ["0x%x" % rva for rva in matches],
+            "status": "mapped" if candidate_rva is not None else "unresolved",
+        })
+    unresolved = {
+        (row["unit"], row["name"], row["rva"])
+        for row in crt_rows if row["rva"] not in by_rva
+    }
+    return ({
+        "archive_masked": {
+            "reviewed": len(archive_exact_rvas),
+            "mapped": len(archive_exact),
+            "unresolved": len(archive_exact_rvas) - len(archive_exact),
+            "closure": "bounded-identity; ordered relocation identities remain unaudited",
+        },
+        "linked_shape": {
+            "reviewed": len(linked_shape_rvas),
+            "mapped": len(linked_shape),
+            "unresolved": len(linked_shape_rvas) - len(linked_shape),
+            "closure": "bounded-shape; ordered relocation identities remain unaudited",
+        },
+        "residuals": [row for row in rows if row["status"] != "mapped"],
+        "nontrivial_mappings": [
+            row for row in rows
+            if row["status"] == "mapped" and (
+                len(row["masked_body_candidates"]) != 1 or
+                row["candidate_name"] != claims[int(row["retail_rva"], 16)]["symbol"])
+        ],
+        "interpretation": (
+            "Rows proved masked-exact against the pinned CRT archive pair are strong identity "
+            "and placement evidence, not relocation closure. Other complete linked-shape groups "
+            "are weaker placement evidence. Both remain bounded until their ordered relocation "
+            "identities are audited. Reviewed DIR32 and aligned REL32 fields are masked; raw MAP "
+            "names never override a body-group result."),
+    }, placements, unresolved)
+
+
 def parse_unresolved(output):
     symbols = sorted(set(re.findall(r"unresolved external symbol\s+(\S+)", output)))
     classes = defaultdict(list)
@@ -1222,7 +1435,9 @@ def funclet_band_diagnostics(retail_path, candidate_path, candidate, map_path,
 def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
                                    compgen_aliases=None, volatile_aliases=None,
                                    funclet_placements=None,
-                                   import_thunk_placements=None):
+                                   import_thunk_placements=None,
+                                   crt_placements=None,
+                                   unavailable_crt=None):
     """Join every recovered function to the candidate MAP by semantic identity."""
     retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
@@ -1234,6 +1449,8 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
                                    for row in retail_symbols) else {})
     funclet_placements = funclet_placements or {}
     import_thunk_placements = import_thunk_placements or {}
+    crt_placements = crt_placements or {}
+    unavailable_crt = unavailable_crt or set()
     candidate_records = defaultdict(list)
     for record in parse_map_symbol_records(map_path):
         candidate_records[record["name"]].append(record)
@@ -1252,12 +1469,21 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
             (symbol["unit"], symbol["name"], symbol["rva"]))
         import_thunk_rva = import_thunk_placements.get(
             (symbol["unit"], symbol["name"], symbol["rva"]))
+        identity = (symbol["unit"], symbol["name"], symbol["rva"])
+        crt_match = crt_placements.get(identity)
         if funclet_rva is not None:
             direct_matches = [funclet_rva]
             evidence = "shifted-text-x-rel32-proof"
         elif import_thunk_rva is not None:
             direct_matches = [import_thunk_rva]
             evidence = "semantic-import-iat-target"
+        elif crt_match is not None:
+            crt_rva, crt_evidence = crt_match
+            direct_matches = [crt_rva]
+            evidence = crt_evidence
+        elif identity in unavailable_crt:
+            records = ()
+            evidence = "bounded-crt-evidence"
         elif VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol["name"]):
             alias = volatile_aliases.get((symbol["unit"], symbol["name"]))
             if alias is not None:
@@ -1330,7 +1556,9 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
             "bytes and relocation shape agree. Stripped EH funclets join through the uniformly "
             "shifted .text$x band only after every non-REL32 byte and every project COFF section "
             "signature agrees. Six-byte import thunks join by the DLL plus name-or-ordinal "
-            "identity resolved from their encoded IAT slots."),
+            "identity resolved from their encoded IAT slots. Masked-exact CRT collisions join "
+            "only as complete monotone definition-order groups. Weaker complete linked-shape "
+            "groups remain explicitly bounded pending ordered relocation-identity review."),
     }
 
 
@@ -2045,12 +2273,21 @@ def audit_existing_link(output, map_path=None, report_path=None,
         RETAIL_EXE, output, candidate, map_path, retail_symbols)
     import_thunks, import_thunk_placements = import_thunk_diagnostics(
         RETAIL_EXE, output, candidate, map_path, retail_symbols)
-    functions = function_placement_diagnostics(
+    initial_functions = function_placement_diagnostics(
         candidate, map_path, retail_symbols=retail_symbols,
         funclet_placements=funclet_placements,
         import_thunk_placements=import_thunk_placements)
+    crt_functions, crt_placements, unavailable_crt = crt_function_diagnostics(
+        RETAIL_EXE, output, candidate, map_path, initial_functions)
+    functions = function_placement_diagnostics(
+        candidate, map_path, retail_symbols=retail_symbols,
+        funclet_placements=funclet_placements,
+        import_thunk_placements=import_thunk_placements,
+        crt_placements=crt_placements,
+        unavailable_crt=unavailable_crt)
     functions["funclet_band"] = funclet_band
     functions["import_thunks"] = import_thunks
+    functions["crt_archive_bodies"] = crt_functions
     closure = {
         "file_bytes_exact": file_bytes["exact"],
         "section_geometry_exact": all(
