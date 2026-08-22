@@ -81,12 +81,29 @@ class Clangd:
         self.proc.stdin.write(f"Content-Length: {len(body)}\r\n\r\n".encode() + body)
         self.proc.stdin.flush()
 
+    def _died(self) -> None:
+        """clangd's stdout hit EOF, so it is gone (it SIGSEGVs on some TUs while
+        background-indexing). Reap it and bail: at EOF `read` returns b"" forever, so
+        without this the header loop below spins at 100% CPU until someone kills us."""
+        try:
+            rc = self.proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+            rc = self.proc.wait()
+        sys.exit(f"clangd exited unexpectedly (rc={rc})")
+
     def _recv(self) -> dict:
         headers = b""
         while not headers.endswith(b"\r\n\r\n"):
-            headers += self.proc.stdout.read(1)
+            byte = self.proc.stdout.read(1)
+            if not byte:
+                self._died()
+            headers += byte
         length = int(re.search(rb"Content-Length: (\d+)", headers).group(1))
-        return json.loads(self.proc.stdout.read(length))
+        body = self.proc.stdout.read(length)
+        if len(body) < length:
+            self._died()
+        return json.loads(body)
 
     def _notify(self, method: str, params: dict) -> None:
         self._send({"method": method, "params": params})
