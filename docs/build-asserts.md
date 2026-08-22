@@ -187,5 +187,8 @@ it is a floating-point type.
   no MAP-visible names; the audit instead requires every project `.text$x` COFF
   section signature to occur in the linked band, then accepts the uniform band
   shift only when every remaining byte difference is a decoded REL32 operand.
-  This currently maps all 311 reviewed funclets without inventing labels. See
+  This currently maps all 311 reviewed funclets without inventing labels.
+  Six-byte import thunks are paired by the DLL plus name-or-ordinal identity of
+  their encoded IAT slot, which maps all 23 reviewed thunks even when the retail
+  and candidate linker spellings differ. See
   `docs/linked-function-placement-walls.md` for the independent raw-RVA ledger.

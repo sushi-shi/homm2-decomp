@@ -586,6 +586,51 @@ def read_imports(path):
     return imports
 
 
+def _import_slot_identities(path):
+    """Map linked IAT VAs to semantic DLL/name-or-ordinal identities."""
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    image_base = struct.unpack_from("<I", data, optional + 28)[0]
+    section_offset = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append((rva, max(virtual_size, raw_size), raw_offset))
+
+    def rva_offset(rva):
+        for section_rva, size, raw_offset in sections:
+            if section_rva <= rva < section_rva + size:
+                return raw_offset + rva - section_rva
+        raise ValueError("RVA 0x%x is outside raw PE sections in %s" % (rva, path))
+
+    import_rva, _import_size = struct.unpack_from(
+        "<II", data, optional + 96 + IMAGE_DIRECTORY_ENTRY_IMPORT * 8)
+    imports = read_imports(path)
+    slots = {}
+    if not import_rva:
+        return slots
+    descriptor = rva_offset(import_rva)
+    for imported in imports:
+        lookup_rva, timestamp, forwarder, name_rva, address_rva = struct.unpack_from(
+            "<IIIII", data, descriptor)
+        if not any((lookup_rva, timestamp, forwarder, name_rva, address_rva)):
+            raise ValueError("import descriptors ended before parsed identities in %s" % path)
+        dll = imported["dll"].lower()
+        for index, symbol in enumerate(imported["symbols"]):
+            identity = ((dll, "name", symbol["name"])
+                        if "name" in symbol else
+                        (dll, "ordinal", symbol["ordinal"]))
+            slots[image_base + address_rva + index * 4] = identity
+        descriptor += IMPORT_DESCRIPTOR_SIZE
+    return slots
+
+
 def vendor_imports(imports):
     vendor = {"smackw32.dll", "mss32.dll", "wing32.dll"}
     return [entry for entry in imports if entry["dll"].lower() in vendor]
@@ -656,6 +701,67 @@ def import_diagnostics(retail_imports, candidate_imports):
             "synthetic /INCLUDE roots."),
         "per_dll": per_dll,
     }
+
+
+def import_thunk_diagnostics(retail_path, candidate_path, candidate, map_path,
+                             retail_symbols):
+    """Pair six-byte import thunks by the semantic identity of their IAT slot."""
+    retail_slots = _import_slot_identities(retail_path)
+    candidate_slots = _import_slot_identities(candidate_path)
+    retail_pe = read_pe(retail_path)
+    retail_text = read_pe_section_payload(retail_path, ".text")
+    candidate_text = read_pe_section_payload(candidate_path, ".text")
+    retail_text_rva = retail_pe["sections"][".text"]["rva"]
+    candidate_text_rva = candidate["sections"][".text"]["rva"]
+
+    candidate_by_identity = defaultdict(set)
+    for record in parse_map_symbol_records(map_path):
+        rva = record["va"] - candidate["image_base"]
+        offset = rva - candidate_text_rva
+        if not 0 <= offset <= len(candidate_text) - 6:
+            continue
+        body = candidate_text[offset:offset + 6]
+        if body[:2] != b"\xff\x25":
+            continue
+        identity = candidate_slots.get(struct.unpack_from("<I", body, 2)[0])
+        if identity is not None:
+            candidate_by_identity[identity].add(rva)
+
+    reviewed = [row for row in retail_symbols
+                if row["provenance"] == "reviewed-thunk"]
+    placements = {}
+    rows = []
+    for row in reviewed:
+        offset = row["rva"] - retail_text_rva
+        body = retail_text[offset:offset + row["size"]]
+        identity = (retail_slots.get(struct.unpack_from("<I", body, 2)[0])
+                    if len(body) == 6 and body[:2] == b"\xff\x25" else None)
+        matches = sorted(candidate_by_identity.get(identity, ())) if identity else []
+        if len(matches) == 1:
+            placements[(row["unit"], row["name"], row["rva"])] = matches[0]
+        rows.append({
+            "name": row["name"],
+            "retail_rva": "0x%x" % row["rva"],
+            "identity": ({
+                "dll": identity[0],
+                identity[1]: identity[2],
+            } if identity else None),
+            "candidate_rvas": ["0x%x" % rva for rva in matches],
+            "status": ("mapped" if len(matches) == 1 else
+                       "missing" if not matches else "ambiguous"),
+        })
+    return ({
+        "reviewed": len(reviewed),
+        "mapped": len(placements),
+        "missing": sum(row["status"] == "missing" for row in rows),
+        "ambiguous": sum(row["status"] == "ambiguous" for row in rows),
+        "candidate_semantic_thunks": sum(len(rvas)
+                                         for rvas in candidate_by_identity.values()),
+        "residuals": [row for row in rows if row["status"] != "mapped"],
+        "interpretation": (
+            "Retail and candidate six-byte FF 25 thunks pair only when their encoded IAT slots "
+            "resolve to the same DLL plus imported name or ordinal."),
+    }, placements)
 
 
 def parse_unresolved(output):
@@ -1115,7 +1221,8 @@ def funclet_band_diagnostics(retail_path, candidate_path, candidate, map_path,
 
 def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
                                    compgen_aliases=None, volatile_aliases=None,
-                                   funclet_placements=None):
+                                   funclet_placements=None,
+                                   import_thunk_placements=None):
     """Join every recovered function to the candidate MAP by semantic identity."""
     retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
@@ -1126,6 +1233,7 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
                             if any(VOLATILE_COMPGEN_FUNCTION.fullmatch(row["name"])
                                    for row in retail_symbols) else {})
     funclet_placements = funclet_placements or {}
+    import_thunk_placements = import_thunk_placements or {}
     candidate_records = defaultdict(list)
     for record in parse_map_symbol_records(map_path):
         candidate_records[record["name"]].append(record)
@@ -1142,9 +1250,14 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
         evidence = "exact-linker-name"
         funclet_rva = funclet_placements.get(
             (symbol["unit"], symbol["name"], symbol["rva"]))
+        import_thunk_rva = import_thunk_placements.get(
+            (symbol["unit"], symbol["name"], symbol["rva"]))
         if funclet_rva is not None:
             direct_matches = [funclet_rva]
             evidence = "shifted-text-x-rel32-proof"
+        elif import_thunk_rva is not None:
+            direct_matches = [import_thunk_rva]
+            evidence = "semantic-import-iat-target"
         elif VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol["name"]):
             alias = volatile_aliases.get((symbol["unit"], symbol["name"]))
             if alias is not None:
@@ -1216,7 +1329,8 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
             "proof; volatile $E counters join by normalized per-TU order only when masked body "
             "bytes and relocation shape agree. Stripped EH funclets join through the uniformly "
             "shifted .text$x band only after every non-REL32 byte and every project COFF section "
-            "signature agrees."),
+            "signature agrees. Six-byte import thunks join by the DLL plus name-or-ordinal "
+            "identity resolved from their encoded IAT slots."),
     }
 
 
@@ -1929,10 +2043,14 @@ def audit_existing_link(output, map_path=None, report_path=None,
     retail_symbols = load_claimed_function_symbols()
     funclet_band, funclet_placements = funclet_band_diagnostics(
         RETAIL_EXE, output, candidate, map_path, retail_symbols)
+    import_thunks, import_thunk_placements = import_thunk_diagnostics(
+        RETAIL_EXE, output, candidate, map_path, retail_symbols)
     functions = function_placement_diagnostics(
         candidate, map_path, retail_symbols=retail_symbols,
-        funclet_placements=funclet_placements)
+        funclet_placements=funclet_placements,
+        import_thunk_placements=import_thunk_placements)
     functions["funclet_band"] = funclet_band
+    functions["import_thunks"] = import_thunks
     closure = {
         "file_bytes_exact": file_bytes["exact"],
         "section_geometry_exact": all(

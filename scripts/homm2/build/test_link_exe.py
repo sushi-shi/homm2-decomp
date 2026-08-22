@@ -18,7 +18,8 @@ from homm2.build.link_exe import (
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics,
-    _pair_volatile_function_rows, _shifted_rel32_diagnostics)
+    _import_slot_identities, _pair_volatile_function_rows,
+    _shifted_rel32_diagnostics)
 from homm2.build.link_exe import strip_coff_export_directives, write_order_response
 
 
@@ -260,6 +261,23 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(result["functions"][0]["delta"], -0x10)
         self.assertEqual(result["functions"][0]["match_evidence"],
                          "shifted-text-x-rel32-proof")
+
+    def test_function_placement_uses_semantic_import_thunk(self):
+        candidate = {"image_base": 0x400000}
+        symbol = {
+            "name": "RtlUnwind@KERNEL32", "unit": "(imports)",
+            "rva": 0x1234, "size": 6, "provenance": "reviewed-thunk",
+        }
+        placements = {(symbol["unit"], symbol["name"], symbol["rva"]): 0x1298}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text("")
+            result = function_placement_diagnostics(
+                candidate, path, [symbol], {}, {}, {}, placements)
+        self.assertEqual(result["summary"]["displaced_rva"], 1)
+        self.assertEqual(result["functions"][0]["delta"], 0x64)
+        self.assertEqual(result["functions"][0]["match_evidence"],
+                         "semantic-import-iat-target")
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),
@@ -706,8 +724,13 @@ class LinkExeTest(unittest.TestCase):
             path = Path(temp) / "test.exe"
             path.write_bytes(data)
             imports = read_imports(path)
+            slots = _import_slot_identities(path)
         self.assertEqual(imports, [{"dll": "x.dll", "symbols": [
             {"ordinal": 14}, {"name": "Fn", "hint": 0}]}])
+        self.assertEqual(slots, {
+            0x2060: ("x.dll", "ordinal", 14),
+            0x2064: ("x.dll", "name", "Fn"),
+        })
 
     def test_vendor_abi_normalization_ignores_only_intra_dll_iat_order(self):
         imports = [{"dll": "mss32.dll", "symbols": [

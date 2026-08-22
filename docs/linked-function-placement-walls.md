@@ -116,6 +116,22 @@ Audiere COMDAT positions. The funclet bodies and semantic targets are therefore
 closed, while all 311 raw funclet RVAs remain displaced by −16. The final-link JSON
 retains the section census, every exceptional target pair, and the raw byte result.
 
+## Import thunks
+
+Decorated linker names are not stable enough to identify every import thunk. In
+particular, retail records `RtlUnwind@KERNEL32` at RVA `0xe7c1a`, while the current
+MAP exposes `_RtlUnwind@16` at RVA `0xe7c7e`. Both are the canonical six-byte
+`FF 25 <IAT slot>` form, and both IAT slots resolve to
+`kernel32.dll!RtlUnwind`.
+
+The audit now decodes the IAT operand and pairs thunks only when the resulting DLL
+plus imported name-or-ordinal identity is unique. This maps all 23 reviewed import
+thunks without a spelling exception. Twenty-two form one contiguous import-library
+band displaced by −8 bytes. `RtlUnwind` is displaced by +100 bytes in the later
+runtime-library band. The six WinG MAP rows omit the optional function flag, so the
+proof deliberately relies on executable thunk shape and IAT identity rather than
+that presentation detail. No reviewed thunk is missing or ambiguous.
+
 ## Closure rule
 
 These are bounded raw-placement walls, not byte-exact executable closure. They may
