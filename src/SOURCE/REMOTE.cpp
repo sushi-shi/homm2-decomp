@@ -773,7 +773,7 @@ void PollRemote(void) {
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                     DropDownToOnePlayer();
                 else
-                    ShutDown("");
+                    ShutDown(DATA_COMPGEN(0x00533d74, remoteShutdownEmptyMessage, ""));
             }
             gbInPollSound = oldInPoll;
             bInTimeoutFail = 1;
