@@ -10,7 +10,7 @@ from homm2.build.link_exe import (
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command,
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
-    compare_pe_section_bytes, load_required_initialized_storage,
+    compare_pe_section_bytes, compare_pe_section_range, load_required_initialized_storage,
     function_placement_diagnostics, import_diagnostics,
     load_claimed_data_symbols, load_link_order,
     link_environment, normalized_dll_import, normalized_vendor_imports,
@@ -593,6 +593,7 @@ class LinkExeTest(unittest.TestCase):
             retail.write_bytes(pe(b"abcDEF"))
             candidate.write_bytes(pe(b"abcXYFz"))
             result = compare_pe_section_bytes(retail, candidate, ".data")
+            middle = compare_pe_section_range(retail, candidate, ".data", 2, 3)
         self.assertFalse(result["exact"])
         self.assertEqual(result["matched_bytes"], 4)
         self.assertEqual(result["mismatched_bytes"], 3)
@@ -602,6 +603,9 @@ class LinkExeTest(unittest.TestCase):
             {"offset": 6, "size": 1, "kind": "candidate-tail",
              "retail_hex": "", "candidate_hex": "7a"},
         ])
+        self.assertEqual(middle["offset"], 2)
+        self.assertEqual(middle["size"], 3)
+        self.assertEqual(middle["mismatched_bytes"], 2)
 
     def test_import_parser_preserves_name_and_ordinal(self):
         data = bytearray(0x400)

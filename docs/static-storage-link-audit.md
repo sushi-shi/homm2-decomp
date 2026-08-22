@@ -12,6 +12,12 @@ are recorded. This whole-section comparison is the final authority: a normalized
 object-level 100% score is not proof when either linked section differs. Per-symbol
 and contribution diagnostics exist to attribute the first whole-section mismatch.
 
+`subbands` applies every candidate MAP contribution boundary to the same offset in
+the equal-RVA retail section and compares that bounded span independently. This keeps
+linker-owned import arrays, ordinary read-only data, exception metadata, initialized
+data, and alignment tails separate. The retail image has no MAP, so these are explicitly
+candidate-boundary projections; the raw whole-section result remains authoritative.
+
 `python3 -m homm2.build.assert_relocs --pe-data` supplies the complementary
 code-site audit for all 1,499 unique configured functions. Its exhaustive pass
 reads every retail DIR32 operand from the shipping PE and compares the resulting

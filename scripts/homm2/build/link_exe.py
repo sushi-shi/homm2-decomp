@@ -295,27 +295,26 @@ def read_pe(path):
     }
 
 
-def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
-    """Compare one PE section byte-for-byte at section-relative offsets."""
-    def payload(path):
-        data = Path(path).read_bytes()
-        pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
-        coff = pe_offset + 4
-        section_count = struct.unpack_from("<H", data, coff + 2)[0]
-        optional_size = struct.unpack_from("<H", data, coff + 16)[0]
-        section_offset = coff + 20 + optional_size
-        for index in range(section_count):
-            offset = section_offset + index * COFF_SECTION_HEADER_SIZE
-            section_name = data[offset:offset + 8].split(b"\0", 1)[0].decode(
-                "ascii", "replace")
-            if section_name != name:
-                continue
-            raw_size, raw_offset = struct.unpack_from("<II", data, offset + 16)
-            return data[raw_offset:raw_offset + raw_size]
-        raise ValueError("missing PE section %s in %s" % (name, path))
+def read_pe_section_payload(path, name):
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    section_offset = coff + 20 + optional_size
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        section_name = data[offset:offset + 8].split(b"\0", 1)[0].decode(
+            "ascii", "replace")
+        if section_name != name:
+            continue
+        raw_size, raw_offset = struct.unpack_from("<II", data, offset + 16)
+        return data[raw_offset:raw_offset + raw_size]
+    raise ValueError("missing PE section %s in %s" % (name, path))
 
-    retail = payload(retail_path)
-    candidate = payload(candidate_path)
+
+def compare_byte_spans(retail, candidate, range_limit=32):
+    """Compare two byte spans and retain a bounded mismatch-range preview."""
     common_size = min(len(retail), len(candidate))
     matched = sum(retail[index] == candidate[index] for index in range(common_size))
     total_size = max(len(retail), len(candidate))
@@ -355,6 +354,29 @@ def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
         "first_mismatch_ranges": ranges,
         "range_limit": range_limit,
     }
+
+
+def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
+    """Compare one PE section byte-for-byte at section-relative offsets."""
+    return compare_byte_spans(
+        read_pe_section_payload(retail_path, name),
+        read_pe_section_payload(candidate_path, name),
+        range_limit,
+    )
+
+
+def compare_pe_section_range(retail_path, candidate_path, name, offset, size,
+                             range_limit=8):
+    """Compare one MAP-defined section-relative sub-band."""
+    retail = read_pe_section_payload(retail_path, name)
+    candidate = read_pe_section_payload(candidate_path, name)
+    if offset < 0 or size < 0 or offset + size > len(retail) or offset + size > len(candidate):
+        raise ValueError("PE sub-band %s+0x%x..+0x%x is outside raw section bounds" %
+                         (name, offset, offset + size))
+    result = compare_byte_spans(
+        retail[offset:offset + size], candidate[offset:offset + size], range_limit)
+    result.update({"section": name, "offset": offset, "size": size})
+    return result
 
 
 def pe_section_raw_zero_tail_start(path, name):
@@ -1343,6 +1365,61 @@ def section_diagnostics(retail, candidate):
     return result
 
 
+def linked_subband_diagnostics(retail_path, candidate_path, candidate, map_path):
+    """Compare candidate MAP contribution bands at identical section offsets."""
+    contributions = parse_map_contributions(map_path)
+    result = {}
+    for segment, name in enumerate(candidate["section_order"], 1):
+        raw_size = candidate["sections"][name]["raw_size"]
+        rows = sorted(
+            (row for row in contributions if row["segment"] == segment),
+            key=lambda row: row["offset"])
+        bands = []
+        cursor = 0
+        contribution_end = 0
+
+        def append_band(offset, size, band_name, kind, class_name=None):
+            if not size:
+                return
+            bands.append({
+                "name": band_name,
+                "kind": kind,
+                "class": class_name,
+                **compare_pe_section_range(
+                    retail_path, candidate_path, name, offset, size),
+            })
+
+        for row in rows:
+            if row["offset"] < contribution_end:
+                raise ValueError("overlapping MAP contributions in PE section %s" % name)
+            append_band(cursor, min(row["offset"], raw_size) - cursor,
+                        "<alignment-gap>", "gap")
+            raw_end = min(row["offset"] + row["size"], raw_size)
+            append_band(row["offset"], max(raw_end - row["offset"], 0),
+                        row["name"], "contribution", row["class"])
+            virtual_start = max(row["offset"], raw_size)
+            if row["offset"] + row["size"] > virtual_start:
+                bands.append({
+                    "name": row["name"],
+                    "kind": "virtual-only-contribution",
+                    "class": row["class"],
+                    "section": name,
+                    "offset": virtual_start,
+                    "size": row["offset"] + row["size"] - virtual_start,
+                    "exact": None,
+                })
+            cursor = max(cursor, raw_end)
+            contribution_end = row["offset"] + row["size"]
+        append_band(cursor, raw_size - cursor, "<raw-tail>", "padding")
+        result[name] = {
+            "boundary_evidence": (
+                "Candidate LINK MAP contribution offsets projected onto the same-RVA retail "
+                "section; raw whole-section comparison remains authoritative."),
+            "bands": bands,
+        }
+    return result
+
+
 def resource_diagnostics(retail_path, candidate_path, retail, candidate):
     retail_resources = read_pe_resources(retail_path)
     candidate_resources = read_pe_resources(candidate_path)
@@ -1513,6 +1590,8 @@ def audit_existing_link(output, map_path=None, report_path=None,
         for name in retail["section_order"]
         if name in candidate["sections"]
     }
+    subbands = linked_subband_diagnostics(
+        RETAIL_EXE, output, candidate, map_path)
     file_bytes = compare_file_bytes(RETAIL_EXE, output)
     functions = function_placement_diagnostics(candidate, map_path)
     closure = {
@@ -1540,6 +1619,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "entry_point_delta": candidate["entry_point_rva"] - retail["entry_point_rva"],
         "sections": section_diagnostics(retail, candidate),
         "section_bytes": section_bytes,
+        "subbands": subbands,
         "file_bytes": file_bytes,
         "imports": imports,
         "resources": resources,
