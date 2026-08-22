@@ -90,6 +90,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd8c6e,23,_open,open.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\open.obj!__open|libcmt.lib:build\intel\mt_obj\wopen.obj!__wopen
 0xd8c85,719,__sopen,open.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd8f60,257,__strnicmp,strnicmp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xd9061,9,__purecall,purevirt.obj,libcmt.lib,masked-exact,exact VC6 purevirt.obj body and __amsg_exit relocation; abstract vtable slots point here
 0xd906a,18,_malloc,malloc.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd907c,44,__nh_malloc,malloc.obj,libcmt.lib,masked-exact,
 0xd90a8,231,_realloc,realloc.obj,libcmt.lib,reviewed-sandwich,EH-framed heap body between __nh_malloc and stdio

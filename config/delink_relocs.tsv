@@ -27329,6 +27329,7 @@ site_rva	kind
 0xea540	dir32
 0xea544	dir32
 0xea548	dir32
+0xea630	dir32
 0xea634	dir32
 0xea638	dir32
 0xea7f4	dir32
@@ -27337,6 +27338,7 @@ site_rva	kind
 0xea800	dir32
 0xea804	dir32
 0xea808	dir32
+0xea86c	dir32
 0xea870	dir32
 0xea874	dir32
 0xea938	dir32
@@ -27345,6 +27347,7 @@ site_rva	kind
 0xea944	dir32
 0xea948	dir32
 0xea94c	dir32
+0xea954	dir32
 0xea958	dir32
 0xea95c	dir32
 0xea960	dir32

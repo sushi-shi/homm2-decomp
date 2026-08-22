@@ -2,6 +2,9 @@
 # Candidate COFF relocations and exact code/data layout prove these sites.
 site_rva	reason
 0xb0c1d	exact-DDUpdatePalette-absolute-operand
+0xea630	candidate-vtable-highScoreManager-Open-slot
+0xea86c	candidate-vtable-swapManager-Open-slot
+0xea954	candidate-vtable-soundManager-Open-slot
 0xff35b	packed-gWinSetup-string-pointer
 0xff362	packed-gWinSetup-string-pointer
 0xff369	packed-gWinSetup-string-pointer
