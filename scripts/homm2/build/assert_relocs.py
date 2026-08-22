@@ -880,6 +880,20 @@ def _unique_report_functions(functions):
     return [selected[name] for name in sorted(selected)], duplicates
 
 
+def _map_record_has_owner(record, owner):
+    """Match a MAP object member through an optional library/group prefix."""
+    member = (record.get("object") or "").rsplit(":", 1)[-1]
+    return member.lower() == owner.lower()
+
+
+def _select_candidate_map_records(records, owner):
+    """Prefer the owning object, then accept one externally folded definition."""
+    owned = [record for record in records if _map_record_has_owner(record, owner)]
+    if owned:
+        return owned
+    return records if len(records) == 1 else []
+
+
 def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
                                   retail_function_rva,
                                   candidate_function_rva,
@@ -1330,11 +1344,14 @@ def review_fields(resolved_addresses=False):
 def review_pe_data_targets():
     """Audit every configured linked reference into `.rdata` and `.data`.
 
-    Both operands come from final linked images. Only the section base is
-    normalized, so no delinker symbol, payload pairing, or reviewed private-name
-    mapping can hide a different destination.
+    Final section offsets come directly from both linked images.  The independent
+    multiset pass maps private targets through the reviewed semantic identity
+    oracle, so link-order drift cannot masquerade as a different destination.
     """
-    from homm2.build.link_exe import parse_map_symbol_records
+    from homm2.build.link_exe import (
+        load_compgen_function_aliases,
+        parse_map_symbol_records,
+    )
 
     retail_image = _load_pe_image("build/orig/HMM2PL.exe")
     candidate_image = _load_pe_image("build/link/HMM2PL.exe")
@@ -1354,6 +1371,7 @@ def review_pe_data_targets():
     candidate_functions = {}
     for record in map_records:
         candidate_functions.setdefault(record["name"], []).append(record)
+    compgen_aliases = load_compgen_function_aliases()
     function_rvas = {}
     with open("build/gen/symbol_names.csv", encoding="latin-1", newline="") as stream:
         for row in csv.DictReader(stream):
@@ -1373,6 +1391,7 @@ def review_pe_data_targets():
     shape_novel_identity_bad = []
     unresolved_identity_bad = []
     unavailable_functions = []
+    skipped_volatile_ordinals = []
     duplicate_report_records = []
     configured_functions = 0
     checked_functions = 0
@@ -1389,6 +1408,7 @@ def review_pe_data_targets():
             base_obj, with_sites=True, include_imports=True)
         target_functions = parse_obj(
             target_obj, with_sites=True, include_imports=True)
+        normalized_base = normalized_target = None
         functions, duplicates = _unique_report_functions(
             unit_record.get("functions", []))
         duplicate_report_records.extend({
@@ -1399,18 +1419,37 @@ def review_pe_data_targets():
         for function in functions:
             configured_functions += 1
             name = function["name"]
+            if is_ordinal_local(name):
+                skipped_volatile_ordinals.append({
+                    "unit": unit,
+                    "function": name,
+                    "reason": "per-compilation ordinal; audited as a unit-level group",
+                })
+                continue
+            selected_base = base_functions
+            selected_target = target_functions
+            candidate_name = name
+            if name.startswith("__h2cg$"):
+                if normalized_base is None:
+                    normalized_base = parse_obj(
+                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        with_sites=True, include_imports=True)
+                    normalized_target = parse_obj(
+                        "build/objdiff/normalized/target/%s.c.obj" % unit,
+                        with_sites=True, include_imports=True)
+                selected_base = normalized_base
+                selected_target = normalized_target
+                candidate_name = compgen_aliases.get((unit, name), name)
             function_rva = function_rvas.get((unit, name))
             owner = Path(unit).name.lower() + ".obj"
-            candidates = [
-                record for record in candidate_functions.get(name, [])
-                if (record.get("object") or "").lower() == owner
-            ]
+            candidates = _select_candidate_map_records(
+                candidate_functions.get(candidate_name, []), owner)
             missing_inputs = []
             if function_rva is None:
                 missing_inputs.append("retail-function-rva")
-            if name not in base_functions:
+            if name not in selected_base:
                 missing_inputs.append("candidate-coff-function")
-            if name not in target_functions:
+            if name not in selected_target:
                 missing_inputs.append("target-coff-function")
             if missing_inputs:
                 unavailable_functions.append({
@@ -1431,8 +1470,8 @@ def review_pe_data_targets():
             candidate_function_rva = candidates[0]["va"] - candidate_image[1]
             multiset = check_pe_data_target_multiset(
                 sym, data, dups, local_rvas, unit, function_rva,
-                candidate_function_rva, base_functions[name],
-                target_functions[name], retail_image, candidate_image,
+                candidate_function_rva, selected_base[name],
+                selected_target[name], retail_image, candidate_image,
                 section_ranges, import_rvas)
             audit_stats["retail_multiset_sites"] += multiset["expected_count"]
             audit_stats["candidate_multiset_sites"] += multiset["candidate_count"]
@@ -1467,19 +1506,19 @@ def review_pe_data_targets():
                   not multiset["excess_candidate_targets"]):
                 audit_stats["multiset_exact_functions"] += 1
             problems = check_linked_pe_data_targets(
-                base_functions[name], target_functions[name], function_rva,
+                selected_base[name], selected_target[name], function_rva,
                 candidate_function_rva, retail_image, candidate_image,
                 stats=audit_stats)
             target_types = {
                 relocation[0]: relocation[1]
-                for relocation in target_functions[name]
+                for relocation in selected_target[name]
             }
             aligned_base = [
-                relocation for relocation in base_functions[name]
+                relocation for relocation in selected_base[name]
                 if (relocation[1] == "DIR32" and
                     target_types.get(relocation[0]) == "DIR32" and
                     _matching_linked_site_context(
-                        base_functions[name], target_functions[name],
+                        selected_base[name], selected_target[name],
                         relocation[0], function_rva, candidate_function_rva,
                         retail_image, candidate_image))
             ]
@@ -1490,10 +1529,10 @@ def review_pe_data_targets():
             if multiset["expected_count"] == multiset["candidate_count"]:
                 identity_problems = check_pe_data_targets(
                     sym, data, dups, local_rvas, unit, function_rva,
-                    aligned_base, target_functions[name], section_ranges,
+                    aligned_base, selected_target[name], section_ranges,
                     import_rvas=import_rvas)
             checked_sites += sum(
-                relocation[1] == "DIR32" for relocation in base_functions[name])
+                relocation[1] == "DIR32" for relocation in selected_base[name])
             for problem in problems:
                 bad.append((unit, name, problem))
             for problem in identity_problems:
@@ -1502,7 +1541,7 @@ def review_pe_data_targets():
         identity_bad)
 
     output = {
-        "schema": 6,
+        "schema": 7,
         "scope": "all configured functions with retail and candidate linked owners",
         "ordered_identity_scope": (
             "equal data-target count and matching linked instruction context"),
@@ -1511,6 +1550,7 @@ def review_pe_data_targets():
         "checked_functions": checked_functions,
         "checked_dir32_sites": checked_sites,
         "skipped_functions": skipped_functions,
+        "skipped_volatile_ordinal_functions": skipped_volatile_ordinals,
         "unavailable_functions": unavailable_functions,
         "duplicate_report_records": duplicate_report_records,
         "semantic_imports": {
@@ -1580,6 +1620,7 @@ def review_pe_data_targets():
         "unresolved_identity_functions": len(unresolved_identity_bad),
         "unresolved_identity_sites": audit_stats["multiset_unresolved_sites"],
         "unavailable_functions": len(unavailable_functions),
+        "skipped_volatile_ordinal_functions": len(skipped_volatile_ordinals),
         "duplicate_report_records": len(duplicate_report_records),
     }
     output_path = Path("build/gen/linked_data_relocs.json")

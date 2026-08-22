@@ -12,6 +12,8 @@ from homm2.build.assert_relocs import (
     _classify_candidate_excess,
     _function_bytes,
     _maximum_data_identity_matching,
+    _map_record_has_owner,
+    _select_candidate_map_records,
     _unique_report_functions,
     apply_folded_symbols,
     check_fn,
@@ -91,6 +93,41 @@ class SemanticImportIdentityTest(unittest.TestCase):
             retail, candidate, records, 0x400000), {
                 "__imp__SmackOpen@12": {0xEA3C8},
             })
+
+
+class MapOwnerTest(unittest.TestCase):
+    def test_plain_object_owner_matches(self):
+        self.assertTrue(_map_record_has_owner(
+            {"object": "REQUEST.obj"}, "request.obj"))
+
+    def test_library_or_group_prefix_does_not_hide_member_owner(self):
+        self.assertTrue(_map_record_has_owner(
+            {"object": "BASE-prefix:Misc.obj"}, "misc.obj"))
+
+    def test_different_member_does_not_match(self):
+        self.assertFalse(_map_record_has_owner(
+            {"object": "BASE-prefix:Misc.obj"}, "window.obj"))
+
+    def test_owner_record_wins_over_another_definition(self):
+        records = [
+            {"object": "other.obj", "va": 0x401000},
+            {"object": "BASE-prefix:Misc.obj", "va": 0x402000},
+        ]
+        self.assertEqual(
+            _select_candidate_map_records(records, "misc.obj"), [records[1]])
+
+    def test_unique_folded_definition_can_come_from_another_owner(self):
+        record = {"object": "first.obj", "va": 0x401000}
+        self.assertEqual(
+            _select_candidate_map_records([record], "second.obj"), [record])
+
+    def test_ambiguous_foreign_definitions_are_rejected(self):
+        records = [
+            {"object": "first.obj", "va": 0x401000},
+            {"object": "third.obj", "va": 0x402000},
+        ]
+        self.assertEqual(
+            _select_candidate_map_records(records, "second.obj"), [])
 
 
 class RelocOwnerTest(unittest.TestCase):

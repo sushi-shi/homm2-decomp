@@ -164,6 +164,13 @@ it is a floating-point type.
   `build/gen/linked_data_relocs.json`. IAT slots are paired semantically through
   each PE import directory by DLL plus imported name or ordinal; differing
   resolution-history order therefore needs no manual `__imp__` address claims.
+  Candidate MAP owners ignore an optional library/group prefix, and one unique
+  externally folded definition may satisfy another object's identical COMDAT.
+  Semantic `__h2cg$...` compiler-function identities are translated back to the
+  current raw linker alias through the normalization sidecar. Raw `_$E<n>` and
+  `_$S<n>` names are deliberately excluded from individual final-image pairing:
+  the suffix is a per-compilation counter, so those functions are checked as a
+  complete unit-level relocation group instead.
   Unequal relocation counts remain explicit
   structural residuals, with candidate over-publications and identities absent
   from the corresponding retail function reported separately. This prevents a

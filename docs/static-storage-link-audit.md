@@ -19,8 +19,8 @@ data, and alignment tails separate. The retail image has no MAP, so these are ex
 candidate-boundary projections; the raw whole-section result remains authoritative.
 
 `python3 -m homm2.build.assert_relocs --pe-data` supplies the complementary
-code-site audit for all 1,499 unique configured functions. Its exhaustive pass
-reads every retail DIR32 operand from the shipping PE and compares the resulting
+code-site audit for all uniquely identifiable configured functions. Its exhaustive
+pass reads every retail DIR32 operand from the shipping PE and compares the resulting
 `.rdata`/`.data` identity multiset with candidate identities, independent of code
 site or instruction order. Candidate compiler-local names resolve only through
 reviewed COFF coordinates. Compiler strings normally acquire those coordinates from
@@ -28,6 +28,14 @@ the exact relocation/addend oracle; unique relocation-target content is the fail
 fallback, and ambiguous content requires an explicit source pin. The candidate PE
 independently confirms that each operand reaches one of the audited sections. Thus an
 equal anonymous payload at another retail address cannot satisfy the check.
+
+This is semantic matching, not a requirement to annotate every compiler allocation.
+`DATA_COMPGEN` is retained only where content, relocation/addend structure, and use
+sites cannot distinguish an otherwise justified owner. Raw `_$E<n>`/`_$S<n>` names
+are not stable identities across compilations and are therefore checked as one
+unit-level relocation group rather than paired by their numeric suffix. Semantic
+`__h2cg$...` identities, optional MAP owner prefixes, and externally folded COMDATs
+are resolved before the final-image audit.
 
 A second, ordered pass compares final section offsets only where a small
 relocation-masked code window agrees. Ordered identity diagnostics are further
@@ -112,50 +120,24 @@ The runtime input is the VC6 toolchain's `LIBCMT.LIB`; CRT contribution ordering
 deferred. Current section sizes and the first relative divergence are recorded in
 `build/link/HMM2PL.link.json` rather than copied into this durable document.
 
-The current exhaustive census covers all 1,499 unique functions and 21,664 retail
-data targets: 781 into `.rdata` and 20,883 into `.data`. Candidate code has 21,380
-targets; 21,373 match a retail allocation identity. There are zero equal-count
-identity substitutions, zero unresolved candidate identities, and zero candidate
-targets whose identity is absent from the corresponding retail function. The report
-retains all 291 retail-only and seven candidate-only occurrences.
+At the exact-function checkpoint, the report contains 1,727 configured functions.
+It audits all 1,530 stable semantic identities individually and records 197 volatile
+counter-named helpers as excluded from individual pairing; the separate unit-level
+gate checks their complete relocation groups. The individual pass scans 25,384 DIR32
+sites; its `.rdata`/`.data` multisets contain 22,384 relevant retail sites and 22,384
+candidate sites, all matched. There are no identity substitutions, balanced
+transpositions, relocation-shape differences, candidate excesses, novel identities,
+unresolved identities, or unavailable stable functions. All 240 candidate import
+symbols also resolve to the same semantic DLL/name-or-ordinal identities as retail.
 
-Those seven over-publications belong to five structurally incomplete functions:
-the four nonexact icon blitters `FlipIconToBitmap`, `IconToBitmapColorTable`,
-`IconToBitmapYModify`, and `FlipIconToBitmapColorTable`, plus
-`searchArray::SeedPosition`. Direct instruction review attributes them to retained
-versus reloaded scratch values. SEARCH, for example, reloads `s_candidateY` where
-retail keeps it live, while retail reloads `s_adjacentX` where candidate keeps that
-value live. Their local comments and experiment ledgers record the exact sites.
-The remaining 109 shape-divergent functions are pure candidate subsets. The verifier
-reports candidate-excess and novel-identity shape classes separately so an unequal
-count can no longer suppress that review.
-
-Before this review, `FlipIconToBitmapYModify` appeared to have 68 retail-only and
-66 candidate-only targets. That was a genuine topology-model error: its 18 distinct
-four-byte private BSS owners all contain zero, and the manifest had paired their
-names to retail addresses by candidate section order. Repeated retail code operands
-recover the complete semantic permutation instead. With those placements corrected,
-all 142 candidate targets match retail and the function has only two retail-only
-register-lifetime occurrences.
-
-The ordered context pass compares 12,078 sites (507 `.rdata`, 11,571 `.data`) and
-rejects 1,098 shifted contexts. All 10,710 final-placement divergences are in
-`.data`; `.rdata` has none. Its 20 ordered identity differences form ten balanced,
-manually reviewed transpositions: four ADVMGR pairs (two `MAP_WIDTH * MAP_HEIGHT`
-products and two current-enemy/current-player comparisons), one `TotalOpenTime +
-TotalReadTime` pair in SMACKMGR, two center-plus-origin pairs in Viewwrld, one
-current/previous player-count comparison in Wsnetwin, and two quantity/ratio
-comparisons in tradpost. They remain visible because balanced identities alone do
-not prove semantic equivalence.
-
-The linked `.rdata` raw payloads are both `0xe00` bytes and agree in 3,401 of 3,584
-bytes. All 183 differing bytes have PE-format causes rather than unaccounted storage:
-151 are within the 76 HIGHLOW pointer operands at identical section-relative sites,
-18 are in the `0x54`-byte debug directory at offset zero, and 14 are in the
-`0x5d`-byte export directory at offset `0xc40`. The pointer values change with the
-candidate image layout; the debug records contain the build timestamp and debug
-payload addresses/sizes; and the export records contain image-relative addresses.
-No raw `.rdata` mismatch byte remains outside those three reviewed classes.
+The ordered final-placement pass still records 6,154 shifted references in 501
+functions: 349 into `.rdata` and 5,805 into `.data`. Those are cumulative linked
+allocation-order differences, not evidence of different referenced data. For example,
+`cFRDummy` has the exact source and object relocation to the semantic empty-string
+owner, while that private string occupies a different candidate `.data` offset.
+Raw whole-section and subband differences remain authoritative layout residuals in
+`build/link/HMM2PL.link.json`; semantic identity matching explains them but does not
+erase or declare their bytes exact.
 
 ## Recovered source and model divergences
 
