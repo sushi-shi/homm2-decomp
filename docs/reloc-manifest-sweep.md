@@ -13,6 +13,13 @@ about them is specific to this target. The build shell exports
 `VOSTOK_DELINKER` to the pinned delinker source; point it at a checkout instead
 if you are iterating on the script.
 
+Target-specific overrides proven by candidate relocations, payload, and semantic
+field layout live in `config/delink_reloc_inclusions.tsv` and
+`config/delink_reloc_exclusions.tsv`. The wrapper applies those reviewed sets
+before comparing or rewriting `config/delink_relocs.tsv`, so a future generic
+sweep cannot drop a proven packed pointer or silently reintroduce a known
+non-relocation.
+
 ## Why generated and not donated
 
 The first channel was `homm2 audit reloc-donation`: a claimed function whose

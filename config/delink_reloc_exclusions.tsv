@@ -1,0 +1,6 @@
+# Reviewed false positives emitted by the generic relocation sweep.
+# Each site is proven to be ordinary retail payload despite its dword value
+# falling inside the image. `homm2 audit reloc-sweep` subtracts these sites.
+site_rva	reason
+0xfa654	packed-gMonsterDatabase-fields-form-image-va
+0xff580	packed-IMHotSpots-fields-form-image-va

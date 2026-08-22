@@ -3,7 +3,12 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from homm2.audit.reloc_sweep import SCRIPT, find_script, read_sites
+from homm2.audit.reloc_sweep import (
+    SCRIPT,
+    apply_reviewed_site_overrides,
+    find_script,
+    read_sites,
+)
 
 MANIFEST = (
     "# banner\n"
@@ -21,6 +26,17 @@ class ReadSitesTests(unittest.TestCase):
 
     def test_empty_manifest_reads_as_no_sites(self):
         self.assertEqual(read_sites("site_rva\tkind\n"), set())
+
+    def test_reviewed_site_overrides_are_applied(self):
+        self.assertEqual(
+            apply_reviewed_site_overrides(
+                {0x10, 0x20}, {0x30}, {0x20, 0x40}),
+            {0x10, 0x30},
+        )
+
+    def test_conflicting_reviewed_overrides_are_rejected(self):
+        with self.assertRaises(ValueError):
+            apply_reviewed_site_overrides(set(), {0x20}, {0x20})
 
 
 class FindScriptTests(unittest.TestCase):
