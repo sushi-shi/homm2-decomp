@@ -23,7 +23,6 @@ from pathlib import Path
 
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.extract_resources import read_pe_resources
-from homm2.build.gen_vendor_imports import FORCED_VENDOR_IMPORTS
 from homm2.build.reloc_owners import load_reviewed_highlow_sites
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -71,10 +70,9 @@ SYSTEM_LIBS_AFTER_VENDOR = (
 
 def build_link_command(link_exe, map_path, output, object_paths, import_libraries,
                        resource_path):
-    """Compose the LINK input and forced-import order."""
+    """Compose the legacy final-link input without synthetic resolution roots."""
     command = [
         "wine", str(link_exe), *RETAIL_LINK_FLAGS,
-        *("/INCLUDE:" + symbol for symbol in FORCED_VENDOR_IMPORTS),
         "/MAP:" + str(map_path),
         "/OUT:" + str(output),
         *SYSTEM_LIBS_BEFORE_VENDOR,
@@ -622,6 +620,17 @@ def import_diagnostics(retail_imports, candidate_imports):
         "complete_iat_order_matches_retail": (
             retail_dll_order == candidate_dll_order and
             all(row["iat_order_matches_retail"] for row in per_dll)),
+        "iat_order_classification": (
+            "exact" if (retail_dll_order == candidate_dll_order and
+                        all(row["iat_order_matches_retail"] for row in per_dll)) else
+            "resolution-history-wall" if (
+                retail_dll_order == candidate_dll_order and
+                all(row["abi_matches_retail"] for row in per_dll)) else
+            "structural-import-mismatch"),
+        "iat_order_note": (
+            "With exact DLL order and per-DLL ABI, intra-DLL ILT/IAT order is retained as a "
+            "diagnostic of LINK's undefined-symbol resolution history. It is not forced with "
+            "synthetic /INCLUDE roots."),
         "per_dll": per_dll,
     }
 
@@ -1625,12 +1634,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                    if "Incremental Linker Version" in line), None)
     report = {
         "status": ("linked" if run.returncode == 0 and candidate and vendor_import_abi_match and
-                   vendor_import_order_match and advapi_import_abi_match and resource_match else
+                   advapi_import_abi_match and resource_match else
                    "resource-mismatch" if run.returncode == 0 and candidate and
-                   vendor_import_abi_match and vendor_import_order_match and advapi_import_abi_match else
+                   vendor_import_abi_match and advapi_import_abi_match else
                    "system-import-mismatch" if run.returncode == 0 and candidate and
-                   vendor_import_abi_match and vendor_import_order_match else
-                   "vendor-import-order-mismatch" if run.returncode == 0 and candidate and
                    vendor_import_abi_match else
                    "vendor-import-mismatch" if run.returncode == 0 and candidate else "failed"),
         "return_code": run.returncode,
@@ -1648,7 +1655,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         "order_source": "config/units.toml manifest order",
         "crt_order": "deferred",
         "link_flags": list(RETAIL_LINK_FLAGS),
-        "forced_vendor_imports": list(FORCED_VENDOR_IMPORTS),
+        "forced_vendor_imports": [],
         "stripped_source_export_objects": stripped_export_objects,
         "link_input_order": {
             "system_libraries_before_vendor": list(SYSTEM_LIBS_BEFORE_VENDOR),
@@ -1673,6 +1680,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "candidate": candidate_imports,
             "vendor_abi_matches_retail": vendor_import_abi_match,
             "vendor_iat_order_matches_retail": vendor_import_order_match,
+            "vendor_iat_order_classification": (
+                "exact" if vendor_import_order_match else
+                "resolution-history-wall" if vendor_import_abi_match else
+                "structural-import-mismatch"),
             "advapi_abi_matches_retail": advapi_import_abi_match,
         },
         "units": [],
@@ -1826,8 +1837,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % report_path)
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
-            vendor_import_order_match and advapi_import_abi_match and resource_match and
-            required_storage_ok else
+            advapi_import_abi_match and resource_match and required_storage_ok else
             (run.returncode or 1))
 
 

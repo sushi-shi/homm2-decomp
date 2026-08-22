@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest import mock
 
 from homm2.build.link_exe import (
-    FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
+    RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command,
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
@@ -37,15 +37,13 @@ class LinkExeTest(unittest.TestCase):
             copied = output.read_bytes()[60:124]
         self.assertIn(b"-defaultlib:LIBCMT", copied)
         self.assertNotIn(b"export:", copied.lower())
-    def test_link_command_forces_vendor_members_before_game_objects(self):
+    def test_link_command_does_not_force_resolution_history(self):
         objects = [r"Z:\\obj\\one.obj", r"Z:\\obj\\two.obj"]
         vendors = [r"Z:\\lib\\smack.lib", r"Z:\\lib\\mss.lib", r"Z:\\lib\\wing.lib"]
         command = build_link_command(
             "LINK.EXE", r"Z:\\out\\game.map", r"Z:\\out\\game.exe",
             objects, vendors, r"Z:\\out\\game.res")
-        forced = ["/INCLUDE:" + symbol for symbol in FORCED_VENDOR_IMPORTS]
-        self.assertEqual(command[2 + len(RETAIL_LINK_FLAGS):
-                                 2 + len(RETAIL_LINK_FLAGS) + len(forced)], forced)
+        self.assertFalse(any(argument.startswith("/INCLUDE:") for argument in command))
         self.assertLess(command.index(SYSTEM_LIBS_BEFORE_VENDOR[0]), command.index(vendors[0]))
         self.assertLess(command.index(vendors[-1]), command.index(SYSTEM_LIBS_AFTER_VENDOR[0]))
         self.assertLess(command.index(SYSTEM_LIBS_AFTER_VENDOR[-1]), command.index(objects[0]))
@@ -74,6 +72,7 @@ class LinkExeTest(unittest.TestCase):
         self.assertTrue(result["dll_order_matches_retail"])
         self.assertTrue(result["complete_abi_matches_retail"])
         self.assertFalse(result["complete_iat_order_matches_retail"])
+        self.assertEqual(result["iat_order_classification"], "resolution-history-wall")
         self.assertFalse(result["per_dll"][0]["iat_order_matches_retail"])
 
     def test_link_environment_uses_toolchain_lib_search_path(self):

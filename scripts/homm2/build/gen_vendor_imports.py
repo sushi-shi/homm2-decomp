@@ -31,8 +31,8 @@ class ImportSpec:
     lookup_name: str | None = None
 
 
-# Preserve retail IAT order and hint values.  Hints are advisory to the loader,
-# but retaining them makes the linked import records directly comparable.
+# Preserve the reviewed import ABI and hint values. Hints are advisory to the
+# loader, but retaining them makes each linked import record directly comparable.
 MSS_IMPORTS = (
     ("_AIL_set_sample_loop_count@8", 119),
     ("_AIL_set_sample_playback_rate@8", 121),
@@ -91,41 +91,10 @@ WING_IMPORTS = (
     ("_WinGBitBlt@32", 0, "WinGBitBlt"),
 )
 
-# LINK pulls old-style import-library members in response to unresolved
-# symbols.  These explicit roots reproduce the retail intra-DLL IAT order when
-# the vendor libraries precede game objects on the command line; whether the
-# VC6 linker needs the forcing at all is link-campaign calibration.
-FORCE_WING_IMPORTS = (
-    "_WinGStretchBlt@40",
-    "_WinGBitBlt@32",
-    "_WinGSetDIBColorTable@16",
-    "_WinGRecommendDIBFormat@4",
-    "_WinGCreateBitmap@12",
-    "_WinGCreateDC@0",
-)
-FORCE_SMACK_IMPORTS = (
-    "_SmackSummary@8",
-    "_SmackWait@4",
-    "_SmackOpen@12",
-    "_SmackClose@4",
-    "_SmackToBuffer@28",
-    "_SmackDoFrame@4",
-    "_SmackToBufferRect@8",
-    "_SmackNextFrame@4",
-    "_SmackSoundUseMSS@4",
-    "_SmackSoundUseDirectSound@4",
-)
-FORCE_MSS_IMPORTS = tuple(symbol for symbol, _ in reversed(MSS_IMPORTS))
-FORCED_VENDOR_IMPORTS = (
-    FORCE_WING_IMPORTS
-    + FORCE_SMACK_IMPORTS
-    + FORCE_MSS_IMPORTS
-)
-
 # With the bundled SDK ADVAPI32.LIB, final LINK resolves the object's
 # __imp__RegCreateKeyA@12 reference as RegOpenKeyA. Build the small retail
 # import set explicitly so startup retains RegCreateKeyA semantics as well as
-# retail's IAT order and hint values.
+# retail's ABI and hint values.
 ADVAPI_IMPORTS = (
     ("_RegOpenKeyExA@20", 217, "RegOpenKeyExA"),
     ("_RegSetValueExA@24", 236, "RegSetValueExA"),

@@ -3,10 +3,6 @@ import unittest
 
 from homm2.build.gen_vendor_imports import (
     ADVAPI_IMPORTS,
-    FORCED_VENDOR_IMPORTS,
-    FORCE_MSS_IMPORTS,
-    FORCE_SMACK_IMPORTS,
-    FORCE_WING_IMPORTS,
     MSS_IMPORTS,
     SMACK_IMPORTS,
     WING_IMPORTS,
@@ -29,19 +25,6 @@ class VendorImportTests(unittest.TestCase):
             ["RegOpenKeyExA", "RegSetValueExA", "RegCreateKeyA",
              "RegQueryValueExA", "RegCloseKey"],
         )
-
-    def test_forced_import_order_covers_every_vendor_import_once(self):
-        expected = ({symbol for symbol, _ in MSS_IMPORTS}
-                    | {symbol for symbol, _ in SMACK_IMPORTS}
-                    | {symbol for symbol, _, _ in WING_IMPORTS})
-        self.assertEqual(set(FORCED_VENDOR_IMPORTS), expected)
-        self.assertEqual(len(FORCED_VENDOR_IMPORTS), len(expected))
-        self.assertEqual(FORCE_MSS_IMPORTS,
-                         tuple(symbol for symbol, _ in reversed(MSS_IMPORTS)))
-        self.assertEqual(FORCED_VENDOR_IMPORTS,
-                         FORCE_WING_IMPORTS
-                         + FORCE_SMACK_IMPORTS
-                         + FORCE_MSS_IMPORTS)
 
     def test_each_dll_uses_its_retail_import_form(self):
         specs = import_specs()
