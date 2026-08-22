@@ -108,6 +108,16 @@
 #define AI_CREATURE_RANDOM_BASE 90
 #define AI_HERO_PURCHASE_BONUS 500.0f
 #define AI_HERO_PURCHASE_FACTOR 1.3
+#define AI_FIGHT_EVENT_REWARD_500_VALUE                                           \
+    DATA_COMPGEN(0x004ea6a0, aiFightEventReward500Value, 500.0f)
+#define AI_FIGHT_EVENT_REWARD_1000_VALUE                                          \
+    DATA_COMPGEN(0x004ea7a4, aiFightEventReward1000Value, 1000.0f)
+#define AI_FIGHT_EVENT_REWARD_2000_VALUE                                          \
+    DATA_COMPGEN(0x004ea79c, aiFightEventReward2000Value, 2000.0f)
+#define AI_FIGHT_EVENT_REWARD_3000_VALUE                                          \
+    DATA_COMPGEN(0x004ea7a0, aiFightEventReward3000Value, 3000.0f)
+#define AI_FIGHT_EVENT_REWARD_5000_VALUE                                          \
+    DATA_COMPGEN(0x004ea798, aiFightEventReward5000Value, 5000.0f)
 #define AI_HERO_PURCHASE_GOLD_COST 2500
 #define AI_HERO_PURCHASE_EXPERIENCE_BASE 2000
 #define AI_HERO_PURCHASE_CELL_PENALTY 200.0f
@@ -4933,23 +4943,26 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             switch (cell->m_objectMetadata) {
                 case FIGHT_EVENT_LEVEL_1:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_500)
+                        AI_FIGHT_EVENT_REWARD_500_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_2:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_1000)
+                        AI_FIGHT_EVENT_REWARD_1000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_3:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)]
-                        * IDX(FIGHT_EVENT_REWARD_3000)
+                        AI_FIGHT_EVENT_REWARD_3000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_4:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_1000)
+                        AI_FIGHT_EVENT_REWARD_1000_VALUE
+                            * gafAITurnCostResource[IDX(RES_GOLD)]
                         + gpCurPlayer->m_aiData.m_artifactValue
                     );
                     break;
@@ -4959,23 +4972,26 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             switch (cell->m_objectMetadata) {
                 case FIGHT_EVENT_LEVEL_1:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_1000)
+                        AI_FIGHT_EVENT_REWARD_1000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_2:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_2000)
+                        AI_FIGHT_EVENT_REWARD_2000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_3:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)]
-                        * IDX(FIGHT_EVENT_REWARD_5000)
+                        AI_FIGHT_EVENT_REWARD_5000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_4:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_2000)
+                        AI_FIGHT_EVENT_REWARD_2000_VALUE
+                            * gafAITurnCostResource[IDX(RES_GOLD)]
                         + gpCurPlayer->m_aiData.m_artifactValue
                     );
                     break;
@@ -4985,22 +5001,26 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             switch (cell->m_objectMetadata) {
                 case FIGHT_EVENT_LEVEL_1:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_500)
+                        AI_FIGHT_EVENT_REWARD_500_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_2:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_1000)
+                        AI_FIGHT_EVENT_REWARD_1000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_3:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_2000)
+                        AI_FIGHT_EVENT_REWARD_2000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_4:
                     rewardValue0 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_5000)
+                        AI_FIGHT_EVENT_REWARD_5000_VALUE
+                        * gafAITurnCostResource[IDX(RES_GOLD)]
                     );
                     break;
             }
