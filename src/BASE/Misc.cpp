@@ -2017,7 +2017,10 @@ void GetDataEntry(
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;
-    strcpy(cDEDest, "");
+    strcpy(
+        cDEDest,
+        DATA_COMPGEN(0x005360c8, dataEntryEmptyDestination, "")
+    );
 
     textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
     nHeight = textLines * PROMPT_LINE_HEIGHT;
@@ -2043,7 +2046,10 @@ void GetDataEntry(
     if (initialText != NULL)
         strcpy(cBuf, initialText);
     else
-        strcpy(cBuf, "");
+        strcpy(
+            cBuf,
+            DATA_COMPGEN(0x005360cc, dataEntryEmptyInitialText, "")
+        );
     msg.payload.widget.id = ENTRY_TEXT_WIDGET;
     msg.payload.widget.data.text = cBuf;
     DataEntryWin->BroadcastMessage(msg);
@@ -2097,7 +2103,11 @@ void GetDataEntry(
         bDataEntryTime = ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
-    gpMouseManager->SetPointer("", nFrame, savedCursorType);
+    gpMouseManager->SetPointer(
+        DATA_COMPGEN(0x005360d0, dataEntryEmptyCursorFilename, ""),
+        nFrame,
+        savedCursorType
+    );
     gbAllowTextEntryEscape = true;
 }
 
