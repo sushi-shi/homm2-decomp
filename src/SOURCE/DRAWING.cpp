@@ -131,7 +131,12 @@ VA(0x00437e02, 0x46)
 void combatManager::CheckUpdateCombatMessages(void) {
     if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0
         && m_combatMessageExpiration < KBTickCount())
-        CombatMessage("", 1, 0, 1);
+        CombatMessage(
+            DATA_COMPGEN(0x005244a0, checkUpdateCombatMessagesEmptyText, ""),
+            1,
+            0,
+            1
+        );
 }
 
 // The incoming text is copied into this private buffer first: the wrapper below
