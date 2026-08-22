@@ -197,7 +197,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     iVWCenterOffset = iVWViewableCells >> 1;
     iVWMapOriginY = 0;
     iVWMapOriginX = iVWMapOriginY;
-    if (MAP_WIDTH != iVWViewableCells) {
+    if (iVWViewableCells != MAP_WIDTH) {
         iVWMapOriginX = centerX - (iVWViewableCells >> 1);
         if (iVWMapOriginX < 0)
             iVWMapOriginX = 0;
@@ -210,7 +210,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
             iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
     }
 
-    iVWXPixelOffset = (WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
+    iVWXPixelOffset = (WORLD_WINDOW_X - IDX(iVWViewableCells) * IDX(giViewWorldScale)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
     gpMouseManager->SetPointer(
         DATA_COMPGEN(0x00519b74, viewWorldMouseResource, "advmice.mse"),

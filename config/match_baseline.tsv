@@ -1342,7 +1342,7 @@ SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	100.0000	719a6ee1438c
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	100.0000	5714a5317380
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	8f85a9beed9e
 SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	100.0000	edef4fa852a2
-SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	99.8347	43e19b386b16
+SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	1cc8affa191c
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	100.0000	eac901e4d42e
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	0abee7954c6f
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4c07c527f13e
