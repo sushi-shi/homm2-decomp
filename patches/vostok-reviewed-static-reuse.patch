@@ -1,0 +1,86 @@
+--- a/src/object_files.rs
++++ b/src/object_files.rs
+@@ -843,6 +843,18 @@
+             return Ok(());
+         }
+ 
++        if matches!(reloc_kind, RelocKind::ConjuredStatic { .. })
++            && self.object.symbol_id(reloc_name.as_bytes()).is_some()
++        {
++            self.add_relocation(
++                reloc_name,
++                ObjectLocation::Extern(object::SymbolKind::Data),
++                reloc_offset,
++                RelocationEncoding::Absolute,
++            )?;
++            return Ok(());
++        }
++
+         // `Function` and `ReviewedData` reference a real definition elsewhere; a
+         // `Conjured*` target is materialized as a private per-TU copy, unless the
+         // caller only wants a reference.
+@@ -1892,6 +1904,64 @@
+     }
+ 
+     #[test]
++    fn reviewed_static_relocation_reuses_defined_symbol_without_materializing_data() {
++        let mut output = ObjectFile::empty_with_topology(false, SectionTopology::Synthesized);
++        let data_section_id = output.data_section();
++        output
++            .object
++            .append_section_data(data_section_id, &[1, 2, 3, 4], 4);
++        output.object.add_symbol(object::write::Symbol {
++            name: b"reviewed".to_vec(),
++            value: 0,
++            size: 4,
++            kind: object::SymbolKind::Data,
++            scope: object::SymbolScope::Linkage,
++            weak: false,
++            section: object::write::SymbolSection::Section(data_section_id),
++            flags: object::SymbolFlags::None,
++        });
++        let text_section_id = output.text_section();
++        let field = output.append_section_data(text_section_id, &[0; 4], 0x90);
++        output
++            .add_relocation_at(
++                RelocKind::ConjuredStatic {
++                    symbol: RawString::from(&b"reviewed"[..]),
++                    target_rva: 0x100,
++                },
++                field,
++                &SymbolMatcher::off(),
++                &[],
++                &BTreeMap::new(),
++                &mut HashSet::new(),
++                TargetMaterialization::Materialize,
++            )
++            .unwrap();
++
++        let bytes = output.object.write().unwrap();
++        let parsed = object::File::parse(bytes.as_slice()).unwrap();
++        assert_eq!(parsed.section_by_name(".data").unwrap().size(), 4);
++        let matching = parsed
++            .symbols()
++            .filter(|symbol| symbol.name() == Ok("reviewed"))
++            .collect::<Vec<_>>();
++        assert_eq!(matching.len(), 1);
++        assert!(matching[0].is_definition());
++        let relocation = parsed
++            .section_by_name(".text")
++            .unwrap()
++            .relocations()
++            .next()
++            .unwrap();
++        let object::RelocationTarget::Symbol(index) = relocation.1.target() else {
++            panic!("reviewed relocation must target a symbol");
++        };
++        let target = parsed.symbol_by_index(index).unwrap();
++        assert_eq!(target.name(), Ok("reviewed"));
++        assert!(target.is_definition());
++        assert_eq!(target.address(), 0);
++    }
++
++    #[test]
+     fn absolute_function_reference_uses_coff_function_type() {
+         let mut object = ObjectFile::empty_with_topology(false, SectionTopology::Synthesized);
+         let text_section_id = object.text_section();
