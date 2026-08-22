@@ -33,6 +33,13 @@ an exact score. The boundary symbol restores the reviewed size as the
 comparison extent without deleting, masking, or reordering any byte. A span
 whose remainder contains any other byte value, exceeds fifteen bytes, or has
 no reviewed size claim is left untouched.
+
+The delinker can also omit a recursive ``REL32`` relocation because the linked
+displacement already targets the containing function. When the candidate has a
+zero-addend relocation to that same public function at the same operand site,
+and the raw retail displacement resolves exactly to the reviewed entry RVA, the
+disposable target receives the missing record. This restores lost COFF metadata
+without changing the linked instruction bytes.
 """
 
 import argparse
@@ -247,6 +254,22 @@ class CoffFile:
                          section.raw_offset + absolute_site, addend & 0xFFFFFFFF)
         return True
 
+    def _insert_relocation(self, function, site, symbol_name, typ,
+                           symbol_index=None):
+        """Queue a relocation at a site that has none (field bytes kept)."""
+        absolute_site = function.value + site
+        if (function.section, absolute_site) in self.relocations:
+            return False
+        section = self.sections[function.section - 1]
+        if absolute_site + 4 > section.raw_size:
+            return False
+        if symbol_index is None:
+            symbol_index = self._new_symbols.setdefault(
+                symbol_name, self.symbol_count + len(self._new_symbols))
+        self._new_relocs.append(
+            (function.section, absolute_site, symbol_index, typ))
+        return True
+
     def insert_dir32(self, function, site, symbol_name):
         """Queue a DIR32 record at a site that has none (field bytes kept).
 
@@ -255,15 +278,18 @@ class CoffFile:
         slot while the field itself stays zero, so adding the record to the
         disposable comparison copy changes no byte of the section.
         """
-        absolute_site = function.value + site
-        if (function.section, absolute_site) in self.relocations:
+        return self._insert_relocation(function, site, symbol_name, DIR32)
+
+    def insert_rel32(self, function, site, symbol_name):
+        """Queue a REL32 record at a proven recursive-call operand."""
+        if function.name != symbol_name:
+            return False
+        if not self._insert_relocation(
+                function, site, symbol_name, REL32, function.index):
             return False
         section = self.sections[function.section - 1]
-        if absolute_site + 4 > section.raw_size:
-            return False
-        symbol_index = self._new_symbols.setdefault(
-            symbol_name, self.symbol_count + len(self._new_symbols))
-        self._new_relocs.append((function.section, absolute_site, symbol_index))
+        struct.pack_into(
+            "<I", self.data, section.raw_offset + function.value + site, 0)
         return True
 
     def patch_rel32(self, function, site, expected_symbol, new_symbol):
@@ -317,15 +343,15 @@ class CoffFile:
             # header pointer) with the queued records merged in site order.
             first_header = 20 + struct.unpack_from("<H", self.data, 16)[0]
             by_section = defaultdict(list)
-            for section_index, site, symbol_index in self._new_relocs:
-                by_section[section_index].append((site, symbol_index))
+            for section_index, site, symbol_index, typ in self._new_relocs:
+                by_section[section_index].append((site, symbol_index, typ))
             for section_index, additions in sorted(by_section.items()):
                 section = self.sections[section_index - 1]
                 table = [bytes(self.data[section.reloc_offset + k * 10:
                                          section.reloc_offset + k * 10 + 10])
                          for k in range(section.reloc_count)]
-                table.extend(struct.pack("<IIH", site, symbol_index, DIR32)
-                             for site, symbol_index in additions)
+                table.extend(struct.pack("<IIH", site, symbol_index, typ)
+                             for site, symbol_index, typ in additions)
                 table.sort(key=lambda record: struct.unpack_from("<I", record)[0])
                 header = first_header + (section_index - 1) * 40
                 struct.pack_into("<I", prefix, header + 24,
@@ -412,6 +438,22 @@ def authorize_rel32_alias(symbols, data, duplicates, base, target):
     return base_symbol
 
 
+def authorize_missing_self_rel32(function_rva, function_size, function_name,
+                                  site, base, retail_opcode, retail_operand):
+    """Return the self symbol when linked bytes prove a lost REL32 record."""
+    base_type, base_symbol, base_addend = base
+    if (base_type != "REL32" or base_symbol != function_name
+            or base_addend != 0 or retail_operand is None
+            or len(retail_operand) != 4 or site < 0
+            or site + 4 > function_size or retail_opcode != b"\xe8"):
+        return None
+    displacement = struct.unpack("<i", retail_operand)[0]
+    retail_target = (function_rva + site + 4 + displacement) & 0xFFFFFFFF
+    if retail_target != function_rva:
+        return None
+    return base_symbol
+
+
 def function_inventory(function_rvas):
     result = defaultdict(set)
     for unit, name in function_rvas:
@@ -478,6 +520,16 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
                 retail_operand = _pe_read(function_rva + site, 4)
                 if retail_operand == b"\x00\x00\x00\x00" and target.insert_dir32(
                         target_functions[name], site, "__except_list"):
+                    patched_functions.add(name)
+                    patched_sites += 1
+                    continue
+            if target_reloc is None and base_type == "REL32":
+                self_symbol = authorize_missing_self_rel32(
+                    function_rva, function_sizes[(unit, name)], name, site, base,
+                    _pe_read(function_rva + site - 1, 1),
+                    _pe_read(function_rva + site, 4))
+                if (self_symbol is not None and target.insert_rel32(
+                        target_functions[name], site, self_symbol)):
                     patched_functions.add(name)
                     patched_sites += 1
                     continue

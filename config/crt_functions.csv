@@ -41,7 +41,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd74ca,126,__onexit,onexit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7548,18,_atexit,onexit.obj,libcmt.lib,masked-exact,
 0xd7590,20,_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
-0xd75a4,9,$alt_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd75a4,9,_atan,atan.obj,libcmt.lib,reviewed-archive-public-entry,VC6 atan.obj exports _atan at section offset 0x14; wrapper dispatch entry
 0xd75ad,125,$body_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,fld1/fpatan body
 0xd7630,664,_memmove,memmove.obj,libcmt.lib,reviewed-sandwich,prefix-24 twin pair
 0xd7965,308,__strupr,strupr.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)

@@ -38,6 +38,19 @@ Thus neither a compiler-private counter nor an alternate external alias is
 itself matching evidence: resolved identity, addend, payload, occurrence, and
 topology are the evidence.
 
+A linked recursive call can lose its COFF `REL32` record when the delinker keeps
+the already-resolved displacement to the containing function. The paired pass
+restores that record only when the candidate site has a zero-addend relocation
+to the same public function, the retail operand is immediately preceded by a
+direct-call opcode, and the raw retail displacement resolves exactly to
+the reviewed entry RVA. The operand must also lie wholly inside the reviewed
+retail function extent, so candidate tail material cannot authorize a record in
+the following retail bytes. The comparison copy receives the missing record and
+the zero COFF addend emitted by VC6; resolving that record reproduces the
+unchanged retail call target. The canonical retail executable is never modified.
+A different destination, symbol, addend, opcode, or relocation kind remains a
+mismatch.
+
 VC6 floating literals use external COMDAT names such as
 `__real@8@3ffeb333333333333000`. Once one physical owner is bound to a semantic
 `DATA_COMPGEN` identity, the normalizer derives the original `__real@...` name

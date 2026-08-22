@@ -3,8 +3,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from homm2.build.canonicalize_relocs import (
-    CoffFile, Coverage, authorize_owner_alias, authorize_rel32_alias,
-    record_site_coverage,
+    CoffFile, Coverage, authorize_missing_self_rel32, authorize_owner_alias,
+    authorize_rel32_alias, record_site_coverage,
 )
 from homm2.build.test_canonicalize_data_symbols import (
     DIR32, TEXT, SectionSpec, make_coff,
@@ -62,6 +62,75 @@ class Rel32AliasAuthorizationTest(unittest.TestCase):
         self.assertIsNone(authorize_rel32_alias(
             symbols, {}, duplicates, ("REL32", "left", 0),
             ("REL32", "right", 0)))
+
+
+class MissingSelfRel32AuthorizationTest(unittest.TestCase):
+    def test_exact_linked_self_target_authorizes(self):
+        function_rva = 0x1A1D9
+        site = 0x10B4
+        displacement = function_rva - (function_rva + site + 4)
+
+        self.assertEqual(authorize_missing_self_rel32(
+            function_rva, site + 4, "function", site,
+            ("REL32", "function", 0),
+            b"\xe8",
+            displacement.to_bytes(4, "little", signed=True)), "function")
+
+    def test_wrong_identity_addend_or_target_is_rejected(self):
+        operand = (-0x24).to_bytes(4, "little", signed=True)
+
+        self.assertIsNone(authorize_missing_self_rel32(
+            0x1000, 0x40, "function", 0x20,
+            ("REL32", "other", 0), b"\xe8", operand))
+        self.assertIsNone(authorize_missing_self_rel32(
+            0x1000, 0x40, "function", 0x20,
+            ("REL32", "function", 4), b"\xe8", operand))
+        self.assertIsNone(authorize_missing_self_rel32(
+            0x1000, 0x40, "function", 0x24,
+            ("REL32", "function", 0), b"\xe8", operand))
+
+    def test_site_outside_reviewed_function_is_rejected(self):
+        self.assertIsNone(authorize_missing_self_rel32(
+            0x1000, 0x20, "function", 0x20,
+            ("REL32", "function", 0), b"\xe8", bytes(4)))
+
+    def test_non_call_operand_is_rejected(self):
+        self.assertIsNone(authorize_missing_self_rel32(
+            0x1000, 0x40, "function", 0x20,
+            ("REL32", "function", 0), b"\x00",
+            (-0x24).to_bytes(4, "little", signed=True)))
+
+
+class RelocationInsertionTest(unittest.TestCase):
+    FUNCTION_TYPE = 0x20
+
+    def test_dir32_and_rel32_records_keep_their_types(self):
+        obj = make_coff(
+            [SectionSpec(".text", b"\0\0\0\0\x01\x02\x03\x04", TEXT)],
+            [("function", 0, 1, self.FUNCTION_TYPE, 2)])
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "test.obj"
+            path.write_bytes(obj)
+            coff = CoffFile(path)
+            function = coff.unique_text_functions()["function"]
+
+            self.assertTrue(coff.insert_dir32(function, 0, "absolute"))
+            self.assertTrue(coff.insert_rel32(function, 4, "function"))
+            coff.finish()
+
+            parsed = CoffFile(path)
+            records = [(site, relocation.typ,
+                        parsed.symbols[relocation.symbol_index].name)
+                       for (_section, site), relocation
+                       in sorted(parsed.relocations.items())]
+            self.assertEqual(records, [
+                (0, DIR32, "absolute"),
+                (4, 0x14, "function"),
+            ])
+            section = parsed.sections[0]
+            self.assertEqual(
+                parsed.data[section.raw_offset + 4:section.raw_offset + 8],
+                bytes(4))
 
 
 class CoverageTest(unittest.TestCase):
