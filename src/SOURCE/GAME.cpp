@@ -1479,7 +1479,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (loadFromFile || _strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(pathBuf, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(pathBuf, "%s%s", gcGamePath, filename);
@@ -1522,7 +1522,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gpAdvManager->PurgeMapChangeQueue();
     read(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
     read(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
-    if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
+    if (_strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
     read(fd, &m_playerCount, sizeof(m_playerCount));
 
