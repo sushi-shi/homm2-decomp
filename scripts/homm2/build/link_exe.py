@@ -41,6 +41,7 @@ IMAGE_DIRECTORY_ENTRY_BASERELOC = 5
 IMPORT_DESCRIPTOR_SIZE = 20
 IMPORT_ORDINAL_FLAG32 = 0x80000000
 IMAGE_REL_BASED_HIGHLOW = 3
+VOLATILE_COMPGEN_FUNCTION = re.compile(r"^_?\$E\d+$")
 
 # Read from the retail PE optional header: VC6 link, image base 0x400000,
 # WINDOWS 4.0 subsystem, stack 66112/4096, heap 1048576/4096, and no debug
@@ -816,13 +817,123 @@ def load_compgen_function_aliases(sidecar_root=None):
     return aliases
 
 
+def _pair_volatile_function_rows(retail_rows, candidate_rows):
+    """Pair counter-named helpers only when normalized body evidence agrees."""
+    if len(retail_rows) != len(candidate_rows):
+        return {}
+    aliases = {}
+    for retail, candidate in zip(retail_rows, candidate_rows):
+        if retail["signature"] != candidate["signature"]:
+            return {}
+        aliases[retail["name"]] = candidate["name"]
+    return aliases
+
+
+def load_volatile_function_aliases(retail_symbols=None, base_root=None,
+                                   target_root=None):
+    """Map retail `$E<n>` claims to current raw names by normalized TU order.
+
+    The suffix is a per-compilation counter and has no cross-build identity.
+    After semantic ``VA_COMPGEN`` helpers have been renamed out of this family,
+    the remaining normalized base/target functions are paired in compiler
+    section order.  Equal relocation-masked bytes and relocation shape make the
+    pairing fail closed rather than relying on the numeric suffix.
+    """
+    from homm2.build.canonicalize_data_symbols import (
+        CoffObject,
+        FUNCTION_TYPE,
+        MEM_EXECUTE,
+        RELOCATION_WIDTHS,
+    )
+
+    retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
+                      else retail_symbols)
+    claims = {
+        (row["unit"], row["name"]): row
+        for row in retail_symbols
+        if (VOLATILE_COMPGEN_FUNCTION.fullmatch(row["name"]) and
+            not row["unit"].startswith("("))
+    }
+    base_root = Path(base_root or REPO / "build/objdiff/normalized/base")
+    target_root = Path(target_root or REPO / "build/objdiff/normalized/target")
+
+    def function_rows(path, unit, target):
+        coff = CoffObject(path.read_bytes())
+        by_section = defaultdict(list)
+        for symbol in coff.symbols.values():
+            if (symbol.section > 0 and symbol.typ == FUNCTION_TYPE and
+                    coff.sections[symbol.section - 1].characteristics & MEM_EXECUTE):
+                by_section[symbol.section].append(symbol)
+        rows = []
+        for section_number, symbols in by_section.items():
+            section = coff.sections[section_number - 1]
+            for symbol in symbols:
+                if not VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol.name):
+                    continue
+                claim = claims.get((unit, symbol.name)) if target else None
+                if target and claim is None:
+                    continue
+                if target:
+                    size = claim["size"]
+                else:
+                    later = sorted(
+                        other.value for other in symbols
+                        if other.value > symbol.value)
+                    size = ((later[0] if later else section.raw_size) - symbol.value)
+                    while (size and coff.data[
+                            section.raw_offset + symbol.value + size - 1] in (0x90, 0xCC)):
+                        size -= 1
+                start = symbol.value
+                end = start + size
+                if end > section.raw_size:
+                    continue
+                body = bytearray(coff.data[
+                    section.raw_offset + start:section.raw_offset + end])
+                relocations = []
+                valid = True
+                for relocation in coff.relocations:
+                    if relocation.section != section_number or not (
+                            start <= relocation.site < end):
+                        continue
+                    site = relocation.site - start
+                    width = RELOCATION_WIDTHS.get(relocation.typ)
+                    if width is None or site + width > len(body):
+                        valid = False
+                        break
+                    body[site:site + width] = b"\0" * width
+                    relocations.append((site, relocation.typ))
+                if valid:
+                    rows.append({
+                        "order": (section_number, symbol.value, symbol.name),
+                        "name": symbol.name,
+                        "signature": (bytes(body), tuple(relocations)),
+                    })
+        return sorted(rows, key=lambda row: row["order"])
+
+    aliases = {}
+    for unit in sorted({unit for unit, _name in claims}):
+        base_path = base_root / (unit + ".obj")
+        target_path = target_root / (unit + ".c.obj")
+        if not base_path.exists() or not target_path.exists():
+            continue
+        retail_rows = function_rows(target_path, unit, True)
+        candidate_rows = function_rows(base_path, unit, False)
+        paired = _pair_volatile_function_rows(retail_rows, candidate_rows)
+        aliases.update({(unit, name): alias for name, alias in paired.items()})
+    return aliases
+
+
 def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
-                                   compgen_aliases=None):
-    """Join every recovered function to the candidate MAP by exact linker name."""
+                                   compgen_aliases=None, volatile_aliases=None):
+    """Join every recovered function to the candidate MAP by semantic identity."""
     retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
     compgen_aliases = (load_compgen_function_aliases() if compgen_aliases is None
                        else compgen_aliases)
+    if volatile_aliases is None:
+        volatile_aliases = (load_volatile_function_aliases(retail_symbols)
+                            if any(VOLATILE_COMPGEN_FUNCTION.fullmatch(row["name"])
+                                   for row in retail_symbols) else {})
     candidate_records = defaultdict(list)
     for record in parse_map_symbol_records(map_path):
         candidate_records[record["name"]].append(record)
@@ -834,15 +945,29 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
     rows = []
     for symbol in retail_symbols:
         candidate_name = symbol["name"]
-        records = candidate_records.get(candidate_name, ())
+        records = ()
         evidence = "exact-linker-name"
-        if not records:
+        if VOLATILE_COMPGEN_FUNCTION.fullmatch(symbol["name"]):
+            alias = volatile_aliases.get((symbol["unit"], symbol["name"]))
+            if alias is not None:
+                candidate_name = alias
+                records = [record for record in candidate_records.get(alias, ())
+                           if unit_record(record, symbol["unit"])]
+                evidence = "normalized-volatile-unit-order"
+        else:
+            records = candidate_records.get(candidate_name, ())
+        if not records and symbol["name"].startswith("__h2cg$"):
             alias = compgen_aliases.get((symbol["unit"], symbol["name"]))
             if alias is not None:
                 candidate_name = alias
                 records = [record for record in candidate_records.get(alias, ())
                            if unit_record(record, symbol["unit"])]
                 evidence = "semantic-compgen-sidecar"
+        if records and evidence == "exact-linker-name":
+            owned = [record for record in records
+                     if unit_record(record, symbol["unit"])]
+            if owned:
+                records = owned
         matches = sorted(set(
             record["va"] - candidate["image_base"] for record in records))
         candidate_rva = matches[0] if len(matches) == 1 else None
@@ -871,9 +996,16 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
 
     provenances = sorted(set(row["provenance"] for row in rows))
     source_rows = [row for row in rows if row["provenance"].startswith("source-")]
+    project_rows = [row for row in rows if not row["unit"].startswith("(")]
     return {
         "summary": summary(rows),
         "source_summary": summary(source_rows),
+        "project_summary": summary(project_rows),
+        "semantic_volatile_aliases": {
+            "mapped": len(volatile_aliases),
+            "renumbered": sum(
+                name != alias for (_unit, name), alias in volatile_aliases.items()),
+        },
         "by_provenance": {
             provenance: summary([row for row in rows if row["provenance"] == provenance])
             for provenance in provenances
@@ -881,9 +1013,10 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
         "residuals": [row for row in rows if row["status"] != "exact"],
         "functions": rows,
         "interpretation": (
-            "Candidate addresses come only from exact decorated-name MAP joins. Duplicate MAP "
-            "rows at one RVA are collapsed. Synthetic compiler-function identities join through "
-            "the normalizer's relocation-role proof to a raw per-TU $E name."),
+            "Candidate addresses use owner-scoped decorated-name MAP joins. Duplicate MAP rows "
+            "at one RVA are collapsed. Semantic compiler functions join through relocation-role "
+            "proof; volatile $E counters join by normalized per-TU order only when masked body "
+            "bytes and relocation shape agree."),
     }
 
 
@@ -1605,6 +1738,9 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "source_function_rvas_exact": not any(
             row["status"] != "exact" for row in functions["functions"]
             if row["provenance"].startswith("source-")),
+        "project_function_rvas_exact": not any(
+            row["status"] != "exact" for row in functions["functions"]
+            if not row["unit"].startswith("(")),
         "reviewed_function_rvas_exact": not functions["residuals"],
         "required_initialized_storage_exact": not static_storage[
             "required_initialized"]["violations"],
@@ -1632,6 +1768,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
     write_missing_data_report(missing_data_path, static_storage["public_symbols"])
 
     function_summary = functions["source_summary"]
+    project_function_summary = functions["project_summary"]
     print("link audit: sections %d/%d byte-exact; whole file %.6f%%" % (
         sum(row["exact"] for row in section_bytes.values()), len(section_bytes),
         file_bytes["match_percent"]))
@@ -1639,6 +1776,10 @@ def audit_existing_link(output, map_path=None, report_path=None,
         function_summary["exact_rva"], function_summary["total"],
         function_summary["displaced_rva"],
         function_summary["missing"] + function_summary["ambiguous"]))
+    print("link audit: project function RVAs %d/%d exact; %d displaced, %d unavailable" % (
+        project_function_summary["exact_rva"], project_function_summary["total"],
+        project_function_summary["displaced_rva"],
+        project_function_summary["missing"] + project_function_summary["ambiguous"]))
     print("link audit: import ABI %s; IAT order %s; resources %s" % (
         "matches" if imports["complete_abi_matches_retail"] else "differs",
         "matches" if imports["complete_iat_order_matches_retail"] else "differs",

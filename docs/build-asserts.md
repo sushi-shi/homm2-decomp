@@ -175,3 +175,13 @@ it is a floating-point type.
   structural residuals, with candidate over-publications and identities absent
   from the corresponding retail function reported separately. This prevents a
   shape mismatch from suppressing a private-owner mapping error.
+- **`homm2 link` function placement** — joins every recovered project function
+  to the final MAP by semantic identity and reports raw RVA placement separately
+  from object-code exactness. Ordinary decorated names are owner-scoped.
+  Reviewed `__h2cg$...` helpers use the normalization sidecar. Remaining
+  compiler-counter `_$E<n>` helpers are paired in normalized per-TU section
+  order only when their relocation-masked bodies and relocation site/type shapes
+  agree; the numeric suffix is never treated as a cross-build identity. The
+  current census maps all 197 such helpers, including eight whose suffix changed,
+  and leaves no missing or ambiguous project function. See
+  `docs/linked-function-placement-walls.md` for the independent raw-RVA ledger.

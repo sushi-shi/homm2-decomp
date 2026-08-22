@@ -17,7 +17,8 @@ from homm2.build.link_exe import (
     parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
-    sibling_tool_identities, static_symbol_diagnostics)
+    sibling_tool_identities, static_symbol_diagnostics,
+    _pair_volatile_function_rows)
 from homm2.build.link_exe import strip_coff_export_directives, write_order_response
 
 
@@ -160,6 +161,7 @@ class LinkExeTest(unittest.TestCase):
             "missing": 1, "ambiguous": 0,
         })
         self.assertEqual(result["source_summary"], result["summary"])
+        self.assertEqual(result["project_summary"], result["summary"])
         self.assertEqual(result["residuals"][0]["delta"], 4)
         self.assertEqual(result["by_provenance"]["source-VA_COMPGEN"]["missing"], 1)
 
@@ -182,6 +184,40 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(result["functions"][0]["candidate_name"], "_$E14")
         self.assertEqual(result["functions"][0]["match_evidence"],
                          "semantic-compgen-sidecar")
+
+    def test_function_placement_uses_semantic_volatile_alias_in_own_object(self):
+        candidate = {"image_base": 0x400000}
+        symbols = [{
+            "name": "_$E14", "unit": "SOURCE/A", "rva": 0x1234,
+            "size": 0x0F, "provenance": "reviewed-compgen",
+        }]
+        aliases = {("SOURCE/A", "_$E14"): "_$E91"}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(
+                " 0001:00001234 _$E91 00401234 f A.obj\n"
+                " 0001:00002234 _$E91 00402234 f OTHER.obj\n")
+            result = function_placement_diagnostics(
+                candidate, path, symbols, {}, aliases)
+        self.assertEqual(result["summary"]["exact_rva"], 1)
+        self.assertEqual(result["functions"][0]["candidate_name"], "_$E91")
+        self.assertEqual(result["functions"][0]["match_evidence"],
+                         "normalized-volatile-unit-order")
+
+    def test_volatile_function_pairing_requires_every_signature(self):
+        retail = [
+            {"name": "_$E1", "signature": (b"one", ((1, 6),))},
+            {"name": "_$E2", "signature": (b"two", ())},
+        ]
+        candidate = [
+            {"name": "_$E8", "signature": (b"one", ((1, 6),))},
+            {"name": "_$E9", "signature": (b"two", ())},
+        ]
+        self.assertEqual(_pair_volatile_function_rows(retail, candidate), {
+            "_$E1": "_$E8", "_$E2": "_$E9",
+        })
+        candidate[1]["signature"] = (b"different", ())
+        self.assertEqual(_pair_volatile_function_rows(retail, candidate), {})
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),
