@@ -272,7 +272,7 @@ BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	43405f0969f4
 BASE/Misc	?Random@@YIHHH@Z	100.0000	e437de47de08
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	e6fef53929fd
 BASE/Misc	?ReadPrefsFromFile@@YIXXZ	99.7273	d27180f4c76e
-BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	99.9827	5b0ce2ba99f6
+BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	ca9ae2f3cd38
 BASE/Misc	?SGenRand@@YIHXZ	100.0000	6b3432eea953
 BASE/Misc	?SIncRandomize@@YIXHH@Z	100.0000	93a5532f7a68
 BASE/Misc	?SRand@@YIXH@Z	100.0000	45854b9476d2

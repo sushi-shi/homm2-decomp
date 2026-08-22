@@ -1019,7 +1019,10 @@ void ReadPrefsFromRegistry(void) {
                 &dwcbData
             )
             != 0)
-            strcpy(gcRegAppPath, "");
+            strcpy(
+                gcRegAppPath,
+                DATA_COMPGEN(0x005360c0, missingRegistryAppPath, "")
+            );
         if (RegQueryValueExA(
                 hKey,
                 "HMM2POL CDDrive",
@@ -1029,7 +1032,10 @@ void ReadPrefsFromRegistry(void) {
                 &dwcbData
             )
             != 0)
-            strcpy(gcRegCDRomPath, "");
+            strcpy(
+                gcRegCDRomPath,
+                DATA_COMPGEN(0x005360c4, missingRegistryCDRomPath, "")
+            );
         RegCloseKey(hKey);
         if (gConfig.gfx[IDX(giCurExe)].width <= 0)
             gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
