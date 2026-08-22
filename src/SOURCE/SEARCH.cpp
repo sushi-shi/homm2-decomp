@@ -250,7 +250,7 @@ void searchArray::SeedPosition(
                     s_neighborY = s_currentNode.y + normalDirTable[IDX(s_direction)].y;
                     s_neighborNode = &GetColumn(s_neighborX)[MAP_WIDTH * s_neighborY];
                     if (!(!findAdjacentMonster || s_currentNode.rvFlag1
-                          || !(MAP_EXTRA_AT_WFIRST(s_neighborX, s_neighborY)
+                          || !(MAP_EXTRA_AT(s_neighborX, s_neighborY)
                                & SEARCH_MAP_BLOCKED)
                           || !s_neighborNode->visited || !s_neighborNode->rvFlag1
                           || s_neighborNode->distance
