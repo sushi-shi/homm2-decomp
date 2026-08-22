@@ -29,6 +29,16 @@ for a wrong CRT source declaration: for example, MSVC's `_write` and legacy `wri
 declarations naturally emit different C++ COFF spellings. Reconstruct the declaration
 that emits retail's spelling instead of forcing the target to match the candidate.
 
+Some reviewed runtime entries have more than one legitimate public spelling at
+the same linked RVA, while the stripped PE and synthetic PDB retain only one as
+the default target owner. `config/reviewed_rel32_aliases.tsv` records each
+additional spelling, its canonical inventory name, its exact RVA, and
+independent provenance. The paired-target pass admits an alias only when the
+canonical name already resolves uniquely to that RVA and the alias does not
+resolve elsewhere; ordinary equal-addend, same-site `REL32` checks still apply.
+This preserves callers using the default spelling and rewrites only sites whose
+candidate object proves the reviewed alternate.
+
 These rows are reconstruction evidence. They are added whenever owner/addend identity
 is certain; fuzzy percentage is not an acceptance criterion. Exact same-site code can
 provide evidence, but semantic array indexing, TU ownership, serialization layout, or

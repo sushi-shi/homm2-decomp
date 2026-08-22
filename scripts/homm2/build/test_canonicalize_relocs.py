@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 from homm2.build.canonicalize_relocs import (
     CoffFile, Coverage, authorize_import_alias, authorize_missing_self_rel32,
     authorize_owner_alias, authorize_rel32_alias, import_iat_aliases,
-    record_site_coverage,
+    load_reviewed_rel32_aliases, record_site_coverage,
 )
 from homm2.build.test_canonicalize_data_symbols import (
     DIR32, TEXT, SectionSpec, make_coff,
@@ -127,6 +127,49 @@ class Rel32AliasAuthorizationTest(unittest.TestCase):
         self.assertIsNone(authorize_rel32_alias(
             symbols, {}, duplicates, ("REL32", "left", 0),
             ("REL32", "right", 0)))
+
+
+class ReviewedRel32AliasesTest(unittest.TestCase):
+    def _manifest(self, directory, row):
+        path = Path(directory) / "aliases.tsv"
+        path.write_text(
+            "alias\tcanonical\trva\tprovenance\n" + row + "\n",
+            encoding="utf-8")
+        return path
+
+    def test_exact_canonical_rva_adds_alias(self):
+        symbols = {"_open": 0xD8C6E}
+        duplicates = {"_open": {0xD8C6E}}
+        with TemporaryDirectory() as directory:
+            load_reviewed_rel32_aliases(
+                self._manifest(
+                    directory,
+                    "__open\t_open\t0x000d8c6e\tVC6 open.obj"),
+                symbols, duplicates)
+        self.assertEqual(symbols["__open"], 0xD8C6E)
+        self.assertEqual(duplicates["__open"], {0xD8C6E})
+
+    def test_wrong_canonical_or_conflicting_alias_fails_closed(self):
+        with TemporaryDirectory() as directory:
+            path = self._manifest(
+                directory,
+                "__open\t_open\t0x000d8c6e\tVC6 open.obj")
+            with self.assertRaisesRegex(ValueError, "does not resolve uniquely"):
+                load_reviewed_rel32_aliases(
+                    path, {"_open": 0xD8C70}, {"_open": {0xD8C70}})
+            with self.assertRaisesRegex(ValueError, "conflicts"):
+                load_reviewed_rel32_aliases(
+                    path,
+                    {"_open": 0xD8C6E, "__open": 0xD8C70},
+                    {"_open": {0xD8C6E}, "__open": {0xD8C70}})
+
+    def test_missing_provenance_fails_closed(self):
+        with TemporaryDirectory() as directory:
+            path = self._manifest(
+                directory, "__open\t_open\t0x000d8c6e\t")
+            with self.assertRaisesRegex(ValueError, "lacks a name or provenance"):
+                load_reviewed_rel32_aliases(
+                    path, {"_open": 0xD8C6E}, {"_open": {0xD8C6E}})
 
 
 class MissingSelfRel32AuthorizationTest(unittest.TestCase):

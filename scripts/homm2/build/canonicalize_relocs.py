@@ -21,9 +21,11 @@ equivalent spelling. A relocation is rewritten when:
 A wrong candidate offset cannot authorize a rewrite and remains visible to
 strict objdiff. Equivalent REL32 aliases are likewise rewritten only at paired
 sites when both names resolve to the same unique public RVA and carry the same
-COFF addend. The disposable target receives a separate undefined COFF symbol
-for each proven identity, so a synthetic symbol shared by unrelated relocations
-is never renamed globally. Input and output paths must differ.
+COFF addend. Reviewed aliases which the stripped image cannot name are supplied
+with an independently proven canonical symbol and RVA. The disposable target
+receives a separate undefined COFF symbol for each proven identity, so a
+synthetic symbol shared by unrelated relocations is never renamed globally.
+Input and output paths must differ.
 
 The pass also appends a local ``$fnpad@<offset>`` boundary symbol after each
 function whose delinked ``.text`` span runs past its reviewed retail size and
@@ -391,6 +393,45 @@ def load_retail_symbols(path):
     return public_data, function_rvas, function_sizes
 
 
+def load_reviewed_rel32_aliases(path, symbols, duplicates):
+    """Merge independently reviewed same-RVA public aliases into resolution.
+
+    The stripped PE cannot recover every original COFF spelling. Each row must
+    name a canonical inventory symbol which already resolves uniquely to the
+    reviewed RVA. A conflicting alias fails closed instead of weakening the
+    ordinary same-address REL32 proof.
+    """
+    with Path(path).open(encoding="utf-8", newline="") as stream:
+        rows = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        for row in rows:
+            alias = row.get("alias", "")
+            canonical = row.get("canonical", "")
+            provenance = row.get("provenance", "")
+            if not alias or not canonical or not provenance:
+                raise ValueError(
+                    "reviewed REL32 alias row lacks a name or provenance")
+            try:
+                rva = int(row["rva"], 0)
+            except (KeyError, ValueError) as error:
+                raise ValueError(
+                    "reviewed REL32 alias row has an invalid RVA") from error
+            canonical_rvas = duplicates.get(canonical, set())
+            if symbols.get(canonical) != rva or canonical_rvas != {rva}:
+                raise ValueError(
+                    "reviewed REL32 canonical %s does not resolve uniquely "
+                    "to 0x%x" % (canonical, rva))
+            alias_rvas = duplicates.setdefault(alias, set())
+            if alias_rvas and alias_rvas != {rva}:
+                raise ValueError(
+                    "reviewed REL32 alias %s conflicts with public RVAs %s" %
+                    (alias, ", ".join("0x%x" % value
+                                     for value in sorted(alias_rvas))))
+            alias_rvas.add(rva)
+            symbols[alias] = rva
+
+
 REAL_LITERAL = re.compile(r"^__real@(4|8)@([0-9a-f]{20})$")
 
 
@@ -743,6 +784,8 @@ def main(argv=None):
     parser.add_argument("--target-dir", default="build/delink")
     parser.add_argument("--output-dir", default="build/delink-paired")
     parser.add_argument("--symbols", default="build/gen/symbol_names.csv")
+    parser.add_argument(
+        "--rel32-aliases", default="config/reviewed_rel32_aliases.tsv")
     parser.add_argument("--unit")
     parser.add_argument("--base")
     parser.add_argument("--target")
@@ -762,6 +805,8 @@ def main(argv=None):
         public_data, function_rvas, function_sizes = load_retail_symbols(
             args.symbols)
         symbols, data, duplicates = load_symbols()
+        load_reviewed_rel32_aliases(
+            args.rel32_aliases, symbols, duplicates)
         names = function_inventory(function_rvas).get(args.unit, set())
         functions, aliases, sites, boundaries, coverage = canonicalize_unit(
             args.unit, names, public_data, function_rvas, function_sizes,
@@ -770,6 +815,7 @@ def main(argv=None):
             "target": Path(args.target),
             "base": Path(args.base),
             "symbols": Path(args.symbols),
+            "rel32_aliases": Path(args.rel32_aliases),
         })
         print("canonicalized %d relocation sites (%d aliases, %d functions, "
               "%d alignment boundaries)" % (sites, aliases, functions,
@@ -802,6 +848,7 @@ def main(argv=None):
     public_data, function_rvas, function_sizes = load_retail_symbols(
         args.symbols)
     symbols, data, duplicates = load_symbols()
+    load_reviewed_rel32_aliases(args.rel32_aliases, symbols, duplicates)
     inventory = function_inventory(function_rvas)
     function_count = alias_count = site_count = boundary_count = 0
     unit_count = 0

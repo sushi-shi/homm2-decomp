@@ -30,13 +30,15 @@ separate undefined COFF symbol and redirects only that relocation. It never
 renames a shared target symbol globally, and it does not require a prior match
 score to authorize the address proof.
 
-The same pass handles `REL32` aliases such as retail `_open` versus candidate
-`__open`. It rewrites only when both names resolve to one unique public RVA and
-the encoded COFF addends are equal. The raw linker inputs retain their original
-names; only the disposable comparison target receives the candidate spelling.
-Thus neither a compiler-private counter nor an alternate external alias is
-itself matching evidence: resolved identity, addend, payload, occurrence, and
-topology are the evidence.
+The same pass handles `REL32` aliases when both names resolve to one unique
+public RVA and the encoded COFF addends are equal. Additional public spellings
+which the stripped PE cannot distinguish live in
+`config/reviewed_rel32_aliases.tsv`; each must name a canonical inventory symbol
+and exact RVA with independent provenance. The raw linker inputs retain their
+original names; only the disposable comparison target receives the candidate
+spelling. Thus neither a compiler-private counter nor an alternate external
+alias is itself matching evidence: resolved identity, addend, payload,
+occurrence, and topology are the evidence.
 
 A linked recursive call can lose its COFF `REL32` record when the delinker keeps
 the already-resolved displacement to the containing function. The paired pass

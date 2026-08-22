@@ -1,0 +1,7 @@
+# Reviewed public REL32 aliases which the stripped image cannot distinguish.
+# The canonical name and RVA must resolve uniquely in symbol_names.csv. The
+# alias is admitted only to disposable paired-target normalization.
+alias	canonical	rva	provenance
+__open	_open	0x000d8c6e	VC6 LIBCMT.LIB open.obj public symbol table
+__write	_write	0x000d8760	VC6 LIBCMT.LIB write.obj public symbol table
+__close	_close	0x000d8b8e	VC6 LIBCMT.LIB close.obj public symbol table

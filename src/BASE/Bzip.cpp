@@ -1876,7 +1876,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     allocateCompressStructures();
 
     strcpy(fname, ".\\DATA\\");
-    strcat(fname, "H2C");
+    strcat(fname, DATA_COMPGEN(0x00520100, encodeDataH2C, "H2C"));
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
@@ -1917,7 +1917,7 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     allocateCompressStructures();
 
     strcpy(fname, ".\\DATA\\");
-    strcat(fname, "H2C");
+    strcat(fname, DATA_COMPGEN(0x00520114, decodeDataH2C, "H2C"));
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
@@ -1950,4 +1950,3 @@ DATA(0x00537054) char inName[1024];
 DATA(0x00536c54) char outName[1024];
 char progNameReally[0x400];
 i32 keepInputFiles;
-

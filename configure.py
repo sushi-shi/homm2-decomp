@@ -87,7 +87,8 @@ def main():
         w.rule("canonicalize_relocs",
                command=(f"{PY} -m homm2.build.canonicalize_relocs "
                         "--unit $unit --base $base --target $in --output $out "
-                        "--symbols build/gen/symbol_names.csv"),
+                        "--symbols build/gen/symbol_names.csv "
+                        "--rel32-aliases config/reviewed_rel32_aliases.tsv"),
                description="normalize-relocs $unit")
         w.rule("implib_def",
                command=('wine "$$MSVC_DIR/bin/LIB.EXE" /NOLOGO /MACHINE:IX86 '
@@ -170,6 +171,7 @@ def main():
                                   "scripts/homm2/build/assert_relocs.py",
                                   "scripts/homm2/build/gen_vendor_imports.py",
                                   "build/gen/symbol_names.csv",
+                                  "config/reviewed_rel32_aliases.tsv",
                                   "build/orig/HMM2PL.exe"],
                         variables={"base": obj, "unit": u["unit"]})
                 target_normalized = (
