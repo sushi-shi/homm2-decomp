@@ -84,3 +84,97 @@
      fn absolute_function_reference_uses_coff_function_type() {
          let mut object = ObjectFile::empty_with_topology(false, SectionTopology::Synthesized);
          let text_section_id = object.text_section();
+--- a/src/data_manifest.rs
++++ b/src/data_manifest.rs
+@@ -324,5 +324,13 @@
+         (addend < definition.size).then_some((definition, addend))
+     }
++
++    pub fn has_external_definition(&self, symbol: RawString<'_>) -> bool {
++        self.definitions.iter().any(|definition| {
++            definition.scope == DataScope::External
++                && definition.symbol_name.as_bytes() == symbol.as_bytes()
++        })
++    }
++
+ }
+ 
+ fn validate_text(path: &Path, line: usize, field: &str, value: &[u8]) -> anyhow::Result<()> {
+@@ -427,6 +434,20 @@
+         assert_eq!(constant.scope, DataScope::Local);
+     }
+ 
++    #[test]
++    fn identifies_only_reviewed_external_definitions() {
++        let parsed = parse(&format!(
++            "{HEADER_TEXT}one.c\t0x100\t4\tdata\t4\t-\t0\texternal\n\
++             two.c\t0x300\t4\tdata\t4\t-\t0\tlocal\n"
++        ))
++        .unwrap();
++        assert!(parsed.has_external_definition(RawString::from(&b"table"[..])));
++        assert!(!parsed.has_external_definition(RawString::from(&b"scratch"[..])));
++        assert!(!parsed.has_external_definition(RawString::from(
++            &b"absent"[..]
++        )));
++    }
++
+     #[test]
+     fn accepts_missing_final_line_ending_and_uses_raw_pdb_symbol_bytes() {
+         let mut bytes = HEADER.to_vec();
+         bytes.extend_from_slice(b"\nu.c\t0x180\t4\tdata\t4\t-\t0\texternal");
+--- a/src/relocs.rs
++++ b/src/relocs.rs
+@@ -221,6 +221,10 @@
+         target_rva,
+     )? {
+-        let kind = if is_static {
++        let kind = if data_manifest.has_external_definition(owner) {
++            RelocKind::ReviewedData {
++                symbol: owner,
++            }
++        } else if is_static {
+             RelocKind::ConjuredStatic {
+                 symbol: owner,
+                 target_rva,
+@@ -715,11 +719,16 @@
+             {
+                 coff_data_reloc.copy_from_slice(&addend.to_le_bytes());
++                let kind = if data_manifest.has_external_definition(owner) {
++                    RelocKind::ReviewedData { symbol: owner }
++                } else {
++                    RelocKind::ConjuredConstant {
++                        symbol: owner,
++                        target_rva,
++                    }
++                };
+                 relocs_rva.insert(
+                     reloc_rva,
+-                    RelocKind::ConjuredConstant {
+-                        symbol: owner,
+-                        target_rva,
+-                    },
++                    kind,
+                 );
+                 return Ok(());
+             }
+@@ -797,11 +806,16 @@
+             {
+                 coff_data_reloc.copy_from_slice(&addend.to_le_bytes());
++                let kind = if data_manifest.has_external_definition(owner) {
++                    RelocKind::ReviewedData { symbol: owner }
++                } else {
++                    RelocKind::ConjuredStatic {
++                        symbol: owner,
++                        target_rva,
++                    }
++                };
+                 relocs_rva.insert(
+                     reloc_rva,
+-                    RelocKind::ConjuredStatic {
+-                        symbol: owner,
+-                        target_rva,
+-                    },
++                    kind,
+                 );
+                 return Ok(());
+             }
