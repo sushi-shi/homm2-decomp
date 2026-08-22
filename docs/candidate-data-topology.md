@@ -34,6 +34,10 @@ source annotation when independent retail relocation evidence proves its placeme
 The generated Vostok manifests combine those automatic literal rows with source
 annotations and candidate COFF topology:
 
+Function-relative relocation proofs derive their candidate extent from COFF function
+type and storage class. Named internal labels, including spellings other than `$L...`,
+never terminate the function census merely because they occur later in `.text`.
+
 - `DATA(rva)` marks an ordinary named definition, including a block-scope static.
   Clang supplies its declaration name, type, and logical `sizeof`; the candidate
   binder resolves VC6's compiler-specific local-scope decoration from COFF.

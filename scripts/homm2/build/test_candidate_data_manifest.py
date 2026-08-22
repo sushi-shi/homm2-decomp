@@ -28,14 +28,21 @@ from homm2.build.candidate_data_manifest import (
 
 class CandidateDataManifestTest(unittest.TestCase):
     def test_function_end_ignores_vc6_internal_labels(self):
-        function = SimpleNamespace(section=1, value=0x100)
+        function = SimpleNamespace(section=1, value=0x100, kind="function")
         functions = {
             "fn": function,
-            "$L123": SimpleNamespace(section=1, value=0x120),
-            "$L456": SimpleNamespace(section=1, value=0x140),
-            "next": SimpleNamespace(section=1, value=0x180),
+            "$L123": SimpleNamespace(section=1, value=0x120, kind="label"),
+            "$menuDone$1": SimpleNamespace(
+                section=1, value=0x140, kind="label"),
+            "next": SimpleNamespace(section=1, value=0x180, kind="function"),
         }
-        self.assertEqual(_function_end(functions, function, 0x200), 0x180)
+        with mock.patch(
+                "homm2.build.candidate_data_manifest._coff_symbol_fields",
+                side_effect=lambda _coff, symbol: (
+                    (0x0020, 2) if symbol.kind == "function" else (0, 6))):
+            self.assertEqual(
+                _function_end(SimpleNamespace(), functions, function, 0x200),
+                0x180)
 
     def test_open_group_retains_exact_relocation_proposal(self):
         definition = {

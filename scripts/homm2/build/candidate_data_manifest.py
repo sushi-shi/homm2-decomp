@@ -393,19 +393,23 @@ def _symbol_inventory(path):
     return public, public_data, functions
 
 
-def _function_end(functions, function, section_size):
+def _function_end(coff, functions, function, section_size):
     """Return the next real text-function boundary after ``function``.
 
-    VC6 emits ``$L...`` symbols for jump tables and internal labels.  They may
-    lie inside the reviewed function span and therefore cannot terminate its
-    relocation census.
+    VC6 emits named labels as well as ``$L...`` symbols inside functions.  The
+    spelling is not a boundary oracle: only a COFF function-typed external or
+    static symbol can terminate the relocation census.
     """
+    def is_function(symbol):
+        typ, storage = _coff_symbol_fields(coff, symbol)
+        return typ == 0x0020 and storage in (2, 3)
+
     peers = sorted(
         symbol.value
-        for name, symbol in functions.items()
+        for symbol in functions.values()
         if (symbol.section == function.section
             and symbol.value > function.value
-            and not name.startswith("$L"))
+            and is_function(symbol))
     )
     return peers[0] if peers else section_size
 
@@ -416,7 +420,7 @@ def _function_dir32(coff, function_name):
     if function is None:
         return None
     section = coff.sections[function.section - 1]
-    end = _function_end(functions, function, section.raw_size)
+    end = _function_end(coff, functions, function, section.raw_size)
     rows = []
     for (section_index, site), relocation in sorted(coff.relocations.items()):
         if (section_index != function.section or relocation.typ != DIR32 or
