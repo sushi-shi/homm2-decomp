@@ -573,7 +573,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
     sprintf(gText, "%d", m_campaignScenarioBonus[IDX(iCurViewSide)][iCurViewMap]);
     campWin->BroadcastMessage(message);
 
-    strcpy(gText, "");
+    strcpy(gText, DATA_COMPGEN(0x005240b8, campaignAwardsEmptyText, ""));
     for (mapIndex = 0; mapIndex < CAMPAIGN_AWARD_COUNT; ++mapIndex) {
         if (m_campaignAwards[mapIndex]) {
             strcat(gText, cCampaignAwards[mapIndex]);
