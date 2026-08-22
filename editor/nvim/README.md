@@ -107,7 +107,7 @@ Enable per session with `:Homm2 autobuild`, or by default with
 the in-flight one (latest wins), so saving several times quickly doesn't queue
 builds or race `ninja` on `build/`.
 
-The overlay %s use `function_reloc_diffs=data_value`, the same setting
+The overlay %s use `function_reloc_diffs=all`, the same setting
 `objdiff-cli report generate` uses, so they match the report's
 `fuzzy_match_percent` exactly (no number jump). It only re-diffs the **edited
 unit** — the target side is fixed by the retail EXE, so a body edit can't change

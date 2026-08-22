@@ -1068,7 +1068,7 @@ local function fast_build_popup(root, unit, before, now, elapsed)
     title = (" %s  %.1fs "):format(unit, elapsed or 0) })
 end
 
---- Per-unit FUZZY match %s as {name -> pct}. `-c function_reloc_diffs=data_value` is the
+--- Per-unit FUZZY match %s as {name -> pct}. `-c function_reloc_diffs=all` is the
 --- exact setting `objdiff-cli report generate` uses, so these equal report.json's
 --- fuzzy_match_percent - the overlay stays consistent with report-derived hints (no
 --- jump on first save). Kept separate from unit_diff, whose STRICT diff the asm
@@ -1076,7 +1076,7 @@ end
 local function unit_fuzzy_pcts(root, unit, cb)
   if vim.fn.executable("objdiff-cli") == 0 then return cb({}) end
   local cmd = { "objdiff-cli", "diff", "-p", ODIR, "-u", unit, "-o", "-",
-                "--format", "json", "-c", "function_reloc_diffs=data_value" }
+                "--format", "json", "-c", "function_reloc_diffs=all" }
   log("objdiff-cli diff -u " .. unit .. " (fuzzy %s)  [" .. root .. "]")
   vim.system(cmd, { cwd = root, text = true }, function(res)
     vim.schedule(function()

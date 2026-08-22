@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import struct
 import sys
 import tempfile
 from pathlib import Path
@@ -32,8 +33,8 @@ STDCALL = re.compile(r"^_(?P<name>[A-Za-z_][A-Za-z0-9_]*)@(?P<bytes>\d+)$")
 PLAIN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
-def imported_names(exe: Path, dll: str) -> list[str]:
-    """Return the exact named imports for ``dll`` in retail IAT order."""
+def imported_hints(exe: Path, dll: str) -> dict[str, int]:
+    """Return the exact named imports and hints for ``dll`` in retail IAT order."""
     imports = read_imports(exe)
     entry = next((row for row in imports if row["dll"].lower() == dll.lower()), None)
     if entry is None:
@@ -44,7 +45,12 @@ def imported_names(exe: Path, dll: str) -> list[str]:
             f"{dll} contains ordinal-only imports {ordinal_only}; "
             "a C stub cannot recover their source export names"
         )
-    return [row["name"] for row in entry["symbols"]]
+    return {row["name"]: row["hint"] for row in entry["symbols"]}
+
+
+def imported_names(exe: Path, dll: str) -> list[str]:
+    """Return the exact named imports for ``dll`` in retail IAT order."""
+    return list(imported_hints(exe, dll))
 
 
 def export_names(path: Path, dll: str | None = None) -> list[str]:
@@ -109,6 +115,86 @@ def validate_export_hints(exe: Path, dll: str, exports: list[str]) -> None:
         raise ValueError(f"{dll} export table does not reproduce retail hints: {details}")
 
 
+def verify_archive_hints(path: Path, expected: dict[str, int]) -> None:
+    """Prove the produced archive's ``.idata$6`` hint/name records are retail-exact."""
+    data = path.read_bytes()
+    if data[:8] != b"!<arch>\n":
+        raise ValueError(f"{path}: generated import library is not an archive")
+
+    actual: dict[str, int] = {}
+    offset = 8
+    while offset + 60 <= len(data):
+        try:
+            size = int(data[offset + 48:offset + 58].decode().strip() or "0")
+        except (UnicodeDecodeError, ValueError) as error:
+            raise ValueError(f"{path}: invalid archive member header") from error
+        body_offset = offset + 60
+        member = data[body_offset:body_offset + size]
+        if len(member) != size:
+            raise ValueError(f"{path}: truncated archive member")
+        if len(member) >= 20 and member[:4] == b"\0\0\xff\xff":
+            # VC6 stores each named import as an IMPORT_OBJECT_HEADER followed
+            # by public-symbol and DLL strings, rather than a full COFF object
+            # with a materialized .idata$6 section. The hint in this header is
+            # exactly what LINK later writes to the image's .idata$6 record.
+            try:
+                _sig1, _sig2, _version, _machine, _stamp, data_size, hint, flags = (
+                    struct.unpack_from("<HHHHIIHH", member)
+                )
+            except struct.error as error:
+                raise ValueError(f"{path}: malformed short-import member") from error
+            payload = member[20:20 + data_size]
+            strings = payload.split(b"\0")
+            if len(strings) < 3:
+                raise ValueError(f"{path}: malformed short-import strings")
+            public_name = strings[0].decode("latin-1")
+            name_type = (flags >> 2) & 0x7
+            if name_type == 1:  # IMPORT_OBJECT_NAME
+                export_name = public_name
+            elif name_type == 2:  # IMPORT_OBJECT_NAME_NO_PREFIX
+                export_name = public_name[1:] if public_name[:1] in "_@?" else public_name
+            elif name_type == 3:  # IMPORT_OBJECT_NAME_UNDECORATE
+                export_name = public_name[1:] if public_name[:1] in "_@?" else public_name
+                export_name = export_name.split("@", 1)[0]
+            elif name_type == 4 and len(strings) >= 4:  # IMPORT_OBJECT_NAME_EXPORTAS
+                export_name = strings[2].decode("latin-1")
+            else:
+                export_name = ""
+            if export_name in expected:
+                actual[export_name] = hint
+        # Traditional import-library members materialize .idata$6 in a normal
+        # COFF section. Keep supporting that VC5-era representation as well.
+        elif len(member) > 20 and member[:4] != b"\xff\xff\0\0":
+            try:
+                section_count = struct.unpack_from("<H", member, 2)[0]
+                for index in range(section_count):
+                    header = member[20 + 40 * index:20 + 40 * (index + 1)]
+                    if len(header) != 40 or header[:8].rstrip(b"\0") != b".idata$6":
+                        continue
+                    raw_size, raw_offset = struct.unpack_from("<II", header, 16)
+                    blob = member[raw_offset:raw_offset + raw_size]
+                    nul = blob.find(b"\0", 2)
+                    if len(blob) <= 3 or nul < 0:
+                        continue
+                    hint = struct.unpack_from("<H", blob, 0)[0]
+                    name = blob[2:nul].decode("latin-1")
+                    if name in expected:
+                        actual[name] = hint
+            except struct.error as error:
+                raise ValueError(f"{path}: malformed COFF archive member") from error
+        offset = body_offset + size + (size & 1)
+
+    mismatches = {
+        name: (hint, actual.get(name))
+        for name, hint in expected.items()
+        if actual.get(name) != hint
+    }
+    if mismatches:
+        raise ValueError(
+            f"{path.name}: hint mismatch after synthesis: {mismatches}"
+        )
+
+
 def stub_source(dll: str, names: list[str]) -> str:
     """Generate C definitions whose VC6 export decoration equals retail."""
     lines = [
@@ -151,7 +237,8 @@ def synthesize(
     """Create ``output`` via VC6's linker-generated import library."""
     exe = exe.resolve()
     output = output.resolve()
-    imports = imported_names(exe, dll)
+    hints = imported_hints(exe, dll)
+    imports = list(hints)
     names = (
         export_names(definition_path, dll)
         if definition_path is not None
@@ -207,6 +294,7 @@ def synthesize(
             implib,
             f"{dll} stub link",
         )
+        verify_archive_hints(implib, hints)
         output.write_bytes(implib.read_bytes())
     print(
         f"[import-lib] {dll}: {len(imports)} retail imports, "

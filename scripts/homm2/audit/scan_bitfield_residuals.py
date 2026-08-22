@@ -5,7 +5,7 @@ The scanner is read-only.  By default it recursively discovers retained
 ``best.candidate.obj`` / ``best.retail.obj`` pairs, reuses a sibling
 ``best.objdiff.json`` when present, and otherwise asks objdiff for JSON on
 stdout.  The one-shot objdiff invocation uses the repository's relocation-aware
-``functionRelocDiffs=data_value`` policy.
+``functionRelocDiffs=all`` policy.
 
 Pass ``--live`` to additionally compare every current normalized unit pair
 under ``build/objdiff/paired/target`` and ``build/objdiff/base``.  Whole-unit
@@ -49,7 +49,7 @@ DEFAULT_JSON_NAME = "best.objdiff.json"
 DEFAULT_LIVE_PAIRED_ROOT = Path("build/objdiff/paired/target")
 DEFAULT_LIVE_BASE_ROOT = Path("build/objdiff/base")
 DEFAULT_SYMBOLS = Path("build/gen/symbol_names.csv")
-RELOCATION_CONFIG = "functionRelocDiffs=data_value"
+RELOCATION_CONFIG = "functionRelocDiffs=all"
 LOW_MASKS = frozenset((1 << width) - 1 for width in range(1, 8))
 REGISTER_FAMILIES = {
     "al": ("al", "ax", "eax"),

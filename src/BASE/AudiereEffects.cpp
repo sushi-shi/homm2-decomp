@@ -191,3 +191,5 @@ VA(0x004ccf50, 0x11)
 bool AudiereSampleIterationActive(void) {
     return gAudiereSampleIterationDepth > 0;
 }
+
+inline AudiereSampleNode::~AudiereSampleNode() {}

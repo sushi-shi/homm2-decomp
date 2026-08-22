@@ -59,7 +59,7 @@ COMPGEN_MARKER = re.compile(
     r"([A-Za-z_]\w*(?:::[A-Za-z_]\w*)*)\s*\)\s*$")
 COMPGEN_KINDS = {
     "STATIC_INIT_DISPATCH", "STATIC_ATEXIT", "STATIC_DTOR", "STATIC_CTOR",
-    "LOCALE_FACET_ID_INIT",
+    "LOCALE_FACET_ID_INIT", "LOCALE_FACET_ID_ATEXIT",
 }
 
 # Every cursor kind that can carry a VA marker and produce a linker symbol.

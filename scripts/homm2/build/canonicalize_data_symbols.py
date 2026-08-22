@@ -554,27 +554,45 @@ def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
         return ("_atexit" in names and
                 any(name.startswith("?id@?$ctype@") for name in names))
 
+    def is_static_init_dispatch(index, owner):
+        targets = outgoing[index]
+        return (any(target in volatile and
+                    (is_special_member(target, owner, "??0") or
+                     is_inline_static_member_helper(target, owner))
+                    for target in targets) and
+                any(target in volatile and is_atexit(target, owner)
+                    for target in targets))
+
+    def is_inline_static_ctor(index, owner):
+        return (is_inline_static_member_helper(index, owner) and
+                any(index in outgoing[caller] and
+                    is_static_init_dispatch(caller, owner)
+                    for caller in volatile))
+
+    def is_inline_static_dtor(index, owner):
+        return (is_inline_static_member_helper(index, owner) and
+                any(index in outgoing[caller] and is_atexit(caller, owner)
+                    for caller in volatile))
+
     def has_role(index, claim):
         if claim.kind == "STATIC_CTOR":
-            return is_special_member(index, claim.owner, "??0")
+            return (is_special_member(index, claim.owner, "??0") or
+                    is_inline_static_ctor(index, claim.owner))
         if claim.kind == "STATIC_DTOR":
-            return is_special_member(index, claim.owner, "??1")
+            return (is_special_member(index, claim.owner, "??1") or
+                    is_inline_static_dtor(index, claim.owner))
         if claim.kind == "STATIC_ATEXIT":
             return is_atexit(index, claim.owner)
         if claim.kind == "STATIC_INIT_DISPATCH":
-            targets = outgoing[index]
-            return (any(target in volatile and
-                        (is_special_member(target, claim.owner, "??0") or
-                         is_inline_static_member_helper(target, claim.owner))
-                        for target in targets) and
-                    any(target in volatile and is_atexit(target, claim.owner)
-                        for target in targets))
+            return is_static_init_dispatch(index, claim.owner)
         if claim.kind == "LOCALE_FACET_ID_INIT":
             names = target_names(index)
             return (any(name.startswith("??_B?1???id@?$ctype@")
                         for name in names) and
                     any(target in volatile and is_locale_facet_id_atexit(target)
                         for target in outgoing[index]))
+        if claim.kind == "LOCALE_FACET_ID_ATEXIT":
+            return is_locale_facet_id_atexit(index)
         return False
 
     assigned = {}

@@ -166,7 +166,12 @@ def _optional_header() -> bytes:
     return bytes(data)
 
 
-def _descriptor_object() -> bytes:
+def _descriptor_object(
+    import_descriptor: str = "WING32_IMPORT_DESCRIPTOR",
+    null_descriptor: str = "NULL_IMPORT_DESCRIPTOR",
+    null_thunk: str = "\x7fWING32_NULL_THUNK_DATA",
+    dll: str = "WING32.dll",
+) -> bytes:
     optional = _optional_header()
     idata2_raw = 20 + len(optional) + 80
     idata2_relocations = idata2_raw + 20
@@ -182,13 +187,13 @@ def _descriptor_object() -> bytes:
 
     strings = bytearray(b"\0\0\0\0")
     symbols = bytearray()
-    symbols += _symbol("WING32_IMPORT_DESCRIPTOR", 0, 1, 2, 0, strings)
+    symbols += _symbol(import_descriptor, 0, 1, 2, 0, strings)
     symbols += _symbol(".idata$2", 0x48, 1, 0x68, 0, strings)
     symbols += _symbol(".idata$6", 0, 2, 3, 0, strings)
     symbols += _symbol(".idata$4", 0x48, 0, 0x68, 0, strings)
     symbols += _symbol(".idata$5", 0x48, 0, 0x68, 0, strings)
-    symbols += _symbol("NULL_IMPORT_DESCRIPTOR", 0, 0, 2, 0, strings)
-    symbols += _symbol("\x7fWING32_NULL_THUNK_DATA", 0, 0, 2, 0, strings)
+    symbols += _symbol(null_descriptor, 0, 0, 2, 0, strings)
+    symbols += _symbol(null_thunk, 0, 0, 2, 0, strings)
     struct.pack_into("<I", strings, 0, len(strings))
 
     data = bytearray(header + optional + sections)
@@ -196,33 +201,40 @@ def _descriptor_object() -> bytes:
     data += struct.pack("<IIH", 12, 2, 7)
     data += struct.pack("<IIH", 0, 3, 7)
     data += struct.pack("<IIH", 16, 4, 7)
-    data += b"WING32.dll\0\0"
+    dll_bytes = dll.encode("ascii") + b"\0"
+    if len(dll_bytes) > 12:
+        raise ValueError(f"DLL name {dll!r} exceeds legacy descriptor capacity")
+    data += dll_bytes.ljust(12, b"\0")
     data += symbols + strings
     return bytes(data)
 
 
-def _null_descriptor_object() -> bytes:
+def _null_descriptor_object(null_descriptor: str = "NULL_IMPORT_DESCRIPTOR") -> bytes:
     symbol_offset = 20 + 40 + 20
     header = struct.pack("<HHIIIHH", 0x14C, 1, 0, symbol_offset, 1, 0, 0x8180)
     sections = _section(".idata$3", 0, 20, 60, 0, 0, 0xC0000048)
     strings = bytearray(b"\0\0\0\0")
-    symbols = _symbol("NULL_IMPORT_DESCRIPTOR", 0, 1, 2, 0, strings)
+    symbols = _symbol(null_descriptor, 0, 1, 2, 0, strings)
     struct.pack_into("<I", strings, 0, len(strings))
     return header + sections + b"\0" * 20 + symbols + strings
 
 
-def _null_thunk_object() -> bytes:
+def _null_thunk_object(null_thunk: str = "\x7fWING32_NULL_THUNK_DATA") -> bytes:
     symbol_offset = 20 + 80 + 8
     header = struct.pack("<HHIIIHH", 0x14C, 2, 0, symbol_offset, 1, 0, 0x8180)
     sections = _section(".idata$5", 0, 4, 100, 0, 0, 0x48)
     sections += _section(".idata$4", 0, 4, 104, 0, 0, 0x48)
     strings = bytearray(b"\0\0\0\0")
-    symbols = _symbol("\x7fWING32_NULL_THUNK_DATA", 0, 1, 2, 0, strings)
+    symbols = _symbol(null_thunk, 0, 1, 2, 0, strings)
     struct.pack_into("<I", strings, 0, len(strings))
     return header + sections + b"\0" * 8 + symbols + strings
 
 
-def _function_object(spec: ExportSpec, hint: int) -> bytes:
+def _function_object(
+    spec: ExportSpec,
+    hint: int,
+    import_descriptor: str = "WING32_IMPORT_DESCRIPTOR",
+) -> bytes:
     lookup = struct.pack("<H", hint) + spec.lookup.encode("ascii") + b"\0"
     if len(lookup) & 1:
         lookup += b"\0"
@@ -252,7 +264,7 @@ def _function_object(spec: ExportSpec, hint: int) -> bytes:
     symbols += struct.pack("<IHHIhBBH", 6, 1, 0, 0, 0, 1, 0, 0)
     symbols += _symbol(spec.caller, 0, 1, 2, 0, strings)
     symbols += _symbol(".idata$6", 0, 2, 3, 0, strings)
-    symbols += _symbol("WING32_IMPORT_DESCRIPTOR", 0, 0, 2, 0, strings)
+    symbols += _symbol(import_descriptor, 0, 0, 2, 0, strings)
     symbols += _symbol(spec.import_symbol, 0, 3, 2, 0, strings)
     struct.pack_into("<I", strings, 0, len(strings))
 
@@ -268,10 +280,10 @@ def _function_object(spec: ExportSpec, hint: int) -> bytes:
     return bytes(data)
 
 
-def _archive_header(size: int) -> bytes:
+def _archive_header(size: int, member_name: str = MEMBER_NAME) -> bytes:
     return b"".join(
         (
-            MEMBER_NAME.encode("ascii").ljust(16),
+            member_name.encode("ascii").ljust(16),
             b"0".ljust(12),
             b"0".ljust(6),
             b"0".ljust(6),
@@ -282,9 +294,9 @@ def _archive_header(size: int) -> bytes:
     )
 
 
-def _linker_header(size: int) -> bytes:
-    return _archive_header(size).replace(
-        MEMBER_NAME.encode("ascii").ljust(16), b"/".ljust(16), 1
+def _linker_header(size: int, member_name: str = MEMBER_NAME) -> bytes:
+    return _archive_header(size, member_name).replace(
+        member_name.encode("ascii").ljust(16), b"/".ljust(16), 1
     )
 
 

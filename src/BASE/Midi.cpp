@@ -151,5 +151,7 @@ void MIDISetVolume(i32& fadeSteps) {
     AIL_set_XMIDI_master_volume(hMDI, volume);
 }
 
-DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x005361a0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
+DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
+DATA(0x00536380) u8 gMusicFlagA;
+DATA(0x00536381) u8 gMusicFlagB;

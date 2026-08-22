@@ -177,7 +177,7 @@ def locale_facet_id_graph():
 
 def inline_static_member_graph(owner_symbol):
     return make_coff([SectionSpec(
-        ".text", bytes(0x8E), TEXT, (
+        ".text", bytes(0xC8), TEXT, (
             (0x04, 1, REL32), (0x09, 2, REL32),
             (0x20, 4, DIR32),
             (0x70, 3, DIR32), (0x78, 5, REL32),
@@ -441,16 +441,51 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
 
         self.assertEqual(CoffObject(result.data).symbols[0].name, claim.name)
 
+    def test_inlined_static_member_family_uses_callgraph_roles(self):
+        owner = "AudiereMusicState::stream"
+        claims = tuple(CompgenClaim(
+            "__h2cg$MODULE$%s$AudiereMusicState$stream" % kind.lower(),
+            kind, owner, size)
+            for kind, size in (
+                ("STATIC_INIT_DISPATCH", 0x0F),
+                ("STATIC_CTOR", 0x61),
+                ("STATIC_ATEXIT", 0x12),
+                ("STATIC_DTOR", 0x46),
+            ))
+
+        result = canonicalize_coff(inline_static_member_graph(
+            "?stream@AudiereMusicState@@2VRefPtr@@A"), claims)
+        parsed = CoffObject(result.data)
+
+        self.assertEqual(
+            [parsed.symbols[index].name for index in range(4)],
+            [claim.name for claim in claims],
+        )
+
     def test_locale_facet_id_initializer_has_a_semantic_role(self):
-        claim = CompgenClaim(
-            "__h2cg$MODULE$locale_facet_id_init$WCharCtypeId",
-            "LOCALE_FACET_ID_INIT", "WCharCtypeId", 0x27)
+        claims = (
+            CompgenClaim(
+                "__h2cg$MODULE$locale_facet_id_init$WCharCtypeId",
+                "LOCALE_FACET_ID_INIT", "WCharCtypeId", 0x27),
+            CompgenClaim(
+                "__h2cg$MODULE$locale_facet_id_atexit$WCharCtypeId",
+                "LOCALE_FACET_ID_ATEXIT", "WCharCtypeId", 0x12),
+        )
 
-        result = canonicalize_coff(locale_facet_id_graph(), (claim,))
+        result = canonicalize_coff(locale_facet_id_graph(), claims)
 
-        self.assertEqual(CoffObject(result.data).symbols[0].name, claim.name)
-        self.assertEqual(result.rows[0].preview,
-                         "LOCALE_FACET_ID_INIT:WCharCtypeId")
+        parsed = CoffObject(result.data)
+        self.assertEqual(
+            [parsed.symbols[index].name for index in range(2)],
+            [claim.name for claim in claims],
+        )
+        self.assertEqual(
+            [row.preview for row in result.rows],
+            [
+                "LOCALE_FACET_ID_INIT:WCharCtypeId",
+                "LOCALE_FACET_ID_ATEXIT:WCharCtypeId",
+            ],
+        )
 
     def test_unresolved_compiler_function_claim_warns_without_renaming(self):
         payload = make_coff([

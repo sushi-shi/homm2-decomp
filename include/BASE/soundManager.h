@@ -132,7 +132,7 @@ extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
-extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
+extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 
 #endif

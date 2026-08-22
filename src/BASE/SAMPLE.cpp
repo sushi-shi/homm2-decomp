@@ -30,7 +30,7 @@ sample::sample(char* name)
 
     char fileName[FILENAME_CAPACITY];
     strcpy(fileName, name);
-    _strrev(fileName);
+    strrev(fileName);
 
     for (i32 i = 0; i < FORMAT_SUFFIX_LENGTH; i++) {
         switch (fileName[i]) {

@@ -106,6 +106,15 @@ def main():
                command=(f"{PY} -m homm2.build.legacy_import_lib "
                         "--definition $in --out $out"),
                description="legacy-implib WING32.dll")
+        w.rule("regular_implib",
+               command=(f"{PY} -m homm2.build.regular_import_lib --exe $in "
+                        "--dll $dll --definition $definition --out $out"),
+               description="regular-implib $dll")
+        w.rule("regular_vendor_implib",
+               command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
+                        "--exe $in --dll $dll --definition $definition "
+                        "--out $out $options"),
+               description="regular-implib $dll")
         w.rule("patched_implib",
                command=(f"{PY} -m homm2.build.gen_vendor_imports "
                         "--definition $in --out $out --dll $dll "
@@ -116,21 +125,24 @@ def main():
                rspfile="$out.rsp",
                rspfile_content="/NOLOGO /MACHINE:IX86 /OUT:$out $in",
                description="archive $out")
+        w.rule("extract_archive_member",
+               command='llvm-ar p $in "$member" > $out',
+               description="extract $member")
+        w.rule("adapt_omf_link_object",
+               command=(f"{PY} -m homm2.build.adapt_omf_link_object "
+                        "--input $in --output $out --unit $unit"),
+               description="cvtomf-topology $unit")
+        w.rule("adapt_comdat_link_order",
+               command=(f"{PY} -m homm2.build.adapt_comdat_link_order "
+                        "--input $in --output $out --unit $unit"),
+               description="comdat-order $unit")
         w.rule("link_exe",
-               command='wine "$$MSVC_DIR/bin/LINK.EXE" @build/link/HMM2PL.rsp',
-               description="link HMM2PL.exe",
-               rspfile="build/link/HMM2PL.rsp",
-               rspfile_content=(
-                   "/NOLOGO /MACHINE:IX86 /BASE:0x400000 "
-                   "/SUBSYSTEM:WINDOWS,4.0 /STACK:66112,4096 "
-                   "/HEAP:1048576,4096 /INCREMENTAL:NO /OPT:NOREF "
-                   "/DEBUG /PDB:build/HMM2PL.pdb "
-                   "/LIBPATH:build/toolchain/msvc/lib "
-                   "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe "
-                   "$link_args"))
+               command=(f"{PY} -m homm2.build.exact_link.orchestrate "
+                        "--retail-exact"),
+               description="retail-exact link HMM2PL.exe")
         w.rule("link_audit",
                command=(f"{PY} -m homm2.build.link_exe --audit-existing "
-                        "--out build/link/HMM2PL.exe"),
+                        "--strict --out build/link/HMM2PL.exe"),
                description="link-audit HMM2PL.exe")
         w.rule("link_resources",
                command=(f"{PY} -m homm2.build.extract_resources "
@@ -236,7 +248,7 @@ def main():
         w.build("all", "phony", inputs=comparison_inputs)
         w.build("base", "phony", inputs=objs)
         import_outputs = []
-        for name in ("audiere", "mss32"):
+        for name in ("audiere",):
             output = f"build/link/{name}.lib"
             w.build(
                 output,
@@ -254,20 +266,58 @@ def main():
                 },
             )
             import_outputs.append(output)
+        output = "build/link/mss32.lib"
+        w.build(
+            output,
+            "regular_implib",
+            inputs="build/orig/HMM2PL.exe",
+            implicit=[
+                "scripts/homm2/build/regular_import_lib.py",
+                "scripts/homm2/build/legacy_import_lib.py",
+                "scripts/homm2/build/import_lib.py",
+                "scripts/homm2/build/link_exe.py",
+                "imports/mss32.def",
+            ],
+            variables={
+                "dll": "mss32.dll",
+                "definition": "imports/mss32.def",
+            },
+        )
+        import_outputs.append(output)
         output = "build/link/smackw32.lib"
-        w.build(output, "implib_def", inputs="imports/smackw32.def")
+        w.build(
+            output,
+            "regular_vendor_implib",
+            inputs="build/orig/HMM2PL.exe",
+            implicit=[
+                "scripts/homm2/build/regular_vendor_import_lib.py",
+                "scripts/homm2/build/regular_import_lib.py",
+                "scripts/homm2/build/legacy_import_lib.py",
+                "scripts/homm2/build/link_exe.py",
+                "imports/smackw32.def",
+            ],
+            variables={
+                "dll": "smackw32.DLL",
+                "definition": "imports/smackw32.def",
+            },
+        )
         import_outputs.append(output)
         output = "build/link/netapi32.lib"
         w.build(
             output,
-            "patched_implib",
-            inputs="imports/netapi32.def",
-            implicit="scripts/homm2/build/gen_vendor_imports.py",
+            "regular_vendor_implib",
+            inputs="build/orig/HMM2PL.exe",
+            implicit=[
+                "scripts/homm2/build/regular_vendor_import_lib.py",
+                "scripts/homm2/build/regular_import_lib.py",
+                "scripts/homm2/build/legacy_import_lib.py",
+                "scripts/homm2/build/link_exe.py",
+                "imports/netapi32.def",
+            ],
             variables={
                 "dll": "NETAPI32.dll",
-                "symbol": "_Netbios@4",
-                "lookup": "Netbios",
-                "hint": "180",
+                "definition": "imports/netapi32.def",
+                "options": "--symbol _Netbios@4 --lookup Netbios --hint 180",
             },
         )
         import_outputs.append(output)
@@ -279,6 +329,15 @@ def main():
             implicit="scripts/homm2/build/legacy_import_lib.py",
         )
         import_outputs.append(output)
+        runtime_delete_object = "build/link/libcmt-delete.obj"
+        runtime_delete_archive = "build/link/libcmt-delete.lib"
+        w.build(
+            runtime_delete_object,
+            "extract_archive_member",
+            inputs="build/toolchain/msvc/lib/LIBCMT.LIB",
+            variables={"member": r"build\intel\mt_obj\delete.obj"},
+        )
+        w.build(runtime_delete_archive, "archive", inputs=runtime_delete_object)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
                 inputs=["build/orig/HMM2PL.exe",
@@ -295,6 +354,32 @@ def main():
             "build/objdiff/base/SOURCE/X_GLOBAL.obj") + 1
         source_objects = link_objects[:source_end]
         base_objects = link_objects[source_end:]
+        omf_link_objects = {}
+        for unit in ("BASE/BITS", "BASE/TILE"):
+            source = f"build/objdiff/base/{unit}.obj"
+            output = f"build/link/omf/{unit}.obj"
+            w.build(
+                output,
+                "adapt_omf_link_object",
+                inputs=source,
+                implicit="scripts/homm2/build/adapt_omf_link_object.py",
+                variables={"unit": unit},
+            )
+            omf_link_objects[source] = output
+        base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
+        comdat_link_objects = {}
+        for unit in ("BASE/AudiereEffects", "BASE/DIMMER"):
+            source = f"build/objdiff/base/{unit}.obj"
+            output = f"build/link/comdat-order/{unit}.obj"
+            w.build(
+                output,
+                "adapt_comdat_link_order",
+                inputs=source,
+                implicit="scripts/homm2/build/adapt_comdat_link_order.py",
+                variables={"unit": unit},
+            )
+            comdat_link_objects[source] = output
+        base_objects = [comdat_link_objects.get(obj, obj) for obj in base_objects]
         midi_index = base_objects.index("build/objdiff/base/BASE/Midi.obj")
         base_libraries = []
         for library, members in (
@@ -305,11 +390,18 @@ def main():
             # order backwards so each archive scans forwards.
             w.build(library, "archive", inputs=list(reversed(members)))
             base_libraries.append(library)
-        link_args = (source_objects + link_libraries + base_libraries
-                     + [resource_output])
+        link_args = (link_libraries + source_objects + base_libraries
+                     + [runtime_delete_archive, resource_output])
+        exact_link_helpers = sorted(
+            str(path.relative_to(REPO))
+            for path in (REPO / "scripts/homm2/build/exact_link").glob("*.py"))
         w.build(link_outputs, "link_exe",
-                inputs=(source_objects + base_libraries + [resource_output]),
-                implicit=import_outputs,
+                inputs=(source_objects + base_libraries
+                        + [runtime_delete_archive, resource_output]),
+                implicit=(import_outputs + exact_link_helpers + [
+                    "config/retail_crt_order.txt",
+                    "build/gen/delink_data_from_source.tsv",
+                ] + base_symbol_sidecars),
                 variables={"link_args": " ".join(link_args)})
         link_audit_outputs = [
             "build/link/HMM2PL.link.json",
@@ -355,9 +447,9 @@ def main():
         "build_base": False, "build_target": False,
         # Relocation-masked instruction bytes are not sufficient proof: two globals
         # can generate identical opcodes while naming different storage.  Keep the
-        # strictest objdiff relocation-value comparison visible in the normal report;
-        # the owner/addend gates provide the stronger project-specific proof.
-        "options": {"functionRelocDiffs": "data_value"},
+        # strictest objdiff relocation comparison visible in the normal report;
+        # the owner/addend gates remain independent project-specific proof.
+        "options": {"functionRelocDiffs": "all"},
         "watch_patterns": ["*.obj"], "units": units_j,
     }, indent=2) + "\n")
     print(f"configure: {len(units)} units -> build.ninja + build/objdiff/objdiff.json")

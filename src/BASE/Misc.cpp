@@ -583,7 +583,7 @@ void ReadPrefsFromFile(void) {
     FILE* file;
 
     sprintf(gText, "%s", "HEROES2.CFG");
-    if (_access(gText, 0) == -1) {
+    if (access(gText, 0) == -1) {
         SetInstallDefaults();
         SetGameDefaults();
         WritePrefs();
@@ -1485,7 +1485,7 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
     handle = open(gText, _O_BINARY);
     if (handle == -1) {
-        if (_chdir(gcRegAppPath) == -1)
+        if (chdir(gcRegAppPath) == -1)
             return CD_ROM_GAME_DIRECTORY_MISSING;
         handle = open(gText, _O_BINARY);
         if (handle == -1)

@@ -6804,6 +6804,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
 }
 
 VA_COMPGEN(0x0048c2f1, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)
+VA_COMPGEN(0x0048c318, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)
 
 DATA(0x005331c8) float fFirstWeekTownFV = 0.0f;
 DATA(0x005331cc) i32 iVepCacheHits = 0;

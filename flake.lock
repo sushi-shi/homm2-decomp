@@ -19,16 +19,16 @@
     "objdiff-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1774108449,
-        "narHash": "sha256-MBPZFQCddAvJ7Au7+Hl8dB/Nd7lfreCqIXDXdYmZUak=",
+        "lastModified": 1783665201,
+        "narHash": "sha256-2Rzoj8JXv9MOGRHWiIodaBbP8ID+8RFJFuB3hzrodh8=",
         "owner": "encounter",
         "repo": "objdiff",
-        "rev": "3cebee67667d440fa0fe1b64026c35db53ac40d6",
+        "rev": "6bcac60df8bb0b4de5b1cb98b033bdedb9ac6aa4",
         "type": "github"
       },
       "original": {
         "owner": "encounter",
-        "ref": "v3.7.1",
+        "ref": "v3.7.3",
         "repo": "objdiff",
         "type": "github"
       }

@@ -38,7 +38,13 @@ DATA_COMPGEN_GUARD(
 DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
 
 VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::stream)
+VA_COMPGEN(0x004cd090, 0x61, STATIC_CTOR, AudiereMusicState::stream)
+VA_COMPGEN(0x004cd100, 0x12, STATIC_ATEXIT, AudiereMusicState::stream)
+VA_COMPGEN(0x004cd120, 0x46, STATIC_DTOR, AudiereMusicState::stream)
 VA_COMPGEN(0x004cd170, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::source)
+VA_COMPGEN(0x004cd180, 0x61, STATIC_CTOR, AudiereMusicState::source)
+VA_COMPGEN(0x004cd1f0, 0x12, STATIC_ATEXIT, AudiereMusicState::source)
+VA_COMPGEN(0x004cd210, 0x46, STATIC_DTOR, AudiereMusicState::source)
 
 VA(0x004cd260, 0x133)
 void StopAudiereMusic(i32& currentTrack) {
@@ -159,3 +165,4 @@ void PlayAudiereMusic(
 }
 
 VA_COMPGEN(0x004cdae0, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)
+VA_COMPGEN(0x004cdb10, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)

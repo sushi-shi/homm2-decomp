@@ -17,6 +17,8 @@ struct AudiereSampleNode {
         sampleResource = resource;
         next = nextNode;
     }
+
+    inline ~AudiereSampleNode();
 };
 
 // Retail keeps the music stream/source as static class members: their atexit

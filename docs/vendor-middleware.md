@@ -15,7 +15,7 @@ re-verified against its own import table. The GOG re-release EXE
 
 | Middleware | DLL | Version | Import style | Confidence |
 |---|---|---|---|---|
-| Miles Sound System | `mss32.dll` | **3.6** (AIL 2D 3.x) | by name, 33 fns, `__stdcall @N` | High (family), name-imported |
+| Miles Sound System | `mss32.dll` | **3.6** (AIL 2D 3.x) | by name, 29 fns, `__stdcall @N` | High (family), name-imported |
 | Smacker Video | `smackw32.DLL` | **3.0g** | **by ordinal**, 10 fns | High |
 | WinG | `WING32.dll` | **1.0** (1.0.0.37) | by name, 6 fns | Certain |
 
@@ -44,7 +44,7 @@ checked, function-by-function, against the period headers and found accurate:
 - *Miles*: `gondur/mig_src` `AIL.H` reads `AIL_VERSION "3.6B"` / `8-Mar-97`, copyright RAD
   1991-97 — **exactly** the version pinned here (the sibling image's `mss32.dll` build
   string is `MSS V3.6B`). That `AIL.H` is the DOS variant (`cdecl`, `__pascal` callbacks)
-  and declares 22 of our 33 imports; the Win32 stdcall superset (with `AIL_waveOutOpen`,
+  and declares 22 of our 29 imports; the Win32 stdcall superset (with `AIL_waveOutOpen`,
   `AIL_midiOutOpen`, `AIL_redbook_*`) is `MSSW.H`. HMM2PL.exe links the **Win32** `stdcall
   @N` API, which `mss.h` here targets; the AIL 2D core signatures/handle types it shares
   with `AIL.H` match.
@@ -61,7 +61,7 @@ checked, function-by-function, against the period headers and found accurate:
 
 **Why keep the reconstructions rather than vendor the copied SDK files.** (1) The exact,
 directly-usable artifacts are the *wrong* platform/version for a drop-in — the located
-Miles header is the **DOS** `AIL.H` variant (`cdecl`, only 22/33 fns), not the Win32 mss32
+Miles header is the **DOS** `AIL.H` variant (`cdecl`, only 22/29 fns), not the Win32 mss32
 header this EXE links; Smacker `3.0c`/`3.2f` and Miles `6.x` are not `3.0g`/`3.6B` exactly.
 (2) These are third-party-**copyrighted** RAD/Microsoft SDK sources; a clean-room
 reconstruction authored from the observed ABI (import table, `@N` counts, mapped ordinals)
@@ -84,33 +84,49 @@ API. Because the EXE imports **by name**, the exact point release is signature-n
 Smacker 3.0g DLL additionally prints `Smacker needs at least version 3.50F of MSS`,
 bounding the retail Miles at ≥ 3.50F, consistent with 3.6B.
 
-**Import surface (the fingerprint).** 33 functions, each with the classic `__stdcall`
+**Import surface (the fingerprint).** 29 functions, each with the classic `__stdcall`
 `@N` byte-count decoration → argument count `= N/4`. Every prototype in `mss.h` was
 verified against that count (e.g. `AIL_set_sample_type@12` = 3 args, `AIL_startup@0` = 0):
 
 ```
 AIL_startup@0            AIL_shutdown@0            AIL_serve@0
-AIL_last_error@0         AIL_set_preference@8      AIL_get_preference@4
+AIL_last_error@0         AIL_set_preference@8
 AIL_waveOutOpen@16       AIL_allocate_sample_handle@4   AIL_init_sample@4
 AIL_start_sample@4       AIL_end_sample@4          AIL_sample_status@4
 AIL_set_sample_address@12   AIL_set_sample_type@12  AIL_set_sample_playback_rate@8
-AIL_set_sample_volume@8  AIL_sample_volume@4       AIL_set_sample_loop_count@8
+AIL_set_sample_volume@8  AIL_set_sample_loop_count@8
 AIL_midiOutOpen@12       AIL_midiOutClose@4        AIL_set_XMIDI_master_volume@8
 AIL_allocate_sequence_handle@4   AIL_release_sequence_handle@4
 AIL_init_sequence@12     AIL_start_sequence@4      AIL_stop_sequence@4
 AIL_resume_sequence@4    AIL_sequence_status@4     AIL_set_sequence_loop_count@8
-AIL_redbook_open@4       AIL_redbook_close@4       AIL_redbook_tracks@4
-AIL_redbook_track_info@16
 ```
 
 **Codegen note.** Retail call sites use the dllimport indirection
 (`call dword ptr [__imp__AIL_*@N]`, e.g. `.text:004013A3`), so `mss.h` decorates every
 function `extern "C" __declspec(dllimport) <ret> __stdcall AIL_*`.
 
+**Import-library form.** `imports/mss32.def` records the complete 137-name export
+surface, whose sorted positions reproduce every retail-used PE hint.  Correct names and
+hints are not sufficient for final-image matching: the VC6 short-import form and the
+older regular-COFF form have the same linked ABI but different contribution metadata.
+The retail Rich-header census and a raw final-image A/B test select conventional regular
+i386 COFF members for Miles.  `homm2.build.regular_import_lib` emits that measured form,
+keeps the historical extra-decoration topology for unreferenced exports, and re-reads the
+finished archive to verify all 29 used hints.  Relative to the semantically equivalent
+short-import library, this changes no project-function placement and recovers 176 retail
+bytes in the final image when isolated.
+
+Smacker's nine ordinal members and NetBIOS's one named member use the same regular-COFF
+producer family.  Promoting all three vendor libraries changes the candidate Rich-header
+Linker/Unmarked/Import0 census from `8/9/234` to `2/54/195`, exactly matching retail in
+all three categories.  Its current raw score is temporarily lower because changing the
+producer topology also exposes the still-unrecovered IAT resolution order; the exact
+producer census is the stronger structural evidence for the executable-closure campaign.
+
 **Header provenance.** Reconstructed minimal header. Parameter/return **types** were taken
 from the authentic Miles AIL 2D API (cross-checked against a later authentic `mss.h`,
 Miles 6.0c, where the AIL 2D signatures are unchanged) and pinned to the observed `@N`
-arg counts. Only the 33 imported functions + their handle types (`HSAMPLE`, `HSEQUENCE`,
+arg counts. Only the 29 imported functions + their handle types (`HSAMPLE`, `HSEQUENCE`,
 `HDIGDRIVER`, `HMDIDRIVER`, `HREDBOOK`) and the `AIL_waveOutOpen`/`AIL_midiOutOpen`
 MMSYSTEM pass-through types are declared.
 
@@ -230,10 +246,11 @@ original toolchain's SDK dirs. These are **headers only** — never build units,
 
 The proprietary SDK import libraries are not stored in the repository.  The complete
 named-export surfaces needed for the retail hints live in `imports/audiere.def` and
-`imports/mss32.def`.  The build generates C definitions for those exports, links a
-throwaway DLL with VC6 `LINK.EXE`, and retains only its generated `.lib` as a build
-product.  Thus the checked-in definition files are the durable inputs; the filler DLL,
-object, source, `.exp`, and `.lib` are all reproducible and disposable.
+`imports/mss32.def`.  Audiere is synthesized through a throwaway DLL so VC6 produces its
+short-import library.  Miles, Smacker, and NetBIOS are synthesized directly as the
+measured conventional regular-COFF archives described above.  Thus the checked-in
+definition files are the durable inputs and every generated library remains a
+reproducible build product.
 
 **Verification.** A scratch TU including all three headers alongside `Ints.h` and
 `win/windows.h` compiles cleanly under the pinned MSVC (no typedef clashes, all signatures parse)

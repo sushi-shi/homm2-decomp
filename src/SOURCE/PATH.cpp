@@ -635,3 +635,4 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
 }
 
 VA_COMPGEN(0x0047e16a, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)
+VA_COMPGEN(0x0047e191, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)

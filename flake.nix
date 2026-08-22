@@ -12,7 +12,7 @@
       flake = false;
     };
     objdiff-src = {
-      url = "github:encounter/objdiff/v3.7.1";
+      url = "github:encounter/objdiff/v3.7.3";
       flake = false;
     };
   };
@@ -41,7 +41,7 @@
 
       # Build the CLI from the pinned upstream source so its machine-readable diff
       # schema can expose the allocation evidence used by strict data audits.
-      objdiffVersion = "3.7.1";
+      objdiffVersion = "3.7.3";
       objdiffUrl = name: "https://github.com/encounter/objdiff/releases/download/v${objdiffVersion}/${name}";
       objdiffGuiLibs = with pkgs; [ libGL libxkbcommon wayland fontconfig freetype libx11 libxcursor libxi libxrandr libxcb ];
       objdiff-cli = nightly-rustPlatform.buildRustPackage {
@@ -50,8 +50,9 @@
         patches = [
           ./patches/objdiff-data-symbol-details.patch
           ./patches/objdiff-complete-data-sections.patch
+          ./patches/objdiff-score-reloc-addend.patch
         ];
-        cargoHash = "sha256-KlNA9JleBd5TwpeVZrAhAL2nKyp28hKiQ59qyZq7nKg=";
+        cargoHash = "sha256-Z9vyUj35nrHuUoOYM54RLCn7CzcQ6k3A6FsDYKCVqVM=";
         cargoBuildFlags = [ "-p" "objdiff-cli" ];
         cargoTestFlags = [ "-p" "objdiff-core" "-p" "objdiff-cli" ];
         cargoInstallFlags = [ "-p" "objdiff-cli" ];
@@ -60,7 +61,7 @@
       };
       objdiff = pkgs.stdenv.mkDerivation {
         pname = "objdiff"; version = objdiffVersion;
-        src = pkgs.fetchurl { url = objdiffUrl "objdiff-linux-x86_64"; hash = "sha256-LpBPYyWPzuX5jm02WUovzqJQyqz+l8SbRURHDWgFqq8="; };
+        src = pkgs.fetchurl { url = objdiffUrl "objdiff-linux-x86_64"; hash = "sha256-1pzhzJUl/BJQP2XS333KIfkx1YYi8ZyRdPMv5MnJGyA="; };
         dontUnpack = true; nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ]; buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ objdiffGuiLibs;
         installPhase = ''
           install -Dm755 $src $out/bin/objdiff

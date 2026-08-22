@@ -3,7 +3,7 @@
 # Observational only; never an enforcement baseline.
 # Updated by `homm2 status update` and `homm2 build`; do not hand-edit.
 # unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash
-BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	5561b56c68f0
+BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	54a15e0109c8
 BASE/AudiereEffects	?AudiereSamplePlaying@@YI_NPAVsample@@@Z	100.0000	5ae38b433ee8
 BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	71e05d7fe65d
 BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	64f87f82c508
@@ -271,7 +271,7 @@ BASE/Misc	?PrintMemoryLeaks@@YIXXZ	100.0000	5d73a7447012
 BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	43405f0969f4
 BASE/Misc	?Random@@YIHHH@Z	100.0000	e437de47de08
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	e6fef53929fd
-BASE/Misc	?ReadPrefsFromFile@@YIXXZ	100.0000	33622279a3f0
+BASE/Misc	?ReadPrefsFromFile@@YIXXZ	100.0000	e7a0084f7f72
 BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	6a997e0a2ff7
 BASE/Misc	?SGenRand@@YIHXZ	100.0000	6b3432eea953
 BASE/Misc	?SIncRandomize@@YIXHH@Z	100.0000	93a5532f7a68
@@ -280,7 +280,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	100.0000	ee23f77f6613
 BASE/Misc	?SetGameDefaults@@YIXXZ	100.0000	a4c085978c4b
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	44fff69415e8
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	5e86bfda1e0c
-BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	6031d3a242e6
+BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	8d8c9d6234bd
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	100.0000	a5cd20bd63e5
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	100.0000	3c4c70829ceb
@@ -328,7 +328,7 @@ BASE/RESOURCE	??0resource@@QAE@XZ	100.0000	0e12b90947d6
 BASE/RESOURCE	??1resource@@UAE@XZ	100.0000	5bdf521e8c58
 BASE/Ripple	?DoRipple@@YIXPAVbitmap@@0HH@Z	100.0000	4275e6d33ed0
 BASE/SAMPLE	??0MIDIWrap@@QAE@PAD@Z	100.0000	b40e685da3aa
-BASE/SAMPLE	??0sample@@QAE@PAD@Z	100.0000	74d58d8b6664
+BASE/SAMPLE	??0sample@@QAE@PAD@Z	100.0000	a96a299d6471
 BASE/SAMPLE	??1MIDIWrap@@UAE@XZ	100.0000	cfadebe54977
 BASE/SAMPLE	??1sample@@UAE@XZ	100.0000	b2b39e69ebb8
 BASE/TEXTWDGT	??0textWidget@@QAE@FFFFPAD0FFFF@Z	100.0000	379ff38822cc
@@ -419,7 +419,7 @@ BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	4d48e5d8e842
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	100.0000	8b994911f6d9
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	2a049db3ddf7
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	2fb0b969ed19
-BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	1da5ac3f7fee
+BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	e9332dc64a31
 BASE/miscwin	_BlitBitmapToScreenVesa	100.0000	4098916c918c
 BASE/soundmgr	??0soundManager@@QAE@XZ	100.0000	809f03d00b7b
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	100.0000	1e253e385584
@@ -843,7 +843,7 @@ SOURCE/GAME	?InitRandomArtifacts@game@@QAEXXZ	100.0000	de2689c51043
 SOURCE/GAME	?InitializePasswords@game@@QAEXXZ	100.0000	957b77cf0590
 SOURCE/GAME	?IsCursedItem@@YIHH@Z	100.0000	9e1572a2ecf2
 SOURCE/GAME	?IsMobile@game@@QAEHH@Z	100.0000	48dbf1cc34fd
-SOURCE/GAME	?LoadGame@game@@QAEXPADHH@Z	100.0000	5e7668a73b1e
+SOURCE/GAME	?LoadGame@game@@QAEXPADHH@Z	100.0000	51ad681898a9
 SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	100.0000	53422393c3f5
 SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	100.0000	e483da07ff9d
 SOURCE/GAME	?MineTypesOwned@game@@QAEHHH@Z	100.0000	8295dae196bd
@@ -867,7 +867,7 @@ SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	100.0000	ac4ad0eaeff2
 SOURCE/GAME	?Read@playerData@@QAEXH@Z	100.0000	ee05eb7a2db2
 SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	100.0000	a4854b551f9b
 SOURCE/GAME	?RestoreCell@game@@QAEXHHHHPAVmapCell@@H@Z	100.0000	193446d089a6
-SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	100.0000	f2c9a21e2b37
+SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	100.0000	6f8b8a38c92a
 SOURCE/GAME	?Scan@game@@QAEHPACHH@Z	100.0000	9113e6b4951a
 SOURCE/GAME	?SetMapSize@game@@QAEXHH@Z	100.0000	dd41606717c9
 SOURCE/GAME	?SetRandomHeroArmies@game@@QAEXHH@Z	100.0000	7e4f1bdfdfa3

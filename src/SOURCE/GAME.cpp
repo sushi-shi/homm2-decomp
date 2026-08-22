@@ -1183,17 +1183,17 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(genName, filename);
     }
 
-    if (_strnicmp(genName, "RMT", sizeof("RMT") - 1) == 0) {
+    if (strnicmp(genName, "RMT", sizeof("RMT") - 1) == 0) {
         sprintf(savePath, "%s%s", ".\\DATA\\", genName);
     } else {
         sprintf(savePath, "%s%s", gcGamePath, genName);
-        if (_strnicmp(
+        if (strnicmp(
                 genName,
                 "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5" /* "Автосохранение" */,
                 sizeof("AUTOSAVE") - 1
             )
                 != 0
-            && _strnicmp(
+            && strnicmp(
                    genName,
                    "\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb" /* "Игрок Вышел" */,
                    sizeof("PLYREXIT") - 1
@@ -1481,7 +1481,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    if (loadFromFile || _strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(pathBuf, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(pathBuf, "%s%s", gcGamePath, filename);
@@ -1524,7 +1524,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gpAdvManager->PurgeMapChangeQueue();
     read(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
     read(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
-    if (_strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
+    if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
     read(fd, &m_playerCount, sizeof(m_playerCount));
 

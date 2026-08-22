@@ -86,4 +86,4 @@ i16 AutoInitSVGA(void) {
     return 0;
 }
 
-struct tagPAINTSTRUCT ps;
+DATA(0x00539768) struct tagPAINTSTRUCT ps;

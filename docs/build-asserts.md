@@ -85,8 +85,9 @@ definition provide the missing identity evidence.
 
 ### 8. `assert_relocs --fields` — ordered DATA-owner field offsets
 
-The generated objdiff project uses `functionRelocDiffs=data_value`, so the normal report compares
-referenced data values instead of accepting every relocation with the same type. For every live
+The generated objdiff project uses `functionRelocDiffs=all`, so the normal report compares
+relocation target identity/address and referenced data values instead of accepting every relocation
+with the same type. For every live
 function, this gate resolves delinker `const_<RVA>` aliases into explicitly recovered public `DATA()`
 owner extents and compares order-independent owner-relative offset multisets whenever both sides
 reference that owner equally often. The comparison runs at every fuzzy percentage; mismatches below
@@ -102,12 +103,13 @@ not independently recovered extents. The generated `reviewed_delink_data.tsv` pa
 vostok-delinker. The delinker itself selects the containing region and emits the canonical public
 owner plus COFF implicit addend instead of guessing from the nearest preceding symbol.
 
-The pinned objdiff 3.7.1 reads COFF implicit addends in
+The pinned objdiff 3.7.3 reads COFF implicit addends in
 `objdiff-core/src/arch/x86.rs::relocation_override`. Its report command initializes relocation
-comparison to `None`, then applies the generated project's `functionRelocDiffs=data_value` override.
-On the captured `DDInitGraphics` regression, masked behavior is `100.0%` while `data_value` is
-`99.947914%`. This stricter score is still not a substitute for the gate: equal-valued BSS fields can
-compare alike, and objdiff has no project-specific public-owner extent map.
+comparison to `None`, then applies the generated project's `functionRelocDiffs=all` override. The
+local absolute-addend patch additionally prevents a same-named `DIR32` target from being rescued by
+an accidentally equal section-relative address when its owner-relative addend differs. This strict
+score is still not a substitute for the gate: objdiff has no project-specific public-owner extent
+map, and normalization can make different raw identities comparable by design.
 
 ### 9. `assert_fixed_width_ints` — explicit game integer widths
 
@@ -144,7 +146,8 @@ it is a floating-point type.
   See `docs/coff-data-relocations.md`.
 - **`homm2 relocs`** (`assert_relocs.py`) — **opt-in broad reloc-target audit.** The hard
   owner-field subset above is always run; this wider order-independent review remains opt-in.
-  Objdiff's `data_value` score compares referenced data where representable, but does not prove every
+  Objdiff's `all` score compares target identity/address and referenced data where representable, but
+  does not prove every
   resolved target or owner-relative addend: equal-valued fields and unresolved extern/local aliases
   can still hide or manufacture differences. This audit resolves every near-exact fn's reloc
   targets (from `symbol_names.csv` + definition `DATA()` VAs — REL32→symbol RVA, DIR32→symbol+addend,
