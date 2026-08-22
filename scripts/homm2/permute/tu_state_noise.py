@@ -61,6 +61,7 @@ from homm2.build.canonicalize_data_symbols import (
 from homm2.build.canonicalize_relocs import (
     canonicalize_unit,
     function_inventory,
+    load_import_iat_symbols,
     load_retail_symbols,
 )
 from homm2.analysis.disasm import _branch_kind, _cfg
@@ -1306,6 +1307,7 @@ def load_pairing_context(root: Path, unit: str) -> dict:
         "symbols": symbols,
         "data": data,
         "duplicates": duplicates,
+        "import_iat": load_import_iat_symbols(root / "build/orig/HMM2PL.exe"),
         "compgen": load_compgen_claims(
             root / "build/gen/compiler_generated_functions.csv", unit
         ),
@@ -1336,6 +1338,7 @@ def normalize_comparison_pair(
         pairing["symbols"],
         pairing["data"],
         pairing["duplicates"],
+        pairing.get("import_iat", {}),
         candidate_raw,
         paired_retail,
     )

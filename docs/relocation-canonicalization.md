@@ -34,6 +34,25 @@ is certain; fuzzy percentage is not an acceptance criterion. Exact same-site cod
 provide evidence, but semantic array indexing, TU ownership, serialization layout, or
 other independent evidence can also prove a row below 100%.
 
+The disposable paired-target pass also handles two identities which the linked PE
+proves without a hand-authored alias row. A candidate ``__imp_`` DIR32 spelling is
+retained only when the retail import directory maps that exact decorated name to the
+encoded IAT slot. A candidate REL32 spelling is retained across an identical-COMDAT
+fold only when the candidate object defines both spellings with non-empty,
+byte-identical bodies and retail names the folded partner at that same relocation
+site. These rules recover lost COFF spelling; neither changes linked bytes or treats
+same-address symbols as generally interchangeable.
+
+The Gold 2.1 audit that introduced these rules closed ten previously identity-only
+residuals without changing reconstructed source: ``PlayAudiereMusic``, all six
+``BASE/Midi`` API functions, ``PlayMilesSample``, ``soundManager::CDStartup``, and
+``soundManager::ShutdownSoundBackends``. Each retained result has identical
+instruction bytes and complete ordered relocation identity after pairing. The import
+directory independently identifies Audiere's ``0xea324`` IAT slot as
+``_AdrOpenSampleSource@4``; the candidate object independently proves the local
+``RefPtr<SampleSource>::operator=`` and ``RefPtr<OutputStream>::operator=`` COMDAT
+bodies are identical before the linker selects one address.
+
 `python3 -m homm2.build.gen_reloc_aliases` writes candidate-derived proposals to
 `build/gen/reloc_alias_proposals.tsv` and unresolved groups to
 `build/gen/reloc_alias_diagnostics.json`. Proposals never enter canonical targets

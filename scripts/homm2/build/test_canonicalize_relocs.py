@@ -3,8 +3,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from homm2.build.canonicalize_relocs import (
-    CoffFile, Coverage, authorize_missing_self_rel32, authorize_owner_alias,
-    authorize_rel32_alias, record_site_coverage,
+    CoffFile, Coverage, authorize_import_alias, authorize_missing_self_rel32,
+    authorize_owner_alias, authorize_rel32_alias, record_site_coverage,
 )
 from homm2.build.test_canonicalize_data_symbols import (
     DIR32, TEXT, SectionSpec, make_coff,
@@ -34,6 +34,26 @@ class OwnerAliasAuthorizationTest(unittest.TestCase):
         self.assertIsNone(authorize_owner_alias(
             public, "DIR32", "?notConfig@@3UconfigStruct@@A", 0x30,
             0x128D50))
+
+
+class ImportAliasAuthorizationTest(unittest.TestCase):
+    SYMBOL = "__imp__AdrOpenSampleSource@4"
+
+    def test_exact_iat_slot_authorizes(self):
+        self.assertEqual(authorize_import_alias(
+            {self.SYMBOL: 0xEA324}, "DIR32", self.SYMBOL, 0, 0xEA324),
+            self.SYMBOL)
+
+    def test_wrong_slot_type_addend_or_symbol_cannot_authorize(self):
+        imports = {self.SYMBOL: 0xEA324}
+        self.assertIsNone(authorize_import_alias(
+            imports, "DIR32", self.SYMBOL, 0, 0xEA328))
+        self.assertIsNone(authorize_import_alias(
+            imports, "REL32", self.SYMBOL, 0, 0xEA324))
+        self.assertIsNone(authorize_import_alias(
+            imports, "DIR32", self.SYMBOL, 4, 0xEA324))
+        self.assertIsNone(authorize_import_alias(
+            imports, "DIR32", "__imp__AdrOpenDevice@8", 0, 0xEA324))
 
 
 class Rel32AliasAuthorizationTest(unittest.TestCase):

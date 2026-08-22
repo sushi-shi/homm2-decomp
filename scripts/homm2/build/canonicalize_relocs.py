@@ -10,10 +10,13 @@ correctly treats those spellings as different.
 This pass uses the current candidate only as site-specific proof of an
 equivalent spelling. A relocation is rewritten when:
 
-* both sides name the same function and have a DIR32 relocation at the same
+* both sides name the same function and have a relocation at the same
   function-relative site;
-* the candidate names a source-claimed data symbol; and
-* ``public owner RVA + candidate addend == retail PE target RVA`` exactly.
+* a candidate DIR32 names either a source-claimed data symbol or an imported
+  address-table slot recovered independently from the retail import directory;
+* ``public owner RVA + candidate addend == retail PE target RVA`` exactly; or
+* a candidate REL32 names a COMDAT whose candidate body is byte-identical to
+  the retail-named COMDAT at that same site.
 
 A wrong candidate offset cannot authorize a rewrite and remains visible to
 strict objdiff. Equivalent REL32 aliases are likewise rewritten only at paired
@@ -53,7 +56,8 @@ from pathlib import Path
 from typing import NamedTuple
 
 from homm2.build.assert_relocs import (
-    IMAGE_BASE, _pe_read, load_symbols, parse_obj, resolve,
+    IMAGE_BASE, _pe_read, folded_comdat_symbols, load_symbols, parse_obj,
+    resolve,
 )
 from homm2.build.normalized_freshness import write_stamp
 
@@ -420,6 +424,88 @@ def authorize_owner_alias(public_data, base_type, base_symbol, base_addend,
     return base_symbol
 
 
+def authorize_import_alias(import_iat, base_type, base_symbol, base_addend,
+                           retail_target_rva):
+    """Return a candidate import-pointer spelling for its exact retail IAT slot."""
+    if base_type != "DIR32" or base_addend != 0:
+        return None
+    if import_iat.get(base_symbol) != retail_target_rva:
+        return None
+    return base_symbol
+
+
+def load_import_iat_symbols(path):
+    """Map unambiguous COFF ``__imp_`` names to retail IAT slot RVAs."""
+    payload = Path(path).read_bytes()
+    if len(payload) < 0x40 or payload[:2] != b"MZ":
+        raise ValueError("not a PE image: %s" % path)
+    pe = struct.unpack_from("<I", payload, 0x3C)[0]
+    if pe + 24 > len(payload) or payload[pe:pe + 4] != b"PE\0\0":
+        raise ValueError("invalid PE header: %s" % path)
+    section_count = struct.unpack_from("<H", payload, pe + 6)[0]
+    optional_size = struct.unpack_from("<H", payload, pe + 20)[0]
+    optional = pe + 24
+    if (optional + optional_size > len(payload) or optional_size < 112 or
+            struct.unpack_from("<H", payload, optional)[0] != 0x10B):
+        raise ValueError("expected a PE32 optional header: %s" % path)
+    sections = []
+    first_section = optional + optional_size
+    for index in range(section_count):
+        offset = first_section + index * 40
+        if offset + 40 > len(payload):
+            raise ValueError("truncated PE section table: %s" % path)
+        virtual_size, rva, raw_size, raw = struct.unpack_from(
+            "<IIII", payload, offset + 8)
+        sections.append((rva, max(virtual_size, raw_size), raw_size, raw))
+
+    def raw_offset(rva):
+        for start, span, raw_size, raw in sections:
+            delta = rva - start
+            if 0 <= delta < span and delta < raw_size:
+                return raw + delta
+        return None
+
+    def read_string(rva):
+        offset = raw_offset(rva)
+        if offset is None:
+            raise ValueError("unmapped import string RVA 0x%x in %s" % (rva, path))
+        end = payload.find(b"\0", offset)
+        if end < 0:
+            raise ValueError("unterminated import string in %s" % path)
+        return payload[offset:end].decode("latin-1")
+
+    import_rva = struct.unpack_from("<I", payload, optional + 104)[0]
+    descriptor = raw_offset(import_rva) if import_rva else None
+    candidates = defaultdict(set)
+    while descriptor is not None:
+        if descriptor + 20 > len(payload):
+            raise ValueError("truncated import descriptor in %s" % path)
+        original, _stamp, _chain, name_rva, first = struct.unpack_from(
+            "<IIIII", payload, descriptor)
+        if not (original or first or name_rva):
+            break
+        lookup = raw_offset(original or first)
+        if lookup is None:
+            raise ValueError("unmapped import lookup table in %s" % path)
+        slot = first
+        while True:
+            if lookup + 4 > len(payload):
+                raise ValueError("truncated import lookup table in %s" % path)
+            entry = struct.unpack_from("<I", payload, lookup)[0]
+            if entry == 0:
+                break
+            if not entry & 0x80000000:
+                candidates["__imp_" + read_string(entry + 2)].add(slot)
+            lookup += 4
+            slot += 4
+        descriptor += 20
+    return {
+        name: next(iter(slots))
+        for name, slots in candidates.items()
+        if len(slots) == 1
+    }
+
+
 def authorize_rel32_alias(symbols, data, duplicates, base, target):
     """Return the candidate spelling for one proven same-address call target."""
     base_type, base_symbol, base_addend = base
@@ -490,9 +576,11 @@ def record_site_coverage(coverage, base, target, symbols, data, duplicates):
 
 
 def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
-                      symbols, data, duplicates, base_path, target_path):
-    base_sites = parse_obj(str(base_path), with_sites=True)
-    target_sites = parse_obj(str(target_path), with_sites=True)
+                      symbols, data, duplicates, import_iat, base_path,
+                      target_path):
+    base_sites = parse_obj(str(base_path), with_sites=True, include_imports=True)
+    target_sites = parse_obj(
+        str(target_path), with_sites=True, include_imports=True)
     target = CoffFile(target_path)
     target_functions = target.unique_text_functions()
     patched_functions = set()
@@ -507,6 +595,8 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
         coverage.paired_functions += 1
         function_rva = function_rvas[(unit, name)]
         target_by_site = {reloc[0]: reloc[1:] for reloc in target_sites[name]}
+        folded_symbols = folded_comdat_symbols(
+            str(base_path), symbols, data, base_sites[name], target_sites[name])
         coverage.base_sites += len(base_sites[name])
         for site, base_type, base_symbol, base_addend in base_sites[name]:
             target_reloc = target_by_site.get(site)
@@ -538,8 +628,13 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
                 continue
             target_type, target_symbol, target_addend = target_reloc
             if target_type == "REL32" and base_type == "REL32":
-                alias = authorize_rel32_alias(
-                    symbols, data, duplicates, base, target_reloc)
+                alias = None
+                if (base_addend == target_addend and
+                        folded_symbols.get(base_symbol) == target_symbol):
+                    alias = base_symbol
+                if alias is None:
+                    alias = authorize_rel32_alias(
+                        symbols, data, duplicates, base, target_reloc)
                 if alias is None:
                     continue
                 if not target.patch_rel32(
@@ -559,6 +654,10 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
             owner = authorize_owner_alias(
                 public_data, base_type, base_symbol, base_addend,
                 retail_target_rva)
+            if owner is None:
+                owner = authorize_import_alias(
+                    import_iat, base_type, base_symbol, base_addend,
+                    retail_target_rva)
             if owner is None and EH_LOCAL.match(base_symbol or ""):
                 # Compiler-local EH machinery (.text$x FuncInfo records and
                 # handler funclets): the linked address is unknowable from
@@ -609,7 +708,9 @@ def main(argv=None):
     parser.add_argument("--base")
     parser.add_argument("--target")
     parser.add_argument("--output")
+    parser.add_argument("--retail-exe", default="build/orig/HMM2PL.exe")
     args = parser.parse_args(argv)
+    import_iat = load_import_iat_symbols(args.retail_exe)
     single_paths = (args.base, args.target, args.output)
     if args.unit or any(single_paths):
         if not args.unit or not all(single_paths):
@@ -625,7 +726,7 @@ def main(argv=None):
         names = function_inventory(function_rvas).get(args.unit, set())
         functions, aliases, sites, boundaries, coverage = canonicalize_unit(
             args.unit, names, public_data, function_rvas, function_sizes,
-            symbols, data, duplicates, Path(args.base), output)
+            symbols, data, duplicates, import_iat, Path(args.base), output)
         write_stamp(output, {
             "target": Path(args.target),
             "base": Path(args.base),
@@ -673,7 +774,7 @@ def main(argv=None):
             continue
         functions, aliases, sites, boundaries, unit_coverage = canonicalize_unit(
             unit, names, public_data, function_rvas, function_sizes, symbols,
-            data, duplicates, base_path, target_path)
+            data, duplicates, import_iat, base_path, target_path)
         coverage.merge(unit_coverage)
         boundary_count += boundaries
         if sites:

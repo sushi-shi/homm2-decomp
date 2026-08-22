@@ -1545,7 +1545,10 @@ def review(rva):
     target_obj = "build/objdiff/normalized/target/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
-    for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
+    candidate_bodies = _function_bytes(base_obj)
+    for s in sorted({
+            r[1] for r in B
+            if is_fake(sym, data, r[1]) and not candidate_bodies.get(r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
         c, sy = Counter(), {}
