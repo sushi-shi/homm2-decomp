@@ -17,9 +17,11 @@ code-site audit for all 1,499 unique configured functions. Its exhaustive pass
 reads every retail DIR32 operand from the shipping PE and compares the resulting
 `.rdata`/`.data` identity multiset with candidate identities, independent of code
 site or instruction order. Candidate compiler-local names resolve only through
-reviewed COFF coordinates, and the candidate PE independently confirms that each
-operand reaches one of the audited sections. Thus an equal anonymous payload at
-another retail address cannot satisfy the check.
+reviewed COFF coordinates. Compiler strings normally acquire those coordinates from
+the exact relocation/addend oracle; unique relocation-target content is the fail-closed
+fallback, and ambiguous content requires an explicit source pin. The candidate PE
+independently confirms that each operand reaches one of the audited sections. Thus an
+equal anonymous payload at another retail address cannot satisfy the check.
 
 A second, ordered pass compares final section offsets only where a small
 relocation-masked code window agrees. Ordered identity diagnostics are further

@@ -14,6 +14,13 @@ points at the normalized
 copies. Compilation, linking, disassembly, and hard gates continue to use the
 original objects in `build/objdiff/base/` and `build/delink/`.
 
+Source-free compiler-string manifest rows do not turn a `$SG<number>` counter into a
+semantic name. The manifest uses candidate COFF coordinates and reviewed retail
+relocation/content evidence only to make Vostok emit the corresponding physical target
+definition. Candidate and target copies then independently derive the same
+`$anon_str_<hash>_<occurrence>` identity from payload and executable-reference order.
+Only explicit `source-DATA_COMPGEN` provenance invokes the semantic rename pass.
+
 ## Paired relocation identities
 
 The synthetic delink target can spell a relocation as the nearest known public

@@ -360,7 +360,7 @@ def _public_symbol_kinds(path):
 
 def provenance_census(units, base_root, source_root, source_manifest_path,
                       base_suffix=".obj"):
-    """Audit source DATA and DATA_COMPGEN claims against candidate identities."""
+    """Audit source claims and automatic strings against candidate identities."""
     definitions = source_definitions(source_root) if source_root is not None else []
     definitions_by_rva = {}
     definitions_by_unit_rva = {}
@@ -370,11 +370,16 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
 
     source_identities = {}
     compgen_rows = []
+    automatic_rows = []
+    automatic_identities = {}
     unmatched_source_manifest = []
     for row in _source_manifest_rows(source_manifest_path):
         provenance = row.get("provenance", "")
         if provenance.startswith("source-DATA_COMPGEN:"):
             compgen_rows.append(row)
+        elif provenance.startswith("candidate-COFF-string:"):
+            automatic_rows.append(row)
+            automatic_identities[(row["unit"], row["name"])] = row
         elif provenance.startswith("source-DATA:"):
             matches = definitions_by_unit_rva.get((row["unit"], row["rva"]), [])
             if len(matches) != 1:
@@ -390,6 +395,7 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
         if not path.is_file():
             continue
         covered = Counter()
+        automatic = Counter()
         private = Counter()
         storage_by_name = {}
         try:
@@ -404,6 +410,9 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
                 covered[(symbol.name, definition.name)] += 1
                 candidate_source_identities_seen.add((unit, symbol.name))
                 candidate_class[(unit, symbol.name)] = "source-data"
+            elif (unit, symbol.name) in automatic_identities:
+                automatic[symbol.name] += 1
+                candidate_class[(unit, symbol.name)] = "automatic-string"
             else:
                 private[symbol.name] += 1
                 candidate_class[(unit, symbol.name)] = "unmodeled-private"
@@ -415,6 +424,7 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
                 {"symbol": symbol, "source_name": source_name, "count": count}
                 for (symbol, source_name), count in sorted(covered.items())
             ],
+            "candidate_automatic_strings": _name_rows(automatic),
             "candidate_private": _name_rows(private),
             "candidate_storage": storage_by_name,
         }
@@ -448,6 +458,10 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
             item["count"] for row in object_rows.values()
             for item in row["candidate_private"]),
         "source_compgen_rows": len(compgen_rows),
+        "automatic_string_rows": len(automatic_rows),
+        "candidate_automatic_strings": sum(
+            item["count"] for row in object_rows.values()
+            for item in row["candidate_automatic_strings"]),
         "duplicate_source_rvas": len(source_duplicate_rvas),
     }
     return {
@@ -888,9 +902,10 @@ def _print_summary(payload, output):
     provenance = summary.get("provenance")
     if provenance is not None:
         print(
-            "provenance DATA/DATA_COMPGEN/private: %d/%d/%d" % (
+            "provenance DATA/DATA_COMPGEN/auto/private: %d/%d/%d/%d" % (
                 provenance["candidate_data_covered"],
                 provenance["source_compgen_rows"],
+                provenance["candidate_automatic_strings"],
                 provenance["candidate_private"]))
 
 

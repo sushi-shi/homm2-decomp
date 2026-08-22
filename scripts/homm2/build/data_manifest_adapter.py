@@ -1,10 +1,9 @@
-"""Bind source data claims to candidate COFF topology.
+"""Bind reviewed data identities to candidate COFF topology.
 
-``DATA()``, ``DATA_COMPGEN()``, ``VTBL()``, and ``VTBL2()`` are the address
-authorities for reconstructed storage; candidate objects provide the physical
-COFF topology, and this module resolves each claim to its candidate definition.
-The data campaign will assemble delinker manifests from these bindings; until
-then `reviewed_data` writes the header-only stub the normalize edges read. No
+``DATA()``, exceptional ``DATA_COMPGEN()``, ``VTBL()``, and ``VTBL2()`` claims
+provide source-owned identities. Compiler string literals normally need no
+annotation: reviewed retail relocation sites and candidate COFF payload/topology
+provide a source-free identity oracle, with ambiguous payloads withheld. No
 hand-maintained private-data supplement participates in the build.
 """
 
@@ -73,6 +72,7 @@ VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
+AUTO_STRING_DIRECT_PROOFS = frozenset(("aligned-relocation-addend",))
 
 
 @dataclass(frozen=True)
@@ -466,7 +466,8 @@ def _bind_compgen_edges(edges, claim_order, candidate_order):
 
 def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
                                 exe: Path, reserved=(), strict=False,
-                                symbols: Path = SYMBOLS, units: Path = UNITS):
+                                symbols: Path = SYMBOLS, units: Path = UNITS,
+                                placement_evidence=None):
     """Bind semantic source claims to anonymous candidate COFF allocations.
 
     Retail RVA/type/size comes from the source claim. Candidate section bytes and
@@ -485,14 +486,17 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
     claims_by_unit = defaultdict(list)
     for claim in claims:
         claims_by_unit[claim.unit].append(claim)
-    derived, _stats, derivation_diagnostics = derive_allocations(
-        base_dir=base_root, exe=exe, symbols_path=symbols,
-        units_path=units, reviewed_rows=())
-    derived_by_rva = defaultdict(list)
-    for allocation in [
+    if placement_evidence is None:
+        derived, _stats, derivation_diagnostics = derive_allocations(
+            base_dir=base_root, exe=exe, symbols_path=symbols,
+            units_path=units, reviewed_rows=())
+        placement_evidence = [
             *derived,
             *(allocation for diagnostic in derivation_diagnostics
-              for allocation in diagnostic.proposed_allocations)]:
+              for allocation in diagnostic.proposed_allocations),
+        ]
+    derived_by_rva = defaultdict(list)
+    for allocation in placement_evidence:
         derived_by_rva[(allocation.unit, allocation.rva)].append(allocation.name)
 
     for unit, unit_claims in sorted(claims_by_unit.items()):
@@ -607,10 +611,189 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
     return resolved, diagnostics
 
 
+def _candidate_location(candidate: CandidateDefinition):
+    return (
+        candidate.unit,
+        candidate.section_ordinal,
+        candidate.section_value,
+    )
+
+
+def _string_payload(coff: CoffFile, candidate: CandidateDefinition):
+    """Return the logical NUL-terminated payload, excluding physical padding."""
+    raw = _candidate_bytes(coff, candidate, candidate.size)
+    terminator = raw.find(b"\0")
+    if terminator < 0 or any(raw[terminator + 1:]):
+        return None
+    return raw[:terminator + 1]
+
+
+def _string_storage_compatible(candidate_storage, retail_storage, payload):
+    if candidate_storage == retail_storage:
+        return True
+    # The PE merges input .data and .bss. A zero-filled candidate contribution
+    # can lie inside the output section's initialized raw span when later input
+    # contributions force the linker to materialize those bytes.
+    return (candidate_storage == "bss" and retail_storage == "data"
+            and not any(payload))
+
+
+def _retail_relocation_strings(exe: Path, payload_limit: int):
+    """Index reviewed relocation targets by complete C-string payload."""
+    if payload_limit <= 0:
+        return {}, {}, None, None
+    pe = read_pe(exe)
+    image_base, highlow, read_u32, read_bytes = _pe_layout(exe)
+    by_payload = defaultdict(set)
+    storage_by_rva = {}
+    for site in highlow:
+        rva = (read_u32(site) - image_base) & 0xFFFFFFFF
+        classification = classify_pe_storage(pe, rva)
+        retail_storage = {
+            "rdata": "rdata",
+            "data-initialized": "data",
+            "data-loader-zero-tail": "bss",
+        }.get(classification["class"])
+        if retail_storage is None:
+            continue
+        section = pe["sections"][classification["section"]]
+        section_end = section["rva"] + max(
+            section["virtual_size"], section["raw_size"])
+        size = min(payload_limit, section_end - rva)
+        if size <= 0:
+            continue
+        payload = read_bytes(rva, size)
+        terminator = payload.find(b"\0")
+        if terminator < 0:
+            continue
+        payload = payload[:terminator + 1]
+        by_payload[payload].add(rva)
+        storage_by_rva[rva] = retail_storage
+    return by_payload, storage_by_rva, pe, read_bytes
+
+
+def automatic_string_rows(topology_by_unit, base_root: Path, exe: Path,
+                          placement_evidence, reserved=()):
+    """Enroll compiler strings proved without a source annotation.
+
+    An exact candidate/retail relocation-site addend proof owns one allocation
+    even when the same bytes occur at several retail RVAs. Otherwise the
+    Gruntz-style content oracle accepts only a one-candidate/one-retail-target
+    payload in the owning unit. Every other collision remains unmodeled for an
+    exceptional ``DATA_COMPGEN`` claim to resolve explicitly.
+    """
+    reserved_locations = {_candidate_location(row) for row in reserved}
+    coff_by_unit = {}
+    candidates = []
+    payload_by_location = {}
+    payload_peers = defaultdict(list)
+    by_stream_location = {}
+    for unit, (definitions, _sections) in sorted(topology_by_unit.items()):
+        string_candidates = [
+            row for row in definitions
+            if _compgen_candidate_kind(row) == "STRING_LITERAL"
+        ]
+        if not string_candidates:
+            continue
+        coff = coff_by_unit.setdefault(
+            unit, CoffFile(Path(base_root) / f"{unit}.obj"))
+        for candidate in string_candidates:
+            payload = _string_payload(coff, candidate)
+            if payload is None:
+                continue
+            location = _candidate_location(candidate)
+            payload_by_location[location] = payload
+            payload_peers[(unit, payload)].append(candidate)
+            stream_key = (
+                unit, candidate.symbol, candidate.storage,
+                candidate.stream_offset,
+            )
+            if stream_key in by_stream_location:
+                raise ValueError(
+                    f"duplicate compiler-string candidate position {stream_key}")
+            by_stream_location[stream_key] = candidate
+            if location not in reserved_locations:
+                candidates.append(candidate)
+
+    by_direct_candidate = defaultdict(list)
+    for allocation in placement_evidence:
+        if allocation.provenance not in AUTO_STRING_DIRECT_PROOFS:
+            continue
+        candidate = by_stream_location.get((
+            allocation.unit, allocation.name, allocation.storage,
+            allocation.section_offset,
+        ))
+        if candidate is not None:
+            by_direct_candidate[_candidate_location(candidate)].append(allocation)
+
+    payload_limit = max(
+        (len(payload_by_location[_candidate_location(row)])
+         for row in candidates), default=0)
+    retail_by_payload, retail_storage, pe, read_bytes = \
+        _retail_relocation_strings(Path(exe), payload_limit)
+
+    bindings = []
+    for candidate in sorted(candidates, key=lambda row: (
+            row.unit, row.storage, row.stream_offset, row.symbol)):
+        location = _candidate_location(candidate)
+        payload = payload_by_location[location]
+        direct = by_direct_candidate.get(location, ())
+        direct_rvas = {row.rva for row in direct}
+        if len(direct_rvas) > 1:
+            raise ValueError(
+                f"compiler string {candidate.unit}:{candidate.symbol} has "
+                f"conflicting direct placements: "
+                + ", ".join(f"0x{rva:x}" for rva in sorted(direct_rvas)))
+        if direct_rvas:
+            rva = next(iter(direct_rvas))
+            storage = _retail_storage_name(pe, rva)
+            if (not _string_storage_compatible(
+                    candidate.storage, storage, payload)
+                    or read_bytes(rva, len(payload)) != payload):
+                raise ValueError(
+                    f"compiler string {candidate.unit}:{candidate.symbol} "
+                    f"direct placement at 0x{rva:x} contradicts payload/storage")
+            bindings.append((candidate, rva, len(payload), direct[0].provenance))
+            continue
+
+        # Content alone cannot choose among repeated local allocations or
+        # repeated retail payloads. External COMDAT copies in different units
+        # remain independent one-candidate groups and may fold to one RVA.
+        if len(payload_peers[(candidate.unit, payload)]) != 1:
+            continue
+        content_rvas = {
+            rva for rva in retail_by_payload.get(payload, ())
+            if _string_storage_compatible(
+                candidate.storage, retail_storage[rva], payload)
+        }
+        if len(content_rvas) != 1:
+            continue
+        bindings.append((
+            candidate, next(iter(content_rvas)), len(payload),
+            "unique-relocation-target-payload",
+        ))
+
+    rows = []
+    for candidate, rva, size, proof in bindings:
+        rows.append({
+            "name": candidate.symbol,
+            "object": candidate.unit.replace("/", "\\") + ".c",
+            "rva": f"0x{rva:x}",
+            "size": f"0x{size:x}",
+            "storage": candidate.storage,
+            "alignment": f"0x{candidate.alignment:x}",
+            "section_ordinal": str(candidate.section_ordinal),
+            "section_offset": f"0x{candidate.section_value:x}",
+            "scope": "external" if candidate.storage_class == 2 else "local",
+            "provenance": f"candidate-COFF-string:{proof}",
+        })
+    return rows
+
+
 def source_manifest_rows(source_root: Path = SOURCE_ROOT,
                          base_root: Path = BASE_ROOT,
                          exe: Path = EXE, strict=False):
-    """Assemble source DATA/DATA_COMPGEN/vtable claims over candidate COFF."""
+    """Assemble source claims and automatic strings over candidate COFF."""
     source_root = Path(source_root)
     base_root = Path(base_root)
     repo = source_root.parent
@@ -637,15 +820,28 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
     public_by_rva, _public_by_symbol, _global_rvas = _load_public_data()
     ordinary = resolve_source_definitions(
         definitions, topology, public_by_rva)
+    derived, _stats, derivation_diagnostics = derive_allocations(
+        base_dir=base_root, exe=exe, symbols_path=SYMBOLS,
+        units_path=UNITS, reviewed_rows=())
+    placement_evidence = [
+        *derived,
+        *(allocation for diagnostic in derivation_diagnostics
+          for allocation in diagnostic.proposed_allocations),
+    ]
     compiler_generated, diagnostics = resolve_compgen_definitions(
-        compgen, topology, base_root, Path(exe), strict=strict)
+        compgen, topology, base_root, Path(exe), strict=strict,
+        placement_evidence=placement_evidence)
     table_rows = resolve_vtable_definitions(
         vtables, topology, public_by_rva)
     compiler_rows = _folded_compgen_rows(compiler_generated, topology)
+    automatic_rows = automatic_string_rows(
+        topology, base_root, Path(exe), placement_evidence,
+        reserved=(candidate for _claim, candidate in compiler_generated))
     rows = [
         *(_symbol_row(source, candidate, None)
           for source, candidate in ordinary),
         *compiler_rows,
+        *automatic_rows,
         *(_vtable_row(source, candidate)
           for source, candidate in table_rows),
     ]
@@ -655,9 +851,9 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
 
 
 def render_source_manifest(rows):
-    """Serialize semantic source identities used by comparison tooling."""
+    """Serialize reviewed identities used by comparison tooling."""
     lines = [
-        "# Source DATA, DATA_COMPGEN, VTBL, and VTBL2 identities bound to "
+        "# Source claims and source-free compiler strings bound to reviewed "
         "candidate COFF topology.",
         "\t".join(SYMBOL_HEADER),
     ]
@@ -675,7 +871,8 @@ def delinker_manifest_bytes(rows):
     physical COFF allocation that Vostok must emit.
     """
     lines = [
-        "# Physical placements projected from the reviewed source data model.",
+        "# Physical placements projected from reviewed source and relocation "
+        "evidence.",
         "\t".join(DELINK_HEADER),
     ]
     for row in rows:

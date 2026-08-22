@@ -79,12 +79,13 @@ and unresolved/fallback names are unconditional errors even if a mapping mention
 
 `--homm2-root .` reads the shared `DATA`, `DATA_COMPGEN`, `VTBL`, and `VTBL2`
 inventories used by the data-manifest adapter and cross-checks them against
-`build/gen/delink_data_from_source.tsv`. The generated
-`build/gen/delink_data_manifest.tsv` must contain exactly the same source-derived
-definitions projected into Vostok's schema, with section coordinates unassigned because
-the pinned delinker cannot emit candidate COMDAT topology.
-Missing rows, extra rows, duplicate identities/RVAs, overlaps, malformed schemas, and
-source-inventory drift are hard provenance diagnostics.
+`build/gen/delink_data_from_source.tsv`. That manifest additionally contains
+source-free compiler strings admitted by exact relocation/addend proof or the fail-closed
+unique relocation-target payload oracle. The generated
+`build/gen/delink_data_manifest.tsv` must contain exactly the same reviewed definitions
+projected into Vostok's schema. Missing rows, extra rows, duplicate identities/RVAs,
+overlaps, malformed schemas, source-inventory drift, and unrecognized automatic
+provenance are hard diagnostics.
 
 Anchors are indexed by translation unit. A relocation resolves against its current unit
 first, which preserves private identities and repeated compiler names. Cross-unit lookup

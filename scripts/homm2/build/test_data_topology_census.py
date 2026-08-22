@@ -285,11 +285,12 @@ class DataTopologyCensusTest(unittest.TestCase):
     def test_separates_source_data_and_compgen_provenance(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
-            sections = [(".data", 16, DATA_FLAGS)]
+            sections = [(".data", 20, DATA_FLAGS)]
             symbols = [
                 ("?global@@3HA", 0, 1, 0, 2),
                 ("?local@?1???func@@YIXXZ@4HA", 4, 1, 0, 3),
                 ("compiler_private", 8, 1, 0, 3),
+                ("$SG1", 12, 1, 0, 3),
             ]
             _coff(root / "base/A.obj", sections, symbols)
             _coff(root / "target/A.c.obj", sections, symbols)
@@ -310,7 +311,9 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "?local@?1???func@@YIXXZ@4HA\tA.c\t0x104\t0x4\tdata\t0x4\t"
                 "1\t0x4\tlocal\tsource-DATA:A.cpp:4\n"
                 "__h2cg$A$data$compilerPrivate\tA.c\t0x108\t0x4\tdata\t0x4\t"
-                "1\t0x8\tlocal\tsource-DATA_COMPGEN:A.cpp:5\n")
+                "1\t0x8\tlocal\tsource-DATA_COMPGEN:A.cpp:5\n"
+                "$SG1\tA.c\t0x10c\t0x1\tdata\t0x4\t1\t0xc\tlocal\t"
+                "candidate-COFF-string:aligned-relocation-addend\n")
 
             payload = build_census(
                 ["A"], root / "base", root / "target",
@@ -322,6 +325,9 @@ class DataTopologyCensusTest(unittest.TestCase):
             self.assertEqual(provenance["summary"]["candidate_data_covered"], 2)
             self.assertEqual(provenance["summary"]["candidate_private"], 1)
             self.assertEqual(provenance["summary"]["source_compgen_rows"], 1)
+            self.assertEqual(provenance["summary"]["automatic_string_rows"], 1)
+            self.assertEqual(
+                provenance["summary"]["candidate_automatic_strings"], 1)
 
     def test_exact_and_missing_objects_are_counted_separately(self):
         with TemporaryDirectory() as directory:

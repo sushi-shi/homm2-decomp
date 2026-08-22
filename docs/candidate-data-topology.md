@@ -26,20 +26,23 @@ leaves it non-affine; individual cells are never guessed. These cells are
 compiler/linker topology rather than source value expressions, so they are not
 given artificial `DATA_COMPGEN` occurrences.
 
-Candidate discovery is not a canonical naming source. Counter spellings such as
-`$SG39045`, `$T40070`, and `name$S123`, and value-derived floating-literal spellings
-such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities.
-The generated Vostok manifests come only from source annotations and candidate
-COFF topology:
+Candidate discovery by itself is not a canonical naming source. Counter spellings such
+as `$SG39045`, `$T40070`, and `name$S123`, and value-derived floating-literal spellings
+such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities. A compiler string
+is nevertheless enrollable without a source annotation when independent retail
+relocation evidence proves its placement. The generated Vostok manifests combine those
+automatic string rows with source annotations and candidate COFF topology:
 
 - `DATA(rva)` marks an ordinary named definition, including a block-scope static.
   Clang supplies its declaration name, type, and logical `sizeof`; the candidate
   binder resolves VC6's compiler-specific local-scope decoration from COFF.
 - `VTBL(Class, rva)` and `VTBL2(Derived, Base, rva)` mark primary and secondary
   vtables; the tooling derives the MSVC decorated identity.
-- `DATA_COMPGEN(rva, semanticName, value)` marks an anonymous compiler-generated
-  allocation. The annotation owns the retail RVA, semantic identity, value expression,
-  and inferred logical size. Candidate COFF supplies physical topology and scope.
+- `DATA_COMPGEN(rva, semanticName, value)` is the exceptional pin for an anonymous
+  compiler-generated allocation which the automatic oracle cannot identify, or whose
+  non-string type/semantic role must be recorded. The annotation owns the retail RVA,
+  semantic identity, value expression, and inferred logical size. Candidate COFF supplies
+  physical topology and scope.
 - `DATA_COMPGEN_GUARD(rva, semanticName, owner)` marks a compiler-emitted initialization
   guard whose value is implicit.
 
@@ -50,13 +53,25 @@ logical extent fits its physical allocation (which may include alignment padding
 This changes only the comparison symbol table: candidate payload, relocations, linked
 objects, and canonical layout inputs remain untouched.
 
-`DATA_COMPGEN` is intentionally explicit. A source string occurrence alone has no final
-RVA and identical literals may be pooled or repeated, so automatic string inference does
-not establish retail identity. The semantic name describes the allocation's role in its
-TU; it must not copy an unstable COFF counter. The generated Vostok spelling is
-`__h2cg$<unit>$data$<semanticName>`. One semantic identity is allowed per TU and one
-compiler-generated identity per RVA. Repeated expansions of one source macro definition
-coalesce; different names at one RVA are rejected.
+Bare string literals are the default. The automatic oracle first accepts an allocation
+when equal candidate/retail function-relative DIR32 sites and the candidate relocation
+addend resolve it to one retail RVA, and the complete candidate payload/storage agrees
+there. This site proof disambiguates repeated text at distinct retail addresses. As a
+fallback, the oracle content-matches complete NUL-terminated candidate payloads only
+against reviewed retail relocation targets. It accepts that path only when the owning TU
+has one candidate allocation for the payload and the payload occurs at one compatible
+retail RVA. Repeated candidate allocations, repeated retail addresses, payload/storage
+disagreement, and unterminated or non-padding tails are withheld rather than paired by
+order. External string COMDAT copies remain independent per-object emitters and may fold
+onto the one proven retail RVA.
+
+`DATA_COMPGEN` resolves a withheld or non-string case explicitly. Its semantic name
+describes the allocation's role in its TU; it must not copy an unstable COFF counter. The
+generated Vostok spelling is `__h2cg$<unit>$data$<semanticName>`. One semantic identity is
+allowed per TU and one compiler-generated identity per RVA. Repeated expansions of one
+source macro definition coalesce; different names at one RVA are rejected. An explicit
+binding reserves its candidate coordinate, so the automatic oracle cannot publish a
+second identity for the same allocation.
 
 For example:
 
@@ -80,11 +95,11 @@ only for context-dependent expressions and caches per-TU results using the sourc
 headers, compile database, and both parser implementations. Candidate objects are
 bound after parsing and are therefore not part of this source-claim cache.
 
-The binder first validates the source-inferred payload and logical extent against retail
-bytes. It then uses candidate anonymous-symbol class, storage, section replay, public
-anchors, and placement evidence already derived from retail/candidate relocation analysis
-to find one candidate definition. Exact decorated string extents take priority. If
-multiple remaining objects are physically indistinguishable, candidate stream order is
+The explicit binder first validates the source-inferred payload and logical extent against
+retail bytes. It then uses candidate anonymous-symbol class, storage, section replay,
+public anchors, and placement evidence already derived from retail/candidate relocation
+analysis to find one candidate definition. Exact decorated string extents take priority.
+If multiple remaining objects are physically indistinguishable, candidate stream order is
 paired with retail RVA order.
 The output keeps the source semantic name and retail RVA while taking section ordinal,
 section offset, alignment, storage, and local/external scope from that candidate.
@@ -112,8 +127,9 @@ iterative work can continue. Strict assembly fails. It never guesses an identity
 
 `homm2 data-topology assemble` writes both
 `build/gen/delink_data_from_source.tsv` and
-`build/gen/delink_data_manifest.tsv`. The former retains semantic names and source
-provenance for comparison tooling; the latter is its Vostok eight-column projection.
+`build/gen/delink_data_manifest.tsv`. The former retains semantic source names plus
+source-free string provenance for comparison tooling; the latter is its Vostok
+eight-column projection.
 `build/gen/delink_common_symbols.tsv` separately carries externally linked COFF
 COMMON definitions. COMMON has no section bytes or retail RVA; candidate COFF supplies
 its per-object identity and allocation size, while Vostok preserves that symbol state
@@ -140,7 +156,8 @@ The command roles are:
 - `audit` refreshes candidate objects, generated source manifests, diagnostics, and
   coverage without replacing the delinked target. `--strict` requires closure.
 - `census` compares candidate and target COFF symbol/section topology as multisets and
-  reports source `DATA` and generated `DATA_COMPGEN` provenance separately.
+  reports source `DATA`, explicit `DATA_COMPGEN`, and automatic compiler-string
+  provenance separately.
 - `propose` writes a diagnostic-only review queue. Nothing reads it as canonical input.
 - `promote` refreshes generated evidence from source annotations only.
 - `finalize` requires all symbol, section, contribution, and coverage diagnostics to be

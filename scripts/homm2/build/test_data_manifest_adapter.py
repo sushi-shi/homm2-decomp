@@ -2,6 +2,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 from unittest import mock
 
 from homm2.build.data_manifest_adapter import (
@@ -23,6 +24,7 @@ from homm2.build.data_manifest_adapter import (
     _mark_vtable_aliases,
     _symbol_row,
     _vtable_row,
+    automatic_string_rows,
 )
 from homm2.build.annotated_compgen_data import CompgenDataClaim
 from homm2.build.annotated_vtables import AnnotatedVtable
@@ -52,6 +54,91 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_automatic_strings_use_direct_proof_then_unique_content(self):
+        direct = replace(candidate("A", "$SG1", value=0), size=8)
+        collision = replace(candidate("A", "$SG2", value=8), size=8)
+        unique = replace(candidate("A", "$SG3", value=16), size=8)
+        topology = {"A": ([direct, collision, unique], [])}
+        payloads = {
+            "$SG1": b"same\0\0\0\0",
+            "$SG2": b"same\0\0\0\0",
+            "$SG3": b"unique\0\0",
+        }
+        retail = {
+            0x100: b"same\0\0\0\0",
+            0x200: b"same\0\0\0\0",
+            0x300: b"unique\0\0",
+        }
+
+        def read_bytes(rva, size):
+            return retail[rva][:size]
+
+        pe = {
+            "sections": {
+                ".data": {
+                    "rva": 0x100, "virtual_size": 0x300,
+                    "raw_size": 0x300,
+                },
+            },
+        }
+        placement = [SimpleNamespace(
+            unit="A", name="$SG1", storage="data", section_offset=0,
+            rva=0x100, provenance="aligned-relocation-addend",
+        )]
+        with mock.patch(
+                "homm2.build.data_manifest_adapter.CoffFile"), mock.patch(
+                "homm2.build.data_manifest_adapter._candidate_bytes",
+                side_effect=lambda _coff, row, size: payloads[row.symbol][:size]), \
+                mock.patch(
+                    "homm2.build.data_manifest_adapter.read_pe",
+                    return_value=pe), mock.patch(
+                    "homm2.build.data_manifest_adapter._pe_layout",
+                    return_value=(
+                        0x400000, (0x10, 0x14, 0x18),
+                        lambda site: 0x400000 + {
+                            0x10: 0x100, 0x14: 0x200, 0x18: 0x300,
+                        }[site],
+                        read_bytes,
+                    )):
+            rows = automatic_string_rows(
+                topology, Path("base"), Path("game.exe"), placement)
+
+        self.assertEqual([(row["name"], row["rva"], row["provenance"])
+                          for row in rows], [
+            ("$SG1", "0x100",
+             "candidate-COFF-string:aligned-relocation-addend"),
+            ("$SG3", "0x300",
+             "candidate-COFF-string:unique-relocation-target-payload"),
+        ])
+
+    def test_automatic_string_reservation_keeps_collision_ambiguous(self):
+        claimed = replace(candidate("A", "$SG1", value=0), size=8)
+        peer = replace(candidate("A", "$SG2", value=8), size=8)
+        topology = {"A": ([claimed, peer], [])}
+        pe = {
+            "sections": {
+                ".data": {
+                    "rva": 0x100, "virtual_size": 0x100,
+                    "raw_size": 0x100,
+                },
+            },
+        }
+        with mock.patch(
+                "homm2.build.data_manifest_adapter.CoffFile"), mock.patch(
+                "homm2.build.data_manifest_adapter._candidate_bytes",
+                return_value=b"same\0\0\0\0"), mock.patch(
+                    "homm2.build.data_manifest_adapter.read_pe",
+                    return_value=pe), mock.patch(
+                    "homm2.build.data_manifest_adapter._pe_layout",
+                    return_value=(
+                        0x400000, (0x10,), lambda _site: 0x400100,
+                        lambda _rva, size: b"same\0\0\0\0"[:size],
+                    )):
+            rows = automatic_string_rows(
+                topology, Path("base"), Path("game.exe"), (),
+                reserved=(claimed,))
+        self.assertEqual(rows, [])
+
     def test_crt_pointer_sequence_requires_one_complete_reviewed_span(self):
         values = (0x401000, 0x402000)
         reviewed = {

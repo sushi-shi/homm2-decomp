@@ -685,7 +685,8 @@ def load_homm2_provenance(root: Path) -> dict:
     unknown_source_rows = [
         row for row in source_rows if not row["provenance"].startswith(
             ("source-DATA:", "source-DATA_COMPGEN:",
-             "source-VTBL:", "source-VTBL2:"))
+             "source-VTBL:", "source-VTBL2:",
+             "candidate-COFF-string:"))
     ]
     if unknown_source_rows:
         diagnostics.append({
@@ -725,6 +726,9 @@ def load_homm2_provenance(root: Path) -> dict:
         "anchors_by_unit": anchors_by_unit,
         "unique_external_anchors": unique_external_anchors,
         "source_DATA_count": len(definitions),
+        "automatic_string_count": sum(
+            row["provenance"].startswith("candidate-COFF-string:")
+            for row in source_rows),
         "source_manifest_count": len(source_rows),
         "merged_count": len(merged_rows),
         "diagnostics": diagnostics,

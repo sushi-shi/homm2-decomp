@@ -260,11 +260,14 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             manifest_row("??_C@shared", "SOURCE/B", 0x1500,
                          provenance="source-DATA_COMPGEN:src/SOURCE/B.cpp:15"),
         ]
+        automatic = manifest_row(
+            "$SG123", "SOURCE/A", 0x1600, scope="local",
+            provenance="candidate-COFF-string:aligned-relocation-addend")
         write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
-                       [source, *compgen])
+                       [source, *compgen, automatic])
         write_delinker_manifest(
             self.root / "build/gen/delink_data_manifest.tsv",
-            [*compgen, source])
+            [*compgen, automatic, source])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,
@@ -276,8 +279,9 @@ class CoffRelocationTopologyTests(unittest.TestCase):
 
         self.assertEqual([], provenance["diagnostics"])
         self.assertEqual(1, provenance["source_DATA_count"])
-        self.assertEqual(6, provenance["source_manifest_count"])
-        self.assertEqual(6, provenance["merged_count"])
+        self.assertEqual(1, provenance["automatic_string_count"])
+        self.assertEqual(7, provenance["source_manifest_count"])
+        self.assertEqual(7, provenance["merged_count"])
         self.assertEqual(0x1100, topology._anchor_for(
             provenance, "SOURCE/A", "private$S1")["rva"])
         self.assertEqual(0x1200, topology._anchor_for(
@@ -288,6 +292,8 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             provenance, "SOURCE/C", "?gUnique@@3HA")["rva"])
         self.assertEqual(0x1400, topology._anchor_for(
             provenance, "SOURCE/A", "??_C@shared")["rva"])
+        self.assertEqual(0x1600, topology._anchor_for(
+            provenance, "SOURCE/A", "$SG123")["rva"])
         self.assertIsNone(topology._anchor_for(
             provenance, "SOURCE/C", "??_C@shared"))
 
