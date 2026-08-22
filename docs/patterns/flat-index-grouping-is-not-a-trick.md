@@ -88,6 +88,9 @@ hack; each reconstructs a different thing the devs actually typed.
   inline away an existing one, without measuring — the boundary shows.
 - Term order inside the index is likewise pinned; see
   `column-accessor-index-order.md`.
+- The multiplication's operand order is independent of the flat grouping.
+  `searchArray::TestPossibleDirections` retains `(mapExtra + x) + product`, but
+  its exact relocation stream requires `MAP_WIDTH * y`, not `y * MAP_WIDTH`.
 - Do not generalise from "semantically equal" to "byte-equal". Measure: one
   `homm2 build` plus a per-function diff of `build/objdiff/report.json` settles
   it permanently. Note `report.json` is **not** a ninja target — a bare `ninja`
