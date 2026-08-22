@@ -69,7 +69,7 @@ DATA(0x005348f4) i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 i16 memSelector;
 
 static inline u32& FadeSavedUpdate(void) {
-    static u32 savedUpdate;
+    DATA(0x00534958) static u32 savedUpdate;
     return savedUpdate;
 }
 
