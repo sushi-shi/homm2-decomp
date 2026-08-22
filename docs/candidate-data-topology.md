@@ -87,6 +87,10 @@ multiple remaining objects are physically indistinguishable, candidate stream or
 paired with retail RVA order.
 The output keeps the source semantic name and retail RVA while taking section ordinal,
 section offset, alignment, storage, and local/external scope from that candidate.
+An exact function-relative relocation-site proof remains usable to select a
+`DATA_COMPGEN` candidate even when the allocation's enclosing data contribution is still
+open. This narrows only the explicit source claim; it does not close the enclosing
+candidate section or waive its interval, extent, payload, or coverage diagnostics.
 
 A normal assembly warns and omits a missing or ambiguous compiler-generated binding so
 iterative work can continue. Strict assembly fails. It never guesses an identity or emits

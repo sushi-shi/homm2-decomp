@@ -393,15 +393,30 @@ def _symbol_inventory(path):
     return public, public_data, functions
 
 
+def _function_end(functions, function, section_size):
+    """Return the next real text-function boundary after ``function``.
+
+    VC6 emits ``$L...`` symbols for jump tables and internal labels.  They may
+    lie inside the reviewed function span and therefore cannot terminate its
+    relocation census.
+    """
+    peers = sorted(
+        symbol.value
+        for name, symbol in functions.items()
+        if (symbol.section == function.section
+            and symbol.value > function.value
+            and not name.startswith("$L"))
+    )
+    return peers[0] if peers else section_size
+
+
 def _function_dir32(coff, function_name):
     functions = coff.unique_text_functions()
     function = functions.get(function_name)
     if function is None:
         return None
-    peers = sorted(symbol.value for symbol in functions.values()
-                   if symbol.section == function.section and symbol.value > function.value)
     section = coff.sections[function.section - 1]
-    end = peers[0] if peers else section.raw_size
+    end = _function_end(functions, function, section.raw_size)
     rows = []
     for (section_index, site), relocation in sorted(coff.relocations.items()):
         if (section_index != function.section or relocation.typ != DIR32 or
@@ -866,6 +881,13 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 _bounded_section_delta_proofs(
                     group, mapped, evidence, coff, intervals,
                     highlow, read_bytes)
+            # A missing owner contribution keeps the physical section group
+            # open, but it does not invalidate an exact relocation-site proof
+            # for an individual allocation. Preserve that evidence for the
+            # diagnostic proposal stream: source DATA_COMPGEN claims consume
+            # those proposals to disambiguate identical compiler literals.
+            evidenced_mapped = dict(mapped or {})
+            evidenced_evidence = dict(evidence)
             mapped = mapped or {}
             failures = []
             causes = set()
@@ -966,6 +988,8 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                 proposal_evidence = {
                     name: "candidate-section-replay" for name in proposal_mappings
                 }
+                proposal_mappings.update(evidenced_mapped)
+                proposal_evidence.update(evidenced_evidence)
                 proposal_mappings.update(mapped)
                 proposal_evidence.update(evidence)
                 proposed = tuple(CandidateAllocation(

@@ -1,5 +1,8 @@
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from types import SimpleNamespace
+from unittest import mock
 
 from homm2.build.candidate_data_manifest import (
     CandidateAllocation,
@@ -7,6 +10,7 @@ from homm2.build.candidate_data_manifest import (
     _bounded_section_delta_proofs,
     _candidate_data_storage,
     _contains,
+    _function_end,
     _function_relocation_offsets_align,
     _function_relocation_proofs,
     _function_sequence_relocation_proofs,
@@ -23,6 +27,78 @@ from homm2.build.candidate_data_manifest import (
 
 
 class CandidateDataManifestTest(unittest.TestCase):
+    def test_function_end_ignores_vc6_internal_labels(self):
+        function = SimpleNamespace(section=1, value=0x100)
+        functions = {
+            "fn": function,
+            "$L123": SimpleNamespace(section=1, value=0x120),
+            "$L456": SimpleNamespace(section=1, value=0x140),
+            "next": SimpleNamespace(section=1, value=0x180),
+        }
+        self.assertEqual(_function_end(functions, function, 0x200), 0x180)
+
+    def test_open_group_retains_exact_relocation_proposal(self):
+        definition = {
+            "name": "$SG1", "storage": "bss", "section": 1,
+            "section_offset": 0, "symbol_offset": 0, "size": 4,
+            "alignment": 4, "scope": "local",
+        }
+        coff = SimpleNamespace(sections=[], relocations={})
+        function_reloc = [(8, SimpleNamespace(name="$SG1"), 0)]
+
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            base = root / "base"
+            base.mkdir()
+            (base / "A.obj").write_bytes(b"")
+            units = root / "units.toml"
+            units.write_text('[[unit]]\nunit = "A"\n')
+            patches = (
+                mock.patch(
+                    "homm2.build.candidate_data_manifest.candidate_definitions",
+                    return_value=([definition], coff),
+                ),
+                mock.patch(
+                    "homm2.build.candidate_data_manifest._symbol_inventory",
+                    return_value=(
+                        {}, {},
+                        {"A": [{"name": "fn", "rva": 0x100, "size": 0x20}]},
+                    ),
+                ),
+                mock.patch(
+                    "homm2.build.candidate_data_manifest._pe_layout",
+                    return_value=(
+                        0x400000,
+                        [0x108],
+                        lambda _site: 0x400200,
+                        lambda _rva, size: b"\0" * size,
+                    ),
+                ),
+                mock.patch(
+                    "homm2.build.candidate_data_manifest._function_dir32",
+                    return_value=function_reloc,
+                ),
+                mock.patch(
+                    "homm2.build.candidate_data_manifest._layout_group",
+                    return_value=([definition], {}, 4),
+                ),
+            )
+            with patches[0], patches[1], patches[2], patches[3], patches[4]:
+                allocations, _stats, diagnostics = derive_allocations(
+                    base_dir=base,
+                    exe=root / "game.exe",
+                    symbols_path=root / "symbols.csv",
+                    units_path=units,
+                )
+
+        self.assertEqual(allocations, [])
+        self.assertEqual(len(diagnostics), 1)
+        self.assertEqual(
+            [(row.name, row.rva, row.provenance)
+             for row in diagnostics[0].proposed_allocations],
+            [("$SG1", 0x200, "aligned-relocation-addend")],
+        )
+
     def test_linker_sorted_crt_subsection_is_initialized_data(self):
         self.assertEqual(_candidate_data_storage(".CRT$XCU"), "data")
         self.assertEqual(_candidate_data_storage(".CRT$XTX"), "data")
