@@ -11,6 +11,7 @@ from homm2.build.link_exe import (
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
     compare_pe_section_bytes, load_required_initialized_storage,
+    function_placement_diagnostics, import_diagnostics,
     load_claimed_data_symbols, load_link_order,
     link_environment, normalized_dll_import, normalized_vendor_imports,
     parse_map_contributions, parse_map_symbol_records,
@@ -63,6 +64,17 @@ class LinkExeTest(unittest.TestCase):
             ],
         })
         self.assertIsNone(normalized_dll_import(imports, "missing.dll"))
+
+    def test_complete_import_diagnostics_separates_abi_from_iat_order(self):
+        retail = [{"dll": "x.dll", "symbols": [
+            {"name": "A", "hint": 1}, {"name": "B", "hint": 2}]}]
+        candidate = [{"dll": "X.DLL", "symbols": [
+            {"name": "B", "hint": 2}, {"name": "A", "hint": 1}]}]
+        result = import_diagnostics(retail, candidate)
+        self.assertTrue(result["dll_order_matches_retail"])
+        self.assertTrue(result["complete_abi_matches_retail"])
+        self.assertFalse(result["complete_iat_order_matches_retail"])
+        self.assertFalse(result["per_dll"][0]["iat_order_matches_retail"])
 
     def test_link_environment_uses_toolchain_lib_search_path(self):
         environment = link_environment(
@@ -126,6 +138,31 @@ class LinkExeTest(unittest.TestCase):
             "segment": 3, "offset": 0x140, "name": "global", "va": 0x403140,
             "flag": None, "object": "<common>",
         })
+
+    def test_function_placement_audit_collapses_duplicate_map_rows(self):
+        candidate = {"image_base": 0x400000}
+        symbols = [
+            {"name": "exact", "unit": "A", "rva": 0x1000, "size": 4,
+             "provenance": "source-annotation"},
+            {"name": "moved", "unit": "A", "rva": 0x1020, "size": 4,
+             "provenance": "source-annotation"},
+            {"name": "generated", "unit": "B", "rva": 0x1040, "size": 4,
+             "provenance": "source-VA_COMPGEN"},
+        ]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(
+                " 0001:00000000 exact 00401000 f A.obj\n"
+                " 0001:00000000 exact 00401000 f A.obj\n"
+                " 0001:00000024 moved 00401024 f A.obj\n")
+            result = function_placement_diagnostics(candidate, path, symbols)
+        self.assertEqual(result["summary"], {
+            "total": 3, "exact_rva": 1, "displaced_rva": 1,
+            "missing": 1, "ambiguous": 0,
+        })
+        self.assertEqual(result["source_summary"], result["summary"])
+        self.assertEqual(result["residuals"][0]["delta"], 4)
+        self.assertEqual(result["by_provenance"]["source-VA_COMPGEN"]["missing"], 1)
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),

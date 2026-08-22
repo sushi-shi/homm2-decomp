@@ -128,6 +128,10 @@ def main():
                    "/LIBPATH:build/toolchain/msvc/lib "
                    "/MAP:build/link/HMM2PL.map /OUT:build/link/HMM2PL.exe "
                    "$link_args"))
+        w.rule("link_audit",
+               command=(f"{PY} -m homm2.build.link_exe --audit-existing "
+                        "--out build/link/HMM2PL.exe"),
+               description="link-audit HMM2PL.exe")
         w.rule("link_resources",
                command=(f"{PY} -m homm2.build.extract_resources "
                         "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
@@ -305,7 +309,19 @@ def main():
                 inputs=(source_objects + base_libraries + [resource_output]),
                 implicit=import_outputs,
                 variables={"link_args": " ".join(link_args)})
-        w.build("link", "phony", inputs="build/link/HMM2PL.exe")
+        link_audit_outputs = [
+            "build/link/HMM2PL.link.json",
+            "build/link/HMM2PL.missing-data.tsv",
+        ]
+        w.build(link_audit_outputs, "link_audit", inputs=link_outputs,
+                implicit=[
+                    "scripts/homm2/build/link_exe.py",
+                    "build/gen/symbol_names.csv",
+                    "config/required_initialized_storage.tsv",
+                    "config/delink_relocs.tsv",
+                    "build/orig/HMM2PL.exe",
+                ])
+        w.build("link", "phony", inputs="build/link/HMM2PL.link.json")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)
         w.build("link-map", "phony", inputs="build/link/HMM2PL.map")

@@ -108,7 +108,8 @@ homm2 format --check           # verify header and enum formatting
 The final link is opt-in, so object matching stays fast. Ninja generates ordinary import
 libraries from the module-definition files under `imports/`, extracts the retail resources,
 and invokes the pinned VC6 `LINK.EXE` once. The candidate and MAP are written to
-`build/link/HMM2PL.exe` and `build/link/HMM2PL.map`; comparison is a separate step.
+`build/link/HMM2PL.exe` and `build/link/HMM2PL.map`. The same opt-in target then audits
+the existing outputs without relinking and writes `build/link/HMM2PL.link.json`.
 
 `homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
 `DATA`, `DATA_COMPGEN`, `DATA_COMPGEN_GUARD`, `VTBL`, or `VTBL2` identity, run

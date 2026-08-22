@@ -587,6 +587,45 @@ def normalized_dll_import(imports, dll):
     return {"dll": entry["dll"].lower(), "symbols": symbols}
 
 
+def import_diagnostics(retail_imports, candidate_imports):
+    """Compare the complete import ABI and its linker-sensitive ordering."""
+    retail_by_dll = {entry["dll"].lower(): entry for entry in retail_imports}
+    candidate_by_dll = {entry["dll"].lower(): entry for entry in candidate_imports}
+    dlls = list(retail_by_dll)
+    dlls.extend(dll for dll in candidate_by_dll if dll not in retail_by_dll)
+    per_dll = []
+    for dll in dlls:
+        retail = retail_by_dll.get(dll)
+        candidate = candidate_by_dll.get(dll)
+        retail_symbols = retail["symbols"] if retail else []
+        candidate_symbols = candidate["symbols"] if candidate else []
+        key = lambda symbol: json.dumps(symbol, sort_keys=True)
+        per_dll.append({
+            "dll": dll,
+            "retail_present": retail is not None,
+            "candidate_present": candidate is not None,
+            "retail_symbol_count": len(retail_symbols),
+            "candidate_symbol_count": len(candidate_symbols),
+            "abi_matches_retail": (retail is not None and candidate is not None and
+                                   sorted(retail_symbols, key=key) ==
+                                   sorted(candidate_symbols, key=key)),
+            "iat_order_matches_retail": (retail is not None and candidate is not None and
+                                         retail_symbols == candidate_symbols),
+        })
+    retail_dll_order = [entry["dll"].lower() for entry in retail_imports]
+    candidate_dll_order = [entry["dll"].lower() for entry in candidate_imports]
+    return {
+        "retail": retail_imports,
+        "candidate": candidate_imports,
+        "dll_order_matches_retail": retail_dll_order == candidate_dll_order,
+        "complete_abi_matches_retail": all(row["abi_matches_retail"] for row in per_dll),
+        "complete_iat_order_matches_retail": (
+            retail_dll_order == candidate_dll_order and
+            all(row["iat_order_matches_retail"] for row in per_dll)),
+        "per_dll": per_dll,
+    }
+
+
 def parse_unresolved(output):
     symbols = sorted(set(re.findall(r"unresolved external symbol\s+(\S+)", output)))
     classes = defaultdict(list)
@@ -706,6 +745,75 @@ def load_claimed_data_symbols(path=None):
             })
     symbols.sort(key=lambda row: (row["rva"], row["name"]))
     return symbols
+
+
+def load_claimed_function_symbols(path=None):
+    """Every recovered function identity in the source/compgen inventory."""
+    path = Path(path or REPO / "build/gen/symbol_names.csv")
+    symbols = []
+    with path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if row["kind"] != "func":
+                continue
+            symbols.append({
+                "name": row["name"],
+                "unit": row["unit"],
+                "rva": int(row["rva"], 16),
+                "size": int(row["size"], 16),
+                "provenance": row.get("provenance", ""),
+            })
+    symbols.sort(key=lambda row: (row["rva"], row["name"]))
+    return symbols
+
+
+def function_placement_diagnostics(candidate, map_path, retail_symbols=None):
+    """Join every recovered function to the candidate MAP by exact linker name."""
+    retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
+                      else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
+    candidate_rvas = defaultdict(set)
+    for record in parse_map_symbol_records(map_path):
+        candidate_rvas[record["name"]].add(record["va"] - candidate["image_base"])
+
+    rows = []
+    for symbol in retail_symbols:
+        matches = sorted(candidate_rvas.get(symbol["name"], ()))
+        candidate_rva = matches[0] if len(matches) == 1 else None
+        delta = candidate_rva - symbol["rva"] if candidate_rva is not None else None
+        rows.append({
+            **symbol,
+            "retail_rva": "0x%x" % symbol["rva"],
+            "candidate_count": len(matches),
+            "candidate_rva": "0x%x" % candidate_rva if candidate_rva is not None else None,
+            "candidate_rvas": ["0x%x" % rva for rva in matches] if len(matches) > 1 else None,
+            "delta": delta,
+            "status": ("exact" if delta == 0 else "displaced" if delta is not None else
+                       "missing" if not matches else "ambiguous"),
+        })
+
+    def summary(selected):
+        return {
+            "total": len(selected),
+            "exact_rva": sum(row["status"] == "exact" for row in selected),
+            "displaced_rva": sum(row["status"] == "displaced" for row in selected),
+            "missing": sum(row["status"] == "missing" for row in selected),
+            "ambiguous": sum(row["status"] == "ambiguous" for row in selected),
+        }
+
+    provenances = sorted(set(row["provenance"] for row in rows))
+    source_rows = [row for row in rows if row["provenance"].startswith("source-")]
+    return {
+        "summary": summary(rows),
+        "source_summary": summary(source_rows),
+        "by_provenance": {
+            provenance: summary([row for row in rows if row["provenance"] == provenance])
+            for provenance in provenances
+        },
+        "residuals": [row for row in rows if row["status"] != "exact"],
+        "functions": rows,
+        "interpretation": (
+            "Candidate addresses come only from exact decorated-name MAP joins. Duplicate MAP "
+            "rows at one RVA are collapsed; missing compiler-generated names remain explicit."),
+    }
 
 
 def load_required_initialized_storage(path=None):
@@ -1300,6 +1408,116 @@ def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None,
     }
 
 
+def compare_file_bytes(retail_path, candidate_path):
+    retail = Path(retail_path).read_bytes()
+    candidate = Path(candidate_path).read_bytes()
+    common = min(len(retail), len(candidate))
+    matched = sum(retail[index] == candidate[index] for index in range(common))
+    total = max(len(retail), len(candidate))
+    return {
+        "exact": retail == candidate,
+        "retail_size": len(retail),
+        "candidate_size": len(candidate),
+        "matched_bytes": matched,
+        "mismatched_bytes": total - matched,
+        "match_percent": round(matched * 100.0 / total, 6) if total else 100.0,
+        "retail_sha256": hashlib.sha256(retail).hexdigest(),
+        "candidate_sha256": hashlib.sha256(candidate).hexdigest(),
+    }
+
+
+def audit_existing_link(output, map_path=None, report_path=None,
+                        required_initialized_path=None, strict=False):
+    """Audit the executable produced by the current direct Ninja link."""
+    output = Path(output).resolve()
+    map_path = Path(map_path or output.with_suffix(".map")).resolve()
+    report_path = Path(report_path or output.with_suffix(".link.json")).resolve()
+    missing_data_path = output.with_suffix(".missing-data.tsv")
+    if not RETAIL_EXE.exists():
+        raise RuntimeError("retail executable missing: %s" % RETAIL_EXE)
+    if not output.exists():
+        raise RuntimeError("candidate executable missing: %s" % output)
+    if not map_path.exists():
+        raise RuntimeError("candidate MAP missing: %s" % map_path)
+
+    retail = read_pe(RETAIL_EXE)
+    candidate = read_pe(output)
+    resources = resource_diagnostics(RETAIL_EXE, output, retail, candidate)
+    imports = import_diagnostics(read_imports(RETAIL_EXE), read_imports(output))
+    static_storage = static_storage_diagnostics(retail, candidate, map_path)
+    static_storage["section_bytes"] = {
+        name: compare_pe_section_bytes(RETAIL_EXE, output, name)
+        for name in (".rdata", ".data")
+    }
+    required = load_required_initialized_storage(required_initialized_path)
+    source_sizes = {
+        (row.unit, row.rva): row.size
+        for row in annotated_source_definitions(REPO / "src", REPO)
+    }
+    add_payload_evidence(
+        static_storage["public_symbols"], RETAIL_EXE, output, required)
+    static_storage["required_initialized"] = required_initialized_storage_diagnostics(
+        static_storage["public_symbols"], required, source_sizes)
+
+    section_bytes = {
+        name: compare_pe_section_bytes(RETAIL_EXE, output, name)
+        for name in retail["section_order"]
+        if name in candidate["sections"]
+    }
+    file_bytes = compare_file_bytes(RETAIL_EXE, output)
+    functions = function_placement_diagnostics(candidate, map_path)
+    closure = {
+        "file_bytes_exact": file_bytes["exact"],
+        "section_geometry_exact": all(
+            row["retail"] == row["candidate"] for row in section_diagnostics(retail, candidate)),
+        "section_bytes_exact": (retail["section_order"] == candidate["section_order"] and
+                                all(row["exact"] for row in section_bytes.values())),
+        "imports_exact": imports["complete_iat_order_matches_retail"],
+        "resources_exact": resources["semantic_match"],
+        "source_function_rvas_exact": not any(
+            row["status"] != "exact" for row in functions["functions"]
+            if row["provenance"].startswith("source-")),
+        "reviewed_function_rvas_exact": not functions["residuals"],
+        "required_initialized_storage_exact": not static_storage[
+            "required_initialized"]["violations"],
+    }
+    report = {
+        "status": "exact" if file_bytes["exact"] else "different",
+        "mode": "audit-existing-direct-link",
+        "candidate_path": str(output),
+        "map_path": str(map_path),
+        "retail": retail,
+        "candidate": candidate,
+        "entry_point_delta": candidate["entry_point_rva"] - retail["entry_point_rva"],
+        "sections": section_diagnostics(retail, candidate),
+        "section_bytes": section_bytes,
+        "file_bytes": file_bytes,
+        "imports": imports,
+        "resources": resources,
+        "static_storage": static_storage,
+        "function_placement": functions,
+        "closure": closure,
+    }
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    write_missing_data_report(missing_data_path, static_storage["public_symbols"])
+
+    function_summary = functions["source_summary"]
+    print("link audit: sections %d/%d byte-exact; whole file %.6f%%" % (
+        sum(row["exact"] for row in section_bytes.values()), len(section_bytes),
+        file_bytes["match_percent"]))
+    print("link audit: source function RVAs %d/%d exact; %d displaced, %d unavailable" % (
+        function_summary["exact_rva"], function_summary["total"],
+        function_summary["displaced_rva"],
+        function_summary["missing"] + function_summary["ambiguous"]))
+    print("link audit: import ABI %s; IAT order %s; resources %s" % (
+        "matches" if imports["complete_abi_matches_retail"] else "differs",
+        "matches" if imports["complete_iat_order_matches_retail"] else "differs",
+        "match" if resources["semantic_match"] else "differ"))
+    print("link audit: %s" % report_path)
+    return 0 if not strict or file_bytes["exact"] else 1
+
+
 def write_order_response(path):
     """Write a relocatable LINK response file in units.toml manifest order."""
     path = Path(path).resolve()
@@ -1616,6 +1834,12 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default=str(REPO / "build/link/HMM2PL.exe"))
+    parser.add_argument("--map", dest="map_path")
+    parser.add_argument("--report")
+    parser.add_argument("--audit-existing", action="store_true",
+                        help="audit the current direct-link EXE/MAP without relinking")
+    parser.add_argument("--strict", action="store_true",
+                        help="make an audit-existing byte difference fail")
     parser.add_argument("--order", default=str(REPO / "build/link/objects.rsp"))
     parser.add_argument("--imports", action="append")
     parser.add_argument("--resource", default=str(REPO / "build/link/HMM2PL.res"))
@@ -1628,6 +1852,9 @@ def main(argv=None):
     try:
         if args.write_order:
             return write_order_response(args.write_order)
+        if args.audit_existing:
+            return audit_existing_link(
+                args.out, args.map_path, args.report, args.required_initialized, args.strict)
         imports = args.imports or [
             str(REPO / "build/link/vendor-imports-smack.lib"),
             str(REPO / "build/link/vendor-imports-mss.lib"),
