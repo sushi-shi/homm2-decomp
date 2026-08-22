@@ -70,7 +70,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd8072,78,$body_pow,pow.obj,libcmt.lib,reviewed-linked-bytes,pow exponent and domain handling body
 0xd826d,139,_atol,atox.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd82f8,11,_atoi,atox.obj,libcmt.lib,masked-exact,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
-0xd83c0,10,_exp,87ctran.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 8 candidates: libcmt.lib:..\build\intel\mt_obj\87ctran.obj!_exp|libcmt.lib:..\build\intel\mt_obj\87ctran.obj!__CIexp|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!_atan2|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!__CIatan2
+0xd83c0,10,_atan2,87ctriga.obj,libcmt.lib,reviewed-archive-public-entry,VC6 87ctriga.obj exports _atan2 at section offset 0; ResetBoltAngle two-argument call semantics
 0xd83e0,20,_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
 0xd83f4,9,_cos,cos.obj,libcmt.lib,reviewed-archive-public-entry,VC6 cos.obj exports _cos at section offset 0x14; wrapper dispatch entry
 0xd83fd,145,$body_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,fcos body
