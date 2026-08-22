@@ -1326,9 +1326,9 @@ SOURCE/TOWNMGR	?SetArmyCommand@townManager@@QAEXH@Z	100.0000	618621664cdd
 SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	100.0000	0d984a0cc2e3
 SOURCE/TOWNMGR	?SetupExtraStuff@townManager@@QAEXXZ	100.0000	84f3bebd5b7e
 SOURCE/TOWNMGR	?SetupMage@townManager@@QAEXPAVheroWindow@@@Z	100.0000	9462dfb4b387
-SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	99.9939	ad8f0eabc576
+SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	32e6b6fe1d3a
 SOURCE/TOWNMGR	?SetupTown@townManager@@QAEXXZ	100.0000	a7a5bc603fdf
-SOURCE/TOWNMGR	?SetupWell@townManager@@QAEXPAVheroWindow@@@Z	99.9885	390c9eed2a7d
+SOURCE/TOWNMGR	?SetupWell@townManager@@QAEXPAVheroWindow@@@Z	100.0000	74f77aaa8520
 SOURCE/TOWNMGR	?ShiftQualChange@townManager@@QAEXXZ	100.0000	e1dfb8eb2d56
 SOURCE/TOWNMGR	?ShowText@townManager@@QAEXPAD@Z	100.0000	2d74f0e80ff2
 SOURCE/TOWNMGR	?SortStats@@YIXQAJQAC@Z	100.0000	792c5e98cf7c

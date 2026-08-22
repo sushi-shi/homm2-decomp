@@ -3112,7 +3112,10 @@ void townManager::SetupWell(heroWindow* window) {
         monsterInfo_f = gMonsterDatabase[IDX(
             gDwellingType[IDX(m_town->m_type)][dwellingTypes_c[dwellingResult_a]]
         )];
-        strcpy(gText, "");
+        strcpy(
+            gText,
+            DATA_COMPGEN(0x00533ed0, townWellDetailEmpty, "")
+        );
         sprintf(detailText_i, "%s%d", cWellDetail[WELL_DETAIL_ATTACK], monsterInfo_f.attack);
         strcat(gText, detailText_i);
         sprintf(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_DEFENSE], monsterInfo_f.defense);
@@ -3364,7 +3367,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     window->AddWidget(textControl_p, -1);
 
-                    sprintf(gText, "");
+                    sprintf(
+                        gText,
+                        DATA_COMPGEN(0x00533ed4, thievesGuildPrimaryStatsEmpty, "")
+                    );
                     for (heroPosition_d = 0;
                          heroPosition_d < TOWN_THIEVES_PRIMARY_STAT_COUNT;
                          ++heroPosition_d) {
