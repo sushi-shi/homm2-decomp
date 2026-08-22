@@ -608,5 +608,5 @@ DATA(0x00534688) struct sockaddr_in saddr_loc;
 DATA(0x00534698) u16 wVer;
 DATA(0x005344f8) struct WSAData wsadata;
 DATA(0x005344f0) struct in_addr gIn_addrIP;
-struct sockaddr_in saddr_remote;
-i32 iAddrLen;
+DATA(0x005347a0) struct sockaddr_in saddr_remote;
+DATA(0x005344ec) i32 iAddrLen;
