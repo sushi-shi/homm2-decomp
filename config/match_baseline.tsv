@@ -672,7 +672,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	100.0000	aeba045beccf
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	6044b0b8106f
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	34273057dac9
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	c550d9025e6e
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.9920	10284471513d
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	100.0000	768fd748be79
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	100.0000	12c2467028e6
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	dcac6e7285e6
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	a03f1c829007
@@ -695,7 +695,7 @@ SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	8146760cd4d4
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	100.0000	c4f3c1d0558c
 SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	100.0000	c98aec0fcb88
-SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	99.9235	09f8a883a795
+SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	100.0000	4d2d30667703
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	b6e4fdfb1c78
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	e6a7b3727aa5
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	00b1f66eee90

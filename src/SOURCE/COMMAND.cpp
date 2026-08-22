@@ -2145,7 +2145,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 
     m_nonVisualCombat = 1;
     FreeArmies();
-    CombatMessage("", 1, 1, 0);
+    CombatMessage(DATA_COMPGEN(0x0052414c, combatVictoryEmptyMessage, ""), 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     numFades = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
@@ -3128,7 +3128,10 @@ void combatManager::ViewBallista(i32 quickView) {
 
     m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&shooterCount, &attackSkill);
     sprintf(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0" /* "Баллиста" */);
-    strcpy(description, "");
+    strcpy(
+        description,
+        DATA_COMPGEN(0x00524150, combatBallistaEmptyDescription, "")
+    );
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
         sprintf(
             description,
@@ -3158,7 +3161,10 @@ void combatManager::ViewBallista(i32 quickView) {
     }
     strcat(gText, description);
 
-    strcpy(description, "");
+    strcpy(
+        description,
+        DATA_COMPGEN(0x00524154, combatLeftTowerEmptyDescription, "")
+    );
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
         != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
@@ -3197,7 +3203,10 @@ void combatManager::ViewBallista(i32 quickView) {
 
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
         != 0) {
-        strcpy(description, "");
+        strcpy(
+            description,
+            DATA_COMPGEN(0x00524158, combatRightTowerEmptyDescription, "")
+        );
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(
                 description,
