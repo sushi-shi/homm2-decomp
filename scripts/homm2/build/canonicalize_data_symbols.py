@@ -1,9 +1,10 @@
 """Canonicalize MSVC compiler-private names in a disposable COFF copy.
 
 The data transform is deliberately local to one object and content-derived.
-Reviewed ``DATA_COMPGEN`` bindings additionally replace the physical candidate
-symbol with its source-owned semantic identity after proving section, offset,
-extent, storage, and scope against the generated data manifest.
+Reviewed ``DATA_COMPGEN`` bindings and source-free real-literal placements
+additionally replace the physical candidate symbol with its reviewed identity
+after proving section, offset, extent, storage, and scope against the generated
+data manifest.
 Compiler-generated functions may additionally consume source ``VA_COMPGEN``
 claims, then prove their semantic role from the object's relocation graph before
 renaming volatile ``$E`` symbols. Symbol indices do not change. In embedded
@@ -149,6 +150,7 @@ class CompgenDataClaim:
     size: int
     storage: str
     scope: str
+    proof: str = "source-DATA_COMPGEN"
 
 
 @dataclass(frozen=True)
@@ -629,7 +631,15 @@ def _compgen_data_renames(
             if symbol.name == claim.name
             and symbol.index != definition.symbol.index
         ), None)
-        if collision is not None:
+        reviewed_real_reference = (
+            claim.proof == "candidate-COFF-real"
+            and REAL_LITERAL.fullmatch(claim.name) is not None
+            and collision is not None
+            and collision.section == 0
+            and collision.value == 0
+            and collision.typ == 0
+            and collision.storage_class == EXTERNAL_STORAGE)
+        if collision is not None and not reviewed_real_reference:
             raise ValueError(
                 "semantic compiler-data name collides with existing symbol: "
                 f"{claim.name}")
@@ -647,8 +657,7 @@ def _compgen_data_renames(
             claim.size,
             0,
             hashlib.sha256(meaningful).hexdigest(),
-            ("source-DATA_COMPGEN-existing-name" if named
-             else "source-DATA_COMPGEN"),
+            (f"{claim.proof}-existing-name" if named else claim.proof),
             _escaped_preview(meaningful),
         ))
     return renames, tuple(rows)
@@ -1315,7 +1324,9 @@ def load_compgen_data_claims(path: Path | None, unit: str | None):
             delimiter="\t")
         claims = []
         for row in rows:
-            if not row["provenance"].startswith("source-DATA_COMPGEN:"):
+            provenance = row["provenance"]
+            if not provenance.startswith((
+                    "source-DATA_COMPGEN:", "candidate-COFF-real:")):
                 continue
             object_unit = row["object"].replace("\\", "/")
             if object_unit.lower().endswith(".c"):
@@ -1329,6 +1340,8 @@ def load_compgen_data_claims(path: Path | None, unit: str | None):
                 int(row["size"], 0),
                 row["storage"],
                 row["scope"],
+                ("source-DATA_COMPGEN" if provenance.startswith(
+                    "source-DATA_COMPGEN:") else "candidate-COFF-real"),
             ))
         return tuple(claims)
 

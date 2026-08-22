@@ -371,6 +371,7 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
     source_identities = {}
     compgen_rows = []
     automatic_rows = []
+    automatic_real_rows = []
     automatic_identities = {}
     unmatched_source_manifest = []
     for row in _source_manifest_rows(source_manifest_path):
@@ -379,6 +380,9 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
             compgen_rows.append(row)
         elif provenance.startswith("candidate-COFF-string:"):
             automatic_rows.append(row)
+            automatic_identities[(row["unit"], row["name"])] = row
+        elif provenance.startswith("candidate-COFF-real:"):
+            automatic_real_rows.append(row)
             automatic_identities[(row["unit"], row["name"])] = row
         elif provenance.startswith("source-DATA:"):
             matches = definitions_by_unit_rva.get((row["unit"], row["rva"]), [])
@@ -396,6 +400,7 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
             continue
         covered = Counter()
         automatic = Counter()
+        automatic_reals = Counter()
         private = Counter()
         storage_by_name = {}
         try:
@@ -411,8 +416,14 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
                 candidate_source_identities_seen.add((unit, symbol.name))
                 candidate_class[(unit, symbol.name)] = "source-data"
             elif (unit, symbol.name) in automatic_identities:
-                automatic[symbol.name] += 1
-                candidate_class[(unit, symbol.name)] = "automatic-string"
+                automatic_row = automatic_identities[(unit, symbol.name)]
+                if automatic_row["provenance"].startswith(
+                        "candidate-COFF-real:"):
+                    automatic_reals[symbol.name] += 1
+                    candidate_class[(unit, symbol.name)] = "automatic-real"
+                else:
+                    automatic[symbol.name] += 1
+                    candidate_class[(unit, symbol.name)] = "automatic-string"
             else:
                 private[symbol.name] += 1
                 candidate_class[(unit, symbol.name)] = "unmodeled-private"
@@ -425,6 +436,7 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
                 for (symbol, source_name), count in sorted(covered.items())
             ],
             "candidate_automatic_strings": _name_rows(automatic),
+            "candidate_automatic_reals": _name_rows(automatic_reals),
             "candidate_private": _name_rows(private),
             "candidate_storage": storage_by_name,
         }
@@ -459,9 +471,13 @@ def provenance_census(units, base_root, source_root, source_manifest_path,
             for item in row["candidate_private"]),
         "source_compgen_rows": len(compgen_rows),
         "automatic_string_rows": len(automatic_rows),
+        "automatic_real_rows": len(automatic_real_rows),
         "candidate_automatic_strings": sum(
             item["count"] for row in object_rows.values()
             for item in row["candidate_automatic_strings"]),
+        "candidate_automatic_reals": sum(
+            item["count"] for row in object_rows.values()
+            for item in row["candidate_automatic_reals"]),
         "duplicate_source_rvas": len(source_duplicate_rvas),
     }
     return {

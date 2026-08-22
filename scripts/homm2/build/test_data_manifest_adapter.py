@@ -24,6 +24,7 @@ from homm2.build.data_manifest_adapter import (
     _mark_vtable_aliases,
     _symbol_row,
     _vtable_row,
+    automatic_real_rows,
     automatic_string_rows,
 )
 from homm2.build.annotated_compgen_data import CompgenDataClaim
@@ -54,6 +55,69 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_automatic_reals_preserve_width_and_fold_exact_comdats(self):
+        symbol = "__real@8@4002c800000000000000"
+        owner = CandidateDefinition(
+            "A", symbol, 1, ".rdata", 0, 0, 8, 8, "rdata", "global",
+            2, COMDAT_DATA_FLAGS, 2, None)
+        peer = replace(owner, unit="B")
+        owner_section = CandidateSection(
+            "A", "A.c", 1, ".rdata", 8, 8, COMDAT_DATA_FLAGS,
+            "rdata", 0x12345678, 2, None)
+        peer_section = replace(owner_section, unit="B", object_name="B.c")
+        payload = bytes.fromhex("0000000000002940")
+        placement = [SimpleNamespace(
+            unit="A", name=symbol, storage="rdata", section_offset=0,
+            rva=0x100, provenance="aligned-relocation-addend",
+        )]
+        pe = {
+            "sections": {
+                ".rdata": {
+                    "rva": 0x100, "virtual_size": 8, "raw_size": 8,
+                },
+            },
+        }
+        with mock.patch(
+                "homm2.build.data_manifest_adapter.CoffFile"), mock.patch(
+                "homm2.build.data_manifest_adapter._candidate_bytes",
+                return_value=payload), mock.patch(
+                    "homm2.build.data_manifest_adapter.read_pe",
+                    return_value=pe), mock.patch(
+                    "homm2.build.data_manifest_adapter._pe_layout",
+                    return_value=(
+                        0x400000, (0x10,), lambda _site: 0x400100,
+                        lambda _rva, size: payload[:size],
+                    )):
+            rows = automatic_real_rows(
+                {"A": ([owner], [owner_section]),
+                 "B": ([peer], [peer_section])},
+                Path("base"), Path("game.exe"), placement)
+
+        self.assertEqual(
+            [(row["object"], row["name"], row["rva"], row["size"])
+             for row in rows],
+            [("A.c", symbol, "0x100", "0x8"),
+             ("B.c", symbol, "0x100", "0x8")])
+        self.assertTrue(all(
+            row["provenance"] ==
+            "candidate-COFF-real:aligned-relocation-addend:"
+            "candidate-coff-folded-comdat"
+            for row in rows))
+
+    def test_automatic_real_reserves_source_claimed_symbol(self):
+        symbol = "__real@4@40008000000000000000"
+        real = CandidateDefinition(
+            "A", symbol, 1, ".rdata", 0, 0, 4, 4, "rdata", "global",
+            2, COMDAT_DATA_FLAGS, 2, None)
+        real_section = CandidateSection(
+            "A", "A.c", 1, ".rdata", 4, 4, COMDAT_DATA_FLAGS,
+            "rdata", 0x12345678, 2, None)
+        with mock.patch("homm2.build.data_manifest_adapter.CoffFile"):
+            rows = automatic_real_rows(
+                {"A": ([real], [real_section])}, Path("base"),
+                Path("game.exe"), (), reserved_symbols=(symbol,))
+        self.assertEqual(rows, [])
+
     def test_automatic_strings_use_direct_proof_then_unique_content(self):
         direct = replace(candidate("A", "$SG1", value=0), size=8)
         collision = replace(candidate("A", "$SG2", value=8), size=8)

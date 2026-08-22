@@ -28,10 +28,11 @@ given artificial `DATA_COMPGEN` occurrences.
 
 Candidate discovery by itself is not a canonical naming source. Counter spellings such
 as `$SG39045`, `$T40070`, and `name$S123`, and value-derived floating-literal spellings
-such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities. A compiler string
-is nevertheless enrollable without a source annotation when independent retail
-relocation evidence proves its placement. The generated Vostok manifests combine those
-automatic string rows with source annotations and candidate COFF topology:
+such as `__real@8@3ff8a3d70a3d70a3d800`, are not source-semantic identities. A
+compiler string or fixed-width `__real@` literal is nevertheless enrollable without a
+source annotation when independent retail relocation evidence proves its placement.
+The generated Vostok manifests combine those automatic literal rows with source
+annotations and candidate COFF topology:
 
 - `DATA(rva)` marks an ordinary named definition, including a block-scope static.
   Clang supplies its declaration name, type, and logical `sizeof`; the candidate
@@ -40,7 +41,7 @@ automatic string rows with source annotations and candidate COFF topology:
   vtables; the tooling derives the MSVC decorated identity.
 - `DATA_COMPGEN(rva, semanticName, value)` is the exceptional pin for an anonymous
   compiler-generated allocation which the automatic oracle cannot identify, or whose
-  non-string type/semantic role must be recorded. The annotation owns the retail RVA,
+  source-semantic role must be recorded. The annotation owns the retail RVA,
   semantic identity, value expression, and inferred logical size. Candidate COFF supplies
   physical topology and scope.
 - `DATA_COMPGEN_GUARD(rva, semanticName, owner)` marks a compiler-emitted initialization
@@ -128,7 +129,7 @@ iterative work can continue. Strict assembly fails. It never guesses an identity
 `homm2 data-topology assemble` writes both
 `build/gen/delink_data_from_source.tsv` and
 `build/gen/delink_data_manifest.tsv`. The former retains semantic source names plus
-source-free string provenance for comparison tooling; the latter is its Vostok
+source-free compiler-literal provenance for comparison tooling; the latter is its Vostok
 eight-column projection.
 `build/gen/delink_common_symbols.tsv` separately carries externally linked COFF
 COMMON definitions. COMMON has no section bytes or retail RVA; candidate COFF supplies

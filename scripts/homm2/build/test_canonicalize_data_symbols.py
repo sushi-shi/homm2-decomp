@@ -12,6 +12,7 @@ from homm2.build.canonicalize_data_symbols import (
     CompgenDataClaim,
     canonicalize_coff,
     defer_data_comparison,
+    load_compgen_data_claims,
     main,
     sidecar_bytes,
 )
@@ -229,6 +230,35 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
              for section in CoffObject(obj).sections],
         )
         self.assertEqual(result.rows[0].proof, "source-DATA_COMPGEN")
+
+    def test_automatic_real_manifest_renames_reviewed_definition(self):
+        with TemporaryDirectory() as directory:
+            manifest = Path(directory) / "data.tsv"
+            manifest.write_text(
+                "name\tobject\trva\tsize\tstorage\talignment\t"
+                "section_ordinal\tsection_offset\tscope\tprovenance\n"
+                "__real@8@4002c800000000000000\tSOURCE\\Test.c\t"
+                "0xea558\t0x8\trdata\t0x8\t1\t0x0\texternal\t"
+                "candidate-COFF-real:aligned-relocation-addend\n")
+            claims = load_compgen_data_claims(manifest, "SOURCE/Test")
+        self.assertEqual(len(claims), 1)
+        self.assertEqual(claims[0].proof, "candidate-COFF-real")
+
+        payload = bytes.fromhex("0000000000002940")
+        obj = make_coff([
+            SectionSpec(".rdata", payload, RDATA),
+        ], [
+            ("const_000ea558", 0, 1, 0, 2),
+            ("__real@8@4002c800000000000000", 0, 0, 0, 2),
+        ])
+        result = canonicalize_coff(obj, compgen_data=claims)
+        self.assertEqual(
+            CoffObject(result.data).symbols[0].name,
+            "__real@8@4002c800000000000000")
+        self.assertEqual(
+            CoffObject(result.data).symbols[1].name,
+            "__real@8@4002c800000000000000")
+        self.assertEqual(result.rows[0].proof, "candidate-COFF-real")
 
     def test_reviewed_real_literal_identity_applies_to_duplicate_comdat(self):
         original = "__real@8@3ffeb333333333333000"

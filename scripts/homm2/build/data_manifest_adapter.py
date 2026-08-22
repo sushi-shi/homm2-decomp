@@ -1,10 +1,10 @@
 """Bind reviewed data identities to candidate COFF topology.
 
 ``DATA()``, exceptional ``DATA_COMPGEN()``, ``VTBL()``, and ``VTBL2()`` claims
-provide source-owned identities. Compiler string literals normally need no
-annotation: reviewed retail relocation sites and candidate COFF payload/topology
-provide a source-free identity oracle, with ambiguous payloads withheld. No
-hand-maintained private-data supplement participates in the build.
+provide source-owned identities. Compiler string and real literals normally
+need no annotation: reviewed retail relocation sites and candidate COFF
+payload/topology provide a source-free identity oracle, with ambiguous payloads
+withheld. No hand-maintained private-data supplement participates in the build.
 """
 
 from __future__ import annotations
@@ -73,6 +73,7 @@ ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
 AUTO_STRING_DIRECT_PROOFS = frozenset(("aligned-relocation-addend",))
+AUTO_REAL_DIRECT_PROOFS = frozenset(("aligned-relocation-addend",))
 
 
 @dataclass(frozen=True)
@@ -638,6 +639,31 @@ def _string_storage_compatible(candidate_storage, retail_storage, payload):
             and not any(payload))
 
 
+def _folded_candidate_signature(candidate, sections_by_location):
+    section = sections_by_location[
+        (candidate.unit, candidate.section_ordinal)]
+    return (
+        candidate.symbol,
+        candidate.section_name,
+        candidate.section_value,
+        candidate.size,
+        candidate.alignment,
+        candidate.storage,
+        candidate.storage_class,
+        candidate.characteristics,
+        candidate.comdat_selection,
+        candidate.associative_ordinal,
+        section.name,
+        section.size,
+        section.alignment,
+        section.characteristics,
+        section.storage,
+        section.checksum,
+        section.comdat_selection,
+        section.associative_ordinal,
+    )
+
+
 def _retail_relocation_strings(exe: Path, payload_limit: int):
     """Index reviewed relocation targets by complete C-string payload."""
     if payload_limit <= 0:
@@ -790,6 +816,170 @@ def automatic_string_rows(topology_by_unit, base_root: Path, exe: Path,
     return rows
 
 
+def _retail_relocation_real_payloads(exe: Path, sizes):
+    """Index reviewed relocation targets by exact fixed-width payload."""
+    sizes = tuple(sorted(set(sizes)))
+    if not sizes:
+        return {}, {}, None, None
+    pe = read_pe(exe)
+    image_base, highlow, read_u32, read_bytes = _pe_layout(exe)
+    by_payload = defaultdict(set)
+    storage_by_rva = {}
+    for site in highlow:
+        rva = (read_u32(site) - image_base) & 0xFFFFFFFF
+        storage = _retail_storage_name(pe, rva)
+        if storage is None:
+            continue
+        classification = classify_pe_storage(pe, rva)
+        section = pe["sections"][classification["section"]]
+        section_end = section["rva"] + max(
+            section["virtual_size"], section["raw_size"])
+        storage_by_rva[rva] = storage
+        for size in sizes:
+            if rva + size <= section_end:
+                by_payload[(size, read_bytes(rva, size))].add(rva)
+    return by_payload, storage_by_rva, pe, read_bytes
+
+
+def automatic_real_rows(topology_by_unit, base_root: Path, exe: Path,
+                        placement_evidence, reserved_symbols=()):
+    """Enroll VC6 ``__real@`` COMDATs without per-literal annotations.
+
+    Same-spelled external COMDATs are one compiler content identity. An exact
+    function-relative relocation proof places that identity directly. If no
+    direct proof exists, one exact fixed-width payload at one reviewed retail
+    relocation target is sufficient. Conflicting placements and content
+    collisions remain unresolved for an exceptional ``DATA_COMPGEN`` claim.
+    """
+    reserved_symbols = set(reserved_symbols)
+    sections_by_location = {}
+    candidates = []
+    by_stream_location = {}
+    by_identity = defaultdict(list)
+    coff_by_unit = {}
+    payload_by_location = {}
+    for unit, (definitions, sections) in sorted(topology_by_unit.items()):
+        for section in sections:
+            sections_by_location[(unit, section.ordinal)] = section
+        reals = [
+            row for row in definitions
+            if (REAL_LITERAL.fullmatch(row.symbol)
+                and row.symbol not in reserved_symbols
+                and row.storage_class == 2
+                and row.comdat_selection in FOLDABLE_COMDAT_SELECTIONS)
+        ]
+        if not reals:
+            continue
+        coff = coff_by_unit.setdefault(
+            unit, CoffFile(Path(base_root) / f"{unit}.obj"))
+        for candidate in reals:
+            width = int(REAL_LITERAL.fullmatch(candidate.symbol).group(1))
+            if candidate.size != width:
+                raise ValueError(
+                    f"real literal {unit}:{candidate.symbol} has candidate "
+                    f"size 0x{candidate.size:x}, expected 0x{width:x}")
+            location = _candidate_location(candidate)
+            payload_by_location[location] = _candidate_bytes(
+                coff, candidate, candidate.size)
+            stream_key = (
+                unit, candidate.symbol, candidate.storage,
+                candidate.stream_offset,
+            )
+            if stream_key in by_stream_location:
+                raise ValueError(
+                    f"duplicate compiler-real candidate position {stream_key}")
+            by_stream_location[stream_key] = candidate
+            by_identity[(unit, candidate.symbol, candidate.storage)].append(
+                candidate)
+            candidates.append(candidate)
+
+    direct_by_location = defaultdict(list)
+    for allocation in placement_evidence:
+        if allocation.provenance not in AUTO_REAL_DIRECT_PROOFS:
+            continue
+        candidate = by_stream_location.get((
+            allocation.unit, allocation.name, allocation.storage,
+            allocation.section_offset,
+        ))
+        if candidate is None:
+            identity_candidates = by_identity.get((
+                allocation.unit, allocation.name, allocation.storage), ())
+            if len(identity_candidates) == 1:
+                candidate = identity_candidates[0]
+        if candidate is not None:
+            direct_by_location[_candidate_location(candidate)].append(allocation)
+
+    retail_by_payload, retail_storage, pe, read_bytes = \
+        _retail_relocation_real_payloads(
+            Path(exe), (candidate.size for candidate in candidates))
+    groups = defaultdict(list)
+    for candidate in candidates:
+        groups[_folded_candidate_signature(
+            candidate, sections_by_location)].append(candidate)
+
+    rows = []
+    for peers in sorted(groups.values(), key=lambda values: (
+            values[0].symbol, values[0].unit,
+            values[0].section_ordinal, values[0].section_value)):
+        payloads = {
+            payload_by_location[_candidate_location(candidate)]
+            for candidate in peers
+        }
+        if len(payloads) != 1:
+            raise ValueError(
+                f"folded real literal {peers[0].symbol} has conflicting payloads")
+        payload = next(iter(payloads))
+        direct = [
+            allocation
+            for candidate in peers
+            for allocation in direct_by_location.get(
+                _candidate_location(candidate), ())
+        ]
+        direct_rvas = {allocation.rva for allocation in direct}
+        if len(direct_rvas) > 1:
+            raise ValueError(
+                f"real literal {peers[0].symbol} has conflicting direct "
+                "placements: "
+                + ", ".join(f"0x{rva:x}" for rva in sorted(direct_rvas)))
+        if direct_rvas:
+            rva = next(iter(direct_rvas))
+            proof = direct[0].provenance
+        else:
+            compatible_rvas = {
+                rva for rva in retail_by_payload.get(
+                    (peers[0].size, payload), ())
+                if retail_storage[rva] == peers[0].storage
+            }
+            if len(compatible_rvas) != 1:
+                continue
+            rva = next(iter(compatible_rvas))
+            proof = "unique-relocation-target-payload"
+        storage = _retail_storage_name(pe, rva)
+        if (storage != peers[0].storage
+                or read_bytes(rva, peers[0].size) != payload):
+            raise ValueError(
+                f"real literal {peers[0].symbol} placement at 0x{rva:x} "
+                "contradicts payload/storage")
+        provenance = f"candidate-COFF-real:{proof}"
+        if len(peers) > 1:
+            provenance += ":candidate-coff-folded-comdat"
+        for candidate in sorted(peers, key=lambda row: (
+                row.unit, row.section_ordinal, row.section_value)):
+            rows.append({
+                "name": candidate.symbol,
+                "object": candidate.unit.replace("/", "\\") + ".c",
+                "rva": f"0x{rva:x}",
+                "size": f"0x{candidate.size:x}",
+                "storage": candidate.storage,
+                "alignment": f"0x{candidate.alignment:x}",
+                "section_ordinal": str(candidate.section_ordinal),
+                "section_offset": f"0x{candidate.section_value:x}",
+                "scope": "external",
+                "provenance": provenance,
+            })
+    return rows
+
+
 def source_manifest_rows(source_root: Path = SOURCE_ROOT,
                          base_root: Path = BASE_ROOT,
                          exe: Path = EXE, strict=False):
@@ -834,14 +1024,19 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
     table_rows = resolve_vtable_definitions(
         vtables, topology, public_by_rva)
     compiler_rows = _folded_compgen_rows(compiler_generated, topology)
-    automatic_rows = automatic_string_rows(
+    automatic_string_rows_result = automatic_string_rows(
         topology, base_root, Path(exe), placement_evidence,
         reserved=(candidate for _claim, candidate in compiler_generated))
+    automatic_real_rows_result = automatic_real_rows(
+        topology, base_root, Path(exe), placement_evidence,
+        reserved_symbols=(
+            candidate.symbol for _claim, candidate in compiler_generated))
     rows = [
         *(_symbol_row(source, candidate, None)
           for source, candidate in ordinary),
         *compiler_rows,
-        *automatic_rows,
+        *automatic_string_rows_result,
+        *automatic_real_rows_result,
         *(_vtable_row(source, candidate)
           for source, candidate in table_rows),
     ]
@@ -853,7 +1048,7 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
 def render_source_manifest(rows):
     """Serialize reviewed identities used by comparison tooling."""
     lines = [
-        "# Source claims and source-free compiler strings bound to reviewed "
+        "# Source claims and source-free compiler literals bound to reviewed "
         "candidate COFF topology.",
         "\t".join(SYMBOL_HEADER),
     ]
@@ -1191,37 +1386,15 @@ def _folded_compgen_rows(bindings, topology_by_unit):
                         "STRING_LITERAL", "FLOAT_LITERAL")):
                 candidates_by_symbol[candidate.symbol].append(candidate)
 
-    def signature(candidate):
-        section = sections_by_location[
-            (candidate.unit, candidate.section_ordinal)]
-        return (
-            candidate.symbol,
-            candidate.section_name,
-            candidate.section_value,
-            candidate.size,
-            candidate.alignment,
-            candidate.storage,
-            candidate.storage_class,
-            candidate.characteristics,
-            candidate.comdat_selection,
-            candidate.associative_ordinal,
-            section.name,
-            section.size,
-            section.alignment,
-            section.characteristics,
-            section.storage,
-            section.checksum,
-            section.comdat_selection,
-            section.associative_ordinal,
-        )
-
     identities = set()
     for claim, owner in bindings:
         owner_row = _compgen_row(claim, owner)
         peers = [
             candidate
             for candidate in candidates_by_symbol.get(owner.symbol, ())
-            if signature(candidate) == signature(owner)
+            if _folded_candidate_signature(
+                candidate, sections_by_location
+            ) == _folded_candidate_signature(owner, sections_by_location)
         ]
         if not peers:
             peers = [owner]
