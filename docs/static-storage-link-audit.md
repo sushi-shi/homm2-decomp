@@ -139,6 +139,12 @@ Raw whole-section and subband differences remain authoritative layout residuals 
 `build/link/HMM2PL.link.json`; semantic identity matching explains them but does not
 erase or declare their bytes exact.
 
+The linked-section residuals are partitioned and bounded in
+`docs/linked-data-section-walls.md`. In particular, automatic compiler-data
+identity proves the reconstructed owners without requiring a marker for every
+private literal. The residual ledger keeps raw PE bytes, semantic identities,
+volatile linker metadata, import order, and CRT archive order as separate facts.
+
 ## Recovered source and model divergences
 
 Widening the audit from the former near-exact/site-aligned subset to all functions
