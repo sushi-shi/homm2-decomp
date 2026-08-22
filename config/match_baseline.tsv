@@ -1458,7 +1458,7 @@ SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	100.0000	f7134c4bdec7
 SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	100.0000	8b64b352d231
 SOURCE/tradpost	?SetupNewTrade@@YIXXZ	100.0000	1193110a7584
 SOURCE/tradpost	?TradingPostHandler@@YIHAAUtag_message@@@Z	100.0000	1e829d8593ac
-SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	99.9876	cab0eccf4e1a
+SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	100.0000	ab6d0689e2f5
 SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	bd232a97f75f
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	186b89cf6807
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	784a60926049

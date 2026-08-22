@@ -241,7 +241,10 @@ void UpdateTradingPost(i32 draw) {
                             sprintf(gText, "1/%d", ratioLocal);
                     }
                 } else {
-                    sprintf(gText, "");
+                    sprintf(
+                        gText,
+                        DATA_COMPGEN(0x00533f78, tradingPostResourceEmptyText, "")
+                    );
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
