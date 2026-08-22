@@ -558,7 +558,7 @@ i32 TransmitRemoteData(
             i = 0;
             while (i < REMOTE_CONFIRM_POLL_COUNT) {
                 ForcePollSound();
-                if (iIDCtr == giLastConfirm)
+                if (giLastConfirm == iIDCtr)
                     return 1;
                 rv = 0;
                 DelayMilli(REMOTE_CONFIRM_POLL_DELAY);
