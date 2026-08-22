@@ -43,9 +43,11 @@ requires the same exact slot. The corresponding x86 ``__cdecl`` rule recognizes 
 ``__imp__Name`` and has the same slot and zero-addend requirements. A candidate REL32
 spelling is retained across an identical-COMDAT fold only when the candidate object
 defines both spellings with non-empty, byte-identical bodies and retail names the
-folded partner at that same relocation site. These rules recover lost COFF spelling;
-neither changes linked bytes or treats same-address symbols as generally
-interchangeable.
+folded partner at that same relocation site. An ordinal-only PE import supplies no
+name by itself, so it is eligible only when a reviewed DLL-and-ordinal table supplies
+the exact decorated COFF identity; unknown DLLs and ordinals remain unresolved. These
+rules recover lost COFF spelling; none changes linked bytes or treats same-address
+symbols as generally interchangeable.
 
 The Gold 2.1 audit that introduced these rules closed ten previously identity-only
 residuals without changing reconstructed source: ``PlayAudiereMusic``, all six
@@ -76,6 +78,15 @@ both for ``__imp__wsprintfA``. The retail import directory fixes that identity a
 RVA ``0xea218``. Applying the rule closed ``com_init`` and
 ``DriveSupportsFreeSpaceQuery`` with byte-exact reviewed spans, exact CFGs, and equal
 ordered relocation streams.
+
+The Smacker ordinal rule reuses the independently reviewed 3.0g export mapping that
+also generates the vendor import library. The current retail PE contains nine mapped
+``smackw32.DLL`` IAT slots and the candidate contains 20 Smacker import relocation
+sites across ``DoAdvance``, ``SmackManagerMain``, and ``ShutDownSmacker``. Every site
+now resolves to its exact DLL-and-ordinal slot. The only newly exact function was
+``SmackManagerMain``: its reviewed ``0x117d``-byte span is byte-identical, all 207 CFG
+blocks are exact, and its complete ordered relocation stream is equal at 352 of 352
+sites including imports (334 of 334 non-import sites).
 
 `python3 -m homm2.build.gen_reloc_aliases` writes candidate-derived proposals to
 `build/gen/reloc_alias_proposals.tsv` and unresolved groups to

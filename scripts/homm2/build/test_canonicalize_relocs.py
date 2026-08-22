@@ -4,7 +4,8 @@ from tempfile import TemporaryDirectory
 
 from homm2.build.canonicalize_relocs import (
     CoffFile, Coverage, authorize_import_alias, authorize_missing_self_rel32,
-    authorize_owner_alias, authorize_rel32_alias, record_site_coverage,
+    authorize_owner_alias, authorize_rel32_alias, import_iat_aliases,
+    record_site_coverage,
 )
 from homm2.build.test_canonicalize_data_symbols import (
     DIR32, TEXT, SectionSpec, make_coff,
@@ -72,6 +73,32 @@ class ImportAliasAuthorizationTest(unittest.TestCase):
         self.assertIsNone(authorize_import_alias(
             {("cdecl", "wsprintfA"): 0xEA218},
             "DIR32", "__imp__wvsprintfA", 0, 0xEA218))
+
+
+class ImportIatAliasesTest(unittest.TestCase):
+    def test_reviewed_smack_ordinal_recovers_exact_coff_name(self):
+        self.assertEqual(
+            import_iat_aliases(
+                "SMACKW32.DLL", 0x8000000E,
+                lambda _rva: self.fail("ordinal import read a name")),
+            ("__imp__SmackOpen@12",),
+        )
+
+    def test_unknown_dll_or_ordinal_has_no_alias(self):
+        read_string = lambda _rva: self.fail("ordinal import read a name")
+        self.assertEqual(import_iat_aliases(
+            "other.dll", 0x8000000E, read_string), ())
+        self.assertEqual(import_iat_aliases(
+            "smackw32.dll", 0x8000000F, read_string), ())
+
+    def test_named_import_keeps_exact_and_mechanical_aliases(self):
+        self.assertEqual(
+            import_iat_aliases(
+                "KERNEL32.dll", 0x1234,
+                lambda rva: "CreateFileA" if rva == 0x1236 else "wrong"),
+            ("__imp_CreateFileA", ("stdcall", "CreateFileA"),
+             ("cdecl", "CreateFileA")),
+        )
 
 
 class Rel32AliasAuthorizationTest(unittest.TestCase):

@@ -59,6 +59,7 @@ from homm2.build.assert_relocs import (
     IMAGE_BASE, _pe_read, folded_comdat_symbols, load_symbols, parse_obj,
     resolve,
 )
+from homm2.build.gen_vendor_imports import SMACK_IMPORTS
 from homm2.build.normalized_freshness import write_stamp
 
 
@@ -69,6 +70,10 @@ OUTPUT_MARKER = ".homm2-reloc-canonical"
 SYM_CLASS_STATIC = 3
 ALIGNMENT_FILL = {0x90, 0xCC}
 ALIGNMENT_FILL_LIMIT = 16
+REVIEWED_ORDINAL_IMPORTS = {
+    ("smackw32.dll", ordinal): "__imp_" + symbol
+    for symbol, ordinal in SMACK_IMPORTS
+}
 
 # Compiler-local EH machinery spellings: FuncInfo records and handler
 # funclets ($L..., __ehhandler$..., __unwindfunclet$...) live in .text$x,
@@ -445,6 +450,28 @@ def authorize_import_alias(import_iat, base_type, base_symbol, base_addend,
     return base_symbol
 
 
+def import_iat_aliases(dll_name, entry, read_string):
+    """Return reviewed COFF aliases for one PE import lookup entry.
+
+    Named imports support only the mechanical x86 spellings. Ordinal-only
+    imports require an independently reviewed DLL-and-ordinal mapping; the PE
+    ordinal alone does not recover the source-level symbol identity.
+    """
+    if entry & 0x80000000:
+        symbol = REVIEWED_ORDINAL_IMPORTS.get(
+            (dll_name.lower(), entry & 0xFFFF))
+        return (symbol,) if symbol is not None else ()
+
+    import_name = read_string(entry + 2)
+    aliases = ["__imp_" + import_name]
+    if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", import_name):
+        aliases.extend((
+            ("stdcall", import_name),
+            ("cdecl", import_name),
+        ))
+    return tuple(aliases)
+
+
 def load_import_iat_symbols(path):
     """Map unambiguous COFF ``__imp_`` names to retail IAT slot RVAs."""
     payload = Path(path).read_bytes()
@@ -495,6 +522,7 @@ def load_import_iat_symbols(path):
             "<IIIII", payload, descriptor)
         if not (original or first or name_rva):
             break
+        dll_name = read_string(name_rva)
         lookup = raw_offset(original or first)
         if lookup is None:
             raise ValueError("unmapped import lookup table in %s" % path)
@@ -505,12 +533,8 @@ def load_import_iat_symbols(path):
             entry = struct.unpack_from("<I", payload, lookup)[0]
             if entry == 0:
                 break
-            if not entry & 0x80000000:
-                import_name = read_string(entry + 2)
-                candidates["__imp_" + import_name].add(slot)
-                if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", import_name):
-                    candidates[("stdcall", import_name)].add(slot)
-                    candidates[("cdecl", import_name)].add(slot)
+            for alias in import_iat_aliases(dll_name, entry, read_string):
+                candidates[alias].add(slot)
             lookup += 4
             slot += 4
         descriptor += 20

@@ -168,6 +168,7 @@ def main():
                 w.build(paired_target, "canonicalize_relocs", inputs=target_input,
                         implicit=[obj, reloc_normalizer,
                                   "scripts/homm2/build/assert_relocs.py",
+                                  "scripts/homm2/build/gen_vendor_imports.py",
                                   "build/gen/symbol_names.csv",
                                   "build/orig/HMM2PL.exe"],
                         variables={"base": obj, "unit": u["unit"]})
