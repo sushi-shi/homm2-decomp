@@ -501,7 +501,7 @@ SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	100.0000	95efe5caed7b
 SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	b8f4319e7e4a
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	9efb1c3c8853
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	100.0000	640a26505644
-SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	99.8518	60408cb4e81e
+SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	daa2372fccfc
 SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	100.0000	bb8a02fc02ab
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	100.0000	58fbf54c80dc
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	367f9621bc52

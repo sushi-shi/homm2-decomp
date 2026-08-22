@@ -181,10 +181,11 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path,
             rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor), unit=unit,
             size=size, kind="func", provenance="source-annotation"))
 
-    # DATA() names a global definition. The marker binding, the one-VarDecl-per-
-    # marker rule and the complete-type rule all live in annotated_data, which
-    # the data-topology and link audits already read; reusing it keeps one
-    # meaning for a marker instead of two parsers that can drift apart.
+    # DATA() names an ordinary storage definition, including a block-scope
+    # static. The marker binding, the one-VarDecl-per-marker rule and the
+    # complete-type rule all live in annotated_data, which the data-topology and
+    # link audits already read; reusing it keeps one meaning for a marker
+    # instead of two parsers that can drift apart.
     for definition in definitions_for_file(path, source_root, repo, translation):
         # Same discipline as the VA case: a marker that cannot produce a symbol
         # is a source defect, not a row to drop quietly.

@@ -240,14 +240,15 @@ exactly to `crc32Table` at 0x51f5a4, and `include/BASE/MIDI_TYPES.h` is gone.
   content ones: their leading cells always matched and only a trailing invented
   element differed, which the extent sweep removed. `_gMidiText` was a third
   shape again — retail has no such struct at all.
-- **Seven symbols the derivation votes for but cannot spell as a claim.** Two
-  are class statics (`AudiereMusicState::source`/`::stream`), three are
-  function-local statics (`FadeSavedUpdate`'s `savedUpdate`, `LoadRemote`'s
-  `cheatWarned`/`debugWarned`), and one is a `std::ctype<wchar_t>::id` guard.
-  Each has a stable decorated name and unanimous votes; what is missing is a
-  marker channel — `DATA()` binds to a namespace-scope `VarDecl`, and
-  `identifier()` deliberately refuses anything else so a member never claims a
-  namespace-scope address.
+- **Four symbols the derivation votes for but cannot spell as a claim.** Two
+  are class statics (`AudiereMusicState::source`/`::stream`), one is the
+  function-local static `FadeSavedUpdate`'s `savedUpdate`, and one is a
+  `std::ctype<wchar_t>::id` guard. Each has a stable decorated name and unanimous
+  votes; what is missing is a marker channel for the class-static and guard
+  cases. `LoadRemote`'s `cheatWarned`/`debugWarned` left this queue when the
+  ordinary `DATA()` channel was applied directly to their block-scope static
+  definitions; the shared Clang inventory and candidate binder retain their
+  actual local-static decorated names.
 - **`s_drawPixelY` and `s_drawHeroYOffset` (`SOURCE/ADVMGR`) both win
   0x523fd0.** 37 votes and 8 respectively, both with the same runner-up at
   0x523e0c, and one address cannot have two owners. The shape matches the

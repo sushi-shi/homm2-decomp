@@ -122,12 +122,18 @@ def source_definitions(source_root: Path = SOURCE_ROOT,
 
 
 def _decoded_symbol_names(symbol: str) -> set[str]:
-    names = {symbol, symbol.removeprefix("_")}
+    undecorated = symbol.removeprefix("_")
+    names = {symbol, undecorated}
     local = LOCAL_SUFFIX.match(symbol)
     if local:
         names.add(local.group(1).removeprefix("_"))
-    if symbol.startswith("?") and "@@" in symbol:
-        spelling = symbol[1:symbol.index("@@")]
+    # VC6 prefixes block-scope static data symbols with an ordinary COFF
+    # underscore before their C++ decoration, for example
+    # ``_?value@?BB@??function@@...``.  Clang reports the source VarDecl as
+    # ``?value@?1??function@@...``; the lexical-scope code is compiler-local,
+    # but the leading identifier is still the real source identity.
+    if undecorated.startswith("?") and "@@" in undecorated:
+        spelling = undecorated[1:undecorated.index("@@")]
         pieces = spelling.split("@")
         simple = pieces[0]
         names.add(simple)

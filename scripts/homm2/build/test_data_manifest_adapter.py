@@ -271,16 +271,22 @@ class DataManifestAdapterTest(unittest.TestCase):
                 "#define DATA(x)\nstruct Owner { static int member; };\n"
                 "DATA(0x00400100) int global;\n"
                 "DATA(0x00400104) static int local;\n"
-                "DATA(0x00400108) int Owner::member;\n")
+                "DATA(0x00400108) int Owner::member;\n"
+                "void function() {\n"
+                "  DATA(0x0040010c) static int blockLocal;\n"
+                "}\n")
             definitions = source_definitions(root)
         topology = {"A": ([
             candidate("A", "?global@@3HA", value=0),
             candidate("A", "_local$S12", value=4),
             candidate("A", "?member@Owner@@2HA", value=8),
+            candidate(
+                "A", "_?blockLocal@?BB@??function@@YAXXZ@4HA", value=12),
         ], [])}
         resolved = resolve_source_definitions(definitions, topology, {})
         self.assertEqual([row.symbol for _source, row in resolved], [
             "?global@@3HA", "_local$S12", "?member@Owner@@2HA",
+            "_?blockLocal@?BB@??function@@YAXXZ@4HA",
         ])
 
     def test_duplicate_raw_comdat_section_names_keep_distinct_ordinals(self):

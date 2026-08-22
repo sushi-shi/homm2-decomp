@@ -9662,7 +9662,7 @@ void advManager::LoadRemote(void) {
     gSoundBackendsReady = 1;
 
     if (static_cast<i8>(gpGame->m_cheated)) {
-        static i32 cheatWarned = 0;
+        DATA(0x00523ffc) static i32 cheatWarned = 0;
         if (!cheatWarned) {
             cheatWarned = 1;
             sprintf(
@@ -9677,7 +9677,7 @@ void advManager::LoadRemote(void) {
         }
     }
     if (giDebugLevel > 0) {
-        static i32 debugWarned = 0;
+        DATA(0x00524000) static i32 debugWarned = 0;
         if (!debugWarned) {
             debugWarned = 1;
             sprintf(

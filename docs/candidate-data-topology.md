@@ -32,8 +32,9 @@ such as `__real@8@3ff8a3d70a3d70a3d800`, are not semantic identities.
 The generated Vostok manifests come only from source annotations and candidate
 COFF topology:
 
-- `DATA(rva)` marks an ordinary named definition. Clang supplies its declaration name,
-  type, and logical `sizeof`.
+- `DATA(rva)` marks an ordinary named definition, including a block-scope static.
+  Clang supplies its declaration name, type, and logical `sizeof`; the candidate
+  binder resolves VC6's compiler-specific local-scope decoration from COFF.
 - `VTBL(Class, rva)` and `VTBL2(Derived, Base, rva)` mark primary and secondary
   vtables; the tooling derives the MSVC decorated identity.
 - `DATA_COMPGEN(rva, semanticName, value)` marks an anonymous compiler-generated
