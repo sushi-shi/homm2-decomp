@@ -202,8 +202,10 @@ combatManager::combatManager(void) {
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = 0;
-    strcpy(m_previousCombatMessage, "");
-    strcpy(m_currentCombatMessage, "");
+    strcpy(m_previousCombatMessage,
+           DATA_COMPGEN(0x005240ec, combatManagerPreviousMessageEmpty, ""));
+    strcpy(m_currentCombatMessage,
+           DATA_COMPGEN(0x005240f0, combatManagerCurrentMessageEmpty, ""));
 }
 
 VA(0x00425f8f, 0xfa)
