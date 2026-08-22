@@ -66,7 +66,7 @@ H2_ENUM_END(WindowFizzleConstant)
 #endif
 
 DATA(0x005348f4) i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
-i16 memSelector;
+DATA(0x00534954) i16 memSelector;
 
 static inline u32& FadeSavedUpdate(void) {
     DATA(0x00534958) static u32 savedUpdate;
