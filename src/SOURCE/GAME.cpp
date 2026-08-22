@@ -7339,8 +7339,8 @@ void game::SetMapSize(i32 w, i32 h) {
 mapSized:
     if (mapExtra)
         H2_FREE(mapExtra);
-    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT));
-    memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
+    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
+    memset(mapExtra, 0, MAP_HEIGHT * MAP_WIDTH);
 }
 
 VA(0x0045f29c, 0x107)
