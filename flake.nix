@@ -33,6 +33,7 @@
           ./patches/vostok-data-comdat-sections.patch
           ./patches/vostok-common-symbols.patch
           ./patches/vostok-canonical-data-sinks.patch
+          ./patches/vostok-data-manifest-folded-comdat.patch
           ./patches/vostok-reviewed-static-reuse.patch
         ];
         cargoHash = "sha256-ZwFdbqUyh4b0S+fUYKGMN1fWaxRu1zU2ozKpe7CbcYs=";

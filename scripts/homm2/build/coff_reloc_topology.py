@@ -712,9 +712,14 @@ def load_homm2_provenance(root: Path) -> dict:
             unit_anchors[row["name"]] = anchor
         if row["scope"] == "external":
             external_by_name.setdefault(row["name"], []).append(anchor)
-    unique_external_anchors = {
-        name: rows[0] for name, rows in external_by_name.items() if len(rows) == 1
-    }
+    unique_external_anchors = {}
+    for name, rows in external_by_name.items():
+        signatures = {
+            (row["rva"], row["size"], row["scope"])
+            for row in rows
+        }
+        if len(signatures) == 1:
+            unique_external_anchors[name] = rows[0]
     return {
         "root": str(root),
         "anchors_by_unit": anchors_by_unit,

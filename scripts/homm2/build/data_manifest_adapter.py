@@ -68,6 +68,7 @@ SECTION_HEADER = (
 COMMON_HEADER = ("object", "name", "size")
 LOCAL_SUFFIX = re.compile(r"^_?(.+?)\$S[0-9]+$")
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
+FOLDABLE_COMDAT_SELECTIONS = frozenset((2, 3, 4, 6, 7))
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 ORDINAL_STATIC_GUARD = re.compile(r"^_?\$S[0-9]+$")
 FUNCTION_TYPE = 0x0020
@@ -616,8 +617,14 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
     definitions = source_definitions(source_root, base_root)
     compgen = source_compgen_data(source_root, repo)
     vtables = source_vtables(source_root, repo)
-    units = sorted({row.unit for row in [*definitions, *compgen, *vtables]})
-    missing = [base_root / f"{unit}.obj" for unit in units
+    claim_units = {row.unit for row in [*definitions, *compgen, *vtables]}
+    document = tomllib.loads(Path(UNITS).read_text())
+    configured_units = {
+        row["unit"] for row in document.get("unit", ())
+        if (base_root / f'{row["unit"]}.obj').is_file()
+    }
+    units = sorted(claim_units | configured_units)
+    missing = [base_root / f"{unit}.obj" for unit in claim_units
                if not (base_root / f"{unit}.obj").is_file()]
     if missing:
         raise FileNotFoundError(
@@ -634,11 +641,11 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
         compgen, topology, base_root, Path(exe), strict=strict)
     table_rows = resolve_vtable_definitions(
         vtables, topology, public_by_rva)
+    compiler_rows = _folded_compgen_rows(compiler_generated, topology)
     rows = [
         *(_symbol_row(source, candidate, None)
           for source, candidate in ordinary),
-        *(_compgen_row(source, candidate)
-          for source, candidate in compiler_generated),
+        *compiler_rows,
         *(_vtable_row(source, candidate)
           for source, candidate in table_rows),
     ]
@@ -965,6 +972,87 @@ def _compgen_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
     }
 
 
+def _folded_compgen_rows(bindings, topology_by_unit):
+    """Project one reviewed external COMDAT identity into every emitter.
+
+    A string or real-literal COMDAT is present in every candidate object which
+    emits it, while the linker folds those copies onto one retail RVA.  The
+    source use-site claim establishes the retail identity once.  Candidate COFF
+    then proves the additional emitters, but only when the raw symbol and the
+    complete section topology/checksum agree with the claimed copy.
+    """
+    rows = []
+    candidates_by_symbol = defaultdict(list)
+    sections_by_location = {}
+    for unit, (definitions, sections) in topology_by_unit.items():
+        for section in sections:
+            sections_by_location[(unit, section.ordinal)] = section
+        for candidate in definitions:
+            if (candidate.storage_class == 2
+                    and candidate.comdat_selection in FOLDABLE_COMDAT_SELECTIONS
+                    and _compgen_candidate_kind(candidate) in (
+                        "STRING_LITERAL", "FLOAT_LITERAL")):
+                candidates_by_symbol[candidate.symbol].append(candidate)
+
+    def signature(candidate):
+        section = sections_by_location[
+            (candidate.unit, candidate.section_ordinal)]
+        return (
+            candidate.symbol,
+            candidate.section_name,
+            candidate.section_value,
+            candidate.size,
+            candidate.alignment,
+            candidate.storage,
+            candidate.storage_class,
+            candidate.characteristics,
+            candidate.comdat_selection,
+            candidate.associative_ordinal,
+            section.name,
+            section.size,
+            section.alignment,
+            section.characteristics,
+            section.storage,
+            section.checksum,
+            section.comdat_selection,
+            section.associative_ordinal,
+        )
+
+    identities = set()
+    for claim, owner in bindings:
+        owner_row = _compgen_row(claim, owner)
+        peers = [
+            candidate
+            for candidate in candidates_by_symbol.get(owner.symbol, ())
+            if signature(candidate) == signature(owner)
+        ]
+        if not peers:
+            peers = [owner]
+        peer_units = {candidate.unit for candidate in peers}
+        if len(peer_units) != len(peers):
+            raise ValueError(
+                f"{owner.symbol} has duplicate folded COMDAT definitions in one object")
+        if len(peers) > 1:
+            owner_row["provenance"] += ":candidate-coff-folded-comdat"
+        for peer in sorted(peers, key=lambda row: (
+                row.unit, row.section_ordinal, row.section_value)):
+            row = dict(owner_row)
+            row.update({
+                "object": peer.unit.replace("/", "\\") + ".c",
+                "alignment": f"0x{peer.alignment:x}",
+                "section_ordinal": str(peer.section_ordinal),
+                "section_offset": f"0x{peer.section_value:x}",
+                "scope": (
+                    "external" if peer.storage_class == 2 else "local"),
+            })
+            identity = (row["object"], row["name"])
+            if identity in identities:
+                continue
+            identities.add(identity)
+            rows.append(row)
+    return rows
+
+
 def resolve_vtable_definitions(claims, topology_by_unit, public_by_rva):
     """Bind each source VTBL/VTBL2 claim to one emitted candidate definition."""
     resolved = []
@@ -1016,10 +1104,10 @@ def _vtable_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
 
 def _mark_vtable_aliases(rows: list[dict[str, str]]) -> None:
     """Mark source vtable names which candidate COFF aliases at one allocation."""
-    by_rva = defaultdict(list)
+    by_allocation = defaultdict(list)
     for row in rows:
-        by_rva[int(row["rva"], 0)].append(row)
-    for aliases in by_rva.values():
+        by_allocation[(row["object"], int(row["rva"], 0))].append(row)
+    for aliases in by_allocation.values():
         if len(aliases) < 2:
             continue
         for row in aliases:
@@ -1073,7 +1161,16 @@ def validate_symbol_rows(rows, label: str) -> None:
                 "candidate-coff-alias" in row["provenance"]
                 and "candidate-coff-alias" in previous_row["provenance"]
                 and all(row[key] == previous_row[key] for key in alias_fields))
-            if not proved_alias:
+            fold_fields = (
+                "name", "size", "storage", "alignment", "section_offset",
+                "scope")
+            proved_fold = (
+                row["object"] != previous_row["object"]
+                and row["scope"] == "external"
+                and "candidate-coff-folded-comdat" in row["provenance"]
+                and "candidate-coff-folded-comdat" in previous_row["provenance"]
+                and all(row[key] == previous_row[key] for key in fold_fields))
+            if not (proved_alias or proved_fold):
                 raise ValueError(
                     f"{label} duplicate RVA 0x{rva:x}: {identity} and {previous_identity}")
         else:

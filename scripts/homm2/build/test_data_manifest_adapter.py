@@ -9,6 +9,7 @@ from homm2.build.data_manifest_adapter import (
     CandidateSection,
     _bind_compgen_edges,
     _compgen_candidate_kind,
+    _folded_compgen_rows,
     _interior_compgen_aliases,
     _unique_reviewed_pointer_sequence_rva,
     candidate_topology,
@@ -135,6 +136,52 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual(_compgen_candidate_kind(guard), "STATIC_INIT_GUARD")
         self.assertIsNone(_compgen_candidate_kind(candidate("A", "_$S18")))
 
+    def test_external_compgen_comdat_is_projected_into_every_exact_emitter(self):
+        symbol = "__real@8@3ffec000000000000000"
+        owner = CandidateDefinition(
+            "A", symbol, 1, ".rdata", 0, 0, 8, 8, "rdata", "global",
+            2, 0x40401040, 2, None)
+        peer = replace(owner, unit="B", section_ordinal=3)
+        owner_section = CandidateSection(
+            "A", "A.c", 1, ".rdata", 8, 8, 0x40401040, "rdata",
+            0x12345678, 2, None)
+        peer_sections = [
+            CandidateSection(
+                "B", "B.c", ordinal, ".text", 0, 1, 0x60300020,
+                None, 0, 0, None)
+            for ordinal in (1, 2)
+        ] + [replace(owner_section, unit="B", object_name="B.c", ordinal=3)]
+        claim = CompgenDataClaim(
+            "A", 0x100, "sharedScale", "FLOAT_LITERAL", 8,
+            "A.cpp:1", "A.cpp:1", ())
+        rows = _folded_compgen_rows(
+            [(claim, owner)], {
+                "A": ([owner], [owner_section]),
+                "B": ([peer], peer_sections),
+            })
+        self.assertEqual([row["object"] for row in rows], ["A.c", "B.c"])
+        self.assertEqual(len({row["name"] for row in rows}), 1)
+        self.assertTrue(all(
+            "candidate-coff-folded-comdat" in row["provenance"]
+            for row in rows))
+        validate_symbol_rows(rows, "fixture")
+
+        different = replace(peer_sections[-1], checksum=0x87654321)
+        rows = _folded_compgen_rows(
+            [(claim, owner)], {
+                "A": ([owner], [owner_section]),
+                "B": ([peer], [*peer_sections[:-1], different]),
+            })
+        self.assertEqual([row["object"] for row in rows], ["A.c"])
+
+        local = replace(owner, storage_class=3, scope="local",
+                        comdat_selection=0)
+        rows = _folded_compgen_rows(
+            [(claim, local)], {"A": ([local], [owner_section])})
+        self.assertEqual([row["object"] for row in rows], ["A.c"])
+        self.assertNotIn("candidate-coff-folded-comdat", rows[0]["provenance"])
+        self.assertEqual(rows[0]["scope"], "local")
+
     def test_compgen_interior_alias_keeps_the_owning_allocation(self):
         owner = CompgenDataClaim(
             "A", 0x100, "sourceFile", "STRING_LITERAL", 8,
@@ -240,6 +287,21 @@ class DataManifestAdapterTest(unittest.TestCase):
         _mark_vtable_aliases(rows)
         validate_symbol_rows(rows, "fixture")
         self.assertTrue(all("candidate-coff-alias" in row["provenance"]
+                            for row in rows))
+
+    def test_alias_marker_does_not_conflate_cross_object_folds(self):
+        rows = [
+            {
+                "object": "A.c", "rva": "0x100",
+                "provenance": "source-DATA_COMPGEN:test:fold-a",
+            },
+            {
+                "object": "B.c", "rva": "0x100",
+                "provenance": "source-DATA_COMPGEN:test:fold-b",
+            },
+        ]
+        _mark_vtable_aliases(rows)
+        self.assertTrue(all("candidate-coff-alias" not in row["provenance"]
                             for row in rows))
 
     def test_primary_vtable_requires_matching_inventory_row(self):

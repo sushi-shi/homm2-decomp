@@ -93,6 +93,17 @@ An exact function-relative relocation-site proof remains usable to select a
 open. This narrows only the explicit source claim; it does not close the enclosing
 candidate section or waive its interval, extent, payload, or coverage diagnostics.
 
+An external compiler-generated definition in a foldable COMDAT may have identical
+candidate definitions in several objects even though the linker retains one retail
+allocation. The source annotation claims that allocation once. The manifest adapter
+projects the reviewed identity into every exact emitter only when the raw symbol and
+the complete candidate definition/section signature agree, including selection,
+association, characteristics, extent, alignment, and section checksum. Local symbols,
+non-foldable sections, duplicate definitions within one object, or any signature
+disagreement retain a single owner or fail validation. Vostok accepts these repeated
+rows only for distinct external objects with identical RVA, size, storage, alignment,
+and scope; they remain physical compiler copies, not additional semantic owners.
+
 A normal assembly warns and omits a missing or ambiguous compiler-generated binding so
 iterative work can continue. Strict assembly fails. It never guesses an identity or emits
 `const_*`, `string_*`, `data_*`, `bss_*`, or another fallback spelling.

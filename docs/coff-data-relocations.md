@@ -89,8 +89,10 @@ source-inventory drift are hard provenance diagnostics.
 Anchors are indexed by translation unit. A relocation resolves against its current unit
 first, which preserves private identities and repeated compiler names. Cross-unit lookup
 is allowed only for an external symbol identity that occurs exactly once in the merged
-manifest; repeated or private names are never guessed globally. These checks validate
-provenance and do not grant normalization permission.
+manifest, or whose repeated folded-COMDAT rows all name the same reviewed RVA, extent,
+and external scope. A disagreement or any private repetition remains ambiguous rather
+than being guessed globally. These checks validate provenance and do not grant
+normalization permission.
 
 ## Empty return stubs
 
