@@ -1390,7 +1390,7 @@ SOURCE/X_CAMPGN	?ResetMapChoices@ExpCampaign@@QAEXXZ	100.0000	1af0cdd79d9a
 SOURCE/X_CAMPGN	?ResetMapsPlayed@ExpCampaign@@QAEXXZ	100.0000	fcc4d178f503
 SOURCE/X_CAMPGN	?SetMapWasPlayed@ExpCampaign@@QAEXXZ	100.0000	974e0dadcc18
 SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	100.0000	eda780f50ff2
-SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	99.9913	36c52d6f7462
+SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	100.0000	8358c9be7680
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	100.0000	d9110770ac1b
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	7fe2d921f763
 SOURCE/comwin	?com_init@@YIFEHH@Z	99.8853	8454c2d13a94

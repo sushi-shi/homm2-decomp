@@ -653,7 +653,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
 
     hasVisibleAward = 0;
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
-    strcpy(gText, "");
+    strcpy(gText, DATA_COMPGEN(0x005347d8, expansionCampaignAwardsEmptyText, ""));
     for (i = 0; i < EXPANSION_CAMPAIGN_AWARD_COUNT; ++i) {
         if (m_awards[i] != 0) {
             hasVisibleAward = 1;
