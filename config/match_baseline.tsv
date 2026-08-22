@@ -648,7 +648,7 @@ SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	100.0000	29f4b0050263
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	24f641e468f2
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	100.0000	cbc34783cc18
 SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	100.0000	6b2dc9a8acf8
-SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	99.9806	84d2ff938385
+SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	a3f390df6486
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	8915b1da317d
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	d9de47dae8d0
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	dba6f232c7b1

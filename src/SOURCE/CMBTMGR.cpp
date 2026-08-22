@@ -521,7 +521,7 @@ i32 combatManager::Open(i32 openFlags) {
     glTimers[0] = KBTickCount();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
-    CombatMessage("", 1, 1, 0);
+    CombatMessage(DATA_COMPGEN(0x005240f4, combatOpenEmptyMessage, ""), 1, 1, 0);
     gConfig.showCombatMouseHex = savedMouseHex;
     if (gpBufferPalette->m_data != m_combatPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
