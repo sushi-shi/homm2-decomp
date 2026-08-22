@@ -292,7 +292,7 @@ BASE/PALETTE	??0palette@@QAE@K@Z	100.0000	f84faf9f9362
 BASE/PALETTE	??0palette@@QAE@XZ	100.0000	3a8ddbed70bb
 BASE/PALETTE	??1palette@@UAE@XZ	100.0000	d44227d46df5
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	977653b21b8c
-BASE/RESMGR	??0resourceManager@@QAE@XZ	99.8936	5940326a4f09
+BASE/RESMGR	??0resourceManager@@QAE@XZ	100.0000	bcaeb7018199
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	17efabe498ff
 BASE/RESMGR	?Close@resourceManager@@UAEXXZ	100.0000	1fd071d94feb
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	79a97f40642b

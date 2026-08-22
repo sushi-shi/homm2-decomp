@@ -35,7 +35,8 @@ resourceManager::resourceManager(void) : baseManager() {
     m_active = false;
     m_resourceListHead = NULL;
     m_expunging = 0;
-    strcpy(m_lastFileName, "");
+    strcpy(m_lastFileName,
+           DATA_COMPGEN(0x005349c4, resourceManagerLastFileNameEmpty, ""));
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         m_aggregateFd[aggregateIndex] = INVALID_FILE;
