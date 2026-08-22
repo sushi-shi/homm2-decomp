@@ -1208,7 +1208,7 @@ SOURCE/SETUP	?SetupComPort@game@@QAEHXZ	100.0000	b7fb09399646
 SOURCE/SETUP	?SetupComPortHandler@@YIHAAUtag_message@@@Z	100.0000	329b15b18517
 SOURCE/SETUP	?SetupGame@game@@QAEHXZ	100.0000	fc4b6c98af0d
 SOURCE/SETUP	?SetupGameHandler@@YIHAAUtag_message@@@Z	100.0000	2254483287f5
-SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	99.9333	db465629a6dd
+SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	100.0000	227da450af1b
 SOURCE/SETUP	?SetupHotSeatGameHandler@@YIHAAUtag_message@@@Z	100.0000	e43d4ead0b03
 SOURCE/SETUP	?SetupModemGame@game@@QAEHXZ	100.0000	00755bfa2e5a
 SOURCE/SETUP	?SetupModemGameHandler@@YIHAAUtag_message@@@Z	100.0000	a1b11c032192

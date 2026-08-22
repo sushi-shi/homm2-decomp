@@ -181,7 +181,10 @@ i32 game::SetupHotSeatGame(void) {
     }
 
     for (i = 0; i < PLAYER_COUNT; i++)
-        strcpy(cPlayerNames[i], "");
+        strcpy(
+            cPlayerNames[i],
+            DATA_COMPGEN(0x00533e30, setupHotSeatEmptyPlayerName, "")
+        );
 
     if (giSetupGameType == 0) {
         sprintf(
@@ -195,7 +198,10 @@ i32 game::SetupHotSeatGame(void) {
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
-                strcpy(name, "");
+                strcpy(
+                    name,
+                    DATA_COMPGEN(0x00533e34, setupHotSeatEmptyEntryName, "")
+                );
                 sprintf(
                     gText,
                     /* %d игрок: Ввести имя. */ DATA_COMPGEN(
