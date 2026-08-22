@@ -159,7 +159,10 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
         return;
 
     if (clear != 0) {
-        strcpy(m_previousCombatMessage, "");
+        strcpy(
+            m_previousCombatMessage,
+            DATA_COMPGEN(0x005244a4, combatMessageClearPreviousText, "")
+        );
         strcpy(m_currentCombatMessage, gCombatMessageText);
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = 0;
@@ -169,7 +172,10 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             if (m_combatMessageExpiration > KBTickCount()) {
                 return;
             } else {
-                strcpy(m_previousCombatMessage, "");
+                strcpy(
+                    m_previousCombatMessage,
+                    DATA_COMPGEN(0x005244a8, combatMessageExpiredPreviousText, "")
+                );
                 m_previousCombatMessageExpiration = 0;
                 m_combatMessageExpiration = 0;
             }
@@ -177,7 +183,10 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             if (m_combatMessageExpiration != 0)
                 strcpy(m_previousCombatMessage, m_currentCombatMessage);
             else
-                strcpy(m_previousCombatMessage, "");
+                strcpy(
+                    m_previousCombatMessage,
+                    DATA_COMPGEN(0x005244ac, combatMessageMissingPreviousText, "")
+                );
             m_previousCombatMessageExpiration = m_combatMessageExpiration;
             m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
         }
