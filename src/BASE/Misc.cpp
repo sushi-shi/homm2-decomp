@@ -595,7 +595,7 @@ void ReadPrefsFromFile(void) {
     FILE* file;
 
     sprintf(gText, "%s", "HEROES2.CFG");
-    if (access(gText, 0) == -1) {
+    if (_access(gText, 0) == -1) {
         SetInstallDefaults();
         SetGameDefaults();
         WritePrefs();
@@ -610,8 +610,14 @@ void ReadPrefsFromFile(void) {
             WritePrefs();
         }
     }
-    strcpy(gcRegCDRomPath, "");
-    strcpy(gcRegAppPath, "");
+    strcpy(
+        gcRegCDRomPath,
+        DATA_COMPGEN(0x005360b8, readPrefsCDRomPathEmpty, "")
+    );
+    strcpy(
+        gcRegAppPath,
+        DATA_COMPGEN(0x005360bc, readPrefsAppPathEmpty, "")
+    );
 }
 
 H2_ENUM_BEGIN(RegistryValueSize)
