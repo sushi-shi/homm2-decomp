@@ -31,7 +31,7 @@ H2_ENUM_BEGIN(InputManagerTiming)
     CURSOR_CHECK_DELAY = 500
 H2_ENUM_END(InputManagerTiming)
 
-i32 iCurSwapPalette = 0;
+DATA(0x00536078) i32 iCurSwapPalette = 0;
 DATA(0x0053607c) i32 bLastMouseOffscreen = 0;
 DATA(0x00536080) i32 bLastOnscreenMouseColor = 0;
 DATA(0x00536084) i32 bInCheckChangeCursor = 0;
