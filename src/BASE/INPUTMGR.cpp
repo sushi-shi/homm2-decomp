@@ -340,7 +340,7 @@ void inputManager::SetKeyCodeType(
 }
 
 VA(0x004bcad0, 0x33)
-static void TranslateInputCharacterCp1251(tag_message& event) {
+void TranslateInputCharacterCp1251(tag_message& event) {
     if (event.payload.keyboard.keyCode >= 0
         && event.payload.keyboard.keyCode < static_cast<i32>(sizeof(gInputCharacterMapCp1251)))
         event.payload.keyboard.keyCode =

@@ -43,7 +43,7 @@ font::~font() {
 // zero-extended byte, so the codes stay numeric: a signed char literal
 // ('\xa8' == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
 VA(0x004c37a0, 0x52)
-static i32 RemapCyrillicCharacter(i32 character) {
+i32 RemapCyrillicCharacter(i32 character) {
     if (character == 0xa8)              // 'Ё'
         return 0xa0;
     if (character == 0xb8)              // 'ё'
