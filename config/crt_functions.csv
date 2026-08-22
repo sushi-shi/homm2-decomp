@@ -75,7 +75,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd83f4,9,$alt_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
 0xd83fd,145,$body_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,fcos body
 0xd8490,20,_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
-0xd84a4,9,$alt_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd84a4,9,_sin,sin.obj,libcmt.lib,reviewed-archive-public-entry,VC6 sin.obj exports _sin at section offset 0x14; wrapper dispatch entry
 0xd84ad,158,$body_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,fsin body
 0xd853e,253,_WinMainCRTStartup,crt0.obj,libcmt.lib,reviewed-sandwich,ghidra-fid entry; EH frame; calls WinMain
 0xd8646,34,__amsg_exit,crt0msg.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
