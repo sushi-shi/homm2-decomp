@@ -457,11 +457,14 @@ def _function_relocation_proofs(candidate, function_rva, retail_sites,
             continue
         paired_sites += 1
         target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
-        if symbol.name in defined:
-            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
-        elif symbol.name in public:
+        # A same-TU definition can also have an authoritative retail public
+        # RVA.  Such a symbol validates the pairing; it is not an inferred
+        # private allocation merely because it appears in ``defined``.
+        if symbol.name in public:
             if (public[symbol.name] + addend) & 0xFFFFFFFF == target_rva:
                 known_anchors += 1
+        elif symbol.name in defined:
+            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
     return proposed, known_anchors, paired_sites, offsets_align, valid
 
 
@@ -474,12 +477,12 @@ def _function_sequence_relocation_proofs(candidate, retail_sites, read_u32,
     known_anchors = 0
     for (_site, symbol, addend), retail_site in zip(candidate, retail_sites):
         target_rva = (read_u32(retail_site) - image_base) & 0xFFFFFFFF
-        if symbol.name in defined:
-            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
-        elif symbol.name in public:
+        if symbol.name in public:
             known_anchors += 1
             if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
                 return [], known_anchors, False
+        elif symbol.name in defined:
+            proposed.append((symbol.name, (target_rva - addend) & 0xFFFFFFFF))
     return proposed, known_anchors, True
 
 

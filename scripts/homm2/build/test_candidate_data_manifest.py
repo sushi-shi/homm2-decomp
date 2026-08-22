@@ -348,6 +348,33 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(paired, 3)
         self.assertTrue(valid)
 
+    def test_defined_public_symbol_is_an_anchor_not_a_private_proposal(self):
+        private = SimpleNamespace(name="$SG1")
+        public_owner = SimpleNamespace(name="?owner@@3HA")
+        candidate = [(0x10, private, 0), (0x20, public_owner, 4)]
+        values = {
+            0x4010: 0x400000 + 0x700,
+            0x4020: 0x400000 + 0x204,
+        }
+        defined = {"$SG1": {}, "?owner@@3HA": {}}
+        public = {"?owner@@3HA": 0x200}
+
+        proposed, anchors, paired, _aligned, valid = \
+            _function_relocation_proofs(
+                candidate, 0x4000, sorted(values), values.__getitem__,
+                0x400000, defined, public)
+        self.assertEqual(proposed, [("$SG1", 0x700)])
+        self.assertEqual(anchors, 1)
+        self.assertEqual(paired, 2)
+        self.assertTrue(valid)
+
+        proposed, anchors, valid = _function_sequence_relocation_proofs(
+            candidate, sorted(values), values.__getitem__, 0x400000,
+            defined, public)
+        self.assertEqual(proposed, [("$SG1", 0x700)])
+        self.assertEqual(anchors, 1)
+        self.assertTrue(valid)
+
     def test_validated_sequence_pairs_shifted_private_relocation(self):
         private = SimpleNamespace(name="$SG1")
         anchor = SimpleNamespace(name="?known@@3HA")
