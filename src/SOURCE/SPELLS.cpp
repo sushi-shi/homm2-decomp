@@ -3629,7 +3629,9 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
         gText,
         "%s%s \xf1\xee\xef\xf0\xee\xf2\xe8\xe2\xeb\xff\xe5\xf2\xf1\xff "
         "\xfd\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe!",
-        target->m_quantity == 1 ? "" : "\xce\xf2\xf0\xff\xe4 ",
+        target->m_quantity == 1
+            ? DATA_COMPGEN(0x00533ec8, spellCastFailureSingularPrefixEmpty, "")
+            : "\xce\xf2\xf0\xff\xe4 ",
         target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
                                 : gArmyNamesPlural[IDX(target->m_monsterType)]
     );
