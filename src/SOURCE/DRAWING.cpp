@@ -119,11 +119,22 @@ void combatManager::ClearCombatMessages(i32 force) {
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
         return;
     if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
-        strcpy(m_previousCombatMessage, "");
-        strcpy(m_currentCombatMessage, "");
+        strcpy(
+            m_previousCombatMessage,
+            DATA_COMPGEN(0x00524494, clearCombatPreviousMessageEmpty, "")
+        );
+        strcpy(
+            m_currentCombatMessage,
+            DATA_COMPGEN(0x00524498, clearCombatCurrentMessageEmpty, "")
+        );
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = 0;
-        CombatMessage("", 1, 0, 0);
+        CombatMessage(
+            DATA_COMPGEN(0x0052449c, clearCombatDisplayEmpty, ""),
+            1,
+            0,
+            0
+        );
     }
 }
 
