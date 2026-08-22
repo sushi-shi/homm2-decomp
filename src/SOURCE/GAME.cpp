@@ -1155,9 +1155,19 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
 
     if (generateName) {
         if (gbInCampaign) {
-            sprintf(genName, "%s.%s", filename, "GMC");
+            sprintf(
+                genName,
+                "%s.%s",
+                filename,
+                DATA_COMPGEN(0x004f7560, saveGameCampaignExtension, "GMC")
+            );
         } else if (xIsPlayingExpansionCampaign) {
-            sprintf(genName, "%s.%s", filename, "GXC");
+            sprintf(
+                genName,
+                "%s.%s",
+                filename,
+                DATA_COMPGEN(0x004f756c, saveGameExpansionCampaignExtension, "GXC")
+            );
         } else {
             nHuman = 0;
             for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
@@ -1173,11 +1183,11 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(genName, filename);
     }
 
-    if (strnicmp(genName, "RMT", sizeof("RMT") - 1) == 0) {
+    if (_strnicmp(genName, "RMT", sizeof("RMT") - 1) == 0) {
         sprintf(savePath, "%s%s", ".\\DATA\\", genName);
     } else {
         sprintf(savePath, "%s%s", gcGamePath, genName);
-        if (strnicmp(
+        if (_strnicmp(
                 genName,
                 DATA_COMPGEN(
                     0x004f75a4,
@@ -1187,7 +1197,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
                 sizeof("AUTOSAVE") - 1
             )
                 != 0
-            && strnicmp(
+            && _strnicmp(
                    genName,
                    DATA_COMPGEN(
                        0x004f75b4,
