@@ -39,11 +39,13 @@ proves without a hand-authored alias row. A candidate ``__imp_`` DIR32 spelling 
 retained only when the retail import directory maps that exact decorated name to the
 encoded IAT slot. For x86 ``__stdcall`` imports whose PE export name is undecorated,
 the pass recognizes only the mechanical ``__imp__Name@N`` COFF form and still
-requires the same exact slot. A candidate REL32 spelling is retained across an
-identical-COMDAT fold only when the candidate object defines both spellings with
-non-empty, byte-identical bodies and retail names the folded partner at that same
-relocation site. These rules recover lost COFF spelling; neither changes linked bytes
-or treats same-address symbols as generally interchangeable.
+requires the same exact slot. The corresponding x86 ``__cdecl`` rule recognizes only
+``__imp__Name`` and has the same slot and zero-addend requirements. A candidate REL32
+spelling is retained across an identical-COMDAT fold only when the candidate object
+defines both spellings with non-empty, byte-identical bodies and retail names the
+folded partner at that same relocation site. These rules recover lost COFF spelling;
+neither changes linked bytes or treats same-address symbols as generally
+interchangeable.
 
 The Gold 2.1 audit that introduced these rules closed ten previously identity-only
 residuals without changing reconstructed source: ``PlayAudiereMusic``, all six
@@ -68,6 +70,12 @@ slot, and every normalized function has a complete, equal ordered relocation str
 The executable spans are byte-exact; the disassembler's apparent suffix differences
 for ``DPSD``, ``AppCommand``, and ``DDSD`` begin after their real return in embedded
 switch-table or adjacent compiler-data bytes covered by the enclosing source marker.
+
+The candidate-wide x86 ``__cdecl`` census contained exactly two applicable sites,
+both for ``__imp__wsprintfA``. The retail import directory fixes that identity at IAT
+RVA ``0xea218``. Applying the rule closed ``com_init`` and
+``DriveSupportsFreeSpaceQuery`` with byte-exact reviewed spans, exact CFGs, and equal
+ordered relocation streams.
 
 `python3 -m homm2.build.gen_reloc_aliases` writes candidate-derived proposals to
 `build/gen/reloc_alias_proposals.tsv` and unresolved groups to

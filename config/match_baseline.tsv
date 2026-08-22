@@ -247,7 +247,7 @@ BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	100.0000	d6833a6a3037
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	8e1bd50148cc
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	100.0000	876930ea736e
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	100.0000	9c11b66a7960
-BASE/Misc	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	99.8649	f4d19ceabdd4
+BASE/Misc	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	100.0000	f4d19ceabdd4
 BASE/Misc	?FadeIn@@YIXH@Z	100.0000	7316a9671415
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	e99518d06bf5
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	100.0000	8b3a93e21e15
@@ -1393,7 +1393,7 @@ SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	100.0000	eda780f50ff2
 SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	100.0000	8358c9be7680
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	100.0000	d9110770ac1b
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	7fe2d921f763
-SOURCE/comwin	?com_init@@YIFEHH@Z	99.9771	8454c2d13a94
+SOURCE/comwin	?com_init@@YIFEHH@Z	100.0000	8454c2d13a94
 SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	dc964b5b85ab
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	d3dfb2830a60
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	2c5d5b8e8bb7

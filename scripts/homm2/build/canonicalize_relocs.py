@@ -435,6 +435,11 @@ def authorize_import_alias(import_iat, base_type, base_symbol, base_addend,
             r"__imp__([A-Za-z][A-Za-z0-9_]*)@[0-9]+", base_symbol or "")
         if stdcall is not None:
             slot = import_iat.get(("stdcall", stdcall.group(1)))
+    if slot is None:
+        cdecl = re.fullmatch(
+            r"__imp__([A-Za-z][A-Za-z0-9_]*)", base_symbol or "")
+        if cdecl is not None:
+            slot = import_iat.get(("cdecl", cdecl.group(1)))
     if slot != retail_target_rva:
         return None
     return base_symbol
@@ -505,6 +510,7 @@ def load_import_iat_symbols(path):
                 candidates["__imp_" + import_name].add(slot)
                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", import_name):
                     candidates[("stdcall", import_name)].add(slot)
+                    candidates[("cdecl", import_name)].add(slot)
             lookup += 4
             slot += 4
         descriptor += 20
