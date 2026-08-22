@@ -429,7 +429,13 @@ def authorize_import_alias(import_iat, base_type, base_symbol, base_addend,
     """Return a candidate import-pointer spelling for its exact retail IAT slot."""
     if base_type != "DIR32" or base_addend != 0:
         return None
-    if import_iat.get(base_symbol) != retail_target_rva:
+    slot = import_iat.get(base_symbol)
+    if slot is None:
+        stdcall = re.fullmatch(
+            r"__imp__([A-Za-z][A-Za-z0-9_]*)@[0-9]+", base_symbol or "")
+        if stdcall is not None:
+            slot = import_iat.get(("stdcall", stdcall.group(1)))
+    if slot != retail_target_rva:
         return None
     return base_symbol
 
@@ -495,7 +501,10 @@ def load_import_iat_symbols(path):
             if entry == 0:
                 break
             if not entry & 0x80000000:
-                candidates["__imp_" + read_string(entry + 2)].add(slot)
+                import_name = read_string(entry + 2)
+                candidates["__imp_" + import_name].add(slot)
+                if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", import_name):
+                    candidates[("stdcall", import_name)].add(slot)
             lookup += 4
             slot += 4
         descriptor += 20

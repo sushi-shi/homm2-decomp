@@ -44,6 +44,12 @@ class ImportAliasAuthorizationTest(unittest.TestCase):
             {self.SYMBOL: 0xEA324}, "DIR32", self.SYMBOL, 0, 0xEA324),
             self.SYMBOL)
 
+    def test_undecorated_pe_name_authorizes_exact_stdcall_slot(self):
+        symbol = "__imp__CreateBitmapIndirect@4"
+        self.assertEqual(authorize_import_alias(
+            {("stdcall", "CreateBitmapIndirect"): 0xEA1E4},
+            "DIR32", symbol, 0, 0xEA1E4), symbol)
+
     def test_wrong_slot_type_addend_or_symbol_cannot_authorize(self):
         imports = {self.SYMBOL: 0xEA324}
         self.assertIsNone(authorize_import_alias(
@@ -54,6 +60,9 @@ class ImportAliasAuthorizationTest(unittest.TestCase):
             imports, "DIR32", self.SYMBOL, 4, 0xEA324))
         self.assertIsNone(authorize_import_alias(
             imports, "DIR32", "__imp__AdrOpenDevice@8", 0, 0xEA324))
+        self.assertIsNone(authorize_import_alias(
+            {("stdcall", "CreateBitmapIndirect"): 0xEA1E4},
+            "DIR32", "__imp__CreateIconIndirect@4", 0, 0xEA1E4))
 
 
 class Rel32AliasAuthorizationTest(unittest.TestCase):
