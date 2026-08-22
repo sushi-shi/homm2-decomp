@@ -775,23 +775,62 @@ def load_claimed_function_symbols(path=None):
     return symbols
 
 
-def function_placement_diagnostics(candidate, map_path, retail_symbols=None):
+def load_compgen_function_aliases(sidecar_root=None):
+    """Map semantic compiler-function identities back to raw per-TU COFF names."""
+    root = Path(sidecar_root or REPO / "build/objdiff/normalized/base")
+    aliases = {}
+    if not root.exists():
+        return aliases
+    for path in sorted(root.rglob("*.symbols.tsv")):
+        unit = path.relative_to(root).as_posix().removesuffix(".symbols.tsv")
+        with path.open(newline="") as f:
+            for row in csv.DictReader(f, delimiter="\t"):
+                if row["family"] != "compgen":
+                    continue
+                key = (unit, row["canonical_name"])
+                if key in aliases and aliases[key] != row["original_name"]:
+                    raise ValueError("ambiguous compiler-function alias: %s %s" % key)
+                aliases[key] = row["original_name"]
+    return aliases
+
+
+def function_placement_diagnostics(candidate, map_path, retail_symbols=None,
+                                   compgen_aliases=None):
     """Join every recovered function to the candidate MAP by exact linker name."""
     retail_symbols = (load_claimed_function_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
-    candidate_rvas = defaultdict(set)
+    compgen_aliases = (load_compgen_function_aliases() if compgen_aliases is None
+                       else compgen_aliases)
+    candidate_records = defaultdict(list)
     for record in parse_map_symbol_records(map_path):
-        candidate_rvas[record["name"]].add(record["va"] - candidate["image_base"])
+        candidate_records[record["name"]].append(record)
+
+    def unit_record(record, unit):
+        member = (record.get("object") or "").rsplit(":", 1)[-1]
+        return member.lower() == (Path(unit).name + ".obj").lower()
 
     rows = []
     for symbol in retail_symbols:
-        matches = sorted(candidate_rvas.get(symbol["name"], ()))
+        candidate_name = symbol["name"]
+        records = candidate_records.get(candidate_name, ())
+        evidence = "exact-linker-name"
+        if not records:
+            alias = compgen_aliases.get((symbol["unit"], symbol["name"]))
+            if alias is not None:
+                candidate_name = alias
+                records = [record for record in candidate_records.get(alias, ())
+                           if unit_record(record, symbol["unit"])]
+                evidence = "semantic-compgen-sidecar"
+        matches = sorted(set(
+            record["va"] - candidate["image_base"] for record in records))
         candidate_rva = matches[0] if len(matches) == 1 else None
         delta = candidate_rva - symbol["rva"] if candidate_rva is not None else None
         rows.append({
             **symbol,
             "retail_rva": "0x%x" % symbol["rva"],
             "candidate_count": len(matches),
+            "candidate_name": candidate_name if matches else None,
+            "match_evidence": evidence if matches else None,
             "candidate_rva": "0x%x" % candidate_rva if candidate_rva is not None else None,
             "candidate_rvas": ["0x%x" % rva for rva in matches] if len(matches) > 1 else None,
             "delta": delta,
@@ -821,7 +860,8 @@ def function_placement_diagnostics(candidate, map_path, retail_symbols=None):
         "functions": rows,
         "interpretation": (
             "Candidate addresses come only from exact decorated-name MAP joins. Duplicate MAP "
-            "rows at one RVA are collapsed; missing compiler-generated names remain explicit."),
+            "rows at one RVA are collapsed. Synthetic compiler-function identities join through "
+            "the normalizer's relocation-role proof to a raw per-TU $E name."),
     }
 
 

@@ -154,7 +154,7 @@ class LinkExeTest(unittest.TestCase):
                 " 0001:00000000 exact 00401000 f A.obj\n"
                 " 0001:00000000 exact 00401000 f A.obj\n"
                 " 0001:00000024 moved 00401024 f A.obj\n")
-            result = function_placement_diagnostics(candidate, path, symbols)
+            result = function_placement_diagnostics(candidate, path, symbols, {})
         self.assertEqual(result["summary"], {
             "total": 3, "exact_rva": 1, "displaced_rva": 1,
             "missing": 1, "ambiguous": 0,
@@ -162,6 +162,26 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(result["source_summary"], result["summary"])
         self.assertEqual(result["residuals"][0]["delta"], 4)
         self.assertEqual(result["by_provenance"]["source-VA_COMPGEN"]["missing"], 1)
+
+    def test_function_placement_uses_semantic_compgen_alias_in_own_object(self):
+        candidate = {"image_base": 0x400000}
+        symbols = [{
+            "name": "__h2cg$SOURCE$A$static_ctor$Thing", "unit": "SOURCE/A",
+            "rva": 0x1234, "size": 0x0F,
+            "provenance": "source-VA_COMPGEN:STATIC_CTOR",
+        }]
+        aliases = {("SOURCE/A", symbols[0]["name"]): "_$E14"}
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(
+                " 0001:00001234 _$E14 00401234 f A.obj\n"
+                " 0001:00002234 _$E14 00402234 f OTHER.obj\n")
+            result = function_placement_diagnostics(
+                candidate, path, symbols, aliases)
+        self.assertEqual(result["source_summary"]["exact_rva"], 1)
+        self.assertEqual(result["functions"][0]["candidate_name"], "_$E14")
+        self.assertEqual(result["functions"][0]["match_evidence"],
+                         "semantic-compgen-sidecar")
 
     def test_map_symbol_name_decodes_link_printable_octal_escape(self):
         self.assertEqual(decode_map_symbol_name(r"\177KERNEL32_NULL_THUNK_DATA"),

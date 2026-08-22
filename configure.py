@@ -151,6 +151,7 @@ def main():
                 implicit_outputs=normalized_dummy_sidecar,
                 variables={"sidecar": normalized_dummy_sidecar, "unit": "dummy"})
         objs = []
+        base_symbol_sidecars = []
         comparison_inputs = [normalized_dummy]
         comparison_paths = {}
         for u in units:
@@ -167,6 +168,7 @@ def main():
             objs.append(obj)
             normalized = f"build/objdiff/normalized/base/{u['unit']}.obj"
             sidecar = f"build/objdiff/normalized/base/{u['unit']}.symbols.tsv"
+            base_symbol_sidecars.append(sidecar)
             w.build(normalized, "canonicalize_data_symbols", inputs=obj,
                     implicit=normalizer, implicit_outputs=sidecar,
                     variables={"sidecar": sidecar, "unit": u["unit"]})
@@ -320,7 +322,7 @@ def main():
                     "config/required_initialized_storage.tsv",
                     "config/delink_relocs.tsv",
                     "build/orig/HMM2PL.exe",
-                ])
+                ] + base_symbol_sidecars)
         w.build("link", "phony", inputs="build/link/HMM2PL.link.json")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)
