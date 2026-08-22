@@ -10,6 +10,7 @@ from homm2.build.canonicalize_data_symbols import (
     CoffObject,
     CompgenClaim,
     CompgenDataClaim,
+    assert_weak_external_link_set,
     canonicalize_coff,
     defer_data_comparison,
     load_compgen_data_claims,
@@ -79,14 +80,28 @@ def make_coff(sections, symbols):
     for section in sections:
         for site, target_index, typ in section.relocations:
             relocations.extend(struct.pack("<IIH", site, target_index, typ))
+    normalized_symbols = []
+    for spec in symbols:
+        if len(spec) == 5:
+            name, value, section, typ, storage = spec
+            auxiliaries = ()
+        else:
+            name, value, section, typ, storage, auxiliaries = spec
+        if any(len(auxiliary) != 18 for auxiliary in auxiliaries):
+            raise ValueError("COFF test auxiliary records must be 18 bytes")
+        normalized_symbols.append(
+            (name, value, section, typ, storage, tuple(auxiliaries)))
     symbol_table = bytearray()
-    for name, value, section, typ, storage in symbols:
+    for name, value, section, typ, storage, auxiliaries in normalized_symbols:
         symbol_table.extend(encoded_name(name))
-        symbol_table.extend(struct.pack("<IhHBB", value, section, typ, storage, 0))
+        symbol_table.extend(struct.pack(
+            "<IhHBB", value, section, typ, storage, len(auxiliaries)))
+        for auxiliary in auxiliaries:
+            symbol_table.extend(auxiliary)
     struct.pack_into("<I", strings, 0, len(strings))
     header = struct.pack(
         "<HHIIIHH", 0x14C, len(sections), 0, symbol_offset,
-        len(symbols), 0, 0,
+        sum(1 + len(row[5]) for row in normalized_symbols), 0, 0,
     )
     return header + section_table + raw + relocations + symbol_table + strings
 
@@ -179,6 +194,49 @@ def inline_static_member_graph(owner_symbol):
 
 
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
+    @staticmethod
+    def weak_destructor_object():
+        vector = "??_Ebitmap@@UAEPAXI@Z"
+        scalar = "??_Gbitmap@@UAEPAXI@Z"
+        weak_aux = struct.pack("<II10s", 0, 2, bytes(10))
+        return make_coff([
+            SectionSpec(".rdata", bytes(4), RDATA, ((0, 1, DIR32),)),
+            SectionSpec(".text", bytes(8), TEXT),
+        ], [
+            (scalar, 0, 0, 0x20, 2),
+            (vector, 0, 0, 0x20, 105, (weak_aux,)),
+            ("??_7bitmap@@6B@", 0, 1, 0, 2),
+            (scalar, 0, 2, 0x20, 2),
+        ])
+
+    def test_weak_external_retargets_to_defined_default(self):
+        obj = self.weak_destructor_object()
+        result = canonicalize_coff(obj)
+        normalized = CoffObject(result.data)
+        self.assertEqual(normalized.relocations[0].symbol_index, 4)
+        self.assertEqual(
+            normalized.symbols[0].name, "$dup$??_Gbitmap@@UAEPAXI@Z")
+        self.assertEqual(normalized.symbols[1].name, "??_Ebitmap@@UAEPAXI@Z")
+        self.assertEqual(
+            {row.proof for row in result.rows if row.family in ("dup", "weak")},
+            {"undef-dup-of-definition",
+             "weak-external-resolved-to-??_Gbitmap@@UAEPAXI@Z"})
+
+    def test_whole_link_weak_external_guard_rejects_strong_override(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            weak = root / "weak.obj"
+            strong = root / "strong.obj"
+            weak.write_bytes(self.weak_destructor_object())
+            strong.write_bytes(make_coff([
+                SectionSpec(".text", bytes(4), TEXT),
+            ], [
+                ("??_Ebitmap@@UAEPAXI@Z", 0, 1, 0x20, 2),
+            ]))
+            self.assertEqual(assert_weak_external_link_set([weak]), 1)
+            with self.assertRaisesRegex(ValueError, "strong definition"):
+                assert_weak_external_link_set([weak, strong])
+
     def test_defer_data_drops_data_sections_and_symbols(self):
         obj = make_coff([
             SectionSpec(".text", bytes(8), TEXT, ((0, 1, DIR32),)),

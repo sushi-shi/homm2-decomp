@@ -62,6 +62,7 @@ DIR32 = 0x0006
 FUNCTION_TYPE = 0x0020
 EXTERNAL_STORAGE = 2
 STATIC_STORAGE = 3
+WEAK_EXTERNAL_STORAGE = 105
 
 
 @dataclass(frozen=True)
@@ -278,6 +279,37 @@ class CoffObject:
         if section.raw_offset == 0:
             return bytes(section.raw_size)
         return self.data[section.raw_offset:section.raw_offset + section.raw_size]
+
+
+def weak_and_strong_names(payload: bytes) -> tuple[set[str], set[str]]:
+    """Return weakly referenced and strongly defined external names."""
+    coff = CoffObject(payload)
+    weak = {
+        symbol.name for symbol in coff.symbols.values()
+        if symbol.storage_class == WEAK_EXTERNAL_STORAGE
+    }
+    strong = {
+        symbol.name for symbol in coff.symbols.values()
+        if symbol.storage_class == EXTERNAL_STORAGE and symbol.section > 0
+    }
+    return weak, strong
+
+
+def assert_weak_external_link_set(paths: list[Path]) -> int:
+    """Prove that resolving weak externals to their defaults is link-faithful."""
+    weak: set[str] = set()
+    strong: set[str] = set()
+    for path in paths:
+        one_weak, one_strong = weak_and_strong_names(path.read_bytes())
+        weak.update(one_weak)
+        strong.update(one_strong)
+    clash = sorted(weak & strong)
+    if clash:
+        raise ValueError(
+            f"{len(clash)} weak external(s) also have a strong definition, "
+            "so default retargeting is not link-equivalent: " +
+            ", ".join(clash[:8]))
+    return len(weak)
 
 
 def _storage(section: Section) -> str | None:
@@ -799,7 +831,9 @@ def _rewrite_names(coff: CoffObject, renames: dict[int, str]) -> bytes:
 
 def _assert_only_canonical_changes(
         original: CoffObject, payload: bytes, renames: dict[int, str],
-        jump_table_rewrites: tuple[JumpTableRewrite, ...]) -> None:
+        jump_table_rewrites: tuple[JumpTableRewrite, ...],
+        equivalent_retargets: dict[int, int] | None = None) -> None:
+    equivalent_retargets = equivalent_retargets or {}
     normalized = CoffObject(payload)
     rewrites_by_offset = {
         rewrite.relocation_offset: rewrite for rewrite in jump_table_rewrites
@@ -840,7 +874,8 @@ def _assert_only_canonical_changes(
     for before, after in zip(original.relocations, normalized.relocations):
         rewrite = rewrites_by_offset.get(before.offset)
         expected_symbol = (rewrite.owner_symbol_index if rewrite is not None
-                           else before.symbol_index)
+                           else equivalent_retargets.get(
+                               before.symbol_index, before.symbol_index))
         if (before.offset, before.section, before.site, before.typ) != (
                 after.offset, after.section, after.site, after.typ):
             raise RuntimeError("canonical COFF changed relocation site/type/order")
@@ -884,6 +919,10 @@ def _assert_only_canonical_changes(
                       rewrite.relocation_offset + 8] = bytes(4)
         after_prefix[rewrite.relocation_offset + 4:
                      rewrite.relocation_offset + 8] = bytes(4)
+    for relocation in original.relocations:
+        if relocation.symbol_index in equivalent_retargets:
+            before_prefix[relocation.offset + 4:relocation.offset + 8] = bytes(4)
+            after_prefix[relocation.offset + 4:relocation.offset + 8] = bytes(4)
     if before_prefix != after_prefix:
         raise RuntimeError(
             "canonical COFF changed bytes outside symbol names/jump-table relocations")
@@ -1204,6 +1243,56 @@ def canonicalize_coff(payload: bytes,
     renames.update(compgen_rename)
     rows.extend(compgen_rows)
 
+    # The compiler emits a virtual vector-deleting destructor as a COFF weak
+    # external (`??_E...`) whose auxiliary record names the scalar-deleting
+    # destructor (`??_G...`) as its default. The linked retail image therefore
+    # contains the default address, and the delinked object names that resolved
+    # symbol directly. Retarget the disposable comparison copy exactly as the
+    # linker did. `assert_weak_external_link_set` supplies the required global
+    # precondition: no object in the candidate link defines the weak name.
+    defined_external_index = {}
+    for symbol in coff.symbols.values():
+        if symbol.section > 0 and symbol.storage_class == EXTERNAL_STORAGE:
+            defined_external_index.setdefault(symbol.name, symbol.index)
+    equivalent_retargets = {}
+    for symbol in coff.symbols.values():
+        if (symbol.section == 0 and symbol.value == 0 and
+                symbol.storage_class == EXTERNAL_STORAGE and
+                symbol.index not in renames and
+                symbol.name in defined_external_index):
+            renames[symbol.index] = "$dup$" + symbol.name
+            equivalent_retargets[symbol.index] = defined_external_index[symbol.name]
+            rows.append(CanonicalRow(
+                symbol.name, renames[symbol.index], "dup", "undefined",
+                0, 0, 0, 0, 0, "-", "undef-dup-of-definition", "",
+            ))
+    for symbol in coff.symbols.values():
+        if symbol.storage_class != WEAK_EXTERNAL_STORAGE:
+            continue
+        if (symbol.section != 0 or symbol.value != 0 or symbol.aux_count != 1):
+            raise ValueError(
+                f"invalid COFF weak external metadata for {symbol.name}")
+        default_index, search = struct.unpack_from(
+            "<II", coff.data, symbol.offset + SYMBOL_SIZE)
+        default = coff.symbols.get(default_index)
+        if default is None or default.index == symbol.index or search not in (1, 2, 3):
+            raise ValueError(
+                f"invalid COFF weak external default for {symbol.name}")
+        equivalent_retargets[symbol.index] = default.index
+        rows.append(CanonicalRow(
+            symbol.name, symbol.name, "weak", "undefined", 0, 0, 0, 0, 0, "-",
+            "weak-external-resolved-to-" + default.name, "",
+        ))
+    for index in list(equivalent_retargets):
+        seen = {index}
+        target = equivalent_retargets[index]
+        while target in equivalent_retargets and target not in seen:
+            seen.add(target)
+            target = equivalent_retargets[target]
+        if target in seen:
+            raise ValueError("cyclic equivalent COFF relocation targets")
+        equivalent_retargets[index] = target
+
     # /Gf turns pooled literals into COMDATs the linker folds image-wide, so
     # a delinked relocation can carry another unit's global occurrence index
     # in its $anon_str name. Both sides therefore renumber every $anon_str
@@ -1239,8 +1328,21 @@ def canonicalize_coff(payload: bytes,
     normalized = _rewrite_names(coff, renames)
     normalized, jump_table_rewrites = _rewrite_jump_table_relocations(
         coff, normalized)
+    if equivalent_retargets:
+        data = bytearray(normalized)
+        jump_table_offsets = {
+            rewrite.relocation_offset for rewrite in jump_table_rewrites
+        }
+        for relocation in coff.relocations:
+            if (relocation.symbol_index in equivalent_retargets and
+                    relocation.offset not in jump_table_offsets):
+                struct.pack_into(
+                    "<I", data, relocation.offset + 4,
+                    equivalent_retargets[relocation.symbol_index])
+        normalized = bytes(data)
     _assert_only_canonical_changes(
-        coff, normalized, renames, jump_table_rewrites)
+        coff, normalized, renames, jump_table_rewrites,
+        equivalent_retargets)
     return CanonicalizedObject(normalized, tuple(rows))
 
 
@@ -1407,7 +1509,23 @@ def main(argv=None):
                              "copy until the data campaign models storage")
     parser.add_argument("--summary-root", type=Path, action="append")
     parser.add_argument("--summary-output", type=Path)
+    parser.add_argument("--assert-weak-link-set", type=Path, nargs="+")
+    parser.add_argument("--weak-stamp", type=Path)
     args = parser.parse_args(argv)
+    if args.assert_weak_link_set:
+        if (args.input or args.output or args.sidecar or args.summary_root or
+                args.summary_output or not args.weak_stamp):
+            parser.error("weak-link-set mode requires only input objects and --weak-stamp")
+        count = assert_weak_external_link_set(args.assert_weak_link_set)
+        _atomic_write(
+            args.weak_stamp,
+            ("# candidate whole-link weak-external proof\n"
+             f"objects\t{len(args.assert_weak_link_set)}\n"
+             f"weak_names\t{count}\n").encode("utf-8"))
+        print(
+            f"[normalize-data] whole-link weak-external proof: "
+            f"{count} names across {len(args.assert_weak_link_set)} objects")
+        return 0
     if args.summary_root:
         if args.input or args.output or args.sidecar:
             parser.error("summary mode cannot be combined with object mode")

@@ -84,6 +84,10 @@ def main():
                         "--data-manifest build/gen/delink_data_from_source.tsv "
                         "--data-base-root build/objdiff/base"),
                description="normalize-data $unit")
+        w.rule("assert_weak_external_link_set",
+               command=(f"{PY} -m homm2.build.canonicalize_data_symbols "
+                        "--assert-weak-link-set $in --weak-stamp $out"),
+               description="prove weak-external defaults")
         w.rule("canonicalize_relocs",
                command=(f"{PY} -m homm2.build.canonicalize_relocs "
                         "--unit $unit --base $base --target $in --output $out "
@@ -129,9 +133,12 @@ def main():
                         "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
                         "--report build/link/HMM2PL.resources.json"),
                description="link-resources HMM2PL.res")
+        weak_external_stamp = (
+            "build/objdiff/normalized/weak-external-link-set.stamp")
         normalizer = ["scripts/homm2/build/canonicalize_data_symbols.py",
                       "build/gen/compiler_generated_functions.csv",
-                      "build/gen/delink_data_from_source.tsv"]
+                      "build/gen/delink_data_from_source.tsv",
+                      weak_external_stamp]
         reloc_normalizer = "scripts/homm2/build/canonicalize_relocs.py"
         normalized_dummy = "build/objdiff/normalized/dummy.obj"
         normalized_dummy_sidecar = "build/objdiff/normalized/dummy.symbols.tsv"
@@ -192,6 +199,14 @@ def main():
                     f"./normalized/base/{u['unit']}.obj",
                     "./normalized/dummy.obj",
                 )
+        weak_link_inputs = objs + [
+            str(path.relative_to(REPO))
+            for path in sorted(delink.rglob("*.c.obj"))
+        ]
+        w.build(
+            weak_external_stamp, "assert_weak_external_link_set",
+            inputs=weak_link_inputs,
+            implicit="scripts/homm2/build/canonicalize_data_symbols.py")
         # Parenthesized root modules - "(unmatched)", "(libcmt)", "(imports)",
         # "(funclets)", "(compgen)" - are target-only: reviewed or residual
         # functions delinked without a base source to compile against. They
