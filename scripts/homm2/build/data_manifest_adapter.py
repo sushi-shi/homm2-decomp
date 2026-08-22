@@ -1091,6 +1091,30 @@ def automatic_real_rows(topology_by_unit, base_root: Path, exe: Path,
     return rows
 
 
+def redundant_compgen_claims(bindings, topology_by_unit, automatic_rows):
+    """Return source claims already proved by an automatic identity oracle."""
+    physical_fields = (
+        "object", "rva", "size", "storage", "alignment",
+        "section_ordinal", "section_offset", "scope",
+    )
+
+    def physical_identity(row):
+        return tuple(row[field] for field in physical_fields)
+
+    automatic_identities = {
+        physical_identity(row) for row in automatic_rows
+    }
+    redundant = []
+    for claim, candidate in bindings:
+        claimed_rows = _folded_compgen_rows(
+            [(claim, candidate)], topology_by_unit)
+        if claimed_rows and all(
+                physical_identity(row) in automatic_identities
+                for row in claimed_rows):
+            redundant.append(claim)
+    return redundant
+
+
 def source_manifest_rows(source_root: Path = SOURCE_ROOT,
                          base_root: Path = BASE_ROOT,
                          exe: Path = EXE, strict=False):
@@ -1138,18 +1162,42 @@ def source_manifest_rows(source_root: Path = SOURCE_ROOT,
         vtables, topology, public_by_rva)
     compiler_rows = _folded_compgen_rows(compiler_generated, topology)
     automatic_string_rows_result = automatic_string_rows(
-        topology, base_root, Path(exe), placement_evidence,
-        reserved=(candidate for _claim, candidate in compiler_generated))
+        topology, base_root, Path(exe), placement_evidence)
     automatic_real_rows_result = automatic_real_rows(
-        topology, base_root, Path(exe), placement_evidence,
-        reserved_symbols=(
-            candidate.symbol for _claim, candidate in compiler_generated))
+        topology, base_root, Path(exe), placement_evidence)
+    automatic_rows = [
+        *automatic_string_rows_result,
+        *automatic_real_rows_result,
+    ]
+    redundant = redundant_compgen_claims(
+        compiler_generated, topology, automatic_rows)
+    if redundant:
+        redundancy_diagnostics = [
+            f"{claim.location}: redundant DATA_COMPGEN identity "
+            f"{claim.semantic_name}; automatic compiler-data oracle already "
+            "proves this allocation"
+            for claim in redundant
+        ]
+        if strict:
+            raise ValueError("\n".join(redundancy_diagnostics))
+        diagnostics.extend(redundancy_diagnostics)
+
+    # Preserve exceptional source identities when a non-strict audit reports
+    # redundancy, while avoiding duplicate physical manifest rows.
+    compiler_locations = {
+        (row["object"], row["section_ordinal"], row["section_offset"])
+        for row in compiler_rows
+    }
+    automatic_rows = [
+        row for row in automatic_rows
+        if (row["object"], row["section_ordinal"], row["section_offset"])
+        not in compiler_locations
+    ]
     rows = [
         *(_symbol_row(source, candidate, None)
           for source, candidate in ordinary),
         *compiler_rows,
-        *automatic_string_rows_result,
-        *automatic_real_rows_result,
+        *automatic_rows,
         *(_vtable_row(source, candidate)
           for source, candidate in table_rows),
     ]

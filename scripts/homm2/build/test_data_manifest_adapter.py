@@ -17,6 +17,7 @@ from homm2.build.data_manifest_adapter import (
     candidate_common_manifest_bytes,
     delinker_manifest_bytes,
     resolve_compgen_definitions,
+    redundant_compgen_claims,
     resolve_vtable_definitions,
     resolve_source_definitions,
     source_data_relocation_allocations,
@@ -56,6 +57,38 @@ def section(unit, ordinal, size, alignment=1, storage="data", selection=0,
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_redundant_compgen_claim_requires_every_folded_emitter(self):
+        claim = CompgenDataClaim(
+            "A", 0x100, "literal", "STRING_LITERAL", 4,
+            "src/A.cpp:1", "src/A.cpp:1", (),
+        )
+        owner = replace(
+            candidate("A", "??_C@literal", ordinal=1, value=0),
+            section_name=".rdata", storage="rdata", size=4,
+            comdat_selection=2,
+        )
+        peer = replace(owner, unit="B", section_ordinal=2)
+        topology = {
+            "A": ([owner], [section(
+                "A", 1, 4, storage="rdata", selection=2,
+                name=".rdata")]),
+            "B": ([peer], [section(
+                "B", 2, 4, storage="rdata", selection=2,
+                name=".rdata")]),
+        }
+        automatic_rows = _folded_compgen_rows([(claim, owner)], topology)
+
+        self.assertEqual(
+            redundant_compgen_claims(
+                [(claim, owner)], topology, automatic_rows),
+            [claim],
+        )
+        self.assertEqual(
+            redundant_compgen_claims(
+                [(claim, owner)], topology, automatic_rows[:1]),
+            [],
+        )
+
     def test_source_data_relocation_places_ambiguous_empty_string(self):
         owner = candidate("A", "?owner@@3PADA", ordinal=1, value=0)
         literal = replace(
