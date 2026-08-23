@@ -22,11 +22,13 @@ H2_ENUM_BEGIN(WingraphPaletteConstant)
     SYSTEM_PALETTE_REGION_COUNT = 2
 H2_ENUM_END(WingraphPaletteConstant)
 
-DATA(0x00534470) static RECT gDDSourceRect;
-DATA(0x00533fb8) static RECT gDDClientRect;
-DATA(0x00534488) static RECT gDDDestinationRect;
-DATA(0x00533fc8) static HRESULT gDDResult;
-DATA(0x00533fd0) static DDSURFACEDESC gDDSurfaceDesc;
+DATA(0x00533fb8) static RECT gDDClientRect = {0};
+DATA(0x00533fc8) static HRESULT gDDResult = 0;
+DATA(0x00533fd0) static DDSURFACEDESC gDDSurfaceDesc = {0};
+DATA(0x00534040) struct _IMAGE screenImage = {0};
+DATA(0x00534470) static RECT gDDSourceRect = {0};
+DATA(0x00534480) i32l lPaintStart = 0;
+DATA(0x00534488) static RECT gDDDestinationRect = {0};
 
 VA(0x004afbe0, 0x3a)
 void DDRestoreDisplayMode(void) {
@@ -1152,5 +1154,3 @@ DATA(0x005344d4) HPALETTE hpalApp = NULL;
 DATA(0x005344d8) HINSTANCE hWinGLibrary = NULL;
 DATA(0x005344dc) HINSTANCE hDDrawLibrary = NULL;
 DATA(0x005344e0) i32l lDelayRefresh = 0;
-DATA(0x00534480) i32l lPaintStart;
-DATA(0x00534040) struct _IMAGE screenImage;

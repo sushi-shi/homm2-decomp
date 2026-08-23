@@ -979,31 +979,46 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 DATA(0x004ea40c) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
-DATA(0x00523e3c) static u16 s_drawGroundTile;
-DATA(0x00523e2c) static i32 s_adjacentMonsterX;
-DATA(0x00523fd0) static i32 s_drawPixelY;
-DATA(0x00523e14) static mapCellExtra* s_drawExtra;
-DATA(0x00523e38) static i32 s_adjacentMonsterY;
-DATA(0x00523fa0) static i32 s_adjacentMonsterMinX;
-DATA(0x00523ff8) static i32 s_adjacentMonsterMinY;
-DATA(0x00523de4) static i32 s_drawMonsterFrame;
-DATA(0x00523fa4) static i32 s_drawCloudFrame;
-DATA(0x00523e24) static i32 s_drawStoneTile;
-DATA(0x00523e28) static mapCell* s_drawCell;
-DATA(0x00523f9c) static mineRecord* s_drawMine;
-DATA(0x00523fd8) static hero* s_drawHero;
-DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType;
-DATA(0x00523f94) static i32 s_drawCovered;
-DATA(0x00523e34) static mapCell* s_drawAdjacentCell;
-DATA(0x00523fe0) static i32 s_drawHasHero;
-DATA(0x00523e18) static i32 s_adjacentMonsterEndY;
-DATA(0x00523e1c) static i32 s_drawFlipCloud;
-DATA(0x00523e20) static i32 s_drawHeroFrame;
-DATA(0x00523fe8) static i32 s_drawPixelX;
-DATA(0x00523fa8) static i32 s_drawPlayerColor;
-DATA(0x00523e30) static i32 s_adjacentMonsterEndX;
-DATA(0x00523fe4) static i32 s_drawAnimationLength;
-DATA(0x00523e0c) static i32 s_drawHeroYOffset;
+DATA(0x00523de0) i32 iThisMaxY = 0;
+DATA(0x00523de4) static i32 s_drawMonsterFrame = 0;
+DATA(0x00523de8) i32 iLastAnimFrame = 0;
+DATA(0x00523dec) i32 giFrameStep = 0;
+DATA(0x00523df0) struct tag_message CDMsg = {0};
+DATA(0x00523e0c) static i32 s_drawHeroYOffset = 0;
+DATA(0x00523e10) i32 iThisMinY = 0;
+DATA(0x00523e14) static mapCellExtra* s_drawExtra = NULL;
+DATA(0x00523e18) static i32 s_adjacentMonsterEndY = 0;
+DATA(0x00523e1c) static i32 s_drawFlipCloud = 0;
+DATA(0x00523e20) static i32 s_drawHeroFrame = 0;
+DATA(0x00523e24) static i32 s_drawStoneTile = 0;
+DATA(0x00523e28) static mapCell* s_drawCell = NULL;
+DATA(0x00523e2c) static i32 s_adjacentMonsterX = 0;
+DATA(0x00523e30) static i32 s_adjacentMonsterEndX = 0;
+DATA(0x00523e34) static mapCell* s_drawAdjacentCell = NULL;
+DATA(0x00523e38) static i32 s_adjacentMonsterY = 0;
+DATA(0x00523e3c) static u16 s_drawGroundTile = 0;
+DATA(0x00523e40) i32 giLimitUpdMaxX = 0;
+DATA(0x00523e44) i32 giLimitUpdMaxY = 0;
+DATA(0x00523e48) i32 bPrefsChanged = 0;
+DATA(0x00523e4c) i32 giTownPortalChoice = 0;
+DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
+DATA(0x00523f94) static i32 s_drawCovered = 0;
+DATA(0x00523f98) i32 giLimitUpdMinY = 0;
+DATA(0x00523f9c) static mineRecord* s_drawMine = NULL;
+DATA(0x00523fa0) static i32 s_adjacentMonsterMinX = 0;
+DATA(0x00523fa4) static i32 s_drawCloudFrame = 0;
+DATA(0x00523fa8) static i32 s_drawPlayerColor = 0;
+DATA(0x00523fac) struct tag_message USMsg = {0};
+DATA(0x00523fcc) class heroWindow* cPanel = NULL;
+DATA(0x00523fd0) static i32 s_drawPixelY = 0;
+DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType = 0;
+DATA(0x00523fd8) static hero* s_drawHero = NULL;
+DATA(0x00523fdc) class heroWindow* townPortalWin = NULL;
+DATA(0x00523fe0) static i32 s_drawHasHero = 0;
+DATA(0x00523fe4) static i32 s_drawAnimationLength = 0;
+DATA(0x00523fe8) static i32 s_drawPixelX = 0;
+DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = {0};
+DATA(0x00523ff8) static i32 s_adjacentMonsterMinY = 0;
 H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
 H2_ENUM_END(AdvVisitMetadata)
@@ -10860,21 +10875,5 @@ DATA(0x004ef1dc) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
 DATA(0x0052402c) i32 iLastSandAnimTime = 0;
 DATA(0x00524030) i32 iLastNewSandAnimTime = 0;
 DATA(0x00524034) i32 giFrameCount = 0;
-DATA(0x00523fcc) class heroWindow* cPanel;
-DATA(0x00523de0) i32 iThisMaxY;
-DATA(0x00523e4c) i32 giTownPortalChoice;
-DATA(0x00523e10) i32 iThisMinY;
-DATA(0x00523fdc) class heroWindow* townPortalWin;
-DATA(0x00523fac) struct tag_message USMsg;
-DATA(0x00523dec) i32 giFrameStep;
-DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
-DATA(0x00523e40) i32 giLimitUpdMaxX;
-DATA(0x00523e44) i32 giLimitUpdMaxY;
-DATA(0x00523e48) i32 bPrefsChanged;
-DATA(0x00523f98) i32 giLimitUpdMinY;
-DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
-DATA(0x00523df0) struct tag_message CDMsg;
-DATA(0x00523de8) i32 iLastAnimFrame;
-
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(advManager, 0x004ea42c)

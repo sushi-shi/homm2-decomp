@@ -28,18 +28,19 @@ H2_ENUM_END(FindPathConstant)
 
 }
 
-DATA(0x005245e4) static i32 gSearchLow;
-DATA(0x00524544) static mapCell* gSearchNextCell;
-DATA(0x005245d8) static searchNode* gSearchCell;
-DATA(0x00524540) static i32 gSearchNextY;
-DATA(0x00524554) static mapCell* gSearchCurrentCell;
-DATA(0x00524550) static i32 gSearchDirection;
-DATA(0x00524548) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType;
-DATA(0x0052454c) static i32 gSearchNextX;
-DATA(0x005245d0) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain;
-DATA(0x005245dc) static searchNode* gSearchQueueNode;
-DATA(0x005245d4) static i32 gSearchMiddle;
-DATA(0x005245e0) static i32 gSearchHigh;
+DATA(0x00524540) static i32 gSearchNextY = 0;
+DATA(0x00524544) static mapCell* gSearchNextCell = NULL;
+DATA(0x00524548) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType = 0;
+DATA(0x0052454c) static i32 gSearchNextX = 0;
+DATA(0x00524550) static i32 gSearchDirection = 0;
+DATA(0x00524554) static mapCell* gSearchCurrentCell = NULL;
+DATA(0x00524558) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = {0};
+DATA(0x005245d0) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain = 0;
+DATA(0x005245d4) static i32 gSearchMiddle = 0;
+DATA(0x005245d8) static searchNode* gSearchCell = NULL;
+DATA(0x005245dc) static searchNode* gSearchQueueNode = NULL;
+DATA(0x005245e0) static i32 gSearchHigh = 0;
+DATA(0x005245e4) static i32 gSearchLow = 0;
 
 VA(0x00449c30, 0x25)
 searchArray::searchArray(void) {
@@ -590,5 +591,3 @@ void searchArray::PushCombatPoint(
     cell->direction = static_cast<u8>(direction);
     cell->distance = static_cast<u16>(distance);
 }
-
-DATA(0x00524558) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
