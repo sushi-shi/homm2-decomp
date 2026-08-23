@@ -11,35 +11,43 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
-DATA(0x00533de0) static i32 s_directionBlocked;
-DATA(0x00533e04) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
-DATA(0x00533e14) static i32 s_processedPointCount;
-DATA(0x00533db4) static i32 s_remainingMobility;
-DATA(0x00533dc8) static i32 s_adjacentX;
-DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SEARCH_DIRECTION_COUNT];
-DATA(0x00533dbc) static i32 s_targetWater;
-DATA(0x00533db0) static i32 s_neighborX;
-DATA(0x00533ddc) static i32 s_mapY;
-DATA(0x00533df4) static i32 s_currentCost;
-DATA(0x00533df8) static mapCell* s_neighborCell;
-DATA(0x00533e20) static i32 s_adjacentY;
-DATA(0x00533de8) static mapCell* s_targetCell;
-DATA(0x00533dc4) static i32 s_currentWater;
-DATA(0x00533e1c) static i32 s_bestTargetCost;
-DATA(0x00533e08) static i32 s_adjacentMonsterX;
-DATA(0x00533dc0) static i32 s_adjacentCost;
-DATA(0x00533e00) static i32 s_mapX;
-DATA(0x00533de4) static i32 s_neighborY;
-DATA(0x00533da4) static i32 s_hasAdjacentMonster;
-DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
-DATA(0x00533e0c) static i32 s_targetStepCost;
-DATA(0x00533dfc) static i32 s_candidateY;
-DATA(0x00533e18) static searchNode* s_neighborNode;
-DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
-DATA(0x00533dd0) static searchNode s_currentNode;
-DATA(0x00533da0) static i32 s_hasTarget;
-DATA(0x00533dec) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
-DATA(0x00533e28) static hero* s_currentHero;
+struct SeedPositionState {
+    i32 hasTarget;
+    i32 hasAdjacentMonster;
+    H2_ENUM_STORAGE(TerrainType, i8) possibleDirections[SEARCH_DIRECTION_COUNT];
+    i32 neighborX;
+    i32 remainingMobility;
+    u8 padding18[4];
+    i32 targetWater;
+    i32 adjacentCost;
+    i32 currentWater;
+    i32 adjacentX;
+    u8 padding2c[4];
+    searchNode currentNode;
+    i32 mapY;
+    i32 directionBlocked;
+    i32 neighborY;
+    mapCell* targetCell;
+    i8 directionCosts[SEARCH_DIRECTION_COUNT];
+    i32 currentCost;
+    mapCell* neighborCell;
+    i32 candidateY;
+    i32 mapX;
+    H2_ENUM_STORAGE(MapObjectType, i32) triggerType;
+    i32 adjacentMonsterX;
+    i32 targetStepCost;
+    H2_ENUM_STORAGE_STEPPED(MapDirection, i32) direction;
+    i32 processedPointCount;
+    searchNode* neighborNode;
+    i32 bestTargetCost;
+    i32 adjacentY;
+    H2_ENUM_STORAGE(TerrainType, i32) terrain;
+    hero* currentHero;
+};
+
+SIZE(SeedPositionState, 0x8c);
+
+DATA(0x00533da0) static SeedPositionState s_seedPositionState;
 
 VA(0x004916c0, 0x116)
 i32 searchArray::BuildPath(
@@ -95,7 +103,7 @@ void searchArray::SeedPosition(
         Clear();
         m_lastX = SEARCH_INVALID_COORDINATE;
         m_lastY = SEARCH_INVALID_COORDINATE;
-        s_currentCost = 0;
+        s_seedPositionState.currentCost = 0;
     }
 
     giSeedingValid = 1;
@@ -104,204 +112,204 @@ void searchArray::SeedPosition(
             return;
         }
 
-        s_targetCell = gpAdvManager->GetCell(targetX, targetY);
-        if (s_targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
+        s_seedPositionState.targetCell = gpAdvManager->GetCell(targetX, targetY);
+        if (s_seedPositionState.targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
             return;
 
-        targetTerrain = giGroundToTerrain[s_targetCell->m_terrainImageIndex];
+        targetTerrain = giGroundToTerrain[s_seedPositionState.targetCell->m_terrainImageIndex];
         if (targetTerrain == TERRAIN_WATER) {
             if (waterMode) {
-                if (s_targetCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
+                if (s_seedPositionState.targetCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
                     return;
             } else {
-                if (s_targetCell->m_triggerType
+                if (s_seedPositionState.targetCell->m_triggerType
                         != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
-                    && s_targetCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
-                    && s_targetCell->m_triggerType
+                    && s_seedPositionState.targetCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                    && s_seedPositionState.targetCell->m_triggerType
                            != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
                     return;
             }
         }
 
-        s_hasTarget = 1;
-        s_targetWater = s_targetCell->m_isRoad;
-        s_bestTargetCost = SEARCH_MAX_COST;
+        s_seedPositionState.hasTarget = 1;
+        s_seedPositionState.targetWater = s_seedPositionState.targetCell->m_isRoad;
+        s_seedPositionState.bestTargetCost = SEARCH_MAX_COST;
     } else {
-        s_hasTarget = 0;
+        s_seedPositionState.hasTarget = 0;
     }
 
-    if (s_hasTarget && continueSeed) {
-        s_currentNode = GetColumn(targetX)[MAP_WIDTH * targetY];
-        if (s_currentNode.visited
-            && s_currentNode.distance <= s_currentCost + SEARCH_TARGET_COST_WINDOW)
+    if (s_seedPositionState.hasTarget && continueSeed) {
+        s_seedPositionState.currentNode = GetColumn(targetX)[MAP_WIDTH * targetY];
+        if (s_seedPositionState.currentNode.visited
+            && s_seedPositionState.currentNode.distance <= s_seedPositionState.currentCost + SEARCH_TARGET_COST_WINDOW)
             return;
     }
 
     if (!continueSeed)
         PushPoint(seedX, seedY, seedDirection, 0, maximumCost, 0, 0, 0, 0, 0, 0, 0);
 
-    s_currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    s_seedPositionState.currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
 
     while (m_queueCount > 0) {
         --m_queueSize;
-        s_currentNode = m_queue[m_queueSize];
+        s_seedPositionState.currentNode = m_queue[m_queueSize];
 
-        if (s_hasTarget && s_bestTargetCost < SEARCH_MAX_COST
-            && s_currentNode.distance + SEARCH_TARGET_COST_WINDOW >= s_bestTargetCost) {
-            s_currentCost = s_currentNode.distance;
+        if (s_seedPositionState.hasTarget && s_seedPositionState.bestTargetCost < SEARCH_MAX_COST
+            && s_seedPositionState.currentNode.distance + SEARCH_TARGET_COST_WINDOW >= s_seedPositionState.bestTargetCost) {
+            s_seedPositionState.currentCost = s_seedPositionState.currentNode.distance;
             ++m_queueSize;
             return;
         }
 
-        if (s_currentNode.distance > maximumCost && maximumCost > 0)
+        if (s_seedPositionState.currentNode.distance > maximumCost && maximumCost > 0)
             goto point_complete;
 
         {
-            if (s_currentNode.rvFlag1) {
-                s_hasAdjacentMonster = 1;
-                s_adjacentMonsterX = s_currentNode.adjacentMonsterX;
-                s_adjacentY = s_currentNode.adjacentMonsterY;
+            if (s_seedPositionState.currentNode.rvFlag1) {
+                s_seedPositionState.hasAdjacentMonster = 1;
+                s_seedPositionState.adjacentMonsterX = s_seedPositionState.currentNode.adjacentMonsterX;
+                s_seedPositionState.adjacentY = s_seedPositionState.currentNode.adjacentMonsterY;
             } else {
-                s_hasAdjacentMonster = 0;
+                s_seedPositionState.hasAdjacentMonster = 0;
             }
 
-            if (s_currentNode.unknownFlag) {
-                s_triggerType = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
+            if (s_seedPositionState.currentNode.unknownFlag) {
+                s_seedPositionState.triggerType = gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)
                                     ->m_triggerType
                     & MAP_TRIGGER_TYPE_MASK;
-                if (s_triggerType == MAP_OBJECT_MONSTER
-                    || s_triggerType == MAP_OBJECT_HERO_INTERACTION
-                    || s_triggerType == MAP_OBJECT_BOAT) {
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                if (s_seedPositionState.triggerType == MAP_OBJECT_MONSTER
+                    || s_seedPositionState.triggerType == MAP_OBJECT_HERO_INTERACTION
+                    || s_seedPositionState.triggerType == MAP_OBJECT_BOAT) {
+                    if (!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1)
                         goto point_complete;
-                    s_hasAdjacentMonster = 1;
-                    s_adjacentMonsterX = s_currentNode.x;
-                    s_adjacentY = s_currentNode.y;
-                    if (s_triggerType == MAP_OBJECT_HERO_INTERACTION
+                    s_seedPositionState.hasAdjacentMonster = 1;
+                    s_seedPositionState.adjacentMonsterX = s_seedPositionState.currentNode.x;
+                    s_seedPositionState.adjacentY = s_seedPositionState.currentNode.y;
+                    if (s_seedPositionState.triggerType == MAP_OBJECT_HERO_INTERACTION
                         && gpGame->m_availableHeroes
-                               [gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
+                               [gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)
                                     ->m_objectMetadata]
                             == giCurPlayer)
                         goto point_complete;
                 } else {
-                    if (s_triggerType == MAP_OBJECT_STONE_LITHS
-                        || s_triggerType == MAP_OBJECT_WHIRLPOOL)
+                    if (s_seedPositionState.triggerType == MAP_OBJECT_STONE_LITHS
+                        || s_seedPositionState.triggerType == MAP_OBJECT_WHIRLPOOL)
                         goto point_complete;
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                    if (!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1)
                         goto point_complete;
-                    if (StopOnTrigger(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)))
+                    if (StopOnTrigger(gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)))
                         goto point_complete;
                 }
             }
 
         expand_directions:
             if (waterMode) {
-                s_triggerType =
-                    gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_triggerType;
-                if (s_triggerType == MAP_OBJECT_COAST)
+                s_seedPositionState.triggerType =
+                    gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)->m_triggerType;
+                if (s_seedPositionState.triggerType == MAP_OBJECT_COAST)
                     goto point_complete;
             } else {
-                if ((*(mapExtra + s_currentNode.x + s_currentNode.y * MAP_WIDTH)
+                if ((*(mapExtra + s_seedPositionState.currentNode.x + s_seedPositionState.currentNode.y * MAP_WIDTH)
                      & SEARCH_MAP_BLOCKED)
-                    && (s_currentNode.x != seedX || s_currentNode.y != seedY)) {
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                    && (s_seedPositionState.currentNode.x != seedX || s_seedPositionState.currentNode.y != seedY)) {
+                    if (!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1)
                         goto point_complete;
-                    if (s_currentNode.rvFlag1) {
+                    if (s_seedPositionState.currentNode.rvFlag1) {
                         if (gpAdvManager->FindAdjacentMonster(
-                                s_currentNode.x,
-                                s_currentNode.y,
-                                &s_adjacentMonsterX,
-                                &s_adjacentY,
-                                s_currentNode.adjacentMonsterX,
-                                s_currentNode.adjacentMonsterY
+                                s_seedPositionState.currentNode.x,
+                                s_seedPositionState.currentNode.y,
+                                &s_seedPositionState.adjacentMonsterX,
+                                &s_seedPositionState.adjacentY,
+                                s_seedPositionState.currentNode.adjacentMonsterX,
+                                s_seedPositionState.currentNode.adjacentMonsterY
                             ))
                             goto point_complete;
                     } else if (gpAdvManager->FindAdjacentMonster(
-                                   s_currentNode.x,
-                                   s_currentNode.y,
-                                   &s_adjacentMonsterX,
-                                   &s_adjacentY,
+                                   s_seedPositionState.currentNode.x,
+                                   s_seedPositionState.currentNode.y,
+                                   &s_seedPositionState.adjacentMonsterX,
+                                   &s_seedPositionState.adjacentY,
                                    SEARCH_INVALID_COORDINATE,
                                    SEARCH_INVALID_COORDINATE
                                )) {
-                        s_hasAdjacentMonster = 1;
+                        s_seedPositionState.hasAdjacentMonster = 1;
                     }
                 }
             }
 
             TestPossibleDirections(
-                s_currentNode.x,
-                s_currentNode.y,
-                s_possibleDirections,
-                s_directionCosts,
+                s_seedPositionState.currentNode.x,
+                s_seedPositionState.currentNode.y,
+                s_seedPositionState.possibleDirections,
+                s_seedPositionState.directionCosts,
                 1,
                 waterMode
             );
-            s_terrain = giGroundToTerrain[gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
+            s_seedPositionState.terrain = giGroundToTerrain[gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)
                                               ->m_terrainImageIndex];
-            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
-            s_remainingMobility = giCurTempMobility - s_currentNode.distance;
-            for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
-                 ++s_direction) {
-                if (s_possibleDirections[IDX(s_direction)] == TERRAIN_INVALID)
+            s_seedPositionState.currentWater = gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)->m_isRoad;
+            s_seedPositionState.remainingMobility = giCurTempMobility - s_seedPositionState.currentNode.distance;
+            for (s_seedPositionState.direction = MAP_DIRECTION_NORTH; s_seedPositionState.direction < MAP_DIRECTION_COUNT;
+                 ++s_seedPositionState.direction) {
+                if (s_seedPositionState.possibleDirections[IDX(s_seedPositionState.direction)] == TERRAIN_INVALID)
                     continue;
                 {
-                    s_neighborX = s_currentNode.x + normalDirTable[IDX(s_direction)].x;
-                    s_neighborY = s_currentNode.y + normalDirTable[IDX(s_direction)].y;
-                    s_neighborNode = &GetColumn(s_neighborX)[MAP_WIDTH * s_neighborY];
-                    if (!(!findAdjacentMonster || s_currentNode.rvFlag1
-                          || !(MAP_EXTRA_AT(s_neighborX, s_neighborY)
+                    s_seedPositionState.neighborX = s_seedPositionState.currentNode.x + normalDirTable[IDX(s_seedPositionState.direction)].x;
+                    s_seedPositionState.neighborY = s_seedPositionState.currentNode.y + normalDirTable[IDX(s_seedPositionState.direction)].y;
+                    s_seedPositionState.neighborNode = &GetColumn(s_seedPositionState.neighborX)[MAP_WIDTH * s_seedPositionState.neighborY];
+                    if (!(!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1
+                          || !(MAP_EXTRA_AT(s_seedPositionState.neighborX, s_seedPositionState.neighborY)
                                & SEARCH_MAP_BLOCKED)
-                          || !s_neighborNode->visited || !s_neighborNode->rvFlag1
-                          || s_neighborNode->distance
-                                 >= s_currentNode.distance + SEARCH_MONSTER_RESEED_WINDOW
+                          || !s_seedPositionState.neighborNode->visited || !s_seedPositionState.neighborNode->rvFlag1
+                          || s_seedPositionState.neighborNode->distance
+                                 >= s_seedPositionState.currentNode.distance + SEARCH_MONSTER_RESEED_WINDOW
                           || !gpAdvManager->FindAdjacentMonster(
-                              s_neighborX,
-                              s_neighborY,
-                              &s_adjacentMonsterX,
-                              &s_adjacentY,
+                              s_seedPositionState.neighborX,
+                              s_seedPositionState.neighborY,
+                              &s_seedPositionState.adjacentMonsterX,
+                              &s_seedPositionState.adjacentY,
                               SEARCH_INVALID_COORDINATE,
                               SEARCH_INVALID_COORDINATE
                           )
-                          || s_neighborNode->adjacentMonsterX != s_adjacentMonsterX
-                          || s_neighborNode->adjacentMonsterY != s_adjacentY))
+                          || s_seedPositionState.neighborNode->adjacentMonsterX != s_seedPositionState.adjacentMonsterX
+                          || s_seedPositionState.neighborNode->adjacentMonsterY != s_seedPositionState.adjacentY))
                         continue;
                     {
                         PushPoint(
-                            s_neighborX,
-                            s_neighborY,
-                            s_direction,
-                            s_currentNode.distance
+                            s_seedPositionState.neighborX,
+                            s_seedPositionState.neighborY,
+                            s_seedPositionState.direction,
+                            s_seedPositionState.currentNode.distance
                                 + CalcTerrainCost(
-                                    s_terrain,
-                                    IDX(s_direction),
-                                    s_remainingMobility,
+                                    s_seedPositionState.terrain,
+                                    IDX(s_seedPositionState.direction),
+                                    s_seedPositionState.remainingMobility,
                                     pathfindingSkill,
-                                    s_currentWater,
-                                    gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
+                                    s_seedPositionState.currentWater,
+                                    gpAdvManager->GetCell(s_seedPositionState.neighborX, s_seedPositionState.neighborY)->m_isRoad
                                 ),
                             maximumCost,
-                            s_directionCosts[IDX(s_direction)],
-                            s_hasAdjacentMonster,
-                            s_adjacentMonsterX,
-                            s_adjacentY,
-                            s_currentNode.rvFlag2,
-                            s_currentNode.previousFlags,
-                            s_currentNode.terrain
+                            s_seedPositionState.directionCosts[IDX(s_seedPositionState.direction)],
+                            s_seedPositionState.hasAdjacentMonster,
+                            s_seedPositionState.adjacentMonsterX,
+                            s_seedPositionState.adjacentY,
+                            s_seedPositionState.currentNode.rvFlag2,
+                            s_seedPositionState.currentNode.previousFlags,
+                            s_seedPositionState.currentNode.terrain
                         );
 
-                        if (s_hasTarget && s_neighborX == targetX && s_neighborY == targetY
-                            && !s_currentNode.rvFlag1) {
-                            s_targetStepCost = CalcTerrainCost(
-                                s_possibleDirections[IDX(s_direction)],
-                                IDX(s_direction),
-                                giCurTempMobility - s_currentNode.distance,
+                        if (s_seedPositionState.hasTarget && s_seedPositionState.neighborX == targetX && s_seedPositionState.neighborY == targetY
+                            && !s_seedPositionState.currentNode.rvFlag1) {
+                            s_seedPositionState.targetStepCost = CalcTerrainCost(
+                                s_seedPositionState.possibleDirections[IDX(s_seedPositionState.direction)],
+                                IDX(s_seedPositionState.direction),
+                                giCurTempMobility - s_seedPositionState.currentNode.distance,
                                 pathfindingSkill,
-                                gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad,
-                                s_targetWater
+                                gpAdvManager->GetCell(s_seedPositionState.neighborX, s_seedPositionState.neighborY)->m_isRoad,
+                                s_seedPositionState.targetWater
                             );
-                            if (s_currentNode.distance + s_targetStepCost < s_bestTargetCost)
-                                s_bestTargetCost = s_currentNode.distance + s_targetStepCost;
+                            if (s_seedPositionState.currentNode.distance + s_seedPositionState.targetStepCost < s_seedPositionState.bestTargetCost)
+                                s_seedPositionState.bestTargetCost = s_seedPositionState.currentNode.distance + s_seedPositionState.targetStepCost;
                         }
                     }
                 }
@@ -309,60 +317,60 @@ void searchArray::SeedPosition(
         }
 
     point_complete:
-        s_processedPointCount++;
+        s_seedPositionState.processedPointCount++;
     }
 
     if (scanMap) {
-        for (s_mapX = 0; s_mapX < MAP_WIDTH; ++s_mapX) {
+        for (s_seedPositionState.mapX = 0; s_seedPositionState.mapX < MAP_WIDTH; ++s_seedPositionState.mapX) {
             {
-                for (s_mapY = 0; s_mapY < MAP_WIDTH; ++s_mapY) {
+                for (s_seedPositionState.mapY = 0; s_seedPositionState.mapY < MAP_WIDTH; ++s_seedPositionState.mapY) {
                     {
-                        if ((gpAdvManager->GetCell(s_mapX, s_mapY)->m_triggerType
+                        if ((gpAdvManager->GetCell(s_seedPositionState.mapX, s_seedPositionState.mapY)->m_triggerType
                              & MAP_TRIGGER_TYPE_MASK)
                             == MAP_OBJECT_MONSTER) {
-                            s_targetCell = gpAdvManager->GetCell(s_mapX, s_mapY);
-                            for (s_direction = MAP_DIRECTION_NORTH;
-                                 s_direction < MAP_DIRECTION_COUNT;
-                                 ++s_direction) {
-                                s_adjacentX = s_mapX + normalDirTable[IDX(s_direction)].x;
-                                s_candidateY = s_mapY + normalDirTable[IDX(s_direction)].y;
-                                if (!(s_adjacentX >= 0 && s_adjacentX < MAP_WIDTH
-                                      && s_candidateY >= 0 && s_candidateY < MAP_HEIGHT))
+                            s_seedPositionState.targetCell = gpAdvManager->GetCell(s_seedPositionState.mapX, s_seedPositionState.mapY);
+                            for (s_seedPositionState.direction = MAP_DIRECTION_NORTH;
+                                 s_seedPositionState.direction < MAP_DIRECTION_COUNT;
+                                 ++s_seedPositionState.direction) {
+                                s_seedPositionState.adjacentX = s_seedPositionState.mapX + normalDirTable[IDX(s_seedPositionState.direction)].x;
+                                s_seedPositionState.candidateY = s_seedPositionState.mapY + normalDirTable[IDX(s_seedPositionState.direction)].y;
+                                if (!(s_seedPositionState.adjacentX >= 0 && s_seedPositionState.adjacentX < MAP_WIDTH
+                                      && s_seedPositionState.candidateY >= 0 && s_seedPositionState.candidateY < MAP_HEIGHT))
                                     continue;
                                 {
-                                    s_neighborCell =
-                                        gpAdvManager->GetCell(s_adjacentX, s_candidateY);
-                                    s_directionBlocked = 1;
-                                    if (((1 << IDX(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
-                                        && s_neighborCell->m_objectIndex != SEARCH_NO_OBJECT
-                                        && s_neighborCell->m_objectTileset != TILESET_DUMMY
-                                        && !(s_neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
-                                        s_directionBlocked = 0;
+                                    s_seedPositionState.neighborCell =
+                                        gpAdvManager->GetCell(s_seedPositionState.adjacentX, s_seedPositionState.candidateY);
+                                    s_seedPositionState.directionBlocked = 1;
+                                    if (((1 << IDX(s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
+                                        && s_seedPositionState.neighborCell->m_objectIndex != SEARCH_NO_OBJECT
+                                        && s_seedPositionState.neighborCell->m_objectTileset != TILESET_DUMMY
+                                        && !(s_seedPositionState.neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
+                                        s_seedPositionState.directionBlocked = 0;
                                     }
 
-                                    if (s_directionBlocked
-                                        && GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
+                                    if (s_seedPositionState.directionBlocked
+                                        && GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
                                                .visited
-                                        && !(s_neighborCell->m_triggerType
+                                        && !(s_seedPositionState.neighborCell->m_triggerType
                                              & MAP_TRIGGER_ACTION_FLAG)) {
-                                        s_terrain =
-                                            giGroundToTerrain[s_neighborCell->m_terrainImageIndex];
-                                        s_adjacentCost =
-                                            GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
+                                        s_seedPositionState.terrain =
+                                            giGroundToTerrain[s_seedPositionState.neighborCell->m_terrainImageIndex];
+                                        s_seedPositionState.adjacentCost =
+                                            GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
                                                 .distance;
                                         PushPoint(
-                                            s_mapX,
-                                            s_mapY,
-                                            (s_direction + MAP_DIRECTION_OPPOSITE_OFFSET)
+                                            s_seedPositionState.mapX,
+                                            s_seedPositionState.mapY,
+                                            (s_seedPositionState.direction + MAP_DIRECTION_OPPOSITE_OFFSET)
                                                 & MAP_DIRECTION_INDEX_MASK,
-                                            s_adjacentCost
+                                            s_seedPositionState.adjacentCost
                                                 + CalcTerrainCost(
-                                                    s_terrain,
-                                                    IDX(s_direction),
-                                                    giCurTempMobility - s_adjacentCost,
+                                                    s_seedPositionState.terrain,
+                                                    IDX(s_seedPositionState.direction),
+                                                    giCurTempMobility - s_seedPositionState.adjacentCost,
                                                     pathfindingSkill,
-                                                    s_neighborCell->m_isRoad,
-                                                    s_targetCell->m_isRoad
+                                                    s_seedPositionState.neighborCell->m_isRoad,
+                                                    s_seedPositionState.targetCell->m_isRoad
                                                 ),
                                             maximumCost,
                                             1,
