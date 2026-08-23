@@ -1,70 +1,82 @@
 # Retail-exact final link
 
-`homm2 link` reconstructs `build/link/HMM2PL.exe` from the current candidate
-objects, retail-derived import records, the pinned VC6 SP5 libraries, and the
-retail resource tree. The strict audit fails if any byte differs from
+`homm2 link` reconstructs `build/link/HMM2PL.exe` with the pinned VC6 SP5
+`LINK.EXE`. The file written by LINK is the audited deliverable: no tool opens
+it afterward for mutation. The strict audit fails if any byte differs from
 `build/orig/HMM2PL.exe`.
 
 ## Compared evidence
 
 Object matching and final-image matching answer different questions:
 
-- `homm2 build` compares the 98 reconstructed translation units. Its closure
-  requires 1,727/1,727 exact functions, complete ordered relocations, and
-  291,978/291,978 exact data bytes.
+- `homm2 build` compares 98 reconstructed translation units. The current
+  closure is 1,727/1,727 exact functions, complete ordered relocations, and
+  291,995/291,995 exact data bytes.
 - `homm2 link` compares PE section geometry and payloads, the complete file,
   imports, resources, initialized storage, and reviewed function placement.
-- Objdiff is configured with `functionRelocDiffs=all`. The local Gruntz-derived
-  patch also compares symbol-relative COFF relocation addends that would
-  otherwise be hidden inside masked operands.
+- Objdiff uses `functionRelocDiffs=all`. The local Gruntz-derived patch also
+  compares symbol-relative COFF relocation addends hidden by ordinary masked
+  operand comparison.
 
-The final-link MAP is emitted by VC6 before the deterministic semantic
-normalizers run. It is retained as provenance for the raw link, not rewritten
-to claim names the linker did not emit. Consequently, its project-function
-summary reports three displaced duplicate Audiere template COMDAT identities.
-Those template instantiations have indistinguishable linked bodies; the current
-objects prove each reviewed function independently and the final PE proves the
-physical bytes and references at every address.
+The VC6 MAP is retained unchanged. Its project-function summary reports three
+displaced duplicate Audiere template COMDAT identities even though the final PE
+is exact; the linker selected byte-identical copies under different MAP names.
+The per-object comparisons prove every reviewed identity independently, while
+the final-image audit proves the selected physical bytes and references.
 
-## Durable link inputs
+## What LINK receives
 
-The final link preserves the retail producer and contribution forms instead of
-treating all semantically equivalent COFF as interchangeable:
+The complete response is retained at `build/link/HMM2PL.rsp`. It contains the
+reconstructed project objects, three project archives, generated import
+libraries, stock VC6 libraries, and the reconstructed resource object. There is
+no `/ORDER` file, synthetic executable padding, or post-link PE normalizer.
 
-- `config/retail_crt_order.txt` fixes the reviewed order of the 177 selected
-  `LIBCMT.LIB` members. One-member archives make that order explicit to LINK.
-- The source and CRT `.bss`, `.data`, `.rdata`, COMMON, and selected COMDAT
-  contributions are adapted in disposable final-link copies. `BITS.asm` and
-  `TILE.asm` are ordinary OMF inputs emitted by the pinned Microsoft MASM 6.11,
-  so VC6 performs the retail OMF-to-COFF conversion itself; no link adapter
-  changes their topology.
-  Candidate object payloads and relocations remain the source of linked data.
-- Audiere uses the VC6 short-import form. Gruntz-style disposable filler exports
-  place the two retail-used names at their retail hint indices, so no complete
-  Audiere export table is a build input. Miles embeds the 29 retail-used names
-  and hints directly in the measured regular-COFF form, likewise without a full
-  export table. Smacker's ordinal-only imports and WinG's caller/export aliases
-  still use reviewed `.def`-syntax manifests; these reconstruct the required
-  import-library interface and are not evidence that the developers authored a
-  `.def` file. Generated archives are checked back against the retail import table.
-- The untouched LINK output is audited with the Gruntz model: DLL descriptors,
-  ILT/IAT slot pairs, padded hint/name records, and DLL strings are paired by
-  `(DLL, name-or-ordinal)`. At the current checkpoint all 240 imports and all
-  6,374 attributable logical bytes are exact. Nine DLLs retain a different raw
-  intra-DLL slot order, reported separately as resolution-history evidence.
-- The same untouched-image audit finds all 244 six-byte import thunks (240
-  identities, including four duplicate occurrences) semantically exact. Their
-  raw positions and order remain a separate layout result.
-- `normalize_imports` is only part of the derived byte-identical proof artifact:
-  it places those already-proved semantic records at retail offsets and retargets
-  references. It is not an authentic LINK input and is not used to claim that the
-  raw linker reproduced import order.
-- `normalize_text` places candidate-authored import thunks, selected CRT tail
-  contributions, exception funclets, `matherr`, and `initcoll` by reviewed
-  identity. It relocates candidate bytes; it does not copy the retail text.
-- `normalize_pe` makes the reviewed deterministic VC6 link timestamp, Rich
-  producer order, and NB10 record explicit. These values are metadata, not
-  runtime code or data.
+Most link inputs are untouched compiler or assembler outputs. Five provenance
+residuals remain explicit rather than being mistaken for recovered source:
+
+- `SOURCE/REQUEST` uses a disposable COFF copy that rotates six distinct
+  one-byte empty-string cells into their retail physical order.
+- `BASE/Misc` uses a disposable COFF copy that separates the Buka track-name
+  literal into its retail contribution position.
+- `BASE/AudiereEffects` and `BASE/DIMMER` use disposable copies with one
+  compiler-generated destructor COMDAT moved to the retail section order.
+- An ordinary one-member archive, made by VC6 `LIB.EXE`, supplies the untouched
+  stock `LIBCMT.LIB` `delete.obj` during the first runtime scan. A later scan of
+  the unmodified stock archive resolves the other 177 selected runtime members.
+  This reproduces the retail Rich producer order, but the original library that
+  owned the first `delete.obj` pull is not yet known.
+
+These are object/library-input reconstruction debts, not executable
+transformations. Removing them through credible source or archive ownership is
+the remaining provenance campaign.
+
+`BITS.asm` and `TILE.asm` are ordinary OMF inputs emitted by Microsoft MASM
+6.11. LINK itself prints its normal OMF-to-COFF conversion warning. The retail
+Rich header independently contains exactly two MASM producer records; compiling
+the same bodies as C++ removes those records and changes linked layout.
+
+The import libraries follow the Gruntz model: they reconstruct the ABI exposed
+by the missing DLL import libraries. Smacker's ordinal-only exports and WinG's
+aliases use reviewed `.def`-syntax manifests, but this is not a claim that the
+game developers authored those `.def` files. The generated libraries are
+checked against all 240 retail imports before linking.
+
+## Historical VC6 metadata
+
+VC6 derives the NB10 signature from PDB creation time and increments its age on
+subsequent links. The retail executable records signature `0x3e5cd475`, age 4,
+the path
+`e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb`, and final link
+timestamp `0x3e8d400b`.
+
+The build reproduces that ordinary history rather than writing those bytes:
+
+1. create the PDB during a link at `2003-02-26 14:51:33`;
+2. run LINK three more times at `2003-04-04 08:19:23`;
+3. retain the fourth untouched LINK output, whose PDB age is 4.
+
+`libfaketime` only controls the process clock. The four invocations all use the
+same response file and untouched `LINK.EXE`.
 
 ## Verification
 
@@ -76,15 +88,10 @@ homm2 link
 sha256sum build/orig/HMM2PL.exe build/link/HMM2PL.exe
 ```
 
-The strict link report is `build/link/HMM2PL.link.json`. At the current source
-checkpoint it reports four of four PE sections byte-exact, whole-file
-`100.000000%`, exact import ABI/order, and exact resources. Both SHA-256 values
-are:
+The strict report at `build/link/HMM2PL.link.json` records four of four PE
+sections byte-exact, whole-file `100.000000%`, exact raw import order, exact
+resources, and exact NB10 metadata. Both SHA-256 values are:
 
 ```text
 bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a
 ```
-
-`build/link/HMM2PL.raw.exe` is the actual LINK.EXE output. Its report keeps raw
-section/SHA percentages distinct from `semantic_import_bytes`; a semantic 100%
-never changes or hides the raw IAT-order diagnostic.

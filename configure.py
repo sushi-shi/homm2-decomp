@@ -140,9 +140,8 @@ def main():
                         "--input $in --output $out --unit $unit"),
                description="comdat-order $unit")
         w.rule("link_exe",
-               command=(f"{PY} -m homm2.build.exact_link.orchestrate "
-                        "--retail-exact"),
-               description="retail-exact link HMM2PL.exe")
+               command=f"{PY} -m homm2.build.exact_link.plain",
+               description="plain retail-exact LINK.EXE HMM2PL.exe")
         w.rule("link_audit",
                command=(f"{PY} -m homm2.build.link_exe --audit-existing "
                         "--strict --out build/link/HMM2PL.exe"),
@@ -375,10 +374,8 @@ def main():
             # order backwards so each archive scans forwards.
             w.build(library, "archive", inputs=list(reversed(members)))
             base_libraries.append(library)
-        # Retail selects delete.obj during a first ordinary LIBCMT scan here;
-        # a later runtime scan resolves the remaining members.  Keeping the
-        # stock archive in the response reproduces that behavior without a
-        # derived one-member archive.
+        # The plain-link driver consumes this stock runtime scan after preparing
+        # the still-open delete.obj archive-ownership residual.
         runtime_delete_scan = "LIBCMT.LIB"
         link_args = (link_libraries + source_objects + base_libraries
                      + [runtime_delete_scan, resource_output])

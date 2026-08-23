@@ -95,11 +95,17 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--report-only", action="store_true")
     parser.add_argument("--owner", choices=("SOURCE", "BASE"), default="SOURCE")
+    parser.add_argument(
+        "--unit",
+        help=r"adapt only this manifest object, for example SOURCE\REQUEST.c",
+    )
     parser.add_argument("--previous-end", type=lambda value: int(value, 0), default=0x123DD4)
     options = parser.parse_args()
     claims = load_claims(options.owner)
     planned = []
     for object_name, rows in claims.items():
+        if options.unit is not None and object_name != options.unit:
+            continue
         source = object_path(object_name)
         blob = source.read_bytes()
         size, original_alignment = bss_size_and_alignment(blob)
@@ -118,6 +124,9 @@ def main() -> None:
         if len(offsets) != len(rows):
             raise CoffError(f"{object_name}: duplicate .bss claim")
         planned.append((start, end, object_name, source, blob, offsets, original_alignment))
+
+    if options.unit is not None and not planned:
+        raise CoffError(f"no .bss claims found for {options.unit}")
 
     planned.sort()
     if options.report_only:

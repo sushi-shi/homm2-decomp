@@ -108,11 +108,10 @@ homm2 format --check           # verify header and enum formatting
 The final link is opt-in, so object matching stays fast. Ninja generates the reviewed import
 libraries from retail import records plus the ordinal/alias manifests under `imports/`,
 extracts the retail resources,
-and invokes the pinned VC6 `LINK.EXE` with the reviewed object, archive-member, section, and
-COMMON topology. Deterministic semantic normalization then places the import tables, CRT tail,
-funclets, and VC6 debug metadata. The candidate and pre-normalization MAP are written to
-`build/link/HMM2PL.exe` and `build/link/HMM2PL.map`. The same target performs a strict whole-file
-audit and writes `build/link/HMM2PL.link.json`; any byte difference fails the build.
+and invokes the pinned VC6 `LINK.EXE` with the recovered object and library topology. The
+untouched LINK output and its MAP are `build/link/HMM2PL.exe` and `build/link/HMM2PL.map`;
+there is no post-link executable rewrite. The same target performs a strict whole-file audit
+and writes `build/link/HMM2PL.link.json`; any byte difference fails the build.
 The evidence and contribution contracts are documented in
 [`docs/retail-exact-link.md`](docs/retail-exact-link.md).
 
