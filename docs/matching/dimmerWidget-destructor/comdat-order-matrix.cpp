@@ -106,6 +106,19 @@
 // deleting-destructor section 5, and the remaining methods in sections 6..10.
 // Compiler path identity is not the missing emission-order state.
 
+// Native /ORDER probe:
+//
+//   build/link/order-comdat-probe.py
+//   build/link/order-comdat-probe/HMM2PL.map
+//
+// BASE-suffix was rebuilt from the untouched raw DIMMER and AudiereEffects
+// objects and LINK 6.00 received a 2,641-symbol retail-order file.  Ordinary
+// project functions use NoDuplicates COMDAT selection and are rejected from the
+// order file with LNK4065, while accepted Any-selection compiler COMDATs move to
+// a global front band.  ??_GdimmerWidget lands at 0x0041dfb0 rather than retail
+// 0x004d3440.  Because /ORDER cannot keep the surrounding ctor/Read/Main/Draw
+// contributions in place, it cannot replace the object-local section move.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved

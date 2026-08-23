@@ -106,3 +106,19 @@
 // source replacement must make VC6 emit the contribution inside Misc at that
 // exact section boundary; archive scheduling cannot substitute for that missing
 // object-internal topology.
+
+// IsCDDrive lexical-owner diagnostic:
+//
+//   build/link/misc-track-placement-probe.py
+//   build/link/misc-track-source-position/results.json
+//
+// Retail places the 0x1e-byte track text immediately after IsCDDrive's four-byte
+// "A:\\" literal contribution, so four disposable variants added an unused
+// function-local static pointer/const pointer/array/const array containing the
+// same text.  The pointer variants do make VC6 append a second copy to
+// IsCDDrive's data, but they expand that contribution from 0x4 to 0x24 bytes and
+// leave the original 0x1e-byte global-initializer copy in section 3.  The array
+// form instead adds the duplicate to main data; the unused const array is erased.
+// All retain 79 sections, and none yields the retail single-copy 0x4 + 0x1e
+// sequence.  The experiment supports the lexical placement reading but rejects
+// an ordinary function-local static as its source.  No unused storage is retained.

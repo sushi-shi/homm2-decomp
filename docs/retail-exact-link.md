@@ -50,6 +50,14 @@ These are object/library-input reconstruction debts, not executable
 transformations. Removing them through credible source or archive ownership is
 the remaining provenance campaign.
 
+Gruntz's independently reversed LINK contribution model agrees with the local
+probes: LINK appends whole object contributions and can only relocate a duplicate
+COMDAT to the first defining object. A VC6 `/ORDER` experiment using all 2,641
+public MAP symbols cannot preserve the retail interleaving because ordinary
+NoDuplicates functions are not orderable and object-local `$E` helpers are not
+public names. Thus `/ORDER` is not a hidden replacement for the Audiere/DIMMER
+input preparation.
+
 `BITS.asm` and `TILE.asm` are ordinary OMF inputs emitted by Microsoft MASM
 6.11. LINK itself prints its normal OMF-to-COFF conversion warning. The retail
 Rich header independently contains exactly two MASM producer records; compiling

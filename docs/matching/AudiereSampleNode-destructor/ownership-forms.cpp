@@ -114,6 +114,25 @@
 // destructor in AudiereMusic.  These arms reject both a standard-header queue
 // explanation and the simplest Gruntz-style adjacent-TU first-definer shape.
 
+// Gruntz linker-model and /ORDER probe:
+//
+//   build/link/order-comdat-probe.py
+//   build/link/order-comdat-probe/retail-public.order
+//   build/link/order-comdat-probe/HMM2PL.map
+//
+// Gruntz's LINK 5.10 disassembly and direct probes establish that a .text
+// contribution is appended whole in object-arrival order; the only apparent
+// cross-object interleaving is first-definer selection among duplicate COMDATs.
+// AudiereEffects is the sole candidate object defining this destructor, so that
+// mechanism has no second body to select.  A real LINK 6.00 /ORDER probe rebuilt
+// BASE-suffix from untouched AudiereEffects and DIMMER objects and supplied all
+// 2,641 public MAP symbols in retail order.  LINK rejects ordinary NoDuplicates
+// project functions with LNK4065 and cannot name the local $E21/$E20 helpers
+// (LNK4037); accepted Any-selection COMDATs instead form a global front band.
+// The node destructor lands at 0x00417fd0 rather than 0x004cd050.  /ORDER cannot
+// express the required position after two object-local counter helpers and is
+// not a transformation-free substitute for the reviewed section move.
+
 // Disposition: retain the authentic inline destructor and classify its final-link
 // COMDAT position as an original object/compiler ownership wall. No explicit dtor,
 // source padding, /ORDER directive, or synthetic linker root is retained.
