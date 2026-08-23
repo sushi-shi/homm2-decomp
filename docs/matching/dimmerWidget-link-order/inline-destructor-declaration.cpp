@@ -13,3 +13,12 @@
 
 // Attempted declaration:
 virtual inline ~dimmerWidget(void) OVERRIDE;
+
+// Historical language-selection matrix:
+//
+//   build/link/source-language-spelling/results.json
+//
+// Eight .cpp/.c/.C/.cc/.cxx inputs using default C++, /TP, and per-file /Tp all
+// emit the scalar deleting destructor as section 5, before the second constructor
+// and the ordinary methods.  Source suffix and language-option spelling do not
+// expose the retail placement after Draw.

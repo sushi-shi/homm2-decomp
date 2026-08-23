@@ -97,6 +97,14 @@
 // node destructor, three RefPtr helpers, $E21, $E20.  Path hashing and output-name
 // state therefore do not account for the retail order.
 
+// Historical language-selection matrix:
+//
+//   build/link/source-language-spelling/results.json
+//
+// Eight .cpp/.c/.C/.cc/.cxx forms using default C++, /TP, and per-file /Tp all
+// retain that same six-section order.  The reconstructed suffix and the spelling
+// used to force C++ mode are not the missing compiler state.
+
 // Template-owner diagnostics (measured and reverted): explicit specializations
 // of only the three live RefPtr members move those exact bodies before the node
 // destructor, but VC6 still emits $E21/$E20 after it.  Explicit ctype<unsigned

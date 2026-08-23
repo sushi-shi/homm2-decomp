@@ -43,6 +43,16 @@
 // retail VA 0x00533d98 also occurs as a little-endian dword exactly once in the
 // entire PE, at file offset 0x116ae0: cFRDummy's initializer.  No code or other
 // data provides evidence that the backing byte belongs to SEARCH or another TU.
+
+// Historical language-selection matrix:
+//
+//   build/link/source-language-spelling/results.json
+//
+// VC6 compiled all eight ordinary C++ selections: .cpp default, explicit /TP,
+// .c/.C/.cc/.cxx with /TP, and .c/.C passed through the per-file /Tp option.
+// Every object retains the same six offsets and points cFRDummy at offset 0x0c.
+// The reconstructed .cpp suffix versus the inventory's historical .c spelling
+// therefore does not explain the retail rotation.
 //
 // Exact topology proof (measured, but deliberately not retained):
 //

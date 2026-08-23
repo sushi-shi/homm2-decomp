@@ -68,6 +68,11 @@
 // definition after IsCDDrive.  None produces the ordinary section-44 retail
 // contribution, and all were reverted.
 
+// VC6 language-selection spellings are also invariant.  The complete 8-arm
+// matrix at build/link/source-language-spelling/results.json covers .cpp default,
+// explicit /TP, .c/.C/.cc/.cxx with /TP, and .c/.C through /Tp.  Every object
+// keeps the pointer and literal together in section 3 at offset 0x1c.
+
 // Historical path-state probes add 29 unchanged-source objects:
 //
 //   build/link/source-path-spelling/results.json
