@@ -29,19 +29,20 @@ H2_ENUM_BEGIN(MouseManagerLocalConstant)
     RESOURCE_NAME_CAPACITY = 16
 H2_ENUM_END(MouseManagerLocalConstant)
 
-DATA(0x005352d0) static i32 gOldMouseRight;
-DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-DATA(0x00535ed8) static POINT gMouseScreenPt;
-DATA(0x00536060) static POINT
-    gMouseCheckPt;
-DATA(0x005349cc) static i32 gOldMouseTop;
-DATA(0x005352d4) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-DATA(0x00535ee0) void* cAndBits[MOUSE_CURSOR_COUNT];
-DATA(0x005355d4) void* cColorBits[MOUSE_CURSOR_COUNT];
-DATA(0x00535754) static i32 gOldMouseBottom;
-DATA(0x005349c8) static i32 gOldMouseLeft;
-DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
-DATA(0x00535454) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
+DATA(0x005349c8) static i32 gOldMouseLeft = 0;
+DATA(0x005349cc) static i32 gOldMouseTop = 0;
+DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = {0};
+DATA(0x005352d0) static i32 gOldMouseRight = 0;
+DATA(0x005352d4) HICON hMouseCursor[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x00535454) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x005355d4) void* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x00535754) static i32 gOldMouseBottom = 0;
+DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = {0};
+DATA(0x00535ed8) static POINT gMouseScreenPt = {0};
+DATA(0x00535ee0) void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
+DATA(0x00536060) static POINT gMouseCheckPt = {0};
+DATA(0x00536068) b32 gbInSetPointer = false;
+DATA(0x0053606c) i32 bInNewMouseUpdate = 0;
 
 
 DATA(0x0051e224) i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57};
@@ -71,10 +72,6 @@ DATA(0x0051e2f0) i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1},
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}
 };
-DATA(0x00536068) b32 gbInSetPointer = false;
-DATA(0x0053606c) i32 bInNewMouseUpdate = 0;
-
-
 VA(0x004b9050, 0x12e)
 mouseManager::mouseManager(void) : baseManager() {
     i32 i;
