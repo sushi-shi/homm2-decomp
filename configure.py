@@ -143,10 +143,11 @@ def main():
                         "--strict --out build/link/HMM2PL.exe"),
                description="link-audit HMM2PL.exe")
         w.rule("link_resources",
-               command=(f"{PY} -m homm2.build.extract_resources "
-                        "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
+               command=(f"{PY} -m homm2.build.rc_res "
+                        "--rc res/HMM2PL.rc --out build/link/HMM2PL.res "
+                        "--verify-exe build/orig/HMM2PL.exe "
                         "--report build/link/HMM2PL.resources.json"),
-               description="link-resources HMM2PL.res")
+               description="rc-res HMM2PL.res")
         weak_external_stamp = (
             "build/objdiff/normalized/weak-external-link-set.stamp")
         normalizer = ["scripts/homm2/build/canonicalize_data_symbols.py",
@@ -325,8 +326,11 @@ def main():
         import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
-                inputs=["build/orig/HMM2PL.exe",
-                        "scripts/homm2/build/extract_resources.py"])
+                inputs=["res/HMM2PL.rc", "res/heroes.ico",
+                        "build/orig/HMM2PL.exe"],
+                implicit=["scripts/homm2/build/rc_res.py",
+                          "scripts/homm2/build/extract_resources.py",
+                          "build/toolchain/msvc/bin/RC.EXE"])
         link_objects = sorted(
             objs,
             key=lambda obj: first_function_rva.get(

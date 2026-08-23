@@ -8,10 +8,12 @@ afterward for mutation.
   resources, no COFF transforms; one LINK pass with an ordinary PDB. Output
   `build/link/generic/HMM2PL.exe`. This is what the reconstruction honestly
   produces from source alone.
-- `homm2 link --rsrc` — generic plus the `.rsrc` resources extracted from
-  `build/orig/HMM2PL.exe` (`extract_resources.py`; resources only — every code
-  and data byte still comes from this codebase). Output
-  `build/link/rsrc/HMM2PL.exe`.
+- `homm2 link --rsrc` — generic plus the resources, compiled from source:
+  `res/HMM2PL.rc` (menus, dialog, VERSIONINFO as reviewed rc grammar) plus
+  `res/heroes.ico` (the one retail-extracted binary, the program icon) through
+  the era `RC.EXE` 5.00, gated byte-exactly against `build/orig/HMM2PL.exe` on
+  every build (`rc_res.py`). Output `build/link/rsrc/HMM2PL.exe`. See
+  `docs/resource-source-reconstruction-plan.md`.
 - `homm2 link --transform` — `--rsrc` plus the three reviewed COFF transforms
   declared in `scripts/homm2/build/exact_link/transforms.py`, the historical
   four-pass PDB link, and the strict audit. Output `build/link/HMM2PL.exe`,
