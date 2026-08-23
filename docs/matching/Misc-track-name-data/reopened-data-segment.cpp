@@ -122,3 +122,26 @@
 // All retain 79 sections, and none yields the retail single-copy 0x4 + 0x1e
 // sequence.  The experiment supports the lexical placement reading but rejects
 // an ordinary function-local static as its source.  No unused storage is retained.
+
+// Additional pointer/storage ownership matrix:
+//
+//   build/link/misc-track-source-position/results.json
+//
+// Making the top-level pointer const or const volatile moves the pointer into a
+// new early .rdata section while leaving the string in main .data.  A class
+// static backing array merges the pointer and array in main .data.  A template
+// static backing array does split an exact 0x1e standalone contribution, but VC6
+// emits that COMDAT as early section 4 even when its definition appears between
+// IsCDDrive and DriveSupportsFreeSpaceQuery.  An explicit specialization at that
+// boundary is rejected because the pointer initializer has already instantiated
+// the primary.  These ordinary C++ ownership forms cannot produce section 44.
+
+// Real incremental-source-history probe:
+//
+//   build/link/incremental-source-history/results.json
+//
+// A stable VC6 SP5 /Zi /Gm /Gi database was seeded with a null track pointer,
+// then the direct literal initializer was restored and compiled twice.  The
+// transition folds the pointer and text back into the main .data contribution;
+// the repeated compile retains it.  The missing split is not stale incremental
+// state from adding the initializer late.

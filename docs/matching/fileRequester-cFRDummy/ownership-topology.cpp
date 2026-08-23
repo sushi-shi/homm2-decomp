@@ -25,6 +25,17 @@
 //   six distinct retail relocation identities rather than exposing a new
 //   placement orbit.
 
+// Real incremental-source-history probe:
+//
+//   build/link/incremental-source-history/results.json
+//
+// A stable VC6 SP5 /Zi /Gm /Gi database was seeded with cFRDummy absent, then
+// its direct `char* cFRDummy = "";` definition was restored and compiled twice.
+// Both restored objects allocate the newly introduced initializer literal at
+// the first ordinary REQUEST BSS cell and shift the five function literals.
+// Incremental source history therefore reproduces the baseline rotation, not
+// the retail trailing-cell topology.
+
 // Two further same-TU ownership arms forward-declared an external or class-static
 // one-byte cell, initialized cFRDummy from it, and defined the cell after all
 // functions and named REQUEST data.  VC6 still allocates either named cell at

@@ -103,6 +103,16 @@
 // reported "Skipping... (no relevant changes detected)" and retained that
 // order.  Minimal rebuild does not carry the non-/Gy layout into the /Gy object.
 
+// Real incremental-source-history probe:
+//
+//   build/link/incremental-source-history/results.json
+//
+// A stable VC6 SP5 /Zi /Gm /Gi database was first compiled without the node
+// destructor definition.  Restoring it and compiling twice emits the new node
+// destructor before the three RefPtr helpers and $E21/$E20 on both passes.  The
+// compiler does not append a newly introduced definition after existing helper
+// COMDATs, so ordinary incremental compilation cannot produce the retail tail.
+
 // Historical path-state matrix:
 //
 //   build/link/source-path-spelling/results.json

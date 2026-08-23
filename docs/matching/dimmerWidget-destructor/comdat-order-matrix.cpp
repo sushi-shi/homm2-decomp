@@ -119,6 +119,32 @@
 // deleting-destructor section 5, and the remaining methods in sections 6..10.
 // Compiler path identity is not the missing emission-order state.
 
+// Matrix 10: real /Gi + /Gm source-history transition.
+//
+//   build/link/incremental-source-history/results.json
+//
+// A stable VC6 SP5 /Zi /Gm /Gi database was seeded with the ordinary destructor
+// definition absent, then the definition was restored and the TU was compiled
+// twice.  Both restored objects retain default constructor, deleting destructor,
+// argument constructor, Read, Main, Draw, ordinary destructor.  Adding the real
+// destructor late does not make the already-generated deleting wrapper follow it.
+
+// Matrix 11: older compiler generation.
+//
+//   build/link/compiler-version-probes/DIMMER-vc42.obj
+//   build/link/vc5-DIMMER.cpp
+//
+// An isolated DIMMER TU was compiled with the locally pinned VC5 compiler and
+// with the sibling Price-of-Loyalty project's pinned VC4.2 compiler
+// (CL 10.20.6166).  VC5 emits constructor, vtable, deleting destructor, then the
+// argument constructor and remaining methods: the same early-wrapper orbit.
+// VC4.2 /Gy /GX also emits the wrapper before the argument constructor.  It is
+// additionally code-incompatible with Buka: its exception-aware default
+// constructor is 0x7b bytes instead of the exact VC6/retail 0x2b bytes and has
+// an .xdata contribution and CxxFrameHandler relocations.  Thus the matching
+// tail order in Price of Loyalty is not a reusable older-compiler object orbit;
+// its different optimized source/flags cannot supply Buka's exact /Od bodies.
+
 // Cross-version ownership evidence:
 //
 //   investigation/reports/pol-project-tree.txt
