@@ -204,7 +204,18 @@
 // Private versus shared-header ownership is therefore not the missing queue
 // state, and the exact in-class constructor shape remains evidence-backed.
 
-// UNTRIED: dependency-valid include orders that change where audiere.h and the
-// STL first enter the TU. The bounded probe is
-// build/link/audiere-include-order-probe.py; execution was deferred when the
-// build-execution allowance was exhausted, so it carries no measured result.
+// Include-order matrix:
+//
+//   build/link/audiere-include-order/results.json
+//
+// Seven dependency-valid include orders (baseline plus six permutations of
+// audiere.h, soundBackends.h, soundManager.h, and KB.h entry points) all
+// compile. Include order does steer template instantiation: four arms flip the
+// RefPtr<AudioDevice> destructor ahead of the RefPtr<OutputStream> pair, and
+// the kb_first arm additionally changes the PlayAudiereSample body. But every
+// arm keeps ??1AudiereSampleNode in the leading COMDAT slot (section 18,
+// dtor_after_refptrs false): the end-of-TU inline destructor is emitted at its
+// first use inside Purge, which precedes every RefPtr instantiation regardless
+// of which header enters the TU first. Header entry order therefore cannot
+// supply the retail three-RefPtr -> $E21 -> $E20 -> node-dtor tail, and the
+// object adapter's reviewed section move remains the bounded residual.
