@@ -49,6 +49,9 @@ treating all semantically equivalent COFF as interchangeable:
   `(DLL, name-or-ordinal)`. At the current checkpoint all 240 imports and all
   6,374 attributable logical bytes are exact. Nine DLLs retain a different raw
   intra-DLL slot order, reported separately as resolution-history evidence.
+- The same untouched-image audit finds all 244 six-byte import thunks (240
+  identities, including four duplicate occurrences) semantically exact. Their
+  raw positions and order remain a separate layout result.
 - `normalize_imports` is only part of the derived byte-identical proof artifact:
   it places those already-proved semantic records at retail offsets and retargets
   references. It is not an authentic LINK input and is not used to claim that the

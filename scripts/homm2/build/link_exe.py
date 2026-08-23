@@ -935,6 +935,66 @@ def semantic_import_byte_diagnostics(retail_path, candidate_path):
     }
 
 
+def _semantic_import_thunk_records(path):
+    """Return ordered ``(text offset, import identity)`` FF25 thunk records."""
+    slots = _import_slot_identities(path)
+    text = read_pe_section_payload(path, ".text")
+    records = []
+    for offset in range(len(text) - 5):
+        if text[offset:offset + 2] != b"\xff\x25":
+            continue
+        target = struct.unpack_from("<I", text, offset + 2)[0]
+        identity = slots.get(target)
+        if identity is not None:
+            records.append((offset, identity))
+    return records
+
+
+def semantic_import_thunk_byte_diagnostics(retail_path, candidate_path):
+    """Pair every linked import thunk by semantic IAT identity, without moving it."""
+    retail = _semantic_import_thunk_records(retail_path)
+    candidate = _semantic_import_thunk_records(candidate_path)
+    retail_counts = Counter(identity for _offset, identity in retail)
+    candidate_counts = Counter(identity for _offset, identity in candidate)
+    paired = sum((retail_counts & candidate_counts).values())
+    missing = sum((retail_counts - candidate_counts).values())
+    extra = sum((candidate_counts - retail_counts).values())
+    retail_bytes = 6 * len(retail)
+    matched_bytes = 6 * paired
+    mismatched_bytes = 6 * missing
+    retail_layout = retail
+    candidate_layout = candidate
+    return {
+        "method": "FF25 opcode plus semantic IAT target identity",
+        "exact": not missing and not extra,
+        "match_percent": (
+            round(100.0 * matched_bytes / retail_bytes, 6)
+            if retail_bytes else 100.0
+        ),
+        "retail_logical_bytes": retail_bytes,
+        "matched_bytes": matched_bytes,
+        "mismatched_bytes": mismatched_bytes,
+        "candidate_extra_bytes": 6 * extra,
+        "paired_thunks": paired,
+        "retail_thunks": len(retail),
+        "candidate_thunks": len(candidate),
+        "retail_import_identities": len(retail_counts),
+        "candidate_import_identities": len(candidate_counts),
+        "duplicate_retail_thunks": sum(
+            count - 1 for count in retail_counts.values() if count > 1),
+        "raw_layout_matches_retail": retail_layout == candidate_layout,
+        "raw_layout_is_not_normalized": True,
+        "missing_identities": [
+            {"identity": list(identity), "count": count}
+            for identity, count in sorted((retail_counts - candidate_counts).items())
+        ],
+        "extra_identities": [
+            {"identity": list(identity), "count": count}
+            for identity, count in sorted((candidate_counts - retail_counts).items())
+        ],
+    }
+
+
 def import_thunk_diagnostics(retail_path, candidate_path, candidate, map_path,
                              retail_symbols):
     """Pair six-byte import thunks by the semantic identity of their IAT slot."""
@@ -2477,6 +2537,8 @@ def audit_existing_link(output, map_path=None, report_path=None,
     resources = resource_diagnostics(RETAIL_EXE, output, retail, candidate)
     imports = import_diagnostics(read_imports(RETAIL_EXE), read_imports(output))
     semantic_import_bytes = semantic_import_byte_diagnostics(RETAIL_EXE, output)
+    semantic_import_thunk_bytes = semantic_import_thunk_byte_diagnostics(
+        RETAIL_EXE, output)
     static_storage = static_storage_diagnostics(retail, candidate, map_path)
     static_storage["section_bytes"] = {
         name: compare_pe_section_bytes(RETAIL_EXE, output, name)
@@ -2528,6 +2590,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
                                 all(row["exact"] for row in section_bytes.values())),
         "imports_exact": imports["complete_iat_order_matches_retail"],
         "imports_semantic_exact": semantic_import_bytes["exact"],
+        "import_thunks_semantic_exact": semantic_import_thunk_bytes["exact"],
         "resources_exact": resources["semantic_match"],
         "source_function_rvas_exact": not any(
             row["status"] != "exact" for row in functions["functions"]
@@ -2553,6 +2616,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "file_bytes": file_bytes,
         "imports": imports,
         "semantic_import_bytes": semantic_import_bytes,
+        "semantic_import_thunk_bytes": semantic_import_thunk_bytes,
         "resources": resources,
         "static_storage": static_storage,
         "function_placement": functions,
@@ -2584,6 +2648,12 @@ def audit_existing_link(output, map_path=None, report_path=None,
         semantic_import_bytes["retail_logical_bytes"],
         semantic_import_bytes["match_percent"],
         "matches" if imports["complete_iat_order_matches_retail"] else "differs"))
+    print("link audit: semantic import thunks %d/%d (%.6f%%); raw layout %s" % (
+        semantic_import_thunk_bytes["paired_thunks"],
+        semantic_import_thunk_bytes["retail_thunks"],
+        semantic_import_thunk_bytes["match_percent"],
+        ("matches" if semantic_import_thunk_bytes["raw_layout_matches_retail"]
+         else "differs")))
     print("link audit: %s" % report_path)
     return 0 if not strict or file_bytes["exact"] else 1
 

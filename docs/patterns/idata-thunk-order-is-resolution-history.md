@@ -67,3 +67,8 @@ surrounding padding and unrelated `.rdata` contributions are not attributed to i
 Measured on `build/link/HMM2PL.raw.exe`: 240/240 imports paired, 6,374/6,374 attributable
 logical bytes exact, exact DLL descriptor order, no missing/extra identities, and nine DLLs
 with a different raw intra-DLL order. No executable byte is rewritten for this result.
+
+The corresponding `.text` audit scans only six-byte `FF 25 <IAT-VA>` bodies whose operand
+resolves through that image's import directory. Retail and the raw candidate each contain 244
+such thunks for the same 240 identities (four duplicate occurrences): 244/244 and 1,464/1,464
+logical bytes exact. Their raw placement remains independently different.

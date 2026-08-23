@@ -18,6 +18,7 @@ from homm2.build.link_exe import (
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     semantic_import_byte_diagnostics,
+    semantic_import_thunk_byte_diagnostics,
     sibling_tool_identities, static_symbol_diagnostics,
     _import_slot_identities, _linked_masked_code_equal,
     _ordered_candidate_group_placements, _pair_volatile_function_rows,
@@ -112,6 +113,34 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(exact["paired_imports"], 1)
         self.assertFalse(different["exact"])
         self.assertEqual(different["mismatched_bytes"], 1)
+
+    def test_semantic_import_thunks_pair_duplicate_targets_despite_order(self):
+        a = ("x.dll", "name", "A")
+        b = ("x.dll", "name", "B")
+        slots = {0x402000: a, 0x402004: b}
+        retail = (
+            b"\xff\x25\x00\x20\x40\x00"
+            b"\xff\x25\x04\x20\x40\x00"
+            b"\xff\x25\x00\x20\x40\x00"
+        )
+        candidate = (
+            b"\xff\x25\x00\x20\x40\x00"
+            b"\xff\x25\x00\x20\x40\x00"
+            b"\xff\x25\x04\x20\x40\x00"
+        )
+        with mock.patch(
+            "homm2.build.link_exe._import_slot_identities",
+            side_effect=[slots, slots],
+        ), mock.patch(
+            "homm2.build.link_exe.read_pe_section_payload",
+            side_effect=[retail, candidate],
+        ):
+            result = semantic_import_thunk_byte_diagnostics(
+                Path("retail.exe"), Path("candidate.exe"))
+        self.assertTrue(result["exact"])
+        self.assertEqual(result["paired_thunks"], 3)
+        self.assertEqual(result["duplicate_retail_thunks"], 1)
+        self.assertFalse(result["raw_layout_matches_retail"])
 
     def test_link_environment_uses_toolchain_lib_search_path(self):
         environment = link_environment(
