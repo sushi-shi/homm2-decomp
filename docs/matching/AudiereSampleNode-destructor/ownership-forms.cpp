@@ -248,3 +248,24 @@
 // first-defining-object rule pins the selected copy to AudiereEffects's own
 // section order. Cross-TU ownership cannot realize the tail slot; the
 // residual is AudiereEffects's internal deferred-sweep order alone.
+
+// Mechanism closure (see docs/compiler-re-allocation-order.md):
+//
+//   build/link/audiere-dyninit/  build/link/audiere-noninline-body/
+//   build/link/il-feed/results.json
+//
+// C1XX RE proves deferred-COMDAT emission is net-FIFO first-use with no
+// reachable ordering knob. Behavioral closures on this TU: (a) Play's exact
+// 0x39c body requires the inline declaration - with a plain declaration Play
+// re-lowers to 0x385 whether or not a body exists anywhere in the TU; (b)
+// registration happens at the first CALL even for a plain non-inline
+// definition placed after the last function - the body still emits first in
+// the deferred cluster (sec18), never at its lexical position; (c) a
+// file-scope dynamically-initialized node object emits its $E thunks at the
+// STATIC's lexical position and still leaves the dtor in first-use order, so
+// the dynamic-initializer axis cannot outrank Purge's fn1 call; (d) the
+// /d1il-capture + /d2il-feed two-step (the gruntz emission-order
+// perturbation) round-trips this TU with identical symbol order. Since
+// retail Purge byte-identically calls the destructor as the TU's first use,
+// no same-TU source arrangement under cl 8966 reproduces the post-$E20
+// placement. The wall is a genuine unrecovered first-requirement difference.
