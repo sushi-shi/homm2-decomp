@@ -241,7 +241,7 @@ exactly to `crc32Table` at 0x51f5a4, and `include/BASE/MIDI_TYPES.h` is gone.
   element differed, which the extent sweep removed. `_gMidiText` was a third
   shape again — retail has no such struct at all.
 - **Three symbols the derivation votes for but cannot spell as a claim.** Two
-  are class statics (`AudiereMusicState::source`/`::stream`) and one is a
+  are class statics (`AudiereMusic::source`/`::stream`) and one is a
   `std::ctype<wchar_t>::id` guard. Each has a stable decorated name and unanimous
   votes; what is missing is a marker channel for the class-static and guard
   cases. `LoadRemote`'s `cheatWarned`/`debugWarned` and `FadeSavedUpdate`'s

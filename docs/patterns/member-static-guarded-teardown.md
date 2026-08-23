@@ -16,7 +16,7 @@ Probe A/B: file statics and function-local statics both fail to reproduce it;
 with file-scope definitions) produce the guarded 0x46 teardown byte-for-byte,
 bits assigned in definition order.
 
-**Close.** `AudiereMusicState::stream/source` in BASE/soundBackends.h,
+**Close.** `AudiereMusic::stream/source` in BASE/soundBackends.h,
 definitions at the top of AudiereMusic.cpp. $E14/$E19 init bodies stayed
 masked-exact throughout — only the teardown flavor discriminates.
 Commit 9182c077.

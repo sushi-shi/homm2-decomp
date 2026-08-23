@@ -16,12 +16,12 @@ BASE/AudiereEffects	?StopAllAudiereSamples@@YIXXZ	100.0000	ee7498c4b36a
 BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
 BASE/AudiereMusic	?AudiereMusicAvailable@@YI_NXZ	100.0000	1001bd3a24bb
-BASE/AudiereMusic	?AudiereMusicPlaying@@YI_NXZ	100.0000	d80e2edbabe9
-BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	7ea5dc5c5252
-BASE/AudiereMusic	?ResetAudiereMusic@@YIXXZ	100.0000	28d0e39d5071
-BASE/AudiereMusic	?SetAudiereMusicVolume@@YIXHH@Z	100.0000	bbc82415fb66
+BASE/AudiereMusic	?AudiereMusicPlaying@@YI_NXZ	100.0000	1bc6a362db97
+BASE/AudiereMusic	?PlayAudiereMusic@@YIXV?$RefPtr@VAudioDevice@audiere@@@audiere@@AAH1H@Z	100.0000	f13c686db0e9
+BASE/AudiereMusic	?ResetAudiereMusic@@YIXXZ	100.0000	5e6be6a2b240
+BASE/AudiereMusic	?SetAudiereMusicVolume@@YIXHH@Z	100.0000	58520d3689bd
 BASE/AudiereMusic	?StartupAudiereMusic@@YI_NV?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	6695b12b4972
-BASE/AudiereMusic	?StopAudiereMusic@@YIXAAH@Z	100.0000	dd9cfb76e75d
+BASE/AudiereMusic	?StopAudiereMusic@@YIXAAH@Z	100.0000	5198cc761915
 BASE/BASEMGR	??0baseManager@@QAE@XZ	100.0000	a40f1a975dbb
 BASE/BITMAP	??0bitmap@@QAE@FFF@Z	100.0000	e68d90677767
 BASE/BITMAP	??0bitmap@@QAE@K@Z	100.0000	48f1f25a6080

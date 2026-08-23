@@ -6,18 +6,26 @@ Source: src/BASE/AudiereMusic.cpp
 Evidence
 --------
 VC6 emits one four-byte BSS initialization guard for the two static RefPtr
-members of AudiereMusicState. Candidate COFF identifies it as local `_$S18` at
-.bss+0xf4. Retail placement and the exit-thunk relocations identify the same
+members of AudiereMusic. Candidate COFF identifies it as local `_$S18` at
+.bss+0x8. Retail placement and the exit-thunk relocations identify the same
 allocation at VA 0x005395e4; bit 0 guards `stream` and bit 1 guards `source`.
 
 The candidate exit thunks are counter-named _$E17 and _$E23, while retail calls
-the corresponding bodies _$E15 and _$E20. Both 70-byte bodies were already
-instruction-identical; each differed only at its three guard relocations. The
-source therefore retains the generated RefPtr semantics and adds only:
+the corresponding bodies _$E15 and _$E20. Both 70-byte bodies are
+instruction-identical and their ordered relocations are exact. The source
+retains the generated RefPtr semantics and names the guard with:
 
     DATA_COMPGEN_GUARD(
-        0x005395e4, audiereMusicStateInitializationGuard, AudiereMusicState
+        0x005395e4, audiereMusicInitializationGuard, AudiereMusic
     )
+
+The class name is private and absent from the stripped image. VC6 hashes the
+decorated class-static identities into BSS buckets; the concise semantic name
+`AudiereMusic` places `source` in bucket 0xfb and `stream` in 0x142, before
+the generated guard's 0x3c1 bucket. An explicit zero initializer then places
+the positions array at +0xc. These are the retail offsets, and substituting the
+ordinary compiled object into the raw LINK input preserves exact `.text` and
+`.data` without adapting the object.
 
 Tooling disposition
 -------------------

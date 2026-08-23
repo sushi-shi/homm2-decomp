@@ -30,33 +30,33 @@ DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_CO
     0.05f,
     0.0f
 };
-DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusicState::stream;
-DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusicState::source;
+DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusic::stream;
+DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusic::source;
 DATA_COMPGEN_GUARD(
-    0x005395e4, audiereMusicStateInitializationGuard, AudiereMusicState
+    0x005395e4, audiereMusicInitializationGuard, AudiereMusic
 )
-DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
+DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {0};
 
-VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::stream)
-VA_COMPGEN(0x004cd090, 0x61, STATIC_CTOR, AudiereMusicState::stream)
-VA_COMPGEN(0x004cd100, 0x12, STATIC_ATEXIT, AudiereMusicState::stream)
-VA_COMPGEN(0x004cd120, 0x46, STATIC_DTOR, AudiereMusicState::stream)
-VA_COMPGEN(0x004cd170, 0xf, STATIC_INIT_DISPATCH, AudiereMusicState::source)
-VA_COMPGEN(0x004cd180, 0x61, STATIC_CTOR, AudiereMusicState::source)
-VA_COMPGEN(0x004cd1f0, 0x12, STATIC_ATEXIT, AudiereMusicState::source)
-VA_COMPGEN(0x004cd210, 0x46, STATIC_DTOR, AudiereMusicState::source)
+VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusic::stream)
+VA_COMPGEN(0x004cd090, 0x61, STATIC_CTOR, AudiereMusic::stream)
+VA_COMPGEN(0x004cd100, 0x12, STATIC_ATEXIT, AudiereMusic::stream)
+VA_COMPGEN(0x004cd120, 0x46, STATIC_DTOR, AudiereMusic::stream)
+VA_COMPGEN(0x004cd170, 0xf, STATIC_INIT_DISPATCH, AudiereMusic::source)
+VA_COMPGEN(0x004cd180, 0x61, STATIC_CTOR, AudiereMusic::source)
+VA_COMPGEN(0x004cd1f0, 0x12, STATIC_ATEXIT, AudiereMusic::source)
+VA_COMPGEN(0x004cd210, 0x46, STATIC_DTOR, AudiereMusic::source)
 
 VA(0x004cd260, 0x133)
 void StopAudiereMusic(i32& currentTrack) {
-    if (AudiereMusicState::stream) {
-        if (AudiereMusicState::stream->isPlaying()) {
-            gAudiereMusicPositions[currentTrack] = AudiereMusicState::stream->getPosition();
-            AudiereMusicState::stream->stop();
+    if (AudiereMusic::stream) {
+        if (AudiereMusic::stream->isPlaying()) {
+            gAudiereMusicPositions[currentTrack] = AudiereMusic::stream->getPosition();
+            AudiereMusic::stream->stop();
         }
-        AudiereMusicState::stream = NULL;
+        AudiereMusic::stream = NULL;
     }
-    if (AudiereMusicState::source)
-        AudiereMusicState::source = NULL;
+    if (AudiereMusic::source)
+        AudiereMusic::source = NULL;
     currentTrack = MIDI_NO_TRACK;
 }
 
@@ -67,9 +67,9 @@ bool AudiereMusicAvailable(void) {
 
 VA(0x004cd3b0, 0x36)
 bool AudiereMusicPlaying(void) {
-    if (!AudiereMusicState::stream)
+    if (!AudiereMusic::stream)
         return false;
-    return AudiereMusicState::stream->isPlaying();
+    return AudiereMusic::stream->isPlaying();
 }
 
 VA(0x004cd3f0, 0x99)
@@ -82,13 +82,13 @@ bool StartupAudiereMusic(audiere::AudioDevicePtr device) {
 
 VA(0x004cd490, 0x132)
 void ResetAudiereMusic(void) {
-    if (AudiereMusicState::stream) {
-        if (AudiereMusicState::stream->isPlaying())
-            AudiereMusicState::stream->stop();
-        AudiereMusicState::stream = NULL;
+    if (AudiereMusic::stream) {
+        if (AudiereMusic::stream->isPlaying())
+            AudiereMusic::stream->stop();
+        AudiereMusic::stream = NULL;
     }
-    if (AudiereMusicState::source)
-        AudiereMusicState::source = NULL;
+    if (AudiereMusic::source)
+        AudiereMusic::source = NULL;
     for (i32 track = 0; track < MIDI_TRACK_COUNT; ++track)
         gAudiereMusicPositions[track] = 0;
 }
@@ -112,8 +112,8 @@ void SetAudiereMusicVolume(i32 volume, i32 fading) {
     if (volumeLevel > AUDIERE_FADE_STEP_COUNT)
         volumeLevel = AUDIERE_FADE_STEP_COUNT;
     gAudiereMusicVolume = gAudiereMusicVolumes[volumeLevel];
-    if (AudiereMusicState::stream)
-        AudiereMusicState::stream->setVolume(gAudiereMusicVolume);
+    if (AudiereMusic::stream)
+        AudiereMusic::stream->setVolume(gAudiereMusicVolume);
 }
 
 VA(0x004cd680, 0x3c7)
@@ -150,8 +150,8 @@ void PlayAudiereMusic(
             stream->setRepeat(repeatMusic != 0 ? true : false);
             stream->setVolume(gAudiereMusicVolume);
             stream->play();
-            AudiereMusicState::source = source;
-            AudiereMusicState::stream = stream;
+            AudiereMusic::source = source;
+            AudiereMusic::stream = stream;
         }
     }
     if (fadeSteps > 0) {
