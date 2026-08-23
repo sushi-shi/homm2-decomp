@@ -145,6 +145,33 @@
 // tail order in Price of Loyalty is not a reusable older-compiler object orbit;
 // its different optimized source/flags cannot supply Buka's exact /Od bodies.
 
+// Matrix 12: late constructor history.
+//
+//   build/link/incremental-source-history/results.json
+//   key: DIMMER_constructors_late
+//
+// The seed omitted both constructor definitions, which delays Read, Main, Draw,
+// the ordinary destructor, and the deleting wrapper into a different partial-
+// object orbit.  Restoring both constructors under the same real /Zi /Gm /Gi
+// database regenerates the complete object in the ordinary order: default
+// constructor, deleting destructor, argument constructor, Read, Main, Draw,
+// ordinary destructor.  A repeat compile is identical.  Late constructor
+// introduction does not preserve the attractive seed order.
+
+// Matrix 13: mixed compiler phases and remaining IDE modes.
+//
+//   build/link/mixed-vc6-phases/{results.json,topology.json}
+//   build/link/residual-flag-probes/results.json
+//
+// Both distinct VC6 drivers were crossed with RTM/SP3/SP5 C++ front ends and
+// RTM/SP3/SP5 back ends.  Four SP5-front-end/older-back-end combinations reject
+// their intermediate interface; all fourteen compiling combinations retain the
+// early deleting destructor.  /Zi, /ZI with and without /Gm, /FD, or /FR,
+// browse information, /O2, and explicit /Gf-/GF- also keep the wrapper between
+// the two constructors.  The Price of Loyalty target's similar tail placement
+// is therefore not explained by optimization level, service-pack phase mixing,
+// or an ordinary IDE build switch.
+
 // Cross-version ownership evidence:
 //
 //   investigation/reports/pol-project-tree.txt

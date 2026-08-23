@@ -113,6 +113,28 @@
 // compiler does not append a newly introduced definition after existing helper
 // COMDATs, so ordinary incremental compilation cannot produce the retail tail.
 
+// A complementary late-use history kept the inline definition but seeded the
+// same real /Zi /Gm /Gi database with all three AudiereSampleNode delete
+// expressions absent.  Restoring those delete sites newly materializes the node
+// destructor in section 31, before the three RefPtr helpers and $E21/$E20 in
+// sections 33..41.  The repeated compile keeps that order.  Delaying first
+// semantic use therefore does not append the COMDAT at the retail tail either
+// (`AudiereEffects_deletes_late` in the same results file).
+
+// Mixed compiler-phase and residual build-mode probes:
+//
+//   build/link/mixed-vc6-phases/{results.json,topology.json}
+//   build/link/residual-flag-probes/results.json
+//
+// The complete local Cartesian matrix crossed both distinct VC6 drivers, all
+// RTM/SP3/SP5 C++ front ends, and all RTM/SP3/SP5 back ends.  Four combinations
+// with the SP5 front end and an older back end are interface-incompatible; all
+// fourteen compiling combinations retain node destructor -> three RefPtr
+// helpers -> $E21 -> $E20.  /Zi, /ZI (which is incompatible with the retail
+// /Ob1 state), /ZI with /Gm, /FD, or /FR, browse information alone, /O2, and
+// explicit /Gf-/GF- likewise expose no tail-destructor orbit.  Compiler service-
+// pack phase mixing and the remaining ordinary IDE build modes are rejected.
+
 // Historical path-state matrix:
 //
 //   build/link/source-path-spelling/results.json

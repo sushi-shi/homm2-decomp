@@ -36,6 +36,14 @@
 // Incremental source history therefore reproduces the baseline rotation, not
 // the retail trailing-cell topology.
 
+// A complementary late-literal history seeded the same database with the five
+// function-level empty literals replaced by gText references, while retaining
+// the direct cFRDummy initializer.  Restoring the five literals allocates them
+// after cFRDummy's already-first cell: cFRDummy remains at +0x0c and the function
+// cells occupy +0x10..+0x20.  Thus neither order of incremental introduction
+// produces the retail five-function-cells-then-global-cell identity sequence
+// (`REQUEST_literals_late` in the same results file).
+
 // Two further same-TU ownership arms forward-declared an external or class-static
 // one-byte cell, initialized cFRDummy from it, and defined the cell after all
 // functions and named REQUEST data.  VC6 still allocates either named cell at
@@ -118,3 +126,17 @@
 // 9af62364dcb864c640124e71b4fbfe1107df26834b993825c7230f047d720a93, not
 // retail.  Selectany on the pointer therefore changes the wrong contribution;
 // it does not supply a natural trailing backing cell.
+
+// Mixed compiler-phase and residual build-mode probes:
+//
+//   build/link/mixed-vc6-phases/{results.json,topology.json}
+//   build/link/residual-flag-probes/results.json
+//
+// Fourteen compatible combinations spanning both VC6 drivers and every
+// RTM/SP3/SP5 front-end/back-end phase preserve the first-cell initializer.
+// Older C++ front ends renumber the private $SG symbols by 451, proving that the
+// phase substitution took effect, but the initializer still targets BSS +0x0c.
+// /Zi, /FR, and explicit /Gf-/GF- are likewise invariant.  /ZI and /O2 instead
+// pool the empty literal into a COMDAT and remove the required six writable
+// identities.  No tested compiler installation or ordinary IDE flag state
+// supplies the retail rotation.

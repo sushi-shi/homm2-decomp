@@ -145,3 +145,18 @@
 // transition folds the pointer and text back into the main .data contribution;
 // the repeated compile retains it.  The missing split is not stale incremental
 // state from adding the initializer late.
+
+// Mixed compiler-phase and residual build-mode probes:
+//
+//   build/link/mixed-vc6-phases/{results.json,topology.json}
+//   build/link/residual-flag-probes/results.json
+//
+// Both distinct VC6 drivers and every RTM/SP3/SP5 front-end/back-end phase were
+// crossed.  Four SP5-front-end/older-back-end combinations are incompatible;
+// all fourteen compiling combinations keep the text at offset 0x1c in the
+// leading 0x3a-byte .data contribution.  /Zi, /FR, and explicit /Gf-/GF- are
+// also invariant.  /ZI splits the text into an early 0x1e .rdata contribution,
+// while /O2 emits an early 0x1e .data contribution; both are the wrong storage
+// orbit and position and change required code/data.  Service-pack phase mixing,
+// edit-and-continue, browse information, and optimization mode do not expose
+// retail section 44.
