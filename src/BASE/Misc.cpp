@@ -182,11 +182,15 @@ H2_ENUM_END(FileIdHashConstant)
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-DATA(0x00536088) static i32 giFindMid;
-
-DATA(0x0053609c) static i32 gBlitRight;
-DATA(0x00536098) static i32 gBlitBottom;
-
+DATA(0x00536088) static i32 giFindMid = 0;
+DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime = 0;
+DATA(0x00536090) i32 inBoxY = 0;
+DATA(0x00536094) i32 inBoxX = 0;
+DATA(0x00536098) static i32 gBlitBottom = 0;
+DATA(0x0053609c) static i32 gBlitRight = 0;
+DATA(0x005360a0) class heroWindow* DataEntryWin = NULL;
+DATA(0x005360a4) char* cDEDest = NULL;
+DATA(0x005360a8) i32 iDEMaxLen = 0;
 DATA(0x005360ac) i32 iMemEntries = 0;
 DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
 DATA(0x005360b4) i32 giTotalMemAllocated = 0;
@@ -2162,10 +2166,3 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     }
     return EventWindowHandler(message);
 }
-
-DATA(0x005360a0) class heroWindow* DataEntryWin;
-DATA(0x005360a4) char* cDEDest;
-DATA(0x005360a8) i32 iDEMaxLen;
-DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
-DATA(0x00536094) i32 inBoxX;
-DATA(0x00536090) i32 inBoxY;
