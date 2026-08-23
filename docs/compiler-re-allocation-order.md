@@ -535,3 +535,367 @@ standalone scripts (section table + symbol table walk, no external deps).
    anyone wants to close the "is there a second work list that could reorder"
    question completely; the behavioural sweep already says it is inactive under
    every flag combination the campaign uses.
+
+---
+
+## 9. Follow-ups (round 2)
+
+### 9.1 `DAT_104E2DC9` / `DAT_104E2DC8` — chased, and RULED OUT
+
+**Sole writer of both: `FUN_10445981`** (a `main.c` module function, the
+per-compilation setup called first by `FUN_10445601`), at `0x10445AA9` and
+`0x10445AB8`. The condition is now named:
+
+```asm
+10445a84  MOV DL,[0x104D8098]   ; -Yu   target  (USE a PCH)
+10445a8f  MOV AL,[0x104D80A0]   ; -Yc   target  (CREATE a PCH)
+10445a94  CMP AL,BL             ; BL == 0
+10445a96  JNZ skip              ;   -Yc set   -> skip
+10445a9c  CMP DL,BL
+10445a9e  JZ  skip              ;   -Yu clear -> skip
+10445aa9  MOV [0x104E2DC9],1    ; secondary work list ON
+10445ab8  MOV [0x104E2DC8],AL   ; = 0 on this path
+```
+
+> `DAT_104E2DC9` is set **exactly when `/Yu` is on and `/Yc` is off** — i.e. the
+> PCH-*consuming* compile, precisely the MSDEV IDE-era build mode. No option
+> targets `0x104E2DC8`/`0x104E2DC9` directly; they are pure derived state.
+> `DAT_104E2DC8` is set to **0** on that same path, so `FUN_1044B373`'s
+> `DAT_104E2DC8 != 0` branch is *off* whenever the secondary list is *on* —
+> they are alternatives, not a pair.
+
+**Drain order:** `FUN_10442285` (the `-BnoWorkList`-guarded site) is called from
+`FUN_10445601`, the end-of-compilation routine. `FUN_1040ABD0` (deferred drain +
+`$E`) has no caller in `FUN_10445601`; its only entry is the `FUN_1040ABB2`
+trampoline used as a queue callback, i.e. it is driven from inside the emit
+loop. **So the secondary list does drain after the `$E` walk** — the structural
+prerequisite the coordinator hypothesised is real.
+
+**But it carries no code.** Measured directly: a real `/Yu` PCH-consuming build
+of `src/BASE/AudiereEffects.cpp` (PCH created in a separate `/Yc` step, then
+`/FIpchhdr.h /Yupchhdr.h /Fp…`) yields the **same 11 sections in the same order
+with the same sizes and the same function/COMDAT symbols** —
+`??1AudiereSampleNode` is still the first COMDAT. The *only* difference in the
+whole object is two anonymous EH-table ordinals in `.xdata$x`
+(`$T55767/$T55771` → `$T55765/$T55769`), a uniform −2 shift because the PCH
+consumed two values of the shared anonymous-symbol counter — which is itself an
+independent confirmation of §3's single-counter finding, and is exactly the
+class of difference §5.3 shows carries no ordering information.
+
+Consistent with what `FUN_10442285` actually walks: it
+is handed `DAT_104D7534` (the *segment* table) and iterates a per-segment list
+at `[EDI+0x228]` testing `[EDI+0x28]`, then checks `-C9IL` — PCH-deferred
+symbol/debug records, not function bodies.
+
+**Verdict: the secondary work list cannot explain any of the three residuals.**
+No IDE-era build state reorders code emission.
+
+### 9.2 The registration rule for a not-yet-seen inline body
+
+Probes `n1`–`n5`, a deliberate model of the AudiereEffects TU (fn1 deletes
+through a pointer, three more functions using other inlines whose bodies were
+visible from the start, a file-scope dynamically-initialized object, and the
+destructor's body only at EOF):
+
+| Probe | Body form | Object pos | Result (`base_gx`) |
+|---|---|---|---|
+| `n3` | defined **in-class** | after fns | `??1Node` emitted at **first use** (right after Purge) |
+| `n1` | out-of-line `inline` at EOF | before body | `Purge…Stop, _$E2, _$E1`, then `??1Node` **last** |
+| `n2` | out-of-line `inline` at EOF | after body | same — `??1Node` **last** |
+| `n4` | `n1` + `inline` keyword *in-class too* | after fns | same — `??1Node` **last** |
+| `n5` | `n4` + object defined **first** | before fns | `_$E2,_$E1, Purge…Stop`, then `??1Node` **last** |
+
+> **Rule.** For a member function whose body has **not yet been seen** at the
+> call site, nothing can be enqueued there; the out-of-line copy is emitted at
+> its **definition** point. A body defined at EOF therefore lands after
+> everything defined earlier — including the `$E` thunks. A body defined
+> **in-class** is available at the call site and is enqueued there, so it is
+> emitted in first-use order. The `inline` keyword on the in-class *declaration*
+> is irrelevant (`n4` == `n1`).
+
+Critically, **`Purge` is byte-identical across `n1`/`n2`/`n3`** (0x4d, 3 relocs,
+`REL32 -> ??1Node@@QAE@XZ` at `+0x1e`): this axis is free on the caller side, so
+it cannot cost anything already matched.
+
+**New rule discovered in `n5`:** the `$E` thunk **body** is emitted at the
+*source position of the initialized object's definition*, not at end of TU
+(`n5` puts `_$E2`/`_$E1` at `.text+0` because the object precedes the
+functions). Only the `.CRT$XCU` cell is created by the end-of-TU
+`FUN_1044B373` walk. This refines §4.2.
+
+### 9.3 The gap that remains for AudiereEffects — a sharp constraint
+
+`src/BASE/AudiereEffects.cpp:203` **already** uses the EOF out-of-line form
+(`inline AudiereSampleNode::~AudiereSampleNode() {}`, declared
+`inline ~AudiereSampleNode();` at `include/BASE/soundBackends.h:21`), so §9.2's
+axis is already satisfied — yet ours still emits it as the *first* COMDAT. The
+residual is therefore **not** the definition-site axis. Retail's delinked
+ground truth is one contiguous `.text` run:
+
+```
+…12 functions… , ??1RefPtr<AudioDevice> @0x7d0 , ??4RefPtr<OutputStream> @0x7fc ,
+_$E21 @0x850 , _$E20 @0x878 , ??1AudiereSampleNode @0x88c
+```
+
+Three differences from ours, each now a precise statement about the retail source:
+
+1. Retail never emits `??1RefPtr<OutputStream>` at all — we do. So in retail no
+   `RefPtr<OutputStream>` was ever destroyed by value in this TU.
+2. Retail's helper order is `RefPtr<AudioDevice>::~RefPtr` then
+   `RefPtr<OutputStream>::operator=`; ours is the reverse plus an extra. By §4.3
+   that is a first-use ordering statement about the twelve functions.
+3. `??1AudiereSampleNode` sits **after** both `$E` thunks, so by §4.5 its first
+   requirement came *during* dynamic-initializer emission — i.e. from the
+   object's atexit destructor, not from `PurgeFinishedAudiereSamples`.
+
+**Unresolved tension worth flagging:** by §9.2's `n5` result the `$E` thunk
+bodies follow the object's source position, and retail's are late (`0x850`),
+which implies the dynamically-initialized object was defined *after* all twelve
+functions — but retail's only `.bss` symbol is `_gAudiereEffects` at `.bss+0`,
+and by §5.2 `.bss` order is declaration order, which implies it was defined
+*first*. Both cannot hold for a single object. The most likely resolution is
+that retail's `$E21`/`$E20` belong to a **different, late-defined** file-scope
+object than `gAudiereEffects` (one whose storage is not in this TU's `.bss` —
+e.g. a `RefPtr`/`AudioDevicePtr`-typed static, which would also explain
+difference 1). That is the next thing to test, and it is a source-shape
+question, not a compiler question.
+
+---
+
+## 10. Follow-ups (round 3) — the AudiereEffects tail as a constraint problem
+
+### 10.1 Reading (c) is DEAD — the `$E` pair's owner, pinned by relocation
+
+The delinked retail object's tail relocations settle it:
+
+```
+_$E21 @0x850   +0x856 DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51   (local-static guard)
+               +0x863 DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51
+               +0x86c DIR32 -> ??_B?1???id@?$ctype@G@std@@$D@@9@51
+               +0x871 REL32 -> _$E20
+_$E20 @0x878   +0x87c DIR32 -> ?id@?$ctype@G@std@@$E
+               +0x881 REL32 -> _atexit
+.CRT$XCU       +0x000 DIR32 -> _$E21
+```
+
+> **Retail's `$E21`/`$E20` are the `std::ctype<G>::id` guarded-local-static
+> machinery** — `$E21` is the guarded initializer (tests/sets the `??_B…@51`
+> guard, calls `$E20`), `$E20` registers the facet's destructor with `_atexit`.
+> The `?1?` in the guard's decoration marks a **function-local** static.
+
+There is no late-defined `RefPtr`-typed file-scope object. My §9.3 reading (c)
+is refuted, and with it the §9.3 "unresolved tension" — retail's `$E` position
+has nothing to do with `gAudiereEffects`, so there is no conflict with
+`_gAudiereEffects` sitting at `.bss+0`. The `$E` pair's position is set by where
+the **ctype accessor containing that local static** was emitted.
+
+Also confirmed from the same dump: Purge's two delete sites (`+0x65`, `+0x114`)
+are `REL32 -> ??1AudiereSampleNode@@QAE@XZ`, the **tail** body at `0x88c`.
+
+### 10.2 The retail tail is reachable — proven
+
+Probes `q1`, `q2`, `q3` (`/Gy`), modelling the TU as: a delete site, a function
+using a helper's dtor + `operator=`, a **function-local guarded static**, and
+the node destructor defined **out-of-line at EOF**:
+
+```
+[3] Purge                      <- delete site
+[4] Play                       <- calls ??1Ref / operator=
+[5] .text$x  [6] .xdata$x      <- EH funclets
+[7] ??1Ref              0x13   <- FIRST dtor body
+[8] ?id@Facet (guarded) 0x34   <- accessor holding the local static
+[9] _$E2 (atexit)       0x0f
+[10] Use
+[11] ??1Node            0x13   <- SECOND dtor body, LAST
+```
+
+That is retail's `[0x2c dtor][0x54 assign][$E21][$E20][0x2c dtor]` shape: **two
+dtor bodies straddling the guarded-static `$E` machinery, the EOF-defined one
+last.** So the target topology is *reachable* under the pinned toolchain.
+
+**Option (b) is unnecessary.** `q2` (node class templated, `typedef` preserving
+the spelling, dtor instantiated in the end-of-TU walk) and `q3` (plain class,
+dtor defined out-of-line at EOF) produce **byte-identical topology**. Templating
+buys nothing; §9.2's definition-point rule alone does the work.
+
+**Option (a) is unnecessary too** — no inlining-at-the-delete-site trick is
+needed; the delete sites keep their `REL32` call to the tail body (§9.2 already
+showed the caller bytes are invariant across all these forms).
+
+### 10.3 The one remaining gap, stated exactly
+
+In `q1`/`q2`/`q3` the guarded-static accessor is defined **mid-file, before** the
+destructor's EOF definition. In our real `AudiereEffects.cpp` the ctype
+requirement lands **last** (section 11, the 5-byte `?id@?$ctype@G@std@@$E`),
+*after* the line-203 definition — which is exactly why our node destructor
+emits early instead of last. Everything else already matches.
+
+> **The required source shape is therefore:** keep
+> `AudiereSampleNode::~AudiereSampleNode` defined out-of-line at EOF (as it
+> already is), **and arrange for the `std::ctype<G>::id` accessor to be required
+> earlier in the TU than line 203** — i.e. between `PlayAudiereSample`'s
+> `RefPtr::operator=` use and the destructor's definition point.
+
+What triggers that requirement in our build is `<locale>` machinery reached
+through the audiere headers; it currently instantiates at the very end. The
+open question is a *header/instantiation-timing* question, not a compiler one:
+find what in retail's TU touched the `ctype<G>` facet mid-file. Note retail's
+ctype machinery is `0x28 + 0x14` bytes (a separate guarded init **and** an
+atexit thunk) while ours is a single 5-byte thunk — so retail's `ctype<G>`
+instantiation is not merely repositioned but *differently shaped*, which is a
+strong hint that the trigger is a real use, not an incidental one.
+
+### 10.4 DIMMER — the recipe does NOT transfer; the pair stays eager
+
+Probes `d1` (virtual dtor defined out-of-line at EOF, after both ctors and
+Read/Main/Draw) and `d2` (dtor defined first):
+
+```
+d1: ??0Widget() , ??_7 , ??_G , ??0Widget(int) , Read , Main , Draw , ??1Widget
+d2: ??1Widget   , ??_7 , ??_G , ??0Widget()    , ??0Widget(int) , Read , Main , Draw
+retail: ??0dimmerWidget() , ??0dimmerWidget(FFFFFF) , Read , Main , Draw , ??_G , ??1 , $E19 , $E18
+```
+
+Moving the destructor to EOF **does not** move the pair: in `d1` `??_7`/`??_G`
+still emit immediately after the *first constructor*, confirming §4.6 — the
+pair is eager and rides the first vtable requirement, which a constructor always
+is. Retail's `??_G` sits after `Draw`, so in retail the constructors were **not**
+the first vtable requirement.
+
+I could not construct any state in which a constructor references `??_7`
+without triggering pair emission, and there is no compiler flag for it (§6).
+**DIMMER therefore remains unexplained** — the AudiereEffects recipe does not
+transfer, and I am not going to guess a mechanism for it. The honest next step
+is to check whether retail's `dimmerWidget` constructors are genuinely the
+first vtable requirement in that TU, or whether some earlier-emitted construct
+(a placement-new, a array-ctor helper, or a base-class subobject ctor) held
+that role.
+
+---
+
+## 11. The post-`$E` channel — architecture, and the verdict
+
+### 11.1 There IS a second drain, and here is the exact loop
+
+`FUN_1040ABD0`, once queues A/B/C are empty:
+
+```c
+if ((DAT_104D7438 && *DAT_104D7438) || (DAT_104D743C && *DAT_104D743C) || DAT_104E9428) {
+    FUN_1044B373();                 /* member-init / dynamic-init walk  => $E21/$E20 */
+    clear DAT_104D7438;
+    if (DAT_104D743C) return FUN_1045B299();   /* same tail: clears 743C, then recurses */
+}
+DAT_104E9428 = 0;
+if (FUN_1040AE53()) { FUN_10423EFC(); FUN_10425299(); }   /* pending-body path   */
+else if (!FUN_1040AE89()) return 0;                       /* nothing left: DONE  */
+return FUN_1040ABD0();                                     /* RECURSE = 2nd drain */
+```
+
+`FUN_1045B299` is literally this same tail duplicated. So the shape is a
+**fixpoint loop**: drain → member-init walk → re-scan → recurse → drain again.
+The post-`$E` emission slot the coordinator inferred from the object layout is
+real and is this recursion.
+
+### 11.2 What routes an item into it
+
+Two feeders, both re-scanned after `FUN_1044B373`:
+
+- **`FUN_1040AE53`** — walks the symbol/segment table (`DAT_104D7410`,
+  `DAT_104D7534`) with the iterator `FUN_1041E52C`/`FUN_1041E53D`, selecting on
+  `sym->[0x32]` kind ∈ {0, 0xB…0x10}. True ⇒ driver runs `FUN_10423EFC` +
+  `FUN_10425299`, then recurses.
+- **`FUN_1040AE89`** — the **template-specialization scanner**. Guarded by
+  `DAT_104D7610 && DAT_104D7610[2]`. It walks a two-level list `DAT_104D75BC`
+  (outer chained `[2]`, inner chained `[2]`) and enqueues each inner item onto
+  **queue C** via `FUN_10427303(&DAT_104DA6C0, item[1], 0, 1, 0, &DAT_104DA710)`
+  when:
+
+  ```
+  (item->[2] & 4) == 0                       /* not already emitted */
+  && (  (item->[0x1c] & 3) != 0
+     || (item->[0x25] & 2) != 0
+     || (owner->[0x28]->[0x3e] & 0x10) != 0
+     || DAT_104D8106 != 0 )                  /* DAT_104D8106 == -BforceInst */
+  ```
+
+> **The post-`$E` channel is queue C, fed by `FUN_1040AE89`, and the routing key
+> is "a pending TEMPLATE SPECIALIZATION not yet emitted whose needed-flag is
+> set".** `-BforceInst` makes that predicate unconditional — but `FUN_1040AE89`
+> is also scanned on every earlier iteration, so it *front-loads* instantiation
+> rather than deferring it. That is exactly measurement 1: the template arm
+> lands at s21, before the `$E`s.
+
+### 11.3 Can the member-init synthesis attach to a source position? No
+
+`?id@…$D` member-static initializers are registered into `DAT_104D7438` and are
+emitted **only** by `FUN_1044B373`, which by construction runs when the queues
+are exhausted. There is no source-position path for that form. (Contrast §9.2's
+`n5`: a *file-scope object's* dynamic initializer body **does** follow source
+position — a different registration path. The `$D` member form does not.) This
+independently confirms measurements 3 and 4: nothing reachable moves the pair.
+
+### 11.4 Does the post-item helper re-enter the instantiation machinery? Yes — but it drags only itself
+
+Probe `r1` (user template specialization first required by a template
+static-data-member's initializer) produces the retail-shaped tail:
+
+```
+[4] Touch   [5] Purge
+[6] _$E6                  0x27   guarded init
+[7] _$E4                  0x12   atexit registration
+[8] ?id@?$Facet@H@@$E     0x2c   <- POST-$E item, and a substantial body
+```
+
+So the post-`$E` slot really can hold a 0x2c body. **But its payload is the
+guarded-init/atexit-helper shape** (`558bec33c0a0…83e00185c07519…`), not a
+destructor — and `??1User<int>` itself was *not* dragged out with it. The
+facet-dtor-thunk chain emits the helper, not the user body.
+
+### 11.5 Verdict: NONE — Audiere joins DIMMER as an honest wall
+
+Retail's `0x88c` body is **REL32-called by Purge** (`+0x65`, `+0x114` — address
+truth, not a delinker name claim), so it is a body that *user code calls*. The
+architecture offers exactly one post-`$E` route, and it admits only pending
+template specializations flagged during the walk, or the member-static's own
+`$E` helper. Neither can be a user-called destructor whose only requirement site
+is a `delete` in function #1 — that requirement is satisfied in the very first
+drain, long before `FUN_1044B373`.
+
+**There is no event sequence in this front end that produces
+`[drain][id-init $Es][user dtor COMDAT REL32-called from fn1]`.** Combined with
+§11.3 (the `$E`s cannot move early) both directions are closed, and the five
+measurement sets bound the source axis. I am calling it: **AudiereEffects is a
+wall, on the same footing as DIMMER (§10.4).**
+
+### 11.6 One structural avenue I did NOT close — contribution granularity
+
+Reading our own object rather than the delinked one surfaces something the
+ordering analysis cannot explain, and it may be the real story:
+
+```
+ours  : [.text sec4 : 12 fns , _$E21 , _$E20][s7 ??1][s8 ??1][s9 ??4][s10 ??1][s11 ?id$E 0x5]
+retail: 12 fns , ??1(0x7d0) , ??4(0x7fc) , $E21(0x850) , $E20(0x878) , ??1(0x88c)
+```
+
+**Our `_$E21`/`_$E20` are appended to the main `.text` contribution; retail's sit
+between COMDATs**, which requires them to be in their own contribution. That is a
+*granularity* difference (which section the thunks are emitted into), not a
+queue-ordering difference — and no amount of source reshaping inside the TU can
+change it, because §11.3 fixes when they are emitted, not where.
+
+Note also all three of our 0x2c bodies share one payload
+(`558bec51894dfc8b45fc8338…`). The pinned `LINK.EXE` **does** support COMDAT
+folding — `OPT:ICF` (file `0x8860`) and `NOICF` (`0x7bf2`) are both in its
+option table — so identical-payload COMDATs can collapse to a single body that
+several call sites and slots share. That would dissolve the ordering problem
+without any source change, because the object's tail COMDAT *count and order*
+would stop mattering; only the post-fold image layout would.
+
+This is **not a new axis for the campaign**: `scripts/homm2/build/link_exe.py`
+already links with `/OPT:NOREF` (which suppresses REF and hence ICF), and
+`scripts/homm2/build/exact_link/orchestrate.py:505` already has a conditional
+`/OPT:ICF` prefix. So the folding path is present and was evidently settled
+against. Whether the retail image is a NOREF or an ICF link is a linker-level
+question the coordinator already owns — but it is the one reading under which
+the §11.5 wall does not need to be climbed at all, so it is worth re-testing
+with the payload identity above as the specific thing to look for.
