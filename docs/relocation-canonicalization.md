@@ -39,6 +39,16 @@ resolve elsewhere; ordinary equal-addend, same-site `REL32` checks still apply.
 This preserves callers using the default spelling and rewrites only sites whose
 candidate object proves the reviewed alternate.
 
+This pass proves linked-target semantics, not the historical COFF spelling. It
+is candidate-aware: either reviewed spelling can be accepted at the paired site
+when both resolve to the same retail RVA. Consequently, an objdiff function
+reported exact after this pass must not be cited as evidence that the developer
+used one CRT alias rather than another. Source-spelling claims require independent
+evidence such as untouched monolithic-library extraction order and the resulting
+Rich producer census. Raw candidate-versus-delinked comparisons remain the
+diagnostic for showing which identity the pass canonicalized; final executable
+identity is decided only by the untouched linked image.
+
 These rows are reconstruction evidence. They are added whenever owner/addend identity
 is certain; fuzzy percentage is not an acceptance criterion. Exact same-site code can
 provide evidence, but semantic array indexing, TU ownership, serialization layout, or

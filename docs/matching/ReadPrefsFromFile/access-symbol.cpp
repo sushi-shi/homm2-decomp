@@ -19,9 +19,14 @@
 // `_access` has no instruction or relocation divergence: all 203 bytes, seven
 // blocks, and 26 ordered relocation sites are exact.
 //
-// Disposition: retain the unique retail CRT spelling; generated source and
-// compiler-state declarations were not retained.
+// Later final-link evidence superseded the source-spelling conclusion. The
+// stripped PE proves that `_access` and `access` resolve to the same entry but
+// cannot identify which COFF alias the caller used. The monolithic-library
+// extraction and Rich producer census require the OLDNAMES `access` alias at
+// this checkpoint, so the reconstructed source uses `access`. The paired
+// comparison normalization keeps the function-byte proof independent of that
+// unresolved stripped identity.
 
-// Accepted expression:
+// Current link-compatible expression:
 //
-//     if (_access(gText, 0) == -1) {
+//     if (access(gText, 0) == -1) {

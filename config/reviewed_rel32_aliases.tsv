@@ -5,6 +5,8 @@ alias	canonical	rva	provenance
 __open	_open	0x000d8c6e	VC6 LIBCMT.LIB open.obj public symbol table
 __write	_write	0x000d8760	VC6 LIBCMT.LIB write.obj public symbol table
 __close	_close	0x000d8b8e	VC6 LIBCMT.LIB close.obj public symbol table
+__lseek	_lseek	0x000d937c	VC6 LIBCMT.LIB lseek.obj public symbol plus OLDNAMES.LIB lseek.obi weak alias
+_stricmp	_strcmpi	0x000d8690	VC6 OLDNAMES.LIB stricmp.obi and strcmpi.obi weak aliases to the same LIBCMT.LIB stricmp.obj entry
 _strnicmp	__strnicmp	0x000d8f60	VC6 OLDNAMES.LIB strnicmp.obi weak alias to LIBCMT.LIB strnicmp.obj
 _chdir	__chdir	0x000d9454	VC6 OLDNAMES.LIB chdir.obi weak alias to LIBCMT.LIB chdir.obj
 _access	__access	0x000e7ecb	VC6 OLDNAMES.LIB access.obi weak alias to LIBCMT.LIB access.obj

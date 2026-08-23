@@ -280,7 +280,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	100.0000	ee23f77f6613
 BASE/Misc	?SetGameDefaults@@YIXXZ	100.0000	a4c085978c4b
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	44fff69415e8
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	5e86bfda1e0c
-BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	8d8c9d6234bd
+BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	89927ffee260
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	100.0000	a5cd20bd63e5
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	100.0000	3c4c70829ceb
@@ -1045,12 +1045,12 @@ SOURCE/Netbios	?WaitForHost@@YICXZ	100.0000	52c851840267
 SOURCE/Netbios	?nbnet_init@@YIHXZ	100.0000	628ba750fb63
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	100.0000	8366e39e9ea2
 SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	100.0000	6cb6b428bf4e
-SOURCE/Newgame	?GetMap@game@@QAEXXZ	100.0000	65cab9669d2b
+SOURCE/Newgame	?GetMap@game@@QAEXXZ	100.0000	d1486a4b9108
 SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	100.0000	bac63728aa51
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	100.0000	ad081e2d2b51
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	100.0000	62657a3a5821
 SOURCE/Newgame	?NGKPSetupDisplayString@game@@QAEXPADG@Z	100.0000	1f94c5dc68b1
-SOURCE/Newgame	?NewGame@game@@QAEHXZ	100.0000	8395c83cebd2
+SOURCE/Newgame	?NewGame@game@@QAEHXZ	100.0000	ab4305cba356
 SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	100.0000	a42ee159cfbd
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	100.0000	292209677ba8
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	9ec3ce96d04f

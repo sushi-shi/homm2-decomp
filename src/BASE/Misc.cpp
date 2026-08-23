@@ -1485,7 +1485,7 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
     handle = open(gText, _O_BINARY);
     if (handle == -1) {
-        if (chdir(gcRegAppPath) == -1)
+        if (_chdir(gcRegAppPath) == -1)
             return CD_ROM_GAME_DIRECTORY_MISSING;
         handle = open(gText, _O_BINARY);
         if (handle == -1)
@@ -1524,9 +1524,9 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
                 handle = open(gText, _O_BINARY);
                 if (handle == -1)
                     continue;
-                status = lseek(handle, 0, SEEK_END);
+                status = _lseek(handle, 0, SEEK_END);
                 if (status != -1) {
-                    status = lseek(handle, -CD_PROBE_TRAILER_SIZE, SEEK_CUR);
+                    status = _lseek(handle, -CD_PROBE_TRAILER_SIZE, SEEK_CUR);
                     if (status != -1)
                         status = read(handle, buffer, CD_PROBE_TRAILER_SIZE);
                 }

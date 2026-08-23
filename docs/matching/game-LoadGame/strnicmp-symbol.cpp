@@ -18,9 +18,13 @@
 // 57/57 exact blocks, retail size 0x0a79, and all 158 ordered relocations with
 // no candidate-only site.
 //
-// Disposition: ACCEPTED.  Both remote-save prefix comparisons use _strnicmp;
-// generated variants were not retained.
+// Later final-link evidence superseded the source-spelling conclusion. The
+// stripped PE proves one call destination but cannot distinguish the direct
+// `_strnicmp` spelling from the OLDNAMES `strnicmp` alias. The retail producer
+// census and monolithic-library extraction require the alias member at this
+// checkpoint, so the reconstructed source uses `strnicmp`; paired relocation
+// normalization keeps this ambiguity out of the function-byte verdict.
 
-// Accepted calls:
+// Current link-compatible calls:
 //
-//     _strnicmp(filename, "RMT", sizeof("RMT") - 1)
+//     strnicmp(filename, "RMT", sizeof("RMT") - 1)

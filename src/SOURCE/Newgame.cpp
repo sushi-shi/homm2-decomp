@@ -283,7 +283,7 @@ void game::GetMap(void) {
     if (loadResult == FILE_REQUESTER_OK) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
-        if (strcmpi(savedName, gMapName) != 0) {
+        if (stricmp(savedName, gMapName) != 0) {
             strcpy(m_mapFilename, gMapName);
             ProcessNewMap(NULL);
         }
@@ -550,9 +550,9 @@ i32 game::NewGame(void) {
             m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
         }
         if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-            && strcmpi(gpGame->m_mapFilename, "brokena.mp2") == 0)
+            && stricmp(gpGame->m_mapFilename, "brokena.mp2") == 0)
             strcpy(gpGame->m_mapFilename, "slugfest.mp2");
-        if (giNumHumanPlayers > 1 && strcmpi(gpGame->m_mapFilename, "arrax.mx2") == 0)
+        if (giNumHumanPlayers > 1 && stricmp(gpGame->m_mapFilename, "arrax.mx2") == 0)
             strcpy(gpGame->m_mapFilename, "fullhse.mx2");
 
         strcpy(gMapName, m_mapFilename);
