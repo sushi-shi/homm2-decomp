@@ -77,6 +77,22 @@
 // VC6 SP5 /YX preserves the baseline section and symbol order, including the
 // deleting destructor immediately after the first constructor.
 
+// Matrix 7: compiler generation, batch process, explicit PCH, and /Gy removal.
+//
+//   build/link/compiler-version-probes/DIMMER-{rtm,sp3}.obj
+//   build/link/compiler-version-probes/DIMMER-nogy-inline-decl.obj
+//   build/link/compiler-version-probes/DIMMER-explicit-pch.obj
+//   build/link/batch-compile-probes/
+//
+// VC6 RTM, SP3, and SP5 all retain the baseline /Gy order.  Compiling WINDOW
+// and DIMMER in either order in one CL process does too, as does an explicit
+// /Yc + /Yu boundary through dimmerWidget.h.  Without /Gy, the ordinary methods
+// do occur in logical source order; an inline destructor declaration also puts
+// deleting then ordinary destructor at the tail.  But the merged .text starts
+// are 0x0, 0x2b, 0x6a, 0xe1, 0xfa, while retail requires independent 16-byte
+// boundaries at 0x0, 0x30, 0x70, 0xf0, 0x110.  The apparently attractive order
+// therefore destroys exact function placement and is rejected.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved

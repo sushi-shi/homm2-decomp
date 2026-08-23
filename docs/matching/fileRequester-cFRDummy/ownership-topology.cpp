@@ -20,6 +20,10 @@
 //   SP5 build all produced the same rotation.  Moving the definition, making
 //   the pointer file-static, and replacing the literal with initialized or
 //   uninitialized named storage also failed to put the backing cell last.
+//   /Gi and omitted /Gi- preserve the same six-cell rotation.  /Gf instead
+//   coalesces/removes the required writable local cells, so it contradicts the
+//   six distinct retail relocation identities rather than exposing a new
+//   placement orbit.
 //
 // Exact topology proof (measured, but deliberately not retained):
 //

@@ -25,6 +25,32 @@
 // the final sections.  The local XP CRTs use later 5-byte tail-jump bodies, while
 // its c932/c1032 compatibility libraries also emit different bodies.
 //
+// Exhaustive ordinary-library scheduling probes:
+//
+//   build/link/stock-position-matrix/results.json
+//   build/link/defaultlib-matrix/results.json
+//
+// Ten placements of an untouched first LIBCMT scan were tested: before the
+// sources, after source 1 and 10, around OLDNAMES, around each BASE archive,
+// after BASE-suffix, and immediately before the final scan.  No position emits
+// retail Rich order.  The late positions retain exact .text/.data but produce
+// B(8), A(133), E(37); early scans also reorder linked sections.  /INCLUDE on
+// operator delete does not isolate the member.
+//
+// The objects' embedded /DEFAULTLIB:LIBCMT path was tested both with and without
+// the explicit final LIBCMT, while independently enabling embedded OLDNAMES and
+// LIBCPMT.  Every LIBCMT-resolved arm again emits B,A,E.  Allowing all embedded
+// defaults selects one LIBCPMT member and is also non-retail.  Thus
+// /NODEFAULTLIB suppression is not the missing developer link option.
+//
+// A local archive census covered VC6 RTM/SP3/SP5, VC5, LIBCP/LIBCPMT/MSVCPRT,
+// debug variants, CTL framework archives, and the preserved XP CRT families.
+// Only SP5 LIBCMT supplies the exact 11-byte body with compiler ID 0x000b1f6f.
+// VC6 RTM/SP3 and the C++ libraries stamp 0x000b1fe8; VC5's delete.obj has a
+// different 16-byte body; CTL and XP candidates have different allocator/code
+// semantics.  No authentic second local archive currently supplies the retail
+// member.
+//
 // Disposition: REJECT repeated stock LIBCMT as whole-file evidence.  Retain the
 // one-member ordinary VC6 LIB archive until an authentic separate archive owner
 // of the exact 0x000b1f6f delete.obj is identified.  No object bytes are changed.

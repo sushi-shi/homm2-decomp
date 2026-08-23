@@ -49,3 +49,21 @@
 //   build/link/misc-track-source-position/results.json
 //   build/link/misc-track-state/results.json
 //   build/link/project-flag-probes/misc-yx/Misc.obj
+//   build/link/compiler-version-probes/Misc-{gi,gi-default,gf,nogy,rtm,sp3}.obj
+//   build/link/misc-gf-link/results.json
+//
+// /Gi, omitted /Gi-, VC6 RTM, and VC6 SP3 preserve the baseline merged
+// pointer/literal contribution.  Omitting /Gy merges the TU's data and loses
+// the retail per-function contribution topology.  /Gf naturally gives the
+// track text its own 0x1e-byte COMDAT, but also splits every string in the TU;
+// linking that untouched object produces 37,463 .text and 11,922 .data byte
+// mismatches and places the track text at file offset 0x11e5f8 instead of
+// retail 0x11f120.
+//
+// Static/external __forceinline accessors and a return-reference accessor were
+// also measured.  Static forms keep the literal in the main .data section;
+// external forms emit it with SetupCDDrive's late contribution (section 47).
+// A source-positioned __declspec(selectany) backing array is a standalone data
+// COMDAT, but VC6 schedules global data COMDATs at section 4 regardless of its
+// definition after IsCDDrive.  None produces the ordinary section-44 retail
+// contribution, and all were reverted.
