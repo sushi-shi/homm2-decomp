@@ -1,21 +1,32 @@
 #!/usr/bin/env python3
-"""Produce the retail image directly with untouched VC6 LINK.EXE.
+"""Link HMM2PL.exe with untouched VC6 LINK.EXE, in one of three modes.
 
-LINK writes the final executable.  Nothing in this module opens or rewrites that
-executable afterward.  The remaining prepared COFF inputs are deliberately
-isolated here so each can be removed as its original source/library ownership is
-recovered.
+  generic      (default)  raw compiled objects only: no retail-extracted
+                          resources, no COFF transforms. One LINK pass with an
+                          ordinary PDB under build/link/generic/.
+  --rsrc                  generic plus the .rsrc resources extracted from
+                          build/orig/HMM2PL.exe (resources only; every byte of
+                          code and data still comes from this codebase).
+                          Output under build/link/rsrc/.
+  --transform             --rsrc plus the three reviewed COFF transforms from
+                          exact_link/transforms.py, the historical four-pass
+                          PDB link, and the retail SHA-256 assertion. Output
+                          at build/link/HMM2PL.exe, byte-identical to retail.
+
+LINK writes the final executable in every mode. Nothing in this module opens
+or rewrites that executable afterward.
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import os
 import shutil
 import subprocess
 from pathlib import Path
 
-from .adapt_misc_data import adapt as adapt_misc_data
+from . import transforms
 from .crt_order import ninja_link_args
 
 
@@ -67,33 +78,39 @@ def run(command: list[str], *, log: Path | None = None) -> None:
 
 def prepare_request() -> Path:
     # The cFRDummy backing byte is owned by SEARCH's selectany COMDAT, so the
-    # compiled REQUEST object links unmodified.
+    # compiled REQUEST object links unmodified in every mode.
     output = ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
     if not output.exists():
         raise RuntimeError(f"REQUEST final-link object is missing: {output}")
     return output
 
 
-def prepare_misc_prefix_library() -> Path:
-    source_library = LINK_ROOT / "BASE-prefix.lib"
+def rebuild_library_with_transforms(source_library: Path, expect: set[str]) -> Path:
+    """Rebuild one ninja archive, substituting the reviewed transformed copy
+    for each member that exact_link/transforms.py names."""
     members = subprocess.check_output(
         ["llvm-ar", "t", source_library], cwd=ROOT, text=True
     ).splitlines()
     selected = []
-    seen_misc = 0
+    replaced = set()
     for member in members:
+        member = member.replace("\\", "/")
         path = ROOT / member
-        if member.replace("\\", "/").endswith("/BASE/Misc.obj"):
-            output = LINK_ROOT / "plain-inputs/BASE/Misc.obj"
+        unit = member.removeprefix("build/objdiff/base/").removesuffix(".obj")
+        if unit in transforms.TRANSFORMS:
+            output = LINK_ROOT / "plain-inputs" / f"{unit}.obj"
             output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_bytes(adapt_misc_data(path.read_bytes()))
+            output.write_bytes(transforms.apply(unit, path.read_bytes()))
             path = output
-            seen_misc += 1
+            replaced.add(unit)
         selected.append(relative(path))
-    if seen_misc != 1:
-        raise RuntimeError(f"expected one Misc member in {source_library}, got {seen_misc}")
+    if replaced != expect:
+        raise RuntimeError(
+            f"{source_library.name}: transformed {sorted(replaced)}, "
+            f"expected {sorted(expect)}"
+        )
 
-    output = LINK_ROOT / "plain-inputs/BASE-prefix.lib"
+    output = LINK_ROOT / "plain-inputs" / source_library.name
     output.parent.mkdir(parents=True, exist_ok=True)
     output.unlink(missing_ok=True)
     response = output.with_suffix(".lib.rsp")
@@ -105,11 +122,16 @@ def prepare_misc_prefix_library() -> Path:
         + "\n"
     )
     run(["wine", str(LIB_EXE), "@" + relative(response)])
+    print(f"[link] {source_library.name}: transformed members {sorted(replaced)}")
     return output
 
 
 def final_inputs(
-    configured: list[str], request: Path, base_prefix: Path
+    configured: list[str],
+    request: Path,
+    base_prefix: str,
+    base_suffix: str,
+    include_resources: bool,
 ) -> list[str]:
     first_source = configured.index("build/objdiff/base/SOURCE/ADVMGR.obj")
     first_base = configured.index("build/link/BASE-prefix.lib")
@@ -136,12 +158,12 @@ def final_inputs(
         *sources,
         "OLDNAMES.LIB",
         *libraries,
-        relative(base_prefix),
+        base_prefix,
         "build/link/Midi.lib",
-        "build/link/BASE-suffix.lib",
+        base_suffix,
         "MSVCPRT.LIB",
         "LIBCMT.LIB",
-        "build/link/HMM2PL.res",
+        *(["build/link/HMM2PL.res"] if include_resources else []),
     ]
 
 
@@ -164,25 +186,8 @@ def prepare_historical_pdb() -> Path:
     return pdb
 
 
-def main() -> int:
-    for tool in (LINK_EXE, LIB_EXE, LIBCMT, MSVCPRT, RETAIL):
-        if not tool.exists():
-            raise RuntimeError(f"required exact-link input is missing: {tool}")
-    if hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
-        raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
-    faketime = shutil.which("faketime")
-    if faketime is None:
-        raise RuntimeError("faketime is required; enter `nix develop .#build`")
-
-    request = prepare_request()
-    base_prefix = prepare_misc_prefix_library()
-    inputs = final_inputs(ninja_link_args(), request, base_prefix)
-    prepare_historical_pdb()
-
-    output = LINK_ROOT / "HMM2PL.exe"
-    map_path = LINK_ROOT / "HMM2PL.map"
-    response = LINK_ROOT / "HMM2PL.rsp"
-    prefix = [
+def link_prefix(output: Path, map_path: Path, pdb: str) -> list[str]:
+    return [
         "/NOLOGO",
         "/MACHINE:IX86",
         "/BASE:0x400000",
@@ -192,34 +197,91 @@ def main() -> int:
         "/INCREMENTAL:NO",
         "/OPT:NOREF",
         "/DEBUG",
-        "/PDB:" + PDB_WINDOWS_PATH,
+        "/PDB:" + pdb,
         "/LIBPATH:build/toolchain/msvc/lib",
         "/MAP:" + relative(map_path),
         "/OUT:" + relative(output),
     ]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--rsrc", action="store_true",
+        help="link the .rsrc resources extracted from the retail executable",
+    )
+    parser.add_argument(
+        "--transform", action="store_true",
+        help="apply the reviewed COFF transforms and assert the retail SHA-256",
+    )
+    args = parser.parse_args()
+    mode = "transform" if args.transform else ("rsrc" if args.rsrc else "generic")
+
+    for tool in (LINK_EXE, LIB_EXE, LIBCMT, MSVCPRT, RETAIL):
+        if not tool.exists():
+            raise RuntimeError(f"required exact-link input is missing: {tool}")
+    if hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
+        raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
+
+    request = prepare_request()
+    if mode == "transform":
+        base_prefix = relative(rebuild_library_with_transforms(
+            LINK_ROOT / "BASE-prefix.lib", {"BASE/Misc"}))
+        base_suffix = relative(rebuild_library_with_transforms(
+            LINK_ROOT / "BASE-suffix.lib", {"BASE/AudiereEffects", "BASE/DIMMER"}))
+    else:
+        base_prefix = "build/link/BASE-prefix.lib"
+        base_suffix = "build/link/BASE-suffix.lib"
+    inputs = final_inputs(
+        ninja_link_args(), request, base_prefix, base_suffix,
+        include_resources=mode in ("rsrc", "transform"),
+    )
+
+    if mode == "transform":
+        faketime = shutil.which("faketime")
+        if faketime is None:
+            raise RuntimeError("faketime is required; enter `nix develop .#build`")
+        prepare_historical_pdb()
+        output = LINK_ROOT / "HMM2PL.exe"
+        map_path = LINK_ROOT / "HMM2PL.map"
+        response = LINK_ROOT / "HMM2PL.rsp"
+        prefix = link_prefix(output, map_path, PDB_WINDOWS_PATH)
+        response.write_text(" ".join(prefix + inputs) + "\n")
+        output.unlink(missing_ok=True)
+        map_path.unlink(missing_ok=True)
+        for iteration, timestamp in enumerate(LINK_TIMES, 1):
+            run(
+                [faketime, "-f", timestamp, "wine", str(LINK_EXE),
+                 "@" + relative(response)],
+                log=LINK_ROOT / f"HMM2PL.link-{iteration}.log",
+            )
+        digest = hashlib.sha256(output.read_bytes()).hexdigest()
+        if digest != RETAIL_SHA256:
+            raise RuntimeError(
+                f"plain LINK output differs from retail: sha256={digest}, "
+                f"expected={RETAIL_SHA256}"
+            )
+        print(f"plain LINK.EXE output is retail-exact: {digest}")
+        return 0
+
+    mode_root = LINK_ROOT / mode
+    mode_root.mkdir(parents=True, exist_ok=True)
+    output = mode_root / "HMM2PL.exe"
+    map_path = mode_root / "HMM2PL.map"
+    response = mode_root / "HMM2PL.rsp"
+    prefix = link_prefix(output, map_path, relative(mode_root / "HMM2PL.pdb"))
     response.write_text(" ".join(prefix + inputs) + "\n")
     output.unlink(missing_ok=True)
     map_path.unlink(missing_ok=True)
-    for iteration, timestamp in enumerate(LINK_TIMES, 1):
-        run(
-            [
-                faketime,
-                "-f",
-                timestamp,
-                "wine",
-                str(LINK_EXE),
-                "@" + relative(response),
-            ],
-            log=LINK_ROOT / f"HMM2PL.link-{iteration}.log",
-        )
-
+    run(["wine", str(LINK_EXE), "@" + relative(response)],
+        log=mode_root / "HMM2PL.link.log")
+    if not output.exists():
+        raise RuntimeError(f"{mode} LINK produced no executable; see {mode_root}/HMM2PL.link.log")
     digest = hashlib.sha256(output.read_bytes()).hexdigest()
-    if digest != RETAIL_SHA256:
-        raise RuntimeError(
-            f"plain LINK output differs from retail: sha256={digest}, "
-            f"expected={RETAIL_SHA256}"
-        )
-    print(f"plain LINK.EXE output is retail-exact: {digest}")
+    print(
+        f"{mode} LINK.EXE output: {relative(output)} "
+        f"({output.stat().st_size} bytes, sha256={digest})"
+    )
     return 0
 
 

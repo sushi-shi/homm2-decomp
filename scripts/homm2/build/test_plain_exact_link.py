@@ -1,48 +1,79 @@
 import unittest
 
-from homm2.build.exact_link import plain
+from homm2.build.exact_link import plain, transforms
+
+
+CONFIGURED = [
+    "WINMM.LIB",
+    "build/link/wing32.lib",
+    "build/objdiff/base/SOURCE/ADVMGR.obj",
+    "build/objdiff/base/SOURCE/REQUEST.obj",
+    "build/objdiff/base/SOURCE/X_GLOBAL.obj",
+    "build/link/BASE-prefix.lib",
+    "build/link/Midi.lib",
+    "build/link/BASE-suffix.lib",
+    "LIBCMT.LIB",
+    "build/link/HMM2PL.res",
+]
+REQUEST = plain.ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
 
 
 class PlainExactLinkTests(unittest.TestCase):
-    def test_final_inputs_keep_only_the_reviewed_preparations(self):
-        configured = [
-            "WINMM.LIB",
-            "build/link/wing32.lib",
-            "build/objdiff/base/SOURCE/ADVMGR.obj",
-            "build/objdiff/base/SOURCE/REQUEST.obj",
-            "build/objdiff/base/SOURCE/X_GLOBAL.obj",
-            "build/link/BASE-prefix.lib",
-            "build/link/Midi.lib",
-            "build/link/BASE-suffix.lib",
-            "LIBCMT.LIB",
-            "build/link/HMM2PL.res",
-        ]
-        request = plain.ROOT / "build/link/bss-layout-all/SOURCE/REQUEST.obj"
-        prefix = plain.ROOT / "build/link/plain-inputs/BASE-prefix.lib"
-        result = plain.final_inputs(configured, request, prefix)
-
+    def test_transform_inputs_swap_the_prepared_archives_and_keep_resources(self):
+        result = plain.final_inputs(
+            list(CONFIGURED), REQUEST,
+            "build/link/plain-inputs/BASE-prefix.lib",
+            "build/link/plain-inputs/BASE-suffix.lib",
+            include_resources=True,
+        )
         self.assertEqual(
             result[:3],
-            [
-                "/NODEFAULTLIB:LIBCMT",
-                "/NODEFAULTLIB:LIBCPMT",
-                "/NODEFAULTLIB:OLDNAMES",
-            ],
+            ["/NODEFAULTLIB:LIBCMT", "/NODEFAULTLIB:LIBCPMT", "/NODEFAULTLIB:OLDNAMES"],
         )
         self.assertEqual(result[3], "build/objdiff/base/SOURCE/ADVMGR.obj")
-        self.assertEqual(result[4], "build/link/bss-layout-all/SOURCE/REQUEST.obj")
+        self.assertEqual(result[4], "build/objdiff/base/SOURCE/REQUEST.obj")
         self.assertEqual(result[6:9], ["OLDNAMES.LIB", "WINMM.LIB", "build/link/wing32.lib"])
         self.assertEqual(
             result[-6:],
             [
                 "build/link/plain-inputs/BASE-prefix.lib",
                 "build/link/Midi.lib",
-                "build/link/BASE-suffix.lib",
+                "build/link/plain-inputs/BASE-suffix.lib",
                 "MSVCPRT.LIB",
                 "LIBCMT.LIB",
                 "build/link/HMM2PL.res",
             ],
         )
+
+    def test_generic_inputs_use_raw_archives_and_omit_resources(self):
+        result = plain.final_inputs(
+            list(CONFIGURED), REQUEST,
+            "build/link/BASE-prefix.lib",
+            "build/link/BASE-suffix.lib",
+            include_resources=False,
+        )
+        self.assertNotIn("build/link/HMM2PL.res", result)
+        self.assertEqual(
+            result[-5:],
+            [
+                "build/link/BASE-prefix.lib",
+                "build/link/Midi.lib",
+                "build/link/BASE-suffix.lib",
+                "MSVCPRT.LIB",
+                "LIBCMT.LIB",
+            ],
+        )
+
+    def test_rsrc_inputs_keep_raw_archives_with_resources(self):
+        result = plain.final_inputs(
+            list(CONFIGURED), REQUEST,
+            "build/link/BASE-prefix.lib",
+            "build/link/BASE-suffix.lib",
+            include_resources=True,
+        )
+        self.assertEqual(result[-1], "build/link/HMM2PL.res")
+        self.assertIn("build/link/BASE-suffix.lib", result)
+        self.assertNotIn("build/link/plain-inputs/BASE-suffix.lib", result)
 
     def test_final_inputs_reject_unreviewed_tail_drift(self):
         configured = [
@@ -57,8 +88,10 @@ class PlainExactLinkTests(unittest.TestCase):
         ]
         path = plain.ROOT / "build/link/probe.obj"
         with self.assertRaisesRegex(RuntimeError, "unexpected configured final-link tail"):
-            plain.final_inputs(configured, path, path)
+            plain.final_inputs(configured, path, "a.lib", "b.lib", include_resources=True)
 
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_transform_registry_names_exactly_the_three_reviewed_units(self):
+        self.assertEqual(
+            sorted(transforms.TRANSFORMS),
+            ["BASE/AudiereEffects", "BASE/DIMMER", "BASE/Misc"],
+        )

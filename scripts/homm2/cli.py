@@ -87,8 +87,15 @@ def main(argv=None):
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":
+        # Three modes: `link` (generic: raw objects, no retail resources),
+        # `link --rsrc` (adds .rsrc extracted from build/orig/HMM2PL.exe),
+        # `link --transform` (adds the reviewed COFF transforms, four-pass
+        # historical PDB, retail SHA assertion, and the strict image audit).
         if sh("python3", "configure.py"): return 1
-        return sh("ninja", "link", *rest)
+        if "--transform" in rest:
+            return sh("ninja", "link")
+        if sh("ninja", "link-inputs"): return 1
+        return sh("python3", "-m", "homm2.build.exact_link.plain", *rest)
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks

@@ -1,9 +1,28 @@
 # Retail-exact final link
 
-`homm2 link` reconstructs `build/link/HMM2PL.exe` with the pinned VC6 SP5
-`LINK.EXE`. The file written by LINK is the audited deliverable: no tool opens
-it afterward for mutation. The strict audit fails if any byte differs from
-`build/orig/HMM2PL.exe`.
+`homm2 link` drives the pinned VC6 SP5 `LINK.EXE` in one of three modes. In
+every mode the file written by LINK is the deliverable: no tool opens it
+afterward for mutation.
+
+- `homm2 link` — **generic**: raw compiled objects only. No retail-extracted
+  resources, no COFF transforms; one LINK pass with an ordinary PDB. Output
+  `build/link/generic/HMM2PL.exe`. This is what the reconstruction honestly
+  produces from source alone.
+- `homm2 link --rsrc` — generic plus the `.rsrc` resources extracted from
+  `build/orig/HMM2PL.exe` (`extract_resources.py`; resources only — every code
+  and data byte still comes from this codebase). Output
+  `build/link/rsrc/HMM2PL.exe`.
+- `homm2 link --transform` — `--rsrc` plus the three reviewed COFF transforms
+  declared in `scripts/homm2/build/exact_link/transforms.py`, the historical
+  four-pass PDB link, and the strict audit. Output `build/link/HMM2PL.exe`,
+  byte-identical to `build/orig/HMM2PL.exe`; the audit fails if any byte
+  differs.
+
+The ninja archives (`BASE-prefix.lib`, `Midi.lib`, `BASE-suffix.lib`) hold raw
+compiled objects in every mode; `--transform` rebuilds its own prefix/suffix
+variants under `build/link/plain-inputs/` with the transformed members swapped
+in, so the transforms live in exactly one module and are never baked into
+shared build artifacts.
 
 ## Compared evidence
 

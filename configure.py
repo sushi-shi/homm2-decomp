@@ -135,12 +135,8 @@ def main():
                command=(f"{PY} -m homm2.build.ml_wrap "
                         "--src $in --out $out"),
                description="assemble-omf $in")
-        w.rule("adapt_comdat_link_order",
-               command=(f"{PY} -m homm2.build.adapt_comdat_link_order "
-                        "--input $in --output $out --unit $unit"),
-               description="comdat-order $unit")
         w.rule("link_exe",
-               command=f"{PY} -m homm2.build.exact_link.plain",
+               command=f"{PY} -m homm2.build.exact_link.plain --transform",
                description="plain retail-exact LINK.EXE HMM2PL.exe")
         w.rule("link_audit",
                command=(f"{PY} -m homm2.build.link_exe --audit-existing "
@@ -351,19 +347,10 @@ def main():
                     implicit="scripts/homm2/build/ml_wrap.py")
             omf_link_objects[f"build/objdiff/base/{unit}.obj"] = output
         base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
-        comdat_link_objects = {}
-        for unit in ("BASE/AudiereEffects", "BASE/DIMMER"):
-            source = f"build/objdiff/base/{unit}.obj"
-            output = f"build/link/comdat-order/{unit}.obj"
-            w.build(
-                output,
-                "adapt_comdat_link_order",
-                inputs=source,
-                implicit="scripts/homm2/build/adapt_comdat_link_order.py",
-                variables={"unit": unit},
-            )
-            comdat_link_objects[source] = output
-        base_objects = [comdat_link_objects.get(obj, obj) for obj in base_objects]
+        # The archives hold raw compiled objects only. `homm2 link --transform`
+        # applies the reviewed COFF transforms (exact_link/transforms.py) when
+        # rebuilding its own prefix/suffix variants; generic and --rsrc links
+        # consume these archives untouched.
         midi_index = base_objects.index("build/objdiff/base/BASE/Midi.obj")
         base_libraries = []
         for library, members in (
@@ -385,12 +372,18 @@ def main():
         w.build(link_outputs, "link_exe",
                 inputs=(source_objects + base_libraries + [resource_output]),
                 implicit=(import_outputs + exact_link_helpers + [
+                    "scripts/homm2/build/adapt_comdat_link_order.py",
                     "config/retail_crt_order.txt",
                     "build/gen/delink_data_from_source.tsv",
                     "build/toolchain/msvc/lib/LIBCMT.LIB",
                     "build/toolchain/msvc/lib/MSVCPRT.LIB",
                 ] + base_symbol_sidecars),
                 variables={"link_args": " ".join(link_args)})
+        # `homm2 link` (generic) and `homm2 link --rsrc` run the plain driver
+        # directly; this phony target materializes every link input first.
+        w.build("link-inputs", "phony",
+                inputs=(source_objects + base_libraries
+                        + [resource_output] + import_outputs))
         link_audit_outputs = [
             "build/link/HMM2PL.link.json",
             "build/link/HMM2PL.missing-data.tsv",
