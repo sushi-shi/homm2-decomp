@@ -140,3 +140,19 @@
 // pool the empty literal into a COMDAT and remove the required six writable
 // identities.  No tested compiler installation or ordinary IDE flag state
 // supplies the retail rotation.
+
+// C-common diagnostic:
+//
+//   build/link/request-common-storage/results.json
+//
+// Unlike C++, VC6 compiles a tentative C definition
+// `char cFRDummyStorage[1];` as a real COFF common: external, section zero,
+// value/size one. REQUEST was compiled with an `extern "C"` reference to that
+// byte and the common object was passed directly after REQUEST to untouched
+// LINK.EXE. LINK materializes all commons in its global tail, placing this one
+// at 0x00539c78 rather than retail 0x00533d98; input adjacency does not make a
+// common part of REQUEST's ordinary BSS run. The four-pass result hashes
+// 95e6baab4a56b4aa71813c3b4e9330ed859246a723a6083c1592d165a1bbf7d6.
+// The extra C object also carries its own 0x000a2306 compiler record. A C
+// tentative definition therefore supplies neither the required placement nor
+// the retail producer census and is rejected.

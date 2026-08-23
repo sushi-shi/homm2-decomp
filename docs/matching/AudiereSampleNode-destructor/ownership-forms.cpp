@@ -188,3 +188,23 @@
 // Disposition: retain the authentic inline destructor and classify its final-link
 // COMDAT position as an original object/compiler ownership wall. No explicit dtor,
 // source padding, /ORDER directive, or synthetic linker root is retained.
+
+// Private-type and constructor-boundary matrix:
+//
+//   build/link/audiere-node-ownership/results.json
+//
+// No other TU uses AudiereSampleNode, so six further arms moved the complete
+// struct from soundBackends.h into AudiereEffects.cpp and varied its constructor
+// and destructor between class-body, pre-function out-of-class, and end-of-TU
+// inline definitions. Keeping the class-body constructor preserves the exact
+// Purge, Play, and node-destructor fingerprints, but also preserves the baseline
+// node dtor -> three RefPtr helpers -> $E21 -> $E20 order. Every out-of-class
+// constructor arm retains that order and changes PlayAudiereSample; implicit or
+// class-body destructor arms move the destructor earlier and also change Play.
+// Private versus shared-header ownership is therefore not the missing queue
+// state, and the exact in-class constructor shape remains evidence-backed.
+
+// UNTRIED: dependency-valid include orders that change where audiere.h and the
+// STL first enter the TU. The bounded probe is
+// build/link/audiere-include-order-probe.py; execution was deferred when the
+// build-execution allowance was exhausted, so it carries no measured result.

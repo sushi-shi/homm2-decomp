@@ -160,3 +160,17 @@
 // orbit and position and change required code/data.  Service-pack phase mixing,
 // edit-and-continue, browse information, and optimization mode do not expose
 // retail section 44.
+
+// Forward-specialization closure:
+//
+//   build/link/misc-track-source-position/results.json
+//
+// The earlier explicit-member arm specialized the member only after the pointer
+// initializer had instantiated the primary. Two additional valid forms now
+// specialize the whole `CDTrackNameStorage<int>` class before first use, both
+// with and without a defined primary template, and define its static member at
+// the IsCDDrive/DriveSupports boundary. VC6 compiles both but treats the member
+// as ordinary storage, merging it into leading section 3 at offset 0x1c. The
+// attempted `template <> extern` member declaration is illegal in VC6 (C2720,
+// followed by C2086 on the definition). The previously missing specialization
+// branch therefore does not produce retail section 44.
