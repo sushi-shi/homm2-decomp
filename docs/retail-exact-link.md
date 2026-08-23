@@ -44,8 +44,15 @@ treating all semantically equivalent COFF as interchangeable:
   still use reviewed `.def`-syntax manifests; these reconstruct the required
   import-library interface and are not evidence that the developers authored a
   `.def` file. Generated archives are checked back against the retail import table.
-- `normalize_imports` places candidate DLL names, hint/name records, ILT slots,
-  and IAT slots by semantic import identity, then retargets candidate references.
+- The untouched LINK output is audited with the Gruntz model: DLL descriptors,
+  ILT/IAT slot pairs, padded hint/name records, and DLL strings are paired by
+  `(DLL, name-or-ordinal)`. At the current checkpoint all 240 imports and all
+  6,374 attributable logical bytes are exact. Nine DLLs retain a different raw
+  intra-DLL slot order, reported separately as resolution-history evidence.
+- `normalize_imports` is only part of the derived byte-identical proof artifact:
+  it places those already-proved semantic records at retail offsets and retargets
+  references. It is not an authentic LINK input and is not used to claim that the
+  raw linker reproduced import order.
 - `normalize_text` places candidate-authored import thunks, selected CRT tail
   contributions, exception funclets, `matherr`, and `initcoll` by reviewed
   identity. It relocates candidate bytes; it does not copy the retail text.
@@ -71,3 +78,7 @@ are:
 ```text
 bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a
 ```
+
+`build/link/HMM2PL.raw.exe` is the actual LINK.EXE output. Its report keeps raw
+section/SHA percentages distinct from `semantic_import_bytes`; a semantic 100%
+never changes or hides the raw IAT-order diagnostic.

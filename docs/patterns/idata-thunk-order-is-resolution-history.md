@@ -55,3 +55,15 @@ roots are not retained as a byte-steering mechanism.
 The actionable inputs remain DLL descriptor order, exact import identities, ordinals, and
 hints. Raw IAT order remains useful evidence if later authentic source, object-symbol, CRT,
 or archive recovery naturally changes LINK's resolution history.
+
+## Raw Buka link: Gruntz-style semantic closure
+
+The raw VC6 LINK output now carries the same explicit logical byte audit as Gruntz. It pairs
+the descriptor pointer fields and both slot dwords by `(DLL, name-or-ordinal)`, while comparing
+descriptor timestamps/forwarders, padded DLL strings, padded hint/name records, array
+terminators, and the null descriptor literally. Because VC6 merges imports into `.rdata`, the
+surrounding padding and unrelated `.rdata` contributions are not attributed to imports.
+
+Measured on `build/link/HMM2PL.raw.exe`: 240/240 imports paired, 6,374/6,374 attributable
+logical bytes exact, exact DLL descriptor order, no missing/extra identities, and nine DLLs
+with a different raw intra-DLL order. No executable byte is rewritten for this result.

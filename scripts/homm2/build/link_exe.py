@@ -704,6 +704,237 @@ def import_diagnostics(retail_imports, candidate_imports):
     }
 
 
+def _semantic_import_layout(path):
+    """Read the import records needed for a Gruntz-style logical byte audit.
+
+    VC6 merges the import contributions into ``.rdata`` rather than emitting a
+    standalone ``.idata`` section.  Consequently the surrounding section slack
+    is not attributable to imports, but every descriptor, slot pair, DLL name,
+    and padded hint/name record is still independently measurable.
+    """
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    section_offset = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append((rva, max(virtual_size, raw_size), raw_offset, raw_size))
+
+    def rva_offset(rva):
+        for section_rva, size, raw_offset, raw_size in sections:
+            delta = rva - section_rva
+            if 0 <= delta < size and delta < raw_size:
+                return raw_offset + delta
+        raise ValueError("RVA 0x%x is outside raw PE sections in %s" % (rva, path))
+
+    def padded_c_string(rva):
+        offset = rva_offset(rva)
+        end = data.index(0, offset) + 1
+        size = end - offset
+        size += size & 1
+        return bytes(data[offset:offset + size])
+
+    import_rva, _import_size = struct.unpack_from(
+        "<II", data, optional + 96 + IMAGE_DIRECTORY_ENTRY_IMPORT * 8)
+    if not import_rva:
+        return {"descriptors": [], "null_descriptor": b""}
+
+    descriptors = []
+    descriptor_rva = import_rva
+    while True:
+        descriptor_offset = rva_offset(descriptor_rva)
+        descriptor = bytes(data[descriptor_offset:descriptor_offset + 20])
+        values = struct.unpack("<IIIII", descriptor)
+        lookup_rva, _timestamp, _forwarder, name_rva, address_rva = values
+        if not any(values):
+            return {
+                "descriptors": descriptors,
+                "null_descriptor": descriptor,
+            }
+
+        dll_record = padded_c_string(name_rva)
+        dll = dll_record.rstrip(b"\0").decode("ascii", "replace")
+        lookup_rva = lookup_rva or address_rva
+        entries = []
+        index = 0
+        while True:
+            lookup_value = struct.unpack_from(
+                "<I", data, rva_offset(lookup_rva + index * 4))[0]
+            if not lookup_value:
+                break
+            if lookup_value & IMPORT_ORDINAL_FLAG32:
+                identity = ("ordinal", lookup_value & 0xFFFF)
+                record = b""
+            else:
+                record_offset = rva_offset(lookup_value)
+                end = data.index(0, record_offset + 2) + 1
+                size = end - record_offset
+                size += size & 1
+                record = bytes(data[record_offset:record_offset + size])
+                identity = (
+                    "name",
+                    record[2:record.index(0, 2)].decode("ascii", "replace"),
+                )
+            entries.append({"identity": identity, "record": record})
+            index += 1
+
+        lookup_terminator = bytes(
+            data[rva_offset(lookup_rva + index * 4):
+                 rva_offset(lookup_rva + index * 4) + 4])
+        address_terminator = bytes(
+            data[rva_offset(address_rva + index * 4):
+                 rva_offset(address_rva + index * 4) + 4])
+        descriptors.append({
+            "dll": dll,
+            "descriptor": descriptor,
+            "dll_record": dll_record,
+            "entries": entries,
+            "terminators": lookup_terminator + address_terminator,
+        })
+        descriptor_rva += IMPORT_DESCRIPTOR_SIZE
+
+
+def _retail_byte_match(retail, candidate):
+    """Return retail-denominated equal/different bytes plus candidate excess."""
+    shared = min(len(retail), len(candidate))
+    equal = sum(1 for left, right in zip(retail[:shared], candidate[:shared])
+                if left == right)
+    different = len(retail) - equal
+    return equal, different, max(len(candidate) - len(retail), 0)
+
+
+def semantic_import_byte_diagnostics(retail_path, candidate_path):
+    """Compare import bytes by stable DLL/name-or-ordinal identity.
+
+    This is the locally measured Gruntz policy.  It does not rewrite the image
+    or pretend LINK emitted the retail IAT order: the two slot dwords are paired
+    with the same logical import, while hint/name payloads and non-pointer bytes
+    are compared literally.  Raw IAT order remains a separate diagnostic.
+    """
+    retail = _semantic_import_layout(retail_path)
+    candidate = _semantic_import_layout(candidate_path)
+    retail_order = [row["dll"].lower() for row in retail["descriptors"]]
+    candidate_order = [row["dll"].lower() for row in candidate["descriptors"]]
+    candidate_by_dll = {
+        row["dll"].lower(): row for row in candidate["descriptors"]
+    }
+
+    compared = matched = mismatched = candidate_extra = 0
+    paired_imports = 0
+    reordered_dlls = 0
+    missing_dlls = []
+    extra_dlls = [dll for dll in candidate_order if dll not in set(retail_order)]
+
+    def literal(retail_bytes, candidate_bytes):
+        nonlocal compared, matched, mismatched, candidate_extra
+        equal, different, extra = _retail_byte_match(
+            retail_bytes, candidate_bytes)
+        compared += len(retail_bytes)
+        matched += equal
+        mismatched += different
+        candidate_extra += extra
+
+    for retail_descriptor in retail["descriptors"]:
+        dll = retail_descriptor["dll"].lower()
+        candidate_descriptor = candidate_by_dll.get(dll)
+        retail_entries = retail_descriptor["entries"]
+        retail_entry_bytes = sum(8 + len(row["record"]) for row in retail_entries)
+        retail_total = (
+            20 + len(retail_descriptor["dll_record"]) + retail_entry_bytes + 8
+        )
+        if candidate_descriptor is None:
+            missing_dlls.append(dll)
+            compared += retail_total
+            mismatched += retail_total
+            continue
+
+        # Three descriptor fields are RVAs to the paired DLL's ILT/name/IAT.
+        # Timestamp and forwarder fields remain literal bytes.
+        compared += 12
+        matched += 12
+        literal(
+            retail_descriptor["descriptor"][4:12],
+            candidate_descriptor["descriptor"][4:12],
+        )
+        literal(
+            retail_descriptor["dll_record"],
+            candidate_descriptor["dll_record"],
+        )
+
+        candidate_entries = {
+            row["identity"]: row for row in candidate_descriptor["entries"]
+        }
+        retail_identities = [row["identity"] for row in retail_entries]
+        candidate_identities = [
+            row["identity"] for row in candidate_descriptor["entries"]
+        ]
+        if (retail_identities != candidate_identities
+                and set(retail_identities) == set(candidate_identities)):
+            reordered_dlls += 1
+        for retail_entry in retail_entries:
+            candidate_entry = candidate_entries.get(retail_entry["identity"])
+            if candidate_entry is None:
+                size = 8 + len(retail_entry["record"])
+                compared += size
+                mismatched += size
+                continue
+            # ILT and IAT dwords name the same import even when LINK assigned
+            # that import a different slot number in the two images.
+            compared += 8
+            matched += 8
+            literal(retail_entry["record"], candidate_entry["record"])
+            paired_imports += 1
+        candidate_extra += sum(
+            8 + len(row["record"])
+            for row in candidate_descriptor["entries"]
+            if row["identity"] not in set(retail_identities)
+        )
+        literal(
+            retail_descriptor["terminators"],
+            candidate_descriptor["terminators"],
+        )
+
+    literal(retail["null_descriptor"], candidate["null_descriptor"])
+    structural_violations = []
+    if retail_order != candidate_order:
+        structural_violations.append("DLL descriptor order differs")
+    if missing_dlls:
+        structural_violations.append("retail DLLs missing from candidate")
+    if extra_dlls:
+        structural_violations.append("candidate has extra DLLs")
+    exact = not mismatched and not candidate_extra and not structural_violations
+    return {
+        "method": "Gruntz-style semantic pairing by (DLL, name-or-ordinal)",
+        "exact": exact,
+        "match_percent": round(100.0 * matched / compared, 6) if compared else 100.0,
+        "retail_logical_bytes": compared,
+        "matched_bytes": matched,
+        "mismatched_bytes": mismatched,
+        "candidate_extra_bytes": candidate_extra,
+        "paired_imports": paired_imports,
+        "retail_imports": sum(
+            len(row["entries"]) for row in retail["descriptors"]),
+        "candidate_imports": sum(
+            len(row["entries"]) for row in candidate["descriptors"]),
+        "reordered_dlls": reordered_dlls,
+        "dll_order_matches_retail": retail_order == candidate_order,
+        "missing_dlls": missing_dlls,
+        "extra_dlls": extra_dlls,
+        "structural_violations": structural_violations,
+        "raw_iat_order_is_not_normalized": True,
+        "unmeasured": (
+            "VC6 merges imports into .rdata, so surrounding section padding and "
+            "unrelated .rdata contributions are intentionally outside this audit."
+        ),
+    }
+
+
 def import_thunk_diagnostics(retail_path, candidate_path, candidate, map_path,
                              retail_symbols):
     """Pair six-byte import thunks by the semantic identity of their IAT slot."""
@@ -2245,6 +2476,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
     candidate = read_pe(output)
     resources = resource_diagnostics(RETAIL_EXE, output, retail, candidate)
     imports = import_diagnostics(read_imports(RETAIL_EXE), read_imports(output))
+    semantic_import_bytes = semantic_import_byte_diagnostics(RETAIL_EXE, output)
     static_storage = static_storage_diagnostics(retail, candidate, map_path)
     static_storage["section_bytes"] = {
         name: compare_pe_section_bytes(RETAIL_EXE, output, name)
@@ -2295,6 +2527,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "section_bytes_exact": (retail["section_order"] == candidate["section_order"] and
                                 all(row["exact"] for row in section_bytes.values())),
         "imports_exact": imports["complete_iat_order_matches_retail"],
+        "imports_semantic_exact": semantic_import_bytes["exact"],
         "resources_exact": resources["semantic_match"],
         "source_function_rvas_exact": not any(
             row["status"] != "exact" for row in functions["functions"]
@@ -2319,6 +2552,7 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "subbands": subbands,
         "file_bytes": file_bytes,
         "imports": imports,
+        "semantic_import_bytes": semantic_import_bytes,
         "resources": resources,
         "static_storage": static_storage,
         "function_placement": functions,
@@ -2345,6 +2579,11 @@ def audit_existing_link(output, map_path=None, report_path=None,
         "matches" if imports["complete_abi_matches_retail"] else "differs",
         "matches" if imports["complete_iat_order_matches_retail"] else "differs",
         "match" if resources["semantic_match"] else "differ"))
+    print("link audit: semantic import bytes %d/%d (%.6f%%); raw order %s" % (
+        semantic_import_bytes["matched_bytes"],
+        semantic_import_bytes["retail_logical_bytes"],
+        semantic_import_bytes["match_percent"],
+        "matches" if imports["complete_iat_order_matches_retail"] else "differs"))
     print("link audit: %s" % report_path)
     return 0 if not strict or file_bytes["exact"] else 1
 

@@ -17,6 +17,7 @@ from homm2.build.link_exe import (
     parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
+    semantic_import_byte_diagnostics,
     sibling_tool_identities, static_symbol_diagnostics,
     _import_slot_identities, _linked_masked_code_equal,
     _ordered_candidate_group_placements, _pair_volatile_function_rows,
@@ -77,6 +78,40 @@ class LinkExeTest(unittest.TestCase):
         self.assertFalse(result["complete_iat_order_matches_retail"])
         self.assertEqual(result["iat_order_classification"], "resolution-history-wall")
         self.assertFalse(result["per_dll"][0]["iat_order_matches_retail"])
+
+    def test_semantic_import_bytes_compare_hint_payload_literally(self):
+        data = bytearray(0x500)
+        data[:2] = b"MZ"
+        struct.pack_into("<I", data, 0x3C, 0x80)
+        data[0x80:0x84] = b"PE\0\0"
+        struct.pack_into("<H", data, 0x84 + 2, 1)
+        struct.pack_into("<H", data, 0x84 + 16, 0xE0)
+        optional = 0x84 + 20
+        struct.pack_into("<H", data, optional, 0x10B)
+        struct.pack_into("<II", data, optional + 96 + 8, 0x2000, 0x28)
+        section = optional + 0xE0
+        data[section:section + 8] = b".rdata\0\0"
+        struct.pack_into("<IIII", data, section + 8, 0x300, 0x2000, 0x300, 0x200)
+        struct.pack_into("<IIIII", data, 0x200, 0x2040, 0, 0, 0x2080, 0x2060)
+        struct.pack_into("<II", data, 0x240, 0x2090, 0)
+        struct.pack_into("<II", data, 0x260, 0x2090, 0)
+        data[0x280:0x286] = b"x.dll\0"
+        struct.pack_into("<H", data, 0x290, 7)
+        data[0x292:0x295] = b"Fn\0"
+        with tempfile.TemporaryDirectory() as temp:
+            retail = Path(temp) / "retail.exe"
+            candidate = Path(temp) / "candidate.exe"
+            retail.write_bytes(data)
+            candidate.write_bytes(data)
+            exact = semantic_import_byte_diagnostics(retail, candidate)
+            changed = bytearray(data)
+            struct.pack_into("<H", changed, 0x290, 8)
+            candidate.write_bytes(changed)
+            different = semantic_import_byte_diagnostics(retail, candidate)
+        self.assertTrue(exact["exact"])
+        self.assertEqual(exact["paired_imports"], 1)
+        self.assertFalse(different["exact"])
+        self.assertEqual(different["mismatched_bytes"], 1)
 
     def test_link_environment_uses_toolchain_lib_search_path(self):
         environment = link_environment(
