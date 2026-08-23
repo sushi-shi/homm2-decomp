@@ -50,6 +50,24 @@
 // different 16-byte body; CTL and XP candidates have different allocator/code
 // semantics.  No authentic second local archive currently supplies the retail
 // member.
+
+// Direct-object and combined-archive probes:
+//
+//   build/link/rich-order-natural-probes/results.json
+//   build/link/combined-crt-archive/results.json
+//
+// Passing the untouched delete.obj directly is not equivalent to an archive
+// scan: LINK processes it in the direct-object phase, 210,513 bytes differ, and
+// the B(8) Rich producer moves behind the linker/import records.  Adding the
+// member to BASE-suffix.lib, with BASE's exact physical member order preserved,
+// gets the retail A(133),E(37),B(8) Rich order but resolves operator delete as
+// soon as that archive opens.  It lands in the pre-BITMAP gap at 0x004c5cc2
+// instead of 0x004d68c2, changing 1,113 call-site bytes while .rdata, .data, and
+// .rsrc remain exact.  Member-first and member-last forms behave identically.
+// Merging the complete stock LIBCMT into BASE instead pulls the runtime in the
+// wrong scan phase and changes 164,043 bytes.  The separate post-BASE archive
+// boundary is therefore required by LINK resolution semantics, not merely by
+// the current response-file spelling.
 //
 // Disposition: REJECT repeated stock LIBCMT as whole-file evidence.  Retain the
 // one-member ordinary VC6 LIB archive until an authentic separate archive owner
