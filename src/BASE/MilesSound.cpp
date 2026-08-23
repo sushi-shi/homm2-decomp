@@ -26,10 +26,10 @@ DATA(0x00520188) SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {
     {6, 16, 6}
 };
 
-DATA(0x005396d8) static i32 gMilesSamplesReady;
-DATA(0x005396dc) static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
-DATA(0x0053971c) static i32 gMilesSampleHandleCount;
-DATA(0x00539720) static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT];
+DATA(0x005396d8) static i32 gMilesSamplesReady = 0;
+DATA(0x005396dc) static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT] = {0};
+DATA(0x0053971c) static i32 gMilesSampleHandleCount = 0;
+DATA(0x00539720) static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT] = {0};
 
 namespace {
 

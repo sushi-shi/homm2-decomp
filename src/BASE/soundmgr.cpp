@@ -42,8 +42,8 @@ H2_ENUM_BEGIN(SoundSampleStatus)
 H2_ENUM_END(SoundSampleStatus)
 
 
-DATA(0x005348a8) static WAVEOUTCAPSA gWaveOutCaps;
-DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat;
+DATA(0x005348a8) static WAVEOUTCAPSA gWaveOutCaps = {0};
+DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat = {0};
 #define NORMALIZED_VOLUME_MAX 127.0f
 
 DATA(0x005348f0) bool gSoundDisabled = false;

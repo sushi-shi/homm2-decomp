@@ -11,22 +11,22 @@
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-DATA(0x00539838) static i32 s_y;
-DATA(0x0053983c) static i32 s_clipB;
-DATA(0x00539840) static i32 s_x;
-DATA(0x00539844) static i32 s_left;
-DATA(0x00539848) static u8* s_dimPal;
-DATA(0x0053984c) static u8* s_row;
-DATA(0x00539850) static u8 s_color;
-DATA(0x00539854) static IconEntry* s_entry;
-DATA(0x00539858) static u8* s_src;
-DATA(0x0053985c) static i32 s_dimLen;
-DATA(0x00539860) static i32 s_spanCount;
-DATA(0x00539864) static i32 s_clipR;
-DATA(0x00539868) static u8* s_dst;
-DATA(0x0053986c) static i32 s_loopCount;
-DATA(0x00539870) static i32 s_run;
-DATA(0x00539874) static i32 s_pitch;
+DATA(0x00539838) static i32 s_y = 0;
+DATA(0x0053983c) static i32 s_clipB = 0;
+DATA(0x00539840) static i32 s_x = 0;
+DATA(0x00539844) static i32 s_left = 0;
+DATA(0x00539848) static u8* s_dimPal = 0;
+DATA(0x0053984c) static u8* s_row = 0;
+DATA(0x00539850) static u8 s_color = 0;
+DATA(0x00539854) static IconEntry* s_entry = 0;
+DATA(0x00539858) static u8* s_src = 0;
+DATA(0x0053985c) static i32 s_dimLen = 0;
+DATA(0x00539860) static i32 s_spanCount = 0;
+DATA(0x00539864) static i32 s_clipR = 0;
+DATA(0x00539868) static u8* s_dst = 0;
+DATA(0x0053986c) static i32 s_loopCount = 0;
+DATA(0x00539870) static i32 s_run = 0;
+DATA(0x00539874) static i32 s_pitch = 0;
 
 VA(0x004d5a50, 0x683)
 void IconToBitmapYModify(

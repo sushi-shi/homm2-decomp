@@ -10,22 +10,22 @@
 
 // The decoder keeps every piece of working state in file statics: retail's
 // frame is exactly the two __fastcall spills, with no local slots at all.
-DATA(0x00536118) static i32 s_loopCount;
-DATA(0x0053611c) static u8* s_src;
-DATA(0x00536120) static i32 s_left;
-DATA(0x00536124) static u8* s_dimPal;
-DATA(0x00536128) static i32 s_pitch;
-DATA(0x0053612c) static i32 s_run;
-DATA(0x00536130) static u8* s_dst;
-DATA(0x00536134) static u8 s_color;
-DATA(0x00536138) static i32 s_spanCount;
-DATA(0x0053613c) static i32 s_x;
-DATA(0x00536140) static IconEntry* s_entry;
-DATA(0x00536144) static i32 s_y;
-DATA(0x00536148) static i32 s_clipR;
-DATA(0x0053614c) static i32 s_clipB;
-DATA(0x00536150) static i32 s_dimLen;
-DATA(0x00536154) static u8* s_row;
+DATA(0x00536118) static i32 s_loopCount = 0;
+DATA(0x0053611c) static u8* s_src = 0;
+DATA(0x00536120) static i32 s_left = 0;
+DATA(0x00536124) static u8* s_dimPal = 0;
+DATA(0x00536128) static i32 s_pitch = 0;
+DATA(0x0053612c) static i32 s_run = 0;
+DATA(0x00536130) static u8* s_dst = 0;
+DATA(0x00536134) static u8 s_color = 0;
+DATA(0x00536138) static i32 s_spanCount = 0;
+DATA(0x0053613c) static i32 s_x = 0;
+DATA(0x00536140) static IconEntry* s_entry = 0;
+DATA(0x00536144) static i32 s_y = 0;
+DATA(0x00536148) static i32 s_clipR = 0;
+DATA(0x0053614c) static i32 s_clipB = 0;
+DATA(0x00536150) static i32 s_dimLen = 0;
+DATA(0x00536154) static u8* s_row = 0;
 
 VA(0x004c14c0, 0x750)
 void IconToBitmap(
