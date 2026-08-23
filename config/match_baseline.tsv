@@ -3,16 +3,16 @@
 # Observational only; never an enforcement baseline.
 # Updated by `homm2 status update` and `homm2 build`; do not hand-edit.
 # unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash
-BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	54a15e0109c8
+BASE/AudiereEffects	?AudiereSampleIterationActive@@YI_NXZ	100.0000	cf43f549e496
 BASE/AudiereEffects	?AudiereSamplePlaying@@YI_NPAVsample@@@Z	100.0000	5ae38b433ee8
-BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	71e05d7fe65d
-BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	64f87f82c508
-BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	100.0000	17ca3c1d5aa1
-BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	af9a47dcc636
-BASE/AudiereEffects	?PurgeFinishedAudiereSamples@@YIXXZ	100.0000	96434c35e788
-BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	100.0000	c5bce4cf8033
+BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	3ae2727fe2b9
+BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	218f9b8a4984
+BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	100.0000	7a33c4c23646
+BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	5527cbab3797
+BASE/AudiereEffects	?PurgeFinishedAudiereSamples@@YIXXZ	100.0000	a8b9bffa10cf
+BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	100.0000	5fe99fdb3061
 BASE/AudiereEffects	?SetAudiereSampleVolume@@YIXPAVsample@@H@Z	100.0000	e38b19c6a90a
-BASE/AudiereEffects	?StopAllAudiereSamples@@YIXXZ	100.0000	ee7498c4b36a
+BASE/AudiereEffects	?StopAllAudiereSamples@@YIXXZ	100.0000	b370a5d69d13
 BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
 BASE/AudiereMusic	?AudiereMusicAvailable@@YI_NXZ	100.0000	1001bd3a24bb
