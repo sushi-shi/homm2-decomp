@@ -263,6 +263,23 @@ def main():
     object_root.mkdir(parents=True, exist_ok=True)
     libraries = []
     selected_objects = []
+    delete_matches = archive["delete.obj"]
+    if len(delete_matches) != 1:
+        raise RuntimeError("ambiguous selected archive basename: delete.obj")
+    delete_object = object_root / "delete.obj"
+    delete_object.write_bytes(subprocess.check_output(
+        ["llvm-ar", "p", ARCHIVE, delete_matches[0]]
+    ))
+    delete_library = archive_root / "delete.lib"
+    delete_library.unlink(missing_ok=True)
+    subprocess.run(
+        [
+            "llvm-ar", "rcs", delete_library,
+            delete_object.relative_to(ROOT).as_posix(),
+        ],
+        check=True,
+        cwd=ROOT,
+    )
     for index, member in enumerate(ordered):
         matches = archive[member.lower()]
         if len(matches) != 1:
@@ -327,6 +344,8 @@ def main():
         alias_libraries[member] = library_path.relative_to(ROOT).as_posix()
 
     args = ninja_link_args()
+    delete_scan = args.index("LIBCMT.LIB")
+    args[delete_scan] = delete_library.relative_to(ROOT).as_posix()
     common_order_object = None
     if options.common_order:
         command = [sys.executable, "-m", "homm2.build.exact_link.common_order"]

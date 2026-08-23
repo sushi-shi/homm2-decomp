@@ -99,7 +99,10 @@ def main():
             current_index[member.lower()],
         ),
     )
-    objects = ["build/link/libcmt-delete.obj"]
+    delete_matches = archive["delete.obj"]
+    if len(delete_matches) != 1:
+        raise RuntimeError("ambiguous selected archive basename: delete.obj")
+    objects = [extract("delete.obj", delete_matches[0])]
     for member in ordered:
         matches = archive[member.lower()]
         if len(matches) != 1:
@@ -119,7 +122,7 @@ def main():
     )
 
     args = ninja_link_args()
-    delete_archive = "build/link/libcmt-delete.lib"
+    delete_archive = "LIBCMT.LIB"
     resource = "build/link/HMM2PL.res"
     if delete_archive not in args or args[-1] != resource:
         raise RuntimeError("unexpected normal-link argument tail")

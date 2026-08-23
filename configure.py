@@ -328,15 +328,6 @@ def main():
             implicit="scripts/homm2/build/legacy_import_lib.py",
         )
         import_outputs.append(output)
-        runtime_delete_object = "build/link/libcmt-delete.obj"
-        runtime_delete_archive = "build/link/libcmt-delete.lib"
-        w.build(
-            runtime_delete_object,
-            "extract_archive_member",
-            inputs="build/toolchain/msvc/lib/LIBCMT.LIB",
-            variables={"member": r"build\intel\mt_obj\delete.obj"},
-        )
-        w.build(runtime_delete_archive, "archive", inputs=runtime_delete_object)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
                 inputs=["build/orig/HMM2PL.exe",
@@ -389,17 +380,22 @@ def main():
             # order backwards so each archive scans forwards.
             w.build(library, "archive", inputs=list(reversed(members)))
             base_libraries.append(library)
+        # Retail selects delete.obj during a first ordinary LIBCMT scan here;
+        # a later runtime scan resolves the remaining members.  Keeping the
+        # stock archive in the response reproduces that behavior without a
+        # derived one-member archive.
+        runtime_delete_scan = "LIBCMT.LIB"
         link_args = (link_libraries + source_objects + base_libraries
-                     + [runtime_delete_archive, resource_output])
+                     + [runtime_delete_scan, resource_output])
         exact_link_helpers = sorted(
             str(path.relative_to(REPO))
             for path in (REPO / "scripts/homm2/build/exact_link").glob("*.py"))
         w.build(link_outputs, "link_exe",
-                inputs=(source_objects + base_libraries
-                        + [runtime_delete_archive, resource_output]),
+                inputs=(source_objects + base_libraries + [resource_output]),
                 implicit=(import_outputs + exact_link_helpers + [
                     "config/retail_crt_order.txt",
                     "build/gen/delink_data_from_source.tsv",
+                    "build/toolchain/msvc/lib/LIBCMT.LIB",
                 ] + base_symbol_sidecars),
                 variables={"link_args": " ".join(link_args)})
         link_audit_outputs = [
