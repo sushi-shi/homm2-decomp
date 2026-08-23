@@ -33,12 +33,22 @@ let
     url = "https://archive.org/download/vs6sp5/vs6sp5.exe";
     hash = "sha1-avEvs+LHwnG+Z8nJgzxjuCu3ub8=";
   };
+  # Microsoft Macro Assembler 6.11 was distributed separately from Visual
+  # Studio 6.  PCjs preserves the original 1.44MB diskette as a lossless CHS
+  # JSON image.  Pin the repository commit as well as the fetched file so a
+  # mutable branch cannot silently become a different assembler.
+  masm611-disk1 = pkgs.fetchurl {
+    name = "MASM611-DISK1.json";
+    url = "https://raw.githubusercontent.com/jeffpar/pcjs-miscdisks/bd4cc85928f2291c8d08e610038a1dd70b94ac6c/pcx86/lang/microsoft/masm/6.11/MASM611-DISK1.json";
+    hash = "sha256-ZtLuXQb8nCSbGIevSu1EnxQyJ+7+qTvHMLfQobufa/k=";
+  };
 in
 pkgs.mkShell {
   packages = [
     pkgs.python3
     pkgs.p7zip
     pkgs.cabextract          # multi-volume cabinets; 7z drops spanning entries
+    pkgs.libmspack           # expands MASM's KWAJ-compressed ML.EX$/ML.ER$
     pkgs.gnutar
     pkgs.xz
   ];
@@ -46,6 +56,8 @@ pkgs.mkShell {
   shellHook = ''
     export VC6_DISC1="${vc6-disc1}"
     export VC6_SP5="${vc6-sp5}"
+    export MASM611_DISK1="${masm611-disk1}"
+    export LIBMSPACK="${pkgs.libmspack}/lib/libmspack.so"
     export HOMM2_DIR="$PWD"
     export PYTHONPATH="${./.}''${PYTHONPATH:+:$PYTHONPATH}"
     exec python3 ${./create-toolchain-release.py}

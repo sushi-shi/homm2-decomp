@@ -19,15 +19,24 @@ and upper case; VC6 setup restores the longer ones as it installs. Six C++
 standard headers are longer, and they are not optional - VC6's own `<new>`
 includes `<exception>`, so nothing compiled with `/GX` builds without them.
 
+MASM 6.11 was separate media. PCjs preserves its first diskette as a lossless
+CHS JSON image. The builder reconstructs and verifies the original FAT image,
+extracts ML.EX$/ML.ER$, and expands their KWAJ streams with libmspack. This is
+the OMF producer used for the two hand-assembled final-link inputs; CVTOMF is an
+OMF-to-COFF converter and is not part of that source-to-OMF path.
+
 Every artifact is verified against a pinned SHA-256, and the assembled compiler
 has to stamp the target's own `@comp.id` before the tarball is written.
 """
 
 from __future__ import annotations
 
+import ctypes
 import hashlib
+import json
 import os
 import shutil
+import struct
 import subprocess
 import sys
 import tarfile
@@ -60,8 +69,12 @@ ARTIFACTS = {
     "bin/C2.DLL":     "d50100ac2380d58f3f6f756961fb1319d35f5248e5fa6cafb866ca657e5dda4a",
     "bin/LINK.EXE":   "9672e578fdfaa43bdb8e9c16071682988665cb90bba2904bf02f6a5576d8ffbc",
     "bin/CVTRES.EXE": "83b602ed8e69e979fc9557f482a4a4c6c9a97b4ad67b879aedeacd2b09e5b20b",
+    "bin/ML.EXE":     "94595b9ccc09dbcaf6b877aa11a35576f78de2ab0eb39546abfde430b79dce2f",
+    "bin/ML.ERR":     "092755d3a488767da3de277c141be7c8144110a156cdbd8ae1391eba64697cee",
     "lib/LIBCMT.LIB": "28b9f04962378ec4668072f37d7fd2835cd6cacc17b40cf22002c57bd8e76714",
 }
+
+MASM_DISK_MD5 = "bb1f36e70d67720fa63356010b07c992"
 
 # SP5 stores the back end under an edition-specific alias. Enterprise is ours.
 BACK_END_ALIAS = "msvcep.dll"
@@ -124,7 +137,101 @@ def media(variable: str) -> Path:
     return path
 
 
-def build(work: Path, disc: Path, sp5: Path) -> Path:
+def reconstruct_pcjs_disk(source: Path, output: Path) -> None:
+    """Turn the pinned PCjs CHS JSON representation back into its disk image."""
+    document = json.loads(source.read_text())
+    info = document.get("imageInfo", {})
+    cylinders = int(info.get("cylinders", 0))
+    heads = int(info.get("heads", 0))
+    sectors_per_track = int(info.get("trackDefault", 0))
+    sector_size = int(info.get("sectorDefault", 0))
+    disk_size = int(info.get("diskSize", 0))
+    if (cylinders, heads, sectors_per_track, sector_size, disk_size) != (
+            80, 2, 18, 512, 1_474_560):
+        raise SystemExit("MASM 6.11 media has unexpected disk geometry")
+
+    image = bytearray(disk_size)
+    seen: set[tuple[int, int, int]] = set()
+    for cylinder_data in document.get("diskData", []):
+        for head_data in cylinder_data:
+            for sector in head_data:
+                coordinate = (int(sector["c"]), int(sector["h"]), int(sector["s"]))
+                cylinder, head, number = coordinate
+                if coordinate in seen:
+                    raise SystemExit(f"duplicate MASM disk sector {coordinate}")
+                if not (0 <= cylinder < cylinders and 0 <= head < heads
+                        and 1 <= number <= sectors_per_track):
+                    raise SystemExit(f"invalid MASM disk sector {coordinate}")
+                if int(sector["l"]) != sector_size:
+                    raise SystemExit(f"unexpected MASM sector size at {coordinate}")
+
+                # PCjs shortens runs of identical trailing DWORDs: the last
+                # stored value fills the remainder of the sector.
+                words = [int(value) & 0xffffffff for value in sector.get("d", [])]
+                word_count = sector_size // 4
+                if not words or len(words) > word_count:
+                    raise SystemExit(f"invalid MASM sector payload at {coordinate}")
+                words.extend([words[-1]] * (word_count - len(words)))
+                payload = struct.pack(f"<{word_count}I", *words)
+                offset = ((cylinder * heads + head) * sectors_per_track
+                          + number - 1) * sector_size
+                image[offset:offset + sector_size] = payload
+                seen.add(coordinate)
+
+    expected_sectors = cylinders * heads * sectors_per_track
+    if len(seen) != expected_sectors:
+        raise SystemExit(
+            f"MASM disk has {len(seen)} sectors, expected {expected_sectors}")
+    actual = hashlib.md5(image).hexdigest()
+    if actual != MASM_DISK_MD5 or info.get("hash") != MASM_DISK_MD5:
+        raise SystemExit(
+            f"MASM disk image hashes {actual}, expected {MASM_DISK_MD5}")
+    output.write_bytes(image)
+
+
+def expand_kwaj(source: Path, output: Path) -> None:
+    """Expand one MASM setup KWAJ member through libmspack's public API."""
+    library_path = os.environ.get("LIBMSPACK")
+    if not library_path:
+        raise SystemExit(
+            "LIBMSPACK is not set; use scripts/toolchain/create-toolchain-release.nix")
+
+    class KwajDecompressor(ctypes.Structure):
+        pass
+
+    pointer = ctypes.POINTER(KwajDecompressor)
+    open_type = ctypes.CFUNCTYPE(ctypes.c_void_p, pointer, ctypes.c_char_p)
+    close_type = ctypes.CFUNCTYPE(None, pointer, ctypes.c_void_p)
+    extract_type = ctypes.CFUNCTYPE(
+        ctypes.c_int, pointer, ctypes.c_void_p, ctypes.c_char_p)
+    decompress_type = ctypes.CFUNCTYPE(
+        ctypes.c_int, pointer, ctypes.c_char_p, ctypes.c_char_p)
+    error_type = ctypes.CFUNCTYPE(ctypes.c_int, pointer)
+    KwajDecompressor._fields_ = [
+        ("open", open_type),
+        ("close", close_type),
+        ("extract", extract_type),
+        ("decompress", decompress_type),
+        ("last_error", error_type),
+    ]
+
+    library = ctypes.CDLL(library_path)
+    library.mspack_create_kwaj_decompressor.argtypes = [ctypes.c_void_p]
+    library.mspack_create_kwaj_decompressor.restype = pointer
+    library.mspack_destroy_kwaj_decompressor.argtypes = [pointer]
+    decompressor = library.mspack_create_kwaj_decompressor(None)
+    if not decompressor:
+        raise SystemExit("libmspack could not create a KWAJ decompressor")
+    try:
+        result = decompressor.contents.decompress(
+            decompressor, os.fsencode(source), os.fsencode(output))
+    finally:
+        library.mspack_destroy_kwaj_decompressor(decompressor)
+    if result != 0:
+        raise SystemExit(f"libmspack failed to expand {source.name}: error {result}")
+
+
+def build(work: Path, disc: Path, sp5: Path, masm_disk: Path) -> Path:
     tree = work / "msvc"
     (tree / "bin").mkdir(parents=True)
 
@@ -153,6 +260,14 @@ def build(work: Path, disc: Path, sp5: Path) -> Path:
 
     log(f"installing the Enterprise back end from {BACK_END_ALIAS}")
     shutil.copy2(find(sp5tree, BACK_END_ALIAS), tree / "bin" / "C2.DLL")
+
+    log("reconstructing the MASM 6.11 disk and installing its OMF assembler")
+    masm_image, masm_tree = work / "MASM611-DISK1.img", work / "masm611"
+    reconstruct_pcjs_disk(masm_disk, masm_image)
+    run("7z", "x", "-y", f"-o{masm_tree}", str(masm_image),
+        "BIN/ML.EX$", "BIN/ML.ER$")
+    expand_kwaj(find(masm_tree, "ML.EX$"), tree / "bin" / "ML.EXE")
+    expand_kwaj(find(masm_tree, "ML.ER$"), tree / "bin" / "ML.ERR")
 
     log("restoring the header names the disc could not spell")
     restore_long_names(tree / "include")
@@ -217,11 +332,12 @@ def main() -> None:
         return
 
     disc, sp5 = media("VC6_DISC1"), media("VC6_SP5")
+    masm_disk = media("MASM611_DISK1")
     output = Path(os.environ.get(
         "OUTPUT", REPO / "build" / "homm2-toolchain-vc6-sp5.tar.xz")).expanduser().resolve()
 
     with tempfile.TemporaryDirectory(dir=REPO / "build") as scratch:
-        tree = build(Path(scratch), disc, sp5)
+        tree = build(Path(scratch), disc, sp5, masm_disk)
         verify(tree)
         package(tree, output)
 

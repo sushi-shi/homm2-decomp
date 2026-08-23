@@ -40,7 +40,7 @@ RELEASE_TAG = "toolchain-vc6-sp5"
 ASSET = "homm2-toolchain-vc6-sp5.tar.xz"
 # The gate: a tarball that does not hash to this is not the toolchain, whatever
 # the release page says.
-ASSET_SHA256 = "b243b68a1df8c2c54f7830a14221fa0a73fd3bbca78343fd1dd81a815a32ecec"
+ASSET_SHA256 = "c89aa4d835d63a9ce30576c05e8bf5ff1e5b0070c75b9376b6901ab0b3a6a360"
 
 # One component, and the archive has no wrapping directory - its top level IS
 # msvc/, so it unpacks with no --strip-components. An older toolchain release shipped two
@@ -60,14 +60,16 @@ def log(message: str) -> None:
 
 
 def is_provisioned(root: Path) -> bool:
-    """True when a compiler is already in place.
+    """True when the compiler and OMF assembler are already in place.
 
     Deliberately shallow - it decides whether to DOWNLOAD, not whether the tree is
     sound. Depth is the job of the pinned-hash checkers, which run after any fetch
     and on demand via --check.
     """
     binaries = root / "msvc" / "bin"
-    return any((binaries / name).exists() for name in ("CL.EXE", "cl.exe"))
+    compiler = any((binaries / name).exists() for name in ("CL.EXE", "cl.exe"))
+    assembler = any((binaries / name).exists() for name in ("ML.EXE", "ml.exe"))
+    return compiler and assembler
 
 
 def sha256(path: Path) -> str:

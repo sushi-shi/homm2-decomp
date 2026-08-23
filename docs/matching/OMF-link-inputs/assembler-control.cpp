@@ -29,6 +29,8 @@
 // placement census improved from 1,700/1,727 to 1,715/1,727 exact RVAs.
 //
 // Disposition:
-//   RETAIN the MASM-syntax OMF source and the reproducible JWasm build rule.
-//   REMOVE the former link-only COFF header adapter. The C++ files remain the
-//   annotated analysis and objdiff mirrors; they are not the final link inputs.
+//   RETAIN the MASM-syntax OMF source and assemble it with the pinned original
+//   Microsoft MASM 6.11 media packaged in the VC6 release. JWasm remains an
+//   independent control, not a final-link producer. REMOVE the former link-only
+//   COFF header adapter. The C++ files remain the annotated analysis and objdiff
+//   mirrors; they are not the final link inputs.

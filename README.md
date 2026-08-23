@@ -138,17 +138,19 @@ Rebuilding the tarball from the preserved media stays supported. Two things abou
 make it more than an unzip: its cabinets are a multi-volume set that must be followed
 through the chain, and it ships four back ends under edition-specific names, of which
 Enterprise's `msvcep.dll` is the one this target used. The base disc also spells every
-name in 8.3, so six C++ standard headers are restored to their long names:
+name in 8.3, so six C++ standard headers are restored to their long names. The builder
+also reconstructs the pinned original MASM 6.11 disk image and installs its OMF-producing
+`ML.EXE` and message file:
 
 ```sh
-nix-shell scripts/toolchain/create-toolchain-release.nix     # pins both media by SHA-1
+nix-shell scripts/toolchain/create-toolchain-release.nix     # pins all three media inputs
 scripts/toolchain/create-toolchain-release.py --check build/toolchain/msvc
 ```
 
-Seven artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
-`LINK.EXE`, `CVTRES.EXE`, `LIBCMT.LIB` - and the assembled compiler must stamp the
-target's own `@comp.id` before a tarball is written. `clang`/`clangd` is editor tooling
-only; the Wine VC6 build is the sole verdict on a match.
+Nine artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
+`LINK.EXE`, `CVTRES.EXE`, `ML.EXE`, `ML.ERR`, `LIBCMT.LIB` - and the assembled compiler
+must stamp the target's own `@comp.id` before a tarball is written. `clang`/`clangd` is
+editor tooling only; the Wine VC6 build is the sole verdict on a match.
 
 ninja **tracks header dependencies** (via `cc_wrap.py`'s include scanner), so editing a
 shared header recompiles exactly its includers — no stale objects. `homm2 build`

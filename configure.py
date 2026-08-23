@@ -131,8 +131,9 @@ def main():
         w.rule("extract_archive_member",
                command='llvm-ar p $in "$member" > $out',
                description="extract $member")
-        w.rule("jwasm_omf",
-               command="jwasm -nologo -Zg -omf -Fo$out $in",
+        w.rule("ml_omf",
+               command=(f"{PY} -m homm2.build.ml_wrap "
+                        "--src $in --out $out"),
                description="assemble-omf $in")
         w.rule("adapt_comdat_link_order",
                command=(f"{PY} -m homm2.build.adapt_comdat_link_order "
@@ -347,7 +348,8 @@ def main():
         for unit in ("BASE/BITS", "BASE/TILE"):
             source = f"src/{unit}.asm"
             output = f"build/link/omf/{unit}.obj"
-            w.build(output, "jwasm_omf", inputs=source)
+            w.build(output, "ml_omf", inputs=source,
+                    implicit="scripts/homm2/build/ml_wrap.py")
             omf_link_objects[f"build/objdiff/base/{unit}.obj"] = output
         base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
         comdat_link_objects = {}
