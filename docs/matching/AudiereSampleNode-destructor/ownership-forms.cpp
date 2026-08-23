@@ -219,3 +219,32 @@
 // of which header enters the TU first. Header entry order therefore cannot
 // supply the retail three-RefPtr -> $E21 -> $E20 -> node-dtor tail, and the
 // object adapter's reviewed section move remains the bounded residual.
+
+// Class-name census:
+//
+//   build/link/comdat-name-census/results.json
+//
+// The stripped image pins no class names, so renaming AudiereSampleNode is a
+// legal reconstruction move. Eight names (same-length substitutions, shorter,
+// longer) all emit the identical production-flag order: node dtor section 18,
+// RefPtr helpers 19..21, $E21, $E20. The deferred-emission queue is not keyed
+// by the decorated name, so no rename can rotate the destructor to the tail.
+
+// Cross-TU ownership matrix:
+//
+//   build/link/audiere-cross-ownership/{results.json,results-noninline.json}
+//
+// The destructor slot 0x004cd050 sits exactly between AudiereEffects's $E20
+// and AudiereMusic's first static-init dispatch thunk, so AudiereMusic
+// ownership was measured. With the declaration made non-inline, a plain
+// definition placed before AudiereMusic's static members emits the exact
+// 0x2c retail body as that object's first .text section - the retail position.
+// But the same declaration change re-lowers PlayAudiereSample from 0x39c to
+// 0x385 bytes, and removing only the definition (keeping the inline
+// declaration) does too: Play's delete path needs the visible inline body.
+// An inline-declared, unreferenced definition in AudiereMusic is never
+// emitted. Retail Play therefore proves the body was visible in
+// AudiereEffects, which forces AudiereEffects to emit the COMDAT, and LINK's
+// first-defining-object rule pins the selected copy to AudiereEffects's own
+// section order. Cross-TU ownership cannot realize the tail slot; the
+// residual is AudiereEffects's internal deferred-sweep order alone.

@@ -196,6 +196,17 @@
 // 0x004d3440.  Because /ORDER cannot keep the surrounding ctor/Read/Main/Draw
 // contributions in place, it cannot replace the object-local section move.
 
+// Matrix 14: class-name census.
+//
+//   build/link/comdat-name-census/results.json
+//
+// The stripped image pins no class names, so renaming dimmerWidget is a legal
+// reconstruction move. Eight names (same-length substitutions, shorter, longer)
+// all emit the identical production-flag order: default constructor (3),
+// deleting destructor (5), argument constructor (6), Read (7), Main (8),
+// Draw (9), ordinary destructor (10). The compiler-generated COMDAT scheduler
+// is not keyed by the decorated name; renaming cannot move ??_G to the tail.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved
