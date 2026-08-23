@@ -93,7 +93,20 @@
 // boundaries at 0x0, 0x30, 0x70, 0xf0, 0x110.  The apparently attractive order
 // therefore destroys exact function placement and is rejected.
 
-// Matrix 8: historical source, include, and compiler-output paths.
+// Matrix 8: minimal-rebuild transition from no /Gy to /Gy.
+//
+//   build/link/minimal-rebuild-comdat/results.json
+//
+// A real VC6 SP5 /Zi /Gm database was seeded with the unchanged TU and no /Gy,
+// then rebuilt with /Gy and compiled once more.  The transition emitted fresh
+// COMDATs in the ordinary candidate order: default constructor, deleting
+// destructor, argument constructor, Read, Main, Draw, ordinary destructor.
+// A separate fresh /Gy /Gm object has the same relative order; the third shared-
+// database compile reported "Skipping... (no relevant changes detected)" and
+// retained it.  /Gm does not preserve the attractive merged-text tail order
+// across the flag change.
+
+// Matrix 9: historical source, include, and compiler-output paths.
 //
 //   build/link/source-path-spelling/results.json
 //   build/link/include-path-spelling/results.json
@@ -105,6 +118,17 @@
 // and short names.  All 29 production-/Gy objects retain ctor section 3,
 // deleting-destructor section 5, and the remaining methods in sections 6..10.
 // Compiler path identity is not the missing emission-order state.
+
+// Cross-version ownership evidence:
+//
+//   investigation/reports/pol-project-tree.txt
+//   investigation/reports/pol-compilands.txt
+//
+// The earlier Price of Loyalty executable has the same exceptional order--two
+// constructors, Read, Main, Draw, then the scalar deleting destructor--and its
+// CodeView inventory attributes the whole 0x004dd330..0x004dd440 range and the
+// vtable to .\Win32_RE\DIMMER.OBJ.  The tail wrapper is therefore not a Buka-
+// only adjacent-object ownership accident.
 
 // Native /ORDER probe:
 //

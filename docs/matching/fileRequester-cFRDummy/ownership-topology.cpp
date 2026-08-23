@@ -99,3 +99,11 @@
 // the contribution.  A same-object COMDAT is therefore not a transformation-
 // free replacement for the rotation; only the already rejected cross-TU form
 // reaches the needed post-REQUEST boundary.
+
+// Making cFRDummy itself __declspec(selectany) was also measured.  VC6 emits
+// the pointer as an early .data COMDAT (moving it onto giMapSizeFilter's retail
+// address) while its literal remains the first ordinary REQUEST BSS cell.  The
+// four-pass link produced SHA-256
+// 9af62364dcb864c640124e71b4fbfe1107df26834b993825c7230f047d720a93, not
+// retail.  Selectany on the pointer therefore changes the wrong contribution;
+// it does not supply a natural trailing backing cell.

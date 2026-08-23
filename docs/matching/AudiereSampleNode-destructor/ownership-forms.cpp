@@ -83,6 +83,26 @@
 // order as node destructor, three RefPtr helpers, $E21, $E20.  /GX omission
 // suppresses required cleanup functions and is structurally contradicted.
 
+// Force-inline spelling probe:
+//
+//   build/link/comdat-source-order/results.json
+//
+// Replacing inline with __forceinline on both the declaration and end-of-TU
+// definition preserves the baseline six-symbol order.  Defining the
+// __forceinline destructor in the class emits it earlier still (section 5 in
+// that probe).  Neither spelling exposes the retail tail orbit.
+
+// Minimal-rebuild flag-transition probe:
+//
+//   build/link/minimal-rebuild-comdat/results.json
+//
+// A real VC6 SP5 /Zi /Gm database was seeded without /Gy, then the unchanged TU
+// was rebuilt with /Gy and compiled once more.  The transition emitted fresh
+// per-function COMDATs in the same relative order as a separate fresh /Gy /Gm
+// build: node destructor, three RefPtr helpers, $E21, $E20.  The third compile
+// reported "Skipping... (no relevant changes detected)" and retained that
+// order.  Minimal rebuild does not carry the non-/Gy layout into the /Gy object.
+
 // Historical path-state matrix:
 //
 //   build/link/source-path-spelling/results.json
