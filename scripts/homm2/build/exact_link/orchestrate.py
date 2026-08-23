@@ -80,7 +80,9 @@ def bss_layout_base_libraries(undefine_guard=False, misc_data_layout=False):
             if marker in member:
                 unit_relative = member[member.index(marker):]
                 adapted = ROOT / "build/link/bss-layout-all" / unit_relative
-                if adapted.exists():
+                if adapted.exists() and unit_relative not in {
+                    "BASE/BITS.obj", "BASE/TILE.obj"
+                }:
                     selected = adapted
                     if unit_relative == "BASE/AudiereEffects.obj":
                         combined = (
@@ -113,7 +115,9 @@ def bss_layout_base_libraries(undefine_guard=False, misc_data_layout=False):
                         check=True,
                     )
                     selected = combined
-            if undefine_guard:
+            if undefine_guard and unit_relative not in {
+                "BASE/BITS.obj", "BASE/TILE.obj"
+            }:
                 payload, changed = undefine_common_symbol(
                     selected.read_bytes(), CTYPE_GUARD
                 )

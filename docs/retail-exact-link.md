@@ -33,8 +33,10 @@ treating all semantically equivalent COFF as interchangeable:
 
 - `config/retail_crt_order.txt` fixes the reviewed order of the 177 selected
   `LIBCMT.LIB` members. One-member archives make that order explicit to LINK.
-- The source and CRT `.bss`, `.data`, `.rdata`, COMMON, OMF-converted, and
-  selected COMDAT contributions are adapted in disposable final-link copies.
+- The source and CRT `.bss`, `.data`, `.rdata`, COMMON, and selected COMDAT
+  contributions are adapted in disposable final-link copies. `BITS.asm` and
+  `TILE.asm` are ordinary OMF assembler inputs, so VC6 performs the retail
+  OMF-to-COFF conversion itself; no link adapter changes their topology.
   Candidate object payloads and relocations remain the source of linked data.
 - Audiere uses the VC6 short-import form. Gruntz-style disposable filler exports
   place the two retail-used names at their retail hint indices, so no complete

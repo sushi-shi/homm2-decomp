@@ -131,10 +131,9 @@ def main():
         w.rule("extract_archive_member",
                command='llvm-ar p $in "$member" > $out',
                description="extract $member")
-        w.rule("adapt_omf_link_object",
-               command=(f"{PY} -m homm2.build.adapt_omf_link_object "
-                        "--input $in --output $out --unit $unit"),
-               description="cvtomf-topology $unit")
+        w.rule("jwasm_omf",
+               command="jwasm -nologo -Zg -omf -Fo$out $in",
+               description="assemble-omf $in")
         w.rule("adapt_comdat_link_order",
                command=(f"{PY} -m homm2.build.adapt_comdat_link_order "
                         "--input $in --output $out --unit $unit"),
@@ -346,16 +345,10 @@ def main():
         base_objects = link_objects[source_end:]
         omf_link_objects = {}
         for unit in ("BASE/BITS", "BASE/TILE"):
-            source = f"build/objdiff/base/{unit}.obj"
+            source = f"src/{unit}.asm"
             output = f"build/link/omf/{unit}.obj"
-            w.build(
-                output,
-                "adapt_omf_link_object",
-                inputs=source,
-                implicit="scripts/homm2/build/adapt_omf_link_object.py",
-                variables={"unit": unit},
-            )
-            omf_link_objects[source] = output
+            w.build(output, "jwasm_omf", inputs=source)
+            omf_link_objects[f"build/objdiff/base/{unit}.obj"] = output
         base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
         comdat_link_objects = {}
         for unit in ("BASE/AudiereEffects", "BASE/DIMMER"):

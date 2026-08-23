@@ -6,15 +6,13 @@ Microsoft LINK selects an identical COMDAT from another owner or places an exact
 contribution at a different address. The final-link report therefore joins
 functions semantically first and records address placement as a separate result.
 
-At the exact-function checkpoint, all 1,727 project functions have a unique
-semantic candidate identity. Of those, 1,700 land at the retail RVA and 27 are
-displaced. None are missing or ambiguous. The 27 are confined to five units:
+At the natural-link checkpoint, all 1,727 project functions have a unique
+semantic candidate identity. Of those, 1,715 land at the retail RVA and 12 are
+displaced. None are missing or ambiguous. The 12 are confined to three units:
 
 | Unit | Count | Bounded cause |
 | --- | ---: | --- |
-| `BASE/TILE` | 1 | Exact 399-byte `TileToBitmap` COMDAT lands at the next 16-byte boundary, 12 bytes after retail. |
-| `BASE/BITS` | 3 | Exact 1-byte-aligned `BitTest`, `BitSet`, and `BitClear` contributions begin two bytes before retail because the candidate link omits a retail inter-unit gap. |
-| `BASE/AudiereEffects` | 16 | One implicit destructor COMDAT is emitted early, shifting fourteen later contributions by 48 bytes; two identical template COMDATs are selected from earlier owners. |
+| `BASE/AudiereEffects` | 5 | One implicit destructor COMDAT is emitted early, shifting later contributions; identical template COMDATs may be selected from earlier owners. |
 | `BASE/AudiereMusic` | 2 | LINK selects identical `RefPtr<OutputStream>` template COMDATs from the earlier AudiereEffects owner instead of the retail-local copies. |
 | `BASE/DIMMER` | 5 | The scalar deleting destructor COMDAT is emitted after the first constructor rather than after `Draw`, shifting four ordinary functions by 48 bytes. |
 
@@ -38,18 +36,14 @@ the semantic pairing leaves neither.
 
 ## `TILE` and `BITS`
 
-The retail and candidate `TileToBitmap` bodies and relocations are exact. Its base
-object contribution is a 399-byte `/Gy` COMDAT carrying
-`IMAGE_SCN_ALIGN_16BYTES`; the candidate starts it on the next valid 16-byte
-boundary and is 12 bytes late. This is not evidence for source padding or a fake
-linker root.
-
-The BITS base object contains three separate exact COMDATs of 46, 32, and 34
-bytes, each marked `IMAGE_SCN_ALIGN_1BYTES`. The candidate places `BitTest`
-immediately after the preceding exact function, while retail leaves two bytes
-before the BITS unit. All three functions are consequently two bytes early.
-Synthetic source padding cannot recover an evidenced original contribution and
-is not retained.
+The retail Rich census identifies both units as OMF inputs converted by VC6.
+Their C++ analysis mirrors emitted the right bytes but the wrong COFF topology:
+`TileToBitmap` was a 16-byte-aligned COMDAT and the three BITS functions were
+separate one-byte-aligned COMDATs. Reconstructing the functions as ordinary OMF
+assembly contributions makes VC6 perform the evidenced conversion. `TileToBitmap`
+and all three BITS functions then land at their exact retail RVAs with exact linked
+bytes and relocations. No alignment, producer-id, padding, or post-link adapter is
+retained.
 
 ## Audiere ownership and folding
 

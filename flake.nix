@@ -206,7 +206,7 @@
         # anonymously fetchable.
         build = pkgs.mkShell {
           name = "homm2-build";
-          packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
+          packages = commonTools ++ [ pkgs.jwasm pkgs.wineWow64Packages.staging ];
           shellHook = ''
             ${projectRootHook}
             export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
