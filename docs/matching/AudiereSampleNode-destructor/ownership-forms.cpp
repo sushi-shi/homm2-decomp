@@ -269,3 +269,21 @@
 // retail Purge byte-identically calls the destructor as the TU's first use,
 // no same-TU source arrangement under cl 8966 reproduces the post-$E20
 // placement. The wall is a genuine unrecovered first-requirement difference.
+
+// Terminal closure (docs/compiler-re-allocation-order.md sections 9-11):
+//
+//   build/link/audiere-template-real/  build/link/audiere-template-includes/
+//   build/link/audiere-ctype-order/    build/link/audiere-ctype-fnuse/
+//
+// A templated node (typedef preserving the spelling) keeps all twelve
+// function payloads byte-identical and moves the destructor through the
+// end-of-TU instantiation walk to the last pre-$E slot; five include orders
+// and explicit early ctype requests (address-of, whole-class instantiation)
+// never move the ctype<G>::id member-init $E pair off the tail. The front
+// end's emission driver is a fixpoint loop whose only post-$E channel
+// (queue C, fed by the template-specialization scanner) can never carry a
+// COMDAT whose sole requirement is a delete in function 1, and the ?id$D
+// member-init form has no source-position path. Retail's tail slot is
+// therefore unreachable by any compiler state, linker flag, or source
+// arrangement under the pinned toolchain; the reviewed section move stands
+// as an original-object wall with a complete mechanism proof.

@@ -174,3 +174,15 @@
 // attempted `template <> extern` member declaration is illegal in VC6 (C2720,
 // followed by C2086 on the definition). The previously missing specialization
 // branch therefore does not produce retail section 44.
+
+// Mechanism closure (docs/compiler-re-allocation-order.md):
+//
+// C1XX RE proves cells are emitted in three fixed groups - file-scope
+// variables, file-scope-initializer literals, function-body literals - with
+// lexical allocation but phase-sorted emission, and the complete 103-record
+// front-end option table shows no reachable state (flag, /d1 option, env,
+// pragma, PCH/IDE mode) moves an item between groups. Retail's standalone
+// 0x1e section between IsCDDrive's cell group and DriveSupports's text means
+// the track text was created by function-context codegen in the retail
+// source, which no file-scope pointer initializer can reference. The wall
+// carries a complete mechanism proof; the reviewed section split stands.

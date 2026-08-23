@@ -207,6 +207,17 @@
 // Draw (9), ordinary destructor (10). The compiler-generated COMDAT scheduler
 // is not keyed by the decorated name; renaming cannot move ??_G to the tail.
 
+// Matrix 15: mechanism closure (docs/compiler-re-allocation-order.md).
+//
+// C1XX RE plus probes m1/m2/d1/d2: the ??_7/??_G pair is generated eagerly
+// and atomically at the first vtable requirement, which a constructor always
+// is; moving the destructor definition (EOF or first) does not move the pair,
+// no option in the complete 103-record front-end table parameterises the
+// emission path, and no IDE-era (/Yu-derived) state reorders code emission.
+// Retail's pair after Draw means the constructors were not the first vtable
+// requirement in that compile - a state unreachable under the pinned front
+// end for this source. The wall now carries a complete mechanism proof.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved
