@@ -105,16 +105,16 @@ AIL_resume_sequence@4    AIL_sequence_status@4     AIL_set_sequence_loop_count@8
 (`call dword ptr [__imp__AIL_*@N]`, e.g. `.text:004013A3`), so `mss.h` decorates every
 function `extern "C" __declspec(dllimport) <ret> __stdcall AIL_*`.
 
-**Import-library form.** `imports/mss32.def` records the complete 137-name export
-surface, whose sorted positions reproduce every retail-used PE hint.  Correct names and
-hints are not sufficient for final-image matching: the VC6 short-import form and the
-older regular-COFF form have the same linked ABI but different contribution metadata.
+**Import-library form.** Retail itself records all 29 used decorated names and their
+PE hints. Correct names and hints are not sufficient for final-image matching: the VC6
+short-import form and the older regular-COFF form have the same linked ABI but different
+contribution metadata.
 The retail Rich-header census and a raw final-image A/B test select conventional regular
-i386 COFF members for Miles.  `homm2.build.regular_import_lib` emits that measured form,
-keeps the historical extra-decoration topology for unreferenced exports, and re-reads the
-finished archive to verify all 29 used hints.  Relative to the semantically equivalent
-short-import library, this changes no project-function placement and recovers 176 retail
-bytes in the final image when isolated.
+i386 COFF members for Miles. `homm2.build.regular_import_lib` emits that measured form,
+stores each retail hint directly in its used member, and re-reads the finished archive to
+verify all 29 records. No complete Miles export surface is a build input. Relative to the
+semantically equivalent short-import library, this changes no project-function placement
+and recovers 176 retail bytes in the final image when isolated.
 
 Smacker's nine ordinal members and NetBIOS's one named member use the same regular-COFF
 producer family.  Promoting all three vendor libraries changes the candidate Rich-header
@@ -244,13 +244,15 @@ This makes `#include <mss.h>`, `#include <smack.h>` and `#include <wing.h>` reso
 original toolchain's SDK dirs. These are **headers only** — never build units, and not in
 `config/units.toml`. `smack.h`'s `#include "rad.h"` resolves within the same vendor dir.
 
-The proprietary SDK import libraries are not stored in the repository.  The complete
-named-export surfaces needed for the retail hints live in `imports/audiere.def` and
-`imports/mss32.def`.  Audiere is synthesized through a throwaway DLL so VC6 produces its
-short-import library.  Miles, Smacker, and NetBIOS are synthesized directly as the
-measured conventional regular-COFF archives described above.  Thus the checked-in
-definition files are the durable inputs and every generated library remains a
-reproducible build product.
+The proprietary SDK import libraries are not stored in the repository. Audiere is
+synthesized through a throwaway DLL so VC6 produces its short-import library; disposable
+filler exports reproduce retail hints without reconstructing its complete export table.
+Miles stores retail-used names and hints directly in the measured conventional
+regular-COFF form. Smacker's ordinal-only imports, NetBIOS's decorated-caller alias, and
+WinG's caller/export aliases use small reviewed `.def`-syntax manifests because those
+relationships are not expressible by the named C-stub technique. They are reconstruction
+inputs, not a claim that the game developers linked an authored `.def` file. Every
+generated library remains a reproducible build product and is checked against retail.
 
 **Verification.** A scratch TU including all three headers alongside `Ints.h` and
 `win/windows.h` compiles cleanly under the pinned MSVC (no typedef clashes, all signatures parse)

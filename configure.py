@@ -100,7 +100,7 @@ def main():
                description="lib $out")
         w.rule("implib_stub",
                command=(f"{PY} -m homm2.build.import_lib --exe $in "
-                        "--dll $dll --definition $definition --out $out"),
+                        "--dll $dll --out $out"),
                description="stub-implib $dll")
         w.rule("legacy_implib",
                command=(f"{PY} -m homm2.build.legacy_import_lib "
@@ -108,7 +108,7 @@ def main():
                description="legacy-implib WING32.dll")
         w.rule("regular_implib",
                command=(f"{PY} -m homm2.build.regular_import_lib --exe $in "
-                        "--dll $dll --definition $definition --out $out"),
+                        "--dll $dll --out $out"),
                description="regular-implib $dll")
         w.rule("regular_vendor_implib",
                command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
@@ -258,11 +258,9 @@ def main():
                     "scripts/homm2/build/import_lib.py",
                     "scripts/homm2/build/link_exe.py",
                     "scripts/homm2/build/cc_wrap.py",
-                    f"imports/{name}.def",
                 ],
                 variables={
                     "dll": f"{name}.dll",
-                    "definition": f"imports/{name}.def",
                 },
             )
             import_outputs.append(output)
@@ -276,11 +274,9 @@ def main():
                 "scripts/homm2/build/legacy_import_lib.py",
                 "scripts/homm2/build/import_lib.py",
                 "scripts/homm2/build/link_exe.py",
-                "imports/mss32.def",
             ],
             variables={
                 "dll": "mss32.dll",
-                "definition": "imports/mss32.def",
             },
         )
         import_outputs.append(output)

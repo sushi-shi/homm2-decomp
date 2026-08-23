@@ -1,4 +1,4 @@
-; Miles Sound System 3.50F-compatible named export table, in PE hint order.
+; Analysis-only Miles-compatible export inventory; not a build or historical input.
 ; Retail hints prove the 3.50E table with the six legacy _FILE_*/_MEM_*
 ; exports renamed to their _AIL_file_*/_AIL_mem_* spellings.
 LIBRARY mss32.dll

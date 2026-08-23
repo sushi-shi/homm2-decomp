@@ -2,8 +2,9 @@ import struct
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
-from homm2.build.regular_import_lib import build_archive, read_definition
+from homm2.build.regular_import_lib import build_archive, generate, read_definition
 
 
 def archive_entries(data: bytes):
@@ -18,6 +19,20 @@ def archive_entries(data: bytes):
 
 
 class RegularImportLibraryTests(unittest.TestCase):
+    def test_retail_records_generate_archive_without_definition(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            output = Path(temp_name) / "vendor.lib"
+            hints = {"_Alpha@0": 7, "_Beta@4": 10}
+            with mock.patch(
+                "homm2.build.regular_import_lib.imported_hints",
+                return_value=hints,
+            ):
+                generate(Path("retail.exe"), "vendor.dll", output)
+            objects = list(archive_entries(output.read_bytes()))[2:]
+            self.assertEqual(len(objects), 5)
+            self.assertIn(b"\x07\0_Alpha@0\0", objects[3][1])
+            self.assertIn(b"\x0a\0_Beta@4\0", objects[4][1])
+
     def test_definition_requires_literal_decorated_named_exports(self):
         with tempfile.TemporaryDirectory() as temp_name:
             definition = Path(temp_name) / "vendor.def"

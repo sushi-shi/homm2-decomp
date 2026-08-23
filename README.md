@@ -106,7 +106,8 @@ homm2 format --check           # verify header and enum formatting
 ```
 
 The final link is opt-in, so object matching stays fast. Ninja generates the reviewed import
-libraries from the module-definition files under `imports/`, extracts the retail resources,
+libraries from retail import records plus the ordinal/alias manifests under `imports/`,
+extracts the retail resources,
 and invokes the pinned VC6 `LINK.EXE` with the reviewed object, archive-member, section, and
 COMMON topology. Deterministic semantic normalization then places the import tables, CRT tail,
 funclets, and VC6 debug metadata. The candidate and pre-normalization MAP are written to

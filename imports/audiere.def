@@ -1,4 +1,4 @@
-; Audiere 1.9.2 named export table, in PE hint order.
+; Analysis-only Audiere 1.9.2 export inventory; not a build or historical input.
 LIBRARY audiere.dll
 EXPORTS
 _AdrCreatePinkNoise@0

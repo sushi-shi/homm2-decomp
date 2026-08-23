@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Synthesize vendor import libraries through throwaway stub DLLs.
+"""Synthesize missing named import libraries through throwaway stub DLLs.
 
 ``LIB /DEF`` cannot represent an already-decorated DLL export faithfully: using
 the retail spelling adds an extra underscore to the public import symbol, while
 dropping that underscore changes the name stored in ``.idata$6``.  Compile real
-stub exports from reviewed module-definition files instead and keep the import
-library emitted by VC6 LINK.EXE.  The stub DLL, EXP, object, and generated C
-source are disposable build products.
+stub exports from the retail PE's import records instead and keep the import
+library emitted by Microsoft LINK.EXE.  Retail hint indices are reproduced by
+unreferenced filler exports in the stub DLL's sorted export-name table.  The
+stub DLL, EXP, object, and generated C source are disposable build products;
+no reconstruction of the vendor's complete export table is required.
 """
 
 from __future__ import annotations
@@ -31,6 +33,7 @@ from homm2.build.link_exe import RETAIL_EXE, read_imports
 
 STDCALL = re.compile(r"^_(?P<name>[A-Za-z_][A-Za-z0-9_]*)@(?P<bytes>\d+)$")
 PLAIN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+_IDENT = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
 
 
 def imported_hints(exe: Path, dll: str) -> dict[str, int]:
@@ -51,68 +54,6 @@ def imported_hints(exe: Path, dll: str) -> dict[str, int]:
 def imported_names(exe: Path, dll: str) -> list[str]:
     """Return the exact named imports for ``dll`` in retail IAT order."""
     return list(imported_hints(exe, dll))
-
-
-def export_names(path: Path, dll: str | None = None) -> list[str]:
-    """Read the complete named-export surface from a strict module definition."""
-    library = None
-    in_exports = False
-    names = []
-    for number, raw_line in enumerate(
-        path.read_text(encoding="ascii").splitlines(), start=1
-    ):
-        line = raw_line.split(";", 1)[0].strip()
-        if not line:
-            continue
-        keyword, _, value = line.partition(" ")
-        if keyword.upper() == "LIBRARY":
-            if library is not None or not value.strip():
-                raise ValueError(f"{path}:{number}: invalid LIBRARY directive")
-            library = value.strip()
-            continue
-        if keyword.upper() == "EXPORTS" and not value.strip():
-            in_exports = True
-            continue
-        if not in_exports:
-            raise ValueError(f"{path}:{number}: expected LIBRARY or EXPORTS")
-        if len(line.split()) != 1 or "=" in line:
-            raise ValueError(
-                f"{path}:{number}: only one literal export name is supported"
-            )
-        names.append(line)
-
-    if library is None:
-        raise ValueError(f"{path} has no LIBRARY directive")
-    if dll is not None and library.lower() != dll.lower():
-        raise ValueError(f"{path} defines {library}, expected {dll}")
-    if not in_exports or not names:
-        raise ValueError(f"{path} has no named EXPORTS")
-    duplicates = sorted({name for name in names if names.count(name) > 1})
-    if duplicates:
-        raise ValueError(f"{path} contains duplicate exports: {duplicates}")
-    return names
-
-
-def validate_export_hints(exe: Path, dll: str, exports: list[str]) -> None:
-    """Prove that a complete export table reproduces retail's named hints."""
-    imports = read_imports(exe)
-    entry = next((row for row in imports if row["dll"].lower() == dll.lower()), None)
-    if entry is None:
-        raise ValueError(f"{dll} is absent from the retail import table")
-    indices = {name: index for index, name in enumerate(sorted(exports))}
-    mismatches = []
-    for row in entry["symbols"]:
-        if "name" not in row:
-            continue
-        actual = indices.get(row["name"])
-        if actual != row["hint"]:
-            mismatches.append((row["name"], row["hint"], actual))
-    if mismatches:
-        details = ", ".join(
-            f"{name}: retail {expected}, table {actual}"
-            for name, expected, actual in mismatches
-        )
-        raise ValueError(f"{dll} export table does not reproduce retail hints: {details}")
 
 
 def verify_archive_hints(path: Path, expected: dict[str, int]) -> None:
@@ -195,13 +136,103 @@ def verify_archive_hints(path: Path, expected: dict[str, int]) -> None:
         )
 
 
-def stub_source(dll: str, names: list[str]) -> str:
-    """Generate C definitions whose VC6 export decoration equals retail."""
+def _gap_base(previous: str | None, current: str) -> str:
+    """Return an identifier base sorting strictly inside one export-name gap."""
+    ident = sorted(_IDENT)
+    if previous is None:
+        for index, char in enumerate(current):
+            lower = [candidate for candidate in ident if candidate < char]
+            if lower:
+                base = current[:index] + lower[-1]
+                if all(char in _IDENT for char in base):
+                    return base
+        raise ValueError(f"no filler export sorts below {current!r}")
+
+    index = 0
+    while (
+        index < len(previous)
+        and index < len(current)
+        and previous[index] == current[index]
+    ):
+        index += 1
+    if index >= len(current):
+        raise ValueError(f"invalid sorted export gap {previous!r} .. {current!r}")
+    middle = [
+        char
+        for char in ident
+        if (index >= len(previous) or char > previous[index])
+        and char < current[index]
+    ]
+    if middle:
+        base = previous[:index] + middle[0]
+    else:
+        tail = previous[index + 1] if index + 1 < len(previous) else ""
+        later = [char for char in ident if char > tail]
+        if not later:
+            raise ValueError(
+                f"no identifier filler fits export gap {previous!r} .. {current!r}"
+            )
+        base = previous[:index + 1] + later[0]
+    if not all(char in _IDENT for char in base) or not previous < base < current:
+        raise ValueError(
+            f"invalid filler {base!r} for export gap {previous!r} .. {current!r}"
+        )
+    return base
+
+
+def export_table(names: list[str], hints: dict[str, int]) -> list[tuple[str, bool]]:
+    """Build a sorted export table whose real names occupy retail hint indices."""
+    real = sorted(names)
+    ordered_hints = [hints[name] for name in real]
+    if ordered_hints != sorted(ordered_hints) or len(set(ordered_hints)) != len(
+        ordered_hints
+    ):
+        raise ValueError(
+            "retail hints are not ascending in sorted export-name order"
+        )
+
+    table: list[tuple[str, bool]] = []
+    previous = None
+    position = 0
+    for name, hint in zip(real, ordered_hints):
+        missing = hint - position
+        if missing < 0:
+            raise ValueError(f"retail hint {hint} for {name!r} precedes position")
+        if missing:
+            base = _gap_base(previous, name)
+            width = len(str(missing - 1))
+            fillers = [f"{base}{index:0{width}d}" for index in range(missing)]
+            if fillers != sorted(fillers) or fillers[-1] >= name:
+                raise ValueError(f"fillers do not fit before export {name!r}")
+            table.extend((filler, True) for filler in fillers)
+            position += missing
+        table.append((name, False))
+        previous = name
+        position += 1
+
+    flat = [name for name, _filler in table]
+    if any(left >= right for left, right in zip(flat, flat[1:])):
+        raise ValueError("generated export table is not strictly sorted")
+    return table
+
+
+def stub_source(
+    dll: str, names: list[str], hints: dict[str, int] | None = None
+) -> str:
+    """Generate C definitions with retail export spellings and hint indices."""
     lines = [
         f"/* Generated throwaway exports for {dll}. */",
         "/* The retail PE import names are authoritative. */",
     ]
-    for name in sorted(names):
+    table = (
+        export_table(names, hints)
+        if hints is not None and all(name in hints for name in names)
+        else [(name, False) for name in sorted(names)]
+    )
+    for name, filler in table:
+        if filler:
+            lines.append(f"__declspec(dllexport) void {name}(void) {{}}")
+            continue
         match = STDCALL.fullmatch(name)
         if match:
             nargs, remainder = divmod(int(match.group("bytes")), 4)
@@ -232,21 +263,17 @@ def synthesize(
     exe: Path,
     dll: str,
     output: Path,
-    definition_path: Path | None = None,
+    toolchain_path: Path | None = None,
 ) -> Path:
-    """Create ``output`` via VC6's linker-generated import library."""
+    """Create ``output`` via the selected Microsoft linker-generated library."""
     exe = exe.resolve()
     output = output.resolve()
     hints = imported_hints(exe, dll)
     imports = list(hints)
-    names = (
-        export_names(definition_path, dll)
-        if definition_path is not None
-        else imports
+    names = imports
+    toolchain = (
+        toolchain_path.resolve() if toolchain_path is not None else msvc_dir()
     )
-    if definition_path is not None:
-        validate_export_hints(exe, dll, names)
-    toolchain = msvc_dir()
     compiler = find_ci(toolchain / "bin", "cl.exe")
     linker = find_ci(toolchain / "bin", "link.exe")
     if compiler is None or linker is None:
@@ -265,7 +292,7 @@ def synthesize(
         obj = temp / f"{stem}_stub.obj"
         stub_dll = temp / dll
         implib = temp / f"{stem}.lib"
-        source.write_text(stub_source(dll, names), encoding="ascii")
+        source.write_text(stub_source(dll, names, hints), encoding="ascii")
 
         _run(
             [
@@ -298,7 +325,7 @@ def synthesize(
         output.write_bytes(implib.read_bytes())
     print(
         f"[import-lib] {dll}: {len(imports)} retail imports, "
-        f"{len(names)} stub exports -> {output}"
+        f"{len(export_table(names, hints))} padded stub exports -> {output}"
     )
     return output
 
@@ -309,13 +336,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dll", required=True)
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument(
-        "--definition",
+        "--toolchain",
         type=Path,
-        help="reviewed complete module definition used to reproduce retail hints",
+        help="Microsoft toolchain root; defaults to the pinned HoMM2 toolchain",
     )
     args = parser.parse_args(argv)
     try:
-        synthesize(args.exe, args.dll, args.out, args.definition)
+        synthesize(args.exe, args.dll, args.out, args.toolchain)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"[import-lib] ERROR: {error}", file=sys.stderr)
         return 1

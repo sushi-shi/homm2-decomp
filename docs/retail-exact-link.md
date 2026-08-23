@@ -1,7 +1,7 @@
 # Retail-exact final link
 
 `homm2 link` reconstructs `build/link/HMM2PL.exe` from the current candidate
-objects, reviewed import definitions, the pinned VC6 SP5 libraries, and the
+objects, retail-derived import records, the pinned VC6 SP5 libraries, and the
 retail resource tree. The strict audit fails if any byte differs from
 `build/orig/HMM2PL.exe`.
 
@@ -36,10 +36,14 @@ treating all semantically equivalent COFF as interchangeable:
 - The source and CRT `.bss`, `.data`, `.rdata`, COMMON, OMF-converted, and
   selected COMDAT contributions are adapted in disposable final-link copies.
   Candidate object payloads and relocations remain the source of linked data.
-- Audiere uses the VC6 short-import form. Miles, Smacker, and NetBIOS use the
-  measured regular-COFF form. WinG uses its older reviewed form. The `.def`
-  files remain the semantic export ledgers; generated archives verify used
-  names, ordinals, and hints against the retail import table.
+- Audiere uses the VC6 short-import form. Gruntz-style disposable filler exports
+  place the two retail-used names at their retail hint indices, so no complete
+  Audiere export table is a build input. Miles embeds the 29 retail-used names
+  and hints directly in the measured regular-COFF form, likewise without a full
+  export table. Smacker's ordinal-only imports and WinG's caller/export aliases
+  still use reviewed `.def`-syntax manifests; these reconstruct the required
+  import-library interface and are not evidence that the developers authored a
+  `.def` file. Generated archives are checked back against the retail import table.
 - `normalize_imports` places candidate DLL names, hint/name records, ILT slots,
   and IAT slots by semantic import identity, then retargets candidate references.
 - `normalize_text` places candidate-authored import thunks, selected CRT tail

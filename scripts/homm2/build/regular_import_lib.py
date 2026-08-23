@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Generate a pre-short-record named import library from a reviewed DEF file.
+"""Generate a pre-short-record named import library from retail import records.
 
 VC6 emits compact ``IMPORT_OBJECT_HEADER`` members.  Some retail vendor
 libraries instead contain ordinary i386 COFF objects for every import.  The
 linked ABI is the same, but LINK's contribution and Rich-header accounting are
-not.  This generator preserves the complete DEF export surface and the retail
-PE's used hint values while emitting only the documented regular-COFF form.
+not.  The retail PE supplies every used decorated name and hint, which can be
+stored directly in the member's ``.idata$6`` contribution.  No complete vendor
+export table or historical ``.def`` file is claimed.
 """
 
 from __future__ import annotations
@@ -444,24 +445,31 @@ def build_archive(
     return build_named_specs_archive(dll, specs, hints, exact_public)
 
 
-def generate(exe: Path, dll: str, definition: Path, output: Path) -> Path:
-    definition_dll, exports = read_definition(definition, dll)
+def generate(exe: Path, dll: str, output: Path) -> Path:
+    """Generate the measured regular-COFF form from retail-used imports only."""
     expected = imported_hints(exe, dll)
-    export_hints = {name: index for index, name in enumerate(sorted(exports))}
-    mismatches = {
-        name: (hint, export_hints.get(name))
-        for name, hint in expected.items()
-        if export_hints.get(name) != hint
-    }
-    if mismatches:
-        raise ValueError(f"{definition}: retail hint mismatch: {mismatches}")
+    specs = []
+    for name in sorted(expected):
+        match = STDCALL.fullmatch(name)
+        if match is None:
+            raise ValueError(f"{dll}: expected _stdcall@bytes import, got {name!r}")
+        specs.append(
+            ExportSpec(
+                lookup=name,
+                caller=name,
+                argument_bytes=int(match.group("bytes")),
+                ordinal=expected[name] + 1,
+            )
+        )
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_bytes(build_archive(definition_dll, exports, set(expected)))
+    output.write_bytes(
+        build_named_specs_archive(dll, specs, expected, set(expected))
+    )
     verify_archive_hints(output, expected)
     print(
         f"[regular-implib] {dll}: {len(expected)} retail imports, "
-        f"{len(exports)} named exports -> {output}"
+        f"retail hints embedded directly -> {output}"
     )
     return output
 
@@ -470,11 +478,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, default=RETAIL_EXE)
     parser.add_argument("--dll", required=True)
-    parser.add_argument("--definition", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
     try:
-        generate(args.exe, args.dll, args.definition, args.out)
+        generate(args.exe, args.dll, args.out)
     except (OSError, ValueError) as error:
         print(f"[regular-implib] ERROR: {error}", file=sys.stderr)
         return 1

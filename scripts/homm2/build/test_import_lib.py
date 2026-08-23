@@ -4,10 +4,9 @@ from pathlib import Path
 from unittest import mock
 
 from homm2.build.import_lib import (
-    export_names,
+    export_table,
     imported_names,
     stub_source,
-    validate_export_hints,
     verify_archive_hints,
 )
 
@@ -66,6 +65,26 @@ class ImportLibraryTests(unittest.TestCase):
         self.assertIn("void PlainExport(void) {}", source)
         self.assertNotIn("__stdcall PlainExport", source)
 
+    def test_retail_hints_are_reproduced_with_unreferenced_fillers(self):
+        hints = {
+            "_AIL_shutdown@0": 2,
+            "_AIL_startup@0": 5,
+        }
+        table = export_table(list(hints), hints)
+        self.assertEqual(
+            [index for index, (name, filler) in enumerate(table) if not filler],
+            [2, 5],
+        )
+        source = stub_source("mss32.dll", list(hints), hints)
+        self.assertIn("void __stdcall AIL_shutdown(void) {}", source)
+        self.assertIn("void __stdcall AIL_startup(void) {}", source)
+        self.assertEqual(source.count("__declspec(dllexport)"), 6)
+
+    def test_non_monotonic_retail_hints_are_rejected(self):
+        hints = {"_AIL_shutdown@0": 5, "_AIL_startup@0": 2}
+        with self.assertRaisesRegex(ValueError, "not ascending"):
+            export_table(list(hints), hints)
+
     def test_imported_names_preserve_retail_decoration(self):
         imports = [{
             "dll": "mss32.dll",
@@ -76,49 +95,6 @@ class ImportLibraryTests(unittest.TestCase):
                 imported_names(Path("retail.exe"), "MSS32.DLL"),
                 ["_AIL_startup@0"],
             )
-
-    def test_complete_export_table_reproduces_retail_hints(self):
-        imports = [{
-            "dll": "audiere.dll",
-            "symbols": [
-                {"name": "_AdrOpenDevice@8", "hint": 1},
-                {"name": "_AdrOpenSampleSource@4", "hint": 2},
-            ],
-        }]
-        exports = [
-            "_AdrGetVersion@0",
-            "_AdrOpenDevice@8",
-            "_AdrOpenSampleSource@4",
-        ]
-        with mock.patch("homm2.build.import_lib.read_imports", return_value=imports):
-            validate_export_hints(Path("retail.exe"), "audiere.dll", exports)
-
-    def test_reads_module_definition(self):
-        definition = mock.mock_open(read_data=(
-            "; complete table\n"
-            "LIBRARY audiere.dll\n"
-            "EXPORTS\n"
-            "    _AdrOpenDevice@8\n"
-            "    _AdrOpenSampleSource@4 ; recovered name\n"
-        ))
-        with mock.patch.object(Path, "open", definition):
-            self.assertEqual(
-                export_names(Path("audiere.def"), "AUDIERE.DLL"),
-                ["_AdrOpenDevice@8", "_AdrOpenSampleSource@4"],
-            )
-
-    def test_incorrect_export_hint_is_rejected(self):
-        imports = [{
-            "dll": "audiere.dll",
-            "symbols": [{"name": "_AdrOpenDevice@8", "hint": 10}],
-        }]
-        with mock.patch("homm2.build.import_lib.read_imports", return_value=imports):
-            with self.assertRaisesRegex(ValueError, "does not reproduce retail hints"):
-                validate_export_hints(
-                    Path("retail.exe"),
-                    "audiere.dll",
-                    ["_AdrOpenDevice@8"],
-                )
 
     def test_produced_archive_hint_is_verified(self):
         archive = self.archive_with_hint("_AIL_startup@0", 126)
