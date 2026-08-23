@@ -85,6 +85,11 @@ emits no alternate destructor/vtable copy. The unusual retail placement is also
 not a family rule: fourteen other BASE scalar deleting destructors reproduce the
 ordinary constructor-adjacent position.
 
+An unchanged-source census added 50 varied declaration-forest states under the
+real `/Gy` final-link topology. All 50 preserved the exact same early deleting-
+destructor order while keeping every DIMMER body and ordered-relocation fingerprint
+exact. The retained evidence is recorded in the DIMMER matching ledger.
+
 No tested authentic source or compiler-state arm emits the complete retail order.
 The source therefore retains the semantically correct form; no `/ORDER` file,
 synthetic root, padding function, or vtable patch is used.

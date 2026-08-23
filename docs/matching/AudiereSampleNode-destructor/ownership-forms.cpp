@@ -34,6 +34,25 @@
 // VC6 exposes/inlines the explicit definition. Rejected as a semantic-codegen
 // contradiction, not merely a lower fuzzy score.
 
+// Arm 3: Gruntz-style next-TU first-definer ownership.
+//
+// Declaring the destructor in soundBackends.h but defining it at the start of
+// AudiereMusic.cpp puts its exact 0x2c contribution at retail RVA 0x004cd050 and
+// makes AudiereMusic object-exact.  However, PlayAudiereSample changes to 95.10432%
+// and gains a REL32 call to the now non-inline destructor (41 candidate relocation
+// references versus 39 retail).  Retail therefore requires the implicit/inlinable
+// ownership visible to AudiereEffects; the physically attractive next-TU owner is
+// rejected by code and relocation evidence.
+
+// Unchanged-source compiler-state census:
+//
+//   build/link/audiere-comdat-state-census/results.json
+//   50 declaration-forest trials, insertion=top, seed=0x41554449
+//
+// All 50 compiled in the same relative orbit.  The node destructor was section 7;
+// the three retail-predecessor RefPtr helpers were sections 8, 9, and 10.  No trial
+// moved the destructor after them.
+
 // Disposition: retain the authentic implicit destructor and classify its final-link
 // COMDAT position as an original object/compiler ownership wall. No explicit dtor,
 // source padding, /ORDER directive, or synthetic linker root is retained.

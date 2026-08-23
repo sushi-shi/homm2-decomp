@@ -59,6 +59,17 @@
 // placement is reproduced by the candidate link; DIMMER is the exceptional
 // tail-placed wrapper, so this is not a general VC6/LIBCMT address shift.
 
+// Matrix 5: unchanged-source compiler-state census.
+//
+//   build/link/dimmer-comdat-state-census/results.json
+//   50 declaration-forest trials, insertion=top, seed=0x44494d4d, /Gy retained
+//
+// All 50 compiled.  Every one emitted the same relative section order:
+// default constructor (3), deleting destructor (5), argument constructor (6),
+// Read (7), Main (8), Draw (9), ordinary destructor (10).  All seven section
+// payload/ordered-relocation fingerprints remained exact.  No state put ??_G
+// after Draw, so the candidate orbit is invariant across the bounded census.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved
