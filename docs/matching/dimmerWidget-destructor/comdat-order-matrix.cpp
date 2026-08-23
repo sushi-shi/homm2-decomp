@@ -70,6 +70,13 @@
 // payload/ordered-relocation fingerprints remained exact.  No state put ??_G
 // after Draw, so the candidate orbit is invariant across the bounded census.
 
+// Matrix 6: automatic PCH state.
+//
+//   build/link/project-flag-probes/dimmer-yx/DIMMER.obj
+//
+// VC6 SP5 /YX preserves the baseline section and symbol order, including the
+// deleting destructor immediately after the first constructor.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved

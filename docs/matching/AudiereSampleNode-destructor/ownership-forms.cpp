@@ -53,6 +53,14 @@
 // the three retail-predecessor RefPtr helpers were sections 8, 9, and 10.  No trial
 // moved the destructor after them.
 
+// Project-flag probe:
+//
+//   build/link/project-flag-probes/audiere-yx/AudiereEffects.obj
+//
+// Compiling the unchanged TU with VC6 SP5 /YX preserves the same destructor,
+// RefPtr-helper, and static-exit-helper section order.  Automatic PCH state does
+// not expose the retail orbit.
+
 // Disposition: retain the authentic implicit destructor and classify its final-link
 // COMDAT position as an original object/compiler ownership wall. No explicit dtor,
 // source padding, /ORDER directive, or synthetic linker root is retained.
