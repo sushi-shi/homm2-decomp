@@ -24,6 +24,19 @@ def archive_objects(data: bytes):
     return objects
 
 
+def coff_section_data(data: bytes, expected_name: str) -> bytes:
+    section_count = struct.unpack_from("<H", data, 2)[0]
+    optional_size = struct.unpack_from("<H", data, 16)[0]
+    section_offset = 20 + optional_size
+    for index in range(section_count):
+        offset = section_offset + index * 40
+        name = data[offset : offset + 8].rstrip(b"\0").decode("ascii")
+        if name == expected_name:
+            size, raw_offset = struct.unpack_from("<II", data, offset + 16)
+            return data[raw_offset : raw_offset + size]
+    raise AssertionError(f"missing COFF section {expected_name}")
+
+
 class RegularVendorImportLibraryTests(unittest.TestCase):
     def test_ordinal_definition_emits_immediate_ordinal_thunks(self):
         with tempfile.TemporaryDirectory() as temp_name:
@@ -72,7 +85,9 @@ class RegularVendorImportLibraryTests(unittest.TestCase):
                     180,
                 )
             thunk = archive_objects(output.read_bytes())[3]
-            self.assertIn(b"\xb4\0Netbios\0", thunk)
+            self.assertEqual(
+                coff_section_data(thunk, ".idata$6"), b"\xb4\0Netbios\0"
+            )
             self.assertIn(b"_Netbios@4\0", thunk)
             self.assertIn(b"__imp__Netbios@4\0", thunk)
 

@@ -198,10 +198,6 @@ def _function_object(
     lookup = struct.pack("<H", hint) + spec.lookup.encode("ascii") + b"\0"
     if len(lookup) & 1:
         lookup += b"\0"
-    if patched and spec.lookup != spec.caller:
-        generated_size = 2 + len(spec.caller) + 1
-        generated_size += generated_size & 1
-        lookup = lookup.ljust(generated_size, b"\0")
 
     header_size = 20 + 4 * 40
     text_raw = header_size
