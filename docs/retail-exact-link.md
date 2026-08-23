@@ -31,11 +31,9 @@ reconstructed project objects, three project archives, generated import
 libraries, stock VC6 libraries, and the reconstructed resource object. There is
 no `/ORDER` file, synthetic executable padding, or post-link PE normalizer.
 
-Most link inputs are untouched compiler or assembler outputs. Four provenance
+Most link inputs are untouched compiler or assembler outputs. Three provenance
 residuals remain explicit rather than being mistaken for recovered source:
 
-- `SOURCE/REQUEST` uses a disposable COFF copy that rotates six distinct
-  one-byte empty-string cells into their retail physical order.
 - `BASE/Misc` uses a disposable COFF copy that separates the Buka track-name
   literal into its retail contribution position.
 - `BASE/AudiereEffects` and `BASE/DIMMER` use disposable copies with one
@@ -43,6 +41,14 @@ residuals remain explicit rather than being mistaken for recovered source:
 These are object-input reconstruction debts, not executable
 transformations. Removing them through credible source or archive ownership is
 the remaining provenance campaign.
+
+`SOURCE/REQUEST` formerly carried a fourth adapter rotating its six one-byte
+empty-string cells. It links as the raw compiled object now: SEARCH owns the
+cFRDummy backing byte as a one-byte selectany BSS COMDAT that untouched LINK
+places at retail 0x00533d98 directly after REQUEST's natural 0x1d-byte
+ordinary BSS run. See
+`docs/matching/fileRequester-cFRDummy/ownership-topology.cpp` for the measured
+closure and the provenance caveat on that ownership pair.
 
 The early operator-delete owner is no longer reconstructed. The response scans
 the untouched SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock
