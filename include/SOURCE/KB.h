@@ -713,6 +713,7 @@ extern u8* mapExtra;
 #define MAP_EXTRA_AT(column, row)        (*(mapExtra + column + (row) * MAP_WIDTH))
 #define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
 extern tag_tilePoint normalDirTable[];
+extern u8 giSetupGameType;
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;

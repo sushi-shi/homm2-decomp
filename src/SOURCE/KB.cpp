@@ -1,4 +1,5 @@
 #include <va.h>
+#include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
@@ -15,7 +16,6 @@
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/HERO.h>
-#include <SOURCE/KB.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/Netbios.h>
@@ -30,7 +30,6 @@
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
 #include <BASE/sample.h>
-#include <SOURCE/KB.h>
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
