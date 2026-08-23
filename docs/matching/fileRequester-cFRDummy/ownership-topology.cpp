@@ -156,3 +156,32 @@
 // The extra C object also carries its own 0x000a2306 compiler record. A C
 // tentative definition therefore supplies neither the required placement nor
 // the retail producer census and is rejected.
+
+// Initializer-spelling and lexical closure (2026-08-23):
+//
+//   build/link/request-init-spelling/results.json
+//   build/link/request-local-static/results.json
+//   build/link/incremental-initializer-edit/results.json
+//
+// The direct definition already sits after every function, and the compiled
+// $SG numbering proves parse order is lexical while placement is batch-sorted:
+// VC6 materializes every global-initializer literal cell, even for dynamic
+// initializers (ternary/comma arms) and folded expressions ("" + 0, &""[0]),
+// in a pre-codegen batch ahead of all function cells. A GetFilename-local
+// static puts the cell at retail +0x20 but drags the pointer to .data +0x244.
+// Real /Zi /Gm /Gi histories that change only the initializer type ("-" or
+// NULL to "") fully re-lay out on the transition compile. No single-TU state
+// reaches the early-pointer/late-cell pair.
+//
+// ADOPTED (2026-08-24, adapter-elimination directive): the measured-exact
+// cross-TU ownership pair is now production source. REQUEST declares
+// `struct cFRDummyStorageOwner { static char storage[1]; };` and initializes
+// cFRDummy from it; SEARCH defines the one-byte member as a selectany BSS
+// COMDAT claimed at DATA(0x00533d98). LINK places REQUEST's natural 0x1d-byte
+// ordinary BSS run at 0x00533d78 and selects SEARCH's COMDAT at 0x00533d98;
+// the four-pass link reproduces the retail SHA-256 with the raw compiled
+// REQUEST object, and the batch_bss rotation adapter is removed from
+// exact_link/plain.py. The provenance caveat above stands: the owner class is
+// a placement vehicle, not recovered developer source. It is retained because
+// it is the only measured state that realizes the retail identity rotation
+// with untouched compiler objects and untouched LINK.EXE.

@@ -1238,7 +1238,10 @@ char* fileRequester::GetFilename(void) {
 
 
 DATA(0x00516adc) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-DATA(0x00516ae0) char* cFRDummy = "";
+struct cFRDummyStorageOwner {
+    static char storage[1];
+};
+DATA(0x00516ae0) char* cFRDummy = cFRDummyStorageOwner::storage;
 DATA(0x00533d78) float fGutterMinY;
 DATA(0x00533d7c) float fGutterTravelLength;
 DATA(0x00533d80) i32 iMaxListSize;

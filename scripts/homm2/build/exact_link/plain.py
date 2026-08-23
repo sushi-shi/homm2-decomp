@@ -13,7 +13,6 @@ import hashlib
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 from .adapt_misc_data import adapt as adapt_misc_data
@@ -46,10 +45,13 @@ def relative(path: Path) -> str:
 
 
 def run(command: list[str], *, log: Path | None = None) -> None:
+    # The historical LINK_TIMES strings are UTC; faketime reads them in the
+    # ambient timezone, so pin TZ or the PE/PDB stamps shift with the machine.
     completed = subprocess.run(
         command,
         cwd=ROOT,
         text=True,
+        env={**os.environ, "TZ": "UTC0"},
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
@@ -64,22 +66,11 @@ def run(command: list[str], *, log: Path | None = None) -> None:
 
 
 def prepare_request() -> Path:
-    run(
-        [
-            sys.executable,
-            "-m",
-            "homm2.build.exact_link.batch_bss",
-            "--owner",
-            "SOURCE",
-            "--unit",
-            r"SOURCE\REQUEST.c",
-            "--previous-end",
-            "0x133d78",
-        ]
-    )
-    output = LINK_ROOT / "bss-layout-all/SOURCE/REQUEST.obj"
+    # The cFRDummy backing byte is owned by SEARCH's selectany COMDAT, so the
+    # compiled REQUEST object links unmodified.
+    output = ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
     if not output.exists():
-        raise RuntimeError(f"REQUEST final-link object was not produced: {output}")
+        raise RuntimeError(f"REQUEST final-link object is missing: {output}")
     return output
 
 
