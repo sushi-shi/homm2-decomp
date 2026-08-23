@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 from .adapt_misc_data import adapt as adapt_misc_data
-from .crt_order import archive_names, ninja_link_args
+from .crt_order import ninja_link_args
 
 
 ROOT = next(
@@ -28,6 +28,7 @@ TOOLCHAIN = ROOT / "build/toolchain/msvc"
 LINK_EXE = TOOLCHAIN / "bin/LINK.EXE"
 LIB_EXE = TOOLCHAIN / "bin/LIB.EXE"
 LIBCMT = TOOLCHAIN / "lib/LIBCMT.LIB"
+MSVCPRT = TOOLCHAIN / "lib/MSVCPRT.LIB"
 RETAIL = ROOT / "build/orig/HMM2PL.exe"
 RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
 PDB_WINDOWS_PATH = r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb"
@@ -116,32 +117,8 @@ def prepare_misc_prefix_library() -> Path:
     return output
 
 
-def prepare_delete_library() -> Path:
-    matches = archive_names().get("delete.obj", [])
-    if len(matches) != 1:
-        raise RuntimeError(f"expected one stock LIBCMT delete.obj, got {matches}")
-    object_path = LINK_ROOT / "plain-inputs/delete.obj"
-    object_path.parent.mkdir(parents=True, exist_ok=True)
-    object_path.write_bytes(
-        subprocess.check_output(["llvm-ar", "p", LIBCMT, matches[0]], cwd=ROOT)
-    )
-    output = LINK_ROOT / "plain-inputs/runtime-delete.lib"
-    output.unlink(missing_ok=True)
-    run(
-        [
-            "wine",
-            str(LIB_EXE),
-            "/NOLOGO",
-            "/MACHINE:IX86",
-            "/OUT:" + relative(output),
-            relative(object_path),
-        ]
-    )
-    return output
-
-
 def final_inputs(
-    configured: list[str], request: Path, base_prefix: Path, delete_library: Path
+    configured: list[str], request: Path, base_prefix: Path
 ) -> list[str]:
     first_source = configured.index("build/objdiff/base/SOURCE/ADVMGR.obj")
     first_base = configured.index("build/link/BASE-prefix.lib")
@@ -171,7 +148,7 @@ def final_inputs(
         relative(base_prefix),
         "build/link/Midi.lib",
         "build/link/BASE-suffix.lib",
-        relative(delete_library),
+        "MSVCPRT.LIB",
         "LIBCMT.LIB",
         "build/link/HMM2PL.res",
     ]
@@ -197,7 +174,7 @@ def prepare_historical_pdb() -> Path:
 
 
 def main() -> int:
-    for tool in (LINK_EXE, LIB_EXE, LIBCMT, RETAIL):
+    for tool in (LINK_EXE, LIB_EXE, LIBCMT, MSVCPRT, RETAIL):
         if not tool.exists():
             raise RuntimeError(f"required exact-link input is missing: {tool}")
     if hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
@@ -208,8 +185,7 @@ def main() -> int:
 
     request = prepare_request()
     base_prefix = prepare_misc_prefix_library()
-    delete_library = prepare_delete_library()
-    inputs = final_inputs(ninja_link_args(), request, base_prefix, delete_library)
+    inputs = final_inputs(ninja_link_args(), request, base_prefix)
     prepare_historical_pdb()
 
     output = LINK_ROOT / "HMM2PL.exe"

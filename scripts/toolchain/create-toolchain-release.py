@@ -12,6 +12,8 @@ It does not ship a file called `c2.dll`. It carries four back ends, one per VC6
 edition, stored under unrelated names and renamed on install by `sp598ent.inf`;
 `sp598ent.stf` chooses between them by probing which edition is already present.
 The Enterprise one - the one this target was built with - is `msvcep.dll`.
+The SP5 cabinet tree also supplies both runtime archives whose distinct scan
+boundaries are visible in the retail image: `LIBCMT.LIB` and `MSVCPRT.LIB`.
 
 The base disc needs one thing done to it as well. It carries a single ISO 9660
 primary volume descriptor and no supplementary one, so every name on it is 8.3
@@ -71,7 +73,8 @@ ARTIFACTS = {
     "bin/CVTRES.EXE": "83b602ed8e69e979fc9557f482a4a4c6c9a97b4ad67b879aedeacd2b09e5b20b",
     "bin/ML.EXE":     "94595b9ccc09dbcaf6b877aa11a35576f78de2ab0eb39546abfde430b79dce2f",
     "bin/ML.ERR":     "092755d3a488767da3de277c141be7c8144110a156cdbd8ae1391eba64697cee",
-    "lib/LIBCMT.LIB": "28b9f04962378ec4668072f37d7fd2835cd6cacc17b40cf22002c57bd8e76714",
+    "lib/LIBCMT.LIB":  "28b9f04962378ec4668072f37d7fd2835cd6cacc17b40cf22002c57bd8e76714",
+    "lib/MSVCPRT.LIB": "f4c7ed305aea04cc8ca105abb43202abaaa8bd58a7fb2fdb1c325432f0e1ed03",
 }
 
 MASM_DISK_MD5 = "bb1f36e70d67720fa63356010b07c992"
@@ -256,7 +259,8 @@ def build(work: Path, disc: Path, sp5: Path, masm_disk: Path) -> Path:
     log("overlaying the SP5 components")
     for name in SP5_BIN:
         shutil.copy2(find(sp5tree / "vc98", name), tree / "bin" / name.upper())
-    shutil.copy2(find(sp5tree / "vc98", "libcmt.lib"), tree / "lib" / "LIBCMT.LIB")
+    for name in ("libcmt.lib", "msvcprt.lib"):
+        shutil.copy2(find(sp5tree / "vc98", name), tree / "lib" / name.upper())
 
     log(f"installing the Enterprise back end from {BACK_END_ALIAS}")
     shutil.copy2(find(sp5tree, BACK_END_ALIAS), tree / "bin" / "C2.DLL")

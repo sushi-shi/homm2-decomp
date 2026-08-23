@@ -12,6 +12,7 @@ def _tree(root: Path, cl=True):
     (root / "msvc" / "bin").mkdir(parents=True)
     if cl:
         (root / "msvc" / "bin" / "CL.EXE").write_bytes(b"MZ")
+        (root / "msvc" / "bin" / "ML.EXE").write_bytes(b"MZ")
     return root
 
 

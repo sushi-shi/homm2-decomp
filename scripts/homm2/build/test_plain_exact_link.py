@@ -19,9 +19,7 @@ class PlainExactLinkTests(unittest.TestCase):
         ]
         request = plain.ROOT / "build/link/bss-layout-all/SOURCE/REQUEST.obj"
         prefix = plain.ROOT / "build/link/plain-inputs/BASE-prefix.lib"
-        delete = plain.ROOT / "build/link/plain-inputs/runtime-delete.lib"
-
-        result = plain.final_inputs(configured, request, prefix, delete)
+        result = plain.final_inputs(configured, request, prefix)
 
         self.assertEqual(
             result[:3],
@@ -40,7 +38,7 @@ class PlainExactLinkTests(unittest.TestCase):
                 "build/link/plain-inputs/BASE-prefix.lib",
                 "build/link/Midi.lib",
                 "build/link/BASE-suffix.lib",
-                "build/link/plain-inputs/runtime-delete.lib",
+                "MSVCPRT.LIB",
                 "LIBCMT.LIB",
                 "build/link/HMM2PL.res",
             ],
@@ -59,7 +57,7 @@ class PlainExactLinkTests(unittest.TestCase):
         ]
         path = plain.ROOT / "build/link/probe.obj"
         with self.assertRaisesRegex(RuntimeError, "unexpected configured final-link tail"):
-            plain.final_inputs(configured, path, path, path)
+            plain.final_inputs(configured, path, path)
 
 
 if __name__ == "__main__":

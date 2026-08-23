@@ -374,8 +374,8 @@ def main():
             # order backwards so each archive scans forwards.
             w.build(library, "archive", inputs=list(reversed(members)))
             base_libraries.append(library)
-        # The plain-link driver consumes this stock runtime scan after preparing
-        # the still-open delete.obj archive-ownership residual.
+        # The plain-link driver places the SP5 MSVCPRT scan before this ordinary
+        # LIBCMT scan so the retail operator-delete owner resolves first.
         runtime_delete_scan = "LIBCMT.LIB"
         link_args = (link_libraries + source_objects + base_libraries
                      + [runtime_delete_scan, resource_output])
@@ -388,6 +388,7 @@ def main():
                     "config/retail_crt_order.txt",
                     "build/gen/delink_data_from_source.tsv",
                     "build/toolchain/msvc/lib/LIBCMT.LIB",
+                    "build/toolchain/msvc/lib/MSVCPRT.LIB",
                 ] + base_symbol_sidecars),
                 variables={"link_args": " ".join(link_args)})
         link_audit_outputs = [

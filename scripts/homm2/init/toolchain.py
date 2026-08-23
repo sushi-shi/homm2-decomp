@@ -40,7 +40,7 @@ RELEASE_TAG = "toolchain-vc6-sp5"
 ASSET = "homm2-toolchain-vc6-sp5.tar.xz"
 # The gate: a tarball that does not hash to this is not the toolchain, whatever
 # the release page says.
-ASSET_SHA256 = "c89aa4d835d63a9ce30576c05e8bf5ff1e5b0070c75b9376b6901ab0b3a6a360"
+ASSET_SHA256 = "763ec9c593269e30189a13209ff18fe4f0666d0774a629544c5e2c2c76e67957"
 
 # One component, and the archive has no wrapping directory - its top level IS
 # msvc/, so it unpacks with no --strip-components. An older toolchain release shipped two

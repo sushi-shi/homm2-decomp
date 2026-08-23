@@ -24,7 +24,8 @@ let
   #   size 136,410,832 bytes
   #   sha1 6af12fb3e2c7c271be67c9c9833c63b82bb7b9bf
   # Supplies every updated component, including the back end - which it stores
-  # as os\system\msvcep.dll and renames to c2.dll on install. SHA-1 is the
+  # as os\system\msvcep.dll and renames to c2.dll on install - plus the SP5
+  # LIBCMT.LIB and MSVCPRT.LIB used by the exact retail link. SHA-1 is the
   # strongest digest archive.org publishes for an original file; the extracted
   # artifacts have pinned SHA-256s in create-toolchain-release.py and are a
   # mandatory second verification layer.

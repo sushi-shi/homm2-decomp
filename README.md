@@ -146,8 +146,8 @@ nix-shell scripts/toolchain/create-toolchain-release.nix     # pins all three me
 scripts/toolchain/create-toolchain-release.py --check build/toolchain/msvc
 ```
 
-Nine artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
-`LINK.EXE`, `CVTRES.EXE`, `ML.EXE`, `ML.ERR`, `LIBCMT.LIB` - and the assembled compiler
+Ten artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
+`LINK.EXE`, `CVTRES.EXE`, `ML.EXE`, `ML.ERR`, `LIBCMT.LIB`, `MSVCPRT.LIB` - and the assembled compiler
 must stamp the target's own `@comp.id` before a tarball is written. `clang`/`clangd` is
 editor tooling only; the Wine VC6 build is the sole verdict on a match.
 

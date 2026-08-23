@@ -31,7 +31,7 @@ reconstructed project objects, three project archives, generated import
 libraries, stock VC6 libraries, and the reconstructed resource object. There is
 no `/ORDER` file, synthetic executable padding, or post-link PE normalizer.
 
-Most link inputs are untouched compiler or assembler outputs. Five provenance
+Most link inputs are untouched compiler or assembler outputs. Four provenance
 residuals remain explicit rather than being mistaken for recovered source:
 
 - `SOURCE/REQUEST` uses a disposable COFF copy that rotates six distinct
@@ -40,15 +40,16 @@ residuals remain explicit rather than being mistaken for recovered source:
   literal into its retail contribution position.
 - `BASE/AudiereEffects` and `BASE/DIMMER` use disposable copies with one
   compiler-generated destructor COMDAT moved to the retail section order.
-- An ordinary one-member archive, made by VC6 `LIB.EXE`, supplies the untouched
-  stock `LIBCMT.LIB` `delete.obj` during the first runtime scan. A later scan of
-  the unmodified stock archive resolves the other 177 selected runtime members.
-  This reproduces the retail Rich producer order, but the original library that
-  owned the first `delete.obj` pull is not yet known.
-
-These are object/library-input reconstruction debts, not executable
+These are object-input reconstruction debts, not executable
 transformations. Removing them through credible source or archive ownership is
 the remaining provenance campaign.
+
+The early operator-delete owner is no longer reconstructed. The response scans
+the untouched SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock
+`delop_s.obj` supplies the retail 11-byte body, `_free` relocation, and
+`0x000b1f6f` compiler identity. The later untouched `LIBCMT.LIB` scan resolves
+the other 177 selected runtime members. Both archives come directly from the
+same pinned SP5 cabinet chain used to assemble the compiler and linker.
 
 Gruntz's independently reversed LINK contribution model agrees with the local
 probes: LINK appends whole object contributions and can only relocate a duplicate

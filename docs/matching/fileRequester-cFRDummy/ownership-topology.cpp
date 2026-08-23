@@ -82,3 +82,20 @@
 // only to steer COFF placement.  The exact probe proves that ordinary LINK can
 // realize the retail topology and narrows the residual to original ownership;
 // it does not license a fake class/global in production source.
+
+// Same-TU compiler-generated COMDAT matrix:
+//
+//   build/link/request-natural-comdat/results.json
+//
+// Four ordinary C++ ownership forms were measured both before and after the
+// named REQUEST BSS definitions: an initialized __declspec(selectany) array, a
+// template static-data member, and a class-static selectany definition (the
+// uninitialized selectany spelling is rejected by VC6).  All six compiling arms
+// produce the same linked SHA-256
+// 406939f12fdb055b21cb4c8359195d183f9cbf5b98f9178da10b63d261b686c3.
+// VC6 emits their one-byte BSS COMDAT before REQUEST's 0x1d-byte ordinary BSS
+// contribution regardless of lexical definition order.  That shifts 41 retail
+// BSS references by four bytes and leaves the backing cell at the wrong end of
+// the contribution.  A same-object COMDAT is therefore not a transformation-
+// free replacement for the rotation; only the already rejected cross-TU form
+// reaches the needed post-REQUEST boundary.

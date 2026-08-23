@@ -116,9 +116,10 @@ and class also does not prove that all bytes or pointer relocations within the o
 match retail; those still require an initializer and relocation audit against the
 shipping PE.
 
-The runtime input is the VC6 toolchain's `LIBCMT.LIB`; CRT contribution ordering is
-deferred. Current section sizes and the first relative divergence are recorded in
-`build/link/HMM2PL.link.json` rather than copied into this durable document.
+The runtime inputs are the VC6 SP5 toolchain's `MSVCPRT.LIB` early delete scan
+followed by its ordinary `LIBCMT.LIB` scan. Current section sizes and the first
+relative divergence are recorded in `build/link/HMM2PL.link.json` rather than
+copied into this durable document.
 
 At the exact-function checkpoint, the report contains 1,727 configured functions.
 It audits all 1,530 stable semantic identities individually and records 197 volatile
