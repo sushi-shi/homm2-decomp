@@ -78,3 +78,26 @@
 // installed VC98 include, /Fd, /Fp, case, and short-name spellings.  Every object
 // keeps gcCDTrackName in section 3 and its 0x1e-byte text at section-3 offset
 // 0x1c.  The retail split is independent of those compiler path identities.
+
+// Ordinary cross-object ownership probe:
+//
+//   build/link/misc-cross-object/results.json
+//
+// Misc was compiled with its section-3 pointer referring to an external writable
+// array, while a second VC6 TU supplied the exact 0x1e-byte array in an ordinary
+// .data section.  The backing object was placed before Misc, after Misc, first,
+// and last in BASE-prefix.lib.  All four archive layouts produce the same image:
+// LINK extracts the backing member after processing Misc, so the text lands at
+// VA 0x0051f534 rather than retail 0x0051f120.  Each has 1,261 whole-file byte
+// mismatches (56 .text and 941 .data section bytes); .rdata and .rsrc remain
+// exact.  A separate archive before/after BASE-prefix lands at 0x00523db4 or
+// 0x0051f534, while a direct object lands at 0x0051df64 regardless of its response
+// position.  None can interleave a second object contribution between Misc's
+// IsCDDrive data (candidate section 43) and DriveSupportsFreeSpaceQuery (section
+// 44).  The compiler record census remains unchanged, so this rejection is based
+// on actual contribution placement rather than incidental Rich metadata.
+//
+// Disposition: REJECT a separate backing TU or library member.  An ordinary
+// source replacement must make VC6 emit the contribution inside Misc at that
+// exact section boundary; archive scheduling cannot substitute for that missing
+// object-internal topology.
