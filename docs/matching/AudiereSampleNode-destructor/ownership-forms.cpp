@@ -83,6 +83,20 @@
 // order as node destructor, three RefPtr helpers, $E21, $E20.  /GX omission
 // suppresses required cleanup functions and is structurally contradicted.
 
+// Historical path-state matrix:
+//
+//   build/link/source-path-spelling/results.json
+//   build/link/include-path-spelling/results.json
+//   build/link/output-path-spelling/results.json
+//
+// Eleven source spellings, eight header-search spellings, and ten output/PDB/PCH
+// spellings were compiled with the production /Gy flags.  These cover repository-
+// relative and basename forms, the evidenced E:\Users\igorl\VSS\HMM\HMM2 tree,
+// installed-VC98 and short-name system include paths, and the historical
+// temp\release\game output directory.  All 29 objects retain sections 18..23 as
+// node destructor, three RefPtr helpers, $E21, $E20.  Path hashing and output-name
+// state therefore do not account for the retail order.
+
 // Template-owner diagnostics (measured and reverted): explicit specializations
 // of only the three live RefPtr members move those exact bodies before the node
 // destructor, but VC6 still emits $E21/$E20 after it.  Explicit ctype<unsigned

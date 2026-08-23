@@ -67,3 +67,14 @@
 // COMDAT, but VC6 schedules global data COMDATs at section 4 regardless of its
 // definition after IsCDDrive.  None produces the ordinary section-44 retail
 // contribution, and all were reverted.
+
+// Historical path-state probes add 29 unchanged-source objects:
+//
+//   build/link/source-path-spelling/results.json
+//   build/link/include-path-spelling/results.json
+//   build/link/output-path-spelling/results.json
+//
+// They cover repository-relative, basename, historical E: source/include/output,
+// installed VC98 include, /Fd, /Fp, case, and short-name spellings.  Every object
+// keeps gcCDTrackName in section 3 and its 0x1e-byte text at section-3 offset
+// 0x1c.  The retail split is independent of those compiler path identities.

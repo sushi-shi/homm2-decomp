@@ -93,6 +93,19 @@
 // boundaries at 0x0, 0x30, 0x70, 0xf0, 0x110.  The apparently attractive order
 // therefore destroys exact function placement and is rejected.
 
+// Matrix 8: historical source, include, and compiler-output paths.
+//
+//   build/link/source-path-spelling/results.json
+//   build/link/include-path-spelling/results.json
+//   build/link/output-path-spelling/results.json
+//
+// Eleven source spellings, eight header-search spellings, and ten /Fo-/Fd-/Fp
+// spellings cover the evidenced E:\Users\igorl\VSS\HMM\HMM2 source and
+// temp\release\game trees, an installed VC98 include path, relative paths, case,
+// and short names.  All 29 production-/Gy objects retain ctor section 3,
+// deleting-destructor section 5, and the remaining methods in sections 6..10.
+// Compiler path identity is not the missing emission-order state.
+
 // Disposition: no source or ordinary project-state arm naturally emits the
 // complete retail order.  Do not retain a source perturbation, force a symbol,
 // patch the vtable, or add an /ORDER file.  The residual points to an unresolved

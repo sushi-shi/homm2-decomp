@@ -24,6 +24,25 @@
 //   coalesces/removes the required writable local cells, so it contradicts the
 //   six distinct retail relocation identities rather than exposing a new
 //   placement orbit.
+
+// Two further same-TU ownership arms forward-declared an external or class-static
+// one-byte cell, initialized cFRDummy from it, and defined the cell after all
+// functions and named REQUEST data.  VC6 still allocates either named cell at
+// BSS offset 0x0c.  Source definition order therefore does not reproduce the
+// rotation.  The measured arms are in build/link/request-cfr-scope/results.json.
+
+// Historical source/include/output path matrices contribute another 29 exact-
+// flag objects:
+//
+//   build/link/source-path-spelling/results.json
+//   build/link/include-path-spelling/results.json
+//   build/link/output-path-spelling/results.json
+//
+// Every repository-relative, basename, historical E:, installed-VC98, /Fo, /Fd,
+// /Fp, case, and short-name arm keeps cFRDummy's target at offset 0x0c.  The
+// retail VA 0x00533d98 also occurs as a little-endian dword exactly once in the
+// entire PE, at file offset 0x116ae0: cFRDummy's initializer.  No code or other
+// data provides evidence that the backing byte belongs to SEARCH or another TU.
 //
 // Exact topology proof (measured, but deliberately not retained):
 //
