@@ -709,8 +709,8 @@ void combatManager::CastSpell(
         ResetLimitCreature();
         if (ValidHex(m_limitCreatureHex)
             && m_hexCells[m_limitCreatureHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
-            ++m_limitCreatureCount[IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
-                                  [m_hexCells[m_limitCreatureHex].m_occupantIndex];
+            m_limitCreatureCount[IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
+                                [m_hexCells[m_limitCreatureHex].m_occupantIndex]++;
         }
         m_limitCreature = 0;
         m_limitCreatureHex = COMBAT_HEX_EMPTY;
@@ -1850,7 +1850,7 @@ void combatManager::Armageddon(void) {
 VA(0x00424e48, 0x101)
 void combatManager::TurnToStone(army* target) {
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(target->m_side)][target->m_index];
+    m_limitCreatureCount[IDX(target->m_side)][target->m_index]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,
@@ -1877,7 +1877,7 @@ void combatManager::BloodLustEffect(
     army* target, H2_ENUM_PARAM(MonsterFlags, i32) effect
 ) {
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(target->m_side)][target->m_index];
+    m_limitCreatureCount[IDX(target->m_side)][target->m_index]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,
