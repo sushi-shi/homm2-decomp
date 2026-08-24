@@ -358,7 +358,7 @@ BASE/bmap2	?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z	100.0000	279316cad74f
 BASE/bmap2	?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	1f400ac5219e
 BASE/bmap2	?FillBitmapArea@@YIXPAVbitmap@@HHHHH@Z	100.0000	8924e914a092
 BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	98.4444	e4a324d86f19
-BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	b16832784ed3
+BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	851a77a8b364
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	99b074cdfbe3
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	abe880b8bd31
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	98081568f29e
