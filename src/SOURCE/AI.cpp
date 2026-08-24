@@ -844,7 +844,7 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     army* currentArmy8;
 
     for (armyIndex4 = 0; armyIndex4 < m_armyCount[IDX(side)]; armyIndex4++) {
-        if ((bit36 & mask) != 0) {
+        if ((mask & bit36) != 0) {
             currentArmy8 = &m_armies[IDX(side)][armyIndex4];
             if (currentArmy8 != NULL
                 && HAS(currentArmy8->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
