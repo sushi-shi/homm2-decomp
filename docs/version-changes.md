@@ -358,7 +358,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `army::LoadResources` writes `loopCount = 0` in this image where the
   PoL line wrote 1 (byte-pinned both sides, 2026-08-03) - the two sites
   moved in opposite directions between versions.
-- **[2.1?/unclassified] Visions no longer doubles the join fee.**
+- **[2.1] Visions no longer doubles the join fee.**
   `advManager::DoVisions` computes the diplomacy joining price as
   `gMonsterDatabase[type].cost * count` in this image; the 2.0 body (PoL,
   byte-pinned) multiplies that by 2. Retail bytes at RVA 0x154ac read
@@ -366,13 +366,19 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   mov [ebp-0xf8],ecx` with no `shl ecx,1` - the 2.0 build emits the shift.
   The same function evaluates its strength ratio in **double** precision in
   2.1 (`fild;fild;fdivp`) where 2.0 divides in float (`fidiv`), and
-  multiplies `count * fightValue` rather than `fightValue * count`.
-  Classify against the Gold 2.1 GOG binary.
-- **[Buka; do not backport] Necromancy capacity excludes SKELETON, not GHOST.**
+  multiplies `count * fightValue` rather than `fightValue * count`. English
+  Gold 2.1 stores the single product directly at 0x458ac4..0x458ac8; there is
+  no doubling shift, so the fee change is upstream 2.1 behavior.
+- **[2.1] `army::DamageEnemy` tests Curse in its minimum-damage arm.** PoL
+  2.0 tests Bless in both arms, making the second arm unreachable. Buka reads
+  `m_spellInfluence[CURSE]` at offset 0x10e, and English Gold 2.1 has the same
+  second read at 0x480310. This is an upstream correction.
+- **[2.1; do not backport] Necromancy capacity excludes SKELETON, not GHOST.**
   `combatManager::DoVictory` omits a surviving Skeleton stack from the
   five-stack capacity count, allowing raised Skeletons to merge into it;
   PoL 2.0 instead omits a Ghost stack. Retail immediates are 47 and 59,
-  respectively; the preceding elemental exclusions are identical.
+  respectively; the preceding elemental exclusions are identical. English
+  Gold 2.1 also compares against 47 at 0x43f8d9, proving this is upstream.
 - **[Buka; do not backport] AI resource value uses a new sum order.**
   `philAI::RVConversion` changes the left-associated resource order from
   ORE/GEMS/MERCURY/GOLD/WOOD/SULFUR/CRYSTAL to
@@ -432,15 +438,17 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   2.0 returns 5; Buka returns 3. Both retail functions are exact (PoL
   `0x80ff9`, 294 bytes; Buka `0x5bb52`, 292 bytes). A complete two-arm
   VC4.2 matrix keeps the PoL order exact and scores the Buka order 74.9125%.
-- **[2.1?/unclassified] Combat hex validation tightened.** 2.0's
+- **[2.1] Combat hex validation tightened.** 2.0's
   `ValidHex` accepts hexes 0..125 (PoL byte-proven, `<= 125`); this image
   bounds the grid at `hex < COMBAT_HEX_COUNT` (117). Out-of-grid hexes
-  116..125 were previously "valid".
-- **[2.1?/unclassified] Event artifact transfer excludes the whole
+  117..125 were previously "valid". English Gold 2.1 `ValidHex` at 0x479190
+  compares against 117 and rejects greater-or-equal values.
+- **[2.1] Event artifact transfer excludes the whole
   ultimate range plus the Golden Goose.** 2.0 keeps artifacts above
   `ARTIFACT_ULTIMATE_WAND` (3) transferable - ultimate shield/staff/crown
   and the goose moved between heroes (PoL byte-proven); this image bounds
-  at `<= ARTIFACT_GOLDEN_GOOSE` (7).
+  at `<= ARTIFACT_GOLDEN_GOOSE` (7). English Gold 2.1 uses the same bound at
+  0x48f4c4, proving the change is upstream.
 - **[Buka] Music configuration** routed through the new `MusicFlags` TU and
   the config musicSource/musicVolume paths in `GAME`/`ADVMGR`/`SMACKMGR`
   (fade timing via `glTimers` slots).
@@ -629,9 +637,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `MAP_OBJECT_HERO_INTERACTION` cells through
   `gpGame->GetHero(cell->m_objectMetadata)` and uses the hero's
   `m_locationType`/`m_occupiedTown` when the hero is standing in a town.
-- **[Buka] `game::SetupNewRumour` (0x45fdd7) guards the ultimate-artifact
+- **[2.1] `game::SetupNewRumour` (0x45fdd7) guards the ultimate-artifact
   rumour.** When `m_ultimateArtifactId == -1` the final branch falls back to
   `cRandomTavernText[(giCurTurn / 7) % 8]` instead of naming artifact -1.
+  English Gold 2.1 performs the same `-1` guard and fallback at
+  0x42e1b4..0x42e21d, so this is upstream.
 - **[Buka] `game::UpdateSpellWidgets` (0x4548cf) clears the message struct and
   re-stamps `type` per broadcast.** The body opens with
   `msg.type = MESSAGE_WIDGET; ...; memset(&msg, 0, sizeof(msg));` and then sets
@@ -764,13 +774,6 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `add eax, -0x44(%ebp)` (directionY) where PoL 2.0 reads directionX
   (`giDeferObjDrawX = movingHero->m_x + directionX_b;`). Both deltas are -1
   inside that arm, so the runtime result is unchanged; the source line differs.
-- **[unclassified] `searchArray::SeedCombatPosition` gates on `shots`, not
-  `speed`.** Both of its "already surrounded" tests read
-  `movsbl 0xca(%ecx), %edx` = `m_monster.shots` (monsterInfo + 0x10), where PoL
-  2.0 reads `m_monster.speed` (0xc5 = monsterInfo + 0xb): retail is
-  `if (unit->m_monster.shots > 0 && GetAttackMask(...) == ATTACK_MASK_SURROUNDED)`.
-  A shooter, not a fast unit, is what makes the enemy hex reachable without a
-  path.
 - **[unclassified] `CastleHandler`'s quick-view test reads the RIGHT MOUSE
   BUTTON, not left shift.** Retail masks `0x200`
   (`MESSAGE_MODIFIER_RIGHT_BUTTON`) where the PoL 2.0 reconstruction masks
@@ -784,13 +787,16 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `gbLowMemory` preload suppression, network movie path, DirectSound choice and
   `IVYPOL` palette extraction are absent. These are platform/version behavior;
   do not backport them for 2.0 matching.
-- **[unclassified] `PlaySmacker` no longer runs the video speed test.** In the
+- **[Buka] `PlaySmacker` no longer runs the video speed test.** In the
   `gConfig.slowVideo == VIDEO_SPEED_TEST` branch retail clears the flag, calls
   `WritePrefs()`, stores `0` into one dword global and goes straight to the
   `smksum` threshold test: the PoL sequence `bSmackNum = SMACK_EARTH;
   bTesting = 1; SmackManagerMain(); bTesting = 0;` is gone, so `smksum` is
   whatever the previous playback left behind. The threshold test also lost its
   `|| gbLowMemory` term (retail's chain is two `||` terms, ours was three).
+  English Gold 2.1 `PlaySmacker` at 0x45a2a0 retains the complete PoL sequence
+  at 0x45a35f..0x45a3d5, including the test playback and low-memory term, so
+  this is a Buka regression rather than an upstream 2.1 change.
 - **[unclassified] `searchArray::SeedPosition` keeps a second, dead
   `FindAdjacentMonster` call.** After the guard
   `if (!findAdjacentMonster || s_currentNode.rvFlag1) goto point_complete;`
@@ -945,7 +951,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   Russian. The CREATURES case no longer capitalizes the copied army name -
   PoL's `armyName[0] -= 'a' - 'A';` has no retail counterpart (three
   instructions absent).
-- **[unclassified] `CampaignHandler` (0x233b8) indexes
+- **[Buka] `CampaignHandler` (0x233b8) indexes
   `m_campaignMapEnabled` with the scenario first.** On the switching-map
   accept path retail computes `m_campaignScenario * 12 + IDX(m_campaignType)`
   (`movsbl 0x4(%ecx),%edx; imul $0xc; lea 0xa2(%eax,%edx)`), i.e.
@@ -954,13 +960,18 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   both builds is `[side][map]`, so the 2.1 line writes out of the declared
   `[2][12]` bounds here; the two adjacent statements
   (`m_campaignScenarioBonus`, `m_campaignChoice`) keep `[type][scenario]`.
-- **[unclassified] `game::SetupNetworkGame2` (0x92b64) probes for
+  English Gold 2.1 `CampaignHandler` at 0x472480 has no such write on its
+  accept path (0x472691..0x4726bd), while PoL has the switching path with the
+  correct order. The invalid write is therefore Buka-specific.
+- **[2.1] `game::SetupNetworkGame2` (0x92b64) probes for
   DPLAYX.DLL.** After the Windows-NT check (which in retail dims only
   `CHOICE_THREE`, not PoL's `CHOICE_ONE` *and* `CHOICE_THREE`), the body does
   `hLib = NULL; hLib = LoadLibraryA("DPLAYX.DLL"); if (hLib == NULL) { ...
   dim CHOICE_ONE ... }` with its own `tag_message` in the guarded block.
   Retail's frame is 0x20 bytes larger than PoL's for exactly that handle and
-  message. The library is never freed.
+  message. The library is never freed. English Gold 2.1 has the same probe at
+  0x4baa74..0x4baad6, including the missing `FreeLibrary`, so this is upstream
+  Gold behavior rather than a Buka localization change.
 - **[unclassified] The widget dispatch family stopped snapshotting `m_flags`.**
   Every PoL `Main` override opens `H2EnumStorage<WidgetFlag,i16> flags =
   m_flags;` and then writes `m_flags = flags | WIDGET_FLAG_SELECTED` /

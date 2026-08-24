@@ -33,7 +33,7 @@ decomp-2.1-buka -> clean-2.1-buka -----+
 | Source/tool pipeline | `homm2 selftest`: 786 tests | PASS |
 | Gameplay regression suite | no automated gameplay tests in this tree | MISSING |
 | Buka behavior is defect-free | confirmed retail defects below | FAIL |
-| 2.0 -> Buka behavior provenance | 76 entries still `2.1?`/`unclassified` | OPEN |
+| 2.0 -> Buka behavior provenance | 69 entries still `2.1?`/`unclassified` | OPEN |
 
 Exact matching proves faithful reconstruction, not correct gameplay. It also
 does not prove unused fields, private names, or behavior hidden by equal retail
@@ -53,8 +53,8 @@ Bullet-level provenance census of `docs/version-changes.md`:
 | Class | Entries |
 |---|---:|
 | Buka or Buka-specific compiler/product behavior | 89 |
-| Confirmed upstream Gold 2.1 | 4 |
-| `2.1?` / unclassified between Gold and Buka | 76 |
+| Confirmed upstream Gold 2.1 | 11 |
+| `2.1?` / unclassified between Gold and Buka | 69 |
 | Build-only | 1 |
 | Matching-only | 1 |
 | Bookkeeping/non-delta | 7 |
@@ -74,29 +74,28 @@ Bullet-level provenance census of `docs/version-changes.md`:
 
 | ID | Status | Risk | Evidence / master action |
 |---|---|---|---|
-| BUKA-001 | confirmed retail defect | high | `CampaignHandler` writes `m_campaignMapEnabled[scenario][side]`; the declared and all other accesses are `[side][scenario]`, so later scenarios write out of bounds. Correct in `master`; preserve in `classic-2.1-buka`. |
+| BUKA-001 | confirmed Buka regression | high | `CampaignHandler` writes `m_campaignMapEnabled[scenario][side]`; the declared and all other accesses are `[side][scenario]`, so later scenarios write out of bounds. PoL writes the correct order and English Gold lacks the faulty write. Correct in `master`; preserve in `classic-2.1-buka`. |
 | BUKA-002 | confirmed inherited defect | high | `font::LineWidth` never advances past `\n`; fix and test multiline input in `master`. |
 | BUKA-003 | confirmed retail defect family | medium | Five flipped icon decoders discard partially clipped solid/shadow runs. Correct the clean/master implementation; retain exact shape only in decomp/classic. See `docs/icon-format.md` F1. |
 | BUKA-004 | latent unsafe API | medium | `IconToBitmapScale` ignores clip arguments except at scale 32. Current callers request no clipping; enforce bounds in `master`. See `docs/icon-format.md` F3. |
-| BUKA-005 | suspect regression | medium | `PlaySmacker` removed the speed-test playback but still judges `smksum`, which may describe zero or a previous playback. Classify against English Gold and add a first-run test. |
+| BUKA-005 | confirmed Buka regression | medium | `PlaySmacker` removed the speed-test playback but still judges `smksum`, which may describe zero or a previous playback; English Gold retains the PoL test sequence. Restore or replace the first-run benchmark and test it. |
 | BUKA-006 | confirmed localization defect | low | Major and Minor Scroll share the Russian `Minor Scroll` label; fix Buka locale data. |
 | BUKA-007 | confirmed localization defect | low | Genie-half combat text pairs singular/plural noun and verb forms incorrectly; fix Buka locale data. |
-| BUKA-008 | confirmed process-lifetime leak | low | `SetupNetworkGame2` loads `DPLAYX.DLL` without `FreeLibrary`; replace with the cross-platform capability check. |
+| BUKA-008 | confirmed inherited Gold 2.1 defect | low | `SetupNetworkGame2` loads `DPLAYX.DLL` without `FreeLibrary`; replace with the cross-platform capability check. |
 | MODEL-001 | confirmed source-model defect | medium | `IconEntry::flags : 5` cannot represent the documented value 32. Correct after an all-includer VC6 A/B audit; exact bytes do not settle this unused field. |
 
 ## Later behavior that appears corrective
 
 These still require edition policy and tests; they are not matching backports:
 
-| Site | PoL behavior | Later behavior |
-|---|---|---|
-| `army::DamageEnemy` | tests Bless twice | second test is Curse |
-| `ValidHex` | accepts 0..125 | bounds the 117-cell combat grid |
-| artifact transfer | permits part of ultimate range | excludes ultimate range and Golden Goose |
-| `combatManager::DoVictory` | omits Ghost capacity | omits Skeleton capacity for raised Skeleton merge |
-| `SeedCombatPosition` | tests speed | tests shooter shots |
-| `SetupNewRumour` | may name artifact `-1` | falls back to ordinary rumour |
-| `DoEvent` obelisk access | direct metadata index | 1-based metadata minus one |
+| Site | PoL behavior | Later behavior | Provenance |
+|---|---|---|---|
+| `army::DamageEnemy` | tests Bless twice | second test is Curse | Gold 2.1 |
+| `ValidHex` | accepts 0..125 | bounds the 117-cell combat grid | Gold 2.1 |
+| artifact transfer | permits part of ultimate range | excludes ultimate range and Golden Goose | Gold 2.1 |
+| `combatManager::DoVictory` | omits Ghost capacity | omits Skeleton capacity for raised Skeleton merge | Gold 2.1 |
+| `SetupNewRumour` | may name artifact `-1` | falls back to ordinary rumour | Gold 2.1 |
+| `DoEvent` obelisk access | direct metadata index | 1-based metadata minus one | unresolved |
 
 ## Approval conditions for `master`
 
