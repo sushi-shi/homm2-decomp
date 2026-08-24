@@ -9,8 +9,8 @@ appendix; it is not the matching priority.
 
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
-  has 1,161/1,514 functions live exact and, after this investigation,
-  1,344/1,514 functions exact-max.
+  has 1,162/1,514 functions live exact and, after this investigation,
+  1,345/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -57,6 +57,10 @@ appendix; it is not the matching priority.
   removes the slot swap while pre/post increment is VC4.2-byte-neutral. The
   remaining three bytes are an equivalent loop compare unchanged by a complete
   102-cell source/state matrix.
+- `LoadIcons` closes live at 100%. PoL owns a block-local `heroColor` and the
+  empty `DebugCheck()` hook only in the player-color arm; Buka owns the inline
+  ternary and an outer hook. Reverse matrices reject direct cross-compilation,
+  so this is a matching-only source change with no shipping gameplay effect.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -321,6 +325,20 @@ The focused replay is reproducible from the retained ordinary source; no
 generated declaration is retained. See
 `docs/matching/BlitBitmapToScreen/cross-version-cursor-overlap.cpp`.
 
+### `combatManager::LoadIcons`: branch-owned inline hook, live exact
+
+| property | PoL result |
+|---|---|
+| RVA | `0x00091dda` |
+| retained source | block-local `heroColor`; `DebugCheck()` in player-color arm |
+| bytes / CFG | 999/999; exact 27/27 blocks |
+| relocations | complete ordered 58/58 stream |
+| live score / hash | 100.0000% / `1a653071cbd3` |
+
+The 9-arm PoL matrix closes only the two player-arm-hook scopes. Buka's exact
+inline ternary falls to 98.800900% under VC4.2; the retained PoL form falls to
+99.820274% under VC6. See `docs/matching/LoadIcons/`.
+
 ## Bugs and bug candidates exposed by the exact branch
 
 ### Confirmed reconstruction bug
@@ -379,7 +397,6 @@ payoff and audit cost:
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
 | `CatAttack` | 99.9977% | exact Buka phase/loop structure; large function |
-| `LoadIcons` | 99.9774% | declaration scope and dead-slot layout |
 | `DecodePacket` | 99.9733% | small, near-exact source donor |
 | `ComputerMonsterInteract` | 99.9684% | if/else combat tail and flee return |
 | `HeroInteractionAtTown` | 99.9663% | PHILAI structural/name donor |

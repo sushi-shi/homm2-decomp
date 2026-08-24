@@ -820,7 +820,6 @@ i32 combatManager::MoreTreesNear(void) {
 VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void) {
     i32 index;
-    i32 heroColor;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
         m_combatIcons[index] = NULL;
 
@@ -872,11 +871,13 @@ void combatManager::LoadIcons(void) {
         }
 
         if (m_heroIcons[index]) {
+            i32 heroColor;
             if (m_playerId[index] == -1)
                 heroColor = COMBAT_NEUTRAL_HERO_COLOR;
-            else
+            else {
                 heroColor = gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color;
-            DebugCheck();
+                DebugCheck();
+            }
             sprintf(gText, DATA_COMPGEN(0x004f8a38, loadIconsHerofl02dIcn, "herofl%02d.icn"), heroColor);
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
         }
