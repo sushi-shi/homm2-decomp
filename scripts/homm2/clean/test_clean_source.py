@@ -69,6 +69,8 @@ class CleanSourcePatchTests(unittest.TestCase):
                 "src/SOURCE/GAME.cpp",
                 "src/SOURCE/HERO.cpp",
                 "src/SOURCE/PHILAI.cpp",
+                "src/SOURCE/REQUEST.cpp",
+                "src/SOURCE/SEARCH.cpp",
                 "src/SOURCE/X_CAMPGN.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
             },
@@ -116,6 +118,28 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertIn(
             "bDataEntryTime = ENTRY_PHASE_IMMEDIATE;",
             clean_source.apply_patches("src/BASE/Misc.cpp", misc_source),
+        )
+
+    def test_clean_gold_uses_the_developer_shaped_empty_string(self):
+        request = (
+            "struct cFRDummyStorageOwner {\n"
+            "    static char storage[1];\n"
+            "};\n"
+            "char* cFRDummy = cFRDummyStorageOwner::storage;\n"
+        )
+        search = (
+            "struct cFRDummyStorageOwner {\n"
+            "    static char storage[1];\n"
+            "};\n"
+            "__declspec(selectany) char cFRDummyStorageOwner::storage[1] = {0};\n\n"
+        )
+        self.assertEqual(
+            clean_source.apply_patches("src/SOURCE/REQUEST.cpp", request),
+            'char* cFRDummy = "";\n',
+        )
+        self.assertEqual(
+            clean_source.apply_patches("src/SOURCE/SEARCH.cpp", search),
+            "",
         )
 
     def test_makefileid_does_not_modify_literals(self):
