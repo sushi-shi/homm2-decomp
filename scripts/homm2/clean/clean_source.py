@@ -1845,6 +1845,7 @@ def publish(
     branch: str,
     source_root: Path | None = None,
     full_tree: bool = False,
+    publish_parent: str | None = None,
 ) -> int:
     """Publish the generated tree onto a branch, one commit per source commit.
 
@@ -1863,6 +1864,11 @@ def publish(
     out_root = validate_out_root(out_root)
     source_commit = git("rev-parse", "HEAD")
     source_branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    parent_commit = (
+        git("rev-parse", "--verify", f"{publish_parent}^{{commit}}")
+        if publish_parent
+        else source_commit
+    )
     if git("status", "--porcelain"):
         raise SystemExit("refusing to publish from a dirty source worktree")
 
@@ -1914,7 +1920,7 @@ def publish(
         if exists:
             git("worktree", "add", str(worktree), branch)
         else:
-            git("worktree", "add", "-b", branch, str(worktree), source_commit)
+            git("worktree", "add", "-b", branch, str(worktree), parent_commit)
 
     try:
         assert worktree is not None
@@ -1924,14 +1930,14 @@ def publish(
             )
 
         if exists and subprocess.run(
-            ("git", "merge-base", "--is-ancestor", source_commit, "HEAD"),
+            ("git", "merge-base", "--is-ancestor", parent_commit, "HEAD"),
             cwd=worktree,
             capture_output=True,
             check=False,
         ).returncode:
             subprocess.run(
                 ("git", "merge", "--no-commit", "--no-ff", "-s", "ours",
-                 source_commit),
+                 parent_commit),
                 cwd=worktree,
                 check=True,
                 capture_output=True,
@@ -1994,6 +2000,7 @@ def publish(
             f"hand -- it is a pure function of the matching tree, and every "
             f"change belongs upstream in the generator or the matching source.\n\n"
             f"Source-Commit: {source_commit}\n"
+            f"Publish-Parent: {parent_commit}\n"
         )
         recorded = git("log", "-1", "--format=%B", cwd=worktree) if exists else ""
         if unchanged and source_commit in recorded:
@@ -2095,6 +2102,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--publish", metavar="BRANCH", nargs="?", const="clean",
                         help="commit the generated tree onto BRANCH (default: clean)")
     parser.add_argument(
+        "--publish-parent",
+        metavar="REF",
+        help="anchor a new generated branch at REF instead of the source checkout",
+    )
+    parser.add_argument(
         "--classic-from",
         metavar="TREE",
         help="derive a classic integer-enum tree from an existing clean worktree",
@@ -2118,6 +2130,8 @@ def main(argv: list[str] | None = None) -> int:
     classic = args.classic_from is not None
     if not classic and args.classic_encoding != "utf-8":
         parser.error("--classic-encoding requires --classic-from")
+    if args.publish_parent and not args.publish:
+        parser.error("--publish-parent requires --publish")
     if classic:
         sources, overrides, debris = generate_classic(
             source_root,
@@ -2157,6 +2171,7 @@ def main(argv: list[str] | None = None) -> int:
             args.publish,
             source_root=source_root,
             full_tree=classic,
+            publish_parent=args.publish_parent,
         ) or status
     return status
 
