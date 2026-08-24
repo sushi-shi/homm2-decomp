@@ -361,6 +361,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   five-stack capacity count, allowing raised Skeletons to merge into it;
   PoL 2.0 instead omits a Ghost stack. Retail immediates are 47 and 59,
   respectively; the preceding elemental exclusions are identical.
+- **[Buka; do not backport] AI resource value uses a new sum order.**
+  `philAI::RVConversion` changes the left-associated resource order from
+  ORE/GEMS/MERCURY/GOLD/WOOD/SULFUR/CRYSTAL to
+  GOLD/WOOD/ORE/CRYSTAL/SULFUR/MERCURY/GEMS. Single-precision rounding can
+  affect the final integer conversion; both retail functions pin their order.
 - **[Buka] The RESMGR read helpers lost their error branches.**
   `ReadByte`/`ReadWord`/`ReadLong` in 2.1 are assert + read + return
   with NO `if (bytesRead == 0)` debug-trap block (retail bodies are
