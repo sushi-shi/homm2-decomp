@@ -128,28 +128,17 @@ i32 CalcTerrainCost(
     i32 useRoad,
     i32 usePathfinding
 ) {
-    i32 baseCost;
-    i32 roadCost;
-
     if (mobility < giTerrainCost[IDX(terrain)][pathfindingLevel][1]) {
-        baseCost = giTerrainCost[IDX(terrain)][pathfindingLevel][0];
-        if (mobility < baseCost) {
-            if (useRoad == 0)
-                goto terrainCost;
-            roadCost = giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
-            if (mobility < roadCost)
-                goto pathfindingCost;
+        if (mobility >= giTerrainCost[IDX(terrain)][pathfindingLevel][0]
+            || (useRoad != 0
+                && mobility >= giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0])) {
+            if (useRoad != 0)
+                return giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
+            return giTerrainCost[IDX(terrain)][pathfindingLevel][0];
         }
-        if (useRoad != 0)
-            return giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
-        return baseCost;
-    } else {
-    pathfindingCost:
-        if (useRoad != 0 && usePathfinding != 0)
-            terrain = TERRAIN_ROAD;
     }
-
-terrainCost:
+    if (useRoad != 0 && usePathfinding != 0)
+        terrain = TERRAIN_ROAD;
     return giTerrainCost[IDX(terrain)][pathfindingLevel][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
