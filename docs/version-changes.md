@@ -703,10 +703,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   singular/plural choice IS present in the two sibling messages
   (`KeepAttack`, `CastSpell`), so this is a behaviour difference, not a
   reconstruction shortcut.
-- **[unclassified] `combatManager::CastSpell` (0x99653) guards the
-  `SPELL_MAGIC_ARROW` case body with a literal-true condition.** Retail emits
-  `mov eax,1; test eax,eax; je <case end>` before the case body, i.e. a build
-  switch the shipping tree left permanently on. See
+- **[Buka compiler/source switch; 2.0 backport: no]
+  `combatManager::CastSpell` (0x99653) guards the `SPELL_MAGIC_ARROW` case
+  body with a literal-true condition.** Buka VC6 `/Od` emits
+  `mov eax,1; test eax,eax; je <case end>`. A complete 204-cell VC4.2 product
+  folds the whole-case wrapper and both delay-product orders in every tested
+  state, so it supplies no PoL matching evidence. See
   `docs/patterns/constant-true-case-guard.md`.
 - **[unclassified] `combatManager::ChainLightning` (0x9df96) passes both bolt
   angle limits as `firstBolt ? A : A` ternaries whose arms are equal.** The
