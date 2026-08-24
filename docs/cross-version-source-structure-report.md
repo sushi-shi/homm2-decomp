@@ -61,6 +61,10 @@ appendix; it is not the matching priority.
   empty `DebugCheck()` hook only in the player-color arm; Buka owns the inline
   ternary and an outer hook. Reverse matrices reject direct cross-compilation,
   so this is a matching-only source change with no shipping gameplay effect.
+- `CatAttack` and `DecodePacket` are bounded non-transfers. CatAttack's Buka
+  scope plus 200 fresh states do not beat its 99.9977% MAX. DecodePacket's Buka
+  locals emit 293/314 bytes under VC4.2; 11 CRC spellings and 50 states leave
+  its exact-frame/CFG/relocation two-byte residual unchanged.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -396,8 +400,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `CatAttack` | 99.9977% | exact Buka phase/loop structure; large function |
-| `DecodePacket` | 99.9733% | small, near-exact source donor |
 | `ComputerMonsterInteract` | 99.9684% | if/else combat tail and flee return |
 | `HeroInteractionAtTown` | 99.9663% | PHILAI structural/name donor |
 | `RVOfPosition` | 99.9294% | map access and semantic phase order |
