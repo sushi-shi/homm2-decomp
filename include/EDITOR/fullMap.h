@@ -41,6 +41,9 @@ public:
     mapCell* Row(i32 y) {
         return &cells[width * y];
     }
+    mapCell* Column(i32 x) {
+        return &cells[x];
+    }
     void Cell(mapCell*& cell, i32 x, i32 y) {
         cell = cells + width * y + x;
     }

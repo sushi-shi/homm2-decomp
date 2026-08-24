@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	98.4215	af1276450598
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.5536	8eacb5f6fbd8
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.5860	8eacb5f6fbd8
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	100.0000	d32f8fa0b779
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	a1ba6769f25b
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
@@ -716,7 +716,7 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	8
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	c8bc80a5499a
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	100.0000	49aaad966660
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	99.9684	74eb5ac92014
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.6676	1f42007c59b8
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.6964	1f42007c59b8
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	052eb1c94421
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.7742	8eeaea316f2f
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	a731a8bfe270
@@ -788,7 +788,7 @@ SOURCE/GAME	?ConvertAllToLateOverlay@game@@QAEXHH@Z	100.0000	bbf0988f6f21
 SOURCE/GAME	?ConvertFlagToLateOverlay@game@@QAEXHH@Z	100.0000	289c6fa8a815
 SOURCE/GAME	?ConvertObject@game@@QAEXHHHHHHHHHHH@Z	99.6565	fdfab12edb7a
 SOURCE/GAME	?CountShrines@game@@QAEHH@Z	100.0000	4e26334c5467
-SOURCE/GAME	?CreateBoat@game@@QAEHHHH@Z	95.3778	fbee61fe4fdc
+SOURCE/GAME	?CreateBoat@game@@QAEHHHH@Z	100.0000	fbee61fe4fdc
 SOURCE/GAME	?CreateDiffFile@@YIXPAD00HH@Z	96.0775	c95d418c79af
 SOURCE/GAME	?CreateJoinFile@@YIXPAD00@Z	100.0000	95ca3550856b
 SOURCE/GAME	?DoNewTurn@game@@QAEXXZ	100.0000	45d73c949fb5
@@ -833,7 +833,7 @@ SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	100.0000	f1c37870103d
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	100.0000	600d35163c60
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	823cc4914545
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	283318c47dd3
-SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.2071	374c534f42cc
+SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.3878	374c534f42cc
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	100.0000	551b3d30b6b6
 SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	99.5106	5cdf49667dcb
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	3a5de17df20b
@@ -1249,7 +1249,7 @@ SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
 SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	dcb377ede7bf
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	804db80c0b72
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	100.0000	0d5f3ce7ef96
-SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	96.1564	35f498f79ca2
+SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	98.3520	35f498f79ca2
 SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	0b0070c4c421
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	14b8b962e913
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	def64d7d216d
