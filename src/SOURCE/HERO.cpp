@@ -702,7 +702,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
     levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
-    while (experience < experienceValue) {
+    while (experienceValue > experience) {
         increment = static_cast<i32>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
         experience += increment;
         levelCounter++;
