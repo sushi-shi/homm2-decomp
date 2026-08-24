@@ -105,6 +105,12 @@ appendix; it is not the matching priority.
   state; the Buka name cancels that gain when combined. The retained PoL source
   reaches 99.8217% live at retail size, exact 20/20 CFG and ordered 30/30
   relocations. This is allocation/scope recovery with no gameplay change.
+- `ViewSpellsHandler` is a proven version boundary. Its 50 unchanged-source
+  states are identical at 99.784110%. Buka's global-first hover comparison is
+  byte-neutral in a complete 102-cell product. A second complete 102-cell
+  product rejects Buka's top-page refresh behavior: it grows PoL from 1683 to
+  1714 bytes, adds four relocations, and falls to 99.070270%. The extra
+  `UpdateSpellWidgets`/`MoveWindow` calls remain a later behavior change.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -488,7 +494,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `ViewSpellsHandler` | 99.7841% | refresh path changed/clarified |
 | `CastSpell` | 99.7599% | literal-true Magic Arrow case guard |
 | `FizzleForward` | 99.7204% | save/restore update flags; row recomputation |
 | `Armageddon` | 99.6871% | shake-pointer expression ownership |
