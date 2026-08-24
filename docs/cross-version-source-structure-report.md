@@ -76,6 +76,14 @@ appendix; it is not the matching priority.
   seed 1213156658 trial 32 replays at 99.976950%, retail size, complete ordered
   71/71 relocations, and 125/126 exact blocks. The coordinate-load and B109
   branch-target island remains open.
+- `RVOfPosition` rejects Buka's literal `GetRow(x, 1)[MAP_WIDTH * y]`
+  accessor under VC4.2: its best matched state falls from 99.929410% to
+  98.291760%, grows past retail size, and adds a size-only block. PoL retains
+  `GetRow(y, MAP_WIDTH)[x]`. Four PoL-only hash-bucket local names fix the
+  remaining slot cycle; forest/top seed 1213156658 trial 27 reaches 99.990585%
+  at retail size with exact CFG and ordered 56/56 relocations. A complete
+  306-cell arithmetic/state matrix proves Buka's sum order and five related
+  commutative arms byte-neutral; the seven-byte residual stays open.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -411,7 +419,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `RVOfPosition` | 99.9294% | map access and semantic phase order |
 | `FightValueOfStack` | 99.9139% | exact Buka arithmetic ownership |
 | `SaveGame` | 99.9084% | exact Buka large-body reference |
 | `SmackManagerMain` | 99.8963% | removed speed-test/low-memory branches |
