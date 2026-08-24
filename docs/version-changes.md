@@ -356,13 +356,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   2.1 (`fild;fild;fdivp`) where 2.0 divides in float (`fidiv`), and
   multiplies `count * fightValue` rather than `fightValue * count`.
   Classify against the Gold 2.1 GOG binary.
-- **[Buka] Necromancy eligibility excludes SKELETON, not GHOST.**
-  `combatManager::DoVictory`'s stack-count chain compares
-  `m_monsterType` against creature 47 (SKELETON) where the PoL 2.0
-  bytes compare 59 (GHOST) - the last term of the elemental-exclusion
-  chain (62/63/64/65 prefix identical). Byte-pinned both sides
-  (2026-08-03). Reads as a dev logic fix: skeletons killed in combat
-  no longer feed necromancy.
+- **[Buka; do not backport] Necromancy capacity excludes SKELETON, not GHOST.**
+  `combatManager::DoVictory` omits a surviving Skeleton stack from the
+  five-stack capacity count, allowing raised Skeletons to merge into it;
+  PoL 2.0 instead omits a Ghost stack. Retail immediates are 47 and 59,
+  respectively; the preceding elemental exclusions are identical.
 - **[Buka] The RESMGR read helpers lost their error branches.**
   `ReadByte`/`ReadWord`/`ReadLong` in 2.1 are assert + read + return
   with NO `if (bytesRead == 0)` debug-trap block (retail bodies are
