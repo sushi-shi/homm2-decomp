@@ -105,6 +105,29 @@ def compare(ours: list[dict], retail: list[dict]) -> list[str]:
     return problems
 
 
+def extract_heroes_ico(retail: list[dict], destination: Path) -> None:
+    """Rebuild res/heroes.ico from the retail RT_ICON + RT_GROUP_ICON payloads.
+
+    The icon is retail artwork, so it is never committed; it is materialized
+    from the locally supplied retail executable on every resource build.
+    """
+    group = next(r["data"] for r in retail if r["type"] == 14)
+    image = next(r["data"] for r in retail if r["type"] == 3)
+    reserved, container_type, count = struct.unpack_from("<HHH", group, 0)
+    if (reserved, container_type, count) != (0, 1, 1):
+        raise RuntimeError(f"unexpected RT_GROUP_ICON directory: {group.hex()}")
+    width, height, colors, flags, planes, bits, size, _ordinal = struct.unpack_from(
+        "<BBBBHHIH", group, 6
+    )
+    if size != len(image):
+        raise RuntimeError(f"group says {size} icon bytes, image has {len(image)}")
+    container = struct.pack("<HHH", 0, 1, 1) + struct.pack(
+        "<BBBBHHII", width, height, colors, flags, planes, bits, size, 22
+    ) + image
+    if not destination.exists() or destination.read_bytes() != container:
+        destination.write_bytes(container)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rc", type=Path, default=ROOT / "res/HMM2PL.rc")
@@ -114,6 +137,8 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     check_rc_binaries()
+    retail = read_pe_resources(args.verify_exe)
+    extract_heroes_ico(retail, args.rc.parent / "heroes.ico")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.unlink(missing_ok=True)
     env = dict(os.environ)
@@ -132,7 +157,6 @@ def main(argv=None) -> int:
         raise RuntimeError(f"era RC failed ({completed.returncode}) for {args.rc}")
 
     ours = parse_res(args.out.read_bytes())
-    retail = read_pe_resources(args.verify_exe)
     problems = compare(ours, retail)
     if args.report:
         args.report.write_text(json.dumps({

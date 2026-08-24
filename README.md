@@ -1,31 +1,25 @@
 # homm2-decomp
 
 Binary-matching decompilation of Buka's **Heroes of Might and Magic II** release
-(`HMM2PL.exe`, built from the HoMM2 Gold 2.1 tree, New World Computing, 1997). This build is
-**stripped** - it ships no debug stream and no base-relocation directory, so every symbol here
-comes from the source's own markers and every relocation site from a reviewed manifest. The
-goal is to recover the C++ structure and behavior and, where retail evidence permits,
-reproduce the original code, data, and relocations with the **Visual C++ 6.0 SP5** toolchain.
-Retail executable bytes are authoritative.
-[objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
-not proof of correctness.
+(`HMM2PL.exe`, HoMM2 Gold 2.1 tree, New World Computing 1997 / Бука 2003), rebuilt
+with the original **Visual C++ 6.0 SP5** toolchain under wine. The retail image is
+stripped — no debug stream, no relocations — so every symbol is a claim made by the
+source's own markers and every relocation site comes from a reviewed manifest.
+Retail bytes are authoritative.
 
-This repository does **not** contain the original game's executable or resources. Supply a
-legally obtained `HMM2PL.exe` locally to initialize the matching workspace; the playable port
-branches also require an installed copy of the game data.
-
-`config/retail_functions.csv` carries Ghidra's candidate function boundaries (analysis
-output, not retail evidence); source `VA(...)` markers turn candidates into claims, and
-everything unclaimed delinks into one `(unmatched)` module so the whole `.text` stays
-comparable. The synthesized PDB used by the delinker contains those reconstruction
-results; it is not shipping debug information.
+The reconstruction is **complete**: every function and every data byte matches
+retail, and the pinned `LINK.EXE` reproduces the retail executable byte-for-byte
+from compiled objects (see the link modes below for exactly what that claim rests
+on). This repository contains **no** game content; supply a legally obtained
+`HMM2PL.exe` in `build/orig/` before initializing.
 
 ## Trust and provenance
 
-Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An exact function is
-still independently checkable against retail bytes and ordered relocations, so accepting it does
-not require trusting the model's prose or intent. The cross-platform port is a semantic rewrite,
-not a byte-matching result, and therefore still requires ordinary code review and play-testing.
+Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An
+exact function is still independently checkable against retail bytes and ordered
+relocations, so accepting it does not require trusting the model's prose or
+intent. The cross-platform port is a semantic rewrite, not a byte-matching
+result, and therefore still requires ordinary code review and play-testing.
 
 ## Repository branches
 
@@ -41,14 +35,12 @@ master-pol-2.0
 ironfist-pol-2.0
 ```
 
-- `decomp-gold-2.1-buka` is this branch: the Gold 2.1/Buka reconstruction,
-  derived from the PoL 2.0 tree and re-targeted at Buka's stripped image.
-- `decomp-pol-2.0` is the Price of Loyalty reconstruction; useful for
-  cross-reference on names and semantics, never for byte evidence here.
-- `source-pol-2.0` is generated from that decomp with matching-only machinery removed.
-- `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
-- `master-pol-2.0` is the cross-platform Linux, Windows, and Web port.
-- `ironfist-pol-2.0` applies the Project Ironfist changes to the reconstructed source.
+- `decomp-gold-2.1-buka` — this branch: the Gold 2.1/Buka reconstruction.
+- `decomp-pol-2.0` — the Price of Loyalty reconstruction; cross-reference for
+  names and semantics, never byte evidence here.
+- `source-pol-2.0` / `classic-pol-2.0` — generated source-only trees.
+- `master-pol-2.0` — the cross-platform Linux/Windows/Web port.
+- `ironfist-pol-2.0` — Project Ironfist applied to the reconstructed source.
 
 <!-- match-score:start -->
 ## Match status
@@ -78,103 +70,100 @@ _Excluded from the % above — identified generated/library code, not independen
 ## Layout
 
 ```
-src/      {BASE,SOURCE,EDITOR}   reconstructed C++ (carcass: RVA-annotated stubs -> real bodies)
-include/  {BASE,SOURCE,EDITOR}   recovered class headers (vtables, OVERRIDE) + va.h / Ints.h
-build/orig/   your HMM2PL.exe (gitignored; copy it here before `homm2 init`)
-config/   units.toml             per-TU build manifest
-scripts/homm2/    the CLI package - one role per subpackage, mirroring the commands:
-          core/ analysis/ permute/ audit/ match/ build/ clean/ format/ init/ ghidra/
-          tests live beside what they test; `homm2 selftest` runs them
-scripts/toolchain/  VC6 SP5 toolchain-release builder from preserved media (run once)
-scripts/archive/    retired tooling, kept only to reproduce old audit-ledger commands
-build/    (gitignored)           toolchain, synth PDB, delinked targets, base objs, objdiff report
-flake.nix two dev shells: default (analysis+diff+clang), build (+wine+VC6 SP5)
+src/      {BASE,SOURCE,EDITOR}   reconstructed C++, one TU per retail translation unit
+include/  {BASE,SOURCE,EDITOR}   recovered headers (owner-header model) + va.h / Ints.h
+res/      HMM2PL.rc              retail resources as source (era RC.EXE compiles them;
+                                 heroes.ico is materialized from your local retail exe)
+config/   units.toml, inventories, reviewed manifests
+scripts/  homm2/ (the CLI, one role per subpackage; tests live beside code)
+          toolchain/ (VC6 SP5 release builder from preserved media)
+build/    (gitignored) toolchain, delinked targets, objects, link outputs
+flake.nix dev shells: default (analysis) and build (+wine +VC6 SP5)
 ```
 
-The documentation map and retention policy are in [`docs/README.md`](docs/README.md).
+The documentation map is [`docs/README.md`](docs/README.md); enforced build
+invariants are catalogued in [`docs/build-asserts.md`](docs/build-asserts.md).
 
 ## Quickstart
 
 ```sh
-nix develop .#build            # VC6 SP5 under wine + the tools
-homm2 init                     # ONE-TIME: toolchain fetch -> source markers -> PDB -> delink -> configure
-homm2 redelink [--force]       # EXPLICIT: refresh all delinker inputs and atomically rebuild the target
-homm2 build                    # compile src (wine cl) -> comparisons + hard gates -> refresh status
-homm2 link                     # reproducible retail-exact VC6 link in build/link/
-homm2 status                   # per-unit + overall match %
-homm2 format --check           # verify header and enum formatting
+nix develop .#build       # VC6 SP5 under wine + the tools
+homm2 init                # one-time: fetch pinned toolchain -> delink -> configure
+homm2 build               # compile everything, compare against retail, run gates
+homm2 link                # generic link: raw objects, no retail content
+homm2 link --rsrc         # + resources compiled from res/ (the playable build)
+homm2 link --transform    # + reviewed COFF transforms; byte-identical to retail
+homm2 status              # per-unit and overall match %
+homm2 selftest            # tool test suite
 ```
 
-The final link is opt-in, so object matching stays fast. Ninja generates the reviewed import
-libraries from retail import records plus the ordinal/alias manifests under `imports/`,
-extracts the retail resources,
-and invokes the pinned VC6 `LINK.EXE` with the recovered object and library topology. The
-untouched LINK output and its MAP are `build/link/HMM2PL.exe` and `build/link/HMM2PL.map`;
-there is no post-link executable rewrite. The same target performs a strict whole-file audit
-and writes `build/link/HMM2PL.link.json`; any byte difference fails the build.
-The evidence and contribution contracts are documented in
-[`docs/retail-exact-link.md`](docs/retail-exact-link.md).
+After changing a `VA`/`DATA`/`VTBL` claim, run `homm2 redelink` to rebuild the
+delinked target, then `homm2 build`.
 
-`homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
-`DATA`, `DATA_COMPGEN`, `DATA_COMPGEN_GUARD`, `VTBL`, or `VTBL2` identity, run
-`homm2 redelink` when you want to replace the fixed target, then run `homm2 build`.
-The build performs only a fast warning-only model-drift census, so a half-built TU
-does not force an immediate redelink.
+## Build and play the game
 
-This target was built with **Visual C++ 6.0 SP5**, not the VC 4.2 of the PoL 2.0 line,
-so the toolchain is a single component: `build/toolchain/msvc`, compiler and linker in
-one tree. **`homm2 init` fetches it** from the pinned `toolchain-vc6-sp5` release, gates
-the download on the archive's recorded SHA-256, then re-runs the release builder's own
-`verify()` over the unpacked tree. Nothing to do by hand:
+From nothing to a playable rebuilt executable:
 
 ```sh
-homm2 init                                    # fetches the toolchain, then redelinks
-python3 -m homm2.init.toolchain --check       # re-validate an existing tree
-python3 -m homm2.init.toolchain --force       # refetch over it
+# 0. prerequisites: nix (with flakes), a legally obtained Buka HMM2PL.exe,
+#    and a legally obtained game install (DATA/, MAPS/, the middleware DLLs)
+git clone <this repo> && cd homm2-decomp
+cp /path/to/HMM2PL.exe build/orig/          # the retail control image
+nix develop .#build
+homm2 init                                  # fetch pinned toolchain, delink
+homm2 build                                 # compile + verify 1727/1727 exact
+homm2 link --rsrc                           # the playable rebuilt executable
+
+# one-time play environment (game data + dedicated wineprefix + D: cd drive)
+python3 scripts/toolchain/create-wine-prefix.py /path/to/installed/game
+build/game-wine/play.sh                     # runs the rebuilt HMM2PL.exe
 ```
 
-Rebuilding the tarball from the preserved media stays supported. Two things about SP5
-make it more than an unzip: its cabinets are a multi-volume set that must be followed
-through the chain, and it ships four back ends under edition-specific names, of which
-Enterprise's `msvcep.dll` is the one this target used. The base disc also spells every
-name in 8.3, so six C++ standard headers are restored to their long names. The builder
-also reconstructs the pinned original MASM 6.11 disk image and installs its OMF-producing
-`ML.EXE` and message file:
+The play environment lives in `build/game-wine/` (gitignored): `game/` holds
+your install's data plus the rebuilt `HMM2PL.exe`, `cd/Tracks2/` is where the
+Buka CD's `.ogg` music goes, and `prefix/` is a wineprefix separate from the
+build one, with a virtual desktop so the game's mode switches never touch the
+host. Re-running the provisioner refreshes the rebuilt executable and never
+touches saves or configuration.
 
-```sh
-nix-shell scripts/toolchain/create-toolchain-release.nix     # pins all three media inputs
-scripts/toolchain/create-toolchain-release.py --check build/toolchain/msvc
-```
+## The three link modes
 
-Ten artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
-`LINK.EXE`, `CVTRES.EXE`, `ML.EXE`, `ML.ERR`, `LIBCMT.LIB`, `MSVCPRT.LIB` - and the assembled compiler
-must stamp the target's own `@comp.id` before a tarball is written. `clang`/`clangd` is
-editor tooling only; the Wine VC6 build is the sole verdict on a match.
+Every mode drives the untouched pinned `LINK.EXE`; nothing rewrites the output
+afterward. They differ only in what goes in:
 
-ninja **tracks header dependencies** (via `cc_wrap.py`'s include scanner), so editing a
-shared header recompiles exactly its includers — no stale objects. `homm2 build`
-then runs **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
-forward-decls locally (all come from headers), no object emits a function symbol absent from
-the claimed inventory, every global carries a unique `DATA(<its VA>)`, every free function is
-declared in its owner header, and every extern global has a definition in its owner TU
-(link-completeness), and every class vtable is claimed by a `VTBL()` census marker in its
-owner TU. Full catalog: `docs/build-asserts.md`. (The symbol-model gates are switched off
-until the inventory has grown enough to audit; see `homm2/cli.py`.)
+- **generic** — raw compiled objects only. Shows exactly what the reconstructed
+  source produces; the binary runs but lacks `.rsrc` (window menus, About box,
+  icon).
+- **`--rsrc`** — adds the resources, compiled from `res/HMM2PL.rc` +
+  `res/heroes.ico` by the era `RC.EXE` and byte-gated against retail on every
+  build. Same code, same data, same behavior as retail.
+- **`--transform`** — adds the three reviewed COFF section-header permutations
+  (`scripts/homm2/build/exact_link/transforms.py`, each carrying a proof that no
+  compiler flag or source shape can replace it) plus the historical four-pass
+  PDB link, and asserts the retail SHA-256. The strict audit writes
+  `build/link/HMM2PL.link.json`.
+
+Evidence and contribution contracts: [`docs/retail-exact-link.md`](docs/retail-exact-link.md).
+Why the three transforms are irreducible: [`docs/compiler-re-allocation-order.md`](docs/compiler-re-allocation-order.md).
+
+## Toolchain
+
+`homm2 init` fetches the pinned `toolchain-vc6-sp5` release (SHA-256 gated, then
+re-verified file by file). Rebuilding the tarball from preserved media stays
+supported via `scripts/toolchain/create-toolchain-release.nix`; the builder's
+docstring records the media quirks. `clang`/`clangd` is editor tooling only —
+the wine VC6 build is the sole verdict on a match.
 
 ## Navigate (`homm2 sema`)
 
-Semantic questions about the source/target — grep is lexical only. `homm2 sema -h` lists all;
-addresses are RVAs (a full `VA(0x..)` also works for `rva`):
+Semantic questions about source and target — grep is lexical only. Addresses are
+RVAs (`homm2 sema -h` lists everything):
 
 ```sh
 homm2 sema xref   0x0004a3c0        # who calls this fn (--callees | --tree)
 homm2 sema disasm 0x0004a3c0 --diff # our (compiled) vs retail asm, side by side
-homm2 sema strings 0x0004a3c0       # a fn's string set (--find TEXT = reverse lookup)
+homm2 sema strings 0x0004a3c0       # a fn's string set (--find TEXT = reverse)
 homm2 sema match  SOURCE/KB         # per-fn match % of a unit (or an 0x RVA)
 homm2 sema rva    0x0004a3c0        # dossier: claim / src loc / ghidra / match %
 homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
-homm2 sema def|refs|hover src/… L C # clangd LSP at a point
 ```
-
-xref/disasm/strings/match/rva/clangd need no Ghidra; xref library boundaries need
-a one-time `homm2 ghidra` project (imports the EXE, applies our claimed names).

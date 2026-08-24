@@ -326,8 +326,7 @@ def main():
         import_outputs.append(output)
         resource_output = "build/link/HMM2PL.res"
         w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
-                inputs=["res/HMM2PL.rc", "res/heroes.ico",
-                        "build/orig/HMM2PL.exe"],
+                inputs=["res/HMM2PL.rc", "build/orig/HMM2PL.exe"],
                 implicit=["scripts/homm2/build/rc_res.py",
                           "scripts/homm2/build/extract_resources.py",
                           "build/toolchain/msvc/bin/RC.EXE"])
