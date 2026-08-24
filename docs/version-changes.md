@@ -333,6 +333,9 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   After storing `gConfig.musicSource`, Buka re-reads it, starts Audiere or
   Miles, then replays the previous track. PoL keeps CD and MIDI initialized
   and only replays the track. Do not port the restart tail to 2.0.
+- **[Buka] `MIDIIsPlaying` rejects every negative track index.** Buka tests
+  `CurrentMidiFile < 0`; exact PoL tests only the `MIDI_NO_TRACK` sentinel
+  (`CurrentMidiFile == -1`). Keep PoL's narrower byte-pinned predicate.
 - **[2.1?/unclassified] `bitmap` ctor/dtor rewrite** (`BASE/BITMAP`): the
   ctors allocate with plain `new` under /GX (EH-framed), the dtor `delete`s
   and null-checks; `CopyTo`/`CopyToCareful` bodies differ substantially from
