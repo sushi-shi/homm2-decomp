@@ -416,7 +416,7 @@ BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	100.0000	6d3db8e77fe2
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	fd5367a24c58
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	d4ca54ed70af
 BASE/soundmgr	?ValidatePreviousPosition@soundManager@@QAEXH@Z	100.0000	90a0ea60c65a
-BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	100.0000	ad75a8a3d3da
+BASE/soundmgr	?WAVE_init_driver@@YIPAU_DIG_DRIVER@@KGGG@Z	100.0000	2f4aa37f1e8f
 EDITOR/mapcell	??0fullMap@@QAE@XZ	100.0000	4fd01bc37bd0
 EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	cfae0d66a5ee
 EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	f98ecfb925c9

@@ -417,7 +417,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     gWaveFormat.wf.nChannels = channels;
     gWaveFormat.wf.nSamplesPerSec = sampleRate;
     gWaveFormat.wf.nAvgBytesPerSec =
-        (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels * sampleRate;
+        sampleRate * (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels;
     gWaveFormat.wf.nBlockAlign = (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels;
     gWaveFormat.wBitsPerSample = bitsPerSample;
     rc = AIL_waveOutOpen(&drvr, NULL, 0, &gWaveFormat.wf);
