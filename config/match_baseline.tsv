@@ -677,7 +677,7 @@ SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	47fa1e66459e
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	2f1e1c7d5503
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	6a74e5fe567f
 SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	97.3010	65035bd2fd0e
-SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	99.3704	b55f4d382b6d
+SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	99.9753	3c8ce0f21bd2
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	8fae25eb5921
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	c1ff9e8eeab8
 SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	880c89c023c1

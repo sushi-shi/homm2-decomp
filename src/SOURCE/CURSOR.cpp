@@ -1136,45 +1136,34 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
 
 VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
-    i32 oldOriginX0;
-    i32 cellY1;
-    i32 cellX5;
-    i32 oldOriginY9;
-    mapCell* newCursorCell5;
-    mapCell* oldCursorCell0;
-    mapCell* newPreviousCell4;
-    mapCell* oldPreviousCell2;
+    i32 oldOriginX;
+    i32 oldOriginY;
+    i32 cellX;
+    i32 cellY;
 
-    oldOriginX0 = m_mapOriginX;
-    oldOriginY9 = m_mapOriginY;
+    oldOriginX = m_mapOriginX;
+    oldOriginY = m_mapOriginY;
     m_mapOriginX += directionX;
     m_mapOriginY += directionY;
-    directionX = oldOriginX0 - m_mapOriginX;
-    directionY = oldOriginY9 - m_mapOriginY;
+    directionX = oldOriginX - m_mapOriginX;
+    directionY = oldOriginY - m_mapOriginY;
     if (directionX != 0 || directionY != 0) {
-        oldCursorCell0 = m_mapData->GetCell(m_cursorMapX + oldOriginX0, m_cursorMapY + oldOriginY9);
-        DebugCheck();
-        oldCursorCell0->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+        m_mapData->GetCell(m_cursorMapX + oldOriginX, m_cursorMapY + oldOriginY)->m_flags
+            &= ~CURSOR_MAP_VISIBLE_FLAG;
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
-        cellX5 = m_cursorMapX + m_mapOriginX;
-        cellY1 = m_cursorMapY + m_mapOriginY;
-        newCursorCell5 = m_mapData->cells + m_mapData->width * cellY1 + cellX5;
-        DebugCheck();
-        newCursorCell5->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+        cellX = m_cursorMapX + m_mapOriginX;
+        cellY = m_cursorMapY + m_mapOriginY;
+        m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
-            oldPreviousCell2 = m_mapData->cells
-                + m_mapData->width * (m_previousCursorMapY + oldOriginY9)
-                + (m_previousCursorMapX + oldOriginX0);
-            DebugCheck();
-            oldPreviousCell2->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+            m_mapData
+                ->GetCell(m_previousCursorMapX + oldOriginX, m_previousCursorMapY + oldOriginY)
+                ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
-            cellX5 = m_previousCursorMapX + m_mapOriginX;
-            cellY1 = m_previousCursorMapY + m_mapOriginY;
-            newPreviousCell4 = m_mapData->cells + m_mapData->width * cellY1 + cellX5;
-            DebugCheck();
-            newPreviousCell4->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+            cellX = m_previousCursorMapX + m_mapOriginX;
+            cellY = m_previousCursorMapY + m_mapOriginY;
+            m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         }
     }
     m_forceCompleteDraw = 1;
