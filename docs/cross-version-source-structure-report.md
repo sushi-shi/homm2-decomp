@@ -379,6 +379,21 @@ The complete 102-cell comparison/state product makes Buka's
 residual, with no entry in the gameplay-change inventory. See
 `docs/matching/FightValueOfStack/`.
 
+### Free `SaveGame()`: exact fork-specific names
+
+| property | PoL result |
+|---|---|
+| RVA | `0x00064e9f` |
+| live bytes / CFG | 100.000000%; 588 bytes; exact 24/24 blocks |
+| relocations | complete ordered 41/41 stream |
+| Buka seven-name arm | 99.821655%; same size and topology |
+
+The two functions have the same save logic. PoL's seven suffix-pinned locals
+are already exact; Buka's `ok/nPlayers/i/suffix/pattern/req/status` set changes
+VC4.2 identifier buckets and regresses the bytes. Retain the PoL source. Buka's
+23-block/45-relocation form also carries VC6 and localized-data ownership, not
+a gameplay delta. See `docs/matching/SaveGame/`.
+
 ## Bugs and bug candidates exposed by the exact branch
 
 ### Confirmed reconstruction bug
@@ -436,7 +451,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `SaveGame` | 99.9084% | exact Buka large-body reference |
 | `SmackManagerMain` | 99.8963% | removed speed-test/low-memory branches |
 | `HeroQuickView` | 99.8681% | low-memory and quick-info structure |
 | `InitMenuHandler` | 99.8268% | exact Buka menu CFG |
