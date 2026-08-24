@@ -18,6 +18,10 @@ homm2 clean --out build/clean \
 homm2 clean \
   --classic-from ../homm2-decomp-master \
   --out build/classic --publish classic-pol-2.0             # publish classic branch
+homm2 clean \
+  --classic-from ../source-gold-2.1-buka \
+  --classic-encoding cp1251 \
+  --out build/classic-gold --publish classic-gold-2.1-buka  # readable Russian
 ```
 
 ## Why it is safe
@@ -142,3 +146,10 @@ The domain widths come from the matching tree, including split domains whose
 public type is `i32` but whose serialized fields are narrower. Remaining scoped
 enums become integer typedefs with prefixed constants, avoiding name collisions
 without requiring `enum class`. Inline assembly is copied unchanged.
+
+The Gold/Buka classic branch is intentionally not UTF-8. With
+`--classic-encoding cp1251`, retail `\\xNN` byte escapes inside literals are
+materialized as readable Russian text and the generated C/C++ files are stored
+as Windows-1251. Its Ninja/Nix build uses MinGW GCC with both the input and
+execution character sets fixed to CP1251, preserving the original runtime byte
+strings. The clean source branch and the cross-platform branches remain UTF-8.

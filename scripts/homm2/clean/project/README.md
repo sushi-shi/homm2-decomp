@@ -28,7 +28,8 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
   non-incrementally-linked retail target.
 - `source-gold-2.1-buka` is its generated clean source tree and the primary
   source base of `master`.
-- `classic-gold-2.1-buka` is the corresponding legacy-mangling source view.
+- `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
+  stored as Windows-1251 with readable Russian literals rather than UTF-8.
 - `master` is the cross-platform Linux, Windows, and Web port.
 - `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
 
