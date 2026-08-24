@@ -9673,10 +9673,10 @@ void ComputeAdvNetControl(void) {
     {
         i32 selectedPlayer = -1;
         i32 player;
-        i32 currentPlayer;
+        i32 myPlayer;
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
-            while (giCurPlayer != player) {
+            while (player != giCurPlayer) {
                 if (!gpGame->m_playerDead[player] && gbHumanPlayer[player]) {
                     gbThisNetGotAdventureControl = gbThisNetHumanPlayer[player];
                     return;
@@ -9685,7 +9685,7 @@ void ComputeAdvNetControl(void) {
         }
 
         player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
-        while (giCurPlayer != player) {
+        while (player != giCurPlayer) {
             player = (player + 1) % GAME_PLAYER_COUNT;
             if (!gpGame->m_playerDead[player] && gbHumanPlayer[player]) {
                 selectedPlayer = player;
