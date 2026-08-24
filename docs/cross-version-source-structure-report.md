@@ -126,6 +126,14 @@ appendix; it is not the matching priority.
   extra equal-valued enum declarations are not transferred: their header-level
   VC4.2 state change regresses the raw object to 99.98%. The other three source
   dimensions are byte-neutral and remain in their retail-specific forms.
+- `combatManager::Armageddon` adopts only Buka's destination shake-pointer
+  ownership. Its 50-state census reproduces the historical 99.687065% island;
+  a complete 204-cell source/destination order product raises that island to
+  99.690560% with the same retail size, 92-block graph and 79 relocations.
+  Source order is neutral. A second complete 204-cell product proves both
+  Buka `>= 0` source guards neutral under VC4.2, so PoL keeps its comparisons.
+  This is a matching-source transfer with no behavior change; army-address
+  arithmetic and two comparison islands remain open.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -509,9 +517,7 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `CastSpell` | 99.7599% | literal-true Magic Arrow case guard |
 | `FizzleForward` | 99.7204% | save/restore update flags; row recomputation |
-| `Armageddon` | 99.6871% | shake-pointer expression ownership |
 | `DoVictory` | 99.6867% | compare order plus known semantic delta |
 | `SetCombatDirections` | 99.6679% | exact Buka phase order |
 | `SpecialAttack` | 99.6240% | frame/name donor; localized body differs |

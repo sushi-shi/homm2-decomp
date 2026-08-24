@@ -1778,8 +1778,8 @@ void combatManager::Armageddon(void) {
                              + (offsetY > 0 ? offsetY : 0) * COMBAT_SCREEN_WIDTH
                              + (offsetX > 0 ? offsetX : 0);
                 u8* destination = gpWindowManager->m_screen->m_pixels
-                                  + (offsetY > 0 ? 0 : -offsetY) * COMBAT_SCREEN_WIDTH
-                                  + (offsetX > 0 ? 0 : -offsetX);
+                                  + (offsetX > 0 ? 0 : -offsetX)
+                                  + (offsetY > 0 ? 0 : -offsetY) * COMBAT_SCREEN_WIDTH;
                 i32 row;
                 for (row = 0; row < copyHeight; ++row) {
                     memcpy(destination, source, copyWidth);
