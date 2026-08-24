@@ -1,7 +1,7 @@
 #ifndef HOMM2_EDITOR_FULLMAP_H
 #define HOMM2_EDITOR_FULLMAP_H
 
-#include <va.h>
+#include <Ints.h>
 #include "mapcell.h"
 
 class mapCell;
@@ -29,7 +29,7 @@ public:
         class mapCell*,
         i32,
         i32,
-        H2_ENUM_PARAM(TilesetId, i32),
+        TilesetId,
         i32,
         i32,
         i32
@@ -54,5 +54,4 @@ public:
         return &extras[i];
     }
 };
-SIZE(fullMap, 20);
 #endif

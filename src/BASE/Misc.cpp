@@ -1,5 +1,5 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -12,7 +12,7 @@
 #include <BASE/Misc.h>
 #include <BASE/MiscEnums.h>
 #include <BASE/MISC_TYPES.h>
-H2_ENUM_BEGIN(DataEntryLayout)
+typedef enum DataEntryLayout {
     WINDOW_X                    = 0xb1,
     WINDOW_Y                    = 0x14,
     INPUT_BOX_Y_OFFSET          = 0x17,
@@ -37,9 +37,9 @@ H2_ENUM_BEGIN(DataEntryLayout)
     REDRAW_OFFSET               = 10,
     DRAW_MODE                   = 1,
     WIDGET_Z_ORDER              = -1
-H2_ENUM_END(DataEntryLayout)
+} DataEntryLayout;
 
-H2_ENUM_BEGIN(DataEntryWidgetId)
+typedef enum DataEntryWidgetId {
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
     ENTRY_BUTTON_ONE    = 0x7801,
@@ -48,9 +48,9 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
     ENTRY_BUTTON_SIX    = 0x7806,
     ENTRY_BUTTON_SEVEN  = 0x7807,
     ENTRY_BUTTON_EIGHT  = 0x7808
-H2_ENUM_END(DataEntryWidgetId)
+} DataEntryWidgetId;
 
-H2_ENUM_BEGIN(MiscLogPrivateConstant)
+typedef enum MiscLogPrivateConstant {
     MEMORY_LEAK_DEBUG_LEVEL   = 1,
     FILE_DEBUG_LEVEL          = 2,
     DEBUGGER_OUTPUT_LEVEL     = 4,
@@ -60,9 +60,9 @@ H2_ENUM_BEGIN(MiscLogPrivateConstant)
     MEMORY_ENTRY_CAPACITY     = 2000,
     REPORTED_MEMORY_KILOBYTES = 16034,
     ENTRY_SEARCH_COMPLETE     = 99999
-H2_ENUM_END(MiscLogPrivateConstant)
+} MiscLogPrivateConstant;
 
-H2_ENUM_BEGIN(MiscGameDefaultConstant)
+typedef enum MiscGameDefaultConstant {
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
@@ -77,9 +77,9 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     UNIQUE_ID_MIDDLE_INDEX       = 1,
     UNIQUE_ID_TRAILING_INDEX     = 2,
     UNIQUE_ID_TERMINATOR_INDEX   = 3
-H2_ENUM_END(MiscGameDefaultConstant)
+} MiscGameDefaultConstant;
 
-H2_ENUM_CLASS_BEGIN(MiscGraphicsFieldIndex)
+enum {
     GRAPHICS_SHOW_MENU_FROM_FULLSCREEN   = -5,
     GRAPHICS_X_FROM_FULLSCREEN           = -4,
     GRAPHICS_Y_FROM_FULLSCREEN           = -3,
@@ -87,9 +87,9 @@ H2_ENUM_CLASS_BEGIN(MiscGraphicsFieldIndex)
     GRAPHICS_HEIGHT_FROM_FULLSCREEN      = -1,
     GRAPHICS_FULLSCREEN                  = 0,
     GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN = 1
-H2_ENUM_CLASS_END(MiscGraphicsFieldIndex)
-
-H2_ENUM_BEGIN(MiscCDDriveConstant)
+};
+typedef i32 MiscGraphicsFieldIndex;
+typedef enum MiscCDDriveConstant {
     CD_FIRST_DRIVE_INDEX        = 2,
     CD_DRIVE_SLOT_COUNT         = 26,
     CD_PATH_PREFIX_BYTES        = 2,
@@ -99,9 +99,9 @@ H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_PROBE_TRAILER_SIZE       = 100,
     CD_RETRY_DELAY_MILLISECONDS = 3000,
     CD_RETRY_LIMIT              = 2
-H2_ENUM_END(MiscCDDriveConstant)
+} MiscCDDriveConstant;
 
-H2_ENUM_BEGIN(PCXConstant)
+typedef enum PCXConstant {
     MANUFACTURER_ZSOFT    = 10,
     VERSION_3_0           = 5,
     ENCODING_RLE          = 1,
@@ -113,16 +113,16 @@ H2_ENUM_BEGIN(PCXConstant)
     VGA_PALETTE_MARKER    = 0x0c,
     PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
-H2_ENUM_END(PCXConstant)
+} PCXConstant;
 
-H2_ENUM_BEGIN(MiscCycleColorRange)
+typedef enum MiscCycleColorRange {
     CYCLE_RANGE_ONE_FIRST = 0xd6,
     CYCLE_RANGE_ONE_LAST  = 0xdd,
     CYCLE_RANGE_TWO_FIRST = 0xe7,
     CYCLE_RANGE_TWO_LAST  = 0xed
-H2_ENUM_END(MiscCycleColorRange)
+} MiscCycleColorRange;
 
-H2_ENUM_BEGIN(MiscFadeConstant)
+typedef enum MiscFadeConstant {
     FADE_LEVEL_COUNT              = 0x40,
     FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
@@ -131,9 +131,9 @@ H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_TO_INCREMENT_SHIFT       = 2,
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
-H2_ENUM_END(MiscFadeConstant)
+} MiscFadeConstant;
 
-H2_ENUM_BEGIN(MiscPaletteComponent)
+typedef enum MiscPaletteComponent {
     PALETTE_COMPONENT_COUNT     = 3,
     PALETTE_RED_INDEX           = 0,
     PALETTE_GREEN_INDEX         = 1,
@@ -141,22 +141,22 @@ H2_ENUM_BEGIN(MiscPaletteComponent)
     PALETTE_RED_OUTPUT_OFFSET   = -3,
     PALETTE_GREEN_OUTPUT_OFFSET = -2,
     PALETTE_BLUE_OUTPUT_OFFSET  = -1
-H2_ENUM_END(MiscPaletteComponent)
+} MiscPaletteComponent;
 
-H2_ENUM_BEGIN(MiscWindowConstant)
+typedef enum MiscWindowConstant {
     MINIMUM_WINDOW_WIDTH   = 320,
     MINIMUM_WINDOW_HEIGHT  = 240,
     WINDOW_POSITION_MARGIN = 200
-H2_ENUM_END(MiscWindowConstant)
+} MiscWindowConstant;
 
-H2_ENUM_BEGIN(MiscBlitConstant)
+typedef enum MiscBlitConstant {
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
     BLIT_SCREEN_WIDTH  = 0x280,
     BLIT_SCREEN_HEIGHT = 0x1e0
-H2_ENUM_END(MiscBlitConstant)
+} MiscBlitConstant;
 
-H2_ENUM_BEGIN(SeededRandomConstant)
+typedef enum SeededRandomConstant {
     INITIAL_SEED               = 0x08156a03,
     RANDOM_TERM_MULTIPLIER     = 13,
     RANDOM_TERM_MASK           = 0xFF,
@@ -170,13 +170,13 @@ H2_ENUM_BEGIN(SeededRandomConstant)
     RANDOM_MIX_SHIFT           = 4,
     RANDOM_TOP_BIT             = 31,
     RANDOM_HIGH_MIX_MULTIPLIER = 8
-H2_ENUM_END(SeededRandomConstant)
+} SeededRandomConstant;
 
-H2_ENUM_BEGIN(FileIdHashConstant)
+typedef enum FileIdHashConstant {
     HASH_LEFT_SHIFT  = 5,
     HASH_RIGHT_SHIFT = 25,
     INDEX_NOT_FOUND  = 0xffff
-H2_ENUM_END(FileIdHashConstant)
+} FileIdHashConstant;
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
@@ -195,21 +195,21 @@ H2_ENUM_END(FileIdHashConstant)
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-DATA(0x005331c0) static i32 giFindMid;
+static i32 giFindMid;
 
-DATA(0x005331cc) static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rect right edge
-DATA(0x005331d0) static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
+static i32 gBlitRight;
+static i32 gBlitBottom;
 
-DATA(0x0051dce8) i32 iMemEntries = 0;
-DATA(0x0051dcec) MemEntry* gpMemEntry = NULL;
-DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
-DATA(0x0051dcf8) u8
+i32 iMemEntries = 0;
+MemEntry* gpMemEntry = NULL;
+i32 giTotalMemAllocated = 0;
+u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-DATA(0x0051dd08) i32 iLastSeed = INITIAL_SEED;
-DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
+i32 iLastSeed = INITIAL_SEED;
+static char gMemEntryTag[sizeof("IME")] = "IME";
 
-DATA(0x0051dd10) static SMiscText gMiscText = {
+static SMiscText gMiscText = {
     {{"KBAlloc    Size %d   Ptr %d   File %s  Line %d"},
      {"Free "},
      {"NULL POINTER"},
@@ -361,15 +361,14 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
     {{"advmice.mse"}, {""}, {"evntwin%d.bin"}, {""}, {"buybuild.icn"}, {"bigfont.fnt"}, {""}}
 };
 
-H2_ENUM_BEGIN(StatusBarLayout)
+typedef enum StatusBarLayout {
     STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
     STATUS_TEXT_HEIGHT = 16
-H2_ENUM_END(StatusBarLayout)
+} StatusBarLayout;
 
-VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
     LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
            LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
@@ -378,7 +377,6 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-VA(0x004c3d70, 0x20f)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     char text[FORMAT_BUFFER_SIZE];
     char logText[TEXT_BUFFER_SIZE];
@@ -435,7 +433,6 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[TEXT_BUFFER_SIZE];
     char text[FORMAT_BUFFER_SIZE];
@@ -535,7 +532,6 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     }
 }
 
-VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= MEMORY_LEAK_DEBUG_LEVEL && gpMemEntry != NULL) {
@@ -579,7 +575,6 @@ void PrintMemoryLeaks(void) {
     }
 }
 
-VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void) {
     sprintf(gText, gMiscText.memory.memoryStatusFormat.text, REPORTED_MEMORY_KILOBYTES);
     i32 savedDebugLevel = giDebugLevel;
@@ -608,24 +603,23 @@ void ShowMemoryStatus(void) {
     giDebugLevel = savedDebugLevel;
 }
 
-VA(0x004c44f0, 0x48)
-u32l MAKEFILEID(char* text) {
+u32l MAKEFILEID(const char* text) {
     u32 hash = 0;
     i32 sum = 0;
     for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        if (text[i] >= 'a' && text[i] <= 'z') {
-            text[i] &= ~('a' - 'A');
+        char value = text[i];
+        if (value >= 'a' && value <= 'z') {
+            value &= ~('a' - 'A');
         }
         u32 shiftedHash = hash << HASH_LEFT_SHIFT;
         hash >>= HASH_RIGHT_SHIFT;
         hash += shiftedHash;
-        sum += text[i];
-        hash += text[i] + sum;
+        sum += value;
+        hash += value + sum;
     }
     return hash;
 }
 
-VA(0x004c4540, 0x95)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
     while (1) {
@@ -649,7 +643,6 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 #include <BASE/MiscGraphicsConstants.h>
 
-VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
     i32 done;
     i32 level;
@@ -660,7 +653,7 @@ void FadeIn(i32 increment) {
     if (fadePalette == NULL)
         MemError();
     done = 0;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (gConfig.gfx[(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     for (level = 0; level < MISC_PALETTE_LEVEL_COUNT; level += increment) {
@@ -687,13 +680,12 @@ void FadeIn(i32 increment) {
     delete fadePalette;
 }
 
-VA(0x004c46d0, 0xe6)
 void FadeOut(i32 increment) {
     palette* fadePalette = new palette;
     if (fadePalette == NULL)
         MemError();
     i32 done = 0;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (gConfig.gfx[(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
@@ -723,7 +715,6 @@ void FadeOut(i32 increment) {
     }
 }
 
-VA(0x004c47c0, 0x28)
 i32 Random(i32 low, i32 high) {
     if (low == high) {
         return high;
@@ -734,7 +725,6 @@ i32 Random(i32 low, i32 high) {
     return low + rand() % (high - low + 1);
 }
 
-VA(0x004c47f0, 0x5d)
 void ProcessAssert(i32 condition, char* file, i32 line) {
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
@@ -747,7 +737,6 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
     }
 }
 
-VA(0x004c4850, 0x66)
 char* FindStringInString(char* text, char* pattern) {
     i32 text_len = strlen(text);
     i32 pattern_len = strlen(pattern);
@@ -763,7 +752,6 @@ char* FindStringInString(char* text, char* pattern) {
     return NULL;
 }
 
-VA(0x004c48c0, 0x31)
 char* FindToken(char* text, char token) {
     i32 len = strlen(text);
     for (i32 i = 0; i < len; ++i) {
@@ -773,7 +761,6 @@ char* FindToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004c4900, 0x2b)
 char* FindLastToken(char* text, char token) {
     for (i32 i = strlen(text) - 1; i >= 0; --i) {
         if (text[i] == token) {
@@ -783,34 +770,32 @@ char* FindLastToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004c4930, 0x6c)
 void SetInstallDefaults(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
     strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
-// Retail saves ESI/EDI before materializing the main-game graphics slot.
-VA(0x004c49a0, 0x1b5)
+
 void SetGameDefaults(void) {
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
-    i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
+    i32* fullScreen = &gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].fullScreen;
     do {
-        fullScreen[IDX(GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
-        fullScreen[IDX(GRAPHICS_X_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(GRAPHICS_Y_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
-        fullScreen[IDX(GRAPHICS_FULLSCREEN)] = 1;
+        fullScreen[(GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
+        fullScreen[(GRAPHICS_X_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
+        fullScreen[(GRAPHICS_Y_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
+        fullScreen[(GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
+        fullScreen[(GRAPHICS_FULLSCREEN)] = 1;
         if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
-            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_SMALL_WINDOW_WIDTH;
-            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
+            fullScreen[(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_SMALL_WINDOW_WIDTH;
+            fullScreen[(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
                 DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_WINDOW_WIDTH;
-            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = DEFAULT_WINDOW_HEIGHT;
+            fullScreen[(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_WINDOW_WIDTH;
+            fullScreen[(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = DEFAULT_WINDOW_HEIGHT;
         }
         fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
     } while (fullScreen < &gConfig.showCombatGrid);
@@ -852,7 +837,6 @@ void SetGameDefaults(void) {
     gConfig.needsDefaultInitialization = 0;
 }
 
-VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void) {
     sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
     if (access(gText, 0) == -1) {
@@ -877,16 +861,15 @@ skipDefaults:
     strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
-H2_ENUM_BEGIN(RegistryValueSize)
+typedef enum RegistryValueSize {
     REGISTRY_TEXT_BUFFER_SIZE = 100,
     REGISTRY_DWORD_BYTES      = 4,
     CONFIG_ZERO_BUFFER_WORDS  = 25,
     MODEM_INIT_STRING_SIZE    = 0x62,
     UNIQUE_SYSTEM_ID_SIZE     = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
-H2_ENUM_END(RegistryValueSize)
+} RegistryValueSize;
 
-VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {
     HKEY hKey;
     DWORD dwType;
@@ -989,7 +972,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.directComPort.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+        reinterpret_cast<u8*>(&gConfig.comPort[(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -997,7 +980,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.directBaudRate.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -1005,7 +988,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.modemComPort.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+        reinterpret_cast<u8*>(&gConfig.comPort[(CONFIG_CONNECTION_MODEM)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -1013,7 +996,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.modemBaudRate.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[(CONFIG_CONNECTION_MODEM)]),
         &dwSize
     );
     dwSize = MODEM_INIT_STRING_SIZE + 1;
@@ -1170,7 +1153,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameShowMenu.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].showMenu),
         &dwSize
     );
     RegQueryValueExA(
@@ -1178,7 +1161,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameX.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].x),
         &dwSize
     );
     RegQueryValueExA(
@@ -1186,7 +1169,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameY.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].y),
         &dwSize
     );
     RegQueryValueExA(
@@ -1194,7 +1177,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameWidth.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].width),
         &dwSize
     );
     RegQueryValueExA(
@@ -1202,7 +1185,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameHeight.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].height),
         &dwSize
     );
     RegQueryValueExA(
@@ -1210,7 +1193,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameFullScreen.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].fullScreen),
         &dwSize
     );
     RegQueryValueExA(
@@ -1218,7 +1201,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameColorMouseCursor.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
         &dwSize
     );
     RegQueryValueExA(
@@ -1226,7 +1209,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorShowMenu.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].showMenu),
         &dwSize
     );
     RegQueryValueExA(
@@ -1234,7 +1217,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorX.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].x),
         &dwSize
     );
     RegQueryValueExA(
@@ -1242,7 +1225,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorY.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].y),
         &dwSize
     );
     RegQueryValueExA(
@@ -1250,7 +1233,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorWidth.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].width),
         &dwSize
     );
     RegQueryValueExA(
@@ -1258,7 +1241,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorHeight.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].height),
         &dwSize
     );
     RegQueryValueExA(
@@ -1266,7 +1249,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorFullScreen.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
         &dwSize
     );
     RegQueryValueExA(
@@ -1274,7 +1257,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorColorMouseCursor.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
         &dwSize
     );
     dwSize = MODEM_INIT_STRING_SIZE + 1;
@@ -1299,22 +1282,21 @@ void ReadPrefsFromRegistry(void) {
         != 0)
         strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
-    // Clamp the saved window geometry to sane defaults / on-screen bounds.
-    if (gConfig.gfx[IDX(giCurExe)].width <= 0)
-        gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
-    if (gConfig.gfx[IDX(giCurExe)].height <= 0)
-        gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
-    if (gConfig.gfx[IDX(giCurExe)].x < 0)
-        gConfig.gfx[IDX(giCurExe)].x = 0;
-    if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-    if (gConfig.gfx[IDX(giCurExe)].y < 0)
-        gConfig.gfx[IDX(giCurExe)].y = 0;
-    if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
+
+    if (gConfig.gfx[(giCurExe)].width <= 0)
+        gConfig.gfx[(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
+    if (gConfig.gfx[(giCurExe)].height <= 0)
+        gConfig.gfx[(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
+    if (gConfig.gfx[(giCurExe)].x < 0)
+        gConfig.gfx[(giCurExe)].x = 0;
+    if (gConfig.gfx[(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
+    if (gConfig.gfx[(giCurExe)].y < 0)
+        gConfig.gfx[(giCurExe)].y = 0;
+    if (gConfig.gfx[(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
 }
 
-VA(0x004c5450, 0xa1)
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
@@ -1326,7 +1308,6 @@ void ReadPrefs(void) {
     sprintf(gConfig.rmtSDName, gMiscText.remoteNames.serverRight.text, gConfig.uniqueSystemID);
 }
 
-VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void) {
     i32 zeroBuffer[CONFIG_ZERO_BUFFER_WORDS];
     i32 i;
@@ -1343,7 +1324,6 @@ void WritePrefsToFile(void) {
     }
 }
 
-VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void) {
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
@@ -1423,7 +1403,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.directComPort.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+        reinterpret_cast<u8*>(&gConfig.comPort[(CONFIG_CONNECTION_DIRECT)]),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1431,7 +1411,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.directBaudRate.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[(CONFIG_CONNECTION_DIRECT)]),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1439,7 +1419,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.modemComPort.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+        reinterpret_cast<u8*>(&gConfig.comPort[(CONFIG_CONNECTION_MODEM)]),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1447,7 +1427,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.modemBaudRate.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[(CONFIG_CONNECTION_MODEM)]),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1599,7 +1579,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameShowMenu.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].showMenu),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1607,7 +1587,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameX.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].x),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1615,7 +1595,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameY.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].y),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1623,7 +1603,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameWidth.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].width),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1631,7 +1611,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameHeight.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].height),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1639,7 +1619,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameFullScreen.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].fullScreen),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1647,7 +1627,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameColorMouseCursor.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1655,7 +1635,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorShowMenu.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].showMenu),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1663,7 +1643,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorX.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].x),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1671,7 +1651,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorY.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].y),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1679,7 +1659,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorWidth.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].width),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1687,7 +1667,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorHeight.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].height),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1695,7 +1675,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorFullScreen.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1703,27 +1683,24 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorColorMouseCursor.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
         REGISTRY_DWORD_BYTES
     );
     RegCloseKey(hKey);
 }
 
-VA(0x004c5a10, 0xa)
 void WritePrefs(void) {
     UpdateSystemOptionsMenu();
     WritePrefsToRegistry();
 }
 
-VA(0x004c5a20, 0x3c)
 i32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, gMiscText.cd.rootDrive.text);
     gText[0] = gText[0] + driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-VA(0x004c5a60, 0x3ed)
-H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
+CDRomSetupResult SetupCDDrive(void) {
     char registryPath[CD_PATH_BUFFER_SIZE];
     char registryKey[CD_PATH_BUFFER_SIZE];
     char cdDrives[CD_DRIVE_SLOT_COUNT];
@@ -1827,24 +1804,21 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     }
 }
 
-VA(0x004c5e50, 0x18)
 void BitmapToScreen(class bitmap* bmp) {
     BlitBitmapToScreen(bmp, 0, 0, bmp->m_width, bmp->m_height, 0, 0);
 }
 
-VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
     memcpy(
         gCyclePal,
-        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        paletteData + (CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
         sizeof(gCyclePal)
     );
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
 
-VA(0x004c5eb0, 0x25)
 void BlitBitmapToScreenNoMouseCheck(
     class bitmap* bmp,
     i32 sourceX,
@@ -1857,7 +1831,6 @@ void BlitBitmapToScreenNoMouseCheck(
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
 }
 
-VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(
     class bitmap* bmp,
     i32 sourceX,
@@ -1910,7 +1883,6 @@ void BlitBitmapToScreen(
         gpMouseManager->RestoreUnderlying();
     }
 }
-VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
@@ -1930,7 +1902,6 @@ void LogTruncate(void) {
 }
 
 
-VA(0x004c6120, 0x9e)
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
@@ -1947,7 +1918,6 @@ void LogStr(char* text) {
     }
 }
 
-VA(0x004c61c0, 0x224)
 void LogInt(
     char* label,
     i32 value1,
@@ -2018,7 +1988,6 @@ void LogInt(
     }
 }
 
-VA(0x004c63f0, 0x6c)
 void AiPrint(char* text) {
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
@@ -2046,7 +2015,6 @@ void AiPrint(char* text) {
     );
 }
 
-VA(0x004c6460, 0x7a)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
@@ -2081,7 +2049,6 @@ static inline i32 FadeThreshold(i32 level, i32 increment) {
     return giChangeThreshold[index];
 }
 
-VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
     memcpy(colors, source, sizeof(colors));
@@ -2117,7 +2084,6 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
-VA(0x004c65e0, 0xb8)
 void FadeToColorTable(u8* colorTable, i32 increment) {
     u8* pixel;
     i32 x;
@@ -2151,7 +2117,6 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     gpWindowManager->m_updateFlags = savedUpdateFlags;
 }
 
-VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
     if ((color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST)) {
@@ -2164,7 +2129,6 @@ static inline i32 PCXValueIsLiteral(u8 value) {
     return (value & RLE_RUN_MARKER) != RLE_RUN_MARKER;
 }
 
-VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
     memset(&header, 0, sizeof(header));
@@ -2182,7 +2146,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         return;
     write(fileHandle, &header, sizeof(header));
     u8* encodedRow =
-        static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 1480));
+        static_cast<u8*>(H2_ALLOC(width * 2));
     for (i32 row = 0; row < height; ++row) {
         i32 sourceIndex = 0;
         u8* rowPixels = pixels + row * width;
@@ -2208,20 +2172,19 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         }
         write(fileHandle, encodedRow, encodedSize);
     }
-    H2_FREE_AT(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
+    H2_FREE(encodedRow);
     u8 paletteMarker = VGA_PALETTE_MARKER;
     write(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
     write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
-    H2_FREE_AT(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
+    H2_FREE(outputPalette);
     close(fileHandle);
 }
 
-VA(0x004c68c0, 0x52)
 i32l FileSize(char* filename) {
     FILE* file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
     if (file == NULL) {
@@ -2234,11 +2197,9 @@ i32l FileSize(char* filename) {
     return size;
 }
 
-VA(0x004c6920, 0xc)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
     return &iconPtr->Entries()[index];
 }
-VA(0x004c6930, 0xb8)
 i32 SRandom(i32 low, i32 high) {
     if (high == low) {
         return high;
@@ -2271,7 +2232,6 @@ i32 SRandom(i32 low, i32 high) {
     return rangedResult;
 }
 
-VA(0x004c69f0, 0x5c)
 void SIncRandomize(i32 x, i32 y) {
     x *= RANDOM_TERM_MULTIPLIER;
     x &= RANDOM_TERM_MASK;
@@ -2283,13 +2243,11 @@ void SIncRandomize(i32 x, i32 y) {
     iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
 }
 
-VA(0x004c6a50, 0x10)
 void SRand(i32 seed) {
     iLastSeed = seed;
     srand(seed);
 }
 
-VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
     i32 bitMask;
     i32 ret = 0;
@@ -2305,11 +2263,9 @@ i32 SGenRand(void) {
     return ret;
 }
 
-VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
-VA(0x004c6ac0, 0x386)
 void GetDataEntry(
     char* prompt,
     char* destination,
@@ -2365,7 +2321,7 @@ void GetDataEntry(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = ENTRY_BUTTON_ONE;
-    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    message.payload.widget.data.value = (WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     DataEntryWin->BroadcastMessage(message);
     message.payload.widget.id = ENTRY_BUTTON_SEVEN;
     DataEntryWin->BroadcastMessage(message);
@@ -2418,7 +2374,6 @@ void GetDataEntry(
     gbAllowTextEntryEscape = true;
 }
 
-VA(0x004c6e50, 0x173)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
@@ -2478,9 +2433,9 @@ normalEvent:
     return EventWindowHandler(message);
 }
 
-DATA(0x005331c4) class heroWindow* DataEntryWin;
-DATA(0x005331c8) char* cDEDest;
-DATA(0x005331d4) i32 iDEMaxLen;
-DATA(0x005331d8) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
-DATA(0x005331dc) i32 inBoxX;
-DATA(0x005331e0) i32 inBoxY;
+class heroWindow* DataEntryWin;
+char* cDEDest;
+i32 iDEMaxLen;
+i32 bDataEntryTime;
+i32 inBoxX;
+i32 inBoxY;

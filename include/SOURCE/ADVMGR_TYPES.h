@@ -1,7 +1,7 @@
 #ifndef HOMM2_ADVMGR_TYPES_H
 #define HOMM2_ADVMGR_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/KB.h>
 
@@ -18,6 +18,5 @@ union AdventureRemotePayload {
 };
 #pragma pack(pop)
 
-SIZE(AdventureRemotePayload, ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE);
 
 #endif

@@ -1,24 +1,23 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
 
-#include <va.h>
+#include <Ints.h>
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-// Occupancy is ignored when every object-stack entry is shadow-only or erased.
-H2_ENUM_CLASS_BEGIN(MapCellFlag)
+
+enum {
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
     MAP_CELL_OCCUPIED           = 0x08
-H2_ENUM_CLASS_END(MapCellFlag)
-
-H2_ENUM_BEGIN(MapCellSentinel)
+};
+typedef i32 MapCellFlag;
+typedef enum MapCellSentinel {
     MAPCELL_SPRITE_NONE = 0xff,
     MAPCELL_EXTRA_FREE  = 0xffff
-H2_ENUM_END(MapCellSentinel)
+} MapCellSentinel;
 
-// Adventure-map object image set. Retail expressions use i32, while map records
-// store the domain in packed 6/7-bit fields.
-H2_ENUM_CLASS_BEGIN_SPLIT(TilesetId, u8)
+
+enum {
     TILESET_NONE                    = 0,
     TILESET_OBJNHAUN                = 10,
     TILESET_OBJNARTI                = 11,
@@ -81,13 +80,13 @@ H2_ENUM_CLASS_BEGIN_SPLIT(TilesetId, u8)
     RANDOM_TOWN_OVERLAY_TILESET     = TILESET_OBJNTWSH,
     RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD,
     TILESET_COUNT                   = 64
-H2_ENUM_CLASS_END_SPLIT(TilesetId, u8)
-
+};
+typedef i32 TilesetId;
 #pragma pack(push, 1)
 struct mapCellExtra {
     u16 nextIndex;
     u8 animatedObject : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) objectTileset : 7;
+    TilesetId objectTileset : 7;
     u8 objectIndex;
     u8 objectLayerBit0 : 1;
     u8 objectLayerBit1 : 1;
@@ -95,11 +94,10 @@ struct mapCellExtra {
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
     u8 drawOverlayOnTop : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) overlayTileset : 6;
+    TilesetId overlayTileset : 6;
     u8 overlayIndex;
 };
 #pragma pack(pop)
-SIZE(mapCellExtra, 7);
 
 class mapCell {
 public:
@@ -110,7 +108,7 @@ public:
         struct {
             u8 m_animatedObject : 1;
             u8 m_isRoad : 1;
-            H2_ENUM_BITFIELD(TilesetId, u8) m_objectTileset : 6;
+            TilesetId m_objectTileset : 6;
         };
     };
     u8 m_objectIndex;
@@ -120,31 +118,30 @@ public:
             u16 m_objectLayerBit0 : 1;
             u16 m_objectLayerBit1 : 1;
             u16 m_objectDrawnAsOverlay : 1;
-            // Object-specific payload interpreted according to m_triggerType. It can
-            // encode an object id, quantity, flags, or packed event/site data.
+
+
             u16 m_objectMetadata : 13;
         };
         struct {
             u16 m_tentFlags : 3;
-            // Tent-specific view of the same object metadata payload.
+
             u16 m_tentColor : 13;
         };
     };
     u8 m_animatedOverlay : 1;
     u8 m_drawOverlayOnTop : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) m_overlayTileset : 6;
+    TilesetId m_overlayTileset : 6;
     u8 m_overlayIndex;
     u8 m_flags;
-    H2_ENUM_STORAGE(MapObjectType, u8) m_triggerType;
+    u8 m_triggerType;
     u16 m_extraIndex;
 
-    inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {
-        return (m_flags & IDX(flag)) != 0;
+    inline b32 HasFlag(MapCellFlag flag) const {
+        return (m_flags & (flag)) != 0;
     }
 };
-SIZE(mapCell, 12);
 
-// Legacy on-disk record sizes used by fullMap::Read's conversion path.
+
 struct oldMapCell {
     u8 raw[20];
 };

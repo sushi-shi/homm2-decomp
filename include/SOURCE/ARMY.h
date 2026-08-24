@@ -4,7 +4,7 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)
+enum {
     ARMY_ANIMATION_NONE                  = -1,
     ARMY_ANIMATION_WALK_BEGIN            = 0,
     ARMY_ANIMATION_WALK_BEGIN_STANDING   = 1,
@@ -40,10 +40,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)
     ARMY_ANIMATION_SHOOT_FORWARD_RETURN  = 31,
     ARMY_ANIMATION_SHOOT_DOWN            = 32,
     ARMY_ANIMATION_SHOOT_DOWN_RETURN     = 33
-H2_ENUM_CLASS_END_SPLIT(ArmyAnimationSequence, i8)
-H2_ENUM_STEPPED(ArmyAnimationSequence)
+};
+typedef i32 ArmyAnimationSequence;
 
-H2_ENUM_CLASS_BEGIN(ArmySampleType)
+enum {
     ARMY_SAMPLE_MOVE,
     ARMY_SAMPLE_ATTACK,
     ARMY_SAMPLE_WINCE,
@@ -52,12 +52,12 @@ H2_ENUM_CLASS_BEGIN(ArmySampleType)
     ARMY_SAMPLE_EXTRA_ONE,
     ARMY_SAMPLE_EXTRA_TWO,
     ARMY_SAMPLE_COUNT
-H2_ENUM_CLASS_END(ArmySampleType)
-
-H2_ENUM_BEGIN(ArmyCombatConstant)
+};
+typedef i32 ArmySampleType;
+typedef enum ArmyCombatConstant {
     ARMY_SAMPLE_VOLUME                   = 64,
     ARMY_SAMPLE_CHANNEL                  = 3,
-    ARMY_PRIMARY_SAMPLE_COUNT            = IDX(ARMY_SAMPLE_KILL) + 1,
+    ARMY_PRIMARY_SAMPLE_COUNT            = (ARMY_SAMPLE_KILL) + 1,
     ARMY_QUANTITY_TEXT_SIZE              = 12,
     ARMY_SPELL_EFFECT_ANIMATION_DURATION = 275,
     ARMY_HEX_COLUMNS                     = 13,
@@ -71,9 +71,9 @@ H2_ENUM_BEGIN(ArmyCombatConstant)
     ARMY_POW_EFFECT_DELAY                = 120,
     ARMY_ARCHMAGE_DISPEL_CHANCE          = 20,
     ARMY_PERCENT_MAX                     = 100
-H2_ENUM_END(ArmyCombatConstant)
+} ArmyCombatConstant;
 
-H2_ENUM_CLASS_BEGIN(ArmySpellInfluence)
+enum {
     ARMY_SPELL_INFLUENCE_NONE          = -1,
     ARMY_SPELL_INFLUENCE_HASTE         = 0,
     ARMY_SPELL_INFLUENCE_SLOW          = 1,
@@ -91,16 +91,16 @@ H2_ENUM_CLASS_BEGIN(ArmySpellInfluence)
     ARMY_SPELL_INFLUENCE_STONESKIN     = 13,
     ARMY_SPELL_INFLUENCE_STEELSKIN     = 14,
     ARMY_SPELL_INFLUENCE_COUNT         = 15
-H2_ENUM_CLASS_END(ArmySpellInfluence)
-
-H2_ENUM_CLASS_BEGIN(ArmySpellCancelType)
+};
+typedef i32 ArmySpellInfluence;
+enum {
     ARMY_CANCEL_SPELLS_AFTER_MOVE   = 0,
     ARMY_CANCEL_SPELLS_AFTER_ATTACK = 1,
     ARMY_CANCEL_SPELLS_AFTER_DAMAGE = 2,
     ARMY_CANCEL_SPELLS_UNUSED       = 3
-H2_ENUM_CLASS_END(ArmySpellCancelType)
-
-H2_ENUM_BEGIN(ArmyAttackConstant)
+};
+typedef i32 ArmySpellCancelType;
+typedef enum ArmyAttackConstant {
     ARMY_COMBAT_TEXT_SIZE              = 200,
     ARMY_COMBAT_DIRECTION_COUNT        = 8,
     ARMY_ADJACENT_DIRECTION_COUNT      = 6,
@@ -122,15 +122,15 @@ H2_ENUM_BEGIN(ArmyAttackConstant)
     ARMY_GENIE_HALF_ROLL_MAX           = 5,
     ARMY_GENIE_HALF_ROLL               = 2,
     ARMY_PATH_BLOCKED                  = 3
-H2_ENUM_END(ArmyAttackConstant)
+} ArmyAttackConstant;
 
-H2_ENUM_BEGIN(ArmyFrameConstant)
+typedef enum ArmyFrameConstant {
     ARMY_MISSILE_OFFSET_COUNT     = 3,
     ARMY_PROJECTILE_ANGLE_COUNT   = 12,
     ARMY_ANIMATION_SEQUENCE_COUNT = 34,
     ARMY_ANIMATION_FRAME_COUNT    = 16,
     ARMY_STANDING_CHANCE_COUNT    = 10
-H2_ENUM_END(ArmyFrameConstant)
+} ArmyFrameConstant;
 
 #pragma pack(push, 1)
 struct SMonFrameInfo {
@@ -141,7 +141,7 @@ struct SMonFrameInfo {
     char unknown00;
     i16 spellEffectX;
     i16 spellEffectY;
-    i8 animationXOffsets[IDX(ARMY_ANIMATION_WALK_SOURCE_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
+    i8 animationXOffsets[(ARMY_ANIMATION_WALK_SOURCE_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
     i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
     i8 standingAnimationCount;
     float standingAnimationChances[ARMY_STANDING_CHANCE_COUNT];
@@ -152,11 +152,10 @@ struct SMonFrameInfo {
     struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];
     u8 projectileDirectionCount;
     float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];
-    i32 quantityX[IDX(ARMY_FACING_COUNT)];
+    i32 quantityX[(ARMY_FACING_COUNT)];
     i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
     i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
 };
-SIZE(SMonFrameInfo, 0x335);
 #pragma pack(pop)
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 

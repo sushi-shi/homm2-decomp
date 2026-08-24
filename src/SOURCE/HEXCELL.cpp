@@ -1,18 +1,17 @@
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hexcell.h>
 
-H2_ENUM_BEGIN(TowerDrawConstant)
+typedef enum TowerDrawConstant {
     TOWER_X_OFFSET      = 28,
     TOWER_ROW_Y_ORIGIN  = 139,
     TOWER_EXCLUDED_ROW  = 4,
     TOWER_OVERLAY_FRAME = 9
-H2_ENUM_END(TowerDrawConstant)
+} TowerDrawConstant;
 
-VA(0x0044a3c0, 0x46)
 hexcell::hexcell(void) {
     m_obstacleIndex = -1;
     m_blocked = 0;
@@ -22,12 +21,10 @@ hexcell::hexcell(void) {
     m_deadOccupantCount = 0;
 }
 
-VA(0x0044a406, 0x16)
 void hexcell::DrawGround(void) {
     return;
 }
 
-VA(0x0044a41c, 0xc6)
 void hexcell::DrawLowerDeadOccupants(void) {
     ArmyFacing currentFrame;
     i32 i;
@@ -36,7 +33,7 @@ void hexcell::DrawLowerDeadOccupants(void) {
     if (m_deadOccupantCount > 0) {
         for (i = 0; i < m_deadOccupantCount - 1; ++i) {
             occupant =
-                &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
+                &gpCombatManager->m_armies[(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             currentFrame = occupant->m_facing;
             if (m_deadOccupantFrames[i] != currentFrame)
                 occupant->DrawToBuffer(m_x, m_y, 0);
@@ -44,7 +41,6 @@ void hexcell::DrawLowerDeadOccupants(void) {
     }
 }
 
-VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void) {
     ArmyFacing currentFrame;
     i32 i;
@@ -53,7 +49,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
     if (m_deadOccupantCount > 0) {
         for (i = m_deadOccupantCount - 1; i < m_deadOccupantCount; ++i) {
             occupant =
-                &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
+                &gpCombatManager->m_armies[(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             currentFrame = occupant->m_facing;
             if (m_deadOccupantFrames[i] != currentFrame)
                 occupant->DrawToBuffer(m_x, m_y, 0);
@@ -61,25 +57,23 @@ void hexcell::DrawUpperDeadOccupant(void) {
     }
 }
 
-VA(0x0044a5aa, 0x165)
 void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
     if (m_occupantSide != COMBAT_SIDE_NONE) {
         if (drawState != ARMY_DRAW_ALL) {
-            if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_drawState
+            if (gpCombatManager->m_armies[(m_occupantSide)][m_occupantIndex].m_drawState
                 != drawState)
                 return;
         }
         if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
             && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
             gbCurrArmyDrawn = true;
-        if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_facing
+        if (gpCombatManager->m_armies[(m_occupantSide)][m_occupantIndex].m_facing
             != m_occupantFrame)
-            gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex]
+            gpCombatManager->m_armies[(m_occupantSide)][m_occupantIndex]
                 .DrawToBuffer(m_x, m_y, frame);
     }
 }
 
-VA(0x0044a70f, 0x149)
 void hexcell::DrawTower(i32 frame) {
     i32 level = 0;
     i32 row;
@@ -91,7 +85,7 @@ void hexcell::DrawTower(i32 frame) {
         drawX = m_x;
     else
         drawX = m_x + TOWER_X_OFFSET;
-    gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
+    gpCombatManager->m_combatIcons[(COMBAT_ICON_TOWER)]
         ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL);
 
     row = (m_y - TOWER_ROW_Y_ORIGIN) / COMBAT_HEX_VERTICAL_STEP;
@@ -102,7 +96,7 @@ void hexcell::DrawTower(i32 frame) {
             rightX = m_x;
         else
             rightX = m_x + TOWER_X_OFFSET;
-        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
+        gpCombatManager->m_combatIcons[(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
                 rightX, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL
             );
@@ -111,19 +105,17 @@ void hexcell::DrawTower(i32 frame) {
             temp = m_x - TOWER_X_OFFSET;
         else
             temp = m_x;
-        gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
+        gpCombatManager->m_combatIcons[(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
                 temp, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL
             );
     }
 }
 
-VA(0x0044a858, 0x16)
 void hexcell::DrawClouds(void) {
     return;
 }
 
-VA(0x0044a86e, 0x4f)
 void hexcell::DrawObstacle(void) {
     gpCombatManager->m_obstacleIcons[m_obstacleIndex]
         ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL);

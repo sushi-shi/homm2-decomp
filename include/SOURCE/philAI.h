@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_PHILAI_H
 #define HOMM2_SOURCE_PHILAI_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/hero.h>
 
@@ -17,7 +17,7 @@ public:
     void DoAllHeroInteractions(void);
     void CheckForCreatureUpgrades(void);
     void CheckBuyStuff(void);
-    i32 GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)*);
+    i32 GoodAdjacent(MapDirection*);
     void CheckReload(void);
     void CheckBerserk(void);
     void DimensionDoorTo(i32, i32);
@@ -33,7 +33,7 @@ public:
         i32&,
         i32&,
         i32,
-        H2_ENUM_PARAM(MapDirection, i32)&
+        MapDirection&
     );
     void ProbableOutcomeOfBattle(
         class armyGroup*,
@@ -57,7 +57,7 @@ public:
     void ValueOfBuyingCreature(class town*, CreatureType, i32&, i32, float&);
     void GetBestCreature(class town*, struct BHC&, float&);
     i32 CreaturesToBuy(class town*, i32);
-    i32 CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32), i32);
+    i32 CreaturesToBuy(CreatureType, i32);
     i32 MaxBuyableCreatures(CreatureType);
     void ValueOfBuyingHero(class town*, class hero*, i32&, float&);
     void GetBestHero(class town*, struct BHC&, float&);
@@ -101,15 +101,15 @@ public:
         i32&,
         i32&
     );
-    i32 ChooseToFightForArtifact(ArtifactType, H2_ENUM_PARAM(CreatureType, i32), i32);
+    i32 ChooseToFightForArtifact(ArtifactType, CreatureType, i32);
     i32 NetValueOfArtifact(i32, i32, i32, i32);
     i32 ChooseToPayRansomOnHero(i32);
-    void BuildBuilding(class town*, H2_ENUM_PARAM(BuildingSlotType, i32));
+    void BuildBuilding(class town*, BuildingSlotType);
     void BuildHero(class town*, i32);
     void BuildCreature(class town*, i32, i32);
     i32 CanBuyBHC(struct BHC&);
     i32 CombatMonsterEvent(
-        class hero*, H2_ENUM_PARAM(CreatureType, i32), i32*, class mapCell*
+        class hero*, CreatureType, i32*, class mapCell*
     );
     i32 FightEvent(class hero*, class mapCell*, i32);
     i32 DamageGroup(class armyGroup*, class hero*, class hero*, float);
@@ -118,10 +118,10 @@ public:
     i32 ComputeUpgradeValue(CreatureType, CreatureType);
     i32 ComputeValueOfSS(
         class hero*,
-        H2_ENUM_PARAM(HeroSecondarySkill, i32),
-        H2_ENUM_PARAM(HeroSkillLevel, i32)
+        HeroSecondarySkill,
+        HeroSkillLevel
     );
-    i32 ComputeValueOfFreeSS(class hero*, H2_ENUM_PARAM(HeroSecondarySkill, i32));
+    i32 ComputeValueOfFreeSS(class hero*, HeroSecondarySkill);
     i32 ManaRefreshValue(class hero*, i32);
     i32 ValueOfEventAtPosition(i32, i32, i32, i32*);
     i32 EvaluateGenericSite(class mapCell*);

@@ -8,16 +8,16 @@
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(BoltColorMode)
+enum {
     BOLT_COLOR_RED_TABLE       = 257,
     BOLT_COLOR_RAINBOW_FORWARD = 300,
     BOLT_COLOR_LIGHTNING       = 301,
     BOLT_COLOR_RED_BEAM        = 302,
     BOLT_COLOR_RAINBOW_REVERSE = 303
-H2_ENUM_CLASS_END(BoltColorMode)
-H2_ENUM_FLAGS(BoltColorMode)
+};
+typedef i32 BoltColorMode;
 
-H2_ENUM_BEGIN(SpellCastConstant)
+typedef enum SpellCastConstant {
     SPELL_DEFAULT_CREATURE_POWER                   = 3,
     SPELL_HOURGLASS_POWER_BONUS                    = 2,
     SPELL_WIZARD_HAT_POWER_BONUS                   = 10,
@@ -172,7 +172,7 @@ H2_ENUM_BEGIN(SpellCastConstant)
     SPELL_SAMPLE_NAME_CAPACITY                     = 16,
     SPELL_MISSILE_ANGLE_COUNT                      = 9,
     SPELL_EAGLE_EYE_ROLL_MAX                       = 9
-H2_ENUM_END(SpellCastConstant)
+} SpellCastConstant;
 
 #define SPELL_GOLEM_DAMAGE_MULTIPLIER 0.5
 

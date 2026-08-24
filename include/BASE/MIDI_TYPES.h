@@ -1,13 +1,13 @@
 #ifndef HOMM2_BASE_MIDI_TYPES_H
 #define HOMM2_BASE_MIDI_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(MidiTextSlotSize)
+typedef enum MidiTextSlotSize {
     MIDI_TEXT_SHORT_SLOT_SIZE           = 0x4,
     MIDI_TEXT_LOG_SLOT_SIZE             = 0x8,
     MIDI_TEXT_FILENAME_FORMAT_SLOT_SIZE = 0x14
-H2_ENUM_END(MidiTextSlotSize)
+} MidiTextSlotSize;
 
 typedef struct SMidiText {
     char startupBegin[MIDI_TEXT_SHORT_SLOT_SIZE];
@@ -21,6 +21,5 @@ typedef struct SMidiText {
     char filenameFormat[MIDI_TEXT_FILENAME_FORMAT_SLOT_SIZE];
 } SMidiText;
 
-SIZE(SMidiText, 0x40);
 
 #endif

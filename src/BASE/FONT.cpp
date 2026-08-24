@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <string.h>
 #include <BASE/font.h>
 #include <BASE/resourceManager.h>
@@ -17,7 +17,6 @@ typedef enum FontConstant {
     WRAP_HEIGHT_LINE_COUNT      = 2
 } FontConstant;
 
-VA(0x004c6fd0, 0xc8)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
@@ -33,12 +32,10 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = false;
 }
 
-VA(0x004c70e0, 0x39)
 font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
 
-VA(0x004c7120, 0x24a)
 void font::DrawStringExecute(
     char* str,
     i32 x,
@@ -140,13 +137,11 @@ void font::DrawStringExecute(
     }
 }
 
-VA(0x004c7370, 0x48)
 void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
-VA(0x004c73c0, 0xaf)
 i32 font::GetCharacterWidth(u8 c) {
     if (c == '{' || c == '}') {
         return 0;
@@ -162,7 +157,6 @@ i32 font::GetCharacterWidth(u8 c) {
     }
 }
 
-VA(0x004c7470, 0x313)
 void font::DrawBoundedString(
     char* str,
     i32 x,
@@ -186,7 +180,7 @@ void font::DrawBoundedString(
     i32 wordBreak0 = 0;
     char* text2 = str;
     FontDrawMode drawMode2 = mode;
-    if (HAS(align, FONT_ALIGN_VERTICAL_CENTER)) {
+    if ((((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
         i32 lineCount = LineLength(str, w);
         i32 totalH = m_height * lineCount;
@@ -244,7 +238,6 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-VA(0x004c7790, 0x1b3)
 i32 font::LineLength(char* str, i32 maxW) {
     i32 s = strlen(str);
     char aa = ' ';
@@ -279,7 +272,6 @@ i32 font::LineLength(char* str, i32 maxW) {
     return z;
 }
 
-VA(0x004c7950, 0xc4)
 i32 font::LineWidth(char* str) {
     i32 s = strlen(str);
     i32 q, u;
@@ -294,6 +286,3 @@ i32 font::LineWidth(char* str) {
     }
     return w;
 }
-
-
-VTBL(font, 0x004eb9e4);

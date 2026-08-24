@@ -2,24 +2,23 @@
 #define HOMM2_COMWIN_H
 
 #include <windows.h>
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(ComPortConstant)
+typedef enum ComPortConstant {
     COM_PORT_FLEXIBLE_DATA_SIZE = 1,
     COM_PORT_PREFIX_GAP_SIZE    = 4,
     COM_PORT_RUNTIME_GAP_SIZE   = 0x18,
     COM_SERIAL_BYTE_SIZE        = 8
-H2_ENUM_END(ComPortConstant)
+} ComPortConstant;
 
-H2_ENUM_CLASS_BEGIN(ComBaudRate)
+enum {
     COM_BAUD_2400  = 1,
     COM_BAUD_4800  = 2,
     COM_BAUD_9600  = 3,
     COM_BAUD_19200 = 4,
     COM_BAUD_38400 = 5
-H2_ENUM_CLASS_END(ComBaudRate)
-
-// Intrusive-list anchors store the tail before the head.
+};
+typedef i32 ComBaudRate;
 struct tag_Node {
     struct tag_Node* prev;
     struct tag_Node* next;
@@ -27,8 +26,8 @@ struct tag_Node {
     union {
         u8 comData[COM_PORT_FLEXIBLE_DATA_SIZE];
         struct {
-            u8 sessionIndex; // NetBIOS session table index
-            u8 data[COM_PORT_FLEXIBLE_DATA_SIZE]; // NetBIOS payload (variable length)
+            u8 sessionIndex;
+            u8 data[COM_PORT_FLEXIBLE_DATA_SIZE];
         };
     };
 };
@@ -46,13 +45,12 @@ struct ComPortState {
     tag_Anchor normalQueue;
     tag_Anchor priorityQueue;
 };
-SIZE(ComPortState, 0x60);
 
 void add_node(struct tag_Anchor*, struct tag_Node*);
 struct tag_Node* pop_node(struct tag_Anchor*);
 void init_anchor(struct tag_Anchor*, i32, i32);
 void ShutdownComError(char*);
-i16 com_init(u8, H2_ENUM_PARAM(ComBaudRate, i32), i32);
+i16 com_init(u8, ComBaudRate, i32);
 void com_term(i16);
 i16 com_rcv(i16, u16, void*);
 i16 com_snd(i16, u16, u16, void*, i32);

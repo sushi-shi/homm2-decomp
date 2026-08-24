@@ -1,32 +1,32 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 
-H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
+typedef i32 CDRomSetupResult;
 
 class bitmap;
 class heroWindow;
 class icon;
 struct tag_message;
 
-H2_ENUM_BEGIN(MiscRecordConstant)
+typedef enum MiscRecordConstant {
     MEM_ENTRY_FILE_CAPACITY    = 0x3d,
     PCX_HEADER_PALETTE16_BYTES = 48,
     PCX_HEADER_FILLER_BYTES    = 54
-H2_ENUM_END(MiscRecordConstant)
+} MiscRecordConstant;
 
-H2_ENUM_BEGIN(LogConstant)
+typedef enum LogConstant {
     LOG_UNUSED_VALUE = -999
-H2_ENUM_END(LogConstant)
+} LogConstant;
 
 struct indexArray {
     u16 key;
     u16 value;
 };
 
-// Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
+
 #pragma pack(push, 1)
 struct MemEntry {
     char used;
@@ -36,7 +36,6 @@ struct MemEntry {
     i32 line;
 };
 #pragma pack(pop)
-SIZE(MemEntry, 0x4a);
 #ifdef HOMM2_MISC_INLINE_ICONENTRY
 #pragma pack(push, 1)
 struct IconEntry {
@@ -64,28 +63,34 @@ struct PCXHeader {
     u8 filler[PCX_HEADER_FILLER_BYTES];
 };
 #pragma pack(pop)
-SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
 void* BaseAlloc(u32, char*, i32);
 void BaseFree(void*, char*, i32);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
-u32l MAKEFILEID(char* text);
+u32l MAKEFILEID(const char* text);
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key);
 void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, char* file, i32 line);
-// Allocation wrappers preserve explicit source-file and line operands.
-#define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
-#define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
-#define H2_ALLOC_AT(size, originalFile, originalLine)                                              \
-    BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
-#define H2_FREE_AT(ptr, originalFile, originalLine)                                                \
-    BaseFree(ptr, const_cast<char*>(originalFile), originalLine)
-#define H2_ASSERT(condition, originalFile, originalLine)                                           \
-    ProcessAssert(condition, originalFile, originalLine)
+
+
+constexpr const char* H2SourceName(const char* path) {
+    const char* name = path;
+    for (const char* cursor = path; *cursor != '\0'; ++cursor) {
+        if (*cursor == '/' || *cursor == '\\') {
+            name = cursor + 1;
+        }
+    }
+    return name;
+}
+
+#define H2_ALLOC(size) BaseAlloc(size, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+#define H2_FREE(ptr) BaseFree(ptr, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+#define H2_ASSERT(condition)                                                                       \
+    ProcessAssert(condition, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
 char* FindStringInString(char* text, char* pattern);
 char* FindToken(char* text, char token);
 char* FindLastToken(char* text, char token);
@@ -98,7 +103,7 @@ void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
 i32 IsCDDrive(i32);
-H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void);
+CDRomSetupResult SetupCDDrive(void);
 void BitmapToScreen(class bitmap*);
 void SetPalette(i8*, i32);
 void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
@@ -106,13 +111,11 @@ void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(char*);
 void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
-#if H2_STRICT_ENUMS
 template <typename Enum>
     requires __is_enum(Enum)
 inline void LogInt(char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
-#endif
 void AiPrint(char*);
 void AbsAiPrint(char*);
 void FadeTo(u8*, u8*, i32);
@@ -129,13 +132,13 @@ i32 MemSize(i32);
 void GetDataEntry(char*, char*, i32, char*, i32, i32);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
-H2_ENUM_CLASS_BEGIN(DataEntryPhase)
+enum {
     ENTRY_PHASE_IMMEDIATE    = 0,
     ENTRY_PHASE_POINTER_SENT = 1,
     ENTRY_PHASE_READY        = 2
-H2_ENUM_CLASS_END(DataEntryPhase)
-
-extern H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
+};
+typedef i32 DataEntryPhase;
+extern i32 bDataEntryTime;
 extern char* cDEDest;
 extern class heroWindow* DataEntryWin;
 extern MemEntry* gpMemEntry;

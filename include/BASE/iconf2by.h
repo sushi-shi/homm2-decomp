@@ -3,9 +3,7 @@
 
 #include <Ints.h>
 
-#if H2_STRICT_ENUMS
 #include <BASE/IconDraw.h>
-#endif
 
 class bitmap;
 class icon;
@@ -16,7 +14,7 @@ void FlipIconToBitmapYModify(
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

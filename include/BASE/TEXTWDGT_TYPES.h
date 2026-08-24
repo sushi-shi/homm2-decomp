@@ -1,11 +1,11 @@
 #ifndef HOMM2_BASE_TEXTWDGT_TYPES_H
 #define HOMM2_BASE_TEXTWDGT_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(TextWidgetSourceFileSize)
+typedef enum TextWidgetSourceFileSize {
     TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE = 0x2c
-H2_ENUM_END(TextWidgetSourceFileSize)
+} TextWidgetSourceFileSize;
 
 typedef struct STextWidgetSourceFiles {
     char read[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
@@ -14,6 +14,5 @@ typedef struct STextWidgetSourceFiles {
     char resizeAlloc[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
 } STextWidgetSourceFiles;
 
-SIZE(STextWidgetSourceFiles, 0xb0);
 
 #endif

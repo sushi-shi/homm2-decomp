@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>
 #include <BASE/Misc.h>
@@ -7,13 +7,11 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
 
-H2_ENUM_BEGIN(BitmapConstant)
-    COPY_STRIDE = 640 // Full-screen row stride assumed by CopyTo's fast path.
-H2_ENUM_END(BitmapConstant)
+typedef enum BitmapConstant {
+    COPY_STRIDE = 640
+} BitmapConstant;
 
-VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     m_bitmapType = BITMAP_TYPE_NONE;
@@ -22,43 +20,36 @@ bitmap::bitmap(void)
     m_pixels = NULL;
 }
 
-#line 15
-VA(0x004d0040, 0x53)
 bitmap::bitmap(BitmapType p1, i16 p2, i16 p3)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
-    DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
+    static char dimensionsAllocationSourceFile[] = "BITMAP.cpp";
     m_bitmapType = p1;
     m_width = p2;
     m_height = p3;
-    m_pixels = static_cast<u8*>(H2_ALLOC_AT(p3 * p2, dimensionsAllocationSourceFile, 21));
+    m_pixels = static_cast<u8*>(H2_ALLOC(p3 * p2));
 }
 
-#line 28
-VA(0x004d00a0, 0x8f)
 bitmap::bitmap(u32l id)
     : resource(RESOURCE_CATEGORY_BITMAP, id, RESOURCE_REFERENCE_INITIAL, NULL) {
-    DATA(0x0051fa20) static char resourceAllocationSourceFile[] = RETAIL_FILE;
+    static char resourceAllocationSourceFile[] = "BITMAP.cpp";
     i32 size;
     gpResourceManager->PointToFile(id);
     m_bitmapType = BitmapType(gpResourceManager->ReadWord());
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     size = m_height * m_width;
-    m_pixels = static_cast<u8*>(H2_ALLOC_AT(size, resourceAllocationSourceFile, 37));
+    m_pixels = static_cast<u8*>(H2_ALLOC(size));
     PollSound();
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
 }
-#line 48
-VA(0x004d0130, 0x2c)
 inline bitmap::~bitmap() {
-    DATA(0x0051fa48) static char destructionSourceFile[] = RETAIL_FILE;
+    static char destructionSourceFile[] = "BITMAP.cpp";
     if (m_pixels != NULL)
-        H2_FREE_AT(m_pixels, destructionSourceFile, 51);
+        H2_FREE(m_pixels);
     m_pixels = NULL;
 }
 
-VA(0x004d0160, 0xFF)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
     i32 destinationY;
@@ -94,31 +85,26 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     }
 }
 
-VA(0x004d0260, 0x3c)
 inline void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 
-VA(0x004d02a0, 0x32)
 void bitmap::DrawToScreen(i16 x, i16 y) {
     PollSound();
     BlitBitmapToScreen(this, 0, 0, m_width, m_height, x, y);
     PollSound();
 }
 
-VA(0x004d02e0, 0x2d)
 void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
-VA(0x004d0310, 0x26)
 inline void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 
-VA(0x004d0340, 0xf0)
 void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     i32 sourceX;
     i32 sourceY;
@@ -151,7 +137,6 @@ void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     }
 }
 
-VA(0x004d0430, 0xcb)
 void bitmap::CopyTo(
     class bitmap* destination,
     i32 destinationX,
@@ -202,7 +187,6 @@ static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
-VA(0x004d0500, 0x65)
 void bitmap::CopyToCareful(
     class bitmap* destination,
     i32 destinationX,
@@ -230,8 +214,3 @@ void bitmap::CopyToCareful(
         }
     }
 }
-
-
-VTBL(bitmap, 0x004eba3c);
-
-#undef RETAIL_FILE

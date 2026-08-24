@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -15,7 +15,7 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 
-H2_ENUM_BEGIN(TradingPostWidgetId)
+typedef enum TradingPostWidgetId {
     POST_LEFT_OFFER_ICON  = 0x14,
     POST_RIGHT_OFFER_ICON = 0x15,
     POST_LEFT_OFFER_TEXT  = 0x17,
@@ -24,25 +24,24 @@ H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_INCREMENT        = 0x1a,
     POST_TRACK            = 0x1b,
     POST_EXECUTE          = 0x1d
-H2_ENUM_END(TradingPostWidgetId)
+} TradingPostWidgetId;
 
-H2_ENUM_CLASS_BEGIN(OfferSide)
+enum {
     OFFER_LEFT  = 0,
     OFFER_RIGHT = 1,
     OFFER_COUNT = 2
-H2_ENUM_CLASS_END(OfferSide)
-H2_ENUM_STEPPED(OfferSide)
+};
+typedef i32 OfferSide;
 
-H2_ENUM_BEGIN(TradingPostPrivateConstant)
+typedef enum TradingPostPrivateConstant {
     KNOB_WIDTH      = 17,
     KNOB_HEIGHT     = 8,
     KNOB_FRAME      = 2,
     REDRAW_X_OFFSET = 32,
     REDRAW_WIDTH    = 258,
     REDRAW_HEIGHT   = 418
-H2_ENUM_END(TradingPostPrivateConstant)
+} TradingPostPrivateConstant;
 
-VA(0x004bf340, 0x165)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
     tag_message messageTemp;
 
@@ -51,7 +50,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     bTradeMade = 0;
     tpX = TRADING_POST_WINDOW_X;
     tpY = TRADING_POST_WINDOW_Y;
-    tpWindow = new heroWindow(tpX, tpY, DATA_COMPGEN(0x0051d9e0, doTradingPostTradpostBin, "tradpost.bin"));
+    tpWindow = new heroWindow(tpX, tpY, "tradpost.bin");
     if (tpWindow == NULL)
         MemError();
     leftResource = -1;
@@ -62,7 +61,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
         TRADING_POST_KNOB_Y,
         KNOB_WIDTH,
         KNOB_HEIGHT,
-        DATA_COMPGEN(0x0051d9f0, doTradingPostTradpostIcn, "tradpost.icn"),
+        "tradpost.icn",
         KNOB_FRAME,
         ICON_DRAW_NORMAL,
         TRADING_POST_KNOB_ID,
@@ -77,7 +76,6 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
-VA(0x004bf4a5, 0x596)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
     i32 ratioLocal;
@@ -99,28 +97,28 @@ void UpdateTradingPost(i32 draw) {
         }
         sprintf(
             gText,
-            DATA_COMPGEN(0x0051da3c, updateTradingPostSICanOfferYouD, "{%s}\n\nI can offer you %d %s of %s for %d %s of %s."),
-            bIsMarketPlace != 0 ? DATA_COMPGEN(0x0051da20, updateTradingPostMarketplace, "Marketplace") : DATA_COMPGEN(0x0051da2c, updateTradingPostTradingPost, "Trading Post"),
+            "{%s}\n\nI can offer you %d %s of %s for %d %s of %s.",
+            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post",
             offeredValue,
-            offeredValue > 1 ? DATA_COMPGEN(0x0051da00, updateTradingPostUnits, "units") : DATA_COMPGEN(0x0051da08, updateTradingPostUnit, "unit"),
+            offeredValue > 1 ? "units" : "unit",
             gResourceNames[rightResource],
             requestedValue,
-            requestedValue > 1 ? DATA_COMPGEN(0x0051da10, updateTradingPostUnits2, "units") : DATA_COMPGEN(0x0051da18, updateTradingPostUnit2, "unit"),
+            requestedValue > 1 ? "units" : "unit",
             gResourceNames[leftResource]
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x0051da8c, updateTradingPostSYouHaveReceivedQuiteA, "{%s}\n\nYou have received quite a bargain.  I expect to make no profit on the deal.  "
-            "Can I interest you in any of my other wares?"),
-            bIsMarketPlace != 0 ? DATA_COMPGEN(0x0051da70, updateTradingPostMarketplace2, "Marketplace") : DATA_COMPGEN(0x0051da7c, updateTradingPostTradingPost2, "Trading Post")
+            "{%s}\n\nYou have received quite a bargain.  I expect to make no profit on the deal.  "
+            "Can I interest you in any of my other wares?",
+            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post"
         );
     } else {
         sprintf(
             gText,
-            DATA_COMPGEN(0x0051db28, updateTradingPostSPleaseInspectOurFineWares, "{%s}\n\nPlease inspect our fine wares.  If you feel like offering a trade, click on "
-            "the items you wish to trade with and for."),
-            bIsMarketPlace != 0 ? DATA_COMPGEN(0x0051db0c, updateTradingPostMarketplace3, "Marketplace") : DATA_COMPGEN(0x0051db18, updateTradingPostTradingPost3, "Trading Post")
+            "{%s}\n\nPlease inspect our fine wares.  If you feel like offering a trade, click on "
+            "the items you wish to trade with and for.",
+            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post"
         );
     }
     messageTemp.type = MESSAGE_WIDGET;
@@ -135,7 +133,7 @@ void UpdateTradingPost(i32 draw) {
         else
             messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageTemp.payload.widget.id = resource;
-        messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        messageTemp.payload.widget.data.value = (WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         tpWindow->BroadcastMessage(messageTemp);
     }
 
@@ -158,15 +156,15 @@ void UpdateTradingPost(i32 draw) {
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
-                    sprintf(gText, DATA_COMPGEN(0x0051dba4, updateTradingPostD, "%d"), qtyToTrade);
+                    sprintf(gText, "%d", qtyToTrade);
                 else
-                    sprintf(gText, DATA_COMPGEN(0x0051dba8, updateTradingPostD2, "%d"), qtyToTrade * iTradeRatio);
+                    sprintf(gText, "%d", qtyToTrade * iTradeRatio);
             } else {
                 messageTemp.payload.widget.id = POST_RIGHT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
-                    sprintf(gText, DATA_COMPGEN(0x0051dbac, updateTradingPostD3, "%d"), qtyToTrade * iTradeRatio);
+                    sprintf(gText, "%d", qtyToTrade * iTradeRatio);
                 else
-                    sprintf(gText, DATA_COMPGEN(0x0051dbb0, updateTradingPostD4, "%d"), qtyToTrade);
+                    sprintf(gText, "%d", qtyToTrade);
             }
             tpWindow->BroadcastMessage(messageTemp);
         }
@@ -176,12 +174,12 @@ void UpdateTradingPost(i32 draw) {
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + resource;
-                sprintf(gText, DATA_COMPGEN(0x0051dbb4, updateTradingPostD5, "%d"), gpCurPlayer->m_resources[resource]);
+                sprintf(gText, "%d", gpCurPlayer->m_resources[resource]);
             } else {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + resource;
                 if (leftResource != -1) {
                     if (resource == leftResource) {
-                        sprintf(gText, DATA_COMPGEN(0x0051dbb8, updateTradingPostNA, "n/a"));
+                        sprintf(gText, "n/a");
                     } else {
                         ComputeTradeRatios(
                             leftResource,
@@ -191,12 +189,12 @@ void UpdateTradingPost(i32 draw) {
                             &maxTradeField
                         );
                         if (leftDenominatedLocal != 0)
-                            sprintf(gText, DATA_COMPGEN(0x0051dbbc, updateTradingPostD6, "%d"), ratioLocal);
+                            sprintf(gText, "%d", ratioLocal);
                         else
-                            sprintf(gText, DATA_COMPGEN(0x0051dbc0, updateTradingPost1D, "1/%d"), ratioLocal);
+                            sprintf(gText, "1/%d", ratioLocal);
                     }
                 } else {
-                    sprintf(gText, DATA_COMPGEN(0x0051dbc8, updateTradingPostEmptyString, ""));
+                    sprintf(gText, "");
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
@@ -209,7 +207,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_ICON_FIRST + resource;
             else
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_ICON_FIRST + resource;
-            messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            messageTemp.payload.widget.data.value = (WIDGET_FLAG_DRAW);
             tpWindow->BroadcastMessage(messageTemp);
         }
     }
@@ -230,7 +228,6 @@ void UpdateTradingPost(i32 draw) {
     }
 }
 
-VA(0x004bfa3b, 0xfe)
 void ComputeTradeRatios(
     i32 sourceResource,
     i32 destinationResource,
@@ -242,9 +239,9 @@ void ComputeTradeRatios(
     float destinationValueValue = static_cast<u32>(coreRatio[destinationResource]);
     float tradeRatio = destinationValueValue / sourceValueLocal;
 
-    if (tradeRatio >= DATA_COMPGEN(0x004eb950, computeTradeRatiosConstant, 1.0f)) {
+    if (tradeRatio >= 1.0f) {
         *leftDenominated = 0;
-        *ratio = static_cast<i32>(tradeRatio + DATA_COMPGEN(0x004eb958, computeTradeRatiosConstant2, 0.999)); // NOLINT(readability-magic-numbers)
+        *ratio = static_cast<i32>(tradeRatio + 0.999);
         *maxTrade = gpCurPlayer->m_resources[sourceResource] / *ratio;
     } else {
         *leftDenominated = 1;
@@ -253,7 +250,6 @@ void ComputeTradeRatios(
     }
 }
 
-VA(0x004bfb39, 0x148)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
     i32 knobPosition;
@@ -282,7 +278,6 @@ void DoTradeKnob(struct tag_message message) {
     UpdateTradingPost(1);
 }
 
-VA(0x004bfc81, 0x3a)
 void SetupNewTrade(void) {
     qtyToTrade = 0;
     ComputeTradeRatios(
@@ -294,7 +289,6 @@ void SetupNewTrade(void) {
     );
 }
 
-VA(0x004bfcbb, 0x3b6)
 MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
     i32 updateDisplay = 0;
@@ -322,13 +316,13 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                     case TRADING_POST_KNOB_ID:
                         DoTradeKnob(message);
                         break;
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_WOOD):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_MERCURY):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_ORE):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_SULFUR):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_CRYSTAL):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GEMS):
-                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GOLD):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_WOOD):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_MERCURY):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_ORE):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_SULFUR):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_CRYSTAL):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_GEMS):
+                    case TRADING_POST_LEFT_SELECT_FIRST + (RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_LEFT_SELECT_FIRST;
                         if (leftResource != resourceData) {
                             leftResource = resourceData;
@@ -336,13 +330,13 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                             SetupNewTrade();
                         }
                         break;
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_WOOD):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_MERCURY):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_ORE):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_SULFUR):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_CRYSTAL):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GEMS):
-                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GOLD):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_WOOD):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_MERCURY):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_ORE):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_SULFUR):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_CRYSTAL):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_GEMS):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + (RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_RIGHT_SELECT_FIRST;
                         if (rightResource != resourceData) {
                             rightResource = resourceData;
@@ -392,25 +386,25 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     if (updateDisplay)
         UpdateTradingPost(1);
     if (exitFlag) {
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.id = (WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
-DATA(0x00533170) class iconWidget* tradeKnob;
-DATA(0x00533174) i32 qtyToTrade;
-DATA(0x00533178) i32 leftResource;
-DATA(0x0053317c) i32 iTradeRatio;
-DATA(0x00533180) i32 bTradeMade;
-DATA(0x00533184) float fTradingPostEfficiency;
-DATA(0x00533188) i32 tpX;
-DATA(0x0053318c) i32 tpY;
-DATA(0x00533190) i32 bIsMarketPlace;
-DATA(0x00533194) i32 bLeftDenominated;
-DATA(0x00533198) class heroWindow* tpWindow;
-DATA(0x0053319c) i32 rightResource;
-DATA(0x005331a0) i32 iMaxUnitsToTrade;
-DATA(0x005331a4) i32 maxUnitsToTrade;
+u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
+class iconWidget* tradeKnob;
+i32 qtyToTrade;
+i32 leftResource;
+i32 iTradeRatio;
+i32 bTradeMade;
+float fTradingPostEfficiency;
+i32 tpX;
+i32 tpY;
+i32 bIsMarketPlace;
+i32 bLeftDenominated;
+class heroWindow* tpWindow;
+i32 rightResource;
+i32 iMaxUnitsToTrade;
+i32 maxUnitsToTrade;

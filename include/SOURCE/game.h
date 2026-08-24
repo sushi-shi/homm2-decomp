@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>
@@ -23,22 +23,22 @@ class playerData;
 class town;
 struct tag_message;
 
-H2_ENUM_CLASS_FORWARD(CampaignTrackType);
+typedef i32 CampaignTrackType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(PlayerHandicap, i8)
+enum {
     PLAYER_HANDICAP_NONE     = 0,
     PLAYER_HANDICAP_MODERATE = 1,
     PLAYER_HANDICAP_SEVERE   = 2,
     PLAYER_HANDICAP_COUNT    = 3
-H2_ENUM_CLASS_END_SPLIT(PlayerHandicap, i8)
-H2_ENUM_STEPPED(PlayerHandicap)
+};
+typedef i32 PlayerHandicap;
 
 #pragma pack(push, 1)
 struct mineRecord {
     i8 id;
     i8 owner;
-    H2_ENUM_STORAGE(MineType, i8) resourceType;
-    H2_ENUM_STORAGE(CreatureType, i8) guardianType;
+    i8 resourceType;
+    i8 guardianType;
     u8 guardianCount;
     u8 x;
     u8 y;
@@ -47,16 +47,15 @@ struct boatRecord {
     i8 id;
     i8 x;
     i8 y;
-    H2_ENUM_STORAGE(MapDirection, i8) direction;
-    H2_ENUM_STORAGE(MapObjectType, u8) savedTriggerType;
+    i8 direction;
+    u8 savedTriggerType;
     u8 savedEventData;
     i8 heroId;
     i8 owner;
 };
 #pragma pack(pop)
-SIZE(boatRecord, 8);
 
-H2_ENUM_BEGIN(GameStateStorageConstant)
+typedef enum GameStateStorageConstant {
     GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
     GAME_SAVE_NAME_SIZE                  = 0x15f,
     GAME_MAP_FILENAME_SIZE               = 13,
@@ -73,24 +72,24 @@ H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_CURRENT_MAP_NAME_SIZE           = 16,
     GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
-H2_ENUM_END(GameStateStorageConstant)
+} GameStateStorageConstant;
 
 #pragma pack(push, 1)
 class game {
 public:
     i16 m_difficultyRating;
-    H2_ENUM_STORAGE(CampaignSide, u8) m_campaignType;
-    H2_ENUM_STORAGE(CampaignSide, u8) m_campaignStartingSide;
+    u8 m_campaignType;
+    u8 m_campaignStartingSide;
     i8 m_campaignScenario;
-    u8 m_campaignScenarioCompleted[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScenarioBonus[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScenarioDays[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    u8 m_campaignScenarioCompleted[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignScenarioBonus[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignScenarioDays[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     char m_unknown7d;
     u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
-    u8 m_campaignChoice[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    u8 m_campaignMapEnabled[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    u8 m_campaignChoice[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    u8 m_campaignMapEnabled[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScore;
-    H2_ENUM_STORAGE(CreatureType, i16) m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
+    i16 m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
     i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
@@ -98,10 +97,10 @@ public:
     char m_saveName[GAME_SAVE_NAME_SIZE];
     SMapHeader m_mapHeader;
     i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE_STEPPED(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
+    i8 m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE(GameDifficulty, i8) m_difficulty;
+    i8 m_difficulty;
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];
     i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
@@ -110,34 +109,34 @@ public:
     char _pad_0x47c[GAME_SETUP_STATE_PAD_SIZE];
     i8 m_playerCount;
     i8 m_deadPlayerCount;
-    i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];
+    i8 m_playerDead[(GAME_PLAYER_COUNT)];
     u16 m_day;
     u16 m_week;
     u16 m_month;
-    class playerData m_players[IDX(GAME_PLAYER_COUNT)];
+    class playerData m_players[(GAME_PLAYER_COUNT)];
     class fullMap m_worldMap;
     i8 m_obeliskCount;
-    town m_castleRecs[IDX(GAME_TOWN_COUNT)];
+    town m_castleRecs[(GAME_TOWN_COUNT)];
     union {
-        i8 m_castleOwners[IDX(GAME_TOWN_COUNT)];
-        i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
+        i8 m_castleOwners[(GAME_TOWN_COUNT)];
+        i8 m_townOwners[(GAME_TOWN_COUNT)];
     };
     union {
         char m_dailyEventFlags[GAME_DAILY_EVENT_FLAG_COUNT];
         u8 m_knownTowns[GAME_DAILY_EVENT_FLAG_COUNT];
     };
-    hero m_heroRecs[IDX(GAME_HERO_COUNT)];
-    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];
-    mineRecord m_mines[IDX(GAME_MINE_COUNT)];
-    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];
-    char m_randomArtifacts[IDX(ARTIFACT_COUNT)];
-    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];
-    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];
+    hero m_heroRecs[(GAME_HERO_COUNT)];
+    i8 m_availableHeroes[(GAME_HERO_COUNT)];
+    mineRecord m_mines[(GAME_MINE_COUNT)];
+    i8 m_mineOwners[(GAME_MINE_COUNT)];
+    char m_randomArtifacts[(ARTIFACT_COUNT)];
+    boatRecord m_boats[(GAME_BOAT_COUNT)];
+    i8 m_boatSlots[(GAME_BOAT_COUNT)];
     i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
     char m_defaultPlayerNames[GAME_DEFAULT_PLAYER_NAMES_SIZE];
     i8 m_ultimateArtifactX;
     i8 m_ultimateArtifactY;
-    H2_ENUM_STORAGE(ArtifactType, i8) m_ultimateArtifactId;
+    i8 m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
     u8 m_cheated;
@@ -154,9 +153,9 @@ public:
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
     HeroSpellType m_viewSpellsType;
-    i32 m_viewSpellsTop[IDX(SPELL_TYPE_CATEGORY_COUNT)];
-    i32 m_viewSpellsCount[IDX(SPELL_TYPE_CATEGORY_COUNT)];
-    H2_ENUM_STORAGE(SpellType, i32) m_viewSpell;
+    i32 m_viewSpellsTop[(SPELL_TYPE_CATEGORY_COUNT)];
+    i32 m_viewSpellsCount[(SPELL_TYPE_CATEGORY_COUNT)];
+    i32 m_viewSpell;
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
@@ -177,10 +176,10 @@ public:
     i32 SetupGame(void);
     i32 PickLoadGame(void);
     i32 HandleCampaignWin(void);
-    void PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32), i32);
+    void PlayPreScenarioSmacker(CampaignSide, i32);
     void ShowCampaignInfo(i32, i32);
     void CampaignInfoUpdate(i32);
-    void InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32));
+    void InitEntireCampaign(CampaignSide);
     void InitCampaignMap(void);
     i32 MineTypesOwned(i32, MineType);
     i32 SetupPuzzlePieces(i32, i32);
@@ -225,18 +224,18 @@ public:
     void ViewArmy(
         i32,
         i32,
-        H2_ENUM_PARAM(CreatureType, i32),
+        CreatureType,
         i32,
         class town*,
         i32,
-        H2_ENUM_PARAM(ArmyFacing, i32),
+        ArmyFacing,
         i32,
         class hero*,
         class army*,
         class armyGroup*,
         i32
     );
-    i32 GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32));
+    i32 GetRandomNumTroops(CreatureType);
     void TurnOnAIMusic(void);
     void TurnOffAIMusic(void);
     void NextPlayer(void);
@@ -256,19 +255,19 @@ public:
         i32,
         TilesetId,
         i32,
-        H2_ENUM_PARAM(MapObjectType, i32),
-        H2_ENUM_PARAM(MapObjectType, i32)
+        MapObjectType,
+        MapObjectType
     );
     void RandomizeTown(i32, i32, i32);
     void RandomizeMine(i32, i32);
     void InitRandomArtifacts(void);
-    i32 GetRandomArtifactId(H2_ENUM_PARAM(ArtifactLevelMask, i32), b32);
+    i32 GetRandomArtifactId(ArtifactLevelMask, b32);
     void RandomizeHeroPool(void);
     void SetRandomHeroArmies(i32, i32);
     void ProcessRandomObjects(void);
     void SetVisibility(i32, i32, i32, i32);
     void MakeAllWaterVisible(i32);
-    void GiveArmy(class armyGroup*, H2_ENUM_PARAM(CreatureType, i32), i32, i32);
+    void GiveArmy(class armyGroup*, CreatureType, i32, i32);
     i32 ExperienceValueOfStack(class armyGroup*, class hero*);
     i32 GetLuck(class hero*, class army*, class town*);
     void SetupAdjacentMons(void);
@@ -278,7 +277,7 @@ public:
     void WaitForPlayer(char*, i32);
     i32 HasLateOverlay(i32, i32);
     void ConvertFlagToLateOverlay(i32, i32);
-    i32 HasObjectTilesetIndex(i32, i32, H2_ENUM_PARAM(TilesetId, i32), i32);
+    i32 HasObjectTilesetIndex(i32, i32, TilesetId, i32);
     void ConvertAllToLateOverlay(i32, i32);
     void ProcessMapExtra(void);
     void SetupTowns(void);
@@ -293,7 +292,7 @@ public:
     void RestoreCell(
         i32,
         i32,
-        H2_ENUM_PARAM(MapObjectType, i32),
+        MapObjectType,
         i32,
         class mapCell*,
         i32
@@ -323,26 +322,25 @@ public:
     i32 GetSideDesc(char*, i32, i32);
 };
 #pragma pack(pop)
-SIZE(game, 0x660f);
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;
 extern class iconWidget** iconWidgetDynamic;
 extern OverviewType iLastDynamicType;
 extern OverviewType giOverviewType;
-extern i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)];
+extern i32 giOverviewTop[(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
 extern b32 gbDoModemConfig;
-extern i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
+extern i16 trackXY[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;
 extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
-extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
+extern i32 giOverviewItems[(OVERVIEW_TYPE_COUNT)];
 extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
-extern H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
+extern i32 iCurViewSide;
 extern CampaignTrackType iCampaignTrackType;
 extern i32 bCampaignViewOnly;
 extern i32 iCurViewMap;

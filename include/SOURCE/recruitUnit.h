@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_RECRUITUNIT_H
 #define HOMM2_SOURCE_RECRUITUNIT_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 #include <windows.h>
 #include <BASE/baseManager.h>
@@ -11,19 +11,19 @@ class town;
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(RecruitSourceType)
+enum {
     RECRUIT_SOURCE_EVENT = -1,
     RECRUIT_SOURCE_TOWN  = 0x23
-H2_ENUM_CLASS_END(RecruitSourceType)
-
+};
+typedef i32 RecruitSourceType;
 #pragma pack(push, 1)
 class recruitUnit : public baseManager {
 public:
     RecruitSourceType m_sourceType;
-    H2_ENUM_STORAGE(CreatureType, i32) m_creatureType;
+    i32 m_creatureType;
     char m_padding3e[4];
     i32 m_goldCost;
-    H2_ENUM_STORAGE(ResourceType, i32) m_resourceType;
+    i32 m_resourceType;
     i32 m_resourceCost;
     i32 m_refreshTown;
     heroWindow* m_window;
@@ -39,13 +39,12 @@ public:
     i32 m_quantity;
     recruitUnit(class armyGroup*, CreatureType, i16*);
     recruitUnit(class town*, i32, i32);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Update(void);
 };
 #pragma pack(pop)
-SIZE(recruitUnit, 0x7e);
 extern HMENU hmnuRecruitSave;
 
 #endif

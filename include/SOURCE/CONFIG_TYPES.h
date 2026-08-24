@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_CONFIG_TYPES_H
 #define HOMM2_SOURCE_CONFIG_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 
 #pragma pack(push, 1)
 struct exeGfxConfig {
@@ -14,42 +14,42 @@ struct exeGfxConfig {
     i32 colorMouseCursor;
 };
 
-H2_ENUM_CLASS_BEGIN(ConfigMusicSource)
+enum {
     CONFIG_MUSIC_SOURCE_MIDI    = 0,
     CONFIG_MUSIC_SOURCE_CD      = 1,
     CONFIG_MUSIC_SOURCE_DEFAULT = 3
-H2_ENUM_CLASS_END(ConfigMusicSource)
-
-H2_ENUM_CLASS_BEGIN(ConfigOperaMode)
+};
+typedef i32 ConfigMusicSource;
+enum {
     CONFIG_OPERA_DISABLED = 0,
     CONFIG_OPERA_ENABLED  = 1
-H2_ENUM_CLASS_END(ConfigOperaMode)
-
-H2_ENUM_CLASS_BEGIN(ConfigWalkSpeed)
+};
+typedef i32 ConfigOperaMode;
+enum {
     CONFIG_WALK_SPEED_SLOWEST = 0,
     CONFIG_WALK_SPEED_SLOW    = 1,
     CONFIG_WALK_SPEED_NORMAL  = 2,
     CONFIG_WALK_SPEED_FAST    = 3,
     CONFIG_WALK_SPEED_INSTANT = 4,
     CONFIG_WALK_SPEED_COUNT   = 5
-H2_ENUM_CLASS_END(ConfigWalkSpeed)
-H2_ENUM_STEPPED(ConfigWalkSpeed)
+};
+typedef i32 ConfigWalkSpeed;
 
-H2_ENUM_CLASS_BEGIN(ConfigVolumeLevel)
+enum {
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
     CONFIG_VOLUME_MAX         = 10,
     CONFIG_VOLUME_LEVEL_COUNT = CONFIG_VOLUME_MAX + 1
-H2_ENUM_CLASS_END(ConfigVolumeLevel)
-H2_ENUM_STEPPED(ConfigVolumeLevel)
+};
+typedef i32 ConfigVolumeLevel;
 
-H2_ENUM_CLASS_BEGIN(ConfigExecutable)
+enum {
     CONFIG_EXECUTABLE_GAME   = 0,
     CONFIG_EXECUTABLE_EDITOR = 1,
     CONFIG_EXECUTABLE_COUNT  = 2
-H2_ENUM_CLASS_END(ConfigExecutable)
-
-H2_ENUM_BEGIN(ConfigStorageConstant)
+};
+typedef i32 ConfigExecutable;
+typedef enum ConfigStorageConstant {
     CONFIG_GRAPHICS_SIZE             = 0x1c,
     CONFIG_PERSISTED_SIZE            = 0x19d,
     CONFIG_STRUCT_SIZE               = 0x1a0,
@@ -58,29 +58,29 @@ H2_ENUM_BEGIN(ConfigStorageConstant)
     CONFIG_MODEM_INIT_STRING_SIZE    = 0x64,
     CONFIG_UNIQUE_SYSTEM_ID_SIZE     = 4,
     CONFIG_NETWORK_DEFAULT_NAME_SIZE = 0x18
-H2_ENUM_END(ConfigStorageConstant)
+} ConfigStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(ConfigConnectionType)
+enum {
     CONFIG_CONNECTION_MODEM  = 0,
     CONFIG_CONNECTION_DIRECT = 1,
     CONFIG_CONNECTION_COUNT  = 2
-H2_ENUM_CLASS_END(ConfigConnectionType)
-
-H2_ENUM_CLASS_BEGIN(ConfigComPort)
+};
+typedef i32 ConfigConnectionType;
+enum {
     CONFIG_COM_PORT_UNCONFIGURED = 0,
     CONFIG_COM_PORT_1            = 1,
     CONFIG_COM_PORT_2            = 2,
     CONFIG_COM_PORT_3            = 3,
     CONFIG_COM_PORT_4            = 4
-H2_ENUM_CLASS_END(ConfigComPort)
-
-H2_ENUM_CLASS_BEGIN(ConfigBaudRate)
+};
+typedef i32 ConfigComPort;
+enum {
     CONFIG_BAUD_2400  = 2400,
     CONFIG_BAUD_9600  = 9600,
     CONFIG_BAUD_19200 = 19200,
     CONFIG_BAUD_38400 = 38400
-H2_ENUM_CLASS_END(ConfigBaudRate)
-
+};
+typedef i32 ConfigBaudRate;
 struct configStruct {
     ConfigWalkSpeed computerWalkSpeed;
     ConfigWalkSpeed walkSpeed;
@@ -89,7 +89,7 @@ struct configStruct {
     i32 autosave;
     i32 showRoute;
     i32 blackoutComputer;
-    exeGfxConfig gfx[IDX(CONFIG_EXECUTABLE_COUNT)];
+    exeGfxConfig gfx[(CONFIG_EXECUTABLE_COUNT)];
     i32 firstMapOffset;
     i32 currentMapOffset;
     i32 showObjectBoxes;
@@ -107,8 +107,8 @@ struct configStruct {
     char reservedAfterAutoSave[CONFIG_AUTOSAVE_RESERVED_SIZE];
     ConfigMusicSource musicSource;
     char modemInitString[CONFIG_MODEM_INIT_STRING_SIZE];
-    H2_ENUM_STORAGE(ConfigComPort, i32) comPort[IDX(CONFIG_CONNECTION_COUNT)];
-    H2_ENUM_STORAGE(ConfigBaudRate, i32) baudRate[IDX(CONFIG_CONNECTION_COUNT)];
+    i32 comPort[(CONFIG_CONNECTION_COUNT)];
+    i32 baudRate[(CONFIG_CONNECTION_COUNT)];
     char uniqueSystemID[CONFIG_UNIQUE_SYSTEM_ID_SIZE];
     ConfigOperaMode useOpera;
     i32 quickCombatLevel;
@@ -124,7 +124,5 @@ struct configStruct {
     char networkDefaultName[CONFIG_NETWORK_DEFAULT_NAME_SIZE];
 };
 #pragma pack(pop)
-SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
-SIZE(configStruct, CONFIG_STRUCT_SIZE);
 
 #endif

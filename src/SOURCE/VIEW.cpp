@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -9,7 +9,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
-H2_ENUM_BEGIN(ViewGeneralConstant)
+typedef enum ViewGeneralConstant {
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
     GENERAL_CLOSE              = 10,
@@ -32,9 +32,9 @@ H2_ENUM_BEGIN(ViewGeneralConstant)
     ARMY_Y_OFFSET              = 164,
     ARMY_RIGHT_CLAMP           = 151,
     ARMY_BOTTOM_CLAMP          = 230
-H2_ENUM_END(ViewGeneralConstant)
+} ViewGeneralConstant;
 
-H2_ENUM_BEGIN(ViewGeneralControl)
+typedef enum ViewGeneralControl {
     GENERAL_CONTROL_NONE     = 0,
     GENERAL_NAME_WIDGET      = 1,
     GENERAL_PORTRAIT_WIDGET  = 2,
@@ -46,33 +46,32 @@ H2_ENUM_BEGIN(ViewGeneralControl)
     GENERAL_CONTROL_THIRTEEN = 13,
     GENERAL_CONTROL_FOURTEEN = 14,
     GENERAL_CAPTAIN_WIDGET   = 30
-H2_ENUM_END(ViewGeneralControl)
+} ViewGeneralControl;
 
-H2_ENUM_BEGIN(ViewGeneralLabel)
+typedef enum ViewGeneralLabel {
     GENERAL_LABEL_MORALE = 4,
     GENERAL_LABEL_LUCK   = 5,
     GENERAL_LABEL_MANA   = 6
-H2_ENUM_END(ViewGeneralLabel)
+} ViewGeneralLabel;
 
-H2_ENUM_BEGIN(ViewGeneralLongHelp)
+typedef enum ViewGeneralLongHelp {
     GENERAL_LONG_HELP_CLOSE     = 0,
     GENERAL_LONG_HELP_RETREAT   = 1,
     GENERAL_LONG_HELP_SURRENDER = 2,
     GENERAL_LONG_HELP_CAST      = 3
-H2_ENUM_END(ViewGeneralLongHelp)
+} ViewGeneralLongHelp;
 
-H2_ENUM_BEGIN(ViewGeneralHoverHelp)
+typedef enum ViewGeneralHoverHelp {
     GENERAL_HOVER_HELP_CLOSE     = 1,
     GENERAL_HOVER_HELP_RETREAT   = 2,
     GENERAL_HOVER_HELP_SURRENDER = 3,
     GENERAL_HOVER_HELP_CAST      = 4,
     GENERAL_HOVER_HELP_HERO      = 5,
     GENERAL_HOVER_HELP_CAPTAIN   = 6
-H2_ENUM_END(ViewGeneralHoverHelp)
+} ViewGeneralHoverHelp;
 
-VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(
-    H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
+    CombatSide side, i32 allowActions, i32 quickView
 ) {
     i16 msgConst1;
     i16 msgConst12;
@@ -95,7 +94,7 @@ i32 combatManager::ViewGeneral(
     i16 msgConst26;
     tag_message message15;
 
-    if (m_heroes[IDX(side)] == NULL)
+    if (m_heroes[(side)] == NULL)
         return 0;
     iViewGeneralWhichSide = side;
     msgConst25 = GENERAL_NAME_WIDGET;
@@ -116,112 +115,112 @@ i32 combatManager::ViewGeneral(
     giCurGeneral = side;
 
     message15.type = MESSAGE_WIDGET;
-    generalWindow18 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, DATA_COMPGEN(0x004eddf8, viewGeneralVgenwinBin, "vgenwin.bin"));
+    generalWindow18 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
     if (generalWindow18 == NULL)
         MemError();
-    sprintf(gText, DATA_COMPGEN(0x004ede04, viewGeneralPort04dIcn, "port%04d.icn"), IDX(m_heroes[IDX(side)]->m_portrait));
+    sprintf(gText, "port%04d.icn", (m_heroes[(side)]->m_portrait));
     message15.payload.widget.command = VIEW_GENERAL_SET_ICON;
     message15.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message15.payload.widget.data.text = gText;
     generalWindow18->BroadcastMessage(message15);
 
     message15.payload.widget.command =
-        m_heroes[IDX(side)]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+        m_heroes[(side)]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message15.payload.widget.id = GENERAL_CAPTAIN_WIDGET;
-    message15.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+    message15.payload.widget.data.value = (WIDGET_FLAG_DRAW);
     generalWindow18->BroadcastMessage(message15);
-    if (m_heroes[IDX(side)]->m_isCaptain) {
+    if (m_heroes[(side)]->m_isCaptain) {
         message15.payload.widget.command = VIEW_GENERAL_SET_FRAME;
-        if (m_playerId[IDX(side)] == -1)
+        if (m_playerId[(side)] == -1)
             message15.payload.widget.data.value = GENERAL_CAPTAIN_FRAME;
         else
             message15.payload.widget.data.value =
-                gpGame->m_players[m_playerId[IDX(side)]].m_color;
+                gpGame->m_players[m_playerId[(side)]].m_color;
         generalWindow18->BroadcastMessage(message15);
     }
 
     message15.payload.widget.command = VIEW_GENERAL_SET_FRAME;
     message15.payload.widget.id = GENERAL_COLOR_WIDGET;
-    message15.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[IDX(side)]->m_owner) + 1;
+    message15.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[(side)]->m_owner) + 1;
     generalWindow18->BroadcastMessage(message15);
 
-    if (m_heroes[IDX(side)]->m_isCaptain != 0)
-        sprintf(gText, DATA_COMPGEN(0x004ede14, viewGeneralCaptain, "Captain"));
+    if (m_heroes[(side)]->m_isCaptain != 0)
+        sprintf(gText, "Captain");
     else
         sprintf(
             gText,
-            DATA_COMPGEN(0x004ede1c, viewGeneralSTheS, "%s the %s"),
-            m_heroes[IDX(side)]->m_name,
-            gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
+            "%s the %s",
+            m_heroes[(side)]->m_name,
+            gAlignmentNames[(m_heroes[(side)]->m_cursorType)]
         );
     message15.payload.widget.command = VIEW_GENERAL_SET_TEXT;
     message15.payload.widget.id = GENERAL_NAME_WIDGET;
     message15.payload.widget.data.text = gText;
     generalWindow18->BroadcastMessage(message15);
 
-    morale8 = m_heroes[IDX(side)]->m_army.GetMorale(
-        m_heroes[IDX(side)],
-        m_combatTowns[IDX(side)],
-        gpCombatManager->m_armyGroups[IDX(OppositeCombatSide(side))]
+    morale8 = m_heroes[(side)]->m_army.GetMorale(
+        m_heroes[(side)],
+        m_combatTowns[(side)],
+        gpCombatManager->m_armyGroups[(OppositeCombatSide(side))]
     );
-    luck10 = gpGame->GetLuck(m_heroes[IDX(side)], NULL, m_combatTowns[IDX(side)]);
+    luck10 = gpGame->GetLuck(m_heroes[(side)], NULL, m_combatTowns[(side)]);
     sprintf(
         gText,
-        DATA_COMPGEN(0x004ede28, viewGeneralSDSDSD, "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d"),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_ATTACK)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_ATTACK),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_DEFENSE)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_DEFENSE),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_SPELL_POWER)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_SPELL_POWER),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_KNOWLEDGE)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_KNOWLEDGE),
+        "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
+        cViewGeneralLabels[(HERO_PRIMARY_ATTACK)],
+        m_heroes[(side)]->Stats(HERO_PRIMARY_ATTACK),
+        cViewGeneralLabels[(HERO_PRIMARY_DEFENSE)],
+        m_heroes[(side)]->Stats(HERO_PRIMARY_DEFENSE),
+        cViewGeneralLabels[(HERO_PRIMARY_SPELL_POWER)],
+        m_heroes[(side)]->Stats(HERO_PRIMARY_SPELL_POWER),
+        cViewGeneralLabels[(HERO_PRIMARY_KNOWLEDGE)],
+        m_heroes[(side)]->Stats(HERO_PRIMARY_KNOWLEDGE),
         cViewGeneralLabels[GENERAL_LABEL_MORALE],
         gMoraleText[morale8 + GENERAL_MORALE_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_LUCK],
         gLuckText[luck10 + GENERAL_LUCK_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_MANA],
-        m_heroes[IDX(side)]->m_spellPoints,
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_KNOWLEDGE) * GENERAL_MANA_PER_KNOWLEDGE
+        m_heroes[(side)]->m_spellPoints,
+        m_heroes[(side)]->Stats(HERO_PRIMARY_KNOWLEDGE) * GENERAL_MANA_PER_KNOWLEDGE
     );
     message15.payload.widget.command = VIEW_GENERAL_SET_TEXT;
     message15.payload.widget.id = GENERAL_STATS_WIDGET;
     message15.payload.widget.data.text = gText;
     generalWindow18->BroadcastMessage(message15);
 
-    if (m_heroes[IDX(side)] == NULL || allowActions == 0
-        || m_heroes[IDX(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[IDX(side)] != 0
+    if (m_heroes[(side)] == NULL || allowActions == 0
+        || m_heroes[(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[(side)] != 0
         || m_currentSide != giCurGeneral) {
         message15.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message15.payload.widget.id = GENERAL_CLOSE;
-        message15.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message15.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow18->BroadcastMessage(message15);
         message15.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message15.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message15.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
         generalWindow18->BroadcastMessage(message15);
     }
-    if (allowActions == 0 || m_heroes[IDX(OppositeCombatSide(m_currentSide))] == NULL
+    if (allowActions == 0 || m_heroes[(OppositeCombatSide(m_currentSide))] == NULL
         || m_currentSide != giCurGeneral
-        || m_heroes[IDX(side)]->m_isCaptain != 0) {
+        || m_heroes[(side)]->m_isCaptain != 0) {
         message15.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message15.payload.widget.id = GENERAL_SURRENDER;
-        message15.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message15.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow18->BroadcastMessage(message15);
         message15.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message15.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message15.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
         generalWindow18->BroadcastMessage(message15);
     }
     if (allowActions == 0 || m_currentSide != giCurGeneral
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
-            && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
-        || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[1] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
+            && m_combatTowns[(COMBAT_DEFENDER_SIDE)] != NULL)
+        || m_sideRetreated[(COMBAT_ATTACKER_SIDE)] != 0
+        || m_sideRetreated[1] != 0 || m_heroes[(side)]->m_isCaptain != 0) {
         message15.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message15.payload.widget.id = GENERAL_RETREAT;
-        message15.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message15.payload.widget.data.value = (WIDGET_FLAG_ENABLED);
         generalWindow18->BroadcastMessage(message15);
         message15.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message15.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message15.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
         generalWindow18->BroadcastMessage(message15);
     }
 
@@ -239,7 +238,6 @@ i32 combatManager::ViewGeneral(
     return 0;
 }
 
-VA(0x0040c433, 0x351)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 msgConst;
     i16 msgConst27;
@@ -276,7 +274,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
     switch (message.type) {
         case MESSAGE_WIDGET:
-            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 helpIndex36 = -1;
                 if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                     || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
@@ -349,7 +347,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                     break;
             }
             if (hintIndex11 == GENERAL_HOVER_HELP_HERO
-                && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
+                && gpCombatManager->m_heroes[(iViewGeneralWhichSide)]->m_isCaptain)
                 hintIndex11 = GENERAL_HOVER_HELP_CAPTAIN;
             gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex11], 1, 0, 0);
             return MESSAGE_DISPATCH_CONSUME;
@@ -362,7 +360,6 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     if (viewedArmy == NULL)
         return;
@@ -401,16 +398,16 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
             windowY_5,
             viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
-            m_combatTowns[IDX(side)],
+            m_combatTowns[(side)],
             1,
             viewedArmy->m_facing,
             quickView,
-            m_heroes[IDX(side)],
+            m_heroes[(side)],
             viewedArmy,
-            m_armyGroups[IDX(side)],
+            m_armyGroups[(side)],
             0
         );
     }
 }
 
-DATA(0x004eddf4) H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;
+i32 iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;

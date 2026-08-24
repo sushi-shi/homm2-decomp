@@ -3,19 +3,19 @@
 
 #include <Ints.h>
 
-H2_ENUM_CLASS_BEGIN(IconDrawClipMode)
+enum {
     ICON_DRAW_NO_CLIP = 0,
     ICON_DRAW_CLIP    = 1
-H2_ENUM_CLASS_END(IconDrawClipMode)
-
-H2_ENUM_CLASS_BEGIN_SPLIT(IconDrawOrientation, i8)
+};
+typedef i32 IconDrawClipMode;
+enum {
     ICON_DRAW_NORMAL  = 0,
     ICON_DRAW_FLIPPED = 1
-H2_ENUM_CLASS_END_SPLIT(IconDrawOrientation, i8)
-
-H2_ENUM_CLASS_BEGIN(IconDrawResult)
+};
+typedef i32 IconDrawOrientation;
+enum {
     ICON_DRAW_SKIPPED   = 0,
     ICON_DRAW_COMPLETED = 1
-H2_ENUM_CLASS_END(IconDrawResult)
-
+};
+typedef i32 IconDrawResult;
 #endif

@@ -1,38 +1,38 @@
 #ifndef HOMM2_BASE_HEROWINDOW_H
 #define HOMM2_BASE_HEROWINDOW_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 
 class widget;
 class bitmap;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(WindowFlag)
+enum {
     WINDOW_FLAG_NONE            = 0,
     WINDOW_FLAG_FIXED_LAYER     = 1,
     WINDOW_FLAG_SAVE_BACKGROUND = 2,
     WINDOW_FLAG_STRIP_WINDOW    = 8,
-    WINDOW_FLAG_OWNS_WIDGETS    = 0x4000, // Close/RemoveWidgetById delete the widgets
-    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff // DrawWindow skips the screen update when only fixed-layer is set
-H2_ENUM_CLASS_END(WindowFlag)
-H2_ENUM_FLAGS(WindowFlag)
+    WINDOW_FLAG_OWNS_WIDGETS    = 0x4000,
+    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff
+};
+typedef i32 WindowFlag;
 
-H2_ENUM_BEGIN(WindowDrawId)
-    WINDOW_ALL_WIDGETS_LOW  = -0xffff, // DrawWindow id-range sentinel: no filter
+typedef enum WindowDrawId {
+    WINDOW_ALL_WIDGETS_LOW  = -0xffff,
     WINDOW_ALL_WIDGETS_HIGH = 0xffff,
     WINDOW_DRAW_ID_LIMIT    = 0x7fff
-H2_ENUM_END(WindowDrawId)
+} WindowDrawId;
 
-H2_ENUM_CLASS_BEGIN(WindowState)
+enum {
     WINDOW_STATE_CLOSED = 0,
     WINDOW_STATE_OPEN   = 1
-H2_ENUM_CLASS_END(WindowState)
-H2_ENUM_FLAGS(WindowState)
+};
+typedef i32 WindowState;
 
-H2_ENUM_BEGIN(HeroWindowConstant)
+typedef enum HeroWindowConstant {
     HERO_WINDOW_NAME_CAPACITY = 0x14
-H2_ENUM_END(HeroWindowConstant)
+} HeroWindowConstant;
 
 #pragma pack(push, 1)
 class heroWindow {
@@ -51,7 +51,7 @@ public:
     widget* m_widgetListHead;
     bitmap* m_savedBackground;
     heroWindow(void);
-    heroWindow(i32, i32, i32, i32, H2_ENUM_PARAM(WindowFlag, i32));
+    heroWindow(i32, i32, i32, i32, WindowFlag);
     heroWindow(i32, i32, char*);
     i32 Open(i32, i32);
     void RemoveAndDeleteWidget(i32);

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <string.h>
 #include <windows.h>
 #include <BASE/mouseManager.h>
@@ -13,35 +13,34 @@
 #include <BASE/INPUTMGR_TYPES.h>
 #include <BASE/message.h>
 
-H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
+enum {
     SCAN_CODE_MASK          = 0xff,
     WINDOWS_HIGH_WORD_SHIFT = 16,
     ENCODED_SCAN_CODE_SHIFT = 8,
     ASCII_DELETE_CODE       = 0x7f
-H2_ENUM_CLASS_END(InputManagerScanCodeEncoding)
-
+};
+typedef i32 InputManagerScanCodeEncoding;
 static inline u32 EncodeScanCode(u32 scanCode) {
-    return scanCode << IDX(ENCODED_SCAN_CODE_SHIFT);
+    return scanCode << (ENCODED_SCAN_CODE_SHIFT);
 }
 
-H2_ENUM_BEGIN(InputManagerCursorBounds)
+typedef enum InputManagerCursorBounds {
     CURSOR_INTERIOR_MIN_EXCLUSIVE   = 3,
     CURSOR_INTERIOR_MAX_X_EXCLUSIVE = 636,
     CURSOR_INTERIOR_MAX_Y_EXCLUSIVE = 476
-H2_ENUM_END(InputManagerCursorBounds)
+} InputManagerCursorBounds;
 
-H2_ENUM_BEGIN(InputManagerTiming)
+typedef enum InputManagerTiming {
     CURSOR_CHECK_DELAY = 500
-H2_ENUM_END(InputManagerTiming)
+} InputManagerTiming;
 
-DATA(0x0051f980) i32 iCurSwapPalette = 0;
-DATA(0x0051f984) i32 bLastMouseOffscreen = 0;
-DATA(0x0051f988) i32 bLastOnscreenMouseColor = 0;
-DATA(0x0051f98c) i32 bInCheckChangeCursor = 0;
-DATA(0x0051f990) static SInputManagerText gInputManagerText =
+i32 iCurSwapPalette = 0;
+i32 bLastMouseOffscreen = 0;
+i32 bLastOnscreenMouseColor = 0;
+i32 bInCheckChangeCursor = 0;
+static SInputManagerText gInputManagerText =
     {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
-VA(0x004cdb50, 0x308)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
@@ -60,8 +59,8 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYDOWN:
             event->type = MESSAGE_KEY_DOWN;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> IDX(WINDOWS_HIGH_WORD_SHIFT))
-                & IDX(SCAN_CODE_MASK);
+                static_cast<u16>(static_cast<u32l>(messageData) >> (WINDOWS_HIGH_WORD_SHIFT))
+                & (SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
@@ -82,8 +81,8 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYUP:
             event->type = MESSAGE_KEY_UP;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> IDX(WINDOWS_HIGH_WORD_SHIFT))
-                & IDX(SCAN_CODE_MASK);
+                static_cast<u16>(static_cast<u32l>(messageData) >> (WINDOWS_HIGH_WORD_SHIFT))
+                & (SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
@@ -106,10 +105,10 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (event->type != MESSAGE_NONE) {
         event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+        gpInputManager->m_writeIndex %= (INPUT_EVENT_RING_CAPACITY);
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
             gpInputManager->m_readIndex++;
-            gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+            gpInputManager->m_readIndex %= (INPUT_EVENT_RING_CAPACITY);
         }
         gpInputManager->m_field_0x85a = 0;
 
@@ -122,16 +121,15 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
                 SetFullScreenStatus(0);
-                AppCommand(hwndApp, 0, IDX(KBWIN_MENU_HELP), 0);
+                AppCommand(hwndApp, 0, (KBWIN_MENU_HELP), 0);
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(1 - gConfig.gfx[IDX(giCurExe)].fullScreen);
+                SetFullScreenStatus(1 - gConfig.gfx[(giCurExe)].fullScreen);
         }
     }
     return event->type == MESSAGE_NONE;
 }
 
-VA(0x004cde60, 0x36c)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
@@ -184,13 +182,13 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     event->payload.mouse.x =
         (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
     event->payload.mouse.y =
-        (static_cast<i16>(static_cast<u32l>(messageData) >> IDX(WINDOWS_HIGH_WORD_SHIFT))
+        (static_cast<i16>(static_cast<u32l>(messageData) >> (WINDOWS_HIGH_WORD_SHIFT))
          * MOUSE_SCREEN_HEIGHT)
         / iMainWinScreenHeight;
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
 
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0 && gConfig.gfx[IDX(giCurExe)].colorMouseCursor == 0
+    if (gConfig.gfx[(giCurExe)].fullScreen == 0 && gConfig.gfx[(giCurExe)].colorMouseCursor == 0
         && KBTickCount() > iLastBWOnScreenCheck
         && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
         && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
@@ -204,8 +202,8 @@ afterMouseCoordinates:
     if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
         i32 y = event->payload.mouse.y;
         i32 x = event->payload.mouse.x;
-        if (bInCheckChangeCursor == 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0
-            && gConfig.gfx[IDX(giCurExe)].colorMouseCursor != 0) {
+        if (bInCheckChangeCursor == 0 && gConfig.gfx[(giCurExe)].fullScreen == 0
+            && gConfig.gfx[(giCurExe)].colorMouseCursor != 0) {
             bInCheckChangeCursor = 1;
             if (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT) {
                 if (bLastMouseOffscreen != 0) {
@@ -227,18 +225,17 @@ afterMouseCoordinates:
     if (event->type != MESSAGE_NONE) {
         event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+        gpInputManager->m_writeIndex %= (INPUT_EVENT_RING_CAPACITY);
         i32 readIndex = gpInputManager->m_readIndex;
         if (gpInputManager->m_writeIndex == readIndex) {
             gpInputManager->m_readIndex = readIndex + 1;
-            gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+            gpInputManager->m_readIndex %= (INPUT_EVENT_RING_CAPACITY);
         }
     }
     gpInputManager->m_mouseMessageActive = 0;
     return event->type == MESSAGE_NONE;
 }
 
-VA(0x004ce1d0, 0x56)
 inputManager::inputManager(void) : baseManager() {
     m_active = false;
     m_mouseMessageActive = 0;
@@ -257,7 +254,6 @@ static inline void ResetEventQueue(inputManager* manager) {
     manager->m_readIndex = 0;
 }
 
-VA(0x004ce230, 0x78)
 i32 inputManager::Open(i32 priority) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     ResetEventQueue(this);
@@ -271,7 +267,6 @@ i32 inputManager::Open(i32 priority) {
     return 0;
 }
 
-VA(0x004ce2b0, 0x20)
 void inputManager::Close(void) {
     if (m_active != true)
         return;
@@ -281,12 +276,10 @@ void inputManager::Close(void) {
     m_active = false;
 }
 
-VA(0x004ce2d0, 0x5)
 MessageDispatchResult inputManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004ce2e0, 0xf)
 void inputManager::Flush(void) {
     ResetEventQueue(this);
 }
@@ -298,14 +291,13 @@ static inline void InitializeEmptyEvent(tag_message& event) {
     event.payload.unknown.unknown0x0c = 0;
 }
 
-VA(0x004ce2f0, 0xa8)
 tag_message inputManager::GetEvent(void) {
     tag_message event;
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
         m_readIndex++;
-        m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+        m_readIndex %= (INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
     } else {
@@ -317,13 +309,12 @@ tag_message inputManager::GetEvent(void) {
     return event;
 }
 
-VA(0x004ce3a0, 0xa1)
 tag_message inputManager::PeekEvent(void) {
     tag_message event;
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
-        m_readIndex = m_readIndex % IDX(INPUT_EVENT_RING_CAPACITY);
+        m_readIndex = m_readIndex % (INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
     } else {
@@ -335,18 +326,15 @@ tag_message inputManager::PeekEvent(void) {
     return event;
 }
 
-VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(i32, i32) {}
 
-VA(0x004ce460, 0x1b)
 void inputManager::SetKeyCodeType(
-    H2_ENUM_PARAM(InputManagerKeyCodeType, i32) keyCodeType
+    InputManagerKeyCodeType keyCodeType
 ) {
     m_keyCodeType = keyCodeType;
     ResetEventQueue(this);
 }
 
-VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message& event) {
     if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1
          && event.payload.keyboard.keyCode <= INPUT_SCAN_F10)
@@ -355,7 +343,7 @@ void inputManager::AsciiConvert(tag_message& event) {
         event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode];
     else
         event.payload.keyboard.keyCode =
-            m_keyState[event.payload.keyboard.keyCode] & IDX(SCAN_CODE_MASK);
+            m_keyState[event.payload.keyboard.keyCode] & (SCAN_CODE_MASK);
 
     MessageModifier modifiers = event.payload.keyboard.modifiers & MESSAGE_MODIFIER_SHIFT_KEYS;
     if (modifiers == MESSAGE_MODIFIER_NONE) {
@@ -431,109 +419,107 @@ void inputManager::AsciiConvert(tag_message& event) {
     }
 }
 
-VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void) {
     for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
         m_keyState[scanCode] = EncodeScanCode(scanCode);
 
-    m_keyState[IDX(INPUT_SCAN_NONE)] = 0;
-    m_keyState[IDX(INPUT_SCAN_ESCAPE)] = '\x1b';
-    m_keyState[IDX(INPUT_SCAN_1)] = '1';
-    m_keyState[IDX(INPUT_SCAN_2)] = '2';
-    m_keyState[IDX(INPUT_SCAN_3)] = '3';
-    m_keyState[IDX(INPUT_SCAN_4)] = '4';
-    m_keyState[IDX(INPUT_SCAN_5)] = '5';
-    m_keyState[IDX(INPUT_SCAN_6)] = '6';
-    m_keyState[IDX(INPUT_SCAN_7)] = '7';
-    m_keyState[IDX(INPUT_SCAN_8)] = '8';
-    m_keyState[IDX(INPUT_SCAN_9)] = '9';
-    m_keyState[IDX(INPUT_SCAN_0)] = '0';
-    m_keyState[IDX(INPUT_SCAN_MINUS)] = '-';
-    m_keyState[IDX(INPUT_SCAN_EQUALS)] = '=';
-    m_keyState[IDX(INPUT_SCAN_BACKSPACE)] = IDX(ASCII_DELETE_CODE);
-    m_keyState[IDX(INPUT_SCAN_TAB)] = '\t';
-    m_keyState[IDX(INPUT_SCAN_Q)] = 'Q';
-    m_keyState[IDX(INPUT_SCAN_W)] = 'W';
-    m_keyState[IDX(INPUT_SCAN_E)] = 'E';
-    m_keyState[IDX(INPUT_SCAN_R)] = 'R';
-    m_keyState[IDX(INPUT_SCAN_T)] = 'T';
-    m_keyState[IDX(INPUT_SCAN_Y)] = 'Y';
-    m_keyState[IDX(INPUT_SCAN_U)] = 'U';
-    m_keyState[IDX(INPUT_SCAN_I)] = 'I';
-    m_keyState[IDX(INPUT_SCAN_O)] = 'O';
-    m_keyState[IDX(INPUT_SCAN_P)] = 'P';
-    m_keyState[IDX(INPUT_SCAN_LEFT_BRACKET)] = '[';
-    m_keyState[IDX(INPUT_SCAN_RIGHT_BRACKET)] = ']';
-    m_keyState[IDX(INPUT_SCAN_ENTER)] = '\n';
-    m_keyState[IDX(INPUT_SCAN_CONTROL)] = EncodeScanCode(INPUT_SCAN_CONTROL);
-    m_keyState[IDX(INPUT_SCAN_A)] = 'A';
-    m_keyState[IDX(INPUT_SCAN_S)] = 'S';
-    m_keyState[IDX(INPUT_SCAN_D)] = 'D';
-    m_keyState[IDX(INPUT_SCAN_F)] = 'F';
-    m_keyState[IDX(INPUT_SCAN_G)] = 'G';
-    m_keyState[IDX(INPUT_SCAN_H)] = 'H';
-    m_keyState[IDX(INPUT_SCAN_J)] = 'J';
-    m_keyState[IDX(INPUT_SCAN_K)] = 'K';
-    m_keyState[IDX(INPUT_SCAN_L)] = 'L';
-    m_keyState[IDX(INPUT_SCAN_SEMICOLON)] = '\'';
-    m_keyState[IDX(INPUT_SCAN_APOSTROPHE)] = '\'';
-    m_keyState[IDX(INPUT_SCAN_GRAVE)] = EncodeScanCode(INPUT_SCAN_GRAVE);
-    m_keyState[IDX(INPUT_SCAN_LEFT_SHIFT)] = EncodeScanCode(INPUT_SCAN_LEFT_SHIFT);
-    m_keyState[IDX(INPUT_SCAN_BACKSLASH)] = '\\';
-    m_keyState[IDX(INPUT_SCAN_Z)] = 'Z';
-    m_keyState[IDX(INPUT_SCAN_X)] = 'X';
-    m_keyState[IDX(INPUT_SCAN_C)] = 'C';
-    m_keyState[IDX(INPUT_SCAN_V)] = 'V';
-    m_keyState[IDX(INPUT_SCAN_B)] = 'B';
-    m_keyState[IDX(INPUT_SCAN_N)] = 'N';
-    m_keyState[IDX(INPUT_SCAN_M)] = 'M';
-    m_keyState[IDX(INPUT_SCAN_COMMA)] = ',';
-    m_keyState[IDX(INPUT_SCAN_PERIOD)] = '.';
-    m_keyState[IDX(INPUT_SCAN_SLASH)] = '/';
-    m_keyState[IDX(INPUT_SCAN_RIGHT_SHIFT)] = EncodeScanCode(INPUT_SCAN_RIGHT_SHIFT);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_MULTIPLY)] = '*';
-    m_keyState[IDX(INPUT_SCAN_ALT)] = EncodeScanCode(INPUT_SCAN_ALT);
-    m_keyState[IDX(INPUT_SCAN_SPACE)] = ' ';
-    m_keyState[IDX(INPUT_SCAN_CAPS_LOCK)] = EncodeScanCode(INPUT_SCAN_CAPS_LOCK);
-    m_keyState[IDX(INPUT_SCAN_F1)] = EncodeScanCode(INPUT_SCAN_F1);
-    m_keyState[IDX(INPUT_SCAN_F2)] = EncodeScanCode(INPUT_SCAN_F2);
-    m_keyState[IDX(INPUT_SCAN_F3)] = EncodeScanCode(INPUT_SCAN_F3);
-    m_keyState[IDX(INPUT_SCAN_F4)] = EncodeScanCode(INPUT_SCAN_F4);
-    m_keyState[IDX(INPUT_SCAN_F5)] = EncodeScanCode(INPUT_SCAN_F5);
-    m_keyState[IDX(INPUT_SCAN_F6)] = EncodeScanCode(INPUT_SCAN_F6);
-    m_keyState[IDX(INPUT_SCAN_F7)] = EncodeScanCode(INPUT_SCAN_F7);
-    m_keyState[IDX(INPUT_SCAN_F8)] = EncodeScanCode(INPUT_SCAN_F8);
-    m_keyState[IDX(INPUT_SCAN_F9)] = EncodeScanCode(INPUT_SCAN_F9);
-    m_keyState[IDX(INPUT_SCAN_F10)] = EncodeScanCode(INPUT_SCAN_F10);
-    m_keyState[IDX(INPUT_SCAN_NUM_LOCK)] = EncodeScanCode(INPUT_SCAN_NUM_LOCK);
-    m_keyState[IDX(INPUT_SCAN_SCROLL_LOCK)] = EncodeScanCode(INPUT_SCAN_SCROLL_LOCK);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_7)] = EncodeScanCode(INPUT_SCAN_NUMPAD_7);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_8)] = EncodeScanCode(INPUT_SCAN_NUMPAD_8);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_9)] = EncodeScanCode(INPUT_SCAN_NUMPAD_9);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_MINUS)] = '-';
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_4)] = EncodeScanCode(INPUT_SCAN_NUMPAD_4);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_5)] = EncodeScanCode(INPUT_SCAN_NUMPAD_5);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_6)] = EncodeScanCode(INPUT_SCAN_NUMPAD_6);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_PLUS)] = '+';
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_1)] = EncodeScanCode(INPUT_SCAN_NUMPAD_1);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_2)] = EncodeScanCode(INPUT_SCAN_NUMPAD_2);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_3)] = EncodeScanCode(INPUT_SCAN_NUMPAD_3);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_0)] = EncodeScanCode(INPUT_SCAN_NUMPAD_0);
-    m_keyState[IDX(INPUT_SCAN_NUMPAD_DELETE)] = EncodeScanCode(INPUT_SCAN_NUMPAD_DELETE);
-    m_keyState[IDX(INPUT_SCAN_SYSREQ)] = EncodeScanCode(INPUT_SCAN_SYSREQ);
-    m_keyState[IDX(INPUT_SCAN_RESERVED_55)] = EncodeScanCode(INPUT_SCAN_RESERVED_55);
-    m_keyState[IDX(INPUT_SCAN_ISO_BACKSLASH)] = EncodeScanCode(INPUT_SCAN_ISO_BACKSLASH);
-    m_keyState[IDX(INPUT_SCAN_F11)] = EncodeScanCode(INPUT_SCAN_F11);
-    m_keyState[IDX(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
+    m_keyState[(INPUT_SCAN_NONE)] = 0;
+    m_keyState[(INPUT_SCAN_ESCAPE)] = '\x1b';
+    m_keyState[(INPUT_SCAN_1)] = '1';
+    m_keyState[(INPUT_SCAN_2)] = '2';
+    m_keyState[(INPUT_SCAN_3)] = '3';
+    m_keyState[(INPUT_SCAN_4)] = '4';
+    m_keyState[(INPUT_SCAN_5)] = '5';
+    m_keyState[(INPUT_SCAN_6)] = '6';
+    m_keyState[(INPUT_SCAN_7)] = '7';
+    m_keyState[(INPUT_SCAN_8)] = '8';
+    m_keyState[(INPUT_SCAN_9)] = '9';
+    m_keyState[(INPUT_SCAN_0)] = '0';
+    m_keyState[(INPUT_SCAN_MINUS)] = '-';
+    m_keyState[(INPUT_SCAN_EQUALS)] = '=';
+    m_keyState[(INPUT_SCAN_BACKSPACE)] = (ASCII_DELETE_CODE);
+    m_keyState[(INPUT_SCAN_TAB)] = '\t';
+    m_keyState[(INPUT_SCAN_Q)] = 'Q';
+    m_keyState[(INPUT_SCAN_W)] = 'W';
+    m_keyState[(INPUT_SCAN_E)] = 'E';
+    m_keyState[(INPUT_SCAN_R)] = 'R';
+    m_keyState[(INPUT_SCAN_T)] = 'T';
+    m_keyState[(INPUT_SCAN_Y)] = 'Y';
+    m_keyState[(INPUT_SCAN_U)] = 'U';
+    m_keyState[(INPUT_SCAN_I)] = 'I';
+    m_keyState[(INPUT_SCAN_O)] = 'O';
+    m_keyState[(INPUT_SCAN_P)] = 'P';
+    m_keyState[(INPUT_SCAN_LEFT_BRACKET)] = '[';
+    m_keyState[(INPUT_SCAN_RIGHT_BRACKET)] = ']';
+    m_keyState[(INPUT_SCAN_ENTER)] = '\n';
+    m_keyState[(INPUT_SCAN_CONTROL)] = EncodeScanCode(INPUT_SCAN_CONTROL);
+    m_keyState[(INPUT_SCAN_A)] = 'A';
+    m_keyState[(INPUT_SCAN_S)] = 'S';
+    m_keyState[(INPUT_SCAN_D)] = 'D';
+    m_keyState[(INPUT_SCAN_F)] = 'F';
+    m_keyState[(INPUT_SCAN_G)] = 'G';
+    m_keyState[(INPUT_SCAN_H)] = 'H';
+    m_keyState[(INPUT_SCAN_J)] = 'J';
+    m_keyState[(INPUT_SCAN_K)] = 'K';
+    m_keyState[(INPUT_SCAN_L)] = 'L';
+    m_keyState[(INPUT_SCAN_SEMICOLON)] = '\'';
+    m_keyState[(INPUT_SCAN_APOSTROPHE)] = '\'';
+    m_keyState[(INPUT_SCAN_GRAVE)] = EncodeScanCode(INPUT_SCAN_GRAVE);
+    m_keyState[(INPUT_SCAN_LEFT_SHIFT)] = EncodeScanCode(INPUT_SCAN_LEFT_SHIFT);
+    m_keyState[(INPUT_SCAN_BACKSLASH)] = '\\';
+    m_keyState[(INPUT_SCAN_Z)] = 'Z';
+    m_keyState[(INPUT_SCAN_X)] = 'X';
+    m_keyState[(INPUT_SCAN_C)] = 'C';
+    m_keyState[(INPUT_SCAN_V)] = 'V';
+    m_keyState[(INPUT_SCAN_B)] = 'B';
+    m_keyState[(INPUT_SCAN_N)] = 'N';
+    m_keyState[(INPUT_SCAN_M)] = 'M';
+    m_keyState[(INPUT_SCAN_COMMA)] = ',';
+    m_keyState[(INPUT_SCAN_PERIOD)] = '.';
+    m_keyState[(INPUT_SCAN_SLASH)] = '/';
+    m_keyState[(INPUT_SCAN_RIGHT_SHIFT)] = EncodeScanCode(INPUT_SCAN_RIGHT_SHIFT);
+    m_keyState[(INPUT_SCAN_NUMPAD_MULTIPLY)] = '*';
+    m_keyState[(INPUT_SCAN_ALT)] = EncodeScanCode(INPUT_SCAN_ALT);
+    m_keyState[(INPUT_SCAN_SPACE)] = ' ';
+    m_keyState[(INPUT_SCAN_CAPS_LOCK)] = EncodeScanCode(INPUT_SCAN_CAPS_LOCK);
+    m_keyState[(INPUT_SCAN_F1)] = EncodeScanCode(INPUT_SCAN_F1);
+    m_keyState[(INPUT_SCAN_F2)] = EncodeScanCode(INPUT_SCAN_F2);
+    m_keyState[(INPUT_SCAN_F3)] = EncodeScanCode(INPUT_SCAN_F3);
+    m_keyState[(INPUT_SCAN_F4)] = EncodeScanCode(INPUT_SCAN_F4);
+    m_keyState[(INPUT_SCAN_F5)] = EncodeScanCode(INPUT_SCAN_F5);
+    m_keyState[(INPUT_SCAN_F6)] = EncodeScanCode(INPUT_SCAN_F6);
+    m_keyState[(INPUT_SCAN_F7)] = EncodeScanCode(INPUT_SCAN_F7);
+    m_keyState[(INPUT_SCAN_F8)] = EncodeScanCode(INPUT_SCAN_F8);
+    m_keyState[(INPUT_SCAN_F9)] = EncodeScanCode(INPUT_SCAN_F9);
+    m_keyState[(INPUT_SCAN_F10)] = EncodeScanCode(INPUT_SCAN_F10);
+    m_keyState[(INPUT_SCAN_NUM_LOCK)] = EncodeScanCode(INPUT_SCAN_NUM_LOCK);
+    m_keyState[(INPUT_SCAN_SCROLL_LOCK)] = EncodeScanCode(INPUT_SCAN_SCROLL_LOCK);
+    m_keyState[(INPUT_SCAN_NUMPAD_7)] = EncodeScanCode(INPUT_SCAN_NUMPAD_7);
+    m_keyState[(INPUT_SCAN_NUMPAD_8)] = EncodeScanCode(INPUT_SCAN_NUMPAD_8);
+    m_keyState[(INPUT_SCAN_NUMPAD_9)] = EncodeScanCode(INPUT_SCAN_NUMPAD_9);
+    m_keyState[(INPUT_SCAN_NUMPAD_MINUS)] = '-';
+    m_keyState[(INPUT_SCAN_NUMPAD_4)] = EncodeScanCode(INPUT_SCAN_NUMPAD_4);
+    m_keyState[(INPUT_SCAN_NUMPAD_5)] = EncodeScanCode(INPUT_SCAN_NUMPAD_5);
+    m_keyState[(INPUT_SCAN_NUMPAD_6)] = EncodeScanCode(INPUT_SCAN_NUMPAD_6);
+    m_keyState[(INPUT_SCAN_NUMPAD_PLUS)] = '+';
+    m_keyState[(INPUT_SCAN_NUMPAD_1)] = EncodeScanCode(INPUT_SCAN_NUMPAD_1);
+    m_keyState[(INPUT_SCAN_NUMPAD_2)] = EncodeScanCode(INPUT_SCAN_NUMPAD_2);
+    m_keyState[(INPUT_SCAN_NUMPAD_3)] = EncodeScanCode(INPUT_SCAN_NUMPAD_3);
+    m_keyState[(INPUT_SCAN_NUMPAD_0)] = EncodeScanCode(INPUT_SCAN_NUMPAD_0);
+    m_keyState[(INPUT_SCAN_NUMPAD_DELETE)] = EncodeScanCode(INPUT_SCAN_NUMPAD_DELETE);
+    m_keyState[(INPUT_SCAN_SYSREQ)] = EncodeScanCode(INPUT_SCAN_SYSREQ);
+    m_keyState[(INPUT_SCAN_RESERVED_55)] = EncodeScanCode(INPUT_SCAN_RESERVED_55);
+    m_keyState[(INPUT_SCAN_ISO_BACKSLASH)] = EncodeScanCode(INPUT_SCAN_ISO_BACKSLASH);
+    m_keyState[(INPUT_SCAN_F11)] = EncodeScanCode(INPUT_SCAN_F11);
+    m_keyState[(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
 }
 
-VA(0x004ce990, 0xe4)
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0 && force == 0)
+    if (gConfig.gfx[(giCurExe)].fullScreen != 0 && force == 0)
         return;
-    if (gConfig.gfx[IDX(giCurExe)].colorMouseCursor == 0)
+    if (gConfig.gfx[(giCurExe)].colorMouseCursor == 0)
         return;
 
     bInCheckChangeCursor = 1;
@@ -552,7 +538,6 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
     bInCheckChangeCursor = 0;
 }
 
-VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void) {
     if (gpInputManager->m_mouseMessageActive != 0)
         return;
@@ -567,15 +552,13 @@ void inputManager::ForceMouseMove(void) {
     event->payload.mouse.screenY = event->payload.mouse.y;
     event->payload.mouse.modifiers = gpInputManager->m_modifiers;
     gpInputManager->m_writeIndex++;
-    gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+    gpInputManager->m_writeIndex %= (INPUT_EVENT_RING_CAPACITY);
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
         gpInputManager->m_readIndex++;
-        gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
+        gpInputManager->m_readIndex %= (INPUT_EVENT_RING_CAPACITY);
     }
     gpInputManager->m_mouseMessageActive = 0;
 }
 
 
-VTBL(inputManager, 0x004eba30);
-
-DATA(0x00534bc8) i32 iLastBWOnScreenCheck;
+i32 iLastBWOnScreenCheck;

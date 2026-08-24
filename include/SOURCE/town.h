@@ -1,13 +1,13 @@
 #ifndef HOMM2_SOURCE_TOWN_H
 #define HOMM2_SOURCE_TOWN_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
 
 class hero;
 
-H2_ENUM_CLASS_BEGIN(TownBuilding)
+enum {
     TOWN_BUILDING_MAGE_GUILD                    = 0x1,
     TOWN_BUILDING_THIEVES_GUILD                 = 0x2,
     TOWN_BUILDING_TAVERN                        = 0x4,
@@ -37,11 +37,11 @@ H2_ENUM_CLASS_BEGIN(TownBuilding)
     TOWN_BUILDING_UPGRADED_DWELLING_5           = 0x10000000,
     TOWN_BUILDING_UPGRADED_DWELLING_6           = 0x20000000,
     TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6 = 0x40000000
-H2_ENUM_CLASS_END(TownBuilding)
-H2_ENUM_FLAGS(TownBuilding)
+};
+typedef i32 TownBuilding;
 
-H2_ENUM_BEGIN(TownConstant)
-    TOWN_GARRISON_SLOT_COUNT           = 12, // slots 19..30: dwellings + upgrades (see BuildingSlotType)
+typedef enum TownConstant {
+    TOWN_GARRISON_SLOT_COUNT           = 12,
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,
@@ -62,7 +62,7 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_VIEW_MEMORY_REQUIREMENT       = 0x514,
     TOWN_VIEW_LOW_MEMORY_LIMIT         = 0x320,
     TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
-H2_ENUM_END(TownConstant)
+} TownConstant;
 
 #pragma pack(push, 1)
 class town {
@@ -70,7 +70,7 @@ public:
     char m_id;
     char m_owner;
     i8 m_threat;
-    H2_ENUM_STORAGE(FactionType, char) m_type;
+    char m_type;
     u8 m_x;
     u8 m_y;
     u8 m_boatX;
@@ -80,16 +80,16 @@ public:
     u32l m_buildings;
     i8 m_buildState;
     char m_unknown1d;
-    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)];
+    i16 m_garrison[(TOWN_GARRISON_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
     i8 m_formation;
     i8 m_originalOwner;
     u16 m_extraIndex;
     union {
-        H2_ENUM_STORAGE(SpellType, i8)
+        i8
             m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
-        H2_ENUM_STORAGE(SpellType, i8)
+        i8
             m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
             char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
@@ -107,12 +107,11 @@ public:
     void XformToCastle(void);
     void View(i32);
     void Deallocate(void);
-    void BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32));
+    void BuildBuilding(BuildingSlotType);
     i32 CanBuildDock(void);
     void CalcNumLevelArchers(i32*, i32*);
 };
 #pragma pack(pop)
-SIZE(town, 100);
 extern i32 bEnteringTown;
 
 #endif

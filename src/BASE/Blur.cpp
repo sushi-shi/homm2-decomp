@@ -1,30 +1,27 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Blur.h>
 #include <BASE/palette.h>
 
-// Fixed geometry of the 640-pixel framebuffer region processed by DoBlur.
-// The blur samples sixteen pixels from the horizontal and vertical axes around
-// each output pixel. Component-table indices are byte offsets into int tables.
-// The game palette stores 256 RGB triplets with six-bit component values.
-H2_ENUM_BEGIN(BlurPaletteConstant)
+
+typedef enum BlurPaletteConstant {
     PALETTE_RED_OFFSET         = -3,
     PALETTE_GREEN_OFFSET       = -2,
     PALETTE_BLUE_OFFSET        = -1,
     PALETTE_COLOR_COUNT        = 256,
-    PALETTE_BYTE_COUNT         = IDX(PALETTE_CHANNEL_COUNT) * PALETTE_COLOR_COUNT,
+    PALETTE_BYTE_COUNT         = (PALETTE_CHANNEL_COUNT) * PALETTE_COLOR_COUNT,
     PALETTE_COMPONENT_MAXIMUM  = 0x3f,
     COMPONENT_TABLE_BYTE_COUNT = sizeof(i32) * PALETTE_COLOR_COUNT
-H2_ENUM_END(BlurPaletteConstant)
+} BlurPaletteConstant;
 
-// RGBLOOKP.BIN is addressed as 1024 rows of 32 quantized blue entries.
-H2_ENUM_BEGIN(BlurLookupConstant)
+
+typedef enum BlurLookupConstant {
     QUANTIZATION_SHIFT    = 5,
     QUANTIZATION_MASK     = (1 << QUANTIZATION_SHIFT) - 1,
     LOOKUP_ROW_BYTE_COUNT = 1 << QUANTIZATION_SHIFT,
     LOOKUP_ROW_COUNT      = 1024,
     LOOKUP_BYTE_COUNT     = LOOKUP_ROW_COUNT * LOOKUP_ROW_BYTE_COUNT
-H2_ENUM_END(BlurLookupConstant)
+} BlurLookupConstant;
 
 typedef i32 BlurComponentTable[PALETTE_COLOR_COUNT];
 typedef u8 BlurLookupRow[LOOKUP_ROW_BYTE_COUNT];
@@ -34,22 +31,22 @@ typedef u8 BlurLookupRow[LOOKUP_ROW_BYTE_COUNT];
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
-H2_ENUM_BEGIN(BlurBoundsConstant)
+typedef enum BlurBoundsConstant {
     SCREEN_WIDTH          = 640,
     BORDER_RADIUS         = 4,
     INTERIOR_COLUMN_COUNT = SCREEN_WIDTH - BORDER_RADIUS * 2
-H2_ENUM_END(BlurBoundsConstant)
+} BlurBoundsConstant;
 
-H2_ENUM_BEGIN(BlurKernelConstant)
+typedef enum BlurKernelConstant {
     SECOND_NEIGHBOR_DISTANCE   = 2,
     THIRD_NEIGHBOR_DISTANCE    = 3,
     KERNEL_SAMPLE_COUNT        = 16,
     SPILLED_ARRAY_SAMPLE_COUNT = KERNEL_SAMPLE_COUNT - 3,
     COMPONENT_INDEX_SHIFT      = 2,
     SOUND_POLL_MASK            = 0x3f
-H2_ENUM_END(BlurKernelConstant)
+} BlurKernelConstant;
 
-H2_ENUM_CLASS_BEGIN(BlurKernelSample)
+enum {
     SOUTH_ONE_SAMPLE   = 0,
     WEST_FOUR_SAMPLE   = 1,
     SOUTH_TWO_SAMPLE   = 2,
@@ -63,12 +60,12 @@ H2_ENUM_CLASS_BEGIN(BlurKernelSample)
     EAST_THREE_SAMPLE  = 10,
     EAST_FOUR_SAMPLE   = 11,
     WEST_THREE_SAMPLE  = 12
-H2_ENUM_CLASS_END(BlurKernelSample)
-
-H2_ENUM_BEGIN(BlurTransitionConstant)
+};
+typedef i32 BlurKernelSample;
+typedef enum BlurTransitionConstant {
     FIZZLE_DELAY                    = 150,
     COMBAT_SPEED_DELAY_MILLISECONDS = 350
-H2_ENUM_END(BlurTransitionConstant)
+} BlurTransitionConstant;
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/resourceManager.h>
@@ -77,7 +74,6 @@ H2_ENUM_END(BlurTransitionConstant)
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
 
 #define BLUR_COMPONENT(table, offset)                                                              \
     BlurComponentAt((table), (offset))
@@ -86,10 +82,10 @@ static inline i32& BlurComponentAt(BlurComponentTable& table, i32 offset) {
     return *reinterpret_cast<i32*>(reinterpret_cast<u8*>(table) + offset);
 }
 
-H2_ENUM_BEGIN(BlurTextSlotSize)
+typedef enum BlurTextSlotSize {
     SOURCE_FILE_SLOT_SIZE     = 0x28,
     LOOKUP_FILENAME_SLOT_SIZE = 0x10
-H2_ENUM_END(BlurTextSlotSize)
+} BlurTextSlotSize;
 
 typedef struct SBlurText {
     char lookupAllocationSource[SOURCE_FILE_SLOT_SIZE];
@@ -101,12 +97,10 @@ typedef struct SBlurText {
     char newPaletteFreeSource[SOURCE_FILE_SLOT_SIZE];
 } SBlurText;
 
-SIZE(SBlurText, 0x100);
 
-DATA(0x0051fdc0) static SBlurText gBlurText =
-    {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
+static SBlurText gBlurText =
+    {"Blur.cpp", "RGBLOOKP.BIN", "Blur.cpp", "Blur.cpp", "Blur.cpp", "Blur.cpp", "Blur.cpp"};
 
-VA(0x004d28e0, 0x6a4)
 void DoBlur(
     bitmap* destination,
     bitmap* source,
@@ -124,7 +118,7 @@ void DoBlur(
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 
     BlurLookupRow* lookup = static_cast<BlurLookupRow*>(
-        H2_ALLOC_AT(LOOKUP_BYTE_COUNT, gBlurText.lookupAllocationSource, 0x19)
+        H2_ALLOC(LOOKUP_BYTE_COUNT)
     );
     BlurComponentTable redComponents;
     BlurComponentTable blueComponents;
@@ -133,7 +127,7 @@ void DoBlur(
     i32 componentOffset = 0;
     do {
         componentOffset += sizeof(i32);
-        paletteColor += IDX(PALETTE_CHANNEL_COUNT);
+        paletteColor += (PALETTE_CHANNEL_COUNT);
         BLUR_COMPONENT(redComponents, componentOffset - sizeof(i32)) =
             static_cast<u8>(paletteColor[PALETTE_RED_OFFSET]);
         BLUR_COMPONENT(greenComponents, componentOffset - sizeof(i32)) =
@@ -158,45 +152,45 @@ void DoBlur(
                 PollSound();
             }
             i32 samples[SPILLED_ARRAY_SAMPLE_COUNT];
-            i32 sample15; // south four rows
-            i32 sample14; // north one row
-            i32 sample13; // north four rows
+            i32 sample15;
+            i32 sample14;
+            i32 sample13;
             u8* input = destination->m_pixels + rowOffset + BORDER_RADIUS;
             i32 remaining = INTERIOR_COLUMN_COUNT;
             u8* output = source->m_pixels + rowOffset + BORDER_RADIUS;
             do {
-                samples[IDX(SOUTH_ONE_SAMPLE)] =
+                samples[(SOUTH_ONE_SAMPLE)] =
                     static_cast<u32>(input[SCREEN_WIDTH]) << COMPONENT_INDEX_SHIFT;
                 sample13 =
                     static_cast<u32>(input[-SCREEN_WIDTH * BORDER_RADIUS])
                     << COMPONENT_INDEX_SHIFT;
-                samples[IDX(SOUTH_TWO_SAMPLE)] =
-                    static_cast<u32>(input[SCREEN_WIDTH * IDX(SECOND_NEIGHBOR_DISTANCE)])
+                samples[(SOUTH_TWO_SAMPLE)] =
+                    static_cast<u32>(input[SCREEN_WIDTH * (SECOND_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
-                samples[IDX(NORTH_TWO_SAMPLE)] =
-                    static_cast<u32>(input[-SCREEN_WIDTH * IDX(SECOND_NEIGHBOR_DISTANCE)])
+                samples[(NORTH_TWO_SAMPLE)] =
+                    static_cast<u32>(input[-SCREEN_WIDTH * (SECOND_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
-                samples[IDX(EAST_ONE_SAMPLE)] =
+                samples[(EAST_ONE_SAMPLE)] =
                     static_cast<u32>(input[1]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(WEST_ONE_SAMPLE)] =
+                samples[(WEST_ONE_SAMPLE)] =
                     static_cast<u32>(input[-1]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(EAST_TWO_SAMPLE)] =
+                samples[(EAST_TWO_SAMPLE)] =
                     static_cast<u32>(input[SECOND_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(SOUTH_THREE_SAMPLE)] =
-                    static_cast<u32>(input[SCREEN_WIDTH * IDX(THIRD_NEIGHBOR_DISTANCE)])
+                samples[(SOUTH_THREE_SAMPLE)] =
+                    static_cast<u32>(input[SCREEN_WIDTH * (THIRD_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
-                samples[IDX(WEST_TWO_SAMPLE)] =
+                samples[(WEST_TWO_SAMPLE)] =
                     static_cast<u32>(input[-SECOND_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(NORTH_THREE_SAMPLE)] =
-                    static_cast<u32>(input[-SCREEN_WIDTH * IDX(THIRD_NEIGHBOR_DISTANCE)])
+                samples[(NORTH_THREE_SAMPLE)] =
+                    static_cast<u32>(input[-SCREEN_WIDTH * (THIRD_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
-                samples[IDX(EAST_THREE_SAMPLE)] =
+                samples[(EAST_THREE_SAMPLE)] =
                     static_cast<u32>(input[THIRD_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(EAST_FOUR_SAMPLE)] =
+                samples[(EAST_FOUR_SAMPLE)] =
                     static_cast<u32>(input[BORDER_RADIUS]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(WEST_THREE_SAMPLE)] =
+                samples[(WEST_THREE_SAMPLE)] =
                     static_cast<u32>(input[-THIRD_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
-                samples[IDX(WEST_FOUR_SAMPLE)] =
+                samples[(WEST_FOUR_SAMPLE)] =
                     static_cast<u32>(input[-BORDER_RADIUS]) << COMPONENT_INDEX_SHIFT;
                 sample14 = static_cast<u32>(input[-SCREEN_WIDTH])
                            << COMPONENT_INDEX_SHIFT;
@@ -206,90 +200,90 @@ void DoBlur(
                 u32 redSum = BLUR_COMPONENT(
                     redComponents, sample13
                 ) + BLUR_COMPONENT(
-                    redComponents, samples[IDX(SOUTH_ONE_SAMPLE)]
+                    redComponents, samples[(SOUTH_ONE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(SOUTH_TWO_SAMPLE)]
+                    redComponents, samples[(SOUTH_TWO_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(NORTH_TWO_SAMPLE)]
+                    redComponents, samples[(NORTH_TWO_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(EAST_ONE_SAMPLE)]
+                    redComponents, samples[(EAST_ONE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(WEST_ONE_SAMPLE)]
+                    redComponents, samples[(WEST_ONE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(EAST_TWO_SAMPLE)]
+                    redComponents, samples[(EAST_TWO_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(SOUTH_THREE_SAMPLE)]
+                    redComponents, samples[(SOUTH_THREE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(WEST_TWO_SAMPLE)]
+                    redComponents, samples[(WEST_TWO_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(NORTH_THREE_SAMPLE)]
+                    redComponents, samples[(NORTH_THREE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(EAST_THREE_SAMPLE)]
+                    redComponents, samples[(EAST_THREE_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(EAST_FOUR_SAMPLE)]
+                    redComponents, samples[(EAST_FOUR_SAMPLE)]
                 );
                 redSum += BLUR_COMPONENT(
-                    redComponents, samples[IDX(WEST_THREE_SAMPLE)]
+                    redComponents, samples[(WEST_THREE_SAMPLE)]
                 );
-                redSum += BLUR_COMPONENT(redComponents, samples[IDX(WEST_FOUR_SAMPLE)]);
+                redSum += BLUR_COMPONENT(redComponents, samples[(WEST_FOUR_SAMPLE)]);
                 redSum += BLUR_COMPONENT(redComponents, sample14);
                 redSum += BLUR_COMPONENT(redComponents, sample15);
 
                 u32 greenSum = BLUR_COMPONENT(
-                    greenComponents, samples[IDX(SOUTH_ONE_SAMPLE)]
+                    greenComponents, samples[(SOUTH_ONE_SAMPLE)]
                 )
                                + BLUR_COMPONENT(greenComponents, sample15);
                 greenSum += BLUR_COMPONENT(greenComponents, sample14);
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(SOUTH_TWO_SAMPLE)]
+                    greenComponents, samples[(SOUTH_TWO_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(NORTH_TWO_SAMPLE)]
+                    greenComponents, samples[(NORTH_TWO_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(EAST_ONE_SAMPLE)]
+                    greenComponents, samples[(EAST_ONE_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(WEST_ONE_SAMPLE)]
+                    greenComponents, samples[(WEST_ONE_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(EAST_TWO_SAMPLE)]
+                    greenComponents, samples[(EAST_TWO_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(SOUTH_THREE_SAMPLE)]
+                    greenComponents, samples[(SOUTH_THREE_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(WEST_TWO_SAMPLE)]
+                    greenComponents, samples[(WEST_TWO_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(NORTH_THREE_SAMPLE)]
+                    greenComponents, samples[(NORTH_THREE_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(EAST_THREE_SAMPLE)]
+                    greenComponents, samples[(EAST_THREE_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(EAST_FOUR_SAMPLE)]
+                    greenComponents, samples[(EAST_FOUR_SAMPLE)]
                 );
                 greenSum += BLUR_COMPONENT(
-                    greenComponents, samples[IDX(WEST_THREE_SAMPLE)]
+                    greenComponents, samples[(WEST_THREE_SAMPLE)]
                 );
-                greenSum += BLUR_COMPONENT(greenComponents, samples[IDX(WEST_FOUR_SAMPLE)]);
+                greenSum += BLUR_COMPONENT(greenComponents, samples[(WEST_FOUR_SAMPLE)]);
                 greenSum += BLUR_COMPONENT(
                     greenComponents, sample13
                 );
 
                 u32 blueSum = BLUR_COMPONENT(
-                    blueComponents, samples[IDX(SOUTH_ONE_SAMPLE)]
+                    blueComponents, samples[(SOUTH_ONE_SAMPLE)]
                 )
                               + BLUR_COMPONENT(blueComponents, sample14);
                 blueSum += BLUR_COMPONENT(blueComponents, sample15);
@@ -297,39 +291,39 @@ void DoBlur(
                     blueComponents, sample13
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(SOUTH_TWO_SAMPLE)]
+                    blueComponents, samples[(SOUTH_TWO_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(NORTH_TWO_SAMPLE)]
+                    blueComponents, samples[(NORTH_TWO_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(EAST_ONE_SAMPLE)]
+                    blueComponents, samples[(EAST_ONE_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(WEST_ONE_SAMPLE)]
+                    blueComponents, samples[(WEST_ONE_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(EAST_TWO_SAMPLE)]
+                    blueComponents, samples[(EAST_TWO_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(SOUTH_THREE_SAMPLE)]
+                    blueComponents, samples[(SOUTH_THREE_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(WEST_TWO_SAMPLE)]
+                    blueComponents, samples[(WEST_TWO_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(NORTH_THREE_SAMPLE)]
+                    blueComponents, samples[(NORTH_THREE_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(EAST_THREE_SAMPLE)]
+                    blueComponents, samples[(EAST_THREE_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(EAST_FOUR_SAMPLE)]
+                    blueComponents, samples[(EAST_FOUR_SAMPLE)]
                 );
                 blueSum += BLUR_COMPONENT(
-                    blueComponents, samples[IDX(WEST_THREE_SAMPLE)]
+                    blueComponents, samples[(WEST_THREE_SAMPLE)]
                 );
-                blueSum += BLUR_COMPONENT(blueComponents, samples[IDX(WEST_FOUR_SAMPLE)]);
+                blueSum += BLUR_COMPONENT(blueComponents, samples[(WEST_FOUR_SAMPLE)]);
                 *output++ = lookup[redSum & ~QUANTIZATION_MASK]
                                   [(greenSum & ~QUANTIZATION_MASK)
                                    + (blueSum >> QUANTIZATION_SHIFT)];
@@ -342,42 +336,42 @@ void DoBlur(
 
     PollSound();
     i8* oldPalette = static_cast<i8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gBlurText.oldPaletteAllocationSource, 0x8b)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     i8* newPalette = static_cast<i8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gBlurText.newPaletteAllocationSource, 0x8c)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     memcpy(oldPalette, gPalette->m_data, PALETTE_BYTE_COUNT);
     i8* oldColor = oldPalette;
     i32 remainingColors = PALETTE_COLOR_COUNT;
     i8* newColor = newPalette;
     do {
-        newColor[IDX(PALETTE_CHANNEL_RED)] =
-            oldColor[IDX(PALETTE_CHANNEL_RED)] + static_cast<i8>(redAdjust);
-        newColor[IDX(PALETTE_CHANNEL_GREEN)] =
-            oldColor[IDX(PALETTE_CHANNEL_GREEN)] + static_cast<i8>(greenAdjust);
-        newColor[IDX(PALETTE_CHANNEL_BLUE)] =
-            oldColor[IDX(PALETTE_CHANNEL_BLUE)] + static_cast<i8>(blueAdjust);
-        if (newColor[IDX(PALETTE_CHANNEL_RED)] > PALETTE_COMPONENT_MAXIMUM) {
-            newColor[IDX(PALETTE_CHANNEL_RED)] = PALETTE_COMPONENT_MAXIMUM;
+        newColor[(PALETTE_CHANNEL_RED)] =
+            oldColor[(PALETTE_CHANNEL_RED)] + static_cast<i8>(redAdjust);
+        newColor[(PALETTE_CHANNEL_GREEN)] =
+            oldColor[(PALETTE_CHANNEL_GREEN)] + static_cast<i8>(greenAdjust);
+        newColor[(PALETTE_CHANNEL_BLUE)] =
+            oldColor[(PALETTE_CHANNEL_BLUE)] + static_cast<i8>(blueAdjust);
+        if (newColor[(PALETTE_CHANNEL_RED)] > PALETTE_COMPONENT_MAXIMUM) {
+            newColor[(PALETTE_CHANNEL_RED)] = PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[IDX(PALETTE_CHANNEL_RED)] < 0) {
-            newColor[IDX(PALETTE_CHANNEL_RED)] = 0;
+        if (newColor[(PALETTE_CHANNEL_RED)] < 0) {
+            newColor[(PALETTE_CHANNEL_RED)] = 0;
         }
-        if (newColor[IDX(PALETTE_CHANNEL_GREEN)] > PALETTE_COMPONENT_MAXIMUM) {
-            newColor[IDX(PALETTE_CHANNEL_GREEN)] = PALETTE_COMPONENT_MAXIMUM;
+        if (newColor[(PALETTE_CHANNEL_GREEN)] > PALETTE_COMPONENT_MAXIMUM) {
+            newColor[(PALETTE_CHANNEL_GREEN)] = PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[IDX(PALETTE_CHANNEL_GREEN)] < 0) {
-            newColor[IDX(PALETTE_CHANNEL_GREEN)] = 0;
+        if (newColor[(PALETTE_CHANNEL_GREEN)] < 0) {
+            newColor[(PALETTE_CHANNEL_GREEN)] = 0;
         }
-        if (newColor[IDX(PALETTE_CHANNEL_BLUE)] > PALETTE_COMPONENT_MAXIMUM) {
-            newColor[IDX(PALETTE_CHANNEL_BLUE)] = PALETTE_COMPONENT_MAXIMUM;
+        if (newColor[(PALETTE_CHANNEL_BLUE)] > PALETTE_COMPONENT_MAXIMUM) {
+            newColor[(PALETTE_CHANNEL_BLUE)] = PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[IDX(PALETTE_CHANNEL_BLUE)] < 0) {
-            newColor[IDX(PALETTE_CHANNEL_BLUE)] = 0;
+        if (newColor[(PALETTE_CHANNEL_BLUE)] < 0) {
+            newColor[(PALETTE_CHANNEL_BLUE)] = 0;
         }
-        oldColor += IDX(PALETTE_CHANNEL_COUNT);
-        newColor += IDX(PALETTE_CHANNEL_COUNT);
+        oldColor += (PALETTE_CHANNEL_COUNT);
+        newColor += (PALETTE_CHANNEL_COUNT);
     } while (--remainingColors != 0);
 
     gpWindowManager
@@ -385,25 +379,21 @@ void DoBlur(
     DelayMilli(
         static_cast<i32l>(
             gfCombatSpeedMod[gConfig.combatSpeed]
-            * DATA_COMPGEN(
-                0x004eba84, combatSpeedDelayMilliseconds, IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
-            )
+            * (COMBAT_SPEED_DELAY_MILLISECONDS)
         )
     );
     gpWindowManager->SaveFizzleSource(0, 0, SCREEN_WIDTH, height);
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager
         ->FizzleForward(0, 0, SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
-    H2_FREE_AT(lookup, gBlurText.lookupFreeSource, 0xa8);
+    H2_FREE(lookup);
     if (saved != NULL) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();
-    H2_FREE_AT(oldPalette, gBlurText.oldPaletteFreeSource, 0xad);
-    H2_FREE_AT(newPalette, gBlurText.newPaletteFreeSource, 0xae);
+    H2_FREE(oldPalette);
+    H2_FREE(newPalette);
 }
 
 
 #undef BLUR_COMPONENT
-
-#undef RETAIL_FILE

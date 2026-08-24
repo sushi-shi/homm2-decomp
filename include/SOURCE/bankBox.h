@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_BANKBOX_H
 #define HOMM2_SOURCE_BANKBOX_H
 
-#include <va.h>
+#include <Ints.h>
 
 class heroWindow;
 class playerData;
@@ -18,5 +18,4 @@ public:
     void Update(i32);
 };
 #pragma pack(pop)
-SIZE(bankBox, 0xc);
 #endif

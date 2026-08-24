@@ -2,10 +2,10 @@
 #define HOMM2_KBWIN_H
 
 #include <SOURCE/KB_TYPES.h>
-#include <va.h>
+#include <Ints.h>
 #include <windows.h>
 
-H2_ENUM_BEGIN(KbWinConstant)
+typedef enum KbWinConstant {
     KBWIN_PROCESS_MESSAGE_MAX     = 0x3ff,
     KBWIN_PROCESS_MESSAGE_COUNT   = KBWIN_PROCESS_MESSAGE_MAX + 1,
     KBWIN_COMMAND_LINE_LIMIT      = 0x3c,
@@ -31,9 +31,9 @@ H2_ENUM_BEGIN(KbWinConstant)
     KBWIN_HEIGHT_768              = 768,
     KBWIN_WIDTH_1280              = 1280,
     KBWIN_HEIGHT_1024             = 1024
-H2_ENUM_END(KbWinConstant)
+} KbWinConstant;
 
-H2_ENUM_CLASS_BEGIN(KbWinMenuCommand)
+enum {
     KBWIN_MENU_SIZE_640_480   = 0x9c45,
     KBWIN_MENU_SIZE_800_600   = 0x9c46,
     KBWIN_MENU_SIZE_1024_768  = 0x9c47,
@@ -41,8 +41,8 @@ H2_ENUM_CLASS_BEGIN(KbWinMenuCommand)
     KBWIN_MENU_FULLSCREEN     = 0x9c49,
     KBWIN_MENU_HELP           = 0x9c74,
     KBWIN_MENU_ABOUT          = 0x9c75
-H2_ENUM_CLASS_END(KbWinMenuCommand)
-
+};
+typedef i32 KbWinMenuCommand;
 extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char*, i32);
 i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);
 i32 AppIdle(void);

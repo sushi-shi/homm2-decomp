@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_RESOURCEMANAGER_H
 #define HOMM2_BASE_RESOURCEMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include "baseManager.h"
 
 class MIDIWrap;
@@ -16,17 +16,17 @@ class tileset;
 struct tag_message;
 
 #pragma pack(push, 1)
-struct aggEntry { // one .agg directory record (0xc bytes)
+struct aggEntry {
     u32l id;
     i32l offset;
     u32l size;
 };
 
-H2_ENUM_BEGIN(ResourceManagerLayoutConstant)
+typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_AGGREGATE_LIMIT   = 2,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3c
-H2_ENUM_END(ResourceManagerLayoutConstant)
+} ResourceManagerLayoutConstant;
 
 class resourceManager : public baseManager {
 public:
@@ -41,9 +41,9 @@ public:
     char m_lastFileName[RESOURCE_MANAGER_FILENAME_CAPACITY];
     i32 m_lastFileId;
     resourceManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void GetBackdrop(char*, class bitmap*, i32);
     void GetBackdropAtLoc(char*, class bitmap*, i32, i32, i32);
     class palette* GetPalette(char*);
@@ -73,7 +73,6 @@ public:
     void ReadBlock(i8*, u32l);
 };
 #pragma pack(pop)
-SIZE(resourceManager, 0xa2);
 extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];
