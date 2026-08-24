@@ -342,18 +342,19 @@ i32 heroWindowManager::Open(i32 managerOrder) {
 
 VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {
-    if (m_active == 1) {
-        heroWindow* w = m_windowListTail;
-        while (w != NULL) {
-            heroWindow* prev = w->m_prevWindow;
-            RemoveWindow(w);
-            w = prev;
-        }
-        m_screen->m_pixels = NULL;
-        if (m_screen != NULL)
-            delete m_screen;
-        m_active = false;
+    if (m_active != 1)
+        return;
+
+    heroWindow* w = m_windowListTail;
+    while (w != NULL) {
+        heroWindow* prev = w->m_prevWindow;
+        RemoveWindow(w);
+        w = prev;
     }
+    m_screen->m_pixels = NULL;
+    if (m_screen != NULL)
+        delete m_screen;
+    m_active = false;
 }
 
 VA(0x004cac00, 0x2d)

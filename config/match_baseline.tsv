@@ -336,7 +336,7 @@ BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b3a5e9e584e1
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	a76cec9c7460
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	100.0000	6b587be24fc2
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	427bcb755878
-BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	bc30261b61e9
+BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	ad9ba0fc148f
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	e83b4d15b45f
 BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	5281ad28d06b
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	e13620843518
