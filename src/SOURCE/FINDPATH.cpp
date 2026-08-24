@@ -159,58 +159,60 @@ void searchArray::PushPoint(
 ) {
     if (cost > mobility && mobility > 0)
         return;
-    if (x >= 0 && x <= MAP_WIDTH - 1 && y >= 0 && y <= MAP_HEIGHT - 1
-        && m_queueCount < SEARCH_QUEUE_CAPACITY) {
-        gSearchLow = 0;
-        gSearchHigh = m_queueCount;
-        gSearchCell = &GetNode(x, y);
-        if (!gSearchCell->visited
-            || ((gSearchCell->rvFlag1 || !rvFlag1)
-                && (cost < gSearchCell->distance || (gSearchCell->rvFlag1 && !rvFlag1)))) {
+    if (x < 0 || x > MAP_WIDTH - 1 || y < 0 || y > MAP_HEIGHT - 1)
+        return;
+    if (m_queueCount >= SEARCH_QUEUE_CAPACITY)
+        return;
 
-            for (;;) {
-                gSearchMiddle = (gSearchHigh + gSearchLow) >> 1;
-                gSearchQueueNode = &m_queue[gSearchMiddle];
-                if (gSearchLow >= gSearchHigh)
-                    break;
-                if (cost < gSearchQueueNode->distance)
-                    gSearchLow = gSearchMiddle + 1;
-                else
-                    gSearchHigh = gSearchMiddle;
-            }
-
-            if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
-                memmove(
-                    gSearchQueueNode + 1,
-                    gSearchQueueNode,
-                    (m_queueCount - gSearchMiddle) * sizeof(searchNode)
-                );
-            }
-            m_queueCount++;
-
-            if (giCurTempMobility < cost && rvFlag2 == 0) {
-                gSearchQueueNode->rvFlag2 = 1;
-                gSearchQueueNode->previousX =
-                    static_cast<i8>(x - normalDirTable[IDX(direction)].x);
-                gSearchQueueNode->previousY =
-                    static_cast<i8>(y - normalDirTable[IDX(direction)].y);
-            } else {
-                gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
-                gSearchQueueNode->previousX = static_cast<i8>(previousX);
-                gSearchQueueNode->previousY = static_cast<i8>(previousY);
-            }
-            gSearchQueueNode->x = static_cast<u8>(x);
-            gSearchQueueNode->y = static_cast<u8>(y);
-            gSearchQueueNode->direction = static_cast<u8>(IDX(direction));
-            gSearchQueueNode->distance = static_cast<u16>(cost);
-            gSearchQueueNode->unknownFlag = static_cast<u8>(unknownFlag);
-            gSearchQueueNode->rvFlag1 = static_cast<u8>(rvFlag1);
-            gSearchQueueNode->valueX = static_cast<i8>(valueX);
-            gSearchQueueNode->valueY = static_cast<i8>(valueY);
-            gSearchQueueNode->visited = 1;
-            *gSearchCell = *gSearchQueueNode;
-        }
+    gSearchHigh = m_queueCount;
+    gSearchLow = 0;
+    gSearchCell = &GetNode(x, y);
+    if (gSearchCell->visited) {
+        if (!gSearchCell->rvFlag1 && rvFlag1)
+            return;
+        if (gSearchCell->distance <= cost && (!gSearchCell->rvFlag1 || rvFlag1))
+            return;
     }
+
+    for (;;) {
+        gSearchMiddle = (gSearchHigh + gSearchLow) >> 1;
+        gSearchQueueNode = &m_queue[gSearchMiddle];
+        if (gSearchHigh <= gSearchLow)
+            break;
+        if (cost < gSearchQueueNode->distance)
+            gSearchLow = gSearchMiddle + 1;
+        else
+            gSearchHigh = gSearchMiddle;
+    }
+
+    if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
+        memmove(
+            gSearchQueueNode + 1,
+            gSearchQueueNode,
+            (m_queueCount - gSearchMiddle) * sizeof(searchNode)
+        );
+    }
+    m_queueCount++;
+
+    if (cost > giCurTempMobility && rvFlag2 == 0) {
+        gSearchQueueNode->rvFlag2 = 1;
+        gSearchQueueNode->previousX = static_cast<i8>(x - normalDirTable[IDX(direction)].x);
+        gSearchQueueNode->previousY = static_cast<i8>(y - normalDirTable[IDX(direction)].y);
+    } else {
+        gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
+        gSearchQueueNode->previousX = static_cast<i8>(previousX);
+        gSearchQueueNode->previousY = static_cast<i8>(previousY);
+    }
+    gSearchQueueNode->x = static_cast<u8>(x);
+    gSearchQueueNode->y = static_cast<u8>(y);
+    gSearchQueueNode->direction = static_cast<u8>(IDX(direction));
+    gSearchQueueNode->distance = static_cast<u16>(cost);
+    gSearchQueueNode->unknownFlag = static_cast<u8>(unknownFlag);
+    gSearchQueueNode->rvFlag1 = static_cast<u8>(rvFlag1);
+    gSearchQueueNode->valueX = static_cast<i8>(valueX);
+    gSearchQueueNode->valueY = static_cast<i8>(valueY);
+    gSearchQueueNode->visited = 1;
+    *gSearchCell = *gSearchQueueNode;
 }
 
 VA(0x004a4e90, 0x36f)
