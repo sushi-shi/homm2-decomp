@@ -1,37 +1,40 @@
 #ifndef HOMM2_BASE_SOUNDMANAGER_H
 #define HOMM2_BASE_SOUNDMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include "baseManager.h"
 
-H2_ENUM_BEGIN(MidiTrackConstant)
+typedef enum MidiTrackConstant {
     MIDI_NO_TRACK    = -1,
     MIDI_TRACK_COUNT = 60
-H2_ENUM_END(MidiTrackConstant)
+} MidiTrackConstant;
 
-H2_ENUM_BEGIN(SoundStorageConstant)
+typedef enum SoundStorageConstant {
     SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
     DIGITAL_DRIVER_NAME_COUNT     = 14,
     SOUND_CHANNEL_TYPE_COUNT      = 4
-H2_ENUM_END(SoundStorageConstant)
+} SoundStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
+enum class SoundVolumeConversionMode : i32 {
     SOUND_VOLUME_EFFECT = 100,
     SOUND_VOLUME_MUSIC  = 101
-H2_ENUM_CLASS_END(SoundVolumeConversionMode)
+};
+using enum SoundVolumeConversionMode;
 
-H2_ENUM_CLASS_BEGIN_T(SoundSampleOperation, i16)
+enum class SoundSampleOperation : i16 {
     SOUND_SAMPLE_OPERATION_VOLUME        = 1,
     SOUND_SAMPLE_OPERATION_START         = 5,
     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
     SOUND_SAMPLE_OPERATION_MUSIC_VOLUME  = 101
-H2_ENUM_CLASS_END_T(SoundSampleOperation, i16)
+};
+using enum SoundSampleOperation;
 
-H2_ENUM_CLASS_BEGIN_T(SoundDigitalReportQuery, i16)
+enum class SoundDigitalReportQuery : i16 {
     SOUND_DIGITAL_REPORT_VOLUME  = 1,
     SOUND_DIGITAL_REPORT_PLAYING = 4
-H2_ENUM_CLASS_END_T(SoundDigitalReportQuery, i16)
+};
+using enum SoundDigitalReportQuery;
 
 class sample;
 struct _SAMPLE;
@@ -46,11 +49,11 @@ struct SampleChannelStruct {
     i32 currentChannel;
 };
 
-H2_ENUM_BEGIN(SoundBackendKind)
+typedef enum SoundBackendKind {
     SOUND_BACKEND_AUDIERE = 0,
     SOUND_BACKEND_MILES   = 1,
     SOUND_BACKEND_NONE    = 2
-H2_ENUM_END(SoundBackendKind)
+} SoundBackendKind;
 
 class soundManager : public baseManager {
 public:
@@ -62,9 +65,9 @@ public:
     i32 m_musicFadeSteps;
     i32 m_musicTrack;
     soundManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     bool CDStartup(void);
     void ShutdownSoundBackends(void);
     bool StartupMilesBackend(void);
@@ -87,15 +90,11 @@ public:
     i32 MusicPlaying(void);
 };
 #pragma pack(pop)
-SIZE(soundManager, 0x52);
 
-// Set when the CD-ROM check turns the audio path off; the two backend
-// startups refuse to run while it is set. Distinct from KB's gbNoSound.
+
 extern bool gSoundDisabled;
 
-// Set once a backend has come up and cleared on shutdown; the adventure and
-// game layers save/restore it around forced ambient-music switches, so it is
-// module state rather than a soundManager member.
+
 extern bool gSoundBackendsReady;
 
 inline bool IsAudiereBackend(const soundManager* manager) {
@@ -110,9 +109,7 @@ inline bool IsSoundBackendActive(const soundManager* manager) {
     return IsAudiereBackend(manager) || IsMilesBackend(manager);
 }
 
-// Smacker playback hands the Miles digital driver to the movie player, so the
-// backend that was live when a movie started is remembered here and brought
-// back up afterwards.
+
 inline void soundManager::SaveBackend(void) {
     m_savedBackend = m_backend;
 }

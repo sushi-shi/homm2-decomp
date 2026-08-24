@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/Misc.h>
@@ -10,7 +10,7 @@
 #include <SOURCE/comwin.h>
 #include <SOURCE/kbwin.h>
 
-H2_ENUM_BEGIN(ModemPrivateConstant)
+typedef enum ModemPrivateConstant {
     SETUP_TEXT_CAPACITY = 104,
     RESET_ATTEMPT_COUNT = 2,
     PRINTABLE_CHARACTER_FIRST = 32,
@@ -22,9 +22,8 @@ H2_ENUM_BEGIN(ModemPrivateConstant)
     HANDSHAKE_STAGE_INDEX = 9,
     MILLISECONDS_PER_SECOND = 1000,
     INPUT_QUEUE_GUARD = 4
-H2_ENUM_END(ModemPrivateConstant)
+} ModemPrivateConstant;
 
-VA(0x00472ca0, 0x1f8)
 void ModemSetup(i32 mode) {
     char directConnectMessage3[SETUP_TEXT_CAPACITY];
     i32 resetAttempt9;
@@ -36,7 +35,7 @@ void ModemSetup(i32 mode) {
     inque.readPosition = 0;
     outque.writePosition = 0;
     outque.readPosition = 0;
-    iBaudBits = MODEM_BAUD_CLOCK / IDX(gConfig.baudRate[gbDirectConnect]);
+    iBaudBits = MODEM_BAUD_CLOCK / H2EnumIndex(gConfig.baudRate[gbDirectConnect]);
     com_init(static_cast<u8>(gConfig.comPort[gbDirectConnect]), COM_BAUD_19200, 0);
     LogStr("MS2");
 
@@ -84,9 +83,9 @@ void ModemSetup(i32 mode) {
             "\xef\xf0\xff\xec\xee\xec\xf3 "
             "\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xfe.\n\n\xcd\xe0\xe6\xec\xe8\xf2\xe5 "
             "'\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc "
-            "\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5." /* "Ожидание подключения другого компьютера к прямому соединению.
+            "\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5."
 
-Нажмите 'ОТМЕНА', чтобы прервать ожидание." */
+
         );
         NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
@@ -97,32 +96,30 @@ void ModemSetup(i32 mode) {
     }
 }
 
-VA(0x00472e98, 0x8e)
 i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..." /* "Звоню..." */, numbuf);
+    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..."  , numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..." /* "Звоню..." */, numbuf);
+    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..."  , numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
 }
 
-VA(0x00472f26, 0x42)
 i32l Wait(void) {
     GUIModemResponse(
-        "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe7\xe2\xee\xed\xea\xe0..." /* "Ожидание звонка..." */,
+        "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe7\xe2\xee\xed\xea\xe0..."  ,
         "RING"
     );
     GUIModemCommand(
-        "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xec\xee\xe4\xe5\xec\xe0..." /* "Инициализация модема..." */
+        "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xec\xee\xe4\xe5\xec\xe0..."
         ,
         "ATA"
     );
     if (GUIModemResponse(
-            "\xd3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff..." /* "Установка соединения..." */
+            "\xd3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff..."
             ,
             "CONNECT"
         )
@@ -131,7 +128,6 @@ i32l Wait(void) {
     return 0;
 }
 
-VA(0x00472f68, 0x6c)
 void GUIModemCommand(char* message, char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
@@ -142,7 +138,6 @@ void GUIModemCommand(char* message, char* command) {
         ShutDown(NULL);
 }
 
-VA(0x00472fd4, 0x7e)
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
@@ -160,7 +155,6 @@ i8 GUIModemCommandExec(void) {
     }
 }
 
-VA(0x00473052, 0x61)
 void ModemCommand(char* command) {
     i32 commandLength = strlen(command);
     i32 commandPosition0;
@@ -171,7 +165,6 @@ void ModemCommand(char* command) {
     write_buffer("\r", 1);
 }
 
-VA(0x004730b3, 0x75)
 i8 GUIModemResponse(char* message, char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
@@ -183,7 +176,6 @@ i8 GUIModemResponse(char* message, char* response) {
     return 0;
 }
 
-VA(0x00473128, 0xb3)
 i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
@@ -210,7 +202,6 @@ compareResponse:
     }
 }
 
-VA(0x004731db, 0x42)
 i32 write_buffer(char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
@@ -218,7 +209,6 @@ i32 write_buffer(char* buffer, i32 length) {
     return 1;
 }
 
-VA(0x0047321d, 0x33)
 i32 read_byte(void) {
     u8 value[READ_STORAGE_SIZE];
     i32 received = com_rcv(0, 1, value);
@@ -228,12 +218,10 @@ i32 read_byte(void) {
         return -1;
 }
 
-VA(0x00473250, 0x1c)
 void write_byte(i32 value) {
     com_snd(0, 0, 1, &value, 0);
 }
 
-VA(0x0047326c, 0x19c)
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 seed = KBTickCount();
@@ -273,7 +261,6 @@ void Connect(void) {
     }
 }
 
-VA(0x00473408, 0x1e4)
 i32 WaitForDirectConnect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     switch (WFDCStage) {
@@ -321,10 +308,9 @@ i32 WaitForDirectConnect(void) {
     return 0;
 }
 
-VA(0x004735ec, 0x100)
 char ReadPacket(void) {
     i32 input;
-    if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - IDX(INPUT_QUEUE_GUARD)) {
+    if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - H2EnumIndex(INPUT_QUEUE_GUARD)) {
         LogStr("OverFlow1");
         inque.writePosition = 0;
         newpacket = 1;
@@ -364,7 +350,6 @@ readPacketStart:
     } while (1);
 }
 
-VA(0x004736ec, 0x10b)
 void WriteModemPacket(char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
@@ -395,25 +380,25 @@ void WriteModemPacket(char* buffer, i32 length) {
         ForcePollSound();
 }
 
-DATA(0x005158cc) i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
-DATA(0x00528630) i32 inescape = 0;
-DATA(0x00528634) i32 newpacket = 0;
-DATA(0x00528638) i32 packetlen = 0;
-DATA(0x00528628) char idstr[MODEM_ID_SIZE];
-DATA(0x00527dc8) i32 GUIMRc;
-DATA(0x00527dc0) i32 iModemCommandPos;
-DATA(0x00527db8) i32 GUIMRrespptr;
-DATA(0x00526d44) i32 localstage;
-DATA(0x00526cf8) char numbuf[MODEM_NUMBER_BUFFER_SIZE];
-DATA(0x00527dcc) i32 WFDCStage;
-DATA(0x00526d54) char remoteidstr[MODEM_ID_SIZE];
-DATA(0x00526d50) i32 stime;
-DATA(0x00526d1c) char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
-DATA(0x00526d4c) i32 iLastDialPos;
-DATA(0x00527dbc) i32 remotestage;
-DATA(0x00527d68) char GUIMRresp[MODEM_RESPONSE_SIZE];
-DATA(0x00526d48) i32 oldsec;
-DATA(0x00526d60) inque_t inque;
-DATA(0x00527dc4) i32 iLastActionTime;
-DATA(0x00527dd0) char GUIMRresponse[MODEM_RESPONSE_SIZE];
-DATA(0x00527e20) outque_t outque;
+i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
+i32 inescape = 0;
+i32 newpacket = 0;
+i32 packetlen = 0;
+char idstr[MODEM_ID_SIZE];
+i32 GUIMRc;
+i32 iModemCommandPos;
+i32 GUIMRrespptr;
+i32 localstage;
+char numbuf[MODEM_NUMBER_BUFFER_SIZE];
+i32 WFDCStage;
+char remoteidstr[MODEM_ID_SIZE];
+i32 stime;
+char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
+i32 iLastDialPos;
+i32 remotestage;
+char GUIMRresp[MODEM_RESPONSE_SIZE];
+i32 oldsec;
+inque_t inque;
+i32 iLastActionTime;
+char GUIMRresponse[MODEM_RESPONSE_SIZE];
+outque_t outque;

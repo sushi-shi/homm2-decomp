@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_EXECUTIVE_H
 #define HOMM2_BASE_EXECUTIVE_H
 
-#include <va.h>
+#include <Ints.h>
 
 class baseManager;
 
@@ -24,6 +24,5 @@ public:
     void Terminate(void);
 };
 #pragma pack(pop)
-SIZE(executive, 0x10);
 
 #endif

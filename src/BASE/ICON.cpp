@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/icon.h>
 #include <BASE/IconDraw.h>
 #include <BASE/resource.h>
@@ -18,18 +18,18 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 
-H2_ENUM_CLASS_BEGIN(IconColorTableMode)
+enum class IconColorTableMode : i32 {
     COLOR_TABLE_SKIP_DIM  = 0,
     COLOR_TABLE_APPLY_DIM = 1
-H2_ENUM_CLASS_END(IconColorTableMode)
+};
+using enum IconColorTableMode;
 
-H2_ENUM_BEGIN(IconDrawExtentConstant)
+typedef enum IconDrawExtentConstant {
     DRAW_SCREEN_WIDTH  = 640,
     DRAW_SCREEN_HEIGHT = 480,
     DRAW_COMBAT_HEIGHT = 444
-H2_ENUM_END(IconDrawExtentConstant)
+} IconDrawExtentConstant;
 
-VA(0x004c26f0, 0xb7)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
@@ -38,14 +38,12 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
-VA(0x004c27e0, 0x33)
 inline icon::~icon() {
     H2_FREE(m_data);
 }
 
-VA(0x004c2820, 0x72)
 void icon::DrawToBuffer(
-    i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
+    i32 x, i32 y, i32 frame, IconDrawOrientation orientation
 ) {
     if (orientation == ICON_DRAW_NORMAL) {
         IconToBitmap(
@@ -78,13 +76,12 @@ void icon::DrawToBuffer(
     );
 }
 
-VA(0x004c28a0, 0x3fc)
 IconDrawResult icon::CombatClipDrawToBuffer(
     i32 x,
     i32 y,
     i32 frame,
     struct SLimitData* limits,
-    H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
+    IconDrawOrientation orientation,
     i32 offset,
     u8* colorTable,
     i8* yModify
@@ -166,7 +163,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable,
-                IDX(COLOR_TABLE_APPLY_DIM)
+                H2EnumIndex(COLOR_TABLE_APPLY_DIM)
             );
         else
             FlipIconToBitmapColorTable(
@@ -244,13 +241,12 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     return ICON_DRAW_COMPLETED;
 }
 
-VA(0x004c2ca0, 0x40)
 void icon::ClipFillToBuffer(
     i32 x,
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
+    IconDrawOrientation orientation,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -271,13 +267,12 @@ void icon::ClipFillToBuffer(
     );
 }
 
-VA(0x004c2ce0, 0x13d)
 void icon::FillToBuffer(
     i32 x,
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
+    IconDrawOrientation orientation,
     struct SLimitData* limits
 ) {
     if (orientation != ICON_DRAW_NORMAL) {
@@ -320,9 +315,8 @@ void icon::FillToBuffer(
     );
 }
 
-VA(0x004c2e20, 0x66)
 void icon::DimToBuffer(
-    i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
+    i32 x, i32 y, i32 frame, IconDrawOrientation orientation
 ) {
     if (orientation == ICON_DRAW_NORMAL) {
         DimIconToBitmap(
@@ -354,6 +348,3 @@ void icon::DimToBuffer(
         0
     );
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(icon, 0x004ea99c)

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/executive.h>
 #include <BASE/EXEC_TYPES.h>
 #include <BASE/baseManager.h>
@@ -13,36 +13,35 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
-H2_ENUM_BEGIN(ExecutiveManagerConstant)
+typedef enum ExecutiveManagerConstant {
     MANAGER_DEFAULT_PRIORITY = -1,
     MANAGER_SUCCESS          = 0,
     MANAGER_ERROR            = 3,
     DIALOG_MANAGER_CAPACITY  = 20
-H2_ENUM_END(ExecutiveManagerConstant)
+} ExecutiveManagerConstant;
 
-DATA(0x0051f2f4) static char gExecutiveTextStorage[sizeof(SExecutiveText)] =
-    "\xed\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf0\xe5\xf1\xf3\xf0\xf1\xfb. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0." "\0\0\0"  /* "не могу инициализировать ресурсы. Вероятно, ошибка диска." */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xe0 \xe2\xe2\xee\xe4\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xef\xf0\xee\xe1\xeb\xe5\xec\xe0 \xf1 \xea\xeb\xe0\xe2\xe8\xe0\xf2\xf3\xf0\xee\xe9 \xe8\xeb\xe8 \xec\xfb\xf8\xfc\xfe." "\0\0"  /* "Не могу инициализировать устройства ввода. Вероятно, проблема с клавиатурой или мышью." */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xe7\xe2\xf3\xea." "\0\0"  /* "Не могу инициализировать звук." */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xec\xfb\xf8\xfc." "\0\0"  /* "Не могу инициализировать мышь." */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xee\xea\xed\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0 \xe8\xeb\xe8 \xef\xe0\xec\xff\xf2\xe8." "\0\0\0"  /* "Не могу инициализировать окна. Вероятно, ошибка диска или памяти." */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
+static char gExecutiveTextStorage[sizeof(SExecutiveText)] =
+    "\xed\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf0\xe5\xf1\xf3\xf0\xf1\xfb. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0." "\0\0\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xe0 \xe2\xe2\xee\xe4\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xef\xf0\xee\xe1\xeb\xe5\xec\xe0 \xf1 \xea\xeb\xe0\xe2\xe8\xe0\xf2\xf3\xf0\xee\xe9 \xe8\xeb\xe8 \xec\xfb\xf8\xfc\xfe." "\0\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xe7\xe2\xf3\xea." "\0\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xec\xfb\xf8\xfc." "\0\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xee\xea\xed\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0 \xe8\xeb\xe8 \xef\xe0\xec\xff\xf2\xe8." "\0\0\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
     "-----Manager List Start-----" "\0\0\0\0"
     "-----" "\0\0\0"
     "Head %d   Tail %d" "\0\0\0"
     "-----" "\0\0\0"
     "Manager %20s  this %d   prev %d  next %d" "\0\0\0\0"
     "--*--Manager List Stop --*--\n\n" "\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"  /* "Не могу добавить менеджера!" */
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
+    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
     "Terminated" "\0";
 
 #define gExecutiveText (*reinterpret_cast<SExecutiveText*>(gExecutiveTextStorage))
 
-VA(0x004c4f20, 0x35)
 executive::executive(void) {
     m_managerListHead = NULL;
     m_managerListTail = NULL;
@@ -50,7 +49,6 @@ executive::executive(void) {
     m_result = 0;
 }
 
-VA(0x004c4f60, 0xb0)
 i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
@@ -67,7 +65,6 @@ i32 executive::InitSystem(void) {
     return 0;
 }
 
-VA(0x004c5010, 0xb8)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
@@ -87,7 +84,6 @@ void executive::ShutDownSystem(void) {
     gpResourceManager->Close();
 }
 
-VA(0x004c50d0, 0x170)
 i32 executive::DoDialog(class baseManager* manager) {
     baseManager* savePrev[DIALOG_MANAGER_CAPACITY];
     i32 idx;
@@ -122,7 +118,6 @@ i32 executive::DoDialog(class baseManager* manager) {
     return ex.m_result;
 }
 
-VA(0x004c5240, 0xac)
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
@@ -138,7 +133,6 @@ void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStop);
 }
 
-VA(0x004c52f0, 0x13c)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == NULL)
         return MANAGER_ERROR;
@@ -175,7 +169,6 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     return MANAGER_SUCCESS;
 }
 
-VA(0x004c5430, 0xc3)
 void executive::RemoveManager(class baseManager* mgr) {
     if (mgr == NULL)
         return;
@@ -202,7 +195,6 @@ void executive::RemoveManager(class baseManager* mgr) {
     mgr->m_next = NULL;
 }
 
-VA(0x004c5500, 0x7c)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
@@ -215,7 +207,6 @@ void executive::CallManager(class baseManager* mgr) {
     m_activeManager = saved;
 }
 
-VA(0x004c5580, 0x179)
 void executive::MainLoop(void) {
     i32 done;
     tag_message message;
@@ -241,7 +232,7 @@ void executive::MainLoop(void) {
                         dispatch = 0;
                         break;
                     case MESSAGE_DISPATCH_FORWARD:
-                        if (HAS(message.type, MESSAGE_EXECUTIVE)) {
+                        if ((H2EnumIndex((message.type) & (MESSAGE_EXECUTIVE)))) {
                             switch (message.payload.executive.command) {
                                 case EXECUTIVE_COMMAND_TERMINATE_LOOP:
                                     done++;
@@ -265,7 +256,6 @@ void executive::MainLoop(void) {
     }
 }
 
-VA(0x004c5700, 0x15)
 void executive::Terminate(void) {
     ShutDown(gExecutiveText.terminationMessage);
 }

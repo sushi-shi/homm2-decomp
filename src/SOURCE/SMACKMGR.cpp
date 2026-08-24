@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(SmackManagerConstant)
+typedef enum SmackManagerConstant {
     PALETTE_VALUE_SHIFT            = 2,
     AUDIO_OPEN_FLAGS               = 0xfe000,
     NORMAL_FADE                    = 0x80,
@@ -67,11 +67,10 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     VIDEO_OPEN_READ_SLOW_THRESHOLD = 2000,
     VIDEO_DECOMP_SLOW_THRESHOLD    = 1300,
     SMACK_OPTION_COUNT             = 75
-H2_ENUM_END(SmackManagerConstant)
+} SmackManagerConstant;
 
-DATA(0x00533e94) static i8 bExpansionSmackNum;
+static i8 bExpansionSmackNum;
 
-VA(0x00494540, 0x3f)
 void ConvertSmackerPalette(u8* paletteData) {
     i32 i;
 
@@ -80,7 +79,6 @@ void ConvertSmackerPalette(u8* paletteData) {
             static_cast<u8>(static_cast<i32>(paletteData[i]) >> PALETTE_VALUE_SHIFT);
 }
 
-VA(0x0049457f, 0x1ea)
 void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette) {
     if (drawFrame && smack->NewPalette && !skipPalette) {
         memcpy(gPalette->m_data, smack->Palette, PALETTE_DATA_SIZE);
@@ -141,7 +139,6 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         SmackNextFrame(smack);
 }
 
-VA(0x00494769, 0x117d)
 void SmackManagerMain(void) {
     i32 soundFlags4;
     i32 preloadFlags27;
@@ -209,7 +206,7 @@ void SmackManagerMain(void) {
             savedVolume8 = AIL_digital_master_volume(digitalDriver5);
             AIL_set_digital_master_volume(
                 digitalDriver5,
-                smackMasterVolumes[IDX(gConfig.soundVolume)]
+                smackMasterVolumes[H2EnumIndex(gConfig.soundVolume)]
             );
         }
     }
@@ -250,7 +247,7 @@ void SmackManagerMain(void) {
                 NormalDialog(
                     "\xce\xf8\xe8\xe1\xea\xe0 \xf7\xf2\xe5\xed\xe8\xff \xe4\xe8\xf1\xea\xe0 "
                         "\xc3\xe5\xf0\xee\xe5\xe2 2. \xcf\xee\xe2\xf2\xee\xf0\xe8\xf2\xfc?"
-                    /* "Ошибка чтения диска Героев 2. Повторить?" */,
+                     ,
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -609,7 +606,6 @@ playbackDone:
     gpSoundManager->RestoreBackend();
 }
 
-VA(0x004958e6, 0x44)
 void ShutDownSmacker(void) {
     if (smk1)
         SmackClose(smk1);
@@ -619,7 +615,6 @@ void ShutDownSmacker(void) {
     smk2 = NULL;
 }
 
-VA(0x0049592a, 0x13b)
 i32 PlaySmacker(i32 smackNumber) {
     i32 oldUpdateFlags;
     i8 savedPalette[PALETTE_DATA_SIZE];
@@ -656,22 +651,20 @@ i32 PlaySmacker(i32 smackNumber) {
     return gbPlayedThrough;
 }
 
-DATA(0x00533e9c) i32 bSmackSound = 0;
-DATA(0x00533ea0) icon* brotherIcon = NULL;
-DATA(0x005170c8) static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
+i32 bSmackSound = 0;
+icon* brotherIcon = NULL;
+static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
-VA(0x00495a65, 0x4f)
 ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
     ExpansionCampaignId campaign = EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY;
-    for (; IDX(campaign) < EXPANSION_RECT_COUNT; ++campaign) {
-        if (PointInRect(x, y, &expansionCampaignRects[IDX(campaign)]))
+    for (; H2EnumIndex(campaign) < EXPANSION_RECT_COUNT; ++campaign) {
+        if (PointInRect(x, y, &expansionCampaignRects[H2EnumIndex(campaign)]))
             return campaign;
     }
     return EXPANSION_CAMPAIGN_NONE;
 }
 
-VA(0x00495ab4, 0x64)
 i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     if (x < rect->x)
         return 0;
@@ -684,7 +677,6 @@ i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     return 1;
 }
 
-VA(0x00495b18, 0x243)
 void PrintSummaryInfo(SmackSum* summary) {
     sprintf(
         gText,
@@ -758,8 +750,8 @@ void PrintSummaryInfo(SmackSum* summary) {
 #undef LOG_SUMMARY_VALUE
 }
 
-DATA(0x00533ea4) icon* backImage = NULL;
-DATA(0x005170e8) SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
+icon* backImage = NULL;
+SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
     {"H2XINTRO", "", "H2XINTRO", "", 1, 1, 0, 0, 0, 0, 0},
     {"NWCLOGO", "", "NWCLOGO", "", 1, 1, 0, 0, 0, 0, 0},
     {"WIN", "", "WIN", "", 1, 0, 0, 1, 0, 0, 0},
@@ -837,15 +829,14 @@ DATA(0x005170e8) SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
     {"BUKACRED", "", "BUKACRED", "", 1, 0, 1, 0, 0, 0, 0}
 };
 
-// Miles digital master volume the movie player runs at, indexed by the
-// configured sound level.
-DATA(0x00517e18) i32 smackMasterVolumes[IDX(CONFIG_VOLUME_LEVEL_COUNT)] =
+
+i32 smackMasterVolumes[H2EnumIndex(CONFIG_VOLUME_LEVEL_COUNT)] =
     {0, 127, 97, 75, 52, 40, 30, 20, 15, 10, 5};
-DATA(0x00533ea8) i32 bTesting = 0;
-DATA(0x00533eac) Smack* smk1 = NULL;
-DATA(0x00533eb0) Smack* smk2 = NULL;
-DATA(0x00533e38) i8 bSmackNum;
-DATA(0x00533e98) b32 gbLastFramePlayed;
-DATA(0x00533e40) SmackSum smksum;
-DATA(0x00533e3c) b32 gbPlayedThrough;
-DATA(0x00533e95) i8 bMainDone;
+i32 bTesting = 0;
+Smack* smk1 = NULL;
+Smack* smk2 = NULL;
+i8 bSmackNum;
+b32 gbLastFramePlayed;
+SmackSum smksum;
+b32 gbPlayedThrough;
+i8 bMainDone;

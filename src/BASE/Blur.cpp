@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Blur.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
@@ -11,11 +11,11 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(BlurConstant)
+typedef enum BlurConstant {
     SCREEN_WIDTH              = 640,
     BORDER_RADIUS             = 4,
     PALETTE_COLOR_COUNT       = 256,
-    PALETTE_BYTE_COUNT        = PALETTE_COLOR_COUNT * IDX(PALETTE_CHANNEL_COUNT),
+    PALETTE_BYTE_COUNT        = PALETTE_COLOR_COUNT * H2EnumIndex(PALETTE_CHANNEL_COUNT),
     PALETTE_COMPONENT_MAXIMUM = 0x3f,
     LOOKUP_BYTE_COUNT         = 0x8000,
     COMPONENT_SHIFT           = 5,
@@ -23,10 +23,9 @@ H2_ENUM_BEGIN(BlurConstant)
     GREEN_INDEX_SHIFT         = 5,
     SOUND_POLL_MASK           = 0x3f,
     FIZZLE_DELAY              = 150
-H2_ENUM_END(BlurConstant)
+} BlurConstant;
 
-// The kernel is the four nearest pixels in each of the four directions; every
-// channel sums the same sixteen taps through its own palette component table.
+
 #define BLUR_TAP_SUM(table, at)                                                              \
     (table[(at)[1]] + table[(at)[2]] + table[(at)[3]] + table[(at)[4]] + table[(at)[-1]]      \
      + table[(at)[-2]] + table[(at)[-3]] + table[(at)[-4]] + table[(at)[SCREEN_WIDTH]]        \
@@ -35,7 +34,6 @@ H2_ENUM_END(BlurConstant)
      + table[(at)[-SCREEN_WIDTH * 2]] + table[(at)[-SCREEN_WIDTH * 3]]                        \
      + table[(at)[-SCREEN_WIDTH * 4]])
 
-VA(0x004cba60, 0xa22)
 void DoBlur(
     bitmap* destination,
     bitmap* source,
@@ -66,11 +64,11 @@ void DoBlur(
     lookupTable = static_cast<u8*>(H2_ALLOC(LOOKUP_BYTE_COUNT));
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
         redTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT)]);
+            static_cast<u8>(gpBufferPalette->m_data[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)]);
         greenTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + 1]);
+            static_cast<u8>(gpBufferPalette->m_data[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1]);
         blueTable[i] =
-            static_cast<u8>(gpBufferPalette->m_data[i * IDX(PALETTE_CHANNEL_COUNT) + 2]);
+            static_cast<u8>(gpBufferPalette->m_data[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2]);
     }
 
     gpResourceManager->PointToFile(gpResourceManager->MakeId("RGBLOOKP.BIN", 1));
@@ -102,24 +100,24 @@ void DoBlur(
     memcpy(oldPalette0, gPalette->m_data, PALETTE_BYTE_COUNT);
 
     for (i = 0; i < PALETTE_COLOR_COUNT; i++) {
-        newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] =
-            oldPalette0[i * IDX(PALETTE_CHANNEL_COUNT)] + redAdjust;
-        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] =
-            oldPalette0[i * IDX(PALETTE_CHANNEL_COUNT) + 1] + greenAdjust;
-        newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] =
-            oldPalette0[i * IDX(PALETTE_CHANNEL_COUNT) + 2] + blueAdjust;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] > PALETTE_COMPONENT_MAXIMUM)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] = PALETTE_COMPONENT_MAXIMUM;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] < 0)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT)] = 0;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] > PALETTE_COMPONENT_MAXIMUM)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] = PALETTE_COMPONENT_MAXIMUM;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] < 0)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 1] = 0;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] > PALETTE_COMPONENT_MAXIMUM)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] = PALETTE_COMPONENT_MAXIMUM;
-        if (newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] < 0)
-            newPalette[i * IDX(PALETTE_CHANNEL_COUNT) + 2] = 0;
+        newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] =
+            oldPalette0[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] + redAdjust;
+        newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] =
+            oldPalette0[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] + greenAdjust;
+        newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] =
+            oldPalette0[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] + blueAdjust;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] > PALETTE_COMPONENT_MAXIMUM)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] = PALETTE_COMPONENT_MAXIMUM;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] < 0)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT)] = 0;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] > PALETTE_COMPONENT_MAXIMUM)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] = PALETTE_COMPONENT_MAXIMUM;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] < 0)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 1] = 0;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] > PALETTE_COMPONENT_MAXIMUM)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] = PALETTE_COMPONENT_MAXIMUM;
+        if (newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] < 0)
+            newPalette[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + 2] = 0;
     }
 
     gpWindowManager

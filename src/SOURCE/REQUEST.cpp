@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
@@ -18,7 +18,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
 
-H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
+enum class FileRequesterHelpIndex : i32 {
     REQUESTER_HELP_NONE          = -1,
     REQUESTER_HELP_VALID_BEGIN   = 0,
     REQUESTER_HELP_FILTER_SMALL  = REQUESTER_HELP_VALID_BEGIN,
@@ -36,9 +36,10 @@ H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     REQUESTER_HELP_MAP_NAME      = 12,
     REQUESTER_HELP_DESCRIPTION   = 13,
     REQUESTER_HELP_DIFFICULTY    = 14
-H2_ENUM_CLASS_END(FileRequesterHelpIndex)
+};
+using enum FileRequesterHelpIndex;
 
-H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
+enum class RequesterIconFrame : i32 {
     PLAYER_COUNT_FRAME_BASE = 0x13,
     MAP_SIZE_FRAME_SMALL    = 0x1a,
     MAP_SIZE_FRAME_MEDIUM   = 0x1b,
@@ -46,9 +47,10 @@ H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
     MAP_SIZE_FRAME_XLARGE   = 0x1d,
     VICTORY_FRAME_BASE      = 0x1e,
     LOSS_FRAME_BASE         = 0x24
-H2_ENUM_CLASS_END(RequesterIconFrame)
+};
+using enum RequesterIconFrame;
 
-H2_ENUM_BEGIN(FileRequesterPrivateConstant)
+typedef enum FileRequesterPrivateConstant {
     LEGACY_MAP_BASENAME_SIZE    = 8,
     MAP_LIST_GUTTER_TRAVEL      = 123,
     STANDARD_LIST_GUTTER_TRAVEL = 163,
@@ -73,9 +75,8 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
     CP1251_LOWER_LAST           = 0xff,
     CP1251_YO_UPPER             = 0xa8,
     CP1251_YO_LOWER             = 0xb8
-H2_ENUM_END(FileRequesterPrivateConstant)
+} FileRequesterPrivateConstant;
 
-VA(0x0048e730, 0x70)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = open(gText, _O_BINARY);
@@ -87,12 +88,10 @@ i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     return 1;
 }
 
-VA(0x0048e7a0, 0x10)
 i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
-VA(0x0048e7b0, 0x76)
 i32 ShowThisMapGame(char* filename) {
     return 1;
 
@@ -111,12 +110,10 @@ i32 ShowThisMapGame(char* filename) {
     return 0;
 }
 
-VA(0x0048e826, 0x10)
 i32 ShowThisMap(char*) {
     return 1;
 }
 
-VA(0x0048e836, 0x723)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     HANDLE findHandleWork;
     SMapHeader header;
@@ -141,7 +138,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (header.minHumanPlayers > giNumHumanPlayers
                     || header.maxHumanPlayers < giNumHumanPlayers
                     || (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                        && header.width != giMapSizes[IDX(giMapSizeFilter)]))
+                        && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)]))
                     goto CountNextFile;
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto CountNextFile;
@@ -149,7 +146,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && header.width != giMapSizes[IDX(giMapSizeFilter)])
+                    && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)])
                     goto CountNextFile;
                 if (!ShowThisMap(findFileData.cFileName))
                     goto CountNextFile;
@@ -202,7 +199,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (header.minHumanPlayers > giNumHumanPlayers
                     || header.maxHumanPlayers < giNumHumanPlayers
                     || (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                        && header.width != giMapSizes[IDX(giMapSizeFilter)]))
+                        && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)]))
                     goto InsertNextFile;
                 if (!ShowThisMapGame(findFileData.cFileName))
                     goto InsertNextFile;
@@ -210,7 +207,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && header.width != giMapSizes[IDX(giMapSizeFilter)])
+                    && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)])
                     goto InsertNextFile;
                 if (!ShowThisMap(findFileData.cFileName))
                     goto InsertNextFile;
@@ -251,7 +248,6 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     return m_fileCount;
 }
 
-VA(0x0048ef59, 0x156)
 fileRequester::fileRequester(
     i32 x,
     i32 y,
@@ -288,7 +284,6 @@ fileRequester::fileRequester(
     m_result = RESULT_PENDING;
 }
 
-VA(0x0048f0af, 0x4f)
 i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
     FileRequesterMapSizeFilter oldFilter = giMapSizeFilter;
     giMapSizeFilter = filter;
@@ -297,7 +292,6 @@ i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
     return result > 0;
 }
 
-VA(0x0048f0fe, 0x62)
 void fileRequester::SetupFiles(void) {
     CleanUpData();
     m_fileCount = 0;
@@ -307,7 +301,6 @@ void fileRequester::SetupFiles(void) {
     InitializeFiles(m_directory, m_filePattern, 0);
 }
 
-VA(0x0048f160, 0xa0)
 void fileRequester::CleanUpData(void) {
     if (m_fileNames != NULL) {
         delete[] m_fileNames;
@@ -323,7 +316,6 @@ void fileRequester::CleanUpData(void) {
     m_mapHeaders = NULL;
 }
 
-VA(0x0048f200, 0x75)
 void fileRequester::Close(void) {
     if (!m_active) {
         return;
@@ -336,7 +328,6 @@ void fileRequester::Close(void) {
     m_active = false;
 }
 
-VA(0x0048f275, 0x44b)
 i32 fileRequester::Open(i32 id) {
     strcpy(
         gLastFilename,
@@ -393,7 +384,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Сохранить файл: */ "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+              "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -423,7 +414,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-            /* Загрузить файл: */ "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
+              "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -445,7 +436,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-               /* НОВАЯ ИГРА */ "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
+                 "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -459,20 +450,18 @@ i32 fileRequester::Open(i32 id) {
     return 0;
 }
 
-VA(0x0048f6c0, 0x77)
 void fileRequester::SetOK(i32 enabled) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.id = FILE_REQUESTER_OK;
-    message.payload.widget.data.value = m_active == 1 ? IDX(WIDGET_FLAG_DIMMED) : IDX(WIDGET_FLAG_GRAYED);
+    message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAG_GRAYED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
     m_window->BroadcastMessage(message);
 }
 
-VA(0x0048f737, 0x1124)
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
@@ -501,7 +490,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         );
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
-                        (IDX(giMapSizeFilter) + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
+                        (H2EnumIndex(giMapSizeFilter) + 1) % H2EnumIndex(FILE_REQUESTER_MAP_SIZE_COUNT)
                     );
                     SetupFiles();
                     if (strlen(cycleNameBuffer) != 0) {
@@ -560,7 +549,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe8\xe7 \xf1\xef\xe8\xf1\xea"
                                     "\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 \xea\xed\xee"
                                     "\xef\xea\xf3 \xee\xf2\xec\xe5\xed\xfb."
-                                    /* "Выберите из списка или нажмите кнопку отмены." */
+
                                     ,
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_RESOURCE,
@@ -585,10 +574,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     break;
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT:
-                    if (HAS(
-                            message.payload.widget.modifiers,
-                            MESSAGE_MODIFIER_RIGHT_BUTTON
-                        )) {
+                    if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                         helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {
                             case FILE_REQUESTER_FILTER_SMALL:
@@ -668,7 +654,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         }
                         if (helpIndexMouse >= REQUESTER_HELP_VALID_BEGIN) {
                             NormalDialog(
-                                gFileRequestHelp[IDX(helpIndexMouse)],
+                                gFileRequestHelp[H2EnumIndex(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -697,7 +683,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                             "\xcd\xe5\xf2 \xea\xe0\xf0\xf2 \xf2\xe0\xea\xee\xe3\xee"
                                             " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
                                             "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-                                            /* "Нет карт такого размера для %d игроков-людей." */
+
                                             ,
                                             giNumHumanPlayers
                                         );
@@ -707,7 +693,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                             "\xcd\xe5\xf2 \xea\xe0\xf0\xf2\xfb \xfd\xf2\xee\xe3\xee"
                                             " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
                                             "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-                                            /* "Нет карты этого размера для %d игроков-людей." */
+
                                             ,
                                             giNumHumanPlayers
                                         );
@@ -802,7 +788,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     positions = 1;
                                 stepScreen = static_cast<i32>(
                                     (fGutterTravelLength
-                                     * IDX(FILE_REQUESTER_GUTTER_SCALE))
+                                     * H2EnumIndex(FILE_REQUESTER_GUTTER_SCALE))
                                     / positions
                                 );
                                 mouseX = message.payload.widget.screenX;
@@ -903,8 +889,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     "\xe5\xeb\xee\xe2\xe5\xea.  \xc0 \xe2\xe0\xec \xed\xf3\xe6\xed\xe0 \xea\xe0\xf0"
                     "\xf2\xe0, \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xed\xe0 %d \xf7\xe5\xeb"
                     "\xee\xe2\xe5\xea."
-                    /* "Выбранная вами игра рассчитана только на %d человек.  А вам нужна
-                       карта, как минимум на %d человек." */
+
+
                     ,
                     iResult,
                     giNumHumanPlayers
@@ -932,8 +918,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     "\xe7\xff\xf2\xfc \xef\xee\xe4 \xf1\xe2\xee\xe5 \xf3\xef\xf0\xe0\xe2\xeb\xe5"
                     "\xed\xe8\xe5 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff %d \xec\xe5\xf1\xf2 \xeb"
                     "\xfe\xe4\xe5\xe9?"
-                    /* "Выбранная игра начнется с %d игроками-людьми. Можно ли
-                       компьютеру взять под свое управление оставшиеся %d мест людей?" */
+
+
                     ,
                     iResult,
                     iResult - giNumHumanPlayers
@@ -964,7 +950,6 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0049085b, 0x25b)
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex;
     double gutterStep7;
@@ -1021,7 +1006,6 @@ void fileRequester::DoKnob(void) {
     Update(1);
 }
 
-VA(0x00490ab6, 0xa9e)
 void fileRequester::Update(i32 drawWindow) {
     i32 unusedState;
     double gutterSpan;
@@ -1036,11 +1020,11 @@ void fileRequester::Update(i32 drawWindow) {
     localState = 0;
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
+        for (i = 0; i < H2EnumIndex(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
             message.payload.widget.data.value =
-                (i == IDX(giMapSizeFilter)) + i * FILTER_FRAME_STEP + FILTER_FRAME_BASE;
+                (i == H2EnumIndex(giMapSizeFilter)) + i * FILTER_FRAME_STEP + FILTER_FRAME_BASE;
             m_window->BroadcastMessage(message);
         }
         if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_fileCount > 0) {
@@ -1051,29 +1035,29 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = FILE_REQUESTER_MAP_SIZE;
         if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
-            message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_SMALL);
+            message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_SMALL);
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_MEDIUM) {
-            message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_MEDIUM);
+            message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_MEDIUM);
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_LARGE) {
-            message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_LARGE);
+            message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_LARGE);
         } else {
-            message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_XLARGE);
+            message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_XLARGE);
         }
         m_window->BroadcastMessage(message);
 
         message.payload.widget.id = FILE_REQUESTER_MAP_PLAYER_COUNT;
         message.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].playerCount + IDX(PLAYER_COUNT_FRAME_BASE);
+            m_mapHeaders[m_selectedIndex].playerCount + H2EnumIndex(PLAYER_COUNT_FRAME_BASE);
         m_window->BroadcastMessage(message);
 
         message.payload.widget.id = FILE_REQUESTER_MAP_VICTORY;
         message.payload.widget.data.value =
-            IDX(m_mapHeaders[m_selectedIndex].victoryCondition) + IDX(VICTORY_FRAME_BASE);
+            H2EnumIndex(m_mapHeaders[m_selectedIndex].victoryCondition) + H2EnumIndex(VICTORY_FRAME_BASE);
         m_window->BroadcastMessage(message);
 
         message.payload.widget.id = FILE_REQUESTER_MAP_LOSS;
         message.payload.widget.data.value =
-            IDX(m_mapHeaders[m_selectedIndex].lossCondition) + IDX(LOSS_FRAME_BASE);
+            H2EnumIndex(m_mapHeaders[m_selectedIndex].lossCondition) + H2EnumIndex(LOSS_FRAME_BASE);
         m_window->BroadcastMessage(message);
 
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1082,7 +1066,7 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(message);
 
-        sprintf(gText, "%s", cDifficulty[IDX(m_mapHeaders[m_selectedIndex].difficulty)]);
+        sprintf(gText, "%s", cDifficulty[H2EnumIndex(m_mapHeaders[m_selectedIndex].difficulty)]);
         message.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(message);
 
@@ -1094,7 +1078,7 @@ void fileRequester::Update(i32 drawWindow) {
     for (i = 0; i < iMaxListSize; ++i) {
         if (m_topIndex + i >= m_fileCount) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
             message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(message);
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1110,7 +1094,7 @@ void fileRequester::Update(i32 drawWindow) {
         } else {
             message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
 
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1126,29 +1110,29 @@ void fileRequester::Update(i32 drawWindow) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
-                    message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_SMALL);
+                    message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_SMALL);
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_MEDIUM) {
-                    message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_MEDIUM);
+                    message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_MEDIUM);
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_LARGE) {
-                    message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_LARGE);
+                    message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_LARGE);
                 } else {
-                    message.payload.widget.data.value = IDX(MAP_SIZE_FRAME_XLARGE);
+                    message.payload.widget.data.value = H2EnumIndex(MAP_SIZE_FRAME_XLARGE);
                 }
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                 message.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].playerCount + IDX(PLAYER_COUNT_FRAME_BASE);
+                    m_mapHeaders[m_topIndex + i].playerCount + H2EnumIndex(PLAYER_COUNT_FRAME_BASE);
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 message.payload.widget.data.value =
-                    IDX(m_mapHeaders[m_topIndex + i].victoryCondition) + IDX(VICTORY_FRAME_BASE);
+                    H2EnumIndex(m_mapHeaders[m_topIndex + i].victoryCondition) + H2EnumIndex(VICTORY_FRAME_BASE);
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 message.payload.widget.data.value =
-                    IDX(m_mapHeaders[m_topIndex + i].lossCondition) + IDX(LOSS_FRAME_BASE);
+                    H2EnumIndex(m_mapHeaders[m_topIndex + i].lossCondition) + H2EnumIndex(LOSS_FRAME_BASE);
                 m_window->BroadcastMessage(message);
             }
 
@@ -1175,7 +1159,7 @@ void fileRequester::Update(i32 drawWindow) {
 
     message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
     message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
     m_window->BroadcastMessage(message);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1190,7 +1174,7 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME
         || m_mode == FILE_REQUESTER_MAP) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
         m_window->BroadcastMessage(message);
     }
 
@@ -1198,7 +1182,7 @@ void fileRequester::Update(i32 drawWindow) {
         m_scrollKnob->m_y =
             static_cast<i16>(
                 fGutterTravelLength
-                    / IDX(SCROLL_CENTER_DIVISOR)
+                    / H2EnumIndex(SCROLL_CENTER_DIVISOR)
                 + fGutterMinY
             );
     } else {
@@ -1210,7 +1194,6 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
-VA(0x00491554, 0x12b)
 char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
         && (m_selectedIndex < 0 || m_selectedIndex >= m_fileCount)) {
@@ -1235,16 +1218,11 @@ char* fileRequester::GetFilename(void) {
 }
 
 
-
-
-DATA(0x00516adc) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
+FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
 struct cFRDummyStorageOwner {
     static char storage[1];
 };
-DATA(0x00516ae0) char* cFRDummy = cFRDummyStorageOwner::storage;
-DATA(0x00533d78) float fGutterMinY;
-DATA(0x00533d7c) float fGutterTravelLength;
-DATA(0x00533d80) i32 iMaxListSize;
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(fileRequester, 0x004ea800)
+char* cFRDummy = cFRDummyStorageOwner::storage;
+float fGutterMinY;
+float fGutterTravelLength;
+i32 iMaxListSize;

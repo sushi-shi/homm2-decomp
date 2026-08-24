@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/widget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/heroWindow.h>
@@ -7,19 +7,18 @@
 #include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(WidgetConstant)
+typedef enum WidgetConstant {
     DEFAULT_EXTENT   = 16,
     WIDGET_FLAG_MASK = 0xffff
-H2_ENUM_END(WidgetConstant)
+} WidgetConstant;
 
-VA(0x004d4010, 0x8b)
 widget::widget(
     i16 x,
     i16 y,
     i16 width,
     i16 height,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind
+    WidgetKind kind
 ) {
     m_owner = NULL;
     m_next = NULL;
@@ -34,7 +33,6 @@ widget::widget(
     m_kind = kind;
 }
 
-VA(0x004d40a0, 0x7d)
 widget::widget(void) {
     m_owner = NULL;
     m_next = NULL;
@@ -49,49 +47,45 @@ widget::widget(void) {
     m_height = DEFAULT_EXTENT;
 }
 
-VA(0x004d4120, 0x14)
 widget::~widget() {}
 
-VA(0x004d4140, 0x23)
 i32 widget::Open(i32 zOrder, class heroWindow* owner) {
     m_zOrder = zOrder;
     m_owner = owner;
     return 0;
 }
 
-VA(0x004d4170, 0xb)
 void widget::Close(void) {}
 
-VA(0x004d4180, 0x3b5)
 MessageDispatchResult widget::Main(tag_message& message) {
-    // A switch arm may not jump past an initialisation, so the hit-test
-    // coordinates are declared for the whole function.
+
+
     i16 x;
     i16 y;
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DRAW:
-                    if (HAS(m_flags, WIDGET_FLAG_DRAW))
+                    if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW))))
                         Draw();
-                    if (HAS(m_flags, WIDGET_FLAG_DIMMED))
+                    if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))))
                         Dim();
                     break;
 
                 case WIDGET_COMMAND_SET_FLAGS:
                     if (message.payload.widget.id == m_id) {
-                        if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
                         m_flags |= static_cast<WidgetFlag>(
                             message.payload.widget.data.value & WIDGET_FLAG_MASK
                         );
-                        if (HAS(m_flags, WIDGET_FLAG_DIMMED)) {
+                        if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED)))) {
                             Draw();
                             Dim();
                         }
-                        if (HAS(m_flags, WIDGET_FLAG_UPDATE)) {
+                        if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_UPDATE)))) {
                             gpWindowManager->UpdateScreenRegion(
                                 m_owner->m_posX + m_x,
                                 m_owner->m_posY + m_y,
@@ -106,19 +100,19 @@ MessageDispatchResult widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_CLEAR_FLAGS:
                     if (message.payload.widget.id == m_id) {
-                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
-                            static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(
+                        H2EnumStorage<WidgetFlag, i16> flags =
+                            static_cast<H2EnumStorage<WidgetFlag, i16>>(
                                 message.payload.widget.data.value & WIDGET_FLAG_MASK
                             );
-                        if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
                             flags = WIDGET_FLAG_DIMMED;
                             m_flags &= ~flags;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
                         m_flags &= ~flags;
-                        if (HAS(flags, WIDGET_FLAG_DIMMED))
+                        if ((H2EnumIndex((flags) & (WIDGET_FLAG_DIMMED))))
                             Draw();
-                        if (HAS(flags, WIDGET_FLAG_UPDATE))
+                        if ((H2EnumIndex((flags) & (WIDGET_FLAG_UPDATE))))
                             gpWindowManager->UpdateScreenRegion(
                                 m_owner->m_posX + m_x,
                                 m_owner->m_posY + m_y,
@@ -164,7 +158,6 @@ MessageDispatchResult widget::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004d4540, 0x7e)
 void widget::Dim(void) {
     if (m_kind == WIDGET_KIND_UNDIMMED || m_kind == WIDGET_KIND_TEXT)
         return;
@@ -172,6 +165,3 @@ void widget::Dim(void) {
     i16 y = m_owner->m_posY + m_y;
     DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(widget, 0x004eaa1c)

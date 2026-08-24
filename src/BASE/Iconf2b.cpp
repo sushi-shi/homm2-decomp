@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Iconf2b.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
@@ -8,35 +8,33 @@
 #include <string.h>
 #include <SOURCE/KB.h>
 
-// Retail's frame is exactly the two __fastcall spills: every working value of
-// the decoder lives in a file static, not a local.
-DATA(0x00536158) static u8* s_row = 0;
-DATA(0x0053615c) static IconEntry* s_entry = 0;
-DATA(0x00536160) static i32 s_right = 0;
-DATA(0x00536164) static i32 s_spanCount = 0;
-DATA(0x00536168) static i32 s_left = 0;
-DATA(0x0053616c) static i32 s_y = 0;
-DATA(0x00536170) static i32 s_dimLen = 0;
-DATA(0x00536174) static u8* s_dimPal = 0;
-DATA(0x00536178) static i32 s_x = 0;
-DATA(0x0053617c) static i32 s_clipR = 0;
-DATA(0x00536180) static i32 s_srcSkip = 0;
-DATA(0x00536184) static i32 s_run = 0;
-DATA(0x00536188) static i32 s_clipB = 0;
-DATA(0x0053618c) static u8* s_src = 0;
-DATA(0x00536190) static u8* s_dst = 0;
-DATA(0x00536194) static u8 s_color = 0;
-DATA(0x00536198) static u8* s_copyDst = 0;
-DATA(0x0053619c) static i32 s_loopCount = 0;
 
-VA(0x004c1c60, 0x8a2)
+static u8* s_row = 0;
+static IconEntry* s_entry = 0;
+static i32 s_right = 0;
+static i32 s_spanCount = 0;
+static i32 s_left = 0;
+static i32 s_y = 0;
+static i32 s_dimLen = 0;
+static u8* s_dimPal = 0;
+static i32 s_x = 0;
+static i32 s_clipR = 0;
+static i32 s_srcSkip = 0;
+static i32 s_run = 0;
+static i32 s_clipB = 0;
+static u8* s_src = 0;
+static u8* s_dst = 0;
+static u8 s_color = 0;
+static u8* s_copyDst = 0;
+static i32 s_loopCount = 0;
+
 void FlipIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

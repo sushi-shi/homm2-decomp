@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>
@@ -7,12 +7,11 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(SampleConstant)
+typedef enum SampleConstant {
     FILENAME_CAPACITY    = 32,
     FORMAT_SUFFIX_LENGTH = 3
-H2_ENUM_END(SampleConstant)
+} SampleConstant;
 
-VA(0x004ce250, 0x210)
 sample::sample(char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -57,7 +56,6 @@ sample::sample(char* name)
     }
 
     u32l size = gpResourceManager->GetFileSize(m_id);
-#line 57
     m_playbackData.data =
         static_cast<char*>(H2_ALLOC(size));
     m_playbackData.size = size;
@@ -65,16 +63,13 @@ sample::sample(char* name)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
-VA(0x004ce490, 0x8b)
 inline sample::~sample() {
     if (gpSoundManager != NULL)
         gpSoundManager->StopSample(this);
-#line 97
     H2_FREE(m_playbackData.data);
     memset(&m_playbackData, 0, sizeof(m_playbackData));
 }
 
-VA(0x004ce520, 0xbd)
 MIDIWrap::MIDIWrap(char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -83,19 +78,12 @@ MIDIWrap::MIDIWrap(char* name)
         NULL
     ) {
     u32l size = gpResourceManager->GetFileSize(m_id);
-#line 110
     m_data = static_cast<char*>(H2_ALLOC(size));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-VA(0x004ce610, 0x3d)
 inline MIDIWrap::~MIDIWrap() {
-#line 118
     H2_FREE(m_data);
     m_data = NULL;
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(sample, 0x004ea9d8)
-VTBL(MIDIWrap, 0x004ea9dc)

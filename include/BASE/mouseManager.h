@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_MOUSEMANAGER_H
 #define HOMM2_BASE_MOUSEMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <windows.h>
 #include "baseManager.h"
 
@@ -10,13 +10,14 @@ class bitmap;
 class resource;
 class icon;
 
-H2_ENUM_CLASS_BEGIN(MouseCursorType)
+enum class MouseCursorType : i32 {
     MOUSE_INVALID_CURSOR_TYPE = -1,
     MOUSE_AUTO_CURSOR_TYPE    = -999,
     MOUSE_CURSOR_ADVENTURE    = 0,
     MOUSE_CURSOR_COMBAT       = 1,
     MOUSE_CURSOR_SPELL        = 2
-H2_ENUM_CLASS_END(MouseCursorType)
+};
+using enum MouseCursorType;
 
 #pragma pack(push, 1)
 class mouseManager : public baseManager {
@@ -42,9 +43,9 @@ public:
     i32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void SetPointer(char*, i32, MouseCursorType);
     void SetPointer(i32);
     void NewUpdate(i32);
@@ -60,8 +61,7 @@ public:
     void SetColorMice(i32);
 };
 #pragma pack(pop)
-SIZE(mouseManager, 0x8a);
-H2_ENUM_BEGIN(MouseManagerConstant)
+typedef enum MouseManagerConstant {
     MOUSE_CURSOR_COUNT                 = 96,
     MOUSE_CURSOR_TYPE_SLOT_COUNT       = 3,
     MOUSE_CURSOR_HORIZONTAL            = 0,
@@ -90,7 +90,7 @@ H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_DEFAULT_HOTSPOT              = -1,
     MOUSE_RELOAD_CURSOR_FRAME          = -99,
     MOUSE_KEEP_CURRENT_FRAME           = 1000
-H2_ENUM_END(MouseManagerConstant)
+} MouseManagerConstant;
 extern i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];

@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DIMMERWIDGET_H
 #define HOMM2_BASE_DIMMERWIDGET_H
 
-#include <va.h>
+#include <Ints.h>
 #include "widget.h"
 
 struct tag_message;
@@ -16,13 +16,12 @@ public:
         i16 width,
         i16 height,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind
+        WidgetKind kind
     );
-    virtual ~dimmerWidget(void) OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual ~dimmerWidget(void) override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
 };
 #pragma pack(pop)
-SIZE(dimmerWidget, 0x20);
 #endif

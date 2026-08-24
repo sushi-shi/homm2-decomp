@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_FILEREQUESTER_H
 #define HOMM2_SOURCE_FILEREQUESTER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <windows.h>
 #include <BASE/baseManager.h>
 
@@ -10,14 +10,15 @@ class heroWindow;
 class iconWidget;
 struct SMapHeader;
 
-H2_ENUM_CLASS_BEGIN(FileRequesterMode)
+enum class FileRequesterMode : i32 {
     FILE_REQUESTER_MAP_GAME  = 1,
     FILE_REQUESTER_LOAD_GAME = 2,
     FILE_REQUESTER_SAVE_GAME = 3,
     FILE_REQUESTER_MAP       = 4
-H2_ENUM_CLASS_END(FileRequesterMode)
+};
+using enum FileRequesterMode;
 
-H2_ENUM_BEGIN(FileRequesterControlId)
+typedef enum FileRequesterControlId {
     FILE_REQUESTER_PATH_SIZE                   = 300,
     FILE_REQUESTER_NAME_SIZE                   = 0x15f,
     FILE_REQUESTER_EXTENSION_SIZE              = 5,
@@ -58,16 +59,17 @@ H2_ENUM_BEGIN(FileRequesterControlId)
     FILE_REQUESTER_FILTER_LARGE                = 102,
     FILE_REQUESTER_FILTER_XLARGE               = 103,
     FILE_REQUESTER_FILTER_ALL                  = 104
-H2_ENUM_END(FileRequesterControlId)
+} FileRequesterControlId;
 
-H2_ENUM_CLASS_BEGIN(FileRequesterMapSizeFilter)
+enum class FileRequesterMapSizeFilter : i32 {
     FILE_REQUESTER_MAP_SIZE_SMALL  = 0,
     FILE_REQUESTER_MAP_SIZE_MEDIUM = 1,
     FILE_REQUESTER_MAP_SIZE_LARGE  = 2,
     FILE_REQUESTER_MAP_SIZE_XLARGE = 3,
     FILE_REQUESTER_MAP_SIZE_ALL    = 4,
     FILE_REQUESTER_MAP_SIZE_COUNT  = 5
-H2_ENUM_CLASS_END(FileRequesterMapSizeFilter)
+};
+using enum FileRequesterMapSizeFilter;
 
 struct FileRequesterName {
     char text[FILE_REQUESTER_NAME_SIZE];
@@ -99,9 +101,9 @@ public:
     char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
     fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     i32 InitializeFiles(char*, char*, i32);
     i32 MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);
@@ -112,7 +114,6 @@ public:
     char* GetFilename(void);
 };
 #pragma pack(pop)
-SIZE(fileRequester, 0x42f);
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char* cFRDummy;
 extern float fGutterMinY;

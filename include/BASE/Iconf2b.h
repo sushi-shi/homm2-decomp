@@ -12,7 +12,7 @@ void FlipIconToBitmap(
     i32,
     i32,
     i32,
-    H2_ENUM_PARAM(IconDrawClipMode, i32),
+    IconDrawClipMode,
     i32,
     i32,
     i32,

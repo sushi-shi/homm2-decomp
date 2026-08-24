@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <windows.h>
 #include <dplay.h>
 #include <string.h>
@@ -14,27 +14,26 @@
 #include <BASE/widget.h>
 #include <SOURCE/dpnetwin.h>
 
-#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\DPNETWIN.CPP"
 
-H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
+enum class DirectPlaySessionOpenFlag : i32 {
     SESSION_OPEN_JOIN = 1,
     SESSION_OPEN_CREATE = 2
-H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
+};
+using enum DirectPlaySessionOpenFlag;
 
-H2_ENUM_BEGIN(DirectPlayResult)
+typedef enum DirectPlayResult {
     RESULT_OK = 0,
     RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
     RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
     RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
     RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
-H2_ENUM_END(DirectPlayResult)
+} DirectPlayResult;
 
-H2_ENUM_BEGIN(DirectPlayStorageConstant)
+typedef enum DirectPlayStorageConstant {
     RECEIVE_ARGUMENT_STORAGE_COUNT = 2,
     STATUS_TEXT_SIZE = 32
-H2_ENUM_END(DirectPlayStorageConstant)
+} DirectPlayStorageConstant;
 
-VA(0x00436770, 0x81)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
     LogStr("ServiceProvider:");
     _strupr(name);
@@ -55,7 +54,6 @@ BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, 
     return 1;
 }
 
-VA(0x004367f1, 0x75)
 BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & DPESC_TIMEDOUT)
         return 0;
@@ -75,7 +73,6 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     return 1;
 }
 
-VA(0x00436866, 0x2bf)
 i16 dpnet_init(void) {
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
@@ -95,7 +92,7 @@ i16 dpnet_init(void) {
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
             ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+                 );
         createFunction = NULL;
         dpEnumerate = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
@@ -103,13 +100,13 @@ i16 dpnet_init(void) {
         );
         if (createFunction == NULL)
             ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+                 );
         dpEnumerate = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
         if (dpEnumerate == NULL)
             ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
-                /* "Невозможно загрузить 'DPLAYX.DLL'" */);
+                 );
         dpEnumerate(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
@@ -121,7 +118,7 @@ i16 dpnet_init(void) {
         }
         rc = createFunction(g_lpGuid, &lpIDC, NULL);
         if (rc != RESULT_OK)
-            DPSD(rc, RETAIL_FILE, 136);
+            DPSD(rc, "dpnetwin.cpp", 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
@@ -131,7 +128,7 @@ i16 dpnet_init(void) {
                 "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff.\n\n  "
                     "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
                     "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
-                    /* "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение." */
+
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
@@ -144,7 +141,7 @@ i16 dpnet_init(void) {
                 "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
                 "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
                 "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+                "\xe8\xe3\xf0\xee\xea\xee\xe2."
                 ,
                 giNumHumanPlayers - 1
             );
@@ -167,7 +164,7 @@ i16 dpnet_init(void) {
                 gText,
                 "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff \xed\xe0\xf7\xe0\xeb\xe0 "
                     "\xe8\xe3\xf0\xfb."
-                    /* "Ожидаю игрока для начала игры." */
+
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
@@ -177,7 +174,6 @@ i16 dpnet_init(void) {
     return 0;
 }
 
-VA(0x00436b25, 0xc3)
 void CleanupDPVars(void) {
     lpIDC = NULL;
     dcoID = 0;
@@ -200,7 +196,6 @@ void CleanupDPVars(void) {
     iLastMsgNumHumanPlayers = 1;
 }
 
-VA(0x00436be8, 0xed)
 void dpnet_term(void) {
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
@@ -224,10 +219,9 @@ void dpnet_term(void) {
     CleanupDPVars();
 }
 
-VA(0x00436cd5, 0xcf)
 void dpSendMessage(
     i32 destination,
-    H2_ENUM_PARAM(NetworkPacketType, u8) type,
+    NetworkPacketType type,
     u16 size,
     void* data
 ) {
@@ -240,12 +234,11 @@ void dpSendMessage(
     status = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (status != RESULT_OK && status != RESULT_INVALID_PLAYER
         && status != RESULT_INVALID_ARGUMENT) {
-        DPSD(status, RETAIL_FILE, 268);
+        DPSD(status, "dpnetwin.cpp", 268);
     }
     H2_FREE(message);
 }
 
-VA(0x00436da4, 0x48)
 i32 dpnet_snd(i32 position, i32 size, void* data) {
 
     dpProcessMessages();
@@ -253,7 +246,6 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
     return 0;
 }
 
-VA(0x00436dec, 0x93)
 i16 dpnet_rcv(i16, u16, void* data) {
     u32 size;
 
@@ -267,22 +259,19 @@ i16 dpnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
-VA(0x00436e7f, 0x14)
 u8 dpnet_stat(i16, u16) {
     return 0;
 }
 
-VA(0x00436e93, 0x8)
 i16 __cdecl dpnet_sess(i32, i32, ...) {
     return 0;
 }
 
-VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD size;
     i32 to;
     i32 i;
-    i32 j;  // i and j are unreferenced; retail's frame reserves both slots
+    i32 j;
     i32 sender;
     i32 receiveResult;
 
@@ -300,7 +289,7 @@ void dpProcessMessages(void) {
         if (receiveResult == RESULT_NO_MESSAGES)
             return;
         if (receiveResult != RESULT_OK)
-            DPSD(receiveResult, RETAIL_FILE, 335);
+            DPSD(receiveResult, "dpnetwin.cpp", 335);
         if (sender == 0) {
         } else {
             if (to == 0 || to == dcoID)
@@ -309,7 +298,6 @@ void dpProcessMessages(void) {
     }
 }
 
-VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
     DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
     i32 i;
@@ -371,7 +359,6 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-VA(0x00437177, 0x16a)
 i32 dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
     i32 rv;
@@ -382,11 +369,11 @@ i32 dpWaitForFirstGuest(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = IDX(SESSION_OPEN_CREATE);
+            session.dwFlags = H2EnumIndex(SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
             rv = lpIDC->Open(&session);
             if (rv != RESULT_OK)
-                DPSD(rv, RETAIL_FILE, 442);
+                DPSD(rv, "dpnetwin.cpp", 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -397,7 +384,7 @@ i32 dpWaitForFirstGuest(void) {
         case FIRST_GUEST_CREATE_PLAYER:
             rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (rv != RESULT_OK)
-                DPSD(rv, RETAIL_FILE, 472);
+                DPSD(rv, "dpnetwin.cpp", 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -409,7 +396,6 @@ i32 dpWaitForFirstGuest(void) {
     return 0;
 }
 
-VA(0x004372e1, 0x7c)
 i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
@@ -422,7 +408,7 @@ i32 dpWaitForExtraGuests(void) {
             "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
             "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
             "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
-            "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+            "\xe8\xe3\xf0\xee\xea\xee\xe2."
             ,
             giNumHumanPlayers - 1
         );
@@ -436,7 +422,6 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
-VA(0x0043735d, 0x396)
 i32 dpWaitForHost(void) {
     DPSESSIONDESC session;
     i32 rv;
@@ -470,7 +455,7 @@ i32 dpWaitForHost(void) {
                 return 0;
             }
             if (rv != RESULT_OK)
-                DPSD(rv, RETAIL_FILE, 548);
+                DPSD(rv, "dpnetwin.cpp", 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -481,18 +466,18 @@ i32 dpWaitForHost(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = IDX(SESSION_OPEN_JOIN);
+            session.dwFlags = H2EnumIndex(SESSION_OPEN_JOIN);
             session.dwSession = lSessions[iSessionToTry];
             strcpy(session.szSessionName, "Heroes 2");
             rv = lpIDC->Open(&session);
             if (rv != RESULT_OK)
-                DPSD(rv, RETAIL_FILE, 567);
+                DPSD(rv, "dpnetwin.cpp", 567);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
             rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (rv != RESULT_OK)
-                DPSD(rv, RETAIL_FILE, 577);
+                DPSD(rv, "dpnetwin.cpp", 577);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -519,7 +504,7 @@ i32 dpWaitForHost(void) {
                 }
                 rv = lpIDC->Close();
                 if (rv != RESULT_OK)
-                    DPSD(rv, RETAIL_FILE, 603);
+                    DPSD(rv, "dpnetwin.cpp", 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }
@@ -533,7 +518,6 @@ i32 dpWaitForHost(void) {
     return 0;
 }
 
-VA(0x004376f3, 0x5d5)
 void DPSD(i32 result, char* file, i32 line) {
     i32 flag;
     char errorText[REMOTE_ERROR_TEXT_SIZE];
@@ -641,29 +625,29 @@ void DPSD(i32 result, char* file, i32 line) {
     ShutDown(gText);
 }
 
-DATA(0x005242b4) struct IDirectPlay* lpIDC = NULL;
-DATA(0x005242b8) DPID dcoID = 0;
-DATA(0x005242bc) struct _GUID* IPXGuid = NULL;
-DATA(0x005242c0) struct _GUID* TCPGuid = NULL;
-DATA(0x005242c4) HANDLE dphEvent = NULL;
-DATA(0x005242c8) i32 iDPRcvBufferHead = 0;
-DATA(0x005242cc) i32 iDPRcvBufferTail = 0;
-DATA(0x005242d0) u8** ppDPRcvBuffer = NULL;
-DATA(0x005242d4) i32* piDPRcvBufferSize = NULL;
-DATA(0x005242d8) i32 bStartUpInfoReceived = 0;
-DATA(0x005242dc) HMODULE hinstDplayx = NULL;
-DATA(0x005242e0) H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
+struct IDirectPlay* lpIDC = NULL;
+DPID dcoID = 0;
+struct _GUID* IPXGuid = NULL;
+struct _GUID* TCPGuid = NULL;
+HANDLE dphEvent = NULL;
+i32 iDPRcvBufferHead = 0;
+i32 iDPRcvBufferTail = 0;
+u8** ppDPRcvBuffer = NULL;
+i32* piDPRcvBufferSize = NULL;
+i32 bStartUpInfoReceived = 0;
+HMODULE hinstDplayx = NULL;
+H2SteppedEnumStorage<DirectPlayFirstGuestState, i32>
 iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
-DATA(0x005242e4) H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
-DATA(0x005242e8) i32 iWaitForHostWaitCount = 0;
-DATA(0x005242ec) i32 iEnumCount = 0;
-DATA(0x005242f0) i32 iLastHereIAmTickCount = 0;
-DATA(0x005242f4) i32 bInDPSD = 0;
-DATA(0x005242f8) i32 iGUIDCount = 0;
-DATA(0x004f1ba0) i32 iLastMsgNumHumanPlayers = 1;
-DATA(0x00524280) i32 iMaxSession;
-DATA(0x005242b0) DirectPlayHostAcceptStatus giHostAcceptStatus;
-DATA(0x0052427c) struct _GUID* g_lpGuid;
-DATA(0x00524264) i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
-DATA(0x00524284) i32 iSessionToTry;
-DATA(0x00524288) i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
+H2SteppedEnumStorage<DirectPlayHostState, i32> iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
+i32 iWaitForHostWaitCount = 0;
+i32 iEnumCount = 0;
+i32 iLastHereIAmTickCount = 0;
+i32 bInDPSD = 0;
+i32 iGUIDCount = 0;
+i32 iLastMsgNumHumanPlayers = 1;
+i32 iMaxSession;
+DirectPlayHostAcceptStatus giHostAcceptStatus;
+struct _GUID* g_lpGuid;
+i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
+i32 iSessionToTry;
+i32l lSessions[DP_TRANSPORT_SESSION_COUNT];

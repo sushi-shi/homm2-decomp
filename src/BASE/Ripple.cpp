@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Ripple.h>
 #include <BASE/bitmap.h>
 #include <BASE/mouseManager.h>
@@ -10,19 +10,18 @@
 #include <SOURCE/NOOPT.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(RippleConstant)
+typedef enum RippleConstant {
     SCREEN_WIDTH   = 640,
     PROFILE_RADIUS = 25,
     PROFILE_SIZE   = PROFILE_RADIUS * 2 + 1,
-    // The profile is flat over its outer seven samples, so only the middle
-    // REDRAW_WIDTH columns can change; the sweep step widens that span.
+
+
     REDRAW_RADIUS = 18,
     REDRAW_WIDTH  = 37,
     SWEEP_STEP    = 4,
     SWEEP_END     = SCREEN_WIDTH + PROFILE_RADIUS
-H2_ENUM_END(RippleConstant)
+} RippleConstant;
 
-VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 idx;
     u8 previous[SCREEN_WIDTH];

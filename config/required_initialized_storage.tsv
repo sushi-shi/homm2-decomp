@@ -1,6 +1,0 @@
-# Reviewed globals whose retail initialized-storage reconstruction is complete.
-# Add each verified recovery here with authoritative retail evidence. The link audit
-# hard-fails on storage, normalized bytes, relocation pattern, or reviewed pointer-
-# target regressions. Known legacy mismatches remain transitional diagnostics until
-# their initializers are recovered.
-name	unit	size	retail_sha256	highlow_count	audit	readable_size	readable_sha256

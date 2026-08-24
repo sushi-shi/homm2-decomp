@@ -1,0 +1,138 @@
+ninja_required_version = 1.10
+builddir = build
+cxx = clang++
+dlltool = llvm-dlltool
+cxxflags = --target=i686-w64-windows-gnu -std=gnu++20 -O0 -mno-sse -mno-sse2 -mfpmath=387 -fms-extensions -fsjlj-exceptions -w -D_X86_ -DWIN32 -D_WINDOWS -D_MT -Dregister= -Wno-write-strings -Wno-narrowing -Wno-deprecated-enum-enum-conversion -Wno-deprecated-enum-float-conversion -Iinclude -Ivendor/audiere-1.9.2 -Ivendor/miles-3.6 -Ivendor/smacker-3.0g -Ivendor/wing-1.0
+ldflags = --target=i686-w64-windows-gnu -fuse-ld=lld -mwindows -fsjlj-exceptions -static -static-libgcc -static-libstdc++
+system_libs = -lkernel32 -luser32 -lgdi32 -lwinmm -lws2_32 -lddraw -ldplayx -ladvapi32 -lole32 -luuid -lcomdlg32 -lshell32 -lnetapi32
+runtime_libs = -Wl,--start-group -lstdc++ -lgcc_eh -lgcc -lmcfgthread -lntdll -Wl,--end-group
+
+rule mkdir
+  command = mkdir -p $out
+  restat = 1
+
+rule cxx
+  command = $cxx $cxxflags -MMD -MF $out.d -c $in -o $out
+  depfile = $out.d
+  deps = gcc
+  description = CXX $in
+
+rule implib
+  command = $dlltool -m i386 $dlltool_flags -d $in -l $out
+  description = IMPLIB $in
+
+rule link
+  command = $cxx $ldflags -o $out $in $system_libs $runtime_libs
+  description = LINK $out
+
+build $builddir/obj: mkdir
+build $builddir/imports: mkdir
+build $builddir/obj/BASE_AudiereEffects.o: cxx src/BASE/AudiereEffects.cpp || $builddir/obj
+build $builddir/obj/BASE_AudiereMusic.o: cxx src/BASE/AudiereMusic.cpp || $builddir/obj
+build $builddir/obj/BASE_BASEMGR.o: cxx src/BASE/BASEMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_BITMAP.o: cxx src/BASE/BITMAP.cpp || $builddir/obj
+build $builddir/obj/BASE_BITS.o: cxx src/BASE/BITS.cpp || $builddir/obj
+build $builddir/obj/BASE_BORDER.o: cxx src/BASE/BORDER.cpp || $builddir/obj
+build $builddir/obj/BASE_BUTTON.o: cxx src/BASE/BUTTON.cpp || $builddir/obj
+build $builddir/obj/BASE_Blur.o: cxx src/BASE/Blur.cpp || $builddir/obj
+build $builddir/obj/BASE_Bzip.o: cxx src/BASE/Bzip.cpp || $builddir/obj
+build $builddir/obj/BASE_DIMMER.o: cxx src/BASE/DIMMER.cpp || $builddir/obj
+build $builddir/obj/BASE_EXEC.o: cxx src/BASE/EXEC.cpp || $builddir/obj
+build $builddir/obj/BASE_FONT.o: cxx src/BASE/FONT.cpp || $builddir/obj
+build $builddir/obj/BASE_ICON.o: cxx src/BASE/ICON.cpp || $builddir/obj
+build $builddir/obj/BASE_ICONWDGT.o: cxx src/BASE/ICONWDGT.cpp || $builddir/obj
+build $builddir/obj/BASE_INPUTMGR.o: cxx src/BASE/INPUTMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_Icon2b.o: cxx src/BASE/Icon2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Icond2b.o: cxx src/BASE/Icond2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Icondf2b.o: cxx src/BASE/Icondf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconf2b.o: cxx src/BASE/Iconf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconm2b.o: cxx src/BASE/Iconm2b.cpp || $builddir/obj
+build $builddir/obj/BASE_Iconmf2b.o: cxx src/BASE/Iconmf2b.cpp || $builddir/obj
+build $builddir/obj/BASE_MOUSEMGR.o: cxx src/BASE/MOUSEMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_Midi.o: cxx src/BASE/Midi.cpp || $builddir/obj
+build $builddir/obj/BASE_MilesSound.o: cxx src/BASE/MilesSound.cpp || $builddir/obj
+build $builddir/obj/BASE_Misc.o: cxx src/BASE/Misc.cpp || $builddir/obj
+build $builddir/obj/BASE_MusicFlags.o: cxx src/BASE/MusicFlags.cpp || $builddir/obj
+build $builddir/obj/BASE_PALETTE.o: cxx src/BASE/PALETTE.cpp || $builddir/obj
+build $builddir/obj/BASE_RESMGR.o: cxx src/BASE/RESMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_RESOURCE.o: cxx src/BASE/RESOURCE.cpp || $builddir/obj
+build $builddir/obj/BASE_Ripple.o: cxx src/BASE/Ripple.cpp || $builddir/obj
+build $builddir/obj/BASE_SAMPLE.o: cxx src/BASE/SAMPLE.cpp || $builddir/obj
+build $builddir/obj/BASE_TEXTWDGT.o: cxx src/BASE/TEXTWDGT.cpp || $builddir/obj
+build $builddir/obj/BASE_TILE.o: cxx src/BASE/TILE.cpp || $builddir/obj
+build $builddir/obj/BASE_TILESET.o: cxx src/BASE/TILESET.cpp || $builddir/obj
+build $builddir/obj/BASE_Textntry.o: cxx src/BASE/Textntry.cpp || $builddir/obj
+build $builddir/obj/BASE_WIDGET.o: cxx src/BASE/WIDGET.cpp || $builddir/obj
+build $builddir/obj/BASE_WINDOW.o: cxx src/BASE/WINDOW.cpp || $builddir/obj
+build $builddir/obj/BASE_WINMGR.o: cxx src/BASE/WINMGR.cpp || $builddir/obj
+build $builddir/obj/BASE_bmap2.o: cxx src/BASE/bmap2.cpp || $builddir/obj
+build $builddir/obj/BASE_droplist.o: cxx src/BASE/droplist.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2bc.o: cxx src/BASE/icon2bc.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2bs.o: cxx src/BASE/icon2bs.cpp || $builddir/obj
+build $builddir/obj/BASE_icon2by.o: cxx src/BASE/icon2by.cpp || $builddir/obj
+build $builddir/obj/BASE_iconf2bc.o: cxx src/BASE/iconf2bc.cpp || $builddir/obj
+build $builddir/obj/BASE_iconf2by.o: cxx src/BASE/iconf2by.cpp || $builddir/obj
+build $builddir/obj/BASE_listbox.o: cxx src/BASE/listbox.cpp || $builddir/obj
+build $builddir/obj/BASE_miscwin.o: cxx src/BASE/miscwin.cpp || $builddir/obj
+build $builddir/obj/BASE_soundmgr.o: cxx src/BASE/soundmgr.cpp || $builddir/obj
+build $builddir/obj/EDITOR_mapcell.o: cxx src/EDITOR/mapcell.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ADVMGR.o: cxx src/SOURCE/ADVMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_AI.o: cxx src/SOURCE/AI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ARMY.o: cxx src/SOURCE/ARMY.cpp || $builddir/obj
+build $builddir/obj/SOURCE_ARMYGRP.o: cxx src/SOURCE/ARMYGRP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_CMBTMGR.o: cxx src/SOURCE/CMBTMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_COMMAND.o: cxx src/SOURCE/COMMAND.cpp || $builddir/obj
+build $builddir/obj/SOURCE_CURSOR.o: cxx src/SOURCE/CURSOR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Campaign.o: cxx src/SOURCE/Campaign.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Castle.o: cxx src/SOURCE/Castle.cpp || $builddir/obj
+build $builddir/obj/SOURCE_DRAWING.o: cxx src/SOURCE/DRAWING.cpp || $builddir/obj
+build $builddir/obj/SOURCE_EVENTS.o: cxx src/SOURCE/EVENTS.cpp || $builddir/obj
+build $builddir/obj/SOURCE_FINDPATH.o: cxx src/SOURCE/FINDPATH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_FLY.o: cxx src/SOURCE/FLY.cpp || $builddir/obj
+build $builddir/obj/SOURCE_GAME.o: cxx src/SOURCE/GAME.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HERO.o: cxx src/SOURCE/HERO.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HEXCELL.o: cxx src/SOURCE/HEXCELL.cpp || $builddir/obj
+build $builddir/obj/SOURCE_HISCORE.o: cxx src/SOURCE/HISCORE.cpp || $builddir/obj
+build $builddir/obj/SOURCE_KB.o: cxx src/SOURCE/KB.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Modem.o: cxx src/SOURCE/Modem.cpp || $builddir/obj
+build $builddir/obj/SOURCE_NOOPT.o: cxx src/SOURCE/NOOPT.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Netbios.o: cxx src/SOURCE/Netbios.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Newgame.o: cxx src/SOURCE/Newgame.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Overview.o: cxx src/SOURCE/Overview.cpp || $builddir/obj
+build $builddir/obj/SOURCE_PATH.o: cxx src/SOURCE/PATH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_PHILAI.o: cxx src/SOURCE/PHILAI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_RECRUIT.o: cxx src/SOURCE/RECRUIT.cpp || $builddir/obj
+build $builddir/obj/SOURCE_REMOTE.o: cxx src/SOURCE/REMOTE.cpp || $builddir/obj
+build $builddir/obj/SOURCE_REQUEST.o: cxx src/SOURCE/REQUEST.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SEARCH.o: cxx src/SOURCE/SEARCH.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SETUP.o: cxx src/SOURCE/SETUP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SMACKMGR.o: cxx src/SOURCE/SMACKMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SPELLAI.o: cxx src/SOURCE/SPELLAI.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SPELLS.o: cxx src/SOURCE/SPELLS.cpp || $builddir/obj
+build $builddir/obj/SOURCE_STRIP.o: cxx src/SOURCE/STRIP.cpp || $builddir/obj
+build $builddir/obj/SOURCE_SWAPMGR.o: cxx src/SOURCE/SWAPMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_TOWN.o: cxx src/SOURCE/TOWN.cpp || $builddir/obj
+build $builddir/obj/SOURCE_TOWNMGR.o: cxx src/SOURCE/TOWNMGR.cpp || $builddir/obj
+build $builddir/obj/SOURCE_VIEW.o: cxx src/SOURCE/VIEW.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Viewwrld.o: cxx src/SOURCE/Viewwrld.cpp || $builddir/obj
+build $builddir/obj/SOURCE_Wsnetwin.o: cxx src/SOURCE/Wsnetwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_X_CAMPGN.o: cxx src/SOURCE/X_CAMPGN.cpp || $builddir/obj
+build $builddir/obj/SOURCE_X_GLOBAL.o: cxx src/SOURCE/X_GLOBAL.cpp || $builddir/obj
+build $builddir/obj/SOURCE_comwin.o: cxx src/SOURCE/comwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_dpnetwin.o: cxx src/SOURCE/dpnetwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_kbwin.o: cxx src/SOURCE/kbwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_netwin.o: cxx src/SOURCE/netwin.cpp || $builddir/obj
+build $builddir/obj/SOURCE_tradpost.o: cxx src/SOURCE/tradpost.cpp || $builddir/obj
+build $builddir/obj/SOURCE_wingraph.o: cxx src/SOURCE/wingraph.cpp || $builddir/obj
+build $builddir/obj/SOURCE_x_arena.o: cxx src/SOURCE/x_arena.cpp || $builddir/obj
+build $builddir/imports/AUDIERE.a: implib imports/AUDIERE.def || $builddir/imports
+build $builddir/imports/MSS32.a: implib imports/MSS32.def || $builddir/imports
+build $builddir/imports/SMACKW32.a: implib imports/SMACKW32.def || $builddir/imports
+build $builddir/imports/WING32.a: implib imports/WING32.def || $builddir/imports
+  dlltool_flags = -k
+build $builddir/imports/MSS32_aliases.o: cxx imports/MSS32_aliases.S || $builddir/imports
+
+build objects: phony $builddir/obj/BASE_AudiereEffects.o $builddir/obj/BASE_AudiereMusic.o $builddir/obj/BASE_BASEMGR.o $builddir/obj/BASE_BITMAP.o $builddir/obj/BASE_BITS.o $builddir/obj/BASE_BORDER.o $builddir/obj/BASE_BUTTON.o $builddir/obj/BASE_Blur.o $builddir/obj/BASE_Bzip.o $builddir/obj/BASE_DIMMER.o $builddir/obj/BASE_EXEC.o $builddir/obj/BASE_FONT.o $builddir/obj/BASE_ICON.o $builddir/obj/BASE_ICONWDGT.o $builddir/obj/BASE_INPUTMGR.o $builddir/obj/BASE_Icon2b.o $builddir/obj/BASE_Icond2b.o $builddir/obj/BASE_Icondf2b.o $builddir/obj/BASE_Iconf2b.o $builddir/obj/BASE_Iconm2b.o $builddir/obj/BASE_Iconmf2b.o $builddir/obj/BASE_MOUSEMGR.o $builddir/obj/BASE_Midi.o $builddir/obj/BASE_MilesSound.o $builddir/obj/BASE_Misc.o $builddir/obj/BASE_MusicFlags.o $builddir/obj/BASE_PALETTE.o $builddir/obj/BASE_RESMGR.o $builddir/obj/BASE_RESOURCE.o $builddir/obj/BASE_Ripple.o $builddir/obj/BASE_SAMPLE.o $builddir/obj/BASE_TEXTWDGT.o $builddir/obj/BASE_TILE.o $builddir/obj/BASE_TILESET.o $builddir/obj/BASE_Textntry.o $builddir/obj/BASE_WIDGET.o $builddir/obj/BASE_WINDOW.o $builddir/obj/BASE_WINMGR.o $builddir/obj/BASE_bmap2.o $builddir/obj/BASE_droplist.o $builddir/obj/BASE_icon2bc.o $builddir/obj/BASE_icon2bs.o $builddir/obj/BASE_icon2by.o $builddir/obj/BASE_iconf2bc.o $builddir/obj/BASE_iconf2by.o $builddir/obj/BASE_listbox.o $builddir/obj/BASE_miscwin.o $builddir/obj/BASE_soundmgr.o $builddir/obj/EDITOR_mapcell.o $builddir/obj/SOURCE_ADVMGR.o $builddir/obj/SOURCE_AI.o $builddir/obj/SOURCE_ARMY.o $builddir/obj/SOURCE_ARMYGRP.o $builddir/obj/SOURCE_CMBTMGR.o $builddir/obj/SOURCE_COMMAND.o $builddir/obj/SOURCE_CURSOR.o $builddir/obj/SOURCE_Campaign.o $builddir/obj/SOURCE_Castle.o $builddir/obj/SOURCE_DRAWING.o $builddir/obj/SOURCE_EVENTS.o $builddir/obj/SOURCE_FINDPATH.o $builddir/obj/SOURCE_FLY.o $builddir/obj/SOURCE_GAME.o $builddir/obj/SOURCE_HERO.o $builddir/obj/SOURCE_HEXCELL.o $builddir/obj/SOURCE_HISCORE.o $builddir/obj/SOURCE_KB.o $builddir/obj/SOURCE_Modem.o $builddir/obj/SOURCE_NOOPT.o $builddir/obj/SOURCE_Netbios.o $builddir/obj/SOURCE_Newgame.o $builddir/obj/SOURCE_Overview.o $builddir/obj/SOURCE_PATH.o $builddir/obj/SOURCE_PHILAI.o $builddir/obj/SOURCE_RECRUIT.o $builddir/obj/SOURCE_REMOTE.o $builddir/obj/SOURCE_REQUEST.o $builddir/obj/SOURCE_SEARCH.o $builddir/obj/SOURCE_SETUP.o $builddir/obj/SOURCE_SMACKMGR.o $builddir/obj/SOURCE_SPELLAI.o $builddir/obj/SOURCE_SPELLS.o $builddir/obj/SOURCE_STRIP.o $builddir/obj/SOURCE_SWAPMGR.o $builddir/obj/SOURCE_TOWN.o $builddir/obj/SOURCE_TOWNMGR.o $builddir/obj/SOURCE_VIEW.o $builddir/obj/SOURCE_Viewwrld.o $builddir/obj/SOURCE_Wsnetwin.o $builddir/obj/SOURCE_X_CAMPGN.o $builddir/obj/SOURCE_X_GLOBAL.o $builddir/obj/SOURCE_comwin.o $builddir/obj/SOURCE_dpnetwin.o $builddir/obj/SOURCE_kbwin.o $builddir/obj/SOURCE_netwin.o $builddir/obj/SOURCE_tradpost.o $builddir/obj/SOURCE_wingraph.o $builddir/obj/SOURCE_x_arena.o
+build $builddir/HMM2PL.exe: link $builddir/obj/BASE_AudiereEffects.o $builddir/obj/BASE_AudiereMusic.o $builddir/obj/BASE_BASEMGR.o $builddir/obj/BASE_BITMAP.o $builddir/obj/BASE_BITS.o $builddir/obj/BASE_BORDER.o $builddir/obj/BASE_BUTTON.o $builddir/obj/BASE_Blur.o $builddir/obj/BASE_Bzip.o $builddir/obj/BASE_DIMMER.o $builddir/obj/BASE_EXEC.o $builddir/obj/BASE_FONT.o $builddir/obj/BASE_ICON.o $builddir/obj/BASE_ICONWDGT.o $builddir/obj/BASE_INPUTMGR.o $builddir/obj/BASE_Icon2b.o $builddir/obj/BASE_Icond2b.o $builddir/obj/BASE_Icondf2b.o $builddir/obj/BASE_Iconf2b.o $builddir/obj/BASE_Iconm2b.o $builddir/obj/BASE_Iconmf2b.o $builddir/obj/BASE_MOUSEMGR.o $builddir/obj/BASE_Midi.o $builddir/obj/BASE_MilesSound.o $builddir/obj/BASE_Misc.o $builddir/obj/BASE_MusicFlags.o $builddir/obj/BASE_PALETTE.o $builddir/obj/BASE_RESMGR.o $builddir/obj/BASE_RESOURCE.o $builddir/obj/BASE_Ripple.o $builddir/obj/BASE_SAMPLE.o $builddir/obj/BASE_TEXTWDGT.o $builddir/obj/BASE_TILE.o $builddir/obj/BASE_TILESET.o $builddir/obj/BASE_Textntry.o $builddir/obj/BASE_WIDGET.o $builddir/obj/BASE_WINDOW.o $builddir/obj/BASE_WINMGR.o $builddir/obj/BASE_bmap2.o $builddir/obj/BASE_droplist.o $builddir/obj/BASE_icon2bc.o $builddir/obj/BASE_icon2bs.o $builddir/obj/BASE_icon2by.o $builddir/obj/BASE_iconf2bc.o $builddir/obj/BASE_iconf2by.o $builddir/obj/BASE_listbox.o $builddir/obj/BASE_miscwin.o $builddir/obj/BASE_soundmgr.o $builddir/obj/EDITOR_mapcell.o $builddir/obj/SOURCE_ADVMGR.o $builddir/obj/SOURCE_AI.o $builddir/obj/SOURCE_ARMY.o $builddir/obj/SOURCE_ARMYGRP.o $builddir/obj/SOURCE_CMBTMGR.o $builddir/obj/SOURCE_COMMAND.o $builddir/obj/SOURCE_CURSOR.o $builddir/obj/SOURCE_Campaign.o $builddir/obj/SOURCE_Castle.o $builddir/obj/SOURCE_DRAWING.o $builddir/obj/SOURCE_EVENTS.o $builddir/obj/SOURCE_FINDPATH.o $builddir/obj/SOURCE_FLY.o $builddir/obj/SOURCE_GAME.o $builddir/obj/SOURCE_HERO.o $builddir/obj/SOURCE_HEXCELL.o $builddir/obj/SOURCE_HISCORE.o $builddir/obj/SOURCE_KB.o $builddir/obj/SOURCE_Modem.o $builddir/obj/SOURCE_NOOPT.o $builddir/obj/SOURCE_Netbios.o $builddir/obj/SOURCE_Newgame.o $builddir/obj/SOURCE_Overview.o $builddir/obj/SOURCE_PATH.o $builddir/obj/SOURCE_PHILAI.o $builddir/obj/SOURCE_RECRUIT.o $builddir/obj/SOURCE_REMOTE.o $builddir/obj/SOURCE_REQUEST.o $builddir/obj/SOURCE_SEARCH.o $builddir/obj/SOURCE_SETUP.o $builddir/obj/SOURCE_SMACKMGR.o $builddir/obj/SOURCE_SPELLAI.o $builddir/obj/SOURCE_SPELLS.o $builddir/obj/SOURCE_STRIP.o $builddir/obj/SOURCE_SWAPMGR.o $builddir/obj/SOURCE_TOWN.o $builddir/obj/SOURCE_TOWNMGR.o $builddir/obj/SOURCE_VIEW.o $builddir/obj/SOURCE_Viewwrld.o $builddir/obj/SOURCE_Wsnetwin.o $builddir/obj/SOURCE_X_CAMPGN.o $builddir/obj/SOURCE_X_GLOBAL.o $builddir/obj/SOURCE_comwin.o $builddir/obj/SOURCE_dpnetwin.o $builddir/obj/SOURCE_kbwin.o $builddir/obj/SOURCE_netwin.o $builddir/obj/SOURCE_tradpost.o $builddir/obj/SOURCE_wingraph.o $builddir/obj/SOURCE_x_arena.o $builddir/imports/MSS32_aliases.o $builddir/imports/AUDIERE.a $builddir/imports/MSS32.a $builddir/imports/SMACKW32.a $builddir/imports/WING32.a
+build game: phony $builddir/HMM2PL.exe
+default game

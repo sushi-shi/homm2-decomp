@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/miscwin.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -9,18 +9,17 @@
 #include <windows.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(VesaBlitConstant)
+typedef enum VesaBlitConstant {
     VESA_SCREEN_WIDTH    = 640,
     VESA_SCREEN_HEIGHT   = 480,
     ENLARGE_EXTENT_LIMIT = VESA_SCREEN_WIDTH - 3,
     ENLARGE_PIXEL_GROWTH = 4,
     NET_BOX_TOP          = 411
-H2_ENUM_END(VesaBlitConstant)
+} VesaBlitConstant;
 
-DATA(0x005201b8) static char gInvalidateRectFailedText[] = "InvalidateRect Failed";
-DATA(0x005201d0) static char gUpdateWindowFailedText[] = "UpdateWindow Failed";
+static char gInvalidateRectFailedText[] = "InvalidateRect Failed";
+static char gUpdateWindowFailedText[] = "UpdateWindow Failed";
 
-VA(0x004d4610, 0x1e6)
 extern "C" void __cdecl BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
     i32 sourceX,
@@ -41,7 +40,7 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
             );
     }
 
-    if (gbEnlargeScreenBlit != 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
+    if (gbEnlargeScreenBlit != 0 && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
         if (iMainWinScreenWidth == VESA_SCREEN_WIDTH
             && iMainWinScreenHeight == VESA_SCREEN_HEIGHT) {
             if (width < VESA_SCREEN_WIDTH)
@@ -81,9 +80,8 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         LogStr(gUpdateWindowFailedText);
 }
 
-VA(0x004d4800, 0x8)
 i16 AutoInitSVGA(void) {
     return 0;
 }
 
-DATA(0x00539768) struct tagPAINTSTRUCT ps;
+struct tagPAINTSTRUCT ps;

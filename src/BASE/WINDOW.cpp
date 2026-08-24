@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
@@ -18,7 +18,7 @@
 #include <SOURCE/KB.h>
 #include <stdlib.h>
 #include <string.h>
-H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
+enum class WindowWidgetRecordType : i32 {
     WIDGET_RECORD_END                   = 0,
     WIDGET_RECORD_BORDER                = 1,
     WIDGET_RECORD_BUTTON                = 2,
@@ -32,15 +32,15 @@ H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
     WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE = 0x204,
     WIDGET_RECORD_LIST_BOX              = 0x205,
     WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR = 0x206
-H2_ENUM_CLASS_END(WindowWidgetRecordType)
+};
+using enum WindowWidgetRecordType;
 
-H2_ENUM_BEGIN(WindowConstant)
+typedef enum WindowConstant {
     SCREEN_WIDTH  = 640,
     SCREEN_HEIGHT = 480,
     OPEN_FAILURE  = 3
-H2_ENUM_END(WindowConstant)
+} WindowConstant;
 
-VA(0x004ba5c0, 0x99)
 heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
     m_nextWindow = m_prevWindow = NULL;
@@ -54,9 +54,8 @@ heroWindow::heroWindow(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004ba660, 0x96)
 heroWindow::heroWindow(
-    i32 x, i32 y, i32 w, i32 h, H2_ENUM_PARAM(WindowFlag, i32) flags
+    i32 x, i32 y, i32 w, i32 h, WindowFlag flags
 ) {
     strcpy(name, "Dynamic Construct");
     m_nextWindow = m_prevWindow = NULL;
@@ -71,7 +70,6 @@ heroWindow::heroWindow(
     m_savedBackground = NULL;
 }
 
-VA(0x004ba700, 0x71f)
 heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     widget* pWidget;
     textWidget* pText;
@@ -174,11 +172,10 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     }
 }
 
-VA(0x004bae20, 0x66)
 i32 heroWindow::Open(i32 x, i32 flags) {
-    if (HAS(m_winState, WINDOW_STATE_OPEN) != 0)
+    if ((H2EnumIndex((m_winState) & (WINDOW_STATE_OPEN))) != 0)
         return OPEN_FAILURE;
-    if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0 && SaveBackground() != 0)
+    if ((H2EnumIndex((m_winFlags) & (WINDOW_FLAG_SAVE_BACKGROUND))) != 0 && SaveBackground() != 0)
         return OPEN_FAILURE;
     m_zOrder = x;
     DrawWindow(flags);
@@ -186,7 +183,6 @@ i32 heroWindow::Open(i32 x, i32 flags) {
     return 0;
 }
 
-VA(0x004bae90, 0x82)
 void heroWindow::RemoveAndDeleteWidget(i32 id) {
     widget *w, *next;
     w = m_widgetListHead;
@@ -194,24 +190,23 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
         next = w->m_next;
         if (w->m_id == id) {
             RemoveWidget(w);
-            if (HAS(m_winFlags, WINDOW_FLAG_OWNS_WIDGETS) != 0)
+            if ((H2EnumIndex((m_winFlags) & (WINDOW_FLAG_OWNS_WIDGETS))) != 0)
                 delete w;
         }
         w = next;
     }
 }
 
-VA(0x004baf20, 0xa0)
 void heroWindow::Close(void) {
     widget *w, *next;
-    if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0
-        && HAS(m_winState, WINDOW_STATE_OPEN) != 0)
+    if ((H2EnumIndex((m_winFlags) & (WINDOW_FLAG_SAVE_BACKGROUND))) != 0
+        && (H2EnumIndex((m_winState) & (WINDOW_STATE_OPEN))) != 0)
         RestoreBackground();
     w = m_widgetListHead;
     while (w != NULL) {
         next = w->m_next;
         RemoveWidget(w);
-        if (HAS(m_winFlags, WINDOW_FLAG_OWNS_WIDGETS) != 0) {
+        if ((H2EnumIndex((m_winFlags) & (WINDOW_FLAG_OWNS_WIDGETS))) != 0) {
             delete w;
         }
         w = next;
@@ -219,7 +214,6 @@ void heroWindow::Close(void) {
     m_winState = WINDOW_STATE_CLOSED;
 }
 
-VA(0x004bafc0, 0x109)
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* local_8 = m_widgetListHead;
     if (zOrder == -1) {
@@ -252,7 +246,6 @@ void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     }
 }
 
-VA(0x004bb0d0, 0xe7)
 void heroWindow::RemoveWidget(class widget* w) {
     if (w == NULL)
         return;
@@ -280,7 +273,6 @@ void heroWindow::RemoveWidget(class widget* w) {
     }
 }
 
-VA(0x004bb1c0, 0x5e)
 MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) {
     MessageDispatchResult local_8 = MESSAGE_DISPATCH_CONTINUE;
     widget* local_c = m_widgetListHead;
@@ -297,17 +289,14 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
     return local_8;
 }
 
-VA(0x004bb220, 0x15)
 void heroWindow::DrawWindow(void) {
     DrawWindow(1);
 }
 
-VA(0x004bb240, 0x23)
 void heroWindow::DrawWindow(i32 flags) {
     DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
 }
 
-VA(0x004bb270, 0xed)
 void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     tag_message local_24;
     widget* local_8;
@@ -333,7 +322,6 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     gpMouseManager->m_cursorReady = 1;
 }
 
-VA(0x004bb360, 0xa9)
 i32 heroWindow::SaveBackground(void) {
     m_savedBackground = new bitmap(BITMAP_TYPE_MEMORY, m_winWidth, m_winHeight);
     PollSound();
@@ -342,7 +330,6 @@ i32 heroWindow::SaveBackground(void) {
     return 0;
 }
 
-VA(0x004bb410, 0x8f)
 void heroWindow::RestoreBackground(void) {
     if (gbDrawWindowBackground) {
         m_savedBackground->DrawToBuffer(m_posX, m_posY);
@@ -352,7 +339,6 @@ void heroWindow::RestoreBackground(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004bb4a0, 0x175)
 void heroWindow::MoveWindow(i32 dx, i32 dy) {
     i32 x = m_posX;
     i32 yPrev = m_posY;

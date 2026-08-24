@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -9,7 +9,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
-H2_ENUM_BEGIN(ViewGeneralConstant)
+typedef enum ViewGeneralConstant {
     GENERAL_WINDOW_X           = 179,
     GENERAL_WINDOW_Y           = 60,
     GENERAL_CLOSE              = 10,
@@ -32,9 +32,9 @@ H2_ENUM_BEGIN(ViewGeneralConstant)
     ARMY_Y_OFFSET              = 164,
     ARMY_RIGHT_CLAMP           = 151,
     ARMY_BOTTOM_CLAMP          = 230
-H2_ENUM_END(ViewGeneralConstant)
+} ViewGeneralConstant;
 
-H2_ENUM_BEGIN(ViewGeneralControl)
+typedef enum ViewGeneralControl {
     GENERAL_CONTROL_NONE     = 0,
     GENERAL_NAME_WIDGET      = 1,
     GENERAL_PORTRAIT_WIDGET  = 2,
@@ -46,33 +46,32 @@ H2_ENUM_BEGIN(ViewGeneralControl)
     GENERAL_CONTROL_THIRTEEN = 13,
     GENERAL_CONTROL_FOURTEEN = 14,
     GENERAL_CAPTAIN_WIDGET   = 30
-H2_ENUM_END(ViewGeneralControl)
+} ViewGeneralControl;
 
-H2_ENUM_BEGIN(ViewGeneralLabel)
+typedef enum ViewGeneralLabel {
     GENERAL_LABEL_MORALE = 4,
     GENERAL_LABEL_LUCK   = 5,
     GENERAL_LABEL_MANA   = 6
-H2_ENUM_END(ViewGeneralLabel)
+} ViewGeneralLabel;
 
-H2_ENUM_BEGIN(ViewGeneralLongHelp)
+typedef enum ViewGeneralLongHelp {
     GENERAL_LONG_HELP_CLOSE     = 0,
     GENERAL_LONG_HELP_RETREAT   = 1,
     GENERAL_LONG_HELP_SURRENDER = 2,
     GENERAL_LONG_HELP_CAST      = 3
-H2_ENUM_END(ViewGeneralLongHelp)
+} ViewGeneralLongHelp;
 
-H2_ENUM_BEGIN(ViewGeneralHoverHelp)
+typedef enum ViewGeneralHoverHelp {
     GENERAL_HOVER_HELP_CLOSE     = 1,
     GENERAL_HOVER_HELP_RETREAT   = 2,
     GENERAL_HOVER_HELP_SURRENDER = 3,
     GENERAL_HOVER_HELP_CAST      = 4,
     GENERAL_HOVER_HELP_HERO      = 5,
     GENERAL_HOVER_HELP_CAPTAIN   = 6
-H2_ENUM_END(ViewGeneralHoverHelp)
+} ViewGeneralHoverHelp;
 
-VA(0x004ad4b0, 0x6f9)
 i32 combatManager::ViewGeneral(
-    H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
+    CombatSide side, i32 allowActions, i32 quickView
 ) {
     i16 msgConst37;
     i16 msgConst4;
@@ -95,7 +94,7 @@ i32 combatManager::ViewGeneral(
     tag_message message16;
     i16 msgConst26;
 
-    if (m_heroes[IDX(side)] == NULL)
+    if (m_heroes[H2EnumIndex(side)] == NULL)
         return 0;
     iViewGeneralWhichSide = side;
     msgConst5 = GENERAL_NAME_WIDGET;
@@ -119,110 +118,110 @@ i32 combatManager::ViewGeneral(
     generalWindow26 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
     if (generalWindow26 == NULL)
         MemError();
-    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(side)]->m_portrait));
+    sprintf(gText, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_portrait));
     message16.payload.widget.command = VIEW_GENERAL_SET_ICON;
     message16.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);
 
     message16.payload.widget.command =
-        m_heroes[IDX(side)]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+        m_heroes[H2EnumIndex(side)]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message16.payload.widget.id = GENERAL_CAPTAIN_WIDGET;
-    message16.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+    message16.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
     generalWindow26->BroadcastMessage(message16);
-    if (m_heroes[IDX(side)]->m_isCaptain) {
+    if (m_heroes[H2EnumIndex(side)]->m_isCaptain) {
         message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
-        message16.payload.widget.data.value = m_playerId[IDX(side)] == -1
+        message16.payload.widget.data.value = m_playerId[H2EnumIndex(side)] == -1
             ? GENERAL_CAPTAIN_FRAME
-            : gpGame->m_players[m_playerId[IDX(side)]].m_color;
+            : gpGame->m_players[m_playerId[H2EnumIndex(side)]].m_color;
         generalWindow26->BroadcastMessage(message16);
     }
 
     message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
     message16.payload.widget.id = GENERAL_COLOR_WIDGET;
-    message16.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[IDX(side)]->m_owner) + 1;
+    message16.payload.widget.data.value = gpGame->GetPlayerColor(m_heroes[H2EnumIndex(side)]->m_owner) + 1;
     generalWindow26->BroadcastMessage(message16);
 
-    if (m_heroes[IDX(side)]->m_isCaptain != 0)
+    if (m_heroes[H2EnumIndex(side)]->m_isCaptain != 0)
         sprintf(
             gText,
-            /* Капитан */ "\xca\xe0\xef\xe8\xf2\xe0\xed"
+              "\xca\xe0\xef\xe8\xf2\xe0\xed"
         );
     else
         sprintf(
             gText,
             "%s - %s",
-            m_heroes[IDX(side)]->m_name,
-            gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
+            m_heroes[H2EnumIndex(side)]->m_name,
+            gAlignmentNames[H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_cursorType)]
         );
     message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
     message16.payload.widget.id = GENERAL_NAME_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);
 
-    morale11 = m_heroes[IDX(side)]->m_army.GetMorale(
-        m_heroes[IDX(side)],
-        m_combatTowns[IDX(side)],
-        gpCombatManager->m_armyGroups[IDX(OppositeCombatSide(side))]
+    morale11 = m_heroes[H2EnumIndex(side)]->m_army.GetMorale(
+        m_heroes[H2EnumIndex(side)],
+        m_combatTowns[H2EnumIndex(side)],
+        gpCombatManager->m_armyGroups[H2EnumIndex(OppositeCombatSide(side))]
     );
-    luck14 = gpGame->GetLuck(m_heroes[IDX(side)], NULL, m_combatTowns[IDX(side)]);
+    luck14 = gpGame->GetLuck(m_heroes[H2EnumIndex(side)], NULL, m_combatTowns[H2EnumIndex(side)]);
     sprintf(
         gText,
         "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
-        cViewGeneralLabels[IDX(HERO_PRIMARY_ATTACK)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_ATTACK),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_DEFENSE)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_DEFENSE),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_SPELL_POWER)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_SPELL_POWER),
-        cViewGeneralLabels[IDX(HERO_PRIMARY_KNOWLEDGE)],
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_KNOWLEDGE),
+        cViewGeneralLabels[H2EnumIndex(HERO_PRIMARY_ATTACK)],
+        m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_ATTACK),
+        cViewGeneralLabels[H2EnumIndex(HERO_PRIMARY_DEFENSE)],
+        m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_DEFENSE),
+        cViewGeneralLabels[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)],
+        m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_SPELL_POWER),
+        cViewGeneralLabels[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)],
+        m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_KNOWLEDGE),
         cViewGeneralLabels[GENERAL_LABEL_MORALE],
         gMoraleText[morale11 + GENERAL_MORALE_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_LUCK],
         gLuckText[luck14 + GENERAL_LUCK_TEXT_OFFSET],
         cViewGeneralLabels[GENERAL_LABEL_MANA],
-        m_heroes[IDX(side)]->m_spellPoints,
-        m_heroes[IDX(side)]->Stats(HERO_PRIMARY_KNOWLEDGE) * GENERAL_MANA_PER_KNOWLEDGE
+        m_heroes[H2EnumIndex(side)]->m_spellPoints,
+        m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_KNOWLEDGE) * GENERAL_MANA_PER_KNOWLEDGE
     );
     message16.payload.widget.command = VIEW_GENERAL_SET_TEXT;
     message16.payload.widget.id = GENERAL_STATS_WIDGET;
     message16.payload.widget.data.text = gText;
     generalWindow26->BroadcastMessage(message16);
 
-    if (m_heroes[IDX(side)] == NULL || allowActions == 0
-        || m_heroes[IDX(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[IDX(side)] != 0
+    if (m_heroes[H2EnumIndex(side)] == NULL || allowActions == 0
+        || m_heroes[H2EnumIndex(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[H2EnumIndex(side)] != 0
         || giCurGeneral != m_currentSide) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message16.payload.widget.id = GENERAL_CLOSE;
-        message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
-    if (allowActions == 0 || m_heroes[IDX(OppositeCombatSide(m_currentSide))] == NULL
+    if (allowActions == 0 || m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))] == NULL
         || giCurGeneral != m_currentSide
-        || m_heroes[IDX(side)]->m_isCaptain != 0) {
+        || m_heroes[H2EnumIndex(side)]->m_isCaptain != 0) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message16.payload.widget.id = GENERAL_SURRENDER;
-        message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
     if (allowActions == 0 || giCurGeneral != m_currentSide
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
-            && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
-        || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[1] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
+            && m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != NULL)
+        || m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != 0
+        || m_sideRetreated[1] != 0 || m_heroes[H2EnumIndex(side)]->m_isCaptain != 0) {
         message16.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message16.payload.widget.id = GENERAL_RETREAT;
-        message16.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
         generalWindow26->BroadcastMessage(message16);
         message16.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message16.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message16.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
         generalWindow26->BroadcastMessage(message16);
     }
 
@@ -240,7 +239,6 @@ i32 combatManager::ViewGeneral(
     return 0;
 }
 
-VA(0x004adba9, 0x286)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 msgConst8;
     i16 msgConst28;
@@ -277,7 +275,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
     switch (message.type) {
         case MESSAGE_WIDGET:
-            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 helpIndex36 = -1;
                 if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                     || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
@@ -350,7 +348,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                     break;
             }
             if (hintIndex11 == GENERAL_HOVER_HELP_HERO
-                && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
+                && gpCombatManager->m_heroes[H2EnumIndex(iViewGeneralWhichSide)]->m_isCaptain)
                 hintIndex11 = GENERAL_HOVER_HELP_CAPTAIN;
             gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex11], 1, 0, 0);
             return MESSAGE_DISPATCH_CONSUME;
@@ -363,7 +361,6 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004ade2f, 0x143)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         i32 xWnd;
         i16 viewYOffsetConst;
@@ -403,16 +400,16 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
             yWindow,
             viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
-            m_combatTowns[IDX(side)],
+            m_combatTowns[H2EnumIndex(side)],
             1,
             viewedArmy->m_facing,
             quickView,
-            m_heroes[IDX(side)],
+            m_heroes[H2EnumIndex(side)],
             viewedArmy,
-            m_armyGroups[IDX(side)],
+            m_armyGroups[H2EnumIndex(side)],
             0
         );
     }
 }
 
-DATA(0x00533f7c) H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;
+H2EnumStorage<CombatSide, i32> iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;

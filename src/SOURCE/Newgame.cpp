@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/message.h>
@@ -25,7 +25,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 
-H2_ENUM_BEGIN(NewGameConstant)
+typedef enum NewGameConstant {
     GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
     GAME_KEY_BUFFER_SIZE                  = 0x69,
@@ -101,9 +101,9 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SCENARIO_DESCRIPTION             = 204,
     GAME_SCENARIO_VICTORY                 = 205,
     GAME_SCENARIO_LOSS                    = 206
-H2_ENUM_END(NewGameConstant)
+} NewGameConstant;
 
-H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
+enum class NewGameKeyCode : i32 {
     GAME_KEY_ENTER          = 10,
     GAME_KEY_BACKSPACE      = 0x7f,
     GAME_KEY_FIRST_EXTENDED = 0x100,
@@ -117,15 +117,16 @@ H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
     GAME_KEYPAD_DOWN        = 0x50,
     GAME_KEYPAD_PAGE_DOWN   = 0x51,
     GAME_KEYPAD_INSERT      = 0x52
-H2_ENUM_CLASS_END(NewGameKeyCode)
+};
+using enum NewGameKeyCode;
 
-H2_ENUM_BEGIN(NewGameStorageConstant)
+typedef enum NewGameStorageConstant {
     FILE_MASK_CAPACITY      = 16,
     SAVED_MAP_NAME_CAPACITY = 16,
     PLAYER_LABEL_CAPACITY   = 2
-H2_ENUM_END(NewGameStorageConstant)
+} NewGameStorageConstant;
 
-H2_ENUM_BEGIN(NewGameDialogConstant)
+typedef enum NewGameDialogConstant {
     MAP_REQUESTER_X           = 212,
     MAP_REQUESTER_Y           = 9,
     MAP_CHOICE_WINDOW_X       = 405,
@@ -138,31 +139,33 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
     SCENARIO_WINDOW_X         = 90,
     SCENARIO_WINDOW_Y         = 4,
     NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
-H2_ENUM_END(NewGameDialogConstant)
+} NewGameDialogConstant;
 
-H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
+enum class NewGameMapChoice : i32 {
     MAP_CHOICE_STANDARD  = 1,
     MAP_CHOICE_EXPANSION = 2,
     MAP_CHOICE_CANCEL    = GAME_DIALOG_CANCEL
-H2_ENUM_CLASS_END(NewGameMapChoice)
+};
+using enum NewGameMapChoice;
 
-H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
+enum class NewGamePlayerSlot : i32 {
     PLAYER_SLOT_FIRST  = 0,
     PLAYER_SLOT_SECOND = 1,
     PLAYER_SLOT_THIRD  = 2,
     PLAYER_SLOT_FOURTH = 3,
     PLAYER_SLOT_FIFTH  = 4,
     PLAYER_SLOT_SIXTH  = 5
-H2_ENUM_CLASS_END(NewGamePlayerSlot)
+};
+using enum NewGamePlayerSlot;
 
-H2_ENUM_BEGIN(NewGameMapSizeIndex)
+typedef enum NewGameMapSizeIndex {
     MAP_SIZE_SMALL_INDEX  = 0,
     MAP_SIZE_MEDIUM_INDEX = 1,
     MAP_SIZE_LARGE_INDEX  = 2,
     MAP_SIZE_XLARGE_INDEX = 3
-H2_ENUM_END(NewGameMapSizeIndex)
+} NewGameMapSizeIndex;
 
-H2_ENUM_BEGIN(NewGamePlayerLayout)
+typedef enum NewGamePlayerLayout {
     PLAYER_AREA_WIDTH                 = 372,
     PLAYER_COLUMN_WIDTH               = 62,
     PLAYER_FIRST_X_OFFSET             = 24,
@@ -220,18 +223,17 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
     SCENARIO_PLAYER_RACE_ICON_Y       = PLAYER_RACE_ICON_Y - SCENARIO_PLAYER_Y_OFFSET,
     SCENARIO_PLAYER_RACE_NAME_Y       = PLAYER_RACE_NAME_Y - SCENARIO_PLAYER_Y_OFFSET,
     SCENARIO_PLAYER_RACE_CYCLE_Y      = PLAYER_RACE_CYCLE_Y - SCENARIO_PLAYER_Y_OFFSET
-H2_ENUM_END(NewGamePlayerLayout)
+} NewGamePlayerLayout;
 
-H2_ENUM_BEGIN(NewGameKeyEncoding)
+typedef enum NewGameKeyEncoding {
     KEY_SCAN_CODE_SHIFT = 8,
     KEY_SCAN_CODE_MASK  = 0xff00,
     KEY_ASCII_MASK      = 0xff
-H2_ENUM_END(NewGameKeyEncoding)
+} NewGameKeyEncoding;
 
 
-VA(0x004754b0, 0x1d2)
 void game::GetMap(void) {
-    // Unreferenced, but retail's frame reserves its 28 bytes above loadResult.
+
     tag_message dlgMessage;
     fileRequester* requesterResult;
     i32 loadResult;
@@ -293,7 +295,6 @@ void game::GetMap(void) {
     }
 }
 
-VA(0x00475682, 0x66)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
     m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
@@ -306,7 +307,6 @@ void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameWindow->DrawWindow();
 }
 
-VA(0x004756e8, 0x404)
 void game::InitNewGame(struct SMapHeader* header) {
     i32 humanCount;
     i32 playerType;
@@ -400,7 +400,6 @@ selected_player:
     m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
 }
 
-VA(0x00475aec, 0x5f)
 void game::SetupNetPlayerNames(void) {
     i32 player;
 
@@ -412,7 +411,6 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
-VA(0x00475b4b, 0xa71)
 i32 game::NewGame(void) {
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfo[GAME_MAP_PACKET_SIZE];
@@ -630,7 +628,6 @@ cleanup:
     return result;
 }
 
-    VA(0x004765bc, 0xeb)
     void game::CleanUpNewGameWindow(void) {
         i32 player;
 
@@ -647,7 +644,6 @@ cleanup:
         }
     }
 
-    VA(0x004766a7, 0x794)
     void game::InitNewGameWindow(void) {
         i32 columnGap;
         i32 availWidth;
@@ -881,7 +877,6 @@ cleanup:
         }
     }
 
-    VA(0x00476e3b, 0x50f)
     void game::UpdateNewGameWindow(void) {
         i32 playerLockedValue;
         tag_message message;
@@ -897,12 +892,12 @@ cleanup:
 
         message.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
-        for (playerIndex = 0; playerIndex < IDX(DIFFICULTY_COUNT); ++playerIndex) {
+        for (playerIndex = 0; playerIndex < H2EnumIndex(DIFFICULTY_COUNT); ++playerIndex) {
             message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
             m_newGameWindow->BroadcastMessage(message);
         }
         message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-        message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
+        message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(m_difficulty);
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
@@ -970,7 +965,7 @@ cleanup:
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
                 message.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
             else
-                message.payload.widget.data.value = IDX(m_playerHandicap[playerIndex]);
+                message.payload.widget.data.value = H2EnumIndex(m_playerHandicap[playerIndex]);
             m_newGameWindow->BroadcastMessage(message);
             message.payload.widget.command =
                 m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER
@@ -990,10 +985,10 @@ cleanup:
             message.payload.widget.id = NEW_GAME_RACE_CYCLE_FIRST + playerIndex;
             message.payload.widget.data.value =
                 (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
-                + IDX(m_setupPlayerRace[playerIndex]);
+                + H2EnumIndex(m_setupPlayerRace[playerIndex]);
             m_newGameWindow->BroadcastMessage(message);
 
-            sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex])]);
+            sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerIndex])]);
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_RACE_NAME_FIRST + playerIndex;
             message.payload.widget.data.text = gText;
@@ -1013,7 +1008,6 @@ cleanup:
         DrawNGKPDisplayString(0);
     }
 
-    VA(0x0047734a, 0xdd1)
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
         i32 sendResult;
         i32 oldNetworkId;
@@ -1158,31 +1152,31 @@ cleanup:
         }
 
         if (message.type == MESSAGE_WIDGET) {
-            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
                     || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
                     helpDialogIndexLocal = -1;
                     if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_COUNT) - 1)
+                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
+                                   <= NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1))
                         helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
                     if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_HANDICAP_FIRST + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST
-                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_HANDICAP;
                     if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_COLOR_FIRST + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                   <= NEW_GAME_RACE_FIRST + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
@@ -1190,10 +1184,10 @@ cleanup:
                         helpDialogIndexLocal = GAME_HELP_PLAYER;
                     if ((message.payload.widget.id >= NEW_GAME_RACE_CYCLE_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                                <= NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_RACE_ICON_FIRST
                             && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST
-                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                + H2EnumIndex(GAME_PLAYER_CONTROL_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_RACE;
                     if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
@@ -1271,20 +1265,20 @@ cleanup:
 
                     case NEW_GAME_EVENT_PRESS:
                         switch (message.payload.widget.id) {
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
                                 goto setDifficulty;
 
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
                             setDifficulty:
@@ -1294,22 +1288,22 @@ cleanup:
                                 redraw = 1;
                                 break;
 
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
                                 goto cycleHandicap;
 
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
                             cycleHandicap:
@@ -1318,48 +1312,48 @@ cleanup:
                                 if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
                                     != GAME_COMPUTER_PLAYER) {
                                     gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
-                                        (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
-                                        % IDX(PLAYER_HANDICAP_COUNT)
+                                        (H2EnumIndex(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
+                                        % H2EnumIndex(PLAYER_HANDICAP_COUNT)
                                     );
                                 }
                                 break;
 
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_RACE_FIRST;
                                 goto selectPlayer;
 
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_COLOR_FIRST;
                                 goto selectPlayer;
 
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
                                 goto selectPlayer;
 
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
                             selectPlayer:
@@ -1442,22 +1436,22 @@ cleanup:
                                 }
                                 break;
 
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
                                 goto cycleRace;
 
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
                             cycleRace:
@@ -1556,7 +1550,6 @@ finish:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0047811b, 0x3f3)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
     char buf[GAME_KEY_BUFFER_SIZE];
     char keyChar;
@@ -1595,10 +1588,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_ENTER))
+            if (message.payload.keyboard.keyCode == H2EnumIndex(GAME_KEY_ENTER))
                 return 1;
 
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_BACKSPACE)) {
+            if (message.payload.keyboard.keyCode == H2EnumIndex(GAME_KEY_BACKSPACE)) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1611,7 +1604,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 && message.payload.keyboard.keyCode != 0) {
                 strcpy(buf, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
+                if (message.payload.keyboard.keyCode >= H2EnumIndex(GAME_KEY_FIRST_EXTENDED)) {
                     scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
                         >> KEY_SCAN_CODE_SHIFT;
                     switch (static_cast<NewGameKeyCode>(scanCode)) {
@@ -1676,7 +1669,6 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
     return 0;
 }
 
-VA(0x0047850e, 0x104)
 void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
@@ -1700,7 +1692,6 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
         cNGKPDisplay[cursor + 1] = 0;
 }
 
-VA(0x00478612, 0x8d)
 void game::DrawNGKPDisplayString(i32 updateScreen) {
     if (gbNewGameDialogOver != 0)
         return;
@@ -1732,7 +1723,6 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
         );
 }
 
-VA(0x0047869f, 0xc36)
 void game::ShowScenInfo(void) {
     i32 columnGap;
     i32 availWidth;
@@ -1763,10 +1753,10 @@ void game::ShowScenInfo(void) {
     window->BroadcastMessage(msg);
 
     msg.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
-    msg.payload.widget.data.text = cDifficulty[IDX(m_mapHeader.difficulty)];
+    msg.payload.widget.data.text = cDifficulty[H2EnumIndex(m_mapHeader.difficulty)];
     window->BroadcastMessage(msg);
     msg.payload.widget.id = GAME_SCENARIO_SELECTED_DIFFICULTY;
-    msg.payload.widget.data.text = cDifficulty[IDX(m_difficulty)];
+    msg.payload.widget.data.text = cDifficulty[H2EnumIndex(m_difficulty)];
     window->BroadcastMessage(msg);
 
     sprintf(gText, "%d", CalcDifficultyRating());
@@ -2046,7 +2036,7 @@ void game::ShowScenInfo(void) {
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             msg.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
-            msg.payload.widget.data.value = IDX(m_playerHandicap[playerCounter]);
+            msg.payload.widget.data.value = H2EnumIndex(m_playerHandicap[playerCounter]);
         window->BroadcastMessage(msg);
         msg.payload.widget.command =
             m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
@@ -2059,10 +2049,10 @@ void game::ShowScenInfo(void) {
             NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
         msg.payload.widget.data.value =
             (locked ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
-            + IDX(m_setupPlayerRace[playerCounter]);
+            + H2EnumIndex(m_setupPlayerRace[playerCounter]);
         window->BroadcastMessage(msg);
 
-        sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerCounter])]);
+        sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerCounter])]);
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
             NEW_GAME_RACE_NAME_FIRST + playerCounter;
@@ -2074,7 +2064,6 @@ void game::ShowScenInfo(void) {
     delete window;
 }
 
-VA(0x004792d5, 0x19c)
 void game::GetLossConditionText(char* text) {
     i32 week2;
     hero* lossHero11;
@@ -2091,7 +2080,7 @@ void game::GetLossConditionText(char* text) {
                 sprintf(
                     text,
                     "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc %s '%s'.",
-                    (city2->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+                    (city2->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
                         ? "\xe7\xe0\xec\xee\xea"
                         : "\xe3\xee\xf0\xee\xe4",
                     city2->m_name
@@ -2135,7 +2124,6 @@ void game::GetLossConditionText(char* text) {
     }
 }
 
-VA(0x00479471, 0x2cb)
 void game::GetVictoryConditionText(char* text) {
     town* targetTown;
     i32 localPlayerFirst;
@@ -2152,7 +2140,7 @@ void game::GetVictoryConditionText(char* text) {
                 sprintf(
                     text,
                     "\xc7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc %s '%s'",
-                    (targetTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+                    (targetTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
                         ? "\xe7\xe0\xec\xee\xea"
                         : "\xe3\xee\xf0\xee\xe4",
                     targetTown->m_name
@@ -2241,7 +2229,6 @@ void game::GetVictoryConditionText(char* text) {
     }
 }
 
-VA(0x0047973c, 0x386)
 i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     char colorStr[GAME_SIDE_TEXT_SIZE];
     i32 sideCount;
@@ -2307,11 +2294,11 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     return onSide;
 }
 
-DATA(0x00515d14) b32 gbNewGameDialogOver = true;
-DATA(0x00515d18) i32 NGKPcursorFlashOn = 1;
-DATA(0x00530968) char* cNGKPDisplay;
-DATA(0x00530950) b32 gbNewGameShadowHidden;
-DATA(0x00530960) char* cNGKPCore;
-DATA(0x0053094c) i32 NGKPcursorIndex;
-DATA(0x00530954) char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
-DATA(0x00530964) class icon* NGKPBkg;
+b32 gbNewGameDialogOver = true;
+i32 NGKPcursorFlashOn = 1;
+char* cNGKPDisplay;
+b32 gbNewGameShadowHidden;
+char* cNGKPCore;
+i32 NGKPcursorIndex;
+char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
+class icon* NGKPBkg;

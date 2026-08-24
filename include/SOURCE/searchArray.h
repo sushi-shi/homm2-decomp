@@ -1,13 +1,13 @@
 #ifndef HOMM2_SOURCE_SEARCHARRAY_H
 #define HOMM2_SOURCE_SEARCHARRAY_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/combatTypes.h>
 
 class army;
 extern i32 MAP_WIDTH;
 
-H2_ENUM_BEGIN(SearchConstant)
+typedef enum SearchConstant {
     SEARCH_DIRECTION_COUNT            = 8,
     SEARCH_QUEUE_CAPACITY             = 1024,
     SEARCH_PATH_CAPACITY              = 256,
@@ -29,7 +29,7 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_NO_OBJECT                  = 0xFF,
     SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
     SEARCH_DIRECTION_OBJECT_MASK      = 0x38
-H2_ENUM_END(SearchConstant)
+} SearchConstant;
 
 #pragma pack(push, 1)
 struct searchCell {
@@ -39,7 +39,6 @@ struct searchCell {
     char pad[SEARCH_CELL_PAD_SIZE];
 };
 #pragma pack(pop)
-SIZE(searchCell, 9);
 
 union searchStorage {
     struct searchCell* cells;
@@ -80,7 +79,6 @@ struct searchNode {
     };
 };
 #pragma pack(pop)
-SIZE(searchNode, 9);
 
 #pragma pack(push, 1)
 class searchArray {
@@ -123,7 +121,7 @@ public:
     void SeedPosition(
         i32,
         i32,
-        H2_ENUM_PARAM(MapDirection, i32),
+        MapDirection,
         i32,
         i32,
         i32,
@@ -141,7 +139,7 @@ public:
     void PushPoint(
         i32,
         i32,
-        H2_ENUM_PARAM(MapDirection, i32),
+        MapDirection,
         i32,
         i32,
         i32,
@@ -155,20 +153,19 @@ public:
     void TestPossibleDirections(
         i32,
         i32,
-        H2_ENUM_STORAGE(TerrainType, i8) * const,
+        H2EnumStorage<TerrainType, i8> * const,
         i8* const,
         i32,
         i32
     );
     void SeedCombatPosition(class army*);
     i32 FindCombatPath(i32, i32, class army*, ArmyPathTarget, i32);
-    void PushCombatPoint(i32, H2_ENUM_PARAM(CombatHexDirection, i32), i32, i32);
+    void PushCombatPoint(i32, CombatHexDirection, i32, i32);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];
     }
 };
 #pragma pack(pop)
-SIZE(searchArray, 0x2518);
 extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
 
 #endif

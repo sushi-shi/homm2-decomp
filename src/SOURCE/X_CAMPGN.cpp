@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/heroWindow.h>
@@ -20,7 +20,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 
-H2_ENUM_BEGIN(ExpansionCampaignSmacker)
+typedef enum ExpansionCampaignSmacker {
     SMACKER_POL_INTRO             = 0x27,
     SMACKER_POL_UPRISING          = 0x28,
     SMACKER_POL_ISLAND_OF_CHAOS   = 0x29,
@@ -47,9 +47,9 @@ H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_VOY_KING_AND_COUNTRY  = 0x3e,
     SMACKER_VOY_BLOOD_IS_THICKER  = 0x3f,
     SMACKER_CAMPAIGN_CHOICE       = 0x43
-H2_ENUM_END(ExpansionCampaignSmacker)
+} ExpansionCampaignSmacker;
 
-H2_ENUM_BEGIN(ExpansionCampaignChoiceConstant)
+typedef enum ExpansionCampaignChoiceConstant {
     CAMPAIGN_CHOICE_UNUSED_VALUE       = -1,
     CAMPAIGN_CHOICE_NO_AMOUNT          = -1,
     CAMPAIGN_CHOICE_ZERO_AMOUNT        = 0,
@@ -73,9 +73,9 @@ H2_ENUM_BEGIN(ExpansionCampaignChoiceConstant)
     CAMPAIGN_GOLD_PENALTY_ONE_THOUSAND = -1000,
     CAMPAIGN_WOOD_PENALTY_TEN          = -10,
     CAMPAIGN_MERCURY_PENALTY_TWO       = -2
-H2_ENUM_END(ExpansionCampaignChoiceConstant)
+} ExpansionCampaignChoiceConstant;
 
-H2_ENUM_BEGIN(ExpansionCampaignImplementationConstant)
+typedef enum ExpansionCampaignImplementationConstant {
     TRACK_COORDINATE_COUNT         = 2,
     CAMPAIGN_ICON_X                = 24,
     CAMPAIGN_ICON_Y                = 25,
@@ -86,10 +86,10 @@ H2_ENUM_BEGIN(ExpansionCampaignImplementationConstant)
     TRACK_FRAME_LOCKED             = 2,
     TRACK_FRAME_CAMPAIGN_STRIDE    = 3,
     TRACK_SELECTED_CAMPAIGN_OFFSET = 1
-H2_ENUM_END(ExpansionCampaignImplementationConstant)
+} ExpansionCampaignImplementationConstant;
 
-DATA(0x0051b0b8) static i32
-    expansionCampaignTrackXY[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
+static i32
+    expansionCampaignTrackXY[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                             [TRACK_COORDINATE_COUNT] = {
         {{113, 310},
          {187, 310},
@@ -111,150 +111,148 @@ DATA(0x0051b0b8) static i32
         {{222, 312}, {296, 312}, {370, 312}, {370, 354}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}
 };
 
-DATA(0x0051b1b8) static i32 expansionCampaignMapCounts[IDX(EXPANSION_CAMPAIGN_COUNT)] =
+static i32 expansionCampaignMapCounts[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)] =
     {8, 8, 4, 4};
 
-DATA(0x0051b1c8) SCampaignChoice xCampaignChoices[IDX(
-    EXPANSION_CAMPAIGN_COUNT
-)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT] = {
-    {{{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MEDAL_OF_VALOR), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_STEALTH_SHIELD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BALLISTA), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAJOR_SCROLL), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), IDX(HERO_SKILL_LEVEL_ADVANCED)}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MEDAL_OF_HONOR), CAMPAIGN_CHOICE_NO_AMOUNT},
+SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT] = {
+    {{{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MEDAL_OF_VALOR), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_STEALTH_SHIELD), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MINOR_SCROLL), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_WHITE_PEARL), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_BALLISTA), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MAJOR_SCROLL), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LOGISTICS), H2EnumIndex(HERO_SKILL_LEVEL_ADVANCED)}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MEDAL_OF_HONOR), CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ARTIFACT,
-       IDX(ARTIFACT_CASTER_BRACELET),
+       H2EnumIndex(ARTIFACT_CASTER_BRACELET),
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_DEFENDER_HELM), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_PRIMARY_SKILL,
-       IDX(HERO_PRIMARY_DEFENSE),
+       H2EnumIndex(HERO_PRIMARY_DEFENSE),
        CAMPAIGN_PRIMARY_BONUS_TWO}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
-      {CAMPAIGN_CHOICE_CREATURES, IDX(CREATURE_CRUSADER), CAMPAIGN_CRUSADER_COUNT},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
+      {CAMPAIGN_CHOICE_CREATURES, H2EnumIndex(CREATURE_CRUSADER), CAMPAIGN_CRUSADER_COUNT},
       {CAMPAIGN_CHOICE_ARTIFACT,
-       IDX(ARTIFACT_TRAVELER_BOOTS),
+       H2EnumIndex(ARTIFACT_TRAVELER_BOOTS),
        CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_SULFUR), CAMPAIGN_SULFUR_TEN},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL_SCROLL, IDX(SPELL_ANIMATE_DEAD), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_VIEW_HEROES), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_CREATURES, IDX(CREATURE_MAGE), CAMPAIGN_MAGE_COUNT},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_ESTATES), IDX(HERO_SKILL_LEVEL_ADVANCED)}}},
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_WOOD_FIFTY},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CAMPAIGN_CRYSTAL_TEN}},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_SULFUR), CAMPAIGN_SULFUR_TEN},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_SPELL_SCROLL, H2EnumIndex(SPELL_ANIMATE_DEAD), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SPELL, H2EnumIndex(SPELL_VIEW_HEROES), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_CREATURES, H2EnumIndex(CREATURE_MAGE), CAMPAIGN_MAGE_COUNT},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_ESTATES), H2EnumIndex(HERO_SKILL_LEVEL_ADVANCED)}}},
+    {{{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_WOOD_FIFTY},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_CRYSTAL), CAMPAIGN_CRYSTAL_TEN}},
      {{CAMPAIGN_CHOICE_PRIMARY_SKILL,
-       IDX(HERO_PRIMARY_ATTACK),
+       H2EnumIndex(HERO_PRIMARY_ATTACK),
        CAMPAIGN_PRIMARY_BONUS_ONE},
       {CAMPAIGN_CHOICE_PRIMARY_SKILL,
-       IDX(HERO_PRIMARY_DEFENSE),
+       H2EnumIndex(HERO_PRIMARY_DEFENSE),
        CAMPAIGN_PRIMARY_BONUS_ONE},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_STEEL_SKIN), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_SCOUTING), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LUCK), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LEADERSHIP), IDX(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LOGISTICS), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SPELL, H2EnumIndex(SPELL_STEEL_SKIN), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LOGISTICS), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_SCOUTING), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LUCK), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LEADERSHIP), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
       {CAMPAIGN_CHOICE_ARTIFACT,
-       IDX(ARTIFACT_SPIKED_SHIELD),
+       H2EnumIndex(ARTIFACT_SPIKED_SHIELD),
        CAMPAIGN_ARTIFACT_AMOUNT_ONE}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_PENALTY_ONE_THOUSAND},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_WOOD_PENALTY_TEN},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CAMPAIGN_MERCURY_PENALTY_TWO}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_SCOUTING), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_WOOD_TWENTY}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LEADERSHIP), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_ARCHERY), IDX(HERO_SKILL_LEVEL_BASIC)},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_PENALTY_ONE_THOUSAND},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_WOOD_PENALTY_TEN},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_MERCURY), CAMPAIGN_MERCURY_PENALTY_TWO}},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_SCOUTING), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_WOOD_TWENTY}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LEADERSHIP), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_ARCHERY), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
       {CAMPAIGN_CHOICE_PRIMARY_SKILL,
-       IDX(HERO_PRIMARY_SPELL_POWER),
+       H2EnumIndex(HERO_PRIMARY_SPELL_POWER),
        CAMPAIGN_PRIMARY_BONUS_ONE}}},
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
+    {{{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND},
+      {CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ARTIFACT,
-       IDX(ARTIFACT_STEALTH_SHIELD),
+       H2EnumIndex(ARTIFACT_STEALTH_SHIELD),
        CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT},
+     {{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ARTIFACT,
-       IDX(ARTIFACT_FOREMOST_SCROLL),
+       H2EnumIndex(ARTIFACT_FOREMOST_SCROLL),
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_FIREBLAST), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_HASTE), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_SPELL, H2EnumIndex(SPELL_FIREBLAST), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SPELL, H2EnumIndex(SPELL_MASS_HASTE), CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_SPELL,
-       IDX(SPELL_SUMMON_EARTH_ELEMENTAL),
+       H2EnumIndex(SPELL_SUMMON_EARTH_ELEMENTAL),
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_CHAIN_LIGHTNING), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_WOOD_FIVE},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_ORE), CAMPAIGN_ORE_FIVE},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND}},
+      {CAMPAIGN_CHOICE_SPELL, H2EnumIndex(SPELL_CHAIN_LIGHTNING), CAMPAIGN_CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_WOOD_FIVE},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_ORE), CAMPAIGN_ORE_FIVE},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_ONE_THOUSAND}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}},
-    {{{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_NOMAD_BOOTS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_FIVE_HUNDRED},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_SCOUTING), IDX(HERO_SKILL_LEVEL_BASIC)}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_PATHFINDING), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_NAVIGATION), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_SULFUR), CAMPAIGN_SULFUR_FIFTEEN}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_ARCHERY), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_THREE_THOUSAND},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}},
+    {{{CAMPAIGN_CHOICE_ARTIFACT, H2EnumIndex(ARTIFACT_NOMAD_BOOTS), CAMPAIGN_CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_FIVE_HUNDRED},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_SCOUTING), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_PATHFINDING), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_NAVIGATION), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_SULFUR), CAMPAIGN_SULFUR_FIFTEEN}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_ARCHERY), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_THREE_THOUSAND},
       {CAMPAIGN_CHOICE_PRIMARY_SKILL,
-       IDX(HERO_PRIMARY_ATTACK),
+       H2EnumIndex(HERO_PRIMARY_ATTACK),
        CAMPAIGN_PRIMARY_BONUS_ONE}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_NECROMANCY), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), IDX(HERO_SKILL_LEVEL_BASIC)},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_NECROMANCY), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_SECONDARY_SKILL, H2EnumIndex(HERO_SKILL_LOGISTICS), H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_GOLD), CAMPAIGN_GOLD_TWO_THOUSAND}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
        CAMPAIGN_CHOICE_UNUSED_VALUE,
        CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}}
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT},
+      {CAMPAIGN_CHOICE_RESOURCE, H2EnumIndex(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}}
 };
 
-DATA(0x0051b3a8) static H2_ENUM_STORAGE(GameDifficulty, i8)
-    expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_COUNT)]
+static H2EnumStorage<GameDifficulty, i8>
+    expansionCampaignDifficulty[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
                                [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
                                                           {0, 1, 1, 1, 1, 2, 2, 3},
                                                           {0, 1, 1, 1, 2, 2, 2, 3},
@@ -262,76 +260,64 @@ DATA(0x0051b3a8) static H2_ENUM_STORAGE(GameDifficulty, i8)
                                                           {0, 1, 2, 2, -1, -1, -1, -1}
 };
 
-VA(0x004b32e0, 0x18)
 ExpCampaign::ExpCampaign(void) {
     m_window = NULL;
 }
 
-VA(0x004b32f8, 0xb)
 ExpCampaign::~ExpCampaign() {}
 
-VA(0x004b3303, 0x1e)
 void ExpCampaign::ResetMapChoices(void) {
     memset(m_mapChoices, 0, sizeof(m_mapChoices));
 }
 
-VA(0x004b3321, 0x1e)
 void ExpCampaign::ResetMapsPlayed(void) {
     memset(m_mapsPlayed, 0, sizeof(m_mapsPlayed));
 }
 
-VA(0x004b333f, 0x1e)
 void ExpCampaign::ResetAwards(void) {
     memset(m_awards, 0, sizeof(m_awards));
 }
 
-VA(0x004b335d, 0x1e)
 void ExpCampaign::ResetBonusChoices(void) {
     memset(m_bonusChoices, 0, sizeof(m_bonusChoices));
 }
 
-VA(0x004b337b, 0x17)
-void ExpCampaign::GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
-    m_awards[IDX(award)] = 1;
+void ExpCampaign::GrantAward(ExpansionCampaignAward award) {
+    m_awards[H2EnumIndex(award)] = 1;
 }
 
-VA(0x004b3392, 0x17)
-void ExpCampaign::RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
-    m_awards[IDX(award)] = 0;
+void ExpCampaign::RemoveAward(ExpansionCampaignAward award) {
+    m_awards[H2EnumIndex(award)] = 0;
 }
 
-VA(0x004b33a9, 0x16)
-i8 ExpCampaign::HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
-    return m_awards[IDX(award)];
+i8 ExpCampaign::HasAward(ExpansionCampaignAward award) {
+    return m_awards[H2EnumIndex(award)];
 }
 
-VA(0x004b33bf, 0x19)
 void ExpCampaign::SetMapWasPlayed(void) {
-    m_mapsPlayed[IDX(m_currentMap)] = 1;
+    m_mapsPlayed[H2EnumIndex(m_currentMap)] = 1;
 }
 
-VA(0x004b33d8, 0x4f)
 void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     m_campaignId = campaignId;
     m_currentMap = MAP_NONE;
-    m_mapCount = expansionCampaignMapCounts[IDX(campaignId)];
+    m_mapCount = expansionCampaignMapCounts[H2EnumIndex(campaignId)];
     ResetMapChoices();
     ResetMapsPlayed();
     ResetAwards();
     ResetBonusChoices();
 }
 
-VA(0x004b3427, 0x693)
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* bonus =
-        &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
+        &xCampaignChoices[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)][m_bonusChoices[H2EnumIndex(m_currentMap)]];
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
     sprintf(
         gpGame->m_mapFilename,
         "CAMP%d_%02d.HXC",
-        IDX(m_campaignId) + 1,
-        IDX(m_currentMap) + 1
+        H2EnumIndex(m_campaignId) + 1,
+        H2EnumIndex(m_currentMap) + 1
     );
     gpGame->m_newGameInitialized = 0;
     if (m_currentMap == MAP_FIRST)
@@ -340,7 +326,7 @@ void ExpCampaign::InitMap(void) {
     i32 mapHeaderResult = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
-    gpGame->m_difficulty = expansionCampaignDifficulty[IDX(m_campaignId)][IDX(m_currentMap)];
+    gpGame->m_difficulty = expansionCampaignDifficulty[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
 
@@ -349,7 +335,7 @@ void ExpCampaign::InitMap(void) {
     hero* pHero;
     switch (bonus->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            player->m_resources[IDX(bonus->resource)] += bonus->amount;
+            player->m_resources[H2EnumIndex(bonus->resource)] += bonus->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
@@ -363,7 +349,7 @@ void ExpCampaign::InitMap(void) {
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
                 gpGame->GetHero(player->m_heroIds[0])
-                    ->m_spells[IDX(bonus->spell)] = 1;
+                    ->m_spells[H2EnumIndex(bonus->spell)] = 1;
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
             if (player->m_heroCount > 0) {
@@ -436,9 +422,9 @@ void ExpCampaign::InitMap(void) {
     }
 
     ExpansionCampaignAward whichAward;
-    for (whichAward = AWARD_ELVEN_ALLIANCE; IDX(whichAward) < EXPANSION_CAMPAIGN_AWARD_COUNT;
+    for (whichAward = AWARD_ELVEN_ALLIANCE; H2EnumIndex(whichAward) < EXPANSION_CAMPAIGN_AWARD_COUNT;
          ++whichAward) {
-        if (m_awards[IDX(whichAward)] != 0) {
+        if (m_awards[H2EnumIndex(whichAward)] != 0) {
             switch (whichAward) {
                 case AWARD_ELVEN_ALLIANCE:
                     break;
@@ -493,7 +479,7 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_SET_GUARDIAN:
                     if (player->m_heroCount > 0)
                         gpGame->GetHero(player->m_heroIds[0])
-                            ->m_spells[IDX(SPELL_SET_EARTH_GUARDIAN)] = 1;
+                            ->m_spells[H2EnumIndex(SPELL_SET_EARTH_GUARDIAN)] = 1;
                     break;
                 case AWARD_SPHERE_NEGATION:
                     if (player->m_heroCount > 0)
@@ -510,7 +496,6 @@ void ExpCampaign::InitMap(void) {
     gbRetreatWin = true;
 }
 
-VA(0x004b3aba, 0x34b)
 void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
@@ -526,8 +511,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     i32 mapIndex;
     for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
         trackWidget = new iconWidget(
-            expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][0],
-            expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][1],
+            expansionCampaignTrackXY[H2EnumIndex(m_campaignId)][mapIndex][0],
+            expansionCampaignTrackXY[H2EnumIndex(m_campaignId)][mapIndex][1],
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
@@ -549,7 +534,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         CAMPAIGN_ICON_WIDTH,
         CAMPAIGN_ICON_HEIGHT,
         "x_cmpext.icn",
-        IDX(m_campaignId) + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
+        H2EnumIndex(m_campaignId) + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
         ICON_DRAW_NORMAL,
         -1,
         WIDGET_KIND_ICON_DIRECT,
@@ -564,7 +549,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (viewOnly == 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(EXPANSION_CAMPAIGN_MUSIC);
@@ -575,7 +560,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
-            /* "Вы действительно хотите начать сначала сценарий?" */
+
             "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
             "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc "
             "\xf1\xed\xe0\xf7\xe0\xeb\xe0 \xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
@@ -601,7 +586,6 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     }
 }
 
-VA(0x004b3e05, 0x83d)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     SCampaignChoice* choice;
     tag_message message;
@@ -618,9 +602,9 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
             message.payload.widget.data.value = TRACK_FRAME_PLAYED;
         else
             message.payload.widget.data.value = TRACK_FRAME_LOCKED;
-        if (i == IDX(m_viewMap))
+        if (i == H2EnumIndex(m_viewMap))
             message.payload.widget.data.value +=
-                (IDX(m_campaignId) + TRACK_SELECTED_CAMPAIGN_OFFSET)
+                (H2EnumIndex(m_campaignId) + TRACK_SELECTED_CAMPAIGN_OFFSET)
                 * TRACK_FRAME_CAMPAIGN_STRIDE;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = i + CAMPAIGN_TRACK_WIDGET_FIRST;
@@ -630,25 +614,25 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, "x_track%d.icn", IDX(m_campaignId) + 1);
+    sprintf(gText, "x_track%d.icn", H2EnumIndex(m_campaignId) + 1);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
-    sprintf(gText, "%d", IDX(m_viewMap) + 1);
+    sprintf(gText, "%d", H2EnumIndex(m_viewMap) + 1);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
-    sprintf(gText, "%s", xScenarioName[IDX(m_campaignId)][IDX(m_viewMap)]);
+    sprintf(gText, "%s", xScenarioName[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
-    sprintf(gText, "%s", xScenarioDescription[IDX(m_campaignId)][IDX(m_viewMap)]);
+    sprintf(gText, "%s", xScenarioDescription[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_BONUS_WIDGET;
-    sprintf(gText, "%d", m_mapDays[IDX(m_viewMap)]);
+    sprintf(gText, "%d", m_mapDays[H2EnumIndex(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
     hasVisibleAward = 0;
@@ -662,105 +646,105 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "\xcd\xe5\xf2" /* "Нет" */);
+        sprintf(gText, "\xcd\xe5\xf2"  );
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
-        choice = &xCampaignChoices[IDX(m_campaignId)][IDX(m_viewMap)][i];
+        choice = &xCampaignChoices[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)][i];
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(gText, "%s: %d", gResourceNames[IDX(choice->resource)], choice->amount);
+                sprintf(gText, "%s: %d", gResourceNames[H2EnumIndex(choice->resource)], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->artifact) {
                     case ARTIFACT_MINOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea"
                         );
                         break;
                     case ARTIFACT_MAGE_RING:
                         strcpy(
                             gText,
-                            "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0" /* "Кольцо мага" */
+                            "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0"
                         );
                         break;
                     case ARTIFACT_DEFENDER_HELM:
                         strcpy(
                             gText,
-                            /* "Щлем защитника" */
+
                             "\xd9\xeb\xe5\xec \xe7\xe0\xf9\xe8\xf2\xed\xe8\xea\xe0"
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb" /* "Топор силы" */);
+                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb"  );
                         break;
                     case ARTIFACT_DRAGON_SWORD:
                         strcpy(
                             gText,
-                            "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7" /* "Драконий меч" */
+                            "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7"
                         );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8" /* "Доспехи" */);
+                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8"  );
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
                             gText,
-                            /* "Символ неудачи" */
+
                             "\xd1\xe8\xec\xe2\xee\xeb \xed\xe5\xf3\xe4\xe0\xf7\xe8"
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
                         strcpy(
                             gText,
-                            /* "Громовая палица" */
+
                             "\xc3\xf0\xee\xec\xee\xe2\xe0\xff \xef\xe0\xeb\xe8\xf6\xe0"
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8" /* "Перчатки" */);
+                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8"  );
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
                         strcpy(
                             gText,
-                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea"
                         );
                         break;
                     case ARTIFACT_FOREMOST_SCROLL:
                         strcpy(
                             gText,
-                            /* "Свиток высш. зн." */
+
                             "\xd1\xe2\xe8\xf2\xee\xea \xe2\xfb\xf1\xf8. \xe7\xed."
                         );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0" /* "Баллиста" */);
+                        strcpy(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0"  );
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
                         strcpy(
                             gText,
-                            "\xcd\xe5\xe7\xf0\xe8\xec\xfb\xe9 \xf9\xe8\xf2" /* "Незримый щит" */
+                            "\xcd\xe5\xe7\xf0\xe8\xec\xfb\xe9 \xf9\xe8\xf2"
                         );
                         break;
                     case ARTIFACT_NOMAD_BOOTS:
                         strcpy(
                             gText,
-                            /* "Башмаки кочевника" */
+
                             "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xea\xee\xf7\xe5\xe2\xed\xe8\xea\xe0"
                         );
                         break;
                     case ARTIFACT_TRAVELER_BOOTS:
                         strcpy(
                             gText,
-                            /* "Башмаки путника" */
+
                             "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xef\xf3\xf2\xed\xe8\xea\xe0"
                         );
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
                     default:
-                        sprintf(gText, "%s", gArtifactNames[IDX(choice->artifact)]);
+                        sprintf(gText, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
                         break;
                 }
                 break;
@@ -769,10 +753,10 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     sprintf(
                         gText,
                         "\xcf\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xe7\xe5\xec\xeb\xff\xed\xfb\xf5 \xfd"
-                        "\xeb." /* "Призвать земляных эл." */
+                        "\xeb."
                     );
                 else
-                    sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
+                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
                 if ((choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL
@@ -795,7 +779,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 }
                 break;
             case CAMPAIGN_CHOICE_CREATURES:
-                strcpy(armyName, gArmyNamesPlural[IDX(choice->creature)]);
+                strcpy(armyName, gArmyNamesPlural[H2EnumIndex(choice->creature)]);
                 sprintf(gText, "%d %s", choice->amount, armyName);
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
@@ -803,17 +787,17 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     gText,
                     "%d %s",
                     choice->value,
-                    "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb" /* "Обрывки карты" */
+                    "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb"
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2" /* "Опыт" */);
+                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2"  );
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "\xed/\xe4" /* "н/д" */);
+                sprintf(gText, "\xed/\xe4"  );
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
+                sprintf(gText, gAlignmentNames[H2EnumIndex(choice->faction)]);
                 break;
             case CAMPAIGN_CHOICE_PRIMARY_SKILL:
                 sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
@@ -830,11 +814,11 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     sprintf(
                         gText,
                         "%s %s",
-                        gSpellNames[IDX(choice->spell)],
-                        "\xd1\xe2\xe8\xf2\xee\xea" /* "Свиток" */
+                        gSpellNames[H2EnumIndex(choice->spell)],
+                        "\xd1\xe2\xe8\xf2\xee\xea"
                     );
                 } else {
-                    sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
+                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 }
                 break;
             }
@@ -846,13 +830,13 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
         message.payload.widget.id = i + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        if (m_viewOnly == 0 && m_mapChoices[IDX(m_viewMap)] != 0)
+        if (m_viewOnly == 0 && m_mapChoices[H2EnumIndex(m_viewMap)] != 0)
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
             message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
         m_window->BroadcastMessage(message);
 
-        if (m_bonusChoices[IDX(m_viewMap)] == i)
+        if (m_bonusChoices[H2EnumIndex(m_viewMap)] == i)
             message.payload.widget.command = CAMPAIGN_MESSAGE_SELECT;
         else
             message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
@@ -863,14 +847,13 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->DrawWindow();
 }
 
-VA(0x004b4642, 0x131)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
     i32 map;
 
     if (m_currentMap > MAP_NONE) {
         days = Days();
-        m_mapsPlayed[IDX(m_currentMap)] = 1;
+        m_mapsPlayed[H2EnumIndex(m_currentMap)] = 1;
     }
     memset(m_mapChoices, 0, m_mapCount);
     switch (m_campaignId) {
@@ -904,158 +887,153 @@ i32 ExpCampaign::HandleVictory(void) {
     return 0;
 }
 
-VA(0x004b4773, 0x145)
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
-        case MAP_NONE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
             PlaySmacker(SMACKER_POL_INTRO);
-            m_mapChoices[IDX(MAP_POL_UPRISING)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_UPRISING)] = 1;
             break;
-        case MAP_POL_UPRISING + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_UPRISING) + 1):
             PlaySmacker(SMACKER_POL_UPRISING);
-            m_mapChoices[IDX(MAP_POL_ISLAND_OF_CHAOS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS)] = 1;
             break;
-        case MAP_POL_ISLAND_OF_CHAOS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS) + 1):
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
-            m_mapChoices[IDX(MAP_POL_ARROWS_FLIGHT)] = 1;
-            m_mapChoices[IDX(MAP_POL_ABYSS)] = 1;
-            m_awards[IDX(AWARD_BREASTPLATE_ANDURAN)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_ARROWS_FLIGHT)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_ABYSS)] = 1;
+            m_awards[H2EnumIndex(AWARD_BREASTPLATE_ANDURAN)] = 1;
             break;
-        case MAP_POL_ARROWS_FLIGHT + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ARROWS_FLIGHT) + 1):
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
-            m_mapChoices[IDX(MAP_POL_GIANTS_PASS)] = 1;
-            m_awards[IDX(AWARD_ELVEN_ALLIANCE)] = 1;
-            m_awards[IDX(AWARD_WOOD_BONUS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_GIANTS_PASS)] = 1;
+            m_awards[H2EnumIndex(AWARD_ELVEN_ALLIANCE)] = 1;
+            m_awards[H2EnumIndex(AWARD_WOOD_BONUS)] = 1;
             break;
-        case MAP_POL_ABYSS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ABYSS) + 1):
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
-            m_mapChoices[IDX(MAP_POL_AURORA_BOREALIS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case MAP_POL_GIANTS_PASS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_GIANTS_PASS) + 1):
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
-            m_mapChoices[IDX(MAP_POL_AURORA_BOREALIS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case MAP_POL_AURORA_BOREALIS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_AURORA_BOREALIS) + 1):
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
-            m_mapChoices[IDX(MAP_POL_BETRAYALS_END)] = 1;
-            m_mapChoices[IDX(MAP_POL_CORRUPTIONS_HEART)] = 1;
-            m_awards[IDX(AWARD_HELMET_ANDURAN)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_BETRAYALS_END)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_CORRUPTIONS_HEART)] = 1;
+            m_awards[H2EnumIndex(AWARD_HELMET_ANDURAN)] = 1;
             break;
-        case MAP_POL_BETRAYALS_END + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_BETRAYALS_END) + 1):
             PlaySmacker(SMACKER_POL_BETRAYALS_END);
-            m_mapChoices[IDX(MAP_POL_CORRUPTIONS_HEART)] = 1;
-            m_awards[IDX(AWARD_BATTLE_GARB)] = 1;
-            m_awards[IDX(AWARD_BREASTPLATE_ANDURAN)] = 0;
-            m_awards[IDX(AWARD_HELMET_ANDURAN)] = 0;
-            m_awards[IDX(AWARD_DEFEAT_KRAEGER)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_POL_CORRUPTIONS_HEART)] = 1;
+            m_awards[H2EnumIndex(AWARD_BATTLE_GARB)] = 1;
+            m_awards[H2EnumIndex(AWARD_BREASTPLATE_ANDURAN)] = 0;
+            m_awards[H2EnumIndex(AWARD_HELMET_ANDURAN)] = 0;
+            m_awards[H2EnumIndex(AWARD_DEFEAT_KRAEGER)] = 1;
             break;
-        case MAP_POL_CORRUPTIONS_HEART + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_CORRUPTIONS_HEART) + 1):
             PlaySmacker(SMACKER_POL_CORRUPTIONS_HEART);
             break;
     }
 }
 
-VA(0x004b48b8, 0x126)
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
-        case MAP_NONE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
             PlaySmacker(SMACKER_DES_INTRO);
-            m_mapChoices[IDX(MAP_DES_CONQUER_AND_UNIFY)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY)] = 1;
             break;
-        case MAP_DES_CONQUER_AND_UNIFY + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY) + 1):
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
-            m_mapChoices[IDX(MAP_DES_BORDER_TOWNS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_BORDER_TOWNS)] = 1;
             break;
-        case MAP_DES_BORDER_TOWNS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_BORDER_TOWNS) + 1):
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
-            m_mapChoices[IDX(MAP_DES_WAYWARD_SON)] = 1;
-            m_mapChoices[IDX(MAP_DES_UNCLE_IVAN)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_WAYWARD_SON)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_UNCLE_IVAN)] = 1;
             break;
-        case MAP_DES_WAYWARD_SON + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_WAYWARD_SON) + 1):
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
-            m_mapChoices[IDX(MAP_DES_SOUTHERN_WAR)] = 1;
-            m_awards[IDX(AWARD_WAYWARD_SON)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_SOUTHERN_WAR)] = 1;
+            m_awards[H2EnumIndex(AWARD_WAYWARD_SON)] = 1;
             break;
-        case MAP_DES_UNCLE_IVAN + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_UNCLE_IVAN) + 1):
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
-            m_mapChoices[IDX(MAP_DES_SOUTHERN_WAR)] = 1;
-            m_awards[IDX(AWARD_UNCLE_IVAN)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_SOUTHERN_WAR)] = 1;
+            m_awards[H2EnumIndex(AWARD_UNCLE_IVAN)] = 1;
             break;
-        case MAP_DES_SOUTHERN_WAR + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_SOUTHERN_WAR) + 1):
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
-            m_mapChoices[IDX(MAP_DES_IVORY_GATES)] = 1;
-            m_mapChoices[IDX(MAP_DES_ELVEN_LANDS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_IVORY_GATES)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_ELVEN_LANDS)] = 1;
             break;
-        case MAP_DES_IVORY_GATES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_IVORY_GATES) + 1):
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
-            m_mapChoices[IDX(MAP_DES_EPIC_BATTLE)] = 1;
-            m_awards[IDX(AWARD_LEGENDARY_SCEPTER)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_EPIC_BATTLE)] = 1;
+            m_awards[H2EnumIndex(AWARD_LEGENDARY_SCEPTER)] = 1;
             break;
-        case MAP_DES_ELVEN_LANDS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_ELVEN_LANDS) + 1):
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
-            m_mapChoices[IDX(MAP_DES_EPIC_BATTLE)] = 1;
-            m_awards[IDX(AWARD_ELVEN_ALLIANCE)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_DES_EPIC_BATTLE)] = 1;
+            m_awards[H2EnumIndex(AWARD_ELVEN_ALLIANCE)] = 1;
             break;
-        case MAP_DES_EPIC_BATTLE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_EPIC_BATTLE) + 1):
             PlaySmacker(SMACKER_DES_EPIC_BATTLE);
             break;
     }
 }
 
-VA(0x004b49de, 0xa8)
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
-        case MAP_NONE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
             PlaySmacker(SMACKER_WIZ_INTRO);
-            m_mapChoices[IDX(MAP_WIZ_SHROUDED_ISLES)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_WIZ_SHROUDED_ISLES)] = 1;
             break;
-        case MAP_WIZ_SHROUDED_ISLES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_SHROUDED_ISLES) + 1):
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
-            m_mapChoices[IDX(MAP_WIZ_ETERNAL_SCROLLS)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS)] = 1;
             break;
-        case MAP_WIZ_ETERNAL_SCROLLS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS) + 1):
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
-            m_mapChoices[IDX(MAP_WIZ_POWERS_END)] = 1;
-            m_mapChoices[IDX(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
-            m_awards[IDX(AWARD_SET_GUARDIAN)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_WIZ_POWERS_END)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
+            m_awards[H2EnumIndex(AWARD_SET_GUARDIAN)] = 1;
             break;
-        case MAP_WIZ_POWERS_END + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_POWERS_END) + 1):
             PlaySmacker(SMACKER_WIZ_POWERS_END);
-            m_mapChoices[IDX(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
-            m_awards[IDX(AWARD_SPHERE_NEGATION)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
+            m_awards[H2EnumIndex(AWARD_SPHERE_NEGATION)] = 1;
             break;
-        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY) + 1):
             PlaySmacker(SMACKER_WIZ_FOUNT_OF_WIZARDRY);
             break;
     }
 }
 
-VA(0x004b4a86, 0x93)
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
-        case MAP_NONE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
             PlaySmacker(SMACKER_VOY_INTRO);
-            m_mapChoices[IDX(MAP_VOY_STRANDED)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_VOY_STRANDED)] = 1;
             break;
-        case MAP_VOY_STRANDED + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_STRANDED) + 1):
             PlaySmacker(SMACKER_VOY_STRANDED);
-            m_mapChoices[IDX(MAP_VOY_PIRATE_ISLES)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_VOY_PIRATE_ISLES)] = 1;
             break;
-        case MAP_VOY_PIRATE_ISLES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_PIRATE_ISLES) + 1):
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
-            m_mapChoices[IDX(MAP_VOY_KING_AND_COUNTRY)] = 1;
-            m_mapChoices[IDX(MAP_VOY_BLOOD_IS_THICKER)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_VOY_KING_AND_COUNTRY)] = 1;
+            m_mapChoices[H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER)] = 1;
             break;
-        case MAP_VOY_KING_AND_COUNTRY + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_KING_AND_COUNTRY) + 1):
             PlaySmacker(SMACKER_VOY_KING_AND_COUNTRY);
             break;
-        case MAP_VOY_BLOOD_IS_THICKER + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER) + 1):
             PlaySmacker(SMACKER_VOY_BLOOD_IS_THICKER);
             break;
     }
 }
 
-VA(0x004b4b19, 0x67)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
         case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
@@ -1074,32 +1052,31 @@ void ExpCampaign::ReplaySmacker(void) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-VA(0x004b4b80, 0xcc)
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
-        case MAP_POL_UPRISING + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_UPRISING) + 1):
             PlaySmacker(SMACKER_POL_INTRO);
             break;
-        case MAP_POL_ISLAND_OF_CHAOS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS) + 1):
             PlaySmacker(SMACKER_POL_UPRISING);
             break;
-        case MAP_POL_ARROWS_FLIGHT + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ARROWS_FLIGHT) + 1):
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case MAP_POL_ABYSS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ABYSS) + 1):
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case MAP_POL_GIANTS_PASS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_GIANTS_PASS) + 1):
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
             break;
-        case MAP_POL_AURORA_BOREALIS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_AURORA_BOREALIS) + 1):
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             break;
-        case MAP_POL_BETRAYALS_END + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_BETRAYALS_END) + 1):
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
             break;
-        case MAP_POL_CORRUPTIONS_HEART + 1:
-            if (m_mapsPlayed[IDX(MAP_POL_BETRAYALS_END)])
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_CORRUPTIONS_HEART) + 1):
+            if (m_mapsPlayed[H2EnumIndex(MAP_POL_BETRAYALS_END)])
                 PlaySmacker(SMACKER_POL_BETRAYALS_END);
             else
                 PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
@@ -1107,50 +1084,48 @@ void ExpCampaign::ReplaySmacker1(void) {
     }
 }
 
-VA(0x004b4c4c, 0xb0)
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
-        case MAP_DES_CONQUER_AND_UNIFY + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY) + 1):
             PlaySmacker(SMACKER_DES_INTRO);
             break;
-        case MAP_DES_BORDER_TOWNS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_BORDER_TOWNS) + 1):
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
             break;
-        case MAP_DES_WAYWARD_SON + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_WAYWARD_SON) + 1):
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case MAP_DES_UNCLE_IVAN + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_UNCLE_IVAN) + 1):
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case MAP_DES_SOUTHERN_WAR + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_SOUTHERN_WAR) + 1):
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             break;
-        case MAP_DES_IVORY_GATES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_IVORY_GATES) + 1):
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case MAP_DES_ELVEN_LANDS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_ELVEN_LANDS) + 1):
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case MAP_DES_EPIC_BATTLE + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_EPIC_BATTLE) + 1):
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             break;
     }
 }
 
-VA(0x004b4cfc, 0x88)
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
-        case MAP_WIZ_SHROUDED_ISLES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_SHROUDED_ISLES) + 1):
             PlaySmacker(SMACKER_WIZ_INTRO);
             break;
-        case MAP_WIZ_ETERNAL_SCROLLS + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS) + 1):
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
             break;
-        case MAP_WIZ_POWERS_END + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_POWERS_END) + 1):
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
             break;
-        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
-            if (m_mapsPlayed[IDX(MAP_WIZ_POWERS_END)])
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY) + 1):
+            if (m_mapsPlayed[H2EnumIndex(MAP_WIZ_POWERS_END)])
                 PlaySmacker(SMACKER_WIZ_POWERS_END);
             else
                 PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
@@ -1158,47 +1133,43 @@ void ExpCampaign::ReplaySmacker3(void) {
     }
 }
 
-VA(0x004b4d84, 0x70)
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
-        case MAP_VOY_STRANDED + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_STRANDED) + 1):
             PlaySmacker(SMACKER_VOY_INTRO);
             break;
-        case MAP_VOY_PIRATE_ISLES + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_PIRATE_ISLES) + 1):
             PlaySmacker(SMACKER_VOY_STRANDED);
             break;
-        case MAP_VOY_KING_AND_COUNTRY + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_KING_AND_COUNTRY) + 1):
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
             break;
-        case MAP_VOY_BLOOD_IS_THICKER + 1:
+        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER) + 1):
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
     }
 }
 
-VA(0x004b4df4, 0x3c)
 u8 ExpCampaign::IsCompleted(void) {
     if (m_mapsPlayed[m_mapCount - 1])
         return 1;
     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
-        && m_mapsPlayed[IDX(MAP_VOY_KING_AND_COUNTRY)])
+        && m_mapsPlayed[H2EnumIndex(MAP_VOY_KING_AND_COUNTRY)])
         return 1;
     return 0;
 }
 
-VA(0x004b4e30, 0x24)
 i8 ExpCampaign::IsThisMapCompleted(void) {
-    if (m_mapsPlayed[IDX(m_currentMap)])
+    if (m_mapsPlayed[H2EnumIndex(m_currentMap)])
         return 1;
     return 0;
 }
 
-VA(0x004b4e54, 0x2ae)
 MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == true)
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
@@ -1236,8 +1207,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                     case CAMPAIGN_BONUS_WIDGET_1:
                     case CAMPAIGN_BONUS_WIDGET_2:
                         if (xCampaign.m_viewOnly == 0
-                            && xCampaign.m_mapChoices[IDX(xCampaign.m_viewMap)]) {
-                            xCampaign.m_bonusChoices[IDX(xCampaign.m_viewMap)] =
+                            && xCampaign.m_mapChoices[H2EnumIndex(xCampaign.m_viewMap)]) {
+                            xCampaign.m_bonusChoices[H2EnumIndex(xCampaign.m_viewMap)] =
                                 message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST;
                             xCampaign.UpdateInfo(1);
                         }
@@ -1253,12 +1224,12 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         break;
                     case CAMPAIGN_DIALOG_ACCEPT:
                         if (xCampaign.m_viewOnly == 0) {
-                            if (xCampaign.m_mapChoices[IDX(xCampaign.m_viewMap)]) {
+                            if (xCampaign.m_mapChoices[H2EnumIndex(xCampaign.m_viewMap)]) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
                             } else {
                                 NormalDialog(
-                                    /* "Выбранная карта - плохой выбор
-                                       для вашего следующего сценария." */
+
+
                                     "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff "
                                     "\xea\xe0\xf0\xf2\xe0 - \xef\xeb\xee\xf5\xee\xe9 "
                                     "\xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff "
@@ -1297,53 +1268,46 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004b5102, 0x5f)
 void ExpCampaign::Autosave(void) {
     if (m_currentMap != MAP_NONE) {
-        m_mapsPlayed[IDX(m_currentMap)] = 1;
+        m_mapsPlayed[H2EnumIndex(m_currentMap)] = 1;
         sprintf(
             gText,
             "%s_%d",
-            xShortCampaignNames[IDX(m_campaignId)],
-            IDX(m_currentMap) + 1
+            xShortCampaignNames[H2EnumIndex(m_campaignId)],
+            H2EnumIndex(m_currentMap) + 1
         );
         gpGame->SaveGame(gText, 1, 0);
     }
 }
 
-VA(0x004b5161, 0x1a)
 ExpansionCampaignId ExpCampaign::Choose(void) {
     PlaySmacker(SMACKER_CAMPAIGN_CHOICE);
     return xLastChoice;
 }
 
-VA(0x004b517b, 0x58)
 i16 ExpCampaign::Days(void) {
-    return (m_mapDays[IDX(m_currentMap)]
+    return (m_mapDays[H2EnumIndex(m_currentMap)]
             + (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH)
            + (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK + gpGame->m_day;
 }
 
-VA(0x004b51d3, 0x10)
 i32 ExpCampaign::CampaignID(void) {
-    return IDX(m_campaignId);
+    return H2EnumIndex(m_campaignId);
 }
 
-VA(0x004b51e3, 0x28)
 char* ExpCampaign::JosephName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xJosephName[0];
-    return xStableText[IDX(m_currentMap)];
+    return xStableText[H2EnumIndex(m_currentMap)];
 }
 
-VA(0x004b520b, 0x28)
 char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xUncleIvanName[0];
-    return xStableText[IDX(m_currentMap) + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
+    return xStableText[H2EnumIndex(m_currentMap) + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
 }
 
-VA(0x004b5233, 0x30)
 i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
     if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS
         && m_currentMap == MAP_DES_ELVEN_LANDS
@@ -1352,7 +1316,6 @@ i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
     return 0;
 }
 
-VA(0x004b5263, 0x22)
 i8 ExpCampaign::IsSpecialUA(void) {
     if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE
         && m_currentMap == MAP_WIZ_POWERS_END)
@@ -1360,7 +1323,6 @@ i8 ExpCampaign::IsSpecialUA(void) {
     return 0;
 }
 
-VA(0x004b5285, 0x50)
 i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
     playerData* player = &gpGame->m_players[playerIndex];
 

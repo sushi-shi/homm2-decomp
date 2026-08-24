@@ -3,8 +3,8 @@
 
 #include <Ints.h>
 
-extern "C" i32 __cdecl BitTest(const void*, u32);
-extern "C" void __cdecl BitSet(void*, u32);
-extern "C" void __cdecl BitClear(void*, u32);
+extern "C" i32 __cdecl H2BitTest(const void*, u32);
+extern "C" void __cdecl H2BitSet(void*, u32);
+extern "C" void __cdecl H2BitClear(void*, u32);
 
 #endif

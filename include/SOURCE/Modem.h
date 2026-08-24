@@ -1,7 +1,7 @@
 #ifndef HOMM2_MODEM_H
 #define HOMM2_MODEM_H
 
-#include <va.h>
+#include <Ints.h>
 
 void ModemSetup(i32);
 i32l Dial(void);
@@ -19,7 +19,7 @@ i32 WaitForDirectConnect(void);
 char ReadPacket(void);
 void WriteModemPacket(char*, i32);
 
-H2_ENUM_BEGIN(ModemConstant)
+typedef enum ModemConstant {
     MODEM_MODE_DIAL                  = 3,
     MODEM_MODE_WAIT                  = 4,
     MODEM_CONNECTION_INIT_STAGE      = 0,
@@ -45,7 +45,7 @@ H2_ENUM_BEGIN(ModemConstant)
     MODEM_QUEUE_OUTPUT_SIZE          = 0x800,
     MODEM_ESCAPE_BYTE                = 0x70,
     MODEM_PACKET_END                 = 1
-H2_ENUM_END(ModemConstant)
+} ModemConstant;
 
 struct inque_t {
     i32 readPosition;
@@ -58,8 +58,6 @@ struct outque_t {
     i32 writePosition;
     char data[MODEM_QUEUE_OUTPUT_SIZE];
 };
-SIZE(inque_t, 0x1008);
-SIZE(outque_t, 0x808);
 
 extern i32 iBaudBits;
 extern i32 inescape;

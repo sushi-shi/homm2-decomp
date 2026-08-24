@@ -1,20 +1,21 @@
 #ifndef HOMM2_SOURCE_HERO_H
 #define HOMM2_SOURCE_HERO_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
 
 class town;
 
-H2_ENUM_CLASS_BEGIN(HeroSpellType)
+enum class HeroSpellType : i32 {
     SPELL_TYPE_COMBAT         = 0,
     SPELL_TYPE_ADVENTURE      = 1,
     SPELL_TYPE_CATEGORY_COUNT = 2,
     SPELL_TYPE_ALL            = SPELL_TYPE_CATEGORY_COUNT
-H2_ENUM_CLASS_END(HeroSpellType)
+};
+using enum HeroSpellType;
 
-H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
+enum class HeroSecondarySkill : i32 {
     HERO_SKILL_NONE        = -1,
     HERO_SKILL_PATHFINDING = 0,
     HERO_SKILL_ARCHERY     = 1,
@@ -31,25 +32,28 @@ H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
     HERO_SKILL_NECROMANCY  = 12,
     HERO_SKILL_ESTATES     = 13,
     HERO_SKILL_COUNT       = 14
-H2_ENUM_CLASS_END(HeroSecondarySkill)
-H2_ENUM_STEPPED(HeroSecondarySkill)
+};
+using enum HeroSecondarySkill;
+ENABLE_ENUM_STEPS(HeroSecondarySkill)
 
-H2_ENUM_CLASS_BEGIN_SPLIT(HeroSkillLevel, u8)
+enum class HeroSkillLevel : u8 {
     HERO_SKILL_LEVEL_NONE     = 0,
     HERO_SKILL_LEVEL_BASIC    = 1,
     HERO_SKILL_LEVEL_ADVANCED = 2,
     HERO_SKILL_LEVEL_EXPERT   = 3,
     HERO_SKILL_LEVEL_COUNT    = 4
-H2_ENUM_CLASS_END_SPLIT(HeroSkillLevel, u8)
+};
+using enum HeroSkillLevel;
 
-H2_ENUM_CLASS_BEGIN(HeroPrimaryStat)
+enum class HeroPrimaryStat : i32 {
     HERO_PRIMARY_ATTACK      = 0,
     HERO_PRIMARY_DEFENSE     = 1,
     HERO_PRIMARY_SPELL_POWER = 2,
     HERO_PRIMARY_KNOWLEDGE   = 3
-H2_ENUM_CLASS_END(HeroPrimaryStat)
+};
+using enum HeroPrimaryStat;
 
-H2_ENUM_BEGIN(HeroConstant)
+typedef enum HeroConstant {
     HERO_OWNER_NONE                           = -1,
     HERO_BOAT_NONE                            = 0xff,
     HERO_DESTINATION_NONE                     = -1,
@@ -84,9 +88,9 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_NECROMANCY_BONUS_MAX                 = 6,
     HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX       = 9,
     HERO_NECROMANCY_PERCENT_PER_LEVEL         = 10
-H2_ENUM_END(HeroConstant)
+} HeroConstant;
 
-H2_ENUM_CLASS_BEGIN_T(HeroEventFlag, u32)
+enum class HeroEventFlag : u32 {
     HERO_EVENT_NONE                = 0,
     HERO_EVENT_BUOY                = 0x2,
     ADVMGR_VISIT_FORT              = HERO_EVENT_BUOY,
@@ -121,8 +125,9 @@ H2_ENUM_CLASS_BEGIN_T(HeroEventFlag, u32)
     ADVMGR_VISIT_GENERIC_ALTAR     = HERO_EVENT_STABLES,
     WEEKLY_HERO_VISIT_FLAG         = HERO_EVENT_STABLES,
     HERO_EVENT_GROUPED_FORMATION   = 0x00008000
-H2_ENUM_CLASS_END_T(HeroEventFlag, u32)
-H2_ENUM_FLAGS(HeroEventFlag)
+};
+using enum HeroEventFlag;
+ENABLE_ENUM_FLAGS(HeroEventFlag)
 
 #pragma pack(push, 1)
 class hero {
@@ -135,8 +140,8 @@ public:
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
     char m_name[HERO_NAME_SIZE];
-    H2_ENUM_STORAGE(HeroCursorType, u8) m_cursorType;
-    H2_ENUM_STORAGE(HeroPortrait, u8) m_portrait;
+    H2EnumStorage<HeroCursorType, u8> m_cursorType;
+    H2EnumStorage<HeroPortrait, u8> m_portrait;
     i32 m_x;
     i32 m_y;
     i32 m_destinationX;
@@ -153,14 +158,14 @@ public:
             i8 m_patrolRadius;
         };
     };
-    H2_ENUM_STORAGE(MapDirection, u8) m_direction;
-    H2_ENUM_STORAGE(MapObjectType, i16) m_locationType;
+    H2EnumStorage<MapDirection, u8> m_direction;
+    H2EnumStorage<MapObjectType, i16> m_locationType;
     i16 m_occupiedTown;
     i32 m_mobility;
     i32 m_remainingMobility;
     i32 m_experience;
     i16 m_level;
-    i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)];
+    i8 m_primaryStats[H2EnumIndex(HERO_STARTING_STAT_COUNT)];
     i8 m_morale;
     i8 m_luck;
     char _pad_0x46[HERO_RUNTIME_ALIGNMENT_SIZE];
@@ -174,17 +179,17 @@ public:
     u8 m_randomSeed;
     u8 m_enabled;
     class armyGroup m_army;
-    H2_ENUM_STORAGE_STEPPED(HeroSkillLevel, i8) m_secondarySkills[IDX(HERO_SKILL_COUNT)];
-    u8 m_secondarySkillOrder[IDX(HERO_SKILL_COUNT)];
+    H2SteppedEnumStorage<HeroSkillLevel, i8> m_secondarySkills[H2EnumIndex(HERO_SKILL_COUNT)];
+    u8 m_secondarySkillOrder[H2EnumIndex(HERO_SKILL_COUNT)];
     i32 m_secondarySkillCount;
-    i8 m_spells[IDX(SPELL_COUNT)];
-    H2_ENUM_STORAGE(ArtifactType, i8) m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
+    i8 m_spells[H2EnumIndex(SPELL_COUNT)];
+    H2EnumStorage<ArtifactType, i8> m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
     float m_aiFightValue;
     i8 m_artifactExtra[HERO_ARTIFACT_SLOT_COUNT];
     i32 IsEmbarked(void) {
-        return HAS(m_eventFlags, HERO_EVENT_EMBARKED);
+        return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
     hero(void);
     void Read(i32, i8);
@@ -196,7 +201,7 @@ public:
     SpellType GetNthSpell(HeroSpellType, i32);
     i32 GetNumSpells(HeroSpellType);
     void UseSpell(SpellType);
-    void AddSpell(H2_ENUM_PARAM(SpellType, i32), i32);
+    void AddSpell(SpellType, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32, i32);
@@ -210,26 +215,25 @@ public:
     void CheckLevel(void);
     i32 NumArtifacts(void);
     void SetSS(
-        H2_ENUM_PARAM(HeroSecondarySkill, i32), H2_ENUM_PARAM(HeroSkillLevel, i32)
+        HeroSecondarySkill, HeroSkillLevel
     );
-    i32 TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+    i32 TakeSS(HeroSecondarySkill, i32);
     i32 GiveSS(
-        H2_ENUM_PARAM(HeroSecondarySkill, i32),
-        H2_ENUM_PARAM(HeroSkillLevel, i32)
+        HeroSecondarySkill,
+        HeroSkillLevel
     );
-    i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32));
+    i32 CreatureTypeCount(CreatureType);
     void UpgradeCreatures(
-        H2_ENUM_PARAM(CreatureType, i32), H2_ENUM_PARAM(CreatureType, i32)
+        CreatureType, CreatureType
     );
     HeroSecondarySkill GetNthSS(i32);
     class town* GetOccupiedTown(void);
     i8 Stats(HeroPrimaryStat);
-    i8 GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32));
-    void DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+    i8 GetSSLevel(HeroSecondarySkill);
+    void DoSSLevelDialog(HeroSecondarySkill, i32);
     void CheckAnduranPieces(i32);
 };
 #pragma pack(pop)
-SIZE(hero, 250);
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];

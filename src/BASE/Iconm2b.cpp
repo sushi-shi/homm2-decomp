@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Iconm2b.h>
 #include <BASE/IconDraw.h>
 #include <BASE/icon.h>
@@ -8,19 +8,17 @@
 #include <string.h>
 #include <SOURCE/KB.h>
 
-// Retail's frame is exactly the two __fastcall spills: every working value of
-// the decoder lives in a file static, not a local.
-DATA(0x005363ac) static i32 s_x = 0;
-DATA(0x005363b0) static i32 s_run = 0;
-DATA(0x005363b4) static i32 s_y = 0;
-DATA(0x005363b8) static i32 s_left = 0;
-DATA(0x005363bc) static u8* s_src = 0;
-DATA(0x005363c0) static u8* s_row = 0;
-DATA(0x005363c4) static i32 s_clipR = 0;
-DATA(0x005363c8) static i32 s_clipB = 0;
-DATA(0x005363cc) static IconEntry* s_entry = 0;
 
-VA(0x004c67b0, 0x2e8)
+static i32 s_x = 0;
+static i32 s_run = 0;
+static i32 s_y = 0;
+static i32 s_left = 0;
+static u8* s_src = 0;
+static u8* s_row = 0;
+static i32 s_clipR = 0;
+static i32 s_clipB = 0;
+static IconEntry* s_entry = 0;
+
 void MonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,
@@ -28,7 +26,7 @@ void MonoIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

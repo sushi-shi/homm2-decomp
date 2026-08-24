@@ -1,32 +1,34 @@
 #ifndef HOMM2_BASE_FONT_H
 #define HOMM2_BASE_FONT_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/resource.h>
 
 class icon;
 
-H2_ENUM_BEGIN(FontGlyphConstant)
+typedef enum FontGlyphConstant {
     FONT_SPACER_CHAR    = 0x1f,
     FONT_GLYPH_FALLBACK = 0x5f
-H2_ENUM_END(FontGlyphConstant)
+} FontGlyphConstant;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(FontDrawMode, i16)
+enum class FontDrawMode : i16 {
     FONT_DRAW_DARK_GRAY    = 0,
     FONT_DRAW_DEFAULT      = 1,
     FONT_DRAW_YELLOW       = 2,
     FONT_DRAW_DIMMED       = 3,
     FONT_DRAW_SCENARIO_WIN = 4
-H2_ENUM_CLASS_END_SPLIT(FontDrawMode, i16)
+};
+using enum FontDrawMode;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(FontAlignment, i16)
+enum class FontAlignment : i16 {
     FONT_ALIGN_LEFT            = 0,
     FONT_ALIGN_CENTER          = 1,
     FONT_ALIGN_RIGHT           = 2,
     FONT_ALIGN_VERTICAL_CENTER = 4,
     FONT_ALIGN_CENTER_BOTH     = FONT_ALIGN_CENTER | FONT_ALIGN_VERTICAL_CENTER
-H2_ENUM_CLASS_END_SPLIT(FontAlignment, i16)
-H2_ENUM_FLAGS(FontAlignment)
+};
+using enum FontAlignment;
+ENABLE_ENUM_FLAGS(FontAlignment)
 
 #pragma pack(push, 1)
 class font : public resource {
@@ -51,5 +53,4 @@ public:
     i32 LineWidth(char*);
 };
 #pragma pack(pop)
-SIZE(font, 0x20);
 #endif

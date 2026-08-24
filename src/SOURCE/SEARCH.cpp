@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/FINDPATH.h>
@@ -14,12 +14,12 @@
 struct cFRDummyStorageOwner {
     static char storage[1];
 };
-DATA(0x00533d98) __declspec(selectany) char cFRDummyStorageOwner::storage[1] = {0};
+__declspec(selectany) char cFRDummyStorageOwner::storage[1] = {0};
 
 struct SeedPositionState {
     i32 hasTarget;
     i32 hasAdjacentMonster;
-    H2_ENUM_STORAGE(TerrainType, i8) possibleDirections[SEARCH_DIRECTION_COUNT];
+    H2EnumStorage<TerrainType, i8> possibleDirections[SEARCH_DIRECTION_COUNT];
     i32 neighborX;
     i32 remainingMobility;
     u8 padding18[4];
@@ -38,23 +38,21 @@ struct SeedPositionState {
     mapCell* neighborCell;
     i32 candidateY;
     i32 mapX;
-    H2_ENUM_STORAGE(MapObjectType, i32) triggerType;
+    H2EnumStorage<MapObjectType, i32> triggerType;
     i32 adjacentMonsterX;
     i32 targetStepCost;
-    H2_ENUM_STORAGE_STEPPED(MapDirection, i32) direction;
+    H2SteppedEnumStorage<MapDirection, i32> direction;
     i32 processedPointCount;
     searchNode* neighborNode;
     i32 bestTargetCost;
     i32 adjacentY;
-    H2_ENUM_STORAGE(TerrainType, i32) terrain;
+    H2EnumStorage<TerrainType, i32> terrain;
     hero* currentHero;
 };
 
-SIZE(SeedPositionState, 0x8c);
 
-DATA(0x00533da0) static SeedPositionState s_seedPositionState;
+static SeedPositionState s_seedPositionState;
 
-VA(0x004916c0, 0x116)
 i32 searchArray::BuildPath(
     i32 startX,
     i32 startY,
@@ -79,17 +77,16 @@ i32 searchArray::BuildPath(
         }
         MapDirection backDir =
             OppositeMapDirection(static_cast<MapDirection>(node->direction));
-        destinationX += normalDirTable[IDX(backDir)].x;
-        destinationY += normalDirTable[IDX(backDir)].y;
+        destinationX += normalDirTable[H2EnumIndex(backDir)].x;
+        destinationY += normalDirTable[H2EnumIndex(backDir)].y;
     }
     return m_pathLength;
 }
 
-VA(0x004917d6, 0xcc2)
 void searchArray::SeedPosition(
     i32 seedX,
     i32 seedY,
-    H2_ENUM_PARAM(MapDirection, i32) seedDirection,
+    MapDirection seedDirection,
     i32 maximumCost,
     i32 waterMode,
     i32 findAdjacentMonster,
@@ -100,7 +97,7 @@ void searchArray::SeedPosition(
     i32 continueSeed,
     i32 scanMap
 ) {
-    H2_ENUM_STORAGE(TerrainType, i32) targetTerrain;
+    H2EnumStorage<TerrainType, i32> targetTerrain;
 
     if (!continueSeed) {
         giCurTempMobility = mobility;
@@ -118,7 +115,7 @@ void searchArray::SeedPosition(
         }
 
         s_seedPositionState.targetCell = gpAdvManager->GetCell(targetX, targetY);
-        if (s_seedPositionState.targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
+        if (s_seedPositionState.targetCell->m_flags & H2EnumIndex(MAP_CELL_OCCUPIED))
             return;
 
         targetTerrain = giGroundToTerrain[s_seedPositionState.targetCell->m_terrainImageIndex];
@@ -256,11 +253,11 @@ void searchArray::SeedPosition(
             s_seedPositionState.remainingMobility = giCurTempMobility - s_seedPositionState.currentNode.distance;
             for (s_seedPositionState.direction = MAP_DIRECTION_NORTH; s_seedPositionState.direction < MAP_DIRECTION_COUNT;
                  ++s_seedPositionState.direction) {
-                if (s_seedPositionState.possibleDirections[IDX(s_seedPositionState.direction)] == TERRAIN_INVALID)
+                if (s_seedPositionState.possibleDirections[H2EnumIndex(s_seedPositionState.direction)] == TERRAIN_INVALID)
                     continue;
                 {
-                    s_seedPositionState.neighborX = s_seedPositionState.currentNode.x + normalDirTable[IDX(s_seedPositionState.direction)].x;
-                    s_seedPositionState.neighborY = s_seedPositionState.currentNode.y + normalDirTable[IDX(s_seedPositionState.direction)].y;
+                    s_seedPositionState.neighborX = s_seedPositionState.currentNode.x + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].x;
+                    s_seedPositionState.neighborY = s_seedPositionState.currentNode.y + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].y;
                     s_seedPositionState.neighborNode = &GetColumn(s_seedPositionState.neighborX)[MAP_WIDTH * s_seedPositionState.neighborY];
                     if (!(!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1
                           || !(MAP_EXTRA_AT(s_seedPositionState.neighborX, s_seedPositionState.neighborY)
@@ -287,14 +284,14 @@ void searchArray::SeedPosition(
                             s_seedPositionState.currentNode.distance
                                 + CalcTerrainCost(
                                     s_seedPositionState.terrain,
-                                    IDX(s_seedPositionState.direction),
+                                    H2EnumIndex(s_seedPositionState.direction),
                                     s_seedPositionState.remainingMobility,
                                     pathfindingSkill,
                                     s_seedPositionState.currentWater,
                                     gpAdvManager->GetCell(s_seedPositionState.neighborX, s_seedPositionState.neighborY)->m_isRoad
                                 ),
                             maximumCost,
-                            s_seedPositionState.directionCosts[IDX(s_seedPositionState.direction)],
+                            s_seedPositionState.directionCosts[H2EnumIndex(s_seedPositionState.direction)],
                             s_seedPositionState.hasAdjacentMonster,
                             s_seedPositionState.adjacentMonsterX,
                             s_seedPositionState.adjacentY,
@@ -306,8 +303,8 @@ void searchArray::SeedPosition(
                         if (s_seedPositionState.hasTarget && s_seedPositionState.neighborX == targetX && s_seedPositionState.neighborY == targetY
                             && !s_seedPositionState.currentNode.rvFlag1) {
                             s_seedPositionState.targetStepCost = CalcTerrainCost(
-                                s_seedPositionState.possibleDirections[IDX(s_seedPositionState.direction)],
-                                IDX(s_seedPositionState.direction),
+                                s_seedPositionState.possibleDirections[H2EnumIndex(s_seedPositionState.direction)],
+                                H2EnumIndex(s_seedPositionState.direction),
                                 giCurTempMobility - s_seedPositionState.currentNode.distance,
                                 pathfindingSkill,
                                 gpAdvManager->GetCell(s_seedPositionState.neighborX, s_seedPositionState.neighborY)->m_isRoad,
@@ -337,8 +334,8 @@ void searchArray::SeedPosition(
                             for (s_seedPositionState.direction = MAP_DIRECTION_NORTH;
                                  s_seedPositionState.direction < MAP_DIRECTION_COUNT;
                                  ++s_seedPositionState.direction) {
-                                s_seedPositionState.adjacentX = s_seedPositionState.mapX + normalDirTable[IDX(s_seedPositionState.direction)].x;
-                                s_seedPositionState.candidateY = s_seedPositionState.mapY + normalDirTable[IDX(s_seedPositionState.direction)].y;
+                                s_seedPositionState.adjacentX = s_seedPositionState.mapX + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].x;
+                                s_seedPositionState.candidateY = s_seedPositionState.mapY + normalDirTable[H2EnumIndex(s_seedPositionState.direction)].y;
                                 if (!(s_seedPositionState.adjacentX >= 0 && s_seedPositionState.adjacentX < MAP_WIDTH
                                       && s_seedPositionState.candidateY >= 0 && s_seedPositionState.candidateY < MAP_HEIGHT))
                                     continue;
@@ -346,7 +343,7 @@ void searchArray::SeedPosition(
                                     s_seedPositionState.neighborCell =
                                         gpAdvManager->GetCell(s_seedPositionState.adjacentX, s_seedPositionState.candidateY);
                                     s_seedPositionState.directionBlocked = 1;
-                                    if (((1 << IDX(s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
+                                    if (((1 << H2EnumIndex(s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && s_seedPositionState.neighborCell->m_objectIndex != SEARCH_NO_OBJECT
                                         && s_seedPositionState.neighborCell->m_objectTileset != TILESET_DUMMY
                                         && !(s_seedPositionState.neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
@@ -371,7 +368,7 @@ void searchArray::SeedPosition(
                                             s_seedPositionState.adjacentCost
                                                 + CalcTerrainCost(
                                                     s_seedPositionState.terrain,
-                                                    IDX(s_seedPositionState.direction),
+                                                    H2EnumIndex(s_seedPositionState.direction),
                                                     giCurTempMobility - s_seedPositionState.adjacentCost,
                                                     pathfindingSkill,
                                                     s_seedPositionState.neighborCell->m_isRoad,

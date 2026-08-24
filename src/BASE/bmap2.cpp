@@ -1,24 +1,23 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 #include <SOURCE/KB.h>
-H2_ENUM_BEGIN(BitmapDimConstant)
+typedef enum BitmapDimConstant {
     DIM_PALETTE_LEVEL_STRIDE = 256
-H2_ENUM_END(BitmapDimConstant)
+} BitmapDimConstant;
 
-DATA(0x00536388) static i32 gFillRow = 0;
-DATA(0x0053638c) static u8* gFillPtr = 0;
-DATA(0x00536390) static i32 gDimRow = 0;
-DATA(0x00536394) static u8* gDimPtr = 0;
-DATA(0x00536398) static i32 gDimCol = 0;
-DATA(0x0053639c) static i32 gBlitRow = 0;
-DATA(0x005363a0) static u8* gDimNext = 0;
-DATA(0x005363a4) static u8* gBlitSrc = 0;
-DATA(0x005363a8) static u8* gBlitDst = 0;
+static i32 gFillRow = 0;
+static u8* gFillPtr = 0;
+static i32 gDimRow = 0;
+static u8* gDimPtr = 0;
+static i32 gDimCol = 0;
+static i32 gBlitRow = 0;
+static u8* gDimNext = 0;
+static u8* gBlitSrc = 0;
+static u8* gBlitDst = 0;
 
-VA(0x004c6450, 0x82)
 void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     gFillPtr = bmp->m_pixels + x + y * bmp->m_width;
     for (gFillRow = 0; gFillRow < h; gFillRow++) {
@@ -27,7 +26,6 @@ void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     }
 }
 
-VA(0x004c64e0, 0xee)
 void FillBitmapAreaClip(
     class bitmap* bmp,
     i32 x,
@@ -58,7 +56,6 @@ void FillBitmapAreaClip(
     FillBitmapArea(bmp, x, y, w, h, color);
 }
 
-VA(0x004c65d0, 0xb7)
 void BlitBitmap(
     class bitmap* src,
     i32 sx,
@@ -78,7 +75,6 @@ void BlitBitmap(
     }
 }
 
-VA(0x004c6690, 0xcd)
 void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     gDimPtr = bmp->m_pixels + y * bmp->m_width + x;
     for (gDimRow = 0; gDimRow < h; gDimRow++) {

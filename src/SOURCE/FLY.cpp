@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <math.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -18,15 +18,14 @@
 
 namespace {
 
-H2_ENUM_BEGIN(ArmyFlightConstant)
+typedef enum ArmyFlightConstant {
     ALL_ADJACENT_DIRECTIONS    = 0x3f,
     FLIGHT_SOUND_FRAME         = 1,
     VAMPIRE_FLIGHT_SOUND_DELAY = 100
-H2_ENUM_END(ArmyFlightConstant)
+} ArmyFlightConstant;
 
 }
 
-VA(0x0044b000, 0x21e)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell_9;
     i32 candidateHex;
@@ -44,7 +43,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
         return 0;
     }
-    if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
         candidateHex = GetAdjacentCellIndex(
             hex,
             m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
@@ -90,7 +89,6 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     }
 }
 
-VA(0x0044b21e, 0x396)
 i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 enemyHex;
     u32 directionMask;
@@ -120,7 +118,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    foe = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
+    foe = &gpCombatManager->m_armies[H2EnumIndex(m_targetSide)][m_targetIndex];
     if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex = destination;
     } else {
@@ -144,46 +142,46 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             m_moveTargetHex = m_hex;
             return 1;
         } else {
-            attackMask |= 1 << IDX(moveDir);
+            attackMask |= 1 << H2EnumIndex(moveDir);
         }
     }
 
     directionMask = 0;
-    if (HAS(foe->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+    if ((H2EnumIndex((foe->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex += foe->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
-        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_WEST)
-                                                              : BIT(COMBAT_DIRECTION_EAST);
+        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))
+                                                              : (1 << H2EnumIndex(COMBAT_DIRECTION_EAST));
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
         direction = GetBestDirection(enemyHex, m_hex, directionMask);
         adjHex = GetAdjacentCellIndex(enemyHex, direction);
         if (ValidHex(adjHex)
-            && CanFit(adjHex, 1 - IDX(pathMode), &freeHex)) {
+            && CanFit(adjHex, 1 - H2EnumIndex(pathMode), &freeHex)) {
             m_moveTargetHex = freeHex;
-            if (!HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+            if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
                 m_attackDirection = OppositeDirection(direction);
             } else {
                 attackMask = ~GetAttackMask(
                     m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
                 );
-                for (n = COMBAT_DIRECTION_NORTHEAST; IDX(n) < ARMY_COMBAT_DIRECTION_COUNT; n++) {
-                    if (attackMask & BIT(n)) {
+                for (n = COMBAT_DIRECTION_NORTHEAST; H2EnumIndex(n) < ARMY_COMBAT_DIRECTION_COUNT; n++) {
+                    if (attackMask & (1 << H2EnumIndex(n))) {
                         m_attackDirection = n;
                     }
                 }
             }
             return 1;
         } else {
-            directionMask |= 1 << IDX(direction);
+            directionMask |= 1 << H2EnumIndex(direction);
         }
     }
 
-    if (HAS(foe->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+    if ((H2EnumIndex((foe->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex += foe->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
-        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_EAST)
-                                                           : BIT(COMBAT_DIRECTION_WEST);
+        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))
+                                                           : (1 << H2EnumIndex(COMBAT_DIRECTION_WEST));
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(enemyHex, m_hex, directionMask);
             adjHex = GetAdjacentCellIndex(enemyHex, direction);
@@ -192,19 +190,17 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
                 m_attackDirection = GetBestDirection(m_moveTargetHex, enemyHex, 0);
                 return 1;
             } else {
-                directionMask |= 1 << IDX(direction);
+                directionMask |= 1 << H2EnumIndex(direction);
             }
         }
     }
     return 0;
 }
 
-VA(0x0044b5b4, 0x1a)
 i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
-VA(0x0044b5ce, 0x9e2)
 i32 army::FlyTo(i32 destination) {
     float xPos;
     float yRate0;
@@ -246,14 +242,14 @@ i32 army::FlyTo(i32 destination) {
     if (columnDelta1 > 0 && m_facing == ARMY_FACING_LEFT) {
         m_facingChanged = 1;
         m_facing = OppositeArmyFacing(m_facing);
-        if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             m_hex--;
             destination--;
         }
     } else if (columnDelta1 < 0 && m_facing == ARMY_FACING_RIGHT) {
         m_facingChanged = 1;
         m_facing = OppositeArmyFacing(m_facing);
-        if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             m_hex++;
             destination++;
         }
@@ -279,16 +275,15 @@ i32 army::FlyTo(i32 destination) {
     if (stepCount1 <= 0) {
         stepCount1 = 1;
     }
-    /* The parenthesised divisor casts are load-bearing: without them VC6 folds the
-       divisor into a single `fidiv` instead of pushing both operands onto the x87
-       stack. */
+
+
     xSpeed = static_cast<float>(xDistance) / (static_cast<float>(stepCount1));
     yRate0 = static_cast<float>(ySpan0) / (static_cast<float>(stepCount1));
 
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
-    if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
         srcRearHex0 = m_hex + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[srcRearHex0].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[srcRearHex0].m_occupantSide = COMBAT_SIDE_NONE;
@@ -318,44 +313,44 @@ i32 army::FlyTo(i32 destination) {
                 leg > 0
             );
             if (stepCount1 == 0) {
-                frameCount0 = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
+                frameCount0 = m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)];
                 frameStart = 0;
             } else {
                 if (leg > 0) {
                     frameCount0 +=
-                        m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_BEGIN_STANDING)];
+                        m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN_STANDING)];
                     frameStart = 0;
                 } else {
-                    frameStart = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_BEGIN)];
+                    frameStart = m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_BEGIN)];
                 }
-                frameCount0 = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_MIDDLE)];
+                frameCount0 = m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)];
                 midCount = frameCount0;
                 if (leg + 1 < stepCount1) {
-                    frameCount0 += m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_END)];
+                    frameCount0 += m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK_END)];
                 }
             }
 
             for (m_animationFrame = 0;
-                 m_animationFrame < m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
+                 m_animationFrame < m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)];
                  m_animationFrame++) {
                 if (m_animationFrame >= frameStart
                     && m_animationFrame < frameStart + frameCount0) {
                     xPos += xSpeed / frameCount0;
                     yPos += yRate0 / frameCount0;
                 }
-                if (m_animationFrame % m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
+                if (m_animationFrame % m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
                     == FLIGHT_SOUND_FRAME) {
                     if ((m_monsterType == CREATURE_VAMPIRE
                          || m_monsterType == CREATURE_VAMPIRE_LORD)
                         && leg == 0) {
-                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
+                        gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)]);
                         DelayMilli(VAMPIRE_FLIGHT_SOUND_DELAY);
                     } else if ((m_monsterType == CREATURE_VAMPIRE
                                 || m_monsterType == CREATURE_VAMPIRE_LORD)
                                && leg == stepCount1 - 1) {
-                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)]);
+                        gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_TWO)]);
                     } else {
-                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_MOVE)]);
+                        gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_MOVE)]);
                     }
                 }
 
@@ -429,7 +424,7 @@ i32 army::FlyTo(i32 destination) {
                     oldMaxY - oldMinY + 1
                 );
                 if (m_animationFrame
-                    == m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)] - 1) {
+                    == m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] - 1) {
                     xPos = fromX + (leg + 1) * xSpeed;
                     yPos = sourceY + (leg + 1) * yRate0;
                 }
@@ -443,7 +438,7 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
         static_cast<i8>(gpCombatManager->m_currentArmyIndex);
     gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
-    if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
         endRearHex = destination + (m_facing == ARMY_FACING_LEFT ? -1 : 1);
         gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
             static_cast<i8>(gpCombatManager->m_currentArmySide);
@@ -459,7 +454,7 @@ i32 army::FlyTo(i32 destination) {
     m_animationFrame = 0;
     if (m_facingChanged) {
         m_facing = OppositeArmyFacing(m_facing);
-        if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             if (m_facing == ARMY_FACING_LEFT) {
                 m_hex++;
                 destination++;

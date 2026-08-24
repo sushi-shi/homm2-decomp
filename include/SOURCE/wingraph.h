@@ -4,9 +4,9 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <wing.h>
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(WingraphConstant)
+typedef enum WingraphConstant {
     WINGRAPH_WIDTH                 = 640,
     WINGRAPH_HEIGHT                = 480,
     WINGRAPH_COLOR_DEPTH           = 8,
@@ -20,12 +20,13 @@ H2_ENUM_BEGIN(WingraphConstant)
     WINGRAPH_LOAD_LIBRARY_SUCCESS  = 32,
     WINGRAPH_PAINT_TIMEOUT         = 10000,
     WINGRAPH_ERROR_TEXT_SIZE       = 200
-H2_ENUM_END(WingraphConstant)
+} WingraphConstant;
 
-H2_ENUM_CLASS_BEGIN(WingraphGraphicsType)
+enum class WingraphGraphicsType : i32 {
     WINGRAPH_GRAPHICS_WING        = 1,
     WINGRAPH_GRAPHICS_DIRECT_DRAW = 2
-H2_ENUM_CLASS_END(WingraphGraphicsType)
+};
+using enum WingraphGraphicsType;
 
 #pragma pack(push, 1)
 struct _PALETTE {
@@ -34,14 +35,12 @@ struct _PALETTE {
     PALETTEENTRY entries[WINGRAPH_PALETTE_SIZE];
 };
 #pragma pack(pop)
-SIZE(_PALETTE, 0x404);
 
 struct _IMAGE {
     BITMAPINFOHEADER header;
     RGBQUAD colors[WINGRAPH_PALETTE_SIZE];
     void* bits;
 };
-SIZE(_IMAGE, 0x42c);
 
 typedef HRESULT(__stdcall* DirectDrawCreateProc)(
     GUID* guid,

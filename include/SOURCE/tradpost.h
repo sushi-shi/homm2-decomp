@@ -7,8 +7,8 @@
 
 struct tag_message;
 
-H2_ENUM_BEGIN(TradingPostConstant)
-    TRADING_POST_RESOURCE_COUNT     = IDX(RES_COUNT),
+typedef enum TradingPostConstant {
+    TRADING_POST_RESOURCE_COUNT     = H2EnumIndex(RES_COUNT),
     TRADING_POST_WINDOW_X           = 0x9f,
     TRADING_POST_WINDOW_Y           = 0x17,
     TRADING_POST_KNOB_X             = 0x43,
@@ -25,7 +25,7 @@ H2_ENUM_BEGIN(TradingPostConstant)
     TRADING_POST_RIGHT_ICON_FIRST   = 0x5a,
     TRADING_POST_RIGHT_TEXT_FIRST   = 0x64,
     TRADING_POST_RIGHT_SELECT_FIRST = 0x6e
-H2_ENUM_END(TradingPostConstant)
+} TradingPostConstant;
 
 void DoTradingPost(i32, float);
 void UpdateTradingPost(i32);

@@ -6,7 +6,7 @@
 
 class hero;
 
-H2_ENUM_BEGIN(EventConstant)
+typedef enum EventConstant {
     COMBAT_REMOTE_BUFFER_SIZE             = 0xFF,
     COMBAT_REMOTE_HEADER_SIZE             = 0x9b,
     COMBAT_REMOTE_HERO_FIRST_SIZE         = 200,
@@ -15,10 +15,10 @@ H2_ENUM_BEGIN(EventConstant)
     COMBAT_REMOTE_PACKET_HEADER_SIZE      = 9,
     COMBAT_REMOTE_FRAGMENT_TYPE           = 1,
     COMBAT_REMOTE_TIMEOUT                 = 90000
-H2_ENUM_END(EventConstant)
+} EventConstant;
 
-H2_ENUM_BEGIN(EventRecordConstant)
-    EVENT_RECORD_RESOURCE_COUNT          = IDX(RES_COUNT),
+typedef enum EventRecordConstant {
+    EVENT_RECORD_RESOURCE_COUNT          = H2EnumIndex(RES_COUNT),
     EVENT_RECORD_PLAYER_COUNT            = 6,
     EVENT_RECORD_ARMY_SLOT_COUNT         = 5,
     EVENT_RECORD_SKILL_CAPACITY          = 8,
@@ -32,9 +32,9 @@ H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
     EVENT_RECORD_HERO_NAME_SIZE          = 13,
     EVENT_RECORD_TOWN_NAME_SIZE          = 15
-H2_ENUM_END(EventRecordConstant)
+} EventRecordConstant;
 
-H2_ENUM_BEGIN(MapEventEncodingConstant)
+typedef enum MapEventEncodingConstant {
     EVENT_BARRIER_COLOR_MASK        = 7,
     EVENT_RECRUIT_TYPE_MASK         = 7,
     EVENT_RECRUIT_COUNT_SHIFT       = 3,
@@ -42,9 +42,9 @@ H2_ENUM_BEGIN(MapEventEncodingConstant)
     WISDOM_SPELL_LEVEL_BONUS        = 2,
     PYRAMID_GUARD_STACK_QUANTITY    = 10,
     AI_BATTLE_STAT_MAX              = 40
-H2_ENUM_END(MapEventEncodingConstant)
+} MapEventEncodingConstant;
 
-H2_ENUM_CLASS_BEGIN(GenericSiteType)
+enum class GenericSiteType : i32 {
     GENERIC_SITE_UNKNOWN         = -1,
     GENERIC_SITE_ALCHEMIST_TOWER = 0,
     GENERIC_SITE_ARENA           = 1,
@@ -53,21 +53,23 @@ H2_ENUM_CLASS_BEGIN(GenericSiteType)
     GENERIC_SITE_STABLES         = 4,
     GENERIC_SITE_MERMAID         = 5,
     GENERIC_SITE_SIRENS          = 6
-H2_ENUM_CLASS_END(GenericSiteType)
+};
+using enum GenericSiteType;
 
-H2_ENUM_BEGIN(GenericSiteEncodingConstant)
+typedef enum GenericSiteEncodingConstant {
     GENERIC_SITE_TYPE_MASK   = 0x3f,
     GENERIC_SITE_LEVEL_SHIFT = 6
-H2_ENUM_END(GenericSiteEncodingConstant)
+} GenericSiteEncodingConstant;
 
-H2_ENUM_CLASS_BEGIN(RecruitSiteType)
+enum class RecruitSiteType : i32 {
     RECRUITMENT_SITE_UNKNOWN       = -1,
     RECRUITMENT_SITE_BARROW_MOUNDS = 0,
     RECRUITMENT_SITE_EARTH_ALTAR   = 1,
     RECRUITMENT_SITE_AIR_ALTAR     = 2,
     RECRUITMENT_SITE_FIRE_ALTAR    = 3,
     RECRUITMENT_SITE_WATER_ALTAR   = 4
-H2_ENUM_CLASS_END(RecruitSiteType)
+};
+using enum RecruitSiteType;
 
 #pragma pack(push, 1)
 struct mapEventExtra {
@@ -102,7 +104,7 @@ struct timeEventExtra {
 struct mapHeroExtra {
     i8 owner;
     u8 hasCustomArmy;
-    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2EnumStorage<CreatureType, i8> troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
     u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
@@ -118,7 +120,7 @@ struct mapHeroExtra {
     u8 hasPatrol;
     union {
         i8 patrolRadius;
-        H2_ENUM_STORAGE(FactionType, i8) heroClass;
+        H2EnumStorage<FactionType, i8> heroClass;
     };
     i8 hasAssignedHero;
 };
@@ -128,7 +130,7 @@ struct mapTownExtra {
     u32 buildings;
     i8 mageGuildLevel;
     i8 hasCustomArmy;
-    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2EnumStorage<CreatureType, i8> troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
     u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasShrine;
     char unused18;
@@ -137,7 +139,7 @@ struct mapTownExtra {
 };
 #pragma pack(pop)
 
-H2_ENUM_BEGIN(MapEventConstant)
+typedef enum MapEventConstant {
     MAP_EVENT_DATA_EMPTY                 = 0,
     MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
@@ -273,23 +275,25 @@ H2_ENUM_BEGIN(MapEventConstant)
     COAST_FIZZLE_Y                       = 192,
     COAST_FIZZLE_WIDTH                   = 96,
     COAST_FIZZLE_HEIGHT                  = 96
-H2_ENUM_END(MapEventConstant)
+} MapEventConstant;
 
-H2_ENUM_CLASS_BEGIN(UndeadEventLevel)
+enum class UndeadEventLevel : i32 {
     EVENT_LEVEL_SMALL  = 2,
     EVENT_LEVEL_MEDIUM = 3,
     EVENT_LEVEL_LARGE  = 4,
     EVENT_LEVEL_HUGE   = 5
-H2_ENUM_CLASS_END(UndeadEventLevel)
+};
+using enum UndeadEventLevel;
 
-H2_ENUM_CLASS_BEGIN(FlotsamReward)
+enum class FlotsamReward : i32 {
     FLOTSAM_EMPTY          = 0,
     FLOTSAM_WOOD           = 1,
     FLOTSAM_WOOD_AND_GOLD  = 2,
     FLOTSAM_LARGE_TREASURE = 3
-H2_ENUM_CLASS_END(FlotsamReward)
+};
+using enum FlotsamReward;
 
-H2_ENUM_BEGIN(MonsterInteractionConstant)
+typedef enum MonsterInteractionConstant {
     MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_COUNT_MASK                      = 0xfff,
@@ -298,19 +302,19 @@ H2_ENUM_BEGIN(MonsterInteractionConstant)
     MONSTER_DIALOG_YES                      = 0x7805,
     MONSTER_DIALOG_NO                       = 0x7806,
     MONSTER_OFFER_BUFFER_SIZE               = 300
-H2_ENUM_END(MonsterInteractionConstant)
+} MonsterInteractionConstant;
 
 #define MONSTER_STRENGTH_JOIN 2.0
 #define MONSTER_STRENGTH_FLEE 5.0
 
-H2_ENUM_BEGIN(EventArtifactStatConstant)
+typedef enum EventArtifactStatConstant {
     EVENT_ARTIFACT_PRIMARY_STAT_COUNT     = 4,
     EVENT_ARTIFACT_SLOT_COUNT             = 14,
     EVENT_ARTIFACT_TAKE                   = 1,
     EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER = 10
-H2_ENUM_END(EventArtifactStatConstant)
+} EventArtifactStatConstant;
 
-H2_ENUM_BEGIN(EventEffectConstant)
+typedef enum EventEffectConstant {
     EVENT_WHIRLPOOL_TRIGGER_ROLL     = 1,
     EVENT_WHIRLPOOL_TRIGGER_MAX      = 3,
     EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT = 99999999,
@@ -321,7 +325,7 @@ H2_ENUM_BEGIN(EventEffectConstant)
     EVENT_FIZZLE_WIDTH               = 132,
     EVENT_FIZZLE_HEIGHT              = 132,
     EVENT_FIZZLE_STEPS               = 65
-H2_ENUM_END(EventEffectConstant)
+} EventEffectConstant;
 
 i8 StrEqNoCase(char*, char*);
 i32 GiveArtifact(class hero*, ArtifactType, b32, i8);

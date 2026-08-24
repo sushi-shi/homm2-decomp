@@ -1,9 +1,9 @@
 #ifndef HOMM2_BASE_EXEC_TYPES_H
 #define HOMM2_BASE_EXEC_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(ExecutiveTextSlotSize)
+typedef enum ExecutiveTextSlotSize {
     EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE = 0x3c,
     EXEC_TEXT_INPUT_INIT_SLOT_SIZE    = 0x58,
     EXEC_TEXT_DEVICE_INIT_SLOT_SIZE   = 0x20,
@@ -15,7 +15,7 @@ H2_ENUM_BEGIN(ExecutiveTextSlotSize)
     EXEC_TEXT_LIST_ENTRY_SLOT_SIZE    = 0x2c,
     EXEC_TEXT_LIST_STOP_SLOT_SIZE     = 0x20,
     EXEC_TEXT_TERMINATION_SLOT_SIZE   = 0xc
-H2_ENUM_END(ExecutiveTextSlotSize)
+} ExecutiveTextSlotSize;
 
 typedef struct SExecutiveText {
     char resourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE];
@@ -38,6 +38,5 @@ typedef struct SExecutiveText {
     char terminationMessage[EXEC_TEXT_TERMINATION_SLOT_SIZE];
 } SExecutiveText;
 
-SIZE(SExecutiveText, 0x25c);
 
 #endif

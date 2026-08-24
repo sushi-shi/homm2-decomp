@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/soundManager.h>
 #include <BASE/Midi.h>
 #include <BASE/MusicFlags.h>
@@ -10,29 +10,28 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-H2_ENUM_BEGIN(MidiSequenceStatus)
+typedef enum MidiSequenceStatus {
     SEQUENCE_PLAYING = 4
-H2_ENUM_END(MidiSequenceStatus)
+} MidiSequenceStatus;
 
-H2_ENUM_BEGIN(MidiVolumeConstant)
+typedef enum MidiVolumeConstant {
     VOLUME_HIGH_RANGE = 6,
     VOLUME_FADE_SPLIT = 10,
     VOLUME_LOW_RANGE  = 11,
     MAX_VOLUME        = 127
-H2_ENUM_END(MidiVolumeConstant)
+} MidiVolumeConstant;
 
-H2_ENUM_BEGIN(MidiConstant)
+typedef enum MidiConstant {
     MIDI_FILENAME_CAPACITY = 16
-H2_ENUM_END(MidiConstant)
+} MidiConstant;
 
-DATA(0x0051f554) i32 CurrentMidiFile = MIDI_NO_TRACK;
-DATA(0x0051f558) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+i32 CurrentMidiFile = MIDI_NO_TRACK;
+u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                                   1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-DATA(0x0051f594) static char gMidiFilenameFormat[] = "MIDI%04d.XMI";
+static char gMidiFilenameFormat[] = "MIDI%04d.XMI";
 
-VA(0x004c57d0, 0x51)
 bool MIDIStartup(void) {
     if (MusicFlagsActive())
         return true;
@@ -43,7 +42,6 @@ bool MIDIStartup(void) {
     return true;
 }
 
-VA(0x004c5830, 0xf0)
 void MIDIShutdown(void) {
     i32 i;
     if (!GetMusicFlagA())
@@ -67,7 +65,6 @@ void MIDIShutdown(void) {
     }
 }
 
-VA(0x004c5920, 0x17b)
 void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
     if (!GetMusicFlagA())
         return;
@@ -107,7 +104,6 @@ void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
     currentTrack = midiTrack;
 }
 
-VA(0x004c5aa0, 0xe7)
 void MIDIStop(i32& currentTrack) {
     if (!GetMusicFlagA())
         return;
@@ -127,7 +123,6 @@ void MIDIStop(i32& currentTrack) {
     currentTrack = MIDI_NO_TRACK;
 }
 
-VA(0x004c5b90, 0x56)
 bool MIDIIsPlaying(void) {
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED || !GetMusicFlagA()
         || CurrentMidiFile < 0 || hSequence[CurrentMidiFile] == NULL)
@@ -135,7 +130,6 @@ bool MIDIIsPlaying(void) {
     return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
 }
 
-VA(0x004c5bf0, 0x8f)
 void MIDISetVolume(i32& fadeSteps) {
     if (!GetMusicFlagA())
         return;
@@ -150,8 +144,8 @@ void MIDISetVolume(i32& fadeSteps) {
     AIL_set_XMIDI_master_volume(hMDI, volume);
 }
 
-DATA(0x005361a0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT] = {NULL};
-DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT] = {NULL};
-DATA(0x00536380) u8 gMusicFlagA = 0;
-DATA(0x00536381) u8 gMusicFlagB = 0;
-DATA(0x00536384) struct _MDI_DRIVER* hMDI = NULL;
+struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT] = {NULL};
+class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT] = {NULL};
+u8 gMusicFlagA = 0;
+u8 gMusicFlagB = 0;
+struct _MDI_DRIVER* hMDI = NULL;

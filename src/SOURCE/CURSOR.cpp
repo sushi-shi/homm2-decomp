@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Icon2b.h>
@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(CursorHeroShadowFrame)
+typedef enum CursorHeroShadowFrame {
     SPRITE_UP_STEP_1        = 0x2e,
     SPRITE_UP_STEP_2        = 0x2f,
     SPRITE_UP_STEP_3        = 0x31,
@@ -38,9 +38,9 @@ H2_ENUM_BEGIN(CursorHeroShadowFrame)
     SPRITE_UP_SHADOW_STEP_5 = 0x38,
     SPRITE_UP_SHADOW_STEP_4 = 0x39,
     SPRITE_UP_SHADOW_STEP_3 = 0x3a
-H2_ENUM_END(CursorHeroShadowFrame)
+} CursorHeroShadowFrame;
 
-H2_ENUM_BEGIN(CursorPrivateConstant)
+typedef enum CursorPrivateConstant {
     SLOW_CURSOR_CYCLE_START  = 2,
     SKIPPED_ANIMATION_FRAME  = 4,
     FOOTSTEP_ANIMATION_FRAME = 3,
@@ -49,13 +49,12 @@ H2_ENUM_BEGIN(CursorPrivateConstant)
     MOVE_TILE_HALF_COUNT     = 2,
     GROUP_ALLOC_LINE_OFFSET  = 7,
     GROUP_FREE_LINE_OFFSET   = 25
-H2_ENUM_END(CursorPrivateConstant)
+} CursorPrivateConstant;
 
 #define SLOW_TURN_DELAY_SCALE 1.5
 
 
-VA(0x004332d0, 0x124)
-void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
+void advManager::StartCursor(MapDirection direction) {
     i32 cellX;
     i32 directionY;
     i32 directionX_a;
@@ -68,8 +67,8 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
                         ? 1
                         : SLOW_CURSOR_CYCLE_START;
 
-    directionX_a = normalDirTable[IDX(direction)].x;
-    directionY = normalDirTable[IDX(direction)].y;
+    directionX_a = normalDirTable[H2EnumIndex(direction)].x;
+    directionY = normalDirTable[H2EnumIndex(direction)].y;
     m_previousCursorMapX = m_cursorMapX;
     m_previousCursorMapY = m_cursorMapY;
     m_cursorMapX += directionX_a;
@@ -79,7 +78,6 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
-VA(0x004333f4, 0xe6)
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
         bMoveSoundMade = 1;
@@ -100,7 +98,6 @@ void advManager::StopCursor(i32 stopSound) {
     m_cursorTurning = 0;
 }
 
-VA(0x004334da, 0x5dd)
 void advManager::DrawCursor(void) {
     i32 drawY;
     i32 drawFrame;
@@ -147,7 +144,7 @@ void advManager::DrawCursor(void) {
             );
         }
         FlipIconToBitmap(
-            m_heroIcons[IDX(m_cursorType)],
+            m_heroIcons[H2EnumIndex(m_cursorType)],
             gpWindowManager->m_screen,
             drawX,
             drawY,
@@ -222,7 +219,7 @@ void advManager::DrawCursor(void) {
             );
         }
         IconToBitmap(
-            m_heroIcons[IDX(m_cursorType)],
+            m_heroIcons[H2EnumIndex(m_cursorType)],
             gpWindowManager->m_screen,
             drawX,
             drawY,
@@ -299,7 +296,7 @@ void advManager::DrawCursor(void) {
             bMoveSoundMade = 1;
             if (EveryOther == 0) {
                 gpSoundManager->MemorySample(
-                    m_cursorSamples[IDX(giGroundToTerrain[GetCell(
+                    m_cursorSamples[H2EnumIndex(giGroundToTerrain[GetCell(
                                                              m_mapOriginX
                                                                  + CURSOR_MAP_DRAW_OFFSET,
                                                              m_mapOriginY
@@ -320,7 +317,6 @@ void advManager::DrawCursor(void) {
     }
 }
 
-VA(0x00433ab7, 0x327)
 void advManager::DrawCursorShadow(void) {
     i32 frame;
     i32 boatIndex;
@@ -436,8 +432,7 @@ void advManager::DrawCursorShadow(void) {
     }
 }
 
-VA(0x00433dde, 0x4e)
-i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
+i32 advManager::GetCursorBaseFrame(MapDirection direction) {
     if (direction > MAP_DIRECTION_SOUTH) {
         switch (direction) {
             case MAP_DIRECTION_SOUTH_WEST:
@@ -450,23 +445,22 @@ i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
                 return 0;
         }
     } else {
-        return IDX(direction) * CURSOR_FRAMES_PER_DIRECTION;
+        return H2EnumIndex(direction) * CURSOR_FRAMES_PER_DIRECTION;
     }
 }
 
-VA(0x00433e2c, 0x213)
-void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
+void advManager::TurnTo(MapDirection direction) {
     i32 inc = 1;
-    i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
+    i32 directionDifference = H2EnumIndex(direction) - H2EnumIndex(m_cursorDirection);
     if (directionDifference == 0)
         return;
     if ((directionDifference < 0 && directionDifference >= -DIRECTION_HALF_COUNT)
         || (directionDifference > 0 && directionDifference > DIRECTION_HALF_COUNT))
         inc = -1;
     m_cursorTurning = 1;
-    i32 frameIndex = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
+    i32 frameIndex = H2EnumIndex(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
     i32 delayTime =
-        giStepDelay[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+        giStepDelay[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_SLOWEST)
         delayTime *= CURSOR_SLOW_TURN_MULTIPLIER;
@@ -491,7 +485,7 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         if (frameIndex < 0)
             frameIndex = CURSOR_TURN_FRAME_COUNT - 1;
         frameIndex %= CURSOR_TURN_FRAME_COUNT;
-    } while (frameIndex != IDX(direction) * TURN_FRAME_MULTIPLIER);
+    } while (frameIndex != H2EnumIndex(direction) * TURN_FRAME_MULTIPLIER);
 
     m_cursorDirection = direction;
     StopCursor(1);
@@ -501,13 +495,12 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         UpdateScreen(0, 0);
 }
 
-VA(0x0043403f, 0x8b)
 i32 advManager::GetMoveShowIt(
     hero* movingHero,
-    H2_ENUM_PARAM(MapDirection, i32) direction
+    MapDirection direction
 ) {
-    i32 dx = normalDirTable[IDX(direction)].x;
-    i32 dy = normalDirTable[IDX(direction)].y;
+    i32 dx = normalDirTable[H2EnumIndex(direction)].x;
+    i32 dy = normalDirTable[H2EnumIndex(direction)].y;
     if ((gbThisNetHumanPlayer[giCurPlayer] || !gConfig.blackoutComputer)
         && (MapExtraPosAndAdjacentsSet(movingHero->m_x, movingHero->m_y, giCurWatchPlayerBit)
             || MapExtraPosAndAdjacentsSet(
@@ -520,9 +513,8 @@ i32 advManager::GetMoveShowIt(
         return 0;
 }
 
-VA(0x004340ca, 0x10fb)
 mapCell* advManager::MoveHero(
-    H2_ENUM_PARAM(MapDirection, i32) direction,
+    MapDirection direction,
     i32 stopAfterMove,
     i32* eventX,
     i32* eventY,
@@ -543,7 +535,7 @@ mapCell* advManager::MoveHero(
     hero* movingHero_g;
     i32 terrainCost_h;
     i32 stepDelay_b;
-    H2_ENUM_STORAGE(TerrainType, i32) currentTerrain_a;
+    H2EnumStorage<TerrainType, i32> currentTerrain_a;
     i32 oldHeroX;
     i32 directionY;
     i32 oldHeroY;
@@ -561,8 +553,8 @@ mapCell* advManager::MoveHero(
     movingHero_g = gpGame->GetHero(gpCurPlayer->m_currentHero);
     oldHeroX = movingHero_g->m_x;
     oldHeroY = movingHero_g->m_y;
-    directionX_a = normalDirTable[IDX(direction)].x;
-    directionY = normalDirTable[IDX(direction)].y;
+    directionX_a = normalDirTable[H2EnumIndex(direction)].x;
+    directionY = normalDirTable[H2EnumIndex(direction)].y;
     bShowIt = GetMoveShowIt(movingHero_g, direction);
     if (bShowIt)
         gbMoveShown = true;
@@ -572,9 +564,9 @@ mapCell* advManager::MoveHero(
     destinationCell = GetCell(movingHero_g->m_x + directionX_a, movingHero_g->m_y + directionY);
     terrainCost_h = CalcTerrainCost(
         currentTerrain_a,
-        IDX(direction) & 1,
+        H2EnumIndex(direction) & 1,
         movingHero_g->m_remainingMobility,
-        IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+        H2EnumIndex(movingHero_g->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
         currentCell_g->m_isRoad,
         destinationCell->m_isRoad
     );
@@ -582,7 +574,7 @@ mapCell* advManager::MoveHero(
         giGroundToTerrain[destinationCell->m_terrainImageIndex],
         0,
         movingHero_g->m_remainingMobility - terrainCost_h,
-        IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+        H2EnumIndex(movingHero_g->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
         destinationCell->m_isRoad,
         1
     );
@@ -610,7 +602,7 @@ mapCell* advManager::MoveHero(
         TurnTo(direction);
     movingHero_g->m_direction = direction;
 
-    if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
+    if ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED)))
         && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId == movingHero_g->m_id)
@@ -632,11 +624,11 @@ mapCell* advManager::MoveHero(
         m_cursorActive = 0;
     }
 
-    if (HAS(destinationCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+    if ((H2EnumIndex((destinationCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
         && gpAdvManager->ValidMoveWithEvent(movingHero_g, direction)) {
         switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_BOAT:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                if ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED))))
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = 0;
@@ -662,9 +654,8 @@ mapCell* advManager::MoveHero(
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                    if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                            HERO_EVENT_EMBARKED))
+                if ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+                    if ((H2EnumIndex((gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags) & (HERO_EVENT_EMBARKED))))
                         goto stoppingEvent;
                     else
                         goto movementDone;
@@ -723,15 +714,15 @@ mapCell* advManager::MoveHero(
         m_mapOriginX + directionX_a + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY + CURSOR_MAP_DRAW_OFFSET,
         giCurPlayer,
-        giVisRange[IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
+        giVisRange[H2EnumIndex(movingHero_g->m_secondarySkills[H2EnumIndex(HERO_SKILL_SCOUTING)])]
             + (movingHero_g->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
     );
     m_forceCompleteDraw = 1;
 
     pixelsPerStep =
-        giPixelsPerStep[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+        giPixelsPerStep[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     stepDelay_b =
-        giStepDelay[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+        giStepDelay[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     StartCursor(direction);
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_INSTANT) {
@@ -755,7 +746,7 @@ mapCell* advManager::MoveHero(
             giDeferObjDrawX = movingHero_g->m_x;
             giDeferObjDrawY = movingHero_g->m_y + directionY;
         } else if (directionX_a == -1 && directionY == -1) {
-            /* retail adds the Y delta here; both are -1 in this arm */
+
             giDeferObjDrawX = movingHero_g->m_x + directionY;
             giDeferObjDrawY = movingHero_g->m_y;
         }
@@ -816,7 +807,7 @@ mapCell* advManager::MoveHero(
     if (giGroundToTerrain[step_a] != m_currentTerrain) {
         m_currentTerrain = giGroundToTerrain[step_a];
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
     m_updateMinY = 0;
     m_updateMinX = 0;
@@ -824,8 +815,8 @@ mapCell* advManager::MoveHero(
     cursorCell_h = GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY);
     *eventX = m_mapOriginX + m_cursorMapX;
     *eventY = m_mapOriginY + m_cursorMapY;
-    if (HAS(cursorCell_h->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-        || (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
+    if ((H2EnumIndex((cursorCell_h->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
+        || ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED)))
             && cursorCell_h->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_i = cursorCell_h;
         switch (cursorCell_h->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
@@ -861,8 +852,8 @@ movementDone:
     if (!forceMove) {
         if (oldHeroX != movingHero_g->m_x || oldHeroY != movingHero_g->m_y) {
             if (*(mapExtra + movingHero_g->m_x + movingHero_g->m_y * MAP_WIDTH)
-                & IDX(MAP_EXTRA_ADJACENT_MONSTER)) {
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                & H2EnumIndex(MAP_EXTRA_ADJACENT_MONSTER)) {
+                if ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED))))
                     goto adjacentDone;
                 if (eventCell_i
                     && (eventCell_i->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_BOAT)
@@ -949,7 +940,6 @@ adjacentDone:
     return eventCell_i;
 }
 
-VA(0x004351c5, 0x156)
 void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     hero* currentHero_f;
     i32 killed_e;
@@ -996,10 +986,9 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     }
 }
 
-VA(0x0043531b, 0x116)
 i32 advManager::ValidMoveWithEvent(
     hero* movingHero,
-    H2_ENUM_PARAM(MapDirection, i32) direction
+    MapDirection direction
 ) {
     i32 dirX;
     i32 newX;
@@ -1007,8 +996,8 @@ i32 advManager::ValidMoveWithEvent(
     i32 newY;
     mapCell* destinationCell;
 
-    dirX = normalDirTable[IDX(direction)].x;
-    dirY = normalDirTable[IDX(direction)].y;
+    dirX = normalDirTable[H2EnumIndex(direction)].x;
+    dirY = normalDirTable[H2EnumIndex(direction)].y;
     newX = movingHero->m_x + dirX;
     newY = movingHero->m_y + dirY;
     if (newX < 0 || newX > MAP_WIDTH - 1 || newY < 0
@@ -1018,9 +1007,8 @@ i32 advManager::ValidMoveWithEvent(
     destinationCell = m_mapData->GetCell(newX, newY);
     switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
-            if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                        HERO_EVENT_EMBARKED))
+            if ((H2EnumIndex((movingHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
+                if ((H2EnumIndex((gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags) & (HERO_EVENT_EMBARKED))))
                     return 1;
                 else
                     return 0;
@@ -1031,8 +1019,7 @@ i32 advManager::ValidMoveWithEvent(
     }
 }
 
-VA(0x00435431, 0x457)
-i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventMode) {
+i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
     mapCell* destinationCell;
     i32 destinationMapY;
     i32 southDirection_a;
@@ -1048,8 +1035,8 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     mapCell* northNeighborCell_a;
     i32 centerY;
 
-    directionX = normalDirTable[IDX(direction)].x;
-    directionY_c = normalDirTable[IDX(direction)].y;
+    directionX = normalDirTable[H2EnumIndex(direction)].x;
+    directionY_c = normalDirTable[H2EnumIndex(direction)].y;
     destinationMapX_b = m_mapOriginX + directionX;
     destinationMapY = m_mapOriginY + directionY_c;
     centerX = m_mapOriginX + CURSOR_MAP_DRAW_OFFSET;
@@ -1089,8 +1076,8 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         return 0;
     }
 
-    northDirection_a = (1 << IDX(direction)) & CURSOR_NORTH_DIRECTION_MASK;
-    southDirection_a = (1 << IDX(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
+    northDirection_a = (1 << H2EnumIndex(direction)) & CURSOR_NORTH_DIRECTION_MASK;
+    southDirection_a = (1 << H2EnumIndex(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection_a) {
         if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
             && currentCell_c->m_objectTileset != TILESET_DUMMY
@@ -1126,7 +1113,6 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     return 1;
 }
 
-VA(0x00435888, 0x250)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     i32 oldOriginX;
     i32 oldOriginY;
@@ -1161,7 +1147,6 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     m_forceCompleteDraw = 1;
 }
 
-VA(0x00435ad8, 0x705)
 void advManager::ProcessMapChange(SMapChange change) {
     i32 outOfMobility;
     i32 adjacentMonster;
@@ -1188,7 +1173,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 change.id,
                 change.x,
                 change.y,
-                IDX(change.movement.direction),
+                H2EnumIndex(change.movement.direction),
                 change.sequence,
                 gpGame->GetHero(change.id)->m_x,
                 gpGame->GetHero(change.id)->m_y
@@ -1356,7 +1341,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!" /* "%s сокрушен!" */,
+                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!"  ,
                 cPlayerNames[change.id]
             );
             NormalDialog(
@@ -1379,7 +1364,6 @@ void advManager::ProcessMapChange(SMapChange change) {
     }
 }
 
-VA(0x004361dd, 0x189)
 void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     i32 slot;
 
@@ -1433,7 +1417,6 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     UnwindMapChangeQueue(0, 1);
 }
 
-VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     SMapChange* ptr0;
     i32 size;
@@ -1455,7 +1438,6 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     H2_FREE(buf);
 }
 
-VA(0x0043640d, 0x5e)
 void advManager::PurgeMapChangeQueue(void) {
     i32 slot;
 
@@ -1465,7 +1447,6 @@ void advManager::PurgeMapChangeQueue(void) {
         sMapChangeLastFew[slot].type = MAP_CHANGE_NONE;
 }
 
-VA(0x0043646b, 0x1b5)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queueCount;
     i32 unwoundChanges;
@@ -1513,7 +1494,6 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     }
 }
 
-VA(0x00436620, 0x117)
 void SendMapChange(
     MapChangeType type,
     i8 id,
@@ -1568,16 +1548,16 @@ void SendMapChange(
     );
 }
 
-DATA(0x004f19f0) i32 bMoveSoundMade = 1;
-DATA(0x004f19f4) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16};
-DATA(0x004f1a08) i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
-DATA(0x00524260) u8 EveryOther = 0;
-DATA(0x004f1a1c) i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
-DATA(0x00524258) i32 S1cursorCycle;
-DATA(0x00524220) i32 S1cursorFrameCount;
-DATA(0x0052425c) i32 S1cursorTurning;
-DATA(0x00524224) i32 S1cursorBaseFrame;
-DATA(0x00524254) H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
-DATA(0x00524228) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
+i32 bMoveSoundMade = 1;
+i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16};
+i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
+u8 EveryOther = 0;
+i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
+i32 S1cursorCycle;
+i32 S1cursorFrameCount;
+i32 S1cursorTurning;
+i32 S1cursorBaseFrame;
+H2EnumStorage<MapDirection, i32> S1cursorDirection;
+SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 #undef SLOW_TURN_DELAY_SCALE

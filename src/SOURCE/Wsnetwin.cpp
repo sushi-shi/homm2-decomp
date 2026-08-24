@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <windows.h>
 #include <winsock.h>
 #include <stddef.h>
@@ -18,13 +18,12 @@
 #include <BASE/widget.h>
 #include <SOURCE/Wsnetwin.h>
 
-H2_ENUM_BEGIN(WinsockPrivateConstant)
+typedef enum WinsockPrivateConstant {
     IP_ADDRESS_ENTRY_LIMIT = 20,
     SEND_ATTEMPT_LIMIT = 20,
     EXTRA_GUEST_PLAYER_THRESHOLD = 2
-H2_ENUM_END(WinsockPrivateConstant)
+} WinsockPrivateConstant;
 
-VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     struct hostent* pHost;
@@ -32,14 +31,11 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 plr;
 
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
+    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
         sprintf(
             gText,
-            /* Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы
-               получили доступ к диалоговым окнам Windows.
 
-               Когда соединение будет установлено, вы сможете вернуться в полноэкранный режим
-               нажав 'F4'. */
+
             "\xce\xe1 \xe8\xed\xe8\xf6\xe8\xe8\xf0\xee\xe2\xe0\xed\xe8\xe8 TCP/IP \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff. "
                 "\xc3\xe5\xf0\xee\xe8 II \xef\xe5\xf0\xe5\xea\xeb\xfe\xf7\xe0\xf2\xf1\xff \xe2 \xee\xea\xee\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec, \xf7\xf2\xee\xe1\xfb \xe2\xfb "
                 "\xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 \xe4\xee\xf1\xf2\xf3\xef \xea \xe4\xe8\xe0\xeb\xee\xe3\xee\xe2\xfb\xec \xee\xea\xed\xe0\xec Windows.\n\n"
@@ -96,10 +92,8 @@ i16 wsnet_init(void) {
         if (giTCPHostStatus != -1) {
             sprintf(
                 cWSTextBuffer,
-                /* Создание игры по адресу %s.
 
-                   У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
-                   игру, не дожидаясь  остальных гостей. */
+
                 "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
                     "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
                     "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
@@ -112,11 +106,8 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                /* Открытие игры на %s
 
-                   Ожидание гостя(ей).
 
-                     Нажмите 'ОТМЕНА', чтобы прервать соединение. */
                 "\xce\xf2\xea\xf0\xfb\xf2\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s\n\n"
                     "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff(\xe5\xe9).\n\n  "
                     "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.",
@@ -132,10 +123,8 @@ i16 wsnet_init(void) {
             if (giTCPNumPlayers > EXTRA_GUEST_PLAYER_THRESHOLD) {
                 sprintf(
                     cWSTextBuffer,
-                    /* Создание игры по адресу %s.
 
-                       У вас %d гостей из ожидавшихся %d гостей. Нажмите 'ОТМЕНА', чтобы продолжить
-                       игру, не дожидаясь  остальных гостей. */
+
                     "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
                         "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
                         "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
@@ -149,9 +138,8 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                /* Создание игры на %s.
 
-                   У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
+
                 "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
                     "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
                     "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
@@ -182,8 +170,8 @@ i16 wsnet_init(void) {
             );
         } else {
             GetDataEntry(
-                /* Введите IP адрес сервера.
-                   (Например: 220.415.119.223) */
+
+
                 "\xc2\xe2\xe5\xe4\xe8\xf2\xe5 IP \xe0\xe4\xf0\xe5\xf1 \xf1\xe5\xf0\xe2\xe5\xf0\xe0.\n"
                     "(\xcd\xe0\xef\xf0\xe8\xec\xe5\xf0: 220.415.119.223)",
                 cWSTextBuffer,
@@ -196,7 +184,7 @@ i16 wsnet_init(void) {
         giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
         if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
             NormalDialog(
-                /* Неправильный IP адрес. Попробуйте еще раз. */
+
                 "\xcd\xe5\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xfb\xe9 IP \xe0\xe4\xf0\xe5\xf1. "
                     "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe5\xf9\xe5 \xf0\xe0\xe7.",
                 NORMAL_DIALOG_WAIT_FIRST,
@@ -214,7 +202,7 @@ i16 wsnet_init(void) {
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         sprintf(
             cWSTextBuffer,
-            /* Поиск сервера. */ "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
+              "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
         );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
@@ -223,7 +211,6 @@ i16 wsnet_init(void) {
     return 0;
 }
 
-VA(0x004b2262, 0xb3)
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
@@ -243,10 +230,9 @@ void wsnet_term(void) {
     CleanupDPVars();
 }
 
-VA(0x004b2315, 0x1d3)
 void wsSendMessage(
     i32 destination,
-    H2_ENUM_PARAM(NetworkPacketType, u8) type,
+    NetworkPacketType type,
     u16 size,
     void* data
 ) {
@@ -306,7 +292,6 @@ void wsSendMessage(
     H2_FREE(packetBuffer);
 }
 
-VA(0x004b24e8, 0x4d)
 i32 wsnet_snd(i32 destination, i32 size, void* data) {
     i32 result;
 
@@ -323,7 +308,6 @@ i32 wsnet_snd(i32 destination, i32 size, void* data) {
     return 0;
 }
 
-VA(0x004b2535, 0x93)
 i16 wsnet_rcv(i16, u16, void* data) {
     u32 size;
 
@@ -337,7 +321,6 @@ i16 wsnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
-VA(0x004b25c8, 0x8b)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
     i32 addressLength = sizeof(remote);
@@ -367,7 +350,6 @@ void wsProcessMessages(void) {
     }
 }
 
-VA(0x004b2653, 0x344)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
     tag_message windowMessage;
@@ -448,7 +430,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 cWSTextBuffer,
                 "\xd1\xe5\xf0\xe2\xe5\xf0 \xf3\xe6\xe5 \xf1\xee\xe7\xe4\xe0\xeb \xe8\xe3\xf0\xf3 "
                 "\xe8 \xed\xe5 \xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xed\xee\xe2\xfb\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Сервер уже создал игру и не принимает новых игроков." */
+                "\xe8\xe3\xf0\xee\xea\xee\xe2."
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             ShutDown(NULL);
@@ -457,7 +439,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             sprintf(
                 cWSTextBuffer,
                 "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff "
-                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb." /* "Ожидаю игрока для начала игры." */
+                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb."
             );
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -478,7 +460,6 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-VA(0x004b2997, 0x1c)
 i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
     if (giNumHumanPlayers > 1)
@@ -486,7 +467,6 @@ i32 wsWaitForFirstGuest(void) {
     return 0;
 }
 
-VA(0x004b29b3, 0xaa)
 i32 wsWaitForExtraGuests(void) {
     tag_message message;
 
@@ -497,9 +477,8 @@ i32 wsWaitForExtraGuests(void) {
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             cWSTextBuffer,
-            /* Создание игры на %s.
 
-               У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков. */
+
             "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
                 "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
                 "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
@@ -516,7 +495,6 @@ i32 wsWaitForExtraGuests(void) {
     return 0;
 }
 
-VA(0x004b2a5d, 0xfd)
 i32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
         case 0:
@@ -538,7 +516,7 @@ i32 wsWaitForHost(void) {
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(
                     cWSTextBuffer,
-                    /* Сервер не отвечает. Продолжить ожидание? */ "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
+                      "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
                         "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xee\xe6\xe8\xe4\xe0\xed\xe8\xe5? "
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -556,17 +534,17 @@ i32 wsWaitForHost(void) {
     return 0;
 }
 
-DATA(0x005347b0) i32 bHostFound = 0;
-DATA(0x0051aa9c) u32 sd_dg = INVALID_SOCKET;
-DATA(0x0051aaa0) i32 iWSLastMsgNumHumanPlayers = 1;
-DATA(0x005347b4) i32 iWSAttempts = 0;
-DATA(0x005347b8) i32 iWSNextTickCount = 0;
-DATA(0x005347bc) i32 iWSWaitForHostStatus = 0;
-DATA(0x005344e8) i32 iRc;
-DATA(0x0053469c) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
-DATA(0x00534688) struct sockaddr_in saddr_loc;
-DATA(0x00534698) u16 wVer;
-DATA(0x005344f8) struct WSAData wsadata;
-DATA(0x005344f0) struct in_addr gIn_addrIP;
-DATA(0x005347a0) struct sockaddr_in saddr_remote;
-DATA(0x005344ec) i32 iAddrLen;
+i32 bHostFound = 0;
+u32 sd_dg = INVALID_SOCKET;
+i32 iWSLastMsgNumHumanPlayers = 1;
+i32 iWSAttempts = 0;
+i32 iWSNextTickCount = 0;
+i32 iWSWaitForHostStatus = 0;
+i32 iRc;
+char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
+struct sockaddr_in saddr_loc;
+u16 wVer;
+struct WSAData wsadata;
+struct in_addr gIn_addrIP;
+struct sockaddr_in saddr_remote;
+i32 iAddrLen;

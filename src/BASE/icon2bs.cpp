@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/icon2bs.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
@@ -6,19 +6,18 @@
 #include <string.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(IconScaleConstant)
+typedef enum IconScaleConstant {
     SCALE_NATIVE_SIZE = 0x20,
     SCALE_WORK_BITMAP_SIZE = 0x40
-H2_ENUM_END(IconScaleConstant)
+} IconScaleConstant;
 
-VA(0x004cc4e0, 0x209)
 void IconToBitmapScale(
     class icon* srcIcon,
     class bitmap* dest,
     i32 destX,
     i32 destY,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

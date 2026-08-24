@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
@@ -7,7 +7,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/netwin.h>
 
-H2_ENUM_BEGIN(NetbiosSetupConstant)
+typedef enum NetbiosSetupConstant {
     INIT_UNAVAILABLE         = 1,
     SETUP_SESSION_COUNT      = 5,
     HOST_SESSION             = 0,
@@ -20,9 +20,8 @@ H2_ENUM_BEGIN(NetbiosSetupConstant)
     BROADCAST_INTERVAL       = 500,
     REGISTERED_STATE_ADVANCE = 3,
     DETACH_SOURCE_SESSION    = 1
-H2_ENUM_END(NetbiosSetupConstant)
+} NetbiosSetupConstant;
 
-VA(0x00473830, 0x11c)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 reserved;
@@ -40,10 +39,7 @@ i8 InitNetHost(void) {
             break;
         case SETUP_CHECK_LOCAL_NAME:
             needName =
-                !HAS(
-                    static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION))),
-                    NETBIOS_SESSION_NAME_REGISTERED
-                );
+                !(H2EnumIndex((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION)))) & (NETBIOS_SESSION_NAME_REGISTERED)));
             if (needName)
                 iInitNetHostStatus++;
             else
@@ -65,16 +61,15 @@ i8 InitNetHost(void) {
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
-            if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_NAME_REGISTERED))
+            if ((H2EnumIndex((static_cast<NetbiosSessionStatus>(needName)) & (NETBIOS_SESSION_NAME_REGISTERED))))
                 return 1;
-            else if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_ERROR)) {
+            else if ((H2EnumIndex((static_cast<NetbiosSessionStatus>(needName)) & (NETBIOS_SESSION_ERROR)))) {
             }
             break;
     }
     return 0;
 }
 
-VA(0x0047394c, 0x19c)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 unregistered;
@@ -90,10 +85,7 @@ i8 InitNetGuest(void) {
             }
             break;
         case SETUP_CHECK_LOCAL_NAME:
-            if (HAS(
-                    static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION))),
-                    NETBIOS_SESSION_NAME_REGISTERED
-                ))
+            if ((H2EnumIndex((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION)))) & (NETBIOS_SESSION_NAME_REGISTERED))))
                 iInitNetGuestStatus += REGISTERED_STATE_ADVANCE;
             else
                 iInitNetGuestStatus++;
@@ -115,9 +107,9 @@ i8 InitNetGuest(void) {
         case SETUP_WAIT_FOR_LOCAL_NAME: {
             i32 status = static_cast<u8>(nb_stat(GUEST_SESSION));
             unregistered =
-                !HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_NAME_REGISTERED);
+                !(H2EnumIndex((static_cast<NetbiosSessionStatus>(status)) & (NETBIOS_SESSION_NAME_REGISTERED)));
             if (unregistered) {
-                if (HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_ERROR)) {
+                if ((H2EnumIndex((static_cast<NetbiosSessionStatus>(status)) & (NETBIOS_SESSION_ERROR)))) {
                     iNameRetryCount++;
                     iInitNetGuestStatus--;
                 }
@@ -141,16 +133,12 @@ i8 InitNetGuest(void) {
     return 0;
 }
 
-VA(0x00473ae8, 0x3b)
 i8 WaitForHost(void) {
     i32 status;
 
     switch (iWaitForHostStatus) {
         case WAIT_START:
-            status = HAS(
-                static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION))),
-                NETBIOS_SESSION_ACTIVE
-            );
+            status = (H2EnumIndex((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION)))) & (NETBIOS_SESSION_ACTIVE)));
             if (status != 0)
                 return 1;
             break;
@@ -158,7 +146,6 @@ i8 WaitForHost(void) {
     return 0;
 }
 
-VA(0x00473b23, 0xb3)
 i8 WaitForGuest(void) {
     i32 status;
 
@@ -171,10 +158,7 @@ i8 WaitForGuest(void) {
                 iWaitForGuestStatus++;
             return 0;
         case WAIT_POLL:
-            status = !HAS(
-                static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION))),
-                NETBIOS_SESSION_ACTIVE
-            );
+            status = !(H2EnumIndex((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION)))) & (NETBIOS_SESSION_ACTIVE)));
             if (status) {
                 if (KBTickCount() > iLastBroadcastTime + BROADCAST_INTERVAL) {
                     iLastBroadcastTime = KBTickCount();
@@ -193,7 +177,6 @@ i8 WaitForGuest(void) {
     return 0;
 }
 
-VA(0x00473bd6, 0x18c)
 i32 nbnet_init(void) {
     i32 unused;
 
@@ -239,9 +222,9 @@ i32 nbnet_init(void) {
     return 0;
 }
 
-DATA(0x0052863c) H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetHostStatus = SETUP_INITIALIZE;
-DATA(0x0052863d) H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetGuestStatus = SETUP_INITIALIZE;
-DATA(0x00528640) i32 iNameRetryCount = 0;
-DATA(0x00528644) H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForHostStatus = WAIT_START;
-DATA(0x00528645) H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForGuestStatus = WAIT_START;
-DATA(0x00528648) i32 iLastBroadcastTime = 0;
+H2SteppedEnumStorage<NetbiosSetupState, i8> iInitNetHostStatus = SETUP_INITIALIZE;
+H2SteppedEnumStorage<NetbiosSetupState, i8> iInitNetGuestStatus = SETUP_INITIALIZE;
+i32 iNameRetryCount = 0;
+H2SteppedEnumStorage<NetbiosWaitState, i8> iWaitForHostStatus = WAIT_START;
+H2SteppedEnumStorage<NetbiosWaitState, i8> iWaitForGuestStatus = WAIT_START;
+i32 iLastBroadcastTime = 0;

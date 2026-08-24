@@ -1,5 +1,5 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -13,7 +13,7 @@
 
 #define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
 #include <BASE/MiscEnums.h>
-H2_ENUM_BEGIN(DataEntryLayout)
+typedef enum DataEntryLayout {
     WINDOW_X                    = 0xb1,
     WINDOW_Y                    = 0x14,
     INPUT_BOX_Y_OFFSET          = 0x17,
@@ -38,9 +38,9 @@ H2_ENUM_BEGIN(DataEntryLayout)
     REDRAW_OFFSET               = 10,
     DRAW_MODE                   = 1,
     WIDGET_Z_ORDER              = -1
-H2_ENUM_END(DataEntryLayout)
+} DataEntryLayout;
 
-H2_ENUM_BEGIN(DataEntryWidgetId)
+typedef enum DataEntryWidgetId {
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
     ENTRY_BUTTON_ONE    = 0x7801,
@@ -49,9 +49,9 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
     ENTRY_BUTTON_SIX    = 0x7806,
     ENTRY_BUTTON_SEVEN  = 0x7807,
     ENTRY_BUTTON_EIGHT  = 0x7808
-H2_ENUM_END(DataEntryWidgetId)
+} DataEntryWidgetId;
 
-H2_ENUM_BEGIN(MiscLogPrivateConstant)
+typedef enum MiscLogPrivateConstant {
     MEMORY_LEAK_DEBUG_LEVEL   = 1,
     FILE_DEBUG_LEVEL          = 2,
     DEBUGGER_OUTPUT_LEVEL     = 4,
@@ -61,9 +61,9 @@ H2_ENUM_BEGIN(MiscLogPrivateConstant)
     MEMORY_ENTRY_CAPACITY     = 2000,
     REPORTED_MEMORY_KILOBYTES = 16034,
     ENTRY_SEARCH_COMPLETE     = 99999
-H2_ENUM_END(MiscLogPrivateConstant)
+} MiscLogPrivateConstant;
 
-H2_ENUM_BEGIN(MiscGameDefaultConstant)
+typedef enum MiscGameDefaultConstant {
     DEFAULT_WINDOW_ORIGIN        = 10,
     DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
@@ -78,9 +78,9 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     UNIQUE_ID_MIDDLE_INDEX       = 1,
     UNIQUE_ID_TRAILING_INDEX     = 2,
     UNIQUE_ID_TERMINATOR_INDEX   = 3
-H2_ENUM_END(MiscGameDefaultConstant)
+} MiscGameDefaultConstant;
 
-H2_ENUM_BEGIN(MiscCDDriveConstant)
+typedef enum MiscCDDriveConstant {
     CD_FIRST_DRIVE_INDEX        = 2,
     CD_DRIVE_SLOT_COUNT         = 26,
     CD_PATH_BUFFER_SIZE         = 100,
@@ -89,9 +89,9 @@ H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_PROBE_TRAILER_SIZE       = 100,
     CD_RETRY_DELAY_MILLISECONDS = 3000,
     CD_RETRY_LIMIT              = 2
-H2_ENUM_END(MiscCDDriveConstant)
+} MiscCDDriveConstant;
 
-H2_ENUM_BEGIN(PCXConstant)
+typedef enum PCXConstant {
     MANUFACTURER_ZSOFT    = 10,
     VERSION_3_0           = 5,
     ENCODING_RLE          = 1,
@@ -103,16 +103,16 @@ H2_ENUM_BEGIN(PCXConstant)
     VGA_PALETTE_MARKER    = 0x0c,
     PALETTE_BYTE_COUNT    = 0x300,
     COMPONENT_SCALE_SHIFT = 2
-H2_ENUM_END(PCXConstant)
+} PCXConstant;
 
-H2_ENUM_BEGIN(MiscCycleColorRange)
+typedef enum MiscCycleColorRange {
     CYCLE_RANGE_ONE_FIRST = 0xd6,
     CYCLE_RANGE_ONE_LAST  = 0xdd,
     CYCLE_RANGE_TWO_FIRST = 0xe7,
     CYCLE_RANGE_TWO_LAST  = 0xed
-H2_ENUM_END(MiscCycleColorRange)
+} MiscCycleColorRange;
 
-H2_ENUM_BEGIN(MiscFadeConstant)
+typedef enum MiscFadeConstant {
     FADE_LEVEL_COUNT              = 0x40,
     FADE_LEVEL_LAST               = 0x3f,
     FADE_CHANGE_THRESHOLD_COUNT   = 16,
@@ -121,29 +121,29 @@ H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_TO_INCREMENT_SHIFT       = 2,
     FADE_TO_START_LEVEL           = 0x30,
     FADE_TO_FRAME_DELAY           = 0x32
-H2_ENUM_END(MiscFadeConstant)
+} MiscFadeConstant;
 
-H2_ENUM_BEGIN(MiscPaletteComponent)
+typedef enum MiscPaletteComponent {
     PALETTE_COMPONENT_COUNT     = 3,
     PALETTE_RED_INDEX           = 0,
     PALETTE_GREEN_INDEX         = 1,
     PALETTE_BLUE_INDEX          = 2
-H2_ENUM_END(MiscPaletteComponent)
+} MiscPaletteComponent;
 
-H2_ENUM_BEGIN(MiscWindowConstant)
+typedef enum MiscWindowConstant {
     MINIMUM_WINDOW_WIDTH   = 320,
     MINIMUM_WINDOW_HEIGHT  = 240,
     WINDOW_POSITION_MARGIN = 200
-H2_ENUM_END(MiscWindowConstant)
+} MiscWindowConstant;
 
-H2_ENUM_BEGIN(MiscBlitConstant)
+typedef enum MiscBlitConstant {
     BLIT_SCROLL_OFFSET = 0x10,
     BLIT_SCROLL_EXTENT = 0x1c0,
     BLIT_SCREEN_WIDTH  = 0x280,
     BLIT_SCREEN_HEIGHT = 0x1e0
-H2_ENUM_END(MiscBlitConstant)
+} MiscBlitConstant;
 
-H2_ENUM_BEGIN(SeededRandomConstant)
+typedef enum SeededRandomConstant {
     INITIAL_SEED               = 0x08156a03,
     RANDOM_TERM_MULTIPLIER     = 13,
     RANDOM_TERM_MASK           = 0xFF,
@@ -157,13 +157,13 @@ H2_ENUM_BEGIN(SeededRandomConstant)
     RANDOM_MIX_SHIFT           = 4,
     RANDOM_TOP_BIT             = 31,
     RANDOM_HIGH_MIX_MULTIPLIER = 8
-H2_ENUM_END(SeededRandomConstant)
+} SeededRandomConstant;
 
-H2_ENUM_BEGIN(FileIdHashConstant)
+typedef enum FileIdHashConstant {
     HASH_LEFT_SHIFT  = 5,
     HASH_RIGHT_SHIFT = 25,
     INDEX_NOT_FOUND  = 0xffff
-H2_ENUM_END(FileIdHashConstant)
+} FileIdHashConstant;
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
@@ -182,35 +182,34 @@ H2_ENUM_END(FileIdHashConstant)
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-DATA(0x00536088) static i32 giFindMid = 0;
-DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime = 0;
-DATA(0x00536090) i32 inBoxY = 0;
-DATA(0x00536094) i32 inBoxX = 0;
-DATA(0x00536098) static i32 gBlitBottom = 0;
-DATA(0x0053609c) static i32 gBlitRight = 0;
-DATA(0x005360a0) class heroWindow* DataEntryWin = NULL;
-DATA(0x005360a4) char* cDEDest = NULL;
-DATA(0x005360a8) i32 iDEMaxLen = 0;
-DATA(0x005360ac) i32 iMemEntries = 0;
-DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
-DATA(0x005360b4) i32 giTotalMemAllocated = 0;
-DATA(0x0051e5dc) static char* gcCDTrackName =
+static i32 giFindMid = 0;
+H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
+i32 inBoxY = 0;
+i32 inBoxX = 0;
+static i32 gBlitBottom = 0;
+static i32 gBlitRight = 0;
+class heroWindow* DataEntryWin = NULL;
+char* cDEDest = NULL;
+i32 iDEMaxLen = 0;
+i32 iMemEntries = 0;
+MemEntry* gpMemEntry = NULL;
+i32 giTotalMemAllocated = 0;
+static char* gcCDTrackName =
     "\\Tracks2\\02-AudioTrack 02.ogg";
-DATA(0x0051e5e0) u8
+u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-DATA(0x0051e5f0) i32 iLastSeed = INITIAL_SEED;
-DATA(0x0051e5f4) static char gMemEntryTag[sizeof("IME")] = "IME";
+i32 iLastSeed = INITIAL_SEED;
+static char gMemEntryTag[sizeof("IME")] = "IME";
 
-H2_ENUM_BEGIN(StatusBarLayout)
+typedef enum StatusBarLayout {
     STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
     STATUS_TEXT_HEIGHT = 16
-H2_ENUM_END(StatusBarLayout)
+} StatusBarLayout;
 
-VA(0x004bd4b0, 0x75)
 void InitMemEntry(void) {
     LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
            LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
@@ -219,7 +218,6 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-VA(0x004bd530, 0x113)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     if (size == 0)
         return NULL;
@@ -246,7 +244,6 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-VA(0x004bd650, 0x154)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     if (gpMemEntry == NULL)
         InitMemEntry();
@@ -300,7 +297,6 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     }
 }
 
-VA(0x004bd7b0, 0xe7)
 void PrintMemoryLeaks(void) {
     if (giDebugLevel < MEMORY_LEAK_DEBUG_LEVEL)
         return;
@@ -331,15 +327,13 @@ void PrintMemoryLeaks(void) {
     }
 }
 
-VA(0x004bd8a0, 0x35)
 void ShowMemoryStatus(void) {
     i32 memLeft = MemSize(1);
     sprintf(gText, "Mem Left %dK", memLeft);
     AbsAiPrint(gText);
 }
 
-VA(0x004bd8e0, 0x10a)
-u32l MAKEFILEID(char* text) {
+u32l MAKEFILEID(const char* text) {
     u32 fileId;
     i32 size;
     char buf[GLOBAL_AGGREGATE_PATH_SIZE];
@@ -360,7 +354,6 @@ u32l MAKEFILEID(char* text) {
     return fileId;
 }
 
-VA(0x004bd9f0, 0xe7)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
     while (1) {
@@ -384,14 +377,13 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 #include <BASE/MiscGraphicsConstants.h>
 
-VA(0x004bdae0, 0x1af)
 void FadeIn(i32 increment) {
     i32 done, i, j, delayTime, threshold;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
     done = 0;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
@@ -418,14 +410,13 @@ void FadeIn(i32 increment) {
     delete pal;
 }
 
-VA(0x004bdc90, 0x1b2)
 void FadeOut(i32 increment) {
     i32 done, i, j, delayTime;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
     done = 0;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
+    if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
@@ -452,7 +443,6 @@ void FadeOut(i32 increment) {
     delete pal;
 }
 
-VA(0x004bde50, 0x40)
 i32 Random(i32 low, i32 high) {
     if (high == low) {
         return high;
@@ -463,7 +453,6 @@ i32 Random(i32 low, i32 high) {
     return rand() % (high - low + 1) + low;
 }
 
-VA(0x004bde90, 0x74)
 void ProcessAssert(i32 condition, char* file, i32 line) {
     i32 unusedAssertWord;
     if (condition == 0) {
@@ -477,7 +466,6 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
     }
 }
 
-VA(0x004bdf10, 0x75)
 char* FindStringInString(char* text, char* pattern) {
     i32 iLen = strlen(text);
     i32 patternLen = strlen(pattern);
@@ -488,7 +476,6 @@ char* FindStringInString(char* text, char* pattern) {
     return NULL;
 }
 
-VA(0x004bdf90, 0x56)
 char* FindToken(char* text, char token) {
     i32 iLen = strlen(text);
     for (i32 i = 0; i < iLen; ++i) {
@@ -498,7 +485,6 @@ char* FindToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004bdff0, 0x56)
 char* FindLastToken(char* text, char token) {
     i32 iLen = strlen(text);
     for (i32 i = iLen - 1; i >= 0; --i) {
@@ -508,14 +494,12 @@ char* FindLastToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004be050, 0x47)
 void SetInstallDefaults(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     strcpy(gConfig.autoLoadName, "AUTO");
     strcpy(gConfig.autoSaveName, "AUTO");
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
-VA(0x004be0a0, 0x29d)
 void SetGameDefaults(void) {
     i32 i;
     i32 seed;
@@ -527,7 +511,7 @@ void SetGameDefaults(void) {
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     gConfig.blackoutComputer = 0;
-    for (i = IDX(CONFIG_EXECUTABLE_GAME); i < IDX(CONFIG_EXECUTABLE_COUNT); ++i) {
+    for (i = H2EnumIndex(CONFIG_EXECUTABLE_GAME); i < H2EnumIndex(CONFIG_EXECUTABLE_COUNT); ++i) {
         gConfig.gfx[i].showMenu = 1;
         gConfig.gfx[i].x = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
@@ -560,7 +544,7 @@ void SetGameDefaults(void) {
     gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
     gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
-    // Неизвестный герой
+
     strcpy(
         gConfig.networkDefaultName,
         "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb\xe9 \xe3\xe5\xf0\xee\xe9"
@@ -581,7 +565,6 @@ void SetGameDefaults(void) {
     gConfig.needsDefaultInitialization = 0;
 }
 
-VA(0x004be340, 0xcb)
 void ReadPrefsFromFile(void) {
     i32 result;
     FILE* file;
@@ -612,15 +595,14 @@ void ReadPrefsFromFile(void) {
     );
 }
 
-H2_ENUM_BEGIN(RegistryValueSize)
+typedef enum RegistryValueSize {
     REGISTRY_TEXT_BUFFER_SIZE = 100,
     REGISTRY_DWORD_BYTES      = 4,
     MODEM_INIT_STRING_SIZE    = 0x62,
     UNIQUE_SYSTEM_ID_SIZE     = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
-H2_ENUM_END(RegistryValueSize)
+} RegistryValueSize;
 
-VA(0x004be410, 0x89f)
 void ReadPrefsFromRegistry(void) {
     DWORD dwcbData;
     HKEY hKey;
@@ -719,7 +701,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL DirectConnectComPort",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+            reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -727,7 +709,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL DirectConnectBaudRate",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+            reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -735,7 +717,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL ModemComPort",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+            reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -743,7 +725,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL ModemBaudRate",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+            reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
             &dwcbData
         );
         dwcbData = MODEM_INIT_STRING_SIZE + 1;
@@ -900,7 +882,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameShowMenu",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].showMenu),
             &dwcbData
         );
         RegQueryValueExA(
@@ -908,7 +890,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameWindowXLeft",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].x),
             &dwcbData
         );
         RegQueryValueExA(
@@ -916,7 +898,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameWindowYTop",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].y),
             &dwcbData
         );
         RegQueryValueExA(
@@ -924,7 +906,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameWindowWidth",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].width),
             &dwcbData
         );
         RegQueryValueExA(
@@ -932,7 +914,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameWindowHeight",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].height),
             &dwcbData
         );
         RegQueryValueExA(
@@ -940,7 +922,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameFullScreen",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].fullScreen),
             &dwcbData
         );
         RegQueryValueExA(
@@ -948,7 +930,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL GameColorMouseCursor",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
             &dwcbData
         );
         RegQueryValueExA(
@@ -956,7 +938,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorShowMenu",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].showMenu),
             &dwcbData
         );
         RegQueryValueExA(
@@ -964,7 +946,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorWindowXLeft",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].x),
             &dwcbData
         );
         RegQueryValueExA(
@@ -972,7 +954,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorWindowYTop",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].y),
             &dwcbData
         );
         RegQueryValueExA(
@@ -980,7 +962,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorWindowWidth",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].width),
             &dwcbData
         );
         RegQueryValueExA(
@@ -988,7 +970,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorWindowHeight",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].height),
             &dwcbData
         );
         RegQueryValueExA(
@@ -996,7 +978,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorFullScreen",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
             &dwcbData
         );
         RegQueryValueExA(
@@ -1004,7 +986,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL EditorColorMouseCursor",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
             &dwcbData
         );
         dwcbData = MODEM_INIT_STRING_SIZE + 1;
@@ -1035,22 +1017,21 @@ void ReadPrefsFromRegistry(void) {
                 ""
             );
         RegCloseKey(hKey);
-        if (gConfig.gfx[IDX(giCurExe)].width <= 0)
-            gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
-        if (gConfig.gfx[IDX(giCurExe)].height <= 0)
-            gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
-        if (gConfig.gfx[IDX(giCurExe)].x < 0)
-            gConfig.gfx[IDX(giCurExe)].x = 0;
-        if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-            gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-        if (gConfig.gfx[IDX(giCurExe)].y < 0)
-            gConfig.gfx[IDX(giCurExe)].y = 0;
-        if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-            gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].width <= 0)
+            gConfig.gfx[H2EnumIndex(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].height <= 0)
+            gConfig.gfx[H2EnumIndex(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].x < 0)
+            gConfig.gfx[H2EnumIndex(giCurExe)].x = 0;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+            gConfig.gfx[H2EnumIndex(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].y < 0)
+            gConfig.gfx[H2EnumIndex(giCurExe)].y = 0;
+        if (gConfig.gfx[H2EnumIndex(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+            gConfig.gfx[H2EnumIndex(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
     }
 }
 
-VA(0x004becb0, 0xa8)
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
@@ -1062,7 +1043,6 @@ void ReadPrefs(void) {
     sprintf(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
 }
 
-VA(0x004bed60, 0x63)
 void WritePrefsToFile(void) {
     i32 fd;
 
@@ -1074,7 +1054,6 @@ void WritePrefsToFile(void) {
     close(fd);
 }
 
-VA(0x004bedd0, 0x4cb)
 void WritePrefsToRegistry(void) {
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
@@ -1153,7 +1132,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL DirectConnectComPort",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+            reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1161,7 +1140,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL DirectConnectBaudRate",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+            reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1169,7 +1148,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL ModemComPort",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+            reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1177,7 +1156,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL ModemBaudRate",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+            reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1329,7 +1308,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameShowMenu",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].showMenu),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1337,7 +1316,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameWindowXLeft",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].x),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1345,7 +1324,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameWindowYTop",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].y),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1353,7 +1332,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameWindowWidth",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].width),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1361,7 +1340,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameWindowHeight",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].height),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1369,7 +1348,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameFullScreen",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].fullScreen),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1377,7 +1356,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL GameColorMouseCursor",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1385,7 +1364,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorShowMenu",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].showMenu),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1393,7 +1372,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorWindowXLeft",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].x),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1401,7 +1380,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorWindowYTop",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].y),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1409,7 +1388,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorWindowWidth",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].width),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1417,7 +1396,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorWindowHeight",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].height),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1425,7 +1404,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorFullScreen",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1433,27 +1412,24 @@ void WritePrefsToRegistry(void) {
             "HMM2POL EditorColorMouseCursor",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+            reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
             REGISTRY_DWORD_BYTES
         );
         RegCloseKey(hKey);
     }
 }
 
-VA(0x004bf2a0, 0xf)
 void WritePrefs(void) {
     UpdateSystemOptionsMenu();
     WritePrefsToRegistry();
 }
 
-VA(0x004bf2b0, 0x3f)
 i32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, "A:\\");
     gText[0] += driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-VA(0x004bf2f0, 0x7b)
 bool DriveSupportsFreeSpaceQuery(char driveLetter) {
     UINT oldMode;
     char szPath[CD_DRIVE_QUERY_PATH_SIZE];
@@ -1472,8 +1448,7 @@ bool DriveSupportsFreeSpaceQuery(char driveLetter) {
     }
 }
 
-VA(0x004bf370, 0x35f)
-H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
+CDRomSetupResult SetupCDDrive(void) {
     u32l dwErr;
     u32l drives;
     i32 i;
@@ -1559,24 +1534,21 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     return CD_ROM_EXPANSION_DISC_MISSING;
 }
 
-VA(0x004bf6d0, 0x2b)
 void BitmapToScreen(class bitmap* bmp) {
     BlitBitmapToScreen(bmp, 0, 0, bmp->m_width, bmp->m_height, 0, 0);
 }
 
-VA(0x004bf700, 0x5b)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
     memcpy(
         gCyclePal,
-        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        paletteData + H2EnumIndex(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
         sizeof(gCyclePal)
     );
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
 
-VA(0x004bf760, 0x36)
 void BlitBitmapToScreenNoMouseCheck(
     class bitmap* bmp,
     i32 sourceX,
@@ -1589,7 +1561,6 @@ void BlitBitmapToScreenNoMouseCheck(
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
 }
 
-VA(0x004bf7a0, 0x1e4)
 void BlitBitmapToScreen(
     class bitmap* bmp,
     i32 sourceX,
@@ -1636,7 +1607,6 @@ void BlitBitmapToScreen(
         gpMouseManager->RestoreUnderlying();
     }
 }
-VA(0x004bf990, 0x91)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
     i32 fileHandle;
@@ -1652,7 +1622,6 @@ void LogTruncate(void) {
 }
 
 
-VA(0x004bfa30, 0x9a)
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
     FILE* out;
@@ -1669,7 +1638,6 @@ void LogStr(char* text) {
         OutputDebugStringA(logText);
 }
 
-VA(0x004bfad0, 0x1b6)
 void LogInt(
     char* label,
     i32 value1,
@@ -1728,7 +1696,6 @@ void LogInt(
     LogStr(text);
 }
 
-VA(0x004bfc90, 0x76)
 void AiPrint(char* text) {
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
@@ -1756,7 +1723,6 @@ void AiPrint(char* text) {
     );
 }
 
-VA(0x004bfd10, 0x30)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
@@ -1764,7 +1730,6 @@ void AbsAiPrint(char* text) {
     giDebugLevel = saved;
 }
 
-VA(0x004bfd40, 0x19c)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 temp[MISC_PALETTE_BYTE_COUNT];
     u8 *current, *to;
@@ -1804,7 +1769,6 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
-VA(0x004bfee0, 0x163)
 void FadeToColorTable(u8* colorTable, i32 increment) {
     u8* p;
     i32 x;
@@ -1838,13 +1802,11 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     gpWindowManager->m_updateFlags = savedFlags;
 }
 
-VA(0x004c0050, 0x44)
 i32 IsCycleColor(i32 color) {
     return (color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
 }
 
-VA(0x004c00a0, 0x2a9)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     i32 fd;
     i32 iLen;
@@ -1910,7 +1872,6 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     close(fd);
 }
 
-VA(0x004c0350, 0x73)
 i32l FileSize(char* filename) {
     FILE* f;
     i32l lLen;
@@ -1927,11 +1888,9 @@ i32l FileSize(char* filename) {
     return lLen;
 }
 
-VA(0x004c03d0, 0x1e)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
     return reinterpret_cast<struct IconEntry*>(index * sizeof(IconEntry) + iconPtr->m_data);
 }
-VA(0x004c03f0, 0x72)
 i32 SRandom(i32 low, i32 high) {
     if (high == low) {
         return high;
@@ -1946,7 +1905,6 @@ i32 SRandom(i32 low, i32 high) {
     return result % (high - low + 1) + low;
 }
 
-VA(0x004c0470, 0x92)
 void SIncRandomize(i32 x, i32 y) {
     x *= RANDOM_TERM_MULTIPLIER;
     y *= RANDOM_TERM_MULTIPLIER;
@@ -1959,13 +1917,11 @@ void SIncRandomize(i32 x, i32 y) {
     iLastSeed += feedback << RANDOM_FEEDBACK_SHIFT;
 }
 
-VA(0x004c0510, 0x1f)
 void SRand(i32 seed) {
     iLastSeed = seed;
     srand(seed);
 }
 
-VA(0x004c0530, 0x92)
 i32 SGenRand(void) {
     i32 bitMask;
     i32 ret = 0;
@@ -1981,11 +1937,9 @@ i32 SGenRand(void) {
     return ret;
 }
 
-VA(0x004c05d0, 0x10)
 i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
-VA(0x004c05e0, 0x464)
 void GetDataEntry(
     char* prompt,
     char* destination,
@@ -2055,7 +2009,7 @@ void GetDataEntry(
 
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    msg.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     msg.payload.widget.id = ENTRY_BUTTON_ONE;
     DataEntryWin->BroadcastMessage(msg);
     msg.payload.widget.id = ENTRY_BUTTON_SEVEN;
@@ -2109,7 +2063,6 @@ void GetDataEntry(
     gbAllowTextEntryEscape = true;
 }
 
-VA(0x004c0a50, 0x1fa)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     i16 wId;
 

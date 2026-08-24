@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -13,35 +13,35 @@
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 
-H2_ENUM_BEGIN(ListBoxSourceFileConstant)
+typedef enum ListBoxSourceFileConstant {
     SOURCE_FILE_SLOT_SIZE = 0x2c
-H2_ENUM_END(ListBoxSourceFileConstant)
+} ListBoxSourceFileConstant;
 
-H2_ENUM_BEGIN(ListBoxTiming)
+typedef enum ListBoxTiming {
     DOUBLE_CLICK_TICKS = 0x190
-H2_ENUM_END(ListBoxTiming)
+} ListBoxTiming;
 
-H2_ENUM_BEGIN(ListBoxDestructorSourceFileOffset)
+typedef enum ListBoxDestructorSourceFileOffset {
     DESTRUCTOR_ITEM_SOURCE_FILE_OFFSET = 0,
     DESTRUCTOR_LIST_SOURCE_FILE_OFFSET = SOURCE_FILE_SLOT_SIZE
-H2_ENUM_END(ListBoxDestructorSourceFileOffset)
+} ListBoxDestructorSourceFileOffset;
 
-H2_ENUM_BEGIN(ListBoxDeleteSourceFileOffset)
+typedef enum ListBoxDeleteSourceFileOffset {
     DELETE_ITEM_SOURCE_FILE_OFFSET       = 0,
     DELETE_LIST_SOURCE_FILE_OFFSET       = SOURCE_FILE_SLOT_SIZE,
     DELETE_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
     DELETE_OLD_LIST_SOURCE_FILE_OFFSET   = 3 * SOURCE_FILE_SLOT_SIZE
-H2_ENUM_END(ListBoxDeleteSourceFileOffset)
+} ListBoxDeleteSourceFileOffset;
 
-H2_ENUM_BEGIN(ListBoxMainSourceFileOffset)
+typedef enum ListBoxMainSourceFileOffset {
     REPLACE_ITEM_SOURCE_FILE_OFFSET           = 0,
     REPLACE_ALLOCATION_SOURCE_FILE_OFFSET     = SOURCE_FILE_SLOT_SIZE,
     APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
     APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET = 3 * SOURCE_FILE_SLOT_SIZE,
     APPEND_OLD_LIST_SOURCE_FILE_OFFSET        = 4 * SOURCE_FILE_SLOT_SIZE
-H2_ENUM_END(ListBoxMainSourceFileOffset)
+} ListBoxMainSourceFileOffset;
 
-H2_ENUM_BEGIN(ListBoxFrame)
+typedef enum ListBoxFrame {
     FRAME_FIRST_ROW           = 0,
     FRAME_MIDDLE_ROW          = 1,
     FRAME_LAST_ROW            = 2,
@@ -53,13 +53,13 @@ H2_ENUM_BEGIN(ListBoxFrame)
     FRAME_SCROLL_TRACK_MIDDLE = 8,
     FRAME_SCROLL_TRACK_LAST   = 9,
     FRAME_SCROLL_THUMB        = 10
-H2_ENUM_END(ListBoxFrame)
+} ListBoxFrame;
 
-H2_ENUM_BEGIN(ListBoxStorageConstant)
+typedef enum ListBoxStorageConstant {
     RESOURCE_NAME_CAPACITY = 16
-H2_ENUM_END(ListBoxStorageConstant)
+} ListBoxStorageConstant;
 
-H2_ENUM_BEGIN(ListBoxLayoutConstant)
+typedef enum ListBoxLayoutConstant {
     LIST_EDGE_ROW_COUNT         = 2,
     TEXT_LEFT_INSET             = 5,
     TEXT_HORIZONTAL_INSET_COUNT = 2,
@@ -71,14 +71,13 @@ H2_ENUM_BEGIN(ListBoxLayoutConstant)
     SCROLL_THUMB_TRAVEL_PADDING = 7,
     SCROLL_THUMB_CENTER_DIVISOR = 2,
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
-H2_ENUM_END(ListBoxLayoutConstant)
+} ListBoxLayoutConstant;
 
-H2_ENUM_BEGIN(ListBoxSelectionClickCount)
+typedef enum ListBoxSelectionClickCount {
     SELECTION_SINGLE_CLICK = 1,
     SELECTION_DOUBLE_CLICK = 2
-H2_ENUM_END(ListBoxSelectionClickCount)
+} ListBoxSelectionClickCount;
 
-VA(0x004ce6a0, 0x5d)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_itemCount = 0;
     m_items = NULL;
@@ -87,7 +86,6 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_scrollbar = NULL;
 }
 
-VA(0x004ce730, 0x105)
 listBoxWidget::~listBoxWidget() {
     i32 i;
     gpResourceManager->Dispose(m_font);
@@ -95,14 +93,11 @@ listBoxWidget::~listBoxWidget() {
     if (m_scrollbar != NULL)
         delete m_scrollbar;
     for (i = 0; i < m_itemCount; i++)
-#line 25
         H2_FREE(m_items[i]);
-#line 27
     H2_FREE(m_items);
     gbSendMouseMoveMessages = false;
 }
 
-VA(0x004ce840, 0x41c)
 void listBoxWidget::Read(void) {
     IconEntry* entry;
     i8 name[RESOURCE_NAME_CAPACITY];
@@ -174,7 +169,6 @@ void listBoxWidget::Read(void) {
     m_visibleItemCount = 0;
 }
 
-VA(0x004cec60, 0x1f1)
 void listBoxWidget::DeleteItem(i32 index) {
     if (m_itemCount > index) {
         if (m_selectedIndex == index)
@@ -188,12 +182,10 @@ void listBoxWidget::DeleteItem(i32 index) {
         if (m_topIndex > m_scrollRange)
             m_topIndex = m_scrollRange;
         if (m_itemCount == 1) {
-#line 156
             H2_FREE(m_items[0]);
             H2_FREE(m_items);
             m_items = NULL;
         } else {
-#line 162
             char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
             memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
@@ -203,7 +195,6 @@ void listBoxWidget::DeleteItem(i32 index) {
                     (m_itemCount - index - 1) * sizeof(*m_items)
                 );
             if (m_items != NULL)
-#line 169
                 H2_FREE(m_items);
             m_items = newItems;
         }
@@ -212,14 +203,13 @@ void listBoxWidget::DeleteItem(i32 index) {
     }
 }
 
-VA(0x004cee60, 0x48c)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     i16 x;
     i16 y;
     char* text;
     char** newItems;
 
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -246,7 +236,6 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                         break;
                     text = message.payload.widget.data.text;
                     if (m_itemCount > message.payload.widget.parameter) {
-#line 222
                         H2_FREE(m_items[message.payload.widget.parameter]);
                         m_items[message.payload.widget.parameter] =
                             static_cast<char*>(H2_ALLOC(strlen(text) + 1));
@@ -258,16 +247,13 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                     if (message.payload.widget.id != m_id)
                         break;
                     text = message.payload.widget.data.text;
-#line 233
                     newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
-#line 236
                     newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
                     strcpy(newItems[m_itemCount], text);
                     m_itemCount++;
                     if (m_items != NULL)
-#line 240
                         H2_FREE(m_items);
                     m_items = newItems;
                     if (m_itemCount > m_maxVisibleItems) {
@@ -297,7 +283,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN:
-            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW))))
                 break;
             x = message.payload.mouse.x - m_owner->m_posX;
             y = message.payload.mouse.y - m_owner->m_posY;
@@ -315,19 +301,17 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
 
         case MESSAGE_MOUSE_MOVE:
         case MESSAGE_LEFT_BUTTON_UP:
-            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW))))
                 break;
             return ProcessMouseMessage(message);
     }
     return widget::Main(message);
 }
 
-VA(0x004cf2f0, 0x15)
 void listBoxWidget::Draw(void) {
     DrawLBStuff(0);
 }
 
-VA(0x004cf310, 0x54e)
 void listBoxWidget::DrawLBStuff(i32 doUpdate) {
     i32 row;
     i32 x;
@@ -419,7 +403,6 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             ->UpdateScreenRegion(m_owner->m_posX + m_x, m_owner->m_posY + m_y, m_width, m_height);
 }
 
-VA(0x004cf860, 0x4f2)
 MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     i32 offset;
     i32 x;
@@ -533,6 +516,3 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(listBoxWidget, 0x004ea9e0)

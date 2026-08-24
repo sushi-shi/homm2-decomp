@@ -1,13 +1,13 @@
 #ifndef HOMM2_SOURCE_HIGHSCOREMANAGER_H
 #define HOMM2_SOURCE_HIGHSCOREMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/baseManager.h>
 
 struct tag_message;
 class heroWindow;
 
-H2_ENUM_BEGIN(HighScoreManagerConstant)
+typedef enum HighScoreManagerConstant {
     HIGH_SCORE_DISPLAY_ENTRY_COUNT         = 10,
     HIGH_SCORE_ANIMATION_FRAME_COUNT       = 18,
     HIGH_SCORE_ANIMATION_DELAY             = 120,
@@ -44,7 +44,7 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_UPDATE_WIDTH                = 76,
     HIGH_SCORE_UPDATE_HEIGHT               = 406,
     HIGH_SCORE_MANAGER_OPEN_OK             = 0
-H2_ENUM_END(HighScoreManagerConstant)
+} HighScoreManagerConstant;
 
 #pragma pack(push, 1)
 class highScoreManager : public baseManager {
@@ -54,11 +54,10 @@ public:
     char m_showCampaignScores;
     heroWindow* m_window;
     highScoreManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Update(void);
 };
 #pragma pack(pop)
-SIZE(highScoreManager, 0x63);
 #endif
