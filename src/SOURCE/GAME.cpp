@@ -5582,10 +5582,10 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
         for (row = 0; row < MAP_HEIGHT; row++) {
             for (col = 0; col < MAP_WIDTH; col++) {
                 i32 distance = static_cast<i32>(
-                    sqrt(static_cast<double>((x - col) * (x - col) + (y - row) * (y - row)))
+                    sqrt(static_cast<double>((y - row) * (y - row) + (x - col) * (x - col)))
                 );
                 if (distance < radius) {
-                    mapExtra[MAP_WIDTH * row + col] |= mask;
+                    *(mapExtra + col + MAP_WIDTH * row) |= mask;
                 }
             }
         }
@@ -5595,7 +5595,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
                 visibility = radius - abs(y - row) + radius - abs(x - col);
                 if (visibility >= cutoff && col >= 0 && row >= 0 && col < MAP_WIDTH
                     && row < MAP_HEIGHT) {
-                    mapExtra[MAP_WIDTH * row + col] |= mask;
+                    *(mapExtra + col + MAP_WIDTH * row) |= mask;
                 }
             }
         }
