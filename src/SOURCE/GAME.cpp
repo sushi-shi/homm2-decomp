@@ -820,8 +820,8 @@ VA(0x00470fda, 0x97)
 i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     i32 count = 0;
     i32 i;
+    i32 j;
     for (i = 0; i < m_heroCount; i++) {
-        i32 j;
         for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
             if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == artifact)
                 count++;
@@ -2814,7 +2814,7 @@ void game::InitializePasswords(void) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = 1;
             for (j = 0; j < i; j++) {
-                if (xPasswordStringsIndex[j] == xPasswordStringsIndex[i])
+                if (xPasswordStringsIndex[i] == xPasswordStringsIndex[j])
                     flag = 0;
             }
         }

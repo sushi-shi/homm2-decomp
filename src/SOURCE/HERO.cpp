@@ -2041,7 +2041,7 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 
 VA(0x004705c2, 0xc3)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
-    i8 shrineAndArtifactBonus = 0;
+    i8 bonus = 0;
     // Necromancy bonuses turn the stored 0..3 tier into a 10%-per-point effect score.
     i8 baseLevel;
 
@@ -2051,12 +2051,12 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     if (baseLevel == IDX(HERO_SKILL_LEVEL_NONE))
         return IDX(baseLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
-        shrineAndArtifactBonus++;
+        bonus++;
     if (m_cursorType == FACTION_NECROMANCER)
-        shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
-    if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
-        shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    baseLevel += shrineAndArtifactBonus;
+        bonus += gpGame->CountShrines(m_owner);
+    if (bonus > HERO_NECROMANCY_BONUS_MAX)
+        bonus = HERO_NECROMANCY_BONUS_MAX;
+    baseLevel += bonus;
     if (baseLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
         baseLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
     return IDX(baseLevel);

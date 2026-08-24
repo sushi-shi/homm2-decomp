@@ -7072,18 +7072,18 @@ void advManager::DemobilizeCurrHero(void) {
     m_heroContextLocked = 0;
     hero* currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     StopCursor(1);
-    mapCell* currentCell = GetCell(currentHero->m_x, currentHero->m_y);
-    currentHero->m_locationType = currentCell->m_triggerType;
-    currentHero->m_occupiedTown = currentCell->m_objectMetadata;
+    mapCell* cell = GetCell(currentHero->m_x, currentHero->m_y);
+    currentHero->m_locationType = cell->m_triggerType;
+    currentHero->m_occupiedTown = cell->m_objectMetadata;
     currentHero->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
         currentHero->m_eventFlags = HeroEventFlag(
             static_cast<i32>(currentHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
         );
     }
-    currentCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-    currentCell->m_objectMetadata = currentHero->m_id;
-    currentCell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+    cell->m_objectMetadata = currentHero->m_id;
+    cell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
     m_cursorActive = 0;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
