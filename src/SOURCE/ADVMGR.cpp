@@ -9126,17 +9126,17 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     if (originX < SCROLL_MIN_ORIGIN) {
         originX = SCROLL_MIN_ORIGIN;
     }
-    if (MAP_WIDTH - VIEW_EDGE_MARGIN < originX) {
+    if (originX > MAP_WIDTH - VIEW_EDGE_MARGIN) {
         originX = MAP_WIDTH - VIEW_EDGE_MARGIN;
     }
     if (originY < SCROLL_MIN_ORIGIN) {
         originY = SCROLL_MIN_ORIGIN;
     }
-    if (MAP_HEIGHT - VIEW_EDGE_MARGIN < originY) {
+    if (originY > MAP_HEIGHT - VIEW_EDGE_MARGIN) {
         originY = MAP_HEIGHT - VIEW_EDGE_MARGIN;
     }
 
-    if (m_mapOriginX != originX || m_mapOriginY != originY) {
+    if (originX != m_mapOriginX || originY != m_mapOriginY) {
         DemobilizeCurrHero();
         m_mapOriginX = originX;
         m_mapOriginY = originY;
