@@ -273,11 +273,12 @@ i32 inputManager::Open(i32 priority) {
 
 VA(0x004ce2b0, 0x20)
 void inputManager::Close(void) {
-    if (m_active == true) {
-        ResetEventQueue(this);
-        m_requestedPriority = 0;
-        m_active = false;
-    }
+    if (m_active != true)
+        return;
+
+    ResetEventQueue(this);
+    m_requestedPriority = 0;
+    m_active = false;
 }
 
 VA(0x004ce2d0, 0x5)
