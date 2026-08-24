@@ -16,9 +16,9 @@ H2_ENUM_END(IconWidgetConstant)
 
 VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
+    m_icon = NULL;
     m_frame = 0;
     m_fillColor = 0;
-    m_icon = NULL;
     m_orientation = ICON_DRAW_NORMAL;
     m_iconId = 0;
 }

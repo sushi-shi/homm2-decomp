@@ -16,9 +16,9 @@ H2_ENUM_END(BorderConstant)
 
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
+    m_fillColor = 0;
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
-    m_fillColor = 0;
 }
 
 
