@@ -88,11 +88,11 @@ H2_ENUM_END(ListBoxSelectionClickCount)
 
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
-    m_items = NULL;
-    m_scrollbar = NULL;
-    m_selectedIndex = -1;
     m_itemCount = 0;
+    m_items = NULL;
+    m_selectedIndex = -1;
     m_lastSelectedIndex = -1;
+    m_scrollbar = NULL;
 }
 
 VA(0x004db0d0, 0x86)

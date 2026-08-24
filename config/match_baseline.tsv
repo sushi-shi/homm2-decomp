@@ -373,7 +373,7 @@ BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.8298	95a0
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	05f27a372010.30f5cab9fe5a
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	85.4861	b6be8fbc694d.2e149f56ae53
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	98.4719	876a85e5b4ce.4dabe2f544ff
-BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	40e385482543
+BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	ad64ed00b6e5
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	09f021777edb
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	0c7ef3a9e420
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	0628dc7098ba
