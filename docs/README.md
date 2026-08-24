@@ -55,6 +55,13 @@ Their successors grow here from VC6-measured evidence.
   PoL line's compiler; compiler-scoped).
 - `archive/` contains contracts for retired experiment tools; it is not active workflow guidance.
 
+## Cross-version and branch policy
+
+- `version-changes.md` is the functional 2.0 -> Gold 2.1 -> Buka ledger.
+- `cross-version-spellings.md` records matching-only donor decisions for PoL.
+- `base-selection-audit.md` records the provisional Buka-base decision,
+  defect gate, and the target `clean`/terminal-`classic`/`master` topology.
+
 ## Retention rule
 
 Keep a document when it is a tool contract, reproducible retail/toolchain evidence, an active
