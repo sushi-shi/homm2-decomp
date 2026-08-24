@@ -4798,8 +4798,8 @@ VA(0x00442771, 0x53)
 i32 philAI::NetValueOfArtifact(i32 a1, i32 a2, i32 a3, i32 a4) {
     return static_cast<i32>(
         static_cast<float>(gArtifactBaseRV[a1])
-        - (static_cast<float>(a4) * gafAITurnCostResource[a3]
-           + static_cast<float>(a2) * gafAITurnCostResource[IDX(RES_GOLD)])
+        - (static_cast<float>(a2) * gafAITurnCostResource[IDX(RES_GOLD)]
+           + static_cast<float>(a4) * gafAITurnCostResource[a3])
     );
 }
 
