@@ -2099,14 +2099,14 @@ i32 combatManager::ShotIsThroughWall(
             static_cast<i32>(traceRow1) * COMBAT_GRID_ROW_LENGTH + static_cast<i32>(traceColumn6);
         for (structureIndex0 = 0; structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
              structureIndex0++) {
-            if (iWallToHexCell[structureIndex0] == traceHex11
+            if (traceHex11 == iWallToHexCell[structureIndex0]
                 && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_DESTROYED
                 && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
-            if (iTowerToHexCell[structureIndex0] == traceHex11
+            if (traceHex11 == iTowerToHexCell[structureIndex0]
                 && m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
