@@ -8,6 +8,7 @@
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/Utf8.h>
 #include <BASE/soundManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/advManager.h>
@@ -19,6 +20,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
@@ -147,16 +149,6 @@ enum class BerserkMaskIndex : i32 {
 };
 using enum BerserkMaskIndex;
 
-typedef enum Cp1251Letter {
-    CP1251_CAPITAL_YO = 0xa8,
-    CP1251_SMALL_YO   = 0xb8,
-    CP1251_CAPITAL_A  = 0xc0,
-    CP1251_CAPITAL_YA = 0xdf,
-    CP1251_SMALL_A    = 0xe0,
-    CP1251_SMALL_YA   = 0xff,
-    TARGET_NAME_SIZE  = 100
-} Cp1251Letter;
-
 #define PROJECTILE_HALF_TURN_DEGREES_FLOAT 180.0
 #define PROJECTILE_DIRECTION_MIDPOINT_DIVISOR 2.0f
 #define DAMAGE_DOUBLE_MULTIPLIER 2.0f
@@ -164,36 +156,55 @@ typedef enum Cp1251Letter {
 #define DAMAGE_ROUNDING_OFFSET 0.5
 
 
-inline char ToLowerCp1251(u8 letter) {
-    if (letter >= 'A' && letter <= 'Z') {
-        return static_cast<char>(letter + ARMY_ASCII_CASE_OFFSET);
+void FormatCombatDamage(
+    char* output,
+    const char* attackerName,
+    bool attackerIsPlural,
+    i32 damage,
+    i32 killed,
+    const char* victimName
+) {
+    if (killed > 0) {
+        if (victimName != NULL) {
+            sprintf(
+                output,
+                localization::TrPlural(
+                    attackerIsPlural ? "combat.attack.plural.damage_with_kills"
+                                     : "combat.attack.singular.damage_with_kills",
+                    killed
+                ),
+                attackerName,
+                damage,
+                killed,
+                victimName
+            );
+        } else {
+            sprintf(
+                output,
+                localization::TrPlural(
+                    attackerIsPlural ? "combat.attack.plural.damage_with_generic_kills"
+                                     : "combat.attack.singular.damage_with_generic_kills",
+                    killed
+                ),
+                attackerName,
+                damage,
+                killed
+            );
+        }
+    } else {
+        sprintf(
+            output,
+            localization::Tr(
+                attackerIsPlural ? "combat.attack.plural.damage"
+                                 : "combat.attack.singular.damage"
+            ),
+            attackerName,
+            damage
+        );
     }
-    if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA) {
-        return static_cast<char>(letter + ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter == CP1251_CAPITAL_YO) {
-        return static_cast<char>(CP1251_SMALL_YO);
-    }
-    return static_cast<char>(letter);
 }
 
-inline char ToUpperCp1251(u8 letter) {
-    if (letter >= 'a' && letter <= 'z') {
-        return static_cast<char>(letter - ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA) {
-        return static_cast<char>(letter - ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter == CP1251_SMALL_YO) {
-        return static_cast<char>(CP1251_CAPITAL_YO);
-    }
-    return static_cast<char>(letter);
 }
-
-}
-
-
-static char gTargetName[TARGET_NAME_SIZE];
 
 army::army(void) {
     H2SteppedEnumStorage<ArmySampleType, i32> sampleType;
@@ -1284,35 +1295,31 @@ void army::SpecialAttack(void) {
 
     if (killed > 0) {
         if (damageDone == -1) {
-            sprintf(gText, "\xd4\xe0\xed\xf2\xee\xec \xe2\xee\xe8\xed\xe0 \xf3\xed\xe8\xf7\xf2\xee\xe6\xe5\xed!!");
+            strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
         } else {
-            strcpy(gTargetName, gArmyNames[H2EnumIndex(pEnemy->m_monsterType)]);
-            gTargetName[0] = ToLowerCp1251(gTargetName[0]);
-            sprintf(
+            FormatCombatDamage(
                 gText,
-                "%s %s %s %d %s.\n%d %s %s.",
-                "\xc0\xf2\xe0\xea\xe0",
-                gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-                "\xed\xe0\xed\xee\xf1\xe8\xf2",
+                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                m_quantity > 1,
                 damageDone,
-                "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
                 killed,
-                killed <= 1 ? gTargetName : gArmyNamesPlural[H2EnumIndex(pEnemy->m_monsterType)],
-                killed <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+                killed > 1 ? gArmyNamesPlural[H2EnumIndex(pEnemy->m_monsterType)]
+                           : gArmyNames[H2EnumIndex(pEnemy->m_monsterType)]
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            utf8::UppercaseFirst(gText);
         }
     } else {
-        sprintf(
+        FormatCombatDamage(
             gText,
-            "%s %s %s %d %s.",
-            "\xc0\xf2\xe0\xea\xe0",
-            gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-            "\xed\xe0\xed\xee\xf1\xe8\xf2",
+            m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                           : gArmyNames[H2EnumIndex(m_monsterType)],
+            m_quantity > 1,
             damageDone,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
+            0,
+            NULL
         );
-        gText[0] = ToUpperCp1251(gText[0]);
+        utf8::UppercaseFirst(gText);
     }
     strcpy(combatMsg, gText);
     switch (m_monsterType) {
@@ -1424,31 +1431,16 @@ void army::DoHydraAttack(i32) {
     m_animationState = 1;
     m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_FORWARD;
     gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_ATTACK)]);
-    if (totKilled > 0) {
-        sprintf(
-            gText,
-            "%s %s %s %d %s.\n%d %s %s.",
-            "\xc0\xf2\xe0\xea\xe0",
-            gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-            "\xed\xe0\xed\xee\xf1\xe8\xf2",
-            totDamage,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
-            totKilled,
-            totKilled <= 1 ? "\xe2\xee\xe8\xed" : "\xe2\xee\xe8\xed\xee\xe2",
-            totKilled <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
-        );
-    } else {
-        sprintf(
-            gText,
-            "%s %s %s %d %s.",
-            "\xc0\xf2\xe0\xea\xe0",
-            gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-            "\xed\xe0\xed\xee\xf1\xe8\xf2",
-            totDamage,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
-        );
-    }
-    gText[0] = ToUpperCp1251(gText[0]);
+    FormatCombatDamage(
+        gText,
+        m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                       : gArmyNames[H2EnumIndex(m_monsterType)],
+        m_quantity > 1,
+        totDamage,
+        totKilled,
+        NULL
+    );
+    utf8::UppercaseFirst(gText);
     strcpy(textBuf, gText);
     PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
     gpCombatManager->CombatMessage(textBuf, 1, 1, 0);
@@ -1579,46 +1571,39 @@ void army::DoAttack(i32 retaliation) {
         DamageEnemy(breathTarget_6, &breathDamage_12, &breathKilled, 0, 0);
     }
     if (damage_4 == -1) {
-        sprintf(gText, "\xd4\xe0\xed\xf2\xee\xec \xe2\xee\xe8\xed\xe0 \xf3\xed\xe8\xf7\xf2\xee\xe6\xe5\xed!!");
+        strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
     } else if (gbGenieHalf) {
         sprintf(
             gText,
-            "%s %s \xef\xee\xeb\xee\xe2\xe8\xed\xf3 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe2\xee\xe9\xf1\xea!",
-            m_quantity <= 1 ? gArmyNames[H2EnumIndex(m_monsterType)]
-                            : gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-            m_quantity <= 1 ? "\xf3\xed\xe8\xf7\xf2\xee\xe6\xe0\xfe\xf2"
-                            : "\xf3\xed\xe8\xf7\xf2\xee\xe6\xe0\xe5\xf2"
+            localization::TrPlural("combat.genie.destroy_half", m_quantity),
+            m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                           : gArmyNames[H2EnumIndex(m_monsterType)]
         );
-        gText[0] = ToUpperCp1251(gText[0]);
+        utf8::UppercaseFirst(gText);
     } else {
         if (killed_1 > 0) {
-            strcpy(gTargetName, gArmyNames[H2EnumIndex(target_18->m_monsterType)]);
-            gTargetName[0] = ToLowerCp1251(gTargetName[0]);
-            sprintf(
+            FormatCombatDamage(
                 gText,
-                "%s %s %s %d %s.\n%d %s %s.",
-                "\xc0\xf2\xe0\xea\xe0",
-                gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-                "\xed\xe0\xed\xee\xf1\xe8\xf2",
+                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                m_quantity > 1,
                 damage_4,
-                "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
                 killed_1,
-                killed_1 <= 1 ? gTargetName
-                               : gArmyNamesPlural[H2EnumIndex(target_18->m_monsterType)],
-                killed_1 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+                killed_1 > 1 ? gArmyNamesPlural[H2EnumIndex(target_18->m_monsterType)]
+                             : gArmyNames[H2EnumIndex(target_18->m_monsterType)]
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            utf8::UppercaseFirst(gText);
         } else {
-            sprintf(
+            FormatCombatDamage(
                 gText,
-                "%s %s %s %d %s.",
-                "\xc0\xf2\xe0\xea\xe0",
-                gArmyNamesPlural[H2EnumIndex(m_monsterType)],
-                "\xed\xe0\xed\xee\xf1\xe8\xf2",
+                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                               : gArmyNames[H2EnumIndex(m_monsterType)],
+                m_quantity > 1,
                 damage_4,
-                "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
+                0,
+                NULL
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            utf8::UppercaseFirst(gText);
         }
     }
     strcpy(combatText_10, gText);
@@ -1973,20 +1958,18 @@ void army::CheckLuck(void) {
         if (m_luckOutcome < 0) {
             sprintf(
                 gText,
-                "\xcf\xeb\xee\xf5\xe0\xff \xf3\xe4\xe0\xf7\xe0 \xe1\xfb\xeb\xe0 "
-                "\xed\xe8\xf1\xef\xee\xf1\xeb\xe0\xed\xe0 \xed\xe0 %s!",
-                m_quantity <= 1 ? gArmyNames[H2EnumIndex(m_monsterType)]
-                                : gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                localization::TrPlural("combat.luck.bad", m_quantity),
+                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                               : gArmyNames[H2EnumIndex(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
             sprintf(
                 gText,
-                "\xd3\xe4\xe0\xf7\xe0 \xed\xe0 \xf1\xf2\xee\xf0\xee\xed\xe5 "
-                "\xee\xf2\xf0\xff\xe4\xe0 %s!",
-                m_quantity <= 1 ? gArmyNames[H2EnumIndex(m_monsterType)]
-                                : gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                localization::TrPlural("combat.luck.good", m_quantity),
+                m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
+                               : gArmyNames[H2EnumIndex(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);

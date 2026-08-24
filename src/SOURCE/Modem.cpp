@@ -9,6 +9,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Network.h>
 #include <PLATFORM/Runtime.h>
+#include <SOURCE/Localization.h>
 
 typedef enum ModemPrivateConstant {
     SETUP_TEXT_CAPACITY = 104,
@@ -78,12 +79,7 @@ void ModemSetup(i32 mode) {
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
-            "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xef\xee\xe4\xea\xeb\xfe\xf7\xe5\xed\xe8\xff "
-            "\xe4\xf0\xf3\xe3\xee\xe3\xee \xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xe0 \xea "
-            "\xef\xf0\xff\xec\xee\xec\xf3 "
-            "\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xfe.\n\n\xcd\xe0\xe6\xec\xe8\xf2\xe5 "
-            "'\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc "
-            "\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5."
+            localization::Tr("network.modem.direct_wait")
 
 
         );
@@ -100,9 +96,9 @@ i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..."  , numbuf);
+    sprintf(gText, localization::Tr("network.modem.dialing"), numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..."  , numbuf);
+    sprintf(gText, localization::Tr("network.modem.dialing"), numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
@@ -110,16 +106,16 @@ i32l Dial(void) {
 
 i32l Wait(void) {
     GUIModemResponse(
-        "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe7\xe2\xee\xed\xea\xe0..."  ,
+        localization::Tr("network.modem.waiting_for_ring")  ,
         "RING"
     );
     GUIModemCommand(
-        "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xec\xee\xe4\xe5\xec\xe0..."
+        localization::Tr("network.modem.initializing")
         ,
         "ATA"
     );
     if (GUIModemResponse(
-            "\xd3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff..."
+            localization::Tr("network.modem.establishing")
             ,
             "CONNECT"
         )
@@ -128,7 +124,7 @@ i32l Wait(void) {
     return 0;
 }
 
-void GUIModemCommand(char* message, char* command) {
+void GUIModemCommand(const char* message, const char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
@@ -155,7 +151,7 @@ i8 GUIModemCommandExec(void) {
     }
 }
 
-void ModemCommand(char* command) {
+void ModemCommand(const char* command) {
     i32 commandLength = strlen(command);
     i32 commandPosition0;
     for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
@@ -165,7 +161,7 @@ void ModemCommand(char* command) {
     write_buffer("\r", 1);
 }
 
-i8 GUIModemResponse(char* message, char* response) {
+i8 GUIModemResponse(const char* message, const char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
@@ -202,7 +198,7 @@ compareResponse:
     }
 }
 
-i32 write_buffer(char* buffer, i32 length) {
+i32 write_buffer(const char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
     com_snd(0, 0, static_cast<u16>(length), buffer, 0);
@@ -249,9 +245,9 @@ void Connect(void) {
             oldsec = -1;
         }
 
-        stime = platform::Ticks();
-        if (stime / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
-            oldsec = stime;
+        gModemTimestamp = platform::Ticks();
+        if (gModemTimestamp / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
+            oldsec = gModemTimestamp;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
         }
@@ -291,9 +287,9 @@ i32 WaitForDirectConnect(void) {
                 localstage = remotestage + 1;
                 oldsec = -1;
             }
-            stime = platform::Ticks();
-            if (stime / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
-                oldsec = stime;
+            gModemTimestamp = platform::Ticks();
+            if (gModemTimestamp / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
+                oldsec = gModemTimestamp;
                 sprintf(idMessage, "ID%s_%i", idstr, localstage);
                 WriteModemPacket(idMessage, strlen(idMessage));
             }
@@ -392,7 +388,7 @@ i32 localstage;
 char numbuf[MODEM_NUMBER_BUFFER_SIZE];
 i32 WFDCStage;
 char remoteidstr[MODEM_ID_SIZE];
-i32 stime;
+i32 gModemTimestamp;
 char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
 i32 iLastDialPos;
 i32 remotestage;

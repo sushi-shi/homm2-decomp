@@ -623,10 +623,10 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void NoShowCombatLog(char*);
+    void NoShowCombatLog(const char*);
     void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(char*, i32, i32, i32);
+    void CombatMessage(const char*, i32, i32, i32);
     void CombatMessage(CombatMessageCommand);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);

@@ -16,6 +16,15 @@ public:
 
     virtual std::string UserRoot() const = 0;
 
+    // Directory containing the executable (or the virtual filesystem root on
+    // WASM). Port-owned data such as translation catalogs lives relative to
+    // this path, independently of the user-supplied retail data root.
+    virtual std::string ProgramRoot() const = 0;
+
+    // Optional user-supplied installation containing localized retail
+    // archives. An empty value means that no asset overlay was configured.
+    virtual std::string LocaleDataRoot() const = 0;
+
     virtual std::string Resolve(const char* retailPath, FileMode mode) const = 0;
 
     virtual std::vector<std::string> List(const char* pattern) const = 0;
@@ -23,6 +32,8 @@ public:
     virtual bool Exists(const char* retailPath) const = 0;
 
     virtual i32 Open(const char* retailPath, FileMode mode) = 0;
+
+    virtual i32 OpenLocale(const char* retailPath) = 0;
 
     virtual void Close(i32 file) = 0;
 

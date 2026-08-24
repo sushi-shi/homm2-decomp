@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(homm2 CXX)
 
+include(CTest)
+
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
@@ -125,8 +127,68 @@ add_executable(homm2
   ${HOMM2_GAME_SOURCES}
   ${HOMM2_EXECUTABLE_SOURCES})
 
+# PO files and runtime catalogs stay UTF-8. Original byte-encoded resources
+# are transcoded only when their text fields enter the engine.
+find_program(HOMM2_MSGFMT msgfmt)
+find_program(HOMM2_MSGCAT msgcat)
+find_program(HOMM2_XGETTEXT xgettext)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+file(GLOB HOMM2_PO_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/locales/*.po)
+set(HOMM2_COMPILED_CATALOGS)
+if(HOMM2_PO_FILES)
+  if(NOT HOMM2_MSGFMT OR NOT HOMM2_MSGCAT OR NOT HOMM2_XGETTEXT)
+    message(FATAL_ERROR
+      "gettext tools msgfmt, msgcat and xgettext are required to build translations")
+  endif()
+  set(messageRegistry ${CMAKE_SOURCE_DIR}/locales/messages.def)
+  set(registryTemplate ${CMAKE_CURRENT_BINARY_DIR}/lang/registry.pot)
+  set(tableTemplate ${CMAKE_CURRENT_BINARY_DIR}/lang/tables.pot)
+  set(messageTemplate ${CMAKE_CURRENT_BINARY_DIR}/lang/messages.pot)
+  add_custom_command(
+    OUTPUT ${registryTemplate}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/lang
+    COMMAND ${HOMM2_XGETTEXT} --language=C++ --from-code=UTF-8
+      --keyword=HOMM2_MESSAGE:1c,2 --keyword=HOMM2_PLURAL:1c,2,3
+      --output=${registryTemplate} ${messageRegistry}
+    DEPENDS ${messageRegistry}
+    VERBATIM)
+  add_custom_command(
+    OUTPUT ${tableTemplate}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/localization_tables.py
+      template ${CMAKE_SOURCE_DIR} ${tableTemplate}
+    DEPENDS
+      ${CMAKE_SOURCE_DIR}/tools/localization_tables.py
+      ${CMAKE_SOURCE_DIR}/locales/legacy_tables.def
+      ${CMAKE_SOURCE_DIR}/src/SOURCE/KB.cpp
+      ${CMAKE_SOURCE_DIR}/src/SOURCE/X_GLOBAL.cpp
+    VERBATIM)
+  add_custom_command(
+    OUTPUT ${messageTemplate}
+    COMMAND ${HOMM2_MSGCAT} --use-first --output-file=${messageTemplate}
+      ${registryTemplate} ${tableTemplate}
+    DEPENDS ${registryTemplate} ${tableTemplate}
+    VERBATIM)
+  foreach(po ${HOMM2_PO_FILES})
+    get_filename_component(language ${po} NAME_WE)
+    set(catalog ${CMAKE_CURRENT_BINARY_DIR}/lang/${language}.mo)
+    add_custom_command(
+      OUTPUT ${catalog}
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/lang
+      COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/validate_catalog.py
+        ${po} ${messageTemplate}
+      COMMAND ${HOMM2_MSGFMT} --check --check-format --no-convert
+        --output-file=${catalog} ${po}
+      DEPENDS ${po} ${messageTemplate} ${CMAKE_SOURCE_DIR}/tools/validate_catalog.py
+      VERBATIM)
+    list(APPEND HOMM2_COMPILED_CATALOGS ${catalog})
+  endforeach()
+  add_custom_target(homm2_locales ALL DEPENDS ${HOMM2_COMPILED_CATALOGS})
+  add_dependencies(homm2 homm2_locales)
+endif()
+
 target_include_directories(homm2 PRIVATE
-  ${CMAKE_SOURCE_DIR}/include)
+  ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR})
 
 if(NOT WIN32)
   target_compile_definitions(homm2 PRIVATE
@@ -171,10 +233,36 @@ endif()
 
 target_link_libraries(homm2 PRIVATE homm2_platform ${HOMM2_FFMPEG_LIBRARIES})
 
+if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  add_executable(homm2_localization_encoding_test
+    tools/localization_encoding_test.cpp
+    src/BASE/Utf8.cpp
+    src/SOURCE/PluralRules.cpp)
+  target_include_directories(homm2_localization_encoding_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  target_compile_options(homm2_localization_encoding_test PRIVATE
+    -ffunction-sections -fdata-sections)
+  target_link_options(homm2_localization_encoding_test PRIVATE
+    -Wl,--gc-sections)
+  add_test(NAME localization_encoding COMMAND homm2_localization_encoding_test)
+  add_test(
+    NAME agg_manifest
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)
+  add_test(
+    NAME catalog_validation
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_validate_catalog.py)
+endif()
+
 if(WIN32)
   target_link_libraries(homm2 PRIVATE ws2_32)
   # A game, not a console program: retail came up without one behind it.
   set_target_properties(homm2 PROPERTIES WIN32_EXECUTABLE ON)
+endif()
+
+install(TARGETS homm2 RUNTIME DESTINATION bin)
+if(HOMM2_COMPILED_CATALOGS)
+  install(FILES ${HOMM2_COMPILED_CATALOGS} DESTINATION share/homm2/lang)
 endif()
 
 list(LENGTH HOMM2_GAME_SOURCES HOMM2_GAME_SOURCE_COUNT)

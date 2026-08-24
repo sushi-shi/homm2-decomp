@@ -15,6 +15,7 @@
 #include <SOURCE/SETUP.h>
 #include <stdio.h>
 #include <string.h>
+#include <SOURCE/Localization.h>
 
 typedef enum SetupConstant {
     WINDOW_X = 405,
@@ -126,13 +127,7 @@ i32 game::SetupComPort(void) {
         strcpy(gConfig.modemInitString, "ATZ");
         sprintf(gText, "%s", gConfig.modemInitString);
         GetDataEntry(
-            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xf3\xea\xe0\xe6\xe8\xf2\xe5 "
-            "\xe7\xed\xe0\xf7\xe5\xed\xe8\xe5 \xf1\xf2\xf0\xee\xea\xe8 "
-            "\xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xe2\xe0\xf8\xe5\xe3\xee "
-            "\xec\xee\xe4\xe5\xec\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 'ENTER', "
-            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xe8\xf1\xe2\xee\xe8\xf2\xfc "
-            "\xe7\xed\xe0\xf7\xe5\xed\xe8\xff \xef\xee \xf3\xec\xee\xeb\xf7\xe0\xed\xe8\xfe."
-            ,
+            localization::Tr("network.modem.initialization_prompt"),
             initString,
             MODEM_INIT_ENTRY_LENGTH,
             gText,
@@ -182,10 +177,7 @@ i32 game::SetupHotSeatGame(void) {
         );
 
     if (giSetupGameType == 0) {
-        sprintf(
-            gText,
-              "\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xe7\xe0\xe4\xe0\xf2\xfc\x20\xe8\xec\xe5\xed\xe0\x20\xea\xe0\xe6\xe4\xee\xec\xf3\x20\xe8\xe3\xf0\xee\xea\xf3\x3f"
-        );
+        sprintf(gText, localization::Tr("network.hotseat.enter_names_prompt"));
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
@@ -195,7 +187,7 @@ i32 game::SetupHotSeatGame(void) {
                 );
                 sprintf(
                     gText,
-                      "\x25\x64\x20\xe8\xe3\xf0\xee\xea\x3a\x20\xc2\xe2\xe5\xf1\xf2\xe8\x20\xe8\xec\xff\x2e",
+                    localization::Tr("network.hotseat.player_name_prompt"),
                     i + 1
                 );
                 GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
@@ -321,8 +313,7 @@ i32 game::SetupModemGame(void) {
             LogStr("SMC 9");
             if (gbDirectConnect == 0) {
                 GetDataEntry(
-                    "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 "
-                    "\xf2\xe5\xeb\xe5\xf4\xee\xed\xed\xfb\xe9 \xed\xee\xec\xe5\xf0."
+                    localization::Tr("network.modem.telephone_prompt")
                     ,
                     numbuf,
                     TELEPHONE_ENTRY_LENGTH,
@@ -608,8 +599,7 @@ i32 game::PickLoadGame(void) {
         sprintf(fileMask, "*.GXC");
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
-
-            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 II.",
+            localization::Tr("network.load.expansion_unavailable"),
             NORMAL_DIALOG_INFO,
             -1,
             -1,

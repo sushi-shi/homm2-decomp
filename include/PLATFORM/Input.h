@@ -3,6 +3,8 @@
 
 #include "Types.h"
 
+#include <string>
+
 namespace platform {
 
 enum InputMessageCode : unsigned {
@@ -22,6 +24,7 @@ struct Event {
         None,
         KeyDown,
         KeyUp,
+        TextInput,
         MouseMove,
         MouseDown,
         MouseUp,
@@ -40,6 +43,11 @@ struct Event {
 
     unsigned scanCode = 0;
 
+    // Committed text from the host input method, encoded as UTF-8. This is
+    // deliberately separate from KeyDown: gameplay consumes physical keys,
+    // while editable controls consume layout/IME-aware text.
+    std::string text;
+
     Point position;
     MouseButton button = MouseButton::Left;
 
@@ -57,6 +65,9 @@ public:
 
     virtual Point MousePosition() const = 0;
     virtual void WarpMouse(Point position) = 0;
+
+    virtual void StartTextInput() = 0;
+    virtual void StopTextInput() = 0;
 };
 
 }

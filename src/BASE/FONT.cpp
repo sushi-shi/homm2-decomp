@@ -8,7 +8,14 @@
 #include <BASE/icon2bc.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 typedef enum FontConstant {
     LARGE_FONT_HEIGHT_THRESHOLD = 14,
@@ -31,6 +38,13 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(name);
     gbLoadingMonoIcon = false;
+    if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic
+        && m_glyphIcon->m_frameCount < 162) {
+        localization::UseEnglish(
+            "the selected locale requires FONT.ICN and SMALFONT.ICN with at least 162 frames"
+        );
+        gpResourceManager->DisableLocaleAggregates();
+    }
 }
 
 font::~font() {
@@ -38,16 +52,55 @@ font::~font() {
 }
 
 
-i32 RemapCyrillicCharacter(i32 character) {
-    if (character == 0xa8)
-        return 0xa0;
-    if (character == 0xb8)
-        return 0xc1;
-    if (character < 0xc0)
-        return 0xa1;
-    if (character < 0xe0)
-        return character - 0x40;
-    return character - 0x3f;
+namespace {
+
+i32 CyrillicGlyph(std::uint32_t codePoint) {
+    if (codePoint == 0x0401)
+        return 128;
+    if (codePoint == 0x0451)
+        return 161;
+    if (codePoint >= 0x0410 && codePoint <= 0x042f)
+        return 96 + static_cast<i32>(codePoint - 0x0410);
+    if (codePoint >= 0x0430 && codePoint <= 0x044f)
+        return 129 + static_cast<i32>(codePoint - 0x0430);
+    return FONT_GLYPH_FALLBACK;
+}
+
+i32 GlyphIndex(std::uint32_t codePoint, i32 frameCount) {
+    i32 glyph;
+    if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic) {
+        if (codePoint >= 0x0400)
+            glyph = CyrillicGlyph(codePoint);
+        else if (codePoint >= ' ' && codePoint <= 0x7f)
+            glyph = static_cast<i32>(codePoint - ' ');
+        else
+            glyph = FONT_GLYPH_FALLBACK;
+    } else {
+        if (codePoint >= 'a' && codePoint <= 'z')
+            codePoint -= 'a' - 'A';
+        glyph = codePoint >= ' ' && codePoint <= 0x7f
+            ? static_cast<i32>(codePoint - ' ')
+            : FONT_GLYPH_FALLBACK;
+    }
+    if (frameCount <= 0)
+        return 0;
+    return std::clamp(glyph, 0, frameCount - 1);
+}
+
+bool IsVowel(std::uint32_t codePoint) {
+    switch (codePoint) {
+        case 'a': case 'e': case 'i': case 'o': case 'u': case 'y':
+        case 'A': case 'E': case 'I': case 'O': case 'U': case 'Y':
+        case 0x0410: case 0x0415: case 0x0401: case 0x0418: case 0x041e:
+        case 0x0423: case 0x042b: case 0x042d: case 0x042e: case 0x042f:
+        case 0x0430: case 0x0435: case 0x0451: case 0x0438: case 0x043e:
+        case 0x0443: case 0x044b: case 0x044d: case 0x044e: case 0x044f:
+            return true;
+        default:
+            return false;
+    }
+}
+
 }
 
 void font::DrawStringExecute(
@@ -60,39 +113,36 @@ void font::DrawStringExecute(
     i32 clipR,
     i32 clipB
 ) {
-    i32 c = 0;
     i32 pos = x;
-    i32 i = 0;
-    while (str[i] != 0) {
-        c = static_cast<u8>(str[i]);
-        if (c == FONT_SPACER_CHAR) {
-            pos += GetCharacterWidth(c);
-            goto next;
+    const char* cursor = str;
+    while (cursor != NULL && *cursor != 0) {
+        const utf8::Decoded decoded = utf8::Decode(cursor);
+        const std::uint32_t codePoint = decoded.codePoint;
+        if (codePoint == FONT_SPACER_CHAR) {
+            pos += GetCharacterWidth(codePoint);
+            cursor += decoded.length;
+            continue;
         }
-        if (c == '{') {
+        if (codePoint == '{') {
             m_suppressDraw = 1;
-            goto next;
+            cursor += decoded.length;
+            continue;
         }
-        if (c == '}') {
+        if (codePoint == '}') {
             m_suppressDraw = 0;
-            goto next;
+            cursor += decoded.length;
+            continue;
         }
 
-
-        if (c < ' ' || (c > 0x7f && c < 0xc0 && c != 0xb8 && c != 0xa8)) {
-            c = 0x7f;
-        } else if (c > 0x7f) {
-            c = RemapCyrillicCharacter(c);
-        }
-        c -= ' ';
-        if (c != 0) {
+        const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+        if (glyph != 0) {
             if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
                     pos,
                     y,
-                    c,
+                    glyph,
                     ICON_DRAW_CLIP,
                     clipL,
                     clipT,
@@ -107,7 +157,7 @@ void font::DrawStringExecute(
                     gpWindowManager->m_screen,
                     pos,
                     y,
-                    c,
+                    glyph,
                     ICON_DRAW_CLIP,
                     clipL,
                     clipT,
@@ -123,7 +173,7 @@ void font::DrawStringExecute(
                     gpWindowManager->m_screen,
                     pos,
                     y,
-                    c,
+                    glyph,
                     ICON_DRAW_CLIP,
                     clipL,
                     clipT,
@@ -139,7 +189,7 @@ void font::DrawStringExecute(
                     gpWindowManager->m_screen,
                     pos,
                     y,
-                    c,
+                    glyph,
                     ICON_DRAW_CLIP,
                     clipL,
                     clipT,
@@ -150,9 +200,8 @@ void font::DrawStringExecute(
                     1
                 );
         }
-        pos += GetCharacterWidth(str[i]);
-    next:
-        i++;
+        pos += GetCharacterWidth(codePoint);
+        cursor += decoded.length;
     }
 }
 
@@ -161,41 +210,17 @@ void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
-i32 font::GetCharacterWidth(u8 c) {
-    i32 code = c;
-    if (code == '{' || code == '}') {
+i32 font::GetCharacterWidth(std::uint32_t codePoint) {
+    if (codePoint == '{' || codePoint == '}') {
         return 0;
     }
-    if (code == ' ')
-        code = 'i';
-    if (code == '.')
-        code = '_';
-    if (code < ' '
-        || (code > 0x7f && code < 0xc0 && code != 0xb8 && code != 0xa8)) {
-        code = 0x7f;
-    } else if (code > 0x7f) {
-        code = RemapCyrillicCharacter(code);
-    }
-    code -= ' ';
-    return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[code].w + m_isLarge;
-}
-
-
-static inline bool IsVowel(u8 c) {
-    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y'
-        || c == 0xe0   || c == 0xe5   || c == 0xb8
-        || c == 0xe8   || c == 0xee   || c == 0xf3
-        || c == 0xfb   || c == 0xfd   || c == 0xfe
-        || c == 0xff
-        || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y'
-        || c == 0xc0   || c == 0xc5   || c == 0xa8
-        || c == 0xc8   || c == 0xce   || c == 0xd3
-        || c == 0xdb   || c == 0xdd   || c == 0xde
-        || c == 0xdf  ;
-}
-
-static inline bool IsHyphen(u8 c) {
-    return c == '-';
+    if (codePoint == ' ')
+        codePoint = 'i';
+    if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic
+        && codePoint == '.')
+        codePoint = '_';
+    const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+    return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[glyph].w + m_isLarge;
 }
 
 void font::ExtractLine(
@@ -206,109 +231,104 @@ void font::ExtractLine(
     i32* lineWidth,
     u8 lastLine
 ) {
+    struct Character {
+        std::size_t end;
+        std::uint32_t codePoint;
+        i32 width;
+    };
+
+    const std::size_t start = static_cast<std::size_t>(*position);
+    std::size_t cursor = start;
     i32 width = 0;
-    i32 curPos = *position;
-    i32 wStart = *position;
-    i32 savedWidth;
-    i32 lastEnd;
-    i32 lastWidth;
+    const auto finish = [&](std::size_t end, std::size_t next, i32 measured, bool hyphen) {
+        std::size_t length = end - start;
+        memcpy(line, text + start, length);
+        if (hyphen)
+            line[length++] = '-';
+        line[length] = 0;
+        *position = static_cast<i32>(next);
+        *lineWidth = measured + (hyphen ? GetCharacterWidth('-') : 0);
+    };
 
     if (lastLine != 0) {
-        while (text[curPos] != '\n' && text[curPos] != 0) {
-            width += GetCharacterWidth(text[curPos]);
-            line[curPos - *position] = text[curPos];
-            curPos++;
+        while (text[cursor] != '\n' && text[cursor] != 0) {
+            const utf8::Decoded decoded = utf8::Decode(text + cursor);
+            width += GetCharacterWidth(decoded.codePoint);
+            cursor += decoded.length;
         }
-        if (text[curPos] == '\n') {
-            line[curPos - *position] = 0;
-            *position = curPos + 1;
-            *lineWidth = width;
-            return;
-        }
-        if (text[curPos] == 0) {
-            line[curPos - *position] = 0;
-            *position = curPos;
-            *lineWidth = width;
-            return;
-        }
+        finish(cursor, text[cursor] == '\n' ? cursor + 1 : cursor, width, false);
+        return;
     }
 
-    while (1) {
-        wStart = curPos;
-        savedWidth = width;
-        while (text[curPos] != ' ' && text[curPos] != '\n' && text[curPos] != 0) {
-            width += GetCharacterWidth(text[curPos]);
-            line[curPos - *position] = text[curPos];
-            curPos++;
+    while (true) {
+        const std::size_t wordStart = cursor;
+        const i32 widthBeforeWord = width;
+        std::vector<Character> word;
+        while (text[cursor] != ' ' && text[cursor] != '\n' && text[cursor] != 0) {
+            const utf8::Decoded decoded = utf8::Decode(text + cursor);
+            width += GetCharacterWidth(decoded.codePoint);
+            cursor += decoded.length;
+            word.push_back({cursor, decoded.codePoint, GetCharacterWidth(decoded.codePoint)});
         }
+
         if (width > maxWidth) {
-            if (wStart != *position) {
-                if (line[wStart - *position - 1] == ' ')
-                    *lineWidth = savedWidth - GetCharacterWidth(' ');
-                else
-                    *lineWidth = savedWidth;
-                line[wStart - *position - 1] = 0;
-                *position = wStart;
+            if (wordStart != start) {
+                const std::size_t previous = utf8::Previous(text, wordStart);
+                const bool trailingSpace = text[previous] == ' ';
+                finish(
+                    trailingSpace ? previous : wordStart,
+                    wordStart,
+                    widthBeforeWord - (trailingSpace ? GetCharacterWidth(' ') : 0),
+                    false
+                );
                 return;
             }
-            lastEnd = curPos;
-            lastWidth = width;
-            curPos = curPos - 2;
-            while (width >= maxWidth
-                   || (curPos > wStart + 1
-                       && !IsVowel(text[curPos])
-                       && !((!IsVowel(text[curPos + 1]) && text[curPos] == text[curPos + 1])
-                            || IsHyphen(text[curPos])))) {
-                width -= GetCharacterWidth(text[curPos]);
-                curPos--;
+
+            i32 prefixWidth = 0;
+            std::size_t fallback = 0;
+            i32 fallbackWidth = 0;
+            for (std::size_t index = 0; index < word.size(); ++index) {
+                prefixWidth += word[index].width;
+                if (prefixWidth <= maxWidth || index == 0) {
+                    fallback = index;
+                    fallbackWidth = prefixWidth;
+                }
             }
-            if (curPos <= wStart + 1) {
-                line[lastEnd - *position] = 0;
-                *position = lastEnd + 1;
-                *lineWidth = lastWidth;
-                return;
-            }
-            if (IsVowel(text[curPos])) {
-                line[curPos - *position + 1] = '-';
-                line[curPos - *position + 2] = 0;
-                *lineWidth = width;
-                *position = curPos + 1;
-                return;
-            }
-            if (IsHyphen(text[curPos])) {
-                line[curPos - *position + 1] = 0;
-                *lineWidth = width;
-                *position = curPos + 1;
-                return;
-            }
-            if (!IsVowel(text[curPos])) {
-                if (!IsVowel(text[curPos + 1]) && text[curPos] == text[curPos + 1]) {
-                    line[curPos - *position + 1] = '-';
-                    line[curPos - *position + 2] = 0;
-                    *lineWidth = width;
-                    *position = curPos + 1;
+
+            for (std::size_t count = word.size(); count > 2; --count) {
+                const std::size_t index = count - 2;
+                i32 candidateWidth = 0;
+                for (std::size_t prefix = 0; prefix <= index; ++prefix)
+                    candidateWidth += word[prefix].width;
+                const bool hyphenInText = word[index].codePoint == '-';
+                const bool doubledConsonant = index + 1 < word.size()
+                    && !IsVowel(word[index].codePoint)
+                    && !IsVowel(word[index + 1].codePoint)
+                    && word[index].codePoint == word[index + 1].codePoint;
+                const bool breakable = IsVowel(word[index].codePoint)
+                    || hyphenInText || doubledConsonant;
+                const bool addHyphen = !hyphenInText;
+                if (breakable
+                    && candidateWidth + (addHyphen ? GetCharacterWidth('-') : 0) <= maxWidth) {
+                    finish(word[index].end, word[index].end, candidateWidth, addHyphen);
                     return;
                 }
             }
-        } else {
-            if (text[curPos] == '\n') {
-                line[curPos - *position] = 0;
-                *position = curPos + 1;
-                *lineWidth = width;
-                return;
-            }
-            if (text[curPos] == ' ') {
-                line[curPos - *position] = ' ';
-                width += GetCharacterWidth(' ');
-                curPos++;
-            }
-            if (text[curPos] == 0) {
-                line[curPos - *position] = 0;
-                *position = curPos;
-                *lineWidth = width;
-                return;
-            }
+
+            finish(word[fallback].end, word[fallback].end, fallbackWidth, false);
+            return;
         }
+
+        if (text[cursor] == '\n') {
+            finish(cursor, cursor + 1, width, false);
+            return;
+        }
+        if (text[cursor] == 0) {
+            finish(cursor, cursor, width, false);
+            return;
+        }
+        width += GetCharacterWidth(' ');
+        ++cursor;
     }
 }
 
@@ -321,21 +341,15 @@ void font::DrawBoundedString(
     FontDrawMode mode,
     FontAlignment align
 ) {
+    if (str == NULL)
+        return;
 
-
-    i32 len = strlen(str);
-    char blank = ' ';
-    i32 lastPos;
+    const i32 len = static_cast<i32>(strlen(str));
     i32 xPosition = 0;
     i32 yPosition = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
-    char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
-    strcpy(line, str);
-    FontDrawMode drawMode = mode;
+    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
     if ((H2EnumIndex((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
         i32 lineCount = LineLength(str, w);
@@ -344,62 +358,59 @@ void font::DrawBoundedString(
             yPosition = (h - totalH) / CENTER_DIVISOR;
     }
     m_suppressDraw = 0;
-    while (pos < len && line[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
+    while (pos < len && str[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
-            ExtractLine(str, line, &pos, w, &lw, 1);
+            ExtractLine(str, line.data(), &pos, w, &lw, 1);
         else
-            ExtractLine(str, line, &pos, w, &lw, 0);
+            ExtractLine(str, line.data(), &pos, w, &lw, 0);
         switch (align) {
-        case FONT_ALIGN_LEFT:
-            xPosition = 0;
-            break;
-        case FONT_ALIGN_CENTER:
-            xPosition = (w - lw) / CENTER_DIVISOR + 1;
-            break;
-        case FONT_ALIGN_RIGHT:
-            xPosition = w - lw;
-            break;
+            case FONT_ALIGN_LEFT:
+                xPosition = 0;
+                break;
+            case FONT_ALIGN_CENTER:
+                xPosition = (w - lw) / CENTER_DIVISOR + 1;
+                break;
+            case FONT_ALIGN_RIGHT:
+                xPosition = w - lw;
+                break;
+            default:
+                xPosition = 0;
+                break;
         }
-        DrawStringExecute(line, xPosition + x, yPosition + y, drawMode, x, y, w, h);
+        DrawStringExecute(line.data(), xPosition + x, yPosition + y, mode, x, y, w, h);
         yPosition += m_height;
         lw = 0;
     }
-    H2_FREE(line);
 }
 
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
 i32 font::LineLength(const char* str, i32 maxW) {
-
-
-    i32 len = strlen(str);
-    char blank = ' ';
+    if (str == NULL)
+        return 0;
+    const i32 len = static_cast<i32>(strlen(str));
     i32 count = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
-    char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
+    std::vector<char> line(static_cast<std::size_t>(len) + 2, 0);
     while (pos < len && str[pos] != 0) {
-        ExtractLine(str, line, &pos, maxW, &lw, 0);
+        ExtractLine(str, line.data(), &pos, maxW, &lw, 0);
         count++;
         lw = 0;
     }
-    H2_FREE(line);
     return count;
 }
 
 i32 font::LineWidth(const char* str) {
-    i32 s = strlen(str);
-    i32 idx = 0, w = 0;
-    const char* p = str;
-    while (idx < s && p[idx] != 0) {
-        while (p[idx] != 0 && p[idx] != '\n') {
-            w += GetCharacterWidth(p[idx]);
-            idx++;
-        }
+    i32 width = 0;
+    const char* cursor = str;
+    while (cursor != NULL && *cursor != 0) {
+        const utf8::Decoded decoded = utf8::Decode(cursor);
+        if (decoded.codePoint == '\n')
+            break;
+        width += GetCharacterWidth(decoded.codePoint);
+        cursor += decoded.length;
     }
-    return w;
+    return width;
 }

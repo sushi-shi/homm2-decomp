@@ -27,6 +27,9 @@
 #include <BASE/message.h>
 #include <stdio.h>
 #include <string.h>
+#include <SOURCE/Localization.h>
+
+#include <string>
 
 typedef enum CursorHeroShadowFrame {
     SPRITE_UP_STEP_1        = 0x2e,
@@ -922,8 +925,10 @@ adjacentDone:
             if (secondaryType >= 0 && secondaryType <= CURSOR_RESOURCE_LAST
                 && secondaryAmount < 0)
                 secondaryAmount -= CURSOR_RESOURCE_DIALOG_PENALTY;
+            const std::string eventMessage =
+                localization::DecodeExternalText(mapEvent->message);
             NormalDialog(
-                mapEvent->message,
+                const_cast<char*>(eventMessage.c_str()),
                 1,
                 -1,
                 -1,
@@ -1341,7 +1346,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!"  ,
+                localization::Tr("player.vanquished")  ,
                 cPlayerNames[change.id]
             );
             NormalDialog(

@@ -442,6 +442,23 @@ public:
         }
     }
 
+    void StartTextInput() override {
+        if (!m_textInputActive && m_video.window() != nullptr) {
+            if (!SDL_StartTextInput(m_video.window())) {
+                std::fprintf(stderr, "[homm2] SDL_StartTextInput: %s\n", SDL_GetError());
+                return;
+            }
+            m_textInputActive = true;
+        }
+    }
+
+    void StopTextInput() override {
+        if (m_textInputActive && m_video.window() != nullptr) {
+            SDL_StopTextInput(m_video.window());
+            m_textInputActive = false;
+        }
+    }
+
     void Push(const Event& event) { m_queue.push_back(event); }
     void SetKey(Key key, bool down) {
         if (down) {
@@ -462,6 +479,7 @@ private:
     std::set<int> m_keys;
     unsigned m_buttons = 0;
     Point m_mouse;
+    bool m_textInputActive = false;
 };
 
 class Sdl3Host final : public IHost {
@@ -550,6 +568,12 @@ private:
                 replay.event.scanCode = ToSetOneScanCode(code);
                 replay.event.character =
                     name.size() == 1 ? static_cast<unsigned char>(name[0]) : 0;
+            } else if (action == "text") {
+                replay.event.type = Event::Type::TextInput;
+                std::getline(fields, replay.event.text);
+                if (!replay.event.text.empty() && replay.event.text[0] == ' ') {
+                    replay.event.text.erase(0, 1);
+                }
             } else {
                 continue;
             }
@@ -607,6 +631,14 @@ private:
             m_input.Push(event);
             return;
         }
+
+        case SDL_EVENT_TEXT_INPUT:
+            event.type = Event::Type::TextInput;
+            event.text = sdlEvent.text.text != nullptr ? sdlEvent.text.text : "";
+            if (!event.text.empty()) {
+                m_input.Push(event);
+            }
+            return;
 
         case SDL_EVENT_MOUSE_MOTION: {
             const Point position = ToFramebuffer(sdlEvent.motion.x, sdlEvent.motion.y);
@@ -1048,12 +1080,30 @@ class Sdl3FileSystem final : public IFileSystem {
 public:
     Sdl3FileSystem() {
 #ifdef __EMSCRIPTEN__
+        m_programRoot = "/";
         m_dataRoot = "/game";
 #else
+        if (const char* base = SDL_GetBasePath()) {
+            m_programRoot = base;
+        }
+        if (m_programRoot.empty()) {
+            std::error_code error;
+            m_programRoot = std::filesystem::current_path(error).string();
+            if (error) {
+                m_programRoot = ".";
+            }
+        }
+        while (m_programRoot.size() > 1 && m_programRoot.back() == '/') {
+            m_programRoot.pop_back();
+        }
+
         if (const char* fromEnvironment = SDL_getenv("HOMM2_DATA")) {
             m_dataRoot = fromEnvironment;
         } else {
             m_dataRoot = FindDataRoot();
+        }
+        if (const char* localeData = SDL_getenv("HOMM2_LOCALE_DATA")) {
+            m_localeDataRoot = localeData;
         }
 #endif
 
@@ -1069,6 +1119,8 @@ public:
 
     std::string DataRoot() const override { return m_dataRoot; }
     std::string UserRoot() const override { return m_userRoot; }
+    std::string ProgramRoot() const override { return m_programRoot; }
+    std::string LocaleDataRoot() const override { return m_localeDataRoot; }
 
     std::string Resolve(const char* retailPath, FileMode mode) const override {
         if (!IsUserState(retailPath)) {
@@ -1103,6 +1155,20 @@ public:
             return -1;
         }
 
+        const i32 file = m_nextFile++;
+        m_streams.emplace(file, stream);
+        return file;
+    }
+
+    i32 OpenLocale(const char* retailPath) override {
+        if (m_localeDataRoot.empty()) {
+            return -1;
+        }
+        const std::string path = ResolveIn(m_localeDataRoot, retailPath);
+        SDL_IOStream* stream = SDL_IOFromFile(path.c_str(), "rb");
+        if (stream == nullptr) {
+            return -1;
+        }
         const i32 file = m_nextFile++;
         m_streams.emplace(file, stream);
         return file;
@@ -1178,6 +1244,9 @@ private:
         const auto found = m_streams.find(file);
         return found != m_streams.end() ? found->second : nullptr;
     }
+
+    std::string m_programRoot;
+    std::string m_localeDataRoot;
 
     static bool Present(const std::string& path) {
         std::error_code error;
@@ -1318,6 +1387,7 @@ void DestroyBackend(Backend* backend) {
     if (backend == nullptr || gConcrete == nullptr) {
         return;
     }
+    gConcrete->input.StopTextInput();
     gConcrete->video.Close();
     gConcrete->audio.Close();
     delete gConcrete;

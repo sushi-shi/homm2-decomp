@@ -110,7 +110,7 @@ typedef enum CombatSmallViewStatRow {
     STAT_ROW_LUCK       = 5
 } CombatSmallViewStatRow;
 
-void combatManager::NoShowCombatLog(char* message) {
+void combatManager::NoShowCombatLog(const char* message) {
     char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
     sprintf(logMessage, "NC: %s", message);
     LogStr(logMessage);
@@ -154,7 +154,9 @@ void combatManager::CheckUpdateCombatMessages(void) {
 
 static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
 
-void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPrevious, i32 clear) {
+void combatManager::CombatMessage(
+    const char* message, i32 updateScreen, i32 retainPrevious, i32 clear
+) {
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
     char* newlinePtr;
     tag_message windowMessage;

@@ -1,0 +1,1178 @@
+// This is the authoritative English message registry. Call sites contain only
+// stable IDs. xgettext derives the translator template from this file, and
+// validate_catalog.py rejects stale PO source snapshots during the build.
+
+HOMM2_MESSAGE(
+    "adventure.confirm.restart",
+    "Are you sure you want to restart?  (Your current game will be lost)"
+)
+
+HOMM2_MESSAGE(
+    "adventure.confirm.load_new_game",
+    "Are you sure you want to load a new game?  (Your current game will be lost)"
+)
+
+HOMM2_MESSAGE(
+    "adventure.confirm.quit",
+    "Are you sure you want to quit?"
+)
+
+HOMM2_MESSAGE(
+    "adventure.help.world_map",
+    "{World Map}\n\nA miniature view of the known world.  Left click to move viewing area."
+)
+
+HOMM2_MESSAGE(
+    "adventure.help.status_window",
+    "{Status Window}\n\nThis window provides information on the status of your hero or kingdom, and shows the date.  Left click here to cycle through these windows."
+)
+
+HOMM2_MESSAGE(
+    "adventure.confirm.end_turn_with_mobile_heroes",
+    "One or more heroes may still move, are you sure you want to end your turn?"
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.requires_full_day",
+    "Digging for artifacts requires a whole day, try again tomorrow."
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.inventory_full",
+    "Searching for the Ultimate Artifact is fruitless.  Your hero could not carry it even if he found it - all his artifact slots are full."
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.clear_ground_only",
+    "Try searching on clear ground."
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.land_only",
+    "Try looking on land!!!"
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.no_artifact_space",
+    "You have no room to carry another artifact!"
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.found_artifact",
+    "Congratulations! After spending many hours digging here, you have uncovered the %s"
+)
+
+HOMM2_MESSAGE(
+    "adventure.search.nothing_found",
+    "Nothing here.\nWhere could it be?"
+)
+
+HOMM2_MESSAGE("adventure.quick.border", "Border")
+HOMM2_MESSAGE("adventure.quick.uncharted", "Uncharted Territory")
+HOMM2_MESSAGE("adventure.quick.artifact", "Artifact")
+HOMM2_MESSAGE("adventure.quick.already_visited", "(already visited)")
+HOMM2_MESSAGE("adventure.quick.not_visited", "(not visited)")
+HOMM2_MESSAGE("adventure.quick.unknown", "Unknown")
+HOMM2_MESSAGE("adventure.quick.reefs", "Reefs")
+HOMM2_MESSAGE("adventure.quick.none", "None")
+
+HOMM2_MESSAGE("calendar.month_week", "Month: %d  Week: %d")
+HOMM2_MESSAGE("calendar.day", "Day: %d")
+HOMM2_MESSAGE("calendar.date.status", "Month: %d, Week: %d, Day: %d")
+
+HOMM2_MESSAGE(
+    "adventure.spell.mine_guardian.requires_mine",
+    "You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell."
+)
+
+HOMM2_MESSAGE(
+    "adventure.spell.identify_hero.success",
+    "Enemy heroes are now fully identifiable."
+)
+
+HOMM2_MESSAGE(
+    "adventure.spell.travel.too_tired",
+    "Your hero is too tired to cast this spell today.  Try again tomorrow."
+)
+
+HOMM2_MESSAGE("save.success", "Game saved successfully.")
+HOMM2_MESSAGE("adventure.spell.dimension_door.failed", "Dimension Door failed!!!")
+HOMM2_MESSAGE("adventure.spell.town_gate.no_town", "No available town.  Spell Failed!!!")
+HOMM2_MESSAGE(
+    "adventure.spell.town_gate.land_only",
+    "Spell Failed!!!  You must be on land for this spell to work."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.town_portal.prompt",
+    "{Town Portal}\n\nSelect town to port to."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.town_gate.occupied",
+    "Nearest town occupied.  Spell Failed!!!"
+)
+HOMM2_MESSAGE("adventure.spell.summon_boat.failed", "Summon Boat failed!!!")
+
+HOMM2_MESSAGE(
+    "system.audio.midi_unavailable",
+    "MIDI music is not currently available on this system."
+)
+HOMM2_MESSAGE(
+    "system.audio.digital_sound_unavailable",
+    "Digital sound is not currently available on this system."
+)
+
+HOMM2_MESSAGE(
+    "adventure.spell.visions.no_monster",
+    "You must be within 3 spaces of a monster for the Visions spell to work."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.visions.forced_join",
+    "The creatures are willing to join us!"
+)
+HOMM2_MESSAGE(
+    "adventure.spell.visions.all_join_fee",
+    "All the creatures will join us...\n\nfor a fee of %d gold."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.visions.some_join_fee",
+    "%d of the creatures will join us...\n\nfor a fee of %d gold."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.visions.flee",
+    "These weak creatures will surely flee before us."
+)
+HOMM2_MESSAGE(
+    "adventure.spell.visions.fight",
+    "I fear these creatures are in the mood for a fight."
+)
+
+HOMM2_MESSAGE(
+    "requester.selection.required",
+    "Please make a selection from the list, or press cancel."
+)
+HOMM2_MESSAGE("requester.file_to_save", "File to Save:")
+HOMM2_MESSAGE("requester.file_to_load", "File to Load:")
+
+HOMM2_PLURAL(
+    "requester.map.no_matching_size",
+    "No maps exist for %d human player at that size.",
+    "No maps exist for %d human players at that size."
+)
+
+HOMM2_MESSAGE(
+    "requester.load.insufficient_human_slots",
+    "The game you have chosen only has slots for %d human(s).  You need one with room for at least %d humans."
+)
+
+HOMM2_MESSAGE(
+    "requester.load.replace_human_slots",
+    "The game you have chosen was being played with %d humans. Is it OK if the computer takes the place of the last %d human(s)?"
+)
+
+HOMM2_MESSAGE(
+    "system.video.insufficient_memory",
+    "You don't have enough memory for non-interlaced video."
+)
+HOMM2_MESSAGE("player.vanquished", "%s has been vanquished!")
+HOMM2_MESSAGE("castle.mage_guild.level", "Mage Guild, Level %d")
+HOMM2_MESSAGE(
+    "castle.build.already_this_turn",
+    "Cannot build.  Already built here this turn."
+)
+HOMM2_MESSAGE(
+    "formation.spread.help",
+    "{Spread Formation}\n\n'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army."
+)
+HOMM2_MESSAGE(
+    "formation.grouped.help",
+    "{Grouped Formation}\n\n'Grouped' combat formation bunches your army together in the center of your side of the battlefield."
+)
+HOMM2_MESSAGE("high_score.cheater_suffix", "\n(Cheater)")
+
+HOMM2_MESSAGE(
+    "network.modem.direct_wait",
+    "Waiting for other computer to log in to direct connection.\n\nPress 'CANCEL' to abort."
+)
+HOMM2_MESSAGE("network.modem.dialing", "Dialing... %s")
+HOMM2_MESSAGE("network.modem.waiting_for_ring", "Waiting for ring...")
+HOMM2_MESSAGE("network.modem.initializing", "Initializing modem...")
+HOMM2_MESSAGE("network.modem.establishing", "Establishing connection...")
+HOMM2_MESSAGE(
+    "network.modem.initialization_prompt",
+    "Please enter any special initialization string required by your modem, or hit 'ENTER' to accept the default."
+)
+HOMM2_MESSAGE("network.modem.telephone_prompt", "Please enter the telephone number.")
+HOMM2_MESSAGE(
+    "network.player.handle_prompt",
+    "Please enter a 'handle' by which you will be known."
+)
+HOMM2_MESSAGE("network.send.retry", "Error sending data.  Keep trying??")
+HOMM2_MESSAGE(
+    "network.load.expansion_unavailable",
+    "At least one player does not have the Heroes II Expansion set.  You will only be able to choose from original Heroes II games."
+)
+
+HOMM2_MESSAGE("recruit.title", "Recruit %s")
+HOMM2_MESSAGE("recruit.available", "Available: %d")
+HOMM2_MESSAGE(
+    "recruit.garrison_full",
+    "There is no room in the garrison for this army."
+)
+
+HOMM2_MESSAGE("hero.captain", "Captain")
+HOMM2_MESSAGE("hero.meeting.title", "%s meets %s")
+HOMM2_MESSAGE(
+    "hero.army.split.between_heroes",
+    "Move how many %s troops from %s to %s?"
+)
+HOMM2_MESSAGE(
+    "combat.morale.high.attack_again",
+    "High morale enables the \n%s to attack again."
+)
+HOMM2_MESSAGE(
+    "combat.morale.low.freeze",
+    "Low morale causes the \n%s to freeze in panic."
+)
+HOMM2_MESSAGE("combat.tower.garrison.damage", "Garrison does %d damage.")
+HOMM2_MESSAGE("combat.tower.keep.damage", "Tower does %d damage.")
+HOMM2_PLURAL(
+    "combat.tower.garrison.damage_with_kills",
+    "Garrison does %d damage.\n%d %s perishes.",
+    "Garrison does %d damage.\n%d %s perish."
+)
+HOMM2_PLURAL(
+    "combat.tower.keep.damage_with_kills",
+    "Tower does %d damage.\n%d %s perishes.",
+    "Tower does %d damage.\n%d %s perish."
+)
+
+HOMM2_MESSAGE(
+    "campaign.confirm.restart_scenario",
+    "Are you sure you want to restart this scenario?"
+)
+HOMM2_MESSAGE("campaign.bonus.resource", "%d %s")
+HOMM2_MESSAGE("campaign.bonus.artifact.mage_ring", "Mage's Ring")
+HOMM2_MESSAGE("campaign.bonus.artifact.fizbin_medal", "Fizbin Medal")
+HOMM2_MESSAGE("campaign.bonus.artifact.thunder_mace", "Thunder Mace")
+HOMM2_MESSAGE("campaign.bonus.artifact.gauntlets", "Gauntlets")
+HOMM2_MESSAGE("campaign.bonus.artifact.defender_helm", "Defender Helm")
+HOMM2_MESSAGE("campaign.bonus.artifact.dragon_sword", "Dragon Sword")
+HOMM2_MESSAGE("campaign.bonus.artifact.power_axe", "Power Axe")
+HOMM2_MESSAGE("campaign.bonus.artifact.breastplate", "Breastplate")
+HOMM2_MESSAGE("campaign.bonus.artifact.minor_scroll", "Minor Scroll")
+HOMM2_MESSAGE("campaign.bonus.artifact.major_scroll", "Major Scroll")
+HOMM2_MESSAGE("campaign.bonus.artifact.foremost_scroll", "Foremost Scroll")
+HOMM2_MESSAGE("campaign.bonus.artifact.ballista", "Ballista")
+HOMM2_MESSAGE("campaign.bonus.artifact.stealth_shield", "Stealth Shield")
+HOMM2_MESSAGE("campaign.bonus.artifact.nomad_boots", "Nomad Boots")
+HOMM2_MESSAGE("campaign.bonus.artifact.traveler_boots", "Traveler's Boots")
+HOMM2_MESSAGE("campaign.bonus.spell.summon_earth", "Summon Earth")
+HOMM2_MESSAGE("campaign.bonus.spell_scroll", "%s Scroll")
+HOMM2_MESSAGE("campaign.bonus.secondary_skill", "%s %s")
+HOMM2_MESSAGE("campaign.bonus.creatures", "%d %s")
+HOMM2_MESSAGE("campaign.bonus.puzzle_pieces", "%d Puzzle Pieces")
+HOMM2_MESSAGE("campaign.bonus.experience", "%d Experience")
+HOMM2_MESSAGE("common.not_applicable", "n/a")
+HOMM2_MESSAGE("common.none", "None")
+HOMM2_MESSAGE(
+    "campaign.selection.invalid_next_scenario",
+    "The currently selected map is not a valid choice for your next scenario."
+)
+
+HOMM2_MESSAGE("hero.confirm.dismiss", "Are you sure you want to dismiss this Hero?")
+HOMM2_MESSAGE("hero.level.learned_skill", "\n\nYou have learned %s %s.")
+HOMM2_MESSAGE(
+    "hero.level.choose_skill",
+    "\n\nYou may learn either %s %s or %s %s."
+)
+HOMM2_MESSAGE(
+    "hero.spell_points.help",
+    "{Spell Points}\n\n%s currently has %d spell points out of a maximum of %d.  The maximum number of spell points is 10 times your knowledge.  It is occasionally possible to have more than your maximum spell points via special events."
+)
+HOMM2_MESSAGE("hero.level.help", "{Level %d}\n\nCurrent experience %d\nNext level %d")
+HOMM2_MESSAGE("hero.army.split.prompt", "Move how many troops?")
+HOMM2_MESSAGE("town.screen.title", "Town Screen")
+HOMM2_MESSAGE(
+    "town.mage_guild.spell_book.no_artifact_space",
+    "You must purchase a spell book to use the mage guild, but you currently have no room for a spell book.  Try giving one of your artifacts to another hero."
+)
+HOMM2_MESSAGE(
+    "town.mage_guild.spell_book.cannot_afford",
+    "To cast spells, you must first buy a spell book for 500 gold.  Unfortunately, you seem to be a little short of cash at the moment."
+)
+HOMM2_MESSAGE(
+    "town.mage_guild.spell_book.confirm_purchase",
+    "To cast spells, you must first buy a spell book for 500 gold.  Do you wish to buy one?"
+)
+HOMM2_MESSAGE("town.upgrade.castle_forbidden", "This town may not be upgraded to a castle.")
+HOMM2_MESSAGE("town.boat.creation_failed", "Can't create boat!")
+HOMM2_MESSAGE("town.boat.limit_reached", "Cannot build another boat.")
+HOMM2_MESSAGE(
+    "town.army.split.hero_to_garrison",
+    "Move how many %s troops from Hero's Army to Garrison?"
+)
+HOMM2_MESSAGE(
+    "town.army.split.garrison_to_hero",
+    "Move how many %s troops from Garrison to Hero's Army?"
+)
+HOMM2_MESSAGE("town.build.requires", "\n\nRequires:")
+HOMM2_MESSAGE("town.build.requires_mage_guild_level_2", "\nLevel 2 Mage Guild")
+HOMM2_MESSAGE("town.mage_guild.spells_available", "The above spells are available here.")
+HOMM2_PLURAL(
+    "town.recruit_hero.description",
+    "%s is a level %d %s with %d artifact.",
+    "%s is a level %d %s with %d artifacts."
+)
+HOMM2_MESSAGE(
+    "town.tavern.rumor",
+    "A generous tip for the barkeep yields the following rumor:\n\n%s"
+)
+HOMM2_MESSAGE("town.well.available", "Available:")
+HOMM2_MESSAGE("town.thieves_guild.primary_stats", "Att.\nDef.\nPower\nKnowl.")
+
+HOMM2_MESSAGE("campaign.hero.sister_eliza", "Sister Eliza")
+HOMM2_MESSAGE("campaign.hero.brother_brax", "Brother Brax")
+HOMM2_MESSAGE("spell.none_to_cast", "No spells to cast.")
+HOMM2_MESSAGE(
+    "spell.mana.insufficient",
+    "That spell costs %d mana.  You only have %d mana, so you can't cast the spell."
+)
+HOMM2_MESSAGE("army.hit_points_left", "\nHit Points Left: %d")
+HOMM2_MESSAGE("army.confirm.dismiss", "Are you sure you want to dismiss this army?")
+HOMM2_MESSAGE(
+    "army.upgrade.confirm",
+    "Your troops can be upgraded, but it will cost you dearly.  Do you wish to upgrade them?"
+)
+HOMM2_MESSAGE("army.upgrade.cannot_afford", "You can't afford to upgrade your troops!")
+HOMM2_MESSAGE("player.turn", "%s's turn.")
+HOMM2_MESSAGE("network.data.sending", "Sending Data")
+HOMM2_MESSAGE("network.data.receiving", "Receiving Data")
+HOMM2_MESSAGE("network.receive.retry", "Error receiving data.  Keep trying?")
+HOMM2_MESSAGE("rumor.leader.obelisks", "%s has found the most obelisks.")
+HOMM2_MESSAGE("rumor.leader.artifacts", "%s has found the most artifacts.")
+HOMM2_MESSAGE("rumor.leader.army", "%s has the most powerful forces.")
+HOMM2_MESSAGE("rumor.leader.income", "%s earns the most gold.")
+HOMM2_MESSAGE(
+    "rumor.ultimate_artifact.region",
+    "The ultimate artifact may be found in the %s regions of the world."
+)
+HOMM2_MESSAGE(
+    "rumor.ultimate_artifact.terrain",
+    "The ultimate artifact may be found %s."
+)
+HOMM2_MESSAGE("rumor.ultimate_artifact.identity", "The ultimate artifact is really the %s.")
+
+HOMM2_MESSAGE("player.number", "Player %d")
+HOMM2_MESSAGE("new_game.rating", "Rating %d%%")
+HOMM2_MESSAGE("network.host.canceled_game", "The host has canceled the game.")
+HOMM2_MESSAGE("new_game.positions.cannot_swap", "The two positions selected can not be swapped.")
+HOMM2_MESSAGE("scenario.loss.castle", "Lose the castle '%s'.")
+HOMM2_MESSAGE("scenario.loss.town", "Lose the town '%s'.")
+HOMM2_MESSAGE("scenario.loss.hero", "Lose the hero '%s'.")
+HOMM2_MESSAGE(
+    "scenario.loss.time",
+    "Fail to win by the end of month %d, week %d, day %d."
+)
+HOMM2_MESSAGE("scenario.loss.standard", "Lose all your heroes, towns and castles.")
+HOMM2_MESSAGE("scenario.victory.capture_castle", "Capture the castle '%s'")
+HOMM2_MESSAGE("scenario.victory.capture_town", "Capture the town '%s'")
+HOMM2_MESSAGE("scenario.victory.defeat_hero", "Defeat the hero '%s'")
+HOMM2_MESSAGE("scenario.victory.find_ultimate_artifact", "Find the ultimate artifact")
+HOMM2_MESSAGE("scenario.victory.find_artifact", "Find the %s")
+HOMM2_MESSAGE("scenario.victory.accumulate_gold", "Accumulate %d gold")
+HOMM2_MESSAGE("scenario.victory.side_must_defeat", "%s must defeat %s")
+HOMM2_MESSAGE(
+    "scenario.victory.with_standard_alternative",
+    "%s, or you may win by defeating all enemy heroes and capturing all enemy towns and castles."
+)
+HOMM2_MESSAGE(
+    "scenario.victory.standard",
+    "Defeat all enemy heroes and capture all enemy towns and castles."
+)
+HOMM2_MESSAGE("scenario.side.list.1", "%s")
+HOMM2_MESSAGE("scenario.side.list.2", "%s and %s")
+HOMM2_MESSAGE("scenario.side.list.3", "%s, %s and %s")
+HOMM2_MESSAGE("scenario.side.list.4", "%s, %s, %s and %s")
+HOMM2_MESSAGE("scenario.side.list.5", "%s, %s, %s, %s and %s")
+HOMM2_MESSAGE("scenario.side.list.6", "%s, %s, %s, %s, %s and %s")
+HOMM2_MESSAGE("scenario.side.you", "You")
+HOMM2_MESSAGE("scenario.side.you_and_ally", "You and your ally %s")
+HOMM2_MESSAGE("scenario.side.you_and_allies", "You and your allies %s")
+HOMM2_MESSAGE("scenario.side.enemy", "the enemy - %s")
+HOMM2_MESSAGE("scenario.side.enemy_alliance", "the enemy alliance of %s")
+
+HOMM2_MESSAGE("combat.mirror_image.destroyed", "The mirror image is destroyed!")
+HOMM2_MESSAGE("combat.attack.singular.damage", "%s does %d damage.")
+HOMM2_MESSAGE("combat.attack.plural.damage", "%s do %d damage.")
+HOMM2_PLURAL(
+    "combat.attack.singular.damage_with_kills",
+    "%s does %d damage.\n%d %s perishes.",
+    "%s does %d damage.\n%d %s perish."
+)
+HOMM2_PLURAL(
+    "combat.attack.plural.damage_with_kills",
+    "%s do %d damage.\n%d %s perishes.",
+    "%s do %d damage.\n%d %s perish."
+)
+HOMM2_PLURAL(
+    "combat.attack.singular.damage_with_generic_kills",
+    "%s does %d damage.\n%d creature perishes.",
+    "%s does %d damage.\n%d creatures perish."
+)
+HOMM2_PLURAL(
+    "combat.attack.plural.damage_with_generic_kills",
+    "%s do %d damage.\n%d creature perishes.",
+    "%s do %d damage.\n%d creatures perish."
+)
+HOMM2_PLURAL(
+    "combat.genie.destroy_half",
+    "%s destroys half the enemy troops!",
+    "%s destroy half the enemy troops!"
+)
+HOMM2_PLURAL(
+    "combat.luck.bad",
+    "Bad luck descends on the %s",
+    "Bad luck descends on the %s"
+)
+HOMM2_PLURAL(
+    "combat.luck.good",
+    "Good luck shines on the %s",
+    "Good luck shines on the %s"
+)
+
+HOMM2_MESSAGE("combat.spell.no_hero", "You have no hero to cast a spell.")
+HOMM2_MESSAGE(
+    "combat.spell.negation_sphere",
+    "The Sphere of Negation artifact is in effect for this battle, disabling all combat spells."
+)
+HOMM2_MESSAGE("combat.spell.already_cast", "You have already cast a spell this round.")
+HOMM2_MESSAGE("combat.confirm.retreat", "Are you sure you want to retreat?")
+HOMM2_MESSAGE("resource.gold.insufficient", "You don't have enough gold!")
+HOMM2_MESSAGE("combat.reward.enemy_artifact", "You have captured an enemy artifact!")
+HOMM2_PLURAL(
+    "combat.necromancy.raised",
+    "Practicing the dark arts of necromancy, you are able to raise %d of the enemy's dead to return under your service as a Skeleton.",
+    "Practicing the dark arts of necromancy, you are able to raise %d of the enemy's dead to return under your service as Skeletons."
+)
+HOMM2_MESSAGE(
+    "combat.eagle_eye.learned_spell",
+    "Through eagle-eyed observation, %s is able to learn the magic spell '%s'."
+)
+HOMM2_MESSAGE("combat.casualties.title", "Battlefield Casualties")
+HOMM2_MESSAGE("combat.casualties.attacker", "Attacker")
+HOMM2_MESSAGE("combat.casualties.defender", "Defender")
+HOMM2_MESSAGE(
+    "combat.surrender.offer",
+    "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage for the price of %d gold.\""
+)
+HOMM2_MESSAGE("combat.siege.ballista.title", "Ballista")
+HOMM2_MESSAGE("combat.siege.ballista.destroyed", "\n\nThe Ballista is destroyed.")
+HOMM2_PLURAL(
+    "combat.siege.ballista.fires",
+    "\n\nThe Ballista fires with the strength of %d Archer.",
+    "\n\nThe Ballista fires with the strength of %d Archers."
+)
+HOMM2_PLURAL(
+    "combat.siege.ballista.fires_with_bonus",
+    "\n\nThe Ballista fires with the strength of %d Archer, with a +%d bonus to attack skill.",
+    "\n\nThe Ballista fires with the strength of %d Archers, each with a +%d bonus to their attack skill."
+)
+HOMM2_MESSAGE("combat.siege.left_turret.destroyed", "\n\nThe Left Turret is destroyed.")
+HOMM2_PLURAL(
+    "combat.siege.left_turret.fires",
+    "\n\nThe Left Turret fires with the strength of %d Archer.",
+    "\n\nThe Left Turret fires with the strength of %d Archers."
+)
+HOMM2_PLURAL(
+    "combat.siege.left_turret.fires_with_bonus",
+    "\n\nThe Left Turret fires with the strength of %d Archer, with a +%d bonus to attack skill.",
+    "\n\nThe Left Turret fires with the strength of %d Archers, each with a +%d bonus to their attack skill."
+)
+HOMM2_MESSAGE("combat.siege.right_turret.destroyed", "\n\nThe Right Turret is destroyed.")
+HOMM2_PLURAL(
+    "combat.siege.right_turret.fires",
+    "\n\nThe Right Turret fires with the strength of %d Archer.",
+    "\n\nThe Right Turret fires with the strength of %d Archers."
+)
+HOMM2_PLURAL(
+    "combat.siege.right_turret.fires_with_bonus",
+    "\n\nThe Right Turret fires with the strength of %d Archer, with a +%d bonus to attack skill.",
+    "\n\nThe Right Turret fires with the strength of %d Archers, each with a +%d bonus to their attack skill."
+)
+
+HOMM2_MESSAGE(
+    "network.player_exit.host_terminated",
+    "%s left the game, and the %s decided to terminate the entire game.  The game has been saved as '%s'.  Do you wish to play on alone with the computer taking over for all human players?"
+)
+HOMM2_MESSAGE(
+    "network.player_exit.timed_out_confirm",
+    "%s has been timed out of the game.  The current game has been saved as '%s'.  Do you wish to continue playing with a computer player filling in for %s?"
+)
+HOMM2_MESSAGE(
+    "network.player_exit.exiting_confirm",
+    "%s is exiting the game.  The current game has been saved as '%s'.  Do you wish to continue playing with a computer player filling in for %s?"
+)
+
+HOMM2_MESSAGE("system.initialization_failed", "Initialization failed!")
+HOMM2_MESSAGE("system.sound.initialization_failed", "Unable to initialize sound.")
+HOMM2_MESSAGE("system.manager.add_failed", "Can't add manager!")
+HOMM2_MESSAGE("network.data.waiting_to_receive", "Waiting to receive game data.")
+HOMM2_MESSAGE("player.color_default_name", "%s player")
+HOMM2_MESSAGE(
+    "campaign.victory.complete",
+    "My heroes, our foes have been scattered, their castles broken and laid bare.  The great campaign is now complete, and I stand before you as the undisputed High King!\n\nOur victory was achieved in %d days!"
+)
+HOMM2_MESSAGE("campaign.ruler.archibald", "Archibald")
+HOMM2_MESSAGE("campaign.ruler.roland", "Roland")
+HOMM2_MESSAGE("network.tcp.command_line_incomplete", "Incomplete TCP/IP command line information")
+HOMM2_MESSAGE("town.building.weekly_growth", "The %s increases production of %s by 8 per week.")
+HOMM2_MESSAGE("town.building.produces", "The %s produces %s.")
+HOMM2_MESSAGE(
+    "help.experience",
+    "{Experience}\n\nExperience allows your heroes to go up levels, increasing their primary and secondary skills."
+)
+HOMM2_MESSAGE(
+    "help.resources",
+    "{Resources}\n\nThere are seven resources in Heroes 2, used to build and improves castles, purchase troops and recruit heroes.  Gold is the most common, required for virtually everything.  Wood and ore are used for most buildings.  Gems, Mercury, Sulfur and Crystal are rare magical resources used for the most powerful creatures and buildings."
+)
+HOMM2_MESSAGE("player.eliminated", "You have been eliminated from the game!!!")
+HOMM2_MESSAGE(
+    "player.last_town_warning",
+    "%s, you have lost your last town.  If you do not conquer another town in the next week, you will be eliminated."
+)
+HOMM2_MESSAGE("player.banished.self", "%s, your heroes abandon you, and you are banished from this land.")
+HOMM2_MESSAGE("player.banished.other", "%s's heroes have abandoned him, and he is banished from this land.")
+HOMM2_MESSAGE("victory.side_triumph", "The enemy is beaten.  Your side has triumphed!")
+HOMM2_MESSAGE("victory.capture_town.self", "You captured %s!  You are victorious.")
+HOMM2_MESSAGE("victory.capture_town.enemy", "The enemy has captured %s!  They are triumphant.")
+HOMM2_MESSAGE("loss.town_fallen", "%s has fallen!  All is lost.")
+HOMM2_MESSAGE(
+    "victory.gold.self",
+    "You have built up over %d gold in your treasury.  All enemies bow before your wealth and power."
+)
+HOMM2_MESSAGE(
+    "victory.gold.enemy",
+    "The enemy has built up over %d gold in his treasury.  You must bow done in defeat before his wealth and power."
+)
+HOMM2_MESSAGE("victory.hero_captured", "You have captured the enemy hero %s!  Your quest is complete.")
+HOMM2_MESSAGE("loss.hero", "You have lost the hero %s.  Your quest is over.")
+HOMM2_MESSAGE("loss.time_expired", "You have failed to complete your quest in time.  All is lost.")
+HOMM2_MESSAGE("artifact.ultimate_generic", "Ultimate Artifact")
+HOMM2_MESSAGE("victory.artifact_found.self", "You have found the %s.  Your quest is complete.")
+HOMM2_MESSAGE("victory.artifact_found.enemy", "The enemy has found the %s.  Your quest is a failure.")
+HOMM2_MESSAGE(
+    "campaign.loss.dwarf_towns",
+    "All the dwarf towns have fallen.  This is a disastrous defeat!  You have lost."
+)
+HOMM2_MESSAGE("campaign.victory.dragon_city", "Dragon city has fallen!  You are now the Master of the Dragons.")
+HOMM2_MESSAGE("campaign.loss.roland_captured", "Roland has been captured!  All is lost.")
+
+HOMM2_MESSAGE("high_score.name_prompt", "Please enter your name for the high score list.")
+HOMM2_MESSAGE("network.incoming_data.must_exit", "[ Incoming data, must exit... ]")
+HOMM2_MESSAGE("system.unexpected_termination", "Unexpected Program Termination")
+HOMM2_MESSAGE("system.goodbye", "Bye!")
+HOMM2_MESSAGE("system.file.open_error", "Error opening file %s!")
+HOMM2_MESSAGE("high_score.cheater_rating", "Cheater!!!")
+HOMM2_MESSAGE(
+    "high_score.congratulations.standard",
+    "Congratulations!\n\nDays: %d\nBase Score: %d\nDifficulty: %d\n\nScore: %d\n\nRating:\n%s\n"
+)
+HOMM2_MESSAGE(
+    "high_score.congratulations.campaign",
+    "Congratulations!\n\nDays: %d\n\nRating:\n%s\n"
+)
+HOMM2_MESSAGE("system.memory.out_of_memory", "Out of memory.")
+HOMM2_MESSAGE("game.confirm.restart", "Are you sure you want to restart?  (Your current game will be lost)")
+HOMM2_MESSAGE("game.confirm.load", "Are you sure you want to load a new game?  (Your current game will be lost)")
+HOMM2_MESSAGE(
+    "network.player_exit.host_reports_timeout",
+    "Host player %s reports that player %s has been timed out of the game.  The game will continue with a computer player filling in for %s."
+)
+HOMM2_MESSAGE(
+    "network.player_exit.host_reports_exit",
+    "Host player %s reports that player %s has exited the game.  The game will continue with a computer player filling in for %s."
+)
+HOMM2_MESSAGE("common.or", "or")
+HOMM2_MESSAGE(
+    "network.player_exit.continue_with_computers",
+    "The current game has been saved as '%s'. Do you wish to keep playing with the computer filling in for the other humans?"
+)
+HOMM2_MESSAGE("network.attack.town", "%s's Town is under attack!")
+HOMM2_MESSAGE("network.attack.hero", "%s's Hero is under attack!")
+HOMM2_MESSAGE(
+    "hero.skill.necromancy.help",
+    "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures killed in combat to be brought back from the dead as Skeletons."
+)
+HOMM2_MESSAGE(
+    "hero.artifact.anduran_combined",
+    "The three Anduran artifacts magically combine into one."
+)
+
+HOMM2_MESSAGE(
+    "spell.earthquake.requires_walls",
+    "An earthquake will do you no good unless there are town walls to damage."
+)
+HOMM2_MESSAGE(
+    "spell.summon_elemental.one_type_only",
+    "You may only summon one type of elemental per combat."
+)
+HOMM2_MESSAGE(
+    "spell.summon_elemental.army_full",
+    "You already have %d creatures groups in combat and cannot add any more."
+)
+HOMM2_MESSAGE(
+    "spell.summon_elemental.no_adjacent_space",
+    "There is no open space adjacent to your hero to summon an Elemental to."
+)
+HOMM2_MESSAGE("spell.no_valid_target", "That spell will affect no one!")
+HOMM2_MESSAGE("spell.damage.cold_ring", "The cold ring does %d damage.")
+HOMM2_MESSAGE("spell.damage.fireball", "The fireball does %d damage.")
+HOMM2_MESSAGE("spell.damage.meteor_shower", "The meteor shower does %d damage.")
+HOMM2_MESSAGE("spell.damage.armageddon", "The armaggedon does %d damage.")
+HOMM2_MESSAGE(
+    "spell.damage.all_undead",
+    "The %s spell does %d damage\nto all undead creatures."
+)
+HOMM2_MESSAGE(
+    "spell.damage.all_living",
+    "The Death spell does %d damage\nto all living creatures."
+)
+HOMM2_MESSAGE("spell.mirror_image.failed", "Mirror Image spell failed!")
+HOMM2_PLURAL(
+    "spell.resurrect.result",
+    "%d %s rises from the dead!",
+    "%d %s rise from the dead!"
+)
+HOMM2_PLURAL(
+    "spell.resisted",
+    "The %s resists the spell!",
+    "The %s resist the spell!"
+)
+
+HOMM2_MESSAGE("trading.marketplace.title", "Marketplace")
+HOMM2_MESSAGE("trading.post.title", "Trading Post")
+HOMM2_MESSAGE(
+    "trading.offer.one_for_one",
+    "{%s}\n\nI can offer you %d unit of %s for %d unit of %s."
+)
+HOMM2_MESSAGE(
+    "trading.offer.one_for_many",
+    "{%s}\n\nI can offer you %d unit of %s for %d units of %s."
+)
+HOMM2_MESSAGE(
+    "trading.offer.many_for_one",
+    "{%s}\n\nI can offer you %d units of %s for %d unit of %s."
+)
+HOMM2_MESSAGE(
+    "trading.offer.many_for_many",
+    "{%s}\n\nI can offer you %d units of %s for %d units of %s."
+)
+HOMM2_MESSAGE(
+    "trading.bargain",
+    "{%s}\n\nYou have received quite a bargain.  I expect to make no profit on the deal.  Can I interest you in any of my other wares?"
+)
+HOMM2_MESSAGE(
+    "trading.inspect_wares",
+    "{%s}\n\nPlease inspect our fine wares.  If you feel like offering a trade, click on the items you wish to trade with and for."
+)
+
+HOMM2_MESSAGE("event.inline.14d0296e539d777e", "{Magic Garden}\n\nYou've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.  Perhaps you should try again next week.")
+
+HOMM2_MESSAGE("event.inline.835273ee016ddfeb", "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.  In exchange for his freedom, he guides you to a small pot filled with precious things.")
+
+HOMM2_MESSAGE("event.inline.1553297e35c659a6", "{Sphinx}\n\nYou come across a giant Sphinx.  The Sphinx remains strangely quiet.")
+
+HOMM2_MESSAGE("event.inline.c15ae0e09ee99d18", "\"I have a riddle for you,\" the Sphinx says.  \"Answer correctly, and you shall be rewarded.  Answer incorrectly, and you shall be eaten.  Do you accept the challenge?\"")
+
+HOMM2_MESSAGE("event.inline.785dc53c14bdbc91", "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?")
+
+HOMM2_MESSAGE("event.inline.b34883b51b1f43be", "Looking somewhat disappointed, the Sphinx sighs.  You've answered my riddle so here's your reward.  Now begone.")
+
+HOMM2_MESSAGE("event.inline.da87bc41bfb2530c", "\"You guessed incorrectly,\" the Sphinx says, smiling.  The Sphinx swipes at you with a paw, knocking you to the ground.  Another blow makes the world go black, and you know no more.")
+
+HOMM2_MESSAGE("event.inline.fff2b25d391ab29d", "{Observation Tower}\n\nFrom the observation tower, you are able to see distant lands.")
+
+HOMM2_MESSAGE("event.inline.dfaca12192a50638", "{Hill Fort}\n\nAn unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any such troops brought to them.  Unfortunately, you have none with you.")
+
+HOMM2_MESSAGE("event.inline.6ffe5f935a4c8867", "{Hill Fort}\n\nAll of the %s you have in your army have been trained by the battle masters of the fort.  Your army now contains %s.")
+
+HOMM2_MESSAGE("event.inline.6ec6a4f4693dcb8d", "{Hill Fort}\n\nAll of the %s and %s you have in your army have been trained by the battle masters of the fort.  Your army now contains %s and %s.")
+
+HOMM2_MESSAGE("event.inline.36d8db3120534c34", "{Hill Fort}\n\n All of the %s, %s and %s you have in your army have been trained by the battle masters of the fort.  Your army now contains %s, %s, and %s.")
+
+HOMM2_MESSAGE("event.inline.e7075cc43429178b", "{Freeman's Foundry}\n\nA blacksmith working at the foundry offers to convert all Pikemen and Swordsmen's weapons brought to him from iron to steel. He also says that he knows a process that will convert Iron Golems into Steel Golems.  Unfortunately, you have none of these troops in your army, so he can't help you.")
+
+HOMM2_MESSAGE("event.inline.95b379d46e666d70", "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.")
+
+HOMM2_MESSAGE("event.inline.49edf5c404ac2672", "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into %s and %s.")
+
+HOMM2_MESSAGE("event.inline.16a4b831c7bd6a44", "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into %s, %s, and %s.")
+
+HOMM2_MESSAGE("event.inline.d2a7adee0f4b9a8a", "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you open it, only to find it empty.")
+
+HOMM2_MESSAGE("event.inline.333bff0ee2591ce7", "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you open it and find 1500 gold pieces.")
+
+HOMM2_MESSAGE("event.inline.c96f2e927c9e47ef", "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you open it and find 1000 gold and the %s")
+
+HOMM2_MESSAGE("event.inline.fafa7917b1fb1445", "{Flotsam}\n\nYou search through the flotsam, but find nothing.")
+
+HOMM2_MESSAGE("event.inline.021d355fcf4f31af", "{Flotsam}\n\nYou search through the flotsam, and find some wood.")
+
+HOMM2_MESSAGE("event.inline.d19251bcd8000e2e", "{Flotsam}\n\nYou search through the flotsam, and find some wood and some gold.")
+
+HOMM2_MESSAGE("event.inline.bd36cf6691ab88e7", "{Flotsam}\n\nYou search through the flotsam and find some wood and some gold.")
+
+HOMM2_MESSAGE("event.inline.4967a4ae1966d928", "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the %s.")
+
+HOMM2_MESSAGE("event.inline.12821ba5d6cffff7", "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he says, \"I would give you an artifact as a reward, but you're all full.\"")
+
+HOMM2_MESSAGE("event.inline.e81b091ba4b1417f", "{Magellan's Maps}\n\nThe captain sighs.  \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\"")
+
+HOMM2_MESSAGE("event.inline.19dbe84af3193778", "{Magellan's Maps}\n\nA retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold.  Do you wish to buy the maps?")
+
+HOMM2_MESSAGE("event.inline.4f16d62af9eceb3d", "{Witch's Hut}\n\nAn ancient and immortal witch living in a hut with bird's legs for stilts teaches you %s for her own inscrutable purposes.")
+
+HOMM2_MESSAGE("event.inline.8432c04b1a757522", "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying an ancient tome on %s.  As you approach, she turns and focuses her one glass eye on you.  \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\"")
+
+HOMM2_MESSAGE("event.inline.68e1e92f9a9d12d5", "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying an ancient tome on %s.  As you approach, she turns and speaks.  \"You already know that which I would teach you. I can help you no further.\"")
+
+HOMM2_MESSAGE("event.inline.87ca55017c24c23b", "{Artesian Spring}\n\nThe spring only refills once a week, and someone's already been here this week.")
+
+HOMM2_MESSAGE("event.inline.db769672add76670", "{Artesian Spring}\n\nA drink from the spring fills your blood with magic!  You have twice your normal spell points in reserve.")
+
+HOMM2_MESSAGE("event.inline.ee47b77e069dbc64", "{Artesian Spring}\n\nA drink at the spring is supposed to give you twice your normal spell points, but you are already at that level.")
+
+HOMM2_MESSAGE("event.inline.0ec7b47d176de1a3", "{Magic Well}\n\nA drink from the well has restored your spell points to maximum.")
+
+HOMM2_MESSAGE("event.inline.fa57992068d990d5", "{Magic Well}\n\nA drink at the well is supposed to restore your spell points, but you are already at maximum.")
+
+HOMM2_MESSAGE("event.inline.6e512f3b213f3c96", "{Magic Well}\n\nA second drink at the well in one day will not help you.")
+
+HOMM2_MESSAGE("event.inline.f28640c80e1c5d9c", "{Chest}\n\nAfter scouring the area, you fall upon a hidden treasure cache.  You may take the gold or distribute the gold to the peasants for experience.  Do you wish to keep the gold?")
+
+HOMM2_MESSAGE("event.inline.5ad75e9e7fadd1a6", "{Chest}\n\nAfter scouring the area, you fall upon a hidden chest, containing the ancient artifact '%s'")
+
+HOMM2_MESSAGE("event.inline.c47e37b66bb1b531", "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is supposed to be lucky, so you do.  The stone is very cold to the touch.")
+
+HOMM2_MESSAGE("event.inline.37291a931defe30b", "{Idol}\n\nYou've found an ancient and weathered stone idol.  It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.")
+
+HOMM2_MESSAGE("event.inline.d665709349b9262f", "{Watering Hole}\n\nA drink at the watering hole fills your troops with strength and lifts their spirits.  You can travel a bit further today.")
+
+HOMM2_MESSAGE("event.inline.96fabc1a4bb74b61", "{Watering Hole}\n\nThe drink at the watering hole is refreshing, but offers no further benefit.  The watering hole might help again if you fought a battle first.")
+
+HOMM2_MESSAGE("event.inline.4a92b05b80d8fdb1", "{Oasis}\n\nA drink at the oasis fills your troops with strength and lifts their spirits.  You can travel a bit further today.")
+
+HOMM2_MESSAGE("event.inline.5bee846fe950642e", "{Oasis}\n\nThe drink at the oasis is refreshing, but offers no further benefit.  The oasis might help again if you fought a battle first.")
+
+HOMM2_MESSAGE("event.inline.229894cb0c595023", "{Temple}\n\nA visit and a prayer at the temple raises the morale of your troops.")
+
+HOMM2_MESSAGE("event.inline.9824059f04898b92", "{Temple}\n\nIt doesn't help to pray twice before a battle.  Come back after you've fought.")
+
+HOMM2_MESSAGE("event.inline.74555e8e4156f4be", "{Lean To}\n\nThe lean-to is long abandoned.  There is nothing of value here.")
+
+HOMM2_MESSAGE("event.inline.c451cfe18d2f7330", "{Lean To}\n\nYou've found an abandoned lean-to.  Poking about, you discover some resources hidden nearby.")
+
+HOMM2_MESSAGE("event.inline.cb89443bb85658f3", "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it to safe terrain.  Inside, you find some of the wagon's cargo still intact.")
+
+HOMM2_MESSAGE("event.inline.b7b134ab6de2bf9c", "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it to safe terrain.  Searching inside, you find the '%s'.")
+
+HOMM2_MESSAGE("event.inline.640141be28ff3fd6", "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it to safe terrain.  Unfortunately, others have found it first, and the wagon is empty.")
+
+HOMM2_MESSAGE("event.inline.cfee7ef6dc2dfe29", "{Xanadu}\n\nThe butler opens the door and looks you up and down.  \"You are neither famous nor diplomatic enough to be admitted to see my master,\" he sniffs.  \"Come back when you think yourself worthy.\"")
+
+HOMM2_MESSAGE("event.inline.6e67be895f4b2e0b", "{Xanadu}\n\nThe butler admits you to see the master of the house.  He trains you in the four skills a hero should know.")
+
+HOMM2_MESSAGE("event.inline.da378498c0963c83", "{Xanadu}\n\nRecognizing you, the butler refuses to admit you.  \"The master,\" he says, \"will not see the same student twice.\"")
+
+HOMM2_MESSAGE("event.inline.2ba84ac8f84d579f", "{Fort}\n\n The soldiers living in the fort teach you a few new defensive tricks.")
+
+HOMM2_MESSAGE("event.inline.41d63febc86c9f57", "{Fort}\n\n \"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"")
+
+HOMM2_MESSAGE("event.inline.21050646fbb7b09b", "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of their strange stone edifices.  Silently, they teach you new ways to cast spells.")
+
+HOMM2_MESSAGE("event.inline.abd64140cf81cf64", "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of their strange stone edifices.  Silently, the Druids turn you away, indicating they have nothing new to teach you.")
+
+HOMM2_MESSAGE("event.inline.d0681d4d11aa03cd", "{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.")
+
+HOMM2_MESSAGE("event.inline.adb07f262cb5a288", "{Witch Doctor's Hut}\n\n\"Go 'way!\", the witch doctor barks, \"you know all I know.\"")
+
+HOMM2_MESSAGE("event.inline.412b3e9f25bdd6fb", "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their tactics.  The mercenaries welcome you and your troops and invite you to train with them.")
+
+HOMM2_MESSAGE("event.inline.66fa174294ad02d5", "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their tactics.  \"You're too advanced for us,\" the mercenary captain says.  \"We can teach nothing more.\"")
+
+HOMM2_MESSAGE("event.inline.b586887c923c2b52", "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the Sprites living there wish to join an army.  Maybe next week.")
+
+HOMM2_MESSAGE("event.inline.b74e2c6dcdfc9414", "{Tree City}\n\nSome of the Sprites living in the tree city are willing to join your army for a price.  Do you want to recruit Sprites?")
+
+HOMM2_MESSAGE("event.inline.9cf24d321bfa6701", "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are gone.  Perhaps there will be more next week.")
+
+HOMM2_MESSAGE("event.inline.1836ce3164cbf13b", "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing to join your army for a price.  Do you want to recruit Medusas?")
+
+HOMM2_MESSAGE("event.inline.6674f02fddf78450", "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond of living under, but there are none here.  Perhaps there will be some next week.")
+
+HOMM2_MESSAGE("event.inline.e7cd159b9a0d9237", "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you fight them?")
+
+HOMM2_MESSAGE("event.inline.ead7ae60b21cca0c", "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They approach you and offer to join your forces as mercenaries.  Do you want to buy any Trolls?")
+
+HOMM2_MESSAGE("event.inline.fd6fbeb8bebaabb7", "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your army, but for a price.  Do you want to recruit Trolls?")
+
+HOMM2_MESSAGE("event.inline.59f3f5aaa52a791b", "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of unlife as well.  Perhaps some undead will move in next week.")
+
+HOMM2_MESSAGE("event.inline.95f1f95998dc4804", "{City of the Dead}\n\nYou've found the ruins of an ancient city, now inhabited solely by the undead.  Will you search?")
+
+HOMM2_MESSAGE("event.inline.c9a9da0253003e88", "{City of the Dead}\n\nSome of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price.  Do you want to recruit Liches?")
+
+HOMM2_MESSAGE("event.inline.280d4b94ba469861", "{City of the Dead}\n\nSome Liches living here are willing to join your army for a price.  Do you want to recruit Liches?")
+
+HOMM2_MESSAGE("event.inline.20d6ea6df7166f59", "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this week.  Perhaps a Dragon will become available next week.")
+
+HOMM2_MESSAGE("event.inline.78bd160e3f266ea6", "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere humans.  Do you wish to violate this rule and challenge the Dragons to a fight?")
+
+HOMM2_MESSAGE("event.inline.5ae328bcb860b385", "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price.  Do you wish to recruit Dragons?")
+
+HOMM2_MESSAGE("event.inline.d4b1f646aae1de64", "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your army for a price.  Do you wish to recruit Dragons?")
+
+HOMM2_MESSAGE("event.inline.51b8add2648e9e2f", "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in delight.  \"Ahh, an adventurer!  Allow me to teach you a little of what I have learned over the ages.\"")
+
+HOMM2_MESSAGE("event.inline.924f82c98b13def7", "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I need 2000 gold.\" it whispers. (sniff)  \"Well, come back when you can pay me.\"")
+
+HOMM2_MESSAGE("event.inline.ce98145109683d0e", "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in delight.  \"Ahh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere 2000 gold.\"  (Just bury it around my roots.)")
+
+HOMM2_MESSAGE("event.inline.ee1576513fcb95bc", "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I need 10 gems.\" it whispers. (sniff)  \"Well, come back when you can pay me.\"")
+
+HOMM2_MESSAGE("event.inline.e5ffff5a51e4796f", "{Tree of Knowledge}\n\nAhh, an adventurer! I will be happy to teach you a little of what I have learned over the ages for a mere 10 gems.\"  (Just bury it around my roots.)")
+
+HOMM2_MESSAGE("event.inline.87d5d0b84d168064", "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in delight.  \"It is good to see you, my student.  I hope my teachings have helped you.\"")
+
+HOMM2_MESSAGE("event.inline.bec395b49e2bdfa9", "Shrine - Player Rankings")
+
+HOMM2_MESSAGE("event.inline.57f459c519bb0e07", "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group of novice acolytes.  In exchange for your protection, they agree to teach you a simple spell - ")
+
+HOMM2_MESSAGE("event.inline.74e932ad068a3630", "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a group of rotund friars.  In exchange for your protection, they agree to teach you a spell - ")
+
+HOMM2_MESSAGE("event.inline.8e7c1487402719c9", "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group of high priests.  In exchange for your protection, they agree to teach you a sophisticated spell - ")
+
+HOMM2_MESSAGE("event.inline.81a2a5818237074f", "Unfortunately, you have no Magic Book to record the spell with.")
+
+HOMM2_MESSAGE("event.inline.b2fd77737182a2d9", "Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.  ")
+
+HOMM2_MESSAGE("event.inline.b880ecbc34dcdb8b", "You cannot pick up this artifact, you already have a full load!")
+
+HOMM2_MESSAGE("event.inline.4e929a833e525afd", "The fabled golden bow of the elves lies here in the dust.  You take it and journey back to the elven towns.  They shower you with their graciousness and the king promises that his people will aid you whenever you seek help.")
+
+HOMM2_MESSAGE("event.inline.219ab198b8338466", "{Artifact}\n\nA leprechaun offers you the %s for the small price of 2000 gold.  Do you wish to buy this artifact?")
+
+HOMM2_MESSAGE("event.inline.eb595f1324302ad8", "You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.")
+
+HOMM2_MESSAGE("event.inline.d2d604b822f6a317", "Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you.")
+
+HOMM2_MESSAGE("event.inline.114341b70ac61964", "{Artifact}\n\nYou've found the humble dwelling of a withered hermit.  The hermit tells you that he is willing to give the %s to the first wise person he meets.")
+
+HOMM2_MESSAGE("event.inline.85b58cafd168a4e6", "{Artifact}\n\nYou've come across the spartan quarters of a retired soldier.  The soldier tells you that he is willing to pass on the %s to the first true leader he meets.")
+
+HOMM2_MESSAGE("event.inline.6ab4a1f0b7bda188", "{Artifact}\n\nA leprechaun offers you the %s for the small price of 2500 gold and 3 %s.  Do you wish to buy this artifact?")
+
+HOMM2_MESSAGE("event.inline.d5ae03d7c7901a43", "{Artifact}\n\nA leprechaun offers you the %s for the small price of 3000 gold and 5 %s.  Do you wish to buy this artifact?")
+
+HOMM2_MESSAGE("event.inline.47fbd3f75db6688a", "{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.")
+
+HOMM2_MESSAGE("event.inline.580a8ff25d58cea2", "{Artifact}\n\nThrough a clearing you observe an ancient artifact.  Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s for the artifact?")
+
+HOMM2_MESSAGE("event.inline.29ceb4fc2c520780", "Discretion is the better part of valor, and you decide to avoid this fight for today.")
+
+HOMM2_MESSAGE("event.inline.db0baf49ee252efe", "Victorious, you take your prize, the %s")
+
+HOMM2_MESSAGE("event.inline.967de2778f210f98", "{Daemon Cave}\n\nThe entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth.  Will you enter?")
+
+HOMM2_MESSAGE("event.inline.a55956dc91df9373", "Except for evidence of a terrible battle, the cave is empty.")
+
+HOMM2_MESSAGE("event.inline.bf2299125ded4930", "You find a powerful and grotesque Demon in the cave.  \"Today,\" it rasps, \"you will fight and surely die.  But I will give you a choice of deaths.  You may fight me, or you may fight my servants.  Do you prefer to fight my servants?\"")
+
+HOMM2_MESSAGE("event.inline.cb3ce775e0c55740", "Upon defeating the daemon's servants, you find a hidden cache with 2500 gold.")
+
+HOMM2_MESSAGE("event.inline.2c0fc1c524da5be1", "The Demon screams its challenge and attacks!  After a short, desperate battle, you slay the monster and receive 1,000 experience points.")
+
+HOMM2_MESSAGE("event.inline.ea1d54ae68a8c04a", "The Demon screams its challenge and attacks!  After a short, desperate battle, you slay the monster and find the %s in the back of the cave.")
+
+HOMM2_MESSAGE("event.inline.92b0881ba080eff9", "The Demon screams its challenge and attacks!  After a short, desperate battle, you slay the monster and receive 1,000 experience points and 2,500 gold.")
+
+HOMM2_MESSAGE("event.inline.1b32f445f3853c55", "The Demon leaps upon you and has its claws at your throat before you can even draw your sword.  \"Your life is mine,\" it says.  \"I will sell it back to you for 2,500 gold.\"")
+
+HOMM2_MESSAGE("event.inline.33c78d108003798f", "Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze.")
+
+HOMM2_MESSAGE("event.inline.b84c63468364c5dd", "{Shipwreck}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the shipwreck?")
+
+HOMM2_MESSAGE("event.inline.af08a748652258d4", "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.")
+
+HOMM2_MESSAGE("event.inline.6b614dcca0dde223", "Upon defeating the Ghosts you sift through the debris and find something!")
+
+HOMM2_MESSAGE("event.inline.1fe5ee69b3203322", "{Derelict Ship}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the ship?")
+
+HOMM2_MESSAGE("event.inline.b2f13c84edb58954", "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.")
+
+HOMM2_MESSAGE("event.inline.85fbba93bc78c682", "Upon defeating the Skeletons you sift through the debris and find something!")
+
+HOMM2_MESSAGE("event.inline.f275576ff90522c2", "You come upon the pyramid of a great and ancient king.  You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.  Will you search?")
+
+HOMM2_MESSAGE("event.inline.414c8dd999ff1206", "You come upon the pyramid of a great and ancient king.  Routine exploration reveals that the pyramid is completely empty.")
+
+HOMM2_MESSAGE("event.inline.3c1ac9096798469d", "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell - ")
+
+HOMM2_MESSAGE("event.inline.bdc50da8baa48d7e", "  Unfortunately, you have no Magic Book to record the spell with.")
+
+HOMM2_MESSAGE("event.inline.b748cab66a3bf25b", "  Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.  ")
+
+HOMM2_MESSAGE("event.inline.1a911306b482a58b", "You come upon an abandoned gold mine.  The mine appears to be haunted.  Do you wish to enter?")
+
+HOMM2_MESSAGE("event.inline.d57cce3fb667b859", "You beat the Ghosts and are able to restore the mine to production.")
+
+HOMM2_MESSAGE("event.inline.95e1a0a20e2b7676", "A magical %s barrier stands tall before you, blocking your way.  Runes on the arch read, \"Speak the key and you may pass.\"")
+
+HOMM2_MESSAGE("event.inline.1ee518efd93cbc65", "As you speak the magic word, the glowing barrier dissolves into nothingness.")
+
+HOMM2_MESSAGE("event.inline.907f9f79f5b78059", "You speak, and nothing happens.")
+
+HOMM2_MESSAGE("event.inline.536b0d04d7ca290d", "You enter the tent and see an old woman gazing into a magic gem.  She looks up and says, \"In my travels, I have learned much in the way of arcane magic.  A great oracle taught me his skill.  I have the answer you seek.  The %s keyword is '%s'.\"")
+
+HOMM2_MESSAGE("event.inline.8db49d8e3d5c5308", "As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you.  He checks your pack, and sees that you have 1 cursed item.  For 750 gold, the alchemist will remove it for you.  Do you pay?")
+
+HOMM2_MESSAGE("event.inline.1c9a29276fc4ba9c", "As you enter the Alchemist's Tower, a hobbled, graying man in a brown cloak makes his way towards you.  He checks your pack, and sees that you have %d cursed items.  For 750 gold,  the alchemist will remove them for you.  Do you pay?")
+
+HOMM2_MESSAGE("event.inline.35891c3b946b11c8", "You hear a voice from behind the locked door, \"You don't have enough gold to pay for my services.\"")
+
+HOMM2_MESSAGE("event.inline.4be252d59fc6debb", "You hear a voice from high above in the tower, \"Go away! I can't help you!\"")
+
+HOMM2_MESSAGE("event.inline.5e4d96b705906aad", "The Arena guards turn you away.")
+
+HOMM2_MESSAGE("event.inline.87faaee8cff00588", "The mermaids silently entice you to return later and be blessed again.")
+
+HOMM2_MESSAGE("event.inline.fae6f0b9369f8351", "The magical, soothing beauty of the Mermaids reaches you and your crew.  Just for a moment, you forget your worries and bask in the beauty of the moment.  The mermaids charms bless you with increased luck for your next combat.")
+
+HOMM2_MESSAGE("event.inline.fd826cb8b8a55aeb", "You enter a rickety hut and talk to the magician who lives there.  He tells you of places near and far which may aid you in your journeys.")
+
+HOMM2_MESSAGE("event.inline.90cd00d12dc7f24b", "This eye seems to be intently studying its surroundings.")
+
+HOMM2_MESSAGE("event.inline.acc859e4d069b705", "You have your crew stop up their ears with wax before the sirens' eerie song has any chance of luring them to a watery grave.")
+
+HOMM2_MESSAGE("event.inline.d211349fcd9060a7", "An eerie wailing song emanates from the sirens perched upon the rocks.  Many of your crew fall under its spell, and dive into the water where they drown.  You are now wiser for the visit, and gain %d experience.")
+
+HOMM2_MESSAGE("event.inline.ee7fce7250a9d986", "As the sirens sing their eerie song, your small, determined army manages to overcome the urge to dive headlong into the sea.")
+
+HOMM2_MESSAGE("event.inline.dd448d43b4794460", "The jailer tells you that the hero who was imprisoned here has been released by the king who imprisoned him.")
+
+HOMM2_MESSAGE("event.inline.30d6f33566016021", "You already have 8 heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.")
+
+HOMM2_MESSAGE("event.inline.5aa1a1227a3f148e", "In a dazzling display of daring, you break into the local jail and free the hero imprisoned there, who, in return, pledges loyalty to your cause.")
+
+HOMM2_MESSAGE("event.inline.aa7c539682b9fd51", "As you reach for the %s, it mysteriously disappears.")
+
+HOMM2_MESSAGE("event.inline.bc81eedbd225f1cc", "The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may pass.\"")
+
+HOMM2_MESSAGE("event.inline.cf9fdd5bf3abd972", "The ogres give you a grunt of recognition, \"Archibald's allies may pass.\"")
+
+HOMM2_MESSAGE("event.inline.f68d63dd41307454", "The dragons see you and call out.  \"Our alliance with Archibald compels us to join you.  Unfortunately you have no room.  A pity!\"  They quickly scatter.")
+
+HOMM2_MESSAGE("event.inline.ca210d925c2d4171", "The dwarves recognize their allies and gladly join your forces.")
+
+HOMM2_MESSAGE("event.inline.7e5ecd33e75d57cd", "The ogres recognize you as the Dwarfbane and lumber over to join you.")
+
+HOMM2_MESSAGE("event.inline.f0128914e00d4e7f", "The dragons, snarling and growling, agree to join forces with you, their 'Ally'.")
+
+HOMM2_MESSAGE("event.inline.53220bf577626eb3", "\"The Dwarfbane!!!!, run for your lives.\"")
+
+HOMM2_MESSAGE("event.inline.4a9a02fcd852e2b3", "As you approach the group of elves, their leader calls them all to attention.  He shouts to them, \"Who of you is brave enough to join this fearless ally of ours?\"  The group explodes with cheers as they run to join your ranks.")
+
+HOMM2_MESSAGE("event.inline.b957bcfea39c68b5", "The elves stand at attention as you approach.  Their leader calls to you and says, \"Let us not impede your progress, ally!  Move on, and may victory be yours.\"")
+
+HOMM2_MESSAGE("event.inline.61cb3563007fe53a", "The %s is swayed by your diplomatic tongue, and offers to join your army for the sum of %d gold.  Do you accept?")
+
+HOMM2_MESSAGE("event.inline.459e418255ebdf2c", "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n")
+
+HOMM2_MESSAGE("event.inline.ddc9cf3652f5dd02", "All %d of the %s will join your army for the sum of %d gold.  Do you accept?")
+
+HOMM2_MESSAGE("event.inline.2f685e157f228f6f", "%d of the %d %s will join your army, and the rest will leave you alone, for the sum of %d gold.  Do you accept?")
+
+HOMM2_MESSAGE("event.inline.f87a6ac73c24c595", "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue and engage them?")
+
+HOMM2_MESSAGE("event.inline.2b436715930a57ee", "Error receiving data.  Keep trying?")
+
+HOMM2_MESSAGE("event.inline.d7ee33967c36bb8b", "Game canceled.")
+
+HOMM2_MESSAGE(
+    "network.tcp.fullscreen_warning",
+    "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode to windowed mode, so that any operating-system dialog boxes can be seen.\n\nWhen the connection is successfully made, you can return to full screen mode by pressing 'F4'."
+)
+HOMM2_MESSAGE("network.tcp.socket_start_error", "Error starting sockets: %d")
+HOMM2_MESSAGE("network.tcp.socket_open_error", "Error opening socket: %d")
+HOMM2_MESSAGE("network.tcp.socket_bind_error", "Error binding socket: %d")
+HOMM2_MESSAGE("network.tcp.socket_mode_error", "Error setting socket mode: %d")
+HOMM2_PLURAL(
+    "network.tcp.host.expected_guests",
+    "Hosting game at %s.\n\nYou have %d guest out of an expected total of %d guests now logged in.  Click 'CANCEL' to move on without waiting for additional guests.",
+    "Hosting game at %s.\n\nYou have %d guests out of an expected total of %d guests now logged in.  Click 'CANCEL' to move on without waiting for additional guests."
+)
+HOMM2_MESSAGE(
+    "network.tcp.host.waiting_guests",
+    "Hosting game at %s\n\nWaiting on guests.\n\nPress 'CANCEL' to abort."
+)
+HOMM2_PLURAL(
+    "network.tcp.host.connected_guests",
+    "Hosting game at %s.\n\nYou have %d guest now logged in.  Click 'OK' to move on, or wait for additional guests.",
+    "Hosting game at %s.\n\nYou have %d guests now logged in.  Click 'OK' to move on, or wait for additional guests."
+)
+HOMM2_MESSAGE(
+    "network.tcp.host_address.prompt",
+    "Enter the host IP address.\n(e.g. 192.0.2.1)"
+)
+HOMM2_MESSAGE("network.tcp.host_address.invalid", "Invalid IP address; please try again.")
+HOMM2_MESSAGE("network.tcp.host.searching", "Searching for host.")
+HOMM2_MESSAGE("network.tcp.send_command_error", "TCP/IP error during 'sendto()': %d")
+HOMM2_MESSAGE("network.tcp.send_error", "Error sending: %d")
+HOMM2_MESSAGE(
+    "network.tcp.host.rejected",
+    "The host already has a game in progress and is not accepting new players."
+)
+HOMM2_MESSAGE(
+    "network.tcp.host.waiting_setup",
+    "Waiting for another remote player to set up the game."
+)
+HOMM2_MESSAGE("network.tcp.unknown_message", "Unknown network message: %d\n")
+HOMM2_MESSAGE("network.tcp.host.not_responding", "The host is not responding.  Keep waiting?")
+
+HOMM2_MESSAGE("swap.artifact.cannot_trade", "This item can't be traded.")
+
+HOMM2_MESSAGE(
+    "combat.spell.invalid_teleport_destination",
+    "Invalid Teleport Destination"
+)
+HOMM2_MESSAGE("combat.spell.select_target", "Select Spell Target")
+HOMM2_MESSAGE(
+    "combat.spell.select_teleport_destination",
+    "Select teleport destination."
+)
+HOMM2_MESSAGE("combat.spell.cast", "Cast %s")
+HOMM2_MESSAGE("combat.spell.teleport_here", "Teleport Here")
+HOMM2_MESSAGE("combat.spell.cast_on_target", "Cast %s on %s")
+HOMM2_MESSAGE(
+    "combat.spell.disrupting_ray",
+    "The disrupting ray reduces defense by %d."
+)
+HOMM2_MESSAGE(
+    "combat.spell.cold_ray_damage",
+    "The cold ray does %d\n damage to the %s."
+)
+HOMM2_MESSAGE(
+    "combat.spell.magic_arrow_damage",
+    "The magic arrow does %d\n damage to the %s."
+)
+HOMM2_MESSAGE(
+    "combat.spell.lightning_bolt_damage",
+    "The lightning bolt does %d\n damage to the %s."
+)
+HOMM2_MESSAGE(
+    "combat.spell.elemental_storm_damage",
+    "The elemental storm does %d damage."
+)
+HOMM2_MESSAGE(
+    "combat.ability.cyclops_paralyze",
+    "The %s are paralyzed by the Cyclopes!"
+)
+HOMM2_MESSAGE(
+    "combat.ability.unicorn_blind",
+    "The Unicorns' attack blinds the %s!"
+)
+HOMM2_MESSAGE(
+    "combat.ability.medusa_petrify",
+    "The Medusas' gaze turns the %s to stone!"
+)
+HOMM2_MESSAGE(
+    "combat.ability.mummy_curse",
+    "The Mummies' curse falls upon the %s!"
+)
+HOMM2_MESSAGE(
+    "combat.ability.archmage_dispel",
+    "The Archmages dispel all good spells\non your %s!"
+)
+HOMM2_MESSAGE(
+    "combat.spell.captain_cast_on",
+    "The captain casts '%s' on the %s."
+)
+HOMM2_MESSAGE("combat.spell.hero_cast_on", "%s casts '%s' on the %s.")
+HOMM2_MESSAGE("combat.spell.captain_cast", "The captain casts '%s'.")
+HOMM2_MESSAGE("combat.spell.hero_cast", "%s casts '%s'.")
+
+HOMM2_MESSAGE("system.audio.initialization_error.title", "Sound initialization error!")
+HOMM2_MESSAGE("system.audio.initialization_error.no_device", "No audio device")
+HOMM2_MESSAGE(
+    "network.hotseat.enter_names_prompt",
+    "Do you wish to enter each player's name?"
+)
+HOMM2_MESSAGE("network.hotseat.player_name_prompt", "Enter player %d's name.")
+HOMM2_MESSAGE("site.necromancer_shrine.name", "Shrine")
+HOMM2_MESSAGE(
+    "site.necromancer_shrine.description",
+    "The Shrine increases the necromancy skill of all your necromancers by 10 percent."
+)
+HOMM2_MESSAGE(
+    "system.resources.initialization_failed",
+    "Unable to initialize resources - possible disk problem."
+)
+HOMM2_MESSAGE(
+    "system.input.initialization_failed",
+    "Unable to initialize input devices - possible problem with mouse or keyboard."
+)
+HOMM2_MESSAGE("system.mouse.initialization_failed", "Unable to initialize mouse.")
+HOMM2_MESSAGE(
+    "system.window.initialization_failed",
+    "Unable to initialize windows - possible memory or disk error."
+)
+HOMM2_MESSAGE("system.terminated", "Terminated")
+HOMM2_MESSAGE("resource.file.open_failed", "Can't open file: %s")
+HOMM2_MESSAGE("player.unknown_hero_name", "The Unknown Hero")
+HOMM2_MESSAGE("adventure.quick_info.cannot_dig", "(cannot dig)")
+HOMM2_MESSAGE("adventure.quick_info.can_dig", "(can dig)")
+HOMM2_MESSAGE("adventure.quick_info.guarded_by", "\n\nguarded by %s %s")
+HOMM2_MESSAGE("game.cheats_in_use", "Cheat codes are in use!\n")
+HOMM2_MESSAGE("game.debug_level_in_use", "Someone has their debug level set!\n")
+HOMM2_MESSAGE("system.options.do_not_show", "Don't Show")
+HOMM2_MESSAGE(
+    "system.audio.cd_playback_unavailable",
+    "Unable to set up CD stereo music.  Your CD player might be in use by another program, or your sound driver might not support CD stereo."
+)
+HOMM2_MESSAGE("common.treasure", "Treasure")
+HOMM2_MESSAGE(
+    "network.remote.player_not_responding",
+    "%s's computer is not responding.  Do you wish to keep waiting for a response?"
+)
+HOMM2_MESSAGE(
+    "network.remote.connection_broken",
+    "Your remote connection to the other players appears to be broken.  Do you wish to keep waiting for a response?"
+)
+HOMM2_MESSAGE(
+    "adventure.arena.choose_skill",
+    "You enter the arena and face a pack of vicious lions.  You handily defeat them, to the wild cheers of the crowd.  Impressed by your skill, the aged trainer of gladiators agrees to train you in a skill of your choice."
+)
+
+HOMM2_MESSAGE(
+    "system.cdrom.unavailable_guest_only",
+    "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game."
+)
+HOMM2_MESSAGE(
+    "system.cdrom.expansion_disc_missing",
+    "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion CD-ROM you will only be able to play as the guest in a multi-player game.  If you have the CD, then exit the program, put the CD in, and try again."
+)
+HOMM2_MESSAGE("system.startup_error.title", "Startup Error")
+HOMM2_MESSAGE(
+    "system.startup_error.game_directory_missing",
+    "Unable to change to the Heroes II directory.  Please run the installation program."
+)
+HOMM2_MESSAGE(
+    "system.startup_error.data_files_missing",
+    "Unable to find the Heroes II data files.  Please run the installation program."
+)
+HOMM2_MESSAGE("map.default.chaos", "Chaos")
+HOMM2_MESSAGE("resource.per_day", "%d/day")
+HOMM2_MESSAGE(
+    "system.memory.requirement",
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) and\n480K of Conventional Memory\n\n"
+)

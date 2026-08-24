@@ -17,7 +17,7 @@
         filter = path: type:
           let relative = pkgs.lib.removePrefix (toString ./. + "/") (toString path); in
           relative == "CMakeLists.txt"
-          || pkgs.lib.any (kept: pkgs.lib.hasPrefix kept relative) [ "src" "include" "web" ];
+          || pkgs.lib.any (kept: pkgs.lib.hasPrefix kept relative) [ "src" "include" "web" "locales" "tools" ];
       };
 
       # Emscripten writes its cache next to $HOME, which a build does not have.
@@ -101,8 +101,10 @@
         src = source;
         nativeBuildInputs = [
           pkgs.cmake
+          pkgs.gettext
           pkgs.ninja
           pkgs.pkg-config
+          pkgs.python3
         ];
         buildInputs = [
           ffmpeg-windows
@@ -119,6 +121,8 @@
           runHook preInstall
           mkdir -p "$out/bin"
           cp homm2.exe "$out/bin/HMM2PL.exe"
+          mkdir -p "$out/bin/lang"
+          cp lang/*.mo "$out/bin/lang/"
           ln -s bin/HMM2PL.exe "$out/HMM2PL.exe"
           cp ${./run-game.sh} "$out/run-game.sh"
           chmod +x "$out/run-game.sh"
@@ -128,9 +132,9 @@
 
       mkNative = debug: p32.stdenv.mkDerivation {
         pname = "homm2${if debug then "-debug" else ""}";
-        version = "2.0";
+        version = "2.1";
         src = source;
-        nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
+        nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
         buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
         cmakeFlags = [
           "-DHOMM2_PLATFORM=SDL3"
@@ -142,6 +146,8 @@
         installPhase = ''
           runHook preInstall
           install -Dm755 homm2 "$out/bin/homm2"
+          install -d "$out/share/homm2/lang"
+          cp lang/*.mo "$out/share/homm2/lang/"
           runHook postInstall
         '';
         meta.mainProgram = "homm2";
@@ -199,9 +205,9 @@
 
       homm2-web = pkgs.stdenvNoCC.mkDerivation {
         pname = "homm2-web";
-        version = "2.0";
+        version = "2.1";
         src = source;
-        nativeBuildInputs = [ pkgs.cmake pkgs.emscripten pkgs.ninja ];
+        nativeBuildInputs = [ pkgs.cmake pkgs.emscripten pkgs.gettext pkgs.ninja pkgs.python3 ];
         configurePhase = ''
           runHook preConfigure
           ${emscriptenHome}emcmake cmake -S . -B build -G Ninja \
@@ -220,10 +226,13 @@
           runHook preInstall
           mkdir -p "$out/share/homm2-web"
           cp build/homm2.html build/homm2.js build/homm2.wasm "$out/share/homm2-web/"
+          mkdir -p "$out/share/homm2-web/lang"
+          cp build/lang/*.mo "$out/share/homm2-web/lang/"
           mkdir -p empty/game
           touch empty/game/.keep
           ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
             "$out/share/homm2-web/homm2.data" \
+            --preload "$out/share/homm2-web/lang@/lang" \
             --preload "$PWD/empty/game@/game" \
             --js-output="$out/share/homm2-web/homm2.data.js"
           runHook postInstall
@@ -260,6 +269,7 @@
 
           ${pkgs.emscripten}/share/emscripten/tools/file_packager.py \
             "$destination/homm2.data" \
+            --preload "${homm2-web}/share/homm2-web/lang@/lang" \
             "''${preload[@]}" \
             --js-output="$destination/homm2.data.js"
 
@@ -298,7 +308,7 @@
       };
 
       devShells.${system}.default = p32.mkShell {
-        nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
+        nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
         buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
       };
     };

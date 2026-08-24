@@ -15,6 +15,7 @@
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <SOURCE/netwin.h>
+#include <SOURCE/Localization.h>
 
 typedef enum WinsockPrivateConstant {
     IP_ADDRESS_ENTRY_LIMIT = 20,
@@ -27,17 +28,11 @@ i16 wsnet_init(void) {
     i32 plr;
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
-        sprintf(
-            gText,
-
-
-            "\xce\xe1 \xe8\xed\xe8\xf6\xe8\xe8\xf0\xee\xe2\xe0\xed\xe8\xe8 TCP/IP \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff. "
-                "\xc3\xe5\xf0\xee\xe8 II \xef\xe5\xf0\xe5\xea\xeb\xfe\xf7\xe0\xf2\xf1\xff \xe2 \xee\xea\xee\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec, \xf7\xf2\xee\xe1\xfb \xe2\xfb "
-                "\xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 \xe4\xee\xf1\xf2\xf3\xef \xea \xe4\xe8\xe0\xeb\xee\xe3\xee\xe2\xfb\xec \xee\xea\xed\xe0\xec Windows.\n\n"
-                "\xca\xee\xe3\xe4\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5 \xe1\xf3\xe4\xe5\xf2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xeb\xe5\xed\xee, \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
-                "\xef\xee\xeb\xed\xee\xfd\xea\xf0\xe0\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec \xed\xe0\xe6\xe0\xe2 'F4'."
+        NormalDialog(
+            localization::Tr("network.tcp.fullscreen_warning"),
+            1,
+            -1, -1, -1, 0, -1, 0, -1, 0
         );
-        NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         SetFullScreenStatus(0);
     }
     gbRemoteOn = true;
@@ -47,21 +42,21 @@ i16 wsnet_init(void) {
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
     if (!platform::SocketsStartup()) {
-        sprintf(cWSTextBuffer, "Error starting sockets: %d", platform::LastSocketError());
+        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_start_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     sd_dg = platform::OpenDatagramSocket();
     if (sd_dg == platform::kInvalidSocket) {
-        sprintf(cWSTextBuffer, "Error opening socket: %d", platform::LastSocketError());
+        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_open_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     gbRemoteOn = true;
     if (!platform::BindSocket(sd_dg, WS_TRANSPORT_PORT)) {
-        sprintf(cWSTextBuffer, "Error binding socket: %d", platform::LastSocketError());
+        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_bind_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     if (!platform::SetSocketNonBlocking(sd_dg, true)) {
-        sprintf(cWSTextBuffer, "Error setting socket mode: %d", platform::LastSocketError());
+        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_mode_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     gIn_addrIP = platform::LocalHost();
@@ -72,10 +67,7 @@ i16 wsnet_init(void) {
         if (giTCPHostStatus != -1) {
             sprintf(
                 cWSTextBuffer,
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                    "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                localization::TrPlural("network.tcp.host.expected_guests", 0),
                 platform::HostText(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
@@ -84,9 +76,7 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                "\xce\xf2\xea\xf0\xfb\xf2\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s\n\n"
-                    "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe3\xee\xf1\xf2\xff(\xe5\xe9).\n\n  "
-                    "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.",
+                localization::Tr("network.tcp.host.waiting_guests"),
                 platform::HostText(gIn_addrIP)
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -99,10 +89,10 @@ i16 wsnet_init(void) {
             if (giTCPNumPlayers > EXTRA_GUEST_PLAYER_THRESHOLD) {
                 sprintf(
                     cWSTextBuffer,
-                    "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xef\xee \xe0\xe4\xf0\xe5\xf1\xf3 %s.\n\n"
-                        "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9 \xe8\xe7 \xee\xe6\xe8\xe4\xe0\xe2\xf8\xe8\xf5\xf1\xff %d \xe3\xee\xf1\xf2\xe5\xe9. "
-                        "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xe3\xf0\xf3, \xed\xe5 \xe4\xee\xe6\xe8\xe4\xe0\xff\xf1\xfc  "
-                        "\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5 \xe3\xee\xf1\xf2\xe5\xe9.",
+                    localization::TrPlural(
+                        "network.tcp.host.expected_guests",
+                        giNumHumanPlayers - 1
+                    ),
                     platform::HostText(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
@@ -112,9 +102,10 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                    "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                    "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+                localization::TrPlural(
+                    "network.tcp.host.connected_guests",
+                    giNumHumanPlayers - 1
+                ),
                 platform::HostText(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
@@ -142,10 +133,7 @@ i16 wsnet_init(void) {
             );
         } else {
             GetDataEntry(
-
-
-                "\xc2\xe2\xe5\xe4\xe8\xf2\xe5 IP \xe0\xe4\xf0\xe5\xf1 \xf1\xe5\xf0\xe2\xe5\xf0\xe0.\n"
-                    "(\xcd\xe0\xef\xf0\xe8\xec\xe5\xf0: 220.415.119.223)",
+                localization::Tr("network.tcp.host_address.prompt"),
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
@@ -156,9 +144,7 @@ i16 wsnet_init(void) {
         giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
         if (giNetPosToDCOPos[0] == -1) {
             NormalDialog(
-
-                "\xcd\xe5\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xfb\xe9 IP \xe0\xe4\xf0\xe5\xf1. "
-                    "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe5\xf9\xe5 \xf0\xe0\xe7.",
+                localization::Tr("network.tcp.host_address.invalid"),
                 NORMAL_DIALOG_WAIT_FIRST,
                 -1,
                 -1,
@@ -172,9 +158,11 @@ i16 wsnet_init(void) {
             goto retryAddress;
         }
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
-        sprintf(
+        snprintf(
             cWSTextBuffer,
-              "\xcf\xee\xe8\xf1\xea \xf1\xe5\xf0\xe2\xe5\xf0\xe0."
+            sizeof(cWSTextBuffer),
+            "%s",
+            localization::Tr("network.tcp.host.searching")
         );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
@@ -232,7 +220,12 @@ void wsSendMessage(
                     DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
                     goto sendPacket;
                 }
-                sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
+                snprintf(
+                    cWSTextBuffer,
+                    sizeof(cWSTextBuffer),
+                    localization::Tr("network.tcp.send_command_error"),
+                    error
+                );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
                 return;
             }
@@ -241,7 +234,7 @@ void wsSendMessage(
         peerAddress.host = static_cast<u32l>(destination);
         iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
         if (iRc < 0) {
-            sprintf(cWSTextBuffer, "Error sending: %d", platform::LastSocketError());
+            sprintf(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
         }
@@ -371,20 +364,21 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             bStartUpInfoReceived = 1;
             break;
         case NETWORK_PACKET_GUEST_REJECTED:
-            sprintf(
+            snprintf(
                 cWSTextBuffer,
-                "\xd1\xe5\xf0\xe2\xe5\xf0 \xf3\xe6\xe5 \xf1\xee\xe7\xe4\xe0\xeb \xe8\xe3\xf0\xf3 "
-                "\xe8 \xed\xe5 \xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xed\xee\xe2\xfb\xf5 "
-                "\xe8\xe3\xf0\xee\xea\xee\xe2."
+                sizeof(cWSTextBuffer),
+                "%s",
+                localization::Tr("network.tcp.host.rejected")
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
-            sprintf(
+            snprintf(
                 cWSTextBuffer,
-                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff "
-                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb."
+                sizeof(cWSTextBuffer),
+                "%s",
+                localization::Tr("network.tcp.host.waiting_setup")
             );
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -395,7 +389,12 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             bHostFound = 1;
             break;
         default:
-            sprintf(cWSTextBuffer, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
+            snprintf(
+                cWSTextBuffer,
+                sizeof(cWSTextBuffer),
+                localization::Tr("network.tcp.unknown_message"),
+                static_cast<i32>(rcvBufIn[0])
+            );
             if (giDebugLevel > 0) {
                 sprintf(gText, cWSTextBuffer);
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -422,9 +421,10 @@ i32 wsWaitForExtraGuests(void) {
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             cWSTextBuffer,
-            "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n"
-                "\xd3 \xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
-                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 \xe8\xe3\xf0\xee\xea\xee\xe2.",
+            localization::TrPlural(
+                "network.tcp.host.connected_guests",
+                giNumHumanPlayers - 1
+            ),
             platform::HostText(gIn_addrIP),
             giNumHumanPlayers - 1
         );
@@ -457,10 +457,11 @@ i32 wsWaitForHost(void) {
             iWSNextTickCount = platform::Ticks() + WS_TRANSPORT_HOST_RETRY_DELAY;
             iWSAttempts++;
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
-                sprintf(
+                snprintf(
                     cWSTextBuffer,
-                      "\xd1\xe5\xf0\xe2\xe5\xf0 \xed\xe5 \xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2. "
-                        "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xee\xe6\xe8\xe4\xe0\xed\xe8\xe5? "
+                    sizeof(cWSTextBuffer),
+                    "%s",
+                    localization::Tr("network.tcp.host.not_responding")
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)

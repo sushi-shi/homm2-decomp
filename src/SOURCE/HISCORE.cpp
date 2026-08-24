@@ -14,6 +14,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <PLATFORM/File.h>
+#include <SOURCE/Localization.h>
 
 highScoreManager::highScoreManager(void) {
     i32 entry;
@@ -218,7 +219,7 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                "\n(\xd7\xe8\xf2\xe5\xf0)"
+                localization::Tr("high_score.cheater_suffix")
             );
         m_window->BroadcastMessage(hsMessage);
 

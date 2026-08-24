@@ -6,7 +6,10 @@
 #include <BASE/font.h>
 #include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
 #include <string.h>
+
+#include <vector>
 
 typedef enum TextWidgetConstant {
     RESOURCE_NAME_CAPACITY = 16,
@@ -49,8 +52,11 @@ void textWidget::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
-    m_text = static_cast<char*>(H2_ALLOC(len));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
+    std::vector<char> legacyText(static_cast<std::size_t>(len) + 1, 0);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(legacyText.data()), len);
+    const std::string decodedText = localization::DecodeResourceText(legacyText.data());
+    m_text = static_cast<char*>(H2_ALLOC(decodedText.size() + 1));
+    memcpy(m_text, decodedText.c_str(), decodedText.size() + 1);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);

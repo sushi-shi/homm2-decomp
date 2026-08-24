@@ -9,6 +9,7 @@
 #include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/Utf8.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -18,6 +19,10 @@
 #include <PLATFORM/Runtime.h>
 #include <PLATFORM/Strings.h>
 #include <SOURCE/REQUEST.h>
+#include <SOURCE/Localization.h>
+#include <SOURCE/SaveNames.h>
+
+#include <string>
 
 enum class FileRequesterHelpIndex : i32 {
     REQUESTER_HELP_NONE          = -1,
@@ -69,13 +74,7 @@ typedef enum FileRequesterPrivateConstant {
     FILTER_FRAME_STEP           = 2,
     FILTER_FRAME_BASE           = 9,
     SELECTED_FILL_COLOR         = 2,
-    SCROLL_CENTER_DIVISOR       = 2,
-    CP1251_UPPER_FIRST          = 0xc0,
-    CP1251_UPPER_LAST           = 0xdf,
-    CP1251_LOWER_FIRST          = 0xe0,
-    CP1251_LOWER_LAST           = 0xff,
-    CP1251_YO_UPPER             = 0xa8,
-    CP1251_YO_LOWER             = 0xb8
+    SCROLL_CENTER_DIVISOR       = 2
 } FileRequesterPrivateConstant;
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
@@ -349,10 +348,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(
-            gText,
-              "\xd1\xee\xf5\xf0\xe0\xed\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
-        );
+        sprintf(gText, localization::Tr("requester.file_to_save"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
@@ -379,10 +375,7 @@ i32 fileRequester::Open(i32 id) {
             }
         }
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(
-            gText,
-              "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\xf4\xe0\xe9\xeb\x3a"
-        );
+        sprintf(gText, localization::Tr("requester.file_to_load"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
@@ -403,7 +396,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && platform::CompareIgnoringCase(
                m_filename,
-                 "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
+               save_names::NewGame
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -430,7 +423,7 @@ void fileRequester::SetOK(i32 enabled) {
 }
 
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
-    u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
+    char newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
     i32 mouseX;
     i32 acceptStep = 0;
@@ -513,9 +506,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
-                                    "\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe8\xe7 \xf1\xef\xe8\xf1\xea"
-                                    "\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 \xea\xed\xee"
-                                    "\xef\xea\xf3 \xee\xf2\xec\xe5\xed\xfb."
+                                    localization::Tr("requester.selection.required")
 
                                     ,
                                     NORMAL_DIALOG_INFO,
@@ -644,27 +635,14 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (!MapExistsForFilter(
                                         static_cast<FileRequesterMapSizeFilter>(iResult)
                                     )) {
-                                    if (giNumHumanPlayers == 1) {
-                                        sprintf(
-                                            gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2 \xf2\xe0\xea\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-
-                                            ,
+                                    sprintf(
+                                        gText,
+                                        localization::TrPlural(
+                                            "requester.map.no_matching_size",
                                             giNumHumanPlayers
-                                        );
-                                    } else {
-                                        sprintf(
-                                            gText,
-                                            "\xcd\xe5\xf2 \xea\xe0\xf0\xf2\xfb \xfd\xf2\xee\xe3\xee"
-                                            " \xf0\xe0\xe7\xec\xe5\xf0\xe0 \xe4\xeb\xff %d \xe8\xe3"
-                                            "\xf0\xee\xea\xee\xe2-\xeb\xfe\xe4\xe5\xe9."
-
-                                            ,
-                                            giNumHumanPlayers
-                                        );
-                                    }
+                                        ),
+                                        giNumHumanPlayers
+                                    );
                                     NormalDialog(
                                         gText,
                                         NORMAL_DIALOG_INFO,
@@ -707,39 +685,38 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 m_window->BroadcastMessage(broadcastMessage);
 
                                 memset(newNameData, 0, FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE);
-                                strcpy(reinterpret_cast<char*>(newNameData), broadcastMessage.payload.widget.data.text);
-                                lengthIndex = strlen(reinterpret_cast<char*>(newNameData));
-                                for (iResult = 0; iResult < lengthIndex; ++iResult) {
-                                    if (!((newNameData[iResult] >= 'A'
-                                           && newNameData[iResult] <= 'Z')
-                                          || (newNameData[iResult] >= 'a'
-                                              && newNameData[iResult] <= 'z')
-                                          || (newNameData[iResult] >= '0'
-                                              && newNameData[iResult] <= '9')
-                                          || (newNameData[iResult] >= CP1251_UPPER_FIRST
-                                              && newNameData[iResult] <= CP1251_UPPER_LAST)
-                                          || (newNameData[iResult] >= CP1251_LOWER_FIRST
-                                              && newNameData[iResult] <= CP1251_LOWER_LAST)
-                                          || newNameData[iResult] == CP1251_YO_UPPER
-                                          || newNameData[iResult] == CP1251_YO_LOWER
-                                          || newNameData[iResult] == '_'
-                                          || newNameData[iResult] == ' '
-                                          || FindToken(
-                                                 "$%'-_@~`!(){}^#&+,;=[].",
-                                                 newNameData[iResult]
-                                             ) != NULL)) {
+                                strcpy(newNameData, broadcastMessage.payload.widget.data.text);
+                                lengthIndex = strlen(newNameData);
+                                for (iResult = 0; iResult < lengthIndex;) {
+                                    const utf8::Decoded decoded =
+                                        utf8::Decode(newNameData + iResult);
+                                    const bool allowed = decoded.valid
+                                        && (utf8::IsLetter(decoded.codePoint)
+                                            || decoded.codePoint >= 0x80
+                                            || (decoded.codePoint >= '0'
+                                                && decoded.codePoint <= '9')
+                                            || decoded.codePoint == ' '
+                                            || (decoded.codePoint < 0x80
+                                                && FindToken(
+                                                       "$%'-_@~`!(){}^#&+,;=[].",
+                                                       static_cast<char>(decoded.codePoint)
+                                                   ) != NULL));
+                                    if (!allowed) {
                                         newNameData[iResult] = 0;
+                                        break;
                                     }
+                                    iResult += static_cast<i32>(decoded.length);
                                 }
-                                for (iResult = strlen(reinterpret_cast<char*>(newNameData)) - 1; iResult >= 0; --iResult) {
+                                for (iResult = strlen(newNameData) - 1; iResult >= 0; --iResult) {
                                     if (newNameData[iResult] == ' ')
                                         newNameData[iResult] = 0;
                                     else
                                         iResult = -1;
                                 }
-                                if (strlen(reinterpret_cast<char*>(newNameData)) > 0 && newNameData[0] > ' ') {
+                                if (strlen(newNameData) > 0
+                                    && utf8::Decode(newNameData).codePoint > ' ') {
                                     m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
-                                    strcpy(m_filename, reinterpret_cast<char*>(newNameData));
+                                    strcpy(m_filename, newNameData);
                                     SetOK(1);
                                 }
                                 broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -851,11 +828,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe2\xe0\xec\xe8 \xe8\xe3\xf0\xe0 \xf0"
-                    "\xe0\xf1\xf1\xf7\xe8\xf2\xe0\xed\xe0 \xf2\xee\xeb\xfc\xea\xee \xed\xe0 %d \xf7"
-                    "\xe5\xeb\xee\xe2\xe5\xea.  \xc0 \xe2\xe0\xec \xed\xf3\xe6\xed\xe0 \xea\xe0\xf0"
-                    "\xf2\xe0, \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xed\xe0 %d \xf7\xe5\xeb"
-                    "\xee\xe2\xe5\xea."
+                    localization::Tr("requester.load.insufficient_human_slots")
 
 
                     ,
@@ -879,12 +852,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff \xe8\xe3\xf0\xe0 \xed\xe0\xf7\xed\xe5\xf2"
-                    "\xf1\xff \xf1 %d \xe8\xe3\xf0\xee\xea\xe0\xec\xe8-\xeb\xfe\xe4\xfc\xec\xe8. "
-                    "\xcc\xee\xe6\xed\xee \xeb\xe8 \xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xf3 \xe2"
-                    "\xe7\xff\xf2\xfc \xef\xee\xe4 \xf1\xe2\xee\xe5 \xf3\xef\xf0\xe0\xe2\xeb\xe5"
-                    "\xed\xe8\xe5 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff %d \xec\xe5\xf1\xf2 \xeb"
-                    "\xfe\xe4\xe5\xe9?"
+                    localization::Tr("requester.load.replace_human_slots")
 
 
                     ,
@@ -1029,7 +997,10 @@ void fileRequester::Update(i32 drawWindow) {
 
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.data.text = gText;
-        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+        const std::string selectedMapName = localization::DecodeExternalText(
+            m_mapHeaders[m_selectedIndex].name
+        );
+        sprintf(gText, "%s", selectedMapName.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(message);
 
@@ -1037,7 +1008,10 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(message);
 
-        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].description);
+        const std::string selectedMapDescription = localization::DecodeExternalText(
+            m_mapHeaders[m_selectedIndex].description
+        );
+        sprintf(gText, "%s", selectedMapDescription.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_DESCRIPTION;
         m_window->BroadcastMessage(message);
     }
@@ -1105,7 +1079,10 @@ void fileRequester::Update(i32 drawWindow) {
 
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                sprintf(gText, "%s", m_mapHeaders[m_topIndex + i].name);
+                const std::string mapName = localization::DecodeExternalText(
+                    m_mapHeaders[m_topIndex + i].name
+                );
+                sprintf(gText, "%s", mapName.c_str());
             } else {
                 sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
             }
@@ -1131,7 +1108,10 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-            sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+            const std::string mapName = localization::DecodeExternalText(
+                m_mapHeaders[m_selectedIndex].name
+            );
+            sprintf(gText, "%s", mapName.c_str());
         } else {
             sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
         }

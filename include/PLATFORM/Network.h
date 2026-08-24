@@ -17,7 +17,7 @@ inline constexpr i32 SERIAL_BYTE_SIZE = 8;
 i16 com_init(u8 port, ComBaudRate baudRate, i32 options);
 void com_term(i16 port);
 i16 com_rcv(i16 port, u16 size, void* data);
-i16 com_snd(i16 port, u16 priority, u16 size, void* data, i32 options);
+i16 com_snd(i16 port, u16 priority, u16 size, const void* data, i32 options);
 void comm_wrt_task();
 
 i16 dpnet_init();

@@ -107,7 +107,7 @@ void SetPalette(i8*, i32);
 void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
-void LogStr(char*);
+void LogStr(const char*);
 void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
 template <typename Enum>
     requires __is_enum(Enum)
@@ -127,7 +127,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(char*, char*, i32, char*, i32, i32);
+void GetDataEntry(const char*, char*, i32, char*, i32, i32);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 enum class DataEntryPhase : i32 {

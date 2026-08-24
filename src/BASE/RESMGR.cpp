@@ -1,8 +1,10 @@
 #include <Ints.h>
 #include <PLATFORM/Strings.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
 #include <string.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
 #include <stdio.h>
 #include <errno.h>
 #include <BASE/resourceManager.h>
@@ -43,6 +45,7 @@ resourceManager::resourceManager(void) : baseManager() {
     }
     m_numAggregates = 0;
     m_curAggregate = 0;
+    m_reserved = 0;
 }
 
 void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIcon) {
@@ -227,6 +230,18 @@ MessageDispatchResult resourceManager::Main(struct tag_message&) {
 }
 
 i32 resourceManager::Open(i32 priority) {
+    if (localization::HasCatalog() && !platform::Files().LocaleDataRoot().empty()) {
+        const i32 localeExpansion =
+            LoadAggregateHeader(EXPANSION_AGGREGATE_NAME, true, false);
+        const i32 localeBase = LoadAggregateHeader(DEFAULT_AGGREGATE_NAME, true, false);
+        if (localeExpansion != LOAD_SUCCESS && localeBase != LOAD_SUCCESS) {
+            platform::Host().Log(
+                platform::LogLevel::Warning,
+                "localization: HOMM2_LOCALE_DATA contains no usable AGG archive"
+            );
+        }
+        m_reserved = m_numAggregates;
+    }
     if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != LOAD_SUCCESS)
         return LOAD_ERROR;
     if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != LOAD_SUCCESS)
@@ -237,6 +252,21 @@ i32 resourceManager::Open(i32 priority) {
     strcpy(m_name, "resourceManager");
     m_resourceListHead = NULL;
     return LOAD_SUCCESS;
+}
+
+void resourceManager::DisableLocaleAggregates(void) {
+    for (i32 aggregateIndex = 0; aggregateIndex < m_reserved; ++aggregateIndex) {
+        if (m_aggregateDir[aggregateIndex] != NULL) {
+            H2_FREE(m_aggregateDir[aggregateIndex]);
+            m_aggregateDir[aggregateIndex] = NULL;
+            m_aggregateEntryCount[aggregateIndex] = 0;
+        }
+        if (m_aggregateFd[aggregateIndex] != INVALID_FILE) {
+            platform::FileClose(m_aggregateFd[aggregateIndex]);
+            m_aggregateFd[aggregateIndex] = INVALID_FILE;
+        }
+    }
+    m_reserved = 0;
 }
 
 void resourceManager::RemoveResource(class resource* resourceToRemove) {
@@ -273,7 +303,7 @@ void resourceManager::Close(void) {
     m_active = false;
 }
 
-i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
+i32 resourceManager::LoadAggregateHeader(char* aggregateName, bool locale, bool required) {
     i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
     i32 aggregateFp;
     u32 directoryBytes;
@@ -286,12 +316,15 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
         ShutDown(gText);
         return LOAD_ERROR;
     }
-    aggregateFp = platform::FileOpen(aggregateName, platform::FileMode::Read);
+    aggregateFp = locale
+        ? platform::FileOpenLocale(aggregateName)
+        : platform::FileOpen(aggregateName, platform::FileMode::Read);
     if (aggregateFp == INVALID_FILE) {
+        if (!required)
+            return LOAD_ERROR;
         sprintf(
             gText,
-
-            "\xcd\xe5 \xec\xee\xe3\xf3 \xee\xf2\xea\xf0\xfb\xf2\xfc \xf4\xe0\xe9\xeb: %s",
+            localization::Tr("resource.file.open_failed"),
             aggregateName
         );
         ShutDown(gText);

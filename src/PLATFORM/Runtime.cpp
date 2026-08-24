@@ -31,6 +31,14 @@ void PumpEvents() {
     }
 }
 
+void StartTextInput() {
+    Input().StartTextInput();
+}
+
+void StopTextInput() {
+    Input().StopTextInput();
+}
+
 MenuHandle LoadMenu(const char* name) {
     std::uintptr_t id = 1;
     for (const unsigned char* byte = reinterpret_cast<const unsigned char*>(name); *byte; ++byte) {

@@ -15,6 +15,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/sample.h>
 #include <BASE/soundManager.h>
+#include <BASE/Utf8.h>
 #include <BASE/WINMGR.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/advManager.h>
@@ -29,6 +30,7 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/Localization.h>
 
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
@@ -352,9 +354,10 @@ void combatManager::SetupCombat(
                 static_cast<i32>(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
-            strcpy(
+            utf8::Copy(
                 m_captain.m_name,
-                "\xca\xe0\xef\xe8\xf2\xe0\xed"
+                sizeof(m_captain.m_name),
+                localization::Tr("hero.captain")
             );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
@@ -1041,15 +1044,13 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xc2\xfb\xf1\xee\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xee\xe7\xe2\xee\xeb\xe8\xeb\xe0 \n"
-                "\xe8\xec \xe5\xf9\xe5 \xf0\xe0\xe7 \xe0\xf2\xe0\xea\xee\xe2\xe0\xf2\xfc \xe2\xf0\xe0\xe3\xe0.",
+                localization::Tr("combat.morale.high.attack_again"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1087,15 +1088,13 @@ i32 combatManager::CheckApplyBadMorale(
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "\xcd\xe8\xe7\xea\xe0\xff \xec\xee\xf0\xe0\xeb\xfc %s \xef\xf0\xe8\xe2\xe5\xeb\xe0 \xea \xf2\xee\xec\xf3, \xf7\xf2\xee \n"
-                "\xee\xed\xe8 \xe7\xe0\xf1\xf2\xfb\xeb\xe8 \xe2 \xef\xe0\xed\xe8\xea\xe5.",
+                localization::Tr("combat.morale.low.freeze"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1695,26 +1694,26 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
 
     i32 killed0 = target9->Damage(damage5, SPELL_NONE);
     if (killed0 > 0) {
+        const char* id = tower == COMBAT_TOWER_GARRISON
+            ? "combat.tower.garrison.damage_with_kills"
+            : "combat.tower.keep.damage_with_kills";
         sprintf(
             gText,
-            "%s %d %s.\n%d %s %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
+            localization::TrPlural(id, killed0),
             damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0",
             killed0,
-            killed0 <= 1 ? gArmyNames[H2EnumIndex(target9->m_monsterType)]
-                         : gArmyNamesPlural[H2EnumIndex(target9->m_monsterType)],
-            killed0 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
+            killed0 > 1 ? gArmyNamesPlural[H2EnumIndex(target9->m_monsterType)]
+                        : gArmyNames[H2EnumIndex(target9->m_monsterType)]
         );
     } else {
         sprintf(
             gText,
-            "%s %d %s.",
-            tower == COMBAT_TOWER_GARRISON ? "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2"
-                                                : "\xc1\xe0\xf8\xed\xff \xed\xe0\xed\xee\xf1\xe8\xf2",
-            damage5,
-            "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
+            localization::Tr(
+                tower == COMBAT_TOWER_GARRISON
+                    ? "combat.tower.garrison.damage"
+                    : "combat.tower.keep.damage"
+            ),
+            damage5
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);

@@ -6,6 +6,7 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/Utf8.h>
 #include <BASE/widget.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/armyGroup.h>
@@ -17,6 +18,7 @@
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+#include <SOURCE/Localization.h>
 
 typedef enum RecruitConstant {
     RESOURCE_COUNT = 6,
@@ -62,27 +64,17 @@ void SetupRecruitWin(
     i32 resourceCost,
     i32 available
 ) {
-    char ch;
-    char monsterName[NAME_SIZE];
+    char recruitName[NAME_SIZE];
     char label[LABEL_SIZE];
     tag_message message;
 
-    strcpy(monsterName, GetMonsterPluralName(creatureType));
-
-    if (static_cast<u8>(monsterName[0]) >= 'A' && static_cast<u8>(monsterName[0]) <= 'Z')
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) >= 0xc0 && static_cast<u8>(monsterName[0]) <= 0xdf)
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) == 0xa8)
-        ch = static_cast<char>(0xb8);
-    else
-        ch = monsterName[0];
-    monsterName[0] = ch;
-    sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc"  , monsterName);
+    utf8::Copy(recruitName, sizeof(recruitName), GetMonsterName(creatureType));
+    utf8::UppercaseFirst(recruitName);
+    sprintf(gText, localization::Tr("recruit.title"), recruitName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
-    message.payload.widget.data.text = label;
+    message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
     sprintf(label, "%d", goldCost);
@@ -94,7 +86,7 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: "  , available);
+    sprintf(gText, localization::Tr("recruit.available"), available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
@@ -186,8 +178,7 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "\xc4\xeb\xff \xfd\xf2\xee\xe9 \xe0\xf0\xec\xe8\xe8 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 "
-            "\xe2 \xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe5."
+            localization::Tr("recruit.garrison_full")
             ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
@@ -219,7 +210,7 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: "  , *m_available);
+    sprintf(gText, localization::Tr("recruit.available"), *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);

@@ -9,6 +9,7 @@
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
+#include <BASE/Utf8.h>
 #include <BASE/icon.h>
 #include <BASE/iconWidget.h>
 #include <BASE/resourceManager.h>
@@ -43,6 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <SOURCE/Localization.h>
 
 namespace {
 
@@ -788,7 +790,7 @@ void townManager::SetupTown(void) {
     message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    strcpy(gText, "\xdd\xea\xf0\xe0\xed \xe3\xee\xf0\xee\xe4\xe0");
+    strcpy(gText, localization::Tr("town.screen.title"));
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
@@ -1083,12 +1085,9 @@ void townManager::SetCommandAndText(struct tag_message& message) {
         case TOWN_WIDGET_GARRISON_CREST:
             sprintf(
                 m_statusText,
-                "%s: %d, %s: %d, %s: %d",
-                "\xcc\xe5\xf1\xff\xf6",
+                localization::Tr("calendar.date.status"),
                 gpGame->m_month,
-                "\xcd\xe5\xe4\xe5\xeb\xff",
                 gpGame->m_week,
-                "\xc4\xe5\xed\xfc",
                 gpGame->m_day
             );
             break;
@@ -1415,7 +1414,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
                                         == TOWN_MAX_ARTIFACTS) {
                                         NormalDialog(
-                                            "\xcf\xf0\xe5\xe6\xe4\xe5 \xe2\xe0\xec \xf1\xeb\xe5\xe4\xf3\xe5\xf2 \xea\xf3\xef\xe8\xf2\xfc \xe2\xee\xeb\xf8\xe5\xe1\xed\xf3\xfe \xea\xed\xe8\xe3\xf3 \xe2 \xe3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xed\xe5\xe5 \xe2 \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xe5. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xee\xf2\xe4\xe0\xf2\xfc \xee\xe4\xe8\xed \xe8\xe7 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2 \xe4\xf0\xf3\xe3\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe."  ,
+                                            localization::Tr("town.mage_guild.spell_book.no_artifact_space")  ,
                                             NORMAL_DIALOG_INFO,
                                             -1,
                                             -1,
@@ -1429,7 +1428,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     } else if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)]
                                                < TOWN_SPELL_BOOK_COST) {
                                         NormalDialog(
-                                            "\xd7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff, \xef\xf0\xe5\xe6\xe4\xe5 \xf1\xeb\xe5\xe4\xf3\xe5\xf2 \xea\xf3\xef\xe8\xf2\xfc \xe2\xee\xeb\xf8\xe5\xe1\xed\xf3\xfe \xea\xed\xe8\xe3\xf3 \xe7\xe0 500 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xf1\xeb\xe8\xf8\xea\xee\xec \xec\xe0\xeb\xee \xe4\xe5\xed\xe5\xe3 \xe2 \xe4\xe0\xed\xed\xfb\xe9 \xec\xee\xec\xe5\xed\xf2."  ,
+                                            localization::Tr("town.mage_guild.spell_book.cannot_afford")  ,
                                             NORMAL_DIALOG_INFO,
                                             -1,
                                             -1,
@@ -1442,7 +1441,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         );
                                     } else {
                                         NormalDialog(
-                                            "\xd7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff, \xef\xf0\xe5\xe6\xe4\xe5 \xf1\xeb\xe5\xe4\xf3\xe5\xf2 \xea\xf3\xef\xe8\xf2\xfc \xe2\xee\xeb\xf8\xe5\xe1\xed\xf3\xfe \xea\xed\xe8\xe3\xf3 \xe7\xe0 500 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xef\xf0\xe8\xee\xe1\xf0\xe5\xf1\xf2\xe8 \xe5\xe5?"  ,
+                                            localization::Tr("town.mage_guild.spell_book.confirm_purchase")  ,
                                             NORMAL_DIALOG_CONFIRM,
                                             -1,
                                             -1,
@@ -1554,7 +1553,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             {
                                 if (m_town->m_mayNotUpgradeToCastle != 0) {
                                     NormalDialog(
-                                        "\xdd\xf2\xee\xf2 \xe3\xee\xf0\xee\xe4 \xed\xe5 \xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc \xee\xf2\xf1\xf2\xf0\xee\xe5\xed \xe4\xee \xf3\xf0\xee\xe2\xed\xff \xe7\xe0\xec\xea\xe0."  ,
+                                        localization::Tr("town.upgrade.castle_forbidden")  ,
                                         NORMAL_DIALOG_INFO,
                                         -1,
                                         -1,
@@ -1627,12 +1626,12 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             m_bankBox->Update(1);
                                         } else {
                                             i32 result = 0;
-                                            LogStr("\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc \xea\xee\xf0\xe0\xe1\xeb\xfc!"  );
+                                            LogStr(localization::Tr("town.boat.creation_failed")  );
                                         }
                                     }
                                 } else {
                                     NormalDialog(
-                                        "\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc \xe5\xf9\xe5 \xee\xe4\xe8\xed \xea\xee\xf0\xe0\xe1\xeb\xfc."  ,
+                                        localization::Tr("town.boat.limit_reached")  ,
                                         NORMAL_DIALOG_INFO,
                                         BOAT_LIMIT_DIALOG_X,
                                         BOAT_LIMIT_DIALOG_Y,
@@ -1982,14 +1981,16 @@ void townManager::SplitArmy(void) {
     m_splitMaximum = m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
     message.type = MESSAGE_WIDGET;
     if (m_pendingStrip->m_army == m_swapStrip->m_army) {
-        sprintf(gText, "\xd1\xea\xee\xeb\xfc\xea\xee \xe2\xee\xe8\xed\xee\xe2 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8?"  );
+        sprintf(gText, localization::Tr("hero.army.split.prompt")  );
     } else {
         sprintf(
             gText,
-            "\xca\xe0\xea \xec\xed\xee\xe3\xee %s \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8 \xe8\xe7 \xe0\xf0\xec\xe8\xe8 %s \xe2 \xe0\xf0\xec\xe8\xfe %s?"  ,
-            gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
-            m_swapStrip == m_heroStrip ? "\xe3\xe5\xf0\xee\xff"   : "\xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe0"  ,
-            m_pendingStrip == m_heroStrip ? "\xe3\xe5\xf0\xee\xff"   : "\xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe0"
+            localization::Tr(
+                m_swapStrip == m_heroStrip
+                    ? "town.army.split.hero_to_garrison"
+                    : "town.army.split.garrison_to_hero"
+            ),
+            gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
         );
     }
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -2222,7 +2223,7 @@ i32 townManager::BuyBuild(
         for (index_h = 0; index_h < TOWN_BUILDING_COUNT; ++index_h) {
             if (prerequisiteMask_c & (1L << index_h)) {
                 if (prerequisiteCount_p == 0)
-                    strcat(description_b, "\n\n\xcd\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xee:"  );
+                    strcat(description_b, localization::Tr("town.build.requires")  );
                 ++prerequisiteCount_p;
                 strcat(description_b, "\n");
                 strcat(description_b, GetBuildingName(m_town->m_type, BuildingSlotType(index_h)));
@@ -2231,7 +2232,7 @@ i32 townManager::BuyBuild(
         if (m_town->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE
             && m_town->m_buildState <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
-            strcat(description_b, "\n\xc3\xe8\xeb\xfc\xe4\xe8\xff \xec\xe0\xe3\xee\xe2, 2 \xfd\xf2\xe0\xe6"  );
+            strcat(description_b, localization::Tr("town.build.requires_mage_guild_level_2")  );
     }
     strcat(description_b, "\n ");
 
@@ -2270,7 +2271,7 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         sprintf(
             gText,
-            "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2"  ,
+            localization::Tr("castle.mage_guild.level")  ,
             mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? mageLevel_k + 1
                                                         : TOWN_MAGE_GUILD_MAX_LEVEL
         );
@@ -2550,7 +2551,7 @@ void townManager::SetupMage(heroWindow* window) {
 
     message_i.type = MESSAGE_WIDGET;
     if (m_town->m_occupyingHeroId == -1) {
-        strcpy(gText, "\xd3\xea\xe0\xe7\xe0\xed\xed\xfb\xe5 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xe4\xee\xf1\xf2\xf3\xef\xed\xfb \xe7\xe4\xe5\xf1\xfc."  );
+        strcpy(gText, localization::Tr("town.mage_guild.spells_available")  );
         message_i.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_i.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
         message_i.payload.widget.data.text = gText;
@@ -2744,7 +2745,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     }
     sprintf(
         gText,
-        "%s %d \xf3\xf0\xee\xe2\xed\xff %s. \xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2: %d."  ,
+        localization::TrPlural("town.recruit_hero.description", artifactCount_h),
         m_recruitHero->m_name,
         m_recruitHero->m_level,
         gAlignmentNames[H2EnumIndex(m_recruitHero->m_cursorType)],
@@ -2883,9 +2884,7 @@ void townManager::DoTavern(void) {
     SetWinText(m_heroWindow0, TAVERN_WINDOW_TEXT_ID);
     sprintf(
         gText,
-        "\xd9\xe5\xe4\xf0\xfb\xe5 \xf7\xe0\xe5\xe2\xfb\xe5 \xe2\xfb\xf2\xff\xed\xf3\xeb\xe8 "
-        "\xe8\xe7 \xf3\xf1\xf2 \xf2\xf0\xe0\xea\xf2\xe8\xf0\xf9\xe8\xea\xe0 "
-        "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe8\xe9 \xf1\xeb\xf3\xf5:\n\n%s"
+        localization::Tr("town.tavern.rumor")
 
 
         ,
@@ -3049,7 +3048,7 @@ void townManager::SetupWell(heroWindow* window) {
         if (m_town->m_buildings
             & (1L << (dwellingTypes_c[dwellingResult_a] + H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)))) {
             available_e = m_town->m_garrison[dwellingTypes_c[dwellingResult_a]];
-            sprintf(gText, "\xc4\xee\xf1\xf2\xf3\xef\xed\xee:"  );
+            sprintf(gText, localization::Tr("town.well.available")  );
             message_i.payload.widget.id = dwellingResult_a + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
             message_i.payload.widget.data.text = gText;
             window->BroadcastMessage(message_i);
@@ -3064,16 +3063,7 @@ void townManager::SetupWell(heroWindow* window) {
             gText,
             gArmyNames[H2EnumIndex(gDwellingType[H2EnumIndex(m_town->m_type)][dwellingTypes_c[dwellingResult_a]])]
         );
-        char upperFirst;
-        if (static_cast<u8>(gText[0]) >= 'a' && static_cast<u8>(gText[0]) <= 'z')
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) >= 0xe0 && static_cast<u8>(gText[0]) <= 0xff)
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) == 0xb8)
-            upperFirst = '\xa8';
-        else
-            upperFirst = gText[0];
-        gText[0] = upperFirst;
+        utf8::UppercaseFirst(gText);
         message_i.payload.widget.data.text = gText;
         window->BroadcastMessage(message_i);
     }
@@ -3247,7 +3237,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         while (gpGame->m_playerDead[rank_a] != 0)
             ++rank_a;
         sprintf(gText, gColors[gpGame->m_players[rank_a].m_color]);
-        gText[0] = ToUpperCp1251(gText[0]);
+        utf8::UppercaseFirst(gText);
         message_h.type = MESSAGE_WIDGET;
         message_h.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
@@ -3315,7 +3305,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
             {
                 if (strongestHeroPosition_j != -1) {
                     strongestHero_d = gpGame->GetPlayerHero(rank_a, strongestHeroPosition_j);
-                    sprintf(gText, "\xc0\xf2.\n\xc7\xe0\xf9.\n\xcc\xe0\xe3.\n\xc7\xed."  );
+                    sprintf(gText, localization::Tr("town.thieves_guild.primary_stats")  );
                     widgetText_c = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
                     strcpy(widgetText_c, gText);
                     textControl_p = new textWidget(

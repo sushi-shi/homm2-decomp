@@ -7,20 +7,17 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/Utf8.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Runtime.h>
 #include <BASE/Misc.h>
 #include <BASE/icon.h>
 #include <string.h>
 
-typedef enum TextEntryKeyConstant {
-    ACCEPT_KEY             = 10,
-    DELETE_KEY             = 0x7f,
-    EXTENDED_KEY_SHIFT     = 8,
-    EXTENDED_KEY_HIGH_MASK = 0xff00,
-    ASCII_KEY_MASK         = 0xff
-} TextEntryKeyConstant;
+#include <algorithm>
+#include <vector>
 
 typedef enum TextEntrySourceFileConstant {
     ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
@@ -39,11 +36,6 @@ typedef enum TextEntryConstant {
     EDIT_ALLOCATION_PADDING     = 6,
     PRESERVE_TEXT_FLAG          = 1
 } TextEntryConstant;
-
-typedef enum InputManagerExtendedKey {
-    EXTENDED_KEY_BASE = 0x100
-} InputManagerExtendedKey;
-
 
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
@@ -86,7 +78,11 @@ textEntryWidget::textEntryWidget(
     m_preserveTextOnFocus = 0;
     m_color = FONT_DRAW_DEFAULT;
     m_maxLength = maxLength;
-    m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
+    const std::size_t allocation = std::max<std::size_t>(
+        static_cast<std::size_t>(m_maxLength) + TEXT_ALLOCATION_PADDING,
+        strlen(text) + TEXT_ALLOCATION_PADDING
+    );
+    m_text = static_cast<char*>(H2_ALLOC(allocation));
     strcpy(m_text, text);
     if (layout == TEXT_ENTRY_LAYOUT_INSET) {
         m_preserveTextOnFocus = 1;
@@ -108,8 +104,17 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
-    m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
+    std::vector<char> legacyText(static_cast<std::size_t>(m_maxLength) + 1, 0);
+    gpResourceManager->ReadBlock(
+        reinterpret_cast<i8*>(legacyText.data()), m_maxLength
+    );
+    const std::string decodedText = localization::DecodeResourceText(legacyText.data());
+    const std::size_t allocation = std::max<std::size_t>(
+        static_cast<std::size_t>(m_maxLength) + TEXT_ALLOCATION_PADDING,
+        decodedText.size() + TEXT_ALLOCATION_PADDING
+    );
+    m_text = static_cast<char*>(H2_ALLOC(allocation));
+    memcpy(m_text, decodedText.c_str(), decodedText.size() + 1);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
@@ -233,6 +238,39 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 done = 0;
                 glTimers[0] = platform::Ticks() + CURSOR_BLINK_TICKS;
                 gpMouseManager->ReallyHidePointer();
+                platform::StartTextInput();
+                const auto insertCodePoint = [&](std::uint32_t codePoint) {
+                    if (codePoint < ' ' || codePoint == '{' || codePoint == '}')
+                        return;
+
+                    char encoded[4];
+                    const std::size_t encodedLength = utf8::Encode(codePoint, encoded);
+                    const std::size_t editLength = strlen(edit);
+                    if (encodedLength == 0
+                        || editLength + encodedLength >= static_cast<std::size_t>(m_maxLength)
+                        || editLength + encodedLength >= TEXT_BUFFER_CAPACITY)
+                        return;
+
+                    strcpy(copy, edit);
+                    H2_FREE(m_text);
+                    m_text = static_cast<char*>(
+                        H2_ALLOC(editLength + encodedLength + EDIT_ALLOCATION_PADDING)
+                    );
+                    memmove(
+                        edit + m_cursorPosition + encodedLength,
+                        edit + m_cursorPosition,
+                        editLength - m_cursorPosition + 1
+                    );
+                    memcpy(edit + m_cursorPosition, encoded, encodedLength);
+                    const u16 oldCursor = m_cursorPosition;
+                    m_cursorPosition += static_cast<u16>(encodedLength);
+                    SetupDisplayString(edit, m_cursorPosition);
+                    if (m_entryType != TEXT_ENTRY_READ_MULTILINE
+                        && m_font->LineLength(m_text, m_innerW) > m_maxLines) {
+                        strcpy(edit, copy);
+                        m_cursorPosition = oldCursor;
+                    }
+                };
                 while (done == 0) {
                     if (platform::Ticks() > glTimers[0]) {
                         SetupDisplayString(edit, m_cursorPosition);
@@ -241,7 +279,9 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                     }
                     platform::PumpEvents();
                     event = gpInputManager->GetEvent();
+                    bool redraw = false;
                     if (event.type == MESSAGE_KEY_DOWN) {
+                        redraw = true;
                         switch (event.payload.keyboard.keyCode) {
                             case INPUT_SCAN_ESCAPE:
                                 if (gbAllowTextEntryEscape == 0)
@@ -252,108 +292,58 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                 break;
                             case INPUT_SCAN_NUMPAD_DELETE:
                                 if (m_cursorPosition < strlen(edit)) {
-                                    strcpy(swap, edit + m_cursorPosition + 1);
+                                    const std::size_t next = utf8::Next(edit, m_cursorPosition);
+                                    strcpy(swap, edit + next);
                                     strcpy(edit + m_cursorPosition, swap);
                                 }
                                 break;
                             case INPUT_SCAN_NUMPAD_4:
                                 if (m_cursorPosition > 0) {
-                                    m_cursorPosition--;
+                                    m_cursorPosition = static_cast<u16>(
+                                        utf8::Previous(edit, m_cursorPosition)
+                                    );
                                     if (m_cursorPosition < m_displayOffset)
                                         m_displayOffset = m_cursorPosition;
                                 }
                                 break;
                             case INPUT_SCAN_NUMPAD_6:
-                                if (m_cursorPosition < strlen(edit))
-                                    m_cursorPosition++;
-                                break;
-                            default:
-                                gpInputManager->AsciiConvert(event);
-                                if (event.payload.keyboard.keyCode == ACCEPT_KEY) {
-                                    gbTextEntryEscaped = false;
-                                    done++;
-                                } else if (event.payload.keyboard.keyCode == DELETE_KEY) {
-                                    if (m_cursorPosition > 0) {
-                                        strcpy(swap, edit + m_cursorPosition);
-                                        strcpy(edit + m_cursorPosition - 1, swap);
-                                        m_cursorPosition--;
-                                        if (m_cursorPosition < m_displayOffset)
-                                            m_displayOffset = m_cursorPosition;
-                                    }
-                                } else if (strlen(edit) + 1 < m_maxLength
-                                           && event.payload.keyboard.keyCode != 0) {
-                                    strcpy(copy, edit);
-                                    char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= EXTENDED_KEY_BASE) {
-                                        i32 key = (event.payload.keyboard.keyCode
-                                                   & EXTENDED_KEY_HIGH_MASK)
-                                                  >> EXTENDED_KEY_SHIFT;
-                                        switch (key) {
-                                            case INPUT_SCAN_NUMPAD_0:
-                                                typed = '0';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_1:
-                                                typed = '1';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_2:
-                                                typed = '2';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_3:
-                                                typed = '3';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_4:
-                                                typed = '4';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_5:
-                                                typed = '5';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_6:
-                                                typed = '6';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_7:
-                                                typed = '7';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_8:
-                                                typed = '8';
-                                                break;
-                                            case INPUT_SCAN_NUMPAD_9:
-                                                typed = '9';
-                                                break;
-                                        }
-                                    } else {
-                                        typed = event.payload.keyboard.keyCode & ASCII_KEY_MASK;
-                                        if (typed == '{' || typed == '}')
-                                            typed = 0;
-                                    }
-                                    if (typed != 0) {
-                                        strcpy(swap, m_text);
-                                        H2_FREE(m_text);
-                                        m_text = static_cast<char*>(
-                                            H2_ALLOC(strlen(edit) + EDIT_ALLOCATION_PADDING)
-                                        );
-                                        strcpy(swap, edit);
-                                        swap[m_cursorPosition] = typed;
-                                        swap[m_cursorPosition + 1] = 0;
-                                        strcat(swap, edit + m_cursorPosition);
-                                        strcpy(edit, swap);
-                                        m_cursorPosition++;
-                                        SetupDisplayString(edit, m_cursorPosition);
-                                        if (m_entryType != TEXT_ENTRY_READ_MULTILINE) {
-                                            i32 lineLength = m_font->LineLength(m_text, m_innerW);
-                                            if (lineLength > m_maxLines) {
-                                                strcpy(edit, copy);
-                                                m_cursorPosition--;
-                                            }
-                                        }
-                                    }
+                                if (m_cursorPosition < strlen(edit)) {
+                                    m_cursorPosition = static_cast<u16>(
+                                        utf8::Next(edit, m_cursorPosition)
+                                    );
                                 }
                                 break;
+                            case INPUT_SCAN_ENTER:
+                                gbTextEntryEscaped = false;
+                                done++;
+                                break;
+                            case INPUT_SCAN_BACKSPACE:
+                                if (m_cursorPosition > 0) {
+                                    const std::size_t previous =
+                                        utf8::Previous(edit, m_cursorPosition);
+                                    strcpy(swap, edit + m_cursorPosition);
+                                    strcpy(edit + previous, swap);
+                                    m_cursorPosition = static_cast<u16>(previous);
+                                    if (m_cursorPosition < m_displayOffset)
+                                        m_displayOffset = m_cursorPosition;
+                                }
+                                break;
+                            default:
+                                break;
                         }
+                    } else if (event.type == MESSAGE_TEXT_INPUT) {
+                        redraw = true;
+                        insertCodePoint(
+                            static_cast<std::uint32_t>(event.payload.keyboard.keyCode)
+                        );
+                    }
+                    if (redraw) {
                         SetupDisplayString(edit, m_cursorPosition);
                         Draw();
                         gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
                     }
                 }
+                platform::StopTextInput();
                 gpMouseManager->ReallyShowPointer();
                 strcpy(m_text, edit);
                 m_displayOffset = 0;
@@ -376,8 +366,10 @@ void textEntryWidget::Draw(void) {
 
         strcpy(display, m_text + m_displayOffset);
         len = strlen(display);
-        while (m_font->LineWidth(display) > m_innerW)
-            display[--len] = 0;
+        while (m_font->LineWidth(display) > m_innerW) {
+            len = utf8::Previous(display, len);
+            display[len] = 0;
+        }
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_rectX,
             m_owner->m_posY + m_rectY,
@@ -438,7 +430,9 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
             if (m_font->LineWidth(display) > m_innerW) {
                 display[cursor - m_displayOffset + 1] = 0;
                 if (m_font->LineWidth(display) > m_innerW) {
-                    m_displayOffset++;
+                    m_displayOffset = static_cast<i16>(
+                        utf8::Next(source, m_displayOffset)
+                    );
                     changed = 1;
                 }
             }
@@ -447,9 +441,12 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
             changed = 1;
             while (changed) {
                 changed = 0;
-                strcpy(display, m_text + m_displayOffset - 1);
+                const i16 previous = static_cast<i16>(
+                    utf8::Previous(source, m_displayOffset)
+                );
+                strcpy(display, m_text + previous);
                 if (m_font->LineWidth(display) <= m_innerW)
-                    m_displayOffset--;
+                    m_displayOffset = previous;
                 else
                     changed = 0;
                 if (m_displayOffset == 0)

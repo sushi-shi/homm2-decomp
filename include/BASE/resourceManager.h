@@ -22,7 +22,7 @@ struct aggEntry {
 };
 
 typedef enum ResourceManagerLayoutConstant {
-    RESOURCE_MANAGER_AGGREGATE_LIMIT   = 2,
+    RESOURCE_MANAGER_AGGREGATE_LIMIT   = 4,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
@@ -43,6 +43,7 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
+    void DisableLocaleAggregates(void);
     void GetBackdrop(char*, class bitmap*, i32);
     void GetBackdropAtLoc(char*, class bitmap*, i32, i32, i32);
     class palette* GetPalette(char*);
@@ -58,7 +59,7 @@ public:
     void Expunge(void);
     class resource* Query(u32l);
     void RemoveResource(class resource*);
-    i32 LoadAggregateHeader(char*);
+    i32 LoadAggregateHeader(char*, bool locale = false, bool required = true);
     void PointToFile(u32l);
     u32l GetFileSize(u32l);
     void SavePosition(void);

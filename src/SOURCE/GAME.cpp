@@ -46,6 +46,11 @@
 #include <BASE/mouseManager.h>
 #include <SOURCE/ARMY.h>
 #include <PLATFORM/Runtime.h>
+#include <SOURCE/Localization.h>
+#include <SOURCE/SaveNames.h>
+#include <BASE/Utf8.h>
+
+#include <string>
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \
@@ -64,34 +69,6 @@ typedef enum ExpansionCampaignSaveConstant {
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 } ExpansionCampaignSaveConstant;
 
-
-typedef enum Cp1251Constant {
-    CP1251_CAPITAL_YO = 0xa8,
-    CP1251_SMALL_YO   = 0xb8,
-    CP1251_CAPITAL_A  = 0xc0,
-    CP1251_CAPITAL_YA = 0xdf,
-    CP1251_SMALL_A    = 0xe0,
-    CP1251_SMALL_YA   = 0xff
-} Cp1251Constant;
-
-namespace {
-
-
-    inline char ToUpperCp1251(u8 letter) {
-        char capital;
-
-        if (letter >= 'a' && letter <= 'z')
-            capital = letter - ('a' - 'A');
-        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
-            capital = letter - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (letter == CP1251_SMALL_YO)
-            capital = CP1251_CAPITAL_YO;
-        else
-            capital = letter;
-        return capital;
-    }
-
-}
 
 typedef enum GameSaveFormatConstant {
     SAVE_PATH_CAPACITY                 = 452,
@@ -1087,19 +1064,12 @@ void GenerateStandardFileName(char* source, char* destination) {
     i32 indexOut = 0;
     i32 length = strlen(source);
     i32 i;
-    u8 chr;
+    char chr;
     for (i = 0; i < length; i++) {
         chr = source[i];
         if (chr >= 'a' && chr <= 'z')
-            chr = chr - ('a' - 'A');
-        else if (chr >= CP1251_SMALL_A && chr <= CP1251_SMALL_YA)
-            chr = chr - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (chr == CP1251_SMALL_YO)
-            chr = CP1251_CAPITAL_YO;
-        else
-            chr = chr;
-        if ((chr >= 'A' && chr <= 'Z') || (chr >= CP1251_CAPITAL_A && chr <= CP1251_CAPITAL_YA)
-            || chr == CP1251_CAPITAL_YO || (chr >= '0' && chr <= '9') || chr == '_') {
+            chr -= 'a' - 'A';
+        if ((chr >= 'A' && chr <= 'Z') || (chr >= '0' && chr <= '9') || chr == '_') {
             destination[indexOut] = chr;
             indexOut++;
         }
@@ -1168,14 +1138,14 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(savePath, "%s%s", gcGamePath, genName);
         if (platform::CompareIgnoringCase(
                 genName,
-                "\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5"  ,
-                sizeof("AUTOSAVE") - 1
+                save_names::Autosave,
+                sizeof(save_names::Autosave) - 1
             )
                 != 0
             && platform::CompareIgnoringCase(
                    genName,
-                   "\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb"  ,
-                   sizeof("PLYREXIT") - 1
+                   save_names::PlayerExit,
+                   sizeof(save_names::PlayerExit) - 1
                )
                 != 0)
             strcpy(gpGame->m_saveName, filename);
@@ -1302,7 +1272,7 @@ void game::SetupOrigData(void) {
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
-    strcpy(m_saveName, "\xcd\xce\xc2\xc0\xdf \xc8\xc3\xd0\xc0");
+    strcpy(m_saveName, save_names::NewGame);
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
@@ -1352,7 +1322,11 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
         m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
-        strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
+        utf8::Copy(
+            m_heroRecs[i].m_name,
+            sizeof(m_heroRecs[i].m_name),
+            gHeroDefaultNames[i]
+        );
         m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
@@ -1420,7 +1394,7 @@ void game::SetupOrigData(void) {
     m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = HINT_COORDINATE_UNKNOWN;
     memset(m_obeliskVisitors, 0, sizeof(m_obeliskVisitors));
-    strcpy(gpGame->m_saveName, "\xcd\xce\xc2\xc0\xdf \xc8\xc3\xd0\xc0");
+    strcpy(gpGame->m_saveName, save_names::NewGame);
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
@@ -1485,6 +1459,10 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, cPlayerNames, sizeof(cPlayerNames));
+    for (auto& playerName : cPlayerNames) {
+        const std::string decodedName = localization::DecodeExternalText(playerName);
+        utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
+    }
 
     platform::FileRead(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
     platform::FileRead(fd, &gbInCampaign, sizeof(gbInCampaign));
@@ -1543,6 +1521,10 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
         m_heroRecs[ndx].Read(fd, expTag);
     platform::FileRead(fd, m_availableHeroes, sizeof(m_availableHeroes));
     platform::FileRead(fd, m_castleRecs, sizeof(m_castleRecs));
+    for (town& castle : m_castleRecs) {
+        const std::string decodedName = localization::DecodeExternalText(castle.m_name);
+        utf8::Copy(castle.m_name, sizeof(castle.m_name), decodedName.c_str());
+    }
     platform::FileRead(fd, m_castleOwners, sizeof(m_castleOwners));
     platform::FileRead(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
     platform::FileRead(fd, m_mines, sizeof(m_mines));
@@ -1558,6 +1540,10 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
     platform::FileRead(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
     platform::FileRead(fd, m_rumour, sizeof(m_rumour));
+    {
+        const std::string decodedRumour = localization::DecodeExternalText(m_rumour);
+        utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
+    }
     platform::FileRead(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     platform::FileRead(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     platform::FileRead(
@@ -1923,17 +1909,19 @@ void game::NewMap(char* filename) {
                 if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    strcpy(
+                    utf8::Copy(
                         m_heroRecs[awardHero].m_name,
-                        "\xd1\xe5\xf1\xf2\xf0\xe0 \xdd\xeb\xe8\xe7\xe0"
+                        sizeof(m_heroRecs[awardHero].m_name),
+                        localization::Tr("campaign.hero.sister_eliza")
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    strcpy(
+                    utf8::Copy(
                         m_heroRecs[awardHero].m_name,
-                        "\xc1\xf0\xe0\xf2 \xc1\xf0\xe0\xea\xf1"
+                        sizeof(m_heroRecs[awardHero].m_name),
+                        localization::Tr("campaign.hero.brother_brax")
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
@@ -1965,7 +1953,11 @@ void game::NewMap(char* filename) {
                     if (awardHero < GAME_HERO_COUNT) {
                         m_heroRecs[awardHero].m_experience = CAMPAIGN_EXPERIENCE_BONUS;
                         m_heroRecs[awardHero].CheckLevel();
-                        strcpy(m_heroRecs[awardHero].m_name, heroName);
+                        utf8::Copy(
+                            m_heroRecs[awardHero].m_name,
+                            sizeof(m_heroRecs[awardHero].m_name),
+                            heroName
+                        );
                         m_heroRecs[awardHero].m_portrait = curPic;
                         m_players[player].m_availableHeroIds[0] =
                             static_cast<char>(awardHero);
@@ -3086,7 +3078,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(const_cast<char*>(localization::Tr("spell.none_to_cast")), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -3479,10 +3471,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 > viewSpellsHero->m_spellPoints) {
                                 sprintf(
                                     gText,
-                                    "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf2\xee\xe8\xf2 %d \xee\xf7. "
-                                        "\xec\xe0\xe3\xe8\xe8. \xd3 \xe2\xe0\xf1 \xf2\xee\xeb\xfc\xea\xee %d \xee\xf7. "
-                                        "\xec\xe0\xe3\xe8\xe8. \xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc "
-                                        "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
+                                    localization::Tr("spell.mana.insufficient")
                                          ,
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
@@ -3581,7 +3570,7 @@ void game::ViewArmy(
     i16 numWidget5;
     i32 morale;
     i32 luck4;
-    u8 armyName0[VIEW_ARMY_NAME_SIZE];
+    char armyName0[VIEW_ARMY_NAME_SIZE];
     icon* monsterIcon5;
     tag_message message;
     i16 frame;
@@ -3675,11 +3664,15 @@ void game::ViewArmy(
     m_viewArmyWindow->AddWidget(monsterWidget9, -1);
     gpResourceManager->Dispose(monsterIcon5);
 
-    strcpy(reinterpret_cast<char*>(armyName0), gArmyNames[H2EnumIndex(monsterType)]);
-    armyName0[0] = ToUpperCp1251(armyName0[0]);
+    utf8::Copy(
+        armyName0,
+        sizeof(armyName0),
+        gArmyNames[H2EnumIndex(monsterType)]
+    );
+    utf8::UppercaseFirst(armyName0);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
-    message.payload.widget.data.text = reinterpret_cast<char*>(armyName0);
+    message.payload.widget.data.text = armyName0;
     m_viewArmyWindow->BroadcastMessage(message);
 
     details0 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE));
@@ -3760,8 +3753,7 @@ void game::ViewArmy(
     if (gpCombatManager->m_active == 1) {
         sprintf(
             gText,
-            "\n%s%d",
-            "\xce\xf1\xf2\xe0\xeb\xee\xf1\xfc \xe7\xe4\xee\xf0\xee\xe2\xfc\xff: ",
+            localization::Tr("army.hit_points_left"),
             static_cast<u32>(monster->hitPoints) - theArmy->m_hitPointsLost
         );
         strcat(details0, gText);
@@ -3903,7 +3895,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>("\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xf0\xe0\xf1\xef\xf3\xf1\xf2\xe8\xf2\xfc \xfd\xf2\xee\xf2 \xee\xf2\xf0\xff\xe4?"),
+                            const_cast<char*>(localization::Tr("army.confirm.dismiss")),
                             NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
@@ -3942,8 +3934,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 || gpCurPlayer->m_resources[H2EnumIndex(resourceType7)] >= resourceCost)) {
                             NormalDialog(
                                 const_cast<char*>(
-                                    "\xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2 \xe7\xe0 "
-                                    "\xed\xe5\xea\xee\xf2\xee\xf0\xf3\xfe \xf1\xf3\xec\xec\xf3. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe8\xf5?"
+                                    localization::Tr("army.upgrade.confirm")
                                 ),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
@@ -3967,7 +3958,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                             }
                         } else {
                             NormalDialog(
-                                const_cast<char*>("\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe7\xe2\xee\xeb\xe8\xf2\xfc \xf1\xe5\xe1\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2!"),
+                                const_cast<char*>(localization::Tr("army.upgrade.cannot_afford")),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -4184,7 +4175,7 @@ void game::NextPlayer(void) {
                 humansAlive++;
         }
         SaveGame(
-            const_cast<char*>("\xc0\xe2\xf2\xee\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe8\xe5"  ),
+            const_cast<char*>(save_names::Autosave),
             1,
             0
         );
@@ -4237,7 +4228,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
-            sprintf(gText, "%s, \xf2\xe5\xef\xe5\xf0\xfc \xe2\xe0\xf8 \xf5\xee\xe4.", cPlayerNames[giCurPlayer]);
+            sprintf(gText, localization::Tr("player.turn"), cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
         }
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -6040,7 +6031,8 @@ void game::SetupTowns(void) {
         if (extra0->hasShrine)
             castle8->m_buildings |= H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS);
         castle8->m_mayNotUpgradeToCastle = extra0->unknown28;
-        strcpy(castle8->m_name, extra0->name);
+        const std::string townName = localization::DecodeExternalText(extra0->name);
+        utf8::Copy(castle8->m_name, sizeof(castle8->m_name), townName.c_str());
 
         memset(usedSpells0, 0, H2EnumIndex(SPELL_COUNT));
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
@@ -6264,8 +6256,15 @@ void game::ProcessOnMapHeroes(void) {
                                     -1
                                 );
                         }
-                        if (extra9->hasCustomName)
-                            strcpy(mapHero14->m_name, extra9->name);
+                        if (extra9->hasCustomName) {
+                            const std::string heroName =
+                                localization::DecodeExternalText(extra9->name);
+                            utf8::Copy(
+                                mapHero14->m_name,
+                                sizeof(mapHero14->m_name),
+                                heroName.c_str()
+                            );
+                        }
                         mapHero14->m_experience = 0;
                         gpAdvManager->GiveExperience(mapHero14, extra9->experience, 1);
                         mapHero14->CheckLevel();
@@ -6503,7 +6502,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     LogStr(const_cast<char*>("Transmit Game Start"));
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("\xcf\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe0 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>(localization::Tr("network.data.sending")), RES_NONE, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
@@ -6776,7 +6775,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("\xcf\xee\xeb\xf3\xf7\xe5\xed\xe8\xe5 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>(localization::Tr("network.data.receiving")), RES_NONE, 0);
 
     samplesReady = gSoundBackendsReady;
     oldTrack = gpSoundManager->m_musicTrack;
@@ -6821,7 +6820,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < platform::Ticks()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                const_cast<char*>(localization::Tr("network.receive.retry")),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
@@ -6970,7 +6969,7 @@ i32 game::ReceiveSaveGame(
 
 void game::DoNewTurn(void) {
     char musicFile18[NEW_TURN_MUSIC_FILENAME_CAPACITY];
-    u8 lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
+    char lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
     i32 musicTrack2;
 
     CheckForTimeEvent();
@@ -7028,26 +7027,17 @@ void game::DoNewTurn(void) {
                         gMonthNames[giMonthTypeExtra]
                     );
                 } else if (giMonthType == CALENDAR_PERIOD_CREATURE) {
-                    u8 lowerFirst;
-                    strcpy(
-                        reinterpret_cast<char*>(lowerName19),
+                    utf8::Copy(
+                        lowerName19,
+                        sizeof(lowerName19),
                         gArmyNamesPlural[giMonthTypeExtra]
                     );
-                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
-                        lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
-                    else
-                        lowerFirst = lowerName19[0];
-                    lowerName19[0] = lowerFirst;
+                    utf8::LowercaseFirst(lowerName19);
                     sprintf(
                         gText,
                         cNewTurn[NEW_MONTH_CREATURE_TEXT],
                         gArmyNamesPlural[giMonthTypeExtra],
-                        reinterpret_cast<char*>(lowerName19)
+                        lowerName19
                     );
                 } else {
                     sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
@@ -7058,26 +7048,17 @@ void game::DoNewTurn(void) {
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
-                    u8 lowerFirst;
-                    strcpy(
-                        reinterpret_cast<char*>(lowerName19),
+                    utf8::Copy(
+                        lowerName19,
+                        sizeof(lowerName19),
                         gArmyNamesPlural[giWeekTypeExtra]
                     );
-                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
-                        lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
-                    else
-                        lowerFirst = lowerName19[0];
-                    lowerName19[0] = lowerFirst;
+                    utf8::LowercaseFirst(lowerName19);
                     sprintf(
                         gText,
                         cNewTurn[NEW_WEEK_CREATURE_TEXT],
                         gArmyNamesPlural[giWeekTypeExtra],
-                        reinterpret_cast<char*>(lowerName19)
+                        lowerName19
                     );
                 }
             }
@@ -7536,7 +7517,8 @@ void game::SetupNewRumour(void) {
             event0 =
                 reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex]]);
             if (strlen(event0->text) > 2 && event0->text[0] != '@') {
-                strcpy(m_rumour, event0->text);
+                const std::string rumour = localization::DecodeExternalText(event0->text);
+                utf8::Copy(m_rumour, sizeof(m_rumour), rumour.c_str());
                 event0->text[0] = '@';
                 return;
             }
@@ -7563,25 +7545,25 @@ void game::SetupNewRumour(void) {
                     if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_OBELISKS))
                         sprintf(
                             m_rumour,
-                            "%s \xed\xe0\xf8\xe5\xeb \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xee\xe1\xe5\xeb\xe8\xf1\xea\xee\xe2.",
+                            localization::Tr("rumor.leader.obelisks"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_ARTIFACTS))
                         sprintf(
                             m_rumour,
-                            "%s \xed\xe0\xf8\xe5\xeb \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2.",
+                            localization::Tr("rumor.leader.artifacts"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_ARMY_STRENGTH))
                         sprintf(
                             m_rumour,
-                            "%s \xee\xe1\xeb\xe0\xe4\xe0\xe5\xf2 \xf1\xe0\xec\xfb\xec\xe8 \xf1\xe8\xeb\xfc\xed\xfb\xec\xe8 \xe2\xee\xe9\xf1\xea\xe0\xec\xe8.",
+                            localization::Tr("rumor.leader.army"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else
                         sprintf(
                             m_rumour,
-                            "%s \xe7\xe0\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xe4\xe5\xed\xe5\xe3.",
+                            localization::Tr("rumor.leader.income"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     return;
@@ -7623,15 +7605,13 @@ void game::SetupNewRumour(void) {
                 }
                 sprintf(
                     m_rumour,
-                    "\xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 \xec\xee\xe6\xe5\xf2 "
-                    "\xe1\xfb\xf2\xfc \xed\xe0\xe9\xe4\xe5\xed \xe2 %s \xf7\xe0\xf1\xf2\xe8 \xec\xe8\xf0\xe0.",
+                    localization::Tr("rumor.ultimate_artifact.region"),
                     cDirections[direction]
                 );
             } else if (selectionRoll7 < 66) {
                 sprintf(
                     m_rumour,
-                    "%s, \xf2\xee \xec\xe5\xf1\xf2\xee \xe3\xe4\xe5 \xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
-                    "\xed\xe0\xe9\xe4\xe5\xed \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
+                    localization::Tr("rumor.ultimate_artifact.terrain"),
                     cRumourTerrainDescriptions
                         [H2EnumIndex(giGroundToTerrain
                                  [gpAdvManager
@@ -7641,8 +7621,7 @@ void game::SetupNewRumour(void) {
             } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
                 sprintf(
                     m_rumour,
-                    "\xce\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee, \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 "
-                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 \xfd\xf2\xee %s.",
+                    localization::Tr("rumor.ultimate_artifact.identity"),
                     gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
                 );
             } else {
@@ -7718,8 +7697,10 @@ void game::CheckForTimeEvent(void) {
                 secondaryAmount -= EVENT_RESOURCE_PENALTY;
             }
             if (gbThisNetHumanPlayer[giCurPlayer]) {
+                const std::string eventMessage =
+                    localization::DecodeExternalText(event0->message);
                 NormalDialog(
-                    event0->message,
+                    const_cast<char*>(eventMessage.c_str()),
                     1,
                     -1,
                     -1,

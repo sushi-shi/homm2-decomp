@@ -105,6 +105,8 @@ bool IsScratch(const std::string& name) {
 
 i32 FileOpen(const char* retailPath, FileMode mode) { return Files().Open(retailPath, mode); }
 
+i32 FileOpenLocale(const char* retailPath) { return Files().OpenLocale(retailPath); }
+
 void FileClose(i32 file) { Files().Close(file); }
 
 i32 FileRead(i32 file, void* buffer, i32 count) { return Files().Read(file, buffer, count); }

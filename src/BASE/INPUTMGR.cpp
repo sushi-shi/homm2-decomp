@@ -4,6 +4,7 @@
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -255,6 +256,35 @@ static void PlatformEventHandler(const platform::Event& event) {
                 )
             );
             break;
+        case Type::TextInput: {
+            if (gpInputManager == NULL || gpInputManager->m_active != 1) {
+                break;
+            }
+            const char* cursor = event.text.c_str();
+            while (*cursor != 0) {
+                const utf8::Decoded decoded = utf8::Decode(cursor);
+                cursor += decoded.length;
+                if (!decoded.valid) {
+                    continue;
+                }
+                tag_message* message =
+                    &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
+                memset(message, 0, sizeof(*message));
+                message->type = MESSAGE_TEXT_INPUT;
+                message->payload.keyboard.keyCode = static_cast<i32>(decoded.codePoint);
+                message->payload.keyboard.modifiers = gpInputManager->m_modifiers;
+
+                gpInputManager->m_writeIndex =
+                    (gpInputManager->m_writeIndex + 1)
+                    % H2EnumIndex(INPUT_EVENT_RING_CAPACITY);
+                if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
+                    gpInputManager->m_readIndex =
+                        (gpInputManager->m_readIndex + 1)
+                        % H2EnumIndex(INPUT_EVENT_RING_CAPACITY);
+                }
+            }
+            break;
+        }
         case Type::MouseMove:
             MouseMessageHandler(
                 nullptr,

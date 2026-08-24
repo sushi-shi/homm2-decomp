@@ -8,6 +8,7 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
+#include <SOURCE/Localization.h>
 #include <SOURCE/VIEW.h>
 typedef enum ViewGeneralConstant {
     GENERAL_WINDOW_X           = 179,
@@ -143,10 +144,7 @@ i32 combatManager::ViewGeneral(
     generalWindow26->BroadcastMessage(message16);
 
     if (m_heroes[H2EnumIndex(side)]->m_isCaptain != 0)
-        sprintf(
-            gText,
-              "\xca\xe0\xef\xe8\xf2\xe0\xed"
-        );
+        sprintf(gText, "%s", localization::Tr("hero.captain"));
     else
         sprintf(
             gText,

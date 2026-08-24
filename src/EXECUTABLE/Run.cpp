@@ -6,6 +6,7 @@
 #include <Ints.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/wingraph.h>
 #include <PLATFORM/Platform.h>
@@ -20,6 +21,7 @@ enum CommandLineConstant {
 
 // The window, the game, and everything the game wants standing before it runs.
 i32 RunGame(const char* commandLine) {
+    localization::Initialize(commandLine);
     memset(gcCommandLine, 0, sizeof(gcCommandLine));
     strncpy(gcCommandLine, commandLine, COMMAND_LINE_LIMIT);
     if (EarlySetup() == 0)

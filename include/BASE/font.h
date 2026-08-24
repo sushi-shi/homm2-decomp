@@ -4,6 +4,8 @@
 #include <Ints.h>
 #include <BASE/resource.h>
 
+#include <cstdint>
+
 class icon;
 
 typedef enum FontGlyphConstant {
@@ -42,11 +44,10 @@ public:
 
 protected:
     void DrawStringExecute(const char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
-    void PolishBoundedTextLayout(char*, char*, u32*, i32, i32*, char);
 
 public:
     void DrawString(const char*, i32, i32, FontDrawMode);
-    i32 GetCharacterWidth(u8);
+    i32 GetCharacterWidth(std::uint32_t);
     void ExtractLine(const char*, char*, i32*, i32, i32*, u8);
     void DrawBoundedString(const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
     i32 LineLength(const char*, i32);

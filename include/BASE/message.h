@@ -34,6 +34,7 @@ enum class MessageType : i32 {
     MESSAGE_RIGHT_BUTTON_DOWN          = 0x20,
     SPELL_MESSAGE_CANCEL               = MESSAGE_RIGHT_BUTTON_DOWN,
     MESSAGE_RIGHT_BUTTON_UP            = 0x40,
+    MESSAGE_TEXT_INPUT                 = 0x80,
     MESSAGE_WIDGET                     = 0x200,
     NORMAL_DIALOG_DISABLE_MESSAGE      = MESSAGE_WIDGET,
     NET_BOX_UPDATE_MESSAGE             = MESSAGE_WIDGET,

@@ -13,6 +13,7 @@
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
+#include <BASE/Utf8.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/KB.h>
@@ -25,6 +26,9 @@
 #include <PLATFORM/Runtime.h>
 #include <PLATFORM/Strings.h>
 #include <SOURCE/Newgame.h>
+
+#include <string>
+#include <SOURCE/Localization.h>
 
 typedef enum NewGameConstant {
     GAME_TEXT_BUFFER_COUNT                = 3,
@@ -248,13 +252,7 @@ void game::GetMap(void) {
     );
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
-            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3"
-            "\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 "
-            "II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec"
-            "\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2"
-            "\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed"
-            "\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 "
-            "II.",
+            localization::Tr("network.load.expansion_unavailable"),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -519,7 +517,9 @@ i32 game::NewGame(void) {
                     m_newGameWindow->BroadcastMessage(windowMessage);
 
                     gbNewGameDialogOver = false;
+                    platform::StartTextInput();
                     gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+                    platform::StopTextInput();
                     delete m_newGameWindow;
                     if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
                         result = 0;
@@ -609,7 +609,13 @@ i32 game::NewGame(void) {
         UpdateNewGameWindow();
         gbNewGameShadowHidden = false;
         gbNewGameDialogOver = false;
+        const bool networkChatInput =
+            giNumHumanPlayers > 1 && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT;
+        if (networkChatInput)
+            platform::StartTextInput();
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+        if (networkChatInput)
+            platform::StopTextInput();
         delete m_newGameWindow;
         if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
             result = 0;
@@ -884,7 +890,8 @@ cleanup:
         i32 playerIndex;
         i32 unusedPlayer17;
 
-        strcpy(gText, m_mapHeader.name);
+        const std::string mapName = localization::DecodeExternalText(m_mapHeader.name);
+        strcpy(gText, mapName.c_str());
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_SCENARIO_NAME;
@@ -920,7 +927,7 @@ cleanup:
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
                 sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
-                sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerIndex] + 1);
+                sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
             }
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
@@ -1003,7 +1010,7 @@ cleanup:
         gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
-        sprintf(gText, "%s %d%%", "\xd0\xe5\xe9\xf2\xe8\xed\xe3", gpGame->m_difficultyRating);
+        sprintf(gText, localization::Tr("new_game.rating"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
         DrawNGKPDisplayString(0);
@@ -1052,8 +1059,7 @@ cleanup:
 
                     case GAME_REMOTE_CANCEL:
                         NormalDialog(
-                            "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
-                            "\xe8\xeb \xe8\xe3\xf0\xf3.",
+                            localization::Tr("network.host.canceled_game"),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -1119,7 +1125,8 @@ cleanup:
             }
         }
 
-        if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
+        if ((message.type == MESSAGE_KEY_DOWN || message.type == MESSAGE_TEXT_INPUT)
+            && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
             redraw = 1;
             for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
@@ -1417,10 +1424,7 @@ cleanup:
                                                 static_cast<i8>(swapPlayerTemp);
                                         } else {
                                             NormalDialog(
-                                                "\xc4\xe2\xe5 \xe2\xfb\xe1\xf0\xe0\xed\xed\xfb"
-                                                "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
-                                                "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
-                                                "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
+                                                localization::Tr("new_game.positions.cannot_swap"),
                                                 NORMAL_DIALOG_INFO,
                                                 -1,
                                                 -1,
@@ -1552,13 +1556,42 @@ finish:
 }
 
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
-    char buf[GAME_KEY_BUFFER_SIZE];
-    char keyChar;
-    i32 scanCode;
+    char workText[GAME_KEY_BUFFER_SIZE];
     i32 widthResult;
 
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return 0;
+
+    if (message.type == MESSAGE_TEXT_INPUT) {
+        const std::uint32_t codePoint =
+            static_cast<std::uint32_t>(message.payload.keyboard.keyCode);
+        if (codePoint < ' ' || codePoint == '{' || codePoint == '}')
+            return 0;
+
+        char encoded[4];
+        const std::size_t encodedLength = utf8::Encode(codePoint, encoded);
+        const std::size_t textLength = strlen(cNGKPCore);
+        if (encodedLength == 0 || textLength + encodedLength >= GAME_CHAT_TEXT_LIMIT
+            || textLength + encodedLength >= GAME_KEY_BUFFER_SIZE)
+            return 0;
+
+        strcpy(workText, cNGKPCore);
+        memmove(
+            cNGKPCore + NGKPcursorIndex + encodedLength,
+            cNGKPCore + NGKPcursorIndex,
+            textLength - NGKPcursorIndex + 1
+        );
+        memcpy(cNGKPCore + NGKPcursorIndex, encoded, encodedLength);
+        const i32 oldCursor = NGKPcursorIndex;
+        NGKPcursorIndex += static_cast<i32>(encodedLength);
+        NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
+        widthResult = smallFont->LineLength(cNGKPDisplay, GAME_CHAT_DRAW_WIDTH);
+        if (widthResult > GAME_CHAT_MAX_LINES) {
+            strcpy(cNGKPCore, workText);
+            NGKPcursorIndex = oldCursor;
+        }
+        return 0;
+    }
 
     switch (message.payload.keyboard.keyCode) {
         case INPUT_SCAN_ESCAPE:
@@ -1572,97 +1605,41 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         case INPUT_SCAN_NUMPAD_DELETE:
             if (NGKPcursorIndex < strlen(cNGKPCore)) {
-                strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
+                const std::size_t next = utf8::Next(cNGKPCore, NGKPcursorIndex);
+                strcpy(gText, cNGKPCore + next);
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
             }
             break;
 
         case INPUT_SCAN_NUMPAD_4:
-            if (NGKPcursorIndex > 0)
-                --NGKPcursorIndex;
+            if (NGKPcursorIndex > 0) {
+                NGKPcursorIndex = static_cast<i32>(
+                    utf8::Previous(cNGKPCore, NGKPcursorIndex)
+                );
+            }
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (NGKPcursorIndex < strlen(cNGKPCore))
-                ++NGKPcursorIndex;
+            if (NGKPcursorIndex < strlen(cNGKPCore)) {
+                NGKPcursorIndex = static_cast<i32>(
+                    utf8::Next(cNGKPCore, NGKPcursorIndex)
+                );
+            }
+            break;
+
+        case INPUT_SCAN_ENTER:
+            return 1;
+
+        case INPUT_SCAN_BACKSPACE:
+            if (NGKPcursorIndex > 0) {
+                const std::size_t previous = utf8::Previous(cNGKPCore, NGKPcursorIndex);
+                strcpy(gText, cNGKPCore + NGKPcursorIndex);
+                strcpy(cNGKPCore + previous, gText);
+                NGKPcursorIndex = static_cast<i32>(previous);
+            }
             break;
 
         default:
-            gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == H2EnumIndex(GAME_KEY_ENTER))
-                return 1;
-
-            if (message.payload.keyboard.keyCode == H2EnumIndex(GAME_KEY_BACKSPACE)) {
-                if (NGKPcursorIndex > 0) {
-                    strcpy(gText, cNGKPCore + NGKPcursorIndex);
-                    strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
-                    --NGKPcursorIndex;
-                }
-                break;
-            }
-
-            if (strlen(cNGKPCore) + 1 < GAME_CHAT_TEXT_LIMIT
-                && message.payload.keyboard.keyCode != 0) {
-                strcpy(buf, cNGKPCore);
-                keyChar = 0;
-                if (message.payload.keyboard.keyCode >= H2EnumIndex(GAME_KEY_FIRST_EXTENDED)) {
-                    scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
-                        >> KEY_SCAN_CODE_SHIFT;
-                    switch (static_cast<NewGameKeyCode>(scanCode)) {
-                        case GAME_KEYPAD_INSERT:
-                            keyChar = '0';
-                            break;
-                        case GAME_KEYPAD_END:
-                            keyChar = '1';
-                            break;
-                        case GAME_KEYPAD_DOWN:
-                            keyChar = '2';
-                            break;
-                        case GAME_KEYPAD_PAGE_DOWN:
-                            keyChar = '3';
-                            break;
-                        case GAME_KEYPAD_LEFT:
-                            keyChar = '4';
-                            break;
-                        case GAME_KEYPAD_CENTER:
-                            keyChar = '5';
-                            break;
-                        case GAME_KEYPAD_RIGHT:
-                            keyChar = '6';
-                            break;
-                        case GAME_KEYPAD_HOME:
-                            keyChar = '7';
-                            break;
-                        case GAME_KEYPAD_UP:
-                            keyChar = '8';
-                            break;
-                        case GAME_KEYPAD_PAGE_UP:
-                            keyChar = '9';
-                            break;
-                    }
-                } else {
-                    keyChar =
-                        static_cast<char>(message.payload.keyboard.keyCode & KEY_ASCII_MASK);
-
-                    if (keyChar == '{' || keyChar == '}')
-                        keyChar = 0;
-                }
-
-                if (keyChar != 0) {
-                    strcpy(gText, cNGKPCore);
-                    gText[NGKPcursorIndex] = keyChar;
-                    gText[NGKPcursorIndex + 1] = 0;
-                    strcat(gText, cNGKPCore + NGKPcursorIndex);
-                    strcpy(cNGKPCore, gText);
-                    ++NGKPcursorIndex;
-                    NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
-                    widthResult = smallFont->LineLength(cNGKPDisplay, GAME_CHAT_DRAW_WIDTH);
-                    if (widthResult > GAME_CHAT_MAX_LINES) {
-                        strcpy(cNGKPCore, buf);
-                        --NGKPcursorIndex;
-                    }
-                }
-            }
             break;
     }
 
@@ -1740,6 +1717,9 @@ void game::ShowScenInfo(void) {
     widget* nameWidget;
     widget* iconControl;
     heroWindow* window;
+    const std::string mapName = localization::DecodeExternalText(m_mapHeader.name);
+    const std::string mapDescription =
+        localization::DecodeExternalText(m_mapHeader.description);
 
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     window = new heroWindow(SCENARIO_WINDOW_X, SCENARIO_WINDOW_Y, "sceninfo.bin");
@@ -1750,7 +1730,7 @@ void game::ShowScenInfo(void) {
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     msg.payload.widget.id = NEW_GAME_SCENARIO_NAME;
-    msg.payload.widget.data.text = m_mapHeader.name;
+    msg.payload.widget.data.text = const_cast<char*>(mapName.c_str());
     window->BroadcastMessage(msg);
 
     msg.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
@@ -1778,7 +1758,7 @@ void game::ShowScenInfo(void) {
     window->BroadcastMessage(msg);
 
     msg.payload.widget.id = GAME_SCENARIO_DESCRIPTION;
-    msg.payload.widget.data.text = m_mapHeader.description;
+    msg.payload.widget.data.text = const_cast<char*>(mapDescription.c_str());
     window->BroadcastMessage(msg);
     GetVictoryConditionText(gText);
     msg.payload.widget.id = GAME_SCENARIO_VICTORY;
@@ -1986,7 +1966,7 @@ void game::ShowScenInfo(void) {
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
-            sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerCounter] + 1);
+            sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
@@ -2080,10 +2060,11 @@ void game::GetLossConditionText(char* text) {
                 city2 = GetTown(townId12);
                 sprintf(
                     text,
-                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc %s '%s'.",
-                    (city2->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
-                        ? "\xe7\xe0\xec\xee\xea"
-                        : "\xe3\xee\xf0\xee\xe4",
+                    localization::Tr(
+                        (city2->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
+                            ? "scenario.loss.castle"
+                            : "scenario.loss.town"
+                    ),
                     city2->m_name
                 );
                 break;
@@ -2092,7 +2073,7 @@ void game::GetLossConditionText(char* text) {
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
                 sprintf(
                     text,
-                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'.",
+                    localization::Tr("scenario.loss.hero"),
                     lossHero11->m_name
                 );
                 break;
@@ -2107,9 +2088,7 @@ void game::GetLossConditionText(char* text) {
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
-                    "\xcd\xe5 \xee\xe4\xe5\xf0\xe6\xe0\xf2\xfc \xef\xee\xe1\xe5"
-                    "\xe4\xf3 \xe4\xee \xea\xee\xed\xf6\xe0 %d \xec\xe5\xf1\xff\xf6"
-                    "\xe0, %d \xed\xe5\xe4\xe5\xeb\xe8, %d \xe4\xed\xff.",
+                    localization::Tr("scenario.loss.time"),
                     month19,
                     week2,
                     day26
@@ -2117,11 +2096,7 @@ void game::GetLossConditionText(char* text) {
                 break;
         }
     } else {
-        sprintf(
-            text,
-            "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe2\xf1\xe5\xf5 \xe3\xe5\xf0\xee"
-            "\xe5\xe2, \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
-        );
+        strcpy(text, localization::Tr("scenario.loss.standard"));
     }
 }
 
@@ -2140,10 +2115,11 @@ void game::GetVictoryConditionText(char* text) {
                 );
                 sprintf(
                     text,
-                    "\xc7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc %s '%s'",
-                    (targetTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
-                        ? "\xe7\xe0\xec\xee\xea"
-                        : "\xe3\xee\xf0\xee\xe4",
+                    localization::Tr(
+                        (targetTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
+                            ? "scenario.victory.capture_castle"
+                            : "scenario.victory.capture_town"
+                    ),
                     targetTown->m_name
                 );
                 break;
@@ -2152,7 +2128,7 @@ void game::GetVictoryConditionText(char* text) {
                 victoryHero = GetHero(m_mapHeader.victoryConditionValue);
                 sprintf(
                     text,
-                    "\xcf\xee\xe1\xe5\xe4\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'",
+                    localization::Tr("scenario.victory.defeat_hero"),
                     victoryHero->m_name
                 );
                 break;
@@ -2161,13 +2137,12 @@ void game::GetVictoryConditionText(char* text) {
                 if (m_mapHeader.victoryConditionValue == 0)
                     sprintf(
                         text,
-                        "\xcd\xe0\xe9\xf2\xe8 \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2"
-                        "\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                        localization::Tr("scenario.victory.find_ultimate_artifact")
                     );
                 else
                     sprintf(
                         text,
-                        "\xcd\xe0\xe9\xf2\xe8 %s",
+                        localization::Tr("scenario.victory.find_artifact"),
                         gArtifactNames[m_mapHeader.victoryConditionValue - 1]
                     );
                 break;
@@ -2175,7 +2150,7 @@ void game::GetVictoryConditionText(char* text) {
             case MAP_VICTORY_ACCUMULATE_GOLD:
                 sprintf(
                     text,
-                    "\xd1\xee\xe1\xf0\xe0\xf2\xfc %d \xe7\xee\xeb\xee\xf2\xe0",
+                    localization::Tr("scenario.victory.accumulate_gold"),
                     m_mapHeader.victoryConditionValue * GAME_GOLD_CONDITION_MULTIPLIER
                 );
                 break;
@@ -2191,53 +2166,87 @@ void game::GetVictoryConditionText(char* text) {
                 if (localPlayerFirst)
                     sprintf(
                         text,
-                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
-                        "\xf2\xfc\xf1\xff",
+                        localization::Tr("scenario.victory.side_must_defeat"),
                         firstSide,
                         secondSideValue
                     );
                 else
                     sprintf(
                         text,
-                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
-                        "\xf2\xfc\xf1\xff",
+                        localization::Tr("scenario.victory.side_must_defeat"),
                         secondSideValue,
                         firstSide
                     );
         }
 
         if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE
-            && m_mapHeader.allowNormalVictory != 0)
-            strcat(
+            && m_mapHeader.allowNormalVictory != 0) {
+            char primaryCondition[GAME_SIDE_TEXT_SIZE];
+            utf8::Copy(primaryCondition, sizeof(primaryCondition), text);
+            sprintf(
                 text,
-                ", \xe8\xeb\xe8 \xe2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe8"
-                "\xe3\xf0\xe0\xf2\xfc, \xf3\xed\xe8\xf7\xf2\xee\xe6\xe8\xe2 "
-                "\xe2\xf1\xe5\xf5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5"
-                "\xf0\xee\xe5\xe2 \xe8 \xe7\xe0\xf5\xe2\xe0\xf2\xe8\xe2 \xe2\xf1"
-                "\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4"
-                "\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+                localization::Tr("scenario.victory.with_standard_alternative"),
+                primaryCondition
             );
-        else
+        } else {
             strcat(text, ".");
+        }
     } else {
-        strcpy(
-            text,
-            "\xd3\xed\xe8\xf7\xf2\xee\xe6\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2\xf0"
-            "\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5\xf0\xee\xe5\xe2  \xe8 \xe7\xe0"
-            "\xf5\xe2\xe0\xf2\xe8\xf2\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1"
-            "\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
-        );
+        strcpy(text, localization::Tr("scenario.victory.standard"));
+    }
+}
+
+static void FormatScenarioSideList(
+    char* text,
+    char names[GAME_PLAYER_COUNT][GAME_SIDE_TEXT_SIZE],
+    i32 count
+) {
+    switch (count) {
+        case 1:
+            sprintf(text, localization::Tr("scenario.side.list.1"), names[0]);
+            break;
+        case 2:
+            sprintf(text, localization::Tr("scenario.side.list.2"), names[0], names[1]);
+            break;
+        case 3:
+            sprintf(text, localization::Tr("scenario.side.list.3"), names[0], names[1], names[2]);
+            break;
+        case 4:
+            sprintf(
+                text,
+                localization::Tr("scenario.side.list.4"),
+                names[0], names[1], names[2], names[3]
+            );
+            break;
+        case 5:
+            sprintf(
+                text,
+                localization::Tr("scenario.side.list.5"),
+                names[0], names[1], names[2], names[3], names[4]
+            );
+            break;
+        case 6:
+            sprintf(
+                text,
+                localization::Tr("scenario.side.list.6"),
+                names[0], names[1], names[2], names[3], names[4], names[5]
+            );
+            break;
+        default:
+            text[0] = '\0';
+            break;
     }
 }
 
 i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
-    char colorStr[GAME_SIDE_TEXT_SIZE];
+    char colorNames[GAME_PLAYER_COUNT][GAME_SIDE_TEXT_SIZE];
+    char playerList[GAME_SIDE_TEXT_SIZE];
     i32 sideCount;
     i32 i;
     i32 onSide;
     i32 otherPlayerCount;
     i32 localPlayer;
-    i32 listedPlayerCount;
+    i32 listIndex;
 
     localPlayer = -1;
     for (i = 0; i < m_mapHeader.playerCount; ++i) {
@@ -2246,50 +2255,45 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     }
 
     onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer ? 1 : 0;
-
     sideCount = lastPlayer - firstPlayer + 1;
     otherPlayerCount = sideCount - (onSide != 0);
 
+    listIndex = 0;
+    for (i = firstPlayer; i <= lastPlayer; ++i) {
+        if (!onSide || localPlayer != i) {
+            utf8::Copy(
+                colorNames[listIndex],
+                sizeof(colorNames[listIndex]),
+                gColors[m_setupPlayerColor[i]]
+            );
+            utf8::UppercaseFirst(colorNames[listIndex]);
+            ++listIndex;
+        }
+    }
+
+    if (onSide && otherPlayerCount == 0) {
+        sprintf(text, "%s", localization::Tr("scenario.side.you"));
+        return onSide;
+    }
+
+    FormatScenarioSideList(playerList, colorNames, listIndex);
     if (onSide) {
-        if (otherPlayerCount != 0) {
-            if (otherPlayerCount > 1)
-                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8\xe8 \xf1\xee\xfe\xe7\xed\xe8\xea\xe8 ");
-            else
-                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8 \xf1\xee\xfe\xe7\xed\xe8\xea ");
-
-            listedPlayerCount = 0;
-            for (i = firstPlayer; i <= lastPlayer; ++i) {
-                if (i != localPlayer) {
-                    ++listedPlayerCount;
-                    sprintf(colorStr, gColors[m_setupPlayerColor[i]]);
-                    colorStr[0] = CyrillicToUpper(colorStr[0]);
-                    strcat(text, colorStr);
-                    if (listedPlayerCount < otherPlayerCount - 1)
-                        strcat(text, ", ");
-                    else if (listedPlayerCount < otherPlayerCount)
-                        strcat(text, " \xe8 ");
-                }
-            }
-        } else {
-            sprintf(text, "\xc2\xfb");
-        }
+        sprintf(
+            text,
+            localization::Tr(
+                otherPlayerCount == 1 ? "scenario.side.you_and_ally"
+                                      : "scenario.side.you_and_allies"
+            ),
+            playerList
+        );
     } else {
-        if (sideCount > 1)
-            strcpy(text, "\xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xf1\xee\xfe\xe7 ");
-        else
-            strcpy(text, "\xe2\xf0\xe0\xe3 - ");
-
-        listedPlayerCount = 0;
-        for (i = firstPlayer; i <= lastPlayer; ++i) {
-            ++listedPlayerCount;
-            sprintf(colorStr, gColors[m_setupPlayerColor[i]]);
-            colorStr[0] = CyrillicToUpper(colorStr[0]);
-            strcat(text, colorStr);
-            if (listedPlayerCount < otherPlayerCount - 1)
-                strcat(text, ", ");
-            else if (listedPlayerCount < otherPlayerCount)
-                strcat(text, " \xe8 ");
-        }
+        sprintf(
+            text,
+            localization::Tr(
+                sideCount == 1 ? "scenario.side.enemy" : "scenario.side.enemy_alliance"
+            ),
+            playerList
+        );
     }
 
     return onSide;

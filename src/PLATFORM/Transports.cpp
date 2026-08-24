@@ -11,7 +11,7 @@ void com_term(i16) {}
 
 i16 com_rcv(i16, u16, void*) { return 0; }
 
-i16 com_snd(i16, u16, u16, void*, i32) { return 0; }
+i16 com_snd(i16, u16, u16, const void*, i32) { return 0; }
 
 void comm_wrt_task() {}
 

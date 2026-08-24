@@ -4,6 +4,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/advManager.h>
 #include <PLATFORM/Network.h>
@@ -15,7 +16,9 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
+#include <SOURCE/SaveNames.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/Localization.h>
 
 typedef enum RemoteImplementationConstant {
     CRC_FEEDBACK_BIT                 = 0x08000000,
@@ -120,7 +123,7 @@ void RemoteMain(RemoteGameMode gameMode) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
         sprintf(
             gsNetPlayerInfo[player].name,
-              "\xc8\xe3\xf0\xee\xea\x20\x25\x64",
+              localization::Tr("player.number"),
             player + 1
         );
     }
@@ -151,13 +154,17 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("RM 7");
     if (giTCPHostStatus != -1) {
         if (strlen(gcTCPName) > 0)
-            strcpy(gsThisNetPlayerInfo.name, gcTCPName);
+            utf8::Copy(
+                gsThisNetPlayerInfo.name,
+                sizeof(gsThisNetPlayerInfo.name),
+                gcTCPName
+            );
         else
             strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
     } else {
         GetDataEntry(
 
-            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 \xe8\xec\xff, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec \xe2\xfb \xe1\xf3\xe4\xe5\xf2\xe5 \xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb.",
+            localization::Tr("network.player.handle_prompt"),
             gsThisNetPlayerInfo.name,
             NET_NAME_INPUT_LIMIT,
             gConfig.networkDefaultName,
@@ -539,7 +546,7 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && tries == REMOTE_RETRY_COUNT && rv == 0) {
             NormalDialog(
-                  "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f",
+                  localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -646,8 +653,7 @@ void PollRemote(void) {
                 gbInPollSound = false;
                 sprintf(
                     gText,
-
-                    "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f",
+                    localization::Tr("network.remote.player_not_responding"),
                     gsNetPlayerInfo[queueIndex].name
                 );
                 NormalDialog(
@@ -677,15 +683,13 @@ void PollRemote(void) {
             if (giThisNetPos == 1) {
                 sprintf(
                     gText,
-
-                    "\xca\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\x27\x25\x73\x27\x20\xed\xe5\x20\xee\xf2\xe2\xe5\xf7\xe0\xe5\xf2\x20\xed\xe0\x20\xe7\xe0\xef\xf0\xee\xf1\xfb\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f",
+                    localization::Tr("network.remote.player_not_responding"),
                     gsNetPlayerInfo[0].name
                 );
             } else {
                 sprintf(
                     gText,
-
-                    "\xd3\xe4\xe0\xeb\xe5\xed\xed\xee\xe5\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5\x20\xf1\x20\xe4\xf0\xf3\xe3\xe8\xec\xe8\x20\xe8\xe3\xf0\xee\xea\xe0\xec\xe8\x20\xef\xf0\xe5\xf0\xe2\xe0\xed\xee\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5\x20\xee\xf2\xe2\xe5\xf2\xe0\x3f"
+                    localization::Tr("network.remote.connection_broken")
                 );
             }
             NormalDialog(
@@ -701,15 +705,11 @@ void PollRemote(void) {
                 guestExit.eliminated = 0;
                 ReceiveRemotePlayerExit(guestExit);
             } else {
-                gpGame->SaveGame(
-                      "\xc8\xe3\xf0\xee\xea\x20\xc2\xfb\xf8\xe5\xeb",
-                    1,
-                    0
-                );
+                gpGame->SaveGame(const_cast<char*>(save_names::PlayerExit), 1, 0);
                 sprintf(
                     gText,
-
-                    "\xc4\xe0\xed\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x20\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0\x20\xef\xee\xe4\x20\xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec\x20\x27\xc8\xe3\xf0\xee\xea\x20\xe2\xfb\xf8\xe5\xeb\x27\x2e\x20\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x20\xe8\xe3\xf0\xf3\x2c\x20\xe3\xe4\xe5\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\x20\xe7\xe0\xe9\xec\xe5\xf2\x20\xec\xe5\xf1\xf2\xee\x20\xe2\xfb\xe1\xfb\xe2\xf8\xe8\xf5\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x3f"
+                    localization::Tr("network.player_exit.continue_with_computers"),
+                    save_names::PlayerExit
                 );
                 NormalDialog(
                     gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
@@ -824,7 +824,7 @@ i32 TransmitAndWait(
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < platform::Ticks()) {
             NormalDialog(
-                  "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f",
+                  localization::Tr("network.send.retry"),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,

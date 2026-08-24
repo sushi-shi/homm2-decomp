@@ -22,6 +22,8 @@ enum class SystemMenuCommand : i32 {
 i32l Ticks();
 void SetEventHandler(EventHandler handler);
 void PumpEvents();
+void StartTextInput();
+void StopTextInput();
 
 // Retail hung a Windows menu bar off the window, one per screen. The game half
 // of that survives whole - HandleAppSpecificMenuCommands still runs every

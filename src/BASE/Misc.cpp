@@ -2,6 +2,7 @@
 #include <Ints.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
+#include <SOURCE/Localization.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
@@ -532,10 +533,7 @@ void SetGameDefaults(void) {
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
     gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
 
-    strcpy(
-        gConfig.networkDefaultName,
-        "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb\xe9 \xe3\xe5\xf0\xee\xe9"
-    );
+    strcpy(gConfig.networkDefaultName, localization::Tr("player.unknown_hero_name"));
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
@@ -729,7 +727,7 @@ void LogTruncate(void) {
 }
 
 
-void LogStr(char* text) {
+void LogStr(const char* text) {
     char logText[TEXT_BUFFER_SIZE];
     i32 out;
     if (giDebugLevel < FILE_DEBUG_LEVEL)
@@ -1041,7 +1039,7 @@ i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
 void GetDataEntry(
-    char* prompt,
+    const char* prompt,
     char* destination,
     i32 maximumLength,
     char* initialText,
@@ -1092,7 +1090,7 @@ void GetDataEntry(
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     msg.payload.widget.id = ENTRY_PROMPT_WIDGET;
-    msg.payload.widget.data.text = prompt;
+    msg.payload.widget.data.text = const_cast<char*>(prompt);
     DataEntryWin->BroadcastMessage(msg);
 
     if (initialText != NULL)

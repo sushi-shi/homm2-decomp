@@ -22,6 +22,7 @@
 #include <SOURCE/townObject.h>
 #include <stdio.h>
 #include <string.h>
+#include <SOURCE/Localization.h>
 
 typedef enum CastleControl {
     CONTROL_BUILDING_OVERLAY_FIRST             = 400,
@@ -198,7 +199,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
-                "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2"
+                localization::Tr("castle.mage_guild.level")
                      ,
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
@@ -582,8 +583,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
-                        "\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc. \xc2\xfb \xf3\xe6\xe5 "
-                            "\xf1\xf2\xf0\xee\xe8\xeb\xe8 \xe7\xe4\xe5\xf1\xfc \xe2 \xfd\xf2\xee\xec \xf5\xee\xe4\xf3."
+                        localization::Tr("castle.build.already_this_turn")
 
                     );
                 } else if (gpTownManager->m_town->m_buildings & (1 << H2EnumIndex(whichBuilding))) {
@@ -696,16 +696,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                         if (quickFlag) {
                             NormalDialog(
-                                "{\xd8\xe8\xf0\xee\xea\xe8\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xe2\xe0\xf8\xe5 \xe2\xee\xe9"
-                                    "\xf1\xea\xee \xe7\xe0\xed\xe8\xec\xe0\xe5\xf2 \xef\xee\xe7"
-                                    "\xe8\xf6\xe8\xe8 \xef\xee \xe2\xf1\xe5\xe9 \xf8\xe8\xf0"
-                                    "\xe8\xed\xe5 \xef\xee\xeb\xff \xe1\xee\xff \xe8 \xec\xe5"
-                                    "\xe6\xe4\xf3 \xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8 \xee\xf2"
-                                    "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
-                                    "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
-                                    "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
+                                localization::Tr("formation.spread.help")
                                      ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
@@ -727,14 +718,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                         if (quickFlag) {
                             NormalDialog(
-                                "{\xcf\xeb\xee\xf2\xed\xfb\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                    "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                    "\xef\xee\xf0\xff\xe4\xea\xe5 \xf0\xff\xe4\xfb \xe2\xe0\xf8"
-                                    "\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xf1\xec\xfb\xea\xe0\xfe\xf2"
-                                    "\xf1\xff \xe2\xee\xea\xf0\xf3\xe3 \xf6\xe5\xed\xf2\xf0\xe0"
-                                    "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
-                                    " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
-                                    "\xe1\xee\xff."
+                                localization::Tr("formation.grouped.help")
                                      ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,

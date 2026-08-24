@@ -10,6 +10,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
+#include <BASE/Utf8.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
@@ -28,6 +29,9 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/Localization.h>
+
+#include <string>
 
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
@@ -207,6 +211,8 @@ void hero::Read(i32 file, i8 expansion) {
         platform::FileRead(file, this, sizeof(hero));
     else
         platform::FileRead(file, this, BASE_RECORD_SIZE);
+    const std::string name = localization::DecodeExternalText(m_name);
+    utf8::Copy(m_name, sizeof(m_name), name.c_str());
 }
 
 void hero::Write(i32 file, i8 expansion) {
@@ -497,8 +503,7 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
 
 i32 hero::Dismiss(void) {
     NormalDialog(
-        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 "
-        "\xf3\xe2\xee\xeb\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff?"
+        localization::Tr("hero.confirm.dismiss")
         ,
         NORMAL_DIALOG_CONFIRM,
         -1,
@@ -848,8 +853,7 @@ void hero::CheckLevel(void) {
             } else if (choices[1] == HERO_SKILL_NONE) {
                 sprintf(
                     text,
-                    "\n\n\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8\xe7\xf3\xf7\xe8\xeb "
-                    "%s %s."  ,
+                    localization::Tr("hero.level.learned_skill")  ,
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])])],
                     gSecondarySkills[H2EnumIndex(choices[0])]
                 );
@@ -871,8 +875,7 @@ void hero::CheckLevel(void) {
             } else {
                 sprintf(
                     text,
-                    "\n\n\xc2\xfb \xf2\xe0\xea\xe6\xe5 \xec\xee\xe6\xe5\xf2\xe5 "
-                    "\xe2\xfb\xf3\xf7\xe8\xf2\xfc %s %s \xe8\xeb\xe8 %s %s."
+                    localization::Tr("hero.level.choose_skill")
                      ,
                     gSecondarySkills[H2EnumIndex(choices[0])],
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])])],
@@ -1243,16 +1246,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_SPREAD:
                         if (quickView) {
                             NormalDialog(
-                                "{\xd8\xe8\xf0\xee\xea\xe8\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                "\xef\xee\xf0\xff\xe4\xea\xe5 \xe2\xe0\xf8\xe5 \xe2\xee\xe9"
-                                "\xf1\xea\xee \xe7\xe0\xed\xe8\xec\xe0\xe5\xf2 \xef\xee\xe7"
-                                "\xe8\xf6\xe8\xe8 \xef\xee \xe2\xf1\xe5\xe9 \xf8\xe8\xf0"
-                                "\xe8\xed\xe5 \xef\xee\xeb\xff \xe1\xee\xff \xe8 \xec\xe5"
-                                "\xe6\xe4\xf3 \xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8 \xee\xf2"
-                                "\xf0\xff\xe4\xe0\xec\xe8 \xe8\xec\xe5\xe5\xf2\xf1\xff \xf5"
-                                "\xee\xf2\xff \xe1\xfb \xee\xe4\xed\xe0 \xef\xf3\xf1\xf2"
-                                "\xe0\xff \xea\xeb\xe5\xf2\xea\xe0."
+                                localization::Tr("formation.spread.help")
                                  ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
@@ -1277,14 +1271,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_GROUPED:
                         if (quickView) {
                             NormalDialog(
-                                "{\xcf\xeb\xee\xf2\xed\xfb\xe5 \xf0\xff\xe4\xfb}\n\n\xcf"
-                                "\xf0\xe8 \xf2\xe0\xea\xee\xec \xe1\xee\xe5\xe2\xee\xec "
-                                "\xef\xee\xf0\xff\xe4\xea\xe5 \xf0\xff\xe4\xfb \xe2\xe0\xf8"
-                                "\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xf1\xec\xfb\xea\xe0\xfe\xf2"
-                                "\xf1\xff \xe2\xee\xea\xf0\xf3\xe3 \xf6\xe5\xed\xf2\xf0\xe0"
-                                "\xeb\xfc\xed\xee\xe3\xee \xee\xf2\xf0\xff\xe4\xe0 \xed\xe0"
-                                " \xe2\xe0\xf8\xe5\xec \xea\xf0\xe0\xfe \xef\xee\xeb\xff "
-                                "\xe1\xee\xff."
+                                localization::Tr("formation.grouped.help")
                                  ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
@@ -1310,20 +1297,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_SPELL_POINTS_LAST:
                         sprintf(
                             gText,
-                            "{\xce\xf7\xea\xe8 \xec\xe0\xe3\xe8\xe8}\n\n%s \xf1\xe5\xe9\xf7"
-                            "\xe0\xf1 \xf0\xe0\xf1\xef\xee\xeb\xe0\xe3\xe0\xe5\xf2 %d \xee"
-                            "\xf7\xea\xe0\xec\xe8 \xec\xe0\xe3\xe8\xe8 \xe8\xe7 \xe2\xee"
-                            "\xe7\xec\xee\xe6\xed\xfb\xf5 %d \xee\xf7. \xcc\xe0\xea\xf1\xe8"
-                            "\xec\xe0\xeb\xfc\xed\xee \xe2\xee\xe7\xec\xee\xe6\xed\xee\xe5 "
-                            "\xf7\xe8\xf1\xeb\xee \xee\xf7\xea\xee\xe2 \xec\xe0\xe3\xe8\xe8"
-                            " \xf0\xe0\xe2\xed\xee \xf3\xf0\xee\xe2\xed\xfe \xe7\xed\xe0"
-                            "\xed\xe8\xe9 \xef\xee\xec\xed\xee\xe6\xe5\xed\xed\xee\xec\xf3 "
-                            "\xed\xe0 10. \xcd\xee \xe8\xed\xee\xe3\xe4\xe0, \xe2 \xee\xf1"
-                            "\xee\xe1\xfb\xf5 \xf1\xeb\xf3\xf7\xe0\xff\xf5, \xea\xee\xeb"
-                            "\xe8\xf7\xe5\xf1\xf2\xe2\xee \xee\xf7\xea\xee\xe2 \xec\xe0\xe3"
-                            "\xe8\xe8 \xec\xee\xe6\xe5\xf2 \xef\xf0\xe5\xe2\xfb\xf8\xe0\xf2"
-                            "\xfc \xee\xe1\xfb\xf7\xed\xfb\xe9 \xeb\xe8\xec\xe8\xf2."
-                             ,
+                            localization::Tr("hero.spell_points.help"),
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
                             gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
@@ -1349,9 +1323,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         nextExperience = gpHVHero->GetExperience(heroLevel + 1);
                         sprintf(
                             gText,
-                            "{%d \xf3\xf0\xee\xe2\xe5\xed\xfc}\n\n\xd2\xe5\xea\xf3\xf9\xe8"
-                            "\xe9 \xee\xef\xfb\xf2: %d\n\xd1\xeb\xe5\xe4\xf3\xfe\xf9\xe8"
-                            "\xe9 \xf3\xf0\xee\xe2\xe5\xed\xfc: %d"
+                            localization::Tr("hero.level.help")
                              ,
                             heroLevel,
                             gpHVHero->m_experience,
@@ -1843,7 +1815,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "\xd1\xea\xee\xeb\xfc\xea\xee \xe2\xee\xe8\xed\xee\xe2 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8?");
+    sprintf(gText, localization::Tr("hero.army.split.prompt"));
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
@@ -2009,10 +1981,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
         skillText = gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1];
         sprintf(
             gText,
-            "{%s \xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d)}\n\n%s "
-                "\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff (+%d) \xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2 \xe2\xe5\xf0\xed\xf3\xf2\xfc "
-                "%d \xef\xf0\xee\xf6\xe5\xed\xf2\xee\xe2 \xef\xee\xe3\xe8\xe1\xf8\xe8\xf5 \xe2 \xe1\xee\xfe \xe2\xee\xe8\xed\xee\xe2 \xe2 "
-                "\xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe2 \xe2\xe8\xe4\xe5 \xf1\xea\xe5\xeb\xe5\xf2\xee\xe2."
+            localization::Tr("hero.skill.necromancy.help")
                  ,
             skillText,
             skillBonusValue,
@@ -2055,7 +2024,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
-                "\xd2\xf0\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xc0\xed\xe4\xf3\xf0\xe0\xed\xe0 \xf7\xf3\xe4\xe5\xf1\xed\xfb\xec \xf1\xef\xee\xf1\xee\xe1\xee\xec \xee\xe1\xfa\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc \xe2 \xee\xe4\xe8\xed \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
+                localization::Tr("hero.artifact.anduran_combined"),
                 NORMAL_DIALOG_INFO,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,

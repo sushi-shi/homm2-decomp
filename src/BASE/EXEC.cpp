@@ -12,6 +12,7 @@
 #include <SOURCE/KB.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/Localization.h>
 
 typedef enum ExecutiveManagerConstant {
     MANAGER_DEFAULT_PRIORITY = -1,
@@ -20,27 +21,26 @@ typedef enum ExecutiveManagerConstant {
     DIALOG_MANAGER_CAPACITY  = 20
 } ExecutiveManagerConstant;
 
-static char gExecutiveTextStorage[sizeof(SExecutiveText)] =
-    "\xed\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf0\xe5\xf1\xf3\xf0\xf1\xfb. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0." "\0\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xe0 \xe2\xe2\xee\xe4\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xef\xf0\xee\xe1\xeb\xe5\xec\xe0 \xf1 \xea\xeb\xe0\xe2\xe8\xe0\xf2\xf3\xf0\xee\xe9 \xe8\xeb\xe8 \xec\xfb\xf8\xfc\xfe." "\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xe7\xe2\xf3\xea." "\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xec\xfb\xf8\xfc." "\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe8\xf0\xee\xe2\xe0\xf2\xfc \xee\xea\xed\xe0. \xc2\xe5\xf0\xee\xff\xf2\xed\xee, \xee\xf8\xe8\xe1\xea\xe0 \xe4\xe8\xf1\xea\xe0 \xe8\xeb\xe8 \xef\xe0\xec\xff\xf2\xe8." "\0\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "-----Manager List Start-----" "\0\0\0\0"
-    "-----" "\0\0\0"
-    "Head %d   Tail %d" "\0\0\0"
-    "-----" "\0\0\0"
-    "Manager %20s  this %d   prev %d  next %d" "\0\0\0\0"
-    "--*--Manager List Stop --*--\n\n" "\0\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "\xcd\xe5 \xec\xee\xe3\xf3 \xe4\xee\xe1\xe0\xe2\xe8\xf2\xfc \xec\xe5\xed\xe5\xe4\xe6\xe5\xf0\xe0!" "\0"
-    "Terminated" "\0";
-
-#define gExecutiveText (*reinterpret_cast<SExecutiveText*>(gExecutiveTextStorage))
+static SExecutiveText gExecutiveText = {
+    "Unable to initialize resources - possible disk problem.",
+    "Unable to initialize input devices - possible problem with mouse or keyboard.",
+    "Unable to initialize sound.",
+    "Unable to initialize mouse.",
+    "Unable to initialize windows - possible memory or disk error.",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Can't add manager!",
+    "-----Manager List Start-----",
+    "-----",
+    "Head %d   Tail %d",
+    "-----",
+    "Manager %20s  this %d   prev %d  next %d",
+    "--*--Manager List Stop --*--\n\n",
+    "Can't add manager!",
+    "Can't add manager!",
+    "Terminated"
+};
 
 executive::executive(void) {
     m_managerListHead = NULL;
@@ -51,17 +51,17 @@ executive::executive(void) {
 
 i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.resourceInitError);
+        ShutDown(localization::Tr("system.resources.initialization_failed"));
     if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.inputInitError);
+        ShutDown(localization::Tr("system.input.initialization_failed"));
     if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
         if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
-            ShutDown(gExecutiveText.soundInitError);
+            ShutDown(localization::Tr("system.sound.initialization_failed"));
     }
     if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.mouseInitError);
+        ShutDown(localization::Tr("system.mouse.initialization_failed"));
     if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.windowInitError);
+        ShutDown(localization::Tr("system.window.initialization_failed"));
     return 0;
 }
 
@@ -102,13 +102,13 @@ i32 executive::DoDialog(class baseManager* manager) {
         count++;
     }
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError1);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     if (ex.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError2);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     if (ex.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError3);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     if (ex.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.dialogManagerError4);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     ex.MainLoop();
     RemoveManager(manager);
     for (idx = 0; idx < count; idx++) {
@@ -199,11 +199,11 @@ void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(m_activeManager);
     if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.callManagerError1);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     MainLoop();
     RemoveManager(mgr);
     if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
-        ShutDown(gExecutiveText.callManagerError2);
+        ShutDown(localization::Tr("system.manager.add_failed"));
     m_activeManager = saved;
 }
 
@@ -257,5 +257,5 @@ void executive::MainLoop(void) {
 }
 
 void executive::Terminate(void) {
-    ShutDown(gExecutiveText.terminationMessage);
+    ShutDown(localization::Tr("system.terminated"));
 }
