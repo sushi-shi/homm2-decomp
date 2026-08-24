@@ -362,6 +362,23 @@ The 9-arm PoL matrix closes only the two player-arm-hook scopes. Buka's exact
 inline ternary falls to 98.800900% under VC4.2; the retained PoL form falls to
 99.820274% under VC6. See `docs/matching/LoadIcons/`.
 
+### `philAI::FightValueOfStack`: no transferable edit
+
+| property | PoL result |
+|---|---|
+| RVA | `0x0003fed2` |
+| semantics / layout | same logic; exact 392-byte frame and referenced slots |
+| clean bytes / CFG | 99.827774%; 3064 bytes; exact 147/147 blocks |
+| retained state | 99.913890%; three raw comparison bytes remain |
+| relocations | complete ordered 72/72 stream |
+
+The complete 102-cell comparison/state product makes Buka's
+`scoreIndex < spellCount` condition byte-neutral under VC4.2. A complete
+51-cell descendant using Buka's index name `t` regresses the best state to
+99.843056%. Retain the PoL source; this is a matching-only compiler-state
+residual, with no entry in the gameplay-change inventory. See
+`docs/matching/FightValueOfStack/`.
+
 ## Bugs and bug candidates exposed by the exact branch
 
 ### Confirmed reconstruction bug
@@ -419,7 +436,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `FightValueOfStack` | 99.9139% | exact Buka arithmetic ownership |
 | `SaveGame` | 99.9084% | exact Buka large-body reference |
 | `SmackManagerMain` | 99.8963% | removed speed-test/low-memory branches |
 | `HeroQuickView` | 99.8681% | low-memory and quick-info structure |
