@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_ICONWIDGET_H
 #define HOMM2_BASE_ICONWIDGET_H
 
-#include <va.h>
+#include <Ints.h>
 #include "IconDraw.h"
 #include "widget.h"
 
@@ -13,7 +13,7 @@ class iconWidget : public widget {
 public:
     icon* m_icon;
     i16 m_frame;
-    H2_ENUM_STORAGE(IconDrawOrientation, i8) m_orientation;
+    i8 m_orientation;
     i16 m_fillColor;
     u32l m_iconId;
     iconWidget(void);
@@ -24,9 +24,9 @@ public:
         i16 height,
         u32l iconId,
         i16 frame,
-        H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+        IconDrawOrientation orientation,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind,
+        WidgetKind kind,
         i16 fillColor
     );
     iconWidget(
@@ -36,16 +36,15 @@ public:
         i16 height,
         char* iconName,
         i16 frame,
-        H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+        IconDrawOrientation orientation,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind,
+        WidgetKind kind,
         i16 fillColor
     );
-    virtual inline ~iconWidget() OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual inline ~iconWidget() override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
 };
 #pragma pack(pop)
-SIZE(iconWidget, 0x2d);
 #endif

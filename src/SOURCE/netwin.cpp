@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #define NCB_INCLUDED
 #include <windows.h>
 #include <stdarg.h>
@@ -10,39 +10,38 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\NETWIN.CPP"
 
-H2_ENUM_BEGIN(NetbiosResetConstant)
+typedef enum NetbiosResetConstant {
     RESET_SESSION_LIMIT_INDEX = 0,
     RESET_NAME_LIMIT_INDEX    = 2,
     RESET_SESSION_LIMIT       = 20,
     RESET_NAME_LIMIT          = 10
-H2_ENUM_END(NetbiosResetConstant)
+} NetbiosResetConstant;
 
 
-DATA(0x00528650) static tag_Anchor gNbFreeQueueRuntime = {0};
-DATA(0x00528658) static NetbiosThreadEvents gNbThreadEventsContext = {0};
-DATA(0x00528680) static tag_Anchor gNbReceiveQueueEntry = {0};
-DATA(0x00528688) static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT] = {0};
-DATA(0x00528690) static tag_Anchor gNbSendQueueHead = {0};
-DATA(0x00528698) static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT] = {0};
-DATA(0x0052f698) static CRITICAL_SECTION gNbReceiveLockCriticalSection = {0};
-DATA(0x0052f6b0) static NetbiosSessionBuffer gNbSessionBufferContext = {0};
-DATA(0x005306b0) static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT] = {0};
-DATA(0x00530870) static NetbiosControlBlock gNbControlBlockArena = {0};
-DATA(0x005308b0) static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT] = {0};
-DATA(0x00530920) static CRITICAL_SECTION gNbSendLockBacking = {0};
-DATA(0x00530938) static u8 gNbCallRetries = 0;
-DATA(0x00530939) static u8 gNetbiosAvail = 0;
-DATA(0x0053093a) static u8 gNetbiosLana = 0;
-DATA(0x0053093b) static u8 gNbShutdown = 0;
-DATA(0x0053093c) static u8 gNbLocalNum = 0;
-DATA(0x00530940) static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
+static tag_Anchor gNbFreeQueueRuntime = {0};
+static NetbiosThreadEvents gNbThreadEventsContext = {0};
+static tag_Anchor gNbReceiveQueueEntry = {0};
+static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT] = {0};
+static tag_Anchor gNbSendQueueHead = {0};
+static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT] = {0};
+static CRITICAL_SECTION gNbReceiveLockCriticalSection = {0};
+static NetbiosSessionBuffer gNbSessionBufferContext = {0};
+static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT] = {0};
+static NetbiosControlBlock gNbControlBlockArena = {0};
+static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT] = {0};
+static CRITICAL_SECTION gNbSendLockBacking = {0};
+static u8 gNbCallRetries = 0;
+static u8 gNetbiosAvail = 0;
+static u8 gNetbiosLana = 0;
+static u8 gNbShutdown = 0;
+static u8 gNbLocalNum = 0;
+static u8 gNetStatus[NETBIOS_STATUS_COUNT] = {0};
 
-DATA(0x00515c44) static u8 gNbMaxSess = NETBIOS_INVALID_ID;
-DATA(0x00515c48) static char* gNbGroupName =
+static u8 gNbMaxSess = NETBIOS_INVALID_ID;
+static char* gNbGroupName =
     "Empire Too ";
-DATA(0x00515c4c) static char* gNbListenName =
+static char* gNbListenName =
     "*";
 
 #define gNbFreeQueue gNbFreeQueueRuntime
@@ -58,7 +57,6 @@ DATA(0x00515c4c) static char* gNbListenName =
 #define gNbEvents gNbThreadEventsContext
 #define gNbSndLock gNbSendLockBacking
 
-VA(0x00473da0, 0x94)
 i32 is_netbios_avail(void) {
     NetbiosControlBlock ncb;
     memset(&ncb, 0, sizeof(ncb));
@@ -76,7 +74,6 @@ i32 is_netbios_avail(void) {
     return 0;
 }
 
-VA(0x00473e34, 0x218)
 extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
     NetbiosControlBlock blk;
     i32 idx;
@@ -127,7 +124,6 @@ extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
     return 1;
 }
 
-VA(0x0047404c, 0x1d0)
 extern "C" void __fastcall nb_term(void) {
     tag_Node* np;
     NetbiosControlBlock block;
@@ -142,7 +138,7 @@ extern "C" void __fastcall nb_term(void) {
         block.buffer = &gNbCtlNcb;
         Netbios(&block);
     }
-    if (HAS(gNetStatus[gNbMaxSess], NETBIOS_SESSION_NAME_REGISTERED)) {
+    if ((((gNetStatus[gNbMaxSess]) & (NETBIOS_SESSION_NAME_REGISTERED)))) {
         memset(&block, 0, sizeof(block));
         memcpy(block.name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
         block.command = NETBIOS_COMMAND_DELETE_NAME;
@@ -169,7 +165,6 @@ extern "C" void __fastcall nb_term(void) {
     DeleteCriticalSection(&gNbRcvLock);
 }
 
-VA(0x0047421c, 0x96)
 extern "C" u16 __cdecl nb_rcv(i16 session, void* buf) {
     tag_Node* node;
     i32 len;
@@ -186,7 +181,6 @@ extern "C" u16 __cdecl nb_rcv(i16 session, void* buf) {
     return 0;
 }
 
-VA(0x004742b2, 0xc0)
 extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
     tag_Node* node;
 
@@ -194,8 +188,8 @@ extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
         nb_add_name();
         return 0;
     }
-    if (!HAS(gNetStatus[session], NETBIOS_SESSION_ACTIVE))
-        return IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE);
+    if (!(((gNetStatus[session]) & (NETBIOS_SESSION_ACTIVE))))
+        return (NETBIOS_RESULT_SESSION_OUT_OF_RANGE);
     node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);
@@ -207,16 +201,15 @@ extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
     return 0;
 }
 
-VA(0x00474372, 0x4c7)
 extern "C" u16 __cdecl
-nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
+nb_sess(NetbiosSessionOperation operation, ...) {
     i32 oldsess;
     i32 destinationSession;
     i32 detach;
     NetbiosControlBlock controlBlock;
     char* peer;
     va_list args;
-    H2_ENUM_STORAGE(NetbiosResult, i16) rc;
+    i16 rc;
 
     va_start(args, operation);
     switch (operation) {
@@ -329,21 +322,19 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
     }
     if (rc == NETBIOS_RESULT_PENDING)
         rc = 0;
-    return IDX(rc);
+    return (rc);
 }
 
-VA(0x00474839, 0xf)
 extern "C" char __cdecl nb_stat(i16 session) {
     return static_cast<char>(gNetStatus[session]);
 }
 
-VA(0x00474848, 0x215)
 void nb_thr_ctl(void) {
     i32 keepRunning;
     i32 idx;
     tag_Node* entry;
     NetbiosControlBlock block;
-    H2_ENUM_STORAGE(NetbiosResult, u8) result;
+    u8 result;
     i32 sendComplete;
 
     keepRunning = 1;
@@ -386,7 +377,7 @@ void nb_thr_ctl(void) {
                             case NETBIOS_RESULT_PENDING:
                                 ProcessAssert(
                                     0,
-                                    RETAIL_FILE,
+                                    "netwin.cpp",
                                     495
                                 );
                                 break;
@@ -407,7 +398,6 @@ void nb_thr_ctl(void) {
 }
 
 
-VA(0x00474a5d, 0xb5)
 static void nb_add_name(void) {
     if (gNbCtlNcb.commandComplete != NETBIOS_RESULT_PENDING) {
         strcpy(gNbSessBuf.bytes, gNbGroupName);
@@ -426,12 +416,11 @@ static void nb_add_name(void) {
     }
 }
 
-VA(0x00474b12, 0x193)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(
         ncb == &gNbSessNcb[gNbMaxSess],
-        RETAIL_FILE,
+        "netwin.cpp",
         537
     );
     switch (ncb->returnCode) {
@@ -458,7 +447,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
             sprintf(
                 gText,
                 "Add Name Error %02x\n",
-                IDX(ncb->returnCode)
+                (ncb->returnCode)
             );
             ShutDown(gText);
             gNetStatus[gNbMaxSess] |= NETBIOS_SESSION_ERROR;
@@ -466,8 +455,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     }
 }
 
-VA(0x00474ca5, 0xb4)
-static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_recv_any(i32 session) {
+static NetbiosResult __fastcall nb_recv_any(i32 session) {
     if (gNbSessNcb[session].commandComplete != NETBIOS_RESULT_PENDING) {
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
         gNbSessNcb[session].command =
@@ -481,7 +469,6 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_recv_any(i32 session) {
     return gNbSessNcb[session].commandComplete;
 }
 
-VA(0x00474d59, 0x11d)
 static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
@@ -509,8 +496,7 @@ static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb) {
     }
 }
 
-VA(0x00474e76, 0xc2)
-static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_call(i32 session, void* name) {
+static NetbiosResult __fastcall nb_call(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
@@ -522,8 +508,7 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_call(i32 session, void* n
     return Netbios(&gNbSessNcb[session]);
 }
 
-VA(0x00474f38, 0xc2)
-static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_listen(i32 session, void* name) {
+static NetbiosResult __fastcall nb_listen(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
@@ -535,7 +520,6 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_listen(i32 session, void*
     return Netbios(&gNbSessNcb[session]);
 }
 
-VA(0x00474ffa, 0xf4)
 static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
@@ -564,13 +548,12 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     }
 }
 
-VA(0x004750ee, 0x124)
 static void __fastcall nb_arm_recv(i32 session) {
-    H2_ENUM_STORAGE(NetbiosResult, u8) result;
+    u8 result;
     while (1) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
-            RETAIL_FILE,
+            "netwin.cpp",
             715
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
@@ -595,7 +578,6 @@ static void __fastcall nb_arm_recv(i32 session) {
     }
 }
 
-VA(0x00475212, 0xb1)
 static void __fastcall nb_close_session(i32 session) {
     NetbiosControlBlock controlBlock;
     if (gNbSessNcb[session].commandComplete == NETBIOS_RESULT_PENDING) {
@@ -615,7 +597,6 @@ static void __fastcall nb_close_session(i32 session) {
     }
 }
 
-VA(0x004752c3, 0x137)
 static void __fastcall nb_recv_complete(i32 session) {
     tag_Node* node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
@@ -647,7 +628,6 @@ static void __fastcall nb_recv_complete(i32 session) {
     }
 }
 
-VA(0x004753fa, 0x76)
 static void __fastcall nb_format_name(char* src, u8* dst) {
     u32 i;
     memset(dst, 0, NETBIOS_NAME_SIZE);

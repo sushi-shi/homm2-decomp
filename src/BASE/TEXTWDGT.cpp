@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -8,13 +8,12 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(TextWidgetConstant)
+typedef enum TextWidgetConstant {
     RESOURCE_NAME_CAPACITY = 16,
     DRAW_MODE_MASK         = 0xff,
     TEXT_BUFFER_GROWTH     = 5
-H2_ENUM_END(TextWidgetConstant)
+} TextWidgetConstant;
 
-VA(0x004c2f50, 0x58)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_font = NULL;
     m_text = NULL;
@@ -23,7 +22,6 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004c2fe0, 0xa7)
 textWidget::textWidget(
     i16 x,
     i16 y,
@@ -31,10 +29,10 @@ textWidget::textWidget(
     i16 height,
     char* text,
     char* fontName,
-    H2_ENUM_PARAM(FontDrawMode, i16) color,
+    FontDrawMode color,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
-    H2_ENUM_PARAM(FontAlignment, i16) alignment
+    WidgetKind kind,
+    FontAlignment alignment
 )
     : widget(x, y, width, height, id, kind) {
     m_font = gpResourceManager->GetFont(fontName);
@@ -44,7 +42,6 @@ textWidget::textWidget(
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004c3090, 0x12f)
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -65,8 +62,7 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004c31c0, 0x72)
-inline textWidget::~textWidget() {
+textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE(m_text);
 }
@@ -76,9 +72,8 @@ inline textWidget::~textWidget() {
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.payload.widget.id = idValue
 
-VA(0x004c3240, 0x226)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -96,7 +91,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (msg.payload.widget.id == m_id) {
-                        SetColorIndex(msg.payload.widget.data.value);
+                        SetColorIndex(static_cast<FontDrawMode>(msg.payload.widget.data.value));
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
@@ -111,7 +106,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
                 && relativeY < m_y + m_height) {
                 m_flags |= WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                    msg.payload.widget.parameter = (MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
@@ -120,10 +115,10 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+            if ((((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                    msg.payload.widget.parameter = (MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
@@ -135,7 +130,6 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
 #undef SET_WIDGET_MESSAGE
 
-VA(0x004c3470, 0x82)
 void textWidget::Draw(void) {
     m_font->DrawBoundedString(
         m_text,
@@ -143,17 +137,15 @@ void textWidget::Draw(void) {
         m_owner->m_posY + m_y,
         m_width,
         m_height,
-        HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_color,
+        (((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_color),
         m_alignment
     );
 }
 
-VA(0x004c3500, 0x18)
-void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
+void textWidget::SetColorIndex(FontDrawMode color) {
     m_color = color;
 }
 
-VA(0x004c3520, 0xae)
 void textWidget::SetText(char* text) {
     if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
         u16 newLen = strlen(text);
@@ -166,6 +158,3 @@ void textWidget::SetText(char* text) {
         m_text = text;
     }
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(textWidget, 0x004ea9a0)

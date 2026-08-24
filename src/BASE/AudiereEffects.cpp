@@ -1,11 +1,10 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 
-SIZE(AudiereSampleNode, 0xc);
 
 struct AudiereEffectsState {
     void* buffer;
@@ -17,11 +16,9 @@ struct AudiereEffectsState {
     i32 sampleIterationDepth;
 };
 
-SIZE(AudiereEffectsState, 0x1c);
 
-DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = {0};
+static AudiereEffectsState gAudiereEffects = {0};
 
-VA(0x004cc740, 0x162)
 void PurgeFinishedAudiereSamples(void) {
     if (gAudiereEffects.sampleList == NULL)
         return;
@@ -51,7 +48,6 @@ void PurgeFinishedAudiereSamples(void) {
     }
 }
 
-VA(0x004cc8b0, 0x3a)
 AudiereSampleNode* FindAudiereSample(class sample* sampleResource) {
     for (AudiereSampleNode* node = gAudiereEffects.sampleList; node != NULL;
          node = node->next) {
@@ -61,7 +57,6 @@ AudiereSampleNode* FindAudiereSample(class sample* sampleResource) {
     return NULL;
 }
 
-VA(0x004cc8f0, 0x39c)
 void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr device) {
     if (device == NULL)
         return;
@@ -79,7 +74,7 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
         new AudiereSampleNode(sampleResource, gAudiereEffects.sampleList);
 
     gAudiereEffects.buffer = sampleResource->m_playbackData.data;
-    gAudiereEffects.sampleRate = IDX(sampleResource->m_playbackData.sampleRate);
+    gAudiereEffects.sampleRate = (sampleResource->m_playbackData.sampleRate);
     gAudiereEffects.frameCount = sampleResource->m_playbackData.size;
     if (sampleResource->m_playbackData.stereo != 0) {
         gAudiereEffects.channelCount = 2;
@@ -119,7 +114,6 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
     PurgeFinishedAudiereSamples();
 }
 
-VA(0x004ccc90, 0x3c)
 bool AudiereSamplePlaying(class sample* sampleResource) {
     AudiereSampleNode* node = FindAudiereSample(sampleResource);
     if (node == NULL)
@@ -127,7 +121,6 @@ bool AudiereSamplePlaying(class sample* sampleResource) {
     return node->stream->isPlaying();
 }
 
-VA(0x004cccd0, 0x70)
 void StopAudiereSample(class sample* sampleResource) {
     if (AudiereSampleIterationActive())
         return;
@@ -139,7 +132,6 @@ void StopAudiereSample(class sample* sampleResource) {
     }
 }
 
-VA(0x004ccd40, 0x63)
 void SetAudiereSampleVolume(class sample* sampleResource, i32 volume) {
     if (AudiereSampleIterationActive())
         return;
@@ -150,7 +142,6 @@ void SetAudiereSampleVolume(class sample* sampleResource, i32 volume) {
         sampleNode->stream->setVolume(sampleVolume);
 }
 
-VA(0x004ccdb0, 0x62)
 void WaitForAudiereSample(class sample* sampleResource) {
     if (AudiereSampleIterationActive())
         return;
@@ -162,7 +153,6 @@ void WaitForAudiereSample(class sample* sampleResource) {
     }
 }
 
-VA(0x004cce20, 0x77)
 void StopAllAudiereSamples(void) {
     if (AudiereSampleIterationActive())
         return;
@@ -174,7 +164,6 @@ void StopAllAudiereSamples(void) {
     PurgeFinishedAudiereSamples();
 }
 
-VA(0x004ccea0, 0x6b)
 void SetAllAudiereSampleVolumes(i32 volume) {
     if (AudiereSampleIterationActive())
         return;
@@ -185,17 +174,14 @@ void SetAllAudiereSampleVolumes(i32 volume) {
         sampleNode->stream->setVolume(sampleVolume);
 }
 
-VA(0x004ccf10, 0x12)
 void BeginAudiereSampleIteration(void) {
     ++gAudiereEffects.sampleIterationDepth;
 }
 
-VA(0x004ccf30, 0x12)
 void EndAudiereSampleIteration(void) {
     --gAudiereEffects.sampleIterationDepth;
 }
 
-VA(0x004ccf50, 0x11)
 bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }

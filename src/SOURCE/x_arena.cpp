@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/font.h>
@@ -13,7 +13,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/x_arena.h>
 
-H2_ENUM_BEGIN(ArenaConstant)
+typedef enum ArenaConstant {
     CHOICE_COUNT            = 3,
     WINDOW_RESOURCE         = 5,
     WINDOW_WIDTH            = 306,
@@ -44,9 +44,8 @@ H2_ENUM_BEGIN(ArenaConstant)
     BROADCAST_TEXT_ID       = 1,
     BROADCAST_CONTROL_VALUE = 6,
     DRAW_MODE               = 1
-H2_ENUM_END(ArenaConstant)
+} ArenaConstant;
 
-VA(0x004b2ba0, 0x3bb)
 i32 DoArenaDialog(void) {
     i32 statValue0;
     i32 statValue2;
@@ -75,11 +74,11 @@ i32 DoArenaDialog(void) {
 
     strcpy(
         gText,
-        /* Ð’Ñ‹ Ð²Ð¾ÑˆÐ»Ð¸ Ð½Ð° Ð°Ñ€ÐµÐ½Ñƒ Ð¸ ÑÑ€Ð°Ð·Ð¸Ð»Ð¸ÑÑŒ ÑÐ¾ ÑÐ²Ð¾Ñ€Ð¾Ð¹ ÑÐ²Ð¸Ñ€ÐµÐ¿Ñ‹Ñ… Ð»ÑŒÐ²Ð¾Ð². Ð’Ð¿ÐµÑ‡Ð°Ñ‚Ð»ÐµÐ½Ð½Ñ‹Ð¹ Ð²Ð°ÑˆÐ¸Ð¼ Ð¼Ð°ÑÑ‚ÐµÑ€ÑÑ‚Ð²Ð¾Ð¼
-           Ñ‚Ñ€ÐµÐ½ÐµÑ€ Ð³Ð»Ð°Ð´Ð¸Ð°Ñ‚Ð¾Ñ€Ð¾Ð² ÑÐ¾Ð³Ð»Ð°ÑÐ¸Ð»ÑÑ Ð½Ð°ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð²Ð°Ñ Ð¾Ð´Ð½Ð¾Ð¼Ñƒ Ð½Ð°Ð²Ñ‹ÐºÑƒ Ð½Ð° Ð²Ð°Ñˆ Ð²Ñ‹Ð±Ð¾Ñ€. */
-        "\xc2\xfb \xe2\xee\xf8\xeb\xe8 \xed\xe0 \xe0\xf0\xe5\xed\xf3 \xe8 \xf1\xf0\xe0\xe7\xe8\xeb\xe8\xf1\xfc \xf1\xee \xf1\xe2\xee\xf0\xee\xe9 \xf1\xe2\xe8\xf0\xe5\xef\xfb\xf5 \xeb\xfc\xe2\xee\xe2. "
-            "\xc2\xef\xe5\xf7\xe0\xf2\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xec\xe0\xf1\xf2\xe5\xf0\xf1\xf2\xe2\xee\xec \xf2\xf0\xe5\xed\xe5\xf0 \xe3\xeb\xe0\xe4\xe8\xe0\xf2\xee\xf0\xee\xe2 "
-            "\xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xf1\xff \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xee\xe4\xed\xee\xec\xf3 \xed\xe0\xe2\xfb\xea\xf3 \xed\xe0 \xe2\xe0\xf8 \xe2\xfb\xe1\xee\xf0."
+
+
+        "Âû âîøëè íà àðåíó è ñðàçèëèñü ñî ñâîðîé ñâèðåïûõ ëüâîâ. "
+            "Âïå÷àòëåííûé âàøèì ìàñòåðñòâîì òðåíåð ãëàäèàòîðîâ "
+            "ñîãëàñèëñÿ íàó÷èòü âàñ îäíîìó íàâûêó íà âàø âûáîð."
     );
     lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
     textHeight4 = lineCount11 << TEXT_LINE_SHIFT;
@@ -143,7 +142,6 @@ i32 DoArenaDialog(void) {
     return choice;
 }
 
-VA(0x004b2f5b, 0x1e1)
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     tag_message dialogMessage_12;
     i32 widgetIndex_5;
@@ -152,7 +150,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message_1.type = MESSAGE_WIDGET;
@@ -224,7 +222,6 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004b313c, 0x169)
 void UpdateArenaIcons(void) {
     i32 widgetIndex;
 
@@ -251,6 +248,6 @@ void UpdateArenaIcons(void) {
     arenaWinPtr->DrawWindow(DRAW_MODE, WIDGET_FIRST_ID, WIDGET_LAST_ID);
 }
 
-DATA(0x005347d4) i32 choice;
-DATA(0x005347c8) class iconWidget* skillWidget[CHOICE_COUNT];
-DATA(0x005347c4) class heroWindow* arenaWinPtr;
+i32 choice;
+class iconWidget* skillWidget[CHOICE_COUNT];
+class heroWindow* arenaWinPtr;

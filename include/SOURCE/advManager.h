@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_ADVMANAGER_H
 #define HOMM2_SOURCE_ADVMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/baseManager.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
@@ -26,7 +26,7 @@ struct adventureSoundCell {
     i32 volume;
 };
 
-H2_ENUM_BEGIN(AdventureManagerStorageConstant)
+typedef enum AdventureManagerStorageConstant {
     ADVMGR_LOCATOR_STATE_COUNT           = 12,
     ADVMGR_BOTTOM_VIEW_ITEM_COUNT        = 5,
     ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE = 0x14,
@@ -34,7 +34,7 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
     ADVMGR_OBJECT_ICON_COUNT             = 64,
     ADVMGR_ANIMATION_PHASE_COUNT         = 4,
-    ADVMGR_HERO_ICON_COUNT               = IDX(FACTION_COUNT) + 2,
+    ADVMGR_HERO_ICON_COUNT               = (FACTION_COUNT) + 2,
     ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
@@ -44,14 +44,14 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT  = 6,
     ADVMGR_ARMY_SIZE_NAME_SIZE           = 12,
     ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
-H2_ENUM_END(AdventureManagerStorageConstant)
+} AdventureManagerStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(ArmySizeNameVariant)
+enum {
     ARMY_SIZE_NAME_TITLE    = 0,
     ARMY_SIZE_NAME_SENTENCE = 1,
     ARMY_SIZE_NAME_INLINE   = 2
-H2_ENUM_CLASS_END(ArmySizeNameVariant)
-
+};
+typedef i32 ArmySizeNameVariant;
 #pragma pack(push, 1)
 class advManager : public baseManager {
 public:
@@ -79,7 +79,7 @@ public:
     class heroWindow* m_adventureWindow;
     u16* m_visibilityMap;
     i32 m_visibilityMapValid;
-    H2_ENUM_STORAGE(TerrainType, i32) m_currentTerrain;
+    i32 m_currentTerrain;
     char _pad_0xaa[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class fullMap* m_mapData;
     class iconWidget* m_scrollLeftButton;
@@ -113,8 +113,8 @@ public:
     class icon* m_boatFlagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
     i32 m_cursorActive;
     i32 m_drawHeroShadows;
-    H2_ENUM_STORAGE(HeroCursorType, i32) m_cursorType;
-    H2_ENUM_STORAGE(MapDirection, i32) m_cursorDirection;
+    i32 m_cursorType;
+    i32 m_cursorDirection;
     i32 m_cursorFrame;
     i32 m_cursorFrameCount;
     i32 m_cursorCycle;
@@ -132,23 +132,23 @@ public:
     i32 m_mineGuardianFacingLeft;
     i32 m_activeSoundMask;
     adventureSoundCell m_activeSounds[ADVMGR_ACTIVE_SOUND_COUNT];
-    class sample* m_loopingSamples[IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
+    class sample* m_loopingSamples[(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
     class sample* m_cursorSamples[ADVMGR_CURSOR_SAMPLE_COUNT];
     i32 m_identifyHeroActive;
     i32 m_openState;
     advManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void StartCursor(H2_ENUM_PARAM(MapDirection, i32));
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
+    void StartCursor(MapDirection);
     void StopCursor(i32);
     void DrawCursor(void);
     void DrawCursorShadow(void);
-    i32 GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32));
-    void TurnTo(H2_ENUM_PARAM(MapDirection, i32));
-    i32 GetMoveShowIt(class hero*, H2_ENUM_PARAM(MapDirection, i32));
+    i32 GetCursorBaseFrame(MapDirection);
+    void TurnTo(MapDirection);
+    i32 GetMoveShowIt(class hero*, MapDirection);
     class mapCell* MoveHero(
-        H2_ENUM_PARAM(MapDirection, i32),
+        MapDirection,
         i32,
         i32*,
         i32*,
@@ -158,8 +158,8 @@ public:
         i32
     );
     void CheckAdjacentMon(i32*);
-    i32 ValidMoveWithEvent(class hero*, H2_ENUM_PARAM(MapDirection, i32));
-    i32 ValidMove(H2_ENUM_PARAM(MapDirection, i32), i32);
+    i32 ValidMoveWithEvent(class hero*, MapDirection);
+    i32 ValidMove(MapDirection, i32);
     void MoveOrigin(i32, i32);
     void ProcessMapChange(struct SMapChange);
     void ProcessIncomingSingleMapChange(struct SMapChange*);
@@ -203,7 +203,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32));
+    char* GetArmySizeName(i32, ArmySizeNameVariant);
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
@@ -232,7 +232,7 @@ public:
     void CheckDimNextHeroBut(void);
     void SeedTo(i32, i32);
     void ForceNewHover(void);
-    void ScreenScroll(H2_ENUM_PARAM(MapDirection, i32), i32);
+    void ScreenScroll(MapDirection, i32);
     void CheckScreenScroll(void);
     i32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);
@@ -259,15 +259,15 @@ public:
     void PasswordEvent(class mapCell*, class hero*);
     void GenericSiteEvent(class mapCell*, class hero*);
     void RecruitSiteEvent(class mapCell*, class hero*);
-    void ExpansionRecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), i16*);
+    void ExpansionRecruitEvent(class hero*, CreatureType, i16*);
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
-    void EventSound(H2_ENUM_PARAM(MapObjectType, i32), i32, SAMPLE2*);
+    void EventSound(MapObjectType, i32, SAMPLE2*);
     void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
     void GiveResource(class hero*, ResourceType, i32);
-    void RecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), class mapCell*);
+    void RecruitEvent(class hero*, CreatureType, class mapCell*);
     i32 SkeletonEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 GhostEvent(class hero*, class mapCell*, char*, i32, i32);
@@ -282,10 +282,10 @@ public:
         i32,
         i32,
         i32,
-        H2_ENUM_PARAM(CreatureType, i32),
+        CreatureType,
         i32,
         i32,
-        H2_ENUM_PARAM(CreatureType, i32),
+        CreatureType,
         i32,
         i32
     );
@@ -337,7 +337,7 @@ public:
         i32,
         i32,
         i32,
-        H2_ENUM_PARAM(CombatResult, i32),
+        CombatResult,
         i32,
         i32
     );
@@ -354,7 +354,7 @@ public:
         i32*,
         i32*,
         i32*,
-        H2_ENUM_STORAGE(CombatResult, i8)*,
+        i8*,
         i8*,
         i8*
     );
@@ -373,7 +373,6 @@ public:
     );
 };
 #pragma pack(pop)
-SIZE(advManager, 0x37e);
 
 extern i32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];
@@ -381,7 +380,7 @@ extern i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT];
 extern u8 EveryOther;
 extern i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT];
 extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-                     [IDX(COORDINATE_AXIS_COUNT)];
+                     [(COORDINATE_AXIS_COUNT)];
 extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern b32 gbInViewWorld;
@@ -407,7 +406,7 @@ extern i32 S1cursorCycle;
 extern i32 S1cursorFrameCount;
 extern i32 S1cursorTurning;
 extern i32 S1cursorBaseFrame;
-extern H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
+extern i32 S1cursorDirection;
 extern class icon* pVWMisc;
 extern class icon* pVWLetters;
 extern i32 iVWYPixelOffset;
@@ -415,7 +414,7 @@ extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
 extern i32 iVWDrawAllTerrains;
-extern H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
+extern i32 iVWWhatToDraw;
 extern i32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;

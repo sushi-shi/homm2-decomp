@@ -1,21 +1,21 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
 
-#include <va.h>
+#include <Ints.h>
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-H2_ENUM_CLASS_BEGIN(MapCellFlag)
+enum {
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
     MAP_CELL_OCCUPIED           = 0x08
-H2_ENUM_CLASS_END(MapCellFlag)
-
-H2_ENUM_BEGIN(MapCellSentinel)
+};
+typedef i32 MapCellFlag;
+typedef enum MapCellSentinel {
     MAPCELL_SPRITE_NONE = 0xff,
     MAPCELL_EXTRA_FREE  = 0xffff
-H2_ENUM_END(MapCellSentinel)
+} MapCellSentinel;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(TilesetId, u8)
+enum {
     TILESET_NONE                    = 0,
     TILESET_OBJNHAUN                = 10,
     TILESET_OBJNARTI                = 11,
@@ -78,13 +78,13 @@ H2_ENUM_CLASS_BEGIN_SPLIT(TilesetId, u8)
     RANDOM_TOWN_OVERLAY_TILESET     = TILESET_OBJNTWSH,
     RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD,
     TILESET_COUNT                   = 64
-H2_ENUM_CLASS_END_SPLIT(TilesetId, u8)
-
+};
+typedef i32 TilesetId;
 #pragma pack(push, 1)
 struct mapCellExtra {
     u16 nextIndex;
     u8 animatedObject : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) objectTileset : 7;
+    TilesetId objectTileset : 7;
     u8 objectIndex;
     u8 objectLayerBit0 : 1;
     u8 objectLayerBit1 : 1;
@@ -92,11 +92,10 @@ struct mapCellExtra {
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
     u8 drawOverlayOnTop : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) overlayTileset : 6;
+    TilesetId overlayTileset : 6;
     u8 overlayIndex;
 };
 #pragma pack(pop)
-SIZE(mapCellExtra, 7);
 
 class mapCell {
 public:
@@ -107,7 +106,7 @@ public:
         struct {
             u8 m_animatedObject : 1;
             u8 m_isRoad : 1;
-            H2_ENUM_BITFIELD(TilesetId, u8) m_objectTileset : 6;
+            TilesetId m_objectTileset : 6;
         };
     };
     u8 m_objectIndex;
@@ -126,17 +125,16 @@ public:
     };
     u8 m_animatedOverlay : 1;
     u8 m_drawOverlayOnTop : 1;
-    H2_ENUM_BITFIELD(TilesetId, u8) m_overlayTileset : 6;
+    TilesetId m_overlayTileset : 6;
     u8 m_overlayIndex;
     u8 m_flags;
-    H2_ENUM_STORAGE(MapObjectType, u8) m_triggerType;
+    u8 m_triggerType;
     u16 m_extraIndex;
 
-    inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {
-        return (m_flags & IDX(flag)) != 0;
+    inline b32 HasFlag(MapCellFlag flag) const {
+        return (m_flags & (flag)) != 0;
     }
 };
-SIZE(mapCell, 12);
 
 struct oldMapCell {
     u8 raw[20];

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <string.h>
 #include <BASE/font.h>
 #include <BASE/resourceManager.h>
@@ -18,7 +18,6 @@ typedef enum FontConstant {
     WRAP_HEIGHT_LINE_COUNT      = 2
 } FontConstant;
 
-VA(0x004c3620, 0xe5)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
@@ -34,28 +33,23 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = false;
 }
 
-VA(0x004c3740, 0x5b)
 font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
 
-// Maps a CP1251 byte onto the font's glyph range. Retail compares the
-// zero-extended byte, so the codes stay numeric: a signed char literal
-// ('\xa8' == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
-VA(0x004c37a0, 0x52)
+
 i32 RemapCyrillicCharacter(i32 character) {
-    if (character == 0xa8)              // 'Ё'
+    if (character == 0xa8)
         return 0xa0;
-    if (character == 0xb8)              // 'ё'
+    if (character == 0xb8)
         return 0xc1;
-    if (character < 0xc0)               // below 'А': not a Cyrillic letter
+    if (character < 0xc0)
         return 0xa1;
-    if (character < 0xe0)               // 'А'..'Я'
+    if (character < 0xe0)
         return character - 0x40;
-    return character - 0x3f;            // 'а'..'я'
+    return character - 0x3f;
 }
 
-VA(0x004c3800, 0x222)
 void font::DrawStringExecute(
     char* str,
     i32 x,
@@ -83,9 +77,8 @@ void font::DrawStringExecute(
             m_suppressDraw = 0;
             goto next;
         }
-        // The same glyph remap GetCharacterWidth performs, open-coded: the
-        // codes stay numeric so the byte compares zero-extend (see
-        // RemapCyrillicCharacter).
+
+
         if (c < ' ' || (c > 0x7f && c < 0xc0 && c != 0xb8 && c != 0xa8)) {
             c = 0x7f;
         } else if (c > 0x7f) {
@@ -163,13 +156,11 @@ void font::DrawStringExecute(
     }
 }
 
-VA(0x004c3a30, 0x3d)
 void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
-VA(0x004c3a70, 0xa8)
 i32 font::GetCharacterWidth(u8 c) {
     i32 code = c;
     if (code == '{' || code == '}') {
@@ -177,7 +168,7 @@ i32 font::GetCharacterWidth(u8 c) {
     }
     if (code == ' ')
         code = 'i';
-    if (code == '.')  // the width path measures '.' as the underscore glyph
+    if (code == '.')
         code = '_';
     if (code < ' '
         || (code > 0x7f && code < 0xc0 && code != 0xb8 && code != 0xa8)) {
@@ -189,27 +180,24 @@ i32 font::GetCharacterWidth(u8 c) {
     return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[code].w + m_isLarge;
 }
 
-// Buka's Cyrillic line breaker. Retail compares the zero-extended byte, so
-// like RemapCyrillicCharacter the CP1251 codes stay numeric: with a u8
-// parameter a '\xe0' literal would compare -32 against 224 and never match.
+
 static inline bool IsVowel(u8 c) {
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y'
-        || c == 0xe0 /* а */ || c == 0xe5 /* е */ || c == 0xb8 /* ё */
-        || c == 0xe8 /* и */ || c == 0xee /* о */ || c == 0xf3 /* у */
-        || c == 0xfb /* ы */ || c == 0xfd /* э */ || c == 0xfe /* ю */
-        || c == 0xff /* я */
+        || c == 0xe0   || c == 0xe5   || c == 0xb8
+        || c == 0xe8   || c == 0xee   || c == 0xf3
+        || c == 0xfb   || c == 0xfd   || c == 0xfe
+        || c == 0xff
         || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y'
-        || c == 0xc0 /* А */ || c == 0xc5 /* Е */ || c == 0xa8 /* Ё */
-        || c == 0xc8 /* И */ || c == 0xce /* О */ || c == 0xd3 /* У */
-        || c == 0xdb /* Ы */ || c == 0xdd /* Э */ || c == 0xde /* Ю */
-        || c == 0xdf /* Я */;
+        || c == 0xc0   || c == 0xc5   || c == 0xa8
+        || c == 0xc8   || c == 0xce   || c == 0xd3
+        || c == 0xdb   || c == 0xdd   || c == 0xde
+        || c == 0xdf  ;
 }
 
 static inline bool IsHyphen(u8 c) {
     return c == '-';
 }
 
-VA(0x004c3b20, 0x1044)
 void font::ExtractLine(
     char* text,
     char* line,
@@ -324,7 +312,6 @@ void font::ExtractLine(
     }
 }
 
-VA(0x004c4b70, 0x1f8)
 void font::DrawBoundedString(
     char* str,
     i32 x,
@@ -334,10 +321,8 @@ void font::DrawBoundedString(
     FontDrawMode mode,
     FontAlignment align
 ) {
-    // blank, lastPos, spaceWidth, wordWidth and prevPos are leftovers of the
-    // line-breaking block this function shares with LineLength; retail keeps
-    // their frame slots (lastPos never even gets a store) and their zero
-    // initializers, so the declarations are load-bearing.
+
+
     i32 len = strlen(str);
     char blank = ' ';
     i32 lastPos;
@@ -351,7 +336,7 @@ void font::DrawBoundedString(
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     strcpy(line, str);
     FontDrawMode drawMode = mode;
-    if (HAS(align, FONT_ALIGN_VERTICAL_CENTER)) {
+    if ((((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
         i32 lineCount = LineLength(str, w);
         i32 totalH = lineCount * m_height;
@@ -385,11 +370,9 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-VA(0x004c4d70, 0xc7)
 i32 font::LineLength(char* str, i32 maxW) {
-    // Same shared line-breaking declaration block as DrawBoundedString: blank,
-    // spaceWidth, wordWidth and prevPos are unused here but hold retail frame
-    // slots and emit their initializers.
+
+
     i32 len = strlen(str);
     char blank = ' ';
     i32 count = 0;
@@ -408,7 +391,6 @@ i32 font::LineLength(char* str, i32 maxW) {
     return count;
 }
 
-VA(0x004c4e40, 0x8b)
 i32 font::LineWidth(char* str) {
     i32 s = strlen(str);
     i32 idx = 0, w = 0;
@@ -421,6 +403,3 @@ i32 font::LineWidth(char* str) {
     }
     return w;
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(font, 0x004ea9ac)

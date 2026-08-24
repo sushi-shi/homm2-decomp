@@ -1,10 +1,9 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/tileset.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 
-VA(0x004ce090, 0xf1)
 tileset::tileset(u32l id)
     : resource(RESOURCE_CATEGORY_TILESET, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
@@ -16,10 +15,6 @@ tileset::tileset(u32l id)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-VA(0x004ce1c0, 0x33)
 inline tileset::~tileset() {
     H2_FREE(m_data);
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(tileset, 0x004ea9d4)

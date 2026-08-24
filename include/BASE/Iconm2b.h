@@ -13,7 +13,7 @@ void MonoIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

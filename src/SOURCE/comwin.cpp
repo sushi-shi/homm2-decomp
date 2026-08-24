@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
 
-H2_ENUM_BEGIN(ComConstant)
+typedef enum ComConstant {
     PORT_COUNT           = 2,
     PORT_NAME_SIZE       = 12,
     ERROR_NAME_SIZE      = 100,
@@ -16,31 +16,30 @@ H2_ENUM_BEGIN(ComConstant)
     TRANSMIT_BUFFER_SIZE = 0x1000,
     BREAK_DELAY          = 500,
     NODE_HEADER_SIZE     = 10
-H2_ENUM_END(ComConstant)
+} ComConstant;
 
-H2_ENUM_BEGIN(ComErrorText)
+typedef enum ComErrorText {
     ERROR_TEXT_HEADER          = 0,
     ERROR_TEXT_SUGGESTIONS     = 1,
     ERROR_TEXT_CHECK_CABLES    = 2,
     ERROR_TEXT_REBOOT          = 3,
     ERROR_TEXT_CHECK_PORT      = 4,
     ERROR_TEXT_LOWER_BAUD_RATE = 5
-H2_ENUM_END(ComErrorText)
+} ComErrorText;
 
-H2_ENUM_BEGIN(ComSerialConstant)
+typedef enum ComSerialConstant {
     BAUD_VALUE_2400        = 2400,
     BAUD_VALUE_4800        = 4800,
     BAUD_VALUE_9600        = 9600,
     BAUD_VALUE_19200       = 19200,
     BAUD_VALUE_38400       = 38400,
     READ_RESULT_WORD_COUNT = 2
-H2_ENUM_END(ComSerialConstant)
+} ComSerialConstant;
 
 
-DATA(0x00524160) static ComPortState s_comPorts[PORT_COUNT];
+static ComPortState s_comPorts[PORT_COUNT];
 
 
-VA(0x00432760, 0x5f)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     node->next = NULL;
     node->prev = NULL;
@@ -54,7 +53,6 @@ void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     }
 }
 
-VA(0x004327bf, 0x3b)
 struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     tag_Node* node = anchor->head;
     if (node != NULL)
@@ -64,13 +62,11 @@ struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     return node;
 }
 
-VA(0x004327fa, 0x25)
 void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->head = NULL;
     anchor->tail = NULL;
 }
 
-VA(0x0043281f, 0x383)
 void ShutdownComError(char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
@@ -145,8 +141,7 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
-VA(0x00432ba2, 0x2fc)
-i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
+i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
     i32 err;
     i32 slot;
     BOOL rv;
@@ -194,7 +189,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
             state.BaudRate = BAUD_VALUE_38400;
             break;
         default:
-            state.BaudRate = IDX(baudRate);
+            state.BaudRate = (baudRate);
             break;
     }
 
@@ -230,7 +225,6 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     return static_cast<i16>(slot);
 }
 
-VA(0x00432e9e, 0xe9)
 void com_term(i16 portIndex) {
     tag_Node* node;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
@@ -246,7 +240,6 @@ void com_term(i16 portIndex) {
     }
 }
 
-VA(0x00432f87, 0xc1)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     DWORD err;
     i16 bytesRead[READ_RESULT_WORD_COUNT];
@@ -275,7 +268,6 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     return 0;
 }
 
-VA(0x00433048, 0x11c)
 i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     BOOL result2;
     tag_Node* sendNode2;
@@ -307,12 +299,10 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     return 1;
 }
 
-VA(0x00433164, 0x8)
 i16 __cdecl com_sess(i32, i32, ...) {
     return 0;
 }
 
-VA(0x0043316c, 0x5b)
 u8 com_stat(i16 portIndex, u16) {
     DWORD modemStatus;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE
@@ -322,7 +312,6 @@ u8 com_stat(i16 portIndex, u16) {
     return 0;
 }
 
-VA(0x004331c7, 0xc3)
 void comm_wrt_task(void) {
     DWORD sizeWritten;
     u32 totalWritten;
@@ -354,4 +343,3 @@ void comm_wrt_task(void) {
         H2_FREE(packetNode);
     }
 }
-

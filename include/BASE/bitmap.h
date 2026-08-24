@@ -1,15 +1,15 @@
 #ifndef HOMM2_BASE_BITMAP_H
 #define HOMM2_BASE_BITMAP_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/resource.h>
 
-H2_ENUM_CLASS_BEGIN_T(BitmapType, i16)
+enum {
     BITMAP_TYPE_NONE           = 0,
     BITMAP_TYPE_MEMORY         = 0x21,
     COMBAT_MISSILE_BITMAP_TYPE = BITMAP_TYPE_MEMORY
-H2_ENUM_CLASS_END_T(BitmapType, i16)
-
+};
+typedef i16 BitmapType;
 #pragma pack(push, 1)
 class bitmap : public resource {
 public:
@@ -47,5 +47,4 @@ public:
     );
 };
 #pragma pack(pop)
-SIZE(bitmap, 0x1a);
 #endif

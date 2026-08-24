@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Icond2b.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconMonoRle.h>
@@ -7,26 +7,24 @@
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(IconDimConstant)
+typedef enum IconDimConstant {
     DIM_PALETTE_LEVEL_STRIDE = 0x100
-H2_ENUM_END(IconDimConstant)
+} IconDimConstant;
 
-// Retail's frame is exactly the two __fastcall spills: every working value of
-// the decoder lives in a file static, not a local.
-DATA(0x005363d0) static i32 s_loopCount = 0;
-DATA(0x005363d4) static i32 s_y = 0;
-DATA(0x005363d8) static IconEntry* s_entry = 0;
-DATA(0x005363dc) static i32 s_left = 0;
-DATA(0x005363e0) static i32 s_x = 0;
-DATA(0x005363e4) static u8* s_src = 0;
-DATA(0x005363e8) static u8* s_dst = 0;
-DATA(0x005363ec) static u8* s_row = 0;
-DATA(0x005363f0) static i32 s_clipR = 0;
-DATA(0x005363f4) static i32 s_clipB = 0;
-DATA(0x005363f8) static i32 s_spanCount = 0;
-DATA(0x005363fc) static i32 s_run = 0;
 
-VA(0x004c6af0, 0x357)
+static i32 s_loopCount = 0;
+static i32 s_y = 0;
+static IconEntry* s_entry = 0;
+static i32 s_left = 0;
+static i32 s_x = 0;
+static u8* s_src = 0;
+static u8* s_dst = 0;
+static u8* s_row = 0;
+static i32 s_clipR = 0;
+static i32 s_clipB = 0;
+static i32 s_spanCount = 0;
+static i32 s_run = 0;
+
 void DimIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,
@@ -34,7 +32,7 @@ void DimIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

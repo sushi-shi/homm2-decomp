@@ -1,14 +1,14 @@
 #ifndef HOMM2_BASE_WIDGET_H
 #define HOMM2_BASE_WIDGET_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/widgetKind.h>
 
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(WidgetFlag, i16)
+enum {
     WIDGET_FLAG_NONE     = 0,
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED  = 2,
@@ -16,13 +16,13 @@ H2_ENUM_CLASS_BEGIN_SPLIT(WidgetFlag, i16)
     WIDGET_FLAG_DIMMED   = 8,
     WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
-H2_ENUM_CLASS_END_SPLIT(WidgetFlag, i16)
-H2_ENUM_FLAGS(WidgetFlag)
+};
+typedef i32 WidgetFlag;
 
-H2_ENUM_CLASS_BEGIN(WidgetCommandArgument)
+enum {
     WIDGET_COMMAND_DIMMED = 0x1000
-H2_ENUM_CLASS_END(WidgetCommandArgument)
-
+};
+typedef i32 WidgetCommandArgument;
 #pragma pack(push, 1)
 class widget {
 public:
@@ -31,8 +31,8 @@ public:
     widget* m_prev;
     i16 m_id;
     i16 m_zOrder;
-    H2_ENUM_STORAGE(WidgetKind, i16) m_kind;
-    H2_ENUM_STORAGE(WidgetFlag, i16) m_flags;
+    i16 m_kind;
+    i16 m_flags;
     i16 m_x;
     i16 m_y;
     i16 m_width;
@@ -43,7 +43,7 @@ public:
         i16 width,
         i16 height,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind
+        WidgetKind kind
     );
     widget(void);
     virtual void Draw(void) = 0;
@@ -54,5 +54,4 @@ public:
     void Dim(void);
 };
 #pragma pack(pop)
-SIZE(widget, 0x20);
 #endif

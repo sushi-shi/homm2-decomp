@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_LISTBOXWIDGET_H
 #define HOMM2_BASE_LISTBOXWIDGET_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/font.h>
 #include "widget.h"
 
@@ -17,9 +17,9 @@ public:
     icon* m_icon;
     i16 m_maxVisibleItems;
     i16 m_visibleItemCount;
-    H2_ENUM_STORAGE(FontDrawMode, i16) m_normalColor;
-    H2_ENUM_STORAGE(FontDrawMode, i16) m_selectedColor;
-    H2_ENUM_STORAGE(FontAlignment, i16) m_alignment;
+    i16 m_normalColor;
+    i16 m_selectedColor;
+    i16 m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     i16 m_lastSelectedIndex;
@@ -68,14 +68,13 @@ public:
     u8 m_itemSelectionTracking;
     bitmap* m_scrollbar;
     listBoxWidget(void);
-    virtual ~listBoxWidget() OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual ~listBoxWidget() override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
     void DeleteItem(i32);
     void DrawLBStuff(i32);
     MessageDispatchResult ProcessMouseMessage(struct tag_message&);
 };
 #pragma pack(pop)
-SIZE(listBoxWidget, 0x92);
 #endif

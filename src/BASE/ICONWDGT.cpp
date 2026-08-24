@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/iconWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/icon.h>
@@ -7,16 +7,15 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(IconWidgetConstant)
+typedef enum IconWidgetConstant {
     RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff,
     ORIENTATION_MASK       = 0xff,
     FRAME_INDEX_MASK       = 0xffff,
     CENTER_SHIFT           = 1,
     BOTTOM_PADDING         = 2
-H2_ENUM_END(IconWidgetConstant)
+} IconWidgetConstant;
 
-VA(0x004bb670, 0x58)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_icon = NULL;
     m_frame = 0;
@@ -25,7 +24,6 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_iconId = 0;
 }
 
-VA(0x004bb700, 0xb4)
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -33,9 +31,9 @@ iconWidget::iconWidget(
     i16 height,
     u32l iconId,
     i16 frame,
-    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+    IconDrawOrientation orientation,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -47,7 +45,6 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
-VA(0x004bb7c0, 0xc5)
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -55,9 +52,9 @@ iconWidget::iconWidget(
     i16 height,
     char* iconName,
     i16 frame,
-    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+    IconDrawOrientation orientation,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -69,7 +66,6 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
-VA(0x004bb890, 0x113)
 void iconWidget::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -89,18 +85,16 @@ void iconWidget::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-VA(0x004bb9b0, 0x5b)
 inline iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-VA(0x004bba10, 0x355)
 MessageDispatchResult iconWidget::Main(tag_message& msg) {
-    // A switch arm may not jump past an initialisation, so the hit-test
-    // coordinates are declared for the whole function.
+
+
     i16 x;
     i16 y;
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)
+    if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))
         && (msg.type != MESSAGE_WIDGET
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
         if (msg.type == MESSAGE_WIDGET)
@@ -168,12 +162,12 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+            if ((((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
                 msg.type = MESSAGE_WIDGET;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
                 msg.payload.widget.id = m_id;
-                // Never taken: msg.type was retyped to MESSAGE_WIDGET above.
+
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                 return MESSAGE_DISPATCH_FORWARD;
@@ -184,7 +178,6 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
     return widget::Main(msg);
 }
 
-VA(0x004bbd70, 0x175)
 void iconWidget::Draw(void) {
     i16 x = m_owner->m_posX + m_x;
     i16 y = m_owner->m_posY + m_y;
@@ -211,6 +204,3 @@ void iconWidget::Draw(void) {
             return;
     }
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(iconWidget, 0x004ea984)

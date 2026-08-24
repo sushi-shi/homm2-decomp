@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/soundManager.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
@@ -16,14 +16,14 @@
 #include <BASE/Misc.h>
 #include <audiere.h>
 
-H2_ENUM_BEGIN(SoundConstant)
+typedef enum SoundConstant {
     SAMPLE_VOLUME_MAX            = 0x40,
     MIDI_VOLUME_MAX              = 0x7f,
     CD_VOLUME_SCALE_DIVISOR      = 0x280,
     CD_MUSIC_TRACK_FIRST         = 8,
     CD_MUSIC_TRACK_LAST          = 15,
     FADE_HOLD_STEPS              = 10,
-    FADE_TOTAL_STEPS             = IDX(CONFIG_VOLUME_MAX) + 1,
+    FADE_TOTAL_STEPS             = (CONFIG_VOLUME_MAX) + 1,
     FADE_SAMPLE_RISE_STEPS       = 6,
     AMBIENT_FADE_DELAY_TICKS     = 900,
     AIL_WAVEOUT_PREFERENCE       = 15,
@@ -34,22 +34,21 @@ H2_ENUM_BEGIN(SoundConstant)
     SAMPLE_STOP_MUSIC_WAIT_COUNT = 10,
     FADE_STEP_TICKS              = 60,
     NO_SAMPLE_CHANNEL_TYPE       = SOUND_CHANNEL_TYPE_COUNT
-H2_ENUM_END(SoundConstant)
+} SoundConstant;
 
-H2_ENUM_BEGIN(SoundSampleStatus)
+typedef enum SoundSampleStatus {
     SAMPLE_STATUS_DONE    = 2,
     SAMPLE_STATUS_PLAYING = 4
-H2_ENUM_END(SoundSampleStatus)
+} SoundSampleStatus;
 
 
-DATA(0x005348a8) static WAVEOUTCAPSA gWaveOutCaps = {0};
-DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat = {0};
+static WAVEOUTCAPSA gWaveOutCaps = {0};
+static PCMWAVEFORMAT gWaveFormat = {0};
 #define NORMALIZED_VOLUME_MAX 127.0f
 
-DATA(0x005348f0) bool gSoundDisabled = false;
-DATA(0x005348f1) bool gSoundBackendsReady = false;
+bool gSoundDisabled = false;
+bool gSoundBackendsReady = false;
 
-VA(0x004b5710, 0x101)
 void soundManager::ShutdownSoundBackends(void) {
     if (IsMilesBackend(this)) {
         MIDIShutdown();
@@ -64,7 +63,6 @@ void soundManager::ShutdownSoundBackends(void) {
     m_backend = SOUND_BACKEND_NONE;
 }
 
-VA(0x004b5820, 0x18f)
 bool soundManager::StartupMilesBackend(void) {
     if (m_backend == SOUND_BACKEND_MILES)
         return true;
@@ -81,12 +79,12 @@ bool soundManager::StartupMilesBackend(void) {
     if (waveOutGetDevCapsA(0, &gWaveOutCaps, sizeof(gWaveOutCaps)) != 0) {
         MessageBoxA(
             hwndApp,
-            /* ÐžÑˆÐ¸Ð±ÐºÐ° Ð¸Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð·Ð²ÑƒÐºÐ°!  ÐÐµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð²Ð¾. */
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-                "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
-                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee.",
-            /* ÐžÑˆÐ¸Ð±ÐºÐ° Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ */
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+
+            "Îøèáêà èíèöèàëèçàöèè "
+                "çâóêà!  Íå íàéäåíî "
+                "óñòðîéñòâî.",
+
+            "Îøèáêà çàãðóçêè",
             0
         );
         m_digitalDriver = NULL;
@@ -109,9 +107,9 @@ bool soundManager::StartupMilesBackend(void) {
         MessageBoxA(
             hwndApp,
             AIL_last_error(),
-            /* ÐžÑˆÐ¸Ð±ÐºÐ° Ð¸Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸Ð¸ Ð·Ð²ÑƒÐºÐ°! */
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-                "\xe7\xe2\xf3\xea\xe0!",
+
+            "Îøèáêà èíèöèàëèçàöèè "
+                "çâóêà!",
             0
         );
         m_digitalDriver = NULL;
@@ -124,7 +122,6 @@ bool soundManager::StartupMilesBackend(void) {
     return MIDIStartup();
 }
 
-VA(0x004b59b0, 0x123)
 bool soundManager::CDStartup(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return true;
@@ -142,21 +139,20 @@ bool soundManager::CDStartup(void) {
     return false;
 }
 
-VA(0x004b5ae0, 0xb1)
 i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
     i32 local_8 = 0;
     if (soundType == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= CONFIG_VOLUME_MIN
             && gConfig.musicVolume <= CONFIG_VOLUME_MAX) {
-            local_8 = (volume * (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)))
-                      / IDX(CONFIG_VOLUME_MAX);
+            local_8 = (volume * (FADE_TOTAL_STEPS - (gConfig.musicVolume)))
+                      / (CONFIG_VOLUME_MAX);
             if (local_8 < 1)
                 local_8 = 1;
         }
     } else if (gConfig.soundVolume >= CONFIG_VOLUME_MIN
                && gConfig.soundVolume <= CONFIG_VOLUME_MAX) {
         local_8 =
-            (volume * (FADE_TOTAL_STEPS - IDX(gConfig.soundVolume))) / IDX(CONFIG_VOLUME_MAX);
+            (volume * (FADE_TOTAL_STEPS - (gConfig.soundVolume))) / (CONFIG_VOLUME_MAX);
         if (local_8 < 1)
             local_8 = 1;
     }
@@ -167,14 +163,12 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     return local_8;
 }
 
-VA(0x004b5ba0, 0x2b)
 float soundManager::ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode soundType) {
     return static_cast<float>(ConvertVolume(volume, soundType)) / NORMALIZED_VOLUME_MAX;
 }
 
 #undef NORMALIZED_VOLUME_MAX
 
-VA(0x004b5bd0, 0x146)
 soundManager::soundManager(void) : baseManager() {
     m_backend = SOUND_BACKEND_NONE;
     m_savedBackend = SOUND_BACKEND_NONE;
@@ -187,7 +181,6 @@ soundManager::soundManager(void) : baseManager() {
     m_musicTrack = MIDI_NO_TRACK;
 }
 
-VA(0x004b5d20, 0x2df)
 i32 soundManager::Open(i32) {
     i32 asyncState;
     i32 musicTrack;
@@ -276,7 +269,6 @@ i32 soundManager::Open(i32) {
     return 0;
 }
 
-VA(0x004b6000, 0x28)
 void soundManager::Close(void) {
     if (m_active != 1)
         return;
@@ -284,12 +276,10 @@ void soundManager::Close(void) {
     m_active = false;
 }
 
-VA(0x004b6030, 0xf)
 MessageDispatchResult soundManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004b6040, 0xcb)
 void soundManager::StopAllSamples(i32 stopMusic) {
     if (!gSoundBackendsReady)
         return;
@@ -309,7 +299,6 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     }
 }
 
-VA(0x004b6110, 0x8a)
 void soundManager::StopSample(class sample* sampleResource) {
     if (IsAudiereBackend(this)) {
         StopAudiereSample(sampleResource);
@@ -318,7 +307,6 @@ void soundManager::StopSample(class sample* sampleResource) {
     }
 }
 
-VA(0x004b61a0, 0xa1)
 void soundManager::ModifySample(
     class sample* sampleResource,
     i32 volume
@@ -332,7 +320,6 @@ void soundManager::ModifySample(
     }
 }
 
-VA(0x004b6250, 0x8e)
 bool soundManager::DigitalReport(class sample* sampleResource) {
     if (IsAudiereBackend(this)) {
         return AudiereSamplePlaying(sampleResource);
@@ -342,7 +329,6 @@ bool soundManager::DigitalReport(class sample* sampleResource) {
     return false;
 }
 
-VA(0x004b62e0, 0x4d)
 void soundManager::AdjustSoundVolumes(void) {
     if (!gSoundBackendsReady)
         return;
@@ -350,7 +336,6 @@ void soundManager::AdjustSoundVolumes(void) {
         AdjustMilesSampleVolumes();
 }
 
-VA(0x004b6330, 0xad)
 void soundManager::AdjustMusicVolumes(void) {
     if (!gSoundBackendsReady)
         return;
@@ -362,7 +347,6 @@ void soundManager::AdjustMusicVolumes(void) {
         MIDISetVolume(m_musicFadeSteps);
 }
 
-VA(0x004b63e0, 0xef)
 void soundManager::SetMusicQuality(i32 musicSource) {
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
@@ -386,7 +370,6 @@ void soundManager::SetMusicQuality(i32 musicSource) {
         PlayAmbientMusic(previousTrack);
 }
 
-VA(0x004b64d0, 0x106)
 void soundManager::PlayAmbientMusic(i32 track) {
     if (!gSoundBackendsReady)
         return;
@@ -410,7 +393,6 @@ void soundManager::PlayAmbientMusic(i32 track) {
     m_musicTrack = track;
 }
 
-VA(0x004b65e0, 0x227)
 void soundManager::PollSound(void) {
     i32 musicFadeStep;
     i32 volume;
@@ -455,7 +437,7 @@ void soundManager::PollSound(void) {
             volume = 0;
 
         if (IsAudiereBackend(this)) {
-            volume = (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume
+            volume = (FADE_TOTAL_STEPS - (gConfig.musicVolume)) * volume
                    * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
             if (volume > MIDI_VOLUME_MAX)
                 volume = MIDI_VOLUME_MAX;
@@ -468,7 +450,6 @@ void soundManager::PollSound(void) {
     }
 }
 
-VA(0x004b6810, 0xbb)
 void soundManager::SwitchAmbientMusic(i32 track) {
     if (!gSoundBackendsReady)
         return;
@@ -497,7 +478,6 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     }
 }
 
-VA(0x004b68d0, 0x115)
 void soundManager::MemorySample(class sample* sampleResource) {
     if (sampleResource == NULL)
         return;
@@ -512,13 +492,11 @@ void soundManager::MemorySample(class sample* sampleResource) {
     }
 }
 
-VA(0x004b69f0, 0x41)
 void soundManager::ServiceSound(void) {
     if (IsMilesBackend(this))
         ServiceMilesSamples();
 }
 
-VA(0x004b6a40, 0x49)
 i32 soundManager::MusicPlaying(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return AudiereMusicPlaying();
@@ -529,9 +507,3 @@ i32 soundManager::MusicPlaying(void) {
     }
     return false;
 }
-
-
-
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(soundManager, 0x004ea954)

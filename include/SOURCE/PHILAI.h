@@ -1,7 +1,7 @@
 #ifndef HOMM2_PHILAI_TU_H
 #define HOMM2_PHILAI_TU_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
 class army;
@@ -10,25 +10,25 @@ class playerData;
 class searchArray;
 class town;
 
-H2_ENUM_CLASS_BEGIN(AIPurchaseType)
+enum {
     PURCHASE_NONE     = -1,
     PURCHASE_BUILDING = 0,
     PURCHASE_HERO     = 1,
     PURCHASE_CREATURE = 2
-H2_ENUM_CLASS_END(AIPurchaseType)
-
+};
+typedef i32 AIPurchaseType;
 struct BHC {
     town* pTown;
     AIPurchaseType type;
     union {
         i32 what;
-        H2_ENUM_STORAGE(BuildingSlotType, i32) building;
+        i32 building;
     };
     i32 num;
 };
 
-H2_ENUM_BEGIN(AIPurchaseConstant)
-    AI_PURCHASE_RESOURCE_COUNT     = IDX(RES_COUNT),
+typedef enum AIPurchaseConstant {
+    AI_PURCHASE_RESOURCE_COUNT     = (RES_COUNT),
     AI_PLAYER_COUNT                = 6,
     AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_LEVEL        = 3,
@@ -36,9 +36,9 @@ H2_ENUM_BEGIN(AIPurchaseConstant)
     AI_HERO_BUILD_COORDINATE_UNSET = -99,
     AI_HERO_AVAILABLE_FLAG         = 0x40,
     AI_PURCHASE_VALUE_DEBUG_LEVEL  = 5
-H2_ENUM_END(AIPurchaseConstant)
+} AIPurchaseConstant;
 
-H2_ENUM_BEGIN(AIBattleConstant)
+typedef enum AIBattleConstant {
     AI_BATTLE_NO_PLAYER              = -1,
     AI_BATTLE_ARTIFACT_SLOT_COUNT    = 14,
     AI_BATTLE_BASE_ARTIFACT_LIMIT    = 37,
@@ -46,15 +46,15 @@ H2_ENUM_BEGIN(AIBattleConstant)
     AI_BATTLE_DEFENDER_ARTIFACT_BASE = 1250,
     AI_BATTLE_SPECIAL_ARTIFACT_VALUE = 50000,
     AI_BATTLE_DEBUG_LEVEL            = 9
-H2_ENUM_END(AIBattleConstant)
+} AIBattleConstant;
 
-H2_ENUM_BEGIN(AIGenericSiteConstant)
+typedef enum AIGenericSiteConstant {
     AI_GENERIC_SITE_GOLD_THRESHOLD        = 1500,
     AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE = 500,
     AI_GENERIC_SITE_MAX_LUCK              = 3,
     AI_GENERIC_SITE_ARMY_SLOTS            = 5,
     AI_GENERIC_SITE_WEEK_END              = 8
-H2_ENUM_END(AIGenericSiteConstant)
+} AIGenericSiteConstant;
 
 #define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
@@ -99,12 +99,12 @@ extern b32 gbDismissArmy;
 extern i8 gbNGHuman[];
 extern i32 iViewArmyFrame;
 extern b32 gbAllowUpgrade;
-extern H2_ENUM_STORAGE(CreatureType, i32) iViewArmyType;
+extern i32 iViewArmyType;
 extern class hero* viewSpellsHero;
 extern b32 gbUpgradeArmy;
 extern i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
 extern i8 gbNGDifficulty[];
-extern H2_ENUM_STORAGE(CreatureType, i32) iViewArmyUpgradeToType;
+extern i32 iViewArmyUpgradeToType;
 extern i32 viewArmyBaseX;
 extern i32 viewArmyBaseY;
 extern i8 gbNGColor[];

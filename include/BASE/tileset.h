@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_TILESET_H
 #define HOMM2_BASE_TILESET_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/resource.h>
 
 #pragma pack(push, 1)
@@ -15,5 +15,4 @@ public:
     virtual inline ~tileset();
 };
 #pragma pack(pop)
-SIZE(tileset, 0x1a);
 #endif

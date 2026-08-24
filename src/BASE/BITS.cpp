@@ -1,60 +1,35 @@
-#include <va.h>
-#include <BASE/BITSConstants.h>
+#include <Ints.h>
+
 #include <BASE/BITS.h>
+#include <BASE/BITSConstants.h>
 
-H2_ENUM_BEGIN(BitIndexConstant)
-    INDEX_BYTE_SHIFT       = 3,
-    INDEX_WITHIN_BYTE_MASK = 7
-H2_ENUM_END(BitIndexConstant)
+namespace {
 
-VA(0x004c2ed4, 0x2e)
-extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        and eax, [esi]
-        jne bitSet
-        mov eax, 0
-        jmp done
-    bitSet:
-        mov eax, 1
-    done:
-    }
+constexpr u32 kByteShift = 3;
+constexpr u32 kBitWithinByteMask = 7;
+
 }
 
-VA(0x004c2f02, 0x20)
-extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        or [esi], eax
-    }
+extern "C" i32 H2BitTest(const void* bits, BitIndex bitIndex) {
+    const u8* bytes = static_cast<const u8*>(bits);
+    const u32 index = static_cast<u32>(bitIndex);
+    const u8 mask =
+        static_cast<u8>(1u << (index & kBitWithinByteMask));
+    return (bytes[index >> kByteShift] & mask) != 0 ? 1 : 0;
 }
 
-VA(0x004c2f22, 0x22)
-extern "C" void __cdecl BitClear(void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        not eax
-        and [esi], eax
-    }
+extern "C" void H2BitSet(void* bits, BitIndex bitIndex) {
+    u8* bytes = static_cast<u8*>(bits);
+    const u32 index = static_cast<u32>(bitIndex);
+    const u8 mask =
+        static_cast<u8>(1u << (index & kBitWithinByteMask));
+    bytes[index >> kByteShift] |= mask;
+}
+
+extern "C" void H2BitClear(void* bits, BitIndex bitIndex) {
+    u8* bytes = static_cast<u8*>(bits);
+    const u32 index = static_cast<u32>(bitIndex);
+    const u8 mask =
+        static_cast<u8>(1u << (index & kBitWithinByteMask));
+    bytes[index >> kByteShift] &= static_cast<u8>(~mask);
 }

@@ -1,10 +1,10 @@
 #ifndef HOMM2_CURSOR_H
 #define HOMM2_CURSOR_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-H2_ENUM_BEGIN(CursorConstant)
+typedef enum CursorConstant {
     CURSOR_BOAT_WAKE_TYPE               = 7,
     CURSOR_DIRECTION_COUNT              = 8,
     CURSOR_TURN_FRAME_COUNT             = 16,
@@ -56,17 +56,17 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_REMOTE_PLAYER_ALL            = 0x7f,
     CURSOR_REMOTE_PACKET_TYPE           = 0x29,
     CURSOR_REMOTE_RELIABLE              = 1
-H2_ENUM_END(CursorConstant)
+} CursorConstant;
 
-H2_ENUM_BEGIN(BoatHeroConstant)
+typedef enum BoatHeroConstant {
     BOAT_OCCUPIED_FLAG = 0x80
-H2_ENUM_END(BoatHeroConstant)
+} BoatHeroConstant;
 
-H2_ENUM_BEGIN(MapChangeConstant)
+typedef enum MapChangeConstant {
     MAP_CHANGE_CURRENT_PLAYER = -999
-H2_ENUM_END(MapChangeConstant)
+} MapChangeConstant;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(MapChangeType, u8)
+enum {
     MAP_CHANGE_NONE          = 0,
     MAP_CHANGE_MOVE_HERO     = 1,
     MAP_CHANGE_UNUSED        = 2,
@@ -79,17 +79,17 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapChangeType, u8)
     MAP_CHANGE_TELEPORT_HERO = 9,
     MAP_CHANGE_DEAD_PLAYER   = 10,
     MAP_CHANGE_MY_TURN       = 11
-H2_ENUM_CLASS_END_SPLIT(MapChangeType, u8)
-
+};
+typedef i32 MapChangeType;
 #pragma pack(push, 1)
 struct SMapChange {
-    H2_ENUM_STORAGE(MapChangeType, u8) type;
+    u8 type;
     i8 id;
     u8 x;
     u8 y;
     union {
         struct {
-            H2_ENUM_STORAGE(MapDirection, i8) direction;
+            i8 direction;
             i8 stopAfterMove;
         } movement;
         struct {
@@ -101,7 +101,6 @@ struct SMapChange {
     i32 sequence;
 };
 #pragma pack(pop)
-SIZE(SMapChange, 11);
 
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 

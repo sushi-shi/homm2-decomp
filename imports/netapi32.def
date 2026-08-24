@@ -1,5 +1,0 @@
-; Retail imports only Netbios. Its PE record proves the undecorated lookup
-; spelling and hint 180; the build generator preserves the stdcall caller name.
-LIBRARY NETAPI32.dll
-EXPORTS
-    _Netbios@4

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Iconmf2b.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconMonoRle.h>
@@ -7,20 +7,18 @@
 #include <string.h>
 #include <SOURCE/KB.h>
 
-// Retail's frame is exactly the two __fastcall spills: every working value of
-// the decoder lives in a file static, not a local.
-DATA(0x00539878) static i32 s_y = 0;
-DATA(0x0053987c) static IconEntry* s_entry = 0;
-DATA(0x00539880) static i32 s_left = 0;
-DATA(0x00539884) static i32 s_right = 0;
-DATA(0x00539888) static i32 s_x = 0;
-DATA(0x0053988c) static u8* s_row = 0;
-DATA(0x00539890) static i32 s_run = 0;
-DATA(0x00539894) static u8* s_src = 0;
-DATA(0x00539898) static i32 s_clipR = 0;
-DATA(0x0053989c) static i32 s_clipB = 0;
 
-VA(0x004d6130, 0x32f)
+static i32 s_y = 0;
+static IconEntry* s_entry = 0;
+static i32 s_left = 0;
+static i32 s_right = 0;
+static i32 s_x = 0;
+static u8* s_row = 0;
+static i32 s_run = 0;
+static u8* s_src = 0;
+static i32 s_clipR = 0;
+static i32 s_clipB = 0;
+
 void FlipMonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,
@@ -28,7 +26,7 @@ void FlipMonoIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

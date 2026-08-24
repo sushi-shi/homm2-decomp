@@ -1,4 +1,0 @@
-# Reviewed non-procedure .text ranges exposed after exact procedure carving.
-# These bytes must not be synthesized as functions. The audit requires every
-# nonpadding uncovered byte to be covered by one of these explicit ranges.
-rva,size,kind,unit,reason

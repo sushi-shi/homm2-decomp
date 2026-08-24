@@ -1,10 +1,10 @@
 #ifndef HOMM2_REQUEST_H
 #define HOMM2_REQUEST_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/GAME.h>
 
-H2_ENUM_BEGIN(RequestConstant)
+typedef enum RequestConstant {
     MAP_HEADER_SIZE                 = 0x1a4,
     MAP_HEADER_MAGIC_SIZE           = 4,
     MAP_HEADER_PLAYER_DATA_SIZE     = 0x12,
@@ -14,38 +14,38 @@ H2_ENUM_BEGIN(RequestConstant)
     MAP_HEADER_NAME_SIZE            = 0x3c,
     MAP_HEADER_DESCRIPTION_OFFSET   = 0x76,
     MAP_HEADER_DESCRIPTION_SIZE     = 300,
-    MAP_HEADER_PLAYER_COUNT         = IDX(GAME_PLAYER_COUNT),
+    MAP_HEADER_PLAYER_COUNT         = (GAME_PLAYER_COUNT),
     MAP_HEADER_MAGIC_BASE_GAME      = 90,
     MAP_HEADER_MAGIC_EXPANSION_GAME = 92
-H2_ENUM_END(RequestConstant)
+} RequestConstant;
 
-H2_ENUM_BEGIN(MapDimensionConstant)
+typedef enum MapDimensionConstant {
     MAP_DIMENSION_SMALL  = 36,
     MAP_DIMENSION_MEDIUM = 72,
     MAP_DIMENSION_LARGE  = 108,
     MAP_DIMENSION_XLARGE = 144
-H2_ENUM_END(MapDimensionConstant)
+} MapDimensionConstant;
 
-H2_ENUM_CLASS_BEGIN_T(MapVictoryCondition, u8)
+enum {
     MAP_VICTORY_DEFEAT_ALL      = 0,
     MAP_VICTORY_CAPTURE_TOWN    = 1,
     MAP_VICTORY_DEFEAT_HERO     = 2,
     MAP_VICTORY_FIND_ARTIFACT   = 3,
     MAP_VICTORY_DEFEAT_SIDE     = 4,
     MAP_VICTORY_ACCUMULATE_GOLD = 5
-H2_ENUM_CLASS_END_T(MapVictoryCondition, u8)
-
-H2_ENUM_CLASS_BEGIN_T(MapLossCondition, u8)
+};
+typedef u8 MapVictoryCondition;
+enum {
     MAP_LOSS_STANDARD = 0,
     MAP_LOSS_TOWN     = 1,
     MAP_LOSS_HERO     = 2,
     MAP_LOSS_TIME     = 3
-H2_ENUM_CLASS_END_T(MapLossCondition, u8)
-
+};
+typedef u8 MapLossCondition;
 #pragma pack(push, 1)
 struct SMapHeader {
     u32 magic;
-    H2_ENUM_STORAGE(GameDifficulty, u8) difficulty;
+    u8 difficulty;
     u8 unknown5;
     u8 width;
     u8 height;
@@ -62,7 +62,7 @@ struct SMapHeader {
     MapLossCondition lossCondition;
     u16 lossConditionValue;
     u8 unknown25;
-    H2_ENUM_STORAGE(FactionType, i8) playerRace[MAP_HEADER_PLAYER_COUNT];
+    i8 playerRace[MAP_HEADER_PLAYER_COUNT];
     u16 victoryTownY;
     u16 lossTownY;
     u16 victorySideThreshold;
@@ -73,7 +73,6 @@ struct SMapHeader {
     u8 timeEventCount;
 };
 #pragma pack(pop)
-SIZE(SMapHeader, MAP_HEADER_SIZE);
 
 i32 GetMapHeader(char*, struct SMapHeader*);
 i32 CheckSumIsDemoOK(char*);

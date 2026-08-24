@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DROPLISTWIDGET_H
 #define HOMM2_BASE_DROPLISTWIDGET_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/font.h>
 #include "widget.h"
 
@@ -21,10 +21,10 @@ public:
     i16 m_contentHeight;
     i16 m_maxVisibleItems;
     i16 m_visibleItemCount;
-    H2_ENUM_STORAGE(FontDrawMode, i16) m_normalColor;
-    H2_ENUM_STORAGE(FontDrawMode, i16) m_selColor;
-    H2_ENUM_STORAGE(FontDrawMode, i16) m_unusedColor;
-    H2_ENUM_STORAGE(FontAlignment, i16) m_alignment;
+    i16 m_normalColor;
+    i16 m_selColor;
+    i16 m_unusedColor;
+    i16 m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     char** m_items;
@@ -86,9 +86,9 @@ public:
     u8 m_itemSelectionTracking;
     bitmap* m_savedBackground;
     dropListWidget(void);
-    virtual ~dropListWidget() OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual ~dropListWidget() override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
     void DeleteItem(i32);
     void DrawDropStuff(void);
@@ -97,5 +97,4 @@ public:
     void ProcessSelectDialog(void);
 };
 #pragma pack(pop)
-SIZE(dropListWidget, 0xb4);
 #endif

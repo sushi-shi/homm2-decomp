@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
@@ -53,7 +53,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
+enum {
     SYSTEM_OPTION_MUSIC_VOLUME = 10,
     SYSTEM_OPTION_SOUND_VOLUME = 11,
     SYSTEM_OPTION_HERO_SPEED = 12,
@@ -67,9 +67,9 @@ H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
     SYSTEM_OPTION_LAST = SYSTEM_OPTION_COLOR_CURSOR,
     SYSTEM_OPTION_COUNT = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1,
     SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800
-H2_ENUM_CLASS_END(AdventureSystemOptionsWidgetId)
-
-H2_ENUM_BEGIN(AdventureScreenConstant)
+};
+typedef i32 AdventureSystemOptionsWidgetId;
+typedef enum AdventureScreenConstant {
     SCREEN_WIDTH = 640,
     SCREEN_HEIGHT = 480,
     VIEWPORT_SIZE = SCREEN_HEIGHT,
@@ -84,9 +84,9 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
     RADAR_BOTTOM = 160,
     PUZZLE_TILE_SIZE = 32,
     PUZZLE_X_TRIM = 12
-H2_ENUM_END(AdventureScreenConstant)
+} AdventureScreenConstant;
 
-H2_ENUM_BEGIN(AdventureDrawConstant)
+typedef enum AdventureDrawConstant {
     CELL_PIXELS = 32,
     CELL_CENTER_PIXEL = CELL_PIXELS / 2,
     CELL_LAST_PIXEL = CELL_PIXELS - 1,
@@ -139,17 +139,17 @@ H2_ENUM_BEGIN(AdventureDrawConstant)
     PLAYER_FLAG_FRAME_BASE = 56,
     TILESET_MONSTER = 20,
     TILESET_BOAT = 39
-H2_ENUM_END(AdventureDrawConstant)
+} AdventureDrawConstant;
 
-H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
+typedef enum AdventureUpdateScreenConstant {
     UPDATE_NONE = -1,
     UPDATE_VIEWPORT_ORIGIN = 16,
     UPDATE_VIEWPORT_SIZE = 448,
     UPDATE_ANIMATION_PHASES = 6,
     UPDATE_FRAME_CYCLE = 18
-H2_ENUM_END(AdventureUpdateScreenConstant)
+} AdventureUpdateScreenConstant;
 
-H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
+typedef enum AdventureAnimationPhaseIndex {
     ANIMATION_PHASE_COLUMN_0 = 0,
     ANIMATION_PHASE_COLUMN_1 = 1,
     ANIMATION_PHASE_COLUMN_2 = 2,
@@ -159,9 +159,9 @@ H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
     ANIMATION_PHASE_COLUMN_1_INITIAL = 4,
     ANIMATION_PHASE_COLUMN_2_INITIAL = 11,
     ANIMATION_PHASE_COLUMN_3_INITIAL = 13
-H2_ENUM_END(AdventureAnimationPhaseIndex)
+} AdventureAnimationPhaseIndex;
 
-H2_ENUM_BEGIN(AdventureSourceLineConstant)
+typedef enum AdventureSourceLineConstant {
     CLOSE_BORDER_FREE_LINE_BASE = 0x0124,
     BORDER_INITIAL_FREE_LINE_OFFSET = 22,
     BORDER_SECONDARY_FREE_LINE_OFFSET = 9,
@@ -181,9 +181,9 @@ H2_ENUM_BEGIN(AdventureSourceLineConstant)
     TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x108,
     REDRAW_BORDER_FREE_LINE_BASE = 0x1628,
     SAVE_BORDER_ALLOC_LINE_BASE = 0x2025
-H2_ENUM_END(AdventureSourceLineConstant)
+} AdventureSourceLineConstant;
 
-H2_ENUM_BEGIN(AdventureBorderConstant)
+typedef enum AdventureBorderConstant {
     BORDER_BUFFER_SIZE = 0x7400,
     BORDER_EDGE_SIZE = 16,
     BORDER_VIEW_SIZE = VIEWPORT_SIZE,
@@ -192,15 +192,15 @@ H2_ENUM_BEGIN(AdventureBorderConstant)
     BORDER_SCREEN_PITCH = SCREEN_WIDTH,
     BORDER_SIDE_BYTES = BORDER_EDGE_SIZE,
     BORDER_SAVED_SIDE_BYTES = BORDER_SIDE_BYTES * 2
-H2_ENUM_END(AdventureBorderConstant)
+} AdventureBorderConstant;
 
-H2_ENUM_BEGIN(AdventureScrollConstant)
+typedef enum AdventureScrollConstant {
     SCROLL_MIN_ORIGIN = 1 - VIEW_EDGE_MARGIN,
     VIEW_CENTER_OFFSET = VIEW_CENTER_CELL,
     SCROLL_TICK_INTERVAL = 70
-H2_ENUM_END(AdventureScrollConstant)
+} AdventureScrollConstant;
 
-H2_ENUM_BEGIN(AdventureButtonConstant)
+typedef enum AdventureButtonConstant {
     BUTTON_FIRST = 1,
     BUTTON_LAST = 6,
     BUTTON_TARGET = 2,
@@ -212,15 +212,15 @@ H2_ENUM_BEGIN(AdventureButtonConstant)
     BUTTON_SLOT_6 = 6,
     BUTTON_BROADCAST_ARG = 1,
     BUTTON_BROADCAST_FLAGS = 0x4008
-H2_ENUM_END(AdventureButtonConstant)
+} AdventureButtonConstant;
 
-H2_ENUM_BEGIN(AdventureTriggerConstant)
+typedef enum AdventureTriggerConstant {
     SPECIAL_TRIGGER_MASK = 0x3f,
     TRIGGER_EVENT_5 = 5,
     TRIGGER_EVENT_6 = 6
-H2_ENUM_END(AdventureTriggerConstant)
+} AdventureTriggerConstant;
 
-H2_ENUM_BEGIN(AdventureHoverConstant)
+typedef enum AdventureHoverConstant {
     HOVER_VIEW_CELLS = VIEW_CELL_COUNT,
     HOVER_MAX_CELL = VIEW_LAST_CELL,
     HOVER_OBJECT_BLOCKED = 0x08,
@@ -229,9 +229,9 @@ H2_ENUM_BEGIN(AdventureHoverConstant)
     HOVER_ROUTE_FRAMES_PER_DAY = 6,
     HOVER_SCROLL_FRAME_FIRST = 32,
     HOVER_SCROLL_FRAME_END = 40
-H2_ENUM_END(AdventureHoverConstant)
+} AdventureHoverConstant;
 
-H2_ENUM_BEGIN(AdventurePointerFrame)
+typedef enum AdventurePointerFrame {
     POINTER_DEFAULT = 0,
     POINTER_HERO = 2,
     POINTER_TOWN = 3,
@@ -242,9 +242,9 @@ H2_ENUM_BEGIN(AdventurePointerFrame)
     POINTER_SELECT_HERO = 8,
     POINTER_ACTION = 9,
     POINTER_WATER_ACTION = 28
-H2_ENUM_END(AdventurePointerFrame)
+} AdventurePointerFrame;
 
-H2_ENUM_BEGIN(AdventureFrameConstant)
+typedef enum AdventureFrameConstant {
     MOBILITY_SCALE = 22,
     MOBILITY_DIVISOR = 1500,
     MANA_DIVISOR = 5,
@@ -258,42 +258,37 @@ H2_ENUM_BEGIN(AdventureFrameConstant)
     FRAME_TOP = 25,
     FRAME_HIGH = 24,
     FRAME_MID = 23
-H2_ENUM_END(AdventureFrameConstant)
+} AdventureFrameConstant;
 
-#if H2_STRICT_ENUMS
-H2_ENUM_CLASS_BEGIN(CursorSampleSet)
+enum {
     CURSOR_SAMPLE_SLOW_SET = 0,
     CURSOR_SAMPLE_FAST_SET = 2
-H2_ENUM_CLASS_END(CursorSampleSet)
-#endif
-
-H2_ENUM_BEGIN(AdventureStateConstant)
+};
+typedef i32 CursorSampleSet;
+typedef enum AdventureStateConstant {
     INVALID_HERO = -1,
     LOOPING_SOUND_LIMIT = 4,
     OBJECT_ICON_COUNT = ADVMGR_OBJECT_ICON_COUNT,
     HERO_ICON_COUNT = ADVMGR_HERO_ICON_COUNT,
-    LOOPING_SAMPLE_COUNT = IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT),
+    LOOPING_SAMPLE_COUNT = (ADVMGR_ENVIRONMENT_SOUND_COUNT),
     CURSOR_SAMPLE_COUNT = ADVMGR_CURSOR_SAMPLE_COUNT,
     SOUND_CELL_COUNT = ADVMGR_ACTIVE_SOUND_COUNT,
     HIGH_MEMORY_BUFFER_DIVISOR = 100,
     CURSOR_SAMPLE_VOLUME = 64,
     CURSOR_SAMPLE_CHANNEL = 2,
-#if !H2_STRICT_ENUMS
-    CURSOR_SAMPLE_FAST_SET = 2,
-#endif
-    HERO_ICON_FROTH = IDX(HERO_TYPE_BOAT) + 1,
+    HERO_ICON_FROTH = (HERO_TYPE_BOAT) + 1,
     ADVENTURE_FADE_STEPS = 8,
     FORCED_MUSIC_DELAY = 6000,
     QUICK_VIEW_NONE = -99,
     UNUSED_OBJECT_ICON_1 = 21,
     UNUSED_OBJECT_ICON_2 = 38
-H2_ENUM_END(AdventureStateConstant)
+} AdventureStateConstant;
 
-H2_ENUM_BEGIN(AdventureMainConstant)
+typedef enum AdventureMainConstant {
     ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
-H2_ENUM_END(AdventureMainConstant)
+} AdventureMainConstant;
 
-H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
+typedef enum AdventureEnvironmentSoundConstant {
     ENVIRONMENT_ORIGIN_NONE = -1,
     ENVIRONMENT_SOUND_LOG_UNUSED = -999,
     ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
@@ -303,9 +298,9 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_SOUND_LAYER_COUNT = 2,
     ENVIRONMENT_SOUND_CHANNEL_TYPE = 3,
     ENVIRONMENT_SOUND_EDGE_SPAN = 2
-H2_ENUM_END(AdventureEnvironmentSoundConstant)
+} AdventureEnvironmentSoundConstant;
 
-H2_ENUM_BEGIN(AdventureTeleportConstant)
+typedef enum AdventureTeleportConstant {
     TELEPORT_MAP_CHANGE_VALUE = -999,
     TELEPORT_CELL_OBJECT_FLAG = 0x40,
     TELEPORT_RESTORE_MODE = 99,
@@ -313,9 +308,9 @@ H2_ENUM_BEGIN(AdventureTeleportConstant)
     TELEPORT_DELAY = 90,
     TELEPORT_FIZZLE_TIME = 128,
     TELEPORT_REMOTE_FIZZLE_ADJUSTMENT = 64
-H2_ENUM_END(AdventureTeleportConstant)
+} AdventureTeleportConstant;
 
-H2_ENUM_BEGIN(AdventureTravelSpellConstant)
+typedef enum AdventureTravelSpellConstant {
     TRAVEL_DIALOG_ACCEPT = 1,
     TRAVEL_MUSIC = 1,
     DIMENSION_DOOR_FIRST_BUTTON = 10,
@@ -324,25 +319,25 @@ H2_ENUM_BEGIN(AdventureTravelSpellConstant)
     TOWN_PORTAL_WINDOW_X = 159,
     TOWN_PORTAL_WINDOW_Y = 65,
     TOWN_PORTAL_DISTANCE_LIMIT = 1000
-H2_ENUM_END(AdventureTravelSpellConstant)
+} AdventureTravelSpellConstant;
 
-H2_ENUM_BEGIN(AdventureTownPortalMessage)
+typedef enum AdventureTownPortalMessage {
     TOWN_PORTAL_TITLE_WIDGET = 1,
     TOWN_PORTAL_CHOICE_WIDGET = 100,
     TOWN_PORTAL_CLOSE_WIDGET = 10,
     TOWN_PORTAL_FIRST_CHOICE = 0x7801,
     TOWN_PORTAL_LAST_CHOICE = 0x7802,
-H2_ENUM_END(AdventureTownPortalMessage)
+} AdventureTownPortalMessage;
 
-H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
+typedef enum AdventureSoundTilesetConstant {
     SOUND_GROUND_SHAPE_MASK = 0x0f,
     SOUND_SEAGULL_FRAME_FIRST = 0xb6,
     SOUND_SEAGULL_FRAME_LAST = 0xb7,
     SOUND_ALCHEMIST_FRAME_FIRST = 0x27,
     SOUND_ALCHEMIST_FRAME_LAST = 0x2c
-H2_ENUM_END(AdventureSoundTilesetConstant)
+} AdventureSoundTilesetConstant;
 
-H2_ENUM_BEGIN(AdventureOpenConstant)
+typedef enum AdventureOpenConstant {
     SCROLL_Y = 195,
     SCROLL_LEFT_X = 540,
     SCROLL_RIGHT_X = 612,
@@ -353,23 +348,23 @@ H2_ENUM_BEGIN(AdventureOpenConstant)
     SCROLL_RIGHT_ID = 27,
     TIMER_DELAY = 120,
     MANAGER_MESSAGE = 0x400
-H2_ENUM_END(AdventureOpenConstant)
+} AdventureOpenConstant;
 
-H2_ENUM_BEGIN(AdventureInterfaceConstant)
+typedef enum AdventureInterfaceConstant {
     INTERFACE_AUTO = 0,
     INTERFACE_GOOD = 1,
     INTERFACE_EVIL = 2,
     INTERFACE_TRANSLATION_COUNT = 37
-H2_ENUM_END(AdventureInterfaceConstant)
+} AdventureInterfaceConstant;
 
-H2_ENUM_BEGIN(AdventureSystemOptionConstant)
+typedef enum AdventureSystemOptionConstant {
     OPTION_INTERFACE_COUNT = 3,
     OPTION_DIALOG_MESSAGE = 1,
     OPTION_DIALOG_HELP = 4,
     OPTION_DIALOG_NONE = -1
-H2_ENUM_END(AdventureSystemOptionConstant)
+} AdventureSystemOptionConstant;
 
-H2_ENUM_BEGIN(AdventureSummonBoatConstant)
+typedef enum AdventureSummonBoatConstant {
     SUMMON_CENTER_OFFSET = VIEW_CENTER_CELL,
     SUMMON_DIRECTION_COUNT = 8,
     SUMMON_BOAT_COUNT = 48,
@@ -386,9 +381,9 @@ H2_ENUM_BEGIN(AdventureSummonBoatConstant)
     SUMMON_TARGET_WIDTH = 150,
     SUMMON_TARGET_HEIGHT = 136,
     SUMMON_BOAT_TRIGGER = 0xab
-H2_ENUM_END(AdventureSummonBoatConstant)
+} AdventureSummonBoatConstant;
 
-H2_ENUM_BEGIN(AdventureRouteConstant)
+typedef enum AdventureRouteConstant {
     ROUTE_PATH_COST_LIMIT = 59999,
     ROUTE_TERRAIN_COST_INFINITY = 999999999,
     ROUTE_DAY_MASK = 0x100,
@@ -406,24 +401,24 @@ H2_ENUM_BEGIN(AdventureRouteConstant)
     ROUTE_DIAGONAL_COST_3 = 225,
     ROUTE_DIAGONAL_COST_4 = 262,
     ROUTE_DIAGONAL_COST_5 = 300
-H2_ENUM_END(AdventureRouteConstant)
+} AdventureRouteConstant;
 
-H2_ENUM_BEGIN(AdventureRouteFrame)
+typedef enum AdventureRouteFrame {
     ROUTE_FRAME_COST_0 = 0,
     ROUTE_FRAME_COST_1 = 1,
     ROUTE_FRAME_COST_2 = 2,
     ROUTE_FRAME_COST_3 = 3,
     ROUTE_FRAME_COST_4 = 4,
     ROUTE_FRAME_COST_5 = 5
-H2_ENUM_END(AdventureRouteFrame)
+} AdventureRouteFrame;
 
-H2_ENUM_BEGIN(AdventureSearchConstant)
+typedef enum AdventureSearchConstant {
     ARTIFACT_CAPACITY = HERO_ARTIFACT_SLOT_COUNT,
     DIG_HOLE_FRAME = 140,
     ULTIMATE_ARTIFACT_MUSIC = 41
-H2_ENUM_END(AdventureSearchConstant)
+} AdventureSearchConstant;
 
-H2_ENUM_BEGIN(AdventureComboDrawConstant)
+typedef enum AdventureComboDrawConstant {
     COMBO_VIEW_CELLS = VIEW_CELL_COUNT,
     COMBO_GRID_CELLS = 18,
     COMBO_CLEAR_BYTES = 256,
@@ -436,9 +431,9 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
     COMBO_UPDATE_MIN = 16,
     COMBO_UPDATE_MAX = 463,
     COMBO_FAR_NEIGHBOR_OFFSET = 2,
-H2_ENUM_END(AdventureComboDrawConstant)
+} AdventureComboDrawConstant;
 
-H2_ENUM_BEGIN(AdventureRadarConstant)
+typedef enum AdventureRadarConstant {
     RADAR_SIZE = MAP_DIMENSION_XLARGE,
     RADAR_SCREEN_PITCH = SCREEN_WIDTH,
     RADAR_ROW_GROUPS = 5,
@@ -465,9 +460,9 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_FRAME_VIEW_FAR_XLARGE = 7,
     RADAR_FRAME_VIEW_NEAR_LARGE = 8,
     RADAR_FRAME_VIEW_MIDDLE_LARGE = 9,
-H2_ENUM_END(AdventureRadarConstant)
+} AdventureRadarConstant;
 
-H2_ENUM_BEGIN(AdventureArmySizeThreshold)
+typedef enum AdventureArmySizeThreshold {
     ARMY_FEW_LIMIT = 5,
     ARMY_SEVERAL_LIMIT = 10,
     ARMY_PACK_LIMIT = 20,
@@ -476,9 +471,9 @@ H2_ENUM_BEGIN(AdventureArmySizeThreshold)
     ARMY_THRONG_LIMIT = 250,
     ARMY_SWARM_LIMIT = 500,
     ARMY_ZOUNDS_LIMIT = 1000
-H2_ENUM_END(AdventureArmySizeThreshold)
+} AdventureArmySizeThreshold;
 
-H2_ENUM_BEGIN(AdventureArmySizeBand)
+typedef enum AdventureArmySizeBand {
     ARMY_SIZE_FEW = 0,
     ARMY_SIZE_SEVERAL = 1,
     ARMY_SIZE_PACK = 2,
@@ -488,9 +483,9 @@ H2_ENUM_BEGIN(AdventureArmySizeBand)
     ARMY_SIZE_SWARM = 6,
     ARMY_SIZE_ZOUNDS = 7,
     ARMY_SIZE_LEGION = 8
-H2_ENUM_END(AdventureArmySizeBand)
+} AdventureArmySizeBand;
 
-H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
+typedef enum AdventureArmyQuickViewConstant {
     ARMY_QUICK_SLOT_COUNT = ARMY_GROUP_SLOT_COUNT,
     ARMY_QUICK_ICON_SIZE = 32,
     ARMY_QUICK_ICON_BASELINE = 30,
@@ -508,9 +503,9 @@ H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
     ARMY_QUICK_EMPTY_SLOT = -1,
     ARMY_QUICK_TEXT_WIDTH = 60,
     ARMY_QUICK_TEXT_X_ADJUSTMENT = 14
-H2_ENUM_END(AdventureArmyQuickViewConstant)
+} AdventureArmyQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
+typedef enum AdventureHeroQuickViewConstant {
     HERO_QUICK_ARMY_AREA_WIDTH = 160,
     HERO_QUICK_DETAILED_CREATURE_Y = 124,
     HERO_QUICK_VAGUE_FIRST_ROW_Y = 73,
@@ -527,9 +522,9 @@ H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
     HERO_QUICK_ARMY_LABEL_CAPACITY = 5,
     HERO_QUICK_SECOND_ROW_FIRST_SLOT = 2,
     HERO_QUICK_SECOND_ROW_TEXT_SHIFT = 38
-H2_ENUM_END(AdventureHeroQuickViewConstant)
+} AdventureHeroQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
+typedef enum AdventureTownQuickViewConstant {
     TOWN_QUICK_ARMY_AREA_WIDTH = 192,
     TOWN_QUICK_FIRST_ROW_Y = 76,
     TOWN_QUICK_DEFAULT_WINDOW_X = 328,
@@ -551,9 +546,9 @@ H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
     TOWN_QUICK_INFORMATION_ESTIMATES = 2,
     TOWN_QUICK_INFORMATION_EXACT = 3,
     TOWN_QUICK_DEBUG_INFORMATION = 2
-H2_ENUM_END(AdventureTownQuickViewConstant)
+} AdventureTownQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
+typedef enum AdventureBottomHeroViewConstant {
     BOTTOM_HERO_ARMY_SLOTS = ARMY_GROUP_SLOT_COUNT,
     BOTTOM_HERO_EMPTY_SLOT = -1,
     BOTTOM_HERO_LABEL_BYTES = 6,
@@ -580,9 +575,9 @@ H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_CREATURE_BOUND_COUNT = 2,
     BOTTOM_HERO_FIRST_ICON_ID = 2002,
     BOTTOM_HERO_FIRST_TEXT_ID = 2101,
-H2_ENUM_END(AdventureBottomHeroViewConstant)
+} AdventureBottomHeroViewConstant;
 
-H2_ENUM_BEGIN(AdventureLocatorConstant)
+typedef enum AdventureLocatorConstant {
     LOCATOR_VISIBLE_COUNT = 4,
     LOCATOR_PAGE_THRESHOLD = 5,
     LOCATOR_PAGE_DENOMINATOR_OFFSET = 4,
@@ -631,9 +626,9 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_SCREEN_ROW_HEIGHT = 32,
     LOCATOR_SCREEN_WIDTH = 54,
     LOCATOR_SCREEN_HEIGHT = 30
-H2_ENUM_END(AdventureLocatorConstant)
+} AdventureLocatorConstant;
 
-H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
+typedef enum AdventureQuickViewPlacementConstant {
     QUICK_VIEW_MIN_X = 30,
     QUICK_VIEW_MIN_Y = 16,
     QUICK_VIEW_RIGHT = 448,
@@ -650,26 +645,26 @@ H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
     TOWN_QUICK_VIEW_HEIGHT = 186,
     TOWN_QUICK_VIEW_RIGHT_X = 224,
     TOWN_QUICK_VIEW_BOTTOM_Y = 278
-H2_ENUM_END(AdventureQuickViewPlacementConstant)
+} AdventureQuickViewPlacementConstant;
 
-H2_ENUM_BEGIN(AdventureSpellConstant)
+typedef enum AdventureSpellConstant {
     TRAVEL_SPELL_MOBILITY_COST = 225,
     MINE_GUARDIAN_MAX_POWER = 51,
     MINE_GUARDIANS_PER_POWER = 4,
     MINE_GUARDIAN_VALUE_COUNT = 2,
     MINE_GUARDIAN_TYPE_INDEX = 0
-H2_ENUM_END(AdventureSpellConstant)
+} AdventureSpellConstant;
 
-H2_ENUM_BEGIN(AdventureSaveConstant)
+typedef enum AdventureSaveConstant {
     SAVE_PLAYER_COUNT = GAME_PLAYER_COUNT,
     SAVE_EXTENSION_SIZE = 8,
     SAVE_PATTERN_SIZE = 16,
     SAVE_REQUESTER_X = 131,
     SAVE_REQUESTER_Y = 58,
     SAVE_POINTER_FRAME = 0
-H2_ENUM_END(AdventureSaveConstant)
+} AdventureSaveConstant;
 
-H2_ENUM_BEGIN(AdventureBottomViewConstant)
+typedef enum AdventureBottomViewConstant {
     BOTTOM_VIEW_PANEL_X = 480,
     BOTTOM_VIEW_PANEL_Y = 392,
     BOTTOM_VIEW_PANEL_WIDTH = 143,
@@ -688,9 +683,9 @@ H2_ENUM_BEGIN(AdventureBottomViewConstant)
     BOTTOM_VIEW_CENTER_DIVISOR = 2,
     BOTTOM_VIEW_NO_ENEMY = -1,
     BOTTOM_VIEW_NO_ANIMATION = -1
-H2_ENUM_END(AdventureBottomViewConstant)
+} AdventureBottomViewConstant;
 
-H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
+typedef enum AdventureNewTurnViewConstant {
     NEW_TURN_DATE_ICON_X = 480,
     NEW_TURN_DATE_ICON_Y = 392,
     NEW_TURN_DATE_ICON_WIDTH = 143,
@@ -704,9 +699,9 @@ H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
     NEW_TURN_FIRST_DAY = 1,
     NEW_TURN_WEEK_ALLOC_LINE_OFFSET = 0x29,
     NEW_TURN_DAY_ALLOC_LINE_OFFSET = 0x43
-H2_ENUM_END(AdventureNewTurnViewConstant)
+} AdventureNewTurnViewConstant;
 
-H2_ENUM_BEGIN(AdventureResourceViewConstant)
+typedef enum AdventureResourceViewConstant {
     RESOURCE_VIEW_TEXT_BASE_Y = 398,
     RESOURCE_VIEW_MULTILINE_HEIGHT = 32,
     RESOURCE_VIEW_LINE_HEIGHT = 6,
@@ -723,10 +718,10 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
     RESOURCE_VIEW_COUNT_HEIGHT = 12,
     RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET = 0x26,
     RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x50
-H2_ENUM_END(AdventureResourceViewConstant)
+} AdventureResourceViewConstant;
 
-H2_ENUM_BEGIN(AdventureKingdomViewConstant)
-    KINGDOM_VIEW_RESOURCE_COUNT = IDX(RES_COUNT),
+typedef enum AdventureKingdomViewConstant {
+    KINGDOM_VIEW_RESOURCE_COUNT = (RES_COUNT),
     KINGDOM_VIEW_ENTRY_COUNT = 9,
     KINGDOM_VIEW_CASTLE_ENTRY = 7,
     KINGDOM_VIEW_TOWN_ENTRY = 8,
@@ -748,16 +743,16 @@ H2_ENUM_BEGIN(AdventureKingdomViewConstant)
     KINGDOM_VIEW_CASTLE_TEXT_X = 27,
     KINGDOM_VIEW_VILLAGE_TEXT_X = 80,
     KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x32
-H2_ENUM_END(AdventureKingdomViewConstant)
+} AdventureKingdomViewConstant;
 
-H2_ENUM_BEGIN(AdventureVisionsConstant)
+typedef enum AdventureVisionsConstant {
     VISIONS_RADIUS = 3,
     VISIONS_NO_MONSTER_DISTANCE = 100,
     VISIONS_MESSAGE_BUFFER_SIZE = 200,
     VISIONS_JOIN_COST_MULTIPLIER = 2
-H2_ENUM_END(AdventureVisionsConstant)
+} AdventureVisionsConstant;
 
-H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
+typedef enum AdventureEnemyTurnViewConstant {
     ENEMY_TURN_BACKGROUND_X = 480,
     ENEMY_TURN_BACKGROUND_Y = 392,
     ENEMY_TURN_BACKGROUND_WIDTH = 143,
@@ -790,9 +785,9 @@ H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
     ENEMY_TURN_PHASE_SLOT = 2,
     ENEMY_TURN_ANIMATION_DELAY = 300,
     ENEMY_TURN_PHASE_DELAY = 700
-H2_ENUM_END(AdventureEnemyTurnViewConstant)
+} AdventureEnemyTurnViewConstant;
 
-H2_ENUM_BEGIN(AdventureCloudNeighbor)
+typedef enum AdventureCloudNeighbor {
     CLOUD_NORTH = 0x01,
     CLOUD_EAST = 0x02,
     CLOUD_SOUTH = 0x04,
@@ -805,9 +800,9 @@ H2_ENUM_BEGIN(AdventureCloudNeighbor)
     CLOUD_RIGHT_EDGE = 0x32,
     CLOUD_TOP_EDGE = 0x91,
     CLOUD_BOTTOM_EDGE = 0x64
-H2_ENUM_END(AdventureCloudNeighbor)
+} AdventureCloudNeighbor;
 
-H2_ENUM_BEGIN(AdventureQuickInfoObject)
+typedef enum AdventureQuickInfoObject {
     OBELISK_INDEX_BASE = 1,
     RESOURCE_FRAME_PAIR_MASK = ~1,
     RESOURCE_FRAME_PAIR_STRIDE = 2,
@@ -828,9 +823,9 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     QUICK_INFO_HEIGHT = 96,
     QUICK_INFO_BOTTOM = QUICK_VIEW_RIGHT,
     QUICK_INFO_BOTTOM_Y = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
-H2_ENUM_END(AdventureQuickInfoObject)
+} AdventureQuickInfoObject;
 
-H2_ENUM_BEGIN(AdventureCheatConstant)
+typedef enum AdventureCheatConstant {
     CHEAT_SEQUENCE_RADIX = 10,
     CHEAT_SEQUENCE_MODULUS = 10000000,
     CHEAT_CREATURES_MODULUS = 100000,
@@ -847,9 +842,9 @@ H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_BLACK_DRAGON_COUNT = 5,
     CHEAT_REVEAL_CENTER = 30,
     CHEAT_REVEAL_RADIUS = 180
-H2_ENUM_END(AdventureCheatConstant)
+} AdventureCheatConstant;
 
-H2_ENUM_BEGIN(AdventureSiteConstant)
+typedef enum AdventureSiteConstant {
     GENERIC_SITE_1_END = 4,
     GENERIC_SITE_2_END = 0x48,
     GENERIC_ALTAR_END = 5,
@@ -864,9 +859,9 @@ H2_ENUM_BEGIN(AdventureSiteConstant)
     RECRUITMENT_3_END = 0x78,
     RECRUITMENT_4_END = 0x81,
     RECRUITMENT_5_END = 0x89
-H2_ENUM_END(AdventureSiteConstant)
+} AdventureSiteConstant;
 
-H2_ENUM_BEGIN(AdventurePanelCommand)
+typedef enum AdventurePanelCommand {
     PANEL_NEXT_HERO = 1,
     PANEL_CONTINUE_ROUTE = 2,
     PANEL_OVERVIEW = 3,
@@ -887,15 +882,15 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     BOTTOM_VIEW_DURATION = 3000,
     LOCATORS_PER_PAGE = 5,
     LOCATOR_PAGE_STEP = 4
-H2_ENUM_END(AdventurePanelCommand)
+} AdventurePanelCommand;
 
-H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
+typedef enum AdventureAdjacentMonsterConstant {
     ADJACENT_MONSTER_RADIUS = 1,
     ADJACENT_MONSTER_END_OFFSET = 2,
     ADJACENT_OBJECT_INDEX_NONE = 0xFF
-H2_ENUM_END(AdventureAdjacentMonsterConstant)
+} AdventureAdjacentMonsterConstant;
 
-H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
+typedef enum AdventurePuzzleViewConstant {
     PUZZLE_MUSIC = 23,
     PUZZLE_WINDOW_X = DRAW_CLIP_WIDTH,
     PUZZLE_WINDOW_Y = SCROLL_BORDER,
@@ -908,9 +903,9 @@ H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_Y_ADJUST_Y_FACTOR = 5,
     PUZZLE_PARITY_DIVISOR = 2,
     PUZZLE_FIZZLE_TIME = 220
-H2_ENUM_END(AdventurePuzzleViewConstant)
+} AdventurePuzzleViewConstant;
 
-H2_ENUM_BEGIN(AdventurePanelDialogConstant)
+typedef enum AdventurePanelDialogConstant {
     PANEL_NO_HELP = -1,
     PANEL_WINDOW_X = 144,
     PANEL_WINDOW_Y = 40,
@@ -937,9 +932,9 @@ H2_ENUM_BEGIN(AdventurePanelDialogConstant)
     CONTROL_MAIN_MENU_HELP = 3,
     CONTROL_CLOSE_HELP = 4,
     CONTROL_CONFIRMATION_SIZE = 200
-H2_ENUM_END(AdventurePanelDialogConstant)
+} AdventurePanelDialogConstant;
 
-H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
+typedef enum AdventureSystemOptionsPrivateConstant {
     SYSTEM_OPTIONS_HELP_ACCEPT = 0,
     SYSTEM_OPTIONS_HELP_MUSIC_VOLUME = 1,
     SYSTEM_OPTIONS_HELP_SOUND_VOLUME = 2,
@@ -952,14 +947,14 @@ H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
     SYSTEM_OPTIONS_HELP_COLOR_CURSOR = 9,
     SYSTEM_OPTIONS_HELP_FIRST_OPTION = SYSTEM_OPTIONS_HELP_MUSIC_VOLUME,
     SYSTEM_OPTIONS_TEXT_CAPACITY = 120
-H2_ENUM_END(AdventureSystemOptionsPrivateConstant)
+} AdventureSystemOptionsPrivateConstant;
 
-H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
+enum {
     MUSIC_QUALITY_MIDI = 0,
     MUSIC_QUALITY_CD_STEREO = 1,
     MUSIC_QUALITY_CD_OPERA = 2
-H2_ENUM_CLASS_END(AdventureMusicQuality)
-
+};
+typedef i32 AdventureMusicQuality;
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_RADAR_LEFT_FLOAT \
     static_cast<float>(RADAR_LEFT)
@@ -972,58 +967,56 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 #define ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE \
     static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
-// The route-overlay byte at (column, row), read through this->m_visibilityMap.
-// Same grouping rule as MAP_EXTRA_AT in <SOURCE/KB.h>: retail adds the base and
-// the column term as a unit, so `column` splices unparenthesised on purpose.
+
+
 #define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
-DATA(0x004ea40c) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
+static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
-DATA(0x00523de0) i32 iThisMaxY = 0;
-DATA(0x00523de4) static i32 s_drawMonsterFrame = 0;
-DATA(0x00523de8) i32 iLastAnimFrame = 0;
-DATA(0x00523dec) i32 giFrameStep = 0;
-DATA(0x00523df0) struct tag_message CDMsg = {0};
-DATA(0x00523e0c) static i32 s_drawHeroYOffset = 0;
-DATA(0x00523e10) i32 iThisMinY = 0;
-DATA(0x00523e14) static mapCellExtra* s_drawExtra = NULL;
-DATA(0x00523e18) static i32 s_adjacentMonsterEndY = 0;
-DATA(0x00523e1c) static i32 s_drawFlipCloud = 0;
-DATA(0x00523e20) static i32 s_drawHeroFrame = 0;
-DATA(0x00523e24) static i32 s_drawStoneTile = 0;
-DATA(0x00523e28) static mapCell* s_drawCell = NULL;
-DATA(0x00523e2c) static i32 s_adjacentMonsterX = 0;
-DATA(0x00523e30) static i32 s_adjacentMonsterEndX = 0;
-DATA(0x00523e34) static mapCell* s_drawAdjacentCell = NULL;
-DATA(0x00523e38) static i32 s_adjacentMonsterY = 0;
-DATA(0x00523e3c) static u16 s_drawGroundTile = 0;
-DATA(0x00523e40) i32 giLimitUpdMaxX = 0;
-DATA(0x00523e44) i32 giLimitUpdMaxY = 0;
-DATA(0x00523e48) i32 bPrefsChanged = 0;
-DATA(0x00523e4c) i32 giTownPortalChoice = 0;
-DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
-DATA(0x00523f94) static i32 s_drawCovered = 0;
-DATA(0x00523f98) i32 giLimitUpdMinY = 0;
-DATA(0x00523f9c) static mineRecord* s_drawMine = NULL;
-DATA(0x00523fa0) static i32 s_adjacentMonsterMinX = 0;
-DATA(0x00523fa4) static i32 s_drawCloudFrame = 0;
-DATA(0x00523fa8) static i32 s_drawPlayerColor = 0;
-DATA(0x00523fac) struct tag_message USMsg = {0};
-DATA(0x00523fcc) class heroWindow* cPanel = NULL;
-DATA(0x00523fd0) static i32 s_drawPixelY = 0;
-DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType = 0;
-DATA(0x00523fd8) static hero* s_drawHero = NULL;
-DATA(0x00523fdc) class heroWindow* townPortalWin = NULL;
-DATA(0x00523fe0) static i32 s_drawHasHero = 0;
-DATA(0x00523fe4) static i32 s_drawAnimationLength = 0;
-DATA(0x00523fe8) static i32 s_drawPixelX = 0;
-DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = {0};
-DATA(0x00523ff8) static i32 s_adjacentMonsterMinY = 0;
-H2_ENUM_BEGIN(AdvVisitMetadata)
+i32 iThisMaxY = 0;
+static i32 s_drawMonsterFrame = 0;
+i32 iLastAnimFrame = 0;
+i32 giFrameStep = 0;
+struct tag_message CDMsg = {};
+static i32 s_drawHeroYOffset = 0;
+i32 iThisMinY = 0;
+static mapCellExtra* s_drawExtra = NULL;
+static i32 s_adjacentMonsterEndY = 0;
+static i32 s_drawFlipCloud = 0;
+static i32 s_drawHeroFrame = 0;
+static i32 s_drawStoneTile = 0;
+static mapCell* s_drawCell = NULL;
+static i32 s_adjacentMonsterX = 0;
+static i32 s_adjacentMonsterEndX = 0;
+static mapCell* s_drawAdjacentCell = NULL;
+static i32 s_adjacentMonsterY = 0;
+static u16 s_drawGroundTile = 0;
+i32 giLimitUpdMaxX = 0;
+i32 giLimitUpdMaxY = 0;
+i32 bPrefsChanged = 0;
+i32 giTownPortalChoice = 0;
+i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
+static i32 s_drawCovered = 0;
+i32 giLimitUpdMinY = 0;
+static mineRecord* s_drawMine = NULL;
+static i32 s_adjacentMonsterMinX = 0;
+static i32 s_drawCloudFrame = 0;
+static i32 s_drawPlayerColor = 0;
+struct tag_message USMsg = {};
+class heroWindow* cPanel = NULL;
+static i32 s_drawPixelY = 0;
+static i32 s_drawHeroType = 0;
+static hero* s_drawHero = NULL;
+class heroWindow* townPortalWin = NULL;
+static i32 s_drawHasHero = 0;
+static i32 s_drawAnimationLength = 0;
+static i32 s_drawPixelX = 0;
+char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = {0};
+static i32 s_adjacentMonsterMinY = 0;
+typedef enum AdvVisitMetadata {
     VISIT_BIT_INDEX_MASK = 0x1f
-H2_ENUM_END(AdvVisitMetadata)
+} AdvVisitMetadata;
 
-VA(0x00401000, 0x2f2)
 advManager::advManager(void) {
     m_groundTiles = NULL;
     m_puzzleIcon = NULL;
@@ -1084,7 +1077,6 @@ advManager::advManager(void) {
     m_cursorTurning = 0;
 }
 
-VA(0x004012f2, 0x955)
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
     m_openState = 0;
@@ -1191,38 +1183,38 @@ i32 advManager::Open(i32 id) {
         }
     }
 
-    if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
-        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_KNIGHT)] == NULL) {
+        m_heroIcons[(FACTION_KNIGHT)] = gpResourceManager->GetIcon(
             "kngt32.icn"
         );
     }
-    if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
-        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_BARBARIAN)] == NULL) {
+        m_heroIcons[(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(
             "barb32.icn"
         );
     }
-    if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
-        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_SORCERESS)] == NULL) {
+        m_heroIcons[(FACTION_SORCERESS)] = gpResourceManager->GetIcon(
             "sorc32.icn"
         );
     }
-    if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
-        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_WARLOCK)] == NULL) {
+        m_heroIcons[(FACTION_WARLOCK)] = gpResourceManager->GetIcon(
             "wrlk32.icn"
         );
     }
-    if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
-        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_WIZARD)] == NULL) {
+        m_heroIcons[(FACTION_WIZARD)] = gpResourceManager->GetIcon(
             "wzrd32.icn"
         );
     }
-    if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
-        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(FACTION_NECROMANCER)] == NULL) {
+        m_heroIcons[(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(
             "necr32.icn"
         );
     }
-    if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
-        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(
+    if (m_heroIcons[(HERO_TYPE_BOAT)] == NULL) {
+        m_heroIcons[(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(
             "boat32.icn"
         );
     }
@@ -1364,7 +1356,6 @@ i32 advManager::Open(i32 id) {
     return 0;
 }
 
-VA(0x00401c47, 0x3b8)
 void advManager::Close(void) {
 
     ClearBottomView();
@@ -1437,25 +1428,15 @@ void advManager::Close(void) {
     m_active = false;
 }
 
-VA(0x00401fff, 0xd8)
 void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
-#if H2_STRICT_ENUMS
     CursorSampleSet cursorSampleSet =
         sampleSet >= CONFIG_WALK_SPEED_SLOW ? CURSOR_SAMPLE_FAST_SET : CURSOR_SAMPLE_SLOW_SET;
-#else
-    if (sampleSet >= 1)
-        sampleSet = CURSOR_SAMPLE_FAST_SET;
-#endif
     i32 suffixSample[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
             "wsnd%1d%1d.82M",
-#if H2_STRICT_ENUMS
-            IDX(cursorSampleSet),
-#else
-            sampleSet,
-#endif
+            (cursorSampleSet),
             suffixSample[index]
         );
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
@@ -1464,7 +1445,6 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     }
 }
 
-VA(0x004020d7, 0x59d)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
     char bMoveStopped = 0;
@@ -1567,7 +1547,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 while (gpMouseManager->m_hideCount != 0) {
                     gpMouseManager->ShowColorPointer();
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
                 UpdBottomView(1, 1, 1);
                 if (eventCellState != NULL) {
                     StopCursor(1);
@@ -1636,7 +1616,6 @@ class mapCell* advManager::DoAdvCommand(void) {
     return eventCellState;
 }
 
-VA(0x00402674, 0x15b)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     i32 shouldChange;
     i32 translationIndex;
@@ -1682,7 +1661,6 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
-VA(0x004027cf, 0xe03)
 MessageDispatchResult advManager::Main(struct tag_message& message) {
     MessageDispatchResult result;
     i32 quit;
@@ -1725,7 +1703,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         giForceSwitchMusic = -1;
         curMusic = gpSoundManager->m_musicTrack;
         if (curMusic == WAIT_AMBIENT_MUSIC) {
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
         }
         SetEnvironmentOrigin(
             m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -1743,7 +1721,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
                         if (!(
-                                HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)
+                                (((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))
                             )) {
                             result =
                                 ProcessDeSelect(&message, &quit, &evtCell);
@@ -1751,7 +1729,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         break;
                     case WIDGET_COMMAND_SELECT:
                     case WIDGET_COMMAND_ALTERNATE_SELECT:
-                        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                        if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                             helpId = -1;
                             switch (message.payload.widget.id) {
                                 case PANEL_NEXT_HERO:
@@ -1841,9 +1819,9 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_F8:
                         break;
                     case INPUT_SCAN_F9:
-                        for (c = 0; c < IDX(RES_COUNT); ++c) {
+                        for (c = 0; c < (RES_COUNT); ++c) {
                             gpCurPlayer->m_resources[c] +=
-                                (c == IDX(RES_GOLD) ? CHEAT_GOLD_AMOUNT : CHEAT_RESOURCE_AMOUNT);
+                                (c == (RES_GOLD) ? CHEAT_GOLD_AMOUNT : CHEAT_RESOURCE_AMOUNT);
                         }
                         break;
                     case INPUT_SCAN_0:
@@ -1969,64 +1947,56 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_ESCAPE:
                         break;
                     case INPUT_SCAN_NUMPAD_8:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH, 0);
                         } else {
                             direction = MAP_DIRECTION_NORTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_9:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH_EAST, 0);
                         } else {
                             direction = MAP_DIRECTION_NORTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_6:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_EAST, 0);
                         } else {
                             direction = MAP_DIRECTION_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_3:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 0);
                         } else {
                             direction = MAP_DIRECTION_SOUTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_2:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH, 0);
                         } else {
                             direction = MAP_DIRECTION_SOUTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_1:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 0);
                         } else {
                             direction = MAP_DIRECTION_SOUTH_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_4:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_WEST, 0);
                         } else {
                             direction = MAP_DIRECTION_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_7:
-                        if (HAS(message.payload.keyboard.modifiers,
-                                MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH_WEST, 0);
                         } else {
                             direction = MAP_DIRECTION_NORTH_WEST;
@@ -2048,21 +2018,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 'e';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
+                            "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
                         strcpy(
                             gText,
-                            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
+                            "Вы действительно хотите выйти?"
                         );
                         goto confirm_game_command;
                     confirm_game_command:
@@ -2092,7 +2062,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                                giTerrainToMusicTrack[(m_currentTerrain)]
                             );
                         } else if (xIsPlayingExpansionCampaign) {
                             SetEnvironmentOrigin(
@@ -2108,7 +2078,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                                giTerrainToMusicTrack[(m_currentTerrain)]
                             );
                         } else {
                             gpGame->ShowScenInfo();
@@ -2172,7 +2142,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpMouseManager->ShowColorPointer();
                     }
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[(m_currentTerrain)]
                     );
                     if (evtCell != NULL) {
                         StopCursor(1);
@@ -2200,12 +2170,10 @@ finish_message:
     return result;
 }
 
-VA(0x004035d2, 0x17)
 void advManager::Reseed(i32, i32) {
     giSeedingValid = 0;
 }
 
-VA(0x004035e9, 0xd1f)
 MessageDispatchResult
 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 iPage;
@@ -2236,7 +2204,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 break;
             }
             objectTypeState = gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + iPage];
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 HeroQuickView(objectTypeState, iPage, -1, -1);
             } else {
                 if (objectTypeState == gpCurPlayer->CurrentHero()) {
@@ -2256,7 +2224,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             objectTypeState = gpCurPlayer->m_townIds
                                   [gpCurPlayer->m_townLocatorPage + message->payload.widget.id
                                    - LOCATOR_TOWN_IMAGE_BASE];
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 TownQuickView(
                     objectTypeState,
                     message->payload.widget.id - LOCATOR_TOWN_IMAGE_BASE,
@@ -2319,16 +2287,16 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 visible = 0;
             }
             theCell = GetCell(m_mapOriginX + m_lastHoverCell, m_mapOriginY + m_hoverCellY);
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
                     if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
                         && gpCurPlayer->CurrentHero() != INVALID_HERO && m_heroContextLocked) {
-                        objectTypeState = IDX(MAP_OBJECT_HERO_INTERACTION);
+                        objectTypeState = (MAP_OBJECT_HERO_INTERACTION);
                         objectIdIndex = gpCurPlayer->CurrentHero();
                     } else {
-                        objectTypeState = IDX(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
+                        objectTypeState = (theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                         objectIdIndex = theCell->m_objectMetadata;
                     }
                     switch (static_cast<MapObjectType>(objectTypeState)) {
@@ -2388,10 +2356,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         DoAdvCommand();
                     } else if ((!mobileResult
-                                || HAS(
-                                    message->payload.widget.modifiers,
-                                    MESSAGE_MODIFIER_CONTROL_KEYS
-                                )
+                                || (((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))
                                 || (gConfig.showRoute
                                     && (currentHero->m_destinationX != m_commandTargetX
                                         || currentHero->m_destinationY != m_commandTargetY)))
@@ -2404,9 +2369,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         *eventCell = DoAdvCommand();
                     }
                 } else {
-                    objectTypeState = IDX(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
+                    objectTypeState = (theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                     objectIdIndex = theCell->m_objectMetadata;
-                    if (objectTypeState == IDX(MAP_OBJECT_HERO_INTERACTION)) {
+                    if (objectTypeState == (MAP_OBJECT_HERO_INTERACTION)) {
                         if (objectIdIndex == gpCurPlayer->CurrentHero()) {
                             m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                             DoAdvCommand();
@@ -2414,7 +2379,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                             SetHeroContext(objectIdIndex, 0);
                         }
                     }
-                    if (objectTypeState == IDX(MAP_OBJECT_CASTLE)) {
+                    if (objectTypeState == (MAP_OBJECT_CASTLE)) {
                         if (objectIdIndex == gpCurPlayer->CurrentTown()) {
                             m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                             *eventCell = DoAdvCommand();
@@ -2427,10 +2392,10 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
         }
         case PANEL_RADAR:
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xe0 \xec\xe8\xf0\xe0}\n\n"
-                        "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee \xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec.",
+                    "{Карта мира}\n\n"
+                        "Миникарта изученного мира. Щелчком левой кнопки управлять просмотром.",
                     NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
@@ -2532,13 +2497,13 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
     }
 
-    if ((HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+    if (((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            "{\xce\xea\xed\xee \xf1\xf2\xe0\xf2\xf3\xf1\xe0}\n\n"
-                "\xdd\xf2\xee \xee\xea\xed\xee \xf1\xee\xee\xe1\xf9\xe0\xe5\xf2 \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe \xee \xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe3\xe5\xf0\xee\xff \xe8\xeb\xe8 \xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0, \xe0 \xf2\xe0\xea\xe6\xe5, \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xe5\xf2 \xea\xe0\xeb\xe5\xed\xe4\xe0\xf0\xfc. "
-                "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 \xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec \xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec.",
+            "{Окно статуса}\n\n"
+                "Это окно сообщает информацию о состоянии вашего героя или королевства, а также, показывает календарь. "
+                "Информация в окне меняется при цикличном нажатии левой кнопки мыши на нем.",
             NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
@@ -2553,7 +2518,6 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x00404308, 0x38a)
 MessageDispatchResult
 advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapCell** eventCell) {
     switch (message->payload.widget.id) {
@@ -2594,7 +2558,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 \xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?",
+                    "Один или несколько героев все еще могут ходить. Вы действительно хотите закончить ход?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -2625,7 +2589,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
                 HeroView(
                     giOverviewReturnActionExtra,
                     reinterpret_cast<i32>(
-                        gpGame->GetHero(IDX(giOverviewReturnAction))->GetOccupiedTown()
+                        gpGame->GetHero((giOverviewReturnAction))->GetOccupiedTown()
                     ),
                     1
                 );
@@ -2670,7 +2634,6 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
-VA(0x00404692, 0x518)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     SAMPLE2 sample;
     hero* hero;
@@ -2688,8 +2651,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, \xe7\xe0\xe2\xf2\xf0\xe0."
-                /* "Р Р°СЃРєРѕРїРєРё Р°СЂС‚РµС„Р°РєС‚Р° Р·Р°РЅРёРјР°СЋС‚ С†РµР»С‹Р№ РґРµРЅСЊ." */,
+            "Раскопки артефакта занимают целый день. Попробуйте снова, завтра."
+                 ,
             1,
             -1,
             -1,
@@ -2707,7 +2670,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 \xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, \xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. \xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff \xe7\xe0\xed\xff\xf2.",
+            "Поиски Могущественного артефакта будут бесполезными. Если даже ваш герой и найдет его, то у него попросту нет места, чтобы унести его. Весь инвентарь героя занят.",
             1,
             -1,
             -1,
@@ -2736,7 +2699,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5.",
+            "Попробуйте искать на чистой земле.",
             1,
             -1,
             -1,
@@ -2754,7 +2717,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5!!!",
+            "Попытайтесь искать на суше!!!",
             1,
             -1,
             -1,
@@ -2779,7 +2742,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         cellPtr->m_objectIndex = DIG_HOLE_FRAME;
         cellPtr->m_objectLayerBit0 = 1;
         cellPtr->m_objectLayerBit1 = 1;
-        cellPtr->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
+        cellPtr->m_flags |= (MAP_CELL_OBJECT_SHADOW_ONLY);
     }
     CompleteDraw(0);
     UpdateScreen(0, 0);
@@ -2789,7 +2752,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (hero->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 \xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!",
+                    "У вас нет места для еще одного артефакта!",
                     1,
                     -1,
                     -1,
@@ -2812,15 +2775,15 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                     sprintf(
                         gText,
                         "%s%s",
-                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
-                        gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
+                        "Поздравляем! Проведя многие часы в раскопках, вы разыскали артефакт: ",
+                        gArtifactNames[(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
                         "%s%s",
-                        "\xcf\xee\xe7\xe4\xf0\xe0\xe2\xeb\xff\xe5\xec! \xcf\xf0\xee\xe2\xe5\xe4\xff \xec\xed\xee\xe3\xe8\xe5 \xf7\xe0\xf1\xfb \xe2 \xf0\xe0\xf1\xea\xee\xef\xea\xe0\xf5, \xe2\xfb \xf0\xe0\xe7\xfb\xf1\xea\xe0\xeb\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2: ",
-                        gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
+                        "Поздравляем! Проведя многие часы в раскопках, вы разыскали артефакт: ",
+                        gArtifactNames[(gpGame->m_ultimateArtifactId)]
                     );
                 }
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2829,7 +2792,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 } else {
                     hero->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
             }
             if (special) {
                 GiveArtifact(hero, ARTIFACT_SPHERE_NEGATION, 1, -1);
@@ -2841,7 +2804,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog(
-            "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee \xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?",
+            "Здесь ничего.\nГде бы это могло быть?",
             1,
             -1,
             -1,
@@ -2870,7 +2833,6 @@ search_end:
     return 1;
 }
 
-VA(0x00404baa, 0x935)
 MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroPosX;
     i32 heroPosY;
@@ -3033,7 +2995,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             break;
                         case MAP_OBJECT_CASTLE:
                             pTown = gpGame->GetTown(hoverCell->m_objectMetadata);
-                            if (HAS(hoverCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+                            if ((((hoverCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
                                 && pTown->m_owner != giCurPlayer
                                 && pTown->HasGarrison()) {
                                 gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
@@ -3051,7 +3013,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                     || !StopOnTrigger(hoverCell))) {
                                 gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
                             } else {
-                                if (HAS(hoverCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                                if ((((hoverCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                                     if (m_cursorType != HERO_TYPE_BOAT) {
                                         if (giGroundToTerrain[hoverCell->m_terrainImageIndex]
                                             != TERRAIN_WATER) {
@@ -3113,7 +3075,6 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004054df, 0x239)
 void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (forceUpdate == 0 && bShowIt == 0) {
         if (glTimers[0] < KBTickCount()) {
@@ -3173,7 +3134,6 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     Process1WindowsMessage();
 }
 
-VA(0x00405718, 0x4a2)
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
     i32 drawY;
     i32 drawX;
@@ -3321,12 +3281,10 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
     }
 }
 
-VA(0x00405bba, 0x2f)
 void advManager::CompleteDraw(i32 update) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
-VA(0x00405be9, 0x3e0)
 i32 advManager::GetCloudLookup(i32 x, i32 y) {
     u32 cloudMask = 0;
 
@@ -3404,7 +3362,6 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     return giCloudType[cloudMask];
 }
 
-VA(0x00405fc9, 0x245e)
 void advManager::DrawCell(
     i32 mapX,
     i32 mapY,
@@ -3479,7 +3436,7 @@ void advManager::DrawCell(
                 s_drawCloudFrame = GetCloudLookup(mapX, mapY);
             }
             if (s_drawCloudFrame == 0) {
-                if (HAS(drawMask, ADVMGR_DRAW_CLOUD)) {
+                if ((((drawMask) & (ADVMGR_DRAW_CLOUD)))) {
                     TileToBitmap(
                         m_cloudTiles,
                         (mapX + mapY) & CLOUD_VARIANT_MASK,
@@ -3508,7 +3465,7 @@ void advManager::DrawCell(
             s_drawCovered = 0;
         }
 
-        if (HAS(drawMask, ADVMGR_DRAW_CLOUD) && !gbDrawingPuzzle) {
+        if ((((drawMask) & (ADVMGR_DRAW_CLOUD))) && !gbDrawingPuzzle) {
             if (s_drawCovered != 0) {
                 if (s_drawFlipCloud != 0) {
                     FlipIconToBitmap(
@@ -3544,7 +3501,7 @@ void advManager::DrawCell(
                      & ROUTE_BEYOND_MOBILITY_FLAG)
                     != 0) {
                     IconToBitmapColorTable(
-                        m_objectIcons[IDX(TILESET_ROUTE)],
+                        m_objectIcons[(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
@@ -3560,7 +3517,7 @@ void advManager::DrawCell(
                     );
                 } else {
                     IconToBitmap(
-                        m_objectIcons[IDX(TILESET_ROUTE)],
+                        m_objectIcons[(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
@@ -3575,7 +3532,7 @@ void advManager::DrawCell(
                 }
             }
         } else {
-            if (HAS(drawMask, ADVMGR_DRAW_GROUND)) {
+            if ((((drawMask) & (ADVMGR_DRAW_GROUND)))) {
                 s_drawGroundTile = s_drawCell->m_flags;
                 s_drawGroundTile <<= TERRAIN_FLAGS_SHIFT;
                 s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
@@ -3590,9 +3547,9 @@ void advManager::DrawCell(
                 if (s_drawCell->m_objectLayerBit0
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3606,12 +3563,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3635,9 +3592,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3652,12 +3609,12 @@ void advManager::DrawCell(
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
                                 GetIconEntry(
-                                    m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                    m_objectIcons[(s_drawExtra->objectTileset)],
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3681,9 +3638,9 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3697,12 +3654,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3726,9 +3683,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3743,12 +3700,12 @@ void advManager::DrawCell(
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
                                 GetIconEntry(
-                                    m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                    m_objectIcons[(s_drawExtra->objectTileset)],
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3772,14 +3729,14 @@ void advManager::DrawCell(
                 }
             }
 
-            if (HAS(drawMask, ADVMGR_DRAW_OBJECT)) {
+            if ((((drawMask) & (ADVMGR_DRAW_OBJECT)))) {
                 if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3793,7 +3750,7 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
@@ -3807,7 +3764,7 @@ void advManager::DrawCell(
                             }
                         }
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3833,9 +3790,9 @@ void advManager::DrawCell(
                     if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1
                         && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != TILESET_MONS32
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3850,12 +3807,12 @@ void advManager::DrawCell(
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
                                 GetIconEntry(
-                                    m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                    m_objectIcons[(s_drawExtra->objectTileset)],
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3879,11 +3836,11 @@ void advManager::DrawCell(
                 }
             }
 
-            if ((HAS(drawMask, ADVMGR_DRAW_HERO) || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
+            if (((((drawMask) & (ADVMGR_DRAW_HERO))) || (((drawMask) & (ADVMGR_DRAW_HERO_SHADOW))))
                 && gbDrawingPuzzle == 0) {
                 s_drawHasHero = 0;
                 s_drawHero = NULL;
-                if (HAS(drawMask, ADVMGR_DRAW_HERO)) {
+                if ((((drawMask) & (ADVMGR_DRAW_HERO)))) {
                     if (mapX > 0) {
                         s_drawAdjacentCell = GetCell(mapX - 1, mapY);
                         if (s_drawAdjacentCell->m_triggerType
@@ -3909,7 +3866,7 @@ void advManager::DrawCell(
                                     gpWindowManager->m_screen,
                                     s_drawPixelX - CELL_PIXELS,
                                     s_drawPixelY,
-                                    IDX(s_drawMine->guardianType) - IDX(CREATURE_EARTH_ELEMENTAL),
+                                    (s_drawMine->guardianType) - (CREATURE_EARTH_ELEMENTAL),
                                     ICON_DRAW_CLIP,
                                     0,
                                     0,
@@ -3993,12 +3950,12 @@ void advManager::DrawCell(
                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
-                        s_drawHeroType = HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)
+                        s_drawHeroType = (((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                             ? HERO_TYPE_BOAT
-                            : s_drawHero->m_cursorType;
+                            : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = 1;
-                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+                        if ((((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
                             s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                         }
                     }
@@ -4006,7 +3963,7 @@ void advManager::DrawCell(
 
                 if (s_drawHasHero) {
                     if (s_drawHeroFrame & HERO_FRAME_MIRROR_FLAG) {
-                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                        if ((((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
                                 if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_51) {
@@ -4080,7 +4037,7 @@ void advManager::DrawCell(
                                 );
                             }
                             FlipIconToBitmap(
-                                m_heroIcons[IDX(s_drawHeroType)],
+                                m_heroIcons[(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_PIXELS,
                                 s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
@@ -4127,9 +4084,9 @@ void advManager::DrawCell(
                             }
                         }
                     } else {
-                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                        if ((((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT
-                                && HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                                && (((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                                 IconToBitmap(
                                     m_shadowIcon,
                                     gpWindowManager->m_screen,
@@ -4177,7 +4134,7 @@ void advManager::DrawCell(
                                 );
                             }
                             IconToBitmap(
-                                m_heroIcons[IDX(s_drawHeroType)],
+                                m_heroIcons[(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
@@ -4227,10 +4184,10 @@ void advManager::DrawCell(
                 }
 
                 if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
-                    && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
+                    && (m_comboHeroDrawn == 0 || (((drawMask) & (ADVMGR_DRAW_HERO_SHADOW))))
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
-                    if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                    if ((((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                         cursorSuppressed = 1;
                     } else {
                         DrawCursorShadow();
@@ -4240,14 +4197,14 @@ void advManager::DrawCell(
                 }
             }
 
-            if (HAS(drawMask, ADVMGR_DRAW_OVERLAY) || HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)) {
-                if (HAS(drawMask, ADVMGR_DRAW_OVERLAY)
+            if ((((drawMask) & (ADVMGR_DRAW_OVERLAY))) || (((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))) {
+                if ((((drawMask) & (ADVMGR_DRAW_OVERLAY)))
                     && s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                     if (s_drawCell->m_objectDrawnAsOverlay
                         && (gbDrawingPuzzle == 0
-                            || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                            || bPuzzleDraw[(s_drawCell->m_objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -4262,12 +4219,12 @@ void advManager::DrawCell(
                         if (s_drawCell->m_animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
                                                         m_objectIcons
-                                                            [IDX(s_drawCell->m_objectTileset)],
+                                                            [(s_drawCell->m_objectTileset)],
                                                         s_drawCell->m_objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                m_objectIcons[(s_drawCell->m_objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -4293,9 +4250,9 @@ void advManager::DrawCell(
                     while (s_drawExtra != NULL) {
                         if (s_drawExtra->objectDrawnAsOverlay
                             && (gbDrawingPuzzle == 0
-                                || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                                || bPuzzleDraw[(s_drawExtra->objectTileset)])) {
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -4310,12 +4267,12 @@ void advManager::DrawCell(
                             if (s_drawExtra->animatedObject) {
                                 s_drawAnimationLength =
                                     GetIconEntry(
-                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                        m_objectIcons[(s_drawExtra->objectTileset)],
                                         s_drawExtra->objectIndex
                                     )
                                         ->flags;
                                 IconToBitmap(
-                                    m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                    m_objectIcons[(s_drawExtra->objectTileset)],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
@@ -4341,12 +4298,12 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_overlayIndex != MAPCELL_SPRITE_NONE
-                    && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
-                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
+                    && (((((drawMask) & (ADVMGR_DRAW_OVERLAY))) && !s_drawCell->m_drawOverlayOnTop)
+                        || ((((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))
                             && s_drawCell->m_drawOverlayOnTop))
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_overlayTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawCell->m_overlayTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                        m_objectIcons[(s_drawCell->m_overlayTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -4362,12 +4319,12 @@ void advManager::DrawCell(
                     if (s_drawCell->m_animatedOverlay) {
                         s_drawAnimationLength =
                             GetIconEntry(
-                                m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                                m_objectIcons[(s_drawCell->m_overlayTileset)],
                                 s_drawCell->m_overlayIndex
                             )
                                 ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                            m_objectIcons[(s_drawCell->m_overlayTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -4390,12 +4347,12 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop)
-                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
+                    if (((((drawMask) & (ADVMGR_DRAW_OVERLAY))) && !s_drawExtra->drawOverlayOnTop)
+                        || ((((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))
                             && s_drawExtra->drawOverlayOnTop)) {
-                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->overlayTileset)]) {
+                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[(s_drawExtra->overlayTileset)]) {
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                m_objectIcons[(s_drawExtra->overlayTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -4411,12 +4368,12 @@ void advManager::DrawCell(
                             if (s_drawExtra->animatedOverlay) {
                                 s_drawAnimationLength =
                                     GetIconEntry(
-                                        m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                        m_objectIcons[(s_drawExtra->overlayTileset)],
                                         s_drawExtra->overlayIndex
                                     )
                                         ->flags;
                                 IconToBitmap(
-                                    m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                    m_objectIcons[(s_drawExtra->overlayTileset)],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
@@ -4445,7 +4402,6 @@ void advManager::DrawCell(
     }
 }
 
-VA(0x00408427, 0x85)
 class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT) {
         return m_mapData->GetCell(0, 0);
@@ -4454,7 +4410,6 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     }
 }
 
-VA(0x004084ac, 0xeb7)
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     u8* line;
     u8* pixPtr;
@@ -4478,7 +4433,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 xhi;
     i32 yhi;
     mapCell* cell;
-    H2_ENUM_STORAGE(TilesetId, i32) setId;
+    i32 setId;
     i32 owner;
 
     if (partial == 0) {
@@ -4605,7 +4560,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         if (setId == TILESET_X_LOC2
                             && cell->m_triggerType == MAP_OBJECT_ROCK) {
                             color =
-                                gMapColors[IDX(giGroundToTerrain[cell->m_terrainImageIndex])]
+                                gMapColors[(giGroundToTerrain[cell->m_terrainImageIndex])]
                                 + RADAR_TERRAIN_SHADE;
                         } else {
                             switch (setId) {
@@ -4652,10 +4607,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                             break;
                                         default:
                                             color =
-                                                gMapColors[IDX(
-                                                    giGroundToTerrain[cell
-                                                                          ->m_terrainImageIndex]
-                                                )]
+                                                gMapColors[(giGroundToTerrain[cell
+                                                                          ->m_terrainImageIndex])]
                                                 + RADAR_TERRAIN_SHADE;
                                             break;
                                     }
@@ -4676,9 +4629,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                                      : gpGame->m_players[owner].m_color];
                                             break;
                                         default:
-                                            color = gMapColors[IDX(
-                                                giGroundToTerrain[cell->m_terrainImageIndex]
-                                            )];
+                                            color = gMapColors[(giGroundToTerrain[cell->m_terrainImageIndex])];
                                             break;
                                     }
                                     break;
@@ -4850,7 +4801,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 }
 
-VA(0x00409363, 0x112e)
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     HeroEventFlag visitedMaskValue;
     TilesetId icn;
@@ -4910,7 +4860,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         sprintf(
             gText,
             "%s",
-            "\xc3\xf0\xe0\xed\xe8\xf6\xe0"
+            "Граница"
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
@@ -4920,7 +4870,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(
                 gText,
                 "%s",
-                "\xcd\xe5\xe8\xe7\xf3\xf7\xe5\xed\xed\xe0\xff \xf2\xe5\xf0\xf0\xe8\xf2\xee\xf0\xe8\xff"
+                "Неизученная территория"
             );
         } else {
 
@@ -4929,20 +4879,20 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                        "Артефакт"
                     );
                     break;
                 case MAP_OBJECT_OBELISK:
-                    if HAS (currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG) {
+                    if (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4950,15 +4900,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_GAZEBO:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4966,15 +4916,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_FORT:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4982,15 +4932,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_WITCH_DOCTOR_HUT:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4998,15 +4948,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_MERCENARY_CAMP:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5014,15 +4964,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_STANDING_STONES:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5030,15 +4980,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_TREE_OF_KNOWLEDGE:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5046,15 +4996,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_XANADU:
                     if (pHero != NULL
-                        && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                        && (((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5100,17 +5050,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s\n%s",
-                        gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])],
+                        gTerrainNames[(giGroundToTerrain[currentCell->m_terrainImageIndex])],
                         blocked
-                            ? "(\xed\xe5\xeb\xfc\xe7\xff \xea\xee\xef\xe0\xf2\xfc)"
-                            : "(\xec\xee\xe6\xed\xee \xea\xee\xef\xe0\xf2\xfc)"
+                            ? "(нельзя копать)"
+                            : "(можно копать)"
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(
                         gText,
                         "%s",
-                        gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
+                        gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
                     goto quick_info_guarded;
                 case MAP_OBJECT_MINE:
@@ -5119,18 +5069,18 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s",
-                            gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
+                            gMineNames[(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
                     quick_info_guarded:
                         sprintf(
                             guardStr,
-                            "\n\n\xee\xf5\xf0\xe0\xed\xff\xfe\xf2 %s %s",
+                            "\n\nохраняют %s %s",
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
                             ),
-                            gArmyNamesPlural[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
+                            gArmyNamesPlural[(gpGame->m_mines[currentCell->m_objectMetadata]
                                                      .guardianType)]
                         );
                         strcat(gText, guardStr);
@@ -5138,7 +5088,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s",
-                            gMineNames[IDX(gpGame->m_mines[currentCell->m_objectMetadata]
+                            gMineNames[(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
                     }
@@ -5159,7 +5109,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%d %s",
-                            currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
+                            currentCell->m_objectMetadata & (MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
@@ -5167,7 +5117,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gText,
                             "%s %s",
                             GetArmySizeName(
-                                currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
+                                currentCell->m_objectMetadata & (MAP_MONSTER_COUNT_MASK),
                                 ARMY_SIZE_NAME_SENTENCE
                             ),
                             gArmyNamesPlural[currentCell->m_objectIndex]
@@ -5176,10 +5126,10 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case MAP_OBJECT_BARRIER:
                 case MAP_OBJECT_TRAVELER_TENT:
-                    if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if ((((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             xBarrierColor[currentCell->m_objectMetadata & BARRIER_COLOR_MASK]
                         );
                         uppercaseResult = static_cast<char>(
@@ -5190,7 +5140,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s",
-                            gTerrainNames[IDX(giGroundToTerrain[currentCell->m_terrainImageIndex])]
+                            gTerrainNames[(giGroundToTerrain[currentCell->m_terrainImageIndex])]
                         );
                     }
                     break;
@@ -5203,16 +5153,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         iFrame = currentCell->m_overlayIndex;
                         icn = currentCell->m_overlayTileset;
                     }
-                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
+                    expansionSite = (GENERIC_SITE_UNKNOWN);
                     switch (icn) {
                         case TILESET_X_LOC1:
                             if (iFrame < 0) {
                                 break;
                             } else {
                                 if (iFrame < GENERIC_SITE_1_END) {
-                                    expansionSite = IDX(GENERIC_SITE_ALCHEMIST_TOWER);
+                                    expansionSite = (GENERIC_SITE_ALCHEMIST_TOWER);
                                 } else if (iFrame < GENERIC_SITE_2_END) {
-                                    expansionSite = IDX(GENERIC_SITE_ARENA);
+                                    expansionSite = (GENERIC_SITE_ARENA);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
@@ -5222,15 +5172,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (iFrame < GENERIC_ALTAR_END) {
-                                    expansionSite = IDX(GENERIC_SITE_STABLES);
+                                    expansionSite = (GENERIC_SITE_STABLES);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (iFrame < GENERIC_UNUSED_END) {
-                                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
+                                    expansionSite = (GENERIC_SITE_UNKNOWN);
                                 } else if (iFrame < GENERIC_TOWER_END) {
-                                    expansionSite = IDX(GENERIC_SITE_MERMAID);
+                                    expansionSite = (GENERIC_SITE_MERMAID);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (iFrame < GENERIC_SPRING_END) {
-                                    expansionSite = IDX(GENERIC_SITE_SIRENS);
+                                    expansionSite = (GENERIC_SITE_SIRENS);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
@@ -5240,17 +5190,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (iFrame < GENERIC_SITE_3_SPLIT) {
-                                    expansionSite = IDX(GENERIC_SITE_HUT_OF_MAGI);
+                                    expansionSite = (GENERIC_SITE_HUT_OF_MAGI);
                                 } else if (iFrame < GENERIC_SITE_3_END) {
-                                    expansionSite = IDX(GENERIC_SITE_EYE_OF_MAGI);
+                                    expansionSite = (GENERIC_SITE_EYE_OF_MAGI);
                                 }
                             }
                             break;
                     }
-                    if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
+                    if (expansionSite == (GENERIC_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            "Неизвестно"
                         );
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
@@ -5262,9 +5212,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         );
                         strcat(
                             gText,
-                            HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                            (((pHero->m_eventFlags) & (visitedMaskValue)))
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     }
                     break;
@@ -5277,30 +5227,30 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         iFrame = currentCell->m_overlayIndex;
                         icn = currentCell->m_overlayTileset;
                     }
-                    expansionSite = IDX(RECRUITMENT_SITE_UNKNOWN);
+                    expansionSite = (RECRUITMENT_SITE_UNKNOWN);
                     switch (icn) {
                         case TILESET_X_LOC1:
                             if (iFrame < RECRUITMENT_START) {
                                 break;
                             } else {
                                 if (iFrame < RECRUITMENT_1_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_BARROW_MOUNDS);
+                                    expansionSite = (RECRUITMENT_SITE_BARROW_MOUNDS);
                                 } else if (iFrame < RECRUITMENT_2_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_EARTH_ALTAR);
+                                    expansionSite = (RECRUITMENT_SITE_EARTH_ALTAR);
                                 } else if (iFrame < RECRUITMENT_3_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_AIR_ALTAR);
+                                    expansionSite = (RECRUITMENT_SITE_AIR_ALTAR);
                                 } else if (iFrame < RECRUITMENT_4_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_FIRE_ALTAR);
+                                    expansionSite = (RECRUITMENT_SITE_FIRE_ALTAR);
                                 } else if (iFrame < RECRUITMENT_5_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_WATER_ALTAR);
+                                    expansionSite = (RECRUITMENT_SITE_WATER_ALTAR);
                                 }
                             }
                             break;
                     }
-                    if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
+                    if (expansionSite == (RECRUITMENT_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                            "Неизвестно"
                         );
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
@@ -5311,7 +5261,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
                         sprintf(
                             gText,
-                            "\xd0\xe8\xf4\xfb"
+                            "Рифы"
                         );
                     } else {
                         goto quick_info_default;
@@ -5323,16 +5273,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
-                            HAS(pHero->m_eventFlags, visitedMaskValue)
-                                ? "(\xd3\xe6\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
-                                : "(\xdd\xf2\xee \xec\xe5\xf1\xf2\xee \xe5\xf9\xe5 \xed\xe5 \xef\xee\xf1\xe5\xf9\xe5\xed\xee)"
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            (((pHero->m_eventFlags) & (visitedMaskValue)))
+                                ? "(Уже посещено)"
+                                : "(Это место еще не посещено)"
                         );
                     } else {
                         sprintf(
                             gText,
                             "%s",
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
+                            gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                         );
                     }
                     break;
@@ -5349,9 +5299,9 @@ quick_info_ready:
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
-            IDX(currentCell->m_triggerType),
+            (currentCell->m_triggerType),
             currentCell->m_objectMetadata,
-            currentCell->m_flags & IDX(MAP_CELL_OCCUPIED),
+            currentCell->m_flags & (MAP_CELL_OCCUPIED),
             savedTextLocal,
             m_mapOriginX + cellX,
             m_mapOriginY + cellY
@@ -5368,7 +5318,6 @@ quick_info_ready:
     delete pWin;
 }
 
-VA(0x0040a491, 0x2fe)
 void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen) {
     i32 widgetBase;
     i32 whichHero;
@@ -5451,7 +5400,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 
         message.payload.widget.id = widgetBase + LOCATOR_HERO_PORTRAIT_OFFSET;
         message.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-        message.payload.widget.data.value = IDX(heroPtr->m_portrait);
+        message.payload.widget.data.value = (heroPtr->m_portrait);
         m_adventureWindow->BroadcastMessage(message);
     }
 
@@ -5472,7 +5421,6 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
     }
 }
 
-VA(0x0040a78f, 0xcd)
 void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
     double scrollStep;
@@ -5500,7 +5448,6 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-VA(0x0040a85c, 0x292)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 i;
     i32 whichTown;
@@ -5542,13 +5489,13 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             m_adventureWindow->BroadcastMessage(msg);
             msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
             msg.payload.widget.data.value =
-                IDX(gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
-            if (!(gpGame->GetTown(whichTown)->m_buildings & IDX(TOWN_BUILDING_CASTLE))) {
+                (gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
+            if (!(gpGame->GetTown(whichTown)->m_buildings & (TOWN_BUILDING_CASTLE))) {
                 msg.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
             }
             m_adventureWindow->BroadcastMessage(msg);
 
-            if (BitTest(gpGame->m_knownTowns, whichTown)) {
+            if (H2BitTest(gpGame->m_knownTowns, whichTown)) {
                 msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
             } else {
                 msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
@@ -5574,7 +5521,6 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-VA(0x0040aaee, 0x15e)
 void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
     i32 updated;
 
@@ -5628,7 +5574,6 @@ update_bottom_view:
     forceUpdate = gbForceUpdate;
 }
 
-VA(0x0040ac4c, 0x126)
 void advManager::ClearBottomView(void) {
     i32 widgetIndex;
 
@@ -5653,7 +5598,6 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
-VA(0x0040ad72, 0x53b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     i32 updated;
     tag_message msg;
@@ -5812,7 +5756,6 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     return updated;
 }
 
-VA(0x0040b2ad, 0x387)
 i32 advManager::UpdBottomViewNewTurn(void) {
 
     i32 frameIndex;
@@ -5871,9 +5814,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         week,
         "%s: %d  %s: %d",
-        "\xcc\xe5\xf1\xff\xf6" /* "РњРµСЃСЏС†" */,
+        "Месяц"  ,
         gpGame->m_month,
-        "\xcd\xe5\xe4\xe5\xeb\xff" /* "РќРµРґРµР»СЏ" */,
+        "Неделя"  ,
         gpGame->m_week
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5897,7 +5840,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         day,
         "%s: %d",
-        "\xc4\xe5\xed\xfc" /* "Р”РµРЅСЊ" */,
+        "День"  ,
         gpGame->m_day
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5919,7 +5862,6 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     return 1;
 }
 
-VA(0x0040b634, 0x384)
 i32 advManager::UpdBottomViewResMsg(void) {
 
     i32 iconWidth;
@@ -5992,7 +5934,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             iconWidth,
             iconHeight,
             "resource.icn",
-            IDX(giBottomViewResource),
+            (giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
             WIDGET_KIND_ICON_DIRECT,
@@ -6029,7 +5971,6 @@ i32 advManager::UpdBottomViewResMsg(void) {
     return 1;
 }
 
-VA(0x0040b9b8, 0x37b)
 i32 advManager::UpdBottomViewKingdom(void) {
 
     i32 numVillage;
@@ -6045,22 +5986,22 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
     ClearBottomView();
     iCurBottomView = BOTTOM_VIEW_KINGDOM;
-    rowY[IDX(RES_WOOD)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_MERCURY)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_ORE)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_SULFUR)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_GEMS)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    rowY[IDX(RES_GOLD)] = KINGDOM_VIEW_TOWN_TEXT_Y;
+    rowY[(RES_WOOD)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_MERCURY)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_ORE)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_SULFUR)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_CRYSTAL)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_GEMS)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    rowY[(RES_GOLD)] = KINGDOM_VIEW_TOWN_TEXT_Y;
     rowY[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
     rowY[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
-    textX[IDX(RES_WOOD)] = KINGDOM_VIEW_WOOD_TEXT_X;
-    textX[IDX(RES_MERCURY)] = KINGDOM_VIEW_MERCURY_TEXT_X;
-    textX[IDX(RES_ORE)] = KINGDOM_VIEW_ORE_TEXT_X;
-    textX[IDX(RES_SULFUR)] = KINGDOM_VIEW_SULFUR_TEXT_X;
-    textX[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
-    textX[IDX(RES_GEMS)] = KINGDOM_VIEW_GEMS_TEXT_X;
-    textX[IDX(RES_GOLD)] = KINGDOM_VIEW_GOLD_TEXT_X;
+    textX[(RES_WOOD)] = KINGDOM_VIEW_WOOD_TEXT_X;
+    textX[(RES_MERCURY)] = KINGDOM_VIEW_MERCURY_TEXT_X;
+    textX[(RES_ORE)] = KINGDOM_VIEW_ORE_TEXT_X;
+    textX[(RES_SULFUR)] = KINGDOM_VIEW_SULFUR_TEXT_X;
+    textX[(RES_CRYSTAL)] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
+    textX[(RES_GEMS)] = KINGDOM_VIEW_GEMS_TEXT_X;
+    textX[(RES_GOLD)] = KINGDOM_VIEW_GOLD_TEXT_X;
     textX[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_CASTLE_TEXT_X;
     textX[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_VILLAGE_TEXT_X;
     numVillage = 0;
@@ -6102,7 +6043,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
     for (i = 0; i < gpCurPlayer->m_townCount; ++i) {
         if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_buildings
-            & IDX(TOWN_BUILDING_CASTLE)) {
+            & (TOWN_BUILDING_CASTLE)) {
             ++nCastles;
         } else {
             ++numVillage;
@@ -6151,7 +6092,6 @@ i32 advManager::UpdBottomViewKingdom(void) {
     return 1;
 }
 
-VA(0x0040bd33, 0x5ef)
 i32 advManager::UpdBottomViewHero(void) {
 
     i32 iconX;
@@ -6208,7 +6148,7 @@ i32 advManager::UpdBottomViewHero(void) {
         displayIndex = 0;
         creatureIcons = gpResourceManager->GetIcon("mons32.icn");
         for (slotNumber = 0; slotNumber < BOTTOM_HERO_ARMY_SLOTS; ++slotNumber) {
-            creature = IDX(targetHero->m_army.m_creatureTypes[slotNumber]);
+            creature = (targetHero->m_army.m_creatureTypes[slotNumber]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
                 u8 iconPositions[BOTTOM_HERO_ICON_POSITION_BYTES] =
                     {50, 3, 96, 3, 50, 17, 73, 17, 96, 17, 27, 32, 73, 32, 119, 32};
@@ -6306,7 +6246,6 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
-VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
 
     i32 creatureCount;
@@ -6365,7 +6304,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
     msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     msg.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
-    msg.payload.widget.data.value = IDX(targetHero->m_portrait);
+    msg.payload.widget.data.value = (targetHero->m_portrait);
     win->BroadcastMessage(msg);
     msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     msg.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
@@ -6426,7 +6365,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                        == CREATURE_NONE) {
                     ++idx;
                 }
-                monster = IDX(targetHero->m_army.m_creatureTypes[idx]);
+                monster = (targetHero->m_army.m_creatureTypes[idx]);
                 if (monster != ARMY_QUICK_EMPTY_SLOT) {
                     stackIcons[ii] = new iconWidget(
                         static_cast<i16>(
@@ -6463,7 +6402,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     sizeWidgets[ii] = new textWidget(
                         static_cast<i16>(armyStart + ii * ARMY_QUICK_ICON_SIZE),
                         static_cast<i16>(
-                            HERO_QUICK_DETAILED_CREATURE_Y + IDX(ARMY_QUICK_ICON_SIZE)
+                            HERO_QUICK_DETAILED_CREATURE_Y + (ARMY_QUICK_ICON_SIZE)
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
@@ -6514,7 +6453,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             while (targetHero->m_army.m_creatureTypes[idx] == CREATURE_NONE) {
                 ++idx;
             }
-            monster = IDX(targetHero->m_army.m_creatureTypes[idx]);
+            monster = (targetHero->m_army.m_creatureTypes[idx]);
             stackIcons[ii] = new iconWidget(
                 static_cast<i16>(
                     armyStart + stride * ii
@@ -6577,7 +6516,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 while (targetHero->m_army.m_creatureTypes[idx] == CREATURE_NONE) {
                     ++idx;
                 }
-                monster = IDX(targetHero->m_army.m_creatureTypes[idx]);
+                monster = (targetHero->m_army.m_creatureTypes[idx]);
                 stackIcons[ii] = new iconWidget(
                     static_cast<i16>(
                         armyStart + stride * (ii - HERO_QUICK_SECOND_ROW_FIRST_SLOT)
@@ -6657,8 +6596,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(iconRef);
 }
 
-VA(0x0040d11d, 0xdc)
-char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar) {
+char* advManager::GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar) {
     if (giDebugLevel > 0) {
         sprintf(
             cArmySizeName,
@@ -6668,33 +6606,32 @@ char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVarian
         return cArmySizeName;
     }
     if (armySize < ARMY_FEW_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_FEW][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_FEW][(grammar)];
     }
     if (armySize < ARMY_SEVERAL_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_SEVERAL][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_SEVERAL][(grammar)];
     }
     if (armySize < ARMY_PACK_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_PACK][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_PACK][(grammar)];
     }
     if (armySize < ARMY_LOTS_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_LOTS][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_LOTS][(grammar)];
     }
     if (armySize < ARMY_HORDE_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_HORDE][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_HORDE][(grammar)];
     }
     if (armySize < ARMY_THRONG_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_THRONG][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_THRONG][(grammar)];
     }
     if (armySize < ARMY_SWARM_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_SWARM][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_SWARM][(grammar)];
     }
     if (armySize < ARMY_ZOUNDS_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_ZOUNDS][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_ZOUNDS][(grammar)];
     }
-    return gArmySizeNames[ARMY_SIZE_LEGION][IDX(grammar)];
+    return gArmySizeNames[ARMY_SIZE_LEGION][(grammar)];
 }
 
-VA(0x0040d1f9, 0xcd1)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
 
     i32 creatureCount;
@@ -6761,24 +6698,24 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = TOWN_QUICK_PORTRAIT_WIDGET;
     message.payload.widget.data.value =
-        IDX(townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
-    if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
+        (townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
+    if ((gpGame->GetTown(townId)->m_buildings & (1 << (BUILDING_SLOT_CASTLE))) == 0) {
         message.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
     }
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
-        || BitTest(gpGame->m_knownTowns, static_cast<i8>(townPtr->m_id)) == 0) {
+        || H2BitTest(gpGame->m_knownTowns, static_cast<i8>(townPtr->m_id)) == 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        message.payload.widget.data.value = (WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message);
     }
 
     if (townPtr->m_owner == -1) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        message.payload.widget.data.value = (WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message);
         ++message.payload.widget.id;
         window->BroadcastMessage(message);
@@ -6811,12 +6748,12 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(
                 blankLabel,
-                "\xcd\xe5\xe8\xe7\xe2\xe5\xf1\xf2\xed\xee"
+                "Неизвестно"
             );
         } else {
             sprintf(
                 blankLabel,
-                "\xcd\xe5\xf2"
+                "Нет"
             );
         }
         noArmyText = new textWidget(
@@ -6884,7 +6821,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             while (townPtr->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
                 ++creatureSlot;
             }
-            monster = IDX(townPtr->m_army.m_creatureTypes[creatureSlot]);
+            monster = (townPtr->m_army.m_creatureTypes[creatureSlot]);
             stackIcons[wIndex] = new iconWidget(
                 static_cast<i16>(
                     basePos + stride * wIndex + fiveShift
@@ -6966,7 +6903,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 while (townPtr->m_army.m_creatureTypes[creatureSlot] == CREATURE_NONE) {
                     ++creatureSlot;
                 }
-                monster = IDX(townPtr->m_army.m_creatureTypes[creatureSlot]);
+                monster = (townPtr->m_army.m_creatureTypes[creatureSlot]);
                 stackIcons[wIndex] = new iconWidget(
                     static_cast<i16>(
                         basePos + stride * (wIndex - topRow)
@@ -7059,7 +6996,6 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(creatureIcon);
 }
 
-VA(0x0040deca, 0x100)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
 
     if (!bShowIt) {
@@ -7089,18 +7025,15 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
 }
 
-VA(0x0040dfca, 0x14)
 void advManager::DeactivateCurrTown(void) {
     gpCurPlayer->m_currentTown = -1;
 }
 
-VA(0x0040dfde, 0x1c)
 void advManager::DeactivateCurrHero(void) {
     DemobilizeCurrHero();
     gpCurPlayer->m_currentHero = -1;
 }
 
-VA(0x0040dffa, 0x42)
 void advManager::MobilizeCurrHero(i32 update) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7111,7 +7044,6 @@ void advManager::MobilizeCurrHero(i32 update) {
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
-VA(0x0040e03c, 0x14a)
 void advManager::DemobilizeCurrHero(void) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7129,7 +7061,7 @@ void advManager::DemobilizeCurrHero(void) {
     hp->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
         hp->m_eventFlags =
-            HeroEventFlag(static_cast<i32>(hp->m_eventFlags) | IDX(HERO_EVENT_EMBARKED));
+            HeroEventFlag(static_cast<i32>(hp->m_eventFlags) | (HERO_EVENT_EMBARKED));
     }
     cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
     cell->m_objectMetadata = hp->m_id;
@@ -7139,7 +7071,6 @@ void advManager::DemobilizeCurrHero(void) {
     UpdateScreen(0, 0);
 }
 
-VA(0x0040e186, 0x1ee)
 void advManager::SetTownContext(i32 townId) {
     DeactivateCurrHero();
     gpCurPlayer->m_currentTown = static_cast<i8>(townId);
@@ -7171,17 +7102,16 @@ void advManager::SetTownContext(i32 townId) {
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
     townNo =
-        IDX(giGroundToTerrain[GetCell(tp->m_x, tp->m_y)
+        (giGroundToTerrain[GetCell(tp->m_x, tp->m_y)
                                   ->m_terrainImageIndex]);
     if (static_cast<TerrainType>(townNo) != m_currentTerrain) {
         m_currentTerrain = townNo;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
     }
     gpInputManager->ForceMouseMove();
     m_lastHoverCell = 0;
 }
 
-VA(0x0040e374, 0x34a)
 void advManager::SetHeroContext(i32 heroId, i32 update) {
     if (heroId == INVALID_HERO) {
         return;
@@ -7199,9 +7129,9 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorMapX = VIEW_CENTER_CELL;
     m_previousCursorMapY = CURSOR_INVALID_POSITION;
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
-    m_cursorType = HAS(contextHero->m_eventFlags, HERO_EVENT_EMBARKED)
+    m_cursorType = (((contextHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
         ? HERO_TYPE_BOAT
-        : contextHero->m_cursorType;
+        : static_cast<HeroCursorType>(contextHero->m_cursorType);
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
@@ -7247,7 +7177,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     heroSlot = static_cast<i32>(giGroundToTerrain[currentCell->m_terrainImageIndex]);
     if (static_cast<TerrainType>(heroSlot) != m_currentTerrain) {
         m_currentTerrain = heroSlot;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
     }
     if (!gbHeroMoving) {
         gpInputManager->ForceMouseMove();
@@ -7255,7 +7185,6 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     }
 }
 
-VA(0x0040e6be, 0x1e7)
 void advManager::DoHeroKnob(void) {
     i32 prevPage = gpCurPlayer->m_heroLocatorPage;
     i32 count = gpCurPlayer->m_heroCount;
@@ -7303,7 +7232,6 @@ void advManager::DoHeroKnob(void) {
     UpdateHeroLocators(1, 1);
 }
 
-VA(0x0040e8a5, 0x1e7)
 void advManager::DoTownKnob(void) {
     i32 prevPage = gpCurPlayer->m_townLocatorPage;
     i32 count = gpCurPlayer->m_townCount;
@@ -7351,7 +7279,6 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
-VA(0x0040ea8c, 0x323)
 void advManager::CastSpell(SpellType spell) {
     hero* hero;
     CreatureType mineGuard;
@@ -7384,7 +7311,7 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
+                    "Вы должны встать у входа перед шахтой (лесопилкой или лабораторией алхимика), чтобы направить это заклинание.",
                     1,
                     -1,
                     -1,
@@ -7420,7 +7347,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb.",
+                "Теперь все вражеские герои полностью опознаны.",
                 1,
                 -1,
                 -1,
@@ -7440,7 +7367,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
+                    "Ваш герой слишком измотан, чтобы направлять заклинания сегодня. Попробуйте завтра.",
                     1,
                     -1,
                     -1,
@@ -7479,7 +7406,6 @@ void advManager::CastSpell(SpellType spell) {
     }
 }
 
-VA(0x0040edaf, 0x24b)
 i32 SaveGame(void) {
     i32 ok = 0;
     i32 nPlayers = 0;
@@ -7530,8 +7456,8 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
-                    /* "РРіСЂР° СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅР°." */,
+                "Игра успешно сохранена."
+                     ,
                 1,
                 -1,
                 -1,
@@ -7549,7 +7475,6 @@ i32 SaveGame(void) {
     return ok;
 }
 
-VA(0x0040effa, 0x8b)
 void advManager::CheckCastSpell(void) {
     if (gpCurPlayer->m_currentHero != INVALID_HERO) {
         MobilizeCurrHero(0);
@@ -7569,7 +7494,6 @@ void advManager::CheckCastSpell(void) {
     }
 }
 
-VA(0x0040f085, 0x285)
 MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
@@ -7587,8 +7511,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
-                            if (HAS(message.payload.widget.modifiers,
-                                    MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                            if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                             } else {
                                 if (gpWindowManager->m_dialogResult == TRAVEL_DIALOG_ACCEPT) {
                                     result = 1;
@@ -7633,7 +7556,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                         gpAdvManager->m_mapOriginX + mouseX,
                         gpAdvManager->m_mapOriginY + mouseY
                     );
-                    if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+                    if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
                         || (cell->m_flags & HOVER_OBJECT_BLOCKED)) {
                         gpWindowManager->m_dialogResult = 0;
                         gpMouseManager->SetPointer(POINTER_DEFAULT);
@@ -7658,7 +7581,6 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0040f30a, 0x12b4)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     i32 updateCount;
     i32 tileX;
@@ -8045,12 +7967,10 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     return 1;
 }
 
-VA(0x004105be, 0x2d)
 i32 advManager::ComboDraw(i32 update) {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-VA(0x004105eb, 0x2b6)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundRadius;
     i32 edgeOffset;
@@ -8065,7 +7985,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
         if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             if (stopSounds != 0) {
                 gpSoundManager->StopSample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
+                    m_loopingSamples[(m_activeSounds[edgeOffset].soundId)]
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
                 m_activeSounds[edgeOffset].volume = ENVIRONMENT_SOUND_DEFAULT_VOLUME;
@@ -8120,14 +8040,14 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
                 && m_activeSounds[edgeOffset].volume > ENVIRONMENT_SOUND_MAX_DISTANCE) {
                 gpSoundManager->StopSample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
+                    m_loopingSamples[(m_activeSounds[edgeOffset].soundId)]
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
             }
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
-                && (m_activeSoundMask & BIT(m_activeSounds[edgeOffset].soundId)) != 0) {
+                && (m_activeSoundMask & (1 << (m_activeSounds[edgeOffset].soundId))) != 0) {
                 gpSoundManager->ModifySample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)],
+                    m_loopingSamples[(m_activeSounds[edgeOffset].soundId)],
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
                 );
             }
@@ -8135,7 +8055,6 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     }
 }
 
-VA(0x004108a1, 0x5a)
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
@@ -8148,7 +8067,6 @@ void advManager::CheckLoadSample(i32 index) {
     }
 }
 
-VA(0x004108fb, 0x43e)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* cell = m_mapData->GetCell(x, y);
     AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
@@ -8158,7 +8076,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
         return ADVMGR_SOUND_COASTLINE;
     }
 
-    if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+    if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
         switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_ARCHER_HOUSE:
                 return ADVMGR_SOUND_DWELLING;
@@ -8205,27 +8123,27 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
             case MAP_OBJECT_WATER_WHEEL:
                 return ADVMGR_SOUND_WATER_WHEEL;
             case MAP_OBJECT_ALCHEMIST_LAB:
-                if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
                 }
                 break;
             case MAP_OBJECT_MINE:
-                if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_MINE;
                 }
                 break;
             case MAP_OBJECT_ABANDONED_MINE:
-                if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_ABANDONED_MINE;
                 }
                 break;
             case MAP_OBJECT_SAWMILL:
-                if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_SAWMILL;
                 }
                 break;
             case MAP_OBJECT_DAEMON_CAVE:
-                if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_DAEMON_CAVE;
                 }
                 break;
@@ -8270,7 +8188,6 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-VA(0x00410d39, 0x217)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
     i32 distanceLimit;
@@ -8290,7 +8207,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         if (m_activeSounds[activeIndex].soundId == soundId) {
             if (m_activeSounds[activeIndex].volume > distance) {
                 m_activeSounds[activeIndex].volume = distance;
-                m_activeSoundMask |= BIT(m_activeSounds[activeIndex].soundId);
+                m_activeSoundMask |= (1 << (m_activeSounds[activeIndex].soundId));
             }
             return;
         }
@@ -8311,20 +8228,19 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
 
     if (soundSlot != -1) {
         if (m_activeSounds[soundSlot].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
-            gpSoundManager->StopSample(m_loopingSamples[IDX(m_activeSounds[soundSlot].soundId)]);
+            gpSoundManager->StopSample(m_loopingSamples[(m_activeSounds[soundSlot].soundId)]);
         }
         m_activeSounds[soundSlot].soundId = soundId;
         m_activeSounds[soundSlot].volume = distance;
-        CheckLoadSample(IDX(soundId));
-        m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 1;
-        m_loopingSamples[IDX(soundId)]->m_playbackData.channelType = ENVIRONMENT_SOUND_CHANNEL_TYPE;
-        gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
-        m_activeSoundMask ^= 1 << IDX(m_activeSounds[soundSlot].soundId);
+        CheckLoadSample((soundId));
+        m_loopingSamples[(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
+        m_loopingSamples[(soundId)]->m_playbackData.loopCount = 1;
+        m_loopingSamples[(soundId)]->m_playbackData.channelType = ENVIRONMENT_SOUND_CHANNEL_TYPE;
+        gpSoundManager->MemorySample(m_loopingSamples[(soundId)]);
+        m_activeSoundMask ^= 1 << (m_activeSounds[soundSlot].soundId);
     }
 }
 
-VA(0x00410f50, 0x3c3)
 void advManager::TeleportTo(
     hero* mapHero,
     i32 destinationX,
@@ -8333,7 +8249,7 @@ void advManager::TeleportTo(
     i32 skipMapChange
 ) {
     i32 savedShow;
-    H2_ENUM_STORAGE(TerrainType, i32) terrain;
+    i32 terrain;
     mapCell* cellOld2;
     i32 oldCellFlag26;
     i32 unused;
@@ -8403,7 +8319,7 @@ void advManager::TeleportTo(
         m_mapOriginX + TELEPORT_VIEW_CENTER,
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         giCurPlayer,
-        giVisRange[IDX(mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
+        giVisRange[(mapHero->m_secondarySkills[(HERO_SKILL_SCOUTING)])]
             + (mapHero->HasArtifact(ARTIFACT_TELESCOPE) != 0)
     );
 
@@ -8443,7 +8359,7 @@ void advManager::TeleportTo(
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags =
-                HeroEventFlag(static_cast<i32>(mapHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED));
+                HeroEventFlag(static_cast<i32>(mapHero->m_eventFlags) | (HERO_EVENT_EMBARKED));
         }
         m_cursorActive = 0;
     }
@@ -8456,7 +8372,7 @@ void advManager::TeleportTo(
     terrain = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
     if (terrain != m_currentTerrain) {
         m_currentTerrain = terrain;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
     }
     Reseed(0, 0);
     UpdateRadar(1, 0);
@@ -8464,7 +8380,6 @@ void advManager::TeleportTo(
     ForceNewHover();
 }
 
-VA(0x00411313, 0x202)
 void advManager::DimensionDoor(void) {
     hero* targetHero;
     heroWindow* window;
@@ -8488,12 +8403,12 @@ void advManager::DimensionDoor(void) {
         newX = m_mapOriginX + m_lastHoverCell;
         newY = m_mapOriginY + m_hoverCellY;
         targetCell = GetCell(newX, newY);
-        if ((HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+        if (((((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
              && giGroundToTerrain[targetCell->m_terrainImageIndex] != TERRAIN_WATER)
-            || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+            || (!(((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!",
+                "Не удалось открыть Пространственные врата!!!",
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8508,7 +8423,7 @@ void advManager::DimensionDoor(void) {
         } else {
             gpSoundManager->SwitchAmbientMusic(TRAVEL_MUSIC);
             TeleportTo(targetHero, newX, newY, 0, 0);
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
         }
         gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
@@ -8516,13 +8431,12 @@ void advManager::DimensionDoor(void) {
     }
 }
 
-VA(0x00411515, 0xe0)
 MessageDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1) {
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[(gpAdvManager->m_currentTerrain)]
         );
     }
 
@@ -8553,7 +8467,6 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004115f5, 0x408)
 void advManager::TownGate(SpellType spellId) {
     hero* targetHero;
     i32 dist;
@@ -8568,7 +8481,7 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            "Нет доступного города.  Заклинание прервано!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8581,9 +8494,9 @@ void advManager::TownGate(SpellType spellId) {
         );
         return;
     }
-    if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if ((((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         NormalDialog(
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
+            "Заклинание прервано! Вы должны быть на суше, чтобы это заклинание сработало.",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8605,7 +8518,7 @@ void advManager::TownGate(SpellType spellId) {
         );
         sprintf(
             gText,
-            "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
+            "{Портал города}\x0a\x0aВыберите город, куда хотите перенестись:"
         );
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
@@ -8651,7 +8564,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            "Ближайший город оккупирован. Заклинание прервано!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8679,10 +8592,9 @@ void advManager::TownGate(SpellType spellId) {
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].GiveSpells(NULL);
     targetHero->m_locationType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE;
     targetHero->m_occupiedTown = gpCurPlayer->m_townIds[selectedTown];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
 }
 
-VA(0x004119fd, 0x54c)
 void advManager::SummonBoat(void) {
     i32 placeX;
     hero* summonHero;
@@ -8831,9 +8743,9 @@ summon_done:
     Reseed(0, 0);
     if (!foundBoat) {
         NormalDialog(
-            "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
-                "\xf0\xe0\xe1\xeb\xfc!!!"
-                /* "РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёР·РІР°С‚СЊ РєРѕСЂР°Р±Р»СЊ!!!" */,
+            "Не удалось призвать ко"
+                "рабль!!!"
+                 ,
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8847,7 +8759,6 @@ summon_done:
     }
 }
 
-VA(0x00411f49, 0x44e)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     hero* hero;
     i32 nPath;
@@ -8862,7 +8773,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 mapY;
     mapCell* thisTile;
     i32 dir;
-    H2_ENUM_STORAGE(TerrainType, i32) terr;
+    i32 terr;
     BaseWidgetCommand buttonFrame;
 
     reachable = 0;
@@ -8906,7 +8817,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 giGroundToTerrain[nextTile->m_terrainImageIndex],
                 dir & 1,
                 ROUTE_TERRAIN_COST_INFINITY,
-                IDX(hero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+                (hero->m_secondarySkills[(HERO_SKILL_PATHFINDING)]),
                 thisTile->m_isRoad,
                 nextTile->m_isRoad
             );
@@ -8914,7 +8825,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 terr,
                 dir & 1,
                 remain,
-                IDX(hero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+                (hero->m_secondarySkills[(HERO_SKILL_PATHFINDING)]),
                 thisTile->m_isRoad,
                 nextTile->m_isRoad
             );
@@ -8990,7 +8901,6 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     }
 }
 
-VA(0x00412397, 0xd4)
 void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     hero* currentHero;
 
@@ -9024,7 +8934,6 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     }
 }
 
-VA(0x0041246b, 0x6b)
 void advManager::CheckDimHero(void) {
     if (!gbThisNetHumanPlayer[giCurPlayer] || gpCurPlayer->CurrentHero() == INVALID_HERO) {
         return;
@@ -9036,7 +8945,6 @@ void advManager::CheckDimHero(void) {
     }
 }
 
-VA(0x004124d6, 0x5d)
 void advManager::CheckDimNextHeroBut(void) {
     BaseWidgetCommand frame;
     frame = gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->HasMobileHero()
@@ -9050,7 +8958,6 @@ void advManager::CheckDimNextHeroBut(void) {
     );
 }
 
-VA(0x00412533, 0x115)
 void advManager::SeedTo(i32 targetX, i32 targetY) {
     hero* currentHero;
 
@@ -9071,7 +8978,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+            (currentHero->m_secondarySkills[(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             0,
@@ -9086,7 +8993,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+            (currentHero->m_secondarySkills[(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             1,
@@ -9095,7 +9002,6 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
     }
 }
 
-VA(0x00412648, 0x4f)
 void advManager::ForceNewHover(void) {
     i32 x;
     i32 y;
@@ -9108,8 +9014,7 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
-VA(0x00412697, 0x1a8)
-void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
+void advManager::ScreenScroll(MapDirection direction, i32 updatePointer) {
     i32 xOrigin;
     i32 yOrigin;
 
@@ -9149,7 +9054,7 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 
     if (updatePointer) {
-        gpMouseManager->SetPointer(IDX(direction) + IDX(HOVER_SCROLL_FRAME_FIRST));
+        gpMouseManager->SetPointer((direction) + (HOVER_SCROLL_FRAME_FIRST));
     }
 
     if (xOrigin < SCROLL_MIN_ORIGIN) {
@@ -9175,7 +9080,6 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 }
 
-VA(0x0041283f, 0x16e)
 void advManager::CheckScreenScroll(void) {
     i32 mouseX;
     i32 mouseY;
@@ -9220,7 +9124,6 @@ void advManager::CheckScreenScroll(void) {
     }
 }
 
-VA(0x004129ad, 0x65)
 i32 advManager::MouseInScrollZone(void) {
     i32 x;
     i32 y;
@@ -9235,7 +9138,6 @@ i32 advManager::MouseInScrollZone(void) {
     return 0;
 }
 
-VA(0x00412a12, 0x268)
 void advManager::SetInitialMapOrigin(void) {
     game* gameState;
     town* currentTown9;
@@ -9284,13 +9186,12 @@ void advManager::SetInitialMapOrigin(void) {
     m_currentTerrain = giGroundToTerrain
         [GetCell(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET)
              ->m_terrainImageIndex];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
     Reseed(0, 0);
     CheckDimNextHeroBut();
 }
 
-VA(0x00412c7a, 0x212)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer(
@@ -9329,18 +9230,18 @@ void advManager::LoadRemote(void) {
     gSoundBackendsReady = 1;
 
     if (static_cast<i8>(gpGame->m_cheated)) {
-        DATA(0x00523ffc) static i32 cheatWarned = 0;
+        static i32 cheatWarned = 0;
         if (!cheatWarned) {
             cheatWarned = 1;
             sprintf(
                 gText,
-                "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
+                "Используются чит-коды!\n"
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     if (giDebugLevel > 0) {
-        DATA(0x00524000) static i32 debugWarned = 0;
+        static i32 debugWarned = 0;
         if (!debugWarned) {
             debugWarned = 1;
             sprintf(
@@ -9352,7 +9253,6 @@ void advManager::LoadRemote(void) {
     }
 }
 
-VA(0x00412e8c, 0x1f5)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
     i32 playerExited5;
@@ -9422,7 +9322,6 @@ char* advManager::CheckHandleNet(void) {
     return NULL;
 }
 
-VA(0x00413081, 0x9b)
 MessageDispatchResult
 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE) {
@@ -9437,7 +9336,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
                 break;
 
             case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
-                if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return MESSAGE_DISPATCH_FORWARD;
@@ -9452,7 +9351,6 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x0041311c, 0x1b8)
 void advManager::TrimLoopingSounds(i32 maxSamples) {
     if (giHighMemBuffer > 0) {
         maxSamples += giHighMemBuffer / HIGH_MEMORY_BUFFER_DIVISOR;
@@ -9474,7 +9372,7 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
     for (i = 0; i < SOUND_CELL_COUNT; ++i) {
         if (m_activeSounds[i].soundId >= ADVMGR_SOUND_BUOY
             && m_activeSounds[i].soundId < ADVMGR_ENVIRONMENT_SOUND_COUNT) {
-            ++keep[IDX(m_activeSounds[i].soundId)];
+            ++keep[(m_activeSounds[i].soundId)];
         }
     }
 
@@ -9504,7 +9402,6 @@ disposeSamples:
     }
 }
 
-VA(0x004132d4, 0xc8)
 void advManager::DisableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9527,7 +9424,6 @@ void advManager::DisableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
-VA(0x0041339c, 0xc8)
 void advManager::EnableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9550,7 +9446,6 @@ void advManager::EnableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
-VA(0x00413464, 0x142)
 void advManager::SaveAdventureBorder(void) {
 
     if (m_adventureBorder != NULL) {
@@ -9579,7 +9474,6 @@ void advManager::SaveAdventureBorder(void) {
     }
 }
 
-VA(0x004135a6, 0x134)
 void advManager::DrawAdventureBorder(void) {
     u8* savedPixels;
     u8* screen;
@@ -9613,7 +9507,6 @@ void advManager::DrawAdventureBorder(void) {
     }
 }
 
-VA(0x004136da, 0x37a)
 i32 advManager::FindAdjacentMonster(
     i32 originX,
     i32 originY,
@@ -9696,7 +9589,6 @@ foundAdjacentMonster:
     return 1;
 }
 
-VA(0x00413a54, 0xf9)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
         gbThisNetGotAdventureControl = true;
@@ -9727,7 +9619,6 @@ void ComputeAdvNetControl(void) {
     }
 }
 
-VA(0x00413b4d, 0xda)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     if (MAP_EXTRA_AT_WFIRST(x, y) & mask) {
         return 1;
@@ -9748,7 +9639,6 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     return 0;
 }
 
-VA(0x00413c27, 0x4d3)
 void advManager::ViewPuzzle(void) {
     i32 puzzleX;
     i32 puzzleY;
@@ -9840,7 +9730,7 @@ void advManager::ViewPuzzle(void) {
     }
 
     for (j = 0; j < PUZZLE_PIECE_COUNT; ++j) {
-        if (!BitTest(puzzlePiecesRemoved, j)) {
+        if (!H2BitTest(puzzlePiecesRemoved, j)) {
             puzzleIcn->DrawToBuffer(0, 0, order[j], ICON_DRAW_NORMAL);
             ++visibleCount;
         }
@@ -9864,10 +9754,9 @@ void advManager::ViewPuzzle(void) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
     UpdateRadar(1, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
 }
 
-VA(0x004140fa, 0x79)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     i32 unusedPuzzle0;
     i32 unused1;
@@ -9880,7 +9769,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = false;
     IconToBitmap(
-        m_objectIcons[IDX(TILESET_ROUTE)],
+        m_objectIcons[(TILESET_ROUTE)],
         gpWindowManager->m_screen,
         (right - left) * PUZZLE_TILE_SIZE - PUZZLE_X_TRIM,
         (bottom - top) * PUZZLE_TILE_SIZE,
@@ -9894,7 +9783,6 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
-VA(0x00414173, 0x2a4)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
@@ -9924,7 +9812,7 @@ void advManager::AdvPanel(void) {
             adventurePanel->BroadcastMessage(message);
             message.payload.widget.id = PANEL_DISABLED_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+            message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
             adventurePanel->BroadcastMessage(message);
         }
 
@@ -9942,7 +9830,7 @@ void advManager::AdvPanel(void) {
                     );
                     RedrawAdvScreen(1, 0);
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[(m_currentTerrain)]
                     );
                 } else if (xIsPlayingExpansionCampaign) {
                     SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
@@ -9954,7 +9842,7 @@ void advManager::AdvPanel(void) {
                     );
                     RedrawAdvScreen(1, 0);
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[(m_currentTerrain)]
                     );
                 } else {
                     gpGame->ShowScenInfo();
@@ -9977,11 +9865,10 @@ void advManager::AdvPanel(void) {
     }
 }
 
-VA(0x00414417, 0x14b)
 MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+        if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -10038,14 +9925,13 @@ MessageDispatchResult APanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.id = (WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x00414562, 0x1e5)
 i32 advManager::ControlPanel(void) {
     tag_message message;
 
@@ -10071,14 +9957,14 @@ i32 advManager::ControlPanel(void) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.id = CONTROL_RESTART;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
         panel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
         panel->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEW_GAME;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = (WIDGET_COMMAND_DIMMED);
         panel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
@@ -10107,14 +9993,13 @@ i32 advManager::ControlPanel(void) {
     return 0;
 }
 
-VA(0x00414747, 0x279)
 MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     char question[CONTROL_CONFIRMATION_SIZE];
     i32 helpIndex;
 
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+        if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 helpIndex = PANEL_NO_HELP;
@@ -10157,29 +10042,29 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0"
-                                    "\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4"
-                                    "\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                    /* "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РЅР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°?  (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)" */
+                                "Вы действительно "
+                                    "хотите начать сна"
+                                    "чала?  (Эта игра буд"
+                                    "ет потеряна)"
+
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc "
-                                    "\xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0"
-                                    "\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
-                                    /* "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ РЅРѕРІСѓСЋ РёРіСЂСѓ? (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)" */
+                                "Вы действительно "
+                                    "хотите загрузить "
+                                    "новую игру? (Эта игр"
+                                    "а будет потеряна)"
+
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
                             strcpy(
                                 question,
-                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
-                                    "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?"
-                                    /* "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?" */
+                                "Вы действительно "
+                                    "хотите выйти?"
+
                             );
                         confirm_reset:
                             handled = 1;
@@ -10215,14 +10100,13 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.id = (WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004149c0, 0x1a2)
 void advManager::SystemOptions(void) {
     tag_message message;
     i32 oldInterfaceMode;
@@ -10272,25 +10156,24 @@ void advManager::SystemOptions(void) {
     }
 }
 
-VA(0x00414b62, 0x320)
 void UpdateSystemOptions(i32 initialDraw) {
     AdventureMusicQuality musicQuality;
     tag_message msg;
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_VOLUME);
+    msg.payload.widget.id = (SYSTEM_OPTION_MUSIC_VOLUME);
     msg.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
+    msg.payload.widget.id = (SYSTEM_OPTION_SOUND_VOLUME);
     msg.payload.widget.data.value = static_cast<i32>(gConfig.soundVolume != CONFIG_VOLUME_MUTED)
                                     + ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
+    msg.payload.widget.id = (SYSTEM_OPTION_HERO_SPEED);
     msg.payload.widget.data.value =
-        IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+        (gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
+    msg.payload.widget.id = (SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
@@ -10299,72 +10182,72 @@ void UpdateSystemOptions(i32 initialDraw) {
         musicQuality = MUSIC_QUALITY_CD_OPERA;
     }
     msg.payload.widget.data.value =
-        IDX(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
+        (musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_SHOW_ROUTE);
+    msg.payload.widget.id = (SYSTEM_OPTION_SHOW_ROUTE);
     msg.payload.widget.data.value =
         static_cast<i32>(gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
+    msg.payload.widget.id = (SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer != 0) {
         msg.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     } else {
         msg.payload.widget.data.value =
-            IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+            (gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     }
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
+    msg.payload.widget.id = (SYSTEM_OPTION_INTERFACE);
     msg.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO);
+    msg.payload.widget.id = (SYSTEM_OPTION_VIDEO);
     msg.payload.widget.data.value =
         static_cast<i32>(gConfig.slowVideo != 0) + ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_COLOR_CURSOR);
-    msg.payload.widget.data.value = gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+    msg.payload.widget.id = (SYSTEM_OPTION_COLOR_CURSOR);
+    msg.payload.widget.data.value = gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                                         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
 
     msg.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
+        (SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.data.text = onOffText[(gConfig.musicVolume)];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
+        (SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.data.text = onOffText[(gConfig.soundVolume)];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
+        (SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.data.text = walkSpeedText[(gConfig.walkSpeed)];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
+        (SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.data.text = musicQualityText[(musicQuality)];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        (SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     msg.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        (SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc";
+        msg.payload.widget.data.text = "Не показывать";
     } else {
-        msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
+        msg.payload.widget.data.text = walkSpeedText[(gConfig.computerWalkSpeed)];
     }
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.id = (SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     msg.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(msg);
-    msg.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    msg.payload.widget.id = (SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     msg.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
-        IDX(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        (SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     msg.payload.widget.data.text =
-        cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
+        cBWMouseText[gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(msg);
 
     if (initialDraw == 0) {
@@ -10372,9 +10255,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
-// The redbook and MIDI readiness flags this handler used to test went away
-// with the CD subsystem; both music paths now report present, which makes the
-// "neither is available" dialog unreachable in this build.
+
 static inline bool RedbookMusicPresent(void) {
     return true;
 }
@@ -10383,13 +10264,12 @@ static inline bool MidiMusicPresent(void) {
     return true;
 }
 
-VA(0x00414e82, 0x575)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     i32 accepted = 0;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+        if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_ACTIVATE
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
@@ -10462,10 +10342,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
-                                    "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
-                                        "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
-                                        "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
-                                        /* "Р­С‚Р° СЃРёСЃС‚РµРјР° РЅРµ РїРѕР·РІРѕР»СЏРµС‚ РїСЂРѕРёРіСЂС‹РІР°С‚СЊ MIDI Рё Redbook РјСѓР·С‹РєСѓ." */,
+                                    "Эта система не по"
+                                        "зволяет проигрыв"
+                                        "ать MIDI и Redbook музыку."
+                                         ,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10491,10 +10371,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {
                                 NormalDialog(
-                                    "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
-                                        "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
-                                        "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
-                                        /* "Р¦РёС„СЂРѕРІР°СЏ РјСѓР·С‹РєР° РЅРµ РґРѕСЃС‚СѓРїРЅР° РІ СЌС‚РѕР№ СЃРёСЃС‚РµРјРµ." */,
+                                    "Цифровая музыка "
+                                        "не доступна в это"
+                                        "й системе."
+                                         ,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10538,18 +10418,18 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
-                                        "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
-                                            "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
-                                            "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
-                                            " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
-                                            "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
-                                            "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
-                                            "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
-                                            "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
-                                            "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
-                                            "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
-                                            "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
-                                            /* "РќРµРІРѕР·РјРѕР¶РЅРѕ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ CD РјСѓР·С‹РєРё. Р’Р°С€ РїСЂРёРІРѕРґ CD, РІРѕР·РјРѕР¶РЅРѕ, РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґСЂСѓРіРѕР№ РїСЂРѕРіСЂР°РјРјРѕР№ РёР»Рё РґСЂР°Р№РІРµСЂ Р·РІСѓРєР° РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ CD СЃС‚РµСЂРµРѕ Р·РІСѓРєР°." */,
+                                        "Невозможно уста"
+                                            "новить воспроиз"
+                                            "ведение CD музыки."
+                                            " Ваш привод CD, воз"
+                                            "можно, использу"
+                                            "ется другой про"
+                                            "граммой или дра"
+                                            "йвер звука не по"
+                                            "ддерживает восп"
+                                            "роизведение CD ст"
+                                            "ерео звука."
+                                             ,
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
                                         OPTION_DIALOG_NONE,
@@ -10562,7 +10442,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                     );
                                     break;
                                 }
-                                gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_CD));
+                                gpSoundManager->SetMusicQuality((CONFIG_MUSIC_SOURCE_CD));
                                 gConfig.useOpera = CONFIG_OPERA_DISABLED;
                             } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
@@ -10572,9 +10452,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 if (GetMusicFlagA() == 0) {
                                     gConfig.useOpera =
-                                        static_cast<ConfigOperaMode>(1 - IDX(gConfig.useOpera));
+                                        static_cast<ConfigOperaMode>(1 - (gConfig.useOpera));
                                 } else {
-                                    gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
+                                    gpSoundManager->SetMusicQuality((CONFIG_MUSIC_SOURCE_MIDI));
                                 }
                             }
                             preferencesChanged = 1;
@@ -10601,18 +10481,16 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_COLOR_CURSOR:
-                            gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
-                                1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
+                            gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
+                                1 - gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             gpMouseManager->SetColorMice(
-                                gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+                                gConfig.gfx[(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                             );
                             break;
-#if H2_STRICT_ENUMS
                         case SYSTEM_OPTION_COUNT:
                             break;
-#endif
                     }
                     break;
                 }
@@ -10625,14 +10503,13 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     }
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = static_cast<BaseWidgetCommand>(IDX(SYSTEM_OPTION_FIRST));
+        message.payload.widget.id = (SYSTEM_OPTION_FIRST);
+        message.payload.widget.command = static_cast<BaseWidgetCommand>((SYSTEM_OPTION_FIRST));
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004153f7, 0x59)
 i32 GetMobilityFrame(i32 mobility) {
     i32 frame = mobility * MOBILITY_SCALE / MOBILITY_DIVISOR;
     if (frame < 0) {
@@ -10648,7 +10525,6 @@ i32 GetMobilityFrame(i32 mobility) {
     return frame;
 }
 
-VA(0x00415450, 0x5c)
 i32 GetManaFrame(i32 mana) {
     i32 frame = mana / MANA_DIVISOR;
     if (frame == 0 && mana >= MANA_MIN_VISIBLE) {
@@ -10664,7 +10540,6 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
-VA(0x004154ac, 0x43d)
 i32 advManager::DoVisions(hero* visionHero) {
     CreatureType type;
     mapCell* spot;
@@ -10704,8 +10579,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
-                /* Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РєР°Рє РјРёРЅРёРјСѓРј РІ С‚СЂРµС… С€Р°РіР°С… РѕС‚ РјРѕРЅСЃС‚СЂР°, С‡С‚РѕР±С‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·Р°РєР»РёРЅР°РЅРёРµ Р’РёРґРµРЅРёСЏ. */,
+            "Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения."
+                 ,
             1,
             -1,
             -1,
@@ -10727,12 +10602,12 @@ i32 advManager::DoVisions(hero* visionHero) {
         gText,
         "{%d %s}\n\n",
         count,
-        gArmyNamesPlural[IDX(type)]
+        gArmyNamesPlural[(type)]
     );
     fRatio = static_cast<double>(
                  gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)
              )
-             / static_cast<double>(count * gMonsterDatabase[IDX(type)].fightValue);
+             / static_cast<double>(count * gMonsterDatabase[(type)].fightValue);
 
     if (visionHero->m_army.CanJoin(type) && fRatio > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && type != CREATURE_GHOST
@@ -10741,17 +10616,17 @@ i32 advManager::DoVisions(hero* visionHero) {
         if (isForced) {
             sprintf(
                 msg,
-                "\xd1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xf5\xee\xf2\xff\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe!"
-                    /* РЎСѓС‰РµСЃС‚РІР° С…РѕС‚СЏС‚ РІСЃС‚СѓРїРёС‚СЊ РІ РІР°С€Сѓ Р°СЂРјРёСЋ! */
+                "Существа хотят вступить в вашу армию!"
+
             );
             strcat(gText, msg);
             goto showVision;
-        } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+        } else if (visionHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
-            if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            if (visionHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                 == HERO_SKILL_LEVEL_EXPERT) {
                 joinNum = count;
-            } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            } else if (visionHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                        == HERO_SKILL_LEVEL_ADVANCED) {
                 joinNum = count / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             } else {
@@ -10761,9 +10636,9 @@ i32 advManager::DoVisions(hero* visionHero) {
                 joinNum = 1;
             }
 
-            joinFee = gMonsterDatabase[IDX(type)].cost * count;
+            joinFee = gMonsterDatabase[(type)].cost * count;
             if (joinFee
-                > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                > gpGame->m_players[visionHero->m_owner].m_resources[(RES_GOLD)]) {
                 if (fRatio > MONSTER_STRENGTH_FLEE) {
                     goto creaturesFlee;
                 } else {
@@ -10774,17 +10649,17 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinNum == count) {
                 sprintf(
                     msg,
-                    "\xc2\xf1\xe5 \xf1\xf3\xf9\xe5\xf1\xf2\xe2\xe0 \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xed\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                        /* "Р’СЃРµ СЃСѓС‰РµСЃС‚РІР° РІСЃС‚СѓРїСЏС‚ РІ РЅР°С€Сѓ Р°СЂРјРёСЋ... / Р·Р° РїР»Р°С‚Сѓ РІ СЂР°Р·РјРµСЂРµ %d
-                           Р·РѕР»РѕС‚С‹С…." */,
+                    "Все существа вступят в нашу армию...\n\nза плату в размере %d золотых."
+
+,
                     joinFee
                 );
             } else {
                 sprintf(
                     msg,
-                    "%d \xf1\xf3\xf9\xe5\xf1\xf2\xe2 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xff\xf2\xf1\xff \xea \xed\xe0\xec...\n\n\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 %d \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                        /* "%d СЃСѓС‰РµСЃС‚РІ РїСЂРёСЃРѕРµРґРёРЅСЏС‚СЃСЏ Рє РЅР°Рј... / Р·Р° РїР»Р°С‚Сѓ РІ СЂР°Р·РјРµСЂРµ %d
-                           Р·РѕР»РѕС‚С‹С…." */,
+                    "%d существ присоединятся к нам...\n\nза плату в размере %d золотых."
+
+,
                     count,
                     joinFee
                 );
@@ -10798,8 +10673,8 @@ i32 advManager::DoVisions(hero* visionHero) {
     creaturesFlee:
         sprintf(
             msg,
-            "\xdd\xf2\xe8 \xf1\xeb\xe0\xe1\xfb\xe5 \xf2\xe2\xe0\xf0\xe8 \xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee \xef\xee\xe1\xe5\xe3\xf3\xf2, \xe5\xe4\xe2\xe0 \xe7\xe0\xe2\xe8\xe4\xe5\xe2 \xed\xe0\xf1."
-                /* Р­С‚Рё СЃР»Р°Р±С‹Рµ С‚РІР°СЂРё РѕРїСЂРµРґРµР»РµРЅРЅРѕ РїРѕР±РµРіСѓС‚, РµРґРІР° Р·Р°РІРёРґРµРІ РЅР°СЃ. */
+            "Эти слабые твари определенно побегут, едва завидев нас."
+
         );
         strcat(gText, msg);
         goto showVision;
@@ -10807,8 +10682,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 creaturesFight:
     sprintf(
         msg,
-        "\xc1\xee\xfe\xf1\xfc, \xfd\xf2\xe8 \xf1\xee\xe7\xe4\xe0\xed\xe8\xff \xe2 \xee\xf2\xe2\xf0\xe0\xf2\xe8\xf2\xe5\xeb\xfc\xed\xee\xec \xed\xe0\xf1\xf2\xf0\xee\xe5\xed\xe8\xe8 \xe8 \xe1\xf3\xe4\xf3\xf2 \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff."
-            /* Р‘РѕСЋСЃСЊ, СЌС‚Рё СЃРѕР·РґР°РЅРёСЏ РІ РѕС‚РІСЂР°С‚РёС‚РµР»СЊРЅРѕРј РЅР°СЃС‚СЂРѕРµРЅРёРё Рё Р±СѓРґСѓС‚ СЃСЂР°Р¶Р°С‚СЊСЃСЏ. */
+        "Боюсь, эти создания в отвратительном настроении и будут сражаться."
+
     );
     strcat(gText, msg);
     goto showVision;
@@ -10818,7 +10693,6 @@ showVision:
     return 1;
 }
 
-VA(0x004158e9, 0xc2)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 i;
     hero* crystalHero;
@@ -10840,11 +10714,10 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     return 0;
 }
 
-VA(0x004159ab, 0x68)
 u8 StopOnTrigger(class mapCell* cell) {
     MapObjectType type = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     if (type != MAP_OBJECT_EXPANSION_OBJECT) {
-        return bStopOnTrigger[IDX(type)];
+        return bStopOnTrigger[(type)];
     }
 
     i32 special = cell->m_objectMetadata;
@@ -10857,23 +10730,21 @@ u8 StopOnTrigger(class mapCell* cell) {
     return 0;
 }
 
-DATA(0x004ef1d0) i32 giLimitUpdMinX = -1;
-DATA(0x00524004) i32 iLastScrollTime = 0;
-DATA(0x00524008) i32 iSandAnim = 0;
-DATA(0x0052400c) i32 giLastHourGlassUpdateTime = 0;
-DATA(0x00524010) i32 TrigX = 0;
-DATA(0x00524014) i32 TrigY = 0;
-DATA(0x00524018) BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
-DATA(0x004ef1d4) i32 iCurBottomViewEnemy = -1;
-DATA(0x0052401c) i32 iCurHourGlassPhase = 0;
-DATA(0x004ef1d8) i32 iLastHourGlassPhase = 1;
-DATA(0x00524020) b32 gbForceUpdate = false;
-DATA(0x00524024) i32 giCheatSeq = 0;
-DATA(0x00524028) i32 iQWE = 0;
-DATA(0x004ef1dc) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
+i32 giLimitUpdMinX = -1;
+i32 iLastScrollTime = 0;
+i32 iSandAnim = 0;
+i32 giLastHourGlassUpdateTime = 0;
+i32 TrigX = 0;
+i32 TrigY = 0;
+BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
+i32 iCurBottomViewEnemy = -1;
+i32 iCurHourGlassPhase = 0;
+i32 iLastHourGlassPhase = 1;
+b32 gbForceUpdate = false;
+i32 giCheatSeq = 0;
+i32 iQWE = 0;
+u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
-DATA(0x0052402c) i32 iLastSandAnimTime = 0;
-DATA(0x00524030) i32 iLastNewSandAnimTime = 0;
-DATA(0x00524034) i32 giFrameCount = 0;
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(advManager, 0x004ea42c)
+i32 iLastSandAnimTime = 0;
+i32 iLastNewSandAnimTime = 0;
+i32 giFrameCount = 0;

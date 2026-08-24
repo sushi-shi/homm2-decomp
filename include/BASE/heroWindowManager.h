@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_HEROWINDOWMANAGER_H
 #define HOMM2_BASE_HEROWINDOWMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/WINMGR.h>
 #include "baseManager.h"
@@ -11,16 +11,16 @@ class palette;
 class bitmap;
 struct tag_message;
 
-H2_ENUM_BEGIN(HeroWindowManagerConstant)
+typedef enum HeroWindowManagerConstant {
     HERO_WINDOW_NO_HOVER_WIDGET  = -1,
     HERO_WINDOW_NO_DIALOG_RESULT = -1
-H2_ENUM_END(HeroWindowManagerConstant)
+} HeroWindowManagerConstant;
 
-H2_ENUM_CLASS_BEGIN(WindowFadeMode)
+enum {
     FADE_IN  = 0,
     FADE_OUT = 1
-H2_ENUM_CLASS_END(WindowFadeMode)
-
+};
+typedef i32 WindowFadeMode;
 #pragma pack(push, 1)
 class heroWindowManager : public baseManager {
 public:
@@ -36,9 +36,9 @@ public:
     i32 m_dialogResult;
     i32 m_lastHoverId;
     heroWindowManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     MessageDispatchResult ConvertToHover(struct tag_message&);
     MessageDispatchResult BroadcastMessage(MessageType, BaseWidgetCommand, i32, i32);
     void AddWindow(class heroWindow*, i32, i32);
@@ -54,7 +54,6 @@ public:
     void ReleaseFizzleSource(void);
 };
 #pragma pack(pop)
-SIZE(heroWindowManager, 0x62);
 extern i32 iCombatCycleFrame;
 extern u8 gbEveryOtherCycle;
 extern i32 iCycle1Count;

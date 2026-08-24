@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_SOUNDBACKENDS_H
 #define HOMM2_BASE_SOUNDBACKENDS_H
 
-#include <va.h>
+#include <Ints.h>
 #include <audiere.h>
 
 class sample;
@@ -21,9 +21,7 @@ struct AudiereSampleNode {
     inline ~AudiereSampleNode();
 };
 
-// Retail keeps AudiereMusic::stream/source as static class members: their atexit
-// teardowns carry VC6's member-static destroy-once guard (one flag byte,
-// bit per member), which file-scope statics never get.
+
 struct AudiereMusic {
     static audiere::OutputStreamPtr stream;
     static audiere::SampleSourcePtr source;

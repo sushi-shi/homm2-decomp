@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -15,7 +15,6 @@
 #include <fcntl.h>
 #include <io.h>
 
-VA(0x00465110, 0x59)
 highScoreManager::highScoreManager(void) {
     i32 entry;
 
@@ -24,7 +23,6 @@ highScoreManager::highScoreManager(void) {
     m_showCampaignScores = 0;
 }
 
-VA(0x00465169, 0x16d)
 i32 highScoreManager::Open(i32 id) {
     m_showCampaignScores = giHighScoreType == HIGH_SCORE_CAMPAIGN
                            || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN;
@@ -47,7 +45,6 @@ i32 highScoreManager::Open(i32 id) {
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
-VA(0x004652d6, 0x4f)
 void highScoreManager::Close(void) {
     gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
     gpWindowManager->RemoveWindow(m_window);
@@ -55,7 +52,6 @@ void highScoreManager::Close(void) {
     m_active = false;
 }
 
-VA(0x00465325, 0x1ca)
 MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     i32 result;
     i32 entry;
@@ -88,7 +84,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
         );
     }
 
-    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+    if ((((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         return MESSAGE_DISPATCH_CONSUME;
 
     switch (message.type) {
@@ -122,7 +118,6 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004654ef, 0x6bc)
 void highScoreManager::Update(void) {
     HighScoreEntry highScore;
     i32 rank;
@@ -223,7 +218,7 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                "\n(\xd7\xe8\xf2\xe5\xf0)" /* "\n(Ð§Ð¸Ñ‚ÐµÑ€)" */
+                "\n(×èòåð)"
             );
         m_window->BroadcastMessage(hsMessage);
 
@@ -315,6 +310,3 @@ void highScoreManager::Update(void) {
     if (noScoreFile == 0)
         close(inputFile);
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(highScoreManager, 0x004ea630)

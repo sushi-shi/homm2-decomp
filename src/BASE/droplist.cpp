@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -13,7 +13,7 @@
 #include <SOURCE/kbwin.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(DropListFrame)
+enum {
     FRAME_CLOSED_CONTENT      = 0,
     FRAME_DROP_BUTTON         = 1,
     FRAME_DROP_BUTTON_PRESSED = 2,
@@ -28,13 +28,13 @@ H2_ENUM_CLASS_BEGIN(DropListFrame)
     FRAME_SCROLL_TRACK_MIDDLE = 11,
     FRAME_SCROLL_TRACK_LAST   = 12,
     FRAME_SCROLL_THUMB        = 13
-H2_ENUM_CLASS_END(DropListFrame)
-
-H2_ENUM_BEGIN(DropListStorageConstant)
+};
+typedef i32 DropListFrame;
+typedef enum DropListStorageConstant {
     RESOURCE_NAME_CAPACITY = 16
-H2_ENUM_END(DropListStorageConstant)
+} DropListStorageConstant;
 
-H2_ENUM_BEGIN(DropListLayoutConstant)
+typedef enum DropListLayoutConstant {
     MIN_VISIBLE_ITEM_COUNT      = 3,
     TEXT_LEFT_INSET             = 5,
     TEXT_HORIZONTAL_INSET_COUNT = 2,
@@ -47,9 +47,8 @@ H2_ENUM_BEGIN(DropListLayoutConstant)
     SCROLL_THUMB_TRAVEL_PADDING = 7,
     SCROLL_THUMB_CENTER_DIVISOR = 2,
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
-H2_ENUM_END(DropListLayoutConstant)
+} DropListLayoutConstant;
 
-VA(0x004cfdb0, 0x54)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_itemCount = 0;
     m_items = NULL;
@@ -57,7 +56,6 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_savedBackground = NULL;
 }
 
-VA(0x004cfe40, 0xfb)
 dropListWidget::~dropListWidget() {
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
@@ -68,7 +66,6 @@ dropListWidget::~dropListWidget() {
     H2_FREE(m_items);
 }
 
-VA(0x004cff40, 0x2f8)
 void dropListWidget::Read(void) {
     IconEntry* entry;
     i8 name[RESOURCE_NAME_CAPACITY];
@@ -96,20 +93,20 @@ void dropListWidget::Read(void) {
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
 
-    m_closedContentFrame = IDX(FRAME_CLOSED_CONTENT);
-    m_dropButtonFrame = IDX(FRAME_DROP_BUTTON);
-    m_dropButtonPressedFrame = IDX(FRAME_DROP_BUTTON_PRESSED);
-    m_firstRowFrame = IDX(FRAME_FIRST_ROW);
-    m_middleRowFrame = IDX(FRAME_MIDDLE_ROW);
-    m_lastRowFrame = IDX(FRAME_LAST_ROW);
-    m_scrollUpFrame = IDX(FRAME_SCROLL_UP);
-    m_scrollUpPressedFrame = IDX(FRAME_SCROLL_UP_PRESSED);
-    m_scrollDownFrame = IDX(FRAME_SCROLL_DOWN);
-    m_scrollDownPressedFrame = IDX(FRAME_SCROLL_DOWN_PRESSED);
-    m_scrollTrackFirstFrame = IDX(FRAME_SCROLL_TRACK_FIRST);
-    m_scrollTrackMiddleFrame = IDX(FRAME_SCROLL_TRACK_MIDDLE);
-    m_scrollTrackLastFrame = IDX(FRAME_SCROLL_TRACK_LAST);
-    m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
+    m_closedContentFrame = (FRAME_CLOSED_CONTENT);
+    m_dropButtonFrame = (FRAME_DROP_BUTTON);
+    m_dropButtonPressedFrame = (FRAME_DROP_BUTTON_PRESSED);
+    m_firstRowFrame = (FRAME_FIRST_ROW);
+    m_middleRowFrame = (FRAME_MIDDLE_ROW);
+    m_lastRowFrame = (FRAME_LAST_ROW);
+    m_scrollUpFrame = (FRAME_SCROLL_UP);
+    m_scrollUpPressedFrame = (FRAME_SCROLL_UP_PRESSED);
+    m_scrollDownFrame = (FRAME_SCROLL_DOWN);
+    m_scrollDownPressedFrame = (FRAME_SCROLL_DOWN_PRESSED);
+    m_scrollTrackFirstFrame = (FRAME_SCROLL_TRACK_FIRST);
+    m_scrollTrackMiddleFrame = (FRAME_SCROLL_TRACK_MIDDLE);
+    m_scrollTrackLastFrame = (FRAME_SCROLL_TRACK_LAST);
+    m_scrollThumbFrame = (FRAME_SCROLL_THUMB);
 
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_closedContentFrame;
     m_iconX = m_x;
@@ -126,7 +123,6 @@ void dropListWidget::Read(void) {
     m_scrollThumbHeight = entry->h;
 }
 
-VA(0x004d0240, 0x139)
 void dropListWidget::DeleteItem(i32 index) {
     if (m_itemCount > index) {
         if (m_selectedIndex == index)
@@ -152,12 +148,11 @@ void dropListWidget::DeleteItem(i32 index) {
     }
 }
 
-VA(0x004d0380, 0x42f)
 MessageDispatchResult dropListWidget::Main(tag_message& message) {
     char* text;
     char** newItems;
 
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -223,7 +218,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+            if (!(((m_flags) & (WIDGET_FLAG_DRAW))))
                 break;
             i16 x = message.payload.mouse.x - m_owner->m_posX;
             i16 y = message.payload.mouse.y - m_owner->m_posY;
@@ -253,7 +248,6 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
     return widget::Main(message);
 }
 
-VA(0x004d07b0, 0x11c)
 void dropListWidget::Draw(void) {
     m_icon->DrawToBuffer(
         m_owner->m_posX + m_iconX,
@@ -274,12 +268,11 @@ void dropListWidget::Draw(void) {
             m_owner->m_posY + m_contentY,
             m_contentWidth,
             m_contentHeight,
-            HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_normalColor,
+            (((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_normalColor),
             m_alignment
         );
 }
 
-VA(0x004d08d0, 0x58f)
 void dropListWidget::DrawDropStuff(void) {
     i32 y = m_owner->m_posY + m_listY;
     i32 i;
@@ -364,14 +357,12 @@ void dropListWidget::DrawDropStuff(void) {
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_height + m_savedBackgroundHeight);
 }
 
-VA(0x004d0e60, 0xa6)
 void dropListWidget::SaveDropBackground(void) {
     m_savedBackground =
         new bitmap(BITMAP_TYPE_NONE, m_savedBackgroundWidth, m_savedBackgroundHeight);
     m_savedBackground->GrabScreen(m_savedBackgroundX, m_savedBackgroundY);
 }
 
-VA(0x004d0f10, 0x96)
 void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground->DrawToBuffer(m_savedBackgroundX, m_savedBackgroundY);
     gpWindowManager->UpdateScreenRegion(
@@ -384,7 +375,6 @@ void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004d0fb0, 0xcb2)
 void dropListWidget::ProcessSelectDialog(void) {
     i32 offset;
     i32 x;
@@ -632,6 +622,3 @@ closeList:
         m_height
     );
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(dropListWidget, 0x004ea9ec)

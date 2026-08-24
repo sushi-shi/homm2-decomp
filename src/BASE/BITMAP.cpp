@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>
 #include <BASE/Misc.h>
@@ -7,11 +7,10 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(BitmapConstant)
+typedef enum BitmapConstant {
     COPY_STRIDE = 640
-H2_ENUM_END(BitmapConstant)
+} BitmapConstant;
 
-VA(0x004c5cd0, 0x4c)
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     m_bitmapType = BITMAP_TYPE_NONE;
@@ -20,7 +19,6 @@ bitmap::bitmap(void)
     m_pixels = NULL;
 }
 
-VA(0x004c5d50, 0x99)
 bitmap::bitmap(BitmapType type, i16 width, i16 height)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     m_bitmapType = type;
@@ -29,7 +27,6 @@ bitmap::bitmap(BitmapType type, i16 width, i16 height)
     m_pixels = new u8[width * height];
 }
 
-VA(0x004c5df0, 0xeb)
 bitmap::bitmap(u32l id)
     : resource(RESOURCE_CATEGORY_BITMAP, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     i32 size;
@@ -44,14 +41,12 @@ bitmap::bitmap(u32l id)
     PollSound();
 }
 
-VA(0x004c5ee0, 0x46)
 bitmap::~bitmap() {
     if (m_pixels != NULL)
         delete m_pixels;
     m_pixels = NULL;
 }
 
-VA(0x004c5f30, 0x154)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 destX;
     i32 destY;
@@ -86,31 +81,26 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     BlitBitmap(this, 0, 0, clipWidth, clipHeight, gpWindowManager->m_screen, destX, destY);
 }
 
-VA(0x004c6090, 0x47)
 void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 
-VA(0x004c60e0, 0x3d)
 void bitmap::DrawToScreen(i16 x, i16 y) {
     PollSound();
     BlitBitmapToScreen(this, 0, 0, m_width, m_height, x, y);
     PollSound();
 }
 
-VA(0x004c6120, 0x29)
 void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
-VA(0x004c6150, 0x36)
 void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 
-VA(0x004c6190, 0x12f)
 void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     i32 sourceX;
     i32 sourceY;
@@ -144,7 +134,6 @@ void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     BlitBitmap(source, sourceX, sourceY, clipWidth, clipHeight, this, 0, 0);
 }
 
-VA(0x004c62c0, 0xb6)
 void bitmap::CopyTo(
     class bitmap* destination,
     i32 destinationX,
@@ -185,7 +174,6 @@ static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
-VA(0x004c6380, 0x77)
 void bitmap::CopyToCareful(
     class bitmap* destination,
     i32 destinationX,
@@ -205,6 +193,3 @@ void bitmap::CopyToCareful(
         );
     }
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(bitmap, 0x004ea9b0)

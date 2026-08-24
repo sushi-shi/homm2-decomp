@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/iconf2by.h>
 #include <BASE/IconRle.h>
 #include <SOURCE/KB.h>
@@ -9,35 +9,33 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-// Retail's frame is exactly the two __fastcall spills: every working value of
-// the decoder lives in a file static, not a local.
-DATA(0x005397f0) static IconEntry* s_entry = 0;
-DATA(0x005397f4) static i32 s_loopCount = 0;
-DATA(0x005397f8) static u8* s_src = 0;
-DATA(0x005397fc) static i32 s_right = 0;
-DATA(0x00539800) static i32 s_x = 0;
-DATA(0x00539804) static i32 s_clipR = 0;
-DATA(0x00539808) static u8* s_dst = 0;
-DATA(0x0053980c) static i32 s_spanCount = 0;
-DATA(0x00539810) static i32 s_srcSkip = 0;
-DATA(0x00539814) static i32 s_run = 0;
-DATA(0x00539818) static i32 s_y = 0;
-DATA(0x0053981c) static u8* s_row = 0;
-DATA(0x00539820) static u8* s_dimPal = 0;
-DATA(0x00539824) static u8* s_copyDst = 0;
-DATA(0x00539828) static i32 s_dimLen = 0;
-DATA(0x0053982c) static i32 s_left = 0;
-DATA(0x00539830) static u8 s_color = 0;
-DATA(0x00539834) static i32 s_clipB = 0;
 
-VA(0x004d5270, 0x789)
+static IconEntry* s_entry = 0;
+static i32 s_loopCount = 0;
+static u8* s_src = 0;
+static i32 s_right = 0;
+static i32 s_x = 0;
+static i32 s_clipR = 0;
+static u8* s_dst = 0;
+static i32 s_spanCount = 0;
+static i32 s_srcSkip = 0;
+static i32 s_run = 0;
+static i32 s_y = 0;
+static u8* s_row = 0;
+static u8* s_dimPal = 0;
+static u8* s_copyDst = 0;
+static i32 s_dimLen = 0;
+static i32 s_left = 0;
+static u8 s_color = 0;
+static i32 s_clipB = 0;
+
 void FlipIconToBitmapYModify(
     class icon* srcIcon,
     class bitmap* dest,
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -112,7 +110,7 @@ void FlipIconToBitmapYModify(
                         && s_x - s_dimLen + 1 >= clipX && s_x <= s_clipR) {
                         if (s_x <= s_clipR) {
                             if (s_x - s_dimLen + 1 >= clipX) {
-                                // Retail keeps this redundant store.
+
                                 s_dimLen = s_dimLen;
                                 s_dst = s_row + s_x - s_dimLen + 1;
                             } else {

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -9,12 +9,11 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(BorderConstant)
+typedef enum BorderConstant {
     RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff
-H2_ENUM_END(BorderConstant)
+} BorderConstant;
 
-VA(0x004cb0a0, 0x48)
 border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_fillColor = 0;
     m_backgroundBitmap = NULL;
@@ -22,14 +21,13 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 
-VA(0x004cb120, 0xa8)
 border::border(
     i16 x,
     i16 y,
     i16 w,
     i16 h,
     i16 e,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor,
     char* name
 )
@@ -42,7 +40,6 @@ border::border(
     m_fillColor = fillColor;
 }
 
-VA(0x004cb1d0, 0x7f)
 inline border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
@@ -50,7 +47,6 @@ inline border::~border() {
         gpResourceManager->Dispose(m_backgroundIcon);
 }
 
-VA(0x004cb250, 0x13c)
 void border::Read(void) {
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -79,9 +75,8 @@ void border::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-VA(0x004cb390, 0x1de)
 MessageDispatchResult border::Main(struct tag_message& msg) {
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -109,7 +104,7 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+            if ((((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
                 msg.type = MESSAGE_WIDGET;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
@@ -122,7 +117,6 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
     return widget::Main(msg);
 }
 
-VA(0x004cb570, 0xec)
 void border::Draw(void) {
     i16 x = m_owner->m_posX + m_x;
     i16 y = m_owner->m_posY + m_y;
@@ -151,6 +145,3 @@ void border::Draw(void) {
             return;
     }
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(border, 0x004ea9c4)

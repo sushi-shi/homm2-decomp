@@ -3,11 +3,11 @@
 
 #include <Ints.h>
 
-H2_ENUM_BEGIN(DimPaletteConstant)
+typedef enum DimPaletteConstant {
     DIM_PALETTE_SET_COUNT   = 3,
     DIM_PALETTE_LEVEL_COUNT = 4,
     DIM_PALETTE_COLOR_COUNT = 256
-H2_ENUM_END(DimPaletteConstant)
+} DimPaletteConstant;
 
 extern u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT];
 

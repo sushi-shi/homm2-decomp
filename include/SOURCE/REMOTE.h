@@ -1,12 +1,12 @@
 #ifndef HOMM2_REMOTE_H
 #define HOMM2_REMOTE_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-H2_ENUM_BEGIN(RemoteConstant)
-    REMOTE_PLAYER_COUNT                  = IDX(GAME_PLAYER_COUNT),
+typedef enum RemoteConstant {
+    REMOTE_PLAYER_COUNT                  = (GAME_PLAYER_COUNT),
     REMOTE_QUEUE_CAPACITY                = 128,
     REMOTE_QUEUE_STORAGE_COUNT           = 138,
     REMOTE_RECENT_ID_COUNT               = 30,
@@ -37,7 +37,7 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_CHAIN_TIMEOUT                 = 90000,
     REMOTE_INITIAL_HEARTBEAT             = 1999999999,
     REMOTE_ORDER_SENTINEL                = 999999999
-H2_ENUM_END(RemoteConstant)
+} RemoteConstant;
 
 #pragma pack(push, 1)
 struct RemotePacketHeader {
@@ -51,14 +51,12 @@ struct RemotePacketHeader {
 struct RemoteMessage {
     i8 sender;
     i32 id;
-    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
+    i8 type;
     i8 command;
     i16 payloadSize;
     char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 #pragma pack(pop)
-SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
-SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);
 void RemoteMain(RemoteGameMode);
@@ -76,7 +74,7 @@ i32 TransmitRemoteData(
     i8,
     i8,
     i8,
-    H2_ENUM_PARAM(RemoteMessageType, i8)
+    RemoteMessageType
 );
 char* GetRemoteData(i8);
 void PollRemote(void);
@@ -89,7 +87,7 @@ extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 extern i32 iInOrderCtr;
 extern i32 iCurLastID;
 extern i32 giLastConfirm;
-extern H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode;
+extern u8 GameMode;
 extern i32l lLastHeartbeatSend;
 extern b32 gbInRemoteMain;
 extern b32 gbInRemoteCleanup;

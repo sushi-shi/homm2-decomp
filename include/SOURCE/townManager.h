@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_TOWNMANAGER_H
 #define HOMM2_SOURCE_TOWNMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/baseManager.h>
 
 class heroWindow;
@@ -14,12 +14,12 @@ class bankBox;
 class hero;
 struct tag_message;
 
-H2_ENUM_BEGIN(TownManagerStorageConstant)
+typedef enum TownManagerStorageConstant {
     TOWN_MANAGER_OBJECT_COUNT     = 32,
     TOWN_MANAGER_STATUS_TEXT_SIZE = 0x50
-H2_ENUM_END(TownManagerStorageConstant)
+} TownManagerStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(TownManagerArmyCommand)
+enum {
     ARMY_COMMAND_NONE      = -1,
     ARMY_COMMAND_SELECT    = 0,
     ARMY_COMMAND_VIEW      = 1,
@@ -27,8 +27,8 @@ H2_ENUM_CLASS_BEGIN(TownManagerArmyCommand)
     ARMY_COMMAND_SWAP      = 3,
     ARMY_COMMAND_VIEW_HERO = 4,
     ARMY_COMMAND_SPLIT     = 5
-H2_ENUM_CLASS_END(TownManagerArmyCommand)
-
+};
+typedef i32 TownManagerArmyCommand;
 #pragma pack(push, 1)
 class townManager : public baseManager {
 public:
@@ -36,7 +36,7 @@ public:
     icon* m_backgroundIcon;
     townObject* m_townObjects[TOWN_MANAGER_OBJECT_COUNT];
     i32 m_townObjectCount;
-    H2_ENUM_STORAGE(FactionType, i32) m_lastTownType;
+    i32 m_lastTownType;
     i32 m_unknownC6;
     heroWindow* m_townWindow;
     strip* m_garrisonStrip;
@@ -56,7 +56,7 @@ public:
     u32l m_affordableBuildings;
     u32l m_buildableBuildings;
     i32 m_castleDialogActive;
-    H2_ENUM_STORAGE(BuildingSlotType, i32) m_selectedBuilding;
+    i32 m_selectedBuilding;
     heroWindow* m_heroWindow0;
     heroWindow* m_heroWindow1;
     i32 m_splitAmount;
@@ -64,9 +64,9 @@ public:
     i32 m_recruitState;
     hero* m_recruitHero;
     townManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void SetupExtraStuff(void);
     void SetTown(class town* townData) {
         m_town = townData;
@@ -82,10 +82,10 @@ public:
     void SplitArmy(void);
     void ShiftQualChange(void);
     void ResetStrips(void);
-    void Toggle(H2_ENUM_PARAM(BuildingSlotType, i32));
+    void Toggle(BuildingSlotType);
     void DrawTown(i32, i32);
-    i32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32), i32, i32);
-    void BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32));
+    i32 BuyBuild(BuildingSlotType, i32, i32);
+    void BuildObj(BuildingSlotType);
     void SetupMage(class heroWindow*);
     i32 RecruitHero(i32, i32);
     void DoTavern(void);
@@ -94,5 +94,4 @@ public:
     void SetupCastle(class heroWindow*, i32);
 };
 #pragma pack(pop)
-SIZE(townManager, 0x17a);
 #endif

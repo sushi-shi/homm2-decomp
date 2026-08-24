@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <va.h>
+#include <Ints.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -18,7 +18,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 
-H2_ENUM_BEGIN(RecruitConstant)
+typedef enum RecruitConstant {
     RESOURCE_COUNT = 6,
     GOLD_RESOURCE = 6,
     WINDOW_X = 0x8f,
@@ -33,9 +33,9 @@ H2_ENUM_BEGIN(RecruitConstant)
     VIEW_ARMY_Y = 0x20,
     NO_ROOM_DIALOG_X = 177,
     NO_ROOM_DIALOG_Y = 100
-H2_ENUM_END(RecruitConstant)
+} RecruitConstant;
 
-H2_ENUM_BEGIN(RecruitControl)
+typedef enum RecruitControl {
     TITLE_CONTROL = 0x40,
     CREATURE_CONTROL = 0x42,
     AVAILABLE_CONTROL = 0x43,
@@ -52,12 +52,11 @@ H2_ENUM_BEGIN(RecruitControl)
     CLOSE_CONTROL = 0x7800,
     CANCEL_CONTROL = 0x7801,
     CONFIRM_CONTROL = 0x7802
-H2_ENUM_END(RecruitControl)
+} RecruitControl;
 
-VA(0x0048c330, 0x1f2)
 void SetupRecruitWin(
     class heroWindow* window,
-    H2_ENUM_PARAM(CreatureType, i32) creatureType,
+    CreatureType creatureType,
     i32 goldCost,
     ResourceType resourceType,
     i32 resourceCost,
@@ -69,7 +68,7 @@ void SetupRecruitWin(
     tag_message message;
 
     strcpy(monsterName, GetMonsterPluralName(creatureType));
-    /* CP1251: fold the leading letter to lower case ('A'-'Z', '\xc0'-'\xdf' and '\xa8'). */
+
     if (static_cast<u8>(monsterName[0]) >= 'A' && static_cast<u8>(monsterName[0]) <= 'Z')
         ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
     else if (static_cast<u8>(monsterName[0]) >= 0xc0 && static_cast<u8>(monsterName[0]) <= 0xdf)
@@ -79,7 +78,7 @@ void SetupRecruitWin(
     else
         ch = monsterName[0];
     monsterName[0] = ch;
-    sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc" /* "РќР°РЅСЏС‚СЊ" */, monsterName);
+    sprintf(label, "%s %s", "Нанять"  , monsterName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
@@ -95,12 +94,12 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Р”РѕСЃС‚СѓРїРЅРѕ: " */, available);
+    sprintf(gText, "%s%d", "Доступно: "  , available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    sprintf(gText, "monh%04d.icn", IDX(creatureType));
+    sprintf(gText, "monh%04d.icn", (creatureType));
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = CREATURE_CONTROL;
@@ -109,7 +108,7 @@ void SetupRecruitWin(
     if (resourceType != RECRUIT_NO_RESOURCE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RESOURCE_ICON_CONTROL;
-        message.payload.widget.data.value = IDX(resourceType);
+        message.payload.widget.data.value = (resourceType);
         window->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RESOURCE_IMAGE_CONTROL;
@@ -117,7 +116,6 @@ void SetupRecruitWin(
     }
 }
 
-VA(0x0048c522, 0x26b)
 i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
     i32 resourceMaximum;
@@ -145,14 +143,14 @@ i32 recruitUnit::Open(i32 priority) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_SET_FLAGS,
-        IDX(CLOSE_CONTROL),
+        (CLOSE_CONTROL),
         BROADCAST_FLAGS
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
 
     goldMaximum = gpCurPlayer->m_resources[GOLD_RESOURCE] / m_goldCost;
     if (m_resourceType != RECRUIT_NO_RESOURCE) {
-        resourceMaximum = gpCurPlayer->m_resources[IDX(m_resourceType)] / m_resourceCost;
+        resourceMaximum = gpCurPlayer->m_resources[(m_resourceType)] / m_resourceCost;
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
     } else
         m_maximum = goldMaximum;
@@ -165,7 +163,7 @@ i32 recruitUnit::Open(i32 priority) {
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             CONFIRM_CONTROL,
-            IDX(WIDGET_FLAG_ENABLED)
+            (WIDGET_FLAG_ENABLED)
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
@@ -183,14 +181,13 @@ i32 recruitUnit::Open(i32 priority) {
     return 0;
 }
 
-VA(0x0048c78d, 0xc8)
 void recruitUnit::Close(void) {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "\xc4\xeb\xff \xfd\xf2\xee\xe9 \xe0\xf0\xec\xe8\xe8 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 "
-            "\xe2 \xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe5." /* "Р”Р»СЏ СЌС‚РѕР№ Р°СЂРјРёРё РЅРµС‚ РјРµСЃС‚Р° РІ РіР°СЂРЅРёР·РѕРЅРµ." */
+            "Для этой армии нет места "
+            "в гарнизоне."
             ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
@@ -206,7 +203,7 @@ void recruitUnit::Close(void) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        IDX(CLOSE_CONTROL),
+        (CLOSE_CONTROL),
         BROADCAST_FLAGS
     );
     if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
@@ -217,13 +214,12 @@ void recruitUnit::Close(void) {
     KBChangeMenu(hmnuRecruitSave);
 }
 
-VA(0x0048c855, 0x115)
 void recruitUnit::Update(void) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Р”РѕСЃС‚СѓРїРЅРѕ: " */, *m_available);
+    sprintf(gText, "%s%d", "Доступно: "  , *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
@@ -242,13 +238,12 @@ void recruitUnit::Update(void) {
     }
 }
 
-VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     i32 done = 0;
     i32 quickView;
     i32 cost;
 
-    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+    if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         quickView = 1;
     else
         quickView = 0;
@@ -339,7 +334,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         }
                         gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
                         if (m_resourceType != RECRUIT_NO_RESOURCE) {
-                            gpCurPlayer->m_resources[IDX(m_resourceType)] -=
+                            gpCurPlayer->m_resources[(m_resourceType)] -=
                                 m_quantity * m_resourceCost;
                         }
                         *m_available -= m_quantity;
@@ -362,7 +357,6 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0048cd07, 0xc4)
 recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
     i32 unitCosts[RESOURCE_COUNT + 1];
     i32 resourceIndex;
@@ -380,14 +374,13 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     }
     if (resourceIndex < RESOURCE_COUNT) {
         m_resourceType = ResourceType(resourceIndex);
-        m_resourceCost = unitCosts[IDX(m_resourceType)];
+        m_resourceCost = unitCosts[(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
     }
 }
 
-VA(0x0048cdcb, 0xdf)
 recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     i32 unitCosts[RESOURCE_COUNT + 1];
     i32 resourceIndex;
@@ -395,7 +388,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_refreshTown = refreshTown;
     m_sourceType = RECRUIT_SOURCE_TOWN;
     m_army = &townData->m_army;
-    m_creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
+    m_creatureType = gDwellingType[(townData->m_type)][dwelling];
     m_available = &townData->m_garrison[dwelling];
     GetMonsterCost(m_creatureType, unitCosts);
     m_goldCost = unitCosts[GOLD_RESOURCE];
@@ -405,14 +398,13 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     }
     if (resourceIndex < RESOURCE_COUNT) {
         m_resourceType = ResourceType(resourceIndex);
-        m_resourceCost = unitCosts[IDX(m_resourceType)];
+        m_resourceCost = unitCosts[(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
     }
 }
 
-VA(0x0048ceaa, 0x161)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     CreatureType monsterType;
     ResourceType resourceType;
@@ -423,7 +415,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 resourceIndex;
     i32 avail;
 
-    monsterType = gDwellingType[IDX(townData->m_type)][dwelling];
+    monsterType = gDwellingType[(townData->m_type)][dwelling];
     avail = townData->m_garrison[dwelling];
     GetMonsterCost(monsterType, unitCosts);
     goldCost = unitCosts[GOLD_RESOURCE];
@@ -433,7 +425,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     }
     if (resourceIndex < RESOURCE_COUNT) {
         resourceType = ResourceType(resourceIndex);
-        resourceCost = unitCosts[IDX(resourceType)];
+        resourceCost = unitCosts[(resourceType)];
     } else {
         resourceType = RECRUIT_NO_RESOURCE;
         resourceCost = 0;
@@ -452,7 +444,4 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     gpWindowManager->RemoveWindow(recruitWindow);
 }
 
-DATA(0x00533204) HMENU hmnuRecruitSave;
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(recruitUnit, 0x004ea7f4)
+HMENU hmnuRecruitSave;

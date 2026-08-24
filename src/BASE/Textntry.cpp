@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -14,19 +14,19 @@
 #include <BASE/icon.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(TextEntryKeyConstant)
+typedef enum TextEntryKeyConstant {
     ACCEPT_KEY             = 10,
     DELETE_KEY             = 0x7f,
     EXTENDED_KEY_SHIFT     = 8,
     EXTENDED_KEY_HIGH_MASK = 0xff00,
     ASCII_KEY_MASK         = 0xff
-H2_ENUM_END(TextEntryKeyConstant)
+} TextEntryKeyConstant;
 
-H2_ENUM_BEGIN(TextEntrySourceFileConstant)
+typedef enum TextEntrySourceFileConstant {
     ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-H2_ENUM_END(TextEntrySourceFileConstant)
+} TextEntrySourceFileConstant;
 
-H2_ENUM_BEGIN(TextEntryConstant)
+typedef enum TextEntryConstant {
     RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,
     HORIZONTAL_INSET_SIDE_COUNT = 2,
@@ -38,14 +38,13 @@ H2_ENUM_BEGIN(TextEntryConstant)
     TEXT_ALLOCATION_PADDING     = 5,
     EDIT_ALLOCATION_PADDING     = 6,
     PRESERVE_TEXT_FLAG          = 1
-H2_ENUM_END(TextEntryConstant)
+} TextEntryConstant;
 
-H2_ENUM_BEGIN(InputManagerExtendedKey)
+typedef enum InputManagerExtendedKey {
     EXTENDED_KEY_BASE = 0x100
-H2_ENUM_END(InputManagerExtendedKey)
+} InputManagerExtendedKey;
 
 
-VA(0x004d1cc0, 0x56)
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
     m_maxLength = 0;
@@ -55,7 +54,6 @@ textEntryWidget::textEntryWidget(void) : textWidget() {
     m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
-VA(0x004d1d50, 0x1ac)
 textEntryWidget::textEntryWidget(
     i16 x,
     i16 y,
@@ -64,12 +62,12 @@ textEntryWidget::textEntryWidget(
     i16 maxLength,
     char* text,
     char* fontName,
-    H2_ENUM_PARAM(FontDrawMode, i16) color,
+    FontDrawMode color,
     char* iconName,
     i16 iconFrame,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
-    H2_ENUM_PARAM(TextEntryLayout, i16) layout,
+    WidgetKind kind,
+    TextEntryLayout layout,
     i32 horizontalInset,
     i32 verticalInset
 )
@@ -99,20 +97,17 @@ textEntryWidget::textEntryWidget(
     }
 }
 
-VA(0x004d1f00, 0x5b)
-inline textEntryWidget::~textEntryWidget() {
+textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-VA(0x004d1f60, 0x335)
-void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
+void textEntryWidget::Read(TextEntryReadMode type) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
-#line 99
     m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
@@ -166,14 +161,13 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
-VA(0x004d22a0, 0xb1c)
 MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     i16 done;
     i16 x;
     i16 y;
     tag_message event;
 
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -333,9 +327,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                     }
                                     if (typed != 0) {
                                         strcpy(swap, m_text);
-#line 388
                                         H2_FREE(m_text);
-#line 389
                                         m_text = static_cast<char*>(
                                             H2_ALLOC(strlen(edit) + EDIT_ALLOCATION_PADDING)
                                         );
@@ -377,7 +369,6 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     return widget::Main(message);
 }
 
-VA(0x004d2dc0, 0x253)
 void textEntryWidget::Draw(void) {
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         char display[TEXT_BUFFER_CAPACITY];
@@ -415,13 +406,12 @@ void textEntryWidget::Draw(void) {
             m_owner->m_posY + m_innerY,
             m_innerW,
             m_innerH,
-            HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_color,
+            (((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_color),
             m_alignment
         );
     }
 }
 
-VA(0x004d3020, 0x29a)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     i32 changed;
     char display[TEXT_BUFFER_CAPACITY];
@@ -468,6 +458,3 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
         }
     }
 }
-
-// Compiler-emitted vtables; the markers are census claims, not definitions.
-VTBL(textEntryWidget, 0x004ea9f8)

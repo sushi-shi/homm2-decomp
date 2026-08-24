@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,19 +46,19 @@
 
 namespace {
 
-    H2_ENUM_BEGIN(CombatRemoteCommand)
+    typedef enum CombatRemoteCommand {
         REMOTE_COMMAND = 0x15,
         REMOTE_CONFIRM_COMMAND = 0x16
-    H2_ENUM_END(CombatRemoteCommand)
+    } CombatRemoteCommand;
 
-    H2_ENUM_BEGIN(CombatRemoteFragment)
+    typedef enum CombatRemoteFragment {
         REMOTE_FIRST_HERO_FIRST = 1,
         REMOTE_FIRST_HERO_SECOND = 2,
         REMOTE_SECOND_HERO_FIRST = 3,
         REMOTE_SECOND_HERO_SECOND = 4
-    H2_ENUM_END(CombatRemoteFragment)
+    } CombatRemoteFragment;
 
-    H2_ENUM_BEGIN(UndeadEventConstant)
+    typedef enum UndeadEventConstant {
         SKELETON_EVENT_SMALL_COUNT = 25,
         SKELETON_EVENT_MEDIUM_COUNT = 50,
         SKELETON_EVENT_LARGE_COUNT = 100,
@@ -88,9 +88,9 @@ namespace {
         GHOST_EVENT_MEDIUM_GOLD = 2000,
         GHOST_EVENT_LARGE_GOLD = 5000,
         GHOST_EVENT_HUGE_GOLD = 2000
-    H2_ENUM_END(UndeadEventConstant)
+    } UndeadEventConstant;
 
-    H2_ENUM_BEGIN(AIEventConstant)
+    typedef enum AIEventConstant {
         EVENT_NO_OWNER = -1,
         EVENT_ROGUE_COUNT = 50,
         EVENT_GUARD_COUNT_MAX = 255,
@@ -121,15 +121,15 @@ namespace {
         EVENT_CREATURE_UPGRADE_MOBILITY = 400,
         EVENT_HERO_LIMIT = 8,
         EVENT_JAILED_HERO = 0x41
-    H2_ENUM_END(AIEventConstant)
+    } AIEventConstant;
 
-    H2_ENUM_BEGIN(MonsterCombatValueIndex)
+    typedef enum MonsterCombatValueIndex {
         MONSTER_COMBAT_REMAINING_COUNT = 0,
         MONSTER_COMBAT_RESULT = 1,
         MONSTER_COMBAT_VALUE_COUNT = 2
-    H2_ENUM_END(MonsterCombatValueIndex)
+    } MonsterCombatValueIndex;
 
-    H2_ENUM_BEGIN(CombatFlowConstant)
+    typedef enum CombatFlowConstant {
         COMBAT_AUTO_RESOLVE_DEBUG_LEVEL = 4,
         COMBAT_RANDOM_SEED_MAX = 1000,
         COMBAT_NETWORK_POLL_X = 30,
@@ -138,22 +138,22 @@ namespace {
         COMBAT_NETWORK_POLL_HEIGHT = 4,
         COMBAT_LOW_MEMORY_LIMIT = 900,
         COMBAT_HIGH_MEMORY_LIMIT = 2900
-    H2_ENUM_END(CombatFlowConstant)
+    } CombatFlowConstant;
 
-    H2_ENUM_BEGIN(RiddleComparisonConstant)
+    typedef enum RiddleComparisonConstant {
         RIDDLE_PREFIX_LENGTH = 4,
         RIDDLE_EXPECTED_BUFFER_SIZE = RIDDLE_PREFIX_LENGTH + 1,
         RIDDLE_ANSWER_BUFFER_SIZE = 8
-    H2_ENUM_END(RiddleComparisonConstant)
+    } RiddleComparisonConstant;
 
-    H2_ENUM_BEGIN(BarrierEventConstant)
+    typedef enum BarrierEventConstant {
         COLOR_MASK = 7,
         PASSWORD_SHIFT = 3,
         INPUT_LENGTH = 14,
         INPUT_BUFFER_SIZE = 16
-    H2_ENUM_END(BarrierEventConstant)
+    } BarrierEventConstant;
 
-    H2_ENUM_BEGIN(GenericSiteConstant)
+    typedef enum GenericSiteConstant {
         SITE_ALCHEMIST_COST = 750,
         SITE_VISIBILITY_RADIUS = 10,
         SITE_HUT_COLOR = 3,
@@ -161,17 +161,17 @@ namespace {
         SITE_STABLE_REWARD_VALUE = 8,
         SITE_MERMAID_WINDOW_ICON = 10,
         SITE_STRING_LIMIT = 10
-    H2_ENUM_END(GenericSiteConstant)
+    } GenericSiteConstant;
 
-    H2_ENUM_CLASS_BEGIN_SPLIT(StableVisitResult, u8)
+    enum {
         STABLE_VISIT_NONE = 0,
         STABLE_VISIT_MOBILITY = 1,
         STABLE_VISIT_UPGRADE = 2,
         STABLE_VISIT_MOBILITY_UPGRADE = STABLE_VISIT_MOBILITY | STABLE_VISIT_UPGRADE
-    H2_ENUM_CLASS_END_SPLIT(StableVisitResult, u8)
-    H2_ENUM_FLAGS(StableVisitResult)
+    };
+typedef i32 StableVisitResult;
 
-    H2_ENUM_CLASS_BEGIN(HouseRecruitmentSite)
+    enum {
         RECRUIT_ARCHER = 0,
         RECRUIT_GOBLIN = 1,
         RECRUIT_PEASANT = 2,
@@ -183,16 +183,16 @@ namespace {
         RECRUIT_CAVE = 8,
         RECRUIT_EXCAVATION = 9,
         RECRUIT_SITE_COUNT = 10
-    H2_ENUM_CLASS_END(HouseRecruitmentSite)
-
-    H2_ENUM_BEGIN(HouseEventConstant)
+    };
+typedef i32 HouseRecruitmentSite;
+    typedef enum HouseEventConstant {
         EVENT_HOUSE_DIALOG_STRIDE = 3,
         EVENT_RECRUIT_DIALOG_BASE = 23,
         EVENT_ARMY_FULL_DIALOG_BASE = 24,
         EVENT_EMPTY_DIALOG_BASE = 25
-    H2_ENUM_END(HouseEventConstant)
+    } HouseEventConstant;
 
-    H2_ENUM_BEGIN(EventSoundConstant)
+    typedef enum EventSoundConstant {
         SOUND_NONE = -1,
         SOUND_TRACK_1 = 1,
         SOUND_TREASURE = 19,
@@ -213,9 +213,9 @@ namespace {
         SOUND_MINE = 103,
         SOUND_FILENAME_LENGTH = 32,
         SOUND_SAMPLE_NAME_EMPTY_LIMIT = 1
-    H2_ENUM_END(EventSoundConstant)
+    } EventSoundConstant;
 
-    H2_ENUM_CLASS_BEGIN(EventSoundVariant)
+    enum {
         SOUND_VARIANT_0 = 0,
         SOUND_VARIANT_1 = 1,
         SOUND_VARIANT_2 = 2,
@@ -223,9 +223,9 @@ namespace {
         SOUND_VARIANT_4 = 4,
         SOUND_VARIANT_5 = 5,
         SOUND_VARIANT_6 = 6
-    H2_ENUM_CLASS_END(EventSoundVariant)
-
-    H2_ENUM_BEGIN(EraseObjectConstant)
+    };
+typedef i32 EventSoundVariant;
+    typedef enum EraseObjectConstant {
         NEIGHBOR_COUNT = 4,
         CELL_COUNT = 5,
         ERASE_COORDINATE_COUNT = 2,
@@ -233,9 +233,9 @@ namespace {
         EMPTY_INDEX = 0xFF,
         MAP_CHANGE_VALUE = -999,
         ENVIRONMENT_BORDER = 7
-    H2_ENUM_END(EraseObjectConstant)
+    } EraseObjectConstant;
 
-    H2_ENUM_BEGIN(CombatMonsterEventConstant)
+    typedef enum CombatMonsterEventConstant {
         MONSTER_ARMY_SLOTS = 5,
         MONSTER_RANDOM_MAX = 100,
         MONSTER_REDUCED_STACK_CHANCE = 25,
@@ -243,21 +243,21 @@ namespace {
         MONSTER_FOUR_STACK_THRESHOLD = 50,
         MONSTER_FOUR_STACK_COUNT = 4,
         MONSTER_UPGRADE_CHANCE = 50
-    H2_ENUM_END(CombatMonsterEventConstant)
+    } CombatMonsterEventConstant;
 
-    H2_ENUM_BEGIN(FizzleCenterConstant)
+    typedef enum FizzleCenterConstant {
         ARTIFACT_PICKUP_SOUND_FIRST = 1,
         ARTIFACT_PICKUP_SOUND_LAST = 7
-    H2_ENUM_END(FizzleCenterConstant)
+    } FizzleCenterConstant;
 
-    H2_ENUM_BEGIN(FlotsamConstant)
+    typedef enum FlotsamConstant {
         FLOTSAM_WOOD_AMOUNT = 5,
         FLOTSAM_GOLD_AMOUNT = 200,
         FLOTSAM_LARGE_WOOD_AMOUNT = 10,
         FLOTSAM_LARGE_GOLD_AMOUNT = 500
-    H2_ENUM_END(FlotsamConstant)
+    } FlotsamConstant;
 
-    H2_ENUM_BEGIN(DoEventConstant)
+    typedef enum DoEventConstant {
         ARTESIAN_SPRING_MANA_MULTIPLIER = 2,
         XANADU_DIPLOMACY_MULTIPLIER = 2,
         TEMPLE_MORALE_BONUS = 2,
@@ -265,14 +265,14 @@ namespace {
         SIGN_MINIMUM_TEXT_LENGTH = 1,
         SIGN_RANDOM_TEXT_COUNT = 4,
         CHEST_EXPERIENCE_LEVEL_OFFSET = 1,
-        PRIMARY_BONUS_ATTACK = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_ATTACK),
-        PRIMARY_BONUS_DEFENSE = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_DEFENSE),
+        PRIMARY_BONUS_ATTACK = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + (HERO_PRIMARY_ATTACK),
+        PRIMARY_BONUS_DEFENSE = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + (HERO_PRIMARY_DEFENSE),
         PRIMARY_BONUS_SPELL_POWER =
-            NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_SPELL_POWER),
-        PRIMARY_BONUS_KNOWLEDGE = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_KNOWLEDGE)
-    H2_ENUM_END(DoEventConstant)
+            NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + (HERO_PRIMARY_SPELL_POWER),
+        PRIMARY_BONUS_KNOWLEDGE = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + (HERO_PRIMARY_KNOWLEDGE)
+    } DoEventConstant;
 
-    H2_ENUM_BEGIN(GuardedDwellingConstant)
+    typedef enum GuardedDwellingConstant {
         TROLL_BRIDGE_TROLL_COUNT = 12,
         TROLL_BRIDGE_WAR_TROLL_COUNT = 8,
         TROLL_BRIDGE_WAR_TROLL_STACKS = 2,
@@ -289,9 +289,9 @@ namespace {
         PYRAMID_ROYAL_MUMMY_COUNT = 30,
         PYRAMID_VAMPIRE_LORD_COUNT = 20,
         PYRAMID_VAMPIRE_LORD_STACKS = 2
-    H2_ENUM_END(GuardedDwellingConstant)
+    } GuardedDwellingConstant;
 
-    H2_ENUM_BEGIN(AbandonedMineConversionConstant)
+    typedef enum AbandonedMineConversionConstant {
         MINE_TOP_A_FIRST_FRAME = 0,
         MINE_TOP_A_LAST_FRAME = 4,
         MINE_BOTTOM_A_FRAME = 104,
@@ -306,18 +306,17 @@ namespace {
         MINE_SECOND_BOTTOM_B_FRAME = 80,
         MINE_CENTER_GHOST_FRAME = 5,
         MINE_CENTER_GOLD_FRAME = 4
-    H2_ENUM_END(AbandonedMineConversionConstant)
+    } AbandonedMineConversionConstant;
 
-    H2_ENUM_BEGIN(Cp1251Letter)
+    typedef enum Cp1251Letter {
         CP1251_CAPITAL_YO = 0xa8,
         CP1251_SMALL_YO = 0xb8,
         CP1251_CAPITAL_A = 0xc0,
         CP1251_CAPITAL_YA = 0xdf,
         CP1251_CASE_STEP = 0x20
-    H2_ENUM_END(Cp1251Letter)
+    } Cp1251Letter;
 
-    // The localised build folds the leading letter of a resource name through
-    // the CP1251 alphabet, not through a bare +32 on the Latin range.
+
     inline char ToLowerCp1251(u8 letter) {
         char smallLetter;
 
@@ -343,7 +342,6 @@ namespace {
     (reinterpret_cast<combatRemoteHeroFragment*>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
 #define EVENTS_HERO_BUFFER(buffer) (reinterpret_cast<combatRemoteHeroFragment*>(buffer))
 
-VA(0x0043b640, 0x5fc9)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     char eventText_b[EVENT_TEXT_BUFFER_SIZE];
     mapCell* skeletonCell_e;
@@ -411,12 +409,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xe7\xe0\xe1\xf0\xe5\xeb\xe8 "
-                        "\xe2 \xe2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4, \xe8\xe7 \xf2\xe5\xf5, \xe3\xe4\xe5 "
-                        "\xf2\xe0\xea \xee\xe1\xee\xe6\xe0\xfe\xf2 \xf0\xe5\xe7\xe2\xe8\xf2\xfc\xf1\xff \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xfb "
-                        "\xf1 \xf4\xe5\xff\xec\xe8, \xed\xee \xf1\xe5\xe3\xee\xe4\xed\xff \xe7\xe4\xe5\xf1\xfc \xed\xe8\xea\xee\xe3\xee."
-                        " \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
-                        "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5.",
+                    "{Волшебный сад}\n\nВы забрели "
+                        "в волшебный сад, из тех, где "
+                        "так обожают резвиться лепреконы "
+                        "с феями, но сегодня здесь никого."
+                        " Может, на следующей неделе "
+                        "вам повезет больше.",
                     -1,
                     0,
                     -1,
@@ -428,12 +426,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xef\xee\xe9\xec\xe0\xeb\xe8 "
-                        "\xeb\xe5\xef\xf0\xe5\xea\xee\xed\xe0, \xf2\xe0\xea \xe1\xe5\xf1\xef\xe5\xf7\xed\xee \xe7\xe0\xf1\xed\xf3\xe2\xf8\xe5\xe3\xee "
-                        "\xef\xee\xe4 \xf8\xeb\xff\xef\xea\xee\xe9 \xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe3\xee \xe3\xf0\xe8\xe1\xe0."
-                        " \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xf1\xe2\xee\xe1\xee\xe4\xf3 \xee\xed \xf0\xe0\xf1\xf1\xea\xe0\xe7\xe0\xeb "
-                        "\xe2\xe0\xec, \xe3\xe4\xe5 \xeb\xe5\xe6\xe8\xf2 \xe3\xee\xf0\xf8\xee\xf7\xe5\xea \xf1\xee "
-                        "\xe2\xf1\xff\xea\xe8\xec\xe8 \xf6\xe5\xed\xed\xfb\xec\xe8 \xe2\xe5\xf9\xe8\xf6\xe0\xec\xe8.",
+                    "{Волшебный сад}\n\nВы поймали "
+                        "лепрекона, так беспечно заснувшего "
+                        "под шляпкой волшебного гриба."
+                        " В обмен на свободу он рассказал "
+                        "вам, где лежит горшочек со "
+                        "всякими ценными вещицами.",
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
                     static_cast<ResourceType>(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
@@ -464,8 +462,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra_o->active) {
                 NormalDialog(
-                    "{\xd1\xf4\xe8\xed\xea\xf1}\n\n\xc2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea \xee\xe3\xf0\xee\xec\xed\xee\xec\xf3 "
-                        "\xd1\xf4\xe8\xed\xea\xf1\xf3, \xed\xee \xee\xed \xe4\xe0\xe6\xe5 \xed\xe5 \xf8\xe5\xeb\xee\xf5\xed\xf3\xeb\xf1\xff.",
+                    "{Сфинкс}\n\nВы подошли к огромному "
+                        "Сфинксу, но он даже не шелохнулся.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -480,18 +478,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 sprintf(
                     gText,
-                    "\"\xc5\xf1\xf2\xfc \xf3 \xec\xe5\xed\xff \xe7\xe0\xe3\xe0\xe4\xea\xe0 \xe4\xeb\xff \xf2\xe5\xe1\xff,"
-                        "\"\xf1\xea\xe0\xe7\xe0\xeb \xd1\xf4\xe8\xed\xea\xf1. \"\xce\xf2\xe2\xe5\xf2\xe8\xf8\xfc "
-                        "\xe2\xe5\xf0\xed\xee - \xef\xee\xeb\xf3\xf7\xe8\xf8\xfc \xed\xe0\xe3\xf0\xe0\xe4\xf3. \xce\xf8\xe8\xe1\xe5\xf8\xfc\xf1\xff "
-                        "- \xff \xf1\xee\xe6\xf0\xf3 \xf2\xe5\xe1\xff. \xcf\xf0\xe8\xed\xe8\xec\xe0\xe5\xf8\xfc \xeb\xe8 "
-                        "\xf2\xfb \xec\xee\xe9 \xe2\xfb\xe7\xee\xe2?\""
+                    "\"Есть у меня загадка для тебя,"
+                        "\"сказал Сфинкс. \"Ответишь "
+                        "верно - получишь награду. Ошибешься "
+                        "- я сожру тебя. Принимаешь ли "
+                        "ты мой вызов?\""
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
-                        "\xd1\xf4\xe8\xed\xea\xf1 \xe7\xe0\xe3\xe0\xe4\xe0\xeb \xe2\xe0\xec \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xf3\xfe "
-                            "\xe7\xe0\xe3\xe0\xe4\xea\xf3::\n\n'%s'\n\n\xc2\xe0\xf8 \xee\xf2\xe2\xe5\xf2?",
+                        "Сфинкс загадал вам следующую "
+                            "загадку::\n\n'%s'\n\nВаш ответ?",
                         eventExtra_o->riddle
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
@@ -534,10 +532,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
 
                         NormalDialog(
-                            "\xcd\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf0\xe0\xe7\xee\xf7\xe0\xf0\xee\xe2\xe0\xed\xed\xee "
-                                "\xd1\xf4\xe8\xed\xea\xf1 \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb. \xd2\xfb \xe4\xe0\xeb \xe2\xe5\xf0\xed\xfb\xe9 "
-                                "\xee\xf2\xe2\xe5\xf2, \xe2\xee\xf2 \xf2\xe2\xee\xff \xed\xe0\xe3\xf0\xe0\xe4\xe0. \xc0 \xf2\xe5\xef\xe5\xf0\xfc "
-                                "\xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff.",
+                            "Несколько разочарованно "
+                                "Сфинкс промолвил. Ты дал верный "
+                                "ответ, вот твоя награда. А теперь "
+                                "убирайся.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -551,11 +549,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventExtra_o->active = 0;
                     } else {
                         NormalDialog(
-                            "\"\xd2\xe2\xee\xff \xe4\xee\xe3\xe0\xe4\xea\xe0 \xee\xf8\xe8\xe1\xee\xf7\xed\xe0,\" \xf1\xea\xe0\xe7\xe0\xeb,"
-                                " \xf3\xeb\xfb\xe1\xe0\xff\xf1\xfc, \xd1\xf4\xe8\xed\xea\xf1. \xd3\xf5\xec\xfb\xeb\xff\xfe\xf9\xe8\xe9\xf1\xff "
-                                "\xd1\xf4\xe8\xed\xea\xf1 \xef\xee\xe2\xe0\xeb\xe8\xeb \xf2\xe5\xe1\xff \xed\xe0 \xe7\xe5\xec\xeb\xfe "
-                                "\xe8 \xec\xe8\xf0 \xee\xea\xf3\xf2\xe0\xeb\xe0 \xed\xe5\xef\xf0\xee\xe3\xeb\xff\xe4\xed\xe0\xff "
-                                "\xf2\xfc\xec\xe0.",
+                            "\"Твоя догадка ошибочна,\" сказал,"
+                                " улыбаясь, Сфинкс. Ухмыляющийся "
+                                "Сфинкс повалил тебя на землю "
+                                "и мир окутала непроглядная "
+                                "тьма.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -575,9 +573,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{\xce\xe1\xe7\xee\xf0\xed\xe0\xff \xe1\xe0\xf8\xed\xff}\n\n\xd1 \xe2\xe5\xf0\xf8\xe8\xed\xfb "
-                    "\xee\xe1\xe7\xee\xf0\xed\xee\xe9 \xe1\xe0\xf8\xed\xe8 \xe2\xfb \xf1\xec\xee\xe3\xeb\xe8 "
-                    "\xf0\xe0\xe7\xe3\xeb\xff\xe4\xe5\xf2\xfc \xe4\xe0\xeb\xfc\xed\xe8\xe5 \xe7\xe5\xec\xeb\xe8.",
+                "{Обзорная башня}\n\nС вершины "
+                    "обзорной башни вы смогли "
+                    "разглядеть дальние земли.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -620,42 +618,42 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc4\xeb\xff \xe2\xf1\xe5\xf5 %s, %s"
-                            " \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 "
-                            "\xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 \xf3 \xec\xe0\xf1\xf2\xe5\xf0\xee\xe2 \xe1\xee\xff \xe8\xe7 "
-                            "\xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 "
-                            "\xe0\xf0\xec\xe8\xe8 \xe8\xec\xe5\xfe\xf2\xf1\xff \xee\xf2\xf0\xff\xe4\xfb %s, %s, \xe8 "
+                        "{Форт на холме}\n\nДля всех %s, %s"
+                            " и %s вашего войска проходят "
+                            "обучение у мастеров боя из "
+                            "этого форта. Теперь в вашей "
+                            "армии имеются отряды %s, %s, и "
                             "%s",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(thirdUpgrade_f)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
-                        gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[IDX(thirdUpgrade_f) + 1]
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(secondUpgrade1)],
+                        gArmyNamesPlural[(thirdUpgrade_f)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[(secondUpgrade1) + 1],
+                        gArmyNamesPlural[(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
-                            "%s \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf8\xeb\xe8 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
-                            "\xf3 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0."
-                            " \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xef\xee\xff\xe2\xe8\xeb\xe8\xf1\xfc "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s.",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
-                        gArmyNamesPlural[IDX(secondUpgrade1) + 1]
+                        "{Форт на холме}\n\nВсе отряды "
+                            "%s и %s вашего войска прошли обучение "
+                            "у наставников этого форта."
+                            " Теперь в вашей армии появились "
+                            "отряды %s и %s.",
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(secondUpgrade1)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[(secondUpgrade1) + 1]
                     );
                 } else {
                     sprintf(
                         gText,
-                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
-                            "%s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
-                            "\xf3 \xe1\xee\xe5\xe2\xfb\xf5 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee "
-                            "\xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
-                            "\xe5\xf1\xf2\xfc \xee\xf2\xf0\xff\xe4 %s.",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
+                        "{Форт на холме}\n\nВсе отряды "
+                            "%s вашего войска проходят обучение "
+                            "у боевых наставников этого "
+                            "форта. Теперь в вашей армии "
+                            "есть отряд %s.",
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1]
                     );
                 }
                 EventWindow(
@@ -663,21 +661,21 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO,
                     gText,
                     NORMAL_DIALOG_MONSTER,
-                    IDX(firstUpgrade_e) + 1,
+                    (firstUpgrade_e) + 1,
                     secondUpgrade1 == CREATURE_NONE ? -1 : NORMAL_DIALOG_MONSTER,
-                    IDX(secondUpgrade1) + 1,
+                    (secondUpgrade1) + 1,
                     -1
                 );
             } else {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xcd\xe5\xee\xe1\xfb\xf7\xed\xfb\xe9 "
-                        "\xf1\xee\xfe\xe7 \xee\xe3\xf0\xee\xe2 \xe8 \xe3\xed\xee\xec\xee\xe2 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe2\xe0\xec \xef\xee\xf2\xf0\xe5\xed\xe8\xf0\xee\xe2\xe0\xf2\xfc (\xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc)"
-                        " \xeb\xfe\xe1\xfb\xe5 \xef\xee\xe4\xee\xe1\xed\xfb\xe5 \xe8\xec \xe2\xee\xe9\xf1\xea\xe0."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xf2\xe0\xea\xe8\xf5 \xef\xf0\xe8 "
-                        "\xf1\xe5\xe1\xe5 \xed\xe5\xf2.",
+                    "{Форт на холме}\n\nНеобычный "
+                        "союз огров и гномов предлагает "
+                        "вам потренировать (улучшить)"
+                        " любые подобные им войска."
+                        " К сожалению, у вас таких при "
+                        "себе нет.",
                     -1,
                     0,
                     -1,
@@ -717,35 +715,35 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s, %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
-                            "%s, %s, \xe8 %s",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(thirdUpgrade_f)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
-                        gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[IDX(thirdUpgrade_f) + 1]
+                        "{Вольная литейная}\n\nВсе ваши "
+                            "отряды %s, %s и %s теперь стали отрядами "
+                            "%s, %s, и %s",
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(secondUpgrade1)],
+                        gArmyNamesPlural[(thirdUpgrade_f)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[(secondUpgrade1) + 1],
+                        gArmyNamesPlural[(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
-                            "%s \xe8 %s",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
-                        gArmyNamesPlural[IDX(secondUpgrade1) + 1]
+                        "{Вольная литейная}\n\nВсе ваши "
+                            "отряды %s и %s теперь стали отрядами "
+                            "%s и %s",
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(secondUpgrade1)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[(secondUpgrade1) + 1]
                     );
                 } else {
                     sprintf(
                         gText,
-                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
-                            "\xee\xf2\xf0\xff\xe4\xfb %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
+                        "{Вольная литейная}\n\nВсе ваши "
+                            "отряды %s теперь стали отрядами "
                             "%s.",
-                        gArmyNamesPlural[IDX(firstUpgrade_e)],
-                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
+                        gArmyNamesPlural[(firstUpgrade_e)],
+                        gArmyNamesPlural[(firstUpgrade_e) + 1]
                     );
                 }
                 EventWindow(
@@ -753,25 +751,25 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO,
                     gText,
                     NORMAL_DIALOG_MONSTER,
-                    IDX(firstUpgrade_e) + 1,
+                    (firstUpgrade_e) + 1,
                     secondUpgrade1 == CREATURE_NONE ? -1 : NORMAL_DIALOG_MONSTER,
-                    IDX(secondUpgrade1) + 1,
+                    (secondUpgrade1) + 1,
                     -1
                 );
             } else {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xca\xf3\xe7\xed\xe5\xf6 "
-                        "\xef\xf0\xe8 \xfd\xf2\xee\xe9 \xeb\xe8\xf2\xe5\xe9\xed\xee\xe9 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe7\xe0\xec\xe5\xed\xe8\xf2\xfc \xee\xf0\xf3\xe6\xe8\xe5 \xea\xee\xef\xe5\xe9\xf9\xe8\xea\xee\xe2 "
-                        "\xe8 \xec\xe5\xf7\xed\xe8\xea\xee\xe2 \xf1 \xe6\xe5\xeb\xe5\xe7\xed\xee\xe3\xee \xed\xe0 "
-                        "\xf1\xf2\xe0\xeb\xfc\xed\xee\xe5. \xce\xed \xf2\xe0\xea\xe6\xe5 \xf1\xea\xe0\xe7\xe0\xeb,"
-                        " \xf7\xf2\xee \xe2\xeb\xe0\xe4\xe5\xe5\xf2 \xf2\xe5\xf5\xed\xee\xeb\xee\xe3\xe8\xe5\xe9 "
-                        "\xef\xee\xe2\xfb\xf8\xe5\xed\xe8\xff \xe6\xe5\xeb\xe5\xe7\xed\xfb\xf5 \xe3\xee\xeb\xe5\xec\xee\xe2 "
-                        "\xe4\xee \xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8\xea\xee\xe3\xee "
-                        "\xe8\xe7 \xed\xe8\xf5 \xed\xe5\xf2 \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe8 "
-                        "\xee\xed \xed\xe5 \xec\xee\xe3\xf3\xf2 \xef\xee\xec\xee\xf7\xfc \xe2\xe0\xec.",
+                    "{Вольная литейная}\n\nКузнец "
+                        "при этой литейной предлагает "
+                        "заменить оружие копейщиков "
+                        "и мечников с железного на "
+                        "стальное. Он также сказал,"
+                        " что владеет технологией "
+                        "повышения железных големов "
+                        "до стальных. К сожалению, никого "
+                        "из них нет в вашей армии, и "
+                        "он не могут помочь вам.",
                     -1,
                     0,
                     -1,
@@ -786,10 +784,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
-                        "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
-                        "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee. \xc2\xed\xf3\xf2\xf0\xe8 "
-                        "\xe1\xfb\xeb\xe8 %s \xe8 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    "{Сундук}\n\nПроведя часы, пытаясь "
+                        "выловить сундук из воды, вы "
+                        "наконец открыли его. Внутри "
+                        "были %s и 1000 золотых.",
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
@@ -799,7 +797,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     MAP_EVENT_REWARD_ARTIFACT,
                     cell->m_objectMetadata & CHEST_ARTIFACT_MASK,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SEA_CHEST_ARTIFACT_GOLD,
                     -1,
                     0
@@ -813,14 +811,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
                 NormalDialog(
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
-                        "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
-                        "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee \xe8 \xed\xe0\xf8\xeb\xe8 "
-                        "\xe2\xed\xf3\xf2\xf0\xe8 1500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    "{Сундук}\n\nПроведя часы, пытаясь "
+                        "выловить сундук из воды, вы "
+                        "наконец открыли его и нашли "
+                        "внутри 1500 золотых.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SEA_CHEST_GOLD,
                     -1,
                     0,
@@ -830,11 +828,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
             } else {
                 NormalDialog(
-                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xee\xf2\xf0\xe0\xf2\xe8\xe2 \xf7\xe0\xf1\xfb \xed\xe0 "
-                        "\xf2\xee, \xf7\xf2\xee\xe1\xfb \xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea "
-                        "\xe8\xe7 \xec\xee\xf0\xff, \xe2\xfb \xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 "
-                        "\xe5\xe3\xee \xeb\xe8\xf8\xfc \xe7\xe0 \xf2\xe5\xec, \xf7\xf2\xee\xe1\xfb \xf3\xe2\xe8\xe4\xe5\xf2\xfc:"
-                        " \xe2\xed\xf3\xf2\xf0\xe8 \xef\xf3\xf1\xf2\xee.",
+                    "{Сундук}\n\nПотратив часы на "
+                        "то, чтобы выловить сундук "
+                        "из моря, вы наконец открыли "
+                        "его лишь за тем, чтобы увидеть:"
+                        " внутри пусто.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -854,9 +852,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8, \xed\xee \xed\xe8\xf7\xe5\xe3\xee "
-                            "\xed\xe5 \xed\xe0\xf8\xeb\xe8.",
+                        "{Обломки}\n\nВы исследовали "
+                            "плавающие обломки, но ничего "
+                            "не нашли.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -870,13 +868,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xe4\xee\xe1\xfb\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
+                        "{Обломки}\n\nВы исследовали "
+                            "плавающие обломки и добыли "
+                            "немного древесины.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
-                        IDX(RES_WOOD),
+                        (RES_WOOD),
                         FLOTSAM_WOOD_AMOUNT,
                         -1,
                         0,
@@ -887,15 +885,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe7\xee\xeb\xee\xf2\xe0 \xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
+                        "{Обломки}\n\nВы исследовали "
+                            "плавающие обломки и нашли "
+                            "немного золота и древесины.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
-                        IDX(RES_WOOD),
+                        (RES_WOOD),
                         FLOTSAM_WOOD_AMOUNT,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         FLOTSAM_GOLD_AMOUNT,
                         -1,
                         0
@@ -905,15 +903,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_LARGE_TREASURE:
                     NormalDialog(
-                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
-                            "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
-                            "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb \xe8 \xe7\xee\xeb\xee\xf2\xe0.",
+                        "{Обломки}\n\nВы исследовали "
+                            "плавающие обломки и нашли "
+                            "немного древесины и золота.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
-                        IDX(RES_WOOD),
+                        (RES_WOOD),
                         FLOTSAM_LARGE_WOOD_AMOUNT,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         FLOTSAM_LARGE_GOLD_AMOUNT,
                         -1,
                         0
@@ -931,10 +929,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
-                        "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
-                        "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
-                        "\xee\xea\xe5\xe0\xed\xe5. \xcd\xe0\xe3\xf0\xe0\xe4\xe0 \xe7\xe0 \xe2\xe0\xf8\xf3 \xe4\xee\xe1\xf0\xee\xf2\xf3 "
+                    "{Потерпевший кораблекрушение}"
+                        "\n\nВы спасли жертву кораблекрушения "
+                        "от неминуемой смерти в безжалостном "
+                        "океане. Награда за вашу доброту "
                         "- %s.",
                     gArtifactNames[cell->m_objectMetadata]
                 );
@@ -953,13 +951,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), 1, -1);
             } else {
                 NormalDialog(
-                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
-                        "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
-                        "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
-                        "\xee\xea\xe5\xe0\xed\xe5. \xc8\xf1\xef\xee\xeb\xed\xe5\xed\xed\xfb\xe9 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xe8,"
-                        " \xe1\xe5\xe4\xed\xff\xe3\xe0 \xf1\xea\xe0\xe7\xe0\xeb: \"\xdf \xe1\xfb \xed\xe0\xe3\xf0\xe0\xe4\xe8\xeb "
-                        "\xe2\xe0\xf1 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xec, \xed\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 "
-                        "\xe4\xeb\xff \xed\xe5\xe3\xee \xec\xe5\xf1\xf2\xe0.\"",
+                    "{Потерпевший кораблекрушение}"
+                        "\n\nВы спасли жертву кораблекрушения "
+                        "от неминуемой смерти в безжалостном "
+                        "океане. Исполненный благодарности,"
+                        " бедняга сказал: \"Я бы наградил "
+                        "вас артефактом, но у вас нет "
+                        "для него места.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -976,13 +974,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_MAGELLAN_MAPS:
-            if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < MAGELLAN_MAP_COST) {
+            if (gpCurPlayer->m_resources[(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xca\xe0\xef\xe8\xf2\xe0\xed "
-                        "\xe2\xe7\xe4\xfb\xf5\xe0\xe5\xf2. \"\xd7\xf2\xee, \xe4\xe5\xed\xfc\xe6\xe0\xf2 \xed\xe5 "
-                        "\xf5\xe2\xe0\xf2\xe0\xe5\xf2, \xe4\xe0? \xd2\xfb \xe6\xe5 \xed\xe5 \xe4\xf3\xec\xe0\xe5\xf8\xfc,"
-                        " \xe1\xf3\xe4\xf2\xee \xff \xee\xf2\xe4\xe0\xec \xf2\xe5\xe1\xe5 \xf1\xe2\xee\xe8 \xea\xe0\xf0\xf2\xfb "
-                        "\xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee!\"",
+                    "{Карты Магеллана}\n\nКапитан "
+                        "вздыхает. \"Что, деньжат не "
+                        "хватает, да? Ты же не думаешь,"
+                        " будто я отдам тебе свои карты "
+                        "бесплатно!\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -996,12 +994,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xc1\xfb\xe2\xf8\xe8\xe9 "
-                        "\xea\xe0\xef\xe8\xf2\xe0\xed, \xe6\xe8\xe2\xf3\xf9\xe8\xe9 \xed\xe0 \xfd\xf2\xee\xec \xef\xee\xe4\xed\xee\xe2\xeb\xe5\xed\xed\xee\xec "
-                        "\xf0\xfb\xe1\xee\xeb\xee\xe2\xed\xee\xec \xef\xf0\xe8\xf7\xe0\xeb\xe5, \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                        "\xe2\xe0\xec \xea\xe0\xf0\xf2\xfb, \xf1\xee\xf1\xf2\xe0\xe2\xeb\xe5\xed\xed\xfb\xe5 \xe2 "
-                        "\xef\xf0\xe5\xe6\xed\xe8\xe5 \xe4\xed\xe8, \xe7\xe0 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xe8\xf5 \xea\xf3\xef\xe8\xf2\xfc?",
+                    "{Карты Магеллана}\n\nБывший "
+                        "капитан, живущий на этом подновленном "
+                        "рыболовном причале, предлагает "
+                        "вам карты, составленные в "
+                        "прежние дни, за 1000 золотых. Желаете "
+                        "их купить?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -1013,7 +1011,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    gpCurPlayer->m_resources[IDX(RES_GOLD)] -= MAGELLAN_MAP_COST;
+                    gpCurPlayer->m_resources[(RES_GOLD)] -= MAGELLAN_MAP_COST;
                     gpGame->MakeAllWaterVisible(giCurPlayer);
                     CompleteDraw(0);
                     UpdateScreen(0, 0);
@@ -1025,30 +1023,30 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->m_secondarySkills[cell->m_objectMetadata] != HERO_SKILL_LEVEL_NONE) {
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
-                        "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
-                        "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
-                        "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
-                        "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
-                        "\xe8 \xec\xee\xeb\xe2\xe8\xeb\xe0: \"\xc2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xf2\xee,"
-                        " \xf7\xe5\xec\xf3 \xff \xec\xee\xe3\xeb\xe0 \xe1\xfb \xed\xe0\xf3\xf7\xe8\xf2\xfc. \xc1\xee\xeb\xfc\xf8\xe5 "
-                        "\xed\xe8\xf7\xe5\xec \xef\xee\xec\xee\xf7\xfc \xed\xe5 \xf1\xec\xee\xe3\xf3.\"",
+                    "{Хижина ведьмы}\n\nПодойдя к "
+                        "хижине и заглянув в окно, вы "
+                        "увидели ведьму, склонившуюся "
+                        "над древней книгой под названием "
+                        "%s. Когда вы вошли, она обернулась "
+                        "и молвила: \"Вы уже знаете то,"
+                        " чему я могла бы научить. Больше "
+                        "ничем помочь не смогу.\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
-                        "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
-                        "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
-                        "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
-                        "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
-                        "\xe8 \xed\xe0\xf1\xf2\xe0\xe2\xe8\xeb\xe0 \xed\xe0 \xe2\xe0\xf1 \xf1\xe2\xee\xe9 \xf1\xf2\xe5\xea\xeb\xff\xed\xed\xfb\xe9 "
-                        "\xe3\xeb\xe0\xe7. \"\xd2\xfb \xf3\xe6\xe5 \xe8 \xf2\xe0\xea \xe7\xed\xe0\xe5\xf8\xfc \xe2\xf1\xe5,"
-                        " \xf7\xe5\xe3\xee \xe7\xe0\xf1\xeb\xf3\xe6\xe8\xe2\xe0\xe5\xf8\xfc!\" - \xe7\xe0\xe2\xee\xef\xe8\xeb\xe0 "
-                        "\xe2\xe5\xe4\xfc\xec\xe0. \"- \xc0 \xf2\xe5\xef\xe5\xf0\xfc \xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff "
-                        "\xe8\xe7 \xec\xee\xe5\xe3\xee \xe4\xee\xec\xe0!\"",
+                    "{Хижина ведьмы}\n\nПодойдя к "
+                        "хижине и заглянув в окно, вы "
+                        "увидели ведьму, склонившуюся "
+                        "над древней книгой под названием "
+                        "%s. Когда вы вошли, она обернулась "
+                        "и наставила на вас свой стеклянный "
+                        "глаз. \"Ты уже и так знаешь все,"
+                        " чего заслуживаешь!\" - завопила "
+                        "ведьма. \"- А теперь убирайся "
+                        "из моего дома!\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -1056,11 +1054,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(
                     gText,
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xc4\xf0\xff\xf5\xeb\xe0\xff, \xed\xee "
-                        "\xe1\xe5\xf1\xf1\xec\xe5\xf0\xf2\xed\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0, \xe6\xe8\xe2\xf3\xf9\xe0\xff "
-                        "\xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5 \xed\xe0 \xea\xf3\xf0\xfc\xe8\xf5 \xed\xee\xe6\xea\xe0\xf5,"
-                        " \xef\xee \xea\xe0\xea\xe8\xec-\xf2\xee \xed\xe5\xef\xee\xed\xff\xf2\xed\xfb\xec \xf1\xee\xee\xe1\xf0\xe0\xe6\xe5\xed\xe8\xff\xec "
-                        "\xf0\xe5\xf8\xe8\xeb\xe0, \xf7\xf2\xee %s \xe2\xe0\xec \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff.",
+                    "{Хижина ведьмы}\n\nДряхлая, но "
+                        "бессмертная ведьма, живущая "
+                        "в этой хижине на курьих ножках,"
+                        " по каким-то непонятным соображениям "
+                        "решила, что %s вам пригодится.",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 EventWindow(
@@ -1083,10 +1081,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xdd\xf2\xee\xf2 "
-                        "\xf0\xee\xe4\xed\xe8\xea \xe2\xee\xf1\xef\xee\xeb\xed\xff\xe5\xf2\xf1\xff \xf0\xe0\xe7 \xe2 "
-                        "\xed\xe5\xe4\xe5\xeb\xfe, \xe0 \xea\xf2\xee-\xf2\xee \xf3\xe6\xe5 \xef\xf0\xe8\xea\xeb\xe0\xe4\xfb\xe2\xe0\xeb\xf1\xff "
-                        "\xea \xed\xe5\xec\xf3 \xed\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5.",
+                    "{Артезианский источник}\n\nЭтот "
+                        "родник восполняется раз в "
+                        "неделю, а кто-то уже прикладывался "
+                        "к нему на этой неделе.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1105,11 +1103,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (eventHero2->m_spellPoints
                     >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xe4\xe2\xee\xe5 \xef\xee\xe2\xfb\xf8\xe0\xe5\xf2 "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, "
-                            "\xed\xee \xe2\xfb \xf3\xe6\xe5 \xef\xf0\xe8\xe1\xfb\xe2\xe0\xe5\xf2\xe5 \xe2 \xef\xee\xe4\xee\xe1\xed\xee\xec "
-                            "\xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8.",
+                        "{Артезианский источник}\n\nГлоток "
+                            "из родника обычно вдвое повышает "
+                            "вашу магическую энергию, "
+                            "но вы уже прибываете в подобном "
+                            "состоянии.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1122,11 +1120,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                 } else {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xf3 "
-                            "\xea\xf0\xee\xe2\xfc \xec\xe0\xe3\xe8\xe5\xe9! \xd2\xe5\xef\xe5\xf0\xfc \xf3 \xe2\xe0\xf1 "
-                            "\xe2 \xe7\xe0\xef\xe0\xf1\xe5 \xe2\xe4\xe2\xee\xe5 \xe1\xee\xeb\xfc\xf8\xe5 \xee\xe1\xfb\xf7\xed\xee\xe3\xee "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9 \xfd\xed\xe5\xf0\xe3\xe8\xe8.",
+                        "{Артезианский источник}\n\nГлоток "
+                            "из родника наполняет вашу "
+                            "кровь магией! Теперь у вас "
+                            "в запасе вдвое больше обычного "
+                            "магической энергии.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1143,11 +1141,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_MAGIC_WELL:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_MAGIC_WELL)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_MAGIC_WELL)))) {
                 NormalDialog(
-                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
-                        "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xf2\xee\xf0\xee\xe9 \xe3\xeb\xee\xf2\xee\xea \xe8\xe7 "
-                        "\xea\xee\xeb\xee\xe4\xf6\xe0 \xe7\xe0 \xe4\xe5\xed\xfc \xe2\xe0\xec \xed\xe5 \xef\xee\xec\xee\xe6\xe5\xf2.",
+                    "{Волшебный колодец}\n\nВолшебный "
+                        "колодец}\n\nВторой глоток из "
+                        "колодца за день вам не поможет.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1165,10 +1163,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
                 if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2 "
-                            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 "
-                            "\xee\xed\xe0 \xf3 \xe2\xe0\xf1 \xe8 \xf2\xe0\xea \xed\xe0 \xef\xf0\xe5\xe4\xe5\xeb\xe5.",
+                        "{Волшебный колодец}\n\nГлоток "
+                            "из колодца обычно восстанавливает "
+                            "магическую энергию, но сейчас "
+                            "она у вас и так на пределе.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1181,9 +1179,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                 } else {
                     NormalDialog(
-                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
-                            "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xe2\xee\xf1\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb "
-                            "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe.",
+                        "{Волшебный колодец}\n\nГлоток "
+                            "из колодца полностью восстановил "
+                            "вашу магическую энергию.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1195,7 +1193,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0
                     );
                     eventHero2->m_eventFlags = HeroEventFlag(
-                        static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
+                        static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_MAGIC_WELL)
                     );
                     eventHero2->m_spellPoints = wellSpellPoints_o;
                 }
@@ -1203,9 +1201,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
+                    static_cast<i32>(eventHero2->m_eventFlags) & ~(HERO_EVENT_EMBARKED)
                 );
                 eventHero2->m_remainingMobility = 0;
                 eventHero2->m_direction = m_cursorDirection;
@@ -1245,7 +1243,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 BOAT_RESTORE_MODE
             );
             eventHero2->m_eventFlags = HeroEventFlag(
-                static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+                static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_EMBARKED)
             );
             eventHero2->m_remainingMobility = 0;
             boat_k->heroId = eventHero2->m_id;
@@ -1294,11 +1292,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             else
                 resourceAmount_o = 1;
             EventWindow(
-                IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
+                (gpGame->m_mines[cell->m_objectMetadata].resourceType)
                     + MINE_RESOURCE_ICON_OFFSET,
                 NORMAL_DIALOG_INFO,
                 "",
-                IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
+                (gpGame->m_mines[cell->m_objectMetadata].resourceType),
                 -resourceAmount_o,
                 -1,
                 0,
@@ -1314,7 +1312,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EVENT_TEXT_ALCHEMIST_CAPTURED,
                 NORMAL_DIALOG_INFO,
                 "",
-                IDX(RES_MERCURY),
+                (RES_MERCURY),
                 NORMAL_DIALOG_NO_VALUE,
                 -1,
                 0,
@@ -1330,7 +1328,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EVENT_TEXT_SAWMILL_CAPTURED,
                 NORMAL_DIALOG_INFO,
                 "",
-                IDX(RES_WOOD),
+                (RES_WOOD),
                 -MINE_ORE_INCOME,
                 -1,
                 0,
@@ -1365,9 +1363,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
                 sprintf(
                     gText,
-                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
-                        " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe7\xe0\xf0\xfb\xf2\xfb\xe9 "
-                        "\xeb\xe0\xf0\xe5\xf6, \xe0 \xe2 \xed\xe5\xec - \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 "
+                    "{Ларец}\n\nИсследуя окрестности,"
+                        " вы наткнулись на зарытый "
+                        "ларец, а в нем - древний артефакт "
                         "'%s'",
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
@@ -1394,13 +1392,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
-                        " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
-                        "\xeb\xe0\xf0\xe5\xf6. \xc7\xee\xeb\xee\xf2\xee \xec\xee\xe6\xed\xee \xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc "
-                        "\xf1\xe5\xe1\xe5 \xe8\xeb\xe8 \xf0\xe0\xe7\xe4\xe0\xf2\xfc \xea\xf0\xe5\xf1\xf2\xfc\xff\xed\xe0\xec "
-                        "\xe2 \xee\xe1\xec\xe5\xed \xed\xe0 \xee\xef\xfb\xf2. \xce\xf1\xf2\xe0\xe2\xe8\xf2\xe5 \xf1\xe5\xe1\xe5 "
-                        "\xe7\xee\xeb\xee\xf2\xee?",
-                    IDX(RES_GOLD),
+                    "{Ларец}\n\nИсследуя окрестности,"
+                        " вы наткнулись на древний "
+                        "ларец. Золото можно оставить "
+                        "себе или раздать крестьянам "
+                        "в обмен на опыт. Оставите себе "
+                        "золото?",
+                    (RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     NORMAL_DIALOG_EXPERIENCE,
                     (cell->m_objectMetadata - CHEST_EXPERIENCE_LEVEL_OFFSET)
@@ -1427,7 +1425,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_BUOY:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_BUOY)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_BUOY)))) {
                 EventWindow(
                     EVENT_TEXT_BUOY_VISITED,
                     NORMAL_DIALOG_INFO,
@@ -1441,7 +1439,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_BUOY)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_BUOY)
                 );
                 eventHero2->m_morale++;
                 EventWindow(
@@ -1458,7 +1456,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FAERIE_RING:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_FAERIE_RING)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_FAERIE_RING)))) {
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_VISITED,
                     NORMAL_DIALOG_INFO,
@@ -1472,7 +1470,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FAERIE_RING)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_FAERIE_RING)
                 );
                 eventHero2->m_luck++;
                 EventWindow(
@@ -1489,16 +1487,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_IDOL:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_IDOL)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_IDOL)))) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
-                        " \xc3\xee\xe2\xee\xf0\xff\xf2, \xee\xed \xef\xf0\xe8\xed\xee\xf1\xe8\xf2 \xf3\xe4\xe0\xf7\xf3 "
-                        "\xf2\xe5\xec, \xea\xf2\xee \xe5\xe3\xee \xed\xe0\xe2\xe5\xf9\xe0\xe5\xf2, \xed\xee \xef\xee\xf1\xea\xee\xeb\xfc\xea\xf3 "
-                        "\xe7\xe2\xe5\xe7\xe4\xfb \xe8 \xf2\xe0\xea \xef\xee\xea\xf0\xee\xe2\xe8\xf2\xe5\xeb\xfc\xf1\xf2\xe2\xf3\xfe\xf2 "
-                        "\xe2\xe0\xec, \xe8\xe4\xee\xeb \xed\xe8\xf7\xe5\xe3\xee \xed\xee\xe2\xee\xe3\xee \xe2\xe0\xec "
-                        "\xed\xe5 \xe4\xe0\xeb.",
+                    "{Идол}\n\nВы нашли древнего идола."
+                        " Говорят, он приносит удачу "
+                        "тем, кто его навещает, но поскольку "
+                        "звезды и так покровительствуют "
+                        "вам, идол ничего нового вам "
+                        "не дал.",
                     -1,
                     0,
                     -1,
@@ -1508,17 +1506,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_IDOL)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_IDOL)
                 );
                 eventHero2->m_luck++;
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
-                        " \xc3\xee\xe2\xee\xf0\xff\xf2, \xe5\xf1\xeb\xe8 \xe5\xe3\xee \xef\xee\xf6\xe5\xeb\xee\xe2\xe0\xf2\xfc,"
-                        " \xfd\xf2\xee \xef\xf0\xe8\xed\xe5\xf1\xe5\xf2 \xf3\xe4\xe0\xf7\xf3 - \xe2\xfb \xf2\xe0\xea "
-                        "\xe8 \xef\xee\xf1\xf2\xf3\xef\xe8\xeb\xe8. \xca\xe0\xec\xe5\xed\xfc \xee\xea\xe0\xe7\xe0\xeb\xf1\xff "
-                        "\xee\xf7\xe5\xed\xfc \xf5\xee\xeb\xee\xe4\xe5\xed \xe4\xeb\xff \xe3\xf3\xe1.",
+                    "{Идол}\n\nВы нашли древнего идола."
+                        " Говорят, если его поцеловать,"
+                        " это принесет удачу - вы так "
+                        "и поступили. Камень оказался "
+                        "очень холоден для губ.",
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1529,7 +1527,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FOUNTAIN:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_FOUNTAIN)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_FOUNTAIN)))) {
                 EventWindow(
                     EVENT_TEXT_FOUNTAIN_VISITED,
                     NORMAL_DIALOG_INFO,
@@ -1543,7 +1541,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FOUNTAIN)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_FOUNTAIN)
                 );
                 eventHero2->m_luck++;
                 EventWindow(
@@ -1560,14 +1558,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WATERING_HOLE:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_WATERING_HOLE)))) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc2\xfb\xef\xe8\xe2\xea\xe0 \xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2,"
-                        " \xed\xee \xe8\xed\xfb\xf5 \xe1\xeb\xe0\xe3 \xed\xe5 \xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xc8\xf1\xf2\xee\xf7\xed\xe8\xea "
-                        "\xf1\xed\xee\xe2\xe0 \xef\xee\xec\xee\xe6\xe5\xf2 \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
+                    "{Промоина}\n\nВыпивка освежает,"
+                        " но иных благ не приносит. Источник "
+                        "снова поможет вам после следующей "
+                        "битвы.",
                     -1,
                     0,
                     -1,
@@ -1577,7 +1575,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_WATERING_HOLE)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_WATERING_HOLE)
                 );
                 eventHero2->m_morale++;
                 eventHero2->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
@@ -1585,10 +1583,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc4\xee\xe1\xf0\xfb\xe9 \xe3\xeb\xee\xf2\xee\xea "
-                        "\xe8\xf1\xef\xee\xeb\xed\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xee\xe9\xf1\xea\xe0 \xf1\xe8\xeb\xfb "
-                        "\xe8 \xef\xee\xe4\xed\xff\xeb \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 "
-                        "\xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe4\xe0\xeb\xfc\xf8\xe5.",
+                    "{Промоина}\n\nДобрый глоток "
+                        "исполнил ваши войска силы "
+                        "и поднял дух. Сегодня вы сможете "
+                        "пройти чуть дальше.",
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1599,15 +1597,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_OASIS:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_OASIS)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_OASIS)))) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xeb\xe0\xe3\xe8 \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
-                        "\xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2, \xed\xee \xe8\xed\xee\xe9 \xef\xee\xeb\xfc\xe7\xfb \xed\xe5 "
-                        "\xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xdd\xf2\xee\xf2 \xee\xe0\xe7\xe8\xf1, \xe2\xee\xe7\xec\xee\xe6\xed\xee,"
-                        " \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
+                    "{Оазис}\n\nГлоток влаги в оазисе "
+                        "освежает, но иной пользы не "
+                        "приносит. Этот оазис, возможно,"
+                        " пригодится вам после следующей "
+                        "битвы.",
                     -1,
                     0,
                     -1,
@@ -1617,7 +1615,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_OASIS)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_OASIS)
                 );
                 eventHero2->m_morale++;
                 eventHero2->m_mobility += OASIS_MOBILITY_BONUS;
@@ -1625,10 +1623,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xee\xe4\xfb \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
-                        "\xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2 \xf1\xe8\xeb\xee\xe9 "
-                        "\xe8 \xef\xee\xe4\xed\xe8\xec\xe0\xe5\xf2 \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb "
-                        "\xf1\xec\xee\xe6\xe5\xf2\xe5 \xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe1\xee\xeb\xfc\xf8\xe5.",
+                    "{Оазис}\n\nГлоток воды в оазисе "
+                        "наполняет ваших воинов силой "
+                        "и поднимает дух. Сегодня вы "
+                        "сможете пройти чуть больше.",
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1639,11 +1637,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_TEMPLE:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_TEMPLE)) {
+            if ((((eventHero2->m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
                 NormalDialog(
-                    "{\xd5\xf0\xe0\xec}\n\n\xc4\xe2\xee\xe9\xed\xe0\xff \xec\xee\xeb\xe8\xf2\xe2\xe0 \xe2\xee\xe9\xed\xe5 "
-                        "\xed\xe5 \xef\xee\xe4\xf1\xef\xee\xf0\xfc\xe5. \xc7\xe0\xf5\xee\xe4\xe8\xf2\xe5 \xef\xee\xf1\xeb\xe5 "
-                        "\xe1\xe8\xf2\xe2\xfb.",
+                    "{Храм}\n\nДвойная молитва войне "
+                        "не подспорье. Заходите после "
+                        "битвы.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1657,12 +1655,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_TEMPLE)
+                    static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_TEMPLE)
                 );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
-                    "{\xd5\xf0\xe0\xec}\n\n\xcf\xee\xf1\xe5\xf9\xe5\xed\xe8\xe5 \xf5\xf0\xe0\xec\xe0 \xe8 \xec\xee\xeb\xe8\xf2\xe2\xe0 "
-                        "\xef\xee\xe4\xed\xff\xeb\xe8 \xec\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe9\xf1\xea.",
+                    "{Храм}\n\nПосещение храма и молитва "
+                        "подняли мораль ваших войск.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1679,9 +1677,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xdd\xf2\xee \xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe5 \xe4\xe0\xe2\xed\xee "
-                        "\xe1\xf0\xee\xf8\xe5\xed\xee. \xcd\xe8\xf7\xe5\xe3\xee \xf6\xe5\xed\xed\xee\xe3\xee \xf2\xf3\xf2 "
-                        "\xed\xe5\xf2.",
+                    "{Навес}\n\nЭто сооружение давно "
+                        "брошено. Ничего ценного тут "
+                        "нет.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1695,10 +1693,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 "
-                        "\xed\xe0\xe2\xe5\xf1. \xcf\xee\xe8\xf1\xea\xe0\xe2 \xe2\xee\xea\xf0\xf3\xe3, \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 "
-                        "\xea\xee\xe5-\xea\xe0\xea\xe8\xe5 \xf0\xe5\xf1\xf3\xf0\xf1\xfb, \xef\xf0\xe8\xef\xf0\xff\xf2\xe0\xed\xed\xfb\xe5 "
-                        "\xef\xee\xe1\xeb\xe8\xe7\xee\xf1\xf2\xe8.",
+                    "{Навес}\n\nВы нашли брошенный "
+                        "навес. Поискав вокруг, вы обнаружили "
+                        "кое-какие ресурсы, припрятанные "
+                        "поблизости.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1726,11 +1724,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xea\xf2\xee-\xf2\xee \xed\xe0\xf8\xe5\xeb \xe5\xe5 "
-                        "\xe4\xee \xe2\xe0\xf1, \xef\xee\xe2\xee\xe7\xea\xe0 \xef\xf3\xf1\xf2\xe0.",
+                    "{Повозка}\n\nВы набрели на старую "
+                        "повозку, не доехавшую до торной "
+                        "дороги и брошенную купцом."
+                        " К сожалению, кто-то нашел ее "
+                        "до вас, повозка пуста.",
                     -1,
                     0,
                     -1,
@@ -1747,10 +1745,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xc2 \xed\xe5\xe9 \xe2\xfb \xed\xe0\xf8\xeb\xe8 %s.",
+                    "{Повозка}\n\nВы набрели на старую "
+                        "повозку, не доехавшую до торной "
+                        "дороги и брошенную купцом."
+                        " В ней вы нашли %s.",
                     gArtifactNames[eventValue1]
                 );
                 EventWindow(
@@ -1770,11 +1768,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
-                        "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
-                        "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
-                        " \xc2 \xed\xe5\xe9 \xe6\xe5 \xe2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xee \xf1\xe8\xf5 \xef\xee\xf0 "
-                        "\xed\xe5 \xf2\xf0\xee\xed\xf3\xf2\xfb\xe9 \xe3\xf0\xf3\xe7.",
+                    "{Повозка}\n\nВы набрели на старую "
+                        "повозку, не доехавшую до торной "
+                        "дороги и брошенную купцом."
+                        " В ней же вы нашли до сих пор "
+                        "не тронутый груз.",
                     (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
                     -1,
@@ -1812,13 +1810,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sprintf(
                             gText,
                             "%s.",
-                            "\xd1\xee\xea\xf0\xee\xe2\xe8\xf9\xe5"
+                            "Сокровище"
                         );
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
                             gText,
-                            IDX(RES_GOLD),
+                            (RES_GOLD),
                             SKELETON_GOLD,
                             -1,
                             0,
@@ -1856,7 +1854,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EVENT_TEXT_CAMPFIRE,
                 NORMAL_DIALOG_INFO,
                 "",
-                IDX(RES_GOLD),
+                (RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
                 cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT,
@@ -1869,7 +1867,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero2,
-                ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
+                ResourceType(cell->m_objectMetadata & (CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject_l = 1;
@@ -1884,11 +1882,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xd3\xe7\xed\xe0\xe2 \xe2\xe0\xf1, \xeb\xe0\xea\xe5\xe9 "
-                        "\xee\xf2\xea\xe0\xe7\xe0\xeb\xf1\xff \xef\xf3\xf1\xf2\xe8\xf2\xfc \xe2\xed\xf3\xf2\xf0\xfc."
-                        " \"\xcd\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea,\" - \xf1\xea\xe0\xe7\xe0\xeb \xee\xed, - \"\xed\xe5 "
-                        "\xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xee\xe4\xed\xee\xe3\xee \xe8 \xf2\xee\xe3\xee \xe6\xe5 "
-                        "\xf1\xf2\xf3\xe4\xe5\xed\xf2\xe0 \xe4\xe2\xe0\xe6\xe4\xfb.\"",
+                    "{Ксанаду}\n\nУзнав вас, лакей "
+                        "отказался пустить внутрь."
+                        " \"Наставник,\" - сказал он, - \"не "
+                        "принимает одного и того же "
+                        "студента дважды.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1901,16 +1899,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 if (eventHero2->m_level
-                        + IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
+                        + (eventHero2->m_secondarySkills[(HERO_SKILL_DIPLOMACY)])
                               * XANADU_DIPLOMACY_MULTIPLIER
                     >= XANADU_ADMISSION_LEVEL) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xe4\xee\xef\xf3\xf1\xf2\xe8\xeb "
-                            "\xe2\xe0\xf1 \xe4\xee \xe0\xf3\xe4\xe8\xe5\xed\xf6\xe8\xe8 \xf1 \xf5\xee\xe7\xff\xe8\xed\xee\xec "
-                            "\xe4\xee\xec\xe0. \xc7\xe0\xed\xff\xf2\xe8\xff \xf1 \xed\xe8\xec \xef\xee\xe2\xfb\xf1\xe8\xeb\xe8 "
-                            "\xf7\xe5\xf2\xfb\xf0\xe5 \xf3\xec\xe5\xed\xe8\xff, \xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xe5 "
-                            "\xea\xe0\xe6\xe4\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe.",
+                        "{Ксанаду}\n\nЛакей допустил "
+                            "вас до аудиенции с хозяином "
+                            "дома. Занятия с ним повысили "
+                            "четыре умения, необходимые "
+                            "каждому герою.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1921,19 +1919,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
-                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
-                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
-                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
+                    eventHero2->m_primaryStats[(HERO_PRIMARY_ATTACK)]++;
+                    eventHero2->m_primaryStats[(HERO_PRIMARY_DEFENSE)]++;
+                    eventHero2->m_primaryStats[(HERO_PRIMARY_KNOWLEDGE)]++;
+                    eventHero2->m_primaryStats[(HERO_PRIMARY_SPELL_POWER)]++;
                     eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
                 } else {
                     NormalDialog(
-                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xee\xf2\xea\xf0\xfb\xeb \xe4\xe2\xe5\xf0\xfc "
-                            "\xe8 \xee\xe3\xeb\xff\xe4\xe5\xeb \xe2\xe0\xf1 \xf1 \xed\xee\xe3 \xe4\xee \xe3\xee\xeb\xee\xe2\xfb."
-                            " \"\xc2\xfb \xed\xe5 \xf2\xe0\xea \xe7\xed\xe0\xec\xe5\xed\xe8\xf2\xfb \xe8 \xed\xe5 \xf2\xe0\xea\xee\xe9 "
-                            "\xf3\xe6 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2, \xf7\xf2\xee\xe1\xfb \xec\xee\xe9 \xf5\xee\xe7\xff\xe8\xed "
-                            "\xef\xf0\xe8\xed\xff\xeb \xe2\xe0\xf1,\" - \xf4\xfb\xf0\xea\xed\xf3\xeb \xee\xed. - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf2\xe5\xf1\xfc,"
-                            " \xea\xee\xe3\xe4\xe0 \xf1\xee\xf7\xf2\xe5\xf2\xe5 \xf1\xe5\xe1\xff \xe4\xee\xf1\xf2\xee\xe9\xed\xfb\xec."
+                        "{Ксанаду}\n\nЛакей открыл дверь "
+                            "и оглядел вас с ног до головы."
+                            " \"Вы не так знамениты и не такой "
+                            "уж дипломат, чтобы мой хозяин "
+                            "принял вас,\" - фыркнул он. - \"Возвращайтесь,"
+                            " когда сочтете себя достойным."
                             "\"",
                         NORMAL_DIALOG_INFO,
                         -1,
@@ -1952,10 +1950,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FORT:
             if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd4\xee\xf0\xf2}\n\n \"\xcf\xf0\xee\xf1\xe8\xf2\xe5, \xf1\xfd\xf0,\" - \xd1\xea\xe0\xe7\xe0\xeb "
-                        "\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xfc \xe2\xee\xe8\xed\xee\xe2, - \"\xed\xee "
-                        "\xe2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xe2\xf1\xe5, \xf7\xe5\xec\xf3 \xec\xfb \xf1\xef\xee\xf1\xee\xe1\xed\xfb "
-                        "\xed\xe0\xf3\xf7\xe8\xf2\xfc.\"",
+                    "{Форт}\n\n \"Просите, сэр,\" - Сказал "
+                        "предводитель воинов, - \"но "
+                        "вы уже знаете все, чему мы способны "
+                        "научить.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1969,9 +1967,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xd4\xee\xf0\xf2}\n\n \xc2\xee\xe8\xed\xfb, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 \xe2 \xfd\xf2\xee\xec "
-                        "\xf4\xee\xf0\xf2\xe5, \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xef\xe0\xf0\xe5 \xed\xee\xe2\xfb\xf5 "
-                        "\xe7\xe0\xf9\xe8\xf2\xed\xfb\xf5 \xef\xf0\xe8\xe5\xec\xee\xe2.",
+                    "{Форт}\n\n Воины, живущие в этом "
+                        "форте, научили вас паре новых "
+                        "защитных приемов.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1982,7 +1980,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
+                eventHero2->m_primaryStats[(HERO_PRIMARY_DEFENSE)]++;
                 eventHero2->m_fortVisits |= 1 << cell->m_objectMetadata;
             }
             break;
@@ -1990,12 +1988,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_STANDING_STONES:
             if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
-                        "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
-                        "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
-                        "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xc4\xf0\xf3\xe8\xe4\xfb, \xed\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff "
-                        "\xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff, \xef\xee\xea\xe0\xe7\xe0\xeb\xe8 \xe6\xe5\xf1\xf2\xe0\xec\xe8,"
-                        " \xf7\xf2\xee \xe8\xec \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe5\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xf3\xf7\xe8\xf2\xfc.",
+                    "{Менгир}\n\nВы застали группу "
+                        "друидов за обрядом в одном "
+                        "из их диковинных каменных "
+                        "сооружений. Друиды, не нарушая "
+                        "безмолвия, показали жестами,"
+                        " что им больше нечему вас учить.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2009,12 +2007,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
-                        "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
-                        "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
-                        "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xcd\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff \xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff,"
-                        " \xee\xed\xe8 \xe2\xf1\xe5 \xe6\xe5 \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xed\xee\xe2\xfb\xec "
-                        "\xf1\xef\xee\xf1\xee\xe1\xe0\xec \xea\xee\xeb\xe4\xee\xe2\xf1\xf2\xe2\xe0.",
+                    "{Менгир}\n\nВы застали группу "
+                        "друидов за обрядом в одном "
+                        "из их диковинных каменных "
+                        "сооружений. Не нарушая безмолвия,"
+                        " они все же научили вас новым "
+                        "способам колдовства.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2025,7 +2023,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
+                eventHero2->m_primaryStats[(HERO_PRIMARY_SPELL_POWER)]++;
                 eventHero2->m_standingStoneVisits |= 1 << cell->m_objectMetadata;
             }
             break;
@@ -2033,9 +2031,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\"\xd3\xe1\xe8\xf0\xe0\xe9\xf1\xff!"
-                        "\" -  \xf0\xff\xe2\xea\xed\xf3\xeb\xe0 \xe2\xe5\xe4\xfc\xec\xe0, \"\xf2\xfb \xe7\xed\xe0\xe5\xf8\xfc "
-                        "\xe2\xf1\xe5, \xf7\xf2\xee \xe7\xed\xe0\xfe \xff.\"",
+                    "{Хижина ведьмы}\n\n\"Убирайся!"
+                        "\" -  рявкнула ведьма, \"ты знаешь "
+                        "все, что знаю я.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2049,13 +2047,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xce\xf0\xf7\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0,"
-                        " \xe6\xe8\xe2\xf3\xf9\xe0\xff \xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5, \xee\xe1\xee\xe3\xe0\xf2\xe8\xeb\xe0 "
-                        "\xe2\xe0\xf8\xe8 \xef\xee\xe7\xed\xe0\xed\xe8\xff \xe2 \xec\xe0\xe3\xe8\xe8, \xef\xee\xea\xe0\xe7\xe0\xe2,"
-                        " \xea\xe0\xea \xe3\xe0\xe4\xe0\xf2\xfc \xed\xe0 \xea\xe0\xec\xed\xff\xf5, \xf7\xe8\xf2\xe0\xf2\xfc "
-                        "\xe7\xed\xe0\xec\xe5\xed\xe8\xff \xe8 \xe8\xe7\xe2\xeb\xe5\xea\xe0\xf2\xfc \xf1\xf3\xf9\xed\xee\xf1\xf2\xfc "
-                        "\xe1\xfb\xf2\xe8\xff \xe8\xe7 \xf1\xeb\xee\xe6\xed\xee\xe3\xee \xef\xe5\xf0\xe5\xef\xeb\xe5\xf2\xe5\xed\xe8\xff "
-                        "\xf6\xfb\xef\xeb\xff\xf7\xfc\xe8\xf5 \xef\xee\xf2\xf0\xee\xf5\xee\xe2.",
+                    "{Хижина ведьмы}\n\nОрчая ведьма,"
+                        " живущая в этой хижине, обогатила "
+                        "ваши познания в магии, показав,"
+                        " как гадать на камнях, читать "
+                        "знамения и извлекать сущность "
+                        "бытия из сложного переплетения "
+                        "цыплячьих потрохов.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2066,7 +2064,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
+                eventHero2->m_primaryStats[(HERO_PRIMARY_KNOWLEDGE)]++;
                 eventHero2->m_witchDoctorVisits |= 1 << cell->m_objectMetadata;
             }
             break;
@@ -2074,13 +2072,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MERCENARY_CAMP:
             if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
-                        "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xe3\xe4\xe5 \xe2\xee\xe8\xed\xfb "
-                        "\xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf2 \xf2\xe0\xea\xf2\xe8\xea\xf3. \"\xc4\xeb\xff "
-                        "\xed\xe0\xf1 \xe2\xfb \xf1\xeb\xe8\xf8\xea\xee\xec \xf3\xec\xe5\xeb\xfb\xe9 \xe1\xee\xe5\xf6,"
-                        "\" -\xf1\xea\xe0\xe7\xe0\xeb \xea\xe0\xef\xe8\xf2\xe0\xed \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2."
-                        " - \"\xc1\xee\xeb\xfc\xf8\xe5 \xec\xfb \xed\xe8\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xed\xe0\xf3\xf7\xe8\xf2\xfc "
-                        "\xed\xe5 \xec\xee\xe6\xe5\xec.\"",
+                    "{Лагерь наемников}\n\nВы пришли "
+                        "в лагерь наемников, где воины "
+                        "отрабатывают тактику. \"Для "
+                        "нас вы слишком умелый боец,"
+                        "\" -сказал капитан наемников."
+                        " - \"Больше мы ничему вас научить "
+                        "не можем.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2094,12 +2092,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
-                        "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf9\xe8\xf5 "
-                        "\xf1\xe2\xee\xfe \xf2\xe0\xea\xf2\xe8\xea\xf3. \xcd\xe0\xe5\xec\xed\xe8\xea\xe8 \xef\xee\xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xee\xe2\xe0\xeb\xe8 "
-                        "\xe2\xe0\xf1 \xe8 \xef\xf0\xe8\xe3\xeb\xe0\xf1\xe8\xeb\xe8 \xe2\xec\xe5\xf1\xf2\xe5 \xf1 "
-                        "\xe2\xe0\xf8\xe8\xec \xee\xf2\xf0\xff\xe4\xee\xec \xef\xee\xe7\xe0\xed\xe8\xec\xe0\xf2\xfc\xf1\xff "
-                        "\xe2\xec\xe5\xf1\xf2\xe5 \xf1 \xed\xe8\xec\xe8.",
+                    "{Лагерь наемников}\n\nВы пришли "
+                        "в лагерь наемников, отрабатывающих "
+                        "свою тактику. Наемники поприветствовали "
+                        "вас и пригласили вместе с "
+                        "вашим отрядом позаниматься "
+                        "вместе с ними.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2110,7 +2108,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
+                eventHero2->m_primaryStats[(HERO_PRIMARY_ATTACK)]++;
                 eventHero2->m_mercenaryCampVisits |= 1 << cell->m_objectMetadata;
             }
             break;
@@ -2163,7 +2161,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EVENT_TEXT_WATER_WHEEL_REWARD,
                     NORMAL_DIALOG_INFO,
                     "",
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT,
                     -1,
                     0,
@@ -2182,7 +2180,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 resourceType_a == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
-            strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType_a)]);
+            strcpy(sphinxAnswer_a, gResourceNames[(resourceType_a)]);
             sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
@@ -2196,7 +2194,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WINDMILL:
-            if (cell->m_objectMetadata <= IDX(RES_GOLD)) {
+            if (cell->m_objectMetadata <= (RES_GOLD)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_WINDMILL_REWARD,
@@ -2254,11 +2252,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe9 "
-                        "\xe3\xee\xf0\xee\xe4 \xf4\xe5\xe9. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8 \xee\xe4\xed\xe0 "
-                        "\xf4\xe5\xff \xed\xe5 \xe7\xe0\xf5\xee\xf2\xe5\xeb\xe0 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc \xed\xe0 "
-                        "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xee\xed\xe8 \xef\xe5\xf0\xe5\xe4\xf3\xec\xe0\xfe\xf2.",
+                    "{Древо-город}\n\nВы нашли древесный "
+                        "город фей. К сожалению, ни одна "
+                        "фея не захотела присоединиться "
+                        "к вашей армии. Может быть на "
+                        "следующей неделе они передумают.",
                     -1,
                     0,
                     -1,
@@ -2270,11 +2268,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xcd\xe5\xea\xee\xf2\xee\xf0\xfb\xe5 \xf4\xe5\xe8 "
-                        "\xe8\xe7 \xfd\xf2\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0 \xed\xe0 \xe4\xe5\xf0\xe5\xe2\xfc\xff\xf5 "
-                        "\xe6\xe5\xeb\xe0\xfe\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe "
-                        "\xe7\xe0 \xed\xe5\xea\xee\xf2\xee\xf0\xee\xe5 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xf4\xe5\xe9?",
+                    "{Древо-город}\n\nНекоторые феи "
+                        "из этого города на деревьях "
+                        "желают вступить в вашу армию "
+                        "за некоторое вознаграждение."
+                        " Желаете нанять фей?",
                     -1,
                     0,
                     -1,
@@ -2291,11 +2289,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb,"
-                    " \xed\xee \xf3\xe1\xe5\xe4\xe8\xeb\xe8\xf1\xfc \xeb\xe8\xf8\xfc, \xf7\xf2\xee \xe6\xe8\xe2\xf8\xe8\xe5 "
-                    "\xf2\xf3\xf2 \xec\xe5\xe4\xf3\xe7\xfb \xf3\xf8\xeb\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
-                    "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xed\xe5\xe4\xe5\xeb\xe5.",
+                    "{Руины}\n\nВы обыскали руины,"
+                    " но убедились лишь, что жившие "
+                    "тут медузы ушли. Может быть "
+                    "вам повезет больше на следующей "
+                        "неделе.",
                     -1,
                     0,
                     -1,
@@ -2307,11 +2305,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
-                    "\xe8 \xed\xe0\xf8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xe8\xf5 \xec\xe5\xe4\xf3\xe7,"
-                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xf2\xf3\xf2. \xce\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
-                    "\xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xec\xe5\xe4\xf3\xe7?",
+                    "{Руины}\n\nВы обыскали руины "
+                    "и нашли нескольких медуз,"
+                    " обитающих тут. Они согласны "
+                    "вступить в вашу армию за вознаграждение."
+                        " Желаете нанять медуз?",
                     -1,
                     0,
                     -1,
@@ -2328,11 +2326,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xee\xe4\xe8\xed "
-                    "\xe8\xe7 \xf2\xe5\xf5 \xec\xee\xf1\xf2\xee\xe2, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec\xe8 "
-                    "\xf2\xe0\xea \xeb\xfe\xe1\xff\xf2 \xf1\xe5\xeb\xe8\xf2\xfc\xf1\xff \xf2\xf0\xee\xeb\xeb\xe8,"
-                    " \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf2\xf3\xf2 \xed\xe8\xea\xee\xe3\xee \xed\xe5\xf2. \xcc\xee\xe6\xe5\xf2,"
-                        " \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xef\xee\xff\xe2\xff\xf2\xf1\xff.",
+                    "{Мост троллей}\n\nВы нашли один "
+                    "из тех мостов, под которыми "
+                    "так любят селиться тролли,"
+                    " но сейчас тут никого нет. Может,"
+                        " на следующей неделе появятся.",
                     -1,
                     0,
                     -1,
@@ -2343,9 +2341,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xd2\xf0\xee\xeb\xeb\xe8, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 "
-                    "\xef\xee\xe4 \xfd\xf2\xe8\xec \xec\xee\xf1\xf2\xee\xec \xe1\xf0\xee\xf1\xe0\xfe\xf2 \xe2\xe0\xec "
-                        "\xe2\xfb\xe7\xee\xe2. \xd1\xf0\xe0\xe7\xe8\xf2\xe5\xf1\xfc \xf1 \xed\xe8\xec\xe8?",
+                    "{Мост троллей}\n\nТролли, живущие "
+                    "под этим мостом бросают вам "
+                        "вызов. Сразитесь с ними?",
                     -1,
                     0,
                     -1,
@@ -2377,12 +2375,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xce\xf1\xf2\xe0\xeb\xee\xf1\xfc \xeb\xe8\xf8\xfc "
-                        "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf2\xf0\xee\xeb\xeb\xe5\xe9, \xe2 \xf1\xf2\xf0\xe0\xf5\xe5 "
-                        "\xe7\xe0\xe1\xe8\xe2\xf8\xe8\xf5\xf1\xff \xef\xee\xe4 \xec\xee\xf1\xf2. \xce\xf1\xec\xe5\xeb\xe5\xe2,"
-                        " \xee\xed\xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 \xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 "
-                        "\xe2 \xea\xe0\xf7\xe5\xf1\xf2\xe2\xe5 \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                            "\xed\xe0\xed\xff\xf2\xfc \xf2\xf0\xee\xeb\xeb\xe5\xe9?",
+                        "{Мост троллей}\n\nОсталось лишь "
+                        "несколько троллей, в страхе "
+                        "забившихся под мост. Осмелев,"
+                        " они предложили свои услуги "
+                        "в качестве наемников. Желаете "
+                            "нанять троллей?",
                         -1,
                         0,
                         -1,
@@ -2398,11 +2396,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xf2\xf0\xee\xeb\xeb\xe5\xe9,"
-                    " \xe6\xe8\xe2\xf3\xf9\xe8\xf5 \xef\xee\xe4 \xec\xee\xf1\xf2\xee\xec, \xe6\xe5\xeb\xe0\xe5\xf2 "
-                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8,"
-                    " \xed\xee \xe7\xe0 \xef\xeb\xe0\xf2\xf3.  \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc "
-                        "\xf2\xf0\xee\xeb\xeb\xe5\xe9?",
+                    "{Мост троллей}\n\nКое-кто из троллей,"
+                    " живущих под мостом, желает "
+                    "присоединиться к вашей армии,"
+                    " но за плату.  Желаете нанять "
+                        "троллей?",
                     -1,
                     0,
                     -1,
@@ -2421,11 +2419,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2 \xfd\xf2\xee\xec \xe3\xee\xf0\xee\xe4\xe5 "
-                    "\xec\xe5\xf0\xf2\xe2\xe5\xf6\xee\xe2 \xe6\xe8\xe7\xed\xe8 \xed\xe5 \xed\xe0\xe1\xeb\xfe\xe4\xe0\xe5\xf2\xf1\xff,"
-                    " \xed\xe5\xe6\xe8\xf2\xe8 \xf2\xee\xe6\xe5. \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                    "\xed\xe5\xe4\xe5\xeb\xe5 \xea\xf2\xee-\xf2\xee \xe8\xe7 \xed\xe5\xe6\xe8\xf2\xe8 \xe7\xe0\xe1\xf0\xe5\xe4\xe5\xf2 "
-                        "\xf1\xfe\xe4\xe0.",
+                    "{Град мертвых}\n\nВ этом городе "
+                    "мертвецов жизни не наблюдается,"
+                    " нежити тоже. Может, на следующей "
+                    "неделе кто-то из нежити забредет "
+                        "сюда.",
                     -1,
                     0,
                     -1,
@@ -2436,10 +2434,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
-                    "\xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe3\xee\xf0\xee\xe4\xe0, \xed\xfb\xed\xe5 \xed\xe0\xf1\xe5\xeb\xe5\xed\xed\xee\xe3\xee "
-                    "\xeb\xe8\xf8\xfc \xed\xe5\xe6\xe8\xf2\xfc\xfe. \xce\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc "
-                        "\xe3\xee\xf0\xee\xe4?",
+                    "{Град мертвых}\n\nВы нашли руины "
+                    "древнего города, ныне населенного "
+                    "лишь нежитью. Обследовать "
+                        "город?",
                     -1,
                     0,
                     -1,
@@ -2471,11 +2469,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xd3\xf6\xe5\xeb\xe5\xe2\xf8\xe8\xe5 "
-                    "\xeb\xe8\xf7\xe8 \xef\xf0\xee\xed\xe8\xea\xeb\xe8\xf1\xfc \xe2\xe0\xf8\xe5\xe9 \xef\xee\xe1\xe5\xe4\xee\xe9 "
-                    "\xed\xe0\xe4 \xe8\xf5 \xf1\xee\xe1\xf0\xe0\xf2\xfc\xff\xec\xe8 \xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 "
-                    "\xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xed\xe0\xed\xff\xf2\xfc \xeb\xe8\xf7\xe5\xe9?",
+                    "{Град мертвых}\n\nУцелевшие "
+                    "личи прониклись вашей победой "
+                    "над их собратьями и предложили "
+                    "свои услуги за плату. Желаете "
+                        "нанять личей?",
                     -1,
                     0,
                     -1,
@@ -2492,10 +2490,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xeb\xe8\xf7\xe5\xe9,"
-                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xe7\xe4\xe5\xf1\xfc, \xe6\xe5\xeb\xe0\xe5\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
-                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xcd\xe0\xed\xff\xf2\xfc "
-                        "\xeb\xe8\xf7\xe5\xe9?",
+                    "{Град мертвых}\n\nКое-кто из личей,"
+                    " обитающих здесь, желает вступить "
+                    "в вашу армию за плату. Нанять "
+                        "личей?",
                     -1,
                     0,
                     -1,
@@ -2514,10 +2512,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcd\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
-                    "\xe2 \xe3\xee\xf0\xee\xe4\xe5 \xed\xe5\xf2 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xe6\xe5\xeb\xe0\xfe\xf9\xe8\xf5 "
-                    "\xef\xf0\xe8\xec\xea\xed\xf3\xf2\xfc \xea \xe2\xe0\xec. \xcd\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
-                        "\xed\xe5\xe4\xe5\xeb\xe5, \xe2\xee\xe7\xec\xee\xe6\xed\xee, \xea\xf2\xee-\xf2\xee \xef\xee\xff\xe2\xe8\xf2\xf1\xff.",
+                    "{Драконий город}\n\nНа этой неделе "
+                    "в городе нет драконов, желающих "
+                    "примкнуть к вам. На следующей "
+                        "неделе, возможно, кто-то появится.",
                     -1,
                     0,
                     -1,
@@ -2528,12 +2526,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xf1\xf2\xee\xe8\xf2\xe5 "
-                    "\xef\xf0\xe5\xe4 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec \xe3\xee\xf0\xee\xe4\xee\xec, \xec\xe5\xf1\xf2\xee\xec,"
-                    " \xe7\xe0\xef\xf0\xe5\xf2\xed\xfb\xec \xe4\xeb\xff \xef\xf0\xee\xf1\xf2\xfb\xf5 \xf1\xec\xe5\xf0\xf2\xed\xfb\xf5."
-                    " \xd1\xee\xe1\xeb\xe0\xe3\xee\xe2\xee\xeb\xe8\xf2\xe5 \xeb\xe8 \xe2\xfb \xed\xe0\xf0\xf3\xf8\xe8\xf2\xfc "
-                    "\xfd\xf2\xee \xef\xf0\xe0\xe2\xe8\xeb\xee \xe8 \xe1\xf0\xee\xf1\xe8\xf2\xfc \xe2\xfb\xe7\xee\xe2 "
-                        "\xe4\xf0\xe0\xea\xee\xed\xe0\xec?",
+                    "{Драконий город}\n\nВы стоите "
+                    "пред драконьим городом, местом,"
+                    " запретным для простых смертных."
+                    " Соблаговолите ли вы нарушить "
+                    "это правило и бросить вызов "
+                        "драконам?",
                     -1,
                     0,
                     -1,
@@ -2572,12 +2570,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcf\xee\xf1\xeb\xe5 \xe2\xe0\xf8\xe5\xe9 "
-                    "\xef\xee\xe1\xe5\xe4\xfb \xed\xe0\xe4 \xeb\xf3\xf7\xf8\xe8\xec\xe8 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec\xe8 "
-                    "\xe2\xee\xe8\xed\xe0\xec\xe8 \xee\xf2\xf6\xfb \xe3\xee\xf0\xee\xe4\xe0 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                    "\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xef\xf0\xe5\xe4\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
-                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                        "\xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
+                    "{Драконий город}\n\nПосле вашей "
+                    "победы над лучшими драконьими "
+                    "воинами отцы города согласились "
+                    "за плату предоставить вашему "
+                    "войску драконов. Желаете "
+                        "нанять драконов?",
                     -1,
                     0,
                     -1,
@@ -2594,10 +2592,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 "
-                    "\xe3\xee\xf0\xee\xe4 \xe3\xee\xf2\xee\xe2 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
-                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xed\xe5 \xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee."
-                        " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
+                    "{Драконий город}\n\nДраконий "
+                    "город готов предложить вашему "
+                    "войску драконов, не бесплатно."
+                        " Желаете нанять драконов?",
                     -1,
                     0,
                     -1,
@@ -2724,11 +2722,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                  & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
                 != 0) {
                 NormalDialog(
-                    "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                    "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                    "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec.  \"\xd0\xe0\xe4 \xe2\xe8\xe4\xe5\xf2\xfc "
-                    "\xf2\xe5\xe1\xff, \xec\xee\xe9 \xf3\xf7\xe5\xed\xe8\xea.  \xcd\xe0\xe4\xe5\xfe\xf1\xfc, "
-                    "\xec\xee\xff \xed\xe0\xf3\xea\xe0 \xef\xee\xf8\xeb\xe0 \xf2\xe5\xe1\xe5 \xed\xe0 \xef\xee\xeb\xfc\xe7\xf3."
+                    "{Древо познания}\n\nПри вашем "
+                    "приближении древесные глаза "
+                    "засияли восторгом.  \"Рад видеть "
+                    "тебя, мой ученик.  Надеюсь, "
+                    "моя наука пошла тебе на пользу."
                         "\"",
                     NORMAL_DIALOG_INFO,
                     -1,
@@ -2748,12 +2746,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
                         NormalDialog(
-                            "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                            "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                            "\xe7\xe0\xf1\xe2\xe5\xf2\xe8\xeb\xe8\xf1\xfc \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0,"
-                            " \xf1\xf2\xf0\xe0\xed\xed\xe8\xea! \xcf\xee\xe7\xe2\xee\xeb\xfc \xef\xf0\xe5\xef\xee\xe4\xe0\xf2\xfc "
-                            "\xf2\xe5\xe1\xe5 \xec\xe0\xeb\xf3\xfe \xf2\xee\xeb\xe8\xea\xf3 \xf2\xee\xe3\xee, \xf7\xf2\xee "
-                                "\xff \xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb.\"",
+                            "{Древо познания}\n\nПри вашем "
+                            "приближении древесные глаза "
+                            "засветились восторгом. \"А,"
+                            " странник! Позволь преподать "
+                            "тебе малую толику того, что "
+                                "я выучил за годы.\"",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -2770,15 +2768,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
 
                     case TREE_KNOWLEDGE_GOLD:
-                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
+                        if (gpCurPlayer->m_resources[(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
-                                "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
-                                "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0, \xef\xf3\xf2\xed\xe8\xea!"
-                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xed\xe0\xf3\xf7\xf3 \xf2\xe5\xe1\xff \xf5\xee\xf2\xff "
-                                "\xe1\xfb \xec\xe0\xeb\xee\xe9 \xf7\xe0\xf1\xf2\xe8 \xf2\xee\xe3\xee, \xf7\xf2\xee \xf3\xf1\xe2\xee\xe8\xeb "
-                                "\xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
+                                "{Древо познания}\n\nПри вашем "
+                                "приближении древесные глаза "
+                                "засияли восторгом. \"А, путник!"
+                                " Я с радостью научу тебя хотя "
+                                "бы малой части того, что усвоил "
+                                "за годы, всего за 2000 золотых."
+                                "\" (Просто зарой их у моих корней)"
                                     ".",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
@@ -2791,18 +2789,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 0
                             );
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
+                                gpCurPlayer->m_resources[(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
                             1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc3\xeb\xe0\xe7\xe0 \xe4\xe5\xf0\xe5\xe2\xe0 "
-                                "\xed\xe0\xef\xee\xeb\xed\xe8\xeb\xe8\xf1\xfc \xf1\xeb\xe5\xe7\xe0\xec\xe8. \"\xcc\xed\xe5 "
-                                "\xed\xf3\xe6\xed\xee 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xe2\xe7\xe4\xee\xf5) - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf1\xff, \xea\xee\xe3\xe4\xe0 "
-                                    "\xf1\xec\xee\xe6\xe5\xf8\xfc \xe2\xed\xe5\xf1\xf2\xe8 \xef\xeb\xe0\xf2\xf3.\"",
+                                "{Древо познания}\n\nГлаза дерева "
+                                "наполнились слезами. \"Мне "
+                                "нужно 2000 золотых.\" - прошептало "
+                                "оно. (вздох) - \"Возвращайся, когда "
+                                    "сможешь внести плату.\"",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2817,13 +2815,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
 
                     case TREE_KNOWLEDGE_GEMS:
-                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
+                        if (gpCurPlayer->m_resources[(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc0, \xef\xf3\xf2\xed\xe8\xea!"
-                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xef\xf0\xe5\xef\xee\xe4\xe0\xec \xf2\xe5\xe1\xe5 "
-                                "\xf5\xee\xf2\xfc \xec\xe0\xeb\xf3\xfe \xf7\xe0\xf1\xf2\xfc \xf2\xee\xe3\xee, \xf7\xf2\xee "
-                                "\xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2."
-                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
+                                "{Древо познания}\n\nА, путник!"
+                                " Я с радостью преподам тебе "
+                                "хоть малую часть того, что "
+                                "выучил за годы, всего за 10 самоцветов."
+                                "\" (Просто зарой их у моих корней)"
                                     ".",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
@@ -2836,18 +2834,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 0
                             );
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                                gpCurPlayer->m_resources[IDX(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
+                                gpCurPlayer->m_resources[(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
                                 GiveExperience(eventHero2, levelExperience_g, 0);
                                 eventHero2->m_treeKnowledgeVisits |=
                             1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
                         } else {
                             NormalDialog(
-                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xd1\xeb\xe5\xe7\xfb \xef\xe5\xf0\xe5\xef\xee\xeb\xed\xff\xfe\xf2 "
-                                "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0. \"\xcc\xed\xe5 \xed\xf3\xe6\xed\xee "
-                                "10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
-                                "\xee\xed\xee. (\xc2\xe7\xe4\xee\xf5). \"\xd7\xf2\xee \xe6, \xef\xf0\xe8\xf5\xee\xe4\xe8,"
-                                " \xea\xee\xe3\xe4\xe0 \xf1\xec\xee\xe6\xe5\xf8\xfc \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xfc."
+                                "{Древо познания}\n\nСлезы переполняют "
+                                "древесные глаза. \"Мне нужно "
+                                "10 самоцветов.\" - прошептало "
+                                "оно. (Вздох). \"Что ж, приходи,"
+                                " когда сможешь заплатить."
                                     "\"",
                                 NORMAL_DIALOG_INFO,
                                 -1,
@@ -2890,8 +2888,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
             strcpy(
                 gText,
-                "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
-                    "\xe8\xe3\xf0\xee\xea\xe0\xf5"
+                "Святилище - информация об "
+                    "игроках"
             );
             oracleMessage_o.type = MESSAGE_WIDGET;
             oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -2907,11 +2905,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 1-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xec\xe0\xeb\xe5\xed\xfc\xea\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
-                "\xf1\xeb\xf3\xe6\xe0\xf2 \xec\xee\xeb\xee\xe4\xfb\xe5 \xef\xee\xf1\xeb\xf3\xf8\xed\xe8\xea\xe8."
-                "  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xee\xf1\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
+                "{Святилище 1-го Круга}\n\nВы набрели "
+                "на маленькое святилище, где "
+                "служат молодые послушники."
+                "  В обмен на защиту они согласились "
+                "научить вас простому заклинанию "
                     "- ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
@@ -2921,12 +2919,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 2-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xe1\xee\xe3\xe0\xf2\xee \xf0\xe0\xf1\xef\xe8\xf1\xe0\xed\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5,"
-                " \xe3\xe4\xe5 \xf1\xeb\xf3\xe6\xe0\xf2 \xef\xee\xeb\xed\xee\xef\xf0\xe0\xe2\xed\xfb\xe5 "
-                "\xe1\xf0\xe0\xf2\xfc\xff \xe2\xe5\xf0\xfb.  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 "
-                "\xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 "
-                    "\xed\xee\xe2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe - ",
+                "{Святилище 2-го Круга}\n\nВы набрели "
+                "на богато расписанное святилище,"
+                " где служат полноправные "
+                "братья веры.  В обмен на защиту "
+                "они согласились научить вас "
+                    "новому заклинанию - ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2935,18 +2933,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 3-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
-                "\xed\xe0 \xf0\xee\xf1\xea\xee\xf8\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
-                "\xf1\xeb\xf3\xe6\xe0\xf2 \xe2\xfb\xf1\xf8\xe8\xe5 \xe6\xf0\xe5\xf6\xfb.  \xc2 \xee\xe1\xec\xe5\xed "
-                "\xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
-                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xe5\xec\xf3\xe4\xf0\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
+                "{Святилище 3-го Круга}\n\nВы набрели "
+                "на роскошное святилище, где "
+                "служат высшие жрецы.  В обмен "
+                "на защиту они согласились "
+                "научить вас премудрому заклинанию "
                     "- ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
             if (eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
-                if (IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
-                    <= static_cast<i32>(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+                if ((gsSpellInfo[cell->m_objectMetadata - 1].level)
+                    <= static_cast<i32>(eventHero2->m_secondarySkills[(HERO_SKILL_WISDOM)])
                            + SHRINE_WISDOM_BONUS) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     eventHero2->AddSpell(
@@ -2966,18 +2964,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     strcat(
                         gText,
-                        "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5 \xf5\xe2\xe0\xf2\xe0\xe5\xf2 "
-                            "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
-                            " \xe8 \xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                        "К сожалению, у вас не хватает "
+                            "мудрости, чтобы понять заклинание,"
+                            " и вы не можете выучить его."
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
                 strcat(
                     gText,
-                    "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
-                        "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
-                        "\xe2 \xed\xe5\xe5."
+                    "К сожалению, у вас нет Волшебной "
+                        "книги, чтобы записать заклинание "
+                        "в нее."
                 );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
@@ -2999,7 +2997,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
                     if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                            == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
                         && abs(teleportX_e - x) + abs(teleportY_e - y)
@@ -3015,7 +3013,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
                         if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
-                                == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                                == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
@@ -3042,8 +3040,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe4\xee\xe1\xf0\xe0\xf2\xfc \xfd\xf2\xee\xf2 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0!",
+                    "Вы не можете подобрать этот "
+                        "артефакт, у вас нет места!",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -3061,21 +3059,21 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 strcpy(
                     gText,
-                    "\xd1\xea\xe0\xe7\xee\xf7\xed\xfb\xe9 \xe7\xee\xeb\xee\xf2\xee\xe9 \xeb\xf3\xea \xfd\xeb\xfc\xf4\xee\xe2 "
-                    "\xef\xf0\xee\xf1\xf2\xee \xe2\xe0\xeb\xff\xe5\xf2\xf1\xff \xe7\xe4\xe5\xf1\xfc, \xe2 \xe3\xf0\xff\xe7\xe8."
-                    " \xc2\xfb \xef\xee\xe4\xee\xe1\xf0\xe0\xeb\xe8 \xe5\xe3\xee \xe8 \xee\xf2\xe2\xe5\xe7\xeb\xe8 "
-                    "\xe2 \xfd\xeb\xfc\xf4\xe8\xe9\xf1\xea\xe8\xe9 \xe3\xee\xf0\xee\xe4. \xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
-                    "\xe7\xe0 \xfd\xf2\xee\xf2 \xef\xee\xe4\xe2\xe8\xe3 \xea\xee\xf0\xee\xeb\xfc \xfd\xeb\xfc\xf4\xee\xe2 "
-                    "\xef\xee\xee\xe1\xe5\xf9\xe0\xeb \xe2\xe0\xec \xef\xee\xec\xee\xf9\xfc \xf1\xe2\xee\xe5\xe3\xee "
-                    "\xed\xe0\xf0\xee\xe4\xe0 \xe2 \xeb\xfe\xe1\xf3\xfe \xec\xe8\xed\xf3\xf2\xf3, \xea\xee\xe3\xe4\xe0 "
-                        "\xe2\xe0\xec \xfd\xf2\xee \xef\xee\xed\xe0\xe4\xee\xe1\xe8\xf2\xf1\xff."
+                    "Сказочный золотой лук эльфов "
+                    "просто валяется здесь, в грязи."
+                    " Вы подобрали его и отвезли "
+                    "в эльфийский город. В благодарность "
+                    "за этот подвиг король эльфов "
+                    "пообещал вам помощь своего "
+                    "народа в любую минуту, когда "
+                        "вам это понадобится."
                 );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
                     gText,
                     MAP_EVENT_REWARD_ARTIFACT,
-                    IDX(artifact_g),
+                    (artifact_g),
                     -1,
                     0,
                     -1
@@ -3092,9 +3090,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    gArtifactEvent[IDX(artifact_g)],
+                    gArtifactEvent[(artifact_g)],
                     MAP_EVENT_REWARD_ARTIFACT,
-                    IDX(artifact_g),
+                    (artifact_g),
                     -1,
                     0,
                     -1
@@ -3109,11 +3107,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster_c == CREATURE_ROGUE) {
                     NormalDialog(
-                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xe7\xe0\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
-                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2. \xcd\xee \xe5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 "
-                        "\xea \xed\xe5\xec\xf3, \xe8\xe7 \xea\xf3\xf1\xf2\xee\xe2 \xe2\xfb\xf1\xea\xee\xf7\xe8\xeb\xe0 "
-                        "\xf8\xe0\xe9\xea\xe0 \xf0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea\xee\xe2, \xee\xf5\xf0\xe0\xed\xff\xfe\xf9\xe8\xf5 "
-                            "\xf1\xe2\xee\xe5 \xed\xe0\xe3\xf0\xe0\xe1\xeb\xe5\xed\xed\xee\xe5 \xe4\xee\xe1\xf0\xee.",
+                        "{Артефакт}\n\nВы заметили древний "
+                        "артефакт. Но едва вы подошли "
+                        "к нему, из кустов выскочила "
+                        "шайка разбойников, охраняющих "
+                            "свое награбленное добро.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3130,14 +3128,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     guardedCount_i = 1;
                     sprintf(
                         gText,
-                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcd\xe0 \xef\xf0\xee\xe3\xe0\xeb\xe8\xed\xe5 \xe2\xfb "
-                        "\xef\xf0\xe8\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2."
-                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe5\xe3\xee \xf1\xf2\xee\xf0\xee\xe6\xe8\xf2 "
-                        "\xee\xf2\xf0\xff\xe4 %s. \xcd\xe5 \xef\xf3\xe3\xe0\xe5\xf2 \xeb\xe8 \xe2\xe0\xf1 \xf1\xe8\xeb\xe0 "
-                        "%s, \xe8 \xe1\xf3\xe4\xe5\xf2\xe5 \xeb\xe8 \xe2\xfb \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff "
-                            "\xe7\xe0 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2?",
-                        gArmyNamesPlural[IDX(guardedMonster_c)],
-                        gArmyNamesPlural[IDX(guardedMonster_c)]
+                        "{Артефакт}\n\nНа прогалине вы "
+                        "приметили древний артефакт."
+                        " К сожалению, его сторожит "
+                        "отряд %s. Не пугает ли вас сила "
+                        "%s, и будете ли вы сражаться "
+                            "за артефакт?",
+                        gArmyNamesPlural[(guardedMonster_c)],
+                        gArmyNamesPlural[(guardedMonster_c)]
                     );
                     NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 }
@@ -3164,9 +3162,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventHero2->CheckLevel();
                         sprintf(
                             gText,
-                            "\xce\xe4\xe5\xf0\xe6\xe0\xe2 \xef\xee\xe1\xe5\xe4\xf3, \xe2\xfb \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 "
-                                "\xf1\xe2\xee\xe9 \xf2\xf0\xee\xf4\xe5\xe9 - %s.",
-                            gArtifactNames[IDX(artifact_g)]
+                            "Одержав победу, вы получили "
+                                "свой трофей - %s.",
+                            gArtifactNames[(artifact_g)]
                         );
                         NormalDialog(
                             gText,
@@ -3184,9 +3182,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     }
                 } else {
                     NormalDialog(
-                        "\xc3\xeb\xe0\xe2\xed\xee\xe5 \xe2 \xe4\xee\xe1\xeb\xe5\xf1\xf2\xe8 - \xe1\xeb\xe0\xe3\xee\xf0\xe0\xe7\xf3\xec\xe8\xe5,"
-                            " \xef\xee\xfd\xf2\xee\xec\xf3 \xe2\xfb \xf0\xe5\xf8\xe8\xeb\xe8 \xef\xee\xea\xe0 \xf7\xf2\xee "
-                            "\xe2\xee\xe7\xe4\xe5\xf0\xe6\xe0\xf2\xfc\xf1\xff \xee\xf2 \xfd\xf2\xee\xe9 \xe1\xe8\xf2\xe2\xfb.",
+                        "Главное в доблести - благоразумие,"
+                            " поэтому вы решили пока что "
+                            "воздержаться от этой битвы.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3202,33 +3200,33 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
                     case ARTIFACT_EVENT_MODE_WISDOM:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                        if (eventHero2->m_secondarySkills[(HERO_SKILL_WISDOM)]
                             != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xe5\xf2\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf3\xe1\xee\xe3\xe8\xe9 "
-                            "\xf1\xea\xe8\xf2 \xe8\xe7\xec\xee\xe6\xe4\xe5\xed\xed\xee\xe3\xee \xee\xf2\xf8\xe5\xeb\xfc\xed\xe8\xea\xe0."
-                            " \xd2\xee\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee %s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff "
-                            "\xef\xe5\xf0\xe2\xee\xec\xf3 \xe6\xe5 \xe2\xf1\xf2\xf0\xe5\xf7\xed\xee\xec\xf3 \xe2\xe5\xeb\xe8\xea\xee\xec\xf3 "
-                                "\xec\xf3\xe4\xf0\xe5\xf6\xf3.",
-                            gArtifactNames[IDX(artifact_g)]
+                            "{Аретфакт}\n\nВы нашли убогий "
+                            "скит изможденного отшельника."
+                            " Тот поведал вам, что его %s достанется "
+                            "первому же встречному великому "
+                                "мудрецу.",
+                            gArtifactNames[(artifact_g)]
                         );
                         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                        if (eventHero2->m_secondarySkills[(HERO_SKILL_LEADERSHIP)]
                             != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xe2\xe5\xf1\xf2\xe8\xeb\xe8 \xf1\xf2\xe0\xf0\xee\xe3\xee "
-                            "\xf1\xee\xeb\xe4\xe0\xf2\xe0 \xe2 \xe5\xe3\xee \xf1\xea\xf0\xee\xec\xed\xee\xec \xe6\xe8\xeb\xe8\xf9\xe5."
-                            " \xd1\xee\xeb\xe4\xe0\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee "
-                            "%s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff \xef\xe5\xf0\xe2\xee\xec\xf3 \xed\xe0\xf1\xf2\xee\xff\xf9\xe5\xec\xf3 "
-                                "\xeb\xe8\xe4\xe5\xf0\xf3, \xea\xee\xf2\xee\xf0\xee\xe3\xee \xee\xed \xe2\xf1\xf2\xf0\xe5\xf2\xe8\xf2.",
-                            gArtifactNames[IDX(artifact_g)]
+                            "{Артефакт}\n\nВы навестили старого "
+                            "солдата в его скромном жилище."
+                            " Солдат поведал вам, что его "
+                            "%s достанется первому настоящему "
+                                "лидеру, которого он встретит.",
+                            gArtifactNames[(artifact_g)]
                         );
                         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                         break;
@@ -3239,9 +3237,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            gArtifactEvent[IDX(artifact_g)],
+                            gArtifactEvent[(artifact_g)],
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact_g),
+                            (artifact_g),
                             -1,
                             0,
                             -1
@@ -3256,34 +3254,34 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
-                                " \xca\xf3\xef\xe8\xf2\xe5 \xe5\xe3\xee?",
-                            gArtifactNames[IDX(artifact_g)]
+                            "{Артефакт}\n\nЛепрекон предлагает "
+                                "вам артефакт - %s, всего за 2000 золотых."
+                                " Купите его?",
+                            gArtifactNames[(artifact_g)]
                         );
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_CONFIRM,
                             gText,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact_g),
+                            (artifact_g),
                             -1,
                             0,
                             -1
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)] -=
                                     ARTIFACT_EVENT_GOLD_COST;
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                "Вы и хотели бы расплатиться "
+                                    "с лепреконом, но поняли, что "
+                                    "сделка вам не по карману. Лепрекон "
+                                    "затопал ногами и обиженно "
+                                    "надулся.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3296,10 +3294,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
+                                "Оскорбленный вашим отказом "
+                                    "от его щедрого предложения,"
+                                    " лекреком притопнул ногой "
+                                    "и отвернулся от вас.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3319,11 +3317,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
-                                "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 3 \xe5\xe4\xe8\xed\xe8\xf6\xfb. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                                "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
-                            gArtifactNames[IDX(artifact_g)],
+                            "{Артефакт}\n\nЛепрекон предлагает "
+                                "вам артефакт - %s за 2500 золотых "
+                                "и просит %s - 3 единицы. Желаете "
+                                "купить предмет?",
+                            gArtifactNames[(artifact_g)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -3332,19 +3330,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact_g),
+                            (artifact_g),
                             -1,
                             0,
                             -1,
                             0
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
                                 && gpGame->m_players[eventHero2->m_owner]
                                            .m_resources[artifactResourceType_k]
                                        >= ARTIFACT_EVENT_RESOURCE_3_AMOUNT) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_3_GOLD_COST;
                                 gpGame->m_players[eventHero2->m_owner]
                                     .m_resources[artifactResourceType_k] -=
@@ -3352,11 +3350,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                "Вы и хотели бы расплатиться "
+                                    "с лепреконом, но поняли, что "
+                                    "сделка вам не по карману. Лепрекон "
+                                    "затопал ногами и обиженно "
+                                    "надулся.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3369,10 +3367,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
+                                "Оскорбленный вашим отказом "
+                                    "от его щедрого предложения,"
+                                    " лекреком притопнул ногой "
+                                    "и отвернулся от вас.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3392,11 +3390,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
-                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
-                                "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 3000 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
-                                "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 5 \xe5\xe4\xe8\xed\xe8\xf6. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                                "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
-                            gArtifactNames[IDX(artifact_g)],
+                            "{Артефакт}\n\nЛепрекон предлагает "
+                                "вам артефакт - %s за 3000 золотых "
+                                "и просит %s - 5 единиц. Желаете "
+                                "купить предмет?",
+                            gArtifactNames[(artifact_g)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -3405,19 +3403,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact_g),
+                            (artifact_g),
                             -1,
                             0,
                             -1,
                             0
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
                                 && gpGame->m_players[eventHero2->m_owner]
                                            .m_resources[artifactResourceType_k]
                                        >= ARTIFACT_EVENT_RESOURCE_5_AMOUNT) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_5_GOLD_COST;
                                 gpGame->m_players[eventHero2->m_owner]
                                     .m_resources[artifactResourceType_k] -=
@@ -3425,11 +3423,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
-                                    "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
-                                    "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
-                                    "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
-                                    "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
+                                "Вы и хотели бы расплатиться "
+                                    "с лепреконом, но поняли, что "
+                                    "сделка вам не по карману. Лепрекон "
+                                    "затопал ногами и обиженно "
+                                    "надулся.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3442,10 +3440,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
-                                    "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
-                                    " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
-                                    "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
+                                "Оскорбленный вашим отказом "
+                                    "от его щедрого предложения,"
+                                    " лекреком притопнул ногой "
+                                    "и отвернулся от вас.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3539,11 +3537,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xcf\xe5\xf9\xe5\xf0\xe0 \xe4\xe5\xec\xee\xed\xe0}\n\n\xc2\xf5\xee\xe4 \xe2 \xef\xe5\xf9\xe5\xf0\xf3 "
-                    "\xe7\xe8\xff\xe5\xf2 \xf7\xe5\xf0\xed\xee\xe9 \xe4\xfb\xf0\xee\xe9, \xe8\xe7 \xea\xee\xf2\xee\xf0\xee\xe9 "
-                    "\xf2\xff\xed\xe5\xf2 \xf2\xee\xf8\xed\xee\xf2\xe2\xee\xf0\xed\xfb\xec \xf1\xe5\xf0\xed\xe8\xf1\xf2\xfb\xec "
-                    "\xe7\xeb\xee\xe2\xee\xed\xe8\xe5\xec. \xce\xf2\xe2\xe0\xe6\xe8\xf2\xe5\xf1\xfc \xeb\xe8 "
-                    "\xe2\xfb \xe2\xee\xe9\xf2\xe8?",
+                "{Пещера демона}\n\nВход в пещеру "
+                    "зияет черной дырой, из которой "
+                    "тянет тошнотворным сернистым "
+                    "зловонием. Отважитесь ли "
+                    "вы войти?",
                 -1,
                 0,
                 -1,
@@ -3556,8 +3554,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "\xc5\xf1\xeb\xe8 \xed\xe5 \xf1\xf7\xe8\xf2\xe0\xf2\xfc \xf1\xeb\xe5\xe4\xee\xe2 \xf3\xe6\xe0\xf1\xed\xee\xe9 "
-                        "\xe1\xe8\xf2\xe2\xfb, \xef\xe5\xf9\xe5\xf0\xe0 \xef\xf3\xf1\xf2\xe0.",
+                    "Если не считать следов ужасной "
+                        "битвы, пещера пуста.",
                     -1,
                     0,
                     -1,
@@ -3573,14 +3571,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             sprintf(
                 gText,
-                "\xc2 \xef\xe5\xf9\xe5\xf0\xe5 \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe3\xf0\xee\xe7\xed\xee\xe3\xee "
-                    "\xe4\xee \xed\xe5\xeb\xe5\xef\xee\xf1\xf2\xe8 \xe4\xe5\xec\xee\xed\xe0. \"\xd1\xe5\xe3\xee\xe4\xed\xff,"
-                    "\" - \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed, - \"\xf2\xe5\xe1\xff \xe6\xe4\xf3\xf2 \xe1\xee\xe9 "
-                    "\xe8 \xe2\xe5\xf0\xed\xe0\xff \xf1\xec\xe5\xf0\xf2\xfc. \xcd\xee \xff \xef\xee\xe7\xe2\xee\xeb\xfe "
-                    "\xf2\xe5\xe1\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xf1\xec\xe5\xf0\xf2\xfc. \xd2\xfb \xec\xee\xe6\xe5\xf8\xfc "
-                    "\xe4\xf0\xe0\xf2\xfc\xf1\xff \xf1\xee \xec\xed\xee\xe9 \xe8\xeb\xe8 \xe6\xe5 \xf1 \xec\xee\xe8\xec\xe8 "
-                    "\xf1\xeb\xf3\xe3\xe0\xec\xe8. \xcf\xf0\xe5\xe4\xef\xee\xf7\xe8\xf2\xe0\xe5\xf8\xfc \xf1\xf0\xe0\xe7\xe8\xf2\xfc\xf1\xff "
-                    "\xf1 \xec\xee\xe8\xec\xe8 \xf1\xeb\xf3\xe3\xe0\xec\xe8?\""
+                "В пещере вы обнаружили грозного "
+                    "до нелепости демона. \"Сегодня,"
+                    "\" - прорычал он, - \"тебя ждут бой "
+                    "и верная смерть. Но я позволю "
+                    "тебе выбрать смерть. Ты можешь "
+                    "драться со мной или же с моими "
+                    "слугами. Предпочитаешь сразиться "
+                    "с моими слугами?\""
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -3604,12 +3602,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
-                        "\xce\xe4\xee\xeb\xe5\xe2 \xf1\xeb\xf3\xe3 \xe4\xe5\xec\xee\xed\xe0, \xe2\xfb \xed\xe0\xf8\xeb\xe8 "
-                            "\xea\xeb\xe0\xe4 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                        "Одолев слуг демона, вы нашли "
+                            "клад в размере 2500 золотых.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         DAEMON_GOLD,
                         -1,
                         0,
@@ -3628,11 +3626,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xea\xf0\xe0\xf2\xea\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5 \xe8 \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 1000 \xee\xf7\xea\xee\xe2 "
-                            "\xee\xef\xfb\xf2\xe0.",
+                        "Демон выкрикнул свой вызов "
+                            "и бросился в бой! После краткой,"
+                            " но отчаянной схватки вы прикончили "
+                            "чудовище и получили 1000 очков "
+                            "опыта.",
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
                         -1,
@@ -3649,14 +3647,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     if (gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true) == -1)
                         goto daemonExperienceGold;
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
-                    eventValue1 = IDX(GiveRandomArtifact(eventHero2));
+                    eventValue1 = (GiveRandomArtifact(eventHero2));
                     sprintf(
                         gText,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xe1\xe8\xf2\xe2\xfb \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xe0 \xe2 \xe3\xeb\xf3\xe1\xe8\xed\xe5 \xef\xe5\xf9\xe5\xf0\xfb "
-                            "\xed\xe0\xf8\xeb\xe8 %s.",
+                        "Демон выкрикнул свой вызов "
+                            "и бросился в бой! После непродолжительной,"
+                            " но отчаянной битвы вы прикончили "
+                            "чудовище, а в глубине пещеры "
+                            "нашли %s.",
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -3678,12 +3676,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
-                            "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
-                            " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
-                            "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xef\xee\xeb\xf3\xf7\xe8\xe2 1000 \xee\xf7\xea\xee\xe2 "
-                            "\xee\xef\xfb\xf2\xe0 \xe8 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
-                        IDX(RES_GOLD),
+                        "Демон выкрикнул свой вызов "
+                            "и бросился в бой! После непродолжительной,"
+                            " но отчаянной схватки вы прикончили "
+                            "чудовище, получив 1000 очков "
+                            "опыта и 2500 золотых.",
+                        (RES_GOLD),
                         DAEMON_GOLD,
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
@@ -3699,12 +3697,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "\xc4\xe5\xec\xee\xed \xed\xe0\xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xed\xe0 \xe2\xe0\xf1 \xe8 "
-                            "\xe2\xf6\xe5\xef\xe8\xeb\xf1\xff \xea\xee\xe3\xf2\xff\xec\xe8 \xe2 \xe3\xee\xf0\xeb\xee "
-                            "\xef\xf0\xe5\xe6\xe4\xe5, \xf7\xe5\xec \xe2\xfb \xee\xe1\xed\xe0\xe6\xe8\xeb\xe8 \xec\xe5\xf7."
-                            " \"\xd2\xe2\xee\xff \xe6\xe8\xe7\xed\xfc \xe2 \xec\xee\xe8\xf5 \xf0\xf3\xea\xe0\xf5,\" -"
-                            " \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed. - \"\xdf \xe2\xe5\xf0\xed\xf3 \xe5\xe5 \xf2\xe5\xe1\xe5 "
-                            "\xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.\"",
+                        "Демон набросился на вас и "
+                            "вцепился когтями в горло "
+                            "прежде, чем вы обнажили меч."
+                            " \"Твоя жизнь в моих руках,\" -"
+                            " прорычал он. - \"Я верну ее тебе "
+                            "за 2500 золотых.\"",
                         -1,
                         0,
                         -1,
@@ -3712,16 +3710,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
                     if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                        if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                        if (gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)]
                             < DAEMON_GOLD) {
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                "\xcf\xee\xed\xff\xe2, \xf7\xf2\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5,"
-                                    " \xe4\xe5\xec\xee\xed \xf0\xe0\xf1\xf2\xe5\xf0\xe7\xe0\xeb \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xec\xe8 "
-                                    "\xea\xeb\xfb\xea\xe0\xec\xe8, \xe8 \xef\xee\xf1\xeb\xe5\xe4\xed\xe5\xe5, \xf7\xf2\xee \xe2\xfb "
-                                    "\xe2\xe8\xe4\xe5\xeb\xe8, \xe1\xfb\xeb\xe0 \xe0\xeb\xe0\xff \xef\xe5\xeb\xe5\xed\xe0 \xef\xe5\xf0\xe5\xe4 "
-                                    "\xe3\xeb\xe0\xe7\xe0\xec\xe8.",
+                                "Поняв, что у вас нет 2500 золотых,"
+                                    " демон растерзал вас своими "
+                                    "клыками, и последнее, что вы "
+                                    "видели, была алая пелена перед "
+                                    "глазами.",
                                 -1,
                                 0,
                                 -1,
@@ -3730,7 +3728,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             HeroLoses(eventHero2);
                         } else {
-                            gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                            gpGame->m_players[eventHero2->m_owner].m_resources[(RES_GOLD)] -=
                                 DAEMON_GOLD;
                         }
                     } else {
@@ -3747,12 +3745,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xca\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
-                    "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
-                    "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xef\xee\xf1\xea\xf0\xe8\xef\xfb\xe2\xe0\xe5\xf2,"
-                    " \xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xef\xf0\xe8\xe1\xee\xe5\xec \xed\xe0 "
-                    "\xf1\xea\xe0\xeb\xe0\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc "
-                    "\xee\xe1\xeb\xee\xec\xea\xe8?",
+                "{Кораблекрушение}\n\nГниющий "
+                    "остов огромного пиратского "
+                    "корабля зловеще поскрипывает,"
+                    " покачиваемый прибоем на "
+                    "скалах. Желаете обыскать "
+                    "обломки?",
                 -1,
                 0,
                 -1,
@@ -3765,19 +3763,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8, \xe2\xfb "
-                                "\xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 "
-                                "\xed\xe0 \xf0\xfb\xf2\xfc\xe5 \xe2 \xec\xf3\xf1\xee\xf0\xe5, \xed\xee \xf2\xe0\xea \xed\xe8\xf7\xe5\xe3\xee "
-                                "\xe8 \xed\xe5 \xed\xe0\xf8\xeb\xe8. \xd1\xf2\xee\xeb\xfc \xed\xe5\xe1\xeb\xe0\xe3\xee\xe2\xe8\xe4\xed\xee\xe5 "
-                                "\xe7\xe0\xed\xff\xf2\xe8\xe5 \xf1\xed\xe8\xe7\xe8\xeb\xee \xec\xe0\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe5\xe9 "
-                                "\xe0\xf0\xec\xe8\xe8.",
+                            "Совладав с призраками, вы "
+                                "потратили несколько часов "
+                                "на рытье в мусоре, но так ничего "
+                                "и не нашли. Столь неблаговидное "
+                                "занятие снизило маораль вашей "
+                                "армии.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
                             0,
                             -1
                         );
-                        if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_SHIPWRECK)) {
+                        if (!(((eventHero2->m_eventFlags) & (HERO_EVENT_SHIPWRECK)))) {
                             eventHero2->m_eventFlags =
                                 eventHero2->m_eventFlags | HERO_EVENT_SHIPWRECK;
                             eventHero2->m_morale--;
@@ -3787,9 +3785,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (GhostEvent(
                                 eventHero2,
                                 cell,
-                                "\xce\xe4\xee\xeb\xe5\xe2 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2, \xe2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 "
-                                    "\xee\xf1\xf2\xe0\xed\xea\xe8 \xea\xee\xf0\xe0\xe1\xeb\xff \xe8 \xea\xee\xe5-\xf7\xf2\xee "
-                                    "\xed\xe0\xf8\xeb\xe8!",
+                                "Одолев призраков, вы обыскали "
+                                    "останки корабля и кое-что "
+                                    "нашли!",
                                 x,
                                 y
                             ))
@@ -3825,7 +3823,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0,
                             -1
                         );
-                        if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
+                        if (!(((eventHero2->m_eventFlags) & (HERO_EVENT_GRAVEYARD)))) {
                             eventHero2->m_eventFlags =
                                 eventHero2->m_eventFlags | HERO_EVENT_GRAVEYARD;
                             eventHero2->m_morale--;
@@ -3833,8 +3831,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
                     default:
                         zombieCell_o = GetCell(
-                            x - normalDirTable[IDX(eventHero2->m_direction)].x,
-                            y - normalDirTable[IDX(eventHero2->m_direction)].y
+                            x - normalDirTable[(eventHero2->m_direction)].x,
+                            y - normalDirTable[(eventHero2->m_direction)].y
                         );
                         if (ZombieEvent(
                                 eventHero2,
@@ -3855,11 +3853,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{\xc1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 \xea\xee\xf0\xe0\xe1\xeb\xfc}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
-                    "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
-                    "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xf1\xea\xf0\xe8\xef\xe8\xf2, "
-                    "\xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xe2\xee\xeb\xed\xe0\xec\xe8 \xed\xe0 \xf1\xea\xe0\xeb\xe0\xf5."
-                    " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc \xea\xee\xf0\xe0\xe1\xeb\xfc?",
+                "{Брошенный корабль}\n\nГниющий "
+                    "остов огромного пиратского "
+                    "корабля зловеще скрипит, "
+                    "покачиваемый волнами на скалах."
+                    " Желаете обыскать корабль?",
                 -1,
                 0,
                 -1,
@@ -3872,19 +3870,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "\xd3\xf1\xec\xe8\xf0\xe8\xe2 \xf1\xea\xe5\xeb\xe5\xf2\xee\xe2, \xe2\xfb \xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 "
-                                "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 \xed\xe0 \xef\xee\xe8\xf1\xea\xe8 "
-                                "\xf1\xf0\xe5\xe4\xe8 \xe3\xed\xe8\xeb\xfb\xf5 \xee\xe1\xeb\xee\xec\xea\xee\xe2 - \xe8 \xe2\xef\xf3\xf1\xf2\xf3\xfe."
-                                " \xd1\xf2\xee\xeb\xfc \xe3\xf0\xff\xe7\xed\xe0\xff \xf0\xe0\xe1\xee\xf2\xe0 \xef\xeb\xee\xf5\xee "
-                                "\xf1\xea\xe0\xe7\xe0\xeb\xe0\xf1\xfc \xed\xe0 \xec\xee\xf0\xe0\xeb\xe8 \xe2\xe0\xf8\xe5\xe9 "
-                                "\xe0\xf0\xec\xe8\xe8.",
+                            "Усмирив скелетов, вы потратили "
+                                "несколько часов на поиски "
+                                "среди гнилых обломков - и впустую."
+                                " Столь грязная работа плохо "
+                                "сказалась на морали вашей "
+                                "армии.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
                             0,
                             -1
                         );
-                        if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
+                        if (!(((eventHero2->m_eventFlags) & (HERO_EVENT_DERELICT_SHIP)))) {
                             eventHero2->m_eventFlags =
                                 eventHero2->m_eventFlags | HERO_EVENT_DERELICT_SHIP;
                             eventHero2->m_morale--;
@@ -3892,15 +3890,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
                     default:
                         skeletonCell_e = GetCell(
-                            x - normalDirTable[IDX(eventHero2->m_direction)].x,
-                            y - normalDirTable[IDX(eventHero2->m_direction)].y
+                            x - normalDirTable[(eventHero2->m_direction)].x,
+                            y - normalDirTable[(eventHero2->m_direction)].y
                         );
                         if (SkeletonEvent(
                                 eventHero2,
                                 skeletonCell_e,
-                                "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1\xee \xf1\xea\xe5\xeb\xe5\xf2\xe0\xec\xe8, \xe2\xfb "
-                                    "\xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xea\xee\xe5-\xf7\xf2\xee "
-                                    "\xed\xe0\xf8\xeb\xe8!",
+                                "Совладав со скелетами, вы "
+                                    "обыскали обломки и кое-что "
+                                    "нашли!",
                                 x,
                                 y
                             ))
@@ -3916,13 +3914,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
-                    "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xc8\xf1\xea\xf3\xf8\xe5\xed\xe8\xe5 "
-                    "\xef\xee\xe8\xf1\xea\xe0\xf2\xfc \xe2 \xed\xe5\xe9 \xf1\xee\xea\xf0\xee\xe2\xe8\xf9\xe0 "
-                    "\xe2\xe5\xeb\xe8\xea\xee, \xed\xee \xe2\xfb \xf1\xeb\xfb\xf8\xe0\xeb\xe8 \xe2\xf1\xe5 \xfd\xf2\xe8 "
-                    "\xf1\xea\xe0\xe7\xea\xe8 \xee\xe1 \xf3\xe6\xe0\xf1\xed\xfb\xf5 \xef\xf0\xee\xea\xeb\xff\xf2\xe8\xff\xf5 "
-                    "\xe8 \xed\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xf5 \xf1\xf2\xf0\xe0\xe6\xe5\xe9. \xd5\xee\xf2\xe8\xf2\xe5 "
-                    "\xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3?",
+                "Вы нашли пирамиду древнего "
+                    "великого царя. Искушение "
+                    "поискать в ней сокровища "
+                    "велико, но вы слышали все эти "
+                    "сказки об ужасных проклятиях "
+                    "и неупокоенных стражей. Хотите "
+                    "обследовать пирамиду?",
                 -1,
                 0,
                 -1,
@@ -3932,10 +3930,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
-                        "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
-                            "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xcf\xe5\xf0\xe2\xee\xe5 \xe6\xe5 \xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xed\xe8\xe5 "
-                            "\xef\xe8\xf0\xe0\xec\xe8\xe4\xfb \xef\xee\xea\xe0\xe7\xe0\xeb\xee, \xf7\xf2\xee \xe2 \xed\xe5\xe9 "
-                            "\xe0\xe1\xf1\xee\xeb\xfe\xf2\xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5\xf2.",
+                        "Вы нашли пирамиду древнего "
+                            "великого царя. Первое же обследование "
+                            "пирамиды показало, что в ней "
+                            "абсолютно ничего нет.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3946,9 +3944,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_PYRAMID)) {
+                    if (!(((eventHero2->m_eventFlags) & (HERO_EVENT_PYRAMID)))) {
                         eventHero2->m_eventFlags = HeroEventFlag(
-                            static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_PYRAMID)
+                            static_cast<i32>(eventHero2->m_eventFlags) | (HERO_EVENT_PYRAMID)
                         );
                         eventHero2->m_luck -= PYRAMID_LUCK_PENALTY;
                     }
@@ -3976,20 +3974,20 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                     sprintf(
                             eventText_b,
                             "%s'%s'.  ",
-                            "\xce\xe4\xee\xeb\xe5\xe2 \xf7\xf3\xe4\xee\xe2\xe8\xf9, \xe2\xfb \xf0\xe0\xf1\xf8\xe8\xf4\xf0\xee\xe2\xe0\xeb\xe8 "
-                                "\xe8\xe5\xf0\xee\xe3\xeb\xe8\xf4\xfb \xed\xe0 \xf1\xf2\xe5\xed\xe5, \xf1\xee\xee\xe1\xf9\xe0\xfe\xf9\xe8\xe5 "
-                                "\xf1\xe5\xea\xf0\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff - ",
+                            "Одолев чудовищ, вы расшифровали "
+                                "иероглифы на стене, сообщающие "
+                                "секрет заклинания - ",
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
                                 eventText_b,
-                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
-                                    "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe2 \xed\xe5\xe5 "
-                                    "\xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
+                                "  К сожалению, у вас нет Волшебной "
+                                    "книги, чтобы записать в нее "
+                                    "это заклинание."
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
-                        } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                        } else if (eventHero2->m_secondarySkills[(HERO_SKILL_WISDOM)]
                                    >= HERO_SKILL_LEVEL_EXPERT) {
                             eventHero2->AddSpell(
                                 static_cast<SpellType>(cell->m_objectMetadata - 1),
@@ -4008,9 +4006,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         } else {
                             strcat(
                                 eventText_b,
-                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
-                                    "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
-                                    " \xe8\xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                                "  К сожалению, у вас недостаточно "
+                                    "мудрости, чтобы понять заклинание,"
+                                    " ивы не можете выучить его."
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         }
@@ -4025,10 +4023,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "\xc2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe7\xe0\xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe "
-                    "\xe7\xee\xeb\xee\xf2\xf3\xfe \xf8\xe0\xf5\xf2\xf3. \xca\xe0\xe6\xe5\xf2\xf1\xff, \xee\xed\xe0 "
-                    "\xed\xe0\xf1\xe5\xeb\xe5\xed\xe0 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
-                    "\xe2\xee\xe9\xf2\xe8 \xe2\xed\xf3\xf2\xf0\xfc?",
+                "Вы обнаружили заброшенную "
+                    "золотую шахту. Кажется, она "
+                    "населена призраками. Желаете "
+                    "войти внутрь?",
                 -1,
                 0,
                 -1,
@@ -4058,8 +4056,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "\xc2\xfb \xf0\xe0\xe7\xe1\xe8\xeb\xe8 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2 \xe8 \xf1\xec\xee\xe3\xeb\xe8 "
-                            "\xed\xe0\xeb\xe0\xe4\xe8\xf2\xfc \xe4\xee\xe1\xfb\xf7\xf3 \xe7\xee\xeb\xee\xf2\xe0.",
+                        "Вы разбили призраков и смогли "
+                            "наладить добычу золота.",
                         -1,
                         0,
                         -1,
@@ -4170,12 +4168,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         CompleteDraw(0);
     }
     UpdateScreen(0, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[(m_currentTerrain)]);
     WaitEndSample(&eventSample_f, -1);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
-VA(0x00441609, 0x904)
 void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     i32 erased = 0;
     mapCellExtra* extras_h[NEIGHBOR_COUNT];
@@ -4365,7 +4362,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 extra_l = NULL;
         }
 
-        currentCell_d->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
+        currentCell_d->m_flags |= (MAP_CELL_OBJECT_SHADOW_ONLY);
     cellDone:
         changed_f = 0;
     }
@@ -4375,7 +4372,6 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     gpGame->SetupAdjacentMons();
 }
 
-VA(0x00441f0d, 0xaf)
 void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
     swapManager* swapWindow = new swapManager(firstHero, secondHero);
     if (swapWindow == NULL)
@@ -4385,7 +4381,6 @@ void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
     RedrawAdvScreen(1, 0);
 }
 
-VA(0x00441fbc, 0x125)
 i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     SAMPLE2 eventSample = NULL;
     i32 colorIndex = cell->m_objectMetadata;
@@ -4396,10 +4391,10 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 
     sprintf(
         gText,
-        "\xc4\xee\xf0\xee\xe3\xf3 \xe2\xe0\xec \xef\xf0\xe5\xe3\xf0\xe0\xe6\xe4\xe0\xe5\xf2 %s "
-            "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0. \xd0\xf3\xed\xfb "
-            "\xed\xe0 \xed\xe5\xec \xe3\xeb\xe0\xf1\xff\xf2: \"\xd1\xea\xe0\xe6\xe8 \xf1\xeb\xee\xe2\xee "
-            "\xe8 \xf1\xec\xee\xe6\xe5\xf8\xfc \xef\xf0\xee\xe9\xf2\xe8.\"",
+        "Дорогу вам преграждает %s "
+            "магический барьер. Руны "
+            "на нем гласят: \"Скажи слово "
+            "и сможешь пройти.\"",
         xBarrierColor[colorIndex]
     );
     GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
@@ -4407,10 +4402,10 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
-            "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 "
-                "\xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xea\xe0\xea "
-                "\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0 \xe8\xf1\xf7\xe5\xe7 "
-                "\xe2 \xef\xf3\xf1\xf2\xee\xf2\xe5.",
+            "Едва вы произнесли "
+                "волшебное слово, как "
+                "сверкающий барьер исчез "
+                "в пустоте.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4424,7 +4419,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         return 1;
     } else {
         NormalDialog(
-            "\xc2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 \xf1\xeb\xee\xe2\xee, \xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5 \xef\xf0\xee\xe8\xe7\xee\xf8\xeb\xee.",
+            "Вы произнесли слово, но ничего не произошло.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4439,7 +4434,6 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     }
 }
 
-VA(0x004420e1, 0x95)
 i8 StrEqNoCase(char* firstString, char* sndString) {
     char* firstPtr = firstString;
     char* secondPtr = sndString;
@@ -4464,7 +4458,6 @@ i8 StrEqNoCase(char* firstString, char* sndString) {
     }
 }
 
-VA(0x00442176, 0xe0)
 void advManager::PasswordEvent(mapCell* cell, hero*) {
     SAMPLE2 playSample = NULL;
     i32 color = cell->m_objectMetadata;
@@ -4473,13 +4466,11 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     passwordIndex >>= PASSWORD_SHIFT;
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &playSample);
-    /* "Р’С‹ Р·Р°С€Р»Рё РІ С€Р°С‚РµСЂ Рё СѓРІРёРґРµР»Рё РїРѕР¶РёР»СѓСЋ Р¶РµРЅС‰РёРЅСѓ СЃ РјР°РіРёС‡РµСЃРєРёРј РєР°РјРЅРµРј РІ СЂСѓРєР°С….
-       РџРѕСЃРјРѕС‚СЂРµРІ РЅР° РІР°СЃ, РѕРЅР° СЃРєР°Р·Р°Р»Р°: "РЎС‚СЂР°РЅСЃС‚РІСѓСЏ, СЏ РїРѕР·РЅР°Р»Р° С‚Р°Р№РЅСѓСЋ РјР°РіРёСЋ.
-       Р’РµР»РёРєРёР№ РѕСЂР°РєСѓР» РґР°СЂРѕРІР°Р» РјРЅРµ Р·РЅР°РЅРёСЏ Рё Сѓ РјРµРЅСЏ РµСЃС‚СЊ РѕС‚РІРµС‚ РЅР° С‚РІРѕР№ РІРѕРїСЂРѕСЃ.
-       Р’РѕР»С€РµР±РЅРѕРµ СЃР»РѕРІРѕ, СЃРЅРёРјР°СЋС‰РµРµ %s Р±Р°СЂСЊРµСЂ - '%s'."" */
+
+
     sprintf(
         gText,
-        "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xf8\xe0\xf2\xe5\xf0 \xe8 \xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xef\xee\xe6\xe8\xeb\xf3\xfe \xe6\xe5\xed\xf9\xe8\xed\xf3 \xf1 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe8\xec \xea\xe0\xec\xed\xe5\xec \xe2 \xf0\xf3\xea\xe0\xf5. \xcf\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 \xed\xe0 \xe2\xe0\xf1, \xee\xed\xe0 \xf1\xea\xe0\xe7\xe0\xeb\xe0: \"\xd1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xf3\xff, \xff \xef\xee\xe7\xed\xe0\xeb\xe0 \xf2\xe0\xe9\xed\xf3\xfe \xec\xe0\xe3\xe8\xfe. \xc2\xe5\xeb\xe8\xea\xe8\xe9 \xee\xf0\xe0\xea\xf3\xeb \xe4\xe0\xf0\xee\xe2\xe0\xeb \xec\xed\xe5 \xe7\xed\xe0\xed\xe8\xff \xe8 \xf3 \xec\xe5\xed\xff \xe5\xf1\xf2\xfc \xee\xf2\xe2\xe5\xf2 \xed\xe0 \xf2\xe2\xee\xe9 \xe2\xee\xef\xf0\xee\xf1.  \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xf1\xed\xe8\xec\xe0\xfe\xf9\xe5\xe5 %s \xe1\xe0\xf0\xfc\xe5\xf0 - '%s'.\"",
+        "Вы зашли в шатер и увидели пожилую женщину с магическим камнем в руках. Посмотрев на вас, она сказала: \"Странствуя, я познала тайную магию. Великий оракул даровал мне знания и у меня есть ответ на твой вопрос.  Волшебное слово, снимающее %s барьер - '%s'.\"",
         xBarrierColor[color],
         xPasswordStrings[passwordIndex]
     );
@@ -4487,7 +4478,6 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
-VA(0x00442256, 0x6fc)
 void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 primaryStat15;
     i32 cursedArtifactCount2;
@@ -4497,20 +4487,20 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     GenericSiteType siteType4;
     i32 currentSiteType10;
     i32 mapX37;
-    H2_ENUM_STORAGE(StableVisitResult, i32) unusedTwo1;
+    i32 unusedTwo1;
     i32 mapY14;
     mapCell* currentCell36;
     i32 unusedSite;
-    H2_ENUM_STORAGE(StableVisitResult, i32) unusedOne18;
+    i32 unusedOne18;
     i32 oldQuantity3;
-    H2_ENUM_STORAGE(StableVisitResult, i8) stableResult26;
+    i8 stableResult26;
     CreatureType creatureType;
     i32 experience11;
 
     cursedArtifactCount2 = 0;
     eventSample9 = NULL;
     siteType4 = static_cast<GenericSiteType>(cell->m_objectMetadata);
-    siteType4 = static_cast<GenericSiteType>(IDX(siteType4) & GENERIC_SITE_TYPE_MASK);
+    siteType4 = static_cast<GenericSiteType>((siteType4) & GENERIC_SITE_TYPE_MASK);
     siteLevel8 = cell->m_objectMetadata;
     siteLevel8 >>= GENERIC_SITE_LEVEL_SHIFT;
 
@@ -4522,23 +4512,23 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             if (cursedArtifactCount2 != 0) {
                 EventSound(
-                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9
                 );
                 if (cursedArtifactCount2 == 1) {
                     sprintf(
                         gText,
-                        "\xc5\xe4\xe2\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8 \xe2 \xe1\xe0\xf8\xed\xfe \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0, \xea\xe0\xea \xed\xe0 \xe2\xf1\xf2\xf0\xe5\xf7\xf3 \xe2\xe0\xec \xe2\xfb\xf8\xe5\xeb \xf5\xf0\xee\xec\xee\xe9 \xe8 \xf1\xe5\xe4\xee\xe9 \xec\xf3\xe6\xf7\xe8\xed\xe0. \xce\xed \xef\xf0\xee\xe2\xe5\xf0\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xe5\xf9\xe8 \xe8 \xe7\xe0\xec\xe5\xf2\xe8\xeb, \xf7\xf2\xee \xf1\xf0\xe5\xe4\xe8 \xed\xe8\xf5 \xe5\xf1\xf2\xfc \xee\xe4\xed\xe0 \xef\xf0\xee\xea\xeb\xff\xf2\xe0\xff \xe2\xe5\xf9\xfc. \xc7\xe0 750 \xe7\xee\xeb\xee\xf2\xfb\xf5 \xe0\xeb\xf5\xe8\xec\xe8\xea \xf1\xee\xe3\xeb\xe0\xf1\xe5\xed \xe7\xe0\xe1\xf0\xe0\xf2\xfc \xe5\xe5 \xf3 \xe2\xe0\xf1. \xc2\xfb \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xe5?"
+                        "Едва вы вошли в башню алхимика, как на встречу вам вышел хромой и седой мужчина. Он проверил ваши вещи и заметил, что среди них есть одна проклятая вещь. За 750 золотых алхимик согласен забрать ее у вас. Вы заплатите?"
                     );
                 } else {
                     sprintf(
                         gText,
-                        " \xc5\xe4\xe2\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8 \xe2 \xe1\xe0\xf8\xed\xfe \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0, \xea\xe0\xea \xed\xe0 \xe2\xf1\xf2\xf0\xe5\xf7\xf3 \xe2\xe0\xec \xe2\xfb\xf8\xe5\xeb \xf5\xf0\xee\xec\xee\xe9 \xe8 \xf1\xe5\xe4\xee\xe9 \xec\xf3\xe6\xf7\xe8\xed\xe0. \xce\xed \xef\xf0\xee\xe2\xe5\xf0\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xe5\xf9\xe8 \xe8 \xe7\xe0\xec\xe5\xf2\xe8\xeb, \xf7\xf2\xee \xf1\xf0\xe5\xe4\xe8 \xed\xe8\xf5 %d \xef\xf0\xee\xea\xeb\xff\xf2\xfb\xe5 \xe2\xe5\xf9\xe8. \xc7\xe0 750 \xe7\xee\xeb\xee\xf2\xfb\xf5 \xe0\xeb\xf5\xe8\xec\xe8\xea \xf1\xee\xe3\xeb\xe0\xf1\xe5\xed \xe7\xe0\xe1\xf0\xe0\xf2\xfc \xe8\xf5 \xf3 \xe2\xe0\xf1. \xc2\xfb \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xe5?",
+                        " Едва вы вошли в башню алхимика, как на встречу вам вышел хромой и седой мужчина. Он проверил ваши вещи и заметил, что среди них %d проклятые вещи. За 750 золотых алхимик согласен забрать их у вас. Вы заплатите?",
                         cursedArtifactCount2
                     );
                 }
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
+                    if (gpCurPlayer->m_resources[(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
                             if (IsCursedItem(eventHero->m_artifacts[index8])) {
                                 GiveTakeArtifactStat(
@@ -4547,10 +4537,10 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                                 eventHero->m_artifacts[index8] = ARTIFACT_NONE;
                             }
                         }
-                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SITE_ALCHEMIST_COST;
+                        gpCurPlayer->m_resources[(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
                         NormalDialog(
-                            "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xe8\xe7-\xe7\xe0 \xe7\xe0\xef\xe5\xf0\xf2\xee\xe9 \xe4\xe2\xe5\xf0\xe8: \"\xd3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee \xe7\xee\xeb\xee\xf2\xe0 \xe4\xeb\xff \xec\xee\xe8\xf5 \xf3\xf1\xeb\xf3\xe3.\"",
+                            "Вы слышите голос из-за запертой двери: \"У вас недостаточно золота для моих услуг.\"",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -4565,7 +4555,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 }
             } else {
                 NormalDialog(
-                    "\xc2\xfb \xf1\xeb\xfb\xf8\xe8\xf2\xe5 \xe3\xee\xeb\xee\xf1 \xf1 \xe2\xe5\xf0\xf8\xe8\xed\xfb \xe1\xe0\xf8\xed\xe8: \"\xd3\xe1\xe8\xf0\xe0\xe9\xf2\xe5\xf1\xfc! \xdf \xed\xe5 \xec\xee\xe3\xf3 \xe2\xe0\xec \xef\xee\xec\xee\xf7\xfc!\"",
+                    "Вы слышите голос с вершины башни: \"Убирайтесь! Я не могу вам помочь!\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4580,9 +4570,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             break;
 
         case GENERIC_SITE_ARENA:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_ARENA)) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_ARENA)))) {
                 NormalDialog(
-                    "\xd1\xf2\xf0\xe0\xe6\xe0 \xc0\xf0\xe5\xed\xfb \xef\xf0\xe5\xe3\xf0\xe0\xe4\xe8\xeb\xe0 \xe2\xe0\xec \xe4\xee\xf0\xee\xe3\xf3 \xe8 \xed\xe5 \xef\xf3\xf1\xf2\xe8\xeb\xe0 \xe2\xed\xf3\xf2\xf0\xfc.",
+                    "Стража Арены преградила вам дорогу и не пустила внутрь.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4595,10 +4585,10 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 );
             } else {
                 EventSound(
-                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9
                 );
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_ARENA)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_ARENA)
                 );
                 primaryStat15 = DoArenaDialog();
                 eventHero->m_primaryStats[primaryStat15]++;
@@ -4606,9 +4596,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             break;
 
         case GENERIC_SITE_MERMAID:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_MERMAID)) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_MERMAID)))) {
                 NormalDialog(
-                    "\xd0\xf3\xf1\xe0\xeb\xea\xe8 \xec\xee\xeb\xf7\xe0\xeb\xe8\xe2\xee \xe4\xe0\xeb\xe8 \xe2\xe0\xec \xef\xee\xed\xff\xf2\xfc, \xf7\xf2\xee\xe1\xfb \xe2\xfb \xef\xf0\xe8\xf5\xee\xe4\xe8\xeb\xe8 \xe2 \xe4\xf0\xf3\xe3\xee\xe9 \xf0\xe0\xe7, \xf2\xee\xe3\xe4\xe0 \xee\xed\xe8 \xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xff\xf2 \xe2\xe0\xf1.",
+                    "Русалки молчаливо дали вам понять, чтобы вы приходили в другой раз, тогда они благословят вас.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4621,16 +4611,16 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 );
             } else {
                 EventSound(
-                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9
                 );
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MERMAID)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_MERMAID)
                 );
                 eventHero->m_luck++;
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "\xcc\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe0\xff \xea\xf0\xe0\xf1\xee\xf2\xe0 \xf0\xf3\xf1\xe0\xeb\xee\xea \xee\xe1\xe2\xee\xeb\xee\xea\xeb\xe0 \xe2\xe0\xf1 \xe8 \xe2\xe0\xf8\xf3 \xea\xee\xec\xe0\xed\xe4\xf3. \xcd\xe0 \xea\xe0\xea\xee\xe9-\xf2\xee \xec\xe8\xe3 \xe2\xfb \xef\xee\xe7\xe0\xe1\xfb\xeb\xe8 \xee \xe2\xe0\xf8\xe8\xf5 \xef\xf0\xee\xe1\xeb\xe5\xec\xe0\xf5 \xe8 \xed\xe0\xf1\xeb\xe0\xe4\xe8\xeb\xe8\xf1\xfc \xfd\xf2\xe8\xec \xec\xe3\xed\xee\xe2\xe5\xed\xe8\xe5\xec \xea\xf0\xe0\xf1\xee\xf2\xfb. \xd7\xe0\xf0\xfb \xf0\xf3\xf1\xe0\xeb\xee\xea \xe1\xeb\xe0\xe3\xee\xf1\xeb\xee\xe2\xe8\xeb\xe8 \xe2\xe0\xf1 \xed\xe0 \xf3\xe4\xe0\xf7\xf3 \xe2 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xec \xe1\xee\xfe.",
+                    "Магическая красота русалок обволокла вас и вашу команду. На какой-то миг вы позабыли о ваших проблемах и насладились этим мгновением красоты. Чары русалок благословили вас на удачу в следующем бою.",
                     SITE_MERMAID_WINDOW_ICON,
                     0,
                     -1,
@@ -4641,9 +4631,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             break;
 
         case GENERIC_SITE_HUT_OF_MAGI:
-            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9);
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9);
             NormalDialog(
-                "\xc2\xfb \xe7\xe0\xf8\xeb\xe8 \xe2 \xe2\xe5\xf2\xf5\xf3\xfe \xf5\xe8\xe1\xe0\xf0\xf3 \xe8 \xe7\xe0\xe3\xee\xe2\xee\xf0\xe8\xeb\xe8 \xf1 \xec\xe0\xe3\xee\xec, \xe6\xe8\xe2\xf3\xf9\xe8\xec \xf2\xf3\xf2. \xce\xed \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec \xee \xec\xe5\xf1\xf2\xe0\xf5, \xea\xee\xf2\xee\xf0\xfb\xe5 \xe5\xec\xf3 \xe4\xee\xe2\xee\xe4\xe8\xeb\xee\xf1\xfc \xe2\xe8\xe4\xe5\xf2\xfc. \xdd\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xfc\xf1\xff \xe2\xe0\xec \xe2 \xe2\xe0\xf8\xe8\xf5 \xef\xf3\xf2\xe5\xf8\xe5\xf1\xf2\xe2\xe8\xff\xf5.",
+                "Вы зашли в ветхую хибару и заговорили с магом, живущим тут. Он поведал вам о местах, которые ему доводилось видеть. Это может пригодиться вам в ваших путешествиях.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -4672,7 +4662,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
-                "\xca\xe0\xe6\xe5\xf2\xf1\xff, \xfd\xf2\xee\xf2 \xe3\xeb\xe0\xe7 \xe2\xed\xe8\xec\xe0\xf2\xe5\xeb\xfc\xed\xee \xe8\xe7\xf3\xf7\xe0\xe5\xf2 \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8.",
+                "Кажется, этот глаз внимательно изучает окрестности.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -4686,9 +4676,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             break;
 
         case GENERIC_SITE_SIRENS:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_SIRENS)) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_SIRENS)))) {
                 NormalDialog(
-                    "\xc2\xfb \xef\xf0\xe8\xea\xe0\xe7\xe0\xeb\xe8 \xf1\xe2\xee\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xe5 \xe7\xe0\xeb\xe8\xf2\xfc \xf3\xf8\xe8 \xe2\xee\xf1\xea\xee\xec, \xef\xf0\xe5\xe6\xe4\xe5 \xf7\xe5\xec \xef\xee\xe4\xef\xeb\xfb\xf2\xfc \xea \xf1\xe8\xf0\xe5\xed\xe0\xec, \xf7\xf2\xee\xe1\xfb \xef\xee\xf1\xeb\xf3\xf8\xe0\xf2\xfc \xe8\xf5 \xef\xe5\xed\xe8\xe5, \xea\xee\xf2\xee\xf0\xee\xe5 \xe7\xe0\xef\xf0\xee\xf1\xf2\xee \xec\xee\xe6\xe5\xf2 \xef\xee\xe3\xf3\xe1\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5.",
+                    "Вы приказали своей команде залить уши воском, прежде чем подплыть к сиренам, чтобы послушать их пение, которое запросто может погубить всех в морской пучине.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4709,7 +4699,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                             eventHero->m_army.m_quantities[index8] =
                                 static_cast<i16>(oldQuantity3 * GENERIC_SITE_SIREN_ARMY_REMAINDER);
                             experience11 +=
-                                gMonsterDatabase[IDX(creatureType)].hitPoints
+                                gMonsterDatabase[(creatureType)].hitPoints
                                 * (oldQuantity3 - eventHero->m_army.m_quantities[index8]);
                         }
                     }
@@ -4717,19 +4707,19 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (experience11 != 0) {
                     EventSound(
                         cell->m_triggerType & MAP_TRIGGER_TYPE_MASK,
-                        IDX(siteType4),
+                        (siteType4),
                         &eventSample9
                     );
                     sprintf(
                         gText,
-                        "\xcd\xe0\xe4 \xea\xe0\xec\xed\xff\xec\xe8 \xf0\xe0\xe7\xe4\xe0\xeb\xe0\xf1\xfc \xe6\xf3\xf2\xea\xe0\xff \xef\xe5\xf1\xed\xff \xf1\xe8\xf0\xe5\xed. \xcc\xed\xee\xe3\xe8\xe5 \xe8\xe7 \xe2\xe0\xf8\xe5\xe9 \xea\xee\xec\xe0\xed\xe4\xfb \xf0\xee\xf1\xe8\xeb\xe8\xf1\xfc \xe2 \xe2\xee\xe4\xf3 \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe5\xec \xfd\xf2\xe8\xf5 \xf7\xe0\xf0 \xe8 \xf3\xf2\xee\xed\xf3\xeb\xe8 \xe2 \xec\xee\xf0\xf1\xea\xee\xe9 \xef\xf3\xf7\xe8\xed\xe5. \xc4\xeb\xff \xe2\xe0\xf1 \xfd\xf2\xee \xe1\xfb\xeb \xf5\xee\xf0\xee\xf8\xe8\xe9 \xf3\xf0\xee\xea, \xe4\xe0\xe2\xf8\xe8\xe9 %d \xee\xf7\xea\xee\xe2 \xee\xef\xfb\xf2\xe0.",
+                        "Над камнями раздалась жуткая песня сирен. Многие из вашей команды росились в воду действием этих чар и утонули в морской пучине. Для вас это был хороший урок, давший %d очков опыта.",
                         experience11
                     );
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
                     NormalDialog(
-                        "\xc5\xe4\xe2\xe0 \xf1\xe8\xf0\xe5\xed\xfb \xe7\xe0\xf2\xff\xed\xf3\xeb\xe8 \xf1\xe2\xee\xfe \xf3\xe6\xe0\xf1\xed\xf3\xfe \xef\xe5\xf1\xed\xfe, \xea\xe0\xea \xe2\xe0\xf8\xe0 \xea\xee\xec\xe0\xed\xe4\xe0 \xef\xee\xf1\xe8\xeb\xfc\xed\xe5\xe5 \xed\xe0\xeb\xe5\xe3\xeb\xe0 \xed\xe0 \xe2\xe5\xf1\xeb\xe0 \xe8 \xf3\xe2\xe5\xeb\xe0 \xef\xee\xe4\xe0\xeb\xfc\xf8\xe5 \xea\xee\xf0\xe0\xe1\xeb\xfc \xe2 \xee\xf2\xea\xf0\xfb\xf2\xee \xec\xee\xf0\xe5.",
+                        "Едва сирены затянули свою ужасную песню, как ваша команда посильнее налегла на весла и увела подальше корабль в открыто море.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -4742,7 +4732,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     );
                 }
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_SIRENS)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_SIRENS)
                 );
             }
             break;
@@ -4751,9 +4741,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             unusedOne18 = STABLE_VISIT_MOBILITY;
             unusedTwo1 = STABLE_VISIT_UPGRADE;
             stableResult26 = STABLE_VISIT_NONE;
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_STABLES) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_STABLES))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_STABLES)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_STABLES)
                 );
                 eventHero->m_mobility += SITE_STABLE_MOBILITY;
                 eventHero->m_remainingMobility += SITE_STABLE_MOBILITY;
@@ -4765,11 +4755,11 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             if (stableResult26 != STABLE_VISIT_NONE) {
                 EventSound(
-                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType4), &eventSample9
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, (siteType4), &eventSample9
                 );
             }
-            sprintf(gText, xStableText[IDX(stableResult26)]);
-            if (HAS(stableResult26, STABLE_VISIT_UPGRADE)) {
+            sprintf(gText, xStableText[(stableResult26)]);
+            if ((((stableResult26) & (STABLE_VISIT_UPGRADE)))) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4787,10 +4777,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-VA(0x00442952, 0x170)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 recruitSample = NULL;
-    H2_ENUM_STORAGE(RecruitSiteType, u32) recruitSiteType;
+    u32 recruitSiteType;
     i16 quantity;
     CreatureType creatureType1;
     u32 index;
@@ -4819,7 +4808,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
             break;
     }
 
-    index = IDX(recruitSiteType);
+    index = (recruitSiteType);
     if (quantity == 0) {
         EventWindow(-1, NORMAL_DIALOG_INFO, xRecruitEmpty[index], -1, 0, -1, 0, -1);
     } else {
@@ -4827,15 +4816,14 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, xRecruitBuy[index], -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             ExpansionRecruitEvent(eventHero, creatureType1, &quantity);
-            packedValue = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | IDX(recruitSiteType);
+            packedValue = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | (recruitSiteType);
             cell->m_objectMetadata = packedValue;
         }
     }
 }
 
-VA(0x00442ac2, 0xaa)
 void advManager::ExpansionRecruitEvent(
-    hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, i16* availableCount
+    hero* eventHero, CreatureType creatureType, i16* availableCount
 ) {
     tag_message dialogMessage;
     baseManager* recruitWindow = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
@@ -4846,7 +4834,6 @@ void advManager::ExpansionRecruitEvent(
     delete recruitWindow;
 }
 
-VA(0x00442b6c, 0x21a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     SAMPLE2 eventSample = NULL;
     i32 heroId;
@@ -4855,10 +4842,10 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     heroId = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
         NormalDialog(
-            "\xd2\xfe\xf0\xe5\xec\xf9\xe8\xea \xf1\xea\xe0\xe7\xe0\xeb \xe2\xe0\xec, "
-                "\xf7\xf2\xee \xe3\xe5\xf0\xee\xe9, \xf2\xee\xec\xe8\xe2\xf8\xe8\xe9\xf1\xff "
-                "\xf2\xf3\xf2 \xe2 \xef\xeb\xe5\xed\xf3 \xe1\xfb\xeb \xee\xf1\xe2\xee\xe1\xee\xe6\xe4\xe5\xed "
-                "\xe5\xe3\xee \xea\xee\xf0\xee\xeb\xe5\xec.",
+            "Тюремщик сказал вам, "
+                "что герой, томившийся "
+                "тут в плену был освобожден "
+                "его королем.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4875,12 +4862,12 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
-            "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 8 \xe3\xe5\xf0\xee\xe5\xe2. "
-                "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe2\xe0\xec \xef\xf0\xe8\xe4\xe5\xf2\xf1\xff "
-                "\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xf2\xee\xec\xe8\xf2\xfc\xf1\xff "
-                "\xfd\xf2\xee\xe3\xee \xe3\xe5\xf0\xee\xff \xe2 \xf2\xe5\xec\xed\xe8\xf6\xe5 "
-                "\xe5\xf9\xe5 \xed\xe5\xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee\xe5 "
-                "\xe2\xf0\xe5\xec\xff.",
+            "У вас уже 8 героев. "
+                "К сожалению, вам придется "
+                "оставить томиться "
+                "этого героя в темнице "
+                "еще неопределенное "
+                "время.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4896,14 +4883,14 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
     NormalDialog(
-        "\xd1 \xee\xf1\xeb\xe5\xef\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9 \xee\xf2\xe2\xe0\xe3\xee\xe9 "
-            "\xe2\xfb \xe2\xee\xf0\xe2\xe0\xeb\xe8\xf1\xfc \xe2 \xec\xe5\xf1\xf2\xed\xf3\xfe "
-            "\xf2\xe5\xec\xed\xe8\xf6\xf3 \xe8 \xee\xf1\xe2\xee\xe1\xee\xe4\xe8\xeb\xe8 "
-            "\xe3\xe5\xf0\xee\xff, \xf2\xee\xec\xff\xf9\xe5\xe3\xee\xf1\xff "
-            "\xe7\xe4\xe5\xf1\xfc \xe2 \xef\xeb\xe5\xed\xf3. "
-            "\xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
-            "\xee\xed \xef\xee\xea\xeb\xff\xeb\xf1\xff \xf1\xeb\xf3\xe6\xe8\xf2\xfc "
-            "\xe2\xe0\xec.",
+        "С ослепительной отвагой "
+            "вы ворвались в местную "
+            "темницу и освободили "
+            "героя, томящегося "
+            "здесь в плену. "
+            "В благодарность "
+            "он поклялся служить "
+            "вам.",
         NORMAL_DIALOG_INFO,
         -1,
         -1,
@@ -4941,7 +4928,6 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     );
 }
 
-VA(0x00442d86, 0x1a7)
 void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     hero* attackingHero;
     CombatResult combatResult1;
@@ -4987,9 +4973,8 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     attackingHero->CheckLevel();
 }
 
-VA(0x00442f2d, 0x413)
 void advManager::EventSound(
-    H2_ENUM_PARAM(MapObjectType, i32) eventType,
+    MapObjectType eventType,
     i32 eventData,
     SAMPLE2* outSample
 ) {
@@ -5194,7 +5179,6 @@ void advManager::EventSound(
     }
 }
 
-VA(0x00443340, 0xa9)
 void advManager::EventWindow(
     i32 eventId,
     i32 buttons,
@@ -5229,10 +5213,9 @@ void advManager::EventWindow(
             eventId
         );
 
-    NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
+    NormalDialog(eventText, buttons, -1, -1, (type1), value1, type2, value2, type3, 0);
 }
 
-VA(0x004433e9, 0x92)
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
 
@@ -5243,7 +5226,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     }
 
     if (artifactSlot == EVENT_ARTIFACT_SLOT_COUNT) {
-        return IDX(ARTIFACT_NONE);
+        return (ARTIFACT_NONE);
     }
 
     eventHero->m_artifacts[artifactSlot] = artifact;
@@ -5255,7 +5238,6 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     return artifactSlot;
 }
 
-VA(0x0044347b, 0x4e)
 ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     ArtifactType artifactId =
         ArtifactType(gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true));
@@ -5267,7 +5249,6 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     return artifactId;
 }
 
-VA(0x004434c9, 0x61)
 i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) {
     i32 oldLevel;
     i32 unusedLevel2;
@@ -5284,17 +5265,15 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
     return newLevel1 - oldLevel;
 }
 
-VA(0x0044352a, 0x83)
 void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
     if (resourceType >= RES_WOOD && resourceType <= RES_GOLD)
-        gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
+        gpGame->m_players[eventHero->m_owner].m_resources[(resourceType)] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
-VA(0x004435ad, 0xe0)
 void advManager::RecruitEvent(
-    hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, mapCell* cell
+    hero* eventHero, CreatureType creatureType, mapCell* cell
 ) {
     tag_message recruitMessage;
     i16 availableCount = static_cast<i16>(cell->m_objectMetadata);
@@ -5309,7 +5288,6 @@ void advManager::RecruitEvent(
     cell->m_objectMetadata = static_cast<u16>(availableCount);
 }
 
-VA(0x0044368d, 0x232)
 i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
 
@@ -5337,7 +5315,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SKELETON_EVENT_SMALL_GOLD,
                     -1,
                     0,
@@ -5371,7 +5349,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SKELETON_EVENT_MEDIUM_GOLD,
                     -1,
                     0,
@@ -5405,7 +5383,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SKELETON_EVENT_LARGE_GOLD,
                     -1,
                     0,
@@ -5439,7 +5417,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     SKELETON_EVENT_HUGE_GOLD,
                     -1,
                     0,
@@ -5454,7 +5432,6 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
     return 0;
 }
 
-VA(0x004438bf, 0x26b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5481,7 +5458,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     ZOMBIE_EVENT_SMALL_GOLD,
                     -1,
                     0,
@@ -5515,7 +5492,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     ZOMBIE_EVENT_MEDIUM_GOLD,
                     -1,
                     0,
@@ -5549,7 +5526,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     -1,
                     NORMAL_DIALOG_INFO,
                     text,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     ZOMBIE_EVENT_LARGE_GOLD,
                     -1,
                     0,
@@ -5585,10 +5562,10 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                         -1,
                         NORMAL_DIALOG_INFO,
                         text,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         ZOMBIE_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
-                        IDX(artifactId),
+                        (artifactId),
                         -1
                     );
                 else
@@ -5596,7 +5573,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                         -1,
                         NORMAL_DIALOG_INFO,
                         text,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         ZOMBIE_EVENT_HUGE_GOLD,
                         -1,
                         0,
@@ -5611,7 +5588,6 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
     return 0;
 }
 
-VA(0x00443b2a, 0x2cc)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5643,7 +5619,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     -1,
                     NORMAL_DIALOG_INFO,
                     gText,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     GHOST_EVENT_SMALL_GOLD,
                     -1,
                     0,
@@ -5682,7 +5658,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     -1,
                     NORMAL_DIALOG_INFO,
                     gText,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     GHOST_EVENT_MEDIUM_GOLD,
                     -1,
                     0,
@@ -5721,7 +5697,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     -1,
                     NORMAL_DIALOG_INFO,
                     gText,
-                    IDX(RES_GOLD),
+                    (RES_GOLD),
                     GHOST_EVENT_LARGE_GOLD,
                     -1,
                     0,
@@ -5762,10 +5738,10 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                         -1,
                         NORMAL_DIALOG_INFO,
                         gText,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         GHOST_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
-                        IDX(artifactId),
+                        (artifactId),
                         -1
                     );
                 else
@@ -5773,7 +5749,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                         -1,
                         NORMAL_DIALOG_INFO,
                         gText,
-                        IDX(RES_GOLD),
+                        (RES_GOLD),
                         GHOST_EVENT_HUGE_GOLD,
                         -1,
                         0,
@@ -5788,10 +5764,9 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
     return 0;
 }
 
-VA(0x00443df6, 0x245)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     HouseRecruitmentSite siteIndex = RECRUIT_ARCHER;
-    CreatureType creatureTypes[IDX(RECRUIT_SITE_COUNT)];
+    CreatureType creatureTypes[(RECRUIT_SITE_COUNT)];
 
     switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_ARCHER_HOUSE:
@@ -5829,7 +5804,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 
     if (cell->m_objectMetadata == 0) {
         EventWindow(
-            IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
+            (siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
             NORMAL_DIALOG_INFO,
             "",
             -1,
@@ -5839,19 +5814,19 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             -1
         );
     } else {
-        creatureTypes[IDX(RECRUIT_ARCHER)] = CREATURE_ARCHER;
-        creatureTypes[IDX(RECRUIT_GOBLIN)] = CREATURE_GOBLIN;
-        creatureTypes[IDX(RECRUIT_PEASANT)] = CREATURE_PEASANT;
-        creatureTypes[IDX(RECRUIT_DWARF)] = CREATURE_DWARF;
-        creatureTypes[IDX(RECRUIT_LOG_CABIN)] = CREATURE_DWARF;
-        creatureTypes[IDX(RECRUIT_TREE_HOUSE)] = CREATURE_SPRITE;
-        creatureTypes[IDX(RECRUIT_HALFLING)] = CREATURE_HALFLING;
-        creatureTypes[IDX(RECRUIT_WATCH_TOWER)] = CREATURE_ORC;
-        creatureTypes[IDX(RECRUIT_CAVE)] = CREATURE_CENTAUR;
-        creatureTypes[IDX(RECRUIT_EXCAVATION)] = CREATURE_SKELETON;
+        creatureTypes[(RECRUIT_ARCHER)] = CREATURE_ARCHER;
+        creatureTypes[(RECRUIT_GOBLIN)] = CREATURE_GOBLIN;
+        creatureTypes[(RECRUIT_PEASANT)] = CREATURE_PEASANT;
+        creatureTypes[(RECRUIT_DWARF)] = CREATURE_DWARF;
+        creatureTypes[(RECRUIT_LOG_CABIN)] = CREATURE_DWARF;
+        creatureTypes[(RECRUIT_TREE_HOUSE)] = CREATURE_SPRITE;
+        creatureTypes[(RECRUIT_HALFLING)] = CREATURE_HALFLING;
+        creatureTypes[(RECRUIT_WATCH_TOWER)] = CREATURE_ORC;
+        creatureTypes[(RECRUIT_CAVE)] = CREATURE_CENTAUR;
+        creatureTypes[(RECRUIT_EXCAVATION)] = CREATURE_SKELETON;
 
         EventWindow(
-            IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
+            (siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
             NORMAL_DIALOG_CONFIRM,
             "",
             -1,
@@ -5861,14 +5836,14 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             -1
         );
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-            if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
+            if (eventHero->m_army.CanJoin(creatureTypes[(siteIndex)])) {
                 eventHero->m_army.Add(
-                    creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1
+                    creatureTypes[(siteIndex)], cell->m_objectMetadata, -1
                 );
                 cell->m_objectMetadata = 0;
             } else {
                 EventWindow(
-                    IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
+                    (siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
                     NORMAL_DIALOG_INFO,
                     "",
                     -1,
@@ -5882,7 +5857,6 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     }
 }
 
-VA(0x0044403b, 0x536)
 CombatResult advManager::CombatMonsterEvent(
     hero* eventHero,
     CreatureType monsterType,
@@ -5924,7 +5898,7 @@ CombatResult advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, IDX(CREATURE_NONE), MONSTER_ARMY_SLOTS);
+    memset(gpMonGroup->m_creatureTypes, (CREATURE_NONE), MONSTER_ARMY_SLOTS);
     memset(gpMonGroup->m_creatureCounts, 0, MONSTER_ARMY_SLOTS * sizeof(i16));
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
@@ -5932,7 +5906,7 @@ CombatResult advManager::CombatMonsterEvent(
     groupCount = 0;
     SRand(combatX + combatY);
     if (stackCount == MONSTER_ARMY_SLOTS
-        && HAS(gMonsterDatabase[IDX(monsterType)].attributes, MONSTER_ATTRIBUTE_RANGED) == 0) {
+        && (((gMonsterDatabase[(monsterType)].attributes) & (MONSTER_ATTRIBUTE_RANGED))) == 0) {
         i32 roll = SRandom(0, MONSTER_RANDOM_MAX);
         if (roll < MONSTER_REDUCED_STACK_CHANCE)
             stackCount = MONSTER_REDUCED_STACK_COUNT;
@@ -6065,7 +6039,6 @@ CombatResult advManager::CombatMonsterEvent(
     return battleOutcome;
 }
 
-VA(0x00444571, 0x3d8)
 void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     i32 stats[EVENT_ARTIFACT_PRIMARY_STAT_COUNT];
     i32 i;
@@ -6073,51 +6046,51 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
 
     if (artifact == ARTIFACT_NONE)
         return;
-    stats[IDX(HERO_PRIMARY_ATTACK)] = 0;
-    stats[IDX(HERO_PRIMARY_DEFENSE)] = 0;
-    stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 0;
-    stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
+    stats[(HERO_PRIMARY_ATTACK)] = 0;
+    stats[(HERO_PRIMARY_DEFENSE)] = 0;
+    stats[(HERO_PRIMARY_SPELL_POWER)] = 0;
+    stats[(HERO_PRIMARY_KNOWLEDGE)] = 0;
 
     switch (artifact) {
         case ARTIFACT_ULTIMATE_BOOK:
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 12;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 12;
             break;
         case ARTIFACT_ULTIMATE_SWORD:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 12;
+            stats[(HERO_PRIMARY_ATTACK)] = 12;
             break;
         case ARTIFACT_ULTIMATE_CLOAK:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 12;
+            stats[(HERO_PRIMARY_DEFENSE)] = 12;
             break;
         case ARTIFACT_ULTIMATE_WAND:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 12;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 12;
             break;
         case ARTIFACT_ULTIMATE_SHIELD:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 6;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 6;
+            stats[(HERO_PRIMARY_ATTACK)] = 6;
+            stats[(HERO_PRIMARY_DEFENSE)] = 6;
             break;
         case ARTIFACT_ULTIMATE_STAFF:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 6;
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 6;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 6;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 6;
             break;
         case ARTIFACT_ULTIMATE_CROWN:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 4;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 4;
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
+            stats[(HERO_PRIMARY_ATTACK)] = 4;
+            stats[(HERO_PRIMARY_DEFENSE)] = 4;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 4;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
         case ARTIFACT_GOLDEN_GOOSE:
             break;
         case ARTIFACT_ARCANE_NECKLACE:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 4;
             break;
         case ARTIFACT_CASTER_BRACELET:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
         case ARTIFACT_MAGE_RING:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
         case ARTIFACT_WITCHES_BROACH:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
         case ARTIFACT_MEDAL_OF_VALOR:
             break;
@@ -6130,42 +6103,42 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
         case ARTIFACT_FIZBIN_OF_MISFORTUNE:
             break;
         case ARTIFACT_THUNDER_MACE:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 1;
+            stats[(HERO_PRIMARY_ATTACK)] = 1;
             break;
         case ARTIFACT_ARMORED_GAUNTLETS:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 1;
+            stats[(HERO_PRIMARY_DEFENSE)] = 1;
             break;
         case ARTIFACT_DEFENDER_HELM:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 1;
+            stats[(HERO_PRIMARY_DEFENSE)] = 1;
             break;
         case ARTIFACT_GIANT_FLAIL:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 1;
+            stats[(HERO_PRIMARY_ATTACK)] = 1;
             break;
         case ARTIFACT_BALLISTA:
             break;
         case ARTIFACT_STEALTH_SHIELD:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 2;
+            stats[(HERO_PRIMARY_DEFENSE)] = 2;
             break;
         case ARTIFACT_DRAGON_SWORD:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 3;
+            stats[(HERO_PRIMARY_ATTACK)] = 3;
             break;
         case ARTIFACT_POWER_AXE:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 2;
+            stats[(HERO_PRIMARY_ATTACK)] = 2;
             break;
         case ARTIFACT_DIVINE_BREASTPLATE:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 3;
+            stats[(HERO_PRIMARY_DEFENSE)] = 3;
             break;
         case ARTIFACT_MINOR_SCROLL:
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
         case ARTIFACT_MAJOR_SCROLL:
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 3;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 3;
             break;
         case ARTIFACT_SUPERIOR_SCROLL:
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
         case ARTIFACT_FOREMOST_SCROLL:
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 5;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 5;
             break;
         case ARTIFACT_ENDLESS_SACK_GOLD:
             break;
@@ -6262,38 +6235,38 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
         case ARTIFACT_ENDLESS_POUCH_CRYSTAL:
             break;
         case ARTIFACT_SPIKED_HELM:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 1;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 1;
+            stats[(HERO_PRIMARY_ATTACK)] = 1;
+            stats[(HERO_PRIMARY_DEFENSE)] = 1;
             break;
         case ARTIFACT_SPIKED_SHIELD:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 2;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 2;
+            stats[(HERO_PRIMARY_ATTACK)] = 2;
+            stats[(HERO_PRIMARY_DEFENSE)] = 2;
             break;
         case ARTIFACT_WHITE_PEARL:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 1;
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 1;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 1;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 1;
             break;
         case ARTIFACT_BLACK_PEARL:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 2;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
         case ARTIFACT_MAGIC_BOOK:
             break;
         case ARTIFACT_SPELL_SCROLL:
             break;
         case ARTIFACT_ARM_OF_MARTYR:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
         case ARTIFACT_BREASTPLATE_ANDURAN:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 5;
+            stats[(HERO_PRIMARY_DEFENSE)] = 5;
             break;
         case ARTIFACT_BROACH_SHIELDING:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = -2;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = -2;
             break;
         case ARTIFACT_BATTLE_GARB:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 5;
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 5;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 5;
+            stats[(HERO_PRIMARY_DEFENSE)] = 5;
+            stats[(HERO_PRIMARY_ATTACK)] = 5;
             break;
         case ARTIFACT_CRYSTAL_BALL:
             break;
@@ -6302,30 +6275,30 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
         case ARTIFACT_HEART_ICE:
             break;
         case ARTIFACT_HELMET_ANDURAN:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
         case ARTIFACT_HOLY_HAMMER:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 5;
+            stats[(HERO_PRIMARY_ATTACK)] = 5;
             break;
         case ARTIFACT_LEGENDARY_SCEPTER:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 2;
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 2;
-            stats[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 2;
+            stats[(HERO_PRIMARY_ATTACK)] = 2;
+            stats[(HERO_PRIMARY_DEFENSE)] = 2;
+            stats[(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
         case ARTIFACT_MASTHEAD:
             break;
         case ARTIFACT_SPHERE_NEGATION:
             break;
         case ARTIFACT_STAFF_WIZARDRY:
-            stats[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
+            stats[(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
         case ARTIFACT_SWORD_BREAKER:
-            stats[IDX(HERO_PRIMARY_DEFENSE)] = 4;
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 1;
+            stats[(HERO_PRIMARY_DEFENSE)] = 4;
+            stats[(HERO_PRIMARY_ATTACK)] = 1;
             break;
         case ARTIFACT_SWORD_ANDURAN:
-            stats[IDX(HERO_PRIMARY_ATTACK)] = 5;
+            stats[(HERO_PRIMARY_ATTACK)] = 5;
             break;
         case ARTIFACT_SPADE_NECROMANCY:
             break;
@@ -6335,7 +6308,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
 
     for (i = 0; i < EVENT_ARTIFACT_PRIMARY_STAT_COUNT; i++) {
         targetHero->m_primaryStats[i] += (take == EVENT_ARTIFACT_TAKE ? -1 : 1) * stats[i];
-        if (i == IDX(HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
+        if (i == (HERO_PRIMARY_KNOWLEDGE) && take == EVENT_ARTIFACT_TAKE) {
             maxSpellPoints =
                 targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
             if (targetHero->m_spellPoints > maxSpellPoints)
@@ -6344,7 +6317,6 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     }
 }
 
-VA(0x00444949, 0x1b2)
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
     i32 sourceArtifactSlot;
@@ -6363,11 +6335,11 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             || gbThisNetHumanPlayer[destinationHero->m_owner]) {
                             sprintf(
                                 gText,
-                                "\xdd\xf2\xee %s! \xc5\xe4\xe2\xe0 \xe2\xfb \xe4\xee\xe1\xf0\xe0\xeb\xe8\xf1\xfc \xe4\xee "
-                                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0, \xea\xe0\xea \xef\xf0\xe5\xe4\xec\xe5\xf2 "
-                                    "\xec\xe8\xf1\xf2\xe8\xf7\xe5\xf1\xea\xe8\xec \xee\xe1\xf0\xe0\xe7\xee\xec \xe8\xf1\xf7\xe5\xe7."
-                                    /* "Р­С‚Рѕ %s! Р•РґРІР° РІС‹ РґРѕР±СЂР°Р»РёСЃСЊ РґРѕ Р°СЂС‚РµС„Р°РєС‚Р°, РєР°Рє РїСЂРµРґРјРµС‚ РјРёСЃС‚РёС‡РµСЃРєРёРј РѕР±СЂР°Р·РѕРј РёСЃС‡РµР·." */,
-                                gArtifactNames[IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
+                                "Это %s! Едва вы добрались до "
+                                    "артефакта, как предмет "
+                                    "мистическим образом исчез."
+                                     ,
+                                gArtifactNames[(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
                             NormalDialog(
                                 gText,
@@ -6375,7 +6347,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                                 -1,
                                 -1,
                                 NORMAL_DIALOG_ARTIFACT,
-                                IDX(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                (sourceHero->m_artifacts[sourceArtifactSlot]),
                                 -1,
                                 0,
                                 -1,
@@ -6399,7 +6371,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                         true
                     );
                     sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
-                    sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
+                    sourceHero->m_artifactExtra[sourceArtifactSlot] = (ARTIFACT_NONE);
                     break;
                 }
             }
@@ -6408,7 +6380,6 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     destinationHero->CheckAnduranPieces(0);
 }
 
-VA(0x00444afb, 0x6d)
 void advManager::HeroLoses(hero* lostHero) {
     if (lostHero == NULL)
         return;
@@ -6422,7 +6393,6 @@ void advManager::HeroLoses(hero* lostHero) {
     }
 }
 
-VA(0x00444b68, 0x118)
 void advManager::DoWhirlpool(hero* eventHero) {
     i32 selectedSlot;
     i32 slotNo;
@@ -6441,7 +6411,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
         for (slotNo = 0; slotNo < MONSTER_ARMY_SLOTS; slotNo++) {
             if (eventHero->m_army.m_creatureCounts[slotNo] > 0) {
                 creatureValue = eventHero->m_army.m_creatureCounts[slotNo]
-                    * gMonsterDatabase[IDX(eventHero->m_army.m_creatureTypes[slotNo])].fightValue;
+                    * gMonsterDatabase[(eventHero->m_army.m_creatureTypes[slotNo])].fightValue;
                 if (creatureValue < lowestValue) {
                     lowestValue = creatureValue;
                     selectedSlot = slotNo;
@@ -6458,7 +6428,6 @@ void advManager::DoWhirlpool(hero* eventHero) {
     }
 }
 
-VA(0x00444c80, 0xf3)
 void advManager::FizzleCenter(i32 fizzleType) {
     SAMPLE2 fizzleSample;
     i32 fizzleStepCount;
@@ -6507,7 +6476,6 @@ void advManager::FizzleCenter(i32 fizzleType) {
     }
 }
 
-VA(0x00444d73, 0x2b6c)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 secondaryAmount_j;
     i32 secondaryReward_k;
@@ -6519,7 +6487,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     float attackerLoss_c;
     i32 heroLevel_e;
     i32 levelExperience_g;
-    i32 creatureCosts_a[IDX(RES_COUNT)];
+    i32 creatureCosts_a[(RES_COUNT)];
     i32 spellPower_j;
     i32 adjacentMonster_j;
     i32 savedShowIt_e;
@@ -6538,7 +6506,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 survivingCount_a;
     mapEventExtra* eventExtra_o;
     MapObjectType eventType_g;
-    i32 eventWork_o[IDX(RES_COUNT)];
+    i32 eventWork_o[(RES_COUNT)];
     i32 eraseObject_l;
     i32 battleResult_l;
     i32 creatureFlag_l;
@@ -6570,9 +6538,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
+                    static_cast<i32>(eventHero->m_eventFlags) & ~(HERO_EVENT_EMBARKED)
                 );
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = m_cursorDirection;
@@ -6594,7 +6562,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 EVENT_BOAT_RESTORE_MODE
             );
             eventHero->m_eventFlags = HeroEventFlag(
-                static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+                static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_EMBARKED)
             );
             eventHero->m_remainingMobility = 0;
             boat_k->heroId = eventHero->m_id;
@@ -6626,8 +6594,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             if (eventType_g == MAP_OBJECT_MINE) {
-                for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN);
-                     index_h < IDX(SPELL_SET_WATER_GUARDIAN);
+                for (index_h = (SPELL_SET_EARTH_GUARDIAN);
+                     index_h < (SPELL_SET_WATER_GUARDIAN);
                      ++index_h) {
                     if (eventHero->HasSpell(SpellType(index_h))
                         && eventHero->m_spellPoints > GetManaCost(SpellType(index_h), eventHero)) {
@@ -6689,56 +6657,56 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WATERING_HOLE:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_WATERING_HOLE) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_WATERING_HOLE))) == 0) {
                 eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
                 eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_WATERING_HOLE)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_WATERING_HOLE)
                 );
                 ++eventHero->m_morale;
             }
             break;
 
         case MAP_OBJECT_BUOY:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_BUOY) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_BUOY))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_BUOY)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_BUOY)
                 );
                 ++eventHero->m_morale;
             }
             break;
 
         case MAP_OBJECT_FAERIE_RING:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_FAERIE_RING) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_FAERIE_RING))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_FAERIE_RING)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_FAERIE_RING)
                 );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_IDOL:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_IDOL) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_IDOL))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_IDOL)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_IDOL)
                 );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_FOUNTAIN:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_FOUNTAIN) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_FOUNTAIN))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_FOUNTAIN)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_FOUNTAIN)
                 );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_OASIS:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_OASIS) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_OASIS))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_OASIS)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_OASIS)
                 );
                 ++eventHero->m_morale;
                 eventHero->m_mobility += OASIS_MOBILITY_BONUS;
@@ -6747,9 +6715,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_TEMPLE:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_TEMPLE) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_TEMPLE))) == 0) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_TEMPLE)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_TEMPLE)
                 );
                 eventHero->m_morale += TEMPLE_MORALE_BONUS;
             }
@@ -6792,7 +6760,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    ResourceType((cell->m_objectMetadata & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1),
+                    ResourceType((cell->m_objectMetadata & (ARTIFACT_EVENT_MODE_MASK)) - 1),
                     (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                         >> ARTIFACT_EVENT_RESOURCE_SHIFT
                 );
@@ -6813,7 +6781,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 } else {
                     GiveResource(
                         eventHero,
-                        ResourceType((cell->m_objectMetadata & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1),
+                        ResourceType((cell->m_objectMetadata & (ARTIFACT_EVENT_MODE_MASK)) - 1),
                         (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                             >> ARTIFACT_EVENT_RESOURCE_SHIFT
                     );
@@ -6865,7 +6833,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero,
-                ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
+                ResourceType(cell->m_objectMetadata & (CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject_l = 1;
@@ -6873,7 +6841,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_FORT:
             if ((eventHero->m_fortVisits & (1U << cell->m_objectMetadata)) == 0) {
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_DEFENSE)];
                 eventHero->m_fortVisits |= 1U << cell->m_objectMetadata;
             }
             break;
@@ -6881,34 +6849,34 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if ((eventHero->m_xanaduVisits & (1U << cell->m_objectMetadata)) == 0
                 && eventHero->m_level
-                           + IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
+                           + (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)])
                                  * XANADU_DIPLOMACY_MULTIPLIER
                        >= XANADU_ADMISSION_LEVEL) {
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)];
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)];
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)];
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_ATTACK)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_DEFENSE)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_KNOWLEDGE)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_SPELL_POWER)];
                 eventHero->m_xanaduVisits |= 1U << cell->m_objectMetadata;
             }
             break;
 
         case MAP_OBJECT_STANDING_STONES:
             if ((eventHero->m_standingStoneVisits & (1U << cell->m_objectMetadata)) == 0) {
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_SPELL_POWER)];
                 eventHero->m_standingStoneVisits |= 1U << cell->m_objectMetadata;
             }
             break;
 
         case MAP_OBJECT_WITCH_DOCTOR_HUT:
             if ((eventHero->m_witchDoctorVisits & (1U << cell->m_objectMetadata)) == 0) {
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_KNOWLEDGE)];
                 eventHero->m_witchDoctorVisits |= 1U << cell->m_objectMetadata;
             }
             break;
 
         case MAP_OBJECT_MERCENARY_CAMP:
             if ((eventHero->m_mercenaryCampVisits & (1U << cell->m_objectMetadata)) == 0) {
-                ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)];
+                ++eventHero->m_primaryStats[(HERO_PRIMARY_ATTACK)];
                 eventHero->m_mercenaryCampVisits |= 1U << cell->m_objectMetadata;
             }
             break;
@@ -7058,7 +7026,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     cell->m_objectMetadata -= purchaseCount_o;
                     if (creatureFlag_l == 0) {
                         GetMonsterCost(creatureType_i, creatureCosts_a);
-                        for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h)
+                        for (index_h = 0; index_h < (RES_COUNT); ++index_h)
                             gpCurPlayer->m_resources[index_h] -=
                                 purchaseCount_o
                                 * creatureCosts_a[index_h];
@@ -7088,8 +7056,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         eventHero->CheckLevel();
                         break;
                     case TREE_KNOWLEDGE_GOLD:
-                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] > EVENT_TREE_GOLD) {
-                            gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_TREE_GOLD;
+                        if (gpCurPlayer->m_resources[(RES_GOLD)] > EVENT_TREE_GOLD) {
+                            gpCurPlayer->m_resources[(RES_GOLD)] -= EVENT_TREE_GOLD;
                             GiveExperience(eventHero, levelExperience_g, 1);
                             eventHero->m_treeKnowledgeVisits |=
                                 1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
@@ -7097,8 +7065,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         }
                         break;
                     case TREE_KNOWLEDGE_GEMS:
-                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] > EVENT_TREE_GEMS) {
-                            gpCurPlayer->m_resources[IDX(RES_GEMS)] -= EVENT_TREE_GEMS;
+                        if (gpCurPlayer->m_resources[(RES_GEMS)] > EVENT_TREE_GEMS) {
+                            gpCurPlayer->m_resources[(RES_GEMS)] -= EVENT_TREE_GEMS;
                             GiveExperience(eventHero, levelExperience_g, 1);
                             eventHero->m_treeKnowledgeVisits |=
                                 1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
@@ -7123,8 +7091,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
-                && IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
-                       <= IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+                && (gsSpellInfo[cell->m_objectMetadata - 1].level)
+                       <= (eventHero->m_secondarySkills[(HERO_SKILL_WISDOM)])
                               + WISDOM_SPELL_LEVEL_BONUS) {
                 eventHero->AddSpell(
                     static_cast<SpellType>(cell->m_objectMetadata - 1),
@@ -7144,7 +7112,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
                 for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
                     if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                            == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
                         && abs(exitX - x) + abs(exitY_d - y)
@@ -7161,7 +7129,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
                     for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
                         if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
-                                == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                                == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
                             && abs(exitX - x) + abs(exitY_d - y)
@@ -7213,18 +7181,18 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
                 case ARTIFACT_EVENT_MODE_WISDOM:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                    if (eventHero->m_secondarySkills[(HERO_SKILL_WISDOM)]
                         != HERO_SKILL_LEVEL_NONE)
                         goto artifactPickup;
                     break;
                 case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                    if (eventHero->m_secondarySkills[(HERO_SKILL_LEADERSHIP)]
                         != HERO_SKILL_LEVEL_NONE)
                         goto artifactPickup;
                     break;
                 case ARTIFACT_EVENT_MODE_PICKUP:
                 artifactPickup:
-                    for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h) {
+                    for (index_h = 0; index_h < (RES_COUNT); ++index_h) {
                         if (gpCurPlayer->m_resources[index_h] < 0)
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
@@ -7232,20 +7200,20 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
-                    if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), EVENT_ARTIFACT_GOLD, 0, 0)) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                    if (gpPhilAI->NetValueOfArtifact((artifact_g), EVENT_ARTIFACT_GOLD, 0, 0)) {
+                        gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -=
                             EVENT_ARTIFACT_GOLD;
                         goto artifactPickup;
                     }
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_3:
                     if (gpPhilAI->NetValueOfArtifact(
-                            IDX(artifact_g),
+                            (artifact_g),
                             EVENT_ARTIFACT_RESOURCE_3_GOLD,
                             artifactResource_p,
                             EVENT_ARTIFACT_RESOURCE_3
                         )) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                        gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -=
                             EVENT_ARTIFACT_RESOURCE_3_GOLD;
                         gpGame->m_players[eventHero->m_owner].m_resources[artifactResource_p] -=
                             EVENT_ARTIFACT_RESOURCE_3;
@@ -7254,12 +7222,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_5:
                     if (gpPhilAI->NetValueOfArtifact(
-                            IDX(artifact_g),
+                            (artifact_g),
                             EVENT_ARTIFACT_RESOURCE_5_GOLD,
                             artifactResource_p,
                             EVENT_ARTIFACT_RESOURCE_5
                         )) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                        gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -=
                             EVENT_ARTIFACT_RESOURCE_5_GOLD;
                         gpGame->m_players[eventHero->m_owner].m_resources[artifactResource_p] -=
                             EVENT_ARTIFACT_RESOURCE_5;
@@ -7348,10 +7316,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveResource(eventHero, RES_GOLD, EVENT_DAEMON_GOLD);
                     break;
                 case DAEMON_REWARD_RANSOM:
-                    if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
+                    if (gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)]
                         >= EVENT_DAEMON_GOLD) {
                         if (gpPhilAI->ChooseToPayRansomOnHero(EVENT_DAEMON_GOLD)) {
-                            gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                            gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -=
                                 EVENT_DAEMON_GOLD;
                         } else {
                             HeroLoses(eventHero);
@@ -7376,7 +7344,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             index_h = cell->m_objectMetadata - 1;
             pyramidBattleValue_l = static_cast<i32>(
                 gsSpellInfo[index_h].aiValue
-                * (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)
+                * ((((gsSpellInfo[index_h].attributes) & (SPELL_INFO_ATTRIBUTE_POWER)))
                        ? (eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= AI_BATTLE_STAT_MAX
                               ? gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)]
                               : gfBattleStat[AI_BATTLE_STAT_MAX])
@@ -7428,7 +7396,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 );
             }
             abandonedMineValue_f = static_cast<i32>(
-                gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]
+                gMineCharacteristics[(RES_GOLD)] * gafAITurnCostResource[(RES_GOLD)]
                 * *(gaiTurnValueOfMine + x + y * MAP_WIDTH)
             );
             gpPhilAI->ChooseEvaluateBattle(
@@ -7554,13 +7522,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_MAGIC_WELL:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_MAGIC_WELL) == 0) {
+            if ((((eventHero->m_eventFlags) & (HERO_EVENT_MAGIC_WELL))) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 wellSpellPoints_o =
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
                 if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
-                        static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
+                        static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_MAGIC_WELL)
                     );
                     eventHero->m_spellPoints = static_cast<i16>(wellSpellPoints_o);
                 }
@@ -7587,7 +7555,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 primaryAmount_j = 0;
                 secondaryReward_k = MAP_EVENT_REWARD_NONE;
                 secondaryAmount_j = 0;
-                for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h) {
+                for (index_h = 0; index_h < (RES_COUNT); ++index_h) {
                     gpGame->m_players[giCurPlayer].m_resources[index_h] +=
                         eventExtra_o->resources[index_h];
                     if (gpGame->m_players[giCurPlayer].m_resources[index_h] < 0)
@@ -7635,7 +7603,6 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
-VA(0x004478df, 0x56)
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
@@ -7646,7 +7613,6 @@ i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     return 0;
 }
 
-VA(0x00447935, 0x54)
 void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     i32 unusedPassword6[1];
     i32 color = cell->m_objectMetadata;
@@ -7654,7 +7620,6 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
-VA(0x00447989, 0x351)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 siteLevel6;
     HeroPrimaryStat primaryStat16;
@@ -7669,7 +7634,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
 
     cursedArtifactCount3 = 0;
     siteType3 = static_cast<GenericSiteType>(cell->m_objectMetadata);
-    siteType3 = static_cast<GenericSiteType>(IDX(siteType3) & GENERIC_SITE_TYPE_MASK);
+    siteType3 = static_cast<GenericSiteType>((siteType3) & GENERIC_SITE_TYPE_MASK);
     siteLevel6 = cell->m_objectMetadata;
     siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
 
@@ -7680,20 +7645,20 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                     cursedArtifactCount3++;
             }
             if (cursedArtifactCount3 != 0
-                && gpCurPlayer->m_resources[IDX(RES_GOLD)]
+                && gpCurPlayer->m_resources[(RES_GOLD)]
                        >= EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
                 for (artifactIndex14 = 0; artifactIndex14 < HERO_ARTIFACT_SLOT_COUNT;
                      artifactIndex14++) {
                     if (IsCursedItem(eventHero->m_artifacts[artifactIndex14]))
                         eventHero->m_artifacts[artifactIndex14] = ARTIFACT_NONE;
                 }
-                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
+                gpCurPlayer->m_resources[(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
             }
             break;
         case GENERIC_SITE_ARENA:
             if (!(eventHero->m_eventFlags & HERO_EVENT_ARENA)) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_ARENA)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_ARENA)
                 );
                 switch (eventHero->m_cursorType) {
                     case FACTION_SORCERESS:
@@ -7711,13 +7676,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                     default:
                         primaryStat16 = HERO_PRIMARY_ATTACK;
                 }
-                eventHero->m_primaryStats[IDX(primaryStat16)]++;
+                eventHero->m_primaryStats[(primaryStat16)]++;
             }
             break;
         case GENERIC_SITE_MERMAID:
             if (!(eventHero->m_eventFlags & HERO_EVENT_MERMAID)) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MERMAID)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_MERMAID)
                 );
                 eventHero->m_luck++;
             }
@@ -7736,7 +7701,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                             eventHero->m_army.m_quantities[artifactIndex14] =
                                 static_cast<i16>(quantity1 * AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER);
                             armyValue7 +=
-                                gMonsterDatabase[IDX(creatureType3)].hitPoints
+                                gMonsterDatabase[(creatureType3)].hitPoints
                                 * (quantity1 - eventHero->m_army.m_quantities[artifactIndex14]);
                         }
                     }
@@ -7744,14 +7709,14 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 if (armyValue7 != 0)
                     GiveExperience(eventHero, armyValue7, 1);
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_SIRENS)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_SIRENS)
                 );
             }
             break;
         case GENERIC_SITE_STABLES:
             if (!(eventHero->m_eventFlags & HERO_EVENT_STABLES)) {
                 eventHero->m_eventFlags = HeroEventFlag(
-                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_STABLES)
+                    static_cast<i32>(eventHero->m_eventFlags) | (HERO_EVENT_STABLES)
                 );
                 eventHero->m_mobility += EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += EVENT_CREATURE_UPGRADE_MOBILITY;
@@ -7762,15 +7727,14 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-VA(0x00447cda, 0x189)
 void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 replacementSlot;
     CreatureType monsterType;
     i32 buyCount;
     u32 packedSite;
-    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource;
-    H2_ENUM_STORAGE(RecruitSiteType, u32) recruitType;
-    i32 cost[IDX(RES_COUNT)];
+    i32 resource;
+    u32 recruitType;
+    i32 cost[(RES_COUNT)];
     i32 totalValue;
     i16 quantity;
 
@@ -7814,18 +7778,17 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
                 replacementSlot
             );
             quantity -= buyCount;
-            packedSite = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | IDX(recruitType);
+            packedSite = (quantity << EVENT_RECRUIT_COUNT_SHIFT) | (recruitType);
             cell->m_objectMetadata = packedSite;
             GetMonsterCost(monsterType, cost);
             for (resource = 0; resource < RES_COUNT; resource++) {
-                gpCurPlayer->m_resources[IDX(resource)] -=
-                    buyCount * cost[IDX(resource)];
+                gpCurPlayer->m_resources[(resource)] -=
+                    buyCount * cost[(resource)];
             }
         }
     }
 }
 
-VA(0x00447e63, 0x19c)
 void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 heroId9;
     hero* releasedHero13;
@@ -7864,7 +7827,6 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     );
 }
 
-VA(0x00447fff, 0x731)
 void advManager::PlayerMonsterInteract(
     mapCell* cell,
     mapCell* combatCell,
@@ -7894,24 +7856,24 @@ void advManager::PlayerMonsterInteract(
                     gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
                 )
                 / static_cast<double>(
-                    creatureCount * gMonsterDatabase[IDX(monsterType)].fightValue
+                    creatureCount * gMonsterDatabase[(monsterType)].fightValue
                 );
 
     if (gbInCampaign
-        && ((gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
+        && ((gpGame->m_campaignAwards[(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
              && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF))
-            || (gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_OGRE_ALLIANCE)]
+            || (gpGame->m_campaignAwards[(CAMPAIGN_AWARD_OGRE_ALLIANCE)]
                 && (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD))
-            || (gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DRAGON_ALLIANCE)]
+            || (gpGame->m_campaignAwards[(CAMPAIGN_AWARD_DRAGON_ALLIANCE)]
                 && (monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON
                     || monsterType == CREATURE_BLACK_DRAGON)))) {
         if (!eventHero->m_army.CanJoin(monsterType)) {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xf3\xfe "
-                        "\xe2\xe0\xf1: \"\xc4\xf0\xf3\xe3 \xd0\xee\xeb\xe0\xed\xe4\xe0 "
-                        "- \xed\xe0\xf8 \xe4\xf0\xf3\xe3. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
-                        "\xef\xf0\xee\xe9\xf2\xe8.\"",
+                    "Гномы приветствую "
+                        "вас: \"Друг Роланда "
+                        "- наш друг. Вы можете "
+                        "пройти.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7924,9 +7886,9 @@ void advManager::PlayerMonsterInteract(
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xe2\xe0\xf1: "
-                        "\"\xd1\xee\xfe\xe7\xed\xe8\xea\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
-                        "\xec\xee\xe3\xf3\xf2 \xef\xf0\xee\xe9\xf2\xe8.\"",
+                    "Огры признали вас: "
+                        "\"Союзники Арчибальда "
+                        "могут пройти.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7939,14 +7901,14 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "\xc4\xf0\xe0\xea\xee\xed\xfb, \xef\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 "
-                        "\xed\xe0 \xe2\xe0\xf1, \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb\xe8: "
-                        "\"\xcd\xe0\xf8 \xe0\xeb\xfc\xff\xed\xf1 \xf1 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xee\xec "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe0\xe5\xf2 \xed\xe0\xf1 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.  \xca \xed\xe5\xf1\xf7\xe0\xf1\xf2\xfc\xfe, "
-                        "\xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe4\xeb\xff \xed\xe0\xf1 \xec\xe5\xf1\xf2\xe0. "
-                        "\xca\xe0\xea\xe0\xff \xe6\xe0\xeb\xee\xf1\xf2\xfc!\"  \xc8 "
-                        "\xe1\xfb\xf1\xf2\xf0\xee \xf3\xeb\xe5\xf2\xe5\xeb\xe8.",
+                    "Драконы, посмотрев "
+                        "на вас, промолвили: "
+                        "\"Наш альянс с Арчибальдом "
+                        "вынуждает нас присоединиться "
+                        "к вам.  К несчастью, "
+                        "у вас нет для нас места. "
+                        "Какая жалость!\"  И "
+                        "быстро улетели.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7961,10 +7923,10 @@ void advManager::PlayerMonsterInteract(
         } else {
             if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xf1\xe2\xee\xe8\xf5 "
-                        "\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2 \xe8 \xf0\xe0\xe4\xfb "
-                        "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea "
-                        "\xed\xe8\xec.",
+                    "Гномы признали своих "
+                        "союзников и рады "
+                        "присоединиться к "
+                        "ним.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7977,10 +7939,10 @@ void advManager::PlayerMonsterInteract(
                 );
             else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xed\xe0\xf1, "
-                        "\xea\xe0\xea \xe2\xf0\xe0\xe3\xee\xe2 \xe3\xed\xee\xec\xee\xe2 "
-                        "\xe8 \xf0\xe0\xe4\xfb \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec. ",
+                    "Огры признали нас, "
+                        "как врагов гномов "
+                        "и рады присоединиться "
+                        "к вам. ",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7993,11 +7955,11 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "\xc3\xee\xf0\xe4\xe5\xeb\xe8\xe2\xfb\xe5 \xe4\xf0\xe0\xea\xee\xed\xfb "
-                        "\xe2\xfb\xed\xf3\xe6\xe4\xe5\xed\xfb \xe1\xfb\xeb\xe8 \xef\xf0\xe8\xe7\xed\xe0\xf2\xfc "
-                        "\xe2 \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xf5 '\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2' "
-                        "\xe8 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
-                        "\xea \xe2\xe0\xec.",
+                    "Горделивые драконы "
+                        "вынуждены были признать "
+                        "в вас своих 'союзников' "
+                        "и присоединиться "
+                        "к вам.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -8014,11 +7976,11 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (gbInCampaign && gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)]
+    if (gbInCampaign && gpGame->m_campaignAwards[(CAMPAIGN_AWARD_DWARFBANE)]
         && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
-            "\"\xc2\xf0\xe0\xe3\xe8 \xe3\xed\xee\xec\xee\xe2! \xc1\xe5\xe3\xe8\xf2\xe5, "
-                "\xe5\xf1\xeb\xe8 \xe6\xe8\xe7\xed\xfc \xe4\xee\xf0\xee\xe3\xe0.\"",
+            "\"Враги гномов! Бегите, "
+                "если жизнь дорога.\"",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -8038,17 +8000,17 @@ void advManager::PlayerMonsterInteract(
         *handled = 1;
         if (eventHero->m_army.CanJoin(monsterType)) {
             NormalDialog(
-                "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea "
-                    "\xee\xf2\xf0\xff\xe4\xf3 \xfd\xeb\xfc\xf4\xee\xe2, \xea\xe0\xea "
-                    "\xe8\xf5 \xe2\xee\xe6\xe0\xea \xef\xf0\xe8\xe7\xe2\xe0\xeb "
-                    "\xf1\xe2\xee\xe9 \xee\xf2\xf0\xff\xe4 \xea \xee\xf0\xf3\xe6\xe8\xfe. "
-                    "\xce\xed \xf1\xea\xe0\xe7\xe0\xeb \xe8\xec: \"\xca\xf2\xee "
-                    "\xe8\xe7 \xe2\xe0\xf1 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
-                    "\xf1\xec\xe5\xeb, \xf7\xf2\xee\xe1\xfb \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
-                    "\xe2 \xe0\xf0\xec\xe8\xfe \xed\xe0\xf8\xe5\xe3\xee \xec\xf3\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea\xe0?\" \xc2\xe5\xf1\xfc \xee\xf2\xf0\xff\xe4 "
-                    "\xe5\xe4\xe8\xed\xee\xe4\xf3\xf8\xed\xee \xe2\xf1\xf2\xf3\xef\xe8\xeb "
-                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe.",
+                "Едва вы подошли к "
+                    "отряду эльфов, как "
+                    "их вожак призвал "
+                    "свой отряд к оружию. "
+                    "Он сказал им: \"Кто "
+                    "из вас достаточно "
+                    "смел, чтобы вступить "
+                    "в армию нашего мужественного "
+                    "союзника?\" Весь отряд "
+                    "единодушно вступил "
+                    "в вашу армию.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -8062,15 +8024,15 @@ void advManager::PlayerMonsterInteract(
             eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
             NormalDialog(
-                "\xdd\xeb\xfc\xf4\xfb \xed\xe0\xf1\xf2\xee\xf0\xee\xe6\xe8\xeb\xe8\xf1\xfc "
-                    "\xef\xf0\xe8 \xe2\xe0\xf8\xe5\xec \xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8. "
-                    "\xc8\xf5 \xe2\xee\xe6\xe0\xea \xee\xe1\xf0\xe0\xf2\xe8\xeb\xf1\xff "
-                    "\xea \xe2\xe0\xec \xf1\xee \xf1\xeb\xee\xe2\xe0\xec\xe8: \"\xcc\xfb "
-                    "\xed\xe5 \xec\xee\xe6\xe5\xec \xef\xf0\xe8\xed\xff\xf2\xfc "
-                    "\xf3\xf7\xe0\xf1\xf2\xe8\xe5 \xe2 \xe2\xe0\xf8\xe8\xf5 \xe4\xe5\xeb\xe0\xf5, "
-                    "\xf1\xee\xfe\xe7\xed\xe8\xea! \xcf\xf0\xee\xf5\xee\xe4\xe8, "
-                    "\xed\xe0\xf8\xe0 \xef\xee\xe1\xe5\xe4\xe0 \xe1\xf3\xe4\xe5\xf2 "
-                    "\xe2\xe0\xf8\xe5\xe9.\"",
+                "Эльфы насторожились "
+                    "при вашем приближении. "
+                    "Их вожак обратился "
+                    "к вам со словами: \"Мы "
+                    "не можем принять "
+                    "участие в ваших делах, "
+                    "союзник! Проходи, "
+                    "наша победа будет "
+                    "вашей.\"",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -8087,12 +8049,12 @@ void advManager::PlayerMonsterInteract(
 
     if (eventHero->m_army.CanJoin(monsterType)
         && armyRatio
-            > 2.0 /* MONSTER_STRENGTH_JOIN */
+            > 2.0
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forceJoin) {
-            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
+            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, creatureCount, -1);
@@ -8111,12 +8073,12 @@ void advManager::PlayerMonsterInteract(
                 );
                 goto fightMonsters;
             }
-        } else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+        } else if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
-            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                 == HERO_SKILL_LEVEL_EXPERT)
                 numJoining = creatureCount;
-            else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            else if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                      == HERO_SKILL_LEVEL_ADVANCED)
                 numJoining = creatureCount / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             else
@@ -8124,10 +8086,10 @@ void advManager::PlayerMonsterInteract(
             if (!numJoining)
                 numJoining = 1;
 
-            joiningCost = gMonsterDatabase[IDX(monsterType)].cost * creatureCount;
-            if (joiningCost > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+            joiningCost = gMonsterDatabase[(monsterType)].cost * creatureCount;
+            if (joiningCost > gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)]) {
                 if (armyRatio
-                    > 5.0 /* MONSTER_STRENGTH_FLEE */)
+                    > 5.0  )
                     goto monstersFlee;
                 else
                     goto fightMonsters;
@@ -8136,42 +8098,42 @@ void advManager::PlayerMonsterInteract(
             if (creatureCount == 1) {
                 sprintf(
                     gText,
-                    "%s \xed\xe0\xf5\xee\xe4\xe8\xf2\xf1\xff \xef\xee\xe4 \xe2\xef\xe5\xf7\xe0\xf2\xeb\xe5\xed\xe8\xe5\xec "
-                        "\xe2\xe0\xf8\xe5\xe9 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2\xe8\xf7\xed\xee\xf1\xf2\xe8, "
-                        "\xe8 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 \xf1\xe2\xee\xe8 "
-                        "\xf3\xf1\xeb\xf3\xe3\xe8 \xe2\xe0\xf8\xe5\xec\xf3 \xe2\xee\xe9\xf1\xea\xf3 "
-                        "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
-                    gArmyNames[IDX(monsterType)],
+                    "%s находится под впечатлением "
+                        "вашей дипломатичности, "
+                        "и предлагает свои "
+                        "услуги вашему войску "
+                        "за %d золотых. Вы согласны?",
+                    gArmyNames[(monsterType)],
                     joiningCost
                 );
             } else {
                 sprintf(
                     gText,
-                    "\xc2\xee\xe8\xed\xfb \xef\xee\xea\xee\xf0\xe5\xed\xfb \xe2\xe0\xf8\xe8\xec "
-                        "\xf8\xe0\xf0\xec\xee\xec \xe8 \xe2\xfb\xe4\xe2\xe8\xed\xf3\xeb\xe8 "
-                        "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xe5:\n\n"
+                    "Воины покорены вашим "
+                        "шармом и выдвинули "
+                        "предложение:\n\n"
                 );
                 if (numJoining == creatureCount)
                     sprintf(
                         monsterText,
-                        "\xce\xf2\xf0\xff\xe4 \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 "
-                            "\xe2 \xf0\xff\xe4\xfb \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
-                            "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
-                            "\xef\xf0\xe8\xed\xff\xf2\xfc \xe8\xf5?",
+                        "Отряд из %d %s вступят "
+                            "в ряды вашей армии "
+                            "за %d золотых. Вы согласны "
+                            "принять их?",
                         creatureCount,
-                        gArmyNamesPlural[IDX(monsterType)],
+                        gArmyNamesPlural[(monsterType)],
                         joiningCost
                     );
                 else
                     sprintf(
                         monsterText,
-                        "%d \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xf0\xff\xe4\xfb "
-                            "\xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe0 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff "
-                            "\xee\xf1\xf2\xe0\xe2\xff\xf2 \xe2\xe0\xf1 \xe2 \xef\xee\xea\xee\xe5 "
-                            "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
+                        "%d из %d %s вступят в ряды "
+                            "вашей армии, а оставшиеся "
+                            "оставят вас в покое "
+                            "за %d золотых. Вы согласны?",
                         numJoining,
                         creatureCount,
-                        gArmyNamesPlural[IDX(monsterType)],
+                        gArmyNamesPlural[(monsterType)],
                         joiningCost
                     );
                 strcat(gText, monsterText);
@@ -8182,7 +8144,7 @@ void advManager::PlayerMonsterInteract(
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
-                IDX(RES_GOLD),
+                (RES_GOLD),
                 joiningCost,
                 -1,
                 0,
@@ -8192,7 +8154,7 @@ void advManager::PlayerMonsterInteract(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
-                gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
+                gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -= joiningCost;
                 return;
             } else {
                 EventWindow(
@@ -8214,12 +8176,12 @@ void advManager::PlayerMonsterInteract(
     monstersFlee:
         sprintf(
             gText,
-            "\xc3\xf0\xf3\xef\xef\xe0 %s, \xf1\xf2\xf0\xe0\xf8\xe0\xf1\xfc "
-                "\xec\xee\xf9\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe8\xed\xf1\xf2\xe2\xe0, "
-                "\xe1\xf0\xee\xf1\xe8\xeb\xe0\xf1\xfc \xe2\xf0\xe0\xf1\xf1\xfb\xef\xed\xf3\xfe. "
-                "\xd1\xee\xe8\xe7\xe2\xee\xeb\xe8\xf2\xe5 \xe8\xe7\xeb\xee\xe2\xe8\xf2\xfc "
-                "\xe8\xf5 \xe8 \xe7\xe0\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe4\xf0\xe0\xf2\xfc\xf1\xff?",
-            gArmyNamesPlural[IDX(monsterType)]
+            "Группа %s, страшась "
+                "мощи вашего воинства, "
+                "бросилась врассыпную. "
+                "Соизволите изловить "
+                "их и заставить драться?",
+            gArmyNamesPlural[(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
@@ -8250,7 +8212,6 @@ fightMonsters:
         *handled = 1;
 }
 
-VA(0x00448730, 0x3d4)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
     CreatureType monsterType;
     i32 replacementSlot;
@@ -8270,7 +8231,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 )
                 / static_cast<double>(
                     creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                    * gMonsterDatabase[IDX(monsterType)].fightValue
+                    * gMonsterDatabase[(monsterType)].fightValue
                 );
 
     if (eventHero->m_army.CanJoin(monsterType)
@@ -8299,12 +8260,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 *handled = 1;
             }
         } else {
-            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                 != HERO_SKILL_LEVEL_NONE) {
-                if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                     == HERO_SKILL_LEVEL_EXPERT)
                     joiningCount = creatureCount[MONSTER_COMBAT_REMAINING_COUNT];
-                else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                else if (eventHero->m_secondarySkills[(HERO_SKILL_DIPLOMACY)]
                          == HERO_SKILL_LEVEL_ADVANCED)
                     joiningCount = creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                                    / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
@@ -8315,12 +8276,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     joiningCount = 1;
 
                 joiningCost = static_cast<i32>(
-                    gMonsterDatabase[IDX(monsterType)].cost
+                    gMonsterDatabase[(monsterType)].cost
                     * creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                    * 0.75 /* MONSTER_AI_JOIN_COST_FRACTION */
+                    * 0.75
                 );
                 if (joiningCost
-                    > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                    > gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)]) {
                     if (armyRatio > MONSTER_STRENGTH_FLEE)
                         goto computerMonstersFlee;
                     else
@@ -8335,7 +8296,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     replacementSlot
                 );
                 if (bought > 0) {
-                    gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
+                    gpGame->m_players[eventHero->m_owner].m_resources[(RES_GOLD)] -= joiningCost;
                     gpGame->GiveArmy(
                         &eventHero->m_army,
                         monsterType,
@@ -8354,7 +8315,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         gpAdvManager->GiveExperience(
             eventHero,
             creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
-                * gMonsterDatabase[IDX(monsterType)].hitPoints,
+                * gMonsterDatabase[(monsterType)].hitPoints,
             1
         );
         eventHero->CheckLevel();
@@ -8365,7 +8326,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 CREATURE_SKELETON,
                 static_cast<i32>(
                     static_cast<double>(creatureCount[MONSTER_COMBAT_REMAINING_COUNT])
-                    * 0.1 /* MONSTER_NECROMANCY_FRACTION */
+                    * 0.1
                     * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
                 ),
                 -1
@@ -8387,13 +8348,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     }
 }
 
-VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
     hero* secondHro;
     i32 randSeed;
     i32 firstSide;
     town* battleTown;
-    H2_ENUM_STORAGE(CombatResult, i8) combatRes;
+    i8 combatRes;
     i32 initCombatX;
     i32 netUnused7;
     armyGroup* secondArmy;
@@ -8473,7 +8433,6 @@ i32 advManager::DoNetCombat(char* packet) {
     return 1;
 }
 
-VA(0x00448c95, 0x5e7)
 CombatResult advManager::DoCombat(
     i32 x,
     i32 y,
@@ -8495,7 +8454,7 @@ CombatResult advManager::DoCombat(
     char* packet_j;
     i32 remotePlayer;
     tag_message message9;
-    H2_ENUM_STORAGE(CombatResult, i8) combatResult3;
+    i8 combatResult3;
     i32 savedShowIt_f;
     i32 secondPlayer8;
     i32 savedPlayer1;
@@ -8532,8 +8491,8 @@ CombatResult advManager::DoCombat(
 
     if (firstPlayer4 >= 0 && secondPlayer8 >= 0 && gbHumanPlayer[secondPlayer8]) {
         if (!gbThisNetHumanPlayer[secondPlayer8]) {
-            iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = giThisNetPos;
-            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = gbGamePosToNetPos[secondPlayer8];
+            iCombatControlNetPos[(COMBAT_ATTACKER_SIDE)] = giThisNetPos;
+            iCombatControlNetPos[(COMBAT_DEFENDER_SIDE)] = gbGamePosToNetPos[secondPlayer8];
             SendHeroTownData(
                 x,
                 y,
@@ -8616,12 +8575,12 @@ CombatResult advManager::DoCombat(
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
-                "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
-                    /* "%s, РІР°С€ %s Р°С‚Р°РєРѕРІР°РЅ!" */,
+                "%s, ваш %s атакован!"
+                     ,
                 cPlayerNames[secondPlayer8],
                 combatTown
-                    ? "\xe3\xee\xf0\xee\xe4" /* "РіРѕСЂРѕРґ" */
-                    : "\xe3\xe5\xf0\xee\xe9" /* "РіРµСЂРѕР№" */
+                    ? "город"
+                    : "герой"
             );
             gpGame->WaitForPlayer(gText, secondPlayer8);
         }
@@ -8695,7 +8654,6 @@ combatFinished:
     return gpCombatManager->m_combatResult;
 }
 
-VA(0x0044927c, 0x306)
 void advManager::SendHeroTownData(
     i32 x,
     i32 y,
@@ -8708,7 +8666,7 @@ void advManager::SendHeroTownData(
     i32 setupCombatY,
     i32 randomSeed,
     i32 remotePlayer,
-    H2_ENUM_PARAM(CombatResult, i32) combatResult,
+    CombatResult combatResult,
     i32 retreatWin,
     i32 combatSurrender
 ) {
@@ -8732,10 +8690,10 @@ void advManager::SendHeroTownData(
     buffer->combatSurrender = static_cast<i8>(combatSurrender);
     buffer->firstOwner = static_cast<i8>(firstHero ? firstHero->m_owner : -1);
     buffer->firstGold =
-        firstHero ? gpGame->m_players[firstHero->m_owner].m_resources[IDX(RES_GOLD)] : 0;
+        firstHero ? gpGame->m_players[firstHero->m_owner].m_resources[(RES_GOLD)] : 0;
     buffer->secondOwner = static_cast<i8>(secondHero ? secondHero->m_owner : -1);
     buffer->secondGold =
-        secondHero ? gpGame->m_players[secondHero->m_owner].m_resources[IDX(RES_GOLD)] : 0;
+        secondHero ? gpGame->m_players[secondHero->m_owner].m_resources[(RES_GOLD)] : 0;
     memcpy(&buffer->firstArmy, firstArmy, sizeof(armyGroup));
     memcpy(&buffer->secondArmy, secondArmy, sizeof(armyGroup));
     if (combatTown)
@@ -8819,7 +8777,6 @@ void advManager::SendHeroTownData(
     H2_FREE(buffer);
 }
 
-VA(0x00449582, 0x3de)
 void advManager::ReceiveHeroTownData(
     char* packet,
     i32* remotePlayer,
@@ -8833,7 +8790,7 @@ void advManager::ReceiveHeroTownData(
     i32* setupCombatX,
     i32* setupCombatY,
     i32* randomSeed,
-    H2_ENUM_STORAGE(CombatResult, i8)* combatResult,
+    i8* combatResult,
     i8* retreatWin,
     i8* combatSurrender
 ) {
@@ -8869,11 +8826,11 @@ void advManager::ReceiveHeroTownData(
     *combatSurrender = EVENTS_REMOTE_COMBAT(packet)->combatSurrender;
     firstOwner8 = EVENTS_REMOTE_COMBAT(packet)->firstOwner;
     if (firstOwner8 > 0)
-        gpGame->m_players[firstOwner8].m_resources[IDX(RES_GOLD)] =
+        gpGame->m_players[firstOwner8].m_resources[(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->firstGold;
     secondOwner = EVENTS_REMOTE_COMBAT(packet)->secondOwner;
     if (secondOwner > 0)
-        gpGame->m_players[secondOwner].m_resources[IDX(RES_GOLD)] =
+        gpGame->m_players[secondOwner].m_resources[(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
     *firstArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
@@ -8885,8 +8842,8 @@ void advManager::ReceiveHeroTownData(
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
-    iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = *remotePlayer;
-    iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = giThisNetPos;
+    iCombatControlNetPos[(COMBAT_ATTACKER_SIDE)] = *remotePlayer;
+    iCombatControlNetPos[(COMBAT_DEFENDER_SIDE)] = giThisNetPos;
     result7 = TransmitRemoteData(
         NULL,
         *remotePlayer,
@@ -8920,7 +8877,7 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                const_cast<char*>("Ошибка получения информации. Продолжать?"),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -8934,7 +8891,7 @@ void advManager::ReceiveHeroTownData(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime7 = KBTickCount();
             else
-                ShutDown(const_cast<char*>("\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."));
+                ShutDown(const_cast<char*>("Игра прекращена."));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
@@ -8972,7 +8929,6 @@ void advManager::ReceiveHeroTownData(
     }
 }
 
-VA(0x00449960, 0x1fc)
 CombatResult advManager::AutoResolveCombat(
     i32 x,
     i32 y,
@@ -9053,7 +9009,6 @@ CombatResult advManager::AutoResolveCombat(
     return gpCombatManager->m_combatResult;
 }
 
-VA(0x00449b5c, 0x8f)
 i32 RiddleStringsEqual(char* answer, char* expected) {
     i32 index;
     char expectedPrefix[RIDDLE_EXPECTED_BUFFER_SIZE];
@@ -9072,4 +9027,4 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
     return strcmpi(expectedPrefix, answerPrefix) == 0;
 }
 
-DATA(0x005244b4) b32 gbNoShowCombat = false;
+b32 gbNoShowCombat = false;

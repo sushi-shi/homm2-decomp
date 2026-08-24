@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <BASE/border.h>
 #include <BASE/font.h>
@@ -12,16 +12,15 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/strip.h>
 
-H2_ENUM_BEGIN(BankBoxConstant)
+typedef enum BankBoxConstant {
     BOX_TEXT_SIZE               = 12,
     BOX_NON_GOLD_RESOURCE_COUNT = 6,
     BOX_FIRST_RESOURCE_WIDGET   = 0x7ee,
     BOX_GOLD_WIDGET             = 0x7f4,
     BOX_WINDOW_Z_ORDER          = -1,
     BOX_WINDOW_ACTIVE           = 1
-H2_ENUM_END(BankBoxConstant)
+} BankBoxConstant;
 
-VA(0x004a18a0, 0x2b0)
 strip::strip(
     i32 x,
     i32 y,
@@ -95,7 +94,6 @@ strip::strip(
     gpWindowManager->AddWindow(m_window, -1, drawWindow);
 }
 
-VA(0x004a1b50, 0x12b)
 strip::~strip() {
     i32 slot;
 
@@ -115,13 +113,11 @@ strip::~strip() {
     gpResourceManager->Dispose(m_flagIcon);
 }
 
-VA(0x004a1c7b, 0x35)
 void strip::Draw(void) {
     DrawIcons(1);
     gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT);
 }
 
-VA(0x004a1cb0, 0x37d)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
     CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
@@ -154,7 +150,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_creatureIcons[slot] = NULL;
                 m_cachedCreatureTypes[slot] = CREATURE_NONE;
             } else {
-                sprintf(gText, "monh%04d.icn", IDX(m_army->m_creatureTypes[slot]));
+                sprintf(gText, "monh%04d.icn", (m_army->m_creatureTypes[slot]));
                 m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
                 m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
@@ -171,7 +167,7 @@ void strip::DrawIcons(i32 drawWindow) {
             m_stripIcon->DrawToBuffer(
                 m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
                 m_y + STRIP_CONTENT_Y,
-                IDX(gMonsterDatabase[IDX(creatureType)].race) + STRIP_RACE_FRAME_OFFSET,
+                (gMonsterDatabase[(creatureType)].race) + STRIP_RACE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL
             );
             m_creatureIcons[slot]->DrawToBuffer(
@@ -210,12 +206,10 @@ void strip::DrawIcons(i32 drawWindow) {
     }
 }
 
-VA(0x004a202d, 0x28)
 void strip::DrawFrame(void) {
     m_stripIcon->DrawToBuffer(m_x, m_y, 0, ICON_DRAW_NORMAL);
 }
 
-VA(0x004a2055, 0xd6)
 bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_player = player;
     m_x = x;
@@ -227,13 +221,11 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     Update(1);
 }
 
-VA(0x004a212b, 0x34)
 bankBox::~bankBox() {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
 }
 
-VA(0x004a215f, 0xc0)
 void bankBox::Update(i32 drawWindow) {
     char str[BOX_TEXT_SIZE];
     tag_message message;
@@ -247,7 +239,7 @@ void bankBox::Update(i32 drawWindow) {
         message.payload.widget.data.text = str;
         m_window->BroadcastMessage(message);
     }
-    sprintf(str, "%d", m_player->m_resources[IDX(RES_GOLD)]);
+    sprintf(str, "%d", m_player->m_resources[(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
     message.payload.widget.data.text = str;
     m_window->BroadcastMessage(message);

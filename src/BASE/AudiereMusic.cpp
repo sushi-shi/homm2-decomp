@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/soundBackends.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
@@ -6,17 +6,17 @@
 #include <SOURCE/kbwin.h>
 #include <stdio.h>
 
-H2_ENUM_BEGIN(AudiereMusicConstant)
+typedef enum AudiereMusicConstant {
     AUDIERE_MUSIC_VOLUME_LEVEL_COUNT = 12,
     AUDIERE_FADE_VOLUME_DIVISOR      = 12,
     AUDIERE_FADE_VOLUME_LIMIT        = 121,
     AUDIERE_FADE_START_LEVEL         = 10,
     AUDIERE_FADE_STEP_COUNT          = 11,
     AUDIERE_FADE_DELAY               = 480
-H2_ENUM_END(AudiereMusicConstant)
+} AudiereMusicConstant;
 
-DATA(0x00520130) static float gAudiereMusicVolume = 1.0f;
-DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
+static float gAudiereMusicVolume = 1.0f;
+static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
     0.0f,
     1.0f,
     0.8f,
@@ -30,23 +30,11 @@ DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_CO
     0.05f,
     0.0f
 };
-DATA(0x005395e0) audiere::OutputStreamPtr AudiereMusic::stream;
-DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusic::source;
-DATA_COMPGEN_GUARD(
-    0x005395e4, audiereMusicInitializationGuard, AudiereMusic
-)
-DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {0};
+audiere::OutputStreamPtr AudiereMusic::stream;
+audiere::SampleSourcePtr AudiereMusic::source;
+static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {0};
 
-VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusic::stream)
-VA_COMPGEN(0x004cd090, 0x61, STATIC_CTOR, AudiereMusic::stream)
-VA_COMPGEN(0x004cd100, 0x12, STATIC_ATEXIT, AudiereMusic::stream)
-VA_COMPGEN(0x004cd120, 0x46, STATIC_DTOR, AudiereMusic::stream)
-VA_COMPGEN(0x004cd170, 0xf, STATIC_INIT_DISPATCH, AudiereMusic::source)
-VA_COMPGEN(0x004cd180, 0x61, STATIC_CTOR, AudiereMusic::source)
-VA_COMPGEN(0x004cd1f0, 0x12, STATIC_ATEXIT, AudiereMusic::source)
-VA_COMPGEN(0x004cd210, 0x46, STATIC_DTOR, AudiereMusic::source)
 
-VA(0x004cd260, 0x133)
 void StopAudiereMusic(i32& currentTrack) {
     if (AudiereMusic::stream) {
         if (AudiereMusic::stream->isPlaying()) {
@@ -60,19 +48,16 @@ void StopAudiereMusic(i32& currentTrack) {
     currentTrack = MIDI_NO_TRACK;
 }
 
-VA(0x004cd3a0, 0x7)
 bool AudiereMusicAvailable(void) {
     return true;
 }
 
-VA(0x004cd3b0, 0x36)
 bool AudiereMusicPlaying(void) {
     if (!AudiereMusic::stream)
         return false;
     return AudiereMusic::stream->isPlaying();
 }
 
-VA(0x004cd3f0, 0x99)
 bool StartupAudiereMusic(audiere::AudioDevicePtr device) {
     ResetAudiereMusic();
     if (device == NULL)
@@ -80,7 +65,6 @@ bool StartupAudiereMusic(audiere::AudioDevicePtr device) {
     return true;
 }
 
-VA(0x004cd490, 0x132)
 void ResetAudiereMusic(void) {
     if (AudiereMusic::stream) {
         if (AudiereMusic::stream->isPlaying())
@@ -93,11 +77,10 @@ void ResetAudiereMusic(void) {
         gAudiereMusicPositions[track] = 0;
 }
 
-VA(0x004cd5d0, 0xad)
 void SetAudiereMusicVolume(i32 volume, i32 fading) {
     i32 volumeLevel;
     if (volume == -1) {
-        volumeLevel = IDX(gConfig.musicVolume);
+        volumeLevel = (gConfig.musicVolume);
     } else if (fading != 0) {
         if (volume > AUDIERE_FADE_VOLUME_LIMIT - 1)
             volumeLevel = 1;
@@ -116,7 +99,6 @@ void SetAudiereMusicVolume(i32 volume, i32 fading) {
         AudiereMusic::stream->setVolume(gAudiereMusicVolume);
 }
 
-VA(0x004cd680, 0x3c7)
 void PlayAudiereMusic(
     audiere::AudioDevicePtr device,
     i32& currentTrack,
@@ -163,6 +145,3 @@ void PlayAudiereMusic(
     }
     currentTrack = track;
 }
-
-VA_COMPGEN(0x004cdae0, 0x27, LOCALE_FACET_ID_INIT, WCharCtypeId)
-VA_COMPGEN(0x004cdb10, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)
