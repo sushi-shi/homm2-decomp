@@ -27,7 +27,6 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
-| army::LoadResources dead locals + loopCount | eight `unusedLoadWord*` decls; `loopCount = 1` | no dead locals (frame 0x08); `loopCount = 0` | OPEN - loopCount is VALUE-LEVEL (see version-changes) |
 | swapManager::SplitMons type compare | `selectedArmy->types[selSlot] == targetArmy->types[tgtSlot]` | target-first mirror | OPEN |
 | combatManager::ShotIsThroughWall trace compares | `iWallToHexCell[i] == traceHex11`; `iTowerToHexCell[i] == traceHex11` | `traceHex11 == table[i]` (both) | OPEN - slot 14-perm residual parked |
 | CreateJoinFile diff loop | `while (diffSize1 > position1)` | `while (position1 < diffSize1)` | OPEN - slot residual parked |
@@ -160,6 +159,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `army::LoadResources` dead locals | **compiler-specific; no port** | Complete 4/4 clean VC4.2 Cartesian product crosses the eight PoL dead words with the loop-count value. PoL's dead frame is exact with value 1; the Buka `i`-only frame is 99.783880% with value 1 and 99.780220% with value 0, at the same 1190-byte size/42-block graph/87 relocation count. Keep the PoL frame. Dossier: `docs/matching/army-LoadResources/buka-frame-and-loop-count.cpp` in PoL |
+| `army::LoadResources` sample loop count | **logic change; do not port** | With the exact PoL frame, changing byte-pinned 1 to exact-Buka 0 gives 99.996340%; the retail immediate distinguishes the versions. Keep PoL value 1 and Buka value 0. Logic documentation: `docs/version-changes.md`; same dossier as above |
 | `heroWindow::MoveWindow` clamp sums | **invariant; source port** | Complete 4/4 clean VC4.2 Cartesian product crosses the X and Y addend orders independently. Every arm is exact at 390 bytes, exact 14/14 CFG, and ordered 8/8 relocations. PoL adopts both exact-Buka position-first sums and remains exact after a normal build. The old six-local parked note is obsolete. No gameplay or shipped-byte change. Dossier: `docs/matching/heroWindow-MoveWindow/buka-clamp-sums.cpp` in PoL |
 | `combatManager::DoBlast` segment loop | **invariant; source port** | Complete two-arm clean VC4.2 product proves count-first and exact-Buka counter-first conditions emit one 99.938324%, 826-byte probe object with exact 23/23 CFG and 50/50 relocation count. PoL adopts Buka source. Final normal build is 99.98% with exact CFG, agreeing symbolic branch sequence, and focused 50/50 relocations; the small live compiler-state residual is shared and unrelated. No gameplay change. Dossier: `docs/matching/combatManager-DoBlast/buka-segment-loop.cpp` in PoL |
 | `textWidget::textWidget(void)` store order | **matching decomp; already retained** | Complete two-arm clean VC4.2 product keeps exact-Buka/current-PoL `font,text,color,alignment,kind` exact at 62 bytes, one block, and ordered 2/2 relocations. Historical PoL `color,alignment,font,text,kind` falls to 97.368420% at the same size/count. No source edit required. Dossier: `docs/matching/WidgetDefaultConstructors/buka-store-orders.cpp` in PoL |
