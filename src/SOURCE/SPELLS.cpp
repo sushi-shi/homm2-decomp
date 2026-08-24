@@ -1969,11 +1969,11 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     deltaY = abs(bolt->endY - bolt->pixelY);
     distance =
         static_cast<i32>(sqrt(static_cast<double>(deltaX0 * deltaX0 + deltaY * deltaY)));
-    if (bolt->totalDistance < distance)
+    if (distance > bolt->totalDistance)
         bolt->distanceRatio = 0;
     else
-        bolt->distanceRatio =
-            static_cast<float>(bolt->totalDistance - distance) / bolt->totalDistance;
+        bolt->distanceRatio = static_cast<float>(bolt->totalDistance - distance)
+                              / (static_cast<float>(bolt->totalDistance));
 
     if (bolt->startWidth != bolt->endWidth) {
         widthDelta1 = bolt->endWidth - bolt->startWidth;
@@ -1988,7 +1988,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
         bolt->width = width26;
     }
     bolt->widthFirst = -(bolt->width >> 1);
-    bolt->widthLast = bolt->width + bolt->widthFirst - 1;
+    bolt->widthLast = bolt->widthFirst + bolt->width - 1;
 
     angleX36 = bolt->endX - bolt->pixelX;
     angleY9 = bolt->endY - bolt->pixelY;
@@ -1996,25 +1996,22 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
         static_cast<float>(atan2(static_cast<double>(angleX36), static_cast<double>(angleY9)));
     averageAngle28 =
         static_cast<float>((bolt->minAngle + bolt->maxAngle) / BOLT_ANGLE_AVERAGE_DIVISOR);
-    averageAngle28 = static_cast<float>(
-                         (BOLT_INITIAL_ANGLE_BIAS - bolt->distanceRatio)
-                         / BOLT_INITIAL_ANGLE_DIVISOR
-                     )
-                     * averageAngle28;
+    averageAngle28 = averageAngle28
+                     * ((BOLT_INITIAL_ANGLE_BIAS - bolt->distanceRatio)
+                        / BOLT_INITIAL_ANGLE_DIVISOR);
     bolt->angle = averageAngle28 + bolt->baseAngle;
 
     if (bolt->minAngle == 0 && bolt->maxAngle == 0)
         return;
-    if (bolt->angleDistance * DATA_COMPGEN(0x004eb1b8, resetBoltAngleConstant, BOLT_ANGLE_DISTANCE_FACTOR) < distance || bolt->forceAngle != 0) {
+    if (distance > bolt->angleDistance * DATA_COMPGEN(0x004eb1b8, resetBoltAngleConstant, BOLT_ANGLE_DISTANCE_FACTOR) || bolt->forceAngle != 0) {
         if (bolt->minAngle == bolt->maxAngle)
             randomAngle = static_cast<float>(bolt->minAngle) / IDX(BOLT_ANGLE_PERCENT_SCALE);
         else
             randomAngle = static_cast<float>(Random(bolt->minAngle, bolt->maxAngle))
                           / IDX(BOLT_ANGLE_PERCENT_SCALE);
-        randomAngle = static_cast<float>(
-                          (BOLT_RANDOM_ANGLE_BIAS - bolt->distanceRatio) / BOLT_RANDOM_ANGLE_DIVISOR
-                      )
-                      * randomAngle;
+        randomAngle = randomAngle
+                      * ((BOLT_RANDOM_ANGLE_BIAS - bolt->distanceRatio)
+                         / BOLT_RANDOM_ANGLE_DIVISOR);
         bolt->baseAngle = randomAngle + bolt->baseAngle;
     }
 }

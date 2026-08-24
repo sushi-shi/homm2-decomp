@@ -142,6 +142,13 @@ appendix; it is not the matching priority.
   audited exact island at forest/top seed 1213156658 trial 3: 2353 bytes,
   exact 69-block CFG and the complete ordered 62-relocation stream. This is
   matching decomp only; spell behavior is unchanged.
+- `combatManager::ResetBoltAngle` adopts Buka's arithmetic family but keeps
+  PoL's VC4.2 local names. All 64 independent arithmetic combinations emit one
+  VC4.2 object; a complete 102-cell family/state product confirms the full PoL
+  and Buka forms are byte-identical in every paired state. Buka's local-name
+  set is rejected by a separate 102-cell product. The retained source replays
+  exact at forest/top seed 1213156658 trial 3, retail size, exact 38-block CFG
+  and the complete ordered 30-relocation stream. No behavior change.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
