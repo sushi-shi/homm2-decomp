@@ -7257,7 +7257,7 @@ void game::RestoreCell(
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(i32 w, i32 h) {
     DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = 0x1d0d;
-    if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized)
+    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized)
         goto mapSized;
     {
         bMapInitialized = 1;
