@@ -68,7 +68,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | fullMap::GetNewCellExtra{Overlay,Object} reads | `Row(y)[x]` + `Extra(...)` | `Column(x)[y * width]` + direct `&extras[...]` | do not port: complete 204/204 matrix per function; only PoL Row+Extra reached exact (467 bytes, 22 blocks, 2/2 relocs); Column+Extra best 87.047620%, Row+direct best 98.639460%, full Buka best 85.687070%; shared `Column` accessor remains justified by other callers |
 | fullMap::Cell body / cell assigns | `cells + width * y + x` | `cells + x + y * width` | OPEN |
 | fullMap::Read memcpy args | `cells + width * y + x` etc. | `cells + x + y * width` | OPEN |
-| fullMap::GetNewCellExtraIndex locals | `nb, i, j` | `n, i, j` | OPEN - 4.2 hash differs from VC6; both may hold per-compiler with dev rename in either direction |
+| fullMap::GetNewCellExtraIndex locals | `nb, i, j` | `n, i, j` | do not port: compiler-specific `/Od` hash slot; complete 102/102 matrix gave 50 exact `nb` states and no exact `n` state (`n` best 99.871284%); canonical final 304 bytes, 12 exact blocks, 5/5 relocations |
 | fullMap::Read locals | `tmp` | `tmp1` | OPEN (same class) |
 | fullMap::ChangeTilesetIndex head | if/else | zero-arm ternary `t = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;` | OPEN |
 | fullMap::ChangeTilesetIndex unused local | `dummy` | `a` (bucket-1 pin) | OPEN |
