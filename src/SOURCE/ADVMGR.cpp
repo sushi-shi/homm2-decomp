@@ -7106,7 +7106,7 @@ void advManager::SetTownContext(i32 townId) {
     }
     if (contextValue7 < gpCurPlayer->m_townLocatorPage) {
         gpCurPlayer->m_townLocatorPage = static_cast<i8>(contextValue7);
-    } else if (gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < contextValue7) {
+    } else if (contextValue7 > gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1) {
         gpCurPlayer->m_townLocatorPage =
             static_cast<i8>(contextValue7 - (LOCATOR_VISIBLE_COUNT - 1));
     }
@@ -7128,7 +7128,7 @@ void advManager::SetTownContext(i32 townId) {
         giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
                               ->m_terrainImageIndex]
     );
-    if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
+    if (static_cast<TerrainType>(contextValue7) != m_currentTerrain) {
         m_currentTerrain = contextValue7;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }

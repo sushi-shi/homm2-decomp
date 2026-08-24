@@ -496,7 +496,7 @@ SOURCE/ADVMGR	?SeedTo@advManager@@QAEXHH@Z	100.0000	9b5a29f4a3ec
 SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	100.0000	ec2bb5db1d19
 SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	100.0000	4472ecf69284
 SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	100.0000	366002bc283a
-SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	100.0000	eafaff4a9b0e
+SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	100.0000	4b09fa957bfb
 SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	100.0000	ed54867bc1d8
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	100.0000	1181389cd4cb
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	bd79e40bea31
