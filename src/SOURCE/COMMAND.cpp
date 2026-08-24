@@ -2112,7 +2112,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                 && currentArmy26->m_monsterType != CREATURE_GHOST) {
                 ++necroEligible;
             }
-            if (winningSide == OppositeCombatResult(CombatResultForSide(combatSide))) {
+            if (OppositeCombatResult(CombatResultForSide(combatSide)) == winningSide) {
                 deadCreatureCount3 += currentArmy26->m_initialQuantity - currentArmy26->m_quantity;
             }
         }
@@ -2140,7 +2140,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     if (m_terrainType == TERRAIN_WASTELAND)
         fadeCount = VICTORY_WASTELAND_FADE_STEPS;
     timer = KBTickCount();
-    for (fadeIndex26 = 0; fadeCount > fadeIndex26; ++fadeIndex26) {
+    for (fadeIndex26 = 0; fadeIndex26 < fadeCount; ++fadeIndex26) {
         PollSound();
         DelayTil(&timer);
         timer = KBTickCount() + VICTORY_FADE_DELAY;
@@ -2199,7 +2199,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                                 && m_heroes[IDX(OppositeCombatResult(winningSide))]
                                            ->m_artifacts[fadeIndex26]
                                        != ARTIFACT_MAGIC_BOOK
-                                && emptySlots > iMaxTransferArtifacts) {
+                                && iMaxTransferArtifacts < emptySlots) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
                                     m_heroes[IDX(OppositeCombatResult(winningSide))]
                                         ->m_artifacts[fadeIndex26];
