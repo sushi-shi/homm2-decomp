@@ -707,7 +707,7 @@ SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	97.5653	d8cf98c9236a
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	ecb64497ab5f
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	bd5d671e2bca
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	eed70427cac6
-SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	7f074fe59b5b
+SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	0183a9949a5b
 SOURCE/DRAWING	?UpdateCombatArea@combatManager@@QAEXXZ	100.0000	20ff5a0212fc
 SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	100.0000	69a3c65a09c2
 SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	100.0000	3ac71f95c7ce
