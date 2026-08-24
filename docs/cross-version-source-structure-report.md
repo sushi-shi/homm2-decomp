@@ -92,6 +92,13 @@ appendix; it is not the matching priority.
   `base + stride * index` forms and the loop-bound sum order byte-neutral under
   VC4.2. The remaining 20 raw bytes are three compiler-state operand-load
   islands; there is no version-logic difference in this function.
+- `InitMenuHandler` is a bounded non-transfer. All 50 unchanged-source
+  forest/top probes emit the same 1688-byte PoL object at 99.826760% with
+  ordered 89/89 relocation owners. In a complete 204-cell product, Buka's two
+  mirrored hotspot bounds are byte-neutral, while its literal dialog-close
+  command shrinks PoL by two bytes and falls to 99.584690%. PoL retains
+  `BaseWidgetCommand`; Buka's one-argument ambient-music call belongs to its
+  later sound-backend API rather than shared menu logic.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -475,7 +482,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `InitMenuHandler` | 99.8268% | exact Buka menu CFG |
 | `ControlPanel` | 99.8089% | small, high-confidence donor |
 | `ViewSpellsHandler` | 99.7841% | refresh path changed/clarified |
 | `CastSpell` | 99.7599% | literal-true Magic Arrow case guard |
