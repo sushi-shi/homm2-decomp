@@ -135,11 +135,10 @@ inline void soundManager::MIDIStop(void) {
 
 VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
-    if (gbNoSound == 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED && m_midiReady != 0
-        && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
-        return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
-    }
-    return 0;
+    if (gbNoSound != 0 || gConfig.musicVolume == CONFIG_VOLUME_MUTED || m_midiReady == 0
+        || CurrentMidiFile == MIDI_NO_TRACK || hSequence[CurrentMidiFile] == NULL)
+        return 0;
+    return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
 }
 
 VA(0x004d3fd0, 0x68)
