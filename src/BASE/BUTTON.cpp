@@ -21,12 +21,12 @@ H2_ENUM_END(ButtonConstant)
 
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
+    m_iconId = 0;
+    m_icon = NULL;
     m_normalFrame = 0;
     m_pressedFrame = 0;
-    m_iconId = 0;
     m_selectMode = BUTTON_SELECT_STANDARD;
     m_hotkey = NO_HOTKEY;
-    m_icon = NULL;
 }
 
 VA(0x004dd4c0, 0x6e)
