@@ -297,7 +297,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
     u32 size;
 
     wsProcessMessages();
-    if (iDPRcvBufferTail == iDPRcvBufferHead)
+    if (iDPRcvBufferHead == iDPRcvBufferTail)
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);

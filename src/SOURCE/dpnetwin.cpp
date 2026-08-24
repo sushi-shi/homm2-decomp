@@ -255,7 +255,7 @@ i16 dpnet_rcv(i16, u16, void* data) {
     u32 size;
 
     dpProcessMessages();
-    if (iDPRcvBufferTail == iDPRcvBufferHead)
+    if (iDPRcvBufferHead == iDPRcvBufferTail)
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
