@@ -1389,7 +1389,7 @@ SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	ed9c8b7ec742
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	99.7222	11ae2705655d
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	ee547f2be814
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	42421cf83f8a
-SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	e2b525c1d694
+SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	65d2af2d0962
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	a9f81bca269c
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	98e6d54e9737
 SOURCE/dpnetwin	?dpnet_snd@@YIHHHPAX@Z	100.0000	2ad8ba35990d

@@ -84,7 +84,7 @@ i16 dpnet_init(void) {
     DirectPlayEnumerateFunction enumerateFunction;
     DirectPlayCreateFunction createFunction;
     i32 guestIndex;
-    i32 result;
+    i32 rc;
 
     if (lpIDC != NULL)
         return 0;
@@ -123,9 +123,9 @@ i16 dpnet_init(void) {
                 g_lpGuid = TCPGuid;
                 break;
         }
-        result = createFunction(g_lpGuid, &lpIDC, NULL);
-        if (result != RESULT_OK)
-            DPSD(result, DATA_COMPGEN(0x004ef840, dpnetInitIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), initSourceLineBase + 41);
+        rc = createFunction(g_lpGuid, &lpIDC, NULL);
+        if (rc != RESULT_OK)
+            DPSD(rc, DATA_COMPGEN(0x004ef840, dpnetInitIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), initSourceLineBase + 41);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
@@ -146,7 +146,7 @@ i16 dpnet_init(void) {
             gbRemoteGameOpen = false;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
-            for (guestIndex = 1; giNumHumanPlayers > guestIndex; guestIndex++) {
+            for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
                 startup.netPosition = static_cast<u8>(guestIndex);
                 dpSendMessage(
                     giNetPosToDCOPos[guestIndex],
