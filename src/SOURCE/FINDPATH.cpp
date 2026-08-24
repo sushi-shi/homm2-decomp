@@ -421,19 +421,22 @@ i32 searchArray::FindCombatPath(
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
         if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
-            i32 offset = unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
-            sourceWideHex = unit->m_hex + offset;
-            targetWideHex = targetHex + offset;
+            sourceWideHex =
+                unit->m_hex + (unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1);
+            targetWideHex =
+                targetHex + (unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1);
         }
 
         for (moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++) {
-            i32 moatHex = moatCell[moatIndex];
-            savedMoatState[moatIndex] = gpCombatManager->m_hexCells[moatHex].m_blocked;
+            savedMoatState[moatIndex] =
+                gpCombatManager->m_hexCells[moatCell[moatIndex]].m_blocked;
             if ((moatIndex != DRAWBRIDGE_MOAT_INDEX
                  || gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED)
-                && ((targetHex != moatHex && targetWideHex != moatHex) || ignoreTargetMoat != 0)
-                && (unit->m_hex != moatHex && sourceWideHex != moatHex)) {
-                bIsMoatSlowed[moatHex] = 1;
+                && ((targetHex != moatCell[moatIndex] && targetWideHex != moatCell[moatIndex])
+                    || ignoreTargetMoat != 0)
+                && (unit->m_hex != moatCell[moatIndex]
+                    && sourceWideHex != moatCell[moatIndex])) {
+                bIsMoatSlowed[moatCell[moatIndex]] = 1;
             }
         }
     }
@@ -452,7 +455,6 @@ i32 searchArray::FindCombatPath(
         path = m_storage.aiPath.directions;
         u32 attackMask;
         i32 attackDirection;
-        i32 currentHex;
         searchNode node;
         PushCombatPoint(
             sourceHex,
@@ -461,23 +463,22 @@ i32 searchArray::FindCombatPath(
             unit->m_monster.speed
         );
 
-        while (m_queueCount != 0) {
+        while (m_queueCount > 0) {
             node = m_queue[--m_queueCount];
             if (node.distance > unit->m_monster.speed)
                 continue;
 
-            currentHex = node.x;
             i32 xDistance =
-                abs(gpCombatManager->m_hexCells[currentHex].m_x
+                abs(gpCombatManager->m_hexCells[node.x].m_x
                     - gpCombatManager->m_hexCells[targetHex].m_x);
             i32 yDistance =
-                abs(gpCombatManager->m_hexCells[currentHex].m_y
+                abs(gpCombatManager->m_hexCells[node.x].m_y
                     - gpCombatManager->m_hexCells[targetHex].m_y);
             i32 distance = ApproximateGridDistance(xDistance, yDistance);
 
             if (unit->m_targetSide != COMBAT_SIDE_NONE) {
                 attackMask =
-                    unit->GetAttackMask(currentHex, ARMY_ATTACK_TARGET_ASSIGNED, attackTargetHex);
+                    unit->GetAttackMask(node.x, ARMY_ATTACK_TARGET_ASSIGNED, attackTargetHex);
                 if (attackMask != ATTACK_MASK_SURROUNDED) {
                     attackDirection = 0;
                     goto findAttackDirection;
@@ -485,25 +486,26 @@ i32 searchArray::FindCombatPath(
             }
 
             if (distance < bestDistance) {
-                bestHex = currentHex;
+                bestHex = node.x;
                 bestDistance = distance;
                 if (distance == 0)
                     break;
             }
 
-            u32 moveMask = unit->GetMoveMask(currentHex);
+            u32 moveMask = unit->GetMoveMask(node.x);
             for (CombatHexDirection direction = COMBAT_DIRECTION_NORTHEAST;
                  IDX(direction) < SEARCH_DIRECTION_COUNT;
-                 direction++) {
+                direction++) {
                 if ((moveMask & BIT(direction)) == 0) {
-                    i32 nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
-                    i32 moatCost = bIsMoatSlowed[nextHex]
-                        ? unit->m_speed + MOAT_MOVEMENT_PENALTY
-                        : 0;
+                    i32 nextHex = unit->GetAdjacentCellIndex(node.x, direction);
                     PushCombatPoint(
                         nextHex,
                         direction,
-                        node.distance + moatCost + 1,
+                        node.distance
+                            + (bIsMoatSlowed[nextHex]
+                                   ? unit->m_speed + MOAT_MOVEMENT_PENALTY
+                                   : 0)
+                            + 1,
                         unit->m_monster.speed
                     );
                 }
@@ -545,13 +547,15 @@ restoreMoat:
 
 reconstructPath:
     while (bestHex != sourceHex) {
-        searchNode& cell = m_storage.nodes[bestHex];
-        *path++ = static_cast<i8>(cell.direction);
+        searchNode* cell;
+        CombatHexDirection opposite;
+
+        cell = &GetNode(bestHex, 0);
+        *path++ = static_cast<i8>(cell->direction);
         m_pathLength++;
         if (m_pathLength >= SEARCH_PATH_CAPACITY)
             break;
-        CombatHexDirection opposite =
-            OppositeDirection(static_cast<CombatHexDirection>(cell.direction));
+        opposite = OppositeDirection(static_cast<CombatHexDirection>(cell->direction));
         bestHex = unit->GetAdjacentCellIndex(bestHex, opposite);
     }
     attackTargetHex = m_pathLength;
