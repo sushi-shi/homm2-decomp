@@ -7518,8 +7518,8 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
         gpAdvManager->UpdateScreen(0, 0);
     }
 
-    i32 mouseX = message.payload.mouse.x;
-    i32 mouseY = message.payload.mouse.y;
+    i32 mouseX = message.payload.mouse.screenX;
+    i32 mouseY = message.payload.mouse.screenY;
     i32 handled = 0;
 
     switch (message.type) {
@@ -7551,7 +7551,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
             break;
 
         case MESSAGE_MOUSE_MOVE:
-            if (InMapArea(message.payload.mouse.x, message.payload.mouse.y)) {
+            if (InMapArea(message.payload.mouse.screenX, message.payload.mouse.screenY)) {
                 mouseX /= CELL_PIXELS;
                 mouseY /= CELL_PIXELS;
                 if (mouseX < 0) {

@@ -453,7 +453,7 @@ SOURCE/ADVMGR	?DeactivateCurrHero@advManager@@QAEXXZ	100.0000	79e26bb16f63
 SOURCE/ADVMGR	?DeactivateCurrTown@advManager@@QAEXXZ	100.0000	27cd805571d3
 SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	100.0000	4a628c6e22fb
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	8beb6e0e46ff
-SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	96.5714	e3da9e56c4cc
+SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	96.5926	f23c89f5fd38
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	777b1e84efa1
 SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	100.0000	60582890c279
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	99.0000	d559c91b7f56
