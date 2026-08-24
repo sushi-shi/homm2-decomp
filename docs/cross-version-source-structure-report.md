@@ -51,6 +51,12 @@ appendix; it is not the matching priority.
   99.3026%/1028 bytes to 99.5230% at retail size with exact CFG and relocations;
   a complete state matrix reaches the existing 99.7204% structural island but
   does not yet close the remaining register/SIB ownership.
+- `MirrorImage` separates logic from reconstruction. PoL's 46-block retail body
+  omits Buka's six source-body exclusion guards, so they stay out of 2.0.
+  Buka's `deadline1` slot name and post-increment spelling transfer; the name
+  removes the slot swap while pre/post increment is VC4.2-byte-neutral. The
+  remaining three bytes are an equivalent loop compare unchanged by a complete
+  102-cell source/state matrix.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -337,6 +343,8 @@ generated declaration is retained. See
   changes precision/operand order.
 - `game::GetLuck`: the Rainbow bonus moved before the clamps in the later
   build.
+- `combatManager::MirrorImage`: Buka skips six wide-creature source-body hex
+  combinations; the PoL retail CFG contains none of those guards.
 
 These are useful for a playable bug-fix branch, but applying them here without
 PoL byte evidence would violate the reconstruction objective.
@@ -371,7 +379,6 @@ payoff and audit cost:
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
 | `CatAttack` | 99.9977% | exact Buka phase/loop structure; large function |
-| `MirrorImage` | 99.9806% | six exact Buka self-body exclusion guards |
 | `LoadIcons` | 99.9774% | declaration scope and dead-slot layout |
 | `DecodePacket` | 99.9733% | small, near-exact source donor |
 | `ComputerMonsterInteract` | 99.9684% | if/else combat tail and flee return |

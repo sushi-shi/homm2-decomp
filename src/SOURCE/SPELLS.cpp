@@ -3154,7 +3154,7 @@ void combatManager::MirrorImage(i32 targetHex) {
     i32 candidateHex1;
     i32 frame;
     CombatHexDirection direction6;
-    i32 deadline0;
+    i32 deadline1;
 
     source6 =
         &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
@@ -3235,12 +3235,12 @@ mirror_found:
     xOffset8 = m_hexCells[source6->m_hex].m_x - m_hexCells[image3->m_hex].m_x;
     yOffset = m_hexCells[source6->m_hex].m_y - m_hexCells[image3->m_hex].m_y;
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(m_hexCells[candidateHex1].m_occupantSide)]
-                          [m_hexCells[candidateHex1].m_occupantIndex];
-    ++m_limitCreatureCount[IDX(m_hexCells[targetHex].m_occupantSide)]
-                          [m_hexCells[targetHex].m_occupantIndex];
+    m_limitCreatureCount[IDX(m_hexCells[candidateHex1].m_occupantSide)]
+                        [m_hexCells[candidateHex1].m_occupantIndex]++;
+    m_limitCreatureCount[IDX(m_hexCells[targetHex].m_occupantSide)]
+                        [m_hexCells[targetHex].m_occupantIndex]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    deadline0 = static_cast<i32>(
+    deadline1 = static_cast<i32>(
         KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
     );
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
@@ -3255,8 +3255,8 @@ mirror_found:
             giMaxExtentY - giMinExtentY + 1
         );
         gbLimitToExtent = false;
-        DelayTil(&deadline0);
-        deadline0 = static_cast<i32>(
+        DelayTil(&deadline1);
+        deadline1 = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
         );
     }
