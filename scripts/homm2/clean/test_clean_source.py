@@ -51,26 +51,72 @@ class CleanSourcePatchTests(unittest.TestCase):
             52,
         )
 
-    def test_current_strict_enum_conversions(self):
-        cases = (
-            ("src/SOURCE/ARMY.cpp", "targetSide_8 >= 0", "H2EnumIndex(targetSide_8) >= 0"),
-            ("src/SOURCE/PHILAI.cpp", "best.type >= 0", "H2EnumIndex(best.type) >= 0"),
+    def test_gold_source_needs_only_the_remaining_audited_patches(self):
+        self.assertEqual(
+            set(clean_source.GENERATED_PATCHES),
+            {
+                "include/BASE/Misc.h",
+                "src/BASE/INPUTMGR.cpp",
+                "src/BASE/Misc.cpp",
+                "src/BASE/TEXTWDGT.cpp",
+                "src/BASE/Textntry.cpp",
+                "src/BASE/droplist.cpp",
+                "src/SOURCE/ADVMGR.cpp",
+                "src/SOURCE/ARMY.cpp",
+                "src/SOURCE/COMMAND.cpp",
+                "src/SOURCE/EVENTS.cpp",
+                "src/SOURCE/FINDPATH.cpp",
+                "src/SOURCE/GAME.cpp",
+                "src/SOURCE/HERO.cpp",
+                "src/SOURCE/PHILAI.cpp",
+                "src/SOURCE/X_CAMPGN.cpp",
+                "vendor/audiere-1.9.2/audiere.h",
+            },
         )
-        for relative, source, expected in cases:
-            with self.subTest(relative=relative):
-                self.assertEqual(
-                    clean_source.apply_patches(relative, source),
-                    expected,
-                )
 
     def test_menu_handles_use_the_windows_type(self):
-        source = "#include <Ints.h>\n" + "\n".join(
-            f"extern void* {name};"
-            for name in ("hmnuAdv", "hmnuCmbt", "hmnuDflt", "hmnuTown")
+        header = (clean_source.REPO / "include/SOURCE/KB.h").read_text()
+        source = (clean_source.REPO / "src/SOURCE/KB.cpp").read_text()
+        self.assertIn("#include <windows.h>", header)
+        for name in ("hmnuAdv", "hmnuCmbt", "hmnuDflt", "hmnuTown"):
+            self.assertIn(f"extern HMENU {name};", header)
+            self.assertIn(f"HMENU {name} = NULL;", source)
+
+    def test_gold_text_widget_conversions_are_explicit(self):
+        source = (
+            "SetColorIndex(msg.payload.widget.data.value);\n"
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : m_color,\n"
         )
-        result = clean_source.apply_patches("include/SOURCE/KB.h", source)
-        self.assertNotIn("void*", result)
-        self.assertEqual(result.count("extern HMENU"), 4)
+        result = clean_source.apply_patches("src/BASE/TEXTWDGT.cpp", source)
+        self.assertIn("static_cast<FontDrawMode>(msg.payload.widget.data.value)", result)
+        self.assertIn(": static_cast<FontDrawMode>(m_color),", result)
+
+    def test_audiere_declares_the_c_string_api_it_uses(self):
+        source = "#include <vector>\n#include <string>\n"
+        result = clean_source.apply_patches(
+            "vendor/audiere-1.9.2/audiere.h",
+            source,
+        )
+        self.assertIn("#include <string.h>", result)
+
+    def test_gold_enum_zeroes_use_domain_values(self):
+        input_source = (
+            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0"
+        )
+        self.assertIn(
+            "== MESSAGE_MODIFIER_NONE",
+            clean_source.apply_patches("src/BASE/INPUTMGR.cpp", input_source),
+        )
+
+        misc_source = (
+            "u32l MAKEFILEID(char* text) {\n"
+            "H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;\n"
+        )
+        self.assertIn(
+            "bDataEntryTime = ENTRY_PHASE_IMMEDIATE;",
+            clean_source.apply_patches("src/BASE/Misc.cpp", misc_source),
+        )
 
     def test_makefileid_does_not_modify_literals(self):
         declaration = clean_source.apply_patches(
@@ -80,23 +126,14 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(declaration, "u32l MAKEFILEID(const char* text);")
 
         source = """u32l MAKEFILEID(char* text) {
-    u32 hash = 0;
-    i32 sum = 0;
-    for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        if (text[i] >= 'a' && text[i] <= 'z') {
-            text[i] &= ~('a' - 'A');
-        }
-        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
-        hash >>= HASH_RIGHT_SHIFT;
-        hash += shiftedHash;
-        sum += text[i];
-        hash += text[i] + sum;
-    }
-    return hash;
-}"""
+    char buf[260];
+    strcpy(buf, text);
+    return buf[0];
+}
+H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;"""
         result = clean_source.apply_patches("src/BASE/Misc.cpp", source)
         self.assertIn("u32l MAKEFILEID(const char* text)", result)
-        self.assertIn("char value = text[i];", result)
+        self.assertIn("strcpy(buf, text);", result)
         self.assertNotIn("text[i] &=", result)
 
 
@@ -347,9 +384,11 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
         repo = root / "repo"
         (repo / "include").mkdir(parents=True)
         (repo / "src").mkdir()
+        (repo / "vendor/example").mkdir(parents=True)
         (repo / "scripts/homm2/clean/project").mkdir(parents=True)
         (repo / "include/example.h").write_text("#pragma once\n")
         (repo / "src/example.cpp").write_text("int example;\n")
+        (repo / "vendor/example/license.txt").write_text("keep vendor license\n")
         (repo / "scripts/homm2/clean/project/flake.lock").write_text("{}\n")
         (repo / "scripts/homm2/clean/project/flake.nix").write_text(
             "{ outputs = _: {}; }\n"
@@ -428,10 +467,14 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
                 mock.patch.object(clean_source, "GENERATED_PATCHES", {}),
             ):
                 sources, overrides, debris = clean_source.generate(output)
-            self.assertEqual((sources, overrides, debris), (2, 0, []))
+            self.assertEqual((sources, overrides, debris), (3, 0, []))
             self.assertFalse(stale.exists())
             self.assertTrue((output / "include/example.h").is_file())
             self.assertTrue((output / "src/example.cpp").is_file())
+            self.assertEqual(
+                (output / "vendor/example/license.txt").read_text(),
+                "keep vendor license\n",
+            )
             self.assertEqual((output / "flake.lock").read_text(), "{}\n")
             self.assertIn("outputs", (output / "flake.nix").read_text())
             self.assertIn("/result", (output / ".gitignore").read_text())
@@ -440,6 +483,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             ninja = (output / "build.ninja").read_text()
             self.assertIn("cxx = clang++", ninja)
             self.assertIn("--target=i686-w64-windows-gnu", ninja)
+            self.assertIn("-Ivendor/audiere-1.9.2", ninja)
             self.assertIn("-O0", ninja)
             self.assertIn("-mno-sse -mno-sse2 -mfpmath=387", ninja)
             self.assertIn(
@@ -458,6 +502,10 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
                 ninja,
             )
             self.assertIn(
+                "build $builddir/imports/AUDIERE.a: implib imports/AUDIERE.def",
+                ninja,
+            )
+            self.assertIn(
                 "build $builddir/imports/WING32.a: implib imports/WING32.def",
                 ninja,
             )
@@ -465,6 +513,8 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
 
             mss = (output / "imports/MSS32.def").read_text()
             self.assertIn("  _AIL_startup@0\n", mss)
+            self.assertIn("  _AIL_digital_master_volume@4\n", mss)
+            self.assertIn("  _AIL_set_digital_master_volume@8\n", mss)
             self.assertNotIn("AIL_startup@0 =", mss)
 
             mss_aliases = (output / "imports/MSS32_aliases.S").read_text()
@@ -480,6 +530,11 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             wing = (output / "imports/WING32.def").read_text()
             self.assertIn("  WinGCreateDC@0\n", wing)
             self.assertNotIn("WinGCreateDC@0 =", wing)
+
+            audiere = (output / "imports/AUDIERE.def").read_text()
+            self.assertIn("LIBRARY audiere.dll\n", audiere)
+            self.assertIn("  AdrOpenDevice@8\n", audiere)
+            self.assertIn("  AdrOpenSampleSource@4\n", audiere)
 
     def test_override_comments_are_removed(self):
         with tempfile.TemporaryDirectory() as directory:

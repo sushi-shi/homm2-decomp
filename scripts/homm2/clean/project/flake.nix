@@ -9,8 +9,8 @@
       pkgs = import nixpkgs { inherit system; };
       mingw = pkgs.pkgsCross.mingw32;
       game = mingw.clangStdenv.mkDerivation {
-        pname = "homm2-pol";
-        version = "2.0";
+        pname = "homm2-gold-buka";
+        version = "2.1";
         src = ./.;
         nativeBuildInputs = [
           pkgs.ninja

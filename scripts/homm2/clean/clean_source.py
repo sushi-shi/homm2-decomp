@@ -97,35 +97,82 @@ GENERATED_PATCHES = {
             "u32l MAKEFILEID(const char* text);",
         ),
     ],
-    "include/SOURCE/KB.h": [
+    "src/BASE/Misc.cpp": [
         (
             Pattern.LITERAL, 1,
-            "#include <Ints.h>",
-            "#include <Ints.h>\n#include <windows.h>",
+            "u32l MAKEFILEID(char* text) {",
+            "u32l MAKEFILEID(const char* text) {",
         ),
         (
-            Pattern.REGEX, 4,
-            r"extern void\* (hmnu(?:Adv|Cmbt|Dflt|Town));",
-            r"extern HMENU \1;",
+            Pattern.LITERAL, 1,
+            "H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;",
+            "H2SteppedEnumStorage<DataEntryPhase, i32> "
+            "bDataEntryTime = ENTRY_PHASE_IMMEDIATE;",
         ),
     ],
-    "include/SOURCE/fileRequester.h": [
+    "src/BASE/INPUTMGR.cpp": [
         (
             Pattern.LITERAL, 1,
-            "#include <Ints.h>",
-            "#include <Ints.h>\n#include <windows.h>",
+            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0",
+            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) "
+            "== MESSAGE_MODIFIER_NONE",
+        ),
+    ],
+    "src/BASE/TEXTWDGT.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "SetColorIndex(msg.payload.widget.data.value);",
+            "SetColorIndex(static_cast<FontDrawMode>(msg.payload.widget.data.value));",
         ),
         (
             Pattern.LITERAL, 1,
-            "void* m_previousMenu;",
-            "HMENU m_previousMenu;",
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : m_color,",
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED "
+            ": static_cast<FontDrawMode>(m_color),",
+        ),
+    ],
+    "src/BASE/Textntry.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : m_color,",
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_color),",
+        ),
+    ],
+    "src/BASE/droplist.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : m_normalColor,",
+            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
+            "? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_normalColor),",
+        ),
+    ],
+    "src/SOURCE/ADVMGR.cpp": [
+        (
+            Pattern.REGEX, 2,
+            r"struct tag_message (CDMsg|USMsg) = \{0\};",
+            r"struct tag_message \1 = {};",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            ": s_drawHero->m_cursorType;",
+            ": static_cast<HeroCursorType>(s_drawHero->m_cursorType);",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            ": contextHero->m_cursorType;",
+            ": static_cast<HeroCursorType>(contextHero->m_cursorType);",
         ),
     ],
     "src/SOURCE/ARMY.cpp": [
         (
             Pattern.LITERAL, 1,
-            "targetSide_8 >= 0",
-            "H2EnumIndex(targetSide_8) >= 0",
+            "occupantSide >= 0 && armyIndex >= 0",
+            "H2EnumIndex(occupantSide) >= 0 && armyIndex >= 0",
         ),
     ],
     "src/SOURCE/COMMAND.cpp": [
@@ -135,76 +182,62 @@ GENERATED_PATCHES = {
             "ExperienceValueOfStack(static_cast<CombatSide>("
             "H2EnumIndex(OppositeCombatResult(winningSide))))",
         ),
-    ],
-    "src/SOURCE/dpnetwin.cpp": [
         (
-            Pattern.LITERAL, 1,
-            "LPDPENUMDPCALLBACK, void*",
-            "LPDPENUMDPCALLBACKA, void*",
+            Pattern.LITERAL, 3,
+            "index_0 = COMBAT_ATTACKER_SIDE;",
+            "index_0 = H2EnumIndex(COMBAT_ATTACKER_SIDE);",
         ),
     ],
-    "src/SOURCE/FLY.cpp": [
+    "src/SOURCE/EVENTS.cpp": [
         (
-            Pattern.LITERAL, 2,
-            "static_cast<u32>(m_facing) < ARMY_FACING_RIGHT",
-            "static_cast<u32>(m_facing) < static_cast<u32>(ARMY_FACING_RIGHT)",
+            Pattern.LITERAL, 4,
+            "static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)",
+            "(eventType_g | MAP_TRIGGER_ACTION_FLAG)",
+        ),
+    ],
+    "src/SOURCE/FINDPATH.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "nextHex,\n                direction_a,",
+            "nextHex,\n                static_cast<CombatHexDirection>(direction_a),",
+        ),
+    ],
+    "src/SOURCE/GAME.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "GetRandomNumTroops(cell2->m_objectIndex)",
+            "GetRandomNumTroops(static_cast<CreatureType>(cell2->m_objectIndex))",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            "static_cast<i8>(facing == ARMY_FACING_LEFT),",
+            "facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            "(Random(1, H2EnumIndex(FACTION_COUNT) - 1) + heroClass) "
+            "% H2EnumIndex(FACTION_COUNT);",
+            "static_cast<FactionType>((Random(1, H2EnumIndex(FACTION_COUNT) - 1) "
+            "+ H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT));",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            "m_ultimateArtifactId != -1",
+            "m_ultimateArtifactId != ARTIFACT_NONE",
         ),
     ],
     "src/SOURCE/HERO.cpp": [
         (
             Pattern.LITERAL, 1,
-            "(H2EnumIndex(skillIndexValue) + 1) % HERO_SKILL_COUNT",
-            "(H2EnumIndex(skillIndexValue) + 1) % H2EnumIndex(HERO_SKILL_COUNT)",
+            "(H2EnumIndex(skill) + 1) % HERO_SKILL_COUNT",
+            "(H2EnumIndex(skill) + 1) % H2EnumIndex(HERO_SKILL_COUNT)",
         ),
     ],
     "src/SOURCE/PHILAI.cpp": [
         (
             Pattern.LITERAL, 1,
-            "best.type >= 0",
-            "H2EnumIndex(best.type) >= 0",
-        ),
-    ],
-    "src/SOURCE/KB.cpp": [
-        (
-            Pattern.REGEX, 4,
-            r"void\* (hmnu(?:Adv|Cmbt|Dflt|Town)) = NULL;",
-            r"HMENU \1 = NULL;",
-        ),
-    ],
-    "src/BASE/Misc.cpp": [
-        (
-            Pattern.LITERAL, 1,
-            """u32l MAKEFILEID(char* text) {
-    u32 hash = 0;
-    i32 sum = 0;
-    for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        if (text[i] >= 'a' && text[i] <= 'z') {
-            text[i] &= ~('a' - 'A');
-        }
-        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
-        hash >>= HASH_RIGHT_SHIFT;
-        hash += shiftedHash;
-        sum += text[i];
-        hash += text[i] + sum;
-    }
-    return hash;
-}""",
-            """u32l MAKEFILEID(const char* text) {
-    u32 hash = 0;
-    i32 sum = 0;
-    for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        char value = text[i];
-        if (value >= 'a' && value <= 'z') {
-            value &= ~('a' - 'A');
-        }
-        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
-        hash >>= HASH_RIGHT_SHIFT;
-        hash += shiftedHash;
-        sum += value;
-        hash += value + sum;
-    }
-    return hash;
-}""",
+            "bestBuy.type >= 0",
+            "H2EnumIndex(bestBuy.type) >= 0",
         ),
     ],
     "src/SOURCE/X_CAMPGN.cpp": [
@@ -212,6 +245,13 @@ GENERATED_PATCHES = {
             Pattern.REGEX, 52,
             r"case (MAP_[A-Z0-9_]+) \+ 1:",
             r"case static_cast<ExpansionCampaignMap>(H2EnumIndex(\1) + 1):",
+        ),
+    ],
+    "vendor/audiere-1.9.2/audiere.h": [
+        (
+            Pattern.LITERAL, 1,
+            "#include <vector>\n#include <string>",
+            "#include <vector>\n#include <string>\n#include <string.h>",
         ),
     ],
 }
@@ -1248,6 +1288,7 @@ def write_ninja(out_root: Path) -> None:
     sources = sorted((out_root / "src").rglob("*.cpp"))
     include_flags = [
         "-Iinclude",
+        "-Ivendor/audiere-1.9.2",
         "-Ivendor/miles-3.6",
         "-Ivendor/smacker-3.0g",
         "-Ivendor/wing-1.0",
@@ -1317,6 +1358,7 @@ def write_ninja(out_root: Path) -> None:
         objects.append(obj)
     import_libraries = []
     for dll, dlltool_flags in (
+        ("AUDIERE", ""),
         ("MSS32", ""),
         ("SMACKW32", ""),
         ("WING32", "-k"),
@@ -1345,7 +1387,9 @@ def write_ninja(out_root: Path) -> None:
 
 
 MSS_IMPORTS = (
+    "_AIL_digital_master_volume@4",
     "_AIL_set_sample_loop_count@8",
+    "_AIL_set_digital_master_volume@8",
     "_AIL_set_sample_playback_rate@8",
     "_AIL_start_sample@4",
     "_AIL_set_sample_type@12",
@@ -1380,6 +1424,11 @@ MSS_IMPORTS = (
     "_AIL_get_preference@4",
 )
 
+AUDIERE_IMPORTS = (
+    "AdrOpenDevice@8",
+    "AdrOpenSampleSource@4",
+)
+
 SMACK_IMPORTS = (
     ("_SmackSoundUseDirectSound@4", 38),
     ("_SmackSoundUseMSS@4", 33),
@@ -1406,6 +1455,10 @@ WING_IMPORTS = (
 def write_import_defs(out_root: Path) -> None:
     imports = out_root / "imports"
     imports.mkdir()
+
+    audiere = ["LIBRARY audiere.dll", "EXPORTS"]
+    audiere += [f"  {symbol}" for symbol in AUDIERE_IMPORTS]
+    (imports / "AUDIERE.def").write_text("\n".join(audiere) + "\n")
 
     mss = ["LIBRARY mss32.dll", "EXPORTS"]
     mss += [f"  {symbol}" for symbol in MSS_IMPORTS]
@@ -1444,7 +1497,8 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
     sources = 0
     for tier in ("include", "src", "vendor"):
         for path in sorted((REPO / tier).rglob("*")):
-            if not path.is_file() or path.suffix not in (".h", ".cpp"):
+            allowed = (".h", ".cpp", ".txt") if tier == "vendor" else (".h", ".cpp")
+            if not path.is_file() or path.suffix not in allowed:
                 continue
             relative = path.relative_to(REPO)
             if str(relative).replace("\\", "/") in DROP_FILES:
@@ -1453,8 +1507,13 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
             target.parent.mkdir(parents=True, exist_ok=True)
             source_text = path.read_text()
             relative_text = str(relative).replace("\\", "/")
-            if tier == "vendor":
-                cleaned_text = tidy(strip_comments(source_text)).rstrip("\n") + "\n"
+            if tier == "vendor" and path.suffix in (".h", ".cpp"):
+                cleaned_text = apply_patches(
+                    relative_text,
+                    tidy(strip_comments(source_text)).rstrip("\n") + "\n",
+                )
+            elif tier == "vendor":
+                cleaned_text = source_text
             else:
                 cleaned_text = apply_patches(
                     relative_text,
