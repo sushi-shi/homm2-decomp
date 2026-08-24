@@ -234,12 +234,12 @@ VA(0x004c87a0, 0x8b)
 void resourceManager::Expunge(void) {
     m_expunging = 1;
     resource* currentResource = m_resourceListHead;
-    resource* nextResource = NULL;
+    resource* next = NULL;
     while (currentResource != NULL) {
-        nextResource = currentResource->m_next;
+        next = currentResource->m_next;
         RemoveResource(currentResource);
         delete currentResource;
-        currentResource = nextResource;
+        currentResource = next;
     }
     m_expunging = 0;
 }

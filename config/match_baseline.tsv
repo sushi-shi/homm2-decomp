@@ -258,7 +258,7 @@ BASE/RESMGR	??0resourceManager@@QAE@XZ	100.0000	db93eb6df4cc
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	72732e6010fc
 BASE/RESMGR	?Close@resourceManager@@UAEXXZ	100.0000	80637e8ef3b8
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	91ebf8c168b8
-BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	100.0000	c0471d4361bf
+BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	100.0000	ffb9fc27259c
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	100.0000	b3b580ada322
 BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	100.0000	47d844f9436a
 BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	100.0000	bb918cc9dcd4
