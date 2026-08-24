@@ -1920,7 +1920,7 @@ i32 army::AttackTo(i32 destination) {
         DoAttack(0);
         return 0;
     }
-    if (HAS(m_monster.flags.all, MONSTER_FLAGS_BREATH_ATTACK) && m_hex == m_moveTargetHex) {
+    if (HAS(m_monster.flags.all, MONSTER_FLAGS_BREATH_ATTACK) && m_moveTargetHex == m_hex) {
         DoAttack(0);
         return 0;
     }
@@ -1946,7 +1946,7 @@ i32 army::AttackTo(i32 destination) {
                         gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]
                     ),
                     finishStanding,
-                    gpSearchArray->m_pathLength - 1 != pathIndex_4
+                    pathIndex_4 != gpSearchArray->m_pathLength - 1
                 );
                 if (numSteps >= m_monster.speed && pathIndex_4 != 1) {
                     return ARMY_PATH_BLOCKED;
