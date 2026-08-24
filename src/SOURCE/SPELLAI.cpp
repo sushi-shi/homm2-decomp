@@ -1182,9 +1182,9 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     armyIndexWork = FindResurrectArmyIndex(m_currentSide, spell, hex);
     targetStack = &m_armies[IDX(m_currentSide)][armyIndexWork];
     quantityResult[0] = resurrectPowerWork / targetStack->m_monster.hitPoints;
-    if (targetStack->m_quantity + quantityResult[0] > targetStack->m_initialQuantity)
+    if (quantityResult[0] + targetStack->m_quantity > targetStack->m_initialQuantity)
         quantityResult[0] = targetStack->m_initialQuantity - targetStack->m_quantity;
-    *effect = gMonsterDatabase[IDX(targetStack->m_monsterType)].fightValue * quantityResult[0];
+    *effect = quantityResult[0] * gMonsterDatabase[IDX(targetStack->m_monsterType)].fightValue;
     *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(spell));
     if (spell == SPELL_RESURRECT)
         *effect = static_cast<i32>(*effect * DATA_COMPGEN(0x004eb818, effectSpellResurrectConstant, COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER));
