@@ -95,9 +95,11 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 
 `scripts/` holds three directories and no loose files. Every package under
 `scripts/homm2/` is one role, and the folder structure mirrors the command structure:
-`core/` (shared library — `paths`, `od_slots`), `analysis/` (`homm2 sema`), `permute/`
-(`homm2 permute`), `audit/` (`homm2 audit <tool>`), `match/`, `build/` (the always-on
-gates), `clean/` (`homm2 clean`), `format/`, `init/`, `ghidra/`. Provisioning lives in
+`core/` (shared library — `paths`, `manifest` the one flag-assembly truth, `coff` the
+one COFF/RES reader, `wine` the one tool layer, `od_slots`), `analysis/` (`homm2 sema`),
+`permute/` (`homm2 permute`), `audit/` (`homm2 audit <tool>`), `match/`, `build/` (the
+always-on gates; `build/configure/` generates build.ninja behind the root shim),
+`clean/` (`homm2 clean`), `format/`, `init/`, `ghidra/`. Provisioning lives in
 `scripts/toolchain/`, retired tooling in `scripts/archive/`.
 
 Tests live beside what they test; `homm2 selftest` runs them and asserts a case-count
