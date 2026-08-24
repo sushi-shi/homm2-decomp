@@ -710,7 +710,7 @@ SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	eed70427cac6
 SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	7f074fe59b5b
 SOURCE/DRAWING	?UpdateCombatArea@combatManager@@QAEXXZ	100.0000	20ff5a0212fc
 SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	100.0000	69a3c65a09c2
-SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	100.0000	1e868bc45bbe
+SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	100.0000	3ac71f95c7ce
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	c20735816846
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	833429ba7aa9
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	c8bc80a5499a
