@@ -1328,7 +1328,7 @@ SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	100.0000	9a90ffdf439a
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	82640c9237fc
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	100.0000	dd74e3783d21
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	fca0d109cc86
-SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	100.0000	4c9198d2f8f6
+SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	100.0000	dec06126ae38
 SOURCE/Wsnetwin	?wsnet_rcv@@YIFFGPAX@Z	100.0000	3e65b5a1a61f
 SOURCE/Wsnetwin	?wsnet_snd@@YIHHHPAX@Z	100.0000	c15f11ecc242
 SOURCE/Wsnetwin	?wsnet_term@@YIXXZ	100.0000	7f95220fee3f

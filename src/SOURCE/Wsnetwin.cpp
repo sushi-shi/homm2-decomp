@@ -161,7 +161,7 @@ i16 wsnet_init(void) {
         }
     } else {
     retryAddress:
-        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) != 0) {
+        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
             strcpy(cWSTextBuffer, gcTCPAddress);
             strcpy(gcTCPAddress, DATA_COMPGEN(0x004ed6bc, wsnetInitEmptyString, ""));
         } else {
