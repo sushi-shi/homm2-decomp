@@ -6533,8 +6533,9 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     static_cast<i16>(
                         rowYCurrent - GetIconEntry(monsterIconRef, creatureTypeId)->y
-                        - GetIconEntry(monsterIconRef, creatureTypeId)->h
-                        + ARMY_QUICK_ICON_BASELINE + ARMY_QUICK_SECOND_ROW_ICON_SHIFT
+                        + (ARMY_QUICK_ICON_BASELINE
+                           - GetIconEntry(monsterIconRef, creatureTypeId)->h)
+                        + ARMY_QUICK_SECOND_ROW_ICON_SHIFT
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,

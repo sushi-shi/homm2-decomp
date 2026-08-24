@@ -84,6 +84,14 @@ appendix; it is not the matching priority.
   at retail size with exact CFG and ordered 56/56 relocations. A complete
   306-cell arithmetic/state matrix proves Buka's sum order and five related
   commutative arms byte-neutral; the seven-byte residual stays open.
+- `HeroQuickView` adopts Buka's parenthesized second-row Y expression,
+  `+ (BASELINE - entry->h) + SECOND_ROW_SHIFT`. A complete 102-cell
+  source/state product restores retail size and the exact 101-block CFG;
+  forest/top seed 1213156658 trial 22 reaches 99.992600% with ordered 109/109
+  relocations. A follow-up 184-cell matrix proves Buka's two
+  `base + stride * index` forms and the loop-bound sum order byte-neutral under
+  VC4.2. The remaining 20 raw bytes are three compiler-state operand-load
+  islands; there is no version-logic difference in this function.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -467,7 +475,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `HeroQuickView` | 99.8681% | low-memory and quick-info structure |
 | `InitMenuHandler` | 99.8268% | exact Buka menu CFG |
 | `ControlPanel` | 99.8089% | small, high-confidence donor |
 | `ViewSpellsHandler` | 99.7841% | refresh path changed/clarified |
