@@ -4,49 +4,28 @@
 from __future__ import annotations
 
 import argparse
-import shutil
-import subprocess
 import sys
 from pathlib import Path
 
-from homm2.build.cc_wrap import (
-    ensure_wineserver,
-    find_ci,
-    msvc_dir,
-    winepath_w,
-)
+from homm2.core import wine
 
 
 def assemble(src: Path, out: Path) -> None:
-    toolchain = msvc_dir()
-    assembler = find_ci(toolchain / "bin", "ml.exe")
-    if assembler is None:
-        raise RuntimeError(
-            f"ML.EXE not found under {toolchain}/bin; rebuild or fetch the pinned toolchain")
-    if shutil.which("wine") is None:
-        raise RuntimeError("wine not found; run inside `nix develop .#build`")
-
+    assembler = wine.tool("ml.exe")
     src = src.resolve()
     out = out.resolve()
     if not src.is_file():
         raise RuntimeError(f"assembly source is missing: {src}")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.unlink(missing_ok=True)
-    ensure_wineserver()
-    result = subprocess.run(
-        ["wine", str(assembler), "/nologo", "/c",
-         f"/Fo{winepath_w(out)}", winepath_w(src)],
-        cwd=out.parent,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        encoding="latin1",
-    )
-    if result.returncode or not out.is_file():
-        detail = "\n".join(result.stdout.strip().splitlines()[-15:])
-        raise RuntimeError(
-            f"MASM 6.11 failed for {src.name} (exit {result.returncode})\n{detail}")
+    try:
+        wine.run(assembler, "/nologo", "/c",
+                 f"/Fo{wine.winepath_w(out)}", wine.winepath_w(src),
+                 cwd=out.parent, quiet=True)
+    except RuntimeError as error:
+        raise RuntimeError(f"MASM 6.11 failed for {src.name}: {error}") from error
+    if not out.is_file():
+        raise RuntimeError(f"MASM 6.11 produced no object for {src.name}")
 
 
 def main() -> None:

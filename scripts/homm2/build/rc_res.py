@@ -21,11 +21,11 @@ import hashlib
 import json
 import os
 import struct
-import subprocess
 import sys
 from pathlib import Path
 
 from homm2.build.extract_resources import read_pe_resources
+from homm2.core import wine
 from homm2.core.coff import read_res
 
 
@@ -115,20 +115,11 @@ def main(argv=None) -> int:
     extract_heroes_ico(retail, args.rc.parent / "heroes.ico")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.unlink(missing_ok=True)
-    env = dict(os.environ)
-    env.setdefault("WINEDEBUG", "fixme-all")
     out_relative = os.path.relpath(args.out.resolve(), args.rc.resolve().parent)
-    completed = subprocess.run(
-        ["wine", str(RC_EXE), "/r", "/fo", out_relative.replace("/", "\\"),
-         args.rc.name],
-        cwd=args.rc.parent,
-        env=env,
-        capture_output=True,
-        text=True,
-    )
-    if completed.returncode or not args.out.exists():
-        sys.stderr.write(completed.stdout + completed.stderr)
-        raise RuntimeError(f"era RC failed ({completed.returncode}) for {args.rc}")
+    wine.run(RC_EXE, "/r", "/fo", out_relative.replace("/", "\\"),
+             args.rc.name, cwd=args.rc.parent, quiet=True)
+    if not args.out.exists():
+        raise RuntimeError(f"era RC produced no output for {args.rc}")
 
     ours = parse_res(args.out.read_bytes())
     problems = compare(ours, retail)

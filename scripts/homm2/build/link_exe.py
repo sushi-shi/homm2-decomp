@@ -24,6 +24,7 @@ from pathlib import Path
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.extract_resources import read_pe_resources
 from homm2.build.reloc_owners import load_reviewed_highlow_sites
+from homm2.core import wine as _wine
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
@@ -195,16 +196,11 @@ def sibling_tool_identities(link_exe):
 
 
 def winepath_w(path):
-    return winepaths_w([path])[0]
+    return _wine.winepath_w(path)
 
 
 def winepaths_w(paths):
-    output = subprocess.check_output(
-        ["winepath", "-w", *(str(Path(path).resolve()) for path in paths)], text=True,
-        stderr=subprocess.DEVNULL).splitlines()
-    if len(output) != len(paths):
-        raise RuntimeError("winepath returned %d paths for %d inputs" % (len(output), len(paths)))
-    return output
+    return [_wine.winepath_w(path) for path in paths]
 
 
 def load_link_order(units_path=None, symbols_path=None):

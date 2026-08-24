@@ -22,9 +22,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import os
-import shutil
 import subprocess
 from pathlib import Path
+
+from homm2.core import wine
 
 from . import transforms
 from .crt_order import ninja_link_args
@@ -53,27 +54,6 @@ LINK_TIMES = (
 
 def relative(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
-
-
-def run(command: list[str], *, log: Path | None = None) -> None:
-    # The historical LINK_TIMES strings are UTC; faketime reads them in the
-    # ambient timezone, so pin TZ or the PE/PDB stamps shift with the machine.
-    completed = subprocess.run(
-        command,
-        cwd=ROOT,
-        text=True,
-        env={**os.environ, "TZ": "UTC0"},
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    if log is not None:
-        log.write_text(completed.stdout)
-    elif completed.stdout:
-        print(completed.stdout, end="")
-    if completed.returncode:
-        raise RuntimeError(
-            f"command failed ({completed.returncode}): {' '.join(command)}"
-        )
 
 
 def prepare_request() -> Path:
@@ -121,7 +101,7 @@ def rebuild_library_with_transforms(source_library: Path, expect: set[str]) -> P
         + " ".join(reversed(selected))
         + "\n"
     )
-    run(["wine", str(LIB_EXE), "@" + relative(response)])
+    wine.run(LIB_EXE, "@" + relative(response), cwd=ROOT)
     print(f"[link] {source_library.name}: transformed members {sorted(replaced)}")
     return output
 
@@ -238,9 +218,6 @@ def main() -> int:
     )
 
     if mode == "transform":
-        faketime = shutil.which("faketime")
-        if faketime is None:
-            raise RuntimeError("faketime is required; enter `nix develop .#build`")
         prepare_historical_pdb()
         output = LINK_ROOT / "HMM2PL.exe"
         map_path = LINK_ROOT / "HMM2PL.map"
@@ -250,9 +227,9 @@ def main() -> int:
         output.unlink(missing_ok=True)
         map_path.unlink(missing_ok=True)
         for iteration, timestamp in enumerate(LINK_TIMES, 1):
-            run(
-                [faketime, "-f", timestamp, "wine", str(LINK_EXE),
-                 "@" + relative(response)],
+            wine.run(
+                LINK_EXE, "@" + relative(response),
+                cwd=ROOT, faketime_spec=timestamp,
                 log=LINK_ROOT / f"HMM2PL.link-{iteration}.log",
             )
         digest = hashlib.sha256(output.read_bytes()).hexdigest()
@@ -273,8 +250,8 @@ def main() -> int:
     response.write_text(" ".join(prefix + inputs) + "\n")
     output.unlink(missing_ok=True)
     map_path.unlink(missing_ok=True)
-    run(["wine", str(LINK_EXE), "@" + relative(response)],
-        log=mode_root / "HMM2PL.link.log")
+    wine.run(LINK_EXE, "@" + relative(response),
+             cwd=ROOT, log=mode_root / "HMM2PL.link.log")
     if not output.exists():
         raise RuntimeError(f"{mode} LINK produced no executable; see {mode_root}/HMM2PL.link.log")
     digest = hashlib.sha256(output.read_bytes()).hexdigest()
