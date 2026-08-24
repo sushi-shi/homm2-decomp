@@ -682,8 +682,6 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_CASTLE:
                 if (gpGame->GetTown(destinationCell_j->m_objectMetadata)->m_owner != giCurPlayer
                     && gpGame->GetTown(destinationCell_j->m_objectMetadata)->HasGarrison()) {
-
-                stoppingEvent:
                     StopCursor(1);
                     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
                     UpdateScreen(0, 0);
@@ -699,6 +697,7 @@ mapCell* advManager::MoveHero(
 
             default:
                 if (StopOnTrigger(destinationCell_j)) {
+                stoppingEvent:
                     StopCursor(1);
                     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
                     UpdateScreen(0, 0);
@@ -783,8 +782,8 @@ mapCell* advManager::MoveHero(
                 m_updateMinX = 0;
                 m_updateMinY = 0;
             } else {
-                m_updateMinX += pixelsPerStep_o * directionX_b;
-                m_updateMinY += pixelsPerStep_o * directionY_b;
+                m_updateMinX += directionX_b * pixelsPerStep_o;
+                m_updateMinY += directionY_b * pixelsPerStep_o;
             }
             if (ComboDraw(0)) {
                 giLimitUpdMinX = -1;
@@ -856,7 +855,9 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_BARROW_MOUNDS:
                 eventCell_g = NULL;
         }
+        goto movementDone;
     }
+    goto movementDone;
 
 movementDone:
     UpdateRadar(1, 1);
@@ -865,21 +866,18 @@ movementDone:
         if (movingHero_f->m_x != oldHeroX_b || movingHero_f->m_y != oldHeroY_b) {
             if (mapExtra[movingHero_f->m_y * MAP_WIDTH + movingHero_f->m_x]
                 & IDX(MAP_EXTRA_ADJACENT_MONSTER)) {
-                if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                } else {
-                    if (!eventCell_g)
-                        goto checkAdjacent;
-                    if ((eventCell_g->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_BOAT) {
-                    } else {
-                    checkAdjacent:
-                        CheckAdjacentMon(adjacentMonster);
-                        if (movingHero_f->m_owner != giCurPlayer)
-                            eventCell_g = NULL;
-                    }
-                }
+                if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED))
+                    goto adjacentDone;
+                if (eventCell_g
+                    && (eventCell_g->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_BOAT)
+                    goto adjacentDone;
+                CheckAdjacentMon(adjacentMonster);
+                if (movingHero_f->m_owner != giCurPlayer)
+                    eventCell_g = NULL;
             }
         }
     }
+adjacentDone:
     if (gbThisNetHumanPlayer[giCurPlayer])
         SetNoDialogMenus(1);
 
