@@ -329,6 +329,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   positions, reads a sample handle, and clears the request at exit. Buka has
   none of those removed fields/paths: it returns on zero fade steps and wraps
   only the positive-fade Audiere/Miles body. Do not port this flow to 2.0.
+- **[Buka] `soundManager::SetMusicQuality` restarts the selected backend.**
+  After storing `gConfig.musicSource`, Buka re-reads it, starts Audiere or
+  Miles, then replays the previous track. PoL keeps CD and MIDI initialized
+  and only replays the track. Do not port the restart tail to 2.0.
 - **[2.1?/unclassified] `bitmap` ctor/dtor rewrite** (`BASE/BITMAP`): the
   ctors allocate with plain `new` under /GX (EH-framed), the dtor `delete`s
   and null-checks; `CopyTo`/`CopyToCareful` bodies differ substantially from
