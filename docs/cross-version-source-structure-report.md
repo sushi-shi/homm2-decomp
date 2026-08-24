@@ -118,6 +118,14 @@ appendix; it is not the matching priority.
   runtime true-test, while VC4.2 folds it. The clean PoL maximum remains
   99.759900% at 7864/7882 bytes and 270/270 relocations; its residual is not
   evidence for this Buka-only compiler/source switch.
+- `combatManager::ChainLightning` recovers Buka's use of the otherwise-dead
+  `firstBolt` local. A complete 16-arm product covers the angle argument,
+  force-angle CFG and both timing-product orders. The retained equal-arm angle
+  ternaries use PoL's existing constants and keep the normalized build live
+  exact at 865 bytes, 23/23 blocks and ordered 37/37 relocations. Buka's two
+  extra equal-valued enum declarations are not transferred: their header-level
+  VC4.2 state change regresses the raw object to 99.98%. The other three source
+  dimensions are byte-neutral and remain in their retail-specific forms.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte

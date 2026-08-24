@@ -718,7 +718,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	99.9684	74eb5ac92014
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.6676	fdefe5d735d0
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	052eb1c94421
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.7763	87339af58699
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.7877	87339af58699
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	a731a8bfe270
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	44fb82106f8e
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	95ceaec63cd1
@@ -763,7 +763,7 @@ SOURCE/FINDPATH	?Init@searchArray@@QAEXXZ	100.0000	f2ad7804452f
 SOURCE/FINDPATH	?PushCombatPoint@searchArray@@QAEXHHHH@Z	96.0638	6d282259b7c1
 SOURCE/FINDPATH	?PushPoint@searchArray@@QAEXHHHHHHHHHHHH@Z	96.1720	4a5da17a9cb1
 SOURCE/FINDPATH	?QuickDistance@searchArray@@QAEHHHHH@Z	100.0000	9225b0360239
-SOURCE/FINDPATH	?SeedCombatPosition@searchArray@@QAEXPAVarmy@@@Z	97.6013	6ed85dd1bb4e
+SOURCE/FINDPATH	?SeedCombatPosition@searchArray@@QAEXPAVarmy@@@Z	99.3987	6ed85dd1bb4e
 SOURCE/FINDPATH	?TestPossibleDirections@searchArray@@QAEXHHQAC0HH@Z	94.9253	8cea9840b0a0
 SOURCE/FLY	?CanFit@army@@QAEHHHPAH@Z	100.0000	81c7cf3d9b5c
 SOURCE/FLY	?FlyTo@army@@QAEHH@Z	99.7503	cc184d02d673
@@ -1204,7 +1204,7 @@ SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	03be6c576e52
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	4f7ce9e0410d
 SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	99.8963	b6c4dd4b86a1
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	a4d6ebd8f1a4
-SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6288	1cf560e3f8d0
+SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6294	1cf560e3f8d0
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	5b33d8bad638
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	08f23e411ff2
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	100.0000	4fca16d8e274
@@ -1220,7 +1220,7 @@ SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	3edef7df
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	d968a1690475
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	99.7599	ede675b6e572
-SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	100.0000	8b1dc06f496a
+SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	100.0000	dfb7751a0add
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	a2360f525f06
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	100.0000	368b5b94227f
