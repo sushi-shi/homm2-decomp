@@ -10766,8 +10766,8 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
         if (crystalHero->HasArtifact(ARTIFACT_CRYSTAL_BALL)) {
             range = static_cast<i32>(sqrt(
                 static_cast<double>(
-                    (crystalHero->m_y - y) * (crystalHero->m_y - y)
-                    + (crystalHero->m_x - x) * (crystalHero->m_x - x)
+                    (crystalHero->m_x - x) * (crystalHero->m_x - x)
+                    + (crystalHero->m_y - y) * (crystalHero->m_y - y)
                 )
             ));
             if (range <= radius) {
