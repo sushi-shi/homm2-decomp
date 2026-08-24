@@ -24,23 +24,27 @@ result, and therefore still requires ordinary code review and play-testing.
 ## Repository branches
 
 ```text
-decomp-pol-2.0
-    |
-    +------------------+-------------------+
-    |                  |                   |
-source-pol-2.0     classic-pol-2.0     decomp-gold-2.1-buka (you are here)
-    |
-master-pol-2.0
-    |
-ironfist-pol-2.0
+decomp-pol-2.0 -------------------> decomp-gold-2.1-buka (you are here)
+    |                                   |
+    +------------------+                +------------------------+
+    |                  |                |                        |
+    v                  v                v                        v
+source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
+    |                                   |
+    +-----------------+-----------------+
+                      |
+                      v
+                    master --------> ironfist
 ```
 
 - `decomp-gold-2.1-buka` — this branch: the Gold 2.1/Buka reconstruction.
 - `decomp-pol-2.0` — the Price of Loyalty reconstruction; cross-reference for
   names and semantics, never byte evidence here.
-- `source-pol-2.0` / `classic-pol-2.0` — generated source-only trees.
-- `master-pol-2.0` — the cross-platform Linux/Windows/Web port.
-- `ironfist-pol-2.0` — Project Ironfist applied to the reconstructed source.
+- `source-pol-2.0` / `classic-pol-2.0` — generated PoL source-only trees.
+- `source-gold-2.1-buka` / `classic-gold-2.1-buka` — generated Gold/Buka
+  source-only trees; the clean source branch is the primary base of `master`.
+- `master` — the cross-platform Linux/Windows/Web port.
+- `ironfist` — Project Ironfist applied to the reconstructed source.
 
 <!-- match-score:start -->
 ## Match status
