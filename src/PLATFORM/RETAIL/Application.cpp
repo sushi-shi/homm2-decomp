@@ -6,7 +6,6 @@
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
-#include <BASE/soundmgr.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Entry.h>
