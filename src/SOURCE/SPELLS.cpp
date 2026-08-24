@@ -2255,32 +2255,58 @@ void combatManager::DoBolt(
     i32 frameDelay,
     i32 brightenPalette
 ) {
+    i32 drawDistance6;
+    i32 allFinished7;
+    i32 drawPassCount18;
+    i32 branchChance14;
+    i32 deadline9;
+    palette* originalPalette8;
+    palette* effectPalette7;
+    i8* effectData36;
+    i32 boltIndex3;
+    SBolt* bolts3;
+    i32 extentPadding37;
+    i32 boltCount1;
+    i32 drawPass9;
+    i32 minY4;
+    i32 minX7;
+    i32 maxY3;
+    i32 maxX6;
+    i32 oldBoltCount5;
+    i32 remainingDistance36;
+    i32 branchSeparation9;
+    float branchAngle;
+    float currentAngle15;
+    i32 childDistance14;
+    i32 childX3;
+    i32 childY1;
+    i32 childWidth0;
+
     if (managePointer != 0)
         gpMouseManager->HideColorPointer();
 
-    i32 drawDistance = angleDistance;
-    i32 allFinished = 0;
-    i32 drawPassCount = (angleDistance - 1) / drawDistance + 1;
-    i32 branchChance = branchDistance * BOLT_ANGLE_PERCENT_SCALE / angleDistance;
-    i32 deadline = KBTickCount();
+    drawDistance6 = angleDistance;
+    allFinished7 = 0;
+    drawPassCount18 = (angleDistance - 1) / drawDistance6 + 1;
+    branchChance14 = branchDistance * BOLT_ANGLE_PERCENT_SCALE / angleDistance;
+    deadline9 = KBTickCount();
     gpWindowManager->m_updateFlags = 0;
 
-    palette* originalPalette = NULL;
-    palette* effectPalette = NULL;
+    originalPalette8 = NULL;
+    effectPalette7 = NULL;
     if (brightenPalette != 0) {
-        originalPalette = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f04d8, doBoltKbPal, "kb.pal"));
-        effectPalette = new palette;
-        if (!effectPalette)
+        originalPalette8 = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f04d8, doBoltKbPal, "kb.pal"));
+        effectPalette7 = new palette;
+        if (!effectPalette7)
             MemError();
-        memcpy(effectPalette->Data(), originalPalette->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
-        i8* effectData = effectPalette->Data();
-        i32 component;
-        for (component = 0; component < SPELL_ARMAGEDDON_PALETTE_SIZE; ++component) {
-            effectData[component] += BOLT_PALETTE_BRIGHTEN_STEP;
-            if (effectData[component] > BOLT_PALETTE_COMPONENT_MAX)
-                effectData[component] = BOLT_PALETTE_COMPONENT_MAX;
+        memcpy(effectPalette7->Data(), originalPalette8->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
+        effectData36 = effectPalette7->Data();
+        for (boltIndex3 = 0; boltIndex3 < SPELL_ARMAGEDDON_PALETTE_SIZE; ++boltIndex3) {
+            effectData36[boltIndex3] += BOLT_PALETTE_BRIGHTEN_STEP;
+            if (effectData36[boltIndex3] > BOLT_PALETTE_COMPONENT_MAX)
+                effectData36[boltIndex3] = BOLT_PALETTE_COMPONENT_MAX;
         }
-        SetPalette(effectData, 1);
+        SetPalette(effectData36, 1);
     }
 
     if (endX < startX) {
@@ -2288,15 +2314,15 @@ void combatManager::DoBolt(
         maxAngle = -maxAngle;
     }
     if (maxAngle < minAngle) {
-        i32 savedAngle = maxAngle;
+        boltIndex3 = maxAngle;
         maxAngle = minAngle;
-        minAngle = savedAngle;
+        minAngle = boltIndex3;
     }
 
-    SBolt* bolts = new SBolt[BOLT_MAX_COUNT];
-    i32 extentPadding = (endWidth <= startWidth ? startWidth : endWidth) >> 1;
+    bolts3 = new SBolt[BOLT_MAX_COUNT];
+    extentPadding37 = (endWidth <= startWidth ? startWidth : endWidth) >> 1;
     AddBolt(
-        bolts,
+        bolts3,
         startX,
         startY,
         endX,
@@ -2311,126 +2337,123 @@ void combatManager::DoBolt(
         forceAngle
     );
 
-    i32 boltCount = 1;
-    while (allFinished == 0) {
-        i32 drawPass;
-        for (drawPass = 0; drawPass < drawPassCount; ++drawPass) {
-            allFinished = 1;
-            i32 minY = BOLT_EXTENT_SENTINEL;
-            i32 minX = minY;
-            i32 maxY = -1;
-            i32 maxX = maxY;
-            i32 boltIndex;
-            for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
-                if (bolts[boltIndex].finished == 0) {
-                    if (maxX < bolts[boltIndex].pixelX)
-                        maxX = bolts[boltIndex].pixelX;
-                    if (bolts[boltIndex].pixelX < minX)
-                        minX = bolts[boltIndex].pixelX;
-                    if (maxY < bolts[boltIndex].pixelY)
-                        maxY = bolts[boltIndex].pixelY;
-                    if (bolts[boltIndex].pixelY < minY)
-                        minY = bolts[boltIndex].pixelY;
-                    DrawBolt(&bolts[boltIndex], drawDistance);
-                    if (maxX < bolts[boltIndex].pixelX)
-                        maxX = bolts[boltIndex].pixelX;
-                    if (bolts[boltIndex].pixelX < minX)
-                        minX = bolts[boltIndex].pixelX;
-                    if (maxY < bolts[boltIndex].pixelY)
-                        maxY = bolts[boltIndex].pixelY;
-                    if (bolts[boltIndex].pixelY < minY)
-                        minY = bolts[boltIndex].pixelY;
+    boltCount1 = 1;
+    while (allFinished7 == 0) {
+        for (drawPass9 = 0; drawPass9 < drawPassCount18; ++drawPass9) {
+            allFinished7 = 1;
+            minY4 = BOLT_EXTENT_SENTINEL;
+            minX7 = minY4;
+            maxY3 = -1;
+            maxX6 = maxY3;
+            for (boltIndex3 = 0; boltIndex3 < boltCount1; ++boltIndex3) {
+                if (bolts3[boltIndex3].finished == 0) {
+                    if (maxX6 < bolts3[boltIndex3].pixelX)
+                        maxX6 = bolts3[boltIndex3].pixelX;
+                    if (bolts3[boltIndex3].pixelX < minX7)
+                        minX7 = bolts3[boltIndex3].pixelX;
+                    if (maxY3 < bolts3[boltIndex3].pixelY)
+                        maxY3 = bolts3[boltIndex3].pixelY;
+                    if (bolts3[boltIndex3].pixelY < minY4)
+                        minY4 = bolts3[boltIndex3].pixelY;
+                    DrawBolt(&bolts3[boltIndex3], drawDistance6);
+                    if (maxX6 < bolts3[boltIndex3].pixelX)
+                        maxX6 = bolts3[boltIndex3].pixelX;
+                    if (bolts3[boltIndex3].pixelX < minX7)
+                        minX7 = bolts3[boltIndex3].pixelX;
+                    if (maxY3 < bolts3[boltIndex3].pixelY)
+                        maxY3 = bolts3[boltIndex3].pixelY;
+                    if (bolts3[boltIndex3].pixelY < minY4)
+                        minY4 = bolts3[boltIndex3].pixelY;
                 }
             }
 
-            maxX += extentPadding;
-            minX -= extentPadding;
-            maxY += extentPadding;
-            minY -= extentPadding;
-            if (minX < 0)
-                minX = 0;
-            if (minY < 0)
-                minY = 0;
-            if (COMBAT_SCREEN_WIDTH - 1 < maxX)
-                maxX = COMBAT_SCREEN_WIDTH - 1;
-            if (COMBAT_AREA_HEIGHT - 1 < maxY)
-                maxY = COMBAT_AREA_HEIGHT - 1;
+            maxX6 += extentPadding37;
+            minX7 -= extentPadding37;
+            maxY3 += extentPadding37;
+            minY4 -= extentPadding37;
+            if (minX7 < 0)
+                minX7 = 0;
+            if (minY4 < 0)
+                minY4 = 0;
+            if (COMBAT_SCREEN_WIDTH - 1 < maxX6)
+                maxX6 = COMBAT_SCREEN_WIDTH - 1;
+            if (COMBAT_AREA_HEIGHT - 1 < maxY3)
+                maxY3 = COMBAT_AREA_HEIGHT - 1;
 
-            DelayTil(&deadline);
-            deadline = static_cast<i32>(
+            DelayTil(&deadline9);
+            deadline9 = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay
             );
             BlitBitmapToScreen(
                 gpWindowManager->m_screen,
-                minX,
-                minY,
-                maxX - minX + 1,
-                maxY - minY + 1,
-                minX,
-                minY
+                minX7,
+                minY4,
+                maxX6 - minX7 + 1,
+                maxY3 - minY4 + 1,
+                minX7,
+                minY4
             );
             PollSound();
 
-            for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
-                if (bolts[boltIndex].finished == 0)
-                    allFinished = 0;
+            for (boltIndex3 = 0; boltIndex3 < boltCount1; ++boltIndex3) {
+                if (bolts3[boltIndex3].finished == 0)
+                    allFinished7 = 0;
             }
-            if (allFinished != 0)
-                break;
+            if (allFinished7 != 0)
+                goto boltsDone;
 
             if (branchDistance != 0) {
-                i32 oldBoltCount = boltCount;
-                for (boltIndex = 0; boltIndex < oldBoltCount; ++boltIndex) {
-                    if (bolts[boltIndex].finished == 0) {
-                        i32 remainingDistance =
-                            abs(bolts[boltIndex].endX - bolts[boltIndex].pixelX)
-                            + abs(bolts[boltIndex].endY - bolts[boltIndex].pixelY);
-                        if (boltCount < BOLT_MAX_COUNT
+                oldBoltCount5 = boltCount1;
+                for (boltIndex3 = 0; boltIndex3 < oldBoltCount5; ++boltIndex3) {
+                    if (bolts3[boltIndex3].finished == 0) {
+                        remainingDistance36 =
+                            abs(bolts3[boltIndex3].endX - bolts3[boltIndex3].pixelX)
+                            + abs(bolts3[boltIndex3].endY - bolts3[boltIndex3].pixelY);
+                        if (boltCount1 < BOLT_MAX_COUNT
                             && angleDistance * BRANCH_MIN_REMAINING_DISTANCE_MULTIPLIER
-                                   < remainingDistance
-                            && Random(0, branchChance) < BOLT_BRANCH_PERCENT_LIMIT) {
-                            if (bolts[boltIndex].lastBranchX != 0) {
-                                i32 branchSeparation =
-                                    abs(bolts[boltIndex].lastBranchX - bolts[boltIndex].pixelX)
-                                    + abs(bolts[boltIndex].lastBranchY - bolts[boltIndex].pixelY);
-                                if (branchSeparation < branchDistance * BOLT_BRANCH_COOLDOWN_FACTOR)
-                                    goto skipBranch;
+                                   < remainingDistance36
+                            && Random(0, branchChance14) < BOLT_BRANCH_PERCENT_LIMIT) {
+                            if (bolts3[boltIndex3].lastBranchX != 0) {
+                                branchSeparation9 =
+                                    abs(bolts3[boltIndex3].lastBranchX - bolts3[boltIndex3].pixelX)
+                                    + abs(bolts3[boltIndex3].lastBranchY - bolts3[boltIndex3].pixelY);
+                                if (branchSeparation9 < branchDistance * BOLT_BRANCH_COOLDOWN_FACTOR)
+                                    continue;
                             }
-                            bolts[boltIndex].lastBranchX = bolts[boltIndex].pixelX;
-                            bolts[boltIndex].lastBranchY = bolts[boltIndex].pixelY;
-                            float branchAngle =
+                            bolts3[boltIndex3].lastBranchX = bolts3[boltIndex3].pixelX;
+                            bolts3[boltIndex3].lastBranchY = bolts3[boltIndex3].pixelY;
+                            branchAngle =
                                 static_cast<float>(
                                     Random(BOLT_BRANCH_RANDOM_LOW, BOLT_BRANCH_RANDOM_HIGH)
                                 )
                                 / IDX(BOLT_ANGLE_PERCENT_SCALE);
                             if (Random(0, 1) != 0)
                                 branchAngle = -branchAngle;
-                            float currentAngle = bolts[boltIndex].angle;
-                            float childAngle = branchAngle + currentAngle;
-                            i32 childDistance = Random(branchLength >> 1, branchLength);
-                            if ((remainingDistance >> 1) < childDistance)
-                                childDistance = remainingDistance >> 1;
-                            i32 childX = static_cast<i32>(
-                                sin(static_cast<double>(childAngle)) * childDistance
-                                + bolts[boltIndex].pixelX
+                            currentAngle15 = bolts3[boltIndex3].angle;
+                            currentAngle15 = currentAngle15 + branchAngle;
+                            childDistance14 = Random(branchLength >> 1, branchLength);
+                            if ((remainingDistance36 >> 1) < childDistance14)
+                                childDistance14 = remainingDistance36 >> 1;
+                            childX3 = static_cast<i32>(
+                                bolts3[boltIndex3].pixelX
+                                + childDistance14 * sin(static_cast<double>(currentAngle15))
                             );
-                            i32 childY = static_cast<i32>(
-                                cos(static_cast<double>(childAngle)) * childDistance
-                                + bolts[boltIndex].pixelY
+                            childY1 = static_cast<i32>(
+                                bolts3[boltIndex3].pixelY
+                                + childDistance14 * cos(static_cast<double>(currentAngle15))
                             );
-                            i32 childWidth;
-                            if (bolts[boltIndex].endWidth < bolts[boltIndex].startWidth)
-                                childWidth = bolts[boltIndex].width - 1;
+                            if (bolts3[boltIndex3].endWidth < bolts3[boltIndex3].startWidth)
+                                childWidth0 = bolts3[boltIndex3].width - 1;
                             else
-                                childWidth = bolts[boltIndex].width;
+                                childWidth0 = bolts3[boltIndex3].width;
                             AddBolt(
-                                &bolts[boltCount],
-                                bolts[boltIndex].pixelX,
-                                bolts[boltIndex].pixelY,
-                                childX,
-                                childY,
+                                &bolts3[boltCount1],
+                                bolts3[boltIndex3].pixelX,
+                                bolts3[boltIndex3].pixelY,
+                                childX3,
+                                childY1,
                                 branchDistance,
-                                childWidth,
+                                childWidth0,
                                 1,
                                 colorMode,
                                 static_cast<i32>(
@@ -2440,32 +2463,31 @@ void combatManager::DoBolt(
                                     maxAngle * BOLT_CHILD_ANGLE_SCALE + BOLT_CHILD_ANGLE_OFFSET
                                 ),
                                 angleDistance,
-                                bolts[boltIndex].forceAngle
+                                bolts3[boltIndex3].forceAngle
                             );
-                            ++boltCount;
+                            ++boltCount1;
                         }
                     }
-                skipBranch:;
                 }
             }
         }
 
-        i32 boltIndex;
-        for (boltIndex = 0; boltIndex < boltCount; ++boltIndex) {
-            if (bolts[boltIndex].finished == 0)
-                ResetBoltAngle(&bolts[boltIndex]);
+        for (boltIndex3 = 0; boltIndex3 < boltCount1; ++boltIndex3) {
+            if (bolts3[boltIndex3].finished == 0)
+                ResetBoltAngle(&bolts3[boltIndex3]);
         }
     }
 
-    delete[] bolts;
+boltsDone:
+    delete[] bolts3;
     if (managePointer != 0) {
         DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
         gpMouseManager->ShowColorPointer();
     }
     if (brightenPalette != 0) {
-        SetPalette(originalPalette->Data(), 1);
-        gpResourceManager->Dispose(originalPalette);
-        delete effectPalette;
+        SetPalette(originalPalette8->Data(), 1);
+        gpResourceManager->Dispose(originalPalette8);
+        delete effectPalette7;
     }
     gpWindowManager->m_updateFlags = 1;
 }
