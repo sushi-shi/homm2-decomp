@@ -758,6 +758,13 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `0x2` (`MESSAGE_MODIFIER_LEFT_SHIFT`): `andl $0x200, %ecx` at the
   `WIDGET_COMMAND_SELECT` arm of `CastleHandler` (0x25230). The whole
   castle-screen "quick info" path is therefore a right-click in this build.
+- **[Buka] `SmackManagerMain` replaces PoL's movie backend and low-memory
+  policy.** It saves/restores the sound backend, starts Miles when needed,
+  overrides/restores digital master volume, recognises `BUKA_CREDITS`, and
+  builds non-expansion movie paths from `gcRegCDRomPath + gcAnimPath`. PoL's
+  `gbLowMemory` preload suppression, network movie path, DirectSound choice and
+  `IVYPOL` palette extraction are absent. These are platform/version behavior;
+  do not backport them for 2.0 matching.
 - **[unclassified] `PlaySmacker` no longer runs the video speed test.** In the
   `gConfig.slowVideo == VIDEO_SPEED_TEST` branch retail clears the flag, calls
   `WritePrefs()`, stores `0` into one dword global and goes straight to the
