@@ -77,7 +77,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | heroWindowManager::Close head | wrap | guard-clause unwrap | ported invariant Buka guard/local scope; complete 102/102 matrix across clean + 50 forest/top states; every wrap and guard arm was exact at 69 bytes, 7 blocks, 1/1 reloc, with identical text and raw/normalized relocation hashes within all 51 paired states |
 | AiPrint head | wrap | guard-clause unwrap | ported invariant Buka guard; complete 102/102 matrix across clean + 50 forest/top states; every wrap and guard arm was exact at 108 bytes, 3 blocks, 7/7 relocs, with identical text and raw/normalized relocation hashes within all 51 paired states |
 | soundManager::AdjustSoundVolumes | n/a (Buka-era body) | `&&` split into guard + if | 2.1-only body, no 2.0 counterpart |
-| UpdateSystemOptionsMenu guard | (compare order unrecorded in PoL) | `hmnuApp != hmnuAdv` (reloc-pinned) | OPEN - check 2.0 bytes' operand order |
+| UpdateSystemOptionsMenu guard | `hmnuAdv != hmnuApp` | `hmnuApp != hmnuAdv` | ported invariant Buka order; canonical pre-change PoL object exact at 784 bytes, 50 blocks, 38/38 owner relocs; complete 102/102 matrix occupied a separate 99.747120% KB state orbit but paired both orders with identical text and raw/normalized relocation hashes in all 51 states |
 | ws/dpWaitForExtraGuests first compare | `iWSLastMsg... != giNum...` | `giNumHumanPlayers != i...LastMsg...` | OPEN (same check possible in 2.0) |
 | ws/dpnet_rcv first compare | `Tail == Head` | `Head == Tail` | OPEN |
 | REQUEST GetMapHeader CRT calls | n/a | `open/read/close` (oldnames) | matches 2.0 house style; uncontroversial |
