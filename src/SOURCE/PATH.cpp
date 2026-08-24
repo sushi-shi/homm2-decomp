@@ -96,20 +96,17 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
     i32 directionBitFlag;
     i32 attackHexNext;
 
-    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
-        blockedMaskValue = 0;
-    else
-        blockedMaskValue = SPECIAL_DIRECTION_MASK;
+    blockedMaskValue =
+        HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) ? 0 : SPECIAL_DIRECTION_MASK;
 
     directionBitFlag = 1;
 
-    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
-        directionCountNext = COMBAT_DIRECTION_COUNT;
-    else
-        directionCountNext = COMBAT_DIRECTION_ADJACENT_COUNT;
+    directionCountNext = HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
+                             ? COMBAT_DIRECTION_COUNT
+                             : COMBAT_DIRECTION_ADJACENT_COUNT;
 
     for (directionResult = COMBAT_DIRECTION_NORTHEAST;
-         directionCountNext > IDX(directionResult);
+         IDX(directionResult) < directionCountNext;
          directionResult++) {
         if (!ValidAttack(sourceHex, directionResult, targetMode, targetHex, &attackHexNext))
             blockedMaskValue |= directionBitFlag;
@@ -219,16 +216,14 @@ i32 army::ValidAttack(
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < static_cast<u32>(ARMY_FACING_RIGHT)
-                    ? COMBAT_DIRECTION_NORTHWEST
-                    : COMBAT_DIRECTION_NORTHEAST
+                m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_NORTHWEST
+                                             : COMBAT_DIRECTION_NORTHEAST
             );
         } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < static_cast<u32>(ARMY_FACING_RIGHT)
-                    ? COMBAT_DIRECTION_SOUTHWEST
-                    : COMBAT_DIRECTION_SOUTHEAST
+                m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_SOUTHWEST
+                                             : COMBAT_DIRECTION_SOUTHEAST
             );
         } else {
             switch (m_facing) {
@@ -260,12 +255,12 @@ i32 army::ValidAttack(
     occupantSide = gpCombatManager->m_hexCells[*attackHex].m_occupantSide;
     switch (targetMode) {
         case ARMY_ATTACK_TARGET_ASSIGNED:
-            if (m_targetSide == occupantSide
+            if (occupantSide == m_targetSide
                 && gpCombatManager->m_hexCells[*attackHex].m_occupantIndex == m_targetIndex)
                 return 1;
             break;
         case ARMY_ATTACK_TARGET_ENEMY:
-            if (OppositeCombatSide(gpCombatManager->m_currentSide) == occupantSide)
+            if (occupantSide == OppositeCombatSide(gpCombatManager->m_currentSide))
                 return 1;
             break;
         case ARMY_ATTACK_TARGET_OCCUPIED:
@@ -282,15 +277,11 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
         return ARMY_HEX_INVALID;
 
     if (direction == COMBAT_DIRECTION_WIDE_WEST) {
-        if (m_facing == ARMY_FACING_RIGHT)
-            direction = COMBAT_DIRECTION_NORTHWEST;
-        else
-            direction = COMBAT_DIRECTION_NORTHEAST;
+        direction = m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_NORTHWEST
+                                                  : COMBAT_DIRECTION_NORTHEAST;
     } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
-        if (m_facing == ARMY_FACING_RIGHT)
-            direction = COMBAT_DIRECTION_SOUTHWEST;
-        else
-            direction = COMBAT_DIRECTION_SOUTHEAST;
+        direction = m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_SOUTHWEST
+                                                  : COMBAT_DIRECTION_SOUTHEAST;
     }
 
     return gpCombatManager->m_adjacency[sourceHex][IDX(direction)];
