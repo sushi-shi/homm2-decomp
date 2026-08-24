@@ -3976,7 +3976,7 @@ void UpdateSystemOptionsMenu(void) {
         return;
     if (hmnuApp == NULL)
         return;
-    if (hmnuAdv != hmnuApp)
+    if (hmnuApp != hmnuAdv)
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)
