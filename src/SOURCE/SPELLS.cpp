@@ -3505,7 +3505,7 @@ void combatManager::Resurrect(
     oldQuantity_b = target_i->m_quantity;
     target_i->m_quantity += spellPower * RESURRECT_HIT_POINTS_PER_POWER
                             / target_i->m_monster.hitPoints;
-    if (target_i->m_initialQuantity < target_i->m_quantity)
+    if (target_i->m_quantity > target_i->m_initialQuantity)
         target_i->m_quantity = target_i->m_initialQuantity;
     if (spell == SPELL_RESURRECT)
         target_i->m_temporaryResurrectionQuantity += target_i->m_quantity - oldQuantity_b;
@@ -3536,7 +3536,7 @@ void combatManager::Resurrect(
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o];
                     m_hexCells[deadHex_k].m_occupantFrame =
                         m_hexCells[deadHex_k].m_deadOccupantFrames[index_o];
-                    if (m_hexCells[deadHex_k].m_deadOccupantCount == index_o + 1) {
+                    if (index_o + 1 == m_hexCells[deadHex_k].m_deadOccupantCount) {
                         m_hexCells[deadHex_k].m_deadOccupantSides[index_o] = COMBAT_SIDE_NONE;
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o] = COMBAT_HEX_EMPTY;
                     } else {
@@ -3606,12 +3606,11 @@ void combatManager::Resurrect(
                     target_i->m_animationFrame = 0;
                 } else {
                     target_i->m_animationFrame =
-                        target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1
-                                < RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
-                            ? target_i->m_frameInfo
-                                      .animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
-                                  - 1
-                            : RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o;
+                        RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
+                                < target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1
+                            ? RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
+                            : target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
+                                  - 1;
                 }
             }
             DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
