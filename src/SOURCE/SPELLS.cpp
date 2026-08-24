@@ -2689,8 +2689,8 @@ void combatManager::VaporizeCreature(
         if (phase11 == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         for (row9 = 0; row9 < rowCount; ++row9) {
-            gyModify[row9 * VAPORIZE_STRIPE_WIDTH + firstY8 + topOffset8] = VAPORIZE_MASKED;
-            gyModify[lastY11 + (row9 * -VAPORIZE_STRIPE_WIDTH - bottomOffset4)] = VAPORIZE_MASKED;
+            *(row9 * VAPORIZE_STRIPE_WIDTH + gyModify + topOffset8 + firstY8) = VAPORIZE_MASKED;
+            *(gyModify - row9 * VAPORIZE_STRIPE_WIDTH - bottomOffset4 + lastY11) = VAPORIZE_MASKED;
             gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
