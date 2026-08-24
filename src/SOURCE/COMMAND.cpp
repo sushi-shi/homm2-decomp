@@ -806,7 +806,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseY = message.payload.mouse.screenY;
     i32 unusedResult_14 = 0;
     i32 selectedHex_36;
-    tag_message pendingMessage;
+    tag_message pendingMessage_2;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -818,6 +818,9 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                     i32 helpIndex = -1;
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                        case CONTROL_MAIN_BUTTON:
+                            RightClick(m_selectedHex);
+                            break;
                         case CONTROL_ATTACK:
                             helpIndex = IDX(LONG_HELP_ATTACK);
                             break;
@@ -836,9 +839,6 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         case CONTROL_HELP_FOURTH:
                             helpIndex = IDX(LONG_HELP_CONTROLS);
                             break;
-                        case CONTROL_MAIN_BUTTON:
-                            RightClick(m_selectedHex);
-                            break;
                     }
                     if (helpIndex != -1) {
                         NormalDialog(
@@ -855,40 +855,40 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     }
                 }
-            } else {
-                switch (message.payload.widget.command) {
-                    case WIDGET_COMMAND_SELECT:
-                        switch (static_cast<CombatControlId>(message.payload.widget.id)) {
-                            case CONTROL_MAIN_BUTTON:
-                                DoCommand(m_currentCommand);
-                                break;
-                        }
-                        break;
-                    case WIDGET_COMMAND_DESELECT:
-                        switch (static_cast<CombatControlId>(message.payload.widget.id)) {
-                            case CONTROL_ATTACK:
-                                giNextAction = ACTION_DEFEND;
-                                break;
-                            case CONTROL_WAIT:
-                                giNextAction = ACTION_WAIT;
-                                break;
-                            case CONTROL_DISABLE_SELECTION:
-                                m_gridSelectionDisabled = 1;
-                                break;
-                            case CONTROL_SYSTEM_OPTIONS:
-                                CombatSystemOptions();
-                                break;
-                        }
-                        break;
-                }
+                break;
+            }
+            switch (message.payload.widget.command) {
+                case WIDGET_COMMAND_SELECT:
+                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                        case CONTROL_MAIN_BUTTON:
+                            DoCommand(m_currentCommand);
+                            break;
+                    }
+                    break;
+                case WIDGET_COMMAND_DESELECT:
+                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                        case CONTROL_DISABLE_SELECTION:
+                            m_gridSelectionDisabled = 1;
+                            break;
+                        case CONTROL_WAIT:
+                            giNextAction = ACTION_WAIT;
+                            break;
+                        case CONTROL_ATTACK:
+                            giNextAction = ACTION_DEFEND;
+                            break;
+                        case CONTROL_SYSTEM_OPTIONS:
+                            CombatSystemOptions();
+                            break;
+                    }
+                    break;
             }
             break;
 
         case MESSAGE_MOUSE_MOVE:
             if (m_gridSelectionDisabled != 0)
                 break;
-            pendingMessage = gpInputManager->PeekEvent();
-            if (pendingMessage.type == MESSAGE_MOUSE_MOVE)
+            pendingMessage_2 = gpInputManager->PeekEvent();
+            if (pendingMessage_2.type == MESSAGE_MOUSE_MOVE)
                 break;
             if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
                 != 0)
@@ -899,7 +899,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             UpdateMouseGrid(selectedHex_36, 0);
             if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
                 != 0) {
-                if (m_selectedHex != selectedHex_36
+                if (selectedHex_36 != m_selectedHex
                     || selectedHex_36 == INVALID_HEX) {
                     m_selectedHex = selectedHex_36;
                     m_previousCommand = COMBAT_INVALID_COMMAND;
@@ -916,7 +916,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                     CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                 }
-                if (m_previousCommand != m_currentCommand) {
+                if (m_currentCommand != m_previousCommand) {
                     m_previousCommand = m_currentCommand;
                     CombatMessage(m_currentCommand);
                 }
