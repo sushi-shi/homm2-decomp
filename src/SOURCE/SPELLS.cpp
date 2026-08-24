@@ -3679,6 +3679,26 @@ void combatManager::ModifyDamageForArtifacts(
 
 VA(0x00429ae0, 0x931)
 void combatManager::Earthquake(void) {
+    i32 pass;
+    i32 frame5;
+    i32 deadline3;
+    i32 width0;
+    i32 height8;
+    u8* source9;
+    i32 destinationX37;
+    i32 destinationY5;
+    u8* destination28;
+    i32 row5;
+    CombatCastleWallState newWallStates9[EARTHQUAKE_STRUCTURE_COUNT];
+    CombatCastleWallState newTowerStates15[EARTHQUAKE_STRUCTURE_COUNT];
+    i32 impactPositions2[EARTHQUAKE_MAX_IMPACTS][IDX(COORDINATE_AXIS_COUNT)];
+    i32 impactCount4;
+    i32 structure7;
+    CombatDrawbridgeState newKeepState;
+    i32 impactDelay9[EARTHQUAKE_MAX_IMPACTS];
+    icon* cloudIcon;
+    i32 impact;
+
     // Retail screen-shake trajectory; each row is an ordered x/y displacement.
     // NOLINTBEGIN(readability-magic-numbers)
     i32 shakeOffsets[EARTHQUAKE_SHAKE_FRAME_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {
@@ -3698,6 +3718,8 @@ void combatManager::Earthquake(void) {
         {-2, -3},
         {0, 0}
     };
+    i32 unusedQuakeA1;
+    i32 unusedQuakeB6;
     // NOLINTEND(readability-magic-numbers)
 
     gpMouseManager->HideColorPointer();
@@ -3706,45 +3728,42 @@ void combatManager::Earthquake(void) {
         gpWindowManager->m_screen->m_pixels,
         COMBAT_SCREEN_WIDTH * COMBAT_AREA_HEIGHT
     );
-    i32 pass;
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
-        i32 frame;
-        for (frame = 0; frame < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame) {
-            i32 deadline = static_cast<i32>(
+        for (frame5 = 0; frame5 < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame5) {
+            deadline3 = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
             );
             PollSound();
-            i32 width =
+            width0 =
                 COMBAT_SCREEN_WIDTH
-                - abs(shakeOffsets[frame][IDX(COORDINATE_AXIS_X)]);
-            i32 height =
+                - abs(shakeOffsets[frame5][IDX(COORDINATE_AXIS_X)]);
+            height8 =
                 COMBAT_AREA_HEIGHT
-                - abs(shakeOffsets[frame][IDX(COORDINATE_AXIS_Y)])
+                - abs(shakeOffsets[frame5][IDX(COORDINATE_AXIS_Y)])
                 - 1;
-            u8* source =
+            source9 =
                 m_backgroundBuffer->m_pixels
-                + (shakeOffsets[frame][IDX(COORDINATE_AXIS_Y)] > 0
-                       ? shakeOffsets[frame][IDX(COORDINATE_AXIS_Y)]
+                + (shakeOffsets[frame5][IDX(COORDINATE_AXIS_Y)] > 0
+                       ? shakeOffsets[frame5][IDX(COORDINATE_AXIS_Y)]
                        : 0)
                       * COMBAT_SCREEN_WIDTH
-                + (shakeOffsets[frame][IDX(COORDINATE_AXIS_X)] > 0
-                       ? shakeOffsets[frame][IDX(COORDINATE_AXIS_X)]
+                + (shakeOffsets[frame5][IDX(COORDINATE_AXIS_X)] > 0
+                       ? shakeOffsets[frame5][IDX(COORDINATE_AXIS_X)]
                        : 0);
-            i32 destinationX =
-                shakeOffsets[frame][IDX(COORDINATE_AXIS_X)] <= 0
-                    ? -shakeOffsets[frame][IDX(COORDINATE_AXIS_X)]
+            destinationX37 =
+                shakeOffsets[frame5][IDX(COORDINATE_AXIS_X)] <= 0
+                    ? -shakeOffsets[frame5][IDX(COORDINATE_AXIS_X)]
                     : 0;
-            i32 destinationY =
-                shakeOffsets[frame][IDX(COORDINATE_AXIS_Y)] <= 0
-                    ? -shakeOffsets[frame][IDX(COORDINATE_AXIS_Y)]
+            destinationY5 =
+                shakeOffsets[frame5][IDX(COORDINATE_AXIS_Y)] <= 0
+                    ? -shakeOffsets[frame5][IDX(COORDINATE_AXIS_Y)]
                     : 0;
-            u8* destination = gpWindowManager->m_screen->m_pixels
-                              + destinationY * COMBAT_SCREEN_WIDTH + destinationX;
-            i32 row;
-            for (row = 0; height > row; ++row) {
-                memcpy(destination, source, width);
-                source += COMBAT_SCREEN_WIDTH;
-                destination += COMBAT_SCREEN_WIDTH;
+            destination28 = gpWindowManager->m_screen->m_pixels
+                            + destinationY5 * COMBAT_SCREEN_WIDTH + destinationX37;
+            for (row5 = 0; height8 > row5; ++row5) {
+                memcpy(destination28, source9, width0);
+                source9 += COMBAT_SCREEN_WIDTH;
+                destination28 += COMBAT_SCREEN_WIDTH;
             }
             BlitBitmapToScreen(
                 gpWindowManager->m_screen,
@@ -3755,100 +3774,93 @@ void combatManager::Earthquake(void) {
                 0,
                 0
             );
-            DelayTil(&deadline);
+            DelayTil(&deadline3);
         }
     }
     m_backgroundDrawn = 0;
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
-    CombatCastleWallState newWallStates[EARTHQUAKE_STRUCTURE_COUNT];
-    CombatCastleWallState newTowerStates[EARTHQUAKE_STRUCTURE_COUNT];
-    i32 impactPositions[EARTHQUAKE_MAX_IMPACTS][IDX(COORDINATE_AXIS_COUNT)];
-    i32 impactCount = 0;
-    i32 structure;
-    for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
-        newWallStates[structure] = m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)];
-        if (m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+    impactCount4 = 0;
+    for (structure7 = 0; structure7 < EARTHQUAKE_STRUCTURE_COUNT; ++structure7) {
+        newWallStates9[structure7] = m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)];
+        if (m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                 != COMBAT_WALL_STATE_DESTROYED
-            && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+            && m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                    != COMBAT_WALL_STATE_SECTION_DESTROYED
             && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_WALL_HIT_CHANCE) {
-            ++newWallStates[structure];
-            if (m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+            ++newWallStates9[structure7];
+            if (m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                     != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_TOWER_STANDING
-                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED
-                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structure7 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DAMAGE_LAST
                 && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX)
                        < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
-                ++newWallStates[structure];
-            impactPositions[impactCount][IDX(COORDINATE_AXIS_X)] =
-                wallPos[structure][IDX(COORDINATE_AXIS_X)];
-            impactPositions[impactCount][IDX(COORDINATE_AXIS_Y)] =
-                wallPos[structure][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
-            ++impactCount;
-            if (newWallStates[structure] == COMBAT_WALL_STATE_DESTROYED
-                || newWallStates[structure] == COMBAT_WALL_STATE_SECTION_DESTROYED)
-                m_hexCells[iWallToHexCell[structure]].m_blocked = 0;
+                ++newWallStates9[structure7];
+            impactPositions2[impactCount4][IDX(COORDINATE_AXIS_X)] =
+                wallPos[structure7][IDX(COORDINATE_AXIS_X)];
+            impactPositions2[impactCount4][IDX(COORDINATE_AXIS_Y)] =
+                wallPos[structure7][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
+            ++impactCount4;
+            if (newWallStates9[structure7] == COMBAT_WALL_STATE_DESTROYED
+                || newWallStates9[structure7] == COMBAT_WALL_STATE_SECTION_DESTROYED)
+                m_hexCells[iWallToHexCell[structure7]].m_blocked = 0;
         }
 
-        newTowerStates[structure] = m_wallStates[structure];
-        if (m_wallStates[structure] != COMBAT_WALL_STATE_DESTROYED
+        newTowerStates15[structure7] = m_wallStates[structure7];
+        if (m_wallStates[structure7] != COMBAT_WALL_STATE_DESTROYED
             && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_TOWER_HIT_CHANCE) {
-            newTowerStates[structure] = COMBAT_WALL_STATE_DESTROYED;
-            impactPositions[impactCount][IDX(COORDINATE_AXIS_X)] =
-                towerPos[structure][IDX(COORDINATE_AXIS_X)];
-            impactPositions[impactCount][IDX(COORDINATE_AXIS_Y)] =
-                towerPos[structure][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
-            ++impactCount;
+            newTowerStates15[structure7] = COMBAT_WALL_STATE_DESTROYED;
+            impactPositions2[impactCount4][IDX(COORDINATE_AXIS_X)] =
+                towerPos[structure7][IDX(COORDINATE_AXIS_X)];
+            impactPositions2[impactCount4][IDX(COORDINATE_AXIS_Y)] =
+                towerPos[structure7][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
+            ++impactCount4;
         }
     }
 
-    CombatDrawbridgeState newKeepState = m_drawbridgeState;
+    newKeepState = m_drawbridgeState;
     if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN
         && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
         newKeepState = COMBAT_CASTLE_GATE_HIDDEN;
-        impactPositions[impactCount][IDX(COORDINATE_AXIS_X)] =
+        impactPositions2[impactCount4][IDX(COORDINATE_AXIS_X)] =
             towerPos[0][IDX(COORDINATE_AXIS_X)];
-        impactPositions[impactCount][IDX(COORDINATE_AXIS_Y)] =
+        impactPositions2[impactCount4][IDX(COORDINATE_AXIS_Y)] =
             towerPos[0][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
-        impactPositions[impactCount + 1][IDX(COORDINATE_AXIS_X)] =
+        ++impactCount4;
+        impactPositions2[impactCount4][IDX(COORDINATE_AXIS_X)] =
             towerPos[1][IDX(COORDINATE_AXIS_X)];
-        impactPositions[impactCount + 1][IDX(COORDINATE_AXIS_Y)] =
+        impactPositions2[impactCount4][IDX(COORDINATE_AXIS_Y)] =
             towerPos[1][IDX(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
-        impactCount += EARTHQUAKE_KEEP_IMPACT_COUNT;
+        ++impactCount4;
     }
 
-    i32 impactDelay[EARTHQUAKE_MAX_IMPACTS];
-    for (structure = 0; structure < EARTHQUAKE_MAX_IMPACTS; ++structure)
-        impactDelay[structure] = Random(0, EARTHQUAKE_MAX_IMPACT_DELAY);
+    for (structure7 = 0; structure7 < EARTHQUAKE_MAX_IMPACTS; ++structure7)
+        impactDelay9[structure7] = Random(0, EARTHQUAKE_MAX_IMPACT_DELAY);
     giMinExtentX = EARTHQUAKE_EXTENT_MIN_X;
     giMinExtentY = 0;
     giMaxExtentX = EARTHQUAKE_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
-    if (impactCount != 0) {
-        icon* cloudIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0714, cloudIconLichclodIcn, "lichclod.icn"));
-        i32 frame;
-        for (frame = 0; frame < EARTHQUAKE_CLOUD_FRAME_COUNT; ++frame) {
+    if (impactCount4 != 0) {
+        cloudIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0714, cloudIconLichclodIcn, "lichclod.icn"));
+        for (structure7 = 0; structure7 < EARTHQUAKE_CLOUD_FRAME_COUNT; ++structure7) {
             glTimers[1] = static_cast<i32>(
                 KBTickCount()
                 + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
             );
             DrawFrame(0, 0, 1, 0, 0, 1, 0);
-            i32 impact;
-            for (impact = 0; impact < impactCount; ++impact) {
-                i32 cloudFrame = frame - impactDelay[impact];
-                if (impactDelay[impact] <= frame
-                    && cloudFrame < EARTHQUAKE_CLOUD_VISIBLE_FRAME_COUNT) {
+            for (impact = 0; impact < impactCount4; ++impact) {
+                if (impactDelay9[impact] <= structure7
+                    && structure7 - impactDelay9[impact] < EARTHQUAKE_CLOUD_VISIBLE_FRAME_COUNT) {
                     IconToBitmap(
                         cloudIcon,
                         gpWindowManager->m_screen,
-                        impactPositions[impact][IDX(COORDINATE_AXIS_X)],
-                        impactPositions[impact][IDX(COORDINATE_AXIS_Y)],
-                        cloudFrame,
+                        impactPositions2[impact][IDX(COORDINATE_AXIS_X)],
+                        impactPositions2[impact][IDX(COORDINATE_AXIS_Y)],
+                        structure7 - impactDelay9[impact],
                         ICON_DRAW_CLIP,
                         0,
                         0,
@@ -3865,11 +3877,11 @@ void combatManager::Earthquake(void) {
                 giMaxExtentY - giMinExtentY + 1
             );
             DelayTil(&glTimers[1]);
-            if (frame == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
-                for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
-                    m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
-                        newWallStates[structure];
-                    m_wallStates[structure] = newTowerStates[structure];
+            if (structure7 == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
+                for (impact = 0; impact < EARTHQUAKE_STRUCTURE_COUNT; ++impact) {
+                    m_wallStates[impact + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
+                        newWallStates9[impact];
+                    m_wallStates[impact] = newTowerStates15[impact];
                 }
                 m_drawbridgeState = newKeepState;
             }

@@ -134,6 +134,14 @@ appendix; it is not the matching priority.
   Buka `>= 0` source guards neutral under VC4.2, so PoL keeps its comparisons.
   This is a matching-source transfer with no behavior change; army-address
   arithmetic and two comparison islands remain open.
+- `combatManager::Earthquake` adopts Buka's two keep-impact increments,
+  reused cloud-frame counter, function-scope declaration ownership and two
+  dead frame slots. PoL keeps its independently stronger named shake-pointer
+  family and uses VC4.2-specific local names recovered from retail EBP slots.
+  A complete 408-cell phase product and 102-cell scope/slot product lead to an
+  audited exact island at forest/top seed 1213156658 trial 3: 2353 bytes,
+  exact 69-block CFG and the complete ordered 62-relocation stream. This is
+  matching decomp only; spell behavior is unchanged.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
