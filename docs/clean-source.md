@@ -21,6 +21,7 @@ homm2 clean \
 homm2 clean \
   --classic-from ../source-gold-2.1-buka \
   --classic-encoding cp1251 \
+  --publish-parent decomp-gold-2.1-buka \
   --out build/classic-gold --publish classic-gold-2.1-buka  # readable Russian
 ```
 
@@ -106,6 +107,10 @@ generated branch or advances a branch whose tip already carries the generator
 provenance marker. It refuses dirty generated worktrees, stages only generated
 project files, and records unchanged output with an empty descendant commit
 instead of rewriting published history.
+
+`--publish-parent` decouples content provenance from branch ancestry. Classic
+trees are transformed from their clean source sibling but are anchored directly
+to the matching decompilation commit, preserving the documented branch graph.
 
 The verifier invokes the generated Ninja graph. All 95 translation units,
 including portable replacements for the two old inline-assembly units, must

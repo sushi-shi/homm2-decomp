@@ -599,6 +599,28 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
                 "# Generated source",
             )
 
+    def test_new_generated_branch_can_use_an_explicit_parent(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo, output = self.fixture_repo(Path(directory))
+            parent = git(repo, "rev-parse", "HEAD")
+            (repo / "decomp-only.txt").write_text("advanced matching tree\n")
+            git(repo, "add", "decomp-only.txt")
+            git(repo, "commit", "-m", "advance source")
+            source = git(repo, "rev-parse", "HEAD")
+
+            with mock.patch.object(clean_source, "REPO", repo):
+                clean_source.publish(
+                    output,
+                    "classic",
+                    full_tree=True,
+                    publish_parent=parent,
+                )
+
+            self.assertEqual(git(repo, "rev-parse", "classic^"), parent)
+            message = git(repo, "log", "-1", "--format=%B", "classic")
+            self.assertIn(f"Source-Commit: {source}", message)
+            self.assertIn(f"Publish-Parent: {parent}", message)
+
     def test_existing_generated_branch_merges_new_source_history(self):
         with tempfile.TemporaryDirectory() as directory:
             repo, output = self.fixture_repo(Path(directory))
