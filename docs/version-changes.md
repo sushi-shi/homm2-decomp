@@ -710,11 +710,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   folds the whole-case wrapper and both delay-product orders in every tested
   state, so it supplies no PoL matching evidence. See
   `docs/patterns/constant-true-case-guard.md`.
-- **[unclassified] `combatManager::ChainLightning` (0x9df96) passes both bolt
-  angle limits as `firstBolt ? A : A` ternaries whose arms are equal.** The
-  two `DoBolt` angle arguments are computed with `neg/sbb/and $0/add K` from
-  the `firstBolt` flag; the intended first-bolt/branch-bolt split exists in
-  the source and was neutralised by giving both arms the same value. See
+- **[matching decomp; 2.0 backport: source use only]
+  `combatManager::ChainLightning` (0x9df96) passes both bolt angle limits as
+  `firstBolt ? A : A` ternaries whose arms are equal.** PoL adopted the
+  otherwise-dead `firstBolt` read using its existing constants and remains
+  byte exact. Buka's two extra equal-valued enum names stay Buka-only because
+  importing their declarations perturbs VC4.2 raw bytes. See
   `docs/patterns/identical-arm-ternary.md`.
 - **[unclassified] `combatManager::MirrorImage` (0x9f7c0) skips six
   (facing, direction, sourcePart, distance) combinations.** Between computing
