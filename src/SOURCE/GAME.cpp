@@ -880,10 +880,10 @@ void ComputeUALoc(i32 player) {
             i32 tries = 0;
             while (
                 !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
-                  && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
-                  && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
-                  && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
-                  && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex]
+                  && gpGame->m_worldMap.GetCell(x, y)->m_triggerType == MAP_OBJECT_NONE
+                  && gpGame->m_worldMap.GetCell(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
+                  && gpGame->m_worldMap.GetCell(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE
+                  && giGroundToTerrain[gpGame->m_worldMap.GetCell(x, y)->m_terrainImageIndex]
                          != TERRAIN_WATER)
             ) {
                 tries++;
