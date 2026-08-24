@@ -411,11 +411,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `wordStart = curPos; wordWidth = width;` pair (retail's frame shows
   exactly two stores to the word-start slot and one to the word-width
   slot). Byte-exact 2026-08-05, whole function 0/4164 bytes differing.
-- **[Buka] Rainbow luck bonus applies before the clamps.**
-  `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
-  MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
-  applied it after, letting Rainbow push luck past MAXIMUM. Byte-pinned
-  (2026-08-03) - the reorder closed the whole function exact.
+- **[Buka; do not backport] `game::GetLuck`: Rainbow applies before clamps.**
+  2.0 order: clamps -> Battle Garb -> Rainbow. Buka order: Rainbow ->
+  clamps -> Battle Garb. At luck 3 with Rainbow (+2) and no Battle Garb,
+  2.0 returns 5; Buka returns 3. Both retail functions are exact (PoL
+  `0x80ff9`, 294 bytes; Buka `0x5bb52`, 292 bytes). A complete two-arm
+  VC4.2 matrix keeps the PoL order exact and scores the Buka order 74.9125%.
 - **[2.1?/unclassified] Combat hex validation tightened.** 2.0's
   `ValidHex` accepts hexes 0..125 (PoL byte-proven, `<= 125`); this image
   bounds the grid at `hex < COMBAT_HEX_COUNT` (117). Out-of-grid hexes
