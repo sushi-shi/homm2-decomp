@@ -27,7 +27,6 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
-| soundManager::MemorySample / AdjustMusicVolumes guards | one `\|\|` chain | separate `if (...) return;` statements, one per term | OPEN |
 | soundManager::StartupMilesBackend nAvgBytesPerSec | `(bits / 8) * sampleRate * channels` | `sampleRate * (bits / 8) * channels` - the imul destination register names the LEFT operand | OPEN |
 | MIDIIsPlaying guard polarity | `if (A && B && C && D) return status == 4; return false;` | `if (!A \|\| !B \|\| !C \|\| !D) return false; return status == 4;` - retail places the single `xor al,al` block BEFORE the true arm | OPEN |
 | playerData::NextHero local + hero compare | `current`; `m_heroIds[i] == m_currentHero` | `curHero`; `m_currentHero == m_heroIds[i]` | OPEN |
@@ -168,6 +167,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `soundManager::{AdjustMusicVolumes,MemorySample}` leading guards | **matching decomp; already retained** | Two complete two-arm clean VC4.2 products select exact-Buka's separate returns, already present in PoL. `AdjustMusicVolumes`: exact at 238 bytes and 18/18 CFG versus 86.120690%, 228 bytes for one `\|\|` guard. `MemorySample`: exact at 655 bytes and 28/28 CFG versus 95.783780%, 634 bytes combined. Relocation counts are unchanged within each product. Dossier: `docs/matching/soundManager-GuardClauses/buka-separate-returns.cpp` in PoL |
 | `soundManager::{Open,SetMusicQuality}` backend branch order | **matching decomp; already retained** | Two complete two-arm clean VC4.2 products select the exact-Buka/current-PoL non-MIDI-first order. `Open` is exact at 936 bytes and 30/30 CFG versus 99.544975% inverted; `SetMusicQuality` is exact at 227 bytes, 15/15 CFG, and ordered 8/8 relocations versus 92.033900% inverted. The shared branch orientation and per-arm previous-track assignment are already in PoL. Dossier: `docs/matching/soundManager-MusicBackendSelection/buka-branch-order.cpp` in PoL |
 | `soundManager::SetMusicQuality` backend restart tail | **logic/backend change; do not port** | Exact Buka stores and re-reads `gConfig.musicSource`, starts the newly selected Audiere/Miles backend, then replays the previous track. PoL's exact redbook/MIDI version keeps both backends initialized and only replays the track after the store. Logic documentation: `docs/version-changes.md`; same dossier as above |
 | `soundManager::PollSound` local family | **compiler/version-specific; no port** | Complete two-arm clean VC4.2 product keeps PoL's `volume/smp/delta/snap/now` family exact at 911 bytes, exact 46/46 CFG, and ordered 37/37 relocations. The Buka-derived shared order/names (`musicFadeStep/volume/delta/switchDelta`, with PoL-only `smp` retained) falls to 99.920560% at the same size/topology/count. Keep each compiler's frame. Dossier: `docs/matching/soundManager-PollSound/buka-locals-and-flow.cpp` in PoL |
