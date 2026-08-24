@@ -4985,11 +4985,11 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
             break;
         case PURCHASE_CREATURE:
             jb = IDX(gDwellingType[IDX(bhc.pTown->m_type)][bhc.what]);
-            if (bhc.pTown->m_garrison[bhc.what] < bhc.num)
+            if (bhc.num > bhc.pTown->m_garrison[bhc.what])
                 return 0;
             GetMonsterCost(CreatureType(jb), cost);
             for (idx = 0; idx < AI_PURCHASE_RESOURCE_COUNT; idx++)
-                if (cost[idx] * bhc.num > gpCurPlayer->m_resources[idx])
+                if (gpCurPlayer->m_resources[idx] < cost[idx] * bhc.num)
                     return 0;
             return 1;
     }
