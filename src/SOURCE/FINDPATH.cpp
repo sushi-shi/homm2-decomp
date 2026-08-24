@@ -573,45 +573,51 @@ VA(0x004a5800, 0x100)
 void searchArray::PushCombatPoint(
     i32 hex, H2_ENUM_PARAM(CombatHexDirection, i32) direction, i32 distance, i32 speed
 ) {
-    if (ValidHex(hex)) {
-        i32 low = 0;
-        i32 high = m_queueCount;
-        searchNode* cell;
-        if (speed <= 0 || distance <= speed) {
-            cell = &m_storage.nodes[hex];
-            if ((!cell->visited || distance < cell->distance)
-                && m_queueCount < SEARCH_QUEUE_CAPACITY) {
-                i32 middle;
-                searchNode* node;
+    i32 middle_a;
+    i32 high_c;
+    i32 low;
+    searchNode* node_e;
+    searchNode* cell;
 
-                for (;;) {
-                    middle = (low + high) / BINARY_SEARCH_MIDPOINT_DIVISOR;
-                    node = &m_queue[middle];
-                    if (high <= low)
-                        break;
-                    if (distance < node->distance)
-                        low = middle + 1;
-                    else
-                        high = middle;
-                }
-                if (middle < m_queueCount) {
-                    memmove(node + 1, node, (m_queueCount - middle) * sizeof(searchNode));
-                }
-                m_queueCount++;
-                if (m_maxQueueCount < m_queueCount)
-                    m_maxQueueCount = m_queueCount;
+    if (!ValidHex(hex))
+        return;
+    high_c = m_queueCount;
+    low = 0;
+    if (speed > 0 && distance > speed)
+        return;
 
-                node->x = static_cast<u8>(hex);
-                node->y = 0;
-                node->direction = static_cast<u8>(direction);
-                node->distance = static_cast<u16>(distance);
+    cell = &GetNode(hex, 0);
+    if (cell->visited && cell->distance <= distance)
+        return;
+    if (m_queueCount >= SEARCH_QUEUE_CAPACITY)
+        return;
 
-                cell->visited = 1;
-                cell->direction = static_cast<u8>(direction);
-                cell->distance = static_cast<u16>(distance);
-            }
-        }
+    for (;;) {
+        middle_a = (high_c + low) / BINARY_SEARCH_MIDPOINT_DIVISOR;
+        node_e = &m_queue[middle_a];
+        if (high_c <= low)
+            break;
+        if (distance < node_e->distance)
+            low = middle_a + 1;
+        else
+            high_c = middle_a;
     }
+
+    if (static_cast<u32>(middle_a) < m_queueCount) {
+        memmove(node_e + 1, node_e, (m_queueCount - middle_a) * sizeof(searchNode));
+    }
+    m_queueCount++;
+    if (m_queueCount > m_maxQueueCount)
+        m_maxQueueCount = m_queueCount;
+
+    node_e->x = static_cast<u8>(hex);
+    node_e->y = 0;
+    node_e->direction = static_cast<u8>(direction);
+    node_e->distance = static_cast<u16>(distance);
+
+    cell->visited = 1;
+    cell->direction = static_cast<u8>(direction);
+    cell->distance = static_cast<u16>(distance);
 }
 
 DATA(0x0052adc8) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
