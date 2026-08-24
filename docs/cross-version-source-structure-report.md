@@ -394,6 +394,22 @@ VC4.2 identifier buckets and regresses the bytes. Retain the PoL source. Buka's
 23-block/45-relocation form also carries VC6 and localized-data ownership, not
 a gameplay delta. See `docs/matching/SaveGame/`.
 
+### `SmackManagerMain`: version boundary, two compare islands
+
+| property | PoL result |
+|---|---|
+| RVA / size | `0x0000126d` / 4492 bytes (retail exact) |
+| CFG / relocations | exact 180/180 blocks; ordered 334/334 stream |
+| clean / retained MAX | 99.8352% / 99.8963% |
+| comparison search | 4 arms x 51 states x 2 seeds; 408/408 cells |
+
+Retain PoL's low-memory preload suppression, network movie path, DirectSound/MSS
+selection, and expansion palette extraction. Buka's backend save/restore,
+Miles startup, master-volume handling, CD-root paths and Buka-credits cases are
+version/platform logic, not reconstruction fixes. The two PoL global/local
+compare-load orientations remain a measured compiler-state residual. See
+`docs/matching/SmackManagerMain/`.
+
 ## Bugs and bug candidates exposed by the exact branch
 
 ### Confirmed reconstruction bug
@@ -451,7 +467,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `SmackManagerMain` | 99.8963% | removed speed-test/low-memory branches |
 | `HeroQuickView` | 99.8681% | low-memory and quick-info structure |
 | `InitMenuHandler` | 99.8268% | exact Buka menu CFG |
 | `ControlPanel` | 99.8089% | small, high-confidence donor |
