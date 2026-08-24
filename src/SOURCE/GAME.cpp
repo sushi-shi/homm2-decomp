@@ -5817,7 +5817,7 @@ void game::WaitForPlayer(char* text, i32 player) {
 // Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00481541, 0x104)
 i32 game::HasLateOverlay(i32 col, i32 row) {
-    mapCell* cell = WORLDMAP->Row(row) + col;
+    mapCell* cell = WORLDMAP->GetCell(col, row);
     if (cell->m_drawOverlayOnTop)
         return 1;
     mapCellExtra* extra;

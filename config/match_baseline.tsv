@@ -809,7 +809,7 @@ SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000	06f64fb66733
 SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	100.0000	f63a097a1ed0
 SOURCE/GAME	?GiveTroopsToNeutralTown@game@@QAEXH@Z	100.0000	476ca487c37f
 SOURCE/GAME	?GiveTroopsToNeutralTowns@game@@QAEXXZ	100.0000	9ddbc67ed8db
-SOURCE/GAME	?HasLateOverlay@game@@QAEHHH@Z	100.0000	8bdd6ba3aabe
+SOURCE/GAME	?HasLateOverlay@game@@QAEHHH@Z	100.0000	15ebf1de3a59
 SOURCE/GAME	?HasMobileHero@playerData@@QAEHXZ	100.0000	f37f428833ac
 SOURCE/GAME	?HasObjectTilesetIndex@game@@QAEHHHHH@Z	100.0000	8cca40a51089
 SOURCE/GAME	?HeroIDToHeroPos@game@@QAEHPAVplayerData@@H@Z	100.0000	ad23e1bf1d76
