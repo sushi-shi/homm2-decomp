@@ -350,54 +350,61 @@ void searchArray::TestPossibleDirections(
 
 VA(0x004a5200, 0x1ed)
 void searchArray::SeedCombatPosition(class army* unit) {
-    i32 hex;
+    i32 unused04;
+    army* enemy_a;
+    i32 unused0c;
+    i32 unused10_a;
+    i32 unused1c_g;
+    i32 unused18;
+    i32 index;
+    i32 unused28_o;
+    i32 hex_c;
+    i32 unused20_a;
 
-    for (hex = 0; hex < COMBAT_HEX_COUNT; hex++)
-        gpCombatManager->m_hexCells[hex].m_pathReachable = 0;
+    for (index = 0; index < COMBAT_HEX_COUNT; index++)
+        gpCombatManager->m_hexCells[index].m_pathReachable = 0;
 
     if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) != 0) {
-        for (hex = 0; hex < COMBAT_HEX_COUNT; hex++) {
-            if (unit->CanFit(hex, 0, NULL))
-                gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
+        for (index = 0; index < COMBAT_HEX_COUNT; index++) {
+            if (unit->CanFit(index, 0, NULL))
+                gpCombatManager->m_hexCells[index].m_pathReachable = 1;
         }
     } else {
-        for (hex = 0; hex < COMBAT_HEX_COUNT; hex++) {
-            if (unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX))
-                gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
+        for (index = 0; index < COMBAT_HEX_COUNT; index++) {
+            if (unit->ValidPath(index, ARMY_PATH_EXACT_TARGET_HEX))
+                gpCombatManager->m_hexCells[index].m_pathReachable = 1;
         }
     }
 
-    for (i32 index = 0;
+    for (index = 0;
          index < gpCombatManager->m_armyCount[IDX(OppositeCombatSide(unit->m_side))];
          index++) {
-        army* enemy =
-            &gpCombatManager->m_armies[IDX(OppositeCombatSide(unit->m_side))][index];
-        unit->m_targetSide = enemy->m_side;
-        unit->m_targetIndex = enemy->m_index;
-        hex = enemy->m_hex;
+        enemy_a = &gpCombatManager->m_armies[IDX(OppositeCombatSide(unit->m_side))][index];
+        unit->m_targetSide = enemy_a->m_side;
+        unit->m_targetIndex = enemy_a->m_index;
+        hex_c = enemy_a->m_hex;
 
-        if (unit->m_monster.speed <= 0
-            || unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
-                != ATTACK_MASK_SURROUNDED) {
-            if (unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1)
-                gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
-        } else {
-            gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
+        if (unit->m_monster.speed > 0
+            && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
+                   == ATTACK_MASK_SURROUNDED) {
+            gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
+        } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
+            gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
         }
 
-        if (HAS(enemy->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
-            hex = enemy->GetAdjacentCellIndex(
-                hex,
-                enemy->m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST
-                                                      : COMBAT_DIRECTION_WEST
+        if (HAS(enemy_a->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
+            hex_c = enemy_a->GetAdjacentCellIndex(
+                hex_c,
+                enemy_a->m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST
+                                                       : COMBAT_DIRECTION_WEST
             );
-            if ((unit->m_monster.speed > 0
-                 && unit->GetAttackMask(
-                        unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
-                    )
-                     == ATTACK_MASK_SURROUNDED)
-                || unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
-                gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
+            if (unit->m_monster.speed > 0
+                && unit->GetAttackMask(
+                       unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
+                   ) == ATTACK_MASK_SURROUNDED) {
+                gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
+            } else if (unit->ValidPath(hex_c, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
+                gpCombatManager->m_hexCells[hex_c].m_pathReachable = 1;
             }
         }
     }
