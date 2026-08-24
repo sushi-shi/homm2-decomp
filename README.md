@@ -27,24 +27,29 @@ not a byte-matching result, and therefore still requires ordinary code review an
 ## Repository branches
 
 ```text
-decomp-pol-2.0 (you are here)
-    |
-    +------------------+-------------------+
-    |                  |                   |
-source-pol-2.0     classic-pol-2.0     decomp-gold-2.1-buka
-    |
-master-pol-2.0
-    |
-ironfist-pol-2.0
+decomp-pol-2.0 (you are here) ----> decomp-gold-2.1-buka
+    |                                   |
+    +------------------+                +------------------------+
+    |                  |                |                        |
+    v                  v                v                        v
+source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
+    |                                   |
+    +-----------------+-----------------+
+                      |
+                      v
+                    master --------> ironfist
 ```
 
 - `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
   branches.
 - `source-pol-2.0` is generated from decomp with matching-only machinery removed.
 - `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
-- `master-pol-2.0` is the cross-platform Linux, Windows, and Web port.
-- `ironfist-pol-2.0` applies the Project Ironfist changes to the reconstructed source.
-- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction used for cross-reference.
+- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction and preferred
+  non-incrementally-linked retail target.
+- `source-gold-2.1-buka` is its generated clean source and the primary base of
+  `master`; `classic-gold-2.1-buka` preserves the legacy mangling model.
+- `master` is the cross-platform Linux, Windows, and Web port.
+- `ironfist` applies the Project Ironfist changes to the reconstructed source.
 
 <!-- match-score:start -->
 ## Match status

@@ -357,6 +357,9 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
         (repo / "scripts/homm2/clean/project/.gitignore").write_text(
             "/build/\n/result\n"
         )
+        (repo / "scripts/homm2/clean/project/README.md").write_text(
+            "# Generated source\n"
+        )
         (repo / "scripts/homm2/clean/project/run-game.sh").write_text("#!/bin/sh\n")
         return repo
 
@@ -432,6 +435,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             self.assertEqual((output / "flake.lock").read_text(), "{}\n")
             self.assertIn("outputs", (output / "flake.nix").read_text())
             self.assertIn("/result", (output / ".gitignore").read_text())
+            self.assertEqual((output / "README.md").read_text(), "# Generated source\n")
             self.assertTrue((output / "run-game.sh").stat().st_mode & 0o111)
             ninja = (output / "build.ninja").read_text()
             self.assertIn("cxx = clang++", ninja)
@@ -524,6 +528,7 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
         (output / "src/example.cpp").write_text("int generated_value;\n")
         (output / "imports/example.def").write_text("EXPORTS\n")
         (output / "build.ninja").write_text("build objects: phony\n")
+        (output / "README.md").write_text("# Generated source\n")
         return repo, output
 
     def test_publish_refuses_a_non_generated_branch(self):
@@ -554,6 +559,10 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
             self.assertEqual(
                 git(repo, "show", "clean:src/example.cpp"),
                 "int generated_value;",
+            )
+            self.assertEqual(
+                git(repo, "show", "clean:README.md"),
+                "# Generated source",
             )
 
     def test_existing_generated_branch_merges_new_source_history(self):
