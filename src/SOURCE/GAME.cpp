@@ -758,7 +758,7 @@ i32 playerData::NextHero(i32) {
 
     if (gpCurPlayer->m_currentHero != -1) {
         for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
-            if (gpCurPlayer->m_heroIds[i] == gpCurPlayer->m_currentHero)
+            if (gpCurPlayer->m_currentHero == gpCurPlayer->m_heroIds[i])
                 current = i;
         }
     }
