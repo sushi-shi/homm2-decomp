@@ -672,7 +672,7 @@ SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	100.0000	86dfac63a767
 SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	100.0000	7d7926fa8b01
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	515423a5c846
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	30a6f118b1fe
-SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	73090b5d579c
+SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	4f06de3aafca
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	47fa1e66459e
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	2f1e1c7d5503
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	6a74e5fe567f

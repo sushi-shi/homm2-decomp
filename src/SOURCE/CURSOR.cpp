@@ -181,9 +181,8 @@ void advManager::DrawCursor(void) {
             flagDrawn = 1;
         } else {
             if (m_cursorCycle == 0) {
-                drawFrame_f =
-                    m_updateMaxY % CURSOR_DIRECTION_COUNT
-                    + ((m_cursorFrame & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
+                drawFrame_f = (m_cursorFrame & CURSOR_FRAME_MASK)
+                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
             FlipIconToBitmap(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -257,9 +256,8 @@ void advManager::DrawCursor(void) {
             flagDrawn = 1;
         } else {
             if (m_cursorCycle == 0) {
-                drawFrame_f =
-                    m_updateMaxY % CURSOR_DIRECTION_COUNT
-                    + ((m_cursorFrame & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
+                drawFrame_f = (m_cursorFrame & CURSOR_FRAME_MASK)
+                            + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
             IconToBitmap(
                 m_flagIcons[gpCurPlayer->m_color],
