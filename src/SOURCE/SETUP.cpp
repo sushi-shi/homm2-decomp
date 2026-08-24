@@ -146,8 +146,8 @@ i32 game::SetupComPort(void) {
 
 VA(0x00411200, 0x238)
 i32 game::SetupHotSeatGame(void) {
-    char defaultName[DEFAULT_PLAYER_NAME_CAPACITY];
-    i32 ix;
+    i32 i;
+    char name[DEFAULT_PLAYER_NAME_CAPACITY];
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, DATA_COMPGEN(0x004ee304, windowStphotstBin, "stphotst.bin"));
     if (window == NULL)
@@ -175,17 +175,17 @@ i32 game::SetupHotSeatGame(void) {
             return 0;
     }
 
-    for (ix = 0; ix < PLAYER_COUNT; ix++)
-        strcpy(cPlayerNames[ix], DATA_COMPGEN(0x004ee314, setupHotSeatGameEmptyString, ""));
+    for (i = 0; i < PLAYER_COUNT; i++)
+        strcpy(cPlayerNames[i], DATA_COMPGEN(0x004ee314, setupHotSeatGameEmptyString, ""));
 
     if (giSetupGameType == 0) {
         sprintf(gText, DATA_COMPGEN(0x004ee318, setupHotSeatGameDoYouWishToEnterEach, "Do you wish to enter each player's name?"));
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
-            for (ix = 0; ix < giNumHumanPlayers; ix++) {
-                strcpy(defaultName, DATA_COMPGEN(0x004ee344, setupHotSeatGameEmptyString2, ""));
-                sprintf(gText, DATA_COMPGEN(0x004ee348, setupHotSeatGameEnterPlayerDSName, "Enter player %d's name."), ix + 1);
-                GetDataEntry(gText, cPlayerNames[ix], PLAYER_NAME_LENGTH, defaultName, 0, 1);
+            for (i = 0; i < giNumHumanPlayers; i++) {
+                strcpy(name, DATA_COMPGEN(0x004ee344, setupHotSeatGameEmptyString2, ""));
+                sprintf(gText, DATA_COMPGEN(0x004ee348, setupHotSeatGameEnterPlayerDSName, "Enter player %d's name."), i + 1);
+                GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
             }
         }
     }

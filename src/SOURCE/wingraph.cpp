@@ -528,7 +528,7 @@ void DDCleanUpWinGraphics(void) {
 VA(0x004366b0, 0x305)
 void DDSetFullScreenStatus(i32 fullScreen) {
     i32 width;
-    i32 windowHeight0;
+    i32 windowHeight;
     i32 x;
     i32 y;
     HRESULT result0;
@@ -541,7 +541,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         x = gConfig.gfx[IDX(giCurExe)].x;
         y = gConfig.gfx[IDX(giCurExe)].y;
         width = gConfig.gfx[IDX(giCurExe)].width;
-        windowHeight0 = gConfig.gfx[IDX(giCurExe)].height;
+        windowHeight = gConfig.gfx[IDX(giCurExe)].height;
         gbWinGraphBusy = true;
         gConfig.gfx[IDX(giCurExe)].fullScreen = fullScreen;
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
@@ -597,12 +597,12 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         gbWinGraphBusy = false;
         if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
             SetMenuStatus(1);
-            ResizeWindow(x, y, width, windowHeight0);
+            ResizeWindow(x, y, width, windowHeight);
         } else {
             gConfig.gfx[IDX(giCurExe)].x = x;
             gConfig.gfx[IDX(giCurExe)].y = y;
             gConfig.gfx[IDX(giCurExe)].width = width;
-            gConfig.gfx[IDX(giCurExe)].height = windowHeight0;
+            gConfig.gfx[IDX(giCurExe)].height = windowHeight;
         }
         SetupClipper();
     }

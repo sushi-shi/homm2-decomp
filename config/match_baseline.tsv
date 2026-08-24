@@ -1185,7 +1185,7 @@ SOURCE/SETUP	?SetupComPort@game@@QAEHXZ	100.0000	9bfc97f43fcf
 SOURCE/SETUP	?SetupComPortHandler@@YIHAAUtag_message@@@Z	100.0000	e512b6cf6764
 SOURCE/SETUP	?SetupGame@game@@QAEHXZ	100.0000	b7c8873b9c93
 SOURCE/SETUP	?SetupGameHandler@@YIHAAUtag_message@@@Z	100.0000	f99c88cb0af4
-SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	100.0000	78053006f359
+SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	100.0000	8045127078db
 SOURCE/SETUP	?SetupHotSeatGameHandler@@YIHAAUtag_message@@@Z	100.0000	d61daa7996df
 SOURCE/SETUP	?SetupModemGame@game@@QAEHXZ	100.0000	7643b1b766b8
 SOURCE/SETUP	?SetupModemGameHandler@@YIHAAUtag_message@@@Z	100.0000	76e851a42cc3
@@ -1448,7 +1448,7 @@ SOURCE/wingraph	?DDInitializePalette@@YIXXZ	100.0000	be428d2ea6e0
 SOURCE/wingraph	?DDQueryNewPalette@@YIHXZ	100.0000	a47adc430686
 SOURCE/wingraph	?DDRestoreDisplayMode@@YIXXZ	100.0000	47d8045bdcd0
 SOURCE/wingraph	?DDSD@@YIXHPADH@Z	100.0000	6c3d36352fe0
-SOURCE/wingraph	?DDSetFullScreenStatus@@YIXH@Z	100.0000	f16af4361df4
+SOURCE/wingraph	?DDSetFullScreenStatus@@YIXH@Z	100.0000	9f964b6706ce
 SOURCE/wingraph	?DDSetPalette@@YIHXZ	100.0000	14ea3c80f45b
 SOURCE/wingraph	?DDUpdatePalette@@YIXPAC@Z	100.0000	b87471ebfa1d
 SOURCE/wingraph	?DisconnectDLLs@@YIXXZ	100.0000	dd0acbd51e16
