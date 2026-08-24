@@ -1025,7 +1025,7 @@ SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	100.0000	8abf06a6d0c0
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	96.4662	dd2491936751
 SOURCE/Newgame	?InitNewGameWindow@game@@QAEXXZ	100.0000	9a817edb836c
 SOURCE/Newgame	?NGKPSetupDisplayString@game@@QAEXPADG@Z	100.0000	49a796d8bafa
-SOURCE/Newgame	?NewGame@game@@QAEHXZ	96.2465	94bd8a09abae
+SOURCE/Newgame	?NewGame@game@@QAEHXZ	96.2378	485d8e8346b1
 SOURCE/Newgame	?NewGameHandler@@YIHAAUtag_message@@@Z	97.3179	0ebc69f52884
 SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	100.0000	88a1544e9ca4
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	100.0000	267d76ee27a3

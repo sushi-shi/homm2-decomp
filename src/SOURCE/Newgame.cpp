@@ -534,9 +534,9 @@ i32 game::NewGame(void) {
                 m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
             }
             if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-                && _strcmpi(gpGame->m_mapFilename, DATA_COMPGEN(0x0051ceb4, newGameBrokenaMp22, "brokena.mp2")) == 0)
+                && strcmpi(gpGame->m_mapFilename, DATA_COMPGEN(0x0051ceb4, newGameBrokenaMp22, "brokena.mp2")) == 0)
                 strcpy(gpGame->m_mapFilename, DATA_COMPGEN(0x0051cec0, newGameSlugfestMp2, "slugfest.mp2"));
-            if (giNumHumanPlayers > 1 && _strcmpi(gpGame->m_mapFilename, DATA_COMPGEN(0x0051ced0, newGameArraxMx22, "arrax.mx2")) == 0)
+            if (giNumHumanPlayers > 1 && strcmpi(gpGame->m_mapFilename, DATA_COMPGEN(0x0051ced0, newGameArraxMx22, "arrax.mx2")) == 0)
                 strcpy(gpGame->m_mapFilename, DATA_COMPGEN(0x0051cedc, newGameFullhseMx2, "fullhse.mx2"));
 
             strcpy(gMapName, m_mapFilename);
