@@ -27,7 +27,6 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
-| combatManager::DoBlast segment loop | `segmentCount > segment` | counter-first `segment_h < segmentCount9` | OPEN - FP factor resolved separately; same loop class as combatManager::Main; slot residual now CLOSED, fn EXACT |
 | heroWindow::MoveWindow clamp sums | `m_winWidth + newX`; `m_winHeight + newY` | `newX + m_winWidth`; `newY + m_winHeight` | OPEN - slot 6-perm residual parked (no symmetric rename satisfies newX<newY<=oldH<=oldX<oldY<oldW) |
 | army::LoadResources dead locals + loopCount | eight `unusedLoadWord*` decls; `loopCount = 1` | no dead locals (frame 0x08); `loopCount = 0` | OPEN - loopCount is VALUE-LEVEL (see version-changes) |
 | swapManager::SplitMons type compare | `selectedArmy->types[selSlot] == targetArmy->types[tgtSlot]` | target-first mirror | OPEN |
@@ -162,6 +161,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `combatManager::DoBlast` segment loop | **invariant; source port** | Complete two-arm clean VC4.2 product proves count-first and exact-Buka counter-first conditions emit one 99.938324%, 826-byte probe object with exact 23/23 CFG and 50/50 relocation count. PoL adopts Buka source. Final normal build is 99.98% with exact CFG, agreeing symbolic branch sequence, and focused 50/50 relocations; the small live compiler-state residual is shared and unrelated. No gameplay change. Dossier: `docs/matching/combatManager-DoBlast/buka-segment-loop.cpp` in PoL |
 | `textWidget::textWidget(void)` store order | **matching decomp; already retained** | Complete two-arm clean VC4.2 product keeps exact-Buka/current-PoL `font,text,color,alignment,kind` exact at 62 bytes, one block, and ordered 2/2 relocations. Historical PoL `color,alignment,font,text,kind` falls to 97.368420% at the same size/count. No source edit required. Dossier: `docs/matching/WidgetDefaultConstructors/buka-store-orders.cpp` in PoL |
 | `dropListWidget::dropListWidget(void)` store order | **invariant; source port** | Complete two-arm clean VC4.2 product proves PoL's `items,savedBackground,itemCount,selectedIndex` and exact-Buka's `itemCount,items,selectedIndex,savedBackground` emit identical exact text: 59 bytes, one block, ordered 2/2 relocations. PoL adopts Buka order and remains exact after a normal build. No gameplay or shipped-byte change. Same dossier as above |
 | `playerData::NextHero` local + hero comparison | **mixed matching decomp; comparison port** | Complete 4/4 clean VC4.2 Cartesian product crosses `current`/`curHero` with both comparison orientations. Both `current` arms are exact at 301 bytes, 21/21 CFG, and ordered 11/11 relocations; both `curHero` arms are 99.756410% at the same size/topology/count. PoL adopts Buka's current-hero-first comparison and keeps its exact compiler-specific local name. No gameplay change. Dossier: `docs/matching/playerData-NextHero/buka-name-and-compare.cpp` in PoL |
