@@ -111,6 +111,13 @@ appendix; it is not the matching priority.
   product rejects Buka's top-page refresh behavior: it grows PoL from 1683 to
   1714 bytes, adds four relocations, and falls to 99.070270%. The extra
   `UpdateSpellWidgets`/`MoveWindow` calls remain a later behavior change.
+- `combatManager::CastSpell` does not adopt Buka's literal-true Magic Arrow
+  wrapper. A complete 204-cell product crosses the wrapper with Buka's delay-
+  product order over the clean state and 50 VC4.2 forest states; all four arms
+  are byte-identical within every state. Buka's VC6 `/Od` object preserves the
+  runtime true-test, while VC4.2 folds it. The clean PoL maximum remains
+  99.759900% at 7864/7882 bytes and 270/270 relocations; its residual is not
+  evidence for this Buka-only compiler/source switch.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
