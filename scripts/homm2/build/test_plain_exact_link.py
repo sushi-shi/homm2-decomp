@@ -1,4 +1,7 @@
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
 from homm2.build.exact_link import plain, transforms
 
@@ -19,6 +22,25 @@ REQUEST = plain.ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
 
 
 class PlainExactLinkTests(unittest.TestCase):
+    def test_request_layout_transform_is_confined_to_transform_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw = root / "build/objdiff/base/SOURCE/REQUEST.obj"
+            transformed = root / "build/link/bss-layout-all/SOURCE/REQUEST.obj"
+            raw.parent.mkdir(parents=True)
+            transformed.parent.mkdir(parents=True)
+            raw.write_bytes(b"raw")
+            transformed.write_bytes(b"transformed")
+            with (
+                mock.patch.object(plain, "ROOT", root),
+                mock.patch.object(plain, "LINK_ROOT", root / "build/link"),
+                mock.patch("subprocess.run") as run,
+            ):
+                self.assertEqual(plain.prepare_request(False), raw)
+                run.assert_not_called()
+                self.assertEqual(plain.prepare_request(True), transformed)
+                run.assert_called_once()
+
     def test_transform_inputs_swap_the_prepared_archives_and_keep_resources(self):
         result = plain.final_inputs(
             list(CONFIGURED), REQUEST,

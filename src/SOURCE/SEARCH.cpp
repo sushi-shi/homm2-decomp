@@ -11,11 +11,6 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
-struct cFRDummyStorageOwner {
-    static char storage[1];
-};
-DATA(0x00533d98) __declspec(selectany) char cFRDummyStorageOwner::storage[1] = {0};
-
 struct SeedPositionState {
     i32 hasTarget;
     i32 hasAdjacentMonster;

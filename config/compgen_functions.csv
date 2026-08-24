@@ -71,10 +71,10 @@ entry_rva,size,symbol,unit,source_object,evidence
 0x8d032,18,_$E18,SOURCE/RECRUIT,BASE/AudiereEffects,masked-exact
 0x8e6f5,39,_$E19,SOURCE/REMOTE,BASE/AudiereEffects,masked-exact
 0x8e71c,18,_$E18,SOURCE/REMOTE,BASE/AudiereEffects,masked-exact
-0x9167f,39,_$E20,SOURCE/REQUEST,BASE/AudiereEffects,masked-exact
-0x916a6,18,_$E19,SOURCE/REQUEST,BASE/AudiereEffects,masked-exact
-0x92498,39,_$E20,SOURCE/SEARCH,BASE/AudiereEffects,masked-exact
-0x924bf,18,_$E19,SOURCE/SEARCH,BASE/AudiereEffects,masked-exact
+0x9167f,39,_$E19,SOURCE/REQUEST,BASE/AudiereEffects,masked-exact
+0x916a6,18,_$E18,SOURCE/REQUEST,BASE/AudiereEffects,masked-exact
+0x92498,39,_$E19,SOURCE/SEARCH,BASE/AudiereEffects,masked-exact
+0x924bf,18,_$E18,SOURCE/SEARCH,BASE/AudiereEffects,masked-exact
 0x944fb,39,_$E19,SOURCE/SETUP,BASE/AudiereEffects,masked-exact
 0x94522,18,_$E18,SOURCE/SETUP,BASE/AudiereEffects,masked-exact
 0x95d5b,39,_$E19,SOURCE/SMACKMGR,SOURCE/SMACKMGR,masked-exact

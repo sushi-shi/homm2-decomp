@@ -228,26 +228,6 @@ GENERATED_PATCHES = {
             "m_ultimateArtifactId != ARTIFACT_NONE",
         ),
     ],
-    "src/SOURCE/REQUEST.cpp": [
-        (
-            Pattern.LITERAL, 1,
-            "struct cFRDummyStorageOwner {\n"
-            "    static char storage[1];\n"
-            "};\n"
-            "char* cFRDummy = cFRDummyStorageOwner::storage;",
-            'char* cFRDummy = "";',
-        ),
-    ],
-    "src/SOURCE/SEARCH.cpp": [
-        (
-            Pattern.LITERAL, 1,
-            "struct cFRDummyStorageOwner {\n"
-            "    static char storage[1];\n"
-            "};\n"
-            "__declspec(selectany) char cFRDummyStorageOwner::storage[1] = {0};\n\n",
-            "",
-        ),
-    ],
     "src/SOURCE/HERO.cpp": [
         (
             Pattern.LITERAL, 1,

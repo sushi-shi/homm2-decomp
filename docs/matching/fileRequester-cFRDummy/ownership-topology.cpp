@@ -173,15 +173,12 @@
 // NULL to "") fully re-lay out on the transition compile. No single-TU state
 // reaches the early-pointer/late-cell pair.
 //
-// ADOPTED (2026-08-24, adapter-elimination directive): the measured-exact
-// cross-TU ownership pair is now production source. REQUEST declares
-// `struct cFRDummyStorageOwner { static char storage[1]; };` and initializes
-// cFRDummy from it; SEARCH defines the one-byte member as a selectany BSS
-// COMDAT claimed at DATA(0x00533d98). LINK places REQUEST's natural 0x1d-byte
-// ordinary BSS run at 0x00533d78 and selects SEARCH's COMDAT at 0x00533d98;
-// the four-pass link reproduces the retail SHA-256 with the raw compiled
-// REQUEST object, and the batch_bss rotation adapter is removed from
-// exact_link/plain.py. The provenance caveat above stands: the owner class is
-// a placement vehicle, not recovered developer source. It is retained because
-// it is the only measured state that realizes the retail identity rotation
-// with untouched compiler objects and untouched LINK.EXE.
+// FINAL DISPOSITION (2026-08-24): rejected and removed from reconstructed
+// source. The cross-TU owner was briefly adopted to eliminate the object
+// adapter, but that inverted the project's priority: an invented class is not
+// developer source merely because it makes LINK reproduce private-cell order.
+// REQUEST again carries the cross-version-supported `char* cFRDummy = "";` and
+// SEARCH owns no related declaration. `homm2 link --transform` rotates the six
+// private REQUEST BSS cells in a disposable COFF input; generic links continue
+// to use the raw object. The exact probe remains useful evidence about compiler
+// and linker topology, not evidence for the rejected source construct.

@@ -512,13 +512,13 @@ standalone scripts (section table + symbol table walk, no external deps).
    mechanism. Concretely: a file-scope object in `AudiereEffects.cpp` whose
    **dynamic initializer** is the first construct in the TU to require the node
    destructor.
-2. `SOURCE/REQUEST` and `BASE/Misc` get no such opening: §5.2 puts the
-   file-scope-initializer literal in phase 2 for *every* spelling measured
-   (including the dynamic, ternary/comma and folded `"" + 0`, `&""[0]` forms the
-   main session tried). To reach retail the literal must be created in phase 3,
-   which means it must be first required by *function-body* codegen — i.e. the
-   original `cFRDummy` / track-name cell was not initialized from a file-scope
-   initializer at all in the retail source.
+2. `SOURCE/REQUEST` and `BASE/Misc` get no such compiler-state opening: §5.2
+   puts a file-scope-initializer literal in phase 2 for *every* spelling
+   measured (including dynamic, ternary/comma and folded `"" + 0`, `&""[0]`
+   forms). This proves an emission-order wall in the available compiler states;
+   it does not justify inventing a different semantic owner. REQUEST retains
+   the direct initializer supported by the PoL sibling and applies its private
+   cell rotation only to the disposable exact-link object.
 3. The `-il` tap (`/d1il<prefix>` capture, `/d2il<prefix>` feed — confirmed
    present here as option record `-il$` → `0x104D8144`) would let the
    record-arrival order be read directly rather than inferred from the object.

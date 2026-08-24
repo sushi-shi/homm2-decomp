@@ -14,7 +14,7 @@ afterward for mutation.
   the era `RC.EXE` 5.00, gated byte-exactly against `build/orig/HMM2PL.exe` on
   every build (`rc_res.py`). Output `build/link/rsrc/HMM2PL.exe`. See
   `docs/resource-source-reconstruction-plan.md`.
-- `homm2 link --transform` — `--rsrc` plus the three reviewed COFF transforms
+- `homm2 link --transform` — `--rsrc` plus the four reviewed COFF transforms
   declared in `scripts/homm2/build/exact_link/transforms.py`, the historical
   four-pass PDB link, and the strict audit. Output `build/link/HMM2PL.exe`,
   byte-identical to `build/orig/HMM2PL.exe`; the audit fails if any byte
@@ -63,13 +63,14 @@ These are object-input reconstruction debts, not executable
 transformations. Removing them through credible source or archive ownership is
 the remaining provenance campaign.
 
-`SOURCE/REQUEST` formerly carried a fourth adapter rotating its six one-byte
-empty-string cells. It links as the raw compiled object now: SEARCH owns the
-cFRDummy backing byte as a one-byte selectany BSS COMDAT that untouched LINK
-places at retail 0x00533d98 directly after REQUEST's natural 0x1d-byte
-ordinary BSS run. See
+`SOURCE/REQUEST` uses the developer-shaped, cross-version-supported
+`char* cFRDummy = "";`. VC6 emits that file-scope initializer's backing byte
+before five function-body empty strings, while retail places it after them.
+Transform mode rotates those six private cells in a disposable REQUEST object;
+generic and resource-only modes use the raw compiler output. The rejected
+alternative was an invented cross-TU `selectany` owner in SEARCH. See
 `docs/matching/fileRequester-cFRDummy/ownership-topology.cpp` for the measured
-closure and the provenance caveat on that ownership pair.
+compiler/linker wall and source disposition.
 
 The early operator-delete owner is no longer reconstructed. The response scans
 the untouched SP5 `MSVCPRT.LIB` after `BASE-suffix.lib`; its stock

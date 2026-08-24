@@ -8,10 +8,10 @@
                           build/orig/HMM2PL.exe (resources only; every byte of
                           code and data still comes from this codebase).
                           Output under build/link/rsrc/.
-  --transform             --rsrc plus the three reviewed COFF transforms from
-                          exact_link/transforms.py, the historical four-pass
-                          PDB link, and the retail SHA-256 assertion. Output
-                          at build/link/HMM2PL.exe, byte-identical to retail.
+  --transform             --rsrc plus four reviewed COFF transforms, the
+                          historical four-pass PDB link, and the retail
+                          SHA-256 assertion. Output at build/link/HMM2PL.exe,
+                          byte-identical to retail.
 
 LINK writes the final executable in every mode. Nothing in this module opens
 or rewrites that executable afterward.
@@ -23,6 +23,7 @@ import argparse
 import hashlib
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 from homm2.core import wine
@@ -56,12 +57,34 @@ def relative(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def prepare_request() -> Path:
-    # The cFRDummy backing byte is owned by SEARCH's selectany COMDAT, so the
-    # compiled REQUEST object links unmodified in every mode.
-    output = ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
+def prepare_request(apply_transform: bool) -> Path:
+    raw = ROOT / "build/objdiff/base/SOURCE/REQUEST.obj"
+    if not raw.exists():
+        raise RuntimeError(f"REQUEST final-link object is missing: {raw}")
+    if not apply_transform:
+        return raw
+
+    # VC6 emits cFRDummy's file-scope empty-string cell before REQUEST's five
+    # function-body empty strings. Retail carries the opposite private-cell
+    # order. Keep that compiler-layout accommodation out of reconstructed C++.
+    subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "homm2.build.exact_link.batch_bss",
+            "--owner",
+            "SOURCE",
+            "--unit",
+            r"SOURCE\REQUEST.c",
+            "--previous-end",
+            "0x133d78",
+        ),
+        cwd=ROOT,
+        check=True,
+    )
+    output = LINK_ROOT / "bss-layout-all/SOURCE/REQUEST.obj"
     if not output.exists():
-        raise RuntimeError(f"REQUEST final-link object is missing: {output}")
+        raise RuntimeError(f"REQUEST transformed object was not produced: {output}")
     return output
 
 
@@ -203,7 +226,7 @@ def main() -> int:
     if hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
         raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
 
-    request = prepare_request()
+    request = prepare_request(mode == "transform")
     if mode == "transform":
         base_prefix = relative(rebuild_library_with_transforms(
             LINK_ROOT / "BASE-prefix.lib", {"BASE/Misc"}))
