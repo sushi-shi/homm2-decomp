@@ -936,7 +936,7 @@ void combatManager::CastSpell(
             break;
         case SPELL_COLD_RAY:
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY)
+                static_cast<i32l>(SPELL_COLD_RAY_DELAY * gfCombatSpeedMod[gConfig.combatSpeed])
             );
             damage_m = spellPower_i * SPELL_COLD_RAY_DAMAGE_PER_POWER;
             if (target_i->m_monsterType == CREATURE_FIRE_ELEMENTAL)
@@ -971,7 +971,7 @@ void combatManager::CastSpell(
         case SPELL_MAGIC_ARROW:
             DelayMilli(
                 static_cast<i32l>(
-                    gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_MAGIC_ARROW_DELAY
+                    SPELL_MAGIC_ARROW_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
                 )
             );
             damage_m = spellPower_i * SPELL_MAGIC_ARROW_DAMAGE_PER_POWER;
@@ -1329,7 +1329,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
 
         for (frame_i = 0; frame_i < frameCount_i; ++frame_i) {
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+                KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             IconToBitmap(
                 spellIcon_n,
@@ -1577,7 +1577,7 @@ void combatManager::ElementalStorm(void) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
                 glTimers[0] = static_cast<i32>(
                     KBTickCount()
-                    + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+                    + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
                 );
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 for (row_b = 0; row_b < SPELL_STORM_ROW_COUNT; ++row_b) {
@@ -1671,7 +1671,7 @@ void combatManager::Armageddon(void) {
         memcpy(effectPalette4->Data(), originalPalette5->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
 
         glTimers[0] = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+            KBTickCount() + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         i8* effectData = effectPalette4->Data();
         i32 pass;
@@ -1698,7 +1698,7 @@ void combatManager::Armageddon(void) {
             SetPalette(effectData, 1);
             glTimers[0] = static_cast<i32>(
                 KBTickCount()
-                + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_PALETTE_DELAY
+                + SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             );
         }
 
@@ -1760,7 +1760,7 @@ void combatManager::Armageddon(void) {
                 );
                 i32 timer = static_cast<i32>(
                     KBTickCount()
-                    + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
+                    + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
                 );
                 PollSound();
                 i32 copyWidth =
@@ -1836,7 +1836,7 @@ void combatManager::Armageddon(void) {
         SetPalette(effectDataRestore7, 1);
         DelayMilli(
             static_cast<i32l>(
-                gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_PALETTE_DELAY
+                SPELL_ARMAGEDDON_PALETTE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             )
         );
     }
@@ -2617,7 +2617,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         startX_l = targetX_k;
         startY_l = targetY;
         DelayMilli(
-            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY)
+            static_cast<i32l>(CHAIN_LIGHTNING_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed])
         );
         nextTarget_i = GetNextChainLightningTarget(target_j, 1);
         if (nextTarget_i == COMBAT_HEX_EMPTY)
@@ -2626,7 +2626,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline_o);
         deadline_o = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY
+            KBTickCount() + CHAIN_LIGHTNING_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
         );
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[IDX(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
@@ -2695,7 +2695,7 @@ void combatManager::VaporizeCreature(
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
     }
-    DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
+    DelayMilli(static_cast<i32l>(SPELL_VANISH_END_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]));
     target->m_palette = NULL;
     target->m_showQuantity = 1;
     H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f0514, vaporizeCreatureSourceFile2, RETAIL_FILE), vaporizeSourceLineBase + 0x38);
@@ -2835,7 +2835,7 @@ void combatManager::RippleCreature(
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
     }
-    DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
+    DelayMilli(static_cast<i32l>(SPELL_VANISH_END_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]));
     target2->m_palette = NULL;
     target2->m_showQuantity = 1;
     H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f059c, rippleCreatureSourceFile3, RETAIL_FILE), rippleSourceLineBase + 0x8e);
@@ -3260,7 +3260,7 @@ mirror_found:
                         [m_hexCells[targetHex].m_occupantIndex]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     deadline1 = static_cast<i32>(
-        KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
+        KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
     );
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image3->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset8 / MIRROR_SLIDE_FRAME_COUNT;
@@ -3276,7 +3276,7 @@ mirror_found:
         gbLimitToExtent = false;
         DelayTil(&deadline1);
         deadline1 = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
+            KBTickCount() + MIRROR_SLIDE_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
         );
     }
     image3->m_xOffset = 0;
@@ -3460,7 +3460,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_j);
         deadline_j = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * BLAST_FRAME_DELAY
+            KBTickCount() + BLAST_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
@@ -3583,7 +3583,7 @@ void combatManager::Resurrect(
         for (index_o = 0; index_o < RESURRECT_ANIMATION_FRAME_COUNT; ++index_o) {
             glTimers[0] = static_cast<i32>(
                 KBTickCount()
-                + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
+                + IDX(SPELL_FIZZLE_FRAME_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             IconToBitmap(
                 resurrectIcon,
@@ -3750,7 +3750,7 @@ void combatManager::Earthquake(void) {
     for (pass = 0; pass < EARTHQUAKE_SHAKE_PASS_COUNT; ++pass) {
         for (frame5 = 0; frame5 < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame5) {
             deadline3 = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
+                KBTickCount() + SPELL_ARMAGEDDON_SHAKE_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             PollSound();
             width0 =
@@ -3868,7 +3868,7 @@ void combatManager::Earthquake(void) {
         for (structure7 = 0; structure7 < EARTHQUAKE_CLOUD_FRAME_COUNT; ++structure7) {
             glTimers[1] = static_cast<i32>(
                 KBTickCount()
-                + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
+                + IDX(SPELL_FIZZLE_FRAME_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             DrawFrame(0, 0, 1, 0, 0, 1, 0);
             for (impact = 0; impact < impactCount4; ++impact) {
