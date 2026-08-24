@@ -680,7 +680,7 @@ SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	98.7160	9bb5f351
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	99.9753	3c8ce0f21bd2
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	8fae25eb5921
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	c1ff9e8eeab8
-SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	880c89c023c1
+SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	9ec041fac360
 SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	100.0000	3c3e0517398e
 SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	e27ea2ea0baa
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	c7ee8b021750

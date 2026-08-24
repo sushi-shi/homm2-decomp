@@ -1173,11 +1173,9 @@ void advManager::ProcessMapChange(SMapChange change) {
     i32 eventY_c;
     i32 outOfMobility_g;
     i32 adjacentMonster_m;
-    mapCell* recruitCell_i;
-    mapCell* heroCell_i;
 
     giMapChangeCtr = change.sequence + 1;
-    if (change.player != giCurPlayer) {
+    if (giCurPlayer != change.player) {
         gpAdvManager->DeactivateCurrTown();
         gpAdvManager->DeactivateCurrHero();
     }
@@ -1200,7 +1198,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 gpGame->GetHero(change.id)->m_y
             );
             mapHero_n = gpGame->GetHero(change.id);
-            if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y) {
+            if (mapHero_n->m_x != change.x || mapHero_n->m_y != change.y) {
                 sprintf(
                     gText,
                     DATA_COMPGEN(0x004ee08c, processMapChangeDataMiscommunicationInHeroPositionFirst, "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
@@ -1331,7 +1329,7 @@ void advManager::ProcessMapChange(SMapChange change) {
         case MAP_CHANGE_DEAD_HERO:
             LogStr(DATA_COMPGEN(0x004ee194, processMapChangeMCDeadHero, "MC DeadHero"));
             mapHero_n = gpGame->GetHero(change.id);
-            if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y)
+            if (mapHero_n->m_x != change.x || mapHero_n->m_y != change.y)
                 break;
             mapHero_n->Deallocate(1);
             CompleteDraw(0);
@@ -1350,14 +1348,9 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero_n->m_occupiedTown =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero_n->m_owner = change.player;
-            recruitCell_i = (gpGame->m_worldMap.cells
-                 + gpGame->m_worldMap.width * change.y + change.x);
-            DebugCheck();
-            recruitCell_i->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-            heroCell_i = (gpGame->m_worldMap.cells
-                 + gpGame->m_worldMap.width * change.y + change.x);
-            DebugCheck();
-            heroCell_i->m_objectMetadata = change.id;
+            gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =
+                MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+            gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata = change.id;
             gpAdvManager->SetHeroContext(change.id, 0);
             CompleteDraw(0);
             UpdateScreen(0, 0);
