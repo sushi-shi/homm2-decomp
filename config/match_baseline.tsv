@@ -1241,7 +1241,7 @@ SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	100.0000	35f269802
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	93.2340	bc941575dc97
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	99.5014	21d305890d80
-SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	100.0000	690d89f47a27
+SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	100.0000	ca24c46a434c
 SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	100.0000	33be0f61891c
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	9e47c17c18ef
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	44b2c7e9391a

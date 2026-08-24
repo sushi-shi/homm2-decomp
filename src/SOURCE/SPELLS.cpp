@@ -2879,18 +2879,18 @@ void combatManager::ShowMassSpell(
                 && target0->m_animationSequence != ARMY_ANIMATION_WINCE
                 && target0->m_animationSequence != ARMY_ANIMATION_WINCE_RETURN) {
                 if (target0->m_quantity == 0) {
-                    if (effectFrames
-                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
+                        > effectFrames)
                         effectFrames =
                             target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
                     gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_KILL)]);
                 } else {
-                    if (effectFrames
-                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)]
+                        > effectFrames)
                         effectFrames =
                             target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
-                    if (returnFrames7
-                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)]
+                        > returnFrames7)
                         returnFrames7 = target0->m_frameInfo
                                            .animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
                     gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_WINCE)]);
@@ -2899,7 +2899,7 @@ void combatManager::ShowMassSpell(
         }
     }
 
-    for (frame9 = 0; effectFrames > frame9; ++frame9) {
+    for (frame9 = 0; frame9 < effectFrames; ++frame9) {
         for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
             for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0) {
                 target0 = &m_armies[IDX(side8)][armyIndex0];
