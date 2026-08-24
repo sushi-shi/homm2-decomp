@@ -425,56 +425,57 @@ void combatManager::InitNonVisualVars(void) {
 VA(0x0049089d, 0x203)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
-    i32 sourceHex;
-    for (sourceHex = 0; sourceHex < COMBAT_HEX_COUNT; sourceHex++) {
-        i32 rowIndex = sourceHex / COMBAT_GRID_ROW_LENGTH;
-        CombatHexDirection direction;
+    CombatHexDirection direction;
+    i32 fromHex;
+    i32 rowIndex;
+    for (fromHex = 0; fromHex < COMBAT_HEX_COUNT; fromHex++) {
+        rowIndex = fromHex / COMBAT_GRID_ROW_LENGTH;
         for (direction = COMBAT_DIRECTION_NORTHEAST;
              IDX(direction) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              direction++) {
-            if (sourceHex % COMBAT_GRID_ROW_LENGTH == 0
-                || sourceHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
-                m_adjacency[sourceHex][IDX(direction)] = -1;
+            if (fromHex % COMBAT_GRID_ROW_LENGTH == 0
+                || fromHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
+                m_adjacency[fromHex][IDX(direction)] = -1;
             } else {
                 switch (direction) {
                     case COMBAT_DIRECTION_NORTHEAST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
+                            destinationHex = fromHex - COMBAT_GRID_ROW_LENGTH;
                         else
-                            destinationHex = sourceHex - (COMBAT_GRID_ROW_LENGTH - 1);
+                            destinationHex = fromHex - (COMBAT_GRID_ROW_LENGTH - 1);
                         break;
                     case COMBAT_DIRECTION_SOUTHEAST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
+                            destinationHex = fromHex + COMBAT_GRID_ROW_LENGTH;
                         else
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH + 1;
+                            destinationHex = fromHex + COMBAT_GRID_ROW_LENGTH + 1;
                         break;
                     case COMBAT_DIRECTION_SOUTHWEST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH - 1;
+                            destinationHex = fromHex + COMBAT_GRID_ROW_LENGTH - 1;
                         else
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
+                            destinationHex = fromHex + COMBAT_GRID_ROW_LENGTH;
                         break;
                     case COMBAT_DIRECTION_NORTHWEST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH - 1;
+                            destinationHex = fromHex - COMBAT_GRID_ROW_LENGTH - 1;
                         else
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
+                            destinationHex = fromHex - COMBAT_GRID_ROW_LENGTH;
                         break;
                     case COMBAT_DIRECTION_EAST:
-                        destinationHex = sourceHex + 1;
+                        destinationHex = fromHex + 1;
                         break;
                     case COMBAT_DIRECTION_WEST:
-                        destinationHex = sourceHex - 1;
+                        destinationHex = fromHex - 1;
                         break;
                 }
 
                 if (destinationHex % COMBAT_GRID_ROW_LENGTH == 0
                     || destinationHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1
                     || destinationHex < 0 || destinationHex >= COMBAT_HEX_COUNT)
-                    m_adjacency[sourceHex][IDX(direction)] = -1;
+                    m_adjacency[fromHex][IDX(direction)] = -1;
                 else
-                    m_adjacency[sourceHex][IDX(direction)] = static_cast<i8>(destinationHex);
+                    m_adjacency[fromHex][IDX(direction)] = static_cast<i8>(destinationHex);
             }
         }
     }

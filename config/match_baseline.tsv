@@ -626,7 +626,7 @@ SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	edff4b8adde1
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	29e60d80370f
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	9a3fba1ee4ed
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	22349ef5f7a5
-SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	100.0000	c8d4562fcf14
+SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	100.0000	9a47f36f4bfa
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	99.9682	e56fd1dbb731
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	3c73f59913aa
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	99.5106	a1b1c2536de0
