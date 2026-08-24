@@ -792,7 +792,7 @@ SOURCE/GAME	?CreateBoat@game@@QAEHHHH@Z	100.0000	fbee61fe4fdc
 SOURCE/GAME	?CreateDiffFile@@YIXPAD00HH@Z	96.0775	c95d418c79af
 SOURCE/GAME	?CreateJoinFile@@YIXPAD00@Z	100.0000	e3d9cd9d0f05
 SOURCE/GAME	?DoNewTurn@game@@QAEXXZ	100.0000	45d73c949fb5
-SOURCE/GAME	?ExperienceValueOfStack@game@@QAEHPAVarmyGroup@@PAVhero@@@Z	100.0000	f4575b881c5e
+SOURCE/GAME	?ExperienceValueOfStack@game@@QAEHPAVarmyGroup@@PAVhero@@@Z	100.0000	4ddb37a47815
 SOURCE/GAME	?GenerateStandardFileName@@YIXPAD0@Z	100.0000	0cd97329be6b
 SOURCE/GAME	?GetBoatsBuilt@game@@QAEHXZ	100.0000	c250e4dba7c4
 SOURCE/GAME	?GetLuck@game@@QAEHPAVhero@@PAVarmy@@PAVtown@@@Z	100.0000	038e57f564ac
