@@ -652,7 +652,7 @@ SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	a1ba6769f25b
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
 SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	100.0000	1b0cb7be1ca7
 SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	23c1d15c2606
-SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	7538522a763c
+SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	c209b8a705fe
 SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	99.1126	27640002bef7
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	100.0000	620387977505
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	6898d4037c16

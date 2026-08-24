@@ -333,13 +333,13 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
 
     if (gbNoShowCombat == 0) {
-        if (KBTickCount() > glTimers[0]) {
+        if (glTimers[0] < KBTickCount()) {
             PollSound();
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SOUND_POLL_DELAY
+                KBTickCount() + COMBAT_SOUND_POLL_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             );
         }
-        if (KBTickCount() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT]
+        if (glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] < KBTickCount()
             && gbProcessingCombatAction == 0) {
             gbProcessingCombatAction = true;
             CycleCombatScreen();
