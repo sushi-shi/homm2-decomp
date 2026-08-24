@@ -1246,7 +1246,7 @@ SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	100.0000	33b
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	9e47c17c18ef
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	44b2c7e9391a
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
-SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	57cd18f1e020
+SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	dcb377ede7bf
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	804db80c0b72
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	100.0000	0d5f3ce7ef96
 SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	96.1564	35f498f79ca2

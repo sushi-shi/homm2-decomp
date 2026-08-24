@@ -3304,14 +3304,13 @@ void combatManager::SummonElemental(
         spellPower <<= 1;
     i32 offset;
     for (offset = 0; offset < SUMMON_HEXES_PER_SIDE; ++offset) {
-        if (m_hexCells[summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                     + (randomOffset_a + offset)
-                                           % SUMMON_HEXES_PER_SIDE]]
+        if (m_hexCells[*(summonHexes_l + IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
+                         + (randomOffset_a + offset) % SUMMON_HEXES_PER_SIDE)]
                 .m_occupantSide
             == COMBAT_SIDE_NONE)
-            summonHex = summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                      + (randomOffset_a + offset)
-                                            % SUMMON_HEXES_PER_SIDE];
+            summonHex =
+                *(summonHexes_l + IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
+                  + (randomOffset_a + offset) % SUMMON_HEXES_PER_SIDE);
     }
     m_summonedCreatureType[IDX(m_currentSide)] = monsterType;
     AddArmy(
