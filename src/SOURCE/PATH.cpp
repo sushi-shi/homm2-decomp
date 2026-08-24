@@ -21,12 +21,12 @@ i32 army::FindPath(
     ArmyPathTarget pathMode
 ) {
     i32 pathResult;
-    i32 savedSpeed;
+    i32 savedSpeed2;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return 0;
 
-    savedSpeed = m_monster.speed;
+    savedSpeed2 = m_monster.speed;
     if (ignoreSpeed)
         m_monster.speed = IGNORE_SPEED;
 
@@ -48,7 +48,7 @@ i32 army::FindPath(
             pathResult = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 1);
     }
 
-    m_monster.speed = static_cast<i8>(savedSpeed);
+    m_monster.speed = static_cast<i8>(savedSpeed2);
     return pathResult;
 }
 
@@ -301,7 +301,7 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
 
 VA(0x004be59d, 0x44a)
 i32 army::ValidRange(i32 targetHex) {
-    i32 adjacentHex;
+    i32 adj;
     CombatHexDirection directionResult;
 
     if (!ValidHex(targetHex))
@@ -310,11 +310,11 @@ i32 army::ValidRange(i32 targetHex) {
     m_moveTargetHex = m_hex;
     if (!(m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)) {
         m_attackDirection = GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
-        adjacentHex = GetAdjacentCellIndex(m_hex, m_attackDirection);
-        if (adjacentHex == targetHex)
+        adj = GetAdjacentCellIndex(m_hex, m_attackDirection);
+        if (adj == targetHex)
             return 1;
-        adjacentHex = GetAdjacentCellIndex(adjacentHex, m_attackDirection);
-        if (adjacentHex == targetHex)
+        adj = GetAdjacentCellIndex(adj, m_attackDirection);
+        if (adj == targetHex)
             return 1;
     } else {
         switch (m_facing) {
@@ -323,11 +323,11 @@ i32 army::ValidRange(i32 targetHex) {
                     GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
                 if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
                     m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(m_hex, directionResult);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult);
+                    if (adj == targetHex)
                         return 1;
                 }
 
@@ -335,11 +335,11 @@ i32 army::ValidRange(i32 targetHex) {
                     GetBestDirection(m_hex + WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
                 if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
                     m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult);
+                    if (adj == targetHex)
                         return 1;
                 }
                 if (directionResult == COMBAT_DIRECTION_WEST)
@@ -349,11 +349,11 @@ i32 army::ValidRange(i32 targetHex) {
                 else if (directionResult == COMBAT_DIRECTION_SOUTHWEST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
 
-                adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
+                if (adj == targetHex)
                     return 1;
-                adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(adj, directionResult);
+                if (adj == targetHex)
                     return 1;
                 break;
 
@@ -362,11 +362,11 @@ i32 army::ValidRange(i32 targetHex) {
                     GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
                 if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
                     m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(m_hex, directionResult);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult);
+                    if (adj == targetHex)
                         return 1;
                     return 0;
                 }
@@ -375,11 +375,11 @@ i32 army::ValidRange(i32 targetHex) {
                     GetBestDirection(m_hex - WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
                 if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
                     m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult);
+                    if (adj == targetHex)
                         return 1;
                     return 0;
                 }
@@ -390,11 +390,11 @@ i32 army::ValidRange(i32 targetHex) {
                 else if (directionResult == COMBAT_DIRECTION_SOUTHEAST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
 
-                adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
+                if (adj == targetHex)
                     return 1;
-                adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(adj, directionResult);
+                if (adj == targetHex)
                     return 1;
                 break;
         }
