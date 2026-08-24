@@ -439,7 +439,7 @@ SOURCE/ADVMGR	?CheckDimNextHeroBut@advManager@@QAEXXZ	100.0000	ab5fd7e636c5
 SOURCE/ADVMGR	?CheckHandleNet@advManager@@QAEPADXZ	100.0000	b21b107a35a5
 SOURCE/ADVMGR	?CheckHandleNetPlayerWait@advManager@@QAEHAAUtag_message@@H@Z	100.0000	99fd9e1f0e83
 SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	5dd34e6c1baf
-SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	bb736892e4b6
+SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	b09679d109a6
 SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	100.0000	7b6dfadf5043
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	fb49c92a6a6c
 SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	100.0000	879cd20c0336

@@ -9186,7 +9186,7 @@ void advManager::CheckScreenScroll(void) {
 
         if (gpMouseManager->m_cursorFrame >= HOVER_SCROLL_FRAME_FIRST
             && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END
-            && m_mapOriginX == oldOriginX9 && m_mapOriginY == oldOriginY3) {
+            && oldOriginX9 == m_mapOriginX && oldOriginY3 == m_mapOriginY) {
             gpMouseManager->SetPointer(POINTER_DEFAULT);
         }
     }
