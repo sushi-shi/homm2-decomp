@@ -401,7 +401,7 @@ void hero::HeroScreenUpdate(void) {
     message.type = HERO_UI_MESSAGE;
     UpdateArmies();
     for (index = 0; index < UI_ARMY_SLOT_COUNT; index++) {
-        if (index == giHeroScreenSrcIndex)
+        if (giHeroScreenSrcIndex == index)
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
         else
             message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
