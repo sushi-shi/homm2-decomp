@@ -721,7 +721,8 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (RIGHT, EAST, 0, 1), (RIGHT, WEST, 0, 1), (RIGHT, WEST, 1, <=2),
   (LEFT, WEST, 0, 1), (LEFT, EAST, 0, 1) and (LEFT, EAST, 1, <=2) - the hex
   cells a wide creature's own body would occupy. 62 instructions the
-  reconstruction was missing outright.
+  reconstruction was missing outright. **2.0 backport: no** - PoL retail is
+  0x5c8 bytes/46 blocks and walks the ray without these guards.
 - **[unclassified] `SOURCE/CURSOR` dropped the walk-sample bookkeeping.** PoL
   2.0's `advManager::DrawCursor` kept the last two footstep voices in
   `hOldWalkSample` / `hNewWalkSample` (`if (m_cursorFrameCount == 0)

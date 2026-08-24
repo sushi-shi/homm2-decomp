@@ -74,7 +74,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | combatManager::ProcessCombatMsg switch layout | case order as in source | retail lays inner-switch case bodies in a DIFFERENT order (jump-table targets differ; first body is the m_?f2c3 member call, ours is the 0/1 local store) + one member/local mirror | OPEN - PARKED for body-diff pass: needs jump-table target mapping |
 | combatManager::Resurrect five sites | `m_initialQuantity < m_quantity`; `count == index+1`; `A<B?A:B` min-ternary; two FP/index orders | `m_quantity > m_initialQuantity`; `index+1 == count`; `REVERSE<frames?REVERSE:frames`; FIZZLE_DELAY const-first | OPEN - slot residual now CLOSED, fn EXACT |
 | combatManager::VaporizeCreature stripe writes | `gyModify[row*W + firstY + top]`; `gyModify[lastY + (row*-W - bottom)]` | `*(row*W + gyModify + top + firstY)`; `*(gyModify - row*W - bottom + lastY)` (computed-term-first flat sums; simple loads canonicalize, muls do not; the LAST additive term becomes the index register, which pins top before firstY in the first store) | OPEN - slot residual now CLOSED, fn EXACT |
-| combatManager::TurnToStone limit increment | `++m_limitCreatureCount[side][index]` | `m_limitCreatureCount[side][index]++` - POST-increment; the 4-arm matrix (pre / post / `+= 1` / self-assign) separates cleanly, post is the only arm that reads the second subscript before the row base. Same fix closed BloodLustEffect, MirrorImage (x2) and CastSpell | OPEN - respelling proven for 2.1, test under 4.2 |
+| combatManager::TurnToStone limit increment | `++m_limitCreatureCount[side][index]` | `m_limitCreatureCount[side][index]++` - POST-increment; the 4-arm matrix (pre / post / `+= 1` / self-assign) separates cleanly, post is the only arm that reads the second subscript before the row base. Same fix closed BloodLustEffect, MirrorImage (x2) and CastSpell | PARTIAL: MirrorImage x2 is VC4.2-byte-neutral and adopted in 2.0; other sites remain OPEN |
 | fullMap::GetCell inline body | `cells + y * width + x` | `&Column(x)[y * width]` (nested-inline: y*width via this-temp first, x*12, cells - the retail shape at ~119 call sites; fuzzy +0.3% TU-wide, 0 drops) | OPEN - test under 4.2 |
 | game::HasLateOverlay cell fetch | `WORLDMAP->Row(row) + col` | `WORLDMAP->GetCell(col, row)` | OPEN |
 | ComputeUALoc probe reads | `gpGame->m_worldMap.Row(y)[x].f` (x4) | `gpGame->m_worldMap.GetCell(x, y)->f` | OPEN - slot residual parked |
@@ -242,6 +242,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `combatManager::MirrorImage` deadline local | **invariant** | PoL adopted Buka's `deadline1`; its bucket 10 places the deadline above `direction6` and removes the PoL retail slot swap. Complete 8-cell VC4.2 matrix; clean 99.830505% -> 99.849880% |
 | ValidHex bound (125 vs <117) | **dev-change** | PoL ledger banks ValidHex 100.0000 with `<= 125`; this image compares `< 117` |
 | TransferArtifacts bound (WAND vs GOOSE) | **dev-change** | PoL ledger banks TransferArtifacts 100.0000 with `<= WAND(3)`; this image compares `<= 7` |
 | InsertSound loopCount 0 vs 1 | **dev-change** | both values byte-pinned (PoL 2.0 = 0, Buka = 1); ledgered |
