@@ -1575,7 +1575,7 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     } else if (gConfig.evilInterfaceUsage == INTERFACE_GOOD && gbUseEvilInterface) {
         shouldChange = 1;
     } else if (gConfig.evilInterfaceUsage == INTERFACE_AUTO
-               && gpGame->m_players[player].m_evilInterface != gbUseEvilInterface) {
+               && gbUseEvilInterface != gpGame->m_players[player].m_evilInterface) {
         shouldChange = 1;
     }
 
