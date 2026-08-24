@@ -2094,7 +2094,7 @@ void hero::DoSSLevelDialog(
         NORMAL_DIALOG_NO_RESOURCE,
         NORMAL_DIALOG_NO_VALUE,
         NORMAL_DIALOG_SECONDARY_SKILL,
-        IDX(m_secondarySkills[IDX(skill)]) + IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE
+        IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + IDX(m_secondarySkills[IDX(skill)])
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
         NORMAL_DIALOG_NO_RESOURCE,
         0,
