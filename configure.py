@@ -16,13 +16,15 @@ import csv, json, sys, tomllib
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
 from homm2.build import ninja_syntax
+from homm2.core.manifest import unit_flags as manifest_unit_flags
 
 REPO = Path(__file__).resolve().parent
 PY = "python3"
 
 
 def main():
-    m = tomllib.loads((REPO / "config/units.toml").read_text())
+    manifest = tomllib.loads((REPO / "config/units.toml").read_text())
+    m = manifest
     build, flags, units = m.get("build", {}), m.get("flags", {}), m.get("unit", [])
 
     od = REPO / "build/objdiff"; od.mkdir(parents=True, exist_ok=True)
@@ -167,12 +169,9 @@ def main():
         comparison_paths = {}
         for u in units:
             obj = f"build/objdiff/base/{u['unit']}.obj"
-            unit_flags = list(flags.get(u.get("flags", "base"), []))
-            # Retail linked BASE as a function-packaged static library.  /Gy
-            # supplies the per-function 16-byte section boundaries visible at
-            # every BASE VA; the explicit SOURCE objects remain un-packaged.
-            if u["unit"].startswith("BASE/"):
-                unit_flags.append("/Gy")
+            # The one flag-assembly rule (profile + BASE tier /Gy) lives in
+            # homm2.core.manifest.unit_flags; probes share it via resolve_target.
+            unit_flags = manifest_unit_flags(u, manifest)
             w.build(obj, "cl", inputs=u["source"],
                     variables={"flags": " ".join(unit_flags),
                                "unit": u["unit"]})

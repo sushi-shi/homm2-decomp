@@ -48,6 +48,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
+from homm2.core import manifest
 from homm2.permute.tu_state_metrics import read_coff
 from homm2.build.assert_relocs import load_symbols
 from homm2.build.canonicalize_data_symbols import (
@@ -345,13 +346,14 @@ def make_declaration_forest(
 
 
 def load_units(root: Path) -> dict[str, dict]:
-    raw = tomllib.loads((root / "config/units.toml").read_text())
-    profiles = raw.get("flags", {})
+    raw = manifest.load(root / "config/units.toml")
     out = {}
-    for unit in raw.get("unit", []):
+    for unit in manifest.units(raw):
         out[unit["unit"]] = {
             "source": Path(unit["source"]),
-            "flags": list(profiles[unit.get("flags", "base")]),
+            # The complete production flags, identical to ninja's compile
+            # edges (profile + tier rules) - see homm2.core.manifest.
+            "flags": manifest.unit_flags(unit, raw),
             "profile": unit.get("flags", "base"),
         }
     return out
