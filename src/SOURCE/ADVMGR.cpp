@@ -9542,6 +9542,10 @@ void advManager::SaveAdventureBorder(void) {
 
 VA(0x00469abb, 0x134)
 void advManager::DrawAdventureBorder(void) {
+    u8* savedPixels;
+    u8* screenPixel;
+    i32 row;
+
     if (m_adventureBorder == NULL) {
         return;
     }
@@ -9549,9 +9553,8 @@ void advManager::DrawAdventureBorder(void) {
         return;
     }
 
-    u8* screenPixel = gpWindowManager->m_screen->m_pixels;
-    u8* savedPixels = m_adventureBorder;
-    i32 row;
+    screenPixel = gpWindowManager->m_screen->m_pixels;
+    savedPixels = m_adventureBorder;
     for (row = 0; row < BORDER_EDGE_SIZE; ++row) {
         memcpy(screenPixel, savedPixels, BORDER_ROW_BYTES);
         screenPixel += BORDER_SCREEN_PITCH;
