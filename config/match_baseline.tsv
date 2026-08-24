@@ -305,7 +305,7 @@ BASE/TILE	_TileToBitmap	100.0000	4c92a0567d35
 BASE/TILESET	??0tileset@@QAE@K@Z	100.0000	de2c16211a22
 BASE/TILESET	??1tileset@@UAE@XZ	100.0000	a202a2120d6c
 BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	100.0000	df7b44566fe0
-BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	8e0b611ea549
+BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	05b8da4eb855
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	fb5b4863612a
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	8f55fa1b3dac
 BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	74de7c193243
