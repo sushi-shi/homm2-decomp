@@ -242,6 +242,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `combatManager::LoadIcons` hero-color / `DebugCheck()` ownership | **dev-change (matching-only)** | Buka's exact inline ternary is 98.800900% under VC4.2. PoL closes at 100.0000% only with block-local `heroColor` and the empty hook in the player-color arm; that form is 99.820274% under VC6. Complete clean matrices: PoL 9/9, Buka 3/3. No shipping behavior change |
 | `combatManager::MirrorImage` deadline local | **invariant** | PoL adopted Buka's `deadline1`; its bucket 10 places the deadline above `direction6` and removes the PoL retail slot swap. Complete 8-cell VC4.2 matrix; clean 99.830505% -> 99.849880% |
 | ValidHex bound (125 vs <117) | **dev-change** | PoL ledger banks ValidHex 100.0000 with `<= 125`; this image compares `< 117` |
 | TransferArtifacts bound (WAND vs GOOSE) | **dev-change** | PoL ledger banks TransferArtifacts 100.0000 with `<= WAND(3)`; this image compares `<= 7` |
