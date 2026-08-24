@@ -4379,7 +4379,7 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y) {
         return m_mapData->Cells();
     } else {
-        return &m_mapData->Row(y)[x];
+        return m_mapData->GetCell(x, y);
     }
 }
 
@@ -4510,7 +4510,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 || (giCurPlayerBit & mapExtra[mapRow * MAP_WIDTH + mapColumnLimit]) == 0) {
                 radarColorValue = RADAR_UNSEEN_COLOR;
             } else {
-                cellValue = &m_mapData->Row(mapRow)[mapColumnLimit];
+                cellValue = m_mapData->GetCell(mapColumnLimit, mapRow);
                 if ((cellValue->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
                     && m_mapOriginX + RADAR_CURRENT_CELL == mapColumnLimit
                     && m_mapOriginY + RADAR_CURRENT_CELL == mapRow) {
@@ -8115,7 +8115,7 @@ void advManager::CheckLoadSample(i32 index) {
 
 VA(0x00466a2f, 0x4c1)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
-    mapCell* currentCell = &m_mapData->Row(y)[x];
+    mapCell* currentCell = m_mapData->GetCell(x, y);
     AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
     if (giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER
@@ -9593,7 +9593,7 @@ i32 advManager::FindAdjacentMonster(
             for (s_adjacentMonsterY = originY - ADJACENT_MONSTER_RADIUS;
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
-                if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX].m_triggerType
+                if (m_mapData->GetCell(s_adjacentMonsterX, s_adjacentMonsterY)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                     if (originY > s_adjacentMonsterY) {
                         if ((GetCell(originX, originY)->m_objectIndex
@@ -9634,7 +9634,7 @@ i32 advManager::FindAdjacentMonster(
             for (s_adjacentMonsterY = s_adjacentMonsterMinY;
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
-                if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX].m_triggerType
+                if (m_mapData->GetCell(s_adjacentMonsterX, s_adjacentMonsterY)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                     if (originY > s_adjacentMonsterY) {
                         if ((GetCell(originX, originY)->m_objectIndex
