@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,18 +30,18 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR DATA_COMPGEN(0x004eb8b8, sTEPDIVISORConstant, 12.5)
-#define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR DATA_COMPGEN(0x004eb8c0, sTEPDIVISORConstant2, 78.0f)
-#define COMBAT_CATAPULT_DISTANCE_ARC_SCALE DATA_COMPGEN(0x004eb8a8, aRCSCALEConstant, 0.3)
-#define COMBAT_CATAPULT_TARGET_ARC_SCALE DATA_COMPGEN(0x004eb8b0, aRCSCALEConstant2, 0.35)
-#define COMBAT_MISSILE_DEGREES_PER_RADIAN DATA_COMPGEN(0x004eb8f8, pERRADIANConstant, 180.0)
-#define COMBAT_MISSILE_PI DATA_COMPGEN(0x004eb900, mISSILEPIConstant, 3.14159)
-#define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR DATA_COMPGEN(0x004eb908, aVERAGEDIVISORConstant, 2.0f)
-#define COMBAT_CREATURE_VANISH_DURATION DATA_COMPGEN(0x004eb8f0, vANISHDURATIONConstant, 150.0f)
+#define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
+#define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
+#define COMBAT_CATAPULT_DISTANCE_ARC_SCALE 0.3
+#define COMBAT_CATAPULT_TARGET_ARC_SCALE 0.35
+#define COMBAT_MISSILE_DEGREES_PER_RADIAN 180.0
+#define COMBAT_MISSILE_PI 3.14159
+#define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR 2.0f
+#define COMBAT_CREATURE_VANISH_DURATION 150.0f
 
 namespace {
 
-H2_ENUM_BEGIN(CombatSystemOptionWidget)
+typedef enum CombatSystemOptionWidget {
     SYSTEM_OPTION_SPEED_BUTTON      = 10,
     SYSTEM_OPTION_ARMY_INFO_BUTTON  = 11,
     SYSTEM_OPTION_AUTO_SPELL_BUTTON = 12,
@@ -55,9 +55,9 @@ H2_ENUM_BEGIN(CombatSystemOptionWidget)
     SYSTEM_OPTION_SHADE_TEXT        = 24,
     SYSTEM_OPTION_MOUSE_HEX_TEXT    = 25,
     SYSTEM_OPTION_CLOSE_BUTTON      = 0x7800
-H2_ENUM_END(CombatSystemOptionWidget)
+} CombatSystemOptionWidget;
 
-H2_ENUM_BEGIN(CombatSystemOptionConstant)
+typedef enum CombatSystemOptionConstant {
     SYSTEM_OPTION_CYCLE_COUNT             = 3,
     SYSTEM_OPTION_HELP_DIALOG             = 4,
     SYSTEM_OPTION_SPEED_STATE_OFFSET      = 0,
@@ -69,9 +69,9 @@ H2_ENUM_BEGIN(CombatSystemOptionConstant)
     SYSTEM_OPTION_DRAW_MASK               = 0x7fff,
     SYSTEM_OPTION_WINDOW_X                = 160,
     SYSTEM_OPTION_WINDOW_Y                = 33
-H2_ENUM_END(CombatSystemOptionConstant)
+} CombatSystemOptionConstant;
 
-H2_ENUM_CLASS_BEGIN(CombatSystemOptionHelp)
+enum class CombatSystemOptionHelp : i32 {
     HELP_CLOSE      = 0,
     HELP_SPEED      = 1,
     HELP_ARMY_INFO  = 2,
@@ -79,43 +79,44 @@ H2_ENUM_CLASS_BEGIN(CombatSystemOptionHelp)
     HELP_GRID       = 4,
     HELP_SHADE      = 5,
     HELP_MOUSE_HEX  = 6
-H2_ENUM_CLASS_END(CombatSystemOptionHelp)
+};
+using enum CombatSystemOptionHelp;
 
-H2_ENUM_BEGIN(CombatSetupConstant)
+typedef enum CombatSetupConstant {
     BALLISTA_CATAPULT_ATTACK_COUNT      = 2,
     NECROMANCER_SHRINE_POWER_BONUS      = 2,
     DEFENDER_HERO_OVERLAY_INITIAL_FRAME = 3
-H2_ENUM_END(CombatSetupConstant)
+} CombatSetupConstant;
 
-H2_ENUM_BEGIN(CombatPresentationConstant)
+typedef enum CombatPresentationConstant {
     FADE_STEPS          = 8,
     AMBIENT_MUSIC_FIRST = 2,
     AMBIENT_MUSIC_LAST  = 4
-H2_ENUM_END(CombatPresentationConstant)
+} CombatPresentationConstant;
 
-H2_ENUM_BEGIN(CombatMapConstant)
+typedef enum CombatMapConstant {
     MONSTER_COUNT_SAVE_LIMIT  = 4000,
     MAP_RANDOM_OFFSET_MINIMUM = 8,
     MAP_RANDOM_OFFSET_MAXIMUM = 15
-H2_ENUM_END(CombatMapConstant)
+} CombatMapConstant;
 
-H2_ENUM_BEGIN(CombatNearbyConstant)
+typedef enum CombatNearbyConstant {
     NEARBY_RADIUS_COUNT = 3
-H2_ENUM_END(CombatNearbyConstant)
+} CombatNearbyConstant;
 
-H2_ENUM_BEGIN(CombatKeepStorageConstant)
+typedef enum CombatKeepStorageConstant {
     KEEP_TOWER_SCRATCH_COUNT = 4
-H2_ENUM_END(CombatKeepStorageConstant)
+} CombatKeepStorageConstant;
 
-H2_ENUM_BEGIN(CombatObstacleConstant)
+typedef enum CombatObstacleConstant {
     ELEVATION_OBSTACLE_WEIGHT_DIVISOR = 2
-H2_ENUM_END(CombatObstacleConstant)
+} CombatObstacleConstant;
 
-H2_ENUM_BEGIN(CombatMissileConstant)
+typedef enum CombatMissileConstant {
     MISSILE_DIAMETER_MULTIPLIER = 2
-H2_ENUM_END(CombatMissileConstant)
+} CombatMissileConstant;
 
-H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
+enum class BattlefieldBackgroundIndex : i32 {
     BACKGROUND_WATER       = 0,
     BACKGROUND_GRASS_TREES = 2,
     BACKGROUND_GRASS       = 3,
@@ -128,15 +129,17 @@ H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
     BACKGROUND_DIRT        = 13,
     BACKGROUND_WASTELAND   = 14,
     BACKGROUND_BEACH       = 16
-H2_ENUM_CLASS_END(BattlefieldBackgroundIndex)
+};
+using enum BattlefieldBackgroundIndex;
 
-H2_ENUM_CLASS_BEGIN_T(NearbyFeature, i8)
+enum class NearbyFeature : i8 {
     NEARBY_UNKNOWN  = -1,
     NEARBY_MOUNTAIN = 0,
     NEARBY_TREE     = 1
-H2_ENUM_CLASS_END_T(NearbyFeature, i8)
+};
+using enum NearbyFeature;
 
-H2_ENUM_BEGIN(CombatCastleInteriorRange)
+typedef enum CombatCastleInteriorRange {
     CASTLE_INTERIOR_ROW_0_FIRST = 0,
     CASTLE_INTERIOR_ROW_0_LAST  = 8,
     CASTLE_INTERIOR_ROW_1_FIRST = 13,
@@ -155,34 +158,35 @@ H2_ENUM_BEGIN(CombatCastleInteriorRange)
     CASTLE_INTERIOR_ROW_7_LAST  = 99,
     CASTLE_INTERIOR_ROW_8_FIRST = 104,
     CASTLE_INTERIOR_ROW_8_LAST  = 112
-H2_ENUM_END(CombatCastleInteriorRange)
+} CombatCastleInteriorRange;
 
-H2_ENUM_CLASS_BEGIN(CombatCatapultDamage)
+enum class CombatCatapultDamage : i32 {
     CATAPULT_DAMAGE_NONE   = 0,
     CATAPULT_DAMAGE_NORMAL = 1,
     CATAPULT_DAMAGE_DOUBLE = 2
-H2_ENUM_CLASS_END(CombatCatapultDamage)
+};
+using enum CombatCatapultDamage;
 
-H2_ENUM_CLASS_BEGIN(CombatKeepTargetPriority)
+enum class CombatKeepTargetPriority : i32 {
     KEEP_PRIORITY_NONE     = -1,
     KEEP_PRIORITY_DISABLED = 0,
     KEEP_PRIORITY_WALKER   = 1,
     KEEP_PRIORITY_FLYER    = 2,
     KEEP_PRIORITY_SHOOTER  = 3
-H2_ENUM_CLASS_END(CombatKeepTargetPriority)
+};
+using enum CombatKeepTargetPriority;
 
-H2_ENUM_BEGIN(CombatMoraleConstant)
+typedef enum CombatMoraleConstant {
     MORALE_ROLL_MIN              = 1,
     GOOD_MORALE_ROLL_MAX         = 24,
     BAD_MORALE_ROLL_MAX          = 12,
     BAD_MORALE_NETWORK_ROLL_MAX  = 4,
     BAD_MORALE_NETWORK_SKIP_ROLL = 1,
     MORALE_EFFECT_DURATION       = 180
-H2_ENUM_END(CombatMoraleConstant)
+} CombatMoraleConstant;
 
 }
 
-VA(0x0048fd50, 0x1ba)
 combatManager::combatManager(void) {
     m_unknownF373 = -1;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
@@ -194,18 +198,17 @@ combatManager::combatManager(void) {
     m_unknownF35B = 0;
     m_unknownF353 = -1;
     m_unknownF34F = m_unknownF353;
-    m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)] = m_unknownF34F;
-    m_catapultFrame[IDX(COMBAT_DEFENDER_SIDE)] = m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)];
-    m_unknownF337[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_unknownF337[IDX(COMBAT_DEFENDER_SIDE)] = m_unknownF337[IDX(COMBAT_ATTACKER_SIDE)];
+    m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = m_unknownF34F;
+    m_catapultFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)];
+    m_unknownF337[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_unknownF337[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = m_unknownF337[H2EnumIndex(COMBAT_ATTACKER_SIDE)];
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = 0;
-    strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004f8908, combatManagerEmptyString, ""));
-    strcpy(m_currentCombatMessage, DATA_COMPGEN(0x004f890c, combatManagerEmptyString2, ""));
+    strcpy(m_previousCombatMessage, "");
+    strcpy(m_currentCombatMessage, "");
 }
 
-VA(0x0048ff0a, 0x128)
 void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup) {
     if (sourceGroup == NULL || targetGroup == NULL)
         return;
@@ -239,7 +242,6 @@ void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup
     }
 }
 
-VA(0x00490032, 0x5f2)
 void combatManager::SetupCombat(
     i32 mapX,
     i32 mapY,
@@ -266,31 +268,31 @@ void combatManager::SetupCombat(
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != NULL) {
-        m_playerId[IDX(COMBAT_ATTACKER_SIDE)] = attackerHero->m_owner;
+        m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = attackerHero->m_owner;
         attackerGroup = &attackerHero->m_army;
     } else {
-        m_playerId[IDX(COMBAT_ATTACKER_SIDE)] = -1;
+        m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = -1;
     }
 
     if (defenderHero != NULL) {
-        m_playerId[IDX(COMBAT_DEFENDER_SIDE)] = defenderHero->m_owner;
+        m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = defenderHero->m_owner;
         defenderGroup = &defenderHero->m_army;
     } else if (defenderTown != NULL) {
-        m_playerId[IDX(COMBAT_DEFENDER_SIDE)] = defenderTown->m_owner;
+        m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = defenderTown->m_owner;
         defenderGroup = &defenderTown->m_army;
     } else {
-        m_playerId[IDX(COMBAT_DEFENDER_SIDE)] = -1;
+        m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = -1;
     }
 
-    // Retail reuses this integer counter for the side and captain-array loops.
+
     i32 index;
-    for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++) {
+    for (index = H2EnumIndex(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++) {
         if (m_playerId[index] >= 0)
             m_networkArmyPresent[index] = gbHumanPlayer[m_playerId[index]];
         else
             m_networkArmyPresent[index] = 0;
 
-        if (index == IDX(COMBAT_ATTACKER_SIDE))
+        if (index == H2EnumIndex(COMBAT_ATTACKER_SIDE))
             m_heroes[index] = attackerHero;
         else
             m_heroes[index] = defenderHero;
@@ -298,7 +300,7 @@ void combatManager::SetupCombat(
         if (m_heroes[index] != NULL)
             m_heroes[index]->m_isCaptain = 0;
 
-        if (index == IDX(COMBAT_ATTACKER_SIDE))
+        if (index == H2EnumIndex(COMBAT_ATTACKER_SIDE))
             m_armyGroups[index] = attackerGroup;
         else
             m_armyGroups[index] = defenderGroup;
@@ -310,7 +312,7 @@ void combatManager::SetupCombat(
             m_catapultAttackCount[index] = m_catapultAttacksRemaining[index];
         }
         if (m_heroes[index] != NULL
-            && m_heroes[index]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+            && m_heroes[index]->m_secondarySkills[H2EnumIndex(HERO_SKILL_BALLISTICS)]
                    >= HERO_SKILL_LEVEL_ADVANCED) {
             m_catapultAttackCount[index]++;
             m_catapultAttacksRemaining[index]++;
@@ -323,85 +325,84 @@ void combatManager::SetupCombat(
     m_drawbridgeBackgroundVisible = 0;
     if (defenderTown != NULL) {
         if (defenderTown->m_occupyingHeroId != -1) {
-            m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)] = &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army;
-            CombineGroups(&defenderTown->m_army, &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army);
-            m_visitingHeroPresent[IDX(COMBAT_DEFENDER_SIDE)] = 1;
+            m_armyGroups[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = &m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_army;
+            CombineGroups(&defenderTown->m_army, &m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_army);
+            m_visitingHeroPresent[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 1;
         } else {
-            m_visitingHeroPresent[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+            m_visitingHeroPresent[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
         }
 
-        if (defenderTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+        if (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
             m_inCastleCombat = true;
         else
             m_inCastleCombat = false;
 
         if (m_inCastleCombat != 0) {
-            if (defenderTown->m_buildings & IDX(TOWN_BUILDING_MOAT))
+            if (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_MOAT))
                 m_drawbridgeBackgroundVisible = 1;
             else
                 m_drawbridgeBackgroundVisible = 0;
         }
 
         m_drawbridgeState = COMBAT_CASTLE_GATE_OPEN;
-        m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] = defenderTown;
-        m_originalCombatTown = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)];
+        m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = defenderTown;
+        m_originalCombatTown = m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)];
 
-        if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] == NULL
-            && (defenderTown->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
-            m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = &m_captain;
+        if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == NULL
+            && (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
+            m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
             for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++)
                 m_captain.m_primaryStats[index] =
-                    captainStats[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
+                    captainStats[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
                                 [index];
             m_captain.m_spellPoints =
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
-            m_captain.m_cursorType = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type;
+            m_captain.m_cursorType = m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type;
             m_captain.m_portrait = static_cast<HeroPortrait>(
-                static_cast<i32>(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)
+                static_cast<i32>(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
-            strcpy(m_captain.m_name, DATA_COMPGEN(0x004f8910, setupCombatCaptain, "Captain"));
+            strcpy(m_captain.m_name, "Captain");
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
             for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++)
                 m_captain.m_artifacts[index] = ARTIFACT_NONE;
             m_captain.m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
-            m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->GiveSpells(&m_captain);
+            m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->GiveSpells(&m_captain);
             m_captain.m_isCaptain = 1;
         }
     } else {
         m_inCastleCombat = false;
-        m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] = NULL;
+        m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = NULL;
     }
-    m_combatTowns[IDX(COMBAT_ATTACKER_SIDE)] = NULL;
+    m_combatTowns[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = NULL;
 }
 
-VA(0x00490624, 0x279)
 void combatManager::InitNonVisualVars(void) {
     m_gridSelectionDisabled = 0;
     m_nonVisualCombat = 0;
     CombatSide side;
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        m_spellPower[IDX(side)] = 0;
-        if (m_heroes[IDX(side)] != NULL)
-            m_spellPower[IDX(side)] = m_heroes[IDX(side)]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[IDX(side)] != NULL && m_combatTowns[IDX(side)]->m_type == FACTION_NECROMANCER
-            && (m_combatTowns[IDX(side)]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
-            m_spellPower[IDX(side)] += NECROMANCER_SHRINE_POWER_BONUS;
+    for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
+        m_spellPower[H2EnumIndex(side)] = 0;
+        if (m_heroes[H2EnumIndex(side)] != NULL)
+            m_spellPower[H2EnumIndex(side)] = m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_SPELL_POWER);
+        if (m_combatTowns[H2EnumIndex(side)] != NULL && m_combatTowns[H2EnumIndex(side)]->m_type == FACTION_NECROMANCER
+            && (m_combatTowns[H2EnumIndex(side)]->m_buildings & H2EnumIndex(TOWN_BUILDING_SHRINE)))
+            m_spellPower[H2EnumIndex(side)] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
-    m_heroOverlayFrame[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_heroOverlayFrame[IDX(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
-    m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_heroOverlayFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_heroOverlayFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
+    m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
     m_combatResult = COMBAT_RESULT_PENDING;
     m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
     m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
     m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
     m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
-    m_eagleEyeSpell[IDX(COMBAT_ATTACKER_SIDE)] = SPELL_NONE;
-    m_eagleEyeSpell[IDX(COMBAT_DEFENDER_SIDE)] = SPELL_NONE;
+    m_eagleEyeSpell[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = SPELL_NONE;
+    m_eagleEyeSpell[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = SPELL_NONE;
     giNextAction = ACTION_NONE;
     m_summonedCreatureType[0] = CREATURE_SUMMONED_NONE;
     m_summonedCreatureType[1] = CREATURE_SUMMONED_NONE;
@@ -413,8 +414,8 @@ void combatManager::InitNonVisualVars(void) {
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
     gbRetreatWin = false;
     gbCombatSurrender = false;
-    m_sideDefeated[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_sideDefeated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_sideDefeated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
     m_limitCreature = 1;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
@@ -422,7 +423,6 @@ void combatManager::InitNonVisualVars(void) {
     LoadArmies();
 }
 
-VA(0x0049089d, 0x203)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
     CombatHexDirection direction;
@@ -431,11 +431,11 @@ void combatManager::SetupAdjacencyArray(void) {
     for (fromHex = 0; fromHex < COMBAT_HEX_COUNT; fromHex++) {
         rowIndex = fromHex / COMBAT_GRID_ROW_LENGTH;
         for (direction = COMBAT_DIRECTION_NORTHEAST;
-             IDX(direction) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             H2EnumIndex(direction) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              direction++) {
             if (fromHex % COMBAT_GRID_ROW_LENGTH == 0
                 || fromHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
-                m_adjacency[fromHex][IDX(direction)] = -1;
+                m_adjacency[fromHex][H2EnumIndex(direction)] = -1;
             } else {
                 switch (direction) {
                     case COMBAT_DIRECTION_NORTHEAST:
@@ -473,17 +473,16 @@ void combatManager::SetupAdjacencyArray(void) {
                 if (destinationHex % COMBAT_GRID_ROW_LENGTH == 0
                     || destinationHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1
                     || destinationHex < 0 || destinationHex >= COMBAT_HEX_COUNT)
-                    m_adjacency[fromHex][IDX(direction)] = -1;
+                    m_adjacency[fromHex][H2EnumIndex(direction)] = -1;
                 else
-                    m_adjacency[fromHex][IDX(direction)] = static_cast<i8>(destinationHex);
+                    m_adjacency[fromHex][H2EnumIndex(direction)] = static_cast<i8>(destinationHex);
             }
         }
     }
 }
 
-VA(0x00490aa0, 0x43f)
 i32 combatManager::Open(i32 openFlags) {
-    LogStr(DATA_COMPGEN(0x004f8918, openOp1, "Op1"));
+    LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = 1;
     i32 savedShowMouseHex = gConfig.showCombatMouseHex;
@@ -497,19 +496,19 @@ i32 combatManager::Open(i32 openFlags) {
         new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
     m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     m_mouseGridBuffer = NULL;
-    m_smallViewLastX[IDX(COMBAT_ATTACKER_SIDE)] = -1;
-    m_smallViewLastX[IDX(COMBAT_DEFENDER_SIDE)] = -1;
-    memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
+    m_smallViewLastX[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = -1;
+    m_smallViewLastX[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = -1;
+    memset(m_gridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_gridState));
     LoadIcons();
     InitNonVisualVars();
     SetupAndLoadObstacles();
-    memset(m_previousGridState, IDX(GRID_SHADE_NONE), sizeof(m_previousGridState));
+    memset(m_previousGridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_previousGridState));
     GetNextArmy(0);
     m_backgroundDrawn = 0;
 
-    LogStr(DATA_COMPGEN(0x004f891c, openOp2, "Op2"));
+    LogStr("Op2");
     SAMPLE2 preBattleSample = NULL_SAMPLE2;
-    preBattleSample = LoadPlaySample(DATA_COMPGEN(0x004f8920, openPREBATTL82M, "PREBATTL.82M"));
+    preBattleSample = LoadPlaySample("PREBATTL.82M");
     gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
@@ -517,19 +516,19 @@ i32 combatManager::Open(i32 openFlags) {
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
     gpMouseManager->m_forcePointerUpdate = 0;
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f8930, openCmbtmousMse, "cmbtmous.mse"), COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
-    m_combatWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f8940, openCmbtwinBin, "cmbtwin.bin"));
+    m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
     if (m_combatWindow == NULL)
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = 1;
     DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     glTimers[0] = KBTickCount();
-    m_combatPalette = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f894c, openKbPal, "kb.pal"));
+    m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
-    CombatMessage(DATA_COMPGEN(0x004f8954, openEmptyString, ""), 1, 1, 0);
+    CombatMessage("", 1, 1, 0);
     gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
@@ -537,22 +536,21 @@ i32 combatManager::Open(i32 openFlags) {
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(preBattleSample, -1);
 
-    LogStr(DATA_COMPGEN(0x004f8958, openOp3, "Op3"));
+    LogStr("Op3");
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
     ResetCycleTimers();
-    LogStr(DATA_COMPGEN(0x004f895c, openOp4, "Op4"));
+    LogStr("Op4");
     gpInputManager->Flush();
     ResetMouse();
     m_messageMask = BASE_MANAGER_ACCEPT_WIDGET;
     m_priority = openFlags;
     m_active = true;
-    strcpy(m_name, DATA_COMPGEN(0x004f8960, openCombatManager, "combatManager"));
-    LogStr(DATA_COMPGEN(0x004f8970, openOp5, "Op5"));
+    strcpy(m_name, "combatManager");
+    LogStr("Op5");
     return 0;
 }
 
-VA(0x00490edf, 0x3d6)
 void combatManager::Close(void) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gbLimitedCombatUpdatePalette = false;
@@ -571,25 +569,25 @@ void combatManager::Close(void) {
     i32 total;
     CombatSide groupSide;
     i32 index;
-    // Retail reuses this integer counter for the side and army-group loops.
-    for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++)
+
+    for (index = H2EnumIndex(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++)
         UpdateArmyGroup(static_cast<CombatSide>(index));
 
     total = 0;
-    if (m_playerId[IDX(COMBAT_DEFENDER_SIDE)] == -1)
+    if (m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == -1)
         groupSide = COMBAT_DEFENDER_SIDE;
     else
         groupSide = COMBAT_ATTACKER_SIDE;
 
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
-        if (m_armyGroups[IDX(groupSide)]->m_creatureTypes[index] != CREATURE_NONE)
-            total += m_armyGroups[IDX(groupSide)]->m_creatureCounts[index];
+        if (m_armyGroups[H2EnumIndex(groupSide)]->m_creatureTypes[index] != CREATURE_NONE)
+            total += m_armyGroups[H2EnumIndex(groupSide)]->m_creatureCounts[index];
     }
 
     if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
         if (total > MONSTER_COUNT_SAVE_LIMIT)
             total = MONSTER_COUNT_SAVE_LIMIT;
-        m_battlefieldCell->m_objectMetadata = total & IDX(MAP_MONSTER_COUNT_MASK);
+        m_battlefieldCell->m_objectMetadata = total & H2EnumIndex(MAP_MONSTER_COUNT_MASK);
     }
 
     if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
@@ -615,37 +613,35 @@ void combatManager::Close(void) {
     m_combatWindowOpen = 0;
 }
 
-VA(0x004912b5, 0x38c)
-void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
+void combatManager::UpdateArmyGroup(CombatSide side) {
     i32 index;
     i32 pos;
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
-        m_armyGroups[IDX(side)]->m_creatureTypes[index] = CREATURE_NONE;
-        m_armyGroups[IDX(side)]->m_creatureCounts[index] = 0;
+        m_armyGroups[H2EnumIndex(side)]->m_creatureTypes[index] = CREATURE_NONE;
+        m_armyGroups[H2EnumIndex(side)]->m_creatureCounts[index] = 0;
     }
 
-    for (index = 0; index < m_armyCount[IDX(side)]; index++) {
-        if (!HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED)
-            && m_armies[IDX(side)][index].m_quantity > 0
-            && (m_playerId[IDX(side)] == -1
-                || ((m_armies[IDX(side)][index].m_monsterType != CREATURE_EARTH_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_AIR_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_FIRE_ELEMENTAL
-                     && m_armies[IDX(side)][index].m_monsterType != CREATURE_WATER_ELEMENTAL)
-                    || !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)))
-            && !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
-            m_armyGroups[IDX(side)]->m_creatureTypes[m_armies[IDX(side)][index].m_armyGroupSlot] =
-                m_armies[IDX(side)][index].m_monsterType;
-            m_armyGroups[IDX(side)]->m_creatureCounts[m_armies[IDX(side)][index].m_armyGroupSlot] =
-                static_cast<i16>(m_armies[IDX(side)][index].m_quantity);
+    for (index = 0; index < m_armyCount[H2EnumIndex(side)]; index++) {
+        if (!(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_AI_EXCLUDED)))
+            && m_armies[H2EnumIndex(side)][index].m_quantity > 0
+            && (m_playerId[H2EnumIndex(side)] == -1
+                || ((m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_EARTH_ELEMENTAL
+                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_AIR_ELEMENTAL
+                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_FIRE_ELEMENTAL
+                     && m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_WATER_ELEMENTAL)
+                    || !(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_SUMMONED)))))
+            && !(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)))) {
+            m_armyGroups[H2EnumIndex(side)]->m_creatureTypes[m_armies[H2EnumIndex(side)][index].m_armyGroupSlot] =
+                m_armies[H2EnumIndex(side)][index].m_monsterType;
+            m_armyGroups[H2EnumIndex(side)]->m_creatureCounts[m_armies[H2EnumIndex(side)][index].m_armyGroupSlot] =
+                static_cast<i16>(m_armies[H2EnumIndex(side)][index].m_quantity);
         }
     }
 
     if (giSkeletonsCreated && m_combatResult == CombatResultForSide(side))
-        m_armyGroups[IDX(side)]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
+        m_armyGroups[H2EnumIndex(side)]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
 
-VA(0x00491641, 0x365)
 void combatManager::GenerateMap(void) {
     i32 gridX;
     i32 randomOffset;
@@ -654,9 +650,9 @@ void combatManager::GenerateMap(void) {
     i32 coordinateY;
 
     if (m_inCastleCombat == 1)
-        m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)] = 0;
+        m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
     else
-        m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)] = -1;
+        m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = -1;
 
     for (y = 0; static_cast<i32>(y) < COMBAT_GRID_ROW_COUNT; y++) {
         for (x = 0; x < COMBAT_GRID_ROW_LENGTH; x++) {
@@ -689,7 +685,6 @@ void combatManager::GenerateMap(void) {
     randomOffset = SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
 }
 
-VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
@@ -754,10 +749,9 @@ char* combatManager::GetBackgroundName(void) {
             backgroundIndex = BACKGROUND_WATER;
             break;
     }
-    return cCombatBkgNames[IDX(backgroundIndex)];
+    return cCombatBkgNames[H2EnumIndex(backgroundIndex)];
 }
 
-VA(0x00491bca, 0x210)
 i32 combatManager::MoreTreesNear(void) {
     i32 treeCount;
     i32 x;
@@ -771,7 +765,7 @@ i32 combatManager::MoreTreesNear(void) {
     i32 nearbyDirection;
     i32 centerY;
 
-    memset(nearbyTypeTable, IDX(NEARBY_UNKNOWN), sizeof(nearbyTypeTable));
+    memset(nearbyTypeTable, H2EnumIndex(NEARBY_UNKNOWN), sizeof(nearbyTypeTable));
     combatOriginX = m_combatX;
     centerY = m_combatY;
 
@@ -818,7 +812,6 @@ i32 combatManager::MoreTreesNear(void) {
     return mountainCounter < treeCount;
 }
 
-VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void) {
     i32 index;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
@@ -827,28 +820,28 @@ void combatManager::LoadIcons(void) {
     for (index = 0; index < COMBAT_OBSTACLE_ICON_LOAD_COUNT; index++)
         m_obstacleIcons[index] = NULL;
 
-    m_combatIcons[IDX(COMBAT_ICON_SPELLS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8974, loadIconsSpellsIcn, "spells.icn"));
-    m_combatIcons[IDX(COMBAT_ICON_STATUS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8980, loadIconsTextbarIcn, "textbar.icn"));
-    m_combatIcons[IDX(COMBAT_ICON_GRID)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f898c, loadIconsCmbtmiscIcn, "cmbtmisc.icn"));
-    m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_BACKGROUND)] =
-        gpResourceManager->GetIcon(DATA_COMPGEN(0x004f899c, loadIconsViewarsmIcn, "viewarsm.icn"));
-    m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)] =
-        gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89ac, loadIconsMinilkmrIcn, "minilkmr.icn"));
-    m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89bc, loadIconsSpellinfIcn, "spellinf.icn"));
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_SPELLS)] = gpResourceManager->GetIcon("spells.icn");
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_STATUS)] = gpResourceManager->GetIcon("textbar.icn");
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_GRID)] = gpResourceManager->GetIcon("cmbtmisc.icn");
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_SMALL_VIEW_BACKGROUND)] =
+        gpResourceManager->GetIcon("viewarsm.icn");
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_SMALL_VIEW_MODIFIER)] =
+        gpResourceManager->GetIcon("minilkmr.icn");
+    m_combatIcons[H2EnumIndex(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon("spellinf.icn");
 
     if (m_inCastleCombat) {
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_MOAT)) {
-            m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89cc, loadIconsMoatpartIcn, "moatpart.icn"));
-            m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89dc, loadIconsMoatwholIcn, "moatwhol.icn"));
+        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_MOAT)) {
+            m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
+            m_combatIcons[H2EnumIndex(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
-        m_combatIcons[IDX(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89ec, loadIconsCatapultIcn, "catapult.icn"));
+        m_combatIcons[H2EnumIndex(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon("catapult.icn");
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f89fc, loadIconsCastleCIcn, "castle%c.icn"),
-            cHeroTypeInitial[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
+            "castle%c.icn",
+            cHeroTypeInitial[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
-        m_combatIcons[IDX(COMBAT_ICON_TOWER)] = gpResourceManager->GetIcon(gText);
-        m_combatIcons[IDX(COMBAT_ICON_KEEP)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8a0c, loadIconsKeepIcn, "keep.icn"));
+        m_combatIcons[H2EnumIndex(COMBAT_ICON_TOWER)] = gpResourceManager->GetIcon(gText);
+        m_combatIcons[H2EnumIndex(COMBAT_ICON_KEEP)] = gpResourceManager->GetIcon("keep.icn");
     }
 
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
@@ -860,14 +853,14 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroes[index]) {
             if (m_heroes[index]->m_isCaptain) {
-                sprintf(gText, DATA_COMPGEN(0x004f8a18, loadIconsCmbtcapCIcn, "cmbtcap%c.icn"), cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] =
-                    IDX(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
+                    H2EnumIndex(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
-                sprintf(gText, DATA_COMPGEN(0x004f8a28, loadIconsCmbthroCIcn, "cmbthro%c.icn"), cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
-                m_heroSpriteIndex[index] = IDX(m_heroes[index]->m_cursorType);
+                m_heroSpriteIndex[index] = H2EnumIndex(m_heroes[index]->m_cursorType);
             }
         }
 
@@ -879,13 +872,12 @@ void combatManager::LoadIcons(void) {
                 heroColor = gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color;
                 DebugCheck();
             }
-            sprintf(gText, DATA_COMPGEN(0x004f8a38, loadIconsHerofl02dIcn, "herofl%02d.icn"), heroColor);
+            sprintf(gText, "herofl%02d.icn", heroColor);
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
         }
     }
 }
 
-VA(0x004921c1, 0x124)
 void combatManager::FreeIcons(void) {
     i32 index;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++) {
@@ -906,80 +898,78 @@ void combatManager::FreeIcons(void) {
     }
 }
 
-VA(0x004922e5, 0x36d)
 void combatManager::LoadArmies(void) {
     i32 groupSlot;
     CombatSide side;
     i32 combatHex;
 
-    m_armyCount[IDX(COMBAT_ATTACKER_SIDE)] = m_armyCount[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
 
     for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++) {
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-            m_armies[IDX(side)][groupSlot].m_quantity = 0;
-            m_armies[IDX(side)][groupSlot].m_monsterType = CREATURE_NONE;
+        for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
+            m_armies[H2EnumIndex(side)][groupSlot].m_quantity = 0;
+            m_armies[H2EnumIndex(side)][groupSlot].m_monsterType = CREATURE_NONE;
         }
     }
 
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
+    for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
         for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++)
-            m_armies[IDX(side)][groupSlot].InitClean();
+            m_armies[H2EnumIndex(side)][groupSlot].InitClean();
     }
 
     for (groupSlot = 0; groupSlot < ARMY_GROUP_SLOT_COUNT; groupSlot++) {
-        if (m_armyGroups[IDX(COMBAT_ATTACKER_SIDE)]->m_creatureTypes[groupSlot]
+        if (m_armyGroups[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_creatureTypes[groupSlot]
             != CREATURE_NONE) {
-            if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]
-                && HAS(m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
+            if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]
+                && (H2EnumIndex((m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_eventFlags) & (HERO_EVENT_GROUPED_FORMATION))))
                 combatHex = COMBAT_GROUPED_HEX_STEP * groupSlot + COMBAT_ATTACKER_GROUPED_HEX;
             else
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_ATTACKER_SPREAD_HEX;
 
-            m_armies[IDX(COMBAT_ATTACKER_SIDE)][m_armyCount[IDX(COMBAT_ATTACKER_SIDE)]].Init(
-                m_armyGroups[IDX(COMBAT_ATTACKER_SIDE)]->m_creatureTypes[groupSlot],
-                m_armyGroups[IDX(COMBAT_ATTACKER_SIDE)]->m_creatureCounts[groupSlot],
+            m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)]].Init(
+                m_armyGroups[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_creatureTypes[groupSlot],
+                m_armyGroups[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_creatureCounts[groupSlot],
                 COMBAT_ATTACKER_SIDE,
-                m_armyCount[IDX(COMBAT_ATTACKER_SIDE)],
+                m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)],
                 combatHex,
                 groupSlot
             );
-            m_armies[IDX(COMBAT_ATTACKER_SIDE)][m_armyCount[IDX(COMBAT_ATTACKER_SIDE)]].LoadResources();
-            m_armyCount[IDX(COMBAT_ATTACKER_SIDE)]++;
+            m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)]].LoadResources();
+            m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)]++;
         }
 
-        if (m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)]->m_creatureTypes[groupSlot]
+        if (m_armyGroups[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_creatureTypes[groupSlot]
             != CREATURE_NONE) {
-            if ((m_heroes[IDX(COMBAT_DEFENDER_SIDE)]
-                 && HAS(m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
-                || (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]
-                    && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_formation))
+            if ((m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]
+                 && (H2EnumIndex((m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_eventFlags) & (HERO_EVENT_GROUPED_FORMATION))))
+                || (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]
+                    && m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_formation))
                 combatHex = COMBAT_GROUPED_HEX_STEP * groupSlot + COMBAT_DEFENDER_GROUPED_HEX;
             else
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_DEFENDER_SPREAD_HEX;
 
-            m_armies[IDX(COMBAT_DEFENDER_SIDE)][m_armyCount[IDX(COMBAT_DEFENDER_SIDE)]].Init(
-                m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)]->m_creatureTypes[groupSlot],
-                m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)]->m_creatureCounts[groupSlot],
+            m_armies[H2EnumIndex(COMBAT_DEFENDER_SIDE)][m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)]].Init(
+                m_armyGroups[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_creatureTypes[groupSlot],
+                m_armyGroups[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_creatureCounts[groupSlot],
                 COMBAT_DEFENDER_SIDE,
-                m_armyCount[IDX(COMBAT_DEFENDER_SIDE)],
+                m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)],
                 combatHex,
                 groupSlot
             );
-            m_armies[IDX(COMBAT_DEFENDER_SIDE)][m_armyCount[IDX(COMBAT_DEFENDER_SIDE)]].LoadResources();
-            m_armyCount[IDX(COMBAT_DEFENDER_SIDE)]++;
+            m_armies[H2EnumIndex(COMBAT_DEFENDER_SIDE)][m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)]].LoadResources();
+            m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)]++;
         }
     }
 }
 
-VA(0x00492652, 0xdb)
 void combatManager::FreeArmies(void) {
     i32 index;
     gpSoundManager->StopAllSamples(1);
 
-    for (index = 0; index < m_armyCount[IDX(COMBAT_ATTACKER_SIDE)]; index++)
-        m_armies[IDX(COMBAT_ATTACKER_SIDE)][index].FreeResources();
-    for (index = 0; index < m_armyCount[IDX(COMBAT_DEFENDER_SIDE)]; index++)
-        m_armies[IDX(COMBAT_DEFENDER_SIDE)][index].FreeResources();
+    for (index = 0; index < m_armyCount[H2EnumIndex(COMBAT_ATTACKER_SIDE)]; index++)
+        m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][index].FreeResources();
+    for (index = 0; index < m_armyCount[H2EnumIndex(COMBAT_DEFENDER_SIDE)]; index++)
+        m_armies[H2EnumIndex(COMBAT_DEFENDER_SIDE)][index].FreeResources();
 
     if (gCurLoadedSpellIcon)
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
@@ -987,7 +977,6 @@ void combatManager::FreeArmies(void) {
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
 }
 
-VA(0x0049272d, 0x1e2)
 i32 combatManager::GetGridIndex(i32 x, i32 y) {
     i32 gridX;
     i32 gridY;
@@ -1043,8 +1032,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
     return rowIndex * COMBAT_GRID_ROW_LENGTH + gridColumn;
 }
 
-VA(0x0049290f, 0x1eb)
-void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
+void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return;
     if (bInHighMoraleBonus) {
@@ -1053,8 +1041,8 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     }
     bInHighMoraleBonus = 0;
 
-    army* activeArmy = &m_armies[IDX(side)][index];
-    if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
+    army* activeArmy = &m_armies[H2EnumIndex(side)][index];
+    if ((H2EnumIndex((activeArmy->m_monster.flags.all) & (MONSTER_FLAGS_NO_MORALE))))
         return;
     if (activeArmy->m_quantity == 0)
         return;
@@ -1065,48 +1053,45 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     bInHighMoraleBonus = 1;
     SAMPLE2 moraleSample;
     if (!gbNoShowCombat) {
-        sprintf(gText, DATA_COMPGEN(0x004f8a48, checkApplyGoodMoraleGoodmrle82M, "goodmrle.82M"));
+        sprintf(gText, "goodmrle.82M");
         moraleSample = LoadPlaySample(gText);
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004f8a58, checkApplyGoodMoraleHighMoraleEnablesTheSTo, "High morale enables the \n%s to attack again."),
-                gArmyNames[IDX(activeArmy->m_monsterType)]
+                "High morale enables the \n%s to attack again.",
+                gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004f8a88, checkApplyGoodMoraleHighMoraleEnablesTheSTo2, "High morale enables the \n%s to attack again."),
-                gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
+                "High morale enables the \n%s to attack again.",
+                gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
     }
 
     activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
-    if HAS (activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
-        H2_ENUM_CLEAR_FLAG(
-            activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE
-        );
+    if (H2EnumIndex((activeArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_BAD_MORALE)))
+        ((activeArmy->m_monster.flags.abilityFlags) &= ~(MONSTER_ABILITY_FLAG_BAD_MORALE));
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
     if (!gbNoShowCombat)
         WaitEndSample(moraleSample, -1);
 }
 
-VA(0x00492afa, 0x1cd)
 i32 combatManager::CheckApplyBadMorale(
-    H2_ENUM_PARAM(CombatSide, i32) side, i32 index
+    CombatSide side, i32 index
 ) {
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return 0;
 
-    army* activeArmy = &m_armies[IDX(side)][index];
-    if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
+    army* activeArmy = &m_armies[H2EnumIndex(side)][index];
+    if ((H2EnumIndex((activeArmy->m_monster.flags.all) & (MONSTER_FLAGS_NO_MORALE))))
         return 0;
     if (activeArmy->m_morale >= 0
         || SRandom(MORALE_ROLL_MIN, BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
         return 0;
-    if (!m_networkArmyPresent[IDX(side)]
+    if (!m_networkArmyPresent[H2EnumIndex(side)]
         && SRandom(MORALE_ROLL_MIN, BAD_MORALE_NETWORK_ROLL_MAX)
                == BAD_MORALE_NETWORK_SKIP_ROLL)
         return 0;
@@ -1114,18 +1099,18 @@ i32 combatManager::CheckApplyBadMorale(
     SAMPLE2 moraleSample;
     if (!gbNoShowCombat) {
         moraleSample = NULL_SAMPLE2;
-        moraleSample = LoadPlaySample(DATA_COMPGEN(0x004f8ab8, checkApplyBadMoraleBADMRLE82M, "BADMRLE.82M"));
+        moraleSample = LoadPlaySample("BADMRLE.82M");
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004f8ac4, checkApplyBadMoraleLowMoraleCausesTheSTo, "Low morale causes the \n%s to freeze in panic."),
-                gArmyNames[IDX(activeArmy->m_monsterType)]
+                "Low morale causes the \n%s to freeze in panic.",
+                gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004f8af4, checkApplyBadMoraleLowMoraleCausesTheSTo2, "Low morale causes the \n%s to freeze in panic."),
-                gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
+                "Low morale causes the \n%s to freeze in panic.",
+                gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
     }
@@ -1137,7 +1122,6 @@ i32 combatManager::CheckApplyBadMorale(
     return 1;
 }
 
-VA(0x00492cc7, 0x382)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
     army* activeArmy;
     i32 speedLoop;
@@ -1155,14 +1139,13 @@ restart:
     for (speedLoop = 0; speedLoop < COMBAT_SPEED_LEVEL_COUNT; speedLoop++) {
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             stackSide ^= 1;
-            for (armyCounter = 0; armyCounter < m_armyCount[IDX(stackSide)]; armyCounter++) {
+            for (armyCounter = 0; armyCounter < m_armyCount[H2EnumIndex(stackSide)]; armyCounter++) {
                 skipEntry = 0;
-                activeArmy = armyCounter + m_armies[IDX(stackSide)];
-                if (HAS(activeArmy->m_monster.flags.abilityFlags,
-                        MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
-                    || IDX(activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
-                    || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                    || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
+                activeArmy = armyCounter + m_armies[H2EnumIndex(stackSide)];
+                if ((H2EnumIndex((activeArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)))
+                    || H2EnumIndex(activeArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)])
+                    || activeArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
+                    || activeArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)]
                     || (activeArmy->m_monster.speed != m_currentSpeed
                         && !(
                             activeArmy->m_monster.flags.abilityFlags
@@ -1176,8 +1159,7 @@ restart:
                     ))
                     skipEntry = 1;
 
-                if HAS (activeArmy->m_monster.flags.abilityFlags,
-                        MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
+                if (H2EnumIndex((activeArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_DEFERRED_TURN))) {
                     skipEntry = 1;
                     hasDeferred = 1;
                 }
@@ -1188,11 +1170,11 @@ restart:
                     break;
             }
 
-            if (armyCounter != m_armyCount[IDX(stackSide)]) {
+            if (armyCounter != m_armyCount[H2EnumIndex(stackSide)]) {
                 m_currentArmySide = stackSide;
                 m_currentArmyIndex = armyCounter;
-                if ((armyCounter + m_armies[IDX(stackSide)])
-                        ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
+                if ((armyCounter + m_armies[H2EnumIndex(stackSide)])
+                        ->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
                     m_currentSide = OppositeCombatSide(stackSide);
                 else
                     m_currentSide = stackSide;
@@ -1226,37 +1208,35 @@ restart:
     return 0;
 }
 
-VA(0x00493049, 0xd6)
-i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
+i32 combatManager::IsWinner(CombatSide side) {
     i32 winner;
     i32 index;
 
-    if (m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
+    if (m_sideDefeated[H2EnumIndex(COMBAT_DEFENDER_SIDE) - H2EnumIndex(side)])
         return 1;
-    if (m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
+    if (m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE) - H2EnumIndex(side)])
         return 1;
 
     side ^= 1;
     winner = 1;
-    for (index = 0; index < m_armyCount[IDX(side)]; index++) {
-        if (!(m_armies[IDX(side)][index].m_monster.flags.abilityFlags
+    for (index = 0; index < m_armyCount[H2EnumIndex(side)]; index++) {
+        if (!(m_armies[H2EnumIndex(side)][index].m_monster.flags.abilityFlags
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
             winner = 0;
     }
     return winner;
 }
 
-VA(0x0049311f, 0x100e)
-void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
+void combatManager::CatAttack(CombatSide side) {
     if (!m_inCastleCombat)
         return;
 
-    LogStr(DATA_COMPGEN(0x004f8b24, catAttackCA1, "CA1"));
-    if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
-        || m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
-        m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
-        DrawSmallView(IDX(COMBAT_ATTACKER_SIDE), 1);
-        DrawSmallView(IDX(COMBAT_DEFENDER_SIDE), 1);
+    LogStr("CA1");
+    if (m_smallViewSide[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
+        || m_smallViewSide[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
+        m_smallViewSide[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
+        DrawSmallView(H2EnumIndex(COMBAT_ATTACKER_SIDE), 1);
+        DrawSmallView(H2EnumIndex(COMBAT_DEFENDER_SIDE), 1);
     }
 
     i32 random8 = SRandom(COMBAT_CATAPULT_TARGET_ROLL_MIN, COMBAT_CATAPULT_TARGET_ROLL_MAX);
@@ -1273,25 +1253,25 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 advancedRoll5;
     i32 index28;
 
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] != COMBAT_WALL_STATE_DESTROYED
+        && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)]
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_SECOND)] != COMBAT_WALL_STATE_DESTROYED
+        && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_SECOND)]
                != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)]
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_THIRD)] != COMBAT_WALL_STATE_DESTROYED
+        && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_THIRD)]
                != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FOURTH)] != COMBAT_WALL_STATE_DESTROYED
+        && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
         towerCount1++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
+    if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
         towerCount1++;
 
     if (wallCount7 != 0) {
@@ -1299,23 +1279,23 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         wallIndex17 = -1;
         while (random8 != 0) {
             wallIndex17++;
-            if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+            if (m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                     != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED)
                 random8--;
         }
     } else if (towerCount1 != 0) {
         random8 %= towerCount1;
         if (random8 == 1
-            || m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED)
+            || m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED)
             towerIndex27 = COMBAT_WALL_SLOT_BOTTOM_TOWER;
         else
             towerIndex27 = COMBAT_WALL_SLOT_TOP_TOWER;
     } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
         gateIndex2 = 1;
     } else {
-        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING)
+        if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING)
             keepIndex6 = 0;
     }
 
@@ -1323,30 +1303,30 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         && keepIndex6 == -1)
         return;
 
-    sprintf(gText, DATA_COMPGEN(0x004f8b28, catAttackCatsnd02d82M, "catsnd%02d.82M"), COMBAT_CATAPULT_IMPACT_SOUND);
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     sample* loadedSample26 = gpResourceManager->GetSample(gText);
     i32 unknown15;
     SAMPLE2 catapultSound37 = NULL_SAMPLE2;
     SAMPLE2 impactSound1 = NULL_SAMPLE2;
-    icon* boulder37 = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8b38, boulder37BoulderIcn, "boulder.icn"));
-    sprintf(gText, DATA_COMPGEN(0x004f8b44, catAttackCatsnd02d82M2, "catsnd%02d.82M"), COMBAT_CATAPULT_LAUNCH_SOUND);
+    icon* boulder37 = gpResourceManager->GetIcon("boulder.icn");
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound37 = LoadPlaySample(gText);
 
     i32 impactX5 = -1;
     i32 impactY0 = -1;
     if (wallIndex17 != -1) {
-        impactX5 = wallPos[wallIndex17][IDX(COORDINATE_AXIS_X)];
-        impactY0 = wallPos[wallIndex17][IDX(COORDINATE_AXIS_Y)];
+        impactX5 = wallPos[wallIndex17][H2EnumIndex(COORDINATE_AXIS_X)];
+        impactY0 = wallPos[wallIndex17][H2EnumIndex(COORDINATE_AXIS_Y)];
         targetHex4 = CombatCastleHex(iWallToHexCell[wallIndex17]);
     }
     if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
-        impactX5 = towerPos[IDX(towerIndex27)][IDX(COORDINATE_AXIS_X)];
-        impactY0 = towerPos[IDX(towerIndex27)][IDX(COORDINATE_AXIS_Y)];
-        targetHex4 = CombatCastleHex(iTowerToHexCell[IDX(towerIndex27)]);
+        impactX5 = towerPos[H2EnumIndex(towerIndex27)][H2EnumIndex(COORDINATE_AXIS_X)];
+        impactY0 = towerPos[H2EnumIndex(towerIndex27)][H2EnumIndex(COORDINATE_AXIS_Y)];
+        targetHex4 = CombatCastleHex(iTowerToHexCell[H2EnumIndex(towerIndex27)]);
     }
     if (gateIndex2 != -1) {
-        impactX5 = doorPos[0][IDX(COORDINATE_AXIS_X)];
-        impactY0 = doorPos[0][IDX(COORDINATE_AXIS_Y)];
+        impactX5 = doorPos[0][H2EnumIndex(COORDINATE_AXIS_X)];
+        impactY0 = doorPos[0][H2EnumIndex(COORDINATE_AXIS_Y)];
         targetHex4 = COMBAT_CASTLE_HEX_GATE;
     }
     if (keepIndex6 != -1) {
@@ -1359,11 +1339,11 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     float bounceY0;
     i32 frame18;
 
-    if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+    if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[H2EnumIndex(HERO_SKILL_BALLISTICS)]
         == HERO_SKILL_LEVEL_NONE) {
         firstRoll7 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
-        if (!gbHumanPlayer[m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner])
+        if (!gbHumanPlayer[m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_owner])
             firstRoll7 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
             damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
@@ -1371,30 +1351,30 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             missShot19 = 1;
             damageLevel13 = CATAPULT_DAMAGE_NONE;
         }
-    } else if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+    } else if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[H2EnumIndex(HERO_SKILL_BALLISTICS)]
                <= HERO_SKILL_LEVEL_ADVANCED) {
         advancedRoll5 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
-        if (!gbHumanPlayer[m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner])
+        if (!gbHumanPlayer[m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_owner])
             advancedRoll5 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (advancedRoll5 < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
             damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
-    } else if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+    } else if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[H2EnumIndex(HERO_SKILL_BALLISTICS)]
                == HERO_SKILL_LEVEL_EXPERT) {
         damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
     }
 
     if (missShot19) {
-        // Retail catapult miss-hex payload.
-        // NOLINTBEGIN(readability-magic-numbers)
+
+
         u8 validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] =
             {32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114};
-        // NOLINTEND(readability-magic-numbers)
+
         i32 startDirection =
             SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN, COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT; frame18++) {
             i32 adjacentHex = GetAdjacentCellIndexNoArmy(
-                IDX(targetHex4),
+                H2EnumIndex(targetHex4),
                 static_cast<CombatHexDirection>(
                     (startDirection + frame18) % COMBAT_CATAPULT_DIRECTION_COUNT
                 )
@@ -1419,10 +1399,10 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     giMaxExtentX = COMBAT_CATAPULT_INITIAL_MAX_X;
     giMinExtentY = COMBAT_CATAPULT_INITIAL_MIN_Y;
     giMaxExtentY = COMBAT_CATAPULT_INITIAL_MAX_Y;
-    m_catapultFrame[IDX(side)] = 0;
-    while (m_catapultFrame[IDX(side)] < COMBAT_CATAPULT_LOAD_FRAME_COUNT) {
+    m_catapultFrame[H2EnumIndex(side)] = 0;
+    while (m_catapultFrame[H2EnumIndex(side)] < COMBAT_CATAPULT_LOAD_FRAME_COUNT) {
         DrawFrame(1, 0, 1, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
-        m_catapultFrame[IDX(side)]++;
+        m_catapultFrame[H2EnumIndex(side)]++;
     }
 
     startX7 = COMBAT_CATAPULT_START_X;
@@ -1451,19 +1431,15 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             giMaxExtentX =
                 static_cast<i32l>(
                     projectileX11
-                    + DATA_COMPGEN(
-                        0x004eb8c4,
-                        catapultProjectileExtentRadius,
-                        IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
-                    )
+                    + H2EnumIndex(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
                 );
             giMinExtentY =
                 static_cast<i32l>(
-                    projectileY4 - IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                    projectileY4 - H2EnumIndex(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
                 );
             giMaxExtentY =
                 static_cast<i32l>(
-                    projectileY4 + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                    projectileY4 + H2EnumIndex(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
                 );
             if (previousY2 < projectileY4)
                 giMinExtentY = previousY2 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
@@ -1508,10 +1484,10 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         spriteFrame27++;
         spriteFrame27 %= COMBAT_CATAPULT_BOULDER_FRAME_COUNT;
         if (frame18 < COMBAT_CATAPULT_ADVANCE_FRAME_COUNT)
-            m_catapultFrame[IDX(side)]++;
+            m_catapultFrame[H2EnumIndex(side)]++;
     }
 
-    sprintf(gText, DATA_COMPGEN(0x004f8b54, catAttackCatsnd02d82M3, "catsnd%02d.82M"), COMBAT_CATAPULT_IMPACT_SOUND);
+    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     impactSound1 = LoadPlaySample(gText);
     m_unknownF34B = 0;
     m_unknownF34F = 0;
@@ -1532,7 +1508,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
     icon* cloud29 =
-        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? DATA_COMPGEN(0x004f8b64, cloud29SmalclodIcn, "smalclod.icn") : DATA_COMPGEN(0x004f8b74, cloud29LichclodIcn, "lichclod.icn")));
+        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? "smalclod.icn" : "lichclod.icn"));
 
     for (frame18 = 0; frame18 < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame18++) {
         if (frame18 >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT
@@ -1541,11 +1517,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
             KBTickCount()
             + gfCombatSpeedMod[gConfig.combatSpeed]
-                * DATA_COMPGEN(
-                    0x004eb8c8,
-                    catapultAnimationDelay,
-                    IDX(COMBAT_CATAPULT_ANIMATION_DELAY)
-                )
+                * H2EnumIndex(COMBAT_CATAPULT_ANIMATION_DELAY)
         );
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
         if (gateIndex2 != -1 && frame18 >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot19) {
@@ -1590,64 +1562,63 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
              || (frame18 == COMBAT_CATAPULT_GATE_IMPACT_FRAME && gateIndex2 != -1))
             && !missShot19) {
             if (wallIndex17 != -1) {
-                if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                if (m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         >= COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST
-                    && m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                    && m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                            <= COMBAT_WALL_STATE_SECTION_DAMAGE_LAST) {
-                    m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] +=
-                        IDX(damageLevel13);
-                    if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                    m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] +=
+                        H2EnumIndex(damageLevel13);
+                    if (m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         > COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
-                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
+                        m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                             COMBAT_WALL_STATE_SECTION_DESTROYED;
                 } else {
                     if (damageLevel13 > CATAPULT_DAMAGE_NORMAL)
-                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
+                        m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                             COMBAT_WALL_STATE_DESTROYED;
                     else
-                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]++;
+                        m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]++;
                 }
-                if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                if (m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         == COMBAT_WALL_STATE_DESTROYED
-                    || m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                    || m_wallStates[wallIndex17 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                            == COMBAT_WALL_STATE_SECTION_DESTROYED)
                     m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
             } else if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
-                m_wallStates[IDX(towerIndex27)] = COMBAT_WALL_STATE_DESTROYED;
+                m_wallStates[H2EnumIndex(towerIndex27)] = COMBAT_WALL_STATE_DESTROYED;
             } else if (gateIndex2 != -1) {
                 m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
             } else if (keepIndex6 != -1) {
-                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_DESTROYED;
+                m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_DESTROYED;
             }
         }
     }
 
     gpResourceManager->Dispose(cloud29);
-    m_catapultFrame[IDX(side)] = 0;
+    m_catapultFrame[H2EnumIndex(side)] = 0;
     DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
     gpResourceManager->Dispose(boulder37);
     WaitEndSample(impactSound1, -1);
     WaitEndSample(catapultSound37, -1);
     if (loadedSample26)
         gpResourceManager->Dispose(loadedSample26);
-    LogStr(DATA_COMPGEN(0x004f8b84, catAttackCA2, "CA2"));
+    LogStr("CA2");
 }
 
-VA(0x0049412d, 0x74f)
-void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
+void combatManager::KeepAttack(CombatTowerSelector tower) {
     if (!m_inCastleCombat)
         return;
     if ((tower == COMBAT_TOWER_GARRISON
-         && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING)
+         && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING)
         || (tower == COMBAT_TOWER_TOP
-            && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
+            && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)]
                    != COMBAT_WALL_STATE_TOWER_STANDING)
         || (tower == COMBAT_TOWER_BOTTOM
-            && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
+            && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    != COMBAT_WALL_STATE_TOWER_STANDING))
         return;
 
-    LogStr(DATA_COMPGEN(0x004f8b88, keepAttackKA1, "KA1"));
+    LogStr("KA1");
 
     CombatKeepTargetPriority bestPriority0 = KEEP_PRIORITY_NONE;
     i32 bestValue10 = 0;
@@ -1656,25 +1627,25 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     army* target0;
     i32 value26;
     for (armyIndex3 = 0; armyIndex3 < COMBAT_ARMY_CAPACITY; armyIndex3++) {
-        if (m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex3].IsAlive()) {
-            target0 = &m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex3];
+        if (m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][armyIndex3].IsAlive()) {
+            target0 = &m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][armyIndex3];
             CombatKeepTargetPriority priority;
-            if (target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
-                || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
-                || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
-                || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
+            if (target0->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)]
+                || target0->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
+                || target0->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
+                || target0->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
+                || target0->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
                 priority = KEEP_PRIORITY_DISABLED;
-            } else if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
+            } else if ((H2EnumIndex((target0->m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER)))) {
                 priority = KEEP_PRIORITY_SHOOTER;
-            } else if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
+            } else if ((H2EnumIndex((target0->m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))) {
                 priority = KEEP_PRIORITY_FLYER;
             } else {
                 priority = KEEP_PRIORITY_WALKER;
             }
 
             value26 =
-                gMonsterDatabase[IDX(target0->m_monsterType)].fightValue * target0->m_quantity;
+                gMonsterDatabase[H2EnumIndex(target0->m_monsterType)].fightValue * target0->m_quantity;
             if (bestPriority0 < priority
                 || (bestPriority0 == priority && bestValue10 < value26)) {
                 bestValue10 = value26;
@@ -1687,13 +1658,12 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (bestArmyIndex5 == -1)
         return;
 
-    target0 = &gpCombatManager->m_armies[IDX(COMBAT_ATTACKER_SIDE)][bestArmyIndex5];
-    sprintf(gText, DATA_COMPGEN(0x004f8b8c, keepAttackKeepshot82M, "keepshot.82M"));
+    target0 = &gpCombatManager->m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][bestArmyIndex5];
+    sprintf(gText, "keepshot.82M");
     SAMPLE2 keepSample19 = NULL_SAMPLE2;
     keepSample19 = LoadPlaySample(gText);
 
-    // Retail keep-missile origins by faction and tower.
-    // NOLINTBEGIN(readability-magic-numbers)
+
     CombatTowerOrigin towerOrigins4[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
@@ -1702,32 +1672,32 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    // NOLINTEND(readability-magic-numbers)
+
     i32 unknownTowerData6[KEEP_TOWER_SCRATCH_COUNT];
-    i32 sourceX9 = towerOrigins4[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].x;
-    i32 sourceY6 = towerOrigins4[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].y;
+    i32 sourceX9 = towerOrigins4[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].x;
+    i32 sourceY6 = towerOrigins4[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].y;
     i32 targetX9 = target0->MidX();
     i32 targetY8 = target0->MidY();
-    // Retail keep-missile direction payload.
-    // NOLINTBEGIN(readability-magic-numbers)
+
+
     float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] =
-        {DATA_COMPGEN(0x004eb8cc, missileAngles0Constant6, 90.0f), DATA_COMPGEN(0x004eb8d0, missileAngles0Constant4, 68.5f), DATA_COMPGEN(0x004eb8d4, missileAngles0Constant2, 45.0f), DATA_COMPGEN(0x004eb8d8, missileAngles0Constant8, 20.8f), DATA_COMPGEN(0x004eb8dc, missileAngles0Constant, 0.0f), DATA_COMPGEN(0x004eb8e0, missileAngles0Constant9, -20.8f), DATA_COMPGEN(0x004eb8e4, missileAngles0Constant3, -45.0f), DATA_COMPGEN(0x004eb8e8, missileAngles0Constant5, -68.5f), DATA_COMPGEN(0x004eb8ec, missileAngles0Constant7, -90.0f)};
-    // NOLINTEND(readability-magic-numbers)
+        {90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};
+
     ShootMissile(
         sourceX9,
         sourceY6,
         targetX9,
         targetY8,
         missileAngles0,
-        m_combatIcons[IDX(COMBAT_ICON_KEEP)]
+        m_combatIcons[H2EnumIndex(COMBAT_ICON_KEEP)]
     );
 
     i32 shotCount28;
     i32 attackBonus4;
-    m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&shotCount28, &attackBonus4);
+    m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&shotCount28, &attackBonus4);
     attackBonus4 += COMBAT_KEEP_TOWER_DAMAGE_BONUS;
-    if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)])
-        attackBonus4 += m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->Stats(HERO_PRIMARY_ATTACK);
+    if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)])
+        attackBonus4 += m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->Stats(HERO_PRIMARY_ATTACK);
     attackBonus4 -= target0->m_monster.defense;
     if (attackBonus4 > COMBAT_KEEP_ATTACK_STAT_LIMIT)
         attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
@@ -1749,76 +1719,70 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (killed29 > 0) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f8bd4, keepAttackSDSDSS, "%s %d %s.\n%d %s %s."),
-            tower == COMBAT_TOWER_GARRISON ? DATA_COMPGEN(0x004f8bb8, keepAttackGarrisonDoes, "Garrison does") : DATA_COMPGEN(0x004f8bc8, keepAttackTowerDoes, "Tower does"),
+            "%s %d %s.\n%d %s %s.",
+            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
             damage8,
-            DATA_COMPGEN(0x004f8bb0, keepAttackDamage, "damage"),
+            "damage",
             killed29,
-            killed29 > 1 ? gArmyNamesPlural[IDX(target0->m_monsterType)]
-                         : gArmyNames[IDX(target0->m_monsterType)],
-            killed29 <= 1 ? DATA_COMPGEN(0x004f8b9c, keepAttackPerishes, "perishes") : DATA_COMPGEN(0x004f8ba8, keepAttackPerish, "perish")
+            killed29 > 1 ? gArmyNamesPlural[H2EnumIndex(target0->m_monsterType)]
+                         : gArmyNames[H2EnumIndex(target0->m_monsterType)],
+            killed29 <= 1 ? "perishes" : "perish"
         );
     } else {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f8c0c, keepAttackSDS, "%s %d %s."),
-            tower == COMBAT_TOWER_GARRISON ? DATA_COMPGEN(0x004f8bf0, keepAttackGarrisonDoes2, "Garrison does") : DATA_COMPGEN(0x004f8c00, keepAttackTowerDoes2, "Tower does"),
+            "%s %d %s.",
+            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
             damage8,
-            DATA_COMPGEN(0x004f8be8, keepAttackDamage2, "damage")
+            "damage"
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target0->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
     target0->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     WaitEndSample(keepSample19, -1);
-    LogStr(DATA_COMPGEN(0x004f8c18, keepAttackKA2, "KA2"));
+    LogStr("KA2");
 }
 
-VA(0x0049487c, 0x17b)
-i32 combatManager::ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side) {
+i32 combatManager::ExperienceValueOfStack(CombatSide side) {
     i32 experienceValue6 = 0;
     i32 index;
 
     for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
-        if (m_armies[IDX(side)][index].m_monsterType != CREATURE_NONE
-            && !HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)) {
+        if (m_armies[H2EnumIndex(side)][index].m_monsterType != CREATURE_NONE
+            && !(H2EnumIndex((m_armies[H2EnumIndex(side)][index].m_monster.flags.all) & (MONSTER_FLAGS_SUMMONED)))) {
             experienceValue6 +=
-                (m_armies[IDX(side)][index].m_initialQuantity - m_armies[IDX(side)][index].m_quantity)
-                * gMonsterDatabase[IDX(m_armies[IDX(side)][index].m_monsterType)].hitPoints;
+                (m_armies[H2EnumIndex(side)][index].m_initialQuantity - m_armies[H2EnumIndex(side)][index].m_quantity)
+                * gMonsterDatabase[H2EnumIndex(m_armies[H2EnumIndex(side)][index].m_monsterType)].hitPoints;
         }
     }
-    if (m_heroes[IDX(side)])
+    if (m_heroes[H2EnumIndex(side)])
         experienceValue6 += COMBAT_HERO_EXPERIENCE_VALUE;
     return experienceValue6;
 }
 
-VA(0x004949f7, 0x88)
 void combatManager::ResetHitByCreature(void) {
     CombatSide side;
     i32 index;
 
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
+    for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
         for (index = 0; index < COMBAT_ARMY_CAPACITY; index++)
-            m_armies[IDX(side)][index].m_hitByCreature = 0;
+            m_armies[H2EnumIndex(side)][index].m_hitByCreature = 0;
     }
 }
 
-VA(0x00494a7f, 0x36)
 i32 ValidHex(i32 hex) {
     return hex >= 0 && hex <= COMBAT_VALID_HEX_MAX ? 1 : 0;
 }
 
-VA(0x00494ab5, 0x16)
 void combatManager::SaveCombatBorder(void) {
     return;
 }
 
-VA(0x00494acb, 0x16)
 void combatManager::DrawCombatBorder(void) {
     return;
 }
 
-VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void) {
     u8 obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
     i32 overlayIndex14;
@@ -1836,38 +1800,38 @@ void combatManager::SetupAndLoadObstacles(void) {
 
     m_debugFormation = 0;
     if (m_inCastleCombat) {
-        m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
+        m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
-            m_wallStates[cellIndex1 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
+            m_wallStates[cellIndex1 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
-            if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-                && (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings
-                    & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
-                m_wallStates[cellIndex1 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
+            if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
+                && (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings
+                    & H2EnumIndex(TOWN_BUILDING_FORTIFICATIONS))) {
+                m_wallStates[cellIndex1 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
-            m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
-        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
-            m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
+        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_LEFT_TURRET))
+            m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
+        if (m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_RIGHT_TURRET))
+            m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
                 COMBAT_WALL_STATE_TOWER_STANDING;
 
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_SECOND_TOWER)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_SECOND_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_TOWER)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_TOWER)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_MOAT)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_SECOND_TOWER)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_SECOND_WALL)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_GATE)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_THIRD_TOWER)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_BOTTOM_TOWER)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_MOAT)].m_blocked = 1;
     } else {
         obstacleGoal7 = SRandom(COMBAT_RANDOM_OBSTACLE_MIN, COMBAT_RANDOM_OBSTACLE_MAX);
         obstacleCells18 = 0;
-        terrainMask9 = 1 << IDX(m_terrainType);
+        terrainMask9 = 1 << H2EnumIndex(m_terrainType);
         tryCount28 = 0;
         elevationCells4 = 0;
         if (SRandom(0, COMBAT_RANDOM_PERCENT_MAX) < COMBAT_ELEVATION_OVERLAY_CHANCE) {
@@ -1928,7 +1892,7 @@ void combatManager::SetupAndLoadObstacles(void) {
                          + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1]]
                             .m_blocked = 1;
                 }
-                sprintf(gText, DATA_COMPGEN(0x004f8c20, setupAndLoadObstaclesCobj04dIcn, "cobj%04d.icn"), obstacleType4);
+                sprintf(gText, "cobj%04d.icn", obstacleType4);
                 m_obstacleIcons[m_obstacleCount] = gpResourceManager->GetIcon(gText);
                 m_hexCells[anchorHex9].m_obstacleIndex =
                     static_cast<i8>(m_obstacleCount);
@@ -1938,7 +1902,6 @@ void combatManager::SetupAndLoadObstacles(void) {
     }
 }
 
-VA(0x00494fb9, 0x2a1)
 void combatManager::MakeCreaturesVanish(void) {
     ResetLimitCreature();
     i32 side3;
@@ -1961,7 +1924,7 @@ void combatManager::MakeCreaturesVanish(void) {
                 removedArmy27 = &m_armies[side3][armyIndex0];
                 m_hexCells[removedArmy27->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
                 m_hexCells[removedArmy27->m_hex].m_occupantIndex = -1;
-                if (HAS(removedArmy27->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+                if ((H2EnumIndex((removedArmy27->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
                     m_hexCells[ArmyFacingRearHexOffset(removedArmy27->m_facing)
                                + removedArmy27->m_hex]
                             .m_occupantSide = COMBAT_SIDE_NONE;
@@ -1985,10 +1948,9 @@ void combatManager::MakeCreaturesVanish(void) {
     );
 }
 
-VA(0x0049525a, 0xbd)
 void combatManager::LowerDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
-    drawbridgeSample = LoadPlaySample(DATA_COMPGEN(0x004f8c30, lowerDoorDrawbrg82m, "drawbrg.82m"));
+    drawbridgeSample = LoadPlaySample("drawbrg.82m");
     giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
@@ -2003,10 +1965,9 @@ void combatManager::LowerDoor(void) {
     WaitEndSample(drawbridgeSample, -1);
 }
 
-VA(0x00495317, 0xe6)
 void combatManager::RaiseDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
-    drawbridgeSample = LoadPlaySample(DATA_COMPGEN(0x004f8c3c, raiseDoorDrawbrg82m, "drawbrg.82m"));
+    drawbridgeSample = LoadPlaySample("drawbrg.82m");
     giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
@@ -2020,18 +1981,16 @@ void combatManager::RaiseDoor(void) {
     WaitEndSample(drawbridgeSample, -1);
 }
 
-VA(0x004953fd, 0x84)
 void combatManager::TestRaiseDoor(void) {
     if (m_inCastleCombat && m_drawbridgeState == COMBAT_DRAWBRIDGE_LOWERED
         && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide == COMBAT_SIDE_NONE
         && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_deadOccupantCount == 0
-        && m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_occupantSide == COMBAT_SIDE_NONE
-        && m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_deadOccupantCount == 0) {
+        && m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_GATE)].m_occupantSide == COMBAT_SIDE_NONE
+        && m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_GATE)].m_deadOccupantCount == 0) {
         RaiseDoor();
     }
 }
 
-VA(0x00495481, 0xd8)
 i32 combatManager::InCastle(i32 hex) {
     return ((hex < CASTLE_INTERIOR_ROW_0_FIRST || hex > CASTLE_INTERIOR_ROW_0_LAST)
             && (hex < CASTLE_INTERIOR_ROW_1_FIRST || hex > CASTLE_INTERIOR_ROW_1_LAST)
@@ -2047,15 +2006,14 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
-VA(0x00495559, 0x346)
 i32 combatManager::ShotIsThroughWall(
-    H2_ENUM_PARAM(CombatSide, i32) side, i32 sourceHex, i32 targetHex
+    CombatSide side, i32 sourceHex, i32 targetHex
 ) {
     if (!m_inCastleCombat)
         return 0;
-    if (m_heroes[IDX(side)]
-        && (m_heroes[IDX(side)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
-            || m_heroes[IDX(side)]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+    if (m_heroes[H2EnumIndex(side)]
+        && (m_heroes[H2EnumIndex(side)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
+            || m_heroes[H2EnumIndex(side)]->m_secondarySkills[H2EnumIndex(HERO_SKILL_ARCHERY)]
                    != HERO_SKILL_LEVEL_NONE)) {
         return 0;
     }
@@ -2080,11 +2038,7 @@ i32 combatManager::ShotIsThroughWall(
         rowStep2 = rowDistance17 > 0 ? 1 : -1;
         columnStep5 = static_cast<float>(columnDistance4) / static_cast<float>(abs(rowDistance17));
     }
-    columnStep5 /= DATA_COMPGEN(
-        0x004eb8f4,
-        combatWallTraceSubdivisions,
-        static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
-    );
+    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     float traceColumn6 = static_cast<float>(sourceColumn1);
     float traceRow1 = static_cast<float>(sourceRow9);
@@ -2100,9 +2054,9 @@ i32 combatManager::ShotIsThroughWall(
         for (structureIndex0 = 0; structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
              structureIndex0++) {
             if (traceHex11 == iWallToHexCell[structureIndex0]
-                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structureIndex0 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structureIndex0 + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
@@ -2110,7 +2064,7 @@ i32 combatManager::ShotIsThroughWall(
                 && m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
-            if (traceHex11 == IDX(COMBAT_CASTLE_HEX_GATE)
+            if (traceHex11 == H2EnumIndex(COMBAT_CASTLE_HEX_GATE)
                 && m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
                 return 1;
             }
@@ -2119,7 +2073,6 @@ i32 combatManager::ShotIsThroughWall(
     return 0;
 }
 
-VA(0x0049589f, 0x52e)
 void combatManager::ShootMissile(
     i32 sourceX,
     i32 sourceY,
@@ -2131,7 +2084,7 @@ void combatManager::ShootMissile(
     i32 xDistance1 = targetX - sourceX;
     i32 yDistance19 = targetY - sourceY;
     i32 absoluteXDistance15 = targetX - sourceX;
-    H2_ENUM_STORAGE(IconDrawOrientation, i8) reverseMissile7 = ICON_DRAW_NORMAL;
+    H2EnumStorage<IconDrawOrientation, i8> reverseMissile7 = ICON_DRAW_NORMAL;
     if (absoluteXDistance15 < 0) {
         reverseMissile7 = ICON_DRAW_FLIPPED;
         absoluteXDistance15 = -absoluteXDistance15;
@@ -2250,9 +2203,7 @@ void combatManager::ShootMissile(
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + gfCombatSpeedMod[gConfig.combatSpeed]
-                * DATA_COMPGEN(
-                    0x004eb90c, combatMissileTimerDelay, IDX(COMBAT_MISSILE_TIMER_DELAY)
-                )
+                * H2EnumIndex(COMBAT_MISSILE_TIMER_DELAY)
         );
         oldX8 = missileX16;
         oldY5 = missileY7;
@@ -2276,11 +2227,10 @@ void combatManager::ShootMissile(
     delete missileBackground9;
 }
 
-VA(0x00495dcd, 0xf2)
 void combatManager::CombatSystemOptions(void) {
     tag_message message;
     bCPrefsChanged = 0;
-    CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, DATA_COMPGEN(0x004f8c48, combatSystemOptionsCspanelBin, "cspanel.bin"));
+    CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)
         MemError();
     SetWinText(CSPanel, 1);
@@ -2293,7 +2243,6 @@ void combatManager::CombatSystemOptions(void) {
     DrawFrame(1, 0, 0, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
 }
 
-VA(0x00495ebf, 0x1ea)
 void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
     message.type = COMBAT_SYSTEM_OPTION_EVENT;
@@ -2346,40 +2295,36 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
 }
 
-VA(0x004960a9, 0x39a)
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;
     i32 bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
-        if (HAS(
-                message.payload.widget.modifiers,
-                MESSAGE_MODIFIER_RIGHT_BUTTON
-            )) {
+        if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT
                 || message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
                     case SYSTEM_OPTION_CLOSE_BUTTON:
-                        helpIndex = IDX(HELP_CLOSE);
+                        helpIndex = H2EnumIndex(HELP_CLOSE);
                         break;
                     case SYSTEM_OPTION_SPEED_BUTTON:
-                        helpIndex = IDX(HELP_SPEED);
+                        helpIndex = H2EnumIndex(HELP_SPEED);
                         break;
                     case SYSTEM_OPTION_ARMY_INFO_BUTTON:
-                        helpIndex = IDX(HELP_ARMY_INFO);
+                        helpIndex = H2EnumIndex(HELP_ARMY_INFO);
                         break;
                     case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
-                        helpIndex = IDX(HELP_AUTO_SPELL);
+                        helpIndex = H2EnumIndex(HELP_AUTO_SPELL);
                         break;
                     case SYSTEM_OPTION_GRID_BUTTON:
-                        helpIndex = IDX(HELP_GRID);
+                        helpIndex = H2EnumIndex(HELP_GRID);
                         break;
                     case SYSTEM_OPTION_SHADE_BUTTON:
-                        helpIndex = IDX(HELP_SHADE);
+                        helpIndex = H2EnumIndex(HELP_SHADE);
                         break;
                     case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
-                        helpIndex = IDX(HELP_MOUSE_HEX);
+                        helpIndex = H2EnumIndex(HELP_MOUSE_HEX);
                         break;
                 }
                 if (helpIndex >= 0) {
@@ -2457,14 +2402,12 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
 }
 
 
-VTBL(combatManager, 0x004eb898);
+i32 bInHighMoraleBonus = 0;
+i32 giSeed = 1;
 
-DATA(0x004f8900) i32 bInHighMoraleBonus = 0;
-DATA(0x004f8904) i32 giSeed = 1;
-// Retail castle wall-hex payload.
-// NOLINTBEGIN(readability-magic-numbers)
-DATA(0x004f8c1c) u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
-// NOLINTEND(readability-magic-numbers)
-DATA(0x00528588) i32 bMouseWasVis;
-DATA(0x0052858c) class heroWindow* CSPanel;
-DATA(0x00528590) i32 bCPrefsChanged;
+
+u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
+
+i32 bMouseWasVis;
+class heroWindow* CSPanel;
+i32 bCPrefsChanged;

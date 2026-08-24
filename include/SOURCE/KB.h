@@ -1,12 +1,13 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
 
-#include <va.h>
+#include <Ints.h>
+#include <windows.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
+enum class CDRomSetupResult : i32;
 
 struct SAMPLE2;
 struct SSpellInfo;
@@ -39,7 +40,7 @@ class townManager;
 #include <BASE/message.h>
 #include <BASE/WINMGR.h>
 
-H2_ENUM_BEGIN(GlobalTimerConstant)
+typedef enum GlobalTimerConstant {
     GLOBAL_TIMER_COUNT               = 10,
     GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
     GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
@@ -48,34 +49,32 @@ H2_ENUM_BEGIN(GlobalTimerConstant)
     GLOBAL_MOUSE_TIMER_SLOT          = 6,
     GLOBAL_COLOR_CYCLE_TIMER_SLOT    = 7,
     GLOBAL_COMBAT_CYCLE_TIMER_SLOT   = 8
-H2_ENUM_END(GlobalTimerConstant)
+} GlobalTimerConstant;
 
-H2_ENUM_BEGIN(CombatHeroTableConstant)
+typedef enum CombatHeroTableConstant {
     KB_COMBAT_HERO_VARIANT_COUNT = 2,
-    KB_COMBAT_HERO_SPRITE_COUNT  = IDX(FACTION_COUNT) * KB_COMBAT_HERO_VARIANT_COUNT
-H2_ENUM_END(CombatHeroTableConstant)
+    KB_COMBAT_HERO_SPRITE_COUNT  = H2EnumIndex(FACTION_COUNT) * KB_COMBAT_HERO_VARIANT_COUNT
+} CombatHeroTableConstant;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(CampaignSide, u8)
+enum class CampaignSide : u8 {
     CAMPAIGN_ROLAND     = 0,
     CAMPAIGN_ARCHIBALD  = 1,
     CAMPAIGN_SIDE_COUNT = 2
-H2_ENUM_CLASS_END_SPLIT(CampaignSide, u8)
+};
+using enum CampaignSide;
 
 inline CampaignSide OppositeCampaignSide(CampaignSide side) {
-#if H2_STRICT_ENUMS
     return side == CAMPAIGN_ROLAND ? CAMPAIGN_ARCHIBALD : CAMPAIGN_ROLAND;
-#else
-    return 1 - side;
-#endif
 }
 
-H2_ENUM_CLASS_BEGIN(MonsterScoreField)
+enum class MonsterScoreField : i32 {
     MONSTER_SCORE_THRESHOLD   = 0,
     MONSTER_SCORE_TYPE        = 1,
     MONSTER_SCORE_FIELD_COUNT = 2
-H2_ENUM_CLASS_END(MonsterScoreField)
+};
+using enum MonsterScoreField;
 
-H2_ENUM_CLASS_BEGIN_T(CampaignChoiceType, u8)
+enum class CampaignChoiceType : u8 {
     CAMPAIGN_CHOICE_RESOURCE        = 0,
     CAMPAIGN_CHOICE_ARTIFACT        = 1,
     CAMPAIGN_CHOICE_SPELL           = 2,
@@ -88,9 +87,10 @@ H2_ENUM_CLASS_BEGIN_T(CampaignChoiceType, u8)
     CAMPAIGN_CHOICE_PRIMARY_SKILL   = 9,
     CAMPAIGN_CHOICE_SPELL_SCROLL    = 10,
     CAMPAIGN_CHOICE_INVALID         = 255
-H2_ENUM_CLASS_END_T(CampaignChoiceType, u8)
+};
+using enum CampaignChoiceType;
 
-H2_ENUM_BEGIN(CampaignConstant)
+typedef enum CampaignConstant {
     CAMPAIGN_MAP_COUNT                = 12,
     CAMPAIGN_REGULAR_MAP_COUNT        = 11,
     CAMPAIGN_TRACK_POINT_COUNT        = 13,
@@ -115,28 +115,27 @@ H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_EXPERIENCE_BONUS         = 5000,
     CAMPAIGN_SWITCH_VICTORY_VALUE     = 99,
     CAMPAIGN_ROLAND_TIME_LIMIT        = 90
-H2_ENUM_END(CampaignConstant)
+} CampaignConstant;
 
 #pragma pack(push, 1)
 struct SCampaignChoice {
     CampaignChoiceType type;
     union {
         i16 value;
-        H2_ENUM_STORAGE(ResourceType, i16) resource;
-        H2_ENUM_STORAGE(ArtifactType, i16) artifact;
-        H2_ENUM_STORAGE(SpellType, i16) spell;
-        H2_ENUM_STORAGE(CreatureType, i16) creature;
-        H2_ENUM_STORAGE(FactionType, i16) faction;
+        H2EnumStorage<ResourceType, i16> resource;
+        H2EnumStorage<ArtifactType, i16> artifact;
+        H2EnumStorage<SpellType, i16> spell;
+        H2EnumStorage<CreatureType, i16> creature;
+        H2EnumStorage<FactionType, i16> faction;
     };
     i16 amount;
 };
 #pragma pack(pop)
-SIZE(SCampaignChoice, 5);
 
-extern SCampaignChoice campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT]
+extern SCampaignChoice campaignChoices[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT]
                                       [CAMPAIGN_BONUS_CHOICE_COUNT];
-extern char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-extern char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+extern char* cCampaignName[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+extern char* cCampaignDescription[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
 
 struct SPlayerExit {
     i8 netPosition;
@@ -147,9 +146,8 @@ struct SPlayerExit {
     i8 hostReported;
     i8 continueGame;
 };
-SIZE(SPlayerExit, 7);
 
-H2_ENUM_BEGIN(EventWindowConstant)
+typedef enum EventWindowConstant {
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
     EVENT_WINDOW_CLOSE_COMMAND          = 10,
     EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
@@ -168,18 +166,18 @@ H2_ENUM_BEGIN(EventWindowConstant)
     EVENT_WINDOW_MORALE                 = 12,
     EVENT_WINDOW_BAD_MORALE             = 13,
     EVENT_WINDOW_EXPERIENCE             = 14
-H2_ENUM_END(EventWindowConstant)
+} EventWindowConstant;
 
-H2_ENUM_BEGIN(KbBuildingConstant)
+typedef enum KbBuildingConstant {
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
     KB_BUILDING_RESOURCE_COUNT = 7,
     KB_MAGE_GUILD_MAX_LEVEL    = 5,
     KB_MAGE_GUILD_LEVEL_COUNT  = KB_MAGE_GUILD_MAX_LEVEL + 1,
     KB_DWELLING_TYPE_COUNT     =
-        IDX(BUILDING_SLOT_DWELLING_LAST) - IDX(BUILDING_SLOT_DWELLING_FIRST) + 1
-H2_ENUM_END(KbBuildingConstant)
+        H2EnumIndex(BUILDING_SLOT_DWELLING_LAST) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST) + 1
+} KbBuildingConstant;
 
-H2_ENUM_CLASS_BEGIN(KbDwellingFlag)
+enum class KbDwellingFlag : i32 {
     KB_DWELLING_FIRST_FLAG          = 0x00100000,
     KB_DWELLING_SECOND_FLAG         = 0x00200000,
     KB_DWELLING_THIRD_FLAG          = 0x00400000,
@@ -191,18 +189,19 @@ H2_ENUM_CLASS_BEGIN(KbDwellingFlag)
     KB_DWELLING_UPGRADE_FOURTH_FLAG = 0x10000000,
     KB_DWELLING_UPGRADE_FIFTH_FLAG  = 0x20000000,
     KB_DWELLING_UPGRADE_SIXTH_FLAG  = 0x40000000
-H2_ENUM_CLASS_END(KbDwellingFlag)
+};
+using enum KbDwellingFlag;
 
-H2_ENUM_BEGIN(NormalDialogResourceType)
+typedef enum NormalDialogResourceType {
     NORMAL_DIALOG_NO_RESOURCE      = -1,
-    NORMAL_DIALOG_RESOURCE_WOOD    = IDX(RES_WOOD),
+    NORMAL_DIALOG_RESOURCE_WOOD    = H2EnumIndex(RES_WOOD),
     NORMAL_DIALOG_RESOURCE_FIRST   = NORMAL_DIALOG_RESOURCE_WOOD,
-    NORMAL_DIALOG_RESOURCE_MERCURY = IDX(RES_MERCURY),
-    NORMAL_DIALOG_RESOURCE_ORE     = IDX(RES_ORE),
-    NORMAL_DIALOG_RESOURCE_SULFUR  = IDX(RES_SULFUR),
-    NORMAL_DIALOG_RESOURCE_CRYSTAL = IDX(RES_CRYSTAL),
-    NORMAL_DIALOG_RESOURCE_GEMS    = IDX(RES_GEMS),
-    NORMAL_DIALOG_RESOURCE_GOLD    = IDX(RES_GOLD),
+    NORMAL_DIALOG_RESOURCE_MERCURY = H2EnumIndex(RES_MERCURY),
+    NORMAL_DIALOG_RESOURCE_ORE     = H2EnumIndex(RES_ORE),
+    NORMAL_DIALOG_RESOURCE_SULFUR  = H2EnumIndex(RES_SULFUR),
+    NORMAL_DIALOG_RESOURCE_CRYSTAL = H2EnumIndex(RES_CRYSTAL),
+    NORMAL_DIALOG_RESOURCE_GEMS    = H2EnumIndex(RES_GEMS),
+    NORMAL_DIALOG_RESOURCE_GOLD    = H2EnumIndex(RES_GOLD),
     NORMAL_DIALOG_RESOURCE_LAST    = NORMAL_DIALOG_RESOURCE_GOLD,
     NORMAL_DIALOG_ARTIFACT         = 7,
     NORMAL_DIALOG_SPELL            = 8,
@@ -218,9 +217,9 @@ H2_ENUM_BEGIN(NormalDialogResourceType)
     NORMAL_DIALOG_SECONDARY_SKILL  = 17,
     NORMAL_DIALOG_MONSTER          = 18,
     NORMAL_DIALOG_PRIMARY_SKILL    = 25
-H2_ENUM_END(NormalDialogResourceType)
+} NormalDialogResourceType;
 
-H2_ENUM_BEGIN(NormalDialogConstant)
+typedef enum NormalDialogConstant {
     NORMAL_DIALOG_INFO                     = 1,
     NORMAL_DIALOG_CONFIRM                  = 2,
     NORMAL_DIALOG_BUTTON_PAIR              = 3,
@@ -257,15 +256,16 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_BUTTON_SIX               = 0x7806,
     NORMAL_DIALOG_BUTTON_SEVEN             = 0x7807,
     NORMAL_DIALOG_BUTTON_EIGHT             = 0x7808,
-H2_ENUM_END(NormalDialogConstant)
+} NormalDialogConstant;
 
-H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
+enum class CheckEndGameForcedResult : i32 {
     END_GAME_FORCE_NONE    = 0,
     END_GAME_FORCE_VICTORY = 1,
     END_GAME_FORCE_DEFEAT  = 2
-H2_ENUM_CLASS_END(CheckEndGameForcedResult)
+};
+using enum CheckEndGameForcedResult;
 
-H2_ENUM_BEGIN(HighScoreConstant)
+typedef enum HighScoreConstant {
     HIGH_SCORE_ENTRY_COUNT        = 10,
     HIGH_SCORE_NAME_LENGTH        = 16,
     HIGH_SCORE_PLAYER_NAME_SIZE   = HIGH_SCORE_NAME_LENGTH + 1,
@@ -275,7 +275,7 @@ H2_ENUM_BEGIN(HighScoreConstant)
     HIGH_SCORE_FILE_READ_FLAGS    = 0x8000,
     HIGH_SCORE_FILE_WRITE_FLAGS   = 0x8301,
     HIGH_SCORE_FILE_PERMISSIONS   = 0x80
-H2_ENUM_END(HighScoreConstant)
+} HighScoreConstant;
 
 #pragma pack(push, 1)
 struct HighScoreEntry {
@@ -288,9 +288,8 @@ struct HighScoreEntry {
     char reserved[HIGH_SCORE_RESERVED_SIZE];
 };
 #pragma pack(pop)
-SIZE(HighScoreEntry, 100);
 
-H2_ENUM_BEGIN(AppMenuCommand)
+typedef enum AppMenuCommand {
     APP_MENU_NONE            = 0,
     APP_MENU_VIEW_WORLD      = 0x9c4c,
     APP_MENU_VIEW_PUZZLE     = 0x9c4d,
@@ -337,9 +336,9 @@ H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_CHEAT_MOVEMENT  = 0x9cce,
     APP_MENU_CHEAT_SPELLS    = 0x9ccf,
     APP_MENU_CHEAT_RESOURCES = 0x9cd0
-H2_ENUM_END(AppMenuCommand)
+} AppMenuCommand;
 
-H2_ENUM_CLASS_BEGIN(DialogWaitType)
+enum class DialogWaitType : i32 {
     DIALOG_WAIT_OTHER_PLAYER           = 0,
     DIALOG_WAIT_NETBIOS_GUEST          = 1,
     DIALOG_WAIT_NETBIOS_HOST           = 2,
@@ -354,9 +353,10 @@ H2_ENUM_CLASS_BEGIN(DialogWaitType)
     DIALOG_WAIT_WINSOCK_FIRST_GUEST    = 11,
     DIALOG_WAIT_WINSOCK_GUESTS         = 12,
     DIALOG_WAIT_WINSOCK_HOST           = 13
-H2_ENUM_CLASS_END(DialogWaitType)
+};
+using enum DialogWaitType;
 
-H2_ENUM_BEGIN(OldMainConstant)
+typedef enum OldMainConstant {
     OLD_MAIN_PLAYER_COUNT                     = 6,
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
     OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
@@ -392,7 +392,7 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
     OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
     OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE         = 1
-H2_ENUM_END(OldMainConstant)
+} OldMainConstant;
 
 #pragma pack(push, 1)
 struct OldMainNetSetup {
@@ -402,19 +402,17 @@ struct OldMainNetSetup {
     SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
 };
 #pragma pack(pop)
-SIZE(OldMainNetSetup, 0xd4);
 
 union OldMainNetBuffer {
     OldMainNetSetup setup;
     char bytes[OLD_MAIN_NET_BUFFER_SIZE];
 };
-SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 
 #pragma pack(push, 1)
 struct KbRemotePacket {
     i8 sender;
     char reserved1[OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE];
-    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
+    H2EnumStorage<RemoteMessageType, i8> type;
     i8 command;
     char reserved2[OLD_MAIN_REMOTE_BODY_RESERVED_SIZE];
     union {
@@ -428,9 +426,8 @@ struct KbRemotePacket {
     } payload;
 };
 #pragma pack(pop)
-SIZE(KbRemotePacket, 0xdd);
 
-H2_ENUM_BEGIN(AppMenuConstant)
+typedef enum AppMenuConstant {
     APP_MENU_CHECKED             = 8,
     APP_MENU_UNCHECKED           = 0,
     APP_MENU_CONFIRM_DIALOG      = 2,
@@ -457,11 +454,11 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_COMBAT_LAST         = 44200,
     APP_MENU_COMBAT_HEX_COUNT    = 117,
     APP_MENU_FORMATION_HEX_COUNT = 15
-H2_ENUM_END(AppMenuConstant)
+} AppMenuConstant;
 
-H2_ENUM_BEGIN(NetBoxConstant)
+typedef enum NetBoxConstant {
     NET_BOX_LINE_SIZE = 140
-H2_ENUM_END(NetBoxConstant)
+} NetBoxConstant;
 
 extern "C" void PollSound(void);
 void ForcePollSound(void);
@@ -479,7 +476,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg);
 char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
 char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
-char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32));
+char* GetMonsterName(CreatureType);
 void GetMonsterCost(CreatureType monster, i32* const cost);
 i32 CanBuild(town* t, BuildingSlotType building);
 i32 CanBuy(town* t, BuildingSlotType type);
@@ -488,13 +485,13 @@ MessageDispatchResult WaitHandler(tag_message& msg);
 MessageDispatchResult EventWindowHandler(struct tag_message&);
 MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg);
 void PlayerDead(i32 player);
-void CheckEndGame(H2_ENUM_PARAM(CheckEndGameForcedResult, i32), b32);
+void CheckEndGame(CheckEndGameForcedResult, b32);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
 i32 GetMonType(i32 score, HighScoreType type);
 i32 AddScoreToHighScore(i32, i32, i32, HighScoreType, char*);
-void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty);
+void BVResMsg(char* s, ResourceType res, i32 qty);
 void GOut(char* str);
 i32 NetPosToGamePos(i32 netPos);
 i32 WaitForOtherPlayer(void);
@@ -560,17 +557,17 @@ extern char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
 extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern char* cOutOfMemory;
-extern char* gArmyNames[IDX(CREATURE_COUNT)];
-extern char* gArmyNamesPlural[IDX(CREATURE_COUNT)];
-extern char* cMonFilename[IDX(CREATURE_COUNT)];
-extern char* cArmyFrameFileNames[IDX(CREATURE_COUNT)];
-extern char* gArmyShortNames[IDX(CREATURE_COUNT)];
+extern char* gArmyNames[H2EnumIndex(CREATURE_COUNT)];
+extern char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)];
+extern char* cMonFilename[H2EnumIndex(CREATURE_COUNT)];
+extern char* cArmyFrameFileNames[H2EnumIndex(CREATURE_COUNT)];
+extern char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)];
 extern i32 gArtifactBaseRV[];
 extern b32 gbAllBlack;
 extern b32 gbCheatMenus;
 extern b32 gbClosingApp;
 extern b8 gbCombatSurrender;
-extern i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT];
+extern i8 captainStats[H2EnumIndex(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT];
 extern b32 gbDrawSavedCursor;
 extern b32 gbForegroundApp;
 extern b32 gbFunctionComplete;
@@ -602,23 +599,23 @@ extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
 extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
 extern char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
-extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][KB_DWELLING_TYPE_COUNT];
+extern H2EnumStorage<CreatureType, i8> gDwellingType[][KB_DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
 extern u32l gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
-extern H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
+extern H2EnumStorage<BottomViewMode, i32> giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
-extern H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
+extern H2EnumStorage<ResourceType, i32> giBottomViewResource;
 extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
-extern H2_ENUM_STORAGE(TerrainType, u8) giGroundToTerrain[];
+extern H2EnumStorage<TerrainType, u8> giGroundToTerrain[];
 extern i32 giHighMemBuffer;
 extern i32 giMainVideoModeColorDepth;
 extern i32 giNumHumanPlayers;
-extern i16 giScoreCampaignMon[][IDX(MONSTER_SCORE_FIELD_COUNT)];
-extern i16 giScoreMon[][IDX(MONSTER_SCORE_FIELD_COUNT)];
+extern i16 giScoreCampaignMon[][H2EnumIndex(MONSTER_SCORE_FIELD_COUNT)];
+extern i16 giScoreMon[][H2EnumIndex(MONSTER_SCORE_FIELD_COUNT)];
 extern i32 giTCPHostStatus;
 extern i32 giThisGamePos;
 extern i32 giThisNetPos;
@@ -627,7 +624,7 @@ extern DialogWaitType giWaitType;
 extern i32 glTimers[GLOBAL_TIMER_COUNT];
 extern i32 gMageBaseResourceValues[];
 extern i32 gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
-extern tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)];
+extern tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)];
 extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern i32 gNeutralBaseResourceValues[];
 extern i32 gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
@@ -651,25 +648,26 @@ extern icon* gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
 extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char* gSpecialBuildingNames[];
-extern SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)];
+extern SSpellInfo gsSpellInfo[H2EnumIndex(SPELL_COUNT)];
 extern icon* gSystemIcons;
 extern char gText[];
 extern char* gWellExtraNames[];
 extern SWinSetup gWinSetup[];
-extern void* hmnuAdv;
-extern void* hmnuCmbt;
-extern void* hmnuDflt;
-extern void* hmnuTown;
-extern H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr;
+extern HMENU hmnuAdv;
+extern HMENU hmnuCmbt;
+extern HMENU hmnuDflt;
+extern HMENU hmnuTown;
+extern H2EnumStorage<CDRomSetupResult, i32> iCDRomErr;
 extern i32 iMaxMapExtra;
 extern i32 iNextShingleAnim;
 extern i32 iShingleAnimFrame;
 extern i32 MAP_HEIGHT;
 extern i32 MAP_WIDTH;
-H2_ENUM_CLASS_BEGIN(MapExtraFlag)
+enum class MapExtraFlag : i32 {
     MAP_EXTRA_ADJACENT_MONSTER    = 0x80,
     MAP_EXTRA_ADJACENT_CLEAR_MASK = 0x7f
-H2_ENUM_CLASS_END(MapExtraFlag)
+};
+using enum MapExtraFlag;
 extern u8* mapExtra;
 extern tag_tilePoint normalDirTable[];
 extern SAMPLE2 NULL_SAMPLE2;
@@ -680,6 +678,6 @@ extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;
 extern font* smallFont;
-extern u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)];
+extern u8 iGetSSByAlignment[H2EnumIndex(HERO_SKILL_COUNT)][H2EnumIndex(FACTION_COUNT)];
 
 #endif

@@ -6,7 +6,7 @@
 #include <dplay.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-H2_ENUM_BEGIN(DirectPlayTransportConstant)
+typedef enum DirectPlayTransportConstant {
     DP_TRANSPORT_BUFFER_COUNT          = 200,
     DP_TRANSPORT_RECEIVE_SIZE          = 0x100,
     DP_TRANSPORT_BROADCAST_POSITION    = 0x7f,
@@ -22,7 +22,7 @@ H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_ENUM_LONG_PHASE       = 4,
     DP_TRANSPORT_RETRY_WAIT_COUNT      = 30,
     DP_TRANSPORT_RETRY_DELAY           = 100
-H2_ENUM_END(DirectPlayTransportConstant)
+} DirectPlayTransportConstant;
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {
@@ -31,38 +31,40 @@ struct DirectPlayStartupMessage {
     i32 playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 };
 
-H2_ENUM_CLASS_BEGIN(DirectPlayHostAcceptStatus)
+enum class DirectPlayHostAcceptStatus : i32 {
     HOST_ACCEPT_PENDING  = 0,
     HOST_ACCEPT_ACCEPTED = 1,
     HOST_ACCEPT_REJECTED = 2
-H2_ENUM_CLASS_END(DirectPlayHostAcceptStatus)
+};
+using enum DirectPlayHostAcceptStatus;
 
-H2_ENUM_CLASS_BEGIN(DirectPlayFirstGuestState)
+enum class DirectPlayFirstGuestState : i32 {
     FIRST_GUEST_CREATE_SESSION      = 0,
     FIRST_GUEST_DISABLE_COMPRESSION = 1,
     FIRST_GUEST_CREATE_PLAYER       = 2,
     FIRST_GUEST_WAIT_FOR_PLAYER     = 3
-H2_ENUM_CLASS_END(DirectPlayFirstGuestState)
-H2_ENUM_STEPPED(DirectPlayFirstGuestState)
+};
+using enum DirectPlayFirstGuestState;
+ENABLE_ENUM_STEPS(DirectPlayFirstGuestState)
 
-H2_ENUM_CLASS_BEGIN(DirectPlayHostState)
+enum class DirectPlayHostState : i32 {
     HOST_ENUMERATE_SESSIONS = 0,
     HOST_JOIN_SESSION       = 1,
     HOST_CREATE_PLAYER      = 2,
     HOST_ANNOUNCE_PLAYER    = 3,
     HOST_WAIT_FOR_ACCEPT    = 4,
     HOST_WAIT_FOR_STARTUP   = 5
-H2_ENUM_CLASS_END(DirectPlayHostState)
-H2_ENUM_STEPPED(DirectPlayHostState)
+};
+using enum DirectPlayHostState;
+ENABLE_ENUM_STEPS(DirectPlayHostState)
 #pragma pack(pop)
-SIZE(DirectPlayStartupMessage, 0x1a);
 
 BOOL WINAPI dpEnumServiceProvider(struct _GUID*, char*, DWORD, DWORD, void*);
 BOOL WINAPI dpEnumSession(DPSESSIONDESC*, void*, LPDWORD, DWORD);
 i16 dpnet_init(void);
 void CleanupDPVars(void);
 void dpnet_term(void);
-void dpSendMessage(i32, H2_ENUM_PARAM(NetworkPacketType, u8), u16, void*);
+void dpSendMessage(i32, NetworkPacketType, u16, void*);
 i32 dpnet_snd(i32, i32, void*);
 i16 dpnet_rcv(i16, u16, void*);
 u8 dpnet_stat(i16, u16);
@@ -85,8 +87,8 @@ extern u8** ppDPRcvBuffer;
 extern i32* piDPRcvBufferSize;
 extern i32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
-extern H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32) iDPWaitForFirstGuestStatus;
-extern H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus;
+extern H2SteppedEnumStorage<DirectPlayFirstGuestState, i32> iDPWaitForFirstGuestStatus;
+extern H2SteppedEnumStorage<DirectPlayHostState, i32> iDPWaitForHostStatus;
 extern i32 iWaitForHostWaitCount;
 extern i32 iEnumCount;
 extern i32 iLastHereIAmTickCount;

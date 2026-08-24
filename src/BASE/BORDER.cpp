@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -9,12 +9,11 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(BorderConstant)
+typedef enum BorderConstant {
     RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff
-H2_ENUM_END(BorderConstant)
+} BorderConstant;
 
-VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_fillColor = 0;
     m_backgroundBitmap = NULL;
@@ -22,14 +21,13 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 
-VA(0x004d2130, 0x64)
 border::border(
     i16 x,
     i16 y,
     i16 w,
     i16 h,
     i16 e,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor,
     char* name
 )
@@ -42,7 +40,6 @@ border::border(
     m_fillColor = fillColor;
 }
 
-VA(0x004d21a0, 0x38)
 inline border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
@@ -50,14 +47,13 @@ inline border::~border() {
         gpResourceManager->Dispose(m_backgroundIcon);
 }
 
-VA(0x004d21e0, 0x10e)
 void border::Read(void) {
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    H2_ENUM_STORAGE(WidgetKind, i16) kind = gpResourceManager->ReadWord();
+    H2EnumStorage<WidgetKind, i16> kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
     m_kind = kind;
@@ -79,10 +75,9 @@ void border::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-VA(0x004d22f0, 0x181)
 MessageDispatchResult border::Main(struct tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
+    H2EnumStorage<WidgetFlag, i16> flags = m_flags;
+    if (!(H2EnumIndex((flags) & (WIDGET_FLAG_ENABLED)))) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -109,7 +104,7 @@ hoverEvent: {
     i16 my = static_cast<i16>(msg.payload.mouse.y) - window->m_posY;
     if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
         if (type == MESSAGE_RIGHT_BUTTON_DOWN) {
-            msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+            msg.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
             msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
         } else {
             m_flags = flags | WIDGET_FLAG_SELECTED;
@@ -123,7 +118,7 @@ hoverEvent: {
 }
 
 leaveEvent:
-    if (HAS(flags, WIDGET_FLAG_SELECTED)) {
+    if ((H2EnumIndex((flags) & (WIDGET_FLAG_SELECTED)))) {
         m_flags = flags & ~WIDGET_FLAG_SELECTED;
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
@@ -133,7 +128,6 @@ leaveEvent:
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004d2480, 0xab)
 void border::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = m_y + static_cast<i16>(window->m_posY);
@@ -164,6 +158,3 @@ void border::Draw(void) {
             return;
     }
 }
-
-
-VTBL(border, 0x004eba60);

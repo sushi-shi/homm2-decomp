@@ -8,15 +8,15 @@
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_BEGIN(CastleBuildingConstant)
+typedef enum CastleBuildingConstant {
     CASTLE_SLOT_COUNT     = 18,
     CASTLE_UPGRADE_OFFSET = 5
-H2_ENUM_END(CastleBuildingConstant)
+} CastleBuildingConstant;
 
 MessageDispatchResult CastleHandler(struct tag_message&);
 
-extern H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT];
+extern H2EnumStorage<BuildingSlotType, u8> castleSlotsBase[CASTLE_SLOT_COUNT];
 extern class heroWindow* casWin;
-extern H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];
+extern H2EnumStorage<BuildingSlotType, u8> castleSlotsUse[CASTLE_SLOT_COUNT];
 
 #endif

@@ -1,16 +1,16 @@
 #ifndef HOMM2_BASE_SOUNDMANAGER_H
 #define HOMM2_BASE_SOUNDMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include "baseManager.h"
 
-H2_ENUM_BEGIN(MidiTrackConstant)
+typedef enum MidiTrackConstant {
     MIDI_NO_TRACK    = -1,
     MIDI_TRACK_COUNT = 60
-H2_ENUM_END(MidiTrackConstant)
+} MidiTrackConstant;
 
-H2_ENUM_BEGIN(SoundStorageConstant)
+typedef enum SoundStorageConstant {
     SOUND_SAMPLE_HANDLE_CAPACITY  = 14,
     SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
     DIGITAL_DRIVER_NAME_COUNT     = 14,
@@ -19,24 +19,27 @@ H2_ENUM_BEGIN(SoundStorageConstant)
     MCI_RESULT_CAPACITY           = 0x100,
     SAVED_SAMPLE_VOLUME_CAPACITY  = 0x20,
     MCI_COMMAND_CAPACITY          = 0x100
-H2_ENUM_END(SoundStorageConstant)
+} SoundStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
+enum class SoundVolumeConversionMode : i32 {
     SOUND_VOLUME_EFFECT = 100,
     SOUND_VOLUME_MUSIC  = 101
-H2_ENUM_CLASS_END(SoundVolumeConversionMode)
+};
+using enum SoundVolumeConversionMode;
 
-H2_ENUM_CLASS_BEGIN_T(SoundSampleOperation, i16)
+enum class SoundSampleOperation : i16 {
     SOUND_SAMPLE_OPERATION_VOLUME        = 1,
     SOUND_SAMPLE_OPERATION_START         = 5,
     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
     SOUND_SAMPLE_OPERATION_MUSIC_VOLUME  = 101
-H2_ENUM_CLASS_END_T(SoundSampleOperation, i16)
+};
+using enum SoundSampleOperation;
 
-H2_ENUM_CLASS_BEGIN_T(SoundDigitalReportQuery, i16)
+enum class SoundDigitalReportQuery : i16 {
     SOUND_DIGITAL_REPORT_VOLUME  = 1,
     SOUND_DIGITAL_REPORT_PLAYING = 4
-H2_ENUM_CLASS_END_T(SoundDigitalReportQuery, i16)
+};
+using enum SoundDigitalReportQuery;
 
 class sample;
 struct _SAMPLE;
@@ -90,9 +93,9 @@ public:
     i32 m_midiStarted;
     i32 m_pollTimer;
     soundManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void ValidatePreviousPosition(i32);
     void CDStop(void);
     i32 CDIsPlaying(void);
@@ -122,13 +125,12 @@ public:
     void MIDIStartup(void);
     void MIDIShutdown(void);
     void MIDIPlay(i32);
-    __declspec(dllexport) inline void MIDIStop(void);
-    __declspec(dllexport) inline i32 MIDIIsPlaying(void);
-    __declspec(dllexport) inline void MIDISetVolume(void);
+    inline void MIDIStop(void);
+    inline i32 MIDIIsPlaying(void);
+    inline void MIDISetVolume(void);
     void MIDIPoll(void);
 };
 #pragma pack(pop)
-SIZE(soundManager, 0x6ae);
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];

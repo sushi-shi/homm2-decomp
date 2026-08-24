@@ -1,7 +1,7 @@
 #ifndef HOMM2_EVENTS_TYPES_H
 #define HOMM2_EVENTS_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/combatTypes.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/armyGroup.h>
@@ -18,7 +18,7 @@ struct combatRemoteData {
     i8 setupCombatX;
     i8 setupCombatY;
     i32 randomSeed;
-    H2_ENUM_STORAGE(CombatResult, i8) combatResult;
+    H2EnumStorage<CombatResult, i8> combatResult;
     i8 retreatWin;
     i8 combatSurrender;
     i8 firstOwner;
@@ -37,7 +37,5 @@ struct combatRemoteHeroFragment {
 
 #pragma pack(pop)
 
-SIZE(combatRemoteData, COMBAT_REMOTE_HEADER_SIZE);
-SIZE(combatRemoteHeroFragment, COMBAT_REMOTE_HERO_FIRST_SIZE + 1);
 
 #endif

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <io.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@
 
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
-H2_ENUM_BEGIN(HeroUiConstant)
+typedef enum HeroUiConstant {
     UI_STATUS_TEXT_WIDGET          = 0x12f,
     UI_ARTIFACT_SLOT_0             = 0x14,
     UI_ARTIFACT_SLOT_1             = 0x15,
@@ -138,9 +138,9 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_EMPTY_ARTIFACT_FRAME        = 0,
     UI_ARTIFACT_CONTROL_VALUE      = 2,
     UI_ARMY_RACE_FRAME_OFFSET      = 4
-H2_ENUM_END(HeroUiConstant)
+} HeroUiConstant;
 
-H2_ENUM_CLASS_BEGIN(HeroScreenText)
+enum class HeroScreenText : i32 {
     TEXT_PRIMARY_STAT      = 1,
     TEXT_ADDITIONAL_STATS  = 2,
     TEXT_GOOD_MORALE       = 3,
@@ -165,9 +165,10 @@ H2_ENUM_CLASS_BEGIN(HeroScreenText)
     TEXT_SPELL_POINTS      = 22,
     TEXT_SPREAD_FORMATION  = 23,
     TEXT_GROUPED_FORMATION = 24
-H2_ENUM_CLASS_END(HeroScreenText)
+};
+using enum HeroScreenText;
 
-H2_ENUM_BEGIN(HeroMobilityConstant)
+typedef enum HeroMobilityConstant {
     BASE_RECORD_SIZE              = 0xec,
     LAND_SPEED_COUNT              = 8,
     SLOWEST_LAND_SPEED            = LAND_SPEED_COUNT - 1,
@@ -180,15 +181,14 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     STABLES_MOBILITY_BONUS        = 400,
     AI_DIFFICULTY_MOBILITY_BONUS  = 75,
     AI_STATE_MOBILITY_BONUS       = 50
-H2_ENUM_END(HeroMobilityConstant)
+} HeroMobilityConstant;
 
-H2_ENUM_BEGIN(HeroImplementationConstant)
+typedef enum HeroImplementationConstant {
     EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
     TEMPLE_MORALE_BONUS              = 2,
     PYRAMID_LUCK_PENALTY             = 2
-H2_ENUM_END(HeroImplementationConstant)
+} HeroImplementationConstant;
 
-VA(0x0046c3a0, 0x6f)
 hero::hero(void) {
     m_id = 0;
     m_owner = 0;
@@ -201,7 +201,6 @@ hero::hero(void) {
     giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
 }
 
-VA(0x0046c40f, 0x53)
 void hero::Read(i32 file, i8 expansion) {
     if (expansion)
         read(file, this, sizeof(hero));
@@ -209,7 +208,6 @@ void hero::Read(i32 file, i8 expansion) {
         read(file, this, BASE_RECORD_SIZE);
 }
 
-VA(0x0046c462, 0x53)
 void hero::Write(i32 file, i8 expansion) {
     if (expansion)
         write(file, this, sizeof(hero));
@@ -217,10 +215,8 @@ void hero::Write(i32 file, i8 expansion) {
         write(file, this, BASE_RECORD_SIZE);
 }
 
-VA(0x0046c4b5, 0x18)
 void hero::GetArmyStrengths(u32l* const) {}
 
-VA(0x0046c4cd, 0x59)
 i32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
@@ -231,9 +227,8 @@ i32 hero::HasArtifact(ArtifactType artifact) {
     return 0;
 }
 
-VA(0x0046c526, 0x277)
 i32 hero::CalcMobility(void) {
-    i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500}; // NOLINT(readability-magic-numbers)
+    i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500};
     const i16 seaBaseMobilityCurrent = SEA_BASE_MOBILITY;
     const i16 lighthouseBonusIncrement = LIGHTHOUSE_MOBILITY_BONUS;
     const i16 astrolabeBonus = ASTROLABE_MOBILITY_BONUS;
@@ -244,11 +239,11 @@ i32 hero::CalcMobility(void) {
     i32 slowestSpeedValue;
     i32 armySlotIndex;
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         mobilityResult = seaBaseMobilityCurrent;
         mobilityResult = static_cast<i32>(
             mobilityResult
-            * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
+            * gfSSNavigationMod[H2EnumIndex(m_secondarySkills[H2EnumIndex(HERO_SKILL_NAVIGATION)])]
         );
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, MINE_TYPE_LIGHTHOUSE)
@@ -259,22 +254,22 @@ i32 hero::CalcMobility(void) {
         slowestSpeedValue = SLOWEST_LAND_SPEED;
         for (armySlotIndex = 0; armySlotIndex < ARMY_GROUP_SLOT_COUNT; armySlotIndex++) {
             if (m_army.m_creatureTypes[armySlotIndex] != CREATURE_NONE
-                && gMonsterDatabase[IDX(m_army.m_creatureTypes[armySlotIndex])].speed
+                && gMonsterDatabase[H2EnumIndex(m_army.m_creatureTypes[armySlotIndex])].speed
                        < slowestSpeedValue) {
                 slowestSpeedValue =
-                    gMonsterDatabase[IDX(m_army.m_creatureTypes[armySlotIndex])].speed;
+                    gMonsterDatabase[H2EnumIndex(m_army.m_creatureTypes[armySlotIndex])].speed;
             }
         }
         mobilityResult = landMobility[slowestSpeedValue];
         mobilityResult = static_cast<i32>(
             mobilityResult
-            * gfSSLogisticsMod[IDX(m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)])]
+            * gfSSLogisticsMod[H2EnumIndex(m_secondarySkills[H2EnumIndex(HERO_SKILL_LOGISTICS)])]
         );
         if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
         if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
             mobilityResult += travelerBonus;
-        if (HAS(m_eventFlags, HERO_EVENT_STABLES))
+        if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_STABLES))))
             mobilityResult += STABLES_MOBILITY_BONUS;
     }
 
@@ -290,17 +285,16 @@ i32 hero::CalcMobility(void) {
     return mobilityResult;
 }
 
-VA(0x0046c79d, 0xcf)
 i32 hero::HasSpell(SpellType spell) {
     i32 artifactIndex;
 
     if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
         return 0;
-    if (m_spells[IDX(spell)])
+    if (m_spells[H2EnumIndex(spell)])
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
-            && m_artifactExtra[artifactIndex] == IDX(spell)) {
+            && m_artifactExtra[artifactIndex] == H2EnumIndex(spell)) {
             return 1;
         }
     }
@@ -309,7 +303,6 @@ i32 hero::HasSpell(SpellType spell) {
     return 0;
 }
 
-VA(0x0046c86c, 0xc5)
 SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     SpellType spell;
     i32 spellOrdinalCount = 0;
@@ -318,9 +311,9 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
         if (HasSpell(spell)) {
             if (type == SPELL_TYPE_ALL
                 || (type == SPELL_TYPE_COMBAT
-                    && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+                    && (H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_COMBAT))))
                 || (type == SPELL_TYPE_ADVENTURE
-                    && !HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
+                    && !(H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_COMBAT))))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
@@ -330,7 +323,6 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     return SPELL_NONE;
 }
 
-VA(0x0046c931, 0xd0)
 i32 hero::GetNumSpells(HeroSpellType type) {
     i32 numAdventureSpells;
     i32 numCombatSpells;
@@ -340,7 +332,7 @@ i32 hero::GetNumSpells(HeroSpellType type) {
     numAdventureSpells = 0;
     for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
         if (HasSpell(spell)) {
-            if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+            if ((H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_COMBAT))))
                 numCombatSpells++;
             else
                 numAdventureSpells++;
@@ -358,7 +350,6 @@ i32 hero::GetNumSpells(HeroSpellType type) {
     return 0;
 }
 
-VA(0x0046ca01, 0x8a)
 void hero::UseSpell(SpellType spell) {
     if (spell == SPELL_NONE)
         return;
@@ -370,12 +361,10 @@ void hero::UseSpell(SpellType spell) {
         gpAdvManager->UpdateHeroLocator(-1, 1, 1);
 }
 
-VA(0x0046ca8b, 0x26)
-void hero::AddSpell(H2_ENUM_PARAM(SpellType, i32) spell, i32) {
-    m_spells[IDX(spell)] = 1;
+void hero::AddSpell(SpellType spell, i32) {
+    m_spells[H2EnumIndex(spell)] = 1;
 }
 
-VA(0x0046cab1, 0x82)
 void HeroMessageUpdate(char* text) {
     tag_message message;
 
@@ -393,7 +382,6 @@ void HeroMessageUpdate(char* text) {
     );
 }
 
-VA(0x0046cb33, 0xa8)
 void hero::HeroScreenUpdate(void) {
     tag_message message;
     i32 index;
@@ -413,7 +401,6 @@ void hero::HeroScreenUpdate(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-VA(0x0046cbdb, 0x1d2)
 void hero::UpdateArmies(void) {
     tag_message message;
     i32 index;
@@ -438,12 +425,12 @@ void hero::UpdateArmies(void) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
             message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value =
-                IDX(gMonsterDatabase[IDX(m_army.m_creatureTypes[index])].race)
+                H2EnumIndex(gMonsterDatabase[H2EnumIndex(m_army.m_creatureTypes[index])].race)
                 + UI_ARMY_RACE_FRAME_OFFSET;
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
-            sprintf(gText, DATA_COMPGEN(0x004f6c90, updateArmiesMonh04dIcn, "monh%04d.icn"), IDX(m_army.m_creatureTypes[index]));
+            sprintf(gText, "monh%04d.icn", H2EnumIndex(m_army.m_creatureTypes[index]));
             message.payload.widget.id = index + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
@@ -452,7 +439,7 @@ void hero::UpdateArmies(void) {
             message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
 
-            sprintf(gText, DATA_COMPGEN(0x004f6ca0, updateArmiesD, "%d"), m_army.m_creatureCounts[index]);
+            sprintf(gText, "%d", m_army.m_creatureCounts[index]);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = index + UI_ARMY_COUNT_FIRST;
             message.payload.widget.data.text = gText;
@@ -465,7 +452,6 @@ void hero::UpdateArmies(void) {
     }
 }
 
-VA(0x0046cdad, 0x43)
 void hero::ViewStat(i32 stat, i32 quickView) {
     NormalDialog(
         gStatDesc[stat],
@@ -481,10 +467,9 @@ void hero::ViewStat(i32 stat, i32 quickView) {
     );
 }
 
-VA(0x0046cdf0, 0x9b)
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        sprintf(gText, gArtifactDesc[IDX(artifact)], gSpellNames[extra]);
+        sprintf(gText, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[extra]);
         NormalDialog(
             gText,
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
@@ -499,7 +484,7 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
         );
     } else {
         NormalDialog(
-            gArtifactDesc[IDX(artifact)],
+            gArtifactDesc[H2EnumIndex(artifact)],
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
             -1,
             UI_ARTIFACT_DIALOG_ICON,
@@ -513,10 +498,9 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     }
 }
 
-VA(0x0046ce8b, 0x5d)
 i32 hero::Dismiss(void) {
     NormalDialog(
-        DATA_COMPGEN(0x004f6ca4, dismissAreYouSureYouWantTo, "Are you sure you want to dismiss this Hero?"),
+        "Are you sure you want to dismiss this Hero?",
         NORMAL_DIALOG_CONFIRM,
         -1,
         -1,
@@ -534,7 +518,6 @@ i32 hero::Dismiss(void) {
     return 0;
 }
 
-VA(0x0046cee8, 0x587)
 void hero::Deallocate(i32 updateMap) {
     i32 availableHeroSlotCurrent;
     playerData* player;
@@ -563,7 +546,7 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         gpAdvManager->HideRoute(0, 0, 0);
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         for (index = 0; index < GAME_BOAT_COUNT; index++) {
             if (gpGame->m_boats[index].heroId == m_id) {
                 gpGame->m_boats[index].heroId = -1;
@@ -616,11 +599,10 @@ void hero::Deallocate(i32 updateMap) {
 
     if (gbRetreatWin) {
         availableHeroSlotCurrent = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
-        if (HAS(gpGame
+        if ((H2EnumIndex((gpGame
                     ->m_heroRecs[gpGame->m_players[m_owner]
                                      .m_availableHeroIds[availableHeroSlotCurrent]]
-                    .m_eventFlags,
-                HERO_EVENT_WEEKLY_VISIT)) {
+                    .m_eventFlags) & (HERO_EVENT_WEEKLY_VISIT)))) {
             availableHeroSlotCurrent = 1 - availableHeroSlotCurrent;
         }
         if (gpGame->m_availableHeroes[gpGame->m_players[m_owner]
@@ -633,12 +615,12 @@ void hero::Deallocate(i32 updateMap) {
         gpGame->m_players[m_owner].m_availableHeroIds[availableHeroSlotCurrent] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
         m_eventFlags = HeroEventFlag(
-            static_cast<i32>(m_eventFlags) | IDX(HERO_EVENT_WEEKLY_VISIT)
+            static_cast<i32>(m_eventFlags) | H2EnumIndex(HERO_EVENT_WEEKLY_VISIT)
         );
     }
 
     m_eventFlags = HeroEventFlag(
-        static_cast<i32>(m_eventFlags) & ~IDX(HERO_EVENT_GROUPED_FORMATION)
+        static_cast<i32>(m_eventFlags) & ~H2EnumIndex(HERO_EVENT_GROUPED_FORMATION)
     );
     m_owner = HERO_OWNER_NONE;
     m_destinationY = HERO_DESTINATION_NONE;
@@ -651,14 +633,13 @@ void hero::Deallocate(i32 updateMap) {
         && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO && !gbRetreatWin
         && !gbCombatSurrender) {
-        gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)] = 1;
+        gpGame->m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_CORLAGON_DEFEATED)] = 1;
     }
 
     if (updateMap)
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
-VA(0x0046d46f, 0x9e)
 i32 hero::GetExperience(i32 level) {
     i32 experience;
     i32 levelCounter;
@@ -671,8 +652,8 @@ i32 hero::GetExperience(i32 level) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
-        * DATA_COMPGEN(0x004eb6d8, getExperienceConstant, HERO_EXPERIENCE_GROWTH_FACTOR)
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - H2EnumIndex(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
+        * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
     while (levelCounter < level) {
@@ -683,7 +664,6 @@ i32 hero::GetExperience(i32 level) {
     return experience;
 }
 
-VA(0x0046d50d, 0xc0)
 i32 hero::GetLevel(i32 experienceValue) {
     i32 experience;
     i32 levelCounter;
@@ -697,7 +677,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - H2EnumIndex(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -710,67 +690,64 @@ i32 hero::GetLevel(i32 experienceValue) {
     return levelCounter - 1;
 }
 
-VA(0x0046d5cd, 0x254)
 void hero::ApplyBattleWinTemps(void) {
     m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
     m_lastHeroInteractionTurn = HERO_INTERACTION_TURN_NONE;
 
-    if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_GRAVEYARD)))) {
         m_morale++;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_GRAVEYARD);
+        ((m_eventFlags) &= ~(HERO_EVENT_GRAVEYARD));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_SHIPWRECK)))) {
         m_morale++;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_SHIPWRECK);
+        ((m_eventFlags) &= ~(HERO_EVENT_SHIPWRECK));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_BUOY)))) {
         m_morale--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_BUOY);
+        ((m_eventFlags) &= ~(HERO_EVENT_BUOY));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_OASIS)))) {
         m_morale--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_OASIS);
+        ((m_eventFlags) &= ~(HERO_EVENT_OASIS));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_TEMPLE)))) {
         m_morale -= TEMPLE_MORALE_BONUS;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_TEMPLE);
+        ((m_eventFlags) &= ~(HERO_EVENT_TEMPLE));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_FAERIE_RING)))) {
         m_luck--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FAERIE_RING);
+        ((m_eventFlags) &= ~(HERO_EVENT_FAERIE_RING));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_IDOL)))) {
         m_luck--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_IDOL);
+        ((m_eventFlags) &= ~(HERO_EVENT_IDOL));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_FOUNTAIN)))) {
         m_luck--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FOUNTAIN);
+        ((m_eventFlags) &= ~(HERO_EVENT_FOUNTAIN));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_WATERING_HOLE)))) {
         m_morale--;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_WATERING_HOLE);
+        ((m_eventFlags) &= ~(HERO_EVENT_WATERING_HOLE));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_DERELICT_SHIP)))) {
         m_morale++;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_DERELICT_SHIP);
+        ((m_eventFlags) &= ~(HERO_EVENT_DERELICT_SHIP));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_PYRAMID)))) {
         m_luck += PYRAMID_LUCK_PENALTY;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_PYRAMID);
+        ((m_eventFlags) &= ~(HERO_EVENT_PYRAMID));
     }
-    if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
+    if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_MERMAID)))) {
         m_luck = m_luck - 1;
-        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_MERMAID);
+        ((m_eventFlags) &= ~(HERO_EVENT_MERMAID));
     }
 }
 
-VA(0x0046d821, 0x1e)
 void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
-VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     char line[HERO_LEVEL_TEXT_BUFFER_SIZE];
@@ -796,10 +773,10 @@ void hero::CheckLevel(void) {
             sprintf(line, cHeroLevel[1]);
             strcat(gText, line);
 
-            statBonuses[IDX(HERO_PRIMARY_ATTACK)] = 0;
-            statBonuses[IDX(HERO_PRIMARY_DEFENSE)] = 0;
-            statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)] = 0;
-            statBonuses[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
+            statBonuses[H2EnumIndex(HERO_PRIMARY_ATTACK)] = 0;
+            statBonuses[H2EnumIndex(HERO_PRIMARY_DEFENSE)] = 0;
+            statBonuses[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)] = 0;
+            statBonuses[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)] = 0;
             if (currentLevelIndex <= HERO_LEVEL_HIGH_THRESHOLD)
                 highLevelIndex = 0;
             else
@@ -808,22 +785,22 @@ void hero::CheckLevel(void) {
             SRand(m_randomSeed + currentLevelIndex * HERO_LEVEL_RANDOM_SEED_FACTOR);
             randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
             if (randomValue
-                < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)]) {
-                statBonuses[IDX(HERO_PRIMARY_ATTACK)]++;
+                < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highLevelIndex][H2EnumIndex(HERO_PRIMARY_ATTACK)]) {
+                statBonuses[H2EnumIndex(HERO_PRIMARY_ATTACK)]++;
             } else {
                 randomValue -=
-                    gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)];
+                    gHeroSkillBonus[H2EnumIndex(m_cursorType)][highLevelIndex][H2EnumIndex(HERO_PRIMARY_ATTACK)];
                 if (randomValue
-                    < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)]) {
-                    statBonuses[IDX(HERO_PRIMARY_DEFENSE)]++;
+                    < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highLevelIndex][H2EnumIndex(HERO_PRIMARY_DEFENSE)]) {
+                    statBonuses[H2EnumIndex(HERO_PRIMARY_DEFENSE)]++;
                 } else {
                     randomValue -=
-                        gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)];
-                    if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex]
-                                                     [IDX(HERO_PRIMARY_SPELL_POWER)]) {
-                        statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)]++;
+                        gHeroSkillBonus[H2EnumIndex(m_cursorType)][highLevelIndex][H2EnumIndex(HERO_PRIMARY_DEFENSE)];
+                    if (randomValue < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highLevelIndex]
+                                                     [H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]) {
+                        statBonuses[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]++;
                     } else {
-                        statBonuses[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
+                        statBonuses[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)]++;
                     }
                 }
             }
@@ -832,7 +809,7 @@ void hero::CheckLevel(void) {
                 if (statBonuses[indexValue] > 0) {
                     m_primaryStats[indexValue] =
                         m_primaryStats[indexValue] + statBonuses[indexValue];
-                    sprintf(line, DATA_COMPGEN(0x004f6ce8, checkLevelSD, "\n%s +%d"), gStatNames[indexValue], statBonuses[indexValue]);
+                    sprintf(line, "\n%s +%d", gStatNames[indexValue], statBonuses[indexValue]);
                     strcat(gText, line);
                 }
             }
@@ -841,7 +818,7 @@ void hero::CheckLevel(void) {
                 skillChoicesResult[indexValue] = HERO_SKILL_NONE;
                 if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN
                     && m_cursorType != FACTION_KNIGHT
-                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
+                    && m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                     skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
                 } else {
@@ -851,22 +828,22 @@ void hero::CheckLevel(void) {
                     while (attempts < HERO_SECONDARY_SKILL_SEARCH_LIMIT) {
                         attempts++;
                         if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue)
-                            && ((m_secondarySkills[IDX(skillIndexValue)]
+                            && ((m_secondarySkills[H2EnumIndex(skillIndexValue)]
                                      != HERO_SKILL_LEVEL_NONE
-                                 && m_secondarySkills[IDX(skillIndexValue)]
+                                 && m_secondarySkills[H2EnumIndex(skillIndexValue)]
                                         < HERO_SKILL_LEVEL_EXPERT)
-                                || (m_secondarySkills[IDX(skillIndexValue)]
+                                || (m_secondarySkills[H2EnumIndex(skillIndexValue)]
                                             == HERO_SKILL_LEVEL_NONE
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
                             skillWeightIndex -=
-                                iGetSSByAlignment[IDX(skillIndexValue)][IDX(m_cursorType)];
+                                iGetSSByAlignment[H2EnumIndex(skillIndexValue)][H2EnumIndex(m_cursorType)];
                             if (skillWeightIndex <= 0) {
                                 skillChoicesResult[indexValue] = skillIndexValue;
                                 goto nextAttempt;
                             }
                         }
                         skillIndexValue =
-                            HeroSecondarySkill((IDX(skillIndexValue) + 1) % HERO_SKILL_COUNT);
+                            HeroSecondarySkill((H2EnumIndex(skillIndexValue) + 1) % H2EnumIndex(HERO_SKILL_COUNT));
                     }
                 nextAttempt:
                     attempts--;
@@ -879,16 +856,16 @@ void hero::CheckLevel(void) {
             }
 
             if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
-                sampleValue = LoadPlaySample(const_cast<char*>(DATA_COMPGEN(0x004f6cf0, checkLevelNwherolv82m, "nwherolv.82m")));
+                sampleValue = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
                 if (skillChoicesResult[0] == HERO_SKILL_NONE) {
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else if (skillChoicesResult[1] == HERO_SKILL_NONE) {
                     sprintf(
                         line,
-                        DATA_COMPGEN(0x004f6d00, checkLevelYouHaveLearnedSS, "\n\nYou have learned %s %s."),
+                        "\n\nYou have learned %s %s.",
                         gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
-                        gSecondarySkills[IDX(skillChoicesResult[0])]
+                            [H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[0])])],
+                        gSecondarySkills[H2EnumIndex(skillChoicesResult[0])]
                     );
                     strcat(gText, line);
                     NormalDialog(
@@ -897,8 +874,8 @@ void hero::CheckLevel(void) {
                         -1,
                         -1,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        IDX(m_secondarySkills[IDX(skillChoicesResult[0])])
-                            + IDX(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[0])])
+                            + H2EnumIndex(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         -1,
                         0,
                         -1,
@@ -908,13 +885,13 @@ void hero::CheckLevel(void) {
                 } else {
                     sprintf(
                         line,
-                        DATA_COMPGEN(0x004f6d1c, checkLevelYouMayLearnEitherSS, "\n\nYou may learn either %s %s or %s %s."),
+                        "\n\nYou may learn either %s %s or %s %s.",
                         gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
-                        gSecondarySkills[IDX(skillChoicesResult[0])],
+                            [H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[0])])],
+                        gSecondarySkills[H2EnumIndex(skillChoicesResult[0])],
                         gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[1])])],
-                        gSecondarySkills[IDX(skillChoicesResult[1])]
+                            [H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[1])])],
+                        gSecondarySkills[H2EnumIndex(skillChoicesResult[1])]
                     );
                     strcat(gText, line);
                     NormalDialog(
@@ -923,11 +900,11 @@ void hero::CheckLevel(void) {
                         -1,
                         -1,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        IDX(m_secondarySkills[IDX(skillChoicesResult[0])])
-                            + IDX(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[0])])
+                            + H2EnumIndex(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        IDX(m_secondarySkills[IDX(skillChoicesResult[1])])
-                            + IDX(skillChoicesResult[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        H2EnumIndex(m_secondarySkills[H2EnumIndex(skillChoicesResult[1])])
+                            + H2EnumIndex(skillChoicesResult[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         -1,
                         0
                     );
@@ -939,8 +916,8 @@ void hero::CheckLevel(void) {
             } else {
                 if (skillChoicesResult[0] != HERO_SKILL_NONE) {
                     if (skillChoicesResult[1] != HERO_SKILL_NONE) {
-                        if (gSSValues[IDX(skillChoicesResult[1])][0]
-                            < gSSValues[IDX(skillChoicesResult[0])][0]) {
+                        if (gSSValues[H2EnumIndex(skillChoicesResult[1])][0]
+                            < gSSValues[H2EnumIndex(skillChoicesResult[0])][0]) {
                             GiveSS(skillChoicesResult[0], HERO_SKILL_LEVEL_BASIC);
                         } else {
                             GiveSS(skillChoicesResult[1], HERO_SKILL_LEVEL_BASIC);
@@ -956,7 +933,6 @@ void hero::CheckLevel(void) {
     }
 }
 
-VA(0x0046e067, 0x57)
 i32 hero::NumArtifacts(void) {
     i32 cnt = 0;
     i32 i;
@@ -968,7 +944,6 @@ i32 hero::NumArtifacts(void) {
     return cnt;
 }
 
-VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message& message) {
     i32 armySlot;
     i32 secondarySkillSlot;
@@ -980,53 +955,53 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_PRIMARY_STAT_KNOWLEDGE:
             sprintf(
                 gText,
-                cHeroScreen[IDX(TEXT_PRIMARY_STAT)],
+                cHeroScreen[H2EnumIndex(TEXT_PRIMARY_STAT)],
                 gStatNames[message.payload.widget.id - UI_PRIMARY_STAT_FIRST]
             );
             break;
 
         case UI_ADDITIONAL_STATS:
-            sprintf(gText, cHeroScreen[IDX(TEXT_ADDITIONAL_STATS)]);
+            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_ADDITIONAL_STATS)]);
             break;
 
         case UI_MORALE_FIRST:
         case UI_MORALE_MIDDLE:
         case UI_MORALE_LAST:
             if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) > 0)
-                sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_MORALE)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GOOD_MORALE)]);
             else if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) == 0)
-                sprintf(gText, cHeroScreen[IDX(TEXT_NEUTRAL_MORALE)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_MORALE)]);
             else
-                sprintf(gText, cHeroScreen[IDX(TEXT_BAD_MORALE)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_BAD_MORALE)]);
             break;
 
         case UI_LUCK_FIRST:
         case UI_LUCK_MIDDLE:
         case UI_LUCK_LAST:
             if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) > 0)
-                sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_LUCK)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GOOD_LUCK)]);
             else if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) == 0)
-                sprintf(gText, cHeroScreen[IDX(TEXT_NEUTRAL_LUCK)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_LUCK)]);
             else
-                sprintf(gText, cHeroScreen[IDX(TEXT_BAD_LUCK)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_BAD_LUCK)]);
             break;
 
         case UI_EXPERIENCE_FIRST:
         case UI_EXPERIENCE_LAST:
-            sprintf(gText, cHeroScreen[IDX(TEXT_EXPERIENCE)]);
+            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_EXPERIENCE)]);
             break;
 
         case UI_SPELL_POINTS_FIRST:
         case UI_SPELL_POINTS_LAST:
-            sprintf(gText, cHeroScreen[IDX(TEXT_SPELL_POINTS)]);
+            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_SPELL_POINTS)]);
             break;
 
         case UI_FORMATION_SPREAD:
-            sprintf(gText, cHeroScreen[IDX(TEXT_SPREAD_FORMATION)]);
+            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_SPREAD_FORMATION)]);
             break;
 
         case UI_FORMATION_GROUPED:
-            sprintf(gText, cHeroScreen[IDX(TEXT_GROUPED_FORMATION)]);
+            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GROUPED_FORMATION)]);
             break;
 
         case UI_ARMY_SELECTOR_SLOT_0:
@@ -1039,57 +1014,52 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
                     sprintf(
                         gText,
-                        cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
+                        cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
+                        gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
                 else
-                    strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
+                    strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             } else if (giHeroScreenSrcIndex == armySlot) {
                 sprintf(
                     gText,
-                    cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
+                    cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
+                    gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else if (gpTownManager->m_castleDialogActive != 0) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
                     sprintf(
                         gText,
-                        cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
+                        cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
+                        gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
                 else
-                    strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
+                    strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
-                if (HAS(
-                        message.payload.widget.modifiers,
-                        MESSAGE_MODIFIER_SHIFT_KEYS
-                    ))
+                if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_SHIFT_KEYS))))
                     sprintf(
                         gText,
-                        cHeroScreen[IDX(TEXT_SPLIT_ARMY)],
-                        gArmyNamesPlural[IDX(
-                            gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
-                        )]
+                        cHeroScreen[H2EnumIndex(TEXT_SPLIT_ARMY)],
+                        gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])]
                     );
                 else
                     sprintf(
                         gText,
-                        cHeroScreen[IDX(TEXT_MOVE_ARMY)],
-                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])]
+                        cHeroScreen[H2EnumIndex(TEXT_MOVE_ARMY)],
+                        gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])]
                     );
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot]
                        == gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]) {
                 sprintf(
                     gText,
-                    cHeroScreen[IDX(TEXT_COMBINE_ARMIES)],
-                    gArmyNamesPlural[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
+                    cHeroScreen[H2EnumIndex(TEXT_COMBINE_ARMIES)],
+                    gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else {
                 sprintf(
                     gText,
-                    cHeroScreen[IDX(TEXT_EXCHANGE_ARMIES)],
-                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])],
-                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
+                    cHeroScreen[H2EnumIndex(TEXT_EXCHANGE_ARMIES)],
+                    gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])],
+                    gArmyNames[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             }
             break;
@@ -1110,16 +1080,16 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_ARTIFACT_SLOT_13:
             if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                 == ARTIFACT_NONE)
-                sprintf(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
+                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             else if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                      == ARTIFACT_MAGIC_BOOK)
-                strcpy(gText, cHeroScreen[IDX(TEXT_VIEW_SPELLS)]);
+                strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_VIEW_SPELLS)]);
             else
                 sprintf(
                     gText,
-                    cHeroScreen[IDX(TEXT_ARTIFACT)],
+                    cHeroScreen[H2EnumIndex(TEXT_ARTIFACT)],
                     gArtifactNames
-                        [IDX(gpHVHero->m_artifacts
+                        [H2EnumIndex(gpHVHero->m_artifacts
                                  [message.payload.widget.id - UI_ARTIFACT_FIRST])]
                 );
             break;
@@ -1127,14 +1097,14 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_DISMISS:
             sprintf(
                 gText,
-                cHeroScreen[IDX(TEXT_DISMISS)],
+                cHeroScreen[H2EnumIndex(TEXT_DISMISS)],
                 gpHVHero->m_name,
-                gAlignmentNames[IDX(gpHVHero->m_cursorType)]
+                gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]
             );
             break;
 
         case UI_CLOSE:
-            strcpy(gText, cHeroScreen[IDX(TEXT_EXIT)]);
+            strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_EXIT)]);
             break;
 
         default:
@@ -1157,23 +1127,22 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             if (secondarySkillSlot < gpHVHero->m_secondarySkillCount) {
                 sprintf(
                     gText,
-                    cHeroScreen[IDX(TEXT_SECONDARY_SKILL)],
+                    cHeroScreen[H2EnumIndex(TEXT_SECONDARY_SKILL)],
                     gSecondarySkillLevels
-                        [IDX(gpHVHero->m_secondarySkills
-                                 [IDX(gpHVHero->GetNthSS(secondarySkillSlot))])
+                        [H2EnumIndex(gpHVHero->m_secondarySkills
+                                 [H2EnumIndex(gpHVHero->GetNthSS(secondarySkillSlot))])
                          - 1],
-                    gSecondarySkills[IDX(gpHVHero->GetNthSS(secondarySkillSlot))]
+                    gSecondarySkills[H2EnumIndex(gpHVHero->GetNthSS(secondarySkillSlot))]
                 );
                 break;
             }
         default_hero_text:
-            strcpy(gText, cHeroScreen[IDX(TEXT_SCREEN)]);
+            strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_SCREEN)]);
             break;
     }
     HeroMessageUpdate(gText);
 }
 
-VA(0x0046e816, 0xaef)
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
     i32 temp1;
@@ -1185,10 +1154,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 nextExperience12;
     i32 level14;
 
-    if (HAS(
-            message.payload.widget.modifiers,
-            MESSAGE_MODIFIER_RIGHT_BUTTON
-        ))
+    if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         quickView0 = 1;
     else
         quickView0 = 0;
@@ -1296,9 +1262,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_SPREAD:
                         if (quickView0) {
                             NormalDialog(
-                                DATA_COMPGEN(0x004f6d44, heroHandlerSpreadFormationSpreadCombatFormationSpreads, "{Spread Formation}\n\n'Spread' combat formation spreads your "
+                                "{Spread Formation}\n\n'Spread' combat formation spreads your "
                                 "armies from the top to the bottom of the battlefield, with at "
-                                "least one empty space between each army."),
+                                "least one empty space between each army.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -1312,7 +1278,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
                                 static_cast<i32>(gpHVHero->m_eventFlags)
-                                & ~IDX(HERO_EVENT_GROUPED_FORMATION)
+                                & ~H2EnumIndex(HERO_EVENT_GROUPED_FORMATION)
                             );
                             SetupHeroView();
                             RedrawHeroScreen();
@@ -1322,8 +1288,8 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_GROUPED:
                         if (quickView0) {
                             NormalDialog(
-                                DATA_COMPGEN(0x004f6de8, heroHandlerGroupedFormationGroupedCombatFormationBunches, "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
-                                "army together in the center of your side of the battlefield."),
+                                "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
+                                "army together in the center of your side of the battlefield.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -1337,7 +1303,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         } else {
                             gpHVHero->m_eventFlags = HeroEventFlag(
                                 static_cast<i32>(gpHVHero->m_eventFlags)
-                                | IDX(HERO_EVENT_GROUPED_FORMATION)
+                                | H2EnumIndex(HERO_EVENT_GROUPED_FORMATION)
                             );
                             SetupHeroView();
                             RedrawHeroScreen();
@@ -1348,10 +1314,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_SPELL_POINTS_LAST:
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6e64, heroHandlerSpellPointsSCurrentlyHasD, "{Spell Points}\n\n%s currently has %d spell points out of a maximum "
+                            "{Spell Points}\n\n%s currently has %d spell points out of a maximum "
                             "of %d.  The maximum number of spell points is 10 times your "
                             "knowledge.  It is occasionally possible to have more than your "
-                            "maximum spell points via special events."),
+                            "maximum spell points via special events.",
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
                             gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
@@ -1377,7 +1343,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         nextExperience12 = gpHVHero->GetExperience(level14 + 1);
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6f4c, heroHandlerLevelDCurrentExperienceDNext, "{Level %d}\n\nCurrent experience %d\nNext level %d"),
+                            "{Level %d}\n\nCurrent experience %d\nNext level %d",
                             level14,
                             gpHVHero->m_experience,
                             nextExperience12
@@ -1454,11 +1420,8 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->HeroScreenUpdate();
                                 }
                             } else if (quickView0 == 0) {
-                                temp1 = IDX(gpHVHero->m_army.m_creatureTypes[armySlot7]);
-                                if (!HAS(
-                                        message.payload.widget.modifiers,
-                                        MESSAGE_MODIFIER_SHIFT_KEYS
-                                    )
+                                temp1 = H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot7]);
+                                if (!(H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_SHIFT_KEYS)))
                                     || (gpHVHero->m_army.m_creatureTypes[armySlot7]
                                             != CREATURE_NONE
                                         && gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
@@ -1571,15 +1534,13 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0046f305, 0x4f)
 void RedrawHeroScreen(void) {
     gpResourceManager
-        ->GetBackdrop(DATA_COMPGEN(0x004f6f7c, redrawHeroScreenHerobkgIcn, "herobkg.icn"), gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
+        ->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
     heroWin->DrawWindow();
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-VA(0x0046f354, 0x218)
 i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     mapCell* heroCell;
 
@@ -1591,7 +1552,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     if (fadeAlreadyOut == 0)
         gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
 
-    heroWin = new heroWindow(0, 0, DATA_COMPGEN(0x004f6f88, heroViewHerowindBin, "herowind.bin"));
+    heroWin = new heroWindow(0, 0, "herowind.bin");
     if (heroWin == NULL)
         MemError();
     SetWinText(heroWin, UI_WINDOW_TEXT_ID);
@@ -1623,7 +1584,6 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     return UI_VIEW_CLOSED;
 }
 
-VA(0x0046f56c, 0x9c5)
 void SetupHeroView(void) {
     i32 cannotDismiss;
     tag_message message;
@@ -1641,7 +1601,7 @@ void SetupHeroView(void) {
         cannotDismiss = 1;
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, DATA_COMPGEN(0x004f6f98, setupHeroViewSTheS, "%s the %s"), gpHVHero->m_name, gAlignmentNames[IDX(gpHVHero->m_cursorType)]);
+    sprintf(gText, "%s the %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]);
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_HERO_TITLE;
     message.payload.widget.data.text = gText;
@@ -1680,7 +1640,7 @@ void SetupHeroView(void) {
     message.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(message);
 
-    sprintf(gText, DATA_COMPGEN(0x004f6fa4, setupHeroViewPort04dIcn, "port%04d.icn"), IDX(gpHVHero->m_portrait));
+    sprintf(gText, "port%04d.icn", H2EnumIndex(gpHVHero->m_portrait));
     message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     message.payload.widget.id = UI_HERO_PORTRAIT;
     message.payload.widget.data.text = gText;
@@ -1688,7 +1648,7 @@ void SetupHeroView(void) {
 
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++) {
-        sprintf(gText, DATA_COMPGEN(0x004f6fb4, setupHeroViewD, "%d"), gpHVHero->Stats(HeroPrimaryStat(index)));
+        sprintf(gText, "%d", gpHVHero->Stats(HeroPrimaryStat(index)));
         message.payload.widget.id = UI_PRIMARY_STAT_VALUE_FIRST + index;
         message.payload.widget.data.text = gText;
         heroWin->BroadcastMessage(message);
@@ -1756,20 +1716,20 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    sprintf(gText, DATA_COMPGEN(0x004f6fb8, setupHeroViewD2, "%d"), gpHVHero->m_experience);
+    sprintf(gText, "%d", gpHVHero->m_experience);
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_EXPERIENCE_LAST;
     message.payload.widget.data.text = gText;
     heroWin->BroadcastMessage(message);
 
-    if (HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
+    if ((H2EnumIndex((gpHVHero->m_eventFlags) & (HERO_EVENT_GROUPED_FORMATION))))
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
     else
         message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
     message.payload.widget.id = UI_FORMATION_SPREAD_ICON;
     message.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(message);
-    if (!HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
+    if (!(H2EnumIndex((gpHVHero->m_eventFlags) & (HERO_EVENT_GROUPED_FORMATION))))
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
     else
         message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
@@ -1779,7 +1739,7 @@ void SetupHeroView(void) {
 
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f6fbc, setupHeroViewDD, "%d/%d"),
+        "%d/%d",
         gpHVHero->m_spellPoints,
         gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
     );
@@ -1788,7 +1748,7 @@ void SetupHeroView(void) {
     message.payload.widget.data.text = gText;
     heroWin->BroadcastMessage(message);
 
-    sprintf(gText, DATA_COMPGEN(0x004f6fc4, setupHeroViewCrestIcn, "crest.icn"));
+    sprintf(gText, "crest.icn");
     message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     message.payload.widget.id = UI_PLAYER_CREST;
     heroWin->BroadcastMessage(message);
@@ -1803,7 +1763,7 @@ void SetupHeroView(void) {
             secondarySkill = gpHVHero->GetNthSS(index);
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW1_FIRST + index;
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.data.value = IDX(secondarySkill) + 1;
+            message.payload.widget.data.value = H2EnumIndex(secondarySkill) + 1;
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + index;
@@ -1815,26 +1775,26 @@ void SetupHeroView(void) {
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + index;
-            message.payload.widget.data.text = gSecondarySkills[IDX(secondarySkill)];
+            message.payload.widget.data.text = gSecondarySkills[H2EnumIndex(secondarySkill)];
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW3_FIRST + index;
             secondarySkillBonus = gpHVHero->GetSSLevel(secondarySkill)
-                                  - IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]);
+                                  - H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(secondarySkill)]);
             if (secondarySkillBonus > 0) {
                 sprintf(
                     gText,
-                    DATA_COMPGEN(0x004f6fd0, setupHeroViewSD, "%s+%d"),
+                    "%s+%d",
                     gSecondarySkillLevels
-                        [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1],
+                        [H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(secondarySkill)]) - 1],
                     secondarySkillBonus
                 );
             } else {
                 sprintf(
                     gText,
-                    DATA_COMPGEN(0x004f6fd8, setupHeroViewS, "%s"),
+                    "%s",
                     gSecondarySkillLevels
-                        [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1]
+                        [H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(secondarySkill)]) - 1]
                 );
             }
             message.payload.widget.data.text = gText;
@@ -1862,7 +1822,7 @@ void SetupHeroView(void) {
             message.payload.widget.data.value = UI_ARTIFACT_CONTROL_VALUE;
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.data.value = IDX(gpHVHero->m_artifacts[index]) + 1;
+            message.payload.widget.data.value = H2EnumIndex(gpHVHero->m_artifacts[index]) + 1;
             heroWin->BroadcastMessage(message);
         } else {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
@@ -1879,26 +1839,25 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
-VA(0x0046ff31, 0x2b0)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitTextSlot = UI_SPLIT_TEXT;
     i16 splitAmount = UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
-        new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, DATA_COMPGEN(0x004f6fdc, doHeroSplitSplitwinBin, "splitwin.bin"));
+        new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, "splitwin.bin");
     if (gpTownManager->m_heroWindow1 == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, DATA_COMPGEN(0x004f6fec, doHeroSplitMoveHowManyTroops, "Move how many troops?"));
+    sprintf(gText, "Move how many troops?");
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, DATA_COMPGEN(0x004f7004, doHeroSplitD, "%d"), gpTownManager->m_splitAmount);
+    sprintf(gText, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
@@ -1925,67 +1884,63 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     }
 }
 
-VA(0x004701e1, 0x6a)
 void hero::SetSS(
-    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
-    H2_ENUM_PARAM(HeroSkillLevel, i32) level
+    HeroSecondarySkill skill,
+    HeroSkillLevel level
 ) {
     if (level == HERO_SKILL_LEVEL_NONE)
-        TakeSS(skill, IDX(HERO_SKILL_LEVEL_EXPERT));
-    else if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE)
-        m_secondarySkills[IDX(skill)] = level;
+        TakeSS(skill, H2EnumIndex(HERO_SKILL_LEVEL_EXPERT));
+    else if (m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE)
+        m_secondarySkills[H2EnumIndex(skill)] = level;
     else
         GiveSS(skill, level);
 }
 
-VA(0x0047024b, 0xfa)
-i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
-    H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
-    H2_ENUM_STORAGE_STEPPED(HeroSecondarySkill, i32) otherSkill;
+i32 hero::TakeSS(HeroSecondarySkill skill, i32 levels) {
+    H2EnumStorage<HeroSkillLevel, i32> oldLevel;
+    H2SteppedEnumStorage<HeroSecondarySkill, i32> otherSkill;
 
-    oldLevel = m_secondarySkills[IDX(skill)];
-    if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
-        m_secondarySkills[IDX(skill)] -= levels;
-        if (m_secondarySkills[IDX(skill)] < HERO_SKILL_LEVEL_NONE)
-            m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_NONE;
-        if (m_secondarySkills[IDX(skill)] == HERO_SKILL_LEVEL_NONE) {
+    oldLevel = m_secondarySkills[H2EnumIndex(skill)];
+    if (m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[H2EnumIndex(skill)] -= levels;
+        if (m_secondarySkills[H2EnumIndex(skill)] < HERO_SKILL_LEVEL_NONE)
+            m_secondarySkills[H2EnumIndex(skill)] = HERO_SKILL_LEVEL_NONE;
+        if (m_secondarySkills[H2EnumIndex(skill)] == HERO_SKILL_LEVEL_NONE) {
             for (otherSkill = HERO_SKILL_PATHFINDING; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
-                if (m_secondarySkillOrder[IDX(otherSkill)]
-                    > m_secondarySkillOrder[IDX(skill)]) {
-                    m_secondarySkillOrder[IDX(otherSkill)]--;
+                if (m_secondarySkillOrder[H2EnumIndex(otherSkill)]
+                    > m_secondarySkillOrder[H2EnumIndex(skill)]) {
+                    m_secondarySkillOrder[H2EnumIndex(otherSkill)]--;
                 }
             }
-            m_secondarySkillOrder[IDX(skill)] = 0;
+            m_secondarySkillOrder[H2EnumIndex(skill)] = 0;
             m_secondarySkillCount--;
         }
     }
-    return IDX(oldLevel) - IDX(m_secondarySkills[IDX(skill)]);
+    return H2EnumIndex(oldLevel) - H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]);
 }
 
-VA(0x00470345, 0xbf)
 i32 hero::GiveSS(
-    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
-    H2_ENUM_PARAM(HeroSkillLevel, i32) levels
+    HeroSecondarySkill skill,
+    HeroSkillLevel levels
 ) {
-    H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
+    H2EnumStorage<HeroSkillLevel, i32> oldLevel;
 
-    oldLevel = m_secondarySkills[IDX(skill)];
-    if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
-        m_secondarySkills[IDX(skill)] += IDX(levels);
+    oldLevel = m_secondarySkills[H2EnumIndex(skill)];
+    if (m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[H2EnumIndex(skill)] += H2EnumIndex(levels);
     } else {
         if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
-            m_secondarySkills[IDX(skill)] = levels;
+            m_secondarySkills[H2EnumIndex(skill)] = levels;
             m_secondarySkillCount++;
-            m_secondarySkillOrder[IDX(skill)] = static_cast<u8>(m_secondarySkillCount);
+            m_secondarySkillOrder[H2EnumIndex(skill)] = static_cast<u8>(m_secondarySkillCount);
         }
     }
-    if (m_secondarySkills[IDX(skill)] > HERO_SKILL_LEVEL_EXPERT)
-        m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_EXPERT;
-    return IDX(m_secondarySkills[IDX(skill)]) - IDX(oldLevel);
+    if (m_secondarySkills[H2EnumIndex(skill)] > HERO_SKILL_LEVEL_EXPERT)
+        m_secondarySkills[H2EnumIndex(skill)] = HERO_SKILL_LEVEL_EXPERT;
+    return H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - H2EnumIndex(oldLevel);
 }
 
-VA(0x00470404, 0x6a)
-i32 hero::CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
+i32 hero::CreatureTypeCount(CreatureType creatureType) {
     i32 creatureCount;
     i32 armySlot;
 
@@ -1999,10 +1954,9 @@ i32 hero::CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     return creatureCount;
 }
 
-VA(0x0047046e, 0x5e)
 void hero::UpgradeCreatures(
-    H2_ENUM_PARAM(CreatureType, i32) oldCreatureType,
-    H2_ENUM_PARAM(CreatureType, i32) newCreatureType
+    CreatureType oldCreatureType,
+    CreatureType newCreatureType
 ) {
     i32 numberUpgraded = 0;
     i32 armySlot;
@@ -2013,43 +1967,39 @@ void hero::UpgradeCreatures(
     }
 }
 
-VA(0x004704cc, 0x5e)
 HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
     HeroSecondarySkill skill;
 
     for (skill = HERO_SKILL_PATHFINDING; skill < HERO_SKILL_COUNT; skill++) {
-        if (m_secondarySkillOrder[IDX(skill)] == ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
+        if (m_secondarySkillOrder[H2EnumIndex(skill)] == ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
             return skill;
     }
     return HERO_SKILL_NONE;
 }
 
-VA(0x0047052a, 0x51)
 class town* hero::GetOccupiedTown(void) {
     if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
         return gpGame->GetTown(m_occupiedTown);
     return NULL;
 }
 
-VA(0x0047057b, 0x47)
 i8 hero::Stats(HeroPrimaryStat stat) {
-    if (stat == HERO_PRIMARY_SPELL_POWER && m_primaryStats[IDX(stat)] < HERO_MINIMUM_SPELL_POWER) {
+    if (stat == HERO_PRIMARY_SPELL_POWER && m_primaryStats[H2EnumIndex(stat)] < HERO_MINIMUM_SPELL_POWER) {
         return HERO_MINIMUM_SPELL_POWER;
     }
-    return m_primaryStats[IDX(stat)];
+    return m_primaryStats[H2EnumIndex(stat)];
 }
 
-VA(0x004705c2, 0xc3)
-i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
+i8 hero::GetSSLevel(HeroSecondarySkill skill) {
     i8 bonus = 0;
-    // Necromancy bonuses turn the stored 0..3 tier into a 10%-per-point effect score.
+
     i8 baseLevel;
 
-    baseLevel = static_cast<i8>(m_secondarySkills[IDX(skill)]);
+    baseLevel = static_cast<i8>(m_secondarySkills[H2EnumIndex(skill)]);
     if (skill != HERO_SKILL_NECROMANCY)
-        return IDX(baseLevel);
-    if (baseLevel == IDX(HERO_SKILL_LEVEL_NONE))
-        return IDX(baseLevel);
+        return H2EnumIndex(baseLevel);
+    if (baseLevel == H2EnumIndex(HERO_SKILL_LEVEL_NONE))
+        return H2EnumIndex(baseLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         bonus++;
     if (m_cursorType == FACTION_NECROMANCER)
@@ -2059,23 +2009,22 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     baseLevel += bonus;
     if (baseLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
         baseLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
-    return IDX(baseLevel);
+    return H2EnumIndex(baseLevel);
 }
 
-VA(0x00470685, 0xf4)
 void hero::DoSSLevelDialog(
-    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView
+    HeroSecondarySkill skill, i32 quickView
 ) {
     i32 skillBonusValue;
     char* skillLevelText;
 
-    skillBonusValue = GetSSLevel(skill) - IDX(m_secondarySkills[IDX(skill)]);
+    skillBonusValue = GetSSLevel(skill) - H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]);
     if (skillBonusValue > 0) {
-        skillLevelText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
+        skillLevelText = gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1];
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f7008, doSSLevelDialogSNecromancyDSNecromancyD, "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
-            "killed in combat to be brought back from the dead as Skeletons."),
+            "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
+            "killed in combat to be brought back from the dead as Skeletons.",
             skillLevelText,
             skillBonusValue,
             skillLevelText,
@@ -2085,7 +2034,7 @@ void hero::DoSSLevelDialog(
     } else {
         sprintf(
             gText,
-            cSecSkillDesc[IDX(skill)][IDX(m_secondarySkills[IDX(skill)]) - 1]
+            cSecSkillDesc[H2EnumIndex(skill)][H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]
         );
     }
     NormalDialog(
@@ -2094,7 +2043,7 @@ void hero::DoSSLevelDialog(
         NORMAL_DIALOG_NO_RESOURCE,
         NORMAL_DIALOG_NO_VALUE,
         NORMAL_DIALOG_SECONDARY_SKILL,
-        IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + IDX(m_secondarySkills[IDX(skill)])
+        H2EnumIndex(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
         NORMAL_DIALOG_NO_RESOURCE,
         0,
@@ -2103,7 +2052,6 @@ void hero::DoSSLevelDialog(
     );
 }
 
-VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(i32 showDialog) {
     i32 artifactSlot;
 
@@ -2121,16 +2069,16 @@ void hero::CheckAnduranPieces(i32 showDialog) {
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, H2EnumIndex(ARTIFACT_NONE));
         if (gbThisNetHumanPlayer[m_owner]) {
-            LoadPlaySample(DATA_COMPGEN(0x004f7098, checkAnduranPiecesTreasure82m, "treasure.82m"));
+            LoadPlaySample("treasure.82m");
             NormalDialog(
-                DATA_COMPGEN(0x004f70a8, checkAnduranPiecesTheThreeAnduranArtifactsMagicallyCombine, "The three Anduran artifacts magically combine into one."),
+                "The three Anduran artifacts magically combine into one.",
                 NORMAL_DIALOG_INFO,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
                 NORMAL_DIALOG_ARTIFACT,
-                IDX(ARTIFACT_BATTLE_GARB),
+                H2EnumIndex(ARTIFACT_BATTLE_GARB),
                 NORMAL_DIALOG_NO_RESOURCE,
                 0,
                 NORMAL_DIALOG_NO_RESOURCE,
@@ -2140,9 +2088,9 @@ void hero::CheckAnduranPieces(i32 showDialog) {
     }
 }
 
-DATA(0x004f6c88) class hero* gpHVHero = NULL;
-DATA(0x004f6c8c) class heroWindow* gheroWin = NULL;
-DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
-    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500}; // NOLINT(readability-magic-numbers)
-DATA(0x005280dc) i32 iOrigHeroViewID;
-DATA(0x005280e0) b32 gbNoDismiss;
+class hero* gpHVHero = NULL;
+class heroWindow* gheroWin = NULL;
+i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
+    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
+i32 iOrigHeroViewID;
+b32 gbNoDismiss;

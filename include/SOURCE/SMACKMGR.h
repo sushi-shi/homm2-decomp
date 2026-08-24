@@ -1,18 +1,18 @@
 #ifndef HOMM2_SMACKMGR_H
 #define HOMM2_SMACKMGR_H
 
-#include <va.h>
+#include <Ints.h>
 #include <smack.h>
 #include <mss.h>
 
 void ConvertSmackerPalette(u8*);
 class icon;
-H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
+enum class ExpansionCampaignId : i32;
 
-H2_ENUM_BEGIN(SmackManagerStorageConstant)
+typedef enum SmackManagerStorageConstant {
     SMACK_OPTION_FILENAME_SIZE = 9,
     SMACK_MILES_RESERVED_SIZE  = 0x4c
-H2_ENUM_END(SmackManagerStorageConstant)
+} SmackManagerStorageConstant;
 
 #pragma pack(push, 1)
 struct tag_rect {
@@ -41,10 +41,6 @@ struct SmackMilesDigitalDriver {
     void* directSound;
 };
 #pragma pack(pop)
-SIZE(tag_rect, 8);
-SIZE(SSmackOptions, 45);
-SIZE(SmackMilesDigitalDriver, 0x50);
-SIZE(SmackSum, 0x54);
 
 void DoAdvance(Smack*, i32, i32, i32, i32);
 void SmackManagerMain(void);

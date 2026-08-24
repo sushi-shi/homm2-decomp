@@ -1,6 +1,6 @@
 #include <BASE/WINMGR.h>
 
-H2_ENUM_BEGIN(WindowColorCycleConstant)
+typedef enum WindowColorCycleConstant {
     CYCLE_FRAME_COUNT                    = 8,
     WORLD_CYCLE_COLOR_COUNT              = 8,
     ALTERNATE_CYCLE_FRAME_COUNT          = 6,
@@ -13,9 +13,9 @@ H2_ENUM_BEGIN(WindowColorCycleConstant)
     WORLD_CYCLE_FRAME_COLOR_STEP         = 3,
     COMBAT_CYCLE_FRAME_BYTES             = 12,
     ALTERNATE_CYCLE_FRAME_BYTES          = 21
-H2_ENUM_END(WindowColorCycleConstant)
+} WindowColorCycleConstant;
 
-H2_ENUM_BEGIN(WindowColorCyclePaletteOffset)
+typedef enum WindowColorCyclePaletteOffset {
     CYCLE_ROTATION_1_SAVE_OFFSET        = 9,
     CYCLE_ROTATION_1_DESTINATION_OFFSET = 3,
     CYCLE_ROTATION_1_BYTES              = 9,
@@ -37,63 +37,59 @@ H2_ENUM_BEGIN(WindowColorCyclePaletteOffset)
     CYCLE_ROTATION_5_BYTES              = 9,
     DEFAULT_CYCLE_SOURCE_OFFSET         = 66,
     DEFAULT_CYCLE_SAVE_OFFSET           = 69
-H2_ENUM_END(WindowColorCyclePaletteOffset)
+} WindowColorCyclePaletteOffset;
 
-H2_ENUM_BEGIN(WindowScreenConstant)
+typedef enum WindowScreenConstant {
     SCREEN_WIDTH            = 640,
     SCREEN_HEIGHT           = 480,
     FRAMEBUFFER_DWORD_COUNT = 0x12c00,
     FRAMEBUFFER_FILL_COLOR  = 0x24
-H2_ENUM_END(WindowScreenConstant)
+} WindowScreenConstant;
 
-H2_ENUM_BEGIN(WindowPaletteConstant)
+typedef enum WindowPaletteConstant {
     PALETTE_COLOR_BYTES = 3,
     PALETTE_BYTE_COUNT  = 0x300,
     PALETTE_DWORD_COUNT = 0xc0
-H2_ENUM_END(WindowPaletteConstant)
+} WindowPaletteConstant;
 
-H2_ENUM_BEGIN(WindowFizzleConstant)
+typedef enum WindowFizzleConstant {
     FIZZLE_DEFAULT_DELAY          = 150,
     FIZZLE_CYCLE_TABLE_BYTES      = 0x10000,
     FIZZLE_LOOKUP_HIGH_BYTE_SHIFT = 8,
     DIALOG_FADE_STEPS             = 8,
     SCREENSHOT_FILENAME_CAPACITY  = 16
-H2_ENUM_END(WindowFizzleConstant)
+} WindowFizzleConstant;
 
 #ifdef __clang__
-#define DATA(addr) __attribute__((annotate("data:" #addr)))
 #else
-#define DATA(addr)
 #endif
 
-DATA(0x00534908) i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
-DATA(0x00534968) i16 memSelector;
+i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
+i16 memSelector;
 
 static inline u32& FadeSavedUpdate(void) {
-    DATA(0x0053496c) static u32 savedUpdate;
+    static u32 savedUpdate;
     return savedUpdate;
 }
 
-#undef DATA
-#include <va.h>
+#include <Ints.h>
 #include <BASE/WINMGR_TYPES.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
 
-DATA(0x0051ef28) i32 iCombatCycleFrame = 0;
-DATA(0x0051ef2c) b32 gbEveryOtherCycle = true;
-DATA(0x0051ef30) i32 iCycle1Count = 0;
-DATA(0x0051ef34) i32 iCycle2Count = 0;
-DATA(0x0051ef38) i32 iCycle3Count = 0;
-DATA(0x0051ef3c) i32 iDialogNestCount = 0;
-DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
+i32 iCombatCycleFrame = 0;
+b32 gbEveryOtherCycle = true;
+i32 iCycle1Count = 0;
+i32 iCycle2Count = 0;
+i32 iCycle3Count = 0;
+i32 iDialogNestCount = 0;
+static SWindowManagerText gWindowManagerText = {
     "heroWindowManager",
     "SHOT%04d.PCX",
-    RETAIL_FILE,
-    RETAIL_FILE,
+    "WINMGR.cpp",
+    "WINMGR.cpp",
     "CCYCLE%02d.BIN",
-    RETAIL_FILE,
-    RETAIL_FILE
+    "WINMGR.cpp",
+    "WINMGR.cpp"
 };
 
 #include <BASE/heroWindowManager.h>
@@ -104,7 +100,6 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 
-VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
     iCycle1Count++;
@@ -127,11 +122,11 @@ void CycleColors(i32 forceUpdate) {
                 frame = CYCLE_FRAME_COUNT - frame;
             else
                 frame = iCombatCycleFrame;
-            // Retail world-cycle palette indices are local data, not symbolic domains.
-            // NOLINTBEGIN(readability-magic-numbers)
+
+
             u8 cycleIndices[WORLD_CYCLE_COLOR_COUNT] =
                 {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
-            // NOLINTEND(readability-magic-numbers)
+
             for (i32 colorIndex = 0; colorIndex < WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
                 i8* src = gpBufferPalette->m_data
                           + (cycleIndices[colorIndex] + frame * WORLD_CYCLE_FRAME_COLOR_STEP)
@@ -295,7 +290,6 @@ updatePalette:
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 
-VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = false;
     m_activeWindow = NULL;
@@ -311,7 +305,6 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
 }
 
-VA(0x004caad0, 0xd6)
 i32 heroWindowManager::Open(i32 managerOrder) {
     i32 i;
     InitVideo();
@@ -340,7 +333,6 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     return 0;
 }
 
-VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {
     if (m_active != 1)
         return;
@@ -357,7 +349,6 @@ void heroWindowManager::Close(void) {
     m_active = false;
 }
 
-VA(0x004cac00, 0x2d)
 MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
@@ -370,12 +361,10 @@ MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
     return result;
 }
 
-VA(0x004cac30, 0xf)
 MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
-VA(0x004cac40, 0x35)
 MessageDispatchResult
 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
@@ -386,10 +375,9 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 
     return Main(msg);
 }
 
-VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
-    if (HAS(w->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
+    if ((H2EnumIndex((w->m_winFlags) & (WINDOW_FLAG_FIXED_LAYER))))
         zOrder = 0;
     if (zOrder == -1) {
         if (cur == NULL)
@@ -424,7 +412,6 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
     m_focusWindow = w;
 }
 
-VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow* w) {
     if (w != NULL) {
         w->Close();
@@ -458,7 +445,6 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
     }
 }
 
-VA(0x004cadd0, 0x1cf)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
     MessageDispatchHandler handler,
@@ -536,14 +522,12 @@ i32 heroWindowManager::DoDialog(
 #undef MESSAGE_DISPATCH_CONSUME
 #undef MESSAGE_DISPATCH_FORWARD
 
-VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void) {
     PollSound();
     BitmapToScreen(m_screen);
     PollSound();
 }
 
-VA(0x004cafc0, 0x4f)
 void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
     gpMouseManager->m_cursorReady = 0;
     PollSound();
@@ -552,13 +536,11 @@ void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
     PollSound();
 }
 
-VA(0x004cb010, 0x18)
 void heroWindowManager::RedrawScreen(void) {
     for (heroWindow* w = m_windowListHead; w != NULL; w = w->m_nextWindow)
         w->DrawWindow();
 }
 
-VA(0x004cb030, 0x80)
 void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* pal) {
     if (pal != NULL)
         SetPalette(pal->m_data, 0);
@@ -585,7 +567,6 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
     }
 }
 
-VA(0x004cb0b0, 0x53)
 void heroWindowManager::ScreenShot(void) {
     char local_10[SCREENSHOT_FILENAME_CAPACITY];
     sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
@@ -600,7 +581,6 @@ void heroWindowManager::ScreenShot(void) {
     gpInputManager->Flush();
 }
 
-VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     if (bShowIt != 0) {
         if (x < 0) {
@@ -625,11 +605,9 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     }
 }
 
-// Named one-byte retail stub.
-VA(0x004cb1d0, 0x1)
+
 void CreateFizzleTables(void) {}
 
-VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(
     i32 x,
     i32 y,
@@ -659,18 +637,10 @@ void heroWindowManager::FizzleForward(
             m_updateFlags = 0;
             if (delay == -1)
                 delay = FIZZLE_DEFAULT_DELAY;
-            i8* fadePalette = static_cast<i8*>(H2_ALLOC_AT(
-                PALETTE_BYTE_COUNT,
-                gWindowManagerText.fadePaletteAllocSource,
-                808
-            ));
+            i8* fadePalette = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
             m_fizzleWork =
                 new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-            i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(
-                FIZZLE_CYCLE_TABLE_BYTES,
-                gWindowManagerText.cycleTableAllocSource,
-                810
-            ));
+            i8* cycleTable = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (i32 frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
@@ -721,28 +691,20 @@ void heroWindowManager::FizzleForward(
             if (m_fizzleWork != NULL)
                 delete m_fizzleWork;
             m_fizzleWork = NULL;
-            H2_FREE_AT(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
-            H2_FREE_AT(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
+            H2_FREE(cycleTable);
+            H2_FREE(fadePalette);
         }
     }
 }
 
-VA(0x004cb5f0, 0x19)
 void heroWindowManager::ReleaseFizzleSource(void) {
     if (m_fizzleSource != NULL)
         delete m_fizzleSource;
     m_fizzleSource = NULL;
 }
 
-// Named one-byte retail stub.
-VA(0x004cb610, 0x1)
+
 void CreateColorTables(void) {}
 
-// Named one-byte retail stub.
-VA(0x004cb620, 0x1)
+
 void CreateColorLookupTables(void) {}
-
-
-VTBL(heroWindowManager, 0x004eba10);
-
-#undef RETAIL_FILE

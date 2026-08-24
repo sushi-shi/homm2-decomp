@@ -9,7 +9,7 @@ class town;
 
 void SetupRecruitWin(
     class heroWindow*,
-    H2_ENUM_PARAM(CreatureType, i32),
+    CreatureType,
     i32,
     ResourceType,
     i32,

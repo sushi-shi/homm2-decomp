@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/iconf2bc.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
@@ -7,24 +7,24 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-DATA(0x005380fc) static i32 s_clipB;
-DATA(0x005380e8) static u32 s_loopCount;
-DATA(0x005380d8) static i32 s_y;
-DATA(0x005380d0) static i32 s_x;
-DATA(0x005380f4) static u8* s_dimDst;
-DATA(0x005380f8) static i32 s_left;
-DATA(0x005380e4) static i32 s_right;
-DATA(0x00538104) static u32 s_run;
-DATA(0x005380dc) static u8* s_dimPal;
-DATA(0x00538100) static u8* s_row;
-DATA(0x005380c0) static u8* s_dst;
-DATA(0x005380d4) static i32 s_srcSkip;
-DATA(0x005380f0) static u8* s_src;
-DATA(0x005380ec) static IconEntry* s_entry;
-DATA(0x005380e0) static u32 s_spanCount;
-DATA(0x005380cc) static u8 s_color;
-DATA(0x005380c4) static u32 s_dimLen;
-DATA(0x005380c8) static i32 s_clipR;
+static i32 s_clipB;
+static u32 s_loopCount;
+static i32 s_y;
+static i32 s_x;
+static u8* s_dimDst;
+static i32 s_left;
+static i32 s_right;
+static u32 s_run;
+static u8* s_dimPal;
+static u8* s_row;
+static u8* s_dst;
+static i32 s_srcSkip;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static u8 s_color;
+static u32 s_dimLen;
+static i32 s_clipR;
 
 static inline i32 FlipColorRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
     return clipTop <= currentY && currentY <= clipBottom;
@@ -34,14 +34,13 @@ static inline u8 FlipColorDimValue(u8* dst, u8* palette) {
     return palette[*dst];
 }
 
-VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(
     class icon* srcIcon,
     class bitmap* dest,
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -83,7 +82,7 @@ void FlipIconToBitmapColorTable(
         cmd = *src++;
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                // skip run / end-of-sprite
+
                 s_run = cmd;
                 i32 n = cmd & ICON_RLE_COMMAND_RUN_MASK;
                 s_x = X;
@@ -97,13 +96,13 @@ void FlipIconToBitmapColorTable(
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
-                // 0xc1 - 0xFF : solid colour run
+
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
                 s_color = colorTable[*src++];
                 goto do_fill;
             }
-            // 0xc0 : shadow / dim run
+
             flags = *src++;
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)

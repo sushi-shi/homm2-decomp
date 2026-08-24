@@ -1,23 +1,21 @@
 #ifndef HOMM2_BASE_MESSAGE_H
 #define HOMM2_BASE_MESSAGE_H
 
-#include <va.h>
+#include <Ints.h>
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(MessageDispatchResult)
+enum class MessageDispatchResult : i32 {
     MESSAGE_DISPATCH_CONTINUE = 0,
     MESSAGE_DISPATCH_CONSUME  = 1,
     MESSAGE_DISPATCH_FORWARD  = 2
-H2_ENUM_CLASS_END(MessageDispatchResult)
+};
+using enum MessageDispatchResult;
 
 typedef MessageDispatchResult (*MessageDispatchHandler)(tag_message&);
 
-// Shared event ABI emitted by inputManager and consumed by BASE and SOURCE managers.
-// The complete definition is required anywhere a message is passed or returned by value.
 
-// Values emitted by INPUTMGR and consumed by manager/widget Main loops.
-H2_ENUM_CLASS_BEGIN(MessageType)
+enum class MessageType : i32 {
     MESSAGE_NONE                       = 0,
     MESSAGE_KEY_DOWN                   = 1,
     SPELL_MESSAGE_MOUSE_DOWN           = MESSAGE_KEY_DOWN,
@@ -55,11 +53,12 @@ H2_ENUM_CLASS_BEGIN(MessageType)
     MESSAGE_EXECUTIVE                  = 0x4000,
     COMBAT_WIN_MESSAGE                 = MESSAGE_EXECUTIVE,
     ADVMGR_REMOTE_WAIT_EXIT_MESSAGE    = MESSAGE_EXECUTIVE
-H2_ENUM_CLASS_END(MessageType)
-H2_ENUM_FLAGS(MessageType)
+};
+using enum MessageType;
+ENABLE_ENUM_FLAGS(MessageType)
 
-// One widget-dispatch command space; per-window names are value-verified aliases.
-H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
+
+enum class BaseWidgetCommand : i32 {
     WIDGET_COMMAND_DRAW                       = 2,
     WIDGET_COMMAND_SET_TEXT                   = 3,
     HERO_UI_WIDGET_TEXT                       = WIDGET_COMMAND_SET_TEXT,
@@ -146,7 +145,7 @@ H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     HERO_UI_INPUT_ALTERNATE_SELECT            = WIDGET_COMMAND_ALTERNATE_SELECT,
     INIT_MENU_HELP_COMMAND                    = WIDGET_COMMAND_ALTERNATE_SELECT,
     NEW_GAME_EVENT_ALTERNATE_PRESS            = WIDGET_COMMAND_ALTERNATE_SELECT,
-    // Remote-wait extension outside the canonical widget command sequence.
+
     WIDGET_COMMAND_REMOTE_WAIT_EXIT           = 16,
     ADVMGR_REMOTE_WAIT_EXIT_COMMAND           = WIDGET_COMMAND_REMOTE_WAIT_EXIT,
     HERO_UI_WIDGET_ICON_FILE                  = WIDGET_COMMAND_SET_ICON,
@@ -172,16 +171,17 @@ H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     ADVMGR_REMOTE_WAIT_POP_NET_BOX_COMMAND    = WIDGET_COMMAND_REPLACE_ICON,
     ADVMGR_INTERFACE_REPLACE_RESOURCE         = WIDGET_COMMAND_REPLACE_ICON,
     WIDGET_COMMAND_SET_WIDTH                  = 0x3d
-H2_ENUM_CLASS_END(BaseWidgetCommand)
+};
+using enum BaseWidgetCommand;
 
-H2_ENUM_CLASS_BEGIN(MessageModifier)
+enum class MessageModifier : i32 {
     MESSAGE_MODIFIER_NONE                   = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT            = 1,
     MESSAGE_MODIFIER_LEFT_SHIFT             = 2,
     MESSAGE_MODIFIER_SHIFT_KEYS             = 0x3,
     MESSAGE_MODIFIER_CONTROL                = 4,
     MESSAGE_MODIFIER_ALT                    = 0x20,
-    MESSAGE_MODIFIER_CONTROL_KEYS           = 0xc, // either control-key modifier bit
+    MESSAGE_MODIFIER_CONTROL_KEYS           = 0xc,
     MESSAGE_MODIFIER_CLEAR_CONTROL_MASK     = 0xfffb,
     MESSAGE_MODIFIER_CLEAR_LEFT_SHIFT_MASK  = 0xfffd,
     MESSAGE_MODIFIER_CLEAR_RIGHT_SHIFT_MASK = 0xfffe,
@@ -189,8 +189,9 @@ H2_ENUM_CLASS_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_LEFT_BUTTON            = 0x100,
     MESSAGE_MODIFIER_RIGHT_BUTTON           = 0x200,
     MESSAGE_MODIFIER_BUTTON_MASK            = 0x300
-H2_ENUM_CLASS_END(MessageModifier)
-H2_ENUM_FLAGS(MessageModifier)
+};
+using enum MessageModifier;
+ENABLE_ENUM_FLAGS(MessageModifier)
 
 struct tag_messageKeyboardPayload {
     union {
@@ -203,7 +204,6 @@ struct tag_messageKeyboardPayload {
     i32 unknown0x14;
     i32 unknown0x18;
 };
-SIZE(tag_messageKeyboardPayload, 0x18);
 
 struct tag_messageMousePayload {
     i32 x;
@@ -213,7 +213,6 @@ struct tag_messageMousePayload {
     i32 screenY;
     i32 unknown0x18;
 };
-SIZE(tag_messageMousePayload, 0x18);
 
 struct tag_messageHoverPayload {
     i32 x;
@@ -223,13 +222,11 @@ struct tag_messageHoverPayload {
     i32 screenY;
     i32 unknown0x18;
 };
-SIZE(tag_messageHoverPayload, 0x18);
 
 union tag_messageWidgetData {
     i32 value;
     char* text;
 };
-SIZE(tag_messageWidgetData, 0x4);
 
 struct tag_messageWidgetPayload {
     BaseWidgetCommand command;
@@ -242,16 +239,16 @@ struct tag_messageWidgetPayload {
     i32 screenY;
     tag_messageWidgetData data;
 };
-SIZE(tag_messageWidgetPayload, 0x18);
 
-// Executive-arm commands consumed by the manager loop (EXEC), not by widgets.
-H2_ENUM_CLASS_BEGIN(ExecutiveCommand)
+
+enum class ExecutiveCommand : i32 {
     EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
     EXECUTIVE_COMMAND_REMOVE_MANAGER = 2,
     EXECUTIVE_COMMAND_RETURN_RESULT  = 4,
     FILE_REQUESTER_EXECUTIVE_CLOSE   = EXECUTIVE_COMMAND_RETURN_RESULT,
     SWAP_COMMAND_EXIT                = EXECUTIVE_COMMAND_RETURN_RESULT
-H2_ENUM_CLASS_END(ExecutiveCommand)
+};
+using enum ExecutiveCommand;
 
 struct tag_messageExecutivePayload {
     ExecutiveCommand command;
@@ -261,7 +258,6 @@ struct tag_messageExecutivePayload {
     i32 unknown0x14;
     i32 result;
 };
-SIZE(tag_messageExecutivePayload, 0x18);
 
 struct tag_messageUnknownPayload {
     i32 unknown0x04;
@@ -271,7 +267,6 @@ struct tag_messageUnknownPayload {
     i32 unknown0x14;
     i32 unknown0x18;
 };
-SIZE(tag_messageUnknownPayload, 0x18);
 
 union tag_messagePayload {
     tag_messageKeyboardPayload keyboard;
@@ -281,11 +276,9 @@ union tag_messagePayload {
     tag_messageExecutivePayload executive;
     tag_messageUnknownPayload unknown;
 };
-SIZE(tag_messagePayload, 0x18);
 
 struct tag_message {
     MessageType type;
     tag_messagePayload payload;
 };
-SIZE(tag_message, 0x1c);
 #endif

@@ -1,14 +1,14 @@
 #ifndef HOMM2_SOURCE_HEXCELL_H
 #define HOMM2_SOURCE_HEXCELL_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/icon.h>
 #include <SOURCE/combatTypes.h>
 
-H2_ENUM_BEGIN(HexcellConstant)
+typedef enum HexcellConstant {
     COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
     HEXCELL_LIMIT_COUNT           = 2
-H2_ENUM_END(HexcellConstant)
+} HexcellConstant;
 
 #pragma pack(push, 1)
 class hexcell {
@@ -22,13 +22,13 @@ public:
     i16 m_gridBottom;
     u8 m_blocked;
     i8 m_obstacleIndex;
-    H2_ENUM_STORAGE(CombatSide, i8) m_occupantSide;
+    H2EnumStorage<CombatSide, i8> m_occupantSide;
     i8 m_occupantIndex;
-    H2_ENUM_STORAGE(ArmyFacing, i8) m_occupantFrame;
+    H2EnumStorage<ArmyFacing, i8> m_occupantFrame;
     i32 m_deadOccupantCount;
-    H2_ENUM_STORAGE(CombatSide, i8) m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    H2EnumStorage<CombatSide, i8> m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
     i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
-    H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    H2EnumStorage<ArmyFacing, i8> m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
     u8 m_pathReachable;
     struct SLimitData m_limits[HEXCELL_LIMIT_COUNT];
     hexcell(void);
@@ -41,5 +41,4 @@ public:
     void DrawObstacle(void);
 };
 #pragma pack(pop)
-SIZE(hexcell, 0x62);
 #endif

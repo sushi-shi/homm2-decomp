@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/icon2by.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
@@ -7,22 +7,22 @@
 #include <BASE/IconShear.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-DATA(0x00538150) static i32 s_clipB;
-DATA(0x00538154) static i32 s_loopIndex;
-DATA(0x0053815c) static i32 s_pitch;
-DATA(0x00538158) static i32 s_y;
-DATA(0x00538160) static i32 s_x;
-DATA(0x00538164) static u8* s_dimDst;
-DATA(0x0053816c) static i32 s_left;
-DATA(0x00538168) static u32 s_run;
-DATA(0x00538170) static u8* s_dimPal;
-DATA(0x00538174) static u8* s_row;
-DATA(0x00538178) static u8* s_src;
-DATA(0x00538180) static IconEntry* s_entry;
-DATA(0x0053817c) static u32 s_spanCount;
-DATA(0x00538184) static u8 s_color;
-DATA(0x00538188) static u32 s_dimLen;
-DATA(0x0053818c) static i32 s_clipR;
+static i32 s_clipB;
+static i32 s_loopIndex;
+static i32 s_pitch;
+static i32 s_y;
+static i32 s_x;
+static u8* s_dimDst;
+static i32 s_left;
+static u32 s_run;
+static u8* s_dimPal;
+static u8* s_row;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static u8 s_color;
+static u32 s_dimLen;
+static i32 s_clipR;
 
 static inline i32 IconRowVisible(i8* shear, i32 clipTop, i32 currentY, i32 clipBottom) {
     return shear[currentY] != ICON_SHEAR_SKIP_ROW && clipTop <= currentY && currentY <= clipBottom;
@@ -32,14 +32,13 @@ static inline u8* IconOutsideCopySource(u8* src, i32 currentX, i32 clipX) {
     return src + (clipX - currentX);
 }
 
-VA(0x004da270, 0x588)
 void IconToBitmapYModify(
     class icon* srcIcon,
     class bitmap* dest,
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

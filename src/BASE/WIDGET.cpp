@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/widget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/heroWindow.h>
@@ -7,18 +7,17 @@
 #include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(WidgetConstant)
+typedef enum WidgetConstant {
     DEFAULT_EXTENT = 16
-H2_ENUM_END(WidgetConstant)
+} WidgetConstant;
 
-VA(0x004dde00, 0x5a)
 widget::widget(
     i16 x,
     i16 y,
     i16 width,
     i16 height,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind
+    WidgetKind kind
 ) {
     m_owner = NULL;
     m_next = NULL;
@@ -33,7 +32,6 @@ widget::widget(
     m_kind = kind;
 }
 
-VA(0x004dde60, 0x3f)
 widget::widget(void) {
     m_owner = NULL;
     m_next = NULL;
@@ -48,17 +46,14 @@ widget::widget(void) {
     m_height = DEFAULT_EXTENT;
 }
 
-VA(0x004ddea0, 0x7)
 widget::~widget() {}
 
-VA(0x004ddeb0, 0x14)
 i32 widget::Open(i32 zOrder, class heroWindow* owner) {
     m_zOrder = zOrder;
     m_owner = owner;
     return 0;
 }
 
-VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 static inline void DimWidgetArea(widget* target) {
@@ -80,7 +75,6 @@ static inline i32 IsInsideWidget(widget* target, i16 x, i16 y) {
              || target->m_y + target->m_height <= y);
 }
 
-VA(0x004ddee0, 0x2f4)
 MessageDispatchResult widget::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE: {
@@ -98,9 +92,9 @@ MessageDispatchResult widget::Main(tag_message& message) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DRAW:
-                    if (HAS(m_flags, WIDGET_FLAG_DRAW))
+                    if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW))))
                         Draw();
-                    if (HAS(m_flags, WIDGET_FLAG_DIMMED)
+                    if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED)))
                         && m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                         DimWidgetArea(this);
                         return MESSAGE_DISPATCH_CONTINUE;
@@ -109,23 +103,23 @@ MessageDispatchResult widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_SET_FLAGS:
                     if (m_id == message.payload.widget.id) {
-                        if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
+                        if (message.payload.widget.data.value == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
+                        H2EnumStorage<WidgetFlag, i16> flags =
                             m_flags
-                            | static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(
+                            | static_cast<H2EnumStorage<WidgetFlag, i16>>(
                                 message.payload.widget.data.value
                             );
                         m_flags = flags;
-                        if (HAS(flags, WIDGET_FLAG_DIMMED)) {
+                        if ((H2EnumIndex((flags) & (WIDGET_FLAG_DIMMED)))) {
                             Draw();
                             if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                                 DimWidgetArea(this);
                             }
                         }
-                        if (HAS(m_flags, WIDGET_FLAG_UPDATE)) {
+                        if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_UPDATE)))) {
                             gpWindowManager->UpdateScreenRegion(
                                 m_x + m_owner->m_posX,
                                 m_y + m_owner->m_posY,
@@ -141,16 +135,16 @@ MessageDispatchResult widget::Main(tag_message& message) {
                 case WIDGET_COMMAND_CLEAR_FLAGS:
                     if (m_id == message.payload.widget.id) {
                         i32 rawFlags = message.payload.widget.data.value;
-                        if (rawFlags == IDX(WIDGET_COMMAND_DIMMED)) {
+                        if (rawFlags == H2EnumIndex(WIDGET_COMMAND_DIMMED)) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
-                            static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(rawFlags);
+                        H2EnumStorage<WidgetFlag, i16> flags =
+                            static_cast<H2EnumStorage<WidgetFlag, i16>>(rawFlags);
                         m_flags &= ~flags;
-                        if (HAS(flags, WIDGET_FLAG_DIMMED))
+                        if ((H2EnumIndex((flags) & (WIDGET_FLAG_DIMMED))))
                             Draw();
-                        if (HAS(flags, WIDGET_FLAG_UPDATE))
+                        if ((H2EnumIndex((flags) & (WIDGET_FLAG_UPDATE))))
                             gpWindowManager->UpdateScreenRegion(
                                 m_x + m_owner->m_posX,
                                 m_y + m_owner->m_posY,
@@ -187,7 +181,6 @@ MessageDispatchResult widget::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004de1e0, 0x47)
 void widget::Dim(void) {
     if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
         i16 x = m_owner->m_posX + m_x;
@@ -195,6 +188,3 @@ void widget::Dim(void) {
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
     }
 }
-
-
-VTBL(widget, 0x004ebb00);

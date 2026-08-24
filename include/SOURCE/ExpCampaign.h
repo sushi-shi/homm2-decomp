@@ -1,24 +1,25 @@
 #ifndef HOMM2_SOURCE_EXPCAMPAIGN_H
 #define HOMM2_SOURCE_EXPCAMPAIGN_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
 
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(ExpansionCampaignId)
+enum class ExpansionCampaignId : i32 {
     EXPANSION_CAMPAIGN_NONE             = -1,
     EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY = 0,
     EXPANSION_CAMPAIGN_DESCENDANTS      = 1,
     EXPANSION_CAMPAIGN_WIZARDS_ISLE     = 2,
     EXPANSION_CAMPAIGN_VOYAGE_HOME      = 3,
     EXPANSION_CAMPAIGN_COUNT            = 4
-H2_ENUM_CLASS_END(ExpansionCampaignId)
-H2_ENUM_STEPPED(ExpansionCampaignId)
+};
+using enum ExpansionCampaignId;
+ENABLE_ENUM_STEPS(ExpansionCampaignId)
 
-H2_ENUM_CLASS_BEGIN(ExpansionCampaignMap)
+enum class ExpansionCampaignMap : i32 {
     MAP_NONE                                    = -1,
     MAP_FIRST                                   = 0,
     MAP_POL_UPRISING                            = 0,
@@ -46,10 +47,11 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignMap)
     MAP_VOY_KING_AND_COUNTRY                    = 2,
     MAP_VOY_BLOOD_IS_THICKER                    = 3,
     EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP = 4
-H2_ENUM_CLASS_END(ExpansionCampaignMap)
-H2_ENUM_STEPPED(ExpansionCampaignMap)
+};
+using enum ExpansionCampaignMap;
+ENABLE_ENUM_STEPS(ExpansionCampaignMap)
 
-H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
+enum class ExpansionCampaignAward : i32 {
     AWARD_ELVEN_ALLIANCE      = 0,
     AWARD_BREASTPLATE_ANDURAN = 1,
     AWARD_WOOD_BONUS          = 2,
@@ -61,10 +63,11 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
     AWARD_LEGENDARY_SCEPTER   = 8,
     AWARD_SET_GUARDIAN        = 9,
     AWARD_SPHERE_NEGATION     = 10
-H2_ENUM_CLASS_END(ExpansionCampaignAward)
-H2_ENUM_STEPPED(ExpansionCampaignAward)
+};
+using enum ExpansionCampaignAward;
+ENABLE_ENUM_STEPS(ExpansionCampaignAward)
 
-H2_ENUM_BEGIN(ExpansionCampaignConstant)
+typedef enum ExpansionCampaignConstant {
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT           = 8,
     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT      = 3,
     EXPANSION_CAMPAIGN_AWARD_COUNT             = 11,
@@ -86,7 +89,7 @@ H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAIN_PLAYER             = 0,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X      = 5,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y      = 0
-H2_ENUM_END(ExpansionCampaignConstant)
+} ExpansionCampaignConstant;
 
 #pragma pack(push, 1)
 class ExpCampaign {
@@ -110,9 +113,9 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
-    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
+    void GrantAward(ExpansionCampaignAward);
+    void RemoveAward(ExpansionCampaignAward);
+    i8 HasAward(ExpansionCampaignAward);
     void SetMapWasPlayed(void);
     void InitNewCampaign(ExpansionCampaignId);
     void InitMap(void);
@@ -146,9 +149,8 @@ public:
     i8 IsSpecialLossCondition(i32);
 };
 #pragma pack(pop)
-SIZE(ExpCampaign, 0x50);
 
-extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
+extern struct SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                                               [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif

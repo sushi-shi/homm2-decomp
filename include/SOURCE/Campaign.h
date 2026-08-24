@@ -7,7 +7,7 @@
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(CampaignAward)
+enum class CampaignAward : i32 {
     CAMPAIGN_AWARD_DWARVEN_ALLIANCE           = 0,
     CAMPAIGN_AWARD_SORCERESS_GUILD            = 1,
     CAMPAIGN_AWARD_ROLAND_STRENGTHENED        = 2,
@@ -20,9 +20,10 @@ H2_ENUM_CLASS_BEGIN(CampaignAward)
     CAMPAIGN_AWARD_DRAGON_ALLIANCE            = 9,
     CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN   = 10,
     CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES = 11
-H2_ENUM_CLASS_END(CampaignAward)
+};
+using enum CampaignAward;
 
-H2_ENUM_BEGIN(CampaignMessageConstant)
+typedef enum CampaignMessageConstant {
     CAMPAIGN_CLOSE_COMMAND               = 10,
     CAMPAIGN_DIALOG_CANCEL               = 0x7801,
     CAMPAIGN_DIALOG_ACCEPT               = 0x7802,
@@ -57,9 +58,9 @@ H2_ENUM_BEGIN(CampaignMessageConstant)
     CAMPAIGN_WIDGET_ENABLE_FRAME         = 8,
     CAMPAIGN_WIDGET_DISABLE_FRAME        = 9,
     CAMPAIGN_WIDGET_REFRESH_FRAME        = 4
-H2_ENUM_END(CampaignMessageConstant)
+} CampaignMessageConstant;
 
-H2_ENUM_BEGIN(CampaignDisplayConstant)
+typedef enum CampaignDisplayConstant {
     CAMPAIGN_TRACK_ICON_SIZE       = 41,
     CAMPAIGN_TRACK_ICON_OFFSET     = 2,
     CAMPAIGN_TRACK_ICON_FRAME      = 10,
@@ -71,7 +72,7 @@ H2_ENUM_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_DIALOG_FADE_STEPS     = 8,
     CAMPAIGN_GOOD_MUSIC            = 24,
     CAMPAIGN_EVIL_MUSIC            = 22
-H2_ENUM_END(CampaignDisplayConstant)
+} CampaignDisplayConstant;
 
 MessageDispatchResult CampaignHandler(struct tag_message&);
 
