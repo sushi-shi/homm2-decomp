@@ -65,6 +65,10 @@ appendix; it is not the matching priority.
   scope plus 200 fresh states do not beat its 99.9977% MAX. DecodePacket's Buka
   locals emit 293/314 bytes under VC4.2; 11 CRC spellings and 50 states leave
   its exact-frame/CFG/relocation two-byte residual unchanged.
+- `ComputerMonsterInteract` is another matching-only non-transfer. The literal
+  Buka flee return grows PoL by five bytes; its nested combat-result tail has
+  higher fuzzy but worse graph deltas in every one of 51 states. PoL's current
+  1088-byte, 48-block parent remains retained.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -400,7 +404,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `ComputerMonsterInteract` | 99.9684% | if/else combat tail and flee return |
 | `HeroInteractionAtTown` | 99.9663% | PHILAI structural/name donor |
 | `RVOfPosition` | 99.9294% | map access and semantic phase order |
 | `FightValueOfStack` | 99.9139% | exact Buka arithmetic ownership |
