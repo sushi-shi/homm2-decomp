@@ -27,7 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
-| combatManager::ShotIsThroughWall trace compares | `iWallToHexCell[i] == traceHex11`; `iTowerToHexCell[i] == traceHex11` | `traceHex11 == table[i]` (both) | OPEN - slot 14-perm residual parked |
+| combatManager::ShotIsThroughWall trace compares | `iWallToHexCell[i] == traceHex11`; `iTowerToHexCell[i] == traceHex11` | `traceHex11 == table[i]` (both) | ported invariant source; complete 4/4 clean matrix was byte-neutral, then forest/top trial 1 reproduced audited exact PoL bytes, exact 44-block CFG, and ordered 25/25 relocations; local slot residual was unrelated |
 | CreateJoinFile diff loop | `while (diffSize1 > position1)` | `while (position1 < diffSize1)` | OPEN - slot residual parked |
 | recruitUnit::Update dead buffer | `char text[NAME_SIZE];` declared (PoL) | ABSENT - retail frame is 0x20, exactly NAME_SIZE smaller; sprintf targets gText | OPEN - check whether 2.0 bytes carry the 0x34 frame |
 | army::AttackTo standing if/else + two compares | `if (pI == 1 \|\| steps >= speed) fS=1; else fS=0;`; `m_hex == m_moveTargetHex`; `pathLength - 1 != pI` | De Morgan: `if (pI != 1 && steps < speed) fS=0; else fS=1;`; `m_moveTargetHex == m_hex`; `pI != pathLength - 1` | OPEN - residual: retail slots finishStanding BELOW the this-spill; no rename/scope/register spelling reproduces it (3 probes measured); parked as slot-wall with GetBestDirection |
