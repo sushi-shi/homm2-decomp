@@ -64,11 +64,10 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
 
     m_cursorDirection = direction;
     m_cursorFrame = GetCursorBaseFrame(direction) + 1;
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-        > CONFIG_WALK_SPEED_SLOWEST)
-        m_cursorCycle = 1;
-    else
-        m_cursorCycle = SLOW_CURSOR_CYCLE_START;
+    m_cursorCycle = (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+                            > CONFIG_WALK_SPEED_SLOWEST
+                        ? 1
+                        : SLOW_CURSOR_CYCLE_START;
 
     directionX_a = normalDirTable[IDX(direction)].x;
     directionY_a1 = normalDirTable[IDX(direction)].y;
