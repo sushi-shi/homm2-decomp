@@ -339,14 +339,14 @@ VA(0x004c8c00, 0x11c)
 void resourceManager::PointToFile(u32l fileId) {
     char isFound = 0;
     i32 entryIndex;
-    i32 aggregateIndex;
-    for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
-        if (m_aggregateDir[aggregateIndex] != NULL) {
+    i32 i;
+    for (i = 0; i < RESOURCE_MANAGER_AGGREGATE_LIMIT; i++) {
+        if (m_aggregateDir[i] != NULL) {
             entryIndex = 0;
-            while (entryIndex < m_aggregateEntryCount[aggregateIndex]) {
-                if (m_aggregateDir[aggregateIndex][entryIndex].id == fileId) {
+            while (entryIndex < m_aggregateEntryCount[i]) {
+                if (m_aggregateDir[i][entryIndex].id == fileId) {
                     isFound = 1;
-                    m_curAggregate = aggregateIndex;
+                    m_curAggregate = i;
                     break;
                 }
                 entryIndex++;

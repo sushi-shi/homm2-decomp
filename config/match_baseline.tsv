@@ -275,7 +275,7 @@ BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	100.0000	e4836036dc1
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	d8ff4892bed8
 BASE/RESMGR	?MakeId@resourceManager@@QAEKPADH@Z	100.0000	90d7b48276b9
 BASE/RESMGR	?Open@resourceManager@@UAEHH@Z	100.0000	ca5efbd064f5
-BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	100.0000	6ac90ed6ff46
+BASE/RESMGR	?PointToFile@resourceManager@@QAEXK@Z	100.0000	0640520057c8
 BASE/RESMGR	?Query@resourceManager@@QAEPAVresource@@K@Z	100.0000	ecf1b2ed9ac1
 BASE/RESMGR	?Read13@resourceManager@@QAEXPAC@Z	100.0000	5bfd7d78af19
 BASE/RESMGR	?ReadBlock@resourceManager@@QAEXPACK@Z	100.0000	f6476a22ca09
