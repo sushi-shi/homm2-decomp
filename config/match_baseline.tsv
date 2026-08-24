@@ -531,7 +531,7 @@ SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	94.2703	cf9d2b454986
 SOURCE/AI	?GetFlyerMask@combatManager@@QAEHH@Z	100.0000	061a0b1aa1a0
 SOURCE/AI	?GetMirrorImageMask@combatManager@@QAEHH@Z	100.0000	0ddc985b4e29
 SOURCE/AI	?GetModLichDamage@combatManager@@QAEMPAVarmy@@M@Z	100.0000	a6d8e3c39de7
-SOURCE/AI	?GetOutOfItMask@combatManager@@QAEHH@Z	100.0000	c2407957b183
+SOURCE/AI	?GetOutOfItMask@combatManager@@QAEHH@Z	100.0000	e58ec513a06e
 SOURCE/AI	?GetShooterMask@combatManager@@QAEHH@Z	100.0000	fd8646b27389
 SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	100.0000	0800d05d8708
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	f4bc452ff45c
