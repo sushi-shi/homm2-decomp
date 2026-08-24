@@ -104,7 +104,7 @@ void fullMap::Read(i32 handle, i32 convert) {
         read(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(cells + width * y + x, tmp + width * y + x, sizeof(mapCell));
+                memcpy(cells + x + y * width, tmp + x + y * width, sizeof(mapCell));
         delete tmp;
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
