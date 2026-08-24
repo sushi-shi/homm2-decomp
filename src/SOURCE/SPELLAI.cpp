@@ -829,7 +829,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
             break;
     }
 
-    i32 creatureEffect = gMonsterDatabase[IDX(creatureType)].fightValue * IDX(creatureType);
+    i32 creatureEffect = IDX(creatureType) * gMonsterDatabase[IDX(creatureType)].fightValue;
     if (spell == SPELL_MIRROR_IMAGE) {
         float mirrorMod;
         if (m_spellPower[IDX(m_currentSide)] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)

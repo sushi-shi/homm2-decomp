@@ -1206,7 +1206,7 @@ SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	99.8963	b6c4dd4b86a1
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	a4d6ebd8f1a4
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6294	1cf560e3f8d0
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	5b33d8bad638
-SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	08f23e411ff2
+SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	58c5c99173d4
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	100.0000	8f77b22b7791
 SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.4731	30bea75d92d2
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	100.0000	4ab4f2118180
