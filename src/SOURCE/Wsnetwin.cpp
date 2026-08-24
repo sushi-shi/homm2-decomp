@@ -463,7 +463,7 @@ i32 wsWaitForExtraGuests(void) {
     tag_message message;
 
     wsProcessMessages();
-    if (iWSLastMsgNumHumanPlayers != giNumHumanPlayers) {
+    if (giNumHumanPlayers != iWSLastMsgNumHumanPlayers) {
         if (giTCPHostStatus != -1 && giNumHumanPlayers >= giTCPNumPlayers)
             return 1;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;

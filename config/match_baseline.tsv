@@ -1325,7 +1325,7 @@ SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	964556f6
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4e143dee7a0b
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	100.0000	b5cef3365f19
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	100.0000	9a90ffdf439a
-SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	82640c9237fc
+SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	d1ff8b1929f9
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	100.0000	dd74e3783d21
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	fca0d109cc86
 SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	100.0000	dec06126ae38
@@ -1386,7 +1386,7 @@ SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	100.0000	86abfb62
 SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8b7cbda874d4
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	97.7358	8c02e47fe579
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	ed9c8b7ec742
-SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	99.7222	11ae2705655d
+SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	99.7222	29ce5820ebda
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	ee547f2be814
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	42421cf83f8a
 SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	65d2af2d0962

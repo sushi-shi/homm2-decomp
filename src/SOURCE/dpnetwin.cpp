@@ -416,7 +416,7 @@ i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
-    if (iLastMsgNumHumanPlayers != giNumHumanPlayers) {
+    if (giNumHumanPlayers != iLastMsgNumHumanPlayers) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
