@@ -372,9 +372,9 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
         newX = 0;
     if (newY < 0)
         newY = 0;
-    if (SCREEN_WIDTH < m_winWidth + newX)
+    if (SCREEN_WIDTH < newX + m_winWidth)
         newX = SCREEN_WIDTH - m_winWidth;
-    if (SCREEN_HEIGHT < m_winHeight + newY)
+    if (SCREEN_HEIGHT < newY + m_winHeight)
         newY = SCREEN_HEIGHT - m_winHeight;
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
     m_posX = newX;

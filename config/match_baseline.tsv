@@ -327,7 +327,7 @@ BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	76e767ac93d0
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	b371e731f0e4
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	100.0000	9db6b2fb8287
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	f649650c4c90
-BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	100.0000	df1dd111b48c
+BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	100.0000	3993e1de1954
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	d99e5d9f2b7f
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	4ccbfc786801
 BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	bd140157a7a5
