@@ -125,7 +125,7 @@ void town::Deallocate(void) {
         playerRecord->m_townIds[i] = playerRecord->m_townIds[i + 1];
 
     playerRecord->m_townIds[playerRecord->m_townCount - 1] = TOWN_ID_NONE;
-    if (m_id == playerRecord->m_currentTown)
+    if (playerRecord->m_currentTown == m_id)
         playerRecord->m_currentTown = TOWN_ID_NONE;
     --playerRecord->m_townCount;
     if (playerRecord->m_townCount < TOWN_PLAYER_WINDOW_SIZE)
