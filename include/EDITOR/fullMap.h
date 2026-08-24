@@ -45,7 +45,7 @@ public:
         return &cells[x];
     }
     void Cell(mapCell*& cell, i32 x, i32 y) {
-        cell = cells + width * y + x;
+        cell = cells + x + y * width;
     }
     mapCell* GetCell(i32 x, i32 y) {
         return cells + width * y + x;
