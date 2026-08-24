@@ -4377,9 +4377,9 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         if ((townPtr->m_buildings & AI_BUILDING_SHIPYARD_MASK)
             && townPtr->m_id != giBestShipyardId) {
             index7 =
-                abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
+                abs(townPtr->m_x - heroPtr->m_x) + abs(townPtr->m_y - heroPtr->m_y);
             if (gbActualShipyardFound) {
-                if (giBestShipyardDist > index7) {
+                if (index7 < giBestShipyardDist) {
                     giBestShipyardDist = index7;
                     giBestShipyardId = townPtr->m_id;
                 }
@@ -4395,9 +4395,9 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
                           == TERRAIN_WATER
                    && !gbActualShipyardFound && townPtr->m_id != giBestShipyardId) {
             index7 =
-                abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
+                abs(townPtr->m_x - heroPtr->m_x) + abs(townPtr->m_y - heroPtr->m_y);
             if (gbPossibleShipyardFound) {
-                if (giBestShipyardDist > index7) {
+                if (index7 < giBestShipyardDist) {
                     giBestShipyardDist = index7;
                     giBestShipyardId = townPtr->m_id;
                 }

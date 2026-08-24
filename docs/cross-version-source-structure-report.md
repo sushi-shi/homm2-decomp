@@ -69,6 +69,13 @@ appendix; it is not the matching priority.
   Buka flee return grows PoL by five bytes; its nested combat-result tail has
   higher fuzzy but worse graph deltas in every one of 51 states. PoL's current
   1088-byte, 48-block parent remains retained.
+- `HeroInteractionAtTown` adopts Buka's two `distance < bestDistance`
+  shipyard comparisons and x-then-y distance expression. A complete 408-cell
+  source/state product isolates the comparison as the useful source choice;
+  the Buka town-share and victory-coordinate mirrors are neutral. Forest/top
+  seed 1213156658 trial 32 replays at 99.976950%, retail size, complete ordered
+  71/71 relocations, and 125/126 exact blocks. The coordinate-load and B109
+  branch-target island remains open.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -404,7 +411,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `HeroInteractionAtTown` | 99.9663% | PHILAI structural/name donor |
 | `RVOfPosition` | 99.9294% | map access and semantic phase order |
 | `FightValueOfStack` | 99.9139% | exact Buka arithmetic ownership |
 | `SaveGame` | 99.9084% | exact Buka large-body reference |
