@@ -99,6 +99,12 @@ appendix; it is not the matching priority.
   command shrinks PoL by two bytes and falls to 99.584690%. PoL retains
   `BaseWidgetCommand`; Buka's one-argument ambient-music call belongs to its
   later sound-backend API rather than shared menu logic.
+- `ControlPanel` adopts Buka's function-scope `tag_message`, but not its
+  `panel` local name. The unchanged source is state-invariant at 99.808914%.
+  A complete four-arm, 204-cell product selects the scope-only arm in every
+  state; the Buka name cancels that gain when combined. The retained PoL source
+  reaches 99.8217% live at retail size, exact 20/20 CFG and ordered 30/30
+  relocations. This is allocation/scope recovery with no gameplay change.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
@@ -482,7 +488,6 @@ payoff and audit cost:
 
 | PoL function | retained MAX before new work | donor clue |
 |---|---:|---|
-| `ControlPanel` | 99.8089% | small, high-confidence donor |
 | `ViewSpellsHandler` | 99.7841% | refresh path changed/clarified |
 | `CastSpell` | 99.7599% | literal-true Magic Arrow case guard |
 | `FizzleForward` | 99.7204% | save/restore update flags; row recomputation |

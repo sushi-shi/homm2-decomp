@@ -10009,6 +10009,8 @@ MessageDispatchResult APanelHandler(tag_message& message) {
 
 VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
+    tag_message message;
+
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
     gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68fc, controlPanelAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
@@ -10021,7 +10023,6 @@ i32 advManager::ControlPanel(void) {
         MemError();
     }
     if (gbRemoteOn) {
-        tag_message message;
         message.type = MESSAGE_WIDGET;
         message.payload.widget.id = CONTROL_RESTART;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
