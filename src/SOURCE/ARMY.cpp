@@ -1990,8 +1990,8 @@ void army::CheckLuck(void) {
             sprintf(
                 gText,
                 DATA_COMPGEN(0x004f5680, checkLuckBadLuckDescendsOnTheS, "Bad luck descends on the %s"),
-                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
-                               : gArmyNames[IDX(m_monsterType)]
+                m_quantity <= 1 ? gArmyNames[IDX(m_monsterType)]
+                                : gArmyNamesPlural[IDX(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
@@ -1999,8 +1999,8 @@ void army::CheckLuck(void) {
             sprintf(
                 gText,
                 DATA_COMPGEN(0x004f569c, checkLuckGoodLuckShinesOnTheS, "Good luck shines on the %s"),
-                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
-                               : gArmyNames[IDX(m_monsterType)]
+                m_quantity <= 1 ? gArmyNames[IDX(m_monsterType)]
+                                : gArmyNamesPlural[IDX(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
