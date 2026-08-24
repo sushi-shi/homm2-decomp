@@ -268,7 +268,7 @@ void armyGroup::DamageGroup(float damagePercent) {
                 if (SRandom(0, ARMY_GROUP_RANDOM_PERCENT_MAX) < percentChance)
                     ++numKilled;
             }
-            if (isFirstTroop && m_creatureCounts[i] == numKilled
+            if (isFirstTroop && numKilled == m_creatureCounts[i]
                 && damagePercent < DATA_COMPGEN(0x004eb860, damageGroupConstant, 0.999)) // NOLINT(readability-magic-numbers)
                 --numKilled;
             m_creatureCounts[i] -= numKilled;
