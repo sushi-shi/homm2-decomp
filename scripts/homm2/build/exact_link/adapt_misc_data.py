@@ -5,6 +5,8 @@ import argparse
 import struct
 from pathlib import Path
 
+from homm2.core.coff import CoffObject
+
 
 def symbol_name(data, offset, string_table):
     raw = data[offset:offset + 8]
@@ -16,24 +18,23 @@ def symbol_name(data, offset, string_table):
 
 
 def adapt(payload):
+    coff = CoffObject(payload)
     old = bytearray(payload)
-    section_count = struct.unpack_from("<H", old, 2)[0]
-    optional_size = struct.unpack_from("<H", old, 16)[0]
-    section_table = 20 + optional_size
+    section_count = coff.section_count
+    section_table = 20 + struct.unpack_from("<H", old, 16)[0]
     main_index = 2
     insert_index = 43
     new_ordinal = insert_index + 1
     if section_count != 79:
         raise RuntimeError(f"unexpected Misc section count: {section_count}")
 
-    main_header = section_table + main_index * 40
-    if old[main_header:main_header + 8].rstrip(b"\0") != b".data":
+    main = coff.section(main_index + 1)
+    main_header = main.header_offset
+    if main.name != ".data":
         raise RuntimeError("Misc section 3 is not .data")
-    main_size = struct.unpack_from("<I", old, main_header + 16)[0]
-    main_raw = struct.unpack_from("<I", old, main_header + 20)[0]
-    if main_size != 0x3A:
-        raise RuntimeError(f"unexpected Misc main .data size: 0x{main_size:x}")
-    literal = bytes(old[main_raw + 0x1C:main_raw + 0x3A])
+    if main.raw_size != 0x3A:
+        raise RuntimeError(f"unexpected Misc main .data size: 0x{main.raw_size:x}")
+    literal = coff.section_bytes(main)[0x1C:0x3A]
     if literal != b"\\Tracks2\\02-AudioTrack 02.ogg\0":
         raise RuntimeError("unexpected Misc track literal payload")
 

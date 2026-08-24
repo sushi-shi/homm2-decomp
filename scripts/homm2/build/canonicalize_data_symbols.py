@@ -31,9 +31,30 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from homm2.build.normalized_freshness import write_stamp
+# The COFF reader and its constants live in homm2.core.coff; they are
+# re-exported here because this module was their historical home and several
+# tools still import them from it.
+from homm2.core.coff import (  # noqa: F401  (re-exported)
+    DIR32,
+    EXTERNAL_STORAGE,
+    FUNCTION_TYPE,
+    INITIALIZED_DATA,
+    LNK_INFO,
+    LNK_NRELOC_OVFL,
+    MEM_EXECUTE,
+    MEM_WRITE,
+    RELOCATION_WIDTHS,
+    STATIC_STORAGE,
+    SYMBOL_SIZE,
+    UNINITIALIZED_DATA,
+    WEAK_EXTERNAL_STORAGE,
+    CoffObject,
+    Relocation,
+    Section,
+    Symbol,
+)
 
 
-SYMBOL_SIZE = 18
 VOLATILE_SG = re.compile(r"^\$SG[0-9]+$")
 ANON_STR = re.compile(r"^(\$anon_str_[0-9a-f]{64})_[0-9]+$")
 VOLATILE_T = re.compile(r"^\$T[0-9]+$")
@@ -41,62 +62,6 @@ NAMED_STATIC = re.compile(r"^(?P<prefix>.+\$S)[0-9]+$")
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
 COMPGEN_PREFIX = "__h2cg$"
 REAL_LITERAL = re.compile(r"^__real@(4|8)@[0-9a-f]{20}$")
-
-INITIALIZED_DATA = 0x00000040
-UNINITIALIZED_DATA = 0x00000080
-MEM_EXECUTE = 0x20000000
-MEM_WRITE = 0x80000000
-LNK_NRELOC_OVFL = 0x01000000
-LNK_INFO = 0x00000200
-
-RELOCATION_WIDTHS = {
-    0x0001: 2,  # IMAGE_REL_I386_DIR16
-    0x0002: 2,  # IMAGE_REL_I386_REL16
-    0x0006: 4,  # IMAGE_REL_I386_DIR32
-    0x0007: 4,  # IMAGE_REL_I386_DIR32NB
-    0x000A: 2,  # IMAGE_REL_I386_SECTION
-    0x000B: 4,  # IMAGE_REL_I386_SECREL
-    0x0014: 4,  # IMAGE_REL_I386_REL32
-}
-DIR32 = 0x0006
-FUNCTION_TYPE = 0x0020
-EXTERNAL_STORAGE = 2
-STATIC_STORAGE = 3
-WEAK_EXTERNAL_STORAGE = 105
-
-
-@dataclass(frozen=True)
-class Section:
-    index: int
-    header_offset: int
-    name: str
-    raw_size: int
-    raw_offset: int
-    reloc_offset: int
-    reloc_count: int
-    characteristics: int
-
-
-@dataclass(frozen=True)
-class Symbol:
-    index: int
-    offset: int
-    name: str
-    value: int
-    section: int
-    typ: int
-    storage_class: int
-    aux_count: int
-
-
-@dataclass(frozen=True)
-class Relocation:
-    section: int
-    site: int
-    symbol_index: int
-    typ: int
-    offset: int = 0
-
 
 @dataclass(frozen=True)
 class JumpTableRewrite:
@@ -158,127 +123,6 @@ class CompgenDataClaim:
 class CanonicalizedObject:
     data: bytes
     rows: tuple[CanonicalRow, ...]
-
-
-class CoffObject:
-    def __init__(self, payload: bytes):
-        self.data = bytes(payload)
-        if len(self.data) < 20:
-            raise ValueError("short COFF object")
-        machine, section_count = struct.unpack_from("<HH", self.data, 0)
-        if machine != 0x14C:
-            raise ValueError(f"unsupported COFF machine 0x{machine:x}")
-        self.section_count = section_count
-        self.symbol_offset = struct.unpack_from("<I", self.data, 8)[0]
-        self.symbol_count = struct.unpack_from("<I", self.data, 12)[0]
-        optional_size = struct.unpack_from("<H", self.data, 16)[0]
-        first_section = 20 + optional_size
-        section_end = first_section + section_count * 40
-        if section_end > len(self.data):
-            raise ValueError("truncated COFF section table")
-        self.string_offset = self.symbol_offset + self.symbol_count * SYMBOL_SIZE
-        if self.string_offset + 4 > len(self.data):
-            raise ValueError("missing COFF string table")
-        self.string_size = struct.unpack_from("<I", self.data, self.string_offset)[0]
-        if self.string_size < 4 or self.string_offset + self.string_size != len(self.data):
-            raise ValueError("COFF string table is not final")
-        self.sections = self._read_sections(first_section)
-        self.symbols = self._read_symbols()
-        self.relocations = self._read_relocations()
-
-    def _string_name(self, offset: int) -> str:
-        if not 4 <= offset < self.string_size:
-            raise ValueError(f"invalid COFF string offset {offset}")
-        start = self.string_offset + offset
-        try:
-            end = self.data.index(b"\0", start, self.string_offset + self.string_size)
-        except ValueError as error:
-            raise ValueError("unterminated COFF string") from error
-        return self.data[start:end].decode("latin-1")
-
-    def _symbol_name(self, offset: int) -> str:
-        raw = self.data[offset:offset + 8]
-        zero, string_offset = struct.unpack("<II", raw)
-        if zero == 0:
-            return self._string_name(string_offset)
-        return raw.split(b"\0", 1)[0].decode("latin-1")
-
-    def _section_name(self, offset: int) -> str:
-        raw = self.data[offset:offset + 8].split(b"\0", 1)[0]
-        if raw.startswith(b"/") and raw[1:].isdigit():
-            return self._string_name(int(raw[1:]))
-        return raw.decode("latin-1")
-
-    def _read_sections(self, first: int) -> tuple[Section, ...]:
-        rows = []
-        for zero_index in range(self.section_count):
-            offset = first + zero_index * 40
-            raw_size, raw_offset, reloc_offset = struct.unpack_from(
-                "<III", self.data, offset + 16)
-            reloc_count = struct.unpack_from("<H", self.data, offset + 32)[0]
-            characteristics = struct.unpack_from("<I", self.data, offset + 36)[0]
-            if raw_offset and raw_offset + raw_size > len(self.data):
-                raise ValueError("COFF section raw data is out of bounds")
-            relocation_bytes = (10 if characteristics & LNK_NRELOC_OVFL
-                                else reloc_count * 10)
-            if reloc_count and reloc_offset + relocation_bytes > len(self.data):
-                raise ValueError("COFF relocation table is out of bounds")
-            rows.append(Section(
-                zero_index + 1, offset, self._section_name(offset), raw_size,
-                raw_offset, reloc_offset, reloc_count, characteristics,
-            ))
-        return tuple(rows)
-
-    def _read_symbols(self) -> dict[int, Symbol]:
-        if self.symbol_offset + self.symbol_count * SYMBOL_SIZE > len(self.data):
-            raise ValueError("COFF symbol table is out of bounds")
-        rows = {}
-        index = 0
-        while index < self.symbol_count:
-            offset = self.symbol_offset + index * SYMBOL_SIZE
-            value, section, typ, storage_class, aux_count = struct.unpack_from(
-                "<IhHBB", self.data, offset + 8)
-            if index + aux_count >= self.symbol_count:
-                raise ValueError("COFF auxiliary symbols exceed the symbol table")
-            rows[index] = Symbol(
-                index, offset, self._symbol_name(offset), value, section, typ,
-                storage_class, aux_count,
-            )
-            index += 1 + aux_count
-        return rows
-
-    def _read_relocations(self) -> tuple[Relocation, ...]:
-        rows = []
-        for section in self.sections:
-            count = section.reloc_count
-            first = 0
-            if section.characteristics & LNK_NRELOC_OVFL:
-                if count != 0xFFFF:
-                    raise ValueError("COFF relocation overflow flag/count disagree")
-                if section.reloc_offset + 10 > len(self.data):
-                    raise ValueError("missing COFF relocation overflow record")
-                count, symbol_index, typ = struct.unpack_from(
-                    "<IIH", self.data, section.reloc_offset)
-                if count < 1 or symbol_index or typ:
-                    raise ValueError("invalid COFF relocation overflow record")
-                first = 1
-            for index in range(first, count):
-                offset = section.reloc_offset + index * 10
-                if offset + 10 > len(self.data):
-                    raise ValueError("COFF relocation table is out of bounds")
-                site, symbol_index, typ = struct.unpack_from("<IIH", self.data, offset)
-                if site >= section.raw_size:
-                    raise ValueError("COFF relocation site is outside its section")
-                if symbol_index not in self.symbols:
-                    raise ValueError("COFF relocation targets an auxiliary/missing symbol")
-                rows.append(Relocation(
-                    section.index, site, symbol_index, typ, offset))
-        return tuple(rows)
-
-    def section_bytes(self, section: Section) -> bytes:
-        if section.raw_offset == 0:
-            return bytes(section.raw_size)
-        return self.data[section.raw_offset:section.raw_offset + section.raw_size]
 
 
 def weak_and_strong_names(payload: bytes) -> tuple[set[str], set[str]]:

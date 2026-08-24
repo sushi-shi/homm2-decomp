@@ -15,6 +15,8 @@ CLI:  od_oracle.py a b c d ...        # print the real frame slot order
 import os, struct, subprocess, sys, hashlib
 from pathlib import Path
 
+from homm2.core.coff import CoffObject
+
 MSVC = Path(os.environ["MSVC_DIR"]); CL = MSVC / "bin" / "CL.EXE"
 WORK = Path(os.environ.get("OD_ORACLE_WORK", "/tmp/od_oracle")); WORK.mkdir(parents=True, exist_ok=True)
 _cache = {}
@@ -34,35 +36,18 @@ S_END, S_BPREL32, S_LPROC32, S_GPROC32 = 0x0006, 0x1006, 0x100A, 0x100B
 S_BLOCK32 = 0x0207
 
 
-def _symbol_name(obj: bytes, entry: int, stroff: int) -> str:
-    raw = obj[entry:entry + 8]
-    if raw[:4] == b"\0\0\0\0":
-        rel = struct.unpack_from("<I", raw, 4)[0]
-        return obj[stroff + rel:].split(b"\0", 1)[0].decode("latin1")
-    return raw.rstrip(b"\0").decode("latin1")
-
-
 def _debug_section(obj: bytes):
     """(.debug$S payload, {section_offset: mangled_symbol}) or (b"", {})."""
-    nsec = struct.unpack_from("<H", obj, 2)[0]
-    symoff, nsym = struct.unpack_from("<II", obj, 8)
-    stroff = symoff + nsym * 18
-    for i in range(nsec):
-        o = 20 + i * 40
-        name = obj[o:o + 8]
-        if name[:1] == b"/":
-            name = obj[stroff + int(name[1:].rstrip(b"\0")):].split(b"\0", 1)[0]
-        else:
-            name = name.rstrip(b"\0")
-        if name != b".debug$S":
+    coff = CoffObject(obj)
+    for section in coff.sections:
+        if section.name != ".debug$S":
             continue
-        size, ptr, relptr = struct.unpack_from("<III", obj, o + 16)
-        nreloc = struct.unpack_from("<H", obj, o + 32)[0]
-        relocs = {}
-        for r in range(nreloc):
-            off, idx, _kind = struct.unpack_from("<IIH", obj, relptr + r * 10)
-            relocs[off] = _symbol_name(obj, symoff + idx * 18, stroff)
-        return obj[ptr:ptr + size], relocs
+        relocs = {
+            row.site: coff.symbols[row.symbol_index].name
+            for row in coff.relocations
+            if row.section == section.index
+        }
+        return coff.section_bytes(section), relocs
     return b"", {}
 
 

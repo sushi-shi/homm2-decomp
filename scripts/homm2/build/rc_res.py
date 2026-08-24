@@ -26,6 +26,7 @@ import sys
 from pathlib import Path
 
 from homm2.build.extract_resources import read_pe_resources
+from homm2.core.coff import read_res
 
 
 ROOT = next(
@@ -52,34 +53,7 @@ def check_rc_binaries() -> None:
             raise RuntimeError(f"{path} sha256={digest}, expected {expected}")
 
 
-def parse_res(blob: bytes) -> list[dict]:
-    """RES32 records as {type, name, language, data}, skipping the null header."""
-
-    def name_or_ordinal(data: bytes, offset: int):
-        value = struct.unpack_from("<H", data, offset)[0]
-        if value == 0xFFFF:
-            return struct.unpack_from("<H", data, offset + 2)[0], offset + 4
-        end = offset
-        while struct.unpack_from("<H", data, end)[0] != 0:
-            end += 2
-        return data[offset:end].decode("utf-16-le"), end + 2
-
-    records = []
-    offset = 0
-    while offset < len(blob):
-        data_size, header_size = struct.unpack_from("<II", blob, offset)
-        cursor = offset + 8
-        rtype, cursor = name_or_ordinal(blob, cursor)
-        rname, cursor = name_or_ordinal(blob, cursor)
-        cursor = (cursor + 3) & ~3
-        _data_version, _memory, language = struct.unpack_from("<IHH", blob, cursor)
-        data = blob[offset + header_size: offset + header_size + data_size]
-        if not (rtype == 0 and rname == 0):
-            records.append(
-                {"type": rtype, "name": rname, "language": language, "data": data}
-            )
-        offset = (offset + header_size + data_size + 3) & ~3
-    return records
+parse_res = read_res  # the RES32 reader lives in homm2.core.coff
 
 
 def compare(ours: list[dict], retail: list[dict]) -> list[str]:

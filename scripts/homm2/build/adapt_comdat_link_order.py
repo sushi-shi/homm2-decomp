@@ -16,13 +16,15 @@ import dataclasses
 import struct
 from pathlib import Path
 
+from homm2.core.coff import (
+    LNK_COMDAT as IMAGE_SCN_LNK_COMDAT,
+    STATIC_STORAGE as IMAGE_SYM_CLASS_STATIC,
+    SYMBOL_SIZE,
+    CoffObject,
+)
 
-COFF_I386 = 0x14C
 COFF_HEADER_SIZE = 20
 SECTION_HEADER_SIZE = 40
-SYMBOL_SIZE = 18
-IMAGE_SCN_LNK_COMDAT = 0x00001000
-IMAGE_SYM_CLASS_STATIC = 3
 
 
 @dataclasses.dataclass(frozen=True)
@@ -48,70 +50,42 @@ class CoffError(ValueError):
     pass
 
 
-def _symbol_name(blob: bytes, offset: int, string_offset: int, string_end: int) -> str:
-    raw = blob[offset:offset + 8]
-    if raw[:4] != b"\0\0\0\0":
-        return raw.split(b"\0", 1)[0].decode("ascii")
-    relative = struct.unpack_from("<I", raw, 4)[0]
-    absolute = string_offset + relative
-    if relative < 4 or absolute >= string_end:
-        raise CoffError(f"invalid COFF string-table offset {relative}")
-    end = blob.find(b"\0", absolute, string_end)
-    if end < 0:
-        raise CoffError("unterminated COFF symbol name")
-    return blob[absolute:end].decode("ascii")
-
-
 def adapt(blob: bytes, unit: str) -> bytes:
     move = REVIEWED_MOVES.get(unit)
     if move is None:
         raise CoffError(f"{unit}: not a reviewed COMDAT-order unit")
     if (move.before is None) == (move.after is None):
         raise CoffError(f"{unit}: reviewed move must have exactly one anchor direction")
-    if len(blob) < COFF_HEADER_SIZE:
-        raise CoffError(f"{unit}: truncated COFF header")
 
-    machine, section_count, _, symbol_offset, symbol_count, optional_size, _ = (
-        struct.unpack_from("<HHIIIHH", blob, 0)
-    )
-    if machine != COFF_I386:
-        raise CoffError(f"{unit}: expected i386 COFF, got machine {machine:#x}")
-    if optional_size:
+    try:
+        coff = CoffObject(blob)
+    except ValueError as error:
+        raise CoffError(f"{unit}: {error}") from error
+    if struct.unpack_from("<H", blob, 16)[0]:
         raise CoffError(f"{unit}: object unexpectedly has an optional header")
 
+    section_count = coff.section_count
+    symbol_offset = coff.symbol_offset
+    symbol_count = coff.symbol_count
     section_offset = COFF_HEADER_SIZE
     section_end = section_offset + section_count * SECTION_HEADER_SIZE
-    symbol_end = symbol_offset + symbol_count * SYMBOL_SIZE
-    if section_end > len(blob) or symbol_end + 4 > len(blob):
-        raise CoffError(f"{unit}: truncated section or symbol table")
-    string_size = struct.unpack_from("<I", blob, symbol_end)[0]
-    string_end = symbol_end + string_size
-    if string_size < 4 or string_end > len(blob):
-        raise CoffError(f"{unit}: truncated COFF string table")
 
     wanted = {move.symbol, move.before, move.after} - {None}
     symbol_sections: dict[str, int] = {}
     section_aux_offsets: list[int] = []
-    index = 0
-    while index < symbol_count:
-        offset = symbol_offset + index * SYMBOL_SIZE
-        name = _symbol_name(blob, offset, symbol_end, string_end)
-        value, section_number, symbol_type = struct.unpack_from("<IhH", blob, offset + 8)
-        storage_class = blob[offset + 16]
-        auxiliary_count = blob[offset + 17]
-        if name in wanted and section_number > 0:
-            if name in symbol_sections:
-                raise CoffError(f"{unit}: duplicate defined anchor symbol {name}")
-            symbol_sections[name] = section_number
+    for symbol in coff.symbols.values():
+        if symbol.name in wanted and symbol.section > 0:
+            if symbol.name in symbol_sections:
+                raise CoffError(f"{unit}: duplicate defined anchor symbol {symbol.name}")
+            symbol_sections[symbol.name] = symbol.section
         if (
-            section_number > 0
-            and storage_class == IMAGE_SYM_CLASS_STATIC
-            and symbol_type == 0
-            and value == 0
-            and auxiliary_count == 1
+            symbol.section > 0
+            and symbol.storage_class == IMAGE_SYM_CLASS_STATIC
+            and symbol.typ == 0
+            and symbol.value == 0
+            and symbol.aux_count == 1
         ):
-            section_aux_offsets.append(offset + SYMBOL_SIZE)
-        index += 1 + auxiliary_count
+            section_aux_offsets.append(symbol.offset + SYMBOL_SIZE)
 
     missing = wanted - symbol_sections.keys()
     if missing:
@@ -124,11 +98,8 @@ def adapt(blob: bytes, unit: str) -> bytes:
     if moved_section == anchor_section:
         raise CoffError(f"{unit}: moved symbol and anchor share a section")
 
-    moved_header_offset = section_offset + (moved_section - 1) * SECTION_HEADER_SIZE
-    moved_header = blob[moved_header_offset:moved_header_offset + SECTION_HEADER_SIZE]
-    moved_name = moved_header[:8].split(b"\0", 1)[0]
-    moved_characteristics = struct.unpack_from("<I", moved_header, 36)[0]
-    if moved_name != b".text" or not (moved_characteristics & IMAGE_SCN_LNK_COMDAT):
+    moved = coff.section(moved_section)
+    if moved.name != ".text" or not (moved.characteristics & IMAGE_SCN_LNK_COMDAT):
         raise CoffError(f"{unit}: reviewed source section is not a .text COMDAT")
 
     old_order = list(range(1, section_count + 1))

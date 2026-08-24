@@ -12,6 +12,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+from homm2.core import coff
+
 PE32_MAGIC = 0x10B
 RESOURCE_DIRECTORY_INDEX = 2
 COFF_SECTION_HEADER_SIZE = 40
@@ -21,14 +23,6 @@ RESOURCE_DATA_ENTRY_SIZE = 16
 RESOURCE_NAME_IS_STRING = 0x80000000
 RESOURCE_ENTRY_IS_DIRECTORY = 0x80000000
 RESOURCE_OFFSET_MASK = 0x7FFFFFFF
-RESOURCE_ORDINAL_MARKER = 0xFFFF
-RESOURCE_MEMORY_FLAGS = 0x1030
-
-
-def align(value, alignment=4):
-    return (value + alignment - 1) & ~(alignment - 1)
-
-
 def read_pe_resources(path):
     data = Path(path).read_bytes()
     if len(data) < 0x40 or data[:2] != b"MZ":
@@ -126,32 +120,10 @@ def read_pe_resources(path):
     return resources
 
 
-def encode_identifier(value):
-    if isinstance(value, int):
-        if not 0 <= value <= 0xFFFF:
-            raise ValueError("resource ordinal is outside WORD range: %d" % value)
-        return struct.pack("<HH", RESOURCE_ORDINAL_MARKER, value)
-    return value.encode("utf-16le") + b"\0\0"
-
-
-def encode_res_record(resource):
-    identifiers = encode_identifier(resource["type"]) + encode_identifier(resource["name"])
-    identifiers += b"\0" * (align(len(identifiers)) - len(identifiers))
-    header_tail = struct.pack(
-        "<IHHII", 0, RESOURCE_MEMORY_FLAGS, resource["language"], 0, 0)
-    header_size = 8 + len(identifiers) + len(header_tail)
-    payload = resource["data"]
-    record = struct.pack("<II", len(payload), header_size) + identifiers + header_tail + payload
-    return record + b"\0" * (align(len(record)) - len(record))
-
-
 def write_res(resources, path):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    null_resource = {"type": 0, "name": 0, "language": 0, "data": b""}
-    data = encode_res_record(null_resource)
-    data += b"".join(encode_res_record(resource) for resource in resources)
-    path.write_bytes(data)
+    path.write_bytes(coff.write_res(resources))
 
 
 def resource_summary(resources):
