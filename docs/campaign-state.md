@@ -138,7 +138,9 @@ to try FIRST on any residual, in rough order of yield:
   measured.
 - `RESOURCE_NAME_CAPACITY` is not the MOUSEMGR SetPointer lever: 16→20
   fixes `SetPointer(char*)`'s frame and breaks `SetPointer(i32)`'s.
-- `DrawAdventureBorder`'s sibling rename does not transfer (3 probes).
+- `SaveAdventureBorder` and Buka-structured `DrawAdventureBorder` both reject
+  the sibling `screen` spelling under VC4.2; each complete three-name matrix
+  keeps `screenPixel` exact while `screen` is sub-100.
 - `TurnToStone`'s `++m_limitCreatureCount[side][index]`: flat-`+` and
   commuted-bracket spellings both canonicalise identically to ours.
 
