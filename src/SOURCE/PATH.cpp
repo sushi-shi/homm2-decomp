@@ -84,7 +84,8 @@ i32 army::GetMoveMask(i32 sourceHex) {
             blockedMaskValue |= directionBitFlag;
         directionBitFlag <<= 1;
     }
-    return blockedMaskValue | SPECIAL_DIRECTION_MASK;
+    return blockedMaskValue | (1 << IDX(COMBAT_DIRECTION_WIDE_WEST))
+         | (1 << IDX(COMBAT_DIRECTION_WIDE_EAST));
 }
 
 VA(0x004bde41, 0xb5)
