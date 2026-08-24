@@ -224,29 +224,35 @@ void searchArray::TestPossibleDirections(
     i32 allowOccupied,
     i32 waterMode
 ) {
-    TerrainType invalidTerrain = TERRAIN_INVALID;
-
     memset(occupied, 0, SEARCH_DIRECTION_COUNT);
     gSearchCurrentCell = gpAdvManager->GetCell(x, y);
 
-    gSearchDirection = 0;
-    do {
+    for (gSearchDirection = 0; gSearchDirection < SEARCH_DIRECTION_COUNT; gSearchDirection++) {
         gSearchNextX = x + normalDirTable[gSearchDirection].x;
         gSearchNextY = y + normalDirTable[gSearchDirection].y;
-        if (gSearchNextX < 0 || MAP_WIDTH <= gSearchNextX || gSearchNextY < 0
-            || MAP_HEIGHT <= gSearchNextY)
-            goto invalidDirection;
+        if (gSearchNextX < 0 || gSearchNextX >= MAP_WIDTH || gSearchNextY < 0
+            || gSearchNextY >= MAP_HEIGHT) {
+            gSearchTerrain = TERRAIN_INVALID;
+            goto storeDirection;
+        }
 
         gSearchNextCell = gpAdvManager->GetCell(gSearchNextX, gSearchNextY);
-        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0
-            || (gbHumanPlayer[giCurPlayer] != 0
-                && (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
-            goto invalidDirection;
+        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0) {
+            gSearchTerrain = TERRAIN_INVALID;
+            goto storeDirection;
+        }
+        if (gbHumanPlayer[giCurPlayer] != 0
+            && (*(mapExtra + gSearchNextX + MAP_WIDTH * gSearchNextY) & giCurPlayerBit) == 0) {
+            gSearchTerrain = TERRAIN_INVALID;
+            goto storeDirection;
+        }
 
         if (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
             if (!allowOccupied) {
-                if (m_specialTargetX != gSearchNextX || m_specialTargetY != gSearchNextY)
-                    goto invalidDirection;
+                if (gSearchNextX != m_specialTargetX || gSearchNextY != m_specialTargetY) {
+                    gSearchTerrain = TERRAIN_INVALID;
+                    goto storeDirection;
+                }
             } else {
                 occupied[gSearchDirection] = 1;
             }
@@ -256,10 +262,11 @@ void searchArray::TestPossibleDirections(
         if (gSearchTerrain == TERRAIN_WATER) {
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType
-                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
-                    goto invalidDirection;
-                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex]
-                        == TERRAIN_WATER
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
+                    gSearchTerrain = TERRAIN_INVALID;
+                    goto storeDirection;
+                }
+                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex] == TERRAIN_WATER
                     && normalDirTable[gSearchDirection].x != 0
                     && normalDirTable[gSearchDirection].y != 0) {
                     if (giGroundToTerrain
@@ -271,8 +278,10 @@ void searchArray::TestPossibleDirections(
                                [gpAdvManager
                                     ->GetCell(x, y + normalDirTable[gSearchDirection].y)
                                     ->m_terrainImageIndex]
-                               != TERRAIN_WATER)
-                        goto invalidDirection;
+                               != TERRAIN_WATER) {
+                        gSearchTerrain = TERRAIN_INVALID;
+                        goto storeDirection;
+                    }
                 }
             } else {
                 if (gSearchNextCell->m_triggerType
@@ -280,56 +289,63 @@ void searchArray::TestPossibleDirections(
                     && gSearchNextCell->m_triggerType
                            != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
                     && gSearchNextCell->m_triggerType
-                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
-                    goto invalidDirection;
+                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK)) {
+                    gSearchTerrain = TERRAIN_INVALID;
+                    goto storeDirection;
+                }
             }
         } else if (waterMode != 0 && gSearchNextCell->m_triggerType != MAP_OBJECT_COAST) {
-            goto invalidDirection;
+            gSearchTerrain = TERRAIN_INVALID;
+            goto storeDirection;
         }
 
-    testObjects:
         if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
-            if ((gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT
-                 && (gSearchCurrentCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
-                        != SEARCH_BLOCKING_OBJECT_TYPE
-                 && (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0))
-                goto invalidDirection;
+            if (gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT
+                && gSearchCurrentCell->m_objectTileset != TILESET_DUMMY
+                && (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                gSearchTerrain = TERRAIN_INVALID;
+                goto storeDirection;
+            }
             if (gSearchNextCell->m_overlayIndex != SEARCH_NO_OBJECT) {
                 mapCell* belowNext = gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
+
                 if (belowNext->m_objectIndex != SEARCH_NO_OBJECT
-                    && (belowNext->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
-                           != SEARCH_BLOCKING_OBJECT_TYPE
-                    && (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0)
-                    goto invalidDirection;
+                    && belowNext->m_objectTileset != TILESET_DUMMY
+                    && (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                    gSearchTerrain = TERRAIN_INVALID;
+                    goto storeDirection;
+                }
             }
         } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
-            if (gSearchNextCell->m_objectIndex == SEARCH_NO_OBJECT
-                || (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
-                       == SEARCH_BLOCKING_OBJECT_TYPE
-                || (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0
-                || (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-                    && (gSearchTriggerType =
-                            gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK,
-                        StopOnTrigger(gSearchNextCell) != 0))) {
-                if (gSearchCurrentCell->m_overlayIndex == SEARCH_NO_OBJECT)
+            if (gSearchNextCell->m_objectIndex != SEARCH_NO_OBJECT
+                && gSearchNextCell->m_objectTileset != TILESET_DUMMY
+                && (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                if (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    gSearchTriggerType = gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
+                    if (!StopOnTrigger(gSearchNextCell)) {
+                        gSearchTerrain = TERRAIN_INVALID;
+                        goto storeDirection;
+                    }
+                } else {
+                    gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
-                mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
-                if (belowCurrent->m_objectIndex == SEARCH_NO_OBJECT
-                    || (belowCurrent->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
-                           == SEARCH_BLOCKING_OBJECT_TYPE
-                    || (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) != 0)
-                    goto storeDirection;
+                }
             }
-            goto invalidDirection;
+            if (gSearchCurrentCell->m_overlayIndex != SEARCH_NO_OBJECT) {
+                mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
+
+                if (belowCurrent->m_objectIndex != SEARCH_NO_OBJECT
+                    && belowCurrent->m_objectTileset != TILESET_DUMMY
+                    && (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) == 0) {
+                    gSearchTerrain = TERRAIN_INVALID;
+                    goto storeDirection;
+                }
+            }
         }
 
-        goto storeDirection;
-    invalidDirection:
-        gSearchTerrain = invalidTerrain;
     storeDirection:
         terrain[gSearchDirection] = gSearchTerrain;
-        gSearchDirection++;
-    } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
+    }
 }
 
 VA(0x004a5200, 0x1ed)
