@@ -27,7 +27,6 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
-| swapManager::SplitMons type compare | `selectedArmy->types[selSlot] == targetArmy->types[tgtSlot]` | target-first mirror | OPEN |
 | combatManager::ShotIsThroughWall trace compares | `iWallToHexCell[i] == traceHex11`; `iTowerToHexCell[i] == traceHex11` | `traceHex11 == table[i]` (both) | OPEN - slot 14-perm residual parked |
 | CreateJoinFile diff loop | `while (diffSize1 > position1)` | `while (position1 < diffSize1)` | OPEN - slot residual parked |
 | recruitUnit::Update dead buffer | `char text[NAME_SIZE];` declared (PoL) | ABSENT - retail frame is 0x20, exactly NAME_SIZE smaller; sprintf targets gText | OPEN - check whether 2.0 bytes carry the 0x34 frame |
@@ -159,6 +158,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| `swapManager::SplitMons` creature-type comparison | **invariant; source port** | Complete two-arm clean VC4.2 product proves selected-first and exact-Buka target-first comparisons emit identical exact text: 904 bytes, exact 26/26 CFG, and ordered 37/37 relocations. PoL adopts Buka source and remains exact after a normal build. No gameplay or shipped-byte change. Dossier: `docs/matching/swapManager-SplitMons/buka-type-compare.cpp` in PoL |
 | `army::LoadResources` dead locals | **compiler-specific; no port** | Complete 4/4 clean VC4.2 Cartesian product crosses the eight PoL dead words with the loop-count value. PoL's dead frame is exact with value 1; the Buka `i`-only frame is 99.783880% with value 1 and 99.780220% with value 0, at the same 1190-byte size/42-block graph/87 relocation count. Keep the PoL frame. Dossier: `docs/matching/army-LoadResources/buka-frame-and-loop-count.cpp` in PoL |
 | `army::LoadResources` sample loop count | **logic change; do not port** | With the exact PoL frame, changing byte-pinned 1 to exact-Buka 0 gives 99.996340%; the retail immediate distinguishes the versions. Keep PoL value 1 and Buka value 0. Logic documentation: `docs/version-changes.md`; same dossier as above |
 | `heroWindow::MoveWindow` clamp sums | **invariant; source port** | Complete 4/4 clean VC4.2 Cartesian product crosses the X and Y addend orders independently. Every arm is exact at 390 bytes, exact 14/14 CFG, and ordered 8/8 relocations. PoL adopts both exact-Buka position-first sums and remains exact after a normal build. The old six-local parked note is obsolete. No gameplay or shipped-byte change. Dossier: `docs/matching/heroWindow-MoveWindow/buka-clamp-sums.cpp` in PoL |
