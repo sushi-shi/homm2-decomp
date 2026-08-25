@@ -1,4 +1,5 @@
-; Analysis-only Audiere 1.9.2 export inventory; not a build or historical input.
+; Reviewed Audiere 1.9.2 ABI surface for retail-free generic links.
+; Retail-exact links still derive used imports and their hints from HMM2PL.exe.
 LIBRARY audiere.dll
 EXPORTS
 _AdrCreatePinkNoise@0

@@ -4,7 +4,12 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from homm2.build.regular_import_lib import build_archive, generate, read_definition
+from homm2.build.regular_import_lib import (
+    build_archive,
+    generate,
+    generate_from_definition,
+    read_definition,
+)
 
 
 def archive_entries(data: bytes):
@@ -47,6 +52,29 @@ class RegularImportLibraryTests(unittest.TestCase):
                 read_definition(definition, "VENDOR.DLL"),
                 ("vendor.dll", ["_Beta@4", "_Alpha@0"]),
             )
+
+    def test_definition_generates_without_reading_retail_exe(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            root = Path(temp_name)
+            definition = root / "vendor.def"
+            output = root / "vendor.lib"
+            definition.write_text(
+                "LIBRARY vendor.dll\n"
+                "EXPORTS\n"
+                "    _Beta@4\n"
+                "    _Alpha@0\n",
+                encoding="ascii",
+            )
+            with mock.patch(
+                "homm2.build.regular_import_lib.imported_hints"
+            ) as imported:
+                generate_from_definition(
+                    definition, "VENDOR.DLL", output
+                )
+            imported.assert_not_called()
+            objects = list(archive_entries(output.read_bytes()))[2:]
+            self.assertIn(b"_Alpha@0\0", objects[3][1])
+            self.assertIn(b"_Beta@4\0", objects[4][1])
 
     def test_archive_uses_only_regular_coff_and_sorted_hints(self):
         archive = build_archive(

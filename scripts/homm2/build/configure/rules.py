@@ -51,11 +51,20 @@ def emit_rules(w) -> None:
            command=(f"{PY} -m homm2.build.regular_import_lib --exe $in "
                     "--dll $dll --out $out"),
            description="regular-implib $dll")
+    w.rule("definition_implib",
+           command=(f"{PY} -m homm2.build.regular_import_lib "
+                    "--definition $in --dll $dll --out $out"),
+           description="definition-implib $dll")
     w.rule("regular_vendor_implib",
            command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
                     "--exe $in --dll $dll --definition $definition "
                     "--out $out $options"),
            description="regular-implib $dll")
+    w.rule("definition_vendor_implib",
+           command=(f"{PY} -m homm2.build.regular_vendor_import_lib "
+                    "--definition-only --dll $dll --definition $in "
+                    "--out $out $options"),
+           description="definition-implib $dll")
     w.rule("patched_implib",
            command=(f"{PY} -m homm2.build.gen_vendor_imports "
                     "--definition $in --out $out --dll $dll "

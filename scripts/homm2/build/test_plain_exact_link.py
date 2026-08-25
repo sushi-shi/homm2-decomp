@@ -9,6 +9,7 @@ from homm2.build.exact_link import plain, transforms
 CONFIGURED = [
     "WINMM.LIB",
     "build/link/wing32.lib",
+    "build/link/audiere.lib",
     "build/objdiff/base/SOURCE/ADVMGR.obj",
     "build/objdiff/base/SOURCE/REQUEST.obj",
     "build/objdiff/base/SOURCE/X_GLOBAL.obj",
@@ -47,6 +48,7 @@ class PlainExactLinkTests(unittest.TestCase):
             "build/link/plain-inputs/BASE-prefix.lib",
             "build/link/plain-inputs/BASE-suffix.lib",
             include_resources=True,
+            use_generic_imports=False,
         )
         self.assertEqual(
             result[:3],
@@ -73,8 +75,11 @@ class PlainExactLinkTests(unittest.TestCase):
             "build/link/BASE-prefix.lib",
             "build/link/BASE-suffix.lib",
             include_resources=False,
+            use_generic_imports=True,
         )
         self.assertNotIn("build/link/HMM2PL.res", result)
+        self.assertIn("build/link/generic-imports/audiere.lib", result)
+        self.assertNotIn("build/link/audiere.lib", result)
         self.assertEqual(
             result[-5:],
             [
@@ -92,6 +97,7 @@ class PlainExactLinkTests(unittest.TestCase):
             "build/link/BASE-prefix.lib",
             "build/link/BASE-suffix.lib",
             include_resources=True,
+            use_generic_imports=True,
         )
         self.assertEqual(result[-1], "build/link/HMM2PL.res")
         self.assertIn("build/link/BASE-suffix.lib", result)
@@ -110,7 +116,14 @@ class PlainExactLinkTests(unittest.TestCase):
         ]
         path = plain.ROOT / "build/link/probe.obj"
         with self.assertRaisesRegex(RuntimeError, "unexpected configured final-link tail"):
-            plain.final_inputs(configured, path, "a.lib", "b.lib", include_resources=True)
+            plain.final_inputs(
+                configured,
+                path,
+                "a.lib",
+                "b.lib",
+                include_resources=True,
+                use_generic_imports=False,
+            )
 
     def test_transform_registry_names_exactly_the_three_reviewed_units(self):
         self.assertEqual(

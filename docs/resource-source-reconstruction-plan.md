@@ -16,12 +16,12 @@ of the gate comparison.
   as `\ooo` octal escapes under `#pragma code_page(1251)`, so the file is pure
   ASCII. Numeric IDs are preserved as numbers — no symbolic `resource.h` names
   are invented (the retail image names none).
-- `res/heroes.ico` — the one retail binary: the 32x32 16-color program icon,
+- `heroes.ico` — the one retail binary: the 32x32 16-color program icon,
   rebuilt as an ordinary `.ico` container from the retail `RT_ICON` payload
-  and `RT_GROUP_ICON` directory. It is retail artwork, so it is **gitignored
-  and materialized** from the locally supplied `build/orig/HMM2PL.exe` by
-  `rc_res.py` on every resource build; `rc.exe` splits it back into exactly
-  those two records.
+  and `RT_GROUP_ICON` directory. It is retail artwork, so `rc_res.py` stages it
+  beside a temporary copy of `HMM2PL.rc` only while `rc.exe` runs; the staging
+  directory is then removed. `rc.exe` splits it back into exactly those two
+  records.
 - `scripts/homm2/build/rc_res.py` — compiles the `.rc` with the era
   `RC.EXE` 5.00 + `RCDLL.DLL` (from the pinned VS6 Enterprise base disc)
   under wine, then byte-compares every compiled payload (type, name,
@@ -32,6 +32,8 @@ of the gate comparison.
   `homm2 link --transform` consume the compiled `.res`. The `--transform`
   whole-file SHA-256 assertion additionally proves the linked `.rsrc` section
   byte-exact end to end.
+- `homm2 link` does not run this edge and does not open the retail executable;
+  its resource-free output is the source-only provenance boundary.
 
 ## Corrections to the original inventory
 

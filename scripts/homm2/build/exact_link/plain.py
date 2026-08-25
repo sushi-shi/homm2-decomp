@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Link HMM2PL.exe with untouched VC6 LINK.EXE, in one of three modes.
 
-  generic      (default)  raw compiled objects only: no retail-extracted
-                          resources, no COFF transforms. One LINK pass with an
-                          ordinary PDB under build/link/generic/.
-  --rsrc                  generic plus the .rsrc resources extracted from
-                          build/orig/HMM2PL.exe (resources only; every byte of
-                          code and data still comes from this codebase).
+  generic      (default)  raw compiled objects and checked-in ABI manifests:
+                          no retail executable, resources, or COFF transforms.
+                          One LINK pass with an ordinary PDB under
+                          build/link/generic/.
+  --rsrc                  generic plus reconstructed .rsrc resources; opens
+                          build/orig/HMM2PL.exe for the program icon and the
+                          full resource gate. Code and data still come from
+                          this codebase.
                           Output under build/link/rsrc/.
   --transform             --rsrc plus four reviewed COFF transforms, the
                           historical four-pass PDB link, and the retail
@@ -43,6 +45,12 @@ LIBCMT = TOOLCHAIN / "lib/LIBCMT.LIB"
 MSVCPRT = TOOLCHAIN / "lib/MSVCPRT.LIB"
 RETAIL = ROOT / "build/orig/HMM2PL.exe"
 RETAIL_SHA256 = "bc7e9c9320aa3e5c1ffca6d2bfa530ecedb5a3bca1b91c959501c15ad72c329a"
+GENERIC_IMPORT_LIBRARIES = {
+    "build/link/audiere.lib": "build/link/generic-imports/audiere.lib",
+    "build/link/mss32.lib": "build/link/generic-imports/mss32.lib",
+    "build/link/smackw32.lib": "build/link/generic-imports/smackw32.lib",
+    "build/link/netapi32.lib": "build/link/generic-imports/netapi32.lib",
+}
 PDB_WINDOWS_PATH = r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb"
 PDB_RELATIVE_PATH = Path("Users/igorl/VSS/HMM/HMM2/temp/release/game/HMM2PL.pdb")
 LINK_TIMES = (
@@ -135,6 +143,7 @@ def final_inputs(
     base_prefix: str,
     base_suffix: str,
     include_resources: bool,
+    use_generic_imports: bool,
 ) -> list[str]:
     first_source = configured.index("build/objdiff/base/SOURCE/ADVMGR.obj")
     first_base = configured.index("build/link/BASE-prefix.lib")
@@ -149,6 +158,8 @@ def final_inputs(
         raise RuntimeError(f"unexpected configured final-link tail: {configured[first_base:]}")
 
     libraries = configured[:first_source]
+    if use_generic_imports:
+        libraries = [GENERIC_IMPORT_LIBRARIES.get(path, path) for path in libraries]
     sources = configured[first_source:first_base]
     request_raw = "build/objdiff/base/SOURCE/REQUEST.obj"
     if sources.count(request_raw) != 1:
@@ -211,7 +222,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--rsrc", action="store_true",
-        help="link the .rsrc resources extracted from the retail executable",
+        help="link reconstructed .rsrc resources plus the retail program icon",
     )
     parser.add_argument(
         "--transform", action="store_true",
@@ -220,10 +231,15 @@ def main() -> int:
     args = parser.parse_args()
     mode = "transform" if args.transform else ("rsrc" if args.rsrc else "generic")
 
-    for tool in (LINK_EXE, LIB_EXE, LIBCMT, MSVCPRT, RETAIL):
+    required = (LINK_EXE, LIB_EXE, LIBCMT, MSVCPRT)
+    if mode in ("rsrc", "transform"):
+        required += (RETAIL,)
+    for tool in required:
         if not tool.exists():
-            raise RuntimeError(f"required exact-link input is missing: {tool}")
-    if hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256:
+            raise RuntimeError(f"required {mode}-link input is missing: {tool}")
+    if mode in ("rsrc", "transform") and (
+        hashlib.sha256(RETAIL.read_bytes()).hexdigest() != RETAIL_SHA256
+    ):
         raise RuntimeError("build/orig/HMM2PL.exe is not the supported Buka retail image")
 
     request = prepare_request(mode == "transform")
@@ -238,6 +254,7 @@ def main() -> int:
     inputs = final_inputs(
         ninja_link_args(), request, base_prefix, base_suffix,
         include_resources=mode in ("rsrc", "transform"),
+        use_generic_imports=mode != "transform",
     )
 
     if mode == "transform":

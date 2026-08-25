@@ -38,6 +38,27 @@ def coff_section_data(data: bytes, expected_name: str) -> bytes:
 
 
 class RegularVendorImportLibraryTests(unittest.TestCase):
+    def test_ordinal_definition_needs_no_retail_exe(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            root = Path(temp_name)
+            definition = root / "smack.def"
+            output = root / "smack.lib"
+            definition.write_text(
+                "LIBRARY smackw32.DLL\n"
+                "EXPORTS\n"
+                "    SmackOpen@12 @14 NONAME\n",
+                encoding="ascii",
+            )
+            with mock.patch(
+                "homm2.build.regular_vendor_import_lib.retail_symbols"
+            ) as retail:
+                generate_ordinal(
+                    None, "smackw32.DLL", definition, output
+                )
+            retail.assert_not_called()
+            thunk = archive_objects(output.read_bytes())[3]
+            self.assertIn(struct.pack("<I", 0x8000000E) * 2, thunk)
+
     def test_ordinal_definition_emits_immediate_ordinal_thunks(self):
         with tempfile.TemporaryDirectory() as temp_name:
             root = Path(temp_name)

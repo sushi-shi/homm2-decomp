@@ -2,11 +2,12 @@
 """Compile res/HMM2PL.rc with the era resource compiler and gate it byte-exactly.
 
 The retail resources live as SOURCE: `res/HMM2PL.rc` carries the six menus, the
-About dialog, and the VERSIONINFO as reviewed rc grammar, and `res/heroes.ico`
-is the one retail-extracted binary (the 32x32 16-color program icon). This
-driver compiles them with the era RC.EXE 5.00 + RCDLL.DLL under wine, then
-byte-compares every compiled payload (type, name, language, bytes, and order)
-against the retail image in both directions. Any drift fails the build.
+About dialog, and the VERSIONINFO as reviewed rc grammar.  The one binary
+payload, the 32x32 16-color program icon, is extracted into a temporary build
+directory beside a staged copy of that RC file.  It never becomes a repository
+input.  The driver compiles them with the era RC.EXE 5.00 + RCDLL.DLL under
+wine, then byte-compares every compiled payload (type, name, language, bytes,
+and order) against the retail image in both directions. Any drift fails.
 
 The two RC binaries are pinned by SHA-256 and packaged from the same VS6
 Enterprise base disc as the rest of the toolchain. Their compiled output is
@@ -21,6 +22,7 @@ import json
 import os
 import struct
 import sys
+import tempfile
 from pathlib import Path
 
 from homm2.build.extract_resources import read_pe_resources
@@ -80,10 +82,10 @@ def compare(ours: list[dict], retail: list[dict]) -> list[str]:
 
 
 def extract_heroes_ico(retail: list[dict], destination: Path) -> None:
-    """Rebuild res/heroes.ico from the retail RT_ICON + RT_GROUP_ICON payloads.
+    """Rebuild heroes.ico from the retail RT_ICON + RT_GROUP_ICON payloads.
 
-    The icon is retail artwork, so it is never committed; it is materialized
-    from the locally supplied retail executable on every resource build.
+    The icon is retail artwork, so it exists only inside the caller's temporary
+    build directory while RC.EXE is running.
     """
     group = next(r["data"] for r in retail if r["type"] == 14)
     image = next(r["data"] for r in retail if r["type"] == 3)
@@ -112,12 +114,25 @@ def main(argv=None) -> int:
 
     check_rc_binaries()
     retail = read_pe_resources(args.verify_exe)
-    extract_heroes_ico(retail, args.rc.parent / "heroes.ico")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.unlink(missing_ok=True)
-    out_relative = os.path.relpath(args.out.resolve(), args.rc.resolve().parent)
-    wine.run(RC_EXE, "/r", "/fo", out_relative.replace("/", "\\"),
-             args.rc.name, cwd=args.rc.parent, quiet=True)
+    with tempfile.TemporaryDirectory(
+        prefix="homm2-rc-", dir=args.out.parent
+    ) as stage_name:
+        stage = Path(stage_name)
+        staged_rc = stage / args.rc.name
+        staged_rc.write_bytes(args.rc.read_bytes())
+        extract_heroes_ico(retail, stage / "heroes.ico")
+        out_relative = os.path.relpath(args.out.resolve(), stage.resolve())
+        wine.run(
+            RC_EXE,
+            "/r",
+            "/fo",
+            out_relative.replace("/", "\\"),
+            staged_rc.name,
+            cwd=stage,
+            quiet=True,
+        )
     if not args.out.exists():
         raise RuntimeError(f"era RC produced no output for {args.rc}")
 

@@ -87,14 +87,15 @@ def main(argv=None):
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":
-        # Three modes: `link` (generic: raw objects, no retail resources),
-        # `link --rsrc` (adds .rsrc extracted from build/orig/HMM2PL.exe),
+        # Three modes: `link` (generic: source + reviewed ABI manifests only),
+        # `link --rsrc` (the only ordinary mode that opens the retail exe: it
+        # extracts the icon and verifies the reconstructed .rsrc payloads),
         # `link --transform` (adds the reviewed COFF transforms, four-pass
         # historical PDB, retail SHA assertion, and the strict image audit).
         if sh("python3", "configure.py"): return 1
         if "--transform" in rest:
             return sh("ninja", "link")
-        targets = ["link-inputs"]
+        targets = ["link-generic-inputs"]
         if "--rsrc" in rest:
             targets.append("link-resources")
         if sh("ninja", *targets): return 1

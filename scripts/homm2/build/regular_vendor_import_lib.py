@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Generate the measured regular-COFF Smacker and NetBIOS import libraries."""
+"""Generate regular-COFF Smacker and NetBIOS import libraries.
+
+The checked-in DEF is sufficient for generic links when ``--definition-only``
+is explicit. Otherwise the supported retail image (or ``--exe`` override) adds
+an import-table assertion for the exact-link evidence path.
+"""
 
 from __future__ import annotations
 
@@ -63,7 +68,7 @@ def retail_symbols(exe: Path, dll: str) -> list[dict]:
 
 
 def generate_ordinal(
-    exe: Path, dll: str, definition: Path, output: Path
+    exe: Path | None, dll: str, definition: Path, output: Path
 ) -> Path:
     specs = []
     for line in definition_lines(definition, dll):
@@ -79,12 +84,13 @@ def generate_ordinal(
                 ordinal=int(match.group("ordinal")),
             )
         )
-    expected = [symbol["ordinal"] for symbol in retail_symbols(exe, dll)]
-    actual = [spec.ordinal for spec in specs]
-    if sorted(actual) != sorted(expected):
-        raise ValueError(
-            f"{definition}: ordinal set {actual} does not match retail {expected}"
-        )
+    if exe is not None:
+        expected = [symbol["ordinal"] for symbol in retail_symbols(exe, dll)]
+        actual = [spec.ordinal for spec in specs]
+        if sorted(actual) != sorted(expected):
+            raise ValueError(
+                f"{definition}: ordinal set {actual} does not match retail {expected}"
+            )
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(build_ordinal_specs_archive(dll, specs))
     print(f"[regular-implib] {dll}: {len(specs)} ordinal imports -> {output}")
@@ -92,7 +98,7 @@ def generate_ordinal(
 
 
 def generate_named_alias(
-    exe: Path,
+    exe: Path | None,
     dll: str,
     definition: Path,
     output: Path,
@@ -103,11 +109,12 @@ def generate_named_alias(
     lines = definition_lines(definition, dll)
     if lines != [symbol]:
         raise ValueError(f"{definition}: expected sole export {symbol}")
-    expected = retail_symbols(exe, dll)
-    if expected != [{"name": lookup, "hint": hint}]:
-        raise ValueError(
-            f"{definition}: requested {lookup!r}/{hint} does not match retail {expected}"
-        )
+    if exe is not None:
+        expected = retail_symbols(exe, dll)
+        if expected != [{"name": lookup, "hint": hint}]:
+            raise ValueError(
+                f"{definition}: requested {lookup!r}/{hint} does not match retail {expected}"
+            )
     match = re.fullmatch(r"^_[A-Za-z_][A-Za-z0-9_]*@(\d+)$", symbol)
     if match is None:
         raise ValueError(f"{definition}: expected _stdcall@bytes export")
@@ -122,7 +129,9 @@ def generate_named_alias(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--exe", type=Path, default=RETAIL_EXE)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--exe", type=Path)
+    source.add_argument("--definition-only", action="store_true")
     parser.add_argument("--dll", required=True)
     parser.add_argument("--definition", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
@@ -131,12 +140,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--hint", type=int)
     args = parser.parse_args(argv)
     try:
+        verify_exe = None if args.definition_only else (args.exe or RETAIL_EXE)
         alias = (args.symbol, args.lookup, args.hint)
         if alias == (None, None, None):
-            generate_ordinal(args.exe, args.dll, args.definition, args.out)
+            generate_ordinal(verify_exe, args.dll, args.definition, args.out)
         elif None not in alias:
             generate_named_alias(
-                args.exe,
+                verify_exe,
                 args.dll,
                 args.definition,
                 args.out,

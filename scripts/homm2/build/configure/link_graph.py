@@ -22,7 +22,8 @@ LINK_LIBRARIES = [
 def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
                     first_function_rva: dict[str, int],
                     first_compgen_rva: dict[str, int]) -> None:
-    import_outputs = []
+    retail_import_outputs = []
+    generic_import_outputs = []
     for name in ("audiere",):
         output = f"build/link/{name}.lib"
         w.build(
@@ -38,7 +39,16 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
                 "dll": f"{name}.dll",
             },
         )
-        import_outputs.append(output)
+        retail_import_outputs.append(output)
+        generic_output = f"build/link/generic-imports/{name}.lib"
+        w.build(
+            generic_output,
+            "definition_implib",
+            inputs=f"imports/{name}.def",
+            implicit="scripts/homm2/build/regular_import_lib.py",
+            variables={"dll": f"{name}.dll"},
+        )
+        generic_import_outputs.append(generic_output)
     output = "build/link/mss32.lib"
     w.build(
         output,
@@ -54,7 +64,16 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
             "dll": "mss32.dll",
         },
     )
-    import_outputs.append(output)
+    retail_import_outputs.append(output)
+    generic_output = "build/link/generic-imports/mss32.lib"
+    w.build(
+        generic_output,
+        "definition_implib",
+        inputs="imports/mss32.def",
+        implicit="scripts/homm2/build/regular_import_lib.py",
+        variables={"dll": "mss32.dll"},
+    )
+    generic_import_outputs.append(generic_output)
     output = "build/link/smackw32.lib"
     w.build(
         output,
@@ -72,7 +91,17 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
             "definition": "imports/smackw32.def",
         },
     )
-    import_outputs.append(output)
+    retail_import_outputs.append(output)
+    generic_output = "build/link/generic-imports/smackw32.lib"
+    w.build(
+        generic_output,
+        "definition_vendor_implib",
+        inputs="imports/smackw32.def",
+        implicit=["scripts/homm2/build/regular_vendor_import_lib.py",
+                  "scripts/homm2/build/regular_import_lib.py"],
+        variables={"dll": "smackw32.DLL", "options": ""},
+    )
+    generic_import_outputs.append(generic_output)
     output = "build/link/netapi32.lib"
     w.build(
         output,
@@ -91,7 +120,20 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
             "options": "--symbol _Netbios@4 --lookup Netbios --hint 180",
         },
     )
-    import_outputs.append(output)
+    retail_import_outputs.append(output)
+    generic_output = "build/link/generic-imports/netapi32.lib"
+    w.build(
+        generic_output,
+        "definition_vendor_implib",
+        inputs="imports/netapi32.def",
+        implicit=["scripts/homm2/build/regular_vendor_import_lib.py",
+                  "scripts/homm2/build/regular_import_lib.py"],
+        variables={
+            "dll": "NETAPI32.dll",
+            "options": "--symbol _Netbios@4 --lookup Netbios --hint 180",
+        },
+    )
+    generic_import_outputs.append(generic_output)
     output = "build/link/wing32.lib"
     w.build(
         output,
@@ -99,7 +141,8 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
         inputs="imports/wing32.def",
         implicit="scripts/homm2/build/legacy_import_lib.py",
     )
-    import_outputs.append(output)
+    retail_import_outputs.append(output)
+    generic_import_outputs.append(output)
     resource_output = "build/link/HMM2PL.res"
     w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
             inputs=["res/HMM2PL.rc", "build/orig/HMM2PL.exe"],
@@ -150,7 +193,7 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
         for path in (REPO / "scripts/homm2/build/exact_link").glob("*.py"))
     w.build(link_outputs, "link_exe",
             inputs=(source_objects + base_libraries + [resource_output]),
-            implicit=(import_outputs + exact_link_helpers + [
+            implicit=(retail_import_outputs + exact_link_helpers + [
                 "scripts/homm2/build/adapt_comdat_link_order.py",
                 "config/retail_crt_order.txt",
                 "build/gen/delink_data_from_source.tsv",
@@ -159,9 +202,12 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
             ] + base_symbol_sidecars),
             variables={"link_args": " ".join(link_args)})
     # `homm2 link` (generic) and `homm2 link --rsrc` run the plain driver
-    # directly; this phony target materializes every link input first.
+    # directly.  Generic inputs are built only from source and reviewed ABI
+    # manifests; the resource-only mode adds the separate retail resource edge.
     w.build("link-inputs", "phony",
-            inputs=(source_objects + base_libraries + import_outputs))
+            inputs=(source_objects + base_libraries + retail_import_outputs))
+    w.build("link-generic-inputs", "phony",
+            inputs=(source_objects + base_libraries + generic_import_outputs))
     link_audit_outputs = [
         "build/link/HMM2PL.link.json",
         "build/link/HMM2PL.missing-data.tsv",
@@ -175,6 +221,7 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
                 "build/orig/HMM2PL.exe",
             ] + base_symbol_sidecars)
     w.build("link", "phony", inputs="build/link/HMM2PL.link.json")
-    w.build("link-imports", "phony", inputs=import_outputs)
+    w.build("link-imports", "phony", inputs=retail_import_outputs)
+    w.build("link-generic-imports", "phony", inputs=generic_import_outputs)
     w.build("link-resources", "phony", inputs=resource_output)
     w.build("link-map", "phony", inputs="build/link/HMM2PL.map")

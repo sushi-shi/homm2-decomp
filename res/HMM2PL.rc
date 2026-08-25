@@ -7,8 +7,9 @@
 //
 // Only documented rc.exe grammar is used. Statement order IS retail
 // payload order. Cyrillic (cp1251) is carried as \ooo octal escapes
-// under #pragma code_page(1251), so this file is pure ASCII. heroes.ico
-// is the one retail-extracted binary: the 32x32 16-color program icon.
+// under #pragma code_page(1251), so this file is pure ASCII. heroes.ico is
+// the one retail-extracted binary; the build stages it temporarily beside a
+// copy of this source and removes that staging directory after RC.EXE exits.
 
 #pragma code_page(1251)
 

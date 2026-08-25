@@ -94,9 +94,9 @@ invariants are catalogued in [`docs/build-asserts.md`](docs/build-asserts.md).
 nix develop .#build       # VC6 SP5 under wine + the tools
 homm2 init                # one-time: fetch pinned toolchain -> delink -> configure
 homm2 build               # compile everything, compare against retail, run gates
-homm2 link                # generic link: raw objects, no retail content
-homm2 link --rsrc         # + resources compiled from res/ (the playable build)
-homm2 link --transform    # + reviewed COFF transforms; byte-identical to retail
+homm2 link                # source-only link; never opens the retail executable
+homm2 link --rsrc         # + reconstructed resources and retail-extracted icon
+homm2 link --transform    # + exact imports/transforms; byte-identical to retail
 homm2 status              # per-unit and overall match %
 homm2 selftest            # tool test suite
 ```
@@ -116,7 +116,7 @@ cp /path/to/HMM2PL.exe build/orig/          # the retail control image
 nix develop .#build
 homm2 init                                  # fetch pinned toolchain, delink
 homm2 build                                 # compile + verify 1727/1727 exact
-homm2 link --rsrc                           # the playable rebuilt executable
+homm2 link --rsrc                           # playable build; extracts the retail icon
 
 # one-time play environment (game data + dedicated wineprefix + D: cd drive)
 python3 scripts/toolchain/create-wine-prefix.py /path/to/installed/game
@@ -135,17 +135,22 @@ touches saves or configuration.
 Every mode drives the untouched pinned `LINK.EXE`; nothing rewrites the output
 afterward. They differ only in what goes in:
 
-- **generic** — raw compiled objects only. Shows exactly what the reconstructed
-  source produces; the binary runs but lacks `.rsrc` (window menus, About box,
-  icon).
-- **`--rsrc`** — adds the resources, compiled from `res/HMM2PL.rc` +
-  `res/heroes.ico` by the era `RC.EXE` and byte-gated against retail on every
-  build. Same code, same data, same behavior as retail.
+- **generic** — raw compiled objects plus import libraries generated from the
+  checked-in ABI manifests. It never opens or requires `build/orig/HMM2PL.exe`;
+  the binary runs but lacks `.rsrc` (window menus, About box, icon).
+- **`--rsrc`** — adds resources compiled from `res/HMM2PL.rc`; this is the
+  ordinary mode that opens `build/orig/HMM2PL.exe`, extracts `heroes.ico` into
+  a temporary build directory, and byte-gates every compiled resource against
+  retail. Code and data still come from the reconstruction.
 - **`--transform`** — adds the three reviewed COFF section-header permutations
   (`scripts/homm2/build/exact_link/transforms.py`, each carrying a proof that no
   compiler flag or source shape can replace it) plus the historical four-pass
   PDB link, and asserts the retail SHA-256. The strict audit writes
   `build/link/HMM2PL.link.json`.
+
+Generic and `--rsrc` modes use import libraries generated from the reviewed
+`imports/*.def` manifests. Transform mode separately derives exact import
+hints and historical COFF member shapes from the retail control executable.
 
 Evidence and contribution contracts: [`docs/retail-exact-link.md`](docs/retail-exact-link.md).
 Why the three transforms are irreducible: [`docs/compiler-re-allocation-order.md`](docs/compiler-re-allocation-order.md).

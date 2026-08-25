@@ -5,8 +5,12 @@ tests exist for are record-layout misreads and a gate that passes on drift,
 both reproducible offline.
 """
 import struct
+import tempfile
 import unittest
+from pathlib import Path
+from unittest import mock
 
+from homm2.build import rc_res
 from homm2.build.rc_res import compare, parse_res
 
 
@@ -68,3 +72,52 @@ class CompareTests(unittest.TestCase):
         a = self.rows() + [{"type": 16, "name": 1, "language": 1049, "data": b"v"}]
         problems = compare(a, list(reversed(a)))
         self.assertTrue(problems and all("identity" in p for p in problems))
+
+
+class ResourceCompilerStagingTests(unittest.TestCase):
+    def test_icon_exists_only_in_temporary_compiler_directory(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            root = Path(temp_name)
+            source = root / "res/HMM2PL.rc"
+            output = root / "build/link/HMM2PL.res"
+            retail_exe = root / "retail.exe"
+            source.parent.mkdir(parents=True)
+            source.write_text('HEROES ICON DISCARDABLE "heroes.ico"\n')
+            retail_exe.write_bytes(b"retail")
+            icon = b"icon"
+            group = struct.pack("<HHH", 0, 1, 1) + struct.pack(
+                "<BBBBHHIH", 32, 32, 16, 0, 1, 4, len(icon), 22
+            )
+            retail = [
+                {"type": 3, "name": 22, "language": 1049, "data": icon},
+                {"type": 14, "name": "HEROES", "language": 1049,
+                 "data": group},
+            ]
+            staged = []
+
+            def run_compiler(*_args, cwd, **_kwargs):
+                stage = Path(cwd)
+                staged.append(stage)
+                self.assertNotEqual(stage, source.parent)
+                self.assertEqual((stage / source.name).read_bytes(), source.read_bytes())
+                self.assertTrue((stage / "heroes.ico").is_file())
+                output.write_bytes(b"compiled-res")
+
+            with (
+                mock.patch.object(rc_res, "check_rc_binaries"),
+                mock.patch.object(rc_res, "read_pe_resources", return_value=retail),
+                mock.patch.object(rc_res, "parse_res", return_value=retail),
+                mock.patch.object(rc_res.wine, "run", side_effect=run_compiler),
+            ):
+                self.assertEqual(
+                    rc_res.main([
+                        "--rc", str(source),
+                        "--out", str(output),
+                        "--verify-exe", str(retail_exe),
+                    ]),
+                    0,
+                )
+
+            self.assertEqual(len(staged), 1)
+            self.assertFalse(staged[0].exists())
+            self.assertFalse((source.parent / "heroes.ico").exists())

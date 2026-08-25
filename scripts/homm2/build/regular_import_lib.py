@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate a pre-short-record named import library from retail import records.
+"""Generate a pre-short-record named import library from reviewed ABI facts.
 
 VC6 emits compact ``IMPORT_OBJECT_HEADER`` members.  Some retail vendor
 libraries instead contain ordinary i386 COFF objects for every import.  The
 linked ABI is the same, but LINK's contribution and Rich-header accounting are
-not.  The retail PE supplies every used decorated name and hint, which can be
-stored directly in the member's ``.idata$6`` contribution.  No complete vendor
-export table or historical ``.def`` file is claimed.
+not.  Retail-exact mode takes used decorated names and hints from the control
+PE.  Generic mode takes its ABI from a checked-in DEF and assigns conventional
+sorted hints; those advisory values do not require the retail executable.
 """
 
 from __future__ import annotations
@@ -470,14 +470,31 @@ def generate(exe: Path, dll: str, output: Path) -> Path:
     return output
 
 
+def generate_from_definition(definition: Path, dll: str, output: Path) -> Path:
+    """Generate a conventional named import archive without a retail image."""
+    declared_dll, exports = read_definition(definition, dll)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_bytes(build_archive(declared_dll, exports))
+    print(
+        f"[regular-implib] {declared_dll}: {len(exports)} reviewed DEF exports "
+        f"-> {output}"
+    )
+    return output
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--exe", type=Path, default=RETAIL_EXE)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--exe", type=Path)
+    source.add_argument("--definition", type=Path)
     parser.add_argument("--dll", required=True)
     parser.add_argument("--out", required=True, type=Path)
     args = parser.parse_args(argv)
     try:
-        generate(args.exe, args.dll, args.out)
+        if args.definition is not None:
+            generate_from_definition(args.definition, args.dll, args.out)
+        else:
+            generate(args.exe or RETAIL_EXE, args.dll, args.out)
     except (OSError, ValueError) as error:
         print(f"[regular-implib] ERROR: {error}", file=sys.stderr)
         return 1

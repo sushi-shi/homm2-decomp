@@ -4,15 +4,18 @@
 every mode the file written by LINK is the deliverable: no tool opens it
 afterward for mutation.
 
-- `homm2 link` — **generic**: raw compiled objects only. No retail-extracted
-  resources, no COFF transforms; one LINK pass with an ordinary PDB. Output
-  `build/link/generic/HMM2PL.exe`. This is what the reconstruction honestly
-  produces from source alone.
+- `homm2 link` — **generic**: raw compiled objects plus import libraries built
+  from checked-in ABI manifests. It neither opens nor requires
+  `build/orig/HMM2PL.exe`, includes no resources, and applies no COFF
+  transforms. Output `build/link/generic/HMM2PL.exe`. This is what the
+  reconstruction honestly produces from source alone.
 - `homm2 link --rsrc` — generic plus the resources, compiled from source:
   `res/HMM2PL.rc` (menus, dialog, VERSIONINFO as reviewed rc grammar) plus
-  `res/heroes.ico` (the one retail-extracted binary, the program icon) through
-  the era `RC.EXE` 5.00, gated byte-exactly against `build/orig/HMM2PL.exe` on
-  every build (`rc_res.py`). Output `build/link/rsrc/HMM2PL.exe`. See
+  a staged `heroes.ico` (the one retail-extracted binary, the program icon)
+  through the era `RC.EXE` 5.00. This mode opens `build/orig/HMM2PL.exe` and
+  stages the icon beside a temporary copy of the RC source only while the
+  compiler runs; it also gates every compiled resource byte (`rc_res.py`). Output
+  `build/link/rsrc/HMM2PL.exe`. See
   `docs/resource-source-reconstruction-plan.md`.
 - `homm2 link --transform` — `--rsrc` plus the four reviewed COFF transforms
   declared in `scripts/homm2/build/exact_link/transforms.py`, the historical
@@ -25,6 +28,11 @@ compiled objects in every mode; `--transform` rebuilds its own prefix/suffix
 variants under `build/link/plain-inputs/` with the transformed members swapped
 in, so the transforms live in exactly one module and are never baked into
 shared build artifacts.
+
+Generic and `--rsrc` modes use import libraries generated from the reviewed
+`imports/*.def` ABI manifests. Transform mode separately regenerates the
+retail-evidence libraries from the control executable because import hints and
+historical COFF member shapes participate in exact final-image layout.
 
 ## Compared evidence
 
@@ -121,7 +129,7 @@ Run inside `nix develop .#build`:
 
 ```sh
 homm2 build
-homm2 link
+homm2 link --transform
 sha256sum build/orig/HMM2PL.exe build/link/HMM2PL.exe
 ```
 
