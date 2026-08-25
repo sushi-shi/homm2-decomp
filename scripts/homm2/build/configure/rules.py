@@ -82,6 +82,10 @@ def emit_rules(w) -> None:
            command=(f"{PY} -m homm2.build.ml_wrap "
                     "--src $in --out $out"),
            description="assemble-omf $in")
+    w.rule("ml_coff",
+           command=(f"{PY} -m homm2.build.ml_wrap "
+                    "--coff --src $in --out $out"),
+           description="assemble-coff $in")
     w.rule("link_exe",
            command=f"{PY} -m homm2.build.exact_link.plain --transform",
            description="plain retail-exact LINK.EXE HMM2PL.exe")

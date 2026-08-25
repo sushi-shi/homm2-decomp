@@ -1,5 +1,6 @@
 ; Retail links this unit through the OMF-to-COFF converter. TILE.cpp remains
-; the annotated analysis/objdiff mirror; this OMF source is the final-link input.
+; the portable semantic/data mirror; this source is both the final OMF link
+; input and, assembled as COFF, the authoritative code objdiff input.
 
 .386
 .model flat, C
@@ -12,7 +13,7 @@ TILE_FLIP_VERTICAL           EQU 04000h
 TILE_FLIP_HORIZONTAL         EQU 08000h
 
 .data
-gTileScratchWords DWORD 0, 0
+_gTileScratch DWORD 0, 0
 
 .code
 
@@ -29,7 +30,7 @@ TileToBitmap PROC C
     mov edi, DWORD PTR [edi+016h]
     add edi, eax
     mov eax, DWORD PTR [ebp+12]
-    mov gTileScratchWords, eax
+    mov _gTileScratch, eax
     and eax, TILE_INDEX_MASK
     mov DWORD PTR [ebp+12], eax
     mov esi, DWORD PTR [ebp+8]
@@ -43,10 +44,10 @@ TileToBitmap PROC C
     mov dx, WORD PTR [esi+014h]
     mov esi, DWORD PTR [esi+016h]
     add esi, eax
-    mov eax, gTileScratchWords
+    mov eax, _gTileScratch
     and eax, TILE_FLIP_HORIZONTAL
     jne path_h
-    mov eax, gTileScratchWords
+    mov eax, _gTileScratch
     and eax, TILE_FLIP_VERTICAL
     jne path_v
     mov eax, ecx
@@ -86,12 +87,12 @@ v_loop:
     jmp epi
     nop
 path_h:
-    mov eax, gTileScratchWords
+    mov eax, _gTileScratch
     and eax, TILE_FLIP_VERTICAL
     jne path_hv
     add edi, ecx
     dec edi
-    mov gTileScratchWords+4, edx
+    mov _gTileScratch+4, edx
     mov edx, ecx
     add ebx, edx
     add ebx, edx
@@ -106,7 +107,7 @@ h_inner:
     ENDM
     loop h_inner
     add edi, ebx
-    dec DWORD PTR gTileScratchWords+4
+    dec DWORD PTR _gTileScratch+4
     jne h_outer
     jmp epi
     xchg ebx, ebx
@@ -118,7 +119,7 @@ path_hv:
     std
     mov edx, ecx
     shr edx, 3
-    mov gTileScratchWords+4, ecx
+    mov _gTileScratch+4, ecx
 hv_outer:
     mov ecx, edx
 hv_inner:
@@ -129,7 +130,7 @@ hv_inner:
     ENDM
     loop hv_inner
     add edi, ebx
-    dec DWORD PTR gTileScratchWords+4
+    dec DWORD PTR _gTileScratch+4
     jne hv_outer
     cld
     jmp epi

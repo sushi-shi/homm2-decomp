@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble a source file to ordinary OMF with the pinned MASM 6.11 ML.EXE."""
+"""Assemble source with pinned MASM 6.11 as OMF or comparison-only COFF."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 from homm2.core import wine
 
 
-def assemble(src: Path, out: Path) -> None:
+def assemble(src: Path, out: Path, *, coff: bool = False) -> None:
     assembler = wine.tool("ml.exe")
     src = src.resolve()
     out = out.resolve()
@@ -19,8 +19,11 @@ def assemble(src: Path, out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.unlink(missing_ok=True)
     try:
-        wine.run(assembler, "/nologo", "/c",
-                 f"/Fo{wine.winepath_w(out)}", wine.winepath_w(src),
+        flags = ["/nologo", "/c"]
+        if coff:
+            flags.append("/coff")
+        wine.run(assembler, *flags, f"/Fo{wine.winepath_w(out)}",
+                 wine.winepath_w(src),
                  cwd=out.parent, quiet=True)
     except RuntimeError as error:
         raise RuntimeError(f"MASM 6.11 failed for {src.name}: {error}") from error
@@ -32,9 +35,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--src", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument(
+        "--coff", action="store_true",
+        help="emit COFF for objdiff; the retail link continues to use OMF")
     args = parser.parse_args()
     try:
-        assemble(args.src, args.out)
+        assemble(args.src, args.out, coff=args.coff)
     except RuntimeError as error:
         print(f"[ml_wrap] ERROR: {error}", file=sys.stderr)
         raise SystemExit(1) from error

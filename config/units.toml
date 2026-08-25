@@ -49,6 +49,7 @@ flags = "base_gx"
 [[unit]]
 unit = "BASE/BITS"
 source = "src/BASE/BITS.cpp"
+comparison_source = "src/BASE/BITS.asm"
 flags = "o1_frame"
 
 [[unit]]
@@ -183,6 +184,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/TILE"
 source = "src/BASE/TILE.cpp"
+comparison_source = "src/BASE/TILE.asm"
 flags = "base"
 
 [[unit]]

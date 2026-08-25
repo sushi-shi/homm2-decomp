@@ -51,6 +51,20 @@ IMAGE_DIR32 = 6
 IMAGE_REL32 = 20
 
 
+def is_donatable_owner(symbol: str | None) -> bool:
+    """Whether a relocation target spelling can identify durable storage.
+
+    A leading ``$`` is MSVC's namespace for translation-unit-local compiler
+    labels.  Some labels are descriptive (rather than the familiar ``$L`` or
+    ``$SG`` forms), but they are still compile accidents and must never become
+    global identities in the reconstructed PDB.
+    """
+    return bool(symbol) and not symbol.startswith((
+        "$", "__real@", "??_C@", "__ehhandler", "__unwindfunclet",
+        "__catch",
+    ))
+
+
 def load_claims():
     claims = {}
     with SYMBOLS.open() as stream:
@@ -230,13 +244,10 @@ def main(argv=None):
                     if (ours_text is not None and
                             retail_cstring(exe, secs, cell_rva) == ours_text):
                         string_cells[cell_rva] = True
-                # TU-local artifacts never vote: $L jump-table/branch labels
-                # (their name is a compile accident and planting them as PDB
-                # data owners re-splits the delinked table relocs), string and
-                # float literals, and per-function EH funclet labels.
-                if symbol and not symbol.startswith(
-                        ("__real@", "??_C@", "$SG", "$L",
-                         "__ehhandler", "__unwindfunclet", "__catch")):
+                # TU-local artifacts never vote: all $-prefixed compiler
+                # labels (including descriptive labels as well as $L/$SG),
+                # string/float literals, and per-function EH funclet labels.
+                if is_donatable_owner(symbol):
                     # our object stores the addend in the field, so the
                     # symbol's linked address is target - addend
                     owner_rva = target - IMAGE_BASE - addend

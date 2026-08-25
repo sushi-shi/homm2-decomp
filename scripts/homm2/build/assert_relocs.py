@@ -49,6 +49,31 @@ _PARSER_FINGERPRINT = "coff-relocs-v2"
 FIELD_AUDIT_THRESHOLD = 99.5
 
 
+def comparison_base_object(
+        unit, normalized=False,
+        config_path=Path("build/objdiff/objdiff.json")):
+    """Return the candidate object actually selected by the objdiff graph."""
+    fallback = Path("build/objdiff") / (
+        "normalized/base" if normalized else "base") / (unit + ".obj")
+    if not config_path.is_file():
+        return str(fallback)
+    config = json.loads(config_path.read_text())
+    row = next((record for record in config.get("units", [])
+                if record.get("name") == unit), None)
+    if row is None or not row.get("base_path"):
+        return str(fallback)
+    selected = config_path.parent / row["base_path"]
+    if normalized:
+        return str(selected)
+    parts = list(selected.parts)
+    try:
+        index = parts.index("normalized")
+    except ValueError:
+        return str(selected)
+    del parts[index]
+    return str(Path(*parts))
+
+
 class OwnerOffsetMismatch(NamedTuple):
     site: int
     owner_symbol: str
@@ -1288,7 +1313,7 @@ def review_fields(resolved_addresses=False):
                      for function in unit_record.get("functions", [])}
         if not functions:
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
+        base_obj = comparison_base_object(unit)
         target_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             continue
@@ -1302,7 +1327,7 @@ def review_fields(resolved_addresses=False):
                     (name not in selected_base or name not in selected_target)):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        comparison_base_object(unit, normalized=True),
                         with_sites=True)
                     normalized_target = parse_obj(
                         "build/objdiff/normalized/target/%s.c.obj" % unit,
@@ -1400,7 +1425,7 @@ def review_pe_data_targets():
     audit_stats = Counter()
     for unit_record in report["units"]:
         unit = unit_record["name"]
-        base_obj = "build/objdiff/base/%s.obj" % unit
+        base_obj = comparison_base_object(unit)
         target_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             continue
@@ -1432,7 +1457,7 @@ def review_pe_data_targets():
             if name.startswith("__h2cg$"):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        comparison_base_object(unit, normalized=True),
                         with_sites=True, include_imports=True)
                     normalized_target = parse_obj(
                         "build/objdiff/normalized/target/%s.c.obj" % unit,
@@ -1689,7 +1714,7 @@ def review(rva):
     """Single-function normalized multiset review (usable on <100% walls)."""
     sym, data, dups = load_symbols()
     unit, name, _function_rva = _function_for_arg(rva)
-    base_obj = "build/objdiff/normalized/base/%s.obj" % unit
+    base_obj = comparison_base_object(unit, normalized=True)
     target_obj = "build/objdiff/normalized/target/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
@@ -1729,7 +1754,7 @@ def review_counts(scope="BASE"):
         unit_name = unit["name"]
         if not unit_name.startswith(prefix):
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit_name
+        base_obj = comparison_base_object(unit_name)
         target_obj = "build/delink/%s.c.obj" % unit_name
         if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
             continue
@@ -1785,7 +1810,7 @@ def review_addends(scope=None):
         unit = unit_record["name"]
         if prefix and not unit.startswith(prefix):
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
+        base_obj = comparison_base_object(unit)
         target_obj = "build/delink/%s.c.obj" % unit
         missing = [path for path in (base_obj, target_obj) if not os.path.exists(path)]
         if missing:
@@ -1917,7 +1942,7 @@ def main():
         }
         if not near_exact_audited:
             continue
-        base_obj = "build/objdiff/base/%s.obj" % unit
+        base_obj = comparison_base_object(unit)
         tgt_obj = "build/delink/%s.c.obj" % unit
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             continue
@@ -1937,7 +1962,7 @@ def main():
                     (name not in selected_base or name not in selected_target)):
                 if normalized_base is None:
                     normalized_base = parse_obj(
-                        "build/objdiff/normalized/base/%s.obj" % unit)
+                        comparison_base_object(unit, normalized=True))
                     normalized_target = parse_obj(
                         "build/objdiff/normalized/target/%s.c.obj" % unit)
                 selected_base = normalized_base
@@ -1955,7 +1980,8 @@ def main():
                 base_obj_used = base_obj
                 target_obj_used = tgt_obj
                 if selected_base is normalized_base:
-                    base_obj_used = "build/objdiff/normalized/base/%s.obj" % unit
+                    base_obj_used = comparison_base_object(
+                        unit, normalized=True)
                     target_obj_used = "build/objdiff/normalized/target/%s.c.obj" % unit
                 base_sites = parse_obj(base_obj_used, with_sites=True).get(name, [])
                 target_sites = parse_obj(target_obj_used, with_sites=True).get(name, [])

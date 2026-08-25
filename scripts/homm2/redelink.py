@@ -3,9 +3,13 @@
 The target image is stripped, so the whole inventory is project evidence:
 source VA/DATA markers name what has been claimed, config/retail_functions.csv
 carries the analysis candidates that fill the "(unmatched)" module, and the
-reviewed manifests under config/ supply relocation sites and aliases. The
-pipeline is deterministic; `homm2.build.reviewed_data --regenerate` is a no-op
-when nothing changed (pass --force to re-delink anyway).
+reviewed manifests under config/ supply relocation sites and aliases. A clean
+bootstrap inventory deliberately ignores any old relocation-name donation,
+then the candidate objects are configured and rebuilt before exact functions
+regenerate that evidence and the final inventory is emitted. The pipeline is
+deterministic;
+`homm2.build.reviewed_data --regenerate` is a no-op when nothing changed (pass
+--force to re-delink anyway).
 """
 
 import os
@@ -26,6 +30,15 @@ def main(argv=None):
     force = "--force" in argv
     if [argument for argument in argv if argument != "--force"]:
         print("usage: homm2 redelink [--force]")
+        return 1
+    if run("python3", "-m", "homm2.build.source_symbols",
+           "--ignore-donations"):
+        return 1
+    if run("python3", "configure.py"):
+        return 1
+    if run("ninja", "base"):
+        return 1
+    if run("python3", "-m", "homm2.audit.reloc_donation"):
         return 1
     if run("python3", "-m", "homm2.build.source_symbols"):
         return 1

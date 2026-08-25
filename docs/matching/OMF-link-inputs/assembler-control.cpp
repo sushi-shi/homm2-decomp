@@ -2,9 +2,9 @@
 //
 // Retail evidence:
 //   The Rich producer census and the linked contribution boundaries identify
-//   BASE/BITS and BASE/TILE as inputs converted from OMF by VC6 LINK. Their
-//   reconstructed C++ bodies are already exact, but compiling those mirrors
-//   creates COFF COMDATs with different placement.
+//   BASE/BITS and BASE/TILE as inputs converted from OMF by VC6 LINK. Portable
+//   reconstructed C++ mirrors retain their semantics and TILE storage claim,
+//   but cannot reproduce the assembler instruction stream.
 //
 // Source products:
 //   src/BASE/BITS.asm
@@ -23,6 +23,12 @@
 //   BitClear      0x004c2f22
 //   TileToBitmap  0x004c2554
 //
+// MASM 6.11 `/coff` objects assembled from those same source products are the
+// authoritative objdiff inputs. This compares the real instruction stream and
+// ordered relocations without retaining a duplicate inline-assembly C++ body;
+// the final link still uses ordinary OMF and therefore preserves the two MASM
+// Rich-header producer records.
+//
 // The complete linked `.text`, `.data`, and `.rsrc` sections were byte-identical
 // between the MASM and JWasm controls. Their only PE difference was the ordinary
 // NB10/PDB timestamp word in `.rdata`. Against retail, the natural-link project
@@ -32,5 +38,5 @@
 //   RETAIN the MASM-syntax OMF source and assemble it with the pinned original
 //   Microsoft MASM 6.11 media packaged in the VC6 release. JWasm remains an
 //   independent control, not a final-link producer. REMOVE the former link-only
-//   COFF header adapter. The C++ files remain the annotated analysis and objdiff
-//   mirrors; they are not the final link inputs.
+//   COFF header adapter. The C++ files remain portable semantic/data mirrors;
+//   they are neither authoritative code-comparison nor final-link inputs.

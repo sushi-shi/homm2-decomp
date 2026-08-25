@@ -3,13 +3,21 @@
 #include <BASE/bitmap.h>
 #include <BASE/tileset.h>
 
-DATA(0x0051f2ec) static u32 gTileMode;
-DATA(0x0051f2f0) static i32 gTileRowCtr;
+struct TileBlitScratch {
+    u32 mode;
+    i32 row;
+};
+SIZE(TileBlitScratch, 8);
+
+#pragma data_seg(".data")
+DATA(0x0051f2ec) __declspec(allocate(".data"))
+static TileBlitScratch gTileScratch;
+#pragma data_seg()
 
 VA(0x004c2554, 0x18f)
 extern "C" void __cdecl
 TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
-    gTileMode = flags;
+    gTileScratch.mode = flags;
 
     const u32 tileWidth = src->m_tileWidth;
     const u32 tileHeight = src->m_tileHeight;
@@ -20,10 +28,12 @@ TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
     const u32 destinationStride = dst->m_width;
     u8* destination = dst->m_pixels + y * destinationStride + x;
 
-    const b32 flipHorizontal = (gTileMode & TILE_FLIP_HORIZONTAL) != 0;
-    const b32 flipVertical = (gTileMode & TILE_FLIP_VERTICAL) != 0;
-    for (gTileRowCtr = 0; gTileRowCtr < static_cast<i32>(tileHeight); ++gTileRowCtr) {
-        const u32 row = static_cast<u32>(gTileRowCtr);
+    const b32 flipHorizontal = (gTileScratch.mode & TILE_FLIP_HORIZONTAL) != 0;
+    const b32 flipVertical = (gTileScratch.mode & TILE_FLIP_VERTICAL) != 0;
+    for (gTileScratch.row = 0;
+         gTileScratch.row < static_cast<i32>(tileHeight);
+         ++gTileScratch.row) {
+        const u32 row = static_cast<u32>(gTileScratch.row);
         const u32 sourceRow = flipVertical ? tileHeight - 1 - row : row;
         const u8* sourcePixels = source + sourceRow * tileWidth;
         u8* destinationPixels = destination + row * destinationStride;

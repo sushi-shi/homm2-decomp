@@ -211,6 +211,17 @@ class DataMarkerTests(unittest.TestCase):
         self.assertEqual([(r.unit, r.provenance) for r in rows],
                          [("BASE/X", "source-annotation")])
 
+    def test_bootstrap_inventory_ignores_stale_donation_evidence(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "a.cpp").write_text("")
+            with mock.patch.object(mod, "symbols_for_file", return_value=[]), \
+                    mock.patch.object(mod, "source_vtables", return_value=[]), \
+                    mock.patch.object(mod, "_donated_owner_names") as donated:
+                rows = collect(root, root, include_donations=False)
+        donated.assert_not_called()
+        self.assertEqual(rows, [])
+
 
 class NothingMarkedTests(unittest.TestCase):
     def test_a_stripped_tree_yields_nothing_rather_than_guessing(self):

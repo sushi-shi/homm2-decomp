@@ -99,6 +99,9 @@ input preparation.
 6.11. LINK itself prints its normal OMF-to-COFF conversion warning. The retail
 Rich header independently contains exactly two MASM producer records; compiling
 the same bodies as C++ removes those records and changes linked layout.
+The comparison graph assembles the same sources with MASM's `/coff` container
+option so objdiff audits their real function bytes and relocations directly;
+the final-link graph remains OMF.
 
 The import libraries follow the Gruntz model: they reconstruct the ABI exposed
 by the missing DLL import libraries. Smacker's ordinal-only exports and WinG's

@@ -104,6 +104,27 @@ static inline i32 Inner(i32 value)
         after = source_hashes.source_hashes()
         self.assertNotEqual(before[first], after[first])
 
+    def test_authoritative_comparison_source_invalidates_the_unit(self):
+        config = self.root / "config"
+        config.mkdir()
+        assembly = self.root / "src/SOURCE/UNIT.asm"
+        assembly.write_text("First PROC\n ret\nFirst ENDP\n")
+        (config / "units.toml").write_text('''[[unit]]
+unit = "SOURCE/UNIT"
+source = "src/SOURCE/UNIT.cpp"
+comparison_source = "src/SOURCE/UNIT.asm"
+''')
+        self.source_path.write_text(self.source())
+        before = source_hashes.source_hashes()
+        assembly.write_text("First PROC\n nop\n ret\nFirst ENDP\n")
+        after = source_hashes.source_hashes()
+        self.assertNotEqual(
+            before[("SOURCE/UNIT", "?First@@YAHXZ")],
+            after[("SOURCE/UNIT", "?First@@YAHXZ")])
+        self.assertNotEqual(
+            before[("SOURCE/UNIT", "?Second@@YAHXZ")],
+            after[("SOURCE/UNIT", "?Second@@YAHXZ")])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -23,6 +23,7 @@ nothing else will.
 
     python3 -m homm2.build.source_symbols            # -> build/gen/symbol_names.csv
     python3 -m homm2.build.source_symbols --check    # report, write nothing
+    python3 -m homm2.build.source_symbols --ignore-donations  # bootstrap only
 """
 from __future__ import annotations
 
@@ -271,7 +272,8 @@ def reviewed_claims(repo: Path) -> list[SourceSymbol]:
     return rows
 
 
-def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
+def collect(source_root: Path, repo: Path,
+            include_donations: bool = True) -> list[SourceSymbol]:
     rows: list[SourceSymbol] = []
     paths = [path.resolve() for path in sorted(source_root.rglob("*.cpp"))]
     if len(paths) <= 1:
@@ -345,7 +347,8 @@ def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
     claimed_names = {row.name: row.rva for row in seen.values()
                      if row.kind == "data" and
                      row.provenance == "source-annotation"}
-    for rva, name in _donated_owner_names(repo):
+    donated_names = _donated_owner_names(repo) if include_donations else []
+    for rva, name in donated_names:
         # Donation and a written claim disagreeing about one name means the
         # claim's address is wrong; keeping both would put one symbol at two
         # addresses and let the delinker pick either.
@@ -449,11 +452,16 @@ def main(argv=None) -> int:
     parser.add_argument("--compgen-output", type=Path, default=COMPGEN_OUTPUT)
     parser.add_argument("--check", action="store_true",
                         help="report what would be written and write nothing")
+    parser.add_argument(
+        "--ignore-donations", action="store_true",
+        help="ignore generated relocation-owner names while bootstrapping "
+             "fresh donation evidence")
     args = parser.parse_args(argv)
 
     source_root = args.source.resolve()
     compgen = source_compgen_functions(source_root, REPO)
-    rows = collect(source_root, REPO)
+    rows = collect(
+        source_root, REPO, include_donations=not args.ignore_donations)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")

@@ -1,5 +1,5 @@
 """Normalized effective-source hashes used to scope retained function maxima."""
-import csv, hashlib, os, re
+import csv, hashlib, os, re, tomllib
 from pathlib import Path
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
@@ -339,6 +339,25 @@ def _helper_dependencies(block, helpers):
     return [(name, found[name]) for name in sorted(found)]
 
 
+def _comparison_source_hashes():
+    """Return conservative per-unit hashes for authoritative non-C++ inputs."""
+    manifest = REPO / "config/units.toml"
+    if not manifest.is_file():
+        return {}
+    rows = tomllib.loads(manifest.read_text()).get("unit", [])
+    out = {}
+    for row in rows:
+        source = row.get("comparison_source")
+        if not source:
+            continue
+        path = REPO / source
+        if not path.is_file():
+            raise ValueError(
+                f"authoritative comparison source is missing: {source}")
+        out[row["unit"]] = hashlib.sha1(path.read_bytes()).hexdigest()[:12]
+    return out
+
+
 def source_hashes():
     """Return normalized effective-source hashes keyed by ``(unit, function)``.
 
@@ -347,7 +366,9 @@ def source_hashes():
     normalized by :func:`_normalize`, so codegen-neutral argument/member renames
     do not perturb the hash. Functions that call TU-private ``static inline``
     helpers use ``body-hash.dependency-hash`` so helper edits invalidate only
-    their callers' retained maxima.
+    their callers' retained maxima. A unit's authoritative non-C++ comparison
+    source is appended as another dependency, so an assembly edit cannot retain
+    a maximum earned by an older object.
     """
     sym = _rva_to_sym(); cmap = _class_members()
     out = {}
@@ -372,4 +393,9 @@ def source_hashes():
                     out[key] = body_hash + "." + dependency_hash
                 else:
                     out[key] = body_hash
+    comparison_hashes = _comparison_source_hashes()
+    for key, source_hash in list(out.items()):
+        dependency_hash = comparison_hashes.get(key[0])
+        if dependency_hash:
+            out[key] = source_hash + "." + dependency_hash
     return out

@@ -42,13 +42,40 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
                 variables={"flags": " ".join(unit_flags),
                            "unit": u["unit"]})
         objs.append(obj)
-        normalized = f"build/objdiff/normalized/base/{u['unit']}.obj"
-        sidecar = f"build/objdiff/normalized/base/{u['unit']}.symbols.tsv"
-        base_symbol_sidecars.append(sidecar)
-        w.build(normalized, "canonicalize_data_symbols", inputs=obj,
-                implicit=normalizer, implicit_outputs=sidecar,
-                variables={"sidecar": sidecar, "unit": u["unit"]})
+        raw_normalized = f"build/objdiff/normalized/base/{u['unit']}.obj"
+        raw_sidecar = (
+            f"build/objdiff/normalized/base/{u['unit']}.symbols.tsv")
+        base_symbol_sidecars.append(raw_sidecar)
+        w.build(raw_normalized, "canonicalize_data_symbols", inputs=obj,
+                implicit=normalizer, implicit_outputs=raw_sidecar,
+                variables={"sidecar": raw_sidecar, "unit": u["unit"]})
+
+        # Most TUs are authored and compared as C++. BITS and TILE are proven
+        # retail MASM inputs, however: keep their portable C++ semantic/data
+        # mirrors, but compare code emitted directly from the authoritative
+        # assembly source. MASM's /coff changes only the object container; the
+        # final retail link independently assembles the same source as OMF.
+        comparison_obj = obj
+        normalized = raw_normalized
+        comparison_source = u.get("comparison_source")
+        if comparison_source:
+            comparison_obj = (
+                f"build/objdiff/authoritative/{u['unit']}.obj")
+            w.build(comparison_obj, "ml_coff", inputs=comparison_source,
+                    implicit="scripts/homm2/build/ml_wrap.py")
+            normalized = (
+                f"build/objdiff/normalized/authoritative/{u['unit']}.obj")
+            comparison_sidecar = (
+                "build/objdiff/normalized/authoritative/"
+                f"{u['unit']}.symbols.tsv")
+            w.build(normalized, "canonicalize_data_symbols",
+                    inputs=comparison_obj, implicit=normalizer,
+                    implicit_outputs=comparison_sidecar,
+                    variables={"sidecar": comparison_sidecar,
+                               "unit": u["unit"]})
         comparison_inputs.append(normalized)
+        base_comparison_path = (
+            "./" + normalized.removeprefix("build/objdiff/"))
 
         target = delink / f"{u['unit']}.c.obj"
         if target.exists() or u["unit"] in reviewed_units:
@@ -56,13 +83,13 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
             paired_target = (
                 f"build/objdiff/paired/target/{u['unit']}.c.obj")
             w.build(paired_target, "canonicalize_relocs", inputs=target_input,
-                    implicit=[obj, reloc_normalizer,
+                    implicit=[comparison_obj, reloc_normalizer,
                               "scripts/homm2/build/assert_relocs.py",
                               "scripts/homm2/build/gen_vendor_imports.py",
                               "build/gen/symbol_names.csv",
                               "config/reviewed_rel32_aliases.tsv",
                               "build/orig/HMM2PL.exe"],
-                    variables={"base": obj, "unit": u["unit"]})
+                    variables={"base": comparison_obj, "unit": u["unit"]})
             target_normalized = (
                 f"build/objdiff/normalized/target/{u['unit']}.c.obj")
             target_sidecar = (
@@ -73,12 +100,12 @@ def emit_compile_graph(w, manifest: dict, units: list[dict], delink: Path,
                     variables={"sidecar": target_sidecar, "unit": u["unit"]})
             comparison_inputs.append(target_normalized)
             comparison_paths[u["unit"]] = (
-                f"./normalized/base/{u['unit']}.obj",
+                base_comparison_path,
                 f"./normalized/target/{u['unit']}.c.obj",
             )
         else:
             comparison_paths[u["unit"]] = (
-                f"./normalized/base/{u['unit']}.obj",
+                base_comparison_path,
                 "./normalized/dummy.obj",
             )
     weak_link_inputs = objs + [
