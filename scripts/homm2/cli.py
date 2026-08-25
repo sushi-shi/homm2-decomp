@@ -94,7 +94,10 @@ def main(argv=None):
         if sh("python3", "configure.py"): return 1
         if "--transform" in rest:
             return sh("ninja", "link")
-        if sh("ninja", "link-inputs"): return 1
+        targets = ["link-inputs"]
+        if "--rsrc" in rest:
+            targets.append("link-resources")
+        if sh("ninja", *targets): return 1
         return sh("python3", "-m", "homm2.build.exact_link.plain", *rest)
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a

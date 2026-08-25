@@ -23,7 +23,7 @@ of the gate comparison.
   `rc_res.py` on every resource build; `rc.exe` splits it back into exactly
   those two records.
 - `scripts/homm2/build/rc_res.py` — compiles the `.rc` with the era
-  `RC.EXE` 5.00 + `RCDLL.DLL` (1999-04-30, pinned by SHA-256 in the script)
+  `RC.EXE` 5.00 + `RCDLL.DLL` (from the pinned VS6 Enterprise base disc)
   under wine, then byte-compares every compiled payload (type, name,
   language, bytes, order) against `build/orig/HMM2PL.exe` in both
   directions. Any drift fails the build. The report lands at
@@ -50,8 +50,8 @@ copies under different names), and one `RT_VERSION`.
 
 ## Provenance note
 
-The era RC pair is not yet produced by
-`scripts/toolchain/create-toolchain-release.py` (extending it needs the
-install media at hand); until that lands, the pinned SHA-256s in
-`rc_res.py` are the provenance record, and the driver fails with
-instructions when the binaries are absent.
+`scripts/toolchain/create-toolchain-release.py` packages the era RC pair from
+`COMMON/MSDEV98/BIN` on the pinned VS6 Enterprise base disc. The release
+builder and `rc_res.py` both verify their SHA-256s; the latter additionally
+proves their ten compiled payloads byte-exact against retail on every resource
+build.

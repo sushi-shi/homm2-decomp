@@ -8,10 +8,9 @@ driver compiles them with the era RC.EXE 5.00 + RCDLL.DLL under wine, then
 byte-compares every compiled payload (type, name, language, bytes, and order)
 against the retail image in both directions. Any drift fails the build.
 
-The two RC binaries are pinned by SHA-256. They come from the same VC6-era
-media family as the rest of the pinned toolchain (1999-04-30 builds); adding
-them to scripts/toolchain/create-toolchain-release.py needs the install media
-at hand, so until that lands the pins below are the provenance record.
+The two RC binaries are pinned by SHA-256 and packaged from the same VS6
+Enterprise base disc as the rest of the toolchain. Their compiled output is
+also compared payload-for-payload against the supported Buka retail image.
 """
 
 from __future__ import annotations
@@ -34,8 +33,8 @@ ROOT = next(
 )
 RC_EXE = ROOT / "build/toolchain/msvc/bin/RC.EXE"
 RC_PINS = {
-    "RC.EXE": "14a84379d318c76760bd550afaece03b5e8b39b49cbf6de7e0f7f0eac8216242",
-    "RCDLL.DLL": "3c36f9b3d433eb5354655796659d6247684df8158b367d334969183b35454f3c",
+    "RC.EXE": "582d0e68739b1128199d0ffc12eb62f48a17a3216a791fd6be948ff9e2eb2ffa",
+    "RCDLL.DLL": "5932342fc326b056988cebc710b414592b81c9ba18b9ae247b838a6021f2e434",
 }
 
 
@@ -45,7 +44,8 @@ def check_rc_binaries() -> None:
         if not path.exists():
             raise RuntimeError(
                 f"{path} is missing: the era resource compiler (RC.EXE 5.00 + "
-                "RCDLL.DLL, 1999-04-30) is not provisioned. See rc_res.py for "
+                "RCDLL.DLL from the VS6 Enterprise base disc) is not "
+                "provisioned. See rc_res.py for "
                 "the pinned SHA-256 provenance record."
             )
         digest = hashlib.sha256(path.read_bytes()).hexdigest()

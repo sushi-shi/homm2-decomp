@@ -71,6 +71,8 @@ ARTIFACTS = {
     "bin/C2.DLL":     "d50100ac2380d58f3f6f756961fb1319d35f5248e5fa6cafb866ca657e5dda4a",
     "bin/LINK.EXE":   "9672e578fdfaa43bdb8e9c16071682988665cb90bba2904bf02f6a5576d8ffbc",
     "bin/CVTRES.EXE": "83b602ed8e69e979fc9557f482a4a4c6c9a97b4ad67b879aedeacd2b09e5b20b",
+    "bin/RC.EXE":     "582d0e68739b1128199d0ffc12eb62f48a17a3216a791fd6be948ff9e2eb2ffa",
+    "bin/RCDLL.DLL":  "5932342fc326b056988cebc710b414592b81c9ba18b9ae247b838a6021f2e434",
     "bin/ML.EXE":     "94595b9ccc09dbcaf6b877aa11a35576f78de2ab0eb39546abfde430b79dce2f",
     "bin/ML.ERR":     "092755d3a488767da3de277c141be7c8144110a156cdbd8ae1391eba64697cee",
     "lib/LIBCMT.LIB":  "28b9f04962378ec4668072f37d7fd2835cd6cacc17b40cf22002c57bd8e76714",
@@ -82,8 +84,10 @@ MASM_DISK_MD5 = "bb1f36e70d67720fa63356010b07c992"
 # SP5 stores the back end under an edition-specific alias. Enterprise is ours.
 BACK_END_ALIAS = "msvcep.dll"
 
-# CL.EXE loads these from COMMON\MSDEV98\BIN, not from VC98\BIN.
-SHARED_BIN = ("MSPDB60.DLL", "MSOBJ10.DLL")
+# These install from COMMON\MSDEV98\BIN rather than VC98\BIN.  RC.EXE and
+# RCDLL.DLL are also independently gated by rc_res.py against byte-exact
+# resource output from the supported Buka retail image.
+SHARED_BIN = ("MSPDB60.DLL", "MSOBJ10.DLL", "RC.EXE", "RCDLL.DLL")
 
 SP5_BIN = ("cl.exe", "c1.dll", "c1xx.dll", "link.exe", "cvtres.exe")
 

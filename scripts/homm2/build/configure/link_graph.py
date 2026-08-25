@@ -161,8 +161,7 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
     # `homm2 link` (generic) and `homm2 link --rsrc` run the plain driver
     # directly; this phony target materializes every link input first.
     w.build("link-inputs", "phony",
-            inputs=(source_objects + base_libraries
-                    + [resource_output] + import_outputs))
+            inputs=(source_objects + base_libraries + import_outputs))
     link_audit_outputs = [
         "build/link/HMM2PL.link.json",
         "build/link/HMM2PL.missing-data.tsv",
