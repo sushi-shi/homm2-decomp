@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -38,8 +39,34 @@ public:
 
         m_size = {mode.width, mode.height};
         const int scale = mode.scale > 0 ? mode.scale : 2;
+        int windowWidth = mode.width * scale;
+        int windowHeight = mode.height * scale;
+        if (const char* configured = SDL_getenv("HOMM2_WINDOW_SIZE");
+            configured != nullptr && *configured != '\0') {
+            int configuredWidth;
+            int configuredHeight;
+            char trailing;
+            if (SDL_sscanf(
+                    configured,
+                    "%dx%d%c",
+                    &configuredWidth,
+                    &configuredHeight,
+                    &trailing
+                ) == 2
+                && configuredWidth > 0 && configuredHeight > 0) {
+                windowWidth = configuredWidth;
+                windowHeight = configuredHeight;
+            } else {
+                std::fprintf(
+                    stderr,
+                    "[homm2] HOMM2_WINDOW_SIZE must be '<width>x<height>'; using %dx%d\n",
+                    windowWidth,
+                    windowHeight
+                );
+            }
+        }
 
-        m_window = SDL_CreateWindow(mode.title, mode.width * scale, mode.height * scale,
+        m_window = SDL_CreateWindow(mode.title, windowWidth, windowHeight,
                                     SDL_WINDOW_RESIZABLE);
         if (m_window == nullptr) {
             std::fprintf(stderr, "[homm2] SDL_CreateWindow: %s\n", SDL_GetError());
@@ -437,8 +464,18 @@ public:
     void WarpMouse(Point position) override {
         m_mouse = position;
         if (m_video.window() != nullptr) {
-            SDL_WarpMouseInWindow(m_video.window(), static_cast<float>(position.x),
-                                  static_cast<float>(position.y));
+            float windowX = static_cast<float>(position.x);
+            float windowY = static_cast<float>(position.y);
+            if (m_video.renderer() != nullptr) {
+                SDL_RenderCoordinatesToWindow(
+                    m_video.renderer(),
+                    windowX,
+                    windowY,
+                    &windowX,
+                    &windowY
+                );
+            }
+            SDL_WarpMouseInWindow(m_video.window(), windowX, windowY);
         }
     }
 
@@ -499,7 +536,7 @@ public:
         do {
             Yield();
             SDL_Delay(1);
-        } while (Ticks() < deadline);
+        } while (TickDeadlinePending(deadline, Ticks()));
 #endif
     }
 
@@ -685,10 +722,13 @@ private:
             SDL_RenderCoordinatesFromWindow(m_video.renderer(), x, y, &logicalX, &logicalY);
         }
 
-        const Size size = m_video.Resolution();
         const int column = static_cast<int>(std::floor(logicalX));
         const int row = static_cast<int>(std::floor(logicalY));
-        return {std::clamp(column, 0, size.width - 1), std::clamp(row, 0, size.height - 1)};
+        // Captured mouse motion and letterbox coordinates are deliberately
+        // allowed outside the framebuffer. Win32 delivered those signed
+        // client coordinates too; clamping them makes the black bars behave
+        // like the nearest edge control and breaks drags leaving the window.
+        return {column, row};
     }
 
     Sdl3Video& m_video;
@@ -1301,7 +1341,7 @@ private:
 
     static std::filesystem::path Directory(const std::string& root, const std::string& directory) {
         return directory.empty() ? std::filesystem::path(root)
-                                 : std::filesystem::path(root) / directory;
+                                 : std::filesystem::path(ResolveIn(root, directory.c_str()));
     }
 
     static void Collect(

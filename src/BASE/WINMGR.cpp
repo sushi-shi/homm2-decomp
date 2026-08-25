@@ -574,7 +574,7 @@ void heroWindowManager::FizzleForward(
     if (bShowIt == 0)
         return;
     gbEnlargeScreenBlit = false;
-    tickStart = 0;
+    tickStart = platform::Ticks();
     if (x < 0) {
         width += x;
         x = 0;

@@ -10,8 +10,7 @@ typedef enum IconRleCommandConstant {
     ICON_RLE_DIM_SHORT_COUNT_MASK     = 0x03,
     ICON_RLE_DIM_LEVEL_MASK           = 0x3c,
     ICON_RLE_DIM_APPLY_FLAG           = 0x40,
-    ICON_RLE_DIM_RECOLOR_FLAG         = 0x80,
-    ICON_RLE_DIM_PALETTE_LEVEL_STRIDE = 0x40
+    ICON_RLE_DIM_RECOLOR_FLAG         = 0x80
 } IconRleCommandConstant;
 
 inline u8 ReadIconRleByte(u8*& cursor) {

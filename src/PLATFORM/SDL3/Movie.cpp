@@ -146,11 +146,12 @@ bool DecodeAudio(const std::string& path, DecodedAudio& audio) {
     }
 
     while (av_read_frame(decoder.format, decoder.packet) >= 0) {
-        if (decoder.packet->stream_index == stream
-            && avcodec_send_packet(decoder.codec, decoder.packet) >= 0
-            && !ReceiveAudio(decoder, audio)) {
-            av_packet_unref(decoder.packet);
-            return false;
+        if (decoder.packet->stream_index == stream) {
+            if (avcodec_send_packet(decoder.codec, decoder.packet) < 0
+                || !ReceiveAudio(decoder, audio)) {
+                av_packet_unref(decoder.packet);
+                return false;
+            }
         }
         av_packet_unref(decoder.packet);
     }

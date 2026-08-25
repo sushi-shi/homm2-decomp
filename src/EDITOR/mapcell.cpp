@@ -22,10 +22,10 @@ fullMap::~fullMap(void) {
 
 void fullMap::Close(void) {
     if (cells)
-        delete cells;
+        H2_FREE(cells);
     cells = NULL;
     if (extras)
-        delete extras;
+        H2_FREE(extras);
     extras = NULL;
     extraCount = 0;
 }
@@ -67,7 +67,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
         H2_ALLOC((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
     );
     memcpy(i, extras, extraCount * sizeof(mapCellExtra));
-    delete extras;
+    H2_FREE(extras);
     extras = i;
     for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
         extras[j].nextIndex = MAPCELL_EXTRA_FREE;
@@ -157,20 +157,20 @@ void fullMap::Read(i32 handle, i32 convert) {
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
-        delete tmp1;
+        H2_FREE(tmp1);
     } else {
         platform::FileRead(handle, cells, width * height * sizeof(mapCell));
     }
     platform::FileRead(handle, &extraCount, sizeof(extraCount));
     if (extras)
-        delete extras;
+        H2_FREE(extras);
     extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
     if (convert) {
         tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
         platform::FileRead(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
-        delete tmp2;
+        H2_FREE(tmp2);
     } else {
         platform::FileRead(handle, extras, extraCount * sizeof(mapCellExtra));
     }

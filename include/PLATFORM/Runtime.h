@@ -20,6 +20,14 @@ enum class SystemMenuCommand : i32 {
 };
 
 i32l Ticks();
+
+// Retail stores millisecond deadlines in a wrapping 32-bit counter. Compare
+// the signed distance, not the signed counter values, so short waits work on
+// both sides of the 0x7fffffff and 0xffffffff boundaries.
+constexpr bool TickDeadlinePending(u32 deadline, u32 now) {
+    return static_cast<i32>(deadline - now) > 0;
+}
+
 void SetEventHandler(EventHandler handler);
 void PumpEvents();
 void StartTextInput();

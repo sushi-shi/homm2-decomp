@@ -700,7 +700,7 @@ i32 game::PickLoadGame(void) {
         FILE_REQUESTER_LOAD_GAME,
         fileMask,
         gcGamePath,
-        fileMask
+        fileMask + 1
     );
     if (fileReq == NULL)
         MemError();

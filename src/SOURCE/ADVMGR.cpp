@@ -1441,7 +1441,7 @@ void advManager::Close(void) {
     delete m_adventureWindow;
     m_adventureWindow = NULL;
     if (m_visibilityMap != NULL) {
-        delete m_visibilityMap;
+        delete[] m_visibilityMap;
     }
     m_visibilityMap = NULL;
     iCurBottomView = BOTTOM_VIEW_NONE;

@@ -4,7 +4,7 @@
 #include <PLATFORM/Runtime.h>
 
 void DelayTil(i32* endTime) {
-    while (*endTime > platform::Ticks()) {
+    while (platform::TickDeadlinePending(*endTime, platform::Ticks())) {
         platform::PumpEvents();
         PollSound();
     }
@@ -15,7 +15,7 @@ void DelayMilli(i32l delay) {
 }
 
 void DelayTilMilli(i32l endTime) {
-    while (endTime > platform::Ticks()) {
+    while (platform::TickDeadlinePending(endTime, platform::Ticks())) {
         platform::PumpEvents();
         PollSound();
     }
