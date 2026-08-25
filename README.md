@@ -163,3 +163,11 @@ The launcher packages the installed data, serves the bundle on port 8080
 (`HOMM2_WEB_PORT`), and caches it under `~/.cache/homm2-web`
 (`HOMM2_WEB_OUTPUT`). The first build also cross-compiles SDL3 and a minimal
 FFmpeg.
+
+## License
+
+Project-authored reconstruction source and tooling are dedicated to the public
+domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
+Files carrying separate copyright or license notices retain those terms. No
+binary game assets are stored in this repository; retail inputs and build
+outputs incorporating them are not covered by this dedication.
