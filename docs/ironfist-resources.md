@@ -1,35 +1,50 @@
-# Ironfist resource pack
+# Building the Ironfist resources
 
-Ironfist's runtime content is distributed as a GitHub Release asset instead of
-being committed to this branch. It does not replace the retail game data:
-Heroes II: The Price of Loyalty is still required.
+This branch does not store or publish an Ironfist resource archive. Instead,
+the installer builds the runtime content from the original Project Ironfist
+repository and merges it into a user-supplied Heroes II: The Price of Loyalty
+installation.
 
-Current immutable package:
+The source input is pinned to:
 
-- Release/tag: `ironfist-pol-2.0-resources-v1`
-- Asset: `ironfist-pol-2.0-resources-v1.zip`
-- SHA-256: `37194d329c43a32615e2f1926a4ab33d7fdeda4be3add99acb6b59c21175876a`
-- Ironfist source reference: `jkoppel/project-ironfist@31493201`
+- Repository: `https://github.com/jkoppel/project-ironfist.git`
+- Commit: `314932011ed5308efb9f35cecc62e8ca638a7375`
 
-The archive has the game-directory layout at its root. It contains the
-Ironfist aggregate, XML databases, campaign metadata and maps, music, and Lua
-scripts. Extract it over a writable retail PoL installation, or use:
+Run the source builder with:
 
 ```sh
 nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
-The installer requires both retail aggregates, downloads the pinned asset,
-checks its SHA-256 digest, extracts it, and validates representative required
-files. It uses an authenticated `gh` session when anonymous downloads are not
-available, as is the case while the repository is access-restricted. For a
-mirror, set `HOMM2_IRONFIST_RESOURCES_URL` to the exact same archive; the
-checksum remains mandatory.
+The target must be writable and contain both `DATA/HEROES2.AGG` and
+`DATA/HEROES2X.AGG`. The command then:
 
-## Publishing an update
+1. creates a temporary sparse clone and fetches only the pinned commit;
+2. verifies the complete commit ID before consuming any files;
+3. runs upstream `assets/pack.bat` and its checked-in GrayFace packers under an
+   isolated Wine prefix to produce `DATA/ironfist.agg`;
+4. installs upstream XML, maps, campaign metadata, Lua scripts, and music into
+   the corresponding game directories; and
+5. validates representative required outputs before reporting success.
 
-Resource releases are immutable. Build a new archive with `DATA/`, `MAPS/`,
-`CAMPAIGNS/`, `MUSIC/`, and `SCRIPTS/` at its root, choose a new versioned tag,
-then update the version, URL, and SHA-256 in
-`scripts/install-ironfist-resources.sh`. Never replace an existing release
-asset in place because installed source revisions pin its digest.
+The Cyborg theme is upstream `assets/music/homm2_43.ogg`, installed under the
+portable engine's expected name `MUSIC/Track44.ogg`. The portable audio path
+plays that Ogg directly, so the generated aggregate does not need a copied
+retail `MIDI0044.XMI` placeholder.
+
+Set `HOMM2_IRONFIST_SOURCE_URL` to an alternate Git remote or local mirror when
+needed. The commit ID remains fixed and is still verified. The temporary clone,
+build tree, and Wine prefix are removed after installation.
+
+These upstream resources retain Project Ironfist's terms; building them does
+not place them under this repository's source license. The Heroes II retail
+aggregates are checked for presence but are never copied into or used to build
+`ironfist.agg`.
+
+## Updating the source pin
+
+Review a new upstream commit and its resource layout first. Then update the
+commit in `scripts/install-ironfist-resources.sh`, rebuild into an empty test
+installation, and verify the aggregate, maps, campaign, scripts, music, and an
+actual game startup. Do not introduce a prebuilt resource release as an
+alternate input path.

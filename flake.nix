@@ -159,7 +159,12 @@
 
       ironfist-resources = pkgs.writeShellApplication {
         name = "install-ironfist-resources";
-        runtimeInputs = [ pkgs.coreutils pkgs.curl pkgs.findutils pkgs.gh pkgs.unzip ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.findutils
+          pkgs.git
+          pkgs.wineWow64Packages.stable
+        ];
         text = ''
           exec ${pkgs.bash}/bin/bash ${./scripts/install-ironfist-resources.sh} "$@"
         '';

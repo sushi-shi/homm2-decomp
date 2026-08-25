@@ -88,9 +88,9 @@ this tree's enums. Notable divergences:
 - Preferences (file-backed, replacing the registry), the GUI widget-message
   helpers, `IsWellDisabled`, and the expansion state object.
 - The data-driven artifact and creature layers: `DATA/artifacts.xml` and
-  `DATA/creatures.xml` (shipped in the resource release) are the authority; the
-  retail tables grew to Ironfist's 256-entry capacities for the added
-  artifacts (Pandora Box, Iron Fist) and creatures (72–83); secondary
+  `DATA/creatures.xml` (installed from the pinned upstream source) are the
+  authority; the retail tables grew to Ironfist's 256-entry capacities for
+  the added artifacts (Pandora Box, Iron Fist) and creatures (72–83); secondary
   resource costs and random-spawn bounds are table-driven;
   `Ironfist_Startup()` loads everything before the retail main.
 
@@ -123,13 +123,14 @@ full porting history. The late milestones, briefly:
 
 ## Assets
 
-The separately published Ironfist resource pack supplies
-`DATA/ironfist.agg` (packed from upstream `assets/agg` with GrayFace's
-packers; loads before the retail aggregates, optional), `MAPS/` (Ironfist
-maps + the CAMP5 campaign maps), `CAMPAIGNS/cyborg.cmp`, `MUSIC/Track44.ogg`
-(the Cyborg town theme; a stub `MIDI0044.XMI` inside ironfist.agg keeps the
-resource manager satisfied), and `SCRIPTS/` (map Lua siblings + modules).
-Install it into `HOMM2_DATA`; see [the resource-pack contract](ironfist-resources.md).
+The source installer fetches the pinned original Ironfist repository and
+supplies `DATA/ironfist.agg` (built from upstream `assets/agg` with its
+checked-in GrayFace packers; loads before the retail aggregates, optional),
+`MAPS/` (Ironfist maps + the CAMP5 campaign maps), `CAMPAIGNS/cyborg.cmp`,
+`MUSIC/Track44.ogg` (the Cyborg town theme), and `SCRIPTS/` (map Lua siblings
+and modules). The portable audio path plays the Ogg directly and does not need a
+retail XMI copied into the generated aggregate. Build and install these files
+into `HOMM2_DATA`; see [Building the Ironfist resources](ironfist-resources.md).
 
 ## Build
 

@@ -11,6 +11,47 @@ content on top of that reconstructed cross-platform engine.
 The repository does not contain the original game resources. An installed copy
 of the game is required to play it.
 
+## Quick start on Linux
+
+You need Git, [Nix](https://nixos.org/download/) with flakes enabled, internet
+access for the first build, and a writable Heroes II: The Price of Loyalty game
+directory. That directory must contain `DATA/HEROES2.AGG` and
+`DATA/HEROES2X.AGG`.
+
+1. Clone the Ironfist branch and enter it:
+
+   ```sh
+   git clone --branch ironfist --single-branch \
+     https://github.com/sushi-shi/homm2-decomp.git homm2-ironfist
+   cd homm2-ironfist
+   ```
+
+2. Point the game at your writable PoL installation:
+
+   ```sh
+   export HOMM2_DATA=/absolute/path/to/heroes2
+   find "$HOMM2_DATA" -maxdepth 2 \( -type f -o -type l \) \
+     \( -iname HEROES2.AGG -o -iname HEROES2X.AGG \)
+   ```
+
+3. Fetch the pinned original Ironfist source, build its resources, and install
+   them into that game directory:
+
+   ```sh
+   nix run .#ironfist-resources -- "$HOMM2_DATA"
+   ```
+
+4. Build and run the native Linux game:
+
+   ```sh
+   nix run
+   ```
+
+Later runs only need `HOMM2_DATA=/absolute/path/to/heroes2 nix run`; rebuild the
+resources only when this branch changes its pinned Ironfist source revision.
+The longer build, Windows/Wine, Web, locale, and runtime-option instructions are
+below.
+
 ## Repository branch structure
 
 ```text
@@ -89,18 +130,18 @@ HOMM2_DATA=/path/to/heroes2 ./build/homm2
 ### Game data
 
 To run Ironfist you need an installed copy of Heroes II Gold or The Price of Loyalty,
-including both `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`. Install the separately
-published Ironfist resource pack into that directory:
+including both `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`. Build and install the
+Ironfist resources from the pinned original repository into that directory:
 
 ```sh
 nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
-The installer downloads the pinned release asset, verifies its SHA-256 digest,
-and merges `DATA/`, `MAPS/`, `CAMPAIGNS/`, `MUSIC/`, and `SCRIPTS/` into the
-game directory. You can instead download
-[`ironfist-pol-2.0-resources-v1.zip`](https://github.com/sushi-shi/homm2-decomp/releases/download/ironfist-pol-2.0-resources-v1/ironfist-pol-2.0-resources-v1.zip)
-and extract it there manually. See [the resource-pack contract](docs/ironfist-resources.md).
+The installer makes a sparse clone of `jkoppel/project-ironfist` at the pinned
+commit, verifies that commit, runs upstream's resource packers under an isolated
+Wine prefix, and merges `DATA/`, `MAPS/`, `CAMPAIGNS/`, `MUSIC/`, and
+`SCRIPTS/` into the game directory. See
+[Building the Ironfist resources](docs/ironfist-resources.md).
 
 `HOMM2_DATA` should then point to that combined game directory (paths are
 resolved case-insensitively).
@@ -157,7 +198,7 @@ System Options.
 
 ### Windows
 
-First extract the Ironfist resource release over the writable retail game
+First run the source resource installer against the writable retail game
 directory. The Windows package is statically linked; copy `HMM2PL.exe` there
 and run it. For Wine:
 
