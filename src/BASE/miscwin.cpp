@@ -70,7 +70,6 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         {destinationX, destinationY, width, height},
         {destinationX, destinationY}
     );
-    platform::Video().Present();
 }
 
 i16 AutoInitSVGA(void) {
