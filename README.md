@@ -8,6 +8,39 @@ cross-version work.
 The repository does not contain the original game resources. An installed copy
 of the game is required to play it.
 
+## Quick start on Linux
+
+You need Git, [Nix](https://nixos.org/download/) with flakes enabled, and an
+installed Heroes II game directory. The file `DATA/HEROES2.AGG` must exist;
+directory and file names are matched case-insensitively.
+
+1. Clone the native port and enter it:
+
+   ```sh
+   git clone --branch master --single-branch \
+     https://github.com/sushi-shi/homm2-decomp.git homm2
+   cd homm2
+   ```
+
+2. Point the engine at your installed game data:
+
+   ```sh
+   export HOMM2_DATA=/absolute/path/to/heroes2
+   find "$HOMM2_DATA" -maxdepth 2 \( -type f -o -type l \) \
+     -iname HEROES2.AGG
+   ```
+
+3. Build and run the native Linux game:
+
+   ```sh
+   nix run
+   ```
+
+Later runs only need `HOMM2_DATA=/absolute/path/to/heroes2 nix run`. Saves and
+configuration are written under the user data directory, so the retail game
+directory may remain read-only. Windows/Wine, Web, localization, manual-build,
+and runtime-option instructions are below.
+
 ## Repository branch structure
 
 ```text
