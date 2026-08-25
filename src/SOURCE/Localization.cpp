@@ -474,6 +474,13 @@ std::string FormatSignature(const char* text) {
         if (text[index] != '%') {
             continue;
         }
+        // A percentage in prose ("150% damage") is not a printf field. A
+        // numeric conversion never needs the space after a percent sign when
+        // the sign itself directly follows a digit.
+        if (index > 0 && std::isdigit(static_cast<unsigned char>(text[index - 1]))
+            && text[index + 1] == ' ') {
+            continue;
+        }
         ++index;
         if (text[index] == '%') {
             continue;

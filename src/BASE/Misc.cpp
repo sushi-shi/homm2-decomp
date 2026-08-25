@@ -3,6 +3,7 @@
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
+#include <BASE/Utf8.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
@@ -533,7 +534,11 @@ void SetGameDefaults(void) {
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
     gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
 
-    strcpy(gConfig.networkDefaultName, localization::Tr("player.unknown_hero_name"));
+    utf8::Copy(
+        gConfig.networkDefaultName,
+        sizeof(gConfig.networkDefaultName),
+        localization::Tr("player.unknown_hero_name")
+    );
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);

@@ -160,7 +160,11 @@ void RemoteMain(RemoteGameMode gameMode) {
                 gcTCPName
             );
         else
-            strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
+            utf8::Copy(
+                gsThisNetPlayerInfo.name,
+                sizeof(gsThisNetPlayerInfo.name),
+                gConfig.networkDefaultName
+            );
     } else {
         GetDataEntry(
 
@@ -172,7 +176,11 @@ void RemoteMain(RemoteGameMode gameMode) {
             0
         );
     }
-    strcpy(gConfig.networkDefaultName, gsThisNetPlayerInfo.name);
+    utf8::Copy(
+        gConfig.networkDefaultName,
+        sizeof(gConfig.networkDefaultName),
+        gsThisNetPlayerInfo.name
+    );
     WritePrefs();
     strcpy(gsThisNetPlayerInfo.uniqueSystemID, gConfig.uniqueSystemID);
     gsThisNetPlayerInfo.connectionType = NET_PLAYER_CONNECTION_CURRENT;

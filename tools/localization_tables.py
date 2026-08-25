@@ -271,8 +271,10 @@ def emit(root, revision):
     for path, identifier, source_bytes, target_bytes in entries(root, revision):
         source = source_bytes.decode("ascii")
         target = target_bytes.decode("cp1251") if target_bytes is not None else ""
+        # Do not classify ordinary percentage prose such as "150% damage"
+        # as the legal-but-unintended printf sequence "% d".
         format_pattern = re.compile(
-            r"%(?:\d+\$)?[-+#0 .'\dhljztL]*[diuoxXfFeEgGaAcspn]"
+            r"(?<!\d)%(?:\d+\$)?[-+#0 .'\dhljztL]*[diuoxXfFeEgGaAcspn]"
         )
         source_formats = format_pattern.findall(source)
         target_formats = format_pattern.findall(target)

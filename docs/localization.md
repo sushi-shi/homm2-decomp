@@ -226,8 +226,8 @@ Implemented:
 
 - startup language selection, English fallback, UTF-8 MO loading, catalog
   packaging, stale-source and placeholder validation;
-- a complete 1,668-entry Russian catalog: 1,204 recovered table entries and
-  464 directly registered messages;
+- a complete 2,511-entry Russian catalog: 1,999 recovered table entries and
+  512 directly registered messages;
 - a source comparison audit whose only remaining edition differences are the
   internal map name `Chaos` and save-file prefix `WIN_`, neither displayed as
   translatable prose;
