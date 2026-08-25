@@ -110,6 +110,20 @@ After setting `HOMM2_DATA`, run:
 nix run
 ```
 
+Native SDL presentation can be varied independently without changing game
+timing. Scaling defaults to nearest-neighbour and vsync defaults to the SDL
+renderer policy. Set both variables explicitly for reproducible comparisons:
+
+```sh
+HOMM2_SCALE_MODE=nearest HOMM2_VSYNC=0 nix run
+HOMM2_SCALE_MODE=linear  HOMM2_VSYNC=0 nix run
+HOMM2_SCALE_MODE=nearest HOMM2_VSYNC=1 nix run
+HOMM2_SCALE_MODE=linear  HOMM2_VSYNC=1 nix run
+```
+
+`HOMM2_SCALE_MODE` accepts `nearest` or `linear`; `HOMM2_VSYNC` accepts `0`
+or `1`. The selected presentation mode is printed at startup.
+
 ### Windows
 
 The Windows package is statically linked. Copy `HMM2PL.exe` into the writable

@@ -65,7 +65,53 @@ public:
             return false;
         }
 
-        SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
+        SDL_ScaleMode textureScaleMode = SDL_SCALEMODE_NEAREST;
+        const char* textureScaleName = "nearest";
+        if (const char* configured = SDL_getenv("HOMM2_SCALE_MODE");
+            configured != nullptr && *configured != '\0') {
+            if (SDL_strcasecmp(configured, "linear") == 0) {
+                textureScaleMode = SDL_SCALEMODE_LINEAR;
+                textureScaleName = "linear";
+            } else if (SDL_strcasecmp(configured, "nearest") != 0) {
+                std::fprintf(
+                    stderr,
+                    "[homm2] HOMM2_SCALE_MODE must be 'nearest' or 'linear'; using nearest\n"
+                );
+            }
+        }
+        if (!SDL_SetTextureScaleMode(m_texture, textureScaleMode)) {
+            std::fprintf(stderr, "[homm2] SDL_SetTextureScaleMode: %s\n", SDL_GetError());
+        }
+
+        const char* vsyncName = "renderer-default";
+        if (const char* configured = SDL_getenv("HOMM2_VSYNC");
+            configured != nullptr && *configured != '\0') {
+            int interval;
+            if (std::strcmp(configured, "0") == 0) {
+                interval = 0;
+                vsyncName = "off";
+            } else if (std::strcmp(configured, "1") == 0) {
+                interval = 1;
+                vsyncName = "on";
+            } else {
+                interval = -1;
+                std::fprintf(
+                    stderr,
+                    "[homm2] HOMM2_VSYNC must be '0' or '1'; using the renderer default\n"
+                );
+            }
+            if (interval >= 0 && !SDL_SetRenderVSync(m_renderer, interval)) {
+                std::fprintf(stderr, "[homm2] SDL_SetRenderVSync: %s\n", SDL_GetError());
+                vsyncName = "unsupported";
+            }
+        }
+
+        std::fprintf(
+            stderr,
+            "[homm2] video: scaling=%s, vsync=%s\n",
+            textureScaleName,
+            vsyncName
+        );
 
         m_indexed.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);
         m_presented.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);
