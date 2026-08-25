@@ -1,234 +1,41 @@
 #include <va.h>
 #include <BASE/TILE.h>
+#include <BASE/bitmap.h>
+#include <BASE/tileset.h>
 
-H2_ENUM_BEGIN(TileBlitConstant)
-    BITMAP_WIDTH_OFFSET         = 0x12,
-    BITMAP_PIXELS_OFFSET        = 0x16,
-    TILE_WIDTH_OFFSET           = 0x12,
-    TILE_HEIGHT_OFFSET          = 0x14,
-    TILE_PIXELS_OFFSET          = 0x16,
-    PIXELS_PER_DWORD_SHIFT      = 2,
-    FORWARD_ROW_BATCH           = 16,
-    PIXELS_PER_COPY_GROUP_SHIFT = 3,
-    TILE_MODE_STORAGE_OFFSET    = 0,
-    TILE_ROW_STORAGE_OFFSET     = 4,
-    TILE_SCRATCH_WORD_COUNT     = 2
-H2_ENUM_END(TileBlitConstant)
+DATA(0x0051f2ec) static u32 gTileMode;
+DATA(0x0051f2f0) static i32 gTileRowCtr;
 
-#pragma data_seg(".data")
-DATA(0x0051f2ec) __declspec(allocate(".data"))
-static u32 gTileScratchWords[TILE_SCRATCH_WORD_COUNT];
-#pragma data_seg()
-
-#ifdef __clang__
-// clang rejects parameter references inside a naked function's __asm block,
-// so the analysis parse gets a stub definition carrying the same annotation;
-// only MSVC ever compiles the real blitter below.
 VA(0x004c2554, 0x18f)
 extern "C" void __cdecl
-TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {}
-#else
-VA(0x004c2554, 0x18f)
-extern "C" __declspec(naked) void __cdecl
 TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
-    __asm {
-        push    ebp
-        mov     ebp, esp
-        push    esi
-        push    edi
-        mov     edi, dst
-        movzx   ebx, word ptr [edi+BITMAP_WIDTH_OFFSET]
-        mov     eax, y
-        mul     ebx
-        add     eax, x
-        mov     edi, [edi+BITMAP_PIXELS_OFFSET]
-        add     edi, eax
-        mov     eax, flags
-        mov     gTileScratchWords[TILE_MODE_STORAGE_OFFSET], eax
-        and     eax, TILE_INDEX_MASK
-        mov     flags, eax
-        mov     esi, src
-        movzx   ecx, word ptr [esi+TILE_WIDTH_OFFSET]
-        sub     ebx, ecx
-        mov     eax, ecx
-        movzx   edx, word ptr [esi+TILE_HEIGHT_OFFSET]
-        mul     edx
-        mov     edx, flags
-        mul     edx
-        mov     dx, word ptr [esi+TILE_HEIGHT_OFFSET]
-        mov     esi, [esi+TILE_PIXELS_OFFSET]
-        add     esi, eax
-        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
-        and     eax, TILE_FLIP_HORIZONTAL
-        jne     path_h
-        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
-        and     eax, TILE_FLIP_VERTICAL
-        jne     path_v
-        mov     eax, ecx
-        shr     eax, PIXELS_PER_DWORD_SHIFT
-        xchg    ebx, ebx
-        nop
-    fwd:
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        mov ecx, eax
-        rep movsd
-        add edi, ebx
-        sub     dx, FORWARD_ROW_BATCH
-        jne     fwd
-    epi:
-        pop     edi
-        pop     esi
-        pop     ebp
-        ret
-        xchg    ebx, ebx
-    path_v:
-        mov     eax, ecx
-        dec     eax
-        mul     ecx
-        add     esi, eax
-        mov     eax, ecx
-        mov     dx, cx
-    v_loop:
-        mov     ecx, eax
-        shr     ecx, PIXELS_PER_DWORD_SHIFT
-        rep     movsd
-        add     edi, ebx
-        sub     esi, eax
-        sub     esi, eax
-        dec     dx
-        jne     v_loop
-        jmp     epi
-        nop
-    path_h:
-        mov     eax, gTileScratchWords[TILE_MODE_STORAGE_OFFSET]
-        and     eax, TILE_FLIP_VERTICAL
-        jne     path_hv
-        add     edi, ecx
-        dec     edi
-        mov     gTileScratchWords[TILE_ROW_STORAGE_OFFSET], edx
-        mov     edx, ecx
-        add     ebx, edx
-        add     ebx, edx
-        shr     edx, PIXELS_PER_COPY_GROUP_SHIFT
-    h_outer:
-        mov     ecx, edx
-    h_inner:
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        lodsb
-        mov [edi], al
-        dec edi
-        loop    h_inner
-        add     edi, ebx
-        dec     gTileScratchWords[TILE_ROW_STORAGE_OFFSET]
-        jne     h_outer
-        jmp     epi
-        xchg    ebx, ebx
-    path_hv:
-        mov     eax, ecx
-        mul     ecx
-        dec     eax
-        add     esi, eax
-        std
-        mov     edx, ecx
-        shr     edx, PIXELS_PER_COPY_GROUP_SHIFT
-        mov     gTileScratchWords[TILE_ROW_STORAGE_OFFSET], ecx
-    hv_outer:
-        mov     ecx, edx
-    hv_inner:
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        lodsb
-        mov [edi], al
-        inc edi
-        loop    hv_inner
-        add     edi, ebx
-        dec     gTileScratchWords[TILE_ROW_STORAGE_OFFSET]
-        jne     hv_outer
-        cld
-        jmp     epi
+    gTileMode = flags;
+
+    const u32 tileWidth = src->m_tileWidth;
+    const u32 tileHeight = src->m_tileHeight;
+    const u32 tileIndex = flags & TILE_INDEX_MASK;
+    const u8* source = reinterpret_cast<const u8*>(src->m_data)
+        + tileWidth * tileHeight * tileIndex;
+
+    const u32 destinationStride = dst->m_width;
+    u8* destination = dst->m_pixels + y * destinationStride + x;
+
+    const b32 flipHorizontal = (gTileMode & TILE_FLIP_HORIZONTAL) != 0;
+    const b32 flipVertical = (gTileMode & TILE_FLIP_VERTICAL) != 0;
+    for (gTileRowCtr = 0; gTileRowCtr < static_cast<i32>(tileHeight); ++gTileRowCtr) {
+        const u32 row = static_cast<u32>(gTileRowCtr);
+        const u32 sourceRow = flipVertical ? tileHeight - 1 - row : row;
+        const u8* sourcePixels = source + sourceRow * tileWidth;
+        u8* destinationPixels = destination + row * destinationStride;
+
+        if (flipHorizontal) {
+            for (u32 column = 0; column < tileWidth; ++column) {
+                destinationPixels[column] = sourcePixels[tileWidth - 1 - column];
+            }
+        } else {
+            for (u32 column = 0; column < tileWidth; ++column) {
+                destinationPixels[column] = sourcePixels[column];
+            }
+        }
     }
 }
-#endif

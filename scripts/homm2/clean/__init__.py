@@ -10,12 +10,10 @@ generator performs those expansions ahead of time and emits ordinary C++.
   overrides/        files macro expansion CANNOT produce, supplied verbatim
   project/          the build system the generated tree needs, copied verbatim
 
-overrides/ is small and load-bearing. src/BASE/BITS.cpp and src/BASE/TILE.cpp are
-MSVC `__asm` in the matching tree - the bit primitives and the hand-asm tile
-blitter - and nothing but the pinned MSVC can compile them, so the published
-tree gets portable C++ reimplementations. include/Ints.h is the dual-build
-switch itself, so it cannot select itself away; the override is single-branch
-C++20.
+overrides/ is small and load-bearing. include/Ints.h is the dual-build switch
+itself, so it cannot select itself away; the override is single-branch C++20.
+The bit primitives and tile blitter are ordinary reconstructed C++ in the
+matching tree and pass through the normal generator.
 
 project/ is deliberately NOT this repository's flake: that one provisions wine,
 the pinned MSVC, Ghidra, objdiff and the delinker, and the published branch

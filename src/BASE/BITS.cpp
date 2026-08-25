@@ -9,52 +9,30 @@ H2_ENUM_END(BitIndexConstant)
 
 VA(0x004c2ed4, 0x2e)
 extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        and eax, [esi]
-        jne bitSet
-        mov eax, 0
-        jmp done
-    bitSet:
-        mov eax, 1
-    done:
-    }
+    const BitByte* bytes = static_cast<const BitByte*>(bits);
+    const BitWord* word = reinterpret_cast<const BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    return (*word & mask) != 0 ? 1 : 0;
 }
 
 VA(0x004c2f02, 0x20)
 extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        or [esi], eax
-    }
+    BitByte* bytes = static_cast<BitByte*>(bits);
+    BitWord* word = reinterpret_cast<BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    *word |= mask;
 }
 
 VA(0x004c2f22, 0x22)
 extern "C" void __cdecl BitClear(void* bits, BitIndex bitIndex) {
-    __asm {
-        mov esi, bits
-        mov eax, bitIndex
-        mov ecx, eax
-        shr eax, INDEX_BYTE_SHIFT
-        and ecx, INDEX_WITHIN_BYTE_MASK
-        add esi, eax
-        mov eax, 1
-        shl eax, cl
-        not eax
-        and [esi], eax
-    }
+    BitByte* bytes = static_cast<BitByte*>(bits);
+    BitWord* word = reinterpret_cast<BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    *word &= ~mask;
 }

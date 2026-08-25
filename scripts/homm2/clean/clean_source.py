@@ -423,7 +423,7 @@ def _alloc(name: str):
 
 
 def _declspec(args: list[str]) -> str:
-    """Drop dllexport linkage metadata; keep `naked`, which the asm blitters need."""
+    """Drop dllexport linkage metadata; preserve ABI-relevant attributes."""
     return DROPPED if args[0].strip() == "dllexport" else "__declspec(%s)" % args[0]
 
 
@@ -1787,12 +1787,11 @@ def generate_classic(
 
 
 # Macros the clean tree keeps on purpose: the allocation wrappers survive in
-# their argument-free form, and `__declspec` still carries `naked`.
+# their argument-free form, along with source calling conventions.
 INTENTIONALLY_KEPT = {
     "H2_ALLOC",
     "H2_FREE",
     "H2_ASSERT",
-    "__declspec",
     "__cdecl",
     "__fastcall",
     "__stdcall",
