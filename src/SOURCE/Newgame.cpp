@@ -276,7 +276,7 @@ void game::GetMap(void) {
         FILE_REQUESTER_MAP_GAME,
         fileMask,
         gcMapPath,
-        fileMask
+        fileMask + 1
     );
     if (requesterResult == NULL)
         MemError();
