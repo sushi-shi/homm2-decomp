@@ -1,0 +1,8 @@
+    .weak "_AdrOpenDevice@8"
+    .set "_AdrOpenDevice@8", "__AdrOpenDevice@8"
+    .weak "__imp__AdrOpenDevice@8"
+    .set "__imp__AdrOpenDevice@8", "__imp___AdrOpenDevice@8"
+    .weak "_AdrOpenSampleSource@4"
+    .set "_AdrOpenSampleSource@4", "__AdrOpenSampleSource@4"
+    .weak "__imp__AdrOpenSampleSource@4"
+    .set "__imp__AdrOpenSampleSource@4", "__imp___AdrOpenSampleSource@4"

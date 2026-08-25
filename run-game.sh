@@ -108,7 +108,10 @@ reg_has_value() {
     wine reg query "$1" /v "$2" >/dev/null 2>&1
 }
 
-reg_add_string 'HKCU\Software\Wine\Drives' d: cdrom
+# GetDriveTypeA only reports DRIVE_CDROM when Wine's DOS-device mapping is
+# paired with the machine-wide drive-type entry.  This is the same measured
+# setup used by the Gruntz play prefix.
+reg_add_string 'HKLM\Software\Wine\Drives' 'D:' cdrom
 reg_add_string 'HKCU\Software\Wine\Direct3D' renderer "${HOMM2_WINE_RENDERER:-gl}"
 reg_add_string "$game_key" PathPL2 'G:\'
 reg_add_string "$game_key" 'HMM2POL CDDrive' 'D:'
