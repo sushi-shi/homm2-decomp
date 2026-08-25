@@ -110,28 +110,14 @@ After setting `HOMM2_DATA`, run:
 nix run
 ```
 
-Native SDL presentation can be varied independently without changing game
-timing. Scaling defaults to nearest-neighbour and vsync defaults to the SDL
-renderer policy. Set both variables explicitly for reproducible comparisons:
-
-```sh
-HOMM2_SCALE_MODE=nearest HOMM2_VSYNC=0 nix run
-HOMM2_SCALE_MODE=linear  HOMM2_VSYNC=0 nix run
-HOMM2_SCALE_MODE=nearest HOMM2_VSYNC=1 nix run
-HOMM2_SCALE_MODE=linear  HOMM2_VSYNC=1 nix run
-```
-
-`HOMM2_SCALE_MODE` accepts `nearest` or `linear`; `HOMM2_VSYNC` accepts `0`
-or `1`. `HOMM2_WINDOW_SIZE=<width>x<height>` overrides the initial window size.
-The selected presentation mode is printed at startup.
-
 The saved PoL configuration uses a 480x360 window and Gallop movement. This
 reproduces those two choices while retaining the native renderer:
 
 ```sh
-HOMM2_WINDOW_SIZE=480x360 HOMM2_WALK_SPEED=gallop HOMM2_VSYNC=1 nix run
+HOMM2_WINDOW_SIZE=480x360 HOMM2_WALK_SPEED=gallop nix run
 ```
 
+`HOMM2_WINDOW_SIZE=<width>x<height>` overrides the initial window size.
 `HOMM2_WALK_SPEED` accepts `walk`, `trot`, `canter`, `gallop`, `jump`, or the
 corresponding value from 0 through 4. Without an override the setting is read
 from `HEROES2.CFG` in the user data directory and can be changed normally in

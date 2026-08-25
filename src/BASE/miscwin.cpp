@@ -12,6 +12,7 @@
 typedef enum VesaBlitConstant {
     VESA_SCREEN_WIDTH    = 640,
     VESA_SCREEN_HEIGHT   = 480,
+    VESA_SCROLL_MARGIN   = 16,
     ENLARGE_EXTENT_LIMIT = VESA_SCREEN_WIDTH - 3,
     ENLARGE_PIXEL_GROWTH = 4,
     NET_BOX_TOP          = 411
@@ -68,12 +69,15 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
 
     // The Win32 paint path scrolls the map by selecting a shifted source
     // rectangle while keeping the adventure viewport at the same destination.
-    const i32 presentSourceX = giScrollX != 0 ? sourceX : destinationX;
-    const i32 presentSourceY = giScrollY != 0 ? sourceY : destinationY;
+    const i32 presentSourceX =
+        giScrollX != 0 ? giScrollX + VESA_SCROLL_MARGIN : destinationX;
+    const i32 presentSourceY =
+        giScrollY != 0 ? giScrollY + VESA_SCROLL_MARGIN : destinationY;
     platform::Video().Blit(
         {presentSourceX, presentSourceY, width, height},
         {destinationX, destinationY}
     );
+    platform::Video().Present();
 }
 
 i16 AutoInitSVGA(void) {

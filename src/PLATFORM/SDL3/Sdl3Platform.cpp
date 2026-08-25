@@ -75,117 +75,30 @@ public:
             SDL_SetWindowFullscreen(m_window, true);
         }
 
+        m_renderer = SDL_CreateRenderer(m_window, nullptr);
+        if (m_renderer == nullptr) {
+            std::fprintf(stderr, "[homm2] SDL_CreateRenderer: %s\n", SDL_GetError());
+            return false;
+        }
+
+        SDL_SetRenderLogicalPresentation(m_renderer, mode.width, mode.height,
+                                         SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+        m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_XRGB8888,
+                                      SDL_TEXTUREACCESS_STREAMING, mode.width, mode.height);
+        if (m_texture == nullptr) {
+            std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
+            return false;
+        }
+        SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
+
         m_indexed.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);
         m_presented.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);
         m_expanded.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);
-
-        const char* backendName = "renderer";
-        if (const char* configured = SDL_getenv("HOMM2_PRESENT_MODE");
-            configured != nullptr && *configured != '\0') {
-            if (SDL_strcasecmp(configured, "surface") == 0) {
-                m_surfacePresentation = true;
-                backendName = "surface";
-            } else if (SDL_strcasecmp(configured, "renderer") != 0) {
-                std::fprintf(
-                    stderr,
-                    "[homm2] HOMM2_PRESENT_MODE must be 'renderer' or 'surface'; using renderer\n"
-                );
-            }
-        }
-
-        m_scaleMode = SDL_SCALEMODE_NEAREST;
-        const char* textureScaleName = "nearest";
-        if (const char* configured = SDL_getenv("HOMM2_SCALE_MODE");
-            configured != nullptr && *configured != '\0') {
-            if (SDL_strcasecmp(configured, "linear") == 0) {
-                m_scaleMode = SDL_SCALEMODE_LINEAR;
-                textureScaleName = "linear";
-            } else if (SDL_strcasecmp(configured, "nearest") != 0) {
-                std::fprintf(
-                    stderr,
-                    "[homm2] HOMM2_SCALE_MODE must be 'nearest' or 'linear'; using nearest\n"
-                );
-            }
-        }
-
-        int vsyncInterval = -1;
-        const char* vsyncName = m_surfacePresentation ? "surface-default" : "renderer-default";
-        if (const char* configured = SDL_getenv("HOMM2_VSYNC");
-            configured != nullptr && *configured != '\0') {
-            if (std::strcmp(configured, "0") == 0) {
-                vsyncInterval = 0;
-                vsyncName = "off";
-            } else if (std::strcmp(configured, "1") == 0) {
-                vsyncInterval = 1;
-                vsyncName = "on";
-            } else {
-                std::fprintf(
-                    stderr,
-                    "[homm2] HOMM2_VSYNC must be '0' or '1'; using the backend default\n"
-                );
-            }
-        }
-
-        if (m_surfacePresentation) {
-            vsyncName = "compositor";
-            SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "0");
-            if (SDL_GetWindowSurface(m_window) == nullptr) {
-                std::fprintf(stderr, "[homm2] SDL_GetWindowSurface: %s\n", SDL_GetError());
-                return false;
-            }
-            m_frameSurface = SDL_CreateSurfaceFrom(
-                mode.width,
-                mode.height,
-                SDL_PIXELFORMAT_XRGB8888,
-                m_expanded.data(),
-                mode.width * static_cast<int>(sizeof(std::uint32_t))
-            );
-            if (m_frameSurface == nullptr) {
-                std::fprintf(stderr, "[homm2] SDL_CreateSurfaceFrom: %s\n", SDL_GetError());
-                return false;
-            }
-        } else {
-            m_renderer = SDL_CreateRenderer(m_window, nullptr);
-            if (m_renderer == nullptr) {
-                std::fprintf(stderr, "[homm2] SDL_CreateRenderer: %s\n", SDL_GetError());
-                return false;
-            }
-
-            SDL_SetRenderLogicalPresentation(m_renderer, mode.width, mode.height,
-                                             SDL_LOGICAL_PRESENTATION_LETTERBOX);
-
-            m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_XRGB8888,
-                                          SDL_TEXTUREACCESS_STREAMING, mode.width, mode.height);
-            if (m_texture == nullptr) {
-                std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
-                return false;
-            }
-            if (!SDL_SetTextureScaleMode(m_texture, m_scaleMode)) {
-                std::fprintf(stderr, "[homm2] SDL_SetTextureScaleMode: %s\n", SDL_GetError());
-            }
-            if (vsyncInterval >= 0 && !SDL_SetRenderVSync(m_renderer, vsyncInterval)) {
-                std::fprintf(stderr, "[homm2] SDL_SetRenderVSync: %s\n", SDL_GetError());
-                vsyncName = "unsupported";
-            }
-        }
-
-        std::fprintf(
-            stderr,
-            "[homm2] video: window=%dx%d, backend=%s, scaling=%s, vsync=%s\n",
-            windowWidth,
-            windowHeight,
-            backendName,
-            textureScaleName,
-            vsyncName
-        );
         return true;
     }
 
     void Close() override {
-        if (m_frameSurface != nullptr) {
-            SDL_DestroySurface(m_frameSurface);
-            m_frameSurface = nullptr;
-        }
         if (m_texture != nullptr) {
             SDL_DestroyTexture(m_texture);
             m_texture = nullptr;
@@ -243,7 +156,7 @@ public:
     }
 
     void Present() override {
-        if (m_renderer == nullptr && m_frameSurface == nullptr) {
+        if (m_renderer == nullptr) {
             return;
         }
 
@@ -255,42 +168,6 @@ public:
         }
 
         MaybeCapture();
-
-        if (m_surfacePresentation) {
-            SDL_Surface* windowSurface = SDL_GetWindowSurface(m_window);
-            if (windowSurface == nullptr) {
-                std::fprintf(stderr, "[homm2] SDL_GetWindowSurface: %s\n", SDL_GetError());
-                return;
-            }
-
-            int destinationWidth = windowSurface->w;
-            int destinationHeight = destinationWidth * m_size.height / m_size.width;
-            if (destinationHeight > windowSurface->h) {
-                destinationHeight = windowSurface->h;
-                destinationWidth = destinationHeight * m_size.width / m_size.height;
-            }
-            const SDL_Rect destinationRect = {
-                (windowSurface->w - destinationWidth) / 2,
-                (windowSurface->h - destinationHeight) / 2,
-                destinationWidth,
-                destinationHeight,
-            };
-            SDL_FillSurfaceRect(windowSurface, nullptr, 0);
-            if (!SDL_BlitSurfaceScaled(
-                    m_frameSurface,
-                    nullptr,
-                    windowSurface,
-                    &destinationRect,
-                    m_scaleMode
-                )) {
-                std::fprintf(stderr, "[homm2] SDL_BlitSurfaceScaled: %s\n", SDL_GetError());
-                return;
-            }
-            if (!SDL_UpdateWindowSurface(m_window)) {
-                std::fprintf(stderr, "[homm2] SDL_UpdateWindowSurface: %s\n", SDL_GetError());
-            }
-            return;
-        }
 
         SDL_UpdateTexture(m_texture, nullptr, m_expanded.data(),
                           m_size.width * static_cast<int>(sizeof(std::uint32_t)));
@@ -344,39 +221,15 @@ public:
     SDL_Window* window() const { return m_window; }
     SDL_Renderer* renderer() const { return m_renderer; }
 
-    void CoordinatesFromWindow(float x, float y, float* logicalX, float* logicalY) const {
-        if (m_renderer != nullptr) {
-            SDL_RenderCoordinatesFromWindow(m_renderer, x, y, logicalX, logicalY);
-            return;
-        }
-
-        int windowWidth;
-        int windowHeight;
-        SDL_GetWindowSize(m_window, &windowWidth, &windowHeight);
-        int destinationWidth = windowWidth;
-        int destinationHeight = destinationWidth * m_size.height / m_size.width;
-        if (destinationHeight > windowHeight) {
-            destinationHeight = windowHeight;
-            destinationWidth = destinationHeight * m_size.width / m_size.height;
-        }
-        *logicalX = (x - static_cast<float>((windowWidth - destinationWidth) / 2))
-                  * m_size.width / destinationWidth;
-        *logicalY = (y - static_cast<float>((windowHeight - destinationHeight) / 2))
-                  * m_size.height / destinationHeight;
-    }
-
 private:
     SDL_Window* m_window = nullptr;
     SDL_Renderer* m_renderer = nullptr;
     SDL_Texture* m_texture = nullptr;
-    SDL_Surface* m_frameSurface = nullptr;
     Size m_size;
     std::vector<std::uint8_t> m_indexed;
     std::vector<std::uint8_t> m_presented;
     std::vector<std::uint32_t> m_expanded;
     std::uint32_t m_palette[256] = {};
-    SDL_ScaleMode m_scaleMode = SDL_SCALEMODE_NEAREST;
-    bool m_surfacePresentation = false;
     int m_frame = 0;
 };
 
@@ -853,7 +706,9 @@ private:
     Point ToFramebuffer(float x, float y) const {
         float logicalX = x;
         float logicalY = y;
-        m_video.CoordinatesFromWindow(x, y, &logicalX, &logicalY);
+        if (m_video.renderer() != nullptr) {
+            SDL_RenderCoordinatesFromWindow(m_video.renderer(), x, y, &logicalX, &logicalY);
+        }
 
         const Size size = m_video.Resolution();
         const int column = static_cast<int>(std::floor(logicalX));

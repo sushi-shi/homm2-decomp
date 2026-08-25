@@ -690,7 +690,6 @@ void BlitBitmapToScreenNoMouseCheck(
     i32 destinationY
 ) {
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
-    platform::Video().Present();
 }
 
 void BlitBitmapToScreen(
@@ -704,7 +703,6 @@ void BlitBitmapToScreen(
 ) {
     if (gbColorMice == 0) {
         BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
-        platform::Video().Present();
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
@@ -739,7 +737,6 @@ void BlitBitmapToScreen(
         }
         gpMouseManager->RestoreUnderlying();
     }
-    platform::Video().Present();
 }
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
