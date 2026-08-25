@@ -22,7 +22,8 @@ struct aggEntry {
 };
 
 typedef enum ResourceManagerLayoutConstant {
-    RESOURCE_MANAGER_AGGREGATE_LIMIT   = 4,
+    // Two locale overlays plus Ironfist, expansion, and base archives.
+    RESOURCE_MANAGER_AGGREGATE_LIMIT   = 5,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;

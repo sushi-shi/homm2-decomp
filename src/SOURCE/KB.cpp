@@ -6,6 +6,12 @@
 #include <SOURCE/ARMY.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
+#include <IRONFIST/campaigns.h>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/hooks.h>
+#include <IRONFIST/heroes.h>
+#include <IRONFIST/prefs.h>
+#include <IRONFIST/townconsts.h>
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
@@ -498,6 +504,7 @@ i32 oldmain(void) {
     if (bKBDone)
         return 0;
     bKBDone = 1;
+    Ironfist_Startup();
     LogStr("OM1");
     LogStr("OM2");
     command_c = -1;
@@ -927,6 +934,7 @@ i32 oldmain(void) {
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
                     ShutDown(localization::Tr("system.manager.add_failed"));
+                Ironfist_AdvManagerReady();
                 if (command_c == OLD_MAIN_NEW_GAME) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
@@ -1022,7 +1030,9 @@ i32 oldmain(void) {
                             xCampaign.Days(),
                             0,
                             HIGH_SCORE_EXPANSION_CAMPAIGN,
-                            xHSCampaignNames[xCampaign.CampaignID()]
+                            const_cast<char*>(
+                                ironfistCampaignNames[H2EnumIndex(xCampaign.CampaignID())].c_str()
+                            )
                         );
                     }
                     if (campaignResult) {
@@ -1496,7 +1506,19 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
 
 char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
-    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
+    if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD) {
+        sprintf(
+            buf,
+            localization::Tr("town.cyborg.cybernetics_lab.description"),
+            GetBuildingName(race, building)
+        );
+    } else if (IsWellDisabled() && building == BUILDING_SLOT_WELL) {
+        if (race == FACTION_NECROMANCER) {
+            sprintf(buf, "%s", localization::Tr("town.poisoned_well.description"));
+        } else {
+            sprintf(buf, "%s", localization::Tr("town.well.description"));
+        }
+    } else if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(
@@ -1535,6 +1557,12 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
 char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
+    if (race == FACTION_CYBORG && building == BUILDING_SLOT_WELL)
+        return const_cast<char*>(localization::Tr("town.cyborg.energy_pump.name"));
+    if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD)
+        return const_cast<char*>(localization::Tr("town.cyborg.cybernetics_lab.name"));
+    if (IsWellDisabled() && race == FACTION_NECROMANCER && building == BUILDING_SLOT_WELL)
+        return const_cast<char*>(localization::Tr("town.poisoned_well.name"));
     if (building == BUILDING_SLOT_WELL_EXTRA)
         return gWellExtraNames[H2EnumIndex(race)];
     else if (building == BUILDING_SLOT_SPECIAL)
@@ -1542,7 +1570,9 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
     else if (building < BUILDING_SLOT_DWELLING_FIRST)
         return gNeutralBuildingNames[H2EnumIndex(building)];
     else
-        return gDwellingNames[H2EnumIndex(race)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
+        return GetDwellingName(
+            H2EnumIndex(race), H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)
+        );
 }
 
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel) {
@@ -1583,40 +1613,15 @@ char* GetMonsterPluralName(CreatureType monster) {
 }
 
 void GetMonsterCost(CreatureType monster, i32* const cost) {
-    i32 idx;
-    for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
-        cost[idx] = 0;
-    cost[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[H2EnumIndex(monster)].cost;
-    switch (monster) {
-        case CREATURE_GENIE:
-            cost[H2EnumIndex(RES_GEMS)] = MONSTER_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_PHOENIX:
-            cost[H2EnumIndex(RES_MERCURY)] = MONSTER_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_CYCLOPS:
-            cost[H2EnumIndex(RES_CRYSTAL)] = MONSTER_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_GREEN_DRAGON:
-        case CREATURE_RED_DRAGON:
-            cost[H2EnumIndex(RES_SULFUR)] = MONSTER_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_BLACK_DRAGON:
-            cost[H2EnumIndex(RES_SULFUR)] = MONSTER_UPGRADED_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_GIANT:
-            cost[H2EnumIndex(RES_GEMS)] = MONSTER_RARE_RESOURCE_COST;
-            break;
-        case CREATURE_TITAN:
-            cost[H2EnumIndex(RES_GEMS)] = MONSTER_UPGRADED_RARE_RESOURCE_COST;
-            break;
-    }
+    Ironfist_GetMonsterCost(H2EnumIndex(monster), cost);
 }
 
 i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqBits;
     i32 curMask;
     if (H2BitTest(gpGame->m_knownTowns, t->m_id))
+        return 0;
+    if (Ironfist_BuildingDisallowed(t, H2EnumIndex(building)))
         return 0;
     if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE)))
         return 0;
@@ -1687,19 +1692,23 @@ i32 CanBuy(town* t, BuildingSlotType type) {
 }
 
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
+    const i32 raceIndex = H2EnumIndex(race);
+    if (raceIndex < 0 || raceIndex >= KB_FACTION_TABLE_CAPACITY)
+        return 0;
+
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
         return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
         if (building > BUILDING_SLOT_NEUTRAL_LAST)
             return 0;
-        else if (building == BUILDING_SLOT_MAGE_GUILD)
+        else if (building == BUILDING_SLOT_MAGE_GUILD && level >= 0 && level < KB_MAGE_GUILD_LEVEL_COUNT)
             return gMageBaseResourceValues[level];
         else if (building == BUILDING_SLOT_SPECIAL)
-            return gSpecialBuildingBaseResourceValues[H2EnumIndex(race)];
+            return gSpecialBuildingBaseResourceValues[raceIndex];
         else
             return gNeutralBaseResourceValues[H2EnumIndex(building)];
     } else {
-        return gDwellingBaseResourceValues[H2EnumIndex(race)]
+        return gDwellingBaseResourceValues[raceIndex]
                                           [H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
     }
 }
@@ -1928,8 +1937,13 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
-                                cSecSkillDesc[resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
-                                             [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
+                                resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+                                        == CYBERNETICS_SKILL_ROW
+                                    ? cyberneticsDesc
+                                          [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                                    : cSecSkillDesc
+                                          [resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                                          [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -2629,6 +2643,7 @@ void CheckEndGame(
     }
 
     bInCheckEndGame = 0;
+    Ironfist_CheckEndGame();
 }
 
 void QuickViewWait(void) {
@@ -2803,6 +2818,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
 
 showDialog:
+    Ironfist_AppendMoraleInfo(h);
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
 
@@ -2853,7 +2869,8 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_BATTLE_GARB)]);
-    if (modifierStart == static_cast<i32>(strlen(gText)))
+    Ironfist_AppendLuckInfo(h);
+    if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_NONE)]);
 
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -3385,6 +3402,7 @@ void ShutDown(const char* msg) {
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
+    Ironfist_Shutdown();
     CleanUpWinGraphics();
     CleanUpMenus();
     PrintMemoryLeaks();
@@ -3866,6 +3884,10 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     );
                 currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
             }
+            break;
+
+        case APP_MENU_CHEAT_AUTO_WIN:
+            gbAutoWinBattles = !gbAutoWinBattles;
             break;
 
         case APP_MENU_CHEAT_RESOURCES:
@@ -4672,7 +4694,7 @@ i32 GetManaCost(SpellType spell, hero* h) {
                 || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL))
             c >>= 1;
     }
-    return c;
+    return Ironfist_CalcManaCost(h, H2EnumIndex(spell), c);
 }
 
 void SetWinText(heroWindow* j, i32 id) {
@@ -5078,8 +5100,12 @@ void NormalDialog(
             sprintf(
                 resourceText_p[resourceSlot],
                 "%s",
-                gSecondarySkills
-                    [resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+                        == CYBERNETICS_SKILL_ROW
+                    ? localization::Tr("hero.skill.cybernetics")
+                    : gSecondarySkills
+                          [resourceValue_c[resourceSlot]
+                           / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
             strcpy(iconFile_a, "secskill.icn");
             resourceFrame_n = resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
@@ -6087,7 +6113,7 @@ i32 giScreenScroll = 1;
 i32 giMenuCommand = -1;
 b32 gbSendMouseMoveMessages = false;
 b32 gbColorMice = true;
-u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
+u32l gTownEligibleBuildMask[KB_FACTION_TABLE_CAPACITY] = {
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
     TOWN_ELIGIBLE_BUILD_SORCERESS_MASK,
@@ -6296,7 +6322,14 @@ char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "blind.icn",
     "curse.icn",
     "stonskin.icn",
-    "stelskin.icn"
+    "stelskin.icn",
+    "plasmblast.icn",
+    "shdwmark.icn",
+    "mrksmprc.icn",
+    "plsmcone.icn",
+    "forcshld.icn",
+    "firebomb.icn",
+    "implgrnd.icn"
 };
 i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55};
@@ -6351,7 +6384,7 @@ i32 gSSValues[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] 
     {445, 950, 1500}
 };
 H2EnumStorage<ArtifactLevelMask, u8>
-gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
+    gArtifactLevel[KB_ARTIFACT_TABLE_CAPACITY] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x04, 0x04, 0x02, 0x08, 0x08, 0x08,
     0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x02, 0x02,
     0x02, 0x02, 0x04, 0x02, 0x02, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x04, 0x08, 0x04, 0x04,
@@ -6373,7 +6406,7 @@ i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
 i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
 i32 giDebugLevel = 0;
 i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
-tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)] = {
+tag_monsterInfo gMonsterDatabase[KB_CREATURE_TABLE_CAPACITY] = {
     {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
     {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
     {{200, 463}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
@@ -6790,7 +6823,7 @@ i16 giScoreCampaignMon[H2EnumIndex(CREATURE_COUNT)][H2EnumIndex(MONSTER_SCORE_FI
     {480, 60},  {460, 10},  {440, 19},  {420, 45},  {400, 28},  {380, 56},  {360, 35},  {340, 36},
     {320, 46},  {300, 37}
 };
-i8 townTheme[H2EnumIndex(TOWN_MUSIC_TABLE_SIZE)] = {
+i8 townTheme[KB_FACTION_TABLE_CAPACITY] = {
     H2EnumIndex(TOWN_MUSIC_KNIGHT),
     H2EnumIndex(TOWN_MUSIC_BARBARIAN),
     H2EnumIndex(TOWN_MUSIC_WARLOCK),
@@ -6798,15 +6831,29 @@ i8 townTheme[H2EnumIndex(TOWN_MUSIC_TABLE_SIZE)] = {
     H2EnumIndex(TOWN_MUSIC_SORCERESS),
     H2EnumIndex(TOWN_MUSIC_NECROMANCER),
     H2EnumIndex(TOWN_MUSIC_NONE),
-    H2EnumIndex(TOWN_MUSIC_NONE)
+    H2EnumIndex(TOWN_MUSIC_NONE),
+    H2EnumIndex(TOWN_MUSIC_NONE),
+    H2EnumIndex(TOWN_MUSIC_NONE),
+    H2EnumIndex(TOWN_MUSIC_NONE),
+    H2EnumIndex(TOWN_MUSIC_NONE),
+    H2EnumIndex(TOWN_MUSIC_CYBORG)
 };
-i8 gHeroSkillBonus[H2EnumIndex(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
-    {{35, 45, 10, 10}, {25, 25, 25, 25}},
-    {{55, 35, 5, 5}, {25, 25, 25, 25}},
-    {{10, 10, 30, 50}, {20, 20, 30, 30}},
-    {{10, 10, 50, 30}, {20, 20, 30, 30}},
-    {{10, 10, 40, 40}, {20, 20, 30, 30}},
-    {{15, 15, 35, 35}, {25, 25, 25, 25}}
+i8
+    gHeroSkillBonus[KB_FACTION_TABLE_CAPACITY][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+        {{35, 45, 10, 10}, {25, 25, 25, 25}},
+        {{55, 35, 5, 5}, {25, 25, 25, 25}},
+        {{10, 10, 30, 50}, {20, 20, 30, 30}},
+        {{10, 10, 50, 30}, {20, 20, 30, 30}},
+        {{10, 10, 40, 40}, {20, 20, 30, 30}},
+        {{15, 15, 35, 35}, {25, 25, 25, 25}},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        // Cyborg heroes follow the Necromancer skill chances upstream.
+        {{15, 15, 35, 35}, {25, 25, 25, 25}}
 };
 b32 gbLoadingMonoIcon = false;
 i32 giMonoIconSkip = -1;
@@ -6899,78 +6946,23 @@ platform::MenuHandle hmnuDflt = nullptr;
 platform::MenuHandle hmnuCmbt = nullptr;
 platform::MenuHandle hmnuAdv = nullptr;
 platform::MenuHandle hmnuTown = nullptr;
-char* cMonFilename[H2EnumIndex(CREATURE_COUNT)] = {
-    "peasant.icn",
-    "archer.icn",
-    "archer2.icn",
-    "pikeman.icn",
-    "pikeman2.icn",
-    "swordsmn.icn",
-    "swordsm2.icn",
-    "cavalryr.icn",
-    "cavalryb.icn",
-    "paladin.icn",
-    "paladin2.icn",
-    "goblin.icn",
-    "orc.icn",
-    "orc2.icn",
-    "wolf.icn",
-    "ogre.icn",
-    "ogre2.icn",
-    "troll.icn",
-    "troll2.icn",
-    "cyclops.icn",
-    "sprite.icn",
-    "dwarf.icn",
-    "dwarf2.icn",
-    "elf.icn",
-    "elf2.icn",
-    "druid.icn",
-    "druid2.icn",
-    "unicorn.icn",
-    "phoenix.icn",
-    "centaur.icn",
-    "gargoyle.icn",
-    "griffin.icn",
-    "minotaur.icn",
-    "minotau2.icn",
-    "hydra.icn",
-    "draggree.icn",
-    "dragred.icn",
-    "dragblak.icn",
-    "halfling.icn",
-    "boar.icn",
-    "golem.icn",
-    "golem2.icn",
-    "roc.icn",
-    "mage1.icn",
-    "mage2.icn",
-    "titanblu.icn",
-    "titanbla.icn",
-    "skeleton.icn",
-    "zombie.icn",
-    "zombie2.icn",
-    "mummyw.icn",
-    "mummy2.icn",
-    "vampire.icn",
-    "vampire2.icn",
-    "lich.icn",
-    "lich2.icn",
-    "dragbone.icn",
-    "rogue.icn",
-    "nomad.icn",
-    "ghost.icn",
-    "genie.icn",
-    "medusa.icn",
-    "eelem.icn",
-    "aelem.icn",
-    "felem.icn",
-    "welem.icn"
+char* cMonFilename[KB_CREATURE_TABLE_CAPACITY] = {
+    "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
+    "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",
+    "orc.icn",      "orc2.icn",     "wolf.icn",     "ogre.icn",     "ogre2.icn",    "troll.icn",
+    "troll2.icn",   "cyclops.icn",  "sprite.icn",   "dwarf.icn",    "dwarf2.icn",   "elf.icn",
+    "elf2.icn",     "druid.icn",    "druid2.icn",   "unicorn.icn",  "phoenix.icn",  "centaur.icn",
+    "gargoyle.icn", "griffin.icn",  "minotaur.icn", "minotau2.icn", "hydra.icn",    "draggree.icn",
+    "dragred.icn",  "dragblak.icn", "halfling.icn", "boar.icn",     "golem.icn",    "golem2.icn",
+    "roc.icn",      "mage1.icn",    "mage2.icn",    "titanblu.icn", "titanbla.icn", "skeleton.icn",
+    "zombie.icn",   "zombie2.icn",  "mummyw.icn",   "mummy2.icn",   "vampire.icn",  "vampire2.icn",
+    "lich.icn",     "lich2.icn",    "dragbone.icn", "rogue.icn",    "nomad.icn",    "ghost.icn",
+    "genie.icn",    "medusa.icn",   "eelem.icn",    "aelem.icn",    "felem.icn",    "welem.icn"
 };
 b32 gbProcessingCombatAction = false;
 RemoteNetworkProtocol iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
 i32 iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
-SSpellInfo gsSpellInfo[H2EnumIndex(SPELL_COUNT)] = {
+SSpellInfo gsSpellInfo[KB_SPELL_TABLE_CAPACITY] = {
     {"fireball",
      3,
      8,
@@ -7336,75 +7328,78 @@ SSpellInfo gsSpellInfo[H2EnumIndex(SPELL_COUNT)] = {
     {"", 4, 52, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 53, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
+    {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
+    // Ironfist spells 65-72.
+    {"", 1, 55, 0, 700, 20, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
+    {"shdwmark",
+     1,
+     66,
+     33,
+     0,
+     3,
+     {255, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+    {"mrksmprc",
+     1,
+     67,
+     34,
+     200,
+     3,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+    {"plsmcone",
+     2,
+     68,
+     35,
+     50,
+     3,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"forcshld",
+     2,
+     69,
+     36,
+     500,
+     7,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"forcshld",
+     3,
+     70,
+     36,
+     500,
+     7,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"firebomb",
+     4,
+     71,
+     37,
+     500,
+     9,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"implgrnd",
+     5,
+     72,
+     38,
+     500,
+     9,
+     {10, 10, 10, 10, 10, 10},
+     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT}
 };
-char* cArmyFrameFileNames[H2EnumIndex(CREATURE_COUNT)] = {
-    "peas_frm.bin",
-    "archrfrm.bin",
-    "archrfrm.bin",
-    "pikmnfrm.bin",
-    "pikmnfrm.bin",
-    "swrdsfrm.bin",
-    "swrdsfrm.bin",
-    "cvlryfrm.bin",
-    "cvlr2frm.bin",
-    "paladfrm.bin",
-    "paladfrm.bin",
-    "goblnfrm.bin",
-    "orc__frm.bin",
-    "orc__frm.bin",
-    "wolf_frm.bin",
-    "ogre_frm.bin",
-    "ogre_frm.bin",
-    "trollfrm.bin",
-    "trollfrm.bin",
-    "cyclofrm.bin",
-    "spritfrm.bin",
-    "dwarffrm.bin",
-    "dwarffrm.bin",
-    "elf__frm.bin",
-    "elf__frm.bin",
-    "druidfrm.bin",
-    "druidfrm.bin",
-    "unicofrm.bin",
-    "phoenfrm.bin",
-    "centrfrm.bin",
-    "garglfrm.bin",
-    "grifffrm.bin",
-    "minotfrm.bin",
-    "minotfrm.bin",
-    "hydrafrm.bin",
-    "draggfrm.bin",
-    "dragrfrm.bin",
-    "dragbfrm.bin",
-    "halflfrm.bin",
-    "boar_frm.bin",
-    "golemfrm.bin",
-    "golemfrm.bin",
-    "roc__frm.bin",
-    "mage1frm.bin",
-    "mage1frm.bin",
-    "titanfrm.bin",
-    "tita2frm.bin",
-    "skel_frm.bin",
-    "zomb_frm.bin",
-    "zomb_frm.bin",
-    "mummyfrm.bin",
-    "mummyfrm.bin",
-    "vampifrm.bin",
-    "vampifrm.bin",
-    "lich_frm.bin",
-    "lich_frm.bin",
-    "drabnfrm.bin",
-    "roguefrm.bin",
-    "nomadfrm.bin",
-    "ghostfrm.bin",
-    "geniefrm.bin",
-    "medusfrm.bin",
-    "felemfrm.bin",
-    "felemfrm.bin",
-    "felemfrm.bin",
-    "felemfrm.bin"
+char* cArmyFrameFileNames[KB_CREATURE_TABLE_CAPACITY] = {
+    "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin", "pikmnfrm.bin", "swrdsfrm.bin",
+    "swrdsfrm.bin", "cvlryfrm.bin", "cvlr2frm.bin", "paladfrm.bin", "paladfrm.bin", "goblnfrm.bin",
+    "orc__frm.bin", "orc__frm.bin", "wolf_frm.bin", "ogre_frm.bin", "ogre_frm.bin", "trollfrm.bin",
+    "trollfrm.bin", "cyclofrm.bin", "spritfrm.bin", "dwarffrm.bin", "dwarffrm.bin", "elf__frm.bin",
+    "elf__frm.bin", "druidfrm.bin", "druidfrm.bin", "unicofrm.bin", "phoenfrm.bin", "centrfrm.bin",
+    "garglfrm.bin", "grifffrm.bin", "minotfrm.bin", "minotfrm.bin", "hydrafrm.bin", "draggfrm.bin",
+    "dragrfrm.bin", "dragbfrm.bin", "halflfrm.bin", "boar_frm.bin", "golemfrm.bin", "golemfrm.bin",
+    "roc__frm.bin", "mage1frm.bin", "mage1frm.bin", "titanfrm.bin", "tita2frm.bin", "skel_frm.bin",
+    "zomb_frm.bin", "zomb_frm.bin", "mummyfrm.bin", "mummyfrm.bin", "vampifrm.bin", "vampifrm.bin",
+    "lich_frm.bin", "lich_frm.bin", "drabnfrm.bin", "roguefrm.bin", "nomadfrm.bin", "ghostfrm.bin",
+    "geniefrm.bin", "medusfrm.bin", "felemfrm.bin", "felemfrm.bin", "felemfrm.bin", "felemfrm.bin"
 };
 u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x06,
@@ -7442,10 +7437,13 @@ u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x11,
     0x00
 };
-u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
-                                            10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
-                                            16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
-SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
+u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10,
+                                                             10, 8,  8,  10, 10, 10, 10, 15,
+                                                             10, 10, 10, 10, 10, 16, 16, 14,
+                                                             19, 22, 10, 17, 10, 12, 11, 16,
+                                                             7,  8,  8,  8,  8,  8,  8};
+SpellEffectDisplayType
+giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
 char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
                                                      "CBKGWATR.icn",
@@ -7491,12 +7489,20 @@ float gfSSNavigationMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.33f, 1.6
 float gfSSArcheryMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.25f, 1.5f};
 float gfSSAIArcheryMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.04f, 1.1f, 1.2f};
 i8 giVisRange[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)] = {4, 5, 6, 7};
-u8 gStartingHeroStats[H2EnumIndex(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
+u8 gStartingHeroStats[KB_FACTION_TABLE_CAPACITY][HERO_STARTING_STAT_COUNT] = {
     {2, 2, 1, 1, 1},
     {3, 1, 1, 1, 1},
     {0, 0, 2, 3, 1},
     {0, 0, 3, 2, 1},
     {0, 1, 2, 2, 1},
+    {1, 0, 2, 2, 1},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    // Cyborg heroes start with the Necromancer statline upstream.
     {1, 0, 2, 2, 1}
 };
 i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][H2EnumIndex(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
@@ -7514,15 +7520,10 @@ u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1
+    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-char* gTownPrefixNames[H2EnumIndex(FACTION_COUNT)] = {
-    "twnk",
-    "twnb",
-    "twns",
-    "twnw",
-    "twnz",
-    "twnn"};
+char* gTownPrefixNames[KB_FACTION_TABLE_CAPACITY] =
+    {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
 char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage",
     "thie",
@@ -7558,7 +7559,7 @@ char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "ext3"
 };
 H2EnumStorage<CreatureType, i8>
-gDwellingType[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+gDwellingType[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
     {H2EnumIndex(CREATURE_PEASANT),
      H2EnumIndex(CREATURE_ARCHER),
      H2EnumIndex(CREATURE_PIKEMAN),
@@ -7640,7 +7641,7 @@ i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = 
     {5, 8, 5, 8, 8, 8, 1000},
     {5, 10, 5, 10, 10, 10, 1000}
 };
-i32 gSpecialBuildingCosts[H2EnumIndex(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gSpecialBuildingCosts[KB_FACTION_TABLE_CAPACITY][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 0, 15, 0, 0, 0, 1500},
     {10, 0, 10, 0, 0, 0, 2000},
     {0, 0, 0, 0, 10, 0, 1500},
@@ -7670,90 +7671,102 @@ i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 1
 i32 gNeutralBaseResourceValues[H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0
 };
-i32 gSpecialBuildingBaseResourceValues[H2EnumIndex(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
-i32 gDwellingBaseResourceValues[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+i32 gSpecialBuildingBaseResourceValues[KB_FACTION_TABLE_CAPACITY] = {
+    1500, 1000, 1000, 4500, 3500, 1000, 0, 0, 0, 0, 0, 0, 1500
+};
+i32 gDwellingBaseResourceValues[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
     {1956, 2607, 3869, 7510, 16002, 90000, 0, 0, 8500, 0, 120000, 180000},
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
-    {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
+    {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    // The Cyborg building costs currently mirror Knight costs, so their AI
+    // resource values use the same valuation model as those costs.
+    {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0}
 };
-i32 gDwellingCosts[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
-    {{0, 0, 0, 0, 0, 0, 200},
-     {0, 0, 0, 0, 0, 0, 1000},
-     {0, 0, 5, 0, 0, 0, 1000},
-     {10, 0, 10, 0, 0, 0, 2000},
-     {20, 0, 0, 0, 0, 0, 3000},
-     {20, 0, 0, 0, 20, 0, 5000},
-     {5, 0, 0, 0, 0, 0, 1500},
-     {0, 0, 5, 0, 0, 0, 1500},
-     {5, 0, 5, 0, 0, 0, 2000},
-     {10, 0, 0, 0, 0, 0, 3000},
-     {10, 0, 0, 0, 10, 0, 5000},
-     {0, 0, 0, 0, 0, 0, 0}},
-    {{0, 0, 0, 0, 0, 0, 300},
-     {5, 0, 0, 0, 0, 0, 800},
-     {0, 0, 0, 0, 0, 0, 1000},
-     {10, 0, 10, 0, 0, 0, 2000},
-     {0, 0, 20, 0, 0, 0, 4000},
-     {0, 0, 20, 0, 20, 0, 6000},
-     {5, 0, 0, 0, 0, 0, 1200},
-     {0, 0, 0, 0, 0, 0, 0},
-     {5, 0, 5, 0, 0, 0, 3000},
-     {0, 0, 10, 0, 0, 0, 2000},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0}},
-    {{5, 0, 0, 0, 0, 0, 500},
-     {5, 0, 0, 0, 0, 0, 1000},
-     {0, 0, 0, 0, 0, 0, 1500},
-     {0, 0, 10, 0, 0, 0, 2500},
-     {10, 0, 0, 0, 0, 10, 3000},
-     {0, 20, 30, 0, 0, 0, 10000},
-     {5, 0, 0, 0, 0, 0, 1500},
-     {5, 0, 0, 0, 0, 0, 1500},
-     {0, 5, 0, 0, 0, 0, 1500},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0}},
-    {{0, 0, 0, 0, 0, 0, 500},
-     {0, 0, 10, 0, 0, 0, 1000},
-     {0, 0, 0, 0, 0, 0, 2000},
-     {0, 0, 0, 0, 0, 10, 3000},
-     {0, 0, 0, 10, 0, 0, 4000},
-     {0, 0, 30, 20, 0, 0, 15000},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 5, 2000},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 5, 10, 0, 0, 5000},
-     {0, 0, 5, 10, 0, 0, 5000}},
-    {{0, 0, 0, 0, 0, 0, 400},
-     {0, 0, 0, 0, 0, 0, 800},
-     {5, 0, 5, 0, 0, 0, 1500},
-     {5, 0, 0, 0, 0, 0, 3000},
-     {5, 5, 5, 5, 5, 5, 3500},
-     {5, 0, 5, 0, 0, 20, 12500},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 5, 0, 0, 0, 0, 1500},
-     {0, 0, 0, 0, 0, 0, 0},
-     {5, 0, 5, 0, 0, 0, 4000},
-     {5, 0, 5, 0, 0, 20, 12500},
-     {0, 0, 0, 0, 0, 0, 0}},
-    {{0, 0, 0, 0, 0, 0, 400},
-     {0, 0, 0, 0, 0, 0, 1000},
-     {0, 0, 10, 0, 0, 0, 1500},
-     {10, 0, 0, 0, 0, 0, 3000},
-     {10, 0, 0, 10, 0, 0, 4000},
-     {10, 5, 10, 5, 5, 5, 10000},
-     {0, 0, 0, 0, 0, 0, 1000},
-     {0, 0, 5, 0, 0, 0, 1500},
-     {5, 0, 0, 0, 10, 10, 4000},
-     {0, 0, 5, 0, 5, 0, 3000},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0}}
+i32
+    gDwellingCosts[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+        {{0, 0, 0, 0, 0, 0, 200},
+         {0, 0, 0, 0, 0, 0, 1000},
+         {0, 0, 5, 0, 0, 0, 1000},
+         {10, 0, 10, 0, 0, 0, 2000},
+         {20, 0, 0, 0, 0, 0, 3000},
+         {20, 0, 0, 0, 20, 0, 5000},
+         {5, 0, 0, 0, 0, 0, 1500},
+         {0, 0, 5, 0, 0, 0, 1500},
+         {5, 0, 5, 0, 0, 0, 2000},
+         {10, 0, 0, 0, 0, 0, 3000},
+         {10, 0, 0, 0, 10, 0, 5000},
+         {0, 0, 0, 0, 0, 0, 0}},
+        {{0, 0, 0, 0, 0, 0, 300},
+         {5, 0, 0, 0, 0, 0, 800},
+         {0, 0, 0, 0, 0, 0, 1000},
+         {10, 0, 10, 0, 0, 0, 2000},
+         {0, 0, 20, 0, 0, 0, 4000},
+         {0, 0, 20, 0, 20, 0, 6000},
+         {5, 0, 0, 0, 0, 0, 1200},
+         {0, 0, 0, 0, 0, 0, 0},
+         {5, 0, 5, 0, 0, 0, 3000},
+         {0, 0, 10, 0, 0, 0, 2000},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0}},
+        {{5, 0, 0, 0, 0, 0, 500},
+         {5, 0, 0, 0, 0, 0, 1000},
+         {0, 0, 0, 0, 0, 0, 1500},
+         {0, 0, 10, 0, 0, 0, 2500},
+         {10, 0, 0, 0, 0, 10, 3000},
+         {0, 20, 30, 0, 0, 0, 10000},
+         {5, 0, 0, 0, 0, 0, 1500},
+         {5, 0, 0, 0, 0, 0, 1500},
+         {0, 5, 0, 0, 0, 0, 1500},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0}},
+        {{0, 0, 0, 0, 0, 0, 500},
+         {0, 0, 10, 0, 0, 0, 1000},
+         {0, 0, 0, 0, 0, 0, 2000},
+         {0, 0, 0, 0, 0, 10, 3000},
+         {0, 0, 0, 10, 0, 0, 4000},
+         {0, 0, 30, 20, 0, 0, 15000},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 5, 2000},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 5, 10, 0, 0, 5000},
+         {0, 0, 5, 10, 0, 0, 5000}},
+        {{0, 0, 0, 0, 0, 0, 400},
+         {0, 0, 0, 0, 0, 0, 800},
+         {5, 0, 5, 0, 0, 0, 1500},
+         {5, 0, 0, 0, 0, 0, 3000},
+         {5, 5, 5, 5, 5, 5, 3500},
+         {5, 0, 5, 0, 0, 20, 12500},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 5, 0, 0, 0, 0, 1500},
+         {0, 0, 0, 0, 0, 0, 0},
+         {5, 0, 5, 0, 0, 0, 4000},
+         {5, 0, 5, 0, 0, 20, 12500},
+         {0, 0, 0, 0, 0, 0, 0}},
+        {{0, 0, 0, 0, 0, 0, 400},
+         {0, 0, 0, 0, 0, 0, 1000},
+         {0, 0, 10, 0, 0, 0, 1500},
+         {10, 0, 0, 0, 0, 0, 3000},
+         {10, 0, 0, 10, 0, 0, 4000},
+         {10, 5, 10, 5, 5, 5, 10000},
+         {0, 0, 0, 0, 0, 0, 1000},
+         {0, 0, 5, 0, 0, 0, 1500},
+         {5, 0, 0, 0, 10, 10, 4000},
+         {0, 0, 5, 0, 5, 0, 3000},
+         {0, 0, 0, 0, 0, 0, 0},
+         {0, 0, 0, 0, 0, 0, 0}}
 };
-u32l gHierarchyMask[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+u32l gHierarchyMask[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -7825,36 +7838,53 @@ u32l gHierarchyMask[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      0x00400000UL,
      0x00800000UL,
      0xffffffffUL,
+     0xffffffffUL},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    // Cyborg dwelling prerequisites, following the Knight chain upstream.
+    {0x00000000UL,
+     0x00080000UL,
+     0x00080010UL,
+     0x00080004UL,
+     0x00700000UL,
+     0x00700000UL,
+     0x00700000UL,
+     0x00700000UL,
+     0x00700000UL,
+     0x00800000UL,
+     0x01000000UL,
      0xffffffffUL}
 };
 i32 giDebugBuildingToBuild = -1;
-u8 giTerrainToMusicTrack[H2EnumIndex(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-char* cHeroTypeShortName[H2EnumIndex(FACTION_COUNT)] = {
-    "kngt",
-    "barb",
-    "sorc",
-    "wrlk",
-    "wzrd",
-    "necr"};
-char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
+u8
+    giTerrainToMusicTrack[H2EnumIndex(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
+char* cHeroTypeShortName[KB_FACTION_TABLE_CAPACITY] =
+    {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr", "", "", "", "", "", "", "cbrg"};
+char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] =
+    {'k', 'b', 's', 'w', 'z', 'n', 0, 0, 0, 0, 0, 0, 'c'};
 i32 giDeferObjDrawX = -1;
 i32 giDeferObjDrawY = -1;
 class heroWindow* gpInitWin = NULL;
-u8 iGetSSByAlignment[H2EnumIndex(HERO_SKILL_COUNT)][H2EnumIndex(FACTION_COUNT)] = {
-    {3, 4, 2, 2, 2, 3},
-    {2, 3, 3, 1, 1, 1},
-    {3, 3, 2, 2, 2, 2},
-    {2, 4, 1, 4, 2, 1},
-    {3, 2, 2, 2, 2, 2},
-    {2, 3, 4, 2, 2, 2},
-    {5, 3, 1, 1, 2, 0},
-    {2, 1, 4, 5, 5, 4},
-    {1, 1, 3, 3, 4, 3},
-    {1, 2, 3, 1, 2, 1},
-    {4, 3, 3, 3, 3, 3},
-    {1, 1, 2, 3, 3, 3},
-    {0, 0, 0, 1, 0, 7},
-    {3, 2, 2, 2, 2, 2}
+// The Cyborg column mirrors the Knight skill weights upstream.
+u8 iGetSSByAlignment[H2EnumIndex(HERO_SKILL_COUNT)][KB_FACTION_TABLE_CAPACITY] = {
+    {3, 4, 2, 2, 2, 3, 0, 0, 0, 0, 0, 0, 3},
+    {2, 3, 3, 1, 1, 1, 0, 0, 0, 0, 0, 0, 2},
+    {3, 3, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 3},
+    {2, 4, 1, 4, 2, 1, 0, 0, 0, 0, 0, 0, 2},
+    {3, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 3},
+    {2, 3, 4, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2},
+    {5, 3, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 5},
+    {2, 1, 4, 5, 5, 4, 0, 0, 0, 0, 0, 0, 2},
+    {1, 1, 3, 3, 4, 3, 0, 0, 0, 0, 0, 0, 1},
+    {1, 2, 3, 1, 2, 1, 0, 0, 0, 0, 0, 0, 1},
+    {4, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 4},
+    {1, 1, 2, 3, 3, 3, 0, 0, 0, 0, 0, 0, 1},
+    {0, 0, 0, 1, 0, 7, 0, 0, 0, 0, 0, 0, 0},
+    {3, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 3}
 };
 struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
     {{18, 8},
@@ -8086,8 +8116,10 @@ struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
     {0x0080, {43, 30, 18, 84, 85, 73, 60, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0080, {21, 34, 48, 70, 83, 97, 98, -1, -1, -1, -1, -1, -1, -1, -1}}
 };
-i8 captainStats[H2EnumIndex(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT] =
-    {{1, 1, 1, 1}, {1, 1, 1, 1}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}};
+i8 captainStats[KB_FACTION_TABLE_CAPACITY][HERO_PRIMARY_STAT_COUNT] =
+    {{1, 1, 1, 1}, {1, 1, 1, 1}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2},
+     {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0},
+     {0, 0, 2, 2}};
 b32 gbDrawingPuzzle = false;
 i32 giWalkingFrom = -1;
 i32 giWalkingFrom2 = -1;
@@ -8171,7 +8203,7 @@ SCampaignChoice
           {CAMPAIGN_CHOICE_ALIGNMENT, H2EnumIndex(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
 char* congratsText = NULL;
-char* gArtifactNames[H2EnumIndex(ARTIFACT_COUNT)] = {
+char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY] = {
     "Ultimate Book of Knowledge",
     "Ultimate Sword of Dominion",
     "Ultimate Cloak of Protection",
@@ -8276,7 +8308,7 @@ char* gArtifactNames[H2EnumIndex(ARTIFACT_COUNT)] = {
     "Sword of Anduran",
     "Spade of Necromancy"
 };
-char* gArtifactDesc[H2EnumIndex(ARTIFACT_COUNT)] = {
+char* gArtifactDesc[KB_ARTIFACT_TABLE_CAPACITY] = {
     "{Ultimate Book\n(+12 Knowledge)}\n\nThe Ultimate Book of Knowledge increases your knowledge "
     "by 12.",
     "{Ultimate Sword\n(+12 Attack)}\n\nThe Ultimate Sword of Dominion increases your attack skill "
@@ -8415,7 +8447,7 @@ char* gArtifactDesc[H2EnumIndex(ARTIFACT_COUNT)] = {
     "{Sword of Anduran}\n\nThe Sword increases your attack skill by 5.",
     "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill."
 };
-char* gArtifactEvent[H2EnumIndex(ARTIFACT_COUNT)] = {
+char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "",
     "",
     "",
@@ -8671,7 +8703,21 @@ char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
     "{Knowledge}\n\nYour knowledge determines how many spell points your hero may have.  Under "
     "normal cirumstances, a hero is limited to 10 spell points per level of knowledge."
 };
-char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {"Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer", "Multiple", "Random"};
+char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
+    "Knight",
+    "Barbarian",
+    "Sorceress",
+    "Warlock",
+    "Wizard",
+    "Necromancer",
+    "Multiple",
+    "Random",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    "Cyborg"
+};
 char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)] = {
     "peasn",
     "archr",
@@ -8740,7 +8786,7 @@ char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)] = {
     "elemf",
     "elemw"
 };
-char* gArmyNames[H2EnumIndex(CREATURE_COUNT)] = {
+char* gArmyNames[KB_CREATURE_TABLE_CAPACITY] = {
     "peasant",
     "archer",
     "ranger",
@@ -8808,7 +8854,7 @@ char* gArmyNames[H2EnumIndex(CREATURE_COUNT)] = {
     "fire elemental",
     "water elemental"
 };
-char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)] = {
+char* gArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY] = {
     "peasants",
     "archers",
     "rangers",
@@ -9015,7 +9061,8 @@ char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "%s Traveller's Tent",
     "%s",
     "%s",
-    "Jail"
+    "Jail",
+    "Shipyard"
 };
 char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "{Alchemist}\n\nYou have taken control of the local Alchemist shop. It will provide you with "
@@ -9683,7 +9730,7 @@ char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
 };
 char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera"};
-char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+char* gSpellDesc[KB_SPELL_TEXT_CAPACITY] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
     "{Fireblast}\n\nAn improved version of fireball, fireblast affects two hexes around the center "
@@ -9765,9 +9812,20 @@ char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Set Earth Guardian}\n\nSets Earth Elementals to guard a mine against enemy armies.",
     "{Set Air Guardian}\n\nSets Air Elementals to guard a mine against enemy armies.",
     "{Set Fire Guardian}\n\nSets Fire Elementals to guard a mine against enemy armies.",
-    "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies."
+    "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies.",
+    "{Awareness}\n\nExplores a large area around your hero.",
+    "{Shadow Mark}\n\nMarked creature receives 150% damage from your troops for 1 turn",
+    "{Marksman Pierce}\n\nTarget creature receives 1000 damage and is dazed for 1 turn",
+    "{Plasma Cone}\n\nCreates a cone of hot plasma in the direction of the target",
+    "{Force Shield}\n\nCreates a kinetic shield over the target ally",
+    "{Mass Force Shield}\n\nCreates a kinetic shield over all allies",
+    "{Fire Bomb}\n\nSet an area on fire for 2 turns. Creatures will continue burning for 2 turns "
+    "after leaving the area",
+    "{Implosion Grenade}\n\nFires an indirect projectile that explodes inverted dark matter that "
+    "will suck any creature adjacent to it together.",
+    NULL
 };
-char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+char* gSpellNames[KB_SPELL_TEXT_CAPACITY] = {
     "Fireball",
     "Fireblast",
     "Lightning Bolt",
@@ -9832,7 +9890,16 @@ char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Set Earth Guardian",
     "Set Air Guardian",
     "Set Fire Guardian",
-    "Set Water Guardian"
+    "Set Water Guardian",
+    "Awareness",
+    "Shadow Mark",
+    "Marksman Pierce",
+    "Plasma Cone",
+    "Force Shield",
+    "Mass Force Shield",
+    "Fire Bomb",
+    "Implosion Grenade",
+    NULL
 };
 char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {"Basic", "Advanced", "Expert"
@@ -9874,7 +9941,7 @@ char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "",
     ""
 };
-char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+char* gWellExtraNames[KB_FACTION_TABLE_CAPACITY] = {
     "Farm",
     "Garbage Heap",
     "Crystal Garden",
@@ -9883,10 +9950,9 @@ char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Skull Pile",
     "1st Lvl Growth"
 };
-char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
-    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special"
-};
-char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+char* gSpecialBuildingNames[KB_FACTION_TABLE_CAPACITY] =
+    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", NULL};
+char* gDwellingNames[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
      "Blacksmith",
@@ -9959,6 +10025,15 @@ char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      "Upg. Mausoleum",
      "",
      ""}
+};
+// The Cyborg Wisdom slot reads as Cybernetics, with its own descriptions.
+char* cyberneticsDesc[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+    "{Basic Cybernetics}\n\nBasic Cybernetics allows your hero to learn Level 1-3 spells "
+    "from a Cybernetics Lab.",
+    "{Advanced Cybernetics}\n\nAdvanced Cybernetics allows your hero to learn Level 4 "
+    "spells from a Cybernetics Lab.",
+    "{Expert Cybernetics}\n\nExpert Cybernetics allows your hero to learn Level 5 spells "
+    "from a Cybernetics Lab."
 };
 char* cSecSkillDesc[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
@@ -10065,7 +10140,7 @@ char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "",
     ""
 };
-char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+char* gBuildingInfoSpecial[KB_FACTION_TABLE_CAPACITY] = {
     "The Fortifications increase the toughness of the walls, increasing the number of turns it "
     "takes to knock them down.",
     "The Coliseum provides inspiring spectacles to defending troops, raising their morale by two "

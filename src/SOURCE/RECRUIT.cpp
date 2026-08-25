@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
+#include <IRONFIST/hooks.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <BASE/Utf8.h>
@@ -111,6 +112,8 @@ void SetupRecruitWin(
 i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
     i32 resourceMaximum;
+
+    Ironfist_UnitRecruit(static_cast<i32>(m_creatureType.value()));
 
     m_window = new heroWindow(
         WINDOW_X,

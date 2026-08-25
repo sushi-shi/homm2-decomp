@@ -18793,3 +18793,316 @@ msgstr "Завершено"
 msgctxt "system.window.initialization_failed"
 msgid "Unable to initialize windows - possible memory or disk error."
 msgstr "Не могу инициализировать окна. Вероятно, ошибка диска или памяти."
+
+# Ironfist gameplay and UI additions.
+msgctxt "adventure.spell.dimension_door.too_tired"
+msgid "Your hero is too tired to cast this spell today.  Try again tomorrow."
+msgstr "Ваш герой слишком устал, чтобы сегодня произнести это заклинание. Попробуйте завтра."
+
+msgctxt "castle.cybernetics_lab.add_level"
+msgid "Add another level to Cybernetics Lab"
+msgstr "Добавить уровень Лаборатории кибернетики"
+
+msgctxt "castle.cybernetics_lab.build"
+msgid "Build Cybernetics Lab"
+msgstr "Построить Лабораторию кибернетики"
+
+#, c-format
+msgctxt "combat.ability.shadow_mark"
+msgid "The Shadow Assassins mark the %s!"
+msgstr "Теневые убийцы накладывают метку на %s!"
+
+msgctxt "combat.astral_dodge"
+msgid "Cyber Shadow Assassins dodge the attack!"
+msgstr "Кибернетические теневые убийцы уклоняются от атаки!"
+
+#, c-format
+msgctxt "combat.burning.damage"
+msgid "Burning does %d damage. "
+msgstr "Горение наносит %d ед. урона. "
+
+#, c-format
+msgctxt "combat.burning.killed"
+msgid "%d %s perishes."
+msgid_plural "%d %s perish."
+msgstr[0] "Погибает %d %s."
+msgstr[1] "Погибают %d %s."
+msgstr[2] "Погибают %d %s."
+
+#, c-format
+msgctxt "combat.spell.area_damage"
+msgid "Area spell %d does %d damage."
+msgstr "Заклинание по области %d наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.cold_ring_damage"
+msgid "The cold ring does %d damage."
+msgstr "Кольцо холода наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.fire_bomb_damage"
+msgid "The fire bomb does %d damage."
+msgstr "Огненная бомба наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.fireball_damage"
+msgid "The fireball does %d damage."
+msgstr "Огненный шар наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.fireblast_damage"
+msgid "The fireblast does %d damage."
+msgstr "Огненный взрыв наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.implosion_grenade_damage"
+msgid "The implosion grenade does %d damage."
+msgstr "Имплозионная граната наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.marksman_pierce_damage"
+msgid "The marksman pierce round does %d\n damage to the %s."
+msgstr "Бронебойный выстрел наносит %d\n ед. урона отряду %s."
+
+#, c-format
+msgctxt "combat.spell.meteor_shower_damage"
+msgid "The meteor shower does %d damage."
+msgstr "Метеоритный дождь наносит %d ед. урона."
+
+#, c-format
+msgctxt "combat.spell.plasma_cone_damage"
+msgid "The plasma cone stream does %d damage."
+msgstr "Плазменный конус наносит %d ед. урона."
+
+#, c-format
+msgctxt "event.barrier.dissolves"
+msgid "As you speak the magic word \"%s\", the glowing barrier dissolves into nothingness."
+msgstr "Когда вы произносите волшебное слово «%s», сияющий барьер растворяется без следа."
+
+#, c-format
+msgctxt "event.barrier.inspect"
+msgid "A magical %s barrier stands tall before you, blocking your way.  Runes on the arch read, \"Speak the key and you may pass.\""
+msgstr "Перед вами возвышается волшебный %s барьер, преграждая путь. Руны на арке гласят: «Назови ключ — и сможешь пройти»."
+
+msgctxt "event.barrier.no_password"
+msgid "You try guessing in vain, but nothing happens."
+msgstr "Вы пытаетесь угадать слово, но ничего не происходит."
+
+#, c-format
+msgctxt "event.barrier.tent_hint"
+msgid "You enter the tent and find an old woman staring into a glowing gem. \"I have learned much in the way of scrying. Let me share a secret.\" With that, she leans into your ear and whispers the keyword for the %s border guard."
+msgstr "Вы входите в шатер и видите старуху, глядящую в сияющий камень. «Я многое постигла в искусстве предсказания. Позволь поделиться тайной». Она наклоняется к вашему уху и шепчет ключевое слово для %s пограничного стража."
+
+msgctxt "event.shipyard.cannot_build_boat"
+msgid "Cannot build another boat."
+msgstr "Нельзя построить еще одну лодку."
+
+msgctxt "hero.level.learned_spell"
+msgid "You've learned a new spell!"
+msgstr "Вы изучили новое заклинание!"
+
+msgctxt "hero.skill.cybernetics"
+msgid "Cybernetics"
+msgstr "Кибернетика"
+
+msgctxt "town.build.disallowed"
+msgid "\n\nCan't be built in this town."
+msgstr "\n\nНельзя построить в этом городе."
+
+msgctxt "town.cybernetics.level_limit"
+msgid "Your Cyborg hero only learns the level 1-2 spells above."
+msgstr "Ваш герой-киборг может изучить только показанные выше заклинания 1–2 уровней."
+
+msgctxt "town.cybernetics.requires_cyborg"
+msgid "Only Cyborg heroes can learn these spells."
+msgstr "Только герои-киборги могут изучить эти заклинания."
+
+msgctxt "town.mage_guild.spells_added"
+msgid "The above spells have been added to your book."
+msgstr "Показанные выше заклинания добавлены в вашу книгу."
+
+#, c-format
+msgctxt "town.cyborg.cybernetics_lab.description"
+msgid "The %s allows heroes to learn cybernetics spells and replenish their spell points."
+msgstr "%s позволяет героям изучать заклинания кибернетики и восстанавливать очки заклинаний."
+
+msgctxt "town.cyborg.cybernetics_lab.name"
+msgid "Cybernetics Lab"
+msgstr "Лаборатория кибернетики"
+
+msgctxt "town.cyborg.dwelling.1"
+msgid "Sewer"
+msgstr "Канализация"
+
+msgctxt "town.cyborg.dwelling.2"
+msgid "Meeting Hall"
+msgstr "Зал собраний"
+
+msgctxt "town.cyborg.dwelling.3"
+msgid "Arena"
+msgstr "Арена"
+
+msgctxt "town.cyborg.dwelling.4"
+msgid "Hunting Grounds"
+msgstr "Охотничьи угодья"
+
+msgctxt "town.cyborg.dwelling.5"
+msgid "Dojo"
+msgstr "Додзё"
+
+msgctxt "town.cyborg.dwelling.6"
+msgid "Nexus"
+msgstr "Нексус"
+
+msgctxt "town.cyborg.dwelling.upgrade_2"
+msgid "Cyborg Level 2 Upgrade"
+msgstr "Улучшение киборгов 2-го уровня"
+
+msgctxt "town.cyborg.dwelling.upgrade_3"
+msgid "Cyborg Level 3 Upgrade"
+msgstr "Улучшение киборгов 3-го уровня"
+
+msgctxt "town.cyborg.dwelling.upgrade_4"
+msgid "Cyborg Level 4 Upgrade"
+msgstr "Улучшение киборгов 4-го уровня"
+
+msgctxt "town.cyborg.dwelling.upgrade_5"
+msgid "Cyborg Level 5 Upgrade"
+msgstr "Улучшение киборгов 5-го уровня"
+
+msgctxt "town.cyborg.dwelling.upgrade_6"
+msgid "Cyborg Level 6 Upgrade"
+msgstr "Улучшение киборгов 6-го уровня"
+
+msgctxt "town.cyborg.energy_pump.name"
+msgid "Energy Pump"
+msgstr "Энергетический насос"
+
+msgctxt "town.cyborg.growth_building.name"
+msgid "Kobold Hatchery"
+msgstr "Инкубатор кобольдов"
+
+msgctxt "town.cyborg.special_building.description"
+msgid "Lowers the luck of enemy troops."
+msgstr "Снижает удачу вражеских войск."
+
+msgctxt "town.cyborg.special_building.name"
+msgid "Radiation Tower"
+msgstr "Радиационная башня"
+
+msgctxt "town.poisoned_well.description"
+msgid "The Well has been tainted by the presence of dark magic. Good thing undead don't get thirsty."
+msgstr "Колодец осквернен темной магией. К счастью, нежить не испытывает жажды."
+
+msgctxt "town.poisoned_well.name"
+msgid "Poisoned Well"
+msgstr "Отравленный колодец"
+
+msgctxt "town.well.description"
+msgid "The Well provides refreshing drinking water."
+msgstr "Колодец дает освежающую питьевую воду."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gAlignmentNames.12"
+msgid "Cyborg"
+msgstr "Киборг"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gQuickViewText.124"
+msgid "Shipyard"
+msgstr "Верфь"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.65"
+msgid "Awareness"
+msgstr "Осведомленность"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.66"
+msgid "Shadow Mark"
+msgstr "Теневая метка"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.67"
+msgid "Marksman Pierce"
+msgstr "Бронебойный выстрел"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.68"
+msgid "Plasma Cone"
+msgstr "Плазменный конус"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.69"
+msgid "Force Shield"
+msgstr "Силовой щит"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.70"
+msgid "Mass Force Shield"
+msgstr "Массовый силовой щит"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.71"
+msgid "Fire Bomb"
+msgstr "Огненная бомба"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellNames.72"
+msgid "Implosion Grenade"
+msgstr "Имплозионная граната"
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.65"
+msgid "{Awareness}\n\nExplores a large area around your hero."
+msgstr "{Осведомленность}\n\nОткрывает большую область вокруг вашего героя."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.66"
+msgid "{Shadow Mark}\n\nMarked creature receives 150% damage from your troops for 1 turn"
+msgstr "{Теневая метка}\n\nОтмеченный отряд в течение 1 раунда получает 150% урона от ваших войск."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.67"
+msgid "{Marksman Pierce}\n\nTarget creature receives 1000 damage and is dazed for 1 turn"
+msgstr "{Бронебойный выстрел}\n\nЦелевой отряд получает 1000 ед. урона и оглушается на 1 раунд."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.68"
+msgid "{Plasma Cone}\n\nCreates a cone of hot plasma in the direction of the target"
+msgstr "{Плазменный конус}\n\nСоздает конус раскаленной плазмы в направлении цели."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.69"
+msgid "{Force Shield}\n\nCreates a kinetic shield over the target ally"
+msgstr "{Силовой щит}\n\nСоздает кинетический щит над выбранным союзным отрядом."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.70"
+msgid "{Mass Force Shield}\n\nCreates a kinetic shield over all allies"
+msgstr "{Массовый силовой щит}\n\nСоздает кинетический щит над всеми союзными отрядами."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.71"
+msgid "{Fire Bomb}\n\nSet an area on fire for 2 turns. Creatures will continue burning for 2 turns after leaving the area"
+msgstr "{Огненная бомба}\n\nПоджигает область на 2 раунда. Покинувшие ее отряды продолжают гореть еще 2 раунда."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.gSpellDesc.72"
+msgid "{Implosion Grenade}\n\nFires an indirect projectile that explodes inverted dark matter that will suck any creature adjacent to it together."
+msgstr "{Имплозионная граната}\n\nВыпускает навесной снаряд со взрывом инвертированной темной материи, который стягивает соседние отряды к центру."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.cyberneticsDesc.0"
+msgid "{Basic Cybernetics}\n\nBasic Cybernetics allows your hero to learn Level 1-3 spells from a Cybernetics Lab."
+msgstr "{Основы кибернетики}\n\nОсновы кибернетики позволяют герою изучать в Лаборатории кибернетики заклинания 1–3 уровней."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.cyberneticsDesc.1"
+msgid "{Advanced Cybernetics}\n\nAdvanced Cybernetics allows your hero to learn Level 4 spells from a Cybernetics Lab."
+msgstr "{Продвинутая кибернетика}\n\nПродвинутая кибернетика позволяет герою изучать в Лаборатории кибернетики заклинания 4-го уровня."
+
+#. Legacy table entry; English is authoritative in the C++ initializer.
+msgctxt "table.cyberneticsDesc.2"
+msgid "{Expert Cybernetics}\n\nExpert Cybernetics allows your hero to learn Level 5 spells from a Cybernetics Lab."
+msgstr "{Экспертная кибернетика}\n\nЭкспертная кибернетика позволяет герою изучать в Лаборатории кибернетики заклинания 5-го уровня."

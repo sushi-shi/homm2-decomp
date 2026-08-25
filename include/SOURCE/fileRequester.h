@@ -21,7 +21,10 @@ using enum FileRequesterMode;
 typedef enum FileRequesterControlId {
     FILE_REQUESTER_PATH_SIZE                   = 300,
     FILE_REQUESTER_NAME_SIZE                   = 0x15f,
-    FILE_REQUESTER_EXTENSION_SIZE              = 5,
+    // Retail sized this for a bare "MX2" but passes whole "*.MX2" masks as
+    // the default extension -- a one-byte overflow glibc's fortify turns
+    // into an abort.  Roomier here; nothing serializes this layout.
+    FILE_REQUESTER_EXTENSION_SIZE              = 8,
     FILE_REQUESTER_LOCAL_NAME_SIZE             = 352,
     FILE_REQUESTER_LOCAL_EXTENSION_SIZE        = 208,
     FILE_REQUESTER_UPDATE_STORAGE_SIZE         = 372,

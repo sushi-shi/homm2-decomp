@@ -92,9 +92,32 @@ enum class ArmySpellInfluence : i32 {
     ARMY_SPELL_INFLUENCE_ANTI_MAGIC    = 12,
     ARMY_SPELL_INFLUENCE_STONESKIN     = 13,
     ARMY_SPELL_INFLUENCE_STEELSKIN     = 14,
-    ARMY_SPELL_INFLUENCE_COUNT         = 15
+    // Retail effect count; anti-magic dispels only these.
+    ARMY_SPELL_INFLUENCE_RETAIL_COUNT  = 15,
+    // Ironfist effects.
+    ARMY_SPELL_INFLUENCE_BURN          = 15,
+    ARMY_SPELL_INFLUENCE_SHADOW_MARK   = 16,
+    ARMY_SPELL_INFLUENCE_DAZE          = 17,
+    ARMY_SPELL_INFLUENCE_FORCE_SHIELD  = 18,
+    ARMY_SPELL_INFLUENCE_COUNT         = 19
 };
 using enum ArmySpellInfluence;
+
+// Which way a charger flies, for the in-air sprite choice.
+enum ChargingDirection {
+    CHARGING_FORWARD,
+    CHARGING_UP,
+    CHARGING_DOWN
+};
+
+enum IronfistArmyConstant {
+    ARMY_CHARGE_SPRITE_OFFSET      = 10,
+    ARMY_STRAIGHT_LINE_UNREACHABLE = 999,
+    ARMY_PLASMA_BLAST_HEX_COUNT    = 18
+};
+
+// The exact angle of the hex grid's diagonals as atan2 computes it.
+#define ARMY_HEX_DIAGONAL_ANGLE 62.354024636261322
 
 enum class ArmySpellCancelType : i32 {
     ARMY_CANCEL_SPELLS_AFTER_MOVE   = 0,
@@ -164,6 +187,13 @@ struct SMonFrameInfo {
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
 void BuildTempWalkSeq(struct SMonFrameInfo*, i32, i32);
+void BuildTeleporterTempWalkSeq(struct SMonFrameInfo*, i32, i32, bool);
 void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
+
+// Ironfist movement state threading through the attack path.
+extern bool gCloseMove;
+extern bool gMoveAttack;
+extern bool gChargePathDamage;
+extern bool gCharging;
 
 #endif

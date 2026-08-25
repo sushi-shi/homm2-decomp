@@ -182,11 +182,13 @@ inline CreatureType NextCreatureType(CreatureType creatureType) {
 }
 
 enum class ArtifactLevelMask : u8 {
-    ARTIFACT_LEVEL_ULTIMATE = 0x01,
-    ARTIFACT_LEVEL_MAJOR    = 0x02,
-    ARTIFACT_LEVEL_MINOR    = 0x04,
-    ARTIFACT_LEVEL_TREASURE = 0x08,
-    ARTIFACT_LEVEL_RANDOM   = 0x0e
+    ARTIFACT_LEVEL_ULTIMATE  = 0x01,
+    ARTIFACT_LEVEL_MAJOR     = 0x02,
+    ARTIFACT_LEVEL_MINOR     = 0x04,
+    ARTIFACT_LEVEL_TREASURE  = 0x08,
+    ARTIFACT_LEVEL_RANDOM    = 0x0e,
+    ARTIFACT_LEVEL_SPELLBOOK = 0x10,
+    ARTIFACT_LEVEL_UNUSED    = 0x20
 };
 using enum ArtifactLevelMask;
 ENABLE_ENUM_FLAGS(ArtifactLevelMask)
@@ -370,6 +372,16 @@ enum class SpellType : i8 {
     SPELL_SET_FIRE_GUARDIAN      = 63,
     SPELL_SET_WATER_GUARDIAN     = 64,
     SPELL_COUNT                  = 65,
+    // Ironfist spells; SPELL_COUNT keeps the retail bound so random rolls
+    // never produce them.
+    SPELL_AWARENESS              = 65,
+    SPELL_SHADOW_MARK            = 66,
+    SPELL_MARKSMAN_PIERCE        = 67,
+    SPELL_PLASMA_CONE            = 68,
+    SPELL_FORCE_SHIELD           = 69,
+    SPELL_MASS_FORCE_SHIELD      = 70,
+    SPELL_FIRE_BOMB              = 71,
+    SPELL_IMPLOSION_GRENADE      = 72,
     CREATURE_SPELL_PETRIFY       = 101,
     CREATURE_SPELL_DISPEL        = 102
 };
@@ -504,7 +516,9 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_TRAVELER_TENT              = 120,
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
-    MAP_OBJECT_JAIL                       = 123
+    MAP_OBJECT_JAIL                       = 123,
+    // Ironfist's shipyard, buildable boats away from town.
+    MAP_OBJECT_SHIPYARD                   = 124
 };
 using enum MapObjectType;
 ENABLE_ENUM_FLAGS(MapObjectType)
@@ -522,6 +536,7 @@ enum class FactionType : i8 {
     FACTION_NEUTRAL       = 6,
     HERO_TYPE_BOAT        = 6,
     FACTION_RANDOM        = 7,
+    FACTION_CYBORG        = 12,
     FACTION_COUNT         = 6
 };
 using enum FactionType;
@@ -701,7 +716,13 @@ struct tag_tilePoint {
     i16 frameOffset;
 };
 typedef enum MonsterDatabaseConstant {
-    MONSTER_SPRITE_NAME_SIZE = 5
+    MONSTER_SPRITE_NAME_SIZE = 5,
+    // Ironfist extends the creature tables past the retail domain and fills
+    // them from DATA/creatures.xml.
+    KB_CREATURE_TABLE_CAPACITY = 256,
+    // Ironfist generalizes the per-faction town tables to thirteen rows so
+    // the Cyborg faction (12) fits; startup fills the extra rows.
+    KB_FACTION_TABLE_CAPACITY  = 13
 } MonsterDatabaseConstant;
 #pragma pack(push, 1)
 struct tag_monsterInfo {
@@ -787,9 +808,23 @@ enum class CombatEffectType : i8 {
     COMBAT_EFFECT_CURSE         = 29,
     COMBAT_EFFECT_STONE_SKIN    = 30,
     COMBAT_EFFECT_STEEL_SKIN    = 31,
-    COMBAT_EFFECT_COUNT         = 32
+    // Ironfist effects for the Cybernetics spells and abilities.
+    COMBAT_EFFECT_PLASMA_BLAST      = 32,
+    COMBAT_EFFECT_SHADOW_MARK       = 33,
+    COMBAT_EFFECT_MARKSMAN_PIERCE   = 34,
+    COMBAT_EFFECT_PLASMA_CONE       = 35,
+    COMBAT_EFFECT_FORCE_SHIELD      = 36,
+    COMBAT_EFFECT_FIRE_BOMB         = 37,
+    COMBAT_EFFECT_IMPLOSION_GRENADE = 38,
+    COMBAT_EFFECT_COUNT         = 39
 };
 using enum CombatEffectType;
+
+// Ironfist extends the spell tables with its spells 65-72.
+typedef enum SpellTableConstant {
+    KB_SPELL_TABLE_CAPACITY = 73,
+    KB_SPELL_TEXT_CAPACITY  = 74
+} SpellTableConstant;
 
 enum class SpellInfoAttribute : u8 {
     SPELL_INFO_ATTRIBUTE_POWER     = 0x01,

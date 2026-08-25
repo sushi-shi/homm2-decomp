@@ -8,6 +8,7 @@
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
+#include <IRONFIST/hooks.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/CURSOR.h>
@@ -942,6 +943,7 @@ adjacentDone:
             gbHitEvent = true;
         }
     }
+    Ironfist_HeroMoved();
     return eventCell_i;
 }
 

@@ -71,7 +71,7 @@ struct SElevationOverlay {
 #pragma pack(pop)
 
 typedef enum GlobalConstant {
-    HERO_TYPE_INITIAL_COUNT                 = H2EnumIndex(FACTION_COUNT),
+    HERO_TYPE_INITIAL_COUNT                 = KB_FACTION_TABLE_CAPACITY,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT     = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT            = 5,
     X_GLOBAL_RECRUIT_BUY_COUNT              = 5,
@@ -189,6 +189,9 @@ typedef enum KbGameTableConstant {
     KB_ARMY_EFFECT_COUNT                = 20,
     KB_MUSIC_TRACK_COUNT                = 0x3c,
     KB_ARTIFACT_LEVEL_COUNT             = H2EnumIndex(ARTIFACT_COUNT) + 1,
+    // Ironfist extends the artifact tables past the retail domain and fills
+    // them from DATA/artifacts.xml.
+    KB_ARTIFACT_TABLE_CAPACITY          = 256,
     KB_ARTIFACT_BASE_VALUE_COUNT        = H2EnumIndex(ARTIFACT_COUNT),
     KB_STAT_POWER_COUNT                 = 41,
     KB_SPELL_LIMIT_COUNT                = 5,
@@ -197,26 +200,27 @@ typedef enum KbGameTableConstant {
     KB_CLOUD_MASK_COUNT                 = 256,
     KB_HERO_LEVEL_BAND_COUNT            = 2,
     KB_SPELL_INFLUENCE_MAP_COUNT        = 16,
-    KB_SPELL_EFFECT_COUNT               = 32,
-    KB_COMBAT_BACKGROUND_COUNT          = 19,
+    KB_SPELL_EFFECT_COUNT               = H2EnumIndex(COMBAT_EFFECT_COUNT),
+    KB_COMBAT_BACKGROUND_COUNT          = 20,
     KB_COMBAT_OBSTACLE_COUNT            = 32,
     KB_TERRAIN_TYPE_COUNT               = H2EnumIndex(TERRAIN_COUNT) + 1,
     KB_TERRAIN_STEP_TYPE_COUNT          = 2,
-    KB_TRIGGER_TYPE_COUNT               = 124,
+    // Leave room for Ironfist's post-expansion map-object ids.
+    KB_TRIGGER_TYPE_COUNT               = 128,
     KB_TOWN_OBJECT_NAME_COUNT           = 32,
     KB_CASTLE_WALL_SEGMENT_COUNT        = 4,
     KB_CASTLE_TOWER_COUNT               = 4,
     KB_CASTLE_DOOR_POSITION_COUNT       = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT    = 11,
     KB_MOAT_CELL_COUNT                  = 9,
-    KB_ALIGNMENT_NAME_COUNT             = H2EnumIndex(FACTION_COUNT) + 2,
+    KB_ALIGNMENT_NAME_COUNT             = KB_FACTION_TABLE_CAPACITY,
     KB_MINE_NAME_COUNT                  = 7,
-    KB_QUICK_VIEW_TEXT_COUNT            = 124,
-    KB_EVENT_TEXT_TABLE_COUNT           = 95,
-    KB_CONTROL_PANEL_HELP_COUNT         = 5,
-    KB_COMBAT_SPELL_PANEL_HELP_COUNT    = 7,
-    KB_ADVENTURE_PANEL_HELP_COUNT       = 5,
-    KB_INIT_MENU_HELP_COUNT             = 5,
+    KB_QUICK_VIEW_TEXT_COUNT            = 125,
+    KB_EVENT_TEXT_TABLE_COUNT           = 96,
+    KB_CONTROL_PANEL_HELP_COUNT         = 6,
+    KB_COMBAT_SPELL_PANEL_HELP_COUNT    = 8,
+    KB_ADVENTURE_PANEL_HELP_COUNT       = 6,
+    KB_INIT_MENU_HELP_COUNT             = 6,
     KB_ADVENTURE_MENU_HELP_COUNT        = 8,
     KB_LUCK_TEXT_COUNT                  = 7,
     KB_MORALE_TEXT_COUNT                = 7,
@@ -326,7 +330,7 @@ extern i32 giScreenScroll;
 extern i32 giMenuCommand;
 extern b32 gbSendMouseMoveMessages;
 extern b32 gbColorMice;
-extern u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT];
+extern u32l gTownEligibleBuildMask[KB_FACTION_TABLE_CAPACITY];
 extern u8 giMapSizes[KB_MAP_SIZE_COUNT];
 extern b32 gbUseEvilInterface;
 extern char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT];
@@ -350,7 +354,7 @@ extern i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESO
 extern i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
 extern i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
 extern i32 gSSValues[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
-extern H2EnumStorage<ArtifactLevelMask, u8> gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
+extern H2EnumStorage<ArtifactLevelMask, u8> gArtifactLevel[KB_ARTIFACT_TABLE_CAPACITY];
 extern i32 gUltArtifactAvgValue;
 extern i8 giVisRangeTown;
 extern float gfStatPower[KB_STAT_POWER_COUNT];
@@ -371,12 +375,13 @@ enum class TownMusicTrack : i32 {
     TOWN_MUSIC_KNIGHT      = 8,
     TOWN_MUSIC_BARBARIAN   = 9,
     TOWN_MUSIC_SORCERESS   = 10,
+    TOWN_MUSIC_CYBORG      = 44,
     TOWN_MUSIC_TABLE_SIZE  = 8
 };
 using enum TownMusicTrack;
 
-extern i8 townTheme[H2EnumIndex(TOWN_MUSIC_TABLE_SIZE)];
-extern i8 gHeroSkillBonus[H2EnumIndex(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT];
+extern i8 townTheme[KB_FACTION_TABLE_CAPACITY];
+extern i8 gHeroSkillBonus[KB_FACTION_TABLE_CAPACITY][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT];
 extern i32 giMonoIconSkip;
 extern i32 giScrollX;
 extern i32 giScrollY;
@@ -406,14 +411,14 @@ extern float gfSSNavigationMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)];
 extern float gfSSArcheryMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)];
 extern float gfSSAIArcheryMod[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)];
 extern i8 giVisRange[H2EnumIndex(HERO_SKILL_LEVEL_COUNT)];
-extern u8 gStartingHeroStats[H2EnumIndex(FACTION_COUNT)][HERO_STARTING_STAT_COUNT];
+extern u8 gStartingHeroStats[KB_FACTION_TABLE_CAPACITY][HERO_STARTING_STAT_COUNT];
 extern i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][H2EnumIndex(HERO_SKILL_LEVEL_COUNT)]
                         [KB_TERRAIN_STEP_TYPE_COUNT];
-extern char* gTownPrefixNames[H2EnumIndex(FACTION_COUNT)];
+extern char* gTownPrefixNames[KB_FACTION_TABLE_CAPACITY];
 extern char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern i32 giDebugBuildingToBuild;
 extern u8 giTerrainToMusicTrack[H2EnumIndex(TERRAIN_COUNT)];
-extern char* cHeroTypeShortName[H2EnumIndex(FACTION_COUNT)];
+extern char* cHeroTypeShortName[KB_FACTION_TABLE_CAPACITY];
 extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern i32 giDeferObjDrawX;
 extern i32 giDeferObjDrawY;
@@ -433,9 +438,9 @@ extern i32 giWalkingTo2;
 extern i32 giWalkingYMod;
 extern u8 moatCell[KB_MOAT_CELL_COUNT];
 extern char* congratsText;
-extern char* gArtifactNames[H2EnumIndex(ARTIFACT_COUNT)];
-extern char* gArtifactDesc[H2EnumIndex(ARTIFACT_COUNT)];
-extern char* gArtifactEvent[H2EnumIndex(ARTIFACT_COUNT)];
+extern char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY];
+extern char* gArtifactDesc[KB_ARTIFACT_TABLE_CAPACITY];
+extern char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT];
 extern char* gStatNames[HERO_PRIMARY_STAT_COUNT];
 extern char* gStatDesc[HERO_PRIMARY_STAT_COUNT];
 extern char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
@@ -497,11 +502,12 @@ extern char* cWinText[KB_WIN_TEXT_COUNT];
 extern char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT];
 extern char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT];
 extern char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT];
-extern char* gSpellDesc[KB_SPELL_TEXT_COUNT];
-extern char* gSpellNames[KB_SPELL_TEXT_COUNT];
+extern char* gSpellDesc[KB_SPELL_TEXT_CAPACITY];
+extern char* gSpellNames[KB_SPELL_TEXT_CAPACITY];
 extern char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT];
 extern char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT];
 extern char* cSecSkillDesc[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
+extern char* cyberneticsDesc[SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern char* cDirections[KB_DIRECTION_TEXT_COUNT];
 extern char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];
 extern char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT];

@@ -1,6 +1,10 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
+#include <IRONFIST/artifacts.h>
+#include <IRONFIST/hooks.h>
+#include <IRONFIST/prefs.h>
+#include <IRONFIST/save_xml.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/executive.h>
@@ -826,7 +830,8 @@ typedef enum AdventureQuickInfoObject {
     QUICK_INFO_MIN_Y = QUICK_VIEW_MIN_Y,
     QUICK_INFO_HEIGHT = 96,
     QUICK_INFO_BOTTOM = QUICK_VIEW_RIGHT,
-    QUICK_INFO_BOTTOM_Y = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
+    QUICK_INFO_BOTTOM_Y = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT,
+    QUICK_INFO_MIN_Y_ARTIFACT_BOTTOM = 160
 } AdventureQuickInfoObject;
 
 typedef enum AdventureCheatConstant {
@@ -1021,6 +1026,13 @@ static i32 s_adjacentMonsterMinY = 0;
 typedef enum AdvVisitMetadata {
     VISIT_BIT_INDEX_MASK = 0x1f
 } AdvVisitMetadata;
+
+// Town locator frames per faction in locators.icn, castles and villages;
+// the Cyborg frames sit past the retail run.
+static const i32 castleIconFrames[KB_FACTION_TABLE_CAPACITY] =
+    {9, 10, 11, 12, 13, 14, 0, 0, 0, 0, 0, 0, 25};
+static const i32 townIconFrames[KB_FACTION_TABLE_CAPACITY] =
+    {15, 16, 17, 18, 19, 20, 0, 0, 0, 0, 0, 0, 26};
 
 advManager::advManager(void) {
     m_groundTiles = NULL;
@@ -1227,6 +1239,9 @@ i32 advManager::Open(i32 id) {
         m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon(
             "froth.icn"
         );
+    }
+    if (m_heroIcons[H2EnumIndex(FACTION_CYBORG)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_CYBORG)] = gpResourceManager->GetIcon("cbrg32.icn");
     }
 
     gbLoadingMonoIcon = true;
@@ -2558,7 +2573,10 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
             *result = ControlPanel();
             break;
         case PANEL_END_TURN:
-            if (gpCurPlayer->HasMobileHero()) {
+            // The reminder defaults on; read_pref hands back -1 when the
+            // value was never written.
+            if (gpCurPlayer->HasMobileHero()
+                && read_pref<i32>("Show Hero Movement Reminder") != 0) {
                 NormalDialog(
                     localization::Tr("adventure.confirm.end_turn_with_mobile_heroes"),
                     NORMAL_DIALOG_CONFIRM,
@@ -4397,6 +4415,18 @@ void advManager::DrawCell(
                         s_drawExtra = NULL;
                     }
                 }
+
+                // Ironfist lifts heroes above objects that draw as overlays:
+                // cells without a real overlay run the map cursor and the
+                // hero pass again once the overlays are down.  Redrawing the
+                // cursor mid-move crashes, so it waits for the hero to stop.
+                if (s_drawCell->m_overlayIndex == MAPCELL_SPRITE_NONE
+                    && !s_drawCell->m_drawOverlayOnTop) {
+                    if ((s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0 && !gbHeroMoving) {
+                        DrawCursor();
+                    }
+                    DrawCell(mapX, mapY, screenX, screenY, ADVMGR_DRAW_HERO, forceDraw);
+                }
             }
         }
     }
@@ -4875,13 +4905,59 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         } else {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
-                case MAP_OBJECT_ARTIFACT:
-                    sprintf(
-                        gText,
-                        "%s",
-                        localization::Tr("adventure.quick.artifact")
-                    );
-                    break;
+                case MAP_OBJECT_ARTIFACT: {
+                    // Ironfist reveals the artifact: the quick view shows its
+                    // real description and picture instead of a bare
+                    // "Artifact".
+                    delete pWin;
+                    i32 artifact = currentCell->m_objectIndex >> 1;
+                    i32 artifactDialogX = (cellX - 4) * CELL_PIXELS;
+                    i32 artifactDialogY = (cellY - 4) * CELL_PIXELS;
+                    if (artifactDialogX < 0) {
+                        artifactDialogX = 0;
+                    }
+                    if (artifactDialogY < 0) {
+                        artifactDialogY = 0;
+                    }
+                    if (artifactDialogY > QUICK_INFO_MIN_Y_ARTIFACT_BOTTOM) {
+                        artifactDialogY = QUICK_INFO_MIN_Y_ARTIFACT_BOTTOM;
+                    }
+                    if (artifact == H2EnumIndex(ARTIFACT_SPELL_SCROLL)) {
+                        i32 scrollSpell = currentCell->m_objectMetadata;
+                        sprintf(
+                            gText,
+                            GetArtifactDescription(artifact).c_str(),
+                            gSpellNames[scrollSpell]
+                        );
+                        NormalDialog(
+                            gText,
+                            NORMAL_DIALOG_QUICK_VIEW,
+                            artifactDialogX,
+                            artifactDialogY,
+                            NORMAL_DIALOG_ARTIFACT,
+                            artifact,
+                            NORMAL_DIALOG_SPELL,
+                            scrollSpell,
+                            -1,
+                            0
+                        );
+                    } else {
+                        strcpy(gText, GetArtifactDescription(artifact).c_str());
+                        NormalDialog(
+                            gText,
+                            NORMAL_DIALOG_QUICK_VIEW,
+                            artifactDialogX,
+                            artifactDialogY,
+                            NORMAL_DIALOG_ARTIFACT,
+                            artifact,
+                            -1,
+                            0,
+                            -1,
+                            0
+                        );
+                    }
+                    return;
+                }
                 case MAP_OBJECT_OBELISK:
                     if (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG))) {
                         sprintf(
@@ -5288,6 +5364,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     }
 
 quick_info_ready:
+    if (currentCell != NULL) {
+        Ironfist_TooltipText(currentCell, m_mapOriginX + cellX, m_mapOriginY + cellY);
+    }
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
@@ -5485,11 +5564,12 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             msg.payload.widget.data.value = LOCATOR_TOWN_ENABLE_FLAGS;
             m_adventureWindow->BroadcastMessage(msg);
             msg.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-            msg.payload.widget.data.value =
-                H2EnumIndex(gpGame->GetTown(whichTown)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
-            if (!(gpGame->GetTown(whichTown)->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))) {
-                msg.payload.widget.data.value += LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
-            }
+            if (gpGame->GetTown(whichTown)->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
+                msg.payload.widget.data.value =
+                    castleIconFrames[H2EnumIndex(gpGame->GetTown(whichTown)->m_type)];
+            else
+                msg.payload.widget.data.value =
+                    townIconFrames[H2EnumIndex(gpGame->GetTown(whichTown)->m_type)];
             m_adventureWindow->BroadcastMessage(msg);
 
             if (H2BitTest(gpGame->m_knownTowns, whichTown)) {
@@ -6691,11 +6771,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message.payload.widget.id = TOWN_QUICK_PORTRAIT_WIDGET;
-    message.payload.widget.data.value =
-        H2EnumIndex(townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
-    if ((gpGame->GetTown(townId)->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_CASTLE))) == 0) {
-        message.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
-    }
+    if (gpGame->GetTown(townId)->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_CASTLE)))
+        message.payload.widget.data.value = castleIconFrames[H2EnumIndex(townPtr->m_type)];
+    else
+        message.payload.widget.data.value = townIconFrames[H2EnumIndex(townPtr->m_type)];
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
@@ -7331,6 +7410,12 @@ void advManager::CastSpell(SpellType spell) {
                 gpGame->ClaimMine(cell->m_objectMetadata, -1);
             }
             break;
+        case SPELL_AWARENESS:
+            // Lights fifteen tiles of map around the caster.
+            gpGame->SetVisibility(hero->m_x, hero->m_y, giCurPlayer, 15);
+            hero->UseSpell(spell);
+            RedrawAdvScreen(1, 0);
+            break;
         case SPELL_VIEW_MINES:
         case SPELL_VIEW_RESOURCES:
         case SPELL_VIEW_ARTIFACTS:
@@ -7358,6 +7443,10 @@ void advManager::CastSpell(SpellType spell) {
             SummonBoat();
             break;
         case SPELL_DIMENSION_DOOR:
+            // The mobility cost is paid only when the jump succeeds.
+            UpdateHeroLocator(-1, 1, 1);
+            DimensionDoor();
+            break;
         case SPELL_TOWN_GATE:
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
@@ -7381,9 +7470,7 @@ void advManager::CastSpell(SpellType spell) {
                 hero->m_remainingMobility -= TRAVEL_SPELL_MOBILITY_COST;
             }
             UpdateHeroLocator(-1, 1, 1);
-            if (spell == SPELL_DIMENSION_DOOR) {
-                DimensionDoor();
-            } else {
+            {
                 TownGate(spell);
             }
             break;
@@ -7417,21 +7504,11 @@ i32 SaveGame(void) {
         }
     }
 
+    // The extension follows the campaign type, custom campaigns included.
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
-    if (gbInCampaign) {
-        sprintf(suffix, ".GMC");
-        sprintf(pattern, "*.GMC");
-    } else if (xIsPlayingExpansionCampaign) {
-        sprintf(suffix, ".GXC");
-        sprintf(pattern, "*.GXC");
-    } else if (xIsExpansionMap) {
-        sprintf(suffix, ".GX%d", nPlayers);
-        sprintf(pattern, "*.GX%d", nPlayers);
-    } else {
-        sprintf(suffix, ".GM%d", nPlayers);
-        sprintf(pattern, "*.GM%d", nPlayers);
-    }
+    sprintf(suffix, "%s", GetSaveFileExtension(false).c_str());
+    sprintf(pattern, "*%s", suffix);
 
     fileRequester* req = new fileRequester(
         SAVE_REQUESTER_X,
@@ -8382,6 +8459,23 @@ void advManager::DimensionDoor(void) {
     i32 newY;
     mapCell* targetCell;
 
+    targetHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
+    if (targetHero->m_remainingMobility <= 0) {
+        NormalDialog(
+            localization::Tr("adventure.spell.dimension_door.too_tired"),
+            OPTION_DIALOG_MESSAGE,
+            OPTION_DIALOG_NONE,
+            OPTION_DIALOG_NONE,
+            OPTION_DIALOG_NONE,
+            0,
+            OPTION_DIALOG_NONE,
+            0,
+            OPTION_DIALOG_NONE,
+            0
+        );
+        return;
+    }
+
     window = new heroWindow(
         0,
         0,
@@ -8393,7 +8487,6 @@ void advManager::DimensionDoor(void) {
     gpWindowManager->DoDialog(window, DimensionDoorHandler, 0);
     delete window;
 
-    targetHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     if (gpWindowManager->m_dialogResult == TRAVEL_DIALOG_ACCEPT) {
         newX = m_mapOriginX + m_lastHoverCell;
         newY = m_mapOriginY + m_hoverCellY;
@@ -8416,11 +8509,17 @@ void advManager::DimensionDoor(void) {
             );
             UpdateRadar(1, 0);
         } else {
+            // The spell and its mobility cost apply only when the jump lands.
             gpSoundManager->SwitchAmbientMusic(TRAVEL_MUSIC);
             TeleportTo(targetHero, newX, newY, 0, 0);
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
+            gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
+            if (targetHero->m_remainingMobility < TRAVEL_SPELL_MOBILITY_COST) {
+                targetHero->m_remainingMobility = 0;
+            } else {
+                targetHero->m_remainingMobility -= TRAVEL_SPELL_MOBILITY_COST;
+            }
         }
-        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
         UpdateRadar(1, 0);
     }

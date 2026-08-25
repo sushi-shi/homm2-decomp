@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
+#include <map>
+#include <set>
+#include <vector>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/expansions.h>
 #include <string.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
@@ -283,6 +289,7 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_DEATH_RIPPLE:
             case SPELL_DEATH_WAVE:
             case SPELL_MASS_SHIELD:
+            case SPELL_MASS_FORCE_SHIELD:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
                         localization::Tr("spell.no_valid_target")
@@ -396,32 +403,95 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
     i32 hex;
 
     switch (message.type) {
-        case SPELL_MESSAGE_HOVER:
+        case SPELL_MESSAGE_HOVER: {
             hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
-            if (hex != indexToCastOn) {
-                if (!gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
-                    indexToCastOn = NO_SELECTION;
-                    gpMouseManager->SetPointer(0);
-                    if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
-                        gpCombatManager->CombatMessage(
-                            localization::Tr("combat.spell.invalid_teleport_destination"),
-                            1, 0, 0
-                        );
-                    } else {
-                        gpCombatManager->CombatMessage(
-                            localization::Tr("combat.spell.select_target"),
-                            1, 0, 0
-                        );
+            // Shade the whole grid by target validity, then highlight the
+            // spell's footprint under the cursor.
+            u8 savedShades[COMBAT_HEX_COUNT];
+            for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+                savedShades[hexIndex] = H2EnumIndex(gpCombatManager->m_gridState[hexIndex]);
+            }
+            for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+                if (gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hexIndex)) {
+                    gpCombatManager->m_gridState[hexIndex] = GRID_SHADE_EMPTY_BLOCKED;
+                    if (gpCombatManager->m_hexCells[hexIndex].m_occupantSide
+                        != COMBAT_SIDE_NONE) {
+                        gpCombatManager->m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
                     }
+                } else if (hexIndex % HEX_COLUMN_COUNT
+                           && hexIndex % HEX_COLUMN_COUNT != HEX_RIGHT_BORDER) {
+                    gpCombatManager->m_gridState[hexIndex] = GRID_SHADE_NONE;
+                }
+            }
+
+            if (gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
+                indexToCastOn = hex;
+                if (gpCombatManager->m_selectedSpell == SPELL_PLASMA_CONE) {
+                    // The cone streams in the direction the cursor points.
+                    CursorDirection direction = gpCombatManager->GetCursorDirection(
+                        message.payload.mouse.screenX, message.payload.mouse.screenY, hex
+                    );
+                    i32 cursorFrame;
+                    switch (direction) {
+                        case CURSOR_DIRECTION_LEFT_DOWN:
+                            cursorFrame = 10;
+                            break;
+                        case CURSOR_DIRECTION_LEFT:
+                            cursorFrame = 11;
+                            break;
+                        case CURSOR_DIRECTION_LEFT_UP:
+                            cursorFrame = 12;
+                            break;
+                        case CURSOR_DIRECTION_RIGHT_UP:
+                            cursorFrame = 7;
+                            break;
+                        case CURSOR_DIRECTION_RIGHT:
+                            cursorFrame = 8;
+                            break;
+                        case CURSOR_DIRECTION_RIGHT_DOWN:
+                        default:
+                            cursorFrame = 9;
+                            break;
+                    }
+                    gpMouseManager->SetPointer(
+                        const_cast<char*>("cmbtmous.mse"), cursorFrame, MOUSE_AUTO_CURSOR_TYPE
+                    );
+                    gSpellDirection = H2EnumIndex(direction);
                 } else {
-                    indexToCastOn = hex;
                     gpMouseManager->SetPointer(
                         gsSpellInfo[H2EnumIndex(gpCombatManager->m_selectedSpell)].iconIndex
                     );
-                    gpCombatManager->SpellMessage(gpCombatManager->m_selectedSpell, hex);
+                }
+                std::vector<i32> spellMask = gpCombatManager->GetSpellMask(
+                    gpCombatManager->m_selectedSpell, indexToCastOn, gSpellDirection
+                );
+                for (i32 maskHex : spellMask) {
+                    gpCombatManager->m_gridState[maskHex] = GRID_SHADE_REACHABLE;
+                }
+                gpCombatManager->SpellMessage(gpCombatManager->m_selectedSpell, hex);
+            } else {
+                indexToCastOn = NO_SELECTION;
+                gpMouseManager->SetPointer(0);
+                if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
+                    gpCombatManager->CombatMessage(
+                        localization::Tr("combat.spell.invalid_teleport_destination"), 1, 0, 0
+                    );
+                } else {
+                    gpCombatManager->CombatMessage(
+                        localization::Tr("combat.spell.select_target"), 1, 0, 0
+                    );
                 }
             }
+
+            gbLimitToExtent = false;
+            gpCombatManager->UpdateGrid(0, 0);
+            gpCombatManager->DrawFrame(1, 0, 0, 0, 0, 1, 1);
+            for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+                gpCombatManager->m_gridState[hexIndex] =
+                    static_cast<CombatGridShade>(savedShades[hexIndex]);
+            }
             break;
+        }
 
         case SPELL_MESSAGE_SELECT:
             if (indexToCastOn != NO_SELECTION) {
@@ -555,6 +625,17 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
                 return 0;
             break;
 
+        case SPELL_FORCE_SHIELD:
+        case SPELL_MASS_FORCE_SHIELD:
+            // Only shieldable while the shield is below the creature's health.
+            if (m_hexCells[hex].m_occupantSide != m_currentSide)
+                return 0;
+            if (target_j
+                && gIronfistExtra.combat.stack.forceShieldHP[target_j]
+                       >= gMonsterDatabase[H2EnumIndex(target_j->m_monsterType)].hitPoints)
+                return 0;
+            break;
+
         case SPELL_MIRROR_IMAGE:
             if (m_hexCells[hex].m_occupantSide != m_currentSide)
                 return 0;
@@ -580,6 +661,8 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_HYPNOTIZE:
         case SPELL_COLD_RAY:
         case SPELL_DISRUPTING_RAY:
+        case SPELL_SHADOW_MARK:
+        case SPELL_MARKSMAN_PIERCE:
             if (m_hexCells[hex].m_occupantSide != OppositeCombatSide(m_currentSide))
                 return 0;
             break;
@@ -601,6 +684,9 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
+        case SPELL_PLASMA_CONE:
+        case SPELL_FIRE_BOMB:
+        case SPELL_IMPLOSION_GRENADE:
             if (hex == COMBAT_HEX_EMPTY || hex % HEX_COLUMN_COUNT == 0
                 || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
                 return 0;
@@ -622,6 +708,9 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
+        case SPELL_PLASMA_CONE:
+        case SPELL_FIRE_BOMB:
+        case SPELL_IMPLOSION_GRENADE:
             sprintf(
                 gText,
                 localization::Tr("combat.spell.cast"),
@@ -685,7 +774,8 @@ void combatManager::CastSpell(
     i32 unusedCastA8;
     i32 unusedCastB1;
 
-    if (castByCreature == 0 && m_eagleEyeSpell[H2EnumIndex(OppositeCombatSide(m_currentSide))] == SPELL_NONE
+    if (castByCreature == 0 && H2EnumIndex(spell) < H2EnumIndex(SPELL_COUNT)
+        && m_eagleEyeSpell[H2EnumIndex(OppositeCombatSide(m_currentSide))] == SPELL_NONE
         && m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))] != NULL
         && !m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]->HasSpell(spell)
         && m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
@@ -726,7 +816,7 @@ void combatManager::CastSpell(
         || spell == SPELL_MASS_CURE || spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT
         || spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE || spell == SPELL_MASS_SHIELD
         || spell == SPELL_ARMAGEDDON || spell == SPELL_ELEMENTAL_STORM
-        || spell == SPELL_MASS_DISPEL) {
+        || spell == SPELL_MASS_DISPEL || spell == SPELL_MASS_FORCE_SHIELD) {
         target3 = NULL;
     } else if (ValidHex(targetHex)
                && m_hexCells[targetHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
@@ -1061,6 +1151,7 @@ void combatManager::CastSpell(
         case SPELL_DEATH_RIPPLE:
         case SPELL_DEATH_WAVE:
         case SPELL_MASS_SHIELD:
+        case SPELL_MASS_FORCE_SHIELD:
             CastMassSpell(spell, spellPower6);
             break;
         case SPELL_MIRROR_IMAGE:
@@ -1197,6 +1288,65 @@ void combatManager::CastSpell(
         case SPELL_EARTHQUAKE:
             Earthquake();
             break;
+        case SPELL_SHADOW_MARK:
+            ShowSpellMessage(castByCreature, spell, target3);
+            target3->SetSpellInfluence(ARMY_SPELL_INFLUENCE_SHADOW_MARK, 1);
+            target3->SpellEffect(gsSpellInfo[H2EnumIndex(SPELL_SHADOW_MARK)].combatEffect, 0, 0);
+            break;
+        case SPELL_MARKSMAN_PIERCE: {
+            DelayMilli(
+                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_PIERCE_DELAY)
+            );
+            i32l pierceDamage = SPELL_PIERCE_DAMAGE;
+            // The keep's walls blunt the round.
+            if (m_inCastleCombat && m_currentSide == COMBAT_ATTACKER_SIDE
+                && InCastle(target3->m_hex)) {
+                pierceDamage = static_cast<i32l>(pierceDamage * 0.75);
+            }
+            sprintf(
+                gText,
+                localization::Tr("combat.spell.marksman_pierce_damage"),
+                static_cast<i32>(pierceDamage),
+                target3->m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(target3->m_monsterType))
+                                        : GetCreatureName(H2EnumIndex(target3->m_monsterType))
+            );
+            CombatMessage(gText, 1, 1, 0);
+            float pierceAngles[SPELL_MISSILE_ANGLE_COUNT] = {
+                90.000000f,
+                45.000038f,
+                26.565073f,
+                18.262905f,
+                0.000000f,
+                -18.262905f,
+                -26.565073f,
+                -45.000038f,
+                -90.000000f
+            };
+            icon* arrowIcon = gpResourceManager->GetIcon("keep.icn");
+            ShootMissile(
+                castX, castY, target3->MidX(), target3->MidY(), pierceAngles, arrowIcon
+            );
+            gpResourceManager->Dispose(arrowIcon);
+            target3->Damage(pierceDamage, SPELL_NONE);
+            target3->SetSpellInfluence(ARMY_SPELL_INFLUENCE_DAZE, 1);
+            target3->SpellEffect(gsSpellInfo[H2EnumIndex(SPELL_MARKSMAN_PIERCE)].combatEffect, 0, 0);
+            target3->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+            break;
+        }
+        case SPELL_PLASMA_CONE:
+            PlasmaCone(targetHex);
+            break;
+        case SPELL_FORCE_SHIELD:
+            ShowSpellMessage(castByCreature, spell, target3);
+            target3->SetSpellInfluence(ARMY_SPELL_INFLUENCE_FORCE_SHIELD, spellPower6);
+            target3->SpellEffect(gsSpellInfo[H2EnumIndex(SPELL_FORCE_SHIELD)].combatEffect, 0, 0);
+            break;
+        case SPELL_FIRE_BOMB:
+            FireBomb(targetHex);
+            break;
+        case SPELL_IMPLOSION_GRENADE:
+            ImplosionGrenade(targetHex);
+            break;
         default:
             DefaultSpell(targetHex);
             break;
@@ -1239,6 +1389,603 @@ void combatManager::DefaultSpell(i32 targetHex) {
     army* target =
         &m_armies[H2EnumIndex(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
     target->SpellEffect(gsSpellInfo[H2EnumIndex(m_selectedSpell)].combatEffect, 0, 1);
+}
+
+// Ironfist's area-spell engine: hex masks per spell shape, one impact
+// animation, and shared damage application. The Plasma Cone streams in the
+// direction the caster picked.
+i32 gSpellDirection;
+
+static i32 GetHexNeighboursLine(
+    i32 startingFrom, i32 neighborDirection, i32 length, std::vector<i32>& hexes
+) {
+    hexes.clear();
+    i32 currentHex = startingFrom;
+    hexes.push_back(startingFrom);
+    for (i32 step = 0; step < length - 1; step++) {
+        i32 neighbor = GetAdjacentCellIndexNoArmy(
+            currentHex, static_cast<CombatHexDirection>(neighborDirection)
+        );
+        if (neighbor == -1) {
+            break;
+        }
+        hexes.push_back(neighbor);
+        currentHex = neighbor;
+    }
+    return hexes.empty();
+}
+
+static std::vector<i32> GetPlasmaConeSpellMask(i32 fromHex, i32 direction) {
+    static const i32 spellNeighbourDirections[ARMY_ADJACENT_DIRECTION_COUNT][3] = {
+        {5, 0, 1}, // right up
+        {0, 1, 2}, // right
+        {1, 2, 3}, // right down
+        {2, 3, 4}, // left down
+        {3, 4, 5}, // left
+        {4, 5, 0}  // left up
+    };
+    struct HexLineData {
+        i32 fromHex;
+        i32 length;
+    };
+    std::vector<i32> mask;
+    std::vector<HexLineData> hexLines;
+    CombatHexDirection leftDirection =
+        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][0]);
+    CombatHexDirection centerDirection =
+        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][1]);
+    CombatHexDirection rightDirection =
+        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][2]);
+
+    hexLines.push_back({fromHex, 8});
+
+    i32 sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(fromHex, centerDirection), leftDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 6});
+    }
+    sideHex = GetAdjacentCellIndexNoArmy(sideHex, centerDirection);
+    sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(sideHex, centerDirection), leftDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 4});
+    }
+    sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(sideHex, centerDirection), leftDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 2});
+    }
+
+    sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(fromHex, centerDirection), rightDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 6});
+    }
+    sideHex = GetAdjacentCellIndexNoArmy(sideHex, centerDirection);
+    sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(sideHex, centerDirection), rightDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 4});
+    }
+    sideHex = GetAdjacentCellIndexNoArmy(
+        GetAdjacentCellIndexNoArmy(sideHex, centerDirection), rightDirection
+    );
+    if (sideHex != -1) {
+        hexLines.push_back({sideHex, 2});
+    }
+
+    for (auto& line : hexLines) {
+        std::vector<i32> lineHexes;
+        if (!GetHexNeighboursLine(line.fromHex, H2EnumIndex(centerDirection), line.length, lineHexes)) {
+            mask.insert(mask.end(), lineHexes.begin(), lineHexes.end());
+        }
+    }
+    return mask;
+}
+
+static double GetDistanceBetweenPoints(i32 fromX, i32 fromY, i32 toX, i32 toY) {
+    return sqrt(pow(fromX - toX, 2) + pow(fromY - toY, 2));
+}
+
+static bool IsOutOfBoundsHex(i32 hexIndex) {
+    return !ValidHex(hexIndex)
+           || !(hexIndex % ARMY_HEX_COLUMNS
+                && hexIndex % ARMY_HEX_COLUMNS != ARMY_HEX_COLUMNS - 1);
+}
+
+std::vector<i32> combatManager::GetSpellMask(SpellType spell, i32 fromHex, i32 direction) {
+    std::vector<i32> mask;
+    switch (spell) {
+        case SPELL_PLASMA_CONE:
+            mask = GetPlasmaConeSpellMask(fromHex, direction);
+            break;
+        case SPELL_FIREBALL:
+        case SPELL_FIRE_BOMB:
+        case SPELL_METEOR_SHOWER:
+            mask = GetSpellMask(SPELL_COLD_RING, fromHex, direction);
+            mask.push_back(fromHex);
+            break;
+        case SPELL_COLD_RING:
+            for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
+                i32 neighbor =
+                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir));
+                if (ValidSpellTarget(spell, neighbor)) {
+                    mask.push_back(neighbor);
+                }
+            }
+            break;
+        case SPELL_FIREBLAST:
+            mask = GetSpellMask(SPELL_FIREBALL, fromHex, direction);
+            for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
+                i32 straightHex = GetAdjacentCellIndexNoArmy(
+                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir)),
+                    static_cast<CombatHexDirection>(dir)
+                );
+                if (ValidSpellTarget(spell, straightHex)) {
+                    mask.push_back(straightHex);
+                }
+            }
+            for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
+                i32 closestNeighbor =
+                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir));
+                if (ValidSpellTarget(spell, closestNeighbor)) {
+                    i32 rightHex = GetAdjacentCellIndexNoArmy(
+                        closestNeighbor,
+                        static_cast<CombatHexDirection>((dir + 1) % ARMY_ADJACENT_DIRECTION_COUNT)
+                    );
+                    if (ValidSpellTarget(spell, rightHex)) {
+                        mask.push_back(rightHex);
+                    }
+                    i32 leftHex = GetAdjacentCellIndexNoArmy(
+                        closestNeighbor,
+                        static_cast<CombatHexDirection>(
+                            (dir + ARMY_ADJACENT_DIRECTION_COUNT - 1)
+                            % ARMY_ADJACENT_DIRECTION_COUNT
+                        )
+                    );
+                    if (ValidSpellTarget(spell, leftHex)) {
+                        mask.push_back(leftHex);
+                    }
+                }
+            }
+            break;
+        case SPELL_IMPLOSION_GRENADE: {
+            double maxDistance =
+                COMBAT_HEX_SIZE * SPELL_IMPLOSION_HEX_RADIUS - COMBAT_HEX_SIZE / 2;
+            for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+                if (!ValidSpellTarget(spell, hexIndex)) {
+                    continue;
+                }
+                double distance = GetDistanceBetweenPoints(
+                    m_hexCells[fromHex].m_x,
+                    m_hexCells[fromHex].m_gridBottom,
+                    m_hexCells[hexIndex].m_x,
+                    m_hexCells[hexIndex].m_gridBottom
+                );
+                if (distance < maxDistance) {
+                    mask.push_back(hexIndex);
+                }
+            }
+        }
+        default:
+            mask.push_back(fromHex);
+    }
+    std::set<i32> uniqueHexes;
+    for (i32 hexIndex : mask) {
+        if (hexIndex != -1) {
+            uniqueHexes.insert(hexIndex);
+        }
+    }
+    mask.assign(uniqueHexes.begin(), uniqueHexes.end());
+    return mask;
+}
+
+void combatManager::AreaSpellMessage(SpellType spell, i32l damage) {
+    const char* messageId;
+    switch (spell) {
+        case SPELL_FIREBALL:
+            messageId = "combat.spell.fireball_damage";
+            break;
+        case SPELL_FIREBLAST:
+            messageId = "combat.spell.fireblast_damage";
+            break;
+        case SPELL_COLD_RING:
+            messageId = "combat.spell.cold_ring_damage";
+            break;
+        case SPELL_METEOR_SHOWER:
+            messageId = "combat.spell.meteor_shower_damage";
+            break;
+        case SPELL_PLASMA_CONE:
+            messageId = "combat.spell.plasma_cone_damage";
+            break;
+        case SPELL_FIRE_BOMB:
+            messageId = "combat.spell.fire_bomb_damage";
+            break;
+        case SPELL_IMPLOSION_GRENADE:
+            messageId = "combat.spell.implosion_grenade_damage";
+            break;
+        default:
+            sprintf(
+                gText,
+                localization::Tr("combat.spell.area_damage"),
+                H2EnumIndex(spell),
+                static_cast<i32>(damage)
+            );
+            CombatMessage(gText, 1, 1, 0);
+            return;
+    }
+    sprintf(gText, localization::Tr(messageId), static_cast<i32>(damage));
+    CombatMessage(gText, 1, 1, 0);
+}
+
+void combatManager::AreaSpellDrawImpact(
+    i32 hexIndex, icon* spellIcon, double speedMultiplier, i32 drawTimes, i32 flip
+) {
+    if (!gbNoShowCombat) {
+        i32 x = m_hexCells[hexIndex].m_x;
+        i32 y = m_hexCells[hexIndex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET;
+        for (i32 pass = 0; pass < drawTimes; pass++) {
+            for (i32 frame = 0; frame < spellIcon->m_frameCount; frame++) {
+                glTimers[0] = static_cast<i32>(
+                    platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * speedMultiplier
+                );
+                IconToBitmap(
+                    spellIcon,
+                    gpWindowManager->m_screen,
+                    x,
+                    y,
+                    frame,
+                    ICON_DRAW_CLIP,
+                    0,
+                    0,
+                    COMBAT_SCREEN_WIDTH,
+                    COMBAT_AREA_HEIGHT,
+                    0
+                );
+                if (flip) {
+                    FlipIconToBitmap(
+                        spellIcon,
+                        gpWindowManager->m_screen,
+                        x,
+                        y,
+                        frame,
+                        ICON_DRAW_CLIP,
+                        0,
+                        0,
+                        COMBAT_SCREEN_WIDTH,
+                        COMBAT_AREA_HEIGHT,
+                        0
+                    );
+                }
+                UpdateCombatArea();
+                DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+                DelayTil(glTimers);
+            }
+        }
+        gpResourceManager->Dispose(spellIcon);
+    }
+    DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+}
+
+void combatManager::AreaSpellDoDamage(i32l spellDamage, SpellType spell, army* target) {
+    ModifyDamageForArtifacts(
+        &spellDamage,
+        spell,
+        m_heroes[H2EnumIndex(m_currentSide)],
+        m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
+    );
+    AreaSpellMessage(spell, spellDamage);
+    target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+}
+
+bool combatManager::AreaSpellAffectHexes(
+    i32 hexIndex, army* target, SpellType spell, i32l spellDamage, std::vector<i32>& affectedHexes
+) {
+    affectedHexes = GetSpellMask(spell, hexIndex, gSpellDirection);
+    bool anyoneDamaged = false;
+    for (i32 hex : affectedHexes) {
+        hexcell* cell = &m_hexCells[hex];
+        if (spell == SPELL_FIRE_BOMB) {
+            // Fire walls linger where the bomb burst.
+            bool wallExists = false;
+            for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+                if (wall.hexIdx == hex) {
+                    wallExists = true;
+                    wall.turnsLeft = COMBAT_BURN_ROUNDS;
+                    wall.currentFrame = 0;
+                    break;
+                }
+            }
+            if (!wallExists) {
+                gIronfistExtra.combat.spell.fireBombWalls.push_back(
+                    {hex, COMBAT_BURN_ROUNDS, 0}
+                );
+            }
+        }
+        if (cell->m_occupantSide == COMBAT_SIDE_NONE) {
+            continue;
+        }
+        target = &m_armies[H2EnumIndex(cell->m_occupantSide)][cell->m_occupantIndex];
+        if (!target->SpellCastWorks(spell)) {
+            continue;
+        }
+        if (gArmyEffected[H2EnumIndex(target->m_side)][target->m_index]) {
+            continue;
+        }
+        gArmyEffected[H2EnumIndex(target->m_side)][target->m_index] = 1;
+        if (!target->m_damagePending) {
+            i32l damage = spellDamage;
+            if (target->m_monsterType == CREATURE_FIRE_ELEMENTAL && spell == SPELL_COLD_RING) {
+                damage *= ELEMENTAL_WEAKNESS_MULTIPLIER;
+            }
+            if (target->m_monsterType == CREATURE_WATER_ELEMENTAL
+                && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)) {
+                damage *= ELEMENTAL_WEAKNESS_MULTIPLIER;
+            }
+            if (target->m_monsterType == CREATURE_IRON_GOLEM
+                || target->m_monsterType == CREATURE_STEEL_GOLEM) {
+                damage = static_cast<i32l>(damage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+            }
+            if (target->m_monsterType == CREATURE_EARTH_ELEMENTAL
+                && spell == SPELL_METEOR_SHOWER) {
+                damage *= ELEMENTAL_WEAKNESS_MULTIPLIER;
+            }
+            if (spell == SPELL_FIRE_BOMB) {
+                CheckBurnCreature(target);
+            } else {
+                target->Damage(damage, spell);
+            }
+            anyoneDamaged = true;
+        }
+    }
+    return anyoneDamaged;
+}
+
+bool combatManager::AreaSpellAffectHexes(
+    i32 hexIndex, army* target, SpellType spell, i32l spellDamage
+) {
+    std::vector<i32> affectedHexes;
+    return AreaSpellAffectHexes(hexIndex, target, spell, spellDamage, affectedHexes);
+}
+
+void combatManager::PlasmaCone(i32 hexIndex) {
+    if (!ValidHex(hexIndex)) {
+        return;
+    }
+    AreaSpellDrawImpact(hexIndex, gpResourceManager->GetIcon("fireball.icn"), 75.0, 1, 0);
+    ClearEffects();
+
+    i32l spellDamage = SPELL_AREA_DAMAGE_PER_POWER * m_spellPower[H2EnumIndex(m_currentSide)];
+    army* target = &m_armies[H2EnumIndex(m_currentSide)][m_currentArmyIndex];
+    if (AreaSpellAffectHexes(hexIndex, target, SPELL_PLASMA_CONE, spellDamage)) {
+        AreaSpellDoDamage(spellDamage, SPELL_PLASMA_CONE, target);
+    }
+}
+
+void combatManager::FireBomb(i32 hexIndex) {
+    if (!ValidHex(hexIndex)) {
+        return;
+    }
+    AreaSpellDrawImpact(hexIndex, gpResourceManager->GetIcon("fireball.icn"), 75.0, 1, 0);
+    ClearEffects();
+
+    i32l spellDamage = SPELL_AREA_DAMAGE_PER_POWER * m_spellPower[H2EnumIndex(m_currentSide)];
+    army* target = &m_armies[H2EnumIndex(m_currentSide)][m_currentArmyIndex];
+    if (AreaSpellAffectHexes(hexIndex, target, SPELL_FIRE_BOMB, spellDamage)) {
+        AreaSpellDoDamage(spellDamage, SPELL_FIRE_BOMB, target);
+    }
+}
+
+void combatManager::ImplosionGrenade(i32 hexIndex) {
+    if (!ValidHex(hexIndex)) {
+        return;
+    }
+    AreaSpellDrawImpact(hexIndex, gpResourceManager->GetIcon("fireball.icn"), 75.0, 1, 0);
+    ClearEffects();
+
+    i32l spellDamage = SPELL_AREA_DAMAGE_PER_POWER * m_spellPower[H2EnumIndex(m_currentSide)];
+    army* target = &m_armies[H2EnumIndex(m_currentSide)][m_currentArmyIndex];
+    std::vector<i32> affectedHexes;
+    bool anyoneDamaged =
+        AreaSpellAffectHexes(hexIndex, target, SPELL_IMPLOSION_GRENADE, spellDamage, affectedHexes);
+
+    affectedHexes.erase(
+        std::remove(affectedHexes.begin(), affectedHexes.end(), hexIndex), affectedHexes.end()
+    );
+
+    // Each affected stack gets pulled one hex toward the blast's center.
+    std::map<i32, i32> pullDestinations;
+    i32 centerRow = hexIndex / ARMY_HEX_COLUMNS;
+    i32 centerColumn = hexIndex % ARMY_HEX_COLUMNS;
+    for (i32 affectedHex : affectedHexes) {
+        i32 rowDiff = centerRow - affectedHex / ARMY_HEX_COLUMNS;
+        i32 columnDiff = centerColumn - affectedHex % ARMY_HEX_COLUMNS;
+        i32 pullDirection;
+        if (rowDiff < 0) {
+            if (columnDiff < 0) {
+                pullDirection = abs(columnDiff) > abs(rowDiff) ? 4 : 5;
+            } else {
+                pullDirection = abs(columnDiff) > abs(rowDiff) ? 1 : 0;
+            }
+        } else {
+            if (columnDiff < 0) {
+                pullDirection = abs(columnDiff) > abs(rowDiff) ? 4 : 3;
+            } else {
+                pullDirection = abs(columnDiff) > abs(rowDiff) ? 1 : 2;
+            }
+        }
+        pullDestinations[affectedHex] = GetAdjacentCellIndexNoArmy(
+            affectedHex, static_cast<CombatHexDirection>(pullDirection)
+        );
+    }
+
+    // Pull ring by ring from the inside out, keeping two-hexer occupancy
+    // straight, then animate the drags together.
+    hexcell* centerCell = &m_hexCells[hexIndex];
+    std::map<army*, i32> creatureMovesFrom;
+    for (i32 ring = 1; ring <= SPELL_IMPLOSION_HEX_RADIUS; ring++) {
+        double maxDistance = COMBAT_HEX_SIZE * ring - COMBAT_HEX_SIZE / 2;
+        auto it = affectedHexes.begin();
+        while (it != affectedHexes.end()) {
+            i32 affectedHex = *it;
+            hexcell* movableCell = &m_hexCells[affectedHex];
+            if (movableCell->m_occupantSide == COMBAT_SIDE_NONE) {
+                it = affectedHexes.erase(it);
+                continue;
+            }
+            double distance = GetDistanceBetweenPoints(
+                centerCell->m_x,
+                centerCell->m_gridBottom,
+                movableCell->m_x,
+                movableCell->m_gridBottom
+            );
+            if (!(distance < maxDistance)) {
+                ++it;
+                continue;
+            }
+            it = affectedHexes.erase(it);
+
+            i32 destinationHex = pullDestinations[affectedHex];
+            if (destinationHex == -1) {
+                continue;
+            }
+            hexcell* destinationCell = &m_hexCells[destinationHex];
+            army* creatureToMove =
+                &m_armies[H2EnumIndex(movableCell->m_occupantSide)][movableCell->m_occupantIndex];
+            if (destinationCell->m_blocked) {
+                continue;
+            }
+            if (!creatureToMove->CanFit(destinationHex, 0, 0)) {
+                continue;
+            }
+            if (destinationCell->m_occupantSide != COMBAT_SIDE_NONE
+                && !(movableCell->m_occupantSide == destinationCell->m_occupantSide
+                     && movableCell->m_occupantIndex == destinationCell->m_occupantIndex)) {
+                continue;
+            }
+
+            if ((H2EnumIndex((creatureToMove->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
+                i32 destinationSecondHex;
+                i32 affectedSecondHex;
+                if (movableCell->m_occupantFrame == ARMY_FACING_RIGHT) {
+                    destinationSecondHex = destinationHex - 1;
+                    affectedSecondHex = affectedHex - 1;
+                } else {
+                    destinationSecondHex = destinationHex + 1;
+                    affectedSecondHex = affectedHex + 1;
+                }
+                hexcell* destinationSecondCell = &m_hexCells[destinationSecondHex];
+                hexcell* movableSecondCell = &m_hexCells[affectedSecondHex];
+
+                if (destinationSecondCell->m_blocked) {
+                    continue;
+                }
+                if (destinationSecondCell->m_occupantSide != COMBAT_SIDE_NONE
+                    && !(movableSecondCell->m_occupantSide
+                             == destinationSecondCell->m_occupantSide
+                         && movableSecondCell->m_occupantIndex
+                                == destinationSecondCell->m_occupantIndex)) {
+                    continue;
+                }
+
+                if (movableCell->m_occupantFrame == ARMY_FACING_RIGHT) {
+                    if (creatureToMove->m_facing == ARMY_FACING_RIGHT) {
+                        if (IsOutOfBoundsHex(destinationHex)) {
+                            continue;
+                        }
+                        creatureMovesFrom[creatureToMove] = creatureToMove->m_hex;
+                        creatureToMove->m_hex = destinationSecondHex;
+                    } else {
+                        if (IsOutOfBoundsHex(destinationSecondHex)) {
+                            continue;
+                        }
+                        creatureMovesFrom[creatureToMove] = creatureToMove->m_hex;
+                        creatureToMove->m_hex = destinationHex;
+                    }
+                } else {
+                    if (creatureToMove->m_facing == ARMY_FACING_RIGHT) {
+                        if (IsOutOfBoundsHex(destinationHex)) {
+                            continue;
+                        }
+                        creatureMovesFrom[creatureToMove] = creatureToMove->m_hex;
+                        creatureToMove->m_hex = destinationHex;
+                    } else {
+                        if (IsOutOfBoundsHex(destinationSecondHex)) {
+                            continue;
+                        }
+                        creatureMovesFrom[creatureToMove] = creatureToMove->m_hex;
+                        creatureToMove->m_hex = destinationSecondHex;
+                    }
+                }
+
+                i32 occupantIndex = movableCell->m_occupantIndex;
+                movableCell->m_occupantIndex = movableSecondCell->m_occupantIndex = -1;
+                destinationCell->m_occupantIndex = destinationSecondCell->m_occupantIndex =
+                    static_cast<i8>(occupantIndex);
+
+                CombatSide occupantSide = movableCell->m_occupantSide;
+                movableCell->m_occupantSide = movableSecondCell->m_occupantSide =
+                    COMBAT_SIDE_NONE;
+                destinationCell->m_occupantSide = destinationSecondCell->m_occupantSide =
+                    occupantSide;
+
+                ArmyFacing frontFrame = movableCell->m_occupantFrame;
+                ArmyFacing rearFrame = movableSecondCell->m_occupantFrame;
+                movableCell->m_occupantFrame = movableSecondCell->m_occupantFrame =
+                    ARMY_FACING_NONE;
+                destinationCell->m_occupantFrame = frontFrame;
+                destinationSecondCell->m_occupantFrame = rearFrame;
+
+                auto secondFound =
+                    std::find(affectedHexes.begin(), affectedHexes.end(), affectedSecondHex);
+                if (secondFound != affectedHexes.end()) {
+                    it = affectedHexes.erase(secondFound);
+                }
+            } else {
+                creatureMovesFrom[creatureToMove] = creatureToMove->m_hex;
+                creatureToMove->m_hex = destinationHex;
+                destinationCell->m_occupantIndex = movableCell->m_occupantIndex;
+                destinationCell->m_occupantSide = movableCell->m_occupantSide;
+                movableCell->m_occupantIndex = -1;
+                movableCell->m_occupantSide = COMBAT_SIDE_NONE;
+            }
+        }
+    }
+
+    for (i32 frame = 0; frame < SPELL_IMPLOSION_DRAG_FRAMES; frame++) {
+        for (auto& animated : creatureMovesFrom) {
+            army* creature = animated.first;
+            i32 initialHex = animated.second;
+            creature->m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
+            creature->m_animationFrame = 0;
+
+            i32 startX = m_hexCells[initialHex].m_x;
+            i32 startY = m_hexCells[initialHex].m_y;
+            float stepX = static_cast<float>(m_hexCells[creature->m_hex].m_x - startX)
+                          / SPELL_IMPLOSION_DRAG_FRAMES;
+            float stepY = static_cast<float>(m_hexCells[creature->m_hex].m_y - startY)
+                          / SPELL_IMPLOSION_DRAG_FRAMES;
+            creature->DrawToBuffer(
+                static_cast<i32>(startX + stepX * frame),
+                static_cast<i32>(startY + stepY * frame),
+                0
+            );
+        }
+        gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+        DelayTil(glTimers);
+        glTimers[0] = static_cast<i32>(
+            platform::Ticks() + 100 * gfCombatSpeedMod[gConfig.combatSpeed] * 1.3
+        );
+    }
+
+    if (anyoneDamaged) {
+        AreaSpellDoDamage(spellDamage, SPELL_IMPLOSION_GRENADE, target);
+    }
 }
 
 void combatManager::Fireball(i32 targetHex, SpellType spell) {
@@ -2895,6 +3642,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
         case SPELL_MASS_HASTE:
         case SPELL_MASS_BLESS:
         case SPELL_MASS_SHIELD:
+        case SPELL_MASS_FORCE_SHIELD:
             side2 = m_currentSide;
             for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side2)]; ++armyIndex) {
                 if (m_armies[H2EnumIndex(side2)][armyIndex].SpellCastWorks(spell))
@@ -3009,6 +3757,12 @@ applySpellInfluence:
                     break;
                 case SPELL_MASS_SHIELD:
                     target->SetSpellInfluence(ARMY_SPELL_INFLUENCE_SHIELD, spellPower);
+                    break;
+                case SPELL_MASS_FORCE_SHIELD:
+                    target->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_FORCE_SHIELD,
+                        spellPower
+                    );
                     break;
                 case SPELL_MASS_CURE:
                     target->Cure(spellPower);
@@ -3807,6 +4561,8 @@ void combatManager::ShowSpellMessage(
             sprintf(message, localization::Tr("combat.ability.mummy_curse"), targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
             sprintf(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
+        else if (spell == SPELL_SHADOW_MARK)
+            sprintf(message, localization::Tr("combat.ability.shadow_mark"), targetName);
         else {
             unhandledSpell5 = 0;
             ++unhandledSpell5;

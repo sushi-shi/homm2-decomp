@@ -17,7 +17,8 @@
         filter = path: type:
           let relative = pkgs.lib.removePrefix (toString ./. + "/") (toString path); in
           relative == "CMakeLists.txt"
-          || pkgs.lib.any (kept: pkgs.lib.hasPrefix kept relative) [ "src" "include" "web" "locales" "tools" ];
+          || pkgs.lib.any (kept: pkgs.lib.hasPrefix kept relative)
+               [ "src" "include" "web" "locales" "tools" "vendor" "scripts" ];
       };
 
       # Emscripten writes its cache next to $HOME, which a build does not have.
@@ -156,6 +157,14 @@
       homm2 = mkNative false;
       homm2-debug = mkNative true;
 
+      ironfist-resources = pkgs.writeShellApplication {
+        name = "install-ironfist-resources";
+        runtimeInputs = [ pkgs.coreutils pkgs.curl pkgs.findutils pkgs.gh pkgs.unzip ];
+        text = ''
+          exec ${pkgs.bash}/bin/bash ${./scripts/install-ironfist-resources.sh} "$@"
+        '';
+      };
+
       sdl3-web = pkgs.stdenvNoCC.mkDerivation {
         pname = "sdl3-web";
         inherit (pkgs.sdl3) version src;
@@ -256,7 +265,7 @@
           chmod -R u+w "$destination"
 
           preload=()
-          for name in DATA GAMES HELP HEROES2 MAPS MUSIC; do
+          for name in CAMPAIGNS DATA GAMES HELP HEROES2 MAPS MUSIC SCRIPTS; do
             if [ -e "$data/$name" ]; then
               preload+=(--preload "$data/$name@/game/$name")
             fi
@@ -289,6 +298,7 @@
         inherit
           homm2
           homm2-debug
+          ironfist-resources
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -304,6 +314,10 @@
         web = {
           type = "app";
           program = "${homm2-web-run}/bin/homm2-web";
+        };
+        ironfist-resources = {
+          type = "app";
+          program = "${ironfist-resources}/bin/install-ironfist-resources";
         };
       };
 

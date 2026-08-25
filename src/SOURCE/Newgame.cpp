@@ -25,6 +25,7 @@
 #include <SOURCE/game.h>
 #include <PLATFORM/Runtime.h>
 #include <PLATFORM/Strings.h>
+#include <IRONFIST/prefs.h>
 #include <SOURCE/Newgame.h>
 
 #include <string>
@@ -79,6 +80,7 @@ typedef enum NewGameConstant {
     GAME_COLOR_WIDGET_MULTIPLAYER_FRAME   = 27,
     GAME_FIXED_RACE_FRAME_BASE            = 70,
     GAME_RANDOM_RACE_FRAME_BASE           = 51,
+    GAME_PORTRAIT_FRAME_SLOT_COUNT        = 2,
     GAME_HELP_DIFFICULTY                  = 0,
     GAME_HELP_HANDICAP                    = 1,
     GAME_HELP_PLAYER                      = 2,
@@ -107,6 +109,25 @@ typedef enum NewGameConstant {
     GAME_SCENARIO_VICTORY                 = 205,
     GAME_SCENARIO_LOSS                    = 206
 } NewGameConstant;
+
+// ngextra.icn portrait frames per faction (random slot, locked slot); the
+// Cyborg frames sit past the retail run, so the frame is a lookup rather
+// than base-plus-race arithmetic.
+static const i32 factionPortraitIconIdx[KB_FACTION_TABLE_CAPACITY][GAME_PORTRAIT_FRAME_SLOT_COUNT] = {
+    {51, 70},
+    {52, 71},
+    {53, 72},
+    {54, 73},
+    {55, 74},
+    {56, 75},
+    {57, 76},
+    {58, 77},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {0, 0},
+    {82, 83}
+};
 
 enum class NewGameKeyCode : i32 {
     GAME_KEY_ENTER          = 10,
@@ -313,6 +334,16 @@ void game::InitNewGame(struct SMapHeader* header) {
     i32 unusedTally;
     i32 activeColorCount;
     i32 computerCount;
+
+    // A fresh start opens on the last map played.
+    if (!gbInCampaign && !xIsPlayingExpansionCampaign && !strlen(gLastFilename)) {
+        std::string lastPlayed =
+            read_pref<std::string>(xIsExpansionMap ? "Last Map expansion" : "Last Map");
+        if (!lastPlayed.empty() && lastPlayed.length() < sizeof(m_mapFilename)) {
+            strcpy(gMapName, lastPlayed.c_str());
+            strcpy(m_mapFilename, lastPlayed.c_str());
+        }
+    }
 
     activeColorCount = 0;
     unusedTally = 0;
@@ -992,8 +1023,8 @@ cleanup:
             message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
             message.payload.widget.id = NEW_GAME_RACE_CYCLE_FIRST + playerIndex;
             message.payload.widget.data.value =
-                (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
-                + H2EnumIndex(m_setupPlayerRace[playerIndex]);
+                factionPortraitIconIdx[H2EnumIndex(m_setupPlayerRace[playerIndex])]
+                                      [playerLockedValue ? 1 : 0];
             m_newGameWindow->BroadcastMessage(message);
 
             sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerIndex])]);
@@ -1469,6 +1500,10 @@ cleanup:
                                             FACTION_KNIGHT;
                                     else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
                                              == FACTION_NECROMANCER)
+                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                            FACTION_CYBORG;
+                                    else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                             == FACTION_CYBORG)
                                         gpGame->m_setupPlayerRace[currentPlayerLocal] =
                                             FACTION_RANDOM;
                                     else
@@ -2029,8 +2064,8 @@ void game::ShowScenInfo(void) {
         msg.payload.widget.id =
             NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
         msg.payload.widget.data.value =
-            (locked ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
-            + H2EnumIndex(m_setupPlayerRace[playerCounter]);
+            factionPortraitIconIdx[H2EnumIndex(m_setupPlayerRace[playerCounter])]
+                                  [locked ? 1 : 0];
         window->BroadcastMessage(msg);
 
         sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerCounter])]);

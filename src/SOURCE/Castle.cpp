@@ -7,6 +7,8 @@
 #include <BASE/widgetKind.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
+#include <IRONFIST/hooks.h>
+#include <IRONFIST/townconsts.h>
 #include <SOURCE/Castle.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
@@ -50,6 +52,7 @@ typedef enum CastleWidgetFrame {
     FRAME_NONE          = -1,
     FRAME_AVAILABLE     = 1,
     FRAME_UNAVAILABLE   = 2,
+    FRAME_DISALLOWED    = 3,
     FRAME_BUILT         = 11,
     FRAME_CANNOT_BUILD  = 12,
     FRAME_CANNOT_AFFORD = 13
@@ -199,8 +202,10 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
-                localization::Tr("castle.mage_guild.level")
-                     ,
+                localization::Tr(
+                    m_town->m_type == FACTION_CYBORG ? "castle.cybernetics_lab.level"
+                                                     : "castle.mage_guild.level"
+                ),
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
             );
@@ -215,8 +220,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        i32 disallowed =
+            Ironfist_BuildingDisallowed(m_town, H2EnumIndex(castleSlotsUse[slotNum]));
         stateFrame = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << H2EnumIndex(castleSlotsUse[slotNum])))
+        if (disallowed) {
+            stateFrame = FRAME_CANNOT_BUILD;
+        } else if ((m_town->m_buildings & (1L << H2EnumIndex(castleSlotsUse[slotNum])))
             && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
                 || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
             stateFrame = FRAME_BUILT;
@@ -253,8 +262,9 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             msg.payload.widget.id = CONTROL_BUILDING_OVERLAY_FIRST + slotNum;
             casWin->BroadcastMessage(msg);
             msg.payload.widget.command = CASTLE_WIDGET_FRAME;
-            msg.payload.widget.data.value =
-                stateFrame == FRAME_NONE ? H2EnumIndex(FRAME_AVAILABLE) : FRAME_UNAVAILABLE;
+            msg.payload.widget.data.value = disallowed
+                ? H2EnumIndex(FRAME_DISALLOWED)
+                : (stateFrame == FRAME_NONE ? H2EnumIndex(FRAME_AVAILABLE) : FRAME_UNAVAILABLE);
             casWin->BroadcastMessage(msg);
         }
     }
@@ -396,7 +406,11 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                                        ->m_terrainImageIndex])
                           - 1)
                          * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
-    raceBase = H2EnumIndex(m_town->m_type) * RACE_ICON_FRAMES;
+    // Cyborg towns use sprite slot 6, following the OBJNTOWN.ICN order.
+    raceBase =
+        (m_town->m_type == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT
+         : H2EnumIndex(m_town->m_type))
+        * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backFrame = 0;
         for (rowPos = BACKGROUND_TERRAIN_FIRST_ROW; rowPos <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPos) {
@@ -552,7 +566,14 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         objIndex = H2EnumIndex(INFO_CANNOT_AFFORD_MAGE_LEVEL);
                     else
                         objIndex = H2EnumIndex(INFO_ADD_MAGE_GUILD_LEVEL);
-                    strcpy(gText, cCastleInfo[objIndex]);
+                    if (gpTownManager->m_town->m_type == FACTION_CYBORG
+                        && objIndex == H2EnumIndex(INFO_BUILD_MAGE_GUILD))
+                        strcpy(gText, localization::Tr("castle.cybernetics_lab.build"));
+                    else if (gpTownManager->m_town->m_type == FACTION_CYBORG
+                             && objIndex == H2EnumIndex(INFO_ADD_MAGE_GUILD_LEVEL))
+                        strcpy(gText, localization::Tr("castle.cybernetics_lab.add_level"));
+                    else
+                        strcpy(gText, cCastleInfo[objIndex]);
                 }
                 break;
 

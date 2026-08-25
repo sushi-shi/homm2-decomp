@@ -174,6 +174,8 @@ typedef enum SpellCastConstant {
     EARTHQUAKE_EXTENT_MAX_X                        = 575,
     SPELL_SAMPLE_NAME_CAPACITY                     = 16,
     SPELL_MISSILE_ANGLE_COUNT                      = 9,
+    SPELL_PIERCE_DAMAGE                            = 1000,
+    SPELL_PIERCE_DELAY                             = 100,
     SPELL_EAGLE_EYE_ROLL_MAX                       = 9
 } SpellCastConstant;
 

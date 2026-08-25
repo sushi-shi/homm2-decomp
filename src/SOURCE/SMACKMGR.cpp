@@ -211,19 +211,23 @@ void SmackManagerMain(void) {
     smk1 = platform::kInvalidMovie;
     if (bSmackNum != EXPANSION_CAMPAIGN) {
         smk1 = platform::MovieOpen(gText, bSmackSound);
-        if (smk1 == platform::kInvalidMovie)
-            ShutDown("Unable to open animation file.");
-        platform::MovieTarget(
-            smk1,
-            gpWindowManager->m_screen->m_pixels,
-            GRAPHICS_WIDTH,
-            GRAPHICS_HEIGHT,
-            0,
-            0
-        );
+        if (smk1 == platform::kInvalidMovie) {
+            // Ironfist plays on without the CD: missing movies are skipped
+            // and the campaign chooser gets a still backdrop instead.
+            cmpnNoCD = gpResourceManager->GetIcon("CMPNNOCD.icn");
+        } else {
+            platform::MovieTarget(
+                smk1,
+                gpWindowManager->m_screen->m_pixels,
+                GRAPHICS_WIDTH,
+                GRAPHICS_HEIGHT,
+                0,
+                0
+            );
+        }
     }
 
-    if (strlen(SmackOptions[bSmackNum].companionFileName) > 1) {
+    if (smk1 && strlen(SmackOptions[bSmackNum].companionFileName) > 1) {
         if (gConfig.slowVideo)
             sprintf(
                 gText,
@@ -270,12 +274,30 @@ void SmackManagerMain(void) {
     companionStarted26 = 0;
 
     if (bSmackNum == CHOOSE_CAMPAIGN) {
+        if (smk1 == platform::kInvalidMovie) {
+            gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
+            cmpnNoCD->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
+            BlitBitmapToScreen(
+                gpWindowManager->m_screen,
+                0,
+                0,
+                GRAPHICS_WIDTH,
+                GRAPHICS_HEIGHT,
+                0,
+                0
+            );
+            gpMouseManager->SetPointer("advmice.mse", POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
+            gpMouseManager->ReallyShowPointer();
+        }
         platform::PumpEvents();
         while (gpInputManager->GetEvent().type != MESSAGE_NONE)
             ;
     }
 
     while (playing17) {
+        if (smk1 == platform::kInvalidMovie && bSmackNum != CHOOSE_CAMPAIGN
+            && bSmackNum != EXPANSION_CAMPAIGN)
+            break;
         if (bSmackNum == EXPANSION_CAMPAIGN) {
             if (!primaryStarted7) {
                 gpMouseManager->SetPointer(
@@ -304,7 +326,7 @@ void SmackManagerMain(void) {
                 gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
                 primaryStarted7 = 1;
             }
-        } else if (!platform::MovieWaiting(smk1)) {
+        } else if (smk1 != platform::kInvalidMovie && !platform::MovieWaiting(smk1)) {
             if (bSmackNum == INTRO_MUSIC && !musicStarted0) {
                 musicStarted0 = 1;
                 gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
@@ -387,6 +409,18 @@ void SmackManagerMain(void) {
                     if (campaignChoice4 == gbCampaignSideChoice)
                         break;
                     gbCampaignSideChoice = campaignChoice4;
+                    if (!smk1) {
+                        cmpnNoCD->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
+                        BlitBitmapToScreen(
+                            gpWindowManager->m_screen,
+                            0,
+                            0,
+                            GRAPHICS_WIDTH,
+                            GRAPHICS_HEIGHT,
+                            0,
+                            0
+                        );
+                    }
                     if (gbCampaignSideChoice == CAMPAIGN_ARCHIBALD) {
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
@@ -468,7 +502,7 @@ void SmackManagerMain(void) {
                 break;
         }
 
-        if (bSmackNum == CONGRATS
+        if (bSmackNum == CONGRATS && smk1 != platform::kInvalidMovie
             && platform::MovieFrameIndex(smk1) + 1 == platform::MovieFrameCount(smk1)
             && !musicStarted0) {
             musicStarted0 = 1;
@@ -482,6 +516,7 @@ void SmackManagerMain(void) {
                             >= platform::MovieFrameCount(smk2) - 1
                         || (platform::MovieFrameIndex(smk2) <= 0 && companionStarted26)))
                 || (smk2 == platform::kInvalidMovie
+                    && smk1 != platform::kInvalidMovie
                     && (platform::MovieFrameIndex(smk1) >= platform::MovieFrameCount(smk1)
                         || (platform::MovieFrameIndex(smk1) <= 0 && primaryStarted7))))) {
             playing17 = 0;
@@ -555,6 +590,9 @@ playbackDone:
     if (brotherIcon)
         gpResourceManager->Dispose(static_cast<resource*>(brotherIcon));
     brotherIcon = NULL;
+    if (cmpnNoCD)
+        gpResourceManager->Dispose(static_cast<resource*>(cmpnNoCD));
+    cmpnNoCD = NULL;
     if (backImage)
         gpResourceManager->Dispose(static_cast<resource*>(backImage));
     backImage = NULL;
@@ -609,6 +647,7 @@ i32 PlaySmacker(i32 smackNumber) {
 
 i32 bSmackSound = 0;
 icon* brotherIcon = NULL;
+icon* cmpnNoCD = NULL;
 static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 

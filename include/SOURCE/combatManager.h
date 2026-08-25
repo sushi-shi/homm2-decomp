@@ -2,14 +2,27 @@
 #define HOMM2_SOURCE_COMBATMANAGER_H
 
 #include <Ints.h>
+#include <vector>
 #include <BASE/baseManager.h>
 #include <BASE/WINMGR.h>
 #include <BASE/icon.h>
 #include <SOURCE/COMMAND.h>
+#include <SOURCE/graphics.h>
 #include "army.h"
 #include "hero.h"
 #include "hexcell.h"
 #include "SPELLS.h"
+
+// The six directions the plasma-cone cursor can point, matching the hex
+// adjacency order.
+enum CursorDirection {
+    CURSOR_DIRECTION_RIGHT_UP   = 0,
+    CURSOR_DIRECTION_RIGHT      = 1,
+    CURSOR_DIRECTION_RIGHT_DOWN = 2,
+    CURSOR_DIRECTION_LEFT_DOWN  = 3,
+    CURSOR_DIRECTION_LEFT       = 4,
+    CURSOR_DIRECTION_LEFT_UP    = 5
+};
 
 class armyGroup;
 class hero;
@@ -159,6 +172,16 @@ typedef enum CombatCatapultConstant {
     COMBAT_CATAPULT_CLOUD_Y_OFFSET            = 25,
     COMBAT_CATAPULT_KEEP_IMPACT_X             = 600,
     COMBAT_CATAPULT_KEEP_IMPACT_Y             = 160,
+    COMBAT_BURN_BASE_DAMAGE                   = 20,
+    COMBAT_BURN_RANDOM_DAMAGE                 = 5,
+    COMBAT_BURN_ROUNDS                        = 2,
+    COMBAT_ARC_FRAME_COUNT                    = 24,
+    COMBAT_ARC_FRAME_DURATION                 = 40,
+    // Not exact: the hex is really 44 by 42 pixels.
+    COMBAT_HEX_SIZE                           = 43,
+    SPELL_IMPLOSION_HEX_RADIUS                = 5,
+    SPELL_IMPLOSION_DRAG_FRAMES               = 10,
+    SPELL_AREA_DAMAGE_PER_POWER               = 10,
     COMBAT_KEEP_FACTION_COUNT                 = H2EnumIndex(FACTION_COUNT),
     COMBAT_KEEP_TOWER_COUNT                   = 3,
     COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
@@ -628,6 +651,19 @@ public:
     void CheckUpdateCombatMessages(void);
     void CombatMessage(const char*, i32, i32, i32);
     void CombatMessage(CombatMessageCommand);
+    void CheckBurnCreature(class army*);
+    void BurnCreature(class army*);
+    void ArcShot(class icon*, i32, i32, i32, i32);
+    std::vector<i32> GetSpellMask(SpellType, i32, i32);
+    void AreaSpellMessage(SpellType, i32l);
+    void AreaSpellDrawImpact(i32, class icon*, double, i32, i32);
+    void AreaSpellDoDamage(i32l, SpellType, class army*);
+    bool AreaSpellAffectHexes(i32, class army*, SpellType, i32l, std::vector<i32>&);
+    bool AreaSpellAffectHexes(i32, class army*, SpellType, i32l);
+    void PlasmaCone(i32);
+    void FireBomb(i32);
+    void ImplosionGrenade(i32);
+    CursorDirection GetCursorDirection(i32, i32, i32);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
     void SetupGridForArmy(class army*);
@@ -862,6 +898,9 @@ extern H2EnumStorage<ArtifactType, i8> iTransferArtifacts[COMBAT_TRANSFER_ARTIFA
 extern H2EnumStorage<CombatAction, i32> giNextAction;
 extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
+std::vector<Point> MakeCatapultArc(i32, bool, float, float, float, float);
+extern i32 gSpellDirection;
+extern bool gbAutoWinBattles;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
 extern i32 bCPrefsChanged;

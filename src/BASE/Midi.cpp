@@ -15,9 +15,10 @@ typedef enum MidiVolumeConstant {
 } MidiVolumeConstant;
 
 i32 CurrentMidiFile = MIDI_NO_TRACK;
+// Track 44 is Ironfist's Cyborg town theme (data/MUSIC/Track44.ogg).
 u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                  1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 u8 gMusicFlagA = 0;
 u8 gMusicFlagB = 0;

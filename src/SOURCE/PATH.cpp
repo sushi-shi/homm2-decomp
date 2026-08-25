@@ -1,4 +1,8 @@
 #include <Ints.h>
+#include <set>
+#include <vector>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/expansions.h>
 #include <SOURCE/army.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
@@ -12,6 +16,19 @@ typedef enum CombatPathConstant {
     WIDE_HEX_OFFSET        = 1
 } CombatPathConstant;
 
+// The keep's wall hexes, which even a jumper cannot ignore.
+static bool IsCastleWall(i32 hexIndex) {
+    static const std::set<i32> wallHexes = {9, 22, 34, 47, 59, 73, 86, 100, 113, 92};
+    return wallHexes.count(hexIndex) != 0;
+}
+
+static bool IsAICombatTurn(void) {
+    i32 currentPlayerId = gpCombatManager->m_playerId[H2EnumIndex(gpCombatManager->m_currentSide)];
+    if (currentPlayerId == -1)
+        return true;
+    return !gbHumanPlayer[currentPlayerId];
+}
+
 i32 army::FindPath(
     i32 sourceHex,
     i32 targetHex,
@@ -21,9 +38,21 @@ i32 army::FindPath(
 ) {
     i32 pathResult2;
     i32 savedSpeed2;
+    std::vector<i32> obstacleHexes;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return 0;
+
+    // A human-controlled jumper paths as if the obstacles were not there.
+    if (!IsAICombatTurn() && CreatureHasAttribute(H2EnumIndex(m_monsterType), JUMPER)
+        && gIronfistExtra.combat.stack.abilityCounter[this][JUMPER]) {
+        for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+            if (gpCombatManager->m_hexCells[hexIndex].m_blocked && !IsCastleWall(hexIndex)) {
+                obstacleHexes.push_back(hexIndex);
+                gpCombatManager->m_hexCells[hexIndex].m_blocked = 0;
+            }
+        }
+    }
 
     savedSpeed2 = m_monster.speed;
     if (ignoreSpeed)
@@ -48,6 +77,9 @@ i32 army::FindPath(
     }
 
     m_monster.speed = static_cast<i8>(savedSpeed2);
+    for (i32 obstacleHex : obstacleHexes) {
+        gpCombatManager->m_hexCells[obstacleHex].m_blocked = 1;
+    }
     return pathResult2;
 }
 

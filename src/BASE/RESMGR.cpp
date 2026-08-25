@@ -242,6 +242,11 @@ i32 resourceManager::Open(i32 priority) {
         }
         m_reserved = m_numAggregates;
     }
+    // Ironfist's aggregate carries its assets and wins the retail archives,
+    // while an explicitly selected locale overlay still wins every archive.
+    if (platform::FileExists(".\\DATA\\ironfist.agg")
+        && LoadAggregateHeader(".\\DATA\\ironfist.agg") != LOAD_SUCCESS)
+        return LOAD_ERROR;
     if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != LOAD_SUCCESS)
         return LOAD_ERROR;
     if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != LOAD_SUCCESS)

@@ -13,6 +13,8 @@
 #include <BASE/Utf8.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
+#include <IRONFIST/heroes.h>
+#include <IRONFIST/hooks.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/Campaign.h>
@@ -175,6 +177,8 @@ using enum HeroScreenText;
 
 typedef enum HeroMobilityConstant {
     BASE_RECORD_SIZE = 0xec,
+    HERO_RETAIL_SPELL_COUNT = H2EnumIndex(SPELL_COUNT),
+    HERO_TOWN_SEA_MOBILITY_BONUS = 400,
     LAND_SPEED_COUNT = 8,
     SLOWEST_LAND_SPEED = LAND_SPEED_COUNT - 1,
     SEA_BASE_MOBILITY = 1500,
@@ -194,6 +198,18 @@ typedef enum HeroImplementationConstant {
     PYRAMID_LUCK_PENALTY = 2
 } HeroImplementationConstant;
 
+static const char* SecondarySkillName(const hero* heroValue, HeroSecondarySkill skill) {
+    if (heroValue->m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
+        return localization::Tr("hero.skill.cybernetics");
+    return gSecondarySkills[H2EnumIndex(skill)];
+}
+
+static i32 SecondarySkillIconRow(const hero* heroValue, HeroSecondarySkill skill) {
+    if (heroValue->m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
+        return CYBERNETICS_SKILL_ROW;
+    return H2EnumIndex(skill);
+}
+
 hero::hero(void) {
     m_id = 0;
     m_owner = 0;
@@ -206,20 +222,37 @@ hero::hero(void) {
     giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
 }
 
+// The binary save record carries the retail 65-spell book; the Ironfist
+// spell flags beyond it live only in memory and the XML save.
+static_assert(offsetof(hero, m_spells) == 148);
+static_assert(sizeof(hero) == 258);
+
+typedef enum HeroRecordConstant {
+    HERO_RETAIL_PREFIX_SIZE = offsetof(hero, m_spells) + HERO_RETAIL_SPELL_COUNT,
+    HERO_RECORD_TAIL_OFFSET = offsetof(hero, m_artifacts),
+    HERO_EXPANSION_TAIL_SIZE = sizeof(hero) - HERO_RECORD_TAIL_OFFSET,
+    HERO_BASE_TAIL_SIZE      = BASE_RECORD_SIZE - HERO_RETAIL_PREFIX_SIZE
+} HeroRecordConstant;
+
 void hero::Read(i32 file, i8 expansion) {
-    if (expansion)
-        platform::FileRead(file, this, sizeof(hero));
-    else
-        platform::FileRead(file, this, BASE_RECORD_SIZE);
+    platform::FileRead(file, this, HERO_RETAIL_PREFIX_SIZE);
+    platform::FileRead(
+        file,
+        reinterpret_cast<char*>(this) + HERO_RECORD_TAIL_OFFSET,
+        expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
+    );
+    memset(&m_spells[HERO_RETAIL_SPELL_COUNT], 0, sizeof(m_spells) - HERO_RETAIL_SPELL_COUNT);
     const std::string name = localization::DecodeExternalText(m_name);
     utf8::Copy(m_name, sizeof(m_name), name.c_str());
 }
 
 void hero::Write(i32 file, i8 expansion) {
-    if (expansion)
-        platform::FileWrite(file, this, sizeof(hero));
-    else
-        platform::FileWrite(file, this, BASE_RECORD_SIZE);
+    platform::FileWrite(file, this, HERO_RETAIL_PREFIX_SIZE);
+    platform::FileWrite(
+        file,
+        reinterpret_cast<char*>(this) + HERO_RECORD_TAIL_OFFSET,
+        expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
+    );
 }
 
 void hero::GetArmyStrengths(u32l* const) {}
@@ -245,6 +278,33 @@ i32 hero::CalcMobility(void) {
     i32 movePoints;
     i32 slowestSpeedValue;
     i32 creatureIndex;
+
+    // Ironfist: a hero garrisoned in a town moves from the full land base
+    // instead of the army's slowest creature.
+    mapCell* townCell = gpAdvManager->GetCell(m_x, m_y);
+    if (townCell != NULL
+        && townCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+        movePoints = mobilityTable[SLOWEST_LAND_SPEED];
+        movePoints = static_cast<i32>(
+            movePoints
+            * gfSSLogisticsMod[H2EnumIndex(m_secondarySkills[H2EnumIndex(HERO_SKILL_LOGISTICS)])]
+        );
+        if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED))))
+            movePoints += HERO_TOWN_SEA_MOBILITY_BONUS;
+        if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
+            movePoints += nomadBootsBonus;
+        if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
+            movePoints += travelerBonus;
+        if (HasArtifact(ARTIFACT_TRUE_COMPASS))
+            movePoints += compassMobility;
+        if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
+            && gpGame->m_difficulty >= DIFFICULTY_HARD) {
+            movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
+            if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
+                movePoints += AI_STATE_MOBILITY_BONUS;
+        }
+        return Ironfist_CalcMobility(this, movePoints);
+    }
 
     if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         movePoints = seaBaseMobility;
@@ -286,7 +346,7 @@ i32 hero::CalcMobility(void) {
         if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             movePoints += AI_STATE_MOBILITY_BONUS;
     }
-    return movePoints;
+    return Ironfist_CalcMobility(this, movePoints);
 }
 
 i32 hero::HasSpell(SpellType spell) {
@@ -311,7 +371,7 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     SpellType spell;
     i32 spellOrdinalCount = 0;
 
-    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+    for (spell = SPELL_FIREBALL; H2EnumIndex(spell) < KB_SPELL_TABLE_CAPACITY; spell++) {
         if (HasSpell(spell)) {
             if (type == SPELL_TYPE_ALL
                 || (type == SPELL_TYPE_COMBAT
@@ -334,7 +394,7 @@ i32 hero::GetNumSpells(HeroSpellType type) {
 
     numCombatSpells2 = 0;
     numAdventureSpells2 = 0;
-    for (spell2 = SPELL_FIREBALL; spell2 < SPELL_COUNT; spell2++) {
+    for (spell2 = SPELL_FIREBALL; H2EnumIndex(spell2) < KB_SPELL_TABLE_CAPACITY; spell2++) {
         if (HasSpell(spell2)) {
             if ((H2EnumIndex((gsSpellInfo[H2EnumIndex(spell2)].attributes) & (SPELL_INFO_ATTRIBUTE_COMBAT))))
                 numCombatSpells2++;
@@ -366,6 +426,15 @@ void hero::UseSpell(SpellType spell) {
 }
 
 void hero::AddSpell(SpellType spell, i32) {
+    // Cybernetics spells belong to Cyborg heroes alone, and a Cyborg hero
+    // learns no regular spell above level 2.
+    if (H2EnumIndex(spell) >= H2EnumIndex(SPELL_COUNT)) {
+        if (H2EnumIndex(m_cursorType) != 12)
+            return;
+    } else if (m_cursorType == FACTION_CYBORG
+               && H2EnumIndex(gsSpellInfo[H2EnumIndex(spell)].level) > 2) {
+        return;
+    }
     m_spells[H2EnumIndex(spell)] = 1;
 }
 
@@ -855,7 +924,7 @@ void hero::CheckLevel(void) {
                     text,
                     localization::Tr("hero.level.learned_skill")  ,
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])])],
-                    gSecondarySkills[H2EnumIndex(choices[0])]
+                    SecondarySkillName(this, choices[0])
                 );
                 strcat(gText, text);
                 NormalDialog(
@@ -864,7 +933,7 @@ void hero::CheckLevel(void) {
                     -1,
                     -1,
                     NORMAL_DIALOG_SECONDARY_SKILL,
-                    H2EnumIndex(choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                    SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
                         + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]),
                     -1,
                     0,
@@ -877,9 +946,9 @@ void hero::CheckLevel(void) {
                     text,
                     localization::Tr("hero.level.choose_skill")
                      ,
-                    gSecondarySkills[H2EnumIndex(choices[0])],
+                    SecondarySkillName(this, choices[0]),
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])])],
-                    gSecondarySkills[H2EnumIndex(choices[1])],
+                    SecondarySkillName(this, choices[1]),
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])])]
                 );
                 strcat(gText, text);
@@ -889,10 +958,10 @@ void hero::CheckLevel(void) {
                     -1,
                     -1,
                     NORMAL_DIALOG_SECONDARY_SKILL,
-                    H2EnumIndex(choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                    SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
                         + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]),
                     NORMAL_DIALOG_SECONDARY_SKILL,
-                    H2EnumIndex(choices[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                    SecondarySkillIconRow(this, choices[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE
                         + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])]),
                     -1,
                     0
@@ -914,6 +983,24 @@ void hero::CheckLevel(void) {
                 } else {
                     GiveSS(choices[0], HERO_SKILL_LEVEL_BASIC);
                 }
+            }
+        }
+
+        if (m_cursorType == FACTION_CYBORG && m_owner != -1) {
+            SpellType levelSpell = GetCyborgLevelSpell(nLevel);
+            if (levelSpell != SPELL_NONE) {
+                AddSpell(levelSpell, 0);
+                if (gbHumanPlayer[m_owner])
+                    gpAdvManager->EventWindow(
+                        -1,
+                        1,
+                        const_cast<char*>(localization::Tr("hero.level.learned_spell")),
+                        NORMAL_DIALOG_SPELL,
+                        H2EnumIndex(levelSpell),
+                        -1,
+                        0,
+                        -1
+                    );
             }
         }
     }
@@ -1112,13 +1199,14 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 
             secondary_skill_text:
                 if (secondarySkillSlot < gpHVHero->m_secondarySkillCount) {
+                    HeroSecondarySkill secondarySkill = gpHVHero->GetNthSS(secondarySkillSlot);
                     sprintf(
                         gText,
                         cHeroScreen[H2EnumIndex(TEXT_SECONDARY_SKILL)],
                         gSecondarySkillLevels[H2EnumIndex(gpHVHero->m_secondarySkills
-                                                      [H2EnumIndex(gpHVHero->GetNthSS(secondarySkillSlot))])
+                                                      [H2EnumIndex(secondarySkill)])
                                               - 1],
-                        gSecondarySkills[H2EnumIndex(gpHVHero->GetNthSS(secondarySkillSlot))]
+                        SecondarySkillName(gpHVHero, secondarySkill)
                     );
                     break;
                 }
@@ -1727,7 +1815,7 @@ void SetupHeroView(void) {
             skill = gpHVHero->GetNthSS(i);
             msg.payload.widget.id = UI_SECONDARY_SKILL_ROW1_FIRST + i;
             msg.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            msg.payload.widget.data.value = H2EnumIndex(skill) + 1;
+            msg.payload.widget.data.value = SecondarySkillIconRow(gpHVHero, skill) + 1;
             heroWin->BroadcastMessage(msg);
             msg.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             msg.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + i;
@@ -1739,7 +1827,8 @@ void SetupHeroView(void) {
             heroWin->BroadcastMessage(msg);
             msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
             msg.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + i;
-            msg.payload.widget.data.text = gSecondarySkills[H2EnumIndex(skill)];
+            msg.payload.widget.data.text =
+                const_cast<char*>(SecondarySkillName(gpHVHero, skill));
             heroWin->BroadcastMessage(msg);
             msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
             msg.payload.widget.id = UI_SECONDARY_SKILL_ROW3_FIRST + i;
@@ -1844,6 +1933,16 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
                 gpHVHero->m_army.m_creatureTypes[sourceSlot] = CREATURE_NONE;
         }
     }
+}
+
+void hero::ClearSS(void) {
+    i32 skillIndex;
+
+    for (skillIndex = 0; skillIndex < H2EnumIndex(HERO_SKILL_COUNT); skillIndex++) {
+        m_secondarySkills[skillIndex] = HERO_SKILL_LEVEL_NONE;
+        m_secondarySkillOrder[skillIndex] = 0;
+    }
+    m_secondarySkillCount = 0;
 }
 
 void hero::SetSS(
@@ -1975,6 +2074,31 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
 void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     i32 skillBonusValue;
     char* skillText;
+
+    // The Cyborg Wisdom slot is Cybernetics, with its own text and icon row.
+    if (m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM
+        && m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE) {
+        sprintf(
+            gText,
+            "%s",
+            cyberneticsDesc[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]
+        );
+        NormalDialog(
+            gText,
+            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
+            NORMAL_DIALOG_NO_RESOURCE,
+            NORMAL_DIALOG_NO_VALUE,
+            NORMAL_DIALOG_SECONDARY_SKILL,
+            H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
+                + CYBERNETICS_SKILL_ROW * HERO_SECONDARY_SKILL_ICON_STRIDE
+                - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
+            NORMAL_DIALOG_NO_RESOURCE,
+            0,
+            NORMAL_DIALOG_NO_RESOURCE,
+            0
+        );
+        return;
+    }
 
     skillBonusValue = GetSSLevel(skill) - H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]);
     if (skillBonusValue > 0) {

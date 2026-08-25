@@ -30,6 +30,10 @@ std::size_t ApplyLegacyTable(const char* idPrefix, char** values, std::size_t co
 std::size_t ApplyLegacyString(const char* id, char*& value);
 void LocalizeLegacyTables();
 
+// Translate data-file text only while it still matches the catalog's
+// authoritative English source. This preserves third-party overrides.
+std::string TranslateExternal(const char* id, const char* source);
+
 // IDs are stable semantic keys. English fallbacks have one authoritative copy
 // in locales/messages.def; generated POT data keeps translator catalogs in
 // sync with it.

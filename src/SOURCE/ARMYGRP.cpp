@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <string.h>
 #include <BASE/Misc.h>
+#include <IRONFIST/hooks.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
@@ -57,7 +58,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     alignValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
 
     if (HasAllUndead())
-        return 0;
+        return Ironfist_CalcMorale(armyHero, occupiedTown, 0);
 
     if (HasSomeUndead())
         hasSomeUndead = 1;
@@ -75,7 +76,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
 
     if (armyHero != NULL) {
         if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
-            return ARMY_GROUP_MORALE_MAX;
+            return Ironfist_CalcMorale(armyHero, occupiedTown, ARMY_GROUP_MORALE_MAX);
 
         moraleCount += H2EnumIndex(armyHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)]);
         moraleCount += armyHero->m_morale;
@@ -114,7 +115,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     else if (moraleCount > ARMY_GROUP_MORALE_MAX)
         moraleCount = ARMY_GROUP_MORALE_MAX;
 
-    return moraleCount;
+    return Ironfist_CalcMorale(armyHero, occupiedTown, moraleCount);
 }
 
 void armyGroup::Dismiss(i32 slot) {

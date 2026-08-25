@@ -11,6 +11,8 @@
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
+#include <IRONFIST/expansions.h>
+#include <IRONFIST/hooks.h>
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/sample.h>
@@ -372,6 +374,11 @@ void combatManager::SetupCombat(
         m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = NULL;
     }
     m_combatTowns[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = NULL;
+
+    gIronfistExtra.combat.stack.abilityCounter.clear();
+    gIronfistExtra.combat.stack.abilityNowAnimating.clear();
+    gIronfistExtra.combat.stack.forceShieldHP.clear();
+    gIronfistExtra.combat.spell.fireBombWalls.clear();
 }
 
 void combatManager::InitNonVisualVars(void) {
@@ -416,6 +423,7 @@ void combatManager::InitNonVisualVars(void) {
     SetupAdjacencyArray();
     GenerateMap();
     LoadArmies();
+    Ironfist_BattleStart();
 }
 
 void combatManager::SetupAdjacencyArray(void) {
@@ -2047,6 +2055,80 @@ i32 combatManager::ShotIsThroughWall(
         }
     }
     return 0;
+}
+
+// The catapult's parabola, reused by the Cyber Behemoth shot and the
+// Berserker jump.
+std::vector<Point> MakeCatapultArc(
+    i32 numPoints, bool leftToRight, float fromX, float fromY, float targX, float targY
+) {
+    std::vector<Point> points;
+    float amplitude = 0.01282f;
+    float middleX = (targX + fromX) / 2;
+    float stepX = (middleX - fromX) / 12.5f;
+    float peakY = targY - (targX - fromX) * 0.3f - targY * 0.35f;
+    if (leftToRight) {
+        peakY = targY - (fromX - targX) * 0.3f - targY * 0.35f;
+    }
+    float stepY = (peakY - fromY) * amplitude;
+
+    float currentX = fromX;
+    float currentY = fromY;
+    for (i32 pointIndex = 0; pointIndex < numPoints; pointIndex++) {
+        if (pointIndex == numPoints / 2) {
+            stepY = (peakY - targY) * amplitude;
+        }
+        points.push_back(Point(static_cast<i32>(currentX), static_cast<i32>(currentY)));
+        currentX += stepX;
+        currentY += (numPoints / 2 - pointIndex) * stepY;
+    }
+    return points;
+}
+
+// A projectile lobbed along the catapult arc instead of a straight line.
+void combatManager::ArcShot(icon* projectile, i32 fromX, i32 fromY, i32 targX, i32 targY) {
+    bool firingLeft = fromX > targX;
+    i32 frame = 0;
+
+    bitmap* savedScreen =
+        new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+    gpWindowManager->m_screen->CopyTo(
+        savedScreen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+    );
+
+    std::vector<Point> points = MakeCatapultArc(
+        COMBAT_ARC_FRAME_COUNT,
+        firingLeft,
+        static_cast<float>(fromX),
+        static_cast<float>(fromY),
+        static_cast<float>(targX),
+        static_cast<float>(targY)
+    );
+    for (i32 pointIndex = 0; pointIndex < static_cast<i32>(points.size()); pointIndex++) {
+        if (pointIndex % 3 == 0 && frame < projectile->m_frameCount - 1) {
+            frame++;
+        }
+        savedScreen->CopyTo(
+            gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+        );
+        projectile->CombatClipDrawToBuffer(
+            points[pointIndex].x,
+            points[pointIndex].y,
+            frame,
+            NULL,
+            firingLeft ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
+            0,
+            NULL,
+            NULL
+        );
+        gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+        glTimers[0] = static_cast<i32>(
+            platform::Ticks() + COMBAT_ARC_FRAME_DURATION * gfCombatSpeedMod[gConfig.combatSpeed]
+        );
+        DelayTil(glTimers);
+    }
+    delete savedScreen;
+    DrawFrame(1, 0, 0, 0, 1, 1, 1);
 }
 
 void combatManager::ShootMissile(

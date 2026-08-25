@@ -182,7 +182,9 @@ public:
     H2SteppedEnumStorage<HeroSkillLevel, i8> m_secondarySkills[H2EnumIndex(HERO_SKILL_COUNT)];
     u8 m_secondarySkillOrder[H2EnumIndex(HERO_SKILL_COUNT)];
     i32 m_secondarySkillCount;
-    i8 m_spells[H2EnumIndex(SPELL_COUNT)];
+    // Sized for the Ironfist spells 65-72; the retail binary save record
+    // still carries only the first 65 flags (see hero::Read/Write).
+    i8 m_spells[H2EnumIndex(KB_SPELL_TABLE_CAPACITY)];
     H2EnumStorage<ArtifactType, i8> m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
@@ -214,6 +216,7 @@ public:
     void ApplyBattleLossTemps(void);
     void CheckLevel(void);
     i32 NumArtifacts(void);
+    void ClearSS(void);
     void SetSS(
         HeroSecondarySkill, HeroSkillLevel
     );

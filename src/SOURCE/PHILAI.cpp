@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <IRONFIST/hooks.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <BASE/Misc.h>
@@ -4453,6 +4454,9 @@ void philAI::RedistributeTroops(
     i32 again;
     i32 army;
 
+    if (!Ironfist_AIArmySharingAllowed())
+        return;
+
     again = 1;
     gbTroopReload = false;
     while (again) {
@@ -5937,6 +5941,10 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_JAIL:
                 eventRV = EvaluateJail(theCell);
                 break;
+            case MAP_OBJECT_SHIPYARD:
+                // The AI doesn't know how to sail off a shipyard boat yet.
+                eventRV = 0;
+                break;
             default:
                 sprintf(
                     gText,
@@ -6462,7 +6470,6 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
 }
 
 i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChance) {
-
     float winChance;
     i32 result;
     i32 scratch;
@@ -6475,6 +6482,10 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     town* defTown;
     i32 townId;
     armyGroup* townGroup;
+    i32 forcedChaseValue;
+
+    if (Ironfist_ForcedChaseValue(heroId, &forcedChaseValue))
+        return forcedChaseValue;
 
     if (gpGame->m_availableHeroes[heroId] == gpCurAIHero->m_owner) {
         if (mode == EVENT_MODE_IGNORE)

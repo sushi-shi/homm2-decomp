@@ -1,5 +1,10 @@
 #include <Ints.h>
 #include <math.h>
+#include <algorithm>
+#include <set>
+#include <vector>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/expansions.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
@@ -201,7 +206,87 @@ i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
+// The Berserker's parabolic hop between two hexes, drawn frame by frame
+// over a saved copy of the battlefield.
+void army::ArcJump(i32 fromHex, i32 toHex) {
+    bool firingLeft = true;
+    float fromX = static_cast<float>(gpCombatManager->m_hexCells[fromHex].m_x);
+    float fromY = static_cast<float>(gpCombatManager->m_hexCells[fromHex].m_gridBottom);
+    float targX = static_cast<float>(gpCombatManager->m_hexCells[toHex].m_x);
+    float targY = static_cast<float>(gpCombatManager->m_hexCells[toHex].m_gridBottom);
+    if (fromX > targX) {
+        m_facing = ARMY_FACING_LEFT;
+        firingLeft = false;
+    } else {
+        m_facing = ARMY_FACING_RIGHT;
+    }
+
+    gpCombatManager->m_hexCells[fromHex].m_occupantIndex = -1;
+    gpCombatManager->m_hexCells[fromHex].m_occupantSide = COMBAT_SIDE_NONE;
+    gpCombatManager->m_hexCells[fromHex].m_occupantFrame = ARMY_FACING_NONE;
+    gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+
+    bitmap* savedScreen =
+        new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+    gpWindowManager->m_screen->CopyTo(
+        savedScreen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+    );
+
+    m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 31;
+    m_animationFrame = 0;
+    m_animationSequence = ARMY_ANIMATION_WALK_MIDDLE;
+
+    std::vector<Point> points =
+        MakeCatapultArc(COMBAT_ARC_FRAME_COUNT, firingLeft, fromX, fromY, targX, targY);
+    for (i32 pointIndex = 0; pointIndex < static_cast<i32>(points.size()); pointIndex++) {
+        if (pointIndex == 5) {
+            m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 32;
+        } else if (pointIndex == 12) {
+            m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 33;
+        }
+        savedScreen->CopyTo(
+            gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+        );
+        DrawToBuffer(points[pointIndex].x, points[pointIndex].y, 0);
+        gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 0, 1);
+        gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
+        glTimers[0] = static_cast<i32>(
+            platform::Ticks() + COMBAT_ARC_FRAME_DURATION * gfCombatSpeedMod[gConfig.combatSpeed]
+        );
+        DelayTil(glTimers);
+    }
+
+    m_hex = toHex;
+    gpCombatManager->m_hexCells[m_hex].m_occupantSide = m_side;
+    gpCombatManager->m_hexCells[m_hex].m_occupantIndex = static_cast<i8>(m_index);
+    gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
+
+    savedScreen->CopyTo(
+        gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
+    );
+    giMinExtentY = giMinExtentX = giMaxExtentY = giMaxExtentX = 0;
+    m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 1;
+
+    delete savedScreen;
+}
+
+// Whether the hex borders this stack's current position (either hex of a
+// wide creature).
+bool army::IsCloseMove(i32 destination) {
+    for (i32 direction = 0; direction < ARMY_ADJACENT_DIRECTION_COUNT; direction++) {
+        if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
+            && GetAdjacentCellIndex(m_hex + 1, CombatHexDirection(direction)) == destination) {
+            return true;
+        }
+        if (GetAdjacentCellIndex(m_hex, CombatHexDirection(direction)) == destination) {
+            return true;
+        }
+    }
+    return false;
+}
+
 i32 army::FlyTo(i32 destination) {
+    std::vector<i32> chargeAffectedHexes;
     float xPos;
     float yRate0;
     float yPos;
@@ -231,6 +316,7 @@ i32 army::FlyTo(i32 destination) {
     i32 endRearHex;
     i32 oldMaxY;
 
+    gCloseMove = IsCloseMove(destination);
     if (!ValidHex(destination)) {
         return 0;
     }
@@ -307,11 +393,28 @@ i32 army::FlyTo(i32 destination) {
         gpCombatManager->m_backgroundDrawn = 0;
         m_animationSequence = ARMY_ANIMATION_WALK;
         for (leg = 0; leg < stepCount1; leg++) {
-            BuildTempWalkSeq(
-                &m_frameInfo,
-                leg + 1 == stepCount1,
-                leg > 0
-            );
+            if (CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER)) {
+                BuildTeleporterTempWalkSeq(
+                    &m_frameInfo,
+                    leg + 1 == stepCount1,
+                    leg > 0,
+                    gCloseMove
+                );
+            } else {
+                BuildTempWalkSeq(&m_frameInfo, leg + 1 == stepCount1, leg > 0);
+                if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+                    gCharging = true;
+                    ChargingDirection chargeDirection = CHARGING_FORWARD;
+                    double chargeAngle =
+                        (180.0 / M_PI) * atan2(static_cast<double>(ySpan0), abs(xDistance));
+                    if (chargeAngle > 45) {
+                        chargeDirection = CHARGING_DOWN;
+                    } else if (chargeAngle < -45) {
+                        chargeDirection = CHARGING_UP;
+                    }
+                    SetChargingMoveAnimation(chargeDirection);
+                }
+            }
             if (stepCount1 == 0) {
                 frameCount0 = m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)];
                 frameStart = 0;
@@ -335,8 +438,15 @@ i32 army::FlyTo(i32 destination) {
                  m_animationFrame++) {
                 if (m_animationFrame >= frameStart
                     && m_animationFrame < frameStart + frameCount0) {
-                    xPos += xSpeed / frameCount0;
-                    yPos += yRate0 / frameCount0;
+                    // A far teleport snaps straight to the destination.
+                    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER)
+                        && !gCloseMove) {
+                        xPos = static_cast<float>(endX);
+                        yPos = static_cast<float>(endY);
+                    } else {
+                        xPos += xSpeed / frameCount0;
+                        yPos += yRate0 / frameCount0;
+                    }
                 }
                 if (m_animationFrame % m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
                     == FLIGHT_SOUND_FRAME) {
@@ -428,6 +538,14 @@ i32 army::FlyTo(i32 destination) {
                     xPos = fromX + (leg + 1) * xSpeed;
                     yPos = sourceY + (leg + 1) * yRate0;
                 }
+                // The charger hurts everything it flies over.
+                i32 flownHex = gpCombatManager->GetGridIndex(
+                    static_cast<i32>(xPos),
+                    static_cast<i32>(yPos) - ARMY_CHARGE_SPRITE_OFFSET
+                );
+                if (IsEnemyCreatureHex(flownHex)) {
+                    chargeAffectedHexes.push_back(flownHex);
+                }
             }
         }
     }
@@ -465,7 +583,23 @@ i32 army::FlyTo(i32 destination) {
         }
         m_facingChanged = 0;
     }
+    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+        std::set<i32> uniqueHexes(chargeAffectedHexes.begin(), chargeAffectedHexes.end());
+        chargeAffectedHexes.assign(uniqueHexes.begin(), uniqueHexes.end());
+        // The landing target takes the full hit, not the path damage.
+        auto landingHex = std::find(
+            chargeAffectedHexes.begin(), chargeAffectedHexes.end(), giNextActionGridIndex
+        );
+        if (landingHex != chargeAffectedHexes.end()) {
+            chargeAffectedHexes.erase(landingHex);
+        }
+        ChargingDamage(chargeAffectedHexes);
+    }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+        RevertChargingMoveAnimation();
+    }
     gpCombatManager->TestRaiseDoor();
+    gpCombatManager->CheckBurnCreature(this);
     return 1;
 }

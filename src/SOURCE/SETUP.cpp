@@ -12,6 +12,9 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
+#include <IRONFIST/campaigns.h>
+#include <IRONFIST/save_xml.h>
+#include <SOURCE/netwin.h>
 #include <SOURCE/SETUP.h>
 #include <stdio.h>
 #include <string.h>
@@ -550,6 +553,54 @@ i32 game::SetupGame(void) {
                         xIsExpansionMap = 1;
                         xCampaign.InitNewCampaign(xCampaign.Choose());
                         break;
+                    case CHOICE_THREE: {
+                        // The bundled Ironfist campaign.
+                        xIsPlayingExpansionCampaign = 1;
+                        xIsExpansionMap = 1;
+                        i32 campaignId = LoadCampaignFromFile("cyborg.cmp");
+                        if (campaignId == -1) {
+                            result = 0;
+                            goto done;
+                        }
+                        xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));
+                        break;
+                    }
+                    case CHOICE_FOUR: {
+                        // Any other campaign out of CAMPAIGNS/*.cmp.  The
+                        // requester hardcodes error text for retail saves;
+                        // keep it quiet while it browses campaign files.
+                        xIsPlayingExpansionCampaign = 1;
+                        xIsExpansionMap = 1;
+                        i32 savedDebugLevel = giDebugLevel;
+                        i32 savedHumanCount = iWSLastMsgNumHumanPlayers;
+                        iWSLastMsgNumHumanPlayers = 999;
+                        giDebugLevel = 3;
+                        fileRequester* campaignRequester = new fileRequester(
+                            FILE_REQUESTER_X,
+                            FILE_REQUESTER_Y,
+                            FILE_REQUESTER_LOAD_GAME,
+                            "*.cmp",
+                            ".\\CAMPAIGNS\\",
+                            "*.cmp"
+                        );
+                        if (campaignRequester == NULL)
+                            MemError();
+                        i32 requesterResult = gpExec->DoDialog(campaignRequester);
+                        delete campaignRequester;
+                        giDebugLevel = savedDebugLevel;
+                        iWSLastMsgNumHumanPlayers = savedHumanCount;
+                        if (requesterResult != FILE_REQUESTER_OK) {
+                            result = 0;
+                            goto done;
+                        }
+                        i32 campaignId = LoadCampaignFromFile(gLastFilename);
+                        if (campaignId == -1) {
+                            result = 0;
+                            goto done;
+                        }
+                        xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));
+                        break;
+                    }
                     case DIALOG_CANCEL:
                         result = 0;
                         goto done;
@@ -593,10 +644,10 @@ i32 game::PickLoadGame(void) {
     if (gbWaitForRemoteReceive != 0)
         return 1;
 
-    if (gbInCampaign != 0) {
-        sprintf(fileMask, "*.GMC");
-    } else if (xIsPlayingExpansionCampaign != 0) {
-        sprintf(fileMask, "*.GXC");
+    if (gbInCampaign != 0 || xIsPlayingExpansionCampaign != 0) {
+        // Campaign saves pick their extension by campaign type, custom
+        // campaigns included.
+        sprintf(fileMask, "*%s", GetSaveFileExtension(1).c_str());
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             localization::Tr("network.load.expansion_unavailable"),
@@ -635,6 +686,14 @@ i32 game::PickLoadGame(void) {
             sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     }
 
+    // The requester hardcodes error text for the retail campaigns; keep it
+    // quiet for the custom ones.
+    i32 savedDebugLevel_2 = giDebugLevel;
+    i32 savedHumanCount_2 = iWSLastMsgNumHumanPlayers;
+    if (xIsPlayingExpansionCampaign != 0 && IsCustomCampaign(xCampaign.m_campaignId)) {
+        iWSLastMsgNumHumanPlayers = 999;
+        giDebugLevel = 3;
+    }
     fileReq = new fileRequester(
         FILE_REQUESTER_X,
         FILE_REQUESTER_Y,
@@ -646,6 +705,8 @@ i32 game::PickLoadGame(void) {
     if (fileReq == NULL)
         MemError();
     dialogResult = gpExec->DoDialog(fileReq);
+    iWSLastMsgNumHumanPlayers = savedHumanCount_2;
+    giDebugLevel = savedDebugLevel_2;
     if (dialogResult == FILE_REQUESTER_OK) {
         gpGame->LoadGame(gLastFilename, 0, 0);
         delete fileReq;

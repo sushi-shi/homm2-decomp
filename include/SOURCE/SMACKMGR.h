@@ -46,6 +46,7 @@ i8 PointInRect(i32, i32, struct tag_rect*);
 
 extern i32 bSmackSound;
 extern class icon* brotherIcon;
+extern class icon* cmpnNoCD;
 extern class icon* backImage;
 extern struct SSmackOptions SmackOptions[];
 extern platform::MovieId smk1;

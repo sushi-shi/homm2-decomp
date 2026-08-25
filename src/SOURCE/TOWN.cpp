@@ -1,6 +1,8 @@
 #include <Ints.h>
 #include <BASE/BITS.h>
 #include <BASE/executive.h>
+#include <IRONFIST/townconsts.h>
+#include <SOURCE/Castle.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
@@ -135,7 +137,11 @@ void town::BuildBuilding(BuildingSlotType building) {
     i32 level;
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         ++m_buildState;
-        m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+        if (m_type == FACTION_CYBORG)
+            m_spellCounts[m_buildState] =
+                ironfistCyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+        else
+            m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & H2EnumIndex(TOWN_BUILDING_LIBRARY)))
             ++m_spellCounts[m_buildState];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
@@ -182,6 +188,79 @@ void town::BuildBuilding(BuildingSlotType building) {
     }
     GiveSpells(NULL);
     H2BitSet(gpGame->m_knownTowns, m_id);
+}
+
+void town::SetFaction(FactionType faction) {
+    // Shift the adventure-map town graphics from the old faction's sprite
+    // slot to the new one; Cyborg towns use slot 6, following the
+    // OBJNTOWN.ICN order.
+    i32 imageShift = -(m_type == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT : H2EnumIndex(m_type));
+
+    m_turnsOwned = RANDOM_TOWN_AGE;
+    m_type = faction;
+
+    // Raze what the new faction cannot build, downgrading upgraded
+    // dwellings to the base ones it keeps.
+    for (i32 building = TOWN_BUILDING_COUNT - 1; building >= 0; building--) {
+        u32l eligibleMask = gTownEligibleBuildMask[H2EnumIndex(faction)];
+        u32l buildingMask = 1L << building;
+
+        if (building == H2EnumIndex(BUILDING_SLOT_CASTLE) || !(buildingMask & m_buildings)
+            || (buildingMask & eligibleMask))
+            continue;
+
+        m_buildings &= ~buildingMask;
+
+        if (building == H2EnumIndex(BUILDING_SLOT_SPECIAL_THIRTY)) {
+            i32 troopCount = m_garrison[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)];
+            m_garrison[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
+            i32 downgraded = H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE);
+            if (!((1L << downgraded) & eligibleMask)) {
+                m_garrison[downgraded - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
+                downgraded = H2EnumIndex(BUILDING_SLOT_DWELLING_SIXTH);
+            }
+            m_buildings |= 1L << downgraded;
+            m_garrison[downgraded - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = troopCount;
+        } else if (building >= H2EnumIndex(BUILDING_SLOT_UPGRADE_FIRST)
+                   && building <= H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE)) {
+            i32 troopCount = m_garrison[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)];
+            m_garrison[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
+            i32 downgraded = building - CASTLE_UPGRADE_OFFSET;
+            if ((1L << downgraded) & eligibleMask) {
+                m_buildings |= 1L << downgraded;
+                m_garrison[downgraded - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = troopCount;
+            }
+        }
+    }
+
+    imageShift += faction == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT : H2EnumIndex(faction);
+
+    gpGame->ConvertObject(
+        m_x - 5,
+        m_y - 3,
+        m_x + 2,
+        m_y + 1,
+        TILESET_OBJNTOWN,
+        0,
+        255,
+        TILESET_OBJNTOWN,
+        32 * imageShift,
+        MAP_OBJECT_CASTLE,
+        MAP_OBJECT_CASTLE
+    );
+    gpGame->ConvertObject(
+        m_x - 5,
+        m_y - 3,
+        m_x + 2,
+        m_y + 1,
+        TILESET_OBJNTWSH,
+        0,
+        255,
+        TILESET_OBJNTWSH,
+        32 * imageShift,
+        MAP_OBJECT_CASTLE,
+        MAP_OBJECT_CASTLE
+    );
 }
 
 i32 town::CanBuildDock(void) {

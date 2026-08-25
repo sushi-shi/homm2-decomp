@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <BASE/bmap2.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -12,6 +13,8 @@
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/expansions.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
@@ -26,6 +29,9 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
+
+// Debug toggle: every battle ends instantly in the human side's favor.
+bool gbAutoWinBattles;
 
 #define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
@@ -543,7 +549,17 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     } else {
         for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++) {
             if (standable_0[direction_28] != 0) {
-                if (currentArmy_1->m_hex == directionHexes[direction_28]
+                // A charger can also come in on a clear straight line.
+                if (CreatureHasAttribute(H2EnumIndex(currentArmy_1->m_monsterType), CHARGER)
+                    && currentArmy_1->GetStraightLineDistanceToHex(directionHexes[direction_28])
+                           <= currentArmy_1->m_monster.speed
+                    && currentArmy_1->TargetOnStraightLine(directionHexes[direction_28])
+                    && currentArmy_1->TargetOnStraightLine(targetHex)
+                    && currentArmy_1->ValidFlight(
+                        directionHexes[direction_28], ARMY_PATH_ANY_TARGET_HEX
+                    ))
+                    pathValid_28[direction_28] = 1;
+                else if (currentArmy_1->m_hex == directionHexes[direction_28]
                     || currentArmy_1->ValidPath(
                            directionHexes[direction_28],
                            ARMY_PATH_EXACT_TARGET_HEX
@@ -1117,10 +1133,163 @@ void combatManager::ResetRound(void) {
     if (gpCombatManager->m_removedArmyPresent != 0)
         gpCombatManager->MakeCreaturesVanish();
     m_currentSpeed = ROUND_INITIAL_SPEED;
+
+    // Astral dodge re-arms every round; fire walls burn down over rounds.
+    for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
+        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
+            army* currentArmy = m_armies[H2EnumIndex(side)] + armyIndex;
+            if (currentArmy->m_monsterType != CREATURE_NONE
+                && CreatureHasAttribute(H2EnumIndex(currentArmy->m_monsterType), ASTRAL_DODGE))
+                gIronfistExtra.combat.stack.abilityCounter[currentArmy][ASTRAL_DODGE] = 1;
+        }
+    }
+    auto wall = gIronfistExtra.combat.spell.fireBombWalls.begin();
+    while (wall != gIronfistExtra.combat.spell.fireBombWalls.end()) {
+        wall->turnsLeft--;
+        if (wall->turnsLeft < 0)
+            wall = gIronfistExtra.combat.spell.fireBombWalls.erase(wall);
+        else
+            ++wall;
+    }
+}
+
+// Which of the six hex sectors the cursor points at, for the plasma-cone
+// stream. A stripped-down CheckSetMouseDirection.
+CursorDirection combatManager::GetCursorDirection(i32 screenX, i32 screenY, i32 hex) {
+    i32 offsetX = screenX - 44 * (hex % ARMY_HEX_COLUMNS - 1) - 67;
+    if (!(hex / ARMY_HEX_COLUMNS & 1)) {
+        offsetX = screenX - 44 * (hex % ARMY_HEX_COLUMNS - 1) - 89;
+    }
+    i32 offsetY = screenY - 63 - 42 * (hex / ARMY_HEX_COLUMNS) - 26;
+
+    // The hex divides into 24 equal triangles; find the cursor's one.
+    i32 hexPart = 0;
+    i32 offsetXFromCenter = offsetX - 22;
+    if (offsetXFromCenter >= 0) {
+        if (offsetY >= 0) {
+            hexPart = 6;
+        }
+    } else if (offsetY >= 0) {
+        hexPart = 12;
+    } else {
+        hexPart = 18;
+    }
+
+    float slope = static_cast<float>(abs(offsetXFromCenter)) / abs(offsetY);
+    if (hexPart && hexPart != 12) {
+        if (slope >= 0.27f) {
+            if (slope >= 0.58f) {
+                if (slope >= 1.0f) {
+                    if (slope >= 1.73f) {
+                        if (slope < 3.73f) {
+                            ++hexPart;
+                        }
+                    } else {
+                        hexPart += 2;
+                    }
+                } else {
+                    hexPart += 3;
+                }
+            } else {
+                hexPart += 4;
+            }
+        } else {
+            hexPart += 5;
+        }
+    } else if (slope <= 3.73f) {
+        if (slope <= 1.73f) {
+            if (slope <= 1.0f) {
+                if (slope <= 0.58f) {
+                    if (slope > 0.27f) {
+                        ++hexPart;
+                    }
+                } else {
+                    hexPart += 2;
+                }
+            } else {
+                hexPart += 3;
+            }
+        } else {
+            hexPart += 4;
+        }
+    } else {
+        hexPart += 5;
+    }
+
+    if (hexPart < 4) {
+        return CURSOR_DIRECTION_LEFT_DOWN;
+    } else if (hexPart < 8) {
+        return CURSOR_DIRECTION_LEFT;
+    } else if (hexPart < 12) {
+        return CURSOR_DIRECTION_LEFT_UP;
+    } else if (hexPart < 16) {
+        return CURSOR_DIRECTION_RIGHT_UP;
+    } else if (hexPart < 20) {
+        return CURSOR_DIRECTION_RIGHT;
+    }
+    return CURSOR_DIRECTION_RIGHT_DOWN;
+}
+
+void combatManager::CheckBurnCreature(army* stack) {
+    for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+        if (wall.hexIdx == stack->m_hex) {
+            stack->SetSpellInfluence(ARMY_SPELL_INFLUENCE_BURN, COMBAT_BURN_ROUNDS);
+            BurnCreature(stack);
+        }
+    }
+}
+
+void combatManager::BurnCreature(army* stack) {
+    // The walking frames offset differently; force the wince pose before
+    // the effect animation.
+    stack->m_animationSequence = ARMY_ANIMATION_WINCE;
+    stack->m_animationFrame = 0;
+    stack->SpellEffect(gsSpellInfo[H2EnumIndex(SPELL_FIRE_BOMB)].combatEffect, 0, 0);
+
+    i32 burnDamage = COMBAT_BURN_BASE_DAMAGE + SRandom(0, COMBAT_BURN_RANDOM_DAMAGE);
+    i32 creaturesKilled = stack->Damage(burnDamage, SPELL_FIRE_BOMB);
+
+    // PowEffect clobbers the render extents; keep them intact.
+    i32 minExtentX = giMinExtentX;
+    i32 minExtentY = giMinExtentY;
+    i32 maxExtentX = giMaxExtentX;
+    i32 maxExtentY = giMaxExtentY;
+    stack->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+    giMinExtentX = minExtentX;
+    giMinExtentY = minExtentY;
+    giMaxExtentX = maxExtentX;
+    giMaxExtentY = maxExtentY;
+
+    sprintf(gText, localization::Tr("combat.burning.damage"), burnDamage);
+    if (creaturesKilled > 0) {
+        char* targetCreature = creaturesKilled > 1
+            ? GetCreaturePluralName(H2EnumIndex(stack->m_monsterType))
+            : GetCreatureName(H2EnumIndex(stack->m_monsterType));
+        sprintf(
+            gText + strlen(gText),
+            localization::TrPlural("combat.burning.killed", creaturesKilled),
+            creaturesKilled,
+            targetCreature
+        );
+    }
+    CombatMessage(gText, 1, 1, 0);
 }
 
 i32 combatManager::CheckWin(struct tag_message* message) {
     i32 combatEnded = 0;
+    // The auto-win debug toggle hands the battle to the human side.
+    if (gbAutoWinBattles) {
+        if (m_playerId[0] != -1 && gbHumanPlayer[m_playerId[0]])
+            m_combatResult = COMBAT_RESULT_ATTACKER;
+        else if (m_playerId[1] != -1 && gbHumanPlayer[m_playerId[1]])
+            m_combatResult = COMBAT_RESULT_DEFENDER;
+        DoVictory(m_combatResult);
+        if (gbNoShowCombat == 0) {
+            message->type = COMBAT_WIN_MESSAGE;
+            message->payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
+        }
+        return 1;
+    }
     if (IsWinner(m_currentSide) != 0) {
         combatEnded = 1;
         if (IsWinner(OppositeCombatSide(m_currentSide)) != 0)
@@ -1261,7 +1430,17 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                 else
                                     return COMBAT_MESSAGE_COMMAND_SHOOT;
                             }
-                            if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
+                            // A charger may attack down a clear straight line
+                            // even when the walking path is blocked.
+                            if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1
+                                || (CreatureHasAttribute(
+                                        H2EnumIndex(ourArmy_13->m_monsterType), CHARGER
+                                    )
+                                    && ourArmy_13->TargetOnStraightLine(hexIndex)
+                                    && ourArmy_13->ValidFlight(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
+                                    && !ourArmy_13->FlightThroughObstacles(hexIndex)
+                                    && ourArmy_13->GetStraightLineDistanceToHex(hexIndex)
+                                           <= ourArmy_13->m_monster.speed))
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
                             else {
                                 ourArmy_13->m_targetSide = COMBAT_SIDE_NONE;
@@ -2515,6 +2694,11 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     i32 redraw_10;
     MessageDispatchResult dispatchResult_1;
 
+    // A stack that waits on burning ground keeps burning.
+    if (giNextAction == ACTION_WAIT) {
+        CheckBurnCreature(&m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex]);
+    }
+
     ClearCombatMessages(0);
     dispatchResult_1 = MESSAGE_DISPATCH_CONSUME;
     redraw_10 = 0;
@@ -2920,6 +3104,18 @@ setCycleTimer:
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = static_cast<i32>(
         platform::Ticks() + COMBAT_CYCLE_TIMER_FACTOR * gfCombatSpeedMod[gConfig.combatSpeed]
     );
+
+    // The fire walls flicker along with the screen cycle.
+    if (!gIronfistExtra.combat.spell.fireBombWalls.empty()) {
+        icon* wallIcon =
+            gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
+        for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+            wall.currentFrame++;
+            if (wall.currentFrame >= wallIcon->m_frameCount) {
+                wall.currentFrame = 0;
+            }
+        }
+    }
 }
 
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {

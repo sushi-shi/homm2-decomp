@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <IRONFIST/creatures.h>
+#include <IRONFIST/expansions.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -389,6 +391,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     CombatSide oldSide;
     i32 oldIndex;
     i32 j;
+    i32 hexIndex;
 
     if (gbNoShowCombat != 0)
         return;
@@ -420,6 +423,26 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
                    && m_hexCells[j].m_occupantSide != OppositeCombatSide(m_currentSide)
                    && (attackMask & (1 << m_hexCells[j].m_occupantIndex)) != 0) {
             m_gridState[j] = GRID_SHADE_REACHABLE;
+        }
+    }
+
+    // A charger also reaches any enemy along a clear straight line.
+    if (CreatureHasAttribute(H2EnumIndex(armyPtr->m_monsterType), CHARGER)) {
+        for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
+            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
+                && m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side
+                && !armyPtr->FlightThroughObstacles(hexIndex)
+                && armyPtr->TargetOnStraightLine(hexIndex)) {
+                armyPtr->m_moveTargetHex = hexIndex;
+                armyPtr->m_targetSide = m_hexCells[hexIndex].m_occupantSide;
+                armyPtr->m_targetIndex = m_hexCells[hexIndex].m_occupantIndex;
+                if (armyPtr->ValidFlight(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
+                    && armyPtr->GetStraightLineDistanceToHex(hexIndex)
+                           <= armyPtr->m_monster.speed) {
+                    m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
+                    m_hexCells[hexIndex].m_pathReachable = 1;
+                }
+            }
         }
     }
 }
@@ -974,6 +997,28 @@ void combatManager::DrawFrame(
         giMinExtentY--;
         giMaxExtentX++;
         giMaxExtentY++;
+
+        // The fire walls burn inside the redraw extent too.
+        if (!gIronfistExtra.combat.spell.fireBombWalls.empty()) {
+            icon* wallIcon = gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
+            IconEntry* wallEntry = GetIconEntry(wallIcon, 0);
+            for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+                hexcell* wallCell = &m_hexCells[wall.hexIdx];
+                i32 drawX = wallCell->m_x + wallEntry->x;
+                i32 drawY = wallCell->m_gridTop + wallEntry->y;
+                i32 drawMaxX = drawX + wallEntry->w;
+                i32 drawMaxY = drawY + wallEntry->h;
+                if (giMinExtentX > drawX)
+                    giMinExtentX = drawX;
+                if (giMaxExtentX < drawMaxX)
+                    giMaxExtentX = drawMaxX;
+                if (giMinExtentY > drawY)
+                    giMinExtentY = drawY;
+                if (giMaxExtentY < drawMaxY)
+                    giMaxExtentY = drawMaxY;
+            }
+        }
+
         if (giMinExtentX < 0)
             giMinExtentX = 0;
         if (giMinExtentY < 0)
@@ -1015,6 +1060,22 @@ void combatManager::DrawFrame(
     if (computeExtent != 0) {
         gbLimitToExtent = true;
         gbComputeExtent = true;
+    }
+
+    // The lingering fire walls burn under the creatures.
+    for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+        SLimitData wallLimits;
+        gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)])
+            ->CombatClipDrawToBuffer(
+                m_hexCells[wall.hexIdx].m_x,
+                m_hexCells[wall.hexIdx].m_gridTop,
+                wall.currentFrame,
+                &wallLimits,
+                ICON_DRAW_NORMAL,
+                0,
+                NULL,
+                NULL
+            );
     }
 
     for (row = DRAW_FIRST_LAYER; row < DRAW_LAYER_COUNT; row++) {

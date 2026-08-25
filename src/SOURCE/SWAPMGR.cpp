@@ -17,6 +17,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
+#include <IRONFIST/heroes.h>
 #include <SOURCE/hero.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/swapManager.h>
@@ -155,7 +156,12 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id = H2EnumIndex(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = H2EnumIndex(m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget));
+                // The Cyborg Wisdom slot draws the Cybernetics small icon.
+                if (m_heroes[H2EnumIndex(swapSide)]->m_cursorType == FACTION_CYBORG
+                    && m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget) == HERO_SKILL_WISDOM)
+                    message.payload.widget.data.value = CYBERNETICS_MINI_SKILL_FRAME;
+                else
+                    message.payload.widget.data.value = H2EnumIndex(m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;

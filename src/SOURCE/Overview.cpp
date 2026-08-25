@@ -6,6 +6,7 @@
 #include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
+#include <IRONFIST/heroes.h>
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <BASE/executive.h>
@@ -866,7 +867,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
                         const_cast<char*>("miniss.icn"),
-                        static_cast<i16>(skillIndex),
+                        // The Cyborg Wisdom slot draws the Cybernetics small icon.
+                        static_cast<i16>(
+                            curHero->m_cursorType == FACTION_CYBORG
+                                    && skillIndex == HERO_SKILL_WISDOM
+                                ? H2EnumIndex(CYBERNETICS_MINI_SKILL_FRAME)
+                                : H2EnumIndex(skillIndex)
+                        ),
                         ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId + i + HERO_SKILL_FIRST),
                         WIDGET_KIND_ICON_DIRECT,

@@ -62,7 +62,8 @@ public:
 #pragma pack(pop)
 typedef enum MouseManagerConstant {
     MOUSE_CURSOR_COUNT                 = 96,
-    MOUSE_CURSOR_TYPE_SLOT_COUNT       = 3,
+    MOUSE_CURSOR_FALLBACK              = 83,
+    MOUSE_CURSOR_TYPE_SLOT_COUNT       = 4,
     MOUSE_CURSOR_HORIZONTAL            = 0,
     MOUSE_CURSOR_VERTICAL              = 1,
     MOUSE_CURSOR_AXIS_COUNT            = 2,

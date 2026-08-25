@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_ARMY_H
 
 #include <Ints.h>
+#include <vector>
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/icon.h>
 #include <SOURCE/ARMY.h>
@@ -106,6 +107,11 @@ public:
     void DirDoAttack(CombatHexDirection);
     void DoHydraAttack(i32);
     void DoAttack(i32);
+    void SetChargingMoveAnimation(ChargingDirection);
+    void RevertChargingMoveAnimation(void);
+    void SetJumpingAnimation(void);
+    void RevertJumpingAnimation(void);
+    void ChargingDamage(const std::vector<i32>&);
     void ResetPath(void);
     i32 WalkTo(void);
     i32 WalkTo(i32);
@@ -148,6 +154,15 @@ public:
     i32 ValidMove(i32, CombatHexDirection);
     i32 ValidAttack(i32, CombatHexDirection, ArmyAttackTarget, i32, i32*);
     i32 GetAdjacentCellIndex(i32, CombatHexDirection);
+    bool IsCloseMove(i32);
+    void ArcJump(i32, i32);
+    void MoveTo(i32);
+    bool TargetOnStraightLine(i32);
+    CombatHexDirection GetStraightLineDirection(i32);
+    i32 GetStraightLineDistanceToHex(i32);
+    bool FlightThroughObstacles(i32);
+    bool IsEnemyCreatureHex(i32);
+    void MoveAttackNonFlyer(i32, i32);
     i32 ValidRange(i32);
     CombatHexDirection GetBestDirection(i32, i32, i32);
     i32 IsAlive(void) {

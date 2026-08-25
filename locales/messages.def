@@ -1176,3 +1176,104 @@ HOMM2_MESSAGE(
     "system.memory.requirement",
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) and\n480K of Conventional Memory\n\n"
 )
+
+// Ironfist UI and gameplay additions.
+HOMM2_MESSAGE("hero.skill.cybernetics", "Cybernetics")
+HOMM2_MESSAGE("hero.level.learned_spell", "You've learned a new spell!")
+HOMM2_MESSAGE(
+    "adventure.spell.dimension_door.too_tired",
+    "Your hero is too tired to cast this spell today.  Try again tomorrow."
+)
+HOMM2_MESSAGE("castle.cybernetics_lab.build", "Build Cybernetics Lab")
+HOMM2_MESSAGE(
+    "castle.cybernetics_lab.add_level",
+    "Add another level to Cybernetics Lab"
+)
+HOMM2_MESSAGE("combat.ability.shadow_mark", "The Shadow Assassins mark the %s!")
+HOMM2_MESSAGE("combat.astral_dodge", "Cyber Shadow Assassins dodge the attack!")
+HOMM2_MESSAGE("combat.burning.damage", "Burning does %d damage. ")
+HOMM2_PLURAL(
+    "combat.burning.killed",
+    "%d %s perishes.",
+    "%d %s perish."
+)
+HOMM2_MESSAGE("combat.spell.fireball_damage", "The fireball does %d damage.")
+HOMM2_MESSAGE("combat.spell.fireblast_damage", "The fireblast does %d damage.")
+HOMM2_MESSAGE("combat.spell.cold_ring_damage", "The cold ring does %d damage.")
+HOMM2_MESSAGE(
+    "combat.spell.meteor_shower_damage",
+    "The meteor shower does %d damage."
+)
+HOMM2_MESSAGE(
+    "combat.spell.plasma_cone_damage",
+    "The plasma cone stream does %d damage."
+)
+HOMM2_MESSAGE("combat.spell.fire_bomb_damage", "The fire bomb does %d damage.")
+HOMM2_MESSAGE(
+    "combat.spell.implosion_grenade_damage",
+    "The implosion grenade does %d damage."
+)
+HOMM2_MESSAGE("combat.spell.area_damage", "Area spell %d does %d damage.")
+HOMM2_MESSAGE(
+    "combat.spell.marksman_pierce_damage",
+    "The marksman pierce round does %d\n damage to the %s."
+)
+HOMM2_MESSAGE(
+    "event.barrier.inspect",
+    "A magical %s barrier stands tall before you, blocking your way.  Runes on the arch read, \"Speak the key and you may pass.\""
+)
+HOMM2_MESSAGE(
+    "event.barrier.dissolves",
+    "As you speak the magic word \"%s\", the glowing barrier dissolves into nothingness."
+)
+HOMM2_MESSAGE(
+    "event.barrier.no_password",
+    "You try guessing in vain, but nothing happens."
+)
+HOMM2_MESSAGE(
+    "event.barrier.tent_hint",
+    "You enter the tent and find an old woman staring into a glowing gem. \"I have learned much in the way of scrying. Let me share a secret.\" With that, she leans into your ear and whispers the keyword for the %s border guard."
+)
+HOMM2_MESSAGE("event.shipyard.cannot_build_boat", "Cannot build another boat.")
+HOMM2_MESSAGE("town.build.disallowed", "\n\nCan't be built in this town.")
+HOMM2_MESSAGE(
+    "town.cybernetics.requires_cyborg",
+    "Only Cyborg heroes can learn these spells."
+)
+HOMM2_MESSAGE(
+    "town.cybernetics.level_limit",
+    "Your Cyborg hero only learns the level 1-2 spells above."
+)
+HOMM2_MESSAGE(
+    "town.mage_guild.spells_added",
+    "The above spells have been added to your book."
+)
+HOMM2_MESSAGE("town.cyborg.energy_pump.name", "Energy Pump")
+HOMM2_MESSAGE("town.cyborg.cybernetics_lab.name", "Cybernetics Lab")
+HOMM2_MESSAGE(
+    "town.cyborg.cybernetics_lab.description",
+    "The %s allows heroes to learn cybernetics spells and replenish their spell points."
+)
+HOMM2_MESSAGE("town.poisoned_well.name", "Poisoned Well")
+HOMM2_MESSAGE(
+    "town.poisoned_well.description",
+    "The Well has been tainted by the presence of dark magic. Good thing undead don't get thirsty."
+)
+HOMM2_MESSAGE("town.well.description", "The Well provides refreshing drinking water.")
+HOMM2_MESSAGE("town.cyborg.growth_building.name", "Kobold Hatchery")
+HOMM2_MESSAGE("town.cyborg.special_building.name", "Radiation Tower")
+HOMM2_MESSAGE(
+    "town.cyborg.special_building.description",
+    "Lowers the luck of enemy troops."
+)
+HOMM2_MESSAGE("town.cyborg.dwelling.1", "Sewer")
+HOMM2_MESSAGE("town.cyborg.dwelling.2", "Meeting Hall")
+HOMM2_MESSAGE("town.cyborg.dwelling.3", "Arena")
+HOMM2_MESSAGE("town.cyborg.dwelling.4", "Hunting Grounds")
+HOMM2_MESSAGE("town.cyborg.dwelling.5", "Dojo")
+HOMM2_MESSAGE("town.cyborg.dwelling.6", "Nexus")
+HOMM2_MESSAGE("town.cyborg.dwelling.upgrade_2", "Cyborg Level 2 Upgrade")
+HOMM2_MESSAGE("town.cyborg.dwelling.upgrade_3", "Cyborg Level 3 Upgrade")
+HOMM2_MESSAGE("town.cyborg.dwelling.upgrade_4", "Cyborg Level 4 Upgrade")
+HOMM2_MESSAGE("town.cyborg.dwelling.upgrade_5", "Cyborg Level 5 Upgrade")
+HOMM2_MESSAGE("town.cyborg.dwelling.upgrade_6", "Cyborg Level 6 Upgrade")

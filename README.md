@@ -5,6 +5,9 @@ Magic II Gold 2.1 as published by Buka. The Price of Loyalty 2.0 reconstruction
 remains available as an independent source reference and contributes verified
 cross-version work.
 
+This branch adds Project Ironfist as separately distributed, unofficial runtime
+content on top of that reconstructed cross-platform engine.
+
 The repository does not contain the original game resources. An installed copy
 of the game is required to play it.
 
@@ -23,7 +26,6 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                       v
                     master --------> ironfist
 ```
-
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
 - `source-pol-2.0` is its generated, matching-machinery-free source tree.
 - `classic-pol-2.0` is the same generated tree with the original integer-enum
@@ -69,7 +71,7 @@ nix build .#homm2-web
 Requirements:
 
 1. CMake 3.20+, Ninja, and pkg-config.
-2. A C++20 compiler with 32-bit support.
+2. C and C++20 compilers with 32-bit support.
 3. 32-bit SDL3 and FFmpeg libraries (`libavcodec`, `libavformat`, `libavutil`,
    and `libswresample`).
 
@@ -83,8 +85,22 @@ HOMM2_DATA=/path/to/heroes2 ./build/homm2
 
 ### Game data
 
-`HOMM2_DATA` should point to an installed game directory containing
-`DATA/HEROES2.AGG` (case-insensitive):
+To run Ironfist you need an installed copy of Heroes II Gold or The Price of Loyalty,
+including both `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`. Install the separately
+published Ironfist resource pack into that directory:
+
+```sh
+nix run .#ironfist-resources -- /path/to/heroes2
+```
+
+The installer downloads the pinned release asset, verifies its SHA-256 digest,
+and merges `DATA/`, `MAPS/`, `CAMPAIGNS/`, `MUSIC/`, and `SCRIPTS/` into the
+game directory. You can instead download
+[`ironfist-pol-2.0-resources-v1.zip`](https://github.com/sushi-shi/homm2-decomp/releases/download/ironfist-pol-2.0-resources-v1/ironfist-pol-2.0-resources-v1.zip)
+and extract it there manually. See [the resource-pack contract](docs/ironfist-resources.md).
+
+`HOMM2_DATA` should then point to that combined game directory (paths are
+resolved case-insensitively).
 
 ```sh
 export HOMM2_DATA=/path/to/heroes2
@@ -112,8 +128,9 @@ nix run
 
 ### Windows
 
-The Windows package is statically linked. Copy `HMM2PL.exe` into the writable
-game directory and run it. For Wine:
+First extract the Ironfist resource release over the writable retail game
+directory. The Windows package is statically linked; copy `HMM2PL.exe` there
+and run it. For Wine:
 
 ```sh
 nix build .#homm2-windows
@@ -130,7 +147,8 @@ The helper creates a Wine prefix at `<game dir>/.wineprefix` on first run.
 HOMM2_DATA=/path/to/heroes2 nix run .#web
 ```
 
-The launcher packages the installed data, serves the bundle on port 8080
-(`HOMM2_WEB_PORT`), and caches it under `~/.cache/homm2-web`
-(`HOMM2_WEB_OUTPUT`). The first build also cross-compiles SDL3 and a minimal
-FFmpeg.
+The path must contain the retail data and the installed Ironfist resource pack.
+The launcher packages the installed data (including custom campaigns), serves
+the bundle on port 8080 (`HOMM2_WEB_PORT`), and caches it under
+`~/.cache/homm2-web` (`HOMM2_WEB_OUTPUT`). The first build also cross-compiles
+SDL3 and a minimal FFmpeg.

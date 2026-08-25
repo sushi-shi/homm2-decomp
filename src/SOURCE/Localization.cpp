@@ -672,6 +672,22 @@ std::size_t ApplyLegacyString(const char* id, char*& value) {
     return 1;
 }
 
+std::string TranslateExternal(const char* id, const char* source) {
+    if (id == nullptr || source == nullptr) {
+        return source != nullptr ? source : "";
+    }
+    const Message* message = Find(id);
+    if (message == nullptr || message->sourceForms.empty()
+        || message->sourceForms[0] != source || message->forms.empty()
+        || message->forms[0].empty()) {
+        return source;
+    }
+    // External XML fields are complete display strings, never printf format
+    // templates. In particular, ordinary prose such as "150% damage" must
+    // not be mistaken for a conversion because a later word starts with 'd'.
+    return message->forms[0];
+}
+
 const char* Tr(const char* id) {
     const EnglishMessage* base = FindEnglish(id);
     if (base == nullptr) {

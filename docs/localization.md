@@ -66,9 +66,9 @@ until the PO is merged.
 Large recovered global tables use IDs such as `table.<symbol>.<index>`.
 `tools/localization_tables.py` extracts their authoritative English
 initializers, builds the POT portion, and can import format-compatible Russian
-entries from the reconstructed Buka branch. The bridge binds 1,999 entries
-across 114 tables to catalog-owned UTF-8 storage. Together with 512 directly
-registered messages, the Russian catalog currently covers all 2,511 generated
+entries from the reconstructed Buka branch. The bridge binds 2,020 entries
+across 115 tables to catalog-owned UTF-8 storage. Together with 559 directly
+registered messages, the Russian catalog currently covers all 2,579 generated
 entries. New or structurally different messages should use semantic IDs
 directly.
 
@@ -226,8 +226,8 @@ Implemented:
 
 - startup language selection, English fallback, UTF-8 MO loading, catalog
   packaging, stale-source and placeholder validation;
-- a complete 2,511-entry Russian catalog: 1,999 recovered table entries and
-  512 directly registered messages;
+- a complete 2,579-entry Russian catalog: 2,020 recovered table entries and
+  559 directly registered messages;
 - a source comparison audit whose only remaining edition differences are the
   internal map name `Chaos` and save-file prefix `WIN_`, neither displayed as
   translatable prose;

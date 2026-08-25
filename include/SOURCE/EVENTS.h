@@ -10,7 +10,9 @@ typedef enum EventConstant {
     COMBAT_REMOTE_BUFFER_SIZE             = 0xFF,
     COMBAT_REMOTE_HEADER_SIZE             = 0x9b,
     COMBAT_REMOTE_HERO_FIRST_SIZE         = 200,
-    COMBAT_REMOTE_HERO_SECOND_SIZE        = 50,
+    // Together the fragments must cover sizeof(hero); the second one grew
+    // with the Ironfist spell flags.
+    COMBAT_REMOTE_HERO_SECOND_SIZE        = 58,
     COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX = 52,
     COMBAT_REMOTE_PACKET_HEADER_SIZE      = 9,
     COMBAT_REMOTE_FRAGMENT_TYPE           = 1,

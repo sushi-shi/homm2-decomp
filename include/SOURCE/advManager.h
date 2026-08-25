@@ -34,7 +34,8 @@ typedef enum AdventureManagerStorageConstant {
     ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
     ADVMGR_OBJECT_ICON_COUNT             = 64,
     ADVMGR_ANIMATION_PHASE_COUNT         = 4,
-    ADVMGR_HERO_ICON_COUNT               = H2EnumIndex(FACTION_COUNT) + 2,
+    // Sized for the 13-faction table; slots 6 and 7 keep the boat and froth.
+    ADVMGR_HERO_ICON_COUNT               = KB_FACTION_TABLE_CAPACITY + 2,
     ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
@@ -261,6 +262,7 @@ public:
     void GenericSiteEvent(class mapCell*, class hero*);
     void RecruitSiteEvent(class mapCell*, class hero*);
     void ExpansionRecruitEvent(class hero*, CreatureType, i16*);
+    void ShipyardEvent(i32, i32);
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
     void EventSound(MapObjectType, i32, SAMPLE2*);

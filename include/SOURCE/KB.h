@@ -331,7 +331,8 @@ typedef enum AppMenuCommand {
     APP_MENU_CHEAT_REVEAL    = 0x9ccd,
     APP_MENU_CHEAT_MOVEMENT  = 0x9cce,
     APP_MENU_CHEAT_SPELLS    = 0x9ccf,
-    APP_MENU_CHEAT_RESOURCES = 0x9cd0
+    APP_MENU_CHEAT_RESOURCES = 0x9cd0,
+    APP_MENU_CHEAT_AUTO_WIN  = 0x9cd1
 } AppMenuCommand;
 
 enum class DialogWaitType : i32 {
@@ -434,7 +435,7 @@ typedef enum AppMenuConstant {
     APP_MENU_CONFIRM_OK          = 0x7805,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
-    APP_MENU_MAX_SPELLS          = 0x41,
+    APP_MENU_MAX_SPELLS          = KB_SPELL_TABLE_CAPACITY,
     APP_MENU_SPELL_COUNT         = 10,
     APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
@@ -444,7 +445,7 @@ typedef enum AppMenuConstant {
     APP_MENU_CHEAT_ARMY_QUANTITY = 5,
     APP_MENU_CLOSE_MESSAGE       = 0x10,
     APP_MENU_ARMY_FIRST          = 41000,
-    APP_MENU_ARMY_LAST           = 41066,
+    APP_MENU_ARMY_LAST           = 41084,
     APP_MENU_SECONDARY_FIRST     = 42000,
     APP_MENU_SECONDARY_LAST      = 42056,
     APP_MENU_SECONDARY_LEVELS    = 4,
@@ -569,17 +570,17 @@ extern char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
 extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern char* cOutOfMemory;
-extern char* gArmyNames[H2EnumIndex(CREATURE_COUNT)];
-extern char* gArmyNamesPlural[H2EnumIndex(CREATURE_COUNT)];
-extern char* cMonFilename[H2EnumIndex(CREATURE_COUNT)];
-extern char* cArmyFrameFileNames[H2EnumIndex(CREATURE_COUNT)];
+extern char* gArmyNames[KB_CREATURE_TABLE_CAPACITY];
+extern char* gArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY];
+extern char* cMonFilename[KB_CREATURE_TABLE_CAPACITY];
+extern char* cArmyFrameFileNames[KB_CREATURE_TABLE_CAPACITY];
 extern char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)];
 extern i32 gArtifactBaseRV[];
 extern b32 gbAllBlack;
 extern b32 gbCheatMenus;
 extern b32 gbClosingApp;
 extern b8 gbCombatSurrender;
-extern i8 captainStats[H2EnumIndex(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT];
+extern i8 captainStats[KB_FACTION_TABLE_CAPACITY][HERO_PRIMARY_STAT_COUNT];
 extern b32 gbDrawSavedCursor;
 extern b32 gbForegroundApp;
 extern b32 gbFunctionComplete;
@@ -613,7 +614,7 @@ extern char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
 extern H2EnumStorage<CreatureType, i8> gDwellingType[][KB_DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
-extern u32l gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
+extern u32l gHierarchyMask[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT];
 extern H2EnumStorage<BottomViewMode, i32> giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
 extern H2EnumStorage<ResourceType, i32> giBottomViewResource;
@@ -635,7 +636,7 @@ extern DialogWaitType giWaitType;
 extern i32 glTimers[GLOBAL_TIMER_COUNT];
 extern i32 gMageBaseResourceValues[];
 extern i32 gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
-extern tag_monsterInfo gMonsterDatabase[H2EnumIndex(CREATURE_COUNT)];
+extern tag_monsterInfo gMonsterDatabase[KB_CREATURE_TABLE_CAPACITY];
 extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern i32 gNeutralBaseResourceValues[];
 extern i32 gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
@@ -659,7 +660,7 @@ extern icon* gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
 extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char* gSpecialBuildingNames[];
-extern SSpellInfo gsSpellInfo[H2EnumIndex(SPELL_COUNT)];
+extern SSpellInfo gsSpellInfo[KB_SPELL_TABLE_CAPACITY];
 extern icon* gSystemIcons;
 extern char gText[];
 extern char* gWellExtraNames[];
@@ -690,6 +691,6 @@ extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;
 extern font* smallFont;
-extern u8 iGetSSByAlignment[H2EnumIndex(HERO_SKILL_COUNT)][H2EnumIndex(FACTION_COUNT)];
+extern u8 iGetSSByAlignment[H2EnumIndex(HERO_SKILL_COUNT)][KB_FACTION_TABLE_CAPACITY];
 
 #endif

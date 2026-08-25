@@ -196,7 +196,11 @@ void mouseManager::SetPointer(i32 frame) {
         frame = m_cursorFrame;
     else
         m_cursorFrame = frame;
-    m_cursorSizeIndex = frame + iMouseOffset[H2EnumIndex(m_cursorType)];
+    m_cursorSizeIndex = iMouseOffset[H2EnumIndex(m_cursorType)] + frame;
+    // Ironfist's extra combat cursors overflow the retail size tables;
+    // anything past the end borrows the big cursor's metrics.
+    if (m_cursorSizeIndex >= MOUSE_CURSOR_COUNT)
+        m_cursorSizeIndex = MOUSE_CURSOR_FALLBACK;
     H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT);
 
     if (gbColorMice != 0) {

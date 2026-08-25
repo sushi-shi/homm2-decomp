@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(homm2 CXX)
+project(homm2 C CXX)
 
 include(CTest)
 
@@ -40,7 +40,8 @@ endif()
 file(GLOB_RECURSE HOMM2_GAME_SOURCES CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/src/BASE/*.cpp
   ${CMAKE_SOURCE_DIR}/src/SOURCE/*.cpp
-  ${CMAKE_SOURCE_DIR}/src/EDITOR/*.cpp)
+  ${CMAKE_SOURCE_DIR}/src/EDITOR/*.cpp
+  ${CMAKE_SOURCE_DIR}/src/IRONFIST/*.cpp)
 
 if(EMSCRIPTEN)
   set(HOMM2_EXECUTABLE WASM)
@@ -67,6 +68,13 @@ add_library(homm2_platform STATIC
   ${HOMM2_PLATFORM_SYSTEM})
 target_include_directories(homm2_platform PRIVATE
   ${CMAKE_SOURCE_DIR}/include)
+
+file(GLOB HOMM2_LUA_SOURCES CONFIGURE_DEPENDS
+  ${CMAKE_SOURCE_DIR}/vendor/lua-5.3.3/*.c)
+add_library(homm2_lua STATIC ${HOMM2_LUA_SOURCES})
+
+add_library(homm2_tinyxml2 STATIC
+  ${CMAKE_SOURCE_DIR}/vendor/tinyxml2-7.1.0/tinyxml2.cpp)
 
 if(HOMM2_PLATFORM STREQUAL "SDL3")
   # A statically linked SDL3 drags in system libraries of its own. That list
@@ -188,7 +196,9 @@ endif()
 
 target_include_directories(homm2 PRIVATE
   ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR})
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/vendor/lua-5.3.3
+  ${CMAKE_SOURCE_DIR}/vendor/tinyxml2-7.1.0)
 
 if(NOT WIN32)
   target_compile_definitions(homm2 PRIVATE
@@ -231,7 +241,11 @@ elseif(UNIX)
   target_link_options(homm2 PRIVATE -rdynamic)
 endif()
 
-target_link_libraries(homm2 PRIVATE homm2_platform ${HOMM2_FFMPEG_LIBRARIES})
+target_link_libraries(homm2 PRIVATE
+  homm2_platform
+  homm2_lua
+  homm2_tinyxml2
+  ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_localization_encoding_test

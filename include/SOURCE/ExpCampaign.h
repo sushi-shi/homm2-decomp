@@ -125,11 +125,13 @@ public:
     void HandleVictory2(void);
     void HandleVictory3(void);
     void HandleVictory4(void);
+    void HandleVictoryCustomCampaign(void);
     void ReplaySmacker(void);
     void ReplaySmacker1(void);
     void ReplaySmacker2(void);
     void ReplaySmacker3(void);
     void ReplaySmacker4(void);
+    void ReplaySmackerCustomCampaign(void);
     u8 IsCompleted(void);
     i8 IsThisMapCompleted(void);
 
@@ -152,4 +154,11 @@ public:
 extern struct SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                                               [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
+extern i32 expansionCampaignMapCounts[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)];
+extern i32 expansionCampaignTrackXY[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
+                                   [EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2];
+enum class GameDifficulty : i8;
+extern H2EnumStorage<GameDifficulty, i8>
+    expansionCampaignDifficulty[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
+                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
 #endif

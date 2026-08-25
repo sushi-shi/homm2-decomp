@@ -15,6 +15,9 @@
 #include <BASE/mouseManager.h>
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
+#include <IRONFIST/artifacts.h>
+#include <IRONFIST/dialog.h>
+#include <IRONFIST/hooks.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/armyGroup.h>
@@ -41,6 +44,7 @@
 
 #include <string>
 #include <SOURCE/townManager.h>
+#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 #include <SOURCE/Localization.h>
@@ -151,6 +155,10 @@ namespace {
         RIDDLE_EXPECTED_BUFFER_SIZE = RIDDLE_PREFIX_LENGTH + 1,
         RIDDLE_ANSWER_BUFFER_SIZE = 8
     } RiddleComparisonConstant;
+
+    typedef enum ShipyardEventConstant {
+        DIALOG_BUILD_BOAT = 0x7802
+    } ShipyardEventConstant;
 
     typedef enum BarrierEventConstant {
         COLOR_MASK = 7,
@@ -374,6 +382,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType thirdUpgrade_f;
     hero* eventHero2;
     SAMPLE2 eventSample_f;
+
+    if (Ironfist_LocationVisit(cell, x, y))
+        return;
 
     eventHero2 = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
@@ -2597,7 +2608,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 if (H2EnumIndex(gsSpellInfo[cell->m_objectMetadata - 1].level)
                     <= static_cast<i32>(eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)])
-                           + SHRINE_WISDOM_BONUS) {
+                           + SHRINE_WISDOM_BONUS
+                    && eventHero2->m_cursorType != FACTION_CYBORG) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     eventHero2->AddSpell(
                         static_cast<SpellType>(cell->m_objectMetadata - 1),
@@ -2730,7 +2742,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    gArtifactEvent[H2EnumIndex(artifact_g)],
+                    GetArtifactEvent(H2EnumIndex(artifact_g)),
                     MAP_EVENT_REWARD_ARTIFACT,
                     H2EnumIndex(artifact_g),
                     -1,
@@ -2857,7 +2869,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            gArtifactEvent[H2EnumIndex(artifact_g)],
+                            GetArtifactEvent(H2EnumIndex(artifact_g)),
                             MAP_EVENT_REWARD_ARTIFACT,
                             H2EnumIndex(artifact_g),
                             -1,
@@ -3533,7 +3545,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)]
-                                   >= HERO_SKILL_LEVEL_EXPERT) {
+                                       >= HERO_SKILL_LEVEL_EXPERT
+                                   && eventHero2->m_cursorType != FACTION_CYBORG) {
                             eventHero2->AddSpell(
                                 static_cast<SpellType>(cell->m_objectMetadata - 1),
                                 eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
@@ -3694,6 +3707,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_JAIL:
             JailEvent(cell, eventHero2, x, y);
+            break;
+
+        case MAP_OBJECT_SHIPYARD:
+            ShipyardEvent(x, y);
+            break;
     }
 
     UpdateRadar(1, 0);
@@ -3801,7 +3819,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                     if (i_g > 1) {
                         cells_h[i_g]->m_overlayTileset = TILESET_NONE;
                         cells_h[i_g]->m_overlayIndex = EMPTY_INDEX;
-                    } else if (cells_h[i_g]->m_objectIndex != EMPTY_INDEX) {
+                    } else {
                         if (cells_h[i_g]->m_objectIndex == frame_k
                             && cells_h[i_g]->m_objectTileset == cell->m_objectTileset) {
                             cells_h[i_g]->m_objectIndex = 0;
@@ -3926,45 +3944,27 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     colorIndex &= COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= PASSWORD_SHIFT;
-    char word[INPUT_BUFFER_SIZE];
 
     sprintf(
         gText,
-        localization::Tr("event.inline.95e1a0a20e2b7676"),
+        localization::Tr("event.barrier.inspect"),
         xBarrierColor[colorIndex]
     );
-    GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
-    if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+    // Ironfist drops the typed password: visiting the tent is enough, and
+    // the barrier dissolves on its own.
+    H2MessageBox(gText);
+    if (gpCurPlayer->m_barrierTents & (1 << colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
-        NormalDialog(
-            localization::Tr("event.inline.1ee518efd93cbc65"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+        sprintf(
+            gText,
+            localization::Tr("event.barrier.dissolves"),
+            xPasswordStrings[passwordIndex]
         );
+        H2MessageBox(gText);
         return 1;
-    } else {
-        NormalDialog(
-            localization::Tr("event.inline.907f9f79f5b78059"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
-        return 0;
     }
+    H2MessageBox(const_cast<char*>(localization::Tr("event.barrier.no_password")));
+    return 0;
 }
 
 i8 StrEqNoCase(char* firstString, char* sndString) {
@@ -3975,19 +3975,16 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     SAMPLE2 playSample = NULL;
     i32 color = cell->m_objectMetadata;
     color &= COLOR_MASK;
-    i32 passwordIndex = cell->m_objectMetadata;
-    passwordIndex >>= PASSWORD_SHIFT;
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &playSample);
 
 
     sprintf(
         gText,
-        localization::Tr("event.inline.536b0d04d7ca290d"),
-        xBarrierColor[color],
-        xPasswordStrings[passwordIndex]
+        localization::Tr("event.barrier.tent_hint"),
+        xBarrierColor[color]
     );
-    NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+    H2MessageBox(gText);
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
@@ -4345,6 +4342,84 @@ void advManager::ExpansionRecruitEvent(
         MemError();
     gpExec->DoDialog(recruitWindow);
     delete recruitWindow;
+}
+
+// The shipyard builds a boat on any open water tile around it, for the
+// usual thousand gold and ten wood.
+void advManager::ShipyardEvent(i32 x, i32 y) {
+    static const i32 boatCellOffsets[][2] = {
+        {-1, -1},
+        {0, -1},
+        {1, -1},
+        {2, -1},
+        {2, 0},
+        {2, 1},
+        {1, 1},
+        {0, 1},
+        {-1, 1},
+        {-1, 0}
+    };
+    tag_message boatMessage;
+    i32 boatX = 0;
+    i32 boatY = 0;
+    bool boatPossible = false;
+
+    gpMouseManager->SetPointer(0);
+    for (auto& offset : boatCellOffsets) {
+        boatX = x + offset[0];
+        boatY = y + offset[1];
+        mapCell* boatCell = GetCell(boatX, boatY);
+        if (giGroundToTerrain[boatCell->m_terrainImageIndex] == TERRAIN_WATER
+            && boatCell->m_triggerType == MAP_OBJECT_NONE) {
+            boatPossible = true;
+            break;
+        }
+    }
+
+    if (gpGame->GetBoatsBuilt() >= TOWN_MAX_BOATS || !boatPossible) {
+        NormalDialog(
+            localization::Tr("event.shipyard.cannot_build_boat"),
+            1, 208, 40, -1, 0, -1, 0, -1, 0
+        );
+        return;
+    }
+
+    heroWindow* shipWindow = new heroWindow(177, 20, "shipwind.bin");
+    if (shipWindow == NULL)
+        MemError();
+    SetWinText(shipWindow, 12);
+    if (gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_GOLD)] < TOWN_BOAT_GOLD_COST
+        || gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_WOOD)]
+               < TOWN_BOAT_WOOD_COST) {
+        boatMessage.type = MESSAGE_WIDGET;
+        boatMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        boatMessage.payload.widget.id = DIALOG_BUILD_BOAT;
+        boatMessage.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_GRAYED);
+        shipWindow->BroadcastMessage(boatMessage);
+        boatMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        boatMessage.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
+        shipWindow->BroadcastMessage(boatMessage);
+    }
+    gpWindowManager->DoDialog(shipWindow, TrueFalseDialogHandler, 0);
+    delete shipWindow;
+
+    if (gpWindowManager->m_dialogResult == DIALOG_BUILD_BOAT) {
+        if (gpGame->CreateBoat(boatX, boatY, 0) == -1) {
+            LogStr("Can't create boat!");
+        } else {
+            gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_GOLD)] -=
+                TOWN_BOAT_GOLD_COST;
+            gpGame->m_players[giCurPlayer].m_resources[H2EnumIndex(RES_WOOD)] -=
+                TOWN_BOAT_WOOD_COST;
+            if (bShowIt) {
+                gpMouseManager->HideColorPointer();
+                gpWindowManager->SaveFizzleSource(168, 160, 176, 132);
+                CompleteDraw(0);
+                gpWindowManager->FizzleForward(168, 160, 176, 132, 65, 0, 0);
+                gpMouseManager->ShowColorPointer();
+            }
+        }
+    }
 }
 
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
@@ -5546,8 +5621,10 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     i32 i;
     i32 maxSpellPoints;
 
-    if (artifact == ARTIFACT_NONE)
+    if (artifact == ARTIFACT_NONE) {
+        Ironfist_ArtifactStat(targetHero, H2EnumIndex(artifact), take);
         return;
+    }
     stats[H2EnumIndex(HERO_PRIMARY_ATTACK)] = 0;
     stats[H2EnumIndex(HERO_PRIMARY_DEFENSE)] = 0;
     stats[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)] = 0;
@@ -5817,6 +5894,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
     }
+    Ironfist_ArtifactStat(targetHero, H2EnumIndex(artifact), take);
 }
 
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
@@ -7348,6 +7426,7 @@ void advManager::PlayerMonsterInteract(
     i32 numJoining;
 
     unused = 0;
+    Ironfist_MonsterInteract(cell);
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
@@ -7506,9 +7585,28 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
+    // Join-inclined spawns offer themselves to any army with room outside
+    // the retail campaigns, regardless of relative army strength.
+    if (forceJoin && eventHero->m_army.CanJoin(monsterType) && !gbInCampaign
+        && !(xIsPlayingExpansionCampaign && xCampaign.CampaignID() <= 3)) {
+        sprintf(
+            gText,
+            gEventText[EVENT_TEXT_FOLLOWERS],
+            gArmyNamesPlural[H2EnumIndex(monsterType)]
+        );
+        EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
+        if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+            eventHero->m_army.Add(monsterType, creatureCount, -1);
+            *handled = 1;
+            return;
+        }
+        EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+        goto fightMonsters;
+    }
+
     if (eventHero->m_army.CanJoin(monsterType)
         && armyRatio
-            > 2.0
+            > MONSTER_STRENGTH_JOIN
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
@@ -7666,6 +7764,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     i32 joiningCost;
     i32 joiningCount;
 
+    Ironfist_MonsterInteract(cell);
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
