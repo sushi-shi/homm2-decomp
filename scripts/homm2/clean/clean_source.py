@@ -1646,7 +1646,19 @@ def _configure_cp1251_classic_build(out_root: Path) -> None:
     if ninja.count("-fsjlj-exceptions ") != 2:
         raise SystemExit("CP1251 classic build template moved: exception flags")
     ninja = ninja.replace("-fsjlj-exceptions ", "")
+    ninja = replace_once(
+        ninja,
+        "$builddir/imports/AUDIERE_aliases.o "
+        "$builddir/imports/MSS32_aliases.o",
+        "$builddir/imports/MSS32_aliases.o",
+        "build.ninja Audiere aliases",
+    )
     ninja_path.write_text(ninja, encoding="utf-8")
+
+    audiere_path = out_root / "imports/AUDIERE.def"
+    audiere = ["LIBRARY audiere.dll", "EXPORTS"]
+    audiere += [f"  {symbol[1:]} = {symbol}" for symbol in AUDIERE_IMPORTS]
+    audiere_path.write_text("\n".join(audiere) + "\n", encoding="utf-8")
 
     mss_path = out_root / "imports/MSS32.def"
     mss = ["LIBRARY mss32.dll", "EXPORTS"]

@@ -412,6 +412,47 @@ class ClassicSourceTests(unittest.TestCase):
             cyrillic, non_utf8_files = clean_source.verify_cp1251_tree(output)
             self.assertEqual((cyrillic, non_utf8_files), (6, 1))
 
+    def test_cp1251_classic_uses_direct_gcc_audiere_imports(self):
+        source = Path(clean_source.REPO)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            for relative in (
+                "include/BASE/textWidget.h",
+                "include/BASE/textEntryWidget.h",
+                "src/BASE/TEXTWDGT.cpp",
+                "src/BASE/Textntry.cpp",
+            ):
+                target = output / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((source / relative).read_bytes())
+            clean_source.write_ninja(output)
+            (output / "flake.nix").write_text(
+                (source / "scripts/homm2/clean/project/flake.nix").read_text()
+            )
+            imports = output / "imports"
+            imports.mkdir()
+            (imports / "AUDIERE.def").write_text("unused\n")
+            (imports / "MSS32.def").write_text("unused\n")
+
+            clean_source._configure_cp1251_classic_build(output)
+
+            audiere = (imports / "AUDIERE.def").read_text()
+            self.assertIn(
+                "  AdrOpenDevice@8 = _AdrOpenDevice@8\n",
+                audiere,
+            )
+            self.assertIn(
+                "  AdrOpenSampleSource@4 = _AdrOpenSampleSource@4\n",
+                audiere,
+            )
+            ninja = (output / "build.ninja").read_text()
+            link = next(
+                line for line in ninja.splitlines()
+                if line.startswith("build $builddir/HMM2PL.exe: link ")
+            )
+            self.assertNotIn("AUDIERE_aliases.o", link)
+            self.assertIn("MSS32_aliases.o", link)
+
 
 class CleanSourceOutputSafetyTests(unittest.TestCase):
     def fixture_repo(self, root: Path) -> Path:
