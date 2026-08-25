@@ -30,8 +30,8 @@ when a residual will not explain itself, grouped by the question they answer:
   relocs      reloc_sweep - regenerate config/delink_relocs.tsv from the image with
               the delinker's find_relocs.py. The primary DIR32 channel.
               reloc_donation - SUPERSEDED by the sweep; kept as a cross-check and
-              as the only channel that recovers target *identity* (owner names,
-              string cells, interior addends) rather than sites.
+              optional review of interior owner/addend aliases. It supplies no
+              build identity or generated labelling input.
 
 `homm2 audit` with no argument lists them. Dispatch is in-process via runpy, which
 is why these five keep their own differing entry points instead of being reshaped

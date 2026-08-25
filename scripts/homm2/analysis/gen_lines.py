@@ -19,6 +19,7 @@ so the Lua overlay matches a statement to the asm line whose address equals it.
 import json, os, re, struct, subprocess, sys, tomllib
 from pathlib import Path
 
+from homm2.build.fixed_asm import UNITS as FIXED_ASM_UNITS
 from homm2.core.paths import REPO
 
 
@@ -131,6 +132,8 @@ def main(argv):
     u = next((x for x in man.get("unit", []) if x["unit"] == unit), None)
     if not u:
         sys.exit(f"gen_lines: unknown unit {unit}")
+    if unit in FIXED_ASM_UNITS:
+        sys.exit(f"gen_lines: {unit} is an assembly unit without C++ line records")
     flags = man.get("flags", {}).get(u.get("flags", "base"), [])
     src = REPO / u["source"]
     obj = REPO / "build/lines" / f"{unit}.z7.obj"

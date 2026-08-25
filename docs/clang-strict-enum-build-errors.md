@@ -24,9 +24,10 @@ nix develop .#build --command \
   python -m homm2.build.clang_cxx11 --errors-only
 ```
 
-The final audit checks 94 translation units. `BASE/TILE.cpp` remains excluded
-because its MSVC naked inline assembly cannot be parsed by Clang. The final
-result is 94 units, zero failed units, and 1,416 non-fatal warnings.
+The matching-tree audit checks the 96 C++ translation units. `BASE/BITS` and
+`BASE/TILE` are fixed MASM units and therefore have no matching-tree Clang
+translation unit; their portable C++ generator overrides are verified by the
+clean-source MinGW build.
 
 ## Original 41 hard errors
 

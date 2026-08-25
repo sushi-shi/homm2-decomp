@@ -2,9 +2,8 @@
 //
 // Retail evidence:
 //   The Rich producer census and the linked contribution boundaries identify
-//   BASE/BITS and BASE/TILE as inputs converted from OMF by VC6 LINK. Portable
-//   reconstructed C++ mirrors retain their semantics and TILE storage claim,
-//   but cannot reproduce the assembler instruction stream.
+//   BASE/BITS and BASE/TILE as inputs converted from OMF by VC6 LINK. The
+//   matching tree therefore retains only the assembler implementations.
 //
 // Source products:
 //   src/BASE/BITS.asm
@@ -38,5 +37,5 @@
 //   RETAIN the MASM-syntax OMF source and assemble it with the pinned original
 //   Microsoft MASM 6.11 media packaged in the VC6 release. JWasm remains an
 //   independent control, not a final-link producer. REMOVE the former link-only
-//   COFF header adapter. The C++ files remain portable semantic/data mirrors;
-//   they are neither authoritative code-comparison nor final-link inputs.
+//   COFF header adapter and the misleading matching-tree C++ mirrors. Portable
+//   translations live only in the clean-source generator overrides.

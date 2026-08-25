@@ -1,4 +1,4 @@
-"""Recover DIR32 relocation sites and target identities by donation.
+"""Cross-check DIR32 relocation sites from already exact functions.
 
 SUPERSEDED as the site channel by `homm2 audit reloc-sweep`, which recovers
 every site this donates and ~26,000 more, from the image alone. Donation is
@@ -7,13 +7,10 @@ are already masked-identical to retail, so a site arrived *after* exactness
 rather than enabling it, and the data sections -- where nothing is compiled to
 compare against -- could never start at all.
 
-What donation still uniquely provides is target *identity*. The sweep sees a
-dword; this reads the symbol our own object relocated against, which is the
-only channel that yields build/gen/reloc_target_names.tsv (unanimous data-owner
-names), build/gen/string_cells.tsv (content-verified literal cells), and
-config/delink_reloc_aliases.tsv (interior sites as owner + addend). Keep running
-it as claims close: every newly exact function names targets the sweep has
-already placed. Source DATA()/VTBL() markers will retire even that.
+Donation is no longer a build identity channel. Source claims, PE imports and
+reviewed compiler-generated providers feed the symbol inventory directly.
+This command remains a report and an optional cross-check for reviewed DIR32
+sites and interior owner/addend aliases.
 
 Every claimed function whose compiled bytes are masked-identical to the retail
 span at the same length donates its own relocation sites: the compiled object
@@ -123,46 +120,6 @@ def function_bodies(obj_path: Path, coff=None):
     return out
 
 
-def string_data(coff) -> dict:
-    """String symbol -> NUL-terminated bytes from the object's data sections.
-
-    Covers both static $SG cells (/Gf off) and pooled ??_C@ COMDATs (/Gf on).
-    """
-    out = {}
-    for sym in coff.symbols.values():
-        if (not sym.name.startswith(("$SG", "??_C@"))) or sym.section <= 0:
-            continue
-        section = coff.sections[sym.section - 1]
-        raw = bytes(coff.data[section.raw_offset + sym.value:
-                              section.raw_offset + min(sym.value + 512,
-                                                       section.raw_size)])
-        cut = raw.find(b"\0")
-        if cut >= 0:
-            out[sym.name] = raw[:cut]
-    return out
-
-
-def pe_sections(exe: bytes):
-    pe = struct.unpack_from("<I", exe, 0x3C)[0]
-    count = struct.unpack_from("<H", exe, pe + 6)[0]
-    optional = struct.unpack_from("<H", exe, pe + 20)[0]
-    out = []
-    for index in range(count):
-        offset = pe + 24 + optional + index * 40
-        vsize, va, rsize, roff = struct.unpack_from("<4I", exe, offset + 8)
-        out.append((va, min(vsize, rsize), roff))
-    return out
-
-
-def retail_cstring(exe: bytes, secs, rva: int):
-    for va, size, roff in secs:
-        if va <= rva < va + size:
-            raw = exe[roff + rva - va:roff + rva - va + 512]
-            cut = raw.find(b"\0")
-            return raw[:cut] if cut >= 0 else None
-    return None
-
-
 def masked_equal(ours: bytes, retail: bytes, sites) -> bool:
     if len(ours) < len(retail):
         return False
@@ -184,11 +141,9 @@ def main(argv=None):
     end_va = image_extent(exe)
     claims = load_claims()
 
-    secs = pe_sections(exe)
     donated = {}
     named = {}
     interior = []
-    string_cells = {}
     functions_used = 0
     rejected_target = 0
     for unit, rows in sorted(claims.items()):
@@ -199,7 +154,6 @@ def main(argv=None):
             continue
         coff = CoffFile(str(obj_path))
         bodies = function_bodies(obj_path, coff)
-        strings = string_data(coff)
         for rva, size, name in rows:
             body = bodies.get(name)
             if body is None:
@@ -234,16 +188,6 @@ def main(argv=None):
             functions_used += 1
             for site, target, symbol, addend in fn_sites:
                 donated[site] = target
-                if (symbol or "").startswith(("$SG", "??_C@")) and addend == 0:
-                    # string-content evidence: the retail cell holds exactly
-                    # the literal our object compiled -> the cell is a
-                    # string even if its first dword happens to parse as an
-                    # in-image pointer (e.g. "ATA").
-                    ours_text = strings.get(symbol)
-                    cell_rva = target - IMAGE_BASE
-                    if (ours_text is not None and
-                            retail_cstring(exe, secs, cell_rva) == ours_text):
-                        string_cells[cell_rva] = True
                 # TU-local artifacts never vote: all $-prefixed compiler
                 # labels (including descriptive labels as well as $L/$SG),
                 # string/float literals, and per-function EH funclet labels.
@@ -264,19 +208,8 @@ def main(argv=None):
           f"donated {len(donated)} DIR32 sites "
           f"({rejected_target} functions rejected on out-of-image targets)")
 
-    cells_path = REPO / "build/gen/string_cells.tsv"
-    with cells_path.open("w") as stream:
-        print("cell_rva", file=stream)
-        for cell_rva in sorted(string_cells):
-            print(f"0x{cell_rva:x}", file=stream)
-    print(f"[reloc-donation] {len(string_cells)} content-verified string "
-          f"cells -> {cells_path}")
-
-    # target-name evidence: unanimous owners become real names for the
-    # synthetic manifest-target rows (const_<RVA> otherwise). Distinct owners
-    # sharing one spelling (per-TU statics with plain C names) get an @<rva>
-    # suffix so the PDB stays one-name-one-address.
-    names_path = REPO / "build/gen/reloc_target_names.tsv"
+    # Unanimous names are useful only for the optional owner/addend alias
+    # cross-check below. They are never serialized or consumed by regeneration.
     solo = {rva: entries for rva, votes in named.items()
             if len(entries := sorted(votes.items(), key=lambda kv: -kv[1])) == 1}
     by_name = {}
@@ -286,19 +219,8 @@ def main(argv=None):
     for name, rvas in by_name.items():
         for rva in rvas:
             owner_name[rva] = name if len(rvas) == 1 else f"{name}@0x{rva:x}"
-    with names_path.open("w") as stream:
-        print("owner_rva\tsymbol\tvotes", file=stream)
-        for owner_rva in sorted(named):
-            if owner_rva in owner_name:
-                votes = solo[owner_rva][0][1]
-                print(f"0x{owner_rva:x}\t{owner_name[owner_rva]}\t{votes}",
-                      file=stream)
-            else:
-                entries = sorted(named[owner_rva].items(), key=lambda kv: -kv[1])
-                spellings = "|".join(f"{n}:{v}" for n, v in entries)
-                print(f"0x{owner_rva:x}\t(conflict)\t{spellings}", file=stream)
-    print(f"[reloc-donation] {len(owner_name)} unanimous data-owner names -> "
-          f"{names_path}")
+    print(f"[reloc-donation] {len(owner_name)} unanimous data-owner names "
+          "observed (report-only)")
 
     if not args.write:
         for site in sorted(donated)[:20]:

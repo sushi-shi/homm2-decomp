@@ -157,9 +157,6 @@ BASE/BITMAP	src/BASE/BITMAP.cpp:121	VA	0x004d0340	void bitmap::GrabBitmapCareful
 BASE/BITMAP	src/BASE/BITMAP.cpp:154	VA	0x004d0430	void bitmap::CopyTo(
 BASE/BITMAP	src/BASE/BITMAP.cpp:205	VA	0x004d0500	void bitmap::CopyToCareful(
 BASE/BITMAP	src/BASE/BITMAP.cpp:235	VTBL	0x004eba3c	bitmap
-BASE/BITS	src/BASE/BITS.cpp:11	VA	0x004d1594	extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex)
-BASE/BITS	src/BASE/BITS.cpp:33	VA	0x004d15c2	extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex)
-BASE/BITS	src/BASE/BITS.cpp:49	VA	0x004d15e2	extern "C" void __cdecl BitClear(void* bits, BitIndex bitIndex)
 BASE/BORDER	src/BASE/BORDER.cpp:17	VA	0x004d20a0	border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE)
 BASE/BORDER	src/BASE/BORDER.cpp:25	VA	0x004d2130	border::border(
 BASE/BORDER	src/BASE/BORDER.cpp:45	VA	0x004d21a0	inline border::~border()
@@ -723,9 +720,6 @@ BASE/TEXTWDGT	src/BASE/TEXTWDGT.cpp:169	VA	0x004d1490	void textWidget::Draw(void
 BASE/TEXTWDGT	src/BASE/TEXTWDGT.cpp:185	VA	0x004d14e0	void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color)
 BASE/TEXTWDGT	src/BASE/TEXTWDGT.cpp:190	VA	0x004d14f0	void textWidget::SetText(char* text)
 BASE/TEXTWDGT	src/BASE/TEXTWDGT.cpp:209	VTBL	0x004eba50	textWidget
-BASE/TILE	src/BASE/TILE.cpp:17	DATA	0x0051fec0	static u32 gTileMode;
-BASE/TILE	src/BASE/TILE.cpp:18	DATA	0x0051fec4	static i32 gTileRowCtr;
-BASE/TILE	src/BASE/TILE.cpp:20	VA	0x004d310c	extern "C" __declspec(naked) void __cdecl
 BASE/TILESET	src/BASE/TILESET.cpp:10	DATA	0x00520d9c	static STilesetSourceFiles gTilesetSourceFiles = {RETAIL_FILE, RETAIL_FILE};
 BASE/TILESET	src/BASE/TILESET.cpp:12	VA	0x004dac60	tileset::tileset(u32l id)
 BASE/TILESET	src/BASE/TILESET.cpp:24	VA	0x004dad30	inline tileset::~tileset()

@@ -1,4 +1,3 @@
-import json
 import struct
 import tempfile
 import unittest
@@ -25,7 +24,6 @@ from homm2.build.assert_relocs import (
     check_linked_pe_data_targets,
     check_pe_data_targets,
     classify_identity_transpositions,
-    comparison_base_object,
     compare_function_reloc_addends,
     delinked_self_references,
     folded_comdat_symbols,
@@ -43,27 +41,6 @@ from homm2.build.reloc_owners import DataOwner, is_interior_reloc_alias, owners_
 
 GCONFIG_SYMBOL = "?gConfig@@3UconfigStruct@@A"
 GMONSTER_DATABASE_SYMBOL = "?gMonsterDatabase@@3PAUtag_monsterInfo@@A"
-
-
-class ComparisonObjectTest(unittest.TestCase):
-    def test_authoritative_graph_selection_drives_relocation_audits(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp) / "build/objdiff"
-            root.mkdir(parents=True)
-            config = root / "objdiff.json"
-            config.write_text(json.dumps({
-                "units": [{
-                    "name": "BASE/TILE",
-                    "base_path": "./normalized/authoritative/BASE/TILE.obj",
-                }],
-            }))
-            self.assertEqual(
-                comparison_base_object(
-                    "BASE/TILE", normalized=True, config_path=config),
-                str(root / "normalized/authoritative/BASE/TILE.obj"))
-            self.assertEqual(
-                comparison_base_object("BASE/TILE", config_path=config),
-                str(root / "authoritative/BASE/TILE.obj"))
 
 
 class DataIdentityTranspositionTest(unittest.TestCase):

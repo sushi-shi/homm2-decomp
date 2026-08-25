@@ -65,7 +65,7 @@ def main() -> None:
         emit_rules(w)
         objs, base_symbol_sidecars, comparison_paths = emit_compile_graph(
             w, manifest, units, delink, reviewed_units)
-        emit_link_graph(w, objs, base_symbol_sidecars,
+        emit_link_graph(w, units, objs, base_symbol_sidecars,
                         first_function_rva, first_compgen_rva)
         w.default("all")
 

@@ -18,6 +18,7 @@ from pathlib import Path
 import clang.cindex as ci
 
 from homm2.clang_options import ClangMode
+from homm2.build.fixed_asm import claims as fixed_asm_claims
 from homm2.build.annotated_data import (
     _clang_args,
     _mask_lexical_noise,
@@ -151,6 +152,11 @@ def source_function_spans(source_root: Path,
                 rva=va - IMAGE_BASE,
                 size=size,
                 location=f"{path.relative_to(repo).as_posix()}:{line}",
+            ))
+    for unit, source, claim in fixed_asm_claims("func"):
+        if (repo / source).is_file():
+            rows.append(AnnotatedFunctionSpan(
+                unit=unit, rva=claim.rva, size=claim.size, location=source,
             ))
     identities = {row.rva for row in rows}
     if len(identities) != len(rows):

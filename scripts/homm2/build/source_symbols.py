@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
-"""Build build/gen/symbol_names.csv from the VA/DATA annotations in the source.
+"""Build build/gen/symbol_names.csv from source VA/DATA annotations.
 
 This image is stripped: no debug stream names anything, so there is no gift
-inventory that exists before reconstruction starts. The only thing that knows
-an address here is the source itself, and only where somebody has written the
-address down.
+inventory that exists before reconstruction starts. Every address and identity
+must therefore come from explicit, reviewable project evidence.
 
-That makes the rule strict and deliberate: a symbol exists for the delinker if and
-only if a `VA(...)` or `DATA(...)` marker names it. Nothing is inferred from
-Ghidra's function inventory, from signature matching, or from a neighbouring
-symbol's extent. config/retail_functions.csv is a work list of 2,472 candidate
-boundaries; this is the far smaller set that has been claimed and can be delinked
-against. The two are not the same and must not be conflated - one is analysis
-opinion, the other is a reviewed claim.
-
-The set is empty until the campaign starts marking, and an empty inventory is the
-correct answer to "what has been proven so far", not a failure.
+That makes the rule strict and deliberate: identities come from source markers
+or one of three explicit providers: the fixed MASM units, the retail PE import
+table joined to current candidate spellings, and reviewed compiler-generated
+data re-proven against current COFF COMMON definitions. Nothing is inferred
+from Ghidra names, neighbouring extents, or a previous generated inventory.
 
 Unlike homm2.build.annotated_functions - a library for the static-helper case -
 this names every annotated definition, free function and method alike, since
@@ -23,7 +17,6 @@ nothing else will.
 
     python3 -m homm2.build.source_symbols            # -> build/gen/symbol_names.csv
     python3 -m homm2.build.source_symbols --check    # report, write nothing
-    python3 -m homm2.build.source_symbols --ignore-donations  # bootstrap only
 """
 from __future__ import annotations
 
@@ -48,6 +41,11 @@ from homm2.build.annotated_compgen_data import (
     source_compgen_data,
 )
 from homm2.build.annotated_vtables import source_vtables
+from homm2.build.symbol_providers import (
+    assembly_claims,
+    compiler_data_claims,
+    import_claims,
+)
 from homm2.core.paths import REPO
 
 OUTPUT = REPO / "build/gen/symbol_names.csv"
@@ -273,7 +271,7 @@ def reviewed_claims(repo: Path) -> list[SourceSymbol]:
 
 
 def collect(source_root: Path, repo: Path,
-            include_donations: bool = True) -> list[SourceSymbol]:
+            include_binary_providers: bool | None = None) -> list[SourceSymbol]:
     rows: list[SourceSymbol] = []
     paths = [path.resolve() for path in sorted(source_root.rglob("*.cpp"))]
     if len(paths) <= 1:
@@ -311,6 +309,33 @@ def collect(source_root: Path, repo: Path,
             rva=claim.rva, name=claim.name, unit=claim.unit, size=claim.size,
             kind="func", provenance=f"source-VA_COMPGEN:{claim.kind}"))
 
+    if include_binary_providers is None:
+        include_binary_providers = (
+            source_root.resolve() == (repo / "src").resolve()
+        )
+    if include_binary_providers:
+        provider_rows = assembly_claims()
+        provider_rows += import_claims(
+            repo / "build/orig/HMM2PL.exe",
+            repo / "build/objdiff/base",
+            repo / "build/toolchain/msvc/lib",
+        )
+        provider_rows += compiler_data_claims(
+            repo / "config/compiler_generated_data.tsv",
+            repo / "build/objdiff/base",
+        )
+        rows.extend(SourceSymbol(
+            row.rva, row.name, row.unit, row.size, row.kind, row.provenance,
+        ) for row in provider_rows)
+        provider_rvas = {row.name: row.rva for row in provider_rows}
+        for row in rows:
+            expected = provider_rvas.get(row.name)
+            if expected is not None and expected != row.rva:
+                raise ValueError(
+                    f"provider identity {row.name} binds 0x{expected:x}, but "
+                    f"{row.provenance} binds 0x{row.rva:x}"
+                )
+
     seen: dict[int, SourceSymbol] = {}
     for row in sorted(rows):
         clash = seen.get(row.rva)
@@ -341,26 +366,6 @@ def collect(source_root: Path, repo: Path,
         named[key] = row.rva
         seen[row.rva] = row
 
-    # Donation evidence names data owners: every masked-identical function's
-    # relocations vote (symbol, addend) per target, and target - addend pins
-    # the owner's linked address. Unanimous owners become real data rows.
-    claimed_names = {row.name: row.rva for row in seen.values()
-                     if row.kind == "data" and
-                     row.provenance == "source-annotation"}
-    donated_names = _donated_owner_names(repo) if include_donations else []
-    for rva, name in donated_names:
-        # Donation and a written claim disagreeing about one name means the
-        # claim's address is wrong; keeping both would put one symbol at two
-        # addresses and let the delinker pick either.
-        if claimed_names.get(name, rva) != rva:
-            raise ValueError(
-                f"{name} is claimed by DATA() at 0x{claimed_names[name]:x} "
-                f"but donated at 0x{rva:x}")
-        if rva not in seen:
-            seen[rva] = SourceSymbol(
-                rva=rva, name=name, unit="_data",
-                size=0, kind="data", provenance="reloc-donation-owner")
-
     # Every DIR32 site in the reviewed manifest names a target the delinker
     # must be able to symbolize ("all constants must be named"). Targets not
     # covered by a claim get synthetic const_<RVA> aliases; name_strings later
@@ -371,24 +376,6 @@ def collect(source_root: Path, repo: Path,
                 rva=rva, name="const_%08x" % rva, unit="_const",
                 size=0, kind="data", provenance="reloc-manifest-target")
     return sorted(seen.values())
-
-
-def _donated_owner_names(repo: Path) -> list[tuple[int, str]]:
-    path = repo / "build/gen/reloc_target_names.tsv"
-    if not path.is_file():
-        return []
-    rows = []
-    for line in path.read_text().splitlines()[1:]:
-        fields = line.split("\t")
-        if len(fields) < 2 or fields[1] == "(conflict)":
-            continue
-        try:
-            rva = int(fields[0], 16)
-        except ValueError:
-            continue
-        if rva >= 0:
-            rows.append((rva, fields[1]))
-    return rows
 
 
 def _manifest_targets(repo: Path) -> list[int]:
@@ -452,16 +439,11 @@ def main(argv=None) -> int:
     parser.add_argument("--compgen-output", type=Path, default=COMPGEN_OUTPUT)
     parser.add_argument("--check", action="store_true",
                         help="report what would be written and write nothing")
-    parser.add_argument(
-        "--ignore-donations", action="store_true",
-        help="ignore generated relocation-owner names while bootstrapping "
-             "fresh donation evidence")
     args = parser.parse_args(argv)
 
     source_root = args.source.resolve()
     compgen = source_compgen_functions(source_root, REPO)
-    rows = collect(
-        source_root, REPO, include_donations=not args.ignore_donations)
+    rows = collect(source_root, REPO)
     functions = sum(1 for row in rows if row.kind == "func")
     print(f"[source-symbols] {len(rows)} annotated symbols "
           f"({functions} functions, {len(rows) - functions} data)")

@@ -1,0 +1,4 @@
+# Compiler-generated identities which cannot be written as source DATA claims.
+# Every row is re-proven against current candidate COFF COMMON definitions.
+rva	size	name	class	owner
+0x139c80	0x1	??_B?1???id@?$ctype@G@std@@$D@@9@51	common	std::ctype<wchar_t>::id

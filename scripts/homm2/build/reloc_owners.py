@@ -56,6 +56,10 @@ def load_definition_rvas(source_glob="src/**/*.cpp"):
                 match = pattern.search(line)
                 if match:
                     definitions[match.group(2)] = int(match.group(1), 16) - IMAGE_BASE
+    if source_glob == "src/**/*.cpp":
+        from homm2.build.fixed_asm import claims as fixed_asm_claims
+        for _unit, _source, claim in fixed_asm_claims("data"):
+            definitions[claim.name.removeprefix("_")] = claim.rva
     return definitions
 
 

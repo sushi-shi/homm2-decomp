@@ -1237,11 +1237,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   github.com/simenbkr/CTF, ncsc18/for170). The reconstruction restores the
   original local names; the codec bodies are invariant across PoL and Buka.
 
-- The stripped image's DIR32 sites are recovered by donation
-  (`homm2.audit.reloc_donation`): masked-identical claimed functions
-  transfer their compiled relocation sites onto retail bytes; unanimous
-  (symbol, addend) votes name the data owners and alias interior fields as
-  owner+addend. Re-run with `--write` after each matching wave.
+- The stripped image's DIR32 sites are recovered by the image-wide relocation sweep.
+  `homm2.audit.reloc_donation` remains a report-only cross-check from already exact
+  functions and may review interior owner+addend aliases; it no longer supplies symbol
+  identities or any regeneration input.
 - `true`/`false` are REAL keywords on this branch. `include/Ints.h` inherited
   `#define true 1` / `#define false 0` from the MSVC 4.2 line ("pre-bool
   compiler"); VC6 SP5 has `bool`, and the difference is byte-visible - an

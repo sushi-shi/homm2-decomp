@@ -14,6 +14,7 @@ from pathlib import Path
 import clang.cindex as ci
 
 from homm2.clang_options import ClangMode
+from homm2.build.fixed_asm import claims as fixed_asm_claims
 
 
 IMAGE_BASE = 0x400000
@@ -324,6 +325,14 @@ def source_definitions(source_root: Path, repo: Path, object_root: Path | None =
                           for field in AnnotatedDataDefinition.__dataclass_fields__}
                          for row in values],
             }
+    for unit, source, claim in fixed_asm_claims("data"):
+        if (repo / source).is_file():
+            name = claim.name.removeprefix("_")
+            rows.append(AnnotatedDataDefinition(
+                unit=unit, name=name, qualified_name=name,
+                rva=claim.rva, size=claim.size, location=source,
+                is_static=True, symbol=claim.name,
+            ))
     if cache_path is not None:
         _write_inventory_cache(cache_path, retained)
     identities = {(row.unit, row.rva) for row in rows}

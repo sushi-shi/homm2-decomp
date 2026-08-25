@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from homm2.build.fixed_asm import FixedAsmClaim, FixedAsmUnit
 from homm2.match import source_hashes
 
 
@@ -104,20 +105,22 @@ static inline i32 Inner(i32 value)
         after = source_hashes.source_hashes()
         self.assertNotEqual(before[first], after[first])
 
-    def test_authoritative_comparison_source_invalidates_the_unit(self):
-        config = self.root / "config"
-        config.mkdir()
-        assembly = self.root / "src/SOURCE/UNIT.asm"
+    def test_fixed_assembly_source_invalidates_every_unit_function(self):
+        assembly = self.root / "src/SOURCE/ASM.asm"
         assembly.write_text("First PROC\n ret\nFirst ENDP\n")
-        (config / "units.toml").write_text('''[[unit]]
-unit = "SOURCE/UNIT"
-source = "src/SOURCE/UNIT.cpp"
-comparison_source = "src/SOURCE/UNIT.asm"
-''')
-        self.source_path.write_text(self.source())
-        before = source_hashes.source_hashes()
-        assembly.write_text("First PROC\n nop\n ret\nFirst ENDP\n")
-        after = source_hashes.source_hashes()
+        fixed = {
+            "SOURCE/UNIT": FixedAsmUnit(
+                "src/SOURCE/ASM.asm",
+                (
+                    FixedAsmClaim(0x1000, 0x20, "?First@@YAHXZ", "func"),
+                    FixedAsmClaim(0x1100, 0x10, "?Second@@YAHXZ", "func"),
+                ),
+            ),
+        }
+        with mock.patch.object(source_hashes, "FIXED_ASM_UNITS", fixed):
+            before = source_hashes.source_hashes()
+            assembly.write_text("First PROC\n nop\n ret\nFirst ENDP\n")
+            after = source_hashes.source_hashes()
         self.assertNotEqual(
             before[("SOURCE/UNIT", "?First@@YAHXZ")],
             after[("SOURCE/UNIT", "?First@@YAHXZ")])

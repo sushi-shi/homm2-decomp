@@ -1,6 +1,5 @@
-; Retail links this unit through the OMF-to-COFF converter. BITS.cpp remains
-; the portable semantic mirror; this source is both the final OMF link input
-; and, assembled as COFF, the authoritative objdiff input.
+; Retail links this unit through the OMF-to-COFF converter. This is the sole
+; reconstructed implementation: COFF for objdiff, OMF for the final link.
 
 .386
 .model flat, C

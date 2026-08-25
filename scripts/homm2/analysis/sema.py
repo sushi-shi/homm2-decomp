@@ -304,11 +304,14 @@ def cmd_frames(args) -> None:
 
     from homm2.analysis.od_frame_names import format_frames, frame_names
     from homm2.build.cc_wrap import run_compile
+    from homm2.build.fixed_asm import UNITS as FIXED_ASM_UNITS
 
     units = tomllib.loads((REPO / "config/units.toml").read_text())
     entry = next((u for u in units.get("unit", []) if u.get("unit") == args.unit), None)
     if entry is None:
         die(f"unknown unit {args.unit!r} - see config/units.toml")
+    if args.unit in FIXED_ASM_UNITS:
+        die(f"{args.unit} is an assembly unit and has no C++ /Z7 frame records")
 
     obj = REPO / "build/frames" / (args.unit.replace("/", "_") + ".obj")
     flags = [*units["flags"][entry.get("flags", "base")], "/Z7"]

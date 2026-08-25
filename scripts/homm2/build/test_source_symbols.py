@@ -183,45 +183,6 @@ class DataMarkerTests(unittest.TestCase):
         self.assertEqual(rows, [])
         self.assertEqual(parser.call_count, 0)
 
-    def test_donation_disagreeing_with_a_claim_is_an_error(self):
-        # One symbol at two addresses would let the delinker pick either.
-        with TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "a.cpp").write_text("")
-            with mock.patch.object(mod, "symbols_for_file", return_value=[
-                        sym(0x100, "?value@@3HA", kind="data")]), \
-                    mock.patch.object(mod, "source_vtables", return_value=[]), \
-                    mock.patch.object(mod, "_donated_owner_names",
-                                      return_value=[(0x200, "?value@@3HA")]):
-                with self.assertRaises(ValueError) as raised:
-                    collect(root, root)
-        self.assertIn("0x100", str(raised.exception))
-        self.assertIn("0x200", str(raised.exception))
-
-    def test_donation_agreeing_with_a_claim_keeps_the_claim(self):
-        with TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "a.cpp").write_text("")
-            with mock.patch.object(mod, "symbols_for_file", return_value=[
-                        sym(0x100, "?value@@3HA", unit="BASE/X", kind="data")]), \
-                    mock.patch.object(mod, "source_vtables", return_value=[]), \
-                    mock.patch.object(mod, "_donated_owner_names",
-                                      return_value=[(0x100, "?value@@3HA")]):
-                rows = collect(root, root)
-        self.assertEqual([(r.unit, r.provenance) for r in rows],
-                         [("BASE/X", "source-annotation")])
-
-    def test_bootstrap_inventory_ignores_stale_donation_evidence(self):
-        with TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "a.cpp").write_text("")
-            with mock.patch.object(mod, "symbols_for_file", return_value=[]), \
-                    mock.patch.object(mod, "source_vtables", return_value=[]), \
-                    mock.patch.object(mod, "_donated_owner_names") as donated:
-                rows = collect(root, root, include_donations=False)
-        donated.assert_not_called()
-        self.assertEqual(rows, [])
-
 
 class NothingMarkedTests(unittest.TestCase):
     def test_a_stripped_tree_yields_nothing_rather_than_guessing(self):

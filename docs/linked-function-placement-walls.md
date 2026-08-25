@@ -37,13 +37,14 @@ the semantic pairing leaves neither.
 ## `TILE` and `BITS`
 
 The retail Rich census identifies both units as OMF inputs converted by VC6.
-Their C++ analysis mirrors emitted the right bytes but the wrong COFF topology:
+Earlier C++ analysis mirrors emitted the right bytes but the wrong COFF topology:
 `TileToBitmap` was a 16-byte-aligned COMDAT and the three BITS functions were
 separate one-byte-aligned COMDATs. Reconstructing the functions as ordinary OMF
 assembly contributions makes VC6 perform the evidenced conversion. `TileToBitmap`
 and all three BITS functions then land at their exact retail RVAs with exact linked
-bytes and relocations. No alignment, producer-id, padding, or post-link adapter is
-retained.
+bytes and relocations. Those misleading matching-tree mirrors have been removed;
+portable translations exist only as clean-source generator overrides. No alignment,
+producer-id, padding, or post-link adapter is retained.
 
 ## Audiere ownership and folding
 

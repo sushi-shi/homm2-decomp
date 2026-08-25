@@ -10,7 +10,7 @@ headers and asks it to *emulate* VC6 (cl 12.00 == _MSC_VER 1200). clang reads
 those headers as plain files - no wine, parse-only, never a real compile.
 
 Output: build/clangd/compile_commands.json   (git-ignored). The committed .clangd
-points clangd here via CompileFlags.CompilationDatabase. Each [[unit]] in
+points clangd here via CompileFlags.CompilationDatabase. Each C++ [[unit]] in
 config/units.toml gets one entry; the entry supplies `/I include` (so `<va.h>` /
 `<EDITOR/fullMap.h>` resolve) and `/imsvc` for the MSVC system headers.
 
@@ -21,6 +21,7 @@ import json, os, shutil, sys, tomllib
 from pathlib import Path
 
 from homm2.clang_options import ClangMode
+from homm2.build.fixed_asm import UNITS as FIXED_ASM_UNITS
 
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
             Path(__file__).resolve().parents[3])
@@ -103,8 +104,10 @@ def main():
     shared = base_flags(msvc_inc, msvc_low)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    cpp_units = [unit for unit in units if unit["unit"] not in FIXED_ASM_UNITS]
     entries = [{"directory": str(REPO), "file": u["source"],
-                "arguments": ["clang-cl", "/c", u["source"], *shared]} for u in units]
+                "arguments": ["clang-cl", "/c", u["source"], *shared]}
+               for u in cpp_units]
     OUT_FILE.write_text(json.dumps(entries, indent=2) + "\n")
     print(f"[clangd] wrote {OUT_FILE.relative_to(REPO)} ({len(entries)} units)")
     print(f"[clangd] MSVC headers: {msvc_inc}  (+ lowercase mirror {MIRROR_DIR}/msvc)")

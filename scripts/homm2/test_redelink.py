@@ -5,10 +5,8 @@ from homm2.redelink import main
 
 
 PIPELINE = [
-    ("python3", "-m", "homm2.build.source_symbols", "--ignore-donations"),
     ("python3", "configure.py"),
     ("ninja", "base"),
-    ("python3", "-m", "homm2.audit.reloc_donation"),
     ("python3", "-m", "homm2.build.source_symbols"),
     ("python3", "-m", "homm2.build.name_strings"),
     ("python3", "-m", "homm2.build.synth_pdb"),

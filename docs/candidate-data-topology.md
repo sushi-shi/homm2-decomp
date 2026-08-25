@@ -154,10 +154,11 @@ relocation targets are hard errors. Padding is section topology, never a symbol.
 
 The command roles are:
 
-- `homm2 redelink` refreshes function manifests and the synthetic PDB, builds current
-  candidate objects, performs strict data assembly, invokes Vostok, atomically replaces
-  `build/delink`, and reconfigures the comparison graph. This is the normal explicit
-  command after introducing a new modeled symbol.
+- `homm2 redelink` builds current candidate objects, resolves source and explicit-provider
+  claims into one symbol inventory, refreshes function manifests and the synthetic PDB,
+  performs strict data assembly, invokes Vostok, atomically replaces `build/delink`, and
+  reconfigures the comparison graph. This is the normal explicit command after introducing
+  a new modeled symbol.
 - `audit` refreshes candidate objects, generated source manifests, diagnostics, and
   coverage without replacing the delinked target. `--strict` requires closure.
 - `census` compares candidate and target COFF symbol/section topology as multisets and

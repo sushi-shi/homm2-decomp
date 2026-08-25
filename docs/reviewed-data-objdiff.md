@@ -333,14 +333,17 @@ when its payload, extent, storage, placement evidence, and relocation topology s
 missing or ambiguous bindings warn normally and fail strict assembly.
 
 `homm2 redelink` is the explicit full refresh after introducing a modeled symbol. It
-first emits a donation-free source-symbol bootstrap, configures and builds the
-candidate-only `ninja base` target, and regenerates unanimous relocation-target-name
-donations from those current objects. It then refreshes the final function/PDB inputs,
-runs Vostok once, and reconfigures the comparison graph against the new fixed target.
-This ordering prevents a missing or stale generated donation file from changing clean
-build results. `homm2 init` invokes the same pipeline and additionally prepares editor
-tooling. Ordinary `homm2 build` does not repeat manifest assembly or delinking; its
-lightweight model census only warns about drift.
+configures and builds the candidate-only `ninja base` target first, then resolves one
+symbol inventory from source claims and explicit providers. Retail IAT identities come
+from the PE import descriptors joined to exact current/toolchain caller spellings; the
+reviewed `std::ctype<wchar_t>` guard in `config/compiler_generated_data.tsv` is re-proven
+against current candidate COMMON definitions; and the four MASM functions plus TILE's
+scratch allocation come from one fixed exception table. Missing or conflicting provider
+evidence fails before PDB synthesis. Vostok then runs once and the comparison graph is
+reconfigured against the new fixed target. There is no donation bootstrap or generated
+target-name ledger. `homm2 init` invokes the same pipeline and additionally prepares
+editor tooling. Ordinary `homm2 build` does not repeat manifest assembly or delinking;
+its lightweight model census only warns about drift.
 
 Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
 `build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced
@@ -357,6 +360,7 @@ allocation scoring belongs in the generic objdiff consumer; this adapter does no
 rewrite objdiff's native section measures. The final-link initialized-storage audit
 remains authoritative for PE pointer-target content and final storage.
 
-IAT slots are not project data allocations. Vostok reads their exact decorated names from the
-synthetic PDB's retained inventory-backed `.idata` symbols and reconstructs `__imp__...` COFF
-relocations directly; no separate IAT naming manifest is required.
+IAT slots are not project data allocations. Their provider reads exact slot RVAs from the retail
+PE and proves the decorated caller spelling against current candidate objects or the pinned SDK
+import libraries. Vostok reads those resolved identities from the synthetic PDB and reconstructs
+`__imp__...` COFF relocations directly; no separate IAT naming manifest is required.

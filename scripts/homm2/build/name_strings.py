@@ -12,12 +12,33 @@
 # Rewrites build/gen/symbol_names.csv in place. Run by `homm2 redelink`.
 import hashlib
 import struct
+from pathlib import Path
 
+from homm2.build.canonicalize_relocs import CoffFile
+from homm2.build.data_manifest_adapter import candidate_topology, _string_payload
 from homm2.core.paths import REPO
 
 EXE = REPO / "build/orig/HMM2PL.exe"
 CSV = REPO / "build/gen/symbol_names.csv"
 IMAGE_BASE = 0x400000
+BASE_OBJS = REPO / "build/objdiff/base"
+
+
+def candidate_string_payloads(base_root=BASE_OBJS):
+    """Literal payloads current candidate objects prove were compiler strings."""
+    root = Path(base_root)
+    payloads = set()
+    for path in sorted(root.rglob("*.obj")):
+        unit = path.relative_to(root).with_suffix("").as_posix()
+        definitions, _sections = candidate_topology(path, unit)
+        coff = CoffFile(path)
+        for candidate in definitions:
+            if not candidate.symbol.startswith(("??_C@", "$SG")):
+                continue
+            payload = _string_payload(coff, candidate)
+            if payload is not None:
+                payloads.add(payload)
+    return payloads
 
 
 def sections(d):
@@ -69,13 +90,10 @@ def main():
     d = EXE.read_bytes()
     secs = sections(d)
     end = image_end(d)
-    # donation-verified string cells: content matched a compiled literal in a
-    # byte-proven function, overriding the pointer-shape guard (e.g. "ATA").
-    verified = set()
-    cells = REPO / "build/gen/string_cells.tsv"
-    if cells.is_file():
-        for line in cells.read_text().splitlines()[1:]:
-            verified.add(int(line, 16))
+    # A short string can numerically resemble an image pointer (for example
+    # "ATA"). Current candidate COFF literal payloads provide the type proof;
+    # no generated donation state participates.
+    candidate_strings = candidate_string_payloads()
     rows = [ln.rstrip("\n") for ln in open(CSV)]
     hdr, body = rows[0], rows[1:]
 
@@ -91,10 +109,11 @@ def main():
             continue
         const_rows.append((int(f[0], 16), i))
     for rva, i in sorted(const_rows):
-        if rva not in verified and looks_like_pointer(d, secs, rva, end):
+        s = read_str(d, secs, rva)
+        if (looks_like_pointer(d, secs, rva, end)
+                and (s is None or s + b"\0" not in candidate_strings)):
             pointers += 1
             continue
-        s = read_str(d, secs, rva)
         if s is None:
             continue
         digest = hashlib.sha256(s + b"\0").hexdigest()

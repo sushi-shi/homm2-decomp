@@ -39,10 +39,10 @@ side and missing on retail's — a permanent diff no source shape could close.
 
 The sweep is site-anchored instead. It identifies a relocated field from how the
 image encodes it and never consults a symbol, so it has nothing to bootstrap
-from. Donation stays as a cross-check (a non-empty `--write` merge now means the
-sweep *lost* a site) and as the only channel that recovers target *identity* —
-owner names, content-verified string cells, interior addends — until source
-`DATA()`/`VTBL()` markers make even that unnecessary.
+from. Donation stays only as a cross-check (a non-empty `--write` merge now means
+the sweep *lost* a site) and optional review of interior owner/addend aliases.
+It writes no generated identity input. Source claims and explicit fail-closed
+providers feed the symbol inventory directly.
 
 ## The rules, and what they are worth
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import sys
 
+from homm2.build.fixed_asm import UNITS as FIXED_ASM_UNITS
 from homm2.core.paths import REPO
 
 # WINMM and ADVAPI have no pending roots at their first scan, so this
@@ -19,7 +20,8 @@ LINK_LIBRARIES = [
 ]
 
 
-def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
+def emit_link_graph(w, units: list[dict], objs: list[str],
+                    base_symbol_sidecars: list[str],
                     first_function_rva: dict[str, int],
                     first_compgen_rva: dict[str, int]) -> None:
     retail_import_outputs = []
@@ -162,10 +164,14 @@ def emit_link_graph(w, objs: list[str], base_symbol_sidecars: list[str],
     source_objects = link_objects[:source_end]
     base_objects = link_objects[source_end:]
     omf_link_objects = {}
-    for unit in ("BASE/BITS", "BASE/TILE"):
-        source = f"src/{unit}.asm"
+    configured = {entry["unit"]: entry["source"] for entry in units}
+    for unit, assembly in FIXED_ASM_UNITS.items():
+        if configured.get(unit) != assembly.source:
+            raise ValueError(
+                f"{unit} must use fixed MASM source {assembly.source}"
+            )
         output = f"build/link/omf/{unit}.obj"
-        w.build(output, "ml_omf", inputs=source,
+        w.build(output, "ml_omf", inputs=assembly.source,
                 implicit="scripts/homm2/build/ml_wrap.py")
         omf_link_objects[f"build/objdiff/base/{unit}.obj"] = output
     base_objects = [omf_link_objects.get(obj, obj) for obj in base_objects]
