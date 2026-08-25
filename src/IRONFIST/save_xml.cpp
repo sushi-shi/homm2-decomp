@@ -6,6 +6,7 @@
 
 #include <BASE/Misc.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
 #include <SOURCE/netwin.h>
 #include <string.h>
@@ -545,11 +546,13 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     std::string script = GetScriptContents(gMapName);
     if (script.length())
         PushBack(tempDoc, pRoot, "script", script.c_str());
-    return tempDoc->SaveFile(fileName);
+    const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
+    return tempDoc->SaveFile(path.c_str());
 }
 
 tinyxml2::XMLError IronfistXML::Read(const char* fileName) {
-    tinyxml2::XMLError eResult = tempDoc->LoadFile(fileName);
+    const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Read);
+    tinyxml2::XMLError eResult = tempDoc->LoadFile(path.c_str());
     if (!eResult) {
         tinyxml2::XMLNode* pRoot = tempDoc->FirstChild();
         ReadRoot(pRoot);
