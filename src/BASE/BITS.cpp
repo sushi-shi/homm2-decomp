@@ -1,35 +1,35 @@
 #include <Ints.h>
-
-#include <BASE/BITS.h>
 #include <BASE/BITSConstants.h>
+#include <BASE/BITS.h>
 
-namespace {
+typedef enum BitIndexConstant {
+    INDEX_BYTE_SHIFT       = 3,
+    INDEX_WITHIN_BYTE_MASK = 7
+} BitIndexConstant;
 
-constexpr u32 kByteShift = 3;
-constexpr u32 kBitWithinByteMask = 7;
-
+extern "C" i32 __cdecl H2BitTest(const void* bits, BitIndex bitIndex) {
+    const BitByte* bytes = static_cast<const BitByte*>(bits);
+    const BitWord* word = reinterpret_cast<const BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    return (*word & mask) != 0 ? 1 : 0;
 }
 
-extern "C" i32 H2BitTest(const void* bits, BitIndex bitIndex) {
-    const u8* bytes = static_cast<const u8*>(bits);
-    const u32 index = static_cast<u32>(bitIndex);
-    const u8 mask =
-        static_cast<u8>(1u << (index & kBitWithinByteMask));
-    return (bytes[index >> kByteShift] & mask) != 0 ? 1 : 0;
+extern "C" void __cdecl H2BitSet(void* bits, BitIndex bitIndex) {
+    BitByte* bytes = static_cast<BitByte*>(bits);
+    BitWord* word = reinterpret_cast<BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    *word |= mask;
 }
 
-extern "C" void H2BitSet(void* bits, BitIndex bitIndex) {
-    u8* bytes = static_cast<u8*>(bits);
-    const u32 index = static_cast<u32>(bitIndex);
-    const u8 mask =
-        static_cast<u8>(1u << (index & kBitWithinByteMask));
-    bytes[index >> kByteShift] |= mask;
-}
-
-extern "C" void H2BitClear(void* bits, BitIndex bitIndex) {
-    u8* bytes = static_cast<u8*>(bits);
-    const u32 index = static_cast<u32>(bitIndex);
-    const u8 mask =
-        static_cast<u8>(1u << (index & kBitWithinByteMask));
-    bytes[index >> kByteShift] &= static_cast<u8>(~mask);
+extern "C" void __cdecl H2BitClear(void* bits, BitIndex bitIndex) {
+    BitByte* bytes = static_cast<BitByte*>(bits);
+    BitWord* word = reinterpret_cast<BitWord*>(
+        bytes + (bitIndex >> INDEX_BYTE_SHIFT)
+    );
+    const BitWord mask = 1u << (bitIndex & INDEX_WITHIN_BYTE_MASK);
+    *word &= ~mask;
 }
