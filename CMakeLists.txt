@@ -251,6 +251,7 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_localization_encoding_test
     tools/localization_encoding_test.cpp
     src/BASE/Utf8.cpp
+    src/SOURCE/LegacyText.cpp
     src/SOURCE/PluralRules.cpp)
   target_include_directories(homm2_localization_encoding_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
@@ -260,10 +261,20 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_options(homm2_localization_encoding_test PRIVATE
     -Wl,--gc-sections)
   add_test(NAME localization_encoding COMMAND homm2_localization_encoding_test)
+  add_executable(homm2_resource_profile_test
+    tools/resource_profile_test.cpp
+    src/SOURCE/ResourceProfile.cpp)
+  target_include_directories(homm2_resource_profile_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME resource_profile COMMAND homm2_resource_profile_test)
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME tick_deadline COMMAND homm2_tick_deadline_test)
+  add_executable(homm2_legacy_presentation_test tools/legacy_presentation_test.cpp)
+  target_include_directories(homm2_legacy_presentation_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME legacy_presentation COMMAND homm2_legacy_presentation_test)
   add_executable(homm2_filesystem_test tools/filesystem_test.cpp)
   target_include_directories(homm2_filesystem_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

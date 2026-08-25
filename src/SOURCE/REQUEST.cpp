@@ -88,6 +88,26 @@ i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     return 1;
 }
 
+localization::TextEncoding GetMapHeaderTextEncoding(const SMapHeader* header) {
+    if (header == NULL) {
+        return localization::DefaultFileTextEncoding();
+    }
+    const char* fields[] = {header->name, header->description};
+    return localization::DetectTextEncoding(
+        fields,
+        sizeof(fields) / sizeof(fields[0]),
+        localization::DefaultFileTextEncoding()
+    );
+}
+
+namespace {
+
+std::string DecodeMapHeaderText(const SMapHeader& header, const char* text) {
+    return localization::DecodeExternalText(text, GetMapHeaderTextEncoding(&header));
+}
+
+}
+
 i32 CheckSumIsDemoOK(const char*) {
     return 1;
 }
@@ -997,8 +1017,8 @@ void fileRequester::Update(i32 drawWindow) {
 
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.data.text = gText;
-        const std::string selectedMapName = localization::DecodeExternalText(
-            m_mapHeaders[m_selectedIndex].name
+        const std::string selectedMapName = DecodeMapHeaderText(
+            m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].name
         );
         sprintf(gText, "%s", selectedMapName.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_NAME;
@@ -1008,8 +1028,8 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(message);
 
-        const std::string selectedMapDescription = localization::DecodeExternalText(
-            m_mapHeaders[m_selectedIndex].description
+        const std::string selectedMapDescription = DecodeMapHeaderText(
+            m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].description
         );
         sprintf(gText, "%s", selectedMapDescription.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_DESCRIPTION;
@@ -1079,8 +1099,8 @@ void fileRequester::Update(i32 drawWindow) {
 
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                const std::string mapName = localization::DecodeExternalText(
-                    m_mapHeaders[m_topIndex + i].name
+                const std::string mapName = DecodeMapHeaderText(
+                    m_mapHeaders[m_topIndex + i], m_mapHeaders[m_topIndex + i].name
                 );
                 sprintf(gText, "%s", mapName.c_str());
             } else {
@@ -1108,8 +1128,8 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-            const std::string mapName = localization::DecodeExternalText(
-                m_mapHeaders[m_selectedIndex].name
+            const std::string mapName = DecodeMapHeaderText(
+                m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].name
             );
             sprintf(gText, "%s", mapName.c_str());
         } else {

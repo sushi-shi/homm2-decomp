@@ -5,6 +5,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <PLATFORM/Platform.h>
+#include <PLATFORM/LegacyPresentation.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
@@ -70,14 +71,16 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
 
     // The Win32 paint path scrolls the map by selecting a shifted source
     // rectangle while keeping the adventure viewport at the same destination.
-    const i32 presentSourceX =
-        giScrollX != 0 ? giScrollX + VESA_SCROLL_MARGIN : destinationX;
-    const i32 presentSourceY =
-        giScrollY != 0 ? giScrollY + VESA_SCROLL_MARGIN : destinationY;
-    const i32 presentWidth = giScrollX != 0 ? VESA_SCROLL_EXTENT : width;
-    const i32 presentHeight = giScrollY != 0 ? VESA_SCROLL_EXTENT : height;
+    const platform::Rect presentSource = platform::AdventureScrollSource(
+        destinationX,
+        destinationY,
+        width,
+        height,
+        giScrollX,
+        giScrollY
+    );
     platform::Video().Blit(
-        {presentSourceX, presentSourceY, presentWidth, presentHeight},
+        presentSource,
         {destinationX, destinationY}
     );
     platform::Video().Present();

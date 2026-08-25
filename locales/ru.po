@@ -8,8 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Homm2-Font-Profile: buka-cyrillic\n"
-"X-Homm2-Resource-Encoding: windows-1251\n"
+"X-Homm2-Required-Resource-Profile: buka-cyrillic\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 
 #: src/SOURCE/ADVMGR.cpp
@@ -18877,12 +18876,12 @@ msgstr "Плазменный конус наносит %d ед. урона."
 #, c-format
 msgctxt "event.barrier.dissolves"
 msgid "As you speak the magic word \"%s\", the glowing barrier dissolves into nothingness."
-msgstr "Когда вы произносите волшебное слово «%s», сияющий барьер растворяется без следа."
+msgstr "Когда вы произносите волшебное слово \"%s\", сияющий барьер растворяется без следа."
 
 #, c-format
 msgctxt "event.barrier.inspect"
 msgid "A magical %s barrier stands tall before you, blocking your way.  Runes on the arch read, \"Speak the key and you may pass.\""
-msgstr "Перед вами возвышается волшебный %s барьер, преграждая путь. Руны на арке гласят: «Назови ключ — и сможешь пройти»."
+msgstr "Перед вами возвышается волшебный %s барьер, преграждая путь. Руны на арке гласят: \"Назови ключ — и сможешь пройти\"."
 
 msgctxt "event.barrier.no_password"
 msgid "You try guessing in vain, but nothing happens."
@@ -18891,7 +18890,7 @@ msgstr "Вы пытаетесь угадать слово, но ничего н�
 #, c-format
 msgctxt "event.barrier.tent_hint"
 msgid "You enter the tent and find an old woman staring into a glowing gem. \"I have learned much in the way of scrying. Let me share a secret.\" With that, she leans into your ear and whispers the keyword for the %s border guard."
-msgstr "Вы входите в шатер и видите старуху, глядящую в сияющий камень. «Я многое постигла в искусстве предсказания. Позволь поделиться тайной». Она наклоняется к вашему уху и шепчет ключевое слово для %s пограничного стража."
+msgstr "Вы входите в шатер и видите старуху, глядящую в сияющий камень. \"Я многое постигла в искусстве предсказания. Позволь поделиться тайной\". Она наклоняется к вашему уху и шепчет ключевое слово для %s пограничного стража."
 
 msgctxt "event.shipyard.cannot_build_boat"
 msgid "Cannot build another boat."

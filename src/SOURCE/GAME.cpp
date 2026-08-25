@@ -12,6 +12,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -1292,6 +1293,29 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, cPlayerNames, sizeof(cPlayerNames));
+    {
+        const char* provenanceFields[GAME_PLAYER_COUNT + 2] = {
+            m_mapHeader.name,
+            m_mapHeader.description,
+        };
+        for (ndx = 0; ndx < GAME_PLAYER_COUNT; ++ndx) {
+            provenanceFields[ndx + 2] = cPlayerNames[ndx];
+        }
+        localization::SetCurrentFileTextEncoding(
+            localization::DetectTextEncoding(
+                provenanceFields,
+                sizeof(provenanceFields) / sizeof(provenanceFields[0]),
+                localization::DefaultFileTextEncoding()
+            )
+        );
+        platform::Host().Log(
+            platform::LogLevel::Info,
+            (std::string("localization: save-text=")
+             + localization::TextEncodingName(
+                 localization::CurrentFileTextEncoding()
+             )).c_str()
+        );
+    }
     for (auto& playerName : cPlayerNames) {
         const std::string decodedName = localization::DecodeExternalText(playerName);
         utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
@@ -2611,6 +2635,15 @@ i32 game::LoadMap(char* filename) {
     if (handle == -1)
         FileError(gText);
     platform::FileRead(handle, &m_mapHeader, sizeof(m_mapHeader));
+    localization::SetCurrentFileTextEncoding(
+        GetMapHeaderTextEncoding(&m_mapHeader)
+    );
+    platform::Host().Log(
+        platform::LogLevel::Info,
+        (std::string("localization: map-text=")
+         + localization::TextEncodingName(localization::CurrentFileTextEncoding())
+         + ", file=" + filename).c_str()
+    );
     m_worldMap.Read(handle, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 

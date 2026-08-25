@@ -230,14 +230,17 @@ MessageDispatchResult resourceManager::Main(struct tag_message&) {
 }
 
 i32 resourceManager::Open(i32 priority) {
-    if (localization::HasCatalog() && !platform::Files().LocaleDataRoot().empty()) {
+    if (localization::UsesResourceOverlay()) {
         const i32 localeExpansion =
             LoadAggregateHeader(EXPANSION_AGGREGATE_NAME, true, false);
         const i32 localeBase = LoadAggregateHeader(DEFAULT_AGGREGATE_NAME, true, false);
         if (localeExpansion != LOAD_SUCCESS && localeBase != LOAD_SUCCESS) {
             platform::Host().Log(
                 platform::LogLevel::Warning,
-                "localization: HOMM2_LOCALE_DATA contains no usable AGG archive"
+                "resources: HOMM2_LOCALE_DATA contains no usable AGG archive"
+            );
+            localization::RejectResourceProfile(
+                "the selected locale overlay contains no usable AGG archive"
             );
         }
         m_reserved = m_numAggregates;

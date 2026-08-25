@@ -42,6 +42,9 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 The classic branches are terminal views of their corresponding reconstruction;
 they do not feed Gold or `master`.
 
+The cross-version behavioral ledger lives on the evidence-owning Buka
+reconstruction branch; see [Retail version differences](docs/version-differences.md).
+
 ## Reconstruction evidence
 
 The Gold decompilation branch matches all 1,727 reconstructed retail functions
@@ -106,6 +109,19 @@ resolved case-insensitively).
 export HOMM2_DATA=/path/to/heroes2
 ```
 
+The game detects the `western` or `buka-cyrillic` resource profile from
+`FONT.ICN`, independently of `HOMM2_LANGUAGE`. To use Russian UI with English
+primary data and a Buka resource overlay:
+
+```sh
+HOMM2_DATA=/path/to/heroes2-english \
+HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
+HOMM2_LANGUAGE=ru nix run
+```
+
+`HOMM2_RESOURCE_PROFILE=western|buka-cyrillic` overrides automatic detection
+for diagnostics. See [Localization architecture](docs/localization.md).
+
 Without `HOMM2_DATA`, the engine searches these locations in order:
 
 1. The executable directory.
@@ -125,6 +141,19 @@ After setting `HOMM2_DATA`, run:
 ```sh
 nix run
 ```
+
+The saved PoL configuration uses a 480x360 window and Gallop movement. This
+reproduces those two choices while retaining the native renderer:
+
+```sh
+HOMM2_WINDOW_SIZE=480x360 HOMM2_WALK_SPEED=gallop nix run
+```
+
+`HOMM2_WINDOW_SIZE=<width>x<height>` overrides the initial window size.
+`HOMM2_WALK_SPEED` accepts `walk`, `trot`, `canter`, `gallop`, `jump`, or the
+corresponding value from 0 through 4. Without an override the setting is read
+from `HEROES2.CFG` in the user data directory and can be changed normally in
+System Options.
 
 ### Windows
 

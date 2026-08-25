@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include <SOURCE/GAME.h>
+#include <SOURCE/LegacyText.h>
 
 typedef enum RequestConstant {
     MAP_HEADER_SIZE                 = 0x1a4,
@@ -77,6 +78,7 @@ struct SMapHeader {
 #pragma pack(pop)
 
 i32 GetMapHeader(const char*, struct SMapHeader*);
+localization::TextEncoding GetMapHeaderTextEncoding(const struct SMapHeader*);
 i32 CheckSumIsDemoOK(const char*);
 i32 ShowThisMapGame(const char*);
 i32 ShowThisMap(const char*);

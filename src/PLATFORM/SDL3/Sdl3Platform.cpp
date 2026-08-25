@@ -91,7 +91,6 @@ public:
             std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
             return false;
         }
-
         SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST);
 
         m_indexed.assign(static_cast<std::size_t>(mode.width) * mode.height, 0);

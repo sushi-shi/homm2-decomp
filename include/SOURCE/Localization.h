@@ -1,6 +1,9 @@
 #ifndef HOMM2_SOURCE_LOCALIZATION_H
 #define HOMM2_SOURCE_LOCALIZATION_H
 
+#include <SOURCE/LegacyText.h>
+#include <SOURCE/ResourceProfile.h>
+
 #include <cstdint>
 #include <cstddef>
 #include <string>
@@ -18,11 +21,20 @@ void Initialize(const char* commandLine);
 
 const char* Language();
 FontProfile ActiveFontProfile();
+ResourceProfile ActiveResourceProfile();
+TextEncoding ActiveResourceTextEncoding();
+TextEncoding DefaultFileTextEncoding();
+bool UsesResourceOverlay();
 bool HasCatalog();
 
-// Rejects a selected catalog when the installed retail assets cannot render
-// it safely. Subsequent lookups use the built-in English registry.
+// Rejects only the selected UI catalog. The resource profile and its decoder
+// remain unchanged, so English UI can still run on Buka retail data.
 void UseEnglish(const char* reason);
+
+// Called by the font loader when an archive passed structural detection but
+// cannot render the selected profile in practice. This falls back to primary
+// resources and rejects only catalogs that require the unavailable profile.
+void RejectResourceProfile(const char* reason);
 
 // Migration bridge for recovered global char* tables. New code should use
 // Tr() directly.
@@ -43,7 +55,13 @@ const char* TrPlural(const char* id, std::uint32_t count);
 // Original UI resources are byte-encoded. Convert their text fields once at
 // the deserialization boundary; catalog and runtime strings remain UTF-8.
 std::string DecodeResourceText(const char* text);
+std::string DecodeExternalText(const char* text, TextEncoding encoding);
 std::string DecodeExternalText(const char* text);
+
+// The active game/map file's encoding provenance. New games inherit the
+// resource edition; loaded files replace it after inspecting their raw fields.
+TextEncoding CurrentFileTextEncoding();
+void SetCurrentFileTextEncoding(TextEncoding encoding);
 
 }
 

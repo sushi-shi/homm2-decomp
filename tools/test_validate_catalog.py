@@ -10,7 +10,9 @@ import tempfile
 VALIDATOR = pathlib.Path(__file__).with_name("validate_catalog.py")
 HEADER = '''msgid ""
 msgstr ""
+"Language: test\\n"
 "Content-Type: text/plain; charset=UTF-8\\n"
+"X-Homm2-Required-Resource-Profile: western\\n"
 
 '''
 TEMPLATE = '''msgid ""
@@ -80,6 +82,40 @@ msgstr "Translation"
         result = validate(catalog, template)
         assert result.returncode != 0
         assert "no longer defined" in result.stderr
+
+        catalog.write_text(
+            HEADER.replace("western", "unknown")
+            + '''msgctxt "present"
+msgid "Current English"
+msgstr "Translation"
+''',
+            encoding="utf-8",
+        )
+        result = validate(catalog, template)
+        assert result.returncode != 0
+        assert "Required-Resource-Profile" in result.stderr
+
+        catalog.write_text(
+            HEADER
+            + '''msgctxt "present"
+msgid "Current English"
+msgstr "Привет"
+''',
+            encoding="utf-8",
+        )
+        result = validate(catalog, template)
+        assert result.returncode != 0
+        assert "not renderable" in result.stderr
+
+        catalog.write_text(
+            HEADER.replace("western", "buka-cyrillic")
+            + '''msgctxt "present"
+msgid "Current English"
+msgstr "Привет"
+''',
+            encoding="utf-8",
+        )
+        assert validate(catalog, template).returncode == 0
 
 
 if __name__ == "__main__":
