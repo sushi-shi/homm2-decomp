@@ -17,7 +17,8 @@ class AssembleTests(unittest.TestCase):
             def produce(*_args, **_kwargs):
                 output.write_bytes(b"object")
 
-            with mock.patch("homm2.build.ml_wrap.wine.tool",
+            with mock.patch("homm2.build.ml_wrap.wine.prepare_env"), \
+                    mock.patch("homm2.build.ml_wrap.wine.tool",
                             return_value=Path("ML.EXE")), \
                     mock.patch("homm2.build.ml_wrap.wine.winepath_w",
                                side_effect=lambda path: str(path)), \

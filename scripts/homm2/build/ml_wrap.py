@@ -11,6 +11,10 @@ from homm2.core import wine
 
 
 def assemble(src: Path, out: Path, *, coff: bool = False) -> None:
+    # Path conversion must see the repository-owned prefix before it checks the
+    # verified Z: mapping. ``wine.run`` prepares the same environment later,
+    # but its call would otherwise come too late for the /Fo argument.
+    wine.prepare_env()
     assembler = wine.tool("ml.exe")
     src = src.resolve()
     out = out.resolve()

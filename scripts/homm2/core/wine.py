@@ -109,7 +109,8 @@ def prepare_env() -> None:
     if shutil.which("wine") is None:
         raise RuntimeError("wine not found - run inside `nix develop .#build`")
     os.environ.setdefault("WINEDEBUG", "fixme-all,err-kerberos")
-    if not Path(os.environ.get("WINEPREFIX", "")).is_dir():
+    configured_prefix = os.environ.get("WINEPREFIX")
+    if not configured_prefix or not Path(configured_prefix).is_dir():
         os.environ["WINEPREFIX"] = str(REPO / "build/wineprefix")
     ensure_wineserver()
     _ENV_READY = True
@@ -169,16 +170,24 @@ def run(program: Path | str, *args: str, cwd: Path | None = None,
         if faketime is None:
             raise RuntimeError("faketime is required; enter `nix develop .#build`")
         command = [faketime, "-f", faketime_spec, *command]
-    completed = subprocess.run(
-        command, cwd=None if cwd is None else str(cwd), text=True,
-        env=child_env(), stdin=subprocess.DEVNULL,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    # Do not capture through a pipe.  Wine services started alongside the
+    # requested tool can inherit that pipe and keep it open after the tool has
+    # exited, leaving subprocess.run() blocked in communicate().  A regular
+    # temporary file has no EOF ownership problem and still gives callers the
+    # complete combined log.
+    with tempfile.TemporaryFile() as logf:
+        completed = subprocess.run(
+            command, cwd=None if cwd is None else str(cwd),
+            env=child_env(), stdin=subprocess.DEVNULL,
+            stdout=logf, stderr=subprocess.STDOUT)
+        logf.seek(0)
+        output = logf.read().decode("latin1", "replace")
     if log is not None:
-        log.write_text(completed.stdout)
-    elif completed.stdout and not quiet:
-        print(completed.stdout, end="")
+        log.write_text(output)
+    elif output and not quiet:
+        print(output, end="")
     if completed.returncode:
-        tail = "\n".join(completed.stdout.strip().splitlines()[-15:])
+        tail = "\n".join(output.strip().splitlines()[-15:])
         raise RuntimeError(
             f"command failed ({completed.returncode}): {' '.join(command)}\n{tail}")
-    return completed.stdout
+    return output
