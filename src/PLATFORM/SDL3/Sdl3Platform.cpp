@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -462,8 +463,18 @@ public:
     void WarpMouse(Point position) override {
         m_mouse = position;
         if (m_video.window() != nullptr) {
-            SDL_WarpMouseInWindow(m_video.window(), static_cast<float>(position.x),
-                                  static_cast<float>(position.y));
+            float windowX = static_cast<float>(position.x);
+            float windowY = static_cast<float>(position.y);
+            if (m_video.renderer() != nullptr) {
+                SDL_RenderCoordinatesToWindow(
+                    m_video.renderer(),
+                    windowX,
+                    windowY,
+                    &windowX,
+                    &windowY
+                );
+            }
+            SDL_WarpMouseInWindow(m_video.window(), windowX, windowY);
         }
     }
 
@@ -524,7 +535,7 @@ public:
         do {
             Yield();
             SDL_Delay(1);
-        } while (Ticks() < deadline);
+        } while (TickDeadlinePending(deadline, Ticks()));
 #endif
     }
 
@@ -710,10 +721,13 @@ private:
             SDL_RenderCoordinatesFromWindow(m_video.renderer(), x, y, &logicalX, &logicalY);
         }
 
-        const Size size = m_video.Resolution();
         const int column = static_cast<int>(std::floor(logicalX));
         const int row = static_cast<int>(std::floor(logicalY));
-        return {std::clamp(column, 0, size.width - 1), std::clamp(row, 0, size.height - 1)};
+        // Captured mouse motion and letterbox coordinates are deliberately
+        // allowed outside the framebuffer. Win32 delivered those signed
+        // client coordinates too; clamping them makes the black bars behave
+        // like the nearest edge control and breaks drags leaving the window.
+        return {column, row};
     }
 
     Sdl3Video& m_video;
@@ -1326,7 +1340,7 @@ private:
 
     static std::filesystem::path Directory(const std::string& root, const std::string& directory) {
         return directory.empty() ? std::filesystem::path(root)
-                                 : std::filesystem::path(root) / directory;
+                                 : std::filesystem::path(ResolveIn(root, directory.c_str()));
     }
 
     static void Collect(

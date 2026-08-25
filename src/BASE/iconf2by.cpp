@@ -103,9 +103,9 @@ void FlipIconToBitmapYModify(
                     goto fill_run;
                 }
                 if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                    s_dimPal =
-                        reinterpret_cast<u8*>(uDimPal)
-                        + (s_run & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                    s_dimPal = GetDimPaletteTable(
+                        static_cast<u32>(s_run & ICON_RLE_DIM_LEVEL_MASK) >> 2
+                    );
                     if (shear[s_y] != ICON_SHEAR_SKIP_ROW && s_y >= clipY && s_y <= s_clipB
                         && s_x - s_dimLen + 1 >= clipX && s_x <= s_clipR) {
                         if (s_x <= s_clipR) {

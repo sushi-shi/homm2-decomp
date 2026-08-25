@@ -45,7 +45,13 @@ std::vector<std::string> SplitPath(const std::string& path) {
     for (const char character : path) {
         if (character == '\\' || character == '/') {
             if (!current.empty()) {
-                components.push_back(current);
+                if (current == "..") {
+                    if (!components.empty()) {
+                        components.pop_back();
+                    }
+                } else if (current != ".") {
+                    components.push_back(current);
+                }
                 current.clear();
             }
         } else {
@@ -53,7 +59,13 @@ std::vector<std::string> SplitPath(const std::string& path) {
         }
     }
     if (!current.empty()) {
-        components.push_back(current);
+        if (current == "..") {
+            if (!components.empty()) {
+                components.pop_back();
+            }
+        } else if (current != ".") {
+            components.push_back(current);
+        }
     }
     return components;
 }
@@ -70,17 +82,21 @@ std::string Retail(const char* retailPath) {
         path.erase(0, 2);
     }
     std::replace(path.begin(), path.end(), '\\', '/');
-    while (path.starts_with("./")) {
-        path.erase(0, 2);
-    }
     if (path.empty() || path.front() == '/') {
         return std::string();
     }
 
-    for (char& character : path) {
-        character = static_cast<char>(std::toupper(static_cast<unsigned char>(character)));
+    std::string normalized;
+    for (std::string component : SplitPath(path)) {
+        for (char& character : component) {
+            character = static_cast<char>(std::toupper(static_cast<unsigned char>(character)));
+        }
+        if (!normalized.empty()) {
+            normalized.push_back('/');
+        }
+        normalized += component;
     }
-    return path;
+    return normalized;
 }
 
 bool Under(const std::string& path, const std::string& directory) {
@@ -186,9 +202,6 @@ std::string ResolveIn(const std::string& root, const char* retailPath) {
     // the top of the game directory rather than the top of the host.
     std::string resolved = root;
     for (const std::string& component : SplitPath(relative)) {
-        if (component == ".") {
-            continue;
-        }
         const std::string separator = (resolved.empty() || resolved.back() == '/') ? "" : "/";
         const std::string candidate = resolved + separator + component;
         if (Present(candidate)) {

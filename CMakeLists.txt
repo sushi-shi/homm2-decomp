@@ -250,6 +250,15 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME tick_deadline COMMAND homm2_tick_deadline_test)
+  add_executable(homm2_filesystem_test tools/filesystem_test.cpp)
+  target_include_directories(homm2_filesystem_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
+  add_test(NAME filesystem COMMAND homm2_filesystem_test)
+  add_executable(homm2_palette_bank_test tools/palette_bank_test.cpp)
+  target_include_directories(homm2_palette_bank_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME palette_bank COMMAND homm2_palette_bank_test)
   add_test(
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)
