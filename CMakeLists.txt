@@ -246,6 +246,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_options(homm2_localization_encoding_test PRIVATE
     -Wl,--gc-sections)
   add_test(NAME localization_encoding COMMAND homm2_localization_encoding_test)
+  add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
+  target_include_directories(homm2_tick_deadline_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME tick_deadline COMMAND homm2_tick_deadline_test)
   add_test(
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)
