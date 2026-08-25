@@ -1728,11 +1728,12 @@ def generate_classic(
 
 
 # Macros the clean tree keeps on purpose: the allocation wrappers survive in
-# their argument-free form, along with source calling conventions.
+# their argument-free form, along with ABI import attributes and calling conventions.
 INTENTIONALLY_KEPT = {
     "H2_ALLOC",
     "H2_FREE",
     "H2_ASSERT",
+    "__declspec",
     "__cdecl",
     "__fastcall",
     "__stdcall",
