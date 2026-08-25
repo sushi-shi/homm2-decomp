@@ -171,3 +171,11 @@ homm2 sema match  SOURCE/KB         # per-fn match % of a unit (or an 0x RVA)
 homm2 sema rva    0x0004a3c0        # dossier: claim / src loc / ghidra / match %
 homm2 sema symbol combatManager     # fuzzy workspace-symbol search (clangd)
 ```
+
+## License
+
+Project-authored reconstruction source and tooling are dedicated to the public
+domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
+Files carrying separate copyright or license notices retain those terms. No
+binary game assets are stored in this repository; retail inputs and build
+outputs incorporating them are not covered by this dedication.
