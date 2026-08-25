@@ -146,9 +146,9 @@ bool IsUserState(const char* retailPath) {
 
     const std::size_t slash = path.find('/');
     if (slash == std::string::npos) {
-        // Screenshots and the debug log are things the game produces, not
-        // things the installation came with.
-        return path.ends_with(".PCX") || path.ends_with(".LOG");
+        // Preferences, screenshots, and the debug log are things the game
+        // produces, not things the installation came with.
+        return path == "HEROES2.CFG" || path.ends_with(".PCX") || path.ends_with(".LOG");
     }
 
     if (!Under(path, "DATA")) {
