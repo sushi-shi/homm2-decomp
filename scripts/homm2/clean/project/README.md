@@ -65,3 +65,11 @@ ninja game
 
 The executable is written to `build/HEROES2W.EXE`. A non-Nix environment needs
 Ninja, Clang, LLD, LLVM dlltool and a 32-bit MinGW toolchain.
+
+## License
+
+Project-authored reconstruction source and tooling are dedicated to the public
+domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
+Files carrying separate copyright or license notices retain those terms. No
+binary game assets are stored in this repository; retail inputs and build
+outputs incorporating them are not covered by this dedication.

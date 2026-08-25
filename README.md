@@ -169,3 +169,11 @@ homm2 sema def|refs|hover src/… L C # clangd LSP at a point
 
 xref/disasm/strings/match/rva/clangd need no Ghidra; xref library boundaries need
 a one-time `homm2 ghidra` project (imports the EXE, applies our CodeView names).
+
+## License
+
+Project-authored reconstruction source and tooling are dedicated to the public
+domain under [CC0 1.0](LICENSE), to the extent the contributors can do so.
+Files carrying separate copyright or license notices retain those terms. No
+binary game assets are stored in this repository; retail inputs and build
+outputs incorporating them are not covered by this dedication.

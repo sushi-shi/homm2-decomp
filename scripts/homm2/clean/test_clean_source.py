@@ -384,6 +384,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
         (repo / "scripts/homm2/clean/project").mkdir(parents=True)
         (repo / "include/example.h").write_text("#pragma once\n")
         (repo / "src/example.cpp").write_text("int example;\n")
+        (repo / "LICENSE").write_text("CC0 fixture\n")
         (repo / "scripts/homm2/clean/project/flake.lock").write_text("{}\n")
         (repo / "scripts/homm2/clean/project/flake.nix").write_text(
             "{ outputs = _: {}; }\n"
@@ -469,6 +470,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             self.assertEqual((output / "flake.lock").read_text(), "{}\n")
             self.assertIn("outputs", (output / "flake.nix").read_text())
             self.assertIn("/result", (output / ".gitignore").read_text())
+            self.assertEqual((output / "LICENSE").read_text(), "CC0 fixture\n")
             self.assertEqual((output / "README.md").read_text(), "# Generated source\n")
             self.assertTrue((output / "run-game.sh").stat().st_mode & 0o111)
             ninja = (output / "build.ninja").read_text()
@@ -562,6 +564,7 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
         (output / "src/example.cpp").write_text("int generated_value;\n")
         (output / "imports/example.def").write_text("EXPORTS\n")
         (output / "build.ninja").write_text("build objects: phony\n")
+        (output / "LICENSE").write_text("CC0 fixture\n")
         (output / "README.md").write_text("# Generated source\n")
         return repo, output
 
@@ -598,6 +601,7 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
                 git(repo, "show", "clean:README.md"),
                 "# Generated source",
             )
+            self.assertEqual(git(repo, "show", "clean:LICENSE"), "CC0 fixture")
 
     def test_new_generated_branch_can_use_an_explicit_parent(self):
         with tempfile.TemporaryDirectory() as directory:
