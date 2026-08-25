@@ -8,8 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Homm2-Font-Profile: buka-cyrillic\n"
-"X-Homm2-Resource-Encoding: windows-1251\n"
+"X-Homm2-Required-Resource-Profile: buka-cyrillic\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 
 #: src/SOURCE/ADVMGR.cpp

@@ -1,8 +1,9 @@
 #include <SOURCE/Localization.h>
 #include <SOURCE/PluralRules.h>
 
-#include <BASE/Utf8.h>
 #include <PLATFORM/Platform.h>
+#include <PLATFORM/FileSystem.h>
+#include <BASE/Utf8.h>
 
 #include <algorithm>
 #include <cctype>
@@ -50,15 +51,8 @@ struct Catalog {
     std::map<std::string, Message> messages;
     std::string language;
     std::string charset;
-    std::string fontProfile;
-    std::string resourceEncoding;
+    std::string requiredResourceProfile;
     plural::Rules pluralRules;
-};
-
-enum class ResourceEncoding {
-    Western,
-    Cyrillic,
-    Utf8,
 };
 
 struct LegacyBinding {
@@ -68,8 +62,13 @@ struct LegacyBinding {
 
 Catalog gCatalog;
 std::string gLanguage = "en";
-FontProfile gFontProfile = FontProfile::Latin;
-ResourceEncoding gResourceEncoding = ResourceEncoding::Western;
+ResourceProfile gResourceProfile = ResourceProfile::Western;
+ResourceProfile gPrimaryResourceProfile = ResourceProfile::Western;
+ResourceProfile gCatalogResourceProfile = ResourceProfile::Western;
+TextEncoding gCurrentFileTextEncoding = TextEncoding::Windows1252;
+bool gPrimaryProfileDetected = false;
+bool gCatalogRequiresResourceProfile = false;
+bool gUseResourceOverlay = false;
 bool gHasCatalog = false;
 std::set<std::string> gWarnedFormatIds;
 std::set<std::string> gWarnedMissingIds;
@@ -136,6 +135,18 @@ std::string CommandLineLanguage(const char* commandLine) {
     std::istringstream arguments(commandLine != nullptr ? commandLine : "");
     std::string argument;
     constexpr const char* prefix = "--language=";
+    while (arguments >> argument) {
+        if (argument.rfind(prefix, 0) == 0) {
+            return argument.substr(std::char_traits<char>::length(prefix));
+        }
+    }
+    return std::string();
+}
+
+std::string CommandLineResourceProfile(const char* commandLine) {
+    std::istringstream arguments(commandLine != nullptr ? commandLine : "");
+    std::string argument;
+    constexpr const char* prefix = "--resource-profile=";
     while (arguments >> argument) {
         if (argument.rfind(prefix, 0) == 0) {
             return argument.substr(std::char_traits<char>::length(prefix));
@@ -341,10 +352,12 @@ bool ReadMo(const std::filesystem::path& path, Catalog& catalog, std::string& er
             if (marker != std::string::npos) {
                 catalog.charset = Trim(value.substr(marker + sizeof("charset=") - 1));
             }
+        } else if (name == "x-homm2-required-resource-profile") {
+            catalog.requiredResourceProfile = Lower(value);
         } else if (name == "x-homm2-font-profile") {
-            catalog.fontProfile = Lower(value);
-        } else if (name == "x-homm2-resource-encoding") {
-            catalog.resourceEncoding = Lower(value);
+            // Compatibility with catalogs emitted before UI locale and retail
+            // asset selection became independent.
+            catalog.requiredResourceProfile = Lower(value);
         } else if (name == "plural-forms") {
             std::string pluralError;
             if (!plural::Parse(value, catalog.pluralRules, pluralError)) {
@@ -419,41 +432,26 @@ bool LoadCatalog(const std::string& requested) {
                 continue;
             }
 
-            FontProfile fontProfile = FontProfile::Latin;
-            if (loaded.fontProfile == "buka-cyrillic") {
-                fontProfile = FontProfile::BukaCyrillic;
-            } else if (!loaded.fontProfile.empty() && loaded.fontProfile != "latin") {
-                Log(
-                    platform::LogLevel::Warning,
-                    "localization: " + path.string() + " uses unsupported font profile '"
-                        + loaded.fontProfile + "'"
-                );
-                continue;
-            }
-
-            ResourceEncoding resourceEncoding = ResourceEncoding::Western;
-            if (loaded.resourceEncoding == "windows-1251"
-                || loaded.resourceEncoding == "cp1251") {
-                resourceEncoding = ResourceEncoding::Cyrillic;
-            } else if (loaded.resourceEncoding == "utf-8"
-                       || loaded.resourceEncoding == "utf8") {
-                resourceEncoding = ResourceEncoding::Utf8;
-            } else if (!loaded.resourceEncoding.empty()
-                       && loaded.resourceEncoding != "windows-1252"
-                       && loaded.resourceEncoding != "cp1252") {
+            ResourceProfile requiredProfile = ResourceProfile::Western;
+            if (loaded.requiredResourceProfile == "buka-cyrillic"
+                || loaded.requiredResourceProfile == "buka") {
+                requiredProfile = ResourceProfile::BukaCyrillic;
+            } else if (!loaded.requiredResourceProfile.empty()
+                       && loaded.requiredResourceProfile != "western"
+                       && loaded.requiredResourceProfile != "latin") {
                 Log(
                     platform::LogLevel::Warning,
                     "localization: " + path.string()
-                        + " uses unsupported original-resource encoding '"
-                        + loaded.resourceEncoding + "'"
+                        + " requires unsupported resource profile '"
+                        + loaded.requiredResourceProfile + "'"
                 );
                 continue;
             }
 
             gCatalog = std::move(loaded);
             gLanguage = !gCatalog.language.empty() ? gCatalog.language : language;
-            gFontProfile = fontProfile;
-            gResourceEncoding = resourceEncoding;
+            gCatalogResourceProfile = requiredProfile;
+            gCatalogRequiresResourceProfile = !gCatalog.requiredResourceProfile.empty();
             gHasCatalog = true;
             Log(
                 platform::LogLevel::Info,
@@ -463,6 +461,114 @@ bool LoadCatalog(const std::string& requested) {
         }
     }
     return false;
+}
+
+bool ParseResourceProfile(const std::string& value, ResourceProfile& profile) {
+    const std::string normalized = Lower(Trim(value));
+    if (normalized == "western" || normalized == "latin" || normalized == "pol") {
+        profile = ResourceProfile::Western;
+        return true;
+    }
+    if (normalized == "buka" || normalized == "buka-cyrillic"
+        || normalized == "cyrillic") {
+        profile = ResourceProfile::BukaCyrillic;
+        return true;
+    }
+    return false;
+}
+
+bool DetectRootProfile(
+    const std::string& root,
+    ResourceProfile& profile
+) {
+    if (root.empty()) {
+        return false;
+    }
+    constexpr const char* archives[] = {"DATA\\HEROES2.AGG", "DATA\\HEROES2X.AGG"};
+    for (const char* retailPath : archives) {
+        const std::string path = platform::ResolveIn(root, retailPath);
+        std::string error;
+        if (DetectAggResourceProfile(path, profile, error)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void SelectResourceProfile(const char* commandLine) {
+    ResourceProfile primary = ResourceProfile::Western;
+    ResourceProfile overlay = ResourceProfile::Western;
+    gPrimaryProfileDetected = DetectRootProfile(
+        platform::Files().DataRoot(), primary
+    );
+    const bool overlayDetected = DetectRootProfile(
+        platform::Files().LocaleDataRoot(), overlay
+    );
+    if (gPrimaryProfileDetected) {
+        gPrimaryResourceProfile = primary;
+    }
+
+    std::string requested = CommandLineResourceProfile(commandLine);
+    if (requested.empty()) {
+        if (const char* environment = std::getenv("HOMM2_RESOURCE_PROFILE");
+            environment != nullptr && *environment != '\0') {
+            requested = environment;
+        }
+    }
+
+    ResourceProfile explicitProfile = ResourceProfile::Western;
+    const bool hasExplicitProfile = !requested.empty()
+        && ParseResourceProfile(requested, explicitProfile);
+    if (!requested.empty() && !hasExplicitProfile) {
+        Log(
+            platform::LogLevel::Warning,
+            "localization: unsupported resource profile '" + requested
+                + "'; using automatic detection"
+        );
+    }
+
+    const ResourceProfileSelection selection = ChooseResourceProfile(
+        gPrimaryProfileDetected,
+        primary,
+        overlayDetected,
+        overlay,
+        gHasCatalog && gCatalogRequiresResourceProfile,
+        gCatalogResourceProfile,
+        hasExplicitProfile,
+        explicitProfile
+    );
+    gResourceProfile = selection.profile;
+    gUseResourceOverlay = selection.useOverlay;
+    if (hasExplicitProfile) {
+        if (!gUseResourceOverlay
+            && (!gPrimaryProfileDetected || primary != explicitProfile)) {
+            Log(
+                platform::LogLevel::Warning,
+                "localization: requested resource profile '"
+                    + std::string(ResourceProfileName(explicitProfile))
+                    + "' was not detected in primary or locale data"
+            );
+        }
+    }
+
+    gCurrentFileTextEncoding = DefaultFileTextEncoding();
+    Log(
+        platform::LogLevel::Info,
+        "localization: resource-profile="
+            + std::string(ResourceProfileName(gResourceProfile))
+            + ", encoding=" + TextEncodingName(ResourceTextEncoding(gResourceProfile))
+            + (gUseResourceOverlay ? ", archives=locale-overlay" : ", archives=primary")
+    );
+
+    if (gHasCatalog && gCatalogRequiresResourceProfile
+        && gCatalogResourceProfile != gResourceProfile) {
+        UseEnglish(
+            ("catalog requires resource profile '"
+             + std::string(ResourceProfileName(gCatalogResourceProfile))
+             + "' but active profile is '"
+             + ResourceProfileName(gResourceProfile) + "'").c_str()
+        );
+    }
 }
 
 std::string FormatSignature(const char* text) {
@@ -573,8 +679,13 @@ void Initialize(const char* commandLine) {
     RestoreLegacyTables();
     gCatalog = Catalog();
     gLanguage = "en";
-    gFontProfile = FontProfile::Latin;
-    gResourceEncoding = ResourceEncoding::Western;
+    gResourceProfile = ResourceProfile::Western;
+    gPrimaryResourceProfile = ResourceProfile::Western;
+    gCatalogResourceProfile = ResourceProfile::Western;
+    gCurrentFileTextEncoding = TextEncoding::Windows1252;
+    gPrimaryProfileDetected = false;
+    gCatalogRequiresResourceProfile = false;
+    gUseResourceOverlay = false;
     gHasCatalog = false;
     gWarnedFormatIds.clear();
     gWarnedMissingIds.clear();
@@ -598,22 +709,47 @@ void Initialize(const char* commandLine) {
     requested = NormalizeLanguage(std::move(requested));
     if (requested.empty() || requested == "c" || requested == "posix"
         || requested == "en" || requested.rfind("en-", 0) == 0) {
+        SelectResourceProfile(commandLine);
         return;
     }
 
     if (LoadCatalog(requested)) {
-        LocalizeLegacyTables();
+        SelectResourceProfile(commandLine);
+        if (gHasCatalog) {
+            LocalizeLegacyTables();
+        }
     } else if (explicitSelection) {
         Log(
             platform::LogLevel::Warning,
             "localization: no compatible catalog for '" + requested + "'; using English"
         );
+        SelectResourceProfile(commandLine);
+    } else {
+        SelectResourceProfile(commandLine);
     }
 }
 
 const char* Language() { return gLanguage.c_str(); }
 
-FontProfile ActiveFontProfile() { return gFontProfile; }
+FontProfile ActiveFontProfile() {
+    return gResourceProfile == ResourceProfile::BukaCyrillic
+        ? FontProfile::BukaCyrillic
+        : FontProfile::Latin;
+}
+
+ResourceProfile ActiveResourceProfile() { return gResourceProfile; }
+
+TextEncoding ActiveResourceTextEncoding() {
+    return ResourceTextEncoding(gResourceProfile);
+}
+
+TextEncoding DefaultFileTextEncoding() {
+    return ResourceTextEncoding(
+        gPrimaryProfileDetected ? gPrimaryResourceProfile : gResourceProfile
+    );
+}
+
+bool UsesResourceOverlay() { return gUseResourceOverlay; }
 
 bool HasCatalog() { return gHasCatalog; }
 
@@ -629,9 +765,30 @@ void UseEnglish(const char* reason) {
     RestoreLegacyTables();
     gCatalog = Catalog();
     gLanguage = "en";
-    gFontProfile = FontProfile::Latin;
-    gResourceEncoding = ResourceEncoding::Western;
+    gCatalogResourceProfile = ResourceProfile::Western;
+    gCatalogRequiresResourceProfile = false;
     gHasCatalog = false;
+}
+
+void RejectResourceProfile(const char* reason) {
+    const bool rejectedOverlay = gUseResourceOverlay;
+    Log(
+        platform::LogLevel::Warning,
+        std::string("localization: ")
+            + (reason != nullptr ? reason : "resource profile rejected")
+            + (rejectedOverlay
+                ? "; using primary resource profile"
+                : "; using safe western profile")
+    );
+    gUseResourceOverlay = false;
+    gResourceProfile = rejectedOverlay && gPrimaryProfileDetected
+        ? gPrimaryResourceProfile
+        : ResourceProfile::Western;
+    gCurrentFileTextEncoding = DefaultFileTextEncoding();
+    if (gHasCatalog && gCatalogRequiresResourceProfile
+        && gCatalogResourceProfile != gResourceProfile) {
+        UseEnglish("the active retail assets cannot render the selected catalog");
+    }
 }
 
 std::size_t ApplyLegacyTable(const char* idPrefix, char** values, std::size_t count) {
@@ -710,70 +867,22 @@ const char* TrPlural(
     return FormatCompatible(id, english, form.c_str()) ? form.c_str() : english;
 }
 
-namespace {
-
-std::uint32_t DecodeWestern(unsigned char byte) {
-    if (byte < 0x80 || byte >= 0xa0) {
-        return byte;
-    }
-    constexpr std::uint32_t table[] = {
-        0x20ac, 0xfffd, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
-        0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, 0xfffd, 0x017d, 0xfffd,
-        0xfffd, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
-        0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, 0xfffd, 0x017e, 0x0178,
-    };
-    return table[byte - 0x80];
-}
-
-std::uint32_t DecodeCyrillic(unsigned char byte) {
-    if (byte < 0x80) {
-        return byte;
-    }
-    if (byte >= 0xc0) {
-        return 0x0410 + byte - 0xc0;
-    }
-    constexpr std::uint32_t table[] = {
-        0x0402, 0x0403, 0x201a, 0x0453, 0x201e, 0x2026, 0x2020, 0x2021,
-        0x20ac, 0x2030, 0x0409, 0x2039, 0x040a, 0x040c, 0x040b, 0x040f,
-        0x0452, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
-        0xfffd, 0x2122, 0x0459, 0x203a, 0x045a, 0x045c, 0x045b, 0x045f,
-        0x00a0, 0x040e, 0x045e, 0x0408, 0x00a4, 0x0490, 0x00a6, 0x00a7,
-        0x0401, 0x00a9, 0x0404, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x0407,
-        0x00b0, 0x00b1, 0x0406, 0x0456, 0x0491, 0x00b5, 0x00b6, 0x00b7,
-        0x0451, 0x2116, 0x0454, 0x00bb, 0x0458, 0x0405, 0x0455, 0x0457,
-    };
-    return table[byte - 0x80];
-}
-
-} // namespace
-
 std::string DecodeResourceText(const char* text) {
-    if (text == nullptr) {
-        return std::string();
-    }
-    if (gResourceEncoding == ResourceEncoding::Utf8) {
-        return text;
-    }
+    return DecodeText(text, ActiveResourceTextEncoding());
+}
 
-    std::string result;
-    result.reserve(std::strlen(text) * 2);
-    for (const auto* byte = reinterpret_cast<const unsigned char*>(text);
-         *byte != 0; ++byte) {
-        const std::uint32_t codePoint = gResourceEncoding == ResourceEncoding::Cyrillic
-            ? DecodeCyrillic(*byte)
-            : DecodeWestern(*byte);
-        char encoded[4];
-        const std::size_t length = utf8::Encode(codePoint, encoded);
-        result.append(encoded, length);
-    }
-    return result;
+std::string DecodeExternalText(const char* text, TextEncoding encoding) {
+    return DecodeText(text, encoding);
 }
 
 std::string DecodeExternalText(const char* text) {
-    if (text == nullptr || utf8::IsValid(text)) {
-        return text != nullptr ? text : "";
-    }
-    return DecodeResourceText(text);
+    return DecodeText(text, gCurrentFileTextEncoding);
+}
+
+TextEncoding CurrentFileTextEncoding() { return gCurrentFileTextEncoding; }
+
+void SetCurrentFileTextEncoding(TextEncoding encoding) {
+    gCurrentFileTextEncoding = encoding;
 }
 
 }

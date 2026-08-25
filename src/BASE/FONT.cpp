@@ -40,8 +40,8 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = false;
     if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic
         && m_glyphIcon->m_frameCount < 162) {
-        localization::UseEnglish(
-            "the selected locale requires FONT.ICN and SMALFONT.ICN with at least 162 frames"
+        localization::RejectResourceProfile(
+            "the selected profile requires FONT.ICN and SMALFONT.ICN with at least 162 frames"
         );
         gpResourceManager->DisableLocaleAggregates();
     }
@@ -68,6 +68,8 @@ i32 CyrillicGlyph(std::uint32_t codePoint) {
 
 i32 GlyphIndex(std::uint32_t codePoint, i32 frameCount) {
     i32 glyph;
+    if (codePoint == 0x2013 || codePoint == 0x2014)
+        codePoint = '-';
     if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic) {
         if (codePoint >= 0x0400)
             glyph = CyrillicGlyph(codePoint);

@@ -1,4 +1,5 @@
 #include <BASE/Utf8.h>
+#include <SOURCE/LegacyText.h>
 #include <SOURCE/PluralRules.h>
 
 #include <cstdio>
@@ -97,6 +98,68 @@ int main() {
         || localization::plural::Select(rules, 12) != 2
         || localization::plural::Select(rules, 23) != 1) {
         std::fputs("Polish plural-rule mismatch\n", stderr);
+        return 1;
+    }
+
+    const char cp1251[] = "\xcf\xf0\xe8\xe2\xe5\xf2";
+    const char* utf8Russian = reinterpret_cast<const char*>(u8"Привет");
+    const std::string decodedRussian = localization::DecodeText(
+        cp1251, localization::TextEncoding::Windows1251
+    );
+    char encodedRussian[16];
+    if (decodedRussian != utf8Russian
+        || !localization::EncodeText(
+            decodedRussian.c_str(),
+            localization::TextEncoding::Windows1251,
+            encodedRussian,
+            sizeof(encodedRussian)
+        )
+        || std::strcmp(encodedRussian, cp1251) != 0) {
+        std::fputs("Windows-1251 round-trip mismatch\n", stderr);
+        return 1;
+    }
+
+    const char cp1252[] = "caf\xe9";
+    const char* utf8Western = reinterpret_cast<const char*>(u8"café");
+    char encodedWestern[16];
+    if (localization::DecodeText(cp1252, localization::TextEncoding::Windows1252)
+            != utf8Western
+        || !localization::EncodeText(
+            utf8Western,
+            localization::TextEncoding::Windows1252,
+            encodedWestern,
+            sizeof(encodedWestern)
+        )
+        || std::strcmp(encodedWestern, cp1252) != 0) {
+        std::fputs("Windows-1252 round-trip mismatch\n", stderr);
+        return 1;
+    }
+
+    char unrepresentable[8];
+    if (localization::EncodeText(
+            reinterpret_cast<const char*>(u8"猫"),
+            localization::TextEncoding::Windows1251,
+            unrepresentable,
+            sizeof(unrepresentable)
+        )
+        || std::strcmp(unrepresentable, "?") != 0) {
+        std::fputs("legacy replacement mismatch\n", stderr);
+        return 1;
+    }
+
+    const char* legacyFields[] = {"ASCII", cp1251};
+    const char* utf8Fields[] = {"ASCII", utf8Russian};
+    const char* asciiFields[] = {"ASCII", "only"};
+    if (localization::DetectTextEncoding(
+            legacyFields, 2, localization::TextEncoding::Windows1251
+        ) != localization::TextEncoding::Windows1251
+        || localization::DetectTextEncoding(
+            utf8Fields, 2, localization::TextEncoding::Windows1251
+        ) != localization::TextEncoding::Utf8
+        || localization::DetectTextEncoding(
+            asciiFields, 2, localization::TextEncoding::Windows1252
+        ) != localization::TextEncoding::Windows1252) {
+        std::fputs("file provenance detection mismatch\n", stderr);
         return 1;
     }
     return 0;

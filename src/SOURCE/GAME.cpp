@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -1080,6 +1081,29 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, ext);
 }
 
+void EncodeGameFileText(
+    const char* source,
+    char* destination,
+    std::size_t capacity,
+    const char* field
+) {
+    if (!localization::EncodeText(
+            source,
+            localization::CurrentFileTextEncoding(),
+            destination,
+            capacity
+        )) {
+        platform::Host().Log(
+            platform::LogLevel::Warning,
+            (std::string("save: '") + (field != NULL ? field : "text")
+             + "' was truncated or is not representable as "
+             + localization::TextEncodingName(
+                 localization::CurrentFileTextEncoding()
+             )).c_str()
+        );
+    }
+}
+
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     i32 nHuman;
     i32 saveFlag;
@@ -1168,7 +1192,16 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     platform::FileWrite(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileWrite(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileWrite(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileWrite(outFile, cPlayerNames, sizeof(cPlayerNames));
+    decltype(cPlayerNames) serializedPlayerNames;
+    for (iFile = 0; iFile < GAME_PLAYER_COUNT; ++iFile) {
+        EncodeGameFileText(
+            cPlayerNames[iFile],
+            serializedPlayerNames[iFile],
+            sizeof(serializedPlayerNames[iFile]),
+            "player name"
+        );
+    }
+    platform::FileWrite(outFile, serializedPlayerNames, sizeof(serializedPlayerNames));
 
     memset(workBuf, 0, SAVE_LEGACY_CLEAR_SIZE);
     platform::FileWrite(outFile, workBuf, SAVE_LEGACY_SERIALIZED_SIZE);
@@ -1210,7 +1243,17 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
         m_heroRecs[iFile].Write(outFile, !expansionFormat);
     platform::FileWrite(outFile, m_availableHeroes, sizeof(m_availableHeroes));
-    platform::FileWrite(outFile, m_castleRecs, sizeof(m_castleRecs));
+    town serializedCastles[GAME_TOWN_COUNT];
+    memcpy(serializedCastles, m_castleRecs, sizeof(serializedCastles));
+    for (iFile = 0; iFile < GAME_TOWN_COUNT; ++iFile) {
+        EncodeGameFileText(
+            m_castleRecs[iFile].m_name,
+            serializedCastles[iFile].m_name,
+            sizeof(serializedCastles[iFile].m_name),
+            "town name"
+        );
+    }
+    platform::FileWrite(outFile, serializedCastles, sizeof(serializedCastles));
     platform::FileWrite(outFile, m_castleOwners, sizeof(m_castleOwners));
     platform::FileWrite(outFile, m_dailyEventFlags, sizeof(m_dailyEventFlags));
     platform::FileWrite(outFile, m_mines, sizeof(m_mines));
@@ -1225,7 +1268,11 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     platform::FileWrite(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
     platform::FileWrite(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
     platform::FileWrite(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    platform::FileWrite(outFile, m_rumour, sizeof(m_rumour));
+    char serializedRumour[sizeof(m_rumour)];
+    EncodeGameFileText(
+        m_rumour, serializedRumour, sizeof(serializedRumour), "tavern rumour"
+    );
+    platform::FileWrite(outFile, serializedRumour, sizeof(serializedRumour));
     platform::FileWrite(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     platform::FileWrite(outFile, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     platform::FileWrite(
@@ -1459,6 +1506,22 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     platform::FileRead(fd, cPlayerNames, sizeof(cPlayerNames));
+    {
+        const char* provenanceFields[GAME_PLAYER_COUNT + 2] = {
+            m_mapHeader.name,
+            m_mapHeader.description,
+        };
+        for (ndx = 0; ndx < GAME_PLAYER_COUNT; ++ndx) {
+            provenanceFields[ndx + 2] = cPlayerNames[ndx];
+        }
+        localization::SetCurrentFileTextEncoding(
+            localization::DetectTextEncoding(
+                provenanceFields,
+                sizeof(provenanceFields) / sizeof(provenanceFields[0]),
+                localization::DefaultFileTextEncoding()
+            )
+        );
+    }
     for (auto& playerName : cPlayerNames) {
         const std::string decodedName = localization::DecodeExternalText(playerName);
         utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
@@ -2852,6 +2915,9 @@ i32 game::LoadMap(char* filename) {
     if (handle == -1)
         FileError(gText);
     platform::FileRead(handle, &m_mapHeader, sizeof(m_mapHeader));
+    localization::SetCurrentFileTextEncoding(
+        GetMapHeaderTextEncoding(&m_mapHeader)
+    );
     m_worldMap.Read(handle, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 

@@ -1,12 +1,15 @@
 # Localization architecture
 
-Status: implementation and known-limitations record, 2026-08-24.
+Status: implementation and compatibility record, 2026-08-25.
 
-The native port has three localization inputs:
+The native port keeps four independent localization concerns:
 
-1. engine messages compiled with the executable;
-2. text stored in original AGG widget files and maps;
-3. glyphs and labels baked into original bitmap resources.
+| Concern | Selects | Does not select |
+| --- | --- | --- |
+| UI locale | MO catalog and gettext plural rules | retail archives or byte encoding |
+| Resource profile | archive overlay, widget decoder and bitmap-font layout | UI language |
+| Runtime text | UTF-8 representation used by game code | a retail edition |
+| File provenance | encoder used when an old map/save field is written | UI language |
 
 No original game asset is stored in this repository. Project-owned catalogs
 are packaged with the game; localized retail resources remain user-supplied.
@@ -28,16 +31,19 @@ character. Gameplay shortcuts remain physical-key events, separate from text
 input, so a keyboard layout does not insert duplicate characters or alter
 hotkeys.
 
-Original files are not assumed to be UTF-8. `X-Homm2-Resource-Encoding` in a
-catalog describes the separately obtained edition associated with that
-catalog. Serialized UI strings are decoded exactly once when read. Authored
-map and old-save fields are preserved when already valid UTF-8 and otherwise
-decoded with that resource profile. The latter is necessarily a heuristic
-because the retail formats contain no encoding tag.
+Original files are not assumed to be UTF-8. Serialized resource strings are
+decoded exactly once with the active resource profile. A map/save is assigned
+an encoding provenance by inspecting its raw text fields: valid non-ASCII
+UTF-8 wins, while ASCII-only or invalid UTF-8 retains the primary
+installation's Windows-1251/Windows-1252 fallback. That provenance follows the
+active game. It is not taken from a localized AGG overlay, because maps are
+opened from `HOMM2_DATA`.
 
-The currently implemented resource decoders are Windows-1252, Windows-1251,
-and UTF-8. A future legacy edition using another encoding needs a decoder at
-this boundary; it does not change the UTF-8 runtime.
+When a retail save is written, UTF-8 player, hero, town and rumour strings are
+encoded into temporary fixed-size legacy records. The live objects remain
+UTF-8. An unrepresentable or truncated value becomes `?` at that compatibility
+boundary and produces a warning; it never changes the runtime string. The
+implemented file codecs are UTF-8, Windows-1252 and Windows-1251.
 
 ## Catalogs and the English source of truth
 
@@ -109,20 +115,24 @@ atomically.
 
 Catalog discovery checks `HOMM2_LOCALE_PATH`, the executable's `lang`
 directory, the installed shared-data directory, and development-tree
-`lang`/`locales` directories. Catalogs must declare UTF-8 content.
+`lang`/`locales` directories. Catalogs must declare UTF-8 content, a matching
+`Language`, and an `X-Homm2-Required-Resource-Profile`. The build validates
+that every translated character can be mapped by that bitmap-font profile.
 
 ## Bitmap fonts and future languages
 
-UTF-8 storage does not make the original bitmap fonts Unicode fonts. A catalog
-selects a language-independent `X-Homm2-Font-Profile`, which maps Unicode code
-points to frames in the edition's `FONT.ICN` and `SMALFONT.ICN` files.
+UTF-8 storage does not make the original bitmap fonts Unicode fonts. The
+resource profile maps Unicode code points to frames in the edition's
+`FONT.ICN` and `SMALFONT.ICN` files. A catalog only declares the minimum
+resource profile needed to render its translations; it does not activate that
+profile or choose an archive.
 
 Implemented profiles are:
 
-- `latin`: the original 96-frame English layout (ASCII, with the recovered
+- `western`: the original 96-frame English layout (ASCII, with the recovered
   lower-case folding behavior);
 - `buka-cyrillic`: the Buka Cyrillic layout, including `Ё`/`ё`, requiring at
-  least 161 frames.
+  least 162 frames.
 
 The profile is metadata, not an `if (language == ...)` decision. A future
 language can reuse a compatible profile. A language needing different glyphs
@@ -131,10 +141,12 @@ then name that profile in its catalog. Unknown profiles are rejected safely.
 This is necessary because an arbitrary Unicode character cannot be rendered
 by a 96-frame retail bitmap font.
 
-If a selected profile cannot be rendered by the localized archives, the game
-logs a precise warning, restores English catalog bindings, disables localized
-archive overrides, and continues with the primary English assets. It never
-indexes beyond the available font frames.
+The profile is detected structurally from the `FONT.ICN` frame count in the
+installed AGG, or selected explicitly with
+`HOMM2_RESOURCE_PROFILE=western|buka-cyrillic` (also available as
+`--resource-profile=`). This makes English UI on Buka data and Russian UI on a
+Buka overlay equally valid. If a catalog requires unavailable glyphs, only the
+catalog falls back to English; resource decoding remains tied to the assets.
 
 ## External localized resources
 
@@ -146,7 +158,9 @@ HOMM2_LOCALE_DATA=/games/homm2-buka
 HOMM2_LANGUAGE=ru
 ```
 
-The resource manager opens archives in this lookup order:
+Automatic selection prefers a matching localized profile when the chosen
+catalog requires it; otherwise it uses the profile detected in primary data.
+When the overlay is active, the resource manager opens archives in this order:
 
 1. localized `HEROES2X.AGG`;
 2. localized `HEROES2.AGG`;
@@ -171,10 +185,9 @@ python3 tools/agg_manifest.py compare \
   /games/homm2-localized/DATA/HEROES2.AGG changes.json
 ```
 
-The inspected English base archive has 1,434 entries and 96-frame font icons.
-No Buka archive is available in this workspace, so the exact Russian changed
-resource set is intentionally not claimed. The reconstructed Buka renderer
-proves the different font layout and its 161-frame requirement.
+The inspected English base archive has 1,434 entries and 96-frame font icons;
+the Buka archive has the same entry count and a 162-frame `FONT.ICN`. Detection
+uses only this structural metadata and does not retain payloads.
 
 ## Serialized and authored text
 
@@ -186,26 +199,26 @@ them. A future catalog overlay keyed by resource name, widget kind, and widget
 ID could support translations without a localized retail BIN.
 
 MP2/MX2 maps contain fixed-size names, descriptions, rumours, riddles, signs,
-events, hero names, and town names. They have no reliable locale metadata.
-Display paths now normalize those strings at the boundary without changing
-the raw map layout. Official-map translations can later be optional sidecars
-keyed by map checksum; selecting a UI language must not replace user-authored
-prose automatically.
+events, hero names, and town names. They have no locale tag. Map header fields
+establish a per-file provenance; display and runtime-object paths decode with
+it without changing raw map extras. Selecting a UI language never reinterprets
+user-authored prose.
 
-Retail saves and network packets also contain small fixed byte arrays. UTF-8
-is copied without splitting a code point, but those legacy capacities can hold
-fewer non-ASCII characters and old retail executables will not render the new
-UTF-8 bytes. Full-length Unicode names with strict retail interoperability need
-a versioned extension or sidecar that separates runtime strings from the
-legacy serialized fields. This remains an explicit compatibility limitation.
+Retail saves and network packets also contain small fixed byte arrays. Save
+loading detects and records the original byte encoding before decoding fields.
+Save writing re-encodes temporary copies with that provenance, so CP1251 and
+CP1252 retail files remain readable by their original edition. A versioned
+extension or sidecar is still required for names that exceed retail capacity
+or cannot be represented by the file's code page. Network peers likewise need
+the same resource/file profile until packets gain an explicit charset tag.
 
 ## Adding a language
 
 To add a new language:
 
 1. create `locales/<tag>.po` as UTF-8 and merge it with the generated POT;
-2. set `Language`, standard `Plural-Forms`, `X-Homm2-Font-Profile`, and
-   `X-Homm2-Resource-Encoding` headers;
+2. set `Language`, standard `Plural-Forms`, and
+   `X-Homm2-Required-Resource-Profile` headers;
 3. translate semantic IDs and compatible legacy-table entries;
 4. reuse an existing font profile or implement and test a new glyph mapping;
 5. compare any separately obtained localized archives with the metadata-only
@@ -236,7 +249,10 @@ Implemented:
 - catalog-driven gettext plural expressions;
 - localized four-archive overlay, metadata-only AGG comparison, and safe font
   capability fallback;
-- decoding boundaries for serialized widgets and major map/save display paths.
+- independent automatic resource-profile selection from AGG structure;
+- CP1251/CP1252/UTF-8 decoding, per-map/save provenance and legacy save
+  re-encoding without mutating UTF-8 runtime objects;
+- static catalog language/profile/glyph checks and codec/profile round trips.
 
 Known follow-up work that does not change the catalog architecture:
 
@@ -244,8 +260,8 @@ Known follow-up work that does not change the catalog architecture:
   overflow recovered storage;
 - add screenshot/replay coverage in English and Russian with real localized
   resources;
-- design a versioned compatibility extension for full-length Unicode player,
-  hero, and town names;
+- design a versioned compatibility extension for full-length or
+  code-page-unrepresentable Unicode player, hero, and town names;
 - optionally add checksum-keyed official-map translations and widget catalog
   overlays.
 

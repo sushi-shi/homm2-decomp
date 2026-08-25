@@ -333,6 +333,9 @@ void game::InitNewGame(struct SMapHeader* header) {
             m_mapHeader = *header;
         else
             GetMapHeader(m_mapFilename, &m_mapHeader);
+        localization::SetCurrentFileTextEncoding(
+            GetMapHeaderTextEncoding(&m_mapHeader)
+        );
 
         for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
             if (m_mapHeader.playerEnabled[player]) {
@@ -890,7 +893,9 @@ cleanup:
         i32 playerIndex;
         i32 unusedPlayer17;
 
-        const std::string mapName = localization::DecodeExternalText(m_mapHeader.name);
+        const std::string mapName = localization::DecodeExternalText(
+            m_mapHeader.name, GetMapHeaderTextEncoding(&m_mapHeader)
+        );
         strcpy(gText, mapName.c_str());
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
@@ -1717,9 +1722,12 @@ void game::ShowScenInfo(void) {
     widget* nameWidget;
     widget* iconControl;
     heroWindow* window;
-    const std::string mapName = localization::DecodeExternalText(m_mapHeader.name);
+    const localization::TextEncoding mapEncoding = GetMapHeaderTextEncoding(&m_mapHeader);
+    const std::string mapName = localization::DecodeExternalText(
+        m_mapHeader.name, mapEncoding
+    );
     const std::string mapDescription =
-        localization::DecodeExternalText(m_mapHeader.description);
+        localization::DecodeExternalText(m_mapHeader.description, mapEncoding);
 
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     window = new heroWindow(SCENARIO_WINDOW_X, SCENARIO_WINDOW_Y, "sceninfo.bin");

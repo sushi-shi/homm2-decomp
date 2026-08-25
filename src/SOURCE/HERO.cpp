@@ -1,5 +1,6 @@
 #include <Ints.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Platform.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -216,10 +217,22 @@ void hero::Read(i32 file, i8 expansion) {
 }
 
 void hero::Write(i32 file, i8 expansion) {
+    hero serialized = *this;
+    if (!localization::EncodeText(
+            m_name,
+            localization::CurrentFileTextEncoding(),
+            serialized.m_name,
+            sizeof(serialized.m_name)
+        )) {
+        platform::Host().Log(
+            platform::LogLevel::Warning,
+            "save: hero name was truncated or is not representable in the legacy file encoding"
+        );
+    }
     if (expansion)
-        platform::FileWrite(file, this, sizeof(hero));
+        platform::FileWrite(file, &serialized, sizeof(hero));
     else
-        platform::FileWrite(file, this, BASE_RECORD_SIZE);
+        platform::FileWrite(file, &serialized, BASE_RECORD_SIZE);
 }
 
 void hero::GetArmyStrengths(u32l* const) {}

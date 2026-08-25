@@ -40,6 +40,9 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 The classic branches are terminal views of their corresponding reconstruction;
 they do not feed Gold or `master`.
 
+The cross-version behavioral ledger lives on the evidence-owning Buka
+reconstruction branch; see [Retail version differences](docs/version-differences.md).
+
 ## Reconstruction evidence
 
 The Gold decompilation branch matches all 1,727 reconstructed retail functions
@@ -89,6 +92,19 @@ HOMM2_DATA=/path/to/heroes2 ./build/homm2
 ```sh
 export HOMM2_DATA=/path/to/heroes2
 ```
+
+The game detects the `western` or `buka-cyrillic` resource profile from
+`FONT.ICN`, independently of `HOMM2_LANGUAGE`. To use Russian UI with English
+primary data and a Buka resource overlay:
+
+```sh
+HOMM2_DATA=/path/to/heroes2-english \
+HOMM2_LOCALE_DATA=/path/to/heroes2-buka \
+HOMM2_LANGUAGE=ru nix run
+```
+
+`HOMM2_RESOURCE_PROFILE=western|buka-cyrillic` overrides automatic detection
+for diagnostics. See [Localization architecture](docs/localization.md).
 
 Without `HOMM2_DATA`, the engine searches these locations in order:
 
