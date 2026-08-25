@@ -1521,6 +1521,13 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
                 localization::DefaultFileTextEncoding()
             )
         );
+        platform::Host().Log(
+            platform::LogLevel::Info,
+            (std::string("localization: save-text=")
+             + localization::TextEncodingName(
+                 localization::CurrentFileTextEncoding()
+             )).c_str()
+        );
     }
     for (auto& playerName : cPlayerNames) {
         const std::string decodedName = localization::DecodeExternalText(playerName);
@@ -2917,6 +2924,12 @@ i32 game::LoadMap(char* filename) {
     platform::FileRead(handle, &m_mapHeader, sizeof(m_mapHeader));
     localization::SetCurrentFileTextEncoding(
         GetMapHeaderTextEncoding(&m_mapHeader)
+    );
+    platform::Host().Log(
+        platform::LogLevel::Info,
+        (std::string("localization: map-text=")
+         + localization::TextEncodingName(localization::CurrentFileTextEncoding())
+         + ", file=" + filename).c_str()
     );
     m_worldMap.Read(handle, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
