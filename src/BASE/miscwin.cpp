@@ -13,6 +13,7 @@ typedef enum VesaBlitConstant {
     VESA_SCREEN_WIDTH    = 640,
     VESA_SCREEN_HEIGHT   = 480,
     VESA_SCROLL_MARGIN   = 16,
+    VESA_SCROLL_EXTENT   = VESA_SCREEN_HEIGHT - VESA_SCROLL_MARGIN * 2,
     ENLARGE_EXTENT_LIMIT = VESA_SCREEN_WIDTH - 3,
     ENLARGE_PIXEL_GROWTH = 4,
     NET_BOX_TOP          = 411
@@ -73,8 +74,10 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         giScrollX != 0 ? giScrollX + VESA_SCROLL_MARGIN : destinationX;
     const i32 presentSourceY =
         giScrollY != 0 ? giScrollY + VESA_SCROLL_MARGIN : destinationY;
+    const i32 presentWidth = giScrollX != 0 ? VESA_SCROLL_EXTENT : width;
+    const i32 presentHeight = giScrollY != 0 ? VESA_SCROLL_EXTENT : height;
     platform::Video().Blit(
-        {presentSourceX, presentSourceY, width, height},
+        {presentSourceX, presentSourceY, presentWidth, presentHeight},
         {destinationX, destinationY}
     );
     platform::Video().Present();
