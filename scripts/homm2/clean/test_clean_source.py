@@ -540,6 +540,11 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
                 ninja,
             )
             self.assertIn(
+                "build $builddir/imports/AUDIERE_aliases.o: cxx "
+                "imports/AUDIERE_aliases.S",
+                ninja,
+            )
+            self.assertIn(
                 "build $builddir/imports/WING32.a: implib imports/WING32.def",
                 ninja,
             )
@@ -567,8 +572,19 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
 
             audiere = (output / "imports/AUDIERE.def").read_text()
             self.assertIn("LIBRARY audiere.dll\n", audiere)
-            self.assertIn("  AdrOpenDevice@8\n", audiere)
-            self.assertIn("  AdrOpenSampleSource@4\n", audiere)
+            self.assertIn("  _AdrOpenDevice@8\n", audiere)
+            self.assertIn("  _AdrOpenSampleSource@4\n", audiere)
+
+            audiere_aliases = (output / "imports/AUDIERE_aliases.S").read_text()
+            self.assertIn(
+                '    .set "_AdrOpenDevice@8", "__AdrOpenDevice@8"\n',
+                audiere_aliases,
+            )
+            self.assertIn(
+                '    .set "__imp__AdrOpenDevice@8", '
+                '"__imp___AdrOpenDevice@8"\n',
+                audiere_aliases,
+            )
 
     def test_override_comments_are_removed(self):
         with tempfile.TemporaryDirectory() as directory:

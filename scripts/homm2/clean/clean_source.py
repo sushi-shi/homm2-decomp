@@ -1429,6 +1429,10 @@ def write_ninja(out_root: Path) -> None:
         if dlltool_flags:
             lines.append(f"  dlltool_flags = {dlltool_flags}")
         import_libraries.append(library)
+    audiere_aliases = "$builddir/imports/AUDIERE_aliases.o"
+    lines.append(
+        f"build {audiere_aliases}: cxx imports/AUDIERE_aliases.S || $builddir/imports"
+    )
     mss_aliases = "$builddir/imports/MSS32_aliases.o"
     lines.append(
         f"build {mss_aliases}: cxx imports/MSS32_aliases.S || $builddir/imports"
@@ -1437,7 +1441,7 @@ def write_ninja(out_root: Path) -> None:
         "",
         "build objects: phony " + " ".join(objects),
         "build $builddir/HMM2PL.exe: link "
-        + " ".join(objects + [mss_aliases] + import_libraries),
+        + " ".join(objects + [audiere_aliases, mss_aliases] + import_libraries),
         "build game: phony $builddir/HMM2PL.exe",
         "default game",
         "",
@@ -1484,8 +1488,8 @@ MSS_IMPORTS = (
 )
 
 AUDIERE_IMPORTS = (
-    "AdrOpenDevice@8",
-    "AdrOpenSampleSource@4",
+    "_AdrOpenDevice@8",
+    "_AdrOpenSampleSource@4",
 )
 
 SMACK_IMPORTS = (
@@ -1518,6 +1522,15 @@ def write_import_defs(out_root: Path) -> None:
     audiere = ["LIBRARY audiere.dll", "EXPORTS"]
     audiere += [f"  {symbol}" for symbol in AUDIERE_IMPORTS]
     (imports / "AUDIERE.def").write_text("\n".join(audiere) + "\n")
+    audiere_aliases = []
+    for symbol in AUDIERE_IMPORTS:
+        audiere_aliases += [
+            f'    .weak "{symbol}"',
+            f'    .set "{symbol}", "_{symbol}"',
+            f'    .weak "__imp_{symbol}"',
+            f'    .set "__imp_{symbol}", "__imp__{symbol}"',
+        ]
+    (imports / "AUDIERE_aliases.S").write_text("\n".join(audiere_aliases) + "\n")
 
     mss = ["LIBRARY mss32.dll", "EXPORTS"]
     mss += [f"  {symbol}" for symbol in MSS_IMPORTS]
