@@ -290,6 +290,12 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_test(
     NAME catalog_validation
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_validate_catalog.py)
+  add_test(
+    NAME ironfist_interface_audit
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_ironfist_interface_audit.py)
+  add_test(
+    NAME ironfist_hook_contract
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_ironfist_hook_contract.py)
 endif()
 
 if(WIN32)

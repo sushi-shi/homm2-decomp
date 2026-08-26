@@ -12,6 +12,11 @@ names and layouts. Reference checkout:
 `jkoppel/project-ironfist` at `31493201` (same tree as the feasibility
 assessment).
 
+That pinned 2024 source is not identical to the shipped Ironfist 1.3.0
+executable. See [Ironfist equivalence audit](ironfist-equivalence.md) for the
+binary/source distinction, mechanical interface results, callback-placement
+review, and known semantic differences.
+
 ## Ported so far
 
 | Ironfist | Here | Notes |
@@ -28,7 +33,8 @@ assessment).
 | callback patch sites | `IRONFIST/hooks.*` + one-line calls in `src/SOURCE/` | see below |
 | `maps/MODULES`, `maps/GENERIC` | resource pack `SCRIPTS/` | runtime Lua; must be present under `HOMM2_DATA/SCRIPTS` |
 
-Wired callback hooks (same placement as Ironfist's executable patches):
+Wired callback hooks (equivalent placement relative to the retained game
+behavior; see the audited qualifications linked above):
 
 - `game::NewMap` → `ScriptingInit`; adventure-manager startup on a new game →
   `OnMapStart` + first `OnNewDay` (`KB.cpp`); `game::PerDay` → `OnNewDay`;
@@ -42,8 +48,10 @@ Wired callback hooks (same placement as Ironfist's executable patches):
   `armyGroup::GetMorale` → `OnCalcMorale`;
   `combatManager::InitNonVisualVars` → `OnBattleStart`.
 
-The Lua-visible names and values are exactly Ironfist's scripting interface, so
-existing Ironfist map scripts load unchanged.
+The Lua-visible names, handler bindings, result arities, and static values
+match the pinned 2024 Ironfist scripting interface, so scripts for that source
+revision load unchanged. This is a superset of the older interface embedded in
+the shipped 1.3.0 executable.
 
 ## Name-mapping notes
 
@@ -80,7 +88,7 @@ this tree's enums. Notable divergences:
 
 ## Ported since the first milestone
 
-- All 22 script callbacks are wired (the seven late ones: tooltip override,
+- All 23 script callback names are wired (the later ones include tooltip override,
   monster interact, the melee pair, spell chance, mana cost, luck/morale info
   text), and all 129 script functions are real — the last five stubs became
   the vision-sharing, building-ban, AI-army-sharing and forced-chase features,
