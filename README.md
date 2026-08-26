@@ -34,7 +34,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist
+                    master --------> ironfist --------> ironfist-master
 ```
 
 - `decomp-gold-2.1-buka` — this branch: the Gold 2.1/Buka reconstruction.
@@ -45,6 +45,8 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
   source-only trees; the clean source branch is the primary base of `master`.
 - `master` — the cross-platform Linux/Windows/Web port.
 - `ironfist` — Project Ironfist applied to the reconstructed source.
+- `ironfist-master` — the maintained integration with narrow extension
+  boundaries and mechanics in their owning engine classes.
 
 <!-- match-score:start -->
 ## Match status
