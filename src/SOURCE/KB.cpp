@@ -822,16 +822,14 @@ i32 oldmain(void) {
                     sizeof(netBuffer_f.setup.players)
                 );
                 giThisGamePos = NetPosToGamePos(0);
-                gbUseRegularCompression = gbUseDiffCompression = 1;
-                if (giHighMemBuffer < OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT)
-                    gbUseRegularCompression = 0;
+                gbUseBzip2Compression = gbUseDiffCompression = 1;
                 for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
-                    if (!gsNetPlayerInfo[player_h].useRegularCompression)
-                        gbUseRegularCompression = 0;
+                    if (!gsNetPlayerInfo[player_h].useBzip2Compression)
+                        gbUseBzip2Compression = 0;
                     if (!gsNetPlayerInfo[player_h].useDiffCompression)
                         gbUseDiffCompression = 0;
                 }
-                netBuffer_f.setup.useRegularCompression = gbUseRegularCompression;
+                netBuffer_f.setup.useBzip2Compression = gbUseBzip2Compression;
                 netBuffer_f.setup.useDiffCompression = gbUseDiffCompression;
                 for (player_h = 1; player_h < giNumHumanPlayers; player_h++) {
                     transmissionResult_d = TransmitRemoteData(
@@ -3023,7 +3021,7 @@ i32 WaitForOtherPlayer(void) {
                     data->payload.setup.gamePosToNetPos,
                     OLD_MAIN_PLAYER_COUNT
                 );
-                gbUseRegularCompression = data->payload.setup.useRegularCompression;
+                gbUseBzip2Compression = data->payload.setup.useBzip2Compression;
                 gbUseDiffCompression = data->payload.setup.useDiffCompression;
                 memcpy(
                     gsNetPlayerInfo,
@@ -4963,8 +4961,9 @@ void NormalDialog(
             windowY = NORMAL_DIALOG_MAX_TOP;
     }
 
-    sprintf(
+    snprintf(
         iconFile_a,
+        sizeof(iconFile_a),
         "evntwin%d.bin",
         windowRows_b
     );

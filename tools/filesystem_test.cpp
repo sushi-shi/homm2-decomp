@@ -58,6 +58,11 @@ int main() {
         "installation aggregate is not user state"
     );
     valid &= Expect(
+        platform::IsUserState("DATA\\H2CABCD.NW"),
+        false,
+        "removed compressor scratch names are not user state"
+    );
+    valid &= Expect(
         platform::IsUserState("GAMES/../DATA/HEROES2.AGG"),
         false,
         "state classification normalizes parent components"
