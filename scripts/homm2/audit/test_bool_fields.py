@@ -141,7 +141,10 @@ struct Value {
         with tempfile.TemporaryDirectory() as directory:
             repo = Path(directory)
             source, translation = parse(repo, text)
-            facts = analyze_translation_unit(translation, source, repo)[0]
+            facts = next(
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.storage_kind == "field"
+            )
         self.assertFalse(facts.eligible)
         self.assertIn("mutable-reference-argument",
                       {write.kind for write in facts.unknown_writes})
@@ -161,7 +164,10 @@ struct Value {
         with tempfile.TemporaryDirectory() as directory:
             repo = Path(directory)
             source, translation = parse(repo, text)
-            fields = analyze_translation_unit(translation, source, repo)
+            fields = [
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.storage_kind == "field"
+            ]
         self.assertEqual(len(fields), 2)
         self.assertTrue(all(item.eligible for item in fields))
         domains = {item.name: {write.domain for write in item.writes} for item in fields}
@@ -186,6 +192,55 @@ Value values[] = {{0, 9}, {1, 10}};
         self.assertEqual(
             {write.kind for write in by_name["flag"].writes},
             {"aggregate-initializer"},
+        )
+
+    def test_globals_and_locals_use_width_preserving_boolean_targets(self):
+        text = r"""
+typedef int i32;
+typedef signed char i8;
+typedef i32 b32;
+typedef i8 b8;
+typedef char bchar;
+
+i32 globalFlag;
+char charFlag = 0;
+i8 byteFlag = 0;
+bchar existingFlag = false;
+
+void SetGlobals() {
+    globalFlag = 1;
+    charFlag = 1;
+    byteFlag = 1;
+    existingFlag = true;
+}
+
+void LocalFlags(i32 incoming) {
+    i32 localFlag = 0;
+    char localChar = 0;
+    if (incoming) {
+        localFlag = 1;
+        localChar = 1;
+    }
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            facts = analyze_translation_unit(translation, source, repo)
+
+        by_name = {item.name: item for item in facts if item.name != "incoming"}
+        self.assertEqual(by_name["globalFlag"].target_type, "b32")
+        self.assertEqual(by_name["charFlag"].target_type, "bchar")
+        self.assertEqual(by_name["byteFlag"].target_type, "b8")
+        self.assertEqual(by_name["localFlag"].storage_kind, "variable")
+        self.assertEqual(by_name["localChar"].target_type, "bchar")
+        self.assertTrue(all(by_name[name].eligible for name in (
+            "globalFlag", "charFlag", "byteFlag", "localFlag", "localChar")))
+        self.assertEqual(by_name["existingFlag"].declared_type, "bchar")
+        incoming = next(item for item in facts if item.name == "incoming")
+        self.assertEqual(
+            {write.kind for write in incoming.unknown_writes},
+            {"incoming-parameter"},
         )
 
     def test_compilation_database_rejects_wrong_worktree(self):
@@ -266,6 +321,24 @@ Value values[] = {{0, 9}, {1, 10}};
         with mock.patch("homm2.audit.bool_fields.scan", return_value=unproven), \
                 redirect_stdout(StringIO()):
             self.assertEqual(main(["--check"]), 1)
+
+    def test_boolean_parameters_are_inventoried_separately(self):
+        text = r"""
+typedef int i32;
+typedef i32 b32;
+void Consume(b32 enabled) { (void)enabled; }
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            facts = analyze_translation_unit(translation, source, repo)
+
+        enabled = next(item for item in facts if item.name == "enabled")
+        self.assertEqual(enabled.storage_kind, "parameter")
+        self.assertEqual(
+            {write.kind for write in enabled.unknown_writes},
+            {"incoming-parameter"},
+        )
 
 
 if __name__ == "__main__":

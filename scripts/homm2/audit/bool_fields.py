@@ -1,22 +1,32 @@
 #!/usr/bin/env python3
-"""Find ``i32`` data members whose observed write domain is Boolean.
+"""Find integer members, globals, and locals whose observed write domain is Boolean.
 
 This is a conservative, source-identity-aware census.  It uses libclang and the
-repository's generated compilation database, so ``Foo::state`` and
-``Bar::state`` never become one textual bucket.  A field is proposed only when:
+repository's generated compilation database, so two same-spelled variables
+never become one textual bucket. Storage is proposed only when:
 
-* its declaration is spelled ``i32`` in project-owned source;
+* its declaration is spelled ``i32``, ``i8``, or plain ``char`` in
+  project-owned source;
 * the accumulated observed write domain is exactly ``{0, 1}``;
 * every visible direct write is provably confined to that domain; and
-* the field is not exposed directly through a mutable pointer/reference or
+* the object is not exposed directly through a mutable pointer/reference or
   another write shape the scanner cannot prove.
 
 The scanner is deliberately an audit, not a rewrite command.  Its JSON report
 contains declaration and literal-expression byte spans so a reviewed change
-can replace ``i32`` with ``b32`` and the associated ``0``/``1`` literals with
-``false``/``true`` without a second name-based search.  It also reports numeric
-literal writes and unproven writes to fields already typed ``b32``; ``--check``
-fails on every kind of remaining cleanup.
+can replace ``i32`` with ``b32``, ``i8`` with ``b8``, or plain ``char`` with
+``bchar`` while replacing associated ``0``/``1`` literals with
+``false``/``true``. ``bchar`` deliberately preserves plain-char C++ identity
+for globals whose decorated retail symbol depends on it. The audit also reports
+numeric literal writes and unproven writes to already recovered Boolean
+storage; ``--check`` fails on every actionable kind of remaining cleanup.
+Boolean parameters are inventoried separately: their incoming domain belongs
+to the function contract and is not itself a bad write.
+
+Parameters are inventoried but normally remain rejected until a separate
+call-site proof establishes their incoming domain. Aggregate byte writes and
+external deserialization are outside this direct-write census and remain review
+boundaries rather than inferred Boolean evidence.
 
 Run inside ``nix develop .#build``::
 
@@ -50,7 +60,7 @@ from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 DATABASE = Path("build/clangd/compile_commands.json")
 PROJECT_ROOTS = ("include", "src")
 RECORD_KINDS = {
@@ -58,6 +68,7 @@ RECORD_KINDS = {
     ci.CursorKind.STRUCT_DECL,
 }
 REFERENCE_KINDS = {
+    ci.CursorKind.DECL_REF_EXPR,
     ci.CursorKind.MEMBER_REF,
     ci.CursorKind.MEMBER_REF_EXPR,
 }
@@ -73,6 +84,18 @@ WRAPPER_KINDS = {
 MUTABLE_REFERENCE_KINDS = {
     ci.TypeKind.LVALUEREFERENCE,
     ci.TypeKind.RVALUEREFERENCE,
+}
+SOURCE_BOOLEAN_TARGETS = {
+    "i32": "b32",
+    "i8": "b8",
+    "char": "bchar",
+}
+BOOLEAN_TYPES = frozenset(SOURCE_BOOLEAN_TARGETS.values())
+TRACKED_TYPES = frozenset(SOURCE_BOOLEAN_TARGETS) | BOOLEAN_TYPES
+STORAGE_DECL_KINDS = {
+    ci.CursorKind.FIELD_DECL: "field",
+    ci.CursorKind.VAR_DECL: "variable",
+    ci.CursorKind.PARM_DECL: "parameter",
 }
 
 
@@ -105,6 +128,7 @@ class FieldFacts:
     record: str
     name: str
     declared_type: str
+    storage_kind: str = "field"
     declarations: set[SourceSpan] = field(default_factory=set)
     type_spans: set[SourceSpan] = field(default_factory=set)
     writes: set[Write] = field(default_factory=set)
@@ -121,8 +145,13 @@ class FieldFacts:
     def eligible(self) -> bool:
         # A member seen only as zero is not positive Boolean evidence: unused
         # payload words and reset-only queue indexes have exactly that shape.
-        return (self.declared_type == "i32" and self.observed_domain == (0, 1)
+        return (self.declared_type in SOURCE_BOOLEAN_TARGETS
+                and self.observed_domain == (0, 1)
                 and not self.unknown_writes)
+
+    @property
+    def target_type(self) -> str | None:
+        return SOURCE_BOOLEAN_TARGETS.get(self.declared_type)
 
 
 def _project_relative(path: str | Path | None, repo: Path) -> str | None:
@@ -206,6 +235,13 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
             return tuple(sorted(set(left) | set(right)))
     if cursor.kind == ci.CursorKind.BINARY_OPERATOR and cursor.spelling == "," and children:
         return _boolean_domain(children[-1])
+    if cursor.kind == ci.CursorKind.BINARY_OPERATOR and cursor.spelling == "=" and children:
+        return _boolean_domain(children[-1])
+    # The aliases are semantic Boolean storage contracts maintained by this
+    # audit. A value read through one of them is valid Boolean flow even though
+    # its ABI-preserving underlying C++ type remains integral.
+    if cursor.type.spelling in BOOLEAN_TYPES:
+        return (0, 1)
     # Comparisons, logical operators, calls returning bool, and unary ! all have
     # a real Boolean result even in the retail C++98 analysis mode.
     if cursor.type.kind == ci.TypeKind.BOOL:
@@ -256,8 +292,26 @@ def _type_span(cursor: ci.Cursor, repo: Path, declared_type: str) -> SourceSpan 
     for child in cursor.get_children():
         if child.kind == ci.CursorKind.TYPE_REF and child.spelling == declared_type:
             return _span(child, repo)
-    # libclang can omit a TypeRef in a macro-expanded declaration.  Do not
-    # invent a replacement span: such a declaration is not safely rewritable.
+    # Built-in types and some macro-expanded declarations do not carry a
+    # TypeRef. Use the exact declaration token only when its spelling is
+    # unambiguous and it occurs before the declared name.
+    matches = []
+    for token in cursor.get_tokens():
+        if token.spelling != declared_type:
+            continue
+        location = token.location
+        relative = _project_relative(str(location.file) if location.file else None, repo)
+        if relative is None:
+            continue
+        matches.append(SourceSpan(
+            file=relative,
+            line=location.line,
+            column=location.column,
+            start=token.extent.start.offset,
+            end=token.extent.end.offset,
+        ))
+    if len(matches) == 1:
+        return matches[0]
     return None
 
 
@@ -293,17 +347,18 @@ def _record_declaration(type_: ci.Type) -> ci.Cursor | None:
 def _tracked_fields(cursor: ci.Cursor, repo: Path, unit: str) -> dict[str, FieldFacts]:
     out = {}
     for field_cursor in cursor.walk_preorder():
+        storage_kind = STORAGE_DECL_KINDS.get(field_cursor.kind)
         declared_type = field_cursor.type.spelling
-        if field_cursor.kind != ci.CursorKind.FIELD_DECL or declared_type not in ("i32", "b32"):
+        if storage_kind is None or declared_type not in TRACKED_TYPES:
             continue
         declaration = _span(field_cursor, repo)
         type_span = _type_span(field_cursor, repo, declared_type)
         parent = field_cursor.semantic_parent
-        if declaration is None or type_span is None or parent is None or parent.kind not in RECORD_KINDS:
+        if declaration is None or type_span is None or parent is None:
             continue
         # Writing one member of a union overwrites all of them; direct member
         # assignments cannot establish a field-local value domain there.
-        if parent.kind == ci.CursorKind.UNION_DECL:
+        if field_cursor.kind == ci.CursorKind.FIELD_DECL and parent.kind == ci.CursorKind.UNION_DECL:
             continue
         usr = _field_usr(field_cursor)
         current = out.get(usr)
@@ -314,6 +369,7 @@ def _tracked_fields(cursor: ci.Cursor, repo: Path, unit: str) -> dict[str, Field
                 record=_qualified_record(parent),
                 name=field_cursor.spelling,
                 declared_type=declared_type,
+                storage_kind=storage_kind,
             )
             out[usr] = current
         current.declarations.add(declaration)
@@ -366,6 +422,39 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
                 _mark(candidates, usr,
                       _write(initializer, "field-initializer", repo,
                              _boolean_domain(initializer)), handled)
+
+    if cursor.kind in (ci.CursorKind.VAR_DECL, ci.CursorKind.PARM_DECL):
+        usr = _field_usr(cursor)
+        if usr in candidates:
+            if cursor.kind == ci.CursorKind.PARM_DECL:
+                _mark(candidates, usr,
+                      _write(cursor, "incoming-parameter", repo, None), handled)
+            else:
+                ignored = {
+                    ci.CursorKind.ANNOTATE_ATTR,
+                    ci.CursorKind.NAMESPACE_REF,
+                    ci.CursorKind.TEMPLATE_REF,
+                    ci.CursorKind.TYPE_REF,
+                }
+                initializers = [child for child in children if child.kind not in ignored]
+                if initializers:
+                    initializer = initializers[-1]
+                    _mark(candidates, usr,
+                          _write(initializer, "variable-initializer", repo,
+                                 _boolean_domain(initializer)), handled)
+                else:
+                    parent = cursor.semantic_parent
+                    has_static_storage = (
+                        parent is not None
+                        and parent.kind in (ci.CursorKind.TRANSLATION_UNIT,
+                                            ci.CursorKind.NAMESPACE)
+                    ) or cursor.storage_class == ci.StorageClass.STATIC
+                    if cursor.is_definition() and has_static_storage:
+                        _mark(candidates, usr,
+                              _write(cursor, "static-implicit-zero", repo, (0,)), handled)
+                    elif cursor.is_definition():
+                        _mark(candidates, usr,
+                              _write(cursor, "uninitialized-local", repo, None), handled)
 
     if cursor.kind == ci.CursorKind.INIT_LIST_EXPR:
         declaration = _record_declaration(cursor.type)
@@ -440,7 +529,7 @@ def analyze_translation_unit(translation: ci.TranslationUnit, source: Path,
     handled: set[tuple[str, int, int, int]] = set()
     _analyze_cursor(translation.cursor, candidates, repo, handled)
 
-    # Every remaining MemberExpr is a read.  Keeping the locations is useful in
+    # Every remaining member/global/local reference is a read. Keeping the locations is useful in
     # review and, more importantly, prevents an unclassified cursor from being
     # silently treated as a safe write.
     for cursor in translation.cursor.walk_preorder():
@@ -526,10 +615,13 @@ def _merge(rows: list[dict]) -> list[FieldFacts]:
                 record=row["record"],
                 name=row["name"],
                 declared_type=row["declared_type"],
+                storage_kind=row.get("storage_kind", "field"),
             )
             merged[usr] = current
-        elif (current.record, current.name, current.declared_type) != (
-                row["record"], row["name"], row["declared_type"]):
+        elif (current.record, current.name, current.declared_type,
+              current.storage_kind) != (
+                row["record"], row["name"], row["declared_type"],
+                row.get("storage_kind", "field")):
             raise RuntimeError(f"inconsistent repeated field identity: {usr}")
         current.declarations.update(declarations)
         current.type_spans.update(type_spans)
@@ -562,10 +654,12 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         with ProcessPoolExecutor(max_workers=min(worker_count, len(batches))) as pool:
             raw = [row for batch in pool.map(worker, batches) for row in batch]
     fields = _merge(raw)
-    i32_fields = [item for item in fields if item.declared_type == "i32"]
-    b32_fields = [item for item in fields if item.declared_type == "b32"]
-    candidates = [item for item in i32_fields if item.eligible]
-    rejected = [item for item in i32_fields if not item.eligible]
+    source_storage = [item for item in fields if item.declared_type in SOURCE_BOOLEAN_TARGETS]
+    boolean_storage = [item for item in fields if item.declared_type in BOOLEAN_TYPES]
+    candidates = [item for item in source_storage if item.eligible]
+    rejected = [item for item in source_storage if not item.eligible]
+    field_candidates = [item for item in candidates if item.storage_kind == "field"]
+    field_rejected = [item for item in rejected if item.storage_kind == "field"]
 
     def emit(item: FieldFacts) -> dict:
         return {
@@ -573,6 +667,8 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             "record": item.record,
             "name": item.name,
             "declared_type": item.declared_type,
+            "target_type": item.target_type,
+            "storage_kind": item.storage_kind,
             "qualified_name": f"{item.record}::{item.name}",
             "declarations": [asdict(value) for value in sorted(item.declarations)],
             "type_spans": [asdict(value) for value in sorted(item.type_spans)],
@@ -584,51 +680,75 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             "eligible": item.eligible,
         }
 
+    numeric_literal_writes = [
+        {
+            "qualified_name": f"{item.record}::{item.name}",
+            "storage_kind": item.storage_kind,
+            "declarations": [asdict(value) for value in sorted(item.declarations)],
+            "write": asdict(write),
+        }
+        for item in boolean_storage
+        for write in sorted(item.writes)
+        if write.replacement is not None
+    ]
+    unproven_boolean_writes = [
+        {
+            "qualified_name": f"{item.record}::{item.name}",
+            "storage_kind": item.storage_kind,
+            "declarations": [asdict(value) for value in sorted(item.declarations)],
+            "write": asdict(write),
+        }
+        for item in boolean_storage
+        for write in sorted(item.unknown_writes)
+        if write.kind != "incoming-parameter"
+    ]
+    boolean_parameters = [emit(item) for item in boolean_storage
+                          if item.storage_kind == "parameter"]
     return {
         "schema_version": SCHEMA_VERSION,
         "translation_units": len(entries),
-        "i32_fields": len(i32_fields),
-        "b32_fields": len(b32_fields),
-        "eligible_fields": len(candidates),
-        "rejected_fields": len(rejected),
+        # Legacy count names remain machine-readable for report consumers.
+        "i32_fields": sum(item.declared_type == "i32" and item.storage_kind == "field"
+                          for item in fields),
+        "b32_fields": sum(item.declared_type == "b32" and item.storage_kind == "field"
+                          for item in fields),
+        "source_integer_storage": len(source_storage),
+        "boolean_storage": len(boolean_storage),
+        "storage_by_kind": {
+            kind: sum(item.storage_kind == kind for item in fields)
+            for kind in STORAGE_DECL_KINDS.values()
+        },
+        "eligible_fields": len(field_candidates),
+        "rejected_fields": len(field_rejected),
+        "eligible_storage": len(candidates),
+        "rejected_storage": len(rejected),
         "candidates": [emit(item) for item in candidates],
         "rejected": [emit(item) for item in rejected],
-        "b32_numeric_literal_writes": [
-            {
-                "qualified_name": f"{item.record}::{item.name}",
-                "declarations": [asdict(value) for value in sorted(item.declarations)],
-                "write": asdict(write),
-            }
-            for item in b32_fields
-            for write in sorted(item.writes)
-            if write.replacement is not None
-        ],
-        "b32_unproven_writes": [
-            {
-                "qualified_name": f"{item.record}::{item.name}",
-                "declarations": [asdict(value) for value in sorted(item.declarations)],
-                "write": asdict(write),
-            }
-            for item in b32_fields
-            for write in sorted(item.unknown_writes)
-        ],
+        "boolean_numeric_literal_writes": numeric_literal_writes,
+        "boolean_unproven_writes": unproven_boolean_writes,
+        "boolean_parameters": boolean_parameters,
+        "b32_numeric_literal_writes": numeric_literal_writes,
+        "b32_unproven_writes": unproven_boolean_writes,
     }
 
 
 def _text(report: dict, include_rejected: bool) -> str:
     lines = [
         f"[bool-fields] {report['translation_units']} translation units, "
-        f"{report['i32_fields']} i32 fields, "
-        f"{report['eligible_fields']} Boolean candidates, "
-        f"{report['rejected_fields']} rejected; "
-        f"{len(report['b32_numeric_literal_writes'])} numeric and "
-        f"{len(report['b32_unproven_writes'])} unproven writes to b32 fields",
+        f"{report.get('source_integer_storage', report['i32_fields'])} source-integer storage objects, "
+        f"{report.get('eligible_storage', report['eligible_fields'])} Boolean candidates, "
+        f"{report.get('rejected_storage', report['rejected_fields'])} rejected; "
+        f"{len(report.get('boolean_numeric_literal_writes', report['b32_numeric_literal_writes']))} "
+        f"numeric and {len(report.get('boolean_unproven_writes', report['b32_unproven_writes']))} "
+        f"unproven writes to Boolean storage",
     ]
     for item in report["candidates"]:
         location = item["declarations"][0]
         lines.append(
             f"CANDIDATE {location['file']}:{location['line']} "
-            f"{item['qualified_name']} ({len(item['writes'])} writes, "
+            f"{item.get('storage_kind', 'field')} {item['qualified_name']} "
+            f"{item.get('declared_type', 'i32')}->{item.get('target_type', 'b32')} "
+            f"({len(item['writes'])} writes, "
             f"{item['read_count']} reads)")
         for write in item["writes"]:
             lines.append(
@@ -645,16 +765,18 @@ def _text(report: dict, include_rejected: bool) -> str:
             lines.append(
                 f"REJECTED  {location['file']}:{location['line']} "
                 f"{item['qualified_name']}: {kinds}")
-        for item in report["b32_numeric_literal_writes"]:
+        for item in report.get("boolean_numeric_literal_writes",
+                               report["b32_numeric_literal_writes"]):
             write = item["write"]
             lines.append(
-                f"B32-LITERAL {write['file']}:{write['line']} "
+                f"BOOL-LITERAL {write['file']}:{write['line']} "
                 f"{item['qualified_name']}: {write['expression']} -> "
                 f"{write['replacement']}")
-        for item in report["b32_unproven_writes"]:
+        for item in report.get("boolean_unproven_writes",
+                               report["b32_unproven_writes"]):
             write = item["write"]
             lines.append(
-                f"B32-UNPROVEN {write['file']}:{write['line']} "
+                f"BOOL-UNPROVEN {write['file']}:{write['line']} "
                 f"{item['qualified_name']}: {write['kind']}: "
                 f"{write['expression']}")
     return "\n".join(lines) + "\n"
@@ -667,8 +789,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--all", action="store_true", help="include rejected fields in text")
     parser.add_argument(
         "--check", action="store_true",
-        help=("fail when an i32 candidate, numeric 0/1 write, or unproven "
-              "write to b32 remains"))
+        help=("fail when an integer Boolean candidate, numeric 0/1 write, or "
+              "unproven write to Boolean storage remains"))
     parser.add_argument("--tu", action="append", default=[], help="limit to matching source paths")
     parser.add_argument("-j", "--jobs", type=int, default=0)
     args = parser.parse_args(argv)
@@ -685,7 +807,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(output, end="")
     return int(bool(args.check and (
-        report["eligible_fields"] or report["b32_numeric_literal_writes"]
+        report.get("eligible_storage", report["eligible_fields"])
+        or report["b32_numeric_literal_writes"]
         or report["b32_unproven_writes"])))
 
 
