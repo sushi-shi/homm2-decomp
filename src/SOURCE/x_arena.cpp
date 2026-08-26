@@ -48,19 +48,13 @@ typedef enum ArenaConstant {
 } ArenaConstant;
 
 i32 DoArenaDialog(void) {
-    i32 statValue0;
-    i32 statValue2;
-    i32 statValue3;
-    i32 statValue7;
+
     i32 windowLines2 = WINDOW_RESOURCE;
-    i16 widgetMode10 = 1;
-    i32 windowWidth = WINDOW_WIDTH;
+
     i32 windowHeight16 = windowLines2 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
     i32 windowX4 = WINDOW_X;
     i32 windowY3 = (WINDOW_SCREEN_HEIGHT - windowHeight16) / WINDOW_CENTER_DIVISOR;
     char windowName7[WINDOW_NAME_SIZE];
-    i32 lineCount11;
-    i32 textHeight4;
     tag_message message14;
     i32 widgetIndex1;
     textWidget* statWidgets0[CHOICE_COUNT];
@@ -74,8 +68,6 @@ i32 DoArenaDialog(void) {
         MemError();
 
     strcpy(gText, localization::Tr("adventure.arena.choose_skill"));
-    lineCount11 = bigFont->LineLength(gText, TEXT_WIDTH);
-    textHeight4 = lineCount11 << TEXT_LINE_SHIFT;
     message14.type = MESSAGE_WIDGET;
     message14.payload.widget.command = ARENA_BROADCAST_TEXT;
     message14.payload.widget.id = BROADCAST_TEXT_ID;
@@ -137,10 +129,6 @@ i32 DoArenaDialog(void) {
 }
 
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
-    tag_message dialogMessage_12;
-    i32 widgetIndex_5;
-    i32 type_13;
-    i32 extra_18;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -166,8 +154,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         switch (message_1.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                extra_18 = NORMAL_DIALOG_NO_VALUE;
-                type_13 = NORMAL_DIALOG_NO_RESOURCE;
+
                 if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
                     switch (message_1.payload.widget.id) {
                         case WIDGET_FIRST_ID:

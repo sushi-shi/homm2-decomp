@@ -29,7 +29,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    i32 h = gpResourceManager->ReadWord();
+    gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = true;
     else
@@ -50,7 +50,6 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
 font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
-
 
 namespace {
 

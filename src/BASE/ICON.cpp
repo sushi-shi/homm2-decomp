@@ -246,7 +246,7 @@ void icon::ClipFillToBuffer(
     i32 y,
     i32 frame,
     i32 color,
-    IconDrawOrientation orientation,
+    IconDrawOrientation,
     i32 clipX,
     i32 clipY,
     i32 clipW,

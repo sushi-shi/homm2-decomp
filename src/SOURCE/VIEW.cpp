@@ -74,45 +74,19 @@ typedef enum ViewGeneralHoverHelp {
 i32 combatManager::ViewGeneral(
     CombatSide side, i32 allowActions, i32 quickView
 ) {
-    i16 msgConst37;
-    i16 msgConst4;
-    i16 msgConst10;
-    i16 msgConst3;
-    i16 msgConst29;
-    i16 msgConst2;
+
     i32 luck14;
-    i16 msgConst1;
+
     i32 morale11;
-    i16 msgConst7;
-    i16 msgConst6;
-    i16 msgConst5;
-    i16 msgConst17;
-    i16 msgConst18;
-    i16 msgConst15;
-    i32 cost2;
+
     heroWindow* generalWindow26;
-    i16 msgConst28;
+
     tag_message message16;
-    i16 msgConst26;
 
     if (m_heroes[H2EnumIndex(side)] == NULL)
         return 0;
     iViewGeneralWhichSide = side;
-    msgConst5 = GENERAL_NAME_WIDGET;
-    msgConst1 = GENERAL_PORTRAIT_WIDGET;
-    msgConst15 = GENERAL_COLOR_WIDGET;
-    msgConst37 = GENERAL_STATS_WIDGET;
-    msgConst7 = GENERAL_CAPTAIN_WIDGET;
-    msgConst18 = GENERAL_CONTROL_NONE;
-    msgConst26 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst2 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst17 = GENERAL_CLOSE;
-    msgConst3 = GENERAL_RETREAT;
-    msgConst29 = GENERAL_SURRENDER;
-    msgConst10 = GENERAL_CONTROL_THIRTEEN;
-    msgConst6 = GENERAL_CONTROL_FOURTEEN;
+
     giCurGeneral = side;
 
     message16.type = MESSAGE_WIDGET;
@@ -133,7 +107,7 @@ i32 combatManager::ViewGeneral(
     if (m_heroes[H2EnumIndex(side)]->m_isCaptain) {
         message16.payload.widget.command = VIEW_GENERAL_SET_FRAME;
         message16.payload.widget.data.value = m_playerId[H2EnumIndex(side)] == -1
-            ? GENERAL_CAPTAIN_FRAME
+            ? H2EnumIndex(GENERAL_CAPTAIN_FRAME)
             : gpGame->m_players[m_playerId[H2EnumIndex(side)]].m_color;
         generalWindow26->BroadcastMessage(message16);
     }
@@ -238,37 +212,12 @@ i32 combatManager::ViewGeneral(
 }
 
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 msgConst8;
-    i16 msgConst28;
-    i16 msgConst1;
-    i16 msgConst19;
-    i16 msgConst6;
+
     i32 handled28;
-    i16 msgConst0;
-    i16 msgConst18;
-    i16 msgConst17;
-    i16 msgConst3;
-    i16 msgConst4;
+
     i32 helpIndex36;
     i32 hintIndex11;
-    i16 msgConst5;
-    i16 msgConst9;
-    i16 msgConst7;
-    i16 msgConst15;
-    msgConst18 = GENERAL_NAME_WIDGET;
-    msgConst5 = GENERAL_PORTRAIT_WIDGET;
-    msgConst0 = GENERAL_COLOR_WIDGET;
-    msgConst3 = GENERAL_STATS_WIDGET;
-    msgConst9 = GENERAL_CONTROL_NONE;
-    msgConst19 = GENERAL_NAME_WIDGET;
-    msgConst4 = GENERAL_CONTROL_SEVEN;
-    msgConst7 = GENERAL_CONTROL_EIGHT;
-    msgConst28 = GENERAL_CONTROL_NINE;
-    msgConst15 = GENERAL_CLOSE;
-    msgConst1 = GENERAL_RETREAT;
-    msgConst6 = GENERAL_SURRENDER;
-    msgConst8 = GENERAL_CONTROL_THIRTEEN;
-    msgConst17 = GENERAL_CONTROL_FOURTEEN;
+
     handled28 = 0;
 
     switch (message.type) {
@@ -361,22 +310,16 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         i32 xWnd;
-        i16 viewYOffsetConst;
+
         i32 yWindow;
         i32 xDelta;
-        i16 viewXOffsetFixed;
+
         CombatSide side;
-        i16 viewWidthConstant;
-        i16 viewHeightConstant;
 
     if (viewedArmy == NULL)
         return;
     {
 
-        viewWidthConstant = ARMY_WIDTH - ARMY_VIEW_X_OFFSET;
-        viewHeightConstant = ARMY_HEIGHT;
-        viewXOffsetFixed = ARMY_VIEW_X_OFFSET;
-        viewYOffsetConst = ARMY_Y_OFFSET;
         xWnd = m_hexCells[viewedArmy->m_hex].m_x;
         yWindow = m_hexCells[viewedArmy->m_hex].m_y;
         xDelta =

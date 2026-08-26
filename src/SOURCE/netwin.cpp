@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <PLATFORM/Sockets.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -243,7 +244,6 @@ void wsSendMessage(
 }
 
 i32 wsnet_snd(i32 destination, i32 size, void* data) {
-    i32 result;
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
@@ -396,7 +396,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 static_cast<i32>(rcvBufIn[0])
             );
             if (giDebugLevel > 0) {
-                sprintf(gText, cWSTextBuffer);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cWSTextBuffer);
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             }
             LogStr(cWSTextBuffer);

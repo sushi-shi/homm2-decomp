@@ -64,8 +64,8 @@ struct PCXHeader {
 #pragma pack(pop)
 
 void InitMemEntry(void);
-void* BaseAlloc(u32, char*, i32);
-void BaseFree(void*, char*, i32);
+void* BaseAlloc(u32, const char*, i32);
+void BaseFree(void*, const char*, i32);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
 u32l MAKEFILEID(const char* text);
@@ -73,7 +73,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key);
 void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
-void ProcessAssert(i32 condition, char* file, i32 line);
+void ProcessAssert(i32 condition, const char* file, i32 line);
 
 
 constexpr const char* H2SourceName(const char* path) {
@@ -86,13 +86,16 @@ constexpr const char* H2SourceName(const char* path) {
     return name;
 }
 
-#define H2_ALLOC(size) BaseAlloc(size, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
-#define H2_FREE(ptr) BaseFree(ptr, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+#define H2_ALLOC(size) BaseAlloc(size, H2SourceName(__FILE__), __LINE__)
+#define H2_FREE(ptr) BaseFree(ptr, H2SourceName(__FILE__), __LINE__)
 #define H2_ASSERT(condition)                                                                       \
-    ProcessAssert(condition, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
-char* FindStringInString(char* text, char* pattern);
+    ProcessAssert(condition, H2SourceName(__FILE__), __LINE__)
+char* FindStringInString(char* text, const char* pattern);
+const char* FindStringInString(const char* text, const char* pattern);
 char* FindToken(char* text, char token);
+const char* FindToken(const char* text, char token);
 char* FindLastToken(char* text, char token);
+const char* FindLastToken(const char* text, char token);
 void SetInstallDefaults(void);
 void SetGameDefaults(void);
 void ReadPrefsFromFile(void);
@@ -108,19 +111,19 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32)
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(const char*);
-void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
+void LogInt(const char*, i32, i32, i32, i32, i32, i32, i32);
 template <typename Enum>
     requires __is_enum(Enum)
-inline void LogInt(char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+inline void LogInt(const char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
-void AiPrint(char*);
-void AbsAiPrint(char*);
+void AiPrint(const char*);
+void AbsAiPrint(const char*);
 void FadeTo(u8*, u8*, i32);
 void FadeToColorTable(u8*, i32);
 i32 IsCycleColor(i32 color);
-void CreatePCXFile(char*, u8*, i32, i32, u8*);
-i32l FileSize(char* filename);
+void CreatePCXFile(const char*, u8*, i32, i32, u8*);
+i32l FileSize(const char* filename);
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index);
 i32 SRandom(i32 low, i32 high);
 void SIncRandomize(i32 x, i32 y);

@@ -185,7 +185,7 @@ i32 iDEMaxLen = 0;
 i32 iMemEntries = 0;
 MemEntry* gpMemEntry = NULL;
 i32 giTotalMemAllocated = 0;
-static char* gcCDTrackName =
+static const char* gcCDTrackName =
     "\\Tracks2\\02-AudioTrack 02.ogg";
 u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
@@ -209,7 +209,7 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
+void* BaseAlloc(u32 size, const char* originalFile, i32 originalLine) {
     if (size == 0)
         return NULL;
     if (gpMemEntry == NULL)
@@ -235,7 +235,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
+void BaseFree(void* ptr, const char* originalFile, i32 originalLine) {
     if (gpMemEntry == NULL)
         InitMemEntry();
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
@@ -444,19 +444,23 @@ i32 Random(i32 low, i32 high) {
     return rand() % (high - low + 1) + low;
 }
 
-void ProcessAssert(i32 condition, char* file, i32 line) {
-    i32 unusedAssertWord;
+void ProcessAssert(i32 condition, const char* file, i32 line) {
+
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
         platform::ShowMessage("Assert Failure", gText);
-        unusedAssertWord = 0;
+
         ShutDown(NULL);
     }
 }
 
-char* FindStringInString(char* text, char* pattern) {
+char* FindStringInString(char* text, const char* pattern) {
+    return const_cast<char*>(FindStringInString(static_cast<const char*>(text), pattern));
+}
+
+const char* FindStringInString(const char* text, const char* pattern) {
     i32 iLen = strlen(text);
     i32 patternLen = strlen(pattern);
     for (i32 i = 0; i < iLen - patternLen + 1; ++i) {
@@ -467,6 +471,10 @@ char* FindStringInString(char* text, char* pattern) {
 }
 
 char* FindToken(char* text, char token) {
+    return const_cast<char*>(FindToken(static_cast<const char*>(text), token));
+}
+
+const char* FindToken(const char* text, char token) {
     i32 iLen = strlen(text);
     for (i32 i = 0; i < iLen; ++i) {
         if (*(text + i) == token)
@@ -476,6 +484,10 @@ char* FindToken(char* text, char token) {
 }
 
 char* FindLastToken(char* text, char token) {
+    return const_cast<char*>(FindLastToken(static_cast<const char*>(text), token));
+}
+
+const char* FindLastToken(const char* text, char token) {
     i32 iLen = strlen(text);
     for (i32 i = iLen - 1; i >= 0; --i) {
         if (*(text + i) == token)
@@ -493,8 +505,8 @@ void SetInstallDefaults(void) {
 void SetGameDefaults(void) {
     i32 i;
     i32 seed;
-    i32 nAlpha;
-    char* alpha;
+
+    const char* alpha;
 
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
@@ -540,7 +552,7 @@ void SetGameDefaults(void) {
         sizeof(gConfig.networkDefaultName),
         localization::Tr("player.unknown_hero_name")
     );
-    nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
+
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
     seed = 0;
@@ -718,7 +730,6 @@ void LogTruncate(void) {
     platform::FileClose(fileHandle);
 }
 
-
 void LogStr(const char* text) {
     char logText[TEXT_BUFFER_SIZE];
     i32 out;
@@ -736,7 +747,7 @@ void LogStr(const char* text) {
 }
 
 void LogInt(
-    char* label,
+    const char* label,
     i32 value1,
     i32 value2,
     i32 value3,
@@ -793,7 +804,7 @@ void LogInt(
     LogStr(text);
 }
 
-void AiPrint(char* text) {
+void AiPrint(const char* text) {
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
 
@@ -820,7 +831,7 @@ void AiPrint(char* text) {
     );
 }
 
-void AbsAiPrint(char* text) {
+void AbsAiPrint(const char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
     AiPrint(text);
@@ -830,14 +841,12 @@ void AbsAiPrint(char* text) {
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 temp[MISC_PALETTE_BYTE_COUNT];
     u8 *current, *to;
-    i32 idx, change, diff, move, delay, iLevel, nextTime, k;
+    i32 idx, change, diff, move, iLevel, nextTime, k;
 
-    delay = FADE_TO_FRAME_DELAY;
     memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
     increment >>= FADE_TO_INCREMENT_SHIFT;
     if (increment < 1) {
         increment = 1;
-        delay *= WINDOWED_FADE_INCREMENT_SCALE;
     }
     for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
         nextTime = platform::Ticks() + FADE_TO_FRAME_DELAY;
@@ -878,7 +887,9 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     pal = gpBufferPalette->m_data;
-    for (i = 0; i < MISC_PALETTE_BYTE_COUNT / PALETTE_COMPONENT_COUNT; ++i) {
+    for (i = 0;
+         i < H2EnumIndex(MISC_PALETTE_BYTE_COUNT) / H2EnumIndex(PALETTE_COMPONENT_COUNT);
+         ++i) {
         tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
             pal[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
         tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
@@ -904,7 +915,13 @@ i32 IsCycleColor(i32 color) {
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
 }
 
-void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
+void CreatePCXFile(
+    const char* filename,
+    u8* pixels,
+    i32 width,
+    i32 height,
+    u8* paletteData
+) {
     i32 fd;
     i32 iLen;
     u8 bMark;
@@ -969,7 +986,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     platform::FileClose(fd);
 }
 
-i32l FileSize(char* filename) {
+i32l FileSize(const char* filename) {
     i32 file = platform::FileOpen(filename, platform::FileMode::Read);
     if (file == -1)
         FileError(filename);
@@ -1039,7 +1056,7 @@ void GetDataEntry(
     i32 useImmediateHandler
 ) {
     MouseCursorType savedCursorType;
-    i16 wId;
+
     i32 nRows;
     char windowName[WINDOW_NAME_CAPACITY];
     i32 entryY;
@@ -1050,7 +1067,6 @@ void GetDataEntry(
     tag_message msg;
     i32 nFrame;
 
-    wId = ENTRY_TEXT_WIDGET;
     savedCursorType = gpMouseManager->m_cursorType;
     nFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
@@ -1082,7 +1098,7 @@ void GetDataEntry(
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     msg.payload.widget.id = ENTRY_PROMPT_WIDGET;
-    msg.payload.widget.data.text = const_cast<char*>(prompt);
+    msg.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(msg);
 
     if (initialText != NULL)
@@ -1154,9 +1170,7 @@ void GetDataEntry(
 }
 
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
-    i16 wId;
 
-    wId = ENTRY_TEXT_WIDGET;
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;

@@ -56,8 +56,8 @@ struct Catalog {
 };
 
 struct LegacyBinding {
-    char** slot;
-    char* english;
+    const char** slot;
+    const char* english;
 };
 
 Catalog gCatalog;
@@ -791,7 +791,11 @@ void RejectResourceProfile(const char* reason) {
     }
 }
 
-std::size_t ApplyLegacyTable(const char* idPrefix, char** values, std::size_t count) {
+std::size_t ApplyLegacyTable(
+    const char* idPrefix,
+    const char** values,
+    std::size_t count
+) {
     if (!gHasCatalog || idPrefix == nullptr || values == nullptr) {
         return 0;
     }
@@ -803,11 +807,11 @@ std::size_t ApplyLegacyTable(const char* idPrefix, char** values, std::size_t co
     return applied;
 }
 
-std::size_t ApplyLegacyString(const char* id, char*& value) {
+std::size_t ApplyLegacyString(const char* id, const char*& value) {
     if (!gHasCatalog || id == nullptr || value == nullptr || *value == '\0') {
         return 0;
     }
-    char* english = value;
+    const char* english = value;
     const Message* message = Find(id);
     if (message == nullptr || message->sourceForms.empty()
         || message->sourceForms[0] != english || message->forms.empty()
@@ -825,7 +829,7 @@ std::size_t ApplyLegacyString(const char* id, char*& value) {
         return 0;
     }
     gLegacyBindings.push_back({&value, english});
-    value = const_cast<char*>(translated);
+    value = translated;
     return 1;
 }
 

@@ -2,20 +2,19 @@
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
 
-
-char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+const char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Original Campaign}\n\nEither Roland's or Archibald's campaign from the original Heroes of "
     "Might and Magic II.",
     "{Expansion Campaign}\n\nOne of the four new campaigns from the Price of Loyalty expansion "
     "set.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+const char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Original Map}\n\nSelects a game from the original Heroes of Might and Magic II.",
     "{Expansion Map}\n\nSelects a game from the Price of Loyalty expansion set.",
     "{Cancel}\n\nCancel back to main menu."
 };
-char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     "Elven alliance",
     "Breastplate",
     "Wood bonus",
@@ -28,7 +27,7 @@ char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     "Guardian Spell",
     "Sphere of Negation"
 };
-char*
+const char*
     xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
         {"Uprising",
          "Island of Chaos",
@@ -56,7 +55,7 @@ char*
          ""},
         {"Stranded", "Pirate Isles", "King and Country", "Blood is Thicker", "", "", "", ""}
 };
-char*
+const char*
     xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
         {{"Subdue the unruly local lords in order to provide the Empire with facilities to operate "
           "in this region.",
@@ -119,16 +118,16 @@ char*
           "",
           "",
           ""}};
-char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {"POL", "DES", "WIZ", "VOY"};
-char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {"Price of Loyalty", "Descendants", "Wizard's Isle", "Voyage Home"};
-char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
+const char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {"POL", "DES", "WIZ", "VOY"};
+const char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {"Price of Loyalty", "Descendants", "Wizard's Isle", "Voyage Home"};
+const char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
     "This burial site is deathly still.",
     "The pit of mud bubbles for a minute and then lies still.",
     "You enter the structure of white stone pillars, and find nothing.",
     "No Fire Elementals approach you from the lava pool.",
     "A face forms in the water for a moment, and then is gone."
 };
-char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
+const char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
     "Restless spirits of long dead warriors seeking their final resting place offer to join you in "
     "hopes of finding peace.  Do you wish to recruit ghosts?",
     "As you approach the bubbling pit of mud, creatures begin to climb out and position themselves "
@@ -146,10 +145,10 @@ char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
     "pool, and a face that is not your own peers back.  It asks: \"Would you like to call upon the "
     "powers of water?\""
 };
-char* xNecromancerShrine = "Shrine";
-char* xNecromancerShrineDesc =
+const char* xNecromancerShrine = "Shrine";
+const char* xNecromancerShrineDesc =
     "The Shrine increases the necromancy skill of all your necromancers by 10 percent.";
-char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
+const char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
     "The head groom approaches you and speaks, \"You already have a fine horse, and have no "
     "inexperienced cavalry which might make use of our trained war horses.\"",
     "As you approach the stables, the head groom appears, leading a fine looking war horse. \"This "
@@ -164,11 +163,11 @@ char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
     "steed will help speed you in your travels. Alas, he will grow tired in a week. You must also "
     "let me give better horses to your mounted soldiers, their horses look shoddy and weak.\""
 };
-char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Joseph", "Joseph II", "Joseph III", "Joseph IV", "Joseph V", "Joseph VI"};
-char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Uncle Ivan", "Ivan II", "Ivan III", "Ivan IV", "Ivan V", "Ivan VI"};
-char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {"Bas.", "Adv.", "Exp."
+const char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Joseph", "Joseph II", "Joseph III", "Joseph IV", "Joseph V", "Joseph VI"};
+const char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Uncle Ivan", "Ivan II", "Ivan III", "Ivan IV", "Ivan V", "Ivan VI"};
+const char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {"Bas.", "Adv.", "Exp."
 };
-char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
+const char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     "Advance",    "Advent",      "Adventure",  "Animate",     "Archer",     "Arena",
     "Armor",      "Army",        "Arrow",      "Artifact",    "Attraction", "Backstab",
     "Barbarian",  "Baron",       "Battle",     "Berserk",     "Blacksmith", "Blade",

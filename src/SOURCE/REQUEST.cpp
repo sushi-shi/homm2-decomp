@@ -134,7 +134,7 @@ i32 ShowThisMap(const char*) {
     return 1;
 }
 
-i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
+i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i32 countOnly) {
     SMapHeader header;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
@@ -238,9 +238,9 @@ fileRequester::fileRequester(
     i32 x,
     i32 y,
     FileRequesterMode mode,
-    char* pattern,
-    char* directory,
-    char* defaultExtension
+    const char* pattern,
+    const char* directory,
+    const char* defaultExtension
 ) {
     strcpy(m_filePattern, pattern);
     strcpy(m_directory, directory);
@@ -325,10 +325,8 @@ i32 fileRequester::Open(i32 id) {
     m_window = new heroWindow(
         m_x,
         m_y,
-        const_cast<char*>(
-            m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
-                                                                              : "request.bin"
-        )
+        m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
+                                                                          : "request.bin"
     );
     if (m_window == NULL) {
         MemError();
@@ -368,7 +366,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, localization::Tr("requester.file_to_save"));
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("requester.file_to_save"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
@@ -395,7 +393,7 @@ i32 fileRequester::Open(i32 id) {
             }
         }
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, localization::Tr("requester.file_to_load"));
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("requester.file_to_load"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
@@ -445,7 +443,7 @@ void fileRequester::SetOK(i32 enabled) {
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     char newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
-    i32 mouseX;
+
     i32 acceptStep = 0;
     i32 iResult;
     i32 lengthIndex;
@@ -755,7 +753,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                      * H2EnumIndex(FILE_REQUESTER_GUTTER_SCALE))
                                     / positions
                                 );
-                                mouseX = message.payload.widget.screenX;
+
                                 screenY = message.payload.widget.screenY;
                                 screenY = static_cast<i32>(screenY - (m_y + fGutterMinY));
                                 screenY -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
@@ -850,7 +848,6 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     gText,
                     localization::Tr("requester.load.insufficient_human_slots")
 
-
                     ,
                     iResult,
                     giNumHumanPlayers
@@ -873,7 +870,6 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 sprintf(
                     gText,
                     localization::Tr("requester.load.replace_human_slots")
-
 
                     ,
                     iResult,
@@ -962,17 +958,13 @@ void fileRequester::DoKnob(void) {
 }
 
 void fileRequester::Update(i32 drawWindow) {
-    i32 unusedState;
-    double gutterSpan;
-    i32 localState;
+
     tag_message message;
-    char localStorage1[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
+
     i32 i;
     double gutterStepCount1;
-    i32 unusedState7;
 
     message.type = MESSAGE_WIDGET;
-    localState = 0;
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (i = 0; i < H2EnumIndex(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
@@ -1161,7 +1153,7 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
-char* fileRequester::GetFilename(void) {
+const char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
         && (m_selectedIndex < 0 || m_selectedIndex >= m_fileCount)) {
         return cFRDummy;
@@ -1184,9 +1176,8 @@ char* fileRequester::GetFilename(void) {
     return m_filename;
 }
 
-
 FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-char* cFRDummy = "";
+const char* cFRDummy = "";
 float fGutterMinY;
 float fGutterTravelLength;
 i32 iMaxListSize;

@@ -118,7 +118,7 @@ i32 recruitUnit::Open(i32 priority) {
     m_window = new heroWindow(
         WINDOW_X,
         WINDOW_Y,
-        const_cast<char*>(m_resourceType == RECRUIT_NO_RESOURCE ? "recruit0.bin" : "recruit1.bin")
+        m_resourceType == RECRUIT_NO_RESOURCE ? "recruit0.bin" : "recruit1.bin"
     );
     if (m_window == NULL)
         MemError();
@@ -235,7 +235,6 @@ void recruitUnit::Update(void) {
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     i32 done = 0;
     i32 quickView;
-    i32 cost;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         quickView = 1;
@@ -428,7 +427,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     recruitWindow = new heroWindow(
         QUICK_WINDOW_X,
         QUICK_WINDOW_Y,
-        const_cast<char*>(resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
+        resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin"
     );
     if (recruitWindow == NULL)
         MemError();

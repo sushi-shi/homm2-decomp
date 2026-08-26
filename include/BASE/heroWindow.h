@@ -54,7 +54,7 @@ public:
     bitmap* m_savedBackground;
     heroWindow(void);
     heroWindow(i32, i32, i32, i32, WindowFlag);
-    heroWindow(i32, i32, char*);
+    heroWindow(i32, i32, const char*);
     i32 Open(i32, i32);
     void RemoveAndDeleteWidget(i32);
     void Close(void);

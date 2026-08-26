@@ -906,7 +906,7 @@ typedef enum AdventurePuzzleViewConstant {
     PUZZLE_WINDOW_Y = SCROLL_BORDER,
     PUZZLE_VIEW_ORIGIN = SCROLL_BORDER,
     PUZZLE_VIEW_SIZE = UPDATE_VIEWPORT_SIZE,
-    PUZZLE_VIEW_END = PUZZLE_VIEW_ORIGIN + PUZZLE_VIEW_SIZE,
+    PUZZLE_VIEW_END = H2EnumIndex(PUZZLE_VIEW_ORIGIN) + H2EnumIndex(PUZZLE_VIEW_SIZE),
     PUZZLE_COORDINATE_OFFSET = 7,
     PUZZLE_ALIGNMENT_DIVISOR = 3,
     PUZZLE_Y_ADJUST_X_FACTOR = 2,
@@ -978,7 +978,6 @@ using enum AdventureMusicQuality;
 #define ADVMGR_LOCATOR_TOWN_SCROLL_SPAN_DOUBLE \
     static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
-
 
 #define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
@@ -1686,8 +1685,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     MessageDispatchResult result;
     i32 quit;
     i32 c;
-    i32 mx;
-    i32 my;
+
     i32 town;
     mapCell* evtCell;
     MapDirection direction;
@@ -2660,9 +2658,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     hero* hero;
     i32 pl;
     mapCell* cellPtr;
-    tag_message evt;
+
     char special;
-    i32 gaveArtifact;
 
     sample = NULL;
     hero = GetHeroSlot(gpCurPlayer->m_currentHero);
@@ -2816,8 +2813,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             if (special) {
                 GiveArtifact(hero, ARTIFACT_SPHERE_NEGATION, 1, -1);
             } else {
-                gaveArtifact =
-                    GiveArtifact(hero, gpGame->m_ultimateArtifactId, 1, -1);
+                GiveArtifact(hero, gpGame->m_ultimateArtifactId, 1, -1);
             }
             gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
         }
@@ -3392,7 +3388,6 @@ void advManager::DrawCell(
     i32 animFrame;
     i32 cursorFrame;
     i32 boatFrameIndex;
-    i32 cursorSuppressed;
 
     if (forceDraw == 0 && bShowIt == 0) {
         return;
@@ -4207,7 +4202,7 @@ void advManager::DrawCell(
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
                     if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
-                        cursorSuppressed = 1;
+
                     } else {
                         DrawCursorShadow();
                         DrawCursor();
@@ -4447,18 +4442,18 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     u8 color = RADAR_UNSEEN_COLOR;
     i32 xrem;
     i32 ymod;
-    i32 w;
+
     i32 offX;
-    i32 delta;
+
     float fScale;
     i32 townx;
     i32 towny;
     i32 frame;
-    i32 oldColor;
+
     i32 bNoFrame;
     i32 i;
     i32 j;
-    i32 cx;
+
     i32 minx;
     i32 miny;
     i32 xhi;
@@ -4567,7 +4562,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         owner = gpGame->m_availableHeroes[cell->m_objectMetadata];
                         if (owner == giCurPlayer) {
                             color = gOwnerColors
-                                [owner < 0 ? RADAR_NEUTRAL_OWNER
+                                [owner < 0 ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
                                            : gpGame->m_players[owner].m_color];
                         }
                     } else {
@@ -4601,7 +4596,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     townx = gpGame->m_castleRecs[cell->m_objectMetadata].m_x;
                                     towny = gpGame->m_castleRecs[cell->m_objectMetadata].m_y;
                                     color = gOwnerColors
-                                        [owner < 0 ? RADAR_NEUTRAL_OWNER
+                                        [owner < 0 ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
                                                    : gpGame->m_players[owner].m_color];
                                     if (j < towny - RADAR_TOWN_RADIUS || j > towny
                                         || i < townx - RADAR_TOWN_RADIUS
@@ -4633,7 +4628,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                             owner = gpGame->m_mineOwners[cell->m_objectMetadata];
                                             color = gOwnerColors
                                                 [owner < 0
-                                                     ? RADAR_NEUTRAL_OWNER
+                                                     ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
                                                      : gpGame->m_players[owner].m_color];
                                             break;
                                         default:
@@ -4656,7 +4651,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                             owner = gpGame->m_mineOwners[cell->m_objectMetadata];
                                             color = gOwnerColors
                                                 [owner < 0
-                                                     ? RADAR_NEUTRAL_OWNER
+                                                     ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
                                                      : gpGame->m_players[owner].m_color];
                                             break;
                                         default:
@@ -4844,15 +4839,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     char guardStr[QUICK_INFO_TEXT_CAPACITY];
     char savedTextLocal[QUICK_INFO_SAVED_TEXT_CAPACITY];
     tag_message message;
-    char ch;
-    i32 quickInfoShowFlag;
-    i32 j;
+
     i32 expansionSite;
-    char uppercaseResult;
+
     i32 blocked;
     std::string tooltipOverride;
 
-    quickInfoShowFlag = 1;
     currentCell = NULL;
     pHero = NULL;
     if (gpCurPlayer->CurrentHero() != -1) {
@@ -5233,7 +5225,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_EXPANSION_OBJECT: {
-                    ch = -1;
+
                     if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         iFrame = currentCell->m_objectIndex;
                         icn = currentCell->m_objectTileset;
@@ -5286,12 +5278,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (expansionSite == H2EnumIndex(GENERIC_SITE_UNKNOWN)) {
-                        sprintf(
-                            gText,
+                        utf8::Copy(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.quick.unknown")
                         );
                     } else {
-                        sprintf(gText, xGenericSiteNames[expansionSite]);
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, xGenericSiteNames[expansionSite]);
                     }
                     if (pHero != NULL && visitedMaskValue != HERO_EVENT_NONE) {
                         strcat(
@@ -5336,19 +5328,19 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (expansionSite == H2EnumIndex(RECRUITMENT_SITE_UNKNOWN)) {
-                        sprintf(
-                            gText,
+                        utf8::Copy(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.quick.unknown")
                         );
                     } else {
-                        sprintf(gText, xRecruitmentSiteNames[expansionSite]);
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, xRecruitmentSiteNames[expansionSite]);
                     }
                     break;
                 }
                 case MAP_OBJECT_ROCK:
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
-                        sprintf(
-                            gText,
+                        utf8::Copy(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.quick.reefs")
                         );
                     } else {
@@ -5848,7 +5840,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 i32 advManager::UpdBottomViewNewTurn(void) {
 
     i32 frameIndex;
-    i32 month;
+
     char* week;
     char* day;
 
@@ -5987,7 +5979,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         textY -= lineCnt * RESOURCE_VIEW_LINE_HEIGHT;
     }
     messageText = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
-    sprintf(messageText, gcBottomViewText);
+    utf8::Copy(messageText, strlen(gcBottomViewText) + 1, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
         BOTTOM_VIEW_PANEL_X,
         textY + RESOURCE_VIEW_TEXT_BASE_Y,
@@ -6188,7 +6180,7 @@ i32 advManager::UpdBottomViewHero(void) {
     hero* targetHero;
     char* armyCountLabelsResult[BOTTOM_HERO_ARMY_SLOTS];
     i32 labelY;
-    i32 leftEdge;
+
     icon* creatureIcons;
     i32 layoutPos;
     i32 countWidth;
@@ -6196,7 +6188,6 @@ i32 advManager::UpdBottomViewHero(void) {
     i32 displayIndex;
     i32 creature;
     IconEntry* iconEntryValue;
-    i32 rightEdge;
 
     if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_HERO) {
         return 0;
@@ -6335,17 +6326,11 @@ i32 advManager::UpdBottomViewHero(void) {
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
 
     i32 creatureCount;
-    i16 armyWidth = HERO_QUICK_ARMY_AREA_WIDTH;
-    i16 leftEdge = ARMY_QUICK_AREA_LEFT;
-    i16 creatureY = HERO_QUICK_DETAILED_CREATURE_Y;
-    i16 iconWidth = ARMY_QUICK_ICON_SIZE;
-    i16 creatureIconHeight = ARMY_QUICK_ICON_SIZE;
+
     textWidget* sizeWidgets[ARMY_QUICK_SLOT_COUNT];
-    i16 enableFlag = 1;
-    i16 portId = HERO_QUICK_PORTRAIT_WIDGET;
+
     icon* iconRef;
-    i16 statId = HERO_QUICK_PRIMARY_STAT_WIDGET;
-    i16 playerColorWidget = HERO_QUICK_PLAYER_COLOR_WIDGET;
+
     heroWindow* win;
     hero* targetHero;
     char* labels[ARMY_QUICK_SLOT_COUNT];
@@ -6682,7 +6667,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(iconRef);
 }
 
-char* advManager::GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar) {
+const char* advManager::GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar) {
     if (giDebugLevel > 0) {
         sprintf(
             cArmySizeName,
@@ -6718,34 +6703,23 @@ char* advManager::GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar) {
     return gArmySizeNames[ARMY_SIZE_LEGION][H2EnumIndex(grammar)];
 }
 
-void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
+void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
 
     i32 creatureCount;
-    i16 creatureIconHeight;
-    i16 on;
+
     heroWindow* window;
     town* townPtr;
-    i16 playerColorWidget;
+
     i32 oldX;
     i32 scouting;
     i32 oldY;
     i32 armyIndex;
-    i16 leftEdge;
-    i16 creatureIconWidth;
-    i16 faceWidget;
+
     tag_message message;
     icon* creatureIcon;
-    i16 armyAreaWidth;
+
     widget* noArmyText;
     char* blankLabel;
-
-    armyAreaWidth = TOWN_QUICK_ARMY_AREA_WIDTH;
-    leftEdge = ARMY_QUICK_AREA_LEFT;
-    creatureIconWidth = ARMY_QUICK_ICON_SIZE;
-    creatureIconHeight = ARMY_QUICK_ICON_SIZE;
-    on = 1;
-    faceWidget = TOWN_QUICK_PORTRAIT_WIDGET;
-    playerColorWidget = TOWN_QUICK_PLAYER_COLOR_WIDGET;
 
     if (townId == INVALID_HERO) {
         return;
@@ -6815,7 +6789,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, GetTownName(static_cast<i8>(townPtr->m_id)));
+    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, GetTownName(static_cast<i8>(townPtr->m_id)));
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_QUICK_NAME_WIDGET;
     message.payload.widget.data.text = gText;
@@ -6831,8 +6805,8 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN || creatureCount == 0) {
         blankLabel = static_cast<char*>(H2_ALLOC(TOWN_QUICK_EMPTY_LABEL_CAPACITY));
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
-            sprintf(
-                blankLabel,
+            utf8::Copy(
+                blankLabel, TOWN_QUICK_EMPTY_LABEL_CAPACITY,
                 localization::Tr("adventure.quick.unknown")
             );
         } else {
@@ -6865,7 +6839,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
         i32 row2;
         i32 stride;
-        i32 armySlot;
+
         char* troopNames[ARMY_QUICK_SLOT_COUNT];
         i32 fiveShift;
         i32 basePos;
@@ -6892,7 +6866,6 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 break;
         }
 
-        armySlot = 0;
         wIndex = 0;
         creatureSlot = 0;
         stride = TOWN_QUICK_ARMY_AREA_WIDTH / topRow;
@@ -7368,7 +7341,7 @@ void advManager::DoTownKnob(void) {
 void advManager::CastSpell(SpellType spell) {
     hero* hero;
     CreatureType mineGuard;
-    i32 guardianCount;
+
     mapCell* cell;
     i32 power;
     if (gpCurPlayer->m_currentHero != INVALID_HERO) {
@@ -7666,7 +7639,6 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
 }
 
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
-    i32 updateCount;
     i32 tileX;
     i32 drawX;
     i32 tileY;
@@ -8005,11 +7977,9 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     giLimitUpdMinY = COMBO_VIEW_CELLS;
     giLimitUpdMaxX = 0;
     giLimitUpdMaxY = 0;
-    updateCount = 0;
     for (drawY = 0; drawY < COMBO_VIEW_CELLS; ++drawY) {
         for (drawX = 0; drawX < COMBO_VIEW_CELLS; ++drawX) {
             if (bComboDraw[drawX][drawY] != 0) {
-                ++updateCount;
                 if (drawX < giLimitUpdMinX) {
                     giLimitUpdMinX = drawX;
                 }
@@ -8058,7 +8028,7 @@ i32 advManager::ComboDraw(i32 update) {
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundRadius;
     i32 edgeOffset;
-    i32 maxCells = SOUND_CELL_COUNT;
+
     i32 layer;
 
     if (gSoundBackendsReady == 0) {
@@ -8153,7 +8123,6 @@ void advManager::CheckLoadSample(i32 index) {
 
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* cell = m_mapData->GetCell(x, y);
-    AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
     if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
         && (giGroundShape[cell->m_terrainImageIndex] & SOUND_GROUND_SHAPE_MASK)) {
@@ -8336,9 +8305,8 @@ void advManager::TeleportTo(
     H2EnumStorage<TerrainType, i32> terrain;
     mapCell* cellOld2;
     i32 oldCellFlag26;
-    i32 unused;
+
     mapCell* destinationCell29;
-    i32 fizzleTime36;
     town* occupiedTown47;
 
     savedShow = bShowIt;
@@ -8417,10 +8385,6 @@ void advManager::TeleportTo(
         );
         CompleteDraw(0);
         PollSound();
-        fizzleTime36 = TELEPORT_FIZZLE_TIME;
-        if (gbThisNetHumanPlayer[giCurPlayer] == 0) {
-            fizzleTime36 -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
-        }
         gpWindowManager->FizzleForward(
             UPDATE_VIEWPORT_ORIGIN,
             UPDATE_VIEWPORT_ORIGIN,
@@ -8622,8 +8586,8 @@ void advManager::TownGate(SpellType spellId) {
             TOWN_PORTAL_WINDOW_Y,
             "townport.bin"
         );
-        sprintf(
-            gText,
+        utf8::Copy(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("adventure.spell.town_portal.prompt")
         );
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
@@ -8633,7 +8597,7 @@ void advManager::TownGate(SpellType spellId) {
         townPortalWin->BroadcastMessage(message);
 
         for (i = 0; i < gpCurPlayer->m_townCount; ++i) {
-            sprintf(gText, gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_name);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_name);
             message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
             message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_ADD_TOWN;
             message.payload.widget.id = TOWN_PORTAL_CHOICE_WIDGET;
@@ -8712,7 +8676,7 @@ void advManager::SummonBoat(void) {
     i32 foundBoat;
     i32 heroSlot;
     boatRecord* boatRec;
-    mapCell* fromCell;
+
     i32 clipWidth;
     i32 clipX;
     i32 clipY;
@@ -8771,7 +8735,7 @@ void advManager::SummonBoat(void) {
 
         if (foundBoat) {
             boatRec = &gpGame->m_boats[slotIndex];
-            fromCell = GetCell(boatRec->x, boatRec->y);
+
             gpGame->RestoreCell(
                 boatRec->x,
                 boatRec->y,
@@ -9244,7 +9208,7 @@ i32 advManager::MouseInScrollZone(void) {
 }
 
 void advManager::SetInitialMapOrigin(void) {
-    game* gameState;
+
     town* currentTown9;
     playerData* initialPlayer8;
     hero* initialHero5;
@@ -9338,8 +9302,8 @@ void advManager::LoadRemote(void) {
         static i32 cheatWarned = 0;
         if (!cheatWarned) {
             cheatWarned = 1;
-            sprintf(
-                gText,
+            utf8::Copy(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("game.cheats_in_use")
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -9349,7 +9313,7 @@ void advManager::LoadRemote(void) {
         static i32 debugWarned = 0;
         if (!debugWarned) {
             debugWarned = 1;
-            sprintf(gText, localization::Tr("game.debug_level_in_use"));
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("game.debug_level_in_use"));
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
@@ -9588,7 +9552,6 @@ void advManager::DrawAdventureBorder(void) {
         return;
     }
 
-
     screen = gpWindowManager->m_screen->m_pixels;
     savedPixels = m_adventureBorder;
     for (row = 0; row < BORDER_EDGE_SIZE; ++row) {
@@ -9699,7 +9662,7 @@ void ComputeAdvNetControl(void) {
     {
         i32 selected = -1;
         i32 player;
-        i32 myPlayer;
+
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
             while (player != giCurPlayer) {
@@ -9860,12 +9823,6 @@ void advManager::ViewPuzzle(void) {
 }
 
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    i32 unusedPuzzle0;
-    i32 unused1;
-    i32 unused2;
-    i32 unused3;
-    i32 unused4;
-    i32 unused6;
 
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
@@ -10203,7 +10160,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 }
 
 void advManager::SystemOptions(void) {
-    tag_message message;
+
     i32 oldInterfaceMode;
     ConfigWalkSpeed prevWalkSpeed;
     i32 heroMobile;
@@ -10329,7 +10286,7 @@ void UpdateSystemOptions(i32 initialDraw) {
         H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
         msg.payload.widget.data.text =
-            const_cast<char*>(localization::Tr("system.options.do_not_show"));
+            localization::Tr("system.options.do_not_show");
     } else {
         msg.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.computerWalkSpeed)];
     }
@@ -10350,7 +10307,6 @@ void UpdateSystemOptions(i32 initialDraw) {
         cPanel->DrawWindow(1, 0, ADVMGR_SYSTEM_OPTIONS_DRAW_MASK);
     }
 }
-
 
 static inline bool RedbookMusicPresent(void) {
     return true;
@@ -10693,8 +10649,8 @@ i32 advManager::DoVisions(hero* visionHero) {
         && type != CREATURE_EARTH_ELEMENTAL && type != CREATURE_AIR_ELEMENTAL
         && type != CREATURE_FIRE_ELEMENTAL && type != CREATURE_WATER_ELEMENTAL) {
         if (isForced) {
-            sprintf(
-                msg,
+            utf8::Copy(
+                msg, sizeof(msg),
                 localization::Tr("adventure.spell.visions.forced_join")
 
             );
@@ -10750,8 +10706,8 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (fRatio > MONSTER_STRENGTH_FLEE) {
     creaturesFlee:
-        sprintf(
-            msg,
+        utf8::Copy(
+            msg, sizeof(msg),
             localization::Tr("adventure.spell.visions.flee")
 
         );
@@ -10759,8 +10715,8 @@ i32 advManager::DoVisions(hero* visionHero) {
         goto showVision;
     }
 creaturesFight:
-    sprintf(
-        msg,
+    utf8::Copy(
+        msg, sizeof(msg),
         localization::Tr("adventure.spell.visions.fight")
 
     );

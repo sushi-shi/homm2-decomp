@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/expansions.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,7 +153,6 @@ void combatManager::CheckUpdateCombatMessages(void) {
             1
         );
 }
-
 
 static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
 
@@ -330,7 +330,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
             break;
         case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
             if (m_selectedHex == COMBAT_BALLISTA_HEX) {
-                sprintf(gText, cCombatMessage[H2EnumIndex(MESSAGE_TEXT_BALLISTA)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCombatMessage[H2EnumIndex(MESSAGE_TEXT_BALLISTA)]);
             } else {
                 actingMonsterType =
                     m_armies[H2EnumIndex(m_currentArmySide)][m_hexCells[m_selectedHex].m_occupantIndex]
@@ -590,8 +590,6 @@ CopyGridState:
 
 void combatManager::DrawBackground(void) {
     icon* backgroundIcon;
-    i32 unusedBackgroundHeight;
-    i32 unusedBackgroundSide;
 
     if (gbNoShowCombat != 0)
         return;
@@ -894,14 +892,10 @@ void combatManager::DrawFrame(
 ) {
     i32 col;
     CombatDrawLayer row;
-    i32 unusedDrawState1;
+
     H2SteppedEnumStorage<ArmyDrawState, i32> state;
     i32 extentChanged1;
-    i32 unusedDrawState26;
-    i32 unused7;
-    i32 unusedDrawState8;
-    i32 unusedDrawState;
-    i32 gridWasShowing1;
+
     i32 endColumn;
     i32 skipSpecialOccupants8;
     i32 columnStep1;
@@ -1411,7 +1405,7 @@ void combatManager::DrawFrame(
             m_hexCells[moatCell[H2EnumIndex(row)] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
         }
     endRow:
-        gridWasShowing1 = 0;
+
     }
 
     if (gConfig.combatArmyInfoLevel > 0 && m_smallViewSide[0] != COMBAT_SIDE_NONE) {
@@ -1497,10 +1491,10 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
          {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
     };
     i32 oldLimit;
-    i32 unusedSpell1;
+
     army* smallArmy;
     IconDrawResult drawResult1;
-    i32 unusedSlot;
+
     i32 viewX1;
     i32 iconX9;
     i32 spellSlot1;

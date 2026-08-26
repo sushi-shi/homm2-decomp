@@ -203,23 +203,22 @@ void combatManager::DoCompAI(CombatSide) {
     i32 shootStrong;
     u32l myShootPower;
     i32 plan;
-    u32l shootStrengths[COMBAT_SIDE_COUNT];
+
     u32l enemyShooters;
     army* thisArmy;
     u32 oddMasks[COMBAT_SIDE_COUNT];
     CombatHexDirection dirIndex;
     u32l totalArmyStrength;
-    combatManager* combat;
-    i32 fifth;
+
     u32 shooters[COMBAT_SIDE_COUNT];
     i32 archers;
     u32 mirrorMask[COMBAT_SIDE_COUNT];
     i32 rowIndex;
-    i32 archeryBonus;
+
     i32 plusArchers;
     i32 keepStrength;
     i32 grade;
-    town* pCastle;
+
     u8 rowLimit[COMBAT_AI_CASTLE_BOUNDARY_COUNT];
     i32 adjCell;
     hexcell* targetCell;
@@ -242,16 +241,14 @@ void combatManager::DoCompAI(CombatSide) {
     oddMasks[H2EnumIndex(sideEnemy)] = GetOutOfItMask(sideEnemy);
     traitorArray[H2EnumIndex(m_currentSide)] = GetTraitorMask(m_currentSide);
     traitorArray[H2EnumIndex(sideEnemy)] = GetTraitorMask(sideEnemy);
-    shootStrengths[H2EnumIndex(m_currentSide)] = GetStrength(m_currentSide, shooters[H2EnumIndex(m_currentSide)]);
-    shootStrengths[H2EnumIndex(sideEnemy)] = GetStrength(sideEnemy, shooters[H2EnumIndex(sideEnemy)]);
+
     totalArmyStrength = GetStrength(
         m_currentSide,
         shooters[H2EnumIndex(m_currentSide)] | flyerMask[H2EnumIndex(m_currentSide)]
             | walkers[H2EnumIndex(m_currentSide)] | oddMasks[H2EnumIndex(m_currentSide)]
             | traitorArray[H2EnumIndex(m_currentSide)]
     );
-    fifth = static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
-                         / COMBAT_AI_STRENGTH_FRACTION;
+
     shootStrong = 0;
     stronger = 0;
     myShootPower = GetStrength(m_currentSide, shooters[H2EnumIndex(m_currentSide)]);
@@ -269,7 +266,7 @@ void combatManager::DoCompAI(CombatSide) {
                     static_cast<i32>(enemyShooters) / COMBAT_SIDE_COUNT;
         }
         if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING) {
-            pCastle = m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)];
+
             m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&archers, &grade);
             plusArchers = 0;
             if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)]
@@ -283,14 +280,7 @@ void combatManager::DoCompAI(CombatSide) {
                 archers * COMBAT_AI_TOWER_STRENGTH
                 * (grade * COMBAT_AI_TOWER_LEVEL_SCALE + COMBAT_AI_TOWER_BASE_SCALE)
             );
-            archeryBonus =
-                m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != NULL
-                        && (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
-                            || m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]
-                                       ->m_secondarySkills[H2EnumIndex(HERO_SKILL_ARCHERY)]
-                                   != HERO_SKILL_LEVEL_NONE)
-                    ? 0
-                    : 1;
+
             if (m_currentSide == COMBAT_DEFENDER_SIDE)
                 myShootPower += keepStrength;
             else
@@ -890,7 +880,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 oneBit;
     u32 enemyMask;
     CombatHexDirection direction;
-    i32 hexes;
+
     i32 enemyArmy;
     i32 destHex;
 
@@ -934,7 +924,7 @@ i32 combatManager::WalkTowardArmyFront(
     i32 frontDelta;
     i32 frontHex;
     i32 oldSpeed;
-    i32 pathFound;
+
     i32 left;
     i32 step;
 
@@ -955,7 +945,7 @@ i32 combatManager::WalkTowardArmyFront(
 
     oldSpeed = currentArmy->m_monster.speed;
     currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    pathFound = gpSearchArray->FindCombatPath(
+    gpSearchArray->FindCombatPath(
         currentArmy->m_hex,
         frontHex,
         currentArmy,
@@ -996,7 +986,6 @@ i32 combatManager::WalkTowardArmy(
     i32 pathNdx;
     army* targetPtr;
     i32 targetSquare;
-    i32 path;
 
     targetStack = GetClosestArmy(currentArmy, side, mask);
 

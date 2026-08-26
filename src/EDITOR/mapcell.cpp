@@ -31,7 +31,7 @@ void fullMap::Close(void) {
 }
 
 void fullMap::Init(i32 w, i32 h) {
-    i32 n;
+
     width = w;
     height = h;
     Close();
@@ -188,7 +188,6 @@ void fullMap::ChangeTilesetIndex(
     i32 idx;
     mapCellExtra* ptr;
     TilesetId t;
-    i32 a;
 
     ptr = NULL;
     t = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;

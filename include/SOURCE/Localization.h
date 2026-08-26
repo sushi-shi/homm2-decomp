@@ -36,10 +36,14 @@ void UseEnglish(const char* reason);
 // resources and rejects only catalogs that require the unavailable profile.
 void RejectResourceProfile(const char* reason);
 
-// Migration bridge for recovered global char* tables. New code should use
+// Migration bridge for recovered global text tables. New code should use
 // Tr() directly.
-std::size_t ApplyLegacyTable(const char* idPrefix, char** values, std::size_t count);
-std::size_t ApplyLegacyString(const char* id, char*& value);
+std::size_t ApplyLegacyTable(
+    const char* idPrefix,
+    const char** values,
+    std::size_t count
+);
+std::size_t ApplyLegacyString(const char* id, const char*& value);
 void LocalizeLegacyTables();
 
 // Translate data-file text only while it still matches the catalog's
