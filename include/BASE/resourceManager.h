@@ -35,7 +35,7 @@ public:
     i32 m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];
     aggEntry* m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];
     i32 m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];
-    i32 m_expunging;
+    b32 m_expunging;
     i32 m_reserved;
     char m_lastFileName[RESOURCE_MANAGER_FILENAME_CAPACITY];
     i32 m_lastFileId;

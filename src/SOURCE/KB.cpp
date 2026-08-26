@@ -3907,7 +3907,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             }
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
                 gpCombatManager->m_debugFormation = command - APP_MENU_COMBAT_FIRST;
-                gpCombatManager->m_backgroundDrawn = 0;
+                gpCombatManager->m_backgroundDrawn = false;
                 for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
                     gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;

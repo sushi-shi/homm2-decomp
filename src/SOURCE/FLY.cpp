@@ -237,16 +237,16 @@ i32 army::FlyTo(i32 destination) {
     column = m_hex % ARMY_HEX_COLUMNS;
     toColumn1 = destination % ARMY_HEX_COLUMNS;
     columnDelta1 = toColumn1 - column;
-    m_facingChanged = 0;
+    m_facingChanged = false;
     if (columnDelta1 > 0 && m_facing == ARMY_FACING_LEFT) {
-        m_facingChanged = 1;
+        m_facingChanged = true;
         m_facing = OppositeArmyFacing(m_facing);
         if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             m_hex--;
             destination--;
         }
     } else if (columnDelta1 < 0 && m_facing == ARMY_FACING_RIGHT) {
-        m_facingChanged = 1;
+        m_facingChanged = true;
         m_facing = OppositeArmyFacing(m_facing);
         if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             m_hex++;
@@ -302,7 +302,7 @@ i32 army::FlyTo(i32 destination) {
             ARMY_COMBAT_WIDTH,
             ARMY_COMBAT_MAX_Y
         );
-        gpCombatManager->m_backgroundDrawn = 0;
+        gpCombatManager->m_backgroundDrawn = false;
         m_animationSequence = ARMY_ANIMATION_WALK;
         for (leg = 0; leg < stepCount1; leg++) {
             BuildTempWalkSeq(
@@ -461,7 +461,7 @@ i32 army::FlyTo(i32 destination) {
                 destination--;
             }
         }
-        m_facingChanged = 0;
+        m_facingChanged = false;
     }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     gpCombatManager->TestRaiseDoor();

@@ -213,14 +213,14 @@ army::army(void) {
     for (sampleType = ARMY_SAMPLE_MOVE; sampleType < ARMY_SAMPLE_COUNT; sampleType++) {
         m_samples[H2EnumIndex(sampleType)] = NULL;
     }
-    m_drawEnabled = 1;
+    m_drawEnabled = true;
     m_targetSide = COMBAT_SIDE_NONE;
     m_targetIndex = -1;
     m_attackDirection = COMBAT_DIRECTION_INVALID;
     m_unknown5e = 0;
     m_moveTargetHex = 0;
     m_palette = NULL;
-    m_showQuantity = 1;
+    m_showQuantity = true;
     m_yOffset = 0;
     m_xOffset = 0;
 }
@@ -239,9 +239,9 @@ void army::InitClean(void) {
     m_spellCount = 0;
     memset(m_spellInfluence, 0, sizeof(m_spellInfluence));
     m_lastAnimationTime = platform::Ticks();
-    m_drawEnabled = 1;
+    m_drawEnabled = true;
     m_creatureIcon = NULL;
-    m_drawSpellEffect = 0;
+    m_drawSpellEffect = false;
     m_spellEffect = SPELL_NONE;
     m_mirrorSourceIndex = -1;
     m_mirrorImageIndex = -1;
@@ -279,9 +279,9 @@ void army::Init(
     m_animationState = 0;
     m_hitPointsLost = 0;
     m_damagePenalty = ARMY_DAMAGE_PENALTY_NONE;
-    m_killPending = 0;
-    m_deathPending = 0;
-    m_damagePending = 0;
+    m_killPending = false;
+    m_deathPending = false;
+    m_damagePending = false;
     m_side = side;
     m_index = index;
     m_morale = gpCombatManager->m_armyGroups[H2EnumIndex(m_side)]->GetMorale(
@@ -381,7 +381,7 @@ void army::LoadResources(void) {
         if (m_samples[i]) {
             m_samples[i]->m_playbackData.volume = ARMY_SAMPLE_VOLUME;
             m_samples[i]->m_playbackData.channelType = ARMY_SAMPLE_CHANNEL;
-            m_samples[i]->m_playbackData.loopCount = 0;
+            m_samples[i]->m_playbackData.loopCount = false;
         }
     }
 }
@@ -719,17 +719,17 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
     tempRight = giMaxExtentX;
     tempBottom = giMaxExtentY;
 
-    m_facingChanged = 0;
+    m_facingChanged = false;
     if (direction < COMBAT_DIRECTION_SOUTHWEST) {
         if (m_facing == ARMY_FACING_LEFT) {
-            m_facingChanged = 1;
+            m_facingChanged = true;
             m_facing = OppositeArmyFacing(m_facing);
             if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
                 m_hex--;
             }
         }
     } else if (m_facing == ARMY_FACING_RIGHT) {
-        m_facingChanged = 1;
+        m_facingChanged = true;
         m_facing = OppositeArmyFacing(m_facing);
         if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
             m_hex++;
@@ -765,7 +765,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
                 ARMY_COMBAT_HEIGHT
             );
         }
-        gpCombatManager->m_backgroundDrawn = 0;
+        gpCombatManager->m_backgroundDrawn = false;
     }
 
     if (!gbNoShowCombat) {
@@ -821,9 +821,9 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
             gbCurrArmyDrawn = false;
             gbComputeExtent = true;
             gbLimitToExtent = true;
-            m_drawEnabled = 0;
+            m_drawEnabled = false;
             gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 0, 1);
-            m_drawEnabled = 1;
+            m_drawEnabled = true;
             gbLimitToExtent = false;
             gbComputeExtent = false;
             gbCurrArmyDrawn = true;
@@ -886,7 +886,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
                 m_hex--;
             }
         }
-        m_facingChanged = 0;
+        m_facingChanged = false;
     }
     giWalkingFrom = -1;
     giWalkingFrom2 = -1;
@@ -1414,7 +1414,7 @@ void army::DoHydraAttack(i32) {
                     gpCombatManager->m_limitCreatureCount[H2EnumIndex(occupantSide)][armyIndex]++;
                     pTarget = &gpCombatManager->m_armies[H2EnumIndex(occupantSide)][armyIndex];
                     if (!pTarget->m_hitByCreature) {
-                        pTarget->m_hitByCreature = 1;
+                        pTarget->m_hitByCreature = true;
                         DamageEnemy(pTarget, &damage, &killedNow, 0, 0);
                         totDamage += damage;
                         totKilled += killedNow;
@@ -2134,9 +2134,9 @@ i32 army::Damage(i32l damage, SpellType spell) {
     if (!quantityFifth) {
         quantityFifth = 1;
     }
-    m_damagePending = 1;
+    m_damagePending = true;
     if (killed > 0) {
-        m_killPending = 1;
+        m_killPending = true;
         m_lastTargetHex = m_quantity;
     }
     if (killed > m_quantity) {
@@ -2144,7 +2144,7 @@ i32 army::Damage(i32l damage, SpellType spell) {
     }
     m_quantity -= killed;
     if (m_quantity <= 0) {
-        m_deathPending = 1;
+        m_deathPending = true;
     }
     oldFacing = m_facing;
     m_facing = static_cast<ArmyFacing>(
@@ -2306,7 +2306,7 @@ void army::PowEffect(
             current = &gpCombatManager->m_armies[H2EnumIndex(sideNum)][armyIndex];
             current->m_effectAnimationStart = ARMY_ANIMATION_NONE;
             current->m_effectAnimationEnd = ARMY_ANIMATION_NONE;
-            current->m_effectAnimationStarted = 0;
+            current->m_effectAnimationStarted = false;
             if (current->m_damagePending || static_cast<u8>(current->m_animationState)) {
                 if (static_cast<u8>(current->m_animationState)) {
                     current->m_effectAnimationStart = m_pendingAnimationSequence;
@@ -2398,7 +2398,7 @@ void army::PowEffect(
                                 && current->m_animationSequence != ARMY_ANIMATION_DEATH) {
                                 current->m_animationSequence = ARMY_ANIMATION_STAND;
                                 current->m_animationFrame = 0;
-                                current->m_effectAnimationStarted = 1;
+                                current->m_effectAnimationStarted = true;
                             }
                         }
                     }
@@ -2527,9 +2527,9 @@ void army::PowEffect(
                 );
                 current->m_spellEffect = SPELL_NONE;
             }
-            current->m_drawSpellEffect = 0;
-            current->m_damagePending = 0;
-            current->m_killPending = 0;
+            current->m_drawSpellEffect = false;
+            current->m_damagePending = false;
+            current->m_killPending = false;
             current->m_drawState = ARMY_DRAW_NORMAL;
             current->m_animationState = 0;
             current->m_lastTargetHex = -1;
@@ -2569,7 +2569,7 @@ void army::ProcessDeath(i32 immediate) {
         gpCombatManager->m_heroAlternateDeathPending[H2EnumIndex(OppositeCombatSide(m_side))] = 1;
     }
     m_monster.attributes |= MONSTER_ATTRIBUTE_DEAD;
-    m_deathPending = 0;
+    m_deathPending = false;
     frontCell_1 = &gpCombatManager->m_hexCells[m_hex];
     rearHex = 0;
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
@@ -2655,7 +2655,7 @@ void army::SpellEffect(
         }
     }
     frame = 0;
-    m_drawSpellEffect = 1;
+    m_drawSpellEffect = true;
     m_spellEffectYOffset = 0;
     if (!gbNoShowCombat) {
         smallestY = EFFECT_MINIMUM_Y;
@@ -2700,7 +2700,7 @@ void army::SpellEffect(
             DelayTil(&glTimers[1]);
         }
     }
-    m_drawSpellEffect = 0;
+    m_drawSpellEffect = false;
     if (!gbNoShowCombat) {
         if (animateCreature) {
             frameDelay = ARMY_SPELL_EFFECT_ANIMATION_DURATION
@@ -3041,7 +3041,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
     hexcell* adjacentCell;
 
 again:
-    gpCombatManager->m_limitCreature = 0;
+    gpCombatManager->m_limitCreature = false;
     m_targetSide = COMBAT_SIDE_NONE;
     m_targetIndex = -1;
     if (!ValidHex(destination)) {
@@ -3121,7 +3121,7 @@ again:
     } else {
         WalkTo(destination);
     }
-    gpCombatManager->m_limitCreature = 1;
+    gpCombatManager->m_limitCreature = true;
 }
 
 float army::SpellCastWorkChance(SpellType spell) {
