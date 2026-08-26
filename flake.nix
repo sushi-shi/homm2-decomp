@@ -125,8 +125,6 @@
           mkdir -p "$out/bin/lang"
           cp lang/*.mo "$out/bin/lang/"
           ln -s bin/HMM2PL.exe "$out/HMM2PL.exe"
-          cp ${./run-game.sh} "$out/run-game.sh"
-          chmod +x "$out/run-game.sh"
           runHook postInstall
         '';
       };
