@@ -54,7 +54,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master (you are here) --------> ironfist
+                    master (you are here) --------> ironfist --------> ironfist-master
 ```
 
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
@@ -69,6 +69,8 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
   stored as Windows-1251 with readable Russian literals rather than UTF-8.
 - `master` is the cross-platform Linux, Windows, and Web port.
 - `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
+- `ironfist-master` is the maintained integration with narrow extension
+  boundaries and mechanics in their owning engine classes.
 
 The classic branches are terminal views of their corresponding reconstruction;
 they do not feed Gold or `master`.
@@ -99,6 +101,24 @@ nix build .#homm2-linux
 nix build .#homm2-windows
 nix build .#homm2-web
 ```
+
+## Icon decoder model
+
+[`tools/homm2-icon-rs`](tools/homm2-icon-rs) contains a dependency-free Rust
+model of the ICN decoder and blitter family. It is a research and differential-
+testing tool rather than part of the game runtime. Enter its pinned Rust
+nightly toolchain and run the checks from that directory:
+
+```sh
+nix develop ../..#icon
+cargo test --all-targets
+cargo test --doc
+cargo clippy --all-targets -- -D warnings
+cargo fmt --check
+```
+
+The parity tests compile the repository's ten reconstructed C++ decoder units
+and compare them with the Rust model over generated valid streams.
 
 ### Building without Nix
 

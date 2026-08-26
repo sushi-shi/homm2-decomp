@@ -2,13 +2,22 @@
   description = "Heroes of Might and Magic II - Gold 2.1 (Buka) reconstruction";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/64c08a7ca051951c8eae34e3e3cb1e202fe36786";
+  inputs.rust-overlay = {
+    url = "github:oxalica/rust-overlay";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, rust-overlay }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ rust-overlay.overlays.default ];
+      };
       p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
+      iconRust = pkgs.rust-bin.fromRustupToolchainFile
+        ./tools/homm2-icon-rs/rust-toolchain.toml;
       # Only what the build reads. Everything else - docs, the README, the
       # flake itself - would otherwise rebuild all three targets when touched.
       source = builtins.path {
@@ -307,9 +316,14 @@
         };
       };
 
-      devShells.${system}.default = p32.mkShell {
-        nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
-        buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
+      devShells.${system} = {
+        default = p32.mkShell {
+          nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
+          buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
+        };
+        icon = pkgs.mkShell {
+          packages = [ iconRust pkgs.clang ];
+        };
       };
     };
 }
