@@ -10350,9 +10350,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED
-                                && static_cast<bool>(IsAudiereBackend(gpSoundManager)
-                                                     || IsMilesBackend(gpSoundManager))
-                                       == false) {
+                                && !IsSoundBackendActive(gpSoundManager)) {
                                 NormalDialog(
                                     localization::Tr("system.audio.digital_sound_unavailable")
                                          ,
@@ -10397,7 +10395,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_MUSIC_SOURCE:
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                                if (!gpSoundManager->CDStartup()) {
+                                if (!gpSoundManager->StartupCdBackend()) {
                                     NormalDialog(
                                         localization::Tr("system.audio.cd_playback_unavailable"),
                                         OPTION_DIALOG_MESSAGE,
@@ -10418,7 +10416,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
                                 if (!MusicFlagsActive()) {
-                                    gpSoundManager->StartupMilesBackend();
+                                    gpSoundManager->StartupMidiBackend();
                                 }
                                 if (GetMusicFlagA() == 0) {
                                     gConfig.useOpera =
