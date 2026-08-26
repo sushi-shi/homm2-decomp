@@ -33,6 +33,18 @@ def _var_cursor(path, start, end, *, spelling="value", mangled="?value@@3HA",
 
 
 class AnnotatedDataTest(unittest.TestCase):
+    def test_external_source_root_does_not_inherit_repository_masm_claims(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source_root = Path(directory) / "fixture"
+            source_root.mkdir()
+            repo = Path(directory) / "repo"
+            (repo / "src/BASE").mkdir(parents=True)
+            (repo / "src/BASE/TILE.asm").touch()
+
+            rows = source_definitions(source_root, repo)
+
+        self.assertEqual(rows, [])
+
     def test_clang_args_include_vendor_headers_with_stale_database(self):
         with tempfile.TemporaryDirectory() as directory:
             repo = Path(directory)

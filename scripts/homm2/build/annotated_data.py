@@ -325,14 +325,15 @@ def source_definitions(source_root: Path, repo: Path, object_root: Path | None =
                           for field in AnnotatedDataDefinition.__dataclass_fields__}
                          for row in values],
             }
-    for unit, source, claim in fixed_asm_claims("data"):
-        if (repo / source).is_file():
-            name = claim.name.removeprefix("_")
-            rows.append(AnnotatedDataDefinition(
-                unit=unit, name=name, qualified_name=name,
-                rva=claim.rva, size=claim.size, location=source,
-                is_static=True, symbol=claim.name,
-            ))
+    if source_root.resolve() == (repo / "src").resolve():
+        for unit, source, claim in fixed_asm_claims("data"):
+            if (repo / source).is_file():
+                name = claim.name.removeprefix("_")
+                rows.append(AnnotatedDataDefinition(
+                    unit=unit, name=name, qualified_name=name,
+                    rva=claim.rva, size=claim.size, location=source,
+                    is_static=True, symbol=claim.name,
+                ))
     if cache_path is not None:
         _write_inventory_cache(cache_path, retained)
     identities = {(row.unit, row.rva) for row in rows}

@@ -9,6 +9,18 @@ from homm2.build.annotated_functions import (
 
 
 class AnnotatedFunctionsTest(unittest.TestCase):
+    def test_external_source_root_does_not_inherit_repository_masm_claims(self):
+        with TemporaryDirectory() as temporary:
+            repo = Path(temporary) / "repo"
+            (repo / "src/BASE").mkdir(parents=True)
+            (repo / "src/BASE/BITS.asm").touch()
+            source_root = Path(temporary) / "fixture"
+            source_root.mkdir()
+
+            spans = source_function_spans(source_root, repo)
+
+        self.assertEqual(spans, [])
+
     def test_static_va_function_uses_microsoft_fastcall_mangling(self):
         with TemporaryDirectory() as temporary:
             repo = Path(temporary)

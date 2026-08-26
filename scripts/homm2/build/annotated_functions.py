@@ -153,11 +153,12 @@ def source_function_spans(source_root: Path,
                 size=size,
                 location=f"{path.relative_to(repo).as_posix()}:{line}",
             ))
-    for unit, source, claim in fixed_asm_claims("func"):
-        if (repo / source).is_file():
-            rows.append(AnnotatedFunctionSpan(
-                unit=unit, rva=claim.rva, size=claim.size, location=source,
-            ))
+    if source_root == (repo / "src").resolve():
+        for unit, source, claim in fixed_asm_claims("func"):
+            if (repo / source).is_file():
+                rows.append(AnnotatedFunctionSpan(
+                    unit=unit, rva=claim.rva, size=claim.size, location=source,
+                ))
     identities = {row.rva for row in rows}
     if len(identities) != len(rows):
         raise ValueError("duplicate source function RVA")
