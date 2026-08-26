@@ -1348,13 +1348,17 @@ i32 ExpCampaign::CampaignID(void) {
 char* ExpCampaign::JosephName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xJosephName[0];
-    return xStableText[H2EnumIndex(m_currentMap)];
+    return xJosephName[
+        H2EnumIndex(m_currentMap) - H2EnumIndex(EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
+    ];
 }
 
 char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xUncleIvanName[0];
-    return xStableText[H2EnumIndex(m_currentMap) + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
+    return xUncleIvanName[
+        H2EnumIndex(m_currentMap) - H2EnumIndex(EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
+    ];
 }
 
 i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
