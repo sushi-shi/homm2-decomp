@@ -18,7 +18,7 @@ Usage:
     homm2 clean --classic-from ../homm2-decomp-master \
         --out build/classic
     homm2 clean --classic-from ../source-gold-2.1-buka \
-        --classic-encoding cp1251 --out build/classic-gold
+        --classic-russian --out build/classic-gold
 """
 
 from __future__ import annotations
@@ -1249,14 +1249,14 @@ def classicize(
 
 
 def materialize_cp1251_literals(text: str) -> tuple[str, int]:
-    """Render escaped retail bytes as readable CP1251 source characters.
+    """Render escaped retail CP1251 bytes as readable Unicode characters.
 
     Only complete two-digit high-byte ``\\xNN`` escapes inside C/C++ string
     and character literals are eligible. Escaped backslashes stay escaped and
     longer hexadecimal escapes retain their original C++ maximal-munch
-    meaning. Encoding the returned text as CP1251 therefore preserves the
-    literal byte stream while exposing Russian text to readers of the classic
-    Gold branch.
+    meaning. Encoding the returned literal text as CP1251 would reproduce the
+    retail byte stream, while storing this returned text as UTF-8 keeps the
+    classic Gold reading view legible on source hosts such as GitHub.
     """
     pieces: list[str] = []
     replacements = 0
@@ -1631,123 +1631,28 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
     return sources, overrides, debris
 
 
-def _configure_cp1251_classic_build(out_root: Path) -> None:
-    def replace_once(text: str, old: str, new: str, label: str) -> str:
-        if text.count(old) != 1:
-            raise SystemExit(f"CP1251 classic build template moved: {label}")
-        return text.replace(old, new, 1)
-
-    ninja_path = out_root / "build.ninja"
-    ninja = ninja_path.read_text(encoding="utf-8")
-    ninja = replace_once(
-        ninja,
-        "cxx = clang++",
-        "cxx = i686-w64-mingw32-g++",
-        "build.ninja compiler",
-    )
-    ninja = replace_once(
-        ninja,
-        "cxxflags = ",
-        "cxxflags = -finput-charset=CP1251 -fexec-charset=CP1251 ",
-        "build.ninja compiler flags",
-    )
-    if ninja.count("-fsjlj-exceptions ") != 2:
-        raise SystemExit("CP1251 classic build template moved: exception flags")
-    ninja = ninja.replace("-fsjlj-exceptions ", "")
-    ninja = replace_once(
-        ninja,
-        "$builddir/imports/AUDIERE_aliases.o "
-        "$builddir/imports/MSS32_aliases.o",
-        "$builddir/imports/MSS32_aliases.o",
-        "build.ninja Audiere aliases",
-    )
-    ninja_path.write_text(ninja, encoding="utf-8")
-
-    audiere_path = out_root / "imports/AUDIERE.def"
-    audiere = ["LIBRARY audiere.dll", "EXPORTS"]
-    audiere += [f"  {symbol[1:]} = {symbol}" for symbol in AUDIERE_IMPORTS]
-    audiere_path.write_text("\n".join(audiere) + "\n", encoding="utf-8")
-
-    mss_path = out_root / "imports/MSS32.def"
-    mss = ["LIBRARY mss32.dll", "EXPORTS"]
-    mss += [f"  {symbol[1:]} = {symbol}" for symbol in MSS_IMPORTS]
-    mss_path.write_text("\n".join(mss) + "\n", encoding="utf-8")
-
-    for relative, old, new in (
-        (
-            "include/BASE/textWidget.h",
-            "virtual inline ~textWidget",
-            "virtual ~textWidget",
-        ),
-        (
-            "include/BASE/textEntryWidget.h",
-            "virtual inline ~textEntryWidget",
-            "virtual ~textEntryWidget",
-        ),
-        (
-            "src/BASE/TEXTWDGT.cpp",
-            "inline textWidget::~textWidget",
-            "textWidget::~textWidget",
-        ),
-        (
-            "src/BASE/Textntry.cpp",
-            "inline textEntryWidget::~textEntryWidget",
-            "textEntryWidget::~textEntryWidget",
-        ),
-    ):
-        path = out_root / relative
-        text = path.read_text(encoding="cp1251")
-        if text.count(old) != 1:
-            raise SystemExit(f"classic inline definition moved: {relative}: {old}")
-        path.write_bytes(text.replace(old, new, 1).encode("cp1251"))
-
-    flake_path = out_root / "flake.nix"
-    flake = flake_path.read_text(encoding="utf-8")
-    flake = replace_once(
-        flake,
-        "mingw.clangStdenv.mkDerivation",
-        "mingw.gccStdenv.mkDerivation",
-        "flake compiler environment",
-    )
-    flake = replace_once(
-        flake,
-        'sed -i "s|^cxx = clang++$|cxx = $CXX|" build.ninja',
-        'sed -i "s|^cxx = i686-w64-mingw32-g++$|cxx = $CXX|" build.ninja',
-        "flake compiler rewrite",
-    )
-    flake = replace_once(
-        flake,
-        'sed -i "s|--target=i686-w64-windows-gnu ||g" build.ninja',
-        'sed -i "s|--target=i686-w64-windows-gnu ||g" build.ninja\n'
-        '          sed -i "s|-fuse-ld=lld ||g" build.ninja',
-        "flake linker rewrite",
-    )
-    flake_path.write_text(flake, encoding="utf-8")
-
-
-def verify_cp1251_tree(out_root: Path) -> tuple[int, int]:
-    """Require readable Cyrillic and prove the C/C++ tree is not UTF-8."""
+def verify_utf8_russian_tree(out_root: Path) -> tuple[int, int]:
+    """Require a valid UTF-8 C/C++ tree containing readable Cyrillic."""
     cyrillic = 0
-    non_utf8_files = 0
+    source_files = 0
     for path in sorted(out_root.rglob("*")):
         if not path.is_file() or path.suffix not in (".h", ".cpp"):
             continue
-        raw = path.read_bytes()
-        decoded = raw.decode("cp1251")
-        cyrillic += sum("\u0400" <= character <= "\u04ff" for character in decoded)
+        source_files += 1
         try:
-            raw.decode("utf-8")
-        except UnicodeDecodeError:
-            non_utf8_files += 1
-    if cyrillic == 0 or non_utf8_files == 0:
-        raise SystemExit("classic Gold source is not a readable non-UTF8 CP1251 tree")
-    return cyrillic, non_utf8_files
+            decoded = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as error:
+            raise SystemExit(f"classic source is not UTF-8: {path}") from error
+        cyrillic += sum("\u0400" <= character <= "\u04ff" for character in decoded)
+    if cyrillic == 0:
+        raise SystemExit("classic Gold source contains no readable Russian text")
+    return cyrillic, source_files
 
 
 def generate_classic(
     source_root: Path,
     out_root: Path,
-    encoding: str = "utf-8",
+    readable_russian: bool = False,
 ) -> tuple[int, int, list[str]]:
     source_root = source_root.resolve()
     if not (source_root / ".git").exists():
@@ -1794,26 +1699,23 @@ def generate_classic(
                 relative_text,
                 modern_enums,
             )
-            if encoding == "cp1251":
+            if readable_russian:
                 text, count = materialize_cp1251_literals(text)
                 materialized += count
-                target.write_bytes(text.encode("cp1251"))
-            else:
-                target.write_text(text, encoding="utf-8")
+            target.write_text(text, encoding="utf-8")
             transformed += 1
         else:
             shutil.copyfile(source, target)
             target.chmod(source.stat().st_mode)
 
-    if encoding == "cp1251":
+    if readable_russian:
         if materialized == 0:
-            raise SystemExit("CP1251 classic tree contains no materialized high-byte literals")
-        _configure_cp1251_classic_build(out_root)
-        cyrillic, non_utf8_files = verify_cp1251_tree(out_root)
+            raise SystemExit("classic Gold source contains no materialized Russian literals")
+        cyrillic, source_files = verify_utf8_russian_tree(out_root)
         print(f"[clean] materialized {materialized} CP1251 literal bytes")
         print(
             f"[clean] verified {cyrillic} Cyrillic characters across "
-            f"{non_utf8_files} non-UTF8 C/C++ files"
+            f"{source_files} UTF-8 C/C++ files"
         )
 
     return transformed, 0, []
@@ -1845,10 +1747,7 @@ def residue(out_root: Path) -> dict[str, int]:
     for path in sorted(out_root.rglob("*")):
         if not path.is_file() or path.suffix not in (".h", ".cpp"):
             continue
-        try:
-            text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            text = path.read_text(encoding="cp1251")
+        text = path.read_text(encoding="utf-8")
         i, n = 0, len(text)
         while i < n:
             if text[i:i + 2] in ("//", "/*"):
@@ -2205,10 +2104,9 @@ def main(argv: list[str] | None = None) -> int:
         help="derive a classic integer-enum tree from an existing clean worktree",
     )
     parser.add_argument(
-        "--classic-encoding",
-        choices=("utf-8", "cp1251"),
-        default="utf-8",
-        help="source encoding for a classic tree (Gold/Buka uses cp1251)",
+        "--classic-russian",
+        action="store_true",
+        help="render Gold/Buka CP1251 literal bytes as readable UTF-8 Russian",
     )
     args = parser.parse_args(argv)
     requested = (REPO / args.out) if not Path(args.out).is_absolute() else Path(args.out)
@@ -2221,15 +2119,15 @@ def main(argv: list[str] | None = None) -> int:
         else REPO
     )
     classic = args.classic_from is not None
-    if not classic and args.classic_encoding != "utf-8":
-        parser.error("--classic-encoding requires --classic-from")
+    if not classic and args.classic_russian:
+        parser.error("--classic-russian requires --classic-from")
     if args.publish_parent and not args.publish:
         parser.error("--publish-parent requires --publish")
     if classic:
         sources, overrides, debris = generate_classic(
             source_root,
             out_root,
-            encoding=args.classic_encoding,
+            readable_russian=args.classic_russian,
         )
     else:
         sources, overrides, debris = generate(out_root)

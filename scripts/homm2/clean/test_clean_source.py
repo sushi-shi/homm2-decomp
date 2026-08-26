@@ -378,17 +378,17 @@ class ClassicSourceTests(unittest.TestCase):
             "#endif\n",
         )
 
-    def test_cp1251_literals_are_readable_without_changing_bytes(self):
+    def test_cp1251_literals_become_readable_utf8_without_changing_meaning(self):
         source = (
             'const char* text = "\\xcf\\xf0\\xe8\\xe2\\xe5\\xf2";\n'
             "char yo = '\\xa8';\n"
         )
         transformed, count = clean_source.materialize_cp1251_literals(source)
-        encoded = transformed.encode("cp1251")
         self.assertEqual(count, 7)
-        self.assertIn('"Привет"'.encode("cp1251"), encoded)
-        self.assertIn("'Ё'".encode("cp1251"), encoded)
-        self.assertNotIn(b"\\xcf", encoded)
+        self.assertIn('"Привет"'.encode("utf-8"), transformed.encode("utf-8"))
+        self.assertIn("'Ё'".encode("utf-8"), transformed.encode("utf-8"))
+        self.assertIn('"Привет"'.encode("cp1251"), transformed.encode("cp1251"))
+        self.assertNotIn(b"\\xcf", transformed.encode("utf-8"))
 
     def test_cp1251_literal_transform_preserves_escape_meaning(self):
         source = (
@@ -400,58 +400,17 @@ class ClassicSourceTests(unittest.TestCase):
         transformed, count = clean_source.materialize_cp1251_literals(source)
         self.assertEqual((transformed, count), (source, 0))
 
-    def test_cp1251_tree_verification_rejects_utf8(self):
+    def test_utf8_russian_tree_verification_rejects_cp1251(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             (output / "src").mkdir()
             source = output / "src/example.cpp"
             source.write_text('const char* text = "Привет";\n', encoding="utf-8")
-            with self.assertRaisesRegex(SystemExit, "non-UTF8 CP1251"):
-                clean_source.verify_cp1251_tree(output)
+            cyrillic, source_files = clean_source.verify_utf8_russian_tree(output)
+            self.assertEqual((cyrillic, source_files), (6, 1))
             source.write_bytes('const char* text = "Привет";\n'.encode("cp1251"))
-            cyrillic, non_utf8_files = clean_source.verify_cp1251_tree(output)
-            self.assertEqual((cyrillic, non_utf8_files), (6, 1))
-
-    def test_cp1251_classic_uses_direct_gcc_audiere_imports(self):
-        source = Path(clean_source.REPO)
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory)
-            for relative in (
-                "include/BASE/textWidget.h",
-                "include/BASE/textEntryWidget.h",
-                "src/BASE/TEXTWDGT.cpp",
-                "src/BASE/Textntry.cpp",
-            ):
-                target = output / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes((source / relative).read_bytes())
-            clean_source.write_ninja(output)
-            (output / "flake.nix").write_text(
-                (source / "scripts/homm2/clean/project/flake.nix").read_text()
-            )
-            imports = output / "imports"
-            imports.mkdir()
-            (imports / "AUDIERE.def").write_text("unused\n")
-            (imports / "MSS32.def").write_text("unused\n")
-
-            clean_source._configure_cp1251_classic_build(output)
-
-            audiere = (imports / "AUDIERE.def").read_text()
-            self.assertIn(
-                "  AdrOpenDevice@8 = _AdrOpenDevice@8\n",
-                audiere,
-            )
-            self.assertIn(
-                "  AdrOpenSampleSource@4 = _AdrOpenSampleSource@4\n",
-                audiere,
-            )
-            ninja = (output / "build.ninja").read_text()
-            link = next(
-                line for line in ninja.splitlines()
-                if line.startswith("build $builddir/HMM2PL.exe: link ")
-            )
-            self.assertNotIn("AUDIERE_aliases.o", link)
-            self.assertIn("MSS32_aliases.o", link)
+            with self.assertRaisesRegex(SystemExit, "not UTF-8"):
+                clean_source.verify_utf8_russian_tree(output)
 
 
 class CleanSourceOutputSafetyTests(unittest.TestCase):
