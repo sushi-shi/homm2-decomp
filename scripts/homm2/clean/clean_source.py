@@ -2151,17 +2151,28 @@ def stranded(source: str, cleaned: str) -> list[tuple[int, str]]:
 
 
 def verify(out_root: Path) -> int:
-    """Build the generated Windows executable with Ninja."""
+    """Build the generated Windows executable through its pinned Nix flake."""
     import subprocess
 
     result = subprocess.run(
-        ("ninja", "-C", str(out_root), "game"),
+        (
+            "nix", "build", "--no-link", "--print-out-paths",
+            f"path:{out_root.resolve()}",
+        ),
         check=False,
+        capture_output=True,
+        text=True,
     )
     if result.returncode != 0:
+        if result.stderr:
+            print(result.stderr.rstrip(), file=sys.stderr)
         return result.returncode
 
-    executable = out_root / "build/HMM2PL.exe"
+    outputs = result.stdout.splitlines()
+    if len(outputs) != 1:
+        print("[clean] verify: Nix did not return one output path", file=sys.stderr)
+        return 1
+    executable = Path(outputs[0]) / "HMM2PL.exe"
     symbols = subprocess.run(
         ("llvm-nm", "-C", str(executable)),
         check=False,
@@ -2172,7 +2183,7 @@ def verify(out_root: Path) -> int:
         print("[clean] verify: H2EnumIndex survived linking", file=sys.stderr)
         return 1
 
-    print("[clean] verify: built build/HMM2PL.exe")
+    print(f"[clean] verify: built {executable}")
     return 0
 
 
@@ -2180,7 +2191,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", default="build/clean", help="output tree root")
     parser.add_argument("--verify", action="store_true",
-                        help="build the generated Windows executable with Ninja")
+                        help="build the generated Windows executable with its Nix flake")
     parser.add_argument("--publish", metavar="BRANCH", nargs="?", const="clean",
                         help="commit the generated tree onto BRANCH (default: clean)")
     parser.add_argument(

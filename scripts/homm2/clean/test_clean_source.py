@@ -149,7 +149,7 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         self.assertNotIn("constexpr i32 H2EnumIndex(", text)
 
     def test_verify_rejects_enum_index_symbol(self):
-        built = subprocess.CompletedProcess((), 0)
+        built = subprocess.CompletedProcess((), 0, stdout="/nix/store/generated\n")
         symbols = subprocess.CompletedProcess(
             (), 0, stdout="00000000 T H2EnumIndex<int>(int)\n"
         )
@@ -860,10 +860,12 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 
 
 class CleanSourceVerifyTests(unittest.TestCase):
-    def test_verify_runs_generated_ninja_build(self):
+    def test_verify_runs_generated_nix_build(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
-            built = subprocess.CompletedProcess([], 0)
+            built = subprocess.CompletedProcess(
+                [], 0, stdout="/nix/store/generated\n"
+            )
             symbols = subprocess.CompletedProcess([], 0, stdout="")
             with mock.patch(
                 "subprocess.run",
@@ -874,11 +876,16 @@ class CleanSourceVerifyTests(unittest.TestCase):
                 run.call_args_list,
                 [
                     mock.call(
-                        ("ninja", "-C", str(output), "game"),
+                        (
+                            "nix", "build", "--no-link", "--print-out-paths",
+                            f"path:{output.resolve()}",
+                        ),
                         check=False,
+                        capture_output=True,
+                        text=True,
                     ),
                     mock.call(
-                        ("llvm-nm", "-C", str(output / "build/HMM2PL.exe")),
+                        ("llvm-nm", "-C", "/nix/store/generated/HMM2PL.exe"),
                         check=False,
                         capture_output=True,
                         text=True,
