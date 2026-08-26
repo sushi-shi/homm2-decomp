@@ -381,7 +381,6 @@ typedef enum OldMainConstant {
     OLD_MAIN_EXIT                             = 0x69,
     OLD_MAIN_SETUP_NEW                        = 0,
     OLD_MAIN_SETUP_LOAD                       = 1,
-    OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 6000,
     OLD_MAIN_NET_BUFFER_SIZE                  = 256,
     OLD_MAIN_NETWORK_PACKET                   = 0x20,
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
@@ -397,7 +396,7 @@ typedef enum OldMainConstant {
 #pragma pack(push, 1)
 struct OldMainNetSetup {
     i8 gamePosToNetPos[OLD_MAIN_PLAYER_COUNT];
-    i8 useRegularCompression;
+    i8 useBzip2Compression;
     i8 useDiffCompression;
     SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
 };

@@ -42,7 +42,7 @@
 #include <BASE/font.h>
 #include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
-#include <BASE/Bzip.h>
+#include <BASE/Bzip2.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
@@ -252,7 +252,6 @@ typedef enum RemoteSaveConstant {
     REMOTE_LOOPING_SOUND_COUNT       = 4,
     REMOTE_PACKET_TRACKING_CAPACITY  = 5000,
     REMOTE_HEADER_CAPACITY           = 256,
-    REMOTE_BUFFER_EXTRA              = 2000,
     REMOTE_PACKET_PAYLOAD_SIZE       = 200,
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
@@ -480,16 +479,6 @@ typedef enum GameTimeEventConstant {
     EVENT_RESOURCE_COUNT   = 7,
     EVENT_RESOURCE_PENALTY = 100000
 } GameTimeEventConstant;
-
-typedef enum GameCompressionTestConstant {
-    TEST_RANDOM_SIZE_MIN     = 20000,
-    TEST_RANDOM_SIZE_MAX     = 100000,
-    TEST_RANDOM_BUFFER_EXTRA = 5000,
-    TEST_FILE_BUFFER_EXTRA   = 2000,
-    TEST_FILENAME_SIZE       = 32,
-    TEST_MESSAGE_CAPACITY    = 40,
-    COMPRESS_TEST_ITERATIONS = 100
-} GameCompressionTestConstant;
 
 typedef enum GameRumourConstant {
     RUMOUR_SCRATCH_CAPACITY        = 100,
@@ -6520,6 +6509,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     u8* fileData;
     char* acknowledged;
     i32* header;
+    u32 compressionCapacity;
+    u32 compressedSize;
 
     i32 batch;
 
@@ -6532,6 +6523,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     result = 0;
     acknowledged = NULL;
     oldTrack = -1;
+    compressionCapacity = 0;
+    compressedSize = 0;
 
     samplesReady = gSoundBackendsReady;
     gSoundBackendsReady = 1;
@@ -6569,10 +6562,22 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         LOG_UNUSED_VALUE
     );
 
+    if (fileSize <= 0)
+        goto transmitCleanup;
+    if (gbUseBzip2Compression
+        && (!compression::Bzip2CompressBound(
+                static_cast<u32>(fileSize),
+                compressionCapacity
+            )
+            || compressionCapacity > static_cast<u32>(INT32_MAX))) {
+        AiPrint("Bzip2 compression input is too large");
+        goto transmitCleanup;
+    }
+
     header = static_cast<i32*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
-    if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
-    fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
+    if (gbUseBzip2Compression)
+        transmitData = static_cast<u8*>(H2_ALLOC(compressionCapacity));
+    fileData = static_cast<u8*>(H2_ALLOC(fileSize));
 
     file = platform::FileOpen(filename, platform::FileMode::Read);
     if (file == -1)
@@ -6584,17 +6589,24 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         platform::FileRead(file, fileData, fileSize);
         platform::FileClose(file);
         fileCrc = calc_crc_long(fileData, fileSize);
-        if (gbUseRegularCompression)
-            fileSize = EncodeData(
-                reinterpret_cast<char*>(transmitData),
-                reinterpret_cast<char*>(fileData),
-                fileSize
-            );
-        else
+        if (gbUseBzip2Compression) {
+            if (!compression::Bzip2Compress(
+                    transmitData,
+                    compressionCapacity,
+                    fileData,
+                    static_cast<u32>(fileSize),
+                    compressedSize
+                )) {
+                AiPrint("Bzip2 compression failed");
+                goto transmitCleanup;
+            }
+            fileSize = static_cast<i32>(compressedSize);
+        } else {
             transmitData = fileData;
+        }
 
         AiPrint("Transmit Start - Sending");
-        if (gbUseRegularCompression)
+        if (gbUseBzip2Compression)
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
@@ -6784,6 +6796,7 @@ i32 game::ReceiveSaveGame(
     u8* ackBuffer;
     u8* decodedData;
     bool samplesReady;
+    u32 decompressedSize;
 
     i32l lastPacketTime;
 
@@ -6811,6 +6824,7 @@ i32 game::ReceiveSaveGame(
     received = NULL;
     success = 0;
     oldTrack = -1;
+    decompressedSize = 0;
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
@@ -6838,10 +6852,10 @@ i32 game::ReceiveSaveGame(
 
     received = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
-    if (gbUseRegularCompression)
+    if (gbUseBzip2Compression)
         decodedData = static_cast<u8*>(H2_ALLOC(REMOTE_DECODE_BUFFER_SIZE));
     ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
-    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA));
+    incomingData = static_cast<u8*>(H2_ALLOC(dataSize));
 
     lastPacketTime = platform::Ticks();
     LogInt(
@@ -6937,12 +6951,18 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    if (gbUseRegularCompression) {
-        dataSize = DecodeData(
-            reinterpret_cast<char*>(decodedData),
-            reinterpret_cast<char*>(incomingData),
-            dataSize
-        );
+    if (gbUseBzip2Compression) {
+        if (!compression::Bzip2Decompress(
+                decodedData,
+                REMOTE_DECODE_BUFFER_SIZE,
+                incomingData,
+                static_cast<u32>(dataSize),
+                decompressedSize
+            )) {
+            AiPrint("Bzip2 decompression failed");
+            goto receiveCleanup;
+        }
+        dataSize = static_cast<i32>(decompressedSize);
         computedCrc = calc_crc_long(decodedData, dataSize);
     } else {
         decodedData = incomingData;
@@ -6967,6 +6987,7 @@ i32 game::ReceiveSaveGame(
     platform::FileClose(file);
     success = 1;
 
+receiveCleanup:
     if (received)
         H2_FREE(received);
     if (ackBuffer)
@@ -6976,7 +6997,8 @@ i32 game::ReceiveSaveGame(
     if (decodedData && decodedData != incomingData)
         H2_FREE(decodedData);
 
-    CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
+    if (success)
+        CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint("Receive End");
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
@@ -7789,95 +7811,6 @@ i32 CalcFileCRC(char* file) {
     platform::FileClose(fp);
     H2_FREE(blk);
     return checksum;
-}
-
-void CompressTest2(void) {
-
-    char* unpackedData;
-    i32l compSize;
-
-    i32 dataSz;
-    i32 index;
-
-    char* fromData;
-    char* encoded;
-
-    dataSz = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
-    fromData =
-        static_cast<char*>(
-            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
-        );
-    encoded =
-        static_cast<char*>(
-            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
-        );
-    unpackedData =
-        static_cast<char*>(
-            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
-        );
-    for (index = 0; index < dataSz; index++)
-        fromData[index] = static_cast<char>(Random(0, 255));
-
-    compSize = EncodeData(encoded, fromData, dataSz);
-    DecodeData(unpackedData, encoded, compSize);
-
-    H2_FREE(fromData);
-    H2_FREE(encoded);
-    H2_FREE(unpackedData);
-}
-
-void CompressTest(void) {
-    char* fromData;
-    char* encoded;
-
-    i32 hFile;
-    i32l fileSize;
-    char diffName[TEST_FILENAME_SIZE];
-
-    char* unpackedData;
-    i32l compSize;
-
-    LogStr("C1");
-    strcpy(diffName, "c:\\TEMP\\Z.DIF");
-    fileSize = FileSize(diffName);
-    fromData = static_cast<char*>(
-        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
-    );
-    encoded = static_cast<char*>(
-        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
-    );
-    unpackedData = static_cast<char*>(
-        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
-    );
-    LogStr("C2");
-    hFile = platform::FileOpen(diffName, platform::FileMode::Read);
-    if (hFile == -1)
-        FileError(diffName);
-    platform::FileRead(hFile, fromData, fileSize);
-    LogStr("C3");
-
-    LogStr("C4");
-    platform::FileClose(hFile);
-    LogStr("C5");
-    compSize = EncodeData(encoded, fromData, fileSize);
-    LogStr("C6");
-    DecodeData(unpackedData, encoded, compSize);
-    LogStr("C7");
-
-    H2_FREE(fromData);
-    H2_FREE(encoded);
-    H2_FREE(unpackedData);
-    LogStr("C8");
-}
-
-void CompressTest3(void) {
-    char buffer[TEST_MESSAGE_CAPACITY];
-    i32 i;
-    for (i = 0; i < COMPRESS_TEST_ITERATIONS; i++) {
-        sprintf(buffer, "Test # %d", i);
-        AiPrint(buffer);
-        CompressTest2();
-    }
 }
 
 i32 game::CountShrines(i32 player) {

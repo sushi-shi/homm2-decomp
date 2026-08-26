@@ -104,17 +104,6 @@ bool Under(const std::string& path, const std::string& directory) {
         && (path.size() == directory.size() || path[directory.size()] == '/');
 }
 
-// The save compressor works through scratch files named H2C plus four random
-// letters, and the same again with .nw while compressed. H2CAMP.TXT ships with
-// the game and is none of ours.
-bool IsScratch(const std::string& name) {
-    if (!name.starts_with("H2C")) {
-        return false;
-    }
-    return name.size() == sizeof("H2CABCD") - 1
-        || (name.size() == sizeof("H2CABCD.NW") - 1 && name.ends_with(".NW"));
-}
-
 #endif
 
 }
@@ -172,8 +161,7 @@ bool IsUserState(const char* retailPath) {
     }
 
     const std::string name = path.substr(slash + 1);
-    return name.ends_with(".HS") || IsScratch(name)
-        || (name.starts_with("RMT") && name.ends_with(".BIN"));
+    return name.ends_with(".HS") || (name.starts_with("RMT") && name.ends_with(".BIN"));
 #endif
 }
 

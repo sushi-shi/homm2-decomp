@@ -118,6 +118,7 @@
         buildInputs = [
           ffmpeg-windows
           sdl3-windows
+          mingw.bzip2
           mingw.windows.mcfgthreads
         ];
         cmakeFlags = [
@@ -143,7 +144,7 @@
         version = "2.1";
         src = source;
         nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
-        buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
+        buildInputs = [ p32.bzip2 p32.ffmpeg-headless p32.sdl3 ];
         cmakeFlags = [
           "-DHOMM2_PLATFORM=SDL3"
           "-DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON"
@@ -195,6 +196,27 @@
         '';
       };
 
+      # Build the pinned nixpkgs bzip2 source for Emscripten. Using the
+      # Emscripten port directly would download it from GitHub during the
+      # build, which is not reproducible in the Nix sandbox.
+      bzip2-web = pkgs.stdenvNoCC.mkDerivation {
+        pname = "bzip2-web";
+        inherit (pkgs.bzip2) version src;
+        nativeBuildInputs = [ pkgs.emscripten pkgs.gnumake ];
+        buildPhase = ''
+          runHook preBuild
+          ${emscriptenHome}emmake make -j"$NIX_BUILD_CORES" libbz2.a \
+            CC=emcc AR=emar RANLIB=emranlib CFLAGS="-O2"
+          runHook postBuild
+        '';
+        installPhase = ''
+          runHook preInstall
+          install -Dm644 bzlib.h "$out/include/bzlib.h"
+          install -Dm644 libbz2.a "$out/lib/libbz2.a"
+          runHook postInstall
+        '';
+      };
+
       ffmpeg-web = (mkFfmpeg {
         pname = "ffmpeg-web";
         stdenv = pkgs.stdenv;
@@ -222,6 +244,7 @@
           ${emscriptenHome}emcmake cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSDL3_DIR=${sdl3-web}/lib/cmake/SDL3 \
+            -DHOMM2_BZIP2_ROOT=${bzip2-web} \
             -DHOMM2_FFMPEG_ROOT=${ffmpeg-web} \
             -DHOMM2_PLATFORM=SDL3 \
             -DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON
@@ -321,7 +344,7 @@
       devShells.${system} = {
         default = p32.mkShell {
           nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
-          buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
+          buildInputs = [ p32.bzip2 p32.ffmpeg-headless p32.sdl3 ];
         };
         icon = pkgs.mkShell {
           packages = [ iconRust pkgs.clang ];
