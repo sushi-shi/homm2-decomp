@@ -167,6 +167,44 @@ void Set() { values[selector] = 4; }
         self.assertEqual(selector.unknown_writes, set())
         self.assertEqual(len(selector.read_locations), 1)
 
+    def test_array_elements_share_one_storage_domain(self):
+        text = r"""
+typedef signed char i8;
+typedef i8 b8;
+i8 flags[2] = {0, 1};
+b8 positions[2];
+void Set() {
+    flags[0] = 1;
+    positions[0] = -1;
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            by_name = {
+                item.name: item
+                for item in analyze_translation_unit(translation, source, repo)
+            }
+        self.assertTrue(by_name["flags"].eligible)
+        self.assertIn("assignment",
+                      {write.kind for write in by_name["positions"].unknown_writes})
+
+    def test_enum_storage_macro_is_not_a_boolean_candidate(self):
+        text = r"""
+typedef signed char i8;
+#define H2_ENUM_STORAGE(name, storage) storage
+enum Formation { SPREAD = 0, GROUPED = 1 };
+struct Town {
+    H2_ENUM_STORAGE(Formation, i8) formation;
+    void Set() { formation = GROUPED; }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            fields = analyze_translation_unit(translation, source, repo)
+        self.assertNotIn("formation", {item.name for item in fields})
+
     def test_boolean_domain_understands_conditionals_and_bool_results(self):
         text = r"""
 typedef int i32;

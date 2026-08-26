@@ -145,9 +145,17 @@ class FieldFacts:
     def eligible(self) -> bool:
         # A member seen only as zero is not positive Boolean evidence: unused
         # payload words and reset-only queue indexes have exactly that shape.
+        # An uninitialized automatic declaration is not itself a write. Keep
+        # it in the report as a definite-assignment review boundary, but do
+        # not let it hide a local whose every actual write is Boolean.
+        blocking_unknown_writes = {
+            write for write in self.unknown_writes
+            if not (self.storage_kind == "variable"
+                    and write.kind == "uninitialized-local")
+        }
         return (self.declared_type in SOURCE_BOOLEAN_TARGETS
                 and self.observed_domain == (0, 1)
-                and not self.unknown_writes)
+                and not blocking_unknown_writes)
 
     @property
     def target_type(self) -> str | None:
@@ -265,6 +273,14 @@ def _literal_replacement(cursor: ci.Cursor, domain: tuple[int, ...] | None) -> s
     return None
 
 
+def _initializer_leaves(cursor: ci.Cursor) -> list[ci.Cursor]:
+    if cursor.kind != ci.CursorKind.INIT_LIST_EXPR:
+        return [cursor]
+    return [leaf
+            for child in cursor.get_children()
+            for leaf in _initializer_leaves(child)]
+
+
 def _write(cursor: ci.Cursor, kind: str, repo: Path,
            domain: tuple[int, ...] | None) -> Write | None:
     span = _span(cursor, repo)
@@ -320,6 +336,29 @@ def _type_span(cursor: ci.Cursor, repo: Path, declared_type: str) -> SourceSpan 
     return None
 
 
+def _declaration_text(cursor: ci.Cursor, repo: Path) -> str:
+    span = _span(cursor, repo)
+    if span is None:
+        return ""
+    try:
+        source = (repo / span.file).read_bytes()
+        return source[span.start:span.end].decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        return ""
+
+
+def _storage_type(type_: ci.Type) -> tuple[str, int]:
+    """Return the scalar element spelling and array nesting depth."""
+    depth = 0
+    while type_.kind in (ci.TypeKind.CONSTANTARRAY,
+                         ci.TypeKind.INCOMPLETEARRAY,
+                         ci.TypeKind.VARIABLEARRAY,
+                         ci.TypeKind.DEPENDENTSIZEDARRAY):
+        depth += 1
+        type_ = type_.get_array_element_type()
+    return type_.spelling, depth
+
+
 def _field_usr(cursor: ci.Cursor) -> str:
     usr = cursor.get_usr()
     if usr:
@@ -356,6 +395,8 @@ def _lvalue_references(cursor: ci.Cursor,
     if usr is not None:
         return [(usr, cursor)]
     children = list(cursor.get_children())
+    if cursor.kind == ci.CursorKind.ARRAY_SUBSCRIPT_EXPR and children:
+        return _lvalue_references(children[0], candidates)
     if cursor.kind in WRAPPER_KINDS and len(children) == 1:
         return _lvalue_references(children[0], candidates)
     return []
@@ -370,13 +411,18 @@ def _tracked_fields(cursor: ci.Cursor, repo: Path, unit: str) -> dict[str, Field
     out = {}
     for field_cursor in cursor.walk_preorder():
         storage_kind = STORAGE_DECL_KINDS.get(field_cursor.kind)
-        declared_type = field_cursor.type.spelling
+        declared_type, _ = _storage_type(field_cursor.type)
         if storage_kind is None or declared_type not in TRACKED_TYPES:
             continue
         declaration = _span(field_cursor, repo)
         type_span = _type_span(field_cursor, repo, declared_type)
         parent = field_cursor.semantic_parent
         if declaration is None or type_span is None or parent is None:
+            continue
+        # In retail-analysis mode H2_ENUM_STORAGE deliberately expands to its
+        # ABI-width integer. The source nevertheless already carries a
+        # stronger enum domain and must never be proposed as Boolean storage.
+        if "H2_ENUM_" in _declaration_text(field_cursor, repo):
             continue
         # Writing one member of a union overwrites all of them; direct member
         # assignments cannot establish a field-local value domain there.
@@ -461,9 +507,13 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
                 initializers = [child for child in children if child.kind not in ignored]
                 if initializers:
                     initializer = initializers[-1]
-                    _mark(candidates, usr,
-                          _write(initializer, "variable-initializer", repo,
-                                 _boolean_domain(initializer)), handled)
+                    _, array_depth = _storage_type(cursor.type)
+                    values = (_initializer_leaves(initializer)
+                              if array_depth else [initializer])
+                    for value in values:
+                        _mark(candidates, usr,
+                              _write(value, "variable-initializer", repo,
+                                     _boolean_domain(value)), handled)
                 else:
                     parent = cursor.semantic_parent
                     has_static_storage = (
