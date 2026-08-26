@@ -18,6 +18,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <string>
 #include <SOURCE/game.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
@@ -1109,10 +1110,9 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     i32 saveFlag;
     char workBuf[SAVE_LEGACY_SCRATCH_SIZE];
     i32 scratchVals[SAVE_SPARE_SLOT_COUNT];
-    char savePath[SAVE_PATH_CAPACITY];
     i32 outFile;
     i32 iFile;
-    char genName[SAVE_PATH_CAPACITY];
+    std::string genName;
     char humans[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
     char plBuf[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
     void* emptyPayload;
@@ -1127,47 +1127,37 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     gpAdvManager->DemobilizeCurrHero();
 
     if (generateName) {
+        genName = filename;
         if (gbInCampaign) {
-            sprintf(
-                genName,
-                "%s.%s",
-                filename,
-                "GMC"
-            );
+            genName += ".GMC";
         } else if (xIsPlayingExpansionCampaign) {
-            sprintf(
-                genName,
-                "%s.%s",
-                filename,
-                "GXC"
-            );
+            genName += ".GXC";
         } else {
             nHuman = 0;
             for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
                 if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
                     nHuman++;
             }
-            if (xIsExpansionMap && !expansionFormat)
-                sprintf(genName, "%s.GX%d", filename, nHuman);
-            else
-                sprintf(genName, "%s.GM%d", filename, nHuman);
+            genName += xIsExpansionMap && !expansionFormat ? ".GX" : ".GM";
+            genName += std::to_string(nHuman);
         }
     } else {
-        sprintf(genName, filename);
+        genName = filename;
     }
 
-    if (platform::CompareIgnoringCase(genName, "RMT", sizeof("RMT") - 1) == 0) {
-        sprintf(savePath, "%s%s", ".\\DATA\\", genName);
+    std::string savePath;
+    if (platform::CompareIgnoringCase(genName.c_str(), "RMT", sizeof("RMT") - 1) == 0) {
+        savePath = ".\\DATA\\" + genName;
     } else {
-        sprintf(savePath, "%s%s", gcGamePath, genName);
+        savePath = gcGamePath + genName;
         if (platform::CompareIgnoringCase(
-                genName,
+                genName.c_str(),
                 save_names::Autosave,
                 sizeof(save_names::Autosave) - 1
             )
                 != 0
             && platform::CompareIgnoringCase(
-                   genName,
+                   genName.c_str(),
                    save_names::PlayerExit,
                    sizeof(save_names::PlayerExit) - 1
                )
@@ -1175,9 +1165,9 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
             strcpy(gpGame->m_saveName, filename);
     }
 
-    outFile = platform::FileOpen(savePath, platform::FileMode::Write);
+    outFile = platform::FileOpen(savePath.c_str(), platform::FileMode::Write);
     if (outFile == -1)
-        FileError(savePath);
+        FileError(savePath.c_str());
 
     oldTag = -1;
     if (!expansionFormat)

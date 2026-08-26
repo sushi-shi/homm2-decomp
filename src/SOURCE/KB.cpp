@@ -3398,7 +3398,7 @@ typedef enum FileErrorConstant {
     FILE_ERROR_BUFFER_SIZE = 500
 } FileErrorConstant;
 
-void FileError(char* filename) {
+void FileError(const char* filename) {
     char buf[FILE_ERROR_BUFFER_SIZE];
     i32 err;
     char buf1[FILE_ERROR_BUFFER_SIZE];

@@ -510,7 +510,7 @@ i32 WaitForOtherPlayer(void);
 void PopNetBox(char*, i32);
 void AddNetBoxLine(const char* str, char color);
 void ShutDown(const char* msg);
-void FileError(char* filename);
+void FileError(const char* filename);
 void SmackFade(u8* src, u8* dst);
 void ShowCongrats(HighScoreType);
 void CongratsWait(void);
