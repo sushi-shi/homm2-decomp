@@ -112,9 +112,10 @@ instead of rewriting published history.
 trees are transformed from their clean source sibling but are anchored directly
 to the matching decompilation commit, preserving the documented branch graph.
 
-The verifier invokes the generated Ninja graph. All 95 translation units,
-including portable replacements for the two old inline-assembly units, must
-compile and link into the Windows executable.
+The verifier invokes the generated flake's pinned Nix build, which in turn runs
+the generated Ninja graph with the correct MinGW/Clang cross environment. All
+95 translation units, including portable replacements for the two old
+inline-assembly units, must compile and link into the Windows executable.
 
 ## Type information is preserved, not discarded
 
