@@ -43,8 +43,9 @@ nix build .#homm2-windows
 nix build .#homm2-web
 ```
 
-The Windows package cross-compiles the SDL3 platform and minimal FFmpeg. It
-includes the required DLLs and a Wine launcher.
+The Windows package cross-compiles and statically links the SDL3 platform and
+minimal FFmpeg. It includes a Wine launcher; no retail Audiere, Miles, Smacker,
+or Wing DLLs are required.
 
 ## Web
 

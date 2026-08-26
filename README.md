@@ -174,8 +174,9 @@ System Options.
 
 ### Windows
 
-The Windows package is statically linked. Copy `HMM2PL.exe` into the writable
-game directory and run it. For Wine:
+The Windows package is statically linked and does not require the retail
+Audiere, Miles, Smacker, or Wing DLLs. Copy `HMM2PL.exe` into the writable game
+directory and run it. For Wine:
 
 ```sh
 nix build .#homm2-windows
