@@ -43,11 +43,10 @@ Behavioral changes made by Gold 2.1 and the Buka release are tracked in the
 
 ## Build and run
 
-The `source-*` branches build the original 32-bit Price of Loyalty 2.0 Windows
-target. The
-`classic-*` branches are terminal reading views and are not supported build
-targets; switch to the corresponding `source-*` branch to compile or run the
-retail-style game.
+The `source-*` branches build the original 32-bit Price of Loyalty 2.0
+Windows target. The `classic-*` branches are terminal reading views and are not
+supported build targets; switch to the corresponding `source-*` branch to
+compile or run the retail-style game.
 
 On a `source-*` branch, build with Nix:
 
