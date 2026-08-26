@@ -696,6 +696,12 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                 self.assertEqual(marked.count("(you are here)"), 1)
                 self.assertIn(f"{branch} (you are here)", marked)
 
+        source = clean_source._mark_readme_branch(readme, "source-pol-2.0")
+        classic = clean_source._mark_readme_branch(source, "classic-pol-2.0")
+        self.assertEqual(classic.count("(you are here)"), 1)
+        self.assertIn("classic-pol-2.0 (you are here)", classic)
+        self.assertNotIn("source-pol-2.0 (you are here)", classic)
+
     def test_publish_refuses_a_non_generated_branch(self):
         with tempfile.TemporaryDirectory() as directory:
             repo, output = self.fixture_repo(Path(directory))

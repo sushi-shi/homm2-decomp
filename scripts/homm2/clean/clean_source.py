@@ -2098,8 +2098,6 @@ def _mark_readme_branch(text: str, branch: str) -> str:
     """Mark one generated branch in the README's branch diagram."""
     if branch not in GENERATED_BRANCHES:
         return text
-    if "(you are here)" in text:
-        raise SystemExit("generated README template already contains a branch marker")
 
     blocks = list(re.finditer(r"```text\n(.*?)\n```", text, flags=re.DOTALL))
     matching = [match for match in blocks if branch in match.group(1)]
@@ -2109,7 +2107,19 @@ def _mark_readme_branch(text: str, branch: str) -> str:
         )
 
     match = matching[0]
-    diagram = match.group(1).replace(branch, f"{branch} (you are here)", 1)
+    outside = text[:match.start(1)] + text[match.end(1):]
+    if "(you are here)" in outside:
+        raise SystemExit("generated README contains a branch marker outside its diagram")
+
+    diagram = match.group(1)
+    for candidate in GENERATED_BRANCHES:
+        marker = f"{candidate} (you are here)"
+        if diagram.count(marker) > 1:
+            raise SystemExit("generated README contains a duplicate branch marker")
+        diagram = diagram.replace(marker, candidate)
+    if "(you are here)" in diagram:
+        raise SystemExit("generated README contains an unknown branch marker")
+    diagram = diagram.replace(branch, f"{branch} (you are here)", 1)
     return text[:match.start(1)] + diagram + text[match.end(1):]
 
 
