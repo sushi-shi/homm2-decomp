@@ -32,6 +32,7 @@
 
 #include <string>
 
+
 typedef enum CursorHeroShadowFrame {
     SPRITE_UP_STEP_1        = 0x2e,
     SPRITE_UP_STEP_2        = 0x2f,
@@ -943,7 +944,7 @@ adjacentDone:
             gbHitEvent = true;
         }
     }
-    Ironfist_HeroMoved();
+    ironfist::hooks::HeroMoved();
     return eventCell_i;
 }
 

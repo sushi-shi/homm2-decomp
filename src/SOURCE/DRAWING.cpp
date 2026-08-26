@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +23,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+
 enum class CombatDrawLayer : i32 {
     DRAW_FIRST_LAYER        = 0,
     DRAW_LAYER_COUNT        = 9,
@@ -427,7 +428,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     }
 
     // A charger also reaches any enemy along a clear straight line.
-    if (CreatureHasAttribute(H2EnumIndex(armyPtr->m_monsterType), CHARGER)) {
+    if (ironfist::HasCreatureAttribute(armyPtr->m_monsterType, ironfist::CreatureAttribute::Charger)) {
         for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
             if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
                 && m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side
@@ -999,10 +1000,10 @@ void combatManager::DrawFrame(
         giMaxExtentY++;
 
         // The fire walls burn inside the redraw extent too.
-        if (!gIronfistExtra.combat.spell.fireBombWalls.empty()) {
+        if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
             icon* wallIcon = gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
             IconEntry* wallEntry = GetIconEntry(wallIcon, 0);
-            for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+            for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
                 hexcell* wallCell = &m_hexCells[wall.hexIdx];
                 i32 drawX = wallCell->m_x + wallEntry->x;
                 i32 drawY = wallCell->m_gridTop + wallEntry->y;
@@ -1063,7 +1064,7 @@ void combatManager::DrawFrame(
     }
 
     // The lingering fire walls burn under the creatures.
-    for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+    for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
         SLimitData wallLimits;
         gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)])
             ->CombatClipDrawToBuffer(

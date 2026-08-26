@@ -9,22 +9,26 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 
+namespace ironfist::script {
+
 template <typename T>
-class deepbind {
-    T _t;
+class Binding {
+    T m_value;
 
 public:
-    deepbind(T t) : _t(t) {}
+    explicit Binding(T value) : m_value(value) {}
 
-    T get() { return _t; }
+    T Get() const { return m_value; }
 };
 
-void deepbound_push(lua_State* L, deepbind<army*> x);
-void deepbound_push(lua_State* L, deepbind<playerData*> x);
-void deepbound_push(lua_State* L, deepbind<hero*> x);
-void deepbound_push(lua_State* L, deepbind<town*> x);
-void deepbound_push(lua_State* L, deepbind<SCampaignChoice*> x);
+void PushBinding(lua_State* state, Binding<army*> value);
+void PushBinding(lua_State* state, Binding<playerData*> value);
+void PushBinding(lua_State* state, Binding<hero*> value);
+void PushBinding(lua_State* state, Binding<town*> value);
+void PushBinding(lua_State* state, Binding<SCampaignChoice*> value);
 
-void* GetPointerFromLuaClassTable(lua_State* L, i32 stackIndex);
+void* PointerFromLuaClassTable(lua_State* state, i32 stackIndex);
+
+} // namespace ironfist::script
 
 #endif

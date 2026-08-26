@@ -7,6 +7,8 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
+namespace ironfist {
+
 /*
  * Ironfist's hero globals: the editor-placed hero overlay tables (overlay
  * object index to faction and color, with the Cyborg rows 42-47) and the
@@ -14,9 +16,9 @@
  * hero. TOTAL_AVAILABLE_HEROES spans them all.
  */
 
-enum IronfistHeroConstant {
-    IRONFIST_TOTAL_AVAILABLE_HEROES = 73,
-    IRONFIST_FIRST_CYBORG_HERO_ID   = 72,
+enum HeroTableConstant {
+    AVAILABLE_HERO_COUNT = 73,
+    FIRST_CYBORG_HERO_ID   = 72,
     // Cybernetics rides one row past the retail secondary-skill table:
     // row 15 in the dialog image groups, frame 16 in secskill.icn,
     // frame 14 in miniss.icn.
@@ -27,9 +29,11 @@ enum IronfistHeroConstant {
 
 FactionType GetHeroOverlayFaction(i32 overlayObjectIdx);
 i32 GetHeroOverlayColor(i32 overlayObjectIdx);
-extern std::vector<std::string> heroNames;
+extern std::vector<std::string> HeroNames;
 
 // Fixed spells a Cyborg hero picks up at set levels.
 SpellType GetCyborgLevelSpell(i32 level);
+
+} // namespace ironfist
 
 #endif

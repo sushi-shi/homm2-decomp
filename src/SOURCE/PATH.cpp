@@ -2,13 +2,14 @@
 #include <set>
 #include <vector>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <SOURCE/army.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
+
 
 typedef enum CombatPathConstant {
     SPECIAL_DIRECTION_MASK = 0xc0,
@@ -44,8 +45,8 @@ i32 army::FindPath(
         return 0;
 
     // A human-controlled jumper paths as if the obstacles were not there.
-    if (!IsAICombatTurn() && CreatureHasAttribute(H2EnumIndex(m_monsterType), JUMPER)
-        && gIronfistExtra.combat.stack.abilityCounter[this][JUMPER]) {
+    if (!IsAICombatTurn() && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper)
+        && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]) {
         for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
             if (gpCombatManager->m_hexCells[hexIndex].m_blocked && !IsCastleWall(hexIndex)) {
                 obstacleHexes.push_back(hexIndex);

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <IRONFIST/artifacts.h>
 #include <IRONFIST/hooks.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
@@ -26,6 +27,7 @@
 #include <SOURCE/CURSOR.h>
 #include <EDITOR/mapcell.h>
 #include <BASE/mouseManager.h>
+
 
 #define AI_SECONDARY_SKILL_FIGHT_SCALE                                             \
     2500.0f
@@ -4454,7 +4456,7 @@ void philAI::RedistributeTroops(
     i32 again;
     i32 army;
 
-    if (!Ironfist_AIArmySharingAllowed())
+    if (!gpGame->IsAIArmySharingAllowed())
         return;
 
     again = 1;
@@ -6005,7 +6007,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
             for (slot = 0; slot < AI_BATTLE_ARTIFACT_SLOT_COUNT;
                  slot++) {
-                if (IsCursedItem(gpCurAIHero->m_artifacts[slot]))
+                if (ironfist::IsCursedArtifact(gpCurAIHero->m_artifacts[slot]))
                     badArtifacts++;
             }
             if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] > AI_GENERIC_SITE_GOLD_THRESHOLD) {
@@ -6484,7 +6486,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     armyGroup* townGroup;
     i32 forcedChaseValue;
 
-    if (Ironfist_ForcedChaseValue(heroId, &forcedChaseValue))
+    if (gpGame->GetForcedChaseValue(heroId, &forcedChaseValue))
         return forcedChaseValue;
 
     if (gpGame->m_availableHeroes[heroId] == gpCurAIHero->m_owner) {

@@ -154,7 +154,6 @@ void GenerateStandardFileName(char*, char*);
 MessageDispatchResult ViewSpellsHandler(struct tag_message&);
 MessageDispatchResult ViewSpecialHandler(struct tag_message&);
 MessageDispatchResult ViewArmyHandler(struct tag_message&);
-i32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32);
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
 i32 GetSkipCopyLen(u8* buf, i32* pos);

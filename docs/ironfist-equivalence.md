@@ -1,9 +1,11 @@
 # Ironfist equivalence audit
 
-The portable `ironfist` branch is a port of Project Ironfist's game changes,
-not a byte-identical rebuild of an Ironfist Windows executable. It keeps the
-recovered Heroes II Gold 2.1 engine and expresses Ironfist's changes through
-recovered fields, full function integrations, and narrow hooks.
+The portable `ironfist-master` branch integrates Project Ironfist's game
+changes; it is not a byte-identical rebuild of an Ironfist Windows executable.
+It keeps the recovered Heroes II Gold 2.1 engine and expresses Ironfist's
+changes through recovered fields, owning game classes, a separate extension
+state sidecar, and narrow callback/runtime boundaries. The preceding
+`ironfist` branch records the direct portability-oriented port.
 
 This distinction matters because Project Ironfist has two different useful
 reference points:
@@ -120,7 +122,10 @@ and on which part of the host function a Boolean callback suppresses.
 
 `tools/test_ironfist_hook_contract.py` protects the integration-sensitive order
 for map reset, location skipping, tooltip override, morale text, town music,
-and the integrated end-game guard.
+combat startup, and the integrated end-game guard. It also verifies that true
+mechanics remain out of the callback layer, that those mechanics have recovered
+class owners, that Well suppression retains its post-scaling placement, and
+that extension state and map variables have explicit ownership.
 
 ## Corrections found by this audit
 

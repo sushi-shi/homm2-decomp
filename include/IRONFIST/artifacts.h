@@ -8,6 +8,8 @@
 #include <Ints.h>
 #include <SOURCE/X_GLOBAL.h>
 
+namespace ironfist {
+
 /*
  * Ironfist's data-driven artifact metadata: DATA/artifacts.xml is the
  * authority and fills the retail tables (gArtifactNames, gArtifactDesc,
@@ -16,13 +18,8 @@
  * per-artifact cursed/campaign-only traits the retail tables cannot express.
  */
 
-enum IronfistArtifact {
-    ARTIFACT_PANDORA_BOX = 103,
-    ARTIFACT_IRON_FIST   = 104
-};
-
 void LoadArtifacts();
-i32 IsCursedItem(i32 artId);
+bool IsCursedArtifact(ArtifactType artifact);
 bool IsArtifactValid(i32 id);
 bool IsArtifactGenerated(i32 id);
 bool IsArtifactGenerationAllowed(i32 id);
@@ -36,5 +33,7 @@ char* GetArtifactEvent(i32 id);
 
 void DeserializeGeneratedArtifacts(const std::vector<i32>& source);
 std::vector<i32> SerializeGeneratedArtifacts();
+
+} // namespace ironfist
 
 #endif

@@ -7,6 +7,8 @@
 
 #include <PLATFORM/Platform.h>
 
+namespace ironfist {
+
 std::string ResolveDataPath(const std::string& relative) {
     namespace fs = std::filesystem;
 
@@ -28,3 +30,5 @@ std::string ResolveDataPath(const std::string& relative) {
     }
     return resolved.string();
 }
+
+} // namespace ironfist

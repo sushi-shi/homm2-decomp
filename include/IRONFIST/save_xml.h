@@ -7,6 +7,8 @@
 #include <IRONFIST/scripting.h>
 #include <IRONFIST/xml_utils.h>
 
+namespace ironfist::save {
+
 /*
  * Ironfist's XML save format: the whole game object graph plus the
  * Ironfist-only state (script text, map variables, vision/chase/ban state,
@@ -14,7 +16,7 @@
  * calendar-event index tables are written at the recovered widths, and
  * unknown elements are ignored on load.
  */
-class IronfistXML : public UtilsXML::XMLFile {
+class XmlFile : public xml::XMLFile {
 public:
     tinyxml2::XMLError Save(const char* fileName);
     tinyxml2::XMLError Read(const char* fileName);
@@ -33,9 +35,11 @@ private:
                 dest->InsertEndChild(elem);
             }
     }
-    luaTable* ReadTable(tinyxml2::XMLNode* root);
-    void ReadTableElement(tinyxml2::XMLElement* elem, luaTable* lt);
-    void WriteMapVarTable(tinyxml2::XMLNode* dest, std::string id, luaTable* lt);
+    script::LuaTable ReadTable(tinyxml2::XMLNode* root);
+    void ReadTableElement(tinyxml2::XMLElement* elem, script::LuaTable& table);
+    void WriteMapVarTable(
+        tinyxml2::XMLNode* dest, const std::string& id, const script::LuaTable& table
+    );
     void WriteMapVariables(tinyxml2::XMLNode* dest);
     void ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType);
     void ReadCampaignSavedHero(tinyxml2::XMLNode* root);
@@ -49,15 +53,17 @@ private:
 };
 
 // Campaign types as Ironfist's saves spell them.
-enum IronfistCampaignType {
-    IRONFIST_CAMPAIGN_NONE      = 0,
-    IRONFIST_CAMPAIGN_ORIGINAL  = 1,
-    IRONFIST_CAMPAIGN_EXPANSION = 2
+enum CampaignType {
+    CAMPAIGN_NONE      = 0,
+    CAMPAIGN_ORIGINAL  = 1,
+    CAMPAIGN_EXPANSION = 2
 };
 
-i32 Ironfist_GetCampaignType(void);
-b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile);
-i32 Ironfist_SaveGame(char* saveFile, i32 autosave);
-std::string GetSaveFileExtension(b32 isPickLoad);
+i32 GetCampaignType();
+b32 LoadGame(char* fileName, i32 loadFromFile);
+i32 SaveGame(char* saveFile, i32 autosave);
+std::string FileExtension(b32 isPickLoad);
+
+} // namespace ironfist::save
 
 #endif

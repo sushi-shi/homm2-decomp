@@ -65,11 +65,13 @@ class IronfistInterfaceAuditTest(unittest.TestCase):
             lua_setconst(L, "FIRST", VALUE);
             lua_setconst(L, "FIRST", VALUE);
             lua_setconst_nil(L, "DEFAULT_VALUE");
+            SetConstant(L, "SECOND", OTHER_VALUE);
+            SetNilConstant(L, "OTHER_DEFAULT");
             /* lua_setconst(L, "OLD", 9); */
         '''
         calls, nil_names, duplicates = audit.extract_constant_calls(source)
-        self.assertEqual(calls, {"FIRST": "VALUE"})
-        self.assertEqual(nil_names, {"DEFAULT_VALUE"})
+        self.assertEqual(calls, {"FIRST": "VALUE", "SECOND": "OTHER_VALUE"})
+        self.assertEqual(nil_names, {"DEFAULT_VALUE", "OTHER_DEFAULT"})
         self.assertEqual(duplicates, {"FIRST": ["VALUE", "VALUE"]})
 
     def test_resolves_enum_const_and_macro_values(self):

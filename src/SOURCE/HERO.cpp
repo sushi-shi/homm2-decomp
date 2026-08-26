@@ -36,6 +36,7 @@
 
 #include <string>
 
+
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
 typedef enum HeroUiConstant {
@@ -207,7 +208,7 @@ static const char* SecondarySkillName(const hero* heroValue, HeroSecondarySkill 
 
 static i32 SecondarySkillIconRow(const hero* heroValue, HeroSecondarySkill skill) {
     if (heroValue->m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
-        return CYBERNETICS_SKILL_ROW;
+        return ironfist::CYBERNETICS_SKILL_ROW;
     return H2EnumIndex(skill);
 }
 
@@ -316,7 +317,7 @@ i32 hero::CalcMobility(void) {
             if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
                 movePoints += AI_STATE_MOBILITY_BONUS;
         }
-        return Ironfist_CalcMobility(this, movePoints);
+        return ironfist::hooks::ModifyMobility(this, movePoints);
     }
 
     if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
@@ -359,7 +360,7 @@ i32 hero::CalcMobility(void) {
         if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             movePoints += AI_STATE_MOBILITY_BONUS;
     }
-    return Ironfist_CalcMobility(this, movePoints);
+    return ironfist::hooks::ModifyMobility(this, movePoints);
 }
 
 i32 hero::HasSpell(SpellType spell) {
@@ -1000,7 +1001,7 @@ void hero::CheckLevel(void) {
         }
 
         if (m_cursorType == FACTION_CYBORG && m_owner != -1) {
-            SpellType levelSpell = GetCyborgLevelSpell(nLevel);
+            SpellType levelSpell = ironfist::GetCyborgLevelSpell(nLevel);
             if (levelSpell != SPELL_NONE) {
                 AddSpell(levelSpell, 0);
                 if (gbHumanPlayer[m_owner])
@@ -2103,7 +2104,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
             NORMAL_DIALOG_NO_VALUE,
             NORMAL_DIALOG_SECONDARY_SKILL,
             H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
-                + CYBERNETICS_SKILL_ROW * HERO_SECONDARY_SKILL_ICON_STRIDE
+                + ironfist::CYBERNETICS_SKILL_ROW * HERO_SECONDARY_SKILL_ICON_STRIDE
                 - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
             NORMAL_DIALOG_NO_RESOURCE,
             0,

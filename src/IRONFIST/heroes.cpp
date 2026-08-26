@@ -2,6 +2,8 @@
 
 #include <map>
 
+namespace ironfist {
+
 static std::map<i32, FactionType> heroOverlayFactions = {
   {0, FACTION_KNIGHT}, {7, FACTION_KNIGHT}, {14, FACTION_KNIGHT}, {21, FACTION_KNIGHT}, {28, FACTION_KNIGHT}, {35, FACTION_KNIGHT},
   {1, FACTION_BARBARIAN}, {8, FACTION_BARBARIAN}, {15, FACTION_BARBARIAN}, {22, FACTION_BARBARIAN}, {29, FACTION_BARBARIAN}, {36, FACTION_BARBARIAN},
@@ -33,7 +35,7 @@ i32 GetHeroOverlayColor(i32 overlayObjectIdx) {
     return heroOverlayColors[overlayObjectIdx];
 }
 
-std::vector<std::string> heroNames = {
+std::vector<std::string> HeroNames = {
   "Lord Kilburn",
   "Sir Gallant",
   "Ector",
@@ -117,3 +119,5 @@ SpellType GetCyborgLevelSpell(i32 level) {
     auto it = cyborgLevelSpells.find(level);
     return it != cyborgLevelSpells.end() ? it->second : SPELL_NONE;
 }
+
+} // namespace ironfist

@@ -13,6 +13,8 @@
 #include <SOURCE/Localization.h>
 #include <SOURCE/X_GLOBAL.h>
 
+namespace ironfist {
+
 static std::map<i32, std::string> artifactNames;
 static std::map<i32, std::string> artifactDescriptions;
 static std::map<i32, std::string> artifactEvents;
@@ -101,12 +103,13 @@ void LoadArtifacts() {
     ReadArtifactData(doc.FirstChild());
 }
 
-i32 IsCursedItem(i32 artId) {
-    if (artifactIsCursed.find(artId) == artifactIsCursed.end()) {
-        return 0;
+bool IsCursedArtifact(ArtifactType artifact) {
+    const i32 artifactId = H2EnumIndex(artifact);
+    if (artifactIsCursed.find(artifactId) == artifactIsCursed.end()) {
+        return false;
     }
 
-    return artifactIsCursed[artId];
+    return artifactIsCursed[artifactId] != 0;
 }
 
 bool IsArtifactValid(i32 id) {
@@ -206,3 +209,5 @@ char* GetArtifactEvent(i32 id) {
     }
     return const_cast<char*>("");
 }
+
+} // namespace ironfist

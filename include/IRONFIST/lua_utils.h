@@ -6,14 +6,18 @@
 #include <Ints.h>
 #include <IRONFIST/lua.h>
 
-void lua_setconst(lua_State* L, const char* nam, i32 i);
-void lua_setconst_nil(lua_State* L, const char* nam);
+namespace ironfist::script {
+
+void SetConstant(lua_State* L, const char* nam, i32 i);
+void SetNilConstant(lua_State* L, const char* nam);
 
 void DisplayCustomLuaError(lua_State* L, const char* msg);
 void DisplayCustomLuaError(lua_State* L, std::string msg);
 void DisplayLuaError(lua_State* L);
 
-i32 LuaGlobalExists(lua_State* L, const char* nam);
-i32 lua_pcall_nresult(lua_State* L, i32 nargs, i32* nres);
+i32 GlobalExists(lua_State* L, const char* nam);
+i32 CallWithResultCount(lua_State* L, i32 nargs, i32* nres);
+
+} // namespace ironfist::script
 
 #endif

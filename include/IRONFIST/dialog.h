@@ -5,14 +5,16 @@
 
 #include <Ints.h>
 
+namespace ironfist {
+
 // Ironfist scripting speaks these names; the values are the retail
 // NormalDialog argument and resource-image codes.
-enum IronfistDialogType {
+enum ScriptDialogType {
     DIALOG_OR    = 1,
     DIALOG_EMPTY = 0
 };
 
-enum IronfistNormalDialogType {
+enum NormalDialogCode {
     DIALOG_OKAY         = 1,
     DIALOG_YES_NO       = 2,
     DIALOG_CANCEL       = 3,
@@ -22,7 +24,7 @@ enum IronfistNormalDialogType {
     DIALOG_LEARN_CHOICE = 7
 };
 
-enum IronfistMessageBoxImage {
+enum MessageBoxImage {
     IMAGE_EMPTY                  = -1,
     IMAGE_WOOD                   = 0,
     IMAGE_MERCURY                = 1,
@@ -52,5 +54,7 @@ char* H2InputBox(char* msg, i32 len);
 
 void DisplayError(const char* msg, const char* title);
 void DisplayError(std::string msg, std::string title);
+
+} // namespace ironfist
 
 #endif

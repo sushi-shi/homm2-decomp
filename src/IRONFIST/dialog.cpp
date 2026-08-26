@@ -6,6 +6,8 @@
 
 #include <PLATFORM/Platform.h>
 
+namespace ironfist {
+
 void H2MessageBox(char* msg) {
     if (msg) {
         NormalDialog(msg, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -36,3 +38,5 @@ void DisplayError(const char* msg, const char* title) {
 void DisplayError(std::string msg, std::string title) {
     DisplayError(msg.c_str(), title.c_str());
 }
+
+} // namespace ironfist

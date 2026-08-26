@@ -31,6 +31,7 @@
 #include <string>
 #include <SOURCE/Localization.h>
 
+
 typedef enum NewGameConstant {
     GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
@@ -338,7 +339,7 @@ void game::InitNewGame(struct SMapHeader* header) {
     // A fresh start opens on the last map played.
     if (!gbInCampaign && !xIsPlayingExpansionCampaign && !strlen(gLastFilename)) {
         std::string lastPlayed =
-            read_pref<std::string>(xIsExpansionMap ? "Last Map expansion" : "Last Map");
+            ironfist::ReadPreference<std::string>(xIsExpansionMap ? "Last Map expansion" : "Last Map");
         if (!lastPlayed.empty() && lastPlayed.length() < sizeof(m_mapFilename)) {
             strcpy(gMapName, lastPlayed.c_str());
             strcpy(m_mapFilename, lastPlayed.c_str());

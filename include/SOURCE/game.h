@@ -268,6 +268,13 @@ public:
     void ProcessRandomObjects(void);
     void SetVisibility(i32, i32, i32, i32);
     void MakeAllWaterVisible(i32);
+    void ShareVision(i32 sourcePlayer, i32 destinationPlayer);
+    void CancelVisionShare(i32 sourcePlayer, i32 destinationPlayer);
+    void SetAIArmySharing(b32 allow);
+    b32 IsAIArmySharingAllowed(void) const;
+    void ForceHeroChase(i32 sourceHeroId, i32 destinationHeroId, b32 force);
+    b32 IsHeroChaseForced(i32 sourceHeroId, i32 destinationHeroId) const;
+    b32 GetForcedChaseValue(i32 heroId, i32* value) const;
     void GiveArmy(class armyGroup*, CreatureType, i32, i32);
     i32 ExperienceValueOfStack(class armyGroup*, class hero*);
     i32 GetLuck(class hero*, class army*, class town*);

@@ -7,6 +7,8 @@
 
 class heroWindow;
 
+namespace ironfist {
+
 /*
  * Ironfist's widget-message convenience wrappers (gui/msg.cpp), expressed
  * over the recovered message types.
@@ -24,5 +26,7 @@ void GUIDroplistAdd(heroWindow* hwnd, i32 id, std::string& text);
 void GUIDroplistClear(heroWindow* hwnd, i32 id);
 i32 GUIGetDropdownSelection(heroWindow* hwnd, i32 id);
 void GUISetDropdownSelection(heroWindow* hwnd, i32 id, i32 index);
+
+} // namespace ironfist
 
 #endif

@@ -5,8 +5,10 @@ Magic II Gold 2.1 as published by Buka. The Price of Loyalty 2.0 reconstruction
 remains available as an independent source reference and contributes verified
 cross-version work.
 
-This branch adds Project Ironfist as separately distributed, unofficial runtime
-content on top of that reconstructed cross-platform engine.
+This `ironfist-master` branch integrates Project Ironfist's feature set into
+that reconstructed cross-platform engine. It keeps Ironfist's separately
+distributed resources and public Lua/save interfaces, while making its game
+mechanics first-class parts of their owning recovered classes.
 
 The repository does not contain the original game resources. An installed copy
 of the game is required to play it. Gold 2.1 describes the reconstructed engine
@@ -20,10 +22,10 @@ access for the first build, and a writable complete Heroes II installation:
 either Heroes II Gold, or the base game upgraded with The Price of Loyalty. The
 directory must contain `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`.
 
-1. Clone the Ironfist branch and enter it:
+1. Clone the integrated Ironfist branch and enter it:
 
    ```sh
-   git clone --branch ironfist --single-branch \
+   git clone --branch ironfist-master --single-branch \
      https://github.com/sushi-shi/homm2-decomp.git homm2-ironfist
    cd homm2-ironfist
    ```
@@ -67,7 +69,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist (you are here)
+                    master --------> ironfist --------> ironfist-master (you are here)
 ```
 
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
@@ -81,13 +83,18 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 - `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
   stored as Windows-1251 with readable Russian literals rather than UTF-8.
 - `master` is the cross-platform Linux, Windows, and Web port.
-- `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
+- `ironfist` is the direct portability-oriented Project Ironfist integration.
+- `ironfist-master` is the maintained integration: mechanics belong to the
+  recovered engine classes, while narrow namespaced boundaries own runtime,
+  callback, scripting, save, and extension state concerns.
 
 The classic branches are terminal views of their corresponding reconstruction;
 they do not feed Gold or `master`.
 
 The cross-version behavioral ledger lives on the evidence-owning Buka
 reconstruction branch; see [Retail version differences](docs/version-differences.md).
+The Ironfist ownership and compatibility rules are documented in
+[Ironfist integration architecture](docs/ironfist-architecture.md).
 
 ## Reconstruction evidence
 

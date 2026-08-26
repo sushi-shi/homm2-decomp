@@ -790,6 +790,7 @@ public:
         MonsterFlags,
         i32
     );
+    void ApplyPandoraBox(CombatSide side);
     void SetupSmallView(void);
     void ViewBallista(i32);
     i32 DoSpellAI(CombatSide, i32);

@@ -168,8 +168,10 @@ def extract_constant_calls(text):
     code = strip_cpp_comments(text)
     calls = {}
     duplicates = {}
+    # Upstream uses its C-style helpers; the integrated branch uses the same
+    # operations through names normalized to this repository's C++ style.
     pattern = re.compile(
-        r'\blua_setconst\s*\(\s*[^,]+,\s*"([^"]+)"\s*,\s*([^;]+?)\s*\)\s*;',
+        r'\b(?:lua_setconst|SetConstant)\s*\(\s*[^,]+,\s*"([^"]+)"\s*,\s*([^;]+?)\s*\)\s*;',
         re.S,
     )
     for name, expression in pattern.findall(code):
@@ -179,7 +181,10 @@ def extract_constant_calls(text):
         else:
             calls[name] = expression
     nil_names = set(
-        re.findall(r'\blua_setconst_nil\s*\(\s*[^,]+,\s*"([^"]+)"\s*\)', code)
+        re.findall(
+            r'\b(?:lua_setconst_nil|SetNilConstant)\s*\(\s*[^,]+,\s*"([^"]+)"\s*\)',
+            code,
+        )
     )
     return calls, nil_names, duplicates
 

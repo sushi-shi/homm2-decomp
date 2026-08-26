@@ -1,9 +1,11 @@
-# Ironfist Port
+# Ironfist integration
 
-This branch (`ironfist`) carries Project Ironfist's features on top of the
-Gold 2.1/Buka-based cross-platform `master`. The original PoL-based port is
-retained in the backup history as migration evidence, but it is not a base of
-this branch.
+This branch (`ironfist-master`) carries Project Ironfist's features on top of
+the Gold 2.1/Buka-based cross-platform `master`. It succeeds the direct
+`ironfist` port by integrating true mechanics into their owning recovered game
+classes and retaining narrow boundaries for runtime, callbacks, scripting,
+saves, and extension state. See
+[Ironfist integration architecture](ironfist-architecture.md).
 
 Ironfist source is a behavioral reference, not a copy source: its code was
 written against its own reverse-engineered structures, while this tree has the
@@ -30,16 +32,16 @@ review, and known semantic differences.
 | `scripting/consts.cpp` | `src/IRONFIST/consts.cpp` | full constant surface, see the mapping notes below |
 | `scripting/funcs.cpp` | `src/IRONFIST/funcs.cpp` | all 129 registered functions |
 | `gui/dialog_helpers.*` | `IRONFIST/dialog.*` | `MessageBoxA` → `platform::Host().ShowMessage` |
-| callback patch sites | `IRONFIST/hooks.*` + one-line calls in `src/SOURCE/` | see below |
+| callback patch sites | `ironfist::hooks` + qualified calls in `src/SOURCE/` | callbacks only; see below |
 | `maps/MODULES`, `maps/GENERIC` | resource pack `SCRIPTS/` | runtime Lua; must be present under `HOMM2_DATA/SCRIPTS` |
 
 Wired callback hooks (equivalent placement relative to the retained game
 behavior; see the audited qualifications linked above):
 
-- `game::NewMap` → `ScriptingInit`; adventure-manager startup on a new game →
+- `game::NewMap` → `ironfist::runtime::BeginMap`; adventure-manager startup on a new game →
   `OnMapStart` + first `OnNewDay` (`KB.cpp`); `game::PerDay` → `OnNewDay`;
   `CheckEndGame` tail → `OnMapVictory` / `OnMapLoss`; game shutdown →
-  `ScriptingShutdown`.
+  `ironfist::runtime::Shutdown`.
 - `advManager::MoveHero` → `OnHeroMove`; `advManager::DoEvent` →
   `OnLocationVisit` (skip result honored); `game::ClaimTown` →
   `OnCastleConquered`; `GiveTakeArtifactStat` → `OnArtifactGive`/`OnArtifactTake`.
@@ -92,7 +94,7 @@ this tree's enums. Notable divergences:
   monster interact, the melee pair, spell chance, mana cost, luck/morale info
   text), and all 129 script functions are real — the last five stubs became
   the vision-sharing, building-ban, AI-army-sharing and forced-chase features,
-  with state in `gIronfistExtra.adventure`.
+  owned by `game` and `town` with persistent policy in the extension sidecar.
 - Preferences (file-backed, replacing the registry), the GUI widget-message
   helpers, `IsWellDisabled`, and the expansion state object.
 - The data-driven artifact and creature layers: `DATA/artifacts.xml` and
@@ -100,7 +102,7 @@ this tree's enums. Notable divergences:
   authority; the retail tables grew to Ironfist's 256-entry capacities for
   the added artifacts (Pandora Box, Iron Fist) and creatures (72–83); secondary
   resource costs and random-spawn bounds are table-driven;
-  `Ironfist_Startup()` loads everything before the retail main.
+  `ironfist::runtime::Initialize()` loads everything before the retail main.
 
 ## The ledger is empty: everything is ported
 
@@ -111,7 +113,7 @@ full porting history. The late milestones, briefly:
 
 - XML saves (`IRONFIST/save_xml.*`): the whole object graph, script text, map
   variables and the Ironfist-only state; `.GIC`/`.GCC` extensions via
-  `GetSaveFileExtension`.
+  `ironfist::save::FileExtension`.
 - Combat: the eight tech spells (Awareness through Implosion Grenade), the
   creature attribute abilities (strike-and-return, charger/jumper/teleporter
   movement, astral dodge, shadow mark, plasma blast, force shield, fire-bomb
@@ -148,8 +150,8 @@ packages. The root `build.ninja` (classic Windows target) was already stale
 before this branch (it references TUs removed upstream) and does not build the
 Ironfist layer.
 
-Status: all milestones landed on the Gold/Buka base. Clean Linux, MinGW/Windows,
-and Emscripten/Web packages build, the catalog/encoding tests pass, and a
-headless startup smoke passes with GOG data and the Ironfist resource pack
-merged. Interactive Cyborg campaign and combat play-testing remains useful
-runtime coverage.
+Status: all feature milestones landed on the Gold/Buka base. The maintained
+architecture is on `ironfist-master`; the direct `ironfist` port remains its
+history. Linux, MinGW/Windows, Emscripten/Web, resources, public-interface, and
+integration-contract checks are the release gates. Interactive Cyborg campaign
+and combat play-testing remains useful runtime coverage.

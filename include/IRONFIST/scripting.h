@@ -4,56 +4,50 @@
 #include <map>
 #include <string>
 
+namespace ironfist::script {
+
 /*
  * These do not exactly correspond with Lua's own types.
  * Lua claims that integers and floating-points are the same type "number",
  * but it actually treats them differently in some places.
  */
-enum MapVarType {
-    MAPVAR_TYPE_STRING,
-    MAPVAR_TYPE_INTEGER,
-    MAPVAR_TYPE_NUMBER,
-    MAPVAR_TYPE_TABLE,
-    MAPVAR_TYPE_BOOLEAN,
-    MAPVAR_TYPE_ERROR
+enum class MapVariableType {
+    String,
+    Integer,
+    Number,
+    Table,
+    Boolean,
+    Error
 };
 
-struct mapVariable;
+struct MapVariable;
 
-typedef std::map<std::string, mapVariable> luaTable;
+using LuaTable = std::map<std::string, MapVariable>;
 
-struct mapVariable {
-    ~mapVariable() {
-        if (type == MAPVAR_TYPE_TABLE) {
-            delete tableValue;
-        } else {
-            delete singleValue;
-        }
-    }
-
-    MapVarType type;
-    union {
-        std::string* singleValue; // we treat all non-table values the same
-        luaTable* tableValue;
-    };
+struct MapVariable {
+    MapVariableType type = MapVariableType::Error;
+    std::string value;
+    LuaTable table;
 };
 
-void ScriptingInit(std::string& mapFileName);
-void ScriptingInitFromString(std::string& script);
-void ScriptingShutdown();
+void InitializeMap(const std::string& mapFileName);
+void InitializeFromSave(const std::string& script);
+void Shutdown();
 
-std::string GetScriptContents(std::string mapName);
+std::string ScriptContents(const std::string& mapName);
 
-bool isTable(MapVarType type);
-bool isStringNumBool(MapVarType type);
+bool IsTable(MapVariableType type);
+bool IsScalar(MapVariableType type);
 
-MapVarType StringToMapVarType(std::string stringType);
-std::string MapVarTypeToString(MapVarType type);
+MapVariableType ParseMapVariableType(const std::string& typeName);
+std::string MapVariableTypeName(MapVariableType type);
 
-std::map<std::string, mapVariable> LoadMapVariablesFromLUA();
+LuaTable LoadMapVariablesFromLua();
 
-void WriteMapVariablesToLUA(std::map<std::string, mapVariable>& mapVariables);
+void WriteMapVariablesToLua(const LuaTable& mapVariables);
 
 void ErrorLoadingMapVariable(std::string& mapVariableId, const std::string& addErrorMessage);
+
+} // namespace ironfist::script
 
 #endif

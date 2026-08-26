@@ -14,7 +14,7 @@
 #include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
@@ -29,6 +29,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
+
 
 // Debug toggle: every battle ends instantly in the human side's favor.
 bool gbAutoWinBattles;
@@ -550,7 +551,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++) {
             if (standable_0[direction_28] != 0) {
                 // A charger can also come in on a clear straight line.
-                if (CreatureHasAttribute(H2EnumIndex(currentArmy_1->m_monsterType), CHARGER)
+                if (ironfist::HasCreatureAttribute(currentArmy_1->m_monsterType, ironfist::CreatureAttribute::Charger)
                     && currentArmy_1->GetStraightLineDistanceToHex(directionHexes[direction_28])
                            <= currentArmy_1->m_monster.speed
                     && currentArmy_1->TargetOnStraightLine(directionHexes[direction_28])
@@ -1139,15 +1140,15 @@ void combatManager::ResetRound(void) {
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             army* currentArmy = m_armies[H2EnumIndex(side)] + armyIndex;
             if (currentArmy->m_monsterType != CREATURE_NONE
-                && CreatureHasAttribute(H2EnumIndex(currentArmy->m_monsterType), ASTRAL_DODGE))
-                gIronfistExtra.combat.stack.abilityCounter[currentArmy][ASTRAL_DODGE] = 1;
+                && ironfist::HasCreatureAttribute(currentArmy->m_monsterType, ironfist::CreatureAttribute::AstralDodge))
+                ironfist::state::Get().combat.stack.abilityCounter[currentArmy][ironfist::CreatureAttribute::AstralDodge] = 1;
         }
     }
-    auto wall = gIronfistExtra.combat.spell.fireBombWalls.begin();
-    while (wall != gIronfistExtra.combat.spell.fireBombWalls.end()) {
+    auto wall = ironfist::state::Get().combat.spell.fireBombWalls.begin();
+    while (wall != ironfist::state::Get().combat.spell.fireBombWalls.end()) {
         wall->turnsLeft--;
         if (wall->turnsLeft < 0)
-            wall = gIronfistExtra.combat.spell.fireBombWalls.erase(wall);
+            wall = ironfist::state::Get().combat.spell.fireBombWalls.erase(wall);
         else
             ++wall;
     }
@@ -1231,7 +1232,7 @@ CursorDirection combatManager::GetCursorDirection(i32 screenX, i32 screenY, i32 
 }
 
 void combatManager::CheckBurnCreature(army* stack) {
-    for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+    for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
         if (wall.hexIdx == stack->m_hex) {
             stack->SetSpellInfluence(ARMY_SPELL_INFLUENCE_BURN, COMBAT_BURN_ROUNDS);
             BurnCreature(stack);
@@ -1263,8 +1264,8 @@ void combatManager::BurnCreature(army* stack) {
     sprintf(gText, localization::Tr("combat.burning.damage"), burnDamage);
     if (creaturesKilled > 0) {
         char* targetCreature = creaturesKilled > 1
-            ? GetCreaturePluralName(H2EnumIndex(stack->m_monsterType))
-            : GetCreatureName(H2EnumIndex(stack->m_monsterType));
+            ? ironfist::GetCreaturePluralName(H2EnumIndex(stack->m_monsterType))
+            : ironfist::GetCreatureName(H2EnumIndex(stack->m_monsterType));
         sprintf(
             gText + strlen(gText),
             localization::TrPlural("combat.burning.killed", creaturesKilled),
@@ -1433,8 +1434,8 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             // A charger may attack down a clear straight line
                             // even when the walking path is blocked.
                             if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1
-                                || (CreatureHasAttribute(
-                                        H2EnumIndex(ourArmy_13->m_monsterType), CHARGER
+                                || (ironfist::HasCreatureAttribute(
+                                        ourArmy_13->m_monsterType, ironfist::CreatureAttribute::Charger
                                     )
                                     && ourArmy_13->TargetOnStraightLine(hexIndex)
                                     && ourArmy_13->ValidFlight(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
@@ -3106,10 +3107,10 @@ setCycleTimer:
     );
 
     // The fire walls flicker along with the screen cycle.
-    if (!gIronfistExtra.combat.spell.fireBombWalls.empty()) {
+    if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
         icon* wallIcon =
             gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
-        for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+        for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
             wall.currentFrame++;
             if (wall.currentFrame >= wallIcon->m_frameCount) {
                 wall.currentFrame = 0;

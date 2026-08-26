@@ -5,7 +5,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/sample.h>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <IRONFIST/hooks.h>
 #include <BASE/font.h>
 #include <BASE/Misc.h>
@@ -30,6 +30,7 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
+
 
 #define ARMY_HASTE_WALK_DURATION_SCALE 0.65
 #define ARMY_SLOW_WALK_DURATION_SCALE 1.5
@@ -171,7 +172,7 @@ using enum BerserkMaskIndex;
 #define DAMAGE_TELEPORT_MULTIPLIER 1.25f
 
 // Sprite frames for the Cyber creature ability animations.
-enum IronfistArmyFrame {
+enum ExtendedArmyFrame {
     ARMY_FORCE_SHIELD_ICON_X_OFFSET = 2,
     ARMY_FORCE_SHIELD_ICON_Y_OFFSET = -28,
     ARMY_FORCE_SHIELD_TEXT_Y_OFFSET = -24,
@@ -190,17 +191,17 @@ enum IronfistArmyFrame {
 // The Shadow Assassin's wince plays the astral slip once per dodge, then
 // the plain wince returns.
 static void ApplyAstralDodgeWince(army* target) {
-    if (H2EnumIndex(target->m_monsterType) != CREATURE_CYBER_SHADOW_ASSASSIN_ID) {
+    if (target->m_monsterType != CREATURE_CYBER_SHADOW_ASSASSIN) {
         return;
     }
-    if (gIronfistExtra.combat.stack.abilityNowAnimating[target][ASTRAL_DODGE]) {
+    if (ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge]) {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] =
             ARMY_DODGE_ANIMATION_LENGTH;
         for (i32 frame = 0; frame < ARMY_DODGE_ANIMATION_LENGTH; frame++) {
             target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][frame] =
                 static_cast<i8>(ARMY_DODGE_FIRST_FRAME + frame);
         }
-        gIronfistExtra.combat.stack.abilityNowAnimating[target][ASTRAL_DODGE] = false;
+        ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge] = false;
     } else {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] = 1;
         target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][0] =
@@ -301,9 +302,9 @@ void army::InitClean(void) {
     m_mirrorImageIndex = -1;
     m_armyGroupSlot = -1;
     m_lastTargetHex = -1;
-    for (auto& attribute : ironfistAttributeNames) {
-        if (CreatureHasAttribute(H2EnumIndex(m_monsterType), attribute))
-            gIronfistExtra.combat.stack.abilityCounter[this][attribute] = 1;
+    for (auto& attribute : ironfist::CreatureAttributes) {
+        if (ironfist::HasCreatureAttribute(m_monsterType, attribute))
+            ironfist::state::Get().combat.stack.abilityCounter[this][attribute] = 1;
     }
 }
 
@@ -370,9 +371,9 @@ void army::Init(
             rearHex < m_hex ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
     }
     m_armyGroupSlot = unknown;
-    for (auto& attribute : ironfistAttributeNames) {
-        if (CreatureHasAttribute(H2EnumIndex(m_monsterType), attribute))
-            gIronfistExtra.combat.stack.abilityCounter[this][attribute] = 1;
+    for (auto& attribute : ironfist::CreatureAttributes) {
+        if (ironfist::HasCreatureAttribute(m_monsterType, attribute))
+            ironfist::state::Get().combat.stack.abilityCounter[this][attribute] = 1;
     }
 }
 
@@ -661,7 +662,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         }
         // A force-shielded stack shows the shield's remaining strength above
         // the normal quantity box.
-        if (gIronfistExtra.combat.stack.forceShieldHP[this] > 0) {
+        if (ironfist::state::Get().combat.stack.forceShieldHP[this] > 0) {
             gpResourceManager->GetIcon("SPELLINF.ICN")
                 ->CombatClipDrawToBuffer(
                     quantX + ARMY_FORCE_SHIELD_ICON_X_OFFSET,
@@ -673,7 +674,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     gColorTableRed,
                     NULL
                 );
-            sprintf(countText, "%d", gIronfistExtra.combat.stack.forceShieldHP[this]);
+            sprintf(countText, "%d", ironfist::state::Get().combat.stack.forceShieldHP[this]);
             smallFont->DrawBoundedString(
                 countText,
                 quantX,
@@ -1215,7 +1216,7 @@ void army::SpecialAttack(void) {
             MAGE_BOLT_FRAME_DELAY,
             0
         );
-    } else if (H2EnumIndex(m_monsterType) == CREATURE_CYBER_BEHEMOTH_ID) {
+    } else if (m_monsterType == CREATURE_CYBER_BEHEMOTH) {
         // The Cyber Behemoth lobs its shot on the catapult arc.
         gpCombatManager->ArcShot(m_missileIcon, startX, startY, landX, landY);
     } else {
@@ -1380,7 +1381,7 @@ void army::SpecialAttack(void) {
         castX = gpCombatManager->m_hexCells[adjacentHex].m_x;
         castY = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)]);
-    } else if (CreatureHasAttribute(H2EnumIndex(m_monsterType), PLASMA_BLAST)) {
+    } else if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::PlasmaBlast)) {
         // The plasma blast splashes over the eighteen hexes around the target.
         static const i32 plasmaBlastMask[ARMY_PLASMA_BLAST_HEX_COUNT] = {
             -27, -26, -25, -14, -13, -12, -11, -2, -1, 1, 2, 12, 13, 14, 15, 25, 26, 27
@@ -1587,7 +1588,7 @@ void army::DoHydraAttack(i32) {
 }
 
 void army::SetChargingMoveAnimation(ChargingDirection direction) {
-    if (H2EnumIndex(m_monsterType) != CREATURE_CYBER_PLASMA_LANCER_ID) {
+    if (m_monsterType != CREATURE_CYBER_PLASMA_LANCER) {
         return;
     }
     i32 inAirFrame;
@@ -1613,7 +1614,7 @@ void army::SetChargingMoveAnimation(ChargingDirection direction) {
 }
 
 void army::RevertChargingMoveAnimation(void) {
-    if (H2EnumIndex(m_monsterType) != CREATURE_CYBER_PLASMA_LANCER_ID) {
+    if (m_monsterType != CREATURE_CYBER_PLASMA_LANCER) {
         return;
     }
     m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)] = ARMY_WALK_FRAME_COUNT;
@@ -1627,7 +1628,7 @@ void army::RevertChargingMoveAnimation(void) {
 }
 
 void army::SetJumpingAnimation(void) {
-    if (H2EnumIndex(m_monsterType) != CREATURE_CYBER_PLASMA_BERSERKER_ID) {
+    if (m_monsterType != CREATURE_CYBER_PLASMA_BERSERKER) {
         return;
     }
     m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_ATTACK_UP)] =
@@ -1648,7 +1649,7 @@ void army::SetJumpingAnimation(void) {
 }
 
 void army::RevertJumpingAnimation(void) {
-    if (H2EnumIndex(m_monsterType) != CREATURE_CYBER_PLASMA_BERSERKER_ID) {
+    if (m_monsterType != CREATURE_CYBER_PLASMA_BERSERKER) {
         return;
     }
     m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_ATTACK_DOWN)] =
@@ -1694,8 +1695,8 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
     gChargePathDamage = false;
 
     if (totalDamage > 0) {
-        char* attackerName = m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(m_monsterType))
-                                            : GetCreatureName(H2EnumIndex(m_monsterType));
+        char* attackerName = m_quantity > 1 ? ironfist::GetCreaturePluralName(H2EnumIndex(m_monsterType))
+                                            : ironfist::GetCreatureName(H2EnumIndex(m_monsterType));
         if (totalKilled > 0) {
             sprintf(
                 gText,
@@ -1762,7 +1763,7 @@ void army::DoAttack(i32 retaliation) {
     target_1 = NULL;
     breathTarget_6 = NULL;
     originalFacing_6 = m_facing;
-    Ironfist_MeleeAttack(this, retaliation);
+    ironfist::hooks::MeleeAttackStarted(this, retaliation);
     if (retaliation) {
         gCloseMove = true;
         gpCombatManager->m_currentSide = OppositeCombatSide(gpCombatManager->m_currentSide);
@@ -1857,7 +1858,7 @@ void army::DoAttack(i32 retaliation) {
         if (breathTarget_6) {
             DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, retaliation);
         }
-        if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+        if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
             gCharging = false;
         }
         if (damage == -1) {
@@ -1960,14 +1961,14 @@ void army::DoAttack(i32 retaliation) {
                 break;
         }
         // Shadow-marking creatures brand their victim on every hit.
-        if (CreatureHasAttribute(H2EnumIndex(m_monsterType), SHADOW_MARK)
+        if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::ShadowMark)
             && target_1->SpellCastWorks(SPELL_SHADOW_MARK)) {
             target_1->m_spellEffect = SPELL_SHADOW_MARK;
         }
         ApplyAstralDodgeWince(target_1);
-        if (gIronfistExtra.combat.stack.abilityNowAnimating[this][JUMPER]) {
+        if (ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper]) {
             SetJumpingAnimation();
-            gIronfistExtra.combat.stack.abilityNowAnimating[this][JUMPER] = false;
+            ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = false;
         } else {
             RevertJumpingAnimation();
         }
@@ -2009,7 +2010,7 @@ void army::DoAttack(i32 retaliation) {
             && m_monsterType != CREATURE_ROGUE && m_monsterType != CREATURE_SPRITE
             && m_monsterType != CREATURE_VAMPIRE && m_monsterType != CREATURE_VAMPIRE_LORD
             // Teleporting in from afar leaves no chance to retaliate.
-            && !(CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER) && !gCloseMove)
+            && !(ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter) && !gCloseMove)
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
                 static_cast<i32l>(
@@ -2100,7 +2101,7 @@ void army::DoAttack(i32 retaliation) {
     if (retaliation) {
         gpCombatManager->m_currentSide = OppositeCombatSide(gpCombatManager->m_currentSide);
     } else {
-        Ironfist_MeleeAttackComplete(this, target_1);
+        ironfist::hooks::MeleeAttackCompleted(this, target_1);
     }
 }
 
@@ -2179,8 +2180,8 @@ i32 army::WalkTo(i32 destination) {
         );
         // The Berserker jumps: onto its victim from up to four hexes out,
         // or over the first obstacle in its way.
-        if (H2EnumIndex(m_monsterType) == CREATURE_CYBER_PLASMA_BERSERKER_ID
-            && gIronfistExtra.combat.stack.abilityCounter[this][JUMPER]) {
+        if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
+            && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]) {
             i32 stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
             if (gMoveAttack && direction_3 < 4) {
                 for (i32 step = direction_3; step >= 0; step--) {
@@ -2191,7 +2192,7 @@ i32 army::WalkTo(i32 destination) {
                     m_hex = stepHex;
                 }
                 ArcJump(jumpStartHex, stepHex);
-                gIronfistExtra.combat.stack.abilityNowAnimating[this][JUMPER] = true;
+                ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = true;
                 CancelSpellType(ArmySpellCancelType(0));
                 return 0;
             } else if (gpCombatManager->m_hexCells[stepHex].m_blocked) {
@@ -2240,7 +2241,7 @@ i32 army::AttackTo(i32 destination) {
     // A charger whose walking path is blocked flies its straight line in.
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
         || (ValidPath(destination, ARMY_PATH_ANY_TARGET_HEX) == 0
-            && CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER))) {
+            && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger))) {
         if (m_hex != destination) {
             FlyTo(destination);
         }
@@ -2270,8 +2271,8 @@ i32 army::AttackTo(i32 destination) {
                     finishStanding = 0;
                 }
                 // The Berserker leaps the last stretch onto its victim.
-                if (H2EnumIndex(m_monsterType) == CREATURE_CYBER_PLASMA_BERSERKER_ID
-                    && gIronfistExtra.combat.stack.abilityCounter[this][JUMPER]
+                if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
+                    && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]
                     && gMoveAttack && pathIndex_4 < 5) {
                     i32 stepHex = m_hex;
                     for (i32 step = pathIndex_4; step >= 1; step--) {
@@ -2284,7 +2285,7 @@ i32 army::AttackTo(i32 destination) {
                         m_hex = stepHex;
                     }
                     ArcJump(jumpStartHex, stepHex);
-                    gIronfistExtra.combat.stack.abilityNowAnimating[this][JUMPER] = true;
+                    ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = true;
                     break;
                 }
                 Walk(
@@ -2456,7 +2457,7 @@ void army::DamageEnemy(
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER))) && !rangedAttack
         && m_monsterType != CREATURE_TITAN && m_monsterType != CREATURE_MAGE
         && m_monsterType != CREATURE_ARCHMAGE
-        && H2EnumIndex(m_monsterType) != CREATURE_CYBER_BEHEMOTH_ID) {
+        && m_monsterType != CREATURE_CYBER_BEHEMOTH) {
         damage1 /= DAMAGE_HALF_DIVISOR;
     }
     if (rangedAttack && target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_SHIELD)]) {
@@ -2473,14 +2474,14 @@ void army::DamageEnemy(
         damage1 *= DAMAGE_SHADOW_MARK_MULTIPLIER;
     }
     // A jumper strikes harder mid-jump, once per battle.
-    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), JUMPER) && !retaliation
-        && gIronfistExtra.combat.stack.abilityCounter[this][JUMPER]
-        && gIronfistExtra.combat.stack.abilityNowAnimating[this][JUMPER]) {
-        gIronfistExtra.combat.stack.abilityCounter[this][JUMPER] = 0;
+    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper) && !retaliation
+        && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]
+        && ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper]) {
+        ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper] = 0;
         damage1 *= SRandom(125, 150) * 0.01f;
     }
     // A charger's hit softens along its path and lands harder at the end.
-    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER) && gCharging) {
+    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger) && gCharging) {
         if (gChargePathDamage) {
             damage1 *= DAMAGE_CHARGE_PATH_MULTIPLIER;
         } else {
@@ -2488,7 +2489,7 @@ void army::DamageEnemy(
         }
     }
     // Teleporting into an enemy from afar hits harder.
-    if (!gCloseMove && CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER)) {
+    if (!gCloseMove && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)) {
         damage1 *= DAMAGE_TELEPORT_MULTIPLIER;
     }
     damageDone2 = static_cast<i32>(damage1 + DAMAGE_ROUNDING_OFFSET);
@@ -2509,10 +2510,10 @@ void army::DamageEnemy(
     }
     // An astral dodger slips one melee blow per round; -2 marks the dodge.
     if (!rangedAttack && !retaliation
-        && CreatureHasAttribute(H2EnumIndex(target->m_monsterType), ASTRAL_DODGE)
-        && gIronfistExtra.combat.stack.abilityCounter[target][ASTRAL_DODGE]) {
-        gIronfistExtra.combat.stack.abilityNowAnimating[target][ASTRAL_DODGE] = true;
-        gIronfistExtra.combat.stack.abilityCounter[target][ASTRAL_DODGE] = 0;
+        && ironfist::HasCreatureAttribute(target->m_monsterType, ironfist::CreatureAttribute::AstralDodge)
+        && ironfist::state::Get().combat.stack.abilityCounter[target][ironfist::CreatureAttribute::AstralDodge]) {
+        ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge] = true;
+        ironfist::state::Get().combat.stack.abilityCounter[target][ironfist::CreatureAttribute::AstralDodge] = 0;
         damageDone2 = -2;
     }
     *damageResult = damageDone2;
@@ -2521,13 +2522,13 @@ void army::DamageEnemy(
         return;
     }
     // A force shield soaks the hit; the overflow passes through and breaks it.
-    i32 shieldPoints = gIronfistExtra.combat.stack.forceShieldHP[target];
+    i32 shieldPoints = ironfist::state::Get().combat.stack.forceShieldHP[target];
     if (shieldPoints > 0) {
         if (shieldPoints - damageDone2 <= 0) {
             target->CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
             damageDone2 -= shieldPoints;
         } else {
-            gIronfistExtra.combat.stack.forceShieldHP[target] -= damageDone2;
+            ironfist::state::Get().combat.stack.forceShieldHP[target] -= damageDone2;
             damageDone2 = 0;
         }
     }
@@ -3233,7 +3234,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_BURN:
             break;
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
-            gIronfistExtra.combat.stack.forceShieldHP[this] = 0;
+            ironfist::state::Get().combat.stack.forceShieldHP[this] = 0;
             break;
     }
 }
@@ -3308,7 +3309,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_BURN:
             break;
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
-            gIronfistExtra.combat.stack.forceShieldHP[this] =
+            ironfist::state::Get().combat.stack.forceShieldHP[this] =
                 gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints;
             break;
     }
@@ -3634,7 +3635,7 @@ void army::MoveAttackNonFlyer(i32 startHex, i32 attackMask) {
 
     // Strike-and-return creatures fly home after the blow.
     if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_DEAD)))
-        && CreatureHasAttribute(H2EnumIndex(m_monsterType), STRIKE_AND_RETURN)) {
+        && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::StrikeAndReturn)) {
         MoveTo(startHex);
     }
 }
@@ -3675,7 +3676,7 @@ again:
     m_moveTargetHex = destination;
     baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
     if (((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
-         || (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)
+         || (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)
              && TargetOnStraightLine(destination)))
         && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
         if (m_hex != m_moveTargetHex
@@ -3690,7 +3691,7 @@ again:
 move:
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
         // A charger on a clear line flies its move-attack in.
-        || (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER) && gMoveAttack
+        || (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger) && gMoveAttack
             && TargetOnStraightLine(giNextActionGridIndex)
             && TargetOnStraightLine(destination))) {
         m_moveTargetHex = destination;
@@ -3713,11 +3714,11 @@ float army::SpellCastWorkChance(SpellType spell) {
 
     // A dying stack cannot be shadow-marked.
     if (spell == SPELL_SHADOW_MARK && m_deathPending) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)))
         && (spell == SPELL_MIRROR_IMAGE || spell == SPELL_ANTI_MAGIC)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL) {
         foundSpell_8 = 0;
@@ -3728,7 +3729,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             }
         }
         if (!foundSpell_8) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
     }
     if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_ANTI_MAGIC)]
@@ -3736,36 +3737,36 @@ float army::SpellCastWorkChance(SpellType spell) {
             && spell != SPELL_TRUE_RESURRECT && spell != SPELL_ANIMATE_DEAD)
         || m_deathPending || m_monsterType == CREATURE_GREEN_DRAGON
         || m_monsterType == CREATURE_RED_DRAGON || m_monsterType == CREATURE_BLACK_DRAGON) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (spell == SPELL_MIRROR_IMAGE && m_mirrorImageIndex != -1) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if ((spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT)
         && ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))) || m_initialQuantity == m_quantity)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (spell == SPELL_ANIMATE_DEAD
         && (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))) || m_initialQuantity == m_quantity)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if ((spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT)
         && !(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD)))) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if ((spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE)
         && (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD)))) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_PHOENIX
         && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST
             || spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING
             || spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING
             || spell == SPELL_ELEMENTAL_STORM)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_CRUSADER && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))) || m_monsterType == CREATURE_EARTH_ELEMENTAL
          || m_monsterType == CREATURE_AIR_ELEMENTAL || m_monsterType == CREATURE_FIRE_ELEMENTAL
@@ -3773,62 +3774,62 @@ float army::SpellCastWorkChance(SpellType spell) {
          || m_monsterType == CREATURE_TITAN)
         && (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE || spell == SPELL_PARALYZE
             || spell == SPELL_BLIND)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD)))
         && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE || spell == SPELL_BLESS
             || spell == SPELL_MASS_BLESS)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_EARTH_ELEMENTAL
         && (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING
             || spell == SPELL_METEOR_SHOWER)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_AIR_ELEMENTAL && spell == SPELL_METEOR_SHOWER) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_FIRE_ELEMENTAL
         && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (m_monsterType == CREATURE_WATER_ELEMENTAL
         && (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]) {
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_HOLY_PENDANT)
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_PENDANT_FREE_WILL)
             && spell == SPELL_HYPNOTIZE) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_PENDANT_LIFE)
             && (spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE)) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_SERENITY_PENDANT)
             && spell == SPELL_BERSERKER) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_SEEING_EYE_PENDANT)
             && spell == SPELL_BLIND) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_KINETIC_PENDANT)
             && spell == SPELL_PARALYZE) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_PENDANT_DEATH)
             && (spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT)) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
         if (gpCombatManager->m_heroes[H2EnumIndex(m_side)]->HasArtifact(ARTIFACT_WAND_NEGATION)
             && (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL
                 || spell == CREATURE_SPELL_DISPEL)) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
     }
     if (m_quantity == 0
@@ -3843,7 +3844,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             resurrectPower_5 *= ARTIFACT_POWER_MULTIPLIER;
         }
         if (resurrectPower_5 < m_monster.hitPoints) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
     }
     if (spell == CREATURE_SPELL_DISPEL && !m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HASTE)]
@@ -3854,7 +3855,7 @@ float army::SpellCastWorkChance(SpellType spell) {
         && !m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_ANTI_MAGIC)]
         && !m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_STONESKIN)]
         && !m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_STEELSKIN)]) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
     }
     if (spell == SPELL_HYPNOTIZE) {
         hypnotizeHitPoints_37 = gpCombatManager->m_heroes[H2EnumIndex(gpCombatManager->m_currentSide)]->Stats(
@@ -3867,7 +3868,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             hypnotizeHitPoints_37 *= ARTIFACT_POWER_MULTIPLIER;
         }
         if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints_37) {
-            return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
+            return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_NONE);
         }
     }
     if ((m_monsterType == CREATURE_DWARF || m_monsterType == CREATURE_BATTLE_DWARF)
@@ -3878,9 +3879,9 @@ float army::SpellCastWorkChance(SpellType spell) {
         && spell != SPELL_DRAGON_SLAYER && spell != SPELL_BLOOD_LUST && spell != SPELL_MIRROR_IMAGE
         && spell != SPELL_SHIELD && spell != SPELL_MASS_SHIELD
         && spell != SPELL_FORCE_SHIELD && spell != SPELL_MASS_FORCE_SHIELD) {
-        return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_DWARF);
+        return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_DWARF);
     }
-    return Ironfist_CalcSpellChance(this, spell, ARMY_SPELL_CHANCE_ALWAYS);
+    return ironfist::hooks::ModifySpellChance(this, spell, ARMY_SPELL_CHANCE_ALWAYS);
 }
 
 i32 army::SpellCastWorks(SpellType spell) {

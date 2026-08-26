@@ -3,12 +3,12 @@
 The maintained branch chain is:
 
 ```text
-decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist
+decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist -> ironfist-master
 ```
 
 `master` is the portable Gold 2.1 line. Matching-only changes stay on the
 decomp branches; portable platform, localization, and runtime changes belong
-here and flow onward to `ironfist`.
+here and flow onward through `ironfist` to `ironfist-master`.
 
 ```text
 include/PLATFORM/          interfaces
@@ -27,8 +27,8 @@ The native build needs an installed copy of the game data:
 HOMM2_DATA=/path/to/heroes2 nix run .
 ```
 
-On the `ironfist` branch, install the pinned Ironfist resource payload into the
-same writable game directory first:
+On the `ironfist` or `ironfist-master` branch, install the pinned Ironfist
+resource payload into the same writable game directory first:
 
 ```sh
 nix run .#ironfist-resources -- /path/to/heroes2

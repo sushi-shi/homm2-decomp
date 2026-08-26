@@ -8,6 +8,8 @@
 
 #include <PLATFORM/Platform.h>
 
+namespace ironfist {
+
 static std::string PrefsPath() {
     return platform::Files().UserRoot() + "/ironfist.cfg";
 }
@@ -37,7 +39,7 @@ static bool WriteAllPrefs(const std::map<std::string, std::string>& prefs) {
 }
 
 template <>
-i32 read_pref(const std::string& key) {
+i32 ReadPreference(const std::string& key) {
     std::map<std::string, std::string> prefs = ReadAllPrefs();
     const auto found = prefs.find(key);
     if (found == prefs.end()) {
@@ -47,14 +49,14 @@ i32 read_pref(const std::string& key) {
 }
 
 template <>
-std::string read_pref(const std::string& key) {
+std::string ReadPreference(const std::string& key) {
     std::map<std::string, std::string> prefs = ReadAllPrefs();
     const auto found = prefs.find(key);
     return found == prefs.end() ? std::string() : found->second;
 }
 
 template <>
-bool read_pref(const std::string& key, std::string& value) {
+bool ReadPreference(const std::string& key, std::string& value) {
     std::map<std::string, std::string> prefs = ReadAllPrefs();
     const auto found = prefs.find(key);
     if (found == prefs.end()) {
@@ -65,13 +67,13 @@ bool read_pref(const std::string& key, std::string& value) {
 }
 
 template <>
-bool write_pref(const std::string& key, const i32& value) {
+bool WritePreference(const std::string& key, const i32& value) {
     std::map<std::string, std::string> prefs = ReadAllPrefs();
     prefs[key] = std::to_string(value);
     return WriteAllPrefs(prefs);
 }
 
-bool write_pref(const std::string& key, const std::string& value) {
+bool WritePreference(const std::string& key, const std::string& value) {
     std::map<std::string, std::string> prefs = ReadAllPrefs();
     prefs[key] = value;
     return WriteAllPrefs(prefs);
@@ -79,9 +81,9 @@ bool write_pref(const std::string& key, const std::string& value) {
 
 static bool IsWellDisabled_impl() {
     const std::string key = "Disable Well";
-    const i32 wellSetting = read_pref<i32>(key);
+    const i32 wellSetting = ReadPreference<i32>(key);
     if (wellSetting == -1) {
-        write_pref<i32>(key, 0);
+        WritePreference<i32>(key, 0);
         return false;
     }
 
@@ -92,3 +94,5 @@ bool IsWellDisabled() {
     static const bool isDisabled = IsWellDisabled_impl();
     return isDisabled;
 }
+
+} // namespace ironfist

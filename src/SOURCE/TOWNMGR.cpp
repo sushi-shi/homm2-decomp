@@ -49,6 +49,7 @@
 #include <string.h>
 #include <SOURCE/Localization.h>
 
+
 namespace {
 
     typedef enum TownManagerInputCode {
@@ -530,7 +531,7 @@ static const H2EnumStorage<BuildingSlotType, i8>
     TOWN_OBJECT_ORDER_EMPTY_ROW,
     TOWN_OBJECT_ORDER_EMPTY_ROW,
     // The Cyborg town draws every building; order from Ironfist's
-    // gBuildingsToDraw (the ext slots have no faction alias here).
+    // BuildingsToDraw (the ext slots have no faction alias here).
     {TOWN_OBJECT_MAGE_GUILD,
      TOWN_OBJECT_CASTLE_UPGRADE,
      TOWN_OBJECT_CASTLE,
@@ -841,7 +842,7 @@ i32 townManager::Open(i32 id) {
     m_active = true;
     strcpy(m_name, "townManager");
     gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
-    Ironfist_TownOpened(m_town);
+    ironfist::hooks::TownOpened(m_town);
     gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     return 0;
 }
@@ -2304,7 +2305,7 @@ i32 townManager::BuyBuild(
         description_b,
         GetBuildingInfo(m_town->m_type, building, 0)
     );
-    i32 disallowed_p = Ironfist_BuildingDisallowed(m_town, H2EnumIndex(building));
+    i32 disallowed_p = m_town->IsBuildingDisallowed(H2EnumIndex(building));
     if (disallowed_p) {
         strcat(description_b, localization::Tr("town.build.disallowed"));
         cannotBuy = 1;
@@ -2672,7 +2673,7 @@ void townManager::SetupMage(heroWindow* window) {
                 + (m_town->m_type == FACTION_WIZARD
                    && (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG));
             if (m_town->m_type == FACTION_CYBORG)
-                slotLimit = ironfistCyborgSpellLimits[level_f];
+                slotLimit = ironfist::CyborgSpellLimits[level_f];
             if (slot_o >= slotLimit) {
                 spellState_c = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {
@@ -2809,9 +2810,9 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
 
 i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     // Rehiring a hero during the same turn must not refresh movement.
-    hero* ironfistRecruit =
+    hero* recruitedHero =
         &gpGame->m_heroRecs[gpCurPlayer->m_availableHeroIds[availableHeroIndex]];
-    i32 ironfistOldMobility = ironfistRecruit->m_remainingMobility;
+    i32 previousMobility = recruitedHero->m_remainingMobility;
     i16 unusedTextState_j = 1;
     i16 unusedPortraitState_i = 2;
     i16 unusedTextControl_g = 3;
@@ -2947,7 +2948,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     m_recruitHero->m_owner = -1;
     if (m_recruitState != -1)
         m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
-    ironfistRecruit->m_remainingMobility = ironfistOldMobility;
+    recruitedHero->m_remainingMobility = previousMobility;
     return m_recruitState != -1;
 }
 
@@ -3208,7 +3209,7 @@ void townManager::SetupWell(heroWindow* window) {
             growth_a = gMonsterDatabase[H2EnumIndex(gDwellingType[H2EnumIndex(m_town->m_type)]
                                                         [dwellingTypes_c[dwellingResult_a]])]
                           .growth;
-            if (!IsWellDisabled())
+            if (!ironfist::IsWellDisabled())
                 growth_a += TOWN_WELL_BASE_GROWTH_BONUS;
             if (dwellingResult_a == 0
                 && (m_town->m_buildings & (1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))

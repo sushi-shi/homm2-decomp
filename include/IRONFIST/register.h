@@ -3,7 +3,11 @@
 
 #include <IRONFIST/lua.h>
 
-void set_scripting_consts(lua_State* L);
-void set_scripting_funcs(lua_State* L);
+namespace ironfist::script {
+
+void RegisterConstants(lua_State* L);
+void RegisterFunctions(lua_State* L);
+
+} // namespace ironfist::script
 
 #endif

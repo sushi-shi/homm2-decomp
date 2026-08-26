@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
@@ -17,6 +17,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
+
 
 #define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE \
     1.3
@@ -393,7 +394,7 @@ i32 army::FlyTo(i32 destination) {
         gpCombatManager->m_backgroundDrawn = 0;
         m_animationSequence = ARMY_ANIMATION_WALK;
         for (leg = 0; leg < stepCount1; leg++) {
-            if (CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER)) {
+            if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)) {
                 BuildTeleporterTempWalkSeq(
                     &m_frameInfo,
                     leg + 1 == stepCount1,
@@ -402,7 +403,7 @@ i32 army::FlyTo(i32 destination) {
                 );
             } else {
                 BuildTempWalkSeq(&m_frameInfo, leg + 1 == stepCount1, leg > 0);
-                if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+                if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
                     gCharging = true;
                     ChargingDirection chargeDirection = CHARGING_FORWARD;
                     double chargeAngle =
@@ -439,7 +440,7 @@ i32 army::FlyTo(i32 destination) {
                 if (m_animationFrame >= frameStart
                     && m_animationFrame < frameStart + frameCount0) {
                     // A far teleport snaps straight to the destination.
-                    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), TELEPORTER)
+                    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)
                         && !gCloseMove) {
                         xPos = static_cast<float>(endX);
                         yPos = static_cast<float>(endY);
@@ -583,7 +584,7 @@ i32 army::FlyTo(i32 destination) {
         }
         m_facingChanged = 0;
     }
-    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
         std::set<i32> uniqueHexes(chargeAffectedHexes.begin(), chargeAffectedHexes.end());
         chargeAffectedHexes.assign(uniqueHexes.begin(), uniqueHexes.end());
         // The landing target takes the full hit, not the path damage.
@@ -596,7 +597,7 @@ i32 army::FlyTo(i32 destination) {
         ChargingDamage(chargeAffectedHexes);
     }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    if (CreatureHasAttribute(H2EnumIndex(m_monsterType), CHARGER)) {
+    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
         RevertChargingMoveAnimation();
     }
     gpCombatManager->TestRaiseDoor();

@@ -2,14 +2,14 @@
 
 #include <cstring>
 
-namespace UtilsXML {
+namespace ironfist::xml {
 
 tinyxml2::XMLError QueryShortText(tinyxml2::XMLElement* el, i16* dest) {
     i32 val;
     tinyxml2::XMLError res = el->QueryIntText(&val);
     *dest = static_cast<i16>(val);
     return res;
-}
+} // namespace ironfist::xml
 
 tinyxml2::XMLError QueryCharText(tinyxml2::XMLElement* el, char* dest) {
     i32 val;

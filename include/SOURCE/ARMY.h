@@ -110,7 +110,7 @@ enum ChargingDirection {
     CHARGING_DOWN
 };
 
-enum IronfistArmyConstant {
+enum ExtendedArmyConstant {
     ARMY_CHARGE_SPRITE_OFFSET      = 10,
     ARMY_STRAIGHT_LINE_UNREACHABLE = 999,
     ARMY_PLASMA_BLAST_HEX_COUNT    = 18

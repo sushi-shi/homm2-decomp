@@ -23,6 +23,7 @@
 #include <SOURCE/swapManager.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/Localization.h>
+
 typedef enum SwapManagerControl {
     CONTROL_LEFT_HERO               = 0x41,
     CONTROL_RIGHT_HERO              = 0x42,
@@ -159,7 +160,7 @@ i32 swapManager::Open(i32 id) {
                 // The Cyborg Wisdom slot draws the Cybernetics small icon.
                 if (m_heroes[H2EnumIndex(swapSide)]->m_cursorType == FACTION_CYBORG
                     && m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget) == HERO_SKILL_WISDOM)
-                    message.payload.widget.data.value = CYBERNETICS_MINI_SKILL_FRAME;
+                    message.payload.widget.data.value = ironfist::CYBERNETICS_MINI_SKILL_FRAME;
                 else
                     message.payload.widget.data.value = H2EnumIndex(m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget));
                 m_window->BroadcastMessage(message);

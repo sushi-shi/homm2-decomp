@@ -60,6 +60,7 @@
 #include <string.h>
 #include <SOURCE/Localization.h>
 
+
 enum class AdventureSystemOptionsWidgetId : i32 {
     SYSTEM_OPTION_MUSIC_VOLUME = 10,
     SYSTEM_OPTION_SOUND_VOLUME = 11,
@@ -2574,10 +2575,10 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
             *result = ControlPanel();
             break;
         case PANEL_END_TURN:
-            // The reminder defaults on; read_pref hands back -1 when the
+            // The reminder defaults on; ironfist::ReadPreference hands back -1 when the
             // value was never written.
             if (gpCurPlayer->HasMobileHero()
-                && read_pref<i32>("Show Hero Movement Reminder") != 0) {
+                && ironfist::ReadPreference<i32>("Show Hero Movement Reminder") != 0) {
                 NormalDialog(
                     localization::Tr("adventure.confirm.end_turn_with_mobile_heroes"),
                     NORMAL_DIALOG_CONFIRM,
@@ -4896,13 +4897,13 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
-        if (Ironfist_TooltipText(
+        if (ironfist::hooks::OverrideTooltip(
                 currentCell,
                 m_mapOriginX + cellX,
                 m_mapOriginY + cellY,
                 tooltipOverride
             )) {
-            GUISetText(pWin, 1, tooltipOverride);
+            ironfist::GUISetText(pWin, 1, tooltipOverride);
             gpWindowManager->AddWindow(pWin, 1, -1);
             QuickViewWait();
             gpWindowManager->RemoveWindow(pWin);
@@ -4941,7 +4942,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         i32 scrollSpell = currentCell->m_objectMetadata;
                         sprintf(
                             gText,
-                            GetArtifactDescription(artifact).c_str(),
+                            ironfist::GetArtifactDescription(artifact).c_str(),
                             gSpellNames[scrollSpell]
                         );
                         NormalDialog(
@@ -4957,7 +4958,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             0
                         );
                     } else {
-                        strcpy(gText, GetArtifactDescription(artifact).c_str());
+                        strcpy(gText, ironfist::GetArtifactDescription(artifact).c_str());
                         NormalDialog(
                             gText,
                             NORMAL_DIALOG_QUICK_VIEW,
@@ -7519,7 +7520,7 @@ i32 SaveGame(void) {
     // The extension follows the campaign type, custom campaigns included.
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
-    sprintf(suffix, "%s", GetSaveFileExtension(false).c_str());
+    sprintf(suffix, "%s", ironfist::save::FileExtension(false).c_str());
     sprintf(pattern, "*%s", suffix);
 
     fileRequester* req = new fileRequester(

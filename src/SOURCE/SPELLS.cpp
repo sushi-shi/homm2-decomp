@@ -7,7 +7,7 @@
 #include <set>
 #include <vector>
 #include <IRONFIST/creatures.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <string.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
@@ -33,6 +33,7 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
+
 
 #define RIPPLE_MODE_ZERO_AMPLITUDE_BASE 0.3f
 #define RIPPLE_MODE_ZERO_AMPLITUDE_STEP 0.05f
@@ -631,7 +632,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
             if (m_hexCells[hex].m_occupantSide != m_currentSide)
                 return 0;
             if (target_j
-                && gIronfistExtra.combat.stack.forceShieldHP[target_j]
+                && ironfist::state::Get().combat.stack.forceShieldHP[target_j]
                        >= gMonsterDatabase[H2EnumIndex(target_j->m_monsterType)].hitPoints)
                 return 0;
             break;
@@ -1307,8 +1308,8 @@ void combatManager::CastSpell(
                 gText,
                 localization::Tr("combat.spell.marksman_pierce_damage"),
                 static_cast<i32>(pierceDamage),
-                target3->m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(target3->m_monsterType))
-                                        : GetCreatureName(H2EnumIndex(target3->m_monsterType))
+                target3->m_quantity > 1 ? ironfist::GetCreaturePluralName(H2EnumIndex(target3->m_monsterType))
+                                        : ironfist::GetCreatureName(H2EnumIndex(target3->m_monsterType))
             );
             CombatMessage(gText, 1, 1, 0);
             float pierceAngles[SPELL_MISSILE_ANGLE_COUNT] = {
@@ -1693,7 +1694,7 @@ bool combatManager::AreaSpellAffectHexes(
         if (spell == SPELL_FIRE_BOMB) {
             // Fire walls linger where the bomb burst.
             bool wallExists = false;
-            for (auto& wall : gIronfistExtra.combat.spell.fireBombWalls) {
+            for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
                 if (wall.hexIdx == hex) {
                     wallExists = true;
                     wall.turnsLeft = COMBAT_BURN_ROUNDS;
@@ -1702,7 +1703,7 @@ bool combatManager::AreaSpellAffectHexes(
                 }
             }
             if (!wallExists) {
-                gIronfistExtra.combat.spell.fireBombWalls.push_back(
+                ironfist::state::Get().combat.spell.fireBombWalls.push_back(
                     {hex, COMBAT_BURN_ROUNDS, 0}
                 );
             }

@@ -3,6 +3,8 @@
 #include <BASE/heroWindow.h>
 #include <BASE/message.h>
 
+namespace ironfist {
+
 static tag_message MakeWidgetMessage(i32 id, i32 command) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
@@ -83,3 +85,5 @@ void GUISetDropdownSelection(heroWindow* hwnd, i32 id, i32 index) {
     message.payload.widget.data.value = index;
     hwnd->BroadcastMessage(message);
 }
+
+} // namespace ironfist

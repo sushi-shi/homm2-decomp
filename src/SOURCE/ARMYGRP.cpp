@@ -7,6 +7,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
 
+
 typedef enum MoraleConstant {
     FIZBIN_MORALE_PENALTY = 2,
     COLISEUM_MORALE_BONUS = 2,
@@ -58,7 +59,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     alignValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
 
     if (HasAllUndead())
-        return Ironfist_CalcMorale(armyHero, occupiedTown, 0);
+        return ironfist::hooks::ModifyMorale(armyHero, occupiedTown, 0);
 
     if (HasSomeUndead())
         hasSomeUndead = 1;
@@ -76,7 +77,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
 
     if (armyHero != NULL) {
         if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
-            return Ironfist_CalcMorale(armyHero, occupiedTown, ARMY_GROUP_MORALE_MAX);
+            return ironfist::hooks::ModifyMorale(armyHero, occupiedTown, ARMY_GROUP_MORALE_MAX);
 
         moraleCount += H2EnumIndex(armyHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)]);
         moraleCount += armyHero->m_morale;
@@ -115,7 +116,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     else if (moraleCount > ARMY_GROUP_MORALE_MAX)
         moraleCount = ARMY_GROUP_MORALE_MAX;
 
-    return Ironfist_CalcMorale(armyHero, occupiedTown, moraleCount);
+    return ironfist::hooks::ModifyMorale(armyHero, occupiedTown, moraleCount);
 }
 
 void armyGroup::Dismiss(i32 slot) {

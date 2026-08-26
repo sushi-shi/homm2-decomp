@@ -39,6 +39,8 @@
 #include <IRONFIST/prefs.h>
 #include <IRONFIST/heroes.h>
 #include <IRONFIST/hooks.h>
+#include <IRONFIST/state.h>
+#include <IRONFIST/runtime.h>
 #include <IRONFIST/save_xml.h>
 #include <IRONFIST/townconsts.h>
 #include <EDITOR/mapcell.h>
@@ -61,6 +63,7 @@
 #include <BASE/Utf8.h>
 
 #include <string>
+
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \
@@ -1091,7 +1094,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 }
 
 i32 game::SaveGame(char* filename, i32 generateName, i8) {
-    return Ironfist_SaveGame(filename, generateName);
+    return ironfist::save::SaveGame(filename, generateName);
 }
 
 void game::SetupOrigData(void) {
@@ -1256,7 +1259,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (Ironfist_LoadGame(filename, !loadFromFile))
+    if (ironfist::save::LoadGame(filename, !loadFromFile))
         return;
     if (loadFromFile) {
         SetupOrigData();
@@ -1482,8 +1485,8 @@ void game::GiveTroopsToNeutralTown(i32 townId) {
 
     creatureCount += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
     const CreatureType creature =
-        neutralTownCreatureTypes[H2EnumIndex(neutralTown->m_type)][tier];
-    if (H2EnumIndex(creature) != CREATURE_INVALID_ID)
+        ironfist::NeutralTownCreatures[H2EnumIndex(neutralTown->m_type)][tier];
+    if (creature != CREATURE_NONE)
         GiveArmy(&neutralTown->m_army, creature, creatureCount, ARMY_GROUP_EMPTY_SLOT);
 }
 
@@ -1525,7 +1528,7 @@ void game::NewMap(char* filename) {
     i32 townIndex;
 
     if (!gbInCampaign && !xIsPlayingExpansionCampaign) {
-        write_pref(
+        ironfist::WritePreference(
             xIsExpansionMap ? "Last Map expansion" : "Last Map",
             std::string(filename)
         );
@@ -1533,10 +1536,10 @@ void game::NewMap(char* filename) {
     for (player = 0; player < GAME_PLAYER_COUNT; player++) {
         if (m_setupPlayerRace[player] == FACTION_RANDOM) {
             m_setupPlayerRace[player] =
-                FACTIONS_ACTUAL[Random(0, FACTIONS_ACTUAL.size() - 1)];
+                ironfist::PlayableFactions[Random(0, ironfist::PlayableFactions.size() - 1)];
         }
     }
-    Ironfist_NewMap(filename);
+    ironfist::runtime::BeginMap(filename);
 
     dotPos = FindLastToken(gMapName, '.');
     if (dotPos != NULL && StrEqNoCase(dotPos + 1, "MX2"))
@@ -1930,11 +1933,11 @@ void game::NewMap(char* filename) {
     gbInNewGameSetup = false;
     SetupNewRumour();
     gpAdvManager->CheckSetEvilInterface(0, -1);
-    Ironfist_NewMapReady();
+    ironfist::runtime::FinishMap();
     // Towns with no water for a dock never offer one.
     for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
         if (!GetTown(townIndex)->CanBuildDock())
-            Ironfist_DisallowBuilding(townIndex, H2EnumIndex(BUILDING_SLOT_DOCK));
+            m_castleRecs[townIndex].DisallowBuilding(H2EnumIndex(BUILDING_SLOT_DOCK));
     }
     return;
 }
@@ -2773,12 +2776,12 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         -1
     );
     if (suppressVisibility != 0) {
-        Ironfist_CastleConquered(townId, player);
+        ironfist::hooks::CastleConquered(townId, player);
         return;
     }
     SetVisibility(m_castleRecs[townId].m_x, m_castleRecs[townId].m_y, player, giVisRangeTown);
     CheckEndGame(END_GAME_FORCE_NONE, false);
-    Ironfist_CastleConquered(townId, player);
+    ironfist::hooks::CastleConquered(townId, player);
 }
 
 void game::ClaimMine(i32 mineId, i32 player) {
@@ -3803,8 +3806,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
 
 i32 game::GetRandomNumTroops(CreatureType monsterType) {
     return Random(
-        gMonRandBound[H2EnumIndex(monsterType)][0],
-        gMonRandBound[H2EnumIndex(monsterType)][1]
+        ironfist::CreatureRandomBounds[H2EnumIndex(monsterType)][0],
+        ironfist::CreatureRandomBounds[H2EnumIndex(monsterType)][1]
     );
 }
 
@@ -3926,7 +3929,13 @@ void game::NextPlayer(void) {
     }
     if (gbThisNetHumanPlayer[giCurPlayer])
         gpAdvManager->ForceNewHover();
-    Ironfist_HeroPoolRegainMobility();
+    // Ironfist heroes regain their movement while they are in the shared
+    // hiring pool, not when they are hired.
+    for (index = 0; index < GAME_HERO_COUNT; ++index) {
+        hero& poolHero = m_heroRecs[index];
+        poolHero.m_mobility = poolHero.CalcMobility();
+        poolHero.m_remainingMobility = poolHero.m_mobility;
+    }
 }
 
 i32 game::ComputeDailyGold(i32 player) {
@@ -4140,7 +4149,7 @@ void game::PerDay(void) {
                 townHero6->m_spellPoints = static_cast<i16>(maxSpellPoints9);
         }
     }
-    Ironfist_NewDay();
+    ironfist::hooks::NewDay();
 }
 
 void game::PerWeek(void) {
@@ -4164,7 +4173,7 @@ void game::PerWeek(void) {
             giWeekType = CALENDAR_PERIOD_CREATURE;
             // Any randomizable creature can name the week, Ironfist's included.
             giWeekTypeExtra = H2EnumIndex(
-                CREATURES_RANDOMIZABLE[Random(0, CREATURES_RANDOMIZABLE.size() - 1)]
+                ironfist::RandomizableCreatures[Random(0, ironfist::RandomizableCreatures.size() - 1)]
             );
         }
     }
@@ -4177,7 +4186,8 @@ void game::PerWeek(void) {
                 growth2 = gMonsterDatabase[H2EnumIndex(gDwellingType[H2EnumIndex(castle5->m_type)]
                                                              [innerIndex - WEEKLY_FIRST_DWELLING])]
                                .growth;
-                if (castle5->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_SPECIAL_FOUR)))
+                if (castle5->m_buildings
+                    & (1 << H2EnumIndex(BUILDING_SLOT_SPECIAL_FOUR)))
                     growth2 += CASTLE_GROWTH_SPECIAL_BONUS;
                 if (innerIndex == WEEKLY_FIRST_DWELLING
                     && (castle5->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_WELL_EXTRA))))
@@ -4199,6 +4209,14 @@ void game::PerWeek(void) {
                                         [innerIndex - WEEKLY_FIRST_DWELLING])
                            == giWeekTypeExtra)
                     growth2 += CREATURE_WEEK_GROWTH_BONUS;
+                // Preserve Ironfist's post-growth Well suppression exactly. In
+                // particular, AI difficulty scaling has already happened here.
+                if (ironfist::IsWellDisabled()
+                    && (castle5->m_buildings
+                        & (1 << H2EnumIndex(BUILDING_SLOT_SPECIAL_FOUR))))
+                    growth2 -= castle5->m_owner >= 0 ? CASTLE_GROWTH_SPECIAL_BONUS
+                                                     : CASTLE_GROWTH_SPECIAL_BONUS
+                                                           / NEUTRAL_CASTLE_GROWTH_DIVISOR;
                 castle5->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] += growth2;
             }
         }
@@ -4380,7 +4398,6 @@ void game::PerWeek(void) {
     m_week++;
     SetupNewRumour();
     GiveTroopsToNeutralTowns();
-    Ironfist_UndoWellGrowth();
 }
 
 void game::WeeklyRecruitSite(mapCell* cell) {
@@ -4463,7 +4480,7 @@ void game::PerMonth(void) {
                            == giMonthTypeExtra)
                     twn->m_garrison[j - WEEKLY_FIRST_DWELLING] *= CREATURE_MONTH_MULTIPLIER;
 
-                if (giMonthType == CALENDAR_PERIOD_PLAGUE && !IsWellDisabled()) {
+                if (giMonthType == CALENDAR_PERIOD_PLAGUE && !ironfist::IsWellDisabled()) {
                     twn->m_garrison[j - WEEKLY_FIRST_DWELLING] -= growth;
                     if (twn->m_garrison[j - WEEKLY_FIRST_DWELLING] < 0)
                         twn->m_garrison[j - WEEKLY_FIRST_DWELLING] = 0;
@@ -4500,7 +4517,7 @@ void game::PerMonth(void) {
 
     // With the Well disabled the plague math no longer adds up; the month
     // becomes a benign one instead.
-    if (IsWellDisabled() && giMonthType == CALENDAR_PERIOD_PLAGUE) {
+    if (ironfist::IsWellDisabled() && giMonthType == CALENDAR_PERIOD_PLAGUE) {
         giMonthType = CALENDAR_PERIOD_NORMAL;
         giMonthTypeExtra = Random(NORMAL_NAME_MIN, NORMAL_NAME_MAX);
     }
@@ -4603,13 +4620,13 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     FactionType race;
 
     if (townExtra->color == RANDOM_TOWN_UNOWNED_COLOR)
-        race = FACTIONS_ACTUAL[Random(0, FACTIONS_ACTUAL.size() - 1)];
+        race = ironfist::PlayableFactions[Random(0, ironfist::PlayableFactions.size() - 1)];
     else
         race = m_setupPlayerRace[gcColorToSetupPos[townExtra->color]];
 
     castle->m_turnsOwned = RANDOM_TOWN_AGE;
     const i32 spriteRace =
-        race == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT : H2EnumIndex(race);
+        race == FACTION_CYBORG ? ironfist::CYBORG_SPRITE_SLOT : H2EnumIndex(race);
     ConvertObject(
         x + RANDOM_TOWN_LEFT,
         y + RANDOM_TOWN_TOP,
@@ -4807,13 +4824,13 @@ void game::RandomizeMine(i32 x, i32 y) {
 }
 
 void game::InitRandomArtifacts(void) {
-    ResetGeneratedArtifacts();
+    ironfist::ResetGeneratedArtifacts();
     for (i32 x = 0; x < MAP_WIDTH; ++x) {
         for (i32 y = 0; y < MAP_HEIGHT; ++y) {
             mapCell* tile = m_worldMap.GetCell(x, y);
             if (tile->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)) {
                 // Each artifact has two tiles; convert tile id to artifact id.
-                GenerateArtifact(static_cast<u8>(tile->m_objectIndex) / 2);
+                ironfist::GenerateArtifact(static_cast<u8>(tile->m_objectIndex) / 2);
             }
         }
     }
@@ -4836,13 +4853,14 @@ i32 game::GetRandomArtifactId(
         xIsExpansionMap ? KB_ARTIFACT_TABLE_CAPACITY : H2EnumIndex(ARTIFACT_MAGIC_BOOK) + 1;
 
     for (i32 i = 0; i < numArtifacts; ++i) {
-        if ((GetArtifactLevel(i) & H2EnumIndex(levelMask)) == 0) {
+        if ((ironfist::GetArtifactLevel(i) & H2EnumIndex(levelMask)) == 0) {
             continue;
         }
-        if (!IsArtifactGenerationAllowed(i)) {
+        if (!ironfist::IsArtifactGenerationAllowed(i)) {
             continue;
         }
-        if (!cursedAllowed && IsCursedItem(i)) {
+        if (!cursedAllowed
+            && ironfist::IsCursedArtifact(static_cast<ArtifactType>(i))) {
             continue;
         }
         if (i == winConditionArtifact) {
@@ -4854,22 +4872,13 @@ i32 game::GetRandomArtifactId(
 
     // Ran out of artifacts, so reset the used ones and try again.
     if (choices.empty()) {
-        ResetGeneratedArtifacts(H2EnumIndex(levelMask));
+        ironfist::ResetGeneratedArtifacts(H2EnumIndex(levelMask));
         return GetRandomArtifactId(levelMask, allowCursed);
     }
 
     const i32 artifactId = choices[Random(0, choices.size() - 1)];
-    GenerateArtifact(artifactId);
+    ironfist::GenerateArtifact(artifactId);
     return artifactId;
-}
-
-i32 IsCursedItem(ArtifactType item) {
-    if (item == ARTIFACT_FIZBIN_OF_MISFORTUNE || item == ARTIFACT_HIDEOUS_MASK
-        || item == ARTIFACT_TAX_LIEN || item == ARTIFACT_ARM_OF_MARTYR
-        || item == ARTIFACT_BROACH_SHIELDING || item == ARTIFACT_HEART_FIRE
-        || item == ARTIFACT_HEART_ICE)
-        return 1;
-    return 0;
 }
 
 void game::RandomizeHeroPool(void) {
@@ -4909,9 +4918,9 @@ void game::RandomizeHeroPool(void) {
 
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* heroArmy = &m_heroRecs[heroId].m_army;
-    randomHeroCreatureInfo* creatureFaction =
-        randomHeroArmyBounds[H2EnumIndex(m_heroRecs[heroId].m_cursorType)];
-    bool hasTier[IRONFIST_HERO_ARMY_TIER_COUNT];
+    ironfist::StartingArmyRange* creatureFaction =
+        ironfist::StartingArmyBounds[H2EnumIndex(m_heroRecs[heroId].m_cursorType)];
+    bool hasTier[ironfist::HERO_ARMY_TIER_COUNT];
 
     hasTier[0] = true;
     hasTier[1] = Random(0, 99) < 87;
@@ -4920,7 +4929,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
         heroArmy->m_creatureTypes[slot] = CREATURE_NONE;
         heroArmy->m_quantities[slot] = 0;
     }
-    for (i32 tier = 0; tier < IRONFIST_HERO_ARMY_TIER_COUNT; ++tier) {
+    for (i32 tier = 0; tier < ironfist::HERO_ARMY_TIER_COUNT; ++tier) {
         if (hasTier[tier]) {
             double randomLowerBound = creatureFaction[tier].lowQuantity;
             double randomUpperBound = creatureFaction[tier].highQuantity + 0.9;
@@ -5021,8 +5030,8 @@ void game::ProcessRandomObjects(void) {
                     cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
                     do {
                         cell->m_objectIndex = static_cast<u8>(H2EnumIndex(
-                            CREATURES_RANDOMIZABLE[
-                                Random(0, CREATURES_RANDOMIZABLE.size() - 1)
+                            ironfist::RandomizableCreatures[
+                                Random(0, ironfist::RandomizableCreatures.size() - 1)
                             ]
                         ));
                     } while (gMonsterDatabase[cell->m_objectIndex].randomValue <= minValue
@@ -5244,7 +5253,16 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
             }
         }
     }
-    Ironfist_SetVisibilityShared(x, y, player, radius);
+    static bool propagatingSharedVisibility = false;
+    if (!propagatingSharedVisibility) {
+        propagatingSharedVisibility = true;
+        for (i32 destination = 0; destination < GAME_PLAYER_COUNT; ++destination) {
+            if (ironfist::state::Get().adventure.sharePlayerVision[player][destination]) {
+                SetVisibility(x, y, destination, radius);
+            }
+        }
+        propagatingSharedVisibility = false;
+    }
 }
 
 void game::MakeAllWaterVisible(i32 player) {
@@ -5259,7 +5277,79 @@ void game::MakeAllWaterVisible(i32 player) {
                 MAP_EXTRA_AT_WFIRST(x, y) |= mask;
         }
     }
-    Ironfist_AllWaterVisibleShared(player);
+    static bool propagatingSharedVisibility = false;
+    if (!propagatingSharedVisibility) {
+        propagatingSharedVisibility = true;
+        for (i32 destination = 0; destination < GAME_PLAYER_COUNT; ++destination) {
+            if (ironfist::state::Get().adventure.sharePlayerVision[player][destination]) {
+                MakeAllWaterVisible(destination);
+            }
+        }
+        propagatingSharedVisibility = false;
+    }
+}
+
+void game::ShareVision(i32 sourcePlayer, i32 destinationPlayer) {
+    if (sourcePlayer < 0 || sourcePlayer >= GAME_PLAYER_COUNT || destinationPlayer < 0
+        || destinationPlayer >= GAME_PLAYER_COUNT) {
+        return;
+    }
+    ironfist::state::Get().adventure.sharePlayerVision[sourcePlayer][destinationPlayer] = true;
+    // Reapply every active relationship, as Ironfist did when a new share was
+    // added. The iteration order is observable for chains of existing shares.
+    for (i32 source = 0; source < GAME_PLAYER_COUNT; ++source) {
+        for (i32 destination = 0; destination < GAME_PLAYER_COUNT; ++destination) {
+            if (!ironfist::state::Get().adventure.sharePlayerVision[source][destination]) {
+                continue;
+            }
+            for (i32 cell = 0; cell < MAP_WIDTH * MAP_HEIGHT; ++cell) {
+                if (mapExtra[cell] & (1 << source)) {
+                    mapExtra[cell] |= static_cast<u8>(1 << destination);
+                }
+            }
+        }
+    }
+}
+
+void game::CancelVisionShare(i32 sourcePlayer, i32 destinationPlayer) {
+    if (sourcePlayer < 0 || sourcePlayer >= GAME_PLAYER_COUNT || destinationPlayer < 0
+        || destinationPlayer >= GAME_PLAYER_COUNT) {
+        return;
+    }
+    ironfist::state::Get().adventure.sharePlayerVision[sourcePlayer][destinationPlayer] = false;
+}
+
+void game::SetAIArmySharing(b32 allow) {
+    ironfist::state::Get().adventure.allowAIArmySharing = allow;
+}
+
+b32 game::IsAIArmySharingAllowed(void) const {
+    return ironfist::state::Get().adventure.allowAIArmySharing;
+}
+
+void game::ForceHeroChase(i32 sourceHeroId, i32 destinationHeroId, b32 force) {
+    if (sourceHeroId < 0 || sourceHeroId >= GAME_HERO_COUNT || destinationHeroId < 0
+        || destinationHeroId >= GAME_HERO_COUNT) {
+        return;
+    }
+    ironfist::state::Get().adventure.forcedComputerPlayerChases[sourceHeroId][destinationHeroId] = force;
+}
+
+b32 game::IsHeroChaseForced(i32 sourceHeroId, i32 destinationHeroId) const {
+    if (sourceHeroId < 0 || sourceHeroId >= GAME_HERO_COUNT || destinationHeroId < 0
+        || destinationHeroId >= GAME_HERO_COUNT) {
+        return false;
+    }
+    return ironfist::state::Get().adventure.forcedComputerPlayerChases[sourceHeroId][destinationHeroId];
+}
+
+b32 game::GetForcedChaseValue(i32 heroId, i32* value) const {
+    const hero& source = m_heroRecs[gpCurPlayer->m_currentHero];
+    if (IsHeroChaseForced(source.m_id, heroId)) {
+        *value = 32000;
+        return true;
+    }
+    return false;
 }
 
 void game::GiveArmy(
@@ -5311,7 +5401,7 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
 i32 game::GetLuck(hero* h, class army* stack, town* castle) {
     i32 luck;
     if (h == NULL)
-        return Ironfist_CalcLuck(h, stack, castle, NEUTRAL);
+        return ironfist::hooks::ModifyLuck(h, stack, castle, NEUTRAL);
     luck = NEUTRAL;
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
         luck++;
@@ -5336,7 +5426,7 @@ i32 game::GetLuck(hero* h, class army* stack, town* castle) {
         luck = MAXIMUM;
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = MAXIMUM;
-    return Ironfist_CalcLuck(h, stack, castle, luck);
+    return ironfist::hooks::ModifyLuck(h, stack, castle, luck);
 }
 
 void game::SetupAdjacentMons(void) {
@@ -5694,7 +5784,7 @@ void game::SetupTowns(void) {
         if (castle8->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD)) {
             for (slot12 = 1; slot12 <= castle8->m_buildState; slot12++) {
                 if (castle8->m_type == FACTION_CYBORG)
-                    castle8->m_spellCounts[slot12] = ironfistCyborgSpellLimits[slot12 - 1];
+                    castle8->m_spellCounts[slot12] = ironfist::CyborgSpellLimits[slot12 - 1];
                 else
                     castle8->m_spellCounts[slot12] = gSpellLimits[slot12 - 1];
                 if (castle8->m_type == FACTION_WIZARD
@@ -5827,13 +5917,13 @@ void game::ProcessOnMapHeroes(void) {
     };
 
     std::vector<HeroData> heroesAvailable;
-    for (i32 i = 0; i < IRONFIST_TOTAL_AVAILABLE_HEROES; i++) {
+    for (i32 i = 0; i < ironfist::AVAILABLE_HERO_COUNT; i++) {
         HeroData data;
         data.exists = false;
         if (i < H2EnumIndex(GAME_HERO_COUNT)) {
             data.randomizable = true;
             data.faction = static_cast<FactionType>(i / MAP_HEROES_PER_FACTION);
-        } else if (i < IRONFIST_FIRST_CYBORG_HERO_ID) {
+        } else if (i < ironfist::FIRST_CYBORG_HERO_ID) {
             data.randomizable = false;
             data.faction = FACTION_KNIGHT;
         } else {
@@ -5872,8 +5962,8 @@ void game::ProcessOnMapHeroes(void) {
                     faction = mapExtraHero->heroClass;
                 } else {
                     mapExtraHero->owner =
-                        gcColorToPlayerPos[GetHeroOverlayColor(loc->m_objectIndex)];
-                    faction = GetHeroOverlayFaction(loc->m_objectIndex);
+                        gcColorToPlayerPos[ironfist::GetHeroOverlayColor(loc->m_objectIndex)];
+                    faction = ironfist::GetHeroOverlayFaction(loc->m_objectIndex);
                     if (faction == FACTION_NEUTRAL) {
                         faction = m_setupPlayerRace
                             [gcColorToSetupPos[m_players[mapExtraHero->owner].m_color]];
@@ -5932,12 +6022,12 @@ void game::ProcessOnMapHeroes(void) {
                         m_heroRecs[randomHeroIdx].m_portrait =
                             static_cast<HeroPortrait>(extendedHeroId);
                     }
-                    if (extendedHeroId < static_cast<i32>(heroNames.size())
-                        && !heroNames[extendedHeroId].empty()) {
+                    if (extendedHeroId < static_cast<i32>(ironfist::HeroNames.size())
+                        && !ironfist::HeroNames[extendedHeroId].empty()) {
                         utf8::Copy(
                             m_heroRecs[randomHeroIdx].m_name,
                             sizeof(m_heroRecs[randomHeroIdx].m_name),
-                            heroNames[extendedHeroId].c_str()
+                            ironfist::HeroNames[extendedHeroId].c_str()
                         );
                     }
                     if (extendedHeroId < static_cast<i32>(heroesAvailable.size()))

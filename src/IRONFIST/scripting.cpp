@@ -20,29 +20,37 @@
 
 #include <PLATFORM/Platform.h>
 
-using namespace std;
+namespace ironfist::script {
 
-static bool scripting_on = false;
-lua_State* map_lua = NULL;
-lua_State* artifacts_lua = NULL;
+static bool s_scriptingEnabled = false;
+static lua_State* s_mapState = NULL;
+static lua_State* s_artifactState = NULL;
+
+lua_State* MapState() {
+    return s_mapState;
+}
+
+lua_State* ArtifactState() {
+    return s_artifactState;
+}
 
 static void set_lua_globals(lua_State* L) {
-    set_scripting_funcs(L);
-    set_scripting_consts(L);
+    RegisterFunctions(L);
+    RegisterConstants(L);
 }
 
 // Ironfist scripts require modules like "scripts.modules.advmessagebox"
 // against the game directory; resolve them under the data root with the
 // same case-insensitive matching every other retail path gets, so
 // SCRIPTS/MODULES/AdvMessageBox.lua is found on Unix filesystems too.
-static i32 IronfistModuleSearcher(lua_State* ls) {
-    string relative = luaL_checkstring(ls, 1);
+static i32 ModuleSearcher(lua_State* ls) {
+    std::string relative = luaL_checkstring(ls, 1);
     for (char& c : relative) {
         if (c == '.')
             c = '/';
     }
-    string path = ResolveDataPath(relative + ".lua");
-    error_code statError;
+    std::string path = ResolveDataPath(relative + ".lua");
+    std::error_code statError;
     if (!std::filesystem::exists(path, statError)) {
         lua_pushfstring(ls, "\n\tno ironfist module '%s'", path.c_str());
         return 1;
@@ -62,7 +70,7 @@ static void RegisterModuleSearcher(lua_State* ls) {
         lua_rawgeti(ls, -1, slot);
         lua_rawseti(ls, -2, slot + 1);
     }
-    lua_pushcfunction(ls, IronfistModuleSearcher);
+    lua_pushcfunction(ls, ModuleSearcher);
     lua_rawseti(ls, -2, 2);
     lua_pop(ls, 2);
 }
@@ -81,68 +89,68 @@ static lua_State* NewScriptState() {
     return ls;
 }
 
-static void LoadScript(lua_State** ls, const string& script_filename) {
+static void LoadScript(lua_State** ls, const std::string& scriptFilename) {
     *ls = NewScriptState();
 
-    if (luaL_dofile(*ls, script_filename.c_str())) {
+    if (luaL_dofile(*ls, scriptFilename.c_str())) {
         DisplayLuaError(*ls);
     }
 }
 
 static void LoadArtifactsScript() {
-    string script_file = ResolveDataPath("SCRIPTS/GENERIC/artifacts.lua");
-    error_code statError;
-    if (std::filesystem::exists(script_file, statError)) {
-        LoadScript(&artifacts_lua, script_file);
+    std::string scriptFile = ResolveDataPath("SCRIPTS/GENERIC/artifacts.lua");
+    std::error_code statError;
+    if (std::filesystem::exists(scriptFile, statError)) {
+        LoadScript(&s_artifactState, scriptFile);
     }
 }
 
-static string GetScriptFileName(const string& mapFileName) {
+static std::string GetScriptFileName(const std::string& mapFileName) {
     return ResolveDataPath("SCRIPTS/" + mapFileName + ".lua");
 }
 
-void ScriptingInit(string& map_filnam) {
-    ScriptingShutdown();
+void InitializeMap(const std::string& mapFileName) {
+    Shutdown();
 
-    string script_file = GetScriptFileName(map_filnam);
-    error_code statError;
+    std::string scriptFile = GetScriptFileName(mapFileName);
+    std::error_code statError;
 
-    if (std::filesystem::exists(script_file, statError)) {
-        LoadScript(&map_lua, script_file);
-        scripting_on = true;
+    if (std::filesystem::exists(scriptFile, statError)) {
+        LoadScript(&s_mapState, scriptFile);
+        s_scriptingEnabled = true;
     }
 
     LoadArtifactsScript();
 }
 
-void ScriptingInitFromString(string& script) {
-    ScriptingShutdown();
+void InitializeFromSave(const std::string& script) {
+    Shutdown();
 
-    map_lua = NewScriptState();
-    if (luaL_dostring(map_lua, script.c_str())) {
-        DisplayLuaError(map_lua);
+    s_mapState = NewScriptState();
+    if (luaL_dostring(s_mapState, script.c_str())) {
+        DisplayLuaError(s_mapState);
     }
-    scripting_on = true;
+    s_scriptingEnabled = true;
 
     LoadArtifactsScript();
 }
 
-void ScriptingShutdown() {
-    if (map_lua != NULL) {
-        lua_close(map_lua);
-        map_lua = NULL;
-        scripting_on = false;
+void Shutdown() {
+    if (s_mapState != NULL) {
+        lua_close(s_mapState);
+        s_mapState = NULL;
+        s_scriptingEnabled = false;
     }
 
-    if (artifacts_lua != NULL) {
-        lua_close(artifacts_lua);
-        artifacts_lua = NULL;
+    if (s_artifactState != NULL) {
+        lua_close(s_artifactState);
+        s_artifactState = NULL;
     }
 }
 
-std::string GetScriptContents(std::string mapName) {
-    ifstream in(GetScriptFileName(mapName));
-    stringstream buffer;
+std::string ScriptContents(const std::string& mapName) {
+    std::ifstream in(GetScriptFileName(mapName));
+    std::stringstream buffer;
     buffer << in.rdbuf();
     return buffer.str();
 }
@@ -170,67 +178,67 @@ void ErrorLoadingMapVariable(std::string& mapVariableId, const std::string& addE
     ErrorMapVariable(mapVariableId, s2, addErrorMessage);
 }
 
-bool isTable(MapVarType type) {
-    return (type == MAPVAR_TYPE_TABLE);
+bool IsTable(MapVariableType type) {
+    return type == MapVariableType::Table;
 }
 
-bool isStringNumBool(MapVarType type) {
-    return (type == MAPVAR_TYPE_STRING || type == MAPVAR_TYPE_INTEGER
-            || type == MAPVAR_TYPE_NUMBER || type == MAPVAR_TYPE_BOOLEAN);
+bool IsScalar(MapVariableType type) {
+    return type == MapVariableType::String || type == MapVariableType::Integer
+        || type == MapVariableType::Number || type == MapVariableType::Boolean;
 }
 
-MapVarType StringToMapVarType(std::string stringType) {
-    if (stringType == "string") {
-        return MAPVAR_TYPE_STRING;
-    } else if (stringType == "int") {
-        return MAPVAR_TYPE_INTEGER;
-    } else if (stringType == "number") {
-        return MAPVAR_TYPE_NUMBER;
-    } else if (stringType == "boolean") {
-        return MAPVAR_TYPE_BOOLEAN;
-    } else if (stringType == "table") {
-        return MAPVAR_TYPE_TABLE;
+MapVariableType ParseMapVariableType(const std::string& typeName) {
+    if (typeName == "string") {
+        return MapVariableType::String;
+    } else if (typeName == "int") {
+        return MapVariableType::Integer;
+    } else if (typeName == "number") {
+        return MapVariableType::Number;
+    } else if (typeName == "boolean") {
+        return MapVariableType::Boolean;
+    } else if (typeName == "table") {
+        return MapVariableType::Table;
     } else {
-        return MAPVAR_TYPE_ERROR;
+        return MapVariableType::Error;
     }
 }
 
-std::string MapVarTypeToString(MapVarType type) {
+std::string MapVariableTypeName(MapVariableType type) {
     switch (type) {
-        case MAPVAR_TYPE_STRING:  return "string";
-        case MAPVAR_TYPE_INTEGER: return "int";
-        case MAPVAR_TYPE_NUMBER:  return "number";
-        case MAPVAR_TYPE_BOOLEAN: return "boolean";
-        case MAPVAR_TYPE_TABLE:   return "table";
-        default:                  return "error";
+        case MapVariableType::String:  return "string";
+        case MapVariableType::Integer: return "int";
+        case MapVariableType::Number:  return "number";
+        case MapVariableType::Boolean: return "boolean";
+        case MapVariableType::Table:   return "table";
+        default:                       return "error";
     }
 }
 
-static MapVarType mapVarTypeForVal(lua_State* L, i32 idx) {
+static MapVariableType MapVariableTypeForValue(lua_State* L, i32 idx) {
     if (lua_isinteger(L, idx)) {
-        return MAPVAR_TYPE_INTEGER;
+        return MapVariableType::Integer;
     } else {
-        return StringToMapVarType(lua_typename(map_lua, lua_type(map_lua, idx)));
+        return ParseMapVariableType(lua_typename(s_mapState, lua_type(s_mapState, idx)));
     }
 }
 
-static std::string GetMVValueFromLua(MapVarType& type, i32 idx) {
-    if (type == MAPVAR_TYPE_STRING) {
-        std::string stringValue(lua_tostring(map_lua, idx));
+static std::string GetMapVariableValue(lua_State* state, MapVariableType type, i32 idx) {
+    if (type == MapVariableType::String) {
+        std::string stringValue(lua_tostring(state, idx));
         return stringValue;
-    } else if (type == MAPVAR_TYPE_INTEGER) {
-        return std::to_string(lua_tointeger(map_lua, idx));
-    } else if (type == MAPVAR_TYPE_NUMBER) {
-        return std::to_string(lua_tonumber(map_lua, idx));
-    } else if (type == MAPVAR_TYPE_BOOLEAN) {
-        return std::to_string(lua_toboolean(map_lua, idx));
+    } else if (type == MapVariableType::Integer) {
+        return std::to_string(lua_tointeger(state, idx));
+    } else if (type == MapVariableType::Number) {
+        return std::to_string(lua_tonumber(state, idx));
+    } else if (type == MapVariableType::Boolean) {
+        return std::to_string(lua_toboolean(state, idx));
     }
     return std::string();
 }
 
-static std::string GetMVKeyFromLUA(i32 idx) {
-    MapVarType type = mapVarTypeForVal(map_lua, idx);
-    if (type != MAPVAR_TYPE_STRING) {
+static std::string GetMapVariableKey(i32 idx) {
+    MapVariableType type = MapVariableTypeForValue(s_mapState, idx);
+    if (type != MapVariableType::String) {
         DisplayError(
             "Warning: Saving tables with non-string keys may not work properly."
             "This includes arrays, which have integer keys.",
@@ -238,113 +246,109 @@ static std::string GetMVKeyFromLUA(i32 idx) {
         );
     }
 
-    return GetMVValueFromLua(type, idx);
+    return GetMapVariableValue(s_mapState, type, idx);
 }
 
-static luaTable* GetMVTablesFromLua(std::string& mapVariableId) {
-    luaTable* lt = new luaTable;
-    lua_pushnil(map_lua);
-    while (lua_next(map_lua, -2) != 0) {
-        std::string key = GetMVKeyFromLUA(-2);
-        mapVariable* mapVar = new mapVariable;
-        MapVarType valueType = mapVarTypeForVal(map_lua, -1);
-        mapVar->type = valueType;
-        if (isStringNumBool(valueType)) {
-            std::string* sV = new std::string(GetMVValueFromLua(valueType, -1));
-            mapVar->singleValue = sV;
-            (*lt)[key] = *mapVar;
-            lua_pop(map_lua, 1);
-        } else if (isTable(valueType)) {
-            mapVar->tableValue = GetMVTablesFromLua(key);
-            (*lt)[key] = *mapVar;
+static LuaTable ReadLuaTable(std::string& mapVariableId) {
+    LuaTable table;
+    lua_pushnil(s_mapState);
+    while (lua_next(s_mapState, -2) != 0) {
+        std::string key = GetMapVariableKey(-2);
+        MapVariable& mapVariable = table[key];
+        mapVariable.type = MapVariableTypeForValue(s_mapState, -1);
+        if (IsScalar(mapVariable.type)) {
+            mapVariable.value = GetMapVariableValue(s_mapState, mapVariable.type, -1);
+            lua_pop(s_mapState, 1);
+        } else if (IsTable(mapVariable.type)) {
+            mapVariable.table = ReadLuaTable(key);
         } else {
             ErrorSavingMapVariable(mapVariableId, " Wrong type in the table.");
+            table.erase(key);
+            lua_pop(s_mapState, 1);
         }
     }
-    lua_pop(map_lua, 1);
-    return lt;
+    lua_pop(s_mapState, 1);
+    return table;
 }
 
-std::map<std::string, mapVariable> LoadMapVariablesFromLUA() {
-    std::map<std::string, mapVariable> mapVariables;
+LuaTable LoadMapVariablesFromLua() {
+    LuaTable mapVariables;
 
-    if (!scripting_on) {
+    if (!s_scriptingEnabled) {
         return mapVariables;
     }
 
-    lua_getglobal(map_lua, "mapVariables");
+    lua_getglobal(s_mapState, "mapVariables");
 
-    if (lua_isnil(map_lua, -1)) return mapVariables;
+    if (lua_isnil(s_mapState, -1)) return mapVariables;
 
-    lua_pushnil(map_lua);
-    while (lua_next(map_lua, -2) != 0) {
-        std::string mapVariableId(lua_tostring(map_lua, -1));
-        lua_getglobal(map_lua, mapVariableId.c_str());
-        MapVarType mapVariableType = mapVarTypeForVal(map_lua, -1);
-        mapVariable* mapVar = new mapVariable;
-        mapVar->type = mapVariableType;
-        if (isTable(mapVariableType)) {
-            mapVar->tableValue = GetMVTablesFromLua(mapVariableId);
-        } else if (isStringNumBool(mapVariableType)) {
-            std::string* sV = new std::string;
-            *sV = GetMVValueFromLua(mapVariableType, -1);
-            mapVar->singleValue = sV;
-            lua_pop(map_lua, 1);
+    lua_pushnil(s_mapState);
+    while (lua_next(s_mapState, -2) != 0) {
+        std::string mapVariableId(lua_tostring(s_mapState, -1));
+        lua_getglobal(s_mapState, mapVariableId.c_str());
+        MapVariable& mapVariable = mapVariables[mapVariableId];
+        mapVariable.type = MapVariableTypeForValue(s_mapState, -1);
+        if (IsTable(mapVariable.type)) {
+            mapVariable.table = ReadLuaTable(mapVariableId);
+        } else if (IsScalar(mapVariable.type)) {
+            mapVariable.value = GetMapVariableValue(s_mapState, mapVariable.type, -1);
+            lua_pop(s_mapState, 1);
         } else {
             ErrorSavingMapVariable(
                 mapVariableId, " A map variable can only be a table, number, string or boolean."
             );
+            mapVariables.erase(mapVariableId);
         }
-        lua_pop(map_lua, 1);
-        mapVariables[mapVariableId] = *mapVar;
+        lua_pop(s_mapState, 1);
     }
     return mapVariables;
 }
 
-static void PushStringNumBoolToLUA(MapVarType type, std::string value) {
-    if (type == MAPVAR_TYPE_STRING) {
-        lua_pushstring(map_lua, value.c_str());
-    } else if (type == MAPVAR_TYPE_INTEGER) {
-        lua_pushinteger(map_lua, atoi(value.c_str()));
-    } else if (type == MAPVAR_TYPE_NUMBER) {
-        lua_pushnumber(map_lua, atof(value.c_str()));
-    } else if (type == MAPVAR_TYPE_BOOLEAN) {
-        lua_pushboolean(map_lua, atoi(value.c_str()));
+static void PushScalarToLua(MapVariableType type, const std::string& value) {
+    if (type == MapVariableType::String) {
+        lua_pushstring(s_mapState, value.c_str());
+    } else if (type == MapVariableType::Integer) {
+        lua_pushinteger(s_mapState, atoi(value.c_str()));
+    } else if (type == MapVariableType::Number) {
+        lua_pushnumber(s_mapState, atof(value.c_str()));
+    } else if (type == MapVariableType::Boolean) {
+        lua_pushboolean(s_mapState, atoi(value.c_str()));
     }
 }
 
-static void PushTableToLUA(luaTable* lt) {
-    lua_newtable(map_lua);
-    i32 top = lua_gettop(map_lua);
-    for (luaTable::const_iterator it = (*lt).begin(); it != (*lt).end(); ++it) {
-        if (it->second.type == MAPVAR_TYPE_TABLE) {
-            lua_pushstring(map_lua, it->first.c_str());
-            PushTableToLUA(it->second.tableValue);
-            lua_settable(map_lua, top);
+static void PushTableToLua(const LuaTable& table) {
+    lua_newtable(s_mapState);
+    i32 top = lua_gettop(s_mapState);
+    for (const auto& [key, variable] : table) {
+        if (IsTable(variable.type)) {
+            lua_pushstring(s_mapState, key.c_str());
+            PushTableToLua(variable.table);
+            lua_settable(s_mapState, top);
         } else {
-            lua_pushstring(map_lua, it->first.c_str());
-            PushStringNumBoolToLUA(it->second.type, *it->second.singleValue);
-            lua_settable(map_lua, top);
+            lua_pushstring(s_mapState, key.c_str());
+            PushScalarToLua(variable.type, variable.value);
+            lua_settable(s_mapState, top);
         }
     }
 }
 
-void WriteMapVariablesToLUA(std::map<std::string, mapVariable>& mapVariables) {
-    if (!scripting_on) {
+void WriteMapVariablesToLua(const LuaTable& mapVariables) {
+    if (!s_scriptingEnabled) {
         DisplayError(
             "Warning: Map variables detected in map without a script.", "Ironfist bug detected"
         );
         return;
     }
 
-    for (std::map<std::string, mapVariable>::const_iterator it = mapVariables.begin();
-         it != mapVariables.end(); ++it) {
-        if (isTable(it->second.type)) {
-            PushTableToLUA(it->second.tableValue);
-            lua_setglobal(map_lua, it->first.c_str());
+    for (const auto& [name, variable] : mapVariables) {
+        if (IsTable(variable.type)) {
+            PushTableToLua(variable.table);
+            lua_setglobal(s_mapState, name.c_str());
         } else {
-            PushStringNumBoolToLUA(it->second.type, *it->second.singleValue);
-            lua_setglobal(map_lua, it->first.c_str());
+            PushScalarToLua(variable.type, variable.value);
+            lua_setglobal(s_mapState, name.c_str());
         }
     }
 }
+
+} // namespace ironfist::script

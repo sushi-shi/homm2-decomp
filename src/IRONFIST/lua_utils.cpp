@@ -4,12 +4,14 @@
 
 #include <IRONFIST/dialog.h>
 
-void lua_setconst(lua_State* L, const char* nam, i32 i) {
+namespace ironfist::script {
+
+void SetConstant(lua_State* L, const char* nam, i32 i) {
     lua_pushinteger(L, i);
     lua_setglobal(L, nam);
 }
 
-void lua_setconst_nil(lua_State* L, const char* nam) {
+void SetNilConstant(lua_State* L, const char* nam) {
     lua_pushnil(L);
     lua_setglobal(L, nam);
 }
@@ -29,14 +31,14 @@ void DisplayLuaError(lua_State* L) {
     DisplayCustomLuaError(L, msg);
 }
 
-i32 LuaGlobalExists(lua_State* L, const char* nam) {
+i32 GlobalExists(lua_State* L, const char* nam) {
     i32 t = lua_getglobal(L, nam);
     lua_pop(L, 1);
     return t != LUA_TNIL;
 }
 
 // Uses the Lua stack size to get the number of returned arguments.
-i32 lua_pcall_nresult(lua_State* L, i32 nargs, i32* nres) {
+i32 CallWithResultCount(lua_State* L, i32 nargs, i32* nres) {
     const i32 stack_size = lua_gettop(L);
 
     const i32 res_code = lua_pcall(L, nargs, LUA_MULTRET, 0);
@@ -47,3 +49,5 @@ i32 lua_pcall_nresult(lua_State* L, i32 nargs, i32* nres) {
 
     return res_code;
 }
+
+} // namespace ironfist::script

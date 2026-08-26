@@ -10,7 +10,7 @@
 
 #include <Ints.h>
 
-namespace UtilsXML {
+namespace ironfist::xml {
 
 tinyxml2::XMLError QueryShortText(tinyxml2::XMLElement* el, i16* dest);
 tinyxml2::XMLError QueryCharText(tinyxml2::XMLElement* el, char* dest);
@@ -79,6 +79,6 @@ public:
     const char* GetError();
 };
 
-}
+} // namespace ironfist::xml
 
 #endif

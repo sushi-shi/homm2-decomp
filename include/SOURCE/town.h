@@ -109,6 +109,8 @@ public:
     void View(i32);
     void Deallocate(void);
     void BuildBuilding(BuildingSlotType);
+    void DisallowBuilding(i32 building);
+    b32 IsBuildingDisallowed(i32 building) const;
     void SetFaction(FactionType);
     i32 CanBuildDock(void);
     void CalcNumLevelArchers(i32*, i32*);

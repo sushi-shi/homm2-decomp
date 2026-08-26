@@ -26,6 +26,7 @@
 #include <string.h>
 #include <SOURCE/Localization.h>
 
+
 typedef enum CastleControl {
     CONTROL_BUILDING_OVERLAY_FIRST             = 400,
     CONTROL_STATUS_FIRST                       = 500,
@@ -221,7 +222,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         i32 disallowed =
-            Ironfist_BuildingDisallowed(m_town, H2EnumIndex(castleSlotsUse[slotNum]));
+            m_town->IsBuildingDisallowed(H2EnumIndex(castleSlotsUse[slotNum]));
         stateFrame = FRAME_NONE;
         if (disallowed) {
             stateFrame = FRAME_CANNOT_BUILD;
@@ -408,7 +409,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                          * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
     // Cyborg towns use sprite slot 6, following the OBJNTOWN.ICN order.
     raceBase =
-        (m_town->m_type == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT
+        (m_town->m_type == FACTION_CYBORG ? ironfist::CYBORG_SPRITE_SLOT
          : H2EnumIndex(m_town->m_type))
         * RACE_ICON_FRAMES;
     if (updateOnly == 0) {

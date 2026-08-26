@@ -2,6 +2,7 @@
 #include <BASE/BITS.h>
 #include <BASE/executive.h>
 #include <IRONFIST/townconsts.h>
+#include <IRONFIST/state.h>
 #include <SOURCE/Castle.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/GAME.h>
@@ -13,6 +14,20 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
+
+void town::DisallowBuilding(i32 building) {
+    if (building >= 0 && building < 32 && m_id >= 0 && m_id < GAME_TOWN_COUNT) {
+        ironfist::state::Get().adventure.disallowedBuildings[m_id][building] = true;
+    }
+}
+
+b32 town::IsBuildingDisallowed(i32 building) const {
+    if (building < 0 || building >= 32 || m_id < 0 || m_id >= GAME_TOWN_COUNT) {
+        return false;
+    }
+    return ironfist::state::Get().adventure.disallowedBuildings[m_id][building];
+}
+
 town::town(void) {
     m_type = FACTION_KNIGHT;
     m_id = 0;
@@ -139,7 +154,7 @@ void town::BuildBuilding(BuildingSlotType building) {
         ++m_buildState;
         if (m_type == FACTION_CYBORG)
             m_spellCounts[m_buildState] =
-                ironfistCyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+                ironfist::CyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         else
             m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & H2EnumIndex(TOWN_BUILDING_LIBRARY)))
@@ -194,7 +209,7 @@ void town::SetFaction(FactionType faction) {
     // Shift the adventure-map town graphics from the old faction's sprite
     // slot to the new one; Cyborg towns use slot 6, following the
     // OBJNTOWN.ICN order.
-    i32 imageShift = -(m_type == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT : H2EnumIndex(m_type));
+    i32 imageShift = -(m_type == FACTION_CYBORG ? ironfist::CYBORG_SPRITE_SLOT : H2EnumIndex(m_type));
 
     m_turnsOwned = RANDOM_TOWN_AGE;
     m_type = faction;
@@ -233,7 +248,7 @@ void town::SetFaction(FactionType faction) {
         }
     }
 
-    imageShift += faction == FACTION_CYBORG ? IRONFIST_CYBORG_SPRITE_SLOT : H2EnumIndex(faction);
+    imageShift += faction == FACTION_CYBORG ? ironfist::CYBORG_SPRITE_SLOT : H2EnumIndex(faction);
 
     gpGame->ConvertObject(
         m_x - 5,

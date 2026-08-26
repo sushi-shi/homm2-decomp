@@ -8,7 +8,7 @@
 #include <BASE/soundManager.h>
 #include <BASE/Utf8.h>
 #include <IRONFIST/campaigns.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/KB.h>
@@ -23,6 +23,7 @@
 #include <SOURCE/hero.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
+
 
 typedef enum ExpansionCampaignSmacker {
     SMACKER_POL_INTRO             = 0x27,
@@ -303,17 +304,17 @@ void ExpCampaign::SetMapWasPlayed(void) {
 void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     m_campaignId = campaignId;
     m_currentMap = MAP_NONE;
-    m_mapCount = ironfistCampaignMapCounts[H2EnumIndex(campaignId)];
+    m_mapCount = ironfist::CampaignMapCounts[H2EnumIndex(campaignId)];
     ResetMapChoices();
     ResetMapsPlayed();
     ResetAwards();
     ResetBonusChoices();
-    gIronfistExtra.campaign.savedHeroData.clear();
+    ironfist::state::Get().campaign.savedHeroData.clear();
 }
 
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* bonus =
-        CampaignChoice(m_campaignId, H2EnumIndex(m_currentMap), m_bonusChoices[H2EnumIndex(m_currentMap)]);
+        ironfist::CampaignChoice(m_campaignId, H2EnumIndex(m_currentMap), m_bonusChoices[H2EnumIndex(m_currentMap)]);
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
     sprintf(
@@ -330,7 +331,7 @@ void ExpCampaign::InitMap(void) {
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = static_cast<GameDifficulty>(
-        ironfistCampaignDifficulties[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]
+        ironfist::CampaignDifficulties[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]
     );
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
@@ -501,8 +502,8 @@ void ExpCampaign::InitMap(void) {
 
     // Custom campaigns can carry heroes between maps.
     i32 saveIdx = 0;
-    for (auto& carried : ironfistHeroesToLoad[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
-        LoadCampaignSavedHero(carried.first, carried.second, saveIdx);
+    for (auto& carried : ironfist::HeroesToLoad[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
+        ironfist::LoadCampaignSavedHero(carried.first, carried.second, saveIdx);
         saveIdx++;
     }
     gbRetreatWin = true;
@@ -523,8 +524,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     i32 mapIndex;
     for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
         trackWidget = new iconWidget(
-            ironfistCampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].x,
-            ironfistCampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].y,
+            ironfist::CampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].x,
+            ironfist::CampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].y,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
@@ -543,7 +544,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     // Custom campaigns take their header art from Ironfist's x_cmphdr.icn,
     // which indexes straight by campaign ID; the retail four keep the
     // frames retail shipped so they never depend on ironfist.agg.
-    if (IsCustomCampaign(m_campaignId)) {
+    if (ironfist::IsCustomCampaign(m_campaignId)) {
         campIcon = new iconWidget(
             CAMPAIGN_ICON_X,
             CAMPAIGN_ICON_Y,
@@ -652,14 +653,14 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
-    sprintf(gText, "%s", ironfistScenarioNames[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str());
+    sprintf(gText, "%s", ironfist::ScenarioNames[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str());
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     sprintf(
         gText,
         "%s",
-        ironfistScenarioDescriptions[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str()
+        ironfist::ScenarioDescriptions[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str()
     );
     m_window->BroadcastMessage(message);
 
@@ -682,7 +683,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
-        choice = CampaignChoice(m_campaignId, H2EnumIndex(m_viewMap), i);
+        choice = ironfist::CampaignChoice(m_campaignId, H2EnumIndex(m_viewMap), i);
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
                 sprintf(
@@ -1086,18 +1087,18 @@ void ExpCampaign::ReplaySmacker(void) {
 
 void ExpCampaign::HandleVictoryCustomCampaign(void) {
     i32 wonMap = H2EnumIndex(m_currentMap) + 1;
-    if (ironfistVictoryMovies[H2EnumIndex(m_campaignId)].count(wonMap))
-        PlaySmacker(ironfistVictoryMovies[H2EnumIndex(m_campaignId)][wonMap]);
-    for (i32 opened : ironfistMapsToComplete[H2EnumIndex(m_campaignId)][wonMap])
+    if (ironfist::VictoryMovies[H2EnumIndex(m_campaignId)].count(wonMap))
+        PlaySmacker(ironfist::VictoryMovies[H2EnumIndex(m_campaignId)][wonMap]);
+    for (i32 opened : ironfist::MapsToComplete[H2EnumIndex(m_campaignId)][wonMap])
         m_mapChoices[opened] = 1;
-    if (ironfistAwardsToGive[H2EnumIndex(m_campaignId)].count(wonMap))
-        m_awards[ironfistAwardsToGive[H2EnumIndex(m_campaignId)][wonMap]] = 1;
+    if (ironfist::AwardsToGive[H2EnumIndex(m_campaignId)].count(wonMap))
+        m_awards[ironfist::AwardsToGive[H2EnumIndex(m_campaignId)][wonMap]] = 1;
 }
 
 void ExpCampaign::ReplaySmackerCustomCampaign(void) {
     if (H2EnumIndex(m_viewMap) < EXPANSION_CAMPAIGN_MAX_MAP_COUNT
-        && ironfistReplayMovies[H2EnumIndex(m_campaignId)].count(H2EnumIndex(m_viewMap)))
-        PlaySmacker(ironfistReplayMovies[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)]);
+        && ironfist::ReplayMovies[H2EnumIndex(m_campaignId)].count(H2EnumIndex(m_viewMap)))
+        PlaySmacker(ironfist::ReplayMovies[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)]);
 }
 
 void ExpCampaign::ReplaySmacker1(void) {
@@ -1317,13 +1318,13 @@ void ExpCampaign::Autosave(void) {
         sprintf(
             gText,
             "%s_%d",
-            ironfistCampaignShortNames[H2EnumIndex(m_campaignId)].c_str(),
+            ironfist::CampaignShortNames[H2EnumIndex(m_campaignId)].c_str(),
             H2EnumIndex(m_currentMap) + 1
         );
         i32 saveIdx = 0;
         for (auto& carried :
-             ironfistHeroesToSave[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
-            SaveCampaignHero(carried.first, carried.second, saveIdx);
+             ironfist::HeroesToSave[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
+            ironfist::SaveCampaignHero(carried.first, carried.second, saveIdx);
             saveIdx++;
         }
         gpGame->SaveGame(gText, 1, 0);

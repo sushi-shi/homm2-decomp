@@ -8,7 +8,7 @@
 #include <tinyxml2.h>
 
 #include <IRONFIST/dialog.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <IRONFIST/paths.h>
 #include <IRONFIST/xml_utils.h>
 #include <SOURCE/GAME.h>
@@ -17,47 +17,49 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/X_GLOBAL.h>
 
-using namespace UtilsXML;
+namespace ironfist {
 
-std::map<i32, std::string> ironfistCampaignNames;
-std::map<i32, std::string> ironfistCampaignShortNames;
-std::map<i32, i32> ironfistCampaignMapCounts;
-std::map<i32, std::map<i32, std::string>> ironfistScenarioNames;
-std::map<i32, std::map<i32, std::string>> ironfistScenarioDescriptions;
-std::map<i32, std::map<i32, i32>> ironfistCampaignDifficulties;
-std::map<i32, std::map<i32, IronfistTrackPoint>> ironfistCampaignTrack;
-std::map<i32, std::map<i32, std::map<i32, SCampaignChoice>>> ironfistCampaignChoices;
-std::map<i32, std::map<i32, std::set<i32>>> ironfistMapsToComplete;
-std::map<i32, std::map<i32, i32>> ironfistReplayMovies;
-std::map<i32, std::map<i32, i32>> ironfistVictoryMovies;
-std::map<i32, std::map<i32, i32>> ironfistAwardsToGive;
-std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> ironfistHeroesToLoad;
-std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> ironfistHeroesToSave;
-std::map<i32, std::string> ironfistCampaignSourceFiles;
+using namespace xml;
+
+std::map<i32, std::string> CampaignNames;
+std::map<i32, std::string> CampaignShortNames;
+std::map<i32, i32> CampaignMapCounts;
+std::map<i32, std::map<i32, std::string>> ScenarioNames;
+std::map<i32, std::map<i32, std::string>> ScenarioDescriptions;
+std::map<i32, std::map<i32, i32>> CampaignDifficulties;
+std::map<i32, std::map<i32, CampaignTrackPoint>> CampaignTrack;
+std::map<i32, std::map<i32, std::map<i32, SCampaignChoice>>> CampaignChoices;
+std::map<i32, std::map<i32, std::set<i32>>> MapsToComplete;
+std::map<i32, std::map<i32, i32>> ReplayMovies;
+std::map<i32, std::map<i32, i32>> VictoryMovies;
+std::map<i32, std::map<i32, i32>> AwardsToGive;
+std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToLoad;
+std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToSave;
+std::map<i32, std::string> CampaignSourceFiles;
 
 b32 IsCustomCampaign(ExpansionCampaignId id) {
     return H2EnumIndex(id) >= H2EnumIndex(EXPANSION_CAMPAIGN_COUNT);
 }
 
 SCampaignChoice* CampaignChoice(ExpansionCampaignId id, i32 map, i32 choiceIdx) {
-    return &ironfistCampaignChoices[H2EnumIndex(id)][map][choiceIdx];
+    return &CampaignChoices[H2EnumIndex(id)][map][choiceIdx];
 }
 
 void InitializeCampaigns() {
     for (i32 c = 0; c < H2EnumIndex(EXPANSION_CAMPAIGN_COUNT); c++) {
-        ironfistCampaignNames[c] = xHSCampaignNames[c];
-        ironfistCampaignShortNames[c] = xShortCampaignNames[c];
-        ironfistCampaignMapCounts[c] = expansionCampaignMapCounts[c];
+        CampaignNames[c] = xHSCampaignNames[c];
+        CampaignShortNames[c] = xShortCampaignNames[c];
+        CampaignMapCounts[c] = expansionCampaignMapCounts[c];
         for (i32 m = 0; m < expansionCampaignMapCounts[c]; m++) {
-            ironfistScenarioNames[c][m] = xScenarioName[c][m];
-            ironfistScenarioDescriptions[c][m] = xScenarioDescription[c][m];
-            ironfistCampaignDifficulties[c][m] = H2EnumIndex(expansionCampaignDifficulty[c][m]);
-            ironfistCampaignTrack[c][m] = {
+            ScenarioNames[c][m] = xScenarioName[c][m];
+            ScenarioDescriptions[c][m] = xScenarioDescription[c][m];
+            CampaignDifficulties[c][m] = H2EnumIndex(expansionCampaignDifficulty[c][m]);
+            CampaignTrack[c][m] = {
                 expansionCampaignTrackXY[c][m][0],
                 expansionCampaignTrackXY[c][m][1]
             };
             for (i32 n = 0; n < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; n++)
-                ironfistCampaignChoices[c][m][n] = xCampaignChoices[c][m][n];
+                CampaignChoices[c][m][n] = xCampaignChoices[c][m][n];
         }
     }
 
@@ -74,7 +76,7 @@ void InitializeCampaigns() {
             continue;
         i32 campaignId = ReadCampaignMetadata(doc.FirstChild());
         if (campaignId != -1)
-            ironfistCampaignSourceFiles[campaignId] = name;
+            CampaignSourceFiles[campaignId] = name;
     }
 }
 
@@ -95,25 +97,25 @@ i32 ReadCampaignMetadata(tinyxml2::XMLNode* root) {
             elem->QueryIntText(&campaignID);
         } else if (name == "name") {
             const char* text = elem->GetText();
-            ironfistCampaignNames[campaignID] = text ? text : "empty name";
+            CampaignNames[campaignID] = text ? text : "empty name";
         } else if (name == "shortName") {
-            QueryText(elem, ironfistCampaignShortNames[campaignID]);
+            QueryText(elem, CampaignShortNames[campaignID]);
         } else if (name == "numMaps") {
-            elem->QueryIntText(&ironfistCampaignMapCounts[campaignID]);
+            elem->QueryIntText(&CampaignMapCounts[campaignID]);
         } else if (name == "scenarioName") {
             const char* text = elem->Attribute("value");
             if (text)
-                ironfistScenarioNames[campaignID][index] = text;
+                ScenarioNames[campaignID][index] = text;
         } else if (name == "scenarioDescription") {
             const char* text = elem->Attribute("value");
             if (text)
-                ironfistScenarioDescriptions[campaignID][index] = text;
+                ScenarioDescriptions[campaignID][index] = text;
         } else if (name == "scenarioDifficulty") {
-            ironfistCampaignDifficulties[campaignID][index] = value;
+            CampaignDifficulties[campaignID][index] = value;
         } else if (name == "scenarioIcon") {
             i32 scenarioID = elem->IntAttribute("scenarioID");
-            ironfistCampaignTrack[campaignID][scenarioID].x = elem->IntAttribute("x");
-            ironfistCampaignTrack[campaignID][scenarioID].y = elem->IntAttribute("y");
+            CampaignTrack[campaignID][scenarioID].x = elem->IntAttribute("x");
+            CampaignTrack[campaignID][scenarioID].y = elem->IntAttribute("y");
         } else if (name == "choice") {
             i32 scenarioID = elem->IntAttribute("scenarioID");
             i32 choiceID = elem->IntAttribute("id");
@@ -121,31 +123,31 @@ i32 ReadCampaignMetadata(tinyxml2::XMLNode* root) {
             choice.type = static_cast<CampaignChoiceType>(elem->IntAttribute("type"));
             choice.value = static_cast<i16>(elem->IntAttribute("field"));
             choice.amount = static_cast<i16>(elem->IntAttribute("amount"));
-            ironfistCampaignChoices[campaignID][scenarioID][choiceID] = choice;
+            CampaignChoices[campaignID][scenarioID][choiceID] = choice;
         } else if (name == "replaySMK") {
-            ironfistReplayMovies[campaignID][index] = value;
+            ReplayMovies[campaignID][index] = value;
         } else if (name == "victorySMK") {
-            ironfistVictoryMovies[campaignID][index] = value;
+            VictoryMovies[campaignID][index] = value;
         } else if (name == "mapToComplete") {
-            ironfistMapsToComplete[campaignID][index].insert(value);
+            MapsToComplete[campaignID][index].insert(value);
         } else if (name == "award") {
-            ironfistAwardsToGive[campaignID][index] = value;
+            AwardsToGive[campaignID][index] = value;
         } else if (name == "saveHero") {
             i32 scenarioID = elem->IntAttribute("scenarioID");
             i32 playerID = elem->IntAttribute("playerID");
             i32 ownedHeroID = elem->IntAttribute("ownedHeroID");
-            ironfistHeroesToSave[campaignID][scenarioID].insert({playerID, ownedHeroID});
+            HeroesToSave[campaignID][scenarioID].insert({playerID, ownedHeroID});
         } else if (name == "loadHero") {
             i32 scenarioID = elem->IntAttribute("scenarioID");
             i32 playerID = elem->IntAttribute("playerID");
             i32 ownedHeroID = elem->IntAttribute("ownedHeroID");
-            ironfistHeroesToLoad[campaignID][scenarioID].insert({playerID, ownedHeroID});
+            HeroesToLoad[campaignID][scenarioID].insert({playerID, ownedHeroID});
         }
     }
     // The map cap is retail-fixed; a fatter .cmp would corrupt ExpCampaign.
-    if (ironfistCampaignMapCounts.count(campaignID)
-        && ironfistCampaignMapCounts[campaignID] > EXPANSION_CAMPAIGN_MAX_MAP_COUNT)
-        ironfistCampaignMapCounts[campaignID] = EXPANSION_CAMPAIGN_MAX_MAP_COUNT;
+    if (CampaignMapCounts.count(campaignID)
+        && CampaignMapCounts[campaignID] > EXPANSION_CAMPAIGN_MAX_MAP_COUNT)
+        CampaignMapCounts[campaignID] = EXPANSION_CAMPAIGN_MAX_MAP_COUNT;
     return campaignID;
 }
 
@@ -156,14 +158,14 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
 
     tinyxml2::XMLElement* metadata = doc->NewElement("campaignMetadata");
     PushBack(doc, metadata, "id", campaignID);
-    PushBack(doc, metadata, "name", ironfistCampaignNames[campaignID].c_str());
-    PushBack(doc, metadata, "shortName", ironfistCampaignShortNames[campaignID].c_str());
-    PushBack(doc, metadata, "numMaps", ironfistCampaignMapCounts[campaignID]);
-    WriteArray(doc, metadata, "scenarioName", ironfistScenarioNames[campaignID]);
-    WriteArray(doc, metadata, "scenarioDescription", ironfistScenarioDescriptions[campaignID]);
-    WriteArray(doc, metadata, "scenarioDifficulty", ironfistCampaignDifficulties[campaignID]);
+    PushBack(doc, metadata, "name", CampaignNames[campaignID].c_str());
+    PushBack(doc, metadata, "shortName", CampaignShortNames[campaignID].c_str());
+    PushBack(doc, metadata, "numMaps", CampaignMapCounts[campaignID]);
+    WriteArray(doc, metadata, "scenarioName", ScenarioNames[campaignID]);
+    WriteArray(doc, metadata, "scenarioDescription", ScenarioDescriptions[campaignID]);
+    WriteArray(doc, metadata, "scenarioDifficulty", CampaignDifficulties[campaignID]);
 
-    for (auto& track : ironfistCampaignTrack[campaignID]) {
+    for (auto& track : CampaignTrack[campaignID]) {
         tinyxml2::XMLElement* icn = doc->NewElement("scenarioIcon");
         icn->SetAttribute("scenarioID", track.first);
         icn->SetAttribute("x", track.second.x);
@@ -171,7 +173,7 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
         metadata->InsertEndChild(icn);
     }
 
-    for (auto& scenario : ironfistCampaignChoices[campaignID]) {
+    for (auto& scenario : CampaignChoices[campaignID]) {
         for (auto& choiceRow : scenario.second) {
             tinyxml2::XMLElement* choiceElem = doc->NewElement("choice");
             choiceElem->SetAttribute("scenarioID", scenario.first);
@@ -183,9 +185,9 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
         }
     }
 
-    WriteArray(doc, metadata, "replaySMK", ironfistReplayMovies[campaignID]);
-    WriteArray(doc, metadata, "victorySMK", ironfistVictoryMovies[campaignID]);
-    for (auto& mapRow : ironfistMapsToComplete[campaignID]) {
+    WriteArray(doc, metadata, "replaySMK", ReplayMovies[campaignID]);
+    WriteArray(doc, metadata, "victorySMK", VictoryMovies[campaignID]);
+    for (auto& mapRow : MapsToComplete[campaignID]) {
         for (i32 opened : mapRow.second) {
             tinyxml2::XMLElement* mapElem = doc->NewElement("mapToComplete");
             mapElem->SetAttribute("index", mapRow.first);
@@ -193,9 +195,9 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
             metadata->InsertEndChild(mapElem);
         }
     }
-    WriteArray(doc, metadata, "award", ironfistAwardsToGive[campaignID]);
+    WriteArray(doc, metadata, "award", AwardsToGive[campaignID]);
 
-    for (auto& scenario : ironfistHeroesToSave[campaignID]) {
+    for (auto& scenario : HeroesToSave[campaignID]) {
         for (auto& heroData : scenario.second) {
             tinyxml2::XMLElement* heroElem = doc->NewElement("saveHero");
             heroElem->SetAttribute("scenarioID", scenario.first);
@@ -204,7 +206,7 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
             metadata->InsertEndChild(heroElem);
         }
     }
-    for (auto& scenario : ironfistHeroesToLoad[campaignID]) {
+    for (auto& scenario : HeroesToLoad[campaignID]) {
         for (auto& heroData : scenario.second) {
             tinyxml2::XMLElement* heroElem = doc->NewElement("loadHero");
             heroElem->SetAttribute("scenarioID", scenario.first);
@@ -232,7 +234,7 @@ i32 LoadCampaignFromFile(const std::string& filename) {
 void LoadCampaignSavedHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
     i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
     hero* heroRec = &gpGame->m_heroRecs[heroIdx];
-    campaignExtra::partialHeroData* savedHero = &gIronfistExtra.campaign.savedHeroData[saveIdx];
+    state::CampaignState::PartialHeroData* savedHero = &state::Get().campaign.savedHeroData[saveIdx];
 
     for (i32 i = 0; i < H2EnumIndex(HERO_PRIMARY_STAT_COUNT); i++)
         heroRec->m_primaryStats[i] = savedHero->primarySkills[i];
@@ -249,7 +251,7 @@ void LoadCampaignSavedHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
 void SaveCampaignHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
     i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
     hero* heroRec = &gpGame->m_heroRecs[heroIdx];
-    campaignExtra::partialHeroData* savedHero = &gIronfistExtra.campaign.savedHeroData[saveIdx];
+    state::CampaignState::PartialHeroData* savedHero = &state::Get().campaign.savedHeroData[saveIdx];
 
     for (i32 i = 0; i < H2EnumIndex(HERO_PRIMARY_STAT_COUNT); i++)
         savedHero->primarySkills[i] = heroRec->m_primaryStats[i];
@@ -262,3 +264,5 @@ void SaveCampaignHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
     savedHero->numSecSkillsKnown = heroRec->m_secondarySkillCount;
     savedHero->experience = heroRec->m_experience;
 }
+
+} // namespace ironfist

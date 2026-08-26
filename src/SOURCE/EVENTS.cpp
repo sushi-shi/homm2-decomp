@@ -49,6 +49,7 @@
 #include <SOURCE/x_arena.h>
 #include <SOURCE/Localization.h>
 
+
 #define GENERIC_SITE_SIREN_ARMY_REMAINDER                                          \
     0.7
 #define MONSTER_NECROMANCY_FRACTION 0.1
@@ -392,7 +393,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
     // Ironfist's true result suppresses the location handler, not the normal
     // redraw, ambient-audio, and end-game tail of DoEvent.
-    if (Ironfist_LocationVisit(cell, x, y))
+    if (ironfist::hooks::LocationVisit(cell, x, y))
         goto event_done;
 
     gpMouseManager->ShowColorPointer();
@@ -2745,7 +2746,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    GetArtifactEvent(H2EnumIndex(artifact_g)),
+                    ironfist::GetArtifactEvent(H2EnumIndex(artifact_g)),
                     MAP_EVENT_REWARD_ARTIFACT,
                     H2EnumIndex(artifact_g),
                     -1,
@@ -2872,7 +2873,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            GetArtifactEvent(H2EnumIndex(artifact_g)),
+                            ironfist::GetArtifactEvent(H2EnumIndex(artifact_g)),
                             MAP_EVENT_REWARD_ARTIFACT,
                             H2EnumIndex(artifact_g),
                             -1,
@@ -3956,7 +3957,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     );
     // Ironfist drops the typed password: visiting the tent is enough, and
     // the barrier dissolves on its own.
-    H2MessageBox(gText);
+    ironfist::H2MessageBox(gText);
     if (gpCurPlayer->m_barrierTents & (1 << colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         sprintf(
@@ -3964,10 +3965,10 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
             localization::Tr("event.barrier.dissolves"),
             xPasswordStrings[passwordIndex]
         );
-        H2MessageBox(gText);
+        ironfist::H2MessageBox(gText);
         return 1;
     }
-    H2MessageBox(const_cast<char*>(localization::Tr("event.barrier.no_password")));
+    ironfist::H2MessageBox(const_cast<char*>(localization::Tr("event.barrier.no_password")));
     return 0;
 }
 
@@ -3988,7 +3989,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
         localization::Tr("event.barrier.tent_hint"),
         xBarrierColor[color]
     );
-    H2MessageBox(gText);
+    ironfist::H2MessageBox(gText);
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
@@ -4021,7 +4022,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     switch (siteType4) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
             for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
-                if (IsCursedItem(eventHero->m_artifacts[index8]))
+                if (ironfist::IsCursedArtifact(eventHero->m_artifacts[index8]))
                     cursedArtifactCount2++;
             }
             if (cursedArtifactCount2 != 0) {
@@ -4044,7 +4045,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
-                            if (IsCursedItem(eventHero->m_artifacts[index8])) {
+                            if (ironfist::IsCursedArtifact(eventHero->m_artifacts[index8])) {
                                 GiveTakeArtifactStat(
                                     eventHero, eventHero->m_artifacts[index8], EVENT_ARTIFACT_TAKE
                                 );
@@ -5626,7 +5627,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     i32 maxSpellPoints;
 
     if (artifact == ARTIFACT_NONE) {
-        Ironfist_ArtifactStat(targetHero, H2EnumIndex(artifact), take);
+        ironfist::hooks::ArtifactChanged(targetHero, H2EnumIndex(artifact), take);
         return;
     }
     stats[H2EnumIndex(HERO_PRIMARY_ATTACK)] = 0;
@@ -5898,7 +5899,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
                 targetHero->m_spellPoints = static_cast<i16>(maxSpellPoints);
         }
     }
-    Ironfist_ArtifactStat(targetHero, H2EnumIndex(artifact), take);
+    ironfist::hooks::ArtifactChanged(targetHero, H2EnumIndex(artifact), take);
 }
 
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
@@ -7223,7 +7224,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     switch (siteType3) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
             for (artifactIndex14 = 0; artifactIndex14 < HERO_ARTIFACT_SLOT_COUNT; artifactIndex14++) {
-                if (IsCursedItem(eventHero->m_artifacts[artifactIndex14]))
+                if (ironfist::IsCursedArtifact(eventHero->m_artifacts[artifactIndex14]))
                     cursedArtifactCount3++;
             }
             if (cursedArtifactCount3 != 0
@@ -7231,7 +7232,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                        >= EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
                 for (artifactIndex14 = 0; artifactIndex14 < HERO_ARTIFACT_SLOT_COUNT;
                      artifactIndex14++) {
-                    if (IsCursedItem(eventHero->m_artifacts[artifactIndex14]))
+                    if (ironfist::IsCursedArtifact(eventHero->m_artifacts[artifactIndex14]))
                         eventHero->m_artifacts[artifactIndex14] = ARTIFACT_NONE;
                 }
                 gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
@@ -7430,7 +7431,7 @@ void advManager::PlayerMonsterInteract(
     i32 numJoining;
 
     unused = 0;
-    Ironfist_MonsterInteract(cell);
+    ironfist::hooks::MonsterInteraction(cell);
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
@@ -7768,7 +7769,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     i32 joiningCost;
     i32 joiningCount;
 
-    Ironfist_MonsterInteract(cell);
+    ironfist::hooks::MonsterInteraction(cell);
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;

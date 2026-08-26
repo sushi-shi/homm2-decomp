@@ -28,6 +28,8 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 
+namespace ironfist::script {
+
 enum SoundEffectWait { SND_DO_WAIT, SND_DONT_WAIT };
 
 static bool PlaySoundEffect(std::string snd, SoundEffectWait wait, SAMPLE2* samp) {
@@ -159,7 +161,7 @@ static i32 l_inputBox(lua_State* L) {
 }
 
 static i32 l_recruitBox(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i16 quantity = static_cast<i16>(luaL_checknumber(L, 3));
     i16 startQ = quantity;
@@ -209,51 +211,51 @@ static i32 l_getNumPlayers(lua_State* L) {
 
 static i32 l_getPlayer(lua_State* L) {
     i32 n = CheckIndex(L, 1, gpGame->m_playerCount, "player index out of range");
-    deepbound_push(L, deepbind<playerData*>(&gpGame->m_players[n]));
+    PushBinding(L, Binding<playerData*>(&gpGame->m_players[n]));
     return 1;
 }
 
 static i32 l_getCurrentPlayer(lua_State* L) {
-    deepbound_push(L, deepbind<playerData*>(gpCurPlayer));
+    PushBinding(L, Binding<playerData*>(gpCurPlayer));
     return 1;
 }
 
 static i32 l_getPlayerColor(lua_State* L) {
-    playerData* p = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    playerData* p = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, p->m_color);
     return 1;
 }
 
 static i32 l_getNumHeroes(lua_State* L) {
-    playerData* p = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    playerData* p = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, p->m_heroCount);
     return 1;
 }
 
 static i32 l_getHero(lua_State* L) {
-    playerData* p = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* p = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 n = CheckIndex(L, 2, p->m_heroCount, "owned hero index out of range");
     i32 heroId = CheckStoredIndex(
         L, p->m_heroIds[n], H2EnumIndex(GAME_HERO_COUNT), "owned hero id"
     );
-    deepbound_push(L, deepbind<hero*>(&gpGame->m_heroRecs[heroId]));
+    PushBinding(L, Binding<hero*>(&gpGame->m_heroRecs[heroId]));
     return 1;
 }
 
 static i32 l_getHeroForHire(lua_State* L) {
-    playerData* p = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* p = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 n = CheckIndex(
         L, 2, PLAYER_AVAILABLE_HERO_COUNT, "available hero index out of range"
     );
     i32 heroId = CheckStoredIndex(
         L, p->m_availableHeroIds[n], H2EnumIndex(GAME_HERO_COUNT), "available hero id"
     );
-    deepbound_push(L, deepbind<hero*>(&gpGame->m_heroRecs[heroId]));
+    PushBinding(L, Binding<hero*>(&gpGame->m_heroRecs[heroId]));
     return 1;
 }
 
 static i32 l_giveResource(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     i32 val = static_cast<i32>(luaL_checknumber(L, 3));
     player->m_resources[res] += val;
@@ -261,7 +263,7 @@ static i32 l_giveResource(lua_State* L) {
 }
 
 static i32 l_setResource(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     i32 val = static_cast<i32>(luaL_checknumber(L, 3));
     player->m_resources[res] = val;
@@ -269,7 +271,7 @@ static i32 l_setResource(lua_State* L) {
 }
 
 static i32 l_getResource(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, player->m_resources[res]);
     return 1;
@@ -278,32 +280,32 @@ static i32 l_getResource(lua_State* L) {
 static i32 l_shareVision(lua_State* L) {
     i32 sourcePlayer = static_cast<i32>(luaL_checknumber(L, 1));
     i32 destPlayer = static_cast<i32>(luaL_checknumber(L, 2));
-    Ironfist_ShareVision(sourcePlayer, destPlayer);
+    gpGame->ShareVision(sourcePlayer, destPlayer);
     return 0;
 }
 
 static i32 l_cancelShareVision(lua_State* L) {
     i32 sourcePlayer = static_cast<i32>(luaL_checknumber(L, 1));
     i32 destPlayer = static_cast<i32>(luaL_checknumber(L, 2));
-    Ironfist_CancelShareVision(sourcePlayer, destPlayer);
+    gpGame->CancelVisionShare(sourcePlayer, destPlayer);
     return 0;
 }
 
 static i32 l_setDaysAfterTownLost(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 days = static_cast<i32>(luaL_checknumber(L, 2));
     player->m_daysLeft = days;
     return 0;
 }
 
 static i32 l_getDaysAfterTownLost(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, player->m_daysLeft);
     return 1;
 }
 
 static i32 l_revealMap(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
     i32 x = static_cast<i32>(luaL_checknumber(L, 2));
     i32 y = static_cast<i32>(luaL_checknumber(L, 3));
     i32 radius = static_cast<i32>(luaL_checknumber(L, 4));
@@ -318,7 +320,7 @@ static i32 l_revealMap(lua_State* L) {
 }
 
 static i32 l_SetBarrierTentVisited(lua_State* L) {
-    playerData* plyd = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* plyd = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 tentcolor = luaL_checknumber(L, 2);
     plyd->m_barrierTents |= (1 << tentcolor);
 
@@ -351,19 +353,19 @@ static hero* GetCurrentHero() {
 }
 
 static i32 l_getCurrentHero(lua_State* L) {
-    deepbound_push(L, deepbind<hero*>(GetCurrentHero()));
+    PushBinding(L, Binding<hero*>(GetCurrentHero()));
     return 1;
 }
 
 static i32 l_grantSpell(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 sp = static_cast<i32>(luaL_checknumber(L, 2));
     hro->AddSpell(static_cast<SpellType>(sp), hro->Stats(HERO_PRIMARY_KNOWLEDGE));
     return 0;
 }
 
 static i32 l_forgetSpell(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 spell = static_cast<i32>(luaL_checknumber(L, 2));
     if (spell >= 0 && spell < KB_SPELL_TABLE_CAPACITY)
         hro->m_spells[spell] = 0;
@@ -371,7 +373,7 @@ static i32 l_forgetSpell(lua_State* L) {
 }
 
 static i32 l_hasTroop(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 3));
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
@@ -386,7 +388,7 @@ static i32 l_hasTroop(lua_State* L) {
 }
 
 static i32 l_getCreatureAmount(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = 0;
 
@@ -401,7 +403,7 @@ static i32 l_getCreatureAmount(lua_State* L) {
 }
 
 static i32 l_takeTroop(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 3));
 
@@ -421,7 +423,7 @@ static i32 l_takeTroop(lua_State* L) {
 }
 
 static i32 l_teleportHero(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 x = static_cast<i32>(luaL_checknumber(L, 2));
     i32 y = static_cast<i32>(luaL_checknumber(L, 3));
 
@@ -435,51 +437,51 @@ static i32 l_teleportHero(lua_State* L) {
 }
 
 static i32 l_getHeroName(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushstring(L, hro->m_name);
     return 1;
 }
 
 static i32 l_setHeroName(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     CopyLuaName(L, 2, hro->m_name, sizeof(hro->m_name));
     return 0;
 }
 
 static i32 l_getHeroInPool(lua_State* L) {
     i32 n = CheckIndex(L, 1, H2EnumIndex(GAME_HERO_COUNT), "hero index out of range");
-    deepbound_push(L, deepbind<hero*>(&gpGame->m_heroRecs[n]));
+    PushBinding(L, Binding<hero*>(&gpGame->m_heroRecs[n]));
     return 1;
 }
 
 static i32 l_getHeroOwner(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
 
     if (hro->m_owner < 0) {
         lua_pushnil(L);
     } else {
-        deepbound_push(L, deepbind<playerData*>(&gpGame->m_players[hro->m_owner]));
+        PushBinding(L, Binding<playerData*>(&gpGame->m_players[hro->m_owner]));
     }
 
     return 1;
 }
 
 static i32 l_grantArtifact(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     GiveArtifact(hro, static_cast<ArtifactType>(art), 1, -1);
     return 0;
 }
 
 static i32 l_hasArtifact(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushboolean(L, hro->HasArtifact(static_cast<ArtifactType>(art)));
     return 1;
 }
 
 static i32 l_takeArtifact(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     for (i32 i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
         if (hro->m_artifacts[i].value() == art) {
@@ -492,7 +494,7 @@ static i32 l_takeArtifact(lua_State* L) {
 }
 
 static i32 l_countEmptyArtifactSlots(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     i32 amount = 0;
     for (i32 i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
         if (hro->m_artifacts[i] == ARTIFACT_NONE) {
@@ -504,7 +506,7 @@ static i32 l_countEmptyArtifactSlots(lua_State* L) {
 }
 
 static i32 l_countEmptyCreatureSlots(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     i32 amount = 0;
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (hro->m_army.m_creatureTypes[i] == CREATURE_NONE) {
@@ -516,7 +518,7 @@ static i32 l_countEmptyCreatureSlots(lua_State* L) {
 }
 
 static i32 l_setExperiencePoints(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 points = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_experience = points;
     hro->CheckLevel();
@@ -524,13 +526,13 @@ static i32 l_setExperiencePoints(lua_State* L) {
 }
 
 static i32 l_getExperiencePoints(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_experience);
     return 1;
 }
 
 static i32 l_setPrimarySkill(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     i32 amt = static_cast<i32>(luaL_checknumber(L, 3));
     hro->m_primaryStats[skill] = amt;
@@ -538,27 +540,27 @@ static i32 l_setPrimarySkill(lua_State* L) {
 }
 
 static i32 l_getPrimarySkill(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, hro->m_primaryStats[skill]);
     return 1;
 }
 
 static i32 l_setSpellpoints(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 points = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_spellPoints = points;
     return 0;
 }
 
 static i32 l_getSpellpoints(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_spellPoints);
     return 1;
 }
 
 static i32 l_setSecondarySkill(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     i32 level = static_cast<i32>(luaL_checknumber(L, 3));
     hro->SetSS(static_cast<HeroSecondarySkill>(skill), static_cast<HeroSkillLevel>(level));
@@ -566,14 +568,14 @@ static i32 l_setSecondarySkill(lua_State* L) {
 }
 
 static i32 l_getSecondarySkill(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, hro->GetSSLevel(static_cast<HeroSecondarySkill>(skill)));
     return 1;
 }
 
 static i32 l_grantArmy(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 cr = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
     hro->m_army.Add(static_cast<CreatureType>(cr), n, -1);
@@ -581,90 +583,90 @@ static i32 l_grantArmy(lua_State* L) {
 }
 
 static i32 l_getHeroMobility(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_mobility);
     return 1;
 }
 
 static i32 l_setHeroMobility(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 mobility = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_mobility = mobility;
     return 0;
 }
 
 static i32 l_getHeroRemainingMobility(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_remainingMobility);
     return 1;
 }
 
 static i32 l_setHeroRemainingMobility(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 remainingMobility = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_remainingMobility = remainingMobility;
     return 0;
 }
 
 static i32 l_getHeroX(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_x);
     return 1;
 }
 
 static i32 l_getHeroY(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_y);
     return 1;
 }
 
 static i32 l_getHeroLevel(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_level);
     return 1;
 }
 
 static i32 l_getHeroTempMoraleBonuses(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_morale);
     return 1;
 }
 
 static i32 l_setHeroTempMoraleBonuses(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 moraleBonus = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_morale = moraleBonus;
     return 0;
 }
 
 static i32 l_getHeroTempLuckBonuses(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_luck);
     return 1;
 }
 
 static i32 l_setHeroTempLuckBonuses(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 luckBonus = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_luck = luckBonus;
     return 0;
 }
 
 static i32 l_grantSpellScroll(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 sp = static_cast<i32>(luaL_checknumber(L, 2));
     GiveArtifact(hro, ARTIFACT_SPELL_SCROLL, 1, sp);
     return 0;
 }
 
 static i32 l_getHeroFaction(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, hro->m_cursorType.value());
     return 1;
 }
 
 static i32 l_setHeroFaction(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 newFaction = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_cursorType = static_cast<HeroCursorType>(newFaction);
     return 0;
@@ -817,18 +819,18 @@ static void register_map_funcs(lua_State* L) {
 /************************************** Town ******************************************/
 
 static i32 l_getCurrentTown(lua_State* L) {
-    deepbound_push(L, deepbind<town*>(gpTownManager->m_town));
+    PushBinding(L, Binding<town*>(gpTownManager->m_town));
     return 1;
 }
 
 static i32 l_hasVisitingHero(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushboolean(L, twn->m_occupyingHeroId >= 0);
     return 1;
 }
 
 static i32 l_getVisitingHero(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     if (twn->m_occupyingHeroId < 0) {
         lua_pushnil(L);
         return 1;
@@ -836,7 +838,7 @@ static i32 l_getVisitingHero(lua_State* L) {
     i32 heroId = CheckStoredIndex(
         L, twn->m_occupyingHeroId, H2EnumIndex(GAME_HERO_COUNT), "visiting hero id"
     );
-    deepbound_push(L, deepbind<hero*>(&gpGame->m_heroRecs[heroId]));
+    PushBinding(L, Binding<hero*>(&gpGame->m_heroRecs[heroId]));
     return 1;
 }
 
@@ -848,18 +850,18 @@ static i32 l_buildInCurrentTown(lua_State* L) {
 
 static i32 l_getTown(lua_State* L) {
     i32 index = CheckIndex(L, 1, H2EnumIndex(GAME_TOWN_COUNT), "town index out of range");
-    deepbound_push(L, deepbind<town*>(&gpGame->m_castleRecs[index]));
+    PushBinding(L, Binding<town*>(&gpGame->m_castleRecs[index]));
     return 1;
 }
 
 static i32 l_getTownName(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushstring(L, twn->m_name);
     return 1;
 }
 
 static i32 l_setTownName(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     CopyLuaName(L, 2, twn->m_name, sizeof(twn->m_name));
     // Upstream returns the still-on-stack name argument as the single result.
     return 1;
@@ -869,7 +871,7 @@ static i32 l_getTownByName(lua_State* L) {
     char* name = const_cast<char*>(luaL_checkstring(L, 1));
     for (i32 i = 0; i < H2EnumIndex(GAME_TOWN_COUNT); i++) {
         if (strcmp(gpGame->m_castleRecs[i].m_name, name) == 0) {
-            deepbound_push(L, deepbind<town*>(&gpGame->m_castleRecs[i]));
+            PushBinding(L, Binding<town*>(&gpGame->m_castleRecs[i]));
             return 1;
         }
     }
@@ -878,30 +880,30 @@ static i32 l_getTownByName(lua_State* L) {
 }
 
 static i32 l_getPlayerTown(lua_State* L) {
-    playerData* player = static_cast<playerData*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    playerData* player = static_cast<playerData*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 index = CheckIndex(L, 2, player->m_townCount, "owned town index out of range");
     i32 townId = CheckStoredIndex(
         L, player->m_townIds[index], H2EnumIndex(GAME_TOWN_COUNT), "owned town id"
     );
-    deepbound_push(L, deepbind<town*>(&gpGame->m_castleRecs[townId]));
+    PushBinding(L, Binding<town*>(&gpGame->m_castleRecs[townId]));
     return 1;
 }
 
 static i32 l_buildInTown(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 building = static_cast<i32>(luaL_checknumber(L, 2));
     twn->BuildBuilding(static_cast<BuildingSlotType>(building));
     return 0;
 }
 
 static i32 l_getTownFaction(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, twn->m_type.value());
     return 1;
 }
 
 static i32 l_setTownFaction(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 faction = static_cast<i32>(luaL_checknumber(L, 2));
     twn->SetFaction(static_cast<FactionType>(faction));
     return 0;
@@ -918,7 +920,7 @@ static i32 l_getCreatureCost(lua_State* L) {
 }
 
 static i32 l_getTownOwner(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, twn->m_owner);
     return 1;
 }
@@ -931,13 +933,13 @@ static i32 l_setTownOwner(lua_State* L) {
 }
 
 static i32 l_getTownX(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, twn->m_x);
     return 1;
 }
 
 static i32 l_getTownY(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, twn->m_y);
     return 1;
 }
@@ -950,7 +952,7 @@ static i32 l_getTownIDFromPos(lua_State* L) {
 }
 
 static i32 l_setNumberOfCreatures(lua_State* L) {
-    town* cstle = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    town* cstle = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 dwllng = static_cast<i32>(luaL_checknumber(L, 2));
     i32 numcrtrs = static_cast<i32>(luaL_checknumber(L, 3));
     cstle->m_garrison[dwllng] = numcrtrs;
@@ -958,7 +960,7 @@ static i32 l_setNumberOfCreatures(lua_State* L) {
 }
 
 static i32 l_setNumGuildSpells(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
     twn->m_spellCounts[l + TOWN_MAGE_GUILD_FIRST_LEVEL] = n;
@@ -967,7 +969,7 @@ static i32 l_setNumGuildSpells(lua_State* L) {
 }
 
 static i32 l_setGuildSpell(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
     i32 s = static_cast<i32>(luaL_checknumber(L, 4));
@@ -977,7 +979,7 @@ static i32 l_setGuildSpell(lua_State* L) {
 }
 
 static i32 l_getGuildSpell(lua_State* L) {
-    town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
     lua_pushinteger(L, twn->m_spells[l][n].value());
@@ -987,7 +989,9 @@ static i32 l_getGuildSpell(lua_State* L) {
 static i32 l_disallowBuilding(lua_State* L) {
     i32 townIdx = static_cast<i32>(luaL_checknumber(L, 1));
     i32 building = static_cast<i32>(luaL_checknumber(L, 2));
-    Ironfist_DisallowBuilding(townIdx, building);
+    if (townIdx >= 0 && townIdx < GAME_TOWN_COUNT) {
+        gpGame->m_castleRecs[townIdx].DisallowBuilding(building);
+    }
     return 0;
 }
 
@@ -1052,7 +1056,7 @@ static i32 l_battleHasHero(lua_State* L) {
 
 static i32 l_battleGetHero(lua_State* L) {
     i32 side = static_cast<i32>(luaL_checknumber(L, 1));
-    deepbound_push(L, deepbind<hero*>(gpCombatManager->m_heroes[side]));
+    PushBinding(L, Binding<hero*>(gpCombatManager->m_heroes[side]));
     return 1;
 }
 
@@ -1071,140 +1075,140 @@ static i32 l_battleGetNumStacks(lua_State* L) {
 static i32 l_battleGetStack(lua_State* L) {
     i32 side = static_cast<i32>(luaL_checknumber(L, 1));
     i32 idx = static_cast<i32>(luaL_checknumber(L, 2));
-    deepbound_push(L, deepbind<army*>(&gpCombatManager->m_armies[side][idx]));
+    PushBinding(L, Binding<army*>(&gpCombatManager->m_armies[side][idx]));
     return 1;
 }
 
 static i32 l_getStackSide(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_side.value());
     return 1;
 }
 
 static i32 l_getStackType(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monsterType.value());
     return 1;
 }
 
 static i32 l_getStackQuantity(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_quantity);
     return 1;
 }
 
 static i32 l_setStackQuantity(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_quantity = quantity;
     return 0;
 }
 
 static i32 l_getStackInitialQuantity(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_initialQuantity);
     return 1;
 }
 
 static i32 l_setStackInitialQuantity(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 initialQuantity = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_initialQuantity = initialQuantity;
     return 0;
 }
 
 static i32 l_getStackHex(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_hex);
     return 1;
 }
 
 static i32 l_getStackMorale(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_morale);
     return 1;
 }
 
 static i32 l_setStackMorale(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 morale = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_morale = morale;
     return 0;
 }
 
 static i32 l_getStackLuck(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_luck);
     return 1;
 }
 
 static i32 l_setStackLuck(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 luck = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_luck = luck;
     return 0;
 }
 
 static i32 l_getStackAttack(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monster.attack);
     return 1;
 }
 
 static i32 l_setStackAttack(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 attack = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.attack = attack;
     return 0;
 }
 
 static i32 l_getStackDefense(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monster.defense);
     return 1;
 }
 
 static i32 l_setStackDefense(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 defense = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.defense = defense;
     return 0;
 }
 
 static i32 l_getStackSpeed(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monster.speed);
     return 1;
 }
 
 static i32 l_setStackSpeed(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 speed = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.speed = speed;
     return 0;
 }
 
 static i32 l_getStackShots(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monster.shots);
     return 1;
 }
 
 static i32 l_setStackShots(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 shots = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.shots = shots;
     return 0;
 }
 
 static i32 l_getStackHp(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     lua_pushinteger(L, creat->m_monster.hitPoints - creat->m_hitPointsLost);
     return 1;
 }
 
 static i32 l_setStackHp(lua_State* L) {
-    army* creat = static_cast<army*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
+    army* creat = static_cast<army*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 hp = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_hitPointsLost = creat->m_monster.hitPoints - hp;
     return 0;
@@ -1265,7 +1269,7 @@ static i32 l_getCampaignChoiceAmount(lua_State* L) {
 }
 
 static i32 l_getCampaignChoice(lua_State* L) {
-    deepbound_push(L, deepbind<SCampaignChoice*>(CurrentCampaignChoice()));
+    PushBinding(L, Binding<SCampaignChoice*>(CurrentCampaignChoice()));
     return 1;
 }
 
@@ -1318,7 +1322,7 @@ static i32 l_setinclinedtojoin(lua_State* L) {
 }
 
 static i32 l_startbattle(lua_State* L) {
-    hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
+    hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 4)));
     i32 mon1 = static_cast<i32>(luaL_checknumber(L, 2));
     i32 mon1quantity = static_cast<i32>(luaL_checknumber(L, 3));
     i32 switchSides = static_cast<i32>(luaL_checknumber(L, 4));
@@ -1333,15 +1337,15 @@ static i32 l_startbattle(lua_State* L) {
 
 static i32 l_toggleAIArmySharing(lua_State* L) {
     bool toggle = CheckBoolean(L, 1);
-    Ironfist_SetAIArmySharing(toggle);
+    gpGame->SetAIArmySharing(toggle);
     return 0;
 }
 
 static i32 l_forceComputerPlayerChase(lua_State* L) {
-    hero* src = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
-    hero* dst = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(2, 3)));
+    hero* src = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
+    hero* dst = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(2, 3)));
     bool force = CheckBoolean(L, 3);
-    Ironfist_ForceChase(src->m_id, dst->m_id, force);
+    gpGame->ForceHeroChase(src->m_id, dst->m_id, force);
     return 0;
 }
 
@@ -1356,7 +1360,7 @@ static void register_uncategorized_funcs(lua_State* L) {
 
 /**************************************************************************************/
 
-void set_scripting_funcs(lua_State* L) {
+void RegisterFunctions(lua_State* L) {
     register_dialog_funcs(L);
     register_date_funcs(L);
     register_player_funcs(L);
@@ -1367,3 +1371,5 @@ void set_scripting_funcs(lua_State* L) {
     register_campaign_funcs(L);
     register_uncategorized_funcs(L);
 }
+
+} // namespace ironfist::script

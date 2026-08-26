@@ -171,7 +171,21 @@ enum class CreatureType : i8 {
     CREATURE_AIR_ELEMENTAL       = 63,
     CREATURE_FIRE_ELEMENTAL      = 64,
     CREATURE_WATER_ELEMENTAL     = 65,
-    CREATURE_COUNT               = 66
+    CREATURE_COUNT               = 66,
+    // Ironfist creatures. CREATURE_COUNT remains the retail random/table
+    // bound; data-driven Ironfist tables opt into these values explicitly.
+    CREATURE_KOBOLD                 = 72,
+    CREATURE_BLOODSUCKER            = 73,
+    CREATURE_HARPY                  = 74,
+    CREATURE_BLACK_KNIGHT           = 75,
+    CREATURE_CATOBLEBA              = 76,
+    CREATURE_TREANT                 = 77,
+    CREATURE_CYBER_KOBOLD_SPEARMAN  = 78,
+    CREATURE_CYBER_PLASMA_BERSERKER = 79,
+    CREATURE_CYBER_PLASMA_LANCER    = 80,
+    CREATURE_CYBER_INDIGO_PANTHER           = 81,
+    CREATURE_CYBER_SHADOW_ASSASSIN  = 82,
+    CREATURE_CYBER_BEHEMOTH         = 83
 };
 using enum CreatureType;
 ENABLE_ENUM_STEPS(CreatureType)
@@ -300,7 +314,10 @@ enum class ArtifactType : i8 {
     ARTIFACT_SWORD_BREAKER         = 100,
     ARTIFACT_SWORD_ANDURAN         = 101,
     ARTIFACT_SPADE_NECROMANCY      = 102,
-    ARTIFACT_COUNT                 = 103
+    ARTIFACT_COUNT                 = 103,
+    // Ironfist artifacts. ARTIFACT_COUNT remains the retail random bound.
+    ARTIFACT_PANDORA_BOX           = 103,
+    ARTIFACT_IRON_FIST             = 104
 };
 using enum ArtifactType;
 

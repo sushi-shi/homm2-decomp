@@ -8,6 +8,10 @@
 #include <IRONFIST/creatures.h>
 #include <SOURCE/KB_TYPES.h>
 
+class town;
+
+namespace ironfist {
+
 /*
  * Ironfist's faction-generalized town data: dwelling creature types, dwelling
  * and special-building costs, building names, draw orders, eligible-build
@@ -16,29 +20,25 @@
  * from this data at startup.
  */
 
-enum IronfistTownConstant {
-    IRONFIST_FACTION_CYBORG  = H2EnumIndex(FACTION_CYBORG),
+enum TownTableConstant {
     // Cyborg towns borrow the seventh slot of the retail town tilesets and
     // race-icon strips.
-    IRONFIST_CYBORG_SPRITE_SLOT = 6,
-    IRONFIST_NUM_DWELLINGS   = 12,
-    IRONFIST_BUILDING_MAX    = 32,
-    IRONFIST_MAGE_GUILD_LEVELS = 5,
-    DWELLING_1               = 0,
-    DWELLING_2               = 1,
-    DWELLING_3               = 2,
-    DWELLING_4               = 3,
-    DWELLING_5               = 4,
-    DWELLING_6               = 5,
-    DWELLING_2_UPGRADE       = 6,
-    DWELLING_3_UPGRADE       = 7,
-    DWELLING_4_UPGRADE       = 8,
-    DWELLING_5_UPGRADE       = 9,
-    DWELLING_6_UPGRADE       = 10,
-    DWELLING_6_UPGRADE2      = 11
+    CYBORG_SPRITE_SLOT  = 6,
+    DWELLING_1          = 0,
+    DWELLING_2          = 1,
+    DWELLING_3          = 2,
+    DWELLING_4          = 3,
+    DWELLING_5          = 4,
+    DWELLING_6          = 5,
+    DWELLING_2_UPGRADE  = 6,
+    DWELLING_3_UPGRADE  = 7,
+    DWELLING_4_UPGRADE  = 8,
+    DWELLING_5_UPGRADE  = 9,
+    DWELLING_6_UPGRADE  = 10,
+    DWELLING_6_UPGRADE2 = 11
 };
 
-enum IronfistBuildingCode {
+enum BuildingCode {
     BUILDING_MAGE_GUILD      = 0x0,
     BUILDING_THIEVES_GUILD   = 0x1,
     BUILDING_TAVERN          = 0x2,
@@ -84,24 +84,26 @@ struct SBuildingCost {
     i32 gold;
 };
 
-extern i8 gBuildingsToDraw[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_BUILDING_MAX];
-extern SBuildingCost ironfistSpecialBuildingCosts[IRONFIST_FACTION_TABLE_COUNT];
-extern SBuildingCost ironfistDwellingCosts[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_NUM_DWELLINGS];
-extern u8 ironfistDwellingType[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_NUM_DWELLINGS];
-extern u32 ironfistTownEligibleBuildMask[IRONFIST_FACTION_TABLE_COUNT];
-extern const char* ironfistTownPrefixNames[IRONFIST_FACTION_TABLE_COUNT];
-extern i8 ironfistCyborgSpellLimits[IRONFIST_MAGE_GUILD_LEVELS];
+extern i8 BuildingsToDraw[KB_FACTION_TABLE_CAPACITY][H2EnumIndex(BUILDING_SLOT_COUNT)];
+extern SBuildingCost SpecialBuildingCosts[KB_FACTION_TABLE_CAPACITY];
+extern SBuildingCost DwellingCosts[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT];
+extern u8 DwellingTypes[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT];
+extern u32 TownEligibleBuildMasks[KB_FACTION_TABLE_CAPACITY];
+extern const char* TownPrefixNames[KB_FACTION_TABLE_CAPACITY];
+extern i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL];
 
-b32 TownBuildingBuilt(const class town* t, i32 building);
-b32 TownDwellingBuilt(const class town* t, i32 index);
-i32 TownDwellingIndex(const class town* t, i32 tier);
+b32 TownBuildingBuilt(const town* t, i32 building);
+b32 TownDwellingBuilt(const town* t, i32 index);
+i32 TownDwellingIndex(const town* t, i32 tier);
 i32 GetDwellingType(i32 faction, i32 dwellingIndex);
 char* GetDwellingName(i32 faction, i32 dwellingIndex);
 char* GetFirstLevelGrowerName(i32 faction);
 char* GetSpecialBuildingName(i32 faction);
 char* GetSpecialBuildingDesc(i32 faction);
-char* GetIronfistDwellingName(i32 faction, i32 dwelling);
+char* GetCyborgDwellingName(i32 faction, i32 dwelling);
 void BuildingCostToIntArray(SBuildingCost& cost, i32 (&arr)[H2EnumIndex(RES_COUNT)]);
 void InitializeTownConstants();
+
+} // namespace ironfist
 
 #endif

@@ -20,6 +20,7 @@
 #include <string.h>
 #include <SOURCE/Localization.h>
 
+
 typedef enum SetupConstant {
     WINDOW_X = 405,
     WINDOW_Y = 8,
@@ -557,7 +558,7 @@ i32 game::SetupGame(void) {
                         // The bundled Ironfist campaign.
                         xIsPlayingExpansionCampaign = 1;
                         xIsExpansionMap = 1;
-                        i32 campaignId = LoadCampaignFromFile("cyborg.cmp");
+                        i32 campaignId = ironfist::LoadCampaignFromFile("cyborg.cmp");
                         if (campaignId == -1) {
                             result = 0;
                             goto done;
@@ -593,7 +594,7 @@ i32 game::SetupGame(void) {
                             result = 0;
                             goto done;
                         }
-                        i32 campaignId = LoadCampaignFromFile(gLastFilename);
+                        i32 campaignId = ironfist::LoadCampaignFromFile(gLastFilename);
                         if (campaignId == -1) {
                             result = 0;
                             goto done;
@@ -647,7 +648,7 @@ i32 game::PickLoadGame(void) {
     if (gbInCampaign != 0 || xIsPlayingExpansionCampaign != 0) {
         // Campaign saves pick their extension by campaign type, custom
         // campaigns included.
-        sprintf(fileMask, "*%s", GetSaveFileExtension(1).c_str());
+        sprintf(fileMask, "*%s", ironfist::save::FileExtension(1).c_str());
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             localization::Tr("network.load.expansion_unavailable"),
@@ -690,7 +691,7 @@ i32 game::PickLoadGame(void) {
     // quiet for the custom ones.
     i32 savedDebugLevel_2 = giDebugLevel;
     i32 savedHumanCount_2 = iWSLastMsgNumHumanPlayers;
-    if (xIsPlayingExpansionCampaign != 0 && IsCustomCampaign(xCampaign.m_campaignId)) {
+    if (xIsPlayingExpansionCampaign != 0 && ironfist::IsCustomCampaign(xCampaign.m_campaignId)) {
         iWSLastMsgNumHumanPlayers = 999;
         giDebugLevel = 3;
     }

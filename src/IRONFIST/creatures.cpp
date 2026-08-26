@@ -1,6 +1,7 @@
 #include <IRONFIST/creatures.h>
 
 #include <cstdlib>
+#include <array>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -11,11 +12,13 @@
 #include <IRONFIST/paths.h>
 #include <SOURCE/Localization.h>
 
-std::vector<CreatureType> CREATURES_RANDOMIZABLE;
+namespace ironfist {
 
-i32 giNumCreatures;
-i32 gMonRandBound[KB_CREATURE_TABLE_CAPACITY][2];
-i32 gMonSecondaryResourceCost[KB_CREATURE_TABLE_CAPACITY][IRONFIST_SECONDARY_RESOURCE_COUNT];
+std::vector<CreatureType> RandomizableCreatures;
+
+i32 CreatureCount;
+i32 CreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
+i32 CreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY][SECONDARY_RESOURCE_COUNT];
 static char* cArmyProjectileFileNames[KB_CREATURE_TABLE_CAPACITY];
 static bool creatureStringsOwned = false;
 
@@ -46,22 +49,35 @@ static SecondaryResourceNameTableEntry SecondaryResourceNameTable[] = {
     { "gems",    RES_GEMS    }
 };
 
-std::vector<std::string> ironfistAttributeNames = {
-    STRIKE_AND_RETURN, PLASMA_BLAST, TELEPORTER, ASTRAL_DODGE, SHADOW_MARK, JUMPER, CHARGER
+struct ExtendedAttributeName {
+    const char* name;
+    CreatureAttribute attribute;
 };
-static std::vector<std::vector<i32>> ironfistAttributeTable;
+
+static constexpr std::array<ExtendedAttributeName, H2EnumIndex(CreatureAttribute::Count)>
+    ExtendedAttributeNames = { {
+        { "strike-and-return", CreatureAttribute::StrikeAndReturn },
+        { "plasma-blast", CreatureAttribute::PlasmaBlast },
+        { "teleporter", CreatureAttribute::Teleporter },
+        { "astral-dodge", CreatureAttribute::AstralDodge },
+        { "shadow-mark", CreatureAttribute::ShadowMark },
+        { "jumper", CreatureAttribute::Jumper },
+        { "charger", CreatureAttribute::Charger }
+    } };
+
+static std::array<std::vector<bool>, H2EnumIndex(CreatureAttribute::Count)>
+    creatureAttributeTable;
 
 static void ResetCreatureAttributes() {
-    ironfistAttributeTable.clear();
-    for (i32 j = 0; j < static_cast<i32>(ironfistAttributeNames.size()); j++) {
-        ironfistAttributeTable.push_back(std::vector<i32>(KB_CREATURE_TABLE_CAPACITY, 0));
+    for (std::vector<bool>& attributes : creatureAttributeTable) {
+        attributes.assign(KB_CREATURE_TABLE_CAPACITY, false);
     }
 }
 
-void GrantCreatureAttribute(i32 id, std::string name) {
-    for (i32 i = 0; i < static_cast<i32>(ironfistAttributeNames.size()); i++) {
-        if (ironfistAttributeNames[i] == name) {
-            ironfistAttributeTable[i][id] = 1;
+static void GrantCreatureAttribute(i32 id, const std::string& name) {
+    for (const ExtendedAttributeName& entry : ExtendedAttributeNames) {
+        if (entry.name == name) {
+            creatureAttributeTable[H2EnumIndex(entry.attribute)][id] = true;
             return;
         }
     }
@@ -72,15 +88,11 @@ void GrantCreatureAttribute(i32 id, std::string name) {
     exit(1);
 }
 
-i32 CreatureHasAttribute(i32 id, const std::string& name) {
+bool HasCreatureAttribute(CreatureType creature, CreatureAttribute attribute) {
+    const i32 id = H2EnumIndex(creature);
     if (id < 0 || id >= KB_CREATURE_TABLE_CAPACITY)
-        return 0;
-    for (i32 i = 0; i < static_cast<i32>(ironfistAttributeNames.size()); i++) {
-        if (ironfistAttributeNames[i] == name) {
-            return ironfistAttributeTable[i][id];
-        }
-    }
-    return 0;
+        return false;
+    return creatureAttributeTable[H2EnumIndex(attribute)][id];
 }
 
 char* GetCreatureName(i32 id) {
@@ -92,15 +104,7 @@ char* GetCreaturePluralName(i32 id) {
 }
 
 i32 GetNumCreatures() {
-    return giNumCreatures;
-}
-
-void Ironfist_GetMonsterCost(i32 monster, i32* const costs) {
-    for (i32 i = 0; i < IRONFIST_SECONDARY_RESOURCE_COUNT; i++) {
-        costs[i] = gMonSecondaryResourceCost[monster][i];
-    }
-
-    costs[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[monster].cost;
+    return CreatureCount;
 }
 
 static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute, char** dest) {
@@ -132,7 +136,7 @@ static const char* QueryTextAttribute(tinyxml2::XMLElement* el, const char* attr
 }
 
 static void ReadCreatureData(tinyxml2::XMLNode* root) {
-    giNumCreatures = 0;
+    CreatureCount = 0;
 
     for (tinyxml2::XMLNode* creature = root->FirstChild(); creature;
          creature = creature->NextSibling()) {
@@ -154,8 +158,8 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         i32 maxDamage = 0;
         i32 creatureFlags = 0;
 
-        for (i32 i = 0; i < IRONFIST_SECONDARY_RESOURCE_COUNT; i++) {
-            gMonSecondaryResourceCost[id][i] = 0;
+        for (i32 i = 0; i < SECONDARY_RESOURCE_COUNT; i++) {
+            CreatureSecondaryCosts[id][i] = 0;
         }
 
         for (tinyxml2::XMLNode* property = crElem->FirstChild(); property;
@@ -166,8 +170,8 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
                 minDamage = propElem->IntAttribute("minimum");
                 maxDamage = propElem->IntAttribute("maximum");
             } else if (name == "random-spawn") {
-                gMonRandBound[id][0] = propElem->IntAttribute("minimum");
-                gMonRandBound[id][1] = propElem->IntAttribute("maximum");
+                CreatureRandomBounds[id][0] = propElem->IntAttribute("minimum");
+                CreatureRandomBounds[id][1] = propElem->IntAttribute("maximum");
             } else if (name == "creature-attribute") {
                 bool attributeFound = false;
                 const char* attrName = QueryTextAttribute(propElem, "name");
@@ -194,7 +198,7 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
                     if (std::string(SecondaryResourceNameTable[k].name)
                         == std::string(QueryTextAttribute(propElem, "resource"))) {
                         if (!customedSecondaryCost) {
-                            gMonSecondaryResourceCost
+                            CreatureSecondaryCosts
                                 [id][H2EnumIndex(SecondaryResourceNameTable[k].resource)] =
                                     propElem->IntAttribute("cost");
                             customedSecondaryCost = true;
@@ -211,8 +215,8 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             }
         }
 
-        if (id > giNumCreatures)
-            giNumCreatures = id;
+        if (id > CreatureCount)
+            CreatureCount = id;
 
         tag_monsterInfo info = {};
         info.cost = static_cast<i16>(crElem->IntAttribute("cost"));
@@ -232,35 +236,29 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         info.flags.all = static_cast<MonsterFlags>(creatureFlags);
         gMonsterDatabase[id] = info;
     }
-    giNumCreatures++;
+    CreatureCount++;
 }
 
-randomHeroCreatureInfo
-    randomHeroArmyBounds[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_HERO_ARMY_TIER_COUNT] = {
+StartingArmyRange
+    StartingArmyBounds[KB_FACTION_TABLE_CAPACITY][HERO_ARMY_TIER_COUNT] = {
     { { CREATURE_PEASANT, 30, 50 },  { CREATURE_ARCHER, 3, 5 }   },
     { { CREATURE_GOBLIN, 15, 25 },   { CREATURE_ORC, 3, 5 }      },
     { { CREATURE_SPRITE, 10, 20 },   { CREATURE_DWARF, 2, 4 }    },
     { { CREATURE_CENTAUR, 6, 10 },   { CREATURE_GARGOYLE, 2, 4 } },
     { { CREATURE_HALFLING, 6, 10 },  { CREATURE_BOAR, 2, 4 }     },
     { { CREATURE_SKELETON, 6, 10 },  { CREATURE_ZOMBIE, 2, 4 }   },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID), 8, 12 },
-      { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 1), 3, 6 } }
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_NONE, 0, 0 }, { CREATURE_NONE, 0, 0 } },
+    { { CREATURE_CYBER_KOBOLD_SPEARMAN, 8, 12 },
+      { CREATURE_CYBER_PLASMA_BERSERKER, 3, 6 } }
 };
 
 CreatureType
-    neutralTownCreatureTypes[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_NEUTRAL_TOWN_TIER_COUNT] = {
+    NeutralTownCreatures[KB_FACTION_TABLE_CAPACITY][NEUTRAL_TOWN_TIER_COUNT] = {
     { CREATURE_PEASANT, CREATURE_ARCHER, CREATURE_PIKEMAN, CREATURE_SWORDSMAN,
       CREATURE_CAVALRY },
     { CREATURE_GOBLIN, CREATURE_ORC, CREATURE_WOLF, CREATURE_OGRE, CREATURE_TROLL },
@@ -269,37 +267,23 @@ CreatureType
       CREATURE_HYDRA },
     { CREATURE_HALFLING, CREATURE_BOAR, CREATURE_IRON_GOLEM, CREATURE_ROC, CREATURE_MAGE },
     { CREATURE_SKELETON, CREATURE_ZOMBIE, CREATURE_MUMMY, CREATURE_VAMPIRE, CREATURE_LICH },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 1),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 2),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 3),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 4) }
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE, CREATURE_NONE },
+    { CREATURE_CYBER_KOBOLD_SPEARMAN, CREATURE_CYBER_PLASMA_BERSERKER,
+      CREATURE_CYBER_PLASMA_LANCER, CREATURE_CYBER_INDIGO_PANTHER,
+      CREATURE_CYBER_SHADOW_ASSASSIN }
 };
 
-std::vector<FactionType> FACTIONS_ACTUAL = {
+std::vector<FactionType> PlayableFactions = {
     FACTION_KNIGHT,   FACTION_BARBARIAN,   FACTION_SORCERESS,           FACTION_WARLOCK,
     FACTION_WIZARD,   FACTION_NECROMANCER, static_cast<FactionType>(12)
 };
 
-std::vector<std::string> FACTIONS_ACTUAL_NAMES = {
+std::vector<std::string> PlayableFactionNames = {
     "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer", "Cyborg"
 };
 
@@ -318,7 +302,7 @@ void LoadCreatures() {
     }
 
     ResetCreatureAttributes();
-    CREATURES_RANDOMIZABLE.clear();
+    RandomizableCreatures.clear();
 
     tinyxml2::XMLDocument doc(true);
     tinyxml2::XMLError err = doc.LoadFile(ResolveDataPath("DATA/creatures.xml").c_str());
@@ -331,9 +315,9 @@ void LoadCreatures() {
     creatureStringsOwned = true;
 
     for (i32 i = 0; i <= MAX_BASE_CREATURE; i++)
-        CREATURES_RANDOMIZABLE.push_back(static_cast<CreatureType>(i));
-    for (i32 i = MIN_IRONFIST_CREATURE; i <= MAX_IRONFIST_CREATURE; i++)
-        CREATURES_RANDOMIZABLE.push_back(static_cast<CreatureType>(i));
+        RandomizableCreatures.push_back(static_cast<CreatureType>(i));
+    for (i32 i = MIN_EXTENDED_CREATURE; i <= MAX_EXTENDED_CREATURE; i++)
+        RandomizableCreatures.push_back(static_cast<CreatureType>(i));
 }
 
 void UnloadCreatures() {
@@ -355,6 +339,8 @@ void UnloadCreatures() {
         cArmyProjectileFileNames[i] = NULL;
     }
 
-    CREATURES_RANDOMIZABLE.clear();
+    RandomizableCreatures.clear();
     creatureStringsOwned = false;
 }
+
+} // namespace ironfist

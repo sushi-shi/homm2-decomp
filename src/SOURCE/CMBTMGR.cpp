@@ -11,7 +11,9 @@
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
+#include <IRONFIST/artifacts.h>
+#include <IRONFIST/creatures.h>
 #include <IRONFIST/hooks.h>
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
@@ -33,6 +35,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
+
 
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
@@ -375,10 +378,10 @@ void combatManager::SetupCombat(
     }
     m_combatTowns[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = NULL;
 
-    gIronfistExtra.combat.stack.abilityCounter.clear();
-    gIronfistExtra.combat.stack.abilityNowAnimating.clear();
-    gIronfistExtra.combat.stack.forceShieldHP.clear();
-    gIronfistExtra.combat.spell.fireBombWalls.clear();
+    ironfist::state::Get().combat.stack.abilityCounter.clear();
+    ironfist::state::Get().combat.stack.abilityNowAnimating.clear();
+    ironfist::state::Get().combat.stack.forceShieldHP.clear();
+    ironfist::state::Get().combat.spell.fireBombWalls.clear();
 }
 
 void combatManager::InitNonVisualVars(void) {
@@ -423,7 +426,52 @@ void combatManager::InitNonVisualVars(void) {
     SetupAdjacencyArray();
     GenerateMap();
     LoadArmies();
-    Ironfist_BattleStart();
+    ironfist::hooks::BattleStarted();
+    ApplyPandoraBox(COMBAT_ATTACKER_SIDE);
+    ApplyPandoraBox(COMBAT_DEFENDER_SIDE);
+}
+
+void combatManager::ApplyPandoraBox(CombatSide side) {
+    const i32 sideIndex = H2EnumIndex(side);
+    static const i32 squaresAroundCaster[COMBAT_SIDE_COUNT][3] = {
+        { 14, 27, 40 }, { 11, 24, 37 }
+    };
+    if (!m_heroes[sideIndex] || !m_heroes[sideIndex]->HasArtifact(ARTIFACT_PANDORA_BOX)) {
+        return;
+    }
+
+    static const CreatureType creatureChoices[] = {
+        CREATURE_PEASANT, CREATURE_SPRITE, CREATURE_HALFLING, CREATURE_GOBLIN,
+        CREATURE_SKELETON, CREATURE_CENTAUR, CREATURE_ROGUE, CREATURE_BLOODSUCKER
+    };
+    const CreatureType creature = creatureChoices[SRandom(0, 7)];
+
+    i32 hex = -1;
+    const i32 firstChoice = SRandom(0, 2);
+    for (i32 i = 0; i < 3; ++i) {
+        const i32 square = squaresAroundCaster[sideIndex][(i + firstChoice) % 3];
+        if (H2EnumIndex(
+                gMonsterDatabase[H2EnumIndex(creature)].flags.all & MONSTER_FLAGS_WIDE
+            )) {
+            const i32 direction = side == COMBAT_ATTACKER_SIDE ? 1 : -1;
+            if (m_hexCells[square + direction].m_occupantSide.value() != -1) {
+                continue;
+            }
+        }
+        if (m_hexCells[square].m_occupantSide.value() == -1) {
+            hex = square;
+        }
+    }
+
+    if (hex == -1) {
+        return;
+    }
+
+    const i32 quantity = gpGame->GetRandomNumTroops(creature);
+    AddArmy(side, creature, quantity, hex, static_cast<MonsterFlags>(0x8000), 0);
+    hexcell& cell = m_hexCells[hex];
+    m_armies[H2EnumIndex(cell.m_occupantSide)][cell.m_occupantIndex]
+        .m_temporaryResurrectionQuantity = quantity;
 }
 
 void combatManager::SetupAdjacencyArray(void) {

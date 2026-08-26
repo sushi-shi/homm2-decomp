@@ -21,6 +21,7 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/Localization.h>
 
+
 typedef enum RecruitConstant {
     RESOURCE_COUNT = 6,
     GOLD_RESOURCE = 6,
@@ -113,7 +114,7 @@ i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
     i32 resourceMaximum;
 
-    Ironfist_UnitRecruit(static_cast<i32>(m_creatureType.value()));
+    ironfist::hooks::UnitRecruited(static_cast<i32>(m_creatureType.value()));
 
     m_window = new heroWindow(
         WINDOW_X,

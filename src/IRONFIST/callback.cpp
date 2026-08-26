@@ -5,31 +5,33 @@
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/lua_utils.h>
 
-void ironfist_lua_push(lua_State* ls, i32 arg) {
+namespace ironfist::script {
+
+void PushLuaValue(lua_State* ls, i32 arg) {
     lua_pushinteger(ls, arg);
 }
 
-void ironfist_lua_push(lua_State* ls, void* arg) {
+void PushLuaValue(lua_State* ls, void* arg) {
     lua_pushlightuserdata(ls, arg);
 }
 
-void ironfist_lua_push(lua_State* ls, bool arg) {
+void PushLuaValue(lua_State* ls, bool arg) {
     lua_pushboolean(ls, arg);
 }
 
-void ironfist_lua_push(lua_State* ls, std::string arg) {
+void PushLuaValue(lua_State* ls, const std::string& arg) {
     lua_pushstring(ls, arg.c_str());
 }
 
-void ironfist_lua_push(lua_State* ls, char* arg) {
+void PushLuaValue(lua_State* ls, char* arg) {
     lua_pushstring(ls, arg);
 }
 
-void ironfist_lua_push(lua_State* ls, double arg) {
+void PushLuaValue(lua_State* ls, double arg) {
     lua_pushnumber(ls, arg);
 }
 
-void ironfist_lua_pushmulti(lua_State* ls) {
+void PushLuaValues(lua_State* ls) {
 }
 
 template <>
@@ -83,3 +85,5 @@ std::optional<double> PopLuaResult(lua_State* L, i32 arg) {
         return {};
     }
 }
+
+} // namespace ironfist::script

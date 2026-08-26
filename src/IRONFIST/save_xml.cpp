@@ -18,8 +18,9 @@
 #include <IRONFIST/artifacts.h>
 #include <IRONFIST/campaigns.h>
 #include <IRONFIST/dialog.h>
-#include <IRONFIST/expansions.h>
+#include <IRONFIST/state.h>
 #include <IRONFIST/hooks.h>
+#include <IRONFIST/runtime.h>
 #include <IRONFIST/scripting.h>
 
 #include <EDITOR/fullMap.h>
@@ -35,21 +36,23 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
-using namespace UtilsXML;
+namespace ironfist::save {
 
-i32 Ironfist_GetCampaignType(void) {
+using namespace xml;
+
+i32 GetCampaignType(void) {
     if (gbInCampaign)
-        return IRONFIST_CAMPAIGN_ORIGINAL;
+        return CAMPAIGN_ORIGINAL;
     if (xIsPlayingExpansionCampaign)
-        return IRONFIST_CAMPAIGN_EXPANSION;
-    return IRONFIST_CAMPAIGN_NONE;
+        return CAMPAIGN_EXPANSION;
+    return CAMPAIGN_NONE;
 }
 
-tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
+tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     tinyxml2::XMLNode* pRoot = tempDoc->NewElement("ironfist_save");
     tempDoc->InsertFirstChild(pRoot);
 
-    PushBack(tempDoc, pRoot, "allowAIArmySharing", gIronfistExtra.adventure.allowAIArmySharing);
+    PushBack(tempDoc, pRoot, "allowAIArmySharing", gpGame->IsAIArmySharingAllowed());
     PushBack(tempDoc, pRoot, "mapWidth", gpGame->m_worldMap.width);
     PushBack(tempDoc, pRoot, "mapHeight", gpGame->m_worldMap.height);
     PushBack(tempDoc, pRoot, "gameDifficulty", gpGame->m_difficultyRating);
@@ -79,13 +82,13 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(gpGame->m_newGameInitialized));
     PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(gpGame->m_newGameHumanCount));
     PushBack(tempDoc, pRoot, "gbIAmGreatest", gbIAmGreatest);
-    i32 campaignType = Ironfist_GetCampaignType();
+    i32 campaignType = GetCampaignType();
     PushBack(tempDoc, pRoot, "campaignType", campaignType);
 
     tinyxml2::XMLElement* pElement;
     if (campaignType) {
         pElement = tempDoc->NewElement("campaign");
-        if (campaignType == IRONFIST_CAMPAIGN_ORIGINAL) {
+        if (campaignType == CAMPAIGN_ORIGINAL) {
             PushBack(tempDoc, pElement, "campID", static_cast<i32>(gpGame->m_campaignType.value()));
             PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(gpGame->m_campaignStartingSide.value()));
             PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(gpGame->m_campaignScenario));
@@ -116,7 +119,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
                 tempDoc, pElement, "campPlayerCreatureQuantities",
                 gpGame->m_campaignCarryoverCreatureCounts
             );
-        } else if (campaignType == IRONFIST_CAMPAIGN_EXPANSION) {
+        } else if (campaignType == CAMPAIGN_EXPANSION) {
             PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(xCampaign.m_campaignId));
             PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(xCampaign.m_currentMap));
             PushBack(tempDoc, pElement, "numMaps", xCampaign.m_mapCount);
@@ -130,8 +133,8 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
             WriteArray(tempDoc, pElement, "bonusChoices", xCampaign.m_bonusChoices);
 
             // saved hero for autosaved saves
-            for (auto& i : gIronfistExtra.campaign.savedHeroData) {
-                campaignExtra::partialHeroData* savedHero = &i.second;
+            for (auto& i : state::Get().campaign.savedHeroData) {
+                state::CampaignState::PartialHeroData* savedHero = &i.second;
                 tinyxml2::XMLElement* savedHeroElem = tempDoc->NewElement("savedHero");
                 savedHeroElem->SetAttribute("index", i.first);
                 WriteArray(tempDoc, savedHeroElem, "primarySkills", savedHero->primarySkills);
@@ -532,7 +535,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     pElement = tempDoc->NewElement("disallowedBuildings");
     for (i32 j = 0; j < H2EnumIndex(GAME_TOWN_COUNT); j++) {
         for (i32 bit = 0; bit < 32; bit++) {
-            if (gIronfistExtra.adventure.disallowedBuildings[j][bit]) {
+            if (gpGame->m_castleRecs[j].IsBuildingDisallowed(bit)) {
                 tinyxml2::XMLElement* buildElem = tempDoc->NewElement("building");
                 buildElem->SetAttribute("town", j);
                 buildElem->SetAttribute("building", bit);
@@ -543,14 +546,14 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     pRoot->InsertEndChild(pElement);
 
     WriteMapVariables(pRoot);
-    std::string script = GetScriptContents(gMapName);
+    std::string script = script::ScriptContents(gMapName);
     if (script.length())
         PushBack(tempDoc, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
     return tempDoc->SaveFile(path.c_str());
 }
 
-tinyxml2::XMLError IronfistXML::Read(const char* fileName) {
+tinyxml2::XMLError XmlFile::Read(const char* fileName) {
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Read);
     tinyxml2::XMLError eResult = tempDoc->LoadFile(path.c_str());
     if (!eResult) {
@@ -560,79 +563,74 @@ tinyxml2::XMLError IronfistXML::Read(const char* fileName) {
     return eResult;
 }
 
-luaTable* IronfistXML::ReadTable(tinyxml2::XMLNode* root) {
-    luaTable* lt = new luaTable;
+script::LuaTable XmlFile::ReadTable(tinyxml2::XMLNode* root) {
+    script::LuaTable table;
 
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         if (name == "table") {
-            mapVariable* mapVar = new mapVariable;
-            mapVar->type = MAPVAR_TYPE_TABLE;
-            mapVar->tableValue = ReadTable(elem);
             std::string tableId = elem->Attribute("tableId");
-            (*lt)[tableId] = *mapVar;
+            script::MapVariable& variable = table[tableId];
+            variable.type = script::MapVariableType::Table;
+            variable.table = ReadTable(elem);
         } else if (name == "tableElement")
-            this->ReadTableElement(elem, lt);
+            ReadTableElement(elem, table);
     }
-    return lt;
+    return table;
 }
 
-void IronfistXML::ReadTableElement(tinyxml2::XMLElement* elem, luaTable* lt) {
-    mapVariable* mapVar = new mapVariable;
-    mapVar->type = StringToMapVarType(elem->Attribute("type"));
-    std::string* sV = new std::string(elem->Attribute("value"));
-    mapVar->singleValue = sV;
-    (*lt)[elem->Attribute("key")] = *mapVar;
+void XmlFile::ReadTableElement(tinyxml2::XMLElement* elem, script::LuaTable& table) {
+    script::MapVariable& variable = table[elem->Attribute("key")];
+    variable.type = script::ParseMapVariableType(elem->Attribute("type"));
+    variable.value = elem->Attribute("value");
 }
 
-void IronfistXML::WriteMapVarTable(tinyxml2::XMLNode* dest, std::string id, luaTable* lt) {
+void XmlFile::WriteMapVarTable(
+    tinyxml2::XMLNode* dest, const std::string& id, const script::LuaTable& table
+) {
     tinyxml2::XMLElement* tableElem = tempDoc->NewElement("table");
     tableElem->SetAttribute("tableId", id.c_str());
 
-    for (luaTable::const_iterator it = (*lt).begin(); it != (*lt).end(); ++it) {
+    for (const auto& [key, variable] : table) {
         tinyxml2::XMLElement* elem = tableElem;
-        if (it->second.type == MAPVAR_TYPE_TABLE) {
-            WriteMapVarTable(tableElem, it->first, it->second.tableValue);
+        if (script::IsTable(variable.type)) {
+            WriteMapVarTable(tableElem, key, variable.table);
         } else {
             elem = tempDoc->NewElement("tableElement");
-            elem->SetAttribute("key", it->first.c_str());
-            elem->SetAttribute("type", MapVarTypeToString(it->second.type).c_str());
-            elem->SetAttribute("value", (*it->second.singleValue).c_str());
+            elem->SetAttribute("key", key.c_str());
+            elem->SetAttribute("type", script::MapVariableTypeName(variable.type).c_str());
+            elem->SetAttribute("value", variable.value.c_str());
         }
         tableElem->InsertEndChild(elem);
     }
     dest->InsertEndChild(tableElem);
 }
 
-void IronfistXML::WriteMapVariables(tinyxml2::XMLNode* dest) {
-    std::map<std::string, mapVariable> mapVariables = LoadMapVariablesFromLUA();
+void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest) {
+    script::LuaTable mapVariables = script::LoadMapVariablesFromLua();
     if (!mapVariables.size())
         return;
 
     for (i32 i = 0; i != H2EnumIndex(GAME_HERO_COUNT); ++i) {
         for (i32 j = 0; j != H2EnumIndex(GAME_HERO_COUNT); ++j) {
-            if (gIronfistExtra.adventure.forcedComputerPlayerChases[i][j]) {
+            if (gpGame->IsHeroChaseForced(i, j)) {
                 std::string mapVariableId =
                     "_AICHASE_" + std::to_string(i) + "_" + std::to_string(j) + "_";
-                mapVariable mapVar;
-                mapVar.singleValue = nullptr;
-                mapVar.type = MAPVAR_TYPE_BOOLEAN;
-                mapVariables[mapVariableId] = mapVar;
-                mapVariables[mapVariableId].type = MAPVAR_TYPE_BOOLEAN;
-                mapVariables[mapVariableId].singleValue = new std::string("true");
+                script::MapVariable& variable = mapVariables[mapVariableId];
+                variable.type = script::MapVariableType::Boolean;
+                variable.value = "true";
             }
         }
     }
-    for (std::map<std::string, mapVariable>::const_iterator it = mapVariables.begin();
-         it != mapVariables.end(); ++it) {
+    for (const auto& [id, variable] : mapVariables) {
         tinyxml2::XMLElement* elem = tempDoc->NewElement("mapVariable");
-        elem->SetAttribute("id", it->first.c_str());
-        elem->SetAttribute("type", MapVarTypeToString(it->second.type).c_str());
-        if (isTable(it->second.type)) {
-            WriteMapVarTable(elem, it->first, it->second.tableValue);
-        } else if (isStringNumBool(it->second.type)) {
-            elem->SetAttribute("value", (*it->second.singleValue).c_str());
+        elem->SetAttribute("id", id.c_str());
+        elem->SetAttribute("type", script::MapVariableTypeName(variable.type).c_str());
+        if (script::IsTable(variable.type)) {
+            WriteMapVarTable(elem, id, variable.table);
+        } else if (script::IsScalar(variable.type)) {
+            elem->SetAttribute("value", variable.value.c_str());
         } else {
             DisplayError("Wrong Type created by GetMapVariables", "In function SaveMapVariables");
         }
@@ -640,14 +638,14 @@ void IronfistXML::WriteMapVariables(tinyxml2::XMLNode* dest) {
     }
 }
 
-void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
-    gIronfistExtra.campaign.savedHeroData.clear();
+void XmlFile::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
+    state::Get().campaign.savedHeroData.clear();
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
-        if (campaignType == IRONFIST_CAMPAIGN_ORIGINAL) {
+        if (campaignType == CAMPAIGN_ORIGINAL) {
             i32 campId = elem->IntAttribute("campID");
             i32 mapId = elem->IntAttribute("mapID");
             if (name == "campID") QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignType));
@@ -665,7 +663,7 @@ void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
             else if (name == "campBonuses") gpGame->m_campaignAwards[index] = value;
             else if (name == "campPlayerCreatures") gpGame->m_campaignCarryoverCreatureTypes[index] = static_cast<i16>(value);
             else if (name == "campPlayerCreatureQuantities") gpGame->m_campaignCarryoverCreatureCounts[index] = static_cast<i16>(value);
-        } else if (campaignType == IRONFIST_CAMPAIGN_EXPANSION) {
+        } else if (campaignType == CAMPAIGN_EXPANSION) {
             i32 intValue;
             if (name == "campaignID") { elem->QueryIntText(&intValue); xCampaign.m_campaignId = static_cast<ExpansionCampaignId>(intValue); }
             else if (name == "currentMapID") { elem->QueryIntText(&intValue); xCampaign.m_currentMap = static_cast<ExpansionCampaignMap>(intValue); }
@@ -682,10 +680,10 @@ void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
     }
 }
 
-void IronfistXML::ReadCampaignSavedHero(tinyxml2::XMLNode* root) {
+void XmlFile::ReadCampaignSavedHero(tinyxml2::XMLNode* root) {
     i32 savedHeroIdx = root->ToElement()->IntAttribute("index");
-    campaignExtra::partialHeroData* savedHero =
-        &gIronfistExtra.campaign.savedHeroData[savedHeroIdx];
+    state::CampaignState::PartialHeroData* savedHero =
+        &state::Get().campaign.savedHeroData[savedHeroIdx];
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
@@ -700,7 +698,7 @@ void IronfistXML::ReadCampaignSavedHero(tinyxml2::XMLNode* root) {
     }
 }
 
-void IronfistXML::ReadMapHeader(tinyxml2::XMLNode* root) {
+void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root) {
     SMapHeader* mh = &gpGame->m_mapHeader;
     i32 lossValueLow = mh->lossConditionValue & 0xff;
     i32 lossValueHigh = mh->lossConditionValue >> 8;
@@ -753,7 +751,7 @@ void IronfistXML::ReadMapHeader(tinyxml2::XMLNode* root) {
     mh->lossConditionValue = static_cast<u16>(lossValueLow | (lossValueHigh << 8));
 }
 
-void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
+void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
     gpGame->m_worldMap.width = root->ToElement()->IntAttribute("width");
     gpGame->m_worldMap.height = root->ToElement()->IntAttribute("height");
     gpGame->m_worldMap.Init(gpGame->m_worldMap.width, gpGame->m_worldMap.height);
@@ -804,7 +802,7 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
     }
 }
 
-void IronfistXML::ReadMapExtra(tinyxml2::XMLNode* root) {
+void XmlFile::ReadMapExtra(tinyxml2::XMLNode* root) {
     i32 size = 0;
     i32 index = root->ToElement()->IntAttribute("index");
     std::vector<i32> values;
@@ -825,7 +823,7 @@ void IronfistXML::ReadMapExtra(tinyxml2::XMLNode* root) {
     }
 }
 
-void IronfistXML::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
+void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
     playerData* pdata = &gpGame->m_players[dataIndex];
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
@@ -862,7 +860,7 @@ void IronfistXML::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
     }
 }
 
-void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
+void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
     hero* hro = &gpGame->m_heroRecs[heroIndex];
     // Ironfist's hero::Clear: reset the identity and learned data the XML
     // only writes sparsely.
@@ -950,7 +948,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
     }
 }
 
-void IronfistXML::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
+void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
     town* twn = &gpGame->m_castleRecs[townIdx];
     i32 turnsOwnedLow = twn->m_turnsOwned & 0xff;
     i32 turnsOwnedHigh = twn->m_turnsOwned >> 8;
@@ -1007,11 +1005,11 @@ void IronfistXML::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
     twn->m_turnsOwned = static_cast<u16>(turnsOwnedLow | (turnsOwnedHigh << 8));
 }
 
-void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
-    i32 campaignType = IRONFIST_CAMPAIGN_NONE;
+void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
+    i32 campaignType = CAMPAIGN_NONE;
     char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
     std::vector<i32> xmlArtifacts;
-    std::map<std::string, mapVariable> mapVariables;
+    script::LuaTable mapVariables;
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
@@ -1020,14 +1018,17 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         if (name == "allowAIArmySharing") {
             bool allow = true;
             elem->QueryBoolText(&allow);
-            gIronfistExtra.adventure.allowAIArmySharing = allow;
+            gpGame->SetAIArmySharing(allow);
         } else if (name == "disallowedBuildings") {
             for (tinyxml2::XMLNode* build = elem->FirstChild(); build;
                  build = build->NextSibling()) {
                 tinyxml2::XMLElement* buildElem = build->ToElement();
-                Ironfist_DisallowBuilding(
-                    buildElem->IntAttribute("town"), buildElem->IntAttribute("building")
-                );
+                const i32 townIndex = buildElem->IntAttribute("town");
+                if (townIndex >= 0 && townIndex < GAME_TOWN_COUNT) {
+                    gpGame->m_castleRecs[townIndex].DisallowBuilding(
+                        buildElem->IntAttribute("building")
+                    );
+                }
             }
         }
         else if (name == "mapWidth") elem->QueryIntText(&gpGame->m_worldMap.width);
@@ -1135,7 +1136,7 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
             const char* script = elem->GetText();
             if (script) {
                 std::string scriptText(script);
-                ScriptingInitFromString(scriptText);
+                script::InitializeFromSave(scriptText);
             }
         }
         else if (name == "mapExtra") ReadMapExtra(elem);
@@ -1148,29 +1149,26 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "mapVariable") {
             std::string mapVariableId = elem->Attribute("id");
 
-            MapVarType mapVariableType = StringToMapVarType(elem->Attribute("type"));
+            script::MapVariableType mapVariableType = script::ParseMapVariableType(elem->Attribute("type"));
             i32 x;
             i32 y;
-            if ((mapVariableType == MAPVAR_TYPE_BOOLEAN)
+            if ((mapVariableType == script::MapVariableType::Boolean)
                 && (std::string(elem->Attribute("value")) == "true")
                 && (sscanf(mapVariableId.c_str(), "_AICHASE_%d_%d_", &x, &y) == 2)) {
-                gIronfistExtra.adventure.forcedComputerPlayerChases[x][y] = true;
+                gpGame->ForceHeroChase(x, y, true);
             }
-            mapVariable* mapVar = new mapVariable;
-            mapVar->type = mapVariableType;
-            if (isTable(mapVariableType)) {
-                mapVar->tableValue = ReadTable(elem->FirstChild());
-            } else if (isStringNumBool(mapVariableType)) {
-                std::string* sV = new std::string;
-                *sV = elem->Attribute("value");
-                mapVar->singleValue = sV;
+            script::MapVariable& variable = mapVariables[mapVariableId];
+            variable.type = mapVariableType;
+            if (script::IsTable(mapVariableType)) {
+                variable.table = ReadTable(elem->FirstChild());
+            } else if (script::IsScalar(mapVariableType)) {
+                variable.value = elem->Attribute("value");
             } else {
-                ErrorLoadingMapVariable(
+                script::ErrorLoadingMapVariable(
                     mapVariableId,
                     " A map variable can only be a table, number, string or boolean."
                 );
             }
-            mapVariables[mapVariableId] = *mapVar;
         }
     }
 
@@ -1190,10 +1188,10 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
     giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
     DeserializeGeneratedArtifacts(xmlArtifacts);
     if (mapVariables.size())
-        WriteMapVariablesToLUA(mapVariables);
+        script::WriteMapVariablesToLua(mapVariables);
 }
 
-std::string GetSaveFileExtension(b32 isPickLoad) {
+std::string FileExtension(b32 isPickLoad) {
     if (gbInCampaign)
         return ".GMC";
     else if (xIsPlayingExpansionCampaign) {
@@ -1221,13 +1219,13 @@ std::string GetSaveFileExtension(b32 isPickLoad) {
     }
 }
 
-i32 Ironfist_SaveGame(char* saveFile, i32 autosave) {
+i32 SaveGame(char* saveFile, i32 autosave) {
     gpAdvManager->DemobilizeCurrHero();
     std::string filePath;
     std::string saveName = saveFile;
 
     if (autosave)
-        filePath = saveName + GetSaveFileExtension(false);
+        filePath = saveName + FileExtension(false);
     else
         filePath = saveName;
 
@@ -1240,7 +1238,7 @@ i32 Ironfist_SaveGame(char* saveFile, i32 autosave) {
         filePath = ".\\DATA\\" + filePath;
     }
 
-    IronfistXML xml;
+    XmlFile xml;
     tinyxml2::XMLError err = xml.Save(filePath.c_str());
     if (err) {
         std::string message = "Could not save XML. " + std::string(xml.GetError());
@@ -1250,10 +1248,10 @@ i32 Ironfist_SaveGame(char* saveFile, i32 autosave) {
     return 1;
 }
 
-b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile) {
+b32 LoadGame(char* fileName, i32 loadFromFile) {
     if (!loadFromFile) {
         // A fresh game start, not a load; the retail path handles it.
-        Ironfist_ResetGameState();
+        runtime::ResetAdventureState();
         return false;
     }
 
@@ -1269,7 +1267,7 @@ b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile) {
     }
 
     if (firstByte != '<') {
-        Ironfist_ResetGameState();
+        runtime::ResetAdventureState();
         return false;
     }
 
@@ -1278,10 +1276,10 @@ b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile) {
 
     gpAdvManager->PurgeMapChangeQueue();
 
-    Ironfist_ResetGameState();
+    runtime::ResetAdventureState();
 
     ClearMapExtra();
-    IronfistXML xmlDoc;
+    XmlFile xmlDoc;
     tinyxml2::XMLError err = xmlDoc.Read(filePath.c_str());
     if (err) {
         std::string message = "Could not load XML. " + std::string(xmlDoc.GetError());
@@ -1304,3 +1302,5 @@ b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile) {
     gpAdvManager->CheckSetEvilInterface(0, -1);
     return true;
 }
+
+} // namespace ironfist::save

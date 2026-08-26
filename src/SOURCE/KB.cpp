@@ -9,6 +9,7 @@
 #include <IRONFIST/campaigns.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/hooks.h>
+#include <IRONFIST/runtime.h>
 #include <IRONFIST/heroes.h>
 #include <IRONFIST/prefs.h>
 #include <IRONFIST/townconsts.h>
@@ -62,6 +63,7 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
+
 
 typedef enum CampaignChoiceValue {
     CHOICE_VALUE_NONE = -1
@@ -504,7 +506,7 @@ i32 oldmain(void) {
     if (bKBDone)
         return 0;
     bKBDone = 1;
-    Ironfist_Startup();
+    ironfist::runtime::Initialize();
     LogStr("OM1");
     LogStr("OM2");
     command_c = -1;
@@ -934,7 +936,7 @@ i32 oldmain(void) {
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
                     ShutDown(localization::Tr("system.manager.add_failed"));
-                Ironfist_AdvManagerReady();
+                ironfist::runtime::AdventureManagerReady();
                 if (command_c == OLD_MAIN_NEW_GAME) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
@@ -1031,7 +1033,7 @@ i32 oldmain(void) {
                             0,
                             HIGH_SCORE_EXPANSION_CAMPAIGN,
                             const_cast<char*>(
-                                ironfistCampaignNames[H2EnumIndex(xCampaign.CampaignID())].c_str()
+                                ironfist::CampaignNames[H2EnumIndex(xCampaign.CampaignID())].c_str()
                             )
                         );
                     }
@@ -1512,7 +1514,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             localization::Tr("town.cyborg.cybernetics_lab.description"),
             GetBuildingName(race, building)
         );
-    } else if (IsWellDisabled() && building == BUILDING_SLOT_WELL) {
+    } else if (ironfist::IsWellDisabled() && building == BUILDING_SLOT_WELL) {
         if (race == FACTION_NECROMANCER) {
             sprintf(buf, "%s", localization::Tr("town.poisoned_well.description"));
         } else {
@@ -1561,7 +1563,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
         return const_cast<char*>(localization::Tr("town.cyborg.energy_pump.name"));
     if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD)
         return const_cast<char*>(localization::Tr("town.cyborg.cybernetics_lab.name"));
-    if (IsWellDisabled() && race == FACTION_NECROMANCER && building == BUILDING_SLOT_WELL)
+    if (ironfist::IsWellDisabled() && race == FACTION_NECROMANCER && building == BUILDING_SLOT_WELL)
         return const_cast<char*>(localization::Tr("town.poisoned_well.name"));
     if (building == BUILDING_SLOT_WELL_EXTRA)
         return gWellExtraNames[H2EnumIndex(race)];
@@ -1570,7 +1572,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
     else if (building < BUILDING_SLOT_DWELLING_FIRST)
         return gNeutralBuildingNames[H2EnumIndex(building)];
     else
-        return GetDwellingName(
+        return ironfist::GetDwellingName(
             H2EnumIndex(race), H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)
         );
 }
@@ -1613,7 +1615,10 @@ char* GetMonsterPluralName(CreatureType monster) {
 }
 
 void GetMonsterCost(CreatureType monster, i32* const cost) {
-    Ironfist_GetMonsterCost(H2EnumIndex(monster), cost);
+    for (i32 resource = 0; resource < ironfist::SECONDARY_RESOURCE_COUNT; ++resource) {
+        cost[resource] = ironfist::CreatureSecondaryCosts[H2EnumIndex(monster)][resource];
+    }
+    cost[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[H2EnumIndex(monster)].cost;
 }
 
 i32 CanBuild(town* t, BuildingSlotType building) {
@@ -1621,7 +1626,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     i32 curMask;
     if (H2BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (Ironfist_BuildingDisallowed(t, H2EnumIndex(building)))
+    if (t->IsBuildingDisallowed(H2EnumIndex(building)))
         return 0;
     if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE)))
         return 0;
@@ -1938,7 +1943,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
                                 resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT
-                                        == CYBERNETICS_SKILL_ROW
+                                        == ironfist::CYBERNETICS_SKILL_ROW
                                     ? cyberneticsDesc
                                           [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
                                     : cSecSkillDesc
@@ -2643,7 +2648,7 @@ void CheckEndGame(
     }
 
     bInCheckEndGame = 0;
-    Ironfist_CheckEndGame();
+    ironfist::hooks::CheckEndGame();
 }
 
 void QuickViewWait(void) {
@@ -2814,7 +2819,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_BATTLE_GARB)]);
     }
 showDialog:
-    Ironfist_AppendMoraleInfo(h);
+    ironfist::hooks::AppendMoraleInfo(h);
     if (modifierStart == static_cast<i32>(strlen(gText))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_NONE)]);
     }
@@ -2868,7 +2873,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[H2EnumIndex(INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_BATTLE_GARB)]);
-    Ironfist_AppendLuckInfo(h);
+    ironfist::hooks::AppendLuckInfo(h);
     if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_NONE)]);
 
@@ -3401,7 +3406,7 @@ void ShutDown(const char* msg) {
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
-    Ironfist_Shutdown();
+    ironfist::runtime::Shutdown();
     CleanUpWinGraphics();
     CleanUpMenus();
     PrintMemoryLeaks();
@@ -4693,7 +4698,7 @@ i32 GetManaCost(SpellType spell, hero* h) {
                 || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL))
             c >>= 1;
     }
-    return Ironfist_CalcManaCost(h, H2EnumIndex(spell), c);
+    return ironfist::hooks::ModifyManaCost(h, H2EnumIndex(spell), c);
 }
 
 void SetWinText(heroWindow* j, i32 id) {
@@ -5100,7 +5105,7 @@ void NormalDialog(
                 resourceText_p[resourceSlot],
                 "%s",
                 resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
-                        == CYBERNETICS_SKILL_ROW
+                        == ironfist::CYBERNETICS_SKILL_ROW
                     ? localization::Tr("hero.skill.cybernetics")
                     : gSecondarySkills
                           [resourceValue_c[resourceSlot]

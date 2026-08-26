@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 namespace {
 
 typedef enum OverviewStorageConstant {
@@ -871,7 +872,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         static_cast<i16>(
                             curHero->m_cursorType == FACTION_CYBORG
                                     && skillIndex == HERO_SKILL_WISDOM
-                                ? H2EnumIndex(CYBERNETICS_MINI_SKILL_FRAME)
+                                ? H2EnumIndex(ironfist::CYBERNETICS_MINI_SKILL_FRAME)
                                 : H2EnumIndex(skillIndex)
                         ),
                         ICON_DRAW_NORMAL,
