@@ -242,6 +242,7 @@ Value values[] = {{0, 9}, {1, 10}};
             "candidates": [],
             "rejected": [],
             "b32_numeric_literal_writes": [],
+            "b32_unproven_writes": [],
         }
         with mock.patch("homm2.audit.bool_fields.scan", return_value=base), \
                 redirect_stdout(StringIO()):
@@ -251,6 +252,18 @@ Value values[] = {{0, 9}, {1, 10}};
             "qualified_name": "X::flag", "writes": [], "read_count": 0,
         }]}
         with mock.patch("homm2.audit.bool_fields.scan", return_value=dirty), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--check"]), 1)
+
+        unproven = {**base, "b32_unproven_writes": [{
+            "declarations": [{"file": "include/x.h", "line": 1}],
+            "qualified_name": "X::flag",
+            "write": {
+                "file": "src/x.cpp", "line": 2, "kind": "assignment",
+                "expression": "value", "domain": None,
+            },
+        }]}
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=unproven), \
                 redirect_stdout(StringIO()):
             self.assertEqual(main(["--check"]), 1)
 

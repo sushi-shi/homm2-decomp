@@ -15,8 +15,8 @@ The scanner is deliberately an audit, not a rewrite command.  Its JSON report
 contains declaration and literal-expression byte spans so a reviewed change
 can replace ``i32`` with ``b32`` and the associated ``0``/``1`` literals with
 ``false``/``true`` without a second name-based search.  It also reports numeric
-literal writes to fields already typed ``b32``; ``--check`` fails on either
-kind of remaining cleanup.
+literal writes and unproven writes to fields already typed ``b32``; ``--check``
+fails on every kind of remaining cleanup.
 
 Run inside ``nix develop .#build``::
 
@@ -603,6 +603,15 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             for write in sorted(item.writes)
             if write.replacement is not None
         ],
+        "b32_unproven_writes": [
+            {
+                "qualified_name": f"{item.record}::{item.name}",
+                "declarations": [asdict(value) for value in sorted(item.declarations)],
+                "write": asdict(write),
+            }
+            for item in b32_fields
+            for write in sorted(item.unknown_writes)
+        ],
     }
 
 
@@ -612,7 +621,8 @@ def _text(report: dict, include_rejected: bool) -> str:
         f"{report['i32_fields']} i32 fields, "
         f"{report['eligible_fields']} Boolean candidates, "
         f"{report['rejected_fields']} rejected; "
-        f"{len(report['b32_numeric_literal_writes'])} numeric writes to b32 fields",
+        f"{len(report['b32_numeric_literal_writes'])} numeric and "
+        f"{len(report['b32_unproven_writes'])} unproven writes to b32 fields",
     ]
     for item in report["candidates"]:
         location = item["declarations"][0]
@@ -641,6 +651,12 @@ def _text(report: dict, include_rejected: bool) -> str:
                 f"B32-LITERAL {write['file']}:{write['line']} "
                 f"{item['qualified_name']}: {write['expression']} -> "
                 f"{write['replacement']}")
+        for item in report["b32_unproven_writes"]:
+            write = item["write"]
+            lines.append(
+                f"B32-UNPROVEN {write['file']}:{write['line']} "
+                f"{item['qualified_name']}: {write['kind']}: "
+                f"{write['expression']}")
     return "\n".join(lines) + "\n"
 
 
@@ -651,7 +667,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--all", action="store_true", help="include rejected fields in text")
     parser.add_argument(
         "--check", action="store_true",
-        help="fail when an i32 candidate or numeric 0/1 write to b32 remains")
+        help=("fail when an i32 candidate, numeric 0/1 write, or unproven "
+              "write to b32 remains"))
     parser.add_argument("--tu", action="append", default=[], help="limit to matching source paths")
     parser.add_argument("-j", "--jobs", type=int, default=0)
     args = parser.parse_args(argv)
@@ -668,7 +685,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(output, end="")
     return int(bool(args.check and (
-        report["eligible_fields"] or report["b32_numeric_literal_writes"])))
+        report["eligible_fields"] or report["b32_numeric_literal_writes"]
+        or report["b32_unproven_writes"])))
 
 
 if __name__ == "__main__":
