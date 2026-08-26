@@ -5779,7 +5779,7 @@ void game::CancelComputerScreen(void) {
 VA(0x0045bda9, 0xe1)
 void game::ShowComputerScreen(void) {
     if (gConfig.blackoutComputer) {
-        i32 saved = gbThisNetHumanPlayer[giCurPlayer];
+        b32 saved = gbThisNetHumanPlayer[giCurPlayer];
         gbThisNetHumanPlayer[giCurPlayer] = 1;
         i32 i;
         for (i = COMPUTER_SCREEN_WIDGET_FIRST; i <= COMPUTER_SCREEN_WIDGET_LAST; i++)

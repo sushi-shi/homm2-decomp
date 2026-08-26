@@ -1020,8 +1020,8 @@ cleanup:
         i32 swapPlayerTemp;
         i32 currentPlayerLocal;
         tag_message windowMessage;
-        i32 redraw = 0;
-        i32 needSync = 0;
+        b32 redraw = false;
+        b32 needSync = false;
         SMapHeader mapHeader;
         NewGameRemotePacket* remotePacketResult;
         i32 sender;
@@ -1080,7 +1080,7 @@ cleanup:
                             remotePacketResult->payload + MAP_HEADER_NAME_SIZE,
                             GAME_SETUP_DATA_SIZE
                         );
-                        redraw = 1;
+                        redraw = true;
                         break;
 
                     case GAME_REMOTE_MAP_HEADER:
@@ -1094,7 +1094,7 @@ cleanup:
                         break;
 
                     case GAME_REMOTE_CHAT:
-                        redraw = 1;
+                        redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
                             sprintf(
@@ -1126,7 +1126,7 @@ cleanup:
 
         if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
-            redraw = 1;
+            redraw = true;
             for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
                  ++currentPlayerLocal) {
                 strcpy(
@@ -1290,8 +1290,8 @@ cleanup:
                             setDifficulty:
                                 gpGame->m_difficulty =
                                     static_cast<GameDifficulty>(currentPlayerLocal);
-                                needSync = 1;
-                                redraw = 1;
+                                needSync = true;
+                                redraw = true;
                                 break;
 
                             case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIRST):
@@ -1313,8 +1313,8 @@ cleanup:
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
                             cycleHandicap:
-                                needSync = 1;
-                                redraw = 1;
+                                needSync = true;
+                                redraw = true;
                                 if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
                                     != GAME_COMPUTER_PLAYER) {
                                     gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
@@ -1363,8 +1363,8 @@ cleanup:
                                 currentPlayerLocal =
                                     message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
                             selectPlayer:
-                                needSync = 1;
-                                redraw = 1;
+                                needSync = true;
+                                redraw = true;
                                 if (gpGame->m_setupPlayerType[currentPlayerLocal]
                                         != GAME_PLAYER_DEFAULT
                                     || (giNumHumanPlayers > 1
@@ -1474,8 +1474,8 @@ cleanup:
                                             FACTION_RANDOM;
                                     else
                                         ++gpGame->m_setupPlayerRace[currentPlayerLocal];
-                                    needSync = 1;
-                                    redraw = 1;
+                                    needSync = true;
+                                    redraw = true;
                                 }
                                 break;
 

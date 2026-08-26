@@ -1159,7 +1159,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 quickView;
     i32 armySlot;
     i32 dummy;
-    i32 bExit = 0;
+    b32 bExit = false;
     i32 heroLevel;
     i32 iHero;
     i32 secondarySkillSlot;
@@ -1208,10 +1208,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     switch (message.payload.widget.id) {
                         case UI_DISMISS:
                             if (gpHVHero->Dismiss())
-                                bExit = 1;
+                                bExit = true;
                             break;
                         case UI_CLOSE:
-                            bExit = 1;
+                            bExit = true;
                             break;
                         case UI_PREVIOUS_HERO:
                         case UI_NEXT_HERO: {

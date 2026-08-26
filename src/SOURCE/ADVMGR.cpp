@@ -988,7 +988,7 @@ DATA(0x00523e0c) static i32 s_drawHeroYOffset = 0;
 DATA(0x00523e10) i32 iThisMinY = 0;
 DATA(0x00523e14) static mapCellExtra* s_drawExtra = NULL;
 DATA(0x00523e18) static i32 s_adjacentMonsterEndY = 0;
-DATA(0x00523e1c) static i32 s_drawFlipCloud = 0;
+DATA(0x00523e1c) static b32 s_drawFlipCloud = false;
 DATA(0x00523e20) static i32 s_drawHeroFrame = 0;
 DATA(0x00523e24) static i32 s_drawStoneTile = 0;
 DATA(0x00523e28) static mapCell* s_drawCell = NULL;
@@ -1002,7 +1002,7 @@ DATA(0x00523e44) i32 giLimitUpdMaxY = 0;
 DATA(0x00523e48) i32 bPrefsChanged = 0;
 DATA(0x00523e4c) i32 giTownPortalChoice = 0;
 DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
-DATA(0x00523f94) static i32 s_drawCovered = 0;
+DATA(0x00523f94) static b32 s_drawCovered = false;
 DATA(0x00523f98) i32 giLimitUpdMinY = 0;
 DATA(0x00523f9c) static mineRecord* s_drawMine = NULL;
 DATA(0x00523fa0) static i32 s_adjacentMonsterMinX = 0;
@@ -1014,7 +1014,7 @@ DATA(0x00523fd0) static i32 s_drawPixelY = 0;
 DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType = 0;
 DATA(0x00523fd8) static hero* s_drawHero = NULL;
 DATA(0x00523fdc) class heroWindow* townPortalWin = NULL;
-DATA(0x00523fe0) static i32 s_drawHasHero = 0;
+DATA(0x00523fe0) static b32 s_drawHasHero = false;
 DATA(0x00523fe4) static i32 s_drawAnimationLength = 0;
 DATA(0x00523fe8) static i32 s_drawPixelX = 0;
 DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = {0};
@@ -1467,13 +1467,13 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
 VA(0x004020d7, 0x59d)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
-    char bMoveStopped = 0;
+    bchar bMoveStopped = false;
     i32 oldMapValid;
     hero* selectedHero;
     town* viewTown;
     tag_message messageValue;
     i32 moveChanged;
-    char newHover = 0;
+    bchar newHover = false;
     i32 pathIndex;
     i32 moveDone;
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
@@ -1546,7 +1546,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                             || messageValue.type == MESSAGE_LEFT_BUTTON_DOWN
                             || messageValue.type == MESSAGE_RIGHT_BUTTON_DOWN
                             || messageValue.type == MESSAGE_WIDGET) {
-                            bMoveStopped = 1;
+                            bMoveStopped = true;
                             StopCursor(1);
                             goto movement_done;
                         }
@@ -1575,7 +1575,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                     eventCellState = NULL;
                 }
                 Reseed(0, 0);
-                newHover = 1;
+                newHover = true;
                 CheckDimHero();
             }
             break;
@@ -2617,7 +2617,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_OVERVIEW: {
             TrimLoopingSounds(0);
             gpGame->Overview();
-            i32 fadeAfter = 1;
+            b32 fadeAfter = true;
             if (giOverviewReturnAction == OVERVIEW_RETURN_HERO) {
                 gpMouseManager->SetPointer(0);
                 TrimLoopingSounds(0);
@@ -2632,7 +2632,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
                 DemobilizeCurrHero();
                 gpMouseManager->SetPointer(0);
                 gpGame->GetTown(giOverviewReturnActionExtra)->View(1);
-                fadeAfter = 0;
+                fadeAfter = false;
             }
             RedrawAdvScreen(1, 0);
             if (fadeAfter) {
@@ -3471,7 +3471,7 @@ void advManager::DrawCell(
         if (!(((gbAllBlack == 0
                 && (MAP_EXTRA_AT_WFIRST(mapX, mapY) & giCurWatchPlayerBit) != 0)
                || gbDrawingPuzzle != 0))) {
-            s_drawCovered = 1;
+            s_drawCovered = true;
             if (gbAllBlack != 0) {
                 s_drawCloudFrame = 0;
             } else {
@@ -3490,10 +3490,10 @@ void advManager::DrawCell(
                 return;
             }
             if (s_drawCloudFrame >= CLOUD_FLIPPED_FRAME_BASE) {
-                s_drawFlipCloud = 1;
+                s_drawFlipCloud = true;
                 s_drawCloudFrame -= CLOUD_FLIPPED_FRAME_BASE;
             } else {
-                s_drawFlipCloud = 0;
+                s_drawFlipCloud = false;
             }
             if ((s_drawCloudFrame == CLOUD_X_ALTERNATE_FRAME_1
                  || s_drawCloudFrame == CLOUD_X_ALTERNATE_FRAME_2)
@@ -3504,7 +3504,7 @@ void advManager::DrawCell(
                 ++s_drawCloudFrame;
             }
         } else {
-            s_drawCovered = 0;
+            s_drawCovered = false;
         }
 
         if (HAS(drawMask, ADVMGR_DRAW_CLOUD) && !gbDrawingPuzzle) {
@@ -3880,7 +3880,7 @@ void advManager::DrawCell(
 
             if ((HAS(drawMask, ADVMGR_DRAW_HERO) || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                 && gbDrawingPuzzle == 0) {
-                s_drawHasHero = 0;
+                s_drawHasHero = false;
                 s_drawHero = NULL;
                 if (HAS(drawMask, ADVMGR_DRAW_HERO)) {
                     if (mapX > 0) {
@@ -3984,7 +3984,7 @@ void advManager::DrawCell(
                     s_drawHeroType = HERO_TYPE_BOAT;
                     s_drawHeroFrame =
                         GetCursorBaseFrame(gpGame->m_boats[s_drawCell->m_objectMetadata].direction);
-                    s_drawHasHero = 1;
+                    s_drawHasHero = true;
                     s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                 } else {
                     s_drawHeroYOffset = 0;
@@ -3996,7 +3996,7 @@ void advManager::DrawCell(
                             ? HERO_TYPE_BOAT
                             : s_drawHero->m_cursorType;
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
-                        s_drawHasHero = 1;
+                        s_drawHasHero = true;
                         if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                             s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                         }
@@ -7576,7 +7576,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
 
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;
-    i32 result = 0;
+    b32 result = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -7589,7 +7589,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                                     MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             } else {
                                 if (gpWindowManager->m_dialogResult == TRAVEL_DIALOG_ACCEPT) {
-                                    result = 1;
+                                    result = true;
                                 }
                             }
                             break;
@@ -7599,7 +7599,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_CLOSE_BUTTON:
                             gpWindowManager->m_dialogResult = 0;
-                            result = 1;
+                            result = true;
                             break;
                     }
                     break;
@@ -9327,9 +9327,9 @@ void advManager::LoadRemote(void) {
     gSoundBackendsReady = 1;
 
     if (static_cast<i8>(gpGame->m_cheated)) {
-        DATA(0x00523ffc) static i32 cheatWarned = 0;
+        DATA(0x00523ffc) static b32 cheatWarned = false;
         if (!cheatWarned) {
-            cheatWarned = 1;
+            cheatWarned = true;
             sprintf(
                 gText,
                 "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
@@ -9338,9 +9338,9 @@ void advManager::LoadRemote(void) {
         }
     }
     if (giDebugLevel > 0) {
-        DATA(0x00524000) static i32 debugWarned = 0;
+        DATA(0x00524000) static b32 debugWarned = false;
         if (!debugWarned) {
-            debugWarned = 1;
+            debugWarned = true;
             sprintf(
                 gText,
                 "Someone has their debug level set!\n"
@@ -9902,7 +9902,7 @@ void advManager::AdvPanel(void) {
             POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
-        i32 heroWasMobilized = m_heroContextLocked;
+        b32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
 
@@ -9977,7 +9977,7 @@ void advManager::AdvPanel(void) {
 
 VA(0x00414417, 0x14b)
 MessageDispatchResult APanelHandler(tag_message& message) {
-    i32 handled = 0;
+    b32 handled = false;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
@@ -10024,7 +10024,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
                         case PANEL_SCENARIO_INFO:
                         case PANEL_SEARCH:
                         case PANEL_CLOSE_WIDGET:
-                            handled = 1;
+                            handled = true;
                             break;
                     }
                     break;
@@ -10054,7 +10054,7 @@ i32 advManager::ControlPanel(void) {
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    i32 heroWasMobilized = m_heroContextLocked;
+    b32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
     heroWindow* panel = new heroWindow(
@@ -10107,7 +10107,7 @@ i32 advManager::ControlPanel(void) {
 
 VA(0x00414747, 0x279)
 MessageDispatchResult CPanelHandler(tag_message& message) {
-    i32 handled = 0;
+    b32 handled = false;
     char question[CONTROL_CONFIRMATION_SIZE];
     i32 helpIndex;
 
@@ -10180,7 +10180,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                                     /* "Вы действительно хотите выйти?" */
                             );
                         confirm_reset:
-                            handled = 1;
+                            handled = true;
                             if (!bFreshSave) {
                                 NormalDialog(
                                     question,
@@ -10195,13 +10195,13 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                                     0
                                 );
                                 if (gpWindowManager->m_dialogResult == DIALOG_OK) {
-                                    handled = 0;
+                                    handled = false;
                                 }
                             }
                             break;
                         case CONTROL_SAVE_GAME:
                         case PANEL_CLOSE_WIDGET:
-                            handled = 1;
+                            handled = true;
                             break;
                         default:
                             break;
@@ -10383,8 +10383,8 @@ static inline bool MidiMusicPresent(void) {
 
 VA(0x00414e82, 0x575)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
-    i32 preferencesChanged = 0;
-    i32 accepted = 0;
+    b32 preferencesChanged = false;
+    b32 accepted = false;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
@@ -10447,7 +10447,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         static_cast<AdventureSystemOptionsWidgetId>(message.payload.widget.id)
                     ) {
                         case SYSTEM_OPTIONS_DIALOG_ACCEPT:
-                            accepted = 1;
+                            accepted = true;
                             break;
                     }
                     break;
@@ -10479,7 +10479,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             gConfig.musicVolume =
                                 (gConfig.musicVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustMusicVolumes();
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
@@ -10508,14 +10508,14 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             gConfig.soundVolume =
                                 (gConfig.soundVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustSoundVolumes();
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_HERO_SPEED:
                             ++gConfig.walkSpeed;
                             gConfig.walkSpeed %= CONFIG_WALK_SPEED_COUNT;
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
@@ -10528,7 +10528,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             } else {
                                 gConfig.blackoutComputer = 1;
                             }
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
@@ -10575,33 +10575,33 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }
                             }
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_SHOW_ROUTE:
                             gConfig.showRoute = 1 - gConfig.showRoute;
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_INTERFACE:
                             gConfig.evilInterfaceUsage =
                                 (gConfig.evilInterfaceUsage + 1) % OPTION_INTERFACE_COUNT;
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_VIDEO:
                             gConfig.slowVideo = gConfig.slowVideo == 0;
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_COLOR_CURSOR:
                             gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
                                 1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
-                            preferencesChanged = 1;
+                            preferencesChanged = true;
                             bPrefsChanged = 1;
                             gpMouseManager->SetColorMice(
                                 gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor

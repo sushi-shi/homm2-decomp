@@ -60,7 +60,7 @@ VA(0x00421802, 0x231)
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
     i32 moraleCount = 0;
     ArmyGroupAlignmentResult alignValue;
-    i32 hasSomeUndead = 0;
+    b32 hasSomeUndead = false;
     i32 moraleDelta = 0;
     i32 enemyHasBoneDragon;
     i32 index;
@@ -70,7 +70,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         return 0;
 
     if (HasSomeUndead())
-        hasSomeUndead = 1;
+        hasSomeUndead = true;
 
     enemyHasBoneDragon = 0;
     if (enemyGroup != NULL) {
@@ -100,7 +100,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
             moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
-            hasSomeUndead = 1;
+            hasSomeUndead = true;
         if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
             && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
             ++moraleCount;
@@ -256,7 +256,7 @@ void armyGroup::DamageGroup(float damagePercent) {
         * IDX(ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
     i32 i;
-    i32 isFirstTroop = 1;
+    b32 isFirstTroop = true;
     i32 j;
 
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
@@ -274,7 +274,7 @@ void armyGroup::DamageGroup(float damagePercent) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }
-            isFirstTroop = 0;
+            isFirstTroop = false;
         } else {
             m_creatureCounts[i] = 0;
         }

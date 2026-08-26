@@ -305,7 +305,7 @@ void swapManager::DrawSelector(void) {
 
 VA(0x004a29f4, 0x9c2)
 MessageDispatchResult swapManager::Main(tag_message& message) {
-    i32 closeRequested_5 = 0;
+    b32 closeRequested_5 = false;
     i32 quickView_9;
     SwapManagerSide side_6;
     i32 slotIndex_2;
@@ -332,7 +332,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                     if (quickView_9)
                         break;
                     if (message.payload.widget.id == CONTROL_CLOSE)
-                        closeRequested_5 = 1;
+                        closeRequested_5 = true;
                     break;
 
                 case WIDGET_COMMAND_SELECT:

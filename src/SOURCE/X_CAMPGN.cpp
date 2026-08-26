@@ -398,7 +398,7 @@ void ExpCampaign::InitMap(void) {
             player->m_cheatValue = static_cast<i8>(bonus->value);
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
-            i32 savedNewGameSetup = gbInNewGameSetup;
+            b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
                 gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
@@ -515,7 +515,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
-    i32 savedTheme = gbUseEvilInterface;
+    b32 savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = true;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");

@@ -679,8 +679,8 @@ inline town* GetCastleSlot(i32 id) {
 
 VA(0x0047e8cf, 0x4b5)
 void philAI::CheckBuyStuff(void) {
-    i32 done = 0;
-    i32 bought = 0;
+    b32 done = false;
+    b32 bought = false;
     BHC bestBuy;
     town* dockTown;
 
@@ -757,9 +757,9 @@ void philAI::CheckBuyStuff(void) {
                     BuildCreature(bestBuy.pTown, bestBuy.what, bestBuy.num);
                     break;
             }
-            bought = 1;
+            bought = true;
         } else
-            done = 1;
+            done = true;
     }
     if (giBuildShipyard[giCurPlayer] >= 0) {
         gpCurPlayer->m_resources[IDX(RES_GOLD)] += SHIPYARD_GOLD_COST;
@@ -1190,7 +1190,7 @@ void ValidateHero(hero* pHero) {
 VA(0x0047fd23, 0xb3f)
 void philAI::DoAI(i32 player) {
     i32 hiddenPointers0 = 0;
-    i32 hourglassShown0 = 0;
+    b32 hourglassShown0 = false;
     MapDirection adjacentDirection2;
     i32 stopAfterStep6;
     i32 eventY1;
@@ -1200,7 +1200,7 @@ void philAI::DoAI(i32 player) {
     hero* currentHero0;
     i32 stepLimit0;
     i32 steps4;
-    i32 boughtAfterCapture5 = 0;
+    b32 boughtAfterCapture5 = false;
     i32 savedShow3[3];
     mapCell* eventCell3;
     i32 pathIndex0;
@@ -1386,7 +1386,7 @@ void philAI::DoAI(i32 player) {
                 }
                 giShowComputerRoute = 1;
                 if (gpCurAIHero->m_mobility == gpCurAIHero->m_remainingMobility) {
-                    hourglassShown0 = 0;
+                    hourglassShown0 = false;
                     IncrementHourGlass();
                 }
                 if (gpCurAIHero->m_destinationX != -1 && gpCurAIHero->m_destinationY != -1) {
@@ -1455,7 +1455,7 @@ void philAI::DoAI(i32 player) {
 
                         if (gpCurAIHero->m_owner != giCurPlayer) {
                             if (!boughtAfterCapture5) {
-                                boughtAfterCapture5 = 1;
+                                boughtAfterCapture5 = true;
                                 CheckBuyStuff();
                             } else {
                             }
@@ -1463,7 +1463,7 @@ void philAI::DoAI(i32 player) {
                         }
                         if (gpCurAIHero->m_remainingMobility <= (gpCurAIHero->m_mobility >> 1)
                             && !hourglassShown0) {
-                            hourglassShown0 = 1;
+                            hourglassShown0 = true;
                             IncrementHourGlass();
                         }
                         if (pathIndex0 < 0 && gpCurPlayer->m_ultimateArtifactHintChance > 15

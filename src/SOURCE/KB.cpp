@@ -1300,7 +1300,7 @@ i32 InterpretCommandLine(void) {
 
 VA(0x0046829b, 0x619)
 MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
-    i32 handled = 0;
+    b32 handled = false;
     i32 idx;
     i32 menu;
     i32 helpIndex;
@@ -1348,23 +1348,23 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             switch (msg.payload.keyboard.keyCode) {
                 case MENU_KEY_NEW:
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_LOAD:
                     gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_CREDITS:
                     gpWindowManager->m_dialogResult = MENU_CREDITS;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_HIGH_SCORES:
                     gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_EXIT:
                     gpWindowManager->m_dialogResult = MENU_EXIT;
-                    handled = 1;
+                    handled = true;
                     break;
             }
         } else if (msg.type == INIT_MENU_MESSAGE) {
@@ -1421,7 +1421,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                             MENU_REDRAW_WIDTH,
                             MENU_REDRAW_HEIGHT
                         );
-                        handled = 1;
+                        handled = true;
                     }
                     break;
             }
@@ -1501,7 +1501,7 @@ MessageDispatchResult NullHandler(struct tag_message& msg) {
 VA(0x004688c4, 0x145)
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     i16 unusedLocal0L = 2, unusedLocal1H = 3, unusedLocal2D = 8, unusedLocal3A = 9;
-    i32 shouldClose = 0;
+    b32 shouldClose = false;
     i32 unusedResult;
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
@@ -1522,12 +1522,12 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
                 switch (msg.payload.widget.id) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_recruitState = -1;
-                        shouldClose = 1;
+                        shouldClose = true;
                         break;
                     case EVENT_WINDOW_THIRD_BUTTON:
                         gpTownManager->m_recruitState = 0;
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        shouldClose = 1;
+                        shouldClose = true;
                         break;
                 }
                 break;
@@ -3687,7 +3687,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 VA(0x0046d4bb, 0x79)
 void CongratsWait(void) {
     i32 command = 0;
-    i32 done = 0;
+    b32 done = false;
     tag_message msg;
     gpInputManager->Flush();
     while (!done) {
@@ -3697,7 +3697,7 @@ void CongratsWait(void) {
         if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN
             || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN
             || msg.type == MESSAGE_RIGHT_BUTTON_UP)
-            done = 1;
+            done = true;
     }
 }
 

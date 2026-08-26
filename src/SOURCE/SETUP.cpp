@@ -1155,7 +1155,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
 
 VA(0x00494446, 0xb5)
 MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
-    i32 handled = 0;
+    b32 handled = false;
 
     PollSound();
     if (message.type == MESSAGE_WIDGET) {
@@ -1164,7 +1164,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
                 if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
                     || message.payload.widget.id == DIALOG_CANCEL)
-                    handled = 1;
+                    handled = true;
         }
     }
 

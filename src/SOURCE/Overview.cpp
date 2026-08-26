@@ -1220,13 +1220,13 @@ void game::DoKnob(void) {
             Process1WindowsMessage();
             widgetMessage = gpInputManager->GetEvent();
             if (widgetMessage.type == MESSAGE_MOUSE_MOVE) {
-                i32 discardMouseMoves = 1;
+                b32 discardMouseMoves = true;
                 while (discardMouseMoves) {
                     pendingMessage = gpInputManager->PeekEvent();
                     if (pendingMessage.type == MESSAGE_MOUSE_MOVE) {
                         widgetMessage = gpInputManager->GetEvent();
                     } else {
-                        discardMouseMoves = 0;
+                        discardMouseMoves = false;
                     }
                 }
             }

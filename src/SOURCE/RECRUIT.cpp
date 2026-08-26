@@ -244,7 +244,7 @@ void recruitUnit::Update(void) {
 
 VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
-    i32 done = 0;
+    b32 done = false;
     i32 quickView;
     i32 cost;
 
@@ -321,19 +321,19 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
-                        done = 1;
+                        done = true;
                         break;
                     case CONFIRM_CONTROL:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {
-                            done = 1;
+                            done = true;
                             goto checkClose;
                         }
                         if (m_army->CanJoin(m_creatureType) != 0) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
-                            done = 1;
+                            done = true;
                             m_noRoom = true;
                             goto checkClose;
                         }
@@ -344,7 +344,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         }
                         *m_available -= m_quantity;
                         m_recruited = true;
-                        done = 1;
+                        done = true;
                         break;
                 }
                 break;

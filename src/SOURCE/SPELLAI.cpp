@@ -984,7 +984,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
     i32 armyValueResult_3;
     i32 negativeEffectResult;
     *effect = 0;
-    i32 done_11 = 0;
+    b32 done_11 = false;
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) influence_9;
     army* combatTarget;
     i32 curePointsTotal;
@@ -1090,7 +1090,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
         if (targetSide == SPELL_AI_ANY_SIDE && sideWork_6 == IDX(m_currentSide))
             sideWork_6 = IDX(OppositeCombatSide(m_currentSide));
         else
-            done_11 = 1;
+            done_11 = true;
     }
 }
 

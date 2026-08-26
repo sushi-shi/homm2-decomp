@@ -392,7 +392,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     i32 itemIndex;
     IconEntry* entry;
     i32 y;
-    i32 firstRelease = 1;
+    b32 firstRelease = true;
 
     m_scrollUpPressed = 0;
     m_scrollDownPressed = 0;
@@ -512,7 +512,7 @@ void dropListWidget::ProcessSelectDialog(void) {
 
             case MESSAGE_LEFT_BUTTON_UP:
                 if (firstRelease != 0) {
-                    firstRelease = 0;
+                    firstRelease = false;
                     m_icon->DrawToBuffer(
                         m_owner->m_posX + m_dropButtonX,
                         m_owner->m_posY + m_dropButtonY,

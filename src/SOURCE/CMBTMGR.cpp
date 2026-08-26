@@ -1253,7 +1253,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 gateIndex11 = -1;
     i32 keepIndex13 = -1;
     CombatCastleHex targetHex4 = COMBAT_CASTLE_HEX_NONE;
-    i32 missShot19 = 0;
+    b32 missShot19 = false;
     CombatCatapultDamage damageLevel15 = CATAPULT_DAMAGE_NORMAL;
     i32 firstRoll7;
     i32 advancedRoll;
@@ -1354,7 +1354,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
             damageLevel15 = CATAPULT_DAMAGE_DOUBLE;
         else if (firstRoll7 > COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD) {
-            missShot19 = 1;
+            missShot19 = true;
             damageLevel15 = CATAPULT_DAMAGE_NONE;
         }
     } else if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
@@ -1393,7 +1393,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 }
             }
         }
-        missShot19 = 0;
+        missShot19 = false;
         damageLevel15 = CATAPULT_DAMAGE_NORMAL;
     foundMissHex:
         frame++;
@@ -2323,8 +2323,8 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
 
 VA(0x0042b527, 0x2b3)
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
-    i32 bRedraw = 0;
-    i32 bDone = 0;
+    b32 bRedraw = false;
+    b32 bDone = false;
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
         if (HAS(
                 message.payload.widget.modifiers,
@@ -2376,7 +2376,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_CLOSE_BUTTON:
-                            bDone = 1;
+                            bDone = true;
                             break;
                     }
                     break;
@@ -2385,33 +2385,33 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                         case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =
                                 (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                         case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
                                                           % SYSTEM_OPTION_CYCLE_COUNT;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                         case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                         case SYSTEM_OPTION_GRID_BUTTON:
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                         case SYSTEM_OPTION_SHADE_BUTTON:
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                         case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
-                            bRedraw = 1;
+                            bRedraw = true;
                             bCPrefsChanged = 1;
                             break;
                     }

@@ -1747,21 +1747,21 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         default:
                             if (quickView) {
-                                i32 armySelected = 0;
+                                b32 armySelected = false;
                                 hero* viewedHero;
                                 if (message.payload.widget.id >= TOWN_GARRISON_SLOT_FIRST
                                     && message.payload.widget.id <= TOWN_GARRISON_SLOT_LAST) {
                                     m_selectedStrip = m_garrisonStrip;
                                     m_selectedArmySlot =
                                         message.payload.widget.id - TOWN_GARRISON_SLOT_FIRST;
-                                    armySelected = 1;
+                                    armySelected = true;
                                 }
                                 if (message.payload.widget.id >= TOWN_HERO_SLOT_FIRST
                                     && message.payload.widget.id <= TOWN_HERO_SLOT_LAST) {
                                     m_selectedStrip = m_heroStrip;
                                     m_selectedArmySlot =
                                         message.payload.widget.id - TOWN_HERO_SLOT_FIRST;
-                                    armySelected = 1;
+                                    armySelected = true;
                                 }
                                 if (armySelected
                                     && m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
@@ -2933,7 +2933,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
     i16 plusButton_d = TOWN_SPLIT_INCREASE_CONTROL;
     i16 minusButton_g = TOWN_SPLIT_DECREASE_CONTROL;
     i16 amountControl_e = TOWN_SPLIT_AMOUNT_CONTROL;
-    i32 handled_c = 0;
+    b32 handled_c = false;
     i32 unusedAction_l;
 
     if (message.type == MESSAGE_WIDGET) {
@@ -2967,14 +2967,14 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_splitAmount = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        handled_c = 1;
+                        handled_c = true;
                         break;
                     case TOWN_DIALOG_CONFIRM:
                         if (gpTownManager->m_splitAmount == 0)
                             gpWindowManager->m_dialogResult = IDX(DIALOG_CANCEL_ID);
                         else
                             gpWindowManager->m_dialogResult = IDX(TOWN_DIALOG_CONFIRM);
-                        handled_c = 1;
+                        handled_c = true;
                         break;
                     default:
                         break;

@@ -477,7 +477,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
     i32 mouseX;
-    i32 acceptStep = 0;
+    b32 acceptStep = false;
     i32 iResult;
     i32 lengthIndex;
     FileRequesterHelpIndex helpIndexMouse;
@@ -575,11 +575,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                         case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                     }
                     break;
@@ -870,7 +870,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (iResult + m_topIndex == m_selectedIndex) {
                                     message.payload.widget.data.value = FILE_REQUESTER_OK;
                                     message.payload.widget.id = FILE_REQUESTER_OK;
-                                    acceptStep = 1;
+                                    acceptStep = true;
                                     break;
                                 }
                                 if (iResult + m_topIndex >= m_fileCount)
@@ -921,7 +921,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     NORMAL_DIALOG_NO_RESOURCE,
                     0
                 );
-                acceptStep = 0;
+                acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
@@ -951,7 +951,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     0
                 );
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
-                    acceptStep = 0;
+                    acceptStep = false;
                 }
             }
         }

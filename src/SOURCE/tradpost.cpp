@@ -357,8 +357,8 @@ void SetupNewTrade(void) {
 
 VA(0x004ad0d4, 0x394)
 MessageDispatchResult TradingPostHandler(struct tag_message& message) {
-    i32 exitFlag = 0;
-    i32 redraw = 0;
+    b32 exitFlag = false;
+    b32 redraw = false;
     i32 resourceData;
     i32 knobPosition;
 
@@ -377,7 +377,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                             qtyToTrade = 0;
                         if (qtyToTrade > iMaxUnitsToTrade)
                             qtyToTrade = iMaxUnitsToTrade;
-                        redraw = 1;
+                        redraw = true;
                         break;
                     case TRADING_POST_KNOB_ID:
                         DoTradeKnob(message);
@@ -392,7 +392,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         resourceData = message.payload.widget.id - TRADING_POST_LEFT_SELECT_FIRST;
                         if (resourceData != leftResource) {
                             leftResource = resourceData;
-                            redraw = 1;
+                            redraw = true;
                             SetupNewTrade();
                         }
                         break;
@@ -406,7 +406,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         resourceData = message.payload.widget.id - TRADING_POST_RIGHT_SELECT_FIRST;
                         if (resourceData != rightResource) {
                             rightResource = resourceData;
-                            redraw = 1;
+                            redraw = true;
                             if (leftResource != -1)
                                 SetupNewTrade();
                         }
@@ -416,7 +416,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case NORMAL_DIALOG_BUTTON_TWO:
-                        exitFlag = 1;
+                        exitFlag = true;
                         break;
                     case POST_EXECUTE:
                         if (qtyToTrade == 0)
@@ -431,18 +431,18 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         bTradeMade = 1;
                         rightResource = -1;
                         leftResource = rightResource;
-                        redraw = 1;
+                        redraw = true;
                         break;
                     case POST_DECREMENT:
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
-                            redraw = 1;
+                            redraw = true;
                         }
                         break;
                     case POST_INCREMENT:
                         if (qtyToTrade < iMaxUnitsToTrade) {
                             ++qtyToTrade;
-                            redraw = 1;
+                            redraw = true;
                         }
                         break;
                 }

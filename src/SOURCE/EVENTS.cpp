@@ -4177,13 +4177,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
 VA(0x00441609, 0x904)
 void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
-    i32 erased = 0;
+    b32 erased = false;
     mapCellExtra* extras_h[NEIGHBOR_COUNT];
     mapCellExtra* extra_l;
     mapCell* cells_h[NEIGHBOR_COUNT];
     i32 frame_k = NO_FRAME;
     mapCell* currentCell_d;
-    i8 isWide_l = 0;
+    b8 isWide_l = 0;
     i32 i_g;
     i32 unused_m[ERASE_COORDINATE_COUNT];
     i32 cellX_l;
@@ -4195,7 +4195,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         extras_h[i_g] = NULL;
     }
 
-    erased = 1;
+    erased = true;
     if (cell->m_objectTileset == TILESET_OBJNARTI)
         frame_k = cell->m_objectIndex - 1;
     if (cell->m_objectTileset == TILESET_X_LOC3)

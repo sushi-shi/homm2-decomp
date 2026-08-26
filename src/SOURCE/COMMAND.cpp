@@ -1129,24 +1129,24 @@ void combatManager::ResetRound(void) {
 
 VA(0x0042d369, 0x205)
 i32 combatManager::CheckWin(struct tag_message* message) {
-    i32 combatEnded = 0;
+    b32 combatEnded = false;
     if (IsWinner(m_currentSide) != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         if (IsWinner(OppositeCombatSide(m_currentSide)) != 0)
             m_combatResult = COMBAT_RESULT_DRAW;
         else
             m_combatResult = CombatResultForSide(m_currentSide);
     } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         m_combatResult = CombatResultForSide(OppositeCombatSide(m_currentSide));
     } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         gbRetreatWin = true;
         m_combatResult = m_sideRetreated[0] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
     }
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
-        i32 armyAlive = 0;
+        b32 armyAlive = false;
         i32 unusedWinWord37;
         i32 armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
@@ -1155,7 +1155,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
                 && HAS(m_armies[IDX(m_combatResult)][armyIndex].m_monster.flags.all,
                        MONSTER_FLAGS_SUMMONED)
                        == 0) {
-                armyAlive = 1;
+                armyAlive = true;
             }
         }
         if (armyAlive == 0)
@@ -1177,7 +1177,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 rowPos = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    i32 showEnemy_12 = 0;
+    b32 showEnemy_12 = false;
     CombatSide enemySide_27;
     i32 targetIndex;
     army* ourArmy_13;
@@ -1239,7 +1239,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
             } else if (enemySide_27 != COMBAT_SIDE_NONE) {
                 if (enemySide_27 != m_currentArmySide || targetIndex != m_currentArmyIndex) {
-                    showEnemy_12 = 1;
+                    showEnemy_12 = true;
                     if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
                         m_smallViewSide[1] = enemySide_27;
                         m_smallViewArmyIndex[1] = targetIndex;
@@ -3024,7 +3024,7 @@ void combatManager::AddArmy(
     i32 animate
 ) {
     i32 armyIdx = INVALID_ARMY_INDEX;
-    i32 reusedArmy = 0;
+    b32 reusedArmy = false;
     i32 index;
     army* newStack;
     for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
@@ -3041,7 +3041,7 @@ void combatManager::AddArmy(
                 || m_armies[IDX(side)][index].m_monsterType == CREATURE_FIRE_ELEMENTAL
                 || m_armies[IDX(side)][index].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
             armyIdx = index;
-            reusedArmy = 1;
+            reusedArmy = true;
             break;
         }
     }

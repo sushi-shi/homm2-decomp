@@ -1021,7 +1021,7 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignScenario + 1 == SCENARIO_SEVEN
         && m_campaignType == CAMPAIGN_ARCHIBALD) {
-        i32 savedNewGame = gbInNewGameSetup;
+        b32 savedNewGame = gbInNewGameSetup;
         hero* armyHero;
         gbInNewGameSetup = true;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
