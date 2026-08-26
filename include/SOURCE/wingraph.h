@@ -100,7 +100,7 @@ extern struct IDirectDrawSurface* lpDDSOne;
 extern struct IDirectDrawClipper* lpClipper;
 extern struct IDirectDrawPalette* lpDDPal;
 extern i32 iBusyRetry;
-extern i32 bInDDSD;
+extern b32 bInDDSD;
 extern HDC hdcImage;
 extern HBITMAP gbmOldMonoBitmap;
 extern HPALETTE hpalApp;

@@ -873,7 +873,7 @@ void game::InitCampaignMap(void) {
             m_campaignScenario + 1
         );
     }
-    m_newGameInitialized = 0;
+    m_newGameInitialized = false;
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);

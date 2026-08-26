@@ -28,8 +28,8 @@ H2_ENUM_END(ArmyHexConstant)
 #pragma pack(push, 1)
 class army {
 public:
-    char m_animationState;
-    char m_animationCycle;
+    bchar m_animationState;
+    bchar m_animationCycle;
     H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, char) m_pendingAnimationSequence;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationStart;
     H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationEnd;
@@ -154,7 +154,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(army, 0x482);
-extern i32 bSecondAttack;
+extern b32 bSecondAttack;
 extern b32 gbGenieHalf;
 
 #endif

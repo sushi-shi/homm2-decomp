@@ -141,11 +141,11 @@ extern char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
 struct SPlayerExit {
     i8 netPosition;
     i8 gamePosition;
-    i8 updateNetworkControl;
-    i8 timedOut;
-    i8 eliminated;
-    i8 hostReported;
-    i8 continueGame;
+    b8 updateNetworkControl;
+    b8 timedOut;
+    b8 eliminated;
+    b8 hostReported;
+    b8 continueGame;
 };
 SIZE(SPlayerExit, 7);
 
@@ -565,13 +565,13 @@ void CheckShingleUpdate(void);
 void NormalDialog(char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 void UpdateNormalDialog(char* text);
 
-extern i32 bDoColorCycle;
+extern b32 bDoColorCycle;
 extern b32 gbDrawWindowBackground;
 extern i32 bEarlySetupDone;
 extern font* bigFont;
-extern i32 bInShutDown;
+extern b32 bInShutDown;
 extern i32 bShowIt;
-extern i32 bSpecialHideCursor;
+extern b32 bSpecialHideCursor;
 extern char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
 extern char cNetBoxLine[][NET_BOX_LINE_SIZE];

@@ -94,7 +94,7 @@ void town::XformToCastle(void) {
 
 VA(0x004a420c, 0xc4)
 void town::View(i32 noFade) {
-    bEnteringTown = 1;
+    bEnteringTown = true;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
         gAdvDisposeLevel = ADV_DISPOSE_FULL;
     else if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_LOW_MEMORY_LIMIT)
@@ -108,7 +108,7 @@ void town::View(i32 noFade) {
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
-    bEnteringTown = 0;
+    bEnteringTown = false;
 }
 
 VA(0x004a42d0, 0x129)
@@ -215,4 +215,4 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     }
 }
 
-DATA(0x00533ecc) i32 bEnteringTown = 0;
+DATA(0x00533ecc) b32 bEnteringTown = false;

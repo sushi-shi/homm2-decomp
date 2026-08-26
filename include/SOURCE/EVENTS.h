@@ -120,7 +120,7 @@ struct mapHeroExtra {
         i8 patrolRadius;
         H2_ENUM_STORAGE(FactionType, i8) heroClass;
     };
-    i8 hasAssignedHero;
+    b8 hasAssignedHero;
 };
 struct mapTownExtra {
     i8 color;

@@ -303,12 +303,12 @@ extern "C" void PollSound(void) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
         else
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
-        bDoColorCycle = 1;
+        bDoColorCycle = true;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += NON_PALETTED_COLOR_CYCLE_DELAY;
             if (gbHeroMoving)
-                bDoColorCycle = 0;
+                bDoColorCycle = false;
         }
         if (bDoColorCycle)
             CycleColors(0);
@@ -520,7 +520,7 @@ i32 oldmain(void) {
 
     if (bKBDone)
         return 0;
-    bKBDone = 1;
+    bKBDone = true;
     LogStr("OM1");
     LogStr("OM2");
     command_c = -1;
@@ -943,10 +943,10 @@ i32 oldmain(void) {
             giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
 
             if (gbInCampaign && gpGame->m_campaignScenarioWon) {
-                giEndSequence = 1;
+                giEndSequence = true;
                 goto game_over;
             } else if (xIsPlayingExpansionCampaign && xCampaign.IsThisMapCompleted()) {
-                giEndSequence = 1;
+                giEndSequence = true;
                 goto game_over;
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
@@ -956,7 +956,7 @@ i32 oldmain(void) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
                 if (command_c == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
-                    bForceCheckTimeEvent = 0;
+                    bForceCheckTimeEvent = false;
                     gpGame->CheckForTimeEvent();
                 }
                 gpExec->MainLoop();
@@ -1042,7 +1042,7 @@ i32 oldmain(void) {
                             );
                         gpGame->InitCampaignMap();
                         gbGameOver = false;
-                        bForceCheckTimeEvent = 1;
+                        bForceCheckTimeEvent = true;
                         goto initialize_game;
                     }
                 } else if (xIsPlayingExpansionCampaign) {
@@ -1066,7 +1066,7 @@ i32 oldmain(void) {
                             );
                         xCampaign.InitMap();
                         gbGameOver = false;
-                        bForceCheckTimeEvent = 1;
+                        bForceCheckTimeEvent = true;
                         goto initialize_game;
                     }
                 } else {
@@ -2185,7 +2185,7 @@ void CheckEndGame(
     if (bInCheckEndGame)
         return;
 
-    bInCheckEndGame = 1;
+    bInCheckEndGame = true;
     savedRemoteOn_o = gbRemoteOn;
     showedDialog_o = 0;
 
@@ -2612,11 +2612,11 @@ void CheckEndGame(
 
     if (defeated_m) {
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
     if (winFlag) {
         gbGameOver = true;
-        giEndSequence = 1;
+        giEndSequence = true;
     }
 
     if (numAlive == 1 || survivingHumans_a == 0
@@ -2624,27 +2624,27 @@ void CheckEndGame(
         if (survivingHumans_a == 1 && gbThisNetHumanPlayer[lastHuman_a]) {
             if (allowNormalVictory) {
                 gbGameOver = true;
-                giEndSequence = 1;
+                giEndSequence = true;
             }
         } else {
             gbGameOver = true;
-            giEndSequence = 0;
+            giEndSequence = false;
         }
     }
 
     if (savedRemoteOn_o && netHumanCount == 0) {
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
     if (forcedResult == END_GAME_FORCE_VICTORY) {
         winFlag = 1;
         gbGameOver = true;
-        giEndSequence = 1;
+        giEndSequence = true;
     }
     if (forcedResult == END_GAME_FORCE_DEFEAT) {
         defeated_m = 1;
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
 
     if (giEndSequence == 1 && gbGameOver) {
@@ -2725,7 +2725,7 @@ void CheckEndGame(
         xCampaign.Autosave();
     }
 
-    bInCheckEndGame = 0;
+    bInCheckEndGame = false;
 }
 
 VA(0x0046aec9, 0x80)
@@ -2753,7 +2753,7 @@ void InitVars(void) {
     gbCombatSurrender = false;
     gpGame->m_viewArmyResult = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
-    gpGame->m_newGameInitialized = 0;
+    gpGame->m_newGameInitialized = false;
     gbInNewGameSetup = false;
     strcpy(cNetBoxLine[0], "");
     strcpy(cNetBoxLine[1], "");
@@ -3457,7 +3457,7 @@ void ShutDown(char* msg) {
     if (bInShutDown)
         return;
     LogStr("Shutdown");
-    bInShutDown = 1;
+    bInShutDown = true;
     gbClosingApp = true;
     buf[0] = 0;
     gpMouseManager->SetColorMice(0);
@@ -4516,10 +4516,10 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
     } else {
         pe.netPosition = gbGamePosToNetPos[pos];
         pe.gamePosition = pos;
-        pe.updateNetworkControl = 0;
-        pe.timedOut = 0;
-        pe.eliminated = 1;
-        pe.hostReported = 0;
+        pe.updateNetworkControl = false;
+        pe.timedOut = false;
+        pe.eliminated = true;
+        pe.hostReported = false;
         ReceiveRemotePlayerExit(pe);
     }
 }
@@ -4545,8 +4545,8 @@ void HandleRemoteSuddenExit(void) {
     exitInfo.netPosition = static_cast<i8>(giThisNetPos);
     exitInfo.gamePosition = static_cast<i8>(giThisGamePos);
     exitInfo.updateNetworkControl = gbThisNetGotAdventureControl;
-    exitInfo.timedOut = 0;
-    exitInfo.eliminated = 0;
+    exitInfo.timedOut = false;
+    exitInfo.eliminated = false;
     if (giThisNetPos == PLAYER_EXIT_HOST_NET_POSITION)
         destination = PLAYER_EXIT_FIRST_GUEST_NET_POSITION;
     else
@@ -4589,7 +4589,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 sprintf(gText, "\xc2\xfb \xe1\xfb\xeb\xe8 \xe8\xf1\xea\xeb\xfe\xf7\xe5\xed\xfb \xe8\xe7 \xe8\xe3\xf0\xfb!!!");
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 gbGameOver = true;
-                giEndSequence = 0;
+                giEndSequence = false;
                 return;
             }
 
@@ -4692,7 +4692,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     gpGame->SaveGame("\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb", 1, 0);
 
     if (exitInfo.eliminated) {
-        exitInfo.continueGame = 1;
+        exitInfo.continueGame = true;
         if (exitInfo.netPosition == giThisNetPos) {
             localPlayerLost_e = 1;
             goto exitInfoProcessed;
@@ -4710,7 +4710,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             -1,
             PLAYER_EXIT_MESSAGE_TIME
         );
-        exitInfo.continueGame = 1;
+        exitInfo.continueGame = true;
     } else {
         if (exitInfo.timedOut) {
             sprintf(
@@ -4777,7 +4777,7 @@ playerExitHandled:
         RemoteCleanup();
         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
         return;
     }
     if (!exitInfo.continueGame) {
@@ -11341,9 +11341,9 @@ DATA(0x005266c8) void* gLowPage = NULL;
 DATA(0x005266cc) b32 gbInPollSound = false;
 DATA(0x005266d0) H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr = CD_ROM_READY;
 DATA(0x005266d4) i32 bEarlySetupDone = 0;
-DATA(0x005266d8) i32 bKBDone = 0;
+DATA(0x005266d8) b32 bKBDone = false;
 DATA(0x005266dc) struct _REDBOOK* hRedbookz = NULL;
-DATA(0x005266e0) i32 bForceCheckTimeEvent = 0;
+DATA(0x005266e0) b32 bForceCheckTimeEvent = false;
 DATA(0x004ff574) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
     {194, 179, 82, 79},
@@ -11353,8 +11353,8 @@ DATA(0x004ff574) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPO
 };
 
 DATA(0x004ff59c) i32 lastIMHoverID = -1;
-DATA(0x005266e4) i32 bInCheckEndGame = 0;
-DATA(0x005266e8) i32 bInShutDown = 0;
+DATA(0x005266e4) b32 bInCheckEndGame = false;
+DATA(0x005266e8) b32 bInShutDown = false;
 DATA(0x005266ec) b32 gbInMemError = false;
 DATA(0x005266f0) i32 iShingleAnimFrame = 0;
 DATA(0x005261b0) b32 gbHumanPlayer[IDX(GAME_PLAYER_COUNT)];
@@ -11370,16 +11370,16 @@ DATA(0x00524e04) b32 gbInCampaign;
 DATA(0x00526130) i32 giResExtra1;
 DATA(0x00526138) i32 giResExtra2;
 DATA(0x00524de4) i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
-DATA(0x00526164) i32 giSeedingValid;
+DATA(0x00526164) b32 giSeedingValid;
 DATA(0x0052613c) i32 giLimitPlayer;
 DATA(0x005265a8) i32 giShowClouds;
-DATA(0x005263fc) i32 bDoColorCycle;
+DATA(0x005263fc) b32 bDoColorCycle;
 DATA(0x00526100) inputManager* gpInputManager;
 DATA(0x00525a58) i32 iMaxMapExtra;
 DATA(0x00525be4) palette* gPalette;
 DATA(0x005258d0) resourceManager* gpResourceManager;
 DATA(0x00524a34) char gcBotViewText[GLOBAL_BOTTOM_VIEW_TEXT_SIZE];
-DATA(0x005258c4) i32 bSpecialHideCursor;
+DATA(0x005258c4) b32 bSpecialHideCursor;
 DATA(0x005258a0) searchArray* gpSearchArray;
 DATA(0x00525bd8) i32 giResType1;
 DATA(0x005260e8) b32 gbBlackoutPlayer;
@@ -11434,7 +11434,7 @@ DATA(0x00525a10) H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 DATA(0x00524f74) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x005249dc) u8 giSetupGameType;
 DATA(0x00525a64) char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
-DATA(0x005261ac) i32 giFullySeeded;
+DATA(0x005261ac) b32 giFullySeeded;
 DATA(0x00524de0) icon* gBuyBuildIcons;
 DATA(0x00524df0) i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 DATA(0x00524e14) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
@@ -11470,7 +11470,7 @@ DATA(0x00526128) i32 giTotalHighMem;
 DATA(0x00525bc4) i32 gMapX;
 DATA(0x00525bc8) i32 gMapY;
 DATA(0x005258e4) char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
-DATA(0x00524f94) i32 bFreshSave;
+DATA(0x00524f94) b32 bFreshSave;
 DATA(0x005265ac) i32 bShowIt;
 DATA(0x00524ddc) i32 gLowPageScreenSelector;
 DATA(0x0052589c) class heroWindowManager* gpWindowManager;

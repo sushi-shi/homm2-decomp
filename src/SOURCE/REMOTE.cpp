@@ -54,8 +54,8 @@ DATA(0x00533d5c) i32 iIDCtr = 0;
 DATA(0x00533d60) i32 iTimesDropped = 0;
 DATA(0x00533d64) b8 gbInNetSetup = false;
 DATA(0x00533d68) i32 bUseDirectPlay = 0;
-DATA(0x00533d6c) i32 bUseWinsock = 0;
-DATA(0x00533d70) i8 bInTimeoutFail = 0;
+DATA(0x00533d6c) b32 bUseWinsock = false;
+DATA(0x00533d70) b8 bInTimeoutFail = false;
 DATA(0x005167b4)
 i32 iBaud[REMOTE_BAUD_RATE_COUNT] = {300, 1200, 2400, 9600, 19200, 38400, 57600};
 DATA(0x005167d0) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
@@ -85,7 +85,7 @@ void RemoteCleanup(void) {
             break;
     }
     gbRemoteOn = false;
-    xNetHasOldPlayers = 0;
+    xNetHasOldPlayers = false;
     iInOrderCtr = 0;
     iCurLastID = 0;
     giLastConfirm = -1;
@@ -95,11 +95,11 @@ void RemoteCleanup(void) {
     iIDCtr = 0;
     iTimesDropped = 0;
     bUseDirectPlay = 0;
-    bUseWinsock = 0;
-    bInTimeoutFail = 0;
+    bUseWinsock = false;
+    bInTimeoutFail = false;
     bUseDirectPlay = 0;
-    bUseWinsock = 0;
-    bInTimeoutFail = 0;
+    bUseWinsock = false;
+    bInTimeoutFail = false;
     iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
     iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
     gbGotFirstHeartbeat = false;
@@ -119,7 +119,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     i32 setupCounter;
 
     gbInRemoteMain = true;
-    bGotGameType = 0;
+    bGotGameType = false;
     LogStr("In Remote Main");
     LogStr("RM 1");
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
@@ -139,9 +139,9 @@ void RemoteMain(RemoteGameMode gameMode) {
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
         bUseDirectPlay = 1;
     else if (iMPNetProtocol == REMOTE_PROTOCOL_WINSOCK)
-        bUseWinsock = 1;
+        bUseWinsock = true;
     else {
-        bUseWinsock = 0;
+        bUseWinsock = false;
         bUseDirectPlay = bUseWinsock;
     }
     LogStr("RM 4");
@@ -178,7 +178,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     gsThisNetPlayerInfo.useRegularCompression = true;
     gsThisNetPlayerInfo.useDiffCompression = true;
     gsThisNetPlayerInfo.reserved[0] = 1;
-    xNetHasOldPlayers = 0;
+    xNetHasOldPlayers = false;
 
     switch (gameMode) {
                     case REMOTE_GAME_NETWORK_HOST:
@@ -238,7 +238,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(recvData));
                             gotPlayers[netPlayer] = 1;
                             if (gsNetPlayerInfo[netPlayer].reserved[0] == 0)
-                                xNetHasOldPlayers = 1;
+                                xNetHasOldPlayers = true;
                             break;
                     }
                 }
@@ -289,13 +289,13 @@ void RemoteMain(RemoteGameMode gameMode) {
             if (gameMsg != NULL
                 && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
                 && REMOTE_MESSAGE(gameMsg)->command == IDX(SETUP_CAMPAIGN_GAME)) {
-                bGotGameType = 1;
+                bGotGameType = true;
                 giSetupGameType = 1;
             }
             if (gameMsg != NULL
                 && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
                 && REMOTE_MESSAGE(gameMsg)->command == IDX(SETUP_STANDARD_GAME)) {
-                bGotGameType = 1;
+                bGotGameType = true;
                 giSetupGameType = 0;
             }
         }
@@ -658,7 +658,7 @@ void PollRemote(void) {
             if (queueIndex != giThisNetPos
                 && KBTickCount() > lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT
                 && bInTimeoutFail == 0) {
-                bInTimeoutFail = 1;
+                bInTimeoutFail = true;
                 gbInPollSound = false;
                 sprintf(
                     gText,
@@ -674,13 +674,13 @@ void PollRemote(void) {
                 } else {
                     hostExit.netPosition = static_cast<i8>(queueIndex);
                     hostExit.gamePosition = static_cast<i8>(NetPosToGamePos(queueIndex));
-                    hostExit.updateNetworkControl = 1;
-                    hostExit.timedOut = 1;
-                    hostExit.eliminated = 0;
+                    hostExit.updateNetworkControl = true;
+                    hostExit.timedOut = true;
+                    hostExit.eliminated = false;
                     ReceiveRemotePlayerExit(hostExit);
                 }
                 gbInPollSound = oldInPoll;
-                bInTimeoutFail = 0;
+                bInTimeoutFail = false;
             }
         }
     } else {
@@ -688,7 +688,7 @@ void PollRemote(void) {
         if (giThisNetPos != 1)
             timeout += REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT;
         if (KBTickCount() > lLastHeartbeatReceive[0] + timeout && bInTimeoutFail == 0) {
-            bInTimeoutFail = 1;
+            bInTimeoutFail = true;
             gbInPollSound = false;
             if (giThisNetPos == 1) {
                 sprintf(
@@ -712,9 +712,9 @@ void PollRemote(void) {
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
                 guestExit.gamePosition = static_cast<i8>(NetPosToGamePos(0));
-                guestExit.updateNetworkControl = 1;
-                guestExit.timedOut = 1;
-                guestExit.eliminated = 0;
+                guestExit.updateNetworkControl = true;
+                guestExit.timedOut = true;
+                guestExit.eliminated = false;
                 ReceiveRemotePlayerExit(guestExit);
             } else {
                 gpGame->SaveGame(
@@ -736,7 +736,7 @@ void PollRemote(void) {
                     ShutDown("");
             }
             gbInPollSound = oldInPoll;
-            bInTimeoutFail = 1;
+            bInTimeoutFail = true;
         }
     }
 
@@ -887,5 +887,5 @@ DATA(0x00533318) char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533230) SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 DATA(0x0053386c) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533978) char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-DATA(0x00533424) i32 bGotGameType;
+DATA(0x00533424) b32 bGotGameType;
 DATA(0x00533208) SNetPlayerInfo gsThisNetPlayerInfo;

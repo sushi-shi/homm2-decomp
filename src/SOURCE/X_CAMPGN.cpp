@@ -333,7 +333,7 @@ void ExpCampaign::InitMap(void) {
         IDX(m_campaignId) + 1,
         IDX(m_currentMap) + 1
     );
-    gpGame->m_newGameInitialized = 0;
+    gpGame->m_newGameInitialized = false;
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);

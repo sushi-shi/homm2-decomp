@@ -59,7 +59,7 @@ DATA(0x00533ee0) i32 leftResource = 0;
 DATA(0x00533ee4) i32 iMaxUnitsToTrade = 0;
 DATA(0x00533ee8) i32 tpX = 0;
 DATA(0x00533eec) i32 tpY = 0;
-DATA(0x00533ef0) i32 bTradeMade = 0;
+DATA(0x00533ef0) b32 bTradeMade = false;
 DATA(0x00533ef4) static char leftName[OFFER_NAME_SIZE] = {0};
 DATA(0x00533f28) i32 qtyToTrade = 0;
 DATA(0x00533f2c) static char rightName[OFFER_NAME_SIZE] = {0};
@@ -76,7 +76,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
 
     bIsMarketPlace = isMarketplace;
     fTradingPostEfficiency = efficiency;
-    bTradeMade = 0;
+    bTradeMade = false;
     tpX = TRADING_POST_WINDOW_X;
     tpY = TRADING_POST_WINDOW_Y;
     tpWindow = new heroWindow(tpX, tpY, "tradpost.bin");
@@ -428,7 +428,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                             gpCurPlayer->m_resources[leftResource] -= qtyToTrade * iTradeRatio;
                             gpCurPlayer->m_resources[rightResource] += qtyToTrade;
                         }
-                        bTradeMade = 1;
+                        bTradeMade = true;
                         rightResource = -1;
                         leftResource = rightResource;
                         redraw = true;

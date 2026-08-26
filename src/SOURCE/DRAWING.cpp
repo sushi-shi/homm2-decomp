@@ -453,7 +453,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         }
     }
     if (resetGridDisplay != 0)
-        bGridWasShowing = 0;
+        bGridWasShowing = false;
     if (gConfig.combatShadeLevel < 1 && gConfig.showCombatGrid == 0)
         return 0;
 
@@ -563,7 +563,7 @@ DrawCombatGrid:
             }
         }
         didRedraw = 1;
-        bGridWasShowing = 1;
+        bGridWasShowing = true;
     }
 
 CopyGridState:
@@ -1824,5 +1824,5 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     gbInDrawSmallView = false;
 }
 
-DATA(0x0052448c) i32 bGridWasShowing = 0;
+DATA(0x0052448c) b32 bGridWasShowing = false;
 DATA(0x00524490) b32 gbInDrawSmallView = false;

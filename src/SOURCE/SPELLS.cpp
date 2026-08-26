@@ -453,7 +453,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                 } else {
                     giNextActionGridIndex = indexToCastOn;
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT) {
-                        bInTeleportGetDest = 1;
+                        bInTeleportGetDest = true;
                         indexToCastOn = NO_SELECTION;
                         message.type = SPELL_MESSAGE_HOVER;
                         message.payload.mouse.x = message.payload.mouse.screenX;
@@ -466,7 +466,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
-                bInTeleportGetDest = 0;
+                bInTeleportGetDest = false;
                 message.type = SPELL_MESSAGE_DIALOG;
                 message.payload.widget.command = SPELL_COMMAND_CLOSE;
                 return MESSAGE_DISPATCH_FORWARD;
@@ -482,7 +482,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
             giNextAction = ACTION_NONE;
             message.type = SPELL_MESSAGE_DIALOG;
             message.payload.widget.command = SPELL_COMMAND_CLOSE;
-            bInTeleportGetDest = 0;
+            bInTeleportGetDest = false;
             return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1245,7 +1245,7 @@ cast_done:
             combatArmy.m_deathPending = false;
             combatArmy.m_damagePending = false;
             combatArmy.m_drawState = ARMY_DRAW_NORMAL;
-            combatArmy.m_animationState = 0;
+            combatArmy.m_animationState = false;
             combatArmy.m_lastTargetHex = COMBAT_HEX_EMPTY;
         }
     }
@@ -3910,7 +3910,7 @@ void combatManager::ShowSpellMessage(
 
 DATA(0x00533eb8) i32 castX = 0;
 DATA(0x00533ebc) i32 castY = 0;
-DATA(0x00533ec0) i32 bInTeleportGetDest = 0;
+DATA(0x00533ec0) b32 bInTeleportGetDest = false;
 DATA(0x00518330) i32 indexToCastOn = -1;
 DATA(0x00518334) u8 uRedBeam[] = {0x77, 0xb5, 0xbc, 0xc0, 0xc3};
 DATA(0x0051833c) u8 uRainbow[] =

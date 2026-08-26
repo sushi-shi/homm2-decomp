@@ -1031,10 +1031,10 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return;
     if (bInHighMoraleBonus) {
-        bInHighMoraleBonus = 0;
+        bInHighMoraleBonus = false;
         return;
     }
-    bInHighMoraleBonus = 0;
+    bInHighMoraleBonus = false;
 
     army* activeArmy = &m_armies[IDX(side)][index];
     if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
@@ -1045,7 +1045,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
         || SRandom(MORALE_ROLL_MIN, GOOD_MORALE_ROLL_MAX) > activeArmy->m_morale)
         return;
 
-    bInHighMoraleBonus = 1;
+    bInHighMoraleBonus = true;
     SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
         sprintf(gText, "goodmrle.82M");
@@ -2254,7 +2254,7 @@ void combatManager::ShootMissile(
 VA(0x0042b23a, 0x10c)
 void combatManager::CombatSystemOptions(void) {
     tag_message message;
-    bCPrefsChanged = 0;
+    bCPrefsChanged = false;
     CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)
         MemError();
@@ -2386,33 +2386,33 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                             gConfig.combatSpeed =
                                 (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
                                                           % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_GRID_BUTTON:
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_SHADE_BUTTON:
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
                             bRedraw = true;
-                            bCPrefsChanged = 1;
+                            bCPrefsChanged = true;
                             break;
                     }
                     break;
@@ -2432,12 +2432,12 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
 
 
 
-DATA(0x005240e8) i32 bInHighMoraleBonus = 0;
+DATA(0x005240e8) b32 bInHighMoraleBonus = false;
 DATA(0x004f0c54) i32 giSeed = 1;
 DATA(0x004f0c58) u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
 DATA(0x005240e4) i32 bMouseWasVis;
 DATA(0x005240e0) class heroWindow* CSPanel;
-DATA(0x005240dc) i32 bCPrefsChanged;
+DATA(0x005240dc) b32 bCPrefsChanged;
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.
 VTBL(combatManager, 0x004ea540)

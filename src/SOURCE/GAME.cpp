@@ -2261,7 +2261,7 @@ void game::RandomizeEvents(void) {
                     mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     mapEvent0->x = static_cast<i16>(xPos);
                     mapEvent0->y = static_cast<i16>(yPos);
-                    mapEvent0->active = 1;
+                    mapEvent0->active = true;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
@@ -6261,9 +6261,9 @@ void game::ProcessOnMapHeroes(void) {
                         if (extra9->hasCustomHero && extra9->heroId < GAME_HERO_COUNT
                             && !usedHeroes11[extra9->heroId]) {
                             usedHeroes11[extra9->heroId] = 1;
-                            extra9->hasAssignedHero = 1;
+                            extra9->hasAssignedHero = true;
                         } else {
-                            extra9->hasAssignedHero = 0;
+                            extra9->hasAssignedHero = false;
                         }
                         if (isJail4) {
                             extra9->owner = -1;
@@ -7307,7 +7307,7 @@ void game::SetMapSize(i32 w, i32 h) {
     if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized)
         goto mapSized;
     {
-        bMapInitialized = 1;
+        bMapInitialized = true;
         MAP_WIDTH = w;
         MAP_HEIGHT = h;
         gpSearchArray->Init();
@@ -8023,13 +8023,13 @@ DATA(0x004f7554) i8 giMonType[] = {
     IDX(CREATURE_UNICORN),
     IDX(CREATURE_LICH)
 };
-DATA(0x005249a0) char bMapInitialized = 0;
+DATA(0x005249a0) char bMapInitialized = false;
 DATA(0x005245f0) i32 iViewArmyNumTroops;
 DATA(0x005245e8) i8 gbNGHeroType[GAME_PLAYER_COUNT];
 DATA(0x005245f8) SMonFrameInfo sViewArmyMonFrameInfo;
 DATA(0x00524960) i16 giUABaseX;
 DATA(0x00524962) i16 giUABaseY;
-DATA(0x00524998) i32 giEndSequence;
+DATA(0x00524998) b32 giEndSequence;
 DATA(0x00524970) b32 gbDismissArmy;
 DATA(0x0052493c) i8 gbNGHuman[GAME_PLAYER_COUNT];
 DATA(0x0052496c) i32 iViewArmyFrame;

@@ -400,7 +400,7 @@ void DDSD(i32 error, char* file, i32 line) {
 
     if (bInDDSD != 0)
         return;
-    bInDDSD = 1;
+    bInDDSD = true;
     hres = lpDD->RestoreDisplayMode();
     unused = 0;
     switch (error) {
@@ -1147,7 +1147,7 @@ DATA(0x005344b8) struct IDirectDrawSurface* lpDDSOne = NULL;
 DATA(0x005344bc) struct IDirectDrawClipper* lpClipper = NULL;
 DATA(0x005344c0) struct IDirectDrawPalette* lpDDPal = NULL;
 DATA(0x005344c4) i32 iBusyRetry = 0;
-DATA(0x005344c8) i32 bInDDSD = 0;
+DATA(0x005344c8) b32 bInDDSD = false;
 DATA(0x005344cc) HDC hdcImage = NULL;
 DATA(0x005344d0) HBITMAP gbmOldMonoBitmap = NULL;
 DATA(0x005344d4) HPALETTE hpalApp = NULL;

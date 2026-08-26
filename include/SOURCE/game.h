@@ -105,7 +105,7 @@ public:
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];
     i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
-    i8 m_newGameInitialized;
+    b8 m_newGameInitialized;
     i8 m_newGameHumanCount;
     char _pad_0x47c[GAME_SETUP_STATE_PAD_SIZE];
     i8 m_playerCount;

@@ -295,7 +295,7 @@ void game::GetMap(void) {
 
 VA(0x00475682, 0x66)
 void game::ProcessNewMap(struct SMapHeader* header) {
-    m_newGameInitialized = 0;
+    m_newGameInitialized = false;
     m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
     if (m_newGameWindow == NULL)
         return;
@@ -393,7 +393,7 @@ void game::InitNewGame(struct SMapHeader* header) {
             }
         }
         m_difficulty = DIFFICULTY_NORMAL;
-        m_newGameInitialized = 1;
+        m_newGameInitialized = true;
     }
 
 selected_player:
@@ -546,7 +546,7 @@ i32 game::NewGame(void) {
                 strcpy(gpGame->m_mapFilename, "arrax.mx2");
             else
                 strcpy(gpGame->m_mapFilename, "brokena.mp2");
-            m_newGameInitialized = 0;
+            m_newGameInitialized = false;
             m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
         }
         if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS

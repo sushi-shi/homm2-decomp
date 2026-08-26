@@ -66,7 +66,7 @@ void InitAIMapVars(void);
 void CloseAIMapVars(void);
 i32 OnMySide(i32);
 
-extern i32 bHeroBuiltThisTurn;
+extern b32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
 extern i8* gaiEnemyHeroReachable;
 extern i16* gaiHeroEventStratRVOfPos;
@@ -94,7 +94,7 @@ extern i32 iViewArmyNumTroops;
 extern i8 gbNGHeroType[];
 extern i16 giUABaseX;
 extern i16 giUABaseY;
-extern i32 giEndSequence;
+extern b32 giEndSequence;
 extern b32 gbDismissArmy;
 extern i8 gbNGHuman[];
 extern i32 iViewArmyFrame;

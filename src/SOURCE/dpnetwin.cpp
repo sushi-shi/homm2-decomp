@@ -188,14 +188,14 @@ void CleanupDPVars(void) {
     iDPRcvBufferTail = 0;
     ppDPRcvBuffer = NULL;
     piDPRcvBufferSize = NULL;
-    bStartUpInfoReceived = 0;
+    bStartUpInfoReceived = false;
     hinstDplayx = NULL;
     iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
     iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
     iWaitForHostWaitCount = 0;
     iEnumCount = 0;
     iLastHereIAmTickCount = 0;
-    bInDPSD = 0;
+    bInDPSD = false;
     iGUIDCount = 0;
     iLastMsgNumHumanPlayers = 1;
 }
@@ -334,7 +334,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(startup);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                        xNetHasOldPlayers = 1;
+                        xNetHasOldPlayers = true;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                     giNumHumanPlayers++;
                 } else {
@@ -362,7 +362,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 LOG_UNUSED_VALUE
             );
             memcpy(giNetPosToDCOPos, startup->playerIds, sizeof(giNetPosToDCOPos));
-            bStartUpInfoReceived = 1;
+            bStartUpInfoReceived = true;
             break;
         default:
             sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
@@ -540,7 +540,7 @@ void DPSD(i32 result, char* file, i32 line) {
 
     if (bInDPSD != 0)
         return;
-    bInDPSD = 1;
+    bInDPSD = true;
     flag = 0;
     switch (result) {
         case RESULT_OK:
@@ -650,7 +650,7 @@ DATA(0x005242c8) i32 iDPRcvBufferHead = 0;
 DATA(0x005242cc) i32 iDPRcvBufferTail = 0;
 DATA(0x005242d0) u8** ppDPRcvBuffer = NULL;
 DATA(0x005242d4) i32* piDPRcvBufferSize = NULL;
-DATA(0x005242d8) i32 bStartUpInfoReceived = 0;
+DATA(0x005242d8) b32 bStartUpInfoReceived = false;
 DATA(0x005242dc) HMODULE hinstDplayx = NULL;
 DATA(0x005242e0) H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
 iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
@@ -658,7 +658,7 @@ DATA(0x005242e4) H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHos
 DATA(0x005242e8) i32 iWaitForHostWaitCount = 0;
 DATA(0x005242ec) i32 iEnumCount = 0;
 DATA(0x005242f0) i32 iLastHereIAmTickCount = 0;
-DATA(0x005242f4) i32 bInDPSD = 0;
+DATA(0x005242f4) b32 bInDPSD = false;
 DATA(0x005242f8) i32 iGUIDCount = 0;
 DATA(0x004f1ba0) i32 iLastMsgNumHumanPlayers = 1;
 DATA(0x00524280) i32 iMaxSession;

@@ -58,7 +58,7 @@ struct EventExtra {
     u8 applyToComputer;
     u8 cancelAfterVisit;
     char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
-    i8 active;
+    b8 active;
     u16 x;
     u16 y;
     u8 unknown2a;
@@ -166,6 +166,6 @@ void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
 
-extern char bMapInitialized;
+extern bchar bMapInitialized;
 
 #endif

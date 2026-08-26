@@ -143,9 +143,9 @@ public:
 #pragma pack(pop)
 SIZE(inputManager, 0x86a);
 extern i32 iCurSwapPalette;
-extern i32 bLastMouseOffscreen;
-extern i32 bLastOnscreenMouseColor;
-extern i32 bInCheckChangeCursor;
+extern b32 bLastMouseOffscreen;
+extern b32 bLastOnscreenMouseColor;
+extern b32 bInCheckChangeCursor;
 extern i32 iLastBWOnScreenCheck;
 
 #endif

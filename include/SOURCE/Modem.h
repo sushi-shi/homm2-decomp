@@ -62,8 +62,8 @@ SIZE(inque_t, 0x1008);
 SIZE(outque_t, 0x808);
 
 extern i32 iBaudBits;
-extern i32 inescape;
-extern i32 newpacket;
+extern b32 inescape;
+extern b32 newpacket;
 extern i32 packetlen;
 extern char idstr[MODEM_ID_SIZE];
 extern i32 GUIMRc;

@@ -823,19 +823,19 @@ public:
 };
 #pragma pack(pop)
 SIZE(combatManager, 0xf877);
-extern i32 bGridWasShowing;
+extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
 extern H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
-extern i32 bInTeleportGetDest;
+extern b32 bInTeleportGetDest;
 extern i32 indexToCastOn;
 extern u8 uRedBeam[];
 extern u8 uRainbow[];
 extern i8* gyModify;
 extern float gfDurationMods[COMBAT_DURATION_MOD_COUNT];
 extern float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT];
-extern i32 bInHighMoraleBonus;
+extern b32 bInHighMoraleBonus;
 extern i32 giSeed;
 extern u8 wallHex[COMBAT_WALL_SECTION_COUNT];
 extern b32 gbThisNetHasControl;
@@ -844,7 +844,7 @@ extern i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern b32 gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
-extern i32 bSkeletonsShown;
+extern b32 bSkeletonsShown;
 extern b32 gbShowingLoseWindow;
 extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
@@ -856,6 +856,6 @@ extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
-extern i32 bCPrefsChanged;
+extern b32 bCPrefsChanged;
 
 #endif

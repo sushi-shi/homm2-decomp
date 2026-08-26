@@ -1523,7 +1523,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                                 iTransferArtifacts[iCurTransferArtifact]
                             );
                         } else if (giSkeletonsCreated != 0 && bSkeletonsShown == 0) {
-                            bSkeletonsShown = 1;
+                            bSkeletonsShown = true;
                             gpCombatManager->ClearWinLoseBottom(gpCombatManager->m_winLoseWindow);
                             gpCombatManager->ShowSkeletons(gpCombatManager->m_winLoseWindow);
                         } else {
@@ -2092,7 +2092,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     giSkeletonsCreated = 0;
     iMaxTransferArtifacts = 0;
     iCurTransferArtifact = -1;
-    bSkeletonsShown = 0;
+    bSkeletonsShown = false;
     bodies = 0;
     necroEligible = 0;
 
@@ -3253,7 +3253,7 @@ DATA(0x005240fc) i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
 DATA(0x0052411c) b32 gbWhichAnimationPlaying;
 DATA(0x00524144) i32 iMaxTransferArtifacts;
 DATA(0x005240f8) i32 giNextActionExtra;
-DATA(0x00524118) i32 bSkeletonsShown;
+DATA(0x00524118) b32 bSkeletonsShown;
 DATA(0x00524138) b32 gbShowingLoseWindow;
 DATA(0x00524130) i32 giWinCmbtFrame;
 DATA(0x0052413c) i32 giNextActionGridIndex;

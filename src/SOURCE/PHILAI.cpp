@@ -540,7 +540,7 @@ void CheckDoMain(i32 a1, i32 doMain) {
                 else
                     bShowIt = 0;
                 if (bShowIt == 0)
-                    bSpecialHideCursor = 1;
+                    bSpecialHideCursor = true;
                 if (gpAdvManager->ComboDraw(
                         gpAdvManager->m_previousOriginX,
                         gpAdvManager->m_previousOriginY,
@@ -551,7 +551,7 @@ void CheckDoMain(i32 a1, i32 doMain) {
                     gpAdvManager->UpdBottomView(0, 1, 1);
                 bShowIt = oldShowIt;
                 gbDrawSavedCursor = false;
-                bSpecialHideCursor = 0;
+                bSpecialHideCursor = false;
                 gpAdvManager->m_previousOriginX = oldX;
                 gpAdvManager->m_previousOriginY = oldY;
             }
@@ -1295,7 +1295,7 @@ void philAI::DoAI(i32 player) {
         LogStr("\n");
         CheckReload();
         CheckBerserk();
-        giShowComputerRoute = 0;
+        giShowComputerRoute = false;
         if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0
             && MapExtraPosAndAdjacentsSet(
                 gpCurAIHero->m_x,
@@ -1384,7 +1384,7 @@ void philAI::DoAI(i32 player) {
                     iPlacesVisited[iCurPlaceToVisit][1] = gpCurAIHero->m_y;
                     iCurPlaceToVisit++;
                 }
-                giShowComputerRoute = 1;
+                giShowComputerRoute = true;
                 if (gpCurAIHero->m_mobility == gpCurAIHero->m_remainingMobility) {
                     hourglassShown0 = false;
                     IncrementHourGlass();
@@ -1575,7 +1575,7 @@ void philAI::GetTurnAIVars(i32 player) {
         gpCurPlayer->m_aiData.m_obeliskValue * gpGame->m_obeliskCount
         / GAME_OBELISK_VISITOR_COUNT;
     gpCurPlayer->m_aiData.m_unexploredValue = MeanRVOfUnexploredTerritory(player);
-    bHeroBuiltThisTurn = 0;
+    bHeroBuiltThisTurn = false;
     if (giCurTurn - giBuildBoatStuffTurn[player] > 8) {
         giBuildShipyard[player] = -1;
         giBuildBoat[player] = -1;
@@ -1636,9 +1636,9 @@ firstWeekDone:
         static_cast<float>(artifactTotal8 / AI_ARTIFACT_POOL_DIVISOR);
 
     for (generalIndex4 = 0; generalIndex4 < GAME_TOWN_COUNT; generalIndex4++)
-        gpGame->m_castleRecs[generalIndex4].m_threat = 0;
+        gpGame->m_castleRecs[generalIndex4].m_threat = false;
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_townCount; generalIndex4++)
-        gpGame->m_castleRecs[gpCurPlayer->m_townIds[generalIndex4]].m_threat = 0;
+        gpGame->m_castleRecs[gpCurPlayer->m_townIds[generalIndex4]].m_threat = false;
 
     memset(gaiEnemyHeroReachable, 0, MAP_WIDTH * MAP_HEIGHT);
     for (playerIndex0 = 0; playerIndex0 < gpGame->m_playerCount; playerIndex0++) {
@@ -1699,7 +1699,7 @@ firstWeekDone:
                                     outcomeE0
                                 );
                                 if (winChance11 > AI_TOWN_DEFENSE_THRESHOLD)
-                                    threatTownPtr10->m_threat = 1;
+                                    threatTownPtr10->m_threat = true;
                             }
                         }
                     }
@@ -3403,7 +3403,7 @@ i32 philAI::StrategicValueOfPosition(
             MemError();
         search->Init();
     } else {
-        bSVSearchArrayInUse = 1;
+        bSVSearchArrayInUse = true;
         search = &SVSearchArray;
     }
 
@@ -3539,7 +3539,7 @@ i32 philAI::StrategicValueOfPosition(
     if (madeSearch)
         delete search;
     else
-        bSVSearchArrayInUse = 0;
+        bSVSearchArrayInUse = false;
 
     if (*liveChance < 100)
         worth -= (100 - *liveChance) * 2500 / 100;
@@ -4821,7 +4821,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
         static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, FACTION_ANY, 1));
     gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[availableHeroIndex]] =
         AI_HERO_AVAILABLE_FLAG;
-    bHeroBuiltThisTurn = 1;
+    bHeroBuiltThisTurn = true;
     HeroInteractionAtTown(newHero, townPtr, 0, &iDummy);
     ShowStatus();
 }
@@ -5871,7 +5871,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     eventRV = 0;
                     break;
                 }
-                bEvaluatingTravelGates = 0;
+                bEvaluatingTravelGates = false;
                 bestRV = AI_TRAVEL_GATE_INITIAL_VALUE;
                 for (gateY = 0; gateY < MAP_HEIGHT; gateY++) {
                     for (gateX = 0; gateX < MAP_WIDTH; gateX++) {
@@ -5911,7 +5911,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     eventRV = 0;
                 else
                     eventRV = -AI_TRAVEL_GATE_PENALTY;
-                bEvaluatingTravelGates = 1;
+                bEvaluatingTravelGates = true;
                 gbReduceByReload = false;
                 break;
             case MAP_OBJECT_FORT:
@@ -6809,7 +6809,7 @@ VA_COMPGEN(0x0048c318, 0x12, LOCALE_FACET_ID_ATEXIT, WCharCtypeId)
 DATA(0x005331c8) float fFirstWeekTownFV = 0.0f;
 DATA(0x005331cc) i32 iVepCacheHits = 0;
 DATA(0x005331d0) i32 iTotalVepHits = 0;
-DATA(0x005331d4) i32 giShowComputerRoute = 0;
+DATA(0x005331d4) b32 giShowComputerRoute = false;
 DATA(0x005331d8) i16* gaiLiveChanceOfPos = NULL;
 DATA(0x005331dc) i16* gaiHeroStrategicRVOfPos = NULL;
 DATA(0x005331e0) i16* gaiHeroEventStratRVOfPos = NULL;
@@ -6822,8 +6822,8 @@ DATA(0x005331f8) hero* gpCurAIHero = NULL;
 DATA(0x00516458) float gfAttackHumanBonus = 2.0f;
 DATA(0x0051645c) float gfAttackComputerBonus = 0.8f;
 DATA(0x005331fc) i32 iLastFrameRateTimer = 0;
-DATA(0x00533200) i32 bSVSearchArrayInUse = 0;
-DATA(0x00516460) i32 bEvaluatingTravelGates = 1;
+DATA(0x00533200) b32 bSVSearchArrayInUse = false;
+DATA(0x00516460) b32 bEvaluatingTravelGates = true;
 DATA(0x005331a8) b32 gbReduceByBerserk;
 DATA(0x00530bc0) float fBerserkFactor;
 DATA(0x00530abc) i32 giCurPlayer;
@@ -6833,7 +6833,7 @@ DATA(0x00530bb0) i8 giBuildBoat[AI_PLAYER_COUNT];
 DATA(0x00530aac) float fReduceFactor;
 DATA(0x00533134) u8 giCurPlayerBit;
 DATA(0x005309d0) i32 giBestShipyardDist;
-DATA(0x00533130) i32 bHeroBuiltThisTurn;
+DATA(0x00533130) b32 bHeroBuiltThisTurn;
 DATA(0x00533138) i16 gaiHeroLiveChance[GAME_HERO_COUNT];
 DATA(0x00530ab0) i32 giHumanTownConquered;
 DATA(0x0053312c) i32 giCurTurn;

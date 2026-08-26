@@ -38,7 +38,7 @@ i32 wsWaitForFirstGuest(void);
 i32 wsWaitForExtraGuests(void);
 i32 wsWaitForHost(void);
 
-extern i32 bHostFound;
+extern b32 bHostFound;
 extern u32 sd_dg;
 extern i32 iWSLastMsgNumHumanPlayers;
 extern i32 iWSAttempts;

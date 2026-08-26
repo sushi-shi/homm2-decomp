@@ -276,7 +276,7 @@ void army::Init(
     m_quantity = quantity;
     m_initialQuantity = quantity;
     m_temporaryResurrectionQuantity = 0;
-    m_animationState = 0;
+    m_animationState = false;
     m_hitPointsLost = 0;
     m_damagePenalty = ARMY_DAMAGE_PENALTY_NONE;
     m_killPending = false;
@@ -1357,9 +1357,9 @@ void army::SpecialAttack(void) {
         && (m_monsterType == CREATURE_ELF || m_monsterType == CREATURE_GRAND_ELF
             || m_monsterType == CREATURE_RANGER)
         && pEnemy->m_quantity > 0) {
-        bSecondAttack = 1;
+        bSecondAttack = true;
         SpecialAttack();
-        bSecondAttack = 0;
+        bSecondAttack = false;
     }
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
         || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
@@ -1439,7 +1439,7 @@ void army::DoHydraAttack(i32) {
         }
     }
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    m_animationState = 1;
+    m_animationState = true;
     m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_FORWARD;
     gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_ATTACK)]);
     if (totKilled > 0) {
@@ -1578,7 +1578,7 @@ void army::DoAttack(i32 retaliation) {
         }
     }
     CheckLuck();
-    m_animationState = 1;
+    m_animationState = true;
     if (m_attackDirection == COMBAT_DIRECTION_WIDE_WEST
         || m_attackDirection == COMBAT_DIRECTION_NORTHWEST
         || m_attackDirection == COMBAT_DIRECTION_NORTHEAST) {
@@ -2315,9 +2315,9 @@ void army::PowEffect(
                        == ARMY_ANIMATION_SHOOT_FORWARD
                 || gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationSequence
                        == ARMY_ANIMATION_SHOOT_DOWN) {
-                gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle = 1;
+                gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle = true;
             } else {
-                gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle = 0;
+                gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationCycle = false;
             }
             if ((gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_damagePending
                  || static_cast<u8>(gpCombatManager->m_armies[IDX(sideNum)][armyIndex].m_animationState)
@@ -2579,7 +2579,7 @@ void army::PowEffect(
             current->m_damagePending = false;
             current->m_killPending = false;
             current->m_drawState = ARMY_DRAW_NORMAL;
-            current->m_animationState = 0;
+            current->m_animationState = false;
             current->m_lastTargetHex = -1;
         }
     }
@@ -3670,5 +3670,5 @@ i32 army::GetPowBaseY(void) {
     return y;
 }
 
-DATA(0x005240a0) i32 bSecondAttack = 0;
+DATA(0x005240a0) b32 bSecondAttack = false;
 DATA(0x0052409c) b32 gbGenieHalf;

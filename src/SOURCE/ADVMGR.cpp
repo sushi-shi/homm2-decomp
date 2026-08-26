@@ -999,7 +999,7 @@ DATA(0x00523e38) static i32 s_adjacentMonsterY = 0;
 DATA(0x00523e3c) static u16 s_drawGroundTile = 0;
 DATA(0x00523e40) i32 giLimitUpdMaxX = 0;
 DATA(0x00523e44) i32 giLimitUpdMaxY = 0;
-DATA(0x00523e48) i32 bPrefsChanged = 0;
+DATA(0x00523e48) b32 bPrefsChanged = false;
 DATA(0x00523e4c) i32 giTownPortalChoice = 0;
 DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
 DATA(0x00523f94) static b32 s_drawCovered = false;
@@ -2201,7 +2201,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
 
 VA(0x004035d2, 0x17)
 void advManager::Reseed(i32, i32) {
-    giSeedingValid = 0;
+    giSeedingValid = false;
 }
 
 VA(0x004035e9, 0xd1f)
@@ -7524,7 +7524,7 @@ i32 SaveGame(void) {
     i32 status = gpExec->DoDialog(req);
     if (status == FILE_REQUESTER_OK) {
         ok = 1;
-        bFreshSave = 1;
+        bFreshSave = true;
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
@@ -9374,10 +9374,10 @@ char* advManager::CheckHandleNet(void) {
                 if (playerExited5) {
                     exitInfo4.netPosition = packet9->sender;
                     exitInfo4.gamePosition = static_cast<i8>(NetPosToGamePos(packet9->sender));
-                    exitInfo4.updateNetworkControl = 0;
-                    exitInfo4.eliminated = 1;
-                    exitInfo4.hostReported = 1;
-                    exitInfo4.timedOut = 1;
+                    exitInfo4.updateNetworkControl = false;
+                    exitInfo4.eliminated = true;
+                    exitInfo4.hostReported = true;
+                    exitInfo4.timedOut = true;
                     ReceiveRemotePlayerExit(exitInfo4);
                 }
                 LoadRemote();
@@ -10237,7 +10237,7 @@ void advManager::SystemOptions(void) {
     prevWalkSpeed = gConfig.walkSpeed;
     oldInterfaceMode = gConfig.evilInterfaceUsage;
     heroMobile = m_heroContextLocked;
-    bPrefsChanged = 0;
+    bPrefsChanged = false;
     DemobilizeCurrHero();
 
     cPanel = new heroWindow(
@@ -10480,7 +10480,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 (gConfig.musicVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustMusicVolumes();
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
@@ -10509,14 +10509,14 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 (gConfig.soundVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustSoundVolumes();
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_HERO_SPEED:
                             ++gConfig.walkSpeed;
                             gConfig.walkSpeed %= CONFIG_WALK_SPEED_COUNT;
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_COMPUTER_SPEED:
@@ -10529,7 +10529,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 gConfig.blackoutComputer = 1;
                             }
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_MUSIC_SOURCE:
@@ -10576,33 +10576,33 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                             }
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_SHOW_ROUTE:
                             gConfig.showRoute = 1 - gConfig.showRoute;
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_INTERFACE:
                             gConfig.evilInterfaceUsage =
                                 (gConfig.evilInterfaceUsage + 1) % OPTION_INTERFACE_COUNT;
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_VIDEO:
                             gConfig.slowVideo = gConfig.slowVideo == 0;
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             break;
 
                         case SYSTEM_OPTION_COLOR_CURSOR:
                             gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
                                 1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
                             preferencesChanged = true;
-                            bPrefsChanged = 1;
+                            bPrefsChanged = true;
                             gpMouseManager->SetColorMice(
                                 gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                             );

@@ -639,7 +639,7 @@ DATA(0x0051b80c) char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     /* Волк */ "\xc2\xee\xeb\xea",
     /* Зомби */ "\xc7\xee\xec\xe1\xe8"
 };
-DATA(0x00534860) i8 xNetHasOldPlayers = 0;
+DATA(0x00534860) b8 xNetHasOldPlayers = false;
 DATA(0x0051bb58) u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     IDX(FACTION_KNIGHT),
     IDX(FACTION_KNIGHT),
