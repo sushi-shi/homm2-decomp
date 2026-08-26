@@ -5,6 +5,7 @@
 #include <ctime>
 
 #if !defined(__EMSCRIPTEN__) && !defined(_WIN32)
+#include <cerrno>
 #include <execinfo.h>
 #include <fcntl.h>
 #include <ucontext.h>
@@ -23,6 +24,20 @@ namespace {
 
 char gReportPath[512] = {};
 
+void WriteAll(int fileDescriptor, const char* data, std::size_t size) {
+    while (size != 0) {
+        const ssize_t written = ::write(fileDescriptor, data, size);
+        if (written > 0) {
+            data += written;
+            size -= static_cast<std::size_t>(written);
+        } else if (written < 0 && errno == EINTR) {
+            continue;
+        } else {
+            break;
+        }
+    }
+}
+
 const char* SignalName(int number) {
     switch (number) {
     case SIGSEGV: return "SIGSEGV (invalid memory access)";
@@ -37,12 +52,12 @@ const char* SignalName(int number) {
 void WriteBacktrace(int fileDescriptor, int number, void* address, void* rawContext) {
 
     const char* name = SignalName(number);
-    ::write(fileDescriptor, "\nhomm2 crashed: ", 16);
-    ::write(fileDescriptor, name, std::strlen(name));
-    ::write(fileDescriptor, "\n\n", 2);
+    WriteAll(fileDescriptor, "\nhomm2 crashed: ", 16);
+    WriteAll(fileDescriptor, name, std::strlen(name));
+    WriteAll(fileDescriptor, "\n\n", 2);
     char fault[64];
     const int faultLength = std::snprintf(fault, sizeof(fault), "fault address: %p\n\n", address);
-    ::write(fileDescriptor, fault, static_cast<std::size_t>(faultLength > 0 ? faultLength : 0));
+    WriteAll(fileDescriptor, fault, static_cast<std::size_t>(faultLength > 0 ? faultLength : 0));
 #if defined(__i386__)
     ucontext_t* context = static_cast<ucontext_t*>(rawContext);
     char registers[160];
@@ -55,7 +70,7 @@ void WriteBacktrace(int fileDescriptor, int number, void* address, void* rawCont
         static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EDX]),
         static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EDI])
     );
-    ::write(
+    WriteAll(
         fileDescriptor,
         registers,
         static_cast<std::size_t>(registerLength > 0 ? registerLength : 0)
@@ -68,12 +83,12 @@ void WriteBacktrace(int fileDescriptor, int number, void* address, void* rawCont
     const int skip = count > 2 ? 2 : 0;
     ::backtrace_symbols_fd(frames + skip, count - skip, fileDescriptor);
 
-    ::write(fileDescriptor, "\nraw addresses for addr2line -Cfie <binary>:\n", 44);
+    WriteAll(fileDescriptor, "\nraw addresses for addr2line -Cfie <binary>:\n", 44);
     for (int i = skip; i < count; ++i) {
         char text[32];
         const int length =
             std::snprintf(text, sizeof(text), "%p%s", frames[i], i + 1 < count ? " " : "\n");
-        ::write(fileDescriptor, text, static_cast<std::size_t>(length > 0 ? length : 0));
+        WriteAll(fileDescriptor, text, static_cast<std::size_t>(length > 0 ? length : 0));
     }
 }
 
@@ -86,9 +101,9 @@ void Handle(int number, siginfo_t* info, void* context) {
         if (file >= 0) {
             WriteBacktrace(file, number, address, context);
             ::close(file);
-            ::write(STDERR_FILENO, "\nreport written to ", 19);
-            ::write(STDERR_FILENO, gReportPath, std::strlen(gReportPath));
-            ::write(STDERR_FILENO, "\n", 1);
+            WriteAll(STDERR_FILENO, "\nreport written to ", 19);
+            WriteAll(STDERR_FILENO, gReportPath, std::strlen(gReportPath));
+            WriteAll(STDERR_FILENO, "\n", 1);
         }
     }
 

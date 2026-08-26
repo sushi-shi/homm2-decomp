@@ -69,6 +69,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
                       v
                     master --------> ironfist (you are here)
 ```
+
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
 - `source-pol-2.0` is its generated, matching-machinery-free source tree.
 - `classic-pol-2.0` is the same generated tree with the original integer-enum
@@ -203,8 +204,9 @@ System Options.
 ### Windows
 
 First run the source resource installer against the writable retail game
-directory. The Windows package is statically linked; copy `HMM2PL.exe` there
-and run it. For Wine:
+directory. The Windows package is statically linked and does not require the
+retail Audiere, Miles, Smacker, or Wing DLLs; copy `HMM2PL.exe` there and run
+it. For Wine:
 
 ```sh
 nix build .#homm2-windows

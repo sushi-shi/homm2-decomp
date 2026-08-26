@@ -51,13 +51,6 @@ if [ ! -f "$game_dir/$game_exe" ]; then
     exit 1
 fi
 
-for middleware in audiere.dll MSS32.DLL SMACKW32.DLL WING32.DLL; do
-    if [ ! -f "$game_dir/$middleware" ]; then
-        echo "required middleware not found: $game_dir/$middleware" >&2
-        exit 1
-    fi
-done
-
 if [ ! -d "$WINEPREFIX/drive_c" ]; then
     mkdir -p "$WINEPREFIX"
     wineboot -u
@@ -116,6 +109,11 @@ reg_add_string "$game_key" 'HMM2POL CDDrive' 'D:'
 if ! reg_has_value "$game_key" 'HMM2POL MusicVolume'; then
     reg_add_dword "$game_key" 'HMM2POL MusicVolume' 1
 fi
+if [ -n "${HOMM2_FX_VOLUME:-}" ]; then
+    reg_add_dword "$game_key" 'HMM2POL FXVolume' "$HOMM2_FX_VOLUME"
+elif ! reg_has_value "$game_key" 'HMM2POL FXVolume'; then
+    reg_add_dword "$game_key" 'HMM2POL FXVolume' 1
+fi
 if ! reg_has_value "$game_key" 'HMM2POL SoundQuality'; then
     reg_add_dword "$game_key" 'HMM2POL SoundQuality' 1
 fi
@@ -128,10 +126,6 @@ fi
 if ! reg_has_value "$game_key" 'HMM2POL GameFullScreen'; then
     reg_add_dword "$game_key" 'HMM2POL GameFullScreen' 1
 fi
-
-# Miles 6 crashes in Wine while closing a Smacker audio stream. Keep effects
-# muted by default; set HOMM2_FX_VOLUME explicitly to test another Miles setup.
-reg_add_dword "$game_key" 'HMM2POL FXVolume' "${HOMM2_FX_VOLUME:-0}"
 
 # The Buka executable contains Windows-1251 strings. Keep the dedicated prefix
 # on the matching ANSI code page even when the host lacks a Russian locale.

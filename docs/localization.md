@@ -89,6 +89,18 @@ Catalogs may be incomplete. A missing, empty, stale, or format-incompatible
 translation falls back to the authoritative English string. Placeholder
 signatures are checked both during the build and defensively at runtime.
 
+Maintainers can inventory still-inline translations by comparing the current
+UTF-8 tree with a historical localized revision. The tool reports candidates;
+it never rewrites source:
+
+```sh
+python3 tools/localization_inline_audit.py \
+  . <localized-revision> /tmp/homm2-localization-candidates.jsonl
+```
+
+Each result still requires a semantic ID and call-site review before it enters
+`messages.def`.
+
 Plural selection is not keyed to a language name. The runtime parses and
 validates each catalog's standard gettext `Plural-Forms` expression, so Polish,
 Russian, one-form languages, and future grammars do not require branches in

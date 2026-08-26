@@ -71,7 +71,7 @@ void soundManager::ShutdownSoundBackends(void) {
     m_backend = SOUND_BACKEND_NONE;
 }
 
-bool soundManager::StartupMilesBackend(void) {
+bool soundManager::StartupMidiBackend(void) {
     if (m_backend == SOUND_BACKEND_AUDIO_MIDI)
         return true;
     ShutdownSoundBackends();
@@ -81,7 +81,7 @@ bool soundManager::StartupMilesBackend(void) {
     return true;
 }
 
-bool soundManager::CDStartup(void) {
+bool soundManager::StartupCdBackend(void) {
     if (m_backend == SOUND_BACKEND_AUDIO_CD)
         return true;
     ShutdownSoundBackends();
@@ -150,8 +150,8 @@ i32 soundManager::Open(i32) {
 
     m_musicTrack = MIDI_NO_TRACK;
     const bool opened = gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI
-        ? StartupMilesBackend()
-        : CDStartup();
+        ? StartupMidiBackend()
+        : StartupCdBackend();
     if (!opened) {
         gConfig.musicVolume = CONFIG_VOLUME_MUTED;
         gConfig.soundVolume = CONFIG_VOLUME_MUTED;
@@ -233,9 +233,9 @@ void soundManager::SetMusicQuality(i32 musicSource) {
     MIDIStop(m_musicTrack);
     gConfig.musicSource = ConfigMusicSource(musicSource);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        StartupMilesBackend();
+        StartupMidiBackend();
     else
-        CDStartup();
+        StartupCdBackend();
     if (previousTrack >= 0)
         PlayAmbientMusic(previousTrack);
 }

@@ -64,9 +64,9 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    bool CDStartup(void);
+    bool StartupCdBackend(void);
     void ShutdownSoundBackends(void);
-    bool StartupMilesBackend(void);
+    bool StartupMidiBackend(void);
     void SaveBackend(void);
     void RestoreBackend(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
@@ -92,16 +92,16 @@ extern bool gSoundDisabled;
 
 extern bool gSoundBackendsReady;
 
-inline bool IsAudiereBackend(const soundManager* manager) {
+inline bool IsCdBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_AUDIO_CD;
 }
 
-inline bool IsMilesBackend(const soundManager* manager) {
+inline bool IsMidiBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_AUDIO_MIDI;
 }
 
 inline bool IsSoundBackendActive(const soundManager* manager) {
-    return IsAudiereBackend(manager) || IsMilesBackend(manager);
+    return IsCdBackend(manager) || IsMidiBackend(manager);
 }
 
 
@@ -115,9 +115,9 @@ inline void soundManager::RestoreBackend(void) {
     if (m_backend != SOUND_BACKEND_NONE)
         ShutdownSoundBackends();
     if (m_savedBackend == SOUND_BACKEND_AUDIO_MIDI)
-        StartupMilesBackend();
+        StartupMidiBackend();
     else if (m_savedBackend == SOUND_BACKEND_AUDIO_CD)
-        CDStartup();
+        StartupCdBackend();
 }
 
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];

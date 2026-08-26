@@ -19,6 +19,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <string>
 #include <SOURCE/game.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>

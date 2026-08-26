@@ -1,16 +1,14 @@
 # Native port
 
-The branch chain is:
+The maintained branch chain is:
 
 ```text
-decomp-pol-2.0
-  -> source-pol-2.0
-  -> master-pol-2.0
-  -> port-pol-2.0
+decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist
 ```
 
-Core game fixes belong upstream. `port-pol-2.0` owns only `PLATFORM` and its
-native build.
+`master` is the portable Gold 2.1 line. Matching-only changes stay on the
+decomp branches; portable platform, localization, and runtime changes belong
+here and flow onward to `ironfist`.
 
 ```text
 include/PLATFORM/          interfaces
@@ -19,7 +17,7 @@ src/PLATFORM/WIN32/        Win32 translation
 src/PLATFORM/SDL3/         native SDL3 implementation
 ```
 
-All 95 game translation units compile directly. There are no override units.
+All 97 game translation units compile directly. There are no override units.
 
 ## Run
 
@@ -27,6 +25,13 @@ The native build needs an installed copy of the game data:
 
 ```sh
 HOMM2_DATA=/path/to/heroes2 nix run .
+```
+
+On the `ironfist` branch, install the pinned Ironfist resource payload into the
+same writable game directory first:
+
+```sh
+nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
 `HOMM2_DATA` wins when it is set. Otherwise the engine looks for a directory
@@ -43,8 +48,9 @@ nix build .#homm2-windows
 nix build .#homm2-web
 ```
 
-The Windows package cross-compiles the SDL3 platform and minimal FFmpeg. It
-includes the required DLLs and a Wine launcher.
+The Windows package cross-compiles and statically links the SDL3 platform and
+minimal FFmpeg. It includes a Wine launcher; no retail Audiere, Miles, Smacker,
+or Wing DLLs are required.
 
 ## Web
 
