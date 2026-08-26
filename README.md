@@ -54,7 +54,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist
+                    master (you are here) --------> ironfist
 ```
 
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
