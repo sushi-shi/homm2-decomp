@@ -37,7 +37,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist
+                    master --------> ironfist --------> ironfist-master
 ```
 
 - `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
@@ -50,6 +50,8 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
   `master`; `classic-gold-2.1-buka` preserves the legacy mangling model.
 - `master` is the cross-platform Linux, Windows, and Web port.
 - `ironfist` applies the Project Ironfist changes to the reconstructed source.
+- `ironfist-master` is the maintained integration with narrow extension
+  boundaries and mechanics in their owning engine classes.
 
 <!-- match-score:start -->
 ## Match status
