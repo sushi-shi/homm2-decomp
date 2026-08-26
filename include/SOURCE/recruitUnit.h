@@ -31,8 +31,8 @@ public:
     char m_padding56[4];
     armyGroup* m_army;
     char m_padding5e[4];
-    i32 m_recruited;
-    i32 m_noRoom;
+    b32 m_recruited;
+    b32 m_noRoom;
     i16* m_available;
     i32 m_maximum;
     i32 m_goldTotal;

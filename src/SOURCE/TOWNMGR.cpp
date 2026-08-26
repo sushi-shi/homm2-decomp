@@ -692,7 +692,7 @@ townManager::townManager(void) {
     m_heroWindow0 = NULL;
     m_unknownC6 = 0;
     m_selectedBuilding = BUILDING_SLOT_NONE;
-    m_castleDialogActive = 0;
+    m_castleDialogActive = false;
 }
 
 void townManager::SetupExtraStuff(void) {
@@ -735,8 +735,8 @@ i32 townManager::Open(i32 id) {
         MemError();
     glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
     m_lastTownType = FACTION_UNINITIALIZED;
-    m_castleDialogActive = 0;
-    m_recruitResult = 0;
+    m_castleDialogActive = false;
+    m_recruitResult = false;
     m_lastHoverId = TOWN_HOVER_NONE;
     m_lastHoverSubId = 0;
     m_townObjectCount = 0;
@@ -1323,10 +1323,10 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 if (m_heroWindow0 == NULL)
                                     MemError();
                                 SetupCastle(m_heroWindow0, 0);
-                                m_castleDialogActive = 1;
-                                m_recruitResult = 0;
+                                m_castleDialogActive = true;
+                                m_recruitResult = false;
                                 gpWindowManager->DoDialog(m_heroWindow0, CastleHandler, 0);
-                                m_castleDialogActive = 0;
+                                m_castleDialogActive = false;
                                 delete m_heroWindow0;
 
                                 if (m_recruitResult != 0) {
@@ -1368,7 +1368,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         NULL
                                     );
                                     WaitEndSample(&buildSound, -1);
-                                    m_recruitResult = 0;
+                                    m_recruitResult = false;
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
                                     if (m_selectedBuilding == BUILDING_SLOT_NEUTRAL_LAST
@@ -2798,7 +2798,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             0,
             0
         );
-        m_recruitResult = 1;
+        m_recruitResult = true;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             static_cast<i8>(giCurPlayer);

@@ -20,8 +20,8 @@ sample::sample(char* name)
         NULL
     ) {
     m_playbackData.volume = 0x7f;
-    m_playbackData.loopCount = 0;
-    m_playbackData.stereo = 1;
+    m_playbackData.loopCount = false;
+    m_playbackData.stereo = true;
     m_playbackData.sampleFormat = FORMAT_16_BIT;
     m_playbackData.sampleRate = RATE_44100;
     m_playbackData.activeSample = NULL;
@@ -50,7 +50,7 @@ sample::sample(char* name)
                 break;
             case 'M':
             case 'm':
-                m_playbackData.stereo = 0;
+                m_playbackData.stereo = false;
                 break;
         }
     }

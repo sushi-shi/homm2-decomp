@@ -34,8 +34,8 @@ ENABLE_ENUM_FLAGS(FontAlignment)
 class font : public resource {
 public:
     i32 m_height;
-    i32 m_isLarge;
-    i32 m_suppressDraw;
+    b32 m_isLarge;
+    b32 m_suppressDraw;
     icon* m_glyphIcon;
     font(u32l);
     virtual ~font();

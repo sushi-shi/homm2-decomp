@@ -621,7 +621,7 @@ mapCell* advManager::MoveHero(
         StopCursor(1);
         CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
         UpdateScreen(0, 0);
-        m_cursorActive = 0;
+        m_cursorActive = false;
     }
 
     if ((H2EnumIndex((destinationCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
@@ -631,7 +631,7 @@ mapCell* advManager::MoveHero(
                 if ((H2EnumIndex((movingHero_g->m_eventFlags) & (HERO_EVENT_EMBARKED))))
                     goto movementDone;
                 StopCursor(1);
-                m_cursorActive = 0;
+                m_cursorActive = false;
                 fizzleSample = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
                     CURSOR_FIZZLE_X,
@@ -717,7 +717,7 @@ mapCell* advManager::MoveHero(
         giVisRange[H2EnumIndex(movingHero_g->m_secondarySkills[H2EnumIndex(HERO_SKILL_SCOUTING)])]
             + (movingHero_g->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
     );
-    m_forceCompleteDraw = 1;
+    m_forceCompleteDraw = true;
 
     pixelsPerStep =
         giPixelsPerStep[H2EnumIndex((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
@@ -1144,7 +1144,7 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
             m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         }
     }
-    m_forceCompleteDraw = 1;
+    m_forceCompleteDraw = true;
 }
 
 void advManager::ProcessMapChange(SMapChange change) {
