@@ -29,7 +29,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka (you are here)    clas
 - `source-gold-2.1-buka` is its generated clean source tree and the primary
   source base of `master`.
 - `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
-  stored as Windows-1251 with readable Russian literals rather than UTF-8.
+  with retail Windows-1251 string bytes rendered as readable UTF-8 Russian.
 - `master` is the cross-platform Linux, Windows, and Web port.
 - `ironfist` applies Project Ironfist to the reconstructed cross-platform source.
 - `ironfist-master` is the maintained integration with narrow extension
@@ -43,7 +43,12 @@ The behavioral differences from Price of Loyalty 2.0 are tracked in the
 
 ## Build and run
 
-This generated branch builds the original 32-bit Windows target. With Nix:
+The `source-*` branches build the original 32-bit Windows target. The
+`classic-*` branches are terminal reading views and are not supported build
+targets; switch to the corresponding `source-*` branch to compile or run the
+retail-style game.
+
+On a `source-*` branch, build with Nix:
 
 ```sh
 nix build
