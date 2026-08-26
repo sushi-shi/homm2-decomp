@@ -239,7 +239,8 @@ void Connect(void) {
                 GOut(gText);
                 RemoteCleanup();
             }
-            strncpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+            memcpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+            remoteidstr[HANDSHAKE_ID_SIZE] = '\0';
             remotestage = packet[HANDSHAKE_STAGE_INDEX] - '0';
             localstage = remotestage + 1;
             oldsec = -1;
@@ -282,7 +283,8 @@ i32 WaitForDirectConnect(void) {
                     GOut(gText);
                     RemoteCleanup();
                 }
-                strncpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+                memcpy(remoteidstr, packet + HANDSHAKE_PREFIX_SIZE, HANDSHAKE_ID_SIZE);
+                remoteidstr[HANDSHAKE_ID_SIZE] = '\0';
                 remotestage = packet[HANDSHAKE_STAGE_INDEX] - '0';
                 localstage = remotestage + 1;
                 oldsec = -1;

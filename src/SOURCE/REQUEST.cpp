@@ -227,7 +227,13 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            sprintf(fullPath, "%s%s", m_fileNames[indexData5].text, m_extensions[indexData5].text);
+            snprintf(
+                fullPath,
+                sizeof(fullPath),
+                "%s%s",
+                m_fileNames[indexData5].text,
+                m_extensions[indexData5].text
+            );
             GetMapHeader(fullPath, &m_mapHeaders[indexData5]);
         }
     }

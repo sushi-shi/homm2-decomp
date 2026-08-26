@@ -186,8 +186,9 @@ void SmackManagerMain(void) {
     if (bSmackNum == EXPANSION_CAMPAIGN)
         strcpy(path7, ".\\DATA\\");
     else
-        sprintf(
+        snprintf(
             path7,
+            sizeof(path7),
             "%s%s",
             gcRegCDRomPath,
             gcAnimPath

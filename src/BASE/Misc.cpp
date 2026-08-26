@@ -1090,7 +1090,7 @@ void GetDataEntry(
         nRows = MAX_ROW_COUNT;
     entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
 
-    sprintf(windowName, "evntwin%d.bin", nRows);
+    snprintf(windowName, sizeof(windowName), "evntwin%d.bin", nRows);
     DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
     if (DataEntryWin == NULL)
         MemError();
