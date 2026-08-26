@@ -149,6 +149,24 @@ struct Value {
         self.assertIn("mutable-reference-argument",
                       {write.kind for write in facts.unknown_writes})
 
+    def test_array_index_on_assignment_lhs_is_a_read(self):
+        text = r"""
+typedef int i32;
+typedef i32 b32;
+i32 values[2];
+b32 selector = false;
+void Set() { values[selector] = 4; }
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            selector = next(
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.name == "selector"
+            )
+        self.assertEqual(selector.unknown_writes, set())
+        self.assertEqual(len(selector.read_locations), 1)
+
     def test_boolean_domain_understands_conditionals_and_bool_results(self):
         text = r"""
 typedef int i32;
@@ -172,6 +190,26 @@ struct Value {
         self.assertTrue(all(item.eligible for item in fields))
         domains = {item.name: {write.domain for write in item.writes} for item in fields}
         self.assertEqual(domains, {"a": {(0, 1)}, "b": {(0, 1)}})
+
+    def test_boolean_alias_reference_is_proven_boolean_flow(self):
+        text = r"""
+typedef int i32;
+typedef i32 b32;
+b32 source = false;
+struct Value {
+    i32 flag;
+    void Set() { flag = source; }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            flag = next(
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.name == "flag"
+            )
+        self.assertTrue(flag.eligible)
+        self.assertEqual(flag.observed_domain, (0, 1))
 
     def test_aggregate_initializers_are_mapped_by_field_position(self):
         text = r"""

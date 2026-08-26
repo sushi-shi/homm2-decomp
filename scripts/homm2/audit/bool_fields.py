@@ -226,6 +226,8 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
         if referenced.kind == ci.CursorKind.ENUM_CONSTANT_DECL:
             value = referenced.enum_value
             return (value,) if value in (0, 1) else None
+        if referenced.type.spelling in BOOLEAN_TYPES:
+            return (0, 1)
     if cursor.kind in WRAPPER_KINDS and len(children) == 1:
         return _boolean_domain(children[0])
     if cursor.kind == ci.CursorKind.CONDITIONAL_OPERATOR and len(children) == 3:
@@ -340,6 +342,23 @@ def _field_references(cursor: ci.Cursor, candidates: dict[str, FieldFacts]) -> l
         if usr is not None:
             rows.append((usr, child))
     return rows
+
+
+def _lvalue_references(cursor: ci.Cursor,
+                       candidates: dict[str, FieldFacts]) -> list[tuple[str, ci.Cursor]]:
+    """Return only the tracked scalar denoted by an lvalue expression.
+
+    Walking the whole left-hand side is incorrect: in ``array[index] = value``
+    the scalar ``index`` is read, not written. Scalar declarations and member
+    references appear at the lvalue root, modulo transparent AST wrappers.
+    """
+    usr = _referenced_field(cursor, candidates)
+    if usr is not None:
+        return [(usr, cursor)]
+    children = list(cursor.get_children())
+    if cursor.kind in WRAPPER_KINDS and len(children) == 1:
+        return _lvalue_references(children[0], candidates)
+    return []
 
 
 def _record_declaration(type_: ci.Type) -> ci.Cursor | None:
@@ -481,7 +500,7 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
                        ci.CursorKind.COMPOUND_ASSIGNMENT_OPERATOR) and len(children) >= 2:
         operator = cursor.spelling
         lhs, rhs = children[0], children[-1]
-        refs = _field_references(lhs, candidates)
+        refs = _lvalue_references(lhs, candidates)
         if refs and (operator == "=" or cursor.kind == ci.CursorKind.COMPOUND_ASSIGNMENT_OPERATOR):
             domain = _boolean_domain(rhs) if operator == "=" else None
             kind = "assignment" if operator == "=" else "compound-assignment"
@@ -498,7 +517,8 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
             tokens[-1] if tokens and tokens[-1] in ("++", "--") else None)
         if operator is not None:
             kind = "address-escape" if operator == "&" else "unary-update"
-            for usr, reference in _field_references(cursor, candidates):
+            operand = children[0] if children else cursor
+            for usr, reference in _lvalue_references(operand, candidates):
                 _mark(candidates, usr, _write(cursor, kind, repo, None), handled)
                 ref_span = _span(reference, repo)
                 if ref_span is not None:
@@ -514,7 +534,7 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
             if parameter.type.kind in MUTABLE_REFERENCE_KINDS:
                 pointee = parameter.type.get_pointee()
                 if not pointee.is_const_qualified():
-                    for usr, reference in _field_references(argument, candidates):
+                    for usr, reference in _lvalue_references(argument, candidates):
                         _mark(candidates, usr,
                               _write(argument, "mutable-reference-argument", repo, None), handled)
                         ref_span = _span(reference, repo)
