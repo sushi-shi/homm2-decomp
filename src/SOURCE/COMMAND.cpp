@@ -406,7 +406,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
                 message = gpInputManager->GetEvent();
             }
             if (message.type != MESSAGE_NONE)
-                m_gridSelectionDisabled = 0;
+                m_gridSelectionDisabled = false;
         }
         CheckChangeSelector();
     }
@@ -894,7 +894,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case WIDGET_COMMAND_DESELECT:
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
                         case CONTROL_DISABLE_SELECTION:
-                            m_gridSelectionDisabled = 1;
+                            m_gridSelectionDisabled = true;
                             break;
                         case CONTROL_WAIT:
                             giNextAction = ACTION_WAIT;
@@ -2263,7 +2263,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
             giSkeletonsCreated = 1;
     }
 
-    m_nonVisualCombat = 1;
+    m_nonVisualCombat = true;
     FreeArmies();
     CombatMessage("", 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
@@ -2597,7 +2597,7 @@ void combatManager::CheckChangeSelector(void) {
         UpdateGrid(0, 1);
         giNewMonsterCycleFrame = SELECTOR_INITIAL_FRAME;
         m_limitCreatureHex = currentArmy->m_hex;
-        m_limitCreature = 1;
+        m_limitCreature = true;
         DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     }
     SetupSmallView();
@@ -3133,7 +3133,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     gConfig.showCombatGrid = showGrid;
     gConfig.showCombatMouseHex = showMouseHex;
     gConfig.combatShadeLevel = shadeLevel;
-    m_backgroundDrawn = 0;
+    m_backgroundDrawn = false;
     SetupGridForArmy(&m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex]);
     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     ResetMouse();

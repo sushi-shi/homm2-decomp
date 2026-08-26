@@ -31,9 +31,9 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
-        m_isLarge = 1;
+        m_isLarge = true;
     else
-        m_isLarge = 0;
+        m_isLarge = false;
     gpResourceManager->Read13(reinterpret_cast<i8*>(name));
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(name);
@@ -126,12 +126,12 @@ void font::DrawStringExecute(
             continue;
         }
         if (codePoint == '{') {
-            m_suppressDraw = 1;
+            m_suppressDraw = true;
             cursor += decoded.length;
             continue;
         }
         if (codePoint == '}') {
-            m_suppressDraw = 0;
+            m_suppressDraw = false;
             cursor += decoded.length;
             continue;
         }
@@ -208,7 +208,7 @@ void font::DrawStringExecute(
 }
 
 void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
-    m_suppressDraw = 0;
+    m_suppressDraw = false;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
@@ -359,7 +359,7 @@ void font::DrawBoundedString(
         if (totalH < h)
             yPosition = (h - totalH) / CENTER_DIVISOR;
     }
-    m_suppressDraw = 0;
+    m_suppressDraw = false;
     while (pos < len && str[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
             ExtractLine(str, line.data(), &pos, w, &lw, 1);
