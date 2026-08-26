@@ -16,7 +16,8 @@ homm2 clean --out build/clean --verify   # build
 homm2 clean --out build/clean \
   --publish source-pol-2.0                                  # publish source branch
 homm2 clean \
-  --classic-from ../homm2-decomp-master \
+  --classic-from ../source-pol-2.0 \
+  --publish-parent decomp-pol-2.0 \
   --out build/classic --publish classic-pol-2.0             # publish classic branch
 homm2 clean \
   --classic-from ../source-gold-2.1-buka \
