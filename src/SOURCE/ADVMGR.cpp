@@ -3991,7 +3991,7 @@ void advManager::DrawCell(
                     if (s_drawCell->m_triggerType
                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
-                        s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
+                        s_drawPlayerColor = gpGame->m_players[IDX(s_drawHero->m_owner)].m_color;
                         s_drawHeroType = HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)
                             ? HERO_TYPE_BOAT
                             : s_drawHero->m_cursorType;
@@ -5749,7 +5749,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
             msg.payload.widget.id = ENEMY_TURN_CREST_ID;
             msg.payload.widget.data.value =
-                gpGame->m_players[static_cast<char>(giCurPlayer)].m_color;
+                gpGame->m_players[IDX(static_cast<char>(giCurPlayer))].m_color;
             m_adventureWindow->BroadcastMessage(msg);
         } else {
             m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] = new iconWidget(
@@ -6368,7 +6368,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     msg.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
     msg.payload.widget.data.value =
-        gpGame->m_players[targetHero->m_owner].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
+        gpGame->m_players[IDX(targetHero->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
     win->BroadcastMessage(msg);
     ++msg.payload.widget.id;
     ++msg.payload.widget.data.value;
@@ -6784,7 +6784,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
         message.payload.widget.data.value =
-            gpGame->m_players[townPtr->m_owner].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
+            gpGame->m_players[IDX(townPtr->m_owner)].m_color * HERO_QUICK_PLAYER_COLOR_STRIDE;
         window->BroadcastMessage(message);
         ++message.payload.widget.id;
         ++message.payload.widget.data.value;
@@ -10761,7 +10761,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
             joinFee = gMonsterDatabase[IDX(type)].cost * count;
             if (joinFee
-                > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                > gpGame->m_players[IDX(visionHero->m_owner)].m_resources[IDX(RES_GOLD)]) {
                 if (fRatio > MONSTER_STRENGTH_FLEE) {
                     goto creaturesFlee;
                 } else {

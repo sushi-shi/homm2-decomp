@@ -2188,7 +2188,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                 levelsGained = gpAdvManager->GiveExperience(
                     m_heroes[IDX(winningSide)],
                     m_experienceValue[IDX(OppositeCombatResult(winningSide))],
-                    gbThisNetHumanPlayer[m_heroes[IDX(winningSide)]->m_owner] == 0
+                    gbThisNetHumanPlayer[IDX(m_heroes[IDX(winningSide)]->m_owner)] == 0
                 );
 
                 if (gbRetreatWin == 0) {

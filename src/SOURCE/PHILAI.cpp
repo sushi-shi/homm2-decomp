@@ -2399,7 +2399,7 @@ void philAI::ProbableOutcomeOfBattle(
         outcomeValue = static_cast<i32>(
             outcomeValue
             + (artsD + AI_BATTLE_DEFENDER_ARTIFACT_BASE)
-                  * (gbHumanPlayer[defenderHero->m_owner] != 0 ? gfAttackHumanBonus
+                  * (gbHumanPlayer[IDX(defenderHero->m_owner)] != 0 ? gfAttackHumanBonus
                                                               : gfAttackComputerBonus)
                   * winChance
         );
@@ -2777,7 +2777,7 @@ void philAI::ValueOfBuyingCreature(
         }
         creatureRV = static_cast<i32>(
             creatureRV
-            * (gpGame->m_players[townPtr->m_owner].m_aiData.m_attentionWeights.upgradeBase
+            * (gpGame->m_players[IDX(townPtr->m_owner)].m_aiData.m_attentionWeights.upgradeBase
                + AI_CREATURE_BALANCE_BASE)
         );
     }
@@ -3952,7 +3952,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
 
         purchaseValue = static_cast<i32>(
             purchaseFightValue15
-            * gpGame->m_players[gpCurAIHero->m_owner].m_aiData.m_upgradeValueWeight
+            * gpGame->m_players[IDX(gpCurAIHero->m_owner)].m_aiData.m_upgradeValueWeight
         );
         if (useAvailableCount == 0) {
             GetMonsterCost(creature, costTemp);
@@ -5236,7 +5236,7 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 
     if (pTown->m_owner != giCurPlayer) {
         if (pTown->HasGarrison()) {
-            if (pTown->m_owner < 0 || gbHumanPlayer[pTown->m_owner] == 0) {
+            if (pTown->m_owner < 0 || gbHumanPlayer[IDX(pTown->m_owner)] == 0) {
                 quickResult = QuickCombat(
                     &h->m_army,
                     h,
@@ -6624,7 +6624,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
                     townValue
                     * ((EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
                            * AI_EVENT_TOWN_PLAYER_FACTOR
-                           * (gbHumanPlayer[defTown->m_owner] ? gfAttackHumanBonus
+                           * (gbHumanPlayer[IDX(defTown->m_owner)] ? gfAttackHumanBonus
                                                               : gfAttackComputerBonus)
                        + AI_EVENT_VALUE_BASE_FACTOR)
                 );
@@ -6653,7 +6653,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
         if (townValue > 0)
             result = static_cast<i32>(result + townValue * winChance);
 
-        if (gbHumanPlayer[otherHero->m_owner] && result > EVENT_HUMAN_VALUE_THRESHOLD) {
+        if (gbHumanPlayer[IDX(otherHero->m_owner)] && result > EVENT_HUMAN_VALUE_THRESHOLD) {
             if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
                 result *= 2;
             else
@@ -6784,7 +6784,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
                 * (((EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
                         * AI_EVENT_TOWN_PLAYER_FACTOR
                     + AI_TOWN_EVENT_VALUE_BASE_FACTOR)
-                   * (gbHumanPlayer[pTownRec->m_owner] ? gfAttackHumanBonus
+                   * (gbHumanPlayer[IDX(pTownRec->m_owner)] ? gfAttackHumanBonus
                                                        : gfAttackComputerBonus))
             );
         }
@@ -6793,7 +6793,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
             gbReduceByBerserk = false;
     }
 
-    if (pTownRec->m_owner != TOWN_OWNER_NONE && gbHumanPlayer[pTownRec->m_owner]
+    if (pTownRec->m_owner != TOWN_OWNER_NONE && gbHumanPlayer[IDX(pTownRec->m_owner)]
         && eventVal > EVENT_HUMAN_VALUE_THRESHOLD) {
         if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
             eventVal = static_cast<i32>(eventVal * AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR);

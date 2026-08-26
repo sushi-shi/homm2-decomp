@@ -2352,8 +2352,8 @@ void CheckEndGame(
             gpGame->m_mapHeader.victoryTownY
         ));
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
-            && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
-            if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
+            && (gbHumanPlayer[IDX(victoryTownData->m_owner)] || gpGame->m_mapHeader.computerAlsoWins)) {
+            if (gbThisNetHumanPlayer[IDX(victoryTownData->m_owner)]) {
                 winFlag = 1;
             } else {
                 defeated_m = 1;
@@ -2382,7 +2382,7 @@ void CheckEndGame(
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[lossTown->m_owner]) {
+        if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[IDX(lossTown->m_owner)]) {
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
@@ -2433,7 +2433,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         winningHeroEntry_g = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry_g->m_owner < 0 || winningHeroEntry_g->m_owner >= GAME_PLAYER_COUNT
-            || gbHumanPlayer[winningHeroEntry_g->m_owner]) {
+            || gbHumanPlayer[IDX(winningHeroEntry_g->m_owner)]) {
             winFlag = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
@@ -2450,7 +2450,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         lossHero_k = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
         if (lossHero_k->m_owner < 0 || lossHero_k->m_owner >= GAME_PLAYER_COUNT
-            || !gbHumanPlayer[lossHero_k->m_owner]) {
+            || !gbHumanPlayer[IDX(lossHero_k->m_owner)]) {
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;

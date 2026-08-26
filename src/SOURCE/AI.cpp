@@ -58,8 +58,8 @@ i32 combatManager::AICheckRetreat(void) {
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
         && gpGame->m_mapHeader.victoryConditionValue == m_heroes[IDX(m_currentSide)]->m_id)
         return 0;
-    if (gpGame->m_players[m_heroes[IDX(m_currentSide)]->m_owner].m_townCount == 0
-        && gpGame->m_players[m_heroes[IDX(m_currentSide)]->m_owner].m_heroCount
+    if (gpGame->m_players[IDX(m_heroes[IDX(m_currentSide)]->m_owner)].m_townCount == 0
+        && gpGame->m_players[IDX(m_heroes[IDX(m_currentSide)]->m_owner)].m_heroCount
                == COMBAT_AI_LAST_HERO_COUNT)
         return 0;
 

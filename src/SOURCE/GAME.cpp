@@ -4571,7 +4571,7 @@ void game::PerWeek(void) {
                     growth2 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
                 if (castle5->m_owner >= 0
                     && castle5->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] == 0
-                    && !gbHumanPlayer[castle5->m_owner]) {
+                    && !gbHumanPlayer[IDX(castle5->m_owner)]) {
                     if (gpGame->m_difficulty == DIFFICULTY_HARD)
                         growth2 = static_cast<i32>(growth2 * WEEKLY_HARD_GROWTH_FACTOR);
                     if (gpGame->m_difficulty == DIFFICULTY_EXPERT)
@@ -6075,7 +6075,7 @@ void game::SetupTowns(void) {
             dwellingCount1 =
                 defaultDwellingRoll15[Random(0, 99) / DEFAULT_DWELLING_ROLL_BUCKET_COUNT];
             castle8->m_buildings |= IDX(TOWN_BUILDING_DWELLING_1);
-            if (!gbHumanPlayer[castle8->m_owner] && dwellingCount1 == 1 && Random(1, 10) < 4)
+            if (!gbHumanPlayer[IDX(castle8->m_owner)] && dwellingCount1 == 1 && Random(1, 10) < 4)
                 dwellingCount1++;
             if (--dwellingCount1 != 0) {
                 castle8->m_buildings |= IDX(TOWN_BUILDING_DWELLING_2);
@@ -6130,7 +6130,7 @@ void game::SetupTowns(void) {
         }
 
         if (castle8->m_type == FACTION_NECROMANCER && castle8->m_owner != -1
-            && !gbHumanPlayer[castle8->m_owner]) {
+            && !gbHumanPlayer[IDX(castle8->m_owner)]) {
             if (Random(0, 100) < 50)
                 spellIndex3 = IDX(SPELL_DEATH_RIPPLE);
             else
@@ -6188,7 +6188,7 @@ void game::SetupTowns(void) {
                             spell1 = SpellType(
                                 Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN))
                             );
-                        if (castle8->m_owner != -1 && !gbHumanPlayer[castle8->m_owner])
+                        if (castle8->m_owner != -1 && !gbHumanPlayer[IDX(castle8->m_owner)])
                             spellValue =
                                 gsSpellInfo[IDX(spell1)].aiValue
                                     * (HAS(
@@ -6363,10 +6363,10 @@ void game::ProcessOnMapHeroes(void) {
                         } else {
                             mapHero14->m_owner = extra9->owner;
                             m_availableHeroes[extra9->heroId] = mapHero14->m_owner;
-                            m_players[mapHero14->m_owner]
-                                .m_heroIds[m_players[mapHero14->m_owner].m_heroCount] =
+                            m_players[IDX(mapHero14->m_owner)]
+                                .m_heroIds[m_players[IDX(mapHero14->m_owner)].m_heroCount] =
                                 mapHero14->m_id;
-                            m_players[mapHero14->m_owner].m_heroCount++;
+                            m_players[IDX(mapHero14->m_owner)].m_heroCount++;
                         }
 
                         if (!isJail4 && mapY14 > 0) {

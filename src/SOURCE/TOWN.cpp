@@ -113,7 +113,7 @@ void town::View(i32 noFade) {
 
 VA(0x004a42d0, 0x129)
 void town::Deallocate(void) {
-    playerData* pp = &gpGame->m_players[m_owner];
+    playerData* pp = &gpGame->m_players[IDX(m_owner)];
     i32 pos = TOWN_ID_NONE;
     i32 i;
 
@@ -133,7 +133,7 @@ void town::Deallocate(void) {
     else if (pp->m_townLocatorPage + TOWN_PLAYER_WINDOW_SIZE > pp->m_townCount)
         pp->m_townLocatorPage = pp->m_townCount - TOWN_PLAYER_WINDOW_SIZE;
 
-    gpGame->m_townOwners[m_id] = TOWN_OWNER_NONE;
+    gpGame->m_townOwners[IDX(m_id)] = TOWN_OWNER_NONE;
     m_owner = TOWN_OWNER_NONE;
 }
 

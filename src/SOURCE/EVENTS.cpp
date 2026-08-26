@@ -3272,9 +3272,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
                                     ARTIFACT_EVENT_GOLD_COST;
                                 goto giveArtifact;
                             }
@@ -3315,7 +3315,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
+                        sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
                         sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
@@ -3339,15 +3339,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
-                                && gpGame->m_players[eventHero2->m_owner]
-                                           .m_resources[artifactResourceType_k]
+                                && gpGame->m_players[IDX(eventHero2->m_owner)]
+                                           .m_resources[IDX(artifactResourceType_k)]
                                        >= ARTIFACT_EVENT_RESOURCE_3_AMOUNT) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_3_GOLD_COST;
-                                gpGame->m_players[eventHero2->m_owner]
-                                    .m_resources[artifactResourceType_k] -=
+                                gpGame->m_players[IDX(eventHero2->m_owner)]
+                                    .m_resources[IDX(artifactResourceType_k)] -=
                                     ARTIFACT_EVENT_RESOURCE_3_AMOUNT;
                                 goto giveArtifact;
                             }
@@ -3388,7 +3388,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
+                        sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
                         sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
@@ -3412,15 +3412,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0
                         );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                            if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                            if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
-                                && gpGame->m_players[eventHero2->m_owner]
-                                           .m_resources[artifactResourceType_k]
+                                && gpGame->m_players[IDX(eventHero2->m_owner)]
+                                           .m_resources[IDX(artifactResourceType_k)]
                                        >= ARTIFACT_EVENT_RESOURCE_5_AMOUNT) {
-                                gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                                gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_5_GOLD_COST;
-                                gpGame->m_players[eventHero2->m_owner]
-                                    .m_resources[artifactResourceType_k] -=
+                                gpGame->m_players[IDX(eventHero2->m_owner)]
+                                    .m_resources[IDX(artifactResourceType_k)] -=
                                     ARTIFACT_EVENT_RESOURCE_5_AMOUNT;
                                 goto giveArtifact;
                             }
@@ -3712,7 +3712,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
                     if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                        if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
+                        if (gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)]
                             < DAEMON_GOLD) {
                             EventWindow(
                                 -1,
@@ -3730,7 +3730,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             HeroLoses(eventHero2);
                         } else {
-                            gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
+                            gpGame->m_players[IDX(eventHero2->m_owner)].m_resources[IDX(RES_GOLD)] -=
                                 DAEMON_GOLD;
                         }
                     } else {
@@ -5288,8 +5288,8 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
 VA(0x0044352a, 0x83)
 void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
     if (resourceType >= RES_WOOD && resourceType <= RES_GOLD)
-        gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
-    if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
+        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(resourceType)] += amount;
+    if (resourceType == RES_GOLD && gbHumanPlayer[IDX(eventHero->m_owner)])
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -6360,8 +6360,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                 if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
                     && sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
                     if (sourceHero->m_artifacts[sourceArtifactSlot] <= ARTIFACT_GOLDEN_GOOSE) {
-                        if (gbThisNetHumanPlayer[sourceHero->m_owner]
-                            || gbThisNetHumanPlayer[destinationHero->m_owner]) {
+                        if (gbThisNetHumanPlayer[IDX(sourceHero->m_owner)]
+                            || gbThisNetHumanPlayer[IDX(destinationHero->m_owner)]) {
                             sprintf(
                                 gText,
                                 "\xdd\xf2\xee %s! \xc5\xe4\xe2\xe0 \xe2\xfb \xe4\xee\xe1\xf0\xe0\xeb\xe8\xf1\xfc \xe4\xee "
@@ -6431,7 +6431,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
     i32 lowestValue;
     i32 creatureValue;
 
-    if (gbHumanPlayer[eventHero->m_owner] == 0)
+    if (gbHumanPlayer[IDX(eventHero->m_owner)] == 0)
         return;
     if (Random(EVENT_WHIRLPOOL_TRIGGER_ROLL, EVENT_WHIRLPOOL_TRIGGER_MAX)
         != EVENT_WHIRLPOOL_TRIGGER_ROLL)
@@ -7234,7 +7234,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
                     if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), EVENT_ARTIFACT_GOLD, 0, 0)) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
                             EVENT_ARTIFACT_GOLD;
                         goto artifactPickup;
                     }
@@ -7246,9 +7246,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             artifactResource_p,
                             EVENT_ARTIFACT_RESOURCE_3
                         )) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
                             EVENT_ARTIFACT_RESOURCE_3_GOLD;
-                        gpGame->m_players[eventHero->m_owner].m_resources[artifactResource_p] -=
+                        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(artifactResource_p)] -=
                             EVENT_ARTIFACT_RESOURCE_3;
                         goto artifactPickup;
                     }
@@ -7260,9 +7260,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             artifactResource_p,
                             EVENT_ARTIFACT_RESOURCE_5
                         )) {
-                        gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
                             EVENT_ARTIFACT_RESOURCE_5_GOLD;
-                        gpGame->m_players[eventHero->m_owner].m_resources[artifactResource_p] -=
+                        gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(artifactResource_p)] -=
                             EVENT_ARTIFACT_RESOURCE_5;
                         goto artifactPickup;
                     }
@@ -7281,7 +7281,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
                 occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
 
-            if (gbHumanPlayer[otherHero_e->m_owner] == 0) {
+            if (gbHumanPlayer[IDX(otherHero_e->m_owner)] == 0) {
                 combatResult_d = gpPhilAI->QuickCombat(
                     &eventHero->m_army,
                     eventHero,
@@ -7349,10 +7349,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveResource(eventHero, RES_GOLD, EVENT_DAEMON_GOLD);
                     break;
                 case DAEMON_REWARD_RANSOM:
-                    if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
+                    if (gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)]
                         >= EVENT_DAEMON_GOLD) {
                         if (gpPhilAI->ChooseToPayRansomOnHero(EVENT_DAEMON_GOLD)) {
-                            gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
+                            gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -=
                                 EVENT_DAEMON_GOLD;
                         } else {
                             HeroLoses(eventHero);
@@ -8126,7 +8126,7 @@ void advManager::PlayerMonsterInteract(
                 numJoining = 1;
 
             joiningCost = gMonsterDatabase[IDX(monsterType)].cost * creatureCount;
-            if (joiningCost > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+            if (joiningCost > gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)]) {
                 if (armyRatio
                     > 5.0 /* MONSTER_STRENGTH_FLEE */)
                     goto monstersFlee;
@@ -8193,7 +8193,7 @@ void advManager::PlayerMonsterInteract(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
-                gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
+                gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -= joiningCost;
                 return;
             } else {
                 EventWindow(
@@ -8321,7 +8321,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     * 0.75 /* MONSTER_AI_JOIN_COST_FRACTION */
                 );
                 if (joiningCost
-                    > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                    > gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)]) {
                     if (armyRatio > MONSTER_STRENGTH_FLEE)
                         goto computerMonstersFlee;
                     else
@@ -8336,7 +8336,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     replacementSlot
                 );
                 if (bought > 0) {
-                    gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
+                    gpGame->m_players[IDX(eventHero->m_owner)].m_resources[IDX(RES_GOLD)] -= joiningCost;
                     gpGame->GiveArmy(
                         &eventHero->m_army,
                         monsterType,
@@ -8733,10 +8733,10 @@ void advManager::SendHeroTownData(
     buffer->combatSurrender = static_cast<i8>(combatSurrender);
     buffer->firstOwner = static_cast<i8>(firstHero ? firstHero->m_owner : -1);
     buffer->firstGold =
-        firstHero ? gpGame->m_players[firstHero->m_owner].m_resources[IDX(RES_GOLD)] : 0;
+        firstHero ? gpGame->m_players[IDX(firstHero->m_owner)].m_resources[IDX(RES_GOLD)] : 0;
     buffer->secondOwner = static_cast<i8>(secondHero ? secondHero->m_owner : -1);
     buffer->secondGold =
-        secondHero ? gpGame->m_players[secondHero->m_owner].m_resources[IDX(RES_GOLD)] : 0;
+        secondHero ? gpGame->m_players[IDX(secondHero->m_owner)].m_resources[IDX(RES_GOLD)] : 0;
     memcpy(&buffer->firstArmy, firstArmy, sizeof(armyGroup));
     memcpy(&buffer->secondArmy, secondArmy, sizeof(armyGroup));
     if (combatTown)

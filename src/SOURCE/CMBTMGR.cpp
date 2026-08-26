@@ -1349,7 +1349,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         == HERO_SKILL_LEVEL_NONE) {
         firstRoll7 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
-        if (!gbHumanPlayer[m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner])
+        if (!gbHumanPlayer[IDX(m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner)])
             firstRoll7 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
             damageLevel15 = CATAPULT_DAMAGE_DOUBLE;
@@ -1361,7 +1361,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                <= HERO_SKILL_LEVEL_ADVANCED) {
         advancedRoll =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
-        if (!gbHumanPlayer[m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner])
+        if (!gbHumanPlayer[IDX(m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_owner)])
             advancedRoll -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (advancedRoll < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
             damageLevel15 = CATAPULT_DAMAGE_DOUBLE;

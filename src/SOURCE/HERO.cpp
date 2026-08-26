@@ -279,10 +279,10 @@ i32 hero::CalcMobility(void) {
     if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         movePoints += compassMobility;
 
-    if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
+    if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[IDX(m_owner)]
         && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
+        if (gpGame->m_players[IDX(m_owner)].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             movePoints += AI_STATE_MOBILITY_BONUS;
     }
     return movePoints;
@@ -555,7 +555,7 @@ void hero::Deallocate(i32 updateMap) {
         );
 
     oldOwner = m_owner;
-    playerPtr = &gpGame->m_players[m_owner];
+    playerPtr = &gpGame->m_players[IDX(m_owner)];
 
     if (updateMap)
         gpAdvManager->MobilizeCurrHero(0);
@@ -577,7 +577,7 @@ void hero::Deallocate(i32 updateMap) {
         curTown->m_occupyingHeroId = -1;
     }
 
-    if (giCurPlayer != m_owner || gpGame->m_players[m_owner].m_currentHero != m_id
+    if (giCurPlayer != m_owner || gpGame->m_players[IDX(m_owner)].m_currentHero != m_id
         || gpAdvManager->m_heroContextLocked == 0) {
         gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, NULL, 1);
     }
@@ -614,17 +614,17 @@ void hero::Deallocate(i32 updateMap) {
 
     if (gbRetreatWin) {
         availSlot = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
-        if (HAS(gpGame->m_heroRecs[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
+        if (HAS(gpGame->m_heroRecs[gpGame->m_players[IDX(m_owner)].m_availableHeroIds[availSlot]]
                     .m_eventFlags,
                 HERO_EVENT_WEEKLY_VISIT)) {
             availSlot = 1 - availSlot;
         }
-        if (gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
+        if (gpGame->m_availableHeroes[gpGame->m_players[IDX(m_owner)].m_availableHeroIds[availSlot]]
             == HERO_AVAILABILITY_RETREATED) {
-            gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]] =
+            gpGame->m_availableHeroes[gpGame->m_players[IDX(m_owner)].m_availableHeroIds[availSlot]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
-        gpGame->m_players[m_owner].m_availableHeroIds[availSlot] = m_id;
+        gpGame->m_players[IDX(m_owner)].m_availableHeroIds[availSlot] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
         m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | IDX(HERO_EVENT_WEEKLY_VISIT));
     }
@@ -864,7 +864,7 @@ void hero::CheckLevel(void) {
             m_enabled = static_cast<u8>(nLevel);
         }
 
-        if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
+        if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[IDX(m_owner)]) {
             samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
             if (choices[0] == HERO_SKILL_NONE) {
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2098,7 +2098,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
             }
         }
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));
-        if (gbThisNetHumanPlayer[m_owner]) {
+        if (gbThisNetHumanPlayer[IDX(m_owner)]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
                 "\xd2\xf0\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xc0\xed\xe4\xf3\xf0\xe0\xed\xe0 \xf7\xf3\xe4\xe5\xf1\xed\xfb\xec \xf1\xef\xee\xf1\xee\xe1\xee\xec \xee\xe1\xfa\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc \xe2 \xee\xe4\xe8\xed \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
