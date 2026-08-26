@@ -1,0 +1,259 @@
+from __future__ import annotations
+
+import json
+import importlib
+import tempfile
+import unittest
+from contextlib import redirect_stdout
+from io import StringIO
+from pathlib import Path
+from unittest import mock
+
+import clang.cindex as ci
+
+from homm2.audit.bool_fields import (
+    _boolean_domain,
+    _entries,
+    _integer_literal,
+    _merge,
+    analyze_translation_unit,
+    main,
+)
+from homm2.build.annotated_data import configure_libclang
+
+
+SOURCE = r"""
+typedef int i32;
+typedef i32 b32;
+
+struct Good {
+    i32 flag;
+    Good() : flag(0) {}
+    void Set() { flag = 1; }
+    i32 Get() const { return flag; }
+};
+
+struct BoolExpression {
+    i32 flag;
+    void Set(i32 value) { flag = value == 4; }
+};
+
+struct UnknownValue {
+    i32 flag;
+    UnknownValue() : flag(0) {}
+    void Set(i32 value) { flag = value; }
+};
+
+struct Addressed {
+    i32 flag;
+    Addressed() : flag(0) {}
+    static void Fill(i32 *);
+    void Set() { Fill(&flag); }
+};
+
+struct Updated {
+    i32 flag;
+    Updated() : flag(0) {}
+    void Set() { ++flag; }
+};
+
+struct Existing {
+    b32 flag;
+    Existing() : flag(false) {}
+};
+
+struct NeverWritten {
+    i32 value;
+};
+
+struct OneSided {
+    i32 value;
+    OneSided() : value(0) {}
+};
+"""
+
+
+def parse(repo: Path, text: str = SOURCE):
+    source = repo / "src" / "SOURCE" / "TEST.cpp"
+    source.parent.mkdir(parents=True)
+    source.write_text(text)
+    configure_libclang()
+    translation = ci.Index.create().parse(
+        str(source), args=["-x", "c++", "-std=c++20"])
+    diagnostics = [str(item) for item in translation.diagnostics
+                   if item.severity >= ci.Diagnostic.Error]
+    if diagnostics:
+        raise AssertionError(diagnostics)
+    return source, translation
+
+
+class BoolFieldAnalyzerTests(unittest.TestCase):
+    def test_integer_literal_parser_accepts_cpp_bases_and_suffixes(self):
+        self.assertEqual(_integer_literal("0"), 0)
+        self.assertEqual(_integer_literal("01U"), 1)
+        self.assertEqual(_integer_literal("0x1L"), 1)
+        self.assertEqual(_integer_literal("0b1"), 1)
+        self.assertEqual(_integer_literal("2"), 2)
+        self.assertIsNone(_integer_literal("VALUE"))
+
+    def test_analysis_requires_only_proven_boolean_writes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo)
+            fields = analyze_translation_unit(translation, source, repo)
+
+        by_name = {f"{item.record}::{item.name}": item for item in fields}
+        self.assertTrue(by_name["Good::flag"].eligible)
+        self.assertTrue(by_name["BoolExpression::flag"].eligible)
+        self.assertFalse(by_name["UnknownValue::flag"].eligible)
+        self.assertFalse(by_name["Addressed::flag"].eligible)
+        self.assertFalse(by_name["Updated::flag"].eligible)
+        self.assertFalse(by_name["NeverWritten::value"].eligible)
+        self.assertFalse(by_name["OneSided::value"].eligible)
+        self.assertEqual(by_name["Existing::flag"].declared_type, "b32")
+        self.assertFalse(by_name["Existing::flag"].eligible)
+
+        good = by_name["Good::flag"]
+        self.assertEqual({write.domain for write in good.writes}, {(0,), (1,)})
+        self.assertEqual({write.replacement for write in good.writes}, {"false", "true"})
+        self.assertEqual(good.unknown_writes, set())
+        self.assertEqual(len(good.read_locations), 1)
+
+        self.assertEqual(
+            {write.kind for write in by_name["Addressed::flag"].unknown_writes},
+            {"address-escape"},
+        )
+        self.assertEqual(
+            {write.kind for write in by_name["Updated::flag"].unknown_writes},
+            {"unary-update"},
+        )
+
+    def test_mutable_reference_argument_is_rejected(self):
+        text = r"""
+typedef int i32;
+struct Value {
+    i32 flag;
+    Value() : flag(0) {}
+    static void Mutate(i32 &);
+    void Set() { Mutate(flag); }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            facts = analyze_translation_unit(translation, source, repo)[0]
+        self.assertFalse(facts.eligible)
+        self.assertIn("mutable-reference-argument",
+                      {write.kind for write in facts.unknown_writes})
+
+    def test_boolean_domain_understands_conditionals_and_bool_results(self):
+        text = r"""
+typedef int i32;
+struct Value {
+    i32 a;
+    i32 b;
+    void Set(i32 x) {
+        a = x ? 0 : 1;
+        b = x != 0;
+    }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            fields = analyze_translation_unit(translation, source, repo)
+        self.assertEqual(len(fields), 2)
+        self.assertTrue(all(item.eligible for item in fields))
+        domains = {item.name: {write.domain for write in item.writes} for item in fields}
+        self.assertEqual(domains, {"a": {(0, 1)}, "b": {(0, 1)}})
+
+    def test_aggregate_initializers_are_mapped_by_field_position(self):
+        text = r"""
+typedef int i32;
+struct Value {
+    i32 flag;
+    i32 count;
+};
+Value values[] = {{0, 9}, {1, 10}};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            fields = analyze_translation_unit(translation, source, repo)
+        by_name = {item.name: item for item in fields}
+        self.assertTrue(by_name["flag"].eligible)
+        self.assertFalse(by_name["count"].eligible)
+        self.assertEqual(
+            {write.kind for write in by_name["flag"].writes},
+            {"aggregate-initializer"},
+        )
+
+    def test_compilation_database_rejects_wrong_worktree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "build/clangd").mkdir(parents=True)
+            (repo / "build/clangd/compile_commands.json").write_text(json.dumps([{
+                "directory": "/somewhere/else",
+                "file": "src/TEST.cpp",
+                "arguments": ["clang-cl"],
+            }]))
+            with self.assertRaisesRegex(RuntimeError, "outside this worktree"):
+                _entries(repo)
+
+    def test_merge_deduplicates_header_evidence_seen_by_multiple_tus(self):
+        declaration = {
+            "file": "include/value.h", "line": 2, "column": 9,
+            "start": 20, "end": 28,
+        }
+        type_span = {
+            "file": "include/value.h", "line": 2, "column": 5,
+            "start": 20, "end": 23,
+        }
+        write = {
+            "file": "include/value.h", "line": 3, "column": 16,
+            "start": 44, "end": 45, "kind": "assignment",
+            "expression": "1", "domain": (1,), "replacement": "true",
+        }
+        common = {
+            "usr": "field-usr", "record_usr": "record-usr", "record": "Value",
+            "name": "flag", "declared_type": "i32",
+            "declarations": [declaration], "type_spans": [type_span],
+            "writes": [write], "unknown_writes": [], "read_locations": [],
+        }
+        fields = _merge([
+            {**common, "translation_units": ["A"]},
+            {**common, "translation_units": ["B"]},
+        ])
+        self.assertEqual(len(fields), 1)
+        self.assertEqual(len(fields[0].writes), 1)
+        self.assertEqual(fields[0].translation_units, {"A", "B"})
+
+    def test_process_worker_has_a_canonical_import_identity(self):
+        worker = importlib.import_module("homm2.audit.bool_fields")._parse_batch
+        self.assertEqual(worker.__module__, "homm2.audit.bool_fields")
+
+    def test_check_exit_status_is_always_an_integer(self):
+        base = {
+            "translation_units": 1,
+            "i32_fields": 0,
+            "b32_fields": 0,
+            "eligible_fields": 0,
+            "rejected_fields": 0,
+            "candidates": [],
+            "rejected": [],
+            "b32_numeric_literal_writes": [],
+        }
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=base), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--check"]), 0)
+        dirty = {**base, "eligible_fields": 1, "candidates": [{
+            "declarations": [{"file": "include/x.h", "line": 1}],
+            "qualified_name": "X::flag", "writes": [], "read_count": 0,
+        }]}
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=dirty), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--check"]), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
