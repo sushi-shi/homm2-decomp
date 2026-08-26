@@ -179,39 +179,6 @@ i32 inBoxX = 0;
 static i32 gBlitBottom = 0;
 static i32 gBlitRight = 0;
 
-static void ApplyWalkSpeedOverride(void) {
-    const char* configured = getenv("HOMM2_WALK_SPEED");
-    if (configured == NULL || *configured == '\0')
-        return;
-
-    struct WalkSpeedOption {
-        const char* name;
-        ConfigWalkSpeed speed;
-    };
-    const WalkSpeedOption options[] = {
-        {"walk", CONFIG_WALK_SPEED_SLOWEST},
-        {"trot", CONFIG_WALK_SPEED_SLOW},
-        {"canter", CONFIG_WALK_SPEED_NORMAL},
-        {"gallop", CONFIG_WALK_SPEED_FAST},
-        {"jump", CONFIG_WALK_SPEED_INSTANT}
-    };
-
-    for (i32 index = 0; index < H2EnumIndex(CONFIG_WALK_SPEED_COUNT); ++index) {
-        char numeric[2] = {static_cast<char>('0' + index), '\0'};
-        if (strcmp(configured, options[index].name) == 0 || strcmp(configured, numeric) == 0) {
-            gConfig.walkSpeed = options[index].speed;
-            fprintf(stderr, "[homm2] movement: walk-speed=%s\n", options[index].name);
-            return;
-        }
-    }
-
-    fprintf(
-        stderr,
-        "[homm2] HOMM2_WALK_SPEED must be walk, trot, canter, gallop, jump, or 0-4; "
-        "using saved value\n"
-    );
-}
-
 class heroWindow* DataEntryWin = NULL;
 char* cDEDest = NULL;
 i32 iDEMaxLen = 0;
@@ -620,7 +587,6 @@ void ReadPrefsFromRegistry(void) {
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
-    ApplyWalkSpeedOverride();
     sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
     sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
     sprintf(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);

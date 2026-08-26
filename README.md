@@ -81,7 +81,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 - `source-gold-2.1-buka` is its generated clean source tree and the primary
   source base of `master`.
 - `classic-gold-2.1-buka` is the corresponding legacy-mangling source view,
-  stored as Windows-1251 with readable Russian literals rather than UTF-8.
+  with retail Windows-1251 string bytes rendered as readable UTF-8 Russian.
 - `master` is the cross-platform Linux, Windows, and Web port.
 - `ironfist` is the direct portability-oriented Project Ironfist integration.
 - `ironfist-master` is the maintained integration: mechanics belong to the
@@ -195,19 +195,6 @@ After setting `HOMM2_DATA`, run:
 nix run
 ```
 
-The saved PoL configuration uses a 480x360 window and Gallop movement. This
-reproduces those two choices while retaining the native renderer:
-
-```sh
-HOMM2_WINDOW_SIZE=480x360 HOMM2_WALK_SPEED=gallop nix run
-```
-
-`HOMM2_WINDOW_SIZE=<width>x<height>` overrides the initial window size.
-`HOMM2_WALK_SPEED` accepts `walk`, `trot`, `canter`, `gallop`, `jump`, or the
-corresponding value from 0 through 4. Without an override the setting is read
-from `HEROES2.CFG` in the user data directory and can be changed normally in
-System Options.
-
 ### Windows
 
 First run the source resource installer against the writable retail game
@@ -218,11 +205,12 @@ it. For Wine:
 ```sh
 nix build .#homm2-windows
 cp result/bin/HMM2PL.exe /path/to/heroes2/
-cp result/run-game.sh /path/to/heroes2/
-/path/to/heroes2/run-game.sh
+cd /path/to/heroes2
+wine HMM2PL.exe
 ```
 
-The helper creates a Wine prefix at `<game dir>/.wineprefix` on first run.
+The SDL3 port does not need retail registry keys, CD-drive mappings, or a
+special Wine prefix.
 
 ### Web
 
