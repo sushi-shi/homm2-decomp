@@ -1,23 +1,16 @@
 #ifndef HOMM2_IRONFIST_TOWNCONSTS_H
 #define HOMM2_IRONFIST_TOWNCONSTS_H
 
-#include <string>
-#include <vector>
-
 #include <Ints.h>
 #include <IRONFIST/creatures.h>
 #include <SOURCE/KB_TYPES.h>
 
-class town;
-
 namespace ironfist {
 
 /*
- * Ironfist's faction-generalized town data: dwelling creature types, dwelling
- * and special-building costs, building names, draw orders, eligible-build
- * masks and town graphics prefixes, all sized for the 13-faction table so the
- * Cyborgs (faction 12) fit. InitializeTownConstants fills the retail tables
- * from this data at startup.
+ * Ironfist's faction-generalized town data is sized for the 13-faction table
+ * so the Cyborgs (faction 12) fit. InitializeTownConstants fills the recovered
+ * engine tables from that private extension data at startup.
  */
 
 enum TownTableConstant {
@@ -74,34 +67,9 @@ enum BuildingCode {
     BUILDING_INVALID         = -1
 };
 
-struct SBuildingCost {
-    i32 wood;
-    i32 mercury;
-    i32 ore;
-    i32 sulfur;
-    i32 crystal;
-    i32 gems;
-    i32 gold;
-};
-
-extern i8 BuildingsToDraw[KB_FACTION_TABLE_CAPACITY][H2EnumIndex(BUILDING_SLOT_COUNT)];
-extern SBuildingCost SpecialBuildingCosts[KB_FACTION_TABLE_CAPACITY];
-extern SBuildingCost DwellingCosts[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT];
-extern u8 DwellingTypes[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT];
-extern u32 TownEligibleBuildMasks[KB_FACTION_TABLE_CAPACITY];
-extern const char* TownPrefixNames[KB_FACTION_TABLE_CAPACITY];
 extern i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL];
 
-b32 TownBuildingBuilt(const town* t, i32 building);
-b32 TownDwellingBuilt(const town* t, i32 index);
-i32 TownDwellingIndex(const town* t, i32 tier);
-i32 GetDwellingType(i32 faction, i32 dwellingIndex);
 char* GetDwellingName(i32 faction, i32 dwellingIndex);
-char* GetFirstLevelGrowerName(i32 faction);
-char* GetSpecialBuildingName(i32 faction);
-char* GetSpecialBuildingDesc(i32 faction);
-char* GetCyborgDwellingName(i32 faction, i32 dwelling);
-void BuildingCostToIntArray(SBuildingCost& cost, i32 (&arr)[H2EnumIndex(RES_COUNT)]);
 void InitializeTownConstants();
 
 } // namespace ironfist

@@ -33,12 +33,6 @@ void BeginMap(const char* filename) {
     script::InitializeMap(mapName);
 }
 
-void FinishMap() {
-    // Upstream resets this after the retail NewMap body, so a map's top-level
-    // script cannot change it. Preserve that ordering.
-    state::Get().adventure.allowAIArmySharing = true;
-}
-
 void AdventureManagerReady() {
     state::AdventureState& adventure = state::Get().adventure;
     if (!std::strcmp(gpGame->m_saveName, "NEWGAME") && !adventure.firstDayEventDone) {

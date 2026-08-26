@@ -50,7 +50,6 @@ inline constexpr std::array<CreatureAttribute, H2EnumIndex(CreatureAttribute::Co
         CreatureAttribute::Charger
     };
 
-extern i32 CreatureCount;
 extern std::vector<CreatureType> RandomizableCreatures;
 extern i32 CreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
 extern i32 CreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY]
@@ -74,17 +73,15 @@ extern StartingArmyRange
 extern CreatureType
     NeutralTownCreatures[KB_FACTION_TABLE_CAPACITY][NEUTRAL_TOWN_TIER_COUNT];
 
-// The playable factions, including the Cyborgs; random towns and random
-// starting factions draw from this list.
+// Random towns and starting factions draw from the playable factions,
+// including the Cyborgs.
 extern std::vector<FactionType> PlayableFactions;
-extern std::vector<std::string> PlayableFactionNames;
 
 void LoadCreatures();
 void UnloadCreatures();
 bool HasCreatureAttribute(CreatureType creature, CreatureAttribute attribute);
 char* GetCreatureName(i32 id);
 char* GetCreaturePluralName(i32 id);
-i32 GetNumCreatures();
 
 } // namespace ironfist
 

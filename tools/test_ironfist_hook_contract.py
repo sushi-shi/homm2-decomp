@@ -37,9 +37,11 @@ class IronfistHookContractTest(unittest.TestCase):
             self,
             game,
             "ironfist::runtime::BeginMap(filename);",
-            "ironfist::runtime::FinishMap();",
+            "SetAIArmySharing(true);",
             ".DisallowBuilding(",
         )
+        runtime_source = (REPOSITORY / "src/IRONFIST/runtime.cpp").read_text()
+        self.assertNotIn("allowAIArmySharing", runtime_source)
 
     def test_location_skip_preserves_normal_tail(self):
         body = function_body(

@@ -16,7 +16,7 @@ namespace ironfist {
 
 std::vector<CreatureType> RandomizableCreatures;
 
-i32 CreatureCount;
+static i32 CreatureCount;
 i32 CreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
 i32 CreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY][SECONDARY_RESOURCE_COUNT];
 static char* cArmyProjectileFileNames[KB_CREATURE_TABLE_CAPACITY];
@@ -101,10 +101,6 @@ char* GetCreatureName(i32 id) {
 
 char* GetCreaturePluralName(i32 id) {
     return gArmyNamesPlural[id];
-}
-
-i32 GetNumCreatures() {
-    return CreatureCount;
 }
 
 static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute, char** dest) {
@@ -280,11 +276,7 @@ CreatureType
 
 std::vector<FactionType> PlayableFactions = {
     FACTION_KNIGHT,   FACTION_BARBARIAN,   FACTION_SORCERESS,           FACTION_WARLOCK,
-    FACTION_WIZARD,   FACTION_NECROMANCER, static_cast<FactionType>(12)
-};
-
-std::vector<std::string> PlayableFactionNames = {
-    "Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer", "Cyborg"
+    FACTION_WIZARD,   FACTION_NECROMANCER, FACTION_CYBORG
 };
 
 void LoadCreatures() {

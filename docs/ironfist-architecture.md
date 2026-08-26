@@ -62,14 +62,15 @@ lookups in simulation and rendering paths. XML names are translated once while
 loading the creature database.
 
 The recovered `game`, `town`, `hero`, and combat layouts remain unchanged.
-Ironfist-only persistence such as vision relationships, forced chases,
-prohibited buildings, script state, and added combat state lives in the
+Ironfist-only policy and simulation data such as vision relationships, forced
+chases, prohibited buildings, and added combat state lives in the
 `ironfist::state::State` sidecar. It is accessed through `state::Get()`; there is
 no public extension-state global.
 
-Map variables use value ownership (`std::string` and nested map values). This
-removes the old shallow-copy pointer lifetime and leak hazards without changing
-the serialized XML representation.
+Lua states and map variables are owned by `ironfist::script`, not by the
+simulation sidecar. Map variables use value ownership (`std::string` and nested
+map values), removing the old shallow-copy pointer lifetime and leak hazards
+without changing the serialized XML representation.
 
 ## Compatibility invariants
 

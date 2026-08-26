@@ -38,8 +38,6 @@
 
 namespace ironfist::save {
 
-using namespace xml;
-
 i32 GetCampaignType(void) {
     if (gbInCampaign)
         return CAMPAIGN_ORIGINAL;
@@ -52,50 +50,50 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     tinyxml2::XMLNode* pRoot = tempDoc->NewElement("ironfist_save");
     tempDoc->InsertFirstChild(pRoot);
 
-    PushBack(tempDoc, pRoot, "allowAIArmySharing", gpGame->IsAIArmySharingAllowed());
-    PushBack(tempDoc, pRoot, "mapWidth", gpGame->m_worldMap.width);
-    PushBack(tempDoc, pRoot, "mapHeight", gpGame->m_worldMap.height);
-    PushBack(tempDoc, pRoot, "gameDifficulty", gpGame->m_difficultyRating);
-    PushBack(tempDoc, pRoot, "monthType", H2EnumIndex(giMonthType));
-    PushBack(tempDoc, pRoot, "monthTypeExtra", giMonthTypeExtra);
-    PushBack(tempDoc, pRoot, "weekType", H2EnumIndex(giWeekType));
-    PushBack(tempDoc, pRoot, "weekTypeExtra", giWeekTypeExtra);
-    PushBack(tempDoc, pRoot, "giMapChangeCtr", giMapChangeCtr);
-    PushBack(tempDoc, pRoot, "numPlayers", static_cast<i32>(gpGame->m_playerCount));
-    PushBack(tempDoc, pRoot, "giCurPlayer", giCurPlayer);
-    PushBack(tempDoc, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(gpGame->m_deadPlayerCount));
-    PushBack(tempDoc, pRoot, "day", gpGame->m_day);
-    PushBack(tempDoc, pRoot, "week", gpGame->m_week);
-    PushBack(tempDoc, pRoot, "month", gpGame->m_month);
-    PushBack(tempDoc, pRoot, "numObelisks", static_cast<i32>(gpGame->m_obeliskCount));
-    PushBack(tempDoc, pRoot, "ultimateArtifactLocX", static_cast<i32>(gpGame->m_ultimateArtifactX));
-    PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(gpGame->m_ultimateArtifactY));
-    PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(gpGame->m_ultimateArtifactId.value()));
-    PushBack(tempDoc, pRoot, "currentRumor", gpGame->m_rumour);
-    PushBack(tempDoc, pRoot, "numRumors", gpGame->m_rumourEventCount);
-    PushBack(tempDoc, pRoot, "numEvents", gpGame->m_timeEventCount);
-    PushBack(tempDoc, pRoot, "numMapEvents", gpGame->m_mapEventCount);
-    PushBack(tempDoc, pRoot, "iMaxMapExtra", iMaxMapExtra);
-    PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(gpGame->m_difficulty.value()));
-    PushBack(tempDoc, pRoot, "mapFilename", gpGame->m_mapFilename);
-    PushBack(tempDoc, pRoot, "relatedToNewGameSelection", static_cast<i32>(gpGame->m_selectedSetupPlayer));
-    PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(gpGame->m_newGameInitialized));
-    PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(gpGame->m_newGameHumanCount));
-    PushBack(tempDoc, pRoot, "gbIAmGreatest", gbIAmGreatest);
+    xml::PushBack(tempDoc, pRoot, "allowAIArmySharing", gpGame->IsAIArmySharingAllowed());
+    xml::PushBack(tempDoc, pRoot, "mapWidth", gpGame->m_worldMap.width);
+    xml::PushBack(tempDoc, pRoot, "mapHeight", gpGame->m_worldMap.height);
+    xml::PushBack(tempDoc, pRoot, "gameDifficulty", gpGame->m_difficultyRating);
+    xml::PushBack(tempDoc, pRoot, "monthType", H2EnumIndex(giMonthType));
+    xml::PushBack(tempDoc, pRoot, "monthTypeExtra", giMonthTypeExtra);
+    xml::PushBack(tempDoc, pRoot, "weekType", H2EnumIndex(giWeekType));
+    xml::PushBack(tempDoc, pRoot, "weekTypeExtra", giWeekTypeExtra);
+    xml::PushBack(tempDoc, pRoot, "giMapChangeCtr", giMapChangeCtr);
+    xml::PushBack(tempDoc, pRoot, "numPlayers", static_cast<i32>(gpGame->m_playerCount));
+    xml::PushBack(tempDoc, pRoot, "giCurPlayer", giCurPlayer);
+    xml::PushBack(tempDoc, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(gpGame->m_deadPlayerCount));
+    xml::PushBack(tempDoc, pRoot, "day", gpGame->m_day);
+    xml::PushBack(tempDoc, pRoot, "week", gpGame->m_week);
+    xml::PushBack(tempDoc, pRoot, "month", gpGame->m_month);
+    xml::PushBack(tempDoc, pRoot, "numObelisks", static_cast<i32>(gpGame->m_obeliskCount));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocX", static_cast<i32>(gpGame->m_ultimateArtifactX));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(gpGame->m_ultimateArtifactY));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(gpGame->m_ultimateArtifactId.value()));
+    xml::PushBack(tempDoc, pRoot, "currentRumor", gpGame->m_rumour);
+    xml::PushBack(tempDoc, pRoot, "numRumors", gpGame->m_rumourEventCount);
+    xml::PushBack(tempDoc, pRoot, "numEvents", gpGame->m_timeEventCount);
+    xml::PushBack(tempDoc, pRoot, "numMapEvents", gpGame->m_mapEventCount);
+    xml::PushBack(tempDoc, pRoot, "iMaxMapExtra", iMaxMapExtra);
+    xml::PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(gpGame->m_difficulty.value()));
+    xml::PushBack(tempDoc, pRoot, "mapFilename", gpGame->m_mapFilename);
+    xml::PushBack(tempDoc, pRoot, "relatedToNewGameSelection", static_cast<i32>(gpGame->m_selectedSetupPlayer));
+    xml::PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(gpGame->m_newGameInitialized));
+    xml::PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(gpGame->m_newGameHumanCount));
+    xml::PushBack(tempDoc, pRoot, "gbIAmGreatest", gbIAmGreatest);
     i32 campaignType = GetCampaignType();
-    PushBack(tempDoc, pRoot, "campaignType", campaignType);
+    xml::PushBack(tempDoc, pRoot, "campaignType", campaignType);
 
     tinyxml2::XMLElement* pElement;
     if (campaignType) {
         pElement = tempDoc->NewElement("campaign");
         if (campaignType == CAMPAIGN_ORIGINAL) {
-            PushBack(tempDoc, pElement, "campID", static_cast<i32>(gpGame->m_campaignType.value()));
-            PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(gpGame->m_campaignStartingSide.value()));
-            PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(gpGame->m_campaignScenario));
-            PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(gpGame->m_unknown7d));
-            PushBack(tempDoc, pElement, "campDaysPlayedCurrent", gpGame->m_campaignScore);
-            PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(gpGame->m_campaignScenarioWon));
-            PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(gpGame->m_campaignCheated));
+            xml::PushBack(tempDoc, pElement, "campID", static_cast<i32>(gpGame->m_campaignType.value()));
+            xml::PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(gpGame->m_campaignStartingSide.value()));
+            xml::PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(gpGame->m_campaignScenario));
+            xml::PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(gpGame->m_unknown7d));
+            xml::PushBack(tempDoc, pElement, "campDaysPlayedCurrent", gpGame->m_campaignScore);
+            xml::PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(gpGame->m_campaignScenarioWon));
+            xml::PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(gpGame->m_campaignCheated));
 
             WriteCampaignDDArray(
                 tempDoc, pElement, "campMapsWon", gpGame->m_campaignScenarioCompleted
@@ -111,35 +109,35 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
                 tempDoc, pElement, "campMapsPlayed", gpGame->m_campaignMapEnabled
             );
 
-            WriteArray(tempDoc, pElement, "campBonuses", gpGame->m_campaignAwards);
-            WriteArray(
+            xml::WriteArray(tempDoc, pElement, "campBonuses", gpGame->m_campaignAwards);
+            xml::WriteArray(
                 tempDoc, pElement, "campPlayerCreatures", gpGame->m_campaignCarryoverCreatureTypes
             );
-            WriteArray(
+            xml::WriteArray(
                 tempDoc, pElement, "campPlayerCreatureQuantities",
                 gpGame->m_campaignCarryoverCreatureCounts
             );
         } else if (campaignType == CAMPAIGN_EXPANSION) {
-            PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(xCampaign.m_campaignId));
-            PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(xCampaign.m_currentMap));
-            PushBack(tempDoc, pElement, "numMaps", xCampaign.m_mapCount);
-            PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(xCampaign.m_viewMap));
-            PushBack(tempDoc, pElement, "anIntVariable", xCampaign.m_viewOnly);
+            xml::PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(xCampaign.m_campaignId));
+            xml::PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(xCampaign.m_currentMap));
+            xml::PushBack(tempDoc, pElement, "numMaps", xCampaign.m_mapCount);
+            xml::PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(xCampaign.m_viewMap));
+            xml::PushBack(tempDoc, pElement, "anIntVariable", xCampaign.m_viewOnly);
 
-            WriteArray(tempDoc, pElement, "mapChoice", xCampaign.m_mapChoices);
-            WriteArray(tempDoc, pElement, "mapsPlayed", xCampaign.m_mapsPlayed);
-            WriteArray(tempDoc, pElement, "daysPlayed", xCampaign.m_mapDays);
-            WriteArray(tempDoc, pElement, "awards", xCampaign.m_awards);
-            WriteArray(tempDoc, pElement, "bonusChoices", xCampaign.m_bonusChoices);
+            xml::WriteArray(tempDoc, pElement, "mapChoice", xCampaign.m_mapChoices);
+            xml::WriteArray(tempDoc, pElement, "mapsPlayed", xCampaign.m_mapsPlayed);
+            xml::WriteArray(tempDoc, pElement, "daysPlayed", xCampaign.m_mapDays);
+            xml::WriteArray(tempDoc, pElement, "awards", xCampaign.m_awards);
+            xml::WriteArray(tempDoc, pElement, "bonusChoices", xCampaign.m_bonusChoices);
 
             // saved hero for autosaved saves
             for (auto& i : state::Get().campaign.savedHeroData) {
                 state::CampaignState::PartialHeroData* savedHero = &i.second;
                 tinyxml2::XMLElement* savedHeroElem = tempDoc->NewElement("savedHero");
                 savedHeroElem->SetAttribute("index", i.first);
-                WriteArray(tempDoc, savedHeroElem, "primarySkills", savedHero->primarySkills);
-                WriteArray(tempDoc, savedHeroElem, "skillIndex", savedHero->skillIndex);
-                WriteArray(
+                xml::WriteArray(tempDoc, savedHeroElem, "primarySkills", savedHero->primarySkills);
+                xml::WriteArray(tempDoc, savedHeroElem, "skillIndex", savedHero->skillIndex);
+                xml::WriteArray(
                     tempDoc, savedHeroElem, "secondarySkillLevel", savedHero->secondarySkillLevel
                 );
                 for (i32 j = 0; j < KB_SPELL_TABLE_CAPACITY; j++) {
@@ -149,10 +147,10 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
                         savedHeroElem->InsertEndChild(spellElem);
                     }
                 }
-                PushBack(
+                xml::PushBack(
                     tempDoc, savedHeroElem, "numSecSkillsKnown", savedHero->numSecSkillsKnown
                 );
-                PushBack(tempDoc, savedHeroElem, "experience", savedHero->experience);
+                xml::PushBack(tempDoc, savedHeroElem, "experience", savedHero->experience);
 
                 pElement->InsertEndChild(savedHeroElem);
             }
@@ -166,42 +164,42 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
 
     pElement = tempDoc->NewElement("mapHeader");
     SMapHeader* mh = &gpGame->m_mapHeader;
-    PushBack(tempDoc, pElement, "field_0", static_cast<i32>(mh->magic));
-    PushBack(
+    xml::PushBack(tempDoc, pElement, "field_0", static_cast<i32>(mh->magic));
+    xml::PushBack(
         tempDoc, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->unknown5 << 8)))
     );
-    PushBack(tempDoc, pElement, "width", static_cast<i32>(mh->width));
-    PushBack(tempDoc, pElement, "height", static_cast<i32>(mh->height));
-    PushBack(tempDoc, pElement, "numPlayers", static_cast<i32>(mh->playerCount));
-    PushBack(tempDoc, pElement, "minHumans", static_cast<i32>(mh->minHumanPlayers));
-    PushBack(tempDoc, pElement, "maxHumans", static_cast<i32>(mh->maxHumanPlayers));
-    PushBack(tempDoc, pElement, "winConditionType", static_cast<i32>(mh->victoryCondition));
-    PushBack(tempDoc, pElement, "relatedToWinConditionType", static_cast<i32>(mh->computerAlsoWins));
-    PushBack(tempDoc, pElement, "allowDefeatAllVictory", static_cast<i32>(mh->allowNormalVictory));
-    PushBack(tempDoc, pElement, "winConditionArgumentOrLocX", mh->victoryConditionValue);
-    PushBack(tempDoc, pElement, "lossConditionType", static_cast<i32>(mh->lossCondition));
-    PushBack(
+    xml::PushBack(tempDoc, pElement, "width", static_cast<i32>(mh->width));
+    xml::PushBack(tempDoc, pElement, "height", static_cast<i32>(mh->height));
+    xml::PushBack(tempDoc, pElement, "numPlayers", static_cast<i32>(mh->playerCount));
+    xml::PushBack(tempDoc, pElement, "minHumans", static_cast<i32>(mh->minHumanPlayers));
+    xml::PushBack(tempDoc, pElement, "maxHumans", static_cast<i32>(mh->maxHumanPlayers));
+    xml::PushBack(tempDoc, pElement, "winConditionType", static_cast<i32>(mh->victoryCondition));
+    xml::PushBack(tempDoc, pElement, "relatedToWinConditionType", static_cast<i32>(mh->computerAlsoWins));
+    xml::PushBack(tempDoc, pElement, "allowDefeatAllVictory", static_cast<i32>(mh->allowNormalVictory));
+    xml::PushBack(tempDoc, pElement, "winConditionArgumentOrLocX", mh->victoryConditionValue);
+    xml::PushBack(tempDoc, pElement, "lossConditionType", static_cast<i32>(mh->lossCondition));
+    xml::PushBack(
         tempDoc, pElement, "lossConditionArgumentOrLocX", static_cast<i32>((mh->lossConditionValue & 0xff))
     );
-    PushBack(tempDoc, pElement, "field_24", static_cast<i32>((mh->lossConditionValue >> 8)));
-    PushBack(tempDoc, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->unknown25));
-    PushBack(tempDoc, pElement, "winConditionArgumentOrLocY", mh->victoryTownY);
-    PushBack(tempDoc, pElement, "lossConditionArgumentOrLocY", mh->lossTownY);
-    PushBack(tempDoc, pElement, "relatedToPlayerColorOrSide", mh->victorySideThreshold);
-    PushBack(tempDoc, pElement, "name", mh->name);
-    PushBack(tempDoc, pElement, "description", mh->description);
-    PushBack(tempDoc, pElement, "field_1A0", static_cast<i32>(mh->rumourCount));
-    PushBack(tempDoc, pElement, "field_1A1", static_cast<i32>(mh->timeEventCount));
-    PushBack(tempDoc, pElement, "numRumors", static_cast<i32>(mh->rumourCount));
-    PushBack(tempDoc, pElement, "numEvents", static_cast<i32>(mh->timeEventCount));
-    WriteArray(tempDoc, pElement, "hasPlayer", mh->playerEnabled);
-    WriteArray(tempDoc, pElement, "playerMayBeHuman", mh->playerCanHuman);
-    WriteArray(tempDoc, pElement, "playerMayBeComp", mh->playerCanComputer);
-    WriteArray(tempDoc, pElement, "playerFactions", mh->playerRace);
+    xml::PushBack(tempDoc, pElement, "field_24", static_cast<i32>((mh->lossConditionValue >> 8)));
+    xml::PushBack(tempDoc, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->unknown25));
+    xml::PushBack(tempDoc, pElement, "winConditionArgumentOrLocY", mh->victoryTownY);
+    xml::PushBack(tempDoc, pElement, "lossConditionArgumentOrLocY", mh->lossTownY);
+    xml::PushBack(tempDoc, pElement, "relatedToPlayerColorOrSide", mh->victorySideThreshold);
+    xml::PushBack(tempDoc, pElement, "name", mh->name);
+    xml::PushBack(tempDoc, pElement, "description", mh->description);
+    xml::PushBack(tempDoc, pElement, "field_1A0", static_cast<i32>(mh->rumourCount));
+    xml::PushBack(tempDoc, pElement, "field_1A1", static_cast<i32>(mh->timeEventCount));
+    xml::PushBack(tempDoc, pElement, "numRumors", static_cast<i32>(mh->rumourCount));
+    xml::PushBack(tempDoc, pElement, "numEvents", static_cast<i32>(mh->timeEventCount));
+    xml::WriteArray(tempDoc, pElement, "hasPlayer", mh->playerEnabled);
+    xml::WriteArray(tempDoc, pElement, "playerMayBeHuman", mh->playerCanHuman);
+    xml::WriteArray(tempDoc, pElement, "playerMayBeComp", mh->playerCanComputer);
+    xml::WriteArray(tempDoc, pElement, "playerFactions", mh->playerRace);
     pRoot->InsertEndChild(pElement);
 
-    WriteArray(tempDoc, pRoot, "playerNames", cPlayerNames);
-    WriteArray(tempDoc, pRoot, "deadPlayers", gpGame->m_playerDead);
+    xml::WriteArray(tempDoc, pRoot, "playerNames", cPlayerNames);
+    xml::WriteArray(tempDoc, pRoot, "deadPlayers", gpGame->m_playerDead);
 
     char playerAlive[H2EnumIndex(GAME_PLAYER_COUNT)];
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); ++i) {
@@ -210,26 +208,26 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             playerAlive[i] = 0;
     }
 
-    WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
-    WriteArray(tempDoc, pRoot, "heroHireStatus", gpGame->m_availableHeroes);
-    WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", gpGame->m_setupPlayerColor);
-    WriteArray(tempDoc, pRoot, "playerHandicap", gpGame->m_playerHandicap);
-    WriteArray(tempDoc, pRoot, "newGameSelectedFaction", gpGame->m_setupPlayerRace);
-    WriteArray(
+    xml::WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
+    xml::WriteArray(tempDoc, pRoot, "heroHireStatus", gpGame->m_availableHeroes);
+    xml::WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", gpGame->m_setupPlayerColor);
+    xml::WriteArray(tempDoc, pRoot, "playerHandicap", gpGame->m_playerHandicap);
+    xml::WriteArray(tempDoc, pRoot, "newGameSelectedFaction", gpGame->m_setupPlayerRace);
+    xml::WriteArray(
         tempDoc, pRoot, "somePlayerCodeOr10IfMayBeHuman", gpGame->m_setupPlayerNetworkId
     );
-    WriteArray(tempDoc, pRoot, "somePlayerNumData", gpGame->m_setupPlayerType);
-    WriteArray(tempDoc, pRoot, "field_47C", gpGame->_pad_0x47c);
-    WriteArray(tempDoc, pRoot, "field_2773", gpGame->m_castleOwners);
-    WriteArray(tempDoc, pRoot, "builtToday", gpGame->m_dailyEventFlags);
-    WriteArray(tempDoc, pRoot, "field_60A6", gpGame->m_mineOwners);
-    WriteArray(tempDoc, pRoot, "randomArtifacts", SerializeGeneratedArtifacts());
-    WriteArray(tempDoc, pRoot, "boatBuilt", gpGame->m_boatSlots);
-    WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", gpGame->m_obeliskVisitors);
-    WriteArray(tempDoc, pRoot, "field_637D", gpGame->m_defaultPlayerNames);
-    WriteArray(tempDoc, pRoot, "rumorIndices", gpGame->m_rumourEventIndices);
-    WriteArray(tempDoc, pRoot, "eventIndices", gpGame->m_timeEventIndices);
-    WriteArray(tempDoc, pRoot, "mapEventIndices", gpGame->m_mapEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "somePlayerNumData", gpGame->m_setupPlayerType);
+    xml::WriteArray(tempDoc, pRoot, "field_47C", gpGame->_pad_0x47c);
+    xml::WriteArray(tempDoc, pRoot, "field_2773", gpGame->m_castleOwners);
+    xml::WriteArray(tempDoc, pRoot, "builtToday", gpGame->m_dailyEventFlags);
+    xml::WriteArray(tempDoc, pRoot, "field_60A6", gpGame->m_mineOwners);
+    xml::WriteArray(tempDoc, pRoot, "randomArtifacts", SerializeGeneratedArtifacts());
+    xml::WriteArray(tempDoc, pRoot, "boatBuilt", gpGame->m_boatSlots);
+    xml::WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", gpGame->m_obeliskVisitors);
+    xml::WriteArray(tempDoc, pRoot, "field_637D", gpGame->m_defaultPlayerNames);
+    xml::WriteArray(tempDoc, pRoot, "rumorIndices", gpGame->m_rumourEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "eventIndices", gpGame->m_timeEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "mapEventIndices", gpGame->m_mapEventIndices);
 
     for (i32 i = 1; i < iMaxMapExtra; i++) {
         tinyxml2::XMLElement* extraElem = tempDoc->NewElement("mapExtra");
@@ -251,44 +249,44 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         tinyxml2::XMLElement* playerElem = tempDoc->NewElement("playerData");
         playerElem->SetAttribute("index", i);
 
-        PushBack(tempDoc, playerElem, "color", static_cast<i32>(player->m_color));
-        PushBack(tempDoc, playerElem, "numHeroes", static_cast<i32>(player->m_heroCount));
-        PushBack(tempDoc, playerElem, "curHeroIdx", static_cast<i32>(player->m_currentHero));
-        PushBack(
+        xml::PushBack(tempDoc, playerElem, "color", static_cast<i32>(player->m_color));
+        xml::PushBack(tempDoc, playerElem, "numHeroes", static_cast<i32>(player->m_heroCount));
+        xml::PushBack(tempDoc, playerElem, "curHeroIdx", static_cast<i32>(player->m_currentHero));
+        xml::PushBack(
             tempDoc, playerElem, "relatedToSomeSortOfHeroCountOrIdx",
             static_cast<i32>(player->m_heroLocatorPage)
         );
-        PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
-        PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
-        PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
-        PushBack(
+        xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
+        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
+        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
+        xml::PushBack(
             tempDoc, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
         );
-        PushBack(tempDoc, playerElem, "hasEvilFaction", static_cast<i32>(player->m_evilInterface));
-        PushBack(
+        xml::PushBack(tempDoc, playerElem, "hasEvilFaction", static_cast<i32>(player->m_evilInterface));
+        xml::PushBack(
             tempDoc, playerElem, "aiNumberPuzzlePieces",
             static_cast<i32>(player->m_ultimateArtifactHintChance)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, playerElem, "aiProbableUltimateArtifactX",
             static_cast<i32>(player->m_ultimateArtifactHintX)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, playerElem, "aiProbableUltimateArtifactY",
             static_cast<i32>(player->m_ultimateArtifactHintY)
         );
-        PushBack(tempDoc, playerElem, "daysLeftWithoutCastle", static_cast<i32>(player->m_daysLeft));
-        PushBack(tempDoc, playerElem, "numCastles", static_cast<i32>(player->m_townCount));
-        PushBack(tempDoc, playerElem, "mightBeCurCastleIdx", static_cast<i32>(player->m_currentTown));
-        PushBack(tempDoc, playerElem, "relatedToUnknown", static_cast<i32>(player->m_townLocatorPage));
-        PushBack(tempDoc, playerElem, "barrierTentsVisited", static_cast<i32>(player->m_barrierTents));
+        xml::PushBack(tempDoc, playerElem, "daysLeftWithoutCastle", static_cast<i32>(player->m_daysLeft));
+        xml::PushBack(tempDoc, playerElem, "numCastles", static_cast<i32>(player->m_townCount));
+        xml::PushBack(tempDoc, playerElem, "mightBeCurCastleIdx", static_cast<i32>(player->m_currentTown));
+        xml::PushBack(tempDoc, playerElem, "relatedToUnknown", static_cast<i32>(player->m_townLocatorPage));
+        xml::PushBack(tempDoc, playerElem, "barrierTentsVisited", static_cast<i32>(player->m_barrierTents));
 
-        WriteArray(tempDoc, playerElem, "heroesOwned", player->m_heroIds);
-        WriteArray(tempDoc, playerElem, "heroesForPurchase", player->m_availableHeroIds);
-        WriteArray(tempDoc, playerElem, "castlesOwned", player->m_townIds);
-        WriteArray(tempDoc, playerElem, "resources", player->m_resources);
-        WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unknownad);
-        WriteArray(tempDoc, playerElem, "resourcesIncome", player->m_aiData.m_income);
+        xml::WriteArray(tempDoc, playerElem, "heroesOwned", player->m_heroIds);
+        xml::WriteArray(tempDoc, playerElem, "heroesForPurchase", player->m_availableHeroIds);
+        xml::WriteArray(tempDoc, playerElem, "castlesOwned", player->m_townIds);
+        xml::WriteArray(tempDoc, playerElem, "resources", player->m_resources);
+        xml::WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unknownad);
+        xml::WriteArray(tempDoc, playerElem, "resourcesIncome", player->m_aiData.m_income);
 
         pRoot->InsertEndChild(playerElem);
     }
@@ -297,34 +295,34 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         town* twn = &gpGame->m_castleRecs[i];
         tinyxml2::XMLElement* townElem = tempDoc->NewElement("town");
         townElem->SetAttribute("index", i);
-        PushBack(tempDoc, townElem, "idx", static_cast<i32>(twn->m_id));
-        PushBack(tempDoc, townElem, "ownerIdx", static_cast<i32>(twn->m_owner));
-        PushBack(tempDoc, townElem, "alignment", static_cast<i32>(twn->m_threat));
-        PushBack(tempDoc, townElem, "factionID", static_cast<i32>(twn->m_type.value()));
-        PushBack(tempDoc, townElem, "x", static_cast<i32>(twn->m_x));
-        PushBack(tempDoc, townElem, "y", static_cast<i32>(twn->m_y));
-        PushBack(tempDoc, townElem, "buildDockRelated", static_cast<i32>(twn->m_boatX));
-        PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
-        PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
-        PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
-        PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
-        PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
-        PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
-        PushBack(
+        xml::PushBack(tempDoc, townElem, "idx", static_cast<i32>(twn->m_id));
+        xml::PushBack(tempDoc, townElem, "ownerIdx", static_cast<i32>(twn->m_owner));
+        xml::PushBack(tempDoc, townElem, "alignment", static_cast<i32>(twn->m_threat));
+        xml::PushBack(tempDoc, townElem, "factionID", static_cast<i32>(twn->m_type.value()));
+        xml::PushBack(tempDoc, townElem, "x", static_cast<i32>(twn->m_x));
+        xml::PushBack(tempDoc, townElem, "y", static_cast<i32>(twn->m_y));
+        xml::PushBack(tempDoc, townElem, "buildDockRelated", static_cast<i32>(twn->m_boatX));
+        xml::PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
+        xml::PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
+        xml::PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
+        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
+        xml::PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
+        xml::PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
+        xml::PushBack(
             tempDoc, townElem, "mayNotBeUpgradedToCastle", static_cast<i32>(twn->m_mayNotUpgradeToCastle)
         );
-        PushBack(tempDoc, townElem, "field_38", static_cast<i32>(twn->m_formation));
-        PushBack(tempDoc, townElem, "playerPos", static_cast<i32>(twn->m_originalOwner));
-        PushBack(tempDoc, townElem, "extraIdx", twn->m_extraIndex);
-        PushBack(tempDoc, townElem, "field_55", static_cast<i32>((twn->m_turnsOwned & 0xff)));
-        PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
-        PushBack(tempDoc, townElem, "name", twn->m_name);
+        xml::PushBack(tempDoc, townElem, "field_38", static_cast<i32>(twn->m_formation));
+        xml::PushBack(tempDoc, townElem, "playerPos", static_cast<i32>(twn->m_originalOwner));
+        xml::PushBack(tempDoc, townElem, "extraIdx", twn->m_extraIndex);
+        xml::PushBack(tempDoc, townElem, "field_55", static_cast<i32>((twn->m_turnsOwned & 0xff)));
+        xml::PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
+        xml::PushBack(tempDoc, townElem, "name", twn->m_name);
 
-        WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
+        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
             numSpellsOfLevel[j] = twn->m_spellCounts[j + TOWN_MAGE_GUILD_FIRST_LEVEL];
-        WriteArray(tempDoc, townElem, "numSpellsOfLevel", numSpellsOfLevel);
+        xml::WriteArray(tempDoc, townElem, "numSpellsOfLevel", numSpellsOfLevel);
 
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL;
              j++) {
@@ -439,64 +437,64 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         hero* hro = &gpGame->m_heroRecs[i];
         tinyxml2::XMLElement* heroElement = tempDoc->NewElement("hero");
         heroElement->SetAttribute("index", i);
-        PushBack(tempDoc, heroElement, "idx", static_cast<i32>(hro->m_id));
-        PushBack(tempDoc, heroElement, "spellpoints", hro->m_spellPoints);
-        PushBack(tempDoc, heroElement, "ownerIdx", static_cast<i32>(hro->m_owner));
-        PushBack(
+        xml::PushBack(tempDoc, heroElement, "idx", static_cast<i32>(hro->m_id));
+        xml::PushBack(tempDoc, heroElement, "spellpoints", hro->m_spellPoints);
+        xml::PushBack(tempDoc, heroElement, "ownerIdx", static_cast<i32>(hro->m_owner));
+        xml::PushBack(
             tempDoc, heroElement, "aiLastHeroInteractionTurn", hro->m_lastHeroInteractionTurn
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, heroElement, "aiLastHeroInteractionIdx", static_cast<i32>(hro->m_lastInteractionHeroId)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, heroElement, "aiLastTownInteractionTurn", hro->m_lastTownInteractionTurn
         );
-        PushBack(tempDoc, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_visitedTownId));
-        PushBack(tempDoc, heroElement, "name", hro->m_name);
-        PushBack(tempDoc, heroElement, "experience", hro->m_experience);
-        PushBack(tempDoc, heroElement, "factionID", static_cast<i32>(hro->m_cursorType.value()));
-        PushBack(tempDoc, heroElement, "heroID", static_cast<i32>(hro->m_portrait.value()));
-        PushBack(tempDoc, heroElement, "x", hro->m_x);
-        PushBack(tempDoc, heroElement, "y", hro->m_y);
-        PushBack(tempDoc, heroElement, "aiTargetX", hro->m_destinationX);
-        PushBack(tempDoc, heroElement, "aiTargetY", hro->m_destinationY);
-        PushBack(tempDoc, heroElement, "aiPatrolX", static_cast<i32>(hro->m_patrolX));
-        PushBack(tempDoc, heroElement, "aiPatrolY", static_cast<i32>(hro->m_patrolY));
-        PushBack(tempDoc, heroElement, "patrolDistance", static_cast<i32>(hro->m_patrolRadius));
-        PushBack(tempDoc, heroElement, "directionFacing", static_cast<i32>(hro->m_direction.value()));
-        PushBack(tempDoc, heroElement, "occupiedObjType", static_cast<i32>(hro->m_locationType.value()));
-        PushBack(tempDoc, heroElement, "occupiedObjVal", hro->m_occupiedTown);
-        PushBack(tempDoc, heroElement, "mobility", hro->m_mobility);
-        PushBack(tempDoc, heroElement, "remainingMobility", hro->m_remainingMobility);
-        PushBack(tempDoc, heroElement, "oldLevel", hro->m_level);
-        PushBack(tempDoc, heroElement, "attack", static_cast<i32>(hro->m_primaryStats[0]));
-        PushBack(tempDoc, heroElement, "defense", static_cast<i32>(hro->m_primaryStats[1]));
-        PushBack(tempDoc, heroElement, "spellpower", static_cast<i32>(hro->m_primaryStats[2]));
-        PushBack(tempDoc, heroElement, "knowledge", static_cast<i32>(hro->m_primaryStats[3]));
-        PushBack(tempDoc, heroElement, "field_43", static_cast<i32>(hro->m_primaryStats[4]));
-        PushBack(tempDoc, heroElement, "tempMoraleBonuses", static_cast<i32>(hro->m_morale));
-        PushBack(tempDoc, heroElement, "tempLuckBonuses", static_cast<i32>(hro->m_luck));
-        PushBack(tempDoc, heroElement, "gazeboesVisited", static_cast<i32>(hro->m_gazeboVisits));
-        PushBack(tempDoc, heroElement, "fortsVisited", static_cast<i32>(hro->m_fortVisits));
-        PushBack(
+        xml::PushBack(tempDoc, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_visitedTownId));
+        xml::PushBack(tempDoc, heroElement, "name", hro->m_name);
+        xml::PushBack(tempDoc, heroElement, "experience", hro->m_experience);
+        xml::PushBack(tempDoc, heroElement, "factionID", static_cast<i32>(hro->m_cursorType.value()));
+        xml::PushBack(tempDoc, heroElement, "heroID", static_cast<i32>(hro->m_portrait.value()));
+        xml::PushBack(tempDoc, heroElement, "x", hro->m_x);
+        xml::PushBack(tempDoc, heroElement, "y", hro->m_y);
+        xml::PushBack(tempDoc, heroElement, "aiTargetX", hro->m_destinationX);
+        xml::PushBack(tempDoc, heroElement, "aiTargetY", hro->m_destinationY);
+        xml::PushBack(tempDoc, heroElement, "aiPatrolX", static_cast<i32>(hro->m_patrolX));
+        xml::PushBack(tempDoc, heroElement, "aiPatrolY", static_cast<i32>(hro->m_patrolY));
+        xml::PushBack(tempDoc, heroElement, "patrolDistance", static_cast<i32>(hro->m_patrolRadius));
+        xml::PushBack(tempDoc, heroElement, "directionFacing", static_cast<i32>(hro->m_direction.value()));
+        xml::PushBack(tempDoc, heroElement, "occupiedObjType", static_cast<i32>(hro->m_locationType.value()));
+        xml::PushBack(tempDoc, heroElement, "occupiedObjVal", hro->m_occupiedTown);
+        xml::PushBack(tempDoc, heroElement, "mobility", hro->m_mobility);
+        xml::PushBack(tempDoc, heroElement, "remainingMobility", hro->m_remainingMobility);
+        xml::PushBack(tempDoc, heroElement, "oldLevel", hro->m_level);
+        xml::PushBack(tempDoc, heroElement, "attack", static_cast<i32>(hro->m_primaryStats[0]));
+        xml::PushBack(tempDoc, heroElement, "defense", static_cast<i32>(hro->m_primaryStats[1]));
+        xml::PushBack(tempDoc, heroElement, "spellpower", static_cast<i32>(hro->m_primaryStats[2]));
+        xml::PushBack(tempDoc, heroElement, "knowledge", static_cast<i32>(hro->m_primaryStats[3]));
+        xml::PushBack(tempDoc, heroElement, "field_43", static_cast<i32>(hro->m_primaryStats[4]));
+        xml::PushBack(tempDoc, heroElement, "tempMoraleBonuses", static_cast<i32>(hro->m_morale));
+        xml::PushBack(tempDoc, heroElement, "tempLuckBonuses", static_cast<i32>(hro->m_luck));
+        xml::PushBack(tempDoc, heroElement, "gazeboesVisited", static_cast<i32>(hro->m_gazeboVisits));
+        xml::PushBack(tempDoc, heroElement, "fortsVisited", static_cast<i32>(hro->m_fortVisits));
+        xml::PushBack(
             tempDoc, heroElement, "witchDoctorHutsVisited", static_cast<i32>(hro->m_witchDoctorVisits)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, heroElement, "mercenaryCampsVisited", static_cast<i32>(hro->m_mercenaryCampVisits)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, heroElement, "standingStonesVisited", static_cast<i32>(hro->m_standingStoneVisits)
         );
-        PushBack(
+        xml::PushBack(
             tempDoc, heroElement, "treesOfKnowledgeVisited", static_cast<i32>(hro->m_treeKnowledgeVisits)
         );
-        PushBack(tempDoc, heroElement, "xanadusVisited", static_cast<i32>(hro->m_xanaduVisits));
-        PushBack(tempDoc, heroElement, "randomSeed", static_cast<i32>(hro->m_randomSeed));
-        PushBack(tempDoc, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_enabled));
-        PushBack(tempDoc, heroElement, "numSecSkillsKnown", hro->m_secondarySkillCount);
-        PushBack(tempDoc, heroElement, "flags", H2EnumIndex(hro->m_eventFlags));
-        PushBack(tempDoc, heroElement, "isCaptain", static_cast<i32>(hro->m_isCaptain));
-        PushBack(tempDoc, heroElement, "aiParamFV", hro->m_aiFightValue);
+        xml::PushBack(tempDoc, heroElement, "xanadusVisited", static_cast<i32>(hro->m_xanaduVisits));
+        xml::PushBack(tempDoc, heroElement, "randomSeed", static_cast<i32>(hro->m_randomSeed));
+        xml::PushBack(tempDoc, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_enabled));
+        xml::PushBack(tempDoc, heroElement, "numSecSkillsKnown", hro->m_secondarySkillCount);
+        xml::PushBack(tempDoc, heroElement, "flags", H2EnumIndex(hro->m_eventFlags));
+        xml::PushBack(tempDoc, heroElement, "isCaptain", static_cast<i32>(hro->m_isCaptain));
+        xml::PushBack(tempDoc, heroElement, "aiParamFV", hro->m_aiFightValue);
 
         for (i32 j = 0; j < ARMY_GROUP_SLOT_COUNT; j++) {
             tinyxml2::XMLElement* armyElem = tempDoc->NewElement("army");
@@ -548,7 +546,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     WriteMapVariables(pRoot);
     std::string script = script::ScriptContents(gMapName);
     if (script.length())
-        PushBack(tempDoc, pRoot, "script", script.c_str());
+        xml::PushBack(tempDoc, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
     return tempDoc->SaveFile(path.c_str());
 }
@@ -648,13 +646,13 @@ void XmlFile::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
         if (campaignType == CAMPAIGN_ORIGINAL) {
             i32 campId = elem->IntAttribute("campID");
             i32 mapId = elem->IntAttribute("mapID");
-            if (name == "campID") QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignType));
-            else if (name == "campIDanother") QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignStartingSide));
-            else if (name == "campMapID") QueryCharText(elem, &gpGame->m_campaignScenario);
-            else if (name == "campUnknown") QueryCharText(elem, &gpGame->m_unknown7d);
-            else if (name == "campDaysPlayedCurrent") QueryShortText(elem, &gpGame->m_campaignScore);
-            else if (name == "campMaybeWon") QueryCharText(elem, &gpGame->m_campaignScenarioWon);
-            else if (name == "campHasCheated") QueryCharText(elem, &gpGame->m_campaignCheated);
+            if (name == "campID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignType));
+            else if (name == "campIDanother") xml::QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignStartingSide));
+            else if (name == "campMapID") xml::QueryCharText(elem, &gpGame->m_campaignScenario);
+            else if (name == "campUnknown") xml::QueryCharText(elem, &gpGame->m_unknown7d);
+            else if (name == "campDaysPlayedCurrent") xml::QueryShortText(elem, &gpGame->m_campaignScore);
+            else if (name == "campMaybeWon") xml::QueryCharText(elem, &gpGame->m_campaignScenarioWon);
+            else if (name == "campHasCheated") xml::QueryCharText(elem, &gpGame->m_campaignCheated);
             else if (name == "campMapsWon") gpGame->m_campaignScenarioCompleted[campId][mapId] = value;
             else if (name == "campDaysPlayed") gpGame->m_campaignScenarioBonus[campId][mapId] = static_cast<i16>(value);
             else if (name == "campDaysPlayed2") gpGame->m_campaignScenarioDays[campId][mapId] = static_cast<i16>(value);
@@ -717,16 +715,16 @@ void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root) {
             mh->difficulty = static_cast<u8>(intValue & 0xff);
             mh->unknown5 = static_cast<u8>((intValue >> 8) & 0xff);
         }
-        else if (name == "width") QueryCharText(elem, &mh->width);
-        else if (name == "height") QueryCharText(elem, &mh->height);
-        else if (name == "numPlayers") QueryCharText(elem, &mh->playerCount);
-        else if (name == "minHumans") QueryCharText(elem, &mh->minHumanPlayers);
-        else if (name == "maxHumans") QueryCharText(elem, &mh->maxHumanPlayers);
-        else if (name == "winConditionType") QueryCharText(elem, reinterpret_cast<u8*>(&mh->victoryCondition));
-        else if (name == "relatedToWinConditionType") QueryCharText(elem, &mh->computerAlsoWins);
-        else if (name == "allowDefeatAllVictory") QueryCharText(elem, &mh->allowNormalVictory);
-        else if (name == "winConditionArgumentOrLocX") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryConditionValue));
-        else if (name == "lossConditionType") QueryCharText(elem, reinterpret_cast<u8*>(&mh->lossCondition));
+        else if (name == "width") xml::QueryCharText(elem, &mh->width);
+        else if (name == "height") xml::QueryCharText(elem, &mh->height);
+        else if (name == "numPlayers") xml::QueryCharText(elem, &mh->playerCount);
+        else if (name == "minHumans") xml::QueryCharText(elem, &mh->minHumanPlayers);
+        else if (name == "maxHumans") xml::QueryCharText(elem, &mh->maxHumanPlayers);
+        else if (name == "winConditionType") xml::QueryCharText(elem, reinterpret_cast<u8*>(&mh->victoryCondition));
+        else if (name == "relatedToWinConditionType") xml::QueryCharText(elem, &mh->computerAlsoWins);
+        else if (name == "allowDefeatAllVictory") xml::QueryCharText(elem, &mh->allowNormalVictory);
+        else if (name == "winConditionArgumentOrLocX") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryConditionValue));
+        else if (name == "lossConditionType") xml::QueryCharText(elem, reinterpret_cast<u8*>(&mh->lossCondition));
         else if (name == "lossConditionArgumentOrLocX") {
             elem->QueryIntText(&intValue);
             lossValueLow = intValue & 0xff;
@@ -735,14 +733,14 @@ void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root) {
             elem->QueryIntText(&intValue);
             lossValueHigh = intValue & 0xff;
         }
-        else if (name == "noStartingHeroInCastle") QueryCharText(elem, &mh->unknown25);
-        else if (name == "winConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryTownY));
-        else if (name == "lossConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->lossTownY));
-        else if (name == "relatedToPlayerColorOrSide") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victorySideThreshold));
-        else if (name == "name") QueryText(elem, mh->name);
-        else if (name == "description") QueryText(elem, mh->description);
-        else if (name == "field_1A0") QueryCharText(elem, &mh->rumourCount);
-        else if (name == "field_1A1") QueryCharText(elem, &mh->timeEventCount);
+        else if (name == "noStartingHeroInCastle") xml::QueryCharText(elem, &mh->unknown25);
+        else if (name == "winConditionArgumentOrLocY") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryTownY));
+        else if (name == "lossConditionArgumentOrLocY") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->lossTownY));
+        else if (name == "relatedToPlayerColorOrSide") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->victorySideThreshold));
+        else if (name == "name") xml::QueryText(elem, mh->name);
+        else if (name == "description") xml::QueryText(elem, mh->description);
+        else if (name == "field_1A0") xml::QueryCharText(elem, &mh->rumourCount);
+        else if (name == "field_1A1") xml::QueryCharText(elem, &mh->timeEventCount);
         else if (name == "hasPlayer") mh->playerEnabled[index] = value;
         else if (name == "playerMayBeHuman") mh->playerCanHuman[index] = value;
         else if (name == "playerMayBeComp") mh->playerCanComputer[index] = value;
@@ -830,27 +828,27 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
-        if (name == "color") QueryCharText(elem, &pdata->m_color);
-        else if (name == "numHeroes") QueryCharText(elem, &pdata->m_heroCount);
-        else if (name == "curHeroIdx") QueryCharText(elem, &pdata->m_currentHero);
-        else if (name == "relatedToSomeSortOfHeroCountOrIdx") QueryCharText(elem, &pdata->m_heroLocatorPage);
-        else if (name == "hasCheated") QueryCharText(elem, &gpGame->m_cheated);
-        else if (name == "puzzlePieces") QueryCharText(elem, &pdata->m_cheatValue);
+        if (name == "color") xml::QueryCharText(elem, &pdata->m_color);
+        else if (name == "numHeroes") xml::QueryCharText(elem, &pdata->m_heroCount);
+        else if (name == "curHeroIdx") xml::QueryCharText(elem, &pdata->m_currentHero);
+        else if (name == "relatedToSomeSortOfHeroCountOrIdx") xml::QueryCharText(elem, &pdata->m_heroLocatorPage);
+        else if (name == "hasCheated") xml::QueryCharText(elem, &gpGame->m_cheated);
+        else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_cheatValue);
         else if (name == "personality") {
             i32 personality;
             elem->QueryIntText(&personality);
             pdata->m_aiDifficulty = static_cast<PlayerPersonality>(personality);
         }
-        else if (name == "relatedToMaxOrNumHeroes") QueryCharText(elem, &pdata->m_minimumHeroCount);
-        else if (name == "hasEvilFaction") QueryCharText(elem, &pdata->m_evilInterface);
-        else if (name == "aiNumberPuzzlePieces") QueryCharText(elem, &pdata->m_ultimateArtifactHintChance);
-        else if (name == "aiProbableUltimateArtifactX") QueryCharText(elem, &pdata->m_ultimateArtifactHintX);
-        else if (name == "aiProbableUltimateArtifactY") QueryCharText(elem, &pdata->m_ultimateArtifactHintY);
-        else if (name == "daysLeftWithoutCastle") QueryCharText(elem, &pdata->m_daysLeft);
-        else if (name == "numCastles") QueryCharText(elem, &pdata->m_townCount);
-        else if (name == "mightBeCurCastleIdx") QueryCharText(elem, &pdata->m_currentTown);
-        else if (name == "relatedToUnknown") QueryCharText(elem, &pdata->m_townLocatorPage);
-        else if (name == "barrierTentsVisited") QueryCharText(elem, &pdata->m_barrierTents);
+        else if (name == "relatedToMaxOrNumHeroes") xml::QueryCharText(elem, &pdata->m_minimumHeroCount);
+        else if (name == "hasEvilFaction") xml::QueryCharText(elem, &pdata->m_evilInterface);
+        else if (name == "aiNumberPuzzlePieces") xml::QueryCharText(elem, &pdata->m_ultimateArtifactHintChance);
+        else if (name == "aiProbableUltimateArtifactX") xml::QueryCharText(elem, &pdata->m_ultimateArtifactHintX);
+        else if (name == "aiProbableUltimateArtifactY") xml::QueryCharText(elem, &pdata->m_ultimateArtifactHintY);
+        else if (name == "daysLeftWithoutCastle") xml::QueryCharText(elem, &pdata->m_daysLeft);
+        else if (name == "numCastles") xml::QueryCharText(elem, &pdata->m_townCount);
+        else if (name == "mightBeCurCastleIdx") xml::QueryCharText(elem, &pdata->m_currentTown);
+        else if (name == "relatedToUnknown") xml::QueryCharText(elem, &pdata->m_townLocatorPage);
+        else if (name == "barrierTentsVisited") xml::QueryCharText(elem, &pdata->m_barrierTents);
         else if (name == "heroesOwned") pdata->m_heroIds[index] = value;
         else if (name == "heroesForPurchase") pdata->m_availableHeroIds[index] = value;
         else if (name == "castlesOwned") pdata->m_townIds[index] = value;
@@ -876,41 +874,41 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
-        if (name == "idx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_id));
-        else if (name == "spellpoints") QueryShortText(elem, &hro->m_spellPoints);
-        else if (name == "ownerIdx") QueryCharText(elem, &hro->m_owner);
-        else if (name == "aiLastHeroInteractionTurn") QueryShortText(elem, &hro->m_lastHeroInteractionTurn);
-        else if (name == "aiLastHeroInteractionIdx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_lastInteractionHeroId));
-        else if (name == "aiLastTownInteractionTurn") QueryShortText(elem, &hro->m_lastTownInteractionTurn);
-        else if (name == "aiLastTownInteractionIdx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_visitedTownId));
-        else if (name == "name") QueryText(elem, hro->m_name);
+        if (name == "idx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_id));
+        else if (name == "spellpoints") xml::QueryShortText(elem, &hro->m_spellPoints);
+        else if (name == "ownerIdx") xml::QueryCharText(elem, &hro->m_owner);
+        else if (name == "aiLastHeroInteractionTurn") xml::QueryShortText(elem, &hro->m_lastHeroInteractionTurn);
+        else if (name == "aiLastHeroInteractionIdx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_lastInteractionHeroId));
+        else if (name == "aiLastTownInteractionTurn") xml::QueryShortText(elem, &hro->m_lastTownInteractionTurn);
+        else if (name == "aiLastTownInteractionIdx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_visitedTownId));
+        else if (name == "name") xml::QueryText(elem, hro->m_name);
         else if (name == "experience") elem->QueryIntText(&hro->m_experience);
-        else if (name == "factionID") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_cursorType));
-        else if (name == "heroID") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_portrait));
+        else if (name == "factionID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_cursorType));
+        else if (name == "heroID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_portrait));
         else if (name == "x") elem->QueryIntText(&hro->m_x);
         else if (name == "y") elem->QueryIntText(&hro->m_y);
         else if (name == "aiTargetX") elem->QueryIntText(&hro->m_destinationX);
         else if (name == "aiTargetY") elem->QueryIntText(&hro->m_destinationY);
-        else if (name == "aiPatrolX") QueryCharText(elem, &hro->m_patrolX);
-        else if (name == "aiPatrolY") QueryCharText(elem, &hro->m_patrolY);
-        else if (name == "patrolDistance") QueryCharText(elem, &hro->m_patrolRadius);
-        else if (name == "directionFacing") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_direction));
+        else if (name == "aiPatrolX") xml::QueryCharText(elem, &hro->m_patrolX);
+        else if (name == "aiPatrolY") xml::QueryCharText(elem, &hro->m_patrolY);
+        else if (name == "patrolDistance") xml::QueryCharText(elem, &hro->m_patrolRadius);
+        else if (name == "directionFacing") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_direction));
         else if (name == "occupiedObjType") {
             i16 locationType;
-            QueryShortText(elem, &locationType);
+            xml::QueryShortText(elem, &locationType);
             hro->m_locationType = locationType;
         }
-        else if (name == "occupiedObjVal") QueryShortText(elem, &hro->m_occupiedTown);
+        else if (name == "occupiedObjVal") xml::QueryShortText(elem, &hro->m_occupiedTown);
         else if (name == "mobility") elem->QueryIntText(&hro->m_mobility);
         else if (name == "remainingMobility") elem->QueryIntText(&hro->m_remainingMobility);
-        else if (name == "oldLevel") QueryShortText(elem, &hro->m_level);
-        else if (name == "attack") QueryCharText(elem, &hro->m_primaryStats[0]);
-        else if (name == "defense") QueryCharText(elem, &hro->m_primaryStats[1]);
-        else if (name == "spellpower") QueryCharText(elem, &hro->m_primaryStats[2]);
-        else if (name == "knowledge") QueryCharText(elem, &hro->m_primaryStats[3]);
-        else if (name == "field_43") QueryCharText(elem, &hro->m_primaryStats[4]);
-        else if (name == "tempMoraleBonuses") QueryCharText(elem, &hro->m_morale);
-        else if (name == "tempLuckBonuses") QueryCharText(elem, &hro->m_luck);
+        else if (name == "oldLevel") xml::QueryShortText(elem, &hro->m_level);
+        else if (name == "attack") xml::QueryCharText(elem, &hro->m_primaryStats[0]);
+        else if (name == "defense") xml::QueryCharText(elem, &hro->m_primaryStats[1]);
+        else if (name == "spellpower") xml::QueryCharText(elem, &hro->m_primaryStats[2]);
+        else if (name == "knowledge") xml::QueryCharText(elem, &hro->m_primaryStats[3]);
+        else if (name == "field_43") xml::QueryCharText(elem, &hro->m_primaryStats[4]);
+        else if (name == "tempMoraleBonuses") xml::QueryCharText(elem, &hro->m_morale);
+        else if (name == "tempLuckBonuses") xml::QueryCharText(elem, &hro->m_luck);
         else if (name == "gazeboesVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_gazeboVisits));
         else if (name == "fortsVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_fortVisits));
         else if (name == "witchDoctorHutsVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_witchDoctorVisits));
@@ -918,14 +916,14 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "standingStonesVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_standingStoneVisits));
         else if (name == "treesOfKnowledgeVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_treeKnowledgeVisits));
         else if (name == "xanadusVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_xanaduVisits));
-        else if (name == "randomSeed") QueryCharText(elem, &hro->m_randomSeed);
-        else if (name == "wisdomLastOffered") QueryCharText(elem, &hro->m_enabled);
+        else if (name == "randomSeed") xml::QueryCharText(elem, &hro->m_randomSeed);
+        else if (name == "wisdomLastOffered") xml::QueryCharText(elem, &hro->m_enabled);
         else if (name == "flags") {
             i32 flags;
             elem->QueryIntText(&flags);
             hro->m_eventFlags = static_cast<HeroEventFlag>(flags);
         }
-        else if (name == "isCaptain") QueryCharText(elem, &hro->m_isCaptain);
+        else if (name == "isCaptain") xml::QueryCharText(elem, &hro->m_isCaptain);
         else if (name == "aiParamFV") elem->QueryFloatText(&hro->m_aiFightValue);
         else if (name == "army") {
             hro->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
@@ -957,38 +955,38 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
-        if (name == "idx") QueryCharText(elem, &twn->m_id);
-        else if (name == "ownerIdx") QueryCharText(elem, &twn->m_owner);
-        else if (name == "alignment") QueryCharText(elem, &twn->m_threat);
-        else if (name == "factionID") QueryCharText(elem, reinterpret_cast<char*>(&twn->m_type));
-        else if (name == "x") QueryCharText(elem, &twn->m_x);
-        else if (name == "y") QueryCharText(elem, &twn->m_y);
-        else if (name == "buildDockRelated") QueryCharText(elem, &twn->m_boatX);
-        else if (name == "boatCell") QueryCharText(elem, &twn->m_boatY);
-        else if (name == "visitingHeroIdx") QueryCharText(elem, &twn->m_occupyingHeroId);
+        if (name == "idx") xml::QueryCharText(elem, &twn->m_id);
+        else if (name == "ownerIdx") xml::QueryCharText(elem, &twn->m_owner);
+        else if (name == "alignment") xml::QueryCharText(elem, &twn->m_threat);
+        else if (name == "factionID") xml::QueryCharText(elem, reinterpret_cast<char*>(&twn->m_type));
+        else if (name == "x") xml::QueryCharText(elem, &twn->m_x);
+        else if (name == "y") xml::QueryCharText(elem, &twn->m_y);
+        else if (name == "buildDockRelated") xml::QueryCharText(elem, &twn->m_boatX);
+        else if (name == "boatCell") xml::QueryCharText(elem, &twn->m_boatY);
+        else if (name == "visitingHeroIdx") xml::QueryCharText(elem, &twn->m_occupyingHeroId);
         else if (name == "buildingsBuiltFlags") {
             u32 buildings;
             elem->QueryUnsignedText(&buildings);
             twn->m_buildings = buildings;
         }
-        else if (name == "mageGuildLevel") QueryCharText(elem, &twn->m_buildState);
-        else if (name == "field_1D") QueryCharText(elem, &twn->m_unknown1d);
-        else if (name == "exists") QueryCharText(elem, &twn->m_onMap);
-        else if (name == "mayNotBeUpgradedToCastle") QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
-        else if (name == "field_38") QueryCharText(elem, &twn->m_formation);
-        else if (name == "playerPos") QueryCharText(elem, &twn->m_originalOwner);
-        else if (name == "extraIdx") QueryShortText(elem, reinterpret_cast<i16*>(&twn->m_extraIndex));
+        else if (name == "mageGuildLevel") xml::QueryCharText(elem, &twn->m_buildState);
+        else if (name == "field_1D") xml::QueryCharText(elem, &twn->m_unknown1d);
+        else if (name == "exists") xml::QueryCharText(elem, &twn->m_onMap);
+        else if (name == "mayNotBeUpgradedToCastle") xml::QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
+        else if (name == "field_38") xml::QueryCharText(elem, &twn->m_formation);
+        else if (name == "playerPos") xml::QueryCharText(elem, &twn->m_originalOwner);
+        else if (name == "extraIdx") xml::QueryShortText(elem, reinterpret_cast<i16*>(&twn->m_extraIndex));
         else if (name == "field_55") {
             i16 low;
-            QueryShortText(elem, &low);
+            xml::QueryShortText(elem, &low);
             turnsOwnedLow = low & 0xff;
         }
         else if (name == "field_63") {
             i16 high;
-            QueryShortText(elem, &high);
+            xml::QueryShortText(elem, &high);
             turnsOwnedHigh = high & 0xff;
         }
-        else if (name == "name") QueryText(elem, twn->m_name);
+        else if (name == "name") xml::QueryText(elem, twn->m_name);
         else if (name == "garrisonCreature") {
             twn->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
             twn->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
@@ -1036,7 +1034,7 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             elem->QueryIntText(&gpGame->m_worldMap.height);
             gpGame->SetMapSize(gpGame->m_worldMap.width, gpGame->m_worldMap.height);
         }
-        else if (name == "gameDifficulty") QueryShortText(elem, &gpGame->m_difficultyRating);
+        else if (name == "gameDifficulty") xml::QueryShortText(elem, &gpGame->m_difficultyRating);
         else if (name == "monthType") {
             i32 monthType;
             elem->QueryIntText(&monthType);
@@ -1053,20 +1051,20 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             gpAdvManager->PurgeMapChangeQueue();
             elem->QueryIntText(&giMapChangeCtr);
         }
-        else if (name == "numPlayers") QueryCharText(elem, &gpGame->m_playerCount);
+        else if (name == "numPlayers") xml::QueryCharText(elem, &gpGame->m_playerCount);
         else if (name == "giCurPlayer") elem->QueryIntText(&giCurPlayer);
-        else if (name == "couldBeNumDefeatedPlayers") QueryCharText(elem, &gpGame->m_deadPlayerCount);
-        else if (name == "day") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_day));
-        else if (name == "week") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_week));
-        else if (name == "month") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_month));
-        else if (name == "numObelisks") QueryCharText(elem, &gpGame->m_obeliskCount);
-        else if (name == "ultimateArtifactLocX") QueryCharText(elem, &gpGame->m_ultimateArtifactX);
-        else if (name == "ultimateArtifactLocY") QueryCharText(elem, &gpGame->m_ultimateArtifactY);
-        else if (name == "ultimateArtifactIdx") QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_ultimateArtifactId));
-        else if (name == "currentRumor") QueryText(elem, gpGame->m_rumour);
-        else if (name == "numRumors") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_rumourEventCount));
-        else if (name == "numEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_timeEventCount));
-        else if (name == "numMapEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_mapEventCount));
+        else if (name == "couldBeNumDefeatedPlayers") xml::QueryCharText(elem, &gpGame->m_deadPlayerCount);
+        else if (name == "day") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_day));
+        else if (name == "week") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_week));
+        else if (name == "month") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_month));
+        else if (name == "numObelisks") xml::QueryCharText(elem, &gpGame->m_obeliskCount);
+        else if (name == "ultimateArtifactLocX") xml::QueryCharText(elem, &gpGame->m_ultimateArtifactX);
+        else if (name == "ultimateArtifactLocY") xml::QueryCharText(elem, &gpGame->m_ultimateArtifactY);
+        else if (name == "ultimateArtifactIdx") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_ultimateArtifactId));
+        else if (name == "currentRumor") xml::QueryText(elem, gpGame->m_rumour);
+        else if (name == "numRumors") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_rumourEventCount));
+        else if (name == "numEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_timeEventCount));
+        else if (name == "numMapEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_mapEventCount));
         else if (name == "iMaxMapExtra") {
             elem->QueryIntText(&iMaxMapExtra);
             ppMapExtra = static_cast<void**>(H2_ALLOC(sizeof(void*) * iMaxMapExtra));
@@ -1074,15 +1072,15 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             memset(ppMapExtra, 0, sizeof(void*) * iMaxMapExtra);
             memset(pwSizeOfMapExtra, 0, sizeof(i16) * iMaxMapExtra);
         }
-        else if (name == "difficulty") QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
-        else if (name == "mapFilename") QueryText(elem, gpGame->m_mapFilename);
-        else if (name == "relatedToNewGameSelection") QueryCharText(elem, &gpGame->m_selectedSetupPlayer);
-        else if (name == "relatedToNewGameInit") QueryCharText(elem, &gpGame->m_newGameInitialized);
-        else if (name == "numHumanPlayers") QueryCharText(elem, &gpGame->m_newGameHumanCount);
+        else if (name == "difficulty") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
+        else if (name == "mapFilename") xml::QueryText(elem, gpGame->m_mapFilename);
+        else if (name == "relatedToNewGameSelection") xml::QueryCharText(elem, &gpGame->m_selectedSetupPlayer);
+        else if (name == "relatedToNewGameInit") xml::QueryCharText(elem, &gpGame->m_newGameInitialized);
+        else if (name == "numHumanPlayers") xml::QueryCharText(elem, &gpGame->m_newGameHumanCount);
         else if (name == "gbIAmGreatest") elem->QueryIntText(&gbIAmGreatest);
         else if (name == "campaignType") elem->QueryIntText(&campaignType);
         else if (name == "mapHeader") ReadMapHeader(elem);
-        else if (name == "playerNames") QueryText(elem, cPlayerNames[index]);
+        else if (name == "playerNames") xml::QueryText(elem, cPlayerNames[index]);
         else if (name == "deadPlayers") gpGame->m_playerDead[index] = value;
         else if (name == "alivePlayers") hasPlayer[index] = value;
         else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;

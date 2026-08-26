@@ -443,7 +443,7 @@ void hero::AddSpell(SpellType spell, i32) {
     // Cybernetics spells belong to Cyborg heroes alone, and a Cyborg hero
     // learns no regular spell above level 2.
     if (H2EnumIndex(spell) >= H2EnumIndex(SPELL_COUNT)) {
-        if (H2EnumIndex(m_cursorType) != 12)
+        if (m_cursorType != FACTION_CYBORG)
             return;
     } else if (m_cursorType == FACTION_CYBORG
                && H2EnumIndex(gsSpellInfo[H2EnumIndex(spell)].level) > 2) {

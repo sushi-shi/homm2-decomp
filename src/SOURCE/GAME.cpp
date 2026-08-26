@@ -1933,7 +1933,9 @@ void game::NewMap(char* filename) {
     gbInNewGameSetup = false;
     SetupNewRumour();
     gpAdvManager->CheckSetEvilInterface(0, -1);
-    ironfist::runtime::FinishMap();
+    // Upstream restores this default after the retail NewMap body, so a map's
+    // top-level script cannot change it. Keep the policy with its game owner.
+    SetAIArmySharing(true);
     // Towns with no water for a dock never offer one.
     for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
         if (!GetTown(townIndex)->CanBuildDock())

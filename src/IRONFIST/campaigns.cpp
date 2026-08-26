@@ -19,8 +19,6 @@
 
 namespace ironfist {
 
-using namespace xml;
-
 std::map<i32, std::string> CampaignNames;
 std::map<i32, std::string> CampaignShortNames;
 std::map<i32, i32> CampaignMapCounts;
@@ -99,7 +97,7 @@ i32 ReadCampaignMetadata(tinyxml2::XMLNode* root) {
             const char* text = elem->GetText();
             CampaignNames[campaignID] = text ? text : "empty name";
         } else if (name == "shortName") {
-            QueryText(elem, CampaignShortNames[campaignID]);
+            xml::QueryText(elem, CampaignShortNames[campaignID]);
         } else if (name == "numMaps") {
             elem->QueryIntText(&CampaignMapCounts[campaignID]);
         } else if (name == "scenarioName") {
@@ -157,13 +155,13 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
         return;
 
     tinyxml2::XMLElement* metadata = doc->NewElement("campaignMetadata");
-    PushBack(doc, metadata, "id", campaignID);
-    PushBack(doc, metadata, "name", CampaignNames[campaignID].c_str());
-    PushBack(doc, metadata, "shortName", CampaignShortNames[campaignID].c_str());
-    PushBack(doc, metadata, "numMaps", CampaignMapCounts[campaignID]);
-    WriteArray(doc, metadata, "scenarioName", ScenarioNames[campaignID]);
-    WriteArray(doc, metadata, "scenarioDescription", ScenarioDescriptions[campaignID]);
-    WriteArray(doc, metadata, "scenarioDifficulty", CampaignDifficulties[campaignID]);
+    xml::PushBack(doc, metadata, "id", campaignID);
+    xml::PushBack(doc, metadata, "name", CampaignNames[campaignID].c_str());
+    xml::PushBack(doc, metadata, "shortName", CampaignShortNames[campaignID].c_str());
+    xml::PushBack(doc, metadata, "numMaps", CampaignMapCounts[campaignID]);
+    xml::WriteArray(doc, metadata, "scenarioName", ScenarioNames[campaignID]);
+    xml::WriteArray(doc, metadata, "scenarioDescription", ScenarioDescriptions[campaignID]);
+    xml::WriteArray(doc, metadata, "scenarioDifficulty", CampaignDifficulties[campaignID]);
 
     for (auto& track : CampaignTrack[campaignID]) {
         tinyxml2::XMLElement* icn = doc->NewElement("scenarioIcon");
@@ -185,8 +183,8 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
         }
     }
 
-    WriteArray(doc, metadata, "replaySMK", ReplayMovies[campaignID]);
-    WriteArray(doc, metadata, "victorySMK", VictoryMovies[campaignID]);
+    xml::WriteArray(doc, metadata, "replaySMK", ReplayMovies[campaignID]);
+    xml::WriteArray(doc, metadata, "victorySMK", VictoryMovies[campaignID]);
     for (auto& mapRow : MapsToComplete[campaignID]) {
         for (i32 opened : mapRow.second) {
             tinyxml2::XMLElement* mapElem = doc->NewElement("mapToComplete");
@@ -195,7 +193,7 @@ void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) 
             metadata->InsertEndChild(mapElem);
         }
     }
-    WriteArray(doc, metadata, "award", AwardsToGive[campaignID]);
+    xml::WriteArray(doc, metadata, "award", AwardsToGive[campaignID]);
 
     for (auto& scenario : HeroesToSave[campaignID]) {
         for (auto& heroData : scenario.second) {
