@@ -95,6 +95,8 @@ The cross-version behavioral ledger lives on the evidence-owning Buka
 reconstruction branch; see [Retail version differences](docs/version-differences.md).
 The Ironfist ownership and compatibility rules are documented in
 [Ironfist integration architecture](docs/ironfist-architecture.md).
+Corrections and subsystem replacements made only by the portable branch are
+listed in [Intentional retail divergences](docs/retail-divergences.md).
 
 ## Reconstruction evidence
 
@@ -126,8 +128,8 @@ Requirements:
 
 1. CMake 3.20+, Ninja, and pkg-config.
 2. C and C++20 compilers with 32-bit support.
-3. 32-bit SDL3 and FFmpeg libraries (`libavcodec`, `libavformat`, `libavutil`,
-   and `libswresample`).
+3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
+   `libavutil`, and `libswresample`).
 
 ```sh
 cmake -S . -B build -G Ninja

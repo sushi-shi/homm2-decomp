@@ -10,6 +10,9 @@ decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist -> ironfist-m
 decomp branches; portable platform, localization, and runtime changes belong
 here and flow onward through `ironfist` to `ironfist-master`.
 
+Proven retail defects and deliberately replaced subsystems are tracked in
+[Intentional retail divergences](retail-divergences.md).
+
 ```text
 include/PLATFORM/          interfaces
 include/PLATFORM/WIN32/    Win32 declarations used by the game
@@ -48,14 +51,14 @@ nix build .#homm2-windows
 nix build .#homm2-web
 ```
 
-The Windows package cross-compiles and statically links the SDL3 platform and
-minimal FFmpeg. It includes a Wine launcher; no retail Audiere, Miles, Smacker,
-or Wing DLLs are required.
+The Windows package cross-compiles and statically links the SDL3 platform,
+libbz2, and minimal FFmpeg. It includes a Wine launcher; no retail Audiere,
+Miles, Smacker, or Wing DLLs are required.
 
 ## Web
 
-The WebAssembly build cross-compiles SDL3 and a minimal FFmpeg. Game data is
-kept outside the Nix store:
+The WebAssembly build cross-compiles SDL3, libbz2, and a minimal FFmpeg. Game
+data is kept outside the Nix store:
 
 ```sh
 HOMM2_DATA=/path/to/heroes2 nix run .#web
