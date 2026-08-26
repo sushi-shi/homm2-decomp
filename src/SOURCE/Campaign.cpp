@@ -792,8 +792,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                     gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
                                     gpGame->m_campaignType =
                                         OppositeCampaignSide(gpGame->m_campaignType);
-                                    gpGame->m_campaignMapEnabled[gpGame->m_campaignScenario]
-                                                                [H2EnumIndex(gpGame->m_campaignType)] = 1;
+                                    gpGame->m_campaignMapEnabled[H2EnumIndex(gpGame->m_campaignType)]
+                                                                [gpGame->m_campaignScenario] = 1;
                                     gpGame->m_campaignScenarioBonus[H2EnumIndex(gpGame->m_campaignType)]
                                                                    [gpGame->m_campaignScenario] =
                                         gpGame->m_campaignScore;
@@ -873,15 +873,17 @@ void game::InitCampaignMap(void) {
     memset(m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
     if (m_campaignScenario + 1 == CAMPAIGN_SWITCHING_SCENARIO + 1
         && m_campaignStartingSide != m_campaignType) {
-        sprintf(
+        snprintf(
             m_mapFilename,
+            sizeof(m_mapFilename),
             "CAMP%c%02dB.H2C",
             m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
             m_campaignScenario + 1
         );
     } else {
-        sprintf(
+        snprintf(
             m_mapFilename,
+            sizeof(m_mapFilename),
             "CAMP%c%02d.H2C",
             m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
             m_campaignScenario + 1

@@ -381,6 +381,7 @@ void resourceManager::PointToFile(u32l fileId) {
             m_lastFileName
         );
         ShutDown(gText);
+        return;
     }
     platform::FileSeek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset);
 }
@@ -414,6 +415,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
             m_lastFileName
         );
         ShutDown(gText);
+        return 0;
     }
     return m_aggregateDir[matched][entry].size;
 }
