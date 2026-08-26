@@ -157,16 +157,42 @@
       homm2 = mkNative false;
       homm2-debug = mkNative true;
 
+      ironfist-revision = "314932011ed5308efb9f35cecc62e8ca638a7375";
+      ironfist-source = pkgs.fetchgit {
+        url = "https://github.com/jkoppel/project-ironfist.git";
+        rev = ironfist-revision;
+        hash = "sha256-j6ANYrR2XoC9ZCADOE406dKj+1QtcQzP2ktZCTGbnFw=";
+        sparseCheckout = [
+          "/assets/agg/"
+          "/assets/music/"
+          "/cmp/"
+          "/data/"
+          "/maps/"
+        ];
+        nonConeMode = true;
+      };
+
+      ironfist-resource-payload = pkgs.stdenvNoCC.mkDerivation {
+        pname = "ironfist-resource-payload";
+        version = builtins.substring 0 12 ironfist-revision;
+        src = ironfist-source;
+        nativeBuildInputs = [ pkgs.coreutils pkgs.findutils pkgs.python3 ];
+        dontConfigure = true;
+        dontBuild = true;
+        installPhase = ''
+          export HOMM2_IRONFIST_RESOURCE_BUILDER=${./scripts/build-ironfist-resources.py}
+          ${pkgs.bash}/bin/bash ${./scripts/build-ironfist-resource-payload.sh} "$src" "$out"
+        '';
+      };
+
       ironfist-resources = pkgs.writeShellApplication {
         name = "install-ironfist-resources";
         runtimeInputs = [
           pkgs.coreutils
           pkgs.findutils
-          pkgs.git
-          pkgs.python3
         ];
         text = ''
-          export HOMM2_IRONFIST_RESOURCE_BUILDER=${./scripts/build-ironfist-resources.py}
+          export HOMM2_IRONFIST_RESOURCE_PAYLOAD=${ironfist-resource-payload}
           exec ${pkgs.bash}/bin/bash ${./scripts/install-ironfist-resources.sh} "$@"
         '';
       };
@@ -304,6 +330,7 @@
         inherit
           homm2
           homm2-debug
+          ironfist-resource-payload
           ironfist-resources
           homm2-web
           homm2-web-run;

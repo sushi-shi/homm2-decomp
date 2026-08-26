@@ -2,13 +2,12 @@
 
 set -euo pipefail
 
-source_url_default="https://github.com/jkoppel/project-ironfist.git"
-source_commit="314932011ed5308efb9f35cecc62e8ca638a7375"
 aggregate_sha256="2952e91a5d6c38216d8c805346f4941e7527ff31ba05c0d7a1161e90f56a5599"
 
 usage() {
     echo "usage: $0 /path/to/heroes2" >&2
     echo "       HOMM2_DATA=/path/to/heroes2 $0" >&2
+    echo "       HOMM2_IRONFIST_RESOURCE_PAYLOAD=/path/to/payload $0 /path/to/heroes2" >&2
 }
 
 find_game_directory() {
@@ -56,104 +55,57 @@ if ! has_file "$data_directory" HEROES2.AGG || ! has_file "$data_directory" HERO
     exit 1
 fi
 
-resource_tmp=$(mktemp -d "${TMPDIR:-/tmp}/homm2-ironfist-resources.XXXXXX")
-cleanup() {
-    rm -rf -- "$resource_tmp"
-}
-trap cleanup EXIT
-
-source_url="${HOMM2_IRONFIST_SOURCE_URL:-$source_url_default}"
-source_root="$resource_tmp/project-ironfist"
-stage_root="$resource_tmp/stage"
-
-echo "Fetching Project Ironfist $source_commit..."
-git init -q "$source_root"
-git -C "$source_root" sparse-checkout init --no-cone
-git -C "$source_root" sparse-checkout set --no-cone \
-    /assets/agg/ \
-    /assets/music/ \
-    /cmp/ \
-    /data/ \
-    /maps/
-git -C "$source_root" fetch -q --depth=1 --filter=blob:none "$source_url" "$source_commit"
-git -C "$source_root" checkout -q --detach FETCH_HEAD
-
-actual_commit=$(git -C "$source_root" rev-parse HEAD)
-if [[ "$actual_commit" != "$source_commit" ]]; then
-    echo "ironfist-resources: fetched $actual_commit, expected $source_commit" >&2
+payload_root="${HOMM2_IRONFIST_RESOURCE_PAYLOAD:-}"
+if [[ -z "$payload_root" || ! -d "$payload_root" ]]; then
+    echo "ironfist-resources: HOMM2_IRONFIST_RESOURCE_PAYLOAD is not a payload directory" >&2
+    echo "ironfist-resources: use 'nix run .#ironfist-resources -- $game_root' or build a payload first" >&2
     exit 1
 fi
+payload_root=$(realpath "$payload_root")
 
-echo "Building ironfist.agg with the native resource builder..."
-mkdir -p "$source_root/build"
-script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-resource_builder="${HOMM2_IRONFIST_RESOURCE_BUILDER:-$script_directory/build-ironfist-resources.py}"
-python3 "$resource_builder" \
-    "$source_root/assets/agg" \
-    "$source_root/build/ironfist.agg"
+required_files=(
+    DATA/artifacts.xml
+    DATA/creatures.xml
+    DATA/overlays.xml
+    DATA/ironfist.agg
+    CAMPAIGNS/cyborg.cmp
+    MAPS/CAMP5_01.HXC
+    MUSIC/Track44.ogg
+    SCRIPTS/MODULES/binding.lua
+)
 
-aggregate="$source_root/build/ironfist.agg"
-if [[ ! -s "$aggregate" ]]; then
-    echo "ironfist-resources: native builder did not produce build/ironfist.agg" >&2
-    exit 1
-fi
-actual_aggregate_sha256=$(sha256sum "$aggregate" | cut -d ' ' -f 1)
+for filename in "${required_files[@]}"; do
+    if [[ ! -f "$payload_root/$filename" ]]; then
+        echo "ironfist-resources: payload is missing $filename" >&2
+        exit 1
+    fi
+done
+
+actual_aggregate_sha256=$(sha256sum "$payload_root/DATA/ironfist.agg" | cut -d ' ' -f 1)
 if [[ "$actual_aggregate_sha256" != "$aggregate_sha256" ]]; then
     echo "ironfist-resources: aggregate hash is $actual_aggregate_sha256, expected $aggregate_sha256" >&2
     exit 1
 fi
-
-mkdir -p \
-    "$stage_root/DATA" \
-    "$stage_root/MAPS" \
-    "$stage_root/CAMPAIGNS" \
-    "$stage_root/MUSIC" \
-    "$stage_root/SCRIPTS/MODULES" \
-    "$stage_root/SCRIPTS/GENERIC"
-
-cp "$aggregate" "$stage_root/DATA/ironfist.agg"
-cp "$source_root"/data/*.xml "$stage_root/DATA/"
-cp "$source_root"/cmp/*.cmp "$stage_root/CAMPAIGNS/"
-cp "$source_root/assets/music/homm2_43.ogg" "$stage_root/MUSIC/Track44.ogg"
-
-while IFS= read -r -d '' filename; do
-    cp "$filename" "$stage_root/MAPS/"
-done < <(find "$source_root/maps" -mindepth 1 -maxdepth 1 -type f ! -iname '*.lua' -print0)
-
-while IFS= read -r -d '' filename; do
-    cp "$filename" "$stage_root/SCRIPTS/"
-done < <(find "$source_root/maps" -mindepth 1 -maxdepth 1 -type f -iname '*.lua' -print0)
-
-cp -R "$source_root/maps/MODULES/." "$stage_root/SCRIPTS/MODULES/"
-cp -R "$source_root/maps/GENERIC/." "$stage_root/SCRIPTS/GENERIC/"
 
 maps_directory=$(ensure_game_directory MAPS)
 campaigns_directory=$(ensure_game_directory CAMPAIGNS)
 music_directory=$(ensure_game_directory MUSIC)
 scripts_directory=$(ensure_game_directory SCRIPTS)
 
-cp -R "$stage_root/DATA/." "$data_directory/"
-cp -R "$stage_root/MAPS/." "$maps_directory/"
-cp -R "$stage_root/CAMPAIGNS/." "$campaigns_directory/"
-cp -R "$stage_root/MUSIC/." "$music_directory/"
-cp -R "$stage_root/SCRIPTS/." "$scripts_directory/"
-
-required_files=(
-    "$data_directory/artifacts.xml"
-    "$data_directory/creatures.xml"
-    "$data_directory/overlays.xml"
-    "$data_directory/ironfist.agg"
-    "$campaigns_directory/cyborg.cmp"
-    "$maps_directory/CAMP5_01.HXC"
-    "$music_directory/Track44.ogg"
-    "$scripts_directory/MODULES/binding.lua"
-)
+cp -R "$payload_root/DATA/." "$data_directory/"
+cp -R "$payload_root/MAPS/." "$maps_directory/"
+cp -R "$payload_root/CAMPAIGNS/." "$campaigns_directory/"
+cp -R "$payload_root/MUSIC/." "$music_directory/"
+cp -R "$payload_root/SCRIPTS/." "$scripts_directory/"
 
 for filename in "${required_files[@]}"; do
-    if [[ ! -f "$filename" ]]; then
-        echo "ironfist-resources: source build did not install $filename" >&2
+    directory=${filename%%/*}
+    name=${filename#*/}
+    installed_directory=$(find_game_directory "$directory")
+    if [[ ! -f "$installed_directory/$name" ]]; then
+        echo "ironfist-resources: failed to install $filename" >&2
         exit 1
     fi
 done
 
-echo "Installed Project Ironfist $source_commit into $game_root"
+echo "Installed Project Ironfist resources into $game_root"

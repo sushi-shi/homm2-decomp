@@ -34,8 +34,8 @@ directory. That directory must contain `DATA/HEROES2.AGG` and
      \( -iname HEROES2.AGG -o -iname HEROES2X.AGG \)
    ```
 
-3. Fetch the pinned original Ironfist source, build its resources, and install
-   them into that game directory:
+3. Let Nix fetch the pinned original Ironfist source, build its resource
+   payload, and install it into that game directory:
 
    ```sh
    nix run .#ironfist-resources -- "$HOMM2_DATA"
@@ -137,11 +137,11 @@ Ironfist resources from the pinned original repository into that directory:
 nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
-The installer makes a sparse clone of `jkoppel/project-ironfist` at the pinned
-commit, verifies that commit, builds the ICN, FRM, and AGG files with this
-branch's native Python resource builder, and merges `DATA/`, `MAPS/`,
-`CAMPAIGNS/`, `MUSIC/`, and `SCRIPTS/` into the game directory. Neither Wine nor
-the upstream Windows packers are required. See
+The flake fetches only the required paths from `jkoppel/project-ironfist`, pins
+them by commit and Nix content hash, and builds an immutable resource payload in
+the local Nix store. The installer merges its `DATA/`, `MAPS/`, `CAMPAIGNS/`,
+`MUSIC/`, and `SCRIPTS/` into the game directory. Runtime Git, Wine, and the
+upstream Windows packers are not required. See
 [Building the Ironfist resources](docs/ironfist-resources.md).
 
 `HOMM2_DATA` should then point to that combined game directory (paths are
