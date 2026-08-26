@@ -52,7 +52,7 @@ H2_ENUM_BEGIN(SoundBackendKind)
     SOUND_BACKEND_NONE    = 2
 H2_ENUM_END(SoundBackendKind)
 
-class soundManager : public baseManager {
+class soundManager H2_FINAL : public baseManager {
 public:
     SoundBackendKind m_backend;
     SoundBackendKind m_savedBackend;

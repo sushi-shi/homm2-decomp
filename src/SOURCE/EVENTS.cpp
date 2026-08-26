@@ -4367,6 +4367,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
         currentCell_d->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
     cellDone:
+        ;
         changed_f = 0;
     }
 
@@ -4838,7 +4839,7 @@ void advManager::ExpansionRecruitEvent(
     hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, i16* availableCount
 ) {
     tag_message dialogMessage;
-    baseManager* recruitWindow = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
+    recruitUnit* recruitWindow = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
     i32 dialogResult;
     if (recruitWindow == NULL)
         MemError();
@@ -5298,7 +5299,7 @@ void advManager::RecruitEvent(
 ) {
     tag_message recruitMessage;
     i16 availableCount = static_cast<i16>(cell->m_objectMetadata);
-    baseManager* recruitWindow =
+    recruitUnit* recruitWindow =
         new recruitUnit(&eventHero->m_army, creatureType, &availableCount);
     i32 eventResult;
 

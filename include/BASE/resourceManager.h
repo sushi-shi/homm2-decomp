@@ -28,7 +28,7 @@ H2_ENUM_BEGIN(ResourceManagerLayoutConstant)
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 H2_ENUM_END(ResourceManagerLayoutConstant)
 
-class resourceManager : public baseManager {
+class resourceManager H2_FINAL : public baseManager {
 public:
     resource* m_resourceListHead;
     i32 m_numAggregates;

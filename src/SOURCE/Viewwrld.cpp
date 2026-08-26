@@ -220,25 +220,25 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     sprintf(
         gText,
         "ground%d.icn",
-        giViewWorldScale
+        IDX(giViewWorldScale)
     );
     pVWGround = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "vwflag%d.icn",
-        giViewWorldScale
+        IDX(giViewWorldScale)
     );
     pVWFlags = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "misc%d.icn",
-        giViewWorldScale
+        IDX(giViewWorldScale)
     );
     pVWMisc = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "letter%d.icn",
-        giViewWorldScale
+        IDX(giViewWorldScale)
     );
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);

@@ -17,7 +17,7 @@ H2_ENUM_CLASS_BEGIN(RecruitSourceType)
 H2_ENUM_CLASS_END(RecruitSourceType)
 
 #pragma pack(push, 1)
-class recruitUnit : public baseManager {
+class recruitUnit H2_FINAL : public baseManager {
 public:
     RecruitSourceType m_sourceType;
     H2_ENUM_STORAGE(CreatureType, i32) m_creatureType;

@@ -19,7 +19,7 @@ H2_ENUM_CLASS_BEGIN(MouseCursorType)
 H2_ENUM_CLASS_END(MouseCursorType)
 
 #pragma pack(push, 1)
-class mouseManager : public baseManager {
+class mouseManager H2_FINAL : public baseManager {
 public:
     bitmap* m_savedUnderlying;
     i32 m_cursorFrame;

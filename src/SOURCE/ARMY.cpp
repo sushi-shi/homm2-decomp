@@ -3072,7 +3072,6 @@ void army::GoBerserk(void) {
                 goto berserkFinish;
         }
     }
-walkToward:
     if (!HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
         if (gpCombatManager->WalkTowardArmy(this, m_side, masks_28[IDX(m_side)]))
             goto berserkFinish;

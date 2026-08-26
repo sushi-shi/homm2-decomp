@@ -673,7 +673,6 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-    hover_text_ready:
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = CASTLE_WIDGET_TEXT;
         message.payload.widget.id = CONTROL_STATUS_TEXT;
@@ -837,7 +836,6 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         }
     }
 
-selection_done:
     if (ret != 0) {
         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;

@@ -375,7 +375,6 @@ i32 combatManager::ViewSpells(i32) {
                 break;
         }
 
-    restore_pointer:
         gpMouseManager->SetPointer("cmbtmous.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
         if (m_selectedSpell != SPELL_NONE)
             return 1;

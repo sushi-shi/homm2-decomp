@@ -529,7 +529,6 @@ i32 game::SetupGame(void) {
                 break;
         }
 
-    menuDone:
         giMenuCommand = -1;
         result = 1;
         goto done;

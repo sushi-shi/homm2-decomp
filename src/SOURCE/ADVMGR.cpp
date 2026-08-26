@@ -2188,7 +2188,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         }
     }
 
-finish_message:
     if (evtCell != NULL) {
         DoEvent(evtCell, TrigX, TrigY);
     }
@@ -5340,7 +5339,6 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         }
     }
 
-quick_info_ready:
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(

@@ -489,7 +489,7 @@ H2_ENUM_CLASS_BEGIN_T(CombatGridShade, u8)
 H2_ENUM_CLASS_END_T(CombatGridShade, u8)
 
 #pragma pack(push, 1)
-class combatManager : public baseManager {
+class combatManager H2_FINAL : public baseManager {
 public:
     class palette* m_combatPalette;
     i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];

@@ -24,7 +24,7 @@ H2_ENUM_CLASS_BEGIN(SwapManagerItemType)
 H2_ENUM_CLASS_END(SwapManagerItemType)
 
 #pragma pack(push, 1)
-class swapManager : public baseManager {
+class swapManager H2_FINAL : public baseManager {
 public:
     heroWindow* m_window;
     icon* m_selectorIcon;

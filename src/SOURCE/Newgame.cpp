@@ -1533,7 +1533,6 @@ cleanup:
             }
         }
 
-finish:
     if (redraw) {
         gpGame->UpdateNewGameWindow();
         gpGame->m_newGameWindow->DrawWindow();

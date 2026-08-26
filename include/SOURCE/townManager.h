@@ -30,7 +30,7 @@ H2_ENUM_CLASS_BEGIN(TownManagerArmyCommand)
 H2_ENUM_CLASS_END(TownManagerArmyCommand)
 
 #pragma pack(push, 1)
-class townManager : public baseManager {
+class townManager H2_FINAL : public baseManager {
 public:
     town* m_town;
     icon* m_backgroundIcon;

@@ -291,7 +291,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
             "Bad Delete,  File '%13s'  Line % 4d, ptr %12d",
             originalFile,
             originalLine,
-            ptr
+            reinterpret_cast<i32>(ptr)
         );
         LogStr(gText);
     } else {

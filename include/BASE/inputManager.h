@@ -110,7 +110,7 @@ H2_ENUM_BEGIN(InputManagerCapacity)
 H2_ENUM_END(InputManagerCapacity)
 
 #pragma pack(push, 1)
-class inputManager : public baseManager {
+class inputManager H2_FINAL : public baseManager {
 public:
     tag_message m_eventRing[IDX(INPUT_EVENT_RING_CAPACITY)];
     i32 m_readIndex;

@@ -47,7 +47,7 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
 H2_ENUM_END(HighScoreManagerConstant)
 
 #pragma pack(push, 1)
-class highScoreManager : public baseManager {
+class highScoreManager H2_FINAL : public baseManager {
 public:
     i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
     i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];

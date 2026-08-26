@@ -6039,7 +6039,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     gText,
                     "AI encountered object type %d and doesn't know how to deal with it.   "
                         "Tell Phil",
-                    theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK
+                    IDX(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 eventRV = 0;

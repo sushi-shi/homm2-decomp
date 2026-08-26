@@ -5,8 +5,10 @@
 // Derive this from the required language support rather than a compiler name or build flag.
 #if defined(__cplusplus) && __cplusplus >= 202002L
 #define H2_STRICT_ENUMS 1
+#define H2_FINAL final
 #else
 #define H2_STRICT_ENUMS 0
+#define H2_FINAL
 #endif
 
 typedef signed char i8;

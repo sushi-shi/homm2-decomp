@@ -1258,7 +1258,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     i32 quickView;
     char text[BUILDING_DESCRIPTION_CAPACITY];
     i32 dbgBuild;
-    baseManager* manager;
+    recruitUnit* manager;
     i32 status;
     i32 tradeCount;
 

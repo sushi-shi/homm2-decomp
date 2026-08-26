@@ -53,7 +53,7 @@ H2_ENUM_CLASS_BEGIN(ArmySizeNameVariant)
 H2_ENUM_CLASS_END(ArmySizeNameVariant)
 
 #pragma pack(push, 1)
-class advManager : public baseManager {
+class advManager H2_FINAL : public baseManager {
 public:
     AdventureCommand m_selectedCell;
     union {

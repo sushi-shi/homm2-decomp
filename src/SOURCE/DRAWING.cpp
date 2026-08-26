@@ -1367,6 +1367,7 @@ void combatManager::DrawFrame(
             m_hexCells[moatCell[IDX(row)] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
         }
     endRow:
+        ;
         gridWasShowing1 = 0;
     }
 

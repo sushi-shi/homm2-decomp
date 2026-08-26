@@ -202,7 +202,6 @@ void searchArray::SeedPosition(
                 }
             }
 
-        expand_directions:
             if (waterMode) {
                 s_seedPositionState.triggerType =
                     gpAdvManager->GetCell(s_seedPositionState.currentNode.x, s_seedPositionState.currentNode.y)->m_triggerType;

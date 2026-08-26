@@ -23,6 +23,8 @@ typedef unsigned long u32l;
 typedef i32 b32;
 typedef i8 b8;
 
+#define H2_FINAL final
+
 // Values accepted beside a stored enum domain.
 template <typename T>
 inline constexpr bool H2IsMaskLike = std::is_integral_v<T> || std::is_enum_v<T>;

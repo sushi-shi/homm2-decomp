@@ -78,7 +78,7 @@ struct FileRequesterExtension {
 };
 
 #pragma pack(push, 1)
-class fileRequester : public baseManager {
+class fileRequester H2_FINAL : public baseManager {
 public:
     heroWindow* m_window;
     i32 m_x;
