@@ -252,9 +252,12 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
 def _literal_replacement(cursor: ci.Cursor, domain: tuple[int, ...] | None) -> str | None:
     if domain not in ((0,), (1,)):
         return None
+    children = list(cursor.get_children())
+    if cursor.kind in WRAPPER_KINDS and len(children) == 1:
+        return _literal_replacement(children[0], domain)
     current = _tokens(cursor)
-    if cursor.kind == ci.CursorKind.INTEGER_LITERAL and current:
-        value = _integer_literal(current[-1])
+    if len(current) == 1:
+        value = _integer_literal(current[0])
         if value in (0, 1):
             return "true" if value else "false"
     return None

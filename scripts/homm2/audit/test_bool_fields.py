@@ -236,6 +236,10 @@ void LocalFlags(i32 incoming) {
         self.assertEqual(by_name["localChar"].target_type, "bchar")
         self.assertTrue(all(by_name[name].eligible for name in (
             "globalFlag", "charFlag", "byteFlag", "localFlag", "localChar")))
+        self.assertEqual(
+            {write.replacement for write in by_name["localChar"].writes},
+            {"false", "true"},
+        )
         self.assertEqual(by_name["existingFlag"].declared_type, "bchar")
         incoming = next(item for item in facts if item.name == "incoming")
         self.assertEqual(
