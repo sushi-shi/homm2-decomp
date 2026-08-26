@@ -680,6 +680,22 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
         (output / "README.md").write_text("# Generated source\n")
         return repo, output
 
+    def test_generated_readme_marks_the_published_branch(self):
+        readme = """# Generated source
+
+```text
+decomp-pol-2.0 -------------------> decomp-gold-2.1-buka
+    |                                   |
+    v                                   v
+source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-buka
+```
+"""
+        for branch in sorted(clean_source.GENERATED_BRANCHES):
+            with self.subTest(branch=branch):
+                marked = clean_source._mark_readme_branch(readme, branch)
+                self.assertEqual(marked.count("(you are here)"), 1)
+                self.assertIn(f"{branch} (you are here)", marked)
+
     def test_publish_refuses_a_non_generated_branch(self):
         with tempfile.TemporaryDirectory() as directory:
             repo, output = self.fixture_repo(Path(directory))

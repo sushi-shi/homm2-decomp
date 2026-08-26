@@ -60,6 +60,12 @@ PROJECT_FILES = (
     ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
     ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
+GENERATED_BRANCHES = frozenset((
+    "source-pol-2.0",
+    "classic-pol-2.0",
+    "source-gold-2.1-buka",
+    "classic-gold-2.1-buka",
+))
 
 # Sentinel marking a construct that expanded to nothing. Line cleanup uses it to
 # tell "this line went blank because we deleted an annotation" (drop the line)
@@ -2015,6 +2021,13 @@ def publish(
             elif source.is_file():
                 shutil.copy2(source, target)
 
+        if branch in GENERATED_BRANCHES:
+            readme = worktree / "README.md"
+            readme.write_text(
+                _mark_readme_branch(readme.read_text(encoding="utf-8"), branch),
+                encoding="utf-8",
+            )
+
         stage_paths = [
             relative for relative in publish_paths
             if (worktree / relative).exists()
@@ -2079,6 +2092,25 @@ def publish(
         else:
             print(f"[clean] checkout at {worktree}")
     return 0
+
+
+def _mark_readme_branch(text: str, branch: str) -> str:
+    """Mark one generated branch in the README's branch diagram."""
+    if branch not in GENERATED_BRANCHES:
+        return text
+    if "(you are here)" in text:
+        raise SystemExit("generated README template already contains a branch marker")
+
+    blocks = list(re.finditer(r"```text\n(.*?)\n```", text, flags=re.DOTALL))
+    matching = [match for match in blocks if branch in match.group(1)]
+    if len(matching) != 1 or matching[0].group(1).count(branch) != 1:
+        raise SystemExit(
+            "generated README branch diagram does not name %s exactly once" % branch
+        )
+
+    match = matching[0]
+    diagram = match.group(1).replace(branch, f"{branch} (you are here)", 1)
+    return text[:match.start(1)] + diagram + text[match.end(1):]
 
 
 def _punctuation_only(text: str) -> list[tuple[int, str]]:
