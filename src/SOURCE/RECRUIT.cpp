@@ -156,8 +156,8 @@ i32 recruitUnit::Open(i32 priority) {
         m_maximum = goldMaximum;
     if (m_maximum > *m_available)
         m_maximum = *m_available;
-    m_recruited = 0;
-    m_noRoom = 0;
+    m_recruited = false;
+    m_noRoom = false;
     if (*m_available == 0) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
@@ -329,7 +329,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
                             done = 1;
-                            m_noRoom = 1;
+                            m_noRoom = true;
                             goto checkClose;
                         }
                         gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
@@ -338,7 +338,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                                 m_quantity * m_resourceCost;
                         }
                         *m_available -= m_quantity;
-                        m_recruited = 1;
+                        m_recruited = true;
                         done = 1;
                         break;
                 }

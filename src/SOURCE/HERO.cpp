@@ -581,13 +581,13 @@ void hero::Deallocate(i32 updateMap) {
     if (playerPtr->m_currentHero == m_id) {
         playerPtr->m_currentHero = -1;
         if (giCurPlayer == m_owner) {
-            gpAdvManager->m_cursorActive = 0;
+            gpAdvManager->m_cursorActive = false;
             map = &gpGame->m_worldMap;
             DebugCheck();
             map->GetCell(m_x, m_y)->m_flags &= ~HERO_MAP_CELL_PRESENT;
         }
         if (oldOwner == giCurPlayer)
-            gpAdvManager->m_heroContextLocked = 0;
+            gpAdvManager->m_heroContextLocked = false;
     }
 
     playerPtr->m_heroCount--;

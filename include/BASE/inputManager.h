@@ -115,7 +115,7 @@ public:
     tag_message m_eventRing[(INPUT_EVENT_RING_CAPACITY)];
     i32 m_readIndex;
     i32 m_writeIndex;
-    i32 m_mouseMessageActive;
+    b32 m_mouseMessageActive;
     i32 field_0x742;
     i32 field_0x746;
     i32 field_0x74a;

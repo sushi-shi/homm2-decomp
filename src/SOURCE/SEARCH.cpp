@@ -12,8 +12,8 @@
 #include <SOURCE/searchArray.h>
 
 struct SeedPositionState {
-    i32 hasTarget;
-    i32 hasAdjacentMonster;
+    b32 hasTarget;
+    b32 hasAdjacentMonster;
     i8 possibleDirections[SEARCH_DIRECTION_COUNT];
     i32 neighborX;
     i32 remainingMobility;
@@ -25,7 +25,7 @@ struct SeedPositionState {
     u8 padding2c[4];
     searchNode currentNode;
     i32 mapY;
-    i32 directionBlocked;
+    b32 directionBlocked;
     i32 neighborY;
     mapCell* targetCell;
     i8 directionCosts[SEARCH_DIRECTION_COUNT];
@@ -128,11 +128,11 @@ void searchArray::SeedPosition(
             }
         }
 
-        s_seedPositionState.hasTarget = 1;
+        s_seedPositionState.hasTarget = true;
         s_seedPositionState.targetWater = s_seedPositionState.targetCell->m_isRoad;
         s_seedPositionState.bestTargetCost = SEARCH_MAX_COST;
     } else {
-        s_seedPositionState.hasTarget = 0;
+        s_seedPositionState.hasTarget = false;
     }
 
     if (s_seedPositionState.hasTarget && continueSeed) {
@@ -163,11 +163,11 @@ void searchArray::SeedPosition(
 
         {
             if (s_seedPositionState.currentNode.rvFlag1) {
-                s_seedPositionState.hasAdjacentMonster = 1;
+                s_seedPositionState.hasAdjacentMonster = true;
                 s_seedPositionState.adjacentMonsterX = s_seedPositionState.currentNode.adjacentMonsterX;
                 s_seedPositionState.adjacentY = s_seedPositionState.currentNode.adjacentMonsterY;
             } else {
-                s_seedPositionState.hasAdjacentMonster = 0;
+                s_seedPositionState.hasAdjacentMonster = false;
             }
 
             if (s_seedPositionState.currentNode.unknownFlag) {
@@ -179,7 +179,7 @@ void searchArray::SeedPosition(
                     || s_seedPositionState.triggerType == MAP_OBJECT_BOAT) {
                     if (!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1)
                         goto point_complete;
-                    s_seedPositionState.hasAdjacentMonster = 1;
+                    s_seedPositionState.hasAdjacentMonster = true;
                     s_seedPositionState.adjacentMonsterX = s_seedPositionState.currentNode.x;
                     s_seedPositionState.adjacentY = s_seedPositionState.currentNode.y;
                     if (s_seedPositionState.triggerType == MAP_OBJECT_HERO_INTERACTION
@@ -229,7 +229,7 @@ void searchArray::SeedPosition(
                                    SEARCH_INVALID_COORDINATE,
                                    SEARCH_INVALID_COORDINATE
                                )) {
-                        s_seedPositionState.hasAdjacentMonster = 1;
+                        s_seedPositionState.hasAdjacentMonster = true;
                     }
                 }
             }
@@ -337,12 +337,12 @@ void searchArray::SeedPosition(
                                 {
                                     s_seedPositionState.neighborCell =
                                         gpAdvManager->GetCell(s_seedPositionState.adjacentX, s_seedPositionState.candidateY);
-                                    s_seedPositionState.directionBlocked = 1;
+                                    s_seedPositionState.directionBlocked = true;
                                     if (((1 << (s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && s_seedPositionState.neighborCell->m_objectIndex != SEARCH_NO_OBJECT
                                         && s_seedPositionState.neighborCell->m_objectTileset != TILESET_DUMMY
                                         && !(s_seedPositionState.neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
-                                        s_seedPositionState.directionBlocked = 0;
+                                        s_seedPositionState.directionBlocked = false;
                                     }
 
                                     if (s_seedPositionState.directionBlocked

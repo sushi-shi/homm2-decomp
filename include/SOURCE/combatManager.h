@@ -32,11 +32,11 @@ struct SBolt {
     float currentY;
     i32 pixelX;
     i32 pixelY;
-    i32 drawVertically;
+    b32 drawVertically;
     float baseAngle;
     float angle;
-    i32 finished;
-    i32 nearTarget;
+    b32 finished;
+    b32 nearTarget;
     i32 nearestDistance;
     i32 widthFirst;
     i32 widthLast;
@@ -508,13 +508,13 @@ public:
     i32 m_obstacleCount;
     i16 m_eagleEyeSpell[COMBAT_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
-    i32 m_drawbridgeBackgroundVisible;
+    b32 m_drawbridgeBackgroundVisible;
     u8
     m_wallStates[(COMBAT_WALL_SLOT_COUNT)];
     class bitmap* m_combatBuffer;
     class bitmap* m_backgroundBuffer;
     class bitmap* m_mouseGridBuffer;
-    i32 m_backgroundDrawn;
+    b32 m_backgroundDrawn;
     class mapCell* m_battlefieldCell;
     class town* m_combatTowns[COMBAT_SIDE_COUNT];
     class hero* m_heroes[COMBAT_SIDE_COUNT];
@@ -552,8 +552,8 @@ public:
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
     i32 m_currentSide;
-    i32 m_gridSelectionDisabled;
-    i32 m_limitCreature;
+    b32 m_gridSelectionDisabled;
+    b32 m_limitCreature;
     i32 m_limitCreatureHex;
     i32 m_showArmyQuantities;
     i32 m_selectedHex;
@@ -575,7 +575,7 @@ public:
     i32 m_unknownF34B;
     i32 m_unknownF34F;
     i32 m_unknownF353;
-    i32 m_nonVisualCombat;
+    b32 m_nonVisualCombat;
     i32 m_unknownF35B;
     i32 m_killBenefit[COMBAT_SIDE_COUNT];
     class heroWindow* m_combatWindow;
@@ -585,7 +585,7 @@ public:
     i32 m_limitCreatureCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 m_drawHero[COMBAT_SIDE_COUNT];
     i32 m_drawHeroOverlay[COMBAT_SIDE_COUNT];
-    i32 m_combatWindowOpen;
+    b32 m_combatWindowOpen;
     class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     class widget* m_winLoseBottomTextWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     i32 m_combatX;

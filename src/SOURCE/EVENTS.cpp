@@ -1209,7 +1209,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_direction = m_cursorDirection;
                 m_cursorType = eventHero2->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
-                m_cursorActive = 1;
+                m_cursorActive = true;
                 playedSample3 = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
                     COAST_FIZZLE_X,
@@ -1251,7 +1251,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             m_cursorType = HERO_TYPE_BOAT;
             m_cursorDirection = boat_k->direction;
             m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
-            m_cursorActive = 1;
+            m_cursorActive = true;
             CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
             UpdateScreen(0, 0);
             break;
@@ -6546,7 +6546,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 eventHero->m_direction = m_cursorDirection;
                 m_cursorType = eventHero->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
-                m_cursorActive = 1;
+                m_cursorActive = true;
                 CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
@@ -6570,7 +6570,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             m_cursorType = HERO_TYPE_BOAT;
             m_cursorDirection = boat_k->direction;
             m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
-            m_cursorActive = 1;
+            m_cursorActive = true;
             break;
 
         case MAP_OBJECT_ALCHEMIST_LAB:
@@ -8965,7 +8965,7 @@ CombatResult advManager::AutoResolveCombat(
         randomSeed
     );
     gpCombatManager->InitNonVisualVars();
-    gpCombatManager->m_gridSelectionDisabled = 1;
+    gpCombatManager->m_gridSelectionDisabled = true;
     while (!gpCombatManager->m_nonVisualCombat)
         gpCombatManager->Main(message);
     gbNoShowCombat = false;
