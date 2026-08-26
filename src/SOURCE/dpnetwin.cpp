@@ -390,8 +390,8 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
-            gsThisNetPlayerInfo.useRegularCompression = 0;
-            gsThisNetPlayerInfo.useDiffCompression = 0;
+            gsThisNetPlayerInfo.useRegularCompression = false;
+            gsThisNetPlayerInfo.useDiffCompression = false;
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:

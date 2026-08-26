@@ -844,14 +844,14 @@ i32 oldmain(void) {
                     sizeof(netBuffer_f.setup.players)
                 );
                 giThisGamePos = NetPosToGamePos(0);
-                gbUseRegularCompression = gbUseDiffCompression = 1;
+                gbUseRegularCompression = gbUseDiffCompression = true;
                 if (giHighMemBuffer < OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT)
-                    gbUseRegularCompression = 0;
+                    gbUseRegularCompression = false;
                 for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
                     if (!gsNetPlayerInfo[player_h].useRegularCompression)
-                        gbUseRegularCompression = 0;
+                        gbUseRegularCompression = false;
                     if (!gsNetPlayerInfo[player_h].useDiffCompression)
-                        gbUseDiffCompression = 0;
+                        gbUseDiffCompression = false;
                 }
                 netBuffer_f.setup.useRegularCompression = gbUseRegularCompression;
                 netBuffer_f.setup.useDiffCompression = gbUseDiffCompression;

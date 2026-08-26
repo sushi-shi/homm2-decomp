@@ -32,6 +32,9 @@ typedef unsigned __int64 u64;
 // before the `setcc`), a bool-valued one materialises a byte.
 typedef i32 b32;
 typedef i8 b8;
+// Boolean storage whose proven retail C++ type is plain char. Unlike b8, this
+// preserves decorated global-symbol identity as well as byte width.
+typedef char bchar;
 
 // Modern builds type-check domains; the retail MSVC build keeps the integer ABI.
 #if H2_STRICT_ENUMS

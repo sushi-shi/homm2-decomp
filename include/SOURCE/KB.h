@@ -401,8 +401,8 @@ H2_ENUM_END(OldMainConstant)
 #pragma pack(push, 1)
 struct OldMainNetSetup {
     i8 gamePosToNetPos[OLD_MAIN_PLAYER_COUNT];
-    i8 useRegularCompression;
-    i8 useDiffCompression;
+    b8 useRegularCompression;
+    b8 useDiffCompression;
     SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
 };
 #pragma pack(pop)

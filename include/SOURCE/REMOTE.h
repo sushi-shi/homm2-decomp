@@ -82,8 +82,8 @@ char* GetRemoteData(i8);
 void PollRemote(void);
 i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
 
-extern char gbUseDiffCompression;
-extern char gbUseRegularCompression;
+extern bchar gbUseDiffCompression;
+extern bchar gbUseRegularCompression;
 extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 
 extern i32 iInOrderCtr;

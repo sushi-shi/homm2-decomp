@@ -175,8 +175,8 @@ void RemoteMain(RemoteGameMode gameMode) {
     WritePrefs();
     strcpy(gsThisNetPlayerInfo.uniqueSystemID, gConfig.uniqueSystemID);
     gsThisNetPlayerInfo.connectionType = NET_PLAYER_CONNECTION_CURRENT;
-    gsThisNetPlayerInfo.useRegularCompression = 1;
-    gsThisNetPlayerInfo.useDiffCompression = 1;
+    gsThisNetPlayerInfo.useRegularCompression = true;
+    gsThisNetPlayerInfo.useDiffCompression = true;
     gsThisNetPlayerInfo.reserved[0] = 1;
     xNetHasOldPlayers = 0;
 
@@ -877,8 +877,8 @@ transmitComplete:
 DATA(0x00533c38) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533ba0) i32 iLastIds[REMOTE_RECENT_ID_COUNT];
 DATA(0x00533760) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
-DATA(0x005332fc) char gbUseDiffCompression;
-DATA(0x00533428) char gbUseRegularCompression;
+DATA(0x005332fc) bchar gbUseDiffCompression;
+DATA(0x00533428) bchar gbUseRegularCompression;
 DATA(0x0053342c) i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 DATA(0x00533654) char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x00533c18) char gcThisNetName[REMOTE_NET_NAME_SIZE];
