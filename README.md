@@ -138,9 +138,10 @@ nix run .#ironfist-resources -- /path/to/heroes2
 ```
 
 The installer makes a sparse clone of `jkoppel/project-ironfist` at the pinned
-commit, verifies that commit, runs upstream's resource packers under an isolated
-Wine prefix, and merges `DATA/`, `MAPS/`, `CAMPAIGNS/`, `MUSIC/`, and
-`SCRIPTS/` into the game directory. See
+commit, verifies that commit, builds the ICN, FRM, and AGG files with this
+branch's native Python resource builder, and merges `DATA/`, `MAPS/`,
+`CAMPAIGNS/`, `MUSIC/`, and `SCRIPTS/` into the game directory. Neither Wine nor
+the upstream Windows packers are required. See
 [Building the Ironfist resources](docs/ironfist-resources.md).
 
 `HOMM2_DATA` should then point to that combined game directory (paths are

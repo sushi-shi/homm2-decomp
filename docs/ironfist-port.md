@@ -124,8 +124,8 @@ full porting history. The late milestones, briefly:
 ## Assets
 
 The source installer fetches the pinned original Ironfist repository and
-supplies `DATA/ironfist.agg` (built from upstream `assets/agg` with its
-checked-in GrayFace packers; loads before the retail aggregates, optional),
+supplies `DATA/ironfist.agg` (built from upstream `assets/agg` by the portable
+Python resource builder; loads before the retail aggregates, optional),
 `MAPS/` (Ironfist maps + the CAMP5 campaign maps), `CAMPAIGNS/cyborg.cmp`,
 `MUSIC/Track44.ogg` (the Cyborg town theme), and `SCRIPTS/` (map Lua siblings
 and modules). The portable audio path plays the Ogg directly and does not need a

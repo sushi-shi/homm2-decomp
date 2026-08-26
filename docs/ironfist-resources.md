@@ -21,11 +21,15 @@ The target must be writable and contain both `DATA/HEROES2.AGG` and
 
 1. creates a temporary sparse clone and fetches only the pinned commit;
 2. verifies the complete commit ID before consuming any files;
-3. runs upstream `assets/pack.bat` and its checked-in GrayFace packers under an
-   isolated Wine prefix to produce `DATA/ironfist.agg`;
+3. uses this branch's standard-library Python builder to convert the upstream
+   indexed BMP/INI sources into ICN and FRM data and package `DATA/ironfist.agg`;
 4. installs upstream XML, maps, campaign metadata, Lua scripts, and music into
    the corresponding game directories; and
 5. validates representative required outputs before reporting success.
+
+For the pinned source, the builder reproduces the reviewed upstream packer
+output byte for byte. The installer enforces its SHA-256 digest,
+`2952e91a5d6c38216d8c805346f4941e7527ff31ba05c0d7a1161e90f56a5599`.
 
 The Cyborg theme is upstream `assets/music/homm2_43.ogg`, installed under the
 portable engine's expected name `MUSIC/Track44.ogg`. The portable audio path
@@ -34,7 +38,9 @@ retail `MIDI0044.XMI` placeholder.
 
 Set `HOMM2_IRONFIST_SOURCE_URL` to an alternate Git remote or local mirror when
 needed. The commit ID remains fixed and is still verified. The temporary clone,
-build tree, and Wine prefix are removed after installation.
+and build tree are removed after installation. The resource build requires Git
+and Python; it does not download or run `pack.bat`, the GrayFace Windows
+packers, or Wine.
 
 These upstream resources retain Project Ironfist's terms; building them does
 not place them under this repository's source license. The Heroes II retail
@@ -44,7 +50,8 @@ aggregates are checked for presence but are never copied into or used to build
 ## Updating the source pin
 
 Review a new upstream commit and its resource layout first. Then update the
-commit in `scripts/install-ironfist-resources.sh`, rebuild into an empty test
-installation, and verify the aggregate, maps, campaign, scripts, music, and an
-actual game startup. Do not introduce a prebuilt resource release as an
-alternate input path.
+commit and aggregate digest in `scripts/install-ironfist-resources.sh`, rebuild
+into an empty test installation, compare the native aggregate against the
+reviewed upstream packer output when the source format changes, and verify the
+maps, campaign, scripts, music, and an actual game startup. Do not introduce a
+prebuilt resource release as an alternate input path.

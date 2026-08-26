@@ -4,6 +4,7 @@ set -euo pipefail
 
 source_url_default="https://github.com/jkoppel/project-ironfist.git"
 source_commit="314932011ed5308efb9f35cecc62e8ca638a7375"
+aggregate_sha256="2952e91a5d6c38216d8c805346f4941e7527ff31ba05c0d7a1161e90f56a5599"
 
 usage() {
     echo "usage: $0 /path/to/heroes2" >&2
@@ -67,16 +68,13 @@ stage_root="$resource_tmp/stage"
 
 echo "Fetching Project Ironfist $source_commit..."
 git init -q "$source_root"
-git -C "$source_root" sparse-checkout init --cone
-git -C "$source_root" sparse-checkout set \
-    assets/agg \
-    assets/music \
-    cmp \
-    data \
-    maps \
-    tools/dist/agg \
-    tools/dist/frm \
-    tools/dist/icn
+git -C "$source_root" sparse-checkout init --no-cone
+git -C "$source_root" sparse-checkout set --no-cone \
+    /assets/agg/ \
+    /assets/music/ \
+    /cmp/ \
+    /data/ \
+    /maps/
 git -C "$source_root" fetch -q --depth=1 --filter=blob:none "$source_url" "$source_commit"
 git -C "$source_root" checkout -q --detach FETCH_HEAD
 
@@ -86,19 +84,22 @@ if [[ "$actual_commit" != "$source_commit" ]]; then
     exit 1
 fi
 
-echo "Building ironfist.agg with the upstream packers..."
+echo "Building ironfist.agg with the native resource builder..."
 mkdir -p "$source_root/build"
-export WINEPREFIX="$resource_tmp/wineprefix"
-export WINEDEBUG=-all
-(
-    cd "$source_root/assets"
-    wine cmd /d /c pack.bat
-)
-wineserver -w
+script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+resource_builder="${HOMM2_IRONFIST_RESOURCE_BUILDER:-$script_directory/build-ironfist-resources.py}"
+python3 "$resource_builder" \
+    "$source_root/assets/agg" \
+    "$source_root/build/ironfist.agg"
 
 aggregate="$source_root/build/ironfist.agg"
 if [[ ! -s "$aggregate" ]]; then
-    echo "ironfist-resources: upstream pack.bat did not produce build/ironfist.agg" >&2
+    echo "ironfist-resources: native builder did not produce build/ironfist.agg" >&2
+    exit 1
+fi
+actual_aggregate_sha256=$(sha256sum "$aggregate" | cut -d ' ' -f 1)
+if [[ "$actual_aggregate_sha256" != "$aggregate_sha256" ]]; then
+    echo "ironfist-resources: aggregate hash is $actual_aggregate_sha256, expected $aggregate_sha256" >&2
     exit 1
 fi
 

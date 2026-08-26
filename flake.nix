@@ -163,9 +163,10 @@
           pkgs.coreutils
           pkgs.findutils
           pkgs.git
-          pkgs.wineWow64Packages.stable
+          pkgs.python3
         ];
         text = ''
+          export HOMM2_IRONFIST_RESOURCE_BUILDER=${./scripts/build-ironfist-resources.py}
           exec ${pkgs.bash}/bin/bash ${./scripts/install-ironfist-resources.sh} "$@"
         '';
       };
