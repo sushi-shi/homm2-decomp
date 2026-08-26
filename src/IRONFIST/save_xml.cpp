@@ -1288,7 +1288,7 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
     if (platform::CompareIgnoringCase(fileName, "RMT", 3))
         sprintf(gpGame->m_saveName, "%s", fileName);
 
-    gpAdvManager->m_heroContextLocked = 0;
+    gpAdvManager->m_heroContextLocked = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     for (giCurWatchPlayer = giCurPlayer; !gbThisNetHumanPlayer[giCurWatchPlayer];

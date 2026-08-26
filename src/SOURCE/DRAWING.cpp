@@ -749,7 +749,7 @@ void combatManager::DrawBackground(void) {
         COMBAT_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT
     );
-    m_backgroundDrawn = 1;
+    m_backgroundDrawn = true;
 }
 
 void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {

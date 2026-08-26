@@ -224,7 +224,7 @@ void combatManager::DoCompAI(CombatSide) {
     hexcell* targetCell;
     u32 targetHex;
 
-    m_limitCreature = 0;
+    m_limitCreature = false;
     thisArmy = m_currentArmyIndex + m_armies[H2EnumIndex(m_currentArmySide)];
     plan = COMBAT_AI_ATTACK_NONE;
     sideEnemy = OppositeCombatSide(m_currentSide);

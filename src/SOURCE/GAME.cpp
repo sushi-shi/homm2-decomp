@@ -1144,7 +1144,7 @@ void game::SetupOrigData(void) {
     }
 
     m_obeliskCount = 0;
-    gpAdvManager->m_heroContextLocked = 0;
+    gpAdvManager->m_heroContextLocked = false;
     memset(m_availableHeroes, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_availableHeroes));
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
@@ -1439,7 +1439,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, chunkTag, sizeof(i32));
     platform::FileClose(fd);
 
-    gpAdvManager->m_heroContextLocked = 0;
+    gpAdvManager->m_heroContextLocked = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayer = giCurPlayer;
@@ -3828,7 +3828,7 @@ void game::NextPlayer(void) {
         );
     }
 
-    gpAdvManager->m_identifyHeroActive = 0;
+    gpAdvManager->m_identifyHeroActive = false;
     if (gpGame->m_players[giCurPlayer].m_daysLeft > 0)
         gpGame->m_players[giCurPlayer].m_daysLeft--;
     CheckEndGame(END_GAME_FORCE_NONE, false);
@@ -5465,7 +5465,7 @@ void game::ShowComputerScreen(void) {
 
 void game::ShowHeroesLogo(void) {
     if (gpAdvManager->m_openState == 0) {
-        gpAdvManager->m_openState = 1;
+        gpAdvManager->m_openState = true;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
         IconToBitmap(
             theIcon,
