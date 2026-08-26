@@ -53,7 +53,7 @@ DATA(0x00533d58) b32 gbInRemoteCleanup = false;
 DATA(0x00533d5c) i32 iIDCtr = 0;
 DATA(0x00533d60) i32 iTimesDropped = 0;
 DATA(0x00533d64) b8 gbInNetSetup = false;
-DATA(0x00533d68) i32 bUseDirectPlay = 0;
+DATA(0x00533d68) b32 bUseDirectPlay = false;
 DATA(0x00533d6c) b32 bUseWinsock = false;
 DATA(0x00533d70) b8 bInTimeoutFail = false;
 DATA(0x005167b4)
@@ -94,10 +94,10 @@ void RemoteCleanup(void) {
     gbInRemoteMain = false;
     iIDCtr = 0;
     iTimesDropped = 0;
-    bUseDirectPlay = 0;
+    bUseDirectPlay = false;
     bUseWinsock = false;
     bInTimeoutFail = false;
-    bUseDirectPlay = 0;
+    bUseDirectPlay = false;
     bUseWinsock = false;
     bInTimeoutFail = false;
     iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
@@ -137,7 +137,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("RM 3");
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
-        bUseDirectPlay = 1;
+        bUseDirectPlay = true;
     else if (iMPNetProtocol == REMOTE_PROTOCOL_WINSOCK)
         bUseWinsock = true;
     else {

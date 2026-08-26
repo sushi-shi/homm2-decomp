@@ -70,6 +70,13 @@ H2_ENUM_CLASS_BEGIN(CombatCastleHex)
     COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
 H2_ENUM_CLASS_END(CombatCastleHex)
 
+H2_ENUM_BEGIN(CombatWinLoseAnimation)
+    WIN_LOSE_ANIMATION_CYCLE_FIRST  = 1,
+    WIN_LOSE_ANIMATION_LOSS         = 2,
+    WIN_LOSE_ANIMATION_FLEE         = 3,
+    WIN_LOSE_ANIMATION_CYCLE_SECOND = 4
+H2_ENUM_END(CombatWinLoseAnimation)
+
 H2_ENUM_CLASS_BEGIN(CombatDrawbridgeState)
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
@@ -841,7 +848,7 @@ extern u8 wallHex[COMBAT_WALL_SECTION_COUNT];
 extern b32 gbThisNetHasControl;
 extern i32 iCurTransferArtifact;
 extern i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-extern b32 gbWhichAnimationPlaying;
+extern H2_ENUM_STORAGE(CombatWinLoseAnimation, i32) gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
 extern b32 bSkeletonsShown;

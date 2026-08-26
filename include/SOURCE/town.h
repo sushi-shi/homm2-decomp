@@ -40,14 +40,17 @@ H2_ENUM_CLASS_BEGIN(TownBuilding)
 H2_ENUM_CLASS_END(TownBuilding)
 H2_ENUM_FLAGS(TownBuilding)
 
+H2_ENUM_BEGIN(TownFormation)
+    TOWN_FORMATION_SPREAD  = 0,
+    TOWN_FORMATION_GROUPED = 1
+H2_ENUM_END(TownFormation)
+
 H2_ENUM_BEGIN(TownConstant)
     TOWN_GARRISON_SLOT_COUNT           = 12,
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,
     TOWN_DOCK_COORDINATE_NONE          = 0xFF,
-    TOWN_FORMATION_SPREAD              = 0,
-    TOWN_FORMATION_GROUPED             = 1,
     TOWN_PLAYER_WINDOW_SIZE            = 5,
     TOWN_MAGE_GUILD_LEVEL_COUNT        = 5,
     TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
@@ -83,7 +86,7 @@ public:
     i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
-    i8 m_formation;
+    H2_ENUM_STORAGE(TownFormation, i8) m_formation;
     i8 m_originalOwner;
     u16 m_extraIndex;
     union {

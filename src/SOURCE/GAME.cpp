@@ -2981,7 +2981,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     townRec4 = &m_castleRecs[townId];
     if (townRec4->m_owner == player)
         return;
-    townRec4->m_formation = 0;
+    townRec4->m_formation = TOWN_FORMATION_SPREAD;
     if (m_castleOwners[townId] != -1)
         GetCastle(townId)->Deallocate();
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {

@@ -630,9 +630,9 @@ i32 oldmain(void) {
             giSetupGameType = static_cast<u8>(giTCPType);
             RemoteMain(iMPExtendedType);
             if (iMPExtendedType == REMOTE_GAME_NETWORK_GUEST)
-                gbWaitForRemoteReceive = 1;
+                gbWaitForRemoteReceive = true;
             else
-                gbWaitForRemoteReceive = 0;
+                gbWaitForRemoteReceive = false;
             giTCPHostStatus = -1;
             switch (giSetupGameType) {
                 case OLD_MAIN_SETUP_NEW:
@@ -6400,7 +6400,7 @@ DATA(0x004f9c64) char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\ANIM2\\";
 DATA(0x004f9dc4) char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
 DATA(0x004f9dd8) char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 DATA(0x004f9dec) char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\TRACKS2\\";
-DATA(0x00526600) b32 gbPutzingWithMouseCtr = false;
+DATA(0x00526600) i32 gbPutzingWithMouseCtr = 0;
 DATA(0x004f9f4c) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
 DATA(0x00526604) icon* gShingleAnim = NULL;
 DATA(0x00526608) i32 iNextShingleAnim = 0;

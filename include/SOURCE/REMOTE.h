@@ -96,7 +96,7 @@ extern b32 gbInRemoteCleanup;
 extern i32 iIDCtr;
 extern i32 iTimesDropped;
 extern b8 gbInNetSetup;
-extern i32 bUseDirectPlay;
+extern b32 bUseDirectPlay;
 extern b32 bUseWinsock;
 extern b8 bInTimeoutFail;
 extern i32 iBaud[REMOTE_BAUD_RATE_COUNT];

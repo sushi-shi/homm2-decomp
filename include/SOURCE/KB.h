@@ -602,7 +602,7 @@ extern b32 gbInMemError;
 extern b32 gbInNewGameSetup;
 extern b32 gbInPollSound;
 extern b32 gbNoCDRom;
-extern b32 gbPutzingWithMouseCtr;
+extern i32 gbPutzingWithMouseCtr;
 extern b32 gbRemoteOn;
 extern b8 gbRetreatWin;
 extern b32 gbTextEntryEscaped;

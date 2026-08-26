@@ -68,10 +68,6 @@ namespace {
         WIN_LOSE_RESOURCE_LOAD_ID = 200,
         WIN_LOSE_RESOURCE_DRAW_ID = 201,
         WIN_LOSE_DRAW_DEPTH = 0x7fff,
-        WIN_LOSE_ANIMATION_CYCLE_FIRST = 1,
-        WIN_LOSE_ANIMATION_LOSS = 2,
-        WIN_LOSE_ANIMATION_FLEE = 3,
-        WIN_LOSE_ANIMATION_CYCLE_SECOND = 4,
         WIN_LOSE_FIRST_ANIMATION_FRAME = 1,
         WIN_LOSE_LOOP_FRAME_COUNT = 20,
         WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME = 43,
@@ -2087,7 +2083,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
         m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = NULL;
     gbShowingLoseWindow = false;
-    gbWhichAnimationPlaying = true;
+    gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_CYCLE_FIRST;
     giWinCmbtFrame = 0;
     giSkeletonsCreated = 0;
     iMaxTransferArtifacts = 0;
@@ -3250,7 +3246,7 @@ void combatManager::ViewBallista(i32 quickView) {
 DATA(0x0052410c) b32 gbThisNetHasControl;
 DATA(0x00524134) i32 iCurTransferArtifact;
 DATA(0x005240fc) i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-DATA(0x0052411c) b32 gbWhichAnimationPlaying;
+DATA(0x0052411c) H2_ENUM_STORAGE(CombatWinLoseAnimation, i32) gbWhichAnimationPlaying;
 DATA(0x00524144) i32 iMaxTransferArtifacts;
 DATA(0x005240f8) i32 giNextActionExtra;
 DATA(0x00524118) b32 bSkeletonsShown;

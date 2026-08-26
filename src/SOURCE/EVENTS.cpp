@@ -4183,7 +4183,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     mapCell* cells_h[NEIGHBOR_COUNT];
     i32 frame_k = NO_FRAME;
     mapCell* currentCell_d;
-    b8 isWide_l = 0;
+    b8 isWide_l = false;
     i32 i_g;
     i32 unused_m[ERASE_COORDINATE_COUNT];
     i32 cellX_l;
@@ -4202,7 +4202,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         frame_k = cell->m_objectIndex - 1;
     if (cell->m_objectTileset == TILESET_X_LOC2 && cell->m_objectIndex == 9) {
         frame_k = 9;
-        isWide_l = 1;
+        isWide_l = true;
     }
     if (cell->m_objectTileset == TILESET_OBJNMULT && cell->m_objectIndex == 131)
         frame_k = 124;
