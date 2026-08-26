@@ -162,9 +162,6 @@ void CreateJoinFile(char*, char*, char*);
 EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
 i32 CalcFileCRC(char* filename);
-void CompressTest2(void);
-void CompressTest(void);
-void CompressTest3(void);
 
 extern char bMapInitialized;
 

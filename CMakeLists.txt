@@ -7,6 +7,7 @@ option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
+set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "")
 set(CMAKE_CXX_STANDARD 20)
@@ -140,6 +141,26 @@ if(HOMM2_PLATFORM STREQUAL "SDL3")
   endif()
 endif()
 
+if(HOMM2_BZIP2_ROOT)
+  add_library(Homm2BZip2::BZip2 STATIC IMPORTED)
+  set_target_properties(Homm2BZip2::BZip2 PROPERTIES
+    IMPORTED_LOCATION ${HOMM2_BZIP2_ROOT}/lib/libbz2.a
+    INTERFACE_INCLUDE_DIRECTORIES ${HOMM2_BZIP2_ROOT}/include)
+  set(HOMM2_BZIP2_LIBRARY Homm2BZip2::BZip2)
+else()
+  find_package(BZip2 REQUIRED)
+  set(HOMM2_BZIP2_LIBRARY BZip2::BZip2)
+endif()
+
+list(REMOVE_ITEM HOMM2_GAME_SOURCES ${CMAKE_SOURCE_DIR}/src/BASE/Bzip2.cpp)
+add_library(homm2_compression STATIC src/BASE/Bzip2.cpp)
+target_include_directories(homm2_compression PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(homm2_compression PUBLIC ${HOMM2_BZIP2_LIBRARY})
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(homm2_compression PRIVATE
+    -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
+endif()
+
 add_executable(homm2
   ${HOMM2_GAME_SOURCES}
   ${HOMM2_EXECUTABLE_SOURCES})
@@ -253,9 +274,21 @@ target_link_libraries(homm2 PRIVATE
   homm2_platform
   homm2_lua
   homm2_tinyxml2
+  homm2_compression
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  add_executable(homm2_bzip2_test
+    tools/bzip2_test.cpp)
+  target_include_directories(homm2_bzip2_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_bzip2_test PRIVATE homm2_compression)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(homm2_bzip2_test PRIVATE
+      -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
+  endif()
+  add_test(NAME bzip2 COMMAND homm2_bzip2_test)
+
   add_executable(homm2_localization_encoding_test
     tools/localization_encoding_test.cpp
     src/BASE/Utf8.cpp
