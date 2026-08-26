@@ -28,7 +28,7 @@ struct Model {
     UInt32 numSymbols;
     UInt32 incValue;
     UInt32 noExceed;
-    Char* name;
+    const Char* name;
     UInt32 freq[MAX_SYMBOLS + 2];
 };
 
@@ -54,7 +54,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol);
 Int32 arithDecodeSymbol(BitStream* bs, Model* m);
 void initModel(
     Model* m,
-    Char* initName,
+    const Char* initName,
     Int32 initNumSymbols,
     Int32 initIncValue,
     Int32 initNoExceed
@@ -110,7 +110,7 @@ void compressStream(FILE* stream, FILE* zStream);
 Bool uncompressStream(FILE* zStream, FILE* stream);
 void showFileNames(void);
 void cleanUpAndFail(void);
-void panic(char* s);
+void panic(const char* s);
 void crcError(UInt32 crcStored, UInt32 crcComputed);
 void compressedStreamEOF(void);
 void ioError(void);

@@ -23,7 +23,7 @@ public:
         i16,
         WidgetKind,
         i16,
-        char*
+        const char*
     );
     virtual ~border() override;
     virtual void Draw(void) override;

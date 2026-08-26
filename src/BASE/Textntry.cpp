@@ -52,10 +52,10 @@ textEntryWidget::textEntryWidget(
     i16 width,
     i16 height,
     i16 maxLength,
-    char* text,
-    char* fontName,
+    const char* text,
+    const char* fontName,
     FontDrawMode color,
-    char* iconName,
+    const char* iconName,
     i16 iconFrame,
     i16 id,
     WidgetKind kind,
@@ -82,6 +82,7 @@ textEntryWidget::textEntryWidget(
         static_cast<std::size_t>(m_maxLength) + TEXT_ALLOCATION_PADDING,
         strlen(text) + TEXT_ALLOCATION_PADDING
     );
+    H2_FREE(m_text);
     m_text = static_cast<char*>(H2_ALLOC(allocation));
     strcpy(m_text, text);
     if (layout == TEXT_ENTRY_LAYOUT_INSET) {

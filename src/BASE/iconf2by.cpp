@@ -9,7 +9,6 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-
 static IconEntry* s_entry = 0;
 static i32 s_loopCount = 0;
 static u8* s_src = 0;
@@ -35,7 +34,7 @@ void FlipIconToBitmapYModify(
     i32 x,
     i32 y,
     i32 frame,
-    IconDrawClipMode clip,
+    IconDrawClipMode,
     i32 clipX,
     i32 clipY,
     i32 clipW,

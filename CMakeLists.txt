@@ -208,17 +208,16 @@ endif()
 
 target_compile_options(homm2 PRIVATE
   -Wall
-  -Wno-unused-parameter
-  -Wno-sign-compare
-  -Wno-unused-variable
-  -Wno-unused-but-set-variable
-  -Wno-parentheses
-  -Wno-write-strings
+  -Werror=unused-parameter
+  -Werror=sign-compare
+  -Werror=unused-variable
+  -Werror=unused-but-set-variable
+  -Werror=parentheses
+  -Werror=write-strings
   -Wno-invalid-offsetof
-  -Wno-format-security
-  -Wno-error=format-security
-  -Wno-enum-conversion
-  -Wno-narrowing
+  -Werror=format-security
+  -Werror=enum-conversion
+  -Werror=narrowing
   -fpermissive)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/heroWindow.h>
@@ -45,7 +46,6 @@ typedef enum TradingPostPrivateConstant {
     REDRAW_HEIGHT   = 418
 } TradingPostPrivateConstant;
 
-
 float fTradingPostEfficiency = 0.0f;
 i32 bLeftDenominated = 0;
 i32 leftResource = 0;
@@ -62,7 +62,6 @@ class heroWindow* tpWindow = NULL;
 class iconWidget* tradeKnob = NULL;
 
 void DoTradingPost(i32 isMarketplace, float efficiency) {
-    tag_message messageTemp;
 
     bIsMarketPlace = isMarketplace;
     fTradingPostEfficiency = efficiency;
@@ -197,7 +196,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
                     if (leftResource == idx) {
-                        sprintf(gText, localization::Tr("common.not_applicable")  );
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("common.not_applicable")  );
                     } else {
                         ComputeTradeRatios(
                             leftResource,

@@ -20,7 +20,6 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_backgroundIcon = NULL;
 }
 
-
 border::border(
     i16 x,
     i16 y,
@@ -29,7 +28,7 @@ border::border(
     i16 e,
     WidgetKind kind,
     i16 fillColor,
-    char* name
+    const char* name
 )
     : widget(x, y, w, h, e, kind) {
     if (name != NULL)

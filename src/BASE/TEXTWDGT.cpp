@@ -31,7 +31,7 @@ textWidget::textWidget(
     i16 width,
     i16 height,
     char* text,
-    char* fontName,
+    const char* fontName,
     FontDrawMode color,
     i16 id,
     WidgetKind kind,
@@ -40,6 +40,28 @@ textWidget::textWidget(
     : widget(x, y, width, height, id, kind) {
     m_font = gpResourceManager->GetFont(fontName);
     m_text = text;
+    m_color = color;
+    m_alignment = alignment;
+    m_kind = WIDGET_KIND_TEXT;
+}
+
+textWidget::textWidget(
+    i16 x,
+    i16 y,
+    i16 width,
+    i16 height,
+    const char* text,
+    const char* fontName,
+    FontDrawMode color,
+    i16 id,
+    WidgetKind kind,
+    FontAlignment alignment
+)
+    : widget(x, y, width, height, id, kind) {
+    m_font = gpResourceManager->GetFont(fontName);
+    const std::size_t allocation = strlen(text) + TEXT_BUFFER_GROWTH;
+    m_text = static_cast<char*>(H2_ALLOC(allocation));
+    strcpy(m_text, text);
     m_color = color;
     m_alignment = alignment;
     m_kind = WIDGET_KIND_TEXT;
@@ -152,7 +174,7 @@ void textWidget::SetColorIndex(FontDrawMode color) {
     m_color = color;
 }
 
-void textWidget::SetText(char* text) {
+void textWidget::SetText(const char* text) {
     if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
         u16 newLen = strlen(text);
         if (newLen > strlen(m_text)) {
@@ -160,7 +182,5 @@ void textWidget::SetText(char* text) {
             m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
         }
         strcpy(m_text, text);
-    } else {
-        m_text = text;
     }
 }

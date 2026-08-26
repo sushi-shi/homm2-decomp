@@ -18,9 +18,6 @@ typedef enum VesaBlitConstant {
     NET_BOX_TOP          = 411
 } VesaBlitConstant;
 
-static char gInvalidateRectFailedText[] = "InvalidateRect Failed";
-static char gUpdateWindowFailedText[] = "UpdateWindow Failed";
-
 extern "C" void __cdecl BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
     i32 sourceX,

@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define True 1
 #define False 0
 #define ERROR_IF_EOF(i)                                                                            \
@@ -140,7 +139,6 @@ FILE* outputHandleJustInCase;
 #define GETFIRST16(a) ((UInt32)(words[a] >> 16))
 #define GETREST16(a) (words[a] & 0x0000ffff)
 
-
 void initialiseCRC(void) {
     globalCrc = 0xffffffff;
 }
@@ -160,8 +158,8 @@ void setGlobalCRC(u32 newCrc) {
 BitStream* bsOpenReadStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
-        panic(const_cast<char*>(
-            "bsOpenReadStream"));
+        panic(
+            "bsOpenReadStream");
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -174,8 +172,8 @@ BitStream* bsOpenReadStream(FILE* f) {
 BitStream* bsOpenWriteStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
-        panic(const_cast<char*>(
-            "bsOpenWriteStream"));
+        panic(
+            "bsOpenWriteStream");
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -237,7 +235,7 @@ void bsPutUChar(BitStream* bs, u8 c) {
 void bsClose(BitStream* bs) {
     IntNative retVal;
     if (!bsInUse)
-        panic(const_cast<char*>("bsClose"));
+        panic("bsClose");
     bsInUse = False;
 
     if (bs->mode == 'w') {
@@ -271,7 +269,7 @@ void arithCodeBitPlusFollow(BitStream* bs, UInt32 bit) {
     }
 }
 
-void arithCodeStartEncoding(BitStream* bs) {
+void arithCodeStartEncoding(BitStream*) {
     bigL = 0;
     bigR = TWO_TO_THE(smallB - 1);
     bitsOutstanding = 0;
@@ -294,7 +292,7 @@ void arithCodeStartDecoding(BitStream* bs) {
         bigD = (bigD << 1) + bsGetBit(bs);
 }
 
-void arithCodeDoneDecoding(BitStream* bs) {
+void arithCodeDoneDecoding(BitStream*) {
 
 }
 
@@ -337,7 +335,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
     arithCodeRenormalise_Encode(bs);
 
     if (bitsOutstanding > MAX_BITS_OUTSTANDING)
-        panic(const_cast<char*>("arithCodeSymbol: too many bits outstanding"));
+        panic("arithCodeSymbol: too many bits outstanding");
 }
 
 Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
@@ -375,7 +373,7 @@ Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
 
 void initModel(
     Model* m,
-    Char* initName,
+    const Char* initName,
     Int32 initNumSymbols,
     Int32 initIncValue,
     Int32 initNoExceed
@@ -443,7 +441,7 @@ Int32 getSymbol(Model* m, BitStream* bs) {
 void initBogusModel(void) {
     initModel(
         &bogusModel,
-        const_cast<char*>("bogus"),
+        "bogus",
         256,
         0,
         256
@@ -495,56 +493,56 @@ UInt32 getUInt32(BitStream* bs) {
 void initModels(void) {
     initModel(
         &models[BASIS],
-        const_cast<char*>("basis"),
+        "basis",
         11,
         12,
         1000
     );
     initModel(
         &models[MODEL_2_3],
-        const_cast<char*>("2-3"),
+        "2-3",
         2,
         4,
         1000
     );
     initModel(
         &models[MODEL_4_7],
-        const_cast<char*>("4-7"),
+        "4-7",
         4,
         3,
         1000
     );
     initModel(
         &models[MODEL_8_15],
-        const_cast<char*>("8-15"),
+        "8-15",
         8,
         3,
         1000
     );
     initModel(
         &models[MODEL_16_31],
-        const_cast<char*>("16-31"),
+        "16-31",
         16,
         3,
         1000
     );
     initModel(
         &models[MODEL_32_63],
-        const_cast<char*>("32-63"),
+        "32-63",
         32,
         3,
         1000
     );
     initModel(
         &models[MODEL_64_127],
-        const_cast<char*>("64-127"),
+        "64-127",
         64,
         2,
         1000
     );
     initModel(
         &models[MODEL_128_255],
-        const_cast<char*>("128-255"),
+        "128-255",
         128,
         1,
         1000
@@ -652,7 +650,7 @@ void sendMTFVal(BitStream* bs, Int32 n) {
         putSymbol(&models[MODEL_128_255], n - 128 + 1, bs);
     } else {
 
-        panic(const_cast<char*>("sendMTFVal: bad value!"));
+        panic("sendMTFVal: bad value!");
     }
 }
 
@@ -914,7 +912,7 @@ LOOPSTART:
         nextSym
     );
     LogStr(gText);
-    panic(const_cast<char*>("getAndMoveToFrontDecode\n"));
+    panic("getAndMoveToFrontDecode\n");
     return True;
 }
 
@@ -1202,8 +1200,8 @@ void sortIt(void) {
                     hiBound = 900000;
                     break;
                 default:
-                    panic(const_cast<char*>(
-                        "gradedSort"));
+                    panic(
+                        "gradedSort");
                     break;
             }
             if (loBound > lastPP)
@@ -1279,7 +1277,7 @@ void doReversibleTransformation(void) {
         }
 
     if (origPtr == -1)
-        panic(const_cast<char*>("doReversibleTransformation"));
+        panic("doReversibleTransformation");
 }
 
 void undoReversibleTransformation(void) {
@@ -1332,7 +1330,7 @@ void spotBlock(Bool weAreCompressing) {
             n = 255;
 
         if (!(n >= 0 && n <= 255))
-            panic(const_cast<char*>("spotBlock"));
+            panic("spotBlock");
 
         if (weAreCompressing)
             SETFIRST(index, (UChar)n);
@@ -1397,7 +1395,7 @@ Int32 getRLEpair(FILE* src) {
 
     if (chLatest != EOF) {
         if (ungetc(chLatest, src) == EOF)
-            panic(const_cast<char*>("getRLEpair: ungetc failed"));
+            panic("getRLEpair: ungetc failed");
     } else {
         ERROR_IF_NOT_ZERO(errno);
     }
@@ -1688,7 +1686,7 @@ void showFileNames(void) {}
 
 void cleanUpAndFail(void) {}
 
-void panic(char* s) {}
+void panic(const char*) {}
 
 void crcError(UInt32 crcStored, UInt32 crcComputed) {
     sprintf(
@@ -1768,7 +1766,7 @@ void bitStreamEOF(void) {
     cleanUpAndFail();
 }
 
-void __cdecl mySignalCatcher(IntNative* n) {
+void __cdecl mySignalCatcher(IntNative*) {
     sprintf(
         gText,
         "\n%s: Control-C (or similar) caught, quitting.\n",
@@ -1778,7 +1776,7 @@ void __cdecl mySignalCatcher(IntNative* n) {
     cleanUpAndFail();
 }
 
-void mySIGSEGVorSIGBUScatcher(IntNative* n) {
+void mySIGSEGVorSIGBUScatcher(IntNative*) {
     if (compressing) {
         sprintf(
             gText,
@@ -1843,7 +1841,6 @@ Bool endsInBz(Char* name) {
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    IntNative retVal;
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1857,13 +1854,13 @@ void compress(Char* name) {
     compressStream(inStr, outStr);
     outputHandleJustInCase = NULL;
 
-    retVal = remove(inName);
+    remove(inName);
 }
 
 void uncompress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    Bool magicNumberOK;
+
     IntNative retVal;
 
     strcpy(inName, name);
@@ -1876,7 +1873,7 @@ void uncompress(Char* name) {
 
     errno = 0;
     outputHandleJustInCase = outStr;
-    magicNumberOK = uncompressStream(inStr, outStr);
+    uncompressStream(inStr, outStr);
     outputHandleJustInCase = NULL;
 
     retVal = remove(inName);
@@ -1886,7 +1883,7 @@ void uncompress(Char* name) {
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;
-    i32 result;
+
     FILE* fp;
     i32l flen;
 
@@ -1917,12 +1914,12 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
 
     strcat(fname, ".nw");
     fp = fopen(fname, "rb");
-    result = fseek(fp, 0, 2);
+    fseek(fp, 0, 2);
     flen = ftell(fp);
-    result = fseek(fp, 0, 0);
-    result = fread(dst, flen, 1, fp);
-    result = fclose(fp);
-    result = remove(fname);
+    fseek(fp, 0, 0);
+    fread(dst, flen, 1, fp);
+    fclose(fp);
+    remove(fname);
     FreeCompressStructures();
 
     return flen;
@@ -1931,7 +1928,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;
-    i32 result;
+
     FILE* fp;
     i32l flen;
 
@@ -1961,12 +1958,12 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
 
     fname[strlen(fname) - 3] = '\0';
     fp = fopen(fname, "rb");
-    result = fseek(fp, 0, 2);
+    fseek(fp, 0, 2);
     flen = ftell(fp);
-    result = fseek(fp, 0, 0);
-    result = fread(dst, flen, 1, fp);
-    result = fclose(fp);
-    result = remove(fname);
+    fseek(fp, 0, 0);
+    fread(dst, flen, 1, fp);
+    fclose(fp);
+    remove(fname);
     FreeCompressStructures();
 
     return flen;

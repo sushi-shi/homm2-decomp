@@ -761,7 +761,7 @@ void hero::CheckLevel(void) {
     i32 nLevel;
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
-    i32 levelsGained;
+
     i32 highIndex;
     i32 slot;
     SAMPLE2 samp;
@@ -777,10 +777,10 @@ void hero::CheckLevel(void) {
         return;
 
     samp = NULL;
-    levelsGained = newLevel - m_level;
+
     for (nLevel = m_level + 1; nLevel <= newLevel; nLevel++) {
         sprintf(gText, cHeroLevel[0], m_name);
-        sprintf(text, cHeroLevel[1]);
+        utf8::Copy(text, sizeof(text), cHeroLevel[1]);
         strcat(gText, text);
 
         statBonuses[H2EnumIndex(HERO_PRIMARY_ATTACK)] = 0;
@@ -860,7 +860,7 @@ void hero::CheckLevel(void) {
         }
 
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
-            samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
+            samp = LoadPlaySample("nwherolv.82m");
             if (choices[0] == HERO_SKILL_NONE) {
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else if (choices[1] == HERO_SKILL_NONE) {
@@ -962,47 +962,47 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             break;
 
         case UI_ADDITIONAL_STATS:
-            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_ADDITIONAL_STATS)]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_ADDITIONAL_STATS)]);
             break;
 
         case UI_MORALE_FIRST:
         case UI_MORALE_MIDDLE:
         case UI_MORALE_LAST:
             if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) > 0)
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GOOD_MORALE)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_GOOD_MORALE)]);
             else if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) == 0)
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_MORALE)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_MORALE)]);
             else
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_BAD_MORALE)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_BAD_MORALE)]);
             break;
 
         case UI_LUCK_FIRST:
         case UI_LUCK_MIDDLE:
         case UI_LUCK_LAST:
             if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) > 0)
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GOOD_LUCK)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_GOOD_LUCK)]);
             else if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) == 0)
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_LUCK)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_NEUTRAL_LUCK)]);
             else
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_BAD_LUCK)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_BAD_LUCK)]);
             break;
 
         case UI_EXPERIENCE_FIRST:
         case UI_EXPERIENCE_LAST:
-            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_EXPERIENCE)]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_EXPERIENCE)]);
             break;
 
         case UI_SPELL_POINTS_FIRST:
         case UI_SPELL_POINTS_LAST:
-            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_SPELL_POINTS)]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_SPELL_POINTS)]);
             break;
 
         case UI_FORMATION_SPREAD:
-            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_SPREAD_FORMATION)]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_SPREAD_FORMATION)]);
             break;
 
         case UI_FORMATION_GROUPED:
-            sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_GROUPED_FORMATION)]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_GROUPED_FORMATION)]);
             break;
 
         case UI_ARMY_SELECTOR_SLOT_0:
@@ -1082,7 +1082,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_ARTIFACT_SLOT_13:
             if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                 == ARTIFACT_NONE)
-                sprintf(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             else if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                      == ARTIFACT_MAGIC_BOOK)
                 strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_VIEW_SPELLS)]);
@@ -1146,13 +1146,12 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 tmp;
     i32 quickView;
     i32 armySlot;
-    i32 dummy;
+
     i32 bExit = 0;
     i32 heroLevel;
     i32 iHero;
     i32 secondarySkillSlot;
-    tag_message newMsg;
-    i32 j;
+
     i32 nextExperience;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
@@ -1816,8 +1815,7 @@ void SetupHeroView(void) {
 }
 
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
-    i16 splitTextSlot = UI_SPLIT_TEXT;
-    i16 splitAmountSlot = UI_SPLIT_AMOUNT;
+
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
@@ -1828,7 +1826,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, localization::Tr("hero.army.split.prompt"));
+    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("hero.army.split.prompt"));
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
@@ -1932,7 +1930,7 @@ void hero::UpgradeCreatures(
     CreatureType oldCreatureType,
     CreatureType newCreatureType
 ) {
-    i32 numberUpgraded = 0;
+
     i32 armySlot;
 
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
@@ -1987,7 +1985,7 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
 
 void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     i32 skillBonusValue;
-    char* skillText;
+    const char* skillText;
 
     skillBonusValue = GetSSLevel(skill) - H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]);
     if (skillBonusValue > 0) {
@@ -2003,7 +2001,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
             GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL
         );
     } else {
-        sprintf(gText, cSecSkillDesc[H2EnumIndex(skill)][H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]);
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cSecSkillDesc[H2EnumIndex(skill)][H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]);
     }
     NormalDialog(
         gText,

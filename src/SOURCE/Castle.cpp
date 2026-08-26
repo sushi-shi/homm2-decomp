@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/message.h>
 #include <BASE/BITS.h>
 #include <BASE/heroWindow.h>
@@ -103,7 +104,6 @@ typedef enum CastleConstant {
 
 namespace {
 
-
     inline i32 CannotRecruitHero(void) {
         i32 cannot;
 
@@ -121,27 +121,23 @@ namespace {
 
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     u32l captainQuarters;
-    i32 tileX;
-    i32 tileY;
+
     i32 terrainIconFrame;
     i32 column;
     i32 rowPos;
     widget* backgroundWidget;
     i32 raceBase;
-    i16 builtFrame;
+
     i32 slotNum;
     char icnName[TOWN_OBJECT_FILENAME_SIZE];
     i32 backFrame;
-    i16 noBuildFrame;
+
     char captainStatLine[CAPTAIN_STAT_LINE_CAPACITY];
     i32 stateFrame;
     tag_message msg;
-    i16 cannotAffordIcon;
 
     casWin = window;
-    builtFrame = H2EnumIndex(FRAME_BUILT);
-    noBuildFrame = H2EnumIndex(FRAME_CANNOT_BUILD);
-    cannotAffordIcon = H2EnumIndex(FRAME_CANNOT_AFFORD);
+
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
         if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
@@ -389,8 +385,6 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         casWin->BroadcastMessage(msg);
     }
 
-    tileX = BACKGROUND_LEFT;
-    tileY = BACKGROUND_TOP;
     terrainIconFrame = (H2EnumIndex(giGroundToTerrain
                                   [gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)
                                        ->m_terrainImageIndex])
@@ -474,9 +468,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     H2EnumStorage<BuildingSlotType, i32> whichBuilding;
     i32 quickFlag;
     i32 ret;
-    i16 statusWidgetId;
 
-    statusWidgetId = H2EnumIndex(CONTROL_STATUS_TEXT);
     whichBuilding = BUILDING_SLOT_NONE;
     ret = 0;
     hoverMessage = 0;
@@ -517,11 +509,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         switch (whichBuilding) {
 
             case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
-                sprintf(gText, cCastleInfo[H2EnumIndex(INFO_GROUPED_FORMATION)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCastleInfo[H2EnumIndex(INFO_GROUPED_FORMATION)]);
                 break;
 
             case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
-                sprintf(gText, cCastleInfo[H2EnumIndex(INFO_SPREAD_FORMATION)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCastleInfo[H2EnumIndex(INFO_SPREAD_FORMATION)]);
                 break;
 
             case TOWN_OBJECT_MAGE_GUILD:
@@ -581,8 +573,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
             case BUILDING_SLOT_SPECIAL_THIRTY:
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
-                    sprintf(
-                        gText,
+                    utf8::Copy(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("castle.build.already_this_turn")
 
                     );

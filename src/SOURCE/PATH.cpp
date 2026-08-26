@@ -53,7 +53,6 @@ i32 army::FindPath(
 
 i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     i32 pathResult;
-    i32 extra;
 
     if (!ValidHex(targetHex))
         return 0;

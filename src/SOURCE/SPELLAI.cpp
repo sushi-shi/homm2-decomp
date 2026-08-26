@@ -8,7 +8,6 @@
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
 
-
 static const float COMBAT_SPELL_AI_BLIND_MODIFIER = 0.4f;
 static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = 0.55f;
 static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = 0.5f;
@@ -124,7 +123,7 @@ i32 combatManager::DoSpellAI(CombatSide side, i32 restricted) {
 }
 
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
-    i32 durMax_29;
+
     i32 wallsDamagedTotal;
     i32 spellPowerWork;
     i32 hexCell_9;
@@ -708,13 +707,6 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
-    i32 spellPower = m_spellPower[H2EnumIndex(m_currentSide)];
-
-    if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
-         || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
-        && m_heroes[H2EnumIndex(m_currentSide)] != NULL
-        && m_heroes[H2EnumIndex(m_currentSide)]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
-        spellPower <<= 1;
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
@@ -740,9 +732,6 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
                              .SpellCastWorkChance(SPELL_MIRROR_IMAGE);
             monType = m_armies[H2EnumIndex(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex]
                                .m_monsterType;
-            spellPower =
-                m_armies[H2EnumIndex(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex].m_quantity
-                * SPELL_DEFAULT_CREATURE_POWER;
             break;
     }
 
@@ -766,9 +755,9 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     float damageDelta;
-    i32 unused38_h;
+
     i32 newSpd;
-    i32 unused30_j;
+
     army* other = NULL;
     float castChance =
         target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[H2EnumIndex(influence)]));
@@ -783,7 +772,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     i32 distance;
     float afterTurns;
     float beforeTurns;
-    i32 unused48_e;
+
     i32 shooters;
     i32 adjacent;
     i32 dragonCounter;
@@ -1088,7 +1077,6 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     i32 resurrectPower;
     i32 armyIndex;
     i32 count;
-    float workChance;
 
     resurrectPower = m_spellPower[H2EnumIndex(m_currentSide)] * COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
     if (m_heroes[H2EnumIndex(m_currentSide)] != NULL && m_heroes[H2EnumIndex(m_currentSide)]->HasArtifact(ARTIFACT_ANKH))
