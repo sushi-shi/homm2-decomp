@@ -39,32 +39,8 @@ public:
 
         m_size = {mode.width, mode.height};
         const int scale = mode.scale > 0 ? mode.scale : 2;
-        int windowWidth = mode.width * scale;
-        int windowHeight = mode.height * scale;
-        if (const char* configured = SDL_getenv("HOMM2_WINDOW_SIZE");
-            configured != nullptr && *configured != '\0') {
-            int configuredWidth;
-            int configuredHeight;
-            char trailing;
-            if (SDL_sscanf(
-                    configured,
-                    "%dx%d%c",
-                    &configuredWidth,
-                    &configuredHeight,
-                    &trailing
-                ) == 2
-                && configuredWidth > 0 && configuredHeight > 0) {
-                windowWidth = configuredWidth;
-                windowHeight = configuredHeight;
-            } else {
-                std::fprintf(
-                    stderr,
-                    "[homm2] HOMM2_WINDOW_SIZE must be '<width>x<height>'; using %dx%d\n",
-                    windowWidth,
-                    windowHeight
-                );
-            }
-        }
+        const int windowWidth = mode.width * scale;
+        const int windowHeight = mode.height * scale;
 
         m_window = SDL_CreateWindow(mode.title, windowWidth, windowHeight,
                                     SDL_WINDOW_RESIZABLE);
