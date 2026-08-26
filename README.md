@@ -102,24 +102,6 @@ nix build .#homm2-windows
 nix build .#homm2-web
 ```
 
-## Icon decoder model
-
-[`tools/homm2-icon-rs`](tools/homm2-icon-rs) contains a dependency-free Rust
-model of the ICN decoder and blitter family. It is a research and differential-
-testing tool rather than part of the game runtime. Enter its pinned Rust
-nightly toolchain and run the checks from that directory:
-
-```sh
-nix develop ../..#icon
-cargo test --all-targets
-cargo test --doc
-cargo clippy --all-targets -- -D warnings
-cargo fmt --check
-```
-
-The parity tests compile the repository's ten reconstructed C++ decoder units
-and compare them with the Rust model over generated valid streams.
-
 ### Building without Nix
 
 Requirements:
