@@ -734,7 +734,7 @@ void combatManager::DrawBackground(void) {
         COMBAT_SCREEN_WIDTH,
         COMBAT_AREA_HEIGHT
     );
-    m_backgroundDrawn = 1;
+    m_backgroundDrawn = true;
 }
 
 VA(0x00439058, 0x560)

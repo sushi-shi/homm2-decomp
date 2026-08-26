@@ -34,7 +34,7 @@ resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
     m_active = false;
     m_resourceListHead = NULL;
-    m_expunging = 0;
+    m_expunging = false;
     strcpy(m_lastFileName,
            "");
     m_lastFileId = 0;
@@ -231,7 +231,7 @@ void resourceManager::AddResource(class resource* newResource) {
 
 VA(0x004b8740, 0x7e)
 void resourceManager::Expunge(void) {
-    m_expunging = 1;
+    m_expunging = true;
     resource* cur = m_resourceListHead;
     resource* next = NULL;
     while (cur != NULL) {
@@ -240,7 +240,7 @@ void resourceManager::Expunge(void) {
         delete cur;
         cur = next;
     }
-    m_expunging = 0;
+    m_expunging = false;
 }
 
 VA(0x004b87c0, 0x37)

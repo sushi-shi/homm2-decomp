@@ -149,7 +149,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
         return 1;
     if (gpInputManager->m_mouseMessageActive != 0)
         return 1;
-    gpInputManager->m_mouseMessageActive = 1;
+    gpInputManager->m_mouseMessageActive = true;
 
     i32 captureReleased;
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
@@ -230,14 +230,14 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         }
     }
-    gpInputManager->m_mouseMessageActive = 0;
+    gpInputManager->m_mouseMessageActive = false;
     return event->type == MESSAGE_NONE;
 }
 
 VA(0x004bc720, 0x9e)
 inputManager::inputManager(void) : baseManager() {
     m_active = false;
-    m_mouseMessageActive = 0;
+    m_mouseMessageActive = false;
     m_requestedPriority = 1;
     field_0x84e = 0;
     field_0x742 = 0;
@@ -559,7 +559,7 @@ void inputManager::ForceMouseMove(void) {
     // Retail repeats the re-entrancy guard verbatim before claiming the flag.
     if (gpInputManager->m_mouseMessageActive != 0)
         return;
-    gpInputManager->m_mouseMessageActive = 1;
+    gpInputManager->m_mouseMessageActive = true;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->type = MESSAGE_MOUSE_MOVE;
@@ -573,7 +573,7 @@ void inputManager::ForceMouseMove(void) {
         gpInputManager->m_readIndex++;
         gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
     }
-    gpInputManager->m_mouseMessageActive = 0;
+    gpInputManager->m_mouseMessageActive = false;
 }
 
 

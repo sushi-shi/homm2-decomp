@@ -25,9 +25,9 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
-        m_isLarge = 1;
+        m_isLarge = true;
     else
-        m_isLarge = 0;
+        m_isLarge = false;
     gpResourceManager->Read13(reinterpret_cast<i8*>(name));
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(name);
@@ -76,11 +76,11 @@ void font::DrawStringExecute(
             goto next;
         }
         if (c == '{') {
-            m_suppressDraw = 1;
+            m_suppressDraw = true;
             goto next;
         }
         if (c == '}') {
-            m_suppressDraw = 0;
+            m_suppressDraw = false;
             goto next;
         }
         // The same glyph remap GetCharacterWidth performs, open-coded: the
@@ -165,7 +165,7 @@ void font::DrawStringExecute(
 
 VA(0x004c3a30, 0x3d)
 void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
-    m_suppressDraw = 0;
+    m_suppressDraw = false;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
@@ -358,7 +358,7 @@ void font::DrawBoundedString(
         if (totalH < h)
             yPosition = (h - totalH) / CENTER_DIVISOR;
     }
-    m_suppressDraw = 0;
+    m_suppressDraw = false;
     while (pos < len && line[pos] != 0 && (yPosition + m_height <= h || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > h)
             ExtractLine(str, line, &pos, w, &lw, 1);

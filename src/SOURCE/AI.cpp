@@ -228,7 +228,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     hexcell* targetCell;
     u32 targetHex;
 
-    m_limitCreature = 0;
+    m_limitCreature = false;
     thisArmy = m_currentArmyIndex + m_armies[IDX(m_currentArmySide)];
     plan = COMBAT_AI_ATTACK_NONE;
     sideEnemy = OppositeCombatSide(m_currentSide);

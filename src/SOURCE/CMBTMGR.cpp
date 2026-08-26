@@ -189,7 +189,7 @@ combatManager::combatManager(void) {
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_limitCreatureHex = 0;
-    m_limitCreature = 0;
+    m_limitCreature = false;
     m_showArmyQuantities = 1;
     m_currentCommand = CombatMessageCommand(0);
     m_unknownF35B = 0;
@@ -201,7 +201,7 @@ combatManager::combatManager(void) {
     m_unknownF337[IDX(COMBAT_DEFENDER_SIDE)] = 0;
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
-    m_combatWindowOpen = 0;
+    m_combatWindowOpen = false;
     strcpy(m_previousCombatMessage,
            "");
     strcpy(m_currentCombatMessage,
@@ -316,7 +316,7 @@ void combatManager::SetupCombat(
         m_heroCastSpell[index] = 0;
     }
 
-    m_drawbridgeBackgroundVisible = 0;
+    m_drawbridgeBackgroundVisible = false;
     if (defenderTown != NULL) {
         if (defenderTown->m_occupyingHeroId != -1) {
             m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)] = &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army;
@@ -371,8 +371,8 @@ void combatManager::SetupCombat(
 
 VA(0x004265e7, 0x258)
 void combatManager::InitNonVisualVars(void) {
-    m_gridSelectionDisabled = 0;
-    m_nonVisualCombat = 0;
+    m_gridSelectionDisabled = false;
+    m_nonVisualCombat = false;
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         m_spellPower[IDX(side)] = 0;
@@ -407,7 +407,7 @@ void combatManager::InitNonVisualVars(void) {
     gbCombatSurrender = false;
     m_sideDefeated[IDX(COMBAT_ATTACKER_SIDE)] = 0;
     m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE)] = 0;
-    m_limitCreature = 1;
+    m_limitCreature = true;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
     GenerateMap();
@@ -483,7 +483,7 @@ i32 combatManager::Open(i32 openFlags) {
     m_previousCombatMessageExpiration = 0;
     m_combatMessageExpiration = 0;
     m_combatMessagePending = 0;
-    m_combatWindowOpen = 0;
+    m_combatWindowOpen = false;
     gpSoundManager->PlayAmbientMusic(-1);
     m_combatBuffer =
         new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
@@ -497,7 +497,7 @@ i32 combatManager::Open(i32 openFlags) {
     SetupAndLoadObstacles();
     memset(m_previousGridState, IDX(GRID_SHADE_NONE), sizeof(m_previousGridState));
     GetNextArmy(0);
-    m_backgroundDrawn = 0;
+    m_backgroundDrawn = false;
 
     SAMPLE2 preBattleSample = LoadPlaySample("PREBATTL.82M");
     gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
@@ -514,7 +514,7 @@ i32 combatManager::Open(i32 openFlags) {
     if (m_combatWindow == NULL)
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
-    m_combatWindowOpen = 1;
+    m_combatWindowOpen = true;
     DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     glTimers[0] = KBTickCount();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
@@ -595,7 +595,7 @@ void combatManager::Close(void) {
     if (!bMouseWasVis)
         gpMouseManager->HideColorPointer();
     m_active = false;
-    m_combatWindowOpen = 0;
+    m_combatWindowOpen = false;
 }
 
 VA(0x004271ad, 0x2c1)
@@ -1769,7 +1769,7 @@ void combatManager::ResetHitByCreature(void) {
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         for (index = 0; index < COMBAT_ARMY_CAPACITY; index++)
-            m_armies[IDX(side)][index].m_hitByCreature = 0;
+            m_armies[IDX(side)][index].m_hitByCreature = false;
     }
 }
 
@@ -2264,7 +2264,7 @@ void combatManager::CombatSystemOptions(void) {
     delete CSPanel;
     if (bCPrefsChanged)
         WritePrefs();
-    m_backgroundDrawn = 0;
+    m_backgroundDrawn = false;
     DrawFrame(1, 0, 0, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
 }
 

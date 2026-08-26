@@ -1035,8 +1035,8 @@ advManager::advManager(void) {
     m_updateMaxY = 0;
     m_updatePending = 0;
     m_selectedCell = ADVMGR_COMMAND_NONE;
-    m_cursorActive = 0;
-    m_identifyHeroActive = 0;
+    m_cursorActive = false;
+    m_identifyHeroActive = false;
     m_drawHeroShadows = 1;
     m_adventureBorder = NULL;
 
@@ -1067,7 +1067,7 @@ advManager::advManager(void) {
     m_stoneTiles = NULL;
     m_adventureWindow = NULL;
     m_visibilityMap = NULL;
-    m_heroContextLocked = 0;
+    m_heroContextLocked = false;
     m_townContextLocked = 0;
     bShowIt = 1;
     m_lastQuickViewX = QUICK_VIEW_NONE;
@@ -1087,7 +1087,7 @@ advManager::advManager(void) {
 VA(0x004012f2, 0x955)
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
-    m_openState = 0;
+    m_openState = false;
     bShowIt = 0;
     m_adventureBorder = NULL;
 
@@ -1160,7 +1160,7 @@ i32 advManager::Open(i32 id) {
             MemError();
         }
     }
-    m_visibilityMapValid = 0;
+    m_visibilityMapValid = false;
     gpWindowManager->AddWindow(m_adventureWindow, 0, 1);
 
     if (m_groundTiles == NULL) {
@@ -3192,8 +3192,8 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
     }
 
     gpMouseManager->m_cursorReady = 0;
-    m_comboHeroDrawn = 0;
-    m_forceCompleteDraw = 0;
+    m_comboHeroDrawn = false;
+    m_forceCompleteDraw = false;
 
     for (drawY = 0; drawY < DRAW_VIEW_CELLS; ++drawY) {
         for (drawX = 0; drawX < DRAW_VIEW_CELLS; ++drawX) {
@@ -4235,7 +4235,7 @@ void advManager::DrawCell(
                     } else {
                         DrawCursorShadow();
                         DrawCursor();
-                        m_comboHeroDrawn = 1;
+                        m_comboHeroDrawn = true;
                     }
                 }
             }
@@ -4509,7 +4509,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         return;
     }
 
-    gpAdvManager->m_openState = 0;
+    gpAdvManager->m_openState = false;
     xrem = ymod = 0;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
@@ -7120,7 +7120,7 @@ void advManager::DemobilizeCurrHero(void) {
         return;
     }
 
-    m_heroContextLocked = 0;
+    m_heroContextLocked = false;
     hero* hp = gpGame->GetHero(gpCurPlayer->m_currentHero);
     StopCursor(1);
     mapCell* cell = GetCell(hp->m_x, hp->m_y);
@@ -7134,7 +7134,7 @@ void advManager::DemobilizeCurrHero(void) {
     cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
     cell->m_objectMetadata = hp->m_id;
     cell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
-    m_cursorActive = 0;
+    m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
 }
@@ -7190,7 +7190,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     DeactivateCurrTown();
     HideRoute(0, 0, 1);
     DeactivateCurrHero();
-    m_heroContextLocked = 1;
+    m_heroContextLocked = true;
     gpCurPlayer->m_currentHero = static_cast<i8>(heroId);
     hero* contextHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     m_mapOriginX = contextHero->m_x - VIEW_CENTER_OFFSET;
@@ -7238,7 +7238,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         ShowRoute(0, 0, !update);
     }
     UpdBottomView(1, 1, 1);
-    m_cursorActive = 1;
+    m_cursorActive = true;
     UpdateRadar(1, 0);
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -7418,7 +7418,7 @@ void advManager::CastSpell(SpellType spell) {
             ViewWorld(spell, spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
             break;
         case SPELL_IDENTIFY_HERO:
-            m_identifyHeroActive = 1;
+            m_identifyHeroActive = true;
             NormalDialog(
                 "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb.",
                 1,
@@ -7694,7 +7694,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     m_previousOriginX = m_mapOriginX;
     m_previousOriginY = m_mapOriginY;
     memset(bComboDraw, 0, COMBO_CLEAR_BYTES);
-    m_comboHeroDrawn = 0;
+    m_comboHeroDrawn = false;
 
     for (drawY = 0; drawY < COMBO_VIEW_CELLS; ++drawY) {
         for (drawX = 0; drawX < COMBO_VIEW_CELLS; ++drawX) {
@@ -8317,7 +8317,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(IDX(soundId));
         m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 1;
+        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = true;
         m_loopingSamples[IDX(soundId)]->m_playbackData.channelType = ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
         m_activeSoundMask ^= 1 << IDX(m_activeSounds[soundSlot].soundId);
@@ -8445,7 +8445,7 @@ void advManager::TeleportTo(
             mapHero->m_eventFlags =
                 HeroEventFlag(static_cast<i32>(mapHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED));
         }
-        m_cursorActive = 0;
+        m_cursorActive = false;
     }
 
     SetEnvironmentOrigin(
@@ -8890,7 +8890,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     );
     if (gpSearchArray->m_pathLength > 0 && nPath > 0) {
         memset(m_visibilityMap, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(*m_visibilityMap));
-        m_visibilityMapValid = 1;
+        m_visibilityMapValid = true;
         remain = hero->m_remainingMobility;
         mapX = hero->m_x;
         mapY = hero->m_y;
@@ -9017,7 +9017,7 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
         return;
     }
 
-    m_visibilityMapValid = 0;
+    m_visibilityMapValid = false;
     if (redraw) {
         CompleteDraw(0);
         UpdateScreen(0, 0);
@@ -9251,7 +9251,7 @@ void advManager::SetInitialMapOrigin(void) {
     );
     m_hoverCellY = 0;
     m_lastHoverCell = 0;
-    m_cursorActive = 0;
+    m_cursorActive = false;
     gbHeroMoving = false;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->m_currentTown != TOWN_ID_NONE) {

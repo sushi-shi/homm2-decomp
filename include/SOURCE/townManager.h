@@ -52,10 +52,10 @@ public:
     i32 m_lastHoverId;
     i32 m_lastHoverSubId;
     TownManagerArmyCommand m_command;
-    i32 m_recruitResult;
+    b32 m_recruitResult;
     u32l m_affordableBuildings;
     u32l m_buildableBuildings;
-    i32 m_castleDialogActive;
+    b32 m_castleDialogActive;
     H2_ENUM_STORAGE(BuildingSlotType, i32) m_selectedBuilding;
     heroWindow* m_heroWindow0;
     heroWindow* m_heroWindow1;
