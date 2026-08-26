@@ -1,16 +1,14 @@
 # Native port
 
-The branch chain is:
+The maintained branch chain is:
 
 ```text
-decomp-pol-2.0
-  -> source-pol-2.0
-  -> master-pol-2.0
-  -> port-pol-2.0
+decomp-gold-2.1-buka -> source-gold-2.1-buka -> master -> ironfist
 ```
 
-Core game fixes belong upstream. `port-pol-2.0` owns only `PLATFORM` and its
-native build.
+`master` is the portable Gold 2.1 line. Matching-only changes stay on the
+decomp branches; portable platform, localization, and runtime changes belong
+here and flow onward to `ironfist`.
 
 ```text
 include/PLATFORM/          interfaces
@@ -19,7 +17,7 @@ src/PLATFORM/WIN32/        Win32 translation
 src/PLATFORM/SDL3/         native SDL3 implementation
 ```
 
-All 95 game translation units compile directly. There are no override units.
+All 97 game translation units compile directly. There are no override units.
 
 ## Run
 
