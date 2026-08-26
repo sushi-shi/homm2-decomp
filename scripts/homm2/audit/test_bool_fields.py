@@ -188,6 +188,33 @@ void Set() {
         self.assertTrue(by_name["flags"].eligible)
         self.assertIn("assignment",
                       {write.kind for write in by_name["positions"].unknown_writes})
+        self.assertNotIn("variable-initializer",
+                         {write.kind for write in by_name["positions"].unknown_writes})
+
+    def test_uninitialized_local_declaration_is_not_a_value_write(self):
+        text = r"""
+typedef int i32;
+void Set(i32 input) {
+    i32 flag;
+    if (input)
+        flag = 0;
+    else
+        flag = 1;
+    (void)flag;
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            flag = next(
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.name == "flag"
+            )
+        self.assertTrue(flag.eligible)
+        self.assertEqual(
+            {write.kind for write in flag.unknown_writes},
+            {"uninitialized-local"},
+        )
 
     def test_enum_storage_macro_is_not_a_boolean_candidate(self):
         text = r"""
@@ -237,6 +264,26 @@ b32 source = false;
 struct Value {
     i32 flag;
     void Set() { flag = source; }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            flag = next(
+                item for item in analyze_translation_unit(translation, source, repo)
+                if item.name == "flag"
+            )
+        self.assertTrue(flag.eligible)
+        self.assertEqual(flag.observed_domain, (0, 1))
+
+    def test_one_minus_boolean_alias_is_proven_boolean_flow(self):
+        text = r"""
+typedef int i32;
+typedef i32 b32;
+b32 source = false;
+struct Value {
+    i32 flag;
+    void Set() { flag = 1 - source; }
 };
 """
         with tempfile.TemporaryDirectory() as directory:

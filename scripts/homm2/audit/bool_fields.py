@@ -60,7 +60,7 @@ from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 DATABASE = Path("build/clangd/compile_commands.json")
 PROJECT_ROOTS = ("include", "src")
 RECORD_KINDS = {
@@ -96,6 +96,11 @@ STORAGE_DECL_KINDS = {
     ci.CursorKind.FIELD_DECL: "field",
     ci.CursorKind.VAR_DECL: "variable",
     ci.CursorKind.PARM_DECL: "parameter",
+}
+REVIEW_BOUNDARY_WRITE_KINDS = {
+    "address-escape",
+    "mutable-reference-argument",
+    "uninitialized-local",
 }
 
 
@@ -243,6 +248,12 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
         right = _boolean_domain(children[2])
         if left is not None and right is not None:
             return tuple(sorted(set(left) | set(right)))
+    if cursor.kind == ci.CursorKind.BINARY_OPERATOR and cursor.spelling == "-" \
+            and len(children) == 2:
+        left = _boolean_domain(children[0])
+        right = _boolean_domain(children[1])
+        if left == (1,) and right is not None:
+            return (0, 1)
     if cursor.kind == ci.CursorKind.BINARY_OPERATOR and cursor.spelling == "," and children:
         return _boolean_domain(children[-1])
     if cursor.kind == ci.CursorKind.BINARY_OPERATOR and cursor.spelling == "=" and children:
@@ -279,6 +290,19 @@ def _initializer_leaves(cursor: ci.Cursor) -> list[ci.Cursor]:
     return [leaf
             for child in cursor.get_children()
             for leaf in _initializer_leaves(child)]
+
+
+def _has_explicit_initializer(cursor: ci.Cursor) -> bool:
+    tokens = _tokens(cursor)
+    if "=" in tokens or any(child.kind == ci.CursorKind.INIT_LIST_EXPR
+                            for child in cursor.get_children()):
+        return True
+    try:
+        name_index = tokens.index(cursor.spelling)
+    except ValueError:
+        return False
+    return (name_index + 1 < len(tokens)
+            and tokens[name_index + 1] in ("(", "{"))
 
 
 def _write(cursor: ci.Cursor, kind: str, repo: Path,
@@ -505,7 +529,7 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
                     ci.CursorKind.TYPE_REF,
                 }
                 initializers = [child for child in children if child.kind not in ignored]
-                if initializers:
+                if initializers and _has_explicit_initializer(cursor):
                     initializer = initializers[-1]
                     _, array_depth = _storage_type(cursor.type)
                     values = (_initializer_leaves(initializer)
@@ -764,16 +788,26 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         for write in sorted(item.writes)
         if write.replacement is not None
     ]
-    unproven_boolean_writes = [
-        {
+    def emit_unknown(item: FieldFacts, write: Write) -> dict:
+        return {
             "qualified_name": f"{item.record}::{item.name}",
             "storage_kind": item.storage_kind,
             "declarations": [asdict(value) for value in sorted(item.declarations)],
             "write": asdict(write),
         }
+
+    review_boundaries = [
+        emit_unknown(item, write)
         for item in boolean_storage
         for write in sorted(item.unknown_writes)
-        if write.kind != "incoming-parameter"
+        if write.kind in REVIEW_BOUNDARY_WRITE_KINDS
+    ]
+    unproven_boolean_writes = [
+        emit_unknown(item, write)
+        for item in boolean_storage
+        for write in sorted(item.unknown_writes)
+        if (write.kind != "incoming-parameter"
+            and write.kind not in REVIEW_BOUNDARY_WRITE_KINDS)
     ]
     boolean_parameters = [emit(item) for item in boolean_storage
                           if item.storage_kind == "parameter"]
@@ -799,6 +833,7 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         "rejected": [emit(item) for item in rejected],
         "boolean_numeric_literal_writes": numeric_literal_writes,
         "boolean_unproven_writes": unproven_boolean_writes,
+        "boolean_review_boundaries": review_boundaries,
         "boolean_parameters": boolean_parameters,
         "b32_numeric_literal_writes": numeric_literal_writes,
         "b32_unproven_writes": unproven_boolean_writes,
@@ -813,7 +848,8 @@ def _text(report: dict, include_rejected: bool) -> str:
         f"{report.get('rejected_storage', report['rejected_fields'])} rejected; "
         f"{len(report.get('boolean_numeric_literal_writes', report['b32_numeric_literal_writes']))} "
         f"numeric and {len(report.get('boolean_unproven_writes', report['b32_unproven_writes']))} "
-        f"unproven writes to Boolean storage",
+        f"unproven writes to Boolean storage; "
+        f"{len(report.get('boolean_review_boundaries', []))} review boundaries",
     ]
     for item in report["candidates"]:
         location = item["declarations"][0]
@@ -850,6 +886,12 @@ def _text(report: dict, include_rejected: bool) -> str:
             write = item["write"]
             lines.append(
                 f"BOOL-UNPROVEN {write['file']}:{write['line']} "
+                f"{item['qualified_name']}: {write['kind']}: "
+                f"{write['expression']}")
+        for item in report.get("boolean_review_boundaries", []):
+            write = item["write"]
+            lines.append(
+                f"BOOL-BOUNDARY {write['file']}:{write['line']} "
                 f"{item['qualified_name']}: {write['kind']}: "
                 f"{write['expression']}")
     return "\n".join(lines) + "\n"
