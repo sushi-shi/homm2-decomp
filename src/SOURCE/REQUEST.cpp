@@ -382,7 +382,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "Сохранить\x20файл\x3a"
+              "РЎРѕС…СЂР°РЅРёС‚СЊ\x20С„Р°Р№Р»\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -412,7 +412,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(
             gText,
-              "Загрузить\x20файл\x3a"
+              "Р—Р°РіСЂСѓР·РёС‚СЊ\x20С„Р°Р№Р»\x3a"
         );
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -434,7 +434,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_mode == FILE_REQUESTER_SAVE_GAME
         && strcmpi(
                m_filename,
-                 "НОВАЯ\x20ИГРА"
+                 "РќРћР’РђРЇ\x20РР“Р Рђ"
            )
                == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
@@ -544,9 +544,9 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                                 && m_filename[0] == 0) {
                                 NormalDialog(
-                                    "Выберите из списк"
-                                    "а или нажмите кно"
-                                    "пку отмены."
+                                    "Р’С‹Р±РµСЂРёС‚Рµ РёР· СЃРїРёСЃРє"
+                                    "Р° РёР»Рё РЅР°Р¶РјРёС‚Рµ РєРЅРѕ"
+                                    "РїРєСѓ РѕС‚РјРµРЅС‹."
 
                                     ,
                                     NORMAL_DIALOG_INFO,
@@ -678,9 +678,9 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
-                                            "Нет карт такого"
-                                            " размера для %d иг"
-                                            "роков-людей."
+                                            "РќРµС‚ РєР°СЂС‚ С‚Р°РєРѕРіРѕ"
+                                            " СЂР°Р·РјРµСЂР° РґР»СЏ %d РёРі"
+                                            "СЂРѕРєРѕРІ-Р»СЋРґРµР№."
 
                                             ,
                                             giNumHumanPlayers
@@ -688,9 +688,9 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     } else {
                                         sprintf(
                                             gText,
-                                            "Нет карты этого"
-                                            " размера для %d иг"
-                                            "роков-людей."
+                                            "РќРµС‚ РєР°СЂС‚С‹ СЌС‚РѕРіРѕ"
+                                            " СЂР°Р·РјРµСЂР° РґР»СЏ %d РёРі"
+                                            "СЂРѕРєРѕРІ-Р»СЋРґРµР№."
 
                                             ,
                                             giNumHumanPlayers
@@ -882,11 +882,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "Выбранная вами игра р"
-                    "ассчитана только на %d ч"
-                    "еловек.  А вам нужна кар"
-                    "та, как минимум на %d чел"
-                    "овек."
+                    "Р’С‹Р±СЂР°РЅРЅР°СЏ РІР°РјРё РёРіСЂР° СЂ"
+                    "Р°СЃСЃС‡РёС‚Р°РЅР° С‚РѕР»СЊРєРѕ РЅР° %d С‡"
+                    "РµР»РѕРІРµРє.  Рђ РІР°Рј РЅСѓР¶РЅР° РєР°СЂ"
+                    "С‚Р°, РєР°Рє РјРёРЅРёРјСѓРј РЅР° %d С‡РµР»"
+                    "РѕРІРµРє."
 
 
                     ,
@@ -910,12 +910,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "Выбранная игра начнет"
-                    "ся с %d игроками-людьми. "
-                    "Можно ли компьютеру в"
-                    "зять под свое управле"
-                    "ние оставшиеся %d мест л"
-                    "юдей?"
+                    "Р’С‹Р±СЂР°РЅРЅР°СЏ РёРіСЂР° РЅР°С‡РЅРµС‚"
+                    "СЃСЏ СЃ %d РёРіСЂРѕРєР°РјРё-Р»СЋРґСЊРјРё. "
+                    "РњРѕР¶РЅРѕ Р»Рё РєРѕРјРїСЊСЋС‚РµСЂСѓ РІ"
+                    "Р·СЏС‚СЊ РїРѕРґ СЃРІРѕРµ СѓРїСЂР°РІР»Рµ"
+                    "РЅРёРµ РѕСЃС‚Р°РІС€РёРµСЃСЏ %d РјРµСЃС‚ Р»"
+                    "СЋРґРµР№?"
 
 
                     ,

@@ -218,7 +218,7 @@ void highScoreManager::Update(void) {
         if (highScore.cheated)
             strcat(
                 gText,
-                "\n(×èòåğ)"
+                "\n(Ğ§Ğ¸Ñ‚ĞµÑ€)"
             );
         m_window->BroadcastMessage(hsMessage);
 

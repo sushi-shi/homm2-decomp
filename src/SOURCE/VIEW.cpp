@@ -145,7 +145,7 @@ i32 combatManager::ViewGeneral(
     if (m_heroes[(side)]->m_isCaptain != 0)
         sprintf(
             gText,
-              "Капитан"
+              "РљР°РїРёС‚Р°РЅ"
         );
     else
         sprintf(

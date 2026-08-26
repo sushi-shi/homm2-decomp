@@ -25,19 +25,19 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         NULL,
         0,
         0,
-        "Герои\x20\x49\x49"
+        "Р“РµСЂРѕРё\x20\x49\x49"
     );
     errorLast = GetLastError();
     if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(
             gText,
-            "Только\x20одна\x20копия\x20\x25\x73\x20может\x20быть\x20запущена\x20одновременно",
-            "Герои\x20Меча\x20и\x20Магии\x20\x49\x49"
+            "РўРѕР»СЊРєРѕ\x20РѕРґРЅР°\x20РєРѕРїРёСЏ\x20\x25\x73\x20РјРѕР¶РµС‚\x20Р±С‹С‚СЊ\x20Р·Р°РїСѓС‰РµРЅР°\x20РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ",
+            "Р“РµСЂРѕРё\x20РњРµС‡Р°\x20Рё\x20РњР°РіРёРё\x20\x49\x49"
         );
         MessageBoxA(
             NULL,
             gText,
-            "Ошибка\x20загрузки",
+            "РћС€РёР±РєР°\x20Р·Р°РіСЂСѓР·РєРё",
             MB_ICONHAND
         );
         return 0;
@@ -109,7 +109,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(
             instance,
-            "Герои\x20\x49\x49"
+            "Р“РµСЂРѕРё\x20\x49\x49"
         );
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
@@ -268,7 +268,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (window == hwndApp) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "Вы действительно хотите выйти?",
+                        "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?",
                         NORMAL_DIALOG_CONFIRM,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -537,9 +537,9 @@ void InitVideo(void) {
     return;
 }
 
-char szAppName[] = "Герои II";
+char szAppName[] = "Р“РµСЂРѕРё II";
 char szTitle[] =
-    "Герои Меча и Магии II";
+    "Р“РµСЂРѕРё РњРµС‡Р° Рё РњР°РіРёРё II";
 HWND hwndApp = NULL;
 HMENU hmnuApp = NULL;
 HANDLE gEventHandle = NULL;

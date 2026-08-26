@@ -245,8 +245,8 @@ void SmackManagerMain(void) {
             if (!smk1) {
                 gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
                 NormalDialog(
-                    "Ошибка чтения диска "
-                        "Героев 2. Повторить?"
+                    "РћС€РёР±РєР° С‡С‚РµРЅРёСЏ РґРёСЃРєР° "
+                        "Р“РµСЂРѕРµРІ 2. РџРѕРІС‚РѕСЂРёС‚СЊ?"
                      ,
                     NORMAL_DIALOG_CONFIRM,
                     -1,

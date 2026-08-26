@@ -78,12 +78,12 @@ void ModemSetup(i32 mode) {
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
-            "Ожидание подключения "
-            "другого компьютера к "
-            "прямому "
-            "соединению.\n\nНажмите "
-            "'ОТМЕНА', чтобы прервать "
-            "ожидание."
+            "РћР¶РёРґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ "
+            "РґСЂСѓРіРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР° Рє "
+            "РїСЂСЏРјРѕРјСѓ "
+            "СЃРѕРµРґРёРЅРµРЅРёСЋ.\n\nРќР°Р¶РјРёС‚Рµ "
+            "'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ РїСЂРµСЂРІР°С‚СЊ "
+            "РѕР¶РёРґР°РЅРёРµ."
 
 
         );
@@ -100,9 +100,9 @@ i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, "%s %s", "Звоню..."  , numbuf);
+    sprintf(gText, "%s %s", "Р—РІРѕРЅСЋ..."  , numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, "%s %s", "Звоню..."  , numbuf);
+    sprintf(gText, "%s %s", "Р—РІРѕРЅСЋ..."  , numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
@@ -110,16 +110,16 @@ i32l Dial(void) {
 
 i32l Wait(void) {
     GUIModemResponse(
-        "Ожидание звонка..."  ,
+        "РћР¶РёРґР°РЅРёРµ Р·РІРѕРЅРєР°..."  ,
         "RING"
     );
     GUIModemCommand(
-        "Инициализация модема..."
+        "РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РјРѕРґРµРјР°..."
         ,
         "ATA"
     );
     if (GUIModemResponse(
-            "Установка соединения..."
+            "РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕРµРґРёРЅРµРЅРёСЏ..."
             ,
             "CONNECT"
         )

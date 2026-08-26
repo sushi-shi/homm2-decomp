@@ -183,12 +183,12 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_EARTHQUAKE:
                 if (m_combatTowns[(COMBAT_DEFENDER_SIDE)] == NULL) {
                     NormalDialog(
-                        "Îò çåìëåòðÿñåíèÿ "
-                        "íåò íèêàêîãî ïðîêà, "
-                        "åñëè òîëüêî íà êàðòå "
-                        "åñòü ãîðîäñêèå "
-                        "ñòåíû, êîòîðûå ìîæíî "
-                        "ðàçðóøèòü."
+                        "ÐžÑ‚ Ð·ÐµÐ¼Ð»ÐµÑ‚Ñ€ÑÑÐµÐ½Ð¸Ñ "
+                        "Ð½ÐµÑ‚ Ð½Ð¸ÐºÐ°ÐºÐ¾Ð³Ð¾ Ð¿Ñ€Ð¾ÐºÐ°, "
+                        "ÐµÑÐ»Ð¸ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð½Ð° ÐºÐ°Ñ€Ñ‚Ðµ "
+                        "ÐµÑÑ‚ÑŒ Ð³Ð¾Ñ€Ð¾Ð´ÑÐºÐ¸Ðµ "
+                        "ÑÑ‚ÐµÐ½Ñ‹, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¼Ð¾Ð¶Ð½Ð¾ "
+                        "Ñ€Ð°Ð·Ñ€ÑƒÑˆÐ¸Ñ‚ÑŒ."
                         ,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
@@ -220,10 +220,10 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_summonedCreatureType[(m_currentSide)] != CREATURE_SUMMONED_NONE
                     && m_summonedCreatureType[(m_currentSide)] != elementalType) {
                     NormalDialog(
-                        "Âû ìîæåòå ïðèçâàòü "
-                        "ýëåìåíòàëîâ òîëüêî "
-                        "îäíîãî òèïà âî âðåìÿ "
-                        "îäíîãî áîÿ."
+                        "Ð’Ñ‹ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ Ð¿Ñ€Ð¸Ð·Ð²Ð°Ñ‚ÑŒ "
+                        "ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð°Ð»Ð¾Ð² Ñ‚Ð¾Ð»ÑŒÐºÐ¾ "
+                        "Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð° Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ "
+                        "Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ð±Ð¾Ñ."
                         ,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
@@ -240,9 +240,9 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "Ó âàñ óæå åñòü %d ãðóïï "
-                        "âîèíîâ â áîþ è áîëüøå "
-                        "äîáàâèòü íåëüçÿ."
+                        "Ð£ Ð²Ð°Ñ ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ %d Ð³Ñ€ÑƒÐ¿Ð¿ "
+                        "Ð²Ð¾Ð¸Ð½Ð¾Ð² Ð² Ð±Ð¾ÑŽ Ð¸ Ð±Ð¾Ð»ÑŒÑˆÐµ "
+                        "Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð½ÐµÐ»ÑŒÐ·Ñ."
                         ,
                         m_armyCount[(m_currentSide)]
                     );
@@ -263,11 +263,11 @@ i32 combatManager::ViewSpells(i32) {
                 if (!SpaceForElementalExists()) {
                     sprintf(
                         gText,
-                        "Ðÿäîì ñ âàøèì ãåðîåì "
-                        "íåò äîñòàòî÷íîãî "
-                        "ñâîáîäíîãî ìåñòà, "
-                        "÷òîáû ïðèçâàòü "
-                        "ýëåìåíòàëîâ òóäà."
+                        "Ð ÑÐ´Ð¾Ð¼ Ñ Ð²Ð°ÑˆÐ¸Ð¼ Ð³ÐµÑ€Ð¾ÐµÐ¼ "
+                        "Ð½ÐµÑ‚ Ð´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾Ð³Ð¾ "
+                        "ÑÐ²Ð¾Ð±Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ð¼ÐµÑÑ‚Ð°, "
+                        "Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ñ€Ð¸Ð·Ð²Ð°Ñ‚ÑŒ "
+                        "ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð°Ð»Ð¾Ð² Ñ‚ÑƒÐ´Ð°."
                     );
                     NormalDialog(
                         gText,
@@ -300,8 +300,8 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_MASS_SHIELD:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "Çàêëèíàíèå íè íà "
-                        "êîãî íå ïîäåéñòâóåò!"
+                        "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð½Ð¸ Ð½Ð° "
+                        "ÐºÐ¾Ð³Ð¾ Ð½Ðµ Ð¿Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²ÑƒÐµÑ‚!"
                         ,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
@@ -324,9 +324,9 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "Ó âàñ óæå åñòü %d ãðóïï "
-                        "âîèíîâ â áîþ è áîëüøå "
-                        "äîáàâèòü íåëüçÿ."
+                        "Ð£ Ð²Ð°Ñ ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ %d Ð³Ñ€ÑƒÐ¿Ð¿ "
+                        "Ð²Ð¾Ð¸Ð½Ð¾Ð² Ð² Ð±Ð¾ÑŽ Ð¸ Ð±Ð¾Ð»ÑŒÑˆÐµ "
+                        "Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð½ÐµÐ»ÑŒÐ·Ñ."
                         ,
                         m_armyCount[(m_currentSide)]
                     );
@@ -347,8 +347,8 @@ i32 combatManager::ViewSpells(i32) {
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "Çàêëèíàíèå íè íà "
-                        "êîãî íå ïîäåéñòâóåò!"
+                        "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð½Ð¸ Ð½Ð° "
+                        "ÐºÐ¾Ð³Ð¾ Ð½Ðµ Ð¿Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²ÑƒÐµÑ‚!"
                         ,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
@@ -424,12 +424,12 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
                         gpCombatManager->CombatMessage(
-                              "Íåäîïóñòèìîå\x20ìåñòî\x20äëÿ\x20òåëåïîðòàöèè\x20",
+                              "ÐÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ð¾Ðµ\x20Ð¼ÐµÑÑ‚Ð¾\x20Ð´Ð»Ñ\x20Ñ‚ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚Ð°Ñ†Ð¸Ð¸\x20",
                             1, 0, 0
                         );
                     } else {
                         gpCombatManager->CombatMessage(
-                              "Âûáåðèòå\x20öåëü\x20äëÿ\x20çàêëèíàíèÿ",
+                              "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ\x20Ñ†ÐµÐ»ÑŒ\x20Ð´Ð»Ñ\x20Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ",
                             1, 0, 0
                         );
                     }
@@ -457,7 +457,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage(
-                              "Âûáåðèòå\x20ìåñòî\x20íàçíà÷åíèÿ\x20òåëåïîðòàöèè\x2e",
+                              "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ\x20Ð¼ÐµÑÑ‚Ð¾\x20Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ\x20Ñ‚ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚Ð°Ñ†Ð¸Ð¸\x2e",
                             1, 0, 0
                         );
                         return MESSAGE_DISPATCH_CONSUME;
@@ -644,7 +644,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_COLD_RING:
             sprintf(
                 gText,
-                  "Íàïðàâèòü\x20\x27\x25\x73\x27",
+                  "ÐÐ°Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ\x20\x27\x25\x73\x27",
                 gSpellNames[(spell)]
             );
             break;
@@ -652,7 +652,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             if (bInTeleportGetDest) {
                 sprintf(
                     gText,
-                      "Ïåðåíåñòèñü\x20ñþäà"
+                      "ÐŸÐµÑ€ÐµÐ½ÐµÑÑ‚Ð¸ÑÑŒ\x20ÑÑŽÐ´Ð°"
                 );
                 break;
             }
@@ -670,7 +670,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         format_target:
             sprintf(
                 gText,
-                  "Íàïðàâèòü\x20\x27\x25\x73\x27\x20íà\x20\x25\x73",
+                  "ÐÐ°Ð¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ\x20\x27\x25\x73\x27\x20Ð½Ð°\x20\x25\x73",
                 gSpellNames[(spell)],
                 target->m_quantity == 1 ? gArmyNames[(target->m_monsterType)]
                                         : gArmyNamesPlural[(target->m_monsterType)]
@@ -944,7 +944,7 @@ void combatManager::CastSpell(
                 target3->m_monster.defense = SPELL_MINIMUM_DEFENSE;
             sprintf(
                 gText,
-                "Ðàçðóøèòåëüíûé\x20ëó÷\x20óìåíüøàåò\x20çàùèòó\x20íà\x20\x25\x64\x20åä\x2e",
+                "Ð Ð°Ð·Ñ€ÑƒÑˆÐ¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹\x20Ð»ÑƒÑ‡\x20ÑƒÐ¼ÐµÐ½ÑŒÑˆÐ°ÐµÑ‚\x20Ð·Ð°Ñ‰Ð¸Ñ‚Ñƒ\x20Ð½Ð°\x20\x25\x64\x20ÐµÐ´\x2e",
                 oldDefense - target3->m_monster.defense
             );
             CombatMessage(gText, 1, 1, 0);
@@ -969,7 +969,7 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "Õëàäíûé\x20ëó÷\x20íàíîñèò\x20\x25\x64\x0a\x20åä\x2e\x20óðîíà\x20îòðÿäó\x20\x25\x73\x2e",
+                "Ð¥Ð»Ð°Ð´Ð½Ñ‹Ð¹\x20Ð»ÑƒÑ‡\x20Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚\x20\x25\x64\x0a\x20ÐµÐ´\x2e\x20ÑƒÑ€Ð¾Ð½Ð°\x20Ð¾Ñ‚Ñ€ÑÐ´Ñƒ\x20\x25\x73\x2e",
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                     ? gArmyNames[(target3->m_monsterType)]
@@ -998,7 +998,7 @@ void combatManager::CastSpell(
                 );
                 sprintf(
                     gText,
-                    "Âîëøåáíàÿ\x20ñòðåëà\x20íàíîñèò\x20\x25\x64\x0a\x20åä\x2e\x20óðîíà\x20îòðÿäó\x20\x25\x73\x2e",
+                    "Ð’Ð¾Ð»ÑˆÐµÐ±Ð½Ð°Ñ\x20ÑÑ‚Ñ€ÐµÐ»Ð°\x20Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚\x20\x25\x64\x0a\x20ÐµÐ´\x2e\x20ÑƒÑ€Ð¾Ð½Ð°\x20Ð¾Ñ‚Ñ€ÑÐ´Ñƒ\x20\x25\x73\x2e",
                     damage1,
                     target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                         ? gArmyNames[(target3->m_monsterType)]
@@ -1043,7 +1043,7 @@ void combatManager::CastSpell(
             );
             sprintf(
                 gText,
-                "Ðàçðÿä\x20ìîëíèè\x20íàíîñèò\x20\x25\x64\x0a\x20åä\x2e\x20óðîíà\x20îòðÿäó\x20\x25\x73\x2e",
+                "Ð Ð°Ð·Ñ€ÑÐ´\x20Ð¼Ð¾Ð»Ð½Ð¸Ð¸\x20Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚\x20\x25\x64\x0a\x20ÐµÐ´\x2e\x20ÑƒÑ€Ð¾Ð½Ð°\x20Ð¾Ñ‚Ñ€ÑÐ´Ñƒ\x20\x25\x73\x2e",
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
                     ? gArmyNames[(target3->m_monsterType)]
@@ -1428,9 +1428,9 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "Ëåäÿíîå êîëüöî íàíîñèò %d åä. óðîíà.", baseDamage);
+            sprintf(gText, "Ð›ÐµÐ´ÑÐ½Ð¾Ðµ ÐºÐ¾Ð»ÑŒÑ†Ð¾ Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°.", baseDamage);
         else
-            sprintf(gText, "Îãíåííûé øàð íàíîñèò %d åä. óðîíà.", baseDamage);
+            sprintf(gText, "ÐžÐ³Ð½ÐµÐ½Ð½Ñ‹Ð¹ ÑˆÐ°Ñ€ Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°.", baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1510,7 +1510,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, "Çâåçäîïàä íàíîñèò %d åä. óðîíà.", baseDamage);
+        sprintf(gText, "Ð—Ð²ÐµÐ·Ð´Ð¾Ð¿Ð°Ð´ Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°.", baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1586,7 +1586,7 @@ void combatManager::ElementalStorm(void) {
     if (hit) {
         sprintf(
             gText,
-            "Áóðÿ\x20ñòèõèé\x20íàíîñèò\x20\x25\x64\x20åä\x2e\x20óðîíà\x2e",
+            "Ð‘ÑƒÑ€Ñ\x20ÑÑ‚Ð¸Ñ…Ð¸Ð¹\x20Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚\x20\x25\x64\x20ÐµÐ´\x2e\x20ÑƒÑ€Ð¾Ð½Ð°\x2e",
             baseDam
         );
         CombatMessage(gText, 1, 1, 0);
@@ -1628,7 +1628,7 @@ void combatManager::Armageddon(void) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, "Àðìàãåääîí íàíîñèò %d åä. óðîíà.", baseDamage);
+        sprintf(gText, "ÐÑ€Ð¼Ð°Ð³ÐµÐ´Ð´Ð¾Ð½ Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°.", baseDamage);
         CombatMessage(gText, 1, 1, 0);
     }
 
@@ -2959,7 +2959,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             }
             sprintf(
                 gText,
-                "Çàêëèíàíèå '%s' íàíîñèò %d åä. óðîíà\nâñåì íåóïîêîåííûì ñóùåñòâàì.",
+                "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ '%s' Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°\nÐ²ÑÐµÐ¼ Ð½ÐµÑƒÐ¿Ð¾ÐºÐ¾ÐµÐ½Ð½Ñ‹Ð¼ ÑÑƒÑ‰ÐµÑÑ‚Ð²Ð°Ð¼.",
                 gSpellNames[(spell)],
                 damage_c
             );
@@ -2989,7 +2989,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             }
             sprintf(
                 gText,
-                "Çàêëèíàíèå Ñìåðòè íàíîñèò %d åä. óðîíà\nâñåì æèâûì ñóùåñòâàì.",
+                "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ Ð¡Ð¼ÐµÑ€Ñ‚Ð¸ Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ %d ÐµÐ´. ÑƒÑ€Ð¾Ð½Ð°\nÐ²ÑÐµÐ¼ Ð¶Ð¸Ð²Ñ‹Ð¼ ÑÑƒÑ‰ÐµÑÑ‚Ð²Ð°Ð¼.",
                 damage_c
             );
             CombatMessage(gText, 1, 1, 0);
@@ -3133,7 +3133,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         }
         ++distance0;
     }
-    sprintf(gText, "Ñîðâàëîñü çàêëèíàíèå ñîòâîðåíèÿ ôàíòîìîâ!");
+    sprintf(gText, "Ð¡Ð¾Ñ€Ð²Ð°Ð»Ð¾ÑÑŒ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ ÑÐ¾Ñ‚Ð²Ð¾Ñ€ÐµÐ½Ð¸Ñ Ñ„Ð°Ð½Ñ‚Ð¾Ð¼Ð¾Ð²!");
     NormalDialog(
         gText,
         NORMAL_DIALOG_INFO,
@@ -3481,14 +3481,14 @@ void combatManager::Resurrect(SpellType spell, i32 targetHex, i32 spellPower) {
     if (target->m_quantity - oldQuantity_o > 1)
         sprintf(
             gText,
-            "%d %s âîñêðåñàþò èç ìåðòâûõ!",
+            "%d %s Ð²Ð¾ÑÐºÑ€ÐµÑÐ°ÑŽÑ‚ Ð¸Ð· Ð¼ÐµÑ€Ñ‚Ð²Ñ‹Ñ…!",
             target->m_quantity - oldQuantity_o,
             gArmyNamesPlural[(target->m_monsterType)]
         );
     else
         sprintf(
             gText,
-            "%d %s âîñêðåñàåò èç ìåðòâûõ!",
+            "%d %s Ð²Ð¾ÑÐºÑ€ÐµÑÐ°ÐµÑ‚ Ð¸Ð· Ð¼ÐµÑ€Ñ‚Ð²Ñ‹Ñ…!",
             target->m_quantity - oldQuantity_o,
             gArmyNames[(target->m_monsterType)]
         );
@@ -3556,11 +3556,11 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 fizzleSample = LoadPlaySample("rsbryfzl.82m");
     sprintf(
         gText,
-        "%s%s ñîïðîòèâëÿåòñÿ "
-        "ýòîìó çàêëèíàíèþ!",
+        "%s%s ÑÐ¾Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²Ð»ÑÐµÑ‚ÑÑ "
+        "ÑÑ‚Ð¾Ð¼Ñƒ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸ÑŽ!",
         target->m_quantity == 1
             ? ""
-            : "Îòðÿä ",
+            : "ÐžÑ‚Ñ€ÑÐ´ ",
         target->m_quantity == 1 ? gArmyNames[(target->m_monsterType)]
                                 : gArmyNamesPlural[(target->m_monsterType)]
     );
@@ -3819,15 +3819,15 @@ void combatManager::ShowSpellMessage(
         sprintf(targetName, gArmyNamesPlural[(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, "\x25\x73\x20ïàðàëèçîâàíû\x20öèêëîïàìè\x21", targetName);
+            sprintf(message, "\x25\x73\x20Ð¿Ð°Ñ€Ð°Ð»Ð¸Ð·Ð¾Ð²Ð°Ð½Ñ‹\x20Ñ†Ð¸ÐºÐ»Ð¾Ð¿Ð°Ð¼Ð¸\x21", targetName);
         else if (spell == SPELL_BLIND)
-            sprintf(message, "\x25\x73\x20îñëåïëåíû\x20àòàêîé\x20åäèíîðîãîâ\x21", targetName);
+            sprintf(message, "\x25\x73\x20Ð¾ÑÐ»ÐµÐ¿Ð»ÐµÐ½Ñ‹\x20Ð°Ñ‚Ð°ÐºÐ¾Ð¹\x20ÐµÐ´Ð¸Ð½Ð¾Ñ€Ð¾Ð³Ð¾Ð²\x21", targetName);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message, "\x25\x73\x20îáðàùåíû\x20âçîðîì\x20ìåäóçû\x20â\x20êàìåíü\x21", targetName);
+            sprintf(message, "\x25\x73\x20Ð¾Ð±Ñ€Ð°Ñ‰ÐµÐ½Ñ‹\x20Ð²Ð·Ð¾Ñ€Ð¾Ð¼\x20Ð¼ÐµÐ´ÑƒÐ·Ñ‹\x20Ð²\x20ÐºÐ°Ð¼ÐµÐ½ÑŒ\x21", targetName);
         else if (spell == SPELL_CURSE)
-            sprintf(message, "\x25\x73\x20ïðîêëÿòû\x20ìóìèÿìè\x21", targetName);
+            sprintf(message, "\x25\x73\x20Ð¿Ñ€Ð¾ÐºÐ»ÑÑ‚Ñ‹\x20Ð¼ÑƒÐ¼Ð¸ÑÐ¼Ð¸\x21", targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message, "\x25\x73\x20ëèøèëèñü\x20íàëîæåííûõ\x20íà\x20íèõ\x20÷àð\x0aèç\x2dçà\x20àðõèìàãîâ\x21", targetName);
+            sprintf(message, "\x25\x73\x20Ð»Ð¸ÑˆÐ¸Ð»Ð¸ÑÑŒ\x20Ð½Ð°Ð»Ð¾Ð¶ÐµÐ½Ð½Ñ‹Ñ…\x20Ð½Ð°\x20Ð½Ð¸Ñ…\x20Ñ‡Ð°Ñ€\x0aÐ¸Ð·\x2dÐ·Ð°\x20Ð°Ñ€Ñ…Ð¸Ð¼Ð°Ð³Ð¾Ð²\x21", targetName);
         else {
             unhandledSpell5 = 0;
             ++unhandledSpell5;
@@ -3837,25 +3837,25 @@ void combatManager::ShowSpellMessage(
             if (m_heroes[(m_currentSide)]->m_isCaptain != 0)
                 sprintf(
                     message,
-                    "Êàïèòàí\x20íàïðàâëÿåò\x20\x0açàêëèíàíèå\x20\x27\x25\x73\x27\x20íà\x20îòðÿä\x20\x25\x73\x2e",
+                    "ÐšÐ°Ð¿Ð¸Ñ‚Ð°Ð½\x20Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑ‚\x20\x0aÐ·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ\x20\x27\x25\x73\x27\x20Ð½Ð°\x20Ð¾Ñ‚Ñ€ÑÐ´\x20\x25\x73\x2e",
                     gSpellNames[(spell)],
                     targetName
                 );
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20íàïðàâëÿåò\x20\x27\x25\x73\x27\x20íà\x20\x25\x73",
+                    "\x25\x73\x20Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑ‚\x20\x27\x25\x73\x27\x20Ð½Ð°\x20\x25\x73",
                     m_heroes[(m_currentSide)]->m_name,
                     gSpellNames[(spell)],
                     targetName
                 );
         } else {
             if (m_heroes[(m_currentSide)]->m_isCaptain != 0)
-                sprintf(message, "Êàïèòàí\x20íàïðàâëÿåò\x20çàêëèíàíèå\x20\x27\x25\x73\x27", gSpellNames[(spell)]);
+                sprintf(message, "ÐšÐ°Ð¿Ð¸Ñ‚Ð°Ð½\x20Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑ‚\x20Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ\x20\x27\x25\x73\x27", gSpellNames[(spell)]);
             else
                 sprintf(
                     message,
-                    "\x25\x73\x20íàïðàâëÿåò\x20çàêëèíàíèå\x20\x27\x25\x73\x27",
+                    "\x25\x73\x20Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÑÐµÑ‚\x20Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ\x20\x27\x25\x73\x27",
                     m_heroes[(m_currentSide)]->m_name,
                     gSpellNames[(spell)]
                 );

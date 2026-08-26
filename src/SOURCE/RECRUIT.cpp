@@ -78,7 +78,7 @@ void SetupRecruitWin(
     else
         ch = monsterName[0];
     monsterName[0] = ch;
-    sprintf(label, "%s %s", "Íàíÿòü"  , monsterName);
+    sprintf(label, "%s %s", "ĞĞ°Ğ½ÑÑ‚ÑŒ"  , monsterName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
@@ -94,7 +94,7 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "Äîñòóïíî: "  , available);
+    sprintf(gText, "%s%d", "Ğ”Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ¾: "  , available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
@@ -186,8 +186,8 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "Äëÿ ıòîé àğìèè íåò ìåñòà "
-            "â ãàğíèçîíå."
+            "Ğ”Ğ»Ñ ÑÑ‚Ğ¾Ğ¹ Ğ°Ñ€Ğ¼Ğ¸Ğ¸ Ğ½ĞµÑ‚ Ğ¼ĞµÑÑ‚Ğ° "
+            "Ğ² Ğ³Ğ°Ñ€Ğ½Ğ¸Ğ·Ğ¾Ğ½Ğµ."
             ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
@@ -219,7 +219,7 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "Äîñòóïíî: "  , *m_available);
+    sprintf(gText, "%s%d", "Ğ”Ğ¾ÑÑ‚ÑƒĞ¿Ğ½Ğ¾: "  , *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);

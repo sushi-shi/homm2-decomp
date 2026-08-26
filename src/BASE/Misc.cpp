@@ -547,7 +547,7 @@ void SetGameDefaults(void) {
 
     strcpy(
         gConfig.networkDefaultName,
-        "Неизвестный герой"
+        "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РіРµСЂРѕР№"
     );
     nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

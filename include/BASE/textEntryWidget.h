@@ -60,7 +60,7 @@ public:
         i32 horizontalInset,
         i32 verticalInset
     );
-    virtual ~textEntryWidget() override;
+    virtual inline ~textEntryWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(TextEntryReadMode);

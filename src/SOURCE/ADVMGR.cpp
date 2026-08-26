@@ -2018,21 +2018,21 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         c = 'e';
                         strcpy(
                             gText,
-                            "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)"
+                            "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РЅР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°?  (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
                         strcpy(
                             gText,
-                            "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)"
+                            "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ РЅРѕРІСѓСЋ РёРіСЂСѓ? (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
                         strcpy(
                             gText,
-                            "Вы действительно хотите выйти?"
+                            "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?"
                         );
                         goto confirm_game_command;
                     confirm_game_command:
@@ -2394,8 +2394,8 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         case PANEL_RADAR:
             if ((((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 NormalDialog(
-                    "{Карта мира}\n\n"
-                        "Миникарта изученного мира. Щелчком левой кнопки управлять просмотром.",
+                    "{РљР°СЂС‚Р° РјРёСЂР°}\n\n"
+                        "РњРёРЅРёРєР°СЂС‚Р° РёР·СѓС‡РµРЅРЅРѕРіРѕ РјРёСЂР°. Р©РµР»С‡РєРѕРј Р»РµРІРѕР№ РєРЅРѕРїРєРё СѓРїСЂР°РІР»СЏС‚СЊ РїСЂРѕСЃРјРѕС‚СЂРѕРј.",
                     NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
@@ -2501,9 +2501,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            "{Окно статуса}\n\n"
-                "Это окно сообщает информацию о состоянии вашего героя или королевства, а также, показывает календарь. "
-                "Информация в окне меняется при цикличном нажатии левой кнопки мыши на нем.",
+            "{РћРєРЅРѕ СЃС‚Р°С‚СѓСЃР°}\n\n"
+                "Р­С‚Рѕ РѕРєРЅРѕ СЃРѕРѕР±С‰Р°РµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ СЃРѕСЃС‚РѕСЏРЅРёРё РІР°С€РµРіРѕ РіРµСЂРѕСЏ РёР»Рё РєРѕСЂРѕР»РµРІСЃС‚РІР°, Р° С‚Р°РєР¶Рµ, РїРѕРєР°Р·С‹РІР°РµС‚ РєР°Р»РµРЅРґР°СЂСЊ. "
+                "РРЅС„РѕСЂРјР°С†РёСЏ РІ РѕРєРЅРµ РјРµРЅСЏРµС‚СЃСЏ РїСЂРё С†РёРєР»РёС‡РЅРѕРј РЅР°Р¶Р°С‚РёРё Р»РµРІРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё РЅР° РЅРµРј.",
             NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
@@ -2558,7 +2558,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    "Один или несколько героев все еще могут ходить. Вы действительно хотите закончить ход?",
+                    "РћРґРёРЅ РёР»Рё РЅРµСЃРєРѕР»СЊРєРѕ РіРµСЂРѕРµРІ РІСЃРµ РµС‰Рµ РјРѕРіСѓС‚ С…РѕРґРёС‚СЊ. Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ Р·Р°РєРѕРЅС‡РёС‚СЊ С…РѕРґ?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -2651,7 +2651,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Раскопки артефакта занимают целый день. Попробуйте снова, завтра."
+            "Р Р°СЃРєРѕРїРєРё Р°СЂС‚РµС„Р°РєС‚Р° Р·Р°РЅРёРјР°СЋС‚ С†РµР»С‹Р№ РґРµРЅСЊ. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°, Р·Р°РІС‚СЂР°."
                  ,
             1,
             -1,
@@ -2670,7 +2670,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Поиски Могущественного артефакта будут бесполезными. Если даже ваш герой и найдет его, то у него попросту нет места, чтобы унести его. Весь инвентарь героя занят.",
+            "РџРѕРёСЃРєРё РњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ Р°СЂС‚РµС„Р°РєС‚Р° Р±СѓРґСѓС‚ Р±РµСЃРїРѕР»РµР·РЅС‹РјРё. Р•СЃР»Рё РґР°Р¶Рµ РІР°С€ РіРµСЂРѕР№ Рё РЅР°Р№РґРµС‚ РµРіРѕ, С‚Рѕ Сѓ РЅРµРіРѕ РїРѕРїСЂРѕСЃС‚Сѓ РЅРµС‚ РјРµСЃС‚Р°, С‡С‚РѕР±С‹ СѓРЅРµСЃС‚Рё РµРіРѕ. Р’РµСЃСЊ РёРЅРІРµРЅС‚Р°СЂСЊ РіРµСЂРѕСЏ Р·Р°РЅСЏС‚.",
             1,
             -1,
             -1,
@@ -2699,7 +2699,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Попробуйте искать на чистой земле.",
+            "РџРѕРїСЂРѕР±СѓР№С‚Рµ РёСЃРєР°С‚СЊ РЅР° С‡РёСЃС‚РѕР№ Р·РµРјР»Рµ.",
             1,
             -1,
             -1,
@@ -2717,7 +2717,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Попытайтесь искать на суше!!!",
+            "РџРѕРїС‹С‚Р°Р№С‚РµСЃСЊ РёСЃРєР°С‚СЊ РЅР° СЃСѓС€Рµ!!!",
             1,
             -1,
             -1,
@@ -2752,7 +2752,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (hero->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    "У вас нет места для еще одного артефакта!",
+                    "РЈ РІР°СЃ РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РµС‰Рµ РѕРґРЅРѕРіРѕ Р°СЂС‚РµС„Р°РєС‚Р°!",
                     1,
                     -1,
                     -1,
@@ -2775,14 +2775,14 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                     sprintf(
                         gText,
                         "%s%s",
-                        "Поздравляем! Проведя многие часы в раскопках, вы разыскали артефакт: ",
+                        "РџРѕР·РґСЂР°РІР»СЏРµРј! РџСЂРѕРІРµРґСЏ РјРЅРѕРіРёРµ С‡Р°СЃС‹ РІ СЂР°СЃРєРѕРїРєР°С…, РІС‹ СЂР°Р·С‹СЃРєР°Р»Рё Р°СЂС‚РµС„Р°РєС‚: ",
                         gArtifactNames[(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
                         "%s%s",
-                        "Поздравляем! Проведя многие часы в раскопках, вы разыскали артефакт: ",
+                        "РџРѕР·РґСЂР°РІР»СЏРµРј! РџСЂРѕРІРµРґСЏ РјРЅРѕРіРёРµ С‡Р°СЃС‹ РІ СЂР°СЃРєРѕРїРєР°С…, РІС‹ СЂР°Р·С‹СЃРєР°Р»Рё Р°СЂС‚РµС„Р°РєС‚: ",
                         gArtifactNames[(gpGame->m_ultimateArtifactId)]
                     );
                 }
@@ -2804,7 +2804,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog(
-            "Здесь ничего.\nГде бы это могло быть?",
+            "Р—РґРµСЃСЊ РЅРёС‡РµРіРѕ.\nР“РґРµ Р±С‹ СЌС‚Рѕ РјРѕРіР»Рѕ Р±С‹С‚СЊ?",
             1,
             -1,
             -1,
@@ -4860,7 +4860,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         sprintf(
             gText,
             "%s",
-            "Граница"
+            "Р“СЂР°РЅРёС†Р°"
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
@@ -4870,7 +4870,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(
                 gText,
                 "%s",
-                "Неизученная территория"
+                "РќРµРёР·СѓС‡РµРЅРЅР°СЏ С‚РµСЂСЂРёС‚РѕСЂРёСЏ"
             );
         } else {
 
@@ -4879,7 +4879,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        "Артефакт"
+                        "РђСЂС‚РµС„Р°РєС‚"
                     );
                     break;
                 case MAP_OBJECT_OBELISK:
@@ -4891,8 +4891,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4907,8 +4907,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4923,8 +4923,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4939,8 +4939,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4955,8 +4955,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4971,8 +4971,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -4987,8 +4987,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5003,8 +5003,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5052,8 +5052,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         "%s\n%s",
                         gTerrainNames[(giGroundToTerrain[currentCell->m_terrainImageIndex])],
                         blocked
-                            ? "(нельзя копать)"
-                            : "(можно копать)"
+                            ? "(РЅРµР»СЊР·СЏ РєРѕРїР°С‚СЊ)"
+                            : "(РјРѕР¶РЅРѕ РєРѕРїР°С‚СЊ)"
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
@@ -5075,7 +5075,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     quick_info_guarded:
                         sprintf(
                             guardStr,
-                            "\n\nохраняют %s %s",
+                            "\n\nРѕС…СЂР°РЅСЏСЋС‚ %s %s",
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
@@ -5200,7 +5200,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == (GENERIC_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "Неизвестно"
+                            "РќРµРёР·РІРµСЃС‚РЅРѕ"
                         );
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
@@ -5213,8 +5213,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         strcat(
                             gText,
                             (((pHero->m_eventFlags) & (visitedMaskValue)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     }
                     break;
@@ -5250,7 +5250,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (expansionSite == (RECRUITMENT_SITE_UNKNOWN)) {
                         sprintf(
                             gText,
-                            "Неизвестно"
+                            "РќРµРёР·РІРµСЃС‚РЅРѕ"
                         );
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
@@ -5261,7 +5261,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
                         sprintf(
                             gText,
-                            "Рифы"
+                            "Р РёС„С‹"
                         );
                     } else {
                         goto quick_info_default;
@@ -5275,8 +5275,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (((pHero->m_eventFlags) & (visitedMaskValue)))
-                                ? "(Уже посещено)"
-                                : "(Это место еще не посещено)"
+                                ? "(РЈР¶Рµ РїРѕСЃРµС‰РµРЅРѕ)"
+                                : "(Р­С‚Рѕ РјРµСЃС‚Рѕ РµС‰Рµ РЅРµ РїРѕСЃРµС‰РµРЅРѕ)"
                         );
                     } else {
                         sprintf(
@@ -5814,9 +5814,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         week,
         "%s: %d  %s: %d",
-        "Месяц"  ,
+        "РњРµСЃСЏС†"  ,
         gpGame->m_month,
-        "Неделя"  ,
+        "РќРµРґРµР»СЏ"  ,
         gpGame->m_week
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5840,7 +5840,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     sprintf(
         day,
         "%s: %d",
-        "День"  ,
+        "Р”РµРЅСЊ"  ,
         gpGame->m_day
     );
     m_bottomViewAllTexts[0] = new textWidget(
@@ -6748,12 +6748,12 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         if (scouting == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(
                 blankLabel,
-                "Неизвестно"
+                "РќРµРёР·РІРµСЃС‚РЅРѕ"
             );
         } else {
             sprintf(
                 blankLabel,
-                "Нет"
+                "РќРµС‚"
             );
         }
         noArmyText = new textWidget(
@@ -7311,7 +7311,7 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    "Вы должны встать у входа перед шахтой (лесопилкой или лабораторией алхимика), чтобы направить это заклинание.",
+                    "Р’С‹ РґРѕР»Р¶РЅС‹ РІСЃС‚Р°С‚СЊ Сѓ РІС…РѕРґР° РїРµСЂРµРґ С€Р°С…С‚РѕР№ (Р»РµСЃРѕРїРёР»РєРѕР№ РёР»Рё Р»Р°Р±РѕСЂР°С‚РѕСЂРёРµР№ Р°Р»С…РёРјРёРєР°), С‡С‚РѕР±С‹ РЅР°РїСЂР°РІРёС‚СЊ СЌС‚Рѕ Р·Р°РєР»РёРЅР°РЅРёРµ.",
                     1,
                     -1,
                     -1,
@@ -7347,7 +7347,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                "Теперь все вражеские герои полностью опознаны.",
+                "РўРµРїРµСЂСЊ РІСЃРµ РІСЂР°Р¶РµСЃРєРёРµ РіРµСЂРѕРё РїРѕР»РЅРѕСЃС‚СЊСЋ РѕРїРѕР·РЅР°РЅС‹.",
                 1,
                 -1,
                 -1,
@@ -7367,7 +7367,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    "Ваш герой слишком измотан, чтобы направлять заклинания сегодня. Попробуйте завтра.",
+                    "Р’Р°С€ РіРµСЂРѕР№ СЃР»РёС€РєРѕРј РёР·РјРѕС‚Р°РЅ, С‡С‚РѕР±С‹ РЅР°РїСЂР°РІР»СЏС‚СЊ Р·Р°РєР»РёРЅР°РЅРёСЏ СЃРµРіРѕРґРЅСЏ. РџРѕРїСЂРѕР±СѓР№С‚Рµ Р·Р°РІС‚СЂР°.",
                     1,
                     -1,
                     -1,
@@ -7456,7 +7456,7 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                "Игра успешно сохранена."
+                "РРіСЂР° СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅР°."
                      ,
                 1,
                 -1,
@@ -8408,7 +8408,7 @@ void advManager::DimensionDoor(void) {
             || (!(((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                "Не удалось открыть Пространственные врата!!!",
+                "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ РџСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµРЅРЅС‹Рµ РІСЂР°С‚Р°!!!",
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8481,7 +8481,7 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "Нет доступного города.  Заклинание прервано!",
+            "РќРµС‚ РґРѕСЃС‚СѓРїРЅРѕРіРѕ РіРѕСЂРѕРґР°.  Р—Р°РєР»РёРЅР°РЅРёРµ РїСЂРµСЂРІР°РЅРѕ!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8496,7 +8496,7 @@ void advManager::TownGate(SpellType spellId) {
     }
     if ((((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         NormalDialog(
-            "Заклинание прервано! Вы должны быть на суше, чтобы это заклинание сработало.",
+            "Р—Р°РєР»РёРЅР°РЅРёРµ РїСЂРµСЂРІР°РЅРѕ! Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РЅР° СЃСѓС€Рµ, С‡С‚РѕР±С‹ СЌС‚Рѕ Р·Р°РєР»РёРЅР°РЅРёРµ СЃСЂР°Р±РѕС‚Р°Р»Рѕ.",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8518,7 +8518,7 @@ void advManager::TownGate(SpellType spellId) {
         );
         sprintf(
             gText,
-            "{Портал города}\x0a\x0aВыберите город, куда хотите перенестись:"
+            "{РџРѕСЂС‚Р°Р» РіРѕСЂРѕРґР°}\x0a\x0aР’С‹Р±РµСЂРёС‚Рµ РіРѕСЂРѕРґ, РєСѓРґР° С…РѕС‚РёС‚Рµ РїРµСЂРµРЅРµСЃС‚РёСЃСЊ:"
         );
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
@@ -8564,7 +8564,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "Ближайший город оккупирован. Заклинание прервано!",
+            "Р‘Р»РёР¶Р°Р№С€РёР№ РіРѕСЂРѕРґ РѕРєРєСѓРїРёСЂРѕРІР°РЅ. Р—Р°РєР»РёРЅР°РЅРёРµ РїСЂРµСЂРІР°РЅРѕ!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8743,8 +8743,8 @@ summon_done:
     Reseed(0, 0);
     if (!foundBoat) {
         NormalDialog(
-            "Не удалось призвать ко"
-                "рабль!!!"
+            "РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёР·РІР°С‚СЊ РєРѕ"
+                "СЂР°Р±Р»СЊ!!!"
                  ,
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
@@ -9235,7 +9235,7 @@ void advManager::LoadRemote(void) {
             cheatWarned = 1;
             sprintf(
                 gText,
-                "Используются чит-коды!\n"
+                "РСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ С‡РёС‚-РєРѕРґС‹!\n"
             );
             NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -10042,28 +10042,28 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 question,
-                                "Вы действительно "
-                                    "хотите начать сна"
-                                    "чала?  (Эта игра буд"
-                                    "ет потеряна)"
+                                "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ "
+                                    "С…РѕС‚РёС‚Рµ РЅР°С‡Р°С‚СЊ СЃРЅР°"
+                                    "С‡Р°Р»Р°?  (Р­С‚Р° РёРіСЂР° Р±СѓРґ"
+                                    "РµС‚ РїРѕС‚РµСЂСЏРЅР°)"
 
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 question,
-                                "Вы действительно "
-                                    "хотите загрузить "
-                                    "новую игру? (Эта игр"
-                                    "а будет потеряна)"
+                                "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ "
+                                    "С…РѕС‚РёС‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ "
+                                    "РЅРѕРІСѓСЋ РёРіСЂСѓ? (Р­С‚Р° РёРіСЂ"
+                                    "Р° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)"
 
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
                             strcpy(
                                 question,
-                                "Вы действительно "
-                                    "хотите выйти?"
+                                "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ "
+                                    "С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?"
 
                             );
                         confirm_reset:
@@ -10233,7 +10233,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     msg.payload.widget.id =
         (SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        msg.payload.widget.data.text = "Не показывать";
+        msg.payload.widget.data.text = "РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ";
     } else {
         msg.payload.widget.data.text = walkSpeedText[(gConfig.computerWalkSpeed)];
     }
@@ -10342,9 +10342,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
-                                    "Эта система не по"
-                                        "зволяет проигрыв"
-                                        "ать MIDI и Redbook музыку."
+                                    "Р­С‚Р° СЃРёСЃС‚РµРјР° РЅРµ РїРѕ"
+                                        "Р·РІРѕР»СЏРµС‚ РїСЂРѕРёРіСЂС‹РІ"
+                                        "Р°С‚СЊ MIDI Рё Redbook РјСѓР·С‹РєСѓ."
                                          ,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
@@ -10371,9 +10371,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {
                                 NormalDialog(
-                                    "Цифровая музыка "
-                                        "не доступна в это"
-                                        "й системе."
+                                    "Р¦РёС„СЂРѕРІР°СЏ РјСѓР·С‹РєР° "
+                                        "РЅРµ РґРѕСЃС‚СѓРїРЅР° РІ СЌС‚Рѕ"
+                                        "Р№ СЃРёСЃС‚РµРјРµ."
                                          ,
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
@@ -10418,17 +10418,17 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
-                                        "Невозможно уста"
-                                            "новить воспроиз"
-                                            "ведение CD музыки."
-                                            " Ваш привод CD, воз"
-                                            "можно, использу"
-                                            "ется другой про"
-                                            "граммой или дра"
-                                            "йвер звука не по"
-                                            "ддерживает восп"
-                                            "роизведение CD ст"
-                                            "ерео звука."
+                                        "РќРµРІРѕР·РјРѕР¶РЅРѕ СѓСЃС‚Р°"
+                                            "РЅРѕРІРёС‚СЊ РІРѕСЃРїСЂРѕРёР·"
+                                            "РІРµРґРµРЅРёРµ CD РјСѓР·С‹РєРё."
+                                            " Р’Р°С€ РїСЂРёРІРѕРґ CD, РІРѕР·"
+                                            "РјРѕР¶РЅРѕ, РёСЃРїРѕР»СЊР·Сѓ"
+                                            "РµС‚СЃСЏ РґСЂСѓРіРѕР№ РїСЂРѕ"
+                                            "РіСЂР°РјРјРѕР№ РёР»Рё РґСЂР°"
+                                            "Р№РІРµСЂ Р·РІСѓРєР° РЅРµ РїРѕ"
+                                            "РґРґРµСЂР¶РёРІР°РµС‚ РІРѕСЃРї"
+                                            "СЂРѕРёР·РІРµРґРµРЅРёРµ CD СЃС‚"
+                                            "РµСЂРµРѕ Р·РІСѓРєР°."
                                              ,
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
@@ -10579,7 +10579,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения."
+            "Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РєР°Рє РјРёРЅРёРјСѓРј РІ С‚СЂРµС… С€Р°РіР°С… РѕС‚ РјРѕРЅСЃС‚СЂР°, С‡С‚РѕР±С‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р·Р°РєР»РёРЅР°РЅРёРµ Р’РёРґРµРЅРёСЏ."
                  ,
             1,
             -1,
@@ -10616,7 +10616,7 @@ i32 advManager::DoVisions(hero* visionHero) {
         if (isForced) {
             sprintf(
                 msg,
-                "Существа хотят вступить в вашу армию!"
+                "РЎСѓС‰РµСЃС‚РІР° С…РѕС‚СЏС‚ РІСЃС‚СѓРїРёС‚СЊ РІ РІР°С€Сѓ Р°СЂРјРёСЋ!"
 
             );
             strcat(gText, msg);
@@ -10649,7 +10649,7 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinNum == count) {
                 sprintf(
                     msg,
-                    "Все существа вступят в нашу армию...\n\nза плату в размере %d золотых."
+                    "Р’СЃРµ СЃСѓС‰РµСЃС‚РІР° РІСЃС‚СѓРїСЏС‚ РІ РЅР°С€Сѓ Р°СЂРјРёСЋ...\n\nР·Р° РїР»Р°С‚Сѓ РІ СЂР°Р·РјРµСЂРµ %d Р·РѕР»РѕС‚С‹С…."
 
 ,
                     joinFee
@@ -10657,7 +10657,7 @@ i32 advManager::DoVisions(hero* visionHero) {
             } else {
                 sprintf(
                     msg,
-                    "%d существ присоединятся к нам...\n\nза плату в размере %d золотых."
+                    "%d СЃСѓС‰РµСЃС‚РІ РїСЂРёСЃРѕРµРґРёРЅСЏС‚СЃСЏ Рє РЅР°Рј...\n\nР·Р° РїР»Р°С‚Сѓ РІ СЂР°Р·РјРµСЂРµ %d Р·РѕР»РѕС‚С‹С…."
 
 ,
                     count,
@@ -10673,7 +10673,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     creaturesFlee:
         sprintf(
             msg,
-            "Эти слабые твари определенно побегут, едва завидев нас."
+            "Р­С‚Рё СЃР»Р°Р±С‹Рµ С‚РІР°СЂРё РѕРїСЂРµРґРµР»РµРЅРЅРѕ РїРѕР±РµРіСѓС‚, РµРґРІР° Р·Р°РІРёРґРµРІ РЅР°СЃ."
 
         );
         strcat(gText, msg);
@@ -10682,7 +10682,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 creaturesFight:
     sprintf(
         msg,
-        "Боюсь, эти создания в отвратительном настроении и будут сражаться."
+        "Р‘РѕСЋСЃСЊ, СЌС‚Рё СЃРѕР·РґР°РЅРёСЏ РІ РѕС‚РІСЂР°С‚РёС‚РµР»СЊРЅРѕРј РЅР°СЃС‚СЂРѕРµРЅРёРё Рё Р±СѓРґСѓС‚ СЃСЂР°Р¶Р°С‚СЊСЃСЏ."
 
     );
     strcat(gText, msg);

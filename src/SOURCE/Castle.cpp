@@ -197,7 +197,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
-                "%d этаж Гильдии магов"
+                "%d СЌС‚Р°Р¶ Р“РёР»СЊРґРёРё РјР°РіРѕРІ"
                      ,
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
@@ -581,8 +581,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
-                        "Нельзя построить. Вы уже "
-                            "строили здесь в этом ходу."
+                        "РќРµР»СЊР·СЏ РїРѕСЃС‚СЂРѕРёС‚СЊ. Р’С‹ СѓР¶Рµ "
+                            "СЃС‚СЂРѕРёР»Рё Р·РґРµСЃСЊ РІ СЌС‚РѕРј С…РѕРґСѓ."
 
                     );
                 } else if (gpTownManager->m_town->m_buildings & (1 << (whichBuilding))) {
@@ -695,16 +695,16 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                         if (quickFlag) {
                             NormalDialog(
-                                "{Широкие ряды}\n\nП"
-                                    "ри таком боевом "
-                                    "порядке ваше вой"
-                                    "ско занимает поз"
-                                    "иции по всей шир"
-                                    "ине поля боя и ме"
-                                    "жду соседними от"
-                                    "рядами имеется х"
-                                    "отя бы одна пуст"
-                                    "ая клетка."
+                                "{РЁРёСЂРѕРєРёРµ СЂСЏРґС‹}\n\nРџ"
+                                    "СЂРё С‚Р°РєРѕРј Р±РѕРµРІРѕРј "
+                                    "РїРѕСЂСЏРґРєРµ РІР°С€Рµ РІРѕР№"
+                                    "СЃРєРѕ Р·Р°РЅРёРјР°РµС‚ РїРѕР·"
+                                    "РёС†РёРё РїРѕ РІСЃРµР№ С€РёСЂ"
+                                    "РёРЅРµ РїРѕР»СЏ Р±РѕСЏ Рё РјРµ"
+                                    "Р¶РґСѓ СЃРѕСЃРµРґРЅРёРјРё РѕС‚"
+                                    "СЂСЏРґР°РјРё РёРјРµРµС‚СЃСЏ С…"
+                                    "РѕС‚СЏ Р±С‹ РѕРґРЅР° РїСѓСЃС‚"
+                                    "Р°СЏ РєР»РµС‚РєР°."
                                      ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
@@ -726,14 +726,14 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                         if (quickFlag) {
                             NormalDialog(
-                                "{Плотные ряды}\n\nП"
-                                    "ри таком боевом "
-                                    "порядке ряды ваш"
-                                    "ей армии смыкают"
-                                    "ся вокруг центра"
-                                    "льного отряда на"
-                                    " вашем краю поля "
-                                    "боя."
+                                "{РџР»РѕС‚РЅС‹Рµ СЂСЏРґС‹}\n\nРџ"
+                                    "СЂРё С‚Р°РєРѕРј Р±РѕРµРІРѕРј "
+                                    "РїРѕСЂСЏРґРєРµ СЂСЏРґС‹ РІР°С€"
+                                    "РµР№ Р°СЂРјРёРё СЃРјС‹РєР°СЋС‚"
+                                    "СЃСЏ РІРѕРєСЂСѓРі С†РµРЅС‚СЂР°"
+                                    "Р»СЊРЅРѕРіРѕ РѕС‚СЂСЏРґР° РЅР°"
+                                    " РІР°С€РµРј РєСЂР°СЋ РїРѕР»СЏ "
+                                    "Р±РѕСЏ."
                                      ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,

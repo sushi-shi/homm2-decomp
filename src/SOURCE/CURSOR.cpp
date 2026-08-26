@@ -1341,7 +1341,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             LogStr("Dead Player");
             sprintf(
                 gText,
-                "%s сокрушен!"  ,
+                "%s СЃРѕРєСЂСѓС€РµРЅ!"  ,
                 cPlayerNames[change.id]
             );
             NormalDialog(

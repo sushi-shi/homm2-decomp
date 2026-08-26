@@ -90,7 +90,7 @@ i16 dpnet_init(void) {
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
-            ShutDown("Невозможно загрузить 'DPLAYX.DLL'"
+            ShutDown("РќРµРІРѕР·РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ 'DPLAYX.DLL'"
                  );
         createFunction = NULL;
         dpEnumerate = NULL;
@@ -98,13 +98,13 @@ i16 dpnet_init(void) {
             GetProcAddress(hinstDplayx, "DirectPlayCreate")
         );
         if (createFunction == NULL)
-            ShutDown("Невозможно загрузить 'DPLAYX.DLL'"
+            ShutDown("РќРµРІРѕР·РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ 'DPLAYX.DLL'"
                  );
         dpEnumerate = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
         if (dpEnumerate == NULL)
-            ShutDown("Невозможно загрузить 'DPLAYX.DLL'"
+            ShutDown("РќРµРІРѕР·РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ 'DPLAYX.DLL'"
                  );
         dpEnumerate(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
@@ -124,9 +124,9 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
             sprintf(
                 gText,
-                "Ожидание гостя.\n\n  "
-                    "Нажмите 'ОТМЕНА', чтобы "
-                    "прервать соединение."
+                "РћР¶РёРґР°РЅРёРµ РіРѕСЃС‚СЏ.\n\n  "
+                    "РќР°Р¶РјРёС‚Рµ 'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ "
+                    "РїСЂРµСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ."
 
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -136,11 +136,11 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
-                "К вам присоединились %d "
-                "гостей. Нажмите 'ОК' "
-                "чтобы продолжить или "
-                "подождите других "
-                "игроков."
+                "Рљ РІР°Рј РїСЂРёСЃРѕРµРґРёРЅРёР»РёСЃСЊ %d "
+                "РіРѕСЃС‚РµР№. РќР°Р¶РјРёС‚Рµ 'РћРљ' "
+                "С‡С‚РѕР±С‹ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РёР»Рё "
+                "РїРѕРґРѕР¶РґРёС‚Рµ РґСЂСѓРіРёС… "
+                "РёРіСЂРѕРєРѕРІ."
                 ,
                 giNumHumanPlayers - 1
             );
@@ -161,8 +161,8 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
             sprintf(
                 gText,
-                "Ожидаю игрока для начала "
-                    "игры."
+                "РћР¶РёРґР°СЋ РёРіСЂРѕРєР° РґР»СЏ РЅР°С‡Р°Р»Р° "
+                    "РёРіСЂС‹."
 
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -403,11 +403,11 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
-            "К вам присоединились %d "
-            "гостей. Нажмите 'ОК' "
-            "чтобы продолжить или "
-            "подождите других "
-            "игроков."
+            "Рљ РІР°Рј РїСЂРёСЃРѕРµРґРёРЅРёР»РёСЃСЊ %d "
+            "РіРѕСЃС‚РµР№. РќР°Р¶РјРёС‚Рµ 'РћРљ' "
+            "С‡С‚РѕР±С‹ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РёР»Рё "
+            "РїРѕРґРѕР¶РґРёС‚Рµ РґСЂСѓРіРёС… "
+            "РёРіСЂРѕРєРѕРІ."
             ,
             giNumHumanPlayers - 1
         );

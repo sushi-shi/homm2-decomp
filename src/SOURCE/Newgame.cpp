@@ -244,12 +244,12 @@ void game::GetMap(void) {
     );
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
-            "Как минимум у одног"
-            "о игрока нет Героев "
-            "II: Цена Верности. Вы м"
-            "ожете выбрать карт"
-            "у только стандартн"
-            "ого формата Героев "
+            "РљР°Рє РјРёРЅРёРјСѓРј Сѓ РѕРґРЅРѕРі"
+            "Рѕ РёРіСЂРѕРєР° РЅРµС‚ Р“РµСЂРѕРµРІ "
+            "II: Р¦РµРЅР° Р’РµСЂРЅРѕСЃС‚Рё. Р’С‹ Рј"
+            "РѕР¶РµС‚Рµ РІС‹Р±СЂР°С‚СЊ РєР°СЂС‚"
+            "Сѓ С‚РѕР»СЊРєРѕ СЃС‚Р°РЅРґР°СЂС‚РЅ"
+            "РѕРіРѕ С„РѕСЂРјР°С‚Р° Р“РµСЂРѕРµРІ "
             "II.",
             NORMAL_DIALOG_INFO,
             -1,
@@ -916,7 +916,7 @@ cleanup:
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
                 sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
-                sprintf(gText, "Игрок %d", m_setupPlayerNetworkId[playerIndex] + 1);
+                sprintf(gText, "РРіСЂРѕРє %d", m_setupPlayerNetworkId[playerIndex] + 1);
             }
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
@@ -999,7 +999,7 @@ cleanup:
         gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
-        sprintf(gText, "%s %d%%", "Рейтинг", gpGame->m_difficultyRating);
+        sprintf(gText, "%s %d%%", "Р РµР№С‚РёРЅРі", gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
         DrawNGKPDisplayString(0);
@@ -1048,8 +1048,8 @@ cleanup:
 
                     case GAME_REMOTE_CANCEL:
                         NormalDialog(
-                            "Сервер прекрат"
-                            "ил игру.",
+                            "РЎРµСЂРІРµСЂ РїСЂРµРєСЂР°С‚"
+                            "РёР» РёРіСЂСѓ.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -1413,10 +1413,10 @@ cleanup:
                                                 static_cast<i8>(swapPlayerTemp);
                                         } else {
                                             NormalDialog(
-                                                "Две выбранны"
-                                                "х позиции не м"
-                                                "огут поменят"
-                                                "ься местами.",
+                                                "Р”РІРµ РІС‹Р±СЂР°РЅРЅС‹"
+                                                "С… РїРѕР·РёС†РёРё РЅРµ Рј"
+                                                "РѕРіСѓС‚ РїРѕРјРµРЅСЏС‚"
+                                                "СЊСЃСЏ РјРµСЃС‚Р°РјРё.",
                                                 NORMAL_DIALOG_INFO,
                                                 -1,
                                                 -1,
@@ -1982,7 +1982,7 @@ void game::ShowScenInfo(void) {
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
-            sprintf(gText, "Игрок %d", m_setupPlayerNetworkId[playerCounter] + 1);
+            sprintf(gText, "РРіСЂРѕРє %d", m_setupPlayerNetworkId[playerCounter] + 1);
         }
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
@@ -2076,10 +2076,10 @@ void game::GetLossConditionText(char* text) {
                 city2 = GetTown(townId12);
                 sprintf(
                     text,
-                    "Потерять %s '%s'.",
+                    "РџРѕС‚РµСЂСЏС‚СЊ %s '%s'.",
                     (city2->m_buildings & (TOWN_BUILDING_CASTLE))
-                        ? "замок"
-                        : "город",
+                        ? "Р·Р°РјРѕРє"
+                        : "РіРѕСЂРѕРґ",
                     city2->m_name
                 );
                 break;
@@ -2088,7 +2088,7 @@ void game::GetLossConditionText(char* text) {
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
                 sprintf(
                     text,
-                    "Потерять героя '%s'.",
+                    "РџРѕС‚РµСЂСЏС‚СЊ РіРµСЂРѕСЏ '%s'.",
                     lossHero11->m_name
                 );
                 break;
@@ -2103,9 +2103,9 @@ void game::GetLossConditionText(char* text) {
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
-                    "Не одержать побе"
-                    "ду до конца %d месяц"
-                    "а, %d недели, %d дня.",
+                    "РќРµ РѕРґРµСЂР¶Р°С‚СЊ РїРѕР±Рµ"
+                    "РґСѓ РґРѕ РєРѕРЅС†Р° %d РјРµСЃСЏС†"
+                    "Р°, %d РЅРµРґРµР»Рё, %d РґРЅСЏ.",
                     month19,
                     week2,
                     day26
@@ -2115,8 +2115,8 @@ void game::GetLossConditionText(char* text) {
     } else {
         sprintf(
             text,
-            "Потерять всех геро"
-            "ев, города и замки."
+            "РџРѕС‚РµСЂСЏС‚СЊ РІСЃРµС… РіРµСЂРѕ"
+            "РµРІ, РіРѕСЂРѕРґР° Рё Р·Р°РјРєРё."
         );
     }
 }
@@ -2136,10 +2136,10 @@ void game::GetVictoryConditionText(char* text) {
                 );
                 sprintf(
                     text,
-                    "Захватить %s '%s'",
+                    "Р—Р°С…РІР°С‚РёС‚СЊ %s '%s'",
                     (targetTown->m_buildings & (TOWN_BUILDING_CASTLE))
-                        ? "замок"
-                        : "город",
+                        ? "Р·Р°РјРѕРє"
+                        : "РіРѕСЂРѕРґ",
                     targetTown->m_name
                 );
                 break;
@@ -2148,7 +2148,7 @@ void game::GetVictoryConditionText(char* text) {
                 victoryHero = GetHero(m_mapHeader.victoryConditionValue);
                 sprintf(
                     text,
-                    "Победить героя '%s'",
+                    "РџРѕР±РµРґРёС‚СЊ РіРµСЂРѕСЏ '%s'",
                     victoryHero->m_name
                 );
                 break;
@@ -2157,13 +2157,13 @@ void game::GetVictoryConditionText(char* text) {
                 if (m_mapHeader.victoryConditionValue == 0)
                     sprintf(
                         text,
-                        "Найти могуществ"
-                        "енный артефакт"
+                        "РќР°Р№С‚Рё РјРѕРіСѓС‰РµСЃС‚РІ"
+                        "РµРЅРЅС‹Р№ Р°СЂС‚РµС„Р°РєС‚"
                     );
                 else
                     sprintf(
                         text,
-                        "Найти %s",
+                        "РќР°Р№С‚Рё %s",
                         gArtifactNames[m_mapHeader.victoryConditionValue - 1]
                     );
                 break;
@@ -2171,7 +2171,7 @@ void game::GetVictoryConditionText(char* text) {
             case MAP_VICTORY_ACCUMULATE_GOLD:
                 sprintf(
                     text,
-                    "Собрать %d золота",
+                    "РЎРѕР±СЂР°С‚СЊ %d Р·РѕР»РѕС‚Р°",
                     m_mapHeader.victoryConditionValue * GAME_GOLD_CONDITION_MULTIPLIER
                 );
                 break;
@@ -2187,16 +2187,16 @@ void game::GetVictoryConditionText(char* text) {
                 if (localPlayerFirst)
                     sprintf(
                         text,
-                        "%s и %s должны срази"
-                        "ться",
+                        "%s Рё %s РґРѕР»Р¶РЅС‹ СЃСЂР°Р·Рё"
+                        "С‚СЊСЃСЏ",
                         firstSide,
                         secondSideValue
                     );
                 else
                     sprintf(
                         text,
-                        "%s и %s должны срази"
-                        "ться",
+                        "%s Рё %s РґРѕР»Р¶РЅС‹ СЃСЂР°Р·Рё"
+                        "С‚СЊСЃСЏ",
                         secondSideValue,
                         firstSide
                     );
@@ -2206,22 +2206,22 @@ void game::GetVictoryConditionText(char* text) {
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,
-                ", или вы можете выи"
-                "грать, уничтожив "
-                "всех вражеских ге"
-                "роев и захватив вс"
-                "е вражеские город"
-                "а и замки."
+                ", РёР»Рё РІС‹ РјРѕР¶РµС‚Рµ РІС‹Рё"
+                "РіСЂР°С‚СЊ, СѓРЅРёС‡С‚РѕР¶РёРІ "
+                "РІСЃРµС… РІСЂР°Р¶РµСЃРєРёС… РіРµ"
+                "СЂРѕРµРІ Рё Р·Р°С…РІР°С‚РёРІ РІСЃ"
+                "Рµ РІСЂР°Р¶РµСЃРєРёРµ РіРѕСЂРѕРґ"
+                "Р° Рё Р·Р°РјРєРё."
             );
         else
             strcat(text, ".");
     } else {
         strcpy(
             text,
-            "Уничтожить всех вр"
-            "ажеских героев  и за"
-            "хватить все вражес"
-            "кие города и замки."
+            "РЈРЅРёС‡С‚РѕР¶РёС‚СЊ РІСЃРµС… РІСЂ"
+            "Р°Р¶РµСЃРєРёС… РіРµСЂРѕРµРІ  Рё Р·Р°"
+            "С…РІР°С‚РёС‚СЊ РІСЃРµ РІСЂР°Р¶РµСЃ"
+            "РєРёРµ РіРѕСЂРѕРґР° Рё Р·Р°РјРєРё."
         );
     }
 }
@@ -2249,9 +2249,9 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     if (onSide) {
         if (otherPlayerCount != 0) {
             if (otherPlayerCount > 1)
-                sprintf(text, "Вы и ваши союзники ");
+                sprintf(text, "Р’С‹ Рё РІР°С€Рё СЃРѕСЋР·РЅРёРєРё ");
             else
-                sprintf(text, "Вы и ваш союзник ");
+                sprintf(text, "Р’С‹ Рё РІР°С€ СЃРѕСЋР·РЅРёРє ");
 
             listedPlayerCount = 0;
             for (i = firstPlayer; i <= lastPlayer; ++i) {
@@ -2263,17 +2263,17 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
                     if (listedPlayerCount < otherPlayerCount - 1)
                         strcat(text, ", ");
                     else if (listedPlayerCount < otherPlayerCount)
-                        strcat(text, " и ");
+                        strcat(text, " Рё ");
                 }
             }
         } else {
-            sprintf(text, "Вы");
+            sprintf(text, "Р’С‹");
         }
     } else {
         if (sideCount > 1)
-            strcpy(text, "вражеский союз ");
+            strcpy(text, "РІСЂР°Р¶РµСЃРєРёР№ СЃРѕСЋР· ");
         else
-            strcpy(text, "враг - ");
+            strcpy(text, "РІСЂР°Рі - ");
 
         listedPlayerCount = 0;
         for (i = firstPlayer; i <= lastPlayer; ++i) {
@@ -2284,7 +2284,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             if (listedPlayerCount < otherPlayerCount - 1)
                 strcat(text, ", ");
             else if (listedPlayerCount < otherPlayerCount)
-                strcat(text, " и ");
+                strcat(text, " Рё ");
         }
     }
 

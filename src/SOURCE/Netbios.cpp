@@ -31,7 +31,7 @@ i8 InitNetHost(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS не загружена.");
+                ShutDown("NETBIOS РЅРµ Р·Р°РіСЂСѓР¶РµРЅР°.");
             else {
                 iInitNetHostStatus++;
                 gbRemoteOn = true;
@@ -57,7 +57,7 @@ i8 InitNetHost(void) {
                 == NETBIOS_RESULT_SUCCESS)
                 iInitNetHostStatus++;
             else
-                ShutDown("Ошибка инициализации сети.");
+                ShutDown("РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё СЃРµС‚Рё.");
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
@@ -78,7 +78,7 @@ i8 InitNetGuest(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS не загружена.");
+                ShutDown("NETBIOS РЅРµ Р·Р°РіСЂСѓР¶РµРЅР°.");
             else {
                 gbRemoteOn = true;
                 iInitNetGuestStatus++;
@@ -125,7 +125,7 @@ i8 InitNetGuest(void) {
                     )
                 )
                 != NETBIOS_RESULT_SUCCESS) {
-                sprintf(gText, "Ошибка инициализации сети.");
+                sprintf(gText, "РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё СЃРµС‚Рё.");
                 ShutDown(gText);
             }
             return 1;
@@ -184,16 +184,16 @@ i32 nbnet_init(void) {
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
-            sprintf(gText, "Инициализация сети.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
+            sprintf(gText, "РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРµС‚Рё.\n\n  "
+                "РќР°Р¶РјРёС‚Рµ 'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ "
+                "РїСЂРµСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
-            sprintf(gText, "Ожидание гостя.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
+            sprintf(gText, "РћР¶РёРґР°РЅРёРµ РіРѕСЃС‚СЏ.\n\n  "
+                "РќР°Р¶РјРёС‚Рµ 'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ "
+                "РїСЂРµСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ.");
             LogStr("GUON2");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             LogStr("GUON3");
@@ -203,16 +203,16 @@ i32 nbnet_init(void) {
             break;
         case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
-            sprintf(gText, "Инициализация сети.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
+            sprintf(gText, "РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРµС‚Рё.\n\n  "
+                "РќР°Р¶РјРёС‚Рµ 'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ "
+                "РїСЂРµСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
-            sprintf(gText, "Ожидание хоста.\n\n  "
-                "Нажмите 'ОТМЕНА', чтобы "
-                "прервать соединение.");
+            sprintf(gText, "РћР¶РёРґР°РЅРёРµ С…РѕСЃС‚Р°.\n\n  "
+                "РќР°Р¶РјРёС‚Рµ 'РћРўРњР•РќРђ', С‡С‚РѕР±С‹ "
+                "РїСЂРµСЂРІР°С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);

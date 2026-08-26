@@ -97,7 +97,7 @@ textEntryWidget::textEntryWidget(
     }
 }
 
-textEntryWidget::~textEntryWidget() {
+inline textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 

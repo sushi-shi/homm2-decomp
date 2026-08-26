@@ -127,12 +127,12 @@ i32 game::SetupComPort(void) {
         strcpy(gConfig.modemInitString, "ATZ");
         sprintf(gText, "%s", gConfig.modemInitString);
         GetDataEntry(
-            "Пожалуйста, укажите "
-            "значение строки "
-            "инициализации вашего "
-            "модема или нажмите 'ENTER', "
-            "чтобы присвоить "
-            "значения по умолчанию."
+            "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СѓРєР°Р¶РёС‚Рµ "
+            "Р·РЅР°С‡РµРЅРёРµ СЃС‚СЂРѕРєРё "
+            "РёРЅРёС†РёР°Р»РёР·Р°С†РёРё РІР°С€РµРіРѕ "
+            "РјРѕРґРµРјР° РёР»Рё РЅР°Р¶РјРёС‚Рµ 'ENTER', "
+            "С‡С‚РѕР±С‹ РїСЂРёСЃРІРѕРёС‚СЊ "
+            "Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ."
             ,
             initString,
             MODEM_INIT_ENTRY_LENGTH,
@@ -185,7 +185,7 @@ i32 game::SetupHotSeatGame(void) {
     if (giSetupGameType == 0) {
         sprintf(
             gText,
-              "Желаете\x20задать\x20имена\x20каждому\x20игроку\x3f"
+              "Р–РµР»Р°РµС‚Рµ\x20Р·Р°РґР°С‚СЊ\x20РёРјРµРЅР°\x20РєР°Р¶РґРѕРјСѓ\x20РёРіСЂРѕРєСѓ\x3f"
         );
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
@@ -196,7 +196,7 @@ i32 game::SetupHotSeatGame(void) {
                 );
                 sprintf(
                     gText,
-                      "\x25\x64\x20игрок\x3a\x20Ввести\x20имя\x2e",
+                      "\x25\x64\x20РёРіСЂРѕРє\x3a\x20Р’РІРµСЃС‚Рё\x20РёРјСЏ\x2e",
                     i + 1
                 );
                 GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
@@ -350,8 +350,8 @@ i32 game::SetupModemGame(void) {
             LogStr("SMC 9");
             if (gbDirectConnect == 0) {
                 GetDataEntry(
-                    "Пожалуйста, введите "
-                    "телефонный номер."
+                    "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ "
+                    "С‚РµР»РµС„РѕРЅРЅС‹Р№ РЅРѕРјРµСЂ."
                     ,
                     numbuf,
                     TELEPHONE_ENTRY_LENGTH,
@@ -638,7 +638,7 @@ i32 game::PickLoadGame(void) {
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
 
-            "Как минимум у одного игрока нет Героев II: Цена Верности. Вы можете выбрать карту только стандартного формата Героев II.",
+            "РљР°Рє РјРёРЅРёРјСѓРј Сѓ РѕРґРЅРѕРіРѕ РёРіСЂРѕРєР° РЅРµС‚ Р“РµСЂРѕРµРІ II: Р¦РµРЅР° Р’РµСЂРЅРѕСЃС‚Рё. Р’С‹ РјРѕР¶РµС‚Рµ РІС‹Р±СЂР°С‚СЊ РєР°СЂС‚Сѓ С‚РѕР»СЊРєРѕ СЃС‚Р°РЅРґР°СЂС‚РЅРѕРіРѕ С„РѕСЂРјР°С‚Р° Р“РµСЂРѕРµРІ II.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,

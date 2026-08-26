@@ -1282,21 +1282,21 @@ void army::SpecialAttack(void) {
 
     if (killed > 0) {
         if (damageDone == -1) {
-            sprintf(gText, "Фантом воина уничтожен!!");
+            sprintf(gText, "Р¤Р°РЅС‚РѕРј РІРѕРёРЅР° СѓРЅРёС‡С‚РѕР¶РµРЅ!!");
         } else {
             strcpy(gTargetName, gArmyNames[(pEnemy->m_monsterType)]);
             gTargetName[0] = ToLowerCp1251(gTargetName[0]);
             sprintf(
                 gText,
                 "%s %s %s %d %s.\n%d %s %s.",
-                "Атака",
+                "РђС‚Р°РєР°",
                 gArmyNamesPlural[(m_monsterType)],
-                "наносит",
+                "РЅР°РЅРѕСЃРёС‚",
                 damageDone,
-                "ед. урона",
+                "РµРґ. СѓСЂРѕРЅР°",
                 killed,
                 killed <= 1 ? gTargetName : gArmyNamesPlural[(pEnemy->m_monsterType)],
-                killed <= 1 ? "умирает" : "убито"
+                killed <= 1 ? "СѓРјРёСЂР°РµС‚" : "СѓР±РёС‚Рѕ"
             );
             gText[0] = ToUpperCp1251(gText[0]);
         }
@@ -1304,11 +1304,11 @@ void army::SpecialAttack(void) {
         sprintf(
             gText,
             "%s %s %s %d %s.",
-            "Атака",
+            "РђС‚Р°РєР°",
             gArmyNamesPlural[(m_monsterType)],
-            "наносит",
+            "РЅР°РЅРѕСЃРёС‚",
             damageDone,
-            "ед. урона"
+            "РµРґ. СѓСЂРѕРЅР°"
         );
         gText[0] = ToUpperCp1251(gText[0]);
     }
@@ -1426,24 +1426,24 @@ void army::DoHydraAttack(i32) {
         sprintf(
             gText,
             "%s %s %s %d %s.\n%d %s %s.",
-            "Атака",
+            "РђС‚Р°РєР°",
             gArmyNamesPlural[(m_monsterType)],
-            "наносит",
+            "РЅР°РЅРѕСЃРёС‚",
             totDamage,
-            "ед. урона",
+            "РµРґ. СѓСЂРѕРЅР°",
             totKilled,
-            totKilled <= 1 ? "воин" : "воинов",
-            totKilled <= 1 ? "умирает" : "убито"
+            totKilled <= 1 ? "РІРѕРёРЅ" : "РІРѕРёРЅРѕРІ",
+            totKilled <= 1 ? "СѓРјРёСЂР°РµС‚" : "СѓР±РёС‚Рѕ"
         );
     } else {
         sprintf(
             gText,
             "%s %s %s %d %s.",
-            "Атака",
+            "РђС‚Р°РєР°",
             gArmyNamesPlural[(m_monsterType)],
-            "наносит",
+            "РЅР°РЅРѕСЃРёС‚",
             totDamage,
-            "ед. урона"
+            "РµРґ. СѓСЂРѕРЅР°"
         );
     }
     gText[0] = ToUpperCp1251(gText[0]);
@@ -1577,15 +1577,15 @@ void army::DoAttack(i32 retaliation) {
         DamageEnemy(breathTarget_6, &breathDamage_12, &breathKilled, 0, 0);
     }
     if (damage_4 == -1) {
-        sprintf(gText, "Фантом воина уничтожен!!");
+        sprintf(gText, "Р¤Р°РЅС‚РѕРј РІРѕРёРЅР° СѓРЅРёС‡С‚РѕР¶РµРЅ!!");
     } else if (gbGenieHalf) {
         sprintf(
             gText,
-            "%s %s половину вражеских войск!",
+            "%s %s РїРѕР»РѕРІРёРЅСѓ РІСЂР°Р¶РµСЃРєРёС… РІРѕР№СЃРє!",
             m_quantity <= 1 ? gArmyNames[(m_monsterType)]
                             : gArmyNamesPlural[(m_monsterType)],
-            m_quantity <= 1 ? "уничтожают"
-                            : "уничтожает"
+            m_quantity <= 1 ? "СѓРЅРёС‡С‚РѕР¶Р°СЋС‚"
+                            : "СѓРЅРёС‡С‚РѕР¶Р°РµС‚"
         );
         gText[0] = ToUpperCp1251(gText[0]);
     } else {
@@ -1595,26 +1595,26 @@ void army::DoAttack(i32 retaliation) {
             sprintf(
                 gText,
                 "%s %s %s %d %s.\n%d %s %s.",
-                "Атака",
+                "РђС‚Р°РєР°",
                 gArmyNamesPlural[(m_monsterType)],
-                "наносит",
+                "РЅР°РЅРѕСЃРёС‚",
                 damage_4,
-                "ед. урона",
+                "РµРґ. СѓСЂРѕРЅР°",
                 killed_1,
                 killed_1 <= 1 ? gTargetName
                                : gArmyNamesPlural[(target_18->m_monsterType)],
-                killed_1 <= 1 ? "умирает" : "убито"
+                killed_1 <= 1 ? "СѓРјРёСЂР°РµС‚" : "СѓР±РёС‚Рѕ"
             );
             gText[0] = ToUpperCp1251(gText[0]);
         } else {
             sprintf(
                 gText,
                 "%s %s %s %d %s.",
-                "Атака",
+                "РђС‚Р°РєР°",
                 gArmyNamesPlural[(m_monsterType)],
-                "наносит",
+                "РЅР°РЅРѕСЃРёС‚",
                 damage_4,
-                "ед. урона"
+                "РµРґ. СѓСЂРѕРЅР°"
             );
             gText[0] = ToUpperCp1251(gText[0]);
         }
@@ -1971,8 +1971,8 @@ void army::CheckLuck(void) {
         if (m_luckOutcome < 0) {
             sprintf(
                 gText,
-                "Плохая удача была "
-                "ниспослана на %s!",
+                "РџР»РѕС…Р°СЏ СѓРґР°С‡Р° Р±С‹Р»Р° "
+                "РЅРёСЃРїРѕСЃР»Р°РЅР° РЅР° %s!",
                 m_quantity <= 1 ? gArmyNames[(m_monsterType)]
                                 : gArmyNamesPlural[(m_monsterType)]
             );
@@ -1981,8 +1981,8 @@ void army::CheckLuck(void) {
         } else {
             sprintf(
                 gText,
-                "Удача на стороне "
-                "отряда %s!",
+                "РЈРґР°С‡Р° РЅР° СЃС‚РѕСЂРѕРЅРµ "
+                "РѕС‚СЂСЏРґР° %s!",
                 m_quantity <= 1 ? gArmyNames[(m_monsterType)]
                                 : gArmyNamesPlural[(m_monsterType)]
             );

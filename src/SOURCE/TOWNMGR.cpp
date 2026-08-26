@@ -782,7 +782,7 @@ void townManager::SetupTown(void) {
     message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    strcpy(gText, "Экран города");
+    strcpy(gText, "Р­РєСЂР°РЅ РіРѕСЂРѕРґР°");
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
@@ -1078,11 +1078,11 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             sprintf(
                 m_statusText,
                 "%s: %d, %s: %d, %s: %d",
-                "Месяц",
+                "РњРµСЃСЏС†",
                 gpGame->m_month,
-                "Неделя",
+                "РќРµРґРµР»СЏ",
                 gpGame->m_week,
-                "День",
+                "Р”РµРЅСЊ",
                 gpGame->m_day
             );
             break;
@@ -1409,7 +1409,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
                                         == TOWN_MAX_ARTIFACTS) {
                                         NormalDialog(
-                                            "Прежде вам следует купить волшебную книгу в гильдии магов, но сейчас у вас нет места для нее в инвентаре. Попробуйте отдать один из артефактов другому герою."  ,
+                                            "РџСЂРµР¶РґРµ РІР°Рј СЃР»РµРґСѓРµС‚ РєСѓРїРёС‚СЊ РІРѕР»С€РµР±РЅСѓСЋ РєРЅРёРіСѓ РІ РіРёР»СЊРґРёРё РјР°РіРѕРІ, РЅРѕ СЃРµР№С‡Р°СЃ Сѓ РІР°СЃ РЅРµС‚ РјРµСЃС‚Р° РґР»СЏ РЅРµРµ РІ РёРЅРІРµРЅС‚Р°СЂРµ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РѕС‚РґР°С‚СЊ РѕРґРёРЅ РёР· Р°СЂС‚РµС„Р°РєС‚РѕРІ РґСЂСѓРіРѕРјСѓ РіРµСЂРѕСЋ."  ,
                                             NORMAL_DIALOG_INFO,
                                             -1,
                                             -1,
@@ -1423,7 +1423,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     } else if (gpCurPlayer->m_resources[(RES_GOLD)]
                                                < TOWN_SPELL_BOOK_COST) {
                                         NormalDialog(
-                                            "Чтобы направлять заклинания, прежде следует купить волшебную книгу за 500 золотых. К сожалению, у вас слишком мало денег в данный момент."  ,
+                                            "Р§С‚РѕР±С‹ РЅР°РїСЂР°РІР»СЏС‚СЊ Р·Р°РєР»РёРЅР°РЅРёСЏ, РїСЂРµР¶РґРµ СЃР»РµРґСѓРµС‚ РєСѓРїРёС‚СЊ РІРѕР»С€РµР±РЅСѓСЋ РєРЅРёРіСѓ Р·Р° 500 Р·РѕР»РѕС‚С‹С…. Рљ СЃРѕР¶Р°Р»РµРЅРёСЋ, Сѓ РІР°СЃ СЃР»РёС€РєРѕРј РјР°Р»Рѕ РґРµРЅРµРі РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚."  ,
                                             NORMAL_DIALOG_INFO,
                                             -1,
                                             -1,
@@ -1436,7 +1436,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         );
                                     } else {
                                         NormalDialog(
-                                            "Чтобы направлять заклинания, прежде следует купить волшебную книгу за 500 золотых. Желаете приобрести ее?"  ,
+                                            "Р§С‚РѕР±С‹ РЅР°РїСЂР°РІР»СЏС‚СЊ Р·Р°РєР»РёРЅР°РЅРёСЏ, РїСЂРµР¶РґРµ СЃР»РµРґСѓРµС‚ РєСѓРїРёС‚СЊ РІРѕР»С€РµР±РЅСѓСЋ РєРЅРёРіСѓ Р·Р° 500 Р·РѕР»РѕС‚С‹С…. Р–РµР»Р°РµС‚Рµ РїСЂРёРѕР±СЂРµСЃС‚Рё РµРµ?"  ,
                                             NORMAL_DIALOG_CONFIRM,
                                             -1,
                                             -1,
@@ -1548,7 +1548,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             {
                                 if (m_town->m_mayNotUpgradeToCastle != 0) {
                                     NormalDialog(
-                                        "Этот город не может быть отстроен до уровня замка."  ,
+                                        "Р­С‚РѕС‚ РіРѕСЂРѕРґ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЃС‚СЂРѕРµРЅ РґРѕ СѓСЂРѕРІРЅСЏ Р·Р°РјРєР°."  ,
                                         NORMAL_DIALOG_INFO,
                                         -1,
                                         -1,
@@ -1621,12 +1621,12 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             m_bankBox->Update(1);
                                         } else {
                                             i32 result = 0;
-                                            LogStr("Нельзя построить корабль!"  );
+                                            LogStr("РќРµР»СЊР·СЏ РїРѕСЃС‚СЂРѕРёС‚СЊ РєРѕСЂР°Р±Р»СЊ!"  );
                                         }
                                     }
                                 } else {
                                     NormalDialog(
-                                        "Нельзя построить еще один корабль."  ,
+                                        "РќРµР»СЊР·СЏ РїРѕСЃС‚СЂРѕРёС‚СЊ РµС‰Рµ РѕРґРёРЅ РєРѕСЂР°Р±Р»СЊ."  ,
                                         NORMAL_DIALOG_INFO,
                                         BOAT_LIMIT_DIALOG_X,
                                         BOAT_LIMIT_DIALOG_Y,
@@ -1976,14 +1976,14 @@ void townManager::SplitArmy(void) {
     m_splitMaximum = m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
     message.type = MESSAGE_WIDGET;
     if (m_pendingStrip->m_army == m_swapStrip->m_army) {
-        sprintf(gText, "Сколько воинов перенести?"  );
+        sprintf(gText, "РЎРєРѕР»СЊРєРѕ РІРѕРёРЅРѕРІ РїРµСЂРµРЅРµСЃС‚Рё?"  );
     } else {
         sprintf(
             gText,
-            "Как много %s перенести из армии %s в армию %s?"  ,
+            "РљР°Рє РјРЅРѕРіРѕ %s РїРµСЂРµРЅРµСЃС‚Рё РёР· Р°СЂРјРёРё %s РІ Р°СЂРјРёСЋ %s?"  ,
             gArmyNamesPlural[(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
-            m_swapStrip == m_heroStrip ? "героя"   : "гарнизона"  ,
-            m_pendingStrip == m_heroStrip ? "героя"   : "гарнизона"
+            m_swapStrip == m_heroStrip ? "РіРµСЂРѕСЏ"   : "РіР°СЂРЅРёР·РѕРЅР°"  ,
+            m_pendingStrip == m_heroStrip ? "РіРµСЂРѕСЏ"   : "РіР°СЂРЅРёР·РѕРЅР°"
         );
     }
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -2216,7 +2216,7 @@ i32 townManager::BuyBuild(
         for (index_h = 0; index_h < TOWN_BUILDING_COUNT; ++index_h) {
             if (prerequisiteMask_c & (1L << index_h)) {
                 if (prerequisiteCount_p == 0)
-                    strcat(description_b, "\n\nНеобходимо:"  );
+                    strcat(description_b, "\n\nРќРµРѕР±С…РѕРґРёРјРѕ:"  );
                 ++prerequisiteCount_p;
                 strcat(description_b, "\n");
                 strcat(description_b, GetBuildingName(m_town->m_type, BuildingSlotType(index_h)));
@@ -2225,7 +2225,7 @@ i32 townManager::BuyBuild(
         if (m_town->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE
             && m_town->m_buildState <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
-            strcat(description_b, "\nГильдия магов, 2 этаж"  );
+            strcat(description_b, "\nР“РёР»СЊРґРёСЏ РјР°РіРѕРІ, 2 СЌС‚Р°Р¶"  );
     }
     strcat(description_b, "\n ");
 
@@ -2264,7 +2264,7 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         sprintf(
             gText,
-            "%d этаж Гильдии магов"  ,
+            "%d СЌС‚Р°Р¶ Р“РёР»СЊРґРёРё РјР°РіРѕРІ"  ,
             mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? mageLevel_k + 1
                                                         : TOWN_MAGE_GUILD_MAX_LEVEL
         );
@@ -2544,7 +2544,7 @@ void townManager::SetupMage(heroWindow* window) {
 
     message_i.type = MESSAGE_WIDGET;
     if (m_town->m_occupyingHeroId == -1) {
-        strcpy(gText, "Указанные заклинания доступны здесь."  );
+        strcpy(gText, "РЈРєР°Р·Р°РЅРЅС‹Рµ Р·Р°РєР»РёРЅР°РЅРёСЏ РґРѕСЃС‚СѓРїРЅС‹ Р·РґРµСЃСЊ."  );
         message_i.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_i.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
         message_i.payload.widget.data.text = gText;
@@ -2738,7 +2738,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     }
     sprintf(
         gText,
-        "%s %d уровня %s. Артефактов: %d."  ,
+        "%s %d СѓСЂРѕРІРЅСЏ %s. РђСЂС‚РµС„Р°РєС‚РѕРІ: %d."  ,
         m_recruitHero->m_name,
         m_recruitHero->m_level,
         gAlignmentNames[(m_recruitHero->m_cursorType)],
@@ -2877,9 +2877,9 @@ void townManager::DoTavern(void) {
     SetWinText(m_heroWindow0, TAVERN_WINDOW_TEXT_ID);
     sprintf(
         gText,
-        "Щедрые чаевые вытянули "
-        "из уст трактирщика "
-        "следующий слух:\n\n%s"
+        "Р©РµРґСЂС‹Рµ С‡Р°РµРІС‹Рµ РІС‹С‚СЏРЅСѓР»Рё "
+        "РёР· СѓСЃС‚ С‚СЂР°РєС‚РёСЂС‰РёРєР° "
+        "СЃР»РµРґСѓСЋС‰РёР№ СЃР»СѓС…:\n\n%s"
 
 
         ,
@@ -3043,7 +3043,7 @@ void townManager::SetupWell(heroWindow* window) {
         if (m_town->m_buildings
             & (1L << (dwellingTypes_c[dwellingResult_a] + (BUILDING_SLOT_DWELLING_FIRST)))) {
             available_e = m_town->m_garrison[dwellingTypes_c[dwellingResult_a]];
-            sprintf(gText, "Доступно:"  );
+            sprintf(gText, "Р”РѕСЃС‚СѓРїРЅРѕ:"  );
             message_i.payload.widget.id = dwellingResult_a + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
             message_i.payload.widget.data.text = gText;
             window->BroadcastMessage(message_i);
@@ -3064,7 +3064,7 @@ void townManager::SetupWell(heroWindow* window) {
         else if (static_cast<u8>(gText[0]) >= 0xe0 && static_cast<u8>(gText[0]) <= 0xff)
             upperFirst = static_cast<u8>(gText[0]) - ' ';
         else if (static_cast<u8>(gText[0]) == 0xb8)
-            upperFirst = 'Ё';
+            upperFirst = 'РЃ';
         else
             upperFirst = gText[0];
         gText[0] = upperFirst;
@@ -3309,7 +3309,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
             {
                 if (strongestHeroPosition_j != -1) {
                     strongestHero_d = gpGame->GetPlayerHero(rank_a, strongestHeroPosition_j);
-                    sprintf(gText, "Ат.\nЗащ.\nМаг.\nЗн."  );
+                    sprintf(gText, "РђС‚.\nР—Р°С‰.\nРњР°Рі.\nР—РЅ."  );
                     widgetText_c = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
                     strcpy(widgetText_c, gText);
                     textControl_p = new textWidget(

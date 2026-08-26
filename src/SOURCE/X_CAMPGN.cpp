@@ -561,9 +561,9 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
 
-            "Вы действительно "
-            "хотите начать "
-            "сначала сценарий?",
+            "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ "
+            "С…РѕС‚РёС‚Рµ РЅР°С‡Р°С‚СЊ "
+            "СЃРЅР°С‡Р°Р»Р° СЃС†РµРЅР°СЂРёР№?",
             CAMPAIGN_RESTART_CONFIRM,
             CAMPAIGN_DIALOG_NO_RESOURCE,
             CAMPAIGN_DIALOG_NO_RESOURCE,
@@ -646,7 +646,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "Нет"  );
+        sprintf(gText, "РќРµС‚"  );
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
@@ -660,85 +660,85 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     case ARTIFACT_MINOR_SCROLL:
                         strcpy(
                             gText,
-                            "Малый свиток"
+                            "РњР°Р»С‹Р№ СЃРІРёС‚РѕРє"
                         );
                         break;
                     case ARTIFACT_MAGE_RING:
                         strcpy(
                             gText,
-                            "Кольцо мага"
+                            "РљРѕР»СЊС†Рѕ РјР°РіР°"
                         );
                         break;
                     case ARTIFACT_DEFENDER_HELM:
                         strcpy(
                             gText,
 
-                            "Щлем защитника"
+                            "Р©Р»РµРј Р·Р°С‰РёС‚РЅРёРєР°"
                         );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "Топор силы"  );
+                        strcpy(gText, "РўРѕРїРѕСЂ СЃРёР»С‹"  );
                         break;
                     case ARTIFACT_DRAGON_SWORD:
                         strcpy(
                             gText,
-                            "Драконий меч"
+                            "Р”СЂР°РєРѕРЅРёР№ РјРµС‡"
                         );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "Доспехи"  );
+                        strcpy(gText, "Р”РѕСЃРїРµС…Рё"  );
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(
                             gText,
 
-                            "Символ неудачи"
+                            "РЎРёРјРІРѕР» РЅРµСѓРґР°С‡Рё"
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
                         strcpy(
                             gText,
 
-                            "Громовая палица"
+                            "Р“СЂРѕРјРѕРІР°СЏ РїР°Р»РёС†Р°"
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "Перчатки"  );
+                        strcpy(gText, "РџРµСЂС‡Р°С‚РєРё"  );
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
                         strcpy(
                             gText,
-                            "Малый свиток"
+                            "РњР°Р»С‹Р№ СЃРІРёС‚РѕРє"
                         );
                         break;
                     case ARTIFACT_FOREMOST_SCROLL:
                         strcpy(
                             gText,
 
-                            "Свиток высш. зн."
+                            "РЎРІРёС‚РѕРє РІС‹СЃС€. Р·РЅ."
                         );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "Баллиста"  );
+                        strcpy(gText, "Р‘Р°Р»Р»РёСЃС‚Р°"  );
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
                         strcpy(
                             gText,
-                            "Незримый щит"
+                            "РќРµР·СЂРёРјС‹Р№ С‰РёС‚"
                         );
                         break;
                     case ARTIFACT_NOMAD_BOOTS:
                         strcpy(
                             gText,
 
-                            "Башмаки кочевника"
+                            "Р‘Р°С€РјР°РєРё РєРѕС‡РµРІРЅРёРєР°"
                         );
                         break;
                     case ARTIFACT_TRAVELER_BOOTS:
                         strcpy(
                             gText,
 
-                            "Башмаки путника"
+                            "Р‘Р°С€РјР°РєРё РїСѓС‚РЅРёРєР°"
                         );
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
@@ -752,8 +752,8 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(
                         gText,
-                        "Призвать земляных э"
-                        "л."
+                        "РџСЂРёР·РІР°С‚СЊ Р·РµРјР»СЏРЅС‹С… СЌ"
+                        "Р»."
                     );
                 else
                     sprintf(gText, "%s", gSpellNames[(choice->spell)]);
@@ -787,14 +787,14 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     gText,
                     "%d %s",
                     choice->value,
-                    "Обрывки карты"
+                    "РћР±СЂС‹РІРєРё РєР°СЂС‚С‹"
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "Опыт"  );
+                sprintf(gText, "%d %s", choice->value, "РћРїС‹С‚"  );
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "н/д"  );
+                sprintf(gText, "РЅ/Рґ"  );
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[(choice->faction)]);
@@ -815,7 +815,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         gText,
                         "%s %s",
                         gSpellNames[(choice->spell)],
-                        "Свиток"
+                        "РЎРІРёС‚РѕРє"
                     );
                 } else {
                     sprintf(gText, "%s", gSpellNames[(choice->spell)]);
@@ -1230,12 +1230,12 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 NormalDialog(
 
 
-                                    "Выбранная "
-                                    "карта - плохой "
-                                    "выбор для "
-                                    "вашего "
-                                    "следующего "
-                                    "сценария.",
+                                    "Р’С‹Р±СЂР°РЅРЅР°СЏ "
+                                    "РєР°СЂС‚Р° - РїР»РѕС…РѕР№ "
+                                    "РІС‹Р±РѕСЂ РґР»СЏ "
+                                    "РІР°С€РµРіРѕ "
+                                    "СЃР»РµРґСѓСЋС‰РµРіРѕ "
+                                    "СЃС†РµРЅР°СЂРёСЏ.",
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_RESOURCE,
                                     NORMAL_DIALOG_NO_RESOURCE,

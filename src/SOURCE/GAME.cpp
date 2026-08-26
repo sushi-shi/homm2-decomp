@@ -1167,13 +1167,13 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(savePath, "%s%s", gcGamePath, genName);
         if (strnicmp(
                 genName,
-                "Автосохранение"  ,
+                "РђРІС‚РѕСЃРѕС…СЂР°РЅРµРЅРёРµ"  ,
                 sizeof("AUTOSAVE") - 1
             )
                 != 0
             && strnicmp(
                    genName,
-                   "Игрок Вышел"  ,
+                   "РРіСЂРѕРє Р’С‹С€РµР»"  ,
                    sizeof("PLYREXIT") - 1
                )
                 != 0)
@@ -1301,7 +1301,7 @@ void game::SetupOrigData(void) {
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
-    strcpy(m_saveName, "НОВАЯ ИГРА");
+    strcpy(m_saveName, "РќРћР’РђРЇ РР“Р Рђ");
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
@@ -1419,7 +1419,7 @@ void game::SetupOrigData(void) {
     m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = HINT_COORDINATE_UNKNOWN;
     memset(m_obeliskVisitors, 0, sizeof(m_obeliskVisitors));
-    strcpy(gpGame->m_saveName, "НОВАЯ ИГРА");
+    strcpy(gpGame->m_saveName, "РќРћР’РђРЇ РР“Р Рђ");
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
@@ -1924,7 +1924,7 @@ void game::NewMap(char* filename) {
                     m_heroRecs[awardHero].CheckLevel();
                     strcpy(
                         m_heroRecs[awardHero].m_name,
-                        "Сестра Элиза"
+                        "РЎРµСЃС‚СЂР° Р­Р»РёР·Р°"
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
@@ -1932,7 +1932,7 @@ void game::NewMap(char* filename) {
                     m_heroRecs[awardHero].CheckLevel();
                     strcpy(
                         m_heroRecs[awardHero].m_name,
-                        "Брат Бракс"
+                        "Р‘СЂР°С‚ Р‘СЂР°РєСЃ"
                     );
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
@@ -3085,7 +3085,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("Нет заклинаний."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(const_cast<char*>("РќРµС‚ Р·Р°РєР»РёРЅР°РЅРёР№."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -3478,10 +3478,10 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 > viewSpellsHero->m_spellPoints) {
                                 sprintf(
                                     gText,
-                                    "Заклинание стоит %d оч. "
-                                        "магии. У вас только %d оч. "
-                                        "магии. Вы не можете направить "
-                                        "заклинание."
+                                    "Р—Р°РєР»РёРЅР°РЅРёРµ СЃС‚РѕРёС‚ %d РѕС‡. "
+                                        "РјР°РіРёРё. РЈ РІР°СЃ С‚РѕР»СЊРєРѕ %d РѕС‡. "
+                                        "РјР°РіРёРё. Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РЅР°РїСЂР°РІРёС‚СЊ "
+                                        "Р·Р°РєР»РёРЅР°РЅРёРµ."
                                          ,
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
@@ -3760,7 +3760,7 @@ void game::ViewArmy(
         sprintf(
             gText,
             "\n%s%d",
-            "Осталось здоровья: ",
+            "РћСЃС‚Р°Р»РѕСЃСЊ Р·РґРѕСЂРѕРІСЊСЏ: ",
             static_cast<u32>(monster->hitPoints) - theArmy->m_hitPointsLost
         );
         strcat(details0, gText);
@@ -3902,7 +3902,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>("Вы действительно хотите распустить этот отряд?"),
+                            const_cast<char*>("Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ СЂР°СЃРїСѓСЃС‚РёС‚СЊ СЌС‚РѕС‚ РѕС‚СЂСЏРґ?"),
                             NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
@@ -3941,8 +3941,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 || gpCurPlayer->m_resources[(resourceType7)] >= resourceCost)) {
                             NormalDialog(
                                 const_cast<char*>(
-                                    "Вы можете улучшить ваших воинов за "
-                                    "некоторую сумму. Желаете улучшить их?"
+                                    "Р’С‹ РјРѕР¶РµС‚Рµ СѓР»СѓС‡С€РёС‚СЊ РІР°С€РёС… РІРѕРёРЅРѕРІ Р·Р° "
+                                    "РЅРµРєРѕС‚РѕСЂСѓСЋ СЃСѓРјРјСѓ. Р–РµР»Р°РµС‚Рµ СѓР»СѓС‡С€РёС‚СЊ РёС…?"
                                 ),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
@@ -3966,7 +3966,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                             }
                         } else {
                             NormalDialog(
-                                const_cast<char*>("Вы не можете позволить себе улучшить ваших воинов!"),
+                                const_cast<char*>("Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РїРѕР·РІРѕР»РёС‚СЊ СЃРµР±Рµ СѓР»СѓС‡С€РёС‚СЊ РІР°С€РёС… РІРѕРёРЅРѕРІ!"),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -4183,7 +4183,7 @@ void game::NextPlayer(void) {
                 humansAlive++;
         }
         SaveGame(
-            const_cast<char*>("Автосохранение"  ),
+            const_cast<char*>("РђРІС‚РѕСЃРѕС…СЂР°РЅРµРЅРёРµ"  ),
             1,
             0
         );
@@ -4236,7 +4236,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
-            sprintf(gText, "%s, теперь ваш ход.", cPlayerNames[giCurPlayer]);
+            sprintf(gText, "%s, С‚РµРїРµСЂСЊ РІР°С€ С…РѕРґ.", cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
         }
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -6502,7 +6502,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     LogStr(const_cast<char*>("Transmit Game Start"));
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("Пересылка данных"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>("РџРµСЂРµСЃС‹Р»РєР° РґР°РЅРЅС‹С…"), RES_NONE, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
@@ -6775,7 +6775,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("Получение данных"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>("РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…"), RES_NONE, 0);
 
     samplesReady = gSoundBackendsReady;
     oldTrack = gpSoundManager->m_musicTrack;
@@ -6820,7 +6820,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("Ошибка получения информации. Продолжать?"),
+                const_cast<char*>("РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ РёРЅС„РѕСЂРјР°С†РёРё. РџСЂРѕРґРѕР»Р¶Р°С‚СЊ?"),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
@@ -7562,25 +7562,25 @@ void game::SetupNewRumour(void) {
                     if (selectionRoll7 == (THIEVES_CATEGORY_OBELISKS))
                         sprintf(
                             m_rumour,
-                            "%s нашел больше всех обелисков.",
+                            "%s РЅР°С€РµР» Р±РѕР»СЊС€Рµ РІСЃРµС… РѕР±РµР»РёСЃРєРѕРІ.",
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == (THIEVES_CATEGORY_ARTIFACTS))
                         sprintf(
                             m_rumour,
-                            "%s нашел больше всех артефактов.",
+                            "%s РЅР°С€РµР» Р±РѕР»СЊС€Рµ РІСЃРµС… Р°СЂС‚РµС„Р°РєС‚РѕРІ.",
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == (THIEVES_CATEGORY_ARMY_STRENGTH))
                         sprintf(
                             m_rumour,
-                            "%s обладает самыми сильными войсками.",
+                            "%s РѕР±Р»Р°РґР°РµС‚ СЃР°РјС‹РјРё СЃРёР»СЊРЅС‹РјРё РІРѕР№СЃРєР°РјРё.",
                             cPlayerNames[categoryOrder[0]]
                         );
                     else
                         sprintf(
                             m_rumour,
-                            "%s зарабатывает больше всех денег.",
+                            "%s Р·Р°СЂР°Р±Р°С‚С‹РІР°РµС‚ Р±РѕР»СЊС€Рµ РІСЃРµС… РґРµРЅРµРі.",
                             cPlayerNames[categoryOrder[0]]
                         );
                     return;
@@ -7622,15 +7622,15 @@ void game::SetupNewRumour(void) {
                 }
                 sprintf(
                     m_rumour,
-                    "Могущественный артефакт может "
-                    "быть найден в %s части мира.",
+                    "РњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№ Р°СЂС‚РµС„Р°РєС‚ РјРѕР¶РµС‚ "
+                    "Р±С‹С‚СЊ РЅР°Р№РґРµРЅ РІ %s С‡Р°СЃС‚Рё РјРёСЂР°.",
                     cDirections[direction]
                 );
             } else if (selectionRoll7 < 66) {
                 sprintf(
                     m_rumour,
-                    "%s, то место где может быть "
-                    "найден могущественный артефакт.",
+                    "%s, С‚Рѕ РјРµСЃС‚Рѕ РіРґРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ "
+                    "РЅР°Р№РґРµРЅ РјРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№ Р°СЂС‚РµС„Р°РєС‚.",
                     cRumourTerrainDescriptions
                         [(giGroundToTerrain
                                  [gpAdvManager
@@ -7640,8 +7640,8 @@ void game::SetupNewRumour(void) {
             } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
                 sprintf(
                     m_rumour,
-                    "Определенно, могущественный "
-                    "артефакт это %s.",
+                    "РћРїСЂРµРґРµР»РµРЅРЅРѕ, РјРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№ "
+                    "Р°СЂС‚РµС„Р°РєС‚ СЌС‚Рѕ %s.",
                     gArtifactNames[(m_ultimateArtifactId)]
                 );
             } else {

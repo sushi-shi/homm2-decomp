@@ -62,7 +62,7 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-textWidget::~textWidget() {
+inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE(m_text);
 }

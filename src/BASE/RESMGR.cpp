@@ -305,7 +305,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
         sprintf(
             gText,
 
-            "Не могу открыть файл: %s",
+            "РќРµ РјРѕРіСѓ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»: %s",
             aggregateName
         );
         ShutDown(gText);

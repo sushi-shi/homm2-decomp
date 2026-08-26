@@ -8,7 +8,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       mingw = pkgs.pkgsCross.mingw32;
-      game = mingw.gccStdenv.mkDerivation {
+      game = mingw.clangStdenv.mkDerivation {
         pname = "homm2-gold-buka";
         version = "2.1";
         src = ./.;
@@ -28,9 +28,8 @@
         dontConfigure = true;
         buildPhase = ''
           runHook preBuild
-          sed -i "s|^cxx = i686-w64-mingw32-g++$|cxx = $CXX|" build.ninja
+          sed -i "s|^cxx = clang++$|cxx = $CXX|" build.ninja
           sed -i "s|--target=i686-w64-windows-gnu ||g" build.ninja
-          sed -i "s|-fuse-ld=lld ||g" build.ninja
           ninja
           runHook postBuild
         '';

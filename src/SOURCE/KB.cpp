@@ -407,11 +407,11 @@ void SetupCDRom(void) {
         gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
-                "Нет доступа к CD-ROM. Без "
-                "доступа к CD-ROM Герои 2 буду"
-                "т поддерживать только "
-                "сетевую игру в режиме "
-                    "гостя.",
+                "РќРµС‚ РґРѕСЃС‚СѓРїР° Рє CD-ROM. Р‘РµР· "
+                "РґРѕСЃС‚СѓРїР° Рє CD-ROM Р“РµСЂРѕРё 2 Р±СѓРґСѓ"
+                "С‚ РїРѕРґРґРµСЂР¶РёРІР°С‚СЊ С‚РѕР»СЊРєРѕ "
+                "СЃРµС‚РµРІСѓСЋ РёРіСЂСѓ РІ СЂРµР¶РёРјРµ "
+                    "РіРѕСЃС‚СЏ.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -432,16 +432,16 @@ void SetupCDRom(void) {
         gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
-                " Нет доступа к CD-ROM. Без "
-                "доступа к CD-ROM Герои 2 буду"
-                "т поддерживать только "
-                "сетевую игру в режиме "
-                "гостя. Если у вас есть "
-                "диск, закройте эту про"
-                "грамму и вставьте диск "
-                "в привод и попробуйте "
-                "запустить игру еще ра"
-                    "з.",
+                " РќРµС‚ РґРѕСЃС‚СѓРїР° Рє CD-ROM. Р‘РµР· "
+                "РґРѕСЃС‚СѓРїР° Рє CD-ROM Р“РµСЂРѕРё 2 Р±СѓРґСѓ"
+                "С‚ РїРѕРґРґРµСЂР¶РёРІР°С‚СЊ С‚РѕР»СЊРєРѕ "
+                "СЃРµС‚РµРІСѓСЋ РёРіСЂСѓ РІ СЂРµР¶РёРјРµ "
+                "РіРѕСЃС‚СЏ. Р•СЃР»Рё Сѓ РІР°СЃ РµСЃС‚СЊ "
+                "РґРёСЃРє, Р·Р°РєСЂРѕР№С‚Рµ СЌС‚Сѓ РїСЂРѕ"
+                "РіСЂР°РјРјСѓ Рё РІСЃС‚Р°РІСЊС‚Рµ РґРёСЃРє "
+                "РІ РїСЂРёРІРѕРґ Рё РїРѕРїСЂРѕР±СѓР№С‚Рµ "
+                "Р·Р°РїСѓСЃС‚РёС‚СЊ РёРіСЂСѓ РµС‰Рµ СЂР°"
+                    "Р·.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -456,21 +456,21 @@ void SetupCDRom(void) {
     }
     if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
-            "Ошибка загрузки",
-            "Не могу переключиться в "
-                "директорию Героев II.  Зап"
-                "устите программу устан"
-                "овки."
+            "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё",
+            "РќРµ РјРѕРіСѓ РїРµСЂРµРєР»СЋС‡РёС‚СЊСЃСЏ РІ "
+                "РґРёСЂРµРєС‚РѕСЂРёСЋ Р“РµСЂРѕРµРІ II.  Р—Р°Рї"
+                "СѓСЃС‚РёС‚Рµ РїСЂРѕРіСЂР°РјРјСѓ СѓСЃС‚Р°РЅ"
+                "РѕРІРєРё."
         );
         exit(0);
     }
     if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
-            "Ошибка загрузки",
-            "Не могу найти файлы дан"
-                "ных Героев II.  Пожалуйст"
-                "а, запустите программу "
-                "установки."
+            "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё",
+            "РќРµ РјРѕРіСѓ РЅР°Р№С‚Рё С„Р°Р№Р»С‹ РґР°РЅ"
+                "РЅС‹С… Р“РµСЂРѕРµРІ II.  РџРѕР¶Р°Р»СѓР№СЃС‚"
+                "Р°, Р·Р°РїСѓСЃС‚РёС‚Рµ РїСЂРѕРіСЂР°РјРјСѓ "
+                "СѓСЃС‚Р°РЅРѕРІРєРё."
         );
         exit(0);
     }
@@ -517,7 +517,7 @@ i32 oldmain(void) {
     LogStr("OM2");
     command_c = -1;
     if (gpExec->InitSystem())
-        ShutDown("Ошибка инициализации!");
+        ShutDown("РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё!");
     LogStr("OM3");
     KBChangeMenu(hmnuDflt);
     gPalette = gpResourceManager->GetPalette("kb.pal");
@@ -534,8 +534,8 @@ i32 oldmain(void) {
     SetupCDRom();
     LogStr("OM5");
     if (gpSoundManager->Open(-1))
-        ShutDown("Не могу инициализирова"
-            "ть звук.");
+        ShutDown("РќРµ РјРѕРіСѓ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°"
+            "С‚СЊ Р·РІСѓРє.");
     if (giDebugLevel < OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL)
         CheckMem();
     LogStr("OM6");
@@ -757,8 +757,8 @@ i32 oldmain(void) {
                 goto game_setup_complete;
             case OLD_MAIN_HIGH_SCORES:
                 if (gpExec->AddManager(gpHighScoreManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("РќРµ РјРѕРіСѓ РґРѕР±Р°РІРёС‚СЊ РјРµРЅ"
+                        "РµРґР¶РµСЂР°!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 mainScreenLoaded_h = 0;
@@ -874,8 +874,8 @@ i32 oldmain(void) {
                 LogStr("DWM 5");
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
-                    "Ожидаю получения игро"
-                        "вых данных.",
+                    "РћР¶РёРґР°СЋ РїРѕР»СѓС‡РµРЅРёСЏ РёРіСЂРѕ"
+                        "РІС‹С… РґР°РЅРЅС‹С….",
                     OLD_MAIN_DIALOG_WAIT,
                     -1,
                     -1,
@@ -891,7 +891,7 @@ i32 oldmain(void) {
                 gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
                 sprintf(
                     gpGame->m_saveName,
-                    "НОВАЯ ИГРА"
+                    "РќРћР’РђРЇ РР“Р Рђ"
                 );
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtSLName, 0, 0);
@@ -916,7 +916,7 @@ i32 oldmain(void) {
                 if (!strlen(cPlayerNames[player_h])) {
                     sprintf(
                         cPlayerNames[player_h],
-                        "%s игрок",
+                        "%s РёРіСЂРѕРє",
                         gColors[gpGame->m_players[player_h].m_color]
                     );
                     cPlayerNames[player_h][0] = CyrillicToUpper(cPlayerNames[player_h][0]);
@@ -942,8 +942,8 @@ i32 oldmain(void) {
                 goto game_over;
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("РќРµ РјРѕРіСѓ РґРѕР±Р°РІРёС‚СЊ РјРµРЅ"
+                        "РµРґР¶РµСЂР°!");
                 if (command_c == OLD_MAIN_NEW_GAME) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
@@ -970,15 +970,15 @@ i32 oldmain(void) {
             );
             sprintf(
                 gcWinText,
-                "Мои герои! Наши враги "
-                "были разбиты, а их за"
-                "мки преданы разорен"
-                "ию. Великий поход ок"
-                "ончен, и я предстаю п"
-                "еред вами как всеми "
-                "признанный Великий "
-                "Король!\n\nМы достигл"
-                    "и  победы за %d дней!",
+                "РњРѕРё РіРµСЂРѕРё! РќР°С€Рё РІСЂР°РіРё "
+                "Р±С‹Р»Рё СЂР°Р·Р±РёС‚С‹, Р° РёС… Р·Р°"
+                "РјРєРё РїСЂРµРґР°РЅС‹ СЂР°Р·РѕСЂРµРЅ"
+                "РёСЋ. Р’РµР»РёРєРёР№ РїРѕС…РѕРґ РѕРє"
+                "РѕРЅС‡РµРЅ, Рё СЏ РїСЂРµРґСЃС‚Р°СЋ Рї"
+                "РµСЂРµРґ РІР°РјРё РєР°Рє РІСЃРµРјРё "
+                "РїСЂРёР·РЅР°РЅРЅС‹Р№ Р’РµР»РёРєРёР№ "
+                "РљРѕСЂРѕР»СЊ!\n\nРњС‹ РґРѕСЃС‚РёРіР»"
+                    "Рё  РїРѕР±РµРґС‹ Р·Р° %d РґРЅРµР№!",
                 giCurTurn
             );
 
@@ -1021,8 +1021,8 @@ i32 oldmain(void) {
                             HIGH_SCORE_CAMPAIGN,
                             const_cast<char*>(
                                 gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                                    ? "Арчибальд"
-                                    : "Роланд"
+                                    ? "РђСЂС‡РёР±Р°Р»СЊРґ"
+                                    : "Р РѕР»Р°РЅРґ"
                             )
                         );
                     }
@@ -1090,8 +1090,8 @@ i32 oldmain(void) {
             if (gbShowHighScore) {
                 gbShowHighScore = false;
                 if (gpExec->AddManager(gpHighScoreManager, -1))
-                    ShutDown("Не могу добавить мен"
-                        "еджера!");
+                    ShutDown("РќРµ РјРѕРіСѓ РґРѕР±Р°РІРёС‚СЊ РјРµРЅ"
+                        "РµРґР¶РµСЂР°!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 giHighScoreRank = -1;
@@ -1147,7 +1147,7 @@ i32 InterpretCommandLine(void) {
     strcpy(gMapName, "Chaos.mp2");
     strcpy(
         gFullMapName,
-        "Хаос"
+        "РҐР°РѕСЃ"
     );
 
     size = strlen(gcCommandLine);
@@ -1280,8 +1280,8 @@ i32 InterpretCommandLine(void) {
     if (giTCPHostStatus != -1) {
         if (giTCPType == -1 || giTCPNumPlayers == -1
             || (giTCPHostStatus == LINE_TCP_CLIENT && strlen(gcTCPAddress) < 1)) {
-            ShutDown("Незавершенная TCP/IP ком"
-                "андная строка");
+            ShutDown("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ TCP/IP РєРѕРј"
+                "Р°РЅРґРЅР°СЏ СЃС‚СЂРѕРєР°");
         }
         giShowIntro = 0;
     }
@@ -1537,8 +1537,8 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(
             buf,
-            "%s увеличивает прирост %s "
-                "на 8 в неделю."  ,
+            "%s СѓРІРµР»РёС‡РёРІР°РµС‚ РїСЂРёСЂРѕСЃС‚ %s "
+                "РЅР° 8 РІ РЅРµРґРµР»СЋ."  ,
             GetBuildingName(race, building),
             gArmyNamesPlural[(gDwellingType[(race)][0])]
         );
@@ -1549,8 +1549,8 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     } else {
         sprintf(
             gText,
-            "В постройке '%s' можно "
-                "купить %s."  ,
+            "Р’ РїРѕСЃС‚СЂРѕР№РєРµ '%s' РјРѕР¶РЅРѕ "
+                "РєСѓРїРёС‚СЊ %s."  ,
             GetBuildingName(race, building),
             gArmyNamesPlural
                 [(gDwellingType[(race)][(building) - (BUILDING_SLOT_DWELLING_FIRST)])]
@@ -1908,13 +1908,13 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
                             NormalDialog(
-                                "{Опыт}\n\nОпыт поз"
-                                "воляет повыша"
-                                "ть вашим героя"
-                                "м свои уровни, у"
-                                "величивать пе"
-                                "рвичные и втор"
-                                    "ичные навыки.",
+                                "{РћРїС‹С‚}\n\nРћРїС‹С‚ РїРѕР·"
+                                "РІРѕР»СЏРµС‚ РїРѕРІС‹С€Р°"
+                                "С‚СЊ РІР°С€РёРј РіРµСЂРѕСЏ"
+                                "Рј СЃРІРѕРё СѓСЂРѕРІРЅРё, Сѓ"
+                                "РІРµР»РёС‡РёРІР°С‚СЊ РїРµ"
+                                "СЂРІРёС‡РЅС‹Рµ Рё РІС‚РѕСЂ"
+                                    "РёС‡РЅС‹Рµ РЅР°РІС‹РєРё.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -2007,33 +2007,33 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_RESOURCE_GEMS:
                         case NORMAL_DIALOG_RESOURCE_GOLD:
                             NormalDialog(
-                                "{Ресурсы}\n\nВ Геро"
-                                "ях II есть 7 типов "
-                                "ресурсов, испо"
-                                "льзуемых для в"
-                                "озведения пос"
-                                "троек, улучшен"
-                                "ий замков, поку"
-                                "пки воинов и ге"
-                                "роев. Самый рас"
-                                "пространенный "
-                                "ресурс - золото, "
-                                "требуем практ"
-                                "ически везде. Д"
-                                "ревесина и руд"
-                                "а используютс"
-                                "я для возведен"
-                                "ия большинств"
-                                "а построек. Сам"
-                                "оцветы, ртуть, с"
-                                "ера и кристалл"
-                                "ы - редкие магич"
-                                "еские ресурсы, "
-                                "нужные для воз"
-                                "ведения лучши"
-                                "х построек и по"
-                                "купки сильных "
-                                    "воинов.",
+                                "{Р РµСЃСѓСЂСЃС‹}\n\nР’ Р“РµСЂРѕ"
+                                "СЏС… II РµСЃС‚СЊ 7 С‚РёРїРѕРІ "
+                                "СЂРµСЃСѓСЂСЃРѕРІ, РёСЃРїРѕ"
+                                "Р»СЊР·СѓРµРјС‹С… РґР»СЏ РІ"
+                                "РѕР·РІРµРґРµРЅРёСЏ РїРѕСЃ"
+                                "С‚СЂРѕРµРє, СѓР»СѓС‡С€РµРЅ"
+                                "РёР№ Р·Р°РјРєРѕРІ, РїРѕРєСѓ"
+                                "РїРєРё РІРѕРёРЅРѕРІ Рё РіРµ"
+                                "СЂРѕРµРІ. РЎР°РјС‹Р№ СЂР°СЃ"
+                                "РїСЂРѕСЃС‚СЂР°РЅРµРЅРЅС‹Р№ "
+                                "СЂРµСЃСѓСЂСЃ - Р·РѕР»РѕС‚Рѕ, "
+                                "С‚СЂРµР±СѓРµРј РїСЂР°РєС‚"
+                                "РёС‡РµСЃРєРё РІРµР·РґРµ. Р”"
+                                "СЂРµРІРµСЃРёРЅР° Рё СЂСѓРґ"
+                                "Р° РёСЃРїРѕР»СЊР·СѓСЋС‚СЃ"
+                                "СЏ РґР»СЏ РІРѕР·РІРµРґРµРЅ"
+                                "РёСЏ Р±РѕР»СЊС€РёРЅСЃС‚РІ"
+                                "Р° РїРѕСЃС‚СЂРѕРµРє. РЎР°Рј"
+                                "РѕС†РІРµС‚С‹, СЂС‚СѓС‚СЊ, СЃ"
+                                "РµСЂР° Рё РєСЂРёСЃС‚Р°Р»Р»"
+                                "С‹ - СЂРµРґРєРёРµ РјР°РіРёС‡"
+                                "РµСЃРєРёРµ СЂРµСЃСѓСЂСЃС‹, "
+                                "РЅСѓР¶РЅС‹Рµ РґР»СЏ РІРѕР·"
+                                "РІРµРґРµРЅРёСЏ Р»СѓС‡С€Рё"
+                                "С… РїРѕСЃС‚СЂРѕРµРє Рё РїРѕ"
+                                "РєСѓРїРєРё СЃРёР»СЊРЅС‹С… "
+                                    "РІРѕРёРЅРѕРІ.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -2170,10 +2170,10 @@ void CheckEndGame(
                 PlayerDead(player);
                 if (player == giThisGamePos) {
                     showedDialog_o = 1;
-                    sprintf(gText, "Вы были исключены из игры!!!");
+                    sprintf(gText, "Р’С‹ Р±С‹Р»Рё РёСЃРєР»СЋС‡РµРЅС‹ РёР· РёРіСЂС‹!!!");
                     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else {
-                    sprintf(gText, "%s сокрушен!", cPlayerNames[player]);
+                    sprintf(gText, "%s СЃРѕРєСЂСѓС€РµРЅ!", cPlayerNames[player]);
                     NormalDialog(
                         gText,
                         1,
@@ -2192,7 +2192,7 @@ void CheckEndGame(
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
                         sprintf(
                             gText,
-                            "%s, вы потеряли ваш последний город. Если вы не завоюете себе город в течение следующих 7 дней, вы проиграете.",
+                            "%s, РІС‹ РїРѕС‚РµСЂСЏР»Рё РІР°С€ РїРѕСЃР»РµРґРЅРёР№ РіРѕСЂРѕРґ. Р•СЃР»Рё РІС‹ РЅРµ Р·Р°РІРѕСЋРµС‚Рµ СЃРµР±Рµ РіРѕСЂРѕРґ РІ С‚РµС‡РµРЅРёРµ СЃР»РµРґСѓСЋС‰РёС… 7 РґРЅРµР№, РІС‹ РїСЂРѕРёРіСЂР°РµС‚Рµ.",
                             cPlayerNames[player]
                         );
                         NormalDialog(
@@ -2216,14 +2216,14 @@ void CheckEndGame(
                             showedDialog_o = 1;
                             sprintf(
                                 gText,
-                                "%s, ваши герои покинули вас, а вы были изгнаны с позором из этих земель.",
+                                "%s, РІР°С€Рё РіРµСЂРѕРё РїРѕРєРёРЅСѓР»Рё РІР°СЃ, Р° РІС‹ Р±С‹Р»Рё РёР·РіРЅР°РЅС‹ СЃ РїРѕР·РѕСЂРѕРј РёР· СЌС‚РёС… Р·РµРјРµР»СЊ.",
                                 cPlayerNames[player]
                             );
                         }
                     } else {
                         sprintf(
                             gText,
-                            "%s был брошен своими героями и изгнан с позором из этих земель.",
+                            "%s Р±С‹Р» Р±СЂРѕС€РµРЅ СЃРІРѕРёРјРё РіРµСЂРѕСЏРјРё Рё РёР·РіРЅР°РЅ СЃ РїРѕР·РѕСЂРѕРј РёР· СЌС‚РёС… Р·РµРјРµР»СЊ.",
                             cPlayerNames[player]
                         );
                     }
@@ -2313,7 +2313,7 @@ void CheckEndGame(
             }
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = 1;
-                sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
+                sprintf(gText, "Р’СЂР°Рі СЂР°Р·Р±РёС‚, Р° РІР°С€Р° Р°СЂРјРёСЏ РїСЂР°Р·РґРЅСѓРµС‚ С‚СЂРёСѓРјС„!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2336,13 +2336,13 @@ void CheckEndGame(
                 if (winFlag) {
                     sprintf(
                         gText,
-                        "Вы захватили %s! Вы победили.",
+                        "Р’С‹ Р·Р°С…РІР°С‚РёР»Рё %s! Р’С‹ РїРѕР±РµРґРёР»Рё.",
                         victoryTownData->m_name
                     );
                 } else {
                     sprintf(
                         gText,
-                        "Враг захватил %s! Они празднуют триумф.",
+                        "Р’СЂР°Рі Р·Р°С…РІР°С‚РёР» %s! РћРЅРё РїСЂР°Р·РґРЅСѓСЋС‚ С‚СЂРёСѓРјС„.",
                         victoryTownData->m_name
                     );
                 }
@@ -2359,7 +2359,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, "%s пал! Все потеряно.", lossTown->m_name);
+                sprintf(gText, "%s РїР°Р»! Р’СЃРµ РїРѕС‚РµСЂСЏРЅРѕ.", lossTown->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2387,13 +2387,13 @@ void CheckEndGame(
                     if (winFlag) {
                         sprintf(
                             gText,
-                            "Вы собрали более %d золотых в своей казне. Все враги преклонились перед силой вашего состояния.",
+                            "Р’С‹ СЃРѕР±СЂР°Р»Рё Р±РѕР»РµРµ %d Р·РѕР»РѕС‚С‹С… РІ СЃРІРѕРµР№ РєР°Р·РЅРµ. Р’СЃРµ РІСЂР°РіРё РїСЂРµРєР»РѕРЅРёР»РёСЃСЊ РїРµСЂРµРґ СЃРёР»РѕР№ РІР°С€РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ.",
                             bestGold
                         );
                     } else {
                         sprintf(
                             gText,
-                            "Враг собрал более %d золотых в своей казне. Вы должны преклониться перед силой такого состояния и признать свое поражение.",
+                            "Р’СЂР°Рі СЃРѕР±СЂР°Р» Р±РѕР»РµРµ %d Р·РѕР»РѕС‚С‹С… РІ СЃРІРѕРµР№ РєР°Р·РЅРµ. Р’С‹ РґРѕР»Р¶РЅС‹ РїСЂРµРєР»РѕРЅРёС‚СЊСЃСЏ РїРµСЂРµРґ СЃРёР»РѕР№ С‚Р°РєРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ Рё РїСЂРёР·РЅР°С‚СЊ СЃРІРѕРµ РїРѕСЂР°Р¶РµРЅРёРµ.",
                             bestGold
                         );
                     }
@@ -2412,7 +2412,7 @@ void CheckEndGame(
                 showedDialog_o = 1;
                 sprintf(
                     gText,
-                    "%s - вражеский герой, у вас в плену! Ваше задание завершено.",
+                    "%s - РІСЂР°Р¶РµСЃРєРёР№ РіРµСЂРѕР№, Сѓ РІР°СЃ РІ РїР»РµРЅСѓ! Р’Р°С€Рµ Р·Р°РґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРѕ.",
                     winningHeroEntry_g->m_name
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2427,7 +2427,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, "%s - ваш герой, был повержен.  Вы провалили ваше задание.", lossHero_k->m_name);
+                sprintf(gText, "%s - РІР°С€ РіРµСЂРѕР№, Р±С‹Р» РїРѕРІРµСЂР¶РµРЅ.  Р’С‹ РїСЂРѕРІР°Р»РёР»Рё РІР°С€Рµ Р·Р°РґР°РЅРёРµ.", lossHero_k->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2440,7 +2440,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, "Вы не успели завершить ваше задание в срок. Все потеряно.");
+                sprintf(gText, "Р’С‹ РЅРµ СѓСЃРїРµР»Рё Р·Р°РІРµСЂС€РёС‚СЊ РІР°С€Рµ Р·Р°РґР°РЅРёРµ РІ СЃСЂРѕРє. Р’СЃРµ РїРѕС‚РµСЂСЏРЅРѕ.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2485,7 +2485,7 @@ void CheckEndGame(
                 if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
                     sprintf(
                         artifactName,
-                        "Могущественный артефакт"
+                        "РњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№ Р°СЂС‚РµС„Р°РєС‚"
 
                     );
                 } else {
@@ -2495,11 +2495,11 @@ void CheckEndGame(
                     );
                 }
                 if (winFlag) {
-                    sprintf(gText, "Вы нашли %s. Вы справились с заданием.", artifactName);
+                    sprintf(gText, "Р’С‹ РЅР°С€Р»Рё %s. Р’С‹ СЃРїСЂР°РІРёР»РёСЃСЊ СЃ Р·Р°РґР°РЅРёРµРј.", artifactName);
                 } else {
                     sprintf(
                         gText,
-                        "Враг нашел %s. Вы не справились со своим заданием.",
+                        "Р’СЂР°Рі РЅР°С€РµР» %s. Р’С‹ РЅРµ СЃРїСЂР°РІРёР»РёСЃСЊ СЃРѕ СЃРІРѕРёРј Р·Р°РґР°РЅРёРµРј.",
                         artifactName
                     );
                 }
@@ -2523,7 +2523,7 @@ void CheckEndGame(
                 showedDialog_o = 1;
                 sprintf(
                     gText,
-                    "Все города гномов пали. Это сокрушительное поражение! Вы проиграли."
+                    "Р’СЃРµ РіРѕСЂРѕРґР° РіРЅРѕРјРѕРІ РїР°Р»Рё. Р­С‚Рѕ СЃРѕРєСЂСѓС€РёС‚РµР»СЊРЅРѕРµ РїРѕСЂР°Р¶РµРЅРёРµ! Р’С‹ РїСЂРѕРёРіСЂР°Р»Рё."
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2536,7 +2536,7 @@ void CheckEndGame(
         winFlag = 1;
         if (!showedDialog_o) {
             showedDialog_o = 1;
-            sprintf(gText, "Драконий город пал! Теперь вы Повелитель драконов.");
+            sprintf(gText, "Р”СЂР°РєРѕРЅРёР№ РіРѕСЂРѕРґ РїР°Р»! РўРµРїРµСЂСЊ РІС‹ РџРѕРІРµР»РёС‚РµР»СЊ РґСЂР°РєРѕРЅРѕРІ.");
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
@@ -2556,7 +2556,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, "Роланд пленен! Все потеряно.");
+                sprintf(gText, "Р РѕР»Р°РЅРґ РїР»РµРЅРµРЅ! Р’СЃРµ РїРѕС‚РµСЂСЏРЅРѕ.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2577,7 +2577,7 @@ void CheckEndGame(
             winFlag = 1;
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = 1;
-                sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
+                sprintf(gText, "Р’СЂР°Рі СЂР°Р·Р±РёС‚, Р° РІР°С€Р° Р°СЂРјРёСЏ РїСЂР°Р·РґРЅСѓРµС‚ С‚СЂРёСѓРјС„!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2688,7 +2688,7 @@ void CheckEndGame(
             sprintf(
                 campaignSaveName,
                 "%s%c_%02d",
-                "ПОБЕДА_",
+                "РџРћР‘Р•Р”Рђ_",
                 gpGame->m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
@@ -3020,7 +3020,7 @@ i32 AddScoreToHighScore(
             entries_a[dest_o + 1] = entries_a[dest_o];
 
         GetDataEntry(
-            "Пожалуйста, введите свое имя для таблицы рекордов.",
+            "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ СЃРІРѕРµ РёРјСЏ РґР»СЏ С‚Р°Р±Р»РёС†С‹ СЂРµРєРѕСЂРґРѕРІ.",
             playerName_c,
             HIGH_SCORE_NAME_LENGTH,
             NULL,
@@ -3247,7 +3247,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                         break;
                     default:
                         AddNetBoxLine(
-                            "[ Входящая информация, необходимо выйти... ]",
+                            "[ Р’С…РѕРґСЏС‰Р°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ, РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹Р№С‚Рё... ]",
                             BOX_DEFAULT_COLOR
                         );
                         redrawLines_l = 1;
@@ -3427,11 +3427,11 @@ void ShutDown(char* msg) {
         MessageBoxA(
             hwndApp,
             buf,
-            "Непредвиденное прерывание программы",
+            "РќРµРїСЂРµРґРІРёРґРµРЅРЅРѕРµ РїСЂРµСЂС‹РІР°РЅРёРµ РїСЂРѕРіСЂР°РјРјС‹",
             MB_ICONHAND
         );
     } else {
-        sprintf(buf, "Пока!");
+        sprintf(buf, "РџРѕРєР°!");
     }
     ShutDownSmacker();
     ClearMapExtra();
@@ -3491,7 +3491,7 @@ void FileError(char* filename) {
     );
     sprintf(
         buf,
-        "Ошибка открытия файла %s!",
+        "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° %s!",
         filename
     );
     ShutDown(buf);
@@ -3589,14 +3589,14 @@ void ShowCongrats(HighScoreType highScoreType) {
     }
     ratingText[0] = CyrillicToUpper(ratingText[0]);
     if (static_cast<i8>(gpGame->m_cheated))
-        sprintf(ratingText, "Читер!!!");
+        sprintf(ratingText, "Р§РёС‚РµСЂ!!!");
 
     if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: %d\n"
-                "Счет: %d\nСложность: %d\n\n"
-                "Очки: %d\n\nРейтинг:\n%s\n",
+            "РџРѕР·РґСЂР°РІР»СЏРµРј!\n\nР”РЅРµР№: %d\n"
+                "РЎС‡РµС‚: %d\nРЎР»РѕР¶РЅРѕСЃС‚СЊ: %d\n\n"
+                "РћС‡РєРё: %d\n\nР РµР№С‚РёРЅРі:\n%s\n",
             giCurTurn,
             baseScore,
             gpGame->m_difficultyRating,
@@ -3606,16 +3606,16 @@ void ShowCongrats(HighScoreType highScoreType) {
     } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: "
-                "%d\n\nРейтинг:\n%s\n",
+            "РџРѕР·РґСЂР°РІР»СЏРµРј!\n\nР”РЅРµР№: "
+                "%d\n\nР РµР№С‚РёРЅРі:\n%s\n",
             xCampaign.Days(),
             ratingText
         );
     } else {
         sprintf(
             congratsText,
-            "Поздравляем!\n\nДней: "
-                "%d\n\nРейтинг:\n%s\n",
+            "РџРѕР·РґСЂР°РІР»СЏРµРј!\n\nР”РЅРµР№: "
+                "%d\n\nР РµР№С‚РёРЅРі:\n%s\n",
             gpGame->m_campaignScore,
             ratingText
         );
@@ -3700,7 +3700,7 @@ void MemError(void) {
     sprintf(
         gText,
         cOutOfMemory,
-        "Недостаточно памяти."  ,
+        "РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїР°РјСЏС‚Рё."  ,
         MEMORY_ERROR_REQUEST_SIZE
     );
     ShutDown(gText);
@@ -3764,7 +3764,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         case APP_MENU_RESTART_11:
         case APP_MENU_RESTART_12:
         case APP_MENU_RESTART_13:
-            strcpy(gText, "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)");
+            strcpy(gText, "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РЅР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°?  (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)");
             goto confirmMenuCommand;
 
         case APP_MENU_LOAD_0:
@@ -3780,7 +3780,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         case APP_MENU_LOAD_10:
             strcpy(
                 gText,
-                "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)"
+                "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ РЅРѕРІСѓСЋ РёРіСЂСѓ? (Р­С‚Р° РёРіСЂР° Р±СѓРґРµС‚ РїРѕС‚РµСЂСЏРЅР°)"
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
@@ -4521,14 +4521,14 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         if (exitInfo.eliminated) {
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
-                sprintf(gText, "Вы были исключены из игры!!!");
+                sprintf(gText, "Р’С‹ Р±С‹Р»Рё РёСЃРєР»СЋС‡РµРЅС‹ РёР· РёРіСЂС‹!!!");
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 gbGameOver = true;
                 giEndSequence = 0;
                 return;
             }
 
-            sprintf(gText, "%s сокрушен!", gsNetPlayerInfo[exitInfo.netPosition].name);
+            sprintf(gText, "%s СЃРѕРєСЂСѓС€РµРЅ!", gsNetPlayerInfo[exitInfo.netPosition].name);
             NormalDialog(
                 gText,
                 NORMAL_DIALOG_INFO,
@@ -4542,10 +4542,10 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 PLAYER_EXIT_MESSAGE_TIME
             );
         } else if (!exitInfo.continueGame) {
-            gpGame->SaveGame("Игрок Вышел", 1, 0);
+            gpGame->SaveGame("РРіСЂРѕРє Р’С‹С€РµР»", 1, 0);
             sprintf(
                 gText,
-                "%s покидает игру, а %s решает прекратить всю игру. Игра была сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру самостоятельно, где компьютер займет места выбывших игроков?",
+                "%s РїРѕРєРёРґР°РµС‚ РёРіСЂСѓ, Р° %s СЂРµС€Р°РµС‚ РїСЂРµРєСЂР°С‚РёС‚СЊ РІСЃСЋ РёРіСЂСѓ. РРіСЂР° Р±С‹Р»Р° СЃРѕС…СЂР°РЅРµРЅР° РїРѕРґ РЅР°Р·РІР°РЅРёРµРј 'РР“Р РћРљ Р’Р«РЁР•Р›'. Р–РµР»Р°РµС‚Рµ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РёРіСЂСѓ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ, РіРґРµ РєРѕРјРїСЊСЋС‚РµСЂ Р·Р°Р№РјРµС‚ РјРµСЃС‚Р° РІС‹Р±С‹РІС€РёС… РёРіСЂРѕРєРѕРІ?",
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[hostNetPosition].name
             );
@@ -4560,7 +4560,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             if (exitInfo.timedOut) {
                 sprintf(
                     playerExitMessage_k,
-                    "Игрок-сервер %s сообщает, что игрок %s покинул игру. Игра будет продолжена, а компьютер займет место %s.",
+                    "РРіСЂРѕРє-СЃРµСЂРІРµСЂ %s СЃРѕРѕР±С‰Р°РµС‚, С‡С‚Рѕ РёРіСЂРѕРє %s РїРѕРєРёРЅСѓР» РёРіСЂСѓ. РРіСЂР° Р±СѓРґРµС‚ РїСЂРѕРґРѕР»Р¶РµРЅР°, Р° РєРѕРјРїСЊСЋС‚РµСЂ Р·Р°Р№РјРµС‚ РјРµСЃС‚Рѕ %s.",
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name
@@ -4568,7 +4568,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             } else {
                 sprintf(
                     playerExitMessage_k,
-                    "Игрок-сервер %s сообщает, что игрок %s покинул игру. Игра будет продолжена, а компьютер займет место %s.",
+                    "РРіСЂРѕРє-СЃРµСЂРІРµСЂ %s СЃРѕРѕР±С‰Р°РµС‚, С‡С‚Рѕ РёРіСЂРѕРє %s РїРѕРєРёРЅСѓР» РёРіСЂСѓ. РРіСЂР° Р±СѓРґРµС‚ РїСЂРѕРґРѕР»Р¶РµРЅР°, Р° РєРѕРјРїСЊСЋС‚РµСЂ Р·Р°Р№РјРµС‚ РјРµСЃС‚Рѕ %s.",
                     gsNetPlayerInfo[hostNetPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name,
                     gsNetPlayerInfo[exitInfo.netPosition].name
@@ -4623,7 +4623,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
 
     localPlayerLost_e = 0;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
-    gpGame->SaveGame("Игрок Вышел", 1, 0);
+    gpGame->SaveGame("РРіСЂРѕРє Р’С‹С€РµР»", 1, 0);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = 1;
@@ -4631,7 +4631,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             localPlayerLost_e = 1;
             goto exitInfoProcessed;
         }
-        sprintf(gText, "%s сокрушен!", gsNetPlayerInfo[exitInfo.netPosition].name);
+        sprintf(gText, "%s СЃРѕРєСЂСѓС€РµРЅ!", gsNetPlayerInfo[exitInfo.netPosition].name);
         NormalDialog(
             gText,
             NORMAL_DIALOG_INFO,
@@ -4649,14 +4649,14 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
         if (exitInfo.timedOut) {
             sprintf(
                 gText,
-                "%s вышел из игры. Данная игра сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру, с компьютером, занявшим место %s?",
+                "%s РІС‹С€РµР» РёР· РёРіСЂС‹. Р”Р°РЅРЅР°СЏ РёРіСЂР° СЃРѕС…СЂР°РЅРµРЅР° РїРѕРґ РЅР°Р·РІР°РЅРёРµРј 'РР“Р РћРљ Р’Р«РЁР•Р›'. Р–РµР»Р°РµС‚Рµ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РёРіСЂСѓ, СЃ РєРѕРјРїСЊСЋС‚РµСЂРѕРј, Р·Р°РЅСЏРІС€РёРј РјРµСЃС‚Рѕ %s?",
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         } else {
             sprintf(
                 gText,
-                "%s покидает игру. Данная игра сохранена под названием 'ИГРОК ВЫШЕЛ'. Желаете продолжить игру, с компьютером, занявшим место %s?",
+                "%s РїРѕРєРёРґР°РµС‚ РёРіСЂСѓ. Р”Р°РЅРЅР°СЏ РёРіСЂР° СЃРѕС…СЂР°РЅРµРЅР° РїРѕРґ РЅР°Р·РІР°РЅРёРµРј 'РР“Р РћРљ Р’Р«РЁР•Р›'. Р–РµР»Р°РµС‚Рµ РїСЂРѕРґРѕР»Р¶РёС‚СЊ РёРіСЂСѓ, СЃ РєРѕРјРїСЊСЋС‚РµСЂРѕРј, Р·Р°РЅСЏРІС€РёРј РјРµСЃС‚Рѕ %s?",
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
@@ -4707,7 +4707,7 @@ exitInfoProcessed:
 
 playerExitHandled:
     if (localPlayerLost_e) {
-        sprintf(gText, "Вы были исключены из игры!!!");
+        sprintf(gText, "Р’С‹ Р±С‹Р»Рё РёСЃРєР»СЋС‡РµРЅС‹ РёР· РёРіСЂС‹!!!");
         RemoteCleanup();
         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         gbGameOver = true;
@@ -5113,7 +5113,7 @@ void NormalDialog(
             } else {
                 sprintf(
                     resourceText_p[resourceSlot],
-                    "%d/день",
+                    "%d/РґРµРЅСЊ",
                     -resourceValue_c[resourceSlot]
                 );
             }
@@ -5533,7 +5533,7 @@ void NormalDialog(
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
         orText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_OR_TEXT_LENGTH));
-        strcpy(orText, "или");
+        strcpy(orText, "РёР»Рё");
         textPanel_j = new textWidget(
             windowWidth_f / NORMAL_DIALOG_CENTER_PART_COUNT
                 - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
@@ -8248,214 +8248,214 @@ SCampaignChoice
 };
 char* congratsText = NULL;
 char* gArtifactNames[(ARTIFACT_COUNT)] = {
-    "Книга\x20всезнания"  ,
-    "Меч\x20власти"  ,
-    "Защитная\x20накидка"  ,
-    "Жезл\x20магии"  ,
-    "Всемогущий\x20щит"  ,
-    "Всемогущий\x20посох"  ,
-    "Корона\x20всевластия"  ,
-    "Золотой\x20гусь"  ,
-    "Ожерелье\x20тайной\x20магии"  ,
-    "Магический\x20браслет"  ,
-    "Кольцо\x20мага"  ,
-    "Брошь\x20ведьмы"  ,
-    "Медаль\x20отваги"  ,
-    "Медаль\x20мужества"  ,
-    "Медаль\x20доблести"  ,
-    "Медаль\x20почета"  ,
-    "Символ\x20неудачи"  ,
-    "Громовая\x20палица"  ,
-    "Защитная\x20перчатка"  ,
-    "Шлем\x20защитника"  ,
-    "Гигантский\x20цеп"  ,
-    "Баллиста"  ,
-    "Незримый\x20щит"  ,
-    "Драконий\x20меч"  ,
-    "Топор\x20власти"  ,
-    "Божественный\x20доспех"  ,
-    "Малый\x20свиток\x20знания"  ,
-    "Большой\x20свиток\x20знания"  ,
-    "Могущественный\x20свиток\x20знания"  ,
-    "Свиток\x20высшего\x20знания"  ,
-    "Бездонный\x20мешок"  ,
-    "Бездонная\x20сума"  ,
-    "Бездонный\x20кошель"  ,
-    "Башмаки\x20кочевника"  ,
-    "Башмаки\x20путника"  ,
-    "Лапка\x20кролика"  ,
-    "Золотая\x20подкова"  ,
-    "Счастливая\x20монета"  ,
-    "Клевер"  ,
-    "Компас"  ,
-    "Астролябия"  ,
-    "Дурной\x20глаз"  ,
-    "Зачарованные\x20часы"  ,
-    "Золотые\x20часы"  ,
-    "Шапочка"  ,
-    "Ледяная\x20накидка"  ,
-    "Огненная\x20накидка"  ,
-    "Громовой\x20шлем"  ,
-    "Нетающий\x20лед"  ,
-    "Горячий\x20камень"  ,
-    "Жезл\x20молний"  ,
-    "Кольцо\x20змеи"  ,
-    "Символ\x20жизни"  ,
-    "Книга\x20стихий"  ,
-    "Кольцо\x20стихий"  ,
-    "Святой\x20кулон"  ,
-    "Подвеска\x20свободной\x20воли"  ,
-    "Кулон\x20жизни"  ,
-    "Подвеска\x20покоя"  ,
-    "Всевидящий\x20глаз"  ,
-    "Кулон\x20движения"  ,
-    "Кулон\x20смерти"  ,
-    "Посох\x20отрицания"  ,
-    "Золотой\x20лук"  ,
-    "Телескоп"  ,
-    "Перо\x20дипломата"  ,
-    "Шляпа\x20мага"  ,
-    "Кольцо\x20силы"  ,
-    "Обоз"  ,
-    "Подать"  ,
-    "Ужасная\x20маска"  ,
-    "Бездонная\x20сума\x20серы"  ,
-    "Бездонная\x20колба\x20ртути"  ,
-    "Бездонная\x20сума\x20самоцветов"  ,
-    "Нескончаемая\x20вязанка\x20дров"  ,
-    "Бездонная\x20вагонетка\x20руды"  ,
-    "Бездонная\x20сума\x20кристаллов"  ,
-    "Шлем\x20с\x20шипами"  ,
-    "Щит\x20с\x20шипами"  ,
-    "Белая\x20жемчужина"  ,
-    "Черная\x20жемчужина"  ,
-    "Волшебная\x20книга"  ,
+    "РљРЅРёРіР°\x20РІСЃРµР·РЅР°РЅРёСЏ"  ,
+    "РњРµС‡\x20РІР»Р°СЃС‚Рё"  ,
+    "Р—Р°С‰РёС‚РЅР°СЏ\x20РЅР°РєРёРґРєР°"  ,
+    "Р–РµР·Р»\x20РјР°РіРёРё"  ,
+    "Р’СЃРµРјРѕРіСѓС‰РёР№\x20С‰РёС‚"  ,
+    "Р’СЃРµРјРѕРіСѓС‰РёР№\x20РїРѕСЃРѕС…"  ,
+    "РљРѕСЂРѕРЅР°\x20РІСЃРµРІР»Р°СЃС‚РёСЏ"  ,
+    "Р—РѕР»РѕС‚РѕР№\x20РіСѓСЃСЊ"  ,
+    "РћР¶РµСЂРµР»СЊРµ\x20С‚Р°Р№РЅРѕР№\x20РјР°РіРёРё"  ,
+    "РњР°РіРёС‡РµСЃРєРёР№\x20Р±СЂР°СЃР»РµС‚"  ,
+    "РљРѕР»СЊС†Рѕ\x20РјР°РіР°"  ,
+    "Р‘СЂРѕС€СЊ\x20РІРµРґСЊРјС‹"  ,
+    "РњРµРґР°Р»СЊ\x20РѕС‚РІР°РіРё"  ,
+    "РњРµРґР°Р»СЊ\x20РјСѓР¶РµСЃС‚РІР°"  ,
+    "РњРµРґР°Р»СЊ\x20РґРѕР±Р»РµСЃС‚Рё"  ,
+    "РњРµРґР°Р»СЊ\x20РїРѕС‡РµС‚Р°"  ,
+    "РЎРёРјРІРѕР»\x20РЅРµСѓРґР°С‡Рё"  ,
+    "Р“СЂРѕРјРѕРІР°СЏ\x20РїР°Р»РёС†Р°"  ,
+    "Р—Р°С‰РёС‚РЅР°СЏ\x20РїРµСЂС‡Р°С‚РєР°"  ,
+    "РЁР»РµРј\x20Р·Р°С‰РёС‚РЅРёРєР°"  ,
+    "Р“РёРіР°РЅС‚СЃРєРёР№\x20С†РµРї"  ,
+    "Р‘Р°Р»Р»РёСЃС‚Р°"  ,
+    "РќРµР·СЂРёРјС‹Р№\x20С‰РёС‚"  ,
+    "Р”СЂР°РєРѕРЅРёР№\x20РјРµС‡"  ,
+    "РўРѕРїРѕСЂ\x20РІР»Р°СЃС‚Рё"  ,
+    "Р‘РѕР¶РµСЃС‚РІРµРЅРЅС‹Р№\x20РґРѕСЃРїРµС…"  ,
+    "РњР°Р»С‹Р№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ"  ,
+    "Р‘РѕР»СЊС€РѕР№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ"  ,
+    "РњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ"  ,
+    "РЎРІРёС‚РѕРє\x20РІС‹СЃС€РµРіРѕ\x20Р·РЅР°РЅРёСЏ"  ,
+    "Р‘РµР·РґРѕРЅРЅС‹Р№\x20РјРµС€РѕРє"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°"  ,
+    "Р‘РµР·РґРѕРЅРЅС‹Р№\x20РєРѕС€РµР»СЊ"  ,
+    "Р‘Р°С€РјР°РєРё\x20РєРѕС‡РµРІРЅРёРєР°"  ,
+    "Р‘Р°С€РјР°РєРё\x20РїСѓС‚РЅРёРєР°"  ,
+    "Р›Р°РїРєР°\x20РєСЂРѕР»РёРєР°"  ,
+    "Р—РѕР»РѕС‚Р°СЏ\x20РїРѕРґРєРѕРІР°"  ,
+    "РЎС‡Р°СЃС‚Р»РёРІР°СЏ\x20РјРѕРЅРµС‚Р°"  ,
+    "РљР»РµРІРµСЂ"  ,
+    "РљРѕРјРїР°СЃ"  ,
+    "РђСЃС‚СЂРѕР»СЏР±РёСЏ"  ,
+    "Р”СѓСЂРЅРѕР№\x20РіР»Р°Р·"  ,
+    "Р—Р°С‡Р°СЂРѕРІР°РЅРЅС‹Рµ\x20С‡Р°СЃС‹"  ,
+    "Р—РѕР»РѕС‚С‹Рµ\x20С‡Р°СЃС‹"  ,
+    "РЁР°РїРѕС‡РєР°"  ,
+    "Р›РµРґСЏРЅР°СЏ\x20РЅР°РєРёРґРєР°"  ,
+    "РћРіРЅРµРЅРЅР°СЏ\x20РЅР°РєРёРґРєР°"  ,
+    "Р“СЂРѕРјРѕРІРѕР№\x20С€Р»РµРј"  ,
+    "РќРµС‚Р°СЋС‰РёР№\x20Р»РµРґ"  ,
+    "Р“РѕСЂСЏС‡РёР№\x20РєР°РјРµРЅСЊ"  ,
+    "Р–РµР·Р»\x20РјРѕР»РЅРёР№"  ,
+    "РљРѕР»СЊС†Рѕ\x20Р·РјРµРё"  ,
+    "РЎРёРјРІРѕР»\x20Р¶РёР·РЅРё"  ,
+    "РљРЅРёРіР°\x20СЃС‚РёС…РёР№"  ,
+    "РљРѕР»СЊС†Рѕ\x20СЃС‚РёС…РёР№"  ,
+    "РЎРІСЏС‚РѕР№\x20РєСѓР»РѕРЅ"  ,
+    "РџРѕРґРІРµСЃРєР°\x20СЃРІРѕР±РѕРґРЅРѕР№\x20РІРѕР»Рё"  ,
+    "РљСѓР»РѕРЅ\x20Р¶РёР·РЅРё"  ,
+    "РџРѕРґРІРµСЃРєР°\x20РїРѕРєРѕСЏ"  ,
+    "Р’СЃРµРІРёРґСЏС‰РёР№\x20РіР»Р°Р·"  ,
+    "РљСѓР»РѕРЅ\x20РґРІРёР¶РµРЅРёСЏ"  ,
+    "РљСѓР»РѕРЅ\x20СЃРјРµСЂС‚Рё"  ,
+    "РџРѕСЃРѕС…\x20РѕС‚СЂРёС†Р°РЅРёСЏ"  ,
+    "Р—РѕР»РѕС‚РѕР№\x20Р»СѓРє"  ,
+    "РўРµР»РµСЃРєРѕРї"  ,
+    "РџРµСЂРѕ\x20РґРёРїР»РѕРјР°С‚Р°"  ,
+    "РЁР»СЏРїР°\x20РјР°РіР°"  ,
+    "РљРѕР»СЊС†Рѕ\x20СЃРёР»С‹"  ,
+    "РћР±РѕР·"  ,
+    "РџРѕРґР°С‚СЊ"  ,
+    "РЈР¶Р°СЃРЅР°СЏ\x20РјР°СЃРєР°"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20СЃРµСЂС‹"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20РєРѕР»Р±Р°\x20СЂС‚СѓС‚Рё"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20СЃР°РјРѕС†РІРµС‚РѕРІ"  ,
+    "РќРµСЃРєРѕРЅС‡Р°РµРјР°СЏ\x20РІСЏР·Р°РЅРєР°\x20РґСЂРѕРІ"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20РІР°РіРѕРЅРµС‚РєР°\x20СЂСѓРґС‹"  ,
+    "Р‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20РєСЂРёСЃС‚Р°Р»Р»РѕРІ"  ,
+    "РЁР»РµРј\x20СЃ\x20С€РёРїР°РјРё"  ,
+    "Р©РёС‚\x20СЃ\x20С€РёРїР°РјРё"  ,
+    "Р‘РµР»Р°СЏ\x20Р¶РµРјС‡СѓР¶РёРЅР°"  ,
+    "Р§РµСЂРЅР°СЏ\x20Р¶РµРјС‡СѓР¶РёРЅР°"  ,
+    "Р’РѕР»С€РµР±РЅР°СЏ\x20РєРЅРёРіР°"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x32"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x33"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x34"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x35"  ,
-    "Свиток\x20заклинаний"  ,
-    "Рука\x20мученика"  ,
-    "Доспех\x20Андурана"  ,
-    "Защитная\x20брошь"  ,
-    "Боевое\x20одеяние\x20Андурана"  ,
-    "Кристальный\x20шар"  ,
-    "Сердце\x20огня"  ,
-    "Ледяное\x20сердце"  ,
-    "Шлем\x20Андурана"  ,
-    "Святой\x20молот"  ,
-    "Легендарный\x20скипетр"  ,
-    "Наконечник\x20мачты"  ,
-    "Сфера\x20антимагии"  ,
-    "Волшебный\x20посох"  ,
-    "Мечелом"  ,
-    "Меч\x20Андурана"  ,
-    "Лопата\x20могильщика"
+    "РЎРІРёС‚РѕРє\x20Р·Р°РєР»РёРЅР°РЅРёР№"  ,
+    "Р СѓРєР°\x20РјСѓС‡РµРЅРёРєР°"  ,
+    "Р”РѕСЃРїРµС…\x20РђРЅРґСѓСЂР°РЅР°"  ,
+    "Р—Р°С‰РёС‚РЅР°СЏ\x20Р±СЂРѕС€СЊ"  ,
+    "Р‘РѕРµРІРѕРµ\x20РѕРґРµСЏРЅРёРµ\x20РђРЅРґСѓСЂР°РЅР°"  ,
+    "РљСЂРёСЃС‚Р°Р»СЊРЅС‹Р№\x20С€Р°СЂ"  ,
+    "РЎРµСЂРґС†Рµ\x20РѕРіРЅСЏ"  ,
+    "Р›РµРґСЏРЅРѕРµ\x20СЃРµСЂРґС†Рµ"  ,
+    "РЁР»РµРј\x20РђРЅРґСѓСЂР°РЅР°"  ,
+    "РЎРІСЏС‚РѕР№\x20РјРѕР»РѕС‚"  ,
+    "Р›РµРіРµРЅРґР°СЂРЅС‹Р№\x20СЃРєРёРїРµС‚СЂ"  ,
+    "РќР°РєРѕРЅРµС‡РЅРёРє\x20РјР°С‡С‚С‹"  ,
+    "РЎС„РµСЂР°\x20Р°РЅС‚РёРјР°РіРёРё"  ,
+    "Р’РѕР»С€РµР±РЅС‹Р№\x20РїРѕСЃРѕС…"  ,
+    "РњРµС‡РµР»РѕРј"  ,
+    "РњРµС‡\x20РђРЅРґСѓСЂР°РЅР°"  ,
+    "Р›РѕРїР°С‚Р°\x20РјРѕРіРёР»СЊС‰РёРєР°"
 };
 char* gArtifactDesc[(ARTIFACT_COUNT)] = {
-    "\x7bКнига\x20всезнания\x7d\x0a\x28Знания\x20\x2b\x31\x32\x29\x0a\x0aКнига\x20всезнания\x20увеличивает\x20Знания\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bМеч\x20власти\x7d\x0a\x28Атака\x20\x2b\x31\x32\x29\x0a\x0aМеч\x20власти\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bЗащитная\x20накидка\x7d\x0a\x28Защита\x20\x2b\x31\x32\x29\x0a\x0aЗащитная\x20накидка\x20увеличивает\x20Защиту\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bЖезл\x20магии\x7d\x0a\x28Сила\x20магии\x20\x2b\x31\x32\x29\x0a\x0aЖезл\x20магии\x20увеличивает\x20Силу\x20заклинаний\x20на\x20\x31\x32\x20единиц\x2e"  ,
-    "\x7bВсемогущий\x20щит\x7d\x0a\x0aВсемогущий\x20щит\x20увеличивает\x20Атаку\x20и\x20Защиту\x20на\x20\x36\x20единиц\x20каждый\x2e"  ,
-    "\x7bВсемогущий\x20посох\x7d\x0a\x0aВсемогущий\x20посох\x20увеличивает\x20Силу\x20магии\x20и\x20Знания\x20на\x20\x36\x20единиц\x20каждый\x2e"  ,
-    "\x7bКорона\x20всевластия\x7d\x0a\x0aКорона\x20всевластия\x20увеличивает\x20каждый\x20из\x20базовых\x20навыков\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bЗолотой\x20гусь\x7d\x0a\x0aЗолотой\x20гусь\x20приносит\x20в\x20вашу\x20казну\x20по\x20\x31\x30\x2e\x30\x30\x30\x20золотых\x20каждый\x20день\x2e"  ,
-    "\x7bОжерелье\x20тайной\x20магии\x7d\x0a\x28Сила\x20магии\x20\x2b\x34\x29\x0a\x0aОжерелье\x20тайной\x20магии\x20увеличивает\x20Силу\x20магии\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bМагический\x20браслет\x7d\x0a\x28Сила\x20магии\x20\x2b\x32\x29\x0a\x0aМагический\x20браслет\x20увеличивает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bКольцо\x20мага\x7d\x0a\x28Сила\x20магии\x20\x2b\x32\x29\x0a\x0aКольцо\x20мага\x20увеличивает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБрошь\x20ведьмы\x7d\x0a\x28Сила\x20магии\x20\x2b\x33\x29\x0a\x0aБрошь\x20ведьмы\x20увеличивает\x20Силу\x20магии\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМедаль\x20отваги\x7d\x0a\x0aМедаль\x20отваги\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20мужества\x7d\x0a\x0aМедаль\x20мужества\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20доблести\x7d\x0a\x0aМедаль\x20доблести\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bМедаль\x20почета\x7d\x0a\x0aМедаль\x20почета\x20увеличивает\x20мораль\x2e"  ,
-    "\x7bСимвол\x20неудачи\x7d\x0a\x0aСимвол\x20неудачи\x20сильно\x20уменьшает\x20мораль\x2e"  ,
-    "\x7bГромовая\x20палица\x7d\x0a\x28Атака\x20\x2b\x31\x29\x0a\x0aГромовая\x20палица\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bЗащитная\x20перчатка\x7d\x0a\x28Защита\x20\x2b\x31\x29\x0a\x0aЗащитная\x20перчатка\x20увеличивает\x20навык\x20Защиты\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bШлем\x20защитника\x7d\x0a\x28Защита\x20\x2b\x31\x29\x0a\x0aШлем\x20защитника\x20увеличивает\x20навык\x20Защиты\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bГигантский\x20цеп\x7d\x0a\x28Атака\x20\x2b\x31\x29\x0a\x0aГигантский\x20цеп\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bБаллиста\x7d\x0a\x0aБаллиста\x20позволяет\x20вашей\x20катапульте\x20дважды\x20стрелять\x20в\x20один\x20ход\x20боя\x2e"  ,
-    "\x7bНезримый\x20щит\x7d\x0a\x28Защита\x20\x2b\x32\x29\x0a\x0aНезримый\x20щит\x20увеличивает\x20навык\x20Защиты\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bДраконий\x20меч\x7d\x0a\x28Атака\x20\x2b\x33\x29\x0a\x0aДраконий\x20меч\x20увеличивает\x20навык\x20Атаки\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bТопор\x20власти\x7d\x0a\x28Атака\x20\x2b\x32\x29\x0a\x0aТопор\x20власти\x20увеличивает\x20навык\x20Атаки\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБожественный\x20доспех\x7d\x0a\x28Защита\x20\x2b\x33\x29\x0a\x0aБожественный\x20доспех\x20увеличивает\x20навык\x20Защиты\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМалый\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x32\x29\x0a\x0aМалый\x20свиток\x20знания\x20увеличивает\x20Знания\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБольшой\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x33\x29\x0a\x0aБольшой\x20свиток\x20знания\x20увеличивает\x20Знания\x20на\x20\x33\x20единицы\x2e"  ,
-    "\x7bМогущественный\x20свиток\x20знания\x7d\x0a\x28Знания\x20\x2b\x34\x29\x0a\x0aМогущественный\x20свиток\x20Знания\x20увеличивает\x20Знания\x20на\x20\x34\x20единицы\x2e"  ,
-    "\x7bСвиток\x20высшего\x20знания\x7d\x0a\x28Знания\x20\x2b\x35\x29\x0a\x0aСвиток\x20высшего\x20знания\x20увеличивает\x20Знания\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bБездонный\x20мешок\x7d\x0a\x0aБездонный\x20мешок\x20приносит\x20вам\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x7d\x0a\x0aБездонная\x20сума\x20приносит\x20вам\x20\x37\x35\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБездонный\x20кошель\x7d\x0a\x0aБездонный\x20кошель\x20приносит\x20вам\x20\x35\x30\x30\x20золотых\x20в\x20день\x2e"  ,
-    "\x7bБашмаки\x20кочевника\x7d\x0a\x0aБашмаки\x20кочевника\x20увеличивают\x20дальность\x20передвижения\x20по\x20суше\x2e"  ,
-    "\x7bБашмаки\x20путника\x7d\x0a\x0aБашмаки\x20путника\x20увеличивают\x20подвижность\x20отряда\x20на\x20суше\x2e"  ,
-    "\x7bЛапка\x20кролика\x7d\x0a\x0aЛапка\x20кролика\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bЗолотая\x20подкова\x7d\x0a\x0aЗолотая\x20подкова\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bСчастливая\x20монета\x7d\x0a\x0aСчастливая\x20монета\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bКлевер\x7d\x0a\x0aКлевер\x20увеличивает\x20удачу\x20в\x20бою\x2e"  ,
-    "\x7bКомпас\x7d\x0a\x0aКомпас\x20увеличивает\x20подвижность\x20отряда\x20на\x20суше\x20и\x20на\x20море\x2e"  ,
-    "\x7bАстролябия\x7d\x0a\x0aАстролябия\x20увеличивает\x20подвижность\x20отряда\x20на\x20море\x2e"  ,
-    "\x7bДурной\x20глаз\x7d\x0a\x0aАртефакт\x20снижает\x20вполовину\x20количество\x20магической\x20энергии\x2c\x20требуемой\x20на\x20направление\x20заклинаний\x2dпроклятий\x2e"  ,
-    "\x7bЗачарованные\x20часы\x7d\x0a\x0aАртефакт\x20продлевает\x20действие\x20всех\x20ваших\x20заклинаний\x20на\x20\x32\x20хода\x2e"  ,
-    "\x7bЗолотые\x20часы\x7d\x0a\x0aАртефакт\x20удваивает\x20эффективность\x20использования\x20заклинания\x20гипноза\x2e"  ,
-    "\x7bШапочка\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20магической\x20энергии\x20на\x20все\x20заклинания\x20влияющие\x20на\x20разум\x2e"  ,
-    "\x7bЛедяная\x20накидка\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20холода\x2e"  ,
-    "\x7bОгненная\x20накидка\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20огня\x2e"  ,
-    "\x7bГромовой\x20шлем\x7d\x0a\x0aСнижает\x20вполовину\x20урон\x2c\x20наносимый\x20вашим\x20воинам\x20заклинаниями\x20молний\x2e"  ,
-    "\x7bНетающий\x20лед\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20холода\x2e"  ,
-    "\x7bГорячий\x20камень\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20огня\x2e"  ,
-    "\x7bЖезл\x20молний\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x25\x20урон\x2c\x20наносимый\x20врагу\x20вашими\x20заклинаниями\x20молний\x2e"  ,
-    "\x7bКольцо\x20змеи\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20магической\x20энергии\x20на\x20заклинания\x2dблагословения\x2e"  ,
-    "\x7bСимвол\x20жизни\x7d\x0a\x0aУвеличивает\x20вдвое\x20эффективность\x20всех\x20заклинаний\x20связанных\x20с\x20воскрешением\x20и\x20оживлением\x20существ\x2e"  ,
-    "\x7bКнига\x20стихий\x7d\x0a\x0aУвеличивает\x20вдвое\x20эффективность\x20всех\x20заклинаний\x2c\x20связанных\x20с\x20призывом\x20существ\x2e"  ,
-    "\x7bКольцо\x20стихий\x7d\x0a\x0aСнижает\x20вполовину\x20затраты\x20на\x20все\x20заклинания\x2c\x20связанные\x20с\x20вызовом\x20существ\x2e"  ,
-    "\x7bСвятой\x20кулон\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинаниям\x2dпроклятиям\x2e"  ,
-    "\x7bПодвеска\x20свободной\x20воли\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинаниям\x2c\x20связанным\x20с\x20гипнозом\x2e"  ,
-    "\x7bКулон\x20жизни\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20заклинаниям\x20Смерти\x2e"  ,
-    "\x7bПодвеска\x20покоя\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20к\x20заклинанию\x20Берсерк\x2e"  ,
-    "\x7bВсевидящий\x20глаз\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20заклинаниям\x20ослепления\x2e"  ,
-    "\x7bКулон\x20движения\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20парализующим\x20заклинаниям\x2e"  ,
-    "\x7bКулон\x20смерти\x7d\x0a\x0aНаделяет\x20ваших\x20воинов\x20иммунитетом\x20ко\x20всем\x20святым\x20заклинаниям\x2e"  ,
-    "\x7bПосох\x20отрицания\x7d\x0a\x0aАртефакт\x20защищает\x20ваших\x20воинов\x20от\x20заклинания\x20снятия\x20чар\x2e"  ,
-    "\x7bЗолотой\x20лук\x7d\x0a\x0aСнижает\x20вполовину\x20штраф\x20на\x20урон\x20для\x20ваших\x20воинов\x2c\x20стреляющих\x20через\x20препятствия\x20\x28например\x2c\x20стены\x20замка\x29\x2e"  ,
-    "\x7bТелескоп\x7d\x0a\x0aУвеличивает\x20радиус\x20обзора\x20странствующего\x20героя\x20на\x20\x31\x20клетку\x2e"  ,
-    "\x7bПеро\x20дипломата\x7d\x0a\x0aСнижает\x20стоимость\x20сдачи\x20на\x20\x31\x30\x25\x20от\x20общей\x20стоимости\x20армии\x20вашего\x20героя\x2e"  ,
-    "\x7bШляпа\x20мага\x7d\x0a\x0aАртефакт\x20продлевает\x20действие\x20ваших\x20заклинаний\x20на\x20\x31\x30\x20ходов\x21"  ,
-    "\x7bКольцо\x20силы\x7d\x0a\x0aАртефакт\x20возвращает\x20герою\x20\x32\x20дополнительных\x20очка\x20магии\x20за\x20ход\x2e"  ,
-    "\x7bОбоз\x7d\x0a\x0aОбеспечивает\x20ваших\x20воинов\x2dстрелков\x20нескончаемым\x20запасом\x20стрел\x2e"  ,
-    "\x7bПодать\x7d\x0a\x0aАртефакт\x20принуждает\x20вас\x20выплачивать\x20каждый\x20ход\x20\x32\x35\x30\x20золотых\x20налогов\x2e"  ,
-    "\x7bУжасная\x20маска\x7d\x0a\x0aЭтот\x20артефакт\x20не\x20позволяет\x20любым\x20воинам\x20и\x20существам\x20вступить\x20в\x20вашу\x20армию\x2e"  ,
-    "\x7bБездонная\x20сума\x20серы\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20серы\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20колба\x20ртути\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20ртути\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x20самоцветов\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20самоцветов\x20в\x20день\x2e"  ,
-    "\x7bНескончаемая\x20вязанка\x20дров\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20древесины\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20вагонетка\x20руды\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20руды\x20в\x20день\x2e"  ,
-    "\x7bБездонная\x20сума\x20кристаллов\x7d\x0a\x0aАртефакт\x20приносит\x20вам\x20\x31\x20единицу\x20кристаллов\x20в\x20день\x2e"  ,
-    "\x7bШлем\x20с\x20шипами\x7d\x0a\x0aАртефакт\x20увеличивает\x20параметры\x20Атаки\x20и\x20Защиты\x20на\x20\x31\x20единицу\x20каждый\x2e"  ,
-    "\x7bЩит\x20с\x20шипами\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Атаки\x20и\x20Защиты\x20на\x20\x32\x20единицы\x20каждый\x2e"  ,
-    "\x7bБелая\x20жемчужина\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Силы\x20магии\x20и\x20Знания\x20на\x20\x31\x20единицу\x20каждый\x2e"  ,
-    "\x7bЧерная\x20жемчужина\x7d\x0a\x0a\x20Артефакт\x20увеличивает\x20параметры\x20Силы\x20магии\x20и\x20Знания\x20на\x20\x32\x20единицы\x20каждый\x2e"  ,
-    "\x7bВолшебная\x20книга\x7d\x0a\x0aВолшебная\x20книга\x20позволяет\x20направлять\x20заклинания\x2e"  ,
+    "\x7bРљРЅРёРіР°\x20РІСЃРµР·РЅР°РЅРёСЏ\x7d\x0a\x28Р—РЅР°РЅРёСЏ\x20\x2b\x31\x32\x29\x0a\x0aРљРЅРёРіР°\x20РІСЃРµР·РЅР°РЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x31\x32\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bРњРµС‡\x20РІР»Р°СЃС‚Рё\x7d\x0a\x28РђС‚Р°РєР°\x20\x2b\x31\x32\x29\x0a\x0aРњРµС‡\x20РІР»Р°СЃС‚Рё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20РђС‚Р°РєРё\x20РЅР°\x20\x31\x32\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР—Р°С‰РёС‚РЅР°СЏ\x20РЅР°РєРёРґРєР°\x7d\x0a\x28Р—Р°С‰РёС‚Р°\x20\x2b\x31\x32\x29\x0a\x0aР—Р°С‰РёС‚РЅР°СЏ\x20РЅР°РєРёРґРєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—Р°С‰РёС‚Сѓ\x20РЅР°\x20\x31\x32\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР–РµР·Р»\x20РјР°РіРёРё\x7d\x0a\x28РЎРёР»Р°\x20РјР°РіРёРё\x20\x2b\x31\x32\x29\x0a\x0aР–РµР·Р»\x20РјР°РіРёРё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РЅР°\x20\x31\x32\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР’СЃРµРјРѕРіСѓС‰РёР№\x20С‰РёС‚\x7d\x0a\x0aР’СЃРµРјРѕРіСѓС‰РёР№\x20С‰РёС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РђС‚Р°РєСѓ\x20Рё\x20Р—Р°С‰РёС‚Сѓ\x20РЅР°\x20\x36\x20РµРґРёРЅРёС†\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bР’СЃРµРјРѕРіСѓС‰РёР№\x20РїРѕСЃРѕС…\x7d\x0a\x0aР’СЃРµРјРѕРіСѓС‰РёР№\x20РїРѕСЃРѕС…\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20Рё\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x36\x20РµРґРёРЅРёС†\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bРљРѕСЂРѕРЅР°\x20РІСЃРµРІР»Р°СЃС‚РёСЏ\x7d\x0a\x0aРљРѕСЂРѕРЅР°\x20РІСЃРµРІР»Р°СЃС‚РёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РєР°Р¶РґС‹Р№\x20РёР·\x20Р±Р°Р·РѕРІС‹С…\x20РЅР°РІС‹РєРѕРІ\x20РЅР°\x20\x34\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР—РѕР»РѕС‚РѕР№\x20РіСѓСЃСЊ\x7d\x0a\x0aР—РѕР»РѕС‚РѕР№\x20РіСѓСЃСЊ\x20РїСЂРёРЅРѕСЃРёС‚\x20РІ\x20РІР°С€Сѓ\x20РєР°Р·РЅСѓ\x20РїРѕ\x20\x31\x30\x2e\x30\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РєР°Р¶РґС‹Р№\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bРћР¶РµСЂРµР»СЊРµ\x20С‚Р°Р№РЅРѕР№\x20РјР°РіРёРё\x7d\x0a\x28РЎРёР»Р°\x20РјР°РіРёРё\x20\x2b\x34\x29\x0a\x0aРћР¶РµСЂРµР»СЊРµ\x20С‚Р°Р№РЅРѕР№\x20РјР°РіРёРё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20РЅР°\x20\x34\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРњР°РіРёС‡РµСЃРєРёР№\x20Р±СЂР°СЃР»РµС‚\x7d\x0a\x28РЎРёР»Р°\x20РјР°РіРёРё\x20\x2b\x32\x29\x0a\x0aРњР°РіРёС‡РµСЃРєРёР№\x20Р±СЂР°СЃР»РµС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРљРѕР»СЊС†Рѕ\x20РјР°РіР°\x7d\x0a\x28РЎРёР»Р°\x20РјР°РіРёРё\x20\x2b\x32\x29\x0a\x0aРљРѕР»СЊС†Рѕ\x20РјР°РіР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР‘СЂРѕС€СЊ\x20РІРµРґСЊРјС‹\x7d\x0a\x28РЎРёР»Р°\x20РјР°РіРёРё\x20\x2b\x33\x29\x0a\x0aР‘СЂРѕС€СЊ\x20РІРµРґСЊРјС‹\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРњРµРґР°Р»СЊ\x20РѕС‚РІР°РіРё\x7d\x0a\x0aРњРµРґР°Р»СЊ\x20РѕС‚РІР°РіРё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РјРѕСЂР°Р»СЊ\x2e"  ,
+    "\x7bРњРµРґР°Р»СЊ\x20РјСѓР¶РµСЃС‚РІР°\x7d\x0a\x0aРњРµРґР°Р»СЊ\x20РјСѓР¶РµСЃС‚РІР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РјРѕСЂР°Р»СЊ\x2e"  ,
+    "\x7bРњРµРґР°Р»СЊ\x20РґРѕР±Р»РµСЃС‚Рё\x7d\x0a\x0aРњРµРґР°Р»СЊ\x20РґРѕР±Р»РµСЃС‚Рё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РјРѕСЂР°Р»СЊ\x2e"  ,
+    "\x7bРњРµРґР°Р»СЊ\x20РїРѕС‡РµС‚Р°\x7d\x0a\x0aРњРµРґР°Р»СЊ\x20РїРѕС‡РµС‚Р°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РјРѕСЂР°Р»СЊ\x2e"  ,
+    "\x7bРЎРёРјРІРѕР»\x20РЅРµСѓРґР°С‡Рё\x7d\x0a\x0aРЎРёРјРІРѕР»\x20РЅРµСѓРґР°С‡Рё\x20СЃРёР»СЊРЅРѕ\x20СѓРјРµРЅСЊС€Р°РµС‚\x20РјРѕСЂР°Р»СЊ\x2e"  ,
+    "\x7bР“СЂРѕРјРѕРІР°СЏ\x20РїР°Р»РёС†Р°\x7d\x0a\x28РђС‚Р°РєР°\x20\x2b\x31\x29\x0a\x0aР“СЂРѕРјРѕРІР°СЏ\x20РїР°Р»РёС†Р°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20РђС‚Р°РєРё\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bР—Р°С‰РёС‚РЅР°СЏ\x20РїРµСЂС‡Р°С‚РєР°\x7d\x0a\x28Р—Р°С‰РёС‚Р°\x20\x2b\x31\x29\x0a\x0aР—Р°С‰РёС‚РЅР°СЏ\x20РїРµСЂС‡Р°С‚РєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bРЁР»РµРј\x20Р·Р°С‰РёС‚РЅРёРєР°\x7d\x0a\x28Р—Р°С‰РёС‚Р°\x20\x2b\x31\x29\x0a\x0aРЁР»РµРј\x20Р·Р°С‰РёС‚РЅРёРєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bР“РёРіР°РЅС‚СЃРєРёР№\x20С†РµРї\x7d\x0a\x28РђС‚Р°РєР°\x20\x2b\x31\x29\x0a\x0aР“РёРіР°РЅС‚СЃРєРёР№\x20С†РµРї\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20РђС‚Р°РєРё\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bР‘Р°Р»Р»РёСЃС‚Р°\x7d\x0a\x0aР‘Р°Р»Р»РёСЃС‚Р°\x20РїРѕР·РІРѕР»СЏРµС‚\x20РІР°С€РµР№\x20РєР°С‚Р°РїСѓР»СЊС‚Рµ\x20РґРІР°Р¶РґС‹\x20СЃС‚СЂРµР»СЏС‚СЊ\x20РІ\x20РѕРґРёРЅ\x20С…РѕРґ\x20Р±РѕСЏ\x2e"  ,
+    "\x7bРќРµР·СЂРёРјС‹Р№\x20С‰РёС‚\x7d\x0a\x28Р—Р°С‰РёС‚Р°\x20\x2b\x32\x29\x0a\x0aРќРµР·СЂРёРјС‹Р№\x20С‰РёС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР”СЂР°РєРѕРЅРёР№\x20РјРµС‡\x7d\x0a\x28РђС‚Р°РєР°\x20\x2b\x33\x29\x0a\x0aР”СЂР°РєРѕРЅРёР№\x20РјРµС‡\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20РђС‚Р°РєРё\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРўРѕРїРѕСЂ\x20РІР»Р°СЃС‚Рё\x7d\x0a\x28РђС‚Р°РєР°\x20\x2b\x32\x29\x0a\x0aРўРѕРїРѕСЂ\x20РІР»Р°СЃС‚Рё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20РђС‚Р°РєРё\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР‘РѕР¶РµСЃС‚РІРµРЅРЅС‹Р№\x20РґРѕСЃРїРµС…\x7d\x0a\x28Р—Р°С‰РёС‚Р°\x20\x2b\x33\x29\x0a\x0aР‘РѕР¶РµСЃС‚РІРµРЅРЅС‹Р№\x20РґРѕСЃРїРµС…\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°РІС‹Рє\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРњР°Р»С‹Р№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ\x7d\x0a\x28Р—РЅР°РЅРёСЏ\x20\x2b\x32\x29\x0a\x0aРњР°Р»С‹Р№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР‘РѕР»СЊС€РѕР№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ\x7d\x0a\x28Р—РЅР°РЅРёСЏ\x20\x2b\x33\x29\x0a\x0aР‘РѕР»СЊС€РѕР№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№\x20СЃРІРёС‚РѕРє\x20Р·РЅР°РЅРёСЏ\x7d\x0a\x28Р—РЅР°РЅРёСЏ\x20\x2b\x34\x29\x0a\x0aРњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№\x20СЃРІРёС‚РѕРє\x20Р—РЅР°РЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x34\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bРЎРІРёС‚РѕРє\x20РІС‹СЃС€РµРіРѕ\x20Р·РЅР°РЅРёСЏ\x7d\x0a\x28Р—РЅР°РЅРёСЏ\x20\x2b\x35\x29\x0a\x0aРЎРІРёС‚РѕРє\x20РІС‹СЃС€РµРіРѕ\x20Р·РЅР°РЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅС‹Р№\x20РјРµС€РѕРє\x7d\x0a\x0aР‘РµР·РґРѕРЅРЅС‹Р№\x20РјРµС€РѕРє\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x30\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x7d\x0a\x0aР‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x37\x35\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅС‹Р№\x20РєРѕС€РµР»СЊ\x7d\x0a\x0aР‘РµР·РґРѕРЅРЅС‹Р№\x20РєРѕС€РµР»СЊ\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x35\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘Р°С€РјР°РєРё\x20РєРѕС‡РµРІРЅРёРєР°\x7d\x0a\x0aР‘Р°С€РјР°РєРё\x20РєРѕС‡РµРІРЅРёРєР°\x20СѓРІРµР»РёС‡РёРІР°СЋС‚\x20РґР°Р»СЊРЅРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРёР¶РµРЅРёСЏ\x20РїРѕ\x20СЃСѓС€Рµ\x2e"  ,
+    "\x7bР‘Р°С€РјР°РєРё\x20РїСѓС‚РЅРёРєР°\x7d\x0a\x0aР‘Р°С€РјР°РєРё\x20РїСѓС‚РЅРёРєР°\x20СѓРІРµР»РёС‡РёРІР°СЋС‚\x20РїРѕРґРІРёР¶РЅРѕСЃС‚СЊ\x20РѕС‚СЂСЏРґР°\x20РЅР°\x20СЃСѓС€Рµ\x2e"  ,
+    "\x7bР›Р°РїРєР°\x20РєСЂРѕР»РёРєР°\x7d\x0a\x0aР›Р°РїРєР°\x20РєСЂРѕР»РёРєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20РІ\x20Р±РѕСЋ\x2e"  ,
+    "\x7bР—РѕР»РѕС‚Р°СЏ\x20РїРѕРґРєРѕРІР°\x7d\x0a\x0aР—РѕР»РѕС‚Р°СЏ\x20РїРѕРґРєРѕРІР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20РІ\x20Р±РѕСЋ\x2e"  ,
+    "\x7bРЎС‡Р°СЃС‚Р»РёРІР°СЏ\x20РјРѕРЅРµС‚Р°\x7d\x0a\x0aРЎС‡Р°СЃС‚Р»РёРІР°СЏ\x20РјРѕРЅРµС‚Р°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20РІ\x20Р±РѕСЋ\x2e"  ,
+    "\x7bРљР»РµРІРµСЂ\x7d\x0a\x0aРљР»РµРІРµСЂ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20РІ\x20Р±РѕСЋ\x2e"  ,
+    "\x7bРљРѕРјРїР°СЃ\x7d\x0a\x0aРљРѕРјРїР°СЃ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїРѕРґРІРёР¶РЅРѕСЃС‚СЊ\x20РѕС‚СЂСЏРґР°\x20РЅР°\x20СЃСѓС€Рµ\x20Рё\x20РЅР°\x20РјРѕСЂРµ\x2e"  ,
+    "\x7bРђСЃС‚СЂРѕР»СЏР±РёСЏ\x7d\x0a\x0aРђСЃС‚СЂРѕР»СЏР±РёСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїРѕРґРІРёР¶РЅРѕСЃС‚СЊ\x20РѕС‚СЂСЏРґР°\x20РЅР°\x20РјРѕСЂРµ\x2e"  ,
+    "\x7bР”СѓСЂРЅРѕР№\x20РіР»Р°Р·\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20СЃРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20РєРѕР»РёС‡РµСЃС‚РІРѕ\x20РјР°РіРёС‡РµСЃРєРѕР№\x20СЌРЅРµСЂРіРёРё\x2c\x20С‚СЂРµР±СѓРµРјРѕР№\x20РЅР°\x20РЅР°РїСЂР°РІР»РµРЅРёРµ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x2dРїСЂРѕРєР»СЏС‚РёР№\x2e"  ,
+    "\x7bР—Р°С‡Р°СЂРѕРІР°РЅРЅС‹Рµ\x20С‡Р°СЃС‹\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРѕРґР»РµРІР°РµС‚\x20РґРµР№СЃС‚РІРёРµ\x20РІСЃРµС…\x20РІР°С€РёС…\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РЅР°\x20\x32\x20С…РѕРґР°\x2e"  ,
+    "\x7bР—РѕР»РѕС‚С‹Рµ\x20С‡Р°СЃС‹\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20СѓРґРІР°РёРІР°РµС‚\x20СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ\x20РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20РіРёРїРЅРѕР·Р°\x2e"  ,
+    "\x7bРЁР°РїРѕС‡РєР°\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20Р·Р°С‚СЂР°С‚С‹\x20РјР°РіРёС‡РµСЃРєРѕР№\x20СЌРЅРµСЂРіРёРё\x20РЅР°\x20РІСЃРµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20РІР»РёСЏСЋС‰РёРµ\x20РЅР°\x20СЂР°Р·СѓРј\x2e"  ,
+    "\x7bР›РµРґСЏРЅР°СЏ\x20РЅР°РєРёРґРєР°\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІР°С€РёРј\x20РІРѕРёРЅР°Рј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20С…РѕР»РѕРґР°\x2e"  ,
+    "\x7bРћРіРЅРµРЅРЅР°СЏ\x20РЅР°РєРёРґРєР°\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІР°С€РёРј\x20РІРѕРёРЅР°Рј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20РѕРіРЅСЏ\x2e"  ,
+    "\x7bР“СЂРѕРјРѕРІРѕР№\x20С€Р»РµРј\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІР°С€РёРј\x20РІРѕРёРЅР°Рј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20РјРѕР»РЅРёР№\x2e"  ,
+    "\x7bРќРµС‚Р°СЋС‰РёР№\x20Р»РµРґ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x35\x30\x25\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІСЂР°РіСѓ\x20РІР°С€РёРјРё\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20С…РѕР»РѕРґР°\x2e"  ,
+    "\x7bР“РѕСЂСЏС‡РёР№\x20РєР°РјРµРЅСЊ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x35\x30\x25\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІСЂР°РіСѓ\x20РІР°С€РёРјРё\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20РѕРіРЅСЏ\x2e"  ,
+    "\x7bР–РµР·Р»\x20РјРѕР»РЅРёР№\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x35\x30\x25\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІСЂР°РіСѓ\x20РІР°С€РёРјРё\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20РјРѕР»РЅРёР№\x2e"  ,
+    "\x7bРљРѕР»СЊС†Рѕ\x20Р·РјРµРё\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20Р·Р°С‚СЂР°С‚С‹\x20РјР°РіРёС‡РµСЃРєРѕР№\x20СЌРЅРµСЂРіРёРё\x20РЅР°\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2dР±Р»Р°РіРѕСЃР»РѕРІРµРЅРёСЏ\x2e"  ,
+    "\x7bРЎРёРјРІРѕР»\x20Р¶РёР·РЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РІРґРІРѕРµ\x20СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ\x20РІСЃРµС…\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20СЃРІСЏР·Р°РЅРЅС‹С…\x20СЃ\x20РІРѕСЃРєСЂРµС€РµРЅРёРµРј\x20Рё\x20РѕР¶РёРІР»РµРЅРёРµРј\x20СЃСѓС‰РµСЃС‚РІ\x2e"  ,
+    "\x7bРљРЅРёРіР°\x20СЃС‚РёС…РёР№\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РІРґРІРѕРµ\x20СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ\x20РІСЃРµС…\x20Р·Р°РєР»РёРЅР°РЅРёР№\x2c\x20СЃРІСЏР·Р°РЅРЅС‹С…\x20СЃ\x20РїСЂРёР·С‹РІРѕРј\x20СЃСѓС‰РµСЃС‚РІ\x2e"  ,
+    "\x7bРљРѕР»СЊС†Рѕ\x20СЃС‚РёС…РёР№\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20Р·Р°С‚СЂР°С‚С‹\x20РЅР°\x20РІСЃРµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2c\x20СЃРІСЏР·Р°РЅРЅС‹Рµ\x20СЃ\x20РІС‹Р·РѕРІРѕРј\x20СЃСѓС‰РµСЃС‚РІ\x2e"  ,
+    "\x7bРЎРІСЏС‚РѕР№\x20РєСѓР»РѕРЅ\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20Рє\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x2dРїСЂРѕРєР»СЏС‚РёСЏРј\x2e"  ,
+    "\x7bРџРѕРґРІРµСЃРєР°\x20СЃРІРѕР±РѕРґРЅРѕР№\x20РІРѕР»Рё\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20Рє\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x2c\x20СЃРІСЏР·Р°РЅРЅС‹Рј\x20СЃ\x20РіРёРїРЅРѕР·РѕРј\x2e"  ,
+    "\x7bРљСѓР»РѕРЅ\x20Р¶РёР·РЅРё\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20РєРѕ\x20РІСЃРµРј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x20РЎРјРµСЂС‚Рё\x2e"  ,
+    "\x7bРџРѕРґРІРµСЃРєР°\x20РїРѕРєРѕСЏ\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20Рє\x20Р·Р°РєР»РёРЅР°РЅРёСЋ\x20Р‘РµСЂСЃРµСЂРє\x2e"  ,
+    "\x7bР’СЃРµРІРёРґСЏС‰РёР№\x20РіР»Р°Р·\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20РєРѕ\x20РІСЃРµРј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x20РѕСЃР»РµРїР»РµРЅРёСЏ\x2e"  ,
+    "\x7bРљСѓР»РѕРЅ\x20РґРІРёР¶РµРЅРёСЏ\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20РєРѕ\x20РІСЃРµРј\x20РїР°СЂР°Р»РёР·СѓСЋС‰РёРј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x2e"  ,
+    "\x7bРљСѓР»РѕРЅ\x20СЃРјРµСЂС‚Рё\x7d\x0a\x0aРќР°РґРµР»СЏРµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РёРјРјСѓРЅРёС‚РµС‚РѕРј\x20РєРѕ\x20РІСЃРµРј\x20СЃРІСЏС‚С‹Рј\x20Р·Р°РєР»РёРЅР°РЅРёСЏРј\x2e"  ,
+    "\x7bРџРѕСЃРѕС…\x20РѕС‚СЂРёС†Р°РЅРёСЏ\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20Р·Р°С‰РёС‰Р°РµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РѕС‚\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20СЃРЅСЏС‚РёСЏ\x20С‡Р°СЂ\x2e"  ,
+    "\x7bР—РѕР»РѕС‚РѕР№\x20Р»СѓРє\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20РІРїРѕР»РѕРІРёРЅСѓ\x20С€С‚СЂР°С„\x20РЅР°\x20СѓСЂРѕРЅ\x20РґР»СЏ\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x2c\x20СЃС‚СЂРµР»СЏСЋС‰РёС…\x20С‡РµСЂРµР·\x20РїСЂРµРїСЏС‚СЃС‚РІРёСЏ\x20\x28РЅР°РїСЂРёРјРµСЂ\x2c\x20СЃС‚РµРЅС‹\x20Р·Р°РјРєР°\x29\x2e"  ,
+    "\x7bРўРµР»РµСЃРєРѕРї\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20СЂР°РґРёСѓСЃ\x20РѕР±Р·РѕСЂР°\x20СЃС‚СЂР°РЅСЃС‚РІСѓСЋС‰РµРіРѕ\x20РіРµСЂРѕСЏ\x20РЅР°\x20\x31\x20РєР»РµС‚РєСѓ\x2e"  ,
+    "\x7bРџРµСЂРѕ\x20РґРёРїР»РѕРјР°С‚Р°\x7d\x0a\x0aРЎРЅРёР¶Р°РµС‚\x20СЃС‚РѕРёРјРѕСЃС‚СЊ\x20СЃРґР°С‡Рё\x20РЅР°\x20\x31\x30\x25\x20РѕС‚\x20РѕР±С‰РµР№\x20СЃС‚РѕРёРјРѕСЃС‚Рё\x20Р°СЂРјРёРё\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x2e"  ,
+    "\x7bРЁР»СЏРїР°\x20РјР°РіР°\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРѕРґР»РµРІР°РµС‚\x20РґРµР№СЃС‚РІРёРµ\x20РІР°С€РёС…\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РЅР°\x20\x31\x30\x20С…РѕРґРѕРІ\x21"  ,
+    "\x7bРљРѕР»СЊС†Рѕ\x20СЃРёР»С‹\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РІРѕР·РІСЂР°С‰Р°РµС‚\x20РіРµСЂРѕСЋ\x20\x32\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С…\x20РѕС‡РєР°\x20РјР°РіРёРё\x20Р·Р°\x20С…РѕРґ\x2e"  ,
+    "\x7bРћР±РѕР·\x7d\x0a\x0aРћР±РµСЃРїРµС‡РёРІР°РµС‚\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x2dСЃС‚СЂРµР»РєРѕРІ\x20РЅРµСЃРєРѕРЅС‡Р°РµРјС‹Рј\x20Р·Р°РїР°СЃРѕРј\x20СЃС‚СЂРµР»\x2e"  ,
+    "\x7bРџРѕРґР°С‚СЊ\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅСѓР¶РґР°РµС‚\x20РІР°СЃ\x20РІС‹РїР»Р°С‡РёРІР°С‚СЊ\x20РєР°Р¶РґС‹Р№\x20С…РѕРґ\x20\x32\x35\x30\x20Р·РѕР»РѕС‚С‹С…\x20РЅР°Р»РѕРіРѕРІ\x2e"  ,
+    "\x7bРЈР¶Р°СЃРЅР°СЏ\x20РјР°СЃРєР°\x7d\x0a\x0aР­С‚РѕС‚\x20Р°СЂС‚РµС„Р°РєС‚\x20РЅРµ\x20РїРѕР·РІРѕР»СЏРµС‚\x20Р»СЋР±С‹Рј\x20РІРѕРёРЅР°Рј\x20Рё\x20СЃСѓС‰РµСЃС‚РІР°Рј\x20РІСЃС‚СѓРїРёС‚СЊ\x20РІ\x20РІР°С€Сѓ\x20Р°СЂРјРёСЋ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20СЃРµСЂС‹\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20СЃРµСЂС‹\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20РєРѕР»Р±Р°\x20СЂС‚СѓС‚Рё\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20СЂС‚СѓС‚Рё\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20СЃР°РјРѕС†РІРµС‚РѕРІ\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20СЃР°РјРѕС†РІРµС‚РѕРІ\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bРќРµСЃРєРѕРЅС‡Р°РµРјР°СЏ\x20РІСЏР·Р°РЅРєР°\x20РґСЂРѕРІ\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20РґСЂРµРІРµСЃРёРЅС‹\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20РІР°РіРѕРЅРµС‚РєР°\x20СЂСѓРґС‹\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20СЂСѓРґС‹\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bР‘РµР·РґРѕРЅРЅР°СЏ\x20СЃСѓРјР°\x20РєСЂРёСЃС‚Р°Р»Р»РѕРІ\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20РїСЂРёРЅРѕСЃРёС‚\x20РІР°Рј\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20РєСЂРёСЃС‚Р°Р»Р»РѕРІ\x20РІ\x20РґРµРЅСЊ\x2e"  ,
+    "\x7bРЁР»РµРј\x20СЃ\x20С€РёРїР°РјРё\x7d\x0a\x0aРђСЂС‚РµС„Р°РєС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїР°СЂР°РјРµС‚СЂС‹\x20РђС‚Р°РєРё\x20Рё\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bР©РёС‚\x20СЃ\x20С€РёРїР°РјРё\x7d\x0a\x0a\x20РђСЂС‚РµС„Р°РєС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїР°СЂР°РјРµС‚СЂС‹\x20РђС‚Р°РєРё\x20Рё\x20Р—Р°С‰РёС‚С‹\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bР‘РµР»Р°СЏ\x20Р¶РµРјС‡СѓР¶РёРЅР°\x7d\x0a\x0a\x20РђСЂС‚РµС„Р°РєС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїР°СЂР°РјРµС‚СЂС‹\x20РЎРёР»С‹\x20РјР°РіРёРё\x20Рё\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bР§РµСЂРЅР°СЏ\x20Р¶РµРјС‡СѓР¶РёРЅР°\x7d\x0a\x0a\x20РђСЂС‚РµС„Р°РєС‚\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїР°СЂР°РјРµС‚СЂС‹\x20РЎРёР»С‹\x20РјР°РіРёРё\x20Рё\x20Р—РЅР°РЅРёСЏ\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x20РєР°Р¶РґС‹Р№\x2e"  ,
+    "\x7bР’РѕР»С€РµР±РЅР°СЏ\x20РєРЅРёРіР°\x7d\x0a\x0aР’РѕР»С€РµР±РЅР°СЏ\x20РєРЅРёРіР°\x20РїРѕР·РІРѕР»СЏРµС‚\x20РЅР°РїСЂР°РІР»СЏС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2e"  ,
     "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x32\x2e"  ,
     "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x33\x2e"  ,
     "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x34\x2e"  ,
     "\x7b\x45\x52\x52\x4f\x52\x7d\x0a\x0a\x41\x72\x74\x69\x66\x61\x63\x74\x20\x38\x35\x2e"  ,
-    "\x7bСвиток\x20заклинаний\x7d\x0a\x0aЭтот\x20Свиток\x20заклинаний\x20позволяет\x20вам\x20направлять\x20заклинание\x20\x27\x25\x73\x27\x2e"  ,
-    "\x7bРука\x20мученика\x7d\x0a\x0aРука\x20мученика\x20увеличивает\x20Силу\x20заклинаний\x20вашего\x20героя\x20на\x20\x33\x20единицы\x2c\x20но\x20дает\x20штраф\x20к\x20морали\x20за\x20присутствия\x20нежити\x20в\x20армии\x2e"  ,
-    "\x7bДоспех\x20Андурана\x7d\x0a\x0aУвеличивает\x20Защиту\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЗащитная\x20брошь\x7d\x0a\x0aЗащитная\x20брошь\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20заклинаниями\x20Армагеддон\x20и\x20Буря\x20Стихий\x2e\x20При\x20этом\x2c\x20артефакт\x20снижает\x20Силу\x20магии\x20на\x20\x32\x20единицы\x2e"  ,
-    "\x7bБоевое\x20одеяние\x7d\x0a\x0aБоевое\x20одеяние\x20Андурана\x20сочетает\x20в\x20себе\x20силу\x20трех\x20артефактов\x20Андурана\x2e\x20Также\x2c\x20артефакт\x20повышает\x20до\x20максимума\x20удачу\x20и\x20мораль\x20вашей\x20армии\x20и\x20дает\x20возможность\x20направлять\x20заклинание\x20Портал\x20города\x2e"  ,
-    "\x7bКристальный\x20шар\x7d\x0a\x0aКристальный\x20шар\x20дает\x20вам\x20более\x20детальную\x20информацию\x20о\x20монстрах\x2c\x20вражеских\x20героях\x20и\x20том\x2c\x20кто\x20защищает\x20близлежащие\x20от\x20героя\x20замки\x2e"  ,
-    "\x7bСердце\x20огня\x7d\x0a\x0aСердце\x20огня\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20силами\x20огня\x2c\x20но\x20удваивает\x20урон\x2c\x20наносимый\x20вам\x20холодом\x2e"  ,
-    "\x7bЛедяное\x20сердце\x7d\x0a\x0aЛедяное\x20сердце\x20снижает\x20на\x20\x35\x30\x20процентов\x20урон\x2c\x20наносимый\x20силами\x20холода\x2c\x20но\x20удваивает\x20урон\x2c\x20наносимый\x20вам\x20огнем\x2e"  ,
-    "\x7bШлем\x20Андурана\x7d\x0a\x0aУвеличивает\x20Силу\x20заклинаний\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bСвятой\x20молот\x7d\x0a\x0aУвеличивает\x20Атаку\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЛегендарный\x20скипетр\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20все\x20характеристики\x20героя\x2e"  ,
-    "\x7bНаконечник\x20мачты\x7d\x0a\x0aВ\x20сражении\x20на\x20море\x20увеличивает\x20удачу\x20и\x20мораль\x20вашей\x20армии\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bСфера\x20антимагии\x7d\x0a\x0aВ\x20бою\x20артефакт\x20не\x20позволяет\x20обеим\x20сторонам\x20направлять\x20заклинания\x2e"  ,
-    "\x7bВолшебный\x20посох\x7d\x0a\x0aУвеличивает\x20Силу\x20заклинаний\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bМечелом\x7d\x0a\x0aУвеличивает\x20Защиту\x20на\x20\x34\x20единицы\x20и\x20Атаку\x20на\x20\x31\x20единицу\x2e"  ,
-    "\x7bМеч\x20Андурана\x7d\x0a\x0aУвеличивает\x20Атаку\x20на\x20\x35\x20единиц\x2e"  ,
-    "\x7bЛопата\x20могильщика\x7d\x0a\x0aУвеличивает\x20эффективность\x20использования\x20навыка\x20некромантии\x2e"  };
+    "\x7bРЎРІРёС‚РѕРє\x20Р·Р°РєР»РёРЅР°РЅРёР№\x7d\x0a\x0aР­С‚РѕС‚\x20РЎРІРёС‚РѕРє\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РїРѕР·РІРѕР»СЏРµС‚\x20РІР°Рј\x20РЅР°РїСЂР°РІР»СЏС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20\x27\x25\x73\x27\x2e"  ,
+    "\x7bР СѓРєР°\x20РјСѓС‡РµРЅРёРєР°\x7d\x0a\x0aР СѓРєР°\x20РјСѓС‡РµРЅРёРєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2c\x20РЅРѕ\x20РґР°РµС‚\x20С€С‚СЂР°С„\x20Рє\x20РјРѕСЂР°Р»Рё\x20Р·Р°\x20РїСЂРёСЃСѓС‚СЃС‚РІРёСЏ\x20РЅРµР¶РёС‚Рё\x20РІ\x20Р°СЂРјРёРё\x2e"  ,
+    "\x7bР”РѕСЃРїРµС…\x20РђРЅРґСѓСЂР°РЅР°\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20Р—Р°С‰РёС‚Сѓ\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР—Р°С‰РёС‚РЅР°СЏ\x20Р±СЂРѕС€СЊ\x7d\x0a\x0aР—Р°С‰РёС‚РЅР°СЏ\x20Р±СЂРѕС€СЊ\x20СЃРЅРёР¶Р°РµС‚\x20РЅР°\x20\x35\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20Р·Р°РєР»РёРЅР°РЅРёСЏРјРё\x20РђСЂРјР°РіРµРґРґРѕРЅ\x20Рё\x20Р‘СѓСЂСЏ\x20РЎС‚РёС…РёР№\x2e\x20РџСЂРё\x20СЌС‚РѕРј\x2c\x20Р°СЂС‚РµС„Р°РєС‚\x20СЃРЅРёР¶Р°РµС‚\x20РЎРёР»Сѓ\x20РјР°РіРёРё\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e"  ,
+    "\x7bР‘РѕРµРІРѕРµ\x20РѕРґРµСЏРЅРёРµ\x7d\x0a\x0aР‘РѕРµРІРѕРµ\x20РѕРґРµСЏРЅРёРµ\x20РђРЅРґСѓСЂР°РЅР°\x20СЃРѕС‡РµС‚Р°РµС‚\x20РІ\x20СЃРµР±Рµ\x20СЃРёР»Сѓ\x20С‚СЂРµС…\x20Р°СЂС‚РµС„Р°РєС‚РѕРІ\x20РђРЅРґСѓСЂР°РЅР°\x2e\x20РўР°РєР¶Рµ\x2c\x20Р°СЂС‚РµС„Р°РєС‚\x20РїРѕРІС‹С€Р°РµС‚\x20РґРѕ\x20РјР°РєСЃРёРјСѓРјР°\x20СѓРґР°С‡Сѓ\x20Рё\x20РјРѕСЂР°Р»СЊ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x20Рё\x20РґР°РµС‚\x20РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ\x20РЅР°РїСЂР°РІР»СЏС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20РџРѕСЂС‚Р°Р»\x20РіРѕСЂРѕРґР°\x2e"  ,
+    "\x7bРљСЂРёСЃС‚Р°Р»СЊРЅС‹Р№\x20С€Р°СЂ\x7d\x0a\x0aРљСЂРёСЃС‚Р°Р»СЊРЅС‹Р№\x20С€Р°СЂ\x20РґР°РµС‚\x20РІР°Рј\x20Р±РѕР»РµРµ\x20РґРµС‚Р°Р»СЊРЅСѓСЋ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x20Рѕ\x20РјРѕРЅСЃС‚СЂР°С…\x2c\x20РІСЂР°Р¶РµСЃРєРёС…\x20РіРµСЂРѕСЏС…\x20Рё\x20С‚РѕРј\x2c\x20РєС‚Рѕ\x20Р·Р°С‰РёС‰Р°РµС‚\x20Р±Р»РёР·Р»РµР¶Р°С‰РёРµ\x20РѕС‚\x20РіРµСЂРѕСЏ\x20Р·Р°РјРєРё\x2e"  ,
+    "\x7bРЎРµСЂРґС†Рµ\x20РѕРіРЅСЏ\x7d\x0a\x0aРЎРµСЂРґС†Рµ\x20РѕРіРЅСЏ\x20СЃРЅРёР¶Р°РµС‚\x20РЅР°\x20\x35\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20СЃРёР»Р°РјРё\x20РѕРіРЅСЏ\x2c\x20РЅРѕ\x20СѓРґРІР°РёРІР°РµС‚\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІР°Рј\x20С…РѕР»РѕРґРѕРј\x2e"  ,
+    "\x7bР›РµРґСЏРЅРѕРµ\x20СЃРµСЂРґС†Рµ\x7d\x0a\x0aР›РµРґСЏРЅРѕРµ\x20СЃРµСЂРґС†Рµ\x20СЃРЅРёР¶Р°РµС‚\x20РЅР°\x20\x35\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20СЃРёР»Р°РјРё\x20С…РѕР»РѕРґР°\x2c\x20РЅРѕ\x20СѓРґРІР°РёРІР°РµС‚\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІР°Рј\x20РѕРіРЅРµРј\x2e"  ,
+    "\x7bРЁР»РµРј\x20РђРЅРґСѓСЂР°РЅР°\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bРЎРІСЏС‚РѕР№\x20РјРѕР»РѕС‚\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РђС‚Р°РєСѓ\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР›РµРіРµРЅРґР°СЂРЅС‹Р№\x20СЃРєРёРїРµС‚СЂ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x20РІСЃРµ\x20С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё\x20РіРµСЂРѕСЏ\x2e"  ,
+    "\x7bРќР°РєРѕРЅРµС‡РЅРёРє\x20РјР°С‡С‚С‹\x7d\x0a\x0aР’\x20СЃСЂР°Р¶РµРЅРёРё\x20РЅР°\x20РјРѕСЂРµ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20Рё\x20РјРѕСЂР°Р»СЊ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bРЎС„РµСЂР°\x20Р°РЅС‚РёРјР°РіРёРё\x7d\x0a\x0aР’\x20Р±РѕСЋ\x20Р°СЂС‚РµС„Р°РєС‚\x20РЅРµ\x20РїРѕР·РІРѕР»СЏРµС‚\x20РѕР±РµРёРј\x20СЃС‚РѕСЂРѕРЅР°Рј\x20РЅР°РїСЂР°РІР»СЏС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2e"  ,
+    "\x7bР’РѕР»С€РµР±РЅС‹Р№\x20РїРѕСЃРѕС…\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЎРёР»Сѓ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bРњРµС‡РµР»РѕРј\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20Р—Р°С‰РёС‚Сѓ\x20РЅР°\x20\x34\x20РµРґРёРЅРёС†С‹\x20Рё\x20РђС‚Р°РєСѓ\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x2e"  ,
+    "\x7bРњРµС‡\x20РђРЅРґСѓСЂР°РЅР°\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РђС‚Р°РєСѓ\x20РЅР°\x20\x35\x20РµРґРёРЅРёС†\x2e"  ,
+    "\x7bР›РѕРїР°С‚Р°\x20РјРѕРіРёР»СЊС‰РёРєР°\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚СЊ\x20РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ\x20РЅР°РІС‹РєР°\x20РЅРµРєСЂРѕРјР°РЅС‚РёРё\x2e"  };
 char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     ""  ,
     ""  ,
@@ -8465,122 +8465,122 @@ char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     ""  ,
     ""  ,
     ""  ,
-    "Вы\x20вызволяете\x20волшебницу\x2c\x20заточенную\x20в\x20проклятой\x20гробнице\x2c\x20и\x20в\x20награду\x20она\x20вручает\x20вам\x20изысканное\x20алмазное\x20ожерелье\x2e"  ,
-    "Изучая\x20завалы\x20в\x20заброшенной\x20шахте\x2c\x20вы\x20спасаете\x20артель\x20гномов\x2dстарателей\x2e\x20В\x20знак\x20благодарности\x20их\x20старшина\x20дарит\x20вам\x20золотой\x20браслет\x2e"  ,
-    "Вы\x20спешите\x20на\x20звук\x20отчаянного\x20вопля\x20боли\x20и\x20видите\x20кентавра\x2c\x20попавшего\x20в\x20западню\x2e\x20Вы\x20помогаете\x20ему\x20освободиться\x2c\x20и\x20он\x20вручает\x20вам\x20кожаный\x20мешочек\x2e\x20Заглянув\x20внутрь\x2c\x20вы\x20видите\x20ослепительное\x20бриллиантовое\x20кольцо\x2e"  ,
-    "Рядом\x20с\x20останками\x20сожженной\x20колдуньи\x20лежит\x20изящная\x20брошь\x20прекрасной\x20работы\x2e\x20Осторожно\x20приблизившись\x20к\x20обугленному\x20трупу\x2c\x20вы\x20забираете\x20брошь\x20себе\x2e"  ,
-    "В\x20награду\x20за\x20спасение\x20прекрасной\x20девы\x20от\x20посягательств\x20ненавистного\x20барона\x20королевский\x20герольд\x20вручает\x20вам\x20Медаль\x20отваги\x2e"  ,
-    "Вы\x20спасаете\x20маленького\x20мальчика\x20от\x20стаи\x20кровожадных\x20волков\x20и\x20провожаете\x20в\x20имение\x20родителей\x2e\x20Счастливый\x20отец\x20награждает\x20вас\x20Медалью\x20мужества\x2e"  ,
-    "Вы\x20вырываете\x20принцессу\x20соседнего\x20королевства\x20из\x20мерзких\x20лап\x20презренных\x20работорговцев\x20и\x20в\x20награду\x20за\x20подвиг\x20получаете\x20Медаль\x20доблести\x2e"  ,
-    "Вы\x20избавляете\x20округу\x20от\x20ужасного\x20минотавра\x2c\x20добычей\x20которому\x20служили\x20благородные\x20рыцари\x2c\x20и\x20становитесь\x20кавалером\x20Медали\x20почета\x2e"  ,
-    "На\x20обочине\x20пустынной\x20дороги\x20вы\x20находите\x20медаль\x2e\x20Вы\x20подобрали\x20ее\x20и\x20обнаружили\x2c\x20что\x20стали\x20несчастным\x20обладателем\x20Символа\x20неудачи\x2c\x20который\x20понижает\x20боевой\x20дух\x20вашей\x20армии\x2e"  ,
-    "Во\x20время\x20жуткой\x20грозы\x20молния\x20бьет\x20в\x20дерево\x2c\x20разнося\x20его\x20на\x20мелкие\x20щепки\x2e\x20Среди\x20обломков\x20вы\x20обнаруживаете\x20таинственную\x20палицу\x2e"  ,
-    "Вы\x20повстречали\x20печально\x20известного\x20Черного\x20Рыцаря\x21\x20Ваш\x20поединок\x20заканчивается\x20вничью\x2c\x20и\x20рыцарь\x20в\x20знак\x20уважения\x20дарит\x20вам\x20пару\x20латных\x20перчаток\x2e"  ,
-    "Краем\x20глаза\x20вы\x20замечаете\x20золотистый\x20блеск\x20среди\x20пышной\x20зелени\x2e\x20Приглядевшись\x20внимательнее\x2c\x20вы\x20находите\x20под\x20кустами\x20великолепный\x20золотой\x20шлем\x2e"  ,
-    "Неуклюжий\x20гигант\x20нанес\x20себе\x20смертельную\x20рану\x20собственным\x20боевым\x20цепом\x2e\x20Вы\x20прекрасно\x20владеете\x20этим\x20оружием\x20и\x20с\x20уверенностью\x20вынимаете\x20цеп\x20из\x20мертвых\x20рук\x20гиганта\x2e"  ,
-    "Пробираясь\x20через\x20развалины\x20древней\x20крепости\x2c\x20вы\x20находите\x20орудие\x2c\x20которое\x20превратило\x20ее\x20в\x20руины\x2c\x20удивительную\x20баллисту\x20замысловатой\x20конструкции\x2e"  ,
-    "В\x20руках\x20у\x20каменной\x20статуи\x20воина\x20\x2d\x20великолепный\x20серебряный\x20щит\x2e\x20Как\x20только\x20вы\x20забираете\x20щит\x20себе\x2c\x20статуя\x20рассыпается\x20в\x20прах\x2e"  ,
-    "Вы\x20пробираетесь\x20узкой\x20тропой\x2c\x20как\x20вдруг\x20ближайший\x20куст\x20загорается\x20ярким\x20пламенем\x2e\x20В\x20огненном\x20смерче\x20появляется\x20прекрасная\x20дама\x2c\x20которая\x20протягивает\x20вам\x20волшебный\x20меч\x2e"  ,
-    "Вы\x20видите\x20серебряный\x20топор\x2c\x20вогнанный\x20в\x20землю\x20по\x20самую\x20рукоять\x2e\x20Ваши\x20воины\x20пытаются\x20выдернуть\x20его\x2c\x20но\x20усилия\x20их\x20тщетны\x2e\x20Вам\x20же\x20хватило\x20одного\x20усилия\x20и\x20топор\x20у\x20вас\x20в\x20руках\x21"  ,
-    "Шайка\x20разбойников\x20обыскивает\x20тела\x20мертвых\x20воинов\x2e\x20Вы\x20разгоняете\x20мародеров\x20и\x20вдруг\x20замечаете\x2c\x20что\x20в\x20спешке\x20они\x20потеряли\x20великолепный\x20доспех\x2e"  ,
-    "Перед\x20вами\x20возникает\x20парящий\x20в\x20воздухе\x20стеклянный\x20ларец\x20со\x20свитком\x20внутри\x2c\x20лежащем\x20на\x20подушке\x20из\x20пурпурного\x20бархата\x2e\x20От\x20прикосновения\x2c\x20крышка\x20ларца\x20открывается\x2c\x20и\x20свиток\x20оказывается\x20у\x20вас\x20в\x20руках\x2e"  ,
-    "Вы\x20навещаете\x20местного\x20мудреца\x20и\x20рассказываете\x20о\x20цели\x20вашего\x20путешествия\x2e\x20Он\x20достает\x20из\x20мешка\x20пожелтевший\x20свиток\x20и\x20передает\x20его\x20вам\x2e"  ,
-    "Вы\x20стоите\x20перед\x20останками\x20давно\x20умершей\x20жрицы\x20друидов\x2e\x20Пожелтевшие\x20от\x20времени\x20кости\x20проглядывают\x20через\x20прорехи\x20истлевшего\x20одеяния\x2e\x20Пошевелив\x20груду\x20ветоши\x2c\x20вы\x20находите\x20древний\x20свиток\x2e"  ,
-    "Груда\x20пожелтевших\x20костей\x20и\x20обрывки\x20истлевшей\x20материи\x20\x2d\x20вот\x20все\x2c\x20что\x20осталось\x20от\x20жрицы\x20друидов\x2e\x20Среди\x20этих\x20останков\x20вы\x20замечаете\x20таинственный\x20свиток\x2e"  ,
-    "Маленький\x20лепрекон\x20пританцовывает\x20у\x20волшебного\x20мешка\x2e\x20Завидев\x20вас\x2c\x20он\x20замирает\x20на\x20месте\x2c\x20затем\x20издает\x20возмущенный\x20возглас\x2c\x20топает\x20ножкой\x20и\x20растворяется\x20в\x20воздухе\x2e\x20Вы\x20забираете\x20мешок\x20себе\x2e"  ,
-    "Благородная\x20путешественница\x2c\x20отбившаяся\x20от\x20спутников\x2c\x20просит\x20вас\x20о\x20помощи\x2e\x20Проводив\x20ее\x20до\x20дома\x2c\x20вы\x20получаете\x20в\x20награду\x20суму\x2c\x20полную\x20золота\x2e"  ,
-    "Однажды\x20вам\x20в\x20руки\x20попадает\x20наполненный\x20золотом\x20кожаный\x20кошель\x2c\x20принадлежавший\x20великому\x20королю\x2c\x20который\x20умел\x20превращать\x20любой\x20предмет\x20в\x20золото\x2e"  ,
-    "Бродячий\x20торговец\x20просит\x20вас\x20защитить\x20его\x20от\x20банды\x20гоблинов\x2e\x20В\x20награду\x20он\x20дарит\x20вам\x20пару\x20изящных\x20башмаков\x2c\x20испещренных\x20загадочными\x20древними\x20письменами\x2e"  ,
-    "Обнаружив\x20пару\x20замечательных\x20башмаков\x20украшенных\x20бисером\x2c\x20вы\x20благодарите\x20загадочного\x20благодетеля\x20и\x20оставляете\x20их\x20себе\x2e"  ,
-    "В\x20уплату\x20за\x20охрану\x20в\x20пути\x20странствующий\x20торговец\x20предлагает\x20вам\x20лапку\x20кролика\x2e\x20По\x20его\x20словам\x2c\x20она\x20принесет\x20вам\x20удачу\x20в\x20бою\x2e"  ,
-    "Попавший\x20в\x20ловушку\x20единорог\x20испуганно\x20кричит\x2e\x20Вы\x20успокаиваете\x20его\x20и\x20освобождаете\x20от\x20пут\x2e\x20Всхрапнув\x20и\x20ударив\x20копытом\x2c\x20он\x20уносится\x20прочь\x2e\x20Там\x2c\x20где\x20он\x20только\x20что\x20стоял\x2c\x20осталась\x20лежать\x20золотая\x20подкова\x2e"  ,
-    "Вы\x20поймали\x20озорного\x20бесенка\x2c\x20который\x20не\x20давал\x20покоя\x20всей\x20округе\x2e\x20В\x20обмен\x20на\x20свободу\x20он\x20предлагает\x20вам\x20волшебную\x20монету\x2e"  ,
-    "Посреди\x20мертвой\x20лощины\x2c\x20заполненной\x20иссохшей\x20растительностью\x2c\x20вы\x2c\x20к\x20своему\x20удивлению\x2c\x20замечете\x20веселый\x20зеленый\x20побег\x20четырехлистного\x20клевера\x2e"  ,
-    "Странноватый\x20старикашка\x20утверждает\x2c\x20что\x20он\x20\x2d\x20великий\x20изобретатель\x2c\x20и\x20просит\x20вас\x20испытать\x20его\x20новое\x20творение\x2e\x20Надувшись\x20от\x20важности\x2c\x20он\x20вручает\x20вам\x20компас\x2e"  ,
-    "Старый\x20мореход\x20стал\x20добычей\x20людоедов\x2e\x20Вы\x20спасаете\x20его\x2c\x20и\x20в\x20знак\x20благодарности\x20он\x20дарит\x20вам\x20чудесный\x20инструмент\x2c\x20позволяющий\x20измерять\x20расстояния\x20по\x20звездам\x2e"  ,
-    "В\x20заброшенной\x20хижине\x20вы\x20находите\x20скелет\x20давно\x20почившей\x20колдуньи\x2e\x20Приглядевшись\x2c\x20вы\x20замечаете\x2c\x20что\x20в\x20глазнице\x20пожелтевшего\x20черепа\x20зловеще\x20вращается\x20стеклянный\x20глаз\x2e"  ,
-    "За\x20невысоким\x20холмом\x20перед\x20вами\x20открывается\x20зловещая\x20картина\x20\x2d\x20стаи\x20стервятников\x20пируют\x20на\x20поле\x20недавней\x20битвы\x2e\x20Среди\x20тел\x20поверженных\x20воинов\x20вы\x20находите\x20волшебные\x20песочные\x20часы\x2e"  ,
-    "Вы\x20помогаете\x20бродячему\x20торговцу\x20снадобьями\x20вытащить\x20повозку\x20из\x20придорожной\x20канавы\x2e\x20В\x20знак\x20благодарности\x20он\x20вручает\x20вам\x20золотые\x20часы\x2e\x20Он\x20и\x20не\x20подозревал\x2c\x20что\x20часы\x20волшебные\x21"  ,
-    "Вы\x20делаете\x20короткую\x20остановку\x20в\x20маленькой\x20придорожной\x20харчевне\x2e\x20Под\x20звон\x20монет\x20происходит\x20обмен\x20новостями\x2c\x20а\x20то\x20и\x20редкими\x20вещицами\x2e\x20Вот\x20таким\x2dто\x20образом\x20в\x20вашем\x20багаже\x20и\x20оказывается\x20волшебная\x20шапочка\x2e"  ,
-    "Вы\x20спешите\x20на\x20отчаянные\x20крики\x20и\x20видите\x20очаровательную\x20девушку\x2c\x20за\x20которой\x20гонится\x20разъяренный\x20медведь\x2e\x20Через\x20мгновение\x20зверь\x20повержен\x2c\x20и\x20благодарная\x20волшебница\x20шьет\x20вам\x20из\x20его\x20шкуры\x20волшебный\x20плащ\x2e"  ,
-    "За\x20поворотом\x20дороги\x20вы\x20видите\x20сражающихся\x20некроманта\x20и\x20паладина\x2e\x20Некромант\x20атакует\x20паладина\x2c\x20и\x20тот\x20падает\x20на\x20колени\x2e\x20Вы\x20спасаете\x20жизнь\x20паладину\x2c\x20убивая\x20его\x20врага\x2e\x20Паладин\x20дарит\x20вам\x20свою\x20огненную\x20накидку\x2e"  ,
-    "Бродячий\x20медник\x2c\x20у\x20которого\x20кончилась\x20провизия\x2c\x20предлагает\x20вам\x20шлем\x20с\x20гребнем\x20в\x20виде\x20молнии\x20в\x20обмен\x20на\x20еду\x20и\x20питье\x2e\x20Вы\x20соглашаетесь\x20на\x20обмен\x2c\x20а\x20вскоре\x20обнаруживаете\x2c\x20что\x20шлем\x20обладает\x20еще\x20и\x20магическими\x20свойствами\x2e"  ,
-    "Ваше\x20внимание\x20привлекает\x20ледяная\x20сосулька\x2c\x20которая\x20не\x20тает\x2c\x20несмотря\x20на\x20полуденный\x20зной\x2e\x20Вы\x20отламываете\x20ее\x20от\x20карниза\x20и\x20с\x20удивлением\x20обнаруживаете\x2c\x20что\x20даже\x20тепло\x20ваших\x20рук\x20ей\x20нипочем\x2e"  ,
-    "В\x20дальней\x20стране\x20вы\x20встречаете\x20племя\x20приматов\x2e\x20Они\x20разжигают\x20костры\x20при\x20помощи\x20волшебного\x20куска\x20лавы\x2e\x20Вы\x20научили\x20их\x20добывать\x20огонь\x20обычным\x20способом\x2e\x20Обезьяны\x20считают\x20вас\x20богом\x20и\x20дарят\x20свой\x20заветный\x20кусок\x20лавы\x2e"  ,
-    "Во\x20время\x20ужасной\x20грозы\x20на\x20ваших\x20глазах\x20в\x20громоотвод\x20дома\x20бьет\x20молния\x2e\x20Расплавленный\x20громоотвод\x20падает\x20на\x20землю\x2c\x20но\x20его\x20наконечник\x20остается\x20целым\x20и\x20невредимым\x2e\x20Вы\x20подобрали\x20его\x20\x2d\x20оказалось\x2c\x20это\x20магический\x20предмет\x21"  ,
-    "На\x20пальце\x20мертвого\x20странника\x20вы\x20видите\x20необычное\x20кольцо\x2e\x20Оно\x20имеет\x20форму\x20змеи\x2c\x20вцепившейся\x20зубами\x20в\x20собственный\x20хвост\x2e"  ,
-    "Песчаная\x20буря\x20обнажила\x20вход\x20в\x20подземную\x20гробницу\x2e\x20Вы\x20спускаетесь\x20внутрь\x20и\x20обнаруживаете\x2c\x20что\x20здесь\x20уже\x20побывали\x20грабители\x2c\x20однако\x20в\x20темноте\x20они\x20не\x20заметили\x20символ\x20вечной\x20жизни\x2c\x20висящий\x20на\x20серебряной\x20цепи\x2e"  ,
-    "Вы\x20встречаете\x20заклинателя\x2c\x20который\x20просит\x20разрешить\x20ему\x20воспользоваться\x20вашим\x20покровительством\x20на\x20опасном\x20участке\x20пути\x2e\x20Вы\x20соглашаетесь\x2c\x20и\x20в\x20награду\x20он\x20дарит\x20вам\x20Книгу\x20Стихий\x2e"  ,
-    "Расположившись\x20на\x20отдых\x20под\x20невысоким\x20деревом\x2c\x20вы\x20замечаете\x20дикого\x20кота\x2c\x20который\x20подбирается\x20к\x20вороньему\x20гнезду\x2e\x20Вы\x20прогоняете\x20кота\x2c\x20и\x20сами\x20залезаете\x20на\x20дерево\x2e\x20В\x20гнезде\x20вы\x20находите\x20кольцо\x20тонкой\x20работы\x2e"  ,
-    "Странствуя\x20по\x20дальним\x20землям\x2c\x20вы\x20встречаете\x20отшельника\x2c\x20живущего\x20в\x20маленькой\x20аккуратной\x20хижине\x2e\x20Узнав\x20о\x20цели\x20ваших\x20скитаний\x2c\x20он\x20прерывает\x20свои\x20размышления\x2c\x20благословляет\x20вас\x20и\x20дарит\x20амулет\x2c\x20защищающий\x20от\x20злых\x20чар\x2e"  ,
-    "Вы\x20слышите\x20крики\x20о\x20помощи\x20и\x2c\x20поспешив\x20на\x20берег\x20реки\x2c\x20видите\x20фей\x2c\x20потешающихся\x20над\x20стариком\x2c\x20окуная\x20его\x20в\x20воду\x2e\x20Вы\x20выручаете\x20старика\x20из\x20беды\x20и\x20вытаскиваете\x20одну\x20фею\x20на\x20берег\x2e\x20В\x20обмен\x20на\x20свободу\x20она\x20отдает\x20вам\x20подвеску\x2e"  ,
-    "В\x20дороге\x20вы\x20встречаете\x20небольшой\x20караван\x2e\x20Сыграв\x20с\x20хозяином\x20каравана\x20в\x20кости\x2c\x20вы\x20выигрываете\x20волшебную\x20подвеску\x2e\x20Ее\x20прежний\x20владелец\x20утверждает\x2c\x20что\x20она\x20может\x20противостоять\x20чарам\x20смерти\x20некромантов\x2e"  ,
-    "Вы\x20спешите\x20на\x20шум\x20сражения\x20и\x20видите\x20старика\x2dварвара\x2c\x20который\x20с\x20трудом\x20отбивается\x20от\x20гидры\x2e\x20В\x20награду\x20за\x20помощь\x20варвар\x20дарит\x20вам\x20волшебный\x20кулон\x2e"  ,
-    "В\x20хижине\x20у\x20дороги\x20вы\x20находите\x20слепую\x20старуху\x2c\x20умирающую\x20в\x20полном\x20одиночестве\x2e\x20Вы\x20обещаете\x20устроить\x20ей\x20достойные\x20похороны\x2e\x20В\x20знак\x20благодарности\x20она\x20дарит\x20вам\x20волшебную\x20подвеску\x2e"  ,
-    "Дорогу\x20вам\x20преграждает\x20голем\x2c\x20на\x20шее\x20которого\x20сверкает\x20кулон\x2e\x20Вы\x20перерезаете\x20шнурок\x2c\x20и\x20он\x20падает\x20на\x20землю\x2e\x20Голем\x20рассыпается\x20у\x20вас\x20на\x20глазах\x2c\x20а\x20кулон\x20достается\x20вам\x2e"  ,
-    "После\x20короткой\x20ожесточенной\x20схватки\x20с\x20некромантом\x20у\x20вас\x20в\x20руках\x20остается\x20его\x20волшебный\x20кулон\x2e\x20Знакомый\x20чародей\x20объясняет\x20вам\x2c\x20что\x20этот\x20кулон\x20защищает\x20нежить\x2c\x20состоящую\x20в\x20вашей\x20армии\x2c\x20от\x20святого\x20слова\x2e"  ,
-    "Навстречу\x20вам\x20попадается\x20старый\x20друг\x2dчародей\x2e\x20Он\x20вручает\x20вам\x20подарок\x20\x2d\x20волшебный\x20жезл\x2c\x20который\x20делает\x20невозможным\x20применение\x20заклинания\x20снятие\x20чар\x20против\x20ваших\x20соратников\x2e"  ,
-    "Вы\x20случайно\x20встречаете\x20знаменитого\x20стрелка\x20и\x20предлагаете\x20ему\x20сыграть\x20в\x20кости\x2e\x20Он\x20соглашается\x20и\x20ставит\x20свой\x20лук\x20против\x20вашего\x20коня\x2e\x20Вы\x20выигрываете\x2e"  ,
-    "Торговец\x20из\x20далеких\x20земель\x20предлагает\x20вам\x20новейшее\x20изобретение\x20своего\x20народа\x20в\x20обмен\x20на\x20съестные\x20припасы\x2e\x20Эта\x20штука\x2c\x20благодаря\x20которой\x20удаленные\x20предметы\x20кажутся\x20ближе\x2c\x20называется\x20телескопом\x2e"  ,
-    "Вы\x20помогаете\x20дипломату\x20починить\x20сломанную\x20ось\x20в\x20его\x20экипаже\x2c\x20и\x20в\x20знак\x20благодарности\x20он\x20дарит\x20вам\x20перо\x2e\x20Он\x20говорит\x2c\x20что\x20это\x20перо\x20заставляет\x20людей\x20смотреть\x20на\x20вещи\x20глазами\x20его\x20обладателя\x2e"  ,
-    "Вы\x20видите\x20чародея\x2c\x20который\x20удирает\x20от\x20грифона\x2e\x20Вот\x20он\x20распахнул\x20портал\x20и\x20ринулся\x20внутрь\x2c\x20но\x20при\x20этом\x20зацепился\x20шляпой\x2c\x20и\x20она\x20упала\x20она\x20на\x20землю\x2e\x20Вы\x20поднимаете\x20шляпу\x2c\x20отряхиваете\x20ее\x20от\x20пыли\x20и\x20оставляете\x20себе\x2e"  ,
-    "Вы\x20замечаете\x20дерево\x2c\x20похожее\x20на\x20чернокнижника\x20Карнота\x2e\x20На\x20одной\x20из\x20его\x20веток\x20сверкает\x20кольцо\x2e\x20Вы\x20все\x20равно\x20ничем\x20не\x20можете\x20ему\x20помочь\x2c\x20и\x20поэтому\x20забираете\x20кольцо\x20себе\x2e"  ,
-    "Ваше\x20внимание\x20привлекает\x20повозка\x20с\x20боеприпасами\x2c\x20стоящая\x20посреди\x20поля\x2c\x20где\x20когда\x2dто\x20гремела\x20битва\x2e\x20Убедившись\x2c\x20что\x20она\x20в\x20хорошем\x20состоянии\x2c\x20вы\x20присоединяете\x20ее\x20к\x20своему\x20обозу\x2e"  ,
-    "Ваша\x20налоговая\x20декларация\x20превысила\x20приделы\x2e\x20Мытарь\x20сжалился\x20над\x20вами\x20и\x20согласился\x20ежедневно\x20получать\x20от\x20вас\x20всего\x20по\x20\x32\x35\x30\x20золотых\x2e"  ,
-    "Вы\x20вскрыли\x20могилу\x20Синфилия\x20Гардолада\x2c\x20знаменитого\x20чернокнижника\x2c\x20и\x20находите\x20в\x20ней\x20маску\x2e\x20Надев\x20ее\x2c\x20ваше\x20лицо\x20искажает\x20гримаса\x20ужаса\x2e\x20Видимо\x20вам\x20достался\x20маска\x20Громлака\x20Грина\x2e\x20Теперь\x20от\x20нее\x20не\x20избавиться\x21"  ,
-    "Вы\x20посещаете\x20алхимика\x2c\x20который\x20при\x20виде\x20вашей\x20армии\x20незамедлительно\x20признает\x20вас\x20достойнейшим\x20из\x20достойных\x2e\x20Новый\x20подданный\x20дарит\x20вам\x20бездонную\x20сумку\x20серы\x2c\x20которая\x20вам\x20очень\x20даже\x20пригодится\x2e"  ,
-    "Вы\x20делаете\x20короткий\x20привал\x20в\x20башне\x20чародея\x2c\x20покинутой\x20хозяином\x2c\x20и\x20находите\x20волшебный\x20сосуд\x20с\x20ртутью\x2c\x20содержимое\x20которого\x20никогда\x20не\x20кончается\x2e\x20Это\x20же\x20настоящее\x20сокровище\x21"  ,
-    "После\x20короткого\x20ливня\x20на\x20небе\x20появляется\x20радуга\x2e\x20Заметив\x20место\x2c\x20где\x20она\x20упирается\x20в\x20землю\x2c\x20вы\x20находите\x20там\x20горшок\x20золота\x2e\x20Его\x20хозяин\x2c\x20маленький\x20эльф\x2c\x20предлагает\x20взамен\x20бездонную\x20суму\x20самоцветов\x2e"  ,
-    "Вы\x20останавливаетесь\x20на\x20отдых\x20и\x20разводите\x20костер\x2e\x20Неподалеку\x20лежит\x20куча\x20дров\x2e\x20Вы\x20берете\x20одно\x20полено\x20за\x20другим\x2c\x20но\x20куча\x20не\x20уменьшается\x2e\x20Вы\x20с\x20радостью\x20понимаете\x2c\x20что\x20дрова\x20зачарованы\x2c\x20и\x20забираете\x20их\x20себе\x2e"  ,
-    "Вы\x20находите\x20кузницу\x20гоблинов\x2c\x20где\x20они\x20куют\x20оружие\x2e\x20С\x20воинственным\x20кличем\x2c\x20ваши\x20воины\x20нападают\x20на\x20их\x20лагерь\x20и\x20убивают\x20всех\x20врагов\x2e\x20Осмотрев\x20трофеи\x2c\x20вы\x20обнаруживаете\x20волшебную\x20вагонетку\x20с\x20рудой\x2e"  ,
-    "Укрывшись\x20от\x20бури\x20в\x20небольшой\x20пещерке\x2c\x20вы\x20замечаете\x20в\x20углу\x20друзу\x20кристаллов\x2e\x20Вы\x20отламываете\x20кусок\x2c\x20а\x20на\x20его\x20месте\x20вырастает\x20новый\x20кристалл\x2e\x20Вы\x20забераете\x20это\x20сокровище\x20с\x20собой\x2e"  ,
-    "Небольшой\x20отряд\x20орков\x20нападает\x20на\x20вашу\x20армию\x2e\x20Вы\x20без\x20труда\x20отбиваете\x20атаку\x2e\x20На\x20теле\x20одного\x20из\x20нападавших\x20вы\x20видите\x20блестящий\x20шлем\x20с\x20шипами\x2e"  ,
-    "Вы\x20приближаетесь\x20к\x20мосту\x20через\x20глубокий\x20овраг\x2e\x20Неожиданно\x20из\x2dпод\x20моста\x20появляется\x20тролль\x20и\x20требует\x20плату\x20за\x20проход\x2e\x20После\x20отказа\x2c\x20тролль\x20нападает\x20на\x20вас\x2e\x20Убив\x20его\x2c\x20вы\x20забираете\x20себе\x20его\x20шит\x20с\x20шипами\x2e"  ,
-    "Вы\x20пересекаете\x20пересохшее\x20соляное\x20озеро\x2c\x20и\x20вдруг\x20среди\x20обломков\x20ракушек\x20и\x20кусков\x20коралла\x20замечаете\x20великолепную\x20белую\x20жемчужину\x2e"  ,
-    "Слухи\x20об\x20огромном\x20грифоне\x2c\x20нагоняющем\x20ужас\x20на\x20всю\x20округу\x2c\x20приводят\x20вас\x20в\x20его\x20логово\x2e\x20Жестокая\x20схватка\x20заканчивается\x20вашей\x20победой\x2c\x20и\x20в\x20опустевшем\x20гнезде\x20вы\x20находите\x20черную\x20жемчужину\x2e"  ,
+    "Р’С‹\x20РІС‹Р·РІРѕР»СЏРµС‚Рµ\x20РІРѕР»С€РµР±РЅРёС†Сѓ\x2c\x20Р·Р°С‚РѕС‡РµРЅРЅСѓСЋ\x20РІ\x20РїСЂРѕРєР»СЏС‚РѕР№\x20РіСЂРѕР±РЅРёС†Рµ\x2c\x20Рё\x20РІ\x20РЅР°РіСЂР°РґСѓ\x20РѕРЅР°\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20РёР·С‹СЃРєР°РЅРЅРѕРµ\x20Р°Р»РјР°Р·РЅРѕРµ\x20РѕР¶РµСЂРµР»СЊРµ\x2e"  ,
+    "РР·СѓС‡Р°СЏ\x20Р·Р°РІР°Р»С‹\x20РІ\x20Р·Р°Р±СЂРѕС€РµРЅРЅРѕР№\x20С€Р°С…С‚Рµ\x2c\x20РІС‹\x20СЃРїР°СЃР°РµС‚Рµ\x20Р°СЂС‚РµР»СЊ\x20РіРЅРѕРјРѕРІ\x2dСЃС‚Р°СЂР°С‚РµР»РµР№\x2e\x20Р’\x20Р·РЅР°Рє\x20Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё\x20РёС…\x20СЃС‚Р°СЂС€РёРЅР°\x20РґР°СЂРёС‚\x20РІР°Рј\x20Р·РѕР»РѕС‚РѕР№\x20Р±СЂР°СЃР»РµС‚\x2e"  ,
+    "Р’С‹\x20СЃРїРµС€РёС‚Рµ\x20РЅР°\x20Р·РІСѓРє\x20РѕС‚С‡Р°СЏРЅРЅРѕРіРѕ\x20РІРѕРїР»СЏ\x20Р±РѕР»Рё\x20Рё\x20РІРёРґРёС‚Рµ\x20РєРµРЅС‚Р°РІСЂР°\x2c\x20РїРѕРїР°РІС€РµРіРѕ\x20РІ\x20Р·Р°РїР°РґРЅСЋ\x2e\x20Р’С‹\x20РїРѕРјРѕРіР°РµС‚Рµ\x20РµРјСѓ\x20РѕСЃРІРѕР±РѕРґРёС‚СЊСЃСЏ\x2c\x20Рё\x20РѕРЅ\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20РєРѕР¶Р°РЅС‹Р№\x20РјРµС€РѕС‡РµРє\x2e\x20Р—Р°РіР»СЏРЅСѓРІ\x20РІРЅСѓС‚СЂСЊ\x2c\x20РІС‹\x20РІРёРґРёС‚Рµ\x20РѕСЃР»РµРїРёС‚РµР»СЊРЅРѕРµ\x20Р±СЂРёР»Р»РёР°РЅС‚РѕРІРѕРµ\x20РєРѕР»СЊС†Рѕ\x2e"  ,
+    "Р СЏРґРѕРј\x20СЃ\x20РѕСЃС‚Р°РЅРєР°РјРё\x20СЃРѕР¶Р¶РµРЅРЅРѕР№\x20РєРѕР»РґСѓРЅСЊРё\x20Р»РµР¶РёС‚\x20РёР·СЏС‰РЅР°СЏ\x20Р±СЂРѕС€СЊ\x20РїСЂРµРєСЂР°СЃРЅРѕР№\x20СЂР°Р±РѕС‚С‹\x2e\x20РћСЃС‚РѕСЂРѕР¶РЅРѕ\x20РїСЂРёР±Р»РёР·РёРІС€РёСЃСЊ\x20Рє\x20РѕР±СѓРіР»РµРЅРЅРѕРјСѓ\x20С‚СЂСѓРїСѓ\x2c\x20РІС‹\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20Р±СЂРѕС€СЊ\x20СЃРµР±Рµ\x2e"  ,
+    "Р’\x20РЅР°РіСЂР°РґСѓ\x20Р·Р°\x20СЃРїР°СЃРµРЅРёРµ\x20РїСЂРµРєСЂР°СЃРЅРѕР№\x20РґРµРІС‹\x20РѕС‚\x20РїРѕСЃСЏРіР°С‚РµР»СЊСЃС‚РІ\x20РЅРµРЅР°РІРёСЃС‚РЅРѕРіРѕ\x20Р±Р°СЂРѕРЅР°\x20РєРѕСЂРѕР»РµРІСЃРєРёР№\x20РіРµСЂРѕР»СЊРґ\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20РњРµРґР°Р»СЊ\x20РѕС‚РІР°РіРё\x2e"  ,
+    "Р’С‹\x20СЃРїР°СЃР°РµС‚Рµ\x20РјР°Р»РµРЅСЊРєРѕРіРѕ\x20РјР°Р»СЊС‡РёРєР°\x20РѕС‚\x20СЃС‚Р°Рё\x20РєСЂРѕРІРѕР¶Р°РґРЅС‹С…\x20РІРѕР»РєРѕРІ\x20Рё\x20РїСЂРѕРІРѕР¶Р°РµС‚Рµ\x20РІ\x20РёРјРµРЅРёРµ\x20СЂРѕРґРёС‚РµР»РµР№\x2e\x20РЎС‡Р°СЃС‚Р»РёРІС‹Р№\x20РѕС‚РµС†\x20РЅР°РіСЂР°Р¶РґР°РµС‚\x20РІР°СЃ\x20РњРµРґР°Р»СЊСЋ\x20РјСѓР¶РµСЃС‚РІР°\x2e"  ,
+    "Р’С‹\x20РІС‹СЂС‹РІР°РµС‚Рµ\x20РїСЂРёРЅС†РµСЃСЃСѓ\x20СЃРѕСЃРµРґРЅРµРіРѕ\x20РєРѕСЂРѕР»РµРІСЃС‚РІР°\x20РёР·\x20РјРµСЂР·РєРёС…\x20Р»Р°Рї\x20РїСЂРµР·СЂРµРЅРЅС‹С…\x20СЂР°Р±РѕС‚РѕСЂРіРѕРІС†РµРІ\x20Рё\x20РІ\x20РЅР°РіСЂР°РґСѓ\x20Р·Р°\x20РїРѕРґРІРёРі\x20РїРѕР»СѓС‡Р°РµС‚Рµ\x20РњРµРґР°Р»СЊ\x20РґРѕР±Р»РµСЃС‚Рё\x2e"  ,
+    "Р’С‹\x20РёР·Р±Р°РІР»СЏРµС‚Рµ\x20РѕРєСЂСѓРіСѓ\x20РѕС‚\x20СѓР¶Р°СЃРЅРѕРіРѕ\x20РјРёРЅРѕС‚Р°РІСЂР°\x2c\x20РґРѕР±С‹С‡РµР№\x20РєРѕС‚РѕСЂРѕРјСѓ\x20СЃР»СѓР¶РёР»Рё\x20Р±Р»Р°РіРѕСЂРѕРґРЅС‹Рµ\x20СЂС‹С†Р°СЂРё\x2c\x20Рё\x20СЃС‚Р°РЅРѕРІРёС‚РµСЃСЊ\x20РєР°РІР°Р»РµСЂРѕРј\x20РњРµРґР°Р»Рё\x20РїРѕС‡РµС‚Р°\x2e"  ,
+    "РќР°\x20РѕР±РѕС‡РёРЅРµ\x20РїСѓСЃС‚С‹РЅРЅРѕР№\x20РґРѕСЂРѕРіРё\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РјРµРґР°Р»СЊ\x2e\x20Р’С‹\x20РїРѕРґРѕР±СЂР°Р»Рё\x20РµРµ\x20Рё\x20РѕР±РЅР°СЂСѓР¶РёР»Рё\x2c\x20С‡С‚Рѕ\x20СЃС‚Р°Р»Рё\x20РЅРµСЃС‡Р°СЃС‚РЅС‹Рј\x20РѕР±Р»Р°РґР°С‚РµР»РµРј\x20РЎРёРјРІРѕР»Р°\x20РЅРµСѓРґР°С‡Рё\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РїРѕРЅРёР¶Р°РµС‚\x20Р±РѕРµРІРѕР№\x20РґСѓС…\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x2e"  ,
+    "Р’Рѕ\x20РІСЂРµРјСЏ\x20Р¶СѓС‚РєРѕР№\x20РіСЂРѕР·С‹\x20РјРѕР»РЅРёСЏ\x20Р±СЊРµС‚\x20РІ\x20РґРµСЂРµРІРѕ\x2c\x20СЂР°Р·РЅРѕСЃСЏ\x20РµРіРѕ\x20РЅР°\x20РјРµР»РєРёРµ\x20С‰РµРїРєРё\x2e\x20РЎСЂРµРґРё\x20РѕР±Р»РѕРјРєРѕРІ\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x20С‚Р°РёРЅСЃС‚РІРµРЅРЅСѓСЋ\x20РїР°Р»РёС†Сѓ\x2e"  ,
+    "Р’С‹\x20РїРѕРІСЃС‚СЂРµС‡Р°Р»Рё\x20РїРµС‡Р°Р»СЊРЅРѕ\x20РёР·РІРµСЃС‚РЅРѕРіРѕ\x20Р§РµСЂРЅРѕРіРѕ\x20Р С‹С†Р°СЂСЏ\x21\x20Р’Р°С€\x20РїРѕРµРґРёРЅРѕРє\x20Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ\x20РІРЅРёС‡СЊСЋ\x2c\x20Рё\x20СЂС‹С†Р°СЂСЊ\x20РІ\x20Р·РЅР°Рє\x20СѓРІР°Р¶РµРЅРёСЏ\x20РґР°СЂРёС‚\x20РІР°Рј\x20РїР°СЂСѓ\x20Р»Р°С‚РЅС‹С…\x20РїРµСЂС‡Р°С‚РѕРє\x2e"  ,
+    "РљСЂР°РµРј\x20РіР»Р°Р·Р°\x20РІС‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20Р·РѕР»РѕС‚РёСЃС‚С‹Р№\x20Р±Р»РµСЃРє\x20СЃСЂРµРґРё\x20РїС‹С€РЅРѕР№\x20Р·РµР»РµРЅРё\x2e\x20РџСЂРёРіР»СЏРґРµРІС€РёСЃСЊ\x20РІРЅРёРјР°С‚РµР»СЊРЅРµРµ\x2c\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РїРѕРґ\x20РєСѓСЃС‚Р°РјРё\x20РІРµР»РёРєРѕР»РµРїРЅС‹Р№\x20Р·РѕР»РѕС‚РѕР№\x20С€Р»РµРј\x2e"  ,
+    "РќРµСѓРєР»СЋР¶РёР№\x20РіРёРіР°РЅС‚\x20РЅР°РЅРµСЃ\x20СЃРµР±Рµ\x20СЃРјРµСЂС‚РµР»СЊРЅСѓСЋ\x20СЂР°РЅСѓ\x20СЃРѕР±СЃС‚РІРµРЅРЅС‹Рј\x20Р±РѕРµРІС‹Рј\x20С†РµРїРѕРј\x2e\x20Р’С‹\x20РїСЂРµРєСЂР°СЃРЅРѕ\x20РІР»Р°РґРµРµС‚Рµ\x20СЌС‚РёРј\x20РѕСЂСѓР¶РёРµРј\x20Рё\x20СЃ\x20СѓРІРµСЂРµРЅРЅРѕСЃС‚СЊСЋ\x20РІС‹РЅРёРјР°РµС‚Рµ\x20С†РµРї\x20РёР·\x20РјРµСЂС‚РІС‹С…\x20СЂСѓРє\x20РіРёРіР°РЅС‚Р°\x2e"  ,
+    "РџСЂРѕР±РёСЂР°СЏСЃСЊ\x20С‡РµСЂРµР·\x20СЂР°Р·РІР°Р»РёРЅС‹\x20РґСЂРµРІРЅРµР№\x20РєСЂРµРїРѕСЃС‚Рё\x2c\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РѕСЂСѓРґРёРµ\x2c\x20РєРѕС‚РѕСЂРѕРµ\x20РїСЂРµРІСЂР°С‚РёР»Рѕ\x20РµРµ\x20РІ\x20СЂСѓРёРЅС‹\x2c\x20СѓРґРёРІРёС‚РµР»СЊРЅСѓСЋ\x20Р±Р°Р»Р»РёСЃС‚Сѓ\x20Р·Р°РјС‹СЃР»РѕРІР°С‚РѕР№\x20РєРѕРЅСЃС‚СЂСѓРєС†РёРё\x2e"  ,
+    "Р’\x20СЂСѓРєР°С…\x20Сѓ\x20РєР°РјРµРЅРЅРѕР№\x20СЃС‚Р°С‚СѓРё\x20РІРѕРёРЅР°\x20\x2d\x20РІРµР»РёРєРѕР»РµРїРЅС‹Р№\x20СЃРµСЂРµР±СЂСЏРЅС‹Р№\x20С‰РёС‚\x2e\x20РљР°Рє\x20С‚РѕР»СЊРєРѕ\x20РІС‹\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20С‰РёС‚\x20СЃРµР±Рµ\x2c\x20СЃС‚Р°С‚СѓСЏ\x20СЂР°СЃСЃС‹РїР°РµС‚СЃСЏ\x20РІ\x20РїСЂР°С…\x2e"  ,
+    "Р’С‹\x20РїСЂРѕР±РёСЂР°РµС‚РµСЃСЊ\x20СѓР·РєРѕР№\x20С‚СЂРѕРїРѕР№\x2c\x20РєР°Рє\x20РІРґСЂСѓРі\x20Р±Р»РёР¶Р°Р№С€РёР№\x20РєСѓСЃС‚\x20Р·Р°РіРѕСЂР°РµС‚СЃСЏ\x20СЏСЂРєРёРј\x20РїР»Р°РјРµРЅРµРј\x2e\x20Р’\x20РѕРіРЅРµРЅРЅРѕРј\x20СЃРјРµСЂС‡Рµ\x20РїРѕСЏРІР»СЏРµС‚СЃСЏ\x20РїСЂРµРєСЂР°СЃРЅР°СЏ\x20РґР°РјР°\x2c\x20РєРѕС‚РѕСЂР°СЏ\x20РїСЂРѕС‚СЏРіРёРІР°РµС‚\x20РІР°Рј\x20РІРѕР»С€РµР±РЅС‹Р№\x20РјРµС‡\x2e"  ,
+    "Р’С‹\x20РІРёРґРёС‚Рµ\x20СЃРµСЂРµР±СЂСЏРЅС‹Р№\x20С‚РѕРїРѕСЂ\x2c\x20РІРѕРіРЅР°РЅРЅС‹Р№\x20РІ\x20Р·РµРјР»СЋ\x20РїРѕ\x20СЃР°РјСѓСЋ\x20СЂСѓРєРѕСЏС‚СЊ\x2e\x20Р’Р°С€Рё\x20РІРѕРёРЅС‹\x20РїС‹С‚Р°СЋС‚СЃСЏ\x20РІС‹РґРµСЂРЅСѓС‚СЊ\x20РµРіРѕ\x2c\x20РЅРѕ\x20СѓСЃРёР»РёСЏ\x20РёС…\x20С‚С‰РµС‚РЅС‹\x2e\x20Р’Р°Рј\x20Р¶Рµ\x20С…РІР°С‚РёР»Рѕ\x20РѕРґРЅРѕРіРѕ\x20СѓСЃРёР»РёСЏ\x20Рё\x20С‚РѕРїРѕСЂ\x20Сѓ\x20РІР°СЃ\x20РІ\x20СЂСѓРєР°С…\x21"  ,
+    "РЁР°Р№РєР°\x20СЂР°Р·Р±РѕР№РЅРёРєРѕРІ\x20РѕР±С‹СЃРєРёРІР°РµС‚\x20С‚РµР»Р°\x20РјРµСЂС‚РІС‹С…\x20РІРѕРёРЅРѕРІ\x2e\x20Р’С‹\x20СЂР°Р·РіРѕРЅСЏРµС‚Рµ\x20РјР°СЂРѕРґРµСЂРѕРІ\x20Рё\x20РІРґСЂСѓРі\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РІ\x20СЃРїРµС€РєРµ\x20РѕРЅРё\x20РїРѕС‚РµСЂСЏР»Рё\x20РІРµР»РёРєРѕР»РµРїРЅС‹Р№\x20РґРѕСЃРїРµС…\x2e"  ,
+    "РџРµСЂРµРґ\x20РІР°РјРё\x20РІРѕР·РЅРёРєР°РµС‚\x20РїР°СЂСЏС‰РёР№\x20РІ\x20РІРѕР·РґСѓС…Рµ\x20СЃС‚РµРєР»СЏРЅРЅС‹Р№\x20Р»Р°СЂРµС†\x20СЃРѕ\x20СЃРІРёС‚РєРѕРј\x20РІРЅСѓС‚СЂРё\x2c\x20Р»РµР¶Р°С‰РµРј\x20РЅР°\x20РїРѕРґСѓС€РєРµ\x20РёР·\x20РїСѓСЂРїСѓСЂРЅРѕРіРѕ\x20Р±Р°СЂС…Р°С‚Р°\x2e\x20РћС‚\x20РїСЂРёРєРѕСЃРЅРѕРІРµРЅРёСЏ\x2c\x20РєСЂС‹С€РєР°\x20Р»Р°СЂС†Р°\x20РѕС‚РєСЂС‹РІР°РµС‚СЃСЏ\x2c\x20Рё\x20СЃРІРёС‚РѕРє\x20РѕРєР°Р·С‹РІР°РµС‚СЃСЏ\x20Сѓ\x20РІР°СЃ\x20РІ\x20СЂСѓРєР°С…\x2e"  ,
+    "Р’С‹\x20РЅР°РІРµС‰Р°РµС‚Рµ\x20РјРµСЃС‚РЅРѕРіРѕ\x20РјСѓРґСЂРµС†Р°\x20Рё\x20СЂР°СЃСЃРєР°Р·С‹РІР°РµС‚Рµ\x20Рѕ\x20С†РµР»Рё\x20РІР°С€РµРіРѕ\x20РїСѓС‚РµС€РµСЃС‚РІРёСЏ\x2e\x20РћРЅ\x20РґРѕСЃС‚Р°РµС‚\x20РёР·\x20РјРµС€РєР°\x20РїРѕР¶РµР»С‚РµРІС€РёР№\x20СЃРІРёС‚РѕРє\x20Рё\x20РїРµСЂРµРґР°РµС‚\x20РµРіРѕ\x20РІР°Рј\x2e"  ,
+    "Р’С‹\x20СЃС‚РѕРёС‚Рµ\x20РїРµСЂРµРґ\x20РѕСЃС‚Р°РЅРєР°РјРё\x20РґР°РІРЅРѕ\x20СѓРјРµСЂС€РµР№\x20Р¶СЂРёС†С‹\x20РґСЂСѓРёРґРѕРІ\x2e\x20РџРѕР¶РµР»С‚РµРІС€РёРµ\x20РѕС‚\x20РІСЂРµРјРµРЅРё\x20РєРѕСЃС‚Рё\x20РїСЂРѕРіР»СЏРґС‹РІР°СЋС‚\x20С‡РµСЂРµР·\x20РїСЂРѕСЂРµС…Рё\x20РёСЃС‚Р»РµРІС€РµРіРѕ\x20РѕРґРµСЏРЅРёСЏ\x2e\x20РџРѕС€РµРІРµР»РёРІ\x20РіСЂСѓРґСѓ\x20РІРµС‚РѕС€Рё\x2c\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РґСЂРµРІРЅРёР№\x20СЃРІРёС‚РѕРє\x2e"  ,
+    "Р“СЂСѓРґР°\x20РїРѕР¶РµР»С‚РµРІС€РёС…\x20РєРѕСЃС‚РµР№\x20Рё\x20РѕР±СЂС‹РІРєРё\x20РёСЃС‚Р»РµРІС€РµР№\x20РјР°С‚РµСЂРёРё\x20\x2d\x20РІРѕС‚\x20РІСЃРµ\x2c\x20С‡С‚Рѕ\x20РѕСЃС‚Р°Р»РѕСЃСЊ\x20РѕС‚\x20Р¶СЂРёС†С‹\x20РґСЂСѓРёРґРѕРІ\x2e\x20РЎСЂРµРґРё\x20СЌС‚РёС…\x20РѕСЃС‚Р°РЅРєРѕРІ\x20РІС‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20С‚Р°РёРЅСЃС‚РІРµРЅРЅС‹Р№\x20СЃРІРёС‚РѕРє\x2e"  ,
+    "РњР°Р»РµРЅСЊРєРёР№\x20Р»РµРїСЂРµРєРѕРЅ\x20РїСЂРёС‚Р°РЅС†РѕРІС‹РІР°РµС‚\x20Сѓ\x20РІРѕР»С€РµР±РЅРѕРіРѕ\x20РјРµС€РєР°\x2e\x20Р—Р°РІРёРґРµРІ\x20РІР°СЃ\x2c\x20РѕРЅ\x20Р·Р°РјРёСЂР°РµС‚\x20РЅР°\x20РјРµСЃС‚Рµ\x2c\x20Р·Р°С‚РµРј\x20РёР·РґР°РµС‚\x20РІРѕР·РјСѓС‰РµРЅРЅС‹Р№\x20РІРѕР·РіР»Р°СЃ\x2c\x20С‚РѕРїР°РµС‚\x20РЅРѕР¶РєРѕР№\x20Рё\x20СЂР°СЃС‚РІРѕСЂСЏРµС‚СЃСЏ\x20РІ\x20РІРѕР·РґСѓС…Рµ\x2e\x20Р’С‹\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20РјРµС€РѕРє\x20СЃРµР±Рµ\x2e"  ,
+    "Р‘Р»Р°РіРѕСЂРѕРґРЅР°СЏ\x20РїСѓС‚РµС€РµСЃС‚РІРµРЅРЅРёС†Р°\x2c\x20РѕС‚Р±РёРІС€Р°СЏСЃСЏ\x20РѕС‚\x20СЃРїСѓС‚РЅРёРєРѕРІ\x2c\x20РїСЂРѕСЃРёС‚\x20РІР°СЃ\x20Рѕ\x20РїРѕРјРѕС‰Рё\x2e\x20РџСЂРѕРІРѕРґРёРІ\x20РµРµ\x20РґРѕ\x20РґРѕРјР°\x2c\x20РІС‹\x20РїРѕР»СѓС‡Р°РµС‚Рµ\x20РІ\x20РЅР°РіСЂР°РґСѓ\x20СЃСѓРјСѓ\x2c\x20РїРѕР»РЅСѓСЋ\x20Р·РѕР»РѕС‚Р°\x2e"  ,
+    "РћРґРЅР°Р¶РґС‹\x20РІР°Рј\x20РІ\x20СЂСѓРєРё\x20РїРѕРїР°РґР°РµС‚\x20РЅР°РїРѕР»РЅРµРЅРЅС‹Р№\x20Р·РѕР»РѕС‚РѕРј\x20РєРѕР¶Р°РЅС‹Р№\x20РєРѕС€РµР»СЊ\x2c\x20РїСЂРёРЅР°РґР»РµР¶Р°РІС€РёР№\x20РІРµР»РёРєРѕРјСѓ\x20РєРѕСЂРѕР»СЋ\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20СѓРјРµР»\x20РїСЂРµРІСЂР°С‰Р°С‚СЊ\x20Р»СЋР±РѕР№\x20РїСЂРµРґРјРµС‚\x20РІ\x20Р·РѕР»РѕС‚Рѕ\x2e"  ,
+    "Р‘СЂРѕРґСЏС‡РёР№\x20С‚РѕСЂРіРѕРІРµС†\x20РїСЂРѕСЃРёС‚\x20РІР°СЃ\x20Р·Р°С‰РёС‚РёС‚СЊ\x20РµРіРѕ\x20РѕС‚\x20Р±Р°РЅРґС‹\x20РіРѕР±Р»РёРЅРѕРІ\x2e\x20Р’\x20РЅР°РіСЂР°РґСѓ\x20РѕРЅ\x20РґР°СЂРёС‚\x20РІР°Рј\x20РїР°СЂСѓ\x20РёР·СЏС‰РЅС‹С…\x20Р±Р°С€РјР°РєРѕРІ\x2c\x20РёСЃРїРµС‰СЂРµРЅРЅС‹С…\x20Р·Р°РіР°РґРѕС‡РЅС‹РјРё\x20РґСЂРµРІРЅРёРјРё\x20РїРёСЃСЊРјРµРЅР°РјРё\x2e"  ,
+    "РћР±РЅР°СЂСѓР¶РёРІ\x20РїР°СЂСѓ\x20Р·Р°РјРµС‡Р°С‚РµР»СЊРЅС‹С…\x20Р±Р°С€РјР°РєРѕРІ\x20СѓРєСЂР°С€РµРЅРЅС‹С…\x20Р±РёСЃРµСЂРѕРј\x2c\x20РІС‹\x20Р±Р»Р°РіРѕРґР°СЂРёС‚Рµ\x20Р·Р°РіР°РґРѕС‡РЅРѕРіРѕ\x20Р±Р»Р°РіРѕРґРµС‚РµР»СЏ\x20Рё\x20РѕСЃС‚Р°РІР»СЏРµС‚Рµ\x20РёС…\x20СЃРµР±Рµ\x2e"  ,
+    "Р’\x20СѓРїР»Р°С‚Сѓ\x20Р·Р°\x20РѕС…СЂР°РЅСѓ\x20РІ\x20РїСѓС‚Рё\x20СЃС‚СЂР°РЅСЃС‚РІСѓСЋС‰РёР№\x20С‚РѕСЂРіРѕРІРµС†\x20РїСЂРµРґР»Р°РіР°РµС‚\x20РІР°Рј\x20Р»Р°РїРєСѓ\x20РєСЂРѕР»РёРєР°\x2e\x20РџРѕ\x20РµРіРѕ\x20СЃР»РѕРІР°Рј\x2c\x20РѕРЅР°\x20РїСЂРёРЅРµСЃРµС‚\x20РІР°Рј\x20СѓРґР°С‡Сѓ\x20РІ\x20Р±РѕСЋ\x2e"  ,
+    "РџРѕРїР°РІС€РёР№\x20РІ\x20Р»РѕРІСѓС€РєСѓ\x20РµРґРёРЅРѕСЂРѕРі\x20РёСЃРїСѓРіР°РЅРЅРѕ\x20РєСЂРёС‡РёС‚\x2e\x20Р’С‹\x20СѓСЃРїРѕРєР°РёРІР°РµС‚Рµ\x20РµРіРѕ\x20Рё\x20РѕСЃРІРѕР±РѕР¶РґР°РµС‚Рµ\x20РѕС‚\x20РїСѓС‚\x2e\x20Р’СЃС…СЂР°РїРЅСѓРІ\x20Рё\x20СѓРґР°СЂРёРІ\x20РєРѕРїС‹С‚РѕРј\x2c\x20РѕРЅ\x20СѓРЅРѕСЃРёС‚СЃСЏ\x20РїСЂРѕС‡СЊ\x2e\x20РўР°Рј\x2c\x20РіРґРµ\x20РѕРЅ\x20С‚РѕР»СЊРєРѕ\x20С‡С‚Рѕ\x20СЃС‚РѕСЏР»\x2c\x20РѕСЃС‚Р°Р»Р°СЃСЊ\x20Р»РµР¶Р°С‚СЊ\x20Р·РѕР»РѕС‚Р°СЏ\x20РїРѕРґРєРѕРІР°\x2e"  ,
+    "Р’С‹\x20РїРѕР№РјР°Р»Рё\x20РѕР·РѕСЂРЅРѕРіРѕ\x20Р±РµСЃРµРЅРєР°\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РЅРµ\x20РґР°РІР°Р»\x20РїРѕРєРѕСЏ\x20РІСЃРµР№\x20РѕРєСЂСѓРіРµ\x2e\x20Р’\x20РѕР±РјРµРЅ\x20РЅР°\x20СЃРІРѕР±РѕРґСѓ\x20РѕРЅ\x20РїСЂРµРґР»Р°РіР°РµС‚\x20РІР°Рј\x20РІРѕР»С€РµР±РЅСѓСЋ\x20РјРѕРЅРµС‚Сѓ\x2e"  ,
+    "РџРѕСЃСЂРµРґРё\x20РјРµСЂС‚РІРѕР№\x20Р»РѕС‰РёРЅС‹\x2c\x20Р·Р°РїРѕР»РЅРµРЅРЅРѕР№\x20РёСЃСЃРѕС…С€РµР№\x20СЂР°СЃС‚РёС‚РµР»СЊРЅРѕСЃС‚СЊСЋ\x2c\x20РІС‹\x2c\x20Рє\x20СЃРІРѕРµРјСѓ\x20СѓРґРёРІР»РµРЅРёСЋ\x2c\x20Р·Р°РјРµС‡РµС‚Рµ\x20РІРµСЃРµР»С‹Р№\x20Р·РµР»РµРЅС‹Р№\x20РїРѕР±РµРі\x20С‡РµС‚С‹СЂРµС…Р»РёСЃС‚РЅРѕРіРѕ\x20РєР»РµРІРµСЂР°\x2e"  ,
+    "РЎС‚СЂР°РЅРЅРѕРІР°С‚С‹Р№\x20СЃС‚Р°СЂРёРєР°С€РєР°\x20СѓС‚РІРµСЂР¶РґР°РµС‚\x2c\x20С‡С‚Рѕ\x20РѕРЅ\x20\x2d\x20РІРµР»РёРєРёР№\x20РёР·РѕР±СЂРµС‚Р°С‚РµР»СЊ\x2c\x20Рё\x20РїСЂРѕСЃРёС‚\x20РІР°СЃ\x20РёСЃРїС‹С‚Р°С‚СЊ\x20РµРіРѕ\x20РЅРѕРІРѕРµ\x20С‚РІРѕСЂРµРЅРёРµ\x2e\x20РќР°РґСѓРІС€РёСЃСЊ\x20РѕС‚\x20РІР°Р¶РЅРѕСЃС‚Рё\x2c\x20РѕРЅ\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20РєРѕРјРїР°СЃ\x2e"  ,
+    "РЎС‚Р°СЂС‹Р№\x20РјРѕСЂРµС…РѕРґ\x20СЃС‚Р°Р»\x20РґРѕР±С‹С‡РµР№\x20Р»СЋРґРѕРµРґРѕРІ\x2e\x20Р’С‹\x20СЃРїР°СЃР°РµС‚Рµ\x20РµРіРѕ\x2c\x20Рё\x20РІ\x20Р·РЅР°Рє\x20Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё\x20РѕРЅ\x20РґР°СЂРёС‚\x20РІР°Рј\x20С‡СѓРґРµСЃРЅС‹Р№\x20РёРЅСЃС‚СЂСѓРјРµРЅС‚\x2c\x20РїРѕР·РІРѕР»СЏСЋС‰РёР№\x20РёР·РјРµСЂСЏС‚СЊ\x20СЂР°СЃСЃС‚РѕСЏРЅРёСЏ\x20РїРѕ\x20Р·РІРµР·РґР°Рј\x2e"  ,
+    "Р’\x20Р·Р°Р±СЂРѕС€РµРЅРЅРѕР№\x20С…РёР¶РёРЅРµ\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20СЃРєРµР»РµС‚\x20РґР°РІРЅРѕ\x20РїРѕС‡РёРІС€РµР№\x20РєРѕР»РґСѓРЅСЊРё\x2e\x20РџСЂРёРіР»СЏРґРµРІС€РёСЃСЊ\x2c\x20РІС‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РІ\x20РіР»Р°Р·РЅРёС†Рµ\x20РїРѕР¶РµР»С‚РµРІС€РµРіРѕ\x20С‡РµСЂРµРїР°\x20Р·Р»РѕРІРµС‰Рµ\x20РІСЂР°С‰Р°РµС‚СЃСЏ\x20СЃС‚РµРєР»СЏРЅРЅС‹Р№\x20РіР»Р°Р·\x2e"  ,
+    "Р—Р°\x20РЅРµРІС‹СЃРѕРєРёРј\x20С…РѕР»РјРѕРј\x20РїРµСЂРµРґ\x20РІР°РјРё\x20РѕС‚РєСЂС‹РІР°РµС‚СЃСЏ\x20Р·Р»РѕРІРµС‰Р°СЏ\x20РєР°СЂС‚РёРЅР°\x20\x2d\x20СЃС‚Р°Рё\x20СЃС‚РµСЂРІСЏС‚РЅРёРєРѕРІ\x20РїРёСЂСѓСЋС‚\x20РЅР°\x20РїРѕР»Рµ\x20РЅРµРґР°РІРЅРµР№\x20Р±РёС‚РІС‹\x2e\x20РЎСЂРµРґРё\x20С‚РµР»\x20РїРѕРІРµСЂР¶РµРЅРЅС‹С…\x20РІРѕРёРЅРѕРІ\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РІРѕР»С€РµР±РЅС‹Рµ\x20РїРµСЃРѕС‡РЅС‹Рµ\x20С‡Р°СЃС‹\x2e"  ,
+    "Р’С‹\x20РїРѕРјРѕРіР°РµС‚Рµ\x20Р±СЂРѕРґСЏС‡РµРјСѓ\x20С‚РѕСЂРіРѕРІС†Сѓ\x20СЃРЅР°РґРѕР±СЊСЏРјРё\x20РІС‹С‚Р°С‰РёС‚СЊ\x20РїРѕРІРѕР·РєСѓ\x20РёР·\x20РїСЂРёРґРѕСЂРѕР¶РЅРѕР№\x20РєР°РЅР°РІС‹\x2e\x20Р’\x20Р·РЅР°Рє\x20Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё\x20РѕРЅ\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20Р·РѕР»РѕС‚С‹Рµ\x20С‡Р°СЃС‹\x2e\x20РћРЅ\x20Рё\x20РЅРµ\x20РїРѕРґРѕР·СЂРµРІР°Р»\x2c\x20С‡С‚Рѕ\x20С‡Р°СЃС‹\x20РІРѕР»С€РµР±РЅС‹Рµ\x21"  ,
+    "Р’С‹\x20РґРµР»Р°РµС‚Рµ\x20РєРѕСЂРѕС‚РєСѓСЋ\x20РѕСЃС‚Р°РЅРѕРІРєСѓ\x20РІ\x20РјР°Р»РµРЅСЊРєРѕР№\x20РїСЂРёРґРѕСЂРѕР¶РЅРѕР№\x20С…Р°СЂС‡РµРІРЅРµ\x2e\x20РџРѕРґ\x20Р·РІРѕРЅ\x20РјРѕРЅРµС‚\x20РїСЂРѕРёСЃС…РѕРґРёС‚\x20РѕР±РјРµРЅ\x20РЅРѕРІРѕСЃС‚СЏРјРё\x2c\x20Р°\x20С‚Рѕ\x20Рё\x20СЂРµРґРєРёРјРё\x20РІРµС‰РёС†Р°РјРё\x2e\x20Р’РѕС‚\x20С‚Р°РєРёРј\x2dС‚Рѕ\x20РѕР±СЂР°Р·РѕРј\x20РІ\x20РІР°С€РµРј\x20Р±Р°РіР°Р¶Рµ\x20Рё\x20РѕРєР°Р·С‹РІР°РµС‚СЃСЏ\x20РІРѕР»С€РµР±РЅР°СЏ\x20С€Р°РїРѕС‡РєР°\x2e"  ,
+    "Р’С‹\x20СЃРїРµС€РёС‚Рµ\x20РЅР°\x20РѕС‚С‡Р°СЏРЅРЅС‹Рµ\x20РєСЂРёРєРё\x20Рё\x20РІРёРґРёС‚Рµ\x20РѕС‡Р°СЂРѕРІР°С‚РµР»СЊРЅСѓСЋ\x20РґРµРІСѓС€РєСѓ\x2c\x20Р·Р°\x20РєРѕС‚РѕСЂРѕР№\x20РіРѕРЅРёС‚СЃСЏ\x20СЂР°Р·СЉСЏСЂРµРЅРЅС‹Р№\x20РјРµРґРІРµРґСЊ\x2e\x20Р§РµСЂРµР·\x20РјРіРЅРѕРІРµРЅРёРµ\x20Р·РІРµСЂСЊ\x20РїРѕРІРµСЂР¶РµРЅ\x2c\x20Рё\x20Р±Р»Р°РіРѕРґР°СЂРЅР°СЏ\x20РІРѕР»С€РµР±РЅРёС†Р°\x20С€СЊРµС‚\x20РІР°Рј\x20РёР·\x20РµРіРѕ\x20С€РєСѓСЂС‹\x20РІРѕР»С€РµР±РЅС‹Р№\x20РїР»Р°С‰\x2e"  ,
+    "Р—Р°\x20РїРѕРІРѕСЂРѕС‚РѕРј\x20РґРѕСЂРѕРіРё\x20РІС‹\x20РІРёРґРёС‚Рµ\x20СЃСЂР°Р¶Р°СЋС‰РёС…СЃСЏ\x20РЅРµРєСЂРѕРјР°РЅС‚Р°\x20Рё\x20РїР°Р»Р°РґРёРЅР°\x2e\x20РќРµРєСЂРѕРјР°РЅС‚\x20Р°С‚Р°РєСѓРµС‚\x20РїР°Р»Р°РґРёРЅР°\x2c\x20Рё\x20С‚РѕС‚\x20РїР°РґР°РµС‚\x20РЅР°\x20РєРѕР»РµРЅРё\x2e\x20Р’С‹\x20СЃРїР°СЃР°РµС‚Рµ\x20Р¶РёР·РЅСЊ\x20РїР°Р»Р°РґРёРЅСѓ\x2c\x20СѓР±РёРІР°СЏ\x20РµРіРѕ\x20РІСЂР°РіР°\x2e\x20РџР°Р»Р°РґРёРЅ\x20РґР°СЂРёС‚\x20РІР°Рј\x20СЃРІРѕСЋ\x20РѕРіРЅРµРЅРЅСѓСЋ\x20РЅР°РєРёРґРєСѓ\x2e"  ,
+    "Р‘СЂРѕРґСЏС‡РёР№\x20РјРµРґРЅРёРє\x2c\x20Сѓ\x20РєРѕС‚РѕСЂРѕРіРѕ\x20РєРѕРЅС‡РёР»Р°СЃСЊ\x20РїСЂРѕРІРёР·РёСЏ\x2c\x20РїСЂРµРґР»Р°РіР°РµС‚\x20РІР°Рј\x20С€Р»РµРј\x20СЃ\x20РіСЂРµР±РЅРµРј\x20РІ\x20РІРёРґРµ\x20РјРѕР»РЅРёРё\x20РІ\x20РѕР±РјРµРЅ\x20РЅР°\x20РµРґСѓ\x20Рё\x20РїРёС‚СЊРµ\x2e\x20Р’С‹\x20СЃРѕРіР»Р°С€Р°РµС‚РµСЃСЊ\x20РЅР°\x20РѕР±РјРµРЅ\x2c\x20Р°\x20РІСЃРєРѕСЂРµ\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20С€Р»РµРј\x20РѕР±Р»Р°РґР°РµС‚\x20РµС‰Рµ\x20Рё\x20РјР°РіРёС‡РµСЃРєРёРјРё\x20СЃРІРѕР№СЃС‚РІР°РјРё\x2e"  ,
+    "Р’Р°С€Рµ\x20РІРЅРёРјР°РЅРёРµ\x20РїСЂРёРІР»РµРєР°РµС‚\x20Р»РµРґСЏРЅР°СЏ\x20СЃРѕСЃСѓР»СЊРєР°\x2c\x20РєРѕС‚РѕСЂР°СЏ\x20РЅРµ\x20С‚Р°РµС‚\x2c\x20РЅРµСЃРјРѕС‚СЂСЏ\x20РЅР°\x20РїРѕР»СѓРґРµРЅРЅС‹Р№\x20Р·РЅРѕР№\x2e\x20Р’С‹\x20РѕС‚Р»Р°РјС‹РІР°РµС‚Рµ\x20РµРµ\x20РѕС‚\x20РєР°СЂРЅРёР·Р°\x20Рё\x20СЃ\x20СѓРґРёРІР»РµРЅРёРµРј\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РґР°Р¶Рµ\x20С‚РµРїР»Рѕ\x20РІР°С€РёС…\x20СЂСѓРє\x20РµР№\x20РЅРёРїРѕС‡РµРј\x2e"  ,
+    "Р’\x20РґР°Р»СЊРЅРµР№\x20СЃС‚СЂР°РЅРµ\x20РІС‹\x20РІСЃС‚СЂРµС‡Р°РµС‚Рµ\x20РїР»РµРјСЏ\x20РїСЂРёРјР°С‚РѕРІ\x2e\x20РћРЅРё\x20СЂР°Р·Р¶РёРіР°СЋС‚\x20РєРѕСЃС‚СЂС‹\x20РїСЂРё\x20РїРѕРјРѕС‰Рё\x20РІРѕР»С€РµР±РЅРѕРіРѕ\x20РєСѓСЃРєР°\x20Р»Р°РІС‹\x2e\x20Р’С‹\x20РЅР°СѓС‡РёР»Рё\x20РёС…\x20РґРѕР±С‹РІР°С‚СЊ\x20РѕРіРѕРЅСЊ\x20РѕР±С‹С‡РЅС‹Рј\x20СЃРїРѕСЃРѕР±РѕРј\x2e\x20РћР±РµР·СЊСЏРЅС‹\x20СЃС‡РёС‚Р°СЋС‚\x20РІР°СЃ\x20Р±РѕРіРѕРј\x20Рё\x20РґР°СЂСЏС‚\x20СЃРІРѕР№\x20Р·Р°РІРµС‚РЅС‹Р№\x20РєСѓСЃРѕРє\x20Р»Р°РІС‹\x2e"  ,
+    "Р’Рѕ\x20РІСЂРµРјСЏ\x20СѓР¶Р°СЃРЅРѕР№\x20РіСЂРѕР·С‹\x20РЅР°\x20РІР°С€РёС…\x20РіР»Р°Р·Р°С…\x20РІ\x20РіСЂРѕРјРѕРѕС‚РІРѕРґ\x20РґРѕРјР°\x20Р±СЊРµС‚\x20РјРѕР»РЅРёСЏ\x2e\x20Р Р°СЃРїР»Р°РІР»РµРЅРЅС‹Р№\x20РіСЂРѕРјРѕРѕС‚РІРѕРґ\x20РїР°РґР°РµС‚\x20РЅР°\x20Р·РµРјР»СЋ\x2c\x20РЅРѕ\x20РµРіРѕ\x20РЅР°РєРѕРЅРµС‡РЅРёРє\x20РѕСЃС‚Р°РµС‚СЃСЏ\x20С†РµР»С‹Рј\x20Рё\x20РЅРµРІСЂРµРґРёРјС‹Рј\x2e\x20Р’С‹\x20РїРѕРґРѕР±СЂР°Р»Рё\x20РµРіРѕ\x20\x2d\x20РѕРєР°Р·Р°Р»РѕСЃСЊ\x2c\x20СЌС‚Рѕ\x20РјР°РіРёС‡РµСЃРєРёР№\x20РїСЂРµРґРјРµС‚\x21"  ,
+    "РќР°\x20РїР°Р»СЊС†Рµ\x20РјРµСЂС‚РІРѕРіРѕ\x20СЃС‚СЂР°РЅРЅРёРєР°\x20РІС‹\x20РІРёРґРёС‚Рµ\x20РЅРµРѕР±С‹С‡РЅРѕРµ\x20РєРѕР»СЊС†Рѕ\x2e\x20РћРЅРѕ\x20РёРјРµРµС‚\x20С„РѕСЂРјСѓ\x20Р·РјРµРё\x2c\x20РІС†РµРїРёРІС€РµР№СЃСЏ\x20Р·СѓР±Р°РјРё\x20РІ\x20СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№\x20С…РІРѕСЃС‚\x2e"  ,
+    "РџРµСЃС‡Р°РЅР°СЏ\x20Р±СѓСЂСЏ\x20РѕР±РЅР°Р¶РёР»Р°\x20РІС…РѕРґ\x20РІ\x20РїРѕРґР·РµРјРЅСѓСЋ\x20РіСЂРѕР±РЅРёС†Сѓ\x2e\x20Р’С‹\x20СЃРїСѓСЃРєР°РµС‚РµСЃСЊ\x20РІРЅСѓС‚СЂСЊ\x20Рё\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20Р·РґРµСЃСЊ\x20СѓР¶Рµ\x20РїРѕР±С‹РІР°Р»Рё\x20РіСЂР°Р±РёС‚РµР»Рё\x2c\x20РѕРґРЅР°РєРѕ\x20РІ\x20С‚РµРјРЅРѕС‚Рµ\x20РѕРЅРё\x20РЅРµ\x20Р·Р°РјРµС‚РёР»Рё\x20СЃРёРјРІРѕР»\x20РІРµС‡РЅРѕР№\x20Р¶РёР·РЅРё\x2c\x20РІРёСЃСЏС‰РёР№\x20РЅР°\x20СЃРµСЂРµР±СЂСЏРЅРѕР№\x20С†РµРїРё\x2e"  ,
+    "Р’С‹\x20РІСЃС‚СЂРµС‡Р°РµС‚Рµ\x20Р·Р°РєР»РёРЅР°С‚РµР»СЏ\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РїСЂРѕСЃРёС‚\x20СЂР°Р·СЂРµС€РёС‚СЊ\x20РµРјСѓ\x20РІРѕСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ\x20РІР°С€РёРј\x20РїРѕРєСЂРѕРІРёС‚РµР»СЊСЃС‚РІРѕРј\x20РЅР°\x20РѕРїР°СЃРЅРѕРј\x20СѓС‡Р°СЃС‚РєРµ\x20РїСѓС‚Рё\x2e\x20Р’С‹\x20СЃРѕРіР»Р°С€Р°РµС‚РµСЃСЊ\x2c\x20Рё\x20РІ\x20РЅР°РіСЂР°РґСѓ\x20РѕРЅ\x20РґР°СЂРёС‚\x20РІР°Рј\x20РљРЅРёРіСѓ\x20РЎС‚РёС…РёР№\x2e"  ,
+    "Р Р°СЃРїРѕР»РѕР¶РёРІС€РёСЃСЊ\x20РЅР°\x20РѕС‚РґС‹С…\x20РїРѕРґ\x20РЅРµРІС‹СЃРѕРєРёРј\x20РґРµСЂРµРІРѕРј\x2c\x20РІС‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20РґРёРєРѕРіРѕ\x20РєРѕС‚Р°\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РїРѕРґР±РёСЂР°РµС‚СЃСЏ\x20Рє\x20РІРѕСЂРѕРЅСЊРµРјСѓ\x20РіРЅРµР·РґСѓ\x2e\x20Р’С‹\x20РїСЂРѕРіРѕРЅСЏРµС‚Рµ\x20РєРѕС‚Р°\x2c\x20Рё\x20СЃР°РјРё\x20Р·Р°Р»РµР·Р°РµС‚Рµ\x20РЅР°\x20РґРµСЂРµРІРѕ\x2e\x20Р’\x20РіРЅРµР·РґРµ\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РєРѕР»СЊС†Рѕ\x20С‚РѕРЅРєРѕР№\x20СЂР°Р±РѕС‚С‹\x2e"  ,
+    "РЎС‚СЂР°РЅСЃС‚РІСѓСЏ\x20РїРѕ\x20РґР°Р»СЊРЅРёРј\x20Р·РµРјР»СЏРј\x2c\x20РІС‹\x20РІСЃС‚СЂРµС‡Р°РµС‚Рµ\x20РѕС‚С€РµР»СЊРЅРёРєР°\x2c\x20Р¶РёРІСѓС‰РµРіРѕ\x20РІ\x20РјР°Р»РµРЅСЊРєРѕР№\x20Р°РєРєСѓСЂР°С‚РЅРѕР№\x20С…РёР¶РёРЅРµ\x2e\x20РЈР·РЅР°РІ\x20Рѕ\x20С†РµР»Рё\x20РІР°С€РёС…\x20СЃРєРёС‚Р°РЅРёР№\x2c\x20РѕРЅ\x20РїСЂРµСЂС‹РІР°РµС‚\x20СЃРІРѕРё\x20СЂР°Р·РјС‹С€Р»РµРЅРёСЏ\x2c\x20Р±Р»Р°РіРѕСЃР»РѕРІР»СЏРµС‚\x20РІР°СЃ\x20Рё\x20РґР°СЂРёС‚\x20Р°РјСѓР»РµС‚\x2c\x20Р·Р°С‰РёС‰Р°СЋС‰РёР№\x20РѕС‚\x20Р·Р»С‹С…\x20С‡Р°СЂ\x2e"  ,
+    "Р’С‹\x20СЃР»С‹С€РёС‚Рµ\x20РєСЂРёРєРё\x20Рѕ\x20РїРѕРјРѕС‰Рё\x20Рё\x2c\x20РїРѕСЃРїРµС€РёРІ\x20РЅР°\x20Р±РµСЂРµРі\x20СЂРµРєРё\x2c\x20РІРёРґРёС‚Рµ\x20С„РµР№\x2c\x20РїРѕС‚РµС€Р°СЋС‰РёС…СЃСЏ\x20РЅР°Рґ\x20СЃС‚Р°СЂРёРєРѕРј\x2c\x20РѕРєСѓРЅР°СЏ\x20РµРіРѕ\x20РІ\x20РІРѕРґСѓ\x2e\x20Р’С‹\x20РІС‹СЂСѓС‡Р°РµС‚Рµ\x20СЃС‚Р°СЂРёРєР°\x20РёР·\x20Р±РµРґС‹\x20Рё\x20РІС‹С‚Р°СЃРєРёРІР°РµС‚Рµ\x20РѕРґРЅСѓ\x20С„РµСЋ\x20РЅР°\x20Р±РµСЂРµРі\x2e\x20Р’\x20РѕР±РјРµРЅ\x20РЅР°\x20СЃРІРѕР±РѕРґСѓ\x20РѕРЅР°\x20РѕС‚РґР°РµС‚\x20РІР°Рј\x20РїРѕРґРІРµСЃРєСѓ\x2e"  ,
+    "Р’\x20РґРѕСЂРѕРіРµ\x20РІС‹\x20РІСЃС‚СЂРµС‡Р°РµС‚Рµ\x20РЅРµР±РѕР»СЊС€РѕР№\x20РєР°СЂР°РІР°РЅ\x2e\x20РЎС‹РіСЂР°РІ\x20СЃ\x20С…РѕР·СЏРёРЅРѕРј\x20РєР°СЂР°РІР°РЅР°\x20РІ\x20РєРѕСЃС‚Рё\x2c\x20РІС‹\x20РІС‹РёРіСЂС‹РІР°РµС‚Рµ\x20РІРѕР»С€РµР±РЅСѓСЋ\x20РїРѕРґРІРµСЃРєСѓ\x2e\x20Р•Рµ\x20РїСЂРµР¶РЅРёР№\x20РІР»Р°РґРµР»РµС†\x20СѓС‚РІРµСЂР¶РґР°РµС‚\x2c\x20С‡С‚Рѕ\x20РѕРЅР°\x20РјРѕР¶РµС‚\x20РїСЂРѕС‚РёРІРѕСЃС‚РѕСЏС‚СЊ\x20С‡Р°СЂР°Рј\x20СЃРјРµСЂС‚Рё\x20РЅРµРєСЂРѕРјР°РЅС‚РѕРІ\x2e"  ,
+    "Р’С‹\x20СЃРїРµС€РёС‚Рµ\x20РЅР°\x20С€СѓРј\x20СЃСЂР°Р¶РµРЅРёСЏ\x20Рё\x20РІРёРґРёС‚Рµ\x20СЃС‚Р°СЂРёРєР°\x2dРІР°СЂРІР°СЂР°\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20СЃ\x20С‚СЂСѓРґРѕРј\x20РѕС‚Р±РёРІР°РµС‚СЃСЏ\x20РѕС‚\x20РіРёРґСЂС‹\x2e\x20Р’\x20РЅР°РіСЂР°РґСѓ\x20Р·Р°\x20РїРѕРјРѕС‰СЊ\x20РІР°СЂРІР°СЂ\x20РґР°СЂРёС‚\x20РІР°Рј\x20РІРѕР»С€РµР±РЅС‹Р№\x20РєСѓР»РѕРЅ\x2e"  ,
+    "Р’\x20С…РёР¶РёРЅРµ\x20Сѓ\x20РґРѕСЂРѕРіРё\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20СЃР»РµРїСѓСЋ\x20СЃС‚Р°СЂСѓС…Сѓ\x2c\x20СѓРјРёСЂР°СЋС‰СѓСЋ\x20РІ\x20РїРѕР»РЅРѕРј\x20РѕРґРёРЅРѕС‡РµСЃС‚РІРµ\x2e\x20Р’С‹\x20РѕР±РµС‰Р°РµС‚Рµ\x20СѓСЃС‚СЂРѕРёС‚СЊ\x20РµР№\x20РґРѕСЃС‚РѕР№РЅС‹Рµ\x20РїРѕС…РѕСЂРѕРЅС‹\x2e\x20Р’\x20Р·РЅР°Рє\x20Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё\x20РѕРЅР°\x20РґР°СЂРёС‚\x20РІР°Рј\x20РІРѕР»С€РµР±РЅСѓСЋ\x20РїРѕРґРІРµСЃРєСѓ\x2e"  ,
+    "Р”РѕСЂРѕРіСѓ\x20РІР°Рј\x20РїСЂРµРіСЂР°Р¶РґР°РµС‚\x20РіРѕР»РµРј\x2c\x20РЅР°\x20С€РµРµ\x20РєРѕС‚РѕСЂРѕРіРѕ\x20СЃРІРµСЂРєР°РµС‚\x20РєСѓР»РѕРЅ\x2e\x20Р’С‹\x20РїРµСЂРµСЂРµР·Р°РµС‚Рµ\x20С€РЅСѓСЂРѕРє\x2c\x20Рё\x20РѕРЅ\x20РїР°РґР°РµС‚\x20РЅР°\x20Р·РµРјР»СЋ\x2e\x20Р“РѕР»РµРј\x20СЂР°СЃСЃС‹РїР°РµС‚СЃСЏ\x20Сѓ\x20РІР°СЃ\x20РЅР°\x20РіР»Р°Р·Р°С…\x2c\x20Р°\x20РєСѓР»РѕРЅ\x20РґРѕСЃС‚Р°РµС‚СЃСЏ\x20РІР°Рј\x2e"  ,
+    "РџРѕСЃР»Рµ\x20РєРѕСЂРѕС‚РєРѕР№\x20РѕР¶РµСЃС‚РѕС‡РµРЅРЅРѕР№\x20СЃС…РІР°С‚РєРё\x20СЃ\x20РЅРµРєСЂРѕРјР°РЅС‚РѕРј\x20Сѓ\x20РІР°СЃ\x20РІ\x20СЂСѓРєР°С…\x20РѕСЃС‚Р°РµС‚СЃСЏ\x20РµРіРѕ\x20РІРѕР»С€РµР±РЅС‹Р№\x20РєСѓР»РѕРЅ\x2e\x20Р—РЅР°РєРѕРјС‹Р№\x20С‡Р°СЂРѕРґРµР№\x20РѕР±СЉСЏСЃРЅСЏРµС‚\x20РІР°Рј\x2c\x20С‡С‚Рѕ\x20СЌС‚РѕС‚\x20РєСѓР»РѕРЅ\x20Р·Р°С‰РёС‰Р°РµС‚\x20РЅРµР¶РёС‚СЊ\x2c\x20СЃРѕСЃС‚РѕСЏС‰СѓСЋ\x20РІ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x2c\x20РѕС‚\x20СЃРІСЏС‚РѕРіРѕ\x20СЃР»РѕРІР°\x2e"  ,
+    "РќР°РІСЃС‚СЂРµС‡Сѓ\x20РІР°Рј\x20РїРѕРїР°РґР°РµС‚СЃСЏ\x20СЃС‚Р°СЂС‹Р№\x20РґСЂСѓРі\x2dС‡Р°СЂРѕРґРµР№\x2e\x20РћРЅ\x20РІСЂСѓС‡Р°РµС‚\x20РІР°Рј\x20РїРѕРґР°СЂРѕРє\x20\x2d\x20РІРѕР»С€РµР±РЅС‹Р№\x20Р¶РµР·Р»\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РґРµР»Р°РµС‚\x20РЅРµРІРѕР·РјРѕР¶РЅС‹Рј\x20РїСЂРёРјРµРЅРµРЅРёРµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20СЃРЅСЏС‚РёРµ\x20С‡Р°СЂ\x20РїСЂРѕС‚РёРІ\x20РІР°С€РёС…\x20СЃРѕСЂР°С‚РЅРёРєРѕРІ\x2e"  ,
+    "Р’С‹\x20СЃР»СѓС‡Р°Р№РЅРѕ\x20РІСЃС‚СЂРµС‡Р°РµС‚Рµ\x20Р·РЅР°РјРµРЅРёС‚РѕРіРѕ\x20СЃС‚СЂРµР»РєР°\x20Рё\x20РїСЂРµРґР»Р°РіР°РµС‚Рµ\x20РµРјСѓ\x20СЃС‹РіСЂР°С‚СЊ\x20РІ\x20РєРѕСЃС‚Рё\x2e\x20РћРЅ\x20СЃРѕРіР»Р°С€Р°РµС‚СЃСЏ\x20Рё\x20СЃС‚Р°РІРёС‚\x20СЃРІРѕР№\x20Р»СѓРє\x20РїСЂРѕС‚РёРІ\x20РІР°С€РµРіРѕ\x20РєРѕРЅСЏ\x2e\x20Р’С‹\x20РІС‹РёРіСЂС‹РІР°РµС‚Рµ\x2e"  ,
+    "РўРѕСЂРіРѕРІРµС†\x20РёР·\x20РґР°Р»РµРєРёС…\x20Р·РµРјРµР»СЊ\x20РїСЂРµРґР»Р°РіР°РµС‚\x20РІР°Рј\x20РЅРѕРІРµР№С€РµРµ\x20РёР·РѕР±СЂРµС‚РµРЅРёРµ\x20СЃРІРѕРµРіРѕ\x20РЅР°СЂРѕРґР°\x20РІ\x20РѕР±РјРµРЅ\x20РЅР°\x20СЃСЉРµСЃС‚РЅС‹Рµ\x20РїСЂРёРїР°СЃС‹\x2e\x20Р­С‚Р°\x20С€С‚СѓРєР°\x2c\x20Р±Р»Р°РіРѕРґР°СЂСЏ\x20РєРѕС‚РѕСЂРѕР№\x20СѓРґР°Р»РµРЅРЅС‹Рµ\x20РїСЂРµРґРјРµС‚С‹\x20РєР°Р¶СѓС‚СЃСЏ\x20Р±Р»РёР¶Рµ\x2c\x20РЅР°Р·С‹РІР°РµС‚СЃСЏ\x20С‚РµР»РµСЃРєРѕРїРѕРј\x2e"  ,
+    "Р’С‹\x20РїРѕРјРѕРіР°РµС‚Рµ\x20РґРёРїР»РѕРјР°С‚Сѓ\x20РїРѕС‡РёРЅРёС‚СЊ\x20СЃР»РѕРјР°РЅРЅСѓСЋ\x20РѕСЃСЊ\x20РІ\x20РµРіРѕ\x20СЌРєРёРїР°Р¶Рµ\x2c\x20Рё\x20РІ\x20Р·РЅР°Рє\x20Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё\x20РѕРЅ\x20РґР°СЂРёС‚\x20РІР°Рј\x20РїРµСЂРѕ\x2e\x20РћРЅ\x20РіРѕРІРѕСЂРёС‚\x2c\x20С‡С‚Рѕ\x20СЌС‚Рѕ\x20РїРµСЂРѕ\x20Р·Р°СЃС‚Р°РІР»СЏРµС‚\x20Р»СЋРґРµР№\x20СЃРјРѕС‚СЂРµС‚СЊ\x20РЅР°\x20РІРµС‰Рё\x20РіР»Р°Р·Р°РјРё\x20РµРіРѕ\x20РѕР±Р»Р°РґР°С‚РµР»СЏ\x2e"  ,
+    "Р’С‹\x20РІРёРґРёС‚Рµ\x20С‡Р°СЂРѕРґРµСЏ\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20СѓРґРёСЂР°РµС‚\x20РѕС‚\x20РіСЂРёС„РѕРЅР°\x2e\x20Р’РѕС‚\x20РѕРЅ\x20СЂР°СЃРїР°С…РЅСѓР»\x20РїРѕСЂС‚Р°Р»\x20Рё\x20СЂРёРЅСѓР»СЃСЏ\x20РІРЅСѓС‚СЂСЊ\x2c\x20РЅРѕ\x20РїСЂРё\x20СЌС‚РѕРј\x20Р·Р°С†РµРїРёР»СЃСЏ\x20С€Р»СЏРїРѕР№\x2c\x20Рё\x20РѕРЅР°\x20СѓРїР°Р»Р°\x20РѕРЅР°\x20РЅР°\x20Р·РµРјР»СЋ\x2e\x20Р’С‹\x20РїРѕРґРЅРёРјР°РµС‚Рµ\x20С€Р»СЏРїСѓ\x2c\x20РѕС‚СЂСЏС…РёРІР°РµС‚Рµ\x20РµРµ\x20РѕС‚\x20РїС‹Р»Рё\x20Рё\x20РѕСЃС‚Р°РІР»СЏРµС‚Рµ\x20СЃРµР±Рµ\x2e"  ,
+    "Р’С‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20РґРµСЂРµРІРѕ\x2c\x20РїРѕС…РѕР¶РµРµ\x20РЅР°\x20С‡РµСЂРЅРѕРєРЅРёР¶РЅРёРєР°\x20РљР°СЂРЅРѕС‚Р°\x2e\x20РќР°\x20РѕРґРЅРѕР№\x20РёР·\x20РµРіРѕ\x20РІРµС‚РѕРє\x20СЃРІРµСЂРєР°РµС‚\x20РєРѕР»СЊС†Рѕ\x2e\x20Р’С‹\x20РІСЃРµ\x20СЂР°РІРЅРѕ\x20РЅРёС‡РµРј\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РµРјСѓ\x20РїРѕРјРѕС‡СЊ\x2c\x20Рё\x20РїРѕСЌС‚РѕРјСѓ\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20РєРѕР»СЊС†Рѕ\x20СЃРµР±Рµ\x2e"  ,
+    "Р’Р°С€Рµ\x20РІРЅРёРјР°РЅРёРµ\x20РїСЂРёРІР»РµРєР°РµС‚\x20РїРѕРІРѕР·РєР°\x20СЃ\x20Р±РѕРµРїСЂРёРїР°СЃР°РјРё\x2c\x20СЃС‚РѕСЏС‰Р°СЏ\x20РїРѕСЃСЂРµРґРё\x20РїРѕР»СЏ\x2c\x20РіРґРµ\x20РєРѕРіРґР°\x2dС‚Рѕ\x20РіСЂРµРјРµР»Р°\x20Р±РёС‚РІР°\x2e\x20РЈР±РµРґРёРІС€РёСЃСЊ\x2c\x20С‡С‚Рѕ\x20РѕРЅР°\x20РІ\x20С…РѕСЂРѕС€РµРј\x20СЃРѕСЃС‚РѕСЏРЅРёРё\x2c\x20РІС‹\x20РїСЂРёСЃРѕРµРґРёРЅСЏРµС‚Рµ\x20РµРµ\x20Рє\x20СЃРІРѕРµРјСѓ\x20РѕР±РѕР·Сѓ\x2e"  ,
+    "Р’Р°С€Р°\x20РЅР°Р»РѕРіРѕРІР°СЏ\x20РґРµРєР»Р°СЂР°С†РёСЏ\x20РїСЂРµРІС‹СЃРёР»Р°\x20РїСЂРёРґРµР»С‹\x2e\x20РњС‹С‚Р°СЂСЊ\x20СЃР¶Р°Р»РёР»СЃСЏ\x20РЅР°Рґ\x20РІР°РјРё\x20Рё\x20СЃРѕРіР»Р°СЃРёР»СЃСЏ\x20РµР¶РµРґРЅРµРІРЅРѕ\x20РїРѕР»СѓС‡Р°С‚СЊ\x20РѕС‚\x20РІР°СЃ\x20РІСЃРµРіРѕ\x20РїРѕ\x20\x32\x35\x30\x20Р·РѕР»РѕС‚С‹С…\x2e"  ,
+    "Р’С‹\x20РІСЃРєСЂС‹Р»Рё\x20РјРѕРіРёР»Сѓ\x20РЎРёРЅС„РёР»РёСЏ\x20Р“Р°СЂРґРѕР»Р°РґР°\x2c\x20Р·РЅР°РјРµРЅРёС‚РѕРіРѕ\x20С‡РµСЂРЅРѕРєРЅРёР¶РЅРёРєР°\x2c\x20Рё\x20РЅР°С…РѕРґРёС‚Рµ\x20РІ\x20РЅРµР№\x20РјР°СЃРєСѓ\x2e\x20РќР°РґРµРІ\x20РµРµ\x2c\x20РІР°С€Рµ\x20Р»РёС†Рѕ\x20РёСЃРєР°Р¶Р°РµС‚\x20РіСЂРёРјР°СЃР°\x20СѓР¶Р°СЃР°\x2e\x20Р’РёРґРёРјРѕ\x20РІР°Рј\x20РґРѕСЃС‚Р°Р»СЃСЏ\x20РјР°СЃРєР°\x20Р“СЂРѕРјР»Р°РєР°\x20Р“СЂРёРЅР°\x2e\x20РўРµРїРµСЂСЊ\x20РѕС‚\x20РЅРµРµ\x20РЅРµ\x20РёР·Р±Р°РІРёС‚СЊСЃСЏ\x21"  ,
+    "Р’С‹\x20РїРѕСЃРµС‰Р°РµС‚Рµ\x20Р°Р»С…РёРјРёРєР°\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РїСЂРё\x20РІРёРґРµ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x20РЅРµР·Р°РјРµРґР»РёС‚РµР»СЊРЅРѕ\x20РїСЂРёР·РЅР°РµС‚\x20РІР°СЃ\x20РґРѕСЃС‚РѕР№РЅРµР№С€РёРј\x20РёР·\x20РґРѕСЃС‚РѕР№РЅС‹С…\x2e\x20РќРѕРІС‹Р№\x20РїРѕРґРґР°РЅРЅС‹Р№\x20РґР°СЂРёС‚\x20РІР°Рј\x20Р±РµР·РґРѕРЅРЅСѓСЋ\x20СЃСѓРјРєСѓ\x20СЃРµСЂС‹\x2c\x20РєРѕС‚РѕСЂР°СЏ\x20РІР°Рј\x20РѕС‡РµРЅСЊ\x20РґР°Р¶Рµ\x20РїСЂРёРіРѕРґРёС‚СЃСЏ\x2e"  ,
+    "Р’С‹\x20РґРµР»Р°РµС‚Рµ\x20РєРѕСЂРѕС‚РєРёР№\x20РїСЂРёРІР°Р»\x20РІ\x20Р±Р°С€РЅРµ\x20С‡Р°СЂРѕРґРµСЏ\x2c\x20РїРѕРєРёРЅСѓС‚РѕР№\x20С…РѕР·СЏРёРЅРѕРј\x2c\x20Рё\x20РЅР°С…РѕРґРёС‚Рµ\x20РІРѕР»С€РµР±РЅС‹Р№\x20СЃРѕСЃСѓРґ\x20СЃ\x20СЂС‚СѓС‚СЊСЋ\x2c\x20СЃРѕРґРµСЂР¶РёРјРѕРµ\x20РєРѕС‚РѕСЂРѕРіРѕ\x20РЅРёРєРѕРіРґР°\x20РЅРµ\x20РєРѕРЅС‡Р°РµС‚СЃСЏ\x2e\x20Р­С‚Рѕ\x20Р¶Рµ\x20РЅР°СЃС‚РѕСЏС‰РµРµ\x20СЃРѕРєСЂРѕРІРёС‰Рµ\x21"  ,
+    "РџРѕСЃР»Рµ\x20РєРѕСЂРѕС‚РєРѕРіРѕ\x20Р»РёРІРЅСЏ\x20РЅР°\x20РЅРµР±Рµ\x20РїРѕСЏРІР»СЏРµС‚СЃСЏ\x20СЂР°РґСѓРіР°\x2e\x20Р—Р°РјРµС‚РёРІ\x20РјРµСЃС‚Рѕ\x2c\x20РіРґРµ\x20РѕРЅР°\x20СѓРїРёСЂР°РµС‚СЃСЏ\x20РІ\x20Р·РµРјР»СЋ\x2c\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20С‚Р°Рј\x20РіРѕСЂС€РѕРє\x20Р·РѕР»РѕС‚Р°\x2e\x20Р•РіРѕ\x20С…РѕР·СЏРёРЅ\x2c\x20РјР°Р»РµРЅСЊРєРёР№\x20СЌР»СЊС„\x2c\x20РїСЂРµРґР»Р°РіР°РµС‚\x20РІР·Р°РјРµРЅ\x20Р±РµР·РґРѕРЅРЅСѓСЋ\x20СЃСѓРјСѓ\x20СЃР°РјРѕС†РІРµС‚РѕРІ\x2e"  ,
+    "Р’С‹\x20РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚РµСЃСЊ\x20РЅР°\x20РѕС‚РґС‹С…\x20Рё\x20СЂР°Р·РІРѕРґРёС‚Рµ\x20РєРѕСЃС‚РµСЂ\x2e\x20РќРµРїРѕРґР°Р»РµРєСѓ\x20Р»РµР¶РёС‚\x20РєСѓС‡Р°\x20РґСЂРѕРІ\x2e\x20Р’С‹\x20Р±РµСЂРµС‚Рµ\x20РѕРґРЅРѕ\x20РїРѕР»РµРЅРѕ\x20Р·Р°\x20РґСЂСѓРіРёРј\x2c\x20РЅРѕ\x20РєСѓС‡Р°\x20РЅРµ\x20СѓРјРµРЅСЊС€Р°РµС‚СЃСЏ\x2e\x20Р’С‹\x20СЃ\x20СЂР°РґРѕСЃС‚СЊСЋ\x20РїРѕРЅРёРјР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РґСЂРѕРІР°\x20Р·Р°С‡Р°СЂРѕРІР°РЅС‹\x2c\x20Рё\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20РёС…\x20СЃРµР±Рµ\x2e"  ,
+    "Р’С‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РєСѓР·РЅРёС†Сѓ\x20РіРѕР±Р»РёРЅРѕРІ\x2c\x20РіРґРµ\x20РѕРЅРё\x20РєСѓСЋС‚\x20РѕСЂСѓР¶РёРµ\x2e\x20РЎ\x20РІРѕРёРЅСЃС‚РІРµРЅРЅС‹Рј\x20РєР»РёС‡РµРј\x2c\x20РІР°С€Рё\x20РІРѕРёРЅС‹\x20РЅР°РїР°РґР°СЋС‚\x20РЅР°\x20РёС…\x20Р»Р°РіРµСЂСЊ\x20Рё\x20СѓР±РёРІР°СЋС‚\x20РІСЃРµС…\x20РІСЂР°РіРѕРІ\x2e\x20РћСЃРјРѕС‚СЂРµРІ\x20С‚СЂРѕС„РµРё\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x20РІРѕР»С€РµР±РЅСѓСЋ\x20РІР°РіРѕРЅРµС‚РєСѓ\x20СЃ\x20СЂСѓРґРѕР№\x2e"  ,
+    "РЈРєСЂС‹РІС€РёСЃСЊ\x20РѕС‚\x20Р±СѓСЂРё\x20РІ\x20РЅРµР±РѕР»СЊС€РѕР№\x20РїРµС‰РµСЂРєРµ\x2c\x20РІС‹\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20РІ\x20СѓРіР»Сѓ\x20РґСЂСѓР·Сѓ\x20РєСЂРёСЃС‚Р°Р»Р»РѕРІ\x2e\x20Р’С‹\x20РѕС‚Р»Р°РјС‹РІР°РµС‚Рµ\x20РєСѓСЃРѕРє\x2c\x20Р°\x20РЅР°\x20РµРіРѕ\x20РјРµСЃС‚Рµ\x20РІС‹СЂР°СЃС‚Р°РµС‚\x20РЅРѕРІС‹Р№\x20РєСЂРёСЃС‚Р°Р»Р»\x2e\x20Р’С‹\x20Р·Р°Р±РµСЂР°РµС‚Рµ\x20СЌС‚Рѕ\x20СЃРѕРєСЂРѕРІРёС‰Рµ\x20СЃ\x20СЃРѕР±РѕР№\x2e"  ,
+    "РќРµР±РѕР»СЊС€РѕР№\x20РѕС‚СЂСЏРґ\x20РѕСЂРєРѕРІ\x20РЅР°РїР°РґР°РµС‚\x20РЅР°\x20РІР°С€Сѓ\x20Р°СЂРјРёСЋ\x2e\x20Р’С‹\x20Р±РµР·\x20С‚СЂСѓРґР°\x20РѕС‚Р±РёРІР°РµС‚Рµ\x20Р°С‚Р°РєСѓ\x2e\x20РќР°\x20С‚РµР»Рµ\x20РѕРґРЅРѕРіРѕ\x20РёР·\x20РЅР°РїР°РґР°РІС€РёС…\x20РІС‹\x20РІРёРґРёС‚Рµ\x20Р±Р»РµСЃС‚СЏС‰РёР№\x20С€Р»РµРј\x20СЃ\x20С€РёРїР°РјРё\x2e"  ,
+    "Р’С‹\x20РїСЂРёР±Р»РёР¶Р°РµС‚РµСЃСЊ\x20Рє\x20РјРѕСЃС‚Сѓ\x20С‡РµСЂРµР·\x20РіР»СѓР±РѕРєРёР№\x20РѕРІСЂР°Рі\x2e\x20РќРµРѕР¶РёРґР°РЅРЅРѕ\x20РёР·\x2dРїРѕРґ\x20РјРѕСЃС‚Р°\x20РїРѕСЏРІР»СЏРµС‚СЃСЏ\x20С‚СЂРѕР»Р»СЊ\x20Рё\x20С‚СЂРµР±СѓРµС‚\x20РїР»Р°С‚Сѓ\x20Р·Р°\x20РїСЂРѕС…РѕРґ\x2e\x20РџРѕСЃР»Рµ\x20РѕС‚РєР°Р·Р°\x2c\x20С‚СЂРѕР»Р»СЊ\x20РЅР°РїР°РґР°РµС‚\x20РЅР°\x20РІР°СЃ\x2e\x20РЈР±РёРІ\x20РµРіРѕ\x2c\x20РІС‹\x20Р·Р°Р±РёСЂР°РµС‚Рµ\x20СЃРµР±Рµ\x20РµРіРѕ\x20С€РёС‚\x20СЃ\x20С€РёРїР°РјРё\x2e"  ,
+    "Р’С‹\x20РїРµСЂРµСЃРµРєР°РµС‚Рµ\x20РїРµСЂРµСЃРѕС…С€РµРµ\x20СЃРѕР»СЏРЅРѕРµ\x20РѕР·РµСЂРѕ\x2c\x20Рё\x20РІРґСЂСѓРі\x20СЃСЂРµРґРё\x20РѕР±Р»РѕРјРєРѕРІ\x20СЂР°РєСѓС€РµРє\x20Рё\x20РєСѓСЃРєРѕРІ\x20РєРѕСЂР°Р»Р»Р°\x20Р·Р°РјРµС‡Р°РµС‚Рµ\x20РІРµР»РёРєРѕР»РµРїРЅСѓСЋ\x20Р±РµР»СѓСЋ\x20Р¶РµРјС‡СѓР¶РёРЅСѓ\x2e"  ,
+    "РЎР»СѓС…Рё\x20РѕР±\x20РѕРіСЂРѕРјРЅРѕРј\x20РіСЂРёС„РѕРЅРµ\x2c\x20РЅР°РіРѕРЅСЏСЋС‰РµРј\x20СѓР¶Р°СЃ\x20РЅР°\x20РІСЃСЋ\x20РѕРєСЂСѓРіСѓ\x2c\x20РїСЂРёРІРѕРґСЏС‚\x20РІР°СЃ\x20РІ\x20РµРіРѕ\x20Р»РѕРіРѕРІРѕ\x2e\x20Р–РµСЃС‚РѕРєР°СЏ\x20СЃС…РІР°С‚РєР°\x20Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ\x20РІР°С€РµР№\x20РїРѕР±РµРґРѕР№\x2c\x20Рё\x20РІ\x20РѕРїСѓСЃС‚РµРІС€РµРј\x20РіРЅРµР·РґРµ\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20С‡РµСЂРЅСѓСЋ\x20Р¶РµРјС‡СѓР¶РёРЅСѓ\x2e"  ,
     ""  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x32\x2e"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x33\x2e"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x34\x2e"  ,
     "\x45\x52\x52\x4f\x52\x20\x3a\x20\x41\x72\x74\x69\x66\x61\x63\x74\x20\x65\x76\x65\x6e\x74\x20\x38\x35\x2e"  ,
-    "Вы\x20нашли\x20резной\x20ларец\x2c\x20в\x20котором\x20хранился\x20древний\x20свиток\x2e\x20Руны\x20на\x20ларце\x20очень\x20древние\x2e\x20Развернув\x20свиток\x2c\x20вы\x20почувствовали\x20пульсацию\x20магических\x20сил\x2e"  ,
-    "Один\x20из\x20ваших\x20воинов\x20подобрал\x20с\x20земли\x20оторванную\x20руку\x2e\x20Несмотря\x20на\x20то\x2c\x20что\x20рука\x20была\x20оторвана\x20от\x20тела\x2c\x20она\x20все\x20еще\x20продолжала\x20шевелиться\x2e\x20Ваши\x20воины\x20испытали\x20великое\x20отвращение\x20к\x20этому\x20предмету\x2c\x20но\x20вы\x20не\x20смогли\x20заставить\x20себя\x20выкинуть\x20ее\x2e"  ,
-    "Вы\x20обнаружили\x20указатель\x2c\x20на\x20котором\x20было\x20написано\x2c\x20что\x20здесь\x20покоится\x20великий\x20Андуран\x2e\x20Надпись\x20молвила\x2c\x20что\x20преклонивший\x20чело\x20перед\x20могилой\x20будет\x20вознагражден\x2e\x20Вы\x20поступили\x2c\x20как\x20того\x20требовалось\x2c\x20и\x20получили\x20в\x20награду\x20волшебный\x20доспех\x2e"  ,
-    "Добрая\x20колдунья\x20сочла\x2c\x20что\x20ваша\x20армия\x20плохо\x20защищена\x20и\x20даровала\x20вам\x20свою\x20волшебную\x20брошь\x2e"  ,
-    "Вы\x20купили\x20у\x20бедняка\x20ящик\x20со\x20всяким\x20барахлом\x20и\x20на\x20свое\x20удивление\x20нашли\x20в\x20нем\x20три\x20вещи\x20из\x20боевого\x20одеяния\x20Андурана\x21\x20Вот\x20это\x20удача\x21"  ,
-    "Вы\x20проходили\x20мимо\x20труппы\x20бродячих\x20актеров\x2e\x20Они\x20попросили\x20вас\x20станцевать\x20рума\x2dбуту\x2e\x20Вы\x20исполнили\x20несколько\x20произвольных\x20движений\x2c\x20и\x20они\x20за\x20храбрость\x20даровали\x20вам\x20кристальный\x20шар\x2e"  ,
-    "Вы\x20попали\x20на\x20недавно\x20сгоревшую\x20поляну\x2e\x20Посреди\x20поляны\x2c\x20на\x20камне\x20стоял\x20сосуд\x2c\x20в\x20котором\x20сидел\x20огненный\x20элементал\x2e\x20Вы\x20решили\x20взять\x20с\x20собой\x20эту\x20диковинную\x20находку\x2e"  ,
-    "Неожиданно\x20вас\x20сковал\x20пронзительный\x20холод\x2e\x20От\x20неожиданного\x20шока\x20вы\x20упали\x20с\x20коня\x20на\x20землю\x2e\x20Мимо\x20вас\x20промчался\x20огромный\x20ледяной\x20гигант\x2e\x20В\x20спешке\x20он\x20обронил\x20одну\x20ценную\x20вещь\x21"  ,
-    "Вы\x20заметили\x20сверкающий\x20объект\x20невдалеке\x2e\x20Вы\x20послали\x20одного\x20из\x20ваших\x20воинов\x20посмотреть\x2c\x20что\x20это\x20там\x2e\x20Он\x20вернулся\x20с\x20золотым\x20шлемом\x20в\x20руках\x2c\x20который\x20оказался\x20ни\x20чем\x20иным\x2c\x20как\x20шлемом\x20легендарного\x20Андурана\x21"  ,
-    "Вы\x20стали\x20свидетелем\x20поединка\x2c\x20в\x20котором\x20паладин\x20был\x20смертельно\x20ранен\x20отрядом\x20зомби\x2e\x20Он\x20попросил\x20вас\x20взять\x20его\x20молот\x20и\x20завершить\x20начатое\x20им\x20дело\x2e\x20Убив\x20зомби\x20вы\x20повесили\x20молот\x20на\x20свой\x20пояс\x20и\x20удалились\x2e"  ,
-    "Минуя\x20небольшой\x20холм\x2c\x20вы\x20увидели\x2c\x20как\x20маленькая\x20фея\x20тащит\x20огромный\x20скипетр\x2e\x20Улыбнувшись\x2c\x20вы\x20спросили\x2c\x20не\x20нужна\x20ли\x20ей\x20помощь\x2e\x20Фея\x20обиженно\x20спросила\x2c\x20мол\x2c\x20думаешь\x2c\x20это\x20смешно\x3f\x20Вспорхнула\x20и\x20улетела\x2c\x20а\x20скипетр\x20остался\x20вам\x2e"  ,
-    "Старый\x20моряк\x20рассказал\x20вам\x2c\x20что\x20в\x20былые\x20времена\x2c\x20на\x20его\x20ботике\x20стояла\x20мачта\x2c\x20приносящая\x20ему\x20удачу\x2e\x20Он\x20бал\x20вам\x20схему\x2c\x20где\x20ее\x20можно\x20будет\x20найти\x2e\x20Через\x20несколько\x20часов\x20поиска\x2c\x20вы\x20нашли\x20мачту\x20в\x20старом\x20доке\x2e"  ,
-    "На\x20вас\x20налетел\x20торопыга\x2dкрестьянин\x2e\x20Он\x20хотел\x20убежать\x2c\x20но\x20вы\x20остановили\x20его\x2e\x20Извинившись\x2c\x20крестьянин\x20вручил\x20вам\x20необычную\x20сферу\x2e\x20Едва\x20вы\x20дотронулись\x20до\x20нее\x2c\x20как\x20почувствовали\x2c\x20что\x20сфера\x20втягивает\x20в\x20себя\x20магию\x2e\x2e\x2e"  ,
-    "Ваши\x20солдаты\x20нашли\x20необычную\x20вещь\x20и\x20решили\x20принести\x20ее\x20вам\x2e\x20Вы\x20отчистили\x20ее\x20от\x20грязи\x20и\x20смогли\x20прочитать\x20на\x20ней\x20необычные\x20слова\x3a\x20\x22Ум\x20\x2d\x20лучшая\x20сила\x2c\x20а\x20магия\x20сильнее\x20грубой\x20силы\x2e\x20Помни\x20мои\x20слова\x2c\x20и\x20ты\x20всегда\x20будешь\x20побеждать\x2e\x22"  ,
-    "Отставной\x20капитан\x20городской\x20стражи\x20узнал\x20о\x20вашем\x20походе\x20и\x20даровал\x20вам\x20свой\x20меч\x2c\x20сослуживший\x20ему\x20добрую\x20службу\x20в\x20былые\x20времена\x2e"  ,
-    "Тролль\x20остановил\x20вас\x2c\x20сказав\x3a\x20\x22Плати\x20мне\x20\x35\x30\x30\x30\x20золотых\x20или\x20я\x20убью\x20тебя\x20мечом\x20Анудрана\x21\x22\x20Вы\x20отказались\x20платить\x2e\x20Тролль\x20схватился\x20за\x20клинок\x20меча\x2c\x20взвыл\x20от\x20боли\x20и\x20бросив\x20меч\x20убежал\x2e\x20Хорошо\x2c\x20что\x20он\x20был\x20настолько\x20глуп\x2c\x20что\x20не\x20знал\x2c\x20как\x20правильно\x20держать\x20острые\x20предметы\x2e"  ,
-    "В\x20грязи\x20вы\x20подобрали\x20старую\x20лопату\x2e\x20Присмотревшись\x2c\x20вы\x20поняли\x2c\x20что\x20вам\x20посчастливилось\x20найти\x20зачарованную\x20лопату\x20грабителей\x20могил\x2e"  };
+    "Р’С‹\x20РЅР°С€Р»Рё\x20СЂРµР·РЅРѕР№\x20Р»Р°СЂРµС†\x2c\x20РІ\x20РєРѕС‚РѕСЂРѕРј\x20С…СЂР°РЅРёР»СЃСЏ\x20РґСЂРµРІРЅРёР№\x20СЃРІРёС‚РѕРє\x2e\x20Р СѓРЅС‹\x20РЅР°\x20Р»Р°СЂС†Рµ\x20РѕС‡РµРЅСЊ\x20РґСЂРµРІРЅРёРµ\x2e\x20Р Р°Р·РІРµСЂРЅСѓРІ\x20СЃРІРёС‚РѕРє\x2c\x20РІС‹\x20РїРѕС‡СѓРІСЃС‚РІРѕРІР°Р»Рё\x20РїСѓР»СЊСЃР°С†РёСЋ\x20РјР°РіРёС‡РµСЃРєРёС…\x20СЃРёР»\x2e"  ,
+    "РћРґРёРЅ\x20РёР·\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РїРѕРґРѕР±СЂР°Р»\x20СЃ\x20Р·РµРјР»Рё\x20РѕС‚РѕСЂРІР°РЅРЅСѓСЋ\x20СЂСѓРєСѓ\x2e\x20РќРµСЃРјРѕС‚СЂСЏ\x20РЅР°\x20С‚Рѕ\x2c\x20С‡С‚Рѕ\x20СЂСѓРєР°\x20Р±С‹Р»Р°\x20РѕС‚РѕСЂРІР°РЅР°\x20РѕС‚\x20С‚РµР»Р°\x2c\x20РѕРЅР°\x20РІСЃРµ\x20РµС‰Рµ\x20РїСЂРѕРґРѕР»Р¶Р°Р»Р°\x20С€РµРІРµР»РёС‚СЊСЃСЏ\x2e\x20Р’Р°С€Рё\x20РІРѕРёРЅС‹\x20РёСЃРїС‹С‚Р°Р»Рё\x20РІРµР»РёРєРѕРµ\x20РѕС‚РІСЂР°С‰РµРЅРёРµ\x20Рє\x20СЌС‚РѕРјСѓ\x20РїСЂРµРґРјРµС‚Сѓ\x2c\x20РЅРѕ\x20РІС‹\x20РЅРµ\x20СЃРјРѕРіР»Рё\x20Р·Р°СЃС‚Р°РІРёС‚СЊ\x20СЃРµР±СЏ\x20РІС‹РєРёРЅСѓС‚СЊ\x20РµРµ\x2e"  ,
+    "Р’С‹\x20РѕР±РЅР°СЂСѓР¶РёР»Рё\x20СѓРєР°Р·Р°С‚РµР»СЊ\x2c\x20РЅР°\x20РєРѕС‚РѕСЂРѕРј\x20Р±С‹Р»Рѕ\x20РЅР°РїРёСЃР°РЅРѕ\x2c\x20С‡С‚Рѕ\x20Р·РґРµСЃСЊ\x20РїРѕРєРѕРёС‚СЃСЏ\x20РІРµР»РёРєРёР№\x20РђРЅРґСѓСЂР°РЅ\x2e\x20РќР°РґРїРёСЃСЊ\x20РјРѕР»РІРёР»Р°\x2c\x20С‡С‚Рѕ\x20РїСЂРµРєР»РѕРЅРёРІС€РёР№\x20С‡РµР»Рѕ\x20РїРµСЂРµРґ\x20РјРѕРіРёР»РѕР№\x20Р±СѓРґРµС‚\x20РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅ\x2e\x20Р’С‹\x20РїРѕСЃС‚СѓРїРёР»Рё\x2c\x20РєР°Рє\x20С‚РѕРіРѕ\x20С‚СЂРµР±РѕРІР°Р»РѕСЃСЊ\x2c\x20Рё\x20РїРѕР»СѓС‡РёР»Рё\x20РІ\x20РЅР°РіСЂР°РґСѓ\x20РІРѕР»С€РµР±РЅС‹Р№\x20РґРѕСЃРїРµС…\x2e"  ,
+    "Р”РѕР±СЂР°СЏ\x20РєРѕР»РґСѓРЅСЊСЏ\x20СЃРѕС‡Р»Р°\x2c\x20С‡С‚Рѕ\x20РІР°С€Р°\x20Р°СЂРјРёСЏ\x20РїР»РѕС…Рѕ\x20Р·Р°С‰РёС‰РµРЅР°\x20Рё\x20РґР°СЂРѕРІР°Р»Р°\x20РІР°Рј\x20СЃРІРѕСЋ\x20РІРѕР»С€РµР±РЅСѓСЋ\x20Р±СЂРѕС€СЊ\x2e"  ,
+    "Р’С‹\x20РєСѓРїРёР»Рё\x20Сѓ\x20Р±РµРґРЅСЏРєР°\x20СЏС‰РёРє\x20СЃРѕ\x20РІСЃСЏРєРёРј\x20Р±Р°СЂР°С…Р»РѕРј\x20Рё\x20РЅР°\x20СЃРІРѕРµ\x20СѓРґРёРІР»РµРЅРёРµ\x20РЅР°С€Р»Рё\x20РІ\x20РЅРµРј\x20С‚СЂРё\x20РІРµС‰Рё\x20РёР·\x20Р±РѕРµРІРѕРіРѕ\x20РѕРґРµСЏРЅРёСЏ\x20РђРЅРґСѓСЂР°РЅР°\x21\x20Р’РѕС‚\x20СЌС‚Рѕ\x20СѓРґР°С‡Р°\x21"  ,
+    "Р’С‹\x20РїСЂРѕС…РѕРґРёР»Рё\x20РјРёРјРѕ\x20С‚СЂСѓРїРїС‹\x20Р±СЂРѕРґСЏС‡РёС…\x20Р°РєС‚РµСЂРѕРІ\x2e\x20РћРЅРё\x20РїРѕРїСЂРѕСЃРёР»Рё\x20РІР°СЃ\x20СЃС‚Р°РЅС†РµРІР°С‚СЊ\x20СЂСѓРјР°\x2dР±СѓС‚Сѓ\x2e\x20Р’С‹\x20РёСЃРїРѕР»РЅРёР»Рё\x20РЅРµСЃРєРѕР»СЊРєРѕ\x20РїСЂРѕРёР·РІРѕР»СЊРЅС‹С…\x20РґРІРёР¶РµРЅРёР№\x2c\x20Рё\x20РѕРЅРё\x20Р·Р°\x20С…СЂР°Р±СЂРѕСЃС‚СЊ\x20РґР°СЂРѕРІР°Р»Рё\x20РІР°Рј\x20РєСЂРёСЃС‚Р°Р»СЊРЅС‹Р№\x20С€Р°СЂ\x2e"  ,
+    "Р’С‹\x20РїРѕРїР°Р»Рё\x20РЅР°\x20РЅРµРґР°РІРЅРѕ\x20СЃРіРѕСЂРµРІС€СѓСЋ\x20РїРѕР»СЏРЅСѓ\x2e\x20РџРѕСЃСЂРµРґРё\x20РїРѕР»СЏРЅС‹\x2c\x20РЅР°\x20РєР°РјРЅРµ\x20СЃС‚РѕСЏР»\x20СЃРѕСЃСѓРґ\x2c\x20РІ\x20РєРѕС‚РѕСЂРѕРј\x20СЃРёРґРµР»\x20РѕРіРЅРµРЅРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»\x2e\x20Р’С‹\x20СЂРµС€РёР»Рё\x20РІР·СЏС‚СЊ\x20СЃ\x20СЃРѕР±РѕР№\x20СЌС‚Сѓ\x20РґРёРєРѕРІРёРЅРЅСѓСЋ\x20РЅР°С…РѕРґРєСѓ\x2e"  ,
+    "РќРµРѕР¶РёРґР°РЅРЅРѕ\x20РІР°СЃ\x20СЃРєРѕРІР°Р»\x20РїСЂРѕРЅР·РёС‚РµР»СЊРЅС‹Р№\x20С…РѕР»РѕРґ\x2e\x20РћС‚\x20РЅРµРѕР¶РёРґР°РЅРЅРѕРіРѕ\x20С€РѕРєР°\x20РІС‹\x20СѓРїР°Р»Рё\x20СЃ\x20РєРѕРЅСЏ\x20РЅР°\x20Р·РµРјР»СЋ\x2e\x20РњРёРјРѕ\x20РІР°СЃ\x20РїСЂРѕРјС‡Р°Р»СЃСЏ\x20РѕРіСЂРѕРјРЅС‹Р№\x20Р»РµРґСЏРЅРѕР№\x20РіРёРіР°РЅС‚\x2e\x20Р’\x20СЃРїРµС€РєРµ\x20РѕРЅ\x20РѕР±СЂРѕРЅРёР»\x20РѕРґРЅСѓ\x20С†РµРЅРЅСѓСЋ\x20РІРµС‰СЊ\x21"  ,
+    "Р’С‹\x20Р·Р°РјРµС‚РёР»Рё\x20СЃРІРµСЂРєР°СЋС‰РёР№\x20РѕР±СЉРµРєС‚\x20РЅРµРІРґР°Р»РµРєРµ\x2e\x20Р’С‹\x20РїРѕСЃР»Р°Р»Рё\x20РѕРґРЅРѕРіРѕ\x20РёР·\x20РІР°С€РёС…\x20РІРѕРёРЅРѕРІ\x20РїРѕСЃРјРѕС‚СЂРµС‚СЊ\x2c\x20С‡С‚Рѕ\x20СЌС‚Рѕ\x20С‚Р°Рј\x2e\x20РћРЅ\x20РІРµСЂРЅСѓР»СЃСЏ\x20СЃ\x20Р·РѕР»РѕС‚С‹Рј\x20С€Р»РµРјРѕРј\x20РІ\x20СЂСѓРєР°С…\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РѕРєР°Р·Р°Р»СЃСЏ\x20РЅРё\x20С‡РµРј\x20РёРЅС‹Рј\x2c\x20РєР°Рє\x20С€Р»РµРјРѕРј\x20Р»РµРіРµРЅРґР°СЂРЅРѕРіРѕ\x20РђРЅРґСѓСЂР°РЅР°\x21"  ,
+    "Р’С‹\x20СЃС‚Р°Р»Рё\x20СЃРІРёРґРµС‚РµР»РµРј\x20РїРѕРµРґРёРЅРєР°\x2c\x20РІ\x20РєРѕС‚РѕСЂРѕРј\x20РїР°Р»Р°РґРёРЅ\x20Р±С‹Р»\x20СЃРјРµСЂС‚РµР»СЊРЅРѕ\x20СЂР°РЅРµРЅ\x20РѕС‚СЂСЏРґРѕРј\x20Р·РѕРјР±Рё\x2e\x20РћРЅ\x20РїРѕРїСЂРѕСЃРёР»\x20РІР°СЃ\x20РІР·СЏС‚СЊ\x20РµРіРѕ\x20РјРѕР»РѕС‚\x20Рё\x20Р·Р°РІРµСЂС€РёС‚СЊ\x20РЅР°С‡Р°С‚РѕРµ\x20РёРј\x20РґРµР»Рѕ\x2e\x20РЈР±РёРІ\x20Р·РѕРјР±Рё\x20РІС‹\x20РїРѕРІРµСЃРёР»Рё\x20РјРѕР»РѕС‚\x20РЅР°\x20СЃРІРѕР№\x20РїРѕСЏСЃ\x20Рё\x20СѓРґР°Р»РёР»РёСЃСЊ\x2e"  ,
+    "РњРёРЅСѓСЏ\x20РЅРµР±РѕР»СЊС€РѕР№\x20С…РѕР»Рј\x2c\x20РІС‹\x20СѓРІРёРґРµР»Рё\x2c\x20РєР°Рє\x20РјР°Р»РµРЅСЊРєР°СЏ\x20С„РµСЏ\x20С‚Р°С‰РёС‚\x20РѕРіСЂРѕРјРЅС‹Р№\x20СЃРєРёРїРµС‚СЂ\x2e\x20РЈР»С‹Р±РЅСѓРІС€РёСЃСЊ\x2c\x20РІС‹\x20СЃРїСЂРѕСЃРёР»Рё\x2c\x20РЅРµ\x20РЅСѓР¶РЅР°\x20Р»Рё\x20РµР№\x20РїРѕРјРѕС‰СЊ\x2e\x20Р¤РµСЏ\x20РѕР±РёР¶РµРЅРЅРѕ\x20СЃРїСЂРѕСЃРёР»Р°\x2c\x20РјРѕР»\x2c\x20РґСѓРјР°РµС€СЊ\x2c\x20СЌС‚Рѕ\x20СЃРјРµС€РЅРѕ\x3f\x20Р’СЃРїРѕСЂС…РЅСѓР»Р°\x20Рё\x20СѓР»РµС‚РµР»Р°\x2c\x20Р°\x20СЃРєРёРїРµС‚СЂ\x20РѕСЃС‚Р°Р»СЃСЏ\x20РІР°Рј\x2e"  ,
+    "РЎС‚Р°СЂС‹Р№\x20РјРѕСЂСЏРє\x20СЂР°СЃСЃРєР°Р·Р°Р»\x20РІР°Рј\x2c\x20С‡С‚Рѕ\x20РІ\x20Р±С‹Р»С‹Рµ\x20РІСЂРµРјРµРЅР°\x2c\x20РЅР°\x20РµРіРѕ\x20Р±РѕС‚РёРєРµ\x20СЃС‚РѕСЏР»Р°\x20РјР°С‡С‚Р°\x2c\x20РїСЂРёРЅРѕСЃСЏС‰Р°СЏ\x20РµРјСѓ\x20СѓРґР°С‡Сѓ\x2e\x20РћРЅ\x20Р±Р°Р»\x20РІР°Рј\x20СЃС…РµРјСѓ\x2c\x20РіРґРµ\x20РµРµ\x20РјРѕР¶РЅРѕ\x20Р±СѓРґРµС‚\x20РЅР°Р№С‚Рё\x2e\x20Р§РµСЂРµР·\x20РЅРµСЃРєРѕР»СЊРєРѕ\x20С‡Р°СЃРѕРІ\x20РїРѕРёСЃРєР°\x2c\x20РІС‹\x20РЅР°С€Р»Рё\x20РјР°С‡С‚Сѓ\x20РІ\x20СЃС‚Р°СЂРѕРј\x20РґРѕРєРµ\x2e"  ,
+    "РќР°\x20РІР°СЃ\x20РЅР°Р»РµС‚РµР»\x20С‚РѕСЂРѕРїС‹РіР°\x2dРєСЂРµСЃС‚СЊСЏРЅРёРЅ\x2e\x20РћРЅ\x20С…РѕС‚РµР»\x20СѓР±РµР¶Р°С‚СЊ\x2c\x20РЅРѕ\x20РІС‹\x20РѕСЃС‚Р°РЅРѕРІРёР»Рё\x20РµРіРѕ\x2e\x20РР·РІРёРЅРёРІС€РёСЃСЊ\x2c\x20РєСЂРµСЃС‚СЊСЏРЅРёРЅ\x20РІСЂСѓС‡РёР»\x20РІР°Рј\x20РЅРµРѕР±С‹С‡РЅСѓСЋ\x20СЃС„РµСЂСѓ\x2e\x20Р•РґРІР°\x20РІС‹\x20РґРѕС‚СЂРѕРЅСѓР»РёСЃСЊ\x20РґРѕ\x20РЅРµРµ\x2c\x20РєР°Рє\x20РїРѕС‡СѓРІСЃС‚РІРѕРІР°Р»Рё\x2c\x20С‡С‚Рѕ\x20СЃС„РµСЂР°\x20РІС‚СЏРіРёРІР°РµС‚\x20РІ\x20СЃРµР±СЏ\x20РјР°РіРёСЋ\x2e\x2e\x2e"  ,
+    "Р’Р°С€Рё\x20СЃРѕР»РґР°С‚С‹\x20РЅР°С€Р»Рё\x20РЅРµРѕР±С‹С‡РЅСѓСЋ\x20РІРµС‰СЊ\x20Рё\x20СЂРµС€РёР»Рё\x20РїСЂРёРЅРµСЃС‚Рё\x20РµРµ\x20РІР°Рј\x2e\x20Р’С‹\x20РѕС‚С‡РёСЃС‚РёР»Рё\x20РµРµ\x20РѕС‚\x20РіСЂСЏР·Рё\x20Рё\x20СЃРјРѕРіР»Рё\x20РїСЂРѕС‡РёС‚Р°С‚СЊ\x20РЅР°\x20РЅРµР№\x20РЅРµРѕР±С‹С‡РЅС‹Рµ\x20СЃР»РѕРІР°\x3a\x20\x22РЈРј\x20\x2d\x20Р»СѓС‡С€Р°СЏ\x20СЃРёР»Р°\x2c\x20Р°\x20РјР°РіРёСЏ\x20СЃРёР»СЊРЅРµРµ\x20РіСЂСѓР±РѕР№\x20СЃРёР»С‹\x2e\x20РџРѕРјРЅРё\x20РјРѕРё\x20СЃР»РѕРІР°\x2c\x20Рё\x20С‚С‹\x20РІСЃРµРіРґР°\x20Р±СѓРґРµС€СЊ\x20РїРѕР±РµР¶РґР°С‚СЊ\x2e\x22"  ,
+    "РћС‚СЃС‚Р°РІРЅРѕР№\x20РєР°РїРёС‚Р°РЅ\x20РіРѕСЂРѕРґСЃРєРѕР№\x20СЃС‚СЂР°Р¶Рё\x20СѓР·РЅР°Р»\x20Рѕ\x20РІР°С€РµРј\x20РїРѕС…РѕРґРµ\x20Рё\x20РґР°СЂРѕРІР°Р»\x20РІР°Рј\x20СЃРІРѕР№\x20РјРµС‡\x2c\x20СЃРѕСЃР»СѓР¶РёРІС€РёР№\x20РµРјСѓ\x20РґРѕР±СЂСѓСЋ\x20СЃР»СѓР¶Р±Сѓ\x20РІ\x20Р±С‹Р»С‹Рµ\x20РІСЂРµРјРµРЅР°\x2e"  ,
+    "РўСЂРѕР»Р»СЊ\x20РѕСЃС‚Р°РЅРѕРІРёР»\x20РІР°СЃ\x2c\x20СЃРєР°Р·Р°РІ\x3a\x20\x22РџР»Р°С‚Рё\x20РјРЅРµ\x20\x35\x30\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РёР»Рё\x20СЏ\x20СѓР±СЊСЋ\x20С‚РµР±СЏ\x20РјРµС‡РѕРј\x20РђРЅСѓРґСЂР°РЅР°\x21\x22\x20Р’С‹\x20РѕС‚РєР°Р·Р°Р»РёСЃСЊ\x20РїР»Р°С‚РёС‚СЊ\x2e\x20РўСЂРѕР»Р»СЊ\x20СЃС…РІР°С‚РёР»СЃСЏ\x20Р·Р°\x20РєР»РёРЅРѕРє\x20РјРµС‡Р°\x2c\x20РІР·РІС‹Р»\x20РѕС‚\x20Р±РѕР»Рё\x20Рё\x20Р±СЂРѕСЃРёРІ\x20РјРµС‡\x20СѓР±РµР¶Р°Р»\x2e\x20РҐРѕСЂРѕС€Рѕ\x2c\x20С‡С‚Рѕ\x20РѕРЅ\x20Р±С‹Р»\x20РЅР°СЃС‚РѕР»СЊРєРѕ\x20РіР»СѓРї\x2c\x20С‡С‚Рѕ\x20РЅРµ\x20Р·РЅР°Р»\x2c\x20РєР°Рє\x20РїСЂР°РІРёР»СЊРЅРѕ\x20РґРµСЂР¶Р°С‚СЊ\x20РѕСЃС‚СЂС‹Рµ\x20РїСЂРµРґРјРµС‚С‹\x2e"  ,
+    "Р’\x20РіСЂСЏР·Рё\x20РІС‹\x20РїРѕРґРѕР±СЂР°Р»Рё\x20СЃС‚Р°СЂСѓСЋ\x20Р»РѕРїР°С‚Сѓ\x2e\x20РџСЂРёСЃРјРѕС‚СЂРµРІС€РёСЃСЊ\x2c\x20РІС‹\x20РїРѕРЅСЏР»Рё\x2c\x20С‡С‚Рѕ\x20РІР°Рј\x20РїРѕСЃС‡Р°СЃС‚Р»РёРІРёР»РѕСЃСЊ\x20РЅР°Р№С‚Рё\x20Р·Р°С‡Р°СЂРѕРІР°РЅРЅСѓСЋ\x20Р»РѕРїР°С‚Сѓ\x20РіСЂР°Р±РёС‚РµР»РµР№\x20РјРѕРіРёР»\x2e"  };
 char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
-    "Атака"  ,
-    "Защита"  ,
-    "Сила\x20магии"  ,
-    "Знания"
+    "РђС‚Р°РєР°"  ,
+    "Р—Р°С‰РёС‚Р°"  ,
+    "РЎРёР»Р°\x20РјР°РіРёРё"  ,
+    "Р—РЅР°РЅРёСЏ"
 };
 char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
-    "\x7bАтака\x7d\x0a\x0aВаш\x20навык\x20атаки\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20атаки\x20каждого\x20воина\x2e"  ,
-    "\x7bЗащита\x7d\x0a\x0aВаш\x20навык\x20защиты\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20защиты\x20каждого\x20воина\x2e"  ,
-    "\x7bСила\x20магии\x7d\x0a\x0aВаш\x20уровень\x20силы\x20магии\x20определяет\x20длительность\x20действия\x20или\x20силу\x20заклинания\x2e"  ,
-    "\x7bЗнания\x7d\x0a\x0aУровень\x20знаний\x20определяет\x20количество\x20очков\x20магии\x20героя\x2e"
+    "\x7bРђС‚Р°РєР°\x7d\x0a\x0aР’Р°С€\x20РЅР°РІС‹Рє\x20Р°С‚Р°РєРё\x20\x2d\x20Р±РѕРЅСѓСЃ\x2c\x20РґРѕР±Р°РІР»СЏРµРјС‹Р№\x20Рє\x20РЅР°РІС‹РєСѓ\x20Р°С‚Р°РєРё\x20РєР°Р¶РґРѕРіРѕ\x20РІРѕРёРЅР°\x2e"  ,
+    "\x7bР—Р°С‰РёС‚Р°\x7d\x0a\x0aР’Р°С€\x20РЅР°РІС‹Рє\x20Р·Р°С‰РёС‚С‹\x20\x2d\x20Р±РѕРЅСѓСЃ\x2c\x20РґРѕР±Р°РІР»СЏРµРјС‹Р№\x20Рє\x20РЅР°РІС‹РєСѓ\x20Р·Р°С‰РёС‚С‹\x20РєР°Р¶РґРѕРіРѕ\x20РІРѕРёРЅР°\x2e"  ,
+    "\x7bРЎРёР»Р°\x20РјР°РіРёРё\x7d\x0a\x0aР’Р°С€\x20СѓСЂРѕРІРµРЅСЊ\x20СЃРёР»С‹\x20РјР°РіРёРё\x20РѕРїСЂРµРґРµР»СЏРµС‚\x20РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ\x20РґРµР№СЃС‚РІРёСЏ\x20РёР»Рё\x20СЃРёР»Сѓ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2e"  ,
+    "\x7bР—РЅР°РЅРёСЏ\x7d\x0a\x0aРЈСЂРѕРІРµРЅСЊ\x20Р·РЅР°РЅРёР№\x20РѕРїСЂРµРґРµР»СЏРµС‚\x20РєРѕР»РёС‡РµСЃС‚РІРѕ\x20РѕС‡РєРѕРІ\x20РјР°РіРёРё\x20РіРµСЂРѕСЏ\x2e"
 };
 char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
-    "Рыцарь"  ,
-    "Варвар"  ,
-    "Колдунья"  ,
-    "Чернокнижник"  ,
-    "Чародей"  ,
-    "Некромант"  ,
-    "Мульти"  ,
-    "Случайно"
+    "Р С‹С†Р°СЂСЊ"  ,
+    "Р’Р°СЂРІР°СЂ"  ,
+    "РљРѕР»РґСѓРЅСЊСЏ"  ,
+    "Р§РµСЂРЅРѕРєРЅРёР¶РЅРёРє"  ,
+    "Р§Р°СЂРѕРґРµР№"  ,
+    "РќРµРєСЂРѕРјР°РЅС‚"  ,
+    "РњСѓР»СЊС‚Рё"  ,
+    "РЎР»СѓС‡Р°Р№РЅРѕ"
 };
 char* gArmyShortNames[(CREATURE_COUNT)] = {
     "peasn",
@@ -8651,320 +8651,320 @@ char* gArmyShortNames[(CREATURE_COUNT)] = {
     "elemw"
 };
 char* gArmyNames[(CREATURE_COUNT)] = {
-    "Крестьянин"  ,
-    "Стрелок"  ,
-    "Рейнджер"  ,
-    "Копейщик"  ,
-    "Копейщик\x20ветеран"  ,
-    "Мечник"  ,
-    "Мечник\x20мастер"  ,
-    "Всадник"  ,
-    "Чемпион"  ,
-    "Паладин"  ,
-    "Крестоносец"  ,
-    "Гоблин"  ,
-    "Орк"  ,
-    "Вождь\x20орков"  ,
-    "Волк"  ,
-    "Огр"  ,
-    "Лорд\x20огров"  ,
-    "Тролль"  ,
-    "Боевой\x20тролль"  ,
-    "Циклоп"  ,
-    "Фея"  ,
-    "Гном"  ,
-    "Боевой\x20гном"  ,
-    "Эльф"  ,
-    "Высокий\x20эльф"  ,
-    "Друид"  ,
-    "Старший\x20друид"  ,
-    "Единорог"  ,
-    "Феникс"  ,
-    "Кентавр"  ,
-    "Горгулья"  ,
-    "Грифон"  ,
-    "Минотавр"  ,
-    "Царь\x20минотавров"  ,
-    "Гидра"  ,
-    "Зеленый\x20дракон"  ,
-    "Красный\x20дракон"  ,
-    "Черный\x20дракон"  ,
-    "Полурослик"  ,
-    "Боров"  ,
-    "Железный\x20голем"  ,
-    "Стальной\x20голем"  ,
-    "Рух"  ,
-    "Маг"  ,
-    "Архимаг"  ,
-    "Гигант"  ,
-    "Титан"  ,
-    "Скелет"  ,
-    "Зомби"  ,
-    "Зомби\x20мутант"  ,
-    "Мумия"  ,
-    "Королевская\x20мумия"  ,
-    "Вампир"  ,
-    "Лорд\x20вампиров"  ,
-    "Лич"  ,
-    "Могучий\x20лич"  ,
-    "Костяной\x20дракон"  ,
-    "Разбойник"  ,
-    "Кочевник"  ,
-    "Призрак"  ,
-    "Джинн"  ,
-    "Медуза"  ,
-    "Земной\x20элементал"  ,
-    "Воздушный\x20элементал"  ,
-    "Огненный\x20элементал"  ,
-    "Водяной\x20элементал"
+    "РљСЂРµСЃС‚СЊСЏРЅРёРЅ"  ,
+    "РЎС‚СЂРµР»РѕРє"  ,
+    "Р РµР№РЅРґР¶РµСЂ"  ,
+    "РљРѕРїРµР№С‰РёРє"  ,
+    "РљРѕРїРµР№С‰РёРє\x20РІРµС‚РµСЂР°РЅ"  ,
+    "РњРµС‡РЅРёРє"  ,
+    "РњРµС‡РЅРёРє\x20РјР°СЃС‚РµСЂ"  ,
+    "Р’СЃР°РґРЅРёРє"  ,
+    "Р§РµРјРїРёРѕРЅ"  ,
+    "РџР°Р»Р°РґРёРЅ"  ,
+    "РљСЂРµСЃС‚РѕРЅРѕСЃРµС†"  ,
+    "Р“РѕР±Р»РёРЅ"  ,
+    "РћСЂРє"  ,
+    "Р’РѕР¶РґСЊ\x20РѕСЂРєРѕРІ"  ,
+    "Р’РѕР»Рє"  ,
+    "РћРіСЂ"  ,
+    "Р›РѕСЂРґ\x20РѕРіСЂРѕРІ"  ,
+    "РўСЂРѕР»Р»СЊ"  ,
+    "Р‘РѕРµРІРѕР№\x20С‚СЂРѕР»Р»СЊ"  ,
+    "Р¦РёРєР»РѕРї"  ,
+    "Р¤РµСЏ"  ,
+    "Р“РЅРѕРј"  ,
+    "Р‘РѕРµРІРѕР№\x20РіРЅРѕРј"  ,
+    "Р­Р»СЊС„"  ,
+    "Р’С‹СЃРѕРєРёР№\x20СЌР»СЊС„"  ,
+    "Р”СЂСѓРёРґ"  ,
+    "РЎС‚Р°СЂС€РёР№\x20РґСЂСѓРёРґ"  ,
+    "Р•РґРёРЅРѕСЂРѕРі"  ,
+    "Р¤РµРЅРёРєСЃ"  ,
+    "РљРµРЅС‚Р°РІСЂ"  ,
+    "Р“РѕСЂРіСѓР»СЊСЏ"  ,
+    "Р“СЂРёС„РѕРЅ"  ,
+    "РњРёРЅРѕС‚Р°РІСЂ"  ,
+    "Р¦Р°СЂСЊ\x20РјРёРЅРѕС‚Р°РІСЂРѕРІ"  ,
+    "Р“РёРґСЂР°"  ,
+    "Р—РµР»РµРЅС‹Р№\x20РґСЂР°РєРѕРЅ"  ,
+    "РљСЂР°СЃРЅС‹Р№\x20РґСЂР°РєРѕРЅ"  ,
+    "Р§РµСЂРЅС‹Р№\x20РґСЂР°РєРѕРЅ"  ,
+    "РџРѕР»СѓСЂРѕСЃР»РёРє"  ,
+    "Р‘РѕСЂРѕРІ"  ,
+    "Р–РµР»РµР·РЅС‹Р№\x20РіРѕР»РµРј"  ,
+    "РЎС‚Р°Р»СЊРЅРѕР№\x20РіРѕР»РµРј"  ,
+    "Р СѓС…"  ,
+    "РњР°Рі"  ,
+    "РђСЂС…РёРјР°Рі"  ,
+    "Р“РёРіР°РЅС‚"  ,
+    "РўРёС‚Р°РЅ"  ,
+    "РЎРєРµР»РµС‚"  ,
+    "Р—РѕРјР±Рё"  ,
+    "Р—РѕРјР±Рё\x20РјСѓС‚Р°РЅС‚"  ,
+    "РњСѓРјРёСЏ"  ,
+    "РљРѕСЂРѕР»РµРІСЃРєР°СЏ\x20РјСѓРјРёСЏ"  ,
+    "Р’Р°РјРїРёСЂ"  ,
+    "Р›РѕСЂРґ\x20РІР°РјРїРёСЂРѕРІ"  ,
+    "Р›РёС‡"  ,
+    "РњРѕРіСѓС‡РёР№\x20Р»РёС‡"  ,
+    "РљРѕСЃС‚СЏРЅРѕР№\x20РґСЂР°РєРѕРЅ"  ,
+    "Р Р°Р·Р±РѕР№РЅРёРє"  ,
+    "РљРѕС‡РµРІРЅРёРє"  ,
+    "РџСЂРёР·СЂР°Рє"  ,
+    "Р”Р¶РёРЅРЅ"  ,
+    "РњРµРґСѓР·Р°"  ,
+    "Р—РµРјРЅРѕР№\x20СЌР»РµРјРµРЅС‚Р°Р»"  ,
+    "Р’РѕР·РґСѓС€РЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»"  ,
+    "РћРіРЅРµРЅРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»"  ,
+    "Р’РѕРґСЏРЅРѕР№\x20СЌР»РµРјРµРЅС‚Р°Р»"
 };
 char* gArmyNamesPlural[(CREATURE_COUNT)] = {
-    "крестьян"  ,
-    "стрелков"  ,
-    "рейнджеров"  ,
-    "копейщиков"  ,
-    "копейщиков\x20ветеранов"  ,
-    "мечников"  ,
-    "мечников\x20мастеров"  ,
-    "всадников"  ,
-    "чемпионов"  ,
-    "паладинов"  ,
-    "крестоносцев"  ,
-    "гоблинов"  ,
-    "орков"  ,
-    "вождей\x20орков"  ,
-    "волков"  ,
-    "огров"  ,
-    "лордов\x20огров"  ,
-    "троллей"  ,
-    "боевых\x20троллей"  ,
-    "циклопов"  ,
-    "фей"  ,
-    "гномов"  ,
-    "боевых\x20гномов"  ,
-    "эльфов"  ,
-    "высоких\x20эльфов"  ,
-    "друидов"  ,
-    "старших\x20друидов"  ,
-    "единорогов"  ,
-    "фениксов"  ,
-    "кентавров"  ,
-    "горгулий"  ,
-    "грифонов"  ,
-    "минотавров"  ,
-    "царей\x20минотавров"  ,
-    "гидр"  ,
-    "зеленых\x20драконов"  ,
-    "красных\x20драконов"  ,
-    "черных\x20драконов"  ,
-    "полуросликов"  ,
-    "боровов"  ,
-    "железных\x20големов"  ,
-    "стальных\x20големов"  ,
-    "рухов"  ,
-    "магов"  ,
-    "архимагов"  ,
-    "гигантов"  ,
-    "титанов"  ,
-    "скелетов"  ,
-    "зомби"  ,
-    "зомби\x20мутантов"  ,
-    "мумий"  ,
-    "королевских\x20мумий"  ,
-    "вампиров"  ,
-    "лордов\x20вампиров"  ,
-    "личей"  ,
-    "могучих\x20личей"  ,
-    "костяных\x20драконов"  ,
-    "разбойников"  ,
-    "кочевников"  ,
-    "призраков"  ,
-    "джиннов"  ,
-    "медуз"  ,
-    "земных\x20элементалов"  ,
-    "воздушных\x20элементалов"  ,
-    "огненных\x20элементалов"  ,
-    "водных\x20элементалов"
+    "РєСЂРµСЃС‚СЊСЏРЅ"  ,
+    "СЃС‚СЂРµР»РєРѕРІ"  ,
+    "СЂРµР№РЅРґР¶РµСЂРѕРІ"  ,
+    "РєРѕРїРµР№С‰РёРєРѕРІ"  ,
+    "РєРѕРїРµР№С‰РёРєРѕРІ\x20РІРµС‚РµСЂР°РЅРѕРІ"  ,
+    "РјРµС‡РЅРёРєРѕРІ"  ,
+    "РјРµС‡РЅРёРєРѕРІ\x20РјР°СЃС‚РµСЂРѕРІ"  ,
+    "РІСЃР°РґРЅРёРєРѕРІ"  ,
+    "С‡РµРјРїРёРѕРЅРѕРІ"  ,
+    "РїР°Р»Р°РґРёРЅРѕРІ"  ,
+    "РєСЂРµСЃС‚РѕРЅРѕСЃС†РµРІ"  ,
+    "РіРѕР±Р»РёРЅРѕРІ"  ,
+    "РѕСЂРєРѕРІ"  ,
+    "РІРѕР¶РґРµР№\x20РѕСЂРєРѕРІ"  ,
+    "РІРѕР»РєРѕРІ"  ,
+    "РѕРіСЂРѕРІ"  ,
+    "Р»РѕСЂРґРѕРІ\x20РѕРіСЂРѕРІ"  ,
+    "С‚СЂРѕР»Р»РµР№"  ,
+    "Р±РѕРµРІС‹С…\x20С‚СЂРѕР»Р»РµР№"  ,
+    "С†РёРєР»РѕРїРѕРІ"  ,
+    "С„РµР№"  ,
+    "РіРЅРѕРјРѕРІ"  ,
+    "Р±РѕРµРІС‹С…\x20РіРЅРѕРјРѕРІ"  ,
+    "СЌР»СЊС„РѕРІ"  ,
+    "РІС‹СЃРѕРєРёС…\x20СЌР»СЊС„РѕРІ"  ,
+    "РґСЂСѓРёРґРѕРІ"  ,
+    "СЃС‚Р°СЂС€РёС…\x20РґСЂСѓРёРґРѕРІ"  ,
+    "РµРґРёРЅРѕСЂРѕРіРѕРІ"  ,
+    "С„РµРЅРёРєСЃРѕРІ"  ,
+    "РєРµРЅС‚Р°РІСЂРѕРІ"  ,
+    "РіРѕСЂРіСѓР»РёР№"  ,
+    "РіСЂРёС„РѕРЅРѕРІ"  ,
+    "РјРёРЅРѕС‚Р°РІСЂРѕРІ"  ,
+    "С†Р°СЂРµР№\x20РјРёРЅРѕС‚Р°РІСЂРѕРІ"  ,
+    "РіРёРґСЂ"  ,
+    "Р·РµР»РµРЅС‹С…\x20РґСЂР°РєРѕРЅРѕРІ"  ,
+    "РєСЂР°СЃРЅС‹С…\x20РґСЂР°РєРѕРЅРѕРІ"  ,
+    "С‡РµСЂРЅС‹С…\x20РґСЂР°РєРѕРЅРѕРІ"  ,
+    "РїРѕР»СѓСЂРѕСЃР»РёРєРѕРІ"  ,
+    "Р±РѕСЂРѕРІРѕРІ"  ,
+    "Р¶РµР»РµР·РЅС‹С…\x20РіРѕР»РµРјРѕРІ"  ,
+    "СЃС‚Р°Р»СЊРЅС‹С…\x20РіРѕР»РµРјРѕРІ"  ,
+    "СЂСѓС…РѕРІ"  ,
+    "РјР°РіРѕРІ"  ,
+    "Р°СЂС…РёРјР°РіРѕРІ"  ,
+    "РіРёРіР°РЅС‚РѕРІ"  ,
+    "С‚РёС‚Р°РЅРѕРІ"  ,
+    "СЃРєРµР»РµС‚РѕРІ"  ,
+    "Р·РѕРјР±Рё"  ,
+    "Р·РѕРјР±Рё\x20РјСѓС‚Р°РЅС‚РѕРІ"  ,
+    "РјСѓРјРёР№"  ,
+    "РєРѕСЂРѕР»РµРІСЃРєРёС…\x20РјСѓРјРёР№"  ,
+    "РІР°РјРїРёСЂРѕРІ"  ,
+    "Р»РѕСЂРґРѕРІ\x20РІР°РјРїРёСЂРѕРІ"  ,
+    "Р»РёС‡РµР№"  ,
+    "РјРѕРіСѓС‡РёС…\x20Р»РёС‡РµР№"  ,
+    "РєРѕСЃС‚СЏРЅС‹С…\x20РґСЂР°РєРѕРЅРѕРІ"  ,
+    "СЂР°Р·Р±РѕР№РЅРёРєРѕРІ"  ,
+    "РєРѕС‡РµРІРЅРёРєРѕРІ"  ,
+    "РїСЂРёР·СЂР°РєРѕРІ"  ,
+    "РґР¶РёРЅРЅРѕРІ"  ,
+    "РјРµРґСѓР·"  ,
+    "Р·РµРјРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ"  ,
+    "РІРѕР·РґСѓС€РЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ"  ,
+    "РѕРіРЅРµРЅРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ"  ,
+    "РІРѕРґРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ"
 };
 char* gTerrainNames[(TERRAIN_COUNT)] = {
-    "Вода"  ,
-    "Трава"  ,
-    "Снег"  ,
-    "Болото"  ,
-    "Лава"  ,
-    "Пустыня"  ,
-    "Грязь"  ,
-    "Пустошь"  ,
-    "Побережье"
+    "Р’РѕРґР°"  ,
+    "РўСЂР°РІР°"  ,
+    "РЎРЅРµРі"  ,
+    "Р‘РѕР»РѕС‚Рѕ"  ,
+    "Р›Р°РІР°"  ,
+    "РџСѓСЃС‚С‹РЅСЏ"  ,
+    "Р“СЂСЏР·СЊ"  ,
+    "РџСѓСЃС‚РѕС€СЊ"  ,
+    "РџРѕР±РµСЂРµР¶СЊРµ"
 };
 char* gResourceNames[RESOURCE_VALUE_COUNT] = {
-    "Древесина"  ,
-    "Ртуть"  ,
-    "Руда"  ,
-    "Сера"  ,
-    "Кристаллы"  ,
-    "Самоцветы"  ,
-    "Золото"
+    "Р”СЂРµРІРµСЃРёРЅР°"  ,
+    "Р С‚СѓС‚СЊ"  ,
+    "Р СѓРґР°"  ,
+    "РЎРµСЂР°"  ,
+    "РљСЂРёСЃС‚Р°Р»Р»С‹"  ,
+    "РЎР°РјРѕС†РІРµС‚С‹"  ,
+    "Р—РѕР»РѕС‚Рѕ"
 };
 
 
 char* gMineNames[KB_MINE_NAME_COUNT] = {
-    "Лесопилка"  ,
-    "Лаборатория\x20алхимика"  ,
-    "Рудная\x20шахта"  ,
-    "Серная\x20шахта"  ,
-    "Кристальная\x20шахта"  ,
-    "Самоцветная\x20шахта"  ,
-    "Золотая\x20шахта"
+    "Р›РµСЃРѕРїРёР»РєР°"  ,
+    "Р›Р°Р±РѕСЂР°С‚РѕСЂРёСЏ\x20Р°Р»С…РёРјРёРєР°"  ,
+    "Р СѓРґРЅР°СЏ\x20С€Р°С…С‚Р°"  ,
+    "РЎРµСЂРЅР°СЏ\x20С€Р°С…С‚Р°"  ,
+    "РљСЂРёСЃС‚Р°Р»СЊРЅР°СЏ\x20С€Р°С…С‚Р°"  ,
+    "РЎР°РјРѕС†РІРµС‚РЅР°СЏ\x20С€Р°С…С‚Р°"  ,
+    "Р—РѕР»РѕС‚Р°СЏ\x20С€Р°С…С‚Р°"
 };
 char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     ""  ,
-    "Лаборатория\x20алхимика"  ,
-    "Указатель"  ,
-    "Буй"  ,
-    "Скелет"  ,
-    "Пещера\x20демона"  ,
-    "Ларец\x20с\x20сокровищами"  ,
-    "Кольцо\x20фейри"  ,
-    "Костер"  ,
-    "Фонтан"  ,
-    "Беседка"  ,
-    "Древняя\x20лампа"  ,
-    "Кладбище"  ,
-    "Дом\x20стрелков"  ,
-    "Хибара\x20гоблина"  ,
-    "Избушка\x20гномов"  ,
-    "Хижина\x20крестьян"  ,
-    "Хижина"  ,
-    "Дорога"  ,
-    "Событие"  ,
-    "Драконий\x20город"  ,
-    "Маяк"  ,
-    "Водяная\x20мельница"  ,
-    "Шахта"  ,
-    "Бивуак"  ,
-    "Обелиск"  ,
-    "Оазис"  ,
-    "Ресурсы"  ,
+    "Р›Р°Р±РѕСЂР°С‚РѕСЂРёСЏ\x20Р°Р»С…РёРјРёРєР°"  ,
+    "РЈРєР°Р·Р°С‚РµР»СЊ"  ,
+    "Р‘СѓР№"  ,
+    "РЎРєРµР»РµС‚"  ,
+    "РџРµС‰РµСЂР°\x20РґРµРјРѕРЅР°"  ,
+    "Р›Р°СЂРµС†\x20СЃ\x20СЃРѕРєСЂРѕРІРёС‰Р°РјРё"  ,
+    "РљРѕР»СЊС†Рѕ\x20С„РµР№СЂРё"  ,
+    "РљРѕСЃС‚РµСЂ"  ,
+    "Р¤РѕРЅС‚Р°РЅ"  ,
+    "Р‘РµСЃРµРґРєР°"  ,
+    "Р”СЂРµРІРЅСЏСЏ\x20Р»Р°РјРїР°"  ,
+    "РљР»Р°РґР±РёС‰Рµ"  ,
+    "Р”РѕРј\x20СЃС‚СЂРµР»РєРѕРІ"  ,
+    "РҐРёР±Р°СЂР°\x20РіРѕР±Р»РёРЅР°"  ,
+    "РР·Р±СѓС€РєР°\x20РіРЅРѕРјРѕРІ"  ,
+    "РҐРёР¶РёРЅР°\x20РєСЂРµСЃС‚СЊСЏРЅ"  ,
+    "РҐРёР¶РёРЅР°"  ,
+    "Р”РѕСЂРѕРіР°"  ,
+    "РЎРѕР±С‹С‚РёРµ"  ,
+    "Р”СЂР°РєРѕРЅРёР№\x20РіРѕСЂРѕРґ"  ,
+    "РњР°СЏРє"  ,
+    "Р’РѕРґСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°"  ,
+    "РЁР°С…С‚Р°"  ,
+    "Р‘РёРІСѓР°Рє"  ,
+    "РћР±РµР»РёСЃРє"  ,
+    "РћР°Р·РёСЃ"  ,
+    "Р РµСЃСѓСЂСЃС‹"  ,
     ""  ,
-    "Лесопилка"  ,
-    "Оракул"  ,
-    "Святилище\x20\x31\x2dго\x20Круга"  ,
-    "Кораблекрушение"  ,
-    "Сундук"  ,
-    "Шатер"  ,
-    "Город"  ,
-    "Менгир"  ,
-    "Фургоны"  ,
-    "Колодец"  ,
-    "Водоворот"  ,
-    "Ветряная\x20мельница"  ,
-    "Артефакт"  ,
-    "Герой"  ,
-    "Корабль"  ,
-    "Могущественный\x20артефакт"  ,
-    "Случайный\x20артефакт"  ,
-    "Случайный\x20ресурс"  ,
-    "Случайный\x20монстр"  ,
-    "Случайный\x20город"  ,
-    "Случайный\x20замок"  ,
+    "Р›РµСЃРѕРїРёР»РєР°"  ,
+    "РћСЂР°РєСѓР»"  ,
+    "РЎРІСЏС‚РёР»РёС‰Рµ\x20\x31\x2dРіРѕ\x20РљСЂСѓРіР°"  ,
+    "РљРѕСЂР°Р±Р»РµРєСЂСѓС€РµРЅРёРµ"  ,
+    "РЎСѓРЅРґСѓРє"  ,
+    "РЁР°С‚РµСЂ"  ,
+    "Р“РѕСЂРѕРґ"  ,
+    "РњРµРЅРіРёСЂ"  ,
+    "Р¤СѓСЂРіРѕРЅС‹"  ,
+    "РљРѕР»РѕРґРµС†"  ,
+    "Р’РѕРґРѕРІРѕСЂРѕС‚"  ,
+    "Р’РµС‚СЂСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°"  ,
+    "РђСЂС‚РµС„Р°РєС‚"  ,
+    "Р“РµСЂРѕР№"  ,
+    "РљРѕСЂР°Р±Р»СЊ"  ,
+    "РњРѕРіСѓС‰РµСЃС‚РІРµРЅРЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20СЂРµСЃСѓСЂСЃ"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РјРѕРЅСЃС‚СЂ"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РіРѕСЂРѕРґ"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20Р·Р°РјРѕРє"  ,
     ""  ,
-    "Случайный\x20монстр\x20\x2d\x20слабый"  ,
-    "Случайный\x20монстр\x20\x2d\x20средний"  ,
-    "Случайный\x20монстр\x20\x2d\x20сильный"  ,
-    "Случайный\x20монстр\x20\x2d\x20очень\x20сильный"  ,
-    "Случайный\x20герой"  ,
-    "Ничего\x20особенного"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РјРѕРЅСЃС‚СЂ\x20\x2d\x20СЃР»Р°Р±С‹Р№"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РјРѕРЅСЃС‚СЂ\x20\x2d\x20СЃСЂРµРґРЅРёР№"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РјРѕРЅСЃС‚СЂ\x20\x2d\x20СЃРёР»СЊРЅС‹Р№"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РјРѕРЅСЃС‚СЂ\x20\x2d\x20РѕС‡РµРЅСЊ\x20СЃРёР»СЊРЅС‹Р№"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20РіРµСЂРѕР№"  ,
+    "РќРёС‡РµРіРѕ\x20РѕСЃРѕР±РµРЅРЅРѕРіРѕ"  ,
     ""  ,
-    "Сторожевая\x20вышка"  ,
-    "Древо\x2dгород"  ,
-    "Древо\x2dгород"  ,
-    "Руины"  ,
-    "Форт"  ,
-    "Базар"  ,
-    "Заброшенная\x20шахта"  ,
-    "Лачуга\x20гномов"  ,
-    "Стоячие\x20камни"  ,
-    "Идол"  ,
-    "Древо\x20знания"  ,
-    "Хижина\x20ведьмы"  ,
-    "Храм"  ,
-    "Форт\x20на\x20холме"  ,
-    "Нора\x20полурослика"  ,
-    "Лагерь\x20наемников"  ,
-    "Святилище\x20\x32\x2dго\x20Круга"  ,
-    "Святилище\x20\x33\x2dго\x20Круга"  ,
-    "Пирамида"  ,
-    "Город\x20мертвых"  ,
-    "Котлован"  ,
-    "Сфинкс"  ,
-    "Тележка"  ,
-    "Смоляная\x20яма"  ,
-    "Артезианский\x20источник"  ,
-    "Мост\x20троллей"  ,
-    "Промоина"  ,
-    "Хижина\x20ведьмы"  ,
-    "Ксанаду"  ,
-    "Пещера"  ,
-    "Навес"  ,
-    "Карты\x20Магеллана"  ,
-    "Обломки"  ,
-    "Заброшенный\x20корабль"  ,
-    "Потерпевший\x20кораблекрушение"  ,
-    "Бутылка"  ,
-    "Волшебный\x20колодец"  ,
-    "Волшебный\x20сад"  ,
-    "Обзорная\x20башня"  ,
-    "Литейный\x20цех"  ,
-    "Потоки"  ,
-    "Деревья"  ,
-    "Горы"  ,
-    "Вулкан"  ,
-    "Цветы"  ,
-    "Камень"  ,
-    "Озеро"  ,
-    "Мандрагора"  ,
-    "Мертвое\x20дерево"  ,
-    "Пень"  ,
-    "Кратер"  ,
-    "Кактус"  ,
-    "Курган"  ,
-    "Дюна"  ,
-    "Лавовый\x20бассейн"  ,
-    "Куст"  ,
-    "Дыра"  ,
-    "Пласт"  ,
-    "Случайный\x20артефакт\x20\x2d\x20сокровище"  ,
-    "Случайный\x20артефакт\x20\x2d\x20обычный"  ,
-    "Случайный\x20артефакт\x20\x2d\x20ценный"  ,
-    "\x25\x73\x20Барьер"  ,
-    "\x25\x73\x20Шатер\x20путника"  ,
+    "РЎС‚РѕСЂРѕР¶РµРІР°СЏ\x20РІС‹С€РєР°"  ,
+    "Р”СЂРµРІРѕ\x2dРіРѕСЂРѕРґ"  ,
+    "Р”СЂРµРІРѕ\x2dРіРѕСЂРѕРґ"  ,
+    "Р СѓРёРЅС‹"  ,
+    "Р¤РѕСЂС‚"  ,
+    "Р‘Р°Р·Р°СЂ"  ,
+    "Р—Р°Р±СЂРѕС€РµРЅРЅР°СЏ\x20С€Р°С…С‚Р°"  ,
+    "Р›Р°С‡СѓРіР°\x20РіРЅРѕРјРѕРІ"  ,
+    "РЎС‚РѕСЏС‡РёРµ\x20РєР°РјРЅРё"  ,
+    "РРґРѕР»"  ,
+    "Р”СЂРµРІРѕ\x20Р·РЅР°РЅРёСЏ"  ,
+    "РҐРёР¶РёРЅР°\x20РІРµРґСЊРјС‹"  ,
+    "РҐСЂР°Рј"  ,
+    "Р¤РѕСЂС‚\x20РЅР°\x20С…РѕР»РјРµ"  ,
+    "РќРѕСЂР°\x20РїРѕР»СѓСЂРѕСЃР»РёРєР°"  ,
+    "Р›Р°РіРµСЂСЊ\x20РЅР°РµРјРЅРёРєРѕРІ"  ,
+    "РЎРІСЏС‚РёР»РёС‰Рµ\x20\x32\x2dРіРѕ\x20РљСЂСѓРіР°"  ,
+    "РЎРІСЏС‚РёР»РёС‰Рµ\x20\x33\x2dРіРѕ\x20РљСЂСѓРіР°"  ,
+    "РџРёСЂР°РјРёРґР°"  ,
+    "Р“РѕСЂРѕРґ\x20РјРµСЂС‚РІС‹С…"  ,
+    "РљРѕС‚Р»РѕРІР°РЅ"  ,
+    "РЎС„РёРЅРєСЃ"  ,
+    "РўРµР»РµР¶РєР°"  ,
+    "РЎРјРѕР»СЏРЅР°СЏ\x20СЏРјР°"  ,
+    "РђСЂС‚РµР·РёР°РЅСЃРєРёР№\x20РёСЃС‚РѕС‡РЅРёРє"  ,
+    "РњРѕСЃС‚\x20С‚СЂРѕР»Р»РµР№"  ,
+    "РџСЂРѕРјРѕРёРЅР°"  ,
+    "РҐРёР¶РёРЅР°\x20РІРµРґСЊРјС‹"  ,
+    "РљСЃР°РЅР°РґСѓ"  ,
+    "РџРµС‰РµСЂР°"  ,
+    "РќР°РІРµСЃ"  ,
+    "РљР°СЂС‚С‹\x20РњР°РіРµР»Р»Р°РЅР°"  ,
+    "РћР±Р»РѕРјРєРё"  ,
+    "Р—Р°Р±СЂРѕС€РµРЅРЅС‹Р№\x20РєРѕСЂР°Р±Р»СЊ"  ,
+    "РџРѕС‚РµСЂРїРµРІС€РёР№\x20РєРѕСЂР°Р±Р»РµРєСЂСѓС€РµРЅРёРµ"  ,
+    "Р‘СѓС‚С‹Р»РєР°"  ,
+    "Р’РѕР»С€РµР±РЅС‹Р№\x20РєРѕР»РѕРґРµС†"  ,
+    "Р’РѕР»С€РµР±РЅС‹Р№\x20СЃР°Рґ"  ,
+    "РћР±Р·РѕСЂРЅР°СЏ\x20Р±Р°С€РЅСЏ"  ,
+    "Р›РёС‚РµР№РЅС‹Р№\x20С†РµС…"  ,
+    "РџРѕС‚РѕРєРё"  ,
+    "Р”РµСЂРµРІСЊСЏ"  ,
+    "Р“РѕСЂС‹"  ,
+    "Р’СѓР»РєР°РЅ"  ,
+    "Р¦РІРµС‚С‹"  ,
+    "РљР°РјРµРЅСЊ"  ,
+    "РћР·РµСЂРѕ"  ,
+    "РњР°РЅРґСЂР°РіРѕСЂР°"  ,
+    "РњРµСЂС‚РІРѕРµ\x20РґРµСЂРµРІРѕ"  ,
+    "РџРµРЅСЊ"  ,
+    "РљСЂР°С‚РµСЂ"  ,
+    "РљР°РєС‚СѓСЃ"  ,
+    "РљСѓСЂРіР°РЅ"  ,
+    "Р”СЋРЅР°"  ,
+    "Р›Р°РІРѕРІС‹Р№\x20Р±Р°СЃСЃРµР№РЅ"  ,
+    "РљСѓСЃС‚"  ,
+    "Р”С‹СЂР°"  ,
+    "РџР»Р°СЃС‚"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚\x20\x2d\x20СЃРѕРєСЂРѕРІРёС‰Рµ"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚\x20\x2d\x20РѕР±С‹С‡РЅС‹Р№"  ,
+    "РЎР»СѓС‡Р°Р№РЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚\x20\x2d\x20С†РµРЅРЅС‹Р№"  ,
+    "\x25\x73\x20Р‘Р°СЂСЊРµСЂ"  ,
+    "\x25\x73\x20РЁР°С‚РµСЂ\x20РїСѓС‚РЅРёРєР°"  ,
     "\x25\x73"  ,
     "\x25\x73"  ,
-    "Темница"
+    "РўРµРјРЅРёС†Р°"
 };
 char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
 
 
-    "Алхимик\x0a\x0aВы\x20стали\x20хозяин"
-        "ом\x20лаборатории\x20местного\x20"
-        "алхимика\x2e\x20Она\x20будет\x20прин"
-        "осить\x20вам\x20по\x20одной\x20едини"
-        "це\x20ртути\x20в\x20день\x2e",
+    "РђР»С…РёРјРёРє\x0a\x0aР’С‹\x20СЃС‚Р°Р»Рё\x20С…РѕР·СЏРёРЅ"
+        "РѕРј\x20Р»Р°Р±РѕСЂР°С‚РѕСЂРёРё\x20РјРµСЃС‚РЅРѕРіРѕ\x20"
+        "Р°Р»С…РёРјРёРєР°\x2e\x20РћРЅР°\x20Р±СѓРґРµС‚\x20РїСЂРёРЅ"
+        "РѕСЃРёС‚СЊ\x20РІР°Рј\x20РїРѕ\x20РѕРґРЅРѕР№\x20РµРґРёРЅРё"
+        "С†Рµ\x20СЂС‚СѓС‚Рё\x20РІ\x20РґРµРЅСЊ\x2e",
 
-    "Указатель\x0a\x0aНа\x20указателе\x20"
-        "написано\x3a\x0a\x0a\x25\x73\x20находится\x20"
-        "неподалеку\x20отсюда\x2e",
+    "РЈРєР°Р·Р°С‚РµР»СЊ\x0a\x0aРќР°\x20СѓРєР°Р·Р°С‚РµР»Рµ\x20"
+        "РЅР°РїРёСЃР°РЅРѕ\x3a\x0a\x0a\x25\x73\x20РЅР°С…РѕРґРёС‚СЃСЏ\x20"
+        "РЅРµРїРѕРґР°Р»РµРєСѓ\x20РѕС‚СЃСЋРґР°\x2e",
 
-    "Буй\x0a\x0aВаши\x20спутники\x20замеч"
-        "ают\x20морской\x20буй\x2e\x20Он\x20указ"
-        "ывает\x20верный\x20курс\x2e",
+    "Р‘СѓР№\x0a\x0aР’Р°С€Рё\x20СЃРїСѓС‚РЅРёРєРё\x20Р·Р°РјРµС‡"
+        "Р°СЋС‚\x20РјРѕСЂСЃРєРѕР№\x20Р±СѓР№\x2e\x20РћРЅ\x20СѓРєР°Р·"
+        "С‹РІР°РµС‚\x20РІРµСЂРЅС‹Р№\x20РєСѓСЂСЃ\x2e",
 
 
-    "Буй\x0a\x0aВаши\x20спутники\x20замеч"
-        "ают\x20морской\x20буй\x2e\x20Он\x20указ"
-        "ывает\x20верный\x20курс\x2c\x20и\x20это"
-        "\x20повышает\x20их\x20боевой\x20дух\x2e",
+    "Р‘СѓР№\x0a\x0aР’Р°С€Рё\x20СЃРїСѓС‚РЅРёРєРё\x20Р·Р°РјРµС‡"
+        "Р°СЋС‚\x20РјРѕСЂСЃРєРѕР№\x20Р±СѓР№\x2e\x20РћРЅ\x20СѓРєР°Р·"
+        "С‹РІР°РµС‚\x20РІРµСЂРЅС‹Р№\x20РєСѓСЂСЃ\x2c\x20Рё\x20СЌС‚Рѕ"
+        "\x20РїРѕРІС‹С€Р°РµС‚\x20РёС…\x20Р±РѕРµРІРѕР№\x20РґСѓС…\x2e",
     "",
     "",
     "",
@@ -8974,402 +8974,339 @@ char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "",
     "",
 
-    "Кольцо\x20фейри\x0a\x0aВаше\x20войск"
-        "о\x20вступает\x20внутрь\x20кольца"
-        "\x20фейри\x2c\x20но\x20ничего\x20не\x20про"
-        "исходит\x2e",
+    "РљРѕР»СЊС†Рѕ\x20С„РµР№СЂРё\x0a\x0aР’Р°С€Рµ\x20РІРѕР№СЃРє"
+        "Рѕ\x20РІСЃС‚СѓРїР°РµС‚\x20РІРЅСѓС‚СЂСЊ\x20РєРѕР»СЊС†Р°"
+        "\x20С„РµР№СЂРё\x2c\x20РЅРѕ\x20РЅРёС‡РµРіРѕ\x20РЅРµ\x20РїСЂРѕ"
+        "РёСЃС…РѕРґРёС‚\x2e",
 
 
-    "Кольцо\x20фейри\x0a\x0aВаше\x20войск"
-        "о\x20вступает\x20внутрь\x20кольца"
-        "\x20фейри\x2c\x20чары\x20которого\x20пр"
-        "инесут\x20вам\x20удачу\x20в\x20гряду"
-        "щем\x20сражении\x2e",
+    "РљРѕР»СЊС†Рѕ\x20С„РµР№СЂРё\x0a\x0aР’Р°С€Рµ\x20РІРѕР№СЃРє"
+        "Рѕ\x20РІСЃС‚СѓРїР°РµС‚\x20РІРЅСѓС‚СЂСЊ\x20РєРѕР»СЊС†Р°"
+        "\x20С„РµР№СЂРё\x2c\x20С‡Р°СЂС‹\x20РєРѕС‚РѕСЂРѕРіРѕ\x20РїСЂ"
+        "РёРЅРµСЃСѓС‚\x20РІР°Рј\x20СѓРґР°С‡Сѓ\x20РІ\x20РіСЂСЏРґСѓ"
+        "С‰РµРј\x20СЃСЂР°Р¶РµРЅРёРё\x2e",
 
-    "Костер\x0a\x0aОбыскав\x20вражески"
-        "й\x20лагерь\x2c\x20вы\x20находите\x20сп"
-        "рятанный\x20клад\x2e",
+    "РљРѕСЃС‚РµСЂ\x0a\x0aРћР±С‹СЃРєР°РІ\x20РІСЂР°Р¶РµСЃРєРё"
+        "Р№\x20Р»Р°РіРµСЂСЊ\x2c\x20РІС‹\x20РЅР°С…РѕРґРёС‚Рµ\x20СЃРї"
+        "СЂСЏС‚Р°РЅРЅС‹Р№\x20РєР»Р°Рґ\x2e",
 
-    "Фонтан\x0a\x0aВы\x20припадаете\x20к\x20"
-        "струям\x20волшебного\x20фонтан"
-        "а\x2c\x20но\x20ничего\x20не\x20происход"
-        "ит\x2e",
+    "Р¤РѕРЅС‚Р°РЅ\x0a\x0aР’С‹\x20РїСЂРёРїР°РґР°РµС‚Рµ\x20Рє\x20"
+        "СЃС‚СЂСѓСЏРј\x20РІРѕР»С€РµР±РЅРѕРіРѕ\x20С„РѕРЅС‚Р°РЅ"
+        "Р°\x2c\x20РЅРѕ\x20РЅРёС‡РµРіРѕ\x20РЅРµ\x20РїСЂРѕРёСЃС…РѕРґ"
+        "РёС‚\x2e",
 
-    "Фонтан\x0a\x0aБлагоуханная\x20вла"
-        "га\x20волшебного\x20фонтана\x20пр"
-        "инесет\x20вам\x20удачу\x20в\x20гряду"
-        "щем\x20сражении\x2e",
+    "Р¤РѕРЅС‚Р°РЅ\x0a\x0aР‘Р»Р°РіРѕСѓС…Р°РЅРЅР°СЏ\x20РІР»Р°"
+        "РіР°\x20РІРѕР»С€РµР±РЅРѕРіРѕ\x20С„РѕРЅС‚Р°РЅР°\x20РїСЂ"
+        "РёРЅРµСЃРµС‚\x20РІР°Рј\x20СѓРґР°С‡Сѓ\x20РІ\x20РіСЂСЏРґСѓ"
+        "С‰РµРј\x20СЃСЂР°Р¶РµРЅРёРё\x2e",
 
 
-    "Беседка\x0a\x0aНа\x20ступенях\x20бес"
-        "едки\x20появляется\x20старый\x20р"
-        "ыцарь\x2e\x20\x22Мне\x20жаль\x2c\x20храбры"
-        "й\x20воин\x2c\x20но\x20я\x20уже\x20научил\x20"
-        "тебя\x20всему\x2c\x20что\x20знаю\x20сам"
+    "Р‘РµСЃРµРґРєР°\x0a\x0aРќР°\x20СЃС‚СѓРїРµРЅСЏС…\x20Р±РµСЃ"
+        "РµРґРєРё\x20РїРѕСЏРІР»СЏРµС‚СЃСЏ\x20СЃС‚Р°СЂС‹Р№\x20СЂ"
+        "С‹С†Р°СЂСЊ\x2e\x20\x22РњРЅРµ\x20Р¶Р°Р»СЊ\x2c\x20С…СЂР°Р±СЂС‹"
+        "Р№\x20РІРѕРёРЅ\x2c\x20РЅРѕ\x20СЏ\x20СѓР¶Рµ\x20РЅР°СѓС‡РёР»\x20"
+        "С‚РµР±СЏ\x20РІСЃРµРјСѓ\x2c\x20С‡С‚Рѕ\x20Р·РЅР°СЋ\x20СЃР°Рј"
         "\x2e\x22",
 
 
-    "Беседка\x0a\x0aНа\x20ступенях\x20бес"
-        "едки\x20появляется\x20старый\x20р"
-        "ыцарь\x2e\x20\x22О\x20храбрый\x20воин\x2c\x20"
-        "я\x20научу\x20тебя\x20всему\x2c\x20что\x20"
-        "знаю\x20сам\x3b\x20пусть\x20мой\x20опыт"
-        "\x20поможет\x20тебе\x20в\x20твоих\x20ст"
-        "ранствиях\x2e\x22",
+    "Р‘РµСЃРµРґРєР°\x0a\x0aРќР°\x20СЃС‚СѓРїРµРЅСЏС…\x20Р±РµСЃ"
+        "РµРґРєРё\x20РїРѕСЏРІР»СЏРµС‚СЃСЏ\x20СЃС‚Р°СЂС‹Р№\x20СЂ"
+        "С‹С†Р°СЂСЊ\x2e\x20\x22Рћ\x20С…СЂР°Р±СЂС‹Р№\x20РІРѕРёРЅ\x2c\x20"
+        "СЏ\x20РЅР°СѓС‡Сѓ\x20С‚РµР±СЏ\x20РІСЃРµРјСѓ\x2c\x20С‡С‚Рѕ\x20"
+        "Р·РЅР°СЋ\x20СЃР°Рј\x3b\x20РїСѓСЃС‚СЊ\x20РјРѕР№\x20РѕРїС‹С‚"
+        "\x20РїРѕРјРѕР¶РµС‚\x20С‚РµР±Рµ\x20РІ\x20С‚РІРѕРёС…\x20СЃС‚"
+        "СЂР°РЅСЃС‚РІРёСЏС…\x2e\x22",
 
-    "Лампа\x20джинна\x0a\x0aВы\x20находит"
-        "е\x20засыпанную\x20землей\x20помя"
-        "тую\x20и\x20закопченную\x20лампа\x2e"
-        "\x20Хотите\x20ее\x20потереть\x3f",
+    "Р›Р°РјРїР°\x20РґР¶РёРЅРЅР°\x0a\x0aР’С‹\x20РЅР°С…РѕРґРёС‚"
+        "Рµ\x20Р·Р°СЃС‹РїР°РЅРЅСѓСЋ\x20Р·РµРјР»РµР№\x20РїРѕРјСЏ"
+        "С‚СѓСЋ\x20Рё\x20Р·Р°РєРѕРїС‡РµРЅРЅСѓСЋ\x20Р»Р°РјРїР°\x2e"
+        "\x20РҐРѕС‚РёС‚Рµ\x20РµРµ\x20РїРѕС‚РµСЂРµС‚СЊ\x3f",
 
-    "Кладбище\x0a\x0aВы\x20осторожно\x20п"
-        "риближаетесь\x20к\x20захоронен"
-        "ию\x20древних\x20воинов\x2e\x20Хотит"
-        "е\x20вскрыть\x20их\x20могилы\x3f",
-
-
-    "Одержав\x20победу\x20над\x20зомби"
-        "\x2c\x20вы\x20несколько\x20часов\x20под"
-        "ряд\x20обыскиваете\x20могилы\x2c\x20"
-        "но\x20ничего\x20не\x20находите\x2e\x20В"
-        "аш\x20недостойный\x20поступок\x20"
-        "отрицательно\x20влияет\x20на\x20б"
-        "оевой\x20дух\x20войска\x2e",
-
-    "Одержав\x20победу\x20над\x20зомби"
-        "\x2c\x20вы\x20обыскиваете\x20могилы\x20"
-        "и\x20удаляетесь\x20с\x20находкой\x21",
+    "РљР»Р°РґР±РёС‰Рµ\x0a\x0aР’С‹\x20РѕСЃС‚РѕСЂРѕР¶РЅРѕ\x20Рї"
+        "СЂРёР±Р»РёР¶Р°РµС‚РµСЃСЊ\x20Рє\x20Р·Р°С…РѕСЂРѕРЅРµРЅ"
+        "РёСЋ\x20РґСЂРµРІРЅРёС…\x20РІРѕРёРЅРѕРІ\x2e\x20РҐРѕС‚РёС‚"
+        "Рµ\x20РІСЃРєСЂС‹С‚СЊ\x20РёС…\x20РјРѕРіРёР»С‹\x3f",
 
 
-    "\x7bДом\x20стрелков\x7d\x0a\x0aГруппа\x20с"
-        "трелков\x20в\x20поисках\x20славы\x20"
-        "желает\x20примкнуть\x20к\x20вашем"
-        "у\x20войску\x2e\x20Согласны\x20ли\x20вы"
-        "\x20принять\x20их\x3f",
+    "РћРґРµСЂР¶Р°РІ\x20РїРѕР±РµРґСѓ\x20РЅР°Рґ\x20Р·РѕРјР±Рё"
+        "\x2c\x20РІС‹\x20РЅРµСЃРєРѕР»СЊРєРѕ\x20С‡Р°СЃРѕРІ\x20РїРѕРґ"
+        "СЂСЏРґ\x20РѕР±С‹СЃРєРёРІР°РµС‚Рµ\x20РјРѕРіРёР»С‹\x2c\x20"
+        "РЅРѕ\x20РЅРёС‡РµРіРѕ\x20РЅРµ\x20РЅР°С…РѕРґРёС‚Рµ\x2e\x20Р’"
+        "Р°С€\x20РЅРµРґРѕСЃС‚РѕР№РЅС‹Р№\x20РїРѕСЃС‚СѓРїРѕРє\x20"
+        "РѕС‚СЂРёС†Р°С‚РµР»СЊРЅРѕ\x20РІР»РёСЏРµС‚\x20РЅР°\x20Р±"
+        "РѕРµРІРѕР№\x20РґСѓС…\x20РІРѕР№СЃРєР°\x2e",
 
-    "В\x20вашем\x20войске\x20нет\x20места"
-        "\x20для\x20новых\x20рекрутов\x2e",
-
-    "\x7bДом\x20стрелков\x7d\x0a\x0aПриблизи"
-        "вшись\x20к\x20жилищу\x2c\x20вы\x20обнар"
-        "уживаете\x2c\x20что\x20оно\x20пустуе"
-        "т\x2e",
+    "РћРґРµСЂР¶Р°РІ\x20РїРѕР±РµРґСѓ\x20РЅР°Рґ\x20Р·РѕРјР±Рё"
+        "\x2c\x20РІС‹\x20РѕР±С‹СЃРєРёРІР°РµС‚Рµ\x20РјРѕРіРёР»С‹\x20"
+        "Рё\x20СѓРґР°Р»СЏРµС‚РµСЃСЊ\x20СЃ\x20РЅР°С…РѕРґРєРѕР№\x21",
 
 
-    "Хибара\x20гоблинов\x0a\x0aГруппа\x20"
-        "гоблинов\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
+    "\x7bР”РѕРј\x20СЃС‚СЂРµР»РєРѕРІ\x7d\x0a\x0aР“СЂСѓРїРїР°\x20СЃ"
+        "С‚СЂРµР»РєРѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20"
+        "Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРј"
+        "Сѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІС‹"
+        "\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Р’\x20РІР°С€РµРј\x20РІРѕР№СЃРєРµ\x20РЅРµС‚\x20РјРµСЃС‚Р°"
+        "\x20РґР»СЏ\x20РЅРѕРІС‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x2e",
 
-    "Хибара\x20гоблинов\x0a\x0aПриблиз"
-        "ившись\x20к\x20жилищу\x20гоблинов"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
-
-
-    "Хижина\x20крестьян\x0a\x0aГруппа\x20"
-        "крестьян\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
-
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
-
-    "Хижина\x20крестьян\x0a\x0aПриблиз"
-        "ившись\x20к\x20жилищу\x20крестьян"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
+    "\x7bР”РѕРј\x20СЃС‚СЂРµР»РєРѕРІ\x7d\x0a\x0aРџСЂРёР±Р»РёР·Рё"
+        "РІС€РёСЃСЊ\x20Рє\x20Р¶РёР»РёС‰Сѓ\x2c\x20РІС‹\x20РѕР±РЅР°СЂ"
+        "СѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РѕРЅРѕ\x20РїСѓСЃС‚СѓРµ"
+        "С‚\x2e",
 
 
-    "Избушка\x20гномов\x0a\x0aГруппа\x20с"
-        "трелков\x20в\x20поисках\x20славы\x20"
-        "желает\x20примкнуть\x20к\x20вашем"
-        "у\x20войску\x2e\x20Согласны\x20ли\x20вы"
-        "\x20принять\x20их\x3f",
+    "РҐРёР±Р°СЂР°\x20РіРѕР±Р»РёРЅРѕРІ\x0a\x0aР“СЂСѓРїРїР°\x20"
+        "РіРѕР±Р»РёРЅРѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹"
+        "\x20Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€Рµ"
+        "РјСѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІ"
+        "С‹\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
 
-    "Избушка\x20гномов\x0a\x0aПриблизи"
-        "вшись\x20к\x20жилищу\x20стрелков\x2c"
-        "\x20вы\x20обнаруживаете\x2c\x20что\x20о"
-        "но\x20пустует\x2e",
-
-
-    "\x7bМазанка\x7d\x0a\x0aГруппа\x20кресть"
-        "ян\x20в\x20поисках\x20славы\x20желае"
-        "т\x20примкнуть\x20к\x20вашему\x20вой"
-        "ску\x2e\x20Согласны\x20ли\x20вы\x20прин"
-        "ять\x20их\x3f",
-
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
-
-    "\x7bМазанка\x7d\x0a\x0aПриблизившись"
-        "\x20к\x20жилищу\x20Крестьян\x2c\x20вы\x20о"
-        "бнаруживаете\x2c\x20что\x20оно\x20пу"
-        "стует\x2e",
+    "РҐРёР±Р°СЂР°\x20РіРѕР±Р»РёРЅРѕРІ\x0a\x0aРџСЂРёР±Р»РёР·"
+        "РёРІС€РёСЃСЊ\x20Рє\x20Р¶РёР»РёС‰Сѓ\x20РіРѕР±Р»РёРЅРѕРІ"
+        "\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20"
+        "РѕРЅРѕ\x20РїСѓСЃС‚СѓРµС‚\x2e",
 
 
-    "\x7bДрево\x2dдом\x7d\x0a\x0aГруппа\x20фей\x20"
-        "в\x20поисках\x20славы\x20желает\x20п"
-        "римкнуть\x20к\x20вашему\x20войску"
-        "\x2e\x20Согласны\x20ли\x20вы\x20принять"
-        "\x20их\x3f",
+    "РҐРёР¶РёРЅР°\x20РєСЂРµСЃС‚СЊСЏРЅ\x0a\x0aР“СЂСѓРїРїР°\x20"
+        "РєСЂРµСЃС‚СЊСЏРЅ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹"
+        "\x20Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€Рµ"
+        "РјСѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІ"
+        "С‹\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
 
-    "\x7bДрево\x2dдом\x7d\x0a\x0aПриблизивши"
-        "сь\x20к\x20древесному\x20дому\x20Фей"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "он\x20пустует\x2e",
-
-
-    "\x7bНора\x20полуросликов\x7d\x0a\x0aГру"
-        "ппа\x20полуросликов\x20в\x20поиск"
-        "ах\x20славы\x20желает\x20примкнут"
-        "ь\x20к\x20вашему\x20войску\x2e\x20Согла"
-        "сны\x20ли\x20вы\x20принять\x20их\x3f",
-
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
-
-    "\x7bНора\x20полуросликов\x7d\x0a\x0aПри"
-        "близившись\x20к\x20норе\x20полуро"
-        "сликов\x2c\x20вы\x20обнаруживаете"
-        "\x2c\x20что\x20она\x20пустует\x2e",
+    "РҐРёР¶РёРЅР°\x20РєСЂРµСЃС‚СЊСЏРЅ\x0a\x0aРџСЂРёР±Р»РёР·"
+        "РёРІС€РёСЃСЊ\x20Рє\x20Р¶РёР»РёС‰Сѓ\x20РєСЂРµСЃС‚СЊСЏРЅ"
+        "\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20"
+        "РѕРЅРѕ\x20РїСѓСЃС‚СѓРµС‚\x2e",
 
 
-    "\x7bСторожевая\x20вышка\x7d\x0a\x0aГруп"
-        "па\x20орков\x20в\x20поисках\x20славы"
-        "\x20желает\x20примкнуть\x20к\x20ваше"
-        "му\x20войску\x2e\x20Согласны\x20ли\x20в"
-        "ы\x20принять\x20их\x3f",
+    "РР·Р±СѓС€РєР°\x20РіРЅРѕРјРѕРІ\x0a\x0aР“СЂСѓРїРїР°\x20СЃ"
+        "С‚СЂРµР»РєРѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20"
+        "Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРј"
+        "Сѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІС‹"
+        "\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
 
-    "\x7bСторожевая\x20вышка\x7d\x0a\x0aПриб"
-        "лизившись\x20к\x20сторожевой\x20в"
-        "ышке\x20орков\x2c\x20вы\x20обнаружив"
-        "аете\x2c\x20что\x20она\x20пустует\x2e",
-
-
-    "\x7bСнежная\x20пещера\x7d\x0a\x0aГруппа"
-        "\x20кентавров\x20в\x20поисках\x20сла"
-        "вы\x20желает\x20примкнуть\x20к\x20ва"
-        "шему\x20войску\x2e\x20Согласны\x20ли"
-        "\x20вы\x20принять\x20их\x3f",
-
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
-
-    "\x7bПещера\x7d\x0a\x0aПриблизившись\x20"
-        "к\x20пещере\x20кентавров\x2c\x20вы\x20о"
-        "бнаруживаете\x2c\x20что\x20она\x20пу"
-        "стует\x2e",
+    "РР·Р±СѓС€РєР°\x20РіРЅРѕРјРѕРІ\x0a\x0aРџСЂРёР±Р»РёР·Рё"
+        "РІС€РёСЃСЊ\x20Рє\x20Р¶РёР»РёС‰Сѓ\x20СЃС‚СЂРµР»РєРѕРІ\x2c"
+        "\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20Рѕ"
+        "РЅРѕ\x20РїСѓСЃС‚СѓРµС‚\x2e",
 
 
-    "\x7bРаскопки\x7d\x0a\x0aГруппа\x20скеле"
-        "тов\x20в\x20поисках\x20славы\x20жела"
-        "ет\x20примкнуть\x20к\x20вашему\x20во"
-        "йску\x2e\x20Согласны\x20ли\x20вы\x20при"
-        "нять\x20их\x3f",
+    "\x7bРњР°Р·Р°РЅРєР°\x7d\x0a\x0aР“СЂСѓРїРїР°\x20РєСЂРµСЃС‚СЊ"
+        "СЏРЅ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20Р¶РµР»Р°Рµ"
+        "С‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРјСѓ\x20РІРѕР№"
+        "СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІС‹\x20РїСЂРёРЅ"
+        "СЏС‚СЊ\x20РёС…\x3f",
 
-    "Вы\x20не\x20можете\x20принять\x20нов"
-        "ых\x20рекрутов\x20в\x20свое\x20войск"
-        "о\x2c\x20его\x20ряды\x20полны\x2e",
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
 
-    "\x7bРаскопки\x7d\x0a\x0aПриблизившис"
-        "ь\x20к\x20захоронению\x20скелетов"
-        "\x2c\x20вы\x20обнаруживаете\x2c\x20что\x20"
-        "оно\x20пустует\x2e",
+    "\x7bРњР°Р·Р°РЅРєР°\x7d\x0a\x0aРџСЂРёР±Р»РёР·РёРІС€РёСЃСЊ"
+        "\x20Рє\x20Р¶РёР»РёС‰Сѓ\x20РљСЂРµСЃС‚СЊСЏРЅ\x2c\x20РІС‹\x20Рѕ"
+        "Р±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РѕРЅРѕ\x20РїСѓ"
+        "СЃС‚СѓРµС‚\x2e",
+
+
+    "\x7bР”СЂРµРІРѕ\x2dРґРѕРј\x7d\x0a\x0aР“СЂСѓРїРїР°\x20С„РµР№\x20"
+        "РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20Р¶РµР»Р°РµС‚\x20Рї"
+        "СЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРјСѓ\x20РІРѕР№СЃРєСѓ"
+        "\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІС‹\x20РїСЂРёРЅСЏС‚СЊ"
+        "\x20РёС…\x3f",
+
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
+
+    "\x7bР”СЂРµРІРѕ\x2dРґРѕРј\x7d\x0a\x0aРџСЂРёР±Р»РёР·РёРІС€Рё"
+        "СЃСЊ\x20Рє\x20РґСЂРµРІРµСЃРЅРѕРјСѓ\x20РґРѕРјСѓ\x20Р¤РµР№"
+        "\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20"
+        "РѕРЅ\x20РїСѓСЃС‚СѓРµС‚\x2e",
+
+
+    "\x7bРќРѕСЂР°\x20РїРѕР»СѓСЂРѕСЃР»РёРєРѕРІ\x7d\x0a\x0aР“СЂСѓ"
+        "РїРїР°\x20РїРѕР»СѓСЂРѕСЃР»РёРєРѕРІ\x20РІ\x20РїРѕРёСЃРє"
+        "Р°С…\x20СЃР»Р°РІС‹\x20Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚"
+        "СЊ\x20Рє\x20РІР°С€РµРјСѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°"
+        "СЃРЅС‹\x20Р»Рё\x20РІС‹\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
+
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
+
+    "\x7bРќРѕСЂР°\x20РїРѕР»СѓСЂРѕСЃР»РёРєРѕРІ\x7d\x0a\x0aРџСЂРё"
+        "Р±Р»РёР·РёРІС€РёСЃСЊ\x20Рє\x20РЅРѕСЂРµ\x20РїРѕР»СѓСЂРѕ"
+        "СЃР»РёРєРѕРІ\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ"
+        "\x2c\x20С‡С‚Рѕ\x20РѕРЅР°\x20РїСѓСЃС‚СѓРµС‚\x2e",
+
+
+    "\x7bРЎС‚РѕСЂРѕР¶РµРІР°СЏ\x20РІС‹С€РєР°\x7d\x0a\x0aР“СЂСѓРї"
+        "РїР°\x20РѕСЂРєРѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹"
+        "\x20Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€Рµ"
+        "РјСѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІ"
+        "С‹\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
+
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
+
+    "\x7bРЎС‚РѕСЂРѕР¶РµРІР°СЏ\x20РІС‹С€РєР°\x7d\x0a\x0aРџСЂРёР±"
+        "Р»РёР·РёРІС€РёСЃСЊ\x20Рє\x20СЃС‚РѕСЂРѕР¶РµРІРѕР№\x20РІ"
+        "С‹С€РєРµ\x20РѕСЂРєРѕРІ\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІ"
+        "Р°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РѕРЅР°\x20РїСѓСЃС‚СѓРµС‚\x2e",
+
+
+    "\x7bРЎРЅРµР¶РЅР°СЏ\x20РїРµС‰РµСЂР°\x7d\x0a\x0aР“СЂСѓРїРїР°"
+        "\x20РєРµРЅС‚Р°РІСЂРѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°"
+        "РІС‹\x20Р¶РµР»Р°РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°"
+        "С€РµРјСѓ\x20РІРѕР№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё"
+        "\x20РІС‹\x20РїСЂРёРЅСЏС‚СЊ\x20РёС…\x3f",
+
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
+
+    "\x7bРџРµС‰РµСЂР°\x7d\x0a\x0aРџСЂРёР±Р»РёР·РёРІС€РёСЃСЊ\x20"
+        "Рє\x20РїРµС‰РµСЂРµ\x20РєРµРЅС‚Р°РІСЂРѕРІ\x2c\x20РІС‹\x20Рѕ"
+        "Р±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20РѕРЅР°\x20РїСѓ"
+        "СЃС‚СѓРµС‚\x2e",
+
+
+    "\x7bР Р°СЃРєРѕРїРєРё\x7d\x0a\x0aР“СЂСѓРїРїР°\x20СЃРєРµР»Рµ"
+        "С‚РѕРІ\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20Р¶РµР»Р°"
+        "РµС‚\x20РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРјСѓ\x20РІРѕ"
+        "Р№СЃРєСѓ\x2e\x20РЎРѕРіР»Р°СЃРЅС‹\x20Р»Рё\x20РІС‹\x20РїСЂРё"
+        "РЅСЏС‚СЊ\x20РёС…\x3f",
+
+    "Р’С‹\x20РЅРµ\x20РјРѕР¶РµС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РЅРѕРІ"
+        "С‹С…\x20СЂРµРєСЂСѓС‚РѕРІ\x20РІ\x20СЃРІРѕРµ\x20РІРѕР№СЃРє"
+        "Рѕ\x2c\x20РµРіРѕ\x20СЂСЏРґС‹\x20РїРѕР»РЅС‹\x2e",
+
+    "\x7bР Р°СЃРєРѕРїРєРё\x7d\x0a\x0aРџСЂРёР±Р»РёР·РёРІС€РёСЃ"
+        "СЊ\x20Рє\x20Р·Р°С…РѕСЂРѕРЅРµРЅРёСЋ\x20СЃРєРµР»РµС‚РѕРІ"
+        "\x2c\x20РІС‹\x20РѕР±РЅР°СЂСѓР¶РёРІР°РµС‚Рµ\x2c\x20С‡С‚Рѕ\x20"
+        "РѕРЅРѕ\x20РїСѓСЃС‚СѓРµС‚\x2e",
     "",
     "",
     "",
     "",
     "",
 
-    "Маяк\x0a\x0aТеперь\x20маяк\x20ваш\x2c\x20и"
-        "\x20все\x20ваши\x20корабли\x20будут\x20"
-        "преодолевать\x20большее\x20рас"
-        "стояние\x20за\x20один\x20ход\x2e",
+    "РњР°СЏРє\x0a\x0aРўРµРїРµСЂСЊ\x20РјР°СЏРє\x20РІР°С€\x2c\x20Рё"
+        "\x20РІСЃРµ\x20РІР°С€Рё\x20РєРѕСЂР°Р±Р»Рё\x20Р±СѓРґСѓС‚\x20"
+        "РїСЂРµРѕРґРѕР»РµРІР°С‚СЊ\x20Р±РѕР»СЊС€РµРµ\x20СЂР°СЃ"
+        "СЃС‚РѕСЏРЅРёРµ\x20Р·Р°\x20РѕРґРёРЅ\x20С…РѕРґ\x2e",
 
 
-    "Водяная\x20мельница\x0a\x0aМельни"
-        "к\x20обращается\x20к\x20вам\x20со\x20сл"
-        "овами\x3a\x20\x22Сожалею\x2c\x20господи"
-        "н\x2c\x20но\x20сегодня\x20золота\x20у\x20м"
-        "еня\x20нет\x2e\x20Приходите\x20на\x20сл"
-        "едующей\x20неделе\x2e\x22",
+    "Р’РѕРґСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°\x0a\x0aРњРµР»СЊРЅРё"
+        "Рє\x20РѕР±СЂР°С‰Р°РµС‚СЃСЏ\x20Рє\x20РІР°Рј\x20СЃРѕ\x20СЃР»"
+        "РѕРІР°РјРё\x3a\x20\x22РЎРѕР¶Р°Р»РµСЋ\x2c\x20РіРѕСЃРїРѕРґРё"
+        "РЅ\x2c\x20РЅРѕ\x20СЃРµРіРѕРґРЅСЏ\x20Р·РѕР»РѕС‚Р°\x20Сѓ\x20Рј"
+        "РµРЅСЏ\x20РЅРµС‚\x2e\x20РџСЂРёС…РѕРґРёС‚Рµ\x20РЅР°\x20СЃР»"
+        "РµРґСѓСЋС‰РµР№\x20РЅРµРґРµР»Рµ\x2e\x22",
 
 
-    "Водяная\x20мельница\x0a\x0aМельни"
-        "к\x20обращается\x20к\x20вам\x20со\x20сл"
-        "овами\x3a\x20\x22Господин\x2c\x20я\x20труд"
-        "ился\x20в\x20поте\x20лица\x20и\x20прошу"
-        "\x20вас\x20принять\x20мою\x20скромну"
-        "ю\x20лепту\x2e\x20Приходите\x20на\x20сл"
-        "едующей\x20неделе\x2c\x20и\x20вы\x20пол"
-        "учите\x20еще\x20столько\x20же\x2e\x22",
+    "Р’РѕРґСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°\x0a\x0aРњРµР»СЊРЅРё"
+        "Рє\x20РѕР±СЂР°С‰Р°РµС‚СЃСЏ\x20Рє\x20РІР°Рј\x20СЃРѕ\x20СЃР»"
+        "РѕРІР°РјРё\x3a\x20\x22Р“РѕСЃРїРѕРґРёРЅ\x2c\x20СЏ\x20С‚СЂСѓРґ"
+        "РёР»СЃСЏ\x20РІ\x20РїРѕС‚Рµ\x20Р»РёС†Р°\x20Рё\x20РїСЂРѕС€Сѓ"
+        "\x20РІР°СЃ\x20РїСЂРёРЅСЏС‚СЊ\x20РјРѕСЋ\x20СЃРєСЂРѕРјРЅСѓ"
+        "СЋ\x20Р»РµРїС‚Сѓ\x2e\x20РџСЂРёС…РѕРґРёС‚Рµ\x20РЅР°\x20СЃР»"
+        "РµРґСѓСЋС‰РµР№\x20РЅРµРґРµР»Рµ\x2c\x20Рё\x20РІС‹\x20РїРѕР»"
+        "СѓС‡РёС‚Рµ\x20РµС‰Рµ\x20СЃС‚РѕР»СЊРєРѕ\x20Р¶Рµ\x2e\x22",
 
-    "Рудная\x20шахта\x0a\x0aВы\x20стали\x20х"
-        "озяином\x20рудной\x20шахты\x2e\x20Он"
-        "а\x20будет\x20приносить\x20вам\x20по"
-        "\x20две\x20меры\x20руды\x20в\x20день\x2e",
-
-
-    "Серная\x20шахта\x0a\x0aВы\x20стали\x20х"
-        "озяином\x20серной\x20шахты\x2e\x20Он"
-        "а\x20будут\x20приносить\x20вам\x20по"
-        "\x20\x31\x20единице\x20серы\x20в\x20день\x2e",
+    "Р СѓРґРЅР°СЏ\x20С€Р°С…С‚Р°\x0a\x0aР’С‹\x20СЃС‚Р°Р»Рё\x20С…"
+        "РѕР·СЏРёРЅРѕРј\x20СЂСѓРґРЅРѕР№\x20С€Р°С…С‚С‹\x2e\x20РћРЅ"
+        "Р°\x20Р±СѓРґРµС‚\x20РїСЂРёРЅРѕСЃРёС‚СЊ\x20РІР°Рј\x20РїРѕ"
+        "\x20РґРІРµ\x20РјРµСЂС‹\x20СЂСѓРґС‹\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "Кристальная\x20шахта\x0a\x0aВы\x20ст"
-        "али\x20хозяином\x20кристальной"
-        "\x20шахты\x2e\x20Она\x20будет\x20принос"
-        "ить\x20вам\x20по\x20одной\x20мере\x20кр"
-        "исталлов\x20в\x20день\x2e",
+    "РЎРµСЂРЅР°СЏ\x20С€Р°С…С‚Р°\x0a\x0aР’С‹\x20СЃС‚Р°Р»Рё\x20С…"
+        "РѕР·СЏРёРЅРѕРј\x20СЃРµСЂРЅРѕР№\x20С€Р°С…С‚С‹\x2e\x20РћРЅ"
+        "Р°\x20Р±СѓРґСѓС‚\x20РїСЂРёРЅРѕСЃРёС‚СЊ\x20РІР°Рј\x20РїРѕ"
+        "\x20\x31\x20РµРґРёРЅРёС†Рµ\x20СЃРµСЂС‹\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "Самоцветная\x20шахта\x0a\x0aВы\x20ст"
-        "али\x20хозяином\x20самоцветной"
-        "\x20шахты\x2e\x20Она\x20будет\x20принос"
-        "ить\x20вам\x20по\x20\x31\x20единице\x20сам"
-        "оцветов\x20в\x20день\x2e",
+    "РљСЂРёСЃС‚Р°Р»СЊРЅР°СЏ\x20С€Р°С…С‚Р°\x0a\x0aР’С‹\x20СЃС‚"
+        "Р°Р»Рё\x20С…РѕР·СЏРёРЅРѕРј\x20РєСЂРёСЃС‚Р°Р»СЊРЅРѕР№"
+        "\x20С€Р°С…С‚С‹\x2e\x20РћРЅР°\x20Р±СѓРґРµС‚\x20РїСЂРёРЅРѕСЃ"
+        "РёС‚СЊ\x20РІР°Рј\x20РїРѕ\x20РѕРґРЅРѕР№\x20РјРµСЂРµ\x20РєСЂ"
+        "РёСЃС‚Р°Р»Р»РѕРІ\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "Золотая\x20шахта\x0a\x0aВы\x20стали\x20"
-        "хозяином\x20золотой\x20шахты\x2e\x20"
-        "Она\x20будет\x20приносить\x20вам\x20"
-        "по\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e",
+    "РЎР°РјРѕС†РІРµС‚РЅР°СЏ\x20С€Р°С…С‚Р°\x0a\x0aР’С‹\x20СЃС‚"
+        "Р°Р»Рё\x20С…РѕР·СЏРёРЅРѕРј\x20СЃР°РјРѕС†РІРµС‚РЅРѕР№"
+        "\x20С€Р°С…С‚С‹\x2e\x20РћРЅР°\x20Р±СѓРґРµС‚\x20РїСЂРёРЅРѕСЃ"
+        "РёС‚СЊ\x20РІР°Рј\x20РїРѕ\x20\x31\x20РµРґРёРЅРёС†Рµ\x20СЃР°Рј"
+        "РѕС†РІРµС‚РѕРІ\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "Последователи\x0a\x0aГруппа\x20\x25\x73"
-        "\x20в\x20поисках\x20славы\x20желает\x20"
-        "примкнуть\x20к\x20вашему\x20войск"
-        "у\x2e\x20Вы\x20согласны\x20принять\x20и"
-        "х\x3f",
-
-    "Оскорбленные\x20отказом\x20быт"
-        "ь\x20принятыми\x20в\x20ваши\x20ряды\x2c"
-        "\x20они\x20нападают\x20на\x20вас\x21",
+    "Р—РѕР»РѕС‚Р°СЏ\x20С€Р°С…С‚Р°\x0a\x0aР’С‹\x20СЃС‚Р°Р»Рё\x20"
+        "С…РѕР·СЏРёРЅРѕРј\x20Р·РѕР»РѕС‚РѕР№\x20С€Р°С…С‚С‹\x2e\x20"
+        "РћРЅР°\x20Р±СѓРґРµС‚\x20РїСЂРёРЅРѕСЃРёС‚СЊ\x20РІР°Рј\x20"
+        "РїРѕ\x20\x31\x30\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "Обелиск\x0a\x0aПеред\x20вами\x20обел"
-        "иск\x2c\x20высеченный\x20из\x20невид"
-        "анного\x20камня\x2e\x20Вы\x20вглядыв"
-        "аетесь\x20в\x20его\x20гладкую\x20пов"
-        "ерхность\x20и\x20вдруг\x20замечае"
-        "те\x2c\x20что\x20на\x20ней\x20начинают\x20"
-        "проступать\x20таинственные\x20"
-        "знаки\x2e\x20Знаки\x20складываютс"
-        "я\x20во\x20фрагмент\x20древней\x20ка"
-        "рты\x2e\x20Вы\x20торопливо\x20срисов"
-        "ываете\x20его\x2c\x20и\x20знаки\x20исче"
-        "зают\x20так\x20же\x20внезапно\x2c\x20ка"
-        "к\x20и\x20появились\x2e",
+    "РџРѕСЃР»РµРґРѕРІР°С‚РµР»Рё\x0a\x0aР“СЂСѓРїРїР°\x20\x25\x73"
+        "\x20РІ\x20РїРѕРёСЃРєР°С…\x20СЃР»Р°РІС‹\x20Р¶РµР»Р°РµС‚\x20"
+        "РїСЂРёРјРєРЅСѓС‚СЊ\x20Рє\x20РІР°С€РµРјСѓ\x20РІРѕР№СЃРє"
+        "Сѓ\x2e\x20Р’С‹\x20СЃРѕРіР»Р°СЃРЅС‹\x20РїСЂРёРЅСЏС‚СЊ\x20Рё"
+        "С…\x3f",
 
-    "Обелиск\x0a\x0aВы\x20уже\x20посещали"
-        "\x20этот\x20обелиск\x2e",
+    "РћСЃРєРѕСЂР±Р»РµРЅРЅС‹Рµ\x20РѕС‚РєР°Р·РѕРј\x20Р±С‹С‚"
+        "СЊ\x20РїСЂРёРЅСЏС‚С‹РјРё\x20РІ\x20РІР°С€Рё\x20СЂСЏРґС‹\x2c"
+        "\x20РѕРЅРё\x20РЅР°РїР°РґР°СЋС‚\x20РЅР°\x20РІР°СЃ\x21",
+
+
+    "РћР±РµР»РёСЃРє\x0a\x0aРџРµСЂРµРґ\x20РІР°РјРё\x20РѕР±РµР»"
+        "РёСЃРє\x2c\x20РІС‹СЃРµС‡РµРЅРЅС‹Р№\x20РёР·\x20РЅРµРІРёРґ"
+        "Р°РЅРЅРѕРіРѕ\x20РєР°РјРЅСЏ\x2e\x20Р’С‹\x20РІРіР»СЏРґС‹РІ"
+        "Р°РµС‚РµСЃСЊ\x20РІ\x20РµРіРѕ\x20РіР»Р°РґРєСѓСЋ\x20РїРѕРІ"
+        "РµСЂС…РЅРѕСЃС‚СЊ\x20Рё\x20РІРґСЂСѓРі\x20Р·Р°РјРµС‡Р°Рµ"
+        "С‚Рµ\x2c\x20С‡С‚Рѕ\x20РЅР°\x20РЅРµР№\x20РЅР°С‡РёРЅР°СЋС‚\x20"
+        "РїСЂРѕСЃС‚СѓРїР°С‚СЊ\x20С‚Р°РёРЅСЃС‚РІРµРЅРЅС‹Рµ\x20"
+        "Р·РЅР°РєРё\x2e\x20Р—РЅР°РєРё\x20СЃРєР»Р°РґС‹РІР°СЋС‚СЃ"
+        "СЏ\x20РІРѕ\x20С„СЂР°РіРјРµРЅС‚\x20РґСЂРµРІРЅРµР№\x20РєР°"
+        "СЂС‚С‹\x2e\x20Р’С‹\x20С‚РѕСЂРѕРїР»РёРІРѕ\x20СЃСЂРёСЃРѕРІ"
+        "С‹РІР°РµС‚Рµ\x20РµРіРѕ\x2c\x20Рё\x20Р·РЅР°РєРё\x20РёСЃС‡Рµ"
+        "Р·Р°СЋС‚\x20С‚Р°Рє\x20Р¶Рµ\x20РІРЅРµР·Р°РїРЅРѕ\x2c\x20РєР°"
+        "Рє\x20Рё\x20РїРѕСЏРІРёР»РёСЃСЊ\x2e",
+
+    "РћР±РµР»РёСЃРє\x0a\x0aР’С‹\x20СѓР¶Рµ\x20РїРѕСЃРµС‰Р°Р»Рё"
+        "\x20СЌС‚РѕС‚\x20РѕР±РµР»РёСЃРє\x2e",
     "",
     "",
 
-    "Вы\x20нашли\x20ресурс\x20\x28\x25\x73\x29\x2e",
+    "Р’С‹\x20РЅР°С€Р»Рё\x20СЂРµСЃСѓСЂСЃ\x20\x28\x25\x73\x29\x2e",
 
-    "Лесопилка\x0a\x0aВы\x20стали\x20хозя"
-        "ином\x20лесопилки\x2e\x20Она\x20буде"
-        "т\x20приносить\x20вам\x20по\x20\x32\x20еди"
-        "ницы\x20древесины\x20в\x20день\x2e",
+    "Р›РµСЃРѕРїРёР»РєР°\x0a\x0aР’С‹\x20СЃС‚Р°Р»Рё\x20С…РѕР·СЏ"
+        "РёРЅРѕРј\x20Р»РµСЃРѕРїРёР»РєРё\x2e\x20РћРЅР°\x20Р±СѓРґРµ"
+        "С‚\x20РїСЂРёРЅРѕСЃРёС‚СЊ\x20РІР°Рј\x20РїРѕ\x20\x32\x20РµРґРё"
+        "РЅРёС†С‹\x20РґСЂРµРІРµСЃРёРЅС‹\x20РІ\x20РґРµРЅСЊ\x2e",
 
 
-    "\x7bОракул\x7d\x0a\x0aНа\x20поляне\x20в\x20ок"
-        "ружении\x20деревьев\x20восседа"
-        "ет\x20слепой\x20оракул\x2e\x20Вы\x20рас"
-        "сказываете\x20ему\x20о\x20целях\x20в"
-        "ашего\x20похода\x2c\x20и\x20он\x20показ"
-        "ывает\x20вам\x20сильные\x20и\x20слаб"
-        "ые\x20стороны\x20ваших\x20противн"
-        "иков\x20в\x20магическом\x20хруста"
-        "льном\x20шаре\x2e",
+    "\x7bРћСЂР°РєСѓР»\x7d\x0a\x0aРќР°\x20РїРѕР»СЏРЅРµ\x20РІ\x20РѕРє"
+        "СЂСѓР¶РµРЅРёРё\x20РґРµСЂРµРІСЊРµРІ\x20РІРѕСЃСЃРµРґР°"
+        "РµС‚\x20СЃР»РµРїРѕР№\x20РѕСЂР°РєСѓР»\x2e\x20Р’С‹\x20СЂР°СЃ"
+        "СЃРєР°Р·С‹РІР°РµС‚Рµ\x20РµРјСѓ\x20Рѕ\x20С†РµР»СЏС…\x20РІ"
+        "Р°С€РµРіРѕ\x20РїРѕС…РѕРґР°\x2c\x20Рё\x20РѕРЅ\x20РїРѕРєР°Р·"
+        "С‹РІР°РµС‚\x20РІР°Рј\x20СЃРёР»СЊРЅС‹Рµ\x20Рё\x20СЃР»Р°Р±"
+        "С‹Рµ\x20СЃС‚РѕСЂРѕРЅС‹\x20РІР°С€РёС…\x20РїСЂРѕС‚РёРІРЅ"
+        "РёРєРѕРІ\x20РІ\x20РјР°РіРёС‡РµСЃРєРѕРј\x20С…СЂСѓСЃС‚Р°"
+        "Р»СЊРЅРѕРј\x20С€Р°СЂРµ\x2e",
     "",
-    "",
-    "",
-    "",
-    "",
-    "",
-
-
-    "\x7bШатер\x7d\x0a\x0aВаше\x20внимание\x20п"
-        "ривлекает\x20шатер\x2c\x20пологи\x20"
-        "которых\x20трепещут\x20на\x20жарк"
-        "ом\x20ветру\x20пустыни\x2e\x20В\x20нем\x20"
-        "никого\x20нет\x2e\x20Пройдет\x20врем"
-        "я\x2c\x20и\x2c\x20быть\x20может\x2c\x20сюда\x20п"
-        "ридет\x20новый\x20отряд\x20кочевн"
-        "иков\x2e",
-
-
-    "\x7bШатер\x7d\x0a\x0aВаше\x20внимание\x20п"
-        "ривлекают\x20шатер\x2c\x20пологи\x20"
-        "которого\x20трепещут\x20на\x20жар"
-        "ком\x20ветру\x20пустыни\x2e\x20Вы\x20хо"
-        "тите\x20принять\x20в\x20ваше\x20войс"
-        "ко\x20отряд\x20кочевников\x3f",
-
-
-    "\x7bПовозка\x7d\x0a\x0aЦветастая\x20пов"
-        "озка\x20разбойников\x20пуста\x2e\x20"
-        "Пройдет\x20время\x2c\x20и\x2c\x20быть\x20м"
-        "ожет\x2c\x20здесь\x20обоснуется\x20н"
-        "овая\x20шайка\x2e",
-
-
-    "\x7bПовозка\x7d\x0a\x0aВдалеке\x20слыши"
-        "тся\x20музыка\x20и\x20смех\x2e\x20Вы\x20ид"
-        "ете\x20на\x20звуки\x20и\x20видите\x20цв"
-        "етастую\x20повозку\x2c\x20в\x20котор"
-        "ой\x20живут\x20разбойники\x2e\x20Вы\x20"
-        "хотите\x20принять\x20в\x20ваше\x20во"
-        "йско\x20шайку\x20разбойников\x3f",
-
-    "\x7bВодоворот\x7d\x0a\x0aВаш\x20корабль"
-        "\x20попадает\x20в\x20водоворот\x2e\x20Ч"
-        "асть\x20вашего\x20войска\x20исчез"
-        "ает\x20в\x20пучине\x2e",
-
-
-    "\x7bВетряная\x20мельница\x7d\x0a\x0aМел"
-        "ьник\x20обращается\x20к\x20вам\x20со"
-        "\x20словами\x3a\x20\x22Сожалею\x2c\x20госп"
-        "один\x2c\x20но\x20сегодня\x20у\x20меня\x20"
-        "ничего\x20нет\x2e\x20Приходите\x20на"
-        "\x20следующей\x20неделе\x2e\x22",
-
-
-    "\x7bВетряная\x20мельница\x7d\x0a\x0aМел"
-        "ьник\x20обращается\x20к\x20вам\x20со"
-        "\x20словами\x3a\x20\x22Господин\x2c\x20я\x20р"
-        "аботал\x20не\x20покладая\x20рук\x2c\x20"
-        "и\x20прошу\x20вас\x20принять\x20мой\x20"
-        "скромный\x20дар\x2e\x20Приходите\x20"
-        "на\x20следующей\x20неделе\x2c\x20у\x20м"
-        "еня\x20опять\x20найдется\x2c\x20чем\x20"
-        "вас\x20порадовать\x2e\x22",
     "",
     "",
     "",
@@ -9377,1864 +9314,1927 @@ char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "",
 
 
-    "\x7bСкелет\x7d\x0a\x0aВы\x20находите\x20ос"
-        "танки\x20незадачливого\x20иска"
-        "теля\x20приключений\x2e\x20Пошари"
-        "в\x20в\x20груде\x20лохмотьев\x2c\x20вы\x20"
-        "ничего\x20не\x20находите\x2e",
+    "\x7bРЁР°С‚РµСЂ\x7d\x0a\x0aР’Р°С€Рµ\x20РІРЅРёРјР°РЅРёРµ\x20Рї"
+        "СЂРёРІР»РµРєР°РµС‚\x20С€Р°С‚РµСЂ\x2c\x20РїРѕР»РѕРіРё\x20"
+        "РєРѕС‚РѕСЂС‹С…\x20С‚СЂРµРїРµС‰СѓС‚\x20РЅР°\x20Р¶Р°СЂРє"
+        "РѕРј\x20РІРµС‚СЂСѓ\x20РїСѓСЃС‚С‹РЅРё\x2e\x20Р’\x20РЅРµРј\x20"
+        "РЅРёРєРѕРіРѕ\x20РЅРµС‚\x2e\x20РџСЂРѕР№РґРµС‚\x20РІСЂРµРј"
+        "СЏ\x2c\x20Рё\x2c\x20Р±С‹С‚СЊ\x20РјРѕР¶РµС‚\x2c\x20СЃСЋРґР°\x20Рї"
+        "СЂРёРґРµС‚\x20РЅРѕРІС‹Р№\x20РѕС‚СЂСЏРґ\x20РєРѕС‡РµРІРЅ"
+        "РёРєРѕРІ\x2e",
 
 
-    "\x7bСкелет\x7d\x0a\x0aВы\x20находите\x20ос"
-        "танки\x20незадачливого\x20иска"
-        "теля\x20приключений\x2e\x20Пошари"
-        "в\x20в\x20груде\x20лохмотьев\x2c\x20вы\x20"
-        "находите\x2e"
+    "\x7bРЁР°С‚РµСЂ\x7d\x0a\x0aР’Р°С€Рµ\x20РІРЅРёРјР°РЅРёРµ\x20Рї"
+        "СЂРёРІР»РµРєР°СЋС‚\x20С€Р°С‚РµСЂ\x2c\x20РїРѕР»РѕРіРё\x20"
+        "РєРѕС‚РѕСЂРѕРіРѕ\x20С‚СЂРµРїРµС‰СѓС‚\x20РЅР°\x20Р¶Р°СЂ"
+        "РєРѕРј\x20РІРµС‚СЂСѓ\x20РїСѓСЃС‚С‹РЅРё\x2e\x20Р’С‹\x20С…Рѕ"
+        "С‚РёС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РІ\x20РІР°С€Рµ\x20РІРѕР№СЃ"
+        "РєРѕ\x20РѕС‚СЂСЏРґ\x20РєРѕС‡РµРІРЅРёРєРѕРІ\x3f",
+
+
+    "\x7bРџРѕРІРѕР·РєР°\x7d\x0a\x0aР¦РІРµС‚Р°СЃС‚Р°СЏ\x20РїРѕРІ"
+        "РѕР·РєР°\x20СЂР°Р·Р±РѕР№РЅРёРєРѕРІ\x20РїСѓСЃС‚Р°\x2e\x20"
+        "РџСЂРѕР№РґРµС‚\x20РІСЂРµРјСЏ\x2c\x20Рё\x2c\x20Р±С‹С‚СЊ\x20Рј"
+        "РѕР¶РµС‚\x2c\x20Р·РґРµСЃСЊ\x20РѕР±РѕСЃРЅСѓРµС‚СЃСЏ\x20РЅ"
+        "РѕРІР°СЏ\x20С€Р°Р№РєР°\x2e",
+
+
+    "\x7bРџРѕРІРѕР·РєР°\x7d\x0a\x0aР’РґР°Р»РµРєРµ\x20СЃР»С‹С€Рё"
+        "С‚СЃСЏ\x20РјСѓР·С‹РєР°\x20Рё\x20СЃРјРµС…\x2e\x20Р’С‹\x20РёРґ"
+        "РµС‚Рµ\x20РЅР°\x20Р·РІСѓРєРё\x20Рё\x20РІРёРґРёС‚Рµ\x20С†РІ"
+        "РµС‚Р°СЃС‚СѓСЋ\x20РїРѕРІРѕР·РєСѓ\x2c\x20РІ\x20РєРѕС‚РѕСЂ"
+        "РѕР№\x20Р¶РёРІСѓС‚\x20СЂР°Р·Р±РѕР№РЅРёРєРё\x2e\x20Р’С‹\x20"
+        "С…РѕС‚РёС‚Рµ\x20РїСЂРёРЅСЏС‚СЊ\x20РІ\x20РІР°С€Рµ\x20РІРѕ"
+        "Р№СЃРєРѕ\x20С€Р°Р№РєСѓ\x20СЂР°Р·Р±РѕР№РЅРёРєРѕРІ\x3f",
+
+    "\x7bР’РѕРґРѕРІРѕСЂРѕС‚\x7d\x0a\x0aР’Р°С€\x20РєРѕСЂР°Р±Р»СЊ"
+        "\x20РїРѕРїР°РґР°РµС‚\x20РІ\x20РІРѕРґРѕРІРѕСЂРѕС‚\x2e\x20Р§"
+        "Р°СЃС‚СЊ\x20РІР°С€РµРіРѕ\x20РІРѕР№СЃРєР°\x20РёСЃС‡РµР·"
+        "Р°РµС‚\x20РІ\x20РїСѓС‡РёРЅРµ\x2e",
+
+
+    "\x7bР’РµС‚СЂСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°\x7d\x0a\x0aРњРµР»"
+        "СЊРЅРёРє\x20РѕР±СЂР°С‰Р°РµС‚СЃСЏ\x20Рє\x20РІР°Рј\x20СЃРѕ"
+        "\x20СЃР»РѕРІР°РјРё\x3a\x20\x22РЎРѕР¶Р°Р»РµСЋ\x2c\x20РіРѕСЃРї"
+        "РѕРґРёРЅ\x2c\x20РЅРѕ\x20СЃРµРіРѕРґРЅСЏ\x20Сѓ\x20РјРµРЅСЏ\x20"
+        "РЅРёС‡РµРіРѕ\x20РЅРµС‚\x2e\x20РџСЂРёС…РѕРґРёС‚Рµ\x20РЅР°"
+        "\x20СЃР»РµРґСѓСЋС‰РµР№\x20РЅРµРґРµР»Рµ\x2e\x22",
+
+
+    "\x7bР’РµС‚СЂСЏРЅР°СЏ\x20РјРµР»СЊРЅРёС†Р°\x7d\x0a\x0aРњРµР»"
+        "СЊРЅРёРє\x20РѕР±СЂР°С‰Р°РµС‚СЃСЏ\x20Рє\x20РІР°Рј\x20СЃРѕ"
+        "\x20СЃР»РѕРІР°РјРё\x3a\x20\x22Р“РѕСЃРїРѕРґРёРЅ\x2c\x20СЏ\x20СЂ"
+        "Р°Р±РѕС‚Р°Р»\x20РЅРµ\x20РїРѕРєР»Р°РґР°СЏ\x20СЂСѓРє\x2c\x20"
+        "Рё\x20РїСЂРѕС€Сѓ\x20РІР°СЃ\x20РїСЂРёРЅСЏС‚СЊ\x20РјРѕР№\x20"
+        "СЃРєСЂРѕРјРЅС‹Р№\x20РґР°СЂ\x2e\x20РџСЂРёС…РѕРґРёС‚Рµ\x20"
+        "РЅР°\x20СЃР»РµРґСѓСЋС‰РµР№\x20РЅРµРґРµР»Рµ\x2c\x20Сѓ\x20Рј"
+        "РµРЅСЏ\x20РѕРїСЏС‚СЊ\x20РЅР°Р№РґРµС‚СЃСЏ\x2c\x20С‡РµРј\x20"
+        "РІР°СЃ\x20РїРѕСЂР°РґРѕРІР°С‚СЊ\x2e\x22",
+    "",
+    "",
+    "",
+    "",
+    "",
+
+
+    "\x7bРЎРєРµР»РµС‚\x7d\x0a\x0aР’С‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РѕСЃ"
+        "С‚Р°РЅРєРё\x20РЅРµР·Р°РґР°С‡Р»РёРІРѕРіРѕ\x20РёСЃРєР°"
+        "С‚РµР»СЏ\x20РїСЂРёРєР»СЋС‡РµРЅРёР№\x2e\x20РџРѕС€Р°СЂРё"
+        "РІ\x20РІ\x20РіСЂСѓРґРµ\x20Р»РѕС…РјРѕС‚СЊРµРІ\x2c\x20РІС‹\x20"
+        "РЅРёС‡РµРіРѕ\x20РЅРµ\x20РЅР°С…РѕРґРёС‚Рµ\x2e",
+
+
+    "\x7bРЎРєРµР»РµС‚\x7d\x0a\x0aР’С‹\x20РЅР°С…РѕРґРёС‚Рµ\x20РѕСЃ"
+        "С‚Р°РЅРєРё\x20РЅРµР·Р°РґР°С‡Р»РёРІРѕРіРѕ\x20РёСЃРєР°"
+        "С‚РµР»СЏ\x20РїСЂРёРєР»СЋС‡РµРЅРёР№\x2e\x20РџРѕС€Р°СЂРё"
+        "РІ\x20РІ\x20РіСЂСѓРґРµ\x20Р»РѕС…РјРѕС‚СЊРµРІ\x2c\x20РІС‹\x20"
+        "РЅР°С…РѕРґРёС‚Рµ\x2e"
 };
 char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
 
-    "Начать\x20одиночную\x20или\x20сет"
-        "евую\x20игру\x2e",
+    "РќР°С‡Р°С‚СЊ\x20РѕРґРёРЅРѕС‡РЅСѓСЋ\x20РёР»Рё\x20СЃРµС‚"
+        "РµРІСѓСЋ\x20РёРіСЂСѓ\x2e",
 
-    "Загрузить\x20сохраненную\x20иг"
-        "ру\x2e",
+    "Р—Р°РіСЂСѓР·РёС‚СЊ\x20СЃРѕС…СЂР°РЅРµРЅРЅСѓСЋ\x20РёРі"
+        "СЂСѓ\x2e",
 
-    "Сохранить\x20игру\x2e",
+    "РЎРѕС…СЂР°РЅРёС‚СЊ\x20РёРіСЂСѓ\x2e",
 
-    "Выйти\x20из\x20Героев\x20Меча\x20и\x20М"
-        "агии\x20\x49\x49\x2e",
+    "Р’С‹Р№С‚Рё\x20РёР·\x20Р“РµСЂРѕРµРІ\x20РњРµС‡Р°\x20Рё\x20Рњ"
+        "Р°РіРёРё\x20\x49\x49\x2e",
 
-    "Закрыть\x20меню\x2c\x20ничего\x20не\x20"
-        "делая\x2e"
+    "Р—Р°РєСЂС‹С‚СЊ\x20РјРµРЅСЋ\x2c\x20РЅРёС‡РµРіРѕ\x20РЅРµ\x20"
+        "РґРµР»Р°СЏ\x2e"
 };
 char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
 
-    "\x7bОК\x7d\x0a\x0aЗакрыть\x20это\x20меню\x2e",
+    "\x7bРћРљ\x7d\x0a\x0aР—Р°РєСЂС‹С‚СЊ\x20СЌС‚Рѕ\x20РјРµРЅСЋ\x2e",
 
-    "\x7bСкорость\x7d\x0a\x0aУстановить\x20с"
-        "корость\x20действий\x20и\x20анима"
-        "ции\x20воинов\x20в\x20бою\x2e",
-
-
-    "\x7bИнформация\x20о\x20воине\x7d\x0a\x0aВк"
-        "лючить\x20или\x20выключить\x20ото"
-        "бражение\x20окна\x20с\x20информац"
-        "ией\x20о\x20выбранном\x20и\x20атакуе"
-        "мом\x20воине\x2e",
+    "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x7d\x0a\x0aРЈСЃС‚Р°РЅРѕРІРёС‚СЊ\x20СЃ"
+        "РєРѕСЂРѕСЃС‚СЊ\x20РґРµР№СЃС‚РІРёР№\x20Рё\x20Р°РЅРёРјР°"
+        "С†РёРё\x20РІРѕРёРЅРѕРІ\x20РІ\x20Р±РѕСЋ\x2e",
 
 
-    "\x7bМагия\x20в\x20автобое\x7d\x0a\x0aЕсли\x20"
-        "эта\x20опция\x20включена\x2c\x20ваш\x20"
-        "герой\x20будет\x20использовать"
-        "\x20заклинания\x20во\x20время\x20авт"
-        "обоя\x2e\x20\x28Примечание\x3a\x20Эта\x20о"
-        "пция\x20не\x20влияет\x20на\x20исполь"
-        "зование\x20заклинаний\x20компь"
-        "ютерными\x20игроками\x2c\x20и\x20на\x20"
-        "быстрый\x20бой\x2e\x29",
+    "\x7bРРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20РІРѕРёРЅРµ\x7d\x0a\x0aР’Рє"
+        "Р»СЋС‡РёС‚СЊ\x20РёР»Рё\x20РІС‹РєР»СЋС‡РёС‚СЊ\x20РѕС‚Рѕ"
+        "Р±СЂР°Р¶РµРЅРёРµ\x20РѕРєРЅР°\x20СЃ\x20РёРЅС„РѕСЂРјР°С†"
+        "РёРµР№\x20Рѕ\x20РІС‹Р±СЂР°РЅРЅРѕРј\x20Рё\x20Р°С‚Р°РєСѓРµ"
+        "РјРѕРј\x20РІРѕРёРЅРµ\x2e",
 
 
-    "\x7bСетка\x7d\x0a\x0aВключает\x20или\x20вы"
-        "ключает\x20отображение\x20сетк"
-        "и\x2e\x20Все\x20перемещения\x20на\x20по"
-        "ле\x20боя\x20происходят\x20по\x20гек"
-        "сагональной\x20сетке\x2c\x20даже\x20"
-        "если\x20ее\x20отображение\x20откл"
-        "ючено\x2e",
+    "\x7bРњР°РіРёСЏ\x20РІ\x20Р°РІС‚РѕР±РѕРµ\x7d\x0a\x0aР•СЃР»Рё\x20"
+        "СЌС‚Р°\x20РѕРїС†РёСЏ\x20РІРєР»СЋС‡РµРЅР°\x2c\x20РІР°С€\x20"
+        "РіРµСЂРѕР№\x20Р±СѓРґРµС‚\x20РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ"
+        "\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20РІРѕ\x20РІСЂРµРјСЏ\x20Р°РІС‚"
+        "РѕР±РѕСЏ\x2e\x20\x28РџСЂРёРјРµС‡Р°РЅРёРµ\x3a\x20Р­С‚Р°\x20Рѕ"
+        "РїС†РёСЏ\x20РЅРµ\x20РІР»РёСЏРµС‚\x20РЅР°\x20РёСЃРїРѕР»СЊ"
+        "Р·РѕРІР°РЅРёРµ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20РєРѕРјРїСЊ"
+        "СЋС‚РµСЂРЅС‹РјРё\x20РёРіСЂРѕРєР°РјРё\x2c\x20Рё\x20РЅР°\x20"
+        "Р±С‹СЃС‚СЂС‹Р№\x20Р±РѕР№\x2e\x29",
 
 
-    "\x7bЗатенение\x20сетки\x7d\x0a\x0aВключ"
-        "ает\x20или\x20выключает\x20режим\x20"
-        "обозначения\x20возможной\x20да"
-        "льности\x20передвижения\x20выб"
-        "ранного\x20отряда\x20воинов\x2e",
+    "\x7bРЎРµС‚РєР°\x7d\x0a\x0aР’РєР»СЋС‡Р°РµС‚\x20РёР»Рё\x20РІС‹"
+        "РєР»СЋС‡Р°РµС‚\x20РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ\x20СЃРµС‚Рє"
+        "Рё\x2e\x20Р’СЃРµ\x20РїРµСЂРµРјРµС‰РµРЅРёСЏ\x20РЅР°\x20РїРѕ"
+        "Р»Рµ\x20Р±РѕСЏ\x20РїСЂРѕРёСЃС…РѕРґСЏС‚\x20РїРѕ\x20РіРµРє"
+        "СЃР°РіРѕРЅР°Р»СЊРЅРѕР№\x20СЃРµС‚РєРµ\x2c\x20РґР°Р¶Рµ\x20"
+        "РµСЃР»Рё\x20РµРµ\x20РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ\x20РѕС‚РєР»"
+        "СЋС‡РµРЅРѕ\x2e",
 
-    "\x7bКурсор\x20с\x20тенью\x7d\x0a\x0aВключа"
-        "ет\x20или\x20выключает\x20отрисов"
-        "ку\x20тени\x20от\x20курсора\x20на\x20се"
-        "тке\x20координат\x2e"
+
+    "\x7bР—Р°С‚РµРЅРµРЅРёРµ\x20СЃРµС‚РєРё\x7d\x0a\x0aР’РєР»СЋС‡"
+        "Р°РµС‚\x20РёР»Рё\x20РІС‹РєР»СЋС‡Р°РµС‚\x20СЂРµР¶РёРј\x20"
+        "РѕР±РѕР·РЅР°С‡РµРЅРёСЏ\x20РІРѕР·РјРѕР¶РЅРѕР№\x20РґР°"
+        "Р»СЊРЅРѕСЃС‚Рё\x20РїРµСЂРµРґРІРёР¶РµРЅРёСЏ\x20РІС‹Р±"
+        "СЂР°РЅРЅРѕРіРѕ\x20РѕС‚СЂСЏРґР°\x20РІРѕРёРЅРѕРІ\x2e",
+
+    "\x7bРљСѓСЂСЃРѕСЂ\x20СЃ\x20С‚РµРЅСЊСЋ\x7d\x0a\x0aР’РєР»СЋС‡Р°"
+        "РµС‚\x20РёР»Рё\x20РІС‹РєР»СЋС‡Р°РµС‚\x20РѕС‚СЂРёСЃРѕРІ"
+        "РєСѓ\x20С‚РµРЅРё\x20РѕС‚\x20РєСѓСЂСЃРѕСЂР°\x20РЅР°\x20СЃРµ"
+        "С‚РєРµ\x20РєРѕРѕСЂРґРёРЅР°С‚\x2e"
 };
 char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
 
-    "Осмотреть\x20весь\x20мир\x2e",
+    "РћСЃРјРѕС‚СЂРµС‚СЊ\x20РІРµСЃСЊ\x20РјРёСЂ\x2e",
 
-    "Посмотреть\x20головоломку\x2e",
+    "РџРѕСЃРјРѕС‚СЂРµС‚СЊ\x20РіРѕР»РѕРІРѕР»РѕРјРєСѓ\x2e",
 
-    "Показать\x20информацию\x20о\x20сц"
-        "енарии\x2c\x20на\x20котором\x20идет\x20"
-        "игра\x2e",
+    "РџРѕРєР°Р·Р°С‚СЊ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x20Рѕ\x20СЃС†"
+        "РµРЅР°СЂРёРё\x2c\x20РЅР°\x20РєРѕС‚РѕСЂРѕРј\x20РёРґРµС‚\x20"
+        "РёРіСЂР°\x2e",
 
-    "Копать\x20в\x20поисках\x20Великог"
-        "о\x20артефакта\x2e",
+    "РљРѕРїР°С‚СЊ\x20РІ\x20РїРѕРёСЃРєР°С…\x20Р’РµР»РёРєРѕРі"
+        "Рѕ\x20Р°СЂС‚РµС„Р°РєС‚Р°\x2e",
 
-    "Закрыть\x20это\x20меню\x2e"
+    "Р—Р°РєСЂС‹С‚СЊ\x20СЌС‚Рѕ\x20РјРµРЅСЋ\x2e"
 };
 char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
 
-    "\x7bНовая\x20игра\x7d\x0a\x0aНачать\x20отд"
-        "ельный\x20сценарий\x20или\x20сете"
-        "вую\x20игру\x2e",
+    "\x7bРќРѕРІР°СЏ\x20РёРіСЂР°\x7d\x0a\x0aРќР°С‡Р°С‚СЊ\x20РѕС‚Рґ"
+        "РµР»СЊРЅС‹Р№\x20СЃС†РµРЅР°СЂРёР№\x20РёР»Рё\x20СЃРµС‚Рµ"
+        "РІСѓСЋ\x20РёРіСЂСѓ\x2e",
 
-    "\x7bИгры\x7d\x0a\x0aЗагрузить\x20ранее\x20"
-        "сохраненную\x20игру\x2e",
+    "\x7bРРіСЂС‹\x7d\x0a\x0aР—Р°РіСЂСѓР·РёС‚СЊ\x20СЂР°РЅРµРµ\x20"
+        "СЃРѕС…СЂР°РЅРµРЅРЅСѓСЋ\x20РёРіСЂСѓ\x2e",
 
-    "\x7bРекорды\x7d\x0a\x0aПоказать\x20табл"
-        "ицу\x20рекордов\x2e",
+    "\x7bР РµРєРѕСЂРґС‹\x7d\x0a\x0aРџРѕРєР°Р·Р°С‚СЊ\x20С‚Р°Р±Р»"
+        "РёС†Сѓ\x20СЂРµРєРѕСЂРґРѕРІ\x2e",
 
-    "\x7bАвторы\x7d\x0a\x0aПоказать\x20переч"
-        "ень\x20авторов\x20игры\x2e",
+    "\x7bРђРІС‚РѕСЂС‹\x7d\x0a\x0aРџРѕРєР°Р·Р°С‚СЊ\x20РїРµСЂРµС‡"
+        "РµРЅСЊ\x20Р°РІС‚РѕСЂРѕРІ\x20РёРіСЂС‹\x2e",
 
-    "\x7bВыйти\x7d\x0a\x0aВыйти\x20из\x20героев"
-        "\x20Меча\x20и\x20Магии\x20\x49\x49\x20и\x20верну"
-        "ться\x20в\x20операционную\x20сист"
-        "ему\x2e"
+    "\x7bР’С‹Р№С‚Рё\x7d\x0a\x0aР’С‹Р№С‚Рё\x20РёР·\x20РіРµСЂРѕРµРІ"
+        "\x20РњРµС‡Р°\x20Рё\x20РњР°РіРёРё\x20\x49\x49\x20Рё\x20РІРµСЂРЅСѓ"
+        "С‚СЊСЃСЏ\x20РІ\x20РѕРїРµСЂР°С†РёРѕРЅРЅСѓСЋ\x20СЃРёСЃС‚"
+        "РµРјСѓ\x2e"
 };
 char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
 
-    "\x7bСледующий\x20герой\x7d\x0a\x0aВыбра"
-        "ть\x20следующего\x20героя\x2e",
+    "\x7bРЎР»РµРґСѓСЋС‰РёР№\x20РіРµСЂРѕР№\x7d\x0a\x0aР’С‹Р±СЂР°"
+        "С‚СЊ\x20СЃР»РµРґСѓСЋС‰РµРіРѕ\x20РіРµСЂРѕСЏ\x2e",
 
-    "\x7bПродолжить\x20движение\x7d\x0a\x0aП"
-        "родолжить\x20движение\x20героя"
-        "\x20по\x20намеченному\x20пути\x2e",
+    "\x7bРџСЂРѕРґРѕР»Р¶РёС‚СЊ\x20РґРІРёР¶РµРЅРёРµ\x7d\x0a\x0aРџ"
+        "СЂРѕРґРѕР»Р¶РёС‚СЊ\x20РґРІРёР¶РµРЅРёРµ\x20РіРµСЂРѕСЏ"
+        "\x20РїРѕ\x20РЅР°РјРµС‡РµРЅРЅРѕРјСѓ\x20РїСѓС‚Рё\x2e",
 
-    "\x7bОбзор\x20королевства\x7d\x0a\x0aОсм"
-        "отреть\x20ваши\x20владения\x2e",
+    "\x7bРћР±Р·РѕСЂ\x20РєРѕСЂРѕР»РµРІСЃС‚РІР°\x7d\x0a\x0aРћСЃРј"
+        "РѕС‚СЂРµС‚СЊ\x20РІР°С€Рё\x20РІР»Р°РґРµРЅРёСЏ\x2e",
 
-    "\x7bОкончить\x20ход\x7d\x0a\x0aОкончить"
-        "\x20ход\x20и\x20передать\x20управлен"
-        "ие\x20компьютеру\x2e",
+    "\x7bРћРєРѕРЅС‡РёС‚СЊ\x20С…РѕРґ\x7d\x0a\x0aРћРєРѕРЅС‡РёС‚СЊ"
+        "\x20С…РѕРґ\x20Рё\x20РїРµСЂРµРґР°С‚СЊ\x20СѓРїСЂР°РІР»РµРЅ"
+        "РёРµ\x20РєРѕРјРїСЊСЋС‚РµСЂСѓ\x2e",
 
-    "\x7bИгровые\x20действия\x7d\x0a\x0aОткр"
-        "ыть\x20окно\x20доступных\x20игров"
-        "ых\x20действий\x2e",
+    "\x7bРРіСЂРѕРІС‹Рµ\x20РґРµР№СЃС‚РІРёСЏ\x7d\x0a\x0aРћС‚РєСЂ"
+        "С‹С‚СЊ\x20РѕРєРЅРѕ\x20РґРѕСЃС‚СѓРїРЅС‹С…\x20РёРіСЂРѕРІ"
+        "С‹С…\x20РґРµР№СЃС‚РІРёР№\x2e",
 
-    "\x7bОкно\x20файлов\x7d\x0a\x0aОткрывает"
-        "\x20меню\x2c\x20где\x20вы\x20можете\x20заг"
-        "ружать\x20или\x20сохранять\x20игр"
-        "ы\x2e",
+    "\x7bРћРєРЅРѕ\x20С„Р°Р№Р»РѕРІ\x7d\x0a\x0aРћС‚РєСЂС‹РІР°РµС‚"
+        "\x20РјРµРЅСЋ\x2c\x20РіРґРµ\x20РІС‹\x20РјРѕР¶РµС‚Рµ\x20Р·Р°Рі"
+        "СЂСѓР¶Р°С‚СЊ\x20РёР»Рё\x20СЃРѕС…СЂР°РЅСЏС‚СЊ\x20РёРіСЂ"
+        "С‹\x2e",
 
-    "\x7bСистемные\x20настройки\x7d\x0a\x0aО"
-        "ткрывает\x20окно\x20системных\x20"
-        "настроек\x2c\x20позволяющих\x20на"
-        "строить\x20игру\x2e",
+    "\x7bРЎРёСЃС‚РµРјРЅС‹Рµ\x20РЅР°СЃС‚СЂРѕР№РєРё\x7d\x0a\x0aРћ"
+        "С‚РєСЂС‹РІР°РµС‚\x20РѕРєРЅРѕ\x20СЃРёСЃС‚РµРјРЅС‹С…\x20"
+        "РЅР°СЃС‚СЂРѕРµРє\x2c\x20РїРѕР·РІРѕР»СЏСЋС‰РёС…\x20РЅР°"
+        "СЃС‚СЂРѕРёС‚СЊ\x20РёРіСЂСѓ\x2e",
 
-    "\x7bНаправить\x20заклинание\x7d\x0a\x0a"
-        "Направить\x20заклинание\x20на\x20"
-        "стратегической\x20карте\x2e"
+    "\x7bРќР°РїСЂР°РІРёС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x7d\x0a\x0a"
+        "РќР°РїСЂР°РІРёС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20РЅР°\x20"
+        "СЃС‚СЂР°С‚РµРіРёС‡РµСЃРєРѕР№\x20РєР°СЂС‚Рµ\x2e"
 };
 char* gLuckText[KB_LUCK_TEXT_COUNT] = {
 
-    "Проклятая",
+    "РџСЂРѕРєР»СЏС‚Р°СЏ",
 
-    "Ужасная",
+    "РЈР¶Р°СЃРЅР°СЏ",
 
-    "Плохая",
+    "РџР»РѕС…Р°СЏ",
 
-    "Обычная",
+    "РћР±С‹С‡РЅР°СЏ",
 
-    "Хорошая",
+    "РҐРѕСЂРѕС€Р°СЏ",
 
-    "Отличная",
+    "РћС‚Р»РёС‡РЅР°СЏ",
 
-    "Божественная"
+    "Р‘РѕР¶РµСЃС‚РІРµРЅРЅР°СЏ"
 };
 char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
 
-    "Предательская",
+    "РџСЂРµРґР°С‚РµР»СЊСЃРєР°СЏ",
 
-    "Ужасная",
+    "РЈР¶Р°СЃРЅР°СЏ",
 
-    "Плохая",
+    "РџР»РѕС…Р°СЏ",
 
-    "Обычная",
+    "РћР±С‹С‡РЅР°СЏ",
 
-    "Хорошая",
+    "РҐРѕСЂРѕС€Р°СЏ",
 
-    "Отличная",
+    "РћС‚Р»РёС‡РЅР°СЏ",
 
-    "Кровавая\x21"
+    "РљСЂРѕРІР°РІР°СЏ\x21"
 };
 char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
 
-    "Выкл\x2e",
+    "Р’С‹РєР»\x2e",
 
-    "Вкл\x2e",
+    "Р’РєР»\x2e",
 
-    "Вкл\x2e\x0aГромкость\x20\x39",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x39",
 
-    "Вкл\x2e\x0aГромкость\x20\x38",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x38",
 
-    "Вкл\x2e\x0aГромкость\x20\x37",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x37",
 
-    "Вкл\x2e\x0aГромкость\x20\x36",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x36",
 
-    "Вкл\x2e\x0aГромкость\x20\x35",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x35",
 
-    "Вкл\x2e\x0aГромкость\x20\x34",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x34",
 
-    "Вкл\x2e\x0aГромкость\x20\x33",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x33",
 
-    "Вкл\x2e\x0aГромкость\x20\x32",
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x32",
 
-    "Вкл\x2e\x0aГромкость\x20\x31"
+    "Р’РєР»\x2e\x0aР“СЂРѕРјРєРѕСЃС‚СЊ\x20\x31"
 };
 char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
 
-    "Шагом",
+    "РЁР°РіРѕРј",
 
-    "Рысью",
+    "Р С‹СЃСЊСЋ",
 
-    "Аллюром",
+    "РђР»Р»СЋСЂРѕРј",
 
-    "Галопом",
+    "Р“Р°Р»РѕРїРѕРј",
 
-    "Прыжками"
+    "РџСЂС‹Р¶РєР°РјРё"
 };
 char* gColors[(FACTION_COUNT)] = {
-    "синий"  ,
-    "зеленый"  ,
-    "красный"  ,
-    "желтый"  ,
-    "оранжевый"  ,
-    "фиолетовый"
+    "СЃРёРЅРёР№"  ,
+    "Р·РµР»РµРЅС‹Р№"  ,
+    "РєСЂР°СЃРЅС‹Р№"  ,
+    "Р¶РµР»С‚С‹Р№"  ,
+    "РѕСЂР°РЅР¶РµРІС‹Р№"  ,
+    "С„РёРѕР»РµС‚РѕРІС‹Р№"
 };
 static char* gColorAbbreviations[(FACTION_COUNT)] = {
-    "син."  ,
-    "зел."  ,
-    "кр."  ,
-    "жел."  ,
-    "ор."  ,
-    "фиол."
+    "СЃРёРЅ."  ,
+    "Р·РµР»."  ,
+    "РєСЂ."  ,
+    "Р¶РµР»."  ,
+    "РѕСЂ."  ,
+    "С„РёРѕР»."
 };
 char* gMonthNames[KB_MONTH_NAME_COUNT] = {
 
-    "Кузнечика",
+    "РљСѓР·РЅРµС‡РёРєР°",
 
-    "Муравья",
+    "РњСѓСЂР°РІСЊСЏ",
 
-    "Стрекозы",
+    "РЎС‚СЂРµРєРѕР·С‹",
 
-    "Паука",
+    "РџР°СѓРєР°",
 
-    "Бабочки",
+    "Р‘Р°Р±РѕС‡РєРё",
 
-    "Шмеля",
+    "РЁРјРµР»СЏ",
 
-    "Цикады",
+    "Р¦РёРєР°РґС‹",
 
-    "Земляного\x20червя",
+    "Р—РµРјР»СЏРЅРѕРіРѕ\x20С‡РµСЂРІСЏ",
 
-    "Шершня",
+    "РЁРµСЂС€РЅСЏ",
 
-    "Жука"
+    "Р–СѓРєР°"
 };
 char* gWeekNames[KB_WEEK_NAME_COUNT] = {
 
-    "Белки",
+    "Р‘РµР»РєРё",
 
-    "Кролика",
+    "РљСЂРѕР»РёРєР°",
 
-    "Суслика",
+    "РЎСѓСЃР»РёРєР°",
 
-    "Барсука",
+    "Р‘Р°СЂСЃСѓРєР°",
 
-    "Крысы",
+    "РљСЂС‹СЃС‹",
 
-    "Орла",
+    "РћСЂР»Р°",
 
-    "Горностая",
+    "Р“РѕСЂРЅРѕСЃС‚Р°СЏ",
 
-    "Ворона",
+    "Р’РѕСЂРѕРЅР°",
 
-    "Мангуста",
+    "РњР°РЅРіСѓСЃС‚Р°",
 
-    "Собаки",
+    "РЎРѕР±Р°РєРё",
 
-    "Муравьеда",
+    "РњСѓСЂР°РІСЊРµРґР°",
 
-    "Ящерицы",
+    "РЇС‰РµСЂРёС†С‹",
 
-    "Черепахи",
+    "Р§РµСЂРµРїР°С…Рё",
 
-    "Дикобраза",
+    "Р”РёРєРѕР±СЂР°Р·Р°",
 
-    "Кондора"
+    "РљРѕРЅРґРѕСЂР°"
 };
 char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
 
-    "Обзор\x20королевства",
+    "РћР±Р·РѕСЂ\x20РєРѕСЂРѕР»РµРІСЃС‚РІР°",
 
-    "\x25\x73\x20\x2d\x20информация",
+    "\x25\x73\x20\x2d\x20РёРЅС„РѕСЂРјР°С†РёСЏ",
 
-    "Дополнительная\x20статистик"
-        "а\x20героя",
+    "Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅР°СЏ\x20СЃС‚Р°С‚РёСЃС‚РёРє"
+        "Р°\x20РіРµСЂРѕСЏ",
 
-    "Информация\x20о\x20высокой\x20мор"
-        "али",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20РІС‹СЃРѕРєРѕР№\x20РјРѕСЂ"
+        "Р°Р»Рё",
 
-    "Информация\x20об\x20обычной\x20мо"
-        "рали",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20РѕР±\x20РѕР±С‹С‡РЅРѕР№\x20РјРѕ"
+        "СЂР°Р»Рё",
 
-    "Информация\x20о\x20плохой\x20мора"
-        "ли",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20РїР»РѕС…РѕР№\x20РјРѕСЂР°"
+        "Р»Рё",
 
-    "Информация\x20о\x20хорошей\x20уда"
-        "че",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20С…РѕСЂРѕС€РµР№\x20СѓРґР°"
+        "С‡Рµ",
 
-    "Информация\x20об\x20обычной\x20уд"
-        "аче",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20РѕР±\x20РѕР±С‹С‡РЅРѕР№\x20СѓРґ"
+        "Р°С‡Рµ",
 
-    "Информация\x20о\x20плохой\x20удач"
-        "е",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20РїР»РѕС…РѕР№\x20СѓРґР°С‡"
+        "Рµ",
 
-    "Показать\x20опыт",
+    "РџРѕРєР°Р·Р°С‚СЊ\x20РѕРїС‹С‚",
 
-    "Выбрать\x20\x25\x73",
+    "Р’С‹Р±СЂР°С‚СЊ\x20\x25\x73",
 
-    "Пусто",
+    "РџСѓСЃС‚Рѕ",
 
-    "Перенести\x20сюда\x20отряд\x20\x25\x73",
+    "РџРµСЂРµРЅРµСЃС‚Рё\x20СЃСЋРґР°\x20РѕС‚СЂСЏРґ\x20\x25\x73",
 
-    "Отряды\x20\x25\x73\x20и\x20\x25\x73\x20меняются\x20"
-        "местами",
+    "РћС‚СЂСЏРґС‹\x20\x25\x73\x20Рё\x20\x25\x73\x20РјРµРЅСЏСЋС‚СЃСЏ\x20"
+        "РјРµСЃС‚Р°РјРё",
 
-    "Показать\x20заклинания",
+    "РџРѕРєР°Р·Р°С‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ",
 
-    "Посмотреть\x20информацию\x20об"
+    "РџРѕСЃРјРѕС‚СЂРµС‚СЊ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x20РѕР±"
         "\x3a\x20\x25\x73",
 
-    "\x25\x73\x20\x25\x73\x20\x2d\x20уволить",
+    "\x25\x73\x20\x25\x73\x20\x2d\x20СѓРІРѕР»РёС‚СЊ",
 
-    "Закрыть\x20экран\x20героя",
+    "Р—Р°РєСЂС‹С‚СЊ\x20СЌРєСЂР°РЅ\x20РіРµСЂРѕСЏ",
 
-    "Экран\x20героя",
+    "Р­РєСЂР°РЅ\x20РіРµСЂРѕСЏ",
 
-    "\x25\x73\x20в\x20один\x20отряд",
+    "\x25\x73\x20РІ\x20РѕРґРёРЅ\x20РѕС‚СЂСЏРґ",
 
-    "Разделить\x20отряд\x20\x25\x73",
+    "Р Р°Р·РґРµР»РёС‚СЊ\x20РѕС‚СЂСЏРґ\x20\x25\x73",
 
-    "\x25\x73\x20\x25\x73\x20\x2d\x20информация",
+    "\x25\x73\x20\x25\x73\x20\x2d\x20РёРЅС„РѕСЂРјР°С†РёСЏ",
 
-    "Информация\x20об\x20очках\x20маги"
-        "и",
+    "РРЅС„РѕСЂРјР°С†РёСЏ\x20РѕР±\x20РѕС‡РєР°С…\x20РјР°РіРё"
+        "Рё",
 
-    "Выбрать\x20широкие\x20ряды\x20в\x20б"
-        "ою",
+    "Р’С‹Р±СЂР°С‚СЊ\x20С€РёСЂРѕРєРёРµ\x20СЂСЏРґС‹\x20РІ\x20Р±"
+        "РѕСЋ",
 
-    "Сгруппировать\x20воинов"
+    "РЎРіСЂСѓРїРїРёСЂРѕРІР°С‚СЊ\x20РІРѕРёРЅРѕРІ"
 };
 char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
 
-    "Построить\x20Гильдию\x20магов",
+    "РџРѕСЃС‚СЂРѕРёС‚СЊ\x20Р“РёР»СЊРґРёСЋ\x20РјР°РіРѕРІ",
 
-    "Построены\x20все\x20этажи\x20Гиль"
-        "дии\x20магов\x2e",
+    "РџРѕСЃС‚СЂРѕРµРЅС‹\x20РІСЃРµ\x20СЌС‚Р°Р¶Рё\x20Р“РёР»СЊ"
+        "РґРёРё\x20РјР°РіРѕРІ\x2e",
 
-    "Нельзя\x20построить\x20следующ"
-        "ий\x20этаж\x2e",
+    "РќРµР»СЊР·СЏ\x20РїРѕСЃС‚СЂРѕРёС‚СЊ\x20СЃР»РµРґСѓСЋС‰"
+        "РёР№\x20СЌС‚Р°Р¶\x2e",
 
-    "Построить\x20следующий\x20этаж"
-        "\x20Гильдии\x20магов\x20",
+    "РџРѕСЃС‚СЂРѕРёС‚СЊ\x20СЃР»РµРґСѓСЋС‰РёР№\x20СЌС‚Р°Р¶"
+        "\x20Р“РёР»СЊРґРёРё\x20РјР°РіРѕРІ\x20",
 
-    "Постройка\x20\x27\x25\x73\x27\x20уже\x20возве"
-        "дена",
+    "РџРѕСЃС‚СЂРѕР№РєР°\x20\x27\x25\x73\x27\x20СѓР¶Рµ\x20РІРѕР·РІРµ"
+        "РґРµРЅР°",
 
-    "Нельзя\x20возвести\x20постройк"
-        "у\x20\x27\x25\x73\x27",
+    "РќРµР»СЊР·СЏ\x20РІРѕР·РІРµСЃС‚Рё\x20РїРѕСЃС‚СЂРѕР№Рє"
+        "Сѓ\x20\x27\x25\x73\x27",
 
-    "Нельзя\x20возвести\x20постройк"
-        "у\x20\x27\x25\x73\x27",
+    "РќРµР»СЊР·СЏ\x20РІРѕР·РІРµСЃС‚Рё\x20РїРѕСЃС‚СЂРѕР№Рє"
+        "Сѓ\x20\x27\x25\x73\x27",
 
-    "Возвести\x20постройку\x20\x27\x25\x73\x27",
+    "Р’РѕР·РІРµСЃС‚Рё\x20РїРѕСЃС‚СЂРѕР№РєСѓ\x20\x27\x25\x73\x27",
 
-    "Герой\x20вам\x20не\x20по\x20карману\x2e",
+    "Р“РµСЂРѕР№\x20РІР°Рј\x20РЅРµ\x20РїРѕ\x20РєР°СЂРјР°РЅСѓ\x2e",
 
-    "Нельзя\x20нанять\x20\x2d\x20у\x20вас\x20уж"
-        "е\x20\x25\x64\x20героев\x2e",
+    "РќРµР»СЊР·СЏ\x20РЅР°РЅСЏС‚СЊ\x20\x2d\x20Сѓ\x20РІР°СЃ\x20СѓР¶"
+        "Рµ\x20\x25\x64\x20РіРµСЂРѕРµРІ\x2e",
 
-    "Нельзя\x20нанять\x20\x2d\x20в\x20этом\x20г"
-        "ороде\x20у\x20вас\x20уже\x20есть\x20гер"
-        "ой\x2e",
+    "РќРµР»СЊР·СЏ\x20РЅР°РЅСЏС‚СЊ\x20\x2d\x20РІ\x20СЌС‚РѕРј\x20Рі"
+        "РѕСЂРѕРґРµ\x20Сѓ\x20РІР°СЃ\x20СѓР¶Рµ\x20РµСЃС‚СЊ\x20РіРµСЂ"
+        "РѕР№\x2e",
 
-    "Нанять\x20нового\x20героя",
+    "РќР°РЅСЏС‚СЊ\x20РЅРѕРІРѕРіРѕ\x20РіРµСЂРѕСЏ",
 
-    "Выйти\x20из\x20замка",
+    "Р’С‹Р№С‚Рё\x20РёР·\x20Р·Р°РјРєР°",
 
-    "Возможности\x20замка",
+    "Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё\x20Р·Р°РјРєР°",
 
-    "Сгруппировать\x20гарнизон",
+    "РЎРіСЂСѓРїРїРёСЂРѕРІР°С‚СЊ\x20РіР°СЂРЅРёР·РѕРЅ",
 
-    "Выбрать\x20широкие\x20ряды\x20для"
-        "\x20гарнизона"
+    "Р’С‹Р±СЂР°С‚СЊ\x20С€РёСЂРѕРєРёРµ\x20СЂСЏРґС‹\x20РґР»СЏ"
+        "\x20РіР°СЂРЅРёР·РѕРЅР°"
 };
 char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
 
 
-    "\x7bХорошая\x20удача\x7d\x0a\x0aЕсли\x20уд"
-        "ача\x20вашего\x20войска\x20выше\x20о"
-        "бычной\x2c\x20атаки\x20отдельных\x20"
-        "отрядов\x20на\x20поле\x20боя\x20иног"
-        "да\x20оказываются\x20более\x20рез"
-        "ультативными\x20\x28их\x20сила\x20уд"
-        "ваивается\x29\x2e",
+    "\x7bРҐРѕСЂРѕС€Р°СЏ\x20СѓРґР°С‡Р°\x7d\x0a\x0aР•СЃР»Рё\x20СѓРґ"
+        "Р°С‡Р°\x20РІР°С€РµРіРѕ\x20РІРѕР№СЃРєР°\x20РІС‹С€Рµ\x20Рѕ"
+        "Р±С‹С‡РЅРѕР№\x2c\x20Р°С‚Р°РєРё\x20РѕС‚РґРµР»СЊРЅС‹С…\x20"
+        "РѕС‚СЂСЏРґРѕРІ\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x20РёРЅРѕРі"
+        "РґР°\x20РѕРєР°Р·С‹РІР°СЋС‚СЃСЏ\x20Р±РѕР»РµРµ\x20СЂРµР·"
+        "СѓР»СЊС‚Р°С‚РёРІРЅС‹РјРё\x20\x28РёС…\x20СЃРёР»Р°\x20СѓРґ"
+        "РІР°РёРІР°РµС‚СЃСЏ\x29\x2e",
 
 
-    "\x7bОбычная\x20удача\x7d\x0a\x0aС\x20обычн"
-        "ой\x20удачей\x20ваше\x20войско\x20не"
-        "\x20имеет\x20ни\x20преимуществ\x2c\x20н"
-        "и\x20недостатков\x20на\x20поле\x20бо"
-        "я\x2e",
+    "\x7bРћР±С‹С‡РЅР°СЏ\x20СѓРґР°С‡Р°\x7d\x0a\x0aРЎ\x20РѕР±С‹С‡РЅ"
+        "РѕР№\x20СѓРґР°С‡РµР№\x20РІР°С€Рµ\x20РІРѕР№СЃРєРѕ\x20РЅРµ"
+        "\x20РёРјРµРµС‚\x20РЅРё\x20РїСЂРµРёРјСѓС‰РµСЃС‚РІ\x2c\x20РЅ"
+        "Рё\x20РЅРµРґРѕСЃС‚Р°С‚РєРѕРІ\x20РЅР°\x20РїРѕР»Рµ\x20Р±Рѕ"
+        "СЏ\x2e",
 
 
-    "\x7bПлохая\x20удача\x7d\x0a\x0aЕсли\x20ваш"
-        "ему\x20войску\x20не\x20везет\x2c\x20уро"
-        "н\x2c\x20наносимый\x20\x20отдельными"
-        "\x20отрядами\x20на\x20поле\x20боя\x2c\x20м"
-        "ожет\x20оказаться\x20вдвое\x20мен"
-        "ьше\x20обычного\x2e",
+    "\x7bРџР»РѕС…Р°СЏ\x20СѓРґР°С‡Р°\x7d\x0a\x0aР•СЃР»Рё\x20РІР°С€"
+        "РµРјСѓ\x20РІРѕР№СЃРєСѓ\x20РЅРµ\x20РІРµР·РµС‚\x2c\x20СѓСЂРѕ"
+        "РЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20\x20РѕС‚РґРµР»СЊРЅС‹РјРё"
+        "\x20РѕС‚СЂСЏРґР°РјРё\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x2c\x20Рј"
+        "РѕР¶РµС‚\x20РѕРєР°Р·Р°С‚СЊСЃСЏ\x20РІРґРІРѕРµ\x20РјРµРЅ"
+        "СЊС€Рµ\x20РѕР±С‹С‡РЅРѕРіРѕ\x2e",
 
-    "\x25\x73\x0a\x0a\x0aМодификаторы\x20удачи\x3a",
+    "\x25\x73\x0a\x0a\x0aРњРѕРґРёС„РёРєР°С‚РѕСЂС‹\x20СѓРґР°С‡Рё\x3a",
 
-    "\x0aЛапка\x20кролика\x20\x2b\x31",
+    "\x0aР›Р°РїРєР°\x20РєСЂРѕР»РёРєР°\x20\x2b\x31",
 
-    "\x0aЗолотая\x20подкова\x20\x2b\x31",
+    "\x0aР—РѕР»РѕС‚Р°СЏ\x20РїРѕРґРєРѕРІР°\x20\x2b\x31",
 
-    "\x0aМонета\x20\x2b\x31",
+    "\x0aРњРѕРЅРµС‚Р°\x20\x2b\x31",
 
-    "\x0aКлевер\x20\x2b\x31",
+    "\x0aРљР»РµРІРµСЂ\x20\x2b\x31",
 
-    "\x0aПосещен\x20Круг\x20фейри\x20\x2b\x31",
+    "\x0aРџРѕСЃРµС‰РµРЅ\x20РљСЂСѓРі\x20С„РµР№СЂРё\x20\x2b\x31",
 
-    "\x0aПосещен\x20фонтан\x20\x2b\x31",
+    "\x0aРџРѕСЃРµС‰РµРЅ\x20С„РѕРЅС‚Р°РЅ\x20\x2b\x31",
 
-    "\x0aНет",
+    "\x0aРќРµС‚",
 
-    "\x0aГрабитель\x20могил\x20\x2d\x31",
+    "\x0aР“СЂР°Р±РёС‚РµР»СЊ\x20РјРѕРіРёР»\x20\x2d\x31",
 
-    "\x0aРадуга\x20магов\x20\x2b\x32",
+    "\x0aР Р°РґСѓРіР°\x20РјР°РіРѕРІ\x20\x2b\x32",
 
-    "\x0aПосещен\x20идол\x20\x2b\x31",
+    "\x0aРџРѕСЃРµС‰РµРЅ\x20РёРґРѕР»\x20\x2b\x31",
 
-    "\x0aОграблена\x20пирамида\x20\x2d\x32",
+    "\x0aРћРіСЂР°Р±Р»РµРЅР°\x20РїРёСЂР°РјРёРґР°\x20\x2d\x32",
 
-    "\x0aБазовая\x20удача\x20\x2b\x31",
+    "\x0aР‘Р°Р·РѕРІР°СЏ\x20СѓРґР°С‡Р°\x20\x2b\x31",
 
-    "\x0aВысокая\x20удача\x20\x2b\x32",
+    "\x0aР’С‹СЃРѕРєР°СЏ\x20СѓРґР°С‡Р°\x20\x2b\x32",
 
-    "\x0aЭксперт\x20удачи\x20\x2b\x33",
+    "\x0aР­РєСЃРїРµСЂС‚\x20СѓРґР°С‡Рё\x20\x2b\x33",
 
-    "\x0aБонус\x20мачты\x20на\x20море\x20\x2b\x31",
+    "\x0aР‘РѕРЅСѓСЃ\x20РјР°С‡С‚С‹\x20РЅР°\x20РјРѕСЂРµ\x20\x2b\x31",
 
-    "\x0aПосещена\x20русалка\x20\x2b\x31",
+    "\x0aРџРѕСЃРµС‰РµРЅР°\x20СЂСѓСЃР°Р»РєР°\x20\x2b\x31",
 
-    "\x0aБоевое\x20одеяние\x20Андурана"
-        "\x20дает\x20максимальную\x20удачу"
+    "\x0aР‘РѕРµРІРѕРµ\x20РѕРґРµСЏРЅРёРµ\x20РђРЅРґСѓСЂР°РЅР°"
+        "\x20РґР°РµС‚\x20РјР°РєСЃРёРјР°Р»СЊРЅСѓСЋ\x20СѓРґР°С‡Сѓ"
         "\x2e"
 };
 char* IQnames[KB_IQ_NAME_COUNT] = {
 
-    "Нет",
+    "РќРµС‚",
 
-    "Глупый",
+    "Р“Р»СѓРїС‹Р№",
 
-    "Средний",
+    "РЎСЂРµРґРЅРёР№",
 
-    "Умный",
+    "РЈРјРЅС‹Р№",
 
-    "Гений"
+    "Р“РµРЅРёР№"
 };
 char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
 
-    "Предыдущая\x20страница\x20",
+    "РџСЂРµРґС‹РґСѓС‰Р°СЏ\x20СЃС‚СЂР°РЅРёС†Р°\x20",
 
-    "Следующая\x20страница",
+    "РЎР»РµРґСѓСЋС‰Р°СЏ\x20СЃС‚СЂР°РЅРёС†Р°",
 
-    "Небоевые\x20заклинания",
+    "РќРµР±РѕРµРІС‹Рµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ",
 
-    "Боевые\x20заклинания",
+    "Р‘РѕРµРІС‹Рµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ",
 
-    "Закрыть\x20волшебную\x20книгу",
+    "Р—Р°РєСЂС‹С‚СЊ\x20РІРѕР»С€РµР±РЅСѓСЋ\x20РєРЅРёРіСѓ",
 
-    "Заклинания",
+    "Р—Р°РєР»РёРЅР°РЅРёСЏ",
 
-    "Выбрать\x20заклинание",
+    "Р’С‹Р±СЂР°С‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ",
 
-    "Боевые\x20заклинания",
+    "Р‘РѕРµРІС‹Рµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ",
 
-    "У\x20вашего\x20героя\x20осталось\x20"
-        "\x25\x64\x20оч\x2e\x20магии"
+    "РЈ\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20РѕСЃС‚Р°Р»РѕСЃСЊ\x20"
+        "\x25\x64\x20РѕС‡\x2e\x20РјР°РіРёРё"
 };
 char* speedText[KB_SPEED_TEXT_COUNT] = {
       "",
-      "Ползает",
-      "Оч\x2e\x20низкая",
-      "Низкая",
-      "Средняя",
-      "Высокая",
-      "Оч\x2e\x20высокая",
-      "Ультра\x20высокая",
-      "Молниеносная",
-      "Абсолютная"
+      "РџРѕР»Р·Р°РµС‚",
+      "РћС‡\x2e\x20РЅРёР·РєР°СЏ",
+      "РќРёР·РєР°СЏ",
+      "РЎСЂРµРґРЅСЏСЏ",
+      "Р’С‹СЃРѕРєР°СЏ",
+      "РћС‡\x2e\x20РІС‹СЃРѕРєР°СЏ",
+      "РЈР»СЊС‚СЂР°\x20РІС‹СЃРѕРєР°СЏ",
+      "РњРѕР»РЅРёРµРЅРѕСЃРЅР°СЏ",
+      "РђР±СЃРѕР»СЋС‚РЅР°СЏ"
 };
 char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Выстрелов\x3a\x20",
-      "Урон\x3a\x20",
-      "Здоровье\x3a\x20",
-      "Скорость\x3a\x20",
-      "Мораль\x3a\x20",
-      "Удача\x3a\x20",
-      "Выстрелов\x3a\x20"
+      "РђС‚Р°РєР°\x3a\x20",
+      "Р—Р°С‰РёС‚Р°\x3a\x20",
+      "Р’С‹СЃС‚СЂРµР»РѕРІ\x3a\x20",
+      "РЈСЂРѕРЅ\x3a\x20",
+      "Р—РґРѕСЂРѕРІСЊРµ\x3a\x20",
+      "РЎРєРѕСЂРѕСЃС‚СЊ\x3a\x20",
+      "РњРѕСЂР°Р»СЊ\x3a\x20",
+      "РЈРґР°С‡Р°\x3a\x20",
+      "Р’С‹СЃС‚СЂРµР»РѕРІ\x3a\x20"
 };
 char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Выстр\x2e\x3a\x20",
-      "Урон\x3a\x20",
-      "ЗД\x3a\x20",
-      "Скор\x2e\x3a\x20",
-      "Всего\x3a\x20",
-      "\x0a\x0aСкорость\x3a\x0a\x25\x73",
-      "\x0a\x0aПрирост\x0a\x20\x2b\x20\x25\x64\x2fнед\x2e"
+      "РђС‚Р°РєР°\x3a\x20",
+      "Р—Р°С‰РёС‚Р°\x3a\x20",
+      "Р’С‹СЃС‚СЂ\x2e\x3a\x20",
+      "РЈСЂРѕРЅ\x3a\x20",
+      "Р—Р”\x3a\x20",
+      "РЎРєРѕСЂ\x2e\x3a\x20",
+      "Р’СЃРµРіРѕ\x3a\x20",
+      "\x0a\x0aРЎРєРѕСЂРѕСЃС‚СЊ\x3a\x0a\x25\x73",
+      "\x0a\x0aРџСЂРёСЂРѕСЃС‚\x0a\x20\x2b\x20\x25\x64\x2fРЅРµРґ\x2e"
 };
 char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
-      "Обзор\x20королевства\x20\x20\x20Месяц\x3a\x20\x25\x64\x2c\x20Неделя\x3a\x20\x25\x64\x2c\x20День\x3a"
+      "РћР±Р·РѕСЂ\x20РєРѕСЂРѕР»РµРІСЃС‚РІР°\x20\x20\x20РњРµСЃСЏС†\x3a\x20\x25\x64\x2c\x20РќРµРґРµР»СЏ\x3a\x20\x25\x64\x2c\x20Р”РµРЅСЊ\x3a"
         "\x20\x25\x64",
-      "Ваш\x20Драконий\x20город\x2e",
-      "Ваш\x20маяк\x2e"
+      "Р’Р°С€\x20Р”СЂР°РєРѕРЅРёР№\x20РіРѕСЂРѕРґ\x2e",
+      "Р’Р°С€\x20РјР°СЏРє\x2e"
 };
 char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
-      "\x25\x73\x2c\x20у\x20вас\x20осталось\x20всего\x20\x25\x64\x20дней\x20на\x20то\x2c\x20чтобы\x20за"
-        "воевать\x20хотя\x20бы\x20один\x20город\x3b\x20иначе\x20вы\x20будете\x20наве"
-        "ки\x20изгнаны\x20из\x20страны\x2e",
-      "\x25\x73\x2c\x20настал\x20последний\x20день\x2c\x20когда\x20вы\x20еще\x20можете\x20з"
-        "авоевать\x20себе\x20город\x3b\x20в\x20противном\x20случае\x20вы\x20будет"
-        "е\x20навеки\x20изгнаны\x20из\x20страны\x2e",
-      "Астрологи\x20объявляют\x20месяц\x20\x25\x73\x2e\x0a\x0aНаселение\x20всех\x20жи"
-        "лищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x2c\x20что\x20этому\x20месяцу\x20покровител"
-        "ьствует\x20сила\x20\x25\x73\x2e\x0a\x0aПопуляция\x20\x25\x73\x20удваивается\x21\x0a\x0aНас"
-        "еление\x20всех\x20жилищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x20месяц\x20ЧУМЫ\x21\x0a\x0aНаселение\x20всех\x20"
-        "жилищ\x20уменьшилось\x20вдвое\x2e",
-      "Астрологи\x20объявляют\x20неделю\x20\x25\x73\x2e\x0a\x0aНаселение\x20всех\x20ж"
-        "илищ\x20возросло\x2e",
-      "Астрологи\x20объявляют\x2c\x20что\x20этой\x20неделе\x20покровитель"
-        "ствует\x20сила\x20\x25\x73\x2e\x0a\x0aПопуляция\x20\x25\x73\x20\x2b\x35\x2e\x0a\x0aНаселение\x20все"
-        "х\x20жилищ\x20возросло\x2e"
+      "\x25\x73\x2c\x20Сѓ\x20РІР°СЃ\x20РѕСЃС‚Р°Р»РѕСЃСЊ\x20РІСЃРµРіРѕ\x20\x25\x64\x20РґРЅРµР№\x20РЅР°\x20С‚Рѕ\x2c\x20С‡С‚РѕР±С‹\x20Р·Р°"
+        "РІРѕРµРІР°С‚СЊ\x20С…РѕС‚СЏ\x20Р±С‹\x20РѕРґРёРЅ\x20РіРѕСЂРѕРґ\x3b\x20РёРЅР°С‡Рµ\x20РІС‹\x20Р±СѓРґРµС‚Рµ\x20РЅР°РІРµ"
+        "РєРё\x20РёР·РіРЅР°РЅС‹\x20РёР·\x20СЃС‚СЂР°РЅС‹\x2e",
+      "\x25\x73\x2c\x20РЅР°СЃС‚Р°Р»\x20РїРѕСЃР»РµРґРЅРёР№\x20РґРµРЅСЊ\x2c\x20РєРѕРіРґР°\x20РІС‹\x20РµС‰Рµ\x20РјРѕР¶РµС‚Рµ\x20Р·"
+        "Р°РІРѕРµРІР°С‚СЊ\x20СЃРµР±Рµ\x20РіРѕСЂРѕРґ\x3b\x20РІ\x20РїСЂРѕС‚РёРІРЅРѕРј\x20СЃР»СѓС‡Р°Рµ\x20РІС‹\x20Р±СѓРґРµС‚"
+        "Рµ\x20РЅР°РІРµРєРё\x20РёР·РіРЅР°РЅС‹\x20РёР·\x20СЃС‚СЂР°РЅС‹\x2e",
+      "РђСЃС‚СЂРѕР»РѕРіРё\x20РѕР±СЉСЏРІР»СЏСЋС‚\x20РјРµСЃСЏС†\x20\x25\x73\x2e\x0a\x0aРќР°СЃРµР»РµРЅРёРµ\x20РІСЃРµС…\x20Р¶Рё"
+        "Р»РёС‰\x20РІРѕР·СЂРѕСЃР»Рѕ\x2e",
+      "РђСЃС‚СЂРѕР»РѕРіРё\x20РѕР±СЉСЏРІР»СЏСЋС‚\x2c\x20С‡С‚Рѕ\x20СЌС‚РѕРјСѓ\x20РјРµСЃСЏС†Сѓ\x20РїРѕРєСЂРѕРІРёС‚РµР»"
+        "СЊСЃС‚РІСѓРµС‚\x20СЃРёР»Р°\x20\x25\x73\x2e\x0a\x0aРџРѕРїСѓР»СЏС†РёСЏ\x20\x25\x73\x20СѓРґРІР°РёРІР°РµС‚СЃСЏ\x21\x0a\x0aРќР°СЃ"
+        "РµР»РµРЅРёРµ\x20РІСЃРµС…\x20Р¶РёР»РёС‰\x20РІРѕР·СЂРѕСЃР»Рѕ\x2e",
+      "РђСЃС‚СЂРѕР»РѕРіРё\x20РѕР±СЉСЏРІР»СЏСЋС‚\x20РјРµСЃСЏС†\x20Р§РЈРњР«\x21\x0a\x0aРќР°СЃРµР»РµРЅРёРµ\x20РІСЃРµС…\x20"
+        "Р¶РёР»РёС‰\x20СѓРјРµРЅСЊС€РёР»РѕСЃСЊ\x20РІРґРІРѕРµ\x2e",
+      "РђСЃС‚СЂРѕР»РѕРіРё\x20РѕР±СЉСЏРІР»СЏСЋС‚\x20РЅРµРґРµР»СЋ\x20\x25\x73\x2e\x0a\x0aРќР°СЃРµР»РµРЅРёРµ\x20РІСЃРµС…\x20Р¶"
+        "РёР»РёС‰\x20РІРѕР·СЂРѕСЃР»Рѕ\x2e",
+      "РђСЃС‚СЂРѕР»РѕРіРё\x20РѕР±СЉСЏРІР»СЏСЋС‚\x2c\x20С‡С‚Рѕ\x20СЌС‚РѕР№\x20РЅРµРґРµР»Рµ\x20РїРѕРєСЂРѕРІРёС‚РµР»СЊ"
+        "СЃС‚РІСѓРµС‚\x20СЃРёР»Р°\x20\x25\x73\x2e\x0a\x0aРџРѕРїСѓР»СЏС†РёСЏ\x20\x25\x73\x20\x2b\x35\x2e\x0a\x0aРќР°СЃРµР»РµРЅРёРµ\x20РІСЃРµ"
+        "С…\x20Р¶РёР»РёС‰\x20РІРѕР·СЂРѕСЃР»Рѕ\x2e"
 };
 char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
-      "Атака\x3a\x20",
-      "Защита\x3a\x20",
-      "Сила\x20магии\x3a\x20",
-      "Знания\x3a\x20",
-      "Мораль\x3a\x20",
-      "Удача\x3a\x20",
-      "Очки\x20магии\x3a\x20"
+      "РђС‚Р°РєР°\x3a\x20",
+      "Р—Р°С‰РёС‚Р°\x3a\x20",
+      "РЎРёР»Р°\x20РјР°РіРёРё\x3a\x20",
+      "Р—РЅР°РЅРёСЏ\x3a\x20",
+      "РњРѕСЂР°Р»СЊ\x3a\x20",
+      "РЈРґР°С‡Р°\x3a\x20",
+      "РћС‡РєРё\x20РјР°РіРёРё\x3a\x20"
 };
 char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
-      "Остановить\x20катапульту",
-      "Направить\x20заклинание",
-      "Отступить",
-      "Сдаться",
-      "Отменить",
-      "Возможности\x20героя",
-      "Возможности\x20капитана"
+      "РћСЃС‚Р°РЅРѕРІРёС‚СЊ\x20РєР°С‚Р°РїСѓР»СЊС‚Сѓ",
+      "РќР°РїСЂР°РІРёС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ",
+      "РћС‚СЃС‚СѓРїРёС‚СЊ",
+      "РЎРґР°С‚СЊСЃСЏ",
+      "РћС‚РјРµРЅРёС‚СЊ",
+      "Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё\x20РіРµСЂРѕСЏ",
+      "Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё\x20РєР°РїРёС‚Р°РЅР°"
 };
 char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
-      "\x7bНаправить\x20заклинание\x7d\x0a\x0aНаправить\x20заклинание\x2e\x20В\x20"
-        "течение\x20каждого\x20раунда\x20боя\x20можно\x20направить\x20лишь\x20"
-        "одно\x20заклинание\x2e\x20Новый\x20раунд\x20начинается\x20после\x20то"
-        "го\x2c\x20как\x20все\x20отряды\x20на\x20поле\x20боя\x20завершили\x20свой\x20хо"
-        "д\x2e",
-      "\x7bОтступить\x7d\x0a\x0aГерой\x20отступает\x20с\x20поля\x20боя\x2c\x20бросив\x20"
-        "свое\x20войско\x20на\x20произвол\x20судьбы\x2e\x20Отступившего\x20гер"
-        "оя\x20можно\x20будет\x20снова\x20нанять\x20на\x20службу\x2c\x20но\x20при\x20эт"
-        "ом\x20сопровождать\x20его\x20будет\x20лишь\x20очень\x20небольшая\x20а"
-        "рмия\x2c\x20как\x20если\x20бы\x20ваш\x20герой\x20был\x20зеленым\x20новичком"
+      "\x7bРќР°РїСЂР°РІРёС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x7d\x0a\x0aРќР°РїСЂР°РІРёС‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x2e\x20Р’\x20"
+        "С‚РµС‡РµРЅРёРµ\x20РєР°Р¶РґРѕРіРѕ\x20СЂР°СѓРЅРґР°\x20Р±РѕСЏ\x20РјРѕР¶РЅРѕ\x20РЅР°РїСЂР°РІРёС‚СЊ\x20Р»РёС€СЊ\x20"
+        "РѕРґРЅРѕ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x2e\x20РќРѕРІС‹Р№\x20СЂР°СѓРЅРґ\x20РЅР°С‡РёРЅР°РµС‚СЃСЏ\x20РїРѕСЃР»Рµ\x20С‚Рѕ"
+        "РіРѕ\x2c\x20РєР°Рє\x20РІСЃРµ\x20РѕС‚СЂСЏРґС‹\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x20Р·Р°РІРµСЂС€РёР»Рё\x20СЃРІРѕР№\x20С…Рѕ"
+        "Рґ\x2e",
+      "\x7bРћС‚СЃС‚СѓРїРёС‚СЊ\x7d\x0a\x0aР“РµСЂРѕР№\x20РѕС‚СЃС‚СѓРїР°РµС‚\x20СЃ\x20РїРѕР»СЏ\x20Р±РѕСЏ\x2c\x20Р±СЂРѕСЃРёРІ\x20"
+        "СЃРІРѕРµ\x20РІРѕР№СЃРєРѕ\x20РЅР°\x20РїСЂРѕРёР·РІРѕР»\x20СЃСѓРґСЊР±С‹\x2e\x20РћС‚СЃС‚СѓРїРёРІС€РµРіРѕ\x20РіРµСЂ"
+        "РѕСЏ\x20РјРѕР¶РЅРѕ\x20Р±СѓРґРµС‚\x20СЃРЅРѕРІР°\x20РЅР°РЅСЏС‚СЊ\x20РЅР°\x20СЃР»СѓР¶Р±Сѓ\x2c\x20РЅРѕ\x20РїСЂРё\x20СЌС‚"
+        "РѕРј\x20СЃРѕРїСЂРѕРІРѕР¶РґР°С‚СЊ\x20РµРіРѕ\x20Р±СѓРґРµС‚\x20Р»РёС€СЊ\x20РѕС‡РµРЅСЊ\x20РЅРµР±РѕР»СЊС€Р°СЏ\x20Р°"
+        "СЂРјРёСЏ\x2c\x20РєР°Рє\x20РµСЃР»Рё\x20Р±С‹\x20РІР°С€\x20РіРµСЂРѕР№\x20Р±С‹Р»\x20Р·РµР»РµРЅС‹Рј\x20РЅРѕРІРёС‡РєРѕРј"
         "\x2e",
-      "\x7bСдаться\x7d\x0a\x0aКапитуляция\x20стоит\x20денег\x2e\x20Тем\x20не\x20менее"
-        "\x2c\x20если\x20выкуп\x20будет\x20уплачен\x2c\x20героя\x20можно\x20будет\x20сн"
-        "ова\x20нанять\x20на\x20службу\x20вместе\x20со\x20всеми\x20уцелевшими\x20"
-        "в\x20битве\x20войсками\x2e",
-      "\x7bОтмена\x7d\x0a\x0aВернуться\x20в\x20бой\x2e"
+      "\x7bРЎРґР°С‚СЊСЃСЏ\x7d\x0a\x0aРљР°РїРёС‚СѓР»СЏС†РёСЏ\x20СЃС‚РѕРёС‚\x20РґРµРЅРµРі\x2e\x20РўРµРј\x20РЅРµ\x20РјРµРЅРµРµ"
+        "\x2c\x20РµСЃР»Рё\x20РІС‹РєСѓРї\x20Р±СѓРґРµС‚\x20СѓРїР»Р°С‡РµРЅ\x2c\x20РіРµСЂРѕСЏ\x20РјРѕР¶РЅРѕ\x20Р±СѓРґРµС‚\x20СЃРЅ"
+        "РѕРІР°\x20РЅР°РЅСЏС‚СЊ\x20РЅР°\x20СЃР»СѓР¶Р±Сѓ\x20РІРјРµСЃС‚Рµ\x20СЃРѕ\x20РІСЃРµРјРё\x20СѓС†РµР»РµРІС€РёРјРё\x20"
+        "РІ\x20Р±РёС‚РІРµ\x20РІРѕР№СЃРєР°РјРё\x2e",
+      "\x7bРћС‚РјРµРЅР°\x7d\x0a\x0aР’РµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20Р±РѕР№\x2e"
 };
 char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
       "",
-      "\x25\x73\x3a\x20Идти\x20сюда\x2e",
-      "\x25\x73\x3a\x20Перелететь\x20сюда\x2e",
-      "Атаковать\x20\x25\x73",
-      "Стрелять\x20в\x20\x25\x73\x20\x28осталось\x20\x25\x64\x20выстр\x2e\x29",
-      "Возможности\x20героя",
-      "Вражеский\x20герой",
-      "\x25\x73\x3a\x20Показать\x20информацию\x2e",
-      "Нет\x20стрел\x21",
-      "Возможности\x20капитана",
-      "Показать\x20вражеского\x20капитана",
-      "Информация\x20о\x20баллисте"
+      "\x25\x73\x3a\x20РРґС‚Рё\x20СЃСЋРґР°\x2e",
+      "\x25\x73\x3a\x20РџРµСЂРµР»РµС‚РµС‚СЊ\x20СЃСЋРґР°\x2e",
+      "РђС‚Р°РєРѕРІР°С‚СЊ\x20\x25\x73",
+      "РЎС‚СЂРµР»СЏС‚СЊ\x20РІ\x20\x25\x73\x20\x28РѕСЃС‚Р°Р»РѕСЃСЊ\x20\x25\x64\x20РІС‹СЃС‚СЂ\x2e\x29",
+      "Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё\x20РіРµСЂРѕСЏ",
+      "Р’СЂР°Р¶РµСЃРєРёР№\x20РіРµСЂРѕР№",
+      "\x25\x73\x3a\x20РџРѕРєР°Р·Р°С‚СЊ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x2e",
+      "РќРµС‚\x20СЃС‚СЂРµР»\x21",
+      "Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё\x20РєР°РїРёС‚Р°РЅР°",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20РІСЂР°Р¶РµСЃРєРѕРіРѕ\x20РєР°РїРёС‚Р°РЅР°",
+      "РРЅС„РѕСЂРјР°С†РёСЏ\x20Рѕ\x20Р±Р°Р»Р»РёСЃС‚Рµ"
 };
 char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
-    {  "\x25\x73\x20получает",   "\x20уровень\x20опыта\x2e\x0a",   "\x20\x25\x64\x20уровней\x20опыта\x2e\x0a"};
+    {  "\x25\x73\x20РїРѕР»СѓС‡Р°РµС‚",   "\x20СѓСЂРѕРІРµРЅСЊ\x20РѕРїС‹С‚Р°\x2e\x0a",   "\x20\x25\x64\x20СѓСЂРѕРІРЅРµР№\x20РѕРїС‹С‚Р°\x2e\x0a"};
 char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
-      "Подождать\x2c\x20пока\x20походят\x20другие",
-      "Пропустить\x20ход\x20этого\x20воина",
-      "Автобой",
-      "Системные\x20настройки",
+      "РџРѕРґРѕР¶РґР°С‚СЊ\x2c\x20РїРѕРєР°\x20РїРѕС…РѕРґСЏС‚\x20РґСЂСѓРіРёРµ",
+      "РџСЂРѕРїСѓСЃС‚РёС‚СЊ\x20С…РѕРґ\x20СЌС‚РѕРіРѕ\x20РІРѕРёРЅР°",
+      "РђРІС‚РѕР±РѕР№",
+      "РЎРёСЃС‚РµРјРЅС‹Рµ\x20РЅР°СЃС‚СЂРѕР№РєРё",
       ""
 };
 char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
-      "\x7bЖдать\x7d\x0a\x0aДанный\x20отряд\x20откладывает\x20свой\x20ход\x20и\x20сов"
-        "ершает\x20действие\x20после\x20того\x2c\x20как\x20все\x20остальные\x20от"
-        "ряды\x20походили\x2e",
-      "\x7bПропустить\x20ход\x7d\x0a\x0aОтряд\x20пропускает\x20свой\x20ход\x20в\x20эт"
-        "ом\x20раунде\x2e",
-      "\x7bАвтобой\x7d\x0a\x0aКомпьютер\x20вместо\x20вас\x20управляет\x20вашими"
-        "\x20войсками\x20во\x20время\x20боя\x2e",
-      "\x7bНастройки\x7d\x0a\x0aПозволяет\x20изменять\x20настройки\x20боя\x2e",
-      "\x7bИнформационная\x20строка\x7d\x0a\x0aЗдесь\x20отображаются\x20резу"
-        "льтаты\x20действий\x20отдельных\x20отрядов\x2e"
+      "\x7bР–РґР°С‚СЊ\x7d\x0a\x0aР”Р°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РѕС‚РєР»Р°РґС‹РІР°РµС‚\x20СЃРІРѕР№\x20С…РѕРґ\x20Рё\x20СЃРѕРІ"
+        "РµСЂС€Р°РµС‚\x20РґРµР№СЃС‚РІРёРµ\x20РїРѕСЃР»Рµ\x20С‚РѕРіРѕ\x2c\x20РєР°Рє\x20РІСЃРµ\x20РѕСЃС‚Р°Р»СЊРЅС‹Рµ\x20РѕС‚"
+        "СЂСЏРґС‹\x20РїРѕС…РѕРґРёР»Рё\x2e",
+      "\x7bРџСЂРѕРїСѓСЃС‚РёС‚СЊ\x20С…РѕРґ\x7d\x0a\x0aРћС‚СЂСЏРґ\x20РїСЂРѕРїСѓСЃРєР°РµС‚\x20СЃРІРѕР№\x20С…РѕРґ\x20РІ\x20СЌС‚"
+        "РѕРј\x20СЂР°СѓРЅРґРµ\x2e",
+      "\x7bРђРІС‚РѕР±РѕР№\x7d\x0a\x0aРљРѕРјРїСЊСЋС‚РµСЂ\x20РІРјРµСЃС‚Рѕ\x20РІР°СЃ\x20СѓРїСЂР°РІР»СЏРµС‚\x20РІР°С€РёРјРё"
+        "\x20РІРѕР№СЃРєР°РјРё\x20РІРѕ\x20РІСЂРµРјСЏ\x20Р±РѕСЏ\x2e",
+      "\x7bРќР°СЃС‚СЂРѕР№РєРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РёР·РјРµРЅСЏС‚СЊ\x20РЅР°СЃС‚СЂРѕР№РєРё\x20Р±РѕСЏ\x2e",
+      "\x7bРРЅС„РѕСЂРјР°С†РёРѕРЅРЅР°СЏ\x20СЃС‚СЂРѕРєР°\x7d\x0a\x0aР—РґРµСЃСЊ\x20РѕС‚РѕР±СЂР°Р¶Р°СЋС‚СЃСЏ\x20СЂРµР·Сѓ"
+        "Р»СЊС‚Р°С‚С‹\x20РґРµР№СЃС‚РІРёР№\x20РѕС‚РґРµР»СЊРЅС‹С…\x20РѕС‚СЂСЏРґРѕРІ\x2e"
 };
 char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
-      "Разделить\x20отряд\x20\x25\x73",
-      "Нельзя\x20отнять\x20последних\x20воинов\x20у\x20героя\x20",
-      "Соединить\x20отряды\x20\x25\x73",
-      "Разделить\x20отряд\x20\x25\x73",
-      "Посмотреть\x20на\x20\x25\x73",
-      "Нельзя\x20перенести\x20в\x20гарнизон\x20последний\x20отряд\x2e",
-      "Передвинуть\x20сюда\x20отряд\x20\x25\x73",
-      "Отряды\x20\x25\x73\x20и\x20\x25\x73\x20меняются\x20местами",
-      "Выйти\x20из\x20города",
+      "Р Р°Р·РґРµР»РёС‚СЊ\x20РѕС‚СЂСЏРґ\x20\x25\x73",
+      "РќРµР»СЊР·СЏ\x20РѕС‚РЅСЏС‚СЊ\x20РїРѕСЃР»РµРґРЅРёС…\x20РІРѕРёРЅРѕРІ\x20Сѓ\x20РіРµСЂРѕСЏ\x20",
+      "РЎРѕРµРґРёРЅРёС‚СЊ\x20РѕС‚СЂСЏРґС‹\x20\x25\x73",
+      "Р Р°Р·РґРµР»РёС‚СЊ\x20РѕС‚СЂСЏРґ\x20\x25\x73",
+      "РџРѕСЃРјРѕС‚СЂРµС‚СЊ\x20РЅР°\x20\x25\x73",
+      "РќРµР»СЊР·СЏ\x20РїРµСЂРµРЅРµСЃС‚Рё\x20РІ\x20РіР°СЂРЅРёР·РѕРЅ\x20РїРѕСЃР»РµРґРЅРёР№\x20РѕС‚СЂСЏРґ\x2e",
+      "РџРµСЂРµРґРІРёРЅСѓС‚СЊ\x20СЃСЋРґР°\x20РѕС‚СЂСЏРґ\x20\x25\x73",
+      "РћС‚СЂСЏРґС‹\x20\x25\x73\x20Рё\x20\x25\x73\x20РјРµРЅСЏСЋС‚СЃСЏ\x20РјРµСЃС‚Р°РјРё",
+      "Р’С‹Р№С‚Рё\x20РёР·\x20РіРѕСЂРѕРґР°",
       "",
-      "Обзор\x20королевства",
-      "Пусто",
+      "РћР±Р·РѕСЂ\x20РєРѕСЂРѕР»РµРІСЃС‚РІР°",
+      "РџСѓСЃС‚Рѕ",
       "\x25\x73",
-      "Показать\x20героя",
-      "Гильдия\x20магов",
-      "Гильдия\x20воров",
-      "Таверна",
-      "Верфь",
-      "Колодец",
-      "Шатер",
-      "Замок",
-      "Нанять\x20\x25\x73",
-      "Статуя",
-      "Левая\x20башня",
-      "Правая\x20башня",
-      "Ров",
-      "Рынок",
-      "Дом\x20капитана"
+      "РџРѕРєР°Р·Р°С‚СЊ\x20РіРµСЂРѕСЏ",
+      "Р“РёР»СЊРґРёСЏ\x20РјР°РіРѕРІ",
+      "Р“РёР»СЊРґРёСЏ\x20РІРѕСЂРѕРІ",
+      "РўР°РІРµСЂРЅР°",
+      "Р’РµСЂС„СЊ",
+      "РљРѕР»РѕРґРµС†",
+      "РЁР°С‚РµСЂ",
+      "Р—Р°РјРѕРє",
+      "РќР°РЅСЏС‚СЊ\x20\x25\x73",
+      "РЎС‚Р°С‚СѓСЏ",
+      "Р›РµРІР°СЏ\x20Р±Р°С€РЅСЏ",
+      "РџСЂР°РІР°СЏ\x20Р±Р°С€РЅСЏ",
+      "Р РѕРІ",
+      "Р С‹РЅРѕРє",
+      "Р”РѕРј\x20РєР°РїРёС‚Р°РЅР°"
 };
 char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
-      "Лорд\x20Килбурн",   "Сэр\x20Галлант",   "Эктор",      "Гвеннет",   "Тиро",      "Амброзий",     "Руби",
-      "Максимус",        "Димитри",       "Сундакс",    "Финеоз",    "Джоджош",    "Крэг\x20Хак",   "Джезебель",
-      "Жаклин",         "Эргон",         "Тсабу",      "Атлас",      "Астра",     "Наташа",     "Троян",
-      "Ватавна",        "Ребекка",       "Гем",        "Ариэль",      "Карлавн",   "Луна",        "Арий",
-      "Аламар",         "Виспер",        "Кродо",      "Барок",      "Кастор",   "Агар",        "Фалагар",
-      "Расмонт",      "Мира",          "Флинт",      "Давн",       "Галон",     "Мирини",      "Вилфрей",
-      "Саракин",        "Калиндра",      "Мандигал",   "Зом",        "Дарлана",   "Зам",         "Ранлу",
-      "Чарити",        "Риалдо",        "Роксана",     "Сандро",     "Келия"
+      "Р›РѕСЂРґ\x20РљРёР»Р±СѓСЂРЅ",   "РЎСЌСЂ\x20Р“Р°Р»Р»Р°РЅС‚",   "Р­РєС‚РѕСЂ",      "Р“РІРµРЅРЅРµС‚",   "РўРёСЂРѕ",      "РђРјР±СЂРѕР·РёР№",     "Р СѓР±Рё",
+      "РњР°РєСЃРёРјСѓСЃ",        "Р”РёРјРёС‚СЂРё",       "РЎСѓРЅРґР°РєСЃ",    "Р¤РёРЅРµРѕР·",    "Р”Р¶РѕРґР¶РѕС€",    "РљСЂСЌРі\x20РҐР°Рє",   "Р”Р¶РµР·РµР±РµР»СЊ",
+      "Р–Р°РєР»РёРЅ",         "Р­СЂРіРѕРЅ",         "РўСЃР°Р±Сѓ",      "РђС‚Р»Р°СЃ",      "РђСЃС‚СЂР°",     "РќР°С‚Р°С€Р°",     "РўСЂРѕСЏРЅ",
+      "Р’Р°С‚Р°РІРЅР°",        "Р РµР±РµРєРєР°",       "Р“РµРј",        "РђСЂРёСЌР»СЊ",      "РљР°СЂР»Р°РІРЅ",   "Р›СѓРЅР°",        "РђСЂРёР№",
+      "РђР»Р°РјР°СЂ",         "Р’РёСЃРїРµСЂ",        "РљСЂРѕРґРѕ",      "Р‘Р°СЂРѕРє",      "РљР°СЃС‚РѕСЂ",   "РђРіР°СЂ",        "Р¤Р°Р»Р°РіР°СЂ",
+      "Р Р°СЃРјРѕРЅС‚",      "РњРёСЂР°",          "Р¤Р»РёРЅС‚",      "Р”Р°РІРЅ",       "Р“Р°Р»РѕРЅ",     "РњРёСЂРёРЅРё",      "Р’РёР»С„СЂРµР№",
+      "РЎР°СЂР°РєРёРЅ",        "РљР°Р»РёРЅРґСЂР°",      "РњР°РЅРґРёРіР°Р»",   "Р—РѕРј",        "Р”Р°СЂР»Р°РЅР°",   "Р—Р°Рј",         "Р Р°РЅР»Сѓ",
+      "Р§Р°СЂРёС‚Рё",        "Р РёР°Р»РґРѕ",        "Р РѕРєСЃР°РЅР°",     "РЎР°РЅРґСЂРѕ",     "РљРµР»РёСЏ"
 };
 char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
-      "\x7bУровень\x20сложности\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20устанав"
-        "ливать\x20стартовый\x20уровень\x20сложности\x20игры\x2e\x20Чем\x20выш"
-        "е\x20уровень\x20сложности\x2c\x20тем\x20с\x20меньшим\x20количеством\x20р"
-        "есурсов\x20вы\x20начинаете\x20игру\x2c\x20и\x20тем\x20больше\x20ресурсов"
-        "\x20получают\x20ваши\x20компьютерные\x20противники\x2e",
-      "\x7bФора\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20задавать\x20тому\x20или\x20ин"
-        "ому\x20игроку\x2dчеловеку\x20дать\x20фору\x20другим\x20игрокам\x2e\x20Ес"
-        "ли\x20игрок\x20дает\x20другим\x20фору\x2c\x20он\x20начинает\x20игру\x20с\x20ме"
-        "ньшим\x20количеством\x20ресурсов\x20и\x20каждый\x20ход\x20получает"
-        "\x20на\x20\x31\x35\x20или\x20\x33\x30\x20процентов\x20меньше\x20ресурсов\x20в\x20зависи"
-        "мости\x20от\x20того\x2c\x20насколько\x20большую\x20фору\x20он\x20дает\x2e",
-      "\x7bОппоненты\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20вам\x20задать\x20цвет"
-        "\x20игрока\x20и\x20его\x20стартовую\x20позицию\x2e\x20Каждому\x20цвету\x20с"
-        "оответствует\x20определенная\x20стартовая\x20позиция\x2e\x20Нек"
-        "оторые\x20цвета\x20жестко\x20закреплены\x20либо\x20за\x20компьютер"
-        "ными\x2c\x20либо\x20за\x20живыми\x20игроками\x2e",
-      "\x7bКласс\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20задавать\x20класс\x20игро"
-        "ка\x2e\x20Классы\x20не\x20всегда\x20можно\x20изменять\x2e\x20В\x20зависимос"
-        "ти\x20от\x20сценария\x20игрок\x20может\x20получать\x20дополнительн"
-        "ые\x20города\x20и\x2fили\x20героев\x2c\x20направленность\x20которых\x20н"
-        "е\x20совпадает\x20с\x20изначальной\x20направленностью\x20игрока"
+      "\x7bРЈСЂРѕРІРµРЅСЊ\x20СЃР»РѕР¶РЅРѕСЃС‚Рё\x7d\x0a\x0aР­С‚Р°\x20РѕРїС†РёСЏ\x20РїРѕР·РІРѕР»СЏРµС‚\x20СѓСЃС‚Р°РЅР°РІ"
+        "Р»РёРІР°С‚СЊ\x20СЃС‚Р°СЂС‚РѕРІС‹Р№\x20СѓСЂРѕРІРµРЅСЊ\x20СЃР»РѕР¶РЅРѕСЃС‚Рё\x20РёРіСЂС‹\x2e\x20Р§РµРј\x20РІС‹С€"
+        "Рµ\x20СѓСЂРѕРІРµРЅСЊ\x20СЃР»РѕР¶РЅРѕСЃС‚Рё\x2c\x20С‚РµРј\x20СЃ\x20РјРµРЅСЊС€РёРј\x20РєРѕР»РёС‡РµСЃС‚РІРѕРј\x20СЂ"
+        "РµСЃСѓСЂСЃРѕРІ\x20РІС‹\x20РЅР°С‡РёРЅР°РµС‚Рµ\x20РёРіСЂСѓ\x2c\x20Рё\x20С‚РµРј\x20Р±РѕР»СЊС€Рµ\x20СЂРµСЃСѓСЂСЃРѕРІ"
+        "\x20РїРѕР»СѓС‡Р°СЋС‚\x20РІР°С€Рё\x20РєРѕРјРїСЊСЋС‚РµСЂРЅС‹Рµ\x20РїСЂРѕС‚РёРІРЅРёРєРё\x2e",
+      "\x7bР¤РѕСЂР°\x7d\x0a\x0aР­С‚Р°\x20РѕРїС†РёСЏ\x20РїРѕР·РІРѕР»СЏРµС‚\x20Р·Р°РґР°РІР°С‚СЊ\x20С‚РѕРјСѓ\x20РёР»Рё\x20РёРЅ"
+        "РѕРјСѓ\x20РёРіСЂРѕРєСѓ\x2dС‡РµР»РѕРІРµРєСѓ\x20РґР°С‚СЊ\x20С„РѕСЂСѓ\x20РґСЂСѓРіРёРј\x20РёРіСЂРѕРєР°Рј\x2e\x20Р•СЃ"
+        "Р»Рё\x20РёРіСЂРѕРє\x20РґР°РµС‚\x20РґСЂСѓРіРёРј\x20С„РѕСЂСѓ\x2c\x20РѕРЅ\x20РЅР°С‡РёРЅР°РµС‚\x20РёРіСЂСѓ\x20СЃ\x20РјРµ"
+        "РЅСЊС€РёРј\x20РєРѕР»РёС‡РµСЃС‚РІРѕРј\x20СЂРµСЃСѓСЂСЃРѕРІ\x20Рё\x20РєР°Р¶РґС‹Р№\x20С…РѕРґ\x20РїРѕР»СѓС‡Р°РµС‚"
+        "\x20РЅР°\x20\x31\x35\x20РёР»Рё\x20\x33\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x20РјРµРЅСЊС€Рµ\x20СЂРµСЃСѓСЂСЃРѕРІ\x20РІ\x20Р·Р°РІРёСЃРё"
+        "РјРѕСЃС‚Рё\x20РѕС‚\x20С‚РѕРіРѕ\x2c\x20РЅР°СЃРєРѕР»СЊРєРѕ\x20Р±РѕР»СЊС€СѓСЋ\x20С„РѕСЂСѓ\x20РѕРЅ\x20РґР°РµС‚\x2e",
+      "\x7bРћРїРїРѕРЅРµРЅС‚С‹\x7d\x0a\x0aР­С‚Р°\x20РѕРїС†РёСЏ\x20РїРѕР·РІРѕР»СЏРµС‚\x20РІР°Рј\x20Р·Р°РґР°С‚СЊ\x20С†РІРµС‚"
+        "\x20РёРіСЂРѕРєР°\x20Рё\x20РµРіРѕ\x20СЃС‚Р°СЂС‚РѕРІСѓСЋ\x20РїРѕР·РёС†РёСЋ\x2e\x20РљР°Р¶РґРѕРјСѓ\x20С†РІРµС‚Сѓ\x20СЃ"
+        "РѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚\x20РѕРїСЂРµРґРµР»РµРЅРЅР°СЏ\x20СЃС‚Р°СЂС‚РѕРІР°СЏ\x20РїРѕР·РёС†РёСЏ\x2e\x20РќРµРє"
+        "РѕС‚РѕСЂС‹Рµ\x20С†РІРµС‚Р°\x20Р¶РµСЃС‚РєРѕ\x20Р·Р°РєСЂРµРїР»РµРЅС‹\x20Р»РёР±Рѕ\x20Р·Р°\x20РєРѕРјРїСЊСЋС‚РµСЂ"
+        "РЅС‹РјРё\x2c\x20Р»РёР±Рѕ\x20Р·Р°\x20Р¶РёРІС‹РјРё\x20РёРіСЂРѕРєР°РјРё\x2e",
+      "\x7bРљР»Р°СЃСЃ\x7d\x0a\x0aР­С‚Р°\x20РѕРїС†РёСЏ\x20РїРѕР·РІРѕР»СЏРµС‚\x20Р·Р°РґР°РІР°С‚СЊ\x20РєР»Р°СЃСЃ\x20РёРіСЂРѕ"
+        "РєР°\x2e\x20РљР»Р°СЃСЃС‹\x20РЅРµ\x20РІСЃРµРіРґР°\x20РјРѕР¶РЅРѕ\x20РёР·РјРµРЅСЏС‚СЊ\x2e\x20Р’\x20Р·Р°РІРёСЃРёРјРѕСЃ"
+        "С‚Рё\x20РѕС‚\x20СЃС†РµРЅР°СЂРёСЏ\x20РёРіСЂРѕРє\x20РјРѕР¶РµС‚\x20РїРѕР»СѓС‡Р°С‚СЊ\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅ"
+        "С‹Рµ\x20РіРѕСЂРѕРґР°\x20Рё\x2fРёР»Рё\x20РіРµСЂРѕРµРІ\x2c\x20РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊ\x20РєРѕС‚РѕСЂС‹С…\x20РЅ"
+        "Рµ\x20СЃРѕРІРїР°РґР°РµС‚\x20СЃ\x20РёР·РЅР°С‡Р°Р»СЊРЅРѕР№\x20РЅР°РїСЂР°РІР»РµРЅРЅРѕСЃС‚СЊСЋ\x20РёРіСЂРѕРєР°"
         "\x2e",
-      "\x7bСценарий\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20выбрать\x20игровой\x20"
-        "сценарий\x2e",
-      "\x7bРейтинг\x7d\x0a\x0aРейтинг\x20отражает\x20сочетание\x20различных\x20"
-        "игровых\x20установок\x2e\x20Он\x20используется\x20при\x20расчете\x20к"
-        "онечного\x20результата\x2c\x20достигнутого\x20игроком\x2e",
-      "\x7bОК\x7d\x0a\x0aПодтверждает\x20заданные\x20установки\x20и\x20начинает"
-        "\x20новую\x20игру\x2e",
-      "\x7bОтмена\x7d\x0a\x0aНажмите\x2c\x20чтобы\x20вернуться\x20в\x20главное\x20мен"
-        "ю\x2e"
+      "\x7bРЎС†РµРЅР°СЂРёР№\x7d\x0a\x0aР­С‚Р°\x20РѕРїС†РёСЏ\x20РїРѕР·РІРѕР»СЏРµС‚\x20РІС‹Р±СЂР°С‚СЊ\x20РёРіСЂРѕРІРѕР№\x20"
+        "СЃС†РµРЅР°СЂРёР№\x2e",
+      "\x7bР РµР№С‚РёРЅРі\x7d\x0a\x0aР РµР№С‚РёРЅРі\x20РѕС‚СЂР°Р¶Р°РµС‚\x20СЃРѕС‡РµС‚Р°РЅРёРµ\x20СЂР°Р·Р»РёС‡РЅС‹С…\x20"
+        "РёРіСЂРѕРІС‹С…\x20СѓСЃС‚Р°РЅРѕРІРѕРє\x2e\x20РћРЅ\x20РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ\x20РїСЂРё\x20СЂР°СЃС‡РµС‚Рµ\x20Рє"
+        "РѕРЅРµС‡РЅРѕРіРѕ\x20СЂРµР·СѓР»СЊС‚Р°С‚Р°\x2c\x20РґРѕСЃС‚РёРіРЅСѓС‚РѕРіРѕ\x20РёРіСЂРѕРєРѕРј\x2e",
+      "\x7bРћРљ\x7d\x0a\x0aРџРѕРґС‚РІРµСЂР¶РґР°РµС‚\x20Р·Р°РґР°РЅРЅС‹Рµ\x20СѓСЃС‚Р°РЅРѕРІРєРё\x20Рё\x20РЅР°С‡РёРЅР°РµС‚"
+        "\x20РЅРѕРІСѓСЋ\x20РёРіСЂСѓ\x2e",
+      "\x7bРћС‚РјРµРЅР°\x7d\x0a\x0aРќР°Р¶РјРёС‚Рµ\x2c\x20С‡С‚РѕР±С‹\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅ"
+        "СЋ\x2e"
 };
 char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
-      "\x7b\x32\x34\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости\x20"
-        "\x32\x34\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20испо"
-        "льзуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20модем"
-        "ов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорости\x20"
-        "\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x39\x36\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости\x20"
-        "\x39\x36\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20испо"
-        "льзуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20модем"
-        "ов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорости\x20"
-        "\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x31\x39\x32\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости"
-        "\x20\x31\x39\x32\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20ис"
-        "пользуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20мод"
-        "емов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорост"
-        "и\x20\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7b\x33\x38\x34\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости"
-        "\x20\x33\x38\x34\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20ис"
-        "пользуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20мод"
-        "емов\x20\x32\x38\x38\x30\x30\x20бод\x20используйте\x20соединение\x20на\x20скорост"
-        "и\x20\x33\x38\x34\x30\x30\x20бод\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7b\x32\x34\x30\x30\x20Р±РѕРґ\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20"
+        "\x32\x34\x30\x30\x20Р±РѕРґ\x2e\x0a\x0aР—Р°РјРµС‡Р°РЅРёРµ\x3a\x20Р”Р»СЏ\x20РјРѕРґРµРјРѕРІ\x20\x31\x34\x34\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕ"
+        "Р»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20\x31\x39\x32\x30\x30\x2e\x20\x20Р”Р»СЏ\x20РјРѕРґРµРј"
+        "РѕРІ\x20\x32\x38\x38\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20"
+        "\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e",
+      "\x7b\x39\x36\x30\x30\x20Р±РѕРґ\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20"
+        "\x39\x36\x30\x30\x20Р±РѕРґ\x2e\x0a\x0aР—Р°РјРµС‡Р°РЅРёРµ\x3a\x20Р”Р»СЏ\x20РјРѕРґРµРјРѕРІ\x20\x31\x34\x34\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕ"
+        "Р»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20\x31\x39\x32\x30\x30\x2e\x20\x20Р”Р»СЏ\x20РјРѕРґРµРј"
+        "РѕРІ\x20\x32\x38\x38\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20"
+        "\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e",
+      "\x7b\x31\x39\x32\x30\x30\x20Р±РѕРґ\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё"
+        "\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2e\x0a\x0aР—Р°РјРµС‡Р°РЅРёРµ\x3a\x20Р”Р»СЏ\x20РјРѕРґРµРјРѕРІ\x20\x31\x34\x34\x30\x30\x20Р±РѕРґ\x20РёСЃ"
+        "РїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20\x31\x39\x32\x30\x30\x2e\x20\x20Р”Р»СЏ\x20РјРѕРґ"
+        "РµРјРѕРІ\x20\x32\x38\x38\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚"
+        "Рё\x20\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e",
+      "\x7b\x33\x38\x34\x30\x30\x20Р±РѕРґ\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё"
+        "\x20\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e\x0a\x0aР—Р°РјРµС‡Р°РЅРёРµ\x3a\x20Р”Р»СЏ\x20РјРѕРґРµРјРѕРІ\x20\x31\x34\x34\x30\x30\x20Р±РѕРґ\x20РёСЃ"
+        "РїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚Рё\x20\x31\x39\x32\x30\x30\x2e\x20\x20Р”Р»СЏ\x20РјРѕРґ"
+        "РµРјРѕРІ\x20\x32\x38\x38\x30\x30\x20Р±РѕРґ\x20РёСЃРїРѕР»СЊР·СѓР№С‚Рµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅР°\x20СЃРєРѕСЂРѕСЃС‚"
+        "Рё\x20\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
-      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x31\x2e",
-      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x32\x2e",
-      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x33\x2e",
-      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
-        "орт\x20\x43\x4f\x4d\x20\x34\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РјРѕРґРµРјРЅРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20Рї"
+        "РѕСЂС‚\x20\x43\x4f\x4d\x20\x31\x2e",
+      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РјРѕРґРµРјРЅРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20Рї"
+        "РѕСЂС‚\x20\x43\x4f\x4d\x20\x32\x2e",
+      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РјРѕРґРµРјРЅРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20Рї"
+        "РѕСЂС‚\x20\x43\x4f\x4d\x20\x33\x2e",
+      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РјРѕРґРµРјРЅРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20Рї"
+        "РѕСЂС‚\x20\x43\x4f\x4d\x20\x34\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
-      "\x7bСкорость\x20соединения\x20\x32\x34\x30\x30\x20бод\x2e\x7d\x0a\x0aДля\x20компьютеров"
-        "\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использова"
-        "ть\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20более"
-        "\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30\x20б"
-        "од\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начните"
-        "\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компьют"
-        "еров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20испол"
-        "ьзуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x39\x36\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютеро"
-        "в\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использов"
-        "ать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20боле"
-        "е\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30\x20"
-        "бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начнит"
-        "е\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компью"
-        "теров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20испо"
-        "льзуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x31\x39\x32\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютер"
-        "ов\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использо"
-        "вать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20бол"
-        "ее\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30"
-        "\x20бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начни"
-        "те\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компь"
-        "ютеров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20исп"
-        "ользуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bСкорость\x20соединения\x20\x33\x38\x34\x30\x30\x20бод\x2e\x7d\x0a\x0a\x20Для\x20компьютер"
-        "ов\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использо"
-        "вать\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20бол"
-        "ее\x20современным\x20чипом\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20скорость\x20\x33\x38\x34\x30\x30"
-        "\x20бод\x2e\x20Если\x20вы\x20не\x20уверены\x2c\x20какой\x20у\x20вас\x20чип\x2c\x20начни"
-        "те\x20с\x20более\x20низких\x20скоростей\x2e\x20В\x20большинстве\x20компь"
-        "ютеров\x2c\x20произведенных\x20в\x20\x31\x39\x39\x34\x20году\x20и\x20позднее\x2c\x20исп"
-        "ользуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20\x32\x34\x30\x30\x20Р±РѕРґ\x2e\x7d\x0a\x0aР”Р»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ"
+        "\x20СЃ\x20СѓСЃС‚Р°СЂРµРІС€РёРј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20СЃР»РµРґСѓРµС‚\x20РёСЃРїРѕР»СЊР·РѕРІР°"
+        "С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2c\x20Р°\x20РґР»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x20СЃ\x20Р±РѕР»РµРµ"
+        "\x20СЃРѕРІСЂРµРјРµРЅРЅС‹Рј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x33\x38\x34\x30\x30\x20Р±"
+        "РѕРґ\x2e\x20Р•СЃР»Рё\x20РІС‹\x20РЅРµ\x20СѓРІРµСЂРµРЅС‹\x2c\x20РєР°РєРѕР№\x20Сѓ\x20РІР°СЃ\x20С‡РёРї\x2c\x20РЅР°С‡РЅРёС‚Рµ"
+        "\x20СЃ\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СЃРєРѕСЂРѕСЃС‚РµР№\x2e\x20Р’\x20Р±РѕР»СЊС€РёРЅСЃС‚РІРµ\x20РєРѕРјРїСЊСЋС‚"
+        "РµСЂРѕРІ\x2c\x20РїСЂРѕРёР·РІРµРґРµРЅРЅС‹С…\x20РІ\x20\x31\x39\x39\x34\x20РіРѕРґСѓ\x20Рё\x20РїРѕР·РґРЅРµРµ\x2c\x20РёСЃРїРѕР»"
+        "СЊР·СѓРµС‚СЃСЏ\x20С‡РёРї\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20\x39\x36\x30\x30\x20Р±РѕРґ\x2e\x7d\x0a\x0a\x20Р”Р»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕ"
+        "РІ\x20СЃ\x20СѓСЃС‚Р°СЂРµРІС€РёРј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20СЃР»РµРґСѓРµС‚\x20РёСЃРїРѕР»СЊР·РѕРІ"
+        "Р°С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2c\x20Р°\x20РґР»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x20СЃ\x20Р±РѕР»Рµ"
+        "Рµ\x20СЃРѕРІСЂРµРјРµРЅРЅС‹Рј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x33\x38\x34\x30\x30\x20"
+        "Р±РѕРґ\x2e\x20Р•СЃР»Рё\x20РІС‹\x20РЅРµ\x20СѓРІРµСЂРµРЅС‹\x2c\x20РєР°РєРѕР№\x20Сѓ\x20РІР°СЃ\x20С‡РёРї\x2c\x20РЅР°С‡РЅРёС‚"
+        "Рµ\x20СЃ\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СЃРєРѕСЂРѕСЃС‚РµР№\x2e\x20Р’\x20Р±РѕР»СЊС€РёРЅСЃС‚РІРµ\x20РєРѕРјРїСЊСЋ"
+        "С‚РµСЂРѕРІ\x2c\x20РїСЂРѕРёР·РІРµРґРµРЅРЅС‹С…\x20РІ\x20\x31\x39\x39\x34\x20РіРѕРґСѓ\x20Рё\x20РїРѕР·РґРЅРµРµ\x2c\x20РёСЃРїРѕ"
+        "Р»СЊР·СѓРµС‚СЃСЏ\x20С‡РёРї\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2e\x7d\x0a\x0a\x20Р”Р»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂ"
+        "РѕРІ\x20СЃ\x20СѓСЃС‚Р°СЂРµРІС€РёРј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20СЃР»РµРґСѓРµС‚\x20РёСЃРїРѕР»СЊР·Рѕ"
+        "РІР°С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2c\x20Р°\x20РґР»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x20СЃ\x20Р±РѕР»"
+        "РµРµ\x20СЃРѕРІСЂРµРјРµРЅРЅС‹Рј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x33\x38\x34\x30\x30"
+        "\x20Р±РѕРґ\x2e\x20Р•СЃР»Рё\x20РІС‹\x20РЅРµ\x20СѓРІРµСЂРµРЅС‹\x2c\x20РєР°РєРѕР№\x20Сѓ\x20РІР°СЃ\x20С‡РёРї\x2c\x20РЅР°С‡РЅРё"
+        "С‚Рµ\x20СЃ\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СЃРєРѕСЂРѕСЃС‚РµР№\x2e\x20Р’\x20Р±РѕР»СЊС€РёРЅСЃС‚РІРµ\x20РєРѕРјРїСЊ"
+        "СЋС‚РµСЂРѕРІ\x2c\x20РїСЂРѕРёР·РІРµРґРµРЅРЅС‹С…\x20РІ\x20\x31\x39\x39\x34\x20РіРѕРґСѓ\x20Рё\x20РїРѕР·РґРЅРµРµ\x2c\x20РёСЃРї"
+        "РѕР»СЊР·СѓРµС‚СЃСЏ\x20С‡РёРї\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20\x33\x38\x34\x30\x30\x20Р±РѕРґ\x2e\x7d\x0a\x0a\x20Р”Р»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂ"
+        "РѕРІ\x20СЃ\x20СѓСЃС‚Р°СЂРµРІС€РёРј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20СЃР»РµРґСѓРµС‚\x20РёСЃРїРѕР»СЊР·Рѕ"
+        "РІР°С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x31\x39\x32\x30\x30\x20Р±РѕРґ\x2c\x20Р°\x20РґР»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x20СЃ\x20Р±РѕР»"
+        "РµРµ\x20СЃРѕРІСЂРµРјРµРЅРЅС‹Рј\x20С‡РёРїРѕРј\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x20\x2d\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20\x33\x38\x34\x30\x30"
+        "\x20Р±РѕРґ\x2e\x20Р•СЃР»Рё\x20РІС‹\x20РЅРµ\x20СѓРІРµСЂРµРЅС‹\x2c\x20РєР°РєРѕР№\x20Сѓ\x20РІР°СЃ\x20С‡РёРї\x2c\x20РЅР°С‡РЅРё"
+        "С‚Рµ\x20СЃ\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СЃРєРѕСЂРѕСЃС‚РµР№\x2e\x20Р’\x20Р±РѕР»СЊС€РёРЅСЃС‚РІРµ\x20РєРѕРјРїСЊ"
+        "СЋС‚РµСЂРѕРІ\x2c\x20РїСЂРѕРёР·РІРµРґРµРЅРЅС‹С…\x20РІ\x20\x31\x39\x39\x34\x20РіРѕРґСѓ\x20Рё\x20РїРѕР·РґРЅРµРµ\x2c\x20РёСЃРї"
+        "РѕР»СЊР·СѓРµС‚СЃСЏ\x20С‡РёРї\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
-      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x31\x2e",
-      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x32\x2e",
-      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x33\x2e",
-      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
-        "т\x20\x43\x4f\x4d\x20\x34\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РїСЂСЏРјРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20РїРѕСЂ"
+        "С‚\x20\x43\x4f\x4d\x20\x31\x2e",
+      "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РїСЂСЏРјРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20РїРѕСЂ"
+        "С‚\x20\x43\x4f\x4d\x20\x32\x2e",
+      "\x7b\x43\x4f\x4d\x20\x33\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РїСЂСЏРјРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20РїРѕСЂ"
+        "С‚\x20\x43\x4f\x4d\x20\x33\x2e",
+      "\x7b\x43\x4f\x4d\x20\x34\x7d\x0a\x0aРСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РїСЂСЏРјРѕРіРѕ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20РїРѕСЂ"
+        "С‚\x20\x43\x4f\x4d\x20\x34\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
-      "\x7b\x32\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x32\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x34\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x33\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x33\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x33\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x34\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x34\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
-        "\x20\x32\x20дополнительных\x20компьютерных\x20игроков\x2e",
-      "\x7b\x35\x20игроков\x7d\x0a\x0a\x20Играть\x20с\x20\x35\x20людьми\x20и\x2c\x20опционально\x2c\x20"
-        "с\x20\x31\x20компьютерным\x20игроком\x2e",
-      "\x7b\x36\x20игроков\x7d\x0a\x0a\x20Играть\x20с\x20\x36\x20людьми\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7b\x32\x20РёРіСЂРѕРєР°\x7d\x0a\x0aРРіСЂР°С‚СЊ\x20СЃ\x20\x32\x20Р»СЋРґСЊРјРё\x20Рё\x2c\x20РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ\x2c\x20РґРѕ"
+        "\x20\x34\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С…\x20РєРѕРјРїСЊСЋС‚РµСЂРЅС‹С…\x20РёРіСЂРѕРєРѕРІ\x2e",
+      "\x7b\x33\x20РёРіСЂРѕРєР°\x7d\x0a\x0aРРіСЂР°С‚СЊ\x20СЃ\x20\x33\x20Р»СЋРґСЊРјРё\x20Рё\x2c\x20РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ\x2c\x20РґРѕ"
+        "\x20\x33\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С…\x20РєРѕРјРїСЊСЋС‚РµСЂРЅС‹С…\x20РёРіСЂРѕРєРѕРІ\x2e",
+      "\x7b\x34\x20РёРіСЂРѕРєР°\x7d\x0a\x0aРРіСЂР°С‚СЊ\x20СЃ\x20\x34\x20Р»СЋРґСЊРјРё\x20Рё\x2c\x20РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ\x2c\x20РґРѕ"
+        "\x20\x32\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С…\x20РєРѕРјРїСЊСЋС‚РµСЂРЅС‹С…\x20РёРіСЂРѕРєРѕРІ\x2e",
+      "\x7b\x35\x20РёРіСЂРѕРєРѕРІ\x7d\x0a\x0a\x20РРіСЂР°С‚СЊ\x20СЃ\x20\x35\x20Р»СЋРґСЊРјРё\x20Рё\x2c\x20РѕРїС†РёРѕРЅР°Р»СЊРЅРѕ\x2c\x20"
+        "СЃ\x20\x31\x20РєРѕРјРїСЊСЋС‚РµСЂРЅС‹Рј\x20РёРіСЂРѕРєРѕРј\x2e",
+      "\x7b\x36\x20РёРіСЂРѕРєРѕРІ\x7d\x0a\x0a\x20РРіСЂР°С‚СЊ\x20СЃ\x20\x36\x20Р»СЋРґСЊРјРё\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e\x20Может\x20бы"
-        "ть\x2c\x20только\x20один\x20хост\x20в\x20одном\x20сетевом\x20соединении\x2e",
-      "\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-        "ойки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20в"
-        "\x20игру\x2e",
-      "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bРЎРµСЂРІРµСЂ\x7d\x0a\x0aРЎРµСЂРІРµСЂ\x20Р·Р°РґР°РµС‚\x20РЅР°СЃС‚СЂРѕР№РєРё\x20РёРіСЂС‹\x2e\x20РњРѕР¶РµС‚\x20Р±С‹"
+        "С‚СЊ\x2c\x20С‚РѕР»СЊРєРѕ\x20РѕРґРёРЅ\x20С…РѕСЃС‚\x20РІ\x20РѕРґРЅРѕРј\x20СЃРµС‚РµРІРѕРј\x20СЃРѕРµРґРёРЅРµРЅРёРё\x2e",
+      "\x7bР“РѕСЃС‚СЊ\x7d\x0a\x0aР“РѕСЃС‚СЊ\x20РѕР¶РёРґР°РµС‚\x2c\x20РїРѕРєР°\x20СЃРµСЂРІРµСЂ\x20Р·Р°РґР°СЃС‚\x20РЅР°СЃС‚СЂ"
+        "РѕР№РєРё\x20РёРіСЂС‹\x2c\x20РїРѕСЃР»Рµ\x20С‡РµРіРѕ\x20РѕРЅ\x20Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё\x20РІСЃС‚СѓРїРёС‚\x20РІ"
+        "\x20РёРіСЂСѓ\x2e",
+      "\x7bРќР°СЃС‚СЂРѕР№РєРё\x7d\x0a\x0aРР·РјРµРЅРёС‚СЊ\x20РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ\x20РјРѕРґРµРјР°\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e",
-      "\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-        "ойки\x20игры\x2e",
-      "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bРЎРµСЂРІРµСЂ\x7d\x0a\x0aРЎРµСЂРІРµСЂ\x20Р·Р°РґР°РµС‚\x20РЅР°СЃС‚СЂРѕР№РєРё\x20РёРіСЂС‹\x2e",
+      "\x7bР“РѕСЃС‚СЊ\x7d\x0a\x0aР“РѕСЃС‚СЊ\x20РѕР¶РёРґР°РµС‚\x2c\x20РїРѕРєР°\x20СЃРµСЂРІРµСЂ\x20Р·Р°РґР°СЃС‚\x20РЅР°СЃС‚СЂ"
+        "РѕР№РєРё\x20РёРіСЂС‹\x2e",
+      "\x7bРќР°СЃС‚СЂРѕР№РєРё\x7d\x0a\x0aРР·РјРµРЅРёС‚СЊ\x20РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ\x20РјРѕРґРµРјР°\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
-      "\x7bЗа\x20одной\x20машиной\x7d\x0a\x0aИграть\x20за\x20одной\x20машиной\x2c\x20где"
-        "\x20от\x20\x32\x20до\x20\x34\x20игроков\x20людей\x2e",
-      "\x7bЛокальная\x20сеть\x7d\x0a\x0aИграть\x20по\x20сети\x2c\x20где\x20двое\x20игрок"
-        "ов\x20играют\x20по\x20локальной\x20сети\x2c\x20сидя\x20за\x20своими\x20комп"
-        "ьютерами\x2e",
-      "\x7bМодем\x7d\x0a\x0aДвое\x20игроков\x20играют\x20через\x20модемы\x20сидя\x20з"
-        "а\x20своими\x20компьютерами\x2e",
-      "\x7bПрямое\x20соединение\x7d\x0a\x0aДвое\x20игроков\x20играют\x20через\x20н"
-        "оль\x2dмодем\x20сидя\x20за\x20своими\x20компьютерами\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bР—Р°\x20РѕРґРЅРѕР№\x20РјР°С€РёРЅРѕР№\x7d\x0a\x0aРРіСЂР°С‚СЊ\x20Р·Р°\x20РѕРґРЅРѕР№\x20РјР°С€РёРЅРѕР№\x2c\x20РіРґРµ"
+        "\x20РѕС‚\x20\x32\x20РґРѕ\x20\x34\x20РёРіСЂРѕРєРѕРІ\x20Р»СЋРґРµР№\x2e",
+      "\x7bР›РѕРєР°Р»СЊРЅР°СЏ\x20СЃРµС‚СЊ\x7d\x0a\x0aРРіСЂР°С‚СЊ\x20РїРѕ\x20СЃРµС‚Рё\x2c\x20РіРґРµ\x20РґРІРѕРµ\x20РёРіСЂРѕРє"
+        "РѕРІ\x20РёРіСЂР°СЋС‚\x20РїРѕ\x20Р»РѕРєР°Р»СЊРЅРѕР№\x20СЃРµС‚Рё\x2c\x20СЃРёРґСЏ\x20Р·Р°\x20СЃРІРѕРёРјРё\x20РєРѕРјРї"
+        "СЊСЋС‚РµСЂР°РјРё\x2e",
+      "\x7bРњРѕРґРµРј\x7d\x0a\x0aР”РІРѕРµ\x20РёРіСЂРѕРєРѕРІ\x20РёРіСЂР°СЋС‚\x20С‡РµСЂРµР·\x20РјРѕРґРµРјС‹\x20СЃРёРґСЏ\x20Р·"
+        "Р°\x20СЃРІРѕРёРјРё\x20РєРѕРјРїСЊСЋС‚РµСЂР°РјРё\x2e",
+      "\x7bРџСЂСЏРјРѕРµ\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x7d\x0a\x0aР”РІРѕРµ\x20РёРіСЂРѕРєРѕРІ\x20РёРіСЂР°СЋС‚\x20С‡РµСЂРµР·\x20РЅ"
+        "РѕР»СЊ\x2dРјРѕРґРµРј\x20СЃРёРґСЏ\x20Р·Р°\x20СЃРІРѕРёРјРё\x20РєРѕРјРїСЊСЋС‚РµСЂР°РјРё\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
-      "\x7bСервер\x7d\x0a\x0aОпределяет\x20настройки\x20игры\x2e\x20Может\x20быть\x20"
-        "только\x20один\x20сервер\x20в\x20одном\x20соединении\x2e",
-      "\x7bГость\x7d\x0a\x0a\x20Гость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20наст"
-        "ройки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20"
-        "в\x20игру\x2e\x20В\x20игре\x20через\x20\x54\x43\x50\x2f\x49\x50\x20и\x20\x49\x50\x58\x20может\x20быть\x20нес"
-        "колько\x20гостей\x2e\x20В\x20игре\x20через\x20\x4e\x65\x74\x42\x49\x4f\x53\x20\x2d\x20только\x20\x31\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bРЎРµСЂРІРµСЂ\x7d\x0a\x0aРћРїСЂРµРґРµР»СЏРµС‚\x20РЅР°СЃС‚СЂРѕР№РєРё\x20РёРіСЂС‹\x2e\x20РњРѕР¶РµС‚\x20Р±С‹С‚СЊ\x20"
+        "С‚РѕР»СЊРєРѕ\x20РѕРґРёРЅ\x20СЃРµСЂРІРµСЂ\x20РІ\x20РѕРґРЅРѕРј\x20СЃРѕРµРґРёРЅРµРЅРёРё\x2e",
+      "\x7bР“РѕСЃС‚СЊ\x7d\x0a\x0a\x20Р“РѕСЃС‚СЊ\x20РѕР¶РёРґР°РµС‚\x2c\x20РїРѕРєР°\x20СЃРµСЂРІРµСЂ\x20Р·Р°РґР°СЃС‚\x20РЅР°СЃС‚"
+        "СЂРѕР№РєРё\x20РёРіСЂС‹\x2c\x20РїРѕСЃР»Рµ\x20С‡РµРіРѕ\x20РѕРЅ\x20Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё\x20РІСЃС‚СѓРїРёС‚\x20"
+        "РІ\x20РёРіСЂСѓ\x2e\x20Р’\x20РёРіСЂРµ\x20С‡РµСЂРµР·\x20\x54\x43\x50\x2f\x49\x50\x20Рё\x20\x49\x50\x58\x20РјРѕР¶РµС‚\x20Р±С‹С‚СЊ\x20РЅРµСЃ"
+        "РєРѕР»СЊРєРѕ\x20РіРѕСЃС‚РµР№\x2e\x20Р’\x20РёРіСЂРµ\x20С‡РµСЂРµР·\x20\x4e\x65\x74\x42\x49\x4f\x53\x20\x2d\x20С‚РѕР»СЊРєРѕ\x20\x31\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
-      "\x7b\x49\x50\x58\x7d\x0a\x0a\x49\x50\x58\x20является\x20часто\x20используемым\x20сетевым\x20п"
-        "ротоколом\x20для\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e\x20По\x20\x49\x50\x58\x20могут\x20играть\x20до\x20\x36\x20"
-        "человек\x20одновременно\x2e\x20Протокол\x20\x49\x50\x58\x20поддерживает\x20"
-        "только\x20версия\x20игры\x2c\x20работающая\x20под\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e",
-      "\x7b\x54\x43\x50\x2f\x49\x50\x7d\x0a\x0aПротокол\x20\x54\x43\x50\x2f\x49\x50\x20наиболее\x20часто\x20использ"
-        "уется\x20для\x20соединения\x20компьютеров\x20через\x20Интернет\x2e"
-        "\x20По\x20\x54\x43\x50\x2f\x49\x50\x20могут\x20играть\x20до\x20\x36\x20человек\x20одновременн"
-        "о\x2e\x20Протокол\x20\x54\x43\x50\x2f\x49\x50\x20поддерживает\x20только\x20версия\x20иг"
-        "ры\x2c\x20работающая\x20под\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e",
-      "\x7b\x4e\x45\x54\x42\x69\x6f\x73\x7d\x0a\x0aПротокол\x20\x4e\x45\x54\x42\x69\x6f\x73\x20является\x20единственно"
-        "\x20возможным\x20для\x20компьютеров\x2c\x20работающим\x20под\x20\x44\x4f\x53\x2c\x20"
-        "но\x20может\x20быть\x20использован\x20и\x20с\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e\x20\x20Этот\x20"
-        "протокол\x20обеспечивает\x20соединение\x20не\x20более\x20двух\x20и"
-        "гроков\x2e\x20Мы\x20рекомендуем\x20использовать\x20протокол\x20\x49\x50\x58"
+      "\x7b\x49\x50\x58\x7d\x0a\x0a\x49\x50\x58\x20СЏРІР»СЏРµС‚СЃСЏ\x20С‡Р°СЃС‚Рѕ\x20РёСЃРїРѕР»СЊР·СѓРµРјС‹Рј\x20СЃРµС‚РµРІС‹Рј\x20Рї"
+        "СЂРѕС‚РѕРєРѕР»РѕРј\x20РґР»СЏ\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e\x20РџРѕ\x20\x49\x50\x58\x20РјРѕРіСѓС‚\x20РёРіСЂР°С‚СЊ\x20РґРѕ\x20\x36\x20"
+        "С‡РµР»РѕРІРµРє\x20РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ\x2e\x20РџСЂРѕС‚РѕРєРѕР»\x20\x49\x50\x58\x20РїРѕРґРґРµСЂР¶РёРІР°РµС‚\x20"
+        "С‚РѕР»СЊРєРѕ\x20РІРµСЂСЃРёСЏ\x20РёРіСЂС‹\x2c\x20СЂР°Р±РѕС‚Р°СЋС‰Р°СЏ\x20РїРѕРґ\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e",
+      "\x7b\x54\x43\x50\x2f\x49\x50\x7d\x0a\x0aРџСЂРѕС‚РѕРєРѕР»\x20\x54\x43\x50\x2f\x49\x50\x20РЅР°РёР±РѕР»РµРµ\x20С‡Р°СЃС‚Рѕ\x20РёСЃРїРѕР»СЊР·"
+        "СѓРµС‚СЃСЏ\x20РґР»СЏ\x20СЃРѕРµРґРёРЅРµРЅРёСЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x20С‡РµСЂРµР·\x20РРЅС‚РµСЂРЅРµС‚\x2e"
+        "\x20РџРѕ\x20\x54\x43\x50\x2f\x49\x50\x20РјРѕРіСѓС‚\x20РёРіСЂР°С‚СЊ\x20РґРѕ\x20\x36\x20С‡РµР»РѕРІРµРє\x20РѕРґРЅРѕРІСЂРµРјРµРЅРЅ"
+        "Рѕ\x2e\x20РџСЂРѕС‚РѕРєРѕР»\x20\x54\x43\x50\x2f\x49\x50\x20РїРѕРґРґРµСЂР¶РёРІР°РµС‚\x20С‚РѕР»СЊРєРѕ\x20РІРµСЂСЃРёСЏ\x20РёРі"
+        "СЂС‹\x2c\x20СЂР°Р±РѕС‚Р°СЋС‰Р°СЏ\x20РїРѕРґ\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e",
+      "\x7b\x4e\x45\x54\x42\x69\x6f\x73\x7d\x0a\x0aРџСЂРѕС‚РѕРєРѕР»\x20\x4e\x45\x54\x42\x69\x6f\x73\x20СЏРІР»СЏРµС‚СЃСЏ\x20РµРґРёРЅСЃС‚РІРµРЅРЅРѕ"
+        "\x20РІРѕР·РјРѕР¶РЅС‹Рј\x20РґР»СЏ\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРІ\x2c\x20СЂР°Р±РѕС‚Р°СЋС‰РёРј\x20РїРѕРґ\x20\x44\x4f\x53\x2c\x20"
+        "РЅРѕ\x20РјРѕР¶РµС‚\x20Р±С‹С‚СЊ\x20РёСЃРїРѕР»СЊР·РѕРІР°РЅ\x20Рё\x20СЃ\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x39\x35\x2e\x20\x20Р­С‚РѕС‚\x20"
+        "РїСЂРѕС‚РѕРєРѕР»\x20РѕР±РµСЃРїРµС‡РёРІР°РµС‚\x20СЃРѕРµРґРёРЅРµРЅРёРµ\x20РЅРµ\x20Р±РѕР»РµРµ\x20РґРІСѓС…\x20Рё"
+        "РіСЂРѕРєРѕРІ\x2e\x20РњС‹\x20СЂРµРєРѕРјРµРЅРґСѓРµРј\x20РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РїСЂРѕС‚РѕРєРѕР»\x20\x49\x50\x58"
         "\x2e",
-      "\x7bОтмена\x7d\x0a\x0aЗакрыть\x20меню\x2e"
+      "\x7bРћС‚РјРµРЅР°\x7d\x0a\x0aР—Р°РєСЂС‹С‚СЊ\x20РјРµРЅСЋ\x2e"
 };
 char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
-      "\x7bОбычная\x20игра\x7d\x0a\x0aОдиночная\x20игра\x20на\x20отдельной\x20карт"
-        "е\x2e",
-      "\x7bКампания\x7d\x0a\x0aОдиночная\x20игра\x20на\x20серии\x20карт\x2e",
-      "\x7bСетевая\x20игра\x7d\x0a\x0aСетевая\x20игра\x2c\x20где\x20несколько\x20игро"
-        "ков\x2dлюдей\x20сражаются\x20друг\x20против\x20друга\x20на\x20одной\x20к"
-        "арте\x2e",
-      "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
+      "\x7bРћР±С‹С‡РЅР°СЏ\x20РёРіСЂР°\x7d\x0a\x0aРћРґРёРЅРѕС‡РЅР°СЏ\x20РёРіСЂР°\x20РЅР°\x20РѕС‚РґРµР»СЊРЅРѕР№\x20РєР°СЂС‚"
+        "Рµ\x2e",
+      "\x7bРљР°РјРїР°РЅРёСЏ\x7d\x0a\x0aРћРґРёРЅРѕС‡РЅР°СЏ\x20РёРіСЂР°\x20РЅР°\x20СЃРµСЂРёРё\x20РєР°СЂС‚\x2e",
+      "\x7bРЎРµС‚РµРІР°СЏ\x20РёРіСЂР°\x7d\x0a\x0aРЎРµС‚РµРІР°СЏ\x20РёРіСЂР°\x2c\x20РіРґРµ\x20РЅРµСЃРєРѕР»СЊРєРѕ\x20РёРіСЂРѕ"
+        "РєРѕРІ\x2dР»СЋРґРµР№\x20СЃСЂР°Р¶Р°СЋС‚СЃСЏ\x20РґСЂСѓРі\x20РїСЂРѕС‚РёРІ\x20РґСЂСѓРіР°\x20РЅР°\x20РѕРґРЅРѕР№\x20Рє"
+        "Р°СЂС‚Рµ\x2e",
+      "\x7bРћС‚РјРµРЅРёС‚СЊ\x7d\x0a\x0aРћС‚РјРµРЅРёС‚СЊ\x20Рё\x20РІРµСЂРЅСѓС‚СЊСЃСЏ\x20РІ\x20РіР»Р°РІРЅРѕРµ\x20РјРµРЅСЋ\x2e"
 };
 char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
-      "Враг\x20сдался\x21",
-      "Враг\x20повержен\x21",
-      "Великая\x20победа\x21",
-      "\x0a\x0aЗа\x20мужество\x2c\x20проявленное\x20в\x20бою\x2c\x20\x25\x73\x20получает\x20\x25\x64"
-        "\x20оч\x2e\x20опыта\x2e",
-      "\x25\x73\x20сдается\x20врагу\x20и\x20отступает\x20с\x20позором\x2e",
-      "\x25\x73\x20трусливо\x20бежит\x20с\x20поля\x20боя\x2e",
-      "Ваши\x20войска\x20потерпели\x20поражение\x20и\x20\x25\x73\x20покидает\x20ва"
-        "с\x2e",
-      "Ваши\x20силы\x20сдались\x20врагу\x20и\x20отступили\x20с\x20позором\x2e",
-      "Ваши\x20трусливые\x20войска\x20бежали\x20с\x20поля\x20боя\x2e",
-      "Ваши\x20войска\x20потерпели\x20поражение\x2e",
-      "\x0a\x0aЗа\x20мужество\x2c\x20проявленное\x20в\x20бою\x2c\x20\x25\x73\x20получает\x20\x25\x64"
-        "\x20оч\x2e\x20опыта\x2c\x20и\x20получает\x20\x25\x64\x20уровень\x28я\x29\x2e"
+      "Р’СЂР°Рі\x20СЃРґР°Р»СЃСЏ\x21",
+      "Р’СЂР°Рі\x20РїРѕРІРµСЂР¶РµРЅ\x21",
+      "Р’РµР»РёРєР°СЏ\x20РїРѕР±РµРґР°\x21",
+      "\x0a\x0aР—Р°\x20РјСѓР¶РµСЃС‚РІРѕ\x2c\x20РїСЂРѕСЏРІР»РµРЅРЅРѕРµ\x20РІ\x20Р±РѕСЋ\x2c\x20\x25\x73\x20РїРѕР»СѓС‡Р°РµС‚\x20\x25\x64"
+        "\x20РѕС‡\x2e\x20РѕРїС‹С‚Р°\x2e",
+      "\x25\x73\x20СЃРґР°РµС‚СЃСЏ\x20РІСЂР°РіСѓ\x20Рё\x20РѕС‚СЃС‚СѓРїР°РµС‚\x20СЃ\x20РїРѕР·РѕСЂРѕРј\x2e",
+      "\x25\x73\x20С‚СЂСѓСЃР»РёРІРѕ\x20Р±РµР¶РёС‚\x20СЃ\x20РїРѕР»СЏ\x20Р±РѕСЏ\x2e",
+      "Р’Р°С€Рё\x20РІРѕР№СЃРєР°\x20РїРѕС‚РµСЂРїРµР»Рё\x20РїРѕСЂР°Р¶РµРЅРёРµ\x20Рё\x20\x25\x73\x20РїРѕРєРёРґР°РµС‚\x20РІР°"
+        "СЃ\x2e",
+      "Р’Р°С€Рё\x20СЃРёР»С‹\x20СЃРґР°Р»РёСЃСЊ\x20РІСЂР°РіСѓ\x20Рё\x20РѕС‚СЃС‚СѓРїРёР»Рё\x20СЃ\x20РїРѕР·РѕСЂРѕРј\x2e",
+      "Р’Р°С€Рё\x20С‚СЂСѓСЃР»РёРІС‹Рµ\x20РІРѕР№СЃРєР°\x20Р±РµР¶Р°Р»Рё\x20СЃ\x20РїРѕР»СЏ\x20Р±РѕСЏ\x2e",
+      "Р’Р°С€Рё\x20РІРѕР№СЃРєР°\x20РїРѕС‚РµСЂРїРµР»Рё\x20РїРѕСЂР°Р¶РµРЅРёРµ\x2e",
+      "\x0a\x0aР—Р°\x20РјСѓР¶РµСЃС‚РІРѕ\x2c\x20РїСЂРѕСЏРІР»РµРЅРЅРѕРµ\x20РІ\x20Р±РѕСЋ\x2c\x20\x25\x73\x20РїРѕР»СѓС‡Р°РµС‚\x20\x25\x64"
+        "\x20РѕС‡\x2e\x20РѕРїС‹С‚Р°\x2c\x20Рё\x20РїРѕР»СѓС‡Р°РµС‚\x20\x25\x64\x20СѓСЂРѕРІРµРЅСЊ\x28СЏ\x29\x2e"
 };
 char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
-      "\x7bВысокая\x20мораль\x7d\x0a\x0aВысокая\x20мораль\x20может\x20дать\x20в\x20бо"
-        "ю\x20вашим\x20бойцам\x20дополнительную\x20атаку\x2e",
-      "\x7bОбычная\x20мораль\x7d\x0a\x0aС\x20обычной\x20моралью\x20ваши\x20армии\x20н"
-        "икогда\x20не\x20получат\x20дополнительную\x20атаку\x20и\x20не\x20буду"
-        "т\x20прокляты\x2e",
-      "\x7bПлохая\x20мораль\x7d\x0a\x0aПлохая\x20мораль\x20может\x20привести\x20к\x20"
-        "потере\x20хода\x20в\x20бою\x20вашими\x20бойцами\x2e",
-      "\x25\x73\x0a\x0a\x0aМодификаторы\x20морали\x3a",
-      "\x0aБонус\x20рыцаря\x20\x2b\x31",
-      "\x0a\x25\x73\x20со\x20своей\x20армией\x20\x2b\x31",
-      "\x0aВоины\x20\x33\x20рас\x20\x2d\x31",
-      "\x0aВоины\x20\x34\x20рас\x20\x2d\x32",
-      "\x0aМедаль\x20отваги\x20\x2b\x31",
-      "\x0aМедаль\x20мужества\x20\x2b\x31",
-      "\x0aМедаль\x20доблести\x20\x2b\x31",
-      "\x0aМедаль\x20почета\x20\x2b\x31",
-      "\x0aСимвол\x20неудачи\x20\x2d\x32",
-      "\x0aПосещен\x20буй\x20\x2b\x31",
-      "\x0aПосещен\x20оазис\x20\x2b\x31",
-      "\x0aПосещен\x20храм\x20\x2b\x32",
-      "\x0aРасхититель\x20гробниц\x20\x2d\x31",
-      "\x0aРасхититель\x20обломков\x20\x2d\x31",
-      "\x0aТрусость\x20в\x20бою\x20\x25\x64",
-      "\x0aНет",
-      "\x0aВоины\x20\x35\x20рас\x20\x2d\x33",
-      "\x0aВся\x20армия\x20одна\x20нежить\x2c\x20мораль\x20не\x20важна\x2e",
-      "\x0aВ\x20армии\x20нежить\x20\x2d\x31",
-      "\x0aПосещена\x20промоина\x20\x2b\x31",
-      "\x0aРасхититель\x20кораблей\x20\x2d\x31",
-      "\x0aКолизей\x20варваров\x20\x2b\x32",
-      "\x0aТаверна\x20\x2b\x31",
-      "\x0aЛидерство\x20\x31\x2dй\x20ступени\x20\x2b\x31",
-      "\x0aЛидерство\x20\x32\x2dй\x20ступени\x20\x2b\x32",
-      "\x0aЛидерство\x20\x33\x2dй\x20ступени\x20\x2b\x33",
-      "\x0aБонус\x20мачты\x20на\x20море\x20\x2b\x31",
-      "\x0aБоевое\x20одеяние\x20Андурана\x20дает\x20максимальную\x20морал"
-        "ь\x2e"
+      "\x7bР’С‹СЃРѕРєР°СЏ\x20РјРѕСЂР°Р»СЊ\x7d\x0a\x0aР’С‹СЃРѕРєР°СЏ\x20РјРѕСЂР°Р»СЊ\x20РјРѕР¶РµС‚\x20РґР°С‚СЊ\x20РІ\x20Р±Рѕ"
+        "СЋ\x20РІР°С€РёРј\x20Р±РѕР№С†Р°Рј\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ\x20Р°С‚Р°РєСѓ\x2e",
+      "\x7bРћР±С‹С‡РЅР°СЏ\x20РјРѕСЂР°Р»СЊ\x7d\x0a\x0aРЎ\x20РѕР±С‹С‡РЅРѕР№\x20РјРѕСЂР°Р»СЊСЋ\x20РІР°С€Рё\x20Р°СЂРјРёРё\x20РЅ"
+        "РёРєРѕРіРґР°\x20РЅРµ\x20РїРѕР»СѓС‡Р°С‚\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ\x20Р°С‚Р°РєСѓ\x20Рё\x20РЅРµ\x20Р±СѓРґСѓ"
+        "С‚\x20РїСЂРѕРєР»СЏС‚С‹\x2e",
+      "\x7bРџР»РѕС…Р°СЏ\x20РјРѕСЂР°Р»СЊ\x7d\x0a\x0aРџР»РѕС…Р°СЏ\x20РјРѕСЂР°Р»СЊ\x20РјРѕР¶РµС‚\x20РїСЂРёРІРµСЃС‚Рё\x20Рє\x20"
+        "РїРѕС‚РµСЂРµ\x20С…РѕРґР°\x20РІ\x20Р±РѕСЋ\x20РІР°С€РёРјРё\x20Р±РѕР№С†Р°РјРё\x2e",
+      "\x25\x73\x0a\x0a\x0aРњРѕРґРёС„РёРєР°С‚РѕСЂС‹\x20РјРѕСЂР°Р»Рё\x3a",
+      "\x0aР‘РѕРЅСѓСЃ\x20СЂС‹С†Р°СЂСЏ\x20\x2b\x31",
+      "\x0a\x25\x73\x20СЃРѕ\x20СЃРІРѕРµР№\x20Р°СЂРјРёРµР№\x20\x2b\x31",
+      "\x0aР’РѕРёРЅС‹\x20\x33\x20СЂР°СЃ\x20\x2d\x31",
+      "\x0aР’РѕРёРЅС‹\x20\x34\x20СЂР°СЃ\x20\x2d\x32",
+      "\x0aРњРµРґР°Р»СЊ\x20РѕС‚РІР°РіРё\x20\x2b\x31",
+      "\x0aРњРµРґР°Р»СЊ\x20РјСѓР¶РµСЃС‚РІР°\x20\x2b\x31",
+      "\x0aРњРµРґР°Р»СЊ\x20РґРѕР±Р»РµСЃС‚Рё\x20\x2b\x31",
+      "\x0aРњРµРґР°Р»СЊ\x20РїРѕС‡РµС‚Р°\x20\x2b\x31",
+      "\x0aРЎРёРјРІРѕР»\x20РЅРµСѓРґР°С‡Рё\x20\x2d\x32",
+      "\x0aРџРѕСЃРµС‰РµРЅ\x20Р±СѓР№\x20\x2b\x31",
+      "\x0aРџРѕСЃРµС‰РµРЅ\x20РѕР°Р·РёСЃ\x20\x2b\x31",
+      "\x0aРџРѕСЃРµС‰РµРЅ\x20С…СЂР°Рј\x20\x2b\x32",
+      "\x0aР Р°СЃС…РёС‚РёС‚РµР»СЊ\x20РіСЂРѕР±РЅРёС†\x20\x2d\x31",
+      "\x0aР Р°СЃС…РёС‚РёС‚РµР»СЊ\x20РѕР±Р»РѕРјРєРѕРІ\x20\x2d\x31",
+      "\x0aРўСЂСѓСЃРѕСЃС‚СЊ\x20РІ\x20Р±РѕСЋ\x20\x25\x64",
+      "\x0aРќРµС‚",
+      "\x0aР’РѕРёРЅС‹\x20\x35\x20СЂР°СЃ\x20\x2d\x33",
+      "\x0aР’СЃСЏ\x20Р°СЂРјРёСЏ\x20РѕРґРЅР°\x20РЅРµР¶РёС‚СЊ\x2c\x20РјРѕСЂР°Р»СЊ\x20РЅРµ\x20РІР°Р¶РЅР°\x2e",
+      "\x0aР’\x20Р°СЂРјРёРё\x20РЅРµР¶РёС‚СЊ\x20\x2d\x31",
+      "\x0aРџРѕСЃРµС‰РµРЅР°\x20РїСЂРѕРјРѕРёРЅР°\x20\x2b\x31",
+      "\x0aР Р°СЃС…РёС‚РёС‚РµР»СЊ\x20РєРѕСЂР°Р±Р»РµР№\x20\x2d\x31",
+      "\x0aРљРѕР»РёР·РµР№\x20РІР°СЂРІР°СЂРѕРІ\x20\x2b\x32",
+      "\x0aРўР°РІРµСЂРЅР°\x20\x2b\x31",
+      "\x0aР›РёРґРµСЂСЃС‚РІРѕ\x20\x31\x2dР№\x20СЃС‚СѓРїРµРЅРё\x20\x2b\x31",
+      "\x0aР›РёРґРµСЂСЃС‚РІРѕ\x20\x32\x2dР№\x20СЃС‚СѓРїРµРЅРё\x20\x2b\x32",
+      "\x0aР›РёРґРµСЂСЃС‚РІРѕ\x20\x33\x2dР№\x20СЃС‚СѓРїРµРЅРё\x20\x2b\x33",
+      "\x0aР‘РѕРЅСѓСЃ\x20РјР°С‡С‚С‹\x20РЅР°\x20РјРѕСЂРµ\x20\x2b\x31",
+      "\x0aР‘РѕРµРІРѕРµ\x20РѕРґРµСЏРЅРёРµ\x20РђРЅРґСѓСЂР°РЅР°\x20РґР°РµС‚\x20РјР°РєСЃРёРјР°Р»СЊРЅСѓСЋ\x20РјРѕСЂР°Р»"
+        "СЊ\x2e"
 };
-char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {  "Маленькая",   "Средняя",   "Большая",   "Огромная"};
+char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {  "РњР°Р»РµРЅСЊРєР°СЏ",   "РЎСЂРµРґРЅСЏСЏ",   "Р‘РѕР»СЊС€Р°СЏ",   "РћРіСЂРѕРјРЅР°СЏ"};
 char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
-    {  "Легкая",   "Обычная",   "Высокая",   "Эксперт",   "Невозможно\x21"};
-char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {  "Легкая",   "Обычная",   "Тяжелая",   "Эксперт"};
+    {  "Р›РµРіРєР°СЏ",   "РћР±С‹С‡РЅР°СЏ",   "Р’С‹СЃРѕРєР°СЏ",   "Р­РєСЃРїРµСЂС‚",   "РќРµРІРѕР·РјРѕР¶РЅРѕ\x21"};
+char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {  "Р›РµРіРєР°СЏ",   "РћР±С‹С‡РЅР°СЏ",   "РўСЏР¶РµР»Р°СЏ",   "Р­РєСЃРїРµСЂС‚"};
 char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
-    {  "Лорд\x20Айронфист",   "Лорд\x20Слэйер",   "Королева\x20Ламанда",   "Лорд\x20Аламар"};
+    {  "Р›РѕСЂРґ\x20РђР№СЂРѕРЅС„РёСЃС‚",   "Р›РѕСЂРґ\x20РЎР»СЌР№РµСЂ",   "РљРѕСЂРѕР»РµРІР°\x20Р›Р°РјР°РЅРґР°",   "Р›РѕСЂРґ\x20РђР»Р°РјР°СЂ"};
 char* cWinText[KB_WIN_TEXT_COUNT] =
-    {  "Дней\x3a",   "Очки\x3a",   "Сложность\x3a",   "Счет\x3a",   "Ранг\x3a"};
+    {  "Р”РЅРµР№\x3a",   "РћС‡РєРё\x3a",   "РЎР»РѕР¶РЅРѕСЃС‚СЊ\x3a",   "РЎС‡РµС‚\x3a",   "Р Р°РЅРі\x3a"};
 char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
-    {  "Человек\x0a",   "Человек\x0aЛегкая\x20игра",   "Человек\x0aОбычная\x20игра",   "Человек\x0aТяжелая\x20игра",   "Человек\x0aЭксперт"};
+    {  "Р§РµР»РѕРІРµРє\x0a",   "Р§РµР»РѕРІРµРє\x0aР›РµРіРєР°СЏ\x20РёРіСЂР°",   "Р§РµР»РѕРІРµРє\x0aРћР±С‹С‡РЅР°СЏ\x20РёРіСЂР°",   "Р§РµР»РѕРІРµРє\x0aРўСЏР¶РµР»Р°СЏ\x20РёРіСЂР°",   "Р§РµР»РѕРІРµРє\x0aР­РєСЃРїРµСЂС‚"};
 char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
-    {  "Чел\x2e\x2d",   "Чел\x2e\x2dЛегкая\x20игра",   "Чел\x2e\x2dОбычная\x20игра",   "Чел\x2e\x2dТяжелая\x20игра",   "Чел\x2e\x2dЭксперт"};
+    {  "Р§РµР»\x2e\x2d",   "Р§РµР»\x2e\x2dР›РµРіРєР°СЏ\x20РёРіСЂР°",   "Р§РµР»\x2e\x2dРћР±С‹С‡РЅР°СЏ\x20РёРіСЂР°",   "Р§РµР»\x2e\x2dРўСЏР¶РµР»Р°СЏ\x20РёРіСЂР°",   "Р§РµР»\x2e\x2dР­РєСЃРїРµСЂС‚"};
 char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
-    {  "\x4d\x49\x44\x49",   "\x43\x44\x2dстерео\x20без\x20вокала",   "\x43\x44\x2dстерео\x20с\x20вокалом"};
+    {  "\x4d\x49\x44\x49",   "\x43\x44\x2dСЃС‚РµСЂРµРѕ\x20Р±РµР·\x20РІРѕРєР°Р»Р°",   "\x43\x44\x2dСЃС‚РµСЂРµРѕ\x20СЃ\x20РІРѕРєР°Р»РѕРј"};
 char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
-      "\x7bОгненный\x20шар\x7d\x0a\x0aОгромный\x20огненный\x20шар\x20взрывается"
-        "\x20над\x20выбранным\x20участком\x20поля\x20боя\x2c\x20поражая\x20все\x20на"
-        "ходящиеся\x20поблизости\x20отряды\x2e",
-      "\x7bОгненный\x20удар\x7d\x0a\x0aУсовершенствованный\x20вариант\x20огн"
-        "енного\x20шара\x2e\x20Огненный\x20удар\x20поражает\x20отряды\x2c\x20нахо"
-        "дящиеся\x20в\x20радиусе\x20не\x20одного\x2c\x20а\x20двух\x20полей\x20от\x20эпи"
-        "центра\x2e",
-      "\x7bМолния\x7d\x0a\x0aМощный\x20электрический\x20разряд\x20поражает\x20в"
-        "ыбранный\x20отряд\x20противника\x2e",
-      "\x7bЦепь\x20молний\x7d\x0a\x0aЭлектрический\x20разряд\x20поражает\x20выб"
-        "ранный\x20отряд\x20противника\x2c\x20затем\x20ближайший\x20к\x20нему\x20"
-        "отряд\x20с\x20половинной\x20силой\x2c\x20затем\x20следующий\x20отряд\x20"
-        "\x63\x20еще\x20вдвое\x20меньшей\x20силой\x2c\x20и\x20так\x20далее\x20до\x20тех\x20по"
-        "р\x2c\x20пока\x20не\x20уходит\x20в\x20землю\x2e\x20Будьте\x20осторожны\x3a\x20это"
-        "\x20заклинание\x20может\x20поразить\x20и\x20ваши\x20собственные\x20от"
-        "ряды\x21",
-      "\x7bТелепорт\x7d\x0a\x0aМгновенно\x20перемещает\x20выбранный\x20отряд"
-        "\x20в\x20любую\x20свободную\x20точку\x20на\x20поле\x20боя\x2e",
-      "\x7bЛечение\x7d\x0a\x0aНейтрализует\x20все\x20враждебные\x20заклинани"
-        "я\x2c\x20примененные\x20против\x20одного\x20из\x20ваших\x20отрядов\x20и\x20"
-        "восстанавливает\x20по\x20\x35\x20единиц\x20здоровья\x20в\x20расчете\x20н"
-        "а\x20каждый\x20уровень\x20магических\x20способностей\x20героя\x2e",
-      "\x7bОбщее\x20лечение\x7d\x0a\x0aНейтрализует\x20враждебные\x20заклина"
-        "ния\x2c\x20примененные\x20против\x20всех\x20ваших\x20отрядов\x20и\x20вос"
-        "станавливает\x20по\x20\x35\x20единиц\x20здоровья\x20у\x20каждого\x20суще"
-        "ства\x20за\x20каждый\x20уровень\x20магических\x20способностей\x20г"
-        "ероя\x2e",
-      "\x7bВоскрешение\x7d\x0a\x0aДо\x20конца\x20сражения\x20воскрешает\x20воин"
-        "ов\x20в\x20отряде\x2c\x20которому\x20был\x20нанесен\x20урон\x2e",
-      "\x7bИстинное\x20воскрешение\x7d\x0a\x0aНавсегда\x20воскрешает\x20воин"
-        "ов\x20в\x20отряде\x2c\x20которому\x20был\x20нанесен\x20урон\x2e",
-      "\x7bУскорение\x7d\x0a\x0aУвеличивает\x20дальность\x20передвижения\x20"
-        "любого\x20отряда\x20на\x20\x32\x20единицы\x2e",
-      "\x7bОбщее\x20ускорение\x7d\x0a\x0aУвеличивает\x20дальность\x20передви"
-        "жения\x20всех\x20ваших\x20отрядов\x20на\x20\x32\x20единицы\x2e",
-      "\x7bЗамедление\x7d\x0a\x0aВдвое\x20уменьшает\x20дальность\x20передвиж"
-        "ения\x20выбранного\x20отряда\x20противника\x2e",
-      "\x7bОбщее\x20замедление\x7d\x0a\x0aВдвое\x20снижает\x20дальность\x20пере"
-        "мещения\x20всех\x20отрядов\x20противника\x2e",
-      "\x7bОслепление\x7d\x0a\x0aЗатуманивает\x20взоры\x20воинов\x20выбранно"
-        "го\x20отряда\x20и\x20тем\x20самым\x20не\x20позволяет\x20им\x20перемещать"
-        "ся\x20по\x20полю\x20боя\x2e",
-      "\x7bБлагословение\x7d\x0a\x0aУвеличивает\x20до\x20максимума\x20урон\x2c\x20"
-        "наносимый\x20выбранным\x20отрядом\x2e",
-      "\x7bОбщее\x20благословение\x7d\x0a\x0aУвеличивает\x20до\x20максимума\x20"
-        "урон\x2c\x20наносимый\x20всеми\x20вашими\x20отрядами\x2e",
-      "\x7bКаменная\x20кожа\x7d\x0a\x0aВолшебным\x20образом\x20повышает\x20защи"
-        "щенность\x20выбранного\x20отряда\x2e",
-      "\x7bСтальная\x20кожа\x7d\x0a\x0aПовышает\x20защищенность\x20выбранног"
-        "о\x20отряда\x2e\x20Усовершенствованный\x20вариант\x20заклинания"
-        "\x20Каменная\x20кожа\x2e",
-      "\x7bПроклятие\x7d\x0a\x0aУменьшает\x20до\x20минимума\x20урон\x2c\x20причиня"
-        "емый\x20выбранным\x20отрядом\x20противника\x2e",
-      "\x7bОбщее\x20проклятие\x7d\x0a\x0aУменьшает\x20до\x20минимума\x20урон\x2c\x20п"
-        "ричиняемый\x20всеми\x20отрядами\x20противника\x2e",
-      "\x7bСвятое\x20слово\x7d\x0a\x0aНаносит\x20урон\x20всей\x20нежити\x20на\x20поле"
-        "\x20боя\x2e",
-      "\x7bСвятой\x20глас\x7d\x0a\x0aНаносит\x20урон\x20всей\x20нежити\x20на\x20поле\x20"
-        "боя\x2e\x20Усовершенствованный\x20вариант\x20заклинания\x20Свят"
-        "ое\x20слово\x2e",
-      "\x7bАнтимагия\x7d\x0a\x0aЗащищает\x20выбранный\x20отряд\x20от\x20враждеб"
-        "ных\x20заклинаний\x2e",
-      "\x7bСнятие\x20чар\x7d\x0a\x0aСнимает\x20все\x20чары\x20с\x20выбранного\x20отря"
-        "да\x2e",
-      "\x7bОбщее\x20снятие\x20чар\x7d\x0a\x0aСнимает\x20все\x20чары\x20со\x20всех\x20отр"
-        "ядов\x2e",
-      "\x7bВолшебная\x20стрела\x7d\x0a\x0aВолшебная\x20стрела\x20поражает\x20вы"
-        "бранный\x20отряд\x20противника\x2e",
-      "\x7bБерсерк\x7d\x0a\x0aЗаставляет\x20выбранный\x20отряд\x20противника"
-        "\x20нападать\x20на\x20ближайший\x20к\x20нему\x20отряд\x2e",
-      "\x7bАрмагеддон\x7d\x0a\x0aУжасный\x20катаклизм\x20обрушивается\x20на\x20"
-        "поле\x20боя\x2c\x20нанося\x20жестокий\x20урон\x20всем\x20участникам\x20с"
-        "ражения\x2e",
-      "\x7bБуря\x20стихий\x7d\x0a\x0aСилы\x20стихий\x20обрушиваются\x20на\x20поле\x20"
-        "боя\x2c\x20нанося\x20урон\x20всем\x20участникам\x20сражения\x2e",
-      "\x7bЗвездопад\x7d\x0a\x0aЗвездопад\x20поражает\x20выбранный\x20участо"
-        "к\x20поля\x20боя\x2c\x20нанося\x20урон\x20всем\x20находящимся\x20поблизо"
-        "сти\x20участникам\x20сражения\x2e",
-      "\x7bПаралич\x7d\x0a\x0aОтряд\x2c\x20против\x20которого\x20направлено\x20это"
-        "\x20заклинание\x2c\x20поражает\x20паралич\x2c\x20и\x20он\x20теряет\x20спосо"
-        "бность\x20передвигаться\x20или\x20отвечать\x20на\x20удары\x2e",
-      "\x7bГипноз\x7d\x0a\x0aВыбранный\x20отряд\x20противника\x20переходит\x20п"
-        "од\x20контроль\x20вашего\x20героя\x20на\x20один\x20ход\x2c\x20если\x20его\x20с"
-        "уммарное\x20здоровье\x20не\x20превышает\x20магических\x20способ"
-        "ностей\x20героя\x2c\x20умноженных\x20на\x20\x32\x35\x2e",
-      "\x7bХладный\x20луч\x7d\x0a\x0aВысасывает\x20тепло\x20жизни\x20из\x20выбранн"
-        "ого\x20отряда\x20противника\x2e",
-      "\x7bКольцо\x20стужи\x7d\x0a\x0aВысасывает\x20тепло\x20жизни\x20из\x20всех\x20о"
-        "трядов\x20вокруг\x20эпицентра\x20заклинания\x2c\x20за\x20исключени"
-        "ем\x20находящегося\x20в\x20самом\x20эпицентре\x2e",
-      "\x7bРазрушительный\x20луч\x7d\x0a\x0aПонижает\x20защиту\x20выбранного"
-        "\x20отряда\x20противника\x20на\x20\x33\x20единицы\x2e",
-      "\x7bДрожь\x20смерти\x7d\x0a\x0aНаносит\x20урон\x20всем\x20отрядам\x20живых\x20"
-        "воинов\x20в\x20сражении\x2c\x20но\x20не\x20действует\x20на\x20нежить\x2e",
-      "\x7bВолна\x20смерти\x7d\x0a\x0aНаносит\x20урон\x20всем\x20отрядам\x20живых\x20"
-        "воинов\x20в\x20сражении\x2c\x20но\x20не\x20действует\x20на\x20нежить\x2e\x20Ус"
-        "овершенствованный\x20вариант\x20заклинания\x20Дрожь\x20смерт"
-        "и\x2e",
-      "\x7bУбийца\x20драконов\x7d\x0a\x0aЗначительно\x20увеличивает\x20урон\x2c"
-        "\x20наносимый\x20выбранным\x20отрядом\x20в\x20бою\x20против\x20дракон"
-        "ов\x2e",
-      "\x7bЖажда\x20крови\x7d\x0a\x0aУвеличивает\x20урон\x2c\x20наносимый\x20выбра"
-        "нным\x20отрядом\x2e",
-      "\x7bПоднять\x20мертвых\x7d\x0a\x0aНавсегда\x20\x22воскрешает\x22\x20из\x20ране"
-        "нных\x20или\x20уничтоженных\x20отрядов\x20нежити\x2e",
-      "\x7bФантом\x7d\x0a\x0aЗаклинание\x20создает\x20призрачный\x20отряд\x2c\x20к"
-        "оторый\x20является\x20двойником\x20существующего\x20отряда\x2e\x20"
-        "Призрачный\x20отряд\x20наносит\x20противнику\x20такой\x20же\x20уро"
-        "н\x2c\x20как\x20и\x20настоящий\x2c\x20но\x20исчезает\x2c\x20если\x20ему\x20был\x20на"
-        "несен\x20хотя\x20бы\x20минимальный\x20урон\x2e",
-      "\x7bЩит\x7d\x0a\x0aВдвое\x20уменьшает\x20урон\x2c\x20получаемый\x20выбранны"
-        "м\x20отрядом\x20от\x20стрелковых\x20атак\x20противника\x2e",
-      "\x7bОбщий\x20щит\x7d\x0a\x0aВдвое\x20уменьшает\x20урон\x2c\x20получаемый\x20вс"
-        "еми\x20отрядами\x20от\x20стрелковых\x20атак\x20противника\x2e",
-      "\x7bЗемной\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20эл"
-        "ементалов\x20земли\x2c\x20которые\x20присоединяются\x20к\x20вашей\x20"
-        "армии\x2e",
-      "\x7bВоздушный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд"
-        "\x20элементалов\x20воздуха\x2c\x20которые\x20присоединяются\x20к\x20в"
-        "ашей\x20армии\x2e",
-      "\x7bОгненный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20"
-        "элементалов\x20огня\x2c\x20которые\x20присоединяются\x20к\x20вашей"
-        "\x20армии\x2e",
-      "\x7bВодный\x20элементал\x7d\x0a\x0aЗаклинание\x20вызывает\x20отряд\x20эл"
-        "еманталов\x20воздуха\x2c\x20которей\x20присоединяются\x20к\x20ваше"
-        "й\x20армии\x2e",
-      "\x7bЗемлетрясение\x7d\x0a\x0aНаносит\x20ущерб\x20крепостным\x20стенам"
+      "\x7bРћРіРЅРµРЅРЅС‹Р№\x20С€Р°СЂ\x7d\x0a\x0aРћРіСЂРѕРјРЅС‹Р№\x20РѕРіРЅРµРЅРЅС‹Р№\x20С€Р°СЂ\x20РІР·СЂС‹РІР°РµС‚СЃСЏ"
+        "\x20РЅР°Рґ\x20РІС‹Р±СЂР°РЅРЅС‹Рј\x20СѓС‡Р°СЃС‚РєРѕРј\x20РїРѕР»СЏ\x20Р±РѕСЏ\x2c\x20РїРѕСЂР°Р¶Р°СЏ\x20РІСЃРµ\x20РЅР°"
+        "С…РѕРґСЏС‰РёРµСЃСЏ\x20РїРѕР±Р»РёР·РѕСЃС‚Рё\x20РѕС‚СЂСЏРґС‹\x2e",
+      "\x7bРћРіРЅРµРЅРЅС‹Р№\x20СѓРґР°СЂ\x7d\x0a\x0aРЈСЃРѕРІРµСЂС€РµРЅСЃС‚РІРѕРІР°РЅРЅС‹Р№\x20РІР°СЂРёР°РЅС‚\x20РѕРіРЅ"
+        "РµРЅРЅРѕРіРѕ\x20С€Р°СЂР°\x2e\x20РћРіРЅРµРЅРЅС‹Р№\x20СѓРґР°СЂ\x20РїРѕСЂР°Р¶Р°РµС‚\x20РѕС‚СЂСЏРґС‹\x2c\x20РЅР°С…Рѕ"
+        "РґСЏС‰РёРµСЃСЏ\x20РІ\x20СЂР°РґРёСѓСЃРµ\x20РЅРµ\x20РѕРґРЅРѕРіРѕ\x2c\x20Р°\x20РґРІСѓС…\x20РїРѕР»РµР№\x20РѕС‚\x20СЌРїРё"
+        "С†РµРЅС‚СЂР°\x2e",
+      "\x7bРњРѕР»РЅРёСЏ\x7d\x0a\x0aРњРѕС‰РЅС‹Р№\x20СЌР»РµРєС‚СЂРёС‡РµСЃРєРёР№\x20СЂР°Р·СЂСЏРґ\x20РїРѕСЂР°Р¶Р°РµС‚\x20РІ"
+        "С‹Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bР¦РµРїСЊ\x20РјРѕР»РЅРёР№\x7d\x0a\x0aР­Р»РµРєС‚СЂРёС‡РµСЃРєРёР№\x20СЂР°Р·СЂСЏРґ\x20РїРѕСЂР°Р¶Р°РµС‚\x20РІС‹Р±"
+        "СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2c\x20Р·Р°С‚РµРј\x20Р±Р»РёР¶Р°Р№С€РёР№\x20Рє\x20РЅРµРјСѓ\x20"
+        "РѕС‚СЂСЏРґ\x20СЃ\x20РїРѕР»РѕРІРёРЅРЅРѕР№\x20СЃРёР»РѕР№\x2c\x20Р·Р°С‚РµРј\x20СЃР»РµРґСѓСЋС‰РёР№\x20РѕС‚СЂСЏРґ\x20"
+        "\x63\x20РµС‰Рµ\x20РІРґРІРѕРµ\x20РјРµРЅСЊС€РµР№\x20СЃРёР»РѕР№\x2c\x20Рё\x20С‚Р°Рє\x20РґР°Р»РµРµ\x20РґРѕ\x20С‚РµС…\x20РїРѕ"
+        "СЂ\x2c\x20РїРѕРєР°\x20РЅРµ\x20СѓС…РѕРґРёС‚\x20РІ\x20Р·РµРјР»СЋ\x2e\x20Р‘СѓРґСЊС‚Рµ\x20РѕСЃС‚РѕСЂРѕР¶РЅС‹\x3a\x20СЌС‚Рѕ"
+        "\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20РјРѕР¶РµС‚\x20РїРѕСЂР°Р·РёС‚СЊ\x20Рё\x20РІР°С€Рё\x20СЃРѕР±СЃС‚РІРµРЅРЅС‹Рµ\x20РѕС‚"
+        "СЂСЏРґС‹\x21",
+      "\x7bРўРµР»РµРїРѕСЂС‚\x7d\x0a\x0aРњРіРЅРѕРІРµРЅРЅРѕ\x20РїРµСЂРµРјРµС‰Р°РµС‚\x20РІС‹Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ"
+        "\x20РІ\x20Р»СЋР±СѓСЋ\x20СЃРІРѕР±РѕРґРЅСѓСЋ\x20С‚РѕС‡РєСѓ\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x2e",
+      "\x7bР›РµС‡РµРЅРёРµ\x7d\x0a\x0aРќРµР№С‚СЂР°Р»РёР·СѓРµС‚\x20РІСЃРµ\x20РІСЂР°Р¶РґРµР±РЅС‹Рµ\x20Р·Р°РєР»РёРЅР°РЅРё"
+        "СЏ\x2c\x20РїСЂРёРјРµРЅРµРЅРЅС‹Рµ\x20РїСЂРѕС‚РёРІ\x20РѕРґРЅРѕРіРѕ\x20РёР·\x20РІР°С€РёС…\x20РѕС‚СЂСЏРґРѕРІ\x20Рё\x20"
+        "РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚\x20РїРѕ\x20\x35\x20РµРґРёРЅРёС†\x20Р·РґРѕСЂРѕРІСЊСЏ\x20РІ\x20СЂР°СЃС‡РµС‚Рµ\x20РЅ"
+        "Р°\x20РєР°Р¶РґС‹Р№\x20СѓСЂРѕРІРµРЅСЊ\x20РјР°РіРёС‡РµСЃРєРёС…\x20СЃРїРѕСЃРѕР±РЅРѕСЃС‚РµР№\x20РіРµСЂРѕСЏ\x2e",
+      "\x7bРћР±С‰РµРµ\x20Р»РµС‡РµРЅРёРµ\x7d\x0a\x0aРќРµР№С‚СЂР°Р»РёР·СѓРµС‚\x20РІСЂР°Р¶РґРµР±РЅС‹Рµ\x20Р·Р°РєР»РёРЅР°"
+        "РЅРёСЏ\x2c\x20РїСЂРёРјРµРЅРµРЅРЅС‹Рµ\x20РїСЂРѕС‚РёРІ\x20РІСЃРµС…\x20РІР°С€РёС…\x20РѕС‚СЂСЏРґРѕРІ\x20Рё\x20РІРѕСЃ"
+        "СЃС‚Р°РЅР°РІР»РёРІР°РµС‚\x20РїРѕ\x20\x35\x20РµРґРёРЅРёС†\x20Р·РґРѕСЂРѕРІСЊСЏ\x20Сѓ\x20РєР°Р¶РґРѕРіРѕ\x20СЃСѓС‰Рµ"
+        "СЃС‚РІР°\x20Р·Р°\x20РєР°Р¶РґС‹Р№\x20СѓСЂРѕРІРµРЅСЊ\x20РјР°РіРёС‡РµСЃРєРёС…\x20СЃРїРѕСЃРѕР±РЅРѕСЃС‚РµР№\x20Рі"
+        "РµСЂРѕСЏ\x2e",
+      "\x7bР’РѕСЃРєСЂРµС€РµРЅРёРµ\x7d\x0a\x0aР”Рѕ\x20РєРѕРЅС†Р°\x20СЃСЂР°Р¶РµРЅРёСЏ\x20РІРѕСЃРєСЂРµС€Р°РµС‚\x20РІРѕРёРЅ"
+        "РѕРІ\x20РІ\x20РѕС‚СЂСЏРґРµ\x2c\x20РєРѕС‚РѕСЂРѕРјСѓ\x20Р±С‹Р»\x20РЅР°РЅРµСЃРµРЅ\x20СѓСЂРѕРЅ\x2e",
+      "\x7bРСЃС‚РёРЅРЅРѕРµ\x20РІРѕСЃРєСЂРµС€РµРЅРёРµ\x7d\x0a\x0aРќР°РІСЃРµРіРґР°\x20РІРѕСЃРєСЂРµС€Р°РµС‚\x20РІРѕРёРЅ"
+        "РѕРІ\x20РІ\x20РѕС‚СЂСЏРґРµ\x2c\x20РєРѕС‚РѕСЂРѕРјСѓ\x20Р±С‹Р»\x20РЅР°РЅРµСЃРµРЅ\x20СѓСЂРѕРЅ\x2e",
+      "\x7bРЈСЃРєРѕСЂРµРЅРёРµ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РґР°Р»СЊРЅРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРёР¶РµРЅРёСЏ\x20"
+        "Р»СЋР±РѕРіРѕ\x20РѕС‚СЂСЏРґР°\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e",
+      "\x7bРћР±С‰РµРµ\x20СѓСЃРєРѕСЂРµРЅРёРµ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РґР°Р»СЊРЅРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРё"
+        "Р¶РµРЅРёСЏ\x20РІСЃРµС…\x20РІР°С€РёС…\x20РѕС‚СЂСЏРґРѕРІ\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e",
+      "\x7bР—Р°РјРµРґР»РµРЅРёРµ\x7d\x0a\x0aР’РґРІРѕРµ\x20СѓРјРµРЅСЊС€Р°РµС‚\x20РґР°Р»СЊРЅРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРёР¶"
+        "РµРЅРёСЏ\x20РІС‹Р±СЂР°РЅРЅРѕРіРѕ\x20РѕС‚СЂСЏРґР°\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРћР±С‰РµРµ\x20Р·Р°РјРµРґР»РµРЅРёРµ\x7d\x0a\x0aР’РґРІРѕРµ\x20СЃРЅРёР¶Р°РµС‚\x20РґР°Р»СЊРЅРѕСЃС‚СЊ\x20РїРµСЂРµ"
+        "РјРµС‰РµРЅРёСЏ\x20РІСЃРµС…\x20РѕС‚СЂСЏРґРѕРІ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРћСЃР»РµРїР»РµРЅРёРµ\x7d\x0a\x0aР—Р°С‚СѓРјР°РЅРёРІР°РµС‚\x20РІР·РѕСЂС‹\x20РІРѕРёРЅРѕРІ\x20РІС‹Р±СЂР°РЅРЅРѕ"
+        "РіРѕ\x20РѕС‚СЂСЏРґР°\x20Рё\x20С‚РµРј\x20СЃР°РјС‹Рј\x20РЅРµ\x20РїРѕР·РІРѕР»СЏРµС‚\x20РёРј\x20РїРµСЂРµРјРµС‰Р°С‚СЊ"
+        "СЃСЏ\x20РїРѕ\x20РїРѕР»СЋ\x20Р±РѕСЏ\x2e",
+      "\x7bР‘Р»Р°РіРѕСЃР»РѕРІРµРЅРёРµ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РґРѕ\x20РјР°РєСЃРёРјСѓРјР°\x20СѓСЂРѕРЅ\x2c\x20"
+        "РЅР°РЅРѕСЃРёРјС‹Р№\x20РІС‹Р±СЂР°РЅРЅС‹Рј\x20РѕС‚СЂСЏРґРѕРј\x2e",
+      "\x7bРћР±С‰РµРµ\x20Р±Р»Р°РіРѕСЃР»РѕРІРµРЅРёРµ\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РґРѕ\x20РјР°РєСЃРёРјСѓРјР°\x20"
+        "СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІСЃРµРјРё\x20РІР°С€РёРјРё\x20РѕС‚СЂСЏРґР°РјРё\x2e",
+      "\x7bРљР°РјРµРЅРЅР°СЏ\x20РєРѕР¶Р°\x7d\x0a\x0aР’РѕР»С€РµР±РЅС‹Рј\x20РѕР±СЂР°Р·РѕРј\x20РїРѕРІС‹С€Р°РµС‚\x20Р·Р°С‰Рё"
+        "С‰РµРЅРЅРѕСЃС‚СЊ\x20РІС‹Р±СЂР°РЅРЅРѕРіРѕ\x20РѕС‚СЂСЏРґР°\x2e",
+      "\x7bРЎС‚Р°Р»СЊРЅР°СЏ\x20РєРѕР¶Р°\x7d\x0a\x0aРџРѕРІС‹С€Р°РµС‚\x20Р·Р°С‰РёС‰РµРЅРЅРѕСЃС‚СЊ\x20РІС‹Р±СЂР°РЅРЅРѕРі"
+        "Рѕ\x20РѕС‚СЂСЏРґР°\x2e\x20РЈСЃРѕРІРµСЂС€РµРЅСЃС‚РІРѕРІР°РЅРЅС‹Р№\x20РІР°СЂРёР°РЅС‚\x20Р·Р°РєР»РёРЅР°РЅРёСЏ"
+        "\x20РљР°РјРµРЅРЅР°СЏ\x20РєРѕР¶Р°\x2e",
+      "\x7bРџСЂРѕРєР»СЏС‚РёРµ\x7d\x0a\x0aРЈРјРµРЅСЊС€Р°РµС‚\x20РґРѕ\x20РјРёРЅРёРјСѓРјР°\x20СѓСЂРѕРЅ\x2c\x20РїСЂРёС‡РёРЅСЏ"
+        "РµРјС‹Р№\x20РІС‹Р±СЂР°РЅРЅС‹Рј\x20РѕС‚СЂСЏРґРѕРј\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРћР±С‰РµРµ\x20РїСЂРѕРєР»СЏС‚РёРµ\x7d\x0a\x0aРЈРјРµРЅСЊС€Р°РµС‚\x20РґРѕ\x20РјРёРЅРёРјСѓРјР°\x20СѓСЂРѕРЅ\x2c\x20Рї"
+        "СЂРёС‡РёРЅСЏРµРјС‹Р№\x20РІСЃРµРјРё\x20РѕС‚СЂСЏРґР°РјРё\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРЎРІСЏС‚РѕРµ\x20СЃР»РѕРІРѕ\x7d\x0a\x0aРќР°РЅРѕСЃРёС‚\x20СѓСЂРѕРЅ\x20РІСЃРµР№\x20РЅРµР¶РёС‚Рё\x20РЅР°\x20РїРѕР»Рµ"
+        "\x20Р±РѕСЏ\x2e",
+      "\x7bРЎРІСЏС‚РѕР№\x20РіР»Р°СЃ\x7d\x0a\x0aРќР°РЅРѕСЃРёС‚\x20СѓСЂРѕРЅ\x20РІСЃРµР№\x20РЅРµР¶РёС‚Рё\x20РЅР°\x20РїРѕР»Рµ\x20"
+        "Р±РѕСЏ\x2e\x20РЈСЃРѕРІРµСЂС€РµРЅСЃС‚РІРѕРІР°РЅРЅС‹Р№\x20РІР°СЂРёР°РЅС‚\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20РЎРІСЏС‚"
+        "РѕРµ\x20СЃР»РѕРІРѕ\x2e",
+      "\x7bРђРЅС‚РёРјР°РіРёСЏ\x7d\x0a\x0aР—Р°С‰РёС‰Р°РµС‚\x20РІС‹Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РѕС‚\x20РІСЂР°Р¶РґРµР±"
+        "РЅС‹С…\x20Р·Р°РєР»РёРЅР°РЅРёР№\x2e",
+      "\x7bРЎРЅСЏС‚РёРµ\x20С‡Р°СЂ\x7d\x0a\x0aРЎРЅРёРјР°РµС‚\x20РІСЃРµ\x20С‡Р°СЂС‹\x20СЃ\x20РІС‹Р±СЂР°РЅРЅРѕРіРѕ\x20РѕС‚СЂСЏ"
+        "РґР°\x2e",
+      "\x7bРћР±С‰РµРµ\x20СЃРЅСЏС‚РёРµ\x20С‡Р°СЂ\x7d\x0a\x0aРЎРЅРёРјР°РµС‚\x20РІСЃРµ\x20С‡Р°СЂС‹\x20СЃРѕ\x20РІСЃРµС…\x20РѕС‚СЂ"
+        "СЏРґРѕРІ\x2e",
+      "\x7bР’РѕР»С€РµР±РЅР°СЏ\x20СЃС‚СЂРµР»Р°\x7d\x0a\x0aР’РѕР»С€РµР±РЅР°СЏ\x20СЃС‚СЂРµР»Р°\x20РїРѕСЂР°Р¶Р°РµС‚\x20РІС‹"
+        "Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bР‘РµСЂСЃРµСЂРє\x7d\x0a\x0aР—Р°СЃС‚Р°РІР»СЏРµС‚\x20РІС‹Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РїСЂРѕС‚РёРІРЅРёРєР°"
+        "\x20РЅР°РїР°РґР°С‚СЊ\x20РЅР°\x20Р±Р»РёР¶Р°Р№С€РёР№\x20Рє\x20РЅРµРјСѓ\x20РѕС‚СЂСЏРґ\x2e",
+      "\x7bРђСЂРјР°РіРµРґРґРѕРЅ\x7d\x0a\x0aРЈР¶Р°СЃРЅС‹Р№\x20РєР°С‚Р°РєР»РёР·Рј\x20РѕР±СЂСѓС€РёРІР°РµС‚СЃСЏ\x20РЅР°\x20"
+        "РїРѕР»Рµ\x20Р±РѕСЏ\x2c\x20РЅР°РЅРѕСЃСЏ\x20Р¶РµСЃС‚РѕРєРёР№\x20СѓСЂРѕРЅ\x20РІСЃРµРј\x20СѓС‡Р°СЃС‚РЅРёРєР°Рј\x20СЃ"
+        "СЂР°Р¶РµРЅРёСЏ\x2e",
+      "\x7bР‘СѓСЂСЏ\x20СЃС‚РёС…РёР№\x7d\x0a\x0aРЎРёР»С‹\x20СЃС‚РёС…РёР№\x20РѕР±СЂСѓС€РёРІР°СЋС‚СЃСЏ\x20РЅР°\x20РїРѕР»Рµ\x20"
+        "Р±РѕСЏ\x2c\x20РЅР°РЅРѕСЃСЏ\x20СѓСЂРѕРЅ\x20РІСЃРµРј\x20СѓС‡Р°СЃС‚РЅРёРєР°Рј\x20СЃСЂР°Р¶РµРЅРёСЏ\x2e",
+      "\x7bР—РІРµР·РґРѕРїР°Рґ\x7d\x0a\x0aР—РІРµР·РґРѕРїР°Рґ\x20РїРѕСЂР°Р¶Р°РµС‚\x20РІС‹Р±СЂР°РЅРЅС‹Р№\x20СѓС‡Р°СЃС‚Рѕ"
+        "Рє\x20РїРѕР»СЏ\x20Р±РѕСЏ\x2c\x20РЅР°РЅРѕСЃСЏ\x20СѓСЂРѕРЅ\x20РІСЃРµРј\x20РЅР°С…РѕРґСЏС‰РёРјСЃСЏ\x20РїРѕР±Р»РёР·Рѕ"
+        "СЃС‚Рё\x20СѓС‡Р°СЃС‚РЅРёРєР°Рј\x20СЃСЂР°Р¶РµРЅРёСЏ\x2e",
+      "\x7bРџР°СЂР°Р»РёС‡\x7d\x0a\x0aРћС‚СЂСЏРґ\x2c\x20РїСЂРѕС‚РёРІ\x20РєРѕС‚РѕСЂРѕРіРѕ\x20РЅР°РїСЂР°РІР»РµРЅРѕ\x20СЌС‚Рѕ"
+        "\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x2c\x20РїРѕСЂР°Р¶Р°РµС‚\x20РїР°СЂР°Р»РёС‡\x2c\x20Рё\x20РѕРЅ\x20С‚РµСЂСЏРµС‚\x20СЃРїРѕСЃРѕ"
+        "Р±РЅРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРёРіР°С‚СЊСЃСЏ\x20РёР»Рё\x20РѕС‚РІРµС‡Р°С‚СЊ\x20РЅР°\x20СѓРґР°СЂС‹\x2e",
+      "\x7bР“РёРїРЅРѕР·\x7d\x0a\x0aР’С‹Р±СЂР°РЅРЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x20РїРµСЂРµС…РѕРґРёС‚\x20Рї"
+        "РѕРґ\x20РєРѕРЅС‚СЂРѕР»СЊ\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20РЅР°\x20РѕРґРёРЅ\x20С…РѕРґ\x2c\x20РµСЃР»Рё\x20РµРіРѕ\x20СЃ"
+        "СѓРјРјР°СЂРЅРѕРµ\x20Р·РґРѕСЂРѕРІСЊРµ\x20РЅРµ\x20РїСЂРµРІС‹С€Р°РµС‚\x20РјР°РіРёС‡РµСЃРєРёС…\x20СЃРїРѕСЃРѕР±"
+        "РЅРѕСЃС‚РµР№\x20РіРµСЂРѕСЏ\x2c\x20СѓРјРЅРѕР¶РµРЅРЅС‹С…\x20РЅР°\x20\x32\x35\x2e",
+      "\x7bРҐР»Р°РґРЅС‹Р№\x20Р»СѓС‡\x7d\x0a\x0aР’С‹СЃР°СЃС‹РІР°РµС‚\x20С‚РµРїР»Рѕ\x20Р¶РёР·РЅРё\x20РёР·\x20РІС‹Р±СЂР°РЅРЅ"
+        "РѕРіРѕ\x20РѕС‚СЂСЏРґР°\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРљРѕР»СЊС†Рѕ\x20СЃС‚СѓР¶Рё\x7d\x0a\x0aР’С‹СЃР°СЃС‹РІР°РµС‚\x20С‚РµРїР»Рѕ\x20Р¶РёР·РЅРё\x20РёР·\x20РІСЃРµС…\x20Рѕ"
+        "С‚СЂСЏРґРѕРІ\x20РІРѕРєСЂСѓРі\x20СЌРїРёС†РµРЅС‚СЂР°\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x2c\x20Р·Р°\x20РёСЃРєР»СЋС‡РµРЅРё"
+        "РµРј\x20РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ\x20РІ\x20СЃР°РјРѕРј\x20СЌРїРёС†РµРЅС‚СЂРµ\x2e",
+      "\x7bР Р°Р·СЂСѓС€РёС‚РµР»СЊРЅС‹Р№\x20Р»СѓС‡\x7d\x0a\x0aРџРѕРЅРёР¶Р°РµС‚\x20Р·Р°С‰РёС‚Сѓ\x20РІС‹Р±СЂР°РЅРЅРѕРіРѕ"
+        "\x20РѕС‚СЂСЏРґР°\x20РїСЂРѕС‚РёРІРЅРёРєР°\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x2e",
+      "\x7bР”СЂРѕР¶СЊ\x20СЃРјРµСЂС‚Рё\x7d\x0a\x0aРќР°РЅРѕСЃРёС‚\x20СѓСЂРѕРЅ\x20РІСЃРµРј\x20РѕС‚СЂСЏРґР°Рј\x20Р¶РёРІС‹С…\x20"
+        "РІРѕРёРЅРѕРІ\x20РІ\x20СЃСЂР°Р¶РµРЅРёРё\x2c\x20РЅРѕ\x20РЅРµ\x20РґРµР№СЃС‚РІСѓРµС‚\x20РЅР°\x20РЅРµР¶РёС‚СЊ\x2e",
+      "\x7bР’РѕР»РЅР°\x20СЃРјРµСЂС‚Рё\x7d\x0a\x0aРќР°РЅРѕСЃРёС‚\x20СѓСЂРѕРЅ\x20РІСЃРµРј\x20РѕС‚СЂСЏРґР°Рј\x20Р¶РёРІС‹С…\x20"
+        "РІРѕРёРЅРѕРІ\x20РІ\x20СЃСЂР°Р¶РµРЅРёРё\x2c\x20РЅРѕ\x20РЅРµ\x20РґРµР№СЃС‚РІСѓРµС‚\x20РЅР°\x20РЅРµР¶РёС‚СЊ\x2e\x20РЈСЃ"
+        "РѕРІРµСЂС€РµРЅСЃС‚РІРѕРІР°РЅРЅС‹Р№\x20РІР°СЂРёР°РЅС‚\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20Р”СЂРѕР¶СЊ\x20СЃРјРµСЂС‚"
+        "Рё\x2e",
+      "\x7bРЈР±РёР№С†Р°\x20РґСЂР°РєРѕРЅРѕРІ\x7d\x0a\x0aР—РЅР°С‡РёС‚РµР»СЊРЅРѕ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓСЂРѕРЅ\x2c"
+        "\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІС‹Р±СЂР°РЅРЅС‹Рј\x20РѕС‚СЂСЏРґРѕРј\x20РІ\x20Р±РѕСЋ\x20РїСЂРѕС‚РёРІ\x20РґСЂР°РєРѕРЅ"
+        "РѕРІ\x2e",
+      "\x7bР–Р°Р¶РґР°\x20РєСЂРѕРІРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РІС‹Р±СЂР°"
+        "РЅРЅС‹Рј\x20РѕС‚СЂСЏРґРѕРј\x2e",
+      "\x7bРџРѕРґРЅСЏС‚СЊ\x20РјРµСЂС‚РІС‹С…\x7d\x0a\x0aРќР°РІСЃРµРіРґР°\x20\x22РІРѕСЃРєСЂРµС€Р°РµС‚\x22\x20РёР·\x20СЂР°РЅРµ"
+        "РЅРЅС‹С…\x20РёР»Рё\x20СѓРЅРёС‡С‚РѕР¶РµРЅРЅС‹С…\x20РѕС‚СЂСЏРґРѕРІ\x20РЅРµР¶РёС‚Рё\x2e",
+      "\x7bР¤Р°РЅС‚РѕРј\x7d\x0a\x0aР—Р°РєР»РёРЅР°РЅРёРµ\x20СЃРѕР·РґР°РµС‚\x20РїСЂРёР·СЂР°С‡РЅС‹Р№\x20РѕС‚СЂСЏРґ\x2c\x20Рє"
+        "РѕС‚РѕСЂС‹Р№\x20СЏРІР»СЏРµС‚СЃСЏ\x20РґРІРѕР№РЅРёРєРѕРј\x20СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ\x20РѕС‚СЂСЏРґР°\x2e\x20"
+        "РџСЂРёР·СЂР°С‡РЅС‹Р№\x20РѕС‚СЂСЏРґ\x20РЅР°РЅРѕСЃРёС‚\x20РїСЂРѕС‚РёРІРЅРёРєСѓ\x20С‚Р°РєРѕР№\x20Р¶Рµ\x20СѓСЂРѕ"
+        "РЅ\x2c\x20РєР°Рє\x20Рё\x20РЅР°СЃС‚РѕСЏС‰РёР№\x2c\x20РЅРѕ\x20РёСЃС‡РµР·Р°РµС‚\x2c\x20РµСЃР»Рё\x20РµРјСѓ\x20Р±С‹Р»\x20РЅР°"
+        "РЅРµСЃРµРЅ\x20С…РѕС‚СЏ\x20Р±С‹\x20РјРёРЅРёРјР°Р»СЊРЅС‹Р№\x20СѓСЂРѕРЅ\x2e",
+      "\x7bР©РёС‚\x7d\x0a\x0aР’РґРІРѕРµ\x20СѓРјРµРЅСЊС€Р°РµС‚\x20СѓСЂРѕРЅ\x2c\x20РїРѕР»СѓС‡Р°РµРјС‹Р№\x20РІС‹Р±СЂР°РЅРЅС‹"
+        "Рј\x20РѕС‚СЂСЏРґРѕРј\x20РѕС‚\x20СЃС‚СЂРµР»РєРѕРІС‹С…\x20Р°С‚Р°Рє\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРћР±С‰РёР№\x20С‰РёС‚\x7d\x0a\x0aР’РґРІРѕРµ\x20СѓРјРµРЅСЊС€Р°РµС‚\x20СѓСЂРѕРЅ\x2c\x20РїРѕР»СѓС‡Р°РµРјС‹Р№\x20РІСЃ"
+        "РµРјРё\x20РѕС‚СЂСЏРґР°РјРё\x20РѕС‚\x20СЃС‚СЂРµР»РєРѕРІС‹С…\x20Р°С‚Р°Рє\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bР—РµРјРЅРѕР№\x20СЌР»РµРјРµРЅС‚Р°Р»\x7d\x0a\x0aР—Р°РєР»РёРЅР°РЅРёРµ\x20РІС‹Р·С‹РІР°РµС‚\x20РѕС‚СЂСЏРґ\x20СЌР»"
+        "РµРјРµРЅС‚Р°Р»РѕРІ\x20Р·РµРјР»Рё\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РїСЂРёСЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ\x20Рє\x20РІР°С€РµР№\x20"
+        "Р°СЂРјРёРё\x2e",
+      "\x7bР’РѕР·РґСѓС€РЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»\x7d\x0a\x0aР—Р°РєР»РёРЅР°РЅРёРµ\x20РІС‹Р·С‹РІР°РµС‚\x20РѕС‚СЂСЏРґ"
+        "\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РІРѕР·РґСѓС…Р°\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РїСЂРёСЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ\x20Рє\x20РІ"
+        "Р°С€РµР№\x20Р°СЂРјРёРё\x2e",
+      "\x7bРћРіРЅРµРЅРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»\x7d\x0a\x0aР—Р°РєР»РёРЅР°РЅРёРµ\x20РІС‹Р·С‹РІР°РµС‚\x20РѕС‚СЂСЏРґ\x20"
+        "СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РѕРіРЅСЏ\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РїСЂРёСЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ\x20Рє\x20РІР°С€РµР№"
+        "\x20Р°СЂРјРёРё\x2e",
+      "\x7bР’РѕРґРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»\x7d\x0a\x0aР—Р°РєР»РёРЅР°РЅРёРµ\x20РІС‹Р·С‹РІР°РµС‚\x20РѕС‚СЂСЏРґ\x20СЌР»"
+        "РµРјР°РЅС‚Р°Р»РѕРІ\x20РІРѕР·РґСѓС…Р°\x2c\x20РєРѕС‚РѕСЂРµР№\x20РїСЂРёСЃРѕРµРґРёРЅСЏСЋС‚СЃСЏ\x20Рє\x20РІР°С€Рµ"
+        "Р№\x20Р°СЂРјРёРё\x2e",
+      "\x7bР—РµРјР»РµС‚СЂСЏСЃРµРЅРёРµ\x7d\x0a\x0aРќР°РЅРѕСЃРёС‚\x20СѓС‰РµСЂР±\x20РєСЂРµРїРѕСЃС‚РЅС‹Рј\x20СЃС‚РµРЅР°Рј"
         "\x2e",
-      "\x7bПоказать\x20шахты\x7d\x0a\x0aДелает\x20видимыми\x20все\x20шахты\x20на\x20и"
-        "гровой\x20карте\x2e",
-      "\x7bПоказать\x20ресурсы\x7d\x0a\x0aПоказывает\x20все\x20ресурсы\x20на\x20иг"
-        "ровой\x20карте\x2e",
-      "\x7bПоказать\x20артефакты\x7d\x0a\x0aДелает\x20видимыми\x20все\x20артефа"
-        "кты\x20на\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20города\x7d\x0a\x0aДелает\x20видимыми\x20все\x20города\x20и\x20"
-        "замки\x20на\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20героев\x7d\x0a\x0aДелает\x20видимыми\x20всех\x20героев\x20н"
-        "а\x20игровой\x20карте\x2e",
-      "\x7bПоказать\x20все\x7d\x0a\x0aДелает\x20видимыми\x20все\x20объекты\x20на\x20и"
-        "гровой\x20карте\x2e",
-      "\x7bОпознать\x20героев\x7d\x0a\x0aПозволяет\x20получить\x20подробную\x20"
-        "информацию\x20о\x20героях\x20противника\x2e",
-      "\x7bПризвать\x20корабль\x7d\x0a\x0aПеремещает\x20ваш\x20ближайший\x20нез"
-        "анятый\x20корабль\x20в\x20ближайшую\x20к\x20вам\x20точку\x20побережья"
-        "\x2e\x20Вашим\x20считается\x20корабль\x2c\x20который\x20вы\x20только\x20что"
-        "\x20построили\x2c\x20либо\x20тот\x2c\x20на\x20котором\x20вы\x20плавали\x20посл"
-        "едним\x2e",
-      "\x7bПортал\x7d\x0a\x0aПереносит\x20героя\x20в\x20расположенную\x20поблиз"
-        "ости\x20точку\x20на\x20карте\x2e",
-      "\x7bВрата\x20города\x7d\x0a\x0aПереносит\x20героя\x20в\x20ближайший\x20прин"
-        "адлежащий\x20игроку\x20город\x20или\x20замок\x2e",
-      "\x7bПортал\x20города\x7d\x0a\x0aПереносит\x20героя\x20в\x20принадлежащий"
-        "\x20игроку\x20город\x20или\x20замок\x20по\x20его\x20выбору\x2e",
-      "\x7bВиденье\x7d\x0a\x0aЭто\x20заклинание\x20позволяет\x20предсказать\x20"
-        "вероятный\x20исход\x20встречи\x20с\x20нейтральной\x20армией\x2e",
-      "\x7bЗапустение\x7d\x0a\x0aНаводняет\x20принадлежащую\x20игроку\x20шах"
-        "ту\x20призраками\x2c\x20после\x20чего\x20она\x20перестает\x20производ"
-        "ить\x20ресурсы\x2e\x20\x28Не\x20доставайся\x20же\x20ты\x20никому\x21\x29",
-      "\x7bСтража\x20земли\x7d\x0a\x0aОтряд\x20земных\x20элементалов\x20охраняе"
-        "т\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20воздуха\x7d\x0a\x0aОтряд\x20воздушных\x20элементалов\x20ох"
-        "раняет\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20огня\x7d\x0a\x0aОтряд\x20огненных\x20элементалов\x20охраня"
-        "ет\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e",
-      "\x7bСтража\x20воды\x7d\x0a\x0aОтряд\x20водных\x20элементалов\x20охраняет"
-        "\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e"
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20С€Р°С…С‚С‹\x7d\x0a\x0aР”РµР»Р°РµС‚\x20РІРёРґРёРјС‹РјРё\x20РІСЃРµ\x20С€Р°С…С‚С‹\x20РЅР°\x20Рё"
+        "РіСЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20СЂРµСЃСѓСЂСЃС‹\x7d\x0a\x0aРџРѕРєР°Р·С‹РІР°РµС‚\x20РІСЃРµ\x20СЂРµСЃСѓСЂСЃС‹\x20РЅР°\x20РёРі"
+        "СЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20Р°СЂС‚РµС„Р°РєС‚С‹\x7d\x0a\x0aР”РµР»Р°РµС‚\x20РІРёРґРёРјС‹РјРё\x20РІСЃРµ\x20Р°СЂС‚РµС„Р°"
+        "РєС‚С‹\x20РЅР°\x20РёРіСЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20РіРѕСЂРѕРґР°\x7d\x0a\x0aР”РµР»Р°РµС‚\x20РІРёРґРёРјС‹РјРё\x20РІСЃРµ\x20РіРѕСЂРѕРґР°\x20Рё\x20"
+        "Р·Р°РјРєРё\x20РЅР°\x20РёРіСЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20РіРµСЂРѕРµРІ\x7d\x0a\x0aР”РµР»Р°РµС‚\x20РІРёРґРёРјС‹РјРё\x20РІСЃРµС…\x20РіРµСЂРѕРµРІ\x20РЅ"
+        "Р°\x20РёРіСЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРџРѕРєР°Р·Р°С‚СЊ\x20РІСЃРµ\x7d\x0a\x0aР”РµР»Р°РµС‚\x20РІРёРґРёРјС‹РјРё\x20РІСЃРµ\x20РѕР±СЉРµРєС‚С‹\x20РЅР°\x20Рё"
+        "РіСЂРѕРІРѕР№\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРћРїРѕР·РЅР°С‚СЊ\x20РіРµСЂРѕРµРІ\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РїРѕР»СѓС‡РёС‚СЊ\x20РїРѕРґСЂРѕР±РЅСѓСЋ\x20"
+        "РёРЅС„РѕСЂРјР°С†РёСЋ\x20Рѕ\x20РіРµСЂРѕСЏС…\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРџСЂРёР·РІР°С‚СЊ\x20РєРѕСЂР°Р±Р»СЊ\x7d\x0a\x0aРџРµСЂРµРјРµС‰Р°РµС‚\x20РІР°С€\x20Р±Р»РёР¶Р°Р№С€РёР№\x20РЅРµР·"
+        "Р°РЅСЏС‚С‹Р№\x20РєРѕСЂР°Р±Р»СЊ\x20РІ\x20Р±Р»РёР¶Р°Р№С€СѓСЋ\x20Рє\x20РІР°Рј\x20С‚РѕС‡РєСѓ\x20РїРѕР±РµСЂРµР¶СЊСЏ"
+        "\x2e\x20Р’Р°С€РёРј\x20СЃС‡РёС‚Р°РµС‚СЃСЏ\x20РєРѕСЂР°Р±Р»СЊ\x2c\x20РєРѕС‚РѕСЂС‹Р№\x20РІС‹\x20С‚РѕР»СЊРєРѕ\x20С‡С‚Рѕ"
+        "\x20РїРѕСЃС‚СЂРѕРёР»Рё\x2c\x20Р»РёР±Рѕ\x20С‚РѕС‚\x2c\x20РЅР°\x20РєРѕС‚РѕСЂРѕРј\x20РІС‹\x20РїР»Р°РІР°Р»Рё\x20РїРѕСЃР»"
+        "РµРґРЅРёРј\x2e",
+      "\x7bРџРѕСЂС‚Р°Р»\x7d\x0a\x0aРџРµСЂРµРЅРѕСЃРёС‚\x20РіРµСЂРѕСЏ\x20РІ\x20СЂР°СЃРїРѕР»РѕР¶РµРЅРЅСѓСЋ\x20РїРѕР±Р»РёР·"
+        "РѕСЃС‚Рё\x20С‚РѕС‡РєСѓ\x20РЅР°\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bР’СЂР°С‚Р°\x20РіРѕСЂРѕРґР°\x7d\x0a\x0aРџРµСЂРµРЅРѕСЃРёС‚\x20РіРµСЂРѕСЏ\x20РІ\x20Р±Р»РёР¶Р°Р№С€РёР№\x20РїСЂРёРЅ"
+        "Р°РґР»РµР¶Р°С‰РёР№\x20РёРіСЂРѕРєСѓ\x20РіРѕСЂРѕРґ\x20РёР»Рё\x20Р·Р°РјРѕРє\x2e",
+      "\x7bРџРѕСЂС‚Р°Р»\x20РіРѕСЂРѕРґР°\x7d\x0a\x0aРџРµСЂРµРЅРѕСЃРёС‚\x20РіРµСЂРѕСЏ\x20РІ\x20РїСЂРёРЅР°РґР»РµР¶Р°С‰РёР№"
+        "\x20РёРіСЂРѕРєСѓ\x20РіРѕСЂРѕРґ\x20РёР»Рё\x20Р·Р°РјРѕРє\x20РїРѕ\x20РµРіРѕ\x20РІС‹Р±РѕСЂСѓ\x2e",
+      "\x7bР’РёРґРµРЅСЊРµ\x7d\x0a\x0aР­С‚Рѕ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20РїРѕР·РІРѕР»СЏРµС‚\x20РїСЂРµРґСЃРєР°Р·Р°С‚СЊ\x20"
+        "РІРµСЂРѕСЏС‚РЅС‹Р№\x20РёСЃС…РѕРґ\x20РІСЃС‚СЂРµС‡Рё\x20СЃ\x20РЅРµР№С‚СЂР°Р»СЊРЅРѕР№\x20Р°СЂРјРёРµР№\x2e",
+      "\x7bР—Р°РїСѓСЃС‚РµРЅРёРµ\x7d\x0a\x0aРќР°РІРѕРґРЅСЏРµС‚\x20РїСЂРёРЅР°РґР»РµР¶Р°С‰СѓСЋ\x20РёРіСЂРѕРєСѓ\x20С€Р°С…"
+        "С‚Сѓ\x20РїСЂРёР·СЂР°РєР°РјРё\x2c\x20РїРѕСЃР»Рµ\x20С‡РµРіРѕ\x20РѕРЅР°\x20РїРµСЂРµСЃС‚Р°РµС‚\x20РїСЂРѕРёР·РІРѕРґ"
+        "РёС‚СЊ\x20СЂРµСЃСѓСЂСЃС‹\x2e\x20\x28РќРµ\x20РґРѕСЃС‚Р°РІР°Р№СЃСЏ\x20Р¶Рµ\x20С‚С‹\x20РЅРёРєРѕРјСѓ\x21\x29",
+      "\x7bРЎС‚СЂР°Р¶Р°\x20Р·РµРјР»Рё\x7d\x0a\x0aРћС‚СЂСЏРґ\x20Р·РµРјРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РѕС…СЂР°РЅСЏРµ"
+        "С‚\x20С€Р°С…С‚Сѓ\x20РѕС‚\x20РЅР°РїР°РґРµРЅРёСЏ\x20Р°СЂРјРёР№\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРЎС‚СЂР°Р¶Р°\x20РІРѕР·РґСѓС…Р°\x7d\x0a\x0aРћС‚СЂСЏРґ\x20РІРѕР·РґСѓС€РЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РѕС…"
+        "СЂР°РЅСЏРµС‚\x20С€Р°С…С‚Сѓ\x20РѕС‚\x20РЅР°РїР°РґРµРЅРёСЏ\x20Р°СЂРјРёР№\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРЎС‚СЂР°Р¶Р°\x20РѕРіРЅСЏ\x7d\x0a\x0aРћС‚СЂСЏРґ\x20РѕРіРЅРµРЅРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РѕС…СЂР°РЅСЏ"
+        "РµС‚\x20С€Р°С…С‚Сѓ\x20РѕС‚\x20РЅР°РїР°РґРµРЅРёСЏ\x20Р°СЂРјРёР№\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРЎС‚СЂР°Р¶Р°\x20РІРѕРґС‹\x7d\x0a\x0aРћС‚СЂСЏРґ\x20РІРѕРґРЅС‹С…\x20СЌР»РµРјРµРЅС‚Р°Р»РѕРІ\x20РѕС…СЂР°РЅСЏРµС‚"
+        "\x20С€Р°С…С‚Сѓ\x20РѕС‚\x20РЅР°РїР°РґРµРЅРёСЏ\x20Р°СЂРјРёР№\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e"
 };
 char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
-      "Огненный\x20шар",
-      "Огненный\x20взрыв",
-      "Молния",
-      "Цепь\x20молний",
-      "Телепорт",
-      "Лечение",
-      "Общее\x20лечение",
-      "Воскрешение",
-      "Истинное\x20воскрешение",
-      "Ускорение",
-      "Общее\x20ускорение",
-      "Замедление",
-      "Общее\x20замедление",
-      "Ослепление",
-      "Благословение",
-      "Общее\x20благословение",
-      "Каменная\x20кожа",
-      "Стальная\x20кожа",
-      "Проклятие",
-      "Общее\x20проклятие",
-      "Святое\x20слово",
-      "Святой\x20глас",
-      "Антимагия",
-      "Снятие\x20чар",
-      "Общее\x20снятие\x20чар",
-      "Волшебная\x20стрела",
-      "Берсерк",
-      "Армагеддон",
-      "Буря\x20стихий",
-      "Звездопад",
-      "Паралич",
-      "Гипноз",
-      "Хладный\x20луч",
-      "Кольцо\x20стужи",
-      "Разрушительный\x20луч",
-      "Дрожь\x20смерти",
-      "Волна\x20смерти",
-      "Убийца\x20драконов",
-      "Жажда\x20крови",
-      "Поднять\x20мертвых",
-      "Фантом",
-      "Щит",
-      "Общий\x20щит",
-      "Земной\x20элементал",
-      "Воздушный\x20элементал",
-      "Огненный\x20элементал",
-      "Водный\x20элементал",
-      "Землетрясение",
-      "Показать\x20шахты",
-      "Показать\x20ресурсы",
-      "Показать\x20артефакты",
-      "Показать\x20города",
-      "Показать\x20героев",
-      "Показать\x20все",
-      "Опознать\x20героев",
-      "Призвать\x20корабль",
-      "Портал",
-      "Врата\x20города",
-      "Портал\x20города",
-      "Виденье",
-      "Запустение",
-      "Страж\x20земли",
-      "Страж\x20воздуха",
-      "Страж\x20огня",
-      "Страж\x20воды"
+      "РћРіРЅРµРЅРЅС‹Р№\x20С€Р°СЂ",
+      "РћРіРЅРµРЅРЅС‹Р№\x20РІР·СЂС‹РІ",
+      "РњРѕР»РЅРёСЏ",
+      "Р¦РµРїСЊ\x20РјРѕР»РЅРёР№",
+      "РўРµР»РµРїРѕСЂС‚",
+      "Р›РµС‡РµРЅРёРµ",
+      "РћР±С‰РµРµ\x20Р»РµС‡РµРЅРёРµ",
+      "Р’РѕСЃРєСЂРµС€РµРЅРёРµ",
+      "РСЃС‚РёРЅРЅРѕРµ\x20РІРѕСЃРєСЂРµС€РµРЅРёРµ",
+      "РЈСЃРєРѕСЂРµРЅРёРµ",
+      "РћР±С‰РµРµ\x20СѓСЃРєРѕСЂРµРЅРёРµ",
+      "Р—Р°РјРµРґР»РµРЅРёРµ",
+      "РћР±С‰РµРµ\x20Р·Р°РјРµРґР»РµРЅРёРµ",
+      "РћСЃР»РµРїР»РµРЅРёРµ",
+      "Р‘Р»Р°РіРѕСЃР»РѕРІРµРЅРёРµ",
+      "РћР±С‰РµРµ\x20Р±Р»Р°РіРѕСЃР»РѕРІРµРЅРёРµ",
+      "РљР°РјРµРЅРЅР°СЏ\x20РєРѕР¶Р°",
+      "РЎС‚Р°Р»СЊРЅР°СЏ\x20РєРѕР¶Р°",
+      "РџСЂРѕРєР»СЏС‚РёРµ",
+      "РћР±С‰РµРµ\x20РїСЂРѕРєР»СЏС‚РёРµ",
+      "РЎРІСЏС‚РѕРµ\x20СЃР»РѕРІРѕ",
+      "РЎРІСЏС‚РѕР№\x20РіР»Р°СЃ",
+      "РђРЅС‚РёРјР°РіРёСЏ",
+      "РЎРЅСЏС‚РёРµ\x20С‡Р°СЂ",
+      "РћР±С‰РµРµ\x20СЃРЅСЏС‚РёРµ\x20С‡Р°СЂ",
+      "Р’РѕР»С€РµР±РЅР°СЏ\x20СЃС‚СЂРµР»Р°",
+      "Р‘РµСЂСЃРµСЂРє",
+      "РђСЂРјР°РіРµРґРґРѕРЅ",
+      "Р‘СѓСЂСЏ\x20СЃС‚РёС…РёР№",
+      "Р—РІРµР·РґРѕРїР°Рґ",
+      "РџР°СЂР°Р»РёС‡",
+      "Р“РёРїРЅРѕР·",
+      "РҐР»Р°РґРЅС‹Р№\x20Р»СѓС‡",
+      "РљРѕР»СЊС†Рѕ\x20СЃС‚СѓР¶Рё",
+      "Р Р°Р·СЂСѓС€РёС‚РµР»СЊРЅС‹Р№\x20Р»СѓС‡",
+      "Р”СЂРѕР¶СЊ\x20СЃРјРµСЂС‚Рё",
+      "Р’РѕР»РЅР°\x20СЃРјРµСЂС‚Рё",
+      "РЈР±РёР№С†Р°\x20РґСЂР°РєРѕРЅРѕРІ",
+      "Р–Р°Р¶РґР°\x20РєСЂРѕРІРё",
+      "РџРѕРґРЅСЏС‚СЊ\x20РјРµСЂС‚РІС‹С…",
+      "Р¤Р°РЅС‚РѕРј",
+      "Р©РёС‚",
+      "РћР±С‰РёР№\x20С‰РёС‚",
+      "Р—РµРјРЅРѕР№\x20СЌР»РµРјРµРЅС‚Р°Р»",
+      "Р’РѕР·РґСѓС€РЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»",
+      "РћРіРЅРµРЅРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»",
+      "Р’РѕРґРЅС‹Р№\x20СЌР»РµРјРµРЅС‚Р°Р»",
+      "Р—РµРјР»РµС‚СЂСЏСЃРµРЅРёРµ",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20С€Р°С…С‚С‹",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20СЂРµСЃСѓСЂСЃС‹",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20Р°СЂС‚РµС„Р°РєС‚С‹",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20РіРѕСЂРѕРґР°",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20РіРµСЂРѕРµРІ",
+      "РџРѕРєР°Р·Р°С‚СЊ\x20РІСЃРµ",
+      "РћРїРѕР·РЅР°С‚СЊ\x20РіРµСЂРѕРµРІ",
+      "РџСЂРёР·РІР°С‚СЊ\x20РєРѕСЂР°Р±Р»СЊ",
+      "РџРѕСЂС‚Р°Р»",
+      "Р’СЂР°С‚Р°\x20РіРѕСЂРѕРґР°",
+      "РџРѕСЂС‚Р°Р»\x20РіРѕСЂРѕРґР°",
+      "Р’РёРґРµРЅСЊРµ",
+      "Р—Р°РїСѓСЃС‚РµРЅРёРµ",
+      "РЎС‚СЂР°Р¶\x20Р·РµРјР»Рё",
+      "РЎС‚СЂР°Р¶\x20РІРѕР·РґСѓС…Р°",
+      "РЎС‚СЂР°Р¶\x20РѕРіРЅСЏ",
+      "РЎС‚СЂР°Р¶\x20РІРѕРґС‹"
 };
 char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
-    {  "\x31\x20ступени",   "\x32\x20ступени",   "\x33\x20ступени"};
+    {  "\x31\x20СЃС‚СѓРїРµРЅРё",   "\x32\x20СЃС‚СѓРїРµРЅРё",   "\x33\x20СЃС‚СѓРїРµРЅРё"};
 char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
-      "Следопыт",
-      "Стрелок",
-      "Логистика",
-      "Разведка",
-      "Дипломатия",
-      "Навигация",
-      "Лидерство",
-      "Мудрость",
-      "Мистицизм",
-      "Удача",
-      "Баллистика",
-      "Орлиный\x20взор",
-      "Некромантия",
-      "Казначей"
+      "РЎР»РµРґРѕРїС‹С‚",
+      "РЎС‚СЂРµР»РѕРє",
+      "Р›РѕРіРёСЃС‚РёРєР°",
+      "Р Р°Р·РІРµРґРєР°",
+      "Р”РёРїР»РѕРјР°С‚РёСЏ",
+      "РќР°РІРёРіР°С†РёСЏ",
+      "Р›РёРґРµСЂСЃС‚РІРѕ",
+      "РњСѓРґСЂРѕСЃС‚СЊ",
+      "РњРёСЃС‚РёС†РёР·Рј",
+      "РЈРґР°С‡Р°",
+      "Р‘Р°Р»Р»РёСЃС‚РёРєР°",
+      "РћСЂР»РёРЅС‹Р№\x20РІР·РѕСЂ",
+      "РќРµРєСЂРѕРјР°РЅС‚РёСЏ",
+      "РљР°Р·РЅР°С‡РµР№"
 };
 char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
-      "Гильдия\x20магов",
-      "Гильдия\x20воров",
-      "Таверна",
-      "Верфь",
-      "Колодец",
-      "Шатер",
-      "Замок",
-      "Статуя",
-      "Левая\x20башня",
-      "Правая\x20башня",
-      "Рынок",
+      "Р“РёР»СЊРґРёСЏ\x20РјР°РіРѕРІ",
+      "Р“РёР»СЊРґРёСЏ\x20РІРѕСЂРѕРІ",
+      "РўР°РІРµСЂРЅР°",
+      "Р’РµСЂС„СЊ",
+      "РљРѕР»РѕРґРµС†",
+      "РЁР°С‚РµСЂ",
+      "Р—Р°РјРѕРє",
+      "РЎС‚Р°С‚СѓСЏ",
+      "Р›РµРІР°СЏ\x20Р±Р°С€РЅСЏ",
+      "РџСЂР°РІР°СЏ\x20Р±Р°С€РЅСЏ",
+      "Р С‹РЅРѕРє",
       "",
-      "Ров",
+      "Р РѕРІ",
       "",
-      "Док\x20с\x20кораблем",
-      "Дом\x20капитана",
+      "Р”РѕРє\x20СЃ\x20РєРѕСЂР°Р±Р»РµРј",
+      "Р”РѕРј\x20РєР°РїРёС‚Р°РЅР°",
       "",
       "",
       ""
 };
 char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
-      "Ферма",
-      "Свалка\x20истории",
-      "Хрустальный\x20сад",
-      "Водопад",
-      "Фруктовый\x20сад",
-      "Груда\x20черепов",
-      "Прирост\x20воинов\x20\x31\x20ур\x2e"
+      "Р¤РµСЂРјР°",
+      "РЎРІР°Р»РєР°\x20РёСЃС‚РѕСЂРёРё",
+      "РҐСЂСѓСЃС‚Р°Р»СЊРЅС‹Р№\x20СЃР°Рґ",
+      "Р’РѕРґРѕРїР°Рґ",
+      "Р¤СЂСѓРєС‚РѕРІС‹Р№\x20СЃР°Рґ",
+      "Р“СЂСѓРґР°\x20С‡РµСЂРµРїРѕРІ",
+      "РџСЂРёСЂРѕСЃС‚\x20РІРѕРёРЅРѕРІ\x20\x31\x20СѓСЂ\x2e"
 };
 char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
-    {  "Укрепления",   "Колизей",   "Радуга",   "Подземелье",   "Библиотека",   "Шторм",   "Специальная"};
+    {  "РЈРєСЂРµРїР»РµРЅРёСЏ",   "РљРѕР»РёР·РµР№",   "Р Р°РґСѓРіР°",   "РџРѕРґР·РµРјРµР»СЊРµ",   "Р‘РёР±Р»РёРѕС‚РµРєР°",   "РЁС‚РѕСЂРј",   "РЎРїРµС†РёР°Р»СЊРЅР°СЏ"};
 char* gDwellingNames[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
-    {  "Мазанка",
-       "Стрельбище",
-       "Кузница",
-       "Оружейная",
-       "Ристалище",
-       "Собор",
-       "Полигон",
-       "Ковальня",
-       "Арсенал",
-       "Арена",
-       "Храм",
+    {  "РњР°Р·Р°РЅРєР°",
+       "РЎС‚СЂРµР»СЊР±РёС‰Рµ",
+       "РљСѓР·РЅРёС†Р°",
+       "РћСЂСѓР¶РµР№РЅР°СЏ",
+       "Р РёСЃС‚Р°Р»РёС‰Рµ",
+       "РЎРѕР±РѕСЂ",
+       "РџРѕР»РёРіРѕРЅ",
+       "РљРѕРІР°Р»СЊРЅСЏ",
+       "РђСЂСЃРµРЅР°Р»",
+       "РђСЂРµРЅР°",
+       "РҐСЂР°Рј",
        ""},
-    {  "Хижина",
-       "Халупа",
-       "Логово",
-       "Дом\x20огров",
-       "Мост",
-       "Пирамида",
-       "Хибара",
+    {  "РҐРёР¶РёРЅР°",
+       "РҐР°Р»СѓРїР°",
+       "Р›РѕРіРѕРІРѕ",
+       "Р”РѕРј\x20РѕРіСЂРѕРІ",
+       "РњРѕСЃС‚",
+       "РџРёСЂР°РјРёРґР°",
+       "РҐРёР±Р°СЂР°",
        "",
-       "Логово\x20огров",
-       "Царь\x2dмост",
-       "",
-       ""},
-    {  "Древо\x2dдом",
-       "Избушка",
-       "Стрельбище",
-       "Стоунхендж",
-       "Загон",
-       "Алая\x20башня",
-       "Хоромы",
-       "Полигон",
-       "Менгиры",
-       "",
+       "Р›РѕРіРѕРІРѕ\x20РѕРіСЂРѕРІ",
+       "Р¦Р°СЂСЊ\x2dРјРѕСЃС‚",
        "",
        ""},
-    {  "Пещера",
-       "Крипта",
-       "Гнездо",
-       "Лабиринт",
-       "Болото",
-       "Зеленая\x20башня",
+    {  "Р”СЂРµРІРѕ\x2dРґРѕРј",
+       "РР·Р±СѓС€РєР°",
+       "РЎС‚СЂРµР»СЊР±РёС‰Рµ",
+       "РЎС‚РѕСѓРЅС…РµРЅРґР¶",
+       "Р—Р°РіРѕРЅ",
+       "РђР»Р°СЏ\x20Р±Р°С€РЅСЏ",
+       "РҐРѕСЂРѕРјС‹",
+       "РџРѕР»РёРіРѕРЅ",
+       "РњРµРЅРіРёСЂС‹",
        "",
        "",
-       "Большой\x20лабиринт",
-       "",
-       "Красная\x20башня",
-       "Черная\x20башня"},
-    {  "Нора",
-       "Хлев",
-       "Литейный\x20цех",
-       "Гнездовье",
-       "Башня\x20магов",
-       "Небесный\x20замок",
-       "",
-       "Фабрика",
-       "",
-       "Обитель\x20магов",
-       "Небесный\x20чертог",
        ""},
-    {  "Могильник",
-       "Кладбище",
-       "Пирамида",
-       "Особняк",
-       "Мавзолей",
-       "Лаборатория",
-       "Погост",
-       "Великая\x20пирамида",
-       "Цитадель",
-       "Некрополь",
+    {  "РџРµС‰РµСЂР°",
+       "РљСЂРёРїС‚Р°",
+       "Р“РЅРµР·РґРѕ",
+       "Р›Р°Р±РёСЂРёРЅС‚",
+       "Р‘РѕР»РѕС‚Рѕ",
+       "Р—РµР»РµРЅР°СЏ\x20Р±Р°С€РЅСЏ",
+       "",
+       "",
+       "Р‘РѕР»СЊС€РѕР№\x20Р»Р°Р±РёСЂРёРЅС‚",
+       "",
+       "РљСЂР°СЃРЅР°СЏ\x20Р±Р°С€РЅСЏ",
+       "Р§РµСЂРЅР°СЏ\x20Р±Р°С€РЅСЏ"},
+    {  "РќРѕСЂР°",
+       "РҐР»РµРІ",
+       "Р›РёС‚РµР№РЅС‹Р№\x20С†РµС…",
+       "Р“РЅРµР·РґРѕРІСЊРµ",
+       "Р‘Р°С€РЅСЏ\x20РјР°РіРѕРІ",
+       "РќРµР±РµСЃРЅС‹Р№\x20Р·Р°РјРѕРє",
+       "",
+       "Р¤Р°Р±СЂРёРєР°",
+       "",
+       "РћР±РёС‚РµР»СЊ\x20РјР°РіРѕРІ",
+       "РќРµР±РµСЃРЅС‹Р№\x20С‡РµСЂС‚РѕРі",
+       ""},
+    {  "РњРѕРіРёР»СЊРЅРёРє",
+       "РљР»Р°РґР±РёС‰Рµ",
+       "РџРёСЂР°РјРёРґР°",
+       "РћСЃРѕР±РЅСЏРє",
+       "РњР°РІР·РѕР»РµР№",
+       "Р›Р°Р±РѕСЂР°С‚РѕСЂРёСЏ",
+       "РџРѕРіРѕСЃС‚",
+       "Р’РµР»РёРєР°СЏ\x20РїРёСЂР°РјРёРґР°",
+       "Р¦РёС‚Р°РґРµР»СЊ",
+       "РќРµРєСЂРѕРїРѕР»СЊ",
        "",
        ""}
 };
 char* cSecSkillDesc[(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
-    {  "\x7bСледопыт\x20\x31\x20ступени\x7d\x0a\x0aУменьшает\x20замедление\x20при\x20п"
-        "ередвижении\x20по\x20пересеченной\x20местности\x20на\x20\x32\x35\x20проц"
-        "ентов\x2e",
-       "\x7bСледопыт\x20\x32\x20ступени\x7d\x0a\x0aУменьшает\x20замедление\x20при\x20п"
-         "ередвижении\x20по\x20пересеченной\x20местности\x20на\x20\x35\x30\x20проц"
-         "ентов\x2e",
-       "\x7bСледопыт\x20\x33\x20ступени\x7d\x0a\x0aПолностью\x20нейтрализует\x20зам"
-         "едление\x20при\x20передвижении\x20по\x20пересеченной\x20местнос"
-         "ти\x2e"},
-    {  "\x7bСтрелок\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x30\x20процентов"
-        "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e",
-       "\x7bСтрелок\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x35\x20процентов"
-         "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e",
-       "\x7bСтрелок\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x35\x30\x20процентов"
-         "\x20урон\x2c\x20наносимый\x20стреляющими\x20отрядами\x2e"},
-    {  "\x7bЛогистика\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-        "я\x20героя\x20на\x20\x31\x30\x20процентов\x2e",
-       "\x7bЛогистика\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-         "я\x20героя\x20на\x20\x32\x30\x20процентов\x2e",
-       "\x7bЛогистика\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20запас\x20движени"
-         "я\x20героя\x20на\x20\x33\x30\x20процентов\x2e"},
-    {  "\x7bРазведка\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20клетку\x20ра"
-        "диус\x20обзора\x20героя\x2e",
-       "\x7bРазведка\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20клетки\x20ра"
-         "диус\x20обзора\x20героя\x2e",
-       "\x7bРазведка\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20клетки\x20ра"
-         "диус\x20обзора\x20героя\x2e"},
-    {  "\x7bДипломатия\x20\x31\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-        "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-        "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-        "исоединиться\x20до\x20\x31\x2f\x34\x20отряда\x20монстров\x2e",
-       "\x7bДипломатия\x20\x32\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-         "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-         "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-         "исоединиться\x20до\x20\x31\x2f\x32\x20отряда\x20монстров\x2e",
-       "\x7bДипломатия\x20\x33\x20ступени\x7d\x0a\x0aПозволяет\x20вести\x20перегово"
-         "ры\x20с\x20отрядами\x20монстров\x2c\x20более\x20слабыми\x2c\x20чем\x20ваша\x20"
-         "армия\x2e\x20На\x20таком\x20уровне\x20дипломатии\x20к\x20вам\x20может\x20пр"
-         "исоединиться\x20весь\x20отряд\x20монстров\x2e"},
-    {  "\x7bНавигация\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x2f\x33\x20запас\x20"
-        "движения\x20героя\x20при\x20передвижении\x20по\x20воде\x2e",
-       "\x7bНавигация\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x2f\x33\x20запас\x20"
-         "движения\x20героя\x20при\x20передвижении\x20по\x20воде\x2e",
-       "\x7bНавигация\x20\x33\x20ступени\x7d\x0a\x0aУдваивает\x20запас\x20движения\x20"
-         "героя\x20при\x20передвижении\x20по\x20воде\x2e"},
-    {  "\x7bЛидерство\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20единицу\x20"
-        "мораль\x20войск\x20вашего\x20героя\x2e",
-       "\x7bЛидерство\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20единицы\x20"
-         "мораль\x20войск\x20вашего\x20героя\x2e",
-       "\x7bЛидерство\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20единицы\x20"
-         "мораль\x20войск\x20вашего\x20героя\x2e"},
-    {  "\x7bМудрость\x20\x31\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-        "чать\x20заклинания\x20третьего\x20уровня\x2e",
-       "\x7bМудрость\x20\x32\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-         "чать\x20заклинания\x20четвертого\x20уровня\x2e",
-       "\x7bМудрость\x20\x33\x20ступени\x7d\x0a\x0aПозволяет\x20вашему\x20герою\x20изу"
-         "чать\x20заклинания\x20пятого\x20уровня\x2e"},
-    {  "\x7bМистицизм\x20\x31\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-        "\x20по\x20\x32\x20очка\x20магии\x20в\x20день\x2e",
-       "\x7bМистицизм\x20\x32\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-         "\x20по\x20\x33\x20очка\x20магии\x20в\x20день\x2e",
-       "\x7bМистицизм\x20\x33\x20ступени\x7d\x0a\x0aВаш\x20герой\x20восстанавливает"
-         "\x20по\x20\x34\x20очка\x20магии\x20в\x20день\x2e"},
-    {  "\x7bУдача\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x31\x20удачу\x20вашего"
-        "\x20героя\x2e",
-       "\x7bУдача\x20\x32\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x32\x20удачу\x20вашего"
-         "\x20героя\x2e",
-       "\x7bУдача\x20\x33\x20ступени\x7d\x0a\x0aУвеличивает\x20на\x20\x33\x20удачу\x20вашего"
-         "\x20героя\x2e"},
-    {  "\x7bБаллистика\x20\x31\x20ступени\x7d\x0a\x0aУвеличивает\x20точность\x20стр"
-        "ельбы\x20\x20катапульты\x20вашего\x20героя\x20и\x20урон\x2c\x20наносимый"
-        "\x20крепостным\x20стенам\x2e",
-       "\x7bБаллистика\x20\x32\x20ступени\x7d\x0a\x0aКатапульта\x20вашего\x20героя\x20"
-         "делает\x20дополнительный\x20выстрел\x3b\x20при\x20этом\x20увеличив"
-         "ается\x20точность\x20ее\x20стрельбы\x20и\x20урон\x2c\x20наносимый\x20кре"
-         "постным\x20стенам\x2e",
-       "\x7bБаллистика\x20\x33\x20ступени\x7d\x0a\x0aКатапульта\x20вашего\x20героя\x20"
-         "делает\x20дополнительный\x20выстрел\x3b\x20при\x20этом\x20каждый\x20в"
-         "ыстрел\x20разрушает\x20любую\x20стену\x2c\x20за\x20исключением\x20укр"
-         "епленных\x20стен\x20рыцарского\x20замка\x2e"},
-    {  "\x7bОрлиный\x20взор\x20\x31\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x32\x30\x2dп"
-        "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20первого\x20"
-        "или\x20второго\x20уровней\x2c\x20примененное\x20против\x20него\x20в\x20б"
-        "ою\x2e",
-       "\x7bОрлиный\x20взор\x20\x32\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x33\x30\x2dп"
-         "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20третьего"
-         "\x20или\x20более\x20низких\x20уровней\x2c\x20примененное\x20против\x20не"
-         "го\x20в\x20бою\x2e",
-       "\x7bОрлиный\x20глаз\x20\x33\x20ступени\x7d\x0a\x0aДает\x20вашему\x20герою\x20\x34\x30\x2dп"
-         "роцентный\x20шанс\x20выучить\x20любое\x20заклинание\x20четверто"
-         "го\x20или\x20более\x20низких\x20уровней\x2c\x20примененное\x20против\x20"
-         "него\x20в\x20бою\x2e"},
-    {  "\x7bНекромантия\x20\x31\x20ступени\x7d\x0a\x0aВоскрешает\x20\x31\x30\x20процентов"
-        "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-        "скелеты\x20для\x20вашей\x20армии\x2e",
-       "\x7bНекромантия\x20\x32\x20ступени\x7d\x0a\x0aВоскрешает\x20\x32\x30\x20процентов"
-         "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-         "скелеты\x20для\x20вашей\x20армии\x2e",
-       "\x7bНекромантия\x20\x33\x20ступени\x7d\x0a\x0aВоскрешает\x20\x33\x30\x20процентов"
-         "\x20существ\x2c\x20павших\x20на\x20поле\x20боя\x2c\x20и\x20превращает\x20их\x20в\x20"
-         "скелеты\x20для\x20вашей\x20армии\x2e"},
-    {  "\x7bКазначей\x20\x31\x20ступени\x7d\x0a\x0aВаш\x20герой\x20ежедневно\x20собира"
-        "ет\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x31\x30\x30\x20золоты"
-        "х\x2e",
-       "\x7bКазанчей\x20\x32\x20ступени\x7d\x0a\x0aВаш\x20герой\x20ежедневно\x20собира"
-         "ет\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x32\x35\x30\x20золоты"
-         "х\x2e",
-       "\x7bКазначей\x20\x33\x20ступени\x7d\x0a\x0a\x20Ваш\x20герой\x20ежедневно\x20собир"
-         "ает\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x35\x30\x30\x20золот"
-         "ых\x2e"}
+    {  "\x7bРЎР»РµРґРѕРїС‹С‚\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРјРµРЅСЊС€Р°РµС‚\x20Р·Р°РјРµРґР»РµРЅРёРµ\x20РїСЂРё\x20Рї"
+        "РµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РїРµСЂРµСЃРµС‡РµРЅРЅРѕР№\x20РјРµСЃС‚РЅРѕСЃС‚Рё\x20РЅР°\x20\x32\x35\x20РїСЂРѕС†"
+        "РµРЅС‚РѕРІ\x2e",
+       "\x7bРЎР»РµРґРѕРїС‹С‚\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРјРµРЅСЊС€Р°РµС‚\x20Р·Р°РјРµРґР»РµРЅРёРµ\x20РїСЂРё\x20Рї"
+         "РµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РїРµСЂРµСЃРµС‡РµРЅРЅРѕР№\x20РјРµСЃС‚РЅРѕСЃС‚Рё\x20РЅР°\x20\x35\x30\x20РїСЂРѕС†"
+         "РµРЅС‚РѕРІ\x2e",
+       "\x7bРЎР»РµРґРѕРїС‹С‚\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР»РЅРѕСЃС‚СЊСЋ\x20РЅРµР№С‚СЂР°Р»РёР·СѓРµС‚\x20Р·Р°Рј"
+         "РµРґР»РµРЅРёРµ\x20РїСЂРё\x20РїРµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РїРµСЂРµСЃРµС‡РµРЅРЅРѕР№\x20РјРµСЃС‚РЅРѕСЃ"
+         "С‚Рё\x2e"},
+    {  "\x7bРЎС‚СЂРµР»РѕРє\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x31\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+        "\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20СЃС‚СЂРµР»СЏСЋС‰РёРјРё\x20РѕС‚СЂСЏРґР°РјРё\x2e",
+       "\x7bРЎС‚СЂРµР»РѕРє\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x35\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+         "\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20СЃС‚СЂРµР»СЏСЋС‰РёРјРё\x20РѕС‚СЂСЏРґР°РјРё\x2e",
+       "\x7bРЎС‚СЂРµР»РѕРє\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x35\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+         "\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20СЃС‚СЂРµР»СЏСЋС‰РёРјРё\x20РѕС‚СЂСЏРґР°РјРё\x2e"},
+    {  "\x7bР›РѕРіРёСЃС‚РёРєР°\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20Р·Р°РїР°СЃ\x20РґРІРёР¶РµРЅРё"
+        "СЏ\x20РіРµСЂРѕСЏ\x20РЅР°\x20\x31\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x2e",
+       "\x7bР›РѕРіРёСЃС‚РёРєР°\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20Р·Р°РїР°СЃ\x20РґРІРёР¶РµРЅРё"
+         "СЏ\x20РіРµСЂРѕСЏ\x20РЅР°\x20\x32\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x2e",
+       "\x7bР›РѕРіРёСЃС‚РёРєР°\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20Р·Р°РїР°СЃ\x20РґРІРёР¶РµРЅРё"
+         "СЏ\x20РіРµСЂРѕСЏ\x20РЅР°\x20\x33\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ\x2e"},
+    {  "\x7bР Р°Р·РІРµРґРєР°\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x31\x20РєР»РµС‚РєСѓ\x20СЂР°"
+        "РґРёСѓСЃ\x20РѕР±Р·РѕСЂР°\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bР Р°Р·РІРµРґРєР°\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x20РєР»РµС‚РєРё\x20СЂР°"
+         "РґРёСѓСЃ\x20РѕР±Р·РѕСЂР°\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bР Р°Р·РІРµРґРєР°\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x33\x20РєР»РµС‚РєРё\x20СЂР°"
+         "РґРёСѓСЃ\x20РѕР±Р·РѕСЂР°\x20РіРµСЂРѕСЏ\x2e"},
+    {  "\x7bР”РёРїР»РѕРјР°С‚РёСЏ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІРµСЃС‚Рё\x20РїРµСЂРµРіРѕРІРѕ"
+        "СЂС‹\x20СЃ\x20РѕС‚СЂСЏРґР°РјРё\x20РјРѕРЅСЃС‚СЂРѕРІ\x2c\x20Р±РѕР»РµРµ\x20СЃР»Р°Р±С‹РјРё\x2c\x20С‡РµРј\x20РІР°С€Р°\x20"
+        "Р°СЂРјРёСЏ\x2e\x20РќР°\x20С‚Р°РєРѕРј\x20СѓСЂРѕРІРЅРµ\x20РґРёРїР»РѕРјР°С‚РёРё\x20Рє\x20РІР°Рј\x20РјРѕР¶РµС‚\x20РїСЂ"
+        "РёСЃРѕРµРґРёРЅРёС‚СЊСЃСЏ\x20РґРѕ\x20\x31\x2f\x34\x20РѕС‚СЂСЏРґР°\x20РјРѕРЅСЃС‚СЂРѕРІ\x2e",
+       "\x7bР”РёРїР»РѕРјР°С‚РёСЏ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІРµСЃС‚Рё\x20РїРµСЂРµРіРѕРІРѕ"
+         "СЂС‹\x20СЃ\x20РѕС‚СЂСЏРґР°РјРё\x20РјРѕРЅСЃС‚СЂРѕРІ\x2c\x20Р±РѕР»РµРµ\x20СЃР»Р°Р±С‹РјРё\x2c\x20С‡РµРј\x20РІР°С€Р°\x20"
+         "Р°СЂРјРёСЏ\x2e\x20РќР°\x20С‚Р°РєРѕРј\x20СѓСЂРѕРІРЅРµ\x20РґРёРїР»РѕРјР°С‚РёРё\x20Рє\x20РІР°Рј\x20РјРѕР¶РµС‚\x20РїСЂ"
+         "РёСЃРѕРµРґРёРЅРёС‚СЊСЃСЏ\x20РґРѕ\x20\x31\x2f\x32\x20РѕС‚СЂСЏРґР°\x20РјРѕРЅСЃС‚СЂРѕРІ\x2e",
+       "\x7bР”РёРїР»РѕРјР°С‚РёСЏ\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІРµСЃС‚Рё\x20РїРµСЂРµРіРѕРІРѕ"
+         "СЂС‹\x20СЃ\x20РѕС‚СЂСЏРґР°РјРё\x20РјРѕРЅСЃС‚СЂРѕРІ\x2c\x20Р±РѕР»РµРµ\x20СЃР»Р°Р±С‹РјРё\x2c\x20С‡РµРј\x20РІР°С€Р°\x20"
+         "Р°СЂРјРёСЏ\x2e\x20РќР°\x20С‚Р°РєРѕРј\x20СѓСЂРѕРІРЅРµ\x20РґРёРїР»РѕРјР°С‚РёРё\x20Рє\x20РІР°Рј\x20РјРѕР¶РµС‚\x20РїСЂ"
+         "РёСЃРѕРµРґРёРЅРёС‚СЊСЃСЏ\x20РІРµСЃСЊ\x20РѕС‚СЂСЏРґ\x20РјРѕРЅСЃС‚СЂРѕРІ\x2e"},
+    {  "\x7bРќР°РІРёРіР°С†РёСЏ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x31\x2f\x33\x20Р·Р°РїР°СЃ\x20"
+        "РґРІРёР¶РµРЅРёСЏ\x20РіРµСЂРѕСЏ\x20РїСЂРё\x20РїРµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РІРѕРґРµ\x2e",
+       "\x7bРќР°РІРёРіР°С†РёСЏ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x2f\x33\x20Р·Р°РїР°СЃ\x20"
+         "РґРІРёР¶РµРЅРёСЏ\x20РіРµСЂРѕСЏ\x20РїСЂРё\x20РїРµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РІРѕРґРµ\x2e",
+       "\x7bРќР°РІРёРіР°С†РёСЏ\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРґРІР°РёРІР°РµС‚\x20Р·Р°РїР°СЃ\x20РґРІРёР¶РµРЅРёСЏ\x20"
+         "РіРµСЂРѕСЏ\x20РїСЂРё\x20РїРµСЂРµРґРІРёР¶РµРЅРёРё\x20РїРѕ\x20РІРѕРґРµ\x2e"},
+    {  "\x7bР›РёРґРµСЂСЃС‚РІРѕ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x31\x20РµРґРёРЅРёС†Сѓ\x20"
+        "РјРѕСЂР°Р»СЊ\x20РІРѕР№СЃРє\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bР›РёРґРµСЂСЃС‚РІРѕ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x20"
+         "РјРѕСЂР°Р»СЊ\x20РІРѕР№СЃРє\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bР›РёРґРµСЂСЃС‚РІРѕ\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x33\x20РµРґРёРЅРёС†С‹\x20"
+         "РјРѕСЂР°Р»СЊ\x20РІРѕР№СЃРє\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x2e"},
+    {  "\x7bРњСѓРґСЂРѕСЃС‚СЊ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20РёР·Сѓ"
+        "С‡Р°С‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20С‚СЂРµС‚СЊРµРіРѕ\x20СѓСЂРѕРІРЅСЏ\x2e",
+       "\x7bРњСѓРґСЂРѕСЃС‚СЊ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20РёР·Сѓ"
+         "С‡Р°С‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20С‡РµС‚РІРµСЂС‚РѕРіРѕ\x20СѓСЂРѕРІРЅСЏ\x2e",
+       "\x7bРњСѓРґСЂРѕСЃС‚СЊ\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРџРѕР·РІРѕР»СЏРµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20РёР·Сѓ"
+         "С‡Р°С‚СЊ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20РїСЏС‚РѕРіРѕ\x20СѓСЂРѕРІРЅСЏ\x2e"},
+    {  "\x7bРњРёСЃС‚РёС†РёР·Рј\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’Р°С€\x20РіРµСЂРѕР№\x20РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚"
+        "\x20РїРѕ\x20\x32\x20РѕС‡РєР°\x20РјР°РіРёРё\x20РІ\x20РґРµРЅСЊ\x2e",
+       "\x7bРњРёСЃС‚РёС†РёР·Рј\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’Р°С€\x20РіРµСЂРѕР№\x20РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚"
+         "\x20РїРѕ\x20\x33\x20РѕС‡РєР°\x20РјР°РіРёРё\x20РІ\x20РґРµРЅСЊ\x2e",
+       "\x7bРњРёСЃС‚РёС†РёР·Рј\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’Р°С€\x20РіРµСЂРѕР№\x20РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚"
+         "\x20РїРѕ\x20\x34\x20РѕС‡РєР°\x20РјР°РіРёРё\x20РІ\x20РґРµРЅСЊ\x2e"},
+    {  "\x7bРЈРґР°С‡Р°\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x31\x20СѓРґР°С‡Сѓ\x20РІР°С€РµРіРѕ"
+        "\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bРЈРґР°С‡Р°\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x32\x20СѓРґР°С‡Сѓ\x20РІР°С€РµРіРѕ"
+         "\x20РіРµСЂРѕСЏ\x2e",
+       "\x7bРЈРґР°С‡Р°\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20РЅР°\x20\x33\x20СѓРґР°С‡Сѓ\x20РІР°С€РµРіРѕ"
+         "\x20РіРµСЂРѕСЏ\x2e"},
+    {  "\x7bР‘Р°Р»Р»РёСЃС‚РёРєР°\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРЈРІРµР»РёС‡РёРІР°РµС‚\x20С‚РѕС‡РЅРѕСЃС‚СЊ\x20СЃС‚СЂ"
+        "РµР»СЊР±С‹\x20\x20РєР°С‚Р°РїСѓР»СЊС‚С‹\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20Рё\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№"
+        "\x20РєСЂРµРїРѕСЃС‚РЅС‹Рј\x20СЃС‚РµРЅР°Рј\x2e",
+       "\x7bР‘Р°Р»Р»РёСЃС‚РёРєР°\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРљР°С‚Р°РїСѓР»СЊС‚Р°\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20"
+         "РґРµР»Р°РµС‚\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№\x20РІС‹СЃС‚СЂРµР»\x3b\x20РїСЂРё\x20СЌС‚РѕРј\x20СѓРІРµР»РёС‡РёРІ"
+         "Р°РµС‚СЃСЏ\x20С‚РѕС‡РЅРѕСЃС‚СЊ\x20РµРµ\x20СЃС‚СЂРµР»СЊР±С‹\x20Рё\x20СѓСЂРѕРЅ\x2c\x20РЅР°РЅРѕСЃРёРјС‹Р№\x20РєСЂРµ"
+         "РїРѕСЃС‚РЅС‹Рј\x20СЃС‚РµРЅР°Рј\x2e",
+       "\x7bР‘Р°Р»Р»РёСЃС‚РёРєР°\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aРљР°С‚Р°РїСѓР»СЊС‚Р°\x20РІР°С€РµРіРѕ\x20РіРµСЂРѕСЏ\x20"
+         "РґРµР»Р°РµС‚\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№\x20РІС‹СЃС‚СЂРµР»\x3b\x20РїСЂРё\x20СЌС‚РѕРј\x20РєР°Р¶РґС‹Р№\x20РІ"
+         "С‹СЃС‚СЂРµР»\x20СЂР°Р·СЂСѓС€Р°РµС‚\x20Р»СЋР±СѓСЋ\x20СЃС‚РµРЅСѓ\x2c\x20Р·Р°\x20РёСЃРєР»СЋС‡РµРЅРёРµРј\x20СѓРєСЂ"
+         "РµРїР»РµРЅРЅС‹С…\x20СЃС‚РµРЅ\x20СЂС‹С†Р°СЂСЃРєРѕРіРѕ\x20Р·Р°РјРєР°\x2e"},
+    {  "\x7bРћСЂР»РёРЅС‹Р№\x20РІР·РѕСЂ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР”Р°РµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20\x32\x30\x2dРї"
+        "СЂРѕС†РµРЅС‚РЅС‹Р№\x20С€Р°РЅСЃ\x20РІС‹СѓС‡РёС‚СЊ\x20Р»СЋР±РѕРµ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20РїРµСЂРІРѕРіРѕ\x20"
+        "РёР»Рё\x20РІС‚РѕСЂРѕРіРѕ\x20СѓСЂРѕРІРЅРµР№\x2c\x20РїСЂРёРјРµРЅРµРЅРЅРѕРµ\x20РїСЂРѕС‚РёРІ\x20РЅРµРіРѕ\x20РІ\x20Р±"
+        "РѕСЋ\x2e",
+       "\x7bРћСЂР»РёРЅС‹Р№\x20РІР·РѕСЂ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР”Р°РµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20\x33\x30\x2dРї"
+         "СЂРѕС†РµРЅС‚РЅС‹Р№\x20С€Р°РЅСЃ\x20РІС‹СѓС‡РёС‚СЊ\x20Р»СЋР±РѕРµ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20С‚СЂРµС‚СЊРµРіРѕ"
+         "\x20РёР»Рё\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СѓСЂРѕРІРЅРµР№\x2c\x20РїСЂРёРјРµРЅРµРЅРЅРѕРµ\x20РїСЂРѕС‚РёРІ\x20РЅРµ"
+         "РіРѕ\x20РІ\x20Р±РѕСЋ\x2e",
+       "\x7bРћСЂР»РёРЅС‹Р№\x20РіР»Р°Р·\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР”Р°РµС‚\x20РІР°С€РµРјСѓ\x20РіРµСЂРѕСЋ\x20\x34\x30\x2dРї"
+         "СЂРѕС†РµРЅС‚РЅС‹Р№\x20С€Р°РЅСЃ\x20РІС‹СѓС‡РёС‚СЊ\x20Р»СЋР±РѕРµ\x20Р·Р°РєР»РёРЅР°РЅРёРµ\x20С‡РµС‚РІРµСЂС‚Рѕ"
+         "РіРѕ\x20РёР»Рё\x20Р±РѕР»РµРµ\x20РЅРёР·РєРёС…\x20СѓСЂРѕРІРЅРµР№\x2c\x20РїСЂРёРјРµРЅРµРЅРЅРѕРµ\x20РїСЂРѕС‚РёРІ\x20"
+         "РЅРµРіРѕ\x20РІ\x20Р±РѕСЋ\x2e"},
+    {  "\x7bРќРµРєСЂРѕРјР°РЅС‚РёСЏ\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’РѕСЃРєСЂРµС€Р°РµС‚\x20\x31\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+        "\x20СЃСѓС‰РµСЃС‚РІ\x2c\x20РїР°РІС€РёС…\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x2c\x20Рё\x20РїСЂРµРІСЂР°С‰Р°РµС‚\x20РёС…\x20РІ\x20"
+        "СЃРєРµР»РµС‚С‹\x20РґР»СЏ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x2e",
+       "\x7bРќРµРєСЂРѕРјР°РЅС‚РёСЏ\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’РѕСЃРєСЂРµС€Р°РµС‚\x20\x32\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+         "\x20СЃСѓС‰РµСЃС‚РІ\x2c\x20РїР°РІС€РёС…\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x2c\x20Рё\x20РїСЂРµРІСЂР°С‰Р°РµС‚\x20РёС…\x20РІ\x20"
+         "СЃРєРµР»РµС‚С‹\x20РґР»СЏ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x2e",
+       "\x7bРќРµРєСЂРѕРјР°РЅС‚РёСЏ\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’РѕСЃРєСЂРµС€Р°РµС‚\x20\x33\x30\x20РїСЂРѕС†РµРЅС‚РѕРІ"
+         "\x20СЃСѓС‰РµСЃС‚РІ\x2c\x20РїР°РІС€РёС…\x20РЅР°\x20РїРѕР»Рµ\x20Р±РѕСЏ\x2c\x20Рё\x20РїСЂРµРІСЂР°С‰Р°РµС‚\x20РёС…\x20РІ\x20"
+         "СЃРєРµР»РµС‚С‹\x20РґР»СЏ\x20РІР°С€РµР№\x20Р°СЂРјРёРё\x2e"},
+    {  "\x7bРљР°Р·РЅР°С‡РµР№\x20\x31\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’Р°С€\x20РіРµСЂРѕР№\x20РµР¶РµРґРЅРµРІРЅРѕ\x20СЃРѕР±РёСЂР°"
+        "РµС‚\x20СЃРѕ\x20СЃРІРѕРёС…\x20РІР»Р°РґРµРЅРёР№\x20РЅР°Р»РѕРіРё\x20РІ\x20СЂР°Р·РјРµСЂРµ\x20\x31\x30\x30\x20Р·РѕР»РѕС‚С‹"
+        "С…\x2e",
+       "\x7bРљР°Р·Р°РЅС‡РµР№\x20\x32\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0aР’Р°С€\x20РіРµСЂРѕР№\x20РµР¶РµРґРЅРµРІРЅРѕ\x20СЃРѕР±РёСЂР°"
+         "РµС‚\x20СЃРѕ\x20СЃРІРѕРёС…\x20РІР»Р°РґРµРЅРёР№\x20РЅР°Р»РѕРіРё\x20РІ\x20СЂР°Р·РјРµСЂРµ\x20\x32\x35\x30\x20Р·РѕР»РѕС‚С‹"
+         "С…\x2e",
+       "\x7bРљР°Р·РЅР°С‡РµР№\x20\x33\x20СЃС‚СѓРїРµРЅРё\x7d\x0a\x0a\x20Р’Р°С€\x20РіРµСЂРѕР№\x20РµР¶РµРґРЅРµРІРЅРѕ\x20СЃРѕР±РёСЂ"
+         "Р°РµС‚\x20СЃРѕ\x20СЃРІРѕРёС…\x20РІР»Р°РґРµРЅРёР№\x20РЅР°Р»РѕРіРё\x20РІ\x20СЂР°Р·РјРµСЂРµ\x20\x35\x30\x30\x20Р·РѕР»РѕС‚"
+         "С‹С…\x2e"}
 };
 char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
-      "Гильдия\x20магов\x20позволяет\x20разучивать\x20новые\x20заклина"
-        "ния\x20и\x20восстанавливает\x20запас\x20очков\x20магии\x2e",
-      "Гильдия\x20воров\x20дает\x20информацию\x20о\x20врагах\x2e\x20Также\x2c\x20Г"
-        "ильдия\x20воров\x20дает\x20разведывательную\x20информацию\x20о\x20"
-        "вражеских\x20городах\x2e\x20Дополнительные\x20гильдии\x20дают\x20д"
-        "ополнительную\x20информацию\x2e",
-      "Таверна\x20увеличивает\x20мораль\x20бойцов\x2c\x20защищающих\x20за"
-        "мок\x2e",
-      "Верфь\x20позволяет\x20строить\x20корабли\x2e",
-      "Колодец\x20увеличивает\x20прирост\x20всех\x20воинов\x20на\x20\x32\x20в\x20н"
-        "еделю\x2e",
-      "Шатер\x20дает\x20рабочих\x2c\x20которые\x20могут\x20возвести\x20замок"
+      "Р“РёР»СЊРґРёСЏ\x20РјР°РіРѕРІ\x20РїРѕР·РІРѕР»СЏРµС‚\x20СЂР°Р·СѓС‡РёРІР°С‚СЊ\x20РЅРѕРІС‹Рµ\x20Р·Р°РєР»РёРЅР°"
+        "РЅРёСЏ\x20Рё\x20РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚\x20Р·Р°РїР°СЃ\x20РѕС‡РєРѕРІ\x20РјР°РіРёРё\x2e",
+      "Р“РёР»СЊРґРёСЏ\x20РІРѕСЂРѕРІ\x20РґР°РµС‚\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x20Рѕ\x20РІСЂР°РіР°С…\x2e\x20РўР°РєР¶Рµ\x2c\x20Р“"
+        "РёР»СЊРґРёСЏ\x20РІРѕСЂРѕРІ\x20РґР°РµС‚\x20СЂР°Р·РІРµРґС‹РІР°С‚РµР»СЊРЅСѓСЋ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x20Рѕ\x20"
+        "РІСЂР°Р¶РµСЃРєРёС…\x20РіРѕСЂРѕРґР°С…\x2e\x20Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ\x20РіРёР»СЊРґРёРё\x20РґР°СЋС‚\x20Рґ"
+        "РѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ\x20РёРЅС„РѕСЂРјР°С†РёСЋ\x2e",
+      "РўР°РІРµСЂРЅР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РјРѕСЂР°Р»СЊ\x20Р±РѕР№С†РѕРІ\x2c\x20Р·Р°С‰РёС‰Р°СЋС‰РёС…\x20Р·Р°"
+        "РјРѕРє\x2e",
+      "Р’РµСЂС„СЊ\x20РїРѕР·РІРѕР»СЏРµС‚\x20СЃС‚СЂРѕРёС‚СЊ\x20РєРѕСЂР°Р±Р»Рё\x2e",
+      "РљРѕР»РѕРґРµС†\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РїСЂРёСЂРѕСЃС‚\x20РІСЃРµС…\x20РІРѕРёРЅРѕРІ\x20РЅР°\x20\x32\x20РІ\x20РЅ"
+        "РµРґРµР»СЋ\x2e",
+      "РЁР°С‚РµСЂ\x20РґР°РµС‚\x20СЂР°Р±РѕС‡РёС…\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РјРѕРіСѓС‚\x20РІРѕР·РІРµСЃС‚Рё\x20Р·Р°РјРѕРє"
         "\x2e",
-      "Замок\x20улучшает\x20защиту\x20города\x20и\x20увеличивает\x20доход"
-        "\x20до\x20\x31\x30\x30\x30\x20золотых\x20в\x20день\x2e",
-      "Статуя\x20увеличивает\x20доход\x20города\x20на\x20\x32\x35\x30\x20золотых\x20в"
-        "\x20день\x2e",
-      "Левая\x20башня\x20обеспечивает\x20в\x20бою\x20дополнительную\x20ог"
-        "невую\x20мощь\x20замку\x2e",
-      "Правая\x20башня\x20обеспечивает\x20в\x20бою\x20дополнительную\x20о"
-        "гневую\x20мощь\x20замку\x2e",
-      "Рынок\x20можно\x20использовать\x20для\x20перевода\x20одного\x20тип"
-        "а\x20ресурсов\x20в\x20другой\x2e\x20Чем\x20больше\x20рынков\x20вы\x20контро"
-        "лируете\x2c\x20тем\x20выгодней\x20цена\x2e",
+      "Р—Р°РјРѕРє\x20СѓР»СѓС‡С€Р°РµС‚\x20Р·Р°С‰РёС‚Сѓ\x20РіРѕСЂРѕРґР°\x20Рё\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РґРѕС…РѕРґ"
+        "\x20РґРѕ\x20\x31\x30\x30\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ\x20РґРµРЅСЊ\x2e",
+      "РЎС‚Р°С‚СѓСЏ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РґРѕС…РѕРґ\x20РіРѕСЂРѕРґР°\x20РЅР°\x20\x32\x35\x30\x20Р·РѕР»РѕС‚С‹С…\x20РІ"
+        "\x20РґРµРЅСЊ\x2e",
+      "Р›РµРІР°СЏ\x20Р±Р°С€РЅСЏ\x20РѕР±РµСЃРїРµС‡РёРІР°РµС‚\x20РІ\x20Р±РѕСЋ\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ\x20РѕРі"
+        "РЅРµРІСѓСЋ\x20РјРѕС‰СЊ\x20Р·Р°РјРєСѓ\x2e",
+      "РџСЂР°РІР°СЏ\x20Р±Р°С€РЅСЏ\x20РѕР±РµСЃРїРµС‡РёРІР°РµС‚\x20РІ\x20Р±РѕСЋ\x20РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅСѓСЋ\x20Рѕ"
+        "РіРЅРµРІСѓСЋ\x20РјРѕС‰СЊ\x20Р·Р°РјРєСѓ\x2e",
+      "Р С‹РЅРѕРє\x20РјРѕР¶РЅРѕ\x20РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ\x20РґР»СЏ\x20РїРµСЂРµРІРѕРґР°\x20РѕРґРЅРѕРіРѕ\x20С‚РёРї"
+        "Р°\x20СЂРµСЃСѓСЂСЃРѕРІ\x20РІ\x20РґСЂСѓРіРѕР№\x2e\x20Р§РµРј\x20Р±РѕР»СЊС€Рµ\x20СЂС‹РЅРєРѕРІ\x20РІС‹\x20РєРѕРЅС‚СЂРѕ"
+        "Р»РёСЂСѓРµС‚Рµ\x2c\x20С‚РµРј\x20РІС‹РіРѕРґРЅРµР№\x20С†РµРЅР°\x2e",
       "",
-      "Ров\x20замедляет\x20атаку\x20вражеских\x20воинов\x2e\x20Любой\x20воин"
-        "\x2c\x20вошедший\x20в\x20ров\x2c\x20окончит\x20тут\x20свое\x20движение\x20и\x20ст"
-        "анет\x20более\x20уязвимым\x20для\x20атаки\x2e",
+      "Р РѕРІ\x20Р·Р°РјРµРґР»СЏРµС‚\x20Р°С‚Р°РєСѓ\x20РІСЂР°Р¶РµСЃРєРёС…\x20РІРѕРёРЅРѕРІ\x2e\x20Р›СЋР±РѕР№\x20РІРѕРёРЅ"
+        "\x2c\x20РІРѕС€РµРґС€РёР№\x20РІ\x20СЂРѕРІ\x2c\x20РѕРєРѕРЅС‡РёС‚\x20С‚СѓС‚\x20СЃРІРѕРµ\x20РґРІРёР¶РµРЅРёРµ\x20Рё\x20СЃС‚"
+        "Р°РЅРµС‚\x20Р±РѕР»РµРµ\x20СѓСЏР·РІРёРјС‹Рј\x20РґР»СЏ\x20Р°С‚Р°РєРё\x2e",
       "",
-      "Верфь\x20позволяет\x20строить\x20корабли\x2e",
-      "Дом\x20капитана\x20позволяет\x20капитану\x20городской\x20стражи"
-        "\x20организовать\x20защиту\x20замка\x20в\x20отсутствии\x20героя\x2e",
+      "Р’РµСЂС„СЊ\x20РїРѕР·РІРѕР»СЏРµС‚\x20СЃС‚СЂРѕРёС‚СЊ\x20РєРѕСЂР°Р±Р»Рё\x2e",
+      "Р”РѕРј\x20РєР°РїРёС‚Р°РЅР°\x20РїРѕР·РІРѕР»СЏРµС‚\x20РєР°РїРёС‚Р°РЅСѓ\x20РіРѕСЂРѕРґСЃРєРѕР№\x20СЃС‚СЂР°Р¶Рё"
+        "\x20РѕСЂРіР°РЅРёР·РѕРІР°С‚СЊ\x20Р·Р°С‰РёС‚Сѓ\x20Р·Р°РјРєР°\x20РІ\x20РѕС‚СЃСѓС‚СЃС‚РІРёРё\x20РіРµСЂРѕСЏ\x2e",
       "",
       "",
       ""
 };
 char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
-      "Укрепления\x20увеличивают\x20прочность\x20стен\x2c\x20увеличива"
-        "я\x20число\x20раундов\x2c\x20необходимых\x20для\x20полного\x20их\x20разр"
-        "ушения\x2e",
-      "Представления\x2c\x20проходимые\x20в\x20Колизее\x2c\x20увеличивают"
-        "\x20мораль\x20защитников\x20замка\x20на\x20\x32\x20единицы\x2e",
-      "Радуга\x20увеличивает\x20удачу\x20защитников\x20замка\x20на\x20\x32\x20е"
-        "диницы\x2e",
-      "Подземелье\x20увеличивает\x20доход\x20города\x20на\x20\x35\x30\x30\x20золот"
-        "ых\x20в\x20день\x2e",
-      "Библиотека\x20увеличивает\x20число\x20заклинаний\x2c\x20доступн"
-        "ых\x20в\x20Гильдии\x20на\x20\x31\x20на\x20каждый\x20ее\x20этаж\x2e",
-      "Шторм\x20добавляет\x20\x2b\x32\x20единицы\x20к\x20силе\x20заклинаний\x20защ"
-        "итников\x20замка\x2e"
+      "РЈРєСЂРµРїР»РµРЅРёСЏ\x20СѓРІРµР»РёС‡РёРІР°СЋС‚\x20РїСЂРѕС‡РЅРѕСЃС‚СЊ\x20СЃС‚РµРЅ\x2c\x20СѓРІРµР»РёС‡РёРІР°"
+        "СЏ\x20С‡РёСЃР»Рѕ\x20СЂР°СѓРЅРґРѕРІ\x2c\x20РЅРµРѕР±С…РѕРґРёРјС‹С…\x20РґР»СЏ\x20РїРѕР»РЅРѕРіРѕ\x20РёС…\x20СЂР°Р·СЂ"
+        "СѓС€РµРЅРёСЏ\x2e",
+      "РџСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ\x2c\x20РїСЂРѕС…РѕРґРёРјС‹Рµ\x20РІ\x20РљРѕР»РёР·РµРµ\x2c\x20СѓРІРµР»РёС‡РёРІР°СЋС‚"
+        "\x20РјРѕСЂР°Р»СЊ\x20Р·Р°С‰РёС‚РЅРёРєРѕРІ\x20Р·Р°РјРєР°\x20РЅР°\x20\x32\x20РµРґРёРЅРёС†С‹\x2e",
+      "Р Р°РґСѓРіР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20СѓРґР°С‡Сѓ\x20Р·Р°С‰РёС‚РЅРёРєРѕРІ\x20Р·Р°РјРєР°\x20РЅР°\x20\x32\x20Рµ"
+        "РґРёРЅРёС†С‹\x2e",
+      "РџРѕРґР·РµРјРµР»СЊРµ\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20РґРѕС…РѕРґ\x20РіРѕСЂРѕРґР°\x20РЅР°\x20\x35\x30\x30\x20Р·РѕР»РѕС‚"
+        "С‹С…\x20РІ\x20РґРµРЅСЊ\x2e",
+      "Р‘РёР±Р»РёРѕС‚РµРєР°\x20СѓРІРµР»РёС‡РёРІР°РµС‚\x20С‡РёСЃР»Рѕ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x2c\x20РґРѕСЃС‚СѓРїРЅ"
+        "С‹С…\x20РІ\x20Р“РёР»СЊРґРёРё\x20РЅР°\x20\x31\x20РЅР°\x20РєР°Р¶РґС‹Р№\x20РµРµ\x20СЌС‚Р°Р¶\x2e",
+      "РЁС‚РѕСЂРј\x20РґРѕР±Р°РІР»СЏРµС‚\x20\x2b\x32\x20РµРґРёРЅРёС†С‹\x20Рє\x20СЃРёР»Рµ\x20Р·Р°РєР»РёРЅР°РЅРёР№\x20Р·Р°С‰"
+        "РёС‚РЅРёРєРѕРІ\x20Р·Р°РјРєР°\x2e"
 };
 char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
-      "севернее",
-      "северо\x2dвосточнее",
-      "восточнее",
-      "юго\x2dвосточнее",
-      "южнее",
-      "юго\x2dвосточнее",
-      "западнее",
-      "северо\x2dзападнее",
-      "в\x20центре"
+      "СЃРµРІРµСЂРЅРµРµ",
+      "СЃРµРІРµСЂРѕ\x2dРІРѕСЃС‚РѕС‡РЅРµРµ",
+      "РІРѕСЃС‚РѕС‡РЅРµРµ",
+      "СЋРіРѕ\x2dРІРѕСЃС‚РѕС‡РЅРµРµ",
+      "СЋР¶РЅРµРµ",
+      "СЋРіРѕ\x2dРІРѕСЃС‚РѕС‡РЅРµРµ",
+      "Р·Р°РїР°РґРЅРµРµ",
+      "СЃРµРІРµСЂРѕ\x2dР·Р°РїР°РґРЅРµРµ",
+      "РІ\x20С†РµРЅС‚СЂРµ"
 };
 char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
-      "Темные\x20пучины\x20океана",
-      "Зеленые\x20равнины",
-      "Глубокие\x20снега",
-      "Топкие\x20болота",
-      "Застывшая\x20лава",
-      "Бескрайние\x20пески",
-      "Грязь",
-      "Бесплодная\x20пустошь",
-      "Побережье"
+      "РўРµРјРЅС‹Рµ\x20РїСѓС‡РёРЅС‹\x20РѕРєРµР°РЅР°",
+      "Р—РµР»РµРЅС‹Рµ\x20СЂР°РІРЅРёРЅС‹",
+      "Р“Р»СѓР±РѕРєРёРµ\x20СЃРЅРµРіР°",
+      "РўРѕРїРєРёРµ\x20Р±РѕР»РѕС‚Р°",
+      "Р—Р°СЃС‚С‹РІС€Р°СЏ\x20Р»Р°РІР°",
+      "Р‘РµСЃРєСЂР°Р№РЅРёРµ\x20РїРµСЃРєРё",
+      "Р“СЂСЏР·СЊ",
+      "Р‘РµСЃРїР»РѕРґРЅР°СЏ\x20РїСѓСЃС‚РѕС€СЊ",
+      "РџРѕР±РµСЂРµР¶СЊРµ"
 };
-char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {  "Разный",   "\x27Добрый\x27",   "\x27Злой\x27"};
-char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {  "Монохром",   "Цветной"};
-char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {  "Обычная",   "Высокая",   "Оч\x2e\x20высокая"};
-char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {  "Нет",   "Только\x20чары",   "Полная"};
+char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {  "Р Р°Р·РЅС‹Р№",   "\x27Р”РѕР±СЂС‹Р№\x27",   "\x27Р—Р»РѕР№\x27"};
+char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {  "РњРѕРЅРѕС…СЂРѕРј",   "Р¦РІРµС‚РЅРѕР№"};
+char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {  "РћР±С‹С‡РЅР°СЏ",   "Р’С‹СЃРѕРєР°СЏ",   "РћС‡\x2e\x20РІС‹СЃРѕРєР°СЏ"};
+char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {  "РќРµС‚",   "РўРѕР»СЊРєРѕ\x20С‡Р°СЂС‹",   "РџРѕР»РЅР°СЏ"};
 char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
       "\x0a\x0a\x0a\x2a\x2a\x2a\x43\x6f\x6d\x6d\x61\x6e\x64\x20\x4c\x69\x6e\x65\x20\x48\x65\x6c\x70\x2a\x2a\x2a\x0a",
       "\x0a",
-      "\x2f\x44\x30\x20\x2d\x20отключить\x20цифровой\x20звук\x0a",
-      "\x2f\x4d\x30\x20\x2d\x20отключить\x20\x4d\x49\x44\x49\x20музыку\x0a",
-      "\x2f\x52\x30\x20\x2d\x20отключить\x20музыку\x0a",
-      "\x2f\x49\x30\x20\x2d\x20пропустить\x20интро\x0a",
+      "\x2f\x44\x30\x20\x2d\x20РѕС‚РєР»СЋС‡РёС‚СЊ\x20С†РёС„СЂРѕРІРѕР№\x20Р·РІСѓРє\x0a",
+      "\x2f\x4d\x30\x20\x2d\x20РѕС‚РєР»СЋС‡РёС‚СЊ\x20\x4d\x49\x44\x49\x20РјСѓР·С‹РєСѓ\x0a",
+      "\x2f\x52\x30\x20\x2d\x20РѕС‚РєР»СЋС‡РёС‚СЊ\x20РјСѓР·С‹РєСѓ\x0a",
+      "\x2f\x49\x30\x20\x2d\x20РїСЂРѕРїСѓСЃС‚РёС‚СЊ\x20РёРЅС‚СЂРѕ\x0a",
       "\x0a",
       "\x0a",
-      "Пример\x3a\x0a",
+      "РџСЂРёРјРµСЂ\x3a\x0a",
       "\x0a",
       "\x48\x45\x52\x4f\x45\x53\x32\x44\x20\x2f\x52\x30\x20\x2f\x49\x30\x0a",
       "\x0a",
-      "Загрузить\x20\x44\x4f\x53\x20версию\x20Героев\x20\x32\x2e\x0a",
-      "Звук\x20отключен\x20и\x20интро\x20пропущено\x2e\x0a"
+      "Р—Р°РіСЂСѓР·РёС‚СЊ\x20\x44\x4f\x53\x20РІРµСЂСЃРёСЋ\x20Р“РµСЂРѕРµРІ\x20\x32\x2e\x0a",
+      "Р—РІСѓРє\x20РѕС‚РєР»СЋС‡РµРЅ\x20Рё\x20РёРЅС‚СЂРѕ\x20РїСЂРѕРїСѓС‰РµРЅРѕ\x2e\x0a"
 };
 char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
-    {  "Герой\x2fПараметры",   "Навыки",   "Артефакты",   "Города\x2fЗамки",   "Гарнизон",   "Доступно"};
+    {  "Р“РµСЂРѕР№\x2fРџР°СЂР°РјРµС‚СЂС‹",   "РќР°РІС‹РєРё",   "РђСЂС‚РµС„Р°РєС‚С‹",   "Р“РѕСЂРѕРґР°\x2fР—Р°РјРєРё",   "Р“Р°СЂРЅРёР·РѕРЅ",   "Р”РѕСЃС‚СѓРїРЅРѕ"};
 char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
-      "Ошибка\x20передачи\x20данных\x20при\x20выполнении\x20функции\x20\x25\x73"
-        "\x0a\x0aКод\x20ошибки\x3a\x20\x25\x64\x0aЗначение\x20ошибки\x3a\x20\x25\x73\x0a\x0a",
-      "Предлагаемые\x20меры\x20устранения\x20ошибки\x3a",
-      "\x0a\x31\x29\x20Убедитесь\x20в\x20надежности\x20подсоединения\x20кабелей"
+      "РћС€РёР±РєР°\x20РїРµСЂРµРґР°С‡Рё\x20РґР°РЅРЅС‹С…\x20РїСЂРё\x20РІС‹РїРѕР»РЅРµРЅРёРё\x20С„СѓРЅРєС†РёРё\x20\x25\x73"
+        "\x0a\x0aРљРѕРґ\x20РѕС€РёР±РєРё\x3a\x20\x25\x64\x0aР—РЅР°С‡РµРЅРёРµ\x20РѕС€РёР±РєРё\x3a\x20\x25\x73\x0a\x0a",
+      "РџСЂРµРґР»Р°РіР°РµРјС‹Рµ\x20РјРµСЂС‹\x20СѓСЃС‚СЂР°РЅРµРЅРёСЏ\x20РѕС€РёР±РєРё\x3a",
+      "\x0a\x31\x29\x20РЈР±РµРґРёС‚РµСЃСЊ\x20РІ\x20РЅР°РґРµР¶РЅРѕСЃС‚Рё\x20РїРѕРґСЃРѕРµРґРёРЅРµРЅРёСЏ\x20РєР°Р±РµР»РµР№"
         "\x2e",
-      "\x0a\x32\x29\x20Перезагрузите\x20компьютер\x2e",
-      "\x0a\x33\x29\x20Убедитесь\x20в\x20том\x2c\x20что\x20в\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20задан\x20правил"
-        "ьный\x20\x43\x4f\x4d\x20порт\x2e\x20\x28Третья\x20кнопка\x20на\x20экране\x2c\x20где\x20вы\x20"
-        "выбираете\x20Хозяина\x20или\x20Гостя\x2e\x29",
-      "\x0a\x34\x29\x20Попробуйте\x20уменьшить\x20скорость\x20передачи\x20данны"
-        "х\x20в\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20до\x20\x31\x39\x32\x30\x30\x20или\x20до\x20\x39\x36\x30\x30\x2e"
+      "\x0a\x32\x29\x20РџРµСЂРµР·Р°РіСЂСѓР·РёС‚Рµ\x20РєРѕРјРїСЊСЋС‚РµСЂ\x2e",
+      "\x0a\x33\x29\x20РЈР±РµРґРёС‚РµСЃСЊ\x20РІ\x20С‚РѕРј\x2c\x20С‡С‚Рѕ\x20РІ\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20Р·Р°РґР°РЅ\x20РїСЂР°РІРёР»"
+        "СЊРЅС‹Р№\x20\x43\x4f\x4d\x20РїРѕСЂС‚\x2e\x20\x28РўСЂРµС‚СЊСЏ\x20РєРЅРѕРїРєР°\x20РЅР°\x20СЌРєСЂР°РЅРµ\x2c\x20РіРґРµ\x20РІС‹\x20"
+        "РІС‹Р±РёСЂР°РµС‚Рµ\x20РҐРѕР·СЏРёРЅР°\x20РёР»Рё\x20Р“РѕСЃС‚СЏ\x2e\x29",
+      "\x0a\x34\x29\x20РџРѕРїСЂРѕР±СѓР№С‚Рµ\x20СѓРјРµРЅСЊС€РёС‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20РїРµСЂРµРґР°С‡Рё\x20РґР°РЅРЅС‹"
+        "С…\x20РІ\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20РґРѕ\x20\x31\x39\x32\x30\x30\x20РёР»Рё\x20РґРѕ\x20\x39\x36\x30\x30\x2e"
 };
 char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
-    {  "\x25\x64\x20воинов",   "\x25\x64\x20воин",   "Атака",   "Защита",   "ЗД",   "Урон",   "МР",   "УЧ",   "Выстр\x2e"};
+    {  "\x25\x64\x20РІРѕРёРЅРѕРІ",   "\x25\x64\x20РІРѕРёРЅ",   "РђС‚Р°РєР°",   "Р—Р°С‰РёС‚Р°",   "Р—Р”",   "РЈСЂРѕРЅ",   "РњР ",   "РЈР§",   "Р’С‹СЃС‚СЂ\x2e"};
 char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
-      "\x7bМаленькие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20маленьких\x20кар"
-        "т\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2e",
-      "\x7bСредние\x20карты\x7d\x0a\x0aПросмотр\x20только\x20средних\x20карт\x20\x28\x37"
+      "\x7bРњР°Р»РµРЅСЊРєРёРµ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРџСЂРѕСЃРјРѕС‚СЂ\x20С‚РѕР»СЊРєРѕ\x20РјР°Р»РµРЅСЊРєРёС…\x20РєР°СЂ"
+        "С‚\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2e",
+      "\x7bРЎСЂРµРґРЅРёРµ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРџСЂРѕСЃРјРѕС‚СЂ\x20С‚РѕР»СЊРєРѕ\x20СЃСЂРµРґРЅРёС…\x20РєР°СЂС‚\x20\x28\x37"
         "\x32\x20\x78\x20\x37\x32\x29\x2e",
-      "\x7bБольшие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20больших\x20карт\x20\x28\x31"
+      "\x7bР‘РѕР»СЊС€РёРµ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРџСЂРѕСЃРјРѕС‚СЂ\x20С‚РѕР»СЊРєРѕ\x20Р±РѕР»СЊС€РёС…\x20РєР°СЂС‚\x20\x28\x31"
         "\x30\x38\x20\x78\x20\x31\x30\x38\x29\x2e",
-      "\x7bОчень\x20большие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20очень\x20бол"
-        "ьших\x20карт\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
-      "\x7bВсе\x20карты\x7d\x0a\x0aПросмотр\x20всех\x20карт\x2e",
-      "\x7bВвод\x20имени\x7d\x0a\x0aВведите\x20имя\x20файла\x2c\x20под\x20которым\x20вых"
-        "отите\x20сохранить\x20игру\x2e",
-      "\x7bОК\x7d\x0a\x0aПодтверждение\x20выбора\x2e",
-      "\x7bОтмена\x7d\x0a\x0aОтмена\x20без\x20подтверждения\x20выбора\x2e",
-      "\x7bЗначок\x20размера\x7d\x0a\x0aОбозначает\x20размер\x20карты\x3a\x20мален"
-        "ькая\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2c\x20средняя\x20\x28\x37\x32\x20\x78\x20\x37\x32\x29\x2c\x20большая\x20\x28\x31\x30\x38\x20"
-        "\x78\x20\x31\x30\x38\x29\x20или\x20очень\x20большая\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
-      "\x7bЗначок\x20игроков\x7d\x0a\x0aОбозначает\x20количество\x20игроков\x20"
-        "в\x20данном\x20сценарии\x2e\x20При\x20отсутствии\x20игроков\x2dлюдей\x20"
-        "их\x20места\x20занимает\x20компьютер\x2e",
-      "\x7bУсловия\x20победы\x7d\x0aПредусмотрено\x20\x36\x20возможных\x20вариа"
-        "нтов\x3a\x0a\x7bНадгробный\x20камень\x7d\x20\x2d\x20Разгромить\x20всех\x20геро"
-        "ев\x20противника\x20и\x20захватить\x20его\x20замки\x2e\x0a\x7bГород\x7d\x20\x2d\x20З"
-        "ахватить\x20определенный\x20замок\x2e\x0a\x7bПортрет\x20героя\x7d\x20\x2d\x20Р"
-        "азгромить\x20определенного\x20героя\x2e\x0a\x7bМедаль\x7d\x20\x2d\x20Найти\x20"
-        "определенный\x20артефакт\x2e\x0a\x7bРукопожатие\x7d\x20\x2d\x20Ваш\x20альян"
-        "с\x20должен\x20разгромить\x20альянс\x20противника\x2e\x0a\x7bМонеты\x7d\x20"
-        "\x2d\x20Накопить\x20нужное\x20количество\x20золота\x2e",
-      "\x7bУссловия\x20поражения\x7d\x0a\x0aПредусмотрено\x20\x34\x20возможных\x20"
-        "условия\x3a\x0a\x7bНадгробный\x20камень\x7d\x20\x2d\x20Потеря\x20всех\x20ваших"
-        "\x20героев\x20и\x20городов\x2e\x0a\x7bГород\x7d\x20\x2d\x20Потеря\x20определенног"
-        "о\x20замка\x2e\x0a\x7bПортрет\x20героя\x7d\x20\x2d\x20Потеря\x20указанного\x20гер"
-        "оя\x2e\x0a\x7bПесочные\x20часы\x7d\x20\x2d\x20Победа\x20не\x20была\x20достигнута\x20"
-        "до\x20указанного\x20срока\x2e\x29",
-      "\x7bНазвание\x7d\x0a\x0aНазвание\x20карты\x2e",
-      "\x7bОписание\x7d\x0a\x0aОписание\x20карты\x2e",
-      "\x7bТрудность\x20карты\x7d\x0a\x0aСтепень\x20сложности\x20игры\x20на\x20это"
-        "й\x20карте\x2e\x20Трудность\x20карты\x20определяется\x20разработчи"
-        "ком\x20сценария\x2e\x20Более\x20сложные\x20карты\x20характеризуютс"
-        "я\x20большим\x20числом\x20сильных\x20противников\x2c\x20меньшим\x20ко"
-        "личеством\x20ресурсов\x20или\x20специальными\x20условиями\x2c\x20з"
-        "атрудняющими\x20достижение\x20победы\x2e"
+      "\x7bРћС‡РµРЅСЊ\x20Р±РѕР»СЊС€РёРµ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРџСЂРѕСЃРјРѕС‚СЂ\x20С‚РѕР»СЊРєРѕ\x20РѕС‡РµРЅСЊ\x20Р±РѕР»"
+        "СЊС€РёС…\x20РєР°СЂС‚\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
+      "\x7bР’СЃРµ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРџСЂРѕСЃРјРѕС‚СЂ\x20РІСЃРµС…\x20РєР°СЂС‚\x2e",
+      "\x7bР’РІРѕРґ\x20РёРјРµРЅРё\x7d\x0a\x0aР’РІРµРґРёС‚Рµ\x20РёРјСЏ\x20С„Р°Р№Р»Р°\x2c\x20РїРѕРґ\x20РєРѕС‚РѕСЂС‹Рј\x20РІС‹С…"
+        "РѕС‚РёС‚Рµ\x20СЃРѕС…СЂР°РЅРёС‚СЊ\x20РёРіСЂСѓ\x2e",
+      "\x7bРћРљ\x7d\x0a\x0aРџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ\x20РІС‹Р±РѕСЂР°\x2e",
+      "\x7bРћС‚РјРµРЅР°\x7d\x0a\x0aРћС‚РјРµРЅР°\x20Р±РµР·\x20РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ\x20РІС‹Р±РѕСЂР°\x2e",
+      "\x7bР—РЅР°С‡РѕРє\x20СЂР°Р·РјРµСЂР°\x7d\x0a\x0aРћР±РѕР·РЅР°С‡Р°РµС‚\x20СЂР°Р·РјРµСЂ\x20РєР°СЂС‚С‹\x3a\x20РјР°Р»РµРЅ"
+        "СЊРєР°СЏ\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2c\x20СЃСЂРµРґРЅСЏСЏ\x20\x28\x37\x32\x20\x78\x20\x37\x32\x29\x2c\x20Р±РѕР»СЊС€Р°СЏ\x20\x28\x31\x30\x38\x20"
+        "\x78\x20\x31\x30\x38\x29\x20РёР»Рё\x20РѕС‡РµРЅСЊ\x20Р±РѕР»СЊС€Р°СЏ\x20\x28\x31\x34\x34\x20\x78\x20\x31\x34\x34\x29\x2e",
+      "\x7bР—РЅР°С‡РѕРє\x20РёРіСЂРѕРєРѕРІ\x7d\x0a\x0aРћР±РѕР·РЅР°С‡Р°РµС‚\x20РєРѕР»РёС‡РµСЃС‚РІРѕ\x20РёРіСЂРѕРєРѕРІ\x20"
+        "РІ\x20РґР°РЅРЅРѕРј\x20СЃС†РµРЅР°СЂРёРё\x2e\x20РџСЂРё\x20РѕС‚СЃСѓС‚СЃС‚РІРёРё\x20РёРіСЂРѕРєРѕРІ\x2dР»СЋРґРµР№\x20"
+        "РёС…\x20РјРµСЃС‚Р°\x20Р·Р°РЅРёРјР°РµС‚\x20РєРѕРјРїСЊСЋС‚РµСЂ\x2e",
+      "\x7bРЈСЃР»РѕРІРёСЏ\x20РїРѕР±РµРґС‹\x7d\x0aРџСЂРµРґСѓСЃРјРѕС‚СЂРµРЅРѕ\x20\x36\x20РІРѕР·РјРѕР¶РЅС‹С…\x20РІР°СЂРёР°"
+        "РЅС‚РѕРІ\x3a\x0a\x7bРќР°РґРіСЂРѕР±РЅС‹Р№\x20РєР°РјРµРЅСЊ\x7d\x20\x2d\x20Р Р°Р·РіСЂРѕРјРёС‚СЊ\x20РІСЃРµС…\x20РіРµСЂРѕ"
+        "РµРІ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x20Рё\x20Р·Р°С…РІР°С‚РёС‚СЊ\x20РµРіРѕ\x20Р·Р°РјРєРё\x2e\x0a\x7bР“РѕСЂРѕРґ\x7d\x20\x2d\x20Р—"
+        "Р°С…РІР°С‚РёС‚СЊ\x20РѕРїСЂРµРґРµР»РµРЅРЅС‹Р№\x20Р·Р°РјРѕРє\x2e\x0a\x7bРџРѕСЂС‚СЂРµС‚\x20РіРµСЂРѕСЏ\x7d\x20\x2d\x20Р "
+        "Р°Р·РіСЂРѕРјРёС‚СЊ\x20РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ\x20РіРµСЂРѕСЏ\x2e\x0a\x7bРњРµРґР°Р»СЊ\x7d\x20\x2d\x20РќР°Р№С‚Рё\x20"
+        "РѕРїСЂРµРґРµР»РµРЅРЅС‹Р№\x20Р°СЂС‚РµС„Р°РєС‚\x2e\x0a\x7bР СѓРєРѕРїРѕР¶Р°С‚РёРµ\x7d\x20\x2d\x20Р’Р°С€\x20Р°Р»СЊСЏРЅ"
+        "СЃ\x20РґРѕР»Р¶РµРЅ\x20СЂР°Р·РіСЂРѕРјРёС‚СЊ\x20Р°Р»СЊСЏРЅСЃ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e\x0a\x7bРњРѕРЅРµС‚С‹\x7d\x20"
+        "\x2d\x20РќР°РєРѕРїРёС‚СЊ\x20РЅСѓР¶РЅРѕРµ\x20РєРѕР»РёС‡РµСЃС‚РІРѕ\x20Р·РѕР»РѕС‚Р°\x2e",
+      "\x7bРЈСЃСЃР»РѕРІРёСЏ\x20РїРѕСЂР°Р¶РµРЅРёСЏ\x7d\x0a\x0aРџСЂРµРґСѓСЃРјРѕС‚СЂРµРЅРѕ\x20\x34\x20РІРѕР·РјРѕР¶РЅС‹С…\x20"
+        "СѓСЃР»РѕРІРёСЏ\x3a\x0a\x7bРќР°РґРіСЂРѕР±РЅС‹Р№\x20РєР°РјРµРЅСЊ\x7d\x20\x2d\x20РџРѕС‚РµСЂСЏ\x20РІСЃРµС…\x20РІР°С€РёС…"
+        "\x20РіРµСЂРѕРµРІ\x20Рё\x20РіРѕСЂРѕРґРѕРІ\x2e\x0a\x7bР“РѕСЂРѕРґ\x7d\x20\x2d\x20РџРѕС‚РµСЂСЏ\x20РѕРїСЂРµРґРµР»РµРЅРЅРѕРі"
+        "Рѕ\x20Р·Р°РјРєР°\x2e\x0a\x7bРџРѕСЂС‚СЂРµС‚\x20РіРµСЂРѕСЏ\x7d\x20\x2d\x20РџРѕС‚РµСЂСЏ\x20СѓРєР°Р·Р°РЅРЅРѕРіРѕ\x20РіРµСЂ"
+        "РѕСЏ\x2e\x0a\x7bРџРµСЃРѕС‡РЅС‹Рµ\x20С‡Р°СЃС‹\x7d\x20\x2d\x20РџРѕР±РµРґР°\x20РЅРµ\x20Р±С‹Р»Р°\x20РґРѕСЃС‚РёРіРЅСѓС‚Р°\x20"
+        "РґРѕ\x20СѓРєР°Р·Р°РЅРЅРѕРіРѕ\x20СЃСЂРѕРєР°\x2e\x29",
+      "\x7bРќР°Р·РІР°РЅРёРµ\x7d\x0a\x0aРќР°Р·РІР°РЅРёРµ\x20РєР°СЂС‚С‹\x2e",
+      "\x7bРћРїРёСЃР°РЅРёРµ\x7d\x0a\x0aРћРїРёСЃР°РЅРёРµ\x20РєР°СЂС‚С‹\x2e",
+      "\x7bРўСЂСѓРґРЅРѕСЃС‚СЊ\x20РєР°СЂС‚С‹\x7d\x0a\x0aРЎС‚РµРїРµРЅСЊ\x20СЃР»РѕР¶РЅРѕСЃС‚Рё\x20РёРіСЂС‹\x20РЅР°\x20СЌС‚Рѕ"
+        "Р№\x20РєР°СЂС‚Рµ\x2e\x20РўСЂСѓРґРЅРѕСЃС‚СЊ\x20РєР°СЂС‚С‹\x20РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ\x20СЂР°Р·СЂР°Р±РѕС‚С‡Рё"
+        "РєРѕРј\x20СЃС†РµРЅР°СЂРёСЏ\x2e\x20Р‘РѕР»РµРµ\x20СЃР»РѕР¶РЅС‹Рµ\x20РєР°СЂС‚С‹\x20С…Р°СЂР°РєС‚РµСЂРёР·СѓСЋС‚СЃ"
+        "СЏ\x20Р±РѕР»СЊС€РёРј\x20С‡РёСЃР»РѕРј\x20СЃРёР»СЊРЅС‹С…\x20РїСЂРѕС‚РёРІРЅРёРєРѕРІ\x2c\x20РјРµРЅСЊС€РёРј\x20РєРѕ"
+        "Р»РёС‡РµСЃС‚РІРѕРј\x20СЂРµСЃСѓСЂСЃРѕРІ\x20РёР»Рё\x20СЃРїРµС†РёР°Р»СЊРЅС‹РјРё\x20СѓСЃР»РѕРІРёСЏРјРё\x2c\x20Р·"
+        "Р°С‚СЂСѓРґРЅСЏСЋС‰РёРјРё\x20РґРѕСЃС‚РёР¶РµРЅРёРµ\x20РїРѕР±РµРґС‹\x2e"
 };
-char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {  "Воин",   "Строитель",   "Исследователь",   "Человек"};
+char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {  "Р’РѕРёРЅ",   "РЎС‚СЂРѕРёС‚РµР»СЊ",   "РСЃСЃР»РµРґРѕРІР°С‚РµР»СЊ",   "Р§РµР»РѕРІРµРє"};
 char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
-    {  "Мало",   "Мало",   "мало"},
-    {  "Немного",   "Немного",   "немного"},
-    {  "Стая",   "Стая",   "стая"},
-    {  "Много",   "Много",   "много"},
-    {  "Орда",   "Орда",   "орда"},
-    {  "Толпа",   "Толпа",   "толпа"},
-    {  "Свора",   "Свора",   "свора"},
-    {  "Тысячи",   "Тысячи\x2e\x2e\x2e",   "тысячи"},
-    {  "Легион",   "Легион",   "легион"}
+    {  "РњР°Р»Рѕ",   "РњР°Р»Рѕ",   "РјР°Р»Рѕ"},
+    {  "РќРµРјРЅРѕРіРѕ",   "РќРµРјРЅРѕРіРѕ",   "РЅРµРјРЅРѕРіРѕ"},
+    {  "РЎС‚Р°СЏ",   "РЎС‚Р°СЏ",   "СЃС‚Р°СЏ"},
+    {  "РњРЅРѕРіРѕ",   "РњРЅРѕРіРѕ",   "РјРЅРѕРіРѕ"},
+    {  "РћСЂРґР°",   "РћСЂРґР°",   "РѕСЂРґР°"},
+    {  "РўРѕР»РїР°",   "РўРѕР»РїР°",   "С‚РѕР»РїР°"},
+    {  "РЎРІРѕСЂР°",   "РЎРІРѕСЂР°",   "СЃРІРѕСЂР°"},
+    {  "РўС‹СЃСЏС‡Рё",   "РўС‹СЃСЏС‡Рё\x2e\x2e\x2e",   "С‚С‹СЃСЏС‡Рё"},
+    {  "Р›РµРіРёРѕРЅ",   "Р›РµРіРёРѕРЅ",   "Р»РµРіРёРѕРЅ"}
 };
 char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
-      "Истина\x20где\x2dто\x20рядом\x2e",
-      "Темная\x20сторона\x20сильнее\x2e",
-      "Конец\x20Света\x20близок\x2e",
-      "Прах\x20Лорда\x20Слэйера\x20захоронен\x20в\x20основании\x20арены\x2e",
-      "Он\x20невиновен\x2e",
-      "Черный\x20дракон\x20сделает\x20Титана\x20в\x20любой\x20день\x20недели"
+      "РСЃС‚РёРЅР°\x20РіРґРµ\x2dС‚Рѕ\x20СЂСЏРґРѕРј\x2e",
+      "РўРµРјРЅР°СЏ\x20СЃС‚РѕСЂРѕРЅР°\x20СЃРёР»СЊРЅРµРµ\x2e",
+      "РљРѕРЅРµС†\x20РЎРІРµС‚Р°\x20Р±Р»РёР·РѕРє\x2e",
+      "РџСЂР°С…\x20Р›РѕСЂРґР°\x20РЎР»СЌР№РµСЂР°\x20Р·Р°С…РѕСЂРѕРЅРµРЅ\x20РІ\x20РѕСЃРЅРѕРІР°РЅРёРё\x20Р°СЂРµРЅС‹\x2e",
+      "РћРЅ\x20РЅРµРІРёРЅРѕРІРµРЅ\x2e",
+      "Р§РµСЂРЅС‹Р№\x20РґСЂР°РєРѕРЅ\x20СЃРґРµР»Р°РµС‚\x20РўРёС‚Р°РЅР°\x20РІ\x20Р»СЋР±РѕР№\x20РґРµРЅСЊ\x20РЅРµРґРµР»Рё"
         "\x2e",
-      "Он\x20сказал\x20ей\x2c\x20\x22Я\x2dда\x2dда\x2dяда\x2dда\x22\x2e\x2e\x2e\x20а\x20она\x20сказала\x2c"
-        "\x20\x22Ля\x2dля\x2dля\x2c\x20ля\x2dля\x2dля\x2e\x2e\x2e\x22",
-      "Тут\x20бывал\x20человек\x20из\x20Нунтукета\x2e\x2e\x2e"
+      "РћРЅ\x20СЃРєР°Р·Р°Р»\x20РµР№\x2c\x20\x22РЇ\x2dРґР°\x2dРґР°\x2dСЏРґР°\x2dРґР°\x22\x2e\x2e\x2e\x20Р°\x20РѕРЅР°\x20СЃРєР°Р·Р°Р»Р°\x2c"
+        "\x20\x22Р›СЏ\x2dР»СЏ\x2dР»СЏ\x2c\x20Р»СЏ\x2dР»СЏ\x2dР»СЏ\x2e\x2e\x2e\x22",
+      "РўСѓС‚\x20Р±С‹РІР°Р»\x20С‡РµР»РѕРІРµРє\x20РёР·\x20РќСѓРЅС‚СѓРєРµС‚Р°\x2e\x2e\x2e"
 };
 char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
-    {  "Прямо\x20пойдешь\x20\x2d\x20коня\x20потеряешь\x2e",   "Сдается\x20в\x20аренду\x2e",   "До\x20следующего\x20знака\x20\x35\x30\x20миль\x2e",   "Кто\x20идет\x20за\x20Блинским\x3f"};
+    {  "РџСЂСЏРјРѕ\x20РїРѕР№РґРµС€СЊ\x20\x2d\x20РєРѕРЅСЏ\x20РїРѕС‚РµСЂСЏРµС€СЊ\x2e",   "РЎРґР°РµС‚СЃСЏ\x20РІ\x20Р°СЂРµРЅРґСѓ\x2e",   "Р”Рѕ\x20СЃР»РµРґСѓСЋС‰РµРіРѕ\x20Р·РЅР°РєР°\x20\x35\x30\x20РјРёР»СЊ\x2e",   "РљС‚Рѕ\x20РёРґРµС‚\x20Р·Р°\x20Р‘Р»РёРЅСЃРєРёРј\x3f"};
 char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
-      "Альянс\x20гномов",
-      "Гильдия\x20колдуний",
-      "Роланд\x20становится\x20сильнее",
-      "Перенос\x20войск",
-      "Корлагон\x20побежден",
-      "Корона\x20всевластия",
-      "Гильдия\x20некромантов",
-      "Смерть\x20гномам",
-      "Союз\x20огров",
-      "Союз\x20драконов",
-      "Корона\x20всевластия",
-      "Перенос\x20войск"
+      "РђР»СЊСЏРЅСЃ\x20РіРЅРѕРјРѕРІ",
+      "Р“РёР»СЊРґРёСЏ\x20РєРѕР»РґСѓРЅРёР№",
+      "Р РѕР»Р°РЅРґ\x20СЃС‚Р°РЅРѕРІРёС‚СЃСЏ\x20СЃРёР»СЊРЅРµРµ",
+      "РџРµСЂРµРЅРѕСЃ\x20РІРѕР№СЃРє",
+      "РљРѕСЂР»Р°РіРѕРЅ\x20РїРѕР±РµР¶РґРµРЅ",
+      "РљРѕСЂРѕРЅР°\x20РІСЃРµРІР»Р°СЃС‚РёСЏ",
+      "Р“РёР»СЊРґРёСЏ\x20РЅРµРєСЂРѕРјР°РЅС‚РѕРІ",
+      "РЎРјРµСЂС‚СЊ\x20РіРЅРѕРјР°Рј",
+      "РЎРѕСЋР·\x20РѕРіСЂРѕРІ",
+      "РЎРѕСЋР·\x20РґСЂР°РєРѕРЅРѕРІ",
+      "РљРѕСЂРѕРЅР°\x20РІСЃРµРІР»Р°СЃС‚РёСЏ",
+      "РџРµСЂРµРЅРѕСЃ\x20РІРѕР№СЃРє"
 };
 char* cCampaignName[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
-    {  "Сила\x20оружия",
-       "Аннексия",
-       "Спасти\x20гномов",
-       "Копи\x20Каратора",
-       "Переломный\x20момент",
-       "Защитник",
-       "Вызов\x20брошен\x21",
-       "Корона",
-       "Акт\x20отчаяния",
-       "Час\x20нашей\x20славы",
+    {  "РЎРёР»Р°\x20РѕСЂСѓР¶РёСЏ",
+       "РђРЅРЅРµРєСЃРёСЏ",
+       "РЎРїР°СЃС‚Рё\x20РіРЅРѕРјРѕРІ",
+       "РљРѕРїРё\x20РљР°СЂР°С‚РѕСЂР°",
+       "РџРµСЂРµР»РѕРјРЅС‹Р№\x20РјРѕРјРµРЅС‚",
+       "Р—Р°С‰РёС‚РЅРёРє",
+       "Р’С‹Р·РѕРІ\x20Р±СЂРѕС€РµРЅ\x21",
+       "РљРѕСЂРѕРЅР°",
+       "РђРєС‚\x20РѕС‚С‡Р°СЏРЅРёСЏ",
+       "Р§Р°СЃ\x20РЅР°С€РµР№\x20СЃР»Р°РІС‹",
        "",
-       "Предательство"},
-    {  "Первая\x20кровь",
-       "Войны\x20с\x20варварами",
-       "Некроманты\x21",
-       "Смерть\x20гномам",
-       "Переломный\x20момент\x20",
-       "Крестьяне\x21",
-       "Владыка\x20драконов",
-       "Лорды\x20провинций",
-       "Корона",
-       "К\x20вящей\x20славе",
-       "Апокалипсис",
-       "Предательство\x21"}
+       "РџСЂРµРґР°С‚РµР»СЊСЃС‚РІРѕ"},
+    {  "РџРµСЂРІР°СЏ\x20РєСЂРѕРІСЊ",
+       "Р’РѕР№РЅС‹\x20СЃ\x20РІР°СЂРІР°СЂР°РјРё",
+       "РќРµРєСЂРѕРјР°РЅС‚С‹\x21",
+       "РЎРјРµСЂС‚СЊ\x20РіРЅРѕРјР°Рј",
+       "РџРµСЂРµР»РѕРјРЅС‹Р№\x20РјРѕРјРµРЅС‚\x20",
+       "РљСЂРµСЃС‚СЊСЏРЅРµ\x21",
+       "Р’Р»Р°РґС‹РєР°\x20РґСЂР°РєРѕРЅРѕРІ",
+       "Р›РѕСЂРґС‹\x20РїСЂРѕРІРёРЅС†РёР№",
+       "РљРѕСЂРѕРЅР°",
+       "Рљ\x20РІСЏС‰РµР№\x20СЃР»Р°РІРµ",
+       "РђРїРѕРєР°Р»РёРїСЃРёСЃ",
+       "РџСЂРµРґР°С‚РµР»СЊСЃС‚РІРѕ\x21"}
 };
 char* cCampaignDescription[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
-    {  "Прежде\x20чем\x20поднять\x20восстание\x20против\x20брата\x2c\x20Ролан"
-        "д\x20хочет\x2c\x20чтобы\x20вы\x20одержали\x20победу\x20над\x20соседними\x20"
-        "властителями\x2e\x20Между\x20ними\x20нет\x20единства\x2c\x20поэтому\x20б"
-        "ольшую\x20часть\x20времени\x20они\x20будут\x20заняты\x20стычками\x20д"
-        "руг\x20с\x20другом\x2e\x20Победа\x20будет\x20вашей\x2c\x20когда\x20вы\x20захва"
-        "тите\x20все\x20города\x2e",
-       "Властители\x20сопредельных\x20земель\x20отказываются\x20прин"
-         "ести\x20клятву\x20верности\x20Роланду\x2c\x20и\x20поэтому\x20должны\x20б"
-         "ыть\x20повержены\x2e\x20Богатства\x20и\x20власти\x20им\x20не\x20занимать"
-         "\x2c\x20поэтому\x20будьте\x20готовы\x20к\x20нелегкой\x20борьбе\x2e\x20Чтобы"
-         "\x20победить\x2c\x20захватите\x20все\x20вражеские\x20замки\x2e",
-       "Вам\x20следует\x20защитить\x20гномов\x20от\x20армий\x20Арчибальда\x2e"
-         "\x20Чтобы\x20победить\x2c\x20захватите\x20все\x20города\x20и\x20замки\x20пр"
-         "отивника\x2e\x20Следите\x20за\x20тем\x2c\x20чтобы\x20враг\x20не\x20захватил"
-         "\x20все\x20города\x20гномов\x2c\x20иначе\x20победа\x20достанется\x20ему\x2e",
-       "В\x20борьбе\x20за\x20ресурсы\x20и\x20сокровища\x20вам\x20противостоят"
-         "\x20четыре\x20противника\x2c\x20объединившихся\x20в\x20союз\x2e\x20Чтобы"
-         "\x20победить\x2c\x20захватите\x20все\x20вражеские\x20замки\x2e",
-       "Ваши\x20враги\x20заключили\x20против\x20вас\x20союз\x2e\x20Они\x20где\x2dто"
-         "\x20рядом\x2c\x20поэтому\x20в\x20любой\x20момент\x20будьте\x20готовы\x20к\x20б"
-         "итве\x2e\x20Вы\x20победите\x2c\x20когда\x20завладеете\x20всеми\x20четырь"
-         "мя\x20замками\x2c\x20находящимися\x20в\x20этой\x20небольшой\x20долине"
+    {  "РџСЂРµР¶РґРµ\x20С‡РµРј\x20РїРѕРґРЅСЏС‚СЊ\x20РІРѕСЃСЃС‚Р°РЅРёРµ\x20РїСЂРѕС‚РёРІ\x20Р±СЂР°С‚Р°\x2c\x20Р РѕР»Р°РЅ"
+        "Рґ\x20С…РѕС‡РµС‚\x2c\x20С‡С‚РѕР±С‹\x20РІС‹\x20РѕРґРµСЂР¶Р°Р»Рё\x20РїРѕР±РµРґСѓ\x20РЅР°Рґ\x20СЃРѕСЃРµРґРЅРёРјРё\x20"
+        "РІР»Р°СЃС‚РёС‚РµР»СЏРјРё\x2e\x20РњРµР¶РґСѓ\x20РЅРёРјРё\x20РЅРµС‚\x20РµРґРёРЅСЃС‚РІР°\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20Р±"
+        "РѕР»СЊС€СѓСЋ\x20С‡Р°СЃС‚СЊ\x20РІСЂРµРјРµРЅРё\x20РѕРЅРё\x20Р±СѓРґСѓС‚\x20Р·Р°РЅСЏС‚С‹\x20СЃС‚С‹С‡РєР°РјРё\x20Рґ"
+        "СЂСѓРі\x20СЃ\x20РґСЂСѓРіРѕРј\x2e\x20РџРѕР±РµРґР°\x20Р±СѓРґРµС‚\x20РІР°С€РµР№\x2c\x20РєРѕРіРґР°\x20РІС‹\x20Р·Р°С…РІР°"
+        "С‚РёС‚Рµ\x20РІСЃРµ\x20РіРѕСЂРѕРґР°\x2e",
+       "Р’Р»Р°СЃС‚РёС‚РµР»Рё\x20СЃРѕРїСЂРµРґРµР»СЊРЅС‹С…\x20Р·РµРјРµР»СЊ\x20РѕС‚РєР°Р·С‹РІР°СЋС‚СЃСЏ\x20РїСЂРёРЅ"
+         "РµСЃС‚Рё\x20РєР»СЏС‚РІСѓ\x20РІРµСЂРЅРѕСЃС‚Рё\x20Р РѕР»Р°РЅРґСѓ\x2c\x20Рё\x20РїРѕСЌС‚РѕРјСѓ\x20РґРѕР»Р¶РЅС‹\x20Р±"
+         "С‹С‚СЊ\x20РїРѕРІРµСЂР¶РµРЅС‹\x2e\x20Р‘РѕРіР°С‚СЃС‚РІР°\x20Рё\x20РІР»Р°СЃС‚Рё\x20РёРј\x20РЅРµ\x20Р·Р°РЅРёРјР°С‚СЊ"
+         "\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20Р±СѓРґСЊС‚Рµ\x20РіРѕС‚РѕРІС‹\x20Рє\x20РЅРµР»РµРіРєРѕР№\x20Р±РѕСЂСЊР±Рµ\x2e\x20Р§С‚РѕР±С‹"
+         "\x20РїРѕР±РµРґРёС‚СЊ\x2c\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РІСЃРµ\x20РІСЂР°Р¶РµСЃРєРёРµ\x20Р·Р°РјРєРё\x2e",
+       "Р’Р°Рј\x20СЃР»РµРґСѓРµС‚\x20Р·Р°С‰РёС‚РёС‚СЊ\x20РіРЅРѕРјРѕРІ\x20РѕС‚\x20Р°СЂРјРёР№\x20РђСЂС‡РёР±Р°Р»СЊРґР°\x2e"
+         "\x20Р§С‚РѕР±С‹\x20РїРѕР±РµРґРёС‚СЊ\x2c\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РІСЃРµ\x20РіРѕСЂРѕРґР°\x20Рё\x20Р·Р°РјРєРё\x20РїСЂ"
+         "РѕС‚РёРІРЅРёРєР°\x2e\x20РЎР»РµРґРёС‚Рµ\x20Р·Р°\x20С‚РµРј\x2c\x20С‡С‚РѕР±С‹\x20РІСЂР°Рі\x20РЅРµ\x20Р·Р°С…РІР°С‚РёР»"
+         "\x20РІСЃРµ\x20РіРѕСЂРѕРґР°\x20РіРЅРѕРјРѕРІ\x2c\x20РёРЅР°С‡Рµ\x20РїРѕР±РµРґР°\x20РґРѕСЃС‚Р°РЅРµС‚СЃСЏ\x20РµРјСѓ\x2e",
+       "Р’\x20Р±РѕСЂСЊР±Рµ\x20Р·Р°\x20СЂРµСЃСѓСЂСЃС‹\x20Рё\x20СЃРѕРєСЂРѕРІРёС‰Р°\x20РІР°Рј\x20РїСЂРѕС‚РёРІРѕСЃС‚РѕСЏС‚"
+         "\x20С‡РµС‚С‹СЂРµ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2c\x20РѕР±СЉРµРґРёРЅРёРІС€РёС…СЃСЏ\x20РІ\x20СЃРѕСЋР·\x2e\x20Р§С‚РѕР±С‹"
+         "\x20РїРѕР±РµРґРёС‚СЊ\x2c\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РІСЃРµ\x20РІСЂР°Р¶РµСЃРєРёРµ\x20Р·Р°РјРєРё\x2e",
+       "Р’Р°С€Рё\x20РІСЂР°РіРё\x20Р·Р°РєР»СЋС‡РёР»Рё\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x20СЃРѕСЋР·\x2e\x20РћРЅРё\x20РіРґРµ\x2dС‚Рѕ"
+         "\x20СЂСЏРґРѕРј\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20РІ\x20Р»СЋР±РѕР№\x20РјРѕРјРµРЅС‚\x20Р±СѓРґСЊС‚Рµ\x20РіРѕС‚РѕРІС‹\x20Рє\x20Р±"
+         "РёС‚РІРµ\x2e\x20Р’С‹\x20РїРѕР±РµРґРёС‚Рµ\x2c\x20РєРѕРіРґР°\x20Р·Р°РІР»Р°РґРµРµС‚Рµ\x20РІСЃРµРјРё\x20С‡РµС‚С‹СЂСЊ"
+         "РјСЏ\x20Р·Р°РјРєР°РјРё\x2c\x20РЅР°С…РѕРґСЏС‰РёРјРёСЃСЏ\x20РІ\x20СЌС‚РѕР№\x20РЅРµР±РѕР»СЊС€РѕР№\x20РґРѕР»РёРЅРµ"
          "\x2e",
-       "Гильдия\x20колдунов\x20славного\x20города\x20Норастона\x20попро"
-         "сила\x20Роланда\x20помочь\x20ей\x20отбиться\x20от\x20союзников\x20Арч"
-         "ибальда\x2e\x20Чтобы\x20победить\x2c\x20вы\x20должны\x20захватить\x20все"
-         "\x20вражеские\x20замки\x2e\x20Не\x20потеряйте\x20Норастон\x2c\x20иначе\x20в"
-         "ы\x20проиграли\x2e\x20\x28Один\x20из\x20вражеских\x20замков\x20на\x20остров"
-         "е\x20в\x20океане\x29\x2e",
-       "Соберите\x20армию\x20побольше\x20и\x20захватите\x20замок\x20против"
-         "ника\x20не\x20позднее\x2c\x20чем\x20через\x20\x38\x20недель\x2e\x20Вам\x20противо"
-         "стоит\x20всего\x20один\x20противник\x2c\x20но\x20до\x20его\x20замка\x20скак"
-         "ать\x20и\x20скакать\x2e\x20Все\x20войска\x2c\x20которые\x20останутся\x20у\x20в"
-         "ас\x20к\x20концу\x20этого\x20сценария\x2c\x20примут\x20участие\x20в\x20закл"
-         "ючительной\x20битве\x2e",
-       "Найдите\x20корону\x2c\x20прежде\x20чем\x20это\x20сделают\x20герои\x20Арч"
-         "ибальда\x2e\x20Корона\x20понадобится\x20Роланду\x20для\x20победы\x20в"
-         "\x20заключительной\x20битве\x2e",
-       "Три\x20противника\x2c\x20и\x20среди\x20них\x20сам\x20лорд\x20Корлагон\x2c\x20з"
-         "аключили\x20союз\x20и\x20стоят\x20между\x20вами\x20и\x20великой\x20побед"
-         "ой\x2e\x20Роланд\x20обосновался\x20в\x20замке\x20на\x20северо\x2dзападе\x2c"
-         "\x20и\x20если\x20этот\x20замок\x20падет\x2c\x20вы\x20проиграете\x2e\x20Если\x20вы"
-         "\x20захватите\x20Корлагона\x20сейчас\x2c\x20он\x20не\x20будет\x20драться"
-         "\x20против\x20вас\x20в\x20последней\x20битве\x2e",
-       "Итак\x2c\x20пробил\x20час\x20последнего\x20и\x20решительного\x20боя\x2e\x20"
-         "И\x20вы\x2c\x20и\x20ваши\x20противники\x20вооружены\x20до\x20зубов\x2c\x20и\x20вс"
-         "е\x20кругом\x20объединились\x20против\x20вас\x2e\x20Война\x20будет\x20за"
-         "кончена\x2c\x20когда\x20вы\x20захватите\x20в\x20плен\x20Арчибальда\x21",
+       "Р“РёР»СЊРґРёСЏ\x20РєРѕР»РґСѓРЅРѕРІ\x20СЃР»Р°РІРЅРѕРіРѕ\x20РіРѕСЂРѕРґР°\x20РќРѕСЂР°СЃС‚РѕРЅР°\x20РїРѕРїСЂРѕ"
+         "СЃРёР»Р°\x20Р РѕР»Р°РЅРґР°\x20РїРѕРјРѕС‡СЊ\x20РµР№\x20РѕС‚Р±РёС‚СЊСЃСЏ\x20РѕС‚\x20СЃРѕСЋР·РЅРёРєРѕРІ\x20РђСЂС‡"
+         "РёР±Р°Р»СЊРґР°\x2e\x20Р§С‚РѕР±С‹\x20РїРѕР±РµРґРёС‚СЊ\x2c\x20РІС‹\x20РґРѕР»Р¶РЅС‹\x20Р·Р°С…РІР°С‚РёС‚СЊ\x20РІСЃРµ"
+         "\x20РІСЂР°Р¶РµСЃРєРёРµ\x20Р·Р°РјРєРё\x2e\x20РќРµ\x20РїРѕС‚РµСЂСЏР№С‚Рµ\x20РќРѕСЂР°СЃС‚РѕРЅ\x2c\x20РёРЅР°С‡Рµ\x20РІ"
+         "С‹\x20РїСЂРѕРёРіСЂР°Р»Рё\x2e\x20\x28РћРґРёРЅ\x20РёР·\x20РІСЂР°Р¶РµСЃРєРёС…\x20Р·Р°РјРєРѕРІ\x20РЅР°\x20РѕСЃС‚СЂРѕРІ"
+         "Рµ\x20РІ\x20РѕРєРµР°РЅРµ\x29\x2e",
+       "РЎРѕР±РµСЂРёС‚Рµ\x20Р°СЂРјРёСЋ\x20РїРѕР±РѕР»СЊС€Рµ\x20Рё\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20Р·Р°РјРѕРє\x20РїСЂРѕС‚РёРІ"
+         "РЅРёРєР°\x20РЅРµ\x20РїРѕР·РґРЅРµРµ\x2c\x20С‡РµРј\x20С‡РµСЂРµР·\x20\x38\x20РЅРµРґРµР»СЊ\x2e\x20Р’Р°Рј\x20РїСЂРѕС‚РёРІРѕ"
+         "СЃС‚РѕРёС‚\x20РІСЃРµРіРѕ\x20РѕРґРёРЅ\x20РїСЂРѕС‚РёРІРЅРёРє\x2c\x20РЅРѕ\x20РґРѕ\x20РµРіРѕ\x20Р·Р°РјРєР°\x20СЃРєР°Рє"
+         "Р°С‚СЊ\x20Рё\x20СЃРєР°РєР°С‚СЊ\x2e\x20Р’СЃРµ\x20РІРѕР№СЃРєР°\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РѕСЃС‚Р°РЅСѓС‚СЃСЏ\x20Сѓ\x20РІ"
+         "Р°СЃ\x20Рє\x20РєРѕРЅС†Сѓ\x20СЌС‚РѕРіРѕ\x20СЃС†РµРЅР°СЂРёСЏ\x2c\x20РїСЂРёРјСѓС‚\x20СѓС‡Р°СЃС‚РёРµ\x20РІ\x20Р·Р°РєР»"
+         "СЋС‡РёС‚РµР»СЊРЅРѕР№\x20Р±РёС‚РІРµ\x2e",
+       "РќР°Р№РґРёС‚Рµ\x20РєРѕСЂРѕРЅСѓ\x2c\x20РїСЂРµР¶РґРµ\x20С‡РµРј\x20СЌС‚Рѕ\x20СЃРґРµР»Р°СЋС‚\x20РіРµСЂРѕРё\x20РђСЂС‡"
+         "РёР±Р°Р»СЊРґР°\x2e\x20РљРѕСЂРѕРЅР°\x20РїРѕРЅР°РґРѕР±РёС‚СЃСЏ\x20Р РѕР»Р°РЅРґСѓ\x20РґР»СЏ\x20РїРѕР±РµРґС‹\x20РІ"
+         "\x20Р·Р°РєР»СЋС‡РёС‚РµР»СЊРЅРѕР№\x20Р±РёС‚РІРµ\x2e",
+       "РўСЂРё\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2c\x20Рё\x20СЃСЂРµРґРё\x20РЅРёС…\x20СЃР°Рј\x20Р»РѕСЂРґ\x20РљРѕСЂР»Р°РіРѕРЅ\x2c\x20Р·"
+         "Р°РєР»СЋС‡РёР»Рё\x20СЃРѕСЋР·\x20Рё\x20СЃС‚РѕСЏС‚\x20РјРµР¶РґСѓ\x20РІР°РјРё\x20Рё\x20РІРµР»РёРєРѕР№\x20РїРѕР±РµРґ"
+         "РѕР№\x2e\x20Р РѕР»Р°РЅРґ\x20РѕР±РѕСЃРЅРѕРІР°Р»СЃСЏ\x20РІ\x20Р·Р°РјРєРµ\x20РЅР°\x20СЃРµРІРµСЂРѕ\x2dР·Р°РїР°РґРµ\x2c"
+         "\x20Рё\x20РµСЃР»Рё\x20СЌС‚РѕС‚\x20Р·Р°РјРѕРє\x20РїР°РґРµС‚\x2c\x20РІС‹\x20РїСЂРѕРёРіСЂР°РµС‚Рµ\x2e\x20Р•СЃР»Рё\x20РІС‹"
+         "\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РљРѕСЂР»Р°РіРѕРЅР°\x20СЃРµР№С‡Р°СЃ\x2c\x20РѕРЅ\x20РЅРµ\x20Р±СѓРґРµС‚\x20РґСЂР°С‚СЊСЃСЏ"
+         "\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x20РІ\x20РїРѕСЃР»РµРґРЅРµР№\x20Р±РёС‚РІРµ\x2e",
+       "РС‚Р°Рє\x2c\x20РїСЂРѕР±РёР»\x20С‡Р°СЃ\x20РїРѕСЃР»РµРґРЅРµРіРѕ\x20Рё\x20СЂРµС€РёС‚РµР»СЊРЅРѕРіРѕ\x20Р±РѕСЏ\x2e\x20"
+         "Р\x20РІС‹\x2c\x20Рё\x20РІР°С€Рё\x20РїСЂРѕС‚РёРІРЅРёРєРё\x20РІРѕРѕСЂСѓР¶РµРЅС‹\x20РґРѕ\x20Р·СѓР±РѕРІ\x2c\x20Рё\x20РІСЃ"
+         "Рµ\x20РєСЂСѓРіРѕРј\x20РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x2e\x20Р’РѕР№РЅР°\x20Р±СѓРґРµС‚\x20Р·Р°"
+         "РєРѕРЅС‡РµРЅР°\x2c\x20РєРѕРіРґР°\x20РІС‹\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РІ\x20РїР»РµРЅ\x20РђСЂС‡РёР±Р°Р»СЊРґР°\x21",
        "",
-       "Вы\x20сменили\x20сюзерена\x2c\x20и\x20теперь\x20у\x20вас\x20три\x20замка\x20пр"
-         "отив\x20одного\x20у\x20противника\x2e\x20Эта\x20миссия\x20будет\x20для\x20в"
-         "ас\x20самой\x20легкой\x20во\x20всей\x20войне\x2e\x2e\x2e\x20Предатель\x21"},
-    {  "Король\x20Арчибальд\x20требует\x2c\x20чтобы\x20вы\x20разгромили\x20тр"
-        "ех\x20противников\x2c\x20которые\x20обосновались\x20в\x20этих\x20земл"
-        "ях\x2e\x20Они\x20не\x20связаны\x20между\x20собой\x20союзным\x20договором"
-        "\x2c\x20поэтому\x20по\x20большей\x20части\x20они\x20будут\x20тратить\x20сил"
-        "ы\x20на\x20вражду\x20друг\x20с\x20другом\x2e\x20Вы\x20победите\x2c\x20когда\x20вс"
-        "е\x20их\x20замки\x20окажутся\x20в\x20ваших\x20руках\x2e",
-       "Вам\x20предстоит\x20объединить\x20племена\x20северных\x20варвар"
-         "ов\x2c\x20предварительно\x20усмирив\x20их\x2e\x20Как\x20и\x20в\x20предыдуще"
-         "й\x20миссии\x2c\x20противники\x20не\x20состоят\x20в\x20союзе\x20друг\x20с\x20д"
-         "ругом\x2c\x20но\x20у\x20них\x20больше\x20ресурсов\x2e\x20Победа\x20будет\x20ва"
-         "шей\x2c\x20когда\x20вы\x20захватите\x20все\x20вражеские\x20замки\x20и\x20пе"
-         "ребьете\x20всех\x20героев\x20противника\x2e",
-       "Добрые\x20волшебники\x20захватили\x20замок\x20некромантов\x2e\x20Ч"
-         "тобы\x20победить\x2c\x20вы\x20должны\x20отобрать\x20его\x20обратно\x2e\x20П"
-         "омните\x2c\x20что\x20хотя\x20вы\x20и\x20начинаете\x20с\x20сильной\x20армией"
-         "\x2c\x20в\x20самом\x20начале\x20у\x20вас\x20нет\x20своего\x20замка\x2e\x20Вы\x20долж"
-         "ны\x20заиметь\x20его\x20за\x20\x37\x20дней\x2c\x20иначе\x20все\x20потеряно\x2e\x20\x28Б"
-         "лижайший\x20замок\x20на\x20юго\x2dвостоке\x29\x2e",
-       "Гномов\x20следует\x20привести\x20к\x20покорности\x2c\x20прежде\x20чем"
-         "\x20они\x20смогут\x20помешать\x20планам\x20короля\x20Арчибальда\x2e\x20П"
-         "од\x20знаменами\x20Роланда\x20много\x20героев\x2c\x20у\x20него\x20нескол"
-         "ько\x20замков\x2c\x20поэтому\x20будьте\x20готовы\x20к\x20нападению\x20ср"
-         "азу\x20с\x20нескольких\x20сторон\x2e\x20Вам\x20надо\x20захватить\x20все\x20"
-         "города\x20противника\x2e",
-       "Ваши\x20противники\x20объединились\x20против\x20вас\x20и\x20притаи"
-         "лись\x20неподалеку\x2c\x20поэтому\x20будьте\x20начеку\x2e\x20Победа\x20б"
-         "удет\x20вашей\x2c\x20когда\x20вы\x20завладеете\x20всеми\x20четырьмя\x20з"
-         "амками\x2c\x20находящимися\x20в\x20этой\x20небольшой\x20долине\x2e",
-       "Вам\x20предстоит\x20подавить\x20крестьянский\x20бунт\x2c\x20во\x20гла"
-         "ве\x20которого\x20стоят\x20агенты\x20Роланда\x2e\x20Все\x20ваши\x20сосед"
-         "и\x20объединились\x20против\x20вас\x2c\x20но\x20на\x20вашей\x20стороне\x20л"
-         "орд\x20Корлагон\x20\x2d\x20опытный\x20и\x20сильный\x20боец\x2e\x20Чтобы\x20поб"
-         "едить\x2c\x20вы\x20должны\x20захватить\x20все\x20замки\x20противника\x2e",
-       "В\x20этой\x20миссии\x20вам\x20противостоят\x20два\x20противника\x2e\x20О"
-         "ба\x20хорошо\x20вооружены\x20и\x20полны\x20решимости\x20выставить\x20"
-         "вас\x20со\x20своего\x20острова\x2e\x20Избегая\x20встречи\x20с\x20ними\x2c\x20з"
-         "ахватите\x20Драконий\x20город\x20\x2d\x20тогда\x20победа\x20будет\x20за\x20"
-         "вами\x2e",
-       "Вам\x20приказано\x20разгромить\x20удельных\x20властителей\x2c\x20к"
-         "оторые\x20присягнули\x20на\x20верность\x20Роланду\x2e\x20Все\x20враже"
-         "ские\x20замки\x20объединились\x20и\x20выступают\x20против\x20вас\x2e\x20"
-         "Вы\x20начинаете\x20игру\x20без\x20замка\x2e\x20Вам\x20надо\x20захватить\x20"
-         "замок\x20за\x20\x37\x20дней\x2e\x20Победа\x20будет\x20вашей\x2c\x20когда\x20все\x20з"
-         "амки\x20противника\x20падут\x2e",
-       "Найдите\x20корону\x2c\x20пока\x20ею\x20не\x20завладели\x20герои\x20Ролан"
-         "да\x2e\x20Корона\x20понадобится\x20Арчибальду\x20для\x20победы\x20в\x20з"
-         "аключительной\x20битве\x20с\x20Роландом\x2e",
-       "Соберите\x20армию\x20побольше\x20и\x20захватите\x20замок\x20против"
-         "ника\x20не\x20позднее\x2c\x20чем\x20через\x20\x38\x20недель\x2e\x20Вам\x20противо"
-         "стоит\x20всего\x20один\x20противник\x2c\x20но\x20до\x20его\x20замка\x20скак"
-         "ать\x20и\x20скакать\x2e\x20Все\x20войска\x2c\x20которые\x20останутся\x20у\x20в"
-         "ас\x20к\x20концу\x20этого\x20сценария\x2c\x20будут\x20с\x20вами\x20в\x20заключ"
-         "ительной\x20битве\x2e",
-       "Итак\x2c\x20пробил\x20час\x20последней\x20битвы\x2e\x20И\x20вы\x2c\x20и\x20ваши\x20п"
-         "ротивники\x20вооружены\x20до\x20зубов\x2c\x20и\x20все\x20объединились"
-         "\x20против\x20вас\x2e\x20Война\x20закончится\x2c\x20когда\x20вы\x20захватит"
-         "е\x20в\x20плен\x20Роланда\x2c\x20и\x20смотрите\x2c\x20не\x20потеряйте\x20Арчиб"
-         "альда\x20в\x20пылу\x20битвы\x21",
-       "Вы\x20сменили\x20сюзерена\x2c\x20и\x20теперь\x20у\x20вас\x20три\x20замка\x20пр"
-         "отив\x20одного\x20у\x20противника\x2e\x20Эта\x20миссия\x20будет\x20для\x20в"
-         "ас\x20самой\x20легкой\x20во\x20всей\x20войне\x2e\x2e\x2e\x20Предатель\x21"}
+       "Р’С‹\x20СЃРјРµРЅРёР»Рё\x20СЃСЋР·РµСЂРµРЅР°\x2c\x20Рё\x20С‚РµРїРµСЂСЊ\x20Сѓ\x20РІР°СЃ\x20С‚СЂРё\x20Р·Р°РјРєР°\x20РїСЂ"
+         "РѕС‚РёРІ\x20РѕРґРЅРѕРіРѕ\x20Сѓ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e\x20Р­С‚Р°\x20РјРёСЃСЃРёСЏ\x20Р±СѓРґРµС‚\x20РґР»СЏ\x20РІ"
+         "Р°СЃ\x20СЃР°РјРѕР№\x20Р»РµРіРєРѕР№\x20РІРѕ\x20РІСЃРµР№\x20РІРѕР№РЅРµ\x2e\x2e\x2e\x20РџСЂРµРґР°С‚РµР»СЊ\x21"},
+    {  "РљРѕСЂРѕР»СЊ\x20РђСЂС‡РёР±Р°Р»СЊРґ\x20С‚СЂРµР±СѓРµС‚\x2c\x20С‡С‚РѕР±С‹\x20РІС‹\x20СЂР°Р·РіСЂРѕРјРёР»Рё\x20С‚СЂ"
+        "РµС…\x20РїСЂРѕС‚РёРІРЅРёРєРѕРІ\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РѕР±РѕСЃРЅРѕРІР°Р»РёСЃСЊ\x20РІ\x20СЌС‚РёС…\x20Р·РµРјР»"
+        "СЏС…\x2e\x20РћРЅРё\x20РЅРµ\x20СЃРІСЏР·Р°РЅС‹\x20РјРµР¶РґСѓ\x20СЃРѕР±РѕР№\x20СЃРѕСЋР·РЅС‹Рј\x20РґРѕРіРѕРІРѕСЂРѕРј"
+        "\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20РїРѕ\x20Р±РѕР»СЊС€РµР№\x20С‡Р°СЃС‚Рё\x20РѕРЅРё\x20Р±СѓРґСѓС‚\x20С‚СЂР°С‚РёС‚СЊ\x20СЃРёР»"
+        "С‹\x20РЅР°\x20РІСЂР°Р¶РґСѓ\x20РґСЂСѓРі\x20СЃ\x20РґСЂСѓРіРѕРј\x2e\x20Р’С‹\x20РїРѕР±РµРґРёС‚Рµ\x2c\x20РєРѕРіРґР°\x20РІСЃ"
+        "Рµ\x20РёС…\x20Р·Р°РјРєРё\x20РѕРєР°Р¶СѓС‚СЃСЏ\x20РІ\x20РІР°С€РёС…\x20СЂСѓРєР°С…\x2e",
+       "Р’Р°Рј\x20РїСЂРµРґСЃС‚РѕРёС‚\x20РѕР±СЉРµРґРёРЅРёС‚СЊ\x20РїР»РµРјРµРЅР°\x20СЃРµРІРµСЂРЅС‹С…\x20РІР°СЂРІР°СЂ"
+         "РѕРІ\x2c\x20РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ\x20СѓСЃРјРёСЂРёРІ\x20РёС…\x2e\x20РљР°Рє\x20Рё\x20РІ\x20РїСЂРµРґС‹РґСѓС‰Рµ"
+         "Р№\x20РјРёСЃСЃРёРё\x2c\x20РїСЂРѕС‚РёРІРЅРёРєРё\x20РЅРµ\x20СЃРѕСЃС‚РѕСЏС‚\x20РІ\x20СЃРѕСЋР·Рµ\x20РґСЂСѓРі\x20СЃ\x20Рґ"
+         "СЂСѓРіРѕРј\x2c\x20РЅРѕ\x20Сѓ\x20РЅРёС…\x20Р±РѕР»СЊС€Рµ\x20СЂРµСЃСѓСЂСЃРѕРІ\x2e\x20РџРѕР±РµРґР°\x20Р±СѓРґРµС‚\x20РІР°"
+         "С€РµР№\x2c\x20РєРѕРіРґР°\x20РІС‹\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20РІСЃРµ\x20РІСЂР°Р¶РµСЃРєРёРµ\x20Р·Р°РјРєРё\x20Рё\x20РїРµ"
+         "СЂРµР±СЊРµС‚Рµ\x20РІСЃРµС…\x20РіРµСЂРѕРµРІ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+       "Р”РѕР±СЂС‹Рµ\x20РІРѕР»С€РµР±РЅРёРєРё\x20Р·Р°С…РІР°С‚РёР»Рё\x20Р·Р°РјРѕРє\x20РЅРµРєСЂРѕРјР°РЅС‚РѕРІ\x2e\x20Р§"
+         "С‚РѕР±С‹\x20РїРѕР±РµРґРёС‚СЊ\x2c\x20РІС‹\x20РґРѕР»Р¶РЅС‹\x20РѕС‚РѕР±СЂР°С‚СЊ\x20РµРіРѕ\x20РѕР±СЂР°С‚РЅРѕ\x2e\x20Рџ"
+         "РѕРјРЅРёС‚Рµ\x2c\x20С‡С‚Рѕ\x20С…РѕС‚СЏ\x20РІС‹\x20Рё\x20РЅР°С‡РёРЅР°РµС‚Рµ\x20СЃ\x20СЃРёР»СЊРЅРѕР№\x20Р°СЂРјРёРµР№"
+         "\x2c\x20РІ\x20СЃР°РјРѕРј\x20РЅР°С‡Р°Р»Рµ\x20Сѓ\x20РІР°СЃ\x20РЅРµС‚\x20СЃРІРѕРµРіРѕ\x20Р·Р°РјРєР°\x2e\x20Р’С‹\x20РґРѕР»Р¶"
+         "РЅС‹\x20Р·Р°РёРјРµС‚СЊ\x20РµРіРѕ\x20Р·Р°\x20\x37\x20РґРЅРµР№\x2c\x20РёРЅР°С‡Рµ\x20РІСЃРµ\x20РїРѕС‚РµСЂСЏРЅРѕ\x2e\x20\x28Р‘"
+         "Р»РёР¶Р°Р№С€РёР№\x20Р·Р°РјРѕРє\x20РЅР°\x20СЋРіРѕ\x2dРІРѕСЃС‚РѕРєРµ\x29\x2e",
+       "Р“РЅРѕРјРѕРІ\x20СЃР»РµРґСѓРµС‚\x20РїСЂРёРІРµСЃС‚Рё\x20Рє\x20РїРѕРєРѕСЂРЅРѕСЃС‚Рё\x2c\x20РїСЂРµР¶РґРµ\x20С‡РµРј"
+         "\x20РѕРЅРё\x20СЃРјРѕРіСѓС‚\x20РїРѕРјРµС€Р°С‚СЊ\x20РїР»Р°РЅР°Рј\x20РєРѕСЂРѕР»СЏ\x20РђСЂС‡РёР±Р°Р»СЊРґР°\x2e\x20Рџ"
+         "РѕРґ\x20Р·РЅР°РјРµРЅР°РјРё\x20Р РѕР»Р°РЅРґР°\x20РјРЅРѕРіРѕ\x20РіРµСЂРѕРµРІ\x2c\x20Сѓ\x20РЅРµРіРѕ\x20РЅРµСЃРєРѕР»"
+         "СЊРєРѕ\x20Р·Р°РјРєРѕРІ\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20Р±СѓРґСЊС‚Рµ\x20РіРѕС‚РѕРІС‹\x20Рє\x20РЅР°РїР°РґРµРЅРёСЋ\x20СЃСЂ"
+         "Р°Р·Сѓ\x20СЃ\x20РЅРµСЃРєРѕР»СЊРєРёС…\x20СЃС‚РѕСЂРѕРЅ\x2e\x20Р’Р°Рј\x20РЅР°РґРѕ\x20Р·Р°С…РІР°С‚РёС‚СЊ\x20РІСЃРµ\x20"
+         "РіРѕСЂРѕРґР°\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+       "Р’Р°С€Рё\x20РїСЂРѕС‚РёРІРЅРёРєРё\x20РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x20Рё\x20РїСЂРёС‚Р°Рё"
+         "Р»РёСЃСЊ\x20РЅРµРїРѕРґР°Р»РµРєСѓ\x2c\x20РїРѕСЌС‚РѕРјСѓ\x20Р±СѓРґСЊС‚Рµ\x20РЅР°С‡РµРєСѓ\x2e\x20РџРѕР±РµРґР°\x20Р±"
+         "СѓРґРµС‚\x20РІР°С€РµР№\x2c\x20РєРѕРіРґР°\x20РІС‹\x20Р·Р°РІР»Р°РґРµРµС‚Рµ\x20РІСЃРµРјРё\x20С‡РµС‚С‹СЂСЊРјСЏ\x20Р·"
+         "Р°РјРєР°РјРё\x2c\x20РЅР°С…РѕРґСЏС‰РёРјРёСЃСЏ\x20РІ\x20СЌС‚РѕР№\x20РЅРµР±РѕР»СЊС€РѕР№\x20РґРѕР»РёРЅРµ\x2e",
+       "Р’Р°Рј\x20РїСЂРµРґСЃС‚РѕРёС‚\x20РїРѕРґР°РІРёС‚СЊ\x20РєСЂРµСЃС‚СЊСЏРЅСЃРєРёР№\x20Р±СѓРЅС‚\x2c\x20РІРѕ\x20РіР»Р°"
+         "РІРµ\x20РєРѕС‚РѕСЂРѕРіРѕ\x20СЃС‚РѕСЏС‚\x20Р°РіРµРЅС‚С‹\x20Р РѕР»Р°РЅРґР°\x2e\x20Р’СЃРµ\x20РІР°С€Рё\x20СЃРѕСЃРµРґ"
+         "Рё\x20РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x2c\x20РЅРѕ\x20РЅР°\x20РІР°С€РµР№\x20СЃС‚РѕСЂРѕРЅРµ\x20Р»"
+         "РѕСЂРґ\x20РљРѕСЂР»Р°РіРѕРЅ\x20\x2d\x20РѕРїС‹С‚РЅС‹Р№\x20Рё\x20СЃРёР»СЊРЅС‹Р№\x20Р±РѕРµС†\x2e\x20Р§С‚РѕР±С‹\x20РїРѕР±"
+         "РµРґРёС‚СЊ\x2c\x20РІС‹\x20РґРѕР»Р¶РЅС‹\x20Р·Р°С…РІР°С‚РёС‚СЊ\x20РІСЃРµ\x20Р·Р°РјРєРё\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+       "Р’\x20СЌС‚РѕР№\x20РјРёСЃСЃРёРё\x20РІР°Рј\x20РїСЂРѕС‚РёРІРѕСЃС‚РѕСЏС‚\x20РґРІР°\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e\x20Рћ"
+         "Р±Р°\x20С…РѕСЂРѕС€Рѕ\x20РІРѕРѕСЂСѓР¶РµРЅС‹\x20Рё\x20РїРѕР»РЅС‹\x20СЂРµС€РёРјРѕСЃС‚Рё\x20РІС‹СЃС‚Р°РІРёС‚СЊ\x20"
+         "РІР°СЃ\x20СЃРѕ\x20СЃРІРѕРµРіРѕ\x20РѕСЃС‚СЂРѕРІР°\x2e\x20РР·Р±РµРіР°СЏ\x20РІСЃС‚СЂРµС‡Рё\x20СЃ\x20РЅРёРјРё\x2c\x20Р·"
+         "Р°С…РІР°С‚РёС‚Рµ\x20Р”СЂР°РєРѕРЅРёР№\x20РіРѕСЂРѕРґ\x20\x2d\x20С‚РѕРіРґР°\x20РїРѕР±РµРґР°\x20Р±СѓРґРµС‚\x20Р·Р°\x20"
+         "РІР°РјРё\x2e",
+       "Р’Р°Рј\x20РїСЂРёРєР°Р·Р°РЅРѕ\x20СЂР°Р·РіСЂРѕРјРёС‚СЊ\x20СѓРґРµР»СЊРЅС‹С…\x20РІР»Р°СЃС‚РёС‚РµР»РµР№\x2c\x20Рє"
+         "РѕС‚РѕСЂС‹Рµ\x20РїСЂРёСЃСЏРіРЅСѓР»Рё\x20РЅР°\x20РІРµСЂРЅРѕСЃС‚СЊ\x20Р РѕР»Р°РЅРґСѓ\x2e\x20Р’СЃРµ\x20РІСЂР°Р¶Рµ"
+         "СЃРєРёРµ\x20Р·Р°РјРєРё\x20РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ\x20Рё\x20РІС‹СЃС‚СѓРїР°СЋС‚\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x2e\x20"
+         "Р’С‹\x20РЅР°С‡РёРЅР°РµС‚Рµ\x20РёРіСЂСѓ\x20Р±РµР·\x20Р·Р°РјРєР°\x2e\x20Р’Р°Рј\x20РЅР°РґРѕ\x20Р·Р°С…РІР°С‚РёС‚СЊ\x20"
+         "Р·Р°РјРѕРє\x20Р·Р°\x20\x37\x20РґРЅРµР№\x2e\x20РџРѕР±РµРґР°\x20Р±СѓРґРµС‚\x20РІР°С€РµР№\x2c\x20РєРѕРіРґР°\x20РІСЃРµ\x20Р·"
+         "Р°РјРєРё\x20РїСЂРѕС‚РёРІРЅРёРєР°\x20РїР°РґСѓС‚\x2e",
+       "РќР°Р№РґРёС‚Рµ\x20РєРѕСЂРѕРЅСѓ\x2c\x20РїРѕРєР°\x20РµСЋ\x20РЅРµ\x20Р·Р°РІР»Р°РґРµР»Рё\x20РіРµСЂРѕРё\x20Р РѕР»Р°РЅ"
+         "РґР°\x2e\x20РљРѕСЂРѕРЅР°\x20РїРѕРЅР°РґРѕР±РёС‚СЃСЏ\x20РђСЂС‡РёР±Р°Р»СЊРґСѓ\x20РґР»СЏ\x20РїРѕР±РµРґС‹\x20РІ\x20Р·"
+         "Р°РєР»СЋС‡РёС‚РµР»СЊРЅРѕР№\x20Р±РёС‚РІРµ\x20СЃ\x20Р РѕР»Р°РЅРґРѕРј\x2e",
+       "РЎРѕР±РµСЂРёС‚Рµ\x20Р°СЂРјРёСЋ\x20РїРѕР±РѕР»СЊС€Рµ\x20Рё\x20Р·Р°С…РІР°С‚РёС‚Рµ\x20Р·Р°РјРѕРє\x20РїСЂРѕС‚РёРІ"
+         "РЅРёРєР°\x20РЅРµ\x20РїРѕР·РґРЅРµРµ\x2c\x20С‡РµРј\x20С‡РµСЂРµР·\x20\x38\x20РЅРµРґРµР»СЊ\x2e\x20Р’Р°Рј\x20РїСЂРѕС‚РёРІРѕ"
+         "СЃС‚РѕРёС‚\x20РІСЃРµРіРѕ\x20РѕРґРёРЅ\x20РїСЂРѕС‚РёРІРЅРёРє\x2c\x20РЅРѕ\x20РґРѕ\x20РµРіРѕ\x20Р·Р°РјРєР°\x20СЃРєР°Рє"
+         "Р°С‚СЊ\x20Рё\x20СЃРєР°РєР°С‚СЊ\x2e\x20Р’СЃРµ\x20РІРѕР№СЃРєР°\x2c\x20РєРѕС‚РѕСЂС‹Рµ\x20РѕСЃС‚Р°РЅСѓС‚СЃСЏ\x20Сѓ\x20РІ"
+         "Р°СЃ\x20Рє\x20РєРѕРЅС†Сѓ\x20СЌС‚РѕРіРѕ\x20СЃС†РµРЅР°СЂРёСЏ\x2c\x20Р±СѓРґСѓС‚\x20СЃ\x20РІР°РјРё\x20РІ\x20Р·Р°РєР»СЋС‡"
+         "РёС‚РµР»СЊРЅРѕР№\x20Р±РёС‚РІРµ\x2e",
+       "РС‚Р°Рє\x2c\x20РїСЂРѕР±РёР»\x20С‡Р°СЃ\x20РїРѕСЃР»РµРґРЅРµР№\x20Р±РёС‚РІС‹\x2e\x20Р\x20РІС‹\x2c\x20Рё\x20РІР°С€Рё\x20Рї"
+         "СЂРѕС‚РёРІРЅРёРєРё\x20РІРѕРѕСЂСѓР¶РµРЅС‹\x20РґРѕ\x20Р·СѓР±РѕРІ\x2c\x20Рё\x20РІСЃРµ\x20РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ"
+         "\x20РїСЂРѕС‚РёРІ\x20РІР°СЃ\x2e\x20Р’РѕР№РЅР°\x20Р·Р°РєРѕРЅС‡РёС‚СЃСЏ\x2c\x20РєРѕРіРґР°\x20РІС‹\x20Р·Р°С…РІР°С‚РёС‚"
+         "Рµ\x20РІ\x20РїР»РµРЅ\x20Р РѕР»Р°РЅРґР°\x2c\x20Рё\x20СЃРјРѕС‚СЂРёС‚Рµ\x2c\x20РЅРµ\x20РїРѕС‚РµСЂСЏР№С‚Рµ\x20РђСЂС‡РёР±"
+         "Р°Р»СЊРґР°\x20РІ\x20РїС‹Р»Сѓ\x20Р±РёС‚РІС‹\x21",
+       "Р’С‹\x20СЃРјРµРЅРёР»Рё\x20СЃСЋР·РµСЂРµРЅР°\x2c\x20Рё\x20С‚РµРїРµСЂСЊ\x20Сѓ\x20РІР°СЃ\x20С‚СЂРё\x20Р·Р°РјРєР°\x20РїСЂ"
+         "РѕС‚РёРІ\x20РѕРґРЅРѕРіРѕ\x20Сѓ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e\x20Р­С‚Р°\x20РјРёСЃСЃРёСЏ\x20Р±СѓРґРµС‚\x20РґР»СЏ\x20РІ"
+         "Р°СЃ\x20СЃР°РјРѕР№\x20Р»РµРіРєРѕР№\x20РІРѕ\x20РІСЃРµР№\x20РІРѕР№РЅРµ\x2e\x2e\x2e\x20РџСЂРµРґР°С‚РµР»СЊ\x21"}
 };
 char* cOutOfMemory =
-      "\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x25\x73\x0aГероям\x20\x49\x49\x20требуется\x20минимум\x20\x0a\x25\x64"
-        "\x4b\x20Расширенной\x20\x20памяти\x20\x28\x58\x4d\x53\x29\x20и\x0a\x34\x38\x30\x4b\x20общей\x20памяти\x2e"
+      "\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x25\x73\x0aР“РµСЂРѕСЏРј\x20\x49\x49\x20С‚СЂРµР±СѓРµС‚СЃСЏ\x20РјРёРЅРёРјСѓРј\x20\x0a\x25\x64"
+        "\x4b\x20Р Р°СЃС€РёСЂРµРЅРЅРѕР№\x20\x20РїР°РјСЏС‚Рё\x20\x28\x58\x4d\x53\x29\x20Рё\x0a\x34\x38\x30\x4b\x20РѕР±С‰РµР№\x20РїР°РјСЏС‚Рё\x2e"
         "\x0a\x0a";
-char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {  "Обычное",   "Черес\x2d\x0aстрочное"};
+char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {  "РћР±С‹С‡РЅРѕРµ",   "Р§РµСЂРµСЃ\x2d\x0aСЃС‚СЂРѕС‡РЅРѕРµ"};
 char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
-      "\x7bОК\x7d\x0a\x0aЗакрыть\x20меню\x2e",
-      "\x7bМузыка\x7d\x0a\x0aВключить\x20или\x20выключить\x20фоновую\x20музыку\x2e",
-      "\x7bЭффекты\x7d\x0a\x0aВключить\x20или\x20выключить\x20звуковые\x20эффек"
-        "ты\x2e",
-      "\x7bСкорость\x7d\x0a\x0aВыбрать\x20скорость\x20передвижения\x20героев"
-        "\x20по\x20карте\x2e",
-      "\x7bКачество\x20звука\x7d\x0a\x0aВыбрать\x20формат\x20музыки\x2e\x20Как\x20пра"
-        "вило\x2c\x20музыка\x20в\x20формате\x20\x4d\x49\x44\x49\x20не\x20отличается\x20качест"
-        "вом\x2c\x20но\x20она\x20предъявляет\x20меньшие\x20требования\x20к\x20про"
-        "изводительности\x20системы\x2c\x20чем\x20формат\x20Стерео\x20\x43\x44\x2e\x20Ф"
-        "ормат\x20Стерео\x20\x43\x44\x20дает\x20\x20возможность\x20воспроизводить"
-        "\x20оперную\x20музыку\x2e",
-      "\x7bПоказывать\x20путь\x7d\x0a\x0aВключить\x20или\x20выключить\x20отобра"
-        "жение\x20пути\x20героя\x20на\x20карте\x2e\x20\x20Если\x20опция\x20включена\x2c"
-        "\x20первое\x20нажатие\x20по\x20объекту\x20на\x20карте\x20показывает\x20п"
-        "уть\x20к\x20этому\x20объекту\x2c\x20а\x20по\x20второму\x20нажатию\x20левой\x20"
-        "кнпоки\x20мыши\x20начинается\x20движение\x2e\x20Если\x20эта\x20опция\x20"
-        "отключена\x2c\x20движение\x20начинается\x20по\x20первому\x20нажати"
-        "ю\x2e",
-      "\x7bСкорость\x20врага\x7d\x0a\x0aВыбрать\x20скорости\x20перемещения\x20г"
-        "ероев\x2c\x20управляемых\x20компьютером\x2e\x20При\x20этом\x20можно\x20в"
-        "ыбрать\x20режим\x2c\x20в\x20котором\x20не\x20будет\x20отображаться\x20пе"
-        "редвижение\x20противника\x2e",
-      "\x7bИнтерфейс\x7d\x0a\x0aВыбор\x20желаемого\x20типа\x20интерфейса\x2e\x20По"
-        "\x20умолчанию\x20задан\x20динамический\x20интерфейс\x2c\x20в\x20котор"
-        "ом\x20\x27злое\x27\x20графическое\x20оформление\x20используется\x20дл"
-        "я\x20трех\x20\x27злых\x27\x20классов\x20героев\x20\x28варвара\x2c\x20чернокниж"
-        "ника\x20и\x20некроманта\x29\x2e",
-      "\x7bБыстрый\x20бой\x7d\x0a\x0aПри\x20включении\x20этой\x20опции\x20перед\x20ка"
-        "ждым\x20сражением\x20компьютер\x20будет\x20делать\x20запрос\x20о\x20п"
-        "роведении\x20этого\x20сражения\x20в\x20режиме\x20быстрого\x20боя\x2e\x20"
-        "Сражение\x20протекает\x20автоматически\x2c\x20и\x20компьютер\x20де"
-        "монстрирует\x20вам\x20только\x20его\x20результат\x2e",
-      "\x7bКурсор\x7d\x0a\x0aПереключение\x20курсора\x20с\x20черно\x2dбелого\x20на"
-        "\x20цветной\x20и\x20обратно\x2e\x20Цветной\x20курсор\x20выглядит\x20симп"
-        "атичнее\x2c\x20но\x20иногда\x20он\x20перемещается\x20по\x20экрану\x20не\x20"
-        "так\x20плавно\x2c\x20как\x20черно\x2dбелый\x2e"
+      "\x7bРћРљ\x7d\x0a\x0aР—Р°РєСЂС‹С‚СЊ\x20РјРµРЅСЋ\x2e",
+      "\x7bРњСѓР·С‹РєР°\x7d\x0a\x0aР’РєР»СЋС‡РёС‚СЊ\x20РёР»Рё\x20РІС‹РєР»СЋС‡РёС‚СЊ\x20С„РѕРЅРѕРІСѓСЋ\x20РјСѓР·С‹РєСѓ\x2e",
+      "\x7bР­С„С„РµРєС‚С‹\x7d\x0a\x0aР’РєР»СЋС‡РёС‚СЊ\x20РёР»Рё\x20РІС‹РєР»СЋС‡РёС‚СЊ\x20Р·РІСѓРєРѕРІС‹Рµ\x20СЌС„С„РµРє"
+        "С‚С‹\x2e",
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x7d\x0a\x0aР’С‹Р±СЂР°С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚СЊ\x20РїРµСЂРµРґРІРёР¶РµРЅРёСЏ\x20РіРµСЂРѕРµРІ"
+        "\x20РїРѕ\x20РєР°СЂС‚Рµ\x2e",
+      "\x7bРљР°С‡РµСЃС‚РІРѕ\x20Р·РІСѓРєР°\x7d\x0a\x0aР’С‹Р±СЂР°С‚СЊ\x20С„РѕСЂРјР°С‚\x20РјСѓР·С‹РєРё\x2e\x20РљР°Рє\x20РїСЂР°"
+        "РІРёР»Рѕ\x2c\x20РјСѓР·С‹РєР°\x20РІ\x20С„РѕСЂРјР°С‚Рµ\x20\x4d\x49\x44\x49\x20РЅРµ\x20РѕС‚Р»РёС‡Р°РµС‚СЃСЏ\x20РєР°С‡РµСЃС‚"
+        "РІРѕРј\x2c\x20РЅРѕ\x20РѕРЅР°\x20РїСЂРµРґСЉСЏРІР»СЏРµС‚\x20РјРµРЅСЊС€РёРµ\x20С‚СЂРµР±РѕРІР°РЅРёСЏ\x20Рє\x20РїСЂРѕ"
+        "РёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё\x20СЃРёСЃС‚РµРјС‹\x2c\x20С‡РµРј\x20С„РѕСЂРјР°С‚\x20РЎС‚РµСЂРµРѕ\x20\x43\x44\x2e\x20Р¤"
+        "РѕСЂРјР°С‚\x20РЎС‚РµСЂРµРѕ\x20\x43\x44\x20РґР°РµС‚\x20\x20РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ\x20РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚СЊ"
+        "\x20РѕРїРµСЂРЅСѓСЋ\x20РјСѓР·С‹РєСѓ\x2e",
+      "\x7bРџРѕРєР°Р·С‹РІР°С‚СЊ\x20РїСѓС‚СЊ\x7d\x0a\x0aР’РєР»СЋС‡РёС‚СЊ\x20РёР»Рё\x20РІС‹РєР»СЋС‡РёС‚СЊ\x20РѕС‚РѕР±СЂР°"
+        "Р¶РµРЅРёРµ\x20РїСѓС‚Рё\x20РіРµСЂРѕСЏ\x20РЅР°\x20РєР°СЂС‚Рµ\x2e\x20\x20Р•СЃР»Рё\x20РѕРїС†РёСЏ\x20РІРєР»СЋС‡РµРЅР°\x2c"
+        "\x20РїРµСЂРІРѕРµ\x20РЅР°Р¶Р°С‚РёРµ\x20РїРѕ\x20РѕР±СЉРµРєС‚Сѓ\x20РЅР°\x20РєР°СЂС‚Рµ\x20РїРѕРєР°Р·С‹РІР°РµС‚\x20Рї"
+        "СѓС‚СЊ\x20Рє\x20СЌС‚РѕРјСѓ\x20РѕР±СЉРµРєС‚Сѓ\x2c\x20Р°\x20РїРѕ\x20РІС‚РѕСЂРѕРјСѓ\x20РЅР°Р¶Р°С‚РёСЋ\x20Р»РµРІРѕР№\x20"
+        "РєРЅРїРѕРєРё\x20РјС‹С€Рё\x20РЅР°С‡РёРЅР°РµС‚СЃСЏ\x20РґРІРёР¶РµРЅРёРµ\x2e\x20Р•СЃР»Рё\x20СЌС‚Р°\x20РѕРїС†РёСЏ\x20"
+        "РѕС‚РєР»СЋС‡РµРЅР°\x2c\x20РґРІРёР¶РµРЅРёРµ\x20РЅР°С‡РёРЅР°РµС‚СЃСЏ\x20РїРѕ\x20РїРµСЂРІРѕРјСѓ\x20РЅР°Р¶Р°С‚Рё"
+        "СЋ\x2e",
+      "\x7bРЎРєРѕСЂРѕСЃС‚СЊ\x20РІСЂР°РіР°\x7d\x0a\x0aР’С‹Р±СЂР°С‚СЊ\x20СЃРєРѕСЂРѕСЃС‚Рё\x20РїРµСЂРµРјРµС‰РµРЅРёСЏ\x20Рі"
+        "РµСЂРѕРµРІ\x2c\x20СѓРїСЂР°РІР»СЏРµРјС‹С…\x20РєРѕРјРїСЊСЋС‚РµСЂРѕРј\x2e\x20РџСЂРё\x20СЌС‚РѕРј\x20РјРѕР¶РЅРѕ\x20РІ"
+        "С‹Р±СЂР°С‚СЊ\x20СЂРµР¶РёРј\x2c\x20РІ\x20РєРѕС‚РѕСЂРѕРј\x20РЅРµ\x20Р±СѓРґРµС‚\x20РѕС‚РѕР±СЂР°Р¶Р°С‚СЊСЃСЏ\x20РїРµ"
+        "СЂРµРґРІРёР¶РµРЅРёРµ\x20РїСЂРѕС‚РёРІРЅРёРєР°\x2e",
+      "\x7bРРЅС‚РµСЂС„РµР№СЃ\x7d\x0a\x0aР’С‹Р±РѕСЂ\x20Р¶РµР»Р°РµРјРѕРіРѕ\x20С‚РёРїР°\x20РёРЅС‚РµСЂС„РµР№СЃР°\x2e\x20РџРѕ"
+        "\x20СѓРјРѕР»С‡Р°РЅРёСЋ\x20Р·Р°РґР°РЅ\x20РґРёРЅР°РјРёС‡РµСЃРєРёР№\x20РёРЅС‚РµСЂС„РµР№СЃ\x2c\x20РІ\x20РєРѕС‚РѕСЂ"
+        "РѕРј\x20\x27Р·Р»РѕРµ\x27\x20РіСЂР°С„РёС‡РµСЃРєРѕРµ\x20РѕС„РѕСЂРјР»РµРЅРёРµ\x20РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ\x20РґР»"
+        "СЏ\x20С‚СЂРµС…\x20\x27Р·Р»С‹С…\x27\x20РєР»Р°СЃСЃРѕРІ\x20РіРµСЂРѕРµРІ\x20\x28РІР°СЂРІР°СЂР°\x2c\x20С‡РµСЂРЅРѕРєРЅРёР¶"
+        "РЅРёРєР°\x20Рё\x20РЅРµРєСЂРѕРјР°РЅС‚Р°\x29\x2e",
+      "\x7bР‘С‹СЃС‚СЂС‹Р№\x20Р±РѕР№\x7d\x0a\x0aРџСЂРё\x20РІРєР»СЋС‡РµРЅРёРё\x20СЌС‚РѕР№\x20РѕРїС†РёРё\x20РїРµСЂРµРґ\x20РєР°"
+        "Р¶РґС‹Рј\x20СЃСЂР°Р¶РµРЅРёРµРј\x20РєРѕРјРїСЊСЋС‚РµСЂ\x20Р±СѓРґРµС‚\x20РґРµР»Р°С‚СЊ\x20Р·Р°РїСЂРѕСЃ\x20Рѕ\x20Рї"
+        "СЂРѕРІРµРґРµРЅРёРё\x20СЌС‚РѕРіРѕ\x20СЃСЂР°Р¶РµРЅРёСЏ\x20РІ\x20СЂРµР¶РёРјРµ\x20Р±С‹СЃС‚СЂРѕРіРѕ\x20Р±РѕСЏ\x2e\x20"
+        "РЎСЂР°Р¶РµРЅРёРµ\x20РїСЂРѕС‚РµРєР°РµС‚\x20Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё\x2c\x20Рё\x20РєРѕРјРїСЊСЋС‚РµСЂ\x20РґРµ"
+        "РјРѕРЅСЃС‚СЂРёСЂСѓРµС‚\x20РІР°Рј\x20С‚РѕР»СЊРєРѕ\x20РµРіРѕ\x20СЂРµР·СѓР»СЊС‚Р°С‚\x2e",
+      "\x7bРљСѓСЂСЃРѕСЂ\x7d\x0a\x0aРџРµСЂРµРєР»СЋС‡РµРЅРёРµ\x20РєСѓСЂСЃРѕСЂР°\x20СЃ\x20С‡РµСЂРЅРѕ\x2dР±РµР»РѕРіРѕ\x20РЅР°"
+        "\x20С†РІРµС‚РЅРѕР№\x20Рё\x20РѕР±СЂР°С‚РЅРѕ\x2e\x20Р¦РІРµС‚РЅРѕР№\x20РєСѓСЂСЃРѕСЂ\x20РІС‹РіР»СЏРґРёС‚\x20СЃРёРјРї"
+        "Р°С‚РёС‡РЅРµРµ\x2c\x20РЅРѕ\x20РёРЅРѕРіРґР°\x20РѕРЅ\x20РїРµСЂРµРјРµС‰Р°РµС‚СЃСЏ\x20РїРѕ\x20СЌРєСЂР°РЅСѓ\x20РЅРµ\x20"
+        "С‚Р°Рє\x20РїР»Р°РІРЅРѕ\x2c\x20РєР°Рє\x20С‡РµСЂРЅРѕ\x2dР±РµР»С‹Р№\x2e"
 };
 char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
-    {  "Сизый",   "Синий",   "Коричневый",   "Золотой",   "Зеленый",   "Оранжевый",   "Фиолетовый",   "Красный"};
+    {  "РЎРёР·С‹Р№",   "РЎРёРЅРёР№",   "РљРѕСЂРёС‡РЅРµРІС‹Р№",   "Р—РѕР»РѕС‚РѕР№",   "Р—РµР»РµРЅС‹Р№",   "РћСЂР°РЅР¶РµРІС‹Р№",   "Р¤РёРѕР»РµС‚РѕРІС‹Р№",   "РљСЂР°СЃРЅС‹Р№"};
 char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
-      "Башня\x20алхимика",
-      "Арена",
-      "Лачуга\x20волхва",
-      "Око\x20волхва",
-      "Конюшни",
-      "Русалка",
-      "Сирены"
+      "Р‘Р°С€РЅСЏ\x20Р°Р»С…РёРјРёРєР°",
+      "РђСЂРµРЅР°",
+      "Р›Р°С‡СѓРіР°\x20РІРѕР»С…РІР°",
+      "РћРєРѕ\x20РІРѕР»С…РІР°",
+      "РљРѕРЅСЋС€РЅРё",
+      "Р СѓСЃР°Р»РєР°",
+      "РЎРёСЂРµРЅС‹"
 };
 char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
-      "Земляные\x20холмы",
-      "Алтарь\x20Земли",
-      "Алтарь\x20Воздуха",
-      "Алтарь\x20Огня",
-      "Алтарь\x20Воды"
+      "Р—РµРјР»СЏРЅС‹Рµ\x20С…РѕР»РјС‹",
+      "РђР»С‚Р°СЂСЊ\x20Р—РµРјР»Рё",
+      "РђР»С‚Р°СЂСЊ\x20Р’РѕР·РґСѓС…Р°",
+      "РђР»С‚Р°СЂСЊ\x20РћРіРЅСЏ",
+      "РђР»С‚Р°СЂСЊ\x20Р’РѕРґС‹"
 };
 SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
-    {0, 100,   "Построить\x3a"},
-    {1, 100,   "Скорость"},
-    {1, 101,   "Информация\x0aо\x20враге"},
-    {1, 102,   "Магия\x0aв\x20автобое"},
-    {1, 103,   "Сетка"},
-    {1, 104,   "Курсор\x0aс\x20тенью"},
-    {1, 105,   "Затенение\x0aсетки"},
-    {2, 100,   "Музыка"},
-    {2, 101,   "Эффекты"},
-    {2, 102,   "Тип\x20музыки"},
-    {2, 103,   "Скорость"},
-    {2, 104,   "Путь"},
-    {2, 105,   "Враг"},
-    {2, 106,   "Интерфейс"},
-    {2, 107,   "Видео"},
-    {2, 108,   "Тип\x20курсора"},
-    {6, 300,   "Атака"},
-    {6, 301,   "Защита"},
-    {6, 302,   "Сила\x20магии"},
-    {6, 303,   "Знания"},
-    {7, 600,   "Сложность\x20игры\x3a"},
-    {7, 57,   "Легкая"},
-    {7, 58,   "Обычная"},
-    {7, 59,   "Тяжелая"},
-    {7, 60,   "Эксперт"},
-    {7, 61,   "Невозможная"},
-    {7, 62,   "Оппоненты\x3a"},
-    {7, 84,   "Класс\x3a"},
-    {9, 41,   "Золота\x20в\x20день\x3a"},
-    {12, 0,   "Строить\x20корабль\x3a"},
-    {12, 1,   "Цена\x3a"},
-    {14, 800,   "\x31\x2dй"},
-    {14, 801,   "\x32\x2dй"},
-    {14, 802,   "\x33\x2dй"},
-    {14, 803,   "\x34\x2dй"},
-    {14, 804,   "\x35\x2dй"},
-    {14, 805,   "\x36\x2dй"},
-    {14, 604,   "Городов\x3a"},
-    {14, 605,   "Замков\x3a"},
-    {14, 606,   "Героев\x3a"},
-    {14, 607,   "Золота\x20в\x20казне\x3a"},
-    {14, 608,   "Дерево\x20и\x20руда\x3a"},
-    {14, 609,   "Прочие\x20ресурсы\x3a"},
-    {14, 610,   "Найдено\x20обелисков\x3a"},
-    {14, 611,   "Артефакты\x3a"},
-    {14, 612,   "Общая\x20сила\x20армии\x3a"},
-    {14, 613,   "Доход\x3a"},
-    {14, 620,   "Лучший\x20герой\x3a"},
-    {14, 621,   "Лучшие\x20параметры\x3a"},
-    {14, 622,   "Характер\x3a"},
-    {14, 623,   "Лучший\x20воин\x3a"},
-    {14, 0,   "Гильдия\x20воров\x3a\x20достижения\x20игроков"},
-    {17, 110,   "Доступные\x20заклинания\x20были\x20записаны\x20в\x20книгу\x2e"},
-    {18, 600,   "Атака\x3a"},
-    {18, 601,   "Защита\x3a"},
-    {18, 602,   "Сила\x20магии\x3a"},
-    {18, 603,   "Знания\x3a"},
-    {18, 604,   "Очки\x20магии\x3a"},
-    {19, 600,   "Оборона\x3a"},
-    {20, 600,   "Нанять\x20героя"},
-    {21, 600,   "Атака"},
-    {21, 601,   "Защита"},
-    {21, 602,   "Сила\x20магии"},
-    {21, 603,   "Знания"},
-    {22, 0,   "Таверна"},
-    {23, 600,   "Сложность\x0aкарты"},
-    {23, 601,   "Сложность\x0aигры"},
-    {23, 602,   "\x0aРейтинг"},
-    {23, 603,   "Размер\x0aкарты"},
-    {23, 604,   "Оппоненты"},
-    {23, 605,   "Классы"},
-    {23, 606,   "Условия\x0aпобеды"},
-    {23, 607,   "Условия\x0aпоражения"}
+    {0, 100,   "РџРѕСЃС‚СЂРѕРёС‚СЊ\x3a"},
+    {1, 100,   "РЎРєРѕСЂРѕСЃС‚СЊ"},
+    {1, 101,   "РРЅС„РѕСЂРјР°С†РёСЏ\x0aРѕ\x20РІСЂР°РіРµ"},
+    {1, 102,   "РњР°РіРёСЏ\x0aРІ\x20Р°РІС‚РѕР±РѕРµ"},
+    {1, 103,   "РЎРµС‚РєР°"},
+    {1, 104,   "РљСѓСЂСЃРѕСЂ\x0aСЃ\x20С‚РµРЅСЊСЋ"},
+    {1, 105,   "Р—Р°С‚РµРЅРµРЅРёРµ\x0aСЃРµС‚РєРё"},
+    {2, 100,   "РњСѓР·С‹РєР°"},
+    {2, 101,   "Р­С„С„РµРєС‚С‹"},
+    {2, 102,   "РўРёРї\x20РјСѓР·С‹РєРё"},
+    {2, 103,   "РЎРєРѕСЂРѕСЃС‚СЊ"},
+    {2, 104,   "РџСѓС‚СЊ"},
+    {2, 105,   "Р’СЂР°Рі"},
+    {2, 106,   "РРЅС‚РµСЂС„РµР№СЃ"},
+    {2, 107,   "Р’РёРґРµРѕ"},
+    {2, 108,   "РўРёРї\x20РєСѓСЂСЃРѕСЂР°"},
+    {6, 300,   "РђС‚Р°РєР°"},
+    {6, 301,   "Р—Р°С‰РёС‚Р°"},
+    {6, 302,   "РЎРёР»Р°\x20РјР°РіРёРё"},
+    {6, 303,   "Р—РЅР°РЅРёСЏ"},
+    {7, 600,   "РЎР»РѕР¶РЅРѕСЃС‚СЊ\x20РёРіСЂС‹\x3a"},
+    {7, 57,   "Р›РµРіРєР°СЏ"},
+    {7, 58,   "РћР±С‹С‡РЅР°СЏ"},
+    {7, 59,   "РўСЏР¶РµР»Р°СЏ"},
+    {7, 60,   "Р­РєСЃРїРµСЂС‚"},
+    {7, 61,   "РќРµРІРѕР·РјРѕР¶РЅР°СЏ"},
+    {7, 62,   "РћРїРїРѕРЅРµРЅС‚С‹\x3a"},
+    {7, 84,   "РљР»Р°СЃСЃ\x3a"},
+    {9, 41,   "Р—РѕР»РѕС‚Р°\x20РІ\x20РґРµРЅСЊ\x3a"},
+    {12, 0,   "РЎС‚СЂРѕРёС‚СЊ\x20РєРѕСЂР°Р±Р»СЊ\x3a"},
+    {12, 1,   "Р¦РµРЅР°\x3a"},
+    {14, 800,   "\x31\x2dР№"},
+    {14, 801,   "\x32\x2dР№"},
+    {14, 802,   "\x33\x2dР№"},
+    {14, 803,   "\x34\x2dР№"},
+    {14, 804,   "\x35\x2dР№"},
+    {14, 805,   "\x36\x2dР№"},
+    {14, 604,   "Р“РѕСЂРѕРґРѕРІ\x3a"},
+    {14, 605,   "Р—Р°РјРєРѕРІ\x3a"},
+    {14, 606,   "Р“РµСЂРѕРµРІ\x3a"},
+    {14, 607,   "Р—РѕР»РѕС‚Р°\x20РІ\x20РєР°Р·РЅРµ\x3a"},
+    {14, 608,   "Р”РµСЂРµРІРѕ\x20Рё\x20СЂСѓРґР°\x3a"},
+    {14, 609,   "РџСЂРѕС‡РёРµ\x20СЂРµСЃСѓСЂСЃС‹\x3a"},
+    {14, 610,   "РќР°Р№РґРµРЅРѕ\x20РѕР±РµР»РёСЃРєРѕРІ\x3a"},
+    {14, 611,   "РђСЂС‚РµС„Р°РєС‚С‹\x3a"},
+    {14, 612,   "РћР±С‰Р°СЏ\x20СЃРёР»Р°\x20Р°СЂРјРёРё\x3a"},
+    {14, 613,   "Р”РѕС…РѕРґ\x3a"},
+    {14, 620,   "Р›СѓС‡С€РёР№\x20РіРµСЂРѕР№\x3a"},
+    {14, 621,   "Р›СѓС‡С€РёРµ\x20РїР°СЂР°РјРµС‚СЂС‹\x3a"},
+    {14, 622,   "РҐР°СЂР°РєС‚РµСЂ\x3a"},
+    {14, 623,   "Р›СѓС‡С€РёР№\x20РІРѕРёРЅ\x3a"},
+    {14, 0,   "Р“РёР»СЊРґРёСЏ\x20РІРѕСЂРѕРІ\x3a\x20РґРѕСЃС‚РёР¶РµРЅРёСЏ\x20РёРіСЂРѕРєРѕРІ"},
+    {17, 110,   "Р”РѕСЃС‚СѓРїРЅС‹Рµ\x20Р·Р°РєР»РёРЅР°РЅРёСЏ\x20Р±С‹Р»Рё\x20Р·Р°РїРёСЃР°РЅС‹\x20РІ\x20РєРЅРёРіСѓ\x2e"},
+    {18, 600,   "РђС‚Р°РєР°\x3a"},
+    {18, 601,   "Р—Р°С‰РёС‚Р°\x3a"},
+    {18, 602,   "РЎРёР»Р°\x20РјР°РіРёРё\x3a"},
+    {18, 603,   "Р—РЅР°РЅРёСЏ\x3a"},
+    {18, 604,   "РћС‡РєРё\x20РјР°РіРёРё\x3a"},
+    {19, 600,   "РћР±РѕСЂРѕРЅР°\x3a"},
+    {20, 600,   "РќР°РЅСЏС‚СЊ\x20РіРµСЂРѕСЏ"},
+    {21, 600,   "РђС‚Р°РєР°"},
+    {21, 601,   "Р—Р°С‰РёС‚Р°"},
+    {21, 602,   "РЎРёР»Р°\x20РјР°РіРёРё"},
+    {21, 603,   "Р—РЅР°РЅРёСЏ"},
+    {22, 0,   "РўР°РІРµСЂРЅР°"},
+    {23, 600,   "РЎР»РѕР¶РЅРѕСЃС‚СЊ\x0aРєР°СЂС‚С‹"},
+    {23, 601,   "РЎР»РѕР¶РЅРѕСЃС‚СЊ\x0aРёРіСЂС‹"},
+    {23, 602,   "\x0aР РµР№С‚РёРЅРі"},
+    {23, 603,   "Р Р°Р·РјРµСЂ\x0aРєР°СЂС‚С‹"},
+    {23, 604,   "РћРїРїРѕРЅРµРЅС‚С‹"},
+    {23, 605,   "РљР»Р°СЃСЃС‹"},
+    {23, 606,   "РЈСЃР»РѕРІРёСЏ\x0aРїРѕР±РµРґС‹"},
+    {23, 607,   "РЈСЃР»РѕРІРёСЏ\x0aРїРѕСЂР°Р¶РµРЅРёСЏ"}
 };
 b32 gbHeroWindShowing = false;
 b32 gbFullCombatScreenDrawn = true;

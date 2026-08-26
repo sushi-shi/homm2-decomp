@@ -151,39 +151,39 @@ void UpdateTradingPost(i32 draw) {
 
         sprintf(
             gText,
-            "{%s}\n\nНа моем рынке %s и %s "
-            "меняются из соотношения "
-            "%d %s к %d %s"  ,
-            bIsMarketPlace != 0 ? "Рынок"
-                                : "Рынок"  ,
+            "{%s}\n\nРќР° РјРѕРµРј СЂС‹РЅРєРµ %s Рё %s "
+            "РјРµРЅСЏСЋС‚СЃСЏ РёР· СЃРѕРѕС‚РЅРѕС€РµРЅРёСЏ "
+            "%d %s Рє %d %s"  ,
+            bIsMarketPlace != 0 ? "Р С‹РЅРѕРє"
+                                : "Р С‹РЅРѕРє"  ,
             rightName,
             leftName,
             offeredValue,
-            offeredValue > 1 ? "ед."   : "ед."  ,
+            offeredValue > 1 ? "РµРґ."   : "РµРґ."  ,
             requestedValue,
-            requestedValue > 1 ? "ед."   : "ед."
+            requestedValue > 1 ? "РµРґ."   : "РµРґ."
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            "{%s}\n\nВам предложена "
-            "достойная сделка. Я не "
-            "пытаюсь нажиться на ней. "
-            "Вас интересует что-нибудь "
-            "из моих товаров?"  ,
-            bIsMarketPlace != 0 ? "Рынок"
-                                : "Рынок"
+            "{%s}\n\nР’Р°Рј РїСЂРµРґР»РѕР¶РµРЅР° "
+            "РґРѕСЃС‚РѕР№РЅР°СЏ СЃРґРµР»РєР°. РЇ РЅРµ "
+            "РїС‹С‚Р°СЋСЃСЊ РЅР°Р¶РёС‚СЊСЃСЏ РЅР° РЅРµР№. "
+            "Р’Р°СЃ РёРЅС‚РµСЂРµСЃСѓРµС‚ С‡С‚Рѕ-РЅРёР±СѓРґСЊ "
+            "РёР· РјРѕРёС… С‚РѕРІР°СЂРѕРІ?"  ,
+            bIsMarketPlace != 0 ? "Р С‹РЅРѕРє"
+                                : "Р С‹РЅРѕРє"
         );
     } else {
         sprintf(
             gText,
-            "{%s}\n\nПосмотрите на наши "
-            "товары. Если что-то вас "
-            "заинтересует, щелкните "
-            "по нужным вещам и выберите, "
-            "на что хотите поменять."  ,
-            bIsMarketPlace != 0 ? "Рынок"
-                                : "Рынок"
+            "{%s}\n\nРџРѕСЃРјРѕС‚СЂРёС‚Рµ РЅР° РЅР°С€Рё "
+            "С‚РѕРІР°СЂС‹. Р•СЃР»Рё С‡С‚Рѕ-С‚Рѕ РІР°СЃ "
+            "Р·Р°РёРЅС‚РµСЂРµСЃСѓРµС‚, С‰РµР»РєРЅРёС‚Рµ "
+            "РїРѕ РЅСѓР¶РЅС‹Рј РІРµС‰Р°Рј Рё РІС‹Р±РµСЂРёС‚Рµ, "
+            "РЅР° С‡С‚Рѕ С…РѕС‚РёС‚Рµ РїРѕРјРµРЅСЏС‚СЊ."  ,
+            bIsMarketPlace != 0 ? "Р С‹РЅРѕРє"
+                                : "Р С‹РЅРѕРє"
         );
     }
     messageTemp.type = MESSAGE_WIDGET;
@@ -238,7 +238,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
                     if (leftResource == idx) {
-                        sprintf(gText, "н/д"  );
+                        sprintf(gText, "РЅ/Рґ"  );
                     } else {
                         ComputeTradeRatios(
                             leftResource,

@@ -349,7 +349,7 @@ void combatManager::SetupCombat(
             );
             strcpy(
                 m_captain.m_name,
-                "Капитан"
+                "РљР°РїРёС‚Р°РЅ"
             );
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
@@ -1036,15 +1036,15 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "Высокая мораль %s позволила \n"
-                "им еще раз атаковать врага.",
+                "Р’С‹СЃРѕРєР°СЏ РјРѕСЂР°Р»СЊ %s РїРѕР·РІРѕР»РёР»Р° \n"
+                "РёРј РµС‰Рµ СЂР°Р· Р°С‚Р°РєРѕРІР°С‚СЊ РІСЂР°РіР°.",
                 gArmyNames[(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "Высокая мораль %s позволила \n"
-                "им еще раз атаковать врага.",
+                "Р’С‹СЃРѕРєР°СЏ РјРѕСЂР°Р»СЊ %s РїРѕР·РІРѕР»РёР»Р° \n"
+                "РёРј РµС‰Рµ СЂР°Р· Р°С‚Р°РєРѕРІР°С‚СЊ РІСЂР°РіР°.",
                 gArmyNamesPlural[(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1082,15 +1082,15 @@ i32 combatManager::CheckApplyBadMorale(
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "Низкая мораль %s привела к тому, что \n"
-                "они застыли в панике.",
+                "РќРёР·РєР°СЏ РјРѕСЂР°Р»СЊ %s РїСЂРёРІРµР»Р° Рє С‚РѕРјСѓ, С‡С‚Рѕ \n"
+                "РѕРЅРё Р·Р°СЃС‚С‹Р»Рё РІ РїР°РЅРёРєРµ.",
                 gArmyNames[(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "Низкая мораль %s привела к тому, что \n"
-                "они застыли в панике.",
+                "РќРёР·РєР°СЏ РјРѕСЂР°Р»СЊ %s РїСЂРёРІРµР»Р° Рє С‚РѕРјСѓ, С‡С‚Рѕ \n"
+                "РѕРЅРё Р·Р°СЃС‚С‹Р»Рё РІ РїР°РЅРёРєРµ.",
                 gArmyNamesPlural[(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1693,23 +1693,23 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == COMBAT_TOWER_GARRISON ? "Гарнизон наносит"
-                                                : "Башня наносит",
+            tower == COMBAT_TOWER_GARRISON ? "Р“Р°СЂРЅРёР·РѕРЅ РЅР°РЅРѕСЃРёС‚"
+                                                : "Р‘Р°С€РЅСЏ РЅР°РЅРѕСЃРёС‚",
             damage5,
-            "ед. урона",
+            "РµРґ. СѓСЂРѕРЅР°",
             killed0,
             killed0 <= 1 ? gArmyNames[(target9->m_monsterType)]
                          : gArmyNamesPlural[(target9->m_monsterType)],
-            killed0 <= 1 ? "умирает" : "убито"
+            killed0 <= 1 ? "СѓРјРёСЂР°РµС‚" : "СѓР±РёС‚Рѕ"
         );
     } else {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == COMBAT_TOWER_GARRISON ? "Гарнизон наносит"
-                                                : "Башня наносит",
+            tower == COMBAT_TOWER_GARRISON ? "Р“Р°СЂРЅРёР·РѕРЅ РЅР°РЅРѕСЃРёС‚"
+                                                : "Р‘Р°С€РЅСЏ РЅР°РЅРѕСЃРёС‚",
             damage5,
-            "ед. урона"
+            "РµРґ. СѓСЂРѕРЅР°"
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);

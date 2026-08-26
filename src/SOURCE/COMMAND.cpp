@@ -1011,8 +1011,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[(m_currentSide)] == NULL) {
                         NormalDialog(
-                            "У вас нет героев, чтобы "
-                                "направлять заклинания."
+                            "РЈ РІР°СЃ РЅРµС‚ РіРµСЂРѕРµРІ, С‡С‚РѕР±С‹ "
+                                "РЅР°РїСЂР°РІР»СЏС‚СЊ Р·Р°РєР»РёРЅР°РЅРёСЏ."
                                  ,
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
@@ -1026,11 +1026,11 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (IsNegationSphereInEffect() != 0) {
                         NormalDialog(
-                            "Сфера антимагии в "
-                            "действии. Не может "
-                            "быть направлено ни "
-                            "одно боевое "
-                            "заклинание."
+                            "РЎС„РµСЂР° Р°РЅС‚РёРјР°РіРёРё РІ "
+                            "РґРµР№СЃС‚РІРёРё. РќРµ РјРѕР¶РµС‚ "
+                            "Р±С‹С‚СЊ РЅР°РїСЂР°РІР»РµРЅРѕ РЅРё "
+                            "РѕРґРЅРѕ Р±РѕРµРІРѕРµ "
+                            "Р·Р°РєР»РёРЅР°РЅРёРµ."
                             ,
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
@@ -1044,7 +1044,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (m_heroCastSpell[(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
-                            "Вы уже направляли заклинания в этом раунде.",
+                            "Р’С‹ СѓР¶Рµ РЅР°РїСЂР°РІР»СЏР»Рё Р·Р°РєР»РёРЅР°РЅРёСЏ РІ СЌС‚РѕРј СЂР°СѓРЅРґРµ.",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1408,11 +1408,11 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
             if (IsNegationSphereInEffect() != 0) {
                 NormalDialog(
-                    "Сфера антимагии в "
-                    "действии. Не может "
-                    "быть направлено ни "
-                    "одно боевое "
-                    "заклинание."
+                    "РЎС„РµСЂР° Р°РЅС‚РёРјР°РіРёРё РІ "
+                    "РґРµР№СЃС‚РІРёРё. РќРµ РјРѕР¶РµС‚ "
+                    "Р±С‹С‚СЊ РЅР°РїСЂР°РІР»РµРЅРѕ РЅРё "
+                    "РѕРґРЅРѕ Р±РѕРµРІРѕРµ "
+                    "Р·Р°РєР»РёРЅР°РЅРёРµ."
                     ,
                     NORMAL_DIALOG_INFO,
                     NORMAL_DIALOG_NO_RESOURCE,
@@ -1431,8 +1431,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
-                "Вы действительно "
-                "хотите отступить?"
+                "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ "
+                "С…РѕС‚РёС‚Рµ РѕС‚СЃС‚СѓРїРёС‚СЊ?"
                 ,
                 NORMAL_DIALOG_CONFIRM,
                 NORMAL_DIALOG_NO_RESOURCE,
@@ -1453,8 +1453,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 if (gpGame->m_players[m_playerId[(m_currentSide)]].m_resources[(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
-                        "У вас недостаточно "
-                        "золота!"  ,
+                        "РЈ РІР°СЃ РЅРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ "
+                        "Р·РѕР»РѕС‚Р°!"  ,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -1648,7 +1648,7 @@ void combatManager::ShowWinLoseArtifact(
     tag_message message;
     char* artifactName;
 
-    sprintf(gText, "Вы захватили вражеский артефакт!");
+    sprintf(gText, "Р’С‹ Р·Р°С…РІР°С‚РёР»Рё РІСЂР°Р¶РµСЃРєРёР№ Р°СЂС‚РµС„Р°РєС‚!");
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = WIN_LOSE_TEXT_ID;
@@ -1753,12 +1753,12 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (giSkeletonsCreated > 1) {
         sprintf(
             gText,
-            "Использование черной "
-            "магии некромантии "
-            "позволило вам вернуть "
-            "на службу %d "
-            "поверженных врагов в "
-            "виде скелетов."
+            "РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ С‡РµСЂРЅРѕР№ "
+            "РјР°РіРёРё РЅРµРєСЂРѕРјР°РЅС‚РёРё "
+            "РїРѕР·РІРѕР»РёР»Рѕ РІР°Рј РІРµСЂРЅСѓС‚СЊ "
+            "РЅР° СЃР»СѓР¶Р±Сѓ %d "
+            "РїРѕРІРµСЂР¶РµРЅРЅС‹С… РІСЂР°РіРѕРІ РІ "
+            "РІРёРґРµ СЃРєРµР»РµС‚РѕРІ."
 
 
 ,
@@ -1767,12 +1767,12 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     } else {
         sprintf(
             gText,
-            "Использование черной "
-            "магии некромантии "
-            "позволило вам вернуть "
-            "на службу "
-            "поверженного врага в "
-            "виде скелета."
+            "РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ С‡РµСЂРЅРѕР№ "
+            "РјР°РіРёРё РЅРµРєСЂРѕРјР°РЅС‚РёРё "
+            "РїРѕР·РІРѕР»РёР»Рѕ РІР°Рј РІРµСЂРЅСѓС‚СЊ "
+            "РЅР° СЃР»СѓР¶Р±Сѓ "
+            "РїРѕРІРµСЂР¶РµРЅРЅРѕРіРѕ РІСЂР°РіР° РІ "
+            "РІРёРґРµ СЃРєРµР»РµС‚Р°."
 
 
         );
@@ -1849,10 +1849,10 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
     sprintf(
         gText,
-        "С помощью искусства "
-        "орлиного взора, %s "
-        "смог(ла) подглядеть и "
-        "выучить заклинание "
+        "РЎ РїРѕРјРѕС‰СЊСЋ РёСЃРєСѓСЃСЃС‚РІР° "
+        "РѕСЂР»РёРЅРѕРіРѕ РІР·РѕСЂР°, %s "
+        "СЃРјРѕРі(Р»Р°) РїРѕРґРіР»СЏРґРµС‚СЊ Рё "
+        "РІС‹СѓС‡РёС‚СЊ Р·Р°РєР»РёРЅР°РЅРёРµ "
         "'%s'."
 ,
         m_heroes[(m_combatResult)]->m_name,
@@ -1914,7 +1914,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 
     text_1 = static_cast<char*>(H2_ALLOC(CASUALTY_HEADING_CAPACITY));
-    sprintf(text_1, "Потери");
+    sprintf(text_1, "РџРѕС‚РµСЂРё");
     m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] = new textWidget(
         CASUALTY_TITLE_X,
         CASUALTY_TITLE_Y,
@@ -1937,8 +1937,8 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         sprintf(
             text_1,
             side_4 == (COMBAT_ATTACKER_SIDE)
-                ? "Нападавшие:"
-                : "Оборонявшиеся:"
+                ? "РќР°РїР°РґР°РІС€РёРµ:"
+                : "РћР±РѕСЂРѕРЅСЏРІС€РёРµСЃСЏ:"
         );
         m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_4] = new textWidget(
             CASUALTY_TITLE_X,
@@ -1958,7 +1958,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
 
         if (casualtyQuantity_13[side_4] <= 0) {
             text_1 = static_cast<char*>(H2_ALLOC(CASUALTY_NONE_CAPACITY));
-            sprintf(text_1, "Нет"  );
+            sprintf(text_1, "РќРµС‚"  );
             m_winLoseBottomTextWidgets[side_4 * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 CASUALTY_TITLE_X,
                 y_7 + CASUALTY_NONE_Y_OFFSET,
@@ -2427,10 +2427,10 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
-        "%s говорит:\n\n\"Я приму вашу "
-            "капитуляцию и позволю вам и "
-            "вашим воинам уйти с миром за "
-            "%d золотых.\""
+        "%s РіРѕРІРѕСЂРёС‚:\n\n\"РЇ РїСЂРёРјСѓ РІР°С€Сѓ "
+            "РєР°РїРёС‚СѓР»СЏС†РёСЋ Рё РїРѕР·РІРѕР»СЋ РІР°Рј Рё "
+            "РІР°С€РёРј РІРѕРёРЅР°Рј СѓР№С‚Рё СЃ РјРёСЂРѕРј Р·Р° "
+            "%d Р·РѕР»РѕС‚С‹С….\""
              ,
         m_heroes[(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
@@ -3077,7 +3077,7 @@ void combatManager::ViewBallista(i32 quickView) {
     char description[VIEW_DESCRIPTION_SIZE];
 
     m_combatTowns[(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&shooterCount, &attackSkill);
-    sprintf(gText, "Баллиста"  );
+    sprintf(gText, "Р‘Р°Р»Р»РёСЃС‚Р°"  );
     strcpy(
         description,
         ""
@@ -3085,27 +3085,27 @@ void combatManager::ViewBallista(i32 quickView) {
     if (m_wallStates[(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
         sprintf(
             description,
-            "\n\n%s уничтожена."  ,
-            "Баллиста"
+            "\n\n%s СѓРЅРёС‡С‚РѕР¶РµРЅР°."  ,
+            "Р‘Р°Р»Р»РёСЃС‚Р°"
         );
     } else if (attackSkill > 0) {
         sprintf(
             description,
-            "\n\n%s стреляет с силой %d "
-            "стрелков, каждая +%d "
-            "бонусом к их уровню "
-            "атаки."
+            "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+            "СЃС‚СЂРµР»РєРѕРІ, РєР°Р¶РґР°СЏ +%d "
+            "Р±РѕРЅСѓСЃРѕРј Рє РёС… СѓСЂРѕРІРЅСЋ "
+            "Р°С‚Р°РєРё."
 ,
-            "Баллиста"  ,
+            "Р‘Р°Р»Р»РёСЃС‚Р°"  ,
             shooterCount,
             attackSkill
         );
     } else {
         sprintf(
             description,
-            "\n\n%s стреляет с силой %d "
-            "стрелков."  ,
-            "Баллиста"  ,
+            "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+            "СЃС‚СЂРµР»РєРѕРІ."  ,
+            "Р‘Р°Р»Р»РёСЃС‚Р°"  ,
             shooterCount
         );
     }
@@ -3120,30 +3120,30 @@ void combatManager::ViewBallista(i32 quickView) {
         if (m_wallStates[(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(
                 description,
-                "\n\n%s уничтожена."  ,
-                "Левая башня"
+                "\n\n%s СѓРЅРёС‡С‚РѕР¶РµРЅР°."  ,
+                "Р›РµРІР°СЏ Р±Р°С€РЅСЏ"
             );
         } else if (m_wallStates[(COMBAT_WALL_SLOT_TOP_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackSkill > 0) {
                 sprintf(
                     description,
-                    "\n\n%s стреляет с силой %d "
-                    "стрелков, каждая +%d "
-                    "бонусом к их уровню "
-                    "атаки."
+                    "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+                    "СЃС‚СЂРµР»РєРѕРІ, РєР°Р¶РґР°СЏ +%d "
+                    "Р±РѕРЅСѓСЃРѕРј Рє РёС… СѓСЂРѕРІРЅСЋ "
+                    "Р°С‚Р°РєРё."
 ,
-                    "Левая башня"  ,
+                    "Р›РµРІР°СЏ Р±Р°С€РЅСЏ"  ,
                     shooterCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackSkill
                 );
             } else {
                 sprintf(
                     description,
-                    "\n\n%s стреляет с силой %d "
-                    "стрелков."
+                    "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+                    "СЃС‚СЂРµР»РєРѕРІ."
 ,
-                    "Левая башня"  ,
+                    "Р›РµРІР°СЏ Р±Р°С€РЅСЏ"  ,
                     shooterCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }
@@ -3160,30 +3160,30 @@ void combatManager::ViewBallista(i32 quickView) {
         if (m_wallStates[(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(
                 description,
-                "\n\n%s уничтожена."  ,
-                "Правая башня"
+                "\n\n%s СѓРЅРёС‡С‚РѕР¶РµРЅР°."  ,
+                "РџСЂР°РІР°СЏ Р±Р°С€РЅСЏ"
             );
         } else if (m_wallStates[(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackSkill > 0) {
                 sprintf(
                     description,
-                    "\n\n%s стреляет с силой %d "
-                    "стрелков, каждая +%d "
-                    "бонусом к их уровню "
-                    "атаки."
+                    "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+                    "СЃС‚СЂРµР»РєРѕРІ, РєР°Р¶РґР°СЏ +%d "
+                    "Р±РѕРЅСѓСЃРѕРј Рє РёС… СѓСЂРѕРІРЅСЋ "
+                    "Р°С‚Р°РєРё."
 ,
-                    "Правая башня"  ,
+                    "РџСЂР°РІР°СЏ Р±Р°С€РЅСЏ"  ,
                     shooterCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackSkill
                 );
             } else {
                 sprintf(
                     description,
-                    "\n\n%s стреляет с силой %d "
-                    "стрелков."
+                    "\n\n%s СЃС‚СЂРµР»СЏРµС‚ СЃ СЃРёР»РѕР№ %d "
+                    "СЃС‚СЂРµР»РєРѕРІ."
 ,
-                    "Правая башня"  ,
+                    "РџСЂР°РІР°СЏ Р±Р°С€РЅСЏ"  ,
                     shooterCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }

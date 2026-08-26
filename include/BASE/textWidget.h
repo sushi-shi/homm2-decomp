@@ -30,7 +30,7 @@ public:
         WidgetKind kind,
         FontAlignment alignment
     );
-    virtual ~textWidget() override;
+    virtual inline ~textWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);

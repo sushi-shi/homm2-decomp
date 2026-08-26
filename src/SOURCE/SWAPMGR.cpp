@@ -140,7 +140,7 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     sprintf(
         gText,
-          "Âñòðå÷àþòñÿ\x20\x25\x73\x20è\x20\x25\x73",
+          "Ð’ÑÑ‚Ñ€ÐµÑ‡Ð°ÑŽÑ‚ÑÑ\x20\x25\x73\x20Ð¸\x20\x25\x73",
         m_heroes[(SWAP_SIDE_LEFT)]->m_name,
         m_heroes[(SWAP_SIDE_RIGHT)]->m_name
     );
@@ -435,7 +435,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                      "Íåëüçÿ\x20ïåðåäàòü\x20ýòîò\x20ïðåäìåò\x2e",
+                                      "ÐÐµÐ»ÑŒÐ·Ñ\x20Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‚ÑŒ\x20ÑÑ‚Ð¾Ñ‚\x20Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚\x2e",
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -510,7 +510,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                      "Íåëüçÿ\x20ïåðåäàòü\x20ýòîò\x20ïðåäìåò\x2e",
+                                      "ÐÐµÐ»ÑŒÐ·Ñ\x20Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‚ÑŒ\x20ÑÑ‚Ð¾Ñ‚\x20Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚\x2e",
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -963,12 +963,12 @@ void swapManager::SplitMons(void) {
     if (m_selectedSide == m_targetSide) {
         sprintf(
             gText,
-              "Ñêîëüêî\x20âîèíîâ\x20ïåðåíåñòè\x3f"
+              "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾\x20Ð²Ð¾Ð¸Ð½Ð¾Ð²\x20Ð¿ÐµÑ€ÐµÐ½ÐµÑÑ‚Ð¸\x3f"
         );
     } else {
         sprintf(
             gText,
-              "Ñêîëüêî\x20\x25\x73\x20ïåðåíåñòè\x20èç\x20àðìèè\x20\x25\x73\x20â\x20àðìèþ\x20\x25\x73\x3f",
+              "Ð¡ÐºÐ¾Ð»ÑŒÐºÐ¾\x20\x25\x73\x20Ð¿ÐµÑ€ÐµÐ½ÐµÑÑ‚Ð¸\x20Ð¸Ð·\x20Ð°Ñ€Ð¼Ð¸Ð¸\x20\x25\x73\x20Ð²\x20Ð°Ñ€Ð¼Ð¸ÑŽ\x20\x25\x73\x3f",
             gArmyNamesPlural[(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[(m_selectedSide)]->m_name,
             m_heroes[(m_targetSide)]->m_name

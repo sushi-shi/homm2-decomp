@@ -496,8 +496,8 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
 
 i32 hero::Dismiss(void) {
     NormalDialog(
-        "Вы действительно хотите "
-        "уволить героя?"
+        "Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ "
+        "СѓРІРѕР»РёС‚СЊ РіРµСЂРѕСЏ?"
         ,
         NORMAL_DIALOG_CONFIRM,
         -1,
@@ -847,7 +847,7 @@ void hero::CheckLevel(void) {
             } else if (choices[1] == HERO_SKILL_NONE) {
                 sprintf(
                     text,
-                    "\n\nВаш герой изучил "
+                    "\n\nР’Р°С€ РіРµСЂРѕР№ РёР·СѓС‡РёР» "
                     "%s %s."  ,
                     gSecondarySkillLevels[(m_secondarySkills[(choices[0])])],
                     gSecondarySkills[(choices[0])]
@@ -870,8 +870,8 @@ void hero::CheckLevel(void) {
             } else {
                 sprintf(
                     text,
-                    "\n\nВы также можете "
-                    "выучить %s %s или %s %s."
+                    "\n\nР’С‹ С‚Р°РєР¶Рµ РјРѕР¶РµС‚Рµ "
+                    "РІС‹СѓС‡РёС‚СЊ %s %s РёР»Рё %s %s."
                      ,
                     gSecondarySkills[(choices[0])],
                     gSecondarySkillLevels[(m_secondarySkills[(choices[0])])],
@@ -1242,16 +1242,16 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_SPREAD:
                         if (quickView) {
                             NormalDialog(
-                                "{Широкие ряды}\n\nП"
-                                "ри таком боевом "
-                                "порядке ваше вой"
-                                "ско занимает поз"
-                                "иции по всей шир"
-                                "ине поля боя и ме"
-                                "жду соседними от"
-                                "рядами имеется х"
-                                "отя бы одна пуст"
-                                "ая клетка."
+                                "{РЁРёСЂРѕРєРёРµ СЂСЏРґС‹}\n\nРџ"
+                                "СЂРё С‚Р°РєРѕРј Р±РѕРµРІРѕРј "
+                                "РїРѕСЂСЏРґРєРµ РІР°С€Рµ РІРѕР№"
+                                "СЃРєРѕ Р·Р°РЅРёРјР°РµС‚ РїРѕР·"
+                                "РёС†РёРё РїРѕ РІСЃРµР№ С€РёСЂ"
+                                "РёРЅРµ РїРѕР»СЏ Р±РѕСЏ Рё РјРµ"
+                                "Р¶РґСѓ СЃРѕСЃРµРґРЅРёРјРё РѕС‚"
+                                "СЂСЏРґР°РјРё РёРјРµРµС‚СЃСЏ С…"
+                                "РѕС‚СЏ Р±С‹ РѕРґРЅР° РїСѓСЃС‚"
+                                "Р°СЏ РєР»РµС‚РєР°."
                                  ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
@@ -1276,14 +1276,14 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_GROUPED:
                         if (quickView) {
                             NormalDialog(
-                                "{Плотные ряды}\n\nП"
-                                "ри таком боевом "
-                                "порядке ряды ваш"
-                                "ей армии смыкают"
-                                "ся вокруг центра"
-                                "льного отряда на"
-                                " вашем краю поля "
-                                "боя."
+                                "{РџР»РѕС‚РЅС‹Рµ СЂСЏРґС‹}\n\nРџ"
+                                "СЂРё С‚Р°РєРѕРј Р±РѕРµРІРѕРј "
+                                "РїРѕСЂСЏРґРєРµ СЂСЏРґС‹ РІР°С€"
+                                "РµР№ Р°СЂРјРёРё СЃРјС‹РєР°СЋС‚"
+                                "СЃСЏ РІРѕРєСЂСѓРі С†РµРЅС‚СЂР°"
+                                "Р»СЊРЅРѕРіРѕ РѕС‚СЂСЏРґР° РЅР°"
+                                " РІР°С€РµРј РєСЂР°СЋ РїРѕР»СЏ "
+                                "Р±РѕСЏ."
                                  ,
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
@@ -1309,19 +1309,19 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_SPELL_POINTS_LAST:
                         sprintf(
                             gText,
-                            "{Очки магии}\n\n%s сейч"
-                            "ас располагает %d о"
-                            "чками магии из во"
-                            "зможных %d оч. Макси"
-                            "мально возможное "
-                            "число очков магии"
-                            " равно уровню зна"
-                            "ний помноженному "
-                            "на 10. Но иногда, в ос"
-                            "обых случаях, кол"
-                            "ичество очков маг"
-                            "ии может превышат"
-                            "ь обычный лимит."
+                            "{РћС‡РєРё РјР°РіРёРё}\n\n%s СЃРµР№С‡"
+                            "Р°СЃ СЂР°СЃРїРѕР»Р°РіР°РµС‚ %d Рѕ"
+                            "С‡РєР°РјРё РјР°РіРёРё РёР· РІРѕ"
+                            "Р·РјРѕР¶РЅС‹С… %d РѕС‡. РњР°РєСЃРё"
+                            "РјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅРѕРµ "
+                            "С‡РёСЃР»Рѕ РѕС‡РєРѕРІ РјР°РіРёРё"
+                            " СЂР°РІРЅРѕ СѓСЂРѕРІРЅСЋ Р·РЅР°"
+                            "РЅРёР№ РїРѕРјРЅРѕР¶РµРЅРЅРѕРјСѓ "
+                            "РЅР° 10. РќРѕ РёРЅРѕРіРґР°, РІ РѕСЃ"
+                            "РѕР±С‹С… СЃР»СѓС‡Р°СЏС…, РєРѕР»"
+                            "РёС‡РµСЃС‚РІРѕ РѕС‡РєРѕРІ РјР°Рі"
+                            "РёРё РјРѕР¶РµС‚ РїСЂРµРІС‹С€Р°С‚"
+                            "СЊ РѕР±С‹С‡РЅС‹Р№ Р»РёРјРёС‚."
                              ,
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
@@ -1348,9 +1348,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         nextExperience = gpHVHero->GetExperience(heroLevel + 1);
                         sprintf(
                             gText,
-                            "{%d уровень}\n\nТекущи"
-                            "й опыт: %d\nСледующи"
-                            "й уровень: %d"
+                            "{%d СѓСЂРѕРІРµРЅСЊ}\n\nРўРµРєСѓС‰Рё"
+                            "Р№ РѕРїС‹С‚: %d\nРЎР»РµРґСѓСЋС‰Рё"
+                            "Р№ СѓСЂРѕРІРµРЅСЊ: %d"
                              ,
                             heroLevel,
                             gpHVHero->m_experience,
@@ -1842,7 +1842,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "Сколько воинов перенести?");
+    sprintf(gText, "РЎРєРѕР»СЊРєРѕ РІРѕРёРЅРѕРІ РїРµСЂРµРЅРµСЃС‚Рё?");
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
@@ -2008,10 +2008,10 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
         skillText = gSecondarySkillLevels[(m_secondarySkills[(skill)]) - 1];
         sprintf(
             gText,
-            "{%s Некромантия (+%d)}\n\n%s "
-                "Некромантия (+%d) позволяет вернуть "
-                "%d процентов погибших в бою воинов в "
-                "вашу армию в виде скелетов."
+            "{%s РќРµРєСЂРѕРјР°РЅС‚РёСЏ (+%d)}\n\n%s "
+                "РќРµРєСЂРѕРјР°РЅС‚РёСЏ (+%d) РїРѕР·РІРѕР»СЏРµС‚ РІРµСЂРЅСѓС‚СЊ "
+                "%d РїСЂРѕС†РµРЅС‚РѕРІ РїРѕРіРёР±С€РёС… РІ Р±РѕСЋ РІРѕРёРЅРѕРІ РІ "
+                "РІР°С€Сѓ Р°СЂРјРёСЋ РІ РІРёРґРµ СЃРєРµР»РµС‚РѕРІ."
                  ,
             skillText,
             skillBonusValue,
@@ -2054,7 +2054,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
-                "Три артефакта Андурана чудесным способом объединились в один артефакт.",
+                "РўСЂРё Р°СЂС‚РµС„Р°РєС‚Р° РђРЅРґСѓСЂР°РЅР° С‡СѓРґРµСЃРЅС‹Рј СЃРїРѕСЃРѕР±РѕРј РѕР±СЉРµРґРёРЅРёР»РёСЃСЊ РІ РѕРґРёРЅ Р°СЂС‚РµС„Р°РєС‚.",
                 NORMAL_DIALOG_INFO,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
