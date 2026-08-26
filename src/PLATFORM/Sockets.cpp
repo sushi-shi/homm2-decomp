@@ -89,7 +89,7 @@ bool BindSocket(Socket socket, u16 port) {
 bool SetSocketNonBlocking(Socket socket, bool nonBlocking) {
 #ifdef _WIN32
     u_long mode = nonBlocking ? 1 : 0;
-    return ::ioctlsocket(Native(socket), FIONBIO, &mode) == 0;
+    return ::ioctlsocket(Native(socket), static_cast<long>(FIONBIO), &mode) == 0;
 #else
     int flags = ::fcntl(Native(socket), F_GETFL, 0);
     if (flags < 0) {
@@ -101,6 +101,10 @@ bool SetSocketNonBlocking(Socket socket, bool nonBlocking) {
 }
 
 i32 SendTo(Socket socket, const void* data, i32 size, const Address& destination) {
+    if (size < 0 || (size > 0 && data == nullptr)) {
+        return -1;
+    }
+
     sockaddr_in address;
     std::memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
@@ -109,7 +113,11 @@ i32 SendTo(Socket socket, const void* data, i32 size, const Address& destination
     return static_cast<i32>(::sendto(
         Native(socket),
         static_cast<const char*>(data),
+#ifdef _WIN32
+        static_cast<int>(size),
+#else
         static_cast<std::size_t>(size),
+#endif
         0,
         reinterpret_cast<sockaddr*>(&address),
         sizeof(address)
@@ -117,6 +125,10 @@ i32 SendTo(Socket socket, const void* data, i32 size, const Address& destination
 }
 
 i32 ReceiveFrom(Socket socket, void* data, i32 size, Address* source) {
+    if (size < 0 || (size > 0 && data == nullptr)) {
+        return -1;
+    }
+
     sockaddr_in address;
     std::memset(&address, 0, sizeof(address));
 #ifdef _WIN32
@@ -127,7 +139,11 @@ i32 ReceiveFrom(Socket socket, void* data, i32 size, Address* source) {
     const i32 received = static_cast<i32>(::recvfrom(
         Native(socket),
         static_cast<char*>(data),
+#ifdef _WIN32
+        static_cast<int>(size),
+#else
         static_cast<std::size_t>(size),
+#endif
         0,
         reinterpret_cast<sockaddr*>(&address),
         &length

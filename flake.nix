@@ -115,6 +115,7 @@
         cmakeFlags = [
           "-DHOMM2_32BIT=OFF"
           "-DHOMM2_PLATFORM=SDL3"
+          "-DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON"
           "-DCMAKE_BUILD_TYPE=Release"
           "-DCMAKE_EXE_LINKER_FLAGS=-static"
         ];
@@ -137,6 +138,7 @@
         buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
         cmakeFlags = [
           "-DHOMM2_PLATFORM=SDL3"
+          "-DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON"
           "-DCMAKE_BUILD_TYPE=${if debug then "Debug" else "RelWithDebInfo"}"
         ];
         dontStrip = true;
@@ -253,7 +255,8 @@
             -DCMAKE_BUILD_TYPE=Release \
             -DSDL3_DIR=${sdl3-web}/lib/cmake/SDL3 \
             -DHOMM2_FFMPEG_ROOT=${ffmpeg-web} \
-            -DHOMM2_PLATFORM=SDL3
+            -DHOMM2_PLATFORM=SDL3 \
+            -DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON
           runHook postConfigure
         '';
         buildPhase = ''
@@ -283,7 +286,8 @@
         runtimeInputs = [ pkgs.coreutils pkgs.emscripten ];
         text = ''
           data="''${HOMM2_DATA:-}"
-          if [ -z "$data" ] || [ ! -e "$data/DATA/HEROES2.AGG" ]; then
+          if [ -z "$data" ] \
+            || { [ ! -e "$data/DATA/HEROES2.AGG" ] && [ ! -e "$data/DATA/heroes2.agg" ]; }; then
             echo "homm2-web: set HOMM2_DATA to the installed game directory" >&2
             exit 1
           fi

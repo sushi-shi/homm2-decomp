@@ -22,7 +22,6 @@ public:
 
     virtual void Yield() = 0;
 
-    virtual bool ShouldQuit() const = 0;
     virtual void RequestQuit() = 0;
 
     virtual void Log(LogLevel level, const char* message) = 0;

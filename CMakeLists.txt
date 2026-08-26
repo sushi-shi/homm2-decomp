@@ -4,6 +4,7 @@ project(homm2 C CXX)
 include(CTest)
 
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
+option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 
@@ -76,6 +77,14 @@ add_library(homm2_lua STATIC ${HOMM2_LUA_SOURCES})
 add_library(homm2_tinyxml2 STATIC
   ${CMAKE_SOURCE_DIR}/vendor/tinyxml2-7.1.0/tinyxml2.cpp)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(homm2_platform PRIVATE
+    -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow)
+  if(HOMM2_PLATFORM_WARNINGS_AS_ERRORS)
+    target_compile_options(homm2_platform PRIVATE -Werror)
+  endif()
+endif()
+
 if(HOMM2_PLATFORM STREQUAL "SDL3")
   # A statically linked SDL3 drags in system libraries of its own. That list
   # lives in its package config, which pkg-config does not carry.
@@ -89,7 +98,7 @@ if(HOMM2_PLATFORM STREQUAL "SDL3")
   endif()
 
   if(HOMM2_FFMPEG_ROOT)
-    target_include_directories(homm2_platform PUBLIC ${HOMM2_FFMPEG_ROOT}/include)
+    target_include_directories(homm2_platform SYSTEM PUBLIC ${HOMM2_FFMPEG_ROOT}/include)
     foreach(library avformat avcodec swresample avutil)
       list(APPEND HOMM2_FFMPEG_LIBRARIES
         ${HOMM2_FFMPEG_ROOT}/lib/lib${library}.a)
@@ -280,6 +289,22 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
   add_test(NAME filesystem COMMAND homm2_filesystem_test)
+  add_executable(homm2_platform_primitives_test tools/platform_primitives_test.cpp)
+  target_include_directories(homm2_platform_primitives_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  target_link_libraries(homm2_platform_primitives_test PRIVATE homm2_platform)
+  add_test(NAME platform_primitives COMMAND homm2_platform_primitives_test)
+  add_executable(homm2_platform_backend_test tools/platform_backend_test.cpp)
+  target_include_directories(homm2_platform_backend_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_platform_backend_test PRIVATE homm2_platform)
+  add_test(NAME platform_backend COMMAND homm2_platform_backend_test)
+  add_executable(homm2_platform_atexit_test tools/platform_atexit_test.cpp)
+  target_include_directories(homm2_platform_atexit_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_platform_atexit_test PRIVATE homm2_platform)
+  add_test(NAME platform_atexit COMMAND homm2_platform_atexit_test)
   add_executable(homm2_palette_bank_test tools/palette_bank_test.cpp)
   target_include_directories(homm2_palette_bank_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
