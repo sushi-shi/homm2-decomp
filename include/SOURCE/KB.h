@@ -591,7 +591,7 @@ extern b32 gbDrawSavedCursor;
 extern b32 gbForegroundApp;
 extern b32 gbFunctionComplete;
 extern b32 gbGameInitialized;
-extern b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+extern i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
 extern b32 gbHeroMoving;
 extern b32 gbHumanPlayer[];
 extern b32 gbLoadingMonoIcon;

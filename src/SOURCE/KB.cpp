@@ -6888,7 +6888,7 @@ DATA(0x004face8) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
 DATA(0x004fad14) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
 DATA(0x0052662c) b32 gbDrawSavedCursor = false;
-DATA(0x004fad30) b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fad30) i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     {8, 0, 0, 0, 8, 16, 16, 16},
     {17, 9, 1, 1, 1, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -11442,7 +11442,7 @@ DATA(0x0052614c) b32 gbMoveShown;
 DATA(0x0052612c) void** ppMapExtra;
 DATA(0x0052639c) char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 DATA(0x005258cc) i32 giThisNetPos;
-DATA(0x005258dc) b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+DATA(0x005258dc) i8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
 DATA(0x00526418) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00525a54) class heroWindow* heroWin;
 DATA(0x00526158) i32 giOverviewReturnActionExtra;
@@ -11485,4 +11485,4 @@ DATA(0x005258c0) b32 gbWaitForRemoteReceive;
 DATA(0x00525a14) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 DATA(0x00526168) townManager* gpTownManager;
 DATA(0x00524df8) advManager* gpAdvManager;
-DATA(0x00526144) b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+DATA(0x00526144) i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

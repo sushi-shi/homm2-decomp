@@ -359,7 +359,7 @@ extern float gfSpellCastNumMod[KB_SPELL_MOD_COUNT];
 extern float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT];
 extern float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT];
 extern float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT];
-extern b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
+extern i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
 H2_ENUM_CLASS_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE        = 0,
@@ -603,7 +603,7 @@ extern i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbMoveShown;
 extern char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
-extern b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+extern i8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
 extern char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern class heroWindow* heroWin;
 extern i32 giOverviewReturnActionExtra;
