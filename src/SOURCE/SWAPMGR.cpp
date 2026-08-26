@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <stdio.h>
@@ -806,13 +807,6 @@ void swapManager::SwapArtifacts(void) {
 }
 
 void swapManager::SwapMons(void) {
-    i32 selectedArmyCount = 0;
-    for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
-        if (m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
-            && m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
-            ++selectedArmyCount;
-    }
-
     armyGroup* selectedArmy_1 = &m_heroes[H2EnumIndex(m_selectedSide)]->m_army;
     armyGroup* targetArmy_6 = &m_heroes[H2EnumIndex(m_targetSide)]->m_army;
     if (targetArmy_6->m_creatureTypes[m_targetSlot]
@@ -945,20 +939,15 @@ void swapManager::Update(void) {
 }
 
 void swapManager::SplitMons(void) {
-    i16 textControl;
+
     armyGroup* targetTroops;
     armyGroup* selectedArmy;
     i32 openSlot;
-    i16 unusedAmountControl;
-    tag_message message;
-    i32 dlgState;
 
-    unusedAmountControl = SPLIT_AMOUNT_CONTROL;
-    dlgState = 0;
+    tag_message message;
+
     selectedArmy = &m_heroes[H2EnumIndex(m_selectedSide)]->m_army;
     targetTroops = &m_heroes[H2EnumIndex(m_targetSide)]->m_army;
-    dlgState = 0;
-    textControl = SPLIT_TEXT_CONTROL;
 
     gpTownManager->m_heroWindow1 =
         new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
@@ -969,8 +958,8 @@ void swapManager::SplitMons(void) {
 
     message.type = MESSAGE_WIDGET;
     if (m_selectedSide == m_targetSide) {
-        sprintf(
-            gText,
+        utf8::Copy(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
               localization::Tr("hero.army.split.prompt")
         );
     } else {

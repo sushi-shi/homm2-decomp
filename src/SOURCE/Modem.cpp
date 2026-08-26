@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/Misc.h>
@@ -43,7 +44,7 @@ void ModemSetup(i32 mode) {
     if (gbDirectConnect == 0) {
         for (resetAttempt9 = 0; resetAttempt9 < RESET_ATTEMPT_COUNT; ++resetAttempt9) {
             if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
-                sprintf(command, gConfig.modemInitString);
+                utf8::Copy(command, sizeof(command), gConfig.modemInitString);
             else
                 sprintf(command, "ATZ");
             PollSound();
@@ -80,7 +81,6 @@ void ModemSetup(i32 mode) {
         strcpy(
             directConnectMessage3,
             localization::Tr("network.modem.direct_wait")
-
 
         );
         NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -221,7 +221,7 @@ void write_byte(i32 value) {
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 seed = platform::Ticks();
-    i32 packetResult;
+
     seed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", seed);
     oldsec = -1;

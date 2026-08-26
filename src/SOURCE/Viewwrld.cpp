@@ -112,7 +112,7 @@ typedef enum ViewWorldGroundFrame {
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     heroWindow* window;
     i8 palette[WORLD_PALETTE_SIZE];
-    char* iconNames[LEGEND_COUNT];
+    const char* iconNames[LEGEND_COUNT];
     tag_message legendMessage;
 
     memcpy(palette, gpBufferPalette->m_data, WORLD_PALETTE_SIZE);
@@ -245,12 +245,12 @@ void advManager::VWCompleteDraw(void) {
     u8* endPixel0;
     u8 drawTilesets0[WORLD_TILESET_COUNT];
     u8* pix0;
-    i32 spare;
+
     i32 cellX;
     i32 heroHere0;
     mapCellExtra* extraCell;
     i32 cellY;
-    i32 dead;
+
     u32 frame0;
     i32 drawY1;
     i32 screenX;
@@ -654,7 +654,7 @@ void advManager::VWCompleteDraw(void) {
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_MINES)) {
                 color0 = gpGame->m_mineOwners[cell->m_objectMetadata];
-                frame0 = color0 < 0 ? WORLD_NO_OWNER_COLOR
+                frame0 = color0 < 0 ? H2EnumIndex(WORLD_NO_OWNER_COLOR)
                                                   : gpGame->m_players[color0].m_color;
                 IconToBitmap(
                     pVWMisc,

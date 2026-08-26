@@ -24,7 +24,19 @@ public:
         i16 width,
         i16 height,
         char* text,
-        char* fontName,
+        const char* fontName,
+        FontDrawMode color,
+        i16 id,
+        WidgetKind kind,
+        FontAlignment alignment
+    );
+    textWidget(
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        const char* text,
+        const char* fontName,
         FontDrawMode color,
         i16 id,
         WidgetKind kind,
@@ -35,7 +47,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
     void SetColorIndex(FontDrawMode color);
-    void SetText(char* text);
+    void SetText(const char* text);
 };
 #pragma pack(pop)
 #endif

@@ -69,7 +69,7 @@ enum BuildingCode {
 
 extern i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL];
 
-char* GetDwellingName(i32 faction, i32 dwellingIndex);
+const char* GetDwellingName(i32 faction, i32 dwellingIndex);
 void InitializeTownConstants();
 
 } // namespace ironfist

@@ -34,7 +34,7 @@ public:
         i16 y,
         i16 width,
         i16 height,
-        char* iconName,
+        const char* iconName,
         i16 frame,
         IconDrawOrientation orientation,
         i16 id,

@@ -150,7 +150,7 @@ void dropListWidget::DeleteItem(i32 index) {
 }
 
 MessageDispatchResult dropListWidget::Main(tag_message& message) {
-    char* text;
+    const char* text;
     char** newItems;
 
     if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED)))) {
@@ -402,7 +402,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_visibleItemCount = m_scrollRange > 0 ? m_maxVisibleItems
                                            : (m_itemCount > MIN_VISIBLE_ITEM_COUNT
                                                   ? m_itemCount
-                                                  : MIN_VISIBLE_ITEM_COUNT);
+                                                  : static_cast<i16>(MIN_VISIBLE_ITEM_COUNT));
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
     m_firstRowHeight = entry->h;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_middleRowFrame;

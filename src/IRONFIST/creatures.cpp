@@ -19,6 +19,10 @@ std::vector<CreatureType> RandomizableCreatures;
 static i32 CreatureCount;
 i32 CreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
 i32 CreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY][SECONDARY_RESOURCE_COUNT];
+static char* cMonFilenameOwned[KB_CREATURE_TABLE_CAPACITY];
+static char* cArmyFrameFileNamesOwned[KB_CREATURE_TABLE_CAPACITY];
+static char* gArmyNamesOwned[KB_CREATURE_TABLE_CAPACITY];
+static char* gArmyNamesPluralOwned[KB_CREATURE_TABLE_CAPACITY];
 static char* cArmyProjectileFileNames[KB_CREATURE_TABLE_CAPACITY];
 static bool creatureStringsOwned = false;
 
@@ -95,11 +99,11 @@ bool HasCreatureAttribute(CreatureType creature, CreatureAttribute attribute) {
     return creatureAttributeTable[H2EnumIndex(attribute)][id];
 }
 
-char* GetCreatureName(i32 id) {
+const char* GetCreatureName(i32 id) {
     return gArmyNames[id];
 }
 
-char* GetCreaturePluralName(i32 id) {
+const char* GetCreaturePluralName(i32 id) {
     return gArmyNamesPlural[id];
 }
 
@@ -142,12 +146,17 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             continue;
         }
 
-        QueryAttributeCopy(crElem, "icn", &cMonFilename[id]);
-        QueryAttributeCopy(crElem, "frm", &cArmyFrameFileNames[id]);
-        QueryAttributeCopy(crElem, "name-singular", &gArmyNames[id]);
-        QueryAttributeCopy(crElem, "name-plural", &gArmyNamesPlural[id]);
-        LocalizeCreatureName(id, "gArmyNames", &gArmyNames[id]);
-        LocalizeCreatureName(id, "gArmyNamesPlural", &gArmyNamesPlural[id]);
+        cMonFilename[id] = QueryAttributeCopy(crElem, "icn", &cMonFilenameOwned[id]);
+        cArmyFrameFileNames[id] =
+            QueryAttributeCopy(crElem, "frm", &cArmyFrameFileNamesOwned[id]);
+        gArmyNames[id] =
+            QueryAttributeCopy(crElem, "name-singular", &gArmyNamesOwned[id]);
+        gArmyNamesPlural[id] =
+            QueryAttributeCopy(crElem, "name-plural", &gArmyNamesPluralOwned[id]);
+        LocalizeCreatureName(id, "gArmyNames", &gArmyNamesOwned[id]);
+        LocalizeCreatureName(id, "gArmyNamesPlural", &gArmyNamesPluralOwned[id]);
+        gArmyNames[id] = gArmyNamesOwned[id];
+        gArmyNamesPlural[id] = gArmyNamesPluralOwned[id];
         QueryAttributeCopy(crElem, "projectile", &cArmyProjectileFileNames[id]);
 
         i32 minDamage = 0;
@@ -318,12 +327,16 @@ void UnloadCreatures() {
     }
 
     for (i32 i = 0; i < KB_CREATURE_TABLE_CAPACITY; i++) {
-        std::free(cMonFilename[i]);
-        std::free(cArmyFrameFileNames[i]);
-        std::free(gArmyNames[i]);
-        std::free(gArmyNamesPlural[i]);
+        std::free(cMonFilenameOwned[i]);
+        std::free(cArmyFrameFileNamesOwned[i]);
+        std::free(gArmyNamesOwned[i]);
+        std::free(gArmyNamesPluralOwned[i]);
         std::free(cArmyProjectileFileNames[i]);
 
+        cMonFilenameOwned[i] = NULL;
+        cArmyFrameFileNamesOwned[i] = NULL;
+        gArmyNamesOwned[i] = NULL;
+        gArmyNamesPluralOwned[i] = NULL;
         cMonFilename[i] = NULL;
         cArmyFrameFileNames[i] = NULL;
         gArmyNames[i] = NULL;

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -574,7 +575,7 @@ i32 combatManager::FindResurrectArmyIndex(
 
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
-    i32 unused;
+
     i32 destHex;
     if (!ValidHex(hex))
         return 0;
@@ -772,8 +773,6 @@ void combatManager::CastSpell(
     army* teleportArmy6;
     icon* missileIcon6;
     float missileAngles[SPELL_MISSILE_ANGLE_COUNT];
-    i32 unusedCastA8;
-    i32 unusedCastB1;
 
     if (castByCreature == 0 && H2EnumIndex(spell) < H2EnumIndex(SPELL_COUNT)
         && m_eagleEyeSpell[H2EnumIndex(OppositeCombatSide(m_currentSide))] == SPELL_NONE
@@ -1296,7 +1295,10 @@ void combatManager::CastSpell(
             break;
         case SPELL_MARKSMAN_PIERCE: {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_PIERCE_DELAY)
+                static_cast<i32l>(
+                    gfCombatSpeedMod[gConfig.combatSpeed]
+                    * static_cast<float>(SPELL_PIERCE_DELAY)
+                )
             );
             i32l pierceDamage = SPELL_PIERCE_DAMAGE;
             // The keep's walls blunt the round.
@@ -1968,9 +1970,9 @@ void combatManager::ImplosionGrenade(i32 hexIndex) {
             i32 startX = m_hexCells[initialHex].m_x;
             i32 startY = m_hexCells[initialHex].m_y;
             float stepX = static_cast<float>(m_hexCells[creature->m_hex].m_x - startX)
-                          / SPELL_IMPLOSION_DRAG_FRAMES;
+                          / static_cast<float>(SPELL_IMPLOSION_DRAG_FRAMES);
             float stepY = static_cast<float>(m_hexCells[creature->m_hex].m_y - startY)
-                          / SPELL_IMPLOSION_DRAG_FRAMES;
+                          / static_cast<float>(SPELL_IMPLOSION_DRAG_FRAMES);
             creature->DrawToBuffer(
                 static_cast<i32>(startX + stepX * frame),
                 static_cast<i32>(startY + stepY * frame),
@@ -2601,8 +2603,6 @@ void combatManager::BloodLustEffect(army* target, MonsterFlags effect) {
 }
 
 void combatManager::Ripple(i32 strength) {
-    i32 unusedRippleWord1;
-    i32 unusedRippleWord2;
 
     memcpy(
         m_backgroundBuffer->m_pixels,
@@ -2634,7 +2634,7 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
 void combatManager::ResetBoltAngle(SBolt* bolt) {
     i32 angleX7;
     float averageAngle0;
-    i32 unusedBoltAngleWord8;
+
     i32 width6;
     i32 angleY9;
     i32 distance2;
@@ -2696,10 +2696,9 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
 }
 
 void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
-    i32 widthRollResult;
+
     i32 distance15;
-    i32 unusedBoltWord4;
-    i32 unusedDrawWord1;
+
     i32 beamOffset0;
     i32 drawX6;
     i32 drawStep;
@@ -2715,7 +2714,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     previousY = static_cast<i32>(bolt->currentY);
     widthFirst = bolt->widthFirst;
     widthLast5 = bolt->widthLast;
-    widthRollResult = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
+    Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
     for (drawStep = 0; drawStep < stepCount; ++drawStep) {
         bolt->currentX = bolt->currentX + sin(static_cast<double>(bolt->baseAngle));
         bolt->currentY = bolt->currentY + cos(static_cast<double>(bolt->baseAngle));
@@ -2912,7 +2911,7 @@ void combatManager::DoBolt(
     i32 minAngle,
     i32 maxAngle,
     i32 angleDistance,
-    i32 unusedParameter,
+    i32,
     i32 forceAngle,
     i32 frameDelay,
     i32 brightenPalette
@@ -3196,7 +3195,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 damage;
     army* target1;
     i32 deltaY5;
-    i32 unusedChainWord64;
+
     i32 deltaX3;
     i32 targetY;
     i32 startY1;
@@ -3207,10 +3206,10 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 nextTarget10;
     i32 strike18;
     i32 forceAngle4;
-    i32 unusedChainWord5;
+
     i32 targetDamage9;
     i32 deadline4;
-    i32 unusedChainWord8;
+
     i32 branchDistance6;
 
     firstBolt2 = 1;
@@ -3299,9 +3298,9 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
     i32 rowCount;
     army* target_d;
     i32 topOffset5;
-    i32 unusedVaporizeWord;
+
     i32 bottomOffset;
-    i32 height;
+
     i32 phase;
 
     target_d = &m_armies[H2EnumIndex(side)][armyIndex];
@@ -3310,7 +3309,7 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
-    height = giMaxExtentY - giMinExtentY + 1;
+
     target_d->m_palette = gyModify;
     target_d->m_showQuantity = 0;
 
@@ -3357,7 +3356,7 @@ void combatManager::RippleCreature(
     float amplitudeStep7;
     float amplitude5;
     i32 frameDelay_e;
-    i32 height;
+
     i32 phase;
     float amplitudeBase6;
     i32 row_i;
@@ -3400,7 +3399,6 @@ void combatManager::RippleCreature(
     else
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
-    height = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT));
     wave = static_cast<float*>(H2_ALLOC(sizeof(float) * SPELL_MODIFIER_ROW_COUNT));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
@@ -3487,7 +3485,7 @@ void combatManager::ShowMassSpell(
     CombatEffectType effect,
     i32 animateCreatures
 ) {
-    i32 unusedMassSpellWord2;
+
     CombatSide side8;
     army* target0;
     i32 returnFrames4;
@@ -4130,14 +4128,14 @@ void combatManager::DoBlast(i32 targetHex, SpellType spell) {
 void combatManager::Resurrect(SpellType spell, i32 targetHex, i32 spellPower) {
     army* target;
     i32 otherHex;
-    i32 unusedResurrectWord9;
+
     i32 deadHex_j;
-    i32 unusedResurrectWord6;
+
     i32 index_o;
     i32 effectY;
     i32 effectX;
     i32 deadIndex;
-    i32 unusedResurrectWord2;
+
     i32 oldQuantity_o;
     i32 keepSearching_d;
     i32 armyIndex;
@@ -4380,8 +4378,6 @@ void combatManager::Earthquake(void) {
         {-2, -3},
         {0, 0}
     };
-    i32 unusedQuakeA10;
-    i32 unusedQuakeB15;
 
     gpMouseManager->HideColorPointer();
     memcpy(
@@ -4548,9 +4544,8 @@ void combatManager::ShowSpellMessage(
 ) {
     char targetName[TARGET_NAME_CAPACITY];
     char message[MESSAGE_CAPACITY];
-    i32 unhandledSpell5;
     if (target != NULL)
-        sprintf(targetName, gArmyNamesPlural[H2EnumIndex(target->m_monsterType)]);
+        utf8::Copy(targetName, sizeof(targetName), gArmyNamesPlural[H2EnumIndex(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
             sprintf(message, localization::Tr("combat.ability.cyclops_paralyze"), targetName);
@@ -4564,10 +4559,6 @@ void combatManager::ShowSpellMessage(
             sprintf(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
         else if (spell == SPELL_SHADOW_MARK)
             sprintf(message, localization::Tr("combat.ability.shadow_mark"), targetName);
-        else {
-            unhandledSpell5 = 0;
-            ++unhandledSpell5;
-        }
     } else {
         if (target != NULL) {
             if (m_heroes[H2EnumIndex(m_currentSide)]->m_isCaptain != 0)

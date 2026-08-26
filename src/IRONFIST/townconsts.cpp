@@ -295,13 +295,13 @@ static const char* townPrefixNames[KB_FACTION_TABLE_CAPACITY] = {
 // The Cybernetics Lab holds fewer spells per level than a mage guild.
 i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL] = {2, 2, 1, 1, 1};
 
-char* GetDwellingName(i32 faction, i32 dwellingIndex) {
+const char* GetDwellingName(i32 faction, i32 dwellingIndex) {
     if (faction >= 0 && faction < KB_FACTION_TABLE_CAPACITY
         && dwellingIndex >= 0 && dwellingIndex < KB_DWELLING_TYPE_COUNT
         && gDwellingNames[faction][dwellingIndex] != NULL) {
         return gDwellingNames[faction][dwellingIndex];
     }
-    return const_cast<char*>("INVALID DWELLING");
+    return "INVALID DWELLING";
 }
 
 static char* GetFirstLevelGrowerName(i32 faction) {

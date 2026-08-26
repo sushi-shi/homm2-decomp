@@ -209,7 +209,6 @@ static void ApplyAstralDodgeWince(army* target) {
     }
 }
 
-
 void FormatCombatDamage(
     char* output,
     const char* attackerName,
@@ -280,7 +279,7 @@ army::army(void) {
     m_xOffset = 0;
 }
 
-void army::WaitSample(ArmySampleType sampleIndex) {
+void army::WaitSample(ArmySampleType) {
     return;
 }
 
@@ -476,7 +475,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 idle;
     i32 yoff;
     i32 xoff;
-    i32 flags;
+
     i32 numFrames;
     i32 quantX;
     i32 spellX;
@@ -500,7 +499,6 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         return;
     }
 
-    flags = 0;
     color = 0;
     if (m_animationSequence == ARMY_ANIMATION_STAND
         || (m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
@@ -745,7 +743,7 @@ void army::Wince(void) {
 void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing) {
     i32 frame;
     i32 newHex;
-    i32 saveHex;
+
     i32 destHex;
     i32 tempTop;
     i32 tempLeft;
@@ -834,7 +832,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
         || direction == COMBAT_DIRECTION_SOUTHWEST) {
         m_drawState = ARMY_DRAW_IN_FRONT;
     }
-    saveHex = m_hex;
+
     m_animationFrame = 0;
     m_animationSequence = ARMY_ANIMATION_WALK;
     if (!gbNoShowCombat) {
@@ -1017,7 +1015,7 @@ void army::SpecialAttack(void) {
     i32 animSlot;
     i32 landX;
     i32 bgPosX;
-    char hisRow;
+
     i32 spacing;
     i32 landY;
     i32 shotDelay;
@@ -1050,7 +1048,7 @@ void army::SpecialAttack(void) {
     m_palette = NULL;
     pEnemy = m_targetIndex + gpCombatManager->m_armies[H2EnumIndex(m_targetSide)];
     hisCol = pEnemy->m_hex % ARMY_HEX_COLUMNS;
-    hisRow = pEnemy->m_hex / ARMY_HEX_COLUMNS;
+
     originalColumn = m_hex % ARMY_HEX_COLUMNS;
     originalRow = m_hex / ARMY_HEX_COLUMNS;
     wasFacing = m_facing;
@@ -1104,7 +1102,6 @@ void army::SpecialAttack(void) {
             fullYLen > 0 ? -VERTICAL_ANGLE : VERTICAL_ANGLE
         );
     } else {
-
 
         incline = static_cast<float>(-fullYLen)
                 / (static_cast<float>(fullXLen));
@@ -1695,8 +1692,9 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
     gChargePathDamage = false;
 
     if (totalDamage > 0) {
-        char* attackerName = m_quantity > 1 ? ironfist::GetCreaturePluralName(H2EnumIndex(m_monsterType))
-                                            : ironfist::GetCreatureName(H2EnumIndex(m_monsterType));
+        const char* attackerName =
+            m_quantity > 1 ? ironfist::GetCreaturePluralName(H2EnumIndex(m_monsterType))
+                           : ironfist::GetCreatureName(H2EnumIndex(m_monsterType));
         if (totalKilled > 0) {
             sprintf(
                 gText,
@@ -1743,7 +1741,6 @@ void army::DoAttack(i32 retaliation) {
     ArmyFacing desiredFacing;
     i32 effectStopsRetaliation_4;
     ArmyFacing originalFacing_6;
-    CombatSide occupantSide_5;
     char combatText[ARMY_COMBAT_TEXT_SIZE];
     i32 damage;
     i32 targetHex_3;
@@ -3070,7 +3067,7 @@ void army::SpellEffect(
     IconEntry* entry;
     i32 smallestY;
     i32 frameDelay;
-    i32 unusedWord;
+
     i32 frame;
     i32 i;
     u32l effectFileId;
@@ -3343,7 +3340,7 @@ void army::DecrementSpellRounds(void) {
 void army::GoBerserk(void) {
     i32 masks_28[H2EnumIndex(COMBAT_SIDE_COUNT)];
     i32 attackMask_29;
-    i32 unusedMask_16;
+
     i32 targetFound_8;
     i32 savedQuantity_8;
     CombatHexDirection direction_4;
@@ -3357,7 +3354,7 @@ void army::GoBerserk(void) {
 
     targetFound_8 = 0;
     direction_4 = COMBAT_DIRECTION_NORTHEAST;
-    unusedMask_16 = 0;
+
     savedQuantity_8 = m_quantity;
     m_quantity = 0;
     masks_28[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = gpCombatManager->GetAllMask(COMBAT_ATTACKER_SIDE);

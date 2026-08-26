@@ -275,7 +275,7 @@ void combatManager::SetupCombat(
         m_battlefieldCell = NULL;
 
     m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
-    sprintf(m_battlefieldBackgroundName, GetBackgroundName());
+    utf8::Copy(m_battlefieldBackgroundName, sizeof(m_battlefieldBackgroundName), GetBackgroundName());
 
     if (attackerHero != NULL) {
         m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = attackerHero->m_owner;
@@ -657,7 +657,7 @@ void combatManager::Close(void) {
 
 void combatManager::UpdateArmyGroup(CombatSide side) {
     i32 index;
-    i32 pos;
+
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         m_armyGroups[H2EnumIndex(side)]->m_creatureTypes[index] = CREATURE_NONE;
         m_armyGroups[H2EnumIndex(side)]->m_creatureCounts[index] = 0;
@@ -685,11 +685,9 @@ void combatManager::UpdateArmyGroup(CombatSide side) {
 }
 
 void combatManager::GenerateMap(void) {
-    i32 gridX4;
-    i32 randomOffset;
+
     i32 x;
     u32 y;
-    i32 coordinateY;
 
     m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = m_inCastleCombat == 1 ? 0 : -1;
 
@@ -722,10 +720,10 @@ void combatManager::GenerateMap(void) {
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_deadOccupantCount = 0;
         }
     }
-    randomOffset = SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
+    SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
 }
 
-char* combatManager::GetBackgroundName(void) {
+const char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
     m_battlefieldFringe = FRINGE_NONE;
@@ -912,7 +910,7 @@ void combatManager::LoadIcons(void) {
                 gText,
                 "herofl%02d.icn",
                 m_playerId[index] == -1
-                    ? COMBAT_NEUTRAL_HERO_COLOR
+                    ? H2EnumIndex(COMBAT_NEUTRAL_HERO_COLOR)
                     : gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color
             );
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
@@ -1171,7 +1169,6 @@ i32 combatManager::GetNextArmy(i32 checkMorale) {
     i32 stackCounter;
     army* curArmy;
     CombatSide stackSide;
-    i32 i;
 
 restart:
     hasPending = 0;
@@ -1548,7 +1545,7 @@ void combatManager::CatAttack(CombatSide side) {
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
     icon* cloud =
-        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? "smalclod.icn" : "lichclod.icn"));
+        gpResourceManager->GetIcon(missShot19 ? "smalclod.icn" : "lichclod.icn");
 
     for (frame = 0; frame < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame++) {
         if (frame >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT
@@ -1709,7 +1706,7 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    i32 unknownTowerData1[KEEP_TOWER_SCRATCH_COUNT];
+
     i32 sourceX8 = towerOrigins7[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].x;
     i32 sourceY8 = towerOrigins7[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].y;
     i32 targetX6 = target9->MidX();
@@ -2171,7 +2168,9 @@ void combatManager::ArcShot(icon* projectile, i32 fromX, i32 fromY, i32 targX, i
         );
         gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
         glTimers[0] = static_cast<i32>(
-            platform::Ticks() + COMBAT_ARC_FRAME_DURATION * gfCombatSpeedMod[gConfig.combatSpeed]
+            platform::Ticks()
+            + static_cast<float>(COMBAT_ARC_FRAME_DURATION)
+                * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         DelayTil(glTimers);
     }
@@ -2347,7 +2346,7 @@ void combatManager::ShootMissile(
 }
 
 void combatManager::CombatSystemOptions(void) {
-    tag_message message;
+
     bCPrefsChanged = 0;
     CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)
@@ -2518,7 +2517,6 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
-
 
 i32 bInHighMoraleBonus = 0;
 i32 giSeed = 1;

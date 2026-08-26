@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract stable catalog entries from legacy char* table initializers.
+"""Extract stable catalog entries from legacy text table initializers.
 
 The English C++ initializer remains authoritative. ``template`` is used by
 CMake; ``import`` is a maintainer command which pairs it with a historical
@@ -144,7 +144,7 @@ def without_comments(text):
 
 STRING = re.compile(r'(?:u8|u|U|L)?"(?:\\.|[^"\\])*"', re.S)
 DECLARATION = re.compile(
-    r"^(?:DATA(?:_COMPGEN)?\([^\n]*\)\s*)?char\s*\*\s*"
+    r"^(?:DATA(?:_COMPGEN)?\([^\n]*\)\s*)?(?:const\s+)?char\s*\*\s*"
     r"([A-Za-z_]\w*)\s*\[[^;=]*=",
     re.M,
 )

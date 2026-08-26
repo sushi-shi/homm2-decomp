@@ -32,7 +32,7 @@ class IronfistHookContractTest(unittest.TestCase):
         runtime = function_body("src/IRONFIST/runtime.cpp", "void BeginMap(const char* filename)")
         assert_order(self, runtime, "ResetAdventureState();", "script::InitializeMap(mapName);")
 
-        game = function_body("src/SOURCE/GAME.cpp", "void game::NewMap(char* filename)")
+        game = function_body("src/SOURCE/GAME.cpp", "void game::NewMap(const char* filename)")
         assert_order(
             self,
             game,

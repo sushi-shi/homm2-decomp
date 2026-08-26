@@ -644,7 +644,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_SPELL:
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
-                    sprintf(gText, localization::Tr("campaign.bonus.spell.summon_earth"));
+                    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.spell.summon_earth"));
                 else
                     sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 break;
@@ -685,10 +685,10 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 );
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, localization::Tr("common.not_applicable"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("common.not_applicable"));
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[H2EnumIndex(choice->faction)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(choice->faction)]);
                 break;
         }
         message.payload.widget.id = mapIndex + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
@@ -857,7 +857,7 @@ void game::InitCampaignMap(void) {
     i32 heroPriorityBest3;
     i32 bestHeroPositionCandidate;
     i32 selectedChoicePosition0;
-    i32 mapHeaderResultCampaign3;
+
     i32 bonusHeroIndexPosition;
 
     selectedChoicePosition0 = m_campaignChoice[H2EnumIndex(iCurViewSide)][iCurViewMap];
@@ -891,7 +891,7 @@ void game::InitCampaignMap(void) {
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);
-    mapHeaderResultCampaign3 = GetMapHeader(m_mapFilename, &m_mapHeader);
+    GetMapHeader(m_mapFilename, &m_mapHeader);
     LoadGame("origdata.bin", 1, 0);
     InitNewGame(NULL);
 

@@ -821,7 +821,7 @@ public:
     void SetupAdjacencyArray(void);
     void UpdateArmyGroup(CombatSide);
     void GenerateMap(void);
-    char* GetBackgroundName(void);
+    const char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
     void LoadIcons(void);
     void FreeIcons(void);

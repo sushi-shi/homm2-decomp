@@ -39,6 +39,15 @@ int main() {
         return 1;
     }
 
+    char literalPercent[32];
+    const char* formatLikeText = "100% complete: %s";
+    if (utf8::Copy(literalPercent, sizeof(literalPercent), formatLikeText)
+            != std::strlen(formatLikeText)
+        || std::strcmp(literalPercent, formatLikeText) != 0) {
+        std::fputs("literal percent copy mismatch\n", stderr);
+        return 1;
+    }
+
     char encoded[4];
     const std::size_t encodedLength = utf8::Encode(0x732b, encoded);
     if (encodedLength != 3 || std::memcmp(encoded, text + offset - 3, 3) != 0) {

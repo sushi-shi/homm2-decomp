@@ -22,7 +22,7 @@ static std::map<i32, i32> artifactIsCursed;
 static std::map<i32, i32> isGenerated;
 static std::map<i32, i32> artifactIsCampaignOnly;
 
-static char* gArtifactEvents[KB_ARTIFACT_TABLE_CAPACITY] = { 0 };
+static const char* gArtifactEvents[KB_ARTIFACT_TABLE_CAPACITY] = { 0 };
 
 static const char* QueryTextAttribute(tinyxml2::XMLElement* el, const char* attribute) {
     const char* text = NULL;
@@ -197,9 +197,9 @@ std::string GetArtifactDescription(i32 id) {
     return artifactDescriptions[id];
 }
 
-char* GetArtifactEvent(i32 id) {
+const char* GetArtifactEvent(i32 id) {
     if (id < 0 || id >= KB_ARTIFACT_TABLE_CAPACITY) {
-        return const_cast<char*>("");
+        return "";
     }
     if (gArtifactEvents[id] != NULL) {
         return gArtifactEvents[id];
@@ -207,7 +207,7 @@ char* GetArtifactEvent(i32 id) {
     if (id < KB_ARTIFACT_LEVEL_COUNT && gArtifactEvent[id] != NULL) {
         return gArtifactEvent[id];
     }
-    return const_cast<char*>("");
+    return "";
 }
 
 } // namespace ironfist

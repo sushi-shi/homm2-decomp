@@ -1217,7 +1217,7 @@ std::string FileExtension(b32 isPickLoad) {
     }
 }
 
-i32 SaveGame(char* saveFile, i32 autosave) {
+i32 SaveGame(const char* saveFile, i32 autosave) {
     gpAdvManager->DemobilizeCurrHero();
     std::string filePath;
     std::string saveName = saveFile;
@@ -1246,7 +1246,7 @@ i32 SaveGame(char* saveFile, i32 autosave) {
     return 1;
 }
 
-b32 LoadGame(char* fileName, i32 loadFromFile) {
+b32 LoadGame(const char* fileName, i32 loadFromFile) {
     if (!loadFromFile) {
         // A fresh game start, not a load; the retail path handles it.
         runtime::ResetAdventureState();

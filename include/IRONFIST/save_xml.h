@@ -60,8 +60,8 @@ enum CampaignType {
 };
 
 i32 GetCampaignType();
-b32 LoadGame(char* fileName, i32 loadFromFile);
-i32 SaveGame(char* saveFile, i32 autosave);
+b32 LoadGame(const char* fileName, i32 loadFromFile);
+i32 SaveGame(const char* saveFile, i32 autosave);
 std::string FileExtension(b32 isPickLoad);
 
 } // namespace ironfist::save

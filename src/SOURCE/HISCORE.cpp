@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -215,7 +216,7 @@ void highScoreManager::Update(void) {
         hsMessage.payload.widget.id =
             rank * HIGH_SCORE_TEXT_WIDGET_STRIDE + HIGH_SCORE_FIRST_TEXT_WIDGET;
         if (highScore.score != HIGH_SCORE_EMPTY)
-            sprintf(gText, highScore.playerName);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, highScore.playerName);
         if (highScore.cheated)
             strcat(
                 gText,
@@ -231,7 +232,7 @@ void highScoreManager::Update(void) {
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCENARIO_OFFSET;
         if (highScore.score != HIGH_SCORE_EMPTY)
-            sprintf(gText, highScore.scenarioName);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, highScore.scenarioName);
         m_window->BroadcastMessage(hsMessage);
 
         sprintf(

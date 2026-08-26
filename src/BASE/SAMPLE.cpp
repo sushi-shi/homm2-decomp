@@ -12,7 +12,7 @@ typedef enum SampleConstant {
     FORMAT_SUFFIX_LENGTH = 3
 } SampleConstant;
 
-sample::sample(char* name)
+sample::sample(const char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),

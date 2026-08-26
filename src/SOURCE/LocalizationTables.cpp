@@ -9,28 +9,31 @@
 
 // KB.h preserves four original unsized extern declarations. Complete them in
 // this translation unit so the migration registry can derive their bounds.
-extern char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT];
-extern char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT];
-extern char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT];
-extern char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT];
-extern char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT];
-extern char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT];
+extern const char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT];
+extern const char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT];
+extern const char* gDwellingNames[H2EnumIndex(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT];
+extern const char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT];
+extern const char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT];
+extern const char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT];
 extern SWinSetup gWinSetup[KB_WIN_SETUP_COUNT];
-extern char* cOutOfMemory;
-extern char* xNecromancerShrine;
-extern char* xNecromancerShrineDesc;
+extern const char* cOutOfMemory;
+extern const char* xNecromancerShrine;
+extern const char* xNecromancerShrineDesc;
 
 namespace localization {
 
 template<std::size_t Count>
-static std::size_t ApplyLegacyArray(const char* idPrefix, char* (&values)[Count]) {
+static std::size_t ApplyLegacyArray(
+    const char* idPrefix,
+    const char* (&values)[Count]
+) {
     return ApplyLegacyTable(idPrefix, values, Count);
 }
 
 template<std::size_t Rows, std::size_t Columns>
 static std::size_t ApplyLegacyArray(
     const char* idPrefix,
-    char* (&values)[Rows][Columns]
+    const char* (&values)[Rows][Columns]
 ) {
     return ApplyLegacyTable(idPrefix, &values[0][0], Rows * Columns);
 }

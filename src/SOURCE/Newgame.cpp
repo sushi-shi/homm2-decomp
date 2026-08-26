@@ -258,10 +258,8 @@ typedef enum NewGameKeyEncoding {
     KEY_ASCII_MASK      = 0xff
 } NewGameKeyEncoding;
 
-
 void game::GetMap(void) {
 
-    tag_message dlgMessage;
     fileRequester* requesterResult;
     i32 loadResult;
     char fileMask[FILE_MASK_CAPACITY];
@@ -332,7 +330,7 @@ void game::InitNewGame(struct SMapHeader* header) {
     i32 humanCount;
     i32 playerType;
     i32 player;
-    i32 unusedTally;
+
     i32 activeColorCount;
     i32 computerCount;
 
@@ -347,7 +345,7 @@ void game::InitNewGame(struct SMapHeader* header) {
     }
 
     activeColorCount = 0;
-    unusedTally = 0;
+
     humanCount = 0;
     computerCount = 0;
 
@@ -923,7 +921,6 @@ cleanup:
         i32 playerLockedValue;
         tag_message message;
         i32 playerIndex;
-        i32 unusedPlayer17;
 
         const std::string mapName = localization::DecodeExternalText(
             m_mapHeader.name, GetMapHeaderTextEncoding(&m_mapHeader)
@@ -947,7 +944,7 @@ cleanup:
 
         if (giNumHumanPlayers > 1) {
             for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
-                sprintf(gText, cTextReceivedBuffer[playerIndex]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cTextReceivedBuffer[playerIndex]);
                 message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
                 message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
                 message.payload.widget.data.text = gText;
@@ -962,7 +959,7 @@ cleanup:
                     ""
                 );
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
-                sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
                 sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
             }
@@ -1033,7 +1030,7 @@ cleanup:
                                       [playerLockedValue ? 1 : 0];
             m_newGameWindow->BroadcastMessage(message);
 
-            sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerIndex])]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerIndex])]);
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_RACE_NAME_FIRST + playerIndex;
             message.payload.widget.data.text = gText;
@@ -1068,7 +1065,7 @@ cleanup:
         char mapPacketLocal[GAME_MAP_PACKET_SIZE];
         tag_message mapWindowMessageTemp;
         i32 helpDialogIndexLocal;
-        i32 unusedSender;
+
         char mapNamePacket[MAP_HEADER_NAME_SIZE];
 
         if (!gbNewGameShadowHidden) {
@@ -1142,7 +1139,7 @@ cleanup:
                                 remotePacketResult->payload
                             );
                         } else {
-                            unusedSender = 0;
+
                         }
                         gText[GAME_CHAT_TEXT_LIMIT] = 0;
                         for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
@@ -1645,7 +1642,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_DELETE:
-            if (NGKPcursorIndex < strlen(cNGKPCore)) {
+            if (static_cast<std::size_t>(NGKPcursorIndex) < strlen(cNGKPCore)) {
                 const std::size_t next = utf8::Next(cNGKPCore, NGKPcursorIndex);
                 strcpy(gText, cNGKPCore + next);
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
@@ -1661,7 +1658,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (NGKPcursorIndex < strlen(cNGKPCore)) {
+            if (static_cast<std::size_t>(NGKPcursorIndex) < strlen(cNGKPCore)) {
                 NGKPcursorIndex = static_cast<i32>(
                     utf8::Next(cNGKPCore, NGKPcursorIndex)
                 );
@@ -1774,7 +1771,7 @@ void game::ShowScenInfo(void) {
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     msg.payload.widget.id = NEW_GAME_SCENARIO_NAME;
-    msg.payload.widget.data.text = const_cast<char*>(mapName.c_str());
+    msg.payload.widget.data.text = mapName.c_str();
     window->BroadcastMessage(msg);
 
     msg.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
@@ -1802,7 +1799,7 @@ void game::ShowScenInfo(void) {
     window->BroadcastMessage(msg);
 
     msg.payload.widget.id = GAME_SCENARIO_DESCRIPTION;
-    msg.payload.widget.data.text = const_cast<char*>(mapDescription.c_str());
+    msg.payload.widget.data.text = mapDescription.c_str();
     window->BroadcastMessage(msg);
     GetVictoryConditionText(gText);
     msg.payload.widget.id = GAME_SCENARIO_VICTORY;
@@ -2008,7 +2005,7 @@ void game::ShowScenInfo(void) {
                 ""
             );
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
-            sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
             sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
@@ -2077,7 +2074,7 @@ void game::ShowScenInfo(void) {
                                   [locked ? 1 : 0];
         window->BroadcastMessage(msg);
 
-        sprintf(gText, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerCounter])]);
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(m_setupPlayerRace[playerCounter])]);
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
             NEW_GAME_RACE_NAME_FIRST + playerCounter;
@@ -2179,8 +2176,8 @@ void game::GetVictoryConditionText(char* text) {
 
             case MAP_VICTORY_FIND_ARTIFACT:
                 if (m_mapHeader.victoryConditionValue == 0)
-                    sprintf(
-                        text,
+                    utf8::Copy(
+                        text, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("scenario.victory.find_ultimate_artifact")
                     );
                 else

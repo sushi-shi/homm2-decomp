@@ -16,7 +16,7 @@ HANDLE gEventHandle = NULL;
 }
 
 extern "C" i32 __stdcall
-WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
+WinMain(HINSTANCE, HINSTANCE, char* commandLine, i32) {
     gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
     if (gEventHandle == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
         sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");

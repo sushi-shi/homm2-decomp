@@ -205,7 +205,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    char* GetArmySizeName(i32, ArmySizeNameVariant);
+    const char* GetArmySizeName(i32, ArmySizeNameVariant);
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
@@ -272,7 +272,7 @@ public:
     void GiveResource(class hero*, ResourceType, i32);
     void RecruitEvent(class hero*, CreatureType, class mapCell*);
     i32 SkeletonEvent(class hero*, class mapCell*, const char*, i32, i32);
-    i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
+    i32 ZombieEvent(class hero*, class mapCell*, const char*, i32, i32);
     i32 GhostEvent(class hero*, class mapCell*, const char*, i32, i32);
     void HouseEvent(class hero*, class mapCell*);
     CombatResult CombatMonsterEvent(

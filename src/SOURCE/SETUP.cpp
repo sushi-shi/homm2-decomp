@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
@@ -181,7 +182,7 @@ i32 game::SetupHotSeatGame(void) {
         );
 
     if (giSetupGameType == 0) {
-        sprintf(gText, localization::Tr("network.hotseat.enter_names_prompt"));
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("network.hotseat.enter_names_prompt"));
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {

@@ -327,7 +327,7 @@ void ExpCampaign::InitMap(void) {
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
-    i32 mapHeaderResult = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
+    GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = static_cast<GameDifficulty>(
@@ -679,7 +679,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, localization::Tr("common.none")  );
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("common.none")  );
     m_window->BroadcastMessage(message);
 
     for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
@@ -766,8 +766,8 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_SPELL:
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
-                    sprintf(
-                        gText,
+                    utf8::Copy(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("campaign.bonus.spell.summon_earth")
                     );
                 else
@@ -822,10 +822,10 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 );
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, localization::Tr("common.not_applicable")  );
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("common.not_applicable")  );
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[H2EnumIndex(choice->faction)]);
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(choice->faction)]);
                 break;
             case CAMPAIGN_CHOICE_PRIMARY_SKILL:
                 sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
@@ -1346,7 +1346,7 @@ i32 ExpCampaign::CampaignID(void) {
     return H2EnumIndex(m_campaignId);
 }
 
-char* ExpCampaign::JosephName(void) {
+const char* ExpCampaign::JosephName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xJosephName[0];
     return xJosephName[
@@ -1354,7 +1354,7 @@ char* ExpCampaign::JosephName(void) {
     ];
 }
 
-char* ExpCampaign::IvanName(void) {
+const char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xUncleIvanName[0];
     return xUncleIvanName[

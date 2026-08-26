@@ -31,7 +31,7 @@ void PushLuaValue(lua_State* ls, double arg) {
     lua_pushnumber(ls, arg);
 }
 
-void PushLuaValues(lua_State* ls) {
+void PushLuaValues(lua_State*) {
 }
 
 template <>

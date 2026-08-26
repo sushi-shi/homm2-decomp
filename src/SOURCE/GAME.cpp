@@ -82,7 +82,6 @@ typedef enum ExpansionCampaignSaveConstant {
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 } ExpansionCampaignSaveConstant;
 
-
 typedef enum GameSaveFormatConstant {
     SAVE_PATH_CAPACITY                 = 452,
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
@@ -1002,7 +1001,7 @@ i32 game::Scan(i8* array, i32 start, i32 length) {
     return -1;
 }
 
-i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
+i32 game::RandomScan(i8* array, i32 start, i32 range, i32, i8 target) {
     i32 idx = target;
     i32 i;
     for (i = 0; i < RANDOM_SCAN_RETRY_LIMIT; i++) {
@@ -1014,11 +1013,10 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
 }
 
 i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
-    i32 r = -1;
-    i32 previousHero;
+
     i32 heroIdx = -1;
     i32 attempts = 0;
-    i32 oldHeroId;
+
     while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
         heroIdx = Random(0, H2EnumIndex(GAME_HERO_COUNT) - 1);
@@ -1093,7 +1091,7 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, ext);
 }
 
-i32 game::SaveGame(char* filename, i32 generateName, i8) {
+i32 game::SaveGame(const char* filename, i32 generateName, i8) {
     return ironfist::save::SaveGame(filename, generateName);
 }
 
@@ -1242,16 +1240,16 @@ void game::SetupOrigData(void) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-void game::LoadGame(char* filename, i32 loadFromFile, i32) {
+void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
-    i32 oldFlag;
+
     char isHuman[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    i32 saveVal;
+
     i32 rows;
     char pathBuf[SAVE_PATH_CAPACITY];
     i8 expTag;
     i32 fd;
-    char junkBuf[SAVE_LEGACY_CLEAR_SIZE];
+
     i32 ndx;
     char plBuf[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
     char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
@@ -1341,7 +1339,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     platform::FileRead(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
     platform::FileRead(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
     if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
-        sprintf(gpGame->m_saveName, filename);
+        utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     platform::FileRead(fd, &m_playerCount, sizeof(m_playerCount));
 
     platform::FileRead(fd, plBuf, sizeof(plBuf[0]));
@@ -1504,15 +1502,15 @@ void game::GiveTroopsToNeutralTowns(void) {
     }
 }
 
-void game::NewMap(char* filename) {
+void game::NewMap(const char* filename) {
     FactionType sideClass;
-    char* heroName;
+    const char* heroName;
     HeroPortrait curPic;
     FactionType specClass;
     i32 awardHero;
-    i32 padNum;
+
     i32 selectedTown;
-    i32 heroIndex;
+
     i32 humanPos;
     FactionType startClass;
     i32 nTown;
@@ -1522,7 +1520,7 @@ void game::NewMap(char* filename) {
     i32 xPos;
     FactionType race;
     char* dotPos;
-    i32 junkVal;
+
     i32 iPass;
     i32 ultimateDistance;
     i32 townIndex;
@@ -1630,7 +1628,7 @@ void game::NewMap(char* filename) {
         m_players[player].m_ultimateArtifactHintChance = 0;
         m_players[player].m_ultimateArtifactHintX = -1;
         m_players[player].m_ultimateArtifactHintY = -1;
-        heroIndex = 0;
+
         selectedTown = -1;
         if (m_mapHeader.unknown25 == 0 && m_players[player].m_townCount > 0) {
             for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
@@ -1978,8 +1976,6 @@ void game::RandomizeEvents(void) {
     i32 upperCount5;
     TilesetId lowerTilesets5[LAYER_SCAN_CAPACITY];
     TilesetId upperTilesets0[LAYER_SCAN_CAPACITY];
-    i32 upperIndexes8[LAYER_SCAN_CAPACITY];
-    i32 lowerIndexes28[LAYER_SCAN_CAPACITY];
 
     m_mapEventCount = 0;
     memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
@@ -2528,7 +2524,7 @@ void game::RandomizeEvents(void) {
                     )) {
                     if (!cell2->m_objectLayerBit1) {
                         upperTilesets0[upperCount5] = cell2->m_objectTileset;
-                        upperIndexes8[upperCount5] = cell2->m_objectIndex;
+
                         upperCount5++;
                     }
                     if (cell2->m_extraIndex != 0)
@@ -2539,7 +2535,7 @@ void game::RandomizeEvents(void) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
                             upperTilesets0[upperCount5] = extra9->objectTileset;
-                            upperIndexes8[upperCount5] = extra9->objectIndex;
+
                             upperCount5++;
                         }
                         if (extra9->nextIndex != 0)
@@ -2550,7 +2546,7 @@ void game::RandomizeEvents(void) {
                     below0 = m_worldMap.GetCell(xPos, yPos + 1);
                     if (!below0->m_objectLayerBit1) {
                         lowerTilesets5[lowerCount] = below0->m_objectTileset;
-                        lowerIndexes28[lowerCount] = below0->m_objectIndex;
+
                         lowerCount++;
                     }
                     if (below0->m_extraIndex != 0)
@@ -2561,7 +2557,7 @@ void game::RandomizeEvents(void) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
                             lowerTilesets5[lowerCount] = extra9->objectTileset;
-                            lowerIndexes28[lowerCount] = extra9->objectIndex;
+
                             lowerCount++;
                         }
                         if (extra9->nextIndex != 0)
@@ -2629,7 +2625,7 @@ void game::RandomizePassword(mapCell* cell) {
     RandomizeBarrier(cell);
 }
 
-i32 game::LoadMap(char* filename) {
+i32 game::LoadMap(const char* filename) {
     char x[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     char y[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     char type[LOAD_MAP_RECORD_SCRATCH_SIZE];
@@ -2880,7 +2876,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>(localization::Tr("spell.none_to_cast")), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(localization::Tr("spell.none_to_cast"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -2896,7 +2892,7 @@ game::ViewSpells(
         m_viewSpellsCount[H2EnumIndex(SPELL_TYPE_ADVENTURE)] =
             spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
         m_viewSpellsWindow = new heroWindow(
-            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>("spellwin.bin")
+            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, "spellwin.bin"
         );
         if (m_viewSpellsWindow == NULL)
             MemError();
@@ -3356,34 +3352,25 @@ void game::ViewArmy(
     armyGroup* theGroup,
     i32 groupIndex
 ) {
-    i16 titleMessage14;
-    i16 detailMessage0;
+
     tag_monsterInfo* monster;
     iconWidget* monsterWidget9;
     char* details0;
-    i16 blankWidget;
+
     i32 modifier14;
-    i16 quickBaseY;
+
     tag_monsterInfo* armyMonster2;
     char filename5[VIEW_ARMY_FILENAME_SIZE];
-    i16 baseX8;
+
     i32 loopIndex;
     i32 iconFrame8;
-    i16 numWidget5;
+
     i32 morale;
     i32 luck4;
     char armyName0[VIEW_ARMY_NAME_SIZE];
     icon* monsterIcon5;
     tag_message message;
-    i16 frame;
 
-    baseX8 = VIEW_ARMY_UNUSED_BASE_X;
-    quickBaseY = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
-    blankWidget = VIEW_ARMY_BLANK_WIDGET_ID;
-    numWidget5 = VIEW_ARMY_COUNT_WIDGET_ID;
-    titleMessage14 = VIEW_ARMY_TITLE_WIDGET_ID;
-    detailMessage0 = VIEW_ARMY_DETAIL_WIDGET_ID;
-    frame = VIEW_ARMY_MONSTER_WIDGET_ID;
     message.type = MESSAGE_WIDGET;
 
     iViewArmyFrame = 0;
@@ -3419,7 +3406,7 @@ void game::ViewArmy(
 
     x = VIEW_ARMY_WINDOW_X;
     y = VIEW_ARMY_WINDOW_Y;
-    m_viewArmyWindow = new heroWindow(x, y, const_cast<char*>("armywin.bin"));
+    m_viewArmyWindow = new heroWindow(x, y, "armywin.bin");
     if (!m_viewArmyWindow)
         MemError();
 
@@ -3642,7 +3629,7 @@ void game::ViewArmy(
                 static_cast<i16>(spellY10 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
                 0,
                 0,
-                const_cast<char*>("spellinl.icn"),
+                "spellinl.icn",
                 static_cast<i16>(H2EnumIndex(spellIndex8)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
@@ -3676,14 +3663,12 @@ void game::ViewArmy(
 
 MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     i32 resourceCost;
-    i16 frameDelay6;
-    i16 frameOffset;
+
     i32 goldCost;
     ResourceType resourceType7;
 
     gbDismissArmy = false;
     gbUpgradeArmy = false;
-    frameDelay6 = VIEW_ARMY_HANDLER_FRAME_DELAY;
 
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
@@ -3697,7 +3682,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>(localization::Tr("army.confirm.dismiss")),
+                            localization::Tr("army.confirm.dismiss"),
                             NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
@@ -3735,9 +3720,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                             && (resourceType7 == RES_NONE
                                 || gpCurPlayer->m_resources[H2EnumIndex(resourceType7)] >= resourceCost)) {
                             NormalDialog(
-                                const_cast<char*>(
-                                    localization::Tr("army.upgrade.confirm")
-                                ),
+                                localization::Tr("army.upgrade.confirm"),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -3760,7 +3743,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                             }
                         } else {
                             NormalDialog(
-                                const_cast<char*>(localization::Tr("army.upgrade.cannot_afford")),
+                                localization::Tr("army.upgrade.cannot_afford"),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -3826,7 +3809,6 @@ void game::TurnOffAIMusic(void) {
 void game::NextPlayer(void) {
     i32 remotePlayer;
     i32 index;
-    i32 humansAlive;
 
     m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags = HeroEventFlag(
         static_cast<i32>(m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags)
@@ -3839,13 +3821,8 @@ void game::NextPlayer(void) {
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
-        humansAlive = 0;
-        for (index = 0; index < GAME_PLAYER_COUNT; index++) {
-            if (m_playerDead[index] == 0 && gbHumanPlayer[index])
-                humansAlive++;
-        }
         SaveGame(
-            const_cast<char*>(save_names::Autosave),
+            save_names::Autosave,
             1,
             0
         );
@@ -4008,7 +3985,7 @@ void game::PerDay(void) {
     i32 maxSpellPoints9;
     i32 player;
     H2SteppedEnumStorage<ResourceType, i32> resource8;
-    i32 income8;
+
     i32 dailyIncome0;
     MineType resourceType1;
     hero* currentHero7;
@@ -4614,7 +4591,7 @@ void game::ConvertObject(
 }
 
 void game::RandomizeTown(i32 x, i32 y, i32) {
-    i32 unused[RANDOM_TOWN_SCRATCH_WIDTH];
+
     i32 townId = GetTownId(x, y);
     town* castle = GetTown(townId);
     mapTownExtra* townExtra =
@@ -5360,7 +5337,7 @@ void game::GiveArmy(
     i32 count,
     i32 slot
 ) {
-    i32 swap;
+
     i32 i;
     if (slot >= 0) {
         i = slot;
@@ -5513,7 +5490,7 @@ void game::ShowHeroesLogo(void) {
     }
 }
 
-void game::WaitForPlayer(char* text, i32 player) {
+void game::WaitForPlayer(const char* text, i32 player) {
     if (gbBlackoutPlayer && giNumHumanPlayers > 1 && !gbRemoteOn) {
         gpMouseManager->SetPointer(0);
         gbAllBlack = true;
@@ -5634,8 +5611,7 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
 }
 
 void game::ProcessMapExtra(void) {
-    i32 unused;
-    i32 cost;
+
     mapCell* cell10;
     i32 townId;
     i32 row16;
@@ -5685,7 +5661,7 @@ void game::SetupTowns(void) {
     town* castle8;
     i32 townIndex1;
     i32 slot12;
-    i32 unused;
+
     mapTownExtra* extra0;
     i32 attempts17;
     i8 usedSpells0[H2EnumIndex(SPELL_COUNT)];
@@ -6157,16 +6133,11 @@ void game::CheckHeroConsistency(void) {
     i32 player;
     mapCell* cell;
     town* townOccupied;
-    i32 sane;
 
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] != 0)
             continue;
         all += m_players[player].m_heroCount;
-        for (slot = 0; slot < m_players[player].m_heroCount; slot++) {
-            if (m_heroRecs[m_players[player].m_heroIds[slot]].m_owner != player)
-                sane = 0;
-        }
     }
 
     for (player = 0; player < m_playerCount; player++) {
@@ -6262,7 +6233,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     char filename[TRANSMIT_FILENAME_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
-    i32 unused1d0;
+
     u32 fileCrc;
     i32 oldTrack;
     i32 batchCount;
@@ -6275,16 +6246,15 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 packet;
     u8* transmitData;
     i32 file;
-    i32 unused208;
+
     i32 done;
-    i32 unused21c;
+
     bool samplesReady;
     u8* fileData;
     char* acknowledged;
     i32* header;
-    i32 unused8;
+
     i32 batch;
-    i32 unused9;
 
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
     header = NULL;
@@ -6302,10 +6272,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gSoundBackendsReady = samplesReady;
 
-    LogStr(const_cast<char*>("Transmit Game Start"));
+    LogStr("Transmit Game Start");
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>(localization::Tr("network.data.sending")), RES_NONE, 0);
-    AiPrint(const_cast<char*>("Transmit Start - Compressing"));
+        BVResMsg(localization::Tr("network.data.sending"), RES_NONE, 0);
+    AiPrint("Transmit Start - Compressing");
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
@@ -6322,7 +6292,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
     LogInt(
-        const_cast<char*>("PostDiffFileSize"),
+        "PostDiffFileSize",
         fileSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6356,13 +6326,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         else
             transmitData = fileData;
 
-        AiPrint(const_cast<char*>("Transmit Start - Sending"));
+        AiPrint("Transmit Start - Sending");
         if (gbUseRegularCompression)
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
         LogInt(
-            const_cast<char*>("Send"),
+            "Send",
             fileSize,
             transmitCrc,
             LOG_UNUSED_VALUE,
@@ -6426,7 +6396,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             ShutDown(NULL);
                     }
                 }
-                LogStr(const_cast<char*>("PreWait"));
+                LogStr("PreWait");
                 *reinterpret_cast<i16*>(header) =
                     static_cast<i16>(batch * REMOTE_PACKET_BATCH_SIZE);
                 result = TransmitAndWait(
@@ -6437,7 +6407,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                     &reply
                 );
-                LogStr(const_cast<char*>("PostWait"));
+                LogStr("PostWait");
                 if (!result)
                     ShutDown(NULL);
                 for (packet = 0; packet < packetsInBatch; packet++) {
@@ -6477,7 +6447,7 @@ transmitCleanup:
     if (acknowledged)
         H2_FREE(acknowledged);
 
-    AiPrint(const_cast<char*>("Transmit End"));
+    AiPrint("Transmit End");
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
@@ -6547,11 +6517,11 @@ i32 game::ReceiveSaveGame(
     u8* ackBuffer;
     u8* decodedData;
     bool samplesReady;
-    i32 unused2080;
+
     i32l lastPacketTime;
 
     LogInt(
-        const_cast<char*>("FW1"),
+        "FW1",
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6560,8 +6530,8 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    LogStr(const_cast<char*>("RSG1"));
-    AiPrint(const_cast<char*>("Receive Start - Getting Data"));
+    LogStr("RSG1");
+    AiPrint("Receive Start - Getting Data");
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
 
     ackBuffer = NULL;
@@ -6570,14 +6540,14 @@ i32 game::ReceiveSaveGame(
     packet = NULL;
     file = 0;
     finished = 0;
-    unused2080 = 0;
+
     received = NULL;
     success = 0;
     oldTrack = -1;
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>(localization::Tr("network.data.receiving")), RES_NONE, 0);
+        BVResMsg(localization::Tr("network.data.receiving"), RES_NONE, 0);
 
     samplesReady = gSoundBackendsReady;
     oldTrack = gpSoundManager->m_musicTrack;
@@ -6585,7 +6555,7 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->SwitchAmbientMusic(-1);
     gSoundBackendsReady = samplesReady;
 
-    LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
+    LogStr("Begin Transmit Init Confirm");
     result = TransmitRemoteData(
         NULL,
         remotePlayer,
@@ -6595,7 +6565,7 @@ i32 game::ReceiveSaveGame(
         1,
         REMOTE_MESSAGE_DEFAULT
     );
-    LogStr(const_cast<char*>("End Transmit Init Confirm"));
+    LogStr("End Transmit Init Confirm");
     if (!result)
         ShutDown(NULL);
 
@@ -6608,7 +6578,7 @@ i32 game::ReceiveSaveGame(
 
     lastPacketTime = platform::Ticks();
     LogInt(
-        const_cast<char*>("FW2"),
+        "FW2",
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6622,7 +6592,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < platform::Ticks()) {
             NormalDialog(
-                const_cast<char*>(localization::Tr("network.receive.retry")),
+                localization::Tr("network.receive.retry"),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
@@ -6660,7 +6630,7 @@ i32 game::ReceiveSaveGame(
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
                     LogInt(
-                        const_cast<char*>("FW3"),
+                        "FW3",
                         remotePlayer,
                         LOG_UNUSED_VALUE,
                         LOG_UNUSED_VALUE,
@@ -6688,10 +6658,10 @@ i32 game::ReceiveSaveGame(
         }
     }
 
-    AiPrint(const_cast<char*>("Receive Start - Decompressing Data"));
+    AiPrint("Receive Start - Decompressing Data");
     receivedCrc = calc_crc_long(incomingData, dataSize);
     LogInt(
-        const_cast<char*>("Receive"),
+        "Receive",
         dataSize,
         receivedCrc,
         expectedTransmitCrc,
@@ -6712,7 +6682,7 @@ i32 game::ReceiveSaveGame(
         computedCrc = receivedCrc;
     }
     LogInt(
-        const_cast<char*>("Receive"),
+        "Receive",
         dataSize,
         computedCrc,
         expectedCrc,
@@ -6740,7 +6710,7 @@ i32 game::ReceiveSaveGame(
         H2_FREE(decodedData);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
-    AiPrint(const_cast<char*>("Receive End"));
+    AiPrint("Receive End");
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
@@ -6842,7 +6812,7 @@ void game::DoNewTurn(void) {
                         lowerName19
                     );
                 } else {
-                    sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
+                    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
                 }
             } else {
                 musicTrack2 = NEW_WEEK_MUSIC_TRACK;
@@ -6904,7 +6874,7 @@ i32 game::GetNumThievesGuilds(i32 color) {
 }
 
 i32 game::CalcDifficultyRating(void) {
-    i32 notused;
+
     i32 rating = 0;
     if (m_difficulty == DIFFICULTY_EASY)
         rating += RATING_EASY_BONUS;
@@ -6974,7 +6944,7 @@ void game::RestoreCell(
     MapObjectType objectType,
     i32 barrier,
     mapCell* passedCell,
-    i32 p6
+    i32
 ) {
     mapCell* cell;
     if (passedCell)
@@ -7060,9 +7030,9 @@ void CreateDiffFile(
 ) {
     i32 joinSize;
     u8* fullData;
-    i32 unusedVal;
+
     i32 inFd;
-    i32l timeIn;
+
     i32 matchLen;
     u8* prevData;
     i32 diffTotal;
@@ -7074,7 +7044,6 @@ void CreateDiffFile(
     i32 destFile;
     i32 position;
 
-    timeIn = platform::Ticks();
     prevData = NULL;
     fullData = NULL;
     diffOut = NULL;
@@ -7097,7 +7066,7 @@ void CreateDiffFile(
     platform::FileRead(readFile, fullData, joinSize);
     platform::FileClose(readFile);
     LogInt(
-        const_cast<char*>("Orig Join CRC"),
+        "Orig Join CRC",
         calc_crc_long(fullData, joinSize),
         joinSize,
         LOG_UNUSED_VALUE,
@@ -7257,7 +7226,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     platform::FileWrite(joinFile, outData, outSize);
     platform::FileClose(joinFile);
     LogInt(
-        const_cast<char*>("New Join CRC"),
+        "New Join CRC",
         calc_crc_long(outData, outSize),
         outSize,
         LOG_UNUSED_VALUE,
@@ -7502,7 +7471,7 @@ void game::CheckForTimeEvent(void) {
                 const std::string eventMessage =
                     localization::DecodeExternalText(event0->message);
                 NormalDialog(
-                    const_cast<char*>(eventMessage.c_str()),
+                    eventMessage.c_str(),
                     1,
                     -1,
                     -1,
@@ -7556,16 +7525,15 @@ i32 CalcFileCRC(char* file) {
 }
 
 void CompressTest2(void) {
-    i32l plainSize;
+
     char* unpackedData;
     i32l compSize;
-    i32 srcCrc;
+
     i32 dataSz;
     i32 index;
-    i32 unpackedCrc;
+
     char* fromData;
     char* encoded;
-    i32 srcCrcCheck;
 
     dataSz = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
     fromData =
@@ -7582,11 +7550,10 @@ void CompressTest2(void) {
         );
     for (index = 0; index < dataSz; index++)
         fromData[index] = static_cast<char>(Random(0, 255));
-    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+
     compSize = EncodeData(encoded, fromData, dataSz);
-    plainSize = DecodeData(unpackedData, encoded, compSize);
-    unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), dataSz);
-    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+    DecodeData(unpackedData, encoded, compSize);
+
     H2_FREE(fromData);
     H2_FREE(encoded);
     H2_FREE(unpackedData);
@@ -7595,17 +7562,15 @@ void CompressTest2(void) {
 void CompressTest(void) {
     char* fromData;
     char* encoded;
-    i32 srcCrcCheck;
-    i32 unpackedCrc;
+
     i32 hFile;
     i32l fileSize;
     char diffName[TEST_FILENAME_SIZE];
-    i32 srcCrc;
+
     char* unpackedData;
     i32l compSize;
-    i32l plainSize;
 
-    LogStr(const_cast<char*>("C1"));
+    LogStr("C1");
     strcpy(diffName, "c:\\TEMP\\Z.DIF");
     fileSize = FileSize(diffName);
     fromData = static_cast<char*>(
@@ -7617,26 +7582,25 @@ void CompressTest(void) {
     unpackedData = static_cast<char*>(
         H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    LogStr(const_cast<char*>("C2"));
+    LogStr("C2");
     hFile = platform::FileOpen(diffName, platform::FileMode::Read);
     if (hFile == -1)
         FileError(diffName);
     platform::FileRead(hFile, fromData, fileSize);
-    LogStr(const_cast<char*>("C3"));
-    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
-    LogStr(const_cast<char*>("C4"));
+    LogStr("C3");
+
+    LogStr("C4");
     platform::FileClose(hFile);
-    LogStr(const_cast<char*>("C5"));
+    LogStr("C5");
     compSize = EncodeData(encoded, fromData, fileSize);
-    LogStr(const_cast<char*>("C6"));
-    plainSize = DecodeData(unpackedData, encoded, compSize);
-    LogStr(const_cast<char*>("C7"));
-    unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), fileSize);
-    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
+    LogStr("C6");
+    DecodeData(unpackedData, encoded, compSize);
+    LogStr("C7");
+
     H2_FREE(fromData);
     H2_FREE(encoded);
     H2_FREE(unpackedData);
-    LogStr(const_cast<char*>("C8"));
+    LogStr("C8");
 }
 
 void CompressTest3(void) {

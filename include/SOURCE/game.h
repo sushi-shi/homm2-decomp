@@ -207,17 +207,17 @@ public:
         return m_players[player].m_color;
     }
     i32 GetMineId(i32, i32);
-    i32 SaveGame(char*, i32, i8);
+    i32 SaveGame(const char*, i32, i8);
     void SetupOrigData(void);
-    void LoadGame(char*, i32, i32);
+    void LoadGame(const char*, i32, i32);
     void GiveTroopsToNeutralTown(i32);
     void GiveTroopsToNeutralTowns(void);
-    void NewMap(char*);
+    void NewMap(const char*);
     void RandomizeEvents(void);
     void InitializePasswords(void);
     void RandomizeBarrier(class mapCell*);
     void RandomizePassword(class mapCell*);
-    i32 LoadMap(char*);
+    i32 LoadMap(const char*);
     void ClaimTown(i32, i32, i32);
     void ClaimMine(i32, i32);
     SpellType ViewSpells(class hero*, HeroSpellType, MessageDispatchHandler, i32);
@@ -282,7 +282,7 @@ public:
     void CancelComputerScreen(void);
     void ShowComputerScreen(void);
     void ShowHeroesLogo(void);
-    void WaitForPlayer(char*, i32);
+    void WaitForPlayer(const char*, i32);
     i32 HasLateOverlay(i32, i32);
     void ConvertFlagToLateOverlay(i32, i32);
     i32 HasObjectTilesetIndex(i32, i32, TilesetId, i32);

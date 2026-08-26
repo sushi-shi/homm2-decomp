@@ -80,8 +80,8 @@ extern std::vector<FactionType> PlayableFactions;
 void LoadCreatures();
 void UnloadCreatures();
 bool HasCreatureAttribute(CreatureType creature, CreatureAttribute attribute);
-char* GetCreatureName(i32 id);
-char* GetCreaturePluralName(i32 id);
+const char* GetCreatureName(i32 id);
+const char* GetCreaturePluralName(i32 id);
 
 } // namespace ironfist
 

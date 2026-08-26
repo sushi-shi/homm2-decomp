@@ -58,7 +58,6 @@ typedef enum CursorPrivateConstant {
 
 #define SLOW_TURN_DELAY_SCALE 1.5
 
-
 void advManager::StartCursor(MapDirection direction) {
     i32 cellX;
     i32 directionY;
@@ -162,7 +161,6 @@ void advManager::DrawCursor(void) {
             0
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
-            i32 flagDrawn;
 
             FlipIconToBitmap(
                 m_boatFlagIcons[gpCurPlayer->m_color],
@@ -177,7 +175,7 @@ void advManager::DrawCursor(void) {
                 0,
                 0
             );
-            flagDrawn = 1;
+
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
@@ -237,7 +235,6 @@ void advManager::DrawCursor(void) {
             0
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
-            i32 flagDrawn;
 
             IconToBitmap(
                 m_boatFlagIcons[gpCurPlayer->m_color],
@@ -252,7 +249,7 @@ void advManager::DrawCursor(void) {
                 0,
                 0
             );
-            flagDrawn = 1;
+
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
@@ -930,7 +927,7 @@ adjacentDone:
             const std::string eventMessage =
                 localization::DecodeExternalText(mapEvent->message);
             NormalDialog(
-                const_cast<char*>(eventMessage.c_str()),
+                eventMessage.c_str(),
                 1,
                 -1,
                 -1,
@@ -1430,7 +1427,6 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 size;
     SMapChange* buf;
     i32 ix;
-    i32 processed;
 
     size = sizeof(sMapChangeLastFew);
     buf = static_cast<SMapChange*>(H2_ALLOC(size));
@@ -1440,7 +1436,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
         if (ptr0->type != MAP_CHANGE_NONE && ptr0->sequence >= giMapChangeCtr) {
             ProcessIncomingSingleMapChange(ptr0);
         } else {
-            processed = 0;
+
         }
     }
     H2_FREE(buf);

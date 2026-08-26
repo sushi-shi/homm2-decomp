@@ -9,7 +9,6 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-
 static i32 s_y = 0;
 static i32 s_clipB = 0;
 static i32 s_x = 0;
@@ -33,7 +32,7 @@ void IconToBitmapYModify(
     i32 x,
     i32 y,
     i32 frame,
-    IconDrawClipMode clip,
+    IconDrawClipMode,
     i32 clipX,
     i32 clipY,
     i32 clipW,

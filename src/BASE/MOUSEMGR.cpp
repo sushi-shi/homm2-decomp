@@ -36,7 +36,6 @@ static i32 gOldMouseBottom = 0;
 b32 gbInSetPointer = false;
 i32 bInNewMouseUpdate = 0;
 
-
 i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57};
 i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {15, 21}, {22, 21}, {24, 20}, {24, 24}, {30, 25}, {24, 24}, {24, 24}, {19, 23}, {15, 20},
@@ -126,7 +125,7 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
+void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
     if (m_forcePointerUpdate != 0)
         return;

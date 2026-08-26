@@ -292,7 +292,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
         if (giOverviewItems[H2EnumIndex(giOverviewType)] <= OVERVIEW_VISIBLE_ROWS) {
             OVScrollKnob->m_y = SCROLL_KNOB_STATIC_Y;
         } else {
-            i32 unused;
+
             i32 steps = giOverviewItems[H2EnumIndex(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
             float pixelsPerItem = OVERVIEW_SCROLL_KNOB_RANGE_FLOAT / steps;
             OVScrollKnob->m_y = static_cast<i16>(
@@ -340,7 +340,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + ROW_BACKGROUND_Y_OFFSET),
             ROW_BACKGROUND_WIDTH,
             ROW_BACKGROUND_HEIGHT,
-            const_cast<char*>("overview.icn"),
+            "overview.icn",
             static_cast<i16>(H2EnumIndex(giOverviewType) + ROW_BACKGROUND_FRAME_BASE),
             ICON_DRAW_NORMAL,
             static_cast<i16>(rowWidgetId + ROW_BACKGROUND_CONTROL),
@@ -372,7 +372,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     TOWN_NAME_WIDTH,
                     TOWN_NAME_HEIGHT,
                     valueText,
-                    const_cast<char*>("smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     static_cast<i16>(rowWidgetId + TOWN_NAME_CONTROL),
                     WIDGET_KIND_TEXT,
@@ -392,7 +392,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_ICON_Y_OFFSET),
                     TOWN_ICON_WIDTH,
                     TOWN_ICON_HEIGHT,
-                    const_cast<char*>("minitown.icn"),
+                    "minitown.icn",
                     townFrame,
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_SELECT_WIDGET),
@@ -412,7 +412,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_LOCATOR_Y_OFFSET),
                     0,
                     0,
-                    const_cast<char*>("locators.icn"),
+                    "locators.icn",
                     TOWN_LOCATOR_FRAME,
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_LOCATOR_CONTROL),
@@ -442,7 +442,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_HERO_FRAME_Y_OFFSET),
                     TOWN_HERO_FRAME_WIDTH,
                     TOWN_HERO_FRAME_HEIGHT,
-                    const_cast<char*>("portxtra.icn"),
+                    "portxtra.icn",
                     0,
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_HERO_FIRST),
@@ -460,7 +460,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_HERO_PORTRAIT_Y_OFFSET),
                     TOWN_HERO_PORTRAIT_WIDTH,
                     TOWN_HERO_PORTRAIT_HEIGHT,
-                    const_cast<char*>(capt ? "minicapt.icn" : "miniport.icn"),
+                    capt ? "minicapt.icn" : "miniport.icn",
                     capt ? static_cast<u8>(H2EnumIndex(record->m_type)) : H2EnumIndex(heroData->m_portrait),
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_HERO_PORTRAIT_CONTROL),
@@ -478,7 +478,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_MOBILITY_Y_OFFSET),
                     0,
                     0,
-                    const_cast<char*>("mobility.icn"),
+                    "mobility.icn",
                     static_cast<i16>(GetMobilityFrame(capt ? 0 : heroData->m_remainingMobility)),
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_HERO_MOBILITY_CONTROL),
@@ -501,7 +501,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + TOWN_MANA_Y_OFFSET),
                     0,
                     0,
-                    const_cast<char*>("mana.icn"),
+                    "mana.icn",
                     static_cast<i16>(GetManaFrame(capt ? captainMana : heroData->m_spellPoints)),
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + TOWN_HERO_MANA_CONTROL),
@@ -529,7 +529,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
-                            const_cast<char*>("mons32.icn"),
+                            "mons32.icn",
                             static_cast<i16>(record->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId + i + TOWN_ARMY_FIRST),
@@ -558,7 +558,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
-                            const_cast<char*>("smalfont.fnt"),
+                            "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
                             static_cast<i16>(rowWidgetId + i + TOWN_ARMY_ALT_FIRST),
                             WIDGET_KIND_TEXT,
@@ -613,7 +613,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             break;
                     }
 
-                    if ((record->m_buildings & (1 << (building + TOWN_DWELLING_BUILDING_BIT_BASE)))
+                    if ((record->m_buildings
+                         & (1 << (H2EnumIndex(building)
+                                  + H2EnumIndex(TOWN_DWELLING_BUILDING_BIT_BASE))))
                         != 0) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(
@@ -624,7 +626,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
-                            const_cast<char*>("mons32.icn"),
+                            "mons32.icn",
                             static_cast<i16>(gDwellingType[H2EnumIndex(record->m_type)][building]),
                             ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId + building + TOWN_RECRUIT_FIRST),
@@ -649,7 +651,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
-                            const_cast<char*>("smalfont.fnt"),
+                            "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
                             static_cast<i16>(rowWidgetId + building + TOWN_RECRUIT_ALT_FIRST),
                             WIDGET_KIND_TEXT,
@@ -675,7 +677,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_FRAME_Y_OFFSET),
                 HERO_FRAME_WIDTH,
                 HERO_FRAME_HEIGHT,
-                const_cast<char*>("portxtra.icn"),
+                "portxtra.icn",
                 0,
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId + HERO_SELECT_FIRST),
@@ -693,7 +695,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PORTRAIT_Y_OFFSET),
                 HERO_PORTRAIT_WIDTH,
                 HERO_PORTRAIT_HEIGHT,
-                const_cast<char*>("miniport.icn"),
+                "miniport.icn",
                 static_cast<i16>(curHero->m_portrait),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId + HERO_PORTRAIT_CONTROL),
@@ -711,7 +713,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_MOBILITY_Y_OFFSET),
                 0,
                 0,
-                const_cast<char*>("mobility.icn"),
+                "mobility.icn",
                 static_cast<i16>(GetMobilityFrame(curHero->m_remainingMobility)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId + HERO_MOBILITY_CONTROL),
@@ -729,7 +731,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_MANA_Y_OFFSET),
                 0,
                 0,
-                const_cast<char*>("mana.icn"),
+                "mana.icn",
                 static_cast<i16>(GetManaFrame(curHero->m_spellPoints)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId + TOWN_HERO_MANA_CONTROL),
@@ -751,7 +753,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     HERO_PRIMARY_TEXT_WIDTH,
                     HERO_PRIMARY_TEXT_HEIGHT,
                     valueText,
-                    const_cast<char*>("smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     static_cast<i16>(rowWidgetId + i + HERO_PRIMARY_TEXT_FIRST),
                     WIDGET_KIND_TEXT,
@@ -767,7 +769,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_ICON_Y_OFFSET),
                     HERO_PRIMARY_ICON_WIDTH,
                     HERO_PRIMARY_ICON_HEIGHT,
-                    const_cast<char*>("overview.icn"),
+                    "overview.icn",
                     HERO_PRIMARY_ICON_FRAME,
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId + i + HERO_STAT_FIRST),
@@ -793,7 +795,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             ),
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
-                            const_cast<char*>("mons32.icn"),
+                            "mons32.icn",
                             static_cast<i16>(curHero->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId + i + HERO_ARMY_FIRST),
@@ -820,7 +822,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_TEXT_WIDTH,
                             TROOP_TEXT_HEIGHT,
                             valueText,
-                            const_cast<char*>("smalfont.fnt"),
+                            "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
                             static_cast<i16>(rowWidgetId + i + HERO_ARMY_ALT_FIRST),
                             WIDGET_KIND_TEXT,
@@ -846,7 +848,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         ),
                         DETAIL_FRAME_WIDTH,
                         DETAIL_FRAME_HEIGHT,
-                        const_cast<char*>("overview.icn"),
+                        "overview.icn",
                         DETAIL_FRAME_ICON,
                         ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId + i + HERO_SKILL_FRAME_FIRST),
@@ -867,7 +869,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         ),
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
-                        const_cast<char*>("miniss.icn"),
+                        "miniss.icn",
                         // The Cyborg Wisdom slot draws the Cybernetics small icon.
                         static_cast<i16>(
                             curHero->m_cursorType == FACTION_CYBORG
@@ -897,7 +899,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         HERO_SKILL_LEVEL_WIDTH,
                         HERO_SKILL_LEVEL_HEIGHT,
                         valueText,
-                        const_cast<char*>("smalfont.fnt"),
+                        "smalfont.fnt",
                         FONT_DRAW_DEFAULT,
                         static_cast<i16>(rowWidgetId + i + HERO_SKILL_LEVEL_FIRST),
                         WIDGET_KIND_TEXT,
@@ -923,7 +925,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         ),
                         DETAIL_FRAME_WIDTH,
                         DETAIL_FRAME_HEIGHT,
-                        const_cast<char*>("overview.icn"),
+                        "overview.icn",
                         DETAIL_FRAME_ICON,
                         ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId + i + HERO_ARTIFACT_FRAME_FIRST),
@@ -946,7 +948,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         ),
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
-                        const_cast<char*>("artfx.icn"),
+                        "artfx.icn",
                         static_cast<i16>(curHero->m_artifacts[i]),
                         ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId + i + HERO_ARTIFACT_FIRST),
@@ -1034,7 +1036,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
             titleWidths[H2EnumIndex(giOverviewType)][col],
             OVERVIEW_TITLE_HEIGHT,
             titleText,
-            const_cast<char*>("smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             static_cast<i16>(col + OVERVIEW_COLUMN_TITLE_FIRST),
             WIDGET_KIND_TEXT,
@@ -1092,12 +1094,12 @@ void game::Overview(void) {
     giOverviewItems[H2EnumIndex(OVERVIEW_HEROES)] = gpCurPlayer->m_heroCount;
     giOverviewItems[H2EnumIndex(OVERVIEW_TOWNS)] = gpCurPlayer->m_townCount;
     gpMouseManager->SetPointer(
-        const_cast<char*>("advmice.mse"),
+        "advmice.mse",
         OVERVIEW_POINTER_FRAME,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    gpResourceManager->GetBackdrop(const_cast<char*>("overback.icn"), gpWindowManager->m_screen, 1);
-    overWin = new heroWindow(0, 0, const_cast<char*>("overwind.bin"));
+    gpResourceManager->GetBackdrop("overback.icn", gpWindowManager->m_screen, 1);
+    overWin = new heroWindow(0, 0, "overwind.bin");
     if (overWin == NULL) {
         MemError();
     }
@@ -1107,7 +1109,7 @@ void game::Overview(void) {
         SCROLL_KNOB_Y,
         SCROLL_KNOB_WIDTH,
         SCROLL_KNOB_HEIGHT,
-        const_cast<char*>("scrollcn.icn"),
+        "scrollcn.icn",
         SCROLL_KNOB_FRAME,
         ICON_DRAW_NORMAL,
         SCROLL_KNOB_WIDGET,
@@ -1527,7 +1529,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     gpExec->DoDialog(recruitDialog);
                     delete recruitDialog;
                     gpResourceManager->GetBackdrop(
-                        const_cast<char*>("overback.icn"),
+                        "overback.icn",
                         gpWindowManager->m_screen,
                         1
                     );

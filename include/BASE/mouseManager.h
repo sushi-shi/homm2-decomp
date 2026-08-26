@@ -45,7 +45,7 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void SetPointer(char*, i32, MouseCursorType);
+    void SetPointer(const char*, i32, MouseCursorType);
     void SetPointer(i32);
     void NewUpdate(i32);
     void MouseCoords(i32&, i32&);

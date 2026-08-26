@@ -402,7 +402,7 @@ void DeleteMainClasses(void) {
     gpResourceManager = NULL;
 }
 
-void EarlyShutdown(char* caption, char* text) {
+void EarlyShutdown(const char* caption, const char* text) {
     platform::ShowMessage(caption, text);
     exit(0);
 }
@@ -453,17 +453,15 @@ void SetupCDRom(void) {
     }
     if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
-            const_cast<char*>(localization::Tr("system.startup_error.title")),
-            const_cast<char*>(
-                localization::Tr("system.startup_error.game_directory_missing")
-            )
+            localization::Tr("system.startup_error.title"),
+            localization::Tr("system.startup_error.game_directory_missing")
         );
         exit(0);
     }
     if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
-            const_cast<char*>(localization::Tr("system.startup_error.title")),
-            const_cast<char*>(localization::Tr("system.startup_error.data_files_missing"))
+            localization::Tr("system.startup_error.title"),
+            localization::Tr("system.startup_error.data_files_missing")
         );
         exit(0);
     }
@@ -492,9 +490,7 @@ i32 oldmain(void) {
     i32 firstMainScreen_h;
     i32 savedUpdateFlags_l;
     i32 player_h;
-    i32 unusedMainState_o;
-    i32 unusedMenuState;
-    i32 unusedPlayerState_f;
+
     i32 netPlayer_k;
     i32 gamePlayer_m;
     i32 result_i;
@@ -1004,11 +1000,9 @@ i32 oldmain(void) {
                             gpGame->m_campaignScore,
                             0,
                             HIGH_SCORE_CAMPAIGN,
-                            const_cast<char*>(
-                                gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                                    ? localization::Tr("campaign.ruler.archibald")
-                                    : localization::Tr("campaign.ruler.roland")
-                            )
+                            gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                                ? localization::Tr("campaign.ruler.archibald")
+                                : localization::Tr("campaign.ruler.roland")
                         );
                     }
                     if (campaignResult) {
@@ -1458,14 +1452,14 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-MessageDispatchResult NullHandler(struct tag_message& msg) {
+MessageDispatchResult NullHandler(struct tag_message&) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
-    i16 unusedLocal0L = 2, unusedLocal1H = 3, unusedLocal2D = 8, unusedLocal3A = 9;
+
     i32 shouldClose = 0;
-    i32 unusedResult;
+
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
@@ -1506,7 +1500,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD) {
         sprintf(
@@ -1521,7 +1515,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             sprintf(buf, "%s", localization::Tr("town.well.description"));
         }
     } else if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
-        sprintf(buf, xNecromancerShrineDesc);
+        utf8::Copy(buf, sizeof(buf), xNecromancerShrineDesc);
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(
             buf,
@@ -1530,9 +1524,9 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             gArmyNamesPlural[H2EnumIndex(gDwellingType[H2EnumIndex(race)][0])]
         );
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        sprintf(buf, gBuildingInfoSpecial[H2EnumIndex(race)]);
+        utf8::Copy(buf, sizeof(buf), gBuildingInfoSpecial[H2EnumIndex(race)]);
     } else if (building < BUILDING_SLOT_DWELLING_FIRST) {
-        sprintf(buf, cBuildingInfoNeutral[H2EnumIndex(building)]);
+        utf8::Copy(buf, sizeof(buf), cBuildingInfoNeutral[H2EnumIndex(building)]);
     } else {
         sprintf(
             gText,
@@ -1551,12 +1545,12 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             buf
         );
     } else {
-        sprintf(gText, buf);
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, buf);
     }
     return gText;
 }
 
-char* GetBuildingName(FactionType race, BuildingSlotType building) {
+const char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
     if (race == FACTION_CYBORG && building == BUILDING_SLOT_WELL)
@@ -1606,11 +1600,11 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     }
 }
 
-char* GetMonsterName(CreatureType monster) {
+const char* GetMonsterName(CreatureType monster) {
     return gArmyNames[H2EnumIndex(monster)];
 }
 
-char* GetMonsterPluralName(CreatureType monster) {
+const char* GetMonsterPluralName(CreatureType monster) {
     return gArmyNamesPlural[H2EnumIndex(monster)];
 }
 
@@ -2069,7 +2063,7 @@ void CheckEndGame(
     i32 showedDialog_o;
     i32 defeated_m;
     i32 allowNormalVictory;
-    i32 lastLivingPlayer_j;
+
     i32 survivingHumans_a;
     i32 lastHuman_a;
     i32 netHumanCount;
@@ -2096,7 +2090,7 @@ void CheckEndGame(
     i32 winnerPlayer_m;
     char campaignSaveName[END_GAME_CAMPAIGN_SAVE_NAME_SIZE];
     i32 campaignHeroIndex;
-    u32 carryoverHeroId;
+    i32 carryoverHeroId;
 
     if (!gbThisNetGotAdventureControl)
         return;
@@ -2119,7 +2113,7 @@ void CheckEndGame(
                 PlayerDead(player);
                 if (player == giThisGamePos) {
                     showedDialog_o = 1;
-                    sprintf(gText, localization::Tr("player.eliminated"));
+                    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
                     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else {
                     sprintf(gText, localization::Tr("player.vanquished"), cPlayerNames[player]);
@@ -2196,14 +2190,14 @@ void CheckEndGame(
     }
 
     numAlive = 0;
-    lastLivingPlayer_j = 0;
+
     survivingHumans_a = 0;
     lastHuman_a = 0;
     netHumanCount = 0;
     for (player = 0; player < gpGame->m_playerCount; player++) {
         if (!gpGame->m_playerDead[player]) {
             numAlive++;
-            lastLivingPlayer_j = player;
+
             if (gbThisNetHumanPlayer[player]) {
                 netHumanCount++;
             }
@@ -2262,7 +2256,7 @@ void CheckEndGame(
             }
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = 1;
-                sprintf(gText, localization::Tr("victory.side_triumph"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2389,7 +2383,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, localization::Tr("loss.time_expired"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.time_expired"));
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2432,14 +2426,14 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = 1;
                 if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
-                    sprintf(
-                        artifactName,
+                    utf8::Copy(
+                        artifactName, sizeof(artifactName),
                         localization::Tr("artifact.ultimate_generic")
 
                     );
                 } else {
-                    sprintf(
-                        artifactName,
+                    utf8::Copy(
+                        artifactName, sizeof(artifactName),
                         gArtifactNames[gpGame->m_mapHeader.victoryConditionValue - 1]
                     );
                 }
@@ -2470,8 +2464,8 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(
-                    gText,
+                utf8::Copy(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.loss.dwarf_towns")
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2485,7 +2479,7 @@ void CheckEndGame(
         winFlag = 1;
         if (!showedDialog_o) {
             showedDialog_o = 1;
-            sprintf(gText, localization::Tr("campaign.victory.dragon_city"));
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.victory.dragon_city"));
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
@@ -2505,7 +2499,7 @@ void CheckEndGame(
             defeated_m = 1;
             if (!showedDialog_o) {
                 showedDialog_o = 1;
-                sprintf(gText, localization::Tr("campaign.loss.roland_captured"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.loss.roland_captured"));
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2526,7 +2520,7 @@ void CheckEndGame(
             winFlag = 1;
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = 1;
-                sprintf(gText, localization::Tr("victory.side_triumph"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2668,7 +2662,7 @@ void QuickViewWait(void) {
 
 void InitVars(void) {
     i32 i;
-    i32 j;
+
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
@@ -2712,12 +2706,12 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
 
     mixedUndead4 = 0;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) > 0)
-        sprintf(description7, cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)]);
+        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)]);
     else {
         if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) == 0)
-            sprintf(description7, cMoraleInfo[H2EnumIndex(MORALE_INFO_NEUTRAL)]);
+            utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_NEUTRAL)]);
         else
-            sprintf(description7, cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)]);
+            utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)]);
     }
 
     sprintf(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_HEADER)], description7);
@@ -2746,15 +2740,15 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         strcat(gText, description7);
     }
     if (homogeneous5 == ARMY_GROUP_ALIGNMENT_THREE) {
-        sprintf(description7, cMoraleInfo[H2EnumIndex(INFO_THREE_ALIGNMENTS)]);
+        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_THREE_ALIGNMENTS)]);
         strcat(gText, description7);
     }
     if (homogeneous5 == ARMY_GROUP_ALIGNMENT_FOUR) {
-        sprintf(description7, cMoraleInfo[H2EnumIndex(INFO_FOUR_ALIGNMENTS)]);
+        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_FOUR_ALIGNMENTS)]);
         strcat(gText, description7);
     }
     if (homogeneous5 == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
-        sprintf(description7, cMoraleInfo[H2EnumIndex(INFO_FIVE_ALIGNMENTS)]);
+        utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(INFO_FIVE_ALIGNMENTS)]);
         strcat(gText, description7);
     }
 
@@ -2828,16 +2822,16 @@ showDialog:
 
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
     char description4[MORALE_LUCK_DESCRIPTION_SIZE];
-    i32 luckValue;
+
     i32 modifierStart;
 
     if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
-        sprintf(description4, cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)]);
+        utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)]);
     else {
         if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) == 0)
-            sprintf(description4, cLuckInfo[H2EnumIndex(LUCK_INFO_NEUTRAL)]);
+            utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_NEUTRAL)]);
         else
-            sprintf(description4, cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)]);
+            utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)]);
     }
 
     sprintf(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_HEADER)], description4);
@@ -2914,7 +2908,7 @@ i32 AddScoreToHighScore(
     i32 days,
     i32 scenario,
     HighScoreType highScoreType,
-    char* scenarioName
+    const char* scenarioName
 ) {
     i32 dest_o;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
@@ -3000,7 +2994,7 @@ i32 AddScoreToHighScore(
     return 0;
 }
 
-void BVResMsg(char* s, ResourceType res, i32 qty) {
+void BVResMsg(const char* s, ResourceType res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = platform::Ticks() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
@@ -3009,7 +3003,7 @@ void BVResMsg(char* s, ResourceType res, i32 qty) {
     gpAdvManager->UpdBottomView(1, 1, 1);
 }
 
-void GOut(char* str) {
+void GOut(const char* str) {
     if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
@@ -3057,12 +3051,12 @@ i32 WaitForOtherPlayer(void) {
 }
 
 void PopNetBox(char* text, i32 netPlayer) {
-    i32 textY_h;
+
     i32l messageTime_b;
     heroWindow* netWindow_j;
     i32 result_p;
     i32 textWidth_b;
-    i32 textX_k;
+
     i32 savedShowIt_p;
     i32 updateInput_f;
     i32 inputLength_a;
@@ -3071,9 +3065,9 @@ void PopNetBox(char* text, i32 netPlayer) {
     i32 sendText_b;
     tag_message event_o;
     tag_message updateMessage_i;
-    i32 firstLineId_a;
+
     i32 delay_e;
-    i32 lineTextLimit_g;
+
     i32 done_a;
     i32 redrawLines_l;
     i32 redrawSavedShowIt_a;
@@ -3084,10 +3078,6 @@ void PopNetBox(char* text, i32 netPlayer) {
     if (!gbRemoteOn)
         return;
 
-    lineTextLimit_g = BOX_LINE_TEXT_LIMIT;
-    firstLineId_a = BOX_FIRST_LINE_ID;
-    textX_k = BOX_TEXT_X;
-    textY_h = BOX_TEXT_Y;
     messageTime_b = 0;
     if (text != NULL) {
         if (netPlayer >= 0) {
@@ -3095,7 +3085,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].m_color);
         } else {
-            sprintf(gText, text);
+            utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, text);
             gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, BOX_DEFAULT_COLOR);
         }
@@ -3380,7 +3370,7 @@ void ShutDown(const char* msg) {
             buf
         );
     } else {
-        sprintf(buf, localization::Tr("system.goodbye"));
+        utf8::Copy(buf, sizeof(buf), localization::Tr("system.goodbye"));
     }
     ShutDownSmacker();
     ClearMapExtra();
@@ -3514,7 +3504,7 @@ void SmackFade(u8* src, u8* dst) {
 
 void ShowCongrats(HighScoreType highScoreType) {
     u8 palette[MISC_PALETTE_BYTE_COUNT];
-    i32 unused;
+
     i32 baseScore;
     i32 realScore;
     char ratingText[CONGRATS_RATING_LENGTH];
@@ -3548,7 +3538,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     }
     utf8::UppercaseFirst(ratingText);
     if (static_cast<i8>(gpGame->m_cheated))
-        sprintf(ratingText, localization::Tr("high_score.cheater_rating"));
+        utf8::Copy(ratingText, sizeof(ratingText), localization::Tr("high_score.cheater_rating"));
 
     if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(
@@ -3596,7 +3586,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 }
 
 void CongratsWait(void) {
-    i32 command = 0;
+
     i32 done = 0;
     tag_message msg;
     gpInputManager->Flush();
@@ -3616,7 +3606,7 @@ typedef enum SamplePlaybackConstant {
     SAMPLE_DEFAULT_WAIT_TIME = 4000
 } SamplePlaybackConstant;
 
-SAMPLE2 LoadPlaySample(char* name) {
+SAMPLE2 LoadPlaySample(const char* name) {
     SAMPLE2 ss;
     ss = gpResourceManager->GetSample(name);
     if (ss) {
@@ -3661,7 +3651,7 @@ void MemError(void) {
     ShutDown(gText);
 }
 
-char* GetTownName(i32 i) {
+const char* GetTownName(i32 i) {
     town* t = GetCastleRec(i);
     return t->m_name;
 }
@@ -4078,7 +4068,7 @@ void UpdateAppSpecificMenus(void* hMenu) {
         UpdateSystemOptionsMenu();
 }
 
-void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
+void EarlyResizeWindow(i32, i32, i32, i32) {
     if (gbClosingApp)
         return;
 }
@@ -4135,42 +4125,23 @@ void SetupDynamicWindow(
     i32 windowType
 ) {
     i32 leftOffset_p;
-    i32 bottomCornerPaddingNum_j;
+
     i32 numRows;
     widget* newWidgetTemp_p;
     i32 columnsSize_h;
     i32 topOffsetNum_n;
-    i32 contentXPaddingCount_m;
+
     i32 centeredHeightCount_k;
-    i32 centeredPadding_c;
-    i32 topCornerPaddingCount;
+
     i32 bottomOffsetLocal_p;
     i32 rightOffset_p;
-    i32 contentYPadding;
+
     i32 edge_d;
     i32 tileRowPos_k;
     i32 centeredWidthValue_b;
-    i32 leftCornerPaddingLocal_e;
-    i32 rightCornerPaddingValue_j;
-    i32 stoneWidgetColorSize_c;
-    i32 columnIndex_k;
-    i32 bottomEdgeOffset_l;
-    i32 tileWidth_k;
-    i32 tileHeight_h;
-    i32 topEdgeInset;
 
-    tileWidth_k = TILE_SIZE;
-    tileHeight_h = TILE_SIZE;
-    topEdgeInset = -EDGE_OFFSET;
-    bottomEdgeOffset_l = -EDGE_OFFSET;
-    contentXPaddingCount_m = CONTENT_LEFT;
-    contentYPadding = CONTENT_TOP;
-    topCornerPaddingCount = CONTENT_TOP;
-    bottomCornerPaddingNum_j = CONTENT_TOP;
-    leftCornerPaddingLocal_e = CONTENT_TOP;
-    rightCornerPaddingValue_j = CONTENT_TOP;
-    centeredPadding_c = CONTENT_LEFT;
-    stoneWidgetColorSize_c = CONTENT_TOP;
+    i32 columnIndex_k;
+
     newWidgetTemp_p = NULL;
     columnsSize_h = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
@@ -4467,7 +4438,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         if (exitInfo.eliminated) {
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
-                sprintf(gText, localization::Tr("player.eliminated"));
+                utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 gbGameOver = true;
                 giEndSequence = 0;
@@ -4488,7 +4459,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 PLAYER_EXIT_MESSAGE_TIME
             );
         } else if (!exitInfo.continueGame) {
-            gpGame->SaveGame(const_cast<char*>(save_names::PlayerExit), 1, 0);
+            gpGame->SaveGame(save_names::PlayerExit, 1, 0);
             sprintf(
                 gText,
                 localization::Tr("network.player_exit.host_terminated"),
@@ -4564,13 +4535,12 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
 
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     i32 localPlayerLost_e;
-    i32 sendReturn;
-    i32 unusedPacketResult_g;
+
     i32 recipient;
 
     localPlayerLost_e = 0;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
-    gpGame->SaveGame(const_cast<char*>(save_names::PlayerExit), 1, 0);
+    gpGame->SaveGame(save_names::PlayerExit, 1, 0);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = 1;
@@ -4617,7 +4587,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
 exitInfoProcessed:
     if (giNumHumanPlayers == PLAYER_EXIT_DIRECT_PLAYER_COUNT) {
         if (exitInfo.eliminated && !exitInfo.hostReported) {
-            sendReturn = TransmitRemoteData(
+            TransmitRemoteData(
                 reinterpret_cast<char*>(&exitInfo),
                 1 - giThisNetPos,
                 sizeof(exitInfo),
@@ -4638,7 +4608,7 @@ exitInfoProcessed:
             if ((recipient == exitInfo.netPosition && exitInfo.eliminated && !exitInfo.hostReported)
                 || (recipient != exitInfo.netPosition && recipient < giNumHumanPlayers
                     && recipient != giThisNetPos)) {
-                sendReturn = TransmitRemoteData(
+                TransmitRemoteData(
                     reinterpret_cast<char*>(&exitInfo),
                     recipient,
                     sizeof(exitInfo),
@@ -4656,7 +4626,7 @@ exitInfoProcessed:
 
 playerExitHandled:
     if (localPlayerLost_e) {
-        sprintf(gText, localization::Tr("player.eliminated"));
+        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
         RemoteCleanup();
         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         gbGameOver = true;
@@ -4702,12 +4672,10 @@ i32 GetManaCost(SpellType spell, hero* h) {
 }
 
 void SetWinText(heroWindow* j, i32 id) {
-    i32 a = 0;
     i32 i;
     tag_message msg;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
-            a++;
             msg.type = MESSAGE_WIDGET;
             msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             msg.payload.widget.id = gWinSetup[i].widgetId;
@@ -4845,7 +4813,7 @@ void NormalDialog(
     i32 labelY_k;
     widget* borderWidget_k;
     i32 resourceFrame_n;
-    i16 showMessage_d;
+
     i32 textWidgetId;
     heroWindow* savedNormalDialogWindow;
     i32 savedPointerFrame;
@@ -4858,7 +4826,7 @@ void NormalDialog(
     widget* textPanel_j;
     i32 resourceSlot;
     i32 resourceY_f;
-    i32 iconHeight_h;
+
     i32 lineCount;
     i32 dialogContentHeight;
     i32 resourceCenterX_c;
@@ -4875,7 +4843,6 @@ void NormalDialog(
     i32 resourceType_a[NORMAL_DIALOG_RESOURCE_COUNT];
     MouseCursorType savedPointerType_o;
     widget* iconPanel_a;
-    i32 panelHeight_d;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4890,9 +4857,8 @@ void NormalDialog(
     resourceFrame_n = 0;
     textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
     resourceImageWidth = 0;
-    iconHeight_h = 0;
+
     showPrimaryBonus = 0;
-    showMessage_d = 1;
 
     if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL
         && firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
@@ -5013,7 +4979,7 @@ void NormalDialog(
 
     message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
     message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_b.payload.widget.data.text = reinterpret_cast<char*>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_b.payload.widget.data.text = reinterpret_cast<const char*>(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
         message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
         pNormalDialogWindow->BroadcastMessage(message_b);
@@ -5481,7 +5447,7 @@ void NormalDialog(
     message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
     message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
     message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
-    message_b.payload.widget.data.text = const_cast<char*>(text);
+    message_b.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message_b);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
@@ -5539,12 +5505,12 @@ void NormalDialog(
 }
 
 void UpdateNormalDialog(const char* text) {
-    i16 show = 1;
+
     tag_message evt;
     evt.type = MESSAGE_WIDGET;
     evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     evt.payload.widget.id = 1;
-    evt.payload.widget.data.text = const_cast<char*>(text);
+    evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
     pNormalDialogWindow
@@ -5782,7 +5748,7 @@ u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
-char* gTilesetFiles[H2EnumIndex(TILESET_COUNT)] = {
+const char* gTilesetFiles[H2EnumIndex(TILESET_COUNT)] = {
     "",
     "",
     "",
@@ -6128,7 +6094,7 @@ u32l gTownEligibleBuildMask[KB_FACTION_TABLE_CAPACITY] = {
 u8 giMapSizes[KB_MAP_SIZE_COUNT] =
     {MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE, MAP_DIMENSION_XLARGE};
 b32 gbUseEvilInterface = false;
-char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
+const char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {
         "advbord.icn",
         "advborde.icn"
@@ -6294,7 +6260,7 @@ b32 gbDrawWindowBackground = true;
 b32 gbCheatMenus = false;
 b32 gbUseWaveout = false;
 b32 gbShowAllMaps = false;
-char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+const char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6950,7 +6916,7 @@ platform::MenuHandle hmnuDflt = nullptr;
 platform::MenuHandle hmnuCmbt = nullptr;
 platform::MenuHandle hmnuAdv = nullptr;
 platform::MenuHandle hmnuTown = nullptr;
-char* cMonFilename[KB_CREATURE_TABLE_CAPACITY] = {
+const char* cMonFilename[KB_CREATURE_TABLE_CAPACITY] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",
     "orc.icn",      "orc2.icn",     "wolf.icn",     "ogre.icn",     "ogre2.icn",    "troll.icn",
@@ -7392,7 +7358,7 @@ SSpellInfo gsSpellInfo[KB_SPELL_TABLE_CAPACITY] = {
      {10, 10, 10, 10, 10, 10},
      SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT}
 };
-char* cArmyFrameFileNames[KB_CREATURE_TABLE_CAPACITY] = {
+const char* cArmyFrameFileNames[KB_CREATURE_TABLE_CAPACITY] = {
     "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin", "pikmnfrm.bin", "swrdsfrm.bin",
     "swrdsfrm.bin", "cvlryfrm.bin", "cvlr2frm.bin", "paladfrm.bin", "paladfrm.bin", "goblnfrm.bin",
     "orc__frm.bin", "orc__frm.bin", "wolf_frm.bin", "ogre_frm.bin", "ogre_frm.bin", "trollfrm.bin",
@@ -7449,7 +7415,7 @@ u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10,
 SpellEffectDisplayType
 giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
-char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
+const char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
                                                      "CBKGWATR.icn",
                                                      "",
                                                      "CBKGGRTR.icn",
@@ -7526,9 +7492,9 @@ u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-char* gTownPrefixNames[KB_FACTION_TABLE_CAPACITY] =
+const char* gTownPrefixNames[KB_FACTION_TABLE_CAPACITY] =
     {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
-char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+const char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage",
     "thie",
     "tvrn",
@@ -7866,7 +7832,7 @@ u32l gHierarchyMask[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
 i32 giDebugBuildingToBuild = -1;
 u8
     giTerrainToMusicTrack[H2EnumIndex(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-char* cHeroTypeShortName[KB_FACTION_TABLE_CAPACITY] =
+const char* cHeroTypeShortName[KB_FACTION_TABLE_CAPACITY] =
     {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr", "", "", "", "", "", "", "cbrg"};
 char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] =
     {'k', 'b', 's', 'w', 'z', 'n', 0, 0, 0, 0, 0, 0, 'c'};
@@ -8207,7 +8173,7 @@ SCampaignChoice
           {CAMPAIGN_CHOICE_ALIGNMENT, H2EnumIndex(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
 char* congratsText = NULL;
-char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY] = {
+const char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY] = {
     "Ultimate Book of Knowledge",
     "Ultimate Sword of Dominion",
     "Ultimate Cloak of Protection",
@@ -8312,7 +8278,7 @@ char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY] = {
     "Sword of Anduran",
     "Spade of Necromancy"
 };
-char* gArtifactDesc[KB_ARTIFACT_TABLE_CAPACITY] = {
+const char* gArtifactDesc[KB_ARTIFACT_TABLE_CAPACITY] = {
     "{Ultimate Book\n(+12 Knowledge)}\n\nThe Ultimate Book of Knowledge increases your knowledge "
     "by 12.",
     "{Ultimate Sword\n(+12 Attack)}\n\nThe Ultimate Sword of Dominion increases your attack skill "
@@ -8451,7 +8417,7 @@ char* gArtifactDesc[KB_ARTIFACT_TABLE_CAPACITY] = {
     "{Sword of Anduran}\n\nThe Sword increases your attack skill by 5.",
     "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill."
 };
-char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
+const char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "",
     "",
     "",
@@ -8699,15 +8665,15 @@ char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "A dirty shovel has been thrust into a dirt mound nearby. Upon investigation, you discover it "
     "to be the enchanted shovel of the Gravediggers, long thought lost by mortals."
 };
-char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {"Attack Skill", "Defense Skill", "Spell Power", "Knowledge"};
-char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
+const char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {"Attack Skill", "Defense Skill", "Spell Power", "Knowledge"};
+const char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
     "{Attack Skill}\n\nYour attack skill is a bonus added to each creature's attack skill.",
     "{Defense Skill}\n\nYour defense skill is a bonus added to each creature's defense skill.",
     "{Spell Power}\n\nYour spell power determines the length or power of a spell.",
     "{Knowledge}\n\nYour knowledge determines how many spell points your hero may have.  Under "
     "normal cirumstances, a hero is limited to 10 spell points per level of knowledge."
 };
-char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
+const char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     "Knight",
     "Barbarian",
     "Sorceress",
@@ -8722,7 +8688,7 @@ char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     NULL,
     "Cyborg"
 };
-char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)] = {
+const char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)] = {
     "peasn",
     "archr",
     "arch2",
@@ -8790,7 +8756,7 @@ char* gArmyShortNames[H2EnumIndex(CREATURE_COUNT)] = {
     "elemf",
     "elemw"
 };
-char* gArmyNames[KB_CREATURE_TABLE_CAPACITY] = {
+const char* gArmyNames[KB_CREATURE_TABLE_CAPACITY] = {
     "peasant",
     "archer",
     "ranger",
@@ -8858,7 +8824,7 @@ char* gArmyNames[KB_CREATURE_TABLE_CAPACITY] = {
     "fire elemental",
     "water elemental"
 };
-char* gArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY] = {
+const char* gArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY] = {
     "peasants",
     "archers",
     "rangers",
@@ -8926,13 +8892,12 @@ char* gArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY] = {
     "fire elementals",
     "water elementals"
 };
-char* gTerrainNames[H2EnumIndex(TERRAIN_COUNT)] = {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach"
+const char* gTerrainNames[H2EnumIndex(TERRAIN_COUNT)] = {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach"
 };
-char* gResourceNames[RESOURCE_VALUE_COUNT] = {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold"
+const char* gResourceNames[RESOURCE_VALUE_COUNT] = {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold"
 };
 
-
-char* gMineNames[KB_MINE_NAME_COUNT] = {
+const char* gMineNames[KB_MINE_NAME_COUNT] = {
     "Sawmill",
     "Alchemist Lab",
     "Ore Mine",
@@ -8941,7 +8906,7 @@ char* gMineNames[KB_MINE_NAME_COUNT] = {
     "Gem Mine",
     "Gold Mine"
 };
-char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
+const char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "",
     "Alchemist Lab",
     "Sign",
@@ -9068,7 +9033,7 @@ char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "Jail",
     "Shipyard"
 };
-char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
+const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "{Alchemist}\n\nYou have taken control of the local Alchemist shop. It will provide you with "
     "one unit of Mercury per day.",
     "{Signpost}\n\nA signpost reads:}\n\n%s is near.",
@@ -9206,14 +9171,14 @@ char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the "
     "tattered clothing, you find "
 };
-char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
+const char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Start a single or multi-player game.",
     "Load a previously saved game.",
     "Save the current game.",
     "Quit out of Heroes of Might and Magic II.",
     "Exit this menu without doing anything."
 };
-char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
+const char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
     "{Speed}\n\nSet the speed of combat actions and animations.",
     "{Monster Info}\n\nToggle the monster info window, which shows information on the active and "
@@ -9230,21 +9195,21 @@ char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "mouse cursor is currently over is shadowed.  When this is turned on, there is a slight "
     "performance cost, most noticeable on 486 computers."
 };
-char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
+const char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "View the entire world.",
     "View the obelisk puzzle.",
     "View information on the scenario you are currently playing.",
     "Dig for the Ultimate Artifact.",
     "Exit this menu without doing anything."
 };
-char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
+const char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{New Game}\n\nStart a single or multi-player game.",
     "{Load Game}\n\nLoad a previously saved game.",
     "{High Scores}\n\nView the high score screen.",
     "{Credits}\n\nView the credits screen.",
     "{Quit}\n\nQuit Heroes of Might and Magic and return to the operating system."
 };
-char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
+const char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Next Hero}\n\nSelect the next Hero.",
     "{Continue Movement}\n\nContinue the Hero's movement along the current path.",
     "{Kingdom Summary}\n\nView a summary of your kingdom.",
@@ -9254,11 +9219,11 @@ char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{System Options}\n\nBring up the system options menu, allowing you to customize your game.",
     "{Cast Spell}\n\nCast an adventure spell."
 };
-char* gLuckText[KB_LUCK_TEXT_COUNT] = {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish"
+const char* gLuckText[KB_LUCK_TEXT_COUNT] = {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish"
 };
-char* gMoraleText[KB_MORALE_TEXT_COUNT] = {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!"
+const char* gMoraleText[KB_MORALE_TEXT_COUNT] = {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!"
 };
-char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
+const char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "Off",
     "On",
     "On\nVolume 9",
@@ -9271,18 +9236,10 @@ char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "On\nVolume 2",
     "On\nVolume 1"
 };
-char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump"
+const char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump"
 };
-char* gColors[H2EnumIndex(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
-static char* gColorAbbreviations[H2EnumIndex(FACTION_COUNT)] = {
-    "blu.",
-    "grn.",
-    "red.",
-    "yel.",
-    "org.",
-    "pur."
-};
-char* gMonthNames[KB_MONTH_NAME_COUNT] = {
+const char* gColors[H2EnumIndex(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
+const char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Grasshopper",
     "Ant",
     "Dragonfly",
@@ -9294,7 +9251,7 @@ char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Hornet",
     "Beetle"
 };
-char* gWeekNames[KB_WEEK_NAME_COUNT] = {
+const char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Squirrel",
     "Rabbit",
     "Gopher",
@@ -9311,7 +9268,7 @@ char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Hedgehog",
     "Condor"
 };
-char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+const char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Kingdom Overview",
     "View %s Info",
     "Additional hero characteristics",
@@ -9338,7 +9295,7 @@ char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Set army combat formation to 'Spread'",
     "Set army combat formation to 'Grouped'"
 };
-char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+const char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Build Mage Guild",
     "Mage Guild is at highest level.",
     "Cannot afford next level.",
@@ -9356,7 +9313,7 @@ char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Set garrison combat formation to 'Grouped'",
     "Set garrison combat formation to 'Spread'"
 };
-char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+const char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "{Good Luck}\n\nGood luck sometimes lets your armies get lucky attacks (double strength) in "
     "combat.",
     "{Neutral Luck}\n\nNeutral luck means your armies will never get lucky or unlucky attacks on "
@@ -9382,9 +9339,9 @@ char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "\nMermaid visited +1",
     "\nBattle Garb of Anduran gives you maximum luck."
 };
-char* IQnames[KB_IQ_NAME_COUNT] = {"None", "Dumb", "Average", "Smart", "Genius"
+const char* IQnames[KB_IQ_NAME_COUNT] = {"None", "Dumb", "Average", "Smart", "Genius"
 };
-char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+const char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View previous page",
     "View next page",
     "View adventure Spells",
@@ -9395,7 +9352,7 @@ char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View Combat Spells",
     "Your hero has %d spell points remaining"
 };
-char* speedText[KB_SPEED_TEXT_COUNT] = {
+const char* speedText[KB_SPEED_TEXT_COUNT] = {
     "",
     "Crawling",
     "Very slow",
@@ -9407,7 +9364,7 @@ char* speedText[KB_SPEED_TEXT_COUNT] = {
     "Blazing",
     "Instant"
 };
-char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+const char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Attack Skill: ",
     "Defense Skill: ",
     "Shots left: ",
@@ -9418,7 +9375,7 @@ char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Luck: ",
     "Shots: "
 };
-char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+const char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Attack: ",
     "Defense: ",
     "Shots: ",
@@ -9429,12 +9386,12 @@ char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "\n\nSpeed:\n%s",
     "\n\nGrowth\n + %d / week"
 };
-char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
+const char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
     "Kingdom Overview     Month %d, Week %d, Day %d",
     "You own Dragon City.",
     "You own the Lighthouse."
 };
-char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+const char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "%s, you only have %d days left to capture a town, or you will be banished from this land.",
     "%s, this is your last day to capture a town, or you will be banished from this land.",
     "Astrologers proclaim month of the %s.\n\nAll dwellings increase population.",
@@ -9444,7 +9401,7 @@ char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "Astrologers proclaim week of the %s.\n\nAll dwellings increase population.",
     "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population."
 };
-char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+const char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Attack: ",
     "Defense: ",
     "Spell Power: ",
@@ -9453,7 +9410,7 @@ char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Luck: ",
     "Spell Points: "
 };
-char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+const char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Stop Catapult",
     "Cast Spell",
     "Retreat",
@@ -9462,7 +9419,7 @@ char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Hero's Options",
     "Captain's Options"
 };
-char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+const char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "{Cast Spell}\n\nCast a magical spell.  You may only cast one spell per combat round.  The "
     "round is reset when every creature has had a turn.",
     "{Retreat}\n\nRetreat your hero, abandoning your creatures.  Your hero will be available for "
@@ -9471,7 +9428,7 @@ char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "his or her surviving creatures will be available to recruit again.",
     "{Cancel}\n\nReturn to the battle."
 };
-char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+const char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "",
     "Move %s here.",
     "Fly %s here.",
@@ -9485,17 +9442,17 @@ char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "View Opposing Captain",
     "View Ballista Info"
 };
-char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
+const char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
     {"%s has gained", " a level.\n", " %d levels.\n"
 };
-char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+const char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     "Wait for other units to go.",
     "Skip this unit",
     "Auto combat",
     "Customize system options.",
     ""
 };
-char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+const char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Wait}\n\nHave the current creature wait to take its turn until all the other creatures have "
     "gone.  The creature does not lose its turn.",
     "{Skip}\n\nSkips the current creature.  The current creature loses its turn and does not get "
@@ -9504,7 +9461,7 @@ char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{System Options}\n\nAllows you to customize the combat screen.",
     "{Message Bar}\n\nShows the results of individual monster's actions."
 };
-char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
+const char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Redistribute %s army",
     "Cannot combine hero's last army",
     "Combine %s armies",
@@ -9534,7 +9491,7 @@ char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Marketplace",
     "Captain's Quarters"
 };
-char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+const char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     "Lord Kilburn", "Sir Gallant", "Ector",    "Gwenneth", "Tyro",    "Ambrose",   "Ruby",
     "Maximus",      "Dimitri",     "Thundax",  "Fineous",  "Jojosh",  "Crag Hack", "Jezebel",
     "Jaclyn",       "Ergon",       "Tsabu",    "Atlas",    "Astra",   "Natasha",   "Troyan",
@@ -9544,7 +9501,7 @@ char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     "Sarakin",      "Kalindra",    "Mandigal", "Zom",      "Darlana", "Zam",       "Ranloo",
     "Charity",      "Rialdo",      "Roxana",   "Sandro",   "Celia"
 };
-char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+const char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     "{Game Difficulty}\n\nThis lets you change the starting difficulty at which you will play.  "
     "Higher difficulty levels start you off with fewer resources, and at the higher settings, give "
     "extra resources to the computer.",
@@ -9563,7 +9520,7 @@ char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     "{OK}\n\nClick to accept these settings and start a new game.",
     "{Cancel}\n\nClick to return to the main menu."
 };
-char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+const char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: For a 14400 baud modem, use the "
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
     "{9600 Baud}\n\nUse a 9600 baud connection speed. \n\nNote: For a 14400 baud modem, use the "
@@ -9574,14 +9531,14 @@ char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+const char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the modem connection.",
     "{COM 2}\n\nUse COM Port 2 for the modem connection.",
     "{COM 3}\n\nUse COM Port 3 for the modem connection.",
     "{COM 4}\n\nUse COM Port 4 for the modem connection.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+const char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: In general, computers with the "
     "older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip "
     "should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try "
@@ -9600,14 +9557,14 @@ char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+const char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the direct connection.",
     "{COM 2}\n\nUse COM Port 2 for the direct connection.",
     "{COM 3}\n\nUse COM Port 3 for the direct connection.",
     "{Com 4}\n\nUse COM Port 4 for the direct connection.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+const char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{2 Players}\n\nPlay with 2 human players, and optionally, up to 4 additional computer "
     "players.",
     "{3 Players}\n\nPlay with 3 human players, and optionally, up to 3 additional computer "
@@ -9618,19 +9575,19 @@ char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{6 Players}\n\nPlay with 6 human players.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+const char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options, chooses the number to dial, and places the call.",
     "{Guest}\n\nThe guest waits for the host to call and set up the game.",
     "{Config}\n\nChange your modem configuration.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+const char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.",
     "{Guest}\n\nThe guest waits for the host to set up the game.",
     "{Config}\n\nChange your direct connect port configuration.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+const char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
     "{Hot Seat}\n\nPlay a Hot Seat game, where 2 to 4 players play around the same computer, "
     "switching into the 'Hot Seat' when it is their turn.",
     "{Network}\n\nPlay a network game, where 2 players use their own computers connected through a "
@@ -9641,13 +9598,13 @@ char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
     "directly connected through their serial port by a null modem.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+const char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.  There can only be one host per network game.",
     "{Guest}\n\nThe guest waits for the host to set up the game, then is automatically added in.  "
     "There can be multiple guests for TCP/IP and IPX games, but only 1 guest for NetBIOS games.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+const char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "{IPX}\n\nIPX networking is the most commonly used form of network in Windows 95.  Up to 6 "
     "players can play using IPX.  Only the Windows 95 version of Heroes II supports IPX "
     "networking.",
@@ -9661,14 +9618,14 @@ char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "networking is recommended.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+const char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
     "{Standard Game}\n\nA single player game playing out a single map.",
     "{Campaign Game}\n\nA single player game playing through a series of maps.",
     "{Multi-Player Game}\n\nA multi-player game, with several human players competing against each "
     "other on a single map.",
     "{Cancel}\n\nCancel back to the main menu."
 };
-char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+const char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "The enemy has surrendered!",
     "The enemy has fled!",
     "A glorious victory!",
@@ -9681,7 +9638,7 @@ char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "Your forces suffer a bitter defeat.",
     "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s)."
 };
-char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+const char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "{Good Morale}\n\nGood morale may give your armies extra attacks in combat.",
     "{Neutral Morale}\n\nNeutral morale means your armies will never be blessed with extra attacks "
     "or freeze in combat.",
@@ -9716,25 +9673,25 @@ char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "\nMasthead bonus at sea +1",
     "\nBattle Garb of Anduran gives you maximum morale."
 };
-char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
-char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+const char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
+const char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
     {"Easy", "Normal", "Hard", "Expert", "Impossible"
 };
-char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
-char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
+const char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
+const char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {"Lord Ironfist", "Lord Slayer", "Queen Lamanda", "Lord Alamar"};
-char* cWinText[KB_WIN_TEXT_COUNT] =
+const char* cWinText[KB_WIN_TEXT_COUNT] =
     {"Days Spent:", "Base Score:", "Difficulty Rating:", "Final Score:", "Ranking:"
 };
-char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
     {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert"
 };
-char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert"
 };
-char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
+const char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera"};
-char* gSpellDesc[KB_SPELL_TEXT_CAPACITY] = {
+const char* gSpellDesc[KB_SPELL_TEXT_CAPACITY] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
     "{Fireblast}\n\nAn improved version of fireball, fireblast affects two hexes around the center "
@@ -9829,7 +9786,7 @@ char* gSpellDesc[KB_SPELL_TEXT_CAPACITY] = {
     "will suck any creature adjacent to it together.",
     NULL
 };
-char* gSpellNames[KB_SPELL_TEXT_CAPACITY] = {
+const char* gSpellNames[KB_SPELL_TEXT_CAPACITY] = {
     "Fireball",
     "Fireblast",
     "Lightning Bolt",
@@ -9905,10 +9862,10 @@ char* gSpellNames[KB_SPELL_TEXT_CAPACITY] = {
     "Implosion Grenade",
     NULL
 };
-char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
+const char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {"Basic", "Advanced", "Expert"
 };
-char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+const char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Pathfinding",
     "Archery",
     "Logistics",
@@ -9924,7 +9881,7 @@ char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Necromancy",
     "Estates"
 };
-char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+const char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "Mage Guild",
     "Thieves' Guild",
     "Tavern",
@@ -9945,7 +9902,7 @@ char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "",
     ""
 };
-char* gWellExtraNames[KB_FACTION_TABLE_CAPACITY] = {
+const char* gWellExtraNames[KB_FACTION_TABLE_CAPACITY] = {
     "Farm",
     "Garbage Heap",
     "Crystal Garden",
@@ -9954,9 +9911,9 @@ char* gWellExtraNames[KB_FACTION_TABLE_CAPACITY] = {
     "Skull Pile",
     "1st Lvl Growth"
 };
-char* gSpecialBuildingNames[KB_FACTION_TABLE_CAPACITY] =
+const char* gSpecialBuildingNames[KB_FACTION_TABLE_CAPACITY] =
     {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", NULL};
-char* gDwellingNames[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
+const char* gDwellingNames[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
      "Blacksmith",
@@ -10031,7 +9988,7 @@ char* gDwellingNames[KB_FACTION_TABLE_CAPACITY][KB_DWELLING_TYPE_COUNT] = {
      ""}
 };
 // The Cyborg Wisdom slot reads as Cybernetics, with its own descriptions.
-char* cyberneticsDesc[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+const char* cyberneticsDesc[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     "{Basic Cybernetics}\n\nBasic Cybernetics allows your hero to learn Level 1-3 spells "
     "from a Cybernetics Lab.",
     "{Advanced Cybernetics}\n\nAdvanced Cybernetics allows your hero to learn Level 4 "
@@ -10039,7 +9996,7 @@ char* cyberneticsDesc[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     "{Expert Cybernetics}\n\nExpert Cybernetics allows your hero to learn Level 5 spells "
     "from a Cybernetics Lab."
 };
-char* cSecSkillDesc[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+const char* cSecSkillDesc[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
      "terrain by 25 percent.",
      "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for "
@@ -10118,7 +10075,7 @@ char* cSecSkillDesc[H2EnumIndex(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_C
      "{Grand Estates}\n\nYour hero produces 500 gold pieces per turn as tax revenue from "
      "estates."}
 };
-char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+const char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "The Mage Guild allows heroes to learn spells and replenish their spell points.",
     "The Thieves' Guild provides information on enemy players.  Thieves' Guilds can also provide "
     "scouting information on enemy towns.  Additional Guilds provide more information.",
@@ -10144,7 +10101,7 @@ char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "",
     ""
 };
-char* gBuildingInfoSpecial[KB_FACTION_TABLE_CAPACITY] = {
+const char* gBuildingInfoSpecial[KB_FACTION_TABLE_CAPACITY] = {
     "The Fortifications increase the toughness of the walls, increasing the number of turns it "
     "takes to knock them down.",
     "The Coliseum provides inspiring spectacles to defending troops, raising their morale by two "
@@ -10154,7 +10111,7 @@ char* gBuildingInfoSpecial[KB_FACTION_TABLE_CAPACITY] = {
     "The Library increases the number of spells in the Guild by one for each level of the guild.",
     "The Storm adds +2 to the power of spells of a defending spell caster."
 };
-char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
+const char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "northern",
     "northeastern",
     "eastern",
@@ -10165,7 +10122,7 @@ char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "northwestern",
     "central"
 };
-char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+const char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "in the murky depths of the ocean.",
     "on a grassy plain.",
     "in the driven snow.",
@@ -10176,14 +10133,14 @@ char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "in a parched wasteland.",
     "buried on a beach."
 };
-char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil"
+const char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil"
 };
-char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
-char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast"
+const char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
+const char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast"
 };
-char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full"
+const char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full"
 };
-char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+const char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n\n\n***Command Line Help***\n",
     "\n",
     "/D0 - disable digital sound\n",
@@ -10199,9 +10156,9 @@ char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "Starts the DOS version of Heroes2 with redbook\n",
     "sound disabled and the intro skipped.\n"
 };
-char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
+const char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
     {"Hero/Stats", "Skills", "Artifacts", "Town/Castle", "Garrison", "Available"};
-char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+const char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "Communications error on function '%s'\n\nWin95 Error Code: %d\nWin95 Error Meaning: %s\n\n",
     "Suggested solutions:",
     "\n  1) Make sure all cables are firmly connected.",
@@ -10210,10 +10167,10 @@ char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "down on the screen where you choose Host or Guest.)",
     "\n  4) Consider lowering the BAUD rate in 'CONFIG' to 19200 or 9600."
 };
-char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
+const char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
     {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots"
 };
-char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+const char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "{Small Maps}\n\nView only maps of size small (36 x 36).",
     "{Medium Maps}\n\nView only maps of size medium (72 x 72).",
     "{Large Maps}\n\nView only maps of size large (108 x 108).",
@@ -10241,8 +10198,8 @@ char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "stronger enemies, fewer resources, or other special conditions making things tougher for the "
     "human player."
 };
-char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
-char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+const char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
+const char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
     {"Few", "A few", "a few"},
     {"Several", "Several", "several"},
     {"Pack", "A pack of", "a pack of"},
@@ -10253,7 +10210,7 @@ char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] =
     {"Zounds", "Zounds...", "zounds of"},
     {"Legion", "A Legion of", "a legion of"}
 };
-char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+const char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
     "The truth is out there.",
     "The dark side is stronger.",
     "The end of the world is near.",
@@ -10263,9 +10220,9 @@ char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
     "He told her \"Yada yada yada\"...  and then she said \"Blah, blah, blah...\"",
     "There once was a man from Nantucket..."
 };
-char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
+const char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
     {"See Rock City", "This space for rent", "Next sign 50 miles", "Burma shave"};
-char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+const char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     "Dwarven alliance",
     "Sorceress guild",
     "Roland strengthened",
@@ -10279,7 +10236,7 @@ char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     "Ultimate crown",
     "Carry over forces"
 };
-char* cCampaignName[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+const char* cCampaignName[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Force of Arms",
      "Annexation",
      "Save the Dwarves",
@@ -10305,7 +10262,7 @@ char* cCampaignName[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
      "Apocalypse",
      "Betrayal"}
 };
-char* cCampaignDescription[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+const char* cCampaignDescription[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Roland needs you to defeat the lords near his castle to begin his war of "
      "rebellion against his brother.  They are not allied with each other, so "
      "they will spend most of their time fighting with one another.  Victory is "
@@ -10381,14 +10338,14 @@ char* cCampaignDescription[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT]
      "Switching sides leaves you with three castles against the enemy's one.  This "
      "battle will be the easiest one you will face for the rest of the war...traitor."}
 };
-char* cOutOfMemory =
+const char* cOutOfMemory =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) "
     "and\n480K of Conventional Memory\n\n";
-char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {
+const char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {
     "Normal",
     "Interlaced"
 };
-char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+const char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
     "{Music}\n\nToggle ambient music level.",
     "{Effects}\n\nToggle foreground sounds level.",
@@ -10407,9 +10364,9 @@ char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{Mouse Cursor}\n\nToggle color cursors on/off.  Color cursors look nicer, but sometimes don't "
     "move as smoothly as black and white ones."
 };
-char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
+const char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
     {"aqua", "blue", "brown", "gold", "green", "orange", "purple", "red"};
-char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+const char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Alchemist's Tower",
     "Arena",
     "Hut of the Magi",
@@ -10418,7 +10375,7 @@ char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Mermaid",
     "Sirens"
 };
-char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+const char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Barrow Mounds",
     "Earth Summoning Altar",
     "Air Summoning Altar",
