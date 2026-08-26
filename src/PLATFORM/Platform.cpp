@@ -7,6 +7,11 @@ namespace platform {
 namespace {
 
 Backend* gBackend = nullptr;
+bool gCleanupRegistered = false;
+
+void CleanupAtExit() {
+    Shutdown();
+}
 
 }
 
@@ -15,6 +20,13 @@ bool Startup() {
         return true;
     }
     gBackend = CreateBackend();
+    if (gBackend != nullptr && !gCleanupRegistered) {
+        if (std::atexit(CleanupAtExit) != 0) {
+            std::fprintf(stderr, "[homm2] unable to register platform cleanup\n");
+        } else {
+            gCleanupRegistered = true;
+        }
+    }
     return gBackend != nullptr;
 }
 
