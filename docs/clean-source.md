@@ -20,7 +20,7 @@ homm2 clean \
   --out build/classic --publish classic-pol-2.0             # publish classic branch
 homm2 clean \
   --classic-from ../source-gold-2.1-buka \
-  --classic-encoding cp1251 \
+  --classic-russian \
   --publish-parent decomp-gold-2.1-buka \
   --out build/classic-gold --publish classic-gold-2.1-buka  # readable Russian
 ```
@@ -153,9 +153,9 @@ public type is `i32` but whose serialized fields are narrower. Remaining scoped
 enums become integer typedefs with prefixed constants, avoiding name collisions
 without requiring `enum class`. Inline assembly is copied unchanged.
 
-The Gold/Buka classic branch is intentionally not UTF-8. With
-`--classic-encoding cp1251`, retail `\\xNN` byte escapes inside literals are
-materialized as readable Russian text and the generated C/C++ files are stored
-as Windows-1251. Its Ninja/Nix build uses MinGW GCC with both the input and
-execution character sets fixed to CP1251, preserving the original runtime byte
-strings. The clean source branch and the cross-platform branches remain UTF-8.
+The Gold/Buka classic branch is a reading view, not a supported build target.
+With `--classic-russian`, retail `\\xNN` byte escapes inside literals are decoded
+as Windows-1251 and rendered as ordinary Russian text in UTF-8 C/C++ files. This
+keeps the source readable both locally and on UTF-8-only source hosts such as
+GitHub. Runtime byte preservation belongs to the decompilation and source
+branches; the classic view deliberately optimizes presentation for readers.

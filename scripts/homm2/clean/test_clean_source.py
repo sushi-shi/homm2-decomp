@@ -341,17 +341,17 @@ class ClassicSourceTests(unittest.TestCase):
             "#endif\n",
         )
 
-    def test_cp1251_literals_are_readable_without_changing_bytes(self):
+    def test_cp1251_literals_become_readable_utf8_without_changing_meaning(self):
         source = (
             'const char* text = "\\xcf\\xf0\\xe8\\xe2\\xe5\\xf2";\n'
             "char yo = '\\xa8';\n"
         )
         transformed, count = clean_source.materialize_cp1251_literals(source)
-        encoded = transformed.encode("cp1251")
         self.assertEqual(count, 7)
-        self.assertIn('"Привет"'.encode("cp1251"), encoded)
-        self.assertIn("'Ё'".encode("cp1251"), encoded)
-        self.assertNotIn(b"\\xcf", encoded)
+        self.assertIn('"Привет"'.encode("utf-8"), transformed.encode("utf-8"))
+        self.assertIn("'Ё'".encode("utf-8"), transformed.encode("utf-8"))
+        self.assertIn('"Привет"'.encode("cp1251"), transformed.encode("cp1251"))
+        self.assertNotIn(b"\\xcf", transformed.encode("utf-8"))
 
     def test_cp1251_literal_transform_preserves_escape_meaning(self):
         source = (
@@ -363,17 +363,17 @@ class ClassicSourceTests(unittest.TestCase):
         transformed, count = clean_source.materialize_cp1251_literals(source)
         self.assertEqual((transformed, count), (source, 0))
 
-    def test_cp1251_tree_verification_rejects_utf8(self):
+    def test_utf8_russian_tree_verification_rejects_cp1251(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             (output / "src").mkdir()
             source = output / "src/example.cpp"
             source.write_text('const char* text = "Привет";\n', encoding="utf-8")
-            with self.assertRaisesRegex(SystemExit, "non-UTF8 CP1251"):
-                clean_source.verify_cp1251_tree(output)
+            cyrillic, source_files = clean_source.verify_utf8_russian_tree(output)
+            self.assertEqual((cyrillic, source_files), (6, 1))
             source.write_bytes('const char* text = "Привет";\n'.encode("cp1251"))
-            cyrillic, non_utf8_files = clean_source.verify_cp1251_tree(output)
-            self.assertEqual((cyrillic, non_utf8_files), (6, 1))
+            with self.assertRaisesRegex(SystemExit, "not UTF-8"):
+                clean_source.verify_utf8_russian_tree(output)
 
 
 class CleanSourceOutputSafetyTests(unittest.TestCase):
