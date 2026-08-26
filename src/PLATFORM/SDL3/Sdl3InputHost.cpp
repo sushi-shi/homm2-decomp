@@ -399,13 +399,21 @@ public:
     }
 
     void ShowMessage(const char* title, const char* message) override {
+        const char* safeTitle = title != nullptr ? title : "Heroes II";
+        const char* safeMessage = message != nullptr ? message : "";
         if (!SDL_ShowSimpleMessageBox(
                 SDL_MESSAGEBOX_ERROR,
-                title != nullptr ? title : "Heroes II",
-                message != nullptr ? message : "",
+                safeTitle,
+                safeMessage,
                 m_video.Window()
             )) {
-            std::fprintf(stderr, "[homm2] SDL_ShowSimpleMessageBox: %s\n", SDL_GetError());
+            std::fprintf(
+                stderr,
+                "[homm2] %s: %s (message box unavailable: %s)\n",
+                safeTitle,
+                safeMessage,
+                SDL_GetError()
+            );
         }
     }
 
