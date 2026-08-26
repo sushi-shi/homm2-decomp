@@ -861,7 +861,8 @@ static i32 l_getTownName(lua_State* L) {
 static i32 l_setTownName(lua_State* L) {
     town* twn = static_cast<town*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
     CopyLuaName(L, 2, twn->m_name, sizeof(twn->m_name));
-    return 0;
+    // Upstream returns the still-on-stack name argument as the single result.
+    return 1;
 }
 
 static i32 l_getTownByName(lua_State* L) {

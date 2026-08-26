@@ -2813,12 +2813,11 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_BATTLE_GARB)]);
     }
+showDialog:
+    Ironfist_AppendMoraleInfo(h);
     if (modifierStart == static_cast<i32>(strlen(gText))) {
         strcat(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_NONE)]);
     }
-
-showDialog:
-    Ironfist_AppendMoraleInfo(h);
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
 

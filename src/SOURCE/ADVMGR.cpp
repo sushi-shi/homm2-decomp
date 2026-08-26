@@ -2,6 +2,7 @@
 #include <BASE/message.h>
 #include <BASE/icon.h>
 #include <IRONFIST/artifacts.h>
+#include <IRONFIST/gui.h>
 #include <IRONFIST/hooks.h>
 #include <IRONFIST/prefs.h>
 #include <IRONFIST/save_xml.h>
@@ -4849,6 +4850,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 expansionSite;
     char uppercaseResult;
     i32 blocked;
+    std::string tooltipOverride;
 
     quickInfoShowFlag = 1;
     currentCell = NULL;
@@ -4894,6 +4896,19 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         );
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
+        if (Ironfist_TooltipText(
+                currentCell,
+                m_mapOriginX + cellX,
+                m_mapOriginY + cellY,
+                tooltipOverride
+            )) {
+            GUISetText(pWin, 1, tooltipOverride);
+            gpWindowManager->AddWindow(pWin, 1, -1);
+            QuickViewWait();
+            gpWindowManager->RemoveWindow(pWin);
+            delete pWin;
+            return;
+        }
         if ((MAP_EXTRA_AT_WFIRST((m_mapOriginX + cellX), m_mapOriginY + cellY)
              & giCurPlayerBit)
             == 0) {
@@ -5364,9 +5379,6 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     }
 
 quick_info_ready:
-    if (currentCell != NULL) {
-        Ironfist_TooltipText(currentCell, m_mapOriginX + cellX, m_mapOriginY + cellY);
-    }
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(

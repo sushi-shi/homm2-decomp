@@ -842,6 +842,7 @@ i32 townManager::Open(i32 id) {
     strcpy(m_name, "townManager");
     gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
     Ironfist_TownOpened(m_town);
+    gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     return 0;
 }
 

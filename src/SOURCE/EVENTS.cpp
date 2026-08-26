@@ -383,15 +383,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     hero* eventHero2;
     SAMPLE2 eventSample_f;
 
-    if (Ironfist_LocationVisit(cell, x, y))
-        return;
-
     eventHero2 = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eraseObject_l = 0;
     fizzleType_k = 0;
     playedSample3 = NULL;
     eventSample_f = NULL;
+
+    // Ironfist's true result suppresses the location handler, not the normal
+    // redraw, ambient-audio, and end-game tail of DoEvent.
+    if (Ironfist_LocationVisit(cell, x, y))
+        goto event_done;
+
     gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer(0);
 
@@ -3714,6 +3717,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
     }
 
+event_done:
     UpdateRadar(1, 0);
     UpdateHeroLocators(1, 1);
     UpdateTownLocators(1, 1);

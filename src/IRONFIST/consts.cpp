@@ -465,7 +465,6 @@ static void set_location_consts(lua_State* L) {
     lua_setconst(L, "LOCATION_EXPANSION_DWELLING", H2EnumIndex(MAP_OBJECT_EXPANSION_DWELLING));
     lua_setconst(L, "LOCATION_ALCHEMIST_TOWER", H2EnumIndex(MAP_OBJECT_EXPANSION_OBJECT));
     lua_setconst(L, "LOCATION_JAIL", H2EnumIndex(MAP_OBJECT_JAIL));
-    lua_setconst(L, "LOCATION_SHIPYARD", H2EnumIndex(MAP_OBJECT_SHIPYARD));
 }
 
 static void set_map_cell_consts(lua_State* L) {

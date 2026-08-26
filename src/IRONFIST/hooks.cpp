@@ -47,9 +47,16 @@ void Ironfist_ResetGameState(void) {
 }
 
 void Ironfist_NewMap(char* filename) {
+    Ironfist_ResetGameState();
     std::string mapName(filename);
     ScriptingInit(mapName);
-    Ironfist_ResetGameState();
+}
+
+void Ironfist_NewMapReady(void) {
+    // Upstream resets this after the retail NewMap body, so a map's top-level
+    // script cannot change it. Keep that ordering while the other reset state
+    // remains available to the script loaded by Ironfist_NewMap.
+    gIronfistExtra.adventure.allowAIArmySharing = true;
 }
 
 void Ironfist_AdvManagerReady(void) {
@@ -179,12 +186,13 @@ void Ironfist_MonsterInteract(mapCell* cell) {
     );
 }
 
-void Ironfist_TooltipText(mapCell* cell, i32 x, i32 y) {
+b32 Ironfist_TooltipText(mapCell* cell, i32 x, i32 y, std::string& text) {
     i32 locationType = H2EnumIndex(cell->m_triggerType & H2EnumIndex(MAP_TRIGGER_TYPE_MASK));
     auto res = ScriptCallbackResult<std::string>("GetTooltipText", locationType, x, y);
-    if (res.has_value() && !res->empty()) {
-        strcpy(gText, res->c_str());
-    }
+    if (!res.has_value() || res->empty())
+        return false;
+    text = *res;
+    return true;
 }
 
 void Ironfist_AppendLuckInfo(hero* h) {

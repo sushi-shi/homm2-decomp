@@ -1,6 +1,8 @@
 #ifndef HOMM2_IRONFIST_HOOKS_H
 #define HOMM2_IRONFIST_HOOKS_H
 
+#include <string>
+
 #include <Ints.h>
 
 class army;
@@ -18,6 +20,7 @@ enum class SpellType : i8;
 void Ironfist_Startup(void);
 void Ironfist_ResetGameState(void);
 void Ironfist_NewMap(char* filename);
+void Ironfist_NewMapReady(void);
 void Ironfist_AdvManagerReady(void);
 void Ironfist_NewDay(void);
 void Ironfist_CheckEndGame(void);
@@ -35,7 +38,7 @@ float Ironfist_CalcSpellChance(army* stack, SpellType spell, float chance);
 void Ironfist_MeleeAttack(army* attacker, i32 retaliation);
 void Ironfist_MeleeAttackComplete(army* attacker, army* target);
 void Ironfist_MonsterInteract(mapCell* cell);
-void Ironfist_TooltipText(mapCell* cell, i32 x, i32 y);
+b32 Ironfist_TooltipText(mapCell* cell, i32 x, i32 y, std::string& text);
 void Ironfist_AppendLuckInfo(hero* h);
 void Ironfist_AppendMoraleInfo(hero* h);
 void Ironfist_BattleStart(void);
