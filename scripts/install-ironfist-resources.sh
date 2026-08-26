@@ -51,7 +51,7 @@ if [[ -z "$data_directory" ]]; then
     exit 1
 fi
 if ! has_file "$data_directory" HEROES2.AGG || ! has_file "$data_directory" HEROES2X.AGG; then
-    echo "ironfist-resources: Price of Loyalty requires DATA/HEROES2.AGG and DATA/HEROES2X.AGG" >&2
+    echo "ironfist-resources: Ironfist requires a complete Heroes II installation with DATA/HEROES2.AGG and DATA/HEROES2X.AGG" >&2
     exit 1
 fi
 

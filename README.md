@@ -9,14 +9,16 @@ This branch adds Project Ironfist as separately distributed, unofficial runtime
 content on top of that reconstructed cross-platform engine.
 
 The repository does not contain the original game resources. An installed copy
-of the game is required to play it.
+of the game is required to play it. Gold 2.1 describes the reconstructed engine
+and executable version; it does not mean that the retail data archives are
+embedded in the source tree.
 
 ## Quick start on Linux
 
 You need Git, [Nix](https://nixos.org/download/) with flakes enabled, internet
-access for the first build, and a writable Heroes II: The Price of Loyalty game
-directory. That directory must contain `DATA/HEROES2.AGG` and
-`DATA/HEROES2X.AGG`.
+access for the first build, and a writable complete Heroes II installation:
+either Heroes II Gold, or the base game upgraded with The Price of Loyalty. The
+directory must contain `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`.
 
 1. Clone the Ironfist branch and enter it:
 
@@ -26,7 +28,7 @@ directory. That directory must contain `DATA/HEROES2.AGG` and
    cd homm2-ironfist
    ```
 
-2. Point the game at your writable PoL installation:
+2. Point the game at that writable complete installation:
 
    ```sh
    export HOMM2_DATA=/absolute/path/to/heroes2
@@ -65,7 +67,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
     +-----------------+-----------------+
                       |
                       v
-                    master --------> ironfist
+                    master --------> ironfist (you are here)
 ```
 - `decomp-pol-2.0` is the original Price of Loyalty 2.0 reconstruction.
 - `source-pol-2.0` is its generated, matching-machinery-free source tree.
@@ -129,9 +131,10 @@ HOMM2_DATA=/path/to/heroes2 ./build/homm2
 
 ### Game data
 
-To run Ironfist you need an installed copy of Heroes II Gold or The Price of Loyalty,
-including both `DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`. Build and install the
-Ironfist resources from the pinned original repository into that directory:
+To run Ironfist you need a complete Heroes II installation: either Heroes II
+Gold, or the base game upgraded with The Price of Loyalty. It must include both
+`DATA/HEROES2.AGG` and `DATA/HEROES2X.AGG`. Build and install the Ironfist
+resources from the pinned original repository into that directory:
 
 ```sh
 nix run .#ironfist-resources -- /path/to/heroes2

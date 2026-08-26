@@ -3,7 +3,8 @@
 This branch does not store or publish an Ironfist resource archive. Its Nix
 flake fetches the original Project Ironfist source and builds an immutable
 resource payload in the user's local Nix store. The installer then merges that
-payload into a user-supplied Heroes II: The Price of Loyalty installation.
+payload into a user-supplied complete Heroes II installation: either Heroes II
+Gold, or the base game upgraded with The Price of Loyalty.
 
 The source input is pinned to:
 
