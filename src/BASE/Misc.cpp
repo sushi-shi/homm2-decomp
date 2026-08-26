@@ -386,11 +386,12 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 VA(0x004bdae0, 0x1af)
 void FadeIn(i32 increment) {
-    i32 done, i, j, delayTime, threshold;
+    b32 done;
+    i32 i, j, delayTime, threshold;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = 0;
+    done = false;
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
@@ -399,7 +400,7 @@ void FadeIn(i32 increment) {
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
         if (i == MISC_PALETTE_MAX_LEVEL) {
-            done = 1;
+            done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
             threshold = MISC_PALETTE_MAX_LEVEL - i;
@@ -420,11 +421,12 @@ void FadeIn(i32 increment) {
 
 VA(0x004bdc90, 0x1b2)
 void FadeOut(i32 increment) {
-    i32 done, i, j, delayTime;
+    b32 done;
+    i32 i, j, delayTime;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = 0;
+    done = false;
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
@@ -433,7 +435,7 @@ void FadeOut(i32 increment) {
         delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
         if (i == FADE_LEVEL_LAST)
-            done = 1;
+            done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (pal->m_data[j] > 0) {
                 if (pal->m_data[j] > increment)

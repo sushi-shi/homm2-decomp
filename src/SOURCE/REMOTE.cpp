@@ -113,8 +113,8 @@ void RemoteMain(RemoteGameMode gameMode) {
     char* gameMsg;
     char* recvData;
     i32 netPlayer;
-    i32 pending;
-    i32 savedColorMice;
+    b32 pending;
+    b32 savedColorMice;
     i32 player;
     i32 setupCounter;
 
@@ -222,7 +222,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
         LogStr("RM 2");
         if (giThisNetPos == 0) {
-            pending = 1;
+            pending = true;
             memset(gotPlayers, 0, REMOTE_PLAYER_COUNT);
             while (pending != 0) {
                 PollSound();
@@ -242,10 +242,10 @@ void RemoteMain(RemoteGameMode gameMode) {
                             break;
                     }
                 }
-                pending = 0;
+                pending = false;
                 for (player = 1; player < giNumHumanPlayers; player++) {
                     if (gotPlayers[player] == 0)
-                        pending = 1;
+                        pending = true;
                 }
             }
         } else {
@@ -406,12 +406,12 @@ i32 DecodePacket(u8* data, i32) {
 VA(0x0048da49, 0x158)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 size;
-    i32 out;
+    b32 out;
     i32 retry;  // unreferenced; retail's frame reserves the slot
     i32 sendStatus;
     u8 remotePacket[REMOTE_MESSAGE_SIZE];
 
-    out = 1;
+    out = true;
     if (destination == REMOTE_BROADCAST_PLAYER && bUseDirectPlay == 0 && bUseWinsock == 0) {
         destination = 1 - giThisNetPos;
     }
@@ -444,7 +444,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                             LOG_UNUSED_VALUE,
                             LOG_UNUSED_VALUE
                         );
-                        out = 0;
+                        out = false;
                         goto finished;
                     }
                 } while (sendStatus != 0);
@@ -453,7 +453,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
         case REMOTE_GAME_MODEM_HOST:
         case REMOTE_GAME_MODEM_GUEST:
             WriteModemPacket(PacketSend, size);
-            out = 1;
+            out = true;
             break;
     }
 finished:
@@ -601,11 +601,11 @@ char* GetRemoteData(i8 remove) {
 
 VA(0x0048df6f, 0x664)
 void PollRemote(void) {
-    i32 oldInPoll;
+    b32 oldInPoll;
     i32 rc;
     i32 cnt;
     i32 queueIndex;
-    i8 qFull;
+    b8 qFull;
     SPlayerExit hostExit;
     i32 timeout;
     SPlayerExit guestExit;
@@ -629,7 +629,7 @@ void PollRemote(void) {
         return;
     cnt = 0;
     oldInPoll = gbInPollSound;
-    qFull = 0;
+    qFull = false;
     if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
         REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
         REMOTE_MESSAGE(sndBuf)->type = REMOTE_MESSAGE_HEARTBEAT;
@@ -745,7 +745,7 @@ void PollRemote(void) {
             cnt++;
     }
     if (cnt == REMOTE_QUEUE_CAPACITY)
-        qFull = 1;
+        qFull = true;
     rc = 1;
     while (rc != 0) {
     nextIncoming:
@@ -818,7 +818,7 @@ i32 TransmitAndWait(
 ) {
     i32 result;
     i32 clock;
-    i8 complete;
+    b8 complete;
     char* receivedData;
     i32 unusedResponseStatus;
 
@@ -837,7 +837,7 @@ i32 TransmitAndWait(
     if (result == 0)
         goto transmitComplete;
     clock = KBTickCount();
-    complete = 0;
+    complete = false;
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
             NormalDialog(
@@ -866,7 +866,7 @@ i32 TransmitAndWait(
         if (receivedData != NULL
             && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
             && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
-            complete = 1;
+            complete = true;
         }
     }
     *response = receivedData;

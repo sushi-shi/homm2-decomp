@@ -587,7 +587,7 @@ void philAI::DoAllHeroInteractions(void) {
 VA(0x0047e5ac, 0x323)
 void philAI::CheckForCreatureUpgrades(void) {
     i32 townIdx;
-    i32 hasUpgrade;
+    b32 hasUpgrade;
     armyGroup* army;
     CreatureType upgradedType = CREATURE_NONE;
     i32 slot;
@@ -612,7 +612,7 @@ void philAI::CheckForCreatureUpgrades(void) {
             for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
                 if (army->m_creatureTypes[slot] == CREATURE_NONE)
                     continue;
-                hasUpgrade = 0;
+                hasUpgrade = false;
                 for (dwelling = BUILDING_SLOT_DWELLING_SECOND;
                      dwelling <= BUILDING_SLOT_DWELLING_SIXTH;
                      dwelling++) {
@@ -621,14 +621,14 @@ void philAI::CheckForCreatureUpgrades(void) {
                             == army->m_creatureTypes[slot]
                         && (townRef->m_buildings
                             & (1 << (IDX(dwelling) + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
-                        hasUpgrade = 1;
+                        hasUpgrade = true;
                         upgradedType = NextCreatureType(army->m_creatureTypes[slot]);
                     }
                 }
                 if ((army->m_creatureTypes[slot] == CREATURE_GREEN_DRAGON
                      || army->m_creatureTypes[slot] == CREATURE_RED_DRAGON)
                     && (townRef->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
-                    hasUpgrade = 1;
+                    hasUpgrade = true;
                     upgradedType = CREATURE_BLACK_DRAGON;
                 }
                 if (hasUpgrade) {
@@ -1192,10 +1192,10 @@ void philAI::DoAI(i32 player) {
     i32 hiddenPointers0 = 0;
     b32 hourglassShown0 = false;
     MapDirection adjacentDirection2;
-    i32 stopAfterStep6;
+    b32 stopAfterStep6;
     i32 eventY1;
     i32 eventX5;
-    i32 heroDone5;
+    b32 heroDone5;
     i32 minimumValue1;
     hero* currentHero0;
     i32 stepLimit0;
@@ -1309,7 +1309,7 @@ void philAI::DoAI(i32 player) {
             gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
         }
 
-        heroDone5 = 0;
+        heroDone5 = false;
         ResetHeroRVs(0, 0, 0);
         stepLimit0 = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) ? 15 : 5;
         minimumValue1 = gpCurAIHero->m_mobility + 800;
@@ -1400,7 +1400,7 @@ void philAI::DoAI(i32 player) {
                         gpCurAIHero->m_remainingMobility
                     );
                     if (gpSearchArray->m_pathLength == 0) {
-                        heroDone5 = 1;
+                        heroDone5 = true;
                     } else if (gpSearchArray->m_pathLength > 0) {
                         gpAdvManager->UpdateScreen(0, 0);
                         if (targetValue11 > 1000 && gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR)
@@ -1412,7 +1412,7 @@ void philAI::DoAI(i32 player) {
                         pathIndex0 = gpSearchArray->m_pathLength - 1;
                         moveFlagA3 = 0;
                         moveFlagB12 = 0;
-                        stopAfterStep6 = 1;
+                        stopAfterStep6 = true;
                         while (pathIndex0 >= 0 && steps4 < stepLimit0) {
                             stopAfterStep6 =
                                 (steps4 + 1 == stepLimit0 || pathIndex0 == 0) ? 1 : 0;
@@ -1422,7 +1422,7 @@ void philAI::DoAI(i32 player) {
                                 if (GoodAdjacent(&adjacentDirection2)) {
                                     gpSearchArray->m_storage.aiPath.directions[pathIndex0] =
                                         static_cast<i8>(adjacentDirection2);
-                                    stopAfterStep6 = 1;
+                                    stopAfterStep6 = true;
                                 }
                             }
                             direction26 = static_cast<MapDirection>(
@@ -1481,7 +1481,7 @@ void philAI::DoAI(i32 player) {
                                  && eventCell3 == NULL)
                                 || gpCurAIHero->m_remainingMobility < AI_MINIMUM_SITE_MOBILITY
                                 || (moveFlagA3 != 0 && eventCell3 == NULL))) {
-                            heroDone5 = 1;
+                            heroDone5 = true;
                         }
 
                         savedShow3[0] = bShowIt;
@@ -1493,7 +1493,7 @@ void philAI::DoAI(i32 player) {
                         bShowIt = savedShow3[0];
                         gpAdvManager->UpdateRadar(1, 0);
                     } else {
-                        heroDone5 = 1;
+                        heroDone5 = true;
                     }
                     if (eventCell3 != NULL) {
                         gpAdvManager->DoAIEvent(eventCell3, gpCurAIHero, eventX5, eventY1);
@@ -1504,7 +1504,7 @@ void philAI::DoAI(i32 player) {
                         ResetHeroRVs(1, gpCurAIHero->m_destinationX, gpCurAIHero->m_destinationY);
                     }
                 } else {
-                    heroDone5 = 1;
+                    heroDone5 = true;
                 }
             }
         }
@@ -1956,7 +1956,7 @@ i32 philAI::DetermineTargetPosition(
     i32 spread;
     i32 rightX;
     i32 topY;
-    i32 good;
+    b32 good;
     i32 rowCounter;
     i32 dblMob;
     i32 dxy;
@@ -2082,7 +2082,7 @@ i32 philAI::DetermineTargetPosition(
                     cell = gpAdvManager->GetCell(x, y);
                     if (gpSearchArray->GetNode(x, y).distance > mobility) {
                         if (gpSearchArray->GetNode(x, y).distance > dblMob) {
-                            good = 0;
+                            good = false;
                         } else {
                             good = (cell->m_triggerType
                                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
@@ -2115,7 +2115,7 @@ i32 philAI::DetermineTargetPosition(
                             abs(x - gpCurAIHero->m_boatId)
                             + abs(y - static_cast<u8>(gpCurAIHero->m_boatDestY));
                         if (boatDist > gpCurAIHero->m_boatTravelRange)
-                            good = 0;
+                            good = false;
                     }
                     if (good) {
                         for (heroNum = 0; heroNum < gpCurPlayer->m_heroCount;
@@ -2448,7 +2448,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 highestDwellingId_2;
     i32 currentOccupiedSlots_16;
     float adjustedValue_11;
-    i32 creatureLocated_9;
+    b32 creatureLocated_9;
     i32 buildingLevel;
     i32 indexBuilding_2;
     CreatureType currentCreatureType_1;
@@ -2602,12 +2602,12 @@ void philAI::ValueOfBuyingBuilding(
         case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
         case BUILDING_SLOT_SPECIAL_THIRTY:
             if (currentOccupiedSlots_16 == AI_TOWN_ARMY_SLOTS) {
-                creatureLocated_9 = 0;
+                creatureLocated_9 = false;
                 for (indexBuilding_2 = 0; indexBuilding_2 < AI_TOWN_ARMY_SLOTS; indexBuilding_2++) {
                     if (townPtr->m_army.m_creatureTypes[indexBuilding_2]
                         == gDwellingType[IDX(townPtr->m_type)]
                                         [IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]) {
-                        creatureLocated_9 = 1;
+                        creatureLocated_9 = true;
                     }
                 }
                 if (!creatureLocated_9)
@@ -2830,7 +2830,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     float unrandomizedValue0;
     float bestRandomizedScore0;
     i32 weakestArmyValue;
-    i32 canAddUnit8;
+    b32 canAddUnit8;
     float jitteredValue0;
     i32 resourceValue;
 
@@ -2843,11 +2843,11 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
         weakestArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
         if ((townPtr->m_buildings & BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
-            canAddUnit8 = 0;
+            canAddUnit8 = false;
             for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] == CREATURE_NONE
                     || townPtr->m_army.m_creatureTypes[armyIndex] == candidateMonster) {
-                    canAddUnit8 = 1;
+                    canAddUnit8 = true;
                 }
             }
             for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
@@ -2861,7 +2861,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
             if (gMonsterDatabase[IDX(candidateMonster)].randomValue > weakestArmyValue
                 && gMonsterDatabase[IDX(candidateMonster)].randomValue
                        > CREATURE_PURCHASE_EXPENSIVE_VALUE) {
-                canAddUnit8 = 1;
+                canAddUnit8 = true;
             }
             if (dwelling == 0 && townPtr->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT
                 && ((townPtr->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_5))
@@ -2869,7 +2869,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_DWELLING_6)))) {
-                canAddUnit8 = 0;
+                canAddUnit8 = false;
             }
             if (canAddUnit8) {
                 availableUnits = CreaturesToBuy(townPtr, dwelling);
@@ -2964,7 +2964,7 @@ void philAI::ValueOfBuyingHero(
 ) {
     i32 heroCost[AI_PURCHASE_RESOURCE_COUNT];
     i32 rvCost;
-    i32 spellCaster;
+    b32 spellCaster;
     i32 i;
     i32 j;
     i32 heroRV;
@@ -2995,9 +2995,9 @@ void philAI::ValueOfBuyingHero(
         || heroPtr->m_cursorType == FACTION_WARLOCK
         || heroPtr->m_cursorType == FACTION_WIZARD
         || heroPtr->m_cursorType == FACTION_NECROMANCER)
-        spellCaster = 1;
+        spellCaster = true;
     else
-        spellCaster = 0;
+        spellCaster = false;
     if (townPtr->m_type == heroPtr->m_cursorType) {
         heroRV *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_HERO_PURCHASE_IDENTITY;
     } else if ((townPtr->m_buildState >= 2 && spellCaster)
@@ -3356,9 +3356,9 @@ i32 philAI::StrategicValueOfPosition(
     i32 eventPoints;
     H2_ENUM_STORAGE(TerrainType, i32) terrain2;
     i32 xPos;
-    b32 inBoat;
+    i32 inBoat;
     i32 dangerVal;
-    i32 madeSearch;
+    b32 madeSearch;
     i32 extra;
     i32 worth;
     i32 yy;
@@ -3370,7 +3370,7 @@ i32 philAI::StrategicValueOfPosition(
     H2_ENUM_STORAGE(TerrainType, i32) targetTerrain;
     mapCell* cell;
     i32 penalty;
-    i32 townOK;
+    b32 townOK;
 
     if (!extraDistance && !immediate
         && *(gaiHeroStrategicRVOfPos + targetX + targetY * MAP_WIDTH) != RV_UNSET) {
@@ -3379,14 +3379,14 @@ i32 philAI::StrategicValueOfPosition(
     }
 
     worth = 0;
-    madeSearch = 0;
-    townOK = 0;
+    madeSearch = false;
+    townOK = false;
     cell = gpAdvManager->GetCell(targetX, targetY);
     if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
         && GetCastleSlot(cell->m_objectMetadata)->m_owner == giCurPlayer
         && (GetCastleSlot(cell->m_objectMetadata)->m_buildings
             & IDX(TOWN_BUILDING_CASTLE))) {
-        townOK = 1;
+        townOK = true;
     }
     *liveChance = POSITION_FULL_CHANCE;
     if (checkEnemies && !*(gaiEnemyHeroReachable + targetX + targetY * MAP_WIDTH)) {
@@ -3397,7 +3397,7 @@ i32 philAI::StrategicValueOfPosition(
     }
 
     if (bSVSearchArrayInUse) {
-        madeSearch = 1;
+        madeSearch = true;
         search = new searchArray;
         if (!search)
             MemError();
@@ -3409,7 +3409,7 @@ i32 philAI::StrategicValueOfPosition(
 
     inBoat = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED);
     if (inBoat && gpAdvManager->GetCell(targetX, targetY)->m_triggerType == MAP_OBJECT_COAST)
-        inBoat = false;
+        inBoat = 0;
     nearDistance = 700;
     if (immediate || checkEnemies)
         seedDist = 1700;
@@ -3989,7 +3989,7 @@ i32 philAI::QuickCombat(
     float fracLost;
     i32 attackerDead;
     i32 spare1;
-    i32 attackerWin;
+    b32 attackerWin;
     i32 slot;
     i32 tmp;
     float chanceWin;
@@ -4010,7 +4010,7 @@ i32 philAI::QuickCombat(
         defExp * (IDX(gpGame->m_difficulty) * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP + 1.0)
     );
 
-    attackerWin = 0;
+    attackerWin = false;
     army = NULL;
     ProbableOutcomeOfBattle(
         attacker,
@@ -4033,7 +4033,7 @@ i32 philAI::QuickCombat(
         Random(0, QUICK_COMBAT_RANDOM_LIMIT) / static_cast<double>(QUICK_COMBAT_RANDOM_LIMIT)
     );
     if (roll < chanceWin) {
-        attackerWin = 1;
+        attackerWin = true;
         winnerChance = chanceWin;
         army = attacker;
     } else {
@@ -4301,7 +4301,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     i32 townFV;
     i32 moveCount;
     armyGroup* fromArmy;
-    i32 townBetter;
+    b32 townBetter;
     i32 winStrength;
     i32 scratchVal;
     float townShare;
@@ -4316,7 +4316,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     i32 battlePower;
     i32 dstStrength;
     i32 transferRating;
-    i32 hasRoom;
+    b32 hasRoom;
     float transferFactor;
     float curveTerm;
 
@@ -4434,9 +4434,9 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     if (!(transferShare >= wantShare * AI_TOWN_SHARE_DIFFERENCE_FACTOR)
         || transferShare < AI_MINIMUM_TOWN_SHARE_DIFFERENCE)
         return;
-    townBetter = 0;
+    townBetter = false;
     if (wantShare < townShare)
-        townBetter = 1;
+        townBetter = true;
     if (doInteraction != 0) {
         if (battlePower < townFV)
             transferFactor = AI_WEAKER_ARMY_TRANSFER_FACTOR;
@@ -4452,16 +4452,16 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         );
         if (transferRating < 0)
             transferRating = 0;
-        hasRoom = 0;
+        hasRoom = false;
         if (townBetter) {
             for (stackSlot = 0; stackSlot < AI_TOWN_ARMY_SLOTS; stackSlot++) {
                 if (heroPtr->m_army.m_quantities[stackSlot] <= 0)
-                    hasRoom = 1;
+                    hasRoom = true;
             }
         } else {
             for (stackSlot = 0; stackSlot < AI_TOWN_ARMY_SLOTS; stackSlot++) {
                 if (townPtr->m_army.m_quantities[stackSlot] <= 0)
-                    hasRoom = 1;
+                    hasRoom = true;
             }
         }
         if (!hasRoom) {
@@ -4469,7 +4469,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
                 for (otherIndex = 0; otherIndex < AI_TOWN_ARMY_SLOTS; otherIndex++) {
                     if (townPtr->m_army.m_creatureTypes[stackSlot]
                         == heroPtr->m_army.m_creatureTypes[otherIndex]) {
-                        hasRoom = 1;
+                        hasRoom = true;
                         break;
                     }
                 }
@@ -4526,10 +4526,10 @@ void philAI::RedistributeTroops(
     i32 bestSlot;
     i32 dstI;
     i32 fromIdx;
-    i32 again;
+    b32 again;
     i32 army;
 
-    again = 1;
+    again = true;
     gbTroopReload = false;
     while (again) {
         if (preserveOne != 0) {
@@ -4590,7 +4590,7 @@ void philAI::RedistributeTroops(
         }
 
         if (bestSlot == AI_TROOP_EMPTY_SLOT) {
-            again = 0;
+            again = false;
         } else if (destinationArmy->CanJoin(sourceArmy->m_creatureTypes[bestSlot])) {
             howMany = static_cast<i32>(static_cast<float>(
                 static_cast<double>(transferBudget)
@@ -4601,7 +4601,7 @@ void philAI::RedistributeTroops(
                 if (howMany > sourceArmy->m_quantities[bestSlot]) {
                     howMany = sourceArmy->m_quantities[bestSlot];
                 } else {
-                    again = 0;
+                    again = false;
                     if ((howMany
                              >= sourceArmy->m_quantities[bestSlot]
                                     * AI_TROOP_REDISTRIBUTION_STACK_SHARE
@@ -4617,13 +4617,13 @@ void philAI::RedistributeTroops(
 
                 if (preserveOne != 0 && howMany >= army) {
                     howMany = army - 1;
-                    again = 0;
+                    again = false;
                 }
 
                 if (gMonsterDatabase[IDX(sourceArmy->m_creatureTypes[bestSlot])].fightValue
                         * howMany * AI_TROOP_REDISTRIBUTION_BUDGET_FACTOR
                     > transferBudget) {
-                    again = 0;
+                    again = false;
                 } else {
                     transferBudget -=
                         gMonsterDatabase[IDX(sourceArmy->m_creatureTypes[bestSlot])].fightValue
@@ -4639,10 +4639,10 @@ void philAI::RedistributeTroops(
                 if (sourceArmy->m_quantities[bestSlot] == 0)
                     sourceArmy->m_creatureTypes[bestSlot] = CREATURE_NONE;
             } else {
-                again = 0;
+                again = false;
             }
         } else {
-            again = 0;
+            again = false;
         }
     }
 }
@@ -4830,7 +4830,7 @@ VA(0x00487fff, 0x285)
 void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     float weakestValue;
     i32 monsterCosts[AI_PURCHASE_RESOURCE_COUNT];
-    i32 hasRoom;
+    b32 hasRoom;
     i32 lowSlot;
     i32 slotIdx;
     float stackValue;
@@ -4851,11 +4851,11 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     }
 
     creature = gDwellingType[IDX(townPtr->m_type)][dwelling];
-    hasRoom = 0;
+    hasRoom = false;
     for (slotIdx = 0; slotIdx < AI_TOWN_ARMY_SLOTS; slotIdx++) {
         if (townPtr->m_army.m_creatureTypes[slotIdx] == CREATURE_NONE
             || townPtr->m_army.m_creatureTypes[slotIdx] == creature) {
-            hasRoom = 1;
+            hasRoom = true;
         }
     }
 
@@ -5400,7 +5400,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     i32 oracleState;
     i32 armySlot;
     i32 artifactState[3];
-    i32 freeFlag;
+    b32 freeFlag;
     i32 cellState[3];
     H2_ENUM_STORAGE(ResourceType, i32) res;
     i32 prize;
@@ -5676,38 +5676,38 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_ANCIENT_LAMP:
                 buyCreature = CREATURE_GENIE;
-                freeFlag = 0;
+                freeFlag = false;
                 goto creature_purchase;
             case MAP_OBJECT_TREE_CITY:
                 buyCreature = CREATURE_SPRITE;
-                freeFlag = 0;
+                freeFlag = false;
                 goto creature_purchase;
             case MAP_OBJECT_WATCH_TOWER:
                 buyCreature = CREATURE_ORC;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_TREE_HOUSE:
                 buyCreature = CREATURE_SPRITE;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_EXCAVATION:
                 buyCreature = CREATURE_SKELETON;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_HALFLING_HOLE:
                 buyCreature = CREATURE_HALFLING;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_RUINS:
                 buyCreature = CREATURE_MEDUSA;
-                freeFlag = 0;
+                freeFlag = false;
                 goto creature_purchase;
             case MAP_OBJECT_TROLL_BRIDGE:
                 if (theCell->m_objectMetadata & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
                     eventRV = 0;
                 } else {
                     buyCreature = CREATURE_TROLL;
-                    freeFlag = 0;
+                    freeFlag = false;
                     goto creature_purchase;
                 }
                 break;
@@ -5716,7 +5716,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     eventRV = 0;
                 } else {
                     buyCreature = CREATURE_RED_DRAGON;
-                    freeFlag = 0;
+                    freeFlag = false;
                     goto creature_purchase;
                 }
                 break;
@@ -5725,38 +5725,38 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     eventRV = 0;
                 } else {
                     buyCreature = CREATURE_POWER_LICH;
-                    freeFlag = 0;
+                    freeFlag = false;
                     goto creature_purchase;
                 }
                 break;
             case MAP_OBJECT_CAVE:
                 buyCreature = CREATURE_CENTAUR;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_ARCHER_HOUSE:
                 buyCreature = CREATURE_ARCHER;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_GOBLIN_HUT:
                 buyCreature = CREATURE_GOBLIN;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_PEASANT_HUT:
                 buyCreature = CREATURE_PEASANT;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_DWARF_COTTAGE:
             case MAP_OBJECT_SIRENS:
                 buyCreature = CREATURE_DWARF;
-                freeFlag = 1;
+                freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_DESERT_TENT:
                 buyCreature = CREATURE_NOMAD;
-                freeFlag = 0;
+                freeFlag = false;
                 goto creature_purchase;
             case MAP_OBJECT_WAGON_CAMP:
                 buyCreature = CREATURE_ROGUE;
-                freeFlag = 0;
+                freeFlag = false;
             creature_purchase:
                 EvaluateOneTimeCreaturePurchase(
                     buyCreature,

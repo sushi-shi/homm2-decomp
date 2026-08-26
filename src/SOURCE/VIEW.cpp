@@ -247,7 +247,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 msgConst1;
     i16 msgConst19;
     i16 msgConst6;
-    i32 handled28;
+    b32 handled28;
     i16 msgConst0;
     i16 msgConst18;
     i16 msgConst17;
@@ -273,7 +273,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     msgConst6 = GENERAL_SURRENDER;
     msgConst8 = GENERAL_CONTROL_THIRTEEN;
     msgConst17 = GENERAL_CONTROL_FOURTEEN;
-    handled28 = 0;
+    handled28 = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -319,7 +319,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                         case GENERAL_CAST_SPELL:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
-                            handled28 = 1;
+                            handled28 = true;
                             break;
                     }
                     break;

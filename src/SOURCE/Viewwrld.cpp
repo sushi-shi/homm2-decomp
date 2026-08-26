@@ -251,7 +251,7 @@ void advManager::VWCompleteDraw(void) {
     u8* pix0;
     i32 spare;
     i32 cellX;
-    i32 heroHere0;
+    b32 heroHere0;
     mapCellExtra* extraCell;
     i32 cellY;
     i32 dead;
@@ -590,9 +590,9 @@ void advManager::VWCompleteDraw(void) {
             if (gpCurPlayer->m_currentHero != -1
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_x == cellX
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_y == cellY)
-                heroHere0 = 1;
+                heroHere0 = true;
             else
-                heroHere0 = 0;
+                heroHere0 = false;
             if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                  || heroHere0)
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)

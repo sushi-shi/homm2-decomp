@@ -502,9 +502,9 @@ i32 EarlySetup(void) {
 VA(0x00466767, 0x14d1)
 i32 oldmain(void) {
     i32 command_c;
-    i32 quit;
-    i32 mainScreenLoaded_h;
-    i32 firstMainScreen_h;
+    b32 quit;
+    b32 mainScreenLoaded_h;
+    b32 firstMainScreen_h;
     i32 savedUpdateFlags_l;
     i32 player_h;
     i32 unusedMainState_o;
@@ -580,9 +580,9 @@ i32 oldmain(void) {
     LoadSystemwideIcons();
     memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
-    quit = 0;
-    mainScreenLoaded_h = 0;
-    firstMainScreen_h = 1;
+    quit = false;
+    mainScreenLoaded_h = false;
+    firstMainScreen_h = true;
 
     while (!quit) {
     main_menu:
@@ -606,7 +606,7 @@ i32 oldmain(void) {
                     SetPalette(gPalette->m_data, 1);
                 else
                     gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                firstMainScreen_h = 0;
+                firstMainScreen_h = false;
             }
             gpMouseManager->SetPointer(
                 "advmice.mse",
@@ -614,7 +614,7 @@ i32 oldmain(void) {
                 MOUSE_AUTO_CURSOR_TYPE
             );
         }
-        mainScreenLoaded_h = 1;
+        mainScreenLoaded_h = true;
         if (gGameCommand != OLD_MAIN_EXIT)
             gpWindowManager->m_updateFlags = 1;
 
@@ -733,7 +733,7 @@ i32 oldmain(void) {
                             } else {
                                 gpWindowManager
                                     ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                mainScreenLoaded_h = 0;
+                                mainScreenLoaded_h = false;
                                 goto main_menu;
                             }
                         } else {
@@ -744,7 +744,7 @@ i32 oldmain(void) {
                                 } else {
                                     gpWindowManager
                                         ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                    mainScreenLoaded_h = 0;
+                                    mainScreenLoaded_h = false;
                                     goto main_menu;
                                 }
                             } else {
@@ -769,18 +769,18 @@ i32 oldmain(void) {
                         "\xe5\xe4\xe6\xe5\xf0\xe0!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
-                mainScreenLoaded_h = 0;
+                mainScreenLoaded_h = false;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_THIRD_VIDEO);
-                mainScreenLoaded_h = 0;
+                mainScreenLoaded_h = false;
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
-                quit = 1;
+                quit = true;
                 break;
         }
 
@@ -873,7 +873,7 @@ i32 oldmain(void) {
                         ShutDown(NULL);
                 }
                 memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
-                gbThisNetHumanPlayer[giThisGamePos] = 1;
+                gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
             }
@@ -932,7 +932,7 @@ i32 oldmain(void) {
             }
             ComputeAdvNetControl();
             gbGameInitialized = true;
-            mainScreenLoaded_h = 0;
+            mainScreenLoaded_h = false;
             gpSoundManager->StopAllSamples(1);
             gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
             gMapX = 0;
@@ -1006,7 +1006,7 @@ i32 oldmain(void) {
                     ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
-                mainScreenLoaded_h = 1;
+                mainScreenLoaded_h = true;
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
             } else {
                 i32 campaignResult = 0;
@@ -1086,7 +1086,7 @@ i32 oldmain(void) {
                         );
                         gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                         gpWindowManager->m_updateFlags = 1;
-                        mainScreenLoaded_h = 1;
+                        mainScreenLoaded_h = true;
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
                     } else {
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
@@ -1112,12 +1112,12 @@ i32 oldmain(void) {
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                mainScreenLoaded_h = 1;
+                mainScreenLoaded_h = true;
             }
         }
 
         if (gbRemoteOn)
-            quit = 1;
+            quit = true;
     }
 
     ShutDown(NULL);
@@ -1139,7 +1139,7 @@ VA(0x00467ca8, 0x5f3)
 i32 InterpretCommandLine(void) {
     i32 size;
     i32 i;
-    i32 helpRequested;
+    b32 helpRequested;
     gbTCPFirstTime = true;
     giTCPType = -1;
     giTCPHostStatus = -1;
@@ -1150,10 +1150,10 @@ i32 InterpretCommandLine(void) {
     giDebugLevel = 0;
     giShowIntro = 1;
     gbCheatMenus = false;
-    giScreenScroll = 1;
+    giScreenScroll = true;
     giLimitPlayer = 0;
     gbBlackoutPlayer = true;
-    helpRequested = 0;
+    helpRequested = false;
     strcpy(gMapName, "Chaos.mp2");
     strcpy(
         gFullMapName,
@@ -1165,7 +1165,7 @@ i32 InterpretCommandLine(void) {
         if (gcCommandLine[i] == ' ' && i + 1 < size
             && (gcCommandLine[i + 1] == '?' || gcCommandLine[i + 1] == 'h'
                 || gcCommandLine[i + 1] == 'H')) {
-            helpRequested = 1;
+            helpRequested = true;
         }
         if (gcCommandLine[i] == '/' && i + 1 < size) {
             switch (toupper(gcCommandLine[i + 1])) {
@@ -2144,18 +2144,18 @@ void CheckEndGame(
     H2_ENUM_PARAM(CheckEndGameForcedResult, i32) forcedResult,
     b32 dragonCityCaptured
 ) {
-    i32 showedDialog_o;
-    i32 defeated_m;
-    i32 allowNormalVictory;
+    b32 showedDialog_o;
+    b32 defeated_m;
+    b32 allowNormalVictory;
     i32 lastLivingPlayer_j;
     i32 survivingHumans_a;
     i32 lastHuman_a;
     i32 netHumanCount;
     i32 player;
     i32 heroIndex_m;
-    i32 winFlag;
+    b32 winFlag;
     playerData* rec_n;
-    i32 savedRemoteOn_o;
+    b32 savedRemoteOn_o;
     i32 numAlive;
     i32 sideBelow_i;
     i32 sideAbove;
@@ -2163,9 +2163,9 @@ void CheckEndGame(
     town* lossTown;
     town* victoryTownData;
     i32 currentDayIndex;
-    i32 enemyRemaining;
-    i32 hasRoland_j;
-    i32 hasDwarfTown;
+    b32 enemyRemaining;
+    b32 hasRoland_j;
+    b32 hasDwarfTown;
     char artifactName[END_GAME_TEXT_BUFFER_SIZE];
     hero* artifactHeroPtr_c;
     i32 artifactWinnerPerson;
@@ -2187,7 +2187,7 @@ void CheckEndGame(
 
     bInCheckEndGame = true;
     savedRemoteOn_o = gbRemoteOn;
-    showedDialog_o = 0;
+    showedDialog_o = false;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         if (!gpGame->m_playerDead[player]) {
@@ -2196,7 +2196,7 @@ void CheckEndGame(
                 || (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
                 PlayerDead(player);
                 if (player == giThisGamePos) {
-                    showedDialog_o = 1;
+                    showedDialog_o = true;
                     sprintf(gText, "\xc2\xfb \xe1\xfb\xeb\xe8 \xe8\xf1\xea\xeb\xfe\xf7\xe5\xed\xfb \xe8\xe7 \xe8\xe3\xf0\xfb!!!");
                     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else {
@@ -2240,7 +2240,7 @@ void CheckEndGame(
                     PlayerDead(player);
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
                         if (!showedDialog_o) {
-                            showedDialog_o = 1;
+                            showedDialog_o = true;
                             sprintf(
                                 gText,
                                 "%s, \xe2\xe0\xf8\xe8 \xe3\xe5\xf0\xee\xe8 \xef\xee\xea\xe8\xed\xf3\xeb\xe8 \xe2\xe0\xf1, \xe0 \xe2\xfb \xe1\xfb\xeb\xe8 \xe8\xe7\xe3\xed\xe0\xed\xfb \xf1 \xef\xee\xe7\xee\xf0\xee\xec \xe8\xe7 \xfd\xf2\xe8\xf5 \xe7\xe5\xec\xe5\xeb\xfc.",
@@ -2292,14 +2292,14 @@ void CheckEndGame(
         }
     }
 
-    winFlag = 0;
-    defeated_m = 0;
-    allowNormalVictory = 1;
+    winFlag = false;
+    defeated_m = false;
+    allowNormalVictory = true;
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
             && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO)) {
-        allowNormalVictory = 0;
+        allowNormalVictory = false;
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
@@ -2322,7 +2322,7 @@ void CheckEndGame(
                 if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player]
                     && gpGame->m_players[player].m_color
                            >= gpGame->m_mapHeader.victorySideThreshold) {
-                    winFlag = 1;
+                    winFlag = true;
                 }
             }
         } else if (sideAbove == 0) {
@@ -2330,16 +2330,16 @@ void CheckEndGame(
                 if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player]
                     && gpGame->m_players[player].m_color
                            < gpGame->m_mapHeader.victorySideThreshold) {
-                    winFlag = 1;
+                    winFlag = true;
                 }
             }
         }
         if (sideBelow_i == 0 || sideAbove == 0) {
             if (!winFlag) {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o && winFlag) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "\xc2\xf0\xe0\xe3 \xf0\xe0\xe7\xe1\xe8\xf2, \xe0 \xe2\xe0\xf8\xe0 \xe0\xf0\xec\xe8\xff \xef\xf0\xe0\xe7\xe4\xed\xf3\xe5\xf2 \xf2\xf0\xe8\xf3\xec\xf4!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2354,12 +2354,12 @@ void CheckEndGame(
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
             && (gbHumanPlayer[IDX(victoryTownData->m_owner)] || gpGame->m_mapHeader.computerAlsoWins)) {
             if (gbThisNetHumanPlayer[IDX(victoryTownData->m_owner)]) {
-                winFlag = 1;
+                winFlag = true;
             } else {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 if (winFlag) {
                     sprintf(
                         gText,
@@ -2383,9 +2383,9 @@ void CheckEndGame(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
         if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[IDX(lossTown->m_owner)]) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "%s \xef\xe0\xeb! \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.", lossTown->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2405,12 +2405,12 @@ void CheckEndGame(
             }
             if (winnerPlayer_m != END_GAME_NO_PLAYER) {
                 if (gbThisNetHumanPlayer[IDX(winnerPlayer_m)]) {
-                    winFlag = 1;
+                    winFlag = true;
                 } else {
-                    defeated_m = 1;
+                    defeated_m = true;
                 }
                 if (!showedDialog_o) {
-                    showedDialog_o = 1;
+                    showedDialog_o = true;
                     if (winFlag) {
                         sprintf(
                             gText,
@@ -2434,9 +2434,9 @@ void CheckEndGame(
         winningHeroEntry_g = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry_g->m_owner < 0 || winningHeroEntry_g->m_owner >= GAME_PLAYER_COUNT
             || gbHumanPlayer[IDX(winningHeroEntry_g->m_owner)]) {
-            winFlag = 1;
+            winFlag = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(
                     gText,
                     "%s - \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xe3\xe5\xf0\xee\xe9, \xf3 \xe2\xe0\xf1 \xe2 \xef\xeb\xe5\xed\xf3! \xc2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5 \xe7\xe0\xe2\xe5\xf0\xf8\xe5\xed\xee.",
@@ -2451,9 +2451,9 @@ void CheckEndGame(
         lossHero_k = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
         if (lossHero_k->m_owner < 0 || lossHero_k->m_owner >= GAME_PLAYER_COUNT
             || !gbHumanPlayer[IDX(lossHero_k->m_owner)]) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "%s - \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9, \xe1\xfb\xeb \xef\xee\xe2\xe5\xf0\xe6\xe5\xed.  \xc2\xfb \xef\xf0\xee\xe2\xe0\xeb\xe8\xeb\xe8 \xe2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5.", lossHero_k->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2464,9 +2464,9 @@ void CheckEndGame(
         if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
                 + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
             > gpGame->m_mapHeader.lossConditionValue) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "\xc2\xfb \xed\xe5 \xf3\xf1\xef\xe5\xeb\xe8 \xe7\xe0\xe2\xe5\xf0\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5 \xe2 \xf1\xf0\xee\xea. \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2503,12 +2503,12 @@ void CheckEndGame(
         }
         if (artifactWinnerPerson != END_GAME_NO_PLAYER) {
             if (gbThisNetHumanPlayer[artifactWinnerPerson]) {
-                winFlag = 1;
+                winFlag = true;
             } else {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
                     sprintf(
                         artifactName,
@@ -2537,17 +2537,17 @@ void CheckEndGame(
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_DWARF_SCENARIO) {
-        hasDwarfTown = 0;
+        hasDwarfTown = false;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
                 == FACTION_SORCERESS) {
-                hasDwarfTown = 1;
+                hasDwarfTown = true;
             }
         }
         if (!hasDwarfTown) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(
                     gText,
                     "\xc2\xf1\xe5 \xe3\xee\xf0\xee\xe4\xe0 \xe3\xed\xee\xec\xee\xe2 \xef\xe0\xeb\xe8. \xdd\xf2\xee \xf1\xee\xea\xf0\xf3\xf8\xe8\xf2\xe5\xeb\xfc\xed\xee\xe5 \xef\xee\xf0\xe0\xe6\xe5\xed\xe8\xe5! \xc2\xfb \xef\xf0\xee\xe8\xe3\xf0\xe0\xeb\xe8."
@@ -2560,9 +2560,9 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO
         && dragonCityCaptured) {
-        winFlag = 1;
+        winFlag = true;
         if (!showedDialog_o) {
-            showedDialog_o = 1;
+            showedDialog_o = true;
             sprintf(gText, "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xef\xe0\xeb! \xd2\xe5\xef\xe5\xf0\xfc \xe2\xfb \xcf\xee\xe2\xe5\xeb\xe8\xf2\xe5\xeb\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2.");
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -2571,18 +2571,18 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                == END_GAME_ROLAND_CAPTURE_SCENARIO) {
-        hasRoland_j = 0;
+        hasRoland_j = false;
         for (player = 0; player < GAME_HERO_COUNT; player++) {
             if (gpGame->m_heroRecs[player].m_portrait == CAMPAIGN_HERO_ROLAND
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= GAME_PLAYER_COUNT - 1) {
-                hasRoland_j = 1;
+                hasRoland_j = true;
             }
         }
         if (!hasRoland_j) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "\xd0\xee\xeb\xe0\xed\xe4 \xef\xeb\xe5\xed\xe5\xed! \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2592,18 +2592,18 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                == END_GAME_ROLAND_CAPTURE_SCENARIO) {
-        enemyRemaining = 0;
+        enemyRemaining = false;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
                 && gpGame->m_players[player].m_color != PLAYER_COLOR_BLUE
                 && gpGame->m_players[player].m_color != PLAYER_COLOR_YELLOW) {
-                enemyRemaining = 1;
+                enemyRemaining = true;
             }
         }
         if (!enemyRemaining) {
-            winFlag = 1;
+            winFlag = true;
             if (!showedDialog_o && winFlag) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "\xc2\xf0\xe0\xe3 \xf0\xe0\xe7\xe1\xe8\xf2, \xe0 \xe2\xe0\xf8\xe0 \xe0\xf0\xec\xe8\xff \xef\xf0\xe0\xe7\xe4\xed\xf3\xe5\xf2 \xf2\xf0\xe8\xf3\xec\xf4!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2637,21 +2637,21 @@ void CheckEndGame(
         giEndSequence = false;
     }
     if (forcedResult == END_GAME_FORCE_VICTORY) {
-        winFlag = 1;
+        winFlag = true;
         gbGameOver = true;
         giEndSequence = true;
     }
     if (forcedResult == END_GAME_FORCE_DEFEAT) {
-        defeated_m = 1;
+        defeated_m = true;
         gbGameOver = true;
         giEndSequence = false;
     }
 
     if (giEndSequence == 1 && gbGameOver) {
-        winFlag = 1;
+        winFlag = true;
     }
     if (giEndSequence == 0 && gbGameOver) {
-        defeated_m = 1;
+        defeated_m = true;
     }
 
     if (gbInCampaign && winFlag) {
@@ -2731,9 +2731,9 @@ void CheckEndGame(
 VA(0x0046aec9, 0x80)
 void QuickViewWait(void) {
     tag_message event;
-    i32 done;
+    b32 done;
     gpMouseManager->ReallyHidePointer();
-    done = 0;
+    done = false;
     while (!done) {
         PollSound();
         Process1WindowsMessage();
@@ -2783,14 +2783,14 @@ void InitVars(void) {
 
 VA(0x0046b118, 0x593)
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
-    i32 mixedUndead4;
+    b32 mixedUndead4;
     i32 alignment_e;
     ArmyGroupAlignmentResult homogeneous5;
     i32 modifierStart;
     char description7[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 slot8;
 
-    mixedUndead4 = 0;
+    mixedUndead4 = false;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) > 0)
         sprintf(description7, cMoraleInfo[IDX(MORALE_INFO_GOOD)]);
     else {
@@ -2808,7 +2808,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
     if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
         strcat(gText, cMoraleInfo[IDX(INFO_SOME_UNDEAD)]);
-        mixedUndead4 = 1;
+        mixedUndead4 = true;
     }
 
     homogeneous5 = h->m_army.IsHomogeneous(-1);
@@ -3005,9 +3005,9 @@ i32 AddScoreToHighScore(
     i32 entry_a;
     char filename_h[HIGH_SCORE_FILENAME_LENGTH];
     char playerName_c[HIGH_SCORE_INPUT_NAME_SIZE];
-    i32 missingFile_e;
+    b32 missingFile_e;
 
-    missingFile_e = 0;
+    missingFile_e = false;
     if (highScoreType == HIGH_SCORE_STANDARD)
         sprintf(
             filename_h,
@@ -3023,7 +3023,7 @@ i32 AddScoreToHighScore(
 
     file_c = open(filename_h, HIGH_SCORE_FILE_READ_FLAGS);
     if (file_c == -1)
-        missingFile_e = 1;
+        missingFile_e = true;
     if (missingFile_e) {
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
             memset(&entries_a[entry_a], 0, sizeof(HighScoreEntry));
@@ -3152,21 +3152,21 @@ void PopNetBox(char* text, i32 netPlayer) {
     i32 textWidth_b;
     i32 textX_k;
     i32 savedShowIt_p;
-    i32 updateInput_f;
+    b32 updateInput_f;
     i32 inputLength_a;
     char inputText_b[BOX_TEXT_LENGTH];
-    i32 exitForIncomingData_c;
-    i32 sendText_b;
+    b32 exitForIncomingData_c;
+    b32 sendText_b;
     tag_message event_o;
     tag_message updateMessage_i;
     i32 firstLineId_a;
     i32 delay_e;
     i32 lineTextLimit_g;
-    i32 done_a;
-    i32 redrawLines_l;
+    b32 done_a;
+    b32 redrawLines_l;
     i32 redrawSavedShowIt_a;
     KbRemotePacket* remoteData_g;
-    i32 redrawAdventure_o;
+    b32 redrawAdventure_o;
     i32 cursorState_j;
 
     if (!gbRemoteOn)
@@ -3235,13 +3235,13 @@ void PopNetBox(char* text, i32 netPlayer) {
     netWindow_j->BroadcastMessage(updateMessage_i);
 
     gpWindowManager->AddWindow(netWindow_j, -1, 1);
-    exitForIncomingData_c = 0;
-    done_a = 0;
-    updateInput_f = 1;
+    exitForIncomingData_c = false;
+    done_a = false;
+    updateInput_f = true;
     cursorState_j = 0;
-    sendText_b = 0;
-    redrawLines_l = 1;
-    redrawAdventure_o = 0;
+    sendText_b = false;
+    redrawLines_l = true;
+    redrawAdventure_o = false;
     strcpy(inputText_b, "");
     gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_ASCII);
 
@@ -3258,10 +3258,10 @@ void PopNetBox(char* text, i32 netPlayer) {
                             bShowIt = savedShowIt_p;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                             bShowIt = 1;
-                            redrawAdventure_o = 1;
+                            redrawAdventure_o = true;
                         }
                         gbLeaveNetBoxAlone = false;
-                        updateInput_f = 1;
+                        updateInput_f = true;
                         break;
                 }
             } else if (remoteData_g->type != REMOTE_MESSAGE_RELIABLE) {
@@ -3280,7 +3280,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                             gText,
                             gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].m_color
                         );
-                        redrawLines_l = 1;
+                        redrawLines_l = true;
                         if (messageTime_b != 0)
                             messageTime_b = KBTickCount();
                         break;
@@ -3289,8 +3289,8 @@ void PopNetBox(char* text, i32 netPlayer) {
                             "[ \xc2\xf5\xee\xe4\xff\xf9\xe0\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff, \xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xee \xe2\xfb\xe9\xf2\xe8... ]",
                             BOX_DEFAULT_COLOR
                         );
-                        redrawLines_l = 1;
-                        exitForIncomingData_c = 1;
+                        redrawLines_l = true;
+                        exitForIncomingData_c = true;
                         break;
                 }
             }
@@ -3304,16 +3304,16 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (event_o.payload.keyboard.keyCode) {
                     case BOX_KEY_ESCAPE:
                     case BOX_KEY_F1:
-                        done_a = 1;
+                        done_a = true;
                         break;
                     case BOX_KEY_BACKSPACE:
                         if (inputLength_a > 0)
                             inputLength_a--;
-                        updateInput_f = 1;
+                        updateInput_f = true;
                         cursorState_j = 1;
                         break;
                     case BOX_KEY_ENTER:
-                        sendText_b = 1;
+                        sendText_b = true;
                         break;
                     default:
                         if (event_o.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
@@ -3327,7 +3327,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                                 inputText_b[inputLength_a] =
                                     static_cast<char>(event_o.payload.keyboard.keyCode & 0xff);
                                 inputLength_a++;
-                                updateInput_f = 1;
+                                updateInput_f = true;
                                 cursorState_j = 0;
                             }
                         }
@@ -3336,10 +3336,10 @@ void PopNetBox(char* text, i32 netPlayer) {
 
         if (!updateInput_f && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < KBTickCount()) {
             cursorState_j = 1 - cursorState_j;
-            updateInput_f = 1;
+            updateInput_f = true;
         }
         if (sendText_b) {
-            sendText_b = 0;
+            sendText_b = false;
             inputText_b[inputLength_a] = 0;
             AddNetBoxLine(inputText_b, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result_p = TransmitRemoteData(
@@ -3355,12 +3355,12 @@ void PopNetBox(char* text, i32 netPlayer) {
                 ShutDown(NULL);
             inputLength_a = 0;
             strcpy(inputText_b, "");
-            updateInput_f = 1;
-            redrawLines_l = 1;
+            updateInput_f = true;
+            redrawLines_l = true;
         }
 
         if (redrawLines_l) {
-            redrawLines_l = 0;
+            redrawLines_l = false;
             updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
@@ -3393,7 +3393,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         }
 
         if (updateInput_f) {
-            updateInput_f = 0;
+            updateInput_f = false;
             glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + BOX_CURSOR_DELAY;
             if (cursorState_j)
                 inputText_b[inputLength_a] = '_';
@@ -3410,13 +3410,13 @@ void PopNetBox(char* text, i32 netPlayer) {
         }
 
         if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < KBTickCount())
-            done_a = 1;
+            done_a = true;
         if (exitForIncomingData_c) {
             for (delay_e = 0; delay_e < BOX_EXIT_DELAY_STEPS; delay_e++) {
                 PollSound();
                 DelayMilli(BOX_EXIT_DELAY);
             }
-            done_a = 1;
+            done_a = true;
         }
     }
 
@@ -3791,14 +3791,14 @@ i32 GameUnsaved(void) {
 
 VA(0x0046d715, 0x8d0)
 i32 HandleAppSpecificMenuCommands(i32 command) {
-    i32 menuChanged;
+    b32 menuChanged;
     hero* currentHeroRec;
     i32 loopIndex;
     HeroSecondarySkill secondarySkillIndex;
     HeroSkillLevel ssLevel;
     i32 formationHexIndex;
 
-    menuChanged = 0;
+    menuChanged = false;
     currentHeroRec = NULL;
     if (gpCurPlayer != NULL && gpCurPlayer->CurrentHero() != -1)
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
@@ -3887,7 +3887,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             goto adjustMusic;
         adjustMusic:
             gpSoundManager->AdjustMusicVolumes();
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_SOUND_FIRST:
@@ -3925,16 +3925,16 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             goto adjustSound;
         adjustSound:
             gpSoundManager->AdjustSoundVolumes();
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_TOGGLE_ROUTE:
             gConfig.showRoute = 1 - gConfig.showRoute;
-            menuChanged = 1;
+            menuChanged = true;
             break;
         case APP_MENU_TOGGLE_BLACKOUT:
             gConfig.blackoutComputer = 1 - gConfig.blackoutComputer;
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_VIEW_WORLD:
@@ -4472,7 +4472,7 @@ VA(0x0046eb87, 0xd3)
 void TestDynamicWindow(i32 p1, i32 p2) {
     heroWindow* d;
     i32 e, a, b, u, r, c;
-    i32 t;
+    b32 t;
     SetupDynamicWindow(
         0,
         0,
@@ -4491,7 +4491,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
         DYNAMIC_WINDOW_STONE
     );
     gpWindowManager->AddWindow(d, -1, 1);
-    t = 0;
+    t = false;
     gpInputManager->Flush();
     while (!t) {
         Process1WindowsMessage();
@@ -4499,7 +4499,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
             case MESSAGE_KEY_DOWN:
             case MESSAGE_LEFT_BUTTON_DOWN:
             case MESSAGE_RIGHT_BUTTON_DOWN:
-                t = 1;
+                t = true;
         }
     }
     gpWindowManager->RemoveWindow(d);
@@ -4524,9 +4524,12 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
     }
 }
 
-H2_ENUM_BEGIN(PlayerExitLocalConstant)
+H2_ENUM_BEGIN(PlayerExitNetPosition)
     PLAYER_EXIT_HOST_NET_POSITION = 0,
-    PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1,
+    PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1
+H2_ENUM_END(PlayerExitNetPosition)
+
+H2_ENUM_BEGIN(PlayerExitLocalConstant)
     PLAYER_EXIT_DIRECT_PLAYER_COUNT = 2,
     PLAYER_EXIT_MESSAGE_LENGTH = 500,
     PLAYER_EXIT_TRANSMIT_DELAY = 500,
@@ -4537,7 +4540,7 @@ H2_ENUM_END(PlayerExitLocalConstant)
 VA(0x0046ece2, 0x8e)
 void HandleRemoteSuddenExit(void) {
     SPlayerExit exitInfo;
-    i32 destination;
+    PlayerExitNetPosition destination;
     if (!gbGameInitialized)
         return;
     if (!gbRemoteOn)
@@ -4571,17 +4574,17 @@ void DropDownToOnePlayer(void) {
     giNumHumanPlayers = 1;
     for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
         if (i != giThisNetPos)
-            gbHumanPlayer[i] = 0;
+            gbHumanPlayer[i] = false;
     ComputeAdvNetControl();
 }
 
 VA(0x0046edbf, 0x356)
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32 forwardedReport) {
-    i32 showExitMessage_i;
+    b32 showExitMessage_i;
     char playerExitMessage_k[PLAYER_EXIT_MESSAGE_LENGTH];
     i32 netPosition;
 
-    showExitMessage_i = 0;
+    showExitMessage_i = false;
     if (!forwardedReport) {
         if (exitInfo.eliminated) {
             if (exitInfo.netPosition == giThisNetPos) {
@@ -4639,13 +4642,13 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                     gsNetPlayerInfo[exitInfo.netPosition].name
                 );
             }
-            showExitMessage_i = 1;
+            showExitMessage_i = true;
         }
     }
 
     if (giThisNetPos > exitInfo.netPosition)
         giThisNetPos--;
-    gbHumanPlayer[exitInfo.gamePosition] = 0;
+    gbHumanPlayer[exitInfo.gamePosition] = false;
 
     for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
@@ -4682,19 +4685,19 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
 
 VA(0x0046f115, 0x2c9)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
-    i32 localPlayerLost_e;
+    b32 localPlayerLost_e;
     i32 sendReturn;
     i32 unusedPacketResult_g;
     i32 recipient;
 
-    localPlayerLost_e = 0;
+    localPlayerLost_e = false;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
     gpGame->SaveGame("\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb", 1, 0);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = true;
         if (exitInfo.netPosition == giThisNetPos) {
-            localPlayerLost_e = 1;
+            localPlayerLost_e = true;
             goto exitInfoProcessed;
         }
         sprintf(gText, "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!", gsNetPlayerInfo[exitInfo.netPosition].name);
@@ -4747,7 +4750,7 @@ exitInfoProcessed:
         if (localPlayerLost_e)
             goto playerExitHandled;
         giNumHumanPlayers--;
-        gbHumanPlayer[exitInfo.gamePosition] = 0;
+        gbHumanPlayer[exitInfo.gamePosition] = false;
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
@@ -4973,7 +4976,7 @@ void NormalDialog(
     i32 savedPointerFrame;
     i32 windowHeight_h;
     char* orText;
-    i32 showPrimaryBonus;
+    b32 showPrimaryBonus;
     tag_message message_b;
     i32 savedSecondResourceValue_n;
     i32 savedFirstResourceValue;
@@ -5013,13 +5016,13 @@ void NormalDialog(
     textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
     resourceImageWidth = 0;
     iconHeight_h = 0;
-    showPrimaryBonus = 0;
+    showPrimaryBonus = false;
     showMessage_d = 1;
 
     if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL
         && firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
         firstResourceValue -= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET;
-        showPrimaryBonus = 1;
+        showPrimaryBonus = true;
     }
     if (firstResourceType >= NORMAL_DIALOG_MONSTER + 1
         && firstResourceType <= NORMAL_DIALOG_PRIMARY_SKILL - 1) {
@@ -6231,7 +6234,7 @@ DATA(0x005265ec) font* bigFont = NULL;
 DATA(0x005265f0) b32 gbReturnAfterComputeExtent = false;
 DATA(0x004f9b10) b32 gbAllowTextEntryEscape = true;
 DATA(0x005265f4) WindowColorCycleMode giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-DATA(0x004f9b14) i32 giScreenScroll = 1;
+DATA(0x004f9b14) b32 giScreenScroll = true;
 DATA(0x004f9b18) i32 giMenuCommand = -1;
 DATA(0x005265f8) b32 gbSendMouseMoveMessages = false;
 DATA(0x004f9b1c) b32 gbColorMice = true;
@@ -11364,7 +11367,7 @@ DATA(0x005260e4) i32 giMaxExtentY;
 DATA(0x00526398) i32 giRandomClouds;
 DATA(0x00526110) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x00526140) i32 giBottomViewOverrideEndTime;
-DATA(0x005265b0) i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
+DATA(0x005265b0) b8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 DATA(0x005258bc) H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
 DATA(0x00524e04) b32 gbInCampaign;
 DATA(0x00526130) i32 giResExtra1;

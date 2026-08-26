@@ -1000,14 +1000,14 @@ void townManager::Close(void) {
 
 VA(0x004a5e5c, 0x374)
 void townManager::SetArmyCommand(i32 qualifier) {
-    i32 cantMoveLastArmy;
-    i32 sameType;
+    b32 cantMoveLastArmy;
+    b32 sameType;
 
     m_command = ARMY_COMMAND_NONE;
-    cantMoveLastArmy = 0;
+    cantMoveLastArmy = false;
     if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
         && m_pendingStrip != m_swapStrip)
-        cantMoveLastArmy = 1;
+        cantMoveLastArmy = true;
 
     if (m_swapStrip == m_pendingStrip && m_swapArmySlot == m_pendingArmySlot) {
         sprintf(
@@ -1017,10 +1017,10 @@ void townManager::SetArmyCommand(i32 qualifier) {
         );
         m_command = ARMY_COMMAND_VIEW;
     } else {
-        sameType = 0;
+        sameType = false;
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
-            sameType = 1;
+            sameType = true;
         if (sameType) {
             if (qualifier != 0) {
                 sprintf(
@@ -1255,7 +1255,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     SAMPLE2 buildSound = NULL;
     i32 loop;
     i32 leaveTown = 0;
-    i32 quickView;
+    b32 quickView;
     char text[BUILDING_DESCRIPTION_CAPACITY];
     i32 dbgBuild;
     recruitUnit* manager;
@@ -1263,9 +1263,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     i32 tradeCount;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
 
     if (giDebugBuildingToBuild != -1) {
         dbgBuild = giDebugBuildingToBuild;
@@ -1989,7 +1989,7 @@ VA(0x004a84b7, 0x376)
 void townManager::SplitArmy(void) {
     i16 msgId = 1;
     i16 amountId = 4;
-    i32 sameType;
+    b32 sameType;
     tag_message message;
 
     m_heroWindow1 = new heroWindow(SMALL_DIALOG_WINDOW_X, SMALL_DIALOG_WINDOW_Y, "splitwin.bin");
@@ -2020,10 +2020,10 @@ void townManager::SplitArmy(void) {
     gpWindowManager->DoDialog(m_heroWindow1, SplitArmyHandler, 0);
     delete m_heroWindow1;
     if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
-        sameType = 0;
+        sameType = false;
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
-            sameType = 1;
+            sameType = true;
         if (sameType != 0) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] += m_splitAmount;
         } else {

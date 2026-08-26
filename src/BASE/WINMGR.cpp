@@ -429,7 +429,7 @@ i32 heroWindowManager::DoDialog(
     i32 fade
 ) {
     tag_message message;
-    i32 done;
+    b32 done;
     MessageDispatchResult result;
 
     gbInDialog = true;
@@ -443,7 +443,7 @@ i32 heroWindowManager::DoDialog(
         gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
     gpInputManager->Flush();
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
-    done = 0;
+    done = false;
     while (done == 0) {
         PollSound();
         Process1WindowsMessage();
@@ -454,13 +454,13 @@ i32 heroWindowManager::DoDialog(
             if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
                 m_dialogResult = message.payload.widget.id;
-                done = 1;
+                done = true;
             }
         }
         result = handler(message);
         if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
-            done = 1;
+            done = true;
     }
     if (done != 0) {
         if (window != NULL)

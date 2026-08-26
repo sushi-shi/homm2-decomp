@@ -219,17 +219,17 @@ VA(0x004c5580, 0x179)
 void executive::MainLoop(void) {
     i32 done;
     tag_message message;
-    i32 dispatch;
+    b32 dispatch;
 
     done = 0;
-    dispatch = 1;
+    dispatch = true;
     if (m_managerListHead == NULL)
         return;
     gpInputManager->Flush();
     while (!done) {
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
-        dispatch = 1;
+        dispatch = true;
         m_activeManager = m_managerListHead;
         if (m_activeManager == NULL)
             return;
@@ -238,7 +238,7 @@ void executive::MainLoop(void) {
                 && (message.type != MESSAGE_MOUSE_MOVE || m_activeManager != gpWindowManager)) {
                 switch (m_activeManager->Main(message)) {
                     case MESSAGE_DISPATCH_CONSUME:
-                        dispatch = 0;
+                        dispatch = false;
                         break;
                     case MESSAGE_DISPATCH_FORWARD:
                         if (HAS(message.type, MESSAGE_EXECUTIVE)) {

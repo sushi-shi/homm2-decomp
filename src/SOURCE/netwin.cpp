@@ -339,14 +339,14 @@ extern "C" char __cdecl nb_stat(i16 session) {
 
 VA(0x00474848, 0x215)
 void nb_thr_ctl(void) {
-    i32 keepRunning;
+    b32 keepRunning;
     i32 idx;
     tag_Node* entry;
     NetbiosControlBlock block;
     H2_ENUM_STORAGE(NetbiosResult, u8) result;
-    i32 sendComplete;
+    b32 sendComplete;
 
-    keepRunning = 1;
+    keepRunning = true;
     if (WaitForMultipleObjects(NETBIOS_THREAD_EVENT_COUNT, gNbEvents.handles, 0, 0) == WAIT_TIMEOUT)
         return;
     {
@@ -366,7 +366,7 @@ void nb_thr_ctl(void) {
                 entry = pop_node(&gNbSndQueue);
             LeaveCriticalSection(&gNbSndLock);
             if (entry == NULL) {
-                keepRunning = 0;
+                keepRunning = false;
             } else {
                 memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
                 gNbCtlNcb.sessionNumber = gNbSessLsn[entry->sessionIndex];
@@ -376,12 +376,12 @@ void nb_thr_ctl(void) {
                     gNbCtlNcb.length = entry->len;
                     gNbCtlNcb.command = NETBIOS_COMMAND_SEND;
                     gNbCtlNcb.adapterNumber = gNetbiosLana;
-                    sendComplete = 0;
+                    sendComplete = false;
                     while (!sendComplete) {
                         result = Netbios(&gNbCtlNcb);
                         switch (result) {
                             case NETBIOS_RESULT_SUCCESS:
-                                sendComplete = 1;
+                                sendComplete = true;
                                 break;
                             case NETBIOS_RESULT_PENDING:
                                 ProcessAssert(

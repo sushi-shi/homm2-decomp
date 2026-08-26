@@ -105,15 +105,15 @@ namespace {
     // turn, the player cannot pay, the roster is full, or a hero is standing in
     // the town.
     inline i32 CannotRecruitHero(void) {
-        i32 cannot;
+        b32 cannot;
 
         if (!(gpTownManager->m_recruitResult != 0
               || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
               || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
               || gpTownManager->m_town->m_occupyingHeroId != -1))
-            cannot = 0;
+            cannot = false;
         else
-            cannot = 1;
+            cannot = true;
         return cannot;
     }
 
@@ -471,22 +471,22 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 VA(0x00425230, 0xb6d)
 MessageDispatchResult CastleHandler(tag_message& message) {
     i32 objIndex;
-    i32 hoverMessage;
+    b32 hoverMessage;
     i32 heroChoiceIndex;
     H2_ENUM_STORAGE(BuildingSlotType, i32) whichBuilding;
-    i32 quickFlag;
+    b32 quickFlag;
     i32 ret;
     i16 statusWidgetId;
 
     statusWidgetId = IDX(CONTROL_STATUS_TEXT);
     whichBuilding = BUILDING_SLOT_NONE;
     ret = 0;
-    hoverMessage = 0;
+    hoverMessage = false;
 
     if (message.type == MESSAGE_MOUSE_MOVE || message.type == MESSAGE_WIDGET) {
         if (message.type == MESSAGE_MOUSE_MOVE) {
             gpWindowManager->ConvertToHover(message);
-            hoverMessage = 1;
+            hoverMessage = true;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
             whichBuilding = CASTLE_CAPTAIN;

@@ -125,7 +125,7 @@ VA(0x004a1cb0, 0x37d)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
     CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
-    i32 iconsCurrent_8;
+    b32 iconsCurrent_8;
     i32 slot;
     CreatureType creatureType;
 
@@ -139,11 +139,11 @@ void strip::DrawIcons(i32 drawWindow) {
         m_window->DrawWindow(drawWindow);
         return;
     }
-    iconsCurrent_8 = 1;
+    iconsCurrent_8 = true;
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         if (m_army->m_creatureTypes[slot] != CREATURE_NONE
             && m_cachedCreatureTypes[slot] != m_army->m_creatureTypes[slot])
-            iconsCurrent_8 = 0;
+            iconsCurrent_8 = false;
     }
 
     if (iconsCurrent_8 == 0) {

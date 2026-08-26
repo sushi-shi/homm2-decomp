@@ -245,13 +245,13 @@ void recruitUnit::Update(void) {
 VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     b32 done = false;
-    i32 quickView;
+    b32 quickView;
     i32 cost;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:

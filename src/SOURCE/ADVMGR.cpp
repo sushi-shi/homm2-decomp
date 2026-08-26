@@ -1468,7 +1468,7 @@ VA(0x004020d7, 0x59d)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
     bchar bMoveStopped = false;
-    i32 oldMapValid;
+    b32 oldMapValid;
     hero* selectedHero;
     town* viewTown;
     tag_message messageValue;
@@ -1638,7 +1638,7 @@ class mapCell* advManager::DoAdvCommand(void) {
 
 VA(0x00402674, 0x15b)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
-    i32 shouldChange;
+    b32 shouldChange;
     i32 translationIndex;
     i32 savedShowIt;
     tag_message message;
@@ -1647,18 +1647,18 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
         player = giCurWatchPlayer;
     }
 
-    shouldChange = 0;
+    shouldChange = false;
     if (gConfig.evilInterfaceUsage == INTERFACE_EVIL && !gbUseEvilInterface) {
-        shouldChange = 1;
+        shouldChange = true;
     } else if (gConfig.evilInterfaceUsage == INTERFACE_GOOD && gbUseEvilInterface) {
-        shouldChange = 1;
+        shouldChange = true;
     } else if (gConfig.evilInterfaceUsage == INTERFACE_AUTO
                && gbUseEvilInterface != gpGame->m_players[player].m_evilInterface) {
-        shouldChange = 1;
+        shouldChange = true;
     }
 
     if (shouldChange) {
-        gbUseEvilInterface = 1 - gbUseEvilInterface;
+    gbUseEvilInterface = 1 - gbUseEvilInterface;
         if (redraw) {
             message.type = ADVMGR_INTERFACE_MESSAGE;
             message.payload.widget.command = ADVMGR_INTERFACE_REPLACE_RESOURCE;
@@ -2212,7 +2212,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     i32 objectTypeState;
     i32 mouseY;
     i32 objectIdIndex;
-    i32 visible;
+    b32 visible;
     mapCell* theCell;
     tag_message radMsg;
     float fScale;
@@ -2220,7 +2220,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     i32 mobileResult;
     hero* currentHero;
 
-    visible = 1;
+    visible = true;
     mouseX = message->payload.mouse.screenX;
     mouseY = message->payload.mouse.screenY;
 
@@ -2315,7 +2315,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             if (!(*(mapExtra + (m_mapOriginX + m_lastHoverCell)
                     + MAP_WIDTH * (m_mapOriginY + m_hoverCellY))
                   & giCurPlayerBit)) {
-                visible = 0;
+                visible = false;
             }
             theCell = GetCell(m_mapOriginX + m_lastHoverCell, m_mapOriginY + m_hoverCellY);
             if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
@@ -4468,7 +4468,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 towny;
     i32 frame;
     i32 oldColor;
-    i32 bNoFrame;
+    b32 bNoFrame;
     i32 i;
     i32 j;
     i32 cx;
@@ -4750,17 +4750,17 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 
     frame = RADAR_FRAME_NONE;
-    bNoFrame = 0;
+    bNoFrame = false;
     if (gbInViewWorld != 0) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
                 fScale = RADAR_SMALL_CELL_PIXELS;
-                bNoFrame = 1;
+                bNoFrame = true;
                 break;
             case MAP_DIMENSION_MEDIUM:
                 fScale = RADAR_MEDIUM_CELL_PIXELS;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
-                    bNoFrame = 1;
+                    bNoFrame = true;
                 } else {
                     frame = RADAR_FRAME_VIEW_MIDDLE;
                 }
@@ -4768,7 +4768,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             case MAP_DIMENSION_LARGE:
                 fScale = 1.33f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
-                    bNoFrame = 1;
+                    bNoFrame = true;
                 } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
                     frame = RADAR_FRAME_VIEW_MIDDLE_LARGE;
                 } else {
@@ -4867,7 +4867,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 j;
     i32 expansionSite;
     char uppercaseResult;
-    i32 blocked;
+    b32 blocked;
 
     quickInfoShowFlag = 1;
     currentCell = NULL;
@@ -5092,9 +5092,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                          && currentCell->m_objectTileset != TILESET_DUMMY)
                         || currentCell->m_overlayIndex != MAPCELL_SPRITE_NONE
                         || giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER) {
-                        blocked = 1;
+                        blocked = true;
                     } else {
-                        blocked = 0;
+                        blocked = false;
                     }
                     sprintf(
                         gText,
@@ -5653,13 +5653,13 @@ void advManager::ClearBottomView(void) {
 
 VA(0x0040ad72, 0x53b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
-    i32 updated;
+    b32 updated;
     tag_message msg;
 
-    updated = 0;
+    updated = false;
     msg.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
     if (iCurBottomView != BOTTOM_VIEW_ENEMY_TURN) {
-        updated = 1;
+        updated = true;
         gbForceUpdate = true;
         ClearBottomView();
         iCurBottomView = BOTTOM_VIEW_ENEMY_TURN;
@@ -5708,7 +5708,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             if (iSandAnim >= ENEMY_TURN_SAND_FRAME_LIMIT) {
                 iSandAnim = ENEMY_TURN_SAND_RESTART_FRAME;
             }
-            updated = 1;
+            updated = true;
 
             if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] != NULL) {
                 msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
@@ -5740,7 +5740,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     }
 
     if (gbForceUpdate || iCurBottomViewEnemy != giCurPlayer) {
-        updated = 1;
+        updated = true;
         iCurBottomViewEnemy = giCurPlayer;
         if (iCurBottomViewEnemy != giCurPlayer) {
             iCurHourGlassPhase = 0;
@@ -5777,7 +5777,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     if (gbForceUpdate || iCurHourGlassPhase < iLastHourGlassPhase || iLastHourGlassPhase < 0
         || (iCurHourGlassPhase > iLastHourGlassPhase
             && KBTickCount() - giLastHourGlassUpdateTime >= ENEMY_TURN_PHASE_DELAY)) {
-        updated = 1;
+        updated = true;
         iLastHourGlassPhase = iCurHourGlassPhase;
         giLastHourGlassUpdateTime = KBTickCount();
         if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] != NULL) {
@@ -8333,7 +8333,7 @@ void advManager::TeleportTo(
     i32 savedShow;
     H2_ENUM_STORAGE(TerrainType, i32) terrain;
     mapCell* cellOld2;
-    i32 oldCellFlag26;
+    b32 oldCellFlag26;
     i32 unused;
     mapCell* destinationCell29;
     i32 fizzleTime36;
@@ -8359,10 +8359,10 @@ void advManager::TeleportTo(
         occupiedTown47->m_occupyingHeroId = INVALID_HERO;
     }
 
-    oldCellFlag26 = 0;
+    oldCellFlag26 = false;
     if (cellOld2->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
         cellOld2->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
-        oldCellFlag26 = 1;
+        oldCellFlag26 = true;
     } else {
         gpGame->RestoreCell(
             mapHero->m_x,
@@ -8685,11 +8685,11 @@ void advManager::SummonBoat(void) {
     i32 placeX;
     hero* summonHero;
     mapCell* destinationCell;
-    i32 okCell;
+    b32 okCell;
     i32 slotIndex;
     i32 iDir;
     i32 placeY;
-    i32 foundBoat;
+    b32 foundBoat;
     i32 heroSlot;
     boatRecord* boatRec;
     mapCell* fromCell;
@@ -8699,8 +8699,8 @@ void advManager::SummonBoat(void) {
     i32 clipHeight;
 
     summonHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
-    okCell = 0;
-    foundBoat = 0;
+    okCell = false;
+    foundBoat = false;
     destinationCell =
         GetCell(m_mapOriginX + SUMMON_CENTER_OFFSET, m_mapOriginY + SUMMON_CENTER_OFFSET);
     if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
@@ -8719,7 +8719,7 @@ void advManager::SummonBoat(void) {
         if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE
             && destinationCell->m_triggerType == MAP_OBJECT_NONE
             && giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
-            okCell = 1;
+            okCell = true;
             break;
         }
     }
@@ -8730,7 +8730,7 @@ void advManager::SummonBoat(void) {
             if (gpGame->m_boatSlots[slotIndex] != -1
                 && gpGame->m_boats[slotIndex].heroId
                        == (heroSlot | SUMMON_OCCUPIED_FLAG)) {
-                foundBoat = 1;
+                foundBoat = true;
                 break;
             }
         }
@@ -8743,7 +8743,7 @@ void advManager::SummonBoat(void) {
                     && abs(gpGame->m_boats[slotIndex].x - summonHero->m_x)
                                + abs(gpGame->m_boats[slotIndex].y - summonHero->m_y)
                            > SUMMON_MIN_DISTANCE) {
-                    foundBoat = 1;
+                    foundBoat = true;
                     break;
                 }
             }
@@ -8849,7 +8849,7 @@ VA(0x00411f49, 0x44e)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     hero* hero;
     i32 nPath;
-    i32 reachable;
+    b32 reachable;
     mapCell* nextTile;
     i32 frame;
     i32 cost;
@@ -8863,7 +8863,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     H2_ENUM_STORAGE(TerrainType, i32) terr;
     BaseWidgetCommand buttonFrame;
 
-    reachable = 0;
+    reachable = false;
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         return;
     }
@@ -8965,7 +8965,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             if (remain < 0) {
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] += ROUTE_DAY_MASK;
             } else {
-                reachable = 1;
+                reachable = true;
             }
         }
 
@@ -10225,7 +10225,7 @@ void advManager::SystemOptions(void) {
     tag_message message;
     i32 oldInterfaceMode;
     ConfigWalkSpeed prevWalkSpeed;
-    i32 heroMobile;
+    b32 heroMobile;
     i32 n;
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);

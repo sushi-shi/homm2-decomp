@@ -95,6 +95,11 @@ H2_ENUM_BEGIN(CampaignScenarioNumber)
     SCENARIO_THIRTEEN = 13
 H2_ENUM_END(CampaignScenarioNumber)
 
+H2_ENUM_BEGIN(CampaignBonusHeroPosition)
+    CAMPAIGN_BONUS_HERO_FIRST  = 0,
+    CAMPAIGN_BONUS_HERO_SECOND = 1
+H2_ENUM_END(CampaignBonusHeroPosition)
+
 H2_ENUM_CLASS_BEGIN(CampaignTrackType)
     ROLAND_TO_ROLAND             = 0,
     ROLAND_TO_ARCHIBALD          = 1,
@@ -381,7 +386,7 @@ VA(0x004226d2, 0x40a)
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     widget* trackWidget;
     i32 mapIndex;
-    i32 savedInterface;
+    b32 savedInterface;
     tag_message message;
     i32 trackMapIndex;
 
@@ -837,14 +842,14 @@ void game::InitCampaignMap(void) {
     i32 swappedHero;
     i32 heroPositionValue;
     i32 scanPositionId;
-    i32 savedNewGameSetup;
+    b32 savedNewGameSetup;
     i32 playerSlotSlot4;
     SCampaignChoice* choiceBest1;
     i32 heroPriorityBest3;
     i32 bestHeroPositionCandidate;
     i32 selectedChoicePosition0;
     i32 mapHeaderResultCampaign3;
-    i32 bonusHeroIndexPosition;
+    CampaignBonusHeroPosition bonusHeroIndexPosition;
 
     selectedChoicePosition0 = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
@@ -955,11 +960,11 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
-                bonusHeroIndexPosition = 0;
+                bonusHeroIndexPosition = CAMPAIGN_BONUS_HERO_FIRST;
                 if (m_campaignType == CAMPAIGN_ROLAND
                     && m_campaignScenario + 1 == SCENARIO_SIX
                     && m_players[0].m_heroCount > 1)
-                    bonusHeroIndexPosition = 1;
+                    bonusHeroIndexPosition = CAMPAIGN_BONUS_HERO_SECOND;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
                     ->m_spells[IDX(choiceBest1->spell)] = 1;
             }

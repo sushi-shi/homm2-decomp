@@ -45,8 +45,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
     GAME_DIALOG_CLOSE_MESSAGE             = 10,
-    GAME_PLAYER_DEFAULT                   = 0,
-    GAME_PLAYER_FLEXIBLE                  = 1,
     GAME_DIALOG_CANCEL                    = 0x7801,
     GAME_DIALOG_OK                        = 0x7802,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
@@ -102,6 +100,11 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SCENARIO_VICTORY                 = 205,
     GAME_SCENARIO_LOSS                    = 206
 H2_ENUM_END(NewGameConstant)
+
+H2_ENUM_BEGIN(NewGamePlayerSetupType)
+    GAME_PLAYER_DEFAULT  = 0,
+    GAME_PLAYER_FLEXIBLE = 1
+H2_ENUM_END(NewGamePlayerSetupType)
 
 H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
     GAME_KEY_ENTER          = 10,
@@ -309,7 +312,7 @@ void game::ProcessNewMap(struct SMapHeader* header) {
 VA(0x004756e8, 0x404)
 void game::InitNewGame(struct SMapHeader* header) {
     i32 humanCount;
-    i32 playerType;
+    NewGamePlayerSetupType playerType;
     i32 player;
     i32 unusedTally;
     i32 activeColorCount;
@@ -417,18 +420,18 @@ i32 game::NewGame(void) {
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfo[GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
-    i32 mapHeaderOk;
-    i32 playerInfoOk;
+    b32 mapHeaderOk;
+    b32 playerInfoOk;
     NewGameRemotePacket* remoteBuffer;
     heroWindow* choiceWindow;
-    i32 result;
-    i8 wrongExpansionType;
+    b32 result;
+    b8 wrongExpansionType;
     char* mapExt;
     i32 mapHeaderRead;
     i32 textBufferIndex;
     i32 transmitResult;
 
-    result = 1;
+    result = true;
     m_newGameWindow = NULL;
 
     if ((!gbRemoteOn || giThisNetPos == 0) && (!gbRemoteOn || !xNetHasOldPlayers)) {
@@ -467,8 +470,8 @@ i32 game::NewGame(void) {
     NGKPBkg = gpResourceManager->GetIcon("ngextra.icn");
 
     if (gbWaitForRemoteReceive) {
-        mapHeaderOk = 0;
-        playerInfoOk = 0;
+        mapHeaderOk = false;
+        playerInfoOk = false;
         for (;;) {
             PollSound();
             remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
@@ -477,7 +480,7 @@ i32 game::NewGame(void) {
                     case GAME_REMOTE_MAP_HEADER:
                         memset(&m_mapHeader, 0, sizeof(m_mapHeader));
                         memcpy(&m_mapHeader, remoteBuffer->payload, GAME_MAP_PACKET_SIZE);
-                        mapHeaderOk = 1;
+                        mapHeaderOk = true;
                         break;
                     case GAME_REMOTE_PLAYER_INFO:
                         memcpy(
@@ -486,7 +489,7 @@ i32 game::NewGame(void) {
                             GAME_PLAYER_INFO_PACKET_SIZE
                         );
                         SetupNetPlayerNames();
-                        playerInfoOk = 1;
+                        playerInfoOk = true;
                         break;
                 }
                 if (playerInfoOk && mapHeaderOk) {
@@ -523,23 +526,23 @@ i32 game::NewGame(void) {
                     gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
                     delete m_newGameWindow;
                     if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
-                        result = 0;
+                        result = false;
                         goto cleanup;
                     }
-                    result = 1;
+                    result = true;
                     goto cleanup;
                 }
             }
         }
     } else {
     pick_map:
-        wrongExpansionType = 0;
+        wrongExpansionType = false;
         mapExt = FindLastToken(m_mapFilename, '.');
         if (mapExt != NULL) {
             if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
-                wrongExpansionType = 1;
+                wrongExpansionType = true;
             if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
-                wrongExpansionType = 1;
+                wrongExpansionType = true;
         }
         if (!wrongExpansionType) {
             if (xIsExpansionMap)
@@ -613,7 +616,7 @@ i32 game::NewGame(void) {
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
         delete m_newGameWindow;
         if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
-            result = 0;
+            result = false;
         } else {
             m_playerCount = m_mapHeader.playerCount;
             NewMap(gMapName);
@@ -883,7 +886,7 @@ cleanup:
 
     VA(0x00476e3b, 0x50f)
     void game::UpdateNewGameWindow(void) {
-        i32 playerLockedValue;
+        b32 playerLockedValue;
         tag_message message;
         i32 playerIndex;
         i32 unusedPlayer17;
@@ -941,9 +944,9 @@ cleanup:
             if (m_setupPlayerType[playerIndex] != GAME_PLAYER_DEFAULT
                 || (giNumHumanPlayers > 1
                     && m_setupPlayerNetworkId[playerIndex] != GAME_COMPUTER_PLAYER))
-                playerLockedValue = 0;
+                playerLockedValue = false;
             else
-                playerLockedValue = 1;
+                playerLockedValue = true;
             message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
             message.payload.widget.id = NEW_GAME_COLOR_FIRST + playerIndex;
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
@@ -980,9 +983,9 @@ cleanup:
             m_newGameWindow->BroadcastMessage(message);
 
             if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex]] == FACTION_RANDOM)
-                playerLockedValue = 0;
+                playerLockedValue = false;
             else
-                playerLockedValue = 1;
+                playerLockedValue = true;
             message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
             message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
             m_newGameWindow->BroadcastMessage(message);
@@ -1739,7 +1742,7 @@ void game::ShowScenInfo(void) {
     i32 playerStep;
     i32 playerCounter;
     i32 mapSize;
-    i32 locked;
+    b32 locked;
     char* name;
     i32 yExtra;
     i32 raceNameWidth;
@@ -2013,9 +2016,9 @@ void game::ShowScenInfo(void) {
         if (m_setupPlayerType[playerCounter] != GAME_PLAYER_DEFAULT
             || (giNumHumanPlayers > 1
                 && m_setupPlayerNetworkId[playerCounter] != GAME_COMPUTER_PLAYER))
-            locked = 0;
+            locked = false;
         else
-            locked = 1;
+            locked = true;
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         msg.payload.widget.id =
             NEW_GAME_COLOR_FIRST + playerCounter;
@@ -2245,7 +2248,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     char colorStr[GAME_SIDE_TEXT_SIZE];
     i32 sideCount;
     i32 i;
-    i32 onSide;
+    b32 onSide;
     i32 otherPlayerCount;
     i32 localPlayer;
     i32 listedPlayerCount;

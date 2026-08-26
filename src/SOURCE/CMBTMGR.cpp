@@ -1125,9 +1125,9 @@ i32 combatManager::CheckApplyBadMorale(
 
 VA(0x004287bf, 0x345)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
-    i32 skipEnt;
+    b32 skipEnt;
     i32 speedIter;
-    i32 hasPending;
+    b32 hasPending;
     i32 sideLoop;
     i32 stackCounter;
     army* curArmy;
@@ -1135,14 +1135,14 @@ i32 combatManager::GetNextArmy(i32 checkMorale) {
     i32 i;
 
 restart:
-    hasPending = 0;
+    hasPending = false;
     stackSide = m_currentArmySide;
     m_currentSpeed = COMBAT_MAX_SPEED;
     for (speedIter = 0; speedIter < COMBAT_SPEED_LEVEL_COUNT; speedIter++) {
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             stackSide ^= 1;
             for (stackCounter = 0; stackCounter < m_armyCount[IDX(stackSide)]; stackCounter++) {
-                skipEnt = 0;
+                skipEnt = false;
                 curArmy = stackCounter + m_armies[IDX(stackSide)];
                 if (HAS(curArmy->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
@@ -1154,22 +1154,22 @@ restart:
                             curArmy->m_monster.flags.abilityFlags
                             & MONSTER_ABILITY_FLAG_HIGH_MORALE
                         )))
-                    skipEnt = 1;
+                    skipEnt = true;
 
                 if (!skipEnt && speedIter == 0
                     && !(
                         curArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_HIGH_MORALE
                     ))
-                    skipEnt = 1;
+                    skipEnt = true;
 
                 if HAS (curArmy->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
-                    skipEnt = 1;
-                    hasPending = 1;
+                    skipEnt = true;
+                    hasPending = true;
                 }
 
                 if (!skipEnt && checkMorale && CheckApplyBadMorale(stackSide, stackCounter))
-                    skipEnt = 1;
+                    skipEnt = true;
                 if (!skipEnt)
                     break;
             }
@@ -1214,7 +1214,7 @@ restart:
 
 VA(0x00428b04, 0xb4)
 i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
-    i32 result;
+    b32 result;
     i32 index;
 
     if (m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
@@ -1223,11 +1223,11 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
         return 1;
 
     side ^= 1;
-    result = 1;
+    result = true;
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         if (!(m_armies[IDX(side)][index].m_monster.flags.abilityFlags
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
-            result = 0;
+            result = false;
     }
     return result;
 }
@@ -1800,7 +1800,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     i32 elevCells;
     i32 cellIndex;
     u8 typeUsed[COMBAT_OBSTACLE_TYPE_COUNT];
-    i32 blocked;
+    b32 blocked;
     i32 placedCells;
     i32 obstacleHex;
 
@@ -1871,15 +1871,15 @@ void combatManager::SetupAndLoadObstacles(void) {
             if (sCmbtObstacles[obstacleType].minimumColumn
                 > startRow + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET)
                 continue;
-            blocked = 0;
+            blocked = false;
             for (cellIndex = 0; cellIndex < sCmbtObstacles[obstacleType].cellCount; cellIndex++) {
                 obstacleHex = site + sCmbtObstacles[obstacleType].cellOffsets[cellIndex];
                 if (obstacleHex % COMBAT_GRID_ROW_LENGTH <= COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1
                     || obstacleHex % COMBAT_GRID_ROW_LENGTH >= COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
-                    blocked = 1;
+                    blocked = true;
                 }
                 if (m_hexCells[obstacleHex].m_blocked != 0)
-                    blocked = 1;
+                    blocked = true;
             }
             if (blocked != 0)
                 continue;

@@ -57,11 +57,11 @@ void highScoreManager::Close(void) {
 
 VA(0x00465325, 0x1ca)
 MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
-    i32 result;
+    b32 result;
     i32 entry;
     tag_message windowMessage;
 
-    result = 0;
+    result = false;
     if (gbShowHighScore != 0)
         gbShowHighScore = false;
 
@@ -104,7 +104,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
                             break;
                         case HIGH_SCORE_CLOSE_BUTTON:
                             message.payload.widget.data.value = message.payload.widget.id;
-                            result = 1;
+                            result = true;
                             break;
                     }
                     break;
@@ -127,18 +127,18 @@ void highScoreManager::Update(void) {
     HighScoreEntry highScore;
     i32 rank;
     i32 inputFile;
-    i32 noScoreFile;
+    b32 noScoreFile;
     tag_message hsMessage;
     char scorePath[HIGH_SCORE_FILENAME_LENGTH];
 
-    noScoreFile = 0;
+    noScoreFile = false;
     if (m_showCampaignScores)
         sprintf(scorePath, "%sCAMPAIGN.HS", ".\\DATA\\");
     else
         sprintf(scorePath, "%sSTANDARD.HS", ".\\DATA\\");
     inputFile = open(scorePath, HIGH_SCORE_FILE_READ_FLAGS);
     if (inputFile == -1)
-        noScoreFile = 1;
+        noScoreFile = true;
 
     sprintf(gText, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);

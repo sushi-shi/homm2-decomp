@@ -62,7 +62,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     ArmyGroupAlignmentResult alignValue;
     b32 hasSomeUndead = false;
     i32 moraleDelta = 0;
-    i32 enemyHasBoneDragon;
+    b32 enemyHasBoneDragon;
     i32 index;
     alignValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
 
@@ -72,11 +72,11 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     if (HasSomeUndead())
         hasSomeUndead = true;
 
-    enemyHasBoneDragon = 0;
+    enemyHasBoneDragon = false;
     if (enemyGroup != NULL) {
         for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
             if (enemyGroup->m_creatureTypes[index] == CREATURE_BONE_DRAGON)
-                enemyHasBoneDragon = 1;
+                enemyHasBoneDragon = true;
         }
     }
 

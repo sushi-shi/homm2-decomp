@@ -1471,7 +1471,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 unwoundChanges;
     i32 pos1;
     i32 lowestSequence;
-    i32 continueUnwinding;
+    b32 continueUnwinding;
     i32 n;
 
     queueCount = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
@@ -1498,16 +1498,16 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
         }
     }
 
-    continueUnwinding = 1;
+    continueUnwinding = true;
     while (continueUnwinding) {
-        continueUnwinding = 0;
+        continueUnwinding = false;
         for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
             if (sMapChangeQueue[n].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[n].sequence == giMapChangeCtr) {
                 if (processChanges)
                     ProcessMapChange(sMapChangeQueue[n]);
                 sMapChangeQueue[n].type = MAP_CHANGE_NONE;
-                continueUnwinding = 1;
+                continueUnwinding = true;
             }
         }
     }

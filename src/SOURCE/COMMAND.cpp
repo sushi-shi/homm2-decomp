@@ -442,10 +442,10 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
 
-    char standable_0[COMBAT_DIRECTION_COUNT];
+    bchar standable_0[COMBAT_DIRECTION_COUNT];
     i32 directionHexes[COMBAT_DIRECTION_COUNT];
     i32 rearHexes_2[COMBAT_DIRECTION_COUNT];
-    char pathValid_28[COMBAT_DIRECTION_COUNT];
+    bchar pathValid_28[COMBAT_DIRECTION_COUNT];
     i32 outputDirection_7;
     i32 mappedDirection_5;
     i32 previous_1;
@@ -524,9 +524,9 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 
         if (ValidHexToStandOn(directionHexes[direction_28]) != 0
             && ValidHexToStandOn(rearHexes_2[direction_28]) != 0)
-            standable_0[direction_28] = 1;
+            standable_0[direction_28] = true;
         else
-            standable_0[direction_28] = 0;
+            standable_0[direction_28] = false;
     }
 
     if (HAS(currentArmy_1->m_monster.flags.all, MONSTER_FLAGS_FLYING) != 0) {
@@ -540,11 +540,11 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                            directionHexes[direction_28],
                            ARMY_PATH_EXACT_TARGET_HEX
                        ) != 0)
-                    pathValid_28[direction_28] = 1;
+                    pathValid_28[direction_28] = true;
                 else
-                    pathValid_28[direction_28] = 0;
+                    pathValid_28[direction_28] = false;
             } else {
-                pathValid_28[direction_28] = 0;
+                pathValid_28[direction_28] = false;
             }
         }
     }
@@ -555,7 +555,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             m_validDirectionCount++;
     }
     if (m_validDirectionCount == 0)
-        pathValid_28[IDX(COMBAT_DIRECTION_WIDE_WEST)] = 1;
+        pathValid_28[IDX(COMBAT_DIRECTION_WIDE_WEST)] = true;
 
     memset(m_directionMap, -1, sizeof(m_directionMap));
     for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++) {
@@ -2571,19 +2571,19 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;
     army* actingArmy_29;
-    i32 shouldAdvance;
-    i32 redraw_10;
+    b32 shouldAdvance;
+    b32 redraw_10;
     MessageDispatchResult dispatchResult_1;
 
     ClearCombatMessages(0);
     dispatchResult_1 = MESSAGE_DISPATCH_CONSUME;
-    redraw_10 = 0;
+    redraw_10 = false;
     gbProcessingCombatAction = true;
     if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
         || m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
         m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
         m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = COMBAT_SIDE_NONE;
-        redraw_10 = 1;
+        redraw_10 = true;
     }
     if (giNextAction != ACTION_NONE) {
         LogInt(
@@ -2601,7 +2601,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     UpdateMouseGrid(-1, 1);
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     if (UpdateGrid(0, 0) != 0)
-        redraw_10 = 1;
+        redraw_10 = true;
     if (redraw_10 != 0)
         DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 
@@ -2638,7 +2638,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     }
 
     actingArmy_29 = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    shouldAdvance = 0;
+    shouldAdvance = false;
     if (CheckWin(&message) != 0)
         goto Finished;
     switch (giNextAction) {
@@ -2653,7 +2653,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 giNextActionGridIndex2
             );
             if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].m_quantity <= 0)
-                shouldAdvance = 1;
+                shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_MOVE:
@@ -2665,7 +2665,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 goto Finished;
             }
             CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-            shouldAdvance = 1;
+            shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_ATTACK:
@@ -2680,7 +2680,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 goto Finished;
             }
             CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-            shouldAdvance = 1;
+            shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_RETREAT:
@@ -2700,11 +2700,11 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             break;
         case ACTION_WAIT:
             actingArmy_29->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
-            shouldAdvance = 1;
+            shouldAdvance = true;
             break;
         case ACTION_DEFEND:
             actingArmy_29->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
-            shouldAdvance = 1;
+            shouldAdvance = true;
             break;
     }
     giNextAction = ACTION_NONE;

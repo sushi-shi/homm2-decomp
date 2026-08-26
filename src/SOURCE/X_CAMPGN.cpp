@@ -606,9 +606,9 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     SCampaignChoice* choice;
     tag_message message;
     char armyName[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
-    i8 hasVisibleAward;
+    b8 hasVisibleAward;
     i32 i;
-    i8 showScroll;
+    b8 showScroll;
 
     message.type = MESSAGE_WIDGET;
     for (i = 0; i < m_mapCount; ++i) {
@@ -651,12 +651,12 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     sprintf(gText, "%d", m_mapDays[IDX(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
-    hasVisibleAward = 0;
+    hasVisibleAward = false;
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
     strcpy(gText, "");
     for (i = 0; i < EXPANSION_CAMPAIGN_AWARD_COUNT; ++i) {
         if (m_awards[i] != 0) {
-            hasVisibleAward = 1;
+            hasVisibleAward = true;
             strcat(gText, xCampaignAwards[i]);
             strcat(gText, "\n");
         }
@@ -819,11 +819,11 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_SPELL_SCROLL: {
-                showScroll = 1;
+                showScroll = true;
                 switch (choice->spell) {
                     case SPELL_DISRUPTING_RAY:
                     case SPELL_ANIMATE_DEAD:
-                        showScroll = 0;
+                        showScroll = false;
                         break;
                 }
                 if (showScroll != 0) {

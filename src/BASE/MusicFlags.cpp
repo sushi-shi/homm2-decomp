@@ -10,11 +10,11 @@ u8 GetMusicFlagA(void) {
 
 VA(0x004c5780, 0x32)
 u8 MusicFlagsActive(void) {
-    i32 active;
+    b32 active;
     if (gMusicFeatureEnabled && gMusicFlagB)
-        active = 1;
+        active = true;
     else
-        active = 0;
+        active = false;
     return active;
 }
 

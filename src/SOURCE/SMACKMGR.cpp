@@ -145,10 +145,10 @@ VA(0x00494769, 0x117d)
 void SmackManagerMain(void) {
     i32 soundFlags4;
     i32 preloadFlags27;
-    i32 playing17;
-    i32 musicStarted0;
-    i32 companionStarted26;
-    i32 primaryStarted7;
+    b32 playing17;
+    b32 musicStarted0;
+    b32 companionStarted26;
+    b32 primaryStarted7;
     i32 unusedOne8;
     HDIGDRIVER digitalDriver5;
     i32 savedVolume8;
@@ -161,7 +161,7 @@ void SmackManagerMain(void) {
     gpSoundManager->SaveBackend();
     unusedOne8 = 1;
     gbLastFramePlayed = false;
-    musicStarted0 = 0;
+    musicStarted0 = false;
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         i32 initialMouseY29;
         i32 initialMouseX3;
@@ -319,9 +319,9 @@ void SmackManagerMain(void) {
     if (SmackOptions[bSmackNum].fadeIn)
         gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
 
-    playing17 = 1;
-    primaryStarted7 = 0;
-    companionStarted26 = 0;
+    playing17 = true;
+    primaryStarted7 = false;
+    companionStarted26 = false;
 
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         Process1WindowsMessage();
@@ -348,11 +348,11 @@ void SmackManagerMain(void) {
                 backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
                 gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
-                primaryStarted7 = 1;
+                primaryStarted7 = true;
             }
         } else if (!SmackWait(smk1)) {
             if (bSmackNum == INTRO_MUSIC && !musicStarted0) {
-                musicStarted0 = 1;
+                musicStarted0 = true;
                 gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
             }
             if ((!primaryStarted7 || smk1->Frames > 1)
@@ -378,23 +378,23 @@ void SmackManagerMain(void) {
                     if (bSmackNum == SPECIAL_MUSIC)
                         gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 }
-                primaryStarted7 = 1;
+                primaryStarted7 = true;
             }
         }
 
         if (smk2 && primaryStarted7 && !SmackWait(smk2)) {
             if (companionStarted26 && smk2->FrameNum == smk2->Frames - 1) {
-                i32 drawLastFrame;
-                i32 advanceLastFrame2;
+                b32 drawLastFrame;
+                b32 advanceLastFrame2;
 
-                advanceLastFrame2 = 0;
+                advanceLastFrame2 = false;
                 if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo) {
-                    drawLastFrame = 1;
+                    drawLastFrame = true;
                 } else if (bSmackNum == EXPANSION_CAMPAIGN) {
-                    drawLastFrame = 1;
-                    advanceLastFrame2 = 1;
+                    drawLastFrame = true;
+                    advanceLastFrame2 = true;
                 } else {
-                    drawLastFrame = 0;
+                    drawLastFrame = false;
                 }
                 DoAdvance(smk2, drawLastFrame, advanceLastFrame2, 0, 1);
                 gbLastFramePlayed = true;
@@ -407,7 +407,7 @@ void SmackManagerMain(void) {
                     DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
             }
             if (smk2 && smk2->FrameNum > 0)
-                companionStarted26 = 1;
+                companionStarted26 = true;
         }
 
         Process1WindowsMessage();
@@ -515,7 +515,7 @@ void SmackManagerMain(void) {
         }
 
         if (bSmackNum == CONGRATS && smk1->FrameNum + 1 == smk1->Frames && !musicStarted0) {
-            musicStarted0 = 1;
+            musicStarted0 = true;
             gpSoundManager->PlayAmbientMusic(LOSE_MUSIC);
         }
 
@@ -528,7 +528,7 @@ void SmackManagerMain(void) {
                 || (!smk2
                     && (smk1->FrameNum >= smk1->Frames
                         || (smk1->FrameNum <= 0 && primaryStarted7))))) {
-            playing17 = 0;
+            playing17 = false;
             gbPlayedThrough = true;
         }
     }

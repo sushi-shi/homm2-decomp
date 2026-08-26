@@ -306,16 +306,16 @@ void swapManager::DrawSelector(void) {
 VA(0x004a29f4, 0x9c2)
 MessageDispatchResult swapManager::Main(tag_message& message) {
     b32 closeRequested_5 = false;
-    i32 quickView_9;
+    b32 quickView_9;
     SwapManagerSide side_6;
     i32 slotIndex_2;
     i32 artifactSlot_2;
     HeroSecondarySkill secondarySkill_1;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
-        quickView_9 = 1;
+        quickView_9 = true;
     else
-        quickView_9 = 0;
+        quickView_9 = false;
 
     switch (message.type) {
         case MESSAGE_RIGHT_BUTTON_DOWN:

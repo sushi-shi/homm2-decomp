@@ -77,7 +77,7 @@ i8 InitNetHost(void) {
 VA(0x0047394c, 0x19c)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
-    i32 unregistered;
+    b32 unregistered;
 
     switch (iInitNetGuestStatus) {
         case SETUP_INITIALIZE:

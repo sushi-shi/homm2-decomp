@@ -183,6 +183,11 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     AI_STATE_MOBILITY_BONUS = 50
 H2_ENUM_END(HeroMobilityConstant)
 
+H2_ENUM_BEGIN(HeroSkillProbabilityBand)
+    HERO_SKILL_PROBABILITY_LOW  = 0,
+    HERO_SKILL_PROBABILITY_HIGH = 1
+H2_ENUM_END(HeroSkillProbabilityBand)
+
 H2_ENUM_BEGIN(HeroImplementationConstant)
     EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
     TEMPLE_MORALE_BONUS = 2,
@@ -767,7 +772,7 @@ void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
     i32 levelsGained;
-    i32 highIndex;
+    HeroSkillProbabilityBand highIndex;
     i32 slot;
     SAMPLE2 samp;
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
@@ -793,9 +798,9 @@ void hero::CheckLevel(void) {
         statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)] = 0;
         statBonuses[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
         if (nLevel <= HERO_LEVEL_HIGH_THRESHOLD)
-            highIndex = 0;
+            highIndex = HERO_SKILL_PROBABILITY_LOW;
         else
-            highIndex = 1;
+            highIndex = HERO_SKILL_PROBABILITY_HIGH;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         rnd = SRandom(1, HERO_LEVEL_RANDOM_MAX);
@@ -1156,7 +1161,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 VA(0x00462ef8, 0x9ba)
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 tmp;
-    i32 quickView;
+    b32 quickView;
     i32 armySlot;
     i32 dummy;
     b32 bExit = false;
@@ -1168,9 +1173,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 nextExperience;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
 
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
@@ -1618,7 +1623,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 VA(0x00463b0f, 0x906)
 void SetupHeroView(void) {
     i32 tempBonus;
-    i32 bNoDismiss;
+    b32 bNoDismiss;
     tag_message msg;
     tag_message statusMsg;
     i32 i;
@@ -1630,7 +1635,7 @@ void SetupHeroView(void) {
 
     bNoDismiss = gbNoDismiss;
     if (gpHVHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
-        bNoDismiss = 1;
+        bNoDismiss = true;
 
     msg.type = HERO_UI_MESSAGE;
     sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[IDX(gpHVHero->m_cursorType)]);
