@@ -835,7 +835,9 @@ void hero::CheckLevel(void) {
                         goto nextAttempt;
                     }
                 }
-                skill = HeroSecondarySkill((H2EnumIndex(skill) + 1) % H2EnumIndex(HERO_SKILL_COUNT));
+                skill = static_cast<HeroSecondarySkill>(
+                    (H2EnumIndex(skill) + 1) % H2EnumIndex(HERO_SKILL_COUNT)
+                );
             }
         nextAttempt:
             tryCount--;

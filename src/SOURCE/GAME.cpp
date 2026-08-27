@@ -2444,7 +2444,9 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(static_cast<CreatureType>(cell2->m_objectIndex));
+                        cell2->m_objectMetadata = GetRandomNumTroops(
+                            static_cast<CreatureType>(cell2->m_objectIndex)
+                        );
                         if (cell2->m_objectIndex != H2EnumIndex(CREATURE_GHOST)
                             && cell2->m_objectIndex != H2EnumIndex(CREATURE_EARTH_ELEMENTAL)
                             && cell2->m_objectIndex != H2EnumIndex(CREATURE_AIR_ELEMENTAL)
@@ -4548,8 +4550,9 @@ void game::PerWeek(void) {
                 heroClass =
                     m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
             }
-            heroClass =
-                static_cast<FactionType>((Random(1, H2EnumIndex(FACTION_COUNT) - 1) + H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT));
+            heroClass = static_cast<FactionType>(
+                (Random(1, H2EnumIndex(FACTION_COUNT) - 1) + H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT)
+            );
             desiredClass = heroClass;
             if (innerIndex == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]]

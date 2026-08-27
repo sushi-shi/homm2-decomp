@@ -41,6 +41,10 @@ inline CombatResult OppositeCombatResult(CombatResult result) {
     return result == COMBAT_RESULT_ATTACKER ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
 }
 
+inline CombatSide CombatSideForResult(CombatResult result) {
+    return result == COMBAT_RESULT_ATTACKER ? COMBAT_ATTACKER_SIDE : COMBAT_DEFENDER_SIDE;
+}
+
 enum class ArmyFacing : i8 {
     ARMY_FACING_NONE  = -1,
     ARMY_FACING_LEFT  = 0,
