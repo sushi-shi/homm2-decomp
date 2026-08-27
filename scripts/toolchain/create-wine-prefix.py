@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """create-wine-prefix.py - the local HoMM2 GAME environment (play/test).
 
-A one-shot provisioner in the mold of the gruntz sibling script: it builds a
+A one-shot provisioner in the mold of the gruntz sibling script: it stages a
 play environment that is SEPARATE from the build wineprefix. It REQUIRES a
 legally obtained Buka install's files the first time - the runtime set we
 cannot distribute; once game/ is populated a bare run just refreshes the rest
@@ -21,15 +21,10 @@ and assembles:
                        reads "<CDDrive>\\Tracks2\\..." through the registry
     <target>/prefix/   a dedicated wineprefix, SEPARATE from build/wineprefix
 
-Prefix doctrine (adapted from the measured gruntz rules):
-  * default windows version - no Version=win98 pin;
-  * no audio driver pin - auto-probe follows the current default sink;
-  * a 1280x1024 virtual desktop, so the game's DirectDraw mode switches
-    (640x480 up to 1280x1024 from the display menu) never touch the host
-    video mode;
-  * D: maps to <target>/cd as a cdrom drive, and the retail registry key
-    (HKLM\\SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000)
-    gets PathPL2 -> C:\\hmm2 (the game dir) and "HMM2POL CDDrive" -> D:\\.
+The generated play wrapper delegates to the same measured `run-game.sh` that
+ships with a cleaned source tree. That one launch definition owns Wine setup:
+the dedicated prefix, 640x480 virtual desktop, Russian ANSI code page, Buka
+registry values, G: install mapping and D: cdrom mapping.
 
 Idempotent: existing files (saves, HEROES2.CFG, an already-populated game/)
 are never overwritten; only the rebuilt HMM2PL.exe is refreshed.
@@ -38,9 +33,7 @@ are never overwritten; only the rebuilt HMM2PL.exe is refreshed.
 from __future__ import annotations
 
 import argparse
-import os
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -57,9 +50,10 @@ REQUIRED = (
     "smackw32.dll",
     "WING32.DLL",
 )
+GAME_DIRECTORIES = ("DATA", "MAPS", "HELP")
+GAME_ROOT_SUFFIXES = (".cfg", ".dll", ".txt")
 
 DEFAULT_TARGET = REPO / "build" / "game-wine"
-REGISTRY_KEY = r"HKLM\SOFTWARE\Buka\3DO\Heroes of Might and Magic Platinum\1.000"
 
 
 def log(msg: str) -> None:
@@ -78,19 +72,19 @@ def find_ci(root: Path, relative: str) -> Path | None:
         if not current.is_dir():
             return None
         low = part.lower()
-        current = next(
-            (p for p in current.iterdir() if p.name.lower() == low), None)
-        if current is None:
+        matches = sorted(
+            (path for path in current.iterdir() if path.name.lower() == low),
+            key=lambda path: path.name,
+        )
+        if not matches:
             return None
+        if len(matches) != 1:
+            die(
+                f"ambiguous case-insensitive path below {current}: "
+                + ", ".join(path.name for path in matches)
+            )
+        current = matches[0]
     return current
-
-
-def _wine(prefix: Path, *args: str) -> None:
-    env = dict(os.environ, WINEPREFIX=str(prefix),
-               WINEDLLOVERRIDES="mscoree,mshtml=", WINEDEBUG="fixme-all")
-    subprocess.run(["wine", *args], check=False, env=env,
-                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
 
 
 def copy_missing_tree(source: Path, destination: Path) -> int:
@@ -104,6 +98,25 @@ def copy_missing_tree(source: Path, destination: Path) -> int:
         elif not out.exists():
             out.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, out)
+            copied += 1
+    return copied
+
+
+def copy_game_files(source: Path, destination: Path) -> int:
+    """Copy the retail runtime, excluding build/test state beside it."""
+    copied = 0
+    for name in GAME_DIRECTORIES:
+        directory = find_ci(source, name)
+        if directory is not None and directory.is_dir():
+            copied += copy_missing_tree(directory, destination / name)
+    for path in source.iterdir():
+        if not path.is_file() or path.name.startswith("."):
+            continue
+        if path.suffix.lower() not in GAME_ROOT_SUFFIXES:
+            continue
+        output = destination / path.name
+        if not output.exists():
+            shutil.copy2(path, output)
             copied += 1
     return copied
 
@@ -130,62 +143,50 @@ def setup(resources: Path | None, target: Path) -> None:
                 "given (point this script at a legally obtained Buka install)")
         if not resources.is_dir():
             die(f"install folder missing: {resources}")
-        copied = copy_missing_tree(resources, game)
+        copied = copy_game_files(resources, game)
         log(f"copied {copied} files from {resources}")
         still = [name for name in REQUIRED if find_ci(game, name) is None]
         if still:
             die("the install folder lacks the retail runtime set: "
                 + ", ".join(still))
 
+    # The canonical runner checks these names before Wine starts. Preserve the
+    # retail tree, but add the expected spelling when the install used another
+    # case on a case-sensitive host.
+    for relative in REQUIRED:
+        expected = game / relative
+        if expected.is_file():
+            continue
+        source = find_ci(game, relative)
+        if source is None:
+            die(f"staged game unexpectedly lacks {relative}")
+        expected.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, expected)
+
     install_rebuilt_exe(game)
 
-    (target / "cd" / "Tracks2").mkdir(parents=True, exist_ok=True)
+    cd_tracks = target / "cd" / "Tracks2"
+    cd_tracks.mkdir(parents=True, exist_ok=True)
+    source_tracks = find_ci(resources, "Tracks2") if resources is not None else None
+    if source_tracks is not None and source_tracks.is_dir():
+        copied = copy_missing_tree(source_tracks.resolve(), cd_tracks)
+        if copied:
+            log(f"copied {copied} CD music files from {source_tracks}")
 
-    prefix = target / "prefix"
-    if not (prefix / "drive_c").is_dir():
-        log("creating game wineprefix (default windows version) ...")
-        prefix.mkdir(parents=True, exist_ok=True)
-        env = dict(os.environ, WINEPREFIX=str(prefix),
-                   WINEDLLOVERRIDES="mscoree,mshtml=")
-        subprocess.run(["wineboot", "-u"], check=False, env=env,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        _wine(prefix, "reg", "add", r"HKCU\Software\Wine\Explorer",
-              "/v", "Desktop", "/d", "Default", "/f")
-        _wine(prefix, "reg", "add", r"HKCU\Software\Wine\Explorer\Desktops",
-              "/v", "Default", "/d", "1280x1024", "/f")
-
-    c_hmm2 = prefix / "drive_c" / "hmm2"
-    if not c_hmm2.is_symlink():
-        if c_hmm2.exists():
-            die(f"{c_hmm2} exists and is not the expected symlink")
-        c_hmm2.symlink_to(game)
-        log("mapped C:\\hmm2 -> game/")
-
-    dos_d = prefix / "dosdevices" / "d:"
-    if not dos_d.is_symlink():
-        dos_d.parent.mkdir(parents=True, exist_ok=True)
-        if dos_d.exists():
-            dos_d.unlink()
-        dos_d.symlink_to(target / "cd")
-        log(f"mapped D: -> {target / 'cd'}")
-    _wine(prefix, "reg", "add", r"HKLM\Software\Wine\Drives",
-          "/v", "D:", "/d", "cdrom", "/f")
-    _wine(prefix, "reg", "add", REGISTRY_KEY,
-          "/v", "PathPL2", "/d", r"C:\hmm2", "/f")
-    _wine(prefix, "reg", "add", REGISTRY_KEY,
-          "/v", "HMM2POL CDDrive", "/d", "D:\\", "/f")
-    subprocess.run(["wineserver", "-w"], check=False,
-                   env=dict(os.environ, WINEPREFIX=str(prefix)))
+    canonical_runner = REPO / "scripts/homm2/clean/project/run-game.sh"
+    staged_runner = game / "run-game.sh"
+    shutil.copy2(canonical_runner, staged_runner)
+    staged_runner.chmod(0o755)
 
     play = target / "play.sh"
     play.write_text(
         "#!/usr/bin/env bash\n"
-        "# generated by scripts/create-wine-prefix.py - the one launch definition\n"
-        f'cd "$(dirname "$0")/game"\n'
-        f'export WINEPREFIX="$(dirname "$(pwd)")/prefix"\n'
-        'export WINEDLLOVERRIDES="mscoree,mshtml="\n'
-        'export WINEDEBUG="${WINEDEBUG:-fixme-all}"\n'
-        'exec wine HMM2PL.exe "$@"\n'
+        "# generated adapter; game/run-game.sh is the launch definition\n"
+        'environment_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)\n'
+        'export HOMM2_WINEPREFIX="$environment_root/prefix"\n'
+        'export HOMM2_CD_DIR="$environment_root/cd"\n'
+        'export HOMM2_EXE=HMM2PL.exe\n'
+        'exec "$environment_root/game/run-game.sh" "$@"\n'
     )
     play.chmod(0o755)
     log(f"ready: {target} (run {play})")

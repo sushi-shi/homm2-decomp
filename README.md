@@ -125,6 +125,21 @@ python3 scripts/toolchain/create-wine-prefix.py /path/to/installed/game
 build/game-wine/play.sh                     # runs the rebuilt HMM2PL.exe
 ```
 
+The same verified build, resource link, dedicated Wine-prefix setup, and launch
+are also available as one command:
+
+```sh
+HOMM2_DATA=/path/to/installed/game nix run
+```
+
+On its first run, the app copies the legally obtained `HMM2PL.exe` from that
+installation into ignored build state, initializes the matching environment,
+and provisions the dedicated game prefix. Every run performs incremental
+`homm2 build` and `homm2 link --rsrc` steps before refreshing the staged
+executable. The prefix uses the same registry, code-page, virtual-desktop and
+CD-drive setup as the cleaned Buka runner. Pass `--prepare-only` to stop after
+setup without starting the game.
+
 The play environment lives in `build/game-wine/` (gitignored): `game/` holds
 your install's data plus the rebuilt `HMM2PL.exe`, `cd/Tracks2/` is where the
 Buka CD's `.ogg` music goes, and `prefix/` is a wineprefix separate from the

@@ -169,8 +169,56 @@
         export GHIDRA_INSTALL_DIR="${pkgs.ghidra}/lib/ghidra"
         export JAVA_HOME="${pkgs.jdk21}/lib/openjdk"
       '';
+
+      run-game = pkgs.writeShellApplication {
+        name = "homm2-run";
+        runtimeInputs = commonTools ++ [
+          pkgs.wineWow64Packages.staging
+          pkgs.libfaketime
+          pkgs.glibcLocales
+        ];
+        text = ''
+          root="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || true)"
+          if [ ! -f "$root/config/units.toml" ]; then
+            root="''${HOMM2_DIR:-}"
+          fi
+          if [ ! -f "$root/config/units.toml" ]; then
+            echo "homm2-run: run this inside the decomp checkout or set HOMM2_DIR" >&2
+            exit 1
+          fi
+          HOMM2_DIR="$(cd "$root" && pwd -P)"
+          export HOMM2_DIR
+          if [ -n "''${HOMM2_DATA:-}" ]; then
+            HOMM2_DATA="$(realpath "$HOMM2_DATA")"
+            export HOMM2_DATA
+          fi
+          export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
+          export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
+          export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
+          export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
+          export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
+          export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
+          export WINEPREFIX="$HOMM2_DIR/build/wineprefix"
+          export WINEDEBUG="''${WINEDEBUG:-fixme-all,err-kerberos}"
+          export WINEDLLOVERRIDES="mscoree,mshtml="
+          export LOCALE_ARCHIVE="${pkgs.glibcLocales}/lib/locale/locale-archive"
+          cd "$HOMM2_DIR"
+          exec python3 scripts/toolchain/run-rebuilt-game.py "$@"
+        '';
+      };
     in {
-      packages.${system} = { inherit vostok-delinker objdiff objdiff-cli; default = vostok-delinker; };
+      packages.${system} = {
+        inherit vostok-delinker objdiff objdiff-cli;
+        run-game = run-game;
+        default = vostok-delinker;
+      };
+
+      apps.${system} = {
+        default = {
+          type = "app";
+          program = "${run-game}/bin/homm2-run";
+        };
+      };
 
       devShells.${system} = {
         # Default - analysis, target-side delink, objdiff, clangd. No MSVC.
