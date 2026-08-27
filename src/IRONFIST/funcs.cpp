@@ -666,7 +666,7 @@ static i32 l_getHeroFaction(lua_State* L) {
 static i32 l_setHeroFaction(lua_State* L) {
     hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 newFaction = static_cast<i32>(luaL_checknumber(L, 2));
-    hro->m_cursorType = static_cast<HeroCursorType>(newFaction);
+    hro->m_cursorType = FactionTypeFromCode(newFaction);
     return 0;
 }
 
