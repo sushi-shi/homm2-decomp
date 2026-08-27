@@ -1213,7 +1213,7 @@ void philAI::DoAI(i32 player) {
     );
     InitAIMapVars();
     GetTurnAIVars(player);
-    if (gpGame->m_day == 1 || gpGame->m_day == 1) {
+    if (gpGame->m_day == 1) {
         for (pathIndex0 = 0; pathIndex0 < gpCurPlayer->m_heroCount; pathIndex0++) {
             GetHeroSlot(gpCurPlayer->m_heroIds[pathIndex0])->m_lastTownInteractionTurn =
                 INTERACTION_TURN_UNSET;
@@ -3014,7 +3014,7 @@ void philAI::LikelihoodOfEnemyAttacking(
     chanceA = 0.15f;
     chanceB = 0.6f;
     nAttack = 3000;
-    nValue = (i32)((float)nAttack * chanceA);
+    nValue = static_cast<i32>(static_cast<float>(nAttack) * chanceA);
     nWeeks = 6;
     fOut = chanceA * chanceB;
 }
@@ -3074,13 +3074,22 @@ void philAI::GetTurnAttentionValue(i32 player) {
 }
 
 i32 philAI::RVConversion(i32* const p) {
-    return (i32)((((((((float)p[H2EnumIndex(RES_GOLD)] * gafAITurnCostResource[H2EnumIndex(RES_GOLD)])
-                      + (float)p[H2EnumIndex(RES_WOOD)] * gafAITurnCostResource[H2EnumIndex(RES_WOOD)])
-                     + (float)p[H2EnumIndex(RES_ORE)] * gafAITurnCostResource[H2EnumIndex(RES_ORE)])
-                    + (float)p[H2EnumIndex(RES_CRYSTAL)] * gafAITurnCostResource[H2EnumIndex(RES_CRYSTAL)])
-                   + (float)p[H2EnumIndex(RES_SULFUR)] * gafAITurnCostResource[H2EnumIndex(RES_SULFUR)])
-                  + (float)p[H2EnumIndex(RES_MERCURY)] * gafAITurnCostResource[H2EnumIndex(RES_MERCURY)])
-                 + (float)p[H2EnumIndex(RES_GEMS)] * gafAITurnCostResource[H2EnumIndex(RES_GEMS)]);
+    return static_cast<i32>(
+        ((((((static_cast<float>(p[H2EnumIndex(RES_GOLD)])
+              * gafAITurnCostResource[H2EnumIndex(RES_GOLD)])
+             + static_cast<float>(p[H2EnumIndex(RES_WOOD)])
+                   * gafAITurnCostResource[H2EnumIndex(RES_WOOD)])
+            + static_cast<float>(p[H2EnumIndex(RES_ORE)])
+                  * gafAITurnCostResource[H2EnumIndex(RES_ORE)])
+           + static_cast<float>(p[H2EnumIndex(RES_CRYSTAL)])
+                 * gafAITurnCostResource[H2EnumIndex(RES_CRYSTAL)])
+          + static_cast<float>(p[H2EnumIndex(RES_SULFUR)])
+                * gafAITurnCostResource[H2EnumIndex(RES_SULFUR)])
+         + static_cast<float>(p[H2EnumIndex(RES_MERCURY)])
+               * gafAITurnCostResource[H2EnumIndex(RES_MERCURY)])
+        + static_cast<float>(p[H2EnumIndex(RES_GEMS)])
+              * gafAITurnCostResource[H2EnumIndex(RES_GEMS)]
+    );
 }
 
 float philAI::TurnsToBuy(i32* const p) {
@@ -3493,9 +3502,9 @@ i32 philAI::ValueOfTown(town* t) {
         if (t->m_buildings & (1 << H2EnumIndex(building)))
             sum += GetBuildingBaseResourceValue(t->m_type, building, t->m_buildState);
     }
-    sum = (i32)(
+    sum = static_cast<i32>(
         sum
-        + AI_GOLD_TURN_VALUE_SCALE * gafAITurnCostResource[H2EnumIndex(RES_GOLD)] * 5.0f * 1.5
+        + AI_GOLD_TURN_VALUE_SCALE * gafAITurnCostResource[H2EnumIndex(RES_GOLD)] * 5.0f * 1.5f
     );
     sum += 750;
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN
@@ -3519,17 +3528,18 @@ void philAI::TurnCostResource(i32 player) {
     pAI = &gpGame->m_players[player].m_aiData;
     sum = 0;
     for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
-        resValue[res] = (i32)(
-            (double)gResourceBaseValue[res]
-            * ((double)(pAI->m_income[res] * 5) * 0.7
-               + (double)gpGame->m_players[player].m_resources[res])
+        resValue[res] = static_cast<i32>(
+            static_cast<double>(gResourceBaseValue[res])
+            * (static_cast<double>(pAI->m_income[res] * 5) * 0.7
+               + static_cast<double>(gpGame->m_players[player].m_resources[res]))
         );
         sum += resValue[res];
     }
-    avg = (float)(sum / AI_PURCHASE_RESOURCE_COUNT);
+    avg = static_cast<float>(sum / AI_PURCHASE_RESOURCE_COUNT);
     for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
-        frac[res] = (float)resValue[res] / avg;
-        gafAITurnCostResource[res] = (float)(gResourceBaseValue[res] / (frac[res] / 2.0f + 0.5));
+        frac[res] = static_cast<float>(resValue[res]) / avg;
+        gafAITurnCostResource[res] =
+            static_cast<float>(gResourceBaseValue[res] / (frac[res] / 2.0f + 0.5));
     }
 }
 
@@ -3546,8 +3556,8 @@ float philAI::TurnValueOfObelisk(i32 player) {
         return 0.0f;
     ai->m_obeliskValue = each * GAME_OBELISK_VISITOR_COUNT / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
-        ai->m_obeliskValue = (i32)(ai->m_obeliskValue * 1.4);
-    ai->m_obeliskValue = (i32)(
+        ai->m_obeliskValue = static_cast<i32>(ai->m_obeliskValue * 1.4);
+    ai->m_obeliskValue = static_cast<i32>(
         ai->m_obeliskValue
         * (1.5
            - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, 1))
@@ -3555,7 +3565,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     );
     ai->m_obeliskValue =
         static_cast<i32>(ai->m_obeliskValue * (ai->m_attentionWeights.heroValue + 0.66));
-    return (float)ai->m_obeliskValue;
+    return static_cast<float>(ai->m_obeliskValue);
 }
 
 float philAI::FutureDeflator(i32* const p) {
@@ -3662,7 +3672,7 @@ i32 philAI::FightValueOfStack(
                     countMod = -0.1f;
                 else if (group->m_quantities[slot] > 2)
                     countMod = -0.3f;
-                else if (group->m_quantities[slot] > 2)
+                else if (group->m_quantities[slot] > 1)
                     countMod = -0.4f;
                 else
                     countMod = -0.58f;
@@ -5286,9 +5296,9 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     if (deficit <= 0)
         return 0;
 
-    frac = (float)deficit / ((float)sp);
+    frac = static_cast<float>(deficit) / static_cast<float>(sp);
     if (deficit > 0)
-        v = (i32)(deficit * 5 * frac);
+        v = static_cast<i32>(deficit * 5 * frac);
     return v;
 }
 

@@ -268,6 +268,12 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             targetCreature = NULL;
         }
 
+        if (targetCreature == NULL && spellMode != SPELL_AI_GLOBAL
+            && spellMode != SPELL_AI_AREA && spellMode != SPELL_AI_RESURRECT) {
+            *bestEffect = 0;
+            return;
+        }
+
         switch (spell) {
             case SPELL_CURE:
                 EffectSpellCure(&effect_8, H2EnumIndex(m_currentSide), hexCell_9, 1);
@@ -1191,6 +1197,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_COLD_RING:
                 if (step_3 == 0)
                     step_3++;
+                [[fallthrough]];
             case SPELL_FIREBALL:
             case SPELL_FIREBLAST:
             case SPELL_METEOR_SHOWER:

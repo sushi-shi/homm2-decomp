@@ -1489,9 +1489,8 @@ class mapCell* advManager::DoAdvCommand(void) {
             }
             selectedHero->m_destinationX = m_commandTargetX,
             selectedHero->m_destinationY = m_commandTargetY;
-            goto continue_route;
+            [[fallthrough]];
         case ADVMGR_COMMAND_CONTINUE_ROUTE:
-        continue_route:
             if (selectedHero == NULL) {
                 break;
             }
@@ -1581,6 +1580,8 @@ class mapCell* advManager::DoAdvCommand(void) {
             break;
 
         case ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW:
+            if (selectedHero == NULL)
+                break;
             DemobilizeCurrHero();
             gpMouseManager->SetPointer(0);
             viewTown = gpGame->GetTown(selectedHero->m_occupiedTown);
@@ -2177,7 +2178,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         }
     }
 
-finish_message:
     if (evtCell != NULL) {
         DoEvent(evtCell, TrigX, TrigY);
     }
