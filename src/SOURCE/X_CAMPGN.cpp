@@ -883,41 +883,41 @@ i32 ExpCampaign::HandleVictory(void) {
 
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_POL_INTRO);
             m_mapChoices[H2EnumIndex(MAP_POL_UPRISING)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_UPRISING) + 1):
+        case MAP_POL_UPRISING + 1:
             PlaySmacker(SMACKER_POL_UPRISING);
             m_mapChoices[H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS) + 1):
+        case MAP_POL_ISLAND_OF_CHAOS + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             m_mapChoices[H2EnumIndex(MAP_POL_ARROWS_FLIGHT)] = 1;
             m_mapChoices[H2EnumIndex(MAP_POL_ABYSS)] = 1;
             m_awards[H2EnumIndex(AWARD_BREASTPLATE_ANDURAN)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ARROWS_FLIGHT) + 1):
+        case MAP_POL_ARROWS_FLIGHT + 1:
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
             m_mapChoices[H2EnumIndex(MAP_POL_GIANTS_PASS)] = 1;
             m_awards[H2EnumIndex(AWARD_ELVEN_ALLIANCE)] = 1;
             m_awards[H2EnumIndex(AWARD_WOOD_BONUS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ABYSS) + 1):
+        case MAP_POL_ABYSS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_GIANTS_PASS) + 1):
+        case MAP_POL_GIANTS_PASS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_AURORA_BOREALIS) + 1):
+        case MAP_POL_AURORA_BOREALIS + 1:
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
             m_mapChoices[H2EnumIndex(MAP_POL_BETRAYALS_END)] = 1;
             m_mapChoices[H2EnumIndex(MAP_POL_CORRUPTIONS_HEART)] = 1;
             m_awards[H2EnumIndex(AWARD_HELMET_ANDURAN)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_BETRAYALS_END) + 1):
+        case MAP_POL_BETRAYALS_END + 1:
             PlaySmacker(SMACKER_POL_BETRAYALS_END);
             m_mapChoices[H2EnumIndex(MAP_POL_CORRUPTIONS_HEART)] = 1;
             m_awards[H2EnumIndex(AWARD_BATTLE_GARB)] = 1;
@@ -925,7 +925,7 @@ void ExpCampaign::HandleVictory1(void) {
             m_awards[H2EnumIndex(AWARD_HELMET_ANDURAN)] = 0;
             m_awards[H2EnumIndex(AWARD_DEFEAT_KRAEGER)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_CORRUPTIONS_HEART) + 1):
+        case MAP_POL_CORRUPTIONS_HEART + 1:
             PlaySmacker(SMACKER_POL_CORRUPTIONS_HEART);
             break;
     }
@@ -933,45 +933,45 @@ void ExpCampaign::HandleVictory1(void) {
 
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_DES_INTRO);
             m_mapChoices[H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY) + 1):
+        case MAP_DES_CONQUER_AND_UNIFY + 1:
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
             m_mapChoices[H2EnumIndex(MAP_DES_BORDER_TOWNS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_BORDER_TOWNS) + 1):
+        case MAP_DES_BORDER_TOWNS + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             m_mapChoices[H2EnumIndex(MAP_DES_WAYWARD_SON)] = 1;
             m_mapChoices[H2EnumIndex(MAP_DES_UNCLE_IVAN)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_WAYWARD_SON) + 1):
+        case MAP_DES_WAYWARD_SON + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_DES_SOUTHERN_WAR)] = 1;
             m_awards[H2EnumIndex(AWARD_WAYWARD_SON)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_UNCLE_IVAN) + 1):
+        case MAP_DES_UNCLE_IVAN + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_DES_SOUTHERN_WAR)] = 1;
             m_awards[H2EnumIndex(AWARD_UNCLE_IVAN)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_SOUTHERN_WAR) + 1):
+        case MAP_DES_SOUTHERN_WAR + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             m_mapChoices[H2EnumIndex(MAP_DES_IVORY_GATES)] = 1;
             m_mapChoices[H2EnumIndex(MAP_DES_ELVEN_LANDS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_IVORY_GATES) + 1):
+        case MAP_DES_IVORY_GATES + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_DES_EPIC_BATTLE)] = 1;
             m_awards[H2EnumIndex(AWARD_LEGENDARY_SCEPTER)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_ELVEN_LANDS) + 1):
+        case MAP_DES_ELVEN_LANDS + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             m_mapChoices[H2EnumIndex(MAP_DES_EPIC_BATTLE)] = 1;
             m_awards[H2EnumIndex(AWARD_ELVEN_ALLIANCE)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_EPIC_BATTLE) + 1):
+        case MAP_DES_EPIC_BATTLE + 1:
             PlaySmacker(SMACKER_DES_EPIC_BATTLE);
             break;
     }
@@ -979,26 +979,26 @@ void ExpCampaign::HandleVictory2(void) {
 
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_WIZ_INTRO);
             m_mapChoices[H2EnumIndex(MAP_WIZ_SHROUDED_ISLES)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_SHROUDED_ISLES) + 1):
+        case MAP_WIZ_SHROUDED_ISLES + 1:
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
             m_mapChoices[H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS) + 1):
+        case MAP_WIZ_ETERNAL_SCROLLS + 1:
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
             m_mapChoices[H2EnumIndex(MAP_WIZ_POWERS_END)] = 1;
             m_mapChoices[H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
             m_awards[H2EnumIndex(AWARD_SET_GUARDIAN)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_POWERS_END) + 1):
+        case MAP_WIZ_POWERS_END + 1:
             PlaySmacker(SMACKER_WIZ_POWERS_END);
             m_mapChoices[H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
             m_awards[H2EnumIndex(AWARD_SPHERE_NEGATION)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY) + 1):
+        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
             PlaySmacker(SMACKER_WIZ_FOUNT_OF_WIZARDRY);
             break;
     }
@@ -1006,23 +1006,23 @@ void ExpCampaign::HandleVictory3(void) {
 
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_NONE) + 1):
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_VOY_INTRO);
             m_mapChoices[H2EnumIndex(MAP_VOY_STRANDED)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_STRANDED) + 1):
+        case MAP_VOY_STRANDED + 1:
             PlaySmacker(SMACKER_VOY_STRANDED);
             m_mapChoices[H2EnumIndex(MAP_VOY_PIRATE_ISLES)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_PIRATE_ISLES) + 1):
+        case MAP_VOY_PIRATE_ISLES + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
             m_mapChoices[H2EnumIndex(MAP_VOY_KING_AND_COUNTRY)] = 1;
             m_mapChoices[H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER)] = 1;
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_KING_AND_COUNTRY) + 1):
+        case MAP_VOY_KING_AND_COUNTRY + 1:
             PlaySmacker(SMACKER_VOY_KING_AND_COUNTRY);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER) + 1):
+        case MAP_VOY_BLOOD_IS_THICKER + 1:
             PlaySmacker(SMACKER_VOY_BLOOD_IS_THICKER);
             break;
     }
@@ -1048,28 +1048,28 @@ void ExpCampaign::ReplaySmacker(void) {
 
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_UPRISING) + 1):
+        case MAP_POL_UPRISING + 1:
             PlaySmacker(SMACKER_POL_INTRO);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ISLAND_OF_CHAOS) + 1):
+        case MAP_POL_ISLAND_OF_CHAOS + 1:
             PlaySmacker(SMACKER_POL_UPRISING);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ARROWS_FLIGHT) + 1):
+        case MAP_POL_ARROWS_FLIGHT + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_ABYSS) + 1):
+        case MAP_POL_ABYSS + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_GIANTS_PASS) + 1):
+        case MAP_POL_GIANTS_PASS + 1:
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_AURORA_BOREALIS) + 1):
+        case MAP_POL_AURORA_BOREALIS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_BETRAYALS_END) + 1):
+        case MAP_POL_BETRAYALS_END + 1:
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_POL_CORRUPTIONS_HEART) + 1):
+        case MAP_POL_CORRUPTIONS_HEART + 1:
             if (m_mapsPlayed[H2EnumIndex(MAP_POL_BETRAYALS_END)])
                 PlaySmacker(SMACKER_POL_BETRAYALS_END);
             else
@@ -1080,28 +1080,28 @@ void ExpCampaign::ReplaySmacker1(void) {
 
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_CONQUER_AND_UNIFY) + 1):
+        case MAP_DES_CONQUER_AND_UNIFY + 1:
             PlaySmacker(SMACKER_DES_INTRO);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_BORDER_TOWNS) + 1):
+        case MAP_DES_BORDER_TOWNS + 1:
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_WAYWARD_SON) + 1):
+        case MAP_DES_WAYWARD_SON + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_UNCLE_IVAN) + 1):
+        case MAP_DES_UNCLE_IVAN + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_SOUTHERN_WAR) + 1):
+        case MAP_DES_SOUTHERN_WAR + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_IVORY_GATES) + 1):
+        case MAP_DES_IVORY_GATES + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_ELVEN_LANDS) + 1):
+        case MAP_DES_ELVEN_LANDS + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_DES_EPIC_BATTLE) + 1):
+        case MAP_DES_EPIC_BATTLE + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             break;
     }
@@ -1109,16 +1109,16 @@ void ExpCampaign::ReplaySmacker2(void) {
 
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_SHROUDED_ISLES) + 1):
+        case MAP_WIZ_SHROUDED_ISLES + 1:
             PlaySmacker(SMACKER_WIZ_INTRO);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_ETERNAL_SCROLLS) + 1):
+        case MAP_WIZ_ETERNAL_SCROLLS + 1:
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_POWERS_END) + 1):
+        case MAP_WIZ_POWERS_END + 1:
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_WIZ_FOUNT_OF_WIZARDRY) + 1):
+        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
             if (m_mapsPlayed[H2EnumIndex(MAP_WIZ_POWERS_END)])
                 PlaySmacker(SMACKER_WIZ_POWERS_END);
             else
@@ -1129,16 +1129,16 @@ void ExpCampaign::ReplaySmacker3(void) {
 
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_STRANDED) + 1):
+        case MAP_VOY_STRANDED + 1:
             PlaySmacker(SMACKER_VOY_INTRO);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_PIRATE_ISLES) + 1):
+        case MAP_VOY_PIRATE_ISLES + 1:
             PlaySmacker(SMACKER_VOY_STRANDED);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_KING_AND_COUNTRY) + 1):
+        case MAP_VOY_KING_AND_COUNTRY + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
             break;
-        case static_cast<ExpansionCampaignMap>(H2EnumIndex(MAP_VOY_BLOOD_IS_THICKER) + 1):
+        case MAP_VOY_BLOOD_IS_THICKER + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
     }
 }
