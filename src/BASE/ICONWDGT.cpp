@@ -79,7 +79,7 @@ void iconWidget::Read(void) {
     gpResourceManager->RestorePosition();
     m_frame = gpResourceManager->ReadWord();
     m_orientation =
-        static_cast<IconDrawOrientation>(gpResourceManager->ReadWord() & ORIENTATION_MASK);
+        IconDrawOrientationFromCode(gpResourceManager->ReadWord() & ORIENTATION_MASK);
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;

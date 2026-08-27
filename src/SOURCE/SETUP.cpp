@@ -563,7 +563,7 @@ i32 game::SetupGame(void) {
                             result = false;
                             goto done;
                         }
-                        xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));
+        xCampaign.InitNewCampaign(ExpansionCampaignIdFromOrdinal(campaignId));
                         break;
                     }
                     case CHOICE_FOUR: {
@@ -599,7 +599,7 @@ i32 game::SetupGame(void) {
                             result = false;
                             goto done;
                         }
-                        xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));
+        xCampaign.InitNewCampaign(ExpansionCampaignIdFromOrdinal(campaignId));
                         break;
                     }
                     case DIALOG_CANCEL:

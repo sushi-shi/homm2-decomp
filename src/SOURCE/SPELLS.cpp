@@ -525,7 +525,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
             gpCombatManager->DrawFrame(1, 0, 0, 0, 0, 1, 1);
             for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
                 gpCombatManager->m_gridState[hexIndex] =
-                    static_cast<CombatGridShade>(savedShades[hexIndex]);
+                CombatGridShadeFromCode(savedShades[hexIndex]);
             }
             break;
         }
@@ -1458,7 +1458,7 @@ static i32 GetHexNeighboursLine(
     hexes.push_back(startingFrom);
     for (i32 step = 0; step < length - 1; step++) {
         i32 neighbor = GetAdjacentCellIndexNoArmy(
-            currentHex, static_cast<CombatHexDirection>(neighborDirection)
+                currentHex, CombatHexDirectionFromOrdinal(neighborDirection)
         );
         if (neighbor == -1) {
             break;
@@ -1485,11 +1485,11 @@ static std::vector<i32> GetPlasmaConeSpellMask(i32 fromHex, i32 direction) {
     std::vector<i32> mask;
     std::vector<HexLineData> hexLines;
     CombatHexDirection leftDirection =
-        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][0]);
+            CombatHexDirectionFromOrdinal(spellNeighbourDirections[direction][0]);
     CombatHexDirection centerDirection =
-        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][1]);
+            CombatHexDirectionFromOrdinal(spellNeighbourDirections[direction][1]);
     CombatHexDirection rightDirection =
-        static_cast<CombatHexDirection>(spellNeighbourDirections[direction][2]);
+            CombatHexDirectionFromOrdinal(spellNeighbourDirections[direction][2]);
 
     hexLines.push_back({fromHex, 8});
 
@@ -1567,7 +1567,7 @@ std::vector<i32> combatManager::GetSpellMask(SpellType spell, i32 fromHex, i32 d
         case SPELL_COLD_RING:
             for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
                 i32 neighbor =
-                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir));
+            GetAdjacentCellIndexNoArmy(fromHex, CombatHexDirectionFromOrdinal(dir));
                 if (ValidSpellTarget(spell, neighbor)) {
                     mask.push_back(neighbor);
                 }
@@ -1577,8 +1577,8 @@ std::vector<i32> combatManager::GetSpellMask(SpellType spell, i32 fromHex, i32 d
             mask = GetSpellMask(SPELL_FIREBALL, fromHex, direction);
             for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
                 i32 straightHex = GetAdjacentCellIndexNoArmy(
-                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir)),
-                    static_cast<CombatHexDirection>(dir)
+                    GetAdjacentCellIndexNoArmy(fromHex, CombatHexDirectionFromOrdinal(dir)),
+                    CombatHexDirectionFromOrdinal(dir)
                 );
                 if (ValidSpellTarget(spell, straightHex)) {
                     mask.push_back(straightHex);
@@ -1586,18 +1586,18 @@ std::vector<i32> combatManager::GetSpellMask(SpellType spell, i32 fromHex, i32 d
             }
             for (i32 dir = 0; dir < ARMY_ADJACENT_DIRECTION_COUNT; dir++) {
                 i32 closestNeighbor =
-                    GetAdjacentCellIndexNoArmy(fromHex, static_cast<CombatHexDirection>(dir));
+                GetAdjacentCellIndexNoArmy(fromHex, CombatHexDirectionFromOrdinal(dir));
                 if (ValidSpellTarget(spell, closestNeighbor)) {
                     i32 rightHex = GetAdjacentCellIndexNoArmy(
                         closestNeighbor,
-                        static_cast<CombatHexDirection>((dir + 1) % ARMY_ADJACENT_DIRECTION_COUNT)
+                CombatHexDirectionFromOrdinal((dir + 1) % ARMY_ADJACENT_DIRECTION_COUNT)
                     );
                     if (ValidSpellTarget(spell, rightHex)) {
                         mask.push_back(rightHex);
                     }
                     i32 leftHex = GetAdjacentCellIndexNoArmy(
                         closestNeighbor,
-                        static_cast<CombatHexDirection>(
+            CombatHexDirectionFromOrdinal(
                             (dir + ARMY_ADJACENT_DIRECTION_COUNT - 1)
                             % ARMY_ADJACENT_DIRECTION_COUNT
                         )
@@ -1625,6 +1625,7 @@ std::vector<i32> combatManager::GetSpellMask(SpellType spell, i32 fromHex, i32 d
                     mask.push_back(hexIndex);
                 }
             }
+            [[fallthrough]];
         }
         default:
             mask.push_back(fromHex);
@@ -1874,7 +1875,7 @@ void combatManager::ImplosionGrenade(i32 hexIndex) {
             }
         }
         pullDestinations[affectedHex] = GetAdjacentCellIndexNoArmy(
-            affectedHex, static_cast<CombatHexDirection>(pullDirection)
+            affectedHex, CombatHexDirectionFromOrdinal(pullDirection)
         );
     }
 
@@ -2121,13 +2122,13 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     for (frame = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); frame < SPELL_ADJACENT_DIRECTION_COUNT;
          ++frame) {
         affectedHexes[frame + 1] = static_cast<i16>(
-            GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(frame))
+            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame))
         );
         if (spell == SPELL_FIREBLAST) {
             affectedHexes[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
                 static_cast<i16>(target->GetAdjacentCellIndex(
                     affectedHexes[frame + 1],
-                    static_cast<CombatHexDirection>(frame)
+                    CombatHexDirectionFromOrdinal(frame)
                 ));
         }
     }
@@ -2231,7 +2232,7 @@ void combatManager::MeteorShower(i32 targetHex) {
     for (direction = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); direction < SPELL_ADJACENT_DIRECTION_COUNT;
          ++direction) {
         hexes[direction + 1] =
-            GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(direction));
+            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(direction));
     }
 
     if (!gbNoShowCombat) {

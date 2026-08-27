@@ -42,6 +42,13 @@ array arithmetic. Repeated UI formatting tails in adventure quick info, radar,
 Visions, and the town screen are represented by local helpers or an explicit
 outcome selection instead of cross-case jumps.
 
+Numeric enum construction is also explicit on `master`. Public domains cross
+integer storage through the named `FromCode` and `FromOrdinal` entry points in
+`EnumCode.h`; private protocol enums keep an equivalent decoder next to their
+definition. Packed enum storage exposes an already-typed `enum_value()` instead
+of re-decoding it. A source-policy test rejects direct numeric enum casts and
+bypasses of the shared low-level conversion.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |

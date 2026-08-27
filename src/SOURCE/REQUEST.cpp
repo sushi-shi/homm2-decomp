@@ -469,7 +469,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             ""
                         );
                     }
-                    giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
+                    giMapSizeFilter = FileRequesterMapSizeFilterFromCode(
                         (H2EnumIndex(giMapSizeFilter) + 1) % H2EnumIndex(FILE_REQUESTER_MAP_SIZE_COUNT)
                     );
                     SetupFiles();
@@ -653,7 +653,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             case FILE_REQUESTER_FILTER_ALL: {
                                 iResult = message.payload.widget.id - FILE_REQUESTER_FILTER_SMALL;
                                 if (!MapExistsForFilter(
-                                        static_cast<FileRequesterMapSizeFilter>(iResult)
+                                        FileRequesterMapSizeFilterFromCode(iResult)
                                     )) {
                                     utf8::Format(
                                         gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -677,7 +677,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     );
                                     break;
                                 }
-                                giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(iResult);
+                                giMapSizeFilter = FileRequesterMapSizeFilterFromCode(iResult);
                                 if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                     strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                 } else {

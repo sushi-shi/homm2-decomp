@@ -70,6 +70,10 @@ namespace {
     };
 using enum CombatKeyCommand;
 
+    constexpr CombatKeyCommand CombatKeyCommandFromCode(i32 value) {
+        return static_cast<CombatKeyCommand>(value); // H2_ENUM_CODE_BOUNDARY
+    }
+
     typedef enum CombatWinLoseConstant {
         WIN_LOSE_WIDGET_COUNT = 25,
         WIN_LOSE_NEXT_CONTROL = 0x7800,
@@ -131,6 +135,10 @@ using enum CombatBattleResultText;
         CONTROL_MAIN_BUTTON = 0x40
     };
 using enum CombatControlId;
+
+    constexpr CombatControlId CombatControlIdFromCode(i32 value) {
+        return static_cast<CombatControlId>(value); // H2_ENUM_CODE_BOUNDARY
+    }
 
     typedef enum CombatRemoteConstant {
         REMOTE_PACKET_TYPE = 1,
@@ -383,7 +391,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
         if (gbThisNetHasControl == 0) {
             if (message.type == MESSAGE_KEY_DOWN) {
-                switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
+                switch (CombatKeyCommandFromCode(message.payload.keyboard.keyCode)) {
                     case KEY_CLOSE_NETWORK_BOX:
                         PopNetBox(NULL, -1);
                         break;
@@ -733,7 +741,7 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 
     m_mouseDirection = m_directionMap[sector_6];
     CombatHexDirection direction_5 =
-        OppositeDirection(static_cast<CombatHexDirection>(m_directionMap[sector_6]));
+        OppositeDirection(CombatHexDirectionFromCode(m_directionMap[sector_6]));
     CombatHexDirection directionCopy_1 = direction_5;
     CombatHexDirection alternateDirection = COMBAT_DIRECTION_INVALID;
     army* currentArmy = &m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex];
@@ -839,7 +847,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                     || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                     i32 helpIndex = -1;
-                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                    switch (CombatControlIdFromCode(message.payload.widget.id)) {
                         case CONTROL_MAIN_BUTTON:
                             RightClick(m_selectedHex);
                             break;
@@ -881,14 +889,14 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             }
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SELECT:
-                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                    switch (CombatControlIdFromCode(message.payload.widget.id)) {
                         case CONTROL_MAIN_BUTTON:
                             DoCommand(m_currentCommand);
                             break;
                     }
                     break;
                 case WIDGET_COMMAND_DESELECT:
-                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                    switch (CombatControlIdFromCode(message.payload.widget.id)) {
                         case CONTROL_DISABLE_SELECTION:
                             m_gridSelectionDisabled = true;
                             break;
@@ -954,7 +962,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             return MESSAGE_DISPATCH_CONSUME;
 
         case MESSAGE_KEY_DOWN:
-            switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
+            switch (CombatKeyCommandFromCode(message.payload.keyboard.keyCode)) {
                 case KEY_CLOSE_NETWORK_BOX:
                     PopNetBox(NULL, -1);
                     break;
@@ -2293,9 +2301,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
                         1;
                 }
                 m_experienceValue[H2EnumIndex(OppositeCombatResult(winningSide))] =
-                    ExperienceValueOfStack(
-                        static_cast<CombatSide>(H2EnumIndex(OppositeCombatResult(winningSide)))
-                    );
+                    ExperienceValueOfStack(CombatSideForResult(OppositeCombatResult(winningSide)));
                 if (gbRetreatWin != 0)
                     m_experienceValue[H2EnumIndex(OppositeCombatResult(winningSide))] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;

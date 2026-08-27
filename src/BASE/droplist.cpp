@@ -88,10 +88,10 @@ void dropListWidget::Read(void) {
     m_contentWidth = gpResourceManager->ReadWord();
     m_contentHeight = gpResourceManager->ReadWord();
     m_maxVisibleItems = gpResourceManager->ReadWord();
-    m_normalColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
-    m_selColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
-    m_unusedColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
-    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
+    m_normalColor = FontDrawModeFromCode(gpResourceManager->ReadWord());
+    m_selColor = FontDrawModeFromCode(gpResourceManager->ReadWord());
+    m_unusedColor = FontDrawModeFromCode(gpResourceManager->ReadWord());
+    m_alignment = FontAlignmentFromCode(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
 
     m_closedContentFrame = H2EnumIndex(FRAME_CLOSED_CONTENT);
@@ -269,7 +269,7 @@ void dropListWidget::Draw(void) {
             m_owner->m_posY + m_contentY,
             m_contentWidth,
             m_contentHeight,
-            (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_normalColor),
+            (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : m_normalColor.enum_value(),
             m_alignment
         );
 }

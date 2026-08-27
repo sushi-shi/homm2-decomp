@@ -232,7 +232,7 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         info.iconIndex = static_cast<i8>(crElem->IntAttribute("fight-value-aux"));
         info.growth = static_cast<i8>(crElem->IntAttribute("growth"));
         info.hitPoints = static_cast<u16>(crElem->IntAttribute("hp"));
-        info.race = static_cast<FactionType>(crElem->IntAttribute("faction"));
+        info.race = FactionTypeFromCode(crElem->IntAttribute("faction"));
         info.speed = static_cast<i8>(crElem->IntAttribute("speed"));
         info.attack = static_cast<i8>(crElem->IntAttribute("attack"));
         info.defense = static_cast<i8>(crElem->IntAttribute("defense"));
@@ -244,7 +244,7 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             sizeof(info.spriteName),
             QueryTextAttribute(crElem, "short-name")
         );
-        info.flags.all = static_cast<MonsterFlags>(creatureFlags);
+        info.flags.all = MonsterFlagsFromCode(creatureFlags);
         gMonsterDatabase[id] = info;
     }
     CreatureCount++;
@@ -326,9 +326,9 @@ void LoadCreatures() {
     creatureStringsOwned = true;
 
     for (i32 i = 0; i <= MAX_BASE_CREATURE; i++)
-        RandomizableCreatures.push_back(static_cast<CreatureType>(i));
+            RandomizableCreatures.push_back(CreatureTypeFromOrdinal(i));
     for (i32 i = MIN_EXTENDED_CREATURE; i <= MAX_EXTENDED_CREATURE; i++)
-        RandomizableCreatures.push_back(static_cast<CreatureType>(i));
+            RandomizableCreatures.push_back(CreatureTypeFromOrdinal(i));
 }
 
 void UnloadCreatures() {

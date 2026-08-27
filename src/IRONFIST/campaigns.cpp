@@ -118,7 +118,7 @@ i32 ReadCampaignMetadata(tinyxml2::XMLNode* root) {
             i32 scenarioID = elem->IntAttribute("scenarioID");
             i32 choiceID = elem->IntAttribute("id");
             SCampaignChoice choice;
-            choice.type = static_cast<CampaignChoiceType>(elem->IntAttribute("type"));
+            choice.type = CampaignChoiceTypeFromCode(elem->IntAttribute("type"));
             choice.value = static_cast<i16>(elem->IntAttribute("field"));
             choice.amount = static_cast<i16>(elem->IntAttribute("amount"));
             CampaignChoices[campaignID][scenarioID][choiceID] = choice;

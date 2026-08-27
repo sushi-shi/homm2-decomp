@@ -78,6 +78,10 @@ enum class AdventureSystemOptionsWidgetId : i32 {
 };
 using enum AdventureSystemOptionsWidgetId;
 
+constexpr AdventureSystemOptionsWidgetId AdventureSystemOptionsWidgetIdFromCode(i32 value) {
+    return static_cast<AdventureSystemOptionsWidgetId>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 typedef enum AdventureScreenConstant {
     SCREEN_WIDTH = 640,
     SCREEN_HEIGHT = 480,
@@ -1522,7 +1526,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 pathIndex = gpSearchArray->m_pathLength - 1;
                 for (; pathIndex >= 0; --pathIndex) {
                     eventCellState = MoveHero(
-                        static_cast<MapDirection>(
+                        MapDirectionFromCode(
                             gpSearchArray->m_storage.path.directions[pathIndex + 1]
                         ),
                         pathIndex == 0,
@@ -2319,7 +2323,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         objectTypeState = H2EnumIndex(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                         objectIdIndex = theCell->m_objectMetadata;
                     }
-                    switch (static_cast<MapObjectType>(objectTypeState)) {
+                    switch (MapObjectTypeFromCode(objectTypeState)) {
                         case MAP_OBJECT_HERO_INTERACTION:
                             mouseX = m_lastHoverCell * CELL_PIXELS - HERO_QUICK_VIEW_X_OFFSET;
                             if (mouseX < QUICK_VIEW_MIN_X) {
@@ -3965,7 +3969,7 @@ void advManager::DrawCell(
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
                         s_drawHeroType = (H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                             ? HERO_TYPE_BOAT
-                            : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
+                            : s_drawHero->m_cursorType.enum_value();
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
                         if ((H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
@@ -7193,7 +7197,7 @@ void advManager::SetTownContext(i32 townId) {
     townNo =
         H2EnumIndex(giGroundToTerrain[GetCell(tp->m_x, tp->m_y)
                                   ->m_terrainImageIndex]);
-    if (static_cast<TerrainType>(townNo) != m_currentTerrain) {
+    if (TerrainTypeFromCode(townNo) != m_currentTerrain) {
         m_currentTerrain = townNo;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
@@ -7220,7 +7224,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
     m_cursorType = (H2EnumIndex((contextHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
         ? HERO_TYPE_BOAT
-        : static_cast<HeroCursorType>(contextHero->m_cursorType);
+        : contextHero->m_cursorType.enum_value();
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
@@ -7264,7 +7268,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
     heroSlot = static_cast<i32>(giGroundToTerrain[currentCell->m_terrainImageIndex]);
-    if (static_cast<TerrainType>(heroSlot) != m_currentTerrain) {
+    if (TerrainTypeFromCode(heroSlot) != m_currentTerrain) {
         m_currentTerrain = heroSlot;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
@@ -9428,6 +9432,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
+                break;
 
             default:
                 break;
@@ -10346,7 +10351,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
 
-                switch (static_cast<AdventureSystemOptionsWidgetId>(message.payload.widget.id)) {
+                switch (AdventureSystemOptionsWidgetIdFromCode(message.payload.widget.id)) {
                     case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                         helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
                         break;
@@ -10398,7 +10403,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DESELECT:
                     switch (
-                        static_cast<AdventureSystemOptionsWidgetId>(message.payload.widget.id)
+                        AdventureSystemOptionsWidgetIdFromCode(message.payload.widget.id)
                     ) {
                         case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                             accepted = true;
@@ -10408,7 +10413,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                 case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
                     switch (
-                        static_cast<AdventureSystemOptionsWidgetId>(message.payload.widget.id)
+                        AdventureSystemOptionsWidgetIdFromCode(message.payload.widget.id)
                     ) {
                         case SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
@@ -10507,7 +10512,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 if (GetMusicFlagA() == 0) {
                                     gConfig.useOpera =
-                                        static_cast<ConfigOperaMode>(1 - H2EnumIndex(gConfig.useOpera));
+                                        ConfigOperaModeFromCode(1 - H2EnumIndex(gConfig.useOpera));
                                 } else {
                                     gpSoundManager->SetMusicQuality(H2EnumIndex(CONFIG_MUSIC_SOURCE_MIDI));
                                 }
@@ -10651,7 +10656,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     }
 
     spot = GetCell(hitX, bestY);
-    type = static_cast<CreatureType>(spot->m_objectIndex);
+    type = CreatureTypeFromCode(spot->m_objectIndex);
     isForced = spot->m_objectMetadata & MONSTER_JOIN_FORCED;
     count = spot->m_objectMetadata & MONSTER_COUNT_MASK;
     utf8::Format(

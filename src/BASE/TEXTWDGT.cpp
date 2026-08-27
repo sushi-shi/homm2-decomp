@@ -83,10 +83,10 @@ void textWidget::Read(void) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
-    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
+    m_color = FontDrawModeFromCode(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
+    m_alignment = FontAlignmentFromCode(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
     m_id = gpResourceManager->ReadWord();
-    m_kind = static_cast<WidgetKind>(gpResourceManager->ReadWord());
+    m_kind = WidgetKindFromCode(gpResourceManager->ReadWord());
     m_kind = WIDGET_KIND_TEXT;
 }
 
@@ -119,7 +119,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (msg.payload.widget.id == m_id) {
-                        SetColorIndex(static_cast<FontDrawMode>(msg.payload.widget.data.value));
+                        SetColorIndex(FontDrawModeFromCode(msg.payload.widget.data.value));
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
@@ -165,7 +165,7 @@ void textWidget::Draw(void) {
         m_owner->m_posY + m_y,
         m_width,
         m_height,
-        (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_color),
+        (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : m_color.enum_value(),
         m_alignment
     );
 }

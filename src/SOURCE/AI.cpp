@@ -961,7 +961,7 @@ i32 combatManager::WalkTowardArmyFront(
         while (step >= 0 && left != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
-                static_cast<CombatHexDirection>(
+                CombatHexDirectionFromOrdinal(
                     gpSearchArray->m_storage.aiPath.directions[step]
                 )
             );
@@ -1042,7 +1042,7 @@ i32 combatManager::WalkTowardArmy(
         while (pathNdx >= 1 && movement != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
-                static_cast<CombatHexDirection>(
+                CombatHexDirectionFromOrdinal(
                     gpSearchArray->m_storage.aiPath.directions[pathNdx]
                 )
             );

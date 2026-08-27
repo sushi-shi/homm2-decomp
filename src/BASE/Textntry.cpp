@@ -118,8 +118,8 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & COLOR_MASK);
-    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & COLOR_MASK);
+    m_color = FontDrawModeFromCode(gpResourceManager->ReadWord() & COLOR_MASK);
+    m_alignment = FontAlignmentFromCode(gpResourceManager->ReadWord() & COLOR_MASK);
     gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
@@ -161,7 +161,7 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     }
     m_iconFrame = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    m_kind = static_cast<WidgetKind>(gpResourceManager->ReadWord());
+    m_kind = WidgetKindFromCode(gpResourceManager->ReadWord());
     m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
@@ -397,7 +397,7 @@ void textEntryWidget::Draw(void) {
             m_owner->m_posY + m_innerY,
             m_innerW,
             m_innerH,
-            (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_color),
+            (H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : m_color.enum_value(),
             m_alignment
         );
     }

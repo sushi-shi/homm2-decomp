@@ -50,10 +50,10 @@ static bool PlaySoundEffect(std::string snd, SoundEffectWait wait, SAMPLE2* samp
 }
 
 static bool CheckLocationItem(mapCell* loc) {
-    if (!(loc->m_triggerType & H2EnumIndex(MAP_TRIGGER_ACTION_FLAG))) {
+    if (!MAP_TRIGGER_IS_ACTION(loc->m_triggerType)) {
         return false;
     }
-    switch (loc->m_triggerType ^ H2EnumIndex(MAP_TRIGGER_ACTION_FLAG)) {
+    switch (MAP_TRIGGER_OBJECT(loc->m_triggerType)) {
         case MAP_OBJECT_ANCIENT_LAMP:
         case MAP_OBJECT_ARTIFACT:
         case MAP_OBJECT_RESOURCE:
@@ -165,7 +165,7 @@ static i32 l_recruitBox(lua_State* L) {
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i16 quantity = static_cast<i16>(luaL_checknumber(L, 3));
     i16 startQ = quantity;
-    gpAdvManager->ExpansionRecruitEvent(hro, static_cast<CreatureType>(creature), &quantity);
+    gpAdvManager->ExpansionRecruitEvent(hro, CreatureTypeFromCode(creature), &quantity);
 
     lua_pushinteger(L, startQ - quantity);
     return 1;
@@ -360,7 +360,7 @@ static i32 l_getCurrentHero(lua_State* L) {
 static i32 l_grantSpell(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 sp = static_cast<i32>(luaL_checknumber(L, 2));
-    hro->AddSpell(static_cast<SpellType>(sp), hro->Stats(HERO_PRIMARY_KNOWLEDGE));
+    hro->AddSpell(SpellTypeFromCode(sp), hro->Stats(HERO_PRIMARY_KNOWLEDGE));
     return 0;
 }
 
@@ -469,14 +469,14 @@ static i32 l_getHeroOwner(lua_State* L) {
 static i32 l_grantArtifact(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
-    GiveArtifact(hro, static_cast<ArtifactType>(art), 1, -1);
+    GiveArtifact(hro, ArtifactTypeFromCode(art), 1, -1);
     return 0;
 }
 
 static i32 l_hasArtifact(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
-    lua_pushboolean(L, hro->HasArtifact(static_cast<ArtifactType>(art)));
+    lua_pushboolean(L, hro->HasArtifact(ArtifactTypeFromCode(art)));
     return 1;
 }
 
@@ -563,14 +563,14 @@ static i32 l_setSecondarySkill(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     i32 level = static_cast<i32>(luaL_checknumber(L, 3));
-    hro->SetSS(static_cast<HeroSecondarySkill>(skill), static_cast<HeroSkillLevel>(level));
+    hro->SetSS(HeroSecondarySkillFromCode(skill), HeroSkillLevelFromCode(level));
     return 0;
 }
 
 static i32 l_getSecondarySkill(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
-    lua_pushinteger(L, hro->GetSSLevel(static_cast<HeroSecondarySkill>(skill)));
+    lua_pushinteger(L, hro->GetSSLevel(HeroSecondarySkillFromCode(skill)));
     return 1;
 }
 
@@ -578,7 +578,7 @@ static i32 l_grantArmy(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 3)));
     i32 cr = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
-    hro->m_army.Add(static_cast<CreatureType>(cr), n, -1);
+    hro->m_army.Add(CreatureTypeFromCode(cr), n, -1);
     return 0;
 }
 
@@ -668,7 +668,7 @@ static i32 l_getHeroFaction(lua_State* L) {
 static i32 l_setHeroFaction(lua_State* L) {
     hero* hro = static_cast<hero*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 newFaction = static_cast<i32>(luaL_checknumber(L, 2));
-    hro->m_cursorType = static_cast<HeroCursorType>(newFaction);
+    hro->m_cursorType = FactionTypeFromCode(newFaction);
     return 0;
 }
 
@@ -725,7 +725,7 @@ static i32 l_mapSetObject(lua_State* L) {
     // Ironfist's Lua placement contract uses overlay slot 3 for map objects.
     cell->m_overlayIndex = 3;
     cell->m_objectIndex = obj;
-    cell->m_triggerType = obj & 0x7F;
+    cell->m_triggerType = MAP_PASSIVE_TRIGGER(MapObjectTypeFromCode(obj & 0x7f));
     return 0;
 }
 
@@ -738,8 +738,8 @@ static i32 l_mapPutArmy(lua_State* L) {
     mapCell* loc = gpAdvManager->GetCell(x, y);
     loc->m_objectIndex = monIdx;
     loc->m_objectMetadata = monQty;
-    loc->m_objectTileset = TILESET_MONS32;
-    loc->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
+    loc->SetObjectTileset(TILESET_MONS32);
+    loc->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
     loc->m_overlayIndex = -1;
     loc->m_objectLayerBit0 = 0;
     loc->m_objectLayerBit1 = 0;
@@ -844,7 +844,7 @@ static i32 l_getVisitingHero(lua_State* L) {
 
 static i32 l_buildInCurrentTown(lua_State* L) {
     i32 obj = static_cast<i32>(luaL_checknumber(L, 1));
-    gpTownManager->BuildObj(static_cast<BuildingSlotType>(obj));
+    gpTownManager->BuildObj(BuildingSlotTypeFromCode(obj));
     return 0;
 }
 
@@ -892,7 +892,7 @@ static i32 l_getPlayerTown(lua_State* L) {
 static i32 l_buildInTown(lua_State* L) {
     town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 building = static_cast<i32>(luaL_checknumber(L, 2));
-    twn->BuildBuilding(static_cast<BuildingSlotType>(building));
+    twn->BuildBuilding(BuildingSlotTypeFromCode(building));
     return 0;
 }
 
@@ -905,14 +905,14 @@ static i32 l_getTownFaction(lua_State* L) {
 static i32 l_setTownFaction(lua_State* L) {
     town* twn = static_cast<town*>(PointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 faction = static_cast<i32>(luaL_checknumber(L, 2));
-    twn->SetFaction(static_cast<FactionType>(faction));
+    twn->SetFaction(FactionTypeFromCode(faction));
     return 0;
 }
 
 static i32 l_getCreatureCost(lua_State* L) {
     i32 creature = static_cast<i32>(luaL_checknumber(L, 1));
     i32 cost[H2EnumIndex(RES_COUNT)];
-    GetMonsterCost(static_cast<CreatureType>(creature), cost);
+    GetMonsterCost(CreatureTypeFromCode(creature), cost);
     for (i32 i = 0; i < H2EnumIndex(RES_COUNT); i++) {
         lua_pushinteger(L, cost[i]);
     }
@@ -973,7 +973,7 @@ static i32 l_setGuildSpell(lua_State* L) {
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
     i32 s = static_cast<i32>(luaL_checknumber(L, 4));
-    twn->m_spells[l][n] = static_cast<SpellType>(s);
+    twn->m_spells[l][n] = SpellTypeFromCode(s);
     twn->GiveSpells(NULL);
     return 0;
 }
@@ -1030,8 +1030,8 @@ static i32 l_battleSummonCreature(lua_State* L) {
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 4));
 
     gpCombatManager->AddArmy(
-        static_cast<CombatSide>(side), static_cast<CreatureType>(creature), quantity, hex,
-        static_cast<MonsterFlags>(0), 1
+        CombatSideFromCode(side), CreatureTypeFromCode(creature), quantity, hex,
+        MONSTER_FLAGS_NONE, 1
     );
     return 0;
 }
@@ -1328,7 +1328,7 @@ static i32 l_startbattle(lua_State* L) {
     i32 switchSides = static_cast<i32>(luaL_checknumber(L, 4));
     mapCell* mapcell = gpAdvManager->GetCell(hro->m_x, hro->m_y);
     CombatResult winningSide = gpAdvManager->CombatMonsterEvent(
-        hro, static_cast<CreatureType>(mon1), mon1quantity, mapcell, hro->m_x, hro->m_y,
+        hro, CreatureTypeFromCode(mon1), mon1quantity, mapcell, hro->m_x, hro->m_y,
         switchSides, hro->m_x, hro->m_y, CREATURE_NONE, 0, 0, CREATURE_NONE, 0, 0
     );
     lua_pushinteger(L, H2EnumIndex(winningSide));

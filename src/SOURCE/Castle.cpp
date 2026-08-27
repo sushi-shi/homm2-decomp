@@ -532,7 +532,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            static_cast<BuildingSlotType>(whichBuilding)
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1 << whichBuilding))) {
@@ -541,7 +541,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            static_cast<BuildingSlotType>(whichBuilding)
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
                 } else {
@@ -600,7 +600,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         cCastleInfo[H2EnumIndex(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            static_cast<BuildingSlotType>(whichBuilding)
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
                 } else {
@@ -610,7 +610,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                static_cast<BuildingSlotType>(whichBuilding)
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1 << whichBuilding)))
@@ -619,7 +619,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                static_cast<BuildingSlotType>(whichBuilding)
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
                     else
@@ -628,7 +628,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[H2EnumIndex(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                static_cast<BuildingSlotType>(whichBuilding)
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
                 }
@@ -790,7 +790,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 break;
                         }
                         ret = gpTownManager->BuyBuild(
-                            static_cast<BuildingSlotType>(whichBuilding),
+                            BuildingSlotTypeFromCode(whichBuilding),
                             (gpTownManager->m_affordableBuildings & (1 << whichBuilding)) == 0,
                             quickFlag
                         );

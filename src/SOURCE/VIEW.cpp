@@ -208,7 +208,7 @@ i32 combatManager::ViewGeneral(
     delete generalWindow26;
     DrawFrame(1, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
     if (quickView == 0)
-        DoCommand(static_cast<CombatMessageCommand>(gpWindowManager->m_dialogResult));
+        DoCommand(CombatMessageCommandFromCode(gpWindowManager->m_dialogResult));
     return 0;
 }
 

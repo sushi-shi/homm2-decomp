@@ -47,7 +47,8 @@ public:
     constexpr H2EnumStorage(H2EnumStorage<Enum, OtherStorage> value)
         : m_value(static_cast<Storage>(static_cast<Enum>(value))) {}
 
-    constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+    constexpr Enum enum_value() const { return static_cast<Enum>(m_value); }
+    constexpr operator Enum() const { return enum_value(); }
 
 
     template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>

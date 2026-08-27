@@ -422,7 +422,7 @@ typedef enum RandomMineConstant {
 } RandomMineConstant;
 
 inline MineType RandomMineType(MineType first, MineType last) {
-    return static_cast<MineType>(Random(H2EnumIndex(first), H2EnumIndex(last)));
+    return MineTypeFromOrdinal(Random(H2EnumIndex(first), H2EnumIndex(last)));
 }
 
 typedef enum ArtifactGuardianConstant {
@@ -1187,7 +1187,7 @@ void game::SetupOrigData(void) {
             sizeof(m_heroRecs[i].m_name),
             gHeroDefaultNames[i]
         );
-        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_heroRecs[i].m_cursorType = FactionTypeFromOrdinal(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[H2EnumIndex(m_heroRecs[i].m_cursorType)][j];
@@ -1236,7 +1236,7 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = static_cast<u8>(i);
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
-        m_castleRecs[i].m_type = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_castleRecs[i].m_type = FactionTypeFromOrdinal(i / INITIAL_RECORD_TYPE_STRIDE);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_castleRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
@@ -1593,7 +1593,7 @@ void game::NewMap(const char* filename) {
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
-    race = static_cast<FactionType>(Random(0, GAME_PLAYER_COUNT - 1));
+    race = FactionTypeFromOrdinal(Random(0, GAME_PLAYER_COUNT - 1));
     humanPos = giNumHumanPlayers;
 
     for (player = 0; player < GAME_PLAYER_COUNT; player++) {
@@ -1788,7 +1788,7 @@ void game::NewMap(const char* filename) {
                     }
                 }
             }
-            startClass = static_cast<FactionType>(Random(0, H2EnumIndex(FACTION_COUNT) - 1));
+            startClass = FactionTypeFromOrdinal(Random(0, H2EnumIndex(FACTION_COUNT) - 1));
             if (m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]]
                 < FACTION_COUNT)
                 startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
@@ -1865,7 +1865,7 @@ void game::NewMap(const char* filename) {
     m_ultimateArtifactX = static_cast<i8>(player);
     m_ultimateArtifactY = static_cast<i8>(nTown);
     m_ultimateArtifactId =
-        static_cast<ArtifactType>(Random(H2EnumIndex(ARTIFACT_ULTIMATE_BOOK), H2EnumIndex(ARTIFACT_GOLDEN_GOOSE)));
+        ArtifactTypeFromOrdinal(Random(H2EnumIndex(ARTIFACT_ULTIMATE_BOOK), H2EnumIndex(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
         && ((m_campaignType == CAMPAIGN_ROLAND
              && m_campaignScenario + CAMPAIGN_SCENARIO_NUMBER_OFFSET
@@ -1893,7 +1893,7 @@ void game::NewMap(const char* filename) {
                 }
             }
         } else {
-            m_players[player].m_aiDifficulty = static_cast<PlayerPersonality>(Random(
+            m_players[player].m_aiDifficulty = PlayerPersonalityFromOrdinal(Random(
                 H2EnumIndex(PLAYER_PERSONALITY_COMPUTER_FIRST),
                 H2EnumIndex(PLAYER_PERSONALITY_COMPUTER_LAST)
             ));
@@ -2263,7 +2263,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER):
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(static_cast<CreatureType>(cell2->m_objectIndex));
+                        cell2->m_objectMetadata = GetRandomNumTroops(CreatureTypeFromCode(cell2->m_objectIndex));
                         if (cell2->m_objectIndex != H2EnumIndex(CREATURE_GHOST)
                             && cell2->m_objectIndex != H2EnumIndex(CREATURE_EARTH_ELEMENTAL)
                             && cell2->m_objectIndex != H2EnumIndex(CREATURE_AIR_ELEMENTAL)
@@ -2374,7 +2374,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT):
                     randomValue5 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value = static_cast<ArtifactType>(cell2->m_objectIndex / 2);
+                    value = ArtifactTypeFromCode(cell2->m_objectIndex / 2);
                     if (value == ARTIFACT_SPELL_SCROLL)
                         break;
                     if (randomValue5 < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
@@ -2700,7 +2700,7 @@ i32 game::LoadMap(const char* filename) {
             m_castleRecs[i].m_x = static_cast<u8>(x[0]);
             m_castleRecs[i].m_y = static_cast<u8>(y[0]);
             m_castleRecs[i].m_type =
-                static_cast<FactionType>(type[0] & TOWN_RECORD_TYPE_MASK);
+                FactionTypeFromCode(type[0] & TOWN_RECORD_TYPE_MASK);
             if (type[0] < 0)
                 m_castleRecs[i].m_buildings |= H2EnumIndex(TOWN_BUILDING_CASTLE);
             else
@@ -2722,7 +2722,7 @@ i32 game::LoadMap(const char* filename) {
             m_mines[i].guardianType = CREATURE_NONE;
             m_mines[i].x = static_cast<u8>(x[0]);
             m_mines[i].y = static_cast<u8>(y[0]);
-            m_mines[i].resourceType = static_cast<MineType>(type[0]);
+            m_mines[i].resourceType = MineTypeFromCode(type[0]);
         }
     }
 
@@ -4248,7 +4248,7 @@ void game::PerWeek(void) {
                     m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
             }
             heroClass =
-                static_cast<FactionType>((Random(1, H2EnumIndex(FACTION_COUNT) - 1) + H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT));
+                FactionTypeFromOrdinal((Random(1, H2EnumIndex(FACTION_COUNT) - 1) + H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT));
             desiredClass = heroClass;
             if (innerIndex == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]]
@@ -4523,8 +4523,8 @@ void game::PerMonth(void) {
                         spot->SetObjectTileset(TILESET_MONS32);
                         spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
-                            GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra))
-                            + GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra));
+                            GetRandomNumTroops(CreatureTypeFromCode(giMonthTypeExtra))
+                            + GetRandomNumTroops(CreatureTypeFromCode(giMonthTypeExtra));
                         if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
                             < MONSTER_GUARD_CUTOFF)
                             spot->m_objectMetadata |= H2EnumIndex(MAP_MONSTER_GUARD_FLAG);
@@ -4716,21 +4716,21 @@ void game::RandomizeMine(i32 x, i32 y) {
         switch (terrain) {
             case TERRAIN_GRASS:
             case TERRAIN_DIRT:
-                resType = static_cast<MineType>(Random(H2EnumIndex(MINE_TYPE_MERCURY), H2EnumIndex(MINE_TYPE_GOLD)));
+                resType = MineTypeFromOrdinal(Random(H2EnumIndex(MINE_TYPE_MERCURY), H2EnumIndex(MINE_TYPE_GOLD)));
                 if (resType == MINE_TYPE_MERCURY)
                     resType = MINE_TYPE_WOOD;
                 break;
             case TERRAIN_SNOW:
-                resType = static_cast<MineType>(Random(H2EnumIndex(MINE_TYPE_ORE), H2EnumIndex(MINE_TYPE_GOLD)));
+                resType = MineTypeFromOrdinal(Random(H2EnumIndex(MINE_TYPE_ORE), H2EnumIndex(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_SWAMP:
-                resType = static_cast<MineType>(Random(H2EnumIndex(MINE_TYPE_WOOD), H2EnumIndex(MINE_TYPE_GOLD)));
+                resType = MineTypeFromOrdinal(Random(H2EnumIndex(MINE_TYPE_WOOD), H2EnumIndex(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_LAVA:
                 resType = MINE_TYPE_MERCURY;
                 break;
             default:
-                resType = static_cast<MineType>(Random(H2EnumIndex(MINE_TYPE_MERCURY), H2EnumIndex(MINE_TYPE_GOLD)));
+                resType = MineTypeFromOrdinal(Random(H2EnumIndex(MINE_TYPE_MERCURY), H2EnumIndex(MINE_TYPE_GOLD)));
                 break;
         }
         if (RandMineQty[H2EnumIndex(resType)] == 0)
@@ -4878,7 +4878,7 @@ i32 game::GetRandomArtifactId(
             continue;
         }
         if (!cursedAllowed
-            && ironfist::IsCursedArtifact(static_cast<ArtifactType>(i))) {
+                && ironfist::IsCursedArtifact(ArtifactTypeFromOrdinal(i))) {
             continue;
         }
         if (i == winConditionArtifact) {
@@ -5939,7 +5939,7 @@ void game::ProcessOnMapHeroes(void) {
         data.exists = false;
         if (i < H2EnumIndex(GAME_HERO_COUNT)) {
             data.randomizable = true;
-            data.faction = static_cast<FactionType>(i / MAP_HEROES_PER_FACTION);
+            data.faction = FactionTypeFromOrdinal(i / MAP_HEROES_PER_FACTION);
         } else if (i < ironfist::FIRST_CYBORG_HERO_ID) {
             data.randomizable = false;
             data.faction = FACTION_KNIGHT;
@@ -5990,7 +5990,7 @@ void game::ProcessOnMapHeroes(void) {
                 i32 heroIndex;
                 if (mapExtraHero->hasAssignedHero) {
                     heroIndex = mapExtraHero->heroId;
-                    m_heroRecs[heroIndex].m_cursorType = static_cast<HeroCursorType>(faction);
+                    m_heroRecs[heroIndex].m_cursorType = faction;
                 } else {
                     // find a free hero with the wanted faction
                     std::vector<i32> neededFactionHeroes;
@@ -6033,11 +6033,11 @@ void game::ProcessOnMapHeroes(void) {
                         mapExtraHero->hasCustomHero = true;
                     }
 
-                    m_heroRecs[randomHeroIdx].m_cursorType = static_cast<HeroCursorType>(faction);
+                    m_heroRecs[randomHeroIdx].m_cursorType = faction;
                     if (mapExtraHero->hasCustomHero
                         && extendedHeroId >= H2EnumIndex(GAME_HERO_COUNT)) {
                         m_heroRecs[randomHeroIdx].m_portrait =
-                            static_cast<HeroPortrait>(extendedHeroId);
+                            HeroPortraitFromCode(extendedHeroId);
                     }
                     if (extendedHeroId < static_cast<i32>(ironfist::HeroNames.size())
                         && !ironfist::HeroNames[extendedHeroId].empty()) {
@@ -6082,7 +6082,7 @@ void game::ProcessOnMapHeroes(void) {
                 for (i32 i = 0; i < EVENT_RECORD_HERO_ARTIFACT_COUNT; ++i) {
                     if (mapExtraHero->artifacts[i] >= 0) {
                         GiveArtifact(
-                            randomHero, static_cast<ArtifactType>(mapExtraHero->artifacts[i]),
+                        randomHero, ArtifactTypeFromCode(mapExtraHero->artifacts[i]),
                             true, -1
                         );
                     }
@@ -6130,8 +6130,8 @@ void game::ProcessOnMapHeroes(void) {
                     for (i32 i = 0; i < EVENT_RECORD_SKILL_CAPACITY; ++i) {
                         if (mapExtraHero->skillTypes[i] != -1)
                             randomHero->GiveSS(
-                                static_cast<HeroSecondarySkill>(mapExtraHero->skillTypes[i]),
-                                static_cast<HeroSkillLevel>(mapExtraHero->skillLevels[i])
+                            HeroSecondarySkillFromCode(mapExtraHero->skillTypes[i]),
+                            HeroSkillLevelFromCode(mapExtraHero->skillLevels[i])
                             );
                     }
                 } else if (faction == FACTION_CYBORG) {
@@ -6200,7 +6200,7 @@ void game::CheckHeroConsistency(void) {
         for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
             cell = gpAdvManager->GetCell(c, y8);
             if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID))) {
-                if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
+                if (cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != c || boardHro->m_y != y8) {
                         cell->m_triggerType = 0;
@@ -7376,7 +7376,7 @@ void game::SetupNewRumour(void) {
                     H2EnumIndex(THIEVES_CATEGORY_OBELISKS), H2EnumIndex(THIEVES_CATEGORY_INCOME)
                 );
                 GetCategoryStats(
-                    static_cast<TownThievesGuildCategory>(selectionRoll7),
+                    TownThievesGuildCategoryFromOrdinal(selectionRoll7),
                     categoryStats,
                     categoryOrder
                 );

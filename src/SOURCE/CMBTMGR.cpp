@@ -355,7 +355,7 @@ void combatManager::SetupCombat(
             m_captain.m_spellPoints =
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
             m_captain.m_cursorType = m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type;
-            m_captain.m_portrait = static_cast<HeroPortrait>(
+            m_captain.m_portrait = HeroPortraitFromOrdinal(
                 static_cast<i32>(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
@@ -468,7 +468,7 @@ void combatManager::ApplyPandoraBox(CombatSide side) {
     }
 
     const i32 quantity = gpGame->GetRandomNumTroops(creature);
-    AddArmy(side, creature, quantity, hex, static_cast<MonsterFlags>(0x8000), 0);
+    AddArmy(side, creature, quantity, hex, MonsterFlagsFromCode(0x8000), 0);
     hexcell& cell = m_hexCells[hex];
     m_armies[H2EnumIndex(cell.m_occupantSide)][cell.m_occupantIndex]
         .m_temporaryResurrectionQuantity = quantity;
@@ -616,10 +616,10 @@ void combatManager::Close(void) {
     CombatSide groupSide;
     i32 i;
     for (i = H2EnumIndex(COMBAT_ATTACKER_SIDE); i < COMBAT_SIDE_COUNT; i++)
-        UpdateArmyGroup(static_cast<CombatSide>(i));
+        UpdateArmyGroup(CombatSideFromOrdinal(i));
 
     total = 0;
-    groupSide = static_cast<CombatSide>(m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == -1);
+    groupSide = CombatSideForDefender(m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == -1);
 
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (m_armyGroups[H2EnumIndex(groupSide)]->m_creatureTypes[i] != CREATURE_NONE)
@@ -1410,7 +1410,7 @@ void combatManager::CatAttack(CombatSide side) {
         for (frame = 0; frame < COMBAT_CATAPULT_DIRECTION_COUNT; frame++) {
             adjacentHex = GetAdjacentCellIndexNoArmy(
                 H2EnumIndex(targetHex4),
-                static_cast<CombatHexDirection>(
+                CombatHexDirectionFromOrdinal(
                     (startDirection3 + frame) % COMBAT_CATAPULT_DIRECTION_COUNT
                 )
             );

@@ -78,7 +78,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        m_flags |= static_cast<WidgetFlag>(
+    m_flags |= WidgetFlagFromCode(
                             message.payload.widget.data.value & WIDGET_FLAG_MASK
                         );
                         if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED)))) {

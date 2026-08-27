@@ -85,7 +85,7 @@ void button::Read(void) {
     gpResourceManager->RestorePosition();
     m_normalFrame = gpResourceManager->ReadWord();
     m_pressedFrame = gpResourceManager->ReadWord();
-    m_selectMode = static_cast<ButtonSelectMode>(gpResourceManager->ReadWord());
+    m_selectMode = ButtonSelectModeFromCode(gpResourceManager->ReadWord());
     m_hotkey = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();

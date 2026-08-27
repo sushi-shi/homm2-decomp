@@ -102,6 +102,10 @@ namespace {
         TOWN_WIDGET_CLOSE = CONTROL_CLOSE
     };
 using enum TownManagerWidgetId;
+
+    constexpr TownManagerWidgetId TownManagerWidgetIdFromCode(i32 value) {
+        return static_cast<TownManagerWidgetId>(value); // H2_ENUM_CODE_BOUNDARY
+    }
     ENABLE_ENUM_STEPS(TownManagerWidgetId)
 
     enum class TownObjectRenderMask : i32 {
@@ -1148,7 +1152,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
     m_command = ARMY_COMMAND_NONE;
-    switch (static_cast<TownManagerWidgetId>(objectId)) {
+    switch (TownManagerWidgetIdFromCode(objectId)) {
         case TOWN_WIDGET_CLOSE:
             strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_EXIT)]);
             break;
@@ -1327,7 +1331,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
             text, sizeof(text),
             GetBuildingInfo(
                 m_town->m_type,
-                static_cast<BuildingSlotType>(message.payload.widget.id),
+                BuildingSlotTypeFromCode(message.payload.widget.id),
                 1
             )
         );
@@ -1356,15 +1360,15 @@ MessageDispatchResult townManager::Main(tag_message& message) {
         if (dbgBuild == TOWN_DEBUG_BUILD_ALL) {
             for (loop = 0; loop < TOWN_BUILDING_COUNT; ++loop) {
                 if ((gTownEligibleBuildMask[H2EnumIndex(m_town->m_type)]
-                     & (1 << H2EnumIndex(static_cast<BuildingSlotType>(loop))))
+                     & (1 << H2EnumIndex(BuildingSlotTypeFromOrdinal(loop))))
                     || loop == H2EnumIndex(BUILDING_SLOT_CASTLE))
-                    BuildObj(static_cast<BuildingSlotType>(loop));
+                    BuildObj(BuildingSlotTypeFromOrdinal(loop));
             }
         } else {
             if ((gTownEligibleBuildMask[H2EnumIndex(m_town->m_type)]
-                 & (1 << H2EnumIndex(static_cast<BuildingSlotType>(dbgBuild))))
+                 & (1 << H2EnumIndex(BuildingSlotTypeFromOrdinal(dbgBuild))))
                 || dbgBuild == H2EnumIndex(BUILDING_SLOT_CASTLE))
-                BuildObj(static_cast<BuildingSlotType>(dbgBuild));
+                BuildObj(BuildingSlotTypeFromOrdinal(dbgBuild));
         }
     }
 
@@ -1378,7 +1382,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT: {
-                    switch (static_cast<TownManagerWidgetId>(message.payload.widget.id)) {
+                    switch (TownManagerWidgetIdFromCode(message.payload.widget.id)) {
                         case TOWN_WIDGET_BUILDING_DWELLING_1:
                         case TOWN_WIDGET_BUILDING_DWELLING_2:
                         case TOWN_WIDGET_BUILDING_DWELLING_3:
@@ -1625,7 +1629,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         text, sizeof(text),
                                         GetBuildingInfo(
                                             m_town->m_type,
-                                            static_cast<BuildingSlotType>(
+                                            BuildingSlotTypeFromCode(
                                                 message.payload.widget.id
                                             ),
                                             1
@@ -1792,7 +1796,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     text, sizeof(text),
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        static_cast<BuildingSlotType>(message.payload.widget.id),
+                                        BuildingSlotTypeFromCode(message.payload.widget.id),
                                         1
                                     )
                                 );
@@ -2020,7 +2024,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot];
             m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] =
-                static_cast<CreatureType>(oldValue);
+                CreatureTypeFromOrdinal(oldValue);
             ResetStrips();
             break;
 
@@ -2902,7 +2906,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(NULL);
 
-        newHeroClass = static_cast<FactionType>(
+        newHeroClass = FactionTypeFromCode(
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
         );
         newHeroClass = (newHeroClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
