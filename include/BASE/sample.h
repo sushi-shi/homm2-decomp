@@ -9,8 +9,8 @@
 class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
-    sample(char*);
-    virtual inline ~sample() override;
+    sample(const char*);
+    virtual  ~sample() override;
 };
 #pragma pack(pop)
 #endif

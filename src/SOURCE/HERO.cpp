@@ -183,6 +183,11 @@ typedef enum HeroMobilityConstant {
     AI_STATE_MOBILITY_BONUS = 50
 } HeroMobilityConstant;
 
+typedef enum HeroSkillProbabilityBand {
+    HERO_SKILL_PROBABILITY_LOW  = 0,
+    HERO_SKILL_PROBABILITY_HIGH = 1
+} HeroSkillProbabilityBand;
+
 typedef enum HeroImplementationConstant {
     EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
     TEMPLE_MORALE_BONUS = 2,
@@ -273,10 +278,10 @@ i32 hero::CalcMobility(void) {
     if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         movePoints += compassMobility;
 
-    if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
+    if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[(m_owner)]
         && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
+        if (gpGame->m_players[(m_owner)].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             movePoints += AI_STATE_MOBILITY_BONUS;
     }
     return movePoints;
@@ -362,7 +367,7 @@ void hero::AddSpell(SpellType spell, i32) {
     m_spells[(spell)] = 1;
 }
 
-void HeroMessageUpdate(char* text) {
+void HeroMessageUpdate(const char* text) {
     tag_message message;
 
     if (gheroWin == NULL)
@@ -537,7 +542,7 @@ void hero::Deallocate(i32 updateMap) {
         );
 
     oldOwner = m_owner;
-    playerPtr = &gpGame->m_players[m_owner];
+    playerPtr = &gpGame->m_players[(m_owner)];
 
     if (updateMap)
         gpAdvManager->MobilizeCurrHero(0);
@@ -559,7 +564,7 @@ void hero::Deallocate(i32 updateMap) {
         curTown->m_occupyingHeroId = -1;
     }
 
-    if (giCurPlayer != m_owner || gpGame->m_players[m_owner].m_currentHero != m_id
+    if (giCurPlayer != m_owner || gpGame->m_players[(m_owner)].m_currentHero != m_id
         || gpAdvManager->m_heroContextLocked == 0) {
         gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, NULL, 1);
     }
@@ -596,16 +601,16 @@ void hero::Deallocate(i32 updateMap) {
 
     if (gbRetreatWin) {
         availSlot = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
-        if ((((gpGame->m_heroRecs[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
+        if ((((gpGame->m_heroRecs[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]]
                     .m_eventFlags) & (HERO_EVENT_WEEKLY_VISIT)))) {
             availSlot = 1 - availSlot;
         }
-        if (gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
+        if (gpGame->m_availableHeroes[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]]
             == HERO_AVAILABILITY_RETREATED) {
-            gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]] =
+            gpGame->m_availableHeroes[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
-        gpGame->m_players[m_owner].m_availableHeroIds[availSlot] = m_id;
+        gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
         m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | (HERO_EVENT_WEEKLY_VISIT));
     }
@@ -742,8 +747,8 @@ void hero::CheckLevel(void) {
     i32 nLevel;
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
-    i32 levelsGained;
-    i32 highIndex;
+    i32 levelsGained [[maybe_unused]];
+    HeroSkillProbabilityBand highIndex;
     i32 slot;
     SAMPLE2 samp;
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
@@ -769,9 +774,9 @@ void hero::CheckLevel(void) {
         statBonuses[(HERO_PRIMARY_SPELL_POWER)] = 0;
         statBonuses[(HERO_PRIMARY_KNOWLEDGE)] = 0;
         if (nLevel <= HERO_LEVEL_HIGH_THRESHOLD)
-            highIndex = 0;
+            highIndex = HERO_SKILL_PROBABILITY_LOW;
         else
-            highIndex = 1;
+            highIndex = HERO_SKILL_PROBABILITY_HIGH;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         rnd = SRandom(1, HERO_LEVEL_RANDOM_MAX);
@@ -840,7 +845,7 @@ void hero::CheckLevel(void) {
             m_enabled = static_cast<u8>(nLevel);
         }
 
-        if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
+        if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[(m_owner)]) {
             samp = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
             if (choices[0] == HERO_SKILL_NONE) {
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -1127,21 +1132,21 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 tmp;
-    i32 quickView;
+    b32 quickView;
     i32 armySlot;
-    i32 dummy;
-    i32 bExit = 0;
+    i32 dummy [[maybe_unused]];
+    b32 bExit = false;
     i32 heroLevel;
     i32 iHero;
     i32 secondarySkillSlot;
-    tag_message newMsg;
-    i32 j;
+    tag_message newMsg [[maybe_unused]];
+    i32 j [[maybe_unused]];
     i32 nextExperience;
 
     if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
 
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
@@ -1179,10 +1184,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     switch (message.payload.widget.id) {
                         case UI_DISMISS:
                             if (gpHVHero->Dismiss())
-                                bExit = 1;
+                                bExit = true;
                             break;
                         case UI_CLOSE:
-                            bExit = 1;
+                            bExit = true;
                             break;
                         case UI_PREVIOUS_HERO:
                         case UI_NEXT_HERO: {
@@ -1538,7 +1543,7 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     mapCell* heroCell;
 
     gbNoDismiss = noDismiss;
@@ -1583,7 +1588,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 
 void SetupHeroView(void) {
     i32 tempBonus;
-    i32 bNoDismiss;
+    b32 bNoDismiss;
     tag_message msg;
     tag_message statusMsg;
     i32 i;
@@ -1595,7 +1600,7 @@ void SetupHeroView(void) {
 
     bNoDismiss = gbNoDismiss;
     if (gpHVHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
-        bNoDismiss = 1;
+        bNoDismiss = true;
 
     msg.type = HERO_UI_MESSAGE;
     sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[(gpHVHero->m_cursorType)]);
@@ -1830,8 +1835,8 @@ void SetupHeroView(void) {
 }
 
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
-    i16 splitTextSlot = UI_SPLIT_TEXT;
-    i16 splitAmountSlot = UI_SPLIT_AMOUNT;
+    i16 splitTextSlot [[maybe_unused]] = UI_SPLIT_TEXT;
+    i16 splitAmountSlot [[maybe_unused]] = UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
@@ -1946,7 +1951,7 @@ void hero::UpgradeCreatures(
     CreatureType oldCreatureType,
     CreatureType newCreatureType
 ) {
-    i32 numberUpgraded = 0;
+    i32 numberUpgraded [[maybe_unused]] = 0;
     i32 armySlot;
 
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
@@ -2001,7 +2006,7 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
 
 void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     i32 skillBonusValue;
-    char* skillText;
+    const char* skillText;
 
     skillBonusValue = GetSSLevel(skill) - (m_secondarySkills[(skill)]);
     if (skillBonusValue > 0) {
@@ -2051,7 +2056,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
             }
         }
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, (ARTIFACT_NONE));
-        if (gbThisNetHumanPlayer[m_owner]) {
+        if (gbThisNetHumanPlayer[(m_owner)]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
                 "Три артефакта Андурана чудесным способом объединились в один артефакт.",

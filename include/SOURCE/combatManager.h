@@ -69,6 +69,13 @@ enum {
     COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
 };
 typedef i32 CombatCastleHex;
+typedef enum CombatWinLoseAnimation {
+    WIN_LOSE_ANIMATION_CYCLE_FIRST  = 1,
+    WIN_LOSE_ANIMATION_LOSS         = 2,
+    WIN_LOSE_ANIMATION_FLEE         = 3,
+    WIN_LOSE_ANIMATION_CYCLE_SECOND = 4
+} CombatWinLoseAnimation;
+
 enum {
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
@@ -488,7 +495,7 @@ enum {
 };
 typedef u8 CombatGridShade;
 #pragma pack(push, 1)
-class combatManager : public baseManager {
+class combatManager H2_FINAL : public baseManager {
 public:
     class palette* m_combatPalette;
     i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];
@@ -613,10 +620,10 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void NoShowCombatLog(char*);
+    void NoShowCombatLog(const char*);
     void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(char*, i32, i32, i32);
+    void CombatMessage(const char*, i32, i32, i32);
     void CombatMessage(CombatMessageCommand);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
@@ -774,7 +781,7 @@ public:
     void SetupAdjacencyArray(void);
     void UpdateArmyGroup(CombatSide);
     void GenerateMap(void);
-    char* GetBackgroundName(void);
+    const char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
     void LoadIcons(void);
     void FreeIcons(void);
@@ -821,28 +828,28 @@ public:
     i32 WalkTowardArmy(class army*, CombatSide, i32);
 };
 #pragma pack(pop)
-extern i32 bGridWasShowing;
+extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
 extern i32 iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
-extern i32 bInTeleportGetDest;
+extern b32 bInTeleportGetDest;
 extern i32 indexToCastOn;
 extern u8 uRedBeam[];
 extern u8 uRainbow[];
 extern i8* gyModify;
 extern float gfDurationMods[COMBAT_DURATION_MOD_COUNT];
 extern float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT];
-extern i32 bInHighMoraleBonus;
+extern b32 bInHighMoraleBonus;
 extern i32 giSeed;
 extern u8 wallHex[COMBAT_WALL_SECTION_COUNT];
 extern b32 gbThisNetHasControl;
 extern i32 iCurTransferArtifact;
 extern i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-extern b32 gbWhichAnimationPlaying;
+extern i32 gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
-extern i32 bSkeletonsShown;
+extern b32 bSkeletonsShown;
 extern b32 gbShowingLoseWindow;
 extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
@@ -854,6 +861,6 @@ extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
-extern i32 bCPrefsChanged;
+extern b32 bCPrefsChanged;
 
 #endif

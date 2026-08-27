@@ -80,8 +80,8 @@ char* GetRemoteData(i8);
 void PollRemote(void);
 i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
 
-extern char gbUseDiffCompression;
-extern char gbUseRegularCompression;
+extern bchar gbUseDiffCompression;
+extern bchar gbUseRegularCompression;
 extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 
 extern i32 iInOrderCtr;
@@ -94,9 +94,9 @@ extern b32 gbInRemoteCleanup;
 extern i32 iIDCtr;
 extern i32 iTimesDropped;
 extern b8 gbInNetSetup;
-extern i32 bUseDirectPlay;
-extern i32 bUseWinsock;
-extern i8 bInTimeoutFail;
+extern b32 bUseDirectPlay;
+extern b32 bUseWinsock;
+extern b8 bInTimeoutFail;
 extern i32 iBaud[REMOTE_BAUD_RATE_COUNT];
 extern i32 iIRQ[REMOTE_IRQ_COUNT];
 extern char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
@@ -109,7 +109,7 @@ extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-extern i32 bGotGameType;
+extern b32 bGotGameType;
 extern SNetPlayerInfo gsThisNetPlayerInfo;
 
 #endif

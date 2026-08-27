@@ -42,8 +42,8 @@ typedef enum SoundSampleStatus {
 } SoundSampleStatus;
 
 
-static WAVEOUTCAPSA gWaveOutCaps = {0};
-static PCMWAVEFORMAT gWaveFormat = {0};
+static WAVEOUTCAPSA gWaveOutCaps = {};
+static PCMWAVEFORMAT gWaveFormat = {};
 #define NORMALIZED_VOLUME_MAX 127.0f
 
 bool gSoundDisabled = false;
@@ -394,7 +394,7 @@ void soundManager::PlayAmbientMusic(i32 track) {
 }
 
 void soundManager::PollSound(void) {
-    i32 musicFadeStep;
+    i32 musicFadeStep [[maybe_unused]];
     i32 volume;
     i32l delta;
     i32l switchDelta;

@@ -58,7 +58,7 @@ struct EventExtra {
     u8 applyToComputer;
     u8 cancelAfterVisit;
     char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
-    i8 active;
+    b8 active;
     u16 x;
     u16 y;
     u8 unknown2a;
@@ -121,7 +121,6 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_SEED_MAX                  = 255,
     RANDOM_HERO_ENABLED                   = 1,
     RANDOM_HERO_STARTING_SPELL_KNOWN      = 1,
-    RANDOM_HERO_STACK_SELECTED            = 1,
     RANDOM_HERO_FIRST_STACK_CHANCE        = 50,
     RANDOM_HERO_FIRST_STACK_BONUS_CHANCE  = 30,
     RANDOM_HERO_SECOND_STACK_CHANCE       = 25,
@@ -165,6 +164,6 @@ void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
 
-extern char bMapInitialized;
+extern bchar bMapInitialized;
 
 #endif

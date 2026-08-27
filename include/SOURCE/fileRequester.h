@@ -78,7 +78,7 @@ struct FileRequesterExtension {
 };
 
 #pragma pack(push, 1)
-class fileRequester : public baseManager {
+class fileRequester H2_FINAL : public baseManager {
 public:
     heroWindow* m_window;
     i32 m_x;
@@ -109,11 +109,11 @@ public:
     void SetOK(i32);
     void DoKnob(void);
     void Update(i32);
-    char* GetFilename(void);
+    const char* GetFilename(void);
 };
 #pragma pack(pop)
 extern FileRequesterMapSizeFilter giMapSizeFilter;
-extern char* cFRDummy;
+extern const char* cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
 extern i32 iMaxListSize;

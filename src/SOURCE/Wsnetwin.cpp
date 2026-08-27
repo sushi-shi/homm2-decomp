@@ -221,7 +221,7 @@ void wsnet_term(void) {
         H2_FREE(piDPRcvBufferSize);
     piDPRcvBufferSize = NULL;
     WSACleanup();
-    bHostFound = 0;
+    bHostFound = false;
     sd_dg = INVALID_SOCKET;
     iWSLastMsgNumHumanPlayers = 1;
     iWSAttempts = 0;
@@ -293,7 +293,7 @@ void wsSendMessage(
 }
 
 i32 wsnet_snd(i32 destination, i32 size, void* data) {
-    i32 result;
+    i32 result [[maybe_unused]];
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
@@ -392,7 +392,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(message);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                        xNetHasOldPlayers = 1;
+                        xNetHasOldPlayers = true;
                     wsSendMessage(
                         giNetPosToDCOPos[giNumHumanPlayers],
                         NETWORK_PACKET_GUEST_ACCEPTED,
@@ -423,7 +423,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 message + offsetof(WinsockStartupMessage, playerAddresses),
                 sizeof(giNetPosToDCOPos)
             );
-            bStartUpInfoReceived = 1;
+            bStartUpInfoReceived = true;
             break;
         case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
@@ -447,7 +447,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             windowMessage.payload.widget.data.text = cWSTextBuffer;
             pNormalDialogWindow->BroadcastMessage(windowMessage);
             pNormalDialogWindow->DrawWindow();
-            bHostFound = 1;
+            bHostFound = true;
             break;
         default:
             sprintf(cWSTextBuffer, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
@@ -534,7 +534,7 @@ i32 wsWaitForHost(void) {
     return 0;
 }
 
-i32 bHostFound = 0;
+b32 bHostFound = false;
 u32 sd_dg = INVALID_SOCKET;
 i32 iWSLastMsgNumHumanPlayers = 1;
 i32 iWSAttempts = 0;

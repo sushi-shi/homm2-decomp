@@ -15,6 +15,6 @@ tileset::tileset(u32l id)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-inline tileset::~tileset() {
+ tileset::~tileset() {
     H2_FREE(m_data);
 }

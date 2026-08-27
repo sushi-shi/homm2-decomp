@@ -67,7 +67,7 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->tail = NULL;
 }
 
-void ShutdownComError(char* function) {
+void ShutdownComError(const char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
     DWORD errorCode = GetLastError();
@@ -142,7 +142,7 @@ void ShutdownComError(char* function) {
 }
 
 i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
-    i32 err;
+    i32 err [[maybe_unused]];
     i32 slot;
     BOOL rv;
     DCB state;
@@ -268,7 +268,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     return 0;
 }
 
-i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
+i16 com_snd(i16 portIndex, u16, u16 length, const void* data, i32 priority) {
     BOOL result2;
     tag_Node* sendNode2;
 

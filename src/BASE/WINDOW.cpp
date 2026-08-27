@@ -69,7 +69,7 @@ heroWindow::heroWindow(
     m_savedBackground = NULL;
 }
 
-heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
+heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
     widget* pWidget;
     textWidget* pText;
     textEntryWidget* pTextEnt;

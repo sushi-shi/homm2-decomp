@@ -110,7 +110,7 @@ typedef enum InputManagerCapacity {
 } InputManagerCapacity;
 
 #pragma pack(push, 1)
-class inputManager : public baseManager {
+class inputManager H2_FINAL : public baseManager {
 public:
     tag_message m_eventRing[(INPUT_EVENT_RING_CAPACITY)];
     i32 m_readIndex;
@@ -142,9 +142,9 @@ public:
 };
 #pragma pack(pop)
 extern i32 iCurSwapPalette;
-extern i32 bLastMouseOffscreen;
-extern i32 bLastOnscreenMouseColor;
-extern i32 bInCheckChangeCursor;
+extern b32 bLastMouseOffscreen;
+extern b32 bLastOnscreenMouseColor;
+extern b32 bInCheckChangeCursor;
 extern i32 iLastBWOnScreenCheck;
 
 #endif

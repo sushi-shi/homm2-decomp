@@ -23,9 +23,9 @@ public:
         i16,
         WidgetKind,
         i16,
-        char*
+        const char*
     );
-    virtual inline ~border() override;
+    virtual  ~border() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);

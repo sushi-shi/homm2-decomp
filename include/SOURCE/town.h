@@ -40,14 +40,17 @@ enum {
 };
 typedef i32 TownBuilding;
 
+typedef enum TownFormation {
+    TOWN_FORMATION_SPREAD  = 0,
+    TOWN_FORMATION_GROUPED = 1
+} TownFormation;
+
 typedef enum TownConstant {
     TOWN_GARRISON_SLOT_COUNT           = 12,
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,
     TOWN_DOCK_COORDINATE_NONE          = 0xFF,
-    TOWN_FORMATION_SPREAD              = 0,
-    TOWN_FORMATION_GROUPED             = 1,
     TOWN_PLAYER_WINDOW_SIZE            = 5,
     TOWN_MAGE_GUILD_LEVEL_COUNT        = 5,
     TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
@@ -67,16 +70,16 @@ typedef enum TownConstant {
 #pragma pack(push, 1)
 class town {
 public:
-    char m_id;
-    char m_owner;
-    i8 m_threat;
-    char m_type;
+    i8 m_id;
+    i8 m_owner;
+    b8 m_threat;
+    i8 m_type;
     u8 m_x;
     u8 m_y;
     u8 m_boatX;
     u8 m_boatY;
     armyGroup m_army;
-    char m_occupyingHeroId;
+    i8 m_occupyingHeroId;
     u32l m_buildings;
     i8 m_buildState;
     char m_unknown1d;
@@ -112,6 +115,6 @@ public:
     void CalcNumLevelArchers(i32*, i32*);
 };
 #pragma pack(pop)
-extern i32 bEnteringTown;
+extern b32 bEnteringTown;
 
 #endif

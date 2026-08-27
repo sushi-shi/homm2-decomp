@@ -112,7 +112,7 @@ typedef enum ViewWorldGroundFrame {
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     heroWindow* window;
     i8 palette[WORLD_PALETTE_SIZE];
-    char* iconNames[LEGEND_COUNT];
+    const char* iconNames[LEGEND_COUNT];
     tag_message legendMessage;
 
     memcpy(palette, gpBufferPalette->m_data, WORLD_PALETTE_SIZE);
@@ -217,25 +217,25 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     sprintf(
         gText,
         "ground%d.icn",
-        giViewWorldScale
+        (giViewWorldScale)
     );
     pVWGround = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "vwflag%d.icn",
-        giViewWorldScale
+        (giViewWorldScale)
     );
     pVWFlags = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "misc%d.icn",
-        giViewWorldScale
+        (giViewWorldScale)
     );
     pVWMisc = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "letter%d.icn",
-        giViewWorldScale
+        (giViewWorldScale)
     );
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
@@ -245,12 +245,12 @@ void advManager::VWCompleteDraw(void) {
     u8* endPixel0;
     u8 drawTilesets0[WORLD_TILESET_COUNT];
     u8* pix0;
-    i32 spare;
+    i32 spare [[maybe_unused]];
     i32 cellX;
-    i32 heroHere0;
+    b32 heroHere0;
     mapCellExtra* extraCell;
     i32 cellY;
-    i32 dead;
+    i32 dead [[maybe_unused]];
     u32 frame0;
     i32 drawY1;
     i32 screenX;
@@ -586,9 +586,9 @@ void advManager::VWCompleteDraw(void) {
             if (gpCurPlayer->m_currentHero != -1
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_x == cellX
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_y == cellY)
-                heroHere0 = 1;
+                heroHere0 = true;
             else
-                heroHere0 = 0;
+                heroHere0 = false;
             if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                  || heroHere0)
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
@@ -839,9 +839,11 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 }
 
 i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-            [(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
-                                              4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
-                                              7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
+            [(COORDINATE_AXIS_COUNT)] = {
+    {{3, 3}, {5, 5}, {6, 6}, {8, 5}, {2, 3}, {2, 2}},
+    {{4, 5}, {6, 6}, {8, 8}, {11, 7}, {3, 4}, {3, 3}},
+    {{7, 7}, {8, 8}, {10, 10}, {14, 8}, {3, 6}, {4, 4}}
+};
 ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
 i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
 b32 gbInViewWorld = false;
@@ -851,9 +853,9 @@ i32 iVWYPixelOffset;
 class icon* pVWGround;
 i32 iVWViewableCells;
 class icon* pVWFlags;
-i32 iVWDrawAllTerrains;
+b32 iVWDrawAllTerrains;
 i32 iVWWhatToDraw;
-i32 iVWDrawAllObjs;
+b32 iVWDrawAllObjs;
 i32 iVWMapOriginX;
 i32 iVWMapOriginY;
 i32 iVWCenterOffset;

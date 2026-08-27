@@ -811,7 +811,7 @@ typedef sample* SAMPLE2;
 struct SWinSetup {
     u8 windowId;
     u16 widgetId;
-    char* text;
+    const char* text;
 };
 #pragma pack(pop)
 

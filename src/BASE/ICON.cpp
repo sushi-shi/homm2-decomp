@@ -37,7 +37,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
-inline icon::~icon() {
+ icon::~icon() {
     H2_FREE(m_data);
 }
 
@@ -245,7 +245,7 @@ void icon::ClipFillToBuffer(
     i32 y,
     i32 frame,
     i32 color,
-    IconDrawOrientation orientation,
+    IconDrawOrientation orientation [[maybe_unused]],
     i32 clipX,
     i32 clipY,
     i32 clipW,

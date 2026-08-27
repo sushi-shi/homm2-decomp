@@ -22,7 +22,7 @@ enum {
 };
 typedef i32 WindowFadeMode;
 #pragma pack(push, 1)
-class heroWindowManager : public baseManager {
+class heroWindowManager H2_FINAL : public baseManager {
 public:
     heroWindow* m_windowListHead;
     heroWindow* m_windowListTail;

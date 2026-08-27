@@ -17,7 +17,7 @@ enum {
 };
 typedef i32 RecruitSourceType;
 #pragma pack(push, 1)
-class recruitUnit : public baseManager {
+class recruitUnit H2_FINAL : public baseManager {
 public:
     RecruitSourceType m_sourceType;
     i32 m_creatureType;

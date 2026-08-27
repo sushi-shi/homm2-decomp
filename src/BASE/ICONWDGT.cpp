@@ -50,7 +50,7 @@ iconWidget::iconWidget(
     i16 y,
     i16 width,
     i16 height,
-    char* iconName,
+    const char* iconName,
     i16 frame,
     IconDrawOrientation orientation,
     i16 id,
@@ -85,7 +85,7 @@ void iconWidget::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-inline iconWidget::~iconWidget() {
+ iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
@@ -106,7 +106,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
                 case WIDGET_COMMAND_REPLACE_ICON:
-                    if (m_iconId == msg.payload.widget.id) {
+                    if (m_iconId == static_cast<u32l>(msg.payload.widget.id)) {
                         m_iconId = msg.payload.widget.data.value;
                         gpResourceManager->Dispose(m_icon);
                         m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);

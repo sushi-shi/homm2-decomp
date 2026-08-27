@@ -18,7 +18,7 @@ struct AudiereSampleNode {
         next = nextNode;
     }
 
-    inline ~AudiereSampleNode();
+     ~AudiereSampleNode();
 };
 
 

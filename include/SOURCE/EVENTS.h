@@ -120,7 +120,7 @@ struct mapHeroExtra {
         i8 patrolRadius;
         i8 heroClass;
     };
-    i8 hasAssignedHero;
+    b8 hasAssignedHero;
 };
 struct mapTownExtra {
     i8 color;
@@ -323,9 +323,9 @@ typedef enum EventEffectConstant {
     EVENT_FIZZLE_STEPS               = 65
 } EventEffectConstant;
 
-i8 StrEqNoCase(char*, char*);
+i8 StrEqNoCase(const char*, const char*);
 i32 GiveArtifact(class hero*, ArtifactType, b32, i8);
 void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
-i32 RiddleStringsEqual(char*, char*);
+i32 RiddleStringsEqual(const char*, const char*);
 
 #endif

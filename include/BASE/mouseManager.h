@@ -19,7 +19,7 @@ enum {
 };
 typedef i32 MouseCursorType;
 #pragma pack(push, 1)
-class mouseManager : public baseManager {
+class mouseManager H2_FINAL : public baseManager {
 public:
     bitmap* m_savedUnderlying;
     i32 m_cursorFrame;
@@ -45,7 +45,7 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void SetPointer(char*, i32, MouseCursorType);
+    void SetPointer(const char*, i32, MouseCursorType);
     void SetPointer(i32);
     void NewUpdate(i32);
     void MouseCoords(i32&, i32&);
@@ -57,7 +57,7 @@ public:
     void ShowColorPointer(void);
     i32 IsVis(void);
     void CheckUpdateMousePos(void);
-    void SetColorMice(i32);
+    void SetColorMice(b32);
 };
 #pragma pack(pop)
 typedef enum MouseManagerConstant {

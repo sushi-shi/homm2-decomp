@@ -206,7 +206,7 @@ void listBoxWidget::DeleteItem(i32 index) {
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     i16 x;
     i16 y;
-    char* text;
+    const char* text;
     char** newItems;
 
     if (!(((m_flags) & (WIDGET_FLAG_ENABLED)))) {

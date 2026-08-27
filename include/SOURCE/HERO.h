@@ -6,11 +6,11 @@
 
 struct tag_message;
 
-void HeroMessageUpdate(char*);
+void HeroMessageUpdate(const char*);
 void UpdateHeroScreenStatusBar(struct tag_message&);
 MessageDispatchResult HeroHandler(struct tag_message&);
 void RedrawHeroScreen(void);
-i32 HeroView(i32, i32, i32);
+i32 HeroView(i32, b32, b32);
 void SetupHeroView(void);
 void DoHeroSplit(i32, i32);
 

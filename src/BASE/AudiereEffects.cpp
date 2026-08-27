@@ -17,7 +17,7 @@ struct AudiereEffectsState {
 };
 
 
-static AudiereEffectsState gAudiereEffects = {0};
+static AudiereEffectsState gAudiereEffects = {};
 
 void PurgeFinishedAudiereSamples(void) {
     if (gAudiereEffects.sampleList == NULL)
@@ -186,4 +186,4 @@ bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
 
-inline AudiereSampleNode::~AudiereSampleNode() {}
+ AudiereSampleNode::~AudiereSampleNode() {}

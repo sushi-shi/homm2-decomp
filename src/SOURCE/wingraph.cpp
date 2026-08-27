@@ -21,13 +21,13 @@ typedef enum WingraphPaletteConstant {
     SYSTEM_PALETTE_REGION_COUNT = 2
 } WingraphPaletteConstant;
 
-static RECT gDDClientRect = {0};
+static RECT gDDClientRect = {};
 static HRESULT gDDResult = 0;
-static DDSURFACEDESC gDDSurfaceDesc = {0};
-struct _IMAGE screenImage = {0};
-static RECT gDDSourceRect = {0};
+static DDSURFACEDESC gDDSurfaceDesc = {};
+struct _IMAGE screenImage = {};
+static RECT gDDSourceRect = {};
 i32l lPaintStart = 0;
-static RECT gDDDestinationRect = {0};
+static RECT gDDDestinationRect = {};
 
 void DDRestoreDisplayMode(void) {
     HRESULT result;
@@ -44,7 +44,7 @@ void DDRestoreDisplayMode(void) {
 }
 
 i32 DDQueryNewPalette(void) {
-    i32 unused;
+    i32 unused [[maybe_unused]];
 
     if (gbWinGraphBusy != 0)
         return 1;
@@ -140,7 +140,7 @@ void DDInitGraphics(void) {
     InitializePalette();
 }
 
-i32 DDAppPaint(void* window, void* paintDC) {
+i32 DDAppPaint(void* window, void* paintDC [[maybe_unused]]) {
     i32 sourceWidth;
     i32 sourceHeight5;
     i32 sourceTop8;
@@ -341,8 +341,8 @@ i32 DDSetPalette(void) {
 struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary) {
     DDSURFACEDESC ddsd;
     IDirectDrawSurface* lpSurface;
-    i32 cnt;
-    i32 unused;
+    i32 cnt [[maybe_unused]];
+    i32 unused [[maybe_unused]];
     HRESULT rv;
 
     memset(&ddsd, 0, sizeof(ddsd));
@@ -382,14 +382,14 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     return lpSurface;
 }
 
-void DDSD(i32 error, char* file, i32 line) {
-    HRESULT hres;
-    i32 unused;
+void DDSD(i32 error, const char* file, i32 line) {
+    HRESULT hres [[maybe_unused]];
+    i32 unused [[maybe_unused]];
     char errorMessage[WINGRAPH_ERROR_TEXT_SIZE];
 
     if (bInDDSD != 0)
         return;
-    bInDDSD = 1;
+    bInDDSD = true;
     hres = lpDD->RestoreDisplayMode();
     unused = 0;
     switch (error) {
@@ -539,7 +539,7 @@ void __cdecl DDUpdatePalette(i8* paletteData) {
 }
 
 void DDCleanUpWinGraphics(void) {
-    HRESULT restoreResult;
+    HRESULT restoreResult [[maybe_unused]];
     HRESULT result;
 
     if (lpDD != NULL) {
@@ -715,7 +715,7 @@ void WGInitGraphics(void) {
 
 void __cdecl WGUpdatePalette(i8* paletteData) {
     HDC dc0;
-    i32 result;
+    i32 result [[maybe_unused]];
     i32 idx;
 
     for (idx = WINGRAPH_SYSTEM_PALETTE_SIZE;
@@ -831,8 +831,8 @@ void WGInitializePalette(void) {
 }
 
 i32 WGAppPaint(void* window, void* paintDC) {
-    i32 padding8;
-    char unusedByte0;
+    i32 padding8 [[maybe_unused]];
+    char unusedByte0 [[maybe_unused]];
     RECT clientRect16;
     i32 destY0;
     i32 xSource;
@@ -1102,7 +1102,9 @@ b32 gbWinGAttached = true;
 b32 gbDDrawAttached = false;
 WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;
 i32l Orientation = 1;
-struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
+struct _PALETTE LogicalPalette = {
+    WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE, {}
+};
 void* lpInitWin = NULL;
 i32 bPaletteInitialized = 0;
 i32 giTtlBlts = 0;
@@ -1114,7 +1116,7 @@ struct IDirectDrawSurface* lpDDSOne = NULL;
 struct IDirectDrawClipper* lpClipper = NULL;
 struct IDirectDrawPalette* lpDDPal = NULL;
 i32 iBusyRetry = 0;
-i32 bInDDSD = 0;
+b32 bInDDSD = false;
 HDC hdcImage = NULL;
 HBITMAP gbmOldMonoBitmap = NULL;
 HPALETTE hpalApp = NULL;

@@ -39,16 +39,16 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
-    void PolishBoundedTextLayout(char*, char*, u32*, i32, i32*, char);
+    void DrawStringExecute(const char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void PolishBoundedTextLayout(const char*, char*, u32*, i32, i32*, char);
 
 public:
-    void DrawString(char*, i32, i32, FontDrawMode);
+    void DrawString(const char*, i32, i32, FontDrawMode);
     i32 GetCharacterWidth(u8);
-    void ExtractLine(char*, char*, i32*, i32, i32*, u8);
-    void DrawBoundedString(char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
-    i32 LineLength(char*, i32);
-    i32 LineWidth(char*);
+    void ExtractLine(const char*, char*, i32*, i32, i32*, u8);
+    void DrawBoundedString(const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
+    i32 LineLength(const char*, i32);
+    i32 LineWidth(const char*);
 };
 #pragma pack(pop)
 #endif

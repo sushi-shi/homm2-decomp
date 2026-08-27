@@ -39,7 +39,7 @@ public:
         i16 y,
         i16 width,
         i16 height,
-        char* iconName,
+        const char* iconName,
         i16 normalFrame,
         i16 pressedFrame,
         ButtonSelectMode selectMode,
@@ -47,7 +47,7 @@ public:
         i16 id,
         WidgetKind kind
     );
-    virtual inline ~button() override;
+    virtual  ~button() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Read(void);

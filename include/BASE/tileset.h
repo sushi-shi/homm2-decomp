@@ -12,7 +12,7 @@ public:
     u16 m_tileHeight;
     char* m_data;
     tileset(u32l);
-    virtual inline ~tileset();
+    virtual  ~tileset();
 };
 #pragma pack(pop)
 #endif

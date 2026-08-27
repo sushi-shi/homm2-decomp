@@ -30,7 +30,7 @@
           runHook preBuild
           sed -i "s|^cxx = clang++$|cxx = $CXX|" build.ninja
           sed -i "s|--target=i686-w64-windows-gnu ||g" build.ninja
-          ninja
+          ninja -k 0
           runHook postBuild
         '';
         installPhase = ''

@@ -59,10 +59,10 @@ i32 leftResource = 0;
 i32 iMaxUnitsToTrade = 0;
 i32 tpX = 0;
 i32 tpY = 0;
-i32 bTradeMade = 0;
-static char leftName[OFFER_NAME_SIZE] = {0};
+b32 bTradeMade = false;
+static char leftName[OFFER_NAME_SIZE] = {};
 i32 qtyToTrade = 0;
-static char rightName[OFFER_NAME_SIZE] = {0};
+static char rightName[OFFER_NAME_SIZE] = {};
 i32 iTradeRatio = 0;
 i32 rightResource = 0;
 i32 maxUnitsToTrade = 0;
@@ -71,11 +71,11 @@ class heroWindow* tpWindow = NULL;
 class iconWidget* tradeKnob = NULL;
 
 void DoTradingPost(i32 isMarketplace, float efficiency) {
-    tag_message messageTemp;
+    tag_message messageTemp [[maybe_unused]];
 
     bIsMarketPlace = isMarketplace;
     fTradingPostEfficiency = efficiency;
-    bTradeMade = 0;
+    bTradeMade = false;
     tpX = TRADING_POST_WINDOW_X;
     tpY = TRADING_POST_WINDOW_Y;
     tpWindow = new heroWindow(tpX, tpY, "tradpost.bin");
@@ -351,8 +351,8 @@ void SetupNewTrade(void) {
 }
 
 MessageDispatchResult TradingPostHandler(struct tag_message& message) {
-    i32 exitFlag = 0;
-    i32 redraw = 0;
+    b32 exitFlag = false;
+    b32 redraw = false;
     i32 resourceData;
     i32 knobPosition;
 
@@ -371,7 +371,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                             qtyToTrade = 0;
                         if (qtyToTrade > iMaxUnitsToTrade)
                             qtyToTrade = iMaxUnitsToTrade;
-                        redraw = 1;
+                        redraw = true;
                         break;
                     case TRADING_POST_KNOB_ID:
                         DoTradeKnob(message);
@@ -386,7 +386,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         resourceData = message.payload.widget.id - TRADING_POST_LEFT_SELECT_FIRST;
                         if (resourceData != leftResource) {
                             leftResource = resourceData;
-                            redraw = 1;
+                            redraw = true;
                             SetupNewTrade();
                         }
                         break;
@@ -400,7 +400,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         resourceData = message.payload.widget.id - TRADING_POST_RIGHT_SELECT_FIRST;
                         if (resourceData != rightResource) {
                             rightResource = resourceData;
-                            redraw = 1;
+                            redraw = true;
                             if (leftResource != -1)
                                 SetupNewTrade();
                         }
@@ -410,7 +410,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case NORMAL_DIALOG_BUTTON_TWO:
-                        exitFlag = 1;
+                        exitFlag = true;
                         break;
                     case POST_EXECUTE:
                         if (qtyToTrade == 0)
@@ -422,21 +422,21 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                             gpCurPlayer->m_resources[leftResource] -= qtyToTrade * iTradeRatio;
                             gpCurPlayer->m_resources[rightResource] += qtyToTrade;
                         }
-                        bTradeMade = 1;
+                        bTradeMade = true;
                         rightResource = -1;
                         leftResource = rightResource;
-                        redraw = 1;
+                        redraw = true;
                         break;
                     case POST_DECREMENT:
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
-                            redraw = 1;
+                            redraw = true;
                         }
                         break;
                     case POST_INCREMENT:
                         if (qtyToTrade < iMaxUnitsToTrade) {
                             ++qtyToTrade;
-                            redraw = 1;
+                            redraw = true;
                         }
                         break;
                 }

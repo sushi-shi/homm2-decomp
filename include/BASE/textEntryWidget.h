@@ -50,9 +50,9 @@ public:
         i16 height,
         i16 maxLength,
         char* text,
-        char* fontName,
+        const char* fontName,
         FontDrawMode color,
-        char* iconName,
+        const char* iconName,
         i16 iconFrame,
         i16 id,
         WidgetKind kind,
@@ -60,7 +60,7 @@ public:
         i32 horizontalInset,
         i32 verticalInset
     );
-    virtual inline ~textEntryWidget() override;
+    virtual  ~textEntryWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(TextEntryReadMode);

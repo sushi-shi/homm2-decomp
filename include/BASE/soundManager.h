@@ -52,7 +52,7 @@ typedef enum SoundBackendKind {
     SOUND_BACKEND_NONE    = 2
 } SoundBackendKind;
 
-class soundManager : public baseManager {
+class soundManager H2_FINAL : public baseManager {
 public:
     SoundBackendKind m_backend;
     SoundBackendKind m_savedBackend;

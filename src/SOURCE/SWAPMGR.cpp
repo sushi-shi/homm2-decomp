@@ -301,17 +301,17 @@ void swapManager::DrawSelector(void) {
 }
 
 MessageDispatchResult swapManager::Main(tag_message& message) {
-    i32 closeRequested_5 = 0;
-    i32 quickView_9;
+    b32 closeRequested_5 = false;
+    b32 quickView_9;
     SwapManagerSide side_6;
     i32 slotIndex_2;
     i32 artifactSlot_2;
     HeroSecondarySkill secondarySkill_1;
 
     if ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView_9 = 1;
+        quickView_9 = true;
     else
-        quickView_9 = 0;
+        quickView_9 = false;
 
     switch (message.type) {
         case MESSAGE_RIGHT_BUTTON_DOWN:
@@ -328,7 +328,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                     if (quickView_9)
                         break;
                     if (message.payload.widget.id == CONTROL_CLOSE)
-                        closeRequested_5 = 1;
+                        closeRequested_5 = true;
                     break;
 
                 case WIDGET_COMMAND_SELECT:
@@ -798,7 +798,7 @@ void swapManager::SwapArtifacts(void) {
 }
 
 void swapManager::SwapMons(void) {
-    i32 selectedArmyCount = 0;
+    i32 selectedArmyCount [[maybe_unused]] = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
         if (m_heroes[(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
             && m_heroes[(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
@@ -937,13 +937,13 @@ void swapManager::Update(void) {
 }
 
 void swapManager::SplitMons(void) {
-    i16 textControl;
+    i16 textControl [[maybe_unused]];
     armyGroup* targetTroops;
     armyGroup* selectedArmy;
     i32 openSlot;
-    i16 unusedAmountControl;
+    i16 unusedAmountControl [[maybe_unused]];
     tag_message message;
-    i32 dlgState;
+    i32 dlgState [[maybe_unused]];
 
     unusedAmountControl = SPLIT_AMOUNT_CONTROL;
     dlgState = 0;

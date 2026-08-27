@@ -24,18 +24,18 @@ public:
         i16 width,
         i16 height,
         char* text,
-        char* fontName,
+        const char* fontName,
         FontDrawMode color,
         i16 id,
         WidgetKind kind,
         FontAlignment alignment
     );
-    virtual inline ~textWidget() override;
+    virtual  ~textWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
     void SetColorIndex(FontDrawMode color);
-    void SetText(char* text);
+    void SetText(const char* text);
 };
 #pragma pack(pop)
 #endif

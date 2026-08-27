@@ -302,12 +302,12 @@ extern "C" void PollSound(void) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
         else
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
-        bDoColorCycle = 1;
+        bDoColorCycle = true;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += NON_PALETTED_COLOR_CYCLE_DELAY;
             if (gbHeroMoving)
-                bDoColorCycle = 0;
+                bDoColorCycle = false;
         }
         if (bDoColorCycle)
             CycleColors(0);
@@ -392,7 +392,7 @@ void DeleteMainClasses(void) {
     gpResourceManager = NULL;
 }
 
-void EarlyShutdown(char* caption, char* text) {
+void EarlyShutdown(const char* caption, const char* text) {
     MessageBoxA(hwndApp, text, caption, MB_ICONHAND);
     exit(0);
 }
@@ -494,14 +494,14 @@ i32 EarlySetup(void) {
 
 i32 oldmain(void) {
     i32 command_c;
-    i32 quit;
-    i32 mainScreenLoaded_h;
-    i32 firstMainScreen_h;
+    b32 quit;
+    b32 mainScreenLoaded_h;
+    b32 firstMainScreen_h;
     i32 savedUpdateFlags_l;
     i32 player_h;
-    i32 unusedMainState_o;
-    i32 unusedMenuState;
-    i32 unusedPlayerState_f;
+    i32 unusedMainState_o [[maybe_unused]];
+    i32 unusedMenuState [[maybe_unused]];
+    i32 unusedPlayerState_f [[maybe_unused]];
     i32 netPlayer_k;
     i32 gamePlayer_m;
     i32 result_i;
@@ -512,7 +512,7 @@ i32 oldmain(void) {
 
     if (bKBDone)
         return 0;
-    bKBDone = 1;
+    bKBDone = true;
     LogStr("OM1");
     LogStr("OM2");
     command_c = -1;
@@ -572,9 +572,9 @@ i32 oldmain(void) {
     LoadSystemwideIcons();
     memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
     gpMouseManager->ShowColorPointer();
-    quit = 0;
-    mainScreenLoaded_h = 0;
-    firstMainScreen_h = 1;
+    quit = false;
+    mainScreenLoaded_h = false;
+    firstMainScreen_h = true;
 
     while (!quit) {
     main_menu:
@@ -598,7 +598,7 @@ i32 oldmain(void) {
                     SetPalette(gPalette->m_data, 1);
                 else
                     gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                firstMainScreen_h = 0;
+                firstMainScreen_h = false;
             }
             gpMouseManager->SetPointer(
                 "advmice.mse",
@@ -606,7 +606,7 @@ i32 oldmain(void) {
                 MOUSE_AUTO_CURSOR_TYPE
             );
         }
-        mainScreenLoaded_h = 1;
+        mainScreenLoaded_h = true;
         if (gGameCommand != OLD_MAIN_EXIT)
             gpWindowManager->m_updateFlags = 1;
 
@@ -622,9 +622,9 @@ i32 oldmain(void) {
             giSetupGameType = static_cast<u8>(giTCPType);
             RemoteMain(iMPExtendedType);
             if (iMPExtendedType == REMOTE_GAME_NETWORK_GUEST)
-                gbWaitForRemoteReceive = 1;
+                gbWaitForRemoteReceive = true;
             else
-                gbWaitForRemoteReceive = 0;
+                gbWaitForRemoteReceive = false;
             giTCPHostStatus = -1;
             switch (giSetupGameType) {
                 case OLD_MAIN_SETUP_NEW:
@@ -725,7 +725,7 @@ i32 oldmain(void) {
                             } else {
                                 gpWindowManager
                                     ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                mainScreenLoaded_h = 0;
+                                mainScreenLoaded_h = false;
                                 goto main_menu;
                             }
                         } else {
@@ -736,7 +736,7 @@ i32 oldmain(void) {
                                 } else {
                                     gpWindowManager
                                         ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
-                                    mainScreenLoaded_h = 0;
+                                    mainScreenLoaded_h = false;
                                     goto main_menu;
                                 }
                             } else {
@@ -761,18 +761,18 @@ i32 oldmain(void) {
                         "еджера!");
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
-                mainScreenLoaded_h = 0;
+                mainScreenLoaded_h = false;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_THIRD_VIDEO);
-                mainScreenLoaded_h = 0;
+                mainScreenLoaded_h = false;
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
-                quit = 1;
+                quit = true;
                 break;
         }
 
@@ -836,14 +836,14 @@ i32 oldmain(void) {
                     sizeof(netBuffer_f.setup.players)
                 );
                 giThisGamePos = NetPosToGamePos(0);
-                gbUseRegularCompression = gbUseDiffCompression = 1;
+                gbUseRegularCompression = gbUseDiffCompression = true;
                 if (giHighMemBuffer < OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT)
-                    gbUseRegularCompression = 0;
+                    gbUseRegularCompression = false;
                 for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
                     if (!gsNetPlayerInfo[player_h].useRegularCompression)
-                        gbUseRegularCompression = 0;
+                        gbUseRegularCompression = false;
                     if (!gsNetPlayerInfo[player_h].useDiffCompression)
-                        gbUseDiffCompression = 0;
+                        gbUseDiffCompression = false;
                 }
                 netBuffer_f.setup.useRegularCompression = gbUseRegularCompression;
                 netBuffer_f.setup.useDiffCompression = gbUseDiffCompression;
@@ -865,7 +865,7 @@ i32 oldmain(void) {
                         ShutDown(NULL);
                 }
                 memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
-                gbThisNetHumanPlayer[giThisGamePos] = 1;
+                gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
                 gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
             }
@@ -924,7 +924,7 @@ i32 oldmain(void) {
             }
             ComputeAdvNetControl();
             gbGameInitialized = true;
-            mainScreenLoaded_h = 0;
+            mainScreenLoaded_h = false;
             gpSoundManager->StopAllSamples(1);
             gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
             gMapX = 0;
@@ -935,10 +935,10 @@ i32 oldmain(void) {
             giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
 
             if (gbInCampaign && gpGame->m_campaignScenarioWon) {
-                giEndSequence = 1;
+                giEndSequence = true;
                 goto game_over;
             } else if (xIsPlayingExpansionCampaign && xCampaign.IsThisMapCompleted()) {
-                giEndSequence = 1;
+                giEndSequence = true;
                 goto game_over;
             } else {
                 if (gpExec->AddManager(gpAdvManager, -1))
@@ -948,7 +948,7 @@ i32 oldmain(void) {
                     gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
                 }
                 if (command_c == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
-                    bForceCheckTimeEvent = 0;
+                    bForceCheckTimeEvent = false;
                     gpGame->CheckForTimeEvent();
                 }
                 gpExec->MainLoop();
@@ -998,7 +998,7 @@ i32 oldmain(void) {
                     ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
-                mainScreenLoaded_h = 1;
+                mainScreenLoaded_h = true;
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
             } else {
                 i32 campaignResult = 0;
@@ -1019,11 +1019,9 @@ i32 oldmain(void) {
                             gpGame->m_campaignScore,
                             0,
                             HIGH_SCORE_CAMPAIGN,
-                            const_cast<char*>(
-                                gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                                    ? "Арчибальд"
-                                    : "Роланд"
-                            )
+                            gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                                ? "Арчибальд"
+                                : "Роланд"
                         );
                     }
                     if (campaignResult) {
@@ -1034,7 +1032,7 @@ i32 oldmain(void) {
                             );
                         gpGame->InitCampaignMap();
                         gbGameOver = false;
-                        bForceCheckTimeEvent = 1;
+                        bForceCheckTimeEvent = true;
                         goto initialize_game;
                     }
                 } else if (xIsPlayingExpansionCampaign) {
@@ -1058,7 +1056,7 @@ i32 oldmain(void) {
                             );
                         xCampaign.InitMap();
                         gbGameOver = false;
-                        bForceCheckTimeEvent = 1;
+                        bForceCheckTimeEvent = true;
                         goto initialize_game;
                     }
                 } else {
@@ -1078,7 +1076,7 @@ i32 oldmain(void) {
                         );
                         gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                         gpWindowManager->m_updateFlags = 1;
-                        mainScreenLoaded_h = 1;
+                        mainScreenLoaded_h = true;
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
                     } else {
                         gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
@@ -1104,12 +1102,12 @@ i32 oldmain(void) {
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                mainScreenLoaded_h = 1;
+                mainScreenLoaded_h = true;
             }
         }
 
         if (gbRemoteOn)
-            quit = 1;
+            quit = true;
     }
 
     ShutDown(NULL);
@@ -1129,7 +1127,7 @@ char toupper(char c) {
 i32 InterpretCommandLine(void) {
     i32 size;
     i32 i;
-    i32 helpRequested;
+    b32 helpRequested;
     gbTCPFirstTime = true;
     giTCPType = -1;
     giTCPHostStatus = -1;
@@ -1140,10 +1138,10 @@ i32 InterpretCommandLine(void) {
     giDebugLevel = 0;
     giShowIntro = 1;
     gbCheatMenus = false;
-    giScreenScroll = 1;
+    giScreenScroll = true;
     giLimitPlayer = 0;
     gbBlackoutPlayer = true;
-    helpRequested = 0;
+    helpRequested = false;
     strcpy(gMapName, "Chaos.mp2");
     strcpy(
         gFullMapName,
@@ -1155,7 +1153,7 @@ i32 InterpretCommandLine(void) {
         if (gcCommandLine[i] == ' ' && i + 1 < size
             && (gcCommandLine[i + 1] == '?' || gcCommandLine[i + 1] == 'h'
                 || gcCommandLine[i + 1] == 'H')) {
-            helpRequested = 1;
+            helpRequested = true;
         }
         if (gcCommandLine[i] == '/' && i + 1 < size) {
             switch (toupper(gcCommandLine[i + 1])) {
@@ -1289,7 +1287,7 @@ i32 InterpretCommandLine(void) {
 }
 
 MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
-    i32 handled = 0;
+    b32 handled = false;
     i32 idx;
     i32 menu;
     i32 helpIndex;
@@ -1337,23 +1335,23 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
             switch (msg.payload.keyboard.keyCode) {
                 case MENU_KEY_NEW:
                     gpWindowManager->m_dialogResult = MENU_NEW_GAME;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_LOAD:
                     gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_CREDITS:
                     gpWindowManager->m_dialogResult = MENU_CREDITS;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_HIGH_SCORES:
                     gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
-                    handled = 1;
+                    handled = true;
                     break;
                 case MENU_KEY_EXIT:
                     gpWindowManager->m_dialogResult = MENU_EXIT;
-                    handled = 1;
+                    handled = true;
                     break;
             }
         } else if (msg.type == INIT_MENU_MESSAGE) {
@@ -1410,7 +1408,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                             MENU_REDRAW_WIDTH,
                             MENU_REDRAW_HEIGHT
                         );
-                        handled = 1;
+                        handled = true;
                     }
                     break;
             }
@@ -1482,14 +1480,15 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-MessageDispatchResult NullHandler(struct tag_message& msg) {
+MessageDispatchResult NullHandler(struct tag_message& msg [[maybe_unused]]) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
-    i16 unusedLocal0L = 2, unusedLocal1H = 3, unusedLocal2D = 8, unusedLocal3A = 9;
-    i32 shouldClose = 0;
-    i32 unusedResult;
+    i16 unusedLocal0L [[maybe_unused]] = 2, unusedLocal1H [[maybe_unused]] = 3,
+        unusedLocal2D [[maybe_unused]] = 8, unusedLocal3A [[maybe_unused]] = 9;
+    b32 shouldClose = false;
+    i32 unusedResult [[maybe_unused]];
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
@@ -1509,12 +1508,12 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
                 switch (msg.payload.widget.id) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_recruitState = -1;
-                        shouldClose = 1;
+                        shouldClose = true;
                         break;
                     case EVENT_WINDOW_THIRD_BUTTON:
                         gpTownManager->m_recruitState = 0;
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        shouldClose = 1;
+                        shouldClose = true;
                         break;
                 }
                 break;
@@ -1530,7 +1529,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
@@ -1570,7 +1569,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     return gText;
 }
 
-char* GetBuildingName(FactionType race, BuildingSlotType building) {
+const char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
     if (building == BUILDING_SLOT_WELL_EXTRA)
@@ -1612,11 +1611,11 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     }
 }
 
-char* GetMonsterName(CreatureType monster) {
+const char* GetMonsterName(CreatureType monster) {
     return gArmyNames[(monster)];
 }
 
-char* GetMonsterPluralName(CreatureType monster) {
+const char* GetMonsterPluralName(CreatureType monster) {
     return gArmyNamesPlural[(monster)];
 }
 
@@ -2117,18 +2116,18 @@ void CheckEndGame(
     CheckEndGameForcedResult forcedResult,
     b32 dragonCityCaptured
 ) {
-    i32 showedDialog_o;
-    i32 defeated_m;
-    i32 allowNormalVictory;
-    i32 lastLivingPlayer_j;
+    b32 showedDialog_o;
+    b32 defeated_m;
+    b32 allowNormalVictory;
+    i32 lastLivingPlayer_j [[maybe_unused]];
     i32 survivingHumans_a;
     i32 lastHuman_a;
     i32 netHumanCount;
     i32 player;
     i32 heroIndex_m;
-    i32 winFlag;
+    b32 winFlag;
     playerData* rec_n;
-    i32 savedRemoteOn_o;
+    b32 savedRemoteOn_o;
     i32 numAlive;
     i32 sideBelow_i;
     i32 sideAbove;
@@ -2136,9 +2135,9 @@ void CheckEndGame(
     town* lossTown;
     town* victoryTownData;
     i32 currentDayIndex;
-    i32 enemyRemaining;
-    i32 hasRoland_j;
-    i32 hasDwarfTown;
+    b32 enemyRemaining;
+    b32 hasRoland_j;
+    b32 hasDwarfTown;
     char artifactName[END_GAME_TEXT_BUFFER_SIZE];
     hero* artifactHeroPtr_c;
     i32 artifactWinnerPerson;
@@ -2158,9 +2157,9 @@ void CheckEndGame(
     if (bInCheckEndGame)
         return;
 
-    bInCheckEndGame = 1;
+    bInCheckEndGame = true;
     savedRemoteOn_o = gbRemoteOn;
-    showedDialog_o = 0;
+    showedDialog_o = false;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         if (!gpGame->m_playerDead[player]) {
@@ -2169,7 +2168,7 @@ void CheckEndGame(
                 || (xIsPlayingExpansionCampaign && xCampaign.IsSpecialLossCondition(player))) {
                 PlayerDead(player);
                 if (player == giThisGamePos) {
-                    showedDialog_o = 1;
+                    showedDialog_o = true;
                     sprintf(gText, "Вы были исключены из игры!!!");
                     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else {
@@ -2213,7 +2212,7 @@ void CheckEndGame(
                     PlayerDead(player);
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
                         if (!showedDialog_o) {
-                            showedDialog_o = 1;
+                            showedDialog_o = true;
                             sprintf(
                                 gText,
                                 "%s, ваши герои покинули вас, а вы были изгнаны с позором из этих земель.",
@@ -2265,14 +2264,14 @@ void CheckEndGame(
         }
     }
 
-    winFlag = 0;
-    defeated_m = 0;
-    allowNormalVictory = 1;
+    winFlag = false;
+    defeated_m = false;
+    allowNormalVictory = true;
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
             && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO)) {
-        allowNormalVictory = 0;
+        allowNormalVictory = false;
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
@@ -2295,7 +2294,7 @@ void CheckEndGame(
                 if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player]
                     && gpGame->m_players[player].m_color
                            >= gpGame->m_mapHeader.victorySideThreshold) {
-                    winFlag = 1;
+                    winFlag = true;
                 }
             }
         } else if (sideAbove == 0) {
@@ -2303,16 +2302,16 @@ void CheckEndGame(
                 if (gbThisNetHumanPlayer[player] && !gpGame->m_playerDead[player]
                     && gpGame->m_players[player].m_color
                            < gpGame->m_mapHeader.victorySideThreshold) {
-                    winFlag = 1;
+                    winFlag = true;
                 }
             }
         }
         if (sideBelow_i == 0 || sideAbove == 0) {
             if (!winFlag) {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o && winFlag) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2325,14 +2324,14 @@ void CheckEndGame(
             gpGame->m_mapHeader.victoryTownY
         ));
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
-            && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
-            if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
-                winFlag = 1;
+            && (gbHumanPlayer[(victoryTownData->m_owner)] || gpGame->m_mapHeader.computerAlsoWins)) {
+            if (gbThisNetHumanPlayer[(victoryTownData->m_owner)]) {
+                winFlag = true;
             } else {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 if (winFlag) {
                     sprintf(
                         gText,
@@ -2355,10 +2354,10 @@ void CheckEndGame(
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[lossTown->m_owner]) {
-            defeated_m = 1;
+        if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[(lossTown->m_owner)]) {
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "%s пал! Все потеряно.", lossTown->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2378,12 +2377,12 @@ void CheckEndGame(
             }
             if (winnerPlayer_m != END_GAME_NO_PLAYER) {
                 if (gbThisNetHumanPlayer[(winnerPlayer_m)]) {
-                    winFlag = 1;
+                    winFlag = true;
                 } else {
-                    defeated_m = 1;
+                    defeated_m = true;
                 }
                 if (!showedDialog_o) {
-                    showedDialog_o = 1;
+                    showedDialog_o = true;
                     if (winFlag) {
                         sprintf(
                             gText,
@@ -2406,10 +2405,10 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         winningHeroEntry_g = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry_g->m_owner < 0 || winningHeroEntry_g->m_owner >= GAME_PLAYER_COUNT
-            || gbHumanPlayer[winningHeroEntry_g->m_owner]) {
-            winFlag = 1;
+            || gbHumanPlayer[(winningHeroEntry_g->m_owner)]) {
+            winFlag = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(
                     gText,
                     "%s - вражеский герой, у вас в плену! Ваше задание завершено.",
@@ -2423,10 +2422,10 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         lossHero_k = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
         if (lossHero_k->m_owner < 0 || lossHero_k->m_owner >= GAME_PLAYER_COUNT
-            || !gbHumanPlayer[lossHero_k->m_owner]) {
-            defeated_m = 1;
+            || !gbHumanPlayer[(lossHero_k->m_owner)]) {
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "%s - ваш герой, был повержен.  Вы провалили ваше задание.", lossHero_k->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2437,9 +2436,9 @@ void CheckEndGame(
         if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
                 + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
             > gpGame->m_mapHeader.lossConditionValue) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "Вы не успели завершить ваше задание в срок. Все потеряно.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2476,12 +2475,12 @@ void CheckEndGame(
         }
         if (artifactWinnerPerson != END_GAME_NO_PLAYER) {
             if (gbThisNetHumanPlayer[artifactWinnerPerson]) {
-                winFlag = 1;
+                winFlag = true;
             } else {
-                defeated_m = 1;
+                defeated_m = true;
             }
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
                     sprintf(
                         artifactName,
@@ -2510,17 +2509,17 @@ void CheckEndGame(
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_DWARF_SCENARIO) {
-        hasDwarfTown = 0;
+        hasDwarfTown = false;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
                 == FACTION_SORCERESS) {
-                hasDwarfTown = 1;
+                hasDwarfTown = true;
             }
         }
         if (!hasDwarfTown) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(
                     gText,
                     "Все города гномов пали. Это сокрушительное поражение! Вы проиграли."
@@ -2533,9 +2532,9 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO
         && dragonCityCaptured) {
-        winFlag = 1;
+        winFlag = true;
         if (!showedDialog_o) {
-            showedDialog_o = 1;
+            showedDialog_o = true;
             sprintf(gText, "Драконий город пал! Теперь вы Повелитель драконов.");
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -2544,18 +2543,18 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                == END_GAME_ROLAND_CAPTURE_SCENARIO) {
-        hasRoland_j = 0;
+        hasRoland_j = false;
         for (player = 0; player < GAME_HERO_COUNT; player++) {
             if (gpGame->m_heroRecs[player].m_portrait == CAMPAIGN_HERO_ROLAND
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= GAME_PLAYER_COUNT - 1) {
-                hasRoland_j = 1;
+                hasRoland_j = true;
             }
         }
         if (!hasRoland_j) {
-            defeated_m = 1;
+            defeated_m = true;
             if (!showedDialog_o) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "Роланд пленен! Все потеряно.");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2565,18 +2564,18 @@ void CheckEndGame(
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                == END_GAME_ROLAND_CAPTURE_SCENARIO) {
-        enemyRemaining = 0;
+        enemyRemaining = false;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
                 && gpGame->m_players[player].m_color != PLAYER_COLOR_BLUE
                 && gpGame->m_players[player].m_color != PLAYER_COLOR_YELLOW) {
-                enemyRemaining = 1;
+                enemyRemaining = true;
             }
         }
         if (!enemyRemaining) {
-            winFlag = 1;
+            winFlag = true;
             if (!showedDialog_o && winFlag) {
-                showedDialog_o = 1;
+                showedDialog_o = true;
                 sprintf(gText, "Враг разбит, а ваша армия празднует триумф!");
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
@@ -2585,11 +2584,11 @@ void CheckEndGame(
 
     if (defeated_m) {
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
     if (winFlag) {
         gbGameOver = true;
-        giEndSequence = 1;
+        giEndSequence = true;
     }
 
     if (numAlive == 1 || survivingHumans_a == 0
@@ -2597,34 +2596,34 @@ void CheckEndGame(
         if (survivingHumans_a == 1 && gbThisNetHumanPlayer[lastHuman_a]) {
             if (allowNormalVictory) {
                 gbGameOver = true;
-                giEndSequence = 1;
+                giEndSequence = true;
             }
         } else {
             gbGameOver = true;
-            giEndSequence = 0;
+            giEndSequence = false;
         }
     }
 
     if (savedRemoteOn_o && netHumanCount == 0) {
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
     if (forcedResult == END_GAME_FORCE_VICTORY) {
-        winFlag = 1;
+        winFlag = true;
         gbGameOver = true;
-        giEndSequence = 1;
+        giEndSequence = true;
     }
     if (forcedResult == END_GAME_FORCE_DEFEAT) {
-        defeated_m = 1;
+        defeated_m = true;
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
     }
 
     if (giEndSequence == 1 && gbGameOver) {
-        winFlag = 1;
+        winFlag = true;
     }
     if (giEndSequence == 0 && gbGameOver) {
-        defeated_m = 1;
+        defeated_m = true;
     }
 
     if (gbInCampaign && winFlag) {
@@ -2652,7 +2651,7 @@ void CheckEndGame(
             carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
 
-        if (carryoverHeroId != END_GAME_NO_PLAYER) {
+        if (carryoverHeroId != static_cast<u32>(END_GAME_NO_PLAYER)) {
             for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
@@ -2660,8 +2659,8 @@ void CheckEndGame(
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
                 if (carryoverHeroId == CAMPAIGN_SWITCH_VICTORY_VALUE
-                    || (gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
-                               .m_portrait)
+                    || static_cast<u32>((gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
+                               .m_portrait))
                            == carryoverHeroId) {
                     break;
                 }
@@ -2698,14 +2697,14 @@ void CheckEndGame(
         xCampaign.Autosave();
     }
 
-    bInCheckEndGame = 0;
+    bInCheckEndGame = false;
 }
 
 void QuickViewWait(void) {
     tag_message event;
-    i32 done;
+    b32 done;
     gpMouseManager->ReallyHidePointer();
-    done = 0;
+    done = false;
     while (!done) {
         PollSound();
         Process1WindowsMessage();
@@ -2718,13 +2717,13 @@ void QuickViewWait(void) {
 
 void InitVars(void) {
     i32 i;
-    i32 j;
+    i32 j [[maybe_unused]];
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
     gpGame->m_viewArmyResult = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
-    gpGame->m_newGameInitialized = 0;
+    gpGame->m_newGameInitialized = false;
     gbInNewGameSetup = false;
     strcpy(cNetBoxLine[0], "");
     strcpy(cNetBoxLine[1], "");
@@ -2753,14 +2752,14 @@ void InitVars(void) {
 }
 
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
-    i32 mixedUndead4;
+    b32 mixedUndead4;
     i32 alignment_e;
     ArmyGroupAlignmentResult homogeneous5;
     i32 modifierStart;
     char description7[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 slot8;
 
-    mixedUndead4 = 0;
+    mixedUndead4 = false;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) > 0)
         sprintf(description7, cMoraleInfo[(MORALE_INFO_GOOD)]);
     else {
@@ -2778,7 +2777,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
     if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
         strcat(gText, cMoraleInfo[(INFO_SOME_UNDEAD)]);
-        mixedUndead4 = 1;
+        mixedUndead4 = true;
     }
 
     homogeneous5 = h->m_army.IsHomogeneous(-1);
@@ -2878,7 +2877,7 @@ showDialog:
 
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
     char description4[MORALE_LUCK_DESCRIPTION_SIZE];
-    i32 luckValue;
+    i32 luckValue [[maybe_unused]];
     i32 modifierStart;
 
     if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
@@ -2963,7 +2962,7 @@ i32 AddScoreToHighScore(
     i32 days,
     i32 scenario,
     HighScoreType highScoreType,
-    char* scenarioName
+    const char* scenarioName
 ) {
     i32 dest_o;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
@@ -2971,9 +2970,9 @@ i32 AddScoreToHighScore(
     i32 entry_a;
     char filename_h[HIGH_SCORE_FILENAME_LENGTH];
     char playerName_c[HIGH_SCORE_INPUT_NAME_SIZE];
-    i32 missingFile_e;
+    b32 missingFile_e;
 
-    missingFile_e = 0;
+    missingFile_e = false;
     if (highScoreType == HIGH_SCORE_STANDARD)
         sprintf(
             filename_h,
@@ -2989,7 +2988,7 @@ i32 AddScoreToHighScore(
 
     file_c = open(filename_h, HIGH_SCORE_FILE_READ_FLAGS);
     if (file_c == -1)
-        missingFile_e = 1;
+        missingFile_e = true;
     if (missingFile_e) {
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
             memset(&entries_a[entry_a], 0, sizeof(HighScoreEntry));
@@ -3049,7 +3048,7 @@ i32 AddScoreToHighScore(
     return 0;
 }
 
-void BVResMsg(char* s, ResourceType res, i32 qty) {
+void BVResMsg(const char* s, ResourceType res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
@@ -3058,7 +3057,7 @@ void BVResMsg(char* s, ResourceType res, i32 qty) {
     gpAdvManager->UpdBottomView(1, 1, 1);
 }
 
-void GOut(char* str) {
+void GOut(const char* str) {
     if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
@@ -3105,29 +3104,29 @@ i32 WaitForOtherPlayer(void) {
     return result;
 }
 
-void PopNetBox(char* text, i32 netPlayer) {
-    i32 textY_h;
+void PopNetBox(const char* text, i32 netPlayer) {
+    i32 textY_h [[maybe_unused]];
     i32l messageTime_b;
     heroWindow* netWindow_j;
     i32 result_p;
     i32 textWidth_b;
-    i32 textX_k;
+    i32 textX_k [[maybe_unused]];
     i32 savedShowIt_p;
-    i32 updateInput_f;
+    b32 updateInput_f;
     i32 inputLength_a;
     char inputText_b[BOX_TEXT_LENGTH];
-    i32 exitForIncomingData_c;
-    i32 sendText_b;
+    b32 exitForIncomingData_c;
+    b32 sendText_b;
     tag_message event_o;
     tag_message updateMessage_i;
-    i32 firstLineId_a;
+    i32 firstLineId_a [[maybe_unused]];
     i32 delay_e;
-    i32 lineTextLimit_g;
-    i32 done_a;
-    i32 redrawLines_l;
+    i32 lineTextLimit_g [[maybe_unused]];
+    b32 done_a;
+    b32 redrawLines_l;
     i32 redrawSavedShowIt_a;
     KbRemotePacket* remoteData_g;
-    i32 redrawAdventure_o;
+    b32 redrawAdventure_o;
     i32 cursorState_j;
 
     if (!gbRemoteOn)
@@ -3196,13 +3195,13 @@ void PopNetBox(char* text, i32 netPlayer) {
     netWindow_j->BroadcastMessage(updateMessage_i);
 
     gpWindowManager->AddWindow(netWindow_j, -1, 1);
-    exitForIncomingData_c = 0;
-    done_a = 0;
-    updateInput_f = 1;
+    exitForIncomingData_c = false;
+    done_a = false;
+    updateInput_f = true;
     cursorState_j = 0;
-    sendText_b = 0;
-    redrawLines_l = 1;
-    redrawAdventure_o = 0;
+    sendText_b = false;
+    redrawLines_l = true;
+    redrawAdventure_o = false;
     strcpy(inputText_b, "");
     gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_ASCII);
 
@@ -3219,10 +3218,10 @@ void PopNetBox(char* text, i32 netPlayer) {
                             bShowIt = savedShowIt_p;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                             bShowIt = 1;
-                            redrawAdventure_o = 1;
+                            redrawAdventure_o = true;
                         }
                         gbLeaveNetBoxAlone = false;
-                        updateInput_f = 1;
+                        updateInput_f = true;
                         break;
                 }
             } else if (remoteData_g->type != REMOTE_MESSAGE_RELIABLE) {
@@ -3241,7 +3240,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                             gText,
                             gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].m_color
                         );
-                        redrawLines_l = 1;
+                        redrawLines_l = true;
                         if (messageTime_b != 0)
                             messageTime_b = KBTickCount();
                         break;
@@ -3250,8 +3249,8 @@ void PopNetBox(char* text, i32 netPlayer) {
                             "[ Входящая информация, необходимо выйти... ]",
                             BOX_DEFAULT_COLOR
                         );
-                        redrawLines_l = 1;
-                        exitForIncomingData_c = 1;
+                        redrawLines_l = true;
+                        exitForIncomingData_c = true;
                         break;
                 }
             }
@@ -3265,16 +3264,16 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (event_o.payload.keyboard.keyCode) {
                     case BOX_KEY_ESCAPE:
                     case BOX_KEY_F1:
-                        done_a = 1;
+                        done_a = true;
                         break;
                     case BOX_KEY_BACKSPACE:
                         if (inputLength_a > 0)
                             inputLength_a--;
-                        updateInput_f = 1;
+                        updateInput_f = true;
                         cursorState_j = 1;
                         break;
                     case BOX_KEY_ENTER:
-                        sendText_b = 1;
+                        sendText_b = true;
                         break;
                     default:
                         if (event_o.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
@@ -3288,7 +3287,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                                 inputText_b[inputLength_a] =
                                     static_cast<char>(event_o.payload.keyboard.keyCode & 0xff);
                                 inputLength_a++;
-                                updateInput_f = 1;
+                                updateInput_f = true;
                                 cursorState_j = 0;
                             }
                         }
@@ -3297,10 +3296,10 @@ void PopNetBox(char* text, i32 netPlayer) {
 
         if (!updateInput_f && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < KBTickCount()) {
             cursorState_j = 1 - cursorState_j;
-            updateInput_f = 1;
+            updateInput_f = true;
         }
         if (sendText_b) {
-            sendText_b = 0;
+            sendText_b = false;
             inputText_b[inputLength_a] = 0;
             AddNetBoxLine(inputText_b, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result_p = TransmitRemoteData(
@@ -3316,12 +3315,12 @@ void PopNetBox(char* text, i32 netPlayer) {
                 ShutDown(NULL);
             inputLength_a = 0;
             strcpy(inputText_b, "");
-            updateInput_f = 1;
-            redrawLines_l = 1;
+            updateInput_f = true;
+            redrawLines_l = true;
         }
 
         if (redrawLines_l) {
-            redrawLines_l = 0;
+            redrawLines_l = false;
             updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
@@ -3354,7 +3353,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         }
 
         if (updateInput_f) {
-            updateInput_f = 0;
+            updateInput_f = false;
             glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + BOX_CURSOR_DELAY;
             if (cursorState_j)
                 inputText_b[inputLength_a] = '_';
@@ -3371,13 +3370,13 @@ void PopNetBox(char* text, i32 netPlayer) {
         }
 
         if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < KBTickCount())
-            done_a = 1;
+            done_a = true;
         if (exitForIncomingData_c) {
             for (delay_e = 0; delay_e < BOX_EXIT_DELAY_STEPS; delay_e++) {
                 PollSound();
                 DelayMilli(BOX_EXIT_DELAY);
             }
-            done_a = 1;
+            done_a = true;
         }
     }
 
@@ -3396,7 +3395,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     bShowIt = savedShowIt_p;
 }
 
-void AddNetBoxLine(char* str, char color) {
+void AddNetBoxLine(const char* str, char color) {
     if (color < 0 || color > BOX_MAX_COLOR)
         color = BOX_DEFAULT_COLOR;
 
@@ -3411,12 +3410,12 @@ void AddNetBoxLine(char* str, char color) {
     cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
 
-void ShutDown(char* msg) {
+void ShutDown(const char* msg) {
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
     LogStr("Shutdown");
-    bInShutDown = 1;
+    bInShutDown = true;
     gbClosingApp = true;
     buf[0] = 0;
     gpMouseManager->SetColorMice(0);
@@ -3473,7 +3472,7 @@ typedef enum FileErrorConstant {
     FILE_ERROR_BUFFER_SIZE = 500
 } FileErrorConstant;
 
-void FileError(char* filename) {
+void FileError(const char* filename) {
     char buf[FILE_ERROR_BUFFER_SIZE];
     i32 err;
     char buf1[FILE_ERROR_BUFFER_SIZE];
@@ -3567,7 +3566,7 @@ void SmackFade(u8* src, u8* dst) {
 
 void ShowCongrats(HighScoreType highScoreType) {
     u8 palette[MISC_PALETTE_BYTE_COUNT];
-    i32 unused;
+    i32 unused [[maybe_unused]];
     i32 baseScore;
     i32 realScore;
     char ratingText[CONGRATS_RATING_LENGTH];
@@ -3641,8 +3640,8 @@ void ShowCongrats(HighScoreType highScoreType) {
 }
 
 void CongratsWait(void) {
-    i32 command = 0;
-    i32 done = 0;
+    i32 command [[maybe_unused]] = 0;
+    b32 done = false;
     tag_message msg;
     gpInputManager->Flush();
     while (!done) {
@@ -3652,7 +3651,7 @@ void CongratsWait(void) {
         if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN
             || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN
             || msg.type == MESSAGE_RIGHT_BUTTON_UP)
-            done = 1;
+            done = true;
     }
 }
 
@@ -3661,7 +3660,7 @@ typedef enum SamplePlaybackConstant {
     SAMPLE_DEFAULT_WAIT_TIME = 4000
 } SamplePlaybackConstant;
 
-SAMPLE2 LoadPlaySample(char* name) {
+SAMPLE2 LoadPlaySample(const char* name) {
     SAMPLE2 ss;
     ss = gpResourceManager->GetSample(name);
     if (ss) {
@@ -3706,7 +3705,7 @@ void MemError(void) {
     ShutDown(gText);
 }
 
-char* GetTownName(i32 i) {
+const char* GetTownName(i32 i) {
     town* t = GetCastleRec(i);
     return t->m_name;
 }
@@ -3737,14 +3736,14 @@ i32 GameUnsaved(void) {
 }
 
 i32 HandleAppSpecificMenuCommands(i32 command) {
-    i32 menuChanged;
+    b32 menuChanged;
     hero* currentHeroRec;
     i32 loopIndex;
     HeroSecondarySkill secondarySkillIndex;
     HeroSkillLevel ssLevel;
     i32 formationHexIndex;
 
-    menuChanged = 0;
+    menuChanged = false;
     currentHeroRec = NULL;
     if (gpCurPlayer != NULL && gpCurPlayer->CurrentHero() != -1)
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
@@ -3833,7 +3832,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             goto adjustMusic;
         adjustMusic:
             gpSoundManager->AdjustMusicVolumes();
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_SOUND_FIRST:
@@ -3871,16 +3870,16 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             goto adjustSound;
         adjustSound:
             gpSoundManager->AdjustSoundVolumes();
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_TOGGLE_ROUTE:
             gConfig.showRoute = 1 - gConfig.showRoute;
-            menuChanged = 1;
+            menuChanged = true;
             break;
         case APP_MENU_TOGGLE_BLACKOUT:
             gConfig.blackoutComputer = 1 - gConfig.blackoutComputer;
-            menuChanged = 1;
+            menuChanged = true;
             break;
 
         case APP_MENU_VIEW_WORLD:
@@ -4132,7 +4131,12 @@ void UpdateAppSpecificMenus(void* hMenu) {
         UpdateSystemOptionsMenu();
 }
 
-void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
+void EarlyResizeWindow(
+    i32 x [[maybe_unused]],
+    i32 y [[maybe_unused]],
+    i32 w [[maybe_unused]],
+    i32 h [[maybe_unused]]
+) {
     if (gbClosingApp)
         return;
 }
@@ -4189,29 +4193,29 @@ void SetupDynamicWindow(
     i32 windowType
 ) {
     i32 leftOffset_p;
-    i32 bottomCornerPaddingNum_j;
+    i32 bottomCornerPaddingNum_j [[maybe_unused]];
     i32 numRows;
     widget* newWidgetTemp_p;
     i32 columnsSize_h;
     i32 topOffsetNum_n;
-    i32 contentXPaddingCount_m;
+    i32 contentXPaddingCount_m [[maybe_unused]];
     i32 centeredHeightCount_k;
-    i32 centeredPadding_c;
-    i32 topCornerPaddingCount;
+    i32 centeredPadding_c [[maybe_unused]];
+    i32 topCornerPaddingCount [[maybe_unused]];
     i32 bottomOffsetLocal_p;
     i32 rightOffset_p;
-    i32 contentYPadding;
+    i32 contentYPadding [[maybe_unused]];
     i32 edge_d;
     i32 tileRowPos_k;
     i32 centeredWidthValue_b;
-    i32 leftCornerPaddingLocal_e;
-    i32 rightCornerPaddingValue_j;
-    i32 stoneWidgetColorSize_c;
+    i32 leftCornerPaddingLocal_e [[maybe_unused]];
+    i32 rightCornerPaddingValue_j [[maybe_unused]];
+    i32 stoneWidgetColorSize_c [[maybe_unused]];
     i32 columnIndex_k;
-    i32 bottomEdgeOffset_l;
-    i32 tileWidth_k;
-    i32 tileHeight_h;
-    i32 topEdgeInset;
+    i32 bottomEdgeOffset_l [[maybe_unused]];
+    i32 tileWidth_k [[maybe_unused]];
+    i32 tileHeight_h [[maybe_unused]];
+    i32 topEdgeInset [[maybe_unused]];
 
     tileWidth_k = TILE_SIZE;
     tileHeight_h = TILE_SIZE;
@@ -4411,7 +4415,7 @@ void SetupDynamicWindow(
 void TestDynamicWindow(i32 p1, i32 p2) {
     heroWindow* d;
     i32 e, a, b, u, r, c;
-    i32 t;
+    b32 t;
     SetupDynamicWindow(
         0,
         0,
@@ -4430,7 +4434,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
         DYNAMIC_WINDOW_STONE
     );
     gpWindowManager->AddWindow(d, -1, 1);
-    t = 0;
+    t = false;
     gpInputManager->Flush();
     while (!t) {
         Process1WindowsMessage();
@@ -4438,7 +4442,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
             case MESSAGE_KEY_DOWN:
             case MESSAGE_LEFT_BUTTON_DOWN:
             case MESSAGE_RIGHT_BUTTON_DOWN:
-                t = 1;
+                t = true;
         }
     }
     gpWindowManager->RemoveWindow(d);
@@ -4454,17 +4458,20 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
     } else {
         pe.netPosition = gbGamePosToNetPos[pos];
         pe.gamePosition = pos;
-        pe.updateNetworkControl = 0;
-        pe.timedOut = 0;
-        pe.eliminated = 1;
-        pe.hostReported = 0;
+        pe.updateNetworkControl = false;
+        pe.timedOut = false;
+        pe.eliminated = true;
+        pe.hostReported = false;
         ReceiveRemotePlayerExit(pe);
     }
 }
 
-typedef enum PlayerExitLocalConstant {
+typedef enum PlayerExitNetPosition {
     PLAYER_EXIT_HOST_NET_POSITION = 0,
-    PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1,
+    PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1
+} PlayerExitNetPosition;
+
+typedef enum PlayerExitLocalConstant {
     PLAYER_EXIT_DIRECT_PLAYER_COUNT = 2,
     PLAYER_EXIT_MESSAGE_LENGTH = 500,
     PLAYER_EXIT_TRANSMIT_DELAY = 500,
@@ -4474,7 +4481,7 @@ typedef enum PlayerExitLocalConstant {
 
 void HandleRemoteSuddenExit(void) {
     SPlayerExit exitInfo;
-    i32 destination;
+    PlayerExitNetPosition destination;
     if (!gbGameInitialized)
         return;
     if (!gbRemoteOn)
@@ -4482,8 +4489,8 @@ void HandleRemoteSuddenExit(void) {
     exitInfo.netPosition = static_cast<i8>(giThisNetPos);
     exitInfo.gamePosition = static_cast<i8>(giThisGamePos);
     exitInfo.updateNetworkControl = gbThisNetGotAdventureControl;
-    exitInfo.timedOut = 0;
-    exitInfo.eliminated = 0;
+    exitInfo.timedOut = false;
+    exitInfo.eliminated = false;
     if (giThisNetPos == PLAYER_EXIT_HOST_NET_POSITION)
         destination = PLAYER_EXIT_FIRST_GUEST_NET_POSITION;
     else
@@ -4507,16 +4514,16 @@ void DropDownToOnePlayer(void) {
     giNumHumanPlayers = 1;
     for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
         if (i != giThisNetPos)
-            gbHumanPlayer[i] = 0;
+            gbHumanPlayer[i] = false;
     ComputeAdvNetControl();
 }
 
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32 forwardedReport) {
-    i32 showExitMessage_i;
+    b32 showExitMessage_i;
     char playerExitMessage_k[PLAYER_EXIT_MESSAGE_LENGTH];
     i32 netPosition;
 
-    showExitMessage_i = 0;
+    showExitMessage_i = false;
     if (!forwardedReport) {
         if (exitInfo.eliminated) {
             if (exitInfo.netPosition == giThisNetPos) {
@@ -4524,7 +4531,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 sprintf(gText, "Вы были исключены из игры!!!");
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 gbGameOver = true;
-                giEndSequence = 0;
+                giEndSequence = false;
                 return;
             }
 
@@ -4574,13 +4581,13 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                     gsNetPlayerInfo[exitInfo.netPosition].name
                 );
             }
-            showExitMessage_i = 1;
+            showExitMessage_i = true;
         }
     }
 
     if (giThisNetPos > exitInfo.netPosition)
         giThisNetPos--;
-    gbHumanPlayer[exitInfo.gamePosition] = 0;
+    gbHumanPlayer[exitInfo.gamePosition] = false;
 
     for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
@@ -4616,19 +4623,19 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
 }
 
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
-    i32 localPlayerLost_e;
-    i32 sendReturn;
-    i32 unusedPacketResult_g;
+    b32 localPlayerLost_e;
+    i32 sendReturn [[maybe_unused]];
+    i32 unusedPacketResult_g [[maybe_unused]];
     i32 recipient;
 
-    localPlayerLost_e = 0;
+    localPlayerLost_e = false;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
     gpGame->SaveGame("Игрок Вышел", 1, 0);
 
     if (exitInfo.eliminated) {
-        exitInfo.continueGame = 1;
+        exitInfo.continueGame = true;
         if (exitInfo.netPosition == giThisNetPos) {
-            localPlayerLost_e = 1;
+            localPlayerLost_e = true;
             goto exitInfoProcessed;
         }
         sprintf(gText, "%s сокрушен!", gsNetPlayerInfo[exitInfo.netPosition].name);
@@ -4644,7 +4651,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             -1,
             PLAYER_EXIT_MESSAGE_TIME
         );
-        exitInfo.continueGame = 1;
+        exitInfo.continueGame = true;
     } else {
         if (exitInfo.timedOut) {
             sprintf(
@@ -4681,7 +4688,7 @@ exitInfoProcessed:
         if (localPlayerLost_e)
             goto playerExitHandled;
         giNumHumanPlayers--;
-        gbHumanPlayer[exitInfo.gamePosition] = 0;
+        gbHumanPlayer[exitInfo.gamePosition] = false;
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
@@ -4711,7 +4718,7 @@ playerExitHandled:
         RemoteCleanup();
         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         gbGameOver = true;
-        giEndSequence = 0;
+        giEndSequence = false;
         return;
     }
     if (!exitInfo.continueGame) {
@@ -4753,7 +4760,7 @@ i32 GetManaCost(SpellType spell, hero* h) {
 }
 
 void SetWinText(heroWindow* j, i32 id) {
-    i32 a = 0;
+    i32 a [[maybe_unused]] = 0;
     i32 i;
     tag_message msg;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
@@ -4881,7 +4888,7 @@ inline i32 NormalDialogCenterOffset(i32 extent) {
 }
 
 void NormalDialog(
-    char* text,
+    const char* text,
     i32 dialogType,
     i32 windowX,
     i32 windowY,
@@ -4896,20 +4903,20 @@ void NormalDialog(
     i32 labelY_k;
     widget* borderWidget_k;
     i32 resourceFrame_n;
-    i16 showMessage_d;
+    i16 showMessage_d [[maybe_unused]];
     i32 textWidgetId;
     heroWindow* savedNormalDialogWindow;
     i32 savedPointerFrame;
     i32 windowHeight_h;
     char* orText;
-    i32 showPrimaryBonus;
+    b32 showPrimaryBonus;
     tag_message message_b;
     i32 savedSecondResourceValue_n;
     i32 savedFirstResourceValue;
     widget* textPanel_j;
     i32 resourceSlot;
     i32 resourceY_f;
-    i32 iconHeight_h;
+    i32 iconHeight_h [[maybe_unused]];
     i32 lineCount;
     i32 dialogContentHeight;
     i32 resourceCenterX_c;
@@ -4926,7 +4933,7 @@ void NormalDialog(
     i32 resourceType_a[NORMAL_DIALOG_RESOURCE_COUNT];
     MouseCursorType savedPointerType_o;
     widget* iconPanel_a;
-    i32 panelHeight_d;
+    i32 panelHeight_d [[maybe_unused]];
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4942,13 +4949,13 @@ void NormalDialog(
     textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
     resourceImageWidth = 0;
     iconHeight_h = 0;
-    showPrimaryBonus = 0;
+    showPrimaryBonus = false;
     showMessage_d = 1;
 
     if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL
         && firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
         firstResourceValue -= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET;
-        showPrimaryBonus = 1;
+        showPrimaryBonus = true;
     }
     if (firstResourceType >= NORMAL_DIALOG_MONSTER + 1
         && firstResourceType <= NORMAL_DIALOG_PRIMARY_SKILL - 1) {
@@ -5585,8 +5592,8 @@ void NormalDialog(
     pNormalDialogWindow = savedNormalDialogWindow;
 }
 
-void UpdateNormalDialog(char* text) {
-    i16 show = 1;
+void UpdateNormalDialog(const char* text) {
+    i16 show [[maybe_unused]] = 1;
     tag_message evt;
     evt.type = MESSAGE_WIDGET;
     evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -5828,7 +5835,7 @@ u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
-char* gTilesetFiles[(TILESET_COUNT)] = {
+const char* gTilesetFiles[(TILESET_COUNT)] = {
     "",
     "",
     "",
@@ -6159,7 +6166,7 @@ font* bigFont = NULL;
 b32 gbReturnAfterComputeExtent = false;
 b32 gbAllowTextEntryEscape = true;
 WindowColorCycleMode giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-i32 giScreenScroll = 1;
+b32 giScreenScroll = true;
 i32 giMenuCommand = -1;
 b32 gbSendMouseMoveMessages = false;
 b32 gbColorMice = true;
@@ -6174,7 +6181,7 @@ u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
 u8 giMapSizes[KB_MAP_SIZE_COUNT] =
     {MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE, MAP_DIMENSION_XLARGE};
 b32 gbUseEvilInterface = false;
-char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
+const char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {
         "advbord.icn",
         "advborde.icn"
@@ -6328,7 +6335,7 @@ char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\ANIM2\\";
 char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
 char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\TRACKS2\\";
-b32 gbPutzingWithMouseCtr = false;
+i32 gbPutzingWithMouseCtr = 0;
 float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
 icon* gShingleAnim = NULL;
 i32 iNextShingleAnim = 0;
@@ -6340,7 +6347,7 @@ b32 gbDrawWindowBackground = true;
 b32 gbCheatMenus = false;
 b32 gbUseWaveout = false;
 b32 gbShowAllMaps = false;
-char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+const char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6450,24 +6457,24 @@ i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
 i32 giDebugLevel = 0;
 i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
-    {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
-    {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 463}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 639}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
-    {{250, 824}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
-    {{250, 1130}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {{300, 1350}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {{300, 1830}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{375, 2273}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{600, 4704}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
-    {{1000, 5822}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
-    {{40, 109}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MONSTER_FLAGS_NONE},
-    {{140, 299}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{175, 512}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 865}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 1065}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
-    {{500, 2070}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
-    {{600, 1921},
+    {{20, {33}}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", {MONSTER_FLAGS_NONE}},
+    {{150, {312}}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {463}}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {639}}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
+    {{250, {824}}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
+    {{250, {1130}}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
+    {{300, {1350}}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
+    {{300, {1830}}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
+    {{375, {2273}}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
+    {{600, {4704}}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
+    {{1000, {5822}}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
+    {{40, {109}}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", {MONSTER_FLAGS_NONE}},
+    {{140, {299}}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{175, {512}}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {865}}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", {MONSTER_ATTRIBUTE_WIDE}},
+    {{300, {1065}}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", {MONSTER_FLAGS_NONE}},
+    {{500, {2070}}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", {MONSTER_FLAGS_NONE}},
+    {{600, {1921}},
      32,
      3,
      40,
@@ -6479,8 +6486,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      7,
      8,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2337},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{700, {2337}},
      33,
      3,
      40,
@@ -6492,8 +6499,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      9,
      16,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{750, 6074},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{750, {6074}},
      58,
      2,
      80,
@@ -6505,14 +6512,14 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      24,
      0,
      "cycl",
-     MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 129}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
-    {{200, 500}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {{250, 716}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {{250, 554}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{300, 658}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{350, 1290}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{400, 1428},
+     {MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{50, {129}}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", {MONSTER_ATTRIBUTE_FLYING}},
+    {{200, {500}}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
+    {{250, {716}}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
+    {{250, {554}}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{300, {658}}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{350, {1290}}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", {MONSTER_ATTRIBUTE_RANGED}},
+    {{400, {1428}},
      36,
      3,
      25,
@@ -6524,9 +6531,9 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      8,
      16,
      "drui",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{500, 2702}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
-    {{1500, 10114},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{500, {2702}}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", {MONSTER_ATTRIBUTE_WIDE}},
+    {{1500, {10114}},
      56,
      1,
      100,
@@ -6538,8 +6545,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{60, 154},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{60, {154}},
      26,
      8,
      5,
@@ -6551,9 +6558,9 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {{200, 579}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
-    {{300, 1101},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {579}}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", {MONSTER_ATTRIBUTE_FLYING}},
+    {{300, {1101}},
      37,
      4,
      25,
@@ -6565,11 +6572,11 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{400, 1751}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {{500, 2252}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {{800, 2878}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
-    {{3000, 18153},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
+    {{400, {1751}}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
+    {{500, {2252}}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
+    {{800, {2878}}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", {MONSTER_ATTRIBUTE_WIDE}},
+    {{3000, {18153}},
      55,
      1,
      200,
@@ -6581,8 +6588,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{3500, 22962},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{3500, {22962}},
      68,
      1,
      250,
@@ -6594,8 +6601,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{4000, 28144},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{4000, {28144}},
      74,
      1,
      300,
@@ -6607,12 +6614,12 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 134}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {{150, 493}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 951}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
-    {{350, 1324}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
-    {{400, 1739},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{50, {134}}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", {MONSTER_ATTRIBUTE_RANGED}},
+    {{150, {493}}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", {MONSTER_ATTRIBUTE_WIDE}},
+    {{300, {951}}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
+    {{350, {1324}}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
+    {{400, {1739}},
      43,
      3,
      40,
@@ -6624,11 +6631,11 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{600, 1935}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2469}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{2000, 9589}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
-    {{5000, 22933},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
+    {{600, {1935}}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", {MONSTER_ATTRIBUTE_RANGED}},
+    {{700, {2469}}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", {MONSTER_ATTRIBUTE_RANGED}},
+    {{2000, {9589}}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", {MONSTER_FLAGS_NONE}},
+    {{5000, {22933}},
      79,
      1,
      300,
@@ -6640,9 +6647,9 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      30,
      24,
      "titn",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{75, 203}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
-    {{150, 310},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{75, {203}}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{150, {310}},
      21,
      6,
      15,
@@ -6654,8 +6661,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{200, 506},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{200, {506}},
      25,
      6,
      20,
@@ -6667,8 +6674,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{250, 868},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{250, {868}},
      35,
      4,
      25,
@@ -6680,8 +6687,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{300, 1056},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{300, {1056}},
      35,
      4,
      30,
@@ -6693,8 +6700,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{500, 1685},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{500, {1685}},
      42,
      3,
      30,
@@ -6706,8 +6713,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 2461},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{650, {2461}},
      45,
      3,
      40,
@@ -6719,8 +6726,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{750, 2069},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{750, {2069}},
      28,
      2,
      25,
@@ -6732,8 +6739,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
-    {{900, 2625},
+     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{900, {2625}},
      29,
      2,
      35,
@@ -6745,8 +6752,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
-    {{1500, 11744},
+     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{1500, {11744}},
      78,
      1,
      150,
@@ -6758,10 +6765,10 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{50, 177}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MONSTER_FLAGS_NONE},
-    {{200, 805}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
-    {{1000, 1545},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{50, {177}}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", {MONSTER_FLAGS_NONE}},
+    {{200, {805}}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", {MONSTER_ATTRIBUTE_WIDE}},
+    {{1000, {1545}},
      62,
      3,
      20,
@@ -6773,8 +6780,8 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 5692},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{650, {5692}},
      60,
      2,
      50,
@@ -6786,12 +6793,12 @@ tag_monsterInfo gMonsterDatabase[(CREATURE_COUNT)] = {
      30,
      0,
      "geni",
-     MONSTER_ATTRIBUTE_FLYING},
-    {{500, 1979}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
-    {{500, 1732}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
-    {{500, 1412}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
-    {{500, 1501}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
-    {{500, 1690}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MONSTER_FLAGS_NONE}
+     {MONSTER_ATTRIBUTE_FLYING}},
+    {{500, {1979}}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", {MONSTER_ATTRIBUTE_WIDE}},
+    {{500, {1732}}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", {MONSTER_FLAGS_NONE}},
+    {{500, {1412}}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", {MONSTER_FLAGS_NONE}},
+    {{500, {1501}}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", {MONSTER_FLAGS_NONE}},
+    {{500, {1690}}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", {MONSTER_FLAGS_NONE}}
 };
 float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
                                           0.58f, 0.6f,  0.62f, 0.64f, 0.67f, 0.7f,  0.74f,
@@ -6816,7 +6823,7 @@ float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
 float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
 b32 gbDrawSavedCursor = false;
-b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     {8, 0, 0, 0, 8, 16, 16, 16},
     {17, 9, 1, 1, 1, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -6975,7 +6982,7 @@ HMENU hmnuDflt = NULL;
 HMENU hmnuCmbt = NULL;
 HMENU hmnuAdv = NULL;
 HMENU hmnuTown = NULL;
-char* cMonFilename[(CREATURE_COUNT)] = {
+const char* cMonFilename[(CREATURE_COUNT)] = {
     "peasant.icn",
     "archer.icn",
     "archer2.icn",
@@ -7414,7 +7421,7 @@ SSpellInfo gsSpellInfo[(SPELL_COUNT)] = {
     {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
 };
-char* cArmyFrameFileNames[(CREATURE_COUNT)] = {
+const char* cArmyFrameFileNames[(CREATURE_COUNT)] = {
     "peas_frm.bin",
     "archrfrm.bin",
     "archrfrm.bin",
@@ -7523,7 +7530,7 @@ u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
 SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
-char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
+const char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
                                                      "CBKGWATR.icn",
                                                      "",
                                                      "CBKGGRTR.icn",
@@ -7592,14 +7599,14 @@ u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1
 };
-char* gTownPrefixNames[(FACTION_COUNT)] = {
+const char* gTownPrefixNames[(FACTION_COUNT)] = {
     "twnk",
     "twnb",
     "twns",
     "twnw",
     "twnz",
     "twnn"};
-char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+const char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage",
     "thie",
     "tvrn",
@@ -7905,7 +7912,7 @@ u32l gHierarchyMask[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
 };
 i32 giDebugBuildingToBuild = -1;
 u8 giTerrainToMusicTrack[(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-char* cHeroTypeShortName[(FACTION_COUNT)] = {
+const char* cHeroTypeShortName[(FACTION_COUNT)] = {
     "kngt",
     "barb",
     "sorc",
@@ -8173,81 +8180,81 @@ i32 giWalkingYMod = 0;
 u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
 SCampaignChoice
     campaignChoices[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
-        {{{CAMPAIGN_CHOICE_RESOURCE, (RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_ARMORED_GAUNTLETS), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SPELL, (SPELL_MIRROR_IMAGE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, (SPELL_SUMMON_EARTH_ELEMENTAL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, (SPELL_RESURRECT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_RESOURCE, (RES_CRYSTAL), CHOICE_RESOURCE_BONUS},
-          {CAMPAIGN_CHOICE_RESOURCE, (RES_GEMS), CHOICE_RESOURCE_BONUS},
-          {CAMPAIGN_CHOICE_RESOURCE, (RES_MERCURY), CHOICE_RESOURCE_BONUS}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_KNIGHT), CHOICE_NO_AMOUNT}}},
-        {{{CAMPAIGN_CHOICE_RESOURCE, (RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_MAGE_RING), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_MINOR_SCROLL), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_RESOURCE, (RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_SPELL, (SPELL_MASS_CURSE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_DEFENDER_HELM), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, (HERO_SKILL_LOGISTICS), CHOICE_BASIC_SKILL},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_POWER_AXE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_WHITE_PEARL), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, (ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, (FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
+        {{{CAMPAIGN_CHOICE_RESOURCE, {(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_THUNDER_MACE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_ARMORED_GAUNTLETS)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SPELL, {(SPELL_MIRROR_IMAGE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {(SPELL_SUMMON_EARTH_ELEMENTAL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {(SPELL_RESURRECT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, {(RES_CRYSTAL)}, CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, {(RES_GEMS)}, CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, {(RES_MERCURY)}, CHOICE_RESOURCE_BONUS}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}}},
+        {{{CAMPAIGN_CHOICE_RESOURCE, {(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_MAGE_RING)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_MINOR_SCROLL)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, {(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_SPELL, {(SPELL_MASS_CURSE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_DEFENDER_HELM)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {(HERO_SKILL_LOGISTICS)}, CHOICE_BASIC_SKILL},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_POWER_AXE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_WHITE_PEARL)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}}}
 };
 char* congratsText = NULL;
-char* gArtifactNames[(ARTIFACT_COUNT)] = {
+const char* gArtifactNames[(ARTIFACT_COUNT)] = {
     "Книга\x20всезнания"  ,
     "Меч\x20власти"  ,
     "Защитная\x20накидка"  ,
@@ -8352,7 +8359,7 @@ char* gArtifactNames[(ARTIFACT_COUNT)] = {
     "Меч\x20Андурана"  ,
     "Лопата\x20могильщика"
 };
-char* gArtifactDesc[(ARTIFACT_COUNT)] = {
+const char* gArtifactDesc[(ARTIFACT_COUNT)] = {
     "\x7bКнига\x20всезнания\x7d\x0a\x28Знания\x20\x2b\x31\x32\x29\x0a\x0aКнига\x20всезнания\x20увеличивает\x20Знания\x20на\x20\x31\x32\x20единиц\x2e"  ,
     "\x7bМеч\x20власти\x7d\x0a\x28Атака\x20\x2b\x31\x32\x29\x0a\x0aМеч\x20власти\x20увеличивает\x20навык\x20Атаки\x20на\x20\x31\x32\x20единиц\x2e"  ,
     "\x7bЗащитная\x20накидка\x7d\x0a\x28Защита\x20\x2b\x31\x32\x29\x0a\x0aЗащитная\x20накидка\x20увеличивает\x20Защиту\x20на\x20\x31\x32\x20единиц\x2e"  ,
@@ -8456,7 +8463,7 @@ char* gArtifactDesc[(ARTIFACT_COUNT)] = {
     "\x7bМечелом\x7d\x0a\x0aУвеличивает\x20Защиту\x20на\x20\x34\x20единицы\x20и\x20Атаку\x20на\x20\x31\x20единицу\x2e"  ,
     "\x7bМеч\x20Андурана\x7d\x0a\x0aУвеличивает\x20Атаку\x20на\x20\x35\x20единиц\x2e"  ,
     "\x7bЛопата\x20могильщика\x7d\x0a\x0aУвеличивает\x20эффективность\x20использования\x20навыка\x20некромантии\x2e"  };
-char* gArtifactEvent[(ARTIFACT_COUNT)] = {
+const char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     ""  ,
     ""  ,
     ""  ,
@@ -8560,19 +8567,19 @@ char* gArtifactEvent[(ARTIFACT_COUNT)] = {
     "Отставной\x20капитан\x20городской\x20стражи\x20узнал\x20о\x20вашем\x20походе\x20и\x20даровал\x20вам\x20свой\x20меч\x2c\x20сослуживший\x20ему\x20добрую\x20службу\x20в\x20былые\x20времена\x2e"  ,
     "Тролль\x20остановил\x20вас\x2c\x20сказав\x3a\x20\x22Плати\x20мне\x20\x35\x30\x30\x30\x20золотых\x20или\x20я\x20убью\x20тебя\x20мечом\x20Анудрана\x21\x22\x20Вы\x20отказались\x20платить\x2e\x20Тролль\x20схватился\x20за\x20клинок\x20меча\x2c\x20взвыл\x20от\x20боли\x20и\x20бросив\x20меч\x20убежал\x2e\x20Хорошо\x2c\x20что\x20он\x20был\x20настолько\x20глуп\x2c\x20что\x20не\x20знал\x2c\x20как\x20правильно\x20держать\x20острые\x20предметы\x2e"  ,
     "В\x20грязи\x20вы\x20подобрали\x20старую\x20лопату\x2e\x20Присмотревшись\x2c\x20вы\x20поняли\x2c\x20что\x20вам\x20посчастливилось\x20найти\x20зачарованную\x20лопату\x20грабителей\x20могил\x2e"  };
-char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
+const char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
     "Атака"  ,
     "Защита"  ,
     "Сила\x20магии"  ,
     "Знания"
 };
-char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
+const char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
     "\x7bАтака\x7d\x0a\x0aВаш\x20навык\x20атаки\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20атаки\x20каждого\x20воина\x2e"  ,
     "\x7bЗащита\x7d\x0a\x0aВаш\x20навык\x20защиты\x20\x2d\x20бонус\x2c\x20добавляемый\x20к\x20навыку\x20защиты\x20каждого\x20воина\x2e"  ,
     "\x7bСила\x20магии\x7d\x0a\x0aВаш\x20уровень\x20силы\x20магии\x20определяет\x20длительность\x20действия\x20или\x20силу\x20заклинания\x2e"  ,
     "\x7bЗнания\x7d\x0a\x0aУровень\x20знаний\x20определяет\x20количество\x20очков\x20магии\x20героя\x2e"
 };
-char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
+const char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     "Рыцарь"  ,
     "Варвар"  ,
     "Колдунья"  ,
@@ -8582,7 +8589,7 @@ char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     "Мульти"  ,
     "Случайно"
 };
-char* gArmyShortNames[(CREATURE_COUNT)] = {
+const char* gArmyShortNames[(CREATURE_COUNT)] = {
     "peasn",
     "archr",
     "arch2",
@@ -8650,7 +8657,7 @@ char* gArmyShortNames[(CREATURE_COUNT)] = {
     "elemf",
     "elemw"
 };
-char* gArmyNames[(CREATURE_COUNT)] = {
+const char* gArmyNames[(CREATURE_COUNT)] = {
     "Крестьянин"  ,
     "Стрелок"  ,
     "Рейнджер"  ,
@@ -8718,7 +8725,7 @@ char* gArmyNames[(CREATURE_COUNT)] = {
     "Огненный\x20элементал"  ,
     "Водяной\x20элементал"
 };
-char* gArmyNamesPlural[(CREATURE_COUNT)] = {
+const char* gArmyNamesPlural[(CREATURE_COUNT)] = {
     "крестьян"  ,
     "стрелков"  ,
     "рейнджеров"  ,
@@ -8786,7 +8793,7 @@ char* gArmyNamesPlural[(CREATURE_COUNT)] = {
     "огненных\x20элементалов"  ,
     "водных\x20элементалов"
 };
-char* gTerrainNames[(TERRAIN_COUNT)] = {
+const char* gTerrainNames[(TERRAIN_COUNT)] = {
     "Вода"  ,
     "Трава"  ,
     "Снег"  ,
@@ -8797,7 +8804,7 @@ char* gTerrainNames[(TERRAIN_COUNT)] = {
     "Пустошь"  ,
     "Побережье"
 };
-char* gResourceNames[RESOURCE_VALUE_COUNT] = {
+const char* gResourceNames[RESOURCE_VALUE_COUNT] = {
     "Древесина"  ,
     "Ртуть"  ,
     "Руда"  ,
@@ -8808,7 +8815,7 @@ char* gResourceNames[RESOURCE_VALUE_COUNT] = {
 };
 
 
-char* gMineNames[KB_MINE_NAME_COUNT] = {
+const char* gMineNames[KB_MINE_NAME_COUNT] = {
     "Лесопилка"  ,
     "Лаборатория\x20алхимика"  ,
     "Рудная\x20шахта"  ,
@@ -8817,7 +8824,7 @@ char* gMineNames[KB_MINE_NAME_COUNT] = {
     "Самоцветная\x20шахта"  ,
     "Золотая\x20шахта"
 };
-char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
+const char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     ""  ,
     "Лаборатория\x20алхимика"  ,
     "Указатель"  ,
@@ -8943,7 +8950,7 @@ char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "\x25\x73"  ,
     "Темница"
 };
-char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
+const char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
 
 
     "Алхимик\x0a\x0aВы\x20стали\x20хозяин"
@@ -9390,7 +9397,7 @@ char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
         "в\x20в\x20груде\x20лохмотьев\x2c\x20вы\x20"
         "находите\x2e"
 };
-char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
+const char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
 
     "Начать\x20одиночную\x20или\x20сет"
         "евую\x20игру\x2e",
@@ -9406,7 +9413,7 @@ char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Закрыть\x20меню\x2c\x20ничего\x20не\x20"
         "делая\x2e"
 };
-char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
+const char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
 
     "\x7bОК\x7d\x0a\x0aЗакрыть\x20это\x20меню\x2e",
 
@@ -9453,7 +9460,7 @@ char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
         "ку\x20тени\x20от\x20курсора\x20на\x20се"
         "тке\x20координат\x2e"
 };
-char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
+const char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
 
     "Осмотреть\x20весь\x20мир\x2e",
 
@@ -9463,12 +9470,12 @@ char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
         "енарии\x2c\x20на\x20котором\x20идет\x20"
         "игра\x2e",
 
-    "Копать\x20в\x20поисках\x20Великог"
-        "о\x20артефакта\x2e",
+    ("Копать\x20в\x20поисках\x20Великог"
+     "о\x20артефакта\x2e"),
 
     "Закрыть\x20это\x20меню\x2e"
 };
-char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
+const char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
 
     "\x7bНовая\x20игра\x7d\x0a\x0aНачать\x20отд"
         "ельный\x20сценарий\x20или\x20сете"
@@ -9488,7 +9495,7 @@ char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
         "ться\x20в\x20операционную\x20сист"
         "ему\x2e"
 };
-char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
+const char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
 
     "\x7bСледующий\x20герой\x7d\x0a\x0aВыбра"
         "ть\x20следующего\x20героя\x2e",
@@ -9522,7 +9529,7 @@ char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
         "Направить\x20заклинание\x20на\x20"
         "стратегической\x20карте\x2e"
 };
-char* gLuckText[KB_LUCK_TEXT_COUNT] = {
+const char* gLuckText[KB_LUCK_TEXT_COUNT] = {
 
     "Проклятая",
 
@@ -9538,7 +9545,7 @@ char* gLuckText[KB_LUCK_TEXT_COUNT] = {
 
     "Божественная"
 };
-char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
+const char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
 
     "Предательская",
 
@@ -9554,7 +9561,7 @@ char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
 
     "Кровавая\x21"
 };
-char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
+const char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
 
     "Выкл\x2e",
 
@@ -9578,7 +9585,7 @@ char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
 
     "Вкл\x2e\x0aГромкость\x20\x31"
 };
-char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
+const char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
 
     "Шагом",
 
@@ -9590,7 +9597,7 @@ char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
 
     "Прыжками"
 };
-char* gColors[(FACTION_COUNT)] = {
+const char* gColors[(FACTION_COUNT)] = {
     "синий"  ,
     "зеленый"  ,
     "красный"  ,
@@ -9598,7 +9605,7 @@ char* gColors[(FACTION_COUNT)] = {
     "оранжевый"  ,
     "фиолетовый"
 };
-static char* gColorAbbreviations[(FACTION_COUNT)] = {
+static const char* gColorAbbreviations [[maybe_unused]][(FACTION_COUNT)] = {
     "син."  ,
     "зел."  ,
     "кр."  ,
@@ -9606,7 +9613,7 @@ static char* gColorAbbreviations[(FACTION_COUNT)] = {
     "ор."  ,
     "фиол."
 };
-char* gMonthNames[KB_MONTH_NAME_COUNT] = {
+const char* gMonthNames[KB_MONTH_NAME_COUNT] = {
 
     "Кузнечика",
 
@@ -9628,7 +9635,7 @@ char* gMonthNames[KB_MONTH_NAME_COUNT] = {
 
     "Жука"
 };
-char* gWeekNames[KB_WEEK_NAME_COUNT] = {
+const char* gWeekNames[KB_WEEK_NAME_COUNT] = {
 
     "Белки",
 
@@ -9660,7 +9667,7 @@ char* gWeekNames[KB_WEEK_NAME_COUNT] = {
 
     "Кондора"
 };
-char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+const char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
 
     "Обзор\x20королевства",
 
@@ -9723,7 +9730,7 @@ char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
 
     "Сгруппировать\x20воинов"
 };
-char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+const char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
 
     "Построить\x20Гильдию\x20магов",
 
@@ -9767,7 +9774,7 @@ char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Выбрать\x20широкие\x20ряды\x20для"
         "\x20гарнизона"
 };
-char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+const char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
 
 
     "\x7bХорошая\x20удача\x7d\x0a\x0aЕсли\x20уд"
@@ -9831,7 +9838,7 @@ char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
         "\x20дает\x20максимальную\x20удачу"
         "\x2e"
 };
-char* IQnames[KB_IQ_NAME_COUNT] = {
+const char* IQnames[KB_IQ_NAME_COUNT] = {
 
     "Нет",
 
@@ -9843,7 +9850,7 @@ char* IQnames[KB_IQ_NAME_COUNT] = {
 
     "Гений"
 };
-char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+const char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
 
     "Предыдущая\x20страница\x20",
 
@@ -9861,10 +9868,10 @@ char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
 
     "Боевые\x20заклинания",
 
-    "У\x20вашего\x20героя\x20осталось\x20"
-        "\x25\x64\x20оч\x2e\x20магии"
+    ("У\x20вашего\x20героя\x20осталось\x20"
+     "\x25\x64\x20оч\x2e\x20магии")
 };
-char* speedText[KB_SPEED_TEXT_COUNT] = {
+const char* speedText[KB_SPEED_TEXT_COUNT] = {
       "",
       "Ползает",
       "Оч\x2e\x20низкая",
@@ -9876,7 +9883,7 @@ char* speedText[KB_SPEED_TEXT_COUNT] = {
       "Молниеносная",
       "Абсолютная"
 };
-char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+const char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
       "Атака\x3a\x20",
       "Защита\x3a\x20",
       "Выстрелов\x3a\x20",
@@ -9887,7 +9894,7 @@ char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
       "Удача\x3a\x20",
       "Выстрелов\x3a\x20"
 };
-char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+const char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
       "Атака\x3a\x20",
       "Защита\x3a\x20",
       "Выстр\x2e\x3a\x20",
@@ -9898,13 +9905,14 @@ char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
       "\x0a\x0aСкорость\x3a\x0a\x25\x73",
       "\x0a\x0aПрирост\x0a\x20\x2b\x20\x25\x64\x2fнед\x2e"
 };
-char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
-      "Обзор\x20королевства\x20\x20\x20Месяц\x3a\x20\x25\x64\x2c\x20Неделя\x3a\x20\x25\x64\x2c\x20День\x3a"
-        "\x20\x25\x64",
+const char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
+
+    ("Обзор\x20королевства\x20\x20\x20Месяц\x3a\x20\x25\x64\x2c\x20Неделя\x3a\x20\x25\x64\x2c\x20День\x3a"
+     "\x20\x25\x64"),
       "Ваш\x20Драконий\x20город\x2e",
       "Ваш\x20маяк\x2e"
 };
-char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+const char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
       "\x25\x73\x2c\x20у\x20вас\x20осталось\x20всего\x20\x25\x64\x20дней\x20на\x20то\x2c\x20чтобы\x20за"
         "воевать\x20хотя\x20бы\x20один\x20город\x3b\x20иначе\x20вы\x20будете\x20наве"
         "ки\x20изгнаны\x20из\x20страны\x2e",
@@ -9924,7 +9932,7 @@ char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
         "ствует\x20сила\x20\x25\x73\x2e\x0a\x0aПопуляция\x20\x25\x73\x20\x2b\x35\x2e\x0a\x0aНаселение\x20все"
         "х\x20жилищ\x20возросло\x2e"
 };
-char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+const char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
       "Атака\x3a\x20",
       "Защита\x3a\x20",
       "Сила\x20магии\x3a\x20",
@@ -9933,7 +9941,7 @@ char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
       "Удача\x3a\x20",
       "Очки\x20магии\x3a\x20"
 };
-char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+const char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
       "Остановить\x20катапульту",
       "Направить\x20заклинание",
       "Отступить",
@@ -9942,7 +9950,7 @@ char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
       "Возможности\x20героя",
       "Возможности\x20капитана"
 };
-char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+const char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
       "\x7bНаправить\x20заклинание\x7d\x0a\x0aНаправить\x20заклинание\x2e\x20В\x20"
         "течение\x20каждого\x20раунда\x20боя\x20можно\x20направить\x20лишь\x20"
         "одно\x20заклинание\x2e\x20Новый\x20раунд\x20начинается\x20после\x20то"
@@ -9960,7 +9968,7 @@ char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
         "в\x20битве\x20войсками\x2e",
       "\x7bОтмена\x7d\x0a\x0aВернуться\x20в\x20бой\x2e"
 };
-char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+const char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
       "",
       "\x25\x73\x3a\x20Идти\x20сюда\x2e",
       "\x25\x73\x3a\x20Перелететь\x20сюда\x2e",
@@ -9974,16 +9982,16 @@ char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
       "Показать\x20вражеского\x20капитана",
       "Информация\x20о\x20баллисте"
 };
-char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
+const char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
     {  "\x25\x73\x20получает",   "\x20уровень\x20опыта\x2e\x0a",   "\x20\x25\x64\x20уровней\x20опыта\x2e\x0a"};
-char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+const char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
       "Подождать\x2c\x20пока\x20походят\x20другие",
       "Пропустить\x20ход\x20этого\x20воина",
       "Автобой",
       "Системные\x20настройки",
       ""
 };
-char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+const char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
       "\x7bЖдать\x7d\x0a\x0aДанный\x20отряд\x20откладывает\x20свой\x20ход\x20и\x20сов"
         "ершает\x20действие\x20после\x20того\x2c\x20как\x20все\x20остальные\x20от"
         "ряды\x20походили\x2e",
@@ -9995,7 +10003,7 @@ char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
       "\x7bИнформационная\x20строка\x7d\x0a\x0aЗдесь\x20отображаются\x20резу"
         "льтаты\x20действий\x20отдельных\x20отрядов\x2e"
 };
-char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
+const char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
       "Разделить\x20отряд\x20\x25\x73",
       "Нельзя\x20отнять\x20последних\x20воинов\x20у\x20героя\x20",
       "Соединить\x20отряды\x20\x25\x73",
@@ -10025,7 +10033,7 @@ char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
       "Рынок",
       "Дом\x20капитана"
 };
-char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+const char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
       "Лорд\x20Килбурн",   "Сэр\x20Галлант",   "Эктор",      "Гвеннет",   "Тиро",      "Амброзий",     "Руби",
       "Максимус",        "Димитри",       "Сундакс",    "Финеоз",    "Джоджош",    "Крэг\x20Хак",   "Джезебель",
       "Жаклин",         "Эргон",         "Тсабу",      "Атлас",      "Астра",     "Наташа",     "Троян",
@@ -10035,7 +10043,7 @@ char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
       "Саракин",        "Калиндра",      "Мандигал",   "Зом",        "Дарлана",   "Зам",         "Ранлу",
       "Чарити",        "Риалдо",        "Роксана",     "Сандро",     "Келия"
 };
-char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+const char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
       "\x7bУровень\x20сложности\x7d\x0a\x0aЭта\x20опция\x20позволяет\x20устанав"
         "ливать\x20стартовый\x20уровень\x20сложности\x20игры\x2e\x20Чем\x20выш"
         "е\x20уровень\x20сложности\x2c\x20тем\x20с\x20меньшим\x20количеством\x20р"
@@ -10068,7 +10076,7 @@ char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
       "\x7bОтмена\x7d\x0a\x0aНажмите\x2c\x20чтобы\x20вернуться\x20в\x20главное\x20мен"
         "ю\x2e"
 };
-char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+const char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
       "\x7b\x32\x34\x30\x30\x20бод\x7d\x0a\x0aИспользовать\x20соединение\x20на\x20скорости\x20"
         "\x32\x34\x30\x30\x20бод\x2e\x0a\x0aЗамечание\x3a\x20Для\x20модемов\x20\x31\x34\x34\x30\x30\x20бод\x20испо"
         "льзуйте\x20соединение\x20на\x20скорости\x20\x31\x39\x32\x30\x30\x2e\x20\x20Для\x20модем"
@@ -10091,7 +10099,7 @@ char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
         "и\x20\x33\x38\x34\x30\x30\x20бод\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+const char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
       "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
         "орт\x20\x43\x4f\x4d\x20\x31\x2e",
       "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20модемного\x20соединения\x20п"
@@ -10102,7 +10110,7 @@ char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
         "орт\x20\x43\x4f\x4d\x20\x34\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+const char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
       "\x7bСкорость\x20соединения\x20\x32\x34\x30\x30\x20бод\x2e\x7d\x0a\x0aДля\x20компьютеров"
         "\x20с\x20устаревшим\x20чипом\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20следует\x20использова"
         "ть\x20скорость\x20\x31\x39\x32\x30\x30\x20бод\x2c\x20а\x20для\x20компьютеров\x20с\x20более"
@@ -10137,7 +10145,7 @@ char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
         "ользуется\x20чип\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+const char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
       "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
         "т\x20\x43\x4f\x4d\x20\x31\x2e",
       "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0aИспользовать\x20для\x20прямого\x20соединения\x20пор"
@@ -10148,7 +10156,7 @@ char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
         "т\x20\x43\x4f\x4d\x20\x34\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+const char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
       "\x7b\x32\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x32\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
         "\x20\x34\x20дополнительных\x20компьютерных\x20игроков\x2e",
       "\x7b\x33\x20игрока\x7d\x0a\x0aИграть\x20с\x20\x33\x20людьми\x20и\x2c\x20опционально\x2c\x20до"
@@ -10160,23 +10168,25 @@ char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
       "\x7b\x36\x20игроков\x7d\x0a\x0a\x20Играть\x20с\x20\x36\x20людьми\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+const char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
       "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e\x20Может\x20бы"
         "ть\x2c\x20только\x20один\x20хост\x20в\x20одном\x20сетевом\x20соединении\x2e",
-      "\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-        "ойки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20в"
-        "\x20игру\x2e",
+
+    ("\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
+     "ойки\x20игры\x2c\x20после\x20чего\x20он\x20автоматически\x20вступит\x20в"
+     "\x20игру\x2e"),
       "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+const char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
       "\x7bСервер\x7d\x0a\x0aСервер\x20задает\x20настройки\x20игры\x2e",
-      "\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
-        "ойки\x20игры\x2e",
+
+    ("\x7bГость\x7d\x0a\x0aГость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20настр"
+     "ойки\x20игры\x2e"),
       "\x7bНастройки\x7d\x0a\x0aИзменить\x20конфигурацию\x20модема\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+const char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
       "\x7bЗа\x20одной\x20машиной\x7d\x0a\x0aИграть\x20за\x20одной\x20машиной\x2c\x20где"
         "\x20от\x20\x32\x20до\x20\x34\x20игроков\x20людей\x2e",
       "\x7bЛокальная\x20сеть\x7d\x0a\x0aИграть\x20по\x20сети\x2c\x20где\x20двое\x20игрок"
@@ -10188,7 +10198,7 @@ char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
         "оль\x2dмодем\x20сидя\x20за\x20своими\x20компьютерами\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+const char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
       "\x7bСервер\x7d\x0a\x0aОпределяет\x20настройки\x20игры\x2e\x20Может\x20быть\x20"
         "только\x20один\x20сервер\x20в\x20одном\x20соединении\x2e",
       "\x7bГость\x7d\x0a\x0a\x20Гость\x20ожидает\x2c\x20пока\x20сервер\x20задаст\x20наст"
@@ -10197,7 +10207,7 @@ char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
         "колько\x20гостей\x2e\x20В\x20игре\x20через\x20\x4e\x65\x74\x42\x49\x4f\x53\x20\x2d\x20только\x20\x31\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+const char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
       "\x7b\x49\x50\x58\x7d\x0a\x0a\x49\x50\x58\x20является\x20часто\x20используемым\x20сетевым\x20п"
         "ротоколом\x20для\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e\x20По\x20\x49\x50\x58\x20могут\x20играть\x20до\x20\x36\x20"
         "человек\x20одновременно\x2e\x20Протокол\x20\x49\x50\x58\x20поддерживает\x20"
@@ -10215,7 +10225,7 @@ char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
         "\x2e",
       "\x7bОтмена\x7d\x0a\x0aЗакрыть\x20меню\x2e"
 };
-char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+const char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
       "\x7bОбычная\x20игра\x7d\x0a\x0aОдиночная\x20игра\x20на\x20отдельной\x20карт"
         "е\x2e",
       "\x7bКампания\x7d\x0a\x0aОдиночная\x20игра\x20на\x20серии\x20карт\x2e",
@@ -10224,7 +10234,7 @@ char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
         "арте\x2e",
       "\x7bОтменить\x7d\x0a\x0aОтменить\x20и\x20вернуться\x20в\x20главное\x20меню\x2e"
 };
-char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+const char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
       "Враг\x20сдался\x21",
       "Враг\x20повержен\x21",
       "Великая\x20победа\x21",
@@ -10240,7 +10250,7 @@ char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
       "\x0a\x0aЗа\x20мужество\x2c\x20проявленное\x20в\x20бою\x2c\x20\x25\x73\x20получает\x20\x25\x64"
         "\x20оч\x2e\x20опыта\x2c\x20и\x20получает\x20\x25\x64\x20уровень\x28я\x29\x2e"
 };
-char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+const char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
       "\x7bВысокая\x20мораль\x7d\x0a\x0aВысокая\x20мораль\x20может\x20дать\x20в\x20бо"
         "ю\x20вашим\x20бойцам\x20дополнительную\x20атаку\x2e",
       "\x7bОбычная\x20мораль\x7d\x0a\x0aС\x20обычной\x20моралью\x20ваши\x20армии\x20н"
@@ -10279,21 +10289,21 @@ char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
       "\x0aБоевое\x20одеяние\x20Андурана\x20дает\x20максимальную\x20морал"
         "ь\x2e"
 };
-char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {  "Маленькая",   "Средняя",   "Большая",   "Огромная"};
-char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+const char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {  "Маленькая",   "Средняя",   "Большая",   "Огромная"};
+const char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
     {  "Легкая",   "Обычная",   "Высокая",   "Эксперт",   "Невозможно\x21"};
-char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {  "Легкая",   "Обычная",   "Тяжелая",   "Эксперт"};
-char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
+const char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {  "Легкая",   "Обычная",   "Тяжелая",   "Эксперт"};
+const char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {  "Лорд\x20Айронфист",   "Лорд\x20Слэйер",   "Королева\x20Ламанда",   "Лорд\x20Аламар"};
-char* cWinText[KB_WIN_TEXT_COUNT] =
+const char* cWinText[KB_WIN_TEXT_COUNT] =
     {  "Дней\x3a",   "Очки\x3a",   "Сложность\x3a",   "Счет\x3a",   "Ранг\x3a"};
-char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
     {  "Человек\x0a",   "Человек\x0aЛегкая\x20игра",   "Человек\x0aОбычная\x20игра",   "Человек\x0aТяжелая\x20игра",   "Человек\x0aЭксперт"};
-char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
+const char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {  "Чел\x2e\x2d",   "Чел\x2e\x2dЛегкая\x20игра",   "Чел\x2e\x2dОбычная\x20игра",   "Чел\x2e\x2dТяжелая\x20игра",   "Чел\x2e\x2dЭксперт"};
-char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
+const char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {  "\x4d\x49\x44\x49",   "\x43\x44\x2dстерео\x20без\x20вокала",   "\x43\x44\x2dстерео\x20с\x20вокалом"};
-char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+const char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
       "\x7bОгненный\x20шар\x7d\x0a\x0aОгромный\x20огненный\x20шар\x20взрывается"
         "\x20над\x20выбранным\x20участком\x20поля\x20боя\x2c\x20поражая\x20все\x20на"
         "ходящиеся\x20поблизости\x20отряды\x2e",
@@ -10461,7 +10471,7 @@ char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
       "\x7bСтража\x20воды\x7d\x0a\x0aОтряд\x20водных\x20элементалов\x20охраняет"
         "\x20шахту\x20от\x20нападения\x20армий\x20противника\x2e"
 };
-char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+const char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
       "Огненный\x20шар",
       "Огненный\x20взрыв",
       "Молния",
@@ -10528,9 +10538,9 @@ char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
       "Страж\x20огня",
       "Страж\x20воды"
 };
-char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
+const char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {  "\x31\x20ступени",   "\x32\x20ступени",   "\x33\x20ступени"};
-char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+const char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
       "Следопыт",
       "Стрелок",
       "Логистика",
@@ -10546,7 +10556,7 @@ char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
       "Некромантия",
       "Казначей"
 };
-char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+const char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
       "Гильдия\x20магов",
       "Гильдия\x20воров",
       "Таверна",
@@ -10567,7 +10577,7 @@ char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
       "",
       ""
 };
-char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+const char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
       "Ферма",
       "Свалка\x20истории",
       "Хрустальный\x20сад",
@@ -10576,9 +10586,9 @@ char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
       "Груда\x20черепов",
       "Прирост\x20воинов\x20\x31\x20ур\x2e"
 };
-char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
+const char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     {  "Укрепления",   "Колизей",   "Радуга",   "Подземелье",   "Библиотека",   "Шторм",   "Специальная"};
-char* gDwellingNames[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+const char* gDwellingNames[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {  "Мазанка",
        "Стрельбище",
        "Кузница",
@@ -10652,7 +10662,7 @@ char* gDwellingNames[(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
        "",
        ""}
 };
-char* cSecSkillDesc[(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+const char* cSecSkillDesc[(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {  "\x7bСледопыт\x20\x31\x20ступени\x7d\x0a\x0aУменьшает\x20замедление\x20при\x20п"
         "ередвижении\x20по\x20пересеченной\x20местности\x20на\x20\x32\x35\x20проц"
         "ентов\x2e",
@@ -10764,7 +10774,7 @@ char* cSecSkillDesc[(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
          "ает\x20со\x20своих\x20владений\x20налоги\x20в\x20размере\x20\x35\x30\x30\x20золот"
          "ых\x2e"}
 };
-char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+const char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
       "Гильдия\x20магов\x20позволяет\x20разучивать\x20новые\x20заклина"
         "ния\x20и\x20восстанавливает\x20запас\x20очков\x20магии\x2e",
       "Гильдия\x20воров\x20дает\x20информацию\x20о\x20врагах\x2e\x20Также\x2c\x20Г"
@@ -10801,7 +10811,7 @@ char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
       "",
       ""
 };
-char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+const char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
       "Укрепления\x20увеличивают\x20прочность\x20стен\x2c\x20увеличива"
         "я\x20число\x20раундов\x2c\x20необходимых\x20для\x20полного\x20их\x20разр"
         "ушения\x2e",
@@ -10816,7 +10826,7 @@ char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
       "Шторм\x20добавляет\x20\x2b\x32\x20единицы\x20к\x20силе\x20заклинаний\x20защ"
         "итников\x20замка\x2e"
 };
-char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
+const char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
       "севернее",
       "северо\x2dвосточнее",
       "восточнее",
@@ -10827,7 +10837,7 @@ char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
       "северо\x2dзападнее",
       "в\x20центре"
 };
-char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+const char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
       "Темные\x20пучины\x20океана",
       "Зеленые\x20равнины",
       "Глубокие\x20снега",
@@ -10838,11 +10848,11 @@ char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
       "Бесплодная\x20пустошь",
       "Побережье"
 };
-char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {  "Разный",   "\x27Добрый\x27",   "\x27Злой\x27"};
-char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {  "Монохром",   "Цветной"};
-char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {  "Обычная",   "Высокая",   "Оч\x2e\x20высокая"};
-char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {  "Нет",   "Только\x20чары",   "Полная"};
-char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+const char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {  "Разный",   "\x27Добрый\x27",   "\x27Злой\x27"};
+const char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {  "Монохром",   "Цветной"};
+const char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {  "Обычная",   "Высокая",   "Оч\x2e\x20высокая"};
+const char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {  "Нет",   "Только\x20чары",   "Полная"};
+const char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
       "\x0a\x0a\x0a\x2a\x2a\x2a\x43\x6f\x6d\x6d\x61\x6e\x64\x20\x4c\x69\x6e\x65\x20\x48\x65\x6c\x70\x2a\x2a\x2a\x0a",
       "\x0a",
       "\x2f\x44\x30\x20\x2d\x20отключить\x20цифровой\x20звук\x0a",
@@ -10858,9 +10868,9 @@ char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
       "Загрузить\x20\x44\x4f\x53\x20версию\x20Героев\x20\x32\x2e\x0a",
       "Звук\x20отключен\x20и\x20интро\x20пропущено\x2e\x0a"
 };
-char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
+const char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
     {  "Герой\x2fПараметры",   "Навыки",   "Артефакты",   "Города\x2fЗамки",   "Гарнизон",   "Доступно"};
-char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+const char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
       "Ошибка\x20передачи\x20данных\x20при\x20выполнении\x20функции\x20\x25\x73"
         "\x0a\x0aКод\x20ошибки\x3a\x20\x25\x64\x0aЗначение\x20ошибки\x3a\x20\x25\x73\x0a\x0a",
       "Предлагаемые\x20меры\x20устранения\x20ошибки\x3a",
@@ -10873,9 +10883,9 @@ char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
       "\x0a\x34\x29\x20Попробуйте\x20уменьшить\x20скорость\x20передачи\x20данны"
         "х\x20в\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20до\x20\x31\x39\x32\x30\x30\x20или\x20до\x20\x39\x36\x30\x30\x2e"
 };
-char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
+const char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
     {  "\x25\x64\x20воинов",   "\x25\x64\x20воин",   "Атака",   "Защита",   "ЗД",   "Урон",   "МР",   "УЧ",   "Выстр\x2e"};
-char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+const char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
       "\x7bМаленькие\x20карты\x7d\x0a\x0aПросмотр\x20только\x20маленьких\x20кар"
         "т\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2e",
       "\x7bСредние\x20карты\x7d\x0a\x0aПросмотр\x20только\x20средних\x20карт\x20\x28\x37"
@@ -10918,8 +10928,8 @@ char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
         "личеством\x20ресурсов\x20или\x20специальными\x20условиями\x2c\x20з"
         "атрудняющими\x20достижение\x20победы\x2e"
 };
-char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {  "Воин",   "Строитель",   "Исследователь",   "Человек"};
-char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+const char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {  "Воин",   "Строитель",   "Исследователь",   "Человек"};
+const char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
     {  "Мало",   "Мало",   "мало"},
     {  "Немного",   "Немного",   "немного"},
     {  "Стая",   "Стая",   "стая"},
@@ -10930,7 +10940,7 @@ char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] =
     {  "Тысячи",   "Тысячи\x2e\x2e\x2e",   "тысячи"},
     {  "Легион",   "Легион",   "легион"}
 };
-char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+const char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
       "Истина\x20где\x2dто\x20рядом\x2e",
       "Темная\x20сторона\x20сильнее\x2e",
       "Конец\x20Света\x20близок\x2e",
@@ -10942,9 +10952,9 @@ char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
         "\x20\x22Ля\x2dля\x2dля\x2c\x20ля\x2dля\x2dля\x2e\x2e\x2e\x22",
       "Тут\x20бывал\x20человек\x20из\x20Нунтукета\x2e\x2e\x2e"
 };
-char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
+const char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
     {  "Прямо\x20пойдешь\x20\x2d\x20коня\x20потеряешь\x2e",   "Сдается\x20в\x20аренду\x2e",   "До\x20следующего\x20знака\x20\x35\x30\x20миль\x2e",   "Кто\x20идет\x20за\x20Блинским\x3f"};
-char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+const char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
       "Альянс\x20гномов",
       "Гильдия\x20колдуний",
       "Роланд\x20становится\x20сильнее",
@@ -10958,7 +10968,7 @@ char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
       "Корона\x20всевластия",
       "Перенос\x20войск"
 };
-char* cCampaignName[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+const char* cCampaignName[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {  "Сила\x20оружия",
        "Аннексия",
        "Спасти\x20гномов",
@@ -10984,7 +10994,7 @@ char* cCampaignName[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
        "Апокалипсис",
        "Предательство\x21"}
 };
-char* cCampaignDescription[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+const char* cCampaignDescription[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {  "Прежде\x20чем\x20поднять\x20восстание\x20против\x20брата\x2c\x20Ролан"
         "д\x20хочет\x2c\x20чтобы\x20вы\x20одержали\x20победу\x20над\x20соседними\x20"
         "властителями\x2e\x20Между\x20ними\x20нет\x20единства\x2c\x20поэтому\x20б"
@@ -11099,12 +11109,12 @@ char* cCampaignDescription[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
          "отив\x20одного\x20у\x20противника\x2e\x20Эта\x20миссия\x20будет\x20для\x20в"
          "ас\x20самой\x20легкой\x20во\x20всей\x20войне\x2e\x2e\x2e\x20Предатель\x21"}
 };
-char* cOutOfMemory =
+const char* cOutOfMemory =
       "\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x25\x73\x0aГероям\x20\x49\x49\x20требуется\x20минимум\x20\x0a\x25\x64"
         "\x4b\x20Расширенной\x20\x20памяти\x20\x28\x58\x4d\x53\x29\x20и\x0a\x34\x38\x30\x4b\x20общей\x20памяти\x2e"
         "\x0a\x0a";
-char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {  "Обычное",   "Черес\x2d\x0aстрочное"};
-char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+const char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {  "Обычное",   "Черес\x2d\x0aстрочное"};
+const char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
       "\x7bОК\x7d\x0a\x0aЗакрыть\x20меню\x2e",
       "\x7bМузыка\x7d\x0a\x0aВключить\x20или\x20выключить\x20фоновую\x20музыку\x2e",
       "\x7bЭффекты\x7d\x0a\x0aВключить\x20или\x20выключить\x20звуковые\x20эффек"
@@ -11143,9 +11153,9 @@ char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
         "атичнее\x2c\x20но\x20иногда\x20он\x20перемещается\x20по\x20экрану\x20не\x20"
         "так\x20плавно\x2c\x20как\x20черно\x2dбелый\x2e"
 };
-char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
+const char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
     {  "Сизый",   "Синий",   "Коричневый",   "Золотой",   "Зеленый",   "Оранжевый",   "Фиолетовый",   "Красный"};
-char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+const char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
       "Башня\x20алхимика",
       "Арена",
       "Лачуга\x20волхва",
@@ -11154,7 +11164,7 @@ char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
       "Русалка",
       "Сирены"
 };
-char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+const char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
       "Земляные\x20холмы",
       "Алтарь\x20Земли",
       "Алтарь\x20Воздуха",
@@ -11262,9 +11272,9 @@ void* gLowPage = NULL;
 b32 gbInPollSound = false;
 i32 iCDRomErr = CD_ROM_READY;
 i32 bEarlySetupDone = 0;
-i32 bKBDone = 0;
+b32 bKBDone = false;
 struct _REDBOOK* hRedbookz = NULL;
-i32 bForceCheckTimeEvent = 0;
+b32 bForceCheckTimeEvent = false;
 u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
     {194, 179, 82, 79},
@@ -11274,8 +11284,8 @@ u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
 };
 
 i32 lastIMHoverID = -1;
-i32 bInCheckEndGame = 0;
-i32 bInShutDown = 0;
+b32 bInCheckEndGame = false;
+b32 bInShutDown = false;
 b32 gbInMemError = false;
 i32 iShingleAnimFrame = 0;
 b32 gbHumanPlayer[(GAME_PLAYER_COUNT)];
@@ -11285,22 +11295,22 @@ i32 giMaxExtentY;
 i32 giRandomClouds;
 char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 i32 giBottomViewOverrideEndTime;
-i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
+b8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 i32 giBottomViewResource;
 b32 gbInCampaign;
 i32 giResExtra1;
 i32 giResExtra2;
 i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
-i32 giSeedingValid;
+b32 giSeedingValid;
 i32 giLimitPlayer;
 i32 giShowClouds;
-i32 bDoColorCycle;
+b32 bDoColorCycle;
 inputManager* gpInputManager;
 i32 iMaxMapExtra;
 palette* gPalette;
 resourceManager* gpResourceManager;
 char gcBotViewText[GLOBAL_BOTTOM_VIEW_TEXT_SIZE];
-i32 bSpecialHideCursor;
+b32 bSpecialHideCursor;
 searchArray* gpSearchArray;
 i32 giResType1;
 b32 gbBlackoutPlayer;
@@ -11355,7 +11365,7 @@ i32 giBottomViewOverride;
 char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 u8 giSetupGameType;
 char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
-i32 giFullySeeded;
+b32 giFullySeeded;
 icon* gBuyBuildIcons;
 i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
@@ -11363,7 +11373,7 @@ b32 gbMoveShown;
 void** ppMapExtra;
 char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 i32 giThisNetPos;
-b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+i8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
 char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 class heroWindow* heroWin;
 i32 giOverviewReturnActionExtra;
@@ -11391,7 +11401,7 @@ i32 giTotalHighMem;
 i32 gMapX;
 i32 gMapY;
 char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
-i32 bFreshSave;
+b32 bFreshSave;
 i32 bShowIt;
 i32 gLowPageScreenSelector;
 class heroWindowManager* gpWindowManager;
@@ -11406,4 +11416,4 @@ b32 gbWaitForRemoteReceive;
 u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 townManager* gpTownManager;
 advManager* gpAdvManager;
-b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

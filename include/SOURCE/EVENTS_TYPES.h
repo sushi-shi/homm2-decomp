@@ -12,9 +12,9 @@ struct combatRemoteData {
     i8 fragment;
     i8 x;
     i8 y;
-    i8 hasFirstHero;
-    i8 hasTown;
-    i8 hasSecondHero;
+    b8 hasFirstHero;
+    b8 hasTown;
+    b8 hasSecondHero;
     i8 setupCombatX;
     i8 setupCombatY;
     i32 randomSeed;

@@ -29,7 +29,7 @@ border::border(
     i16 e,
     WidgetKind kind,
     i16 fillColor,
-    char* name
+    const char* name
 )
     : widget(x, y, w, h, e, kind) {
     if (name != NULL)
@@ -40,7 +40,7 @@ border::border(
     m_fillColor = fillColor;
 }
 
-inline border::~border() {
+ border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
     if (m_backgroundIcon != NULL)

@@ -123,19 +123,19 @@ i32 combatManager::DoSpellAI(CombatSide side, i32 restricted) {
 }
 
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
-    i32 durMax_29;
+    i32 durMax_29 [[maybe_unused]];
     i32 wallsDamagedTotal;
     i32 spellPowerWork;
     i32 hexCell_9;
-    i32 hasDamageReductionResult;
+    b32 hasDamageReductionResult;
     i32 effect_8;
     army* targetCreature;
     CombatSpellAITargetMode spellMode;
     i32 bDone;
     i32 team_9;
     float durationFactor_16;
-    i32 isMindEffect_13;
-    i32 fullQuantityFlag_4;
+    b32 isMindEffect_13;
+    b32 fullQuantityFlag_4;
     i32 cureAmount_7;
     i32 idx_3;
     i32 sumEffect_9;
@@ -144,7 +144,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     team_9 = 0;
     hexCell_9 = SPELL_AI_FIRST_HEX;
     durationFactor_16 = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
-    fullQuantityFlag_4 = 1;
+    fullQuantityFlag_4 = true;
     sumEffect_9 = 0;
     targetCreature = NULL;
     *bestEffect = 0;
@@ -234,8 +234,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         bDone = FirstArmy(SPELL_AI_FIRST_HEX, team_9, &hexCell_9);
 
     while (!bDone) {
-        hasDamageReductionResult = 0;
-        isMindEffect_13 = 0;
+        hasDamageReductionResult = false;
+        isMindEffect_13 = false;
         effect_8 = 0;
 
         if (m_hexCells[hexCell_9].m_occupantIndex >= 0
@@ -259,11 +259,11 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
             if (targetCreature->m_spellInfluence[(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                 || targetCreature->m_spellInfluence[(ARMY_SPELL_INFLUENCE_BERSERK)])
-                isMindEffect_13 = 1;
+                isMindEffect_13 = true;
             if (targetCreature->m_spellInfluence[(ARMY_SPELL_INFLUENCE_BLIND)]
                 || targetCreature->m_spellInfluence[(ARMY_SPELL_INFLUENCE_PARALYZE)]
                 || targetCreature->m_spellInfluence[(ARMY_SPELL_INFLUENCE_PETRIFIED)])
-                hasDamageReductionResult = 1;
+                hasDamageReductionResult = true;
         } else {
             targetCreature = NULL;
         }
@@ -707,7 +707,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
-    i32 spellPower = m_spellPower[(m_currentSide)];
+    i32 spellPower [[maybe_unused]] = m_spellPower[(m_currentSide)];
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
@@ -765,9 +765,9 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     float damageDelta;
-    i32 unused38_h;
+    i32 unused38_h [[maybe_unused]];
     i32 newSpd;
-    i32 unused30_j;
+    i32 unused30_j [[maybe_unused]];
     army* other = NULL;
     float castChance =
         target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[(influence)]));
@@ -782,9 +782,9 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     i32 distance;
     float afterTurns;
     float beforeTurns;
-    i32 unused48_e;
+    i32 unused48_e [[maybe_unused]];
     i32 shooters;
-    i32 adjacent;
+    b32 adjacent;
     i32 dragonCounter;
     i32 attackMask;
     switch (influence) {
@@ -870,7 +870,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             effect = static_cast<i32>(worth * COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
             break;
         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
-            adjacent = 0;
+            adjacent = false;
             dragonCounter = adjacent;
             for (cnt = 0; cnt < m_armyCount[(OppositeCombatSide(target->m_side))]; cnt++) {
                 other = &m_armies[(target->m_side)][cnt];
@@ -880,7 +880,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                     || other->m_monsterType == CREATURE_BONE_DRAGON) {
                     dragonCounter++;
                     if (target->OtherArmyAdjacent(other->m_side, other->m_index))
-                        adjacent = 1;
+                        adjacent = true;
                 }
             }
             if (adjacent)
@@ -968,11 +968,11 @@ i32 combatManager::FirstResurrectable(
 
 void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
     i32 sideWork_6;
-    i32 fullQuantityWork;
+    b32 fullQuantityWork;
     i32 armyValueResult_3;
     i32 negativeEffectResult;
     *effect = 0;
-    i32 done_11 = 0;
+    b32 done_11 = false;
     i32 influence_9;
     army* combatTarget;
     i32 curePointsTotal;
@@ -1078,7 +1078,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
         if (targetSide == SPELL_AI_ANY_SIDE && sideWork_6 == (m_currentSide))
             sideWork_6 = (OppositeCombatSide(m_currentSide));
         else
-            done_11 = 1;
+            done_11 = true;
     }
 }
 
@@ -1087,7 +1087,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     i32 resurrectPower;
     i32 armyIndex;
     i32 count;
-    float workChance;
+    float workChance [[maybe_unused]];
 
     resurrectPower = m_spellPower[(m_currentSide)] * COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
     if (m_heroes[(m_currentSide)] != NULL && m_heroes[(m_currentSide)]->HasArtifact(ARTIFACT_ANKH))
@@ -1110,7 +1110,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
     i32 remainderResult_4;
     i32 damagePerPowerResult_9;
     i32 stacksKilledCandidate_1[COMBAT_SIDE_COUNT];
-    i32 doneWork;
+    b32 doneWork;
     army* targetCreature_18;
     i32 killedCombatValue_1[COMBAT_SIDE_COUNT];
     CombatSide side_6;
@@ -1174,7 +1174,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
     damage = m_spellPower[(m_currentSide)] * damagePerPowerResult_9;
     currentHex_1 = 0;
     step_3 = 0;
-    doneWork = 0;
+    doneWork = false;
     creaturesKilledResult_5 = 0;
     disruptingRayValueTotal_11 = 0;
     if (m_hexCells[targetHex].m_occupantIndex >= 0)
@@ -1207,7 +1207,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_METEOR_SHOWER:
                 if ((step_3 >= SPELL_FIREBLAST_SECOND_RING_FIRST && spell != SPELL_FIREBLAST)
                     || step_3 >= SPELL_FIREBALL_AFFECTED_HEX_COUNT) {
-                    doneWork = 1;
+                    doneWork = true;
                     break;
                 }
                 if (step_3 == 0)
@@ -1274,7 +1274,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_COLD_RAY:
             case SPELL_DISRUPTING_RAY:
                 if (currentHex_1 == targetHex)
-                    doneWork = 1;
+                    doneWork = true;
                 else
                     currentHex_1 = targetHex;
                 break;
@@ -1291,7 +1291,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                 }
                 step_3++;
                 if (step_3 > CHAIN_LIGHTNING_MAX_TARGETS || currentHex_1 == COMBAT_HEX_EMPTY)
-                    doneWork = 1;
+                    doneWork = true;
                 break;
             case SPELL_TELEPORT:
             case SPELL_CURE:
@@ -1328,7 +1328,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             if (!gArmyEffected[(m_hexCells[currentHex_1].m_occupantSide)]
                               [m_hexCells[currentHex_1].m_occupantIndex]) {
                 gArmyEffected[(m_hexCells[currentHex_1].m_occupantSide)]
-                             [m_hexCells[currentHex_1].m_occupantIndex] = 1;
+                              [m_hexCells[currentHex_1].m_occupantIndex] = true;
                 workChanceWork = targetCreature_18->SpellCastWorkChance(spell);
                 if (workChanceWork > 0.0f) {
                     spellDamageWork = static_cast<i32l>(damage * workChanceWork);

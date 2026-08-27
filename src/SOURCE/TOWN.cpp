@@ -59,7 +59,7 @@ void town::GiveSpells(hero* targetHero) {
 }
 
 void town::XformToCastle(void) {
-    i32 objectType;
+    i32 objectType [[maybe_unused]];
     gpGame->ConvertObject(
         m_x + RANDOM_TOWN_LEFT,
         m_y + RANDOM_TOWN_TOP,
@@ -89,7 +89,7 @@ void town::XformToCastle(void) {
 }
 
 void town::View(i32 noFade) {
-    bEnteringTown = 1;
+    bEnteringTown = true;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
         gAdvDisposeLevel = ADV_DISPOSE_FULL;
     else if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_LOW_MEMORY_LIMIT)
@@ -103,11 +103,11 @@ void town::View(i32 noFade) {
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
-    bEnteringTown = 0;
+    bEnteringTown = false;
 }
 
 void town::Deallocate(void) {
-    playerData* pp = &gpGame->m_players[m_owner];
+    playerData* pp = &gpGame->m_players[(m_owner)];
     i32 pos = TOWN_ID_NONE;
     i32 i;
 
@@ -127,7 +127,7 @@ void town::Deallocate(void) {
     else if (pp->m_townLocatorPage + TOWN_PLAYER_WINDOW_SIZE > pp->m_townCount)
         pp->m_townLocatorPage = pp->m_townCount - TOWN_PLAYER_WINDOW_SIZE;
 
-    gpGame->m_townOwners[m_id] = TOWN_OWNER_NONE;
+    gpGame->m_townOwners[(m_id)] = TOWN_OWNER_NONE;
     m_owner = TOWN_OWNER_NONE;
 }
 
@@ -204,4 +204,4 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     }
 }
 
-i32 bEnteringTown = 0;
+b32 bEnteringTown = false;

@@ -35,7 +35,7 @@ void FlipIconToBitmapYModify(
     i32 x,
     i32 y,
     i32 frame,
-    IconDrawClipMode clip,
+    IconDrawClipMode clip [[maybe_unused]],
     i32 clipX,
     i32 clipY,
     i32 clipW,

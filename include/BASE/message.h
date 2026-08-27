@@ -218,7 +218,7 @@ struct tag_messageHoverPayload {
 
 union tag_messageWidgetData {
     i32 value;
-    char* text;
+    const char* text;
 };
 
 struct tag_messageWidgetPayload {

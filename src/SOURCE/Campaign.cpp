@@ -95,6 +95,11 @@ typedef enum CampaignScenarioNumber {
     SCENARIO_THIRTEEN = 13
 } CampaignScenarioNumber;
 
+typedef enum CampaignBonusHeroPosition {
+    CAMPAIGN_BONUS_HERO_FIRST  = 0,
+    CAMPAIGN_BONUS_HERO_SECOND = 1
+} CampaignBonusHeroPosition;
+
 enum {
     ROLAND_TO_ROLAND             = 0,
     ROLAND_TO_ARCHIBALD          = 1,
@@ -378,7 +383,7 @@ void game::PlayPreScenarioSmacker(CampaignSide side, i32 map) {
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     widget* trackWidget;
     i32 mapIndex;
-    i32 savedInterface;
+    b32 savedInterface;
     tag_message message;
     i32 trackMapIndex;
 
@@ -830,14 +835,14 @@ void game::InitCampaignMap(void) {
     i32 swappedHero;
     i32 heroPositionValue;
     i32 scanPositionId;
-    i32 savedNewGameSetup;
+    b32 savedNewGameSetup;
     i32 playerSlotSlot4;
     SCampaignChoice* choiceBest1;
     i32 heroPriorityBest3;
     i32 bestHeroPositionCandidate;
     i32 selectedChoicePosition0;
-    i32 mapHeaderResultCampaign3;
-    i32 bonusHeroIndexPosition;
+    i32 mapHeaderResultCampaign3 [[maybe_unused]];
+    CampaignBonusHeroPosition bonusHeroIndexPosition;
 
     selectedChoicePosition0 = m_campaignChoice[(iCurViewSide)][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
@@ -866,7 +871,7 @@ void game::InitCampaignMap(void) {
             m_campaignScenario + 1
         );
     }
-    m_newGameInitialized = 0;
+    m_newGameInitialized = false;
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);
@@ -948,11 +953,11 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
-                bonusHeroIndexPosition = 0;
+                bonusHeroIndexPosition = CAMPAIGN_BONUS_HERO_FIRST;
                 if (m_campaignType == CAMPAIGN_ROLAND
                     && m_campaignScenario + 1 == SCENARIO_SIX
                     && m_players[0].m_heroCount > 1)
-                    bonusHeroIndexPosition = 1;
+                    bonusHeroIndexPosition = CAMPAIGN_BONUS_HERO_SECOND;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
                     ->m_spells[(choiceBest1->spell)] = 1;
             }
@@ -1014,7 +1019,7 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignScenario + 1 == SCENARIO_SEVEN
         && m_campaignType == CAMPAIGN_ARCHIBALD) {
-        i32 savedNewGame = gbInNewGameSetup;
+        b32 savedNewGame = gbInNewGameSetup;
         hero* armyHero;
         gbInNewGameSetup = true;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
@@ -1083,9 +1088,32 @@ void game::InitCampaignMap(void) {
 
 i16 trackXY[(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
-    39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
-    557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
-    335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
+    {{39, 336},
+     {113, 336},
+     {150, 294},
+     {187, 336},
+     {261, 336},
+     {335, 336},
+     {409, 378},
+     {409, 294},
+     {483, 336},
+     {557, 336},
+     {-1, -1},
+     {261, 378},
+     {-1, -1}},
+    {{39, 336},
+     {113, 336},
+     {187, 294},
+     {187, 378},
+     {261, 336},
+     {335, 336},
+     {372, 294},
+     {409, 336},
+     {483, 294},
+     {483, 378},
+     {557, 336},
+     {261, 294},
+     {261, 378}}
 };
 class heroWindow* campWin = NULL;
 i32 iCurViewSide;

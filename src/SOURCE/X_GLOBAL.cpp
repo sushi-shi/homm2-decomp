@@ -3,7 +3,7 @@
 #include <SOURCE/X_GLOBAL.h>
 
 
-char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+const char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
 
 
     "{Старая кампания}\n\n"
@@ -22,7 +22,7 @@ char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
         "Отменить и вернуться в "
         "главное меню."
 };
-char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+const char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
 
 
     "{Старая карта}\n\n"
@@ -41,7 +41,7 @@ char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
         "Отменить и вернуться в "
         "главное меню."
 };
-char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
       "Союз эльфов",
       "Доспех",
       "Древесина",
@@ -54,7 +54,7 @@ char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
       "Ангел-хранитель",
       "Сфера антимагии"
 };
-char*
+const char*
     xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
         {  "Мятеж",
            "Земля Хаоса",
@@ -89,7 +89,7 @@ char*
          "",
          ""}
 };
-char*
+const char*
     xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
         {
             {
@@ -278,19 +278,19 @@ char*
                 ""
             }
         };
-char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+const char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
       "ЦВ",
       "НАС",
       "ЧАР",
       "ДОМ"
 };
-char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+const char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
       "Цена\x20верности\x20",
       "Наследники",
       "Остров\x20чародеев",
       "Дорога\x20домой"
 };
-char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
+const char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
       "Это\x20захоронение\x20таит\x20сме"
         "ртельную\x20тишину\x2e",
       "Яма\x20клокочущей\x20грязи\x20вск"
@@ -307,7 +307,7 @@ char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
         "кнули\x20черты\x20чьих\x2dто\x20лиц\x20"
         "и\x20исчезли\x2e"
 };
-char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
+const char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
       "Неупокоенные\x20духи\x20давно\x20"
         "погибших\x20воинов\x20ищут\x20усп"
         "окоения\x20и\x20соглашаются\x20вс"
@@ -357,14 +357,14 @@ char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
         "братиться\x20за\x20помощью\x20к\x20с"
         "илам\x20воды\x3f\x22"
 };
-char* xNecromancerShrine =
+const char* xNecromancerShrine =
       "Темная\x20святыня";
-char* xNecromancerShrineDesc =
+const char* xNecromancerShrineDesc =
       "Увеличивает\x20уровень\x20навы"
         "ка\x20Некромантии\x20каждого\x20в"
         "ашего\x20некроманта\x20на\x20\x31\x30\x20п"
         "роцентов\x2e";
-char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
+const char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
       "Старший\x20конюх\x20подошел\x20к\x20"
         "вам\x20со\x20словами\x3a\x20\x22У\x20вас\x20о"
         "тличный\x20конь\x20под\x20седлом\x20"
@@ -399,7 +399,7 @@ char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
         "ть\x20новых\x20коней\x20и\x20вашим\x20в"
         "садникам\x2e\x22"
 };
-char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+const char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
       "Джозеф",
       "Джозеф\x20\x49\x49",
       "Джозеф\x20\x49\x49\x49",
@@ -407,7 +407,7 @@ char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
       "Джозеф\x20\x56",
       "Джозеф\x20\x56\x49"
 };
-char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+const char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
       "Дядя\x20Иван",
       "Иван\x20\x49\x49",
       "Иван\x20\x49\x49\x49",
@@ -415,12 +415,12 @@ char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
       "Иван\x20\x56",
       "Иван\x20\x56\x49"
 };
-char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+const char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
       "\x31\x20ступ\x2e",
       "\x32\x20ступ\x2e",
       "\x33\x20ступ\x2e"
 };
-char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
+const char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
       "Продвижение",
       "Наступление",
       "Странствие",
@@ -633,7 +633,7 @@ char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
       "Волк",
       "Зомби"
 };
-i8 xNetHasOldPlayers = 0;
+b8 xNetHasOldPlayers = false;
 u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     (FACTION_KNIGHT),
     (FACTION_KNIGHT),
