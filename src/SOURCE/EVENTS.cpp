@@ -3473,7 +3473,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 occupiedTown_b = NULL;
                 if (otherHero_e->m_locationType
-                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                    == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                     occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
                     occupiedTown_b->m_occupyingHeroId = otherHero_e->m_id;
                 }
@@ -4919,7 +4919,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     freedHero->m_mobility = freedHero->m_remainingMobility;
     freedHero->m_locationType = cell->m_triggerType;
     freedHero->m_occupiedTown = cell->m_objectMetadata;
-    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroId;
     SendMapChange(
         MAP_CHANGE_RECRUIT_HERO,
@@ -7249,7 +7249,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 return;
             }
             if (otherHero_e->m_locationType
-                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
                 occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
 
             if (gbHumanPlayer[H2EnumIndex(otherHero_e->m_owner)] == 0) {
@@ -7818,7 +7818,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
     releasedHero13->m_locationType = cell->m_triggerType;
     releasedHero13->m_occupiedTown = cell->m_objectMetadata;
-    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroId9;
     SendMapChange(
         MAP_CHANGE_RECRUIT_HERO,

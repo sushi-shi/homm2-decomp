@@ -131,7 +131,7 @@ public:
     TilesetId m_overlayTileset : 6;
     u8 m_overlayIndex;
     u8 m_flags;
-    H2EnumStorage<MapObjectType, u8> m_triggerType;
+    H2OpenCodeStorage<MapTriggerCode, u8> m_triggerType;
     u16 m_extraIndex;
 
     inline b32 HasFlag(MapCellFlag flag) const {

@@ -809,12 +809,12 @@ i32 philAI::GoodAdjacent(MapDirection* direction) {
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_WHIRLPOOL)) {
                 if (gpAdvManager->GetCell(kn, nb)->m_triggerType
-                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                        != (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                     || GetCastleSlot(gpAdvManager->GetCell(kn, nb)->m_objectMetadata)->m_owner
                         != giCurPlayer
                     || gpCurAIHero->m_lastTownInteractionTurn != giCurTurn) {
                     if (gpAdvManager->GetCell(kn, nb)->m_triggerType
-                            != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                            != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                         || GetHeroSlot(gpAdvManager->GetCell(kn, nb)->m_objectMetadata)->m_owner
                             != giCurPlayer
                         || gpCurAIHero->m_lastHeroInteractionTurn != giCurTurn) {
@@ -873,7 +873,7 @@ void philAI::CheckReload(void) {
             if (gpSearchArray->GetRow(node, 1)[MAP_WIDTH * p].visited) {
                 nb_1 = gpAdvManager->GetCell(node, p);
                 switch (nb_1->m_triggerType) {
-                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
+                    case (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)):
                         jb_5 = FightValueOfStack(
                             &GetCastleSlot(nb_1->m_objectMetadata)->m_army,
                             NULL,
@@ -895,7 +895,7 @@ void philAI::CheckReload(void) {
                                    / (gpSearchArray->GetRow(node, 1)[MAP_WIDTH * p].distance + 30);
                         }
                         break;
-                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION):
+                    case (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)):
                         if (gpGame->m_availableHeroes[nb_1->m_objectMetadata]
                             != gpCurAIHero->m_owner) {
                             jb_5 = FightValueOfStack(
@@ -945,7 +945,7 @@ void philAI::CheckBerserk(void) {
             for (line = 0; line < MAP_HEIGHT; line++) {
                 knIndex = gpAdvManager->GetCell(col, line);
                 switch (knIndex->m_triggerType) {
-                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
+                    case (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)):
                         if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != gpCurAIHero->m_owner) {
                             if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != -1) {
                                 ndx = FightValueOfStack(
@@ -963,7 +963,7 @@ void philAI::CheckBerserk(void) {
                             }
                         }
                         break;
-                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION):
+                    case (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)):
                         if (gpGame->m_availableHeroes[knIndex->m_objectMetadata]
                             != gpCurAIHero->m_owner) {
                             heroPtr = GetHeroSlot(knIndex->m_objectMetadata);
@@ -972,7 +972,7 @@ void philAI::CheckBerserk(void) {
                                 NULL,
                                 1,
                                 heroPtr->m_locationType
-                                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE),
+                                    == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)),
                                 heroPtr->m_occupiedTown,
                                 0
                             );
@@ -1344,7 +1344,7 @@ void philAI::DoAI(i32 player) {
 
                 if (targetValue11 < 75 && gpGame->m_day == 7
                     && gpCurAIHero->m_locationType
-                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                           == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                     gpCurAIHero->m_remainingMobility = 0;
                 }
                 for (pathIndex0 = 0; pathIndex0 < iCurPlaceToVisit; pathIndex0++) {
@@ -1356,7 +1356,7 @@ void philAI::DoAI(i32 player) {
                                        gpCurAIHero->m_destinationY
                                    )
                                    ->m_triggerType
-                               != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                               != (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                         gpCurAIHero->m_remainingMobility = 0;
                     }
                 }
@@ -1493,7 +1493,7 @@ void philAI::DoAI(i32 player) {
         gpCurAIHero->m_remainingMobility = 0;
         gpAdvManager->DeactivateCurrHero();
     aiNextHero:
-        if (gpCurAIHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+        if (gpCurAIHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
             CheckBuyStuff();
         }
     }
@@ -1652,7 +1652,7 @@ firstWeekDone:
                         if (y4 == 0)
                             continue;
                         cell10 = gpAdvManager->GetCell(x3, y4 - 1);
-                        if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                        if (cell10->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                             || (cell10->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                                    == MAP_OBJECT_HERO_INTERACTION) {
                             threatTownId9 = gpGame->GetTownId(x3, y4 - 1);
@@ -2031,9 +2031,9 @@ i32 philAI::DetermineTargetPosition(
                              || y != gpCurAIHero->m_destinationY)
                          && (dxy >= 16
                              || (gpAdvManager->GetCell(x, y)->m_triggerType
-                                     != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                                     != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                                  && (gpAdvManager->GetCell(x, y)->m_triggerType
-                                         != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                                         != (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                                      || GetCastleSlot(gpAdvManager->GetCell(x, y)
                                                           ->m_objectMetadata)
                                                 ->m_owner
@@ -2047,7 +2047,7 @@ i32 philAI::DetermineTargetPosition(
                                             == (MAP_TRIGGER_ACTION_FLAG
                                                 | MAP_OBJECT_HERO_INTERACTION)
                                         || (gpAdvManager->GetCell(x, y)->m_triggerType
-                                                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                                                == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                                             && GetCastleSlot(gpAdvManager->GetCell(x, y)
                                                                  ->m_objectMetadata)
                                                        ->m_owner
@@ -2061,12 +2061,12 @@ i32 philAI::DetermineTargetPosition(
                             good = false;
                         } else {
                             good = (cell->m_triggerType
-                                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                                        == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                                     || cell->m_triggerType
                                            == (MAP_TRIGGER_ACTION_FLAG
                                                | MAP_OBJECT_HERO_INTERACTION)
                                     || (cell->m_triggerType
-                                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                                            == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
                                         && !(H2EnumIndex((gpCurAIHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))));
                         }
                     } else {
@@ -2095,9 +2095,9 @@ i32 philAI::DetermineTargetPosition(
                         for (heroNum = 0; heroNum < gpCurPlayer->m_heroCount;
                              heroNum++) {
                             if (cell->m_triggerType
-                                    != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                                    != (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                                 && cell->m_triggerType
-                                       != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                                       != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                                 && gpCurPlayer->m_heroIds[heroNum] != gpCurAIHero->m_id
                                 && gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroNum]]
                                            .m_destinationX
@@ -3006,7 +3006,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
     best.what = bestHeroIndex10;
     bestValue = bestRawLocal6;
     if (gpGame->m_worldMap.GetCell(townPtr->m_x, townPtr->m_y)->m_triggerType
-        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+        == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
         bestValue -= AI_HERO_PURCHASE_CELL_PENALTY;
     }
 }
@@ -3139,7 +3139,7 @@ i32 philAI::RVOfPosition(
     i32 targetLiveChance12;
     i32 eventValue5;
     i32 strategicDelta5;
-    MapObjectType triggerType7;
+    MapTriggerCode triggerType7;
     i32 currentLiveChance1;
     char debugText1[POSITION_DEBUG_TEXT_CAPACITY];
 
@@ -3324,7 +3324,7 @@ i32 philAI::StrategicValueOfPosition(
     madeSearch = false;
     townOK = false;
     cell = gpAdvManager->GetCell(targetX, targetY);
-    if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+    if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
         && GetCastleSlot(cell->m_objectMetadata)->m_owner == giCurPlayer
         && (GetCastleSlot(cell->m_objectMetadata)->m_buildings
             & H2EnumIndex(TOWN_BUILDING_CASTLE))) {
@@ -3381,7 +3381,7 @@ i32 philAI::StrategicValueOfPosition(
                      && search->GetNode(xPos, yy).distance <= nearDistance)
                     || (checkEnemies
                         && cell->m_triggerType
-                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION))) {
+                               == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))) {
                     CheckDoMain(0, 0);
                     eventPoints = static_cast<i32>(
                         (ValueOfEventAtPosition(xPos, yy, 0, &iDummy) * 25)
@@ -3389,13 +3389,13 @@ i32 philAI::StrategicValueOfPosition(
                     );
                     if (!townOK
                         || cell->m_triggerType
-                               != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                               != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                         || eventPoints >= 0)
                         worth += eventPoints;
                 }
 
                 if (cell->m_triggerType
-                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+                    == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
                     if (gaiHeroLiveChance[cell->m_objectMetadata] == RV_UNSET)
                         ValueOfEventAtPosition(xPos, yy, 0, &iDummy);
                     if (gaiHeroLiveChance[cell->m_objectMetadata] != RV_UNSET
@@ -3437,7 +3437,7 @@ i32 philAI::StrategicValueOfPosition(
                 if (gpCurAIHero->m_id != iAlphaMale && (targetX != xPos || targetY != yy)
                     && search->GetNode(xPos, yy).distance < 1024
                     && gpAdvManager->GetCell(xPos, yy)->m_triggerType
-                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                           == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                     && gpAdvManager->GetCell(xPos, yy)->m_objectMetadata != gpCurAIHero->m_id
                     && gpGame->m_availableHeroes[gpAdvManager->GetCell(xPos, yy)
                                                      ->m_objectMetadata]
@@ -4718,7 +4718,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     newHero->m_locationType = gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType;
     newHero->m_occupiedTown = gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata;
     gpGame->m_worldMap.GetCell(townX, townY)->m_triggerType =
-        (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
+        (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
     gpGame->m_worldMap.GetCell(townX, townY)->m_objectMetadata =
         gpCurPlayer->m_availableHeroIds[availableHeroIndex];
     gpGame->m_availableHeroes[newHero->m_id] = townPtr->m_owner;
@@ -5192,7 +5192,7 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 
     if (pTown->m_owner == giCurPlayer && h->m_x == x && h->m_y == y) {
         pTown->m_occupyingHeroId = gpCurPlayer->CurrentHero();
-        h->m_locationType = (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE);
+        h->m_locationType = (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE));
         h->m_occupiedTown = pTown->m_id;
         HeroInteractionAtTown(h, pTown, 0, &iDummy);
     }
@@ -6510,7 +6510,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
         defTown = NULL;
         townGroup = NULL;
         otherHero = gpGame->GetHero(heroId);
-        if (otherHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+        if (otherHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
             defTown = gpGame->GetTown(otherHero->m_occupiedTown);
             townGroup = &defTown->m_army;
             townValue = ValueOfTown(defTown);
