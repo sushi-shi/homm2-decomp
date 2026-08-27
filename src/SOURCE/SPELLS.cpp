@@ -3727,20 +3727,18 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
         }
     }
 
-    if (gbNoShowCombat)
-        goto applySpellInfluence;
-
-    anyAffected_i = false;
-    for (side2 = COMBAT_ATTACKER_SIDE; H2EnumIndex(side2) < COMBAT_SIDE_COUNT; ++side2) {
-        for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side2)]; ++armyIndex) {
-            if (affected2[H2EnumIndex(side2)][armyIndex] != 0)
-                anyAffected_i = true;
+    if (!gbNoShowCombat) {
+        anyAffected_i = false;
+        for (side2 = COMBAT_ATTACKER_SIDE; H2EnumIndex(side2) < COMBAT_SIDE_COUNT; ++side2) {
+            for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side2)]; ++armyIndex) {
+                if (affected2[H2EnumIndex(side2)][armyIndex] != 0)
+                    anyAffected_i = true;
+            }
         }
+        if (anyAffected_i)
+            ShowMassSpell(affected2, effect, animateCreatures);
     }
-    if (anyAffected_i)
-        ShowMassSpell(affected2, effect, animateCreatures);
 
-applySpellInfluence:
     for (side2 = COMBAT_ATTACKER_SIDE; H2EnumIndex(side2) < COMBAT_SIDE_COUNT; ++side2) {
         for (armyIndex = 0; armyIndex < m_armyCount[H2EnumIndex(side2)]; ++armyIndex) {
             if (affected2[H2EnumIndex(side2)][armyIndex] == 0)

@@ -7124,7 +7124,7 @@ void CreateDiffFile(
                 diffTotal += length;
                 position += length;
                 length = 0;
-                goto Finish;
+                break;
             }
             if (*(prevData + position + length) == *(fullData + position + length)) {
                 matchLen = 1;
@@ -7157,7 +7157,6 @@ void CreateDiffFile(
         }
     }
 
-Finish:
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     destFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (destFile == -1)

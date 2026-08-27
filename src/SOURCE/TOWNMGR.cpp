@@ -1322,6 +1322,29 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
     i32 tradeCount;
 
+    const auto showBuildingInformation = [&]() {
+        utf8::Copy(
+            text, sizeof(text),
+            GetBuildingInfo(
+                m_town->m_type,
+                static_cast<BuildingSlotType>(message.payload.widget.id),
+                1
+            )
+        );
+        NormalDialog(
+            text,
+            NORMAL_DIALOG_QUICK_VIEW,
+            -1,
+            -1,
+            H2EnumIndex(m_town->m_type) + BUILDING_DIALOG_ICON_FRAME_BASE,
+            message.payload.widget.id,
+            -1,
+            0,
+            -1,
+            0
+        );
+    };
+
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         quickView = true;
     else
@@ -1391,7 +1414,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_CASTLE:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "caslwind.bin");
@@ -1480,7 +1504,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_MAGE_GUILD:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 if (m_town->m_occupyingHeroId != -1
@@ -1558,7 +1583,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_WELL:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "wellwind.bin");
@@ -1573,7 +1599,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_THIEVES_GUILD:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "thiefwin.bin");
@@ -1589,7 +1616,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_TAVERN:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 if (m_town->m_type == FACTION_NECROMANCER) {
@@ -1623,7 +1651,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_CASTLE_UPGRADE:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 if (m_town->m_mayNotUpgradeToCastle != 0) {
@@ -1652,7 +1681,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_DOCK:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 gpWindowManager->BroadcastMessage(
@@ -1729,7 +1759,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         case TOWN_WIDGET_BUILDING_MARKETPLACE:
                             if (quickView) {
-                                goto showBuildingInformation;
+                                showBuildingInformation();
+                                break;
                             }
                             {
                                 tradeCount = 0;
@@ -1753,27 +1784,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                         case TOWN_WIDGET_BUILDING_SPECIAL:
                         case TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS:
                             if (quickView) {
-                            showBuildingInformation:
-                                utf8::Copy(
-                                    text, sizeof(text),
-                                    GetBuildingInfo(
-                                        m_town->m_type,
-                                        static_cast<BuildingSlotType>(message.payload.widget.id),
-                                        1
-                                    )
-                                );
-                                NormalDialog(
-                                    text,
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    H2EnumIndex(m_town->m_type) + BUILDING_DIALOG_ICON_FRAME_BASE,
-                                    message.payload.widget.id,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                showBuildingInformation();
                                 break;
                             }
                             {
