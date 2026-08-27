@@ -1269,6 +1269,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 quickView = true;
+                [[fallthrough]];
             case WIDGET_COMMAND_SELECT:
                 if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                     quickView = true;

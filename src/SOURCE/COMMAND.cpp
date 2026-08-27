@@ -361,18 +361,21 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
         return MESSAGE_DISPATCH_FORWARD;
 
     if (gbNoShowCombat == 0) {
-        CombatRemotePacket* packet =
+        CombatRemotePacket* remotePacket =
             reinterpret_cast<CombatRemotePacket*>(GetRemoteData(REMOTE_PACKET_TYPE));
-        if (packet != NULL && packet->type == REMOTE_MESSAGE_RELIABLE) {
-            switch (packet->command) {
+        if (remotePacket != NULL && remotePacket->type == REMOTE_MESSAGE_RELIABLE) {
+            switch (remotePacket->command) {
                 case REMOTE_COMMAND_ACTION:
-                    giNextAction = packet->nextAction;
-                    giNextActionExtra = packet->nextActionExtra;
-                    giNextActionGridIndex = packet->nextActionGridIndex;
-                    giNextActionGridIndex2 = packet->nextActionGridIndex2;
+                    giNextAction = remotePacket->nextAction;
+                    giNextActionExtra = remotePacket->nextActionExtra;
+                    giNextActionGridIndex = remotePacket->nextActionGridIndex;
+                    giNextActionGridIndex2 = remotePacket->nextActionGridIndex2;
                     goto ProcessAction;
                 case REMOTE_COMMAND_MESSAGE:
-                    PopNetBox(reinterpret_cast<char*>(&packet->nextAction), packet->messageLength);
+                    PopNetBox(
+                        reinterpret_cast<char*>(&remotePacket->nextAction),
+                        remotePacket->messageLength
+                    );
                     break;
             }
         }
