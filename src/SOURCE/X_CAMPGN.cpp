@@ -372,8 +372,8 @@ void ExpCampaign::InitMap(void) {
                     }
                 }
                 pHero->SetSS(
-                    static_cast<HeroSecondarySkill>(bonus->value),
-                    static_cast<HeroSkillLevel>(bonus->amount)
+                    HeroSecondarySkillFromCode(bonus->value),
+                    HeroSkillLevelFromCode(bonus->amount)
                 );
             }
             break;
@@ -872,7 +872,7 @@ i32 ExpCampaign::HandleVictory(void) {
         if (m_mapChoices[map]) {
             m_mapDays[map] = days;
             if (m_currentMap == MAP_NONE)
-                m_currentMap = static_cast<ExpansionCampaignMap>(map);
+                m_currentMap = ExpansionCampaignMapFromCode(map);
         }
     }
     ShowInfo(0, 0);
@@ -1193,7 +1193,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
                         if (giDebugLevel >= 1 || xCampaign.m_mapChoices[map]
                             || xCampaign.m_mapsPlayed[map]) {
-                            xCampaign.m_viewMap = static_cast<ExpansionCampaignMap>(map);
+                            xCampaign.m_viewMap = ExpansionCampaignMapFromCode(map);
                             xCampaign.UpdateInfo(1);
                         }
                         break;

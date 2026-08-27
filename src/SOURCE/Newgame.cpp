@@ -153,6 +153,10 @@ enum class NewGameMapChoice : i32 {
 };
 using enum NewGameMapChoice;
 
+constexpr NewGameMapChoice NewGameMapChoiceFromCode(i16 value) {
+    return static_cast<NewGameMapChoice>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 enum class NewGamePlayerSlot : i32 {
     PLAYER_SLOT_FIRST  = 0,
     PLAYER_SLOT_SECOND = 1,
@@ -346,7 +350,7 @@ void game::InitNewGame(struct SMapHeader* header) {
                 m_setupPlayerType[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerNetworkId[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerRace[player] = FACTION_ANY;
-                m_playerHandicap[player] = static_cast<PlayerHandicap>(-1);
+                m_playerHandicap[player] = PLAYER_HANDICAP_UNINITIALIZED;
             } else {
                 m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
@@ -433,7 +437,7 @@ i32 game::NewGame(void) {
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        switch (static_cast<NewGameMapChoice>(static_cast<i16>(gpWindowManager->m_dialogResult))) {
+        switch (NewGameMapChoiceFromCode(static_cast<i16>(gpWindowManager->m_dialogResult))) {
             case MAP_CHOICE_STANDARD:
                 xIsExpansionMap = false;
                 break;
@@ -1289,7 +1293,7 @@ cleanup:
                                     message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
                             setDifficulty:
                                 gpGame->m_difficulty =
-                                    static_cast<GameDifficulty>(currentPlayerLocal);
+                                    GameDifficultyFromCode(currentPlayerLocal);
                                 needSync = true;
                                 redraw = true;
                                 break;

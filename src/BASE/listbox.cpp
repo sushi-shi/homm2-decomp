@@ -115,9 +115,9 @@ void listBoxWidget::Read(void) {
     m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(name));
     gpResourceManager->RestorePosition();
     m_maxVisibleItems = gpResourceManager->ReadWord();
-    m_normalColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
-    m_selectedColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
-    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
+    m_normalColor = FontDrawModeFromCode(gpResourceManager->ReadWord());
+    m_selectedColor = FontDrawModeFromCode(gpResourceManager->ReadWord());
+    m_alignment = FontAlignmentFromCode(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     m_firstRowFrame = FRAME_FIRST_ROW;
     m_middleRowFrame = FRAME_MIDDLE_ROW;

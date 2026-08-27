@@ -642,7 +642,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             spellY + m_spellEffectYOffset,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            static_cast<IconDrawOrientation>(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
+            IconDrawOrientationFromOrdinal(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
             0,
             NULL,
             NULL
@@ -1263,7 +1263,7 @@ void army::SpecialAttack(void) {
             if (k < COMBAT_DIRECTION_ADJACENT_COUNT) {
                 adjacentHex = pEnemy->GetAdjacentCellIndex(
                     pEnemy->m_hex,
-                    static_cast<CombatHexDirection>(k)
+                    CombatHexDirectionFromOrdinal(k)
                 );
             } else {
                 adjacentHex = pEnemy->m_hex;
@@ -1790,7 +1790,7 @@ attackDone:
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
     targetHex_3 = ARMY_HEX_INVALID;
-    m_targetSide = static_cast<CombatSide>(targetHex_3);
+    m_targetSide = COMBAT_SIDE_NONE;
     if (retaliation) {
         gpCombatManager->m_currentSide = OppositeCombatSide(gpCombatManager->m_currentSide);
     }
@@ -1837,7 +1837,7 @@ i32 army::WalkTo(i32 destination) {
             for (direction_3 = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST);
                  direction_3 < ARMY_ADJACENT_DIRECTION_COUNT;
                  direction_3++) {
-                if (GetAdjacentCellIndex(m_hex, static_cast<CombatHexDirection>(direction_3))
+                if (GetAdjacentCellIndex(m_hex, CombatHexDirectionFromOrdinal(direction_3))
                     == moatCell[moatIndex_1]) {
                     canEnterMoat_1 = true;
                 }
@@ -1860,7 +1860,7 @@ i32 army::WalkTo(i32 destination) {
     steps = 0;
     for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
         Walk(
-            static_cast<CombatHexDirection>(
+            CombatHexDirectionFromOrdinal(
                 gpSearchArray->m_storage.path.directions[direction_3 + 1]
             ),
             0,
@@ -1900,7 +1900,7 @@ i32 army::AttackTo(i32 destination) {
     }
     if (FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
         if (gpSearchArray->m_pathLength == 1) {
-            m_attackDirection = static_cast<CombatHexDirection>(
+            m_attackDirection = CombatHexDirectionFromOrdinal(
                 gpSearchArray->m_storage.path.directions[1]
             );
             gpCombatManager->TestRaiseDoor();
@@ -1911,7 +1911,7 @@ i32 army::AttackTo(i32 destination) {
             for (pathIndex = gpSearchArray->m_pathLength - 1; pathIndex != 0; pathIndex--) {
                 stepCount++;
                 Walk(
-                    static_cast<CombatHexDirection>(
+                    CombatHexDirectionFromOrdinal(
                         gpSearchArray->m_storage.path.directions[pathIndex + 1]
                     ),
                     pathIndex != 1 && stepCount < m_monster.speed ? 0 : 1,
@@ -1922,7 +1922,7 @@ i32 army::AttackTo(i32 destination) {
                 }
             }
             CancelSpellType(ArmySpellCancelType(0));
-            m_attackDirection = static_cast<CombatHexDirection>(
+            m_attackDirection = CombatHexDirectionFromOrdinal(
                 gpSearchArray->m_storage.path.directions[1]
             );
             gpCombatManager->TestRaiseDoor();
@@ -2148,12 +2148,10 @@ i32 army::Damage(i32l damage, SpellType spell) {
         m_deathPending = true;
     }
     oldFacing = m_facing;
-    m_facing = static_cast<ArmyFacing>(
-        H2EnumIndex(gpCombatManager
-                ->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
-                          [gpCombatManager->m_currentArmyIndex]
-                .m_facing)
-        ^ H2EnumIndex(ARMY_FACING_RIGHT)
+    m_facing = OppositeArmyFacing(
+        gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
+                                 [gpCombatManager->m_currentArmyIndex]
+            .m_facing
     );
     m_facing = oldFacing;
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
@@ -2914,7 +2912,7 @@ void army::GoBerserk(void) {
         GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     if (attackMask_29 != ARMY_ALL_ATTACK_DIRECTIONS) {
         while (!targetFound_8) {
-            direction_4 = static_cast<CombatHexDirection>(
+            direction_4 = CombatHexDirectionFromOrdinal(
                 Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1)
             );
             if (!(attackMask_29 & (1 << H2EnumIndex(direction_4)))) {

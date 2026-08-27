@@ -26,6 +26,7 @@ struct tag_message;
 enum class CampaignTrackType : i32;
 
 enum class PlayerHandicap : i8 {
+    PLAYER_HANDICAP_UNINITIALIZED = -1,
     PLAYER_HANDICAP_NONE     = 0,
     PLAYER_HANDICAP_MODERATE = 1,
     PLAYER_HANDICAP_SEVERE   = 2,

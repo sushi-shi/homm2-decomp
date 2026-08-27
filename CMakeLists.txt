@@ -289,6 +289,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
+  add_executable(homm2_enum_code_test tools/enum_code_test.cpp)
+  target_include_directories(homm2_enum_code_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(homm2_enum_code_test PRIVATE
+      -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
+  endif()
+  add_test(NAME enum_code COMMAND homm2_enum_code_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE

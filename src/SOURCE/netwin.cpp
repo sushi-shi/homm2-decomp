@@ -297,7 +297,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     tag_message windowMessage;
     i32 player;
 
-    switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
+    switch (NetworkPacketTypeFromCode(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);

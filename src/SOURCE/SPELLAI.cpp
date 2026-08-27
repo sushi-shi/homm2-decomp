@@ -1210,19 +1210,19 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     currentHex_1 = targetHex;
                 if (step_3 > 0 && step_3 <= SPELL_ADJACENT_DIRECTION_COUNT)
                     currentHex_1 = GetAdjacentCellIndexNoArmy(
-                        targetHex, static_cast<CombatHexDirection>(step_3 - 1)
+                        targetHex, CombatHexDirectionFromOrdinal(step_3 - 1)
                     );
                 if (step_3 > SPELL_ADJACENT_DIRECTION_COUNT
                     && step_3 <= SPELL_ADJACENT_DIRECTION_COUNT * 2) {
                     currentHex_1 = GetAdjacentCellIndexNoArmy(
                         targetHex,
-                        static_cast<CombatHexDirection>(
+                        CombatHexDirectionFromOrdinal(
                             step_3 - SPELL_FIREBLAST_SECOND_RING_FIRST
                         )
                     );
                     currentHex_1 = GetAdjacentCellIndexNoArmy(
                         currentHex_1,
-                        static_cast<CombatHexDirection>(
+                        CombatHexDirectionFromOrdinal(
                             step_3 - SPELL_FIREBLAST_SECOND_RING_FIRST
                         )
                     );

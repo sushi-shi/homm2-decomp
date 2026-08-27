@@ -341,6 +341,10 @@ enum class AIArtifactEventMode : i32 {
 };
 using enum AIArtifactEventMode;
 
+constexpr AIArtifactEventMode AIArtifactEventModeFromCode(i32 value) {
+    return static_cast<AIArtifactEventMode>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 typedef enum AIArtifactEventConstant {
     AI_ARTIFACT_EVENT_MODE_MASK             = 0xf,
     AI_EVENT_RESOURCE_TYPE_MASK             = 0xf,
@@ -1398,7 +1402,7 @@ void philAI::DoAI(i32 player) {
                                     stopAfterStep6 = true;
                                 }
                             }
-                            direction26 = static_cast<MapDirection>(
+                            direction26 = MapDirectionFromCode(
                                 gpSearchArray->m_storage.aiPath.directions[pathIndex0]
                             );
                         aiMoveDirection:
@@ -5908,7 +5912,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_WITCH_HUT:
                 eventRV = ComputeValueOfFreeSS(
                     gpCurAIHero,
-                    static_cast<HeroSecondarySkill>(theCell->m_objectMetadata)
+                    HeroSecondarySkillFromCode(theCell->m_objectMetadata)
                 );
                 break;
             case MAP_OBJECT_SIGN:
@@ -5983,8 +5987,8 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 removedQuantity;
 
     badArtifacts = 0;
-    genericType = static_cast<GenericSiteType>(cell->m_objectMetadata);
-    genericType = static_cast<GenericSiteType>(H2EnumIndex(genericType) & H2EnumIndex(GENERIC_SITE_TYPE_MASK));
+    genericType = GenericSiteTypeFromCode(cell->m_objectMetadata);
+    genericType = GenericSiteTypeFromCode(H2EnumIndex(genericType) & H2EnumIndex(GENERIC_SITE_TYPE_MASK));
     value = 0;
 
     switch (genericType) {
@@ -6072,9 +6076,9 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 kn;
 
     i16 lvl;
-    recruitmentSiteType = static_cast<RecruitSiteType>(cell->m_tentColor);
+    recruitmentSiteType = RecruitSiteTypeFromCode(cell->m_tentColor);
     recruitmentSiteType =
-        static_cast<RecruitSiteType>(H2EnumIndex(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK);
+        RecruitSiteTypeFromCode(H2EnumIndex(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK);
     lvl = cell->m_tentColor;
     lvl >>= EVENT_RECRUIT_COUNT_SHIFT;
     nb = 0;
@@ -6202,7 +6206,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     if (eventData & MAP_EVENT_ARTIFACT_GUARD_FLAG) {
         for (idx = 0; idx < ARMY_GROUP_SLOT_COUNT; idx++) {
             gpMonGroup->m_creatureTypes[idx] =
-                static_cast<CreatureType>(eventData & AI_ARTIFACT_EVENT_CREATURE_MASK);
+                CreatureTypeFromCode(eventData & AI_ARTIFACT_EVENT_CREATURE_MASK);
             gpMonGroup->m_quantities[idx] = static_cast<i16>(
                 gpMonGroup->m_creatureTypes[idx] == CREATURE_ROGUE
                     ? H2EnumIndex(AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT)
@@ -6230,7 +6234,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             guardRV = 0;
         result = guardRV;
     } else {
-        switch (static_cast<AIArtifactEventMode>(eventData & AI_ARTIFACT_EVENT_MODE_MASK)) {
+        switch (AIArtifactEventModeFromCode(eventData & AI_ARTIFACT_EVENT_MODE_MASK)) {
             case AI_ARTIFACT_EVENT_VALUE:
                 result = plainVal;
                 break;

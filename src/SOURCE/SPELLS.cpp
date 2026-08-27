@@ -1371,13 +1371,13 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     for (frame = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); frame < SPELL_ADJACENT_DIRECTION_COUNT;
          ++frame) {
         affectedHexes[frame + 1] = static_cast<i16>(
-            GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(frame))
+            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(frame))
         );
         if (spell == SPELL_FIREBLAST) {
             affectedHexes[frame + SPELL_FIREBLAST_SECOND_RING_FIRST] =
                 static_cast<i16>(target->GetAdjacentCellIndex(
                     affectedHexes[frame + 1],
-                    static_cast<CombatHexDirection>(frame)
+                    CombatHexDirectionFromOrdinal(frame)
                 ));
         }
     }
@@ -1481,7 +1481,7 @@ void combatManager::MeteorShower(i32 targetHex) {
     for (direction = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST); direction < SPELL_ADJACENT_DIRECTION_COUNT;
          ++direction) {
         hexes[direction + 1] =
-            GetAdjacentCellIndexNoArmy(targetHex, static_cast<CombatHexDirection>(direction));
+            GetAdjacentCellIndexNoArmy(targetHex, CombatHexDirectionFromOrdinal(direction));
     }
 
     if (!gbNoShowCombat) {

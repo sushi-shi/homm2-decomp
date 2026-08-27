@@ -64,10 +64,10 @@ Key TranslateKey(SDL_Scancode code) {
     default: break;
     }
     if (code >= SDL_SCANCODE_A && code <= SDL_SCANCODE_Z) {
-        return static_cast<Key>(static_cast<int>(Key::A) + (code - SDL_SCANCODE_A));
+        return KeyFromOrdinal(static_cast<int>(Key::A) + (code - SDL_SCANCODE_A));
     }
     if (code >= SDL_SCANCODE_1 && code <= SDL_SCANCODE_9) {
-        return static_cast<Key>(static_cast<int>(Key::Digit1) + (code - SDL_SCANCODE_1));
+        return KeyFromOrdinal(static_cast<int>(Key::Digit1) + (code - SDL_SCANCODE_1));
     }
     if (code == SDL_SCANCODE_0) {
         return Key::Digit0;

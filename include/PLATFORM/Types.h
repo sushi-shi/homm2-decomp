@@ -62,6 +62,10 @@ enum class Key {
     N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 };
 
+constexpr Key KeyFromOrdinal(int value) {
+    return static_cast<Key>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 enum class MouseButton {
     Left,
     Right,

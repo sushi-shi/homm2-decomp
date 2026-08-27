@@ -1422,7 +1422,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->m_army.m_creatureTypes[armySlot] =
                                         gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
                                     gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                        static_cast<CreatureType>(tmp);
+                                        CreatureTypeFromCode(tmp);
                                     tmp = gpHVHero->m_army.m_creatureCounts[armySlot];
                                     gpHVHero->m_army.m_creatureCounts[armySlot] =
                                         gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];

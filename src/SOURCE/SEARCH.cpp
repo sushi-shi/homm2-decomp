@@ -71,7 +71,7 @@ i32 searchArray::BuildPath(
             }
         }
         MapDirection backDir =
-            OppositeMapDirection(static_cast<MapDirection>(node->direction));
+            OppositeMapDirection(MapDirectionFromCode(node->direction));
         destinationX += normalDirTable[H2EnumIndex(backDir)].x;
         destinationY += normalDirTable[H2EnumIndex(backDir)].y;
     }
