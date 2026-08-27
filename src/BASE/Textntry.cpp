@@ -106,9 +106,7 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
     std::vector<char> legacyText(static_cast<std::size_t>(m_maxLength) + 1, 0);
-    gpResourceManager->ReadBlock(
-        reinterpret_cast<i8*>(legacyText.data()), m_maxLength
-    );
+    gpResourceManager->ReadBlock(legacyText.data(), m_maxLength);
     const std::string decodedText = localization::DecodeResourceText(legacyText.data());
     const std::size_t allocation = std::max<std::size_t>(
         static_cast<std::size_t>(m_maxLength) + TEXT_ALLOCATION_PADDING,
@@ -116,13 +114,13 @@ void textEntryWidget::Read(TextEntryReadMode type) {
     );
     m_text = static_cast<char*>(H2_ALLOC(allocation));
     memcpy(m_text, decodedText.c_str(), decodedText.size() + 1);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & COLOR_MASK);
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & COLOR_MASK);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();

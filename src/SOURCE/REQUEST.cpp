@@ -83,9 +83,9 @@ i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     if (file == -1) {
         return 0;
     }
-    platform::FileRead(file, header, sizeof(*header));
+    const bool complete = platform::FileReadExact(file, header, sizeof(*header));
     platform::FileClose(file);
-    return 1;
+    return complete;
 }
 
 localization::TextEncoding GetMapHeaderTextEncoding(const SMapHeader* header) {
@@ -149,7 +149,8 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
         if (m_mode != FILE_REQUESTER_MAP && m_mode != FILE_REQUESTER_MAP_GAME)
             return true;
 
-        GetMapHeader(foundFile.c_str(), &header);
+        if (!GetMapHeader(foundFile.c_str(), &header))
+            return false;
         if (m_mode == FILE_REQUESTER_MAP_GAME
             && (header.minHumanPlayers > giNumHumanPlayers
                 || header.maxHumanPlayers < giNumHumanPlayers))
@@ -228,7 +229,8 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
         for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
             const std::string fullPath =
                 std::string(m_fileNames[indexData5].text) + m_extensions[indexData5].text;
-            GetMapHeader(fullPath.c_str(), &m_mapHeaders[indexData5]);
+            if (!GetMapHeader(fullPath.c_str(), &m_mapHeaders[indexData5]))
+                memset(&m_mapHeaders[indexData5], 0, sizeof(m_mapHeaders[indexData5]));
         }
     }
     return m_fileCount;

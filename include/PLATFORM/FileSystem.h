@@ -48,6 +48,12 @@ public:
     virtual i32 Length(i32 file) = 0;
 };
 
+// Complete a fixed-size record even when a host backend services an operation
+// in smaller chunks. EOF, a zero-progress operation, and backend errors fail
+// without spinning.
+[[nodiscard]] bool ReadExact(IFileSystem& files, i32 file, void* buffer, i32 count);
+[[nodiscard]] bool WriteExact(IFileSystem& files, i32 file, const void* buffer, i32 count);
+
 // Saved games, high scores and the network exchange files. Retail kept them
 // with the installation, as Windows still does; elsewhere they are the user's.
 bool IsUserState(const char* retailPath);

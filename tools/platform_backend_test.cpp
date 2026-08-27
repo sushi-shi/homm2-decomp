@@ -105,10 +105,10 @@ int main() {
     const i32 file = platform::FileOpen("GAMES\\platform.bin", platform::FileMode::Write);
     valid &= Expect(file >= 0, "state file open");
     const char bytes[] = "test";
-    valid &= Expect(platform::FileWrite(file, bytes, -1) == -1, "negative write count");
-    valid &= Expect(platform::FileWrite(file, nullptr, 1) == -1, "null write buffer");
-    valid &= Expect(platform::FileWrite(file, bytes, 0) == 0, "zero write count");
-    valid &= Expect(platform::FileWrite(file, bytes, 4) == 4, "state file write");
+    valid &= Expect(!platform::FileWriteExact(file, bytes, -1), "negative write count");
+    valid &= Expect(!platform::FileWriteExact(file, nullptr, 1), "null write buffer");
+    valid &= Expect(platform::FileWriteExact(file, bytes, 0), "zero write count");
+    valid &= Expect(platform::FileWriteExact(file, bytes, 4), "state file write");
 
     std::ofstream(data / "GAMES" / "Shipped.GIC", std::ios::binary).put('d');
     const std::filesystem::path userGames =

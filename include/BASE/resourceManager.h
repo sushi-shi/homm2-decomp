@@ -69,8 +69,8 @@ public:
     i16 ReadWord(void);
     i32l ReadLong(void);
     u32l MakeId(const char*, i32);
-    void Read13(i8*);
-    void ReadBlock(i8*, u32l);
+    void Read13(void*);
+    void ReadBlock(void*, u32l);
 };
 #pragma pack(pop)
 extern i32 iSaveCtr;

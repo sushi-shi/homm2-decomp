@@ -237,12 +237,14 @@ typedef enum HeroRecordConstant {
 } HeroRecordConstant;
 
 void hero::Read(i32 file, i8 expansion) {
-    platform::FileRead(file, this, HERO_RETAIL_PREFIX_SIZE);
-    platform::FileRead(
-        file,
-        reinterpret_cast<char*>(this) + HERO_RECORD_TAIL_OFFSET,
-        expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
-    );
+    const bool complete = platform::FileReadExact(file, this, HERO_RETAIL_PREFIX_SIZE)
+        && platform::FileReadExact(
+            file,
+            reinterpret_cast<char*>(this) + HERO_RECORD_TAIL_OFFSET,
+            expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
+        );
+    if (!complete)
+        ShutDown(localization::Tr("system.file.read_error"));
     memset(&m_spells[HERO_RETAIL_SPELL_COUNT], 0, sizeof(m_spells) - HERO_RETAIL_SPELL_COUNT);
     const std::string name = localization::DecodeExternalText(m_name);
     utf8::Copy(m_name, sizeof(m_name), name.c_str());
@@ -261,12 +263,14 @@ void hero::Write(i32 file, i8 expansion) {
             "save: hero name was truncated or is not representable in the legacy file encoding"
         );
     }
-    platform::FileWrite(file, &serialized, HERO_RETAIL_PREFIX_SIZE);
-    platform::FileWrite(
-        file,
-        reinterpret_cast<char*>(&serialized) + HERO_RECORD_TAIL_OFFSET,
-        expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
-    );
+    const bool complete = platform::FileWriteExact(file, &serialized, HERO_RETAIL_PREFIX_SIZE)
+        && platform::FileWriteExact(
+            file,
+            reinterpret_cast<char*>(&serialized) + HERO_RECORD_TAIL_OFFSET,
+            expansion ? HERO_EXPANSION_TAIL_SIZE : HERO_BASE_TAIL_SIZE
+        );
+    if (!complete)
+        ShutDown(localization::Tr("system.file.write_error"));
 }
 
 void hero::GetArmyStrengths(u32l* const) {}

@@ -7,6 +7,7 @@
 #include <SOURCE/Localization.h>
 #include <stdio.h>
 #include <errno.h>
+#include <limits>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -58,10 +59,7 @@ void resourceManager::GetBackdrop(const char* name, class bitmap* backdrop, i32 
         ReadWord();
         ReadWord();
         ReadWord();
-        ReadBlock(
-            reinterpret_cast<i8*>(backdrop->m_pixels),
-            backdrop->m_width * backdrop->m_height
-        );
+        ReadBlock(backdrop->m_pixels, backdrop->m_width * backdrop->m_height);
     }
 }
 
@@ -87,8 +85,7 @@ void resourceManager::GetBackdropAtLoc(
         imageHeight = ReadWord();
         for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                (curRow * BACKDROP_ROW_BYTES)
-                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
+                destination->m_pixels + curRow * BACKDROP_ROW_BYTES + destinationX,
                 width
             );
         }
@@ -316,7 +313,7 @@ i32 resourceManager::LoadAggregateHeader(
     bool locale,
     bool required
 ) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS] = {};
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -343,13 +340,54 @@ i32 resourceManager::LoadAggregateHeader(
         return LOAD_ERROR;
     }
     m_curAggregate = m_numAggregates;
-    m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    platform::FileRead(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
+    const auto rejectAggregate = [&](const char* reason) {
+        snprintf(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            "Invalid aggregate '%s': %s",
+            aggregateName,
+            reason
+        );
+        platform::FileClose(m_aggregateFd[m_curAggregate]);
+        m_aggregateFd[m_curAggregate] = INVALID_FILE;
+        m_aggregateEntryCount[m_curAggregate] = 0;
+        if (required) {
+            ShutDown(gText);
+        } else {
+            platform::Host().Log(platform::LogLevel::Warning, gText);
+        }
+        return LOAD_ERROR;
+    };
+    if (!platform::FileReadExact(
+            m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(fpCountBuffer[0])
+        )) {
+        return rejectAggregate("missing entry count");
+    }
     m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
-    directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
+    const i32 aggregateLength = platform::FileLength(m_aggregateFd[m_curAggregate]);
+    if (m_aggregateEntryCount[m_curAggregate] <= 0
+        || aggregateLength < static_cast<i32>(sizeof(fpCountBuffer[0]))
+        || m_aggregateEntryCount[m_curAggregate]
+               > (aggregateLength - static_cast<i32>(sizeof(fpCountBuffer[0]))) / ENTRY_BYTES) {
+        return rejectAggregate("entry table exceeds the file");
+    }
+    directoryBytes = static_cast<u32>(m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES);
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
-    platform::FileRead(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
+    if (m_aggregateDir[m_curAggregate] == NULL
+        || directoryBytes > static_cast<u32>(std::numeric_limits<i32>::max())
+        || !platform::FileReadExact(
+            m_aggregateFd[m_curAggregate],
+            m_aggregateDir[m_curAggregate],
+            static_cast<i32>(directoryBytes)
+        )) {
+        if (m_aggregateDir[m_curAggregate] != NULL) {
+            H2_FREE(m_aggregateDir[m_curAggregate]);
+            m_aggregateDir[m_curAggregate] = NULL;
+        }
+        return rejectAggregate("truncated entry table");
+    }
+    ++m_numAggregates;
     return LOAD_SUCCESS;
 }
 
@@ -435,21 +473,21 @@ void resourceManager::RestorePosition(void) {
 i8 resourceManager::ReadByte(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i8 value = 0;
-    platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    ReadBlock(&value, sizeof(value));
     return value;
 }
 
 i16 resourceManager::ReadWord(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i16 value = 0;
-    platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    ReadBlock(&value, sizeof(value));
     return value;
 }
 
 i32l resourceManager::ReadLong(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i32l value = 0;
-    platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    ReadBlock(&value, sizeof(value));
     return value;
 }
 
@@ -467,19 +505,24 @@ u32l resourceManager::MakeId(const char* name, i32 translate) {
     return result;
 }
 
-void resourceManager::Read13(i8* destination) {
+void resourceManager::Read13(void* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
-void resourceManager::ReadBlock(i8* destination, u32l size) {
+void resourceManager::ReadBlock(void* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     PollSound();
-    i32 bytesRead = platform::FileRead(m_aggregateFd[m_curAggregate], destination, size);
-    if (bytesRead < 0 || static_cast<u32l>(bytesRead) != size) {
+    const bool readable = size <= static_cast<u32l>(std::numeric_limits<i32>::max());
+    if (!readable
+        || !platform::FileReadExact(
+            m_aggregateFd[m_curAggregate], destination, static_cast<i32>(size)
+        )) {
+        if (destination != NULL && readable) {
+            memset(destination, 0, static_cast<size_t>(size));
+        }
         sprintf(
             gText,
-            "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
-            bytesRead,
+            "File error - incomplete read, bytes requested %d, errno %d, last file '%s'",
             static_cast<i32>(size),
             errno,
             m_lastFileName
