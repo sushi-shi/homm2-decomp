@@ -1255,13 +1255,15 @@ void combatManager::BurnCreature(army* stack) {
     giMaxExtentX = maxExtentX;
     giMaxExtentY = maxExtentY;
 
-    sprintf(gText, localization::Tr("combat.burning.damage"), burnDamage);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("combat.burning.damage"), burnDamage);
     if (creaturesKilled > 0) {
         const char* targetCreature = creaturesKilled > 1
             ? ironfist::GetCreaturePluralName(H2EnumIndex(stack->m_monsterType))
             : ironfist::GetCreatureName(H2EnumIndex(stack->m_monsterType));
-        sprintf(
-            gText + strlen(gText),
+        const std::size_t used = strlen(gText);
+        utf8::Format(
+            gText + used,
+            GLOBAL_TEXT_BUFFER_SIZE - used,
             localization::TrPlural("combat.burning.killed", creaturesKilled),
             creaturesKilled,
             targetCreature

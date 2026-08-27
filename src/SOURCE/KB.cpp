@@ -1488,16 +1488,16 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
 const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD) {
-        sprintf(
+        utf8::Format(
             buf,
             localization::Tr("town.cyborg.cybernetics_lab.description"),
             GetBuildingName(race, building)
         );
     } else if (ironfist::IsWellDisabled() && building == BUILDING_SLOT_WELL) {
         if (race == FACTION_NECROMANCER) {
-            sprintf(buf, "%s", localization::Tr("town.poisoned_well.description"));
+            utf8::Format(buf, "%s", localization::Tr("town.poisoned_well.description"));
         } else {
-            sprintf(buf, "%s", localization::Tr("town.well.description"));
+            utf8::Format(buf, "%s", localization::Tr("town.well.description"));
         }
     } else if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         utf8::Copy(buf, sizeof(buf), xNecromancerShrineDesc);
