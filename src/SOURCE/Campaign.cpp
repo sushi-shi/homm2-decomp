@@ -402,7 +402,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         else
             iCampaignTrackType = SWITCH_TO_ARCHIBALD_OPEN;
     } else {
-        iCampaignTrackType = static_cast<CampaignTrackType>(
+        iCampaignTrackType = CampaignTrackTypeFromOrdinal(
             H2EnumIndex(m_campaignStartingSide) * H2EnumIndex(CAMPAIGN_SIDE_COUNT) + H2EnumIndex(m_campaignType)
         );
     }
@@ -996,8 +996,8 @@ void game::InitCampaignMap(void) {
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
                     ->SetSS(
-                        static_cast<HeroSecondarySkill>(choiceBest1->value),
-                        static_cast<HeroSkillLevel>(choiceBest1->amount)
+                        HeroSecondarySkillFromCode(choiceBest1->value),
+                        HeroSkillLevelFromCode(choiceBest1->amount)
                     );
             break;
         case CAMPAIGN_CHOICE_CREATURES:

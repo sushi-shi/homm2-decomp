@@ -217,7 +217,7 @@ static void HandlePandoraBox(i32 side) {
     static const i32 squaresAroundCaster[2][3] = { { 14, 27, 40 }, { 11, 24, 37 } };
     if (gpCombatManager->m_heroes[side]
         && gpCombatManager->m_heroes[side]->HasArtifact(
-               static_cast<ArtifactType>(ARTIFACT_PANDORA_BOX)
+               ArtifactTypeFromOrdinal(H2EnumIndex(ARTIFACT_PANDORA_BOX))
            )) {
         // The HoMM II code appears to lack a definition of creature tier;
         // Ironfist hardcodes the tier-one creatures.
@@ -246,10 +246,10 @@ static void HandlePandoraBox(i32 side) {
         if (hex == -1)
             return;
 
-        const i32 amt = gpGame->GetRandomNumTroops(static_cast<CreatureType>(creat));
+        const i32 amt = gpGame->GetRandomNumTroops(CreatureTypeFromOrdinal(creat));
         gpCombatManager->AddArmy(
-            static_cast<CombatSide>(side), static_cast<CreatureType>(creat), amt, hex,
-            static_cast<MonsterFlags>(0x8000), 0
+            CombatSideFromOrdinal(side), CreatureTypeFromOrdinal(creat), amt, hex,
+            MonsterFlagsFromCode(0x8000), 0
         );
 
         hexcell* cell = &gpCombatManager->m_hexCells[hex];

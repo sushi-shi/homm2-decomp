@@ -10,7 +10,8 @@ static std::map<i32, FactionType> heroOverlayFactions = {
   {4, FACTION_WIZARD}, {11, FACTION_WIZARD}, {18, FACTION_WIZARD}, {25, FACTION_WIZARD}, {32, FACTION_WIZARD}, {39, FACTION_WIZARD},
   {5, FACTION_NECROMANCER}, {12, FACTION_NECROMANCER}, {19, FACTION_NECROMANCER}, {26, FACTION_NECROMANCER}, {33, FACTION_NECROMANCER}, {40, FACTION_NECROMANCER},
   {6, FACTION_NEUTRAL}, {13, FACTION_NEUTRAL}, {20, FACTION_NEUTRAL}, {27, FACTION_NEUTRAL}, {34, FACTION_NEUTRAL}, {41, FACTION_NEUTRAL},
-  {42, static_cast<FactionType>(12)}, {43, static_cast<FactionType>(12)}, {44, static_cast<FactionType>(12)}, {45, static_cast<FactionType>(12)}, {46, static_cast<FactionType>(12)}, {47, static_cast<FactionType>(12)}
+  {42, FACTION_CYBORG}, {43, FACTION_CYBORG}, {44, FACTION_CYBORG},
+  {45, FACTION_CYBORG}, {46, FACTION_CYBORG}, {47, FACTION_CYBORG}
 };
 
 // objectIndex / color

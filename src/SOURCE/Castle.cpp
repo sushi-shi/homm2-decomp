@@ -473,11 +473,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     i32 objIndex;
     b32 hoverMessage;
     i32 heroChoiceIndex;
-    H2EnumStorage<BuildingSlotType, i32> whichBuilding;
+    i32 whichBuilding;
     b32 quickFlag;
     i32 ret;
 
-    whichBuilding = BUILDING_SLOT_NONE;
+    whichBuilding = H2EnumIndex(BUILDING_SLOT_NONE);
     ret = 0;
     hoverMessage = false;
 
@@ -487,11 +487,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             hoverMessage = true;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
-            whichBuilding = CASTLE_CAPTAIN;
+            whichBuilding = H2EnumIndex(CASTLE_CAPTAIN);
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
-            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED);
+            whichBuilding = CONTROL_CAPTAIN_FORMATION_GROUPED;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
-            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD);
+            whichBuilding = CONTROL_CAPTAIN_FORMATION_SPREAD;
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
@@ -505,8 +505,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                      && message.payload.widget.id
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
-            if (whichBuilding != BUILDING_SLOT_NONE)
-                whichBuilding = castleSlotsUse[H2EnumIndex(whichBuilding)];
+            if (whichBuilding != H2EnumIndex(BUILDING_SLOT_NONE))
+                whichBuilding = H2EnumIndex(castleSlotsUse[whichBuilding]);
         }
     }
 
@@ -516,31 +516,31 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (whichBuilding) {
 
-            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+            case CONTROL_CAPTAIN_FORMATION_GROUPED:
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCastleInfo[H2EnumIndex(INFO_GROUPED_FORMATION)]);
                 break;
 
-            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+            case CONTROL_CAPTAIN_FORMATION_SPREAD:
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCastleInfo[H2EnumIndex(INFO_SPREAD_FORMATION)]);
                 break;
 
-            case TOWN_OBJECT_MAGE_GUILD:
-                if (!(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding)))) {
+            case H2EnumIndex(TOWN_OBJECT_MAGE_GUILD):
+                if (!(gpTownManager->m_buildableBuildings & (1 << whichBuilding))) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
-                } else if (!(gpTownManager->m_affordableBuildings & (1 << H2EnumIndex(whichBuilding)))) {
+                } else if (!(gpTownManager->m_affordableBuildings & (1 << whichBuilding))) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
                 } else {
@@ -563,62 +563,62 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 }
                 break;
 
-            case BUILDING_SLOT_SPECIAL_ONE:
-            case BUILDING_SLOT_NECROMANCER_SHRINE:
-            case BUILDING_SLOT_DOCK:
-            case BUILDING_SLOT_SPECIAL_FOUR:
-            case BUILDING_SLOT_SPECIAL_SEVEN:
-            case BUILDING_SLOT_SPECIAL_EIGHT:
-            case BUILDING_SLOT_SPECIAL_NINE:
-            case BUILDING_SLOT_SPECIAL_TEN:
-            case BUILDING_SLOT_WELL_EXTRA:
-            case BUILDING_SLOT_SPECIAL_TWELVE:
-            case BUILDING_SLOT_SPECIAL:
-            case BUILDING_SLOT_NEUTRAL_LAST:
-            case BUILDING_SLOT_DWELLING_FIRST:
-            case BUILDING_SLOT_DWELLING_SECOND:
-            case BUILDING_SLOT_DWELLING_THIRD:
-            case BUILDING_SLOT_DWELLING_FOURTH:
-            case BUILDING_SLOT_DWELLING_FIFTH:
-            case BUILDING_SLOT_DWELLING_SIXTH:
-            case BUILDING_SLOT_UPGRADE_FIRST:
-            case BUILDING_SLOT_UPGRADE_SECOND:
-            case BUILDING_SLOT_UPGRADE_THIRD:
-            case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-            case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
-            case BUILDING_SLOT_SPECIAL_THIRTY:
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_ONE):
+            case H2EnumIndex(BUILDING_SLOT_NECROMANCER_SHRINE):
+            case H2EnumIndex(BUILDING_SLOT_DOCK):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_FOUR):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_SEVEN):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_EIGHT):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_NINE):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_TEN):
+            case H2EnumIndex(BUILDING_SLOT_WELL_EXTRA):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_TWELVE):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL):
+            case H2EnumIndex(BUILDING_SLOT_NEUTRAL_LAST):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_SECOND):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_THIRD):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_FOURTH):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_FIFTH):
+            case H2EnumIndex(BUILDING_SLOT_DWELLING_SIXTH):
+            case H2EnumIndex(BUILDING_SLOT_UPGRADE_FIRST):
+            case H2EnumIndex(BUILDING_SLOT_UPGRADE_SECOND):
+            case H2EnumIndex(BUILDING_SLOT_UPGRADE_THIRD):
+            case H2EnumIndex(BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
+            case H2EnumIndex(BUILDING_SLOT_SPECIAL_THIRTY):
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     utf8::Copy(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("castle.build.already_this_turn")
 
                     );
-                } else if (gpTownManager->m_town->m_buildings & (1 << H2EnumIndex(whichBuilding))) {
+                } else if (gpTownManager->m_town->m_buildings & (1 << whichBuilding)) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            BuildingSlotTypeFromCode(whichBuilding)
                         )
                     );
                 } else {
-                    if (!(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding))))
+                    if (!(gpTownManager->m_buildableBuildings & (1 << whichBuilding)))
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
-                    else if (!(gpTownManager->m_affordableBuildings & (1 << H2EnumIndex(whichBuilding))))
+                    else if (!(gpTownManager->m_affordableBuildings & (1 << whichBuilding)))
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
                     else
@@ -627,22 +627,23 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[H2EnumIndex(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                BuildingSlotTypeFromCode(whichBuilding)
                             )
                         );
                 }
                 break;
 
-            case BUILDING_SLOT_NONE:
+            case H2EnumIndex(BUILDING_SLOT_NONE):
                 switch (message.payload.widget.id) {
                     case CONTROL_HERO_FIRST:
                     case CONTROL_HERO_FIRST + 1:
-                        heroChoiceIndex = message.payload.widget.id - CONTROL_HERO_FIRST;
-                        goto hero_hover_text;
                     case CONTROL_RECRUIT_FIRST:
                     case CONTROL_RECRUIT_FIRST + 1:
-                        heroChoiceIndex = message.payload.widget.id - CONTROL_RECRUIT_FIRST;
-                    hero_hover_text:
+                        if (message.payload.widget.id == CONTROL_HERO_FIRST
+                            || message.payload.widget.id == CONTROL_HERO_FIRST + 1)
+                            heroChoiceIndex = message.payload.widget.id - CONTROL_HERO_FIRST;
+                        else
+                            heroChoiceIndex = message.payload.widget.id - CONTROL_RECRUIT_FIRST;
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] < gHeroGoldCost) {
                             strcpy(gText, cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD_HERO)]);
                         } else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY) {
@@ -699,7 +700,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 quickFlag = ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) != 0;
                 switch (whichBuilding) {
 
-                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+                    case CONTROL_CAPTAIN_FORMATION_SPREAD:
                         if (quickFlag) {
                             NormalDialog(
                                 localization::Tr("formation.spread.help")
@@ -721,7 +722,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
-                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+                    case CONTROL_CAPTAIN_FORMATION_GROUPED:
                         if (quickFlag) {
                             NormalDialog(
                                 localization::Tr("formation.grouped.help")
@@ -743,69 +744,72 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
-                    case TOWN_OBJECT_MAGE_GUILD:
+                    case H2EnumIndex(TOWN_OBJECT_MAGE_GUILD):
                         if (!quickFlag) {
                             if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
-                                || !(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding))))
+                                || !(gpTownManager->m_buildableBuildings & (1 << whichBuilding)))
                                 break;
                         }
                         goto buy_building;
 
-                    case BUILDING_SLOT_SPECIAL_ONE:
-                    case BUILDING_SLOT_NECROMANCER_SHRINE:
-                    case BUILDING_SLOT_DOCK:
-                    case BUILDING_SLOT_SPECIAL_FOUR:
-                    case BUILDING_SLOT_SPECIAL_SEVEN:
-                    case BUILDING_SLOT_SPECIAL_EIGHT:
-                    case BUILDING_SLOT_SPECIAL_NINE:
-                    case BUILDING_SLOT_SPECIAL_TEN:
-                    case BUILDING_SLOT_WELL_EXTRA:
-                    case BUILDING_SLOT_SPECIAL_TWELVE:
-                    case BUILDING_SLOT_SPECIAL:
-                    case BUILDING_SLOT_NEUTRAL_LAST:
-                    case BUILDING_SLOT_DWELLING_FIRST:
-                    case BUILDING_SLOT_DWELLING_SECOND:
-                    case BUILDING_SLOT_DWELLING_THIRD:
-                    case BUILDING_SLOT_DWELLING_FOURTH:
-                    case BUILDING_SLOT_DWELLING_FIFTH:
-                    case BUILDING_SLOT_DWELLING_SIXTH:
-                    case BUILDING_SLOT_UPGRADE_FIRST:
-                    case BUILDING_SLOT_UPGRADE_SECOND:
-                    case BUILDING_SLOT_UPGRADE_THIRD:
-                    case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-                    case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
-                    case BUILDING_SLOT_SPECIAL_THIRTY:
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_ONE):
+                    case H2EnumIndex(BUILDING_SLOT_NECROMANCER_SHRINE):
+                    case H2EnumIndex(BUILDING_SLOT_DOCK):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_FOUR):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_SEVEN):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_EIGHT):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_NINE):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_TEN):
+                    case H2EnumIndex(BUILDING_SLOT_WELL_EXTRA):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_TWELVE):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL):
+                    case H2EnumIndex(BUILDING_SLOT_NEUTRAL_LAST):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_SECOND):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_THIRD):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_FOURTH):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_FIFTH):
+                    case H2EnumIndex(BUILDING_SLOT_DWELLING_SIXTH):
+                    case H2EnumIndex(BUILDING_SLOT_UPGRADE_FIRST):
+                    case H2EnumIndex(BUILDING_SLOT_UPGRADE_SECOND):
+                    case H2EnumIndex(BUILDING_SLOT_UPGRADE_THIRD):
+                    case H2EnumIndex(BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE):
+                    case H2EnumIndex(BUILDING_SLOT_SPECIAL_THIRTY):
                         if (!quickFlag) {
-                            if ((gpTownManager->m_town->m_buildings & (1 << H2EnumIndex(whichBuilding)))
-                                || !(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding))))
+                            if ((gpTownManager->m_town->m_buildings & (1 << whichBuilding))
+                                || !(gpTownManager->m_buildableBuildings & (1 << whichBuilding)))
                                 break;
                         }
                     buy_building:
                         for (objIndex = 0; objIndex < gpTownManager->m_townObjectCount;
                              ++objIndex) {
-                            if (gpTownManager->m_townObjects[objIndex]->m_buildingId
+                            if (H2EnumIndex(gpTownManager->m_townObjects[objIndex]->m_buildingId)
                                 == whichBuilding)
                                 break;
                         }
                         ret = gpTownManager->BuyBuild(
-                            whichBuilding,
-                            (gpTownManager->m_affordableBuildings & (1 << H2EnumIndex(whichBuilding))) == 0,
+                            BuildingSlotTypeFromCode(whichBuilding),
+                            (gpTownManager->m_affordableBuildings & (1 << whichBuilding)) == 0,
                             quickFlag
                         );
                         break;
 
-                    case BUILDING_SLOT_NONE:
+                    case H2EnumIndex(BUILDING_SLOT_NONE):
                         switch (message.payload.widget.id) {
                             case CONTROL_HERO_FIRST:
                             case CONTROL_HERO_FIRST + 1:
-                                heroChoiceIndex = message.payload.widget.id - CONTROL_HERO_FIRST;
-                                goto hero_selected;
                             case CONTROL_RECRUIT_FIRST:
                             case CONTROL_RECRUIT_FIRST + 1:
-                                heroChoiceIndex = message.payload.widget.id - CONTROL_RECRUIT_FIRST;
-                            hero_selected:
+                                if (message.payload.widget.id == CONTROL_HERO_FIRST
+                                    || message.payload.widget.id == CONTROL_HERO_FIRST + 1)
+                                    heroChoiceIndex =
+                                        message.payload.widget.id - CONTROL_HERO_FIRST;
+                                else
+                                    heroChoiceIndex =
+                                        message.payload.widget.id - CONTROL_RECRUIT_FIRST;
                                 if (quickFlag) {
-                                    HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), 1, 0);
+                                    HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), true, false);
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
                                     gpWindowManager

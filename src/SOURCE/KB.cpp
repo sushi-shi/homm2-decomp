@@ -3687,13 +3687,13 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
 
     if (command >= APP_MENU_MUSIC_FIRST && command <= APP_MENU_MUSIC_LAST) {
-        gConfig.musicVolume = static_cast<ConfigVolumeLevel>(command - APP_MENU_MUSIC_FIRST);
+        gConfig.musicVolume = ConfigVolumeLevelFromOrdinal(command - APP_MENU_MUSIC_FIRST);
         gpSoundManager->AdjustMusicVolumes();
         WritePrefs();
         return 0;
     }
     if (command >= APP_MENU_SOUND_FIRST && command <= APP_MENU_SOUND_LAST) {
-        gConfig.soundVolume = static_cast<ConfigVolumeLevel>(command - APP_MENU_SOUND_FIRST);
+        gConfig.soundVolume = ConfigVolumeLevelFromOrdinal(command - APP_MENU_SOUND_FIRST);
         gpSoundManager->AdjustSoundVolumes();
         WritePrefs();
         return 0;
@@ -3802,7 +3802,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (currentHeroRec != NULL) {
                 for (loopIndex = H2EnumIndex(SPELL_FIREBALL); loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
                     currentHeroRec->AddSpell(
-                        static_cast<SpellType>(loopIndex),
+                        SpellTypeFromOrdinal(loopIndex),
                         APP_MENU_SPELL_COUNT
                     );
                 currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
@@ -3839,7 +3839,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 if (gpCurPlayer->CurrentHero() != -1) {
                     gpGame->GiveArmy(
                         &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()].m_army,
-                        static_cast<CreatureType>(command - APP_MENU_ARMY_FIRST),
+                        CreatureTypeFromOrdinal(command - APP_MENU_ARMY_FIRST),
                         APP_MENU_CHEAT_ARMY_QUANTITY,
                         -1
                     );
@@ -3851,10 +3851,10 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 gpGame->m_cheated = 1;
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
-                secondarySkillIndex = static_cast<HeroSecondarySkill>(
+                secondarySkillIndex = HeroSecondarySkillFromOrdinal(
                     (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS
                 );
-                ssLevel = static_cast<HeroSkillLevel>(
+                ssLevel = HeroSkillLevelFromOrdinal(
                     (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS
                 );
                 if (currentHeroRec != NULL)

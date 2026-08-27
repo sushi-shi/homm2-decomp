@@ -242,6 +242,10 @@ using enum HouseRecruitmentSite;
     };
 using enum EventSoundVariant;
 
+    constexpr EventSoundVariant EventSoundVariantFromCode(i32 value) {
+        return static_cast<EventSoundVariant>(value); // H2_ENUM_CODE_BOUNDARY
+    }
+
     typedef enum EraseObjectConstant {
         NEIGHBOR_COUNT = 4,
         CELL_COUNT = 5,
@@ -423,7 +427,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO,
                     localization::Tr("event.inline.835273ee016ddfeb"),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
                     ) == RES_GOLD
                         ? MAP_EVENT_GOLD_AMOUNT
@@ -434,10 +438,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(
                     eventHero2,
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
                     ),
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
                     ) == RES_GOLD
                         ? MAP_EVENT_GOLD_AMOUNT
@@ -789,7 +793,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FLOTSAM: {
-            switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
+            switch (FlotsamRewardFromCode(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
                         localization::Tr("event.inline.fafa7917b1fb1445"),
@@ -965,7 +969,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1
                 );
                 eventHero2->GiveSS(
-                    static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
+                    HeroSecondarySkillFromCode(cell->m_objectMetadata),
                     HERO_SKILL_LEVEL_BASIC
                 );
             }
@@ -1546,7 +1550,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(
                     eventHero2,
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
                     ),
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT
@@ -1607,7 +1611,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(
                     eventHero2,
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
                     ),
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT
@@ -1947,7 +1951,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            resourceType_a = static_cast<ResourceType>(cell->m_objectIndex / 2);
+            resourceType_a = ResourceTypeFromCode(cell->m_objectIndex / 2);
             GiveResource(
                 eventHero2,
                 resourceType_a,
@@ -2615,7 +2619,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     && eventHero2->m_cursorType != FACTION_CYBORG) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     eventHero2->AddSpell(
-                        static_cast<SpellType>(cell->m_objectMetadata - 1),
+                        SpellTypeFromCode(cell->m_objectMetadata - 1),
                         eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
                     EventWindow(
@@ -2698,9 +2702,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT: {
             artifactResourceType_k = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                    >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            artifact_g = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+            artifact_g = ArtifactTypeFromCode(cell->m_objectIndex / 2);
             guardedMonster_c =
-                static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
+                CreatureTypeFromCode(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
                     localization::Tr("event.inline.b880ecbc34dcdb8b"),
@@ -3190,7 +3194,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 break;
             }
 
-            monsterType_f = static_cast<CreatureType>(
+            monsterType_f = CreatureTypeFromCode(
                 ((cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT)
                 + DAEMON_SERVANT_BASE
             );
@@ -3551,7 +3555,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                        >= HERO_SKILL_LEVEL_EXPERT
                                    && eventHero2->m_cursorType != FACTION_CYBORG) {
                             eventHero2->AddSpell(
-                                static_cast<SpellType>(cell->m_objectMetadata - 1),
+                                SpellTypeFromCode(cell->m_objectMetadata - 1),
                                 eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
                             );
                             EventWindow(
@@ -4009,8 +4013,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
     cursedArtifactCount2 = 0;
     eventSample9 = NULL;
-    siteType4 = static_cast<GenericSiteType>(cell->m_objectMetadata);
-    siteType4 = static_cast<GenericSiteType>(H2EnumIndex(siteType4) & GENERIC_SITE_TYPE_MASK);
+    siteType4 = GenericSiteTypeFromCode(cell->m_objectMetadata);
+    siteType4 = GenericSiteTypeFromCode(H2EnumIndex(siteType4) & GENERIC_SITE_TYPE_MASK);
     switch (siteType4) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
             for (index8 = 0; index8 < HERO_ARTIFACT_SLOT_COUNT; index8++) {
@@ -4590,7 +4594,7 @@ void advManager::EventSound(
             musicTrack = treasureSnd;
             break;
         case MAP_OBJECT_ARTIFACT:
-            if (static_cast<EventSoundVariant>(eventData) == SOUND_VARIANT_1)
+            if (EventSoundVariantFromCode(eventData) == SOUND_VARIANT_1)
                 musicTrack = treasureSnd;
             break;
         case MAP_OBJECT_SKELETON:
@@ -4668,7 +4672,7 @@ void advManager::EventSound(
             musicTrack = expSound;
             break;
         case MAP_OBJECT_EXPANSION_OBJECT:
-            switch (static_cast<EventSoundVariant>(eventData)) {
+            switch (EventSoundVariantFromCode(eventData)) {
                 case SOUND_VARIANT_0:
                     musicTrack = expSound;
                     break;
@@ -4851,7 +4855,7 @@ i32 advManager::SkeletonEvent(
     hero* eventHero, mapCell* cell, const char* text, i32 x, i32 y
 ) {
 
-    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+    switch (UndeadEventLevelFromCode(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -5000,7 +5004,7 @@ i32 advManager::ZombieEvent(
     i32 y
 ) {
     ArtifactType artifactId;
-    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+    switch (UndeadEventLevelFromCode(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -5158,7 +5162,7 @@ i32 advManager::GhostEvent(
     hero* eventHero, mapCell* cell, const char* text, i32 x, i32 y
 ) {
     ArtifactType artifactId;
-    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
+    switch (UndeadEventLevelFromCode(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -6166,7 +6170,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         && eventHero->m_spellPoints > GetManaCost(SpellType(index_h), eventHero)) {
                         eventHero->m_spellPoints -= GetManaCost(SpellType(index_h), eventHero);
                         gpGame->m_mines[cell->m_objectMetadata].guardianType =
-                            static_cast<CreatureType>(index_h + 1);
+                            CreatureTypeFromOrdinal(index_h + 1);
                         spellPower_j = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
                         if (spellPower_j > EVENT_MINE_SPELL_POWER_MAX)
                             spellPower_j = EVENT_MINE_SPELL_POWER_MAX;
@@ -6308,10 +6312,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
                     ),
-                    static_cast<ResourceType>(
+                    ResourceTypeFromCode(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
                     ) == RES_GOLD
                         ? MAP_EVENT_GOLD_AMOUNT
@@ -6372,7 +6376,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FLOTSAM:
-            switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
+            switch (FlotsamRewardFromCode(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     break;
                 case FLOTSAM_WOOD:
@@ -6462,7 +6466,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            resourceType_a = static_cast<ResourceType>(cell->m_objectIndex / 2);
+            resourceType_a = ResourceTypeFromCode(cell->m_objectIndex / 2);
             GiveResource(
                 eventHero,
                 resourceType_a,
@@ -6660,7 +6664,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                        <= H2EnumIndex(eventHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)])
                               + WISDOM_SPELL_LEVEL_BONUS) {
                 eventHero->AddSpell(
-                    static_cast<SpellType>(cell->m_objectMetadata - 1),
+                    SpellTypeFromCode(cell->m_objectMetadata - 1),
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                 );
             }
@@ -6716,8 +6720,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT:
             artifactResource_p = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                  >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            artifact_g = static_cast<ArtifactType>(cell->m_objectIndex / 2);
-            artifactGuardCount_b = static_cast<CreatureType>(
+            artifact_g = ArtifactTypeFromCode(cell->m_objectIndex / 2);
+            artifactGuardCount_b = CreatureTypeFromCode(
                 cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK
             );
             if (eventHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
@@ -6938,7 +6942,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 );
                 if (combatResult_d != 0) {
                     eventHero->AddSpell(
-                        static_cast<SpellType>(cell->m_objectMetadata - 1),
+                        SpellTypeFromCode(cell->m_objectMetadata - 1),
                         eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
@@ -7104,7 +7108,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_WITCH_HUT:
             if (eventHero->m_secondarySkills[cell->m_objectMetadata] == HERO_SKILL_LEVEL_NONE)
                 eventHero->GiveSS(
-                    static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
+                    HeroSecondarySkillFromCode(cell->m_objectMetadata),
                     HERO_SKILL_LEVEL_BASIC
                 );
             break;
@@ -7195,8 +7199,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 armyValue7;
 
     cursedArtifactCount3 = 0;
-    siteType3 = static_cast<GenericSiteType>(cell->m_objectMetadata);
-    siteType3 = static_cast<GenericSiteType>(H2EnumIndex(siteType3) & GENERIC_SITE_TYPE_MASK);
+    siteType3 = GenericSiteTypeFromCode(cell->m_objectMetadata);
+    siteType3 = GenericSiteTypeFromCode(H2EnumIndex(siteType3) & GENERIC_SITE_TYPE_MASK);
     switch (siteType3) {
         case GENERIC_SITE_ALCHEMIST_TOWER:
             for (artifactIndex14 = 0; artifactIndex14 < HERO_ARTIFACT_SLOT_COUNT; artifactIndex14++) {
@@ -7410,7 +7414,7 @@ void advManager::PlayerMonsterInteract(
     unused = 0;
     Ironfist_MonsterInteract(cell);
     gpMouseManager->ShowColorPointer();
-    monsterType = static_cast<CreatureType>(cell->m_objectIndex);
+    monsterType = CreatureTypeFromCode(cell->m_objectIndex);
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     armyRatio = static_cast<double>(
@@ -7747,7 +7751,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     i32 joiningCount;
 
     Ironfist_MonsterInteract(cell);
-    monsterType = static_cast<CreatureType>(cell->m_objectIndex);
+    monsterType = CreatureTypeFromCode(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     armyRatio = static_cast<double>(

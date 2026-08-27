@@ -480,11 +480,11 @@ i32 searchArray::FindCombatPath(
                 continue;
             nextHex = unit->GetAdjacentCellIndex(
                 node_g.x,
-                static_cast<CombatHexDirection>(direction_a)
+                CombatHexDirectionFromCode(direction_a)
             );
             PushCombatPoint(
                 nextHex,
-                static_cast<CombatHexDirection>(direction_a),
+                CombatHexDirectionFromCode(direction_a),
                 node_g.distance
                     + (bIsMoatSlowed[nextHex] ? unit->m_speed + MOAT_MOVEMENT_PENALTY : 0)
                     + 1,
@@ -509,7 +509,7 @@ i32 searchArray::FindCombatPath(
         m_pathLength++;
         if (m_pathLength >= SEARCH_PATH_CAPACITY)
             break;
-        opposite = OppositeDirection(static_cast<CombatHexDirection>(cell->direction));
+        opposite = OppositeDirection(CombatHexDirectionFromCode(cell->direction));
         bestHex_j = unit->GetAdjacentCellIndex(bestHex_j, opposite);
     }
     result_e = m_pathLength;

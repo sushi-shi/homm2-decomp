@@ -35,6 +35,10 @@ enum class WindowWidgetRecordType : i32 {
 };
 using enum WindowWidgetRecordType;
 
+constexpr WindowWidgetRecordType WindowWidgetRecordTypeFromCode(i16 value) {
+    return static_cast<WindowWidgetRecordType>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 typedef enum WindowConstant {
     SCREEN_WIDTH  = 640,
     SCREEN_HEIGHT = 480,
@@ -94,13 +98,13 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
     m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
     m_winHeight = gpResourceManager->ReadWord();
-    m_winFlags = static_cast<WindowFlag>(gpResourceManager->ReadWord());
+    m_winFlags = WindowFlagFromCode(gpResourceManager->ReadWord());
     m_winFlags |= WINDOW_FLAG_OWNS_WIDGETS;
     m_widgetListTail = m_widgetListHead = NULL;
     idx = 0;
     while (idx == 0) {
         PollSound();
-        type = static_cast<WindowWidgetRecordType>(gpResourceManager->ReadWord());
+        type = WindowWidgetRecordTypeFromCode(gpResourceManager->ReadWord());
         pWidget = NULL;
         switch (type) {
             case WIDGET_RECORD_END:

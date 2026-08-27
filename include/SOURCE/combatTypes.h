@@ -17,12 +17,16 @@ typedef enum CombatSideConstant {
 } CombatSideConstant;
 
 inline CombatSide& operator^=(CombatSide& side, i32 mask) {
-    side = static_cast<CombatSide>(static_cast<i32>(side) ^ mask);
+    side = CombatSideFromCode(static_cast<i32>(side) ^ mask);
     return side;
 }
 
 inline CombatSide OppositeCombatSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
+}
+
+inline CombatSide CombatSideForDefender(bool defender) {
+    return defender ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
 }
 
 enum class CombatResult : i8 {
@@ -39,6 +43,10 @@ inline CombatResult CombatResultForSide(CombatSide side) {
 
 inline CombatResult OppositeCombatResult(CombatResult result) {
     return result == COMBAT_RESULT_ATTACKER ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
+}
+
+inline CombatSide CombatSideForResult(CombatResult result) {
+    return result == COMBAT_RESULT_DEFENDER ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
 }
 
 enum class ArmyFacing : i8 {

@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_KB_TYPES_H
 
 #include <Ints.h>
+#include <EnumCode.h>
 #include <SOURCE/combatTypes.h>
 
 class sample;
@@ -549,7 +550,7 @@ inline constexpr MapTriggerCode MapActionTrigger(MapObjectType object) {
 }
 
 inline constexpr MapObjectType MapTriggerObject(MapTriggerCode trigger) {
-    return static_cast<MapObjectType>(static_cast<i32>(trigger) & MAP_TRIGGER_TYPE_MASK);
+    return MapObjectTypeFromCode(static_cast<i32>(trigger) & MAP_TRIGGER_TYPE_MASK);
 }
 
 inline constexpr bool MapTriggerIsAction(MapTriggerCode trigger) {

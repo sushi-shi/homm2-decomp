@@ -729,7 +729,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             spellY + m_spellEffectYOffset,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            static_cast<IconDrawOrientation>(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
+            IconDrawOrientationFromOrdinal(H2EnumIndex(ICON_DRAW_FLIPPED) - H2EnumIndex(m_facing)),
             0,
             NULL,
             NULL
@@ -1355,7 +1355,7 @@ void army::SpecialAttack(void) {
             if (k < COMBAT_DIRECTION_ADJACENT_COUNT) {
                 adjacentHex = pEnemy->GetAdjacentCellIndex(
                     pEnemy->m_hex,
-                    static_cast<CombatHexDirection>(k)
+                    CombatHexDirectionFromOrdinal(k)
                 );
             } else {
                 adjacentHex = pEnemy->m_hex;
@@ -2095,7 +2095,7 @@ void army::DoAttack(i32 retaliation) {
         CancelSpellType(ArmySpellCancelType(1));
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
-    targetHex_3 = -1;
+    targetHex_3 = ARMY_HEX_INVALID;
     m_targetSide = COMBAT_SIDE_NONE;
     if (retaliation) {
         gpCombatManager->m_currentSide = OppositeCombatSide(gpCombatManager->m_currentSide);
@@ -2147,7 +2147,7 @@ i32 army::WalkTo(i32 destination) {
                 if (moatCell[moatIndex_1]
                     == GetAdjacentCellIndex(
                         m_hex,
-                        static_cast<CombatHexDirection>(direction_3)
+                        CombatHexDirectionFromOrdinal(direction_3)
                     )) {
                     canEnterMoat_1 = true;
                 }
@@ -2174,7 +2174,7 @@ i32 army::WalkTo(i32 destination) {
     steps = 0;
     i32 jumpStartHex = m_hex;
     for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
-        CombatHexDirection stepDirection = static_cast<CombatHexDirection>(
+        CombatHexDirection stepDirection = CombatHexDirectionFromOrdinal(
             gpSearchArray->m_storage.path.directions[direction_3 + 1]
         );
         // The Berserker jumps: onto its victim from up to four hexes out,
@@ -2184,7 +2184,7 @@ i32 army::WalkTo(i32 destination) {
             i32 stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
             if (gMoveAttack && direction_3 < 4) {
                 for (i32 step = direction_3; step >= 0; step--) {
-                    stepDirection = static_cast<CombatHexDirection>(
+                    stepDirection = CombatHexDirectionFromOrdinal(
                         gpSearchArray->m_storage.path.directions[step + 1]
                     );
                     stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
@@ -2196,7 +2196,7 @@ i32 army::WalkTo(i32 destination) {
                 return 0;
             } else if (gpCombatManager->m_hexCells[stepHex].m_blocked) {
                 for (i32 landIndex = direction_3 - 1; landIndex >= 0; landIndex--) {
-                    stepDirection = static_cast<CombatHexDirection>(
+                    stepDirection = CombatHexDirectionFromOrdinal(
                         gpSearchArray->m_storage.path.directions[landIndex + 1]
                     );
                     m_hex = stepHex;
@@ -2253,7 +2253,7 @@ i32 army::AttackTo(i32 destination) {
     }
     if (FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
         if (gpSearchArray->m_pathLength == 1) {
-            m_attackDirection = static_cast<CombatHexDirection>(
+            m_attackDirection = CombatHexDirectionFromOrdinal(
                 gpSearchArray->m_storage.path.directions[1]
             );
             gpCombatManager->TestRaiseDoor();
@@ -2277,7 +2277,7 @@ i32 army::AttackTo(i32 destination) {
                     for (i32 step = pathIndex_4; step >= 1; step--) {
                         stepHex = GetAdjacentCellIndex(
                             m_hex,
-                            static_cast<CombatHexDirection>(
+                            CombatHexDirectionFromOrdinal(
                                 gpSearchArray->m_storage.path.directions[step + 1]
                             )
                         );
@@ -2288,7 +2288,7 @@ i32 army::AttackTo(i32 destination) {
                     break;
                 }
                 Walk(
-                    static_cast<CombatHexDirection>(
+                    CombatHexDirectionFromOrdinal(
                         gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]
                     ),
                     finishStanding,
@@ -2300,7 +2300,7 @@ i32 army::AttackTo(i32 destination) {
                 jumpStartHex = m_hex;
             }
             CancelSpellType(ArmySpellCancelType(0));
-            m_attackDirection = static_cast<CombatHexDirection>(
+            m_attackDirection = CombatHexDirectionFromOrdinal(
                 gpSearchArray->m_storage.path.directions[1]
             );
             gpCombatManager->TestRaiseDoor();
@@ -2580,12 +2580,10 @@ i32 army::Damage(i32l damage, SpellType spell) {
         m_deathPending = true;
     }
     oldFacing = m_facing;
-    m_facing = static_cast<ArmyFacing>(
-        H2EnumIndex(gpCombatManager
-                ->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
-                          [gpCombatManager->m_currentArmyIndex]
-                .m_facing)
-        ^ H2EnumIndex(ARMY_FACING_RIGHT)
+    m_facing = OppositeArmyFacing(
+        gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
+                                 [gpCombatManager->m_currentArmyIndex]
+            .m_facing
     );
     m_facing = oldFacing;
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
@@ -3366,7 +3364,7 @@ void army::GoBerserk(void) {
         GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     if (attackMask_29 != ARMY_ALL_ATTACK_DIRECTIONS) {
         while (!targetFound_8) {
-            direction_4 = static_cast<CombatHexDirection>(
+            direction_4 = CombatHexDirectionFromOrdinal(
                 Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1)
             );
             if (!(attackMask_29 & (1 << H2EnumIndex(direction_4)))) {

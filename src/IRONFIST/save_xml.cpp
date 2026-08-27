@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
@@ -387,7 +388,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("groundIndex", c->m_terrainImageIndex);
         mapElement->SetAttribute("hasObject", c->m_animatedObject);
         mapElement->SetAttribute("isRoad", c->m_isRoad);
-        mapElement->SetAttribute("objTileset", static_cast<i32>(c->m_objectTileset));
+        mapElement->SetAttribute("objTileset", H2EnumIndex(c->ObjectTileset()));
         mapElement->SetAttribute("objectIndex", c->m_objectIndex);
         mapElement->SetAttribute("field_4_1", c->m_objectLayerBit0);
         mapElement->SetAttribute("isShadow", c->m_objectLayerBit1);
@@ -395,7 +396,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("extraInfo", c->m_objectMetadata);
         mapElement->SetAttribute("hasOverlay", c->m_animatedOverlay);
         mapElement->SetAttribute("hasLateOverlay", c->m_drawOverlayOnTop);
-        mapElement->SetAttribute("overlayTileset", static_cast<i32>(c->m_overlayTileset));
+        mapElement->SetAttribute("overlayTileset", H2EnumIndex(c->OverlayTileset()));
         mapElement->SetAttribute("overlayIndex", c->m_overlayIndex);
         mapElement->SetAttribute("flags", c->m_flags);
         mapElement->SetAttribute("objType", static_cast<i32>(c->m_triggerType.value()));
@@ -409,7 +410,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("index", i);
         mapElement->SetAttribute("nextIdx", e->nextIndex);
         mapElement->SetAttribute("animatedObject", e->animatedObject);
-        mapElement->SetAttribute("objTileset", static_cast<i32>(e->objectTileset));
+        mapElement->SetAttribute("objTileset", H2EnumIndex(e->ObjectTileset()));
         mapElement->SetAttribute("objectIndex", e->objectIndex);
         mapElement->SetAttribute("field_4_1", e->objectLayerBit0);
         mapElement->SetAttribute("field_4_2", e->objectLayerBit1);
@@ -417,7 +418,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("field_4_4", e->objectMetadata);
         mapElement->SetAttribute("animatedLateOverlay", e->animatedOverlay);
         mapElement->SetAttribute("hasLateOverlay", e->drawOverlayOnTop);
-        mapElement->SetAttribute("tileset", static_cast<i32>(e->overlayTileset));
+        mapElement->SetAttribute("tileset", H2EnumIndex(e->OverlayTileset()));
         mapElement->SetAttribute("overlayIndex", e->overlayIndex);
         pElement->InsertEndChild(mapElement);
     }
@@ -667,10 +668,10 @@ void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
             else if (name == "campPlayerCreatureQuantities") gpGame->m_campaignCarryoverCreatureCounts[index] = static_cast<i16>(value);
         } else if (campaignType == IRONFIST_CAMPAIGN_EXPANSION) {
             i32 intValue;
-            if (name == "campaignID") { elem->QueryIntText(&intValue); xCampaign.m_campaignId = static_cast<ExpansionCampaignId>(intValue); }
-            else if (name == "currentMapID") { elem->QueryIntText(&intValue); xCampaign.m_currentMap = static_cast<ExpansionCampaignMap>(intValue); }
+            if (name == "campaignID") { elem->QueryIntText(&intValue); xCampaign.m_campaignId = ExpansionCampaignIdFromCode(intValue); }
+            else if (name == "currentMapID") { elem->QueryIntText(&intValue); xCampaign.m_currentMap = ExpansionCampaignMapFromCode(intValue); }
             else if (name == "numMaps") elem->QueryIntText(&xCampaign.m_mapCount);
-            else if (name == "mightBeScenarioID") { elem->QueryIntText(&intValue); xCampaign.m_viewMap = static_cast<ExpansionCampaignMap>(intValue); }
+            else if (name == "mightBeScenarioID") { elem->QueryIntText(&intValue); xCampaign.m_viewMap = ExpansionCampaignMapFromCode(intValue); }
             else if (name == "anIntVariable") elem->QueryIntText(&xCampaign.m_viewOnly);
             else if (name == "mapChoice") xCampaign.m_mapChoices[index] = value;
             else if (name == "mapsPlayed") xCampaign.m_mapsPlayed[index] = value;
@@ -773,7 +774,7 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             cell->m_terrainImageIndex = elem->IntAttribute("groundIndex");
             cell->m_animatedObject = elem->IntAttribute("hasObject");
             cell->m_isRoad = elem->IntAttribute("isRoad");
-            cell->m_objectTileset = static_cast<TilesetId>(elem->IntAttribute("objTileset"));
+            cell->SetObjectTileset(TilesetIdFromCode(elem->IntAttribute("objTileset")));
             cell->m_objectIndex = elem->IntAttribute("objectIndex");
             cell->m_objectLayerBit0 = elem->IntAttribute("field_4_1");
             cell->m_objectLayerBit1 = elem->IntAttribute("isShadow");
@@ -781,7 +782,7 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             cell->m_objectMetadata = elem->IntAttribute("extraInfo");
             cell->m_animatedOverlay = elem->IntAttribute("hasOverlay");
             cell->m_drawOverlayOnTop = elem->IntAttribute("hasLateOverlay");
-            cell->m_overlayTileset = static_cast<TilesetId>(elem->IntAttribute("overlayTileset"));
+            cell->SetOverlayTileset(TilesetIdFromCode(elem->IntAttribute("overlayTileset")));
             cell->m_overlayIndex = elem->IntAttribute("overlayIndex");
             cell->m_flags = elem->IntAttribute("flags");
             cell->m_triggerType = static_cast<u8>(elem->IntAttribute("objType"));
@@ -790,7 +791,7 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             mapCellExtra* ext = &gpGame->m_worldMap.extras[index];
             ext->nextIndex = elem->IntAttribute("nextIdx");
             ext->animatedObject = elem->IntAttribute("animatedObject");
-            ext->objectTileset = static_cast<TilesetId>(elem->IntAttribute("objTileset"));
+            ext->SetObjectTileset(TilesetIdFromCode(elem->IntAttribute("objTileset")));
             ext->objectIndex = elem->IntAttribute("objectIndex");
             ext->objectLayerBit0 = elem->IntAttribute("field_4_1");
             ext->objectLayerBit1 = elem->IntAttribute("field_4_2");
@@ -798,7 +799,7 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             ext->objectMetadata = elem->IntAttribute("field_4_4");
             ext->animatedOverlay = elem->IntAttribute("animatedLateOverlay");
             ext->drawOverlayOnTop = elem->IntAttribute("hasLateOverlay");
-            ext->overlayTileset = static_cast<TilesetId>(elem->IntAttribute("tileset"));
+            ext->SetOverlayTileset(TilesetIdFromCode(elem->IntAttribute("tileset")));
             ext->overlayIndex = elem->IntAttribute("overlayIndex");
         }
     }
@@ -841,7 +842,7 @@ void IronfistXML::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "personality") {
             i32 personality;
             elem->QueryIntText(&personality);
-            pdata->m_aiDifficulty = static_cast<PlayerPersonality>(personality);
+            pdata->m_aiDifficulty = PlayerPersonalityFromCode(personality);
         }
         else if (name == "relatedToMaxOrNumHeroes") QueryCharText(elem, &pdata->m_minimumHeroCount);
         else if (name == "hasEvilFaction") QueryCharText(elem, &pdata->m_evilInterface);
@@ -870,8 +871,8 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
     hro->m_owner = 0;
     hro->m_x = 0;
     hro->m_y = 0;
-    hro->m_cursorType = static_cast<HeroCursorType>(0);
-    hro->m_portrait = static_cast<HeroPortrait>(0);
+    hro->m_cursorType = FactionTypeFromOrdinal(0);
+    hro->m_portrait = HeroPortraitFromOrdinal(0);
     hro->m_name[0] = '\0';
     memset(hro->m_spells, 0, sizeof(hro->m_spells));
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
@@ -925,7 +926,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "flags") {
             i32 flags;
             elem->QueryIntText(&flags);
-            hro->m_eventFlags = static_cast<HeroEventFlag>(flags);
+            hro->m_eventFlags = HeroEventFlagFromCode(flags);
         }
         else if (name == "isCaptain") QueryCharText(elem, &hro->m_isCaptain);
         else if (name == "aiParamFV") elem->QueryFloatText(&hro->m_aiFightValue);
@@ -934,7 +935,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
             hro->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
         } else if (name == "secondarySkill") {
             hro->m_secondarySkills[index] =
-                static_cast<HeroSkillLevel>(elem->IntAttribute("level"));
+                HeroSkillLevelFromCode(elem->IntAttribute("level"));
             hro->m_secondarySkillOrder[index] = elem->IntAttribute("idx");
         } else if (name == "numSecSkillsKnown")
             elem->QueryIntText(&hro->m_secondarySkillCount);
@@ -1039,13 +1040,13 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "monthType") {
             i32 monthType;
             elem->QueryIntText(&monthType);
-            giMonthType = static_cast<CalendarPeriodType>(monthType);
+            giMonthType = CalendarPeriodTypeFromCode(monthType);
         }
         else if (name == "monthTypeExtra") elem->QueryIntText(&giMonthTypeExtra);
         else if (name == "weekType") {
             i32 weekType;
             elem->QueryIntText(&weekType);
-            giWeekType = static_cast<CalendarPeriodType>(weekType);
+            giWeekType = CalendarPeriodTypeFromCode(weekType);
         }
         else if (name == "weekTypeExtra") elem->QueryIntText(&giWeekTypeExtra);
         else if (name == "giMapChangeCtr") {
@@ -1087,7 +1088,7 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;
         else if (name == "relatedToPlayerPosAndColor") gpGame->m_setupPlayerColor[index] = value;
         else if (name == "playerHandicap") gpGame->m_playerHandicap[index] = value;
-        else if (name == "newGameSelectedFaction") gpGame->m_setupPlayerRace[index] = static_cast<FactionType>(value);
+        else if (name == "newGameSelectedFaction") gpGame->m_setupPlayerRace[index] = FactionTypeFromCode(value);
         else if (name == "somePlayerCodeOr10IfMayBeHuman") gpGame->m_setupPlayerNetworkId[index] = value;
         else if (name == "somePlayerNumData") gpGame->m_setupPlayerType[index] = value;
         else if (name == "field_47C") gpGame->_pad_0x47c[index] = value;

@@ -232,7 +232,7 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         info.iconIndex = static_cast<i8>(crElem->IntAttribute("fight-value-aux"));
         info.growth = static_cast<i8>(crElem->IntAttribute("growth"));
         info.hitPoints = static_cast<u16>(crElem->IntAttribute("hp"));
-        info.race = static_cast<FactionType>(crElem->IntAttribute("faction"));
+        info.race = FactionTypeFromCode(crElem->IntAttribute("faction"));
         info.speed = static_cast<i8>(crElem->IntAttribute("speed"));
         info.attack = static_cast<i8>(crElem->IntAttribute("attack"));
         info.defense = static_cast<i8>(crElem->IntAttribute("defense"));
@@ -244,11 +244,24 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             sizeof(info.spriteName),
             QueryTextAttribute(crElem, "short-name")
         );
-        info.flags.all = static_cast<MonsterFlags>(creatureFlags);
+        info.flags.all = MonsterFlagsFromCode(creatureFlags);
         gMonsterDatabase[id] = info;
     }
     giNumCreatures++;
 }
+
+constexpr CreatureType IRONFIST_CREATURE_INVALID =
+    CreatureTypeFromCode(H2EnumIndex(CREATURE_INVALID_ID));
+constexpr CreatureType IRONFIST_CREATURE_CYBER_KOBOLD =
+    CreatureTypeFromOrdinal(H2EnumIndex(CREATURE_CYBER_KOBOLD_SPEARMAN_ID));
+constexpr CreatureType IRONFIST_CREATURE_CYBER_BERSERKER =
+    CreatureTypeFromOrdinal(H2EnumIndex(CREATURE_CYBER_PLASMA_BERSERKER_ID));
+constexpr CreatureType IRONFIST_CREATURE_CYBER_LANCER =
+    CreatureTypeFromOrdinal(H2EnumIndex(CREATURE_CYBER_PLASMA_LANCER_ID));
+constexpr CreatureType IRONFIST_CREATURE_CYBER_INDIGO =
+    CreatureTypeFromOrdinal(H2EnumIndex(CREATURE_CYBER_INDIGO_ID));
+constexpr CreatureType IRONFIST_CREATURE_CYBER_ASSASSIN =
+    CreatureTypeFromOrdinal(H2EnumIndex(CREATURE_CYBER_SHADOW_ASSASSIN_ID));
 
 randomHeroCreatureInfo
     randomHeroArmyBounds[IRONFIST_FACTION_TABLE_COUNT][IRONFIST_HERO_ARMY_TIER_COUNT] = {
@@ -258,20 +271,14 @@ randomHeroCreatureInfo
     { { CREATURE_CENTAUR, 6, 10 },   { CREATURE_GARGOYLE, 2, 4 } },
     { { CREATURE_HALFLING, 6, 10 },  { CREATURE_BOAR, 2, 4 }     },
     { { CREATURE_SKELETON, 6, 10 },  { CREATURE_ZOMBIE, 2, 4 }   },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 },
-      { static_cast<CreatureType>(CREATURE_INVALID_ID), 0, 0 } },
-    { { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID), 8, 12 },
-      { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 1), 3, 6 } }
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_INVALID, 0, 0 }, { IRONFIST_CREATURE_INVALID, 0, 0 } },
+    { { IRONFIST_CREATURE_CYBER_KOBOLD, 8, 12 },
+      { IRONFIST_CREATURE_CYBER_BERSERKER, 3, 6 } }
 };
 
 CreatureType
@@ -284,34 +291,26 @@ CreatureType
       CREATURE_HYDRA },
     { CREATURE_HALFLING, CREATURE_BOAR, CREATURE_IRON_GOLEM, CREATURE_ROC, CREATURE_MAGE },
     { CREATURE_SKELETON, CREATURE_ZOMBIE, CREATURE_MUMMY, CREATURE_VAMPIRE, CREATURE_LICH },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID), static_cast<CreatureType>(CREATURE_INVALID_ID),
-      static_cast<CreatureType>(CREATURE_INVALID_ID) },
-    { static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 1),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 2),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 3),
-      static_cast<CreatureType>(CREATURE_CYBER_KOBOLD_SPEARMAN_ID + 4) }
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID,
+      IRONFIST_CREATURE_INVALID, IRONFIST_CREATURE_INVALID },
+    { IRONFIST_CREATURE_CYBER_KOBOLD, IRONFIST_CREATURE_CYBER_BERSERKER,
+      IRONFIST_CREATURE_CYBER_LANCER, IRONFIST_CREATURE_CYBER_INDIGO,
+      IRONFIST_CREATURE_CYBER_ASSASSIN }
 };
 
 std::vector<FactionType> FACTIONS_ACTUAL = {
     FACTION_KNIGHT,   FACTION_BARBARIAN,   FACTION_SORCERESS,           FACTION_WARLOCK,
-    FACTION_WIZARD,   FACTION_NECROMANCER, static_cast<FactionType>(12)
+    FACTION_WIZARD,   FACTION_NECROMANCER, FACTION_CYBORG
 };
 
 std::vector<std::string> FACTIONS_ACTUAL_NAMES = {
@@ -350,9 +349,9 @@ void LoadCreatures() {
     creatureStringsOwned = true;
 
     for (i32 i = 0; i <= MAX_BASE_CREATURE; i++)
-        CREATURES_RANDOMIZABLE.push_back(static_cast<CreatureType>(i));
+        CREATURES_RANDOMIZABLE.push_back(CreatureTypeFromOrdinal(i));
     for (i32 i = MIN_IRONFIST_CREATURE; i <= MAX_IRONFIST_CREATURE; i++)
-        CREATURES_RANDOMIZABLE.push_back(static_cast<CreatureType>(i));
+        CREATURES_RANDOMIZABLE.push_back(CreatureTypeFromOrdinal(i));
 }
 
 void UnloadCreatures() {

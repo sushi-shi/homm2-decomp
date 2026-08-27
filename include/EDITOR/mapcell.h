@@ -97,7 +97,7 @@ struct mapCellExtra {
     u8 overlayIndex;
 
     inline TilesetId ObjectTileset(void) const {
-        return static_cast<TilesetId>(objectTilesetBits);
+        return TilesetIdFromCode(objectTilesetBits);
     }
 
     inline void SetObjectTileset(TilesetId tileset) {
@@ -105,7 +105,7 @@ struct mapCellExtra {
     }
 
     inline TilesetId OverlayTileset(void) const {
-        return static_cast<TilesetId>(overlayTilesetBits);
+        return TilesetIdFromCode(overlayTilesetBits);
     }
 
     inline void SetOverlayTileset(TilesetId tileset) {
@@ -153,7 +153,7 @@ public:
     }
 
     inline TilesetId ObjectTileset(void) const {
-        return static_cast<TilesetId>(m_objectTilesetBits);
+        return TilesetIdFromCode(m_objectTilesetBits);
     }
 
     inline void SetObjectTileset(TilesetId tileset) {
@@ -161,7 +161,7 @@ public:
     }
 
     inline TilesetId OverlayTileset(void) const {
-        return static_cast<TilesetId>(m_overlayTilesetBits);
+        return TilesetIdFromCode(m_overlayTilesetBits);
     }
 
     inline void SetOverlayTileset(TilesetId tileset) {

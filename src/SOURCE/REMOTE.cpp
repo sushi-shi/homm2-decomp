@@ -39,6 +39,10 @@ enum class RemoteSetupCommand : i32 {
 };
 using enum RemoteSetupCommand;
 
+constexpr RemoteSetupCommand RemoteSetupCommandFromCode(i8 value) {
+    return static_cast<RemoteSetupCommand>(value); // H2_ENUM_CODE_BOUNDARY
+}
+
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
@@ -239,7 +243,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 LogStr("RM 4");
                 if (recvData != NULL
                     && REMOTE_MESSAGE(recvData)->type == REMOTE_MESSAGE_RELIABLE) {
-                    switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(recvData)->command)) {
+                    switch (RemoteSetupCommandFromCode(REMOTE_MESSAGE(recvData)->command)) {
                         case SETUP_PLAYER_INFO:
                             netPlayer = REMOTE_MESSAGE(recvData)->sender;
                             gsNetPlayerInfo[netPlayer] =
