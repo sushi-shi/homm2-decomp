@@ -199,8 +199,8 @@ void combatManager::DoCompAI(CombatSide) {
     CombatSide sideEnemy;
     u32 flyerMask[COMBAT_SIDE_COUNT];
     u32 walkers[COMBAT_SIDE_COUNT];
-    i32 stronger;
-    i32 shootStrong;
+    b32 stronger;
+    b32 shootStrong;
     u32l myShootPower;
     i32 plan;
 
@@ -249,8 +249,8 @@ void combatManager::DoCompAI(CombatSide) {
             | traitorArray[H2EnumIndex(m_currentSide)]
     );
 
-    shootStrong = 0;
-    stronger = 0;
+    shootStrong = false;
+    stronger = false;
     myShootPower = GetStrength(m_currentSide, shooters[H2EnumIndex(m_currentSide)]);
     enemyShooters = GetStrength(sideEnemy, shooters[H2EnumIndex(sideEnemy)]);
 
@@ -306,9 +306,9 @@ void combatManager::DoCompAI(CombatSide) {
     if (static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
             / COMBAT_AI_STRENGTH_FRACTION
         < static_cast<i32>(myShootPower))
-        shootStrong = 1;
+        shootStrong = true;
     if (static_cast<i32>(enemyShooters) > static_cast<i32>(myShootPower))
-        stronger = 1;
+        stronger = true;
 
     if ((H2EnumIndex((thisArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_SHOOTER))) != 0) {
         if (thisArmy->m_monster.shots > 0)

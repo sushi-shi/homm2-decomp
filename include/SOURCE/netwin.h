@@ -37,7 +37,7 @@ i32 wsWaitForFirstGuest(void);
 i32 wsWaitForExtraGuests(void);
 i32 wsWaitForHost(void);
 
-extern i32 bHostFound;
+extern b32 bHostFound;
 inline constexpr i32 WS_TRANSPORT_PLAYER_LIMIT = 6;
 
 extern i32 giNetPosToDCOPos[WS_TRANSPORT_PLAYER_LIMIT];
@@ -46,7 +46,7 @@ extern i32 iDPRcvBufferHead;
 extern i32 iDPRcvBufferTail;
 extern u8** ppDPRcvBuffer;
 extern i32* piDPRcvBufferSize;
-extern i32 bStartUpInfoReceived;
+extern b32 bStartUpInfoReceived;
 void CleanupDPVars(void);
 extern i32 iWSLastMsgNumHumanPlayers;
 extern i32 iWSAttempts;

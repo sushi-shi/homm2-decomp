@@ -213,12 +213,12 @@ i32 combatManager::ViewGeneral(
 
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
-    i32 handled28;
+    b32 handled28;
 
     i32 helpIndex36;
     i32 hintIndex11;
 
-    handled28 = 0;
+    handled28 = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -264,7 +264,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                         case GENERAL_CAST_SPELL:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
-                            handled28 = 1;
+                            handled28 = true;
                             break;
                     }
                     break;

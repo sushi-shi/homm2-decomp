@@ -42,6 +42,7 @@ public:
     char m_name[BASE_MANAGER_NAME_CAPACITY];
     b32 m_active;
     baseManager(void);
+    virtual ~baseManager() = default;
     void Activate(bool on = true) {
         m_active = on;
     }

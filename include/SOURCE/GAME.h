@@ -59,7 +59,7 @@ struct EventExtra {
     u8 applyToComputer;
     u8 cancelAfterVisit;
     char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
-    i8 active;
+    b8 active;
     u16 x;
     u16 y;
     u8 unknown2a;
@@ -163,6 +163,6 @@ EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
 i32 CalcFileCRC(char* filename);
 
-extern char bMapInitialized;
+extern bchar bMapInitialized;
 
 #endif

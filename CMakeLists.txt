@@ -245,14 +245,24 @@ target_compile_options(homm2 PRIVATE
   -Werror=unused-but-set-variable
   -Werror=parentheses
   -Werror=write-strings
+  -Werror=char-subscripts
+  -Werror=delete-non-virtual-dtor
+  -Werror=format
   -Wno-invalid-offsetof
   -Werror=format-security
+  -Werror=uninitialized
   -Werror=enum-conversion
   -Werror=narrowing
   -fpermissive)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(homm2 PRIVATE -Wno-class-memaccess)
+  target_compile_options(homm2 PRIVATE
+    -Wno-class-memaccess
+    -Werror=array-bounds
+    -Werror=format-overflow
+    -Werror=format-truncation
+    -Werror=maybe-uninitialized
+    -Werror=stringop-truncation)
 endif()
 
 if(EMSCRIPTEN)

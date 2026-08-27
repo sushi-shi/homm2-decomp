@@ -10,7 +10,7 @@ struct exeGfxConfig {
     i32 y;
     i32 width;
     i32 height;
-    i32 fullScreen;
+    b32 fullScreen;
     i32 colorMouseCursor;
 };
 

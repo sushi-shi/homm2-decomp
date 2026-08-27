@@ -57,7 +57,7 @@ public:
     void ShowColorPointer(void);
     i32 IsVis(void);
     void CheckUpdateMousePos(void);
-    void SetColorMice(i32);
+    void SetColorMice(b32);
 };
 #pragma pack(pop)
 typedef enum MouseManagerConstant {

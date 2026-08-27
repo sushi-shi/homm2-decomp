@@ -134,7 +134,7 @@ class hero {
 public:
     i16 m_spellPoints;
     u8 m_id;
-    char m_owner;
+    i8 m_owner;
     i16 m_lastHeroInteractionTurn;
     u8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;

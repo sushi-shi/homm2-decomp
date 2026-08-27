@@ -1068,14 +1068,14 @@ void townManager::Close(void) {
 }
 
 void townManager::SetArmyCommand(i32 qualifier) {
-    i32 cantMoveLastArmy;
-    i32 sameType;
+    b32 cantMoveLastArmy;
+    b32 sameType;
 
     m_command = ARMY_COMMAND_NONE;
-    cantMoveLastArmy = 0;
+    cantMoveLastArmy = false;
     if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
         && m_pendingStrip != m_swapStrip)
-        cantMoveLastArmy = 1;
+        cantMoveLastArmy = true;
 
     if (m_swapStrip == m_pendingStrip && m_swapArmySlot == m_pendingArmySlot) {
         sprintf(
@@ -1085,10 +1085,10 @@ void townManager::SetArmyCommand(i32 qualifier) {
         );
         m_command = ARMY_COMMAND_VIEW;
     } else {
-        sameType = 0;
+        sameType = false;
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
-            sameType = 1;
+            sameType = true;
         if (sameType) {
             if (qualifier != 0) {
                 sprintf(
@@ -1315,7 +1315,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     SAMPLE2 buildSound = NULL;
     i32 loop;
     i32 leaveTown = 0;
-    i32 quickView;
+    b32 quickView;
     char text[BUILDING_DESCRIPTION_CAPACITY];
     i32 dbgBuild;
     baseManager* manager;
@@ -1323,9 +1323,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     i32 tradeCount;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
 
     if (giDebugBuildingToBuild != -1) {
         dbgBuild = giDebugBuildingToBuild;
@@ -1807,21 +1807,21 @@ MessageDispatchResult townManager::Main(tag_message& message) {
 
                         default:
                             if (quickView) {
-                                i32 armySelected = 0;
+                                b32 armySelected = false;
                                 hero* viewedHero;
                                 if (message.payload.widget.id >= TOWN_GARRISON_SLOT_FIRST
                                     && message.payload.widget.id <= TOWN_GARRISON_SLOT_LAST) {
                                     m_selectedStrip = m_garrisonStrip;
                                     m_selectedArmySlot =
                                         message.payload.widget.id - TOWN_GARRISON_SLOT_FIRST;
-                                    armySelected = 1;
+                                    armySelected = true;
                                 }
                                 if (message.payload.widget.id >= TOWN_HERO_SLOT_FIRST
                                     && message.payload.widget.id <= TOWN_HERO_SLOT_LAST) {
                                     m_selectedStrip = m_heroStrip;
                                     m_selectedArmySlot =
                                         message.payload.widget.id - TOWN_HERO_SLOT_FIRST;
-                                    armySelected = 1;
+                                    armySelected = true;
                                 }
                                 if (armySelected
                                     && m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
@@ -2045,7 +2045,7 @@ void townManager::RedrawTownScreen(void) {
 
 void townManager::SplitArmy(void) {
 
-    i32 sameType;
+    b32 sameType;
     tag_message message;
 
     m_heroWindow1 = new heroWindow(SMALL_DIALOG_WINDOW_X, SMALL_DIALOG_WINDOW_Y, "splitwin.bin");
@@ -2078,10 +2078,10 @@ void townManager::SplitArmy(void) {
     gpWindowManager->DoDialog(m_heroWindow1, SplitArmyHandler, 0);
     delete m_heroWindow1;
     if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
-        sameType = 0;
+        sameType = false;
         if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
             == m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])
-            sameType = 1;
+            sameType = true;
         if (sameType != 0) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] += m_splitAmount;
         } else {
@@ -2977,7 +2977,7 @@ void townManager::DoTavern(void) {
 
 MessageDispatchResult SplitArmyHandler(tag_message& message) {
 
-    i32 handled_c = 0;
+    b32 handled_c = false;
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -3010,14 +3010,14 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_splitAmount = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        handled_c = 1;
+                        handled_c = true;
                         break;
                     case TOWN_DIALOG_CONFIRM:
                         if (gpTownManager->m_splitAmount == 0)
                             gpWindowManager->m_dialogResult = H2EnumIndex(DIALOG_CANCEL_ID);
                         else
                             gpWindowManager->m_dialogResult = H2EnumIndex(TOWN_DIALOG_CONFIRM);
-                        handled_c = 1;
+                        handled_c = true;
                         break;
                     default:
                         break;
@@ -3380,10 +3380,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     window->AddWidget(textControl_p, -1);
 
-                    sprintf(
-                        gText,
-                        ""
-                    );
+                    gText[0] = 0;
                     for (heroPosition_d = 0;
                          heroPosition_d < TOWN_THIEVES_PRIMARY_STAT_COUNT;
                          ++heroPosition_d) {
