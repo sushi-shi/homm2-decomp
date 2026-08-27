@@ -55,18 +55,7 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
-                "src/BASE/Misc.cpp",
-                "src/BASE/TEXTWDGT.cpp",
-                "src/BASE/Textntry.cpp",
-                "src/BASE/droplist.cpp",
-                "src/SOURCE/ADVMGR.cpp",
-                "src/SOURCE/ARMY.cpp",
-                "src/SOURCE/COMMAND.cpp",
                 "src/SOURCE/EVENTS.cpp",
-                "src/SOURCE/FINDPATH.cpp",
-                "src/SOURCE/GAME.cpp",
-                "src/SOURCE/HERO.cpp",
-                "src/SOURCE/PHILAI.cpp",
                 "src/SOURCE/X_CAMPGN.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
             },
@@ -80,16 +69,6 @@ class CleanSourcePatchTests(unittest.TestCase):
             self.assertIn(f"extern HMENU {name};", header)
             self.assertIn(f"HMENU {name} = NULL;", source)
 
-    def test_gold_text_widget_conversions_are_explicit(self):
-        source = (
-            "SetColorIndex(msg.payload.widget.data.value);\n"
-            "(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) "
-            "? FONT_DRAW_DIMMED : m_color,\n"
-        )
-        result = clean_source.apply_patches("src/BASE/TEXTWDGT.cpp", source)
-        self.assertIn("static_cast<FontDrawMode>(msg.payload.widget.data.value)", result)
-        self.assertIn(": static_cast<FontDrawMode>(m_color),", result)
-
     def test_audiere_declares_the_c_string_api_it_uses(self):
         source = "#include <vector>\n#include <string>\n"
         result = clean_source.apply_patches(
@@ -97,16 +76,6 @@ class CleanSourcePatchTests(unittest.TestCase):
             source,
         )
         self.assertIn("#include <string.h>", result)
-
-    def test_gold_enum_zero_uses_domain_value(self):
-        misc_source = (
-            "u32l MAKEFILEID(char* text) {\n"
-            "H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;\n"
-        )
-        self.assertIn(
-            "bDataEntryTime = ENTRY_PHASE_IMMEDIATE;",
-            clean_source.apply_patches("src/BASE/Misc.cpp", misc_source),
-        )
 
     def test_makefileid_const_is_encoded_in_source(self):
         declaration = clean_source.clean(
@@ -118,11 +87,8 @@ class CleanSourcePatchTests(unittest.TestCase):
     char buf[260];
     strcpy(buf, text);
     return buf[0];
-}
-H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;"""
-        result = clean_source.clean(
-            clean_source.apply_patches("src/BASE/Misc.cpp", source)
-        )
+}"""
+        result = clean_source.clean(source)
         self.assertIn("u32l MAKEFILEID(const char* text)", result)
         self.assertIn("strcpy(buf, text);", result)
         self.assertNotIn("text[i] &=", result)
