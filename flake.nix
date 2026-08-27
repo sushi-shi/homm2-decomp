@@ -165,6 +165,36 @@
 
       homm2 = mkNative false;
       homm2-debug = mkNative true;
+      homm2-check = homm2.overrideAttrs (_previous: {
+        doCheck = true;
+        checkPhase = ''
+          runHook preCheck
+          ctest --output-on-failure
+          runHook postCheck
+        '';
+      });
+
+      icon-check = pkgs.stdenv.mkDerivation {
+        pname = "homm2-icon-check";
+        version = "0.1.0";
+        src = source;
+        nativeBuildInputs = [ iconRust pkgs.clang ];
+        buildPhase = ''
+          runHook preBuild
+          export CARGO_HOME="$TMPDIR/cargo-home"
+          cd tools/homm2-icon-rs
+          cargo test --all-targets --locked
+          cargo test --doc --locked
+          cargo clippy --all-targets --locked -- -D warnings
+          cargo fmt --check
+          runHook postBuild
+        '';
+        installPhase = ''
+          runHook preInstall
+          touch "$out"
+          runHook postInstall
+        '';
+      };
 
       sdl3-web = pkgs.stdenvNoCC.mkDerivation {
         pname = "sdl3-web";
@@ -328,6 +358,13 @@
         homm2-linux = homm2;
         homm2-windows = windows;
         default = homm2;
+      };
+
+      checks.${system} = {
+        native = homm2-check;
+        windows = windows;
+        web = homm2-web;
+        icon = icon-check;
       };
 
       apps.${system} = {
