@@ -197,7 +197,7 @@ public:
     void UpdateHeroLocator(i32, i32, i32);
     void UpdateHeroLocators(i32, i32);
     void UpdateTownLocators(i32, i32);
-    void UpdBottomView(i32, i32, i32);
+    void UpdBottomView(b32, b32, b32);
     void ClearBottomView(void);
     i32 UpdBottomViewEnemyTurn(void);
     i32 UpdBottomViewNewTurn(void);
@@ -377,7 +377,7 @@ public:
 };
 #pragma pack(pop)
 
-extern i32 bMoveSoundMade;
+extern b32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];
 extern i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT];
 extern u8 EveryOther;
@@ -416,9 +416,9 @@ extern i32 iVWYPixelOffset;
 extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
-extern i32 iVWDrawAllTerrains;
+extern b32 iVWDrawAllTerrains;
 extern H2EnumStorage<SpellType, i32> iVWWhatToDraw;
-extern i32 iVWDrawAllObjs;
+extern b32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;
 extern i32 iVWCenterOffset;
@@ -433,7 +433,7 @@ extern i32 giFrameStep;
 extern char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
 extern i32 giLimitUpdMaxX;
 extern i32 giLimitUpdMaxY;
-extern i32 bPrefsChanged;
+extern b32 bPrefsChanged;
 extern i32 giLimitUpdMinY;
 extern struct tag_message CDMsg;
 extern i8 bComboDraw[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE]

@@ -77,10 +77,6 @@ using enum CombatKeyCommand;
         WIN_LOSE_RESOURCE_LOAD_ID = 200,
         WIN_LOSE_RESOURCE_DRAW_ID = 201,
         WIN_LOSE_DRAW_DEPTH = 0x7fff,
-        WIN_LOSE_ANIMATION_CYCLE_FIRST = 1,
-        WIN_LOSE_ANIMATION_LOSS = 2,
-        WIN_LOSE_ANIMATION_FLEE = 3,
-        WIN_LOSE_ANIMATION_CYCLE_SECOND = 4,
         WIN_LOSE_FIRST_ANIMATION_FRAME = 1,
         WIN_LOSE_LOOP_FRAME_COUNT = 20,
         WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME = 43,
@@ -457,10 +453,10 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
 
-    char standable_0[COMBAT_DIRECTION_COUNT];
+    bchar standable_0[COMBAT_DIRECTION_COUNT];
     i32 directionHexes[COMBAT_DIRECTION_COUNT];
     i32 rearHexes_2[COMBAT_DIRECTION_COUNT];
-    char pathValid_28[COMBAT_DIRECTION_COUNT];
+    bchar pathValid_28[COMBAT_DIRECTION_COUNT];
     i32 outputDirection_7;
     i32 mappedDirection_5;
     i32 previous_1;
@@ -539,9 +535,9 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 
         if (ValidHexToStandOn(directionHexes[direction_28]) != 0
             && ValidHexToStandOn(rearHexes_2[direction_28]) != 0)
-            standable_0[direction_28] = 1;
+            standable_0[direction_28] = true;
         else
-            standable_0[direction_28] = 0;
+            standable_0[direction_28] = false;
     }
 
     if ((H2EnumIndex((currentArmy_1->m_monster.flags.all) & (MONSTER_FLAGS_FLYING))) != 0) {
@@ -565,11 +561,11 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                            directionHexes[direction_28],
                            ARMY_PATH_EXACT_TARGET_HEX
                        ) != 0)
-                    pathValid_28[direction_28] = 1;
+                    pathValid_28[direction_28] = true;
                 else
-                    pathValid_28[direction_28] = 0;
+                    pathValid_28[direction_28] = false;
             } else {
-                pathValid_28[direction_28] = 0;
+                pathValid_28[direction_28] = false;
             }
         }
     }
@@ -580,7 +576,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             m_validDirectionCount++;
     }
     if (m_validDirectionCount == 0)
-        pathValid_28[H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST)] = 1;
+        pathValid_28[H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST)] = true;
 
     memset(m_directionMap, -1, sizeof(m_directionMap));
     for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++) {
@@ -1271,7 +1267,7 @@ void combatManager::BurnCreature(army* stack) {
 }
 
 i32 combatManager::CheckWin(struct tag_message* message) {
-    i32 combatEnded = 0;
+    b32 combatEnded = false;
     // The auto-win debug toggle hands the battle to the human side.
     if (gbAutoWinBattles) {
         if (m_playerId[0] != -1 && gbHumanPlayer[m_playerId[0]])
@@ -1286,22 +1282,22 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         return 1;
     }
     if (IsWinner(m_currentSide) != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         if (IsWinner(OppositeCombatSide(m_currentSide)) != 0)
             m_combatResult = COMBAT_RESULT_DRAW;
         else
             m_combatResult = CombatResultForSide(m_currentSide);
     } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         m_combatResult = CombatResultForSide(OppositeCombatSide(m_currentSide));
     } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
-        combatEnded = 1;
+        combatEnded = true;
         gbRetreatWin = true;
         m_combatResult = m_sideRetreated[0] != 0 ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
     }
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
-        i32 armyAlive = 0;
+        b32 armyAlive = false;
 
         i32 armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
@@ -1309,7 +1305,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
                 && m_armies[H2EnumIndex(m_combatResult)][armyIndex].m_quantity > 0
                 && (H2EnumIndex((m_armies[H2EnumIndex(m_combatResult)][armyIndex].m_monster.flags.all) & (MONSTER_FLAGS_SUMMONED)))
                        == 0) {
-                armyAlive = 1;
+                armyAlive = true;
             }
         }
         if (armyAlive == 0)
@@ -1329,7 +1325,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
 
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    i32 showEnemy_12 = 0;
+    b32 showEnemy_12 = false;
     CombatSide enemySide_27;
     i32 targetIndex;
     army* ourArmy_13;
@@ -1391,7 +1387,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
             } else if (enemySide_27 != COMBAT_SIDE_NONE) {
                 if (enemySide_27 != m_currentArmySide || targetIndex != m_currentArmyIndex) {
-                    showEnemy_12 = 1;
+                    showEnemy_12 = true;
                     if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
                         m_smallViewSide[1] = enemySide_27;
                         m_smallViewArmyIndex[1] = targetIndex;
@@ -1672,7 +1668,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                                 iTransferArtifacts[iCurTransferArtifact]
                             );
                         } else if (giSkeletonsCreated != 0 && bSkeletonsShown == 0) {
-                            bSkeletonsShown = 1;
+                            bSkeletonsShown = true;
                             gpCombatManager->ClearWinLoseBottom(gpCombatManager->m_winLoseWindow);
                             gpCombatManager->ShowSkeletons(gpCombatManager->m_winLoseWindow);
                         } else {
@@ -2195,12 +2191,12 @@ void combatManager::DoVictory(CombatResult winningSide) {
         && m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
         m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = NULL;
     gbShowingLoseWindow = false;
-    gbWhichAnimationPlaying = true;
+    gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_CYCLE_FIRST;
     giWinCmbtFrame = 0;
     giSkeletonsCreated = 0;
     iMaxTransferArtifacts = 0;
     iCurTransferArtifact = -1;
-    bSkeletonsShown = 0;
+    bSkeletonsShown = false;
     bodies = 0;
     necroEligible = 0;
 
@@ -2669,8 +2665,8 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     i32 actionData[H2EnumIndex(ACTION_DATA_COUNT)];
     i32 transmitResult;
     army* actingArmy_29;
-    i32 shouldAdvance;
-    i32 redraw_10;
+    b32 shouldAdvance;
+    b32 redraw_10;
     MessageDispatchResult dispatchResult_1;
 
     // A stack that waits on burning ground keeps burning.
@@ -2680,13 +2676,13 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
 
     ClearCombatMessages(0);
     dispatchResult_1 = MESSAGE_DISPATCH_CONSUME;
-    redraw_10 = 0;
+    redraw_10 = false;
     gbProcessingCombatAction = true;
     if (m_smallViewSide[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
         || m_smallViewSide[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
         m_smallViewSide[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
         m_smallViewSide[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = COMBAT_SIDE_NONE;
-        redraw_10 = 1;
+        redraw_10 = true;
     }
     if (giNextAction != ACTION_NONE) {
         LogInt(
@@ -2704,7 +2700,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     UpdateMouseGrid(-1, 1);
     memset(m_gridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_gridState));
     if (UpdateGrid(0, 0) != 0)
-        redraw_10 = 1;
+        redraw_10 = true;
     if (redraw_10 != 0)
         DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 
@@ -2741,7 +2737,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     }
 
     actingArmy_29 = &m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex];
-    shouldAdvance = 0;
+    shouldAdvance = false;
     if (CheckWin(&message) != 0)
         goto Finished;
     switch (giNextAction) {
@@ -2756,7 +2752,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 giNextActionGridIndex2
             );
             if (m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex].m_quantity <= 0)
-                shouldAdvance = 1;
+                shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_MOVE:
@@ -2768,7 +2764,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 goto Finished;
             }
             CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-            shouldAdvance = 1;
+            shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_ATTACK:
@@ -2783,7 +2779,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 goto Finished;
             }
             CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-            shouldAdvance = 1;
+            shouldAdvance = true;
             ResetCycleTimers();
             break;
         case ACTION_RETREAT:
@@ -2803,11 +2799,11 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             break;
         case ACTION_WAIT:
             actingArmy_29->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
-            shouldAdvance = 1;
+            shouldAdvance = true;
             break;
         case ACTION_DEFEND:
             actingArmy_29->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
-            shouldAdvance = 1;
+            shouldAdvance = true;
             break;
     }
     giNextAction = ACTION_NONE;
@@ -3127,7 +3123,7 @@ void combatManager::AddArmy(
     i32 animate
 ) {
     i32 armyIdx = INVALID_ARMY_INDEX;
-    i32 reusedArmy = 0;
+    b32 reusedArmy = false;
     i32 index;
     army* newStack;
     for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
@@ -3144,7 +3140,7 @@ void combatManager::AddArmy(
                 || m_armies[H2EnumIndex(side)][index].m_monsterType == CREATURE_FIRE_ELEMENTAL
                 || m_armies[H2EnumIndex(side)][index].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
             armyIdx = index;
-            reusedArmy = 1;
+            reusedArmy = true;
             break;
         }
     }
@@ -3317,10 +3313,10 @@ void combatManager::ViewBallista(i32 quickView) {
 b32 gbThisNetHasControl;
 i32 iCurTransferArtifact;
 i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-b32 gbWhichAnimationPlaying;
+H2EnumStorage<CombatWinLoseAnimation, i32> gbWhichAnimationPlaying;
 i32 iMaxTransferArtifacts;
 i32 giNextActionExtra;
-i32 bSkeletonsShown;
+b32 bSkeletonsShown;
 b32 gbShowingLoseWindow;
 i32 giWinCmbtFrame;
 i32 giNextActionGridIndex;

@@ -205,7 +205,7 @@ const char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     "Warfare",    "Warlock",     "Weapon",     "Wings",       "Wizardry",   "Wolf",
     "Zombie"
 };
-i8 xNetHasOldPlayers = 0;
+b8 xNetHasOldPlayers = false;
 u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
     H2EnumIndex(FACTION_KNIGHT),
     H2EnumIndex(FACTION_KNIGHT),

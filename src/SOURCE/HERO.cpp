@@ -831,7 +831,7 @@ void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
 
-    i32 highIndex;
+    b32 highIndex;
     i32 slot;
     SAMPLE2 samp;
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
@@ -857,9 +857,9 @@ void hero::CheckLevel(void) {
         statBonuses[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)] = 0;
         statBonuses[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)] = 0;
         if (nLevel <= HERO_LEVEL_HIGH_THRESHOLD)
-            highIndex = 0;
+            highIndex = false;
         else
-            highIndex = 1;
+            highIndex = true;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         rnd = SRandom(1, HERO_LEVEL_RANDOM_MAX);
@@ -1232,10 +1232,10 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 tmp;
-    i32 quickView;
+    b32 quickView;
     i32 armySlot;
 
-    i32 bExit = 0;
+    b32 bExit = false;
     i32 heroLevel;
     i32 iHero;
     i32 secondarySkillSlot;
@@ -1243,9 +1243,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 nextExperience;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
 
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
@@ -1283,10 +1283,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     switch (message.payload.widget.id) {
                         case UI_DISMISS:
                             if (gpHVHero->Dismiss())
-                                bExit = 1;
+                                bExit = true;
                             break;
                         case UI_CLOSE:
-                            bExit = 1;
+                            bExit = true;
                             break;
                         case UI_PREVIOUS_HERO:
                         case UI_NEXT_HERO: {
@@ -1611,7 +1611,7 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     mapCell* heroCell;
 
     gbNoDismiss = noDismiss;
@@ -1656,7 +1656,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 
 void SetupHeroView(void) {
     i32 tempBonus;
-    i32 bNoDismiss;
+    b32 bNoDismiss;
     tag_message msg;
     tag_message statusMsg;
     i32 i;
@@ -1668,7 +1668,7 @@ void SetupHeroView(void) {
 
     bNoDismiss = gbNoDismiss;
     if (gpHVHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
-        bNoDismiss = 1;
+        bNoDismiss = true;
 
     msg.type = HERO_UI_MESSAGE;
     sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]);

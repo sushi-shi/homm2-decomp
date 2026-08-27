@@ -14,6 +14,8 @@
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
 
+#include <string>
+
 #define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
 #include <BASE/MiscEnums.h>
 typedef enum DataEntryLayout {
@@ -29,7 +31,6 @@ typedef enum DataEntryLayout {
     MAX_ROW_COUNT               = 6,
     CANCEL_Y_OFFSET             = 30,
     ENTRY_BASE_Y                = 50,
-    WINDOW_NAME_CAPACITY        = 16,
     TEXT_BUFFER_CAPACITY        = 100,
     TEXT_FIELD_X                = 35,
     TEXT_FIELD_WIDTH            = 251,
@@ -276,7 +277,7 @@ void BaseFree(void* ptr, const char* originalFile, i32 originalLine) {
     if (entryIndex < ENTRY_SEARCH_COMPLETE) {
         sprintf(
             gText,
-            "Bad Delete,  File '%13s'  Line % 4d, ptr %12d",
+            "Bad Delete,  File '%13s'  Line % 4d, ptr %12p",
             originalFile,
             originalLine,
             ptr
@@ -307,10 +308,10 @@ void PrintMemoryLeaks(void) {
         if (gpMemEntry[entryIndex].used != 0) {
             sprintf(
                 gText,
-                "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
+                "Memory Leak,  File '%13s'  Line % 4d, ptr %12p   size %6d",
                 gpMemEntry[entryIndex].file,
                 gpMemEntry[entryIndex].line,
-                reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
+                gpMemEntry[entryIndex].ptr,
                 gpMemEntry[entryIndex].size
             );
             LogStr(gText);
@@ -369,11 +370,12 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 #include <BASE/MiscGraphicsConstants.h>
 
 void FadeIn(i32 increment) {
-    i32 done, i, j, delayTime, threshold;
+    b32 done;
+    i32 i, j, delayTime, threshold;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = 0;
+    done = false;
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
@@ -382,7 +384,7 @@ void FadeIn(i32 increment) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (i == MISC_PALETTE_MAX_LEVEL) {
-            done = 1;
+            done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
             threshold = MISC_PALETTE_MAX_LEVEL - i;
@@ -402,11 +404,12 @@ void FadeIn(i32 increment) {
 }
 
 void FadeOut(i32 increment) {
-    i32 done, i, j, delayTime;
+    b32 done;
+    i32 i, j, delayTime;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = 0;
+    done = false;
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
@@ -415,7 +418,7 @@ void FadeOut(i32 increment) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (i == FADE_LEVEL_LAST)
-            done = 1;
+            done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (pal->m_data[j] > 0) {
                 if (pal->m_data[j] > increment)
@@ -518,7 +521,7 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].x = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].colorMouseCursor = 0;
-        gConfig.gfx[i].fullScreen = 1;
+        gConfig.gfx[i].fullScreen = true;
         if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
@@ -1058,7 +1061,6 @@ void GetDataEntry(
     MouseCursorType savedCursorType;
 
     i32 nRows;
-    char windowName[WINDOW_NAME_CAPACITY];
     i32 entryY;
     i32 nHeight;
     i32 textLines;
@@ -1090,8 +1092,8 @@ void GetDataEntry(
         nRows = MAX_ROW_COUNT;
     entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
 
-    snprintf(windowName, sizeof(windowName), "evntwin%d.bin", nRows);
-    DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
+    const std::string windowName = "evntwin" + std::to_string(nRows) + ".bin";
+    DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName.c_str());
     if (DataEntryWin == NULL)
         MemError();
 

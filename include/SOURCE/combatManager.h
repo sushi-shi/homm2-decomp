@@ -83,6 +83,14 @@ enum class CombatCastleHex : i32 {
 };
 using enum CombatCastleHex;
 
+enum class CombatWinLoseAnimation : i32 {
+    WIN_LOSE_ANIMATION_CYCLE_FIRST  = 1,
+    WIN_LOSE_ANIMATION_LOSS         = 2,
+    WIN_LOSE_ANIMATION_FLEE         = 3,
+    WIN_LOSE_ANIMATION_CYCLE_SECOND = 4
+};
+using enum CombatWinLoseAnimation;
+
 enum class CombatDrawbridgeState : i32 {
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
@@ -867,28 +875,28 @@ public:
     i32 WalkTowardArmy(class army*, CombatSide, i32);
 };
 #pragma pack(pop)
-extern i32 bGridWasShowing;
+extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
 extern H2EnumStorage<CombatSide, i32> iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
-extern i32 bInTeleportGetDest;
+extern b32 bInTeleportGetDest;
 extern i32 indexToCastOn;
 extern u8 uRedBeam[];
 extern u8 uRainbow[];
 extern i8* gyModify;
 extern float gfDurationMods[COMBAT_DURATION_MOD_COUNT];
 extern float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT];
-extern i32 bInHighMoraleBonus;
+extern b32 bInHighMoraleBonus;
 extern i32 giSeed;
 extern u8 wallHex[COMBAT_WALL_SECTION_COUNT];
 extern b32 gbThisNetHasControl;
 extern i32 iCurTransferArtifact;
 extern i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-extern b32 gbWhichAnimationPlaying;
+extern H2EnumStorage<CombatWinLoseAnimation, i32> gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
-extern i32 bSkeletonsShown;
+extern b32 bSkeletonsShown;
 extern b32 gbShowingLoseWindow;
 extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
@@ -903,6 +911,6 @@ extern i32 gSpellDirection;
 extern bool gbAutoWinBattles;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
-extern i32 bCPrefsChanged;
+extern b32 bCPrefsChanged;
 
 #endif

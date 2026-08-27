@@ -139,11 +139,11 @@ extern const char* cCampaignDescription[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAI
 struct SPlayerExit {
     i8 netPosition;
     i8 gamePosition;
-    i8 updateNetworkControl;
-    i8 timedOut;
-    i8 eliminated;
-    i8 hostReported;
-    i8 continueGame;
+    b8 updateNetworkControl;
+    b8 timedOut;
+    b8 eliminated;
+    b8 hostReported;
+    b8 continueGame;
 };
 
 typedef enum EventWindowConstant {
@@ -558,13 +558,13 @@ void CheckShingleUpdate(void);
 void NormalDialog(const char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 void UpdateNormalDialog(const char* text);
 
-extern i32 bDoColorCycle;
+extern b32 bDoColorCycle;
 extern b32 gbDrawWindowBackground;
 extern i32 bEarlySetupDone;
 extern font* bigFont;
-extern i32 bInShutDown;
+extern b32 bInShutDown;
 extern i32 bShowIt;
-extern i32 bSpecialHideCursor;
+extern b32 bSpecialHideCursor;
 extern const char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
 extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
@@ -584,7 +584,7 @@ extern b32 gbDrawSavedCursor;
 extern b32 gbForegroundApp;
 extern b32 gbFunctionComplete;
 extern b32 gbGameInitialized;
-extern b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+extern i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
 extern b32 gbHeroMoving;
 extern b32 gbHumanPlayer[];
 extern b32 gbLoadingMonoIcon;
@@ -595,7 +595,7 @@ extern b32 gbInMemError;
 extern b32 gbInNewGameSetup;
 extern b32 gbInPollSound;
 extern b32 gbNoCDRom;
-extern b32 gbPutzingWithMouseCtr;
+extern i32 gbPutzingWithMouseCtr;
 extern b32 gbRemoteOn;
 extern b8 gbRetreatWin;
 extern b32 gbTextEntryEscaped;

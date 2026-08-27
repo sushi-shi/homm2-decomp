@@ -39,7 +39,7 @@ extern class iconWidget* tradeKnob;
 extern i32 qtyToTrade;
 extern i32 leftResource;
 extern i32 iTradeRatio;
-extern i32 bTradeMade;
+extern b32 bTradeMade;
 extern float fTradingPostEfficiency;
 extern i32 tpX;
 extern i32 tpY;

@@ -352,7 +352,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 secondaryReward_k;
     i32 primaryReward_e;
     i32 primaryAmount_j;
-    i32 correctAnswer_e;
+    b32 correctAnswer_e;
     boatRecord* boat_k;
     i32 teleportCount_e;
     ResourceType resourceType_a;
@@ -376,7 +376,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade1;
     SAMPLE2 playedSample3;
     CreatureType firstUpgrade_e;
-    i32 fizzleType_k;
+    b32 fizzleType_k;
     i32 eventValue1;
     signEventExtra* signExtra_k;
     CreatureType thirdUpgrade_f;
@@ -386,7 +386,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     eventHero2 = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eraseObject_l = 0;
-    fizzleType_k = 0;
+    fizzleType_k = false;
     playedSample3 = NULL;
     eventSample_f = NULL;
 
@@ -479,7 +479,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         riddle.c_str()
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
-                    correctAnswer_e = 0;
+                    correctAnswer_e = false;
                     for (eventValue1 = 0; eventValue1 < eventExtra_o->answerCount; eventValue1++) {
                         const std::string answer = localization::DecodeExternalText(
                             eventExtra_o->answers[eventValue1]
@@ -488,7 +488,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 sphinxAnswer_a,
                                 answer.c_str()
                             ))
-                            correctAnswer_e = 1;
+                            correctAnswer_e = true;
                     }
 
                     if (correctAnswer_e) {
@@ -784,7 +784,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
             }
-            fizzleType_k = 1;
+            fizzleType_k = true;
             eraseObject_l = 1;
             break;
 
@@ -852,7 +852,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     GiveResource(eventHero2, RES_GOLD, FLOTSAM_LARGE_GOLD_AMOUNT);
                     break;
             }
-            fizzleType_k = 1;
+            fizzleType_k = true;
             eraseObject_l = 1;
             break;
         }
@@ -891,7 +891,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
             }
-            fizzleType_k = 1;
+            fizzleType_k = true;
             eraseObject_l = 1;
             break;
 
@@ -1287,7 +1287,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
             }
             eraseObject_l = 1;
-            fizzleType_k = 1;
+            fizzleType_k = true;
             eventHero2->CheckLevel();
             break;
 
@@ -1693,7 +1693,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject_l = 1;
-            fizzleType_k = 1;
+            fizzleType_k = true;
             SetEnvironmentOrigin(
                 m_mapOriginX + ENVIRONMENT_BORDER,
                 m_mapOriginY + ENVIRONMENT_BORDER,
@@ -1964,7 +1964,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             eraseObject_l = 1;
-            fizzleType_k = 1;
+            fizzleType_k = true;
             break;
 
         case MAP_OBJECT_WINDMILL:
@@ -2016,7 +2016,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
                     eraseObject_l = 1;
-                    fizzleType_k = 1;
+                    fizzleType_k = true;
                 }
             }
             break;
@@ -2735,7 +2735,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject_l = 1;
-                fizzleType_k = 1;
+                fizzleType_k = true;
                 break;
             }
 
@@ -2754,7 +2754,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject_l = 1;
-                fizzleType_k = 1;
+                fizzleType_k = true;
                 break;
             }
 
@@ -2882,7 +2882,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     giveArtifact:
                         GiveArtifact(eventHero2, artifact_g, 1, -1);
                         eraseObject_l = 1;
-                        fizzleType_k = 1;
+                        fizzleType_k = true;
                         break;
 
                     case ARTIFACT_EVENT_MODE_GOLD:
@@ -3126,7 +3126,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
             }
-            fizzleType_k = 1;
+            fizzleType_k = true;
             eraseObject_l = 1;
             break;
         }
@@ -3741,7 +3741,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     mapCell* cells_h[NEIGHBOR_COUNT];
     i32 frame_k = NO_FRAME;
     mapCell* currentCell_d;
-    i8 isWide_l = 0;
+    b8 isWide_l = false;
     i32 i_g;
 
     i32 cellX_l;
@@ -3758,7 +3758,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         frame_k = cell->m_objectIndex - 1;
     if (cell->m_objectTileset == TILESET_X_LOC2 && cell->m_objectIndex == 9) {
         frame_k = 9;
-        isWide_l = 1;
+        isWide_l = true;
     }
     if (cell->m_objectTileset == TILESET_OBJNMULT && cell->m_objectIndex == 131)
         frame_k = 124;
@@ -4313,6 +4313,8 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
         case RECRUITMENT_SITE_WATER_ALTAR:
             creatureType1 = CREATURE_WATER_ELEMENTAL;
             break;
+        default:
+            return;
     }
 
     index = H2EnumIndex(recruitSiteType);
@@ -6072,7 +6074,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     i32 eraseObject_l;
     i32 battleResult_l;
-    i32 creatureFlag_l;
+    b32 creatureFlag_l;
     i32 oldPlayer_o;
     i32 purchaseCost_i;
     i32 battleWon_j;
@@ -6495,78 +6497,78 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_TREE_CITY:
             creatureType_i = CREATURE_SPRITE;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_RUINS:
             creatureType_i = CREATURE_MEDUSA;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_TROLL_BRIDGE:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType_i = CREATURE_TROLL;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_CITY_OF_DEAD:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType_i = CREATURE_POWER_LICH;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_DRAGON_CITY:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType_i = CREATURE_RED_DRAGON;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_HALFLING_HOLE:
             creatureType_i = CREATURE_HALFLING;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_ANCIENT_LAMP:
             creatureType_i = CREATURE_GENIE;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_WAGON_CAMP:
             creatureType_i = CREATURE_ROGUE;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_DESERT_TENT:
             creatureType_i = CREATURE_NOMAD;
-            creatureFlag_l = 0;
+            creatureFlag_l = false;
             goto creaturePurchase;
         case MAP_OBJECT_WATCH_TOWER:
             creatureType_i = CREATURE_ORC;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_TREE_HOUSE:
             creatureType_i = CREATURE_SPRITE;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_ARCHER_HOUSE:
             creatureType_i = CREATURE_ARCHER;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_GOBLIN_HUT:
             creatureType_i = CREATURE_GOBLIN;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_PEASANT_HUT:
             creatureType_i = CREATURE_PEASANT;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_DWARF_COTTAGE:
         case MAP_OBJECT_SIRENS:
             creatureType_i = CREATURE_DWARF;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_CAVE:
             creatureType_i = CREATURE_CENTAUR;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
         case MAP_OBJECT_EXCAVATION:
             creatureType_i = CREATURE_SKELETON;
-            creatureFlag_l = 1;
+            creatureFlag_l = true;
             goto creaturePurchase;
 
         creaturePurchase:
@@ -7315,6 +7317,8 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
         case RECRUITMENT_SITE_WATER_ALTAR:
             monsterType = CREATURE_WATER_ELEMENTAL;
             break;
+        default:
+            return;
     }
 
     if (quantity != 0) {
@@ -8309,15 +8313,15 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    i32 hasFirstHero4;
-    i32 gotSecondHeroFirst2;
-    i32 gotFirstHeroSecond;
+    b32 hasFirstHero4;
+    b32 gotSecondHeroFirst2;
+    b32 gotFirstHeroSecond;
     i32 firstOwner8;
-    i32 gotSecondHeroSecond2;
+    b32 gotSecondHeroSecond2;
     i32 result7;
-    i32 hasTown2;
-    i32 hasSecondHero0;
-    i32 gotFirstHeroFirst0;
+    b32 hasTown2;
+    b32 hasSecondHero0;
+    b32 gotFirstHeroFirst0;
     i32l lastPacketTime7;
     i32 secondOwner;
 
@@ -8326,7 +8330,7 @@ void advManager::ReceiveHeroTownData(
     *combatTown = NULL;
     *secondHero = NULL;
     *secondArmy = NULL;
-    hasFirstHero4 = hasSecondHero0 = hasTown2 = 0;
+    hasFirstHero4 = hasSecondHero0 = hasTown2 = false;
     *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
     *x = EVENTS_REMOTE_COMBAT(packet)->x;
     *y = EVENTS_REMOTE_COMBAT(packet)->y;
@@ -8372,19 +8376,19 @@ void advManager::ReceiveHeroTownData(
         ShutDown(NULL);
 
     lastPacketTime7 = platform::Ticks();
-    gotFirstHeroFirst0 = 1;
-    gotFirstHeroSecond = 1;
-    gotSecondHeroFirst2 = 1;
-    gotSecondHeroSecond2 = 1;
+    gotFirstHeroFirst0 = true;
+    gotFirstHeroSecond = true;
+    gotSecondHeroFirst2 = true;
+    gotSecondHeroSecond2 = true;
     if (hasFirstHero4) {
         *firstHero = static_cast<hero*>(H2_ALLOC(sizeof(hero)));
-        gotFirstHeroFirst0 = 0;
-        gotFirstHeroSecond = 0;
+        gotFirstHeroFirst0 = false;
+        gotFirstHeroSecond = false;
     }
     if (hasSecondHero0) {
         *secondHero = static_cast<hero*>(H2_ALLOC(sizeof(hero)));
-        gotSecondHeroFirst2 = 0;
-        gotSecondHeroSecond2 = 0;
+        gotSecondHeroFirst2 = false;
+        gotSecondHeroSecond2 = false;
     }
 
     while (!gotFirstHeroFirst0 || !gotFirstHeroSecond || !gotSecondHeroFirst2
@@ -8414,7 +8418,7 @@ void advManager::ReceiveHeroTownData(
             lastPacketTime7 = platform::Ticks();
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {
                 memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);
-                gotFirstHeroFirst0 = 1;
+                gotFirstHeroFirst0 = true;
             }
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_SECOND) {
                 memcpy(
@@ -8422,7 +8426,7 @@ void advManager::ReceiveHeroTownData(
                     EVENTS_REMOTE_HERO(packet)->data,
                     COMBAT_REMOTE_HERO_SECOND_SIZE
                 );
-                gotFirstHeroSecond = 1;
+                gotFirstHeroSecond = true;
             }
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_SECOND_HERO_FIRST) {
                 memcpy(
@@ -8430,7 +8434,7 @@ void advManager::ReceiveHeroTownData(
                     EVENTS_REMOTE_HERO(packet)->data,
                     COMBAT_REMOTE_HERO_FIRST_SIZE
                 );
-                gotSecondHeroFirst2 = 1;
+                gotSecondHeroFirst2 = true;
             }
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_SECOND_HERO_SECOND) {
                 memcpy(
@@ -8438,7 +8442,7 @@ void advManager::ReceiveHeroTownData(
                     EVENTS_REMOTE_HERO(packet)->data,
                     COMBAT_REMOTE_HERO_SECOND_SIZE
                 );
-                gotSecondHeroSecond2 = 1;
+                gotSecondHeroSecond2 = true;
             }
         }
     }
@@ -8529,7 +8533,15 @@ i32 RiddleStringsEqual(const char* answer, const char* expected) {
     char expectedPrefix[RIDDLE_EXPECTED_BUFFER_SIZE];
     char answerPrefix[RIDDLE_ANSWER_BUFFER_SIZE];
 
-    strncpy(expectedPrefix, expected, RIDDLE_PREFIX_LENGTH);
+    const auto copyPrefix = [](char* destination, const char* source) {
+        i32 count = 0;
+        for (; count < RIDDLE_PREFIX_LENGTH && source[count] != 0; count++)
+            destination[count] = source[count];
+        for (; count < RIDDLE_PREFIX_LENGTH; count++)
+            destination[count] = 0;
+    };
+
+    copyPrefix(expectedPrefix, expected);
     expectedPrefix[RIDDLE_PREFIX_LENGTH] = 0;
     for (index = RIDDLE_PREFIX_LENGTH - 1; index >= 0; index--) {
         if (expectedPrefix[index] != ' ') {
@@ -8537,7 +8549,7 @@ i32 RiddleStringsEqual(const char* answer, const char* expected) {
             break;
         }
     }
-    strncpy(answerPrefix, answer, RIDDLE_PREFIX_LENGTH);
+    copyPrefix(answerPrefix, answer);
     answerPrefix[strlen(expectedPrefix)] = 0;
     return platform::CompareIgnoringCase(expectedPrefix, answerPrefix) == 0;
 }

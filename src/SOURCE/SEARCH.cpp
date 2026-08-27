@@ -96,14 +96,14 @@ void searchArray::SeedPosition(
 
     if (!continueSeed) {
         giCurTempMobility = mobility;
-        giFullySeeded = 0;
+        giFullySeeded = false;
         Clear();
         m_lastX = SEARCH_INVALID_COORDINATE;
         m_lastY = SEARCH_INVALID_COORDINATE;
         s_seedPositionState.currentCost = 0;
     }
 
-    giSeedingValid = 1;
+    giSeedingValid = true;
     if (targetX >= 0) {
         if (!(MAP_EXTRA_AT_WFIRST(targetX, targetY) & giCurPlayerBit)) {
             return;
@@ -387,5 +387,5 @@ void searchArray::SeedPosition(
             }
         }
     }
-    giFullySeeded = 1;
+    giFullySeeded = true;
 }

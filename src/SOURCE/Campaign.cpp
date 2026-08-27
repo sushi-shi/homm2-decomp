@@ -20,6 +20,8 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/Localization.h>
+
+#include <string>
 typedef enum CampaignScenarioArmyCount {
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
     BARBARIAN_OGRE_COUNT       = 18,
@@ -381,7 +383,7 @@ void game::PlayPreScenarioSmacker(CampaignSide side, i32 map) {
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     widget* trackWidget;
     i32 mapIndex;
-    i32 savedInterface;
+    b32 savedInterface;
     tag_message message;
     i32 trackMapIndex;
 
@@ -851,14 +853,20 @@ void game::InitCampaignMap(void) {
     i32 swappedHero;
     i32 heroPositionValue;
     i32 scanPositionId;
-    i32 savedNewGameSetup;
+    b32 savedNewGameSetup;
     i32 playerSlotSlot4;
     SCampaignChoice* choiceBest1;
     i32 heroPriorityBest3;
     i32 bestHeroPositionCandidate;
     i32 selectedChoicePosition0;
 
-    i32 bonusHeroIndexPosition;
+    b32 bonusHeroIndexPosition;
+
+    if (m_campaignScenario < 0 || m_campaignScenario >= CAMPAIGN_MAP_COUNT) {
+        ShutDown("Invalid campaign scenario number.");
+        return;
+    }
+    const i32 scenarioNumber = m_campaignScenario + 1;
 
     selectedChoicePosition0 = m_campaignChoice[H2EnumIndex(iCurViewSide)][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
@@ -871,25 +879,28 @@ void game::InitCampaignMap(void) {
 
     gpGame->m_campaignScenarioWon = 0;
     memset(m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
-    if (m_campaignScenario + 1 == CAMPAIGN_SWITCHING_SCENARIO + 1
+
+    std::string mapFilename = "CAMP";
+    if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO
         && m_campaignStartingSide != m_campaignType) {
-        snprintf(
-            m_mapFilename,
-            sizeof(m_mapFilename),
-            "CAMP%c%02dB.H2C",
-            m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
-            m_campaignScenario + 1
-        );
+        mapFilename += m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G';
+        if (scenarioNumber < 10)
+            mapFilename += '0';
+        mapFilename += std::to_string(scenarioNumber);
+        mapFilename += 'B';
     } else {
-        snprintf(
-            m_mapFilename,
-            sizeof(m_mapFilename),
-            "CAMP%c%02d.H2C",
-            m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
-            m_campaignScenario + 1
-        );
+        mapFilename += m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E';
+        if (scenarioNumber < 10)
+            mapFilename += '0';
+        mapFilename += std::to_string(scenarioNumber);
     }
-    m_newGameInitialized = 0;
+    mapFilename += ".H2C";
+    if (mapFilename.size() >= sizeof(m_mapFilename)) {
+        ShutDown("Campaign map filename is too long.");
+        return;
+    }
+    memcpy(m_mapFilename, mapFilename.c_str(), mapFilename.size() + 1);
+    m_newGameInitialized = false;
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);
@@ -971,11 +982,11 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
-                bonusHeroIndexPosition = 0;
+                bonusHeroIndexPosition = false;
                 if (m_campaignType == CAMPAIGN_ROLAND
                     && m_campaignScenario + 1 == SCENARIO_SIX
                     && m_players[0].m_heroCount > 1)
-                    bonusHeroIndexPosition = 1;
+                    bonusHeroIndexPosition = true;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
                     ->m_spells[H2EnumIndex(choiceBest1->spell)] = 1;
             }
@@ -1037,7 +1048,7 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignScenario + 1 == SCENARIO_SEVEN
         && m_campaignType == CAMPAIGN_ARCHIBALD) {
-        i32 savedNewGame = gbInNewGameSetup;
+        b32 savedNewGame = gbInNewGameSetup;
         hero* armyHero;
         gbInNewGameSetup = true;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);

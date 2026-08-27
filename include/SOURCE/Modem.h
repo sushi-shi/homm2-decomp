@@ -60,8 +60,8 @@ struct outque_t {
 };
 
 extern i32 iBaudBits;
-extern i32 inescape;
-extern i32 newpacket;
+extern b32 inescape;
+extern b32 newpacket;
 extern i32 packetlen;
 extern char idstr[MODEM_ID_SIZE];
 extern i32 GUIMRc;

@@ -311,12 +311,12 @@ char ReadPacket(void) {
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - H2EnumIndex(INPUT_QUEUE_GUARD)) {
         LogStr("OverFlow1");
         inque.writePosition = 0;
-        newpacket = 1;
+        newpacket = true;
     }
 readPacketStart:
     if (newpacket != 0) {
         packetlen = 0;
-        newpacket = 0;
+        newpacket = false;
     }
     do {
     readNextByte:
@@ -324,22 +324,22 @@ readPacketStart:
         if (input < 0)
             return 0;
         if (inescape != 0) {
-            inescape = 0;
+            inescape = false;
             if (input == MODEM_PACKET_END) {
-                newpacket = 1;
+                newpacket = true;
                 return 1;
             } else if (input == 0) {
-                newpacket = 1;
+                newpacket = true;
                 goto readPacketStart;
             }
         } else {
             if (input == MODEM_ESCAPE_BYTE) {
-                inescape = 1;
+                inescape = true;
                 goto readNextByte;
             }
         }
         if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
-            newpacket = 1;
+            newpacket = true;
             LogStr("OverFlow2");
             goto readPacketStart;
         }
@@ -379,8 +379,8 @@ void WriteModemPacket(char* buffer, i32 length) {
 }
 
 i32 iBaudBits = SERIAL_BYTE_SIZE;
-i32 inescape = 0;
-i32 newpacket = 0;
+b32 inescape = false;
+b32 newpacket = false;
 i32 packetlen = 0;
 char idstr[MODEM_ID_SIZE];
 i32 GUIMRc;

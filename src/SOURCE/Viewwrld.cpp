@@ -217,25 +217,25 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     sprintf(
         gText,
         "ground%d.icn",
-        giViewWorldScale
+        H2EnumIndex(giViewWorldScale)
     );
     pVWGround = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "vwflag%d.icn",
-        giViewWorldScale
+        H2EnumIndex(giViewWorldScale)
     );
     pVWFlags = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "misc%d.icn",
-        giViewWorldScale
+        H2EnumIndex(giViewWorldScale)
     );
     pVWMisc = gpResourceManager->GetIcon(gText);
     sprintf(
         gText,
         "letter%d.icn",
-        giViewWorldScale
+        H2EnumIndex(giViewWorldScale)
     );
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
@@ -247,7 +247,7 @@ void advManager::VWCompleteDraw(void) {
     u8* pix0;
 
     i32 cellX;
-    i32 heroHere0;
+    b32 heroHere0;
     mapCellExtra* extraCell;
     i32 cellY;
 
@@ -586,9 +586,9 @@ void advManager::VWCompleteDraw(void) {
             if (gpCurPlayer->m_currentHero != -1
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_x == cellX
                 && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_y == cellY)
-                heroHere0 = 1;
+                heroHere0 = true;
             else
-                heroHere0 = 0;
+                heroHere0 = false;
             if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                  || heroHere0)
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
@@ -851,9 +851,9 @@ i32 iVWYPixelOffset;
 class icon* pVWGround;
 i32 iVWViewableCells;
 class icon* pVWFlags;
-i32 iVWDrawAllTerrains;
+b32 iVWDrawAllTerrains;
 H2EnumStorage<SpellType, i32> iVWWhatToDraw;
-i32 iVWDrawAllObjs;
+b32 iVWDrawAllObjs;
 i32 iVWMapOriginX;
 i32 iVWMapOriginY;
 i32 iVWCenterOffset;

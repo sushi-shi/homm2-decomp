@@ -22,6 +22,9 @@ typedef unsigned long u32l;
 
 typedef i32 b32;
 typedef i8 b8;
+// Boolean storage whose proven retail C++ type is plain char. Unlike b8, this
+// preserves the source type as well as its byte width.
+typedef char bchar;
 
 
 template <typename T>

@@ -359,7 +359,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             town* record =
                 GetTown(gpCurPlayer->m_townIds[giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex]);
             i32 townFrame;
-            i32 capt;
+            b32 capt;
             i32 captainMana;
             {
                 valueText = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1));
@@ -425,13 +425,13 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 icons++;
             }
 
-            capt = 0;
+            capt = false;
             heroData = NULL;
             if (record->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
                 heroData = GetHero(record->m_occupyingHeroId);
             } else {
                 if ((record->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS)) != 0) {
-                    capt = 1;
+                    capt = true;
                 }
             }
 
@@ -1224,13 +1224,13 @@ void game::DoKnob(void) {
             platform::PumpEvents();
             widgetMessage = gpInputManager->GetEvent();
             if (widgetMessage.type == MESSAGE_MOUSE_MOVE) {
-                i32 discardMouseMoves = 1;
+                b32 discardMouseMoves = true;
                 while (discardMouseMoves) {
                     pendingMessage = gpInputManager->PeekEvent();
                     if (pendingMessage.type == MESSAGE_MOUSE_MOVE) {
                         widgetMessage = gpInputManager->GetEvent();
                     } else {
-                        discardMouseMoves = 0;
+                        discardMouseMoves = false;
                     }
                 }
             }
@@ -1256,18 +1256,18 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     i32 scrollSpan;
     i32 scrollDivisor;
     i32 done;
-    i32 quickView;
+    b32 quickView;
     i32 y;
 
     done = 0;
-    quickView = 0;
+    quickView = false;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                quickView = 1;
+                quickView = true;
             case WIDGET_COMMAND_SELECT:
                 if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
-                    quickView = 1;
+                    quickView = true;
                 }
                 switch (message.payload.widget.id) {
                     case SCROLL_KNOB_WIDGET:

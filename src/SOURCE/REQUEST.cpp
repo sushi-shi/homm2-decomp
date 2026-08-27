@@ -142,7 +142,6 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
     i32 indexData5;
     i32 moveValue;
-    char fullPath[FILE_REQUESTER_PATH_SIZE];
 
     sprintf(gText, "%s%s", directory, pattern);
     const std::vector<std::string> files = platform::Files().List(gText);
@@ -227,14 +226,9 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            snprintf(
-                fullPath,
-                sizeof(fullPath),
-                "%s%s",
-                m_fileNames[indexData5].text,
-                m_extensions[indexData5].text
-            );
-            GetMapHeader(fullPath, &m_mapHeaders[indexData5]);
+            const std::string fullPath =
+                std::string(m_fileNames[indexData5].text) + m_extensions[indexData5].text;
+            GetMapHeader(fullPath.c_str(), &m_mapHeaders[indexData5]);
         }
     }
     return m_fileCount;
@@ -450,7 +444,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     char newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
 
-    i32 acceptStep = 0;
+    b32 acceptStep = false;
     i32 iResult;
     i32 lengthIndex;
     FileRequesterHelpIndex helpIndexMouse;
@@ -546,11 +540,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                         case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                     }
                     break;
@@ -824,7 +818,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (iResult + m_topIndex == m_selectedIndex) {
                                     message.payload.widget.data.value = FILE_REQUESTER_OK;
                                     message.payload.widget.id = FILE_REQUESTER_OK;
-                                    acceptStep = 1;
+                                    acceptStep = true;
                                     break;
                                 }
                                 if (iResult + m_topIndex >= m_fileCount)
@@ -870,7 +864,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     NORMAL_DIALOG_NO_RESOURCE,
                     0
                 );
-                acceptStep = 0;
+                acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
@@ -894,7 +888,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     0
                 );
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
-                    acceptStep = 0;
+                    acceptStep = false;
                 }
             }
         }

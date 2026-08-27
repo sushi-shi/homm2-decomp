@@ -162,8 +162,8 @@ void combatManager::CombatMessage(
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
     char* newlinePtr;
     tag_message windowMessage;
-    i32 oldLimit;
-    i32 oldCompute;
+    b32 oldLimit;
+    b32 oldCompute;
 
     strcpy(gCombatMessageText, message);
     if (gbNoShowCombat != 0) {
@@ -342,10 +342,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                         gArmyNames[H2EnumIndex(actingMonsterType)]
                     );
                 else
-                    sprintf(
-                        gText,
-                        ""
-                    );
+                    gText[0] = 0;
             }
             break;
     }
@@ -448,15 +445,15 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
 }
 
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
-    i32 didRedraw;
-    i32 oldShading;
+    b32 didRedraw;
+    b32 oldShading;
     i32 maxY;
-    i32 gridChanged;
+    b32 gridChanged;
     i32 minY;
     i32 minX;
     i32 maxX;
     i32 cell;
-    i32 doShading;
+    b32 doShading;
 
     if (gbNoShowCombat != 0)
         return 0;
@@ -470,29 +467,29 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         }
     }
     if (resetGridDisplay != 0)
-        bGridWasShowing = 0;
+        bGridWasShowing = false;
     if (gConfig.combatShadeLevel < 1 && gConfig.showCombatGrid == 0)
         return 0;
 
-    didRedraw = 0;
+    didRedraw = false;
     minX = COMBAT_MAX_EXTENT_X;
     minY = COMBAT_MAX_EXTENT_Y;
     maxX = 0;
     maxY = 0;
-    doShading = 0;
-    oldShading = 0;
-    gridChanged = 0;
+    doShading = false;
+    oldShading = false;
+    gridChanged = false;
 
     if (gConfig.combatShadeLevel < 1)
         goto DrawCombatGrid;
 
     for (cell = 0; cell < COMBAT_HEX_COUNT; cell++) {
         if (m_previousGridState[cell] != m_gridState[cell])
-            gridChanged = 1;
+            gridChanged = true;
         if (m_gridState[cell] != GRID_SHADE_NONE)
-            doShading = 1;
+            doShading = true;
         if (m_previousGridState[cell] != GRID_SHADE_NONE)
-            oldShading = 1;
+            oldShading = true;
     }
 
     if (resetGridDisplay != 0) {
@@ -532,7 +529,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 maxX - minX + 1,
                 maxY - minY + 1
             );
-            didRedraw = 1;
+            didRedraw = true;
         }
     }
 
@@ -553,7 +550,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 COMBAT_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT
             );
-            didRedraw = 1;
+            didRedraw = true;
         }
     }
 
@@ -579,8 +576,8 @@ DrawCombatGrid:
                 );
             }
         }
-        didRedraw = 1;
-        bGridWasShowing = 1;
+        didRedraw = true;
+        bGridWasShowing = true;
     }
 
 CopyGridState:
@@ -752,12 +749,12 @@ void combatManager::DrawBackground(void) {
 }
 
 void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
-    i32 savedLimit;
+    b32 savedLimit;
     i32 copyHeight;
     i32 oldMaxX;
     i32 savedMinX;
     i32 backupMaxY;
-    i32 oldCompute;
+    b32 oldCompute;
     i32 savedMinY;
 
     if (m_nonVisualCombat != 0)
@@ -894,10 +891,10 @@ void combatManager::DrawFrame(
     CombatDrawLayer row;
 
     H2SteppedEnumStorage<ArmyDrawState, i32> state;
-    i32 extentChanged1;
+    b32 extentChanged1;
 
     i32 endColumn;
-    i32 skipSpecialOccupants8;
+    b32 skipSpecialOccupants8;
     i32 columnStep1;
     i32 startColumn;
     i32 armyIndex7;
@@ -913,11 +910,11 @@ void combatManager::DrawFrame(
     gpMouseManager->m_cursorReady = 0;
 
     if (computeExtent != 0) {
-        extentChanged1 = 0;
+        extentChanged1 = false;
         for (state = 0; H2EnumIndex(state) < COMBAT_SIDE_COUNT; state++) {
             for (armyIndex7 = 0; armyIndex7 < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex7++) {
                 if (m_limitCreatureCount[H2EnumIndex(state)][armyIndex7] > 0) {
-                    extentChanged1 = 1;
+                    extentChanged1 = true;
                     gbComputeExtent = true;
                     gbSaveBiggestExtent = true;
                     gbReturnAfterComputeExtent = true;
@@ -935,7 +932,7 @@ void combatManager::DrawFrame(
 
         for (state = 0; H2EnumIndex(state) < COMBAT_SIDE_COUNT; state++) {
             if (m_drawHero[H2EnumIndex(state)] != 0) {
-                extentChanged1 = 1;
+                extentChanged1 = true;
                 gbComputeExtent = true;
                 gbSaveBiggestExtent = true;
                 gbReturnAfterComputeExtent = true;
@@ -956,7 +953,7 @@ void combatManager::DrawFrame(
             }
 
             if (m_drawHeroOverlay[H2EnumIndex(state)] != 0) {
-                extentChanged1 = 1;
+                extentChanged1 = true;
                 gbComputeExtent = true;
                 gbSaveBiggestExtent = true;
                 gbReturnAfterComputeExtent = true;
@@ -1190,13 +1187,13 @@ void combatManager::DrawFrame(
             );
         }
 
-        skipSpecialOccupants8 = 0;
+        skipSpecialOccupants8 = false;
         if (m_inCastleCombat != 0
             && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                    != COMBAT_WALL_STATE_DESTROYED
             && m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                    != COMBAT_WALL_STATE_SECTION_DESTROYED) {
-            skipSpecialOccupants8 = 1;
+            skipSpecialOccupants8 = true;
             for (state = ARMY_DRAW_BEHIND; state < ARMY_DRAW_PHASE_COUNT; state++) {
                 m_hexCells[H2EnumIndex(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(state, 0);
                 m_hexCells[H2EnumIndex(COMBAT_CASTLE_SPECIAL_HEX_SECOND)].DrawOccupant(state, 0);
@@ -1490,7 +1487,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
          {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
          {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
     };
-    i32 oldLimit;
+    b32 oldLimit;
 
     army* smallArmy;
     IconDrawResult drawResult1;
@@ -1860,5 +1857,5 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     gbInDrawSmallView = false;
 }
 
-i32 bGridWasShowing = 0;
+b32 bGridWasShowing = false;
 b32 gbInDrawSmallView = false;

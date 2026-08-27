@@ -1028,10 +1028,10 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return;
     if (bInHighMoraleBonus) {
-        bInHighMoraleBonus = 0;
+        bInHighMoraleBonus = false;
         return;
     }
-    bInHighMoraleBonus = 0;
+    bInHighMoraleBonus = false;
 
     army* activeArmy = &m_armies[H2EnumIndex(side)][index];
     if ((H2EnumIndex((activeArmy->m_monster.flags.all) & (MONSTER_FLAGS_NO_MORALE))))
@@ -1042,7 +1042,7 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
         || SRandom(MORALE_ROLL_MIN, GOOD_MORALE_ROLL_MAX) > activeArmy->m_morale)
         return;
 
-    bInHighMoraleBonus = 1;
+    bInHighMoraleBonus = true;
     SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
         sprintf(gText, "goodmrle.82M");
@@ -1114,23 +1114,23 @@ i32 combatManager::CheckApplyBadMorale(
 }
 
 i32 combatManager::GetNextArmy(i32 checkMorale) {
-    i32 skipEnt;
+    b32 skipEnt;
     i32 speedIter;
-    i32 hasPending;
+    b32 hasPending;
     i32 sideLoop;
     i32 stackCounter;
     army* curArmy;
     CombatSide stackSide;
 
 restart:
-    hasPending = 0;
+    hasPending = false;
     stackSide = m_currentArmySide;
     m_currentSpeed = COMBAT_MAX_SPEED;
     for (speedIter = 0; speedIter < COMBAT_SPEED_LEVEL_COUNT; speedIter++) {
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             stackSide ^= 1;
             for (stackCounter = 0; stackCounter < m_armyCount[H2EnumIndex(stackSide)]; stackCounter++) {
-                skipEnt = 0;
+                skipEnt = false;
                 curArmy = stackCounter + m_armies[H2EnumIndex(stackSide)];
                 if ((H2EnumIndex((curArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)))
                     || H2EnumIndex(curArmy->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)])
@@ -1141,21 +1141,21 @@ restart:
                             curArmy->m_monster.flags.abilityFlags
                             & MONSTER_ABILITY_FLAG_HIGH_MORALE
                         )))
-                    skipEnt = 1;
+                    skipEnt = true;
 
                 if (!skipEnt && speedIter == 0
                     && !(
                         curArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_HIGH_MORALE
                     ))
-                    skipEnt = 1;
+                    skipEnt = true;
 
                 if (H2EnumIndex((curArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_DEFERRED_TURN))) {
-                    skipEnt = 1;
-                    hasPending = 1;
+                    skipEnt = true;
+                    hasPending = true;
                 }
 
                 if (!skipEnt && checkMorale && CheckApplyBadMorale(stackSide, stackCounter))
-                    skipEnt = 1;
+                    skipEnt = true;
                 if (!skipEnt)
                     break;
             }
@@ -1199,7 +1199,7 @@ restart:
 }
 
 i32 combatManager::IsWinner(CombatSide side) {
-    i32 result;
+    b32 result;
     i32 index;
 
     if (m_sideDefeated[H2EnumIndex(COMBAT_DEFENDER_SIDE) - H2EnumIndex(side)])
@@ -1208,11 +1208,11 @@ i32 combatManager::IsWinner(CombatSide side) {
         return 1;
 
     side ^= 1;
-    result = 1;
+    result = true;
     for (index = 0; index < m_armyCount[H2EnumIndex(side)]; index++) {
         if (!(m_armies[H2EnumIndex(side)][index].m_monster.flags.abilityFlags
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
-            result = 0;
+            result = false;
     }
     return result;
 }
@@ -1237,7 +1237,7 @@ void combatManager::CatAttack(CombatSide side) {
     i32 gateIndex11 = -1;
     i32 keepIndex13 = -1;
     CombatCastleHex targetHex4 = COMBAT_CASTLE_HEX_NONE;
-    i32 missShot19 = 0;
+    b32 missShot19 = false;
     CombatCatapultDamage damageLevel15 = CATAPULT_DAMAGE_NORMAL;
     i32 firstRoll7;
     i32 advancedRoll;
@@ -1338,7 +1338,7 @@ void combatManager::CatAttack(CombatSide side) {
         if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
             damageLevel15 = CATAPULT_DAMAGE_DOUBLE;
         else if (firstRoll7 > COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD) {
-            missShot19 = 1;
+            missShot19 = true;
             damageLevel15 = CATAPULT_DAMAGE_NONE;
         }
     } else if (m_heroes[H2EnumIndex(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[H2EnumIndex(HERO_SKILL_BALLISTICS)]
@@ -1377,7 +1377,7 @@ void combatManager::CatAttack(CombatSide side) {
                 }
             }
         }
-        missShot19 = 0;
+        missShot19 = false;
         damageLevel15 = CATAPULT_DAMAGE_NORMAL;
     foundMissHex:
         frame++;
@@ -1777,7 +1777,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     i32 elevCells;
     i32 cellIndex;
     u8 typeUsed[COMBAT_OBSTACLE_TYPE_COUNT];
-    i32 blocked;
+    b32 blocked;
     i32 placedCells;
     i32 obstacleHex;
 
@@ -1848,15 +1848,15 @@ void combatManager::SetupAndLoadObstacles(void) {
             if (sCmbtObstacles[obstacleType].minimumColumn
                 > startRow + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET)
                 continue;
-            blocked = 0;
+            blocked = false;
             for (cellIndex = 0; cellIndex < sCmbtObstacles[obstacleType].cellCount; cellIndex++) {
                 obstacleHex = site + sCmbtObstacles[obstacleType].cellOffsets[cellIndex];
                 if (obstacleHex % COMBAT_GRID_ROW_LENGTH <= COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1
                     || obstacleHex % COMBAT_GRID_ROW_LENGTH >= COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
-                    blocked = 1;
+                    blocked = true;
                 }
                 if (m_hexCells[obstacleHex].m_blocked != 0)
-                    blocked = 1;
+                    blocked = true;
             }
             if (blocked != 0)
                 continue;
@@ -2297,7 +2297,7 @@ void combatManager::ShootMissile(
 
 void combatManager::CombatSystemOptions(void) {
 
-    bCPrefsChanged = 0;
+    bCPrefsChanged = false;
     CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)
         MemError();
@@ -2364,8 +2364,8 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
 }
 
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
-    i32 bRedraw = 0;
-    i32 bDone = 0;
+    b32 bRedraw = false;
+    b32 bDone = false;
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
         if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT
@@ -2414,7 +2414,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_CLOSE_BUTTON:
-                            bDone = 1;
+                            bDone = true;
                             break;
                     }
                     break;
@@ -2423,34 +2423,34 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                         case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =
                                 (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
                                                           % SYSTEM_OPTION_CYCLE_COUNT;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_GRID_BUTTON:
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_SHADE_BUTTON:
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
-                            bRedraw = 1;
-                            bCPrefsChanged = 1;
+                            bRedraw = true;
+                            bCPrefsChanged = true;
                             break;
                     }
                     break;
@@ -2468,9 +2468,9 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i32 bInHighMoraleBonus = 0;
+b32 bInHighMoraleBonus = false;
 i32 giSeed = 1;
 u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
 i32 bMouseWasVis;
 class heroWindow* CSPanel;
-i32 bCPrefsChanged;
+b32 bCPrefsChanged;
