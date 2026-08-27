@@ -6781,7 +6781,7 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
-        || H2BitTest(gpGame->m_knownTowns, static_cast<i8>(townPtr->m_id)) == 0) {
+        || H2BitTest(gpGame->m_knownTowns, townPtr->m_id) == 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
@@ -6806,7 +6806,7 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
         window->BroadcastMessage(message);
     }
 
-    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, GetTownName(static_cast<i8>(townPtr->m_id)));
+    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, GetTownName(townPtr->m_id));
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_QUICK_NAME_WIDGET;
     message.payload.widget.data.text = gText;
@@ -7067,7 +7067,7 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
     CompleteDraw(0);
     UpdateScreen(0, 0);
     if (message.type == MESSAGE_LEFT_BUTTON_DOWN && townPtr->m_owner == giCurPlayer) {
-        SetTownContext(static_cast<i8>(townPtr->m_id));
+        SetTownContext(townPtr->m_id);
     }
     gpResourceManager->Dispose(creatureIcon);
 }
@@ -8885,7 +8885,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         mapY = hero->m_y;
 
         for (index = gpSearchArray->m_pathLength - 1; index >= 0; --index) {
-            dir = static_cast<u8>(gpSearchArray->m_storage.path.directions[index + 1]);
+            dir = gpSearchArray->m_storage.path.directions[index + 1];
             thisTile = GetCell(mapX, mapY);
             mapX += normalDirTable[dir].x;
             mapY += normalDirTable[dir].y;
@@ -8945,8 +8945,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             if (index == 0) {
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = 1;
             } else {
-                fromDir =
-                    static_cast<u8>(gpSearchArray->m_storage.path.directions[index]);
+                fromDir = gpSearchArray->m_storage.path.directions[index];
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = static_cast<u16>(
                     frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir]
                     + ROUTE_ARROW_FRAME_OFFSET
@@ -10548,7 +10547,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = static_cast<BaseWidgetCommand>(H2EnumIndex(SYSTEM_OPTION_FIRST));
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

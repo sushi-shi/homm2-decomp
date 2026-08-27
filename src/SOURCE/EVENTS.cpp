@@ -4292,8 +4292,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     u32 index;
     u32 packedValue;
 
-    recruitSiteType = cell->m_objectMetadata;
-    recruitSiteType &= static_cast<RecruitSiteType>(EVENT_RECRUIT_TYPE_MASK);
+    recruitSiteType = DecodeRecruitSiteType(cell->m_objectMetadata);
     quantity = static_cast<i16>(cell->m_objectMetadata);
     quantity >>= EVENT_RECRUIT_COUNT_SHIFT;
 
@@ -7298,8 +7297,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 totalValue;
     i16 quantity;
 
-    recruitType = cell->m_objectMetadata;
-    recruitType &= static_cast<RecruitSiteType>(EVENT_RECRUIT_TYPE_MASK);
+    recruitType = DecodeRecruitSiteType(cell->m_objectMetadata);
     quantity = static_cast<i16>(cell->m_objectMetadata);
     quantity >>= EVENT_RECRUIT_COUNT_SHIFT;
 

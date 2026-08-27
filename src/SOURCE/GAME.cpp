@@ -2912,19 +2912,15 @@ void game::UpdateSpellWidgets(void) {
     memset(&message, 0, sizeof(message));
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = static_cast<BaseWidgetCommand>(
-        H2EnumIndex(WIDGET_COMMAND_SET_FLAGS)
-        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
-    );
+    message.payload.widget.command =
+        WidgetFlagsCommand(spellPoints0 > VIEW_SPELL_MANA_HUNDREDS_THRESHOLD);
     message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_viewSpellsWindow->BroadcastMessage(message);
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = static_cast<BaseWidgetCommand>(
-        H2EnumIndex(WIDGET_COMMAND_SET_FLAGS)
-        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_TENS_THRESHOLD)
-    );
+    message.payload.widget.command =
+        WidgetFlagsCommand(spellPoints0 > VIEW_SPELL_MANA_TENS_THRESHOLD);
     message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_viewSpellsWindow->BroadcastMessage(message);

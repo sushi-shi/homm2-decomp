@@ -73,6 +73,10 @@ enum class RecruitSiteType : i32 {
 };
 using enum RecruitSiteType;
 
+constexpr RecruitSiteType DecodeRecruitSiteType(u32 packedValue) {
+    return static_cast<RecruitSiteType>(packedValue & EVENT_RECRUIT_TYPE_MASK);
+}
+
 #pragma pack(push, 1)
 struct mapEventExtra {
     u8 active;
