@@ -68,23 +68,23 @@ typedef enum TownConstant {
 #pragma pack(push, 1)
 class town {
 public:
-    char m_id;
-    char m_owner;
+    i8 m_id;
+    i8 m_owner;
     i8 m_threat;
-    H2EnumStorage<FactionType, char> m_type;
+    H2EnumStorage<FactionType, i8> m_type;
     u8 m_x;
     u8 m_y;
     u8 m_boatX;
     u8 m_boatY;
     armyGroup m_army;
-    char m_occupyingHeroId;
+    i8 m_occupyingHeroId;
     u32l m_buildings;
     i8 m_buildState;
     char m_unknown1d;
     i16 m_garrison[H2EnumIndex(TOWN_GARRISON_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
-    i8 m_formation;
+    b8 m_formation;
     i8 m_originalOwner;
     u16 m_extraIndex;
     union {
@@ -113,6 +113,6 @@ public:
     void CalcNumLevelArchers(i32*, i32*);
 };
 #pragma pack(pop)
-extern i32 bEnteringTown;
+extern b32 bEnteringTown;
 
 #endif

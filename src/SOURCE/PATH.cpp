@@ -117,8 +117,8 @@ i32 army::ValidMove(CombatHexDirection direction) {
 i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     i32 destHexNext;
     i32 rearSquare;
-    i32 frontValid;
-    i32 rearValidResult;
+    b32 frontValid;
+    b32 rearValidResult;
 
     if (!ValidHex(sourceHex))
         return 0;
@@ -127,7 +127,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     if (!ValidHex(destHexNext))
         return 0;
 
-    frontValid = 0;
+    frontValid = false;
     if (gpCombatManager->m_hexCells[destHexNext].m_occupantSide == COMBAT_SIDE_NONE
         && (!gpCombatManager->m_hexCells[destHexNext].m_blocked
             || (gpCombatManager->m_inCastleCombat
@@ -141,7 +141,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                         && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                    .m_deadOccupantCount
                                == 0))))) {
-        frontValid = 1;
+        frontValid = true;
     }
 
     if (H2EnumIndex((m_monster.attributes) & (MONSTER_ATTRIBUTE_WIDE))) {
@@ -161,7 +161,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                 break;
         }
 
-        rearValidResult = 0;
+        rearValidResult = false;
         if (ValidHex(rearSquare) && gpCombatManager->m_hexCells[rearSquare].m_occupantSide == COMBAT_SIDE_NONE
             && (!gpCombatManager->m_hexCells[rearSquare].m_blocked
                 || (gpCombatManager->m_inCastleCombat
@@ -175,7 +175,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_deadOccupantCount
                                    == 0))))) {
-            rearValidResult = 1;
+            rearValidResult = true;
         }
 
         if (direction == COMBAT_DIRECTION_EAST || direction == COMBAT_DIRECTION_WEST)
@@ -404,14 +404,14 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
 }
 
 CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
-    i32 isMovingDown;
-    i32 leftFl;
+    b32 isMovingDown;
+    b32 leftFl;
     i32 sourceColumnCheck;
     i32 colTarget;
     i32 targetRowVal;
-    i32 isMovingUp;
+    b32 isMovingUp;
     i32 srcRow;
-    i32 isMovingRight;
+    b32 isMovingRight;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return COMBAT_DIRECTION_INVALID;
@@ -420,20 +420,20 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     srcRow = sourceHex / ARMY_HEX_COLUMNS;
     colTarget = targetHex % ARMY_HEX_COLUMNS;
     targetRowVal = targetHex / ARMY_HEX_COLUMNS;
-    isMovingUp = 0;
-    isMovingDown = 0;
-    leftFl = 0;
-    isMovingRight = 0;
+    isMovingUp = false;
+    isMovingDown = false;
+    leftFl = false;
+    isMovingRight = false;
 
     if (colTarget > sourceColumnCheck)
-        isMovingRight = 1;
+        isMovingRight = true;
     else if (colTarget != sourceColumnCheck)
-        leftFl = 1;
+        leftFl = true;
 
     if (targetRowVal > srcRow)
-        isMovingDown = 1;
+        isMovingDown = true;
     else if (targetRowVal != srcRow)
-        isMovingUp = 1;
+        isMovingUp = true;
 
     if (isMovingRight == leftFl) {
         if (isMovingUp == 1) {

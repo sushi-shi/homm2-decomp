@@ -53,9 +53,9 @@ b32 gbInRemoteCleanup = false;
 i32 iIDCtr = 0;
 i32 iTimesDropped = 0;
 b8 gbInNetSetup = false;
-i32 bUseDirectPlay = 0;
-i32 bUseWinsock = 0;
-i8 bInTimeoutFail = 0;
+b32 bUseDirectPlay = false;
+b32 bUseWinsock = false;
+b8 bInTimeoutFail = false;
 i32 iBaud[REMOTE_BAUD_RATE_COUNT] = {300, 1200, 2400, 9600, 19200, 38400, 57600};
 i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 
@@ -83,7 +83,7 @@ void RemoteCleanup(void) {
             break;
     }
     gbRemoteOn = false;
-    xNetHasOldPlayers = 0;
+    xNetHasOldPlayers = false;
     iInOrderCtr = 0;
     iCurLastID = 0;
     giLastConfirm = -1;
@@ -92,12 +92,12 @@ void RemoteCleanup(void) {
     gbInRemoteMain = false;
     iIDCtr = 0;
     iTimesDropped = 0;
-    bUseDirectPlay = 0;
-    bUseWinsock = 0;
-    bInTimeoutFail = 0;
-    bUseDirectPlay = 0;
-    bUseWinsock = 0;
-    bInTimeoutFail = 0;
+    bUseDirectPlay = false;
+    bUseWinsock = false;
+    bInTimeoutFail = false;
+    bUseDirectPlay = false;
+    bUseWinsock = false;
+    bInTimeoutFail = false;
     iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
     iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
     gbGotFirstHeartbeat = false;
@@ -110,12 +110,12 @@ void RemoteMain(RemoteGameMode gameMode) {
     char* gameMsg;
     char* recvData;
     i32 netPlayer;
-    i32 pending;
-    i32 savedColorMice;
+    b32 pending;
+    b32 savedColorMice;
     i32 player;
 
     gbInRemoteMain = true;
-    bGotGameType = 0;
+    bGotGameType = false;
     LogStr("In Remote Main");
     LogStr("RM 1");
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
@@ -133,11 +133,11 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("RM 3");
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
-        bUseDirectPlay = 1;
+        bUseDirectPlay = true;
     else if (iMPNetProtocol == REMOTE_PROTOCOL_WINSOCK)
-        bUseWinsock = 1;
+        bUseWinsock = true;
     else {
-        bUseWinsock = 0;
+        bUseWinsock = false;
         bUseDirectPlay = bUseWinsock;
     }
     LogStr("RM 4");
@@ -186,7 +186,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     gsThisNetPlayerInfo.useBzip2Compression = 1;
     gsThisNetPlayerInfo.useDiffCompression = 1;
     gsThisNetPlayerInfo.reserved[0] = 1;
-    xNetHasOldPlayers = 0;
+    xNetHasOldPlayers = false;
 
     switch (gameMode) {
                     case REMOTE_GAME_NETWORK_HOST:
@@ -230,7 +230,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
         LogStr("RM 2");
         if (giThisNetPos == 0) {
-            pending = 1;
+            pending = true;
             memset(gotPlayers, 0, REMOTE_PLAYER_COUNT);
             while (pending != 0) {
                 PollSound();
@@ -246,14 +246,14 @@ void RemoteMain(RemoteGameMode gameMode) {
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(recvData));
                             gotPlayers[netPlayer] = 1;
                             if (gsNetPlayerInfo[netPlayer].reserved[0] == 0)
-                                xNetHasOldPlayers = 1;
+                                xNetHasOldPlayers = true;
                             break;
                     }
                 }
-                pending = 0;
+                pending = false;
                 for (player = 1; player < giNumHumanPlayers; player++) {
                     if (gotPlayers[player] == 0)
-                        pending = 1;
+                        pending = true;
                 }
             }
         } else {
@@ -290,13 +290,13 @@ void RemoteMain(RemoteGameMode gameMode) {
             if (gameMsg != NULL
                 && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
                 && REMOTE_MESSAGE(gameMsg)->command == H2EnumIndex(SETUP_CAMPAIGN_GAME)) {
-                bGotGameType = 1;
+                bGotGameType = true;
                 giSetupGameType = 1;
             }
             if (gameMsg != NULL
                 && REMOTE_MESSAGE(gameMsg)->type == REMOTE_MESSAGE_RELIABLE
                 && REMOTE_MESSAGE(gameMsg)->command == H2EnumIndex(SETUP_STANDARD_GAME)) {
-                bGotGameType = 1;
+                bGotGameType = true;
                 giSetupGameType = 0;
             }
         }
@@ -400,11 +400,11 @@ i32 DecodePacket(u8* data, i32) {
 
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 size;
-    i32 out;
+    b32 out;
 
     i32 sendStatus;
 
-    out = 1;
+    out = true;
     if (destination == REMOTE_BROADCAST_PLAYER && bUseDirectPlay == 0 && bUseWinsock == 0) {
         destination = 1 - giThisNetPos;
     }
@@ -437,7 +437,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                             LOG_UNUSED_VALUE,
                             LOG_UNUSED_VALUE
                         );
-                        out = 0;
+                        out = false;
                         goto finished;
                     }
                 } while (sendStatus != 0);
@@ -446,7 +446,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
         case REMOTE_GAME_MODEM_HOST:
         case REMOTE_GAME_MODEM_GUEST:
             WriteModemPacket(PacketSend, size);
-            out = 1;
+            out = true;
             break;
     }
 finished:
@@ -590,11 +590,11 @@ char* GetRemoteData(i8 remove) {
 }
 
 void PollRemote(void) {
-    i32 oldInPoll;
+    b32 oldInPoll;
     i32 rc;
     i32 cnt;
     i32 queueIndex;
-    i8 qFull;
+    b8 qFull;
     SPlayerExit hostExit;
     i32 timeout;
     SPlayerExit guestExit;
@@ -618,7 +618,7 @@ void PollRemote(void) {
         return;
     cnt = 0;
     oldInPoll = gbInPollSound;
-    qFull = 0;
+    qFull = false;
     if (platform::Ticks() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
         REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
         REMOTE_MESSAGE(sndBuf)->type = REMOTE_MESSAGE_HEARTBEAT;
@@ -647,7 +647,7 @@ void PollRemote(void) {
             if (queueIndex != giThisNetPos
                 && platform::Ticks() > lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT
                 && bInTimeoutFail == 0) {
-                bInTimeoutFail = 1;
+                bInTimeoutFail = true;
                 gbInPollSound = false;
                 sprintf(
                     gText,
@@ -662,13 +662,13 @@ void PollRemote(void) {
                 } else {
                     hostExit.netPosition = static_cast<i8>(queueIndex);
                     hostExit.gamePosition = static_cast<i8>(NetPosToGamePos(queueIndex));
-                    hostExit.updateNetworkControl = 1;
-                    hostExit.timedOut = 1;
-                    hostExit.eliminated = 0;
+                    hostExit.updateNetworkControl = true;
+                    hostExit.timedOut = true;
+                    hostExit.eliminated = false;
                     ReceiveRemotePlayerExit(hostExit);
                 }
                 gbInPollSound = oldInPoll;
-                bInTimeoutFail = 0;
+                bInTimeoutFail = false;
             }
         }
     } else {
@@ -676,7 +676,7 @@ void PollRemote(void) {
         if (giThisNetPos != 1)
             timeout += REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT;
         if (platform::Ticks() > lLastHeartbeatReceive[0] + timeout && bInTimeoutFail == 0) {
-            bInTimeoutFail = 1;
+            bInTimeoutFail = true;
             gbInPollSound = false;
             if (giThisNetPos == 1) {
                 sprintf(
@@ -698,9 +698,9 @@ void PollRemote(void) {
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
                 guestExit.gamePosition = static_cast<i8>(NetPosToGamePos(0));
-                guestExit.updateNetworkControl = 1;
-                guestExit.timedOut = 1;
-                guestExit.eliminated = 0;
+                guestExit.updateNetworkControl = true;
+                guestExit.timedOut = true;
+                guestExit.eliminated = false;
                 ReceiveRemotePlayerExit(guestExit);
             } else {
                 gpGame->SaveGame(save_names::PlayerExit, 1, 0);
@@ -718,7 +718,7 @@ void PollRemote(void) {
                     ShutDown("");
             }
             gbInPollSound = oldInPoll;
-            bInTimeoutFail = 1;
+            bInTimeoutFail = true;
         }
     }
 
@@ -727,7 +727,7 @@ void PollRemote(void) {
             cnt++;
     }
     if (cnt == REMOTE_QUEUE_CAPACITY)
-        qFull = 1;
+        qFull = true;
     rc = 1;
     while (rc != 0) {
     nextIncoming:
@@ -799,7 +799,7 @@ i32 TransmitAndWait(
 ) {
     i32 result;
     i32 clock;
-    i8 complete;
+    b8 complete;
     char* receivedData;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
@@ -817,7 +817,7 @@ i32 TransmitAndWait(
     if (result == 0)
         goto transmitComplete;
     clock = platform::Ticks();
-    complete = 0;
+    complete = false;
     while (complete == 0) {
         if (clock + REMOTE_CHAIN_TIMEOUT < platform::Ticks()) {
             NormalDialog(
@@ -846,7 +846,7 @@ i32 TransmitAndWait(
         if (receivedData != NULL
             && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
             && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
-            complete = 1;
+            complete = true;
         }
     }
     *response = receivedData;
@@ -867,5 +867,5 @@ char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-i32 bGotGameType;
+b32 bGotGameType;
 SNetPlayerInfo gsThisNetPlayerInfo;

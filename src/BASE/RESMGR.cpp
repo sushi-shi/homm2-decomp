@@ -349,7 +349,7 @@ i32 resourceManager::LoadAggregateHeader(
 }
 
 void resourceManager::PointToFile(u32l fileId) {
-    char found = 0;
+    bchar found = false;
     i32 entry;
     i32 i;
     for (i = 0; i < RESOURCE_MANAGER_AGGREGATE_LIMIT; i++) {
@@ -357,7 +357,7 @@ void resourceManager::PointToFile(u32l fileId) {
             entry = 0;
             while (entry < m_aggregateEntryCount[i]) {
                 if (m_aggregateDir[i][entry].id == fileId) {
-                    found = 1;
+                    found = true;
                     m_curAggregate = i;
                     break;
                 }
@@ -382,7 +382,7 @@ void resourceManager::PointToFile(u32l fileId) {
 }
 
 u32l resourceManager::GetFileSize(u32l fileId) {
-    char found = 0;
+    bchar found = false;
     i32 entry;
     i32 matched;
     i32 i;
@@ -391,7 +391,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
             entry = 0;
             while (entry < m_aggregateEntryCount[i]) {
                 if (m_aggregateDir[i][entry].id == fileId) {
-                    found = 1;
+                    found = true;
                     matched = i;
                     break;
                 }

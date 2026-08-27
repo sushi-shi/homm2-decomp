@@ -341,7 +341,7 @@ i32 game::SetupModemGame(void) {
 
 i32 game::SetupMultiPlayerGame(void) {
     tag_message message;
-    i32 continueFlag;
+    b32 continueFlag;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmp.bin");
     if (window == NULL)
@@ -376,7 +376,7 @@ i32 game::SetupMultiPlayerGame(void) {
             gbDirectConnect = false;
         setupModem:
             iMPBaseType = MULTIPLAYER_BASE_MODEM;
-            continueFlag = 1;
+            continueFlag = true;
             LogStr("Common Modem 1");
             while (continueFlag) {
                 LogStr("Common Modem 2");
@@ -390,7 +390,7 @@ i32 game::SetupMultiPlayerGame(void) {
                         return 0;
                     LogStr("Common Modem 5");
                 } else {
-                    continueFlag = 0;
+                    continueFlag = false;
                 }
                 LogStr("Common Modem 6");
             }
@@ -404,10 +404,10 @@ i32 game::SetupMultiPlayerGame(void) {
 
 i32 game::SetupGame(void) {
     heroWindow* window;
-    i32 result;
+    b32 result;
 
     LogStr("Setup 0");
-    result = 1;
+    result = true;
     xIsPlayingExpansionCampaign = 0;
     xIsExpansionMap = 0;
     gbInCampaign = false;
@@ -485,7 +485,7 @@ i32 game::SetupGame(void) {
 
     menuDone:
         giMenuCommand = -1;
-        result = 1;
+        result = true;
         goto done;
     }
 
@@ -528,7 +528,7 @@ i32 game::SetupGame(void) {
                         xIsExpansionMap = 1;
                         break;
                     case DIALOG_CANCEL:
-                        result = 0;
+                        result = false;
                         goto done;
                 }
             } else {
@@ -542,7 +542,7 @@ i32 game::SetupGame(void) {
                     case CHOICE_ONE:
                         gbInCampaign = true;
                         if (!SetupCampaignGame()) {
-                            result = 0;
+                            result = false;
                             goto done;
                         }
                         break;
@@ -552,7 +552,7 @@ i32 game::SetupGame(void) {
                         xCampaign.InitNewCampaign(xCampaign.Choose());
                         break;
                     case DIALOG_CANCEL:
-                        result = 0;
+                        result = false;
                         goto done;
                 }
             }
@@ -560,13 +560,13 @@ i32 game::SetupGame(void) {
 
         case CHOICE_THREE:
             if (!SetupMultiPlayerGame()) {
-                result = 0;
+                result = false;
                 goto done;
             }
             break;
 
         case DIALOG_CANCEL:
-            result = 0;
+            result = false;
             goto done;
     }
 
@@ -1095,7 +1095,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
 }
 
 MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
-    i32 handled = 0;
+    b32 handled = false;
 
     PollSound();
     if (message.type == MESSAGE_WIDGET) {
@@ -1104,7 +1104,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
                 if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
                     || message.payload.widget.id == DIALOG_CANCEL)
-                    handled = 1;
+                    handled = true;
         }
     }
 

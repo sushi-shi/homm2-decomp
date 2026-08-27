@@ -82,7 +82,7 @@ void advManager::StartCursor(MapDirection direction) {
 
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
-        bMoveSoundMade = 1;
+        bMoveSoundMade = true;
         m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
         m_cursorFrameCount = 0;
         EveryOther = 0;
@@ -293,7 +293,7 @@ void advManager::DrawCursor(void) {
             || ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
                     == CONFIG_WALK_SPEED_INSTANT
                 && !bMoveSoundMade)) {
-            bMoveSoundMade = 1;
+            bMoveSoundMade = true;
             if (EveryOther == 0) {
                 gpSoundManager->MemorySample(
                     m_cursorSamples[H2EnumIndex(giGroundToTerrain[GetCell(
@@ -728,7 +728,7 @@ mapCell* advManager::MoveHero(
         == CONFIG_WALK_SPEED_INSTANT) {
         if (EveryOther)
             --m_cursorFrame;
-        bMoveSoundMade = 0;
+        bMoveSoundMade = false;
         MoveOrigin(directionX_a, directionY);
         movingHero_g->m_x += directionX_a;
         movingHero_g->m_y += directionY;
@@ -881,7 +881,7 @@ adjacentDone:
                     && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
                     GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), 1, -1);
                 if (mapEvent->cancelAfterVisit)
-                    mapEvent->active = 0;
+                    mapEvent->active = false;
             }
         } else {
             i32 primaryType = -1;
@@ -916,7 +916,7 @@ adjacentDone:
                 primaryAmount = mapEvent->artifact;
             }
             if (mapEvent->cancelAfterVisit)
-                mapEvent->active = 0;
+                mapEvent->active = false;
             if (primaryType >= 0 && primaryType <= CURSOR_RESOURCE_LAST && primaryAmount < 0)
                 primaryAmount -= CURSOR_RESOURCE_DIALOG_PENALTY;
             if (secondaryType >= 0 && secondaryType <= CURSOR_RESOURCE_LAST
@@ -1453,7 +1453,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 unwoundChanges;
     i32 pos1;
     i32 lowestSequence;
-    i32 continueUnwinding;
+    b32 continueUnwinding;
     i32 n;
 
     queueCount = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
@@ -1480,16 +1480,16 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
         }
     }
 
-    continueUnwinding = 1;
+    continueUnwinding = true;
     while (continueUnwinding) {
-        continueUnwinding = 0;
+        continueUnwinding = false;
         for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
             if (sMapChangeQueue[n].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[n].sequence == giMapChangeCtr) {
                 if (processChanges)
                     ProcessMapChange(sMapChangeQueue[n]);
                 sMapChangeQueue[n].type = MAP_CHANGE_NONE;
-                continueUnwinding = 1;
+                continueUnwinding = true;
             }
         }
     }
@@ -1549,7 +1549,7 @@ void SendMapChange(
     );
 }
 
-i32 bMoveSoundMade = 1;
+b32 bMoveSoundMade = true;
 i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16};
 i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
 u8 EveryOther = 0;

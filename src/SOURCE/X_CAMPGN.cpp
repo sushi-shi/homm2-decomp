@@ -321,7 +321,7 @@ void ExpCampaign::InitMap(void) {
         H2EnumIndex(m_campaignId) + 1,
         H2EnumIndex(m_currentMap) + 1
     );
-    gpGame->m_newGameInitialized = 0;
+    gpGame->m_newGameInitialized = false;
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
@@ -386,7 +386,7 @@ void ExpCampaign::InitMap(void) {
             player->m_cheatValue = static_cast<i8>(bonus->value);
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
-            i32 savedNewGameSetup = gbInNewGameSetup;
+            b32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
                 gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
@@ -502,7 +502,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
-    i32 savedTheme = gbUseEvilInterface;
+    b32 savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = true;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");
@@ -590,9 +590,9 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     SCampaignChoice* choice;
     tag_message message;
     char armyName[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
-    i8 hasVisibleAward;
+    b8 hasVisibleAward;
     i32 i;
-    i8 showScroll;
+    b8 showScroll;
 
     message.type = MESSAGE_WIDGET;
     for (i = 0; i < m_mapCount; ++i) {
@@ -635,12 +635,12 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     sprintf(gText, "%d", m_mapDays[H2EnumIndex(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
-    hasVisibleAward = 0;
+    hasVisibleAward = false;
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
     strcpy(gText, "");
     for (i = 0; i < EXPANSION_CAMPAIGN_AWARD_COUNT; ++i) {
         if (m_awards[i] != 0) {
-            hasVisibleAward = 1;
+            hasVisibleAward = true;
             strcat(gText, xCampaignAwards[i]);
             strcat(gText, "\n");
         }
@@ -798,11 +798,11 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_SPELL_SCROLL: {
-                showScroll = 1;
+                showScroll = true;
                 switch (choice->spell) {
                     case SPELL_DISRUPTING_RAY:
                     case SPELL_ANIMATE_DEAD:
-                        showScroll = 0;
+                        showScroll = false;
                         break;
                 }
                 if (showScroll != 0) {

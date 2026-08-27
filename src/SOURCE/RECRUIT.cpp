@@ -230,13 +230,13 @@ void recruitUnit::Update(void) {
 }
 
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
-    i32 done = 0;
-    i32 quickView;
+    b32 done = false;
+    b32 quickView;
 
     if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
-        quickView = 1;
+        quickView = true;
     else
-        quickView = 0;
+        quickView = false;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
@@ -306,19 +306,19 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
-                        done = 1;
+                        done = true;
                         break;
                     case CONFIRM_CONTROL:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {
-                            done = 1;
+                            done = true;
                             goto checkClose;
                         }
                         if (m_army->CanJoin(m_creatureType) != 0) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
-                            done = 1;
+                            done = true;
                             m_noRoom = true;
                             goto checkClose;
                         }
@@ -329,7 +329,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         }
                         *m_available -= m_quantity;
                         m_recruited = true;
-                        done = 1;
+                        done = true;
                         break;
                 }
                 break;

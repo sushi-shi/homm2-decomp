@@ -49,7 +49,7 @@ void InitGraphics(void) {
 
     // Retail chose between DirectDraw and WinG here. There is one path now.
     giGraphicsType = WINGRAPH_GRAPHICS_WING;
-    gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = 0;
+    gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = false;
     platform::SetMenuVisible(1);
 }
 

@@ -26,11 +26,11 @@ struct SSmackOptions {
     char companionFileName[SMACK_OPTION_FILENAME_SIZE];
     char slowFileName[SMACK_OPTION_FILENAME_SIZE];
     char slowCompanionFileName[SMACK_OPTION_FILENAME_SIZE];
-    i8 fadeIn;
-    i8 fadeOut;
-    i8 preload;
-    i8 waitForInput;
-    i8 drawCompanion;
+    b8 fadeIn;
+    b8 fadeOut;
+    b8 preload;
+    b8 waitForInput;
+    b8 drawCompanion;
     i16 companionX;
     i16 companionY;
 };
@@ -44,7 +44,7 @@ i32 PlaySmacker(i32);
 ExpansionCampaignId ExpansionCampaignRect(i32, i32);
 i8 PointInRect(i32, i32, struct tag_rect*);
 
-extern i32 bSmackSound;
+extern b32 bSmackSound;
 extern class icon* brotherIcon;
 extern class icon* backImage;
 extern struct SSmackOptions SmackOptions[];
@@ -53,6 +53,6 @@ extern platform::MovieId smk2;
 extern i8 bSmackNum;
 extern b32 gbLastFramePlayed;
 extern b32 gbPlayedThrough;
-extern i8 bMainDone;
+extern b8 bMainDone;
 
 #endif

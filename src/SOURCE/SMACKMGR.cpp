@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <string>
+
 typedef enum SmackManagerConstant {
     PALETTE_VALUE_SHIFT            = 2,
     AUDIO_OPEN_FLAGS               = 0xfe000,
@@ -58,7 +60,6 @@ typedef enum SmackManagerConstant {
     CONGRATS_TEXT_HEIGHT           = 217,
     CONGRATS_BLIT_WIDTH            = GRAPHICS_WIDTH - 1,
     CONGRATS_BLIT_HEIGHT           = GRAPHICS_HEIGHT - 1,
-    MOVIE_PATH_SIZE                = 352,
     MILES_SOUND_SYSTEM_PREFERENCE  = 15,
     CAMPAIGN_BLIT_X                = 49,
     CAMPAIGN_BLIT_Y                = 78,
@@ -149,16 +150,15 @@ void DoAdvance(
 }
 
 void SmackManagerMain(void) {
-    i32 playing17;
-    i32 musicStarted0;
-    i32 companionStarted26;
-    i32 primaryStarted7;
-    char path7[MOVIE_PATH_SIZE];
+    b32 playing17;
+    b32 musicStarted0;
+    b32 companionStarted26;
+    b32 primaryStarted7;
     i8 savedPalette4[PALETTE_DATA_SIZE];
 
     gpSoundManager->SaveBackend();
     gbLastFramePlayed = false;
-    musicStarted0 = 0;
+    musicStarted0 = false;
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         i32 initialMouseY29;
         i32 initialMouseX3;
@@ -175,7 +175,7 @@ void SmackManagerMain(void) {
 
     platform::ChangeMenu(hmnuDflt);
     gpMouseManager->HideColorPointer();
-    bMainDone = 1;
+    bMainDone = true;
     memcpy(savedPalette4, gPalette->m_data, PALETTE_DATA_SIZE);
 
     bSmackSound = IsSoundBackendActive(gpSoundManager)
@@ -183,35 +183,20 @@ void SmackManagerMain(void) {
                && bSmackNum != SMACK_CREDITS
                && bSmackNum != BUKA_CREDITS;
 
-    if (bSmackNum == EXPANSION_CAMPAIGN)
-        strcpy(path7, ".\\DATA\\");
-    else
-        snprintf(
-            path7,
-            sizeof(path7),
-            "%s%s",
-            gcRegCDRomPath,
-            gcAnimPath
-        );
-
-    if (gConfig.slowVideo)
-        sprintf(
-            gText,
-            "%s%s.SMK",
-            path7,
-            SmackOptions[bSmackNum].slowFileName
-        );
-    else
-        sprintf(
-            gText,
-            "%s%s.SMK",
-            path7,
-            SmackOptions[bSmackNum].fileName
-        );
+    const std::string movieDirectory =
+        bSmackNum == EXPANSION_CAMPAIGN ? ".\\DATA\\"
+                                        : std::string(gcRegCDRomPath) + gcAnimPath;
+    const auto moviePath = [&](const char* name) {
+        return movieDirectory + name + ".SMK";
+    };
+    const std::string primaryMoviePath = moviePath(
+        gConfig.slowVideo ? SmackOptions[bSmackNum].slowFileName
+                          : SmackOptions[bSmackNum].fileName
+    );
 
     smk1 = platform::kInvalidMovie;
     if (bSmackNum != EXPANSION_CAMPAIGN) {
-        smk1 = platform::MovieOpen(gText, bSmackSound);
+        smk1 = platform::MovieOpen(primaryMoviePath.c_str(), bSmackSound);
         if (smk1 == platform::kInvalidMovie)
             ShutDown("Unable to open animation file.");
         platform::MovieTarget(
@@ -225,21 +210,11 @@ void SmackManagerMain(void) {
     }
 
     if (strlen(SmackOptions[bSmackNum].companionFileName) > 1) {
-        if (gConfig.slowVideo)
-            sprintf(
-                gText,
-                "%s%s.SMK",
-                path7,
-                SmackOptions[bSmackNum].slowCompanionFileName
-            );
-        else
-            sprintf(
-                gText,
-                "%s%s.SMK",
-                path7,
-                SmackOptions[bSmackNum].companionFileName
-            );
-        smk2 = platform::MovieOpen(gText, bSmackSound);
+        const std::string companionMoviePath = moviePath(
+            gConfig.slowVideo ? SmackOptions[bSmackNum].slowCompanionFileName
+                              : SmackOptions[bSmackNum].companionFileName
+        );
+        smk2 = platform::MovieOpen(companionMoviePath.c_str(), bSmackSound);
         if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo
             && bSmackNum != EXPANSION_CAMPAIGN) {
             platform::MovieTarget(
@@ -266,9 +241,9 @@ void SmackManagerMain(void) {
     if (SmackOptions[bSmackNum].fadeIn)
         gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
 
-    playing17 = 1;
-    primaryStarted7 = 0;
-    companionStarted26 = 0;
+    playing17 = true;
+    primaryStarted7 = false;
+    companionStarted26 = false;
 
     if (bSmackNum == CHOOSE_CAMPAIGN) {
         platform::PumpEvents();
@@ -293,8 +268,8 @@ void SmackManagerMain(void) {
                     MemError();
                 backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
                 backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
-                sprintf(gText, "%s%s.SMK", path7, "IVYPOL");
-                smk2 = platform::MovieOpen(gText, false);
+                const std::string paletteMoviePath = moviePath("IVYPOL");
+                smk2 = platform::MovieOpen(paletteMoviePath.c_str(), false);
                 if (const u8* moviePalette = platform::MoviePalette(smk2))
                     memcpy(gPalette->m_data, moviePalette, PALETTE_DATA_SIZE);
                 platform::MovieClose(smk2);
@@ -303,11 +278,11 @@ void SmackManagerMain(void) {
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
                 gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
-                primaryStarted7 = 1;
+                primaryStarted7 = true;
             }
         } else if (!platform::MovieWaiting(smk1)) {
             if (bSmackNum == INTRO_MUSIC && !musicStarted0) {
-                musicStarted0 = 1;
+                musicStarted0 = true;
                 gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
             }
             if ((!primaryStarted7 || platform::MovieFrameCount(smk1) > 1)
@@ -335,7 +310,7 @@ void SmackManagerMain(void) {
                     if (bSmackNum == SPECIAL_MUSIC)
                         gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 }
-                primaryStarted7 = 1;
+                primaryStarted7 = true;
             }
         }
 
@@ -344,17 +319,17 @@ void SmackManagerMain(void) {
             if (companionStarted26
                 && platform::MovieFrameIndex(smk2)
                     == platform::MovieFrameCount(smk2) - 1) {
-                i32 drawLastFrame;
-                i32 advanceLastFrame2;
+                b32 drawLastFrame;
+                b32 advanceLastFrame2;
 
-                advanceLastFrame2 = 0;
+                advanceLastFrame2 = false;
                 if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo) {
-                    drawLastFrame = 1;
+                    drawLastFrame = true;
                 } else if (bSmackNum == EXPANSION_CAMPAIGN) {
-                    drawLastFrame = 1;
-                    advanceLastFrame2 = 1;
+                    drawLastFrame = true;
+                    advanceLastFrame2 = true;
                 } else {
-                    drawLastFrame = 0;
+                    drawLastFrame = false;
                 }
                 DoAdvance(smk2, drawLastFrame, advanceLastFrame2, 0, 1);
                 gbLastFramePlayed = true;
@@ -367,7 +342,7 @@ void SmackManagerMain(void) {
                     DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
             }
             if (smk2 != platform::kInvalidMovie && platform::MovieFrameIndex(smk2) > 0)
-                companionStarted26 = 1;
+                companionStarted26 = true;
         }
 
         platform::PumpEvents();
@@ -430,13 +405,9 @@ void SmackManagerMain(void) {
                         if (expansionChoice0 != EXPANSION_CAMPAIGN_NONE) {
                             bExpansionSmackNum =
                                 static_cast<i8>(expansionChoice0 + EXPANSION_FIRST_MOVIE);
-                            sprintf(
-                                gText,
-                                "%s%s.SMK",
-                                path7,
-                                SmackOptions[bExpansionSmackNum].fileName
-                            );
-                            smk2 = platform::MovieOpen(gText, bSmackSound);
+                            const std::string expansionMoviePath =
+                                moviePath(SmackOptions[bExpansionSmackNum].fileName);
+                            smk2 = platform::MovieOpen(expansionMoviePath.c_str(), bSmackSound);
                             platform::MovieTarget(
                                 smk2,
                                 gpWindowManager->m_screen->m_pixels,
@@ -472,7 +443,7 @@ void SmackManagerMain(void) {
         if (bSmackNum == CONGRATS
             && platform::MovieFrameIndex(smk1) + 1 == platform::MovieFrameCount(smk1)
             && !musicStarted0) {
-            musicStarted0 = 1;
+            musicStarted0 = true;
             gpSoundManager->PlayAmbientMusic(LOSE_MUSIC);
         }
 
@@ -485,7 +456,7 @@ void SmackManagerMain(void) {
                 || (smk2 == platform::kInvalidMovie
                     && (platform::MovieFrameIndex(smk1) >= platform::MovieFrameCount(smk1)
                         || (platform::MovieFrameIndex(smk1) <= 0 && primaryStarted7))))) {
-            playing17 = 0;
+            playing17 = false;
             gbPlayedThrough = true;
         }
     }
@@ -608,7 +579,7 @@ i32 PlaySmacker(i32 smackNumber) {
     return gbPlayedThrough;
 }
 
-i32 bSmackSound = 0;
+b32 bSmackSound = false;
 icon* brotherIcon = NULL;
 static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
@@ -636,85 +607,85 @@ i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
 
 icon* backImage = NULL;
 SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
-    {"H2XINTRO", "", "H2XINTRO", "", 1, 1, 0, 0, 0, 0, 0},
-    {"NWCLOGO", "", "NWCLOGO", "", 1, 1, 0, 0, 0, 0, 0},
-    {"WIN", "", "WIN", "", 1, 0, 0, 1, 0, 0, 0},
-    {"LOSE", "", "LOSE", "", 1, 1, 1, 1, 0, 0, 0},
-    {"INTRO", "", "INTRO", "", 1, 1, 0, 0, 0, 0, 0},
-    {"GOOD01", "GOOD01V", "GOOD01", "GOOD01V", 1, 1, 1, 0, 1, 348, 420},
-    {"GOOD02", "GOOD02W", "GOOD02", "GOOD02W", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD03", "GOOD03QW", "GOOD03", "GOOD03QW", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD03", "GOOD03QW", "GOOD03", "GOOD03QW", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD04", "GOOD04W", "GOOD04", "GOOD04W", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD05", "GOOD05V", "GOOD05", "GOOD05V", 1, 1, 1, 0, 1, 87, 345},
-    {"GOOD06", "GOOD06AV", "GOOD06", "GOOD6AV", 1, 1, 1, 0, 1, 280, 186},
-    {"GOOD06", "GOOD06BV", "GOOD06", "GOOD6BV", 1, 1, 1, 0, 1, 280, 186},
-    {"GOOD07", "GOOD07QW", "GOOD07", "GOOD07QW", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD07", "GOOD07QW", "GOOD07", "GOOD07QW", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD09", "GOOD09W", "GOOD09", "GOOD09W", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD10", "GOOD10W", "GOOD10", "GOOD10W", 1, 1, 1, 0, 0, 0, 0},
-    {"GOOD10", "GOOD10W", "GOOD10", "GOOD10W", 1, 1, 1, 0, 0, 0, 0},
-    {"LIBRARY", "LIBRARYW", "LIBRARY", "LIBRARYW", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL01", "EVIL01V", "EVIL01", "EVIL01V", 1, 1, 1, 0, 1, 364, 404},
-    {"EVIL02", "EVIL02W", "EVIL02", "EVIL02W", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL03", "EVIL03QW", "EVIL03", "EVIL03QW", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL03", "EVIL03QW", "EVIL03", "EVIL03QW", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL05", "EVIL05AV", "EVIL05", "EVIL5AV", 1, 1, 1, 0, 1, 87, 345},
-    {"EVIL05", "EVIL05BV", "EVIL05", "EVIL5BV", 1, 1, 1, 0, 1, 87, 345},
-    {"EVIL05", "RBETRAYV", "EVIL05", "RBETRAYV", 1, 1, 1, 0, 1, 87, 345},
-    {"EVIL06", "EVIL06AW", "EVIL06", "EVIL06AW", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL06", "EVIL06BW", "EVIL06", "EVIL06BW", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL07", "EVIL07W", "EVIL07", "EVIL07W", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL07", "EVIL07W", "EVIL07", "EVIL07W", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL08", "", "EVIL08", "", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL09", "EVIL09W", "EVIL09", "EVIL09W", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL09", "EVIL09W", "EVIL09", "EVIL09W", 1, 1, 1, 0, 0, 0, 0},
-    {"EVIL10", "EVIL11W", "EVIL10", "EVIL11W", 1, 1, 1, 0, 0, 0, 0},
-    {"PRISON", "", "PRISON", "", 1, 1, 0, 0, 0, 0, 0},
-    {"CHOOSE", "CHOOSEW", "CHOOSE", "CHOOSEW", 1, 1, 1, 1, 0, 0, 0},
-    {"CREDITS", "", "CREDITS", "", 0, 0, 1, 1, 0, 0, 0},
-    {"EARTH", "", "EARTH", "", 1, 1, 0, 0, 0, 0, 0},
-    {"MM6", "", "SMM6", "", 1, 1, 0, 0, 0, 0, 0},
-    {"POL1", "MIXPOL1", "POL1", "MIXPOL1", 1, 1, 1, 0, 0, 0, 0},
-    {"POL2", "MIXPOL2", "POL2", "MIXPOL2", 1, 1, 1, 0, 0, 0, 0},
-    {"POL3", "MIXPOL3", "POL3", "MIXPOL3", 1, 1, 1, 0, 0, 0, 0},
-    {"POL4", "MIXPOL4", "POL4", "MIXPOL4", 1, 1, 1, 0, 0, 0, 0},
-    {"POL5", "MIXPOL5", "POL5", "MIXPOL5", 1, 1, 1, 0, 0, 0, 0},
-    {"POL6", "MIXPOL6", "POL6", "MIXPOL6", 1, 1, 1, 0, 0, 0, 0},
-    {"POL7", "MIXPOL7", "POL7", "MIXPOL7", 1, 1, 1, 0, 0, 0, 0},
-    {"POL8", "MIXPOL8", "POL8", "MIXPOL8", 1, 1, 1, 0, 0, 0, 0},
-    {"DES9", "MIXDES9", "DES9", "MIXDES9", 1, 1, 1, 0, 0, 0, 0},
-    {"DES10", "MIXDES10", "DES10", "MIXDES10", 1, 1, 1, 0, 0, 0, 0},
-    {"DES11", "MIXDES11", "DES11", "MIXDES11", 1, 1, 1, 0, 0, 0, 0},
-    {"DES12", "MIXDES12", "DES12", "MIXDES12", 1, 1, 1, 0, 0, 0, 0},
-    {"DES13", "MIXDES13", "DES13", "MIXDES13", 1, 1, 1, 0, 0, 0, 0},
-    {"DES14", "MIXDES14", "DES14", "MIXDES14", 1, 1, 1, 0, 0, 0, 0},
-    {"DES15", "MIXDES15", "DES15", "MIXDES15", 1, 1, 1, 0, 0, 0, 0},
-    {"WIZ16", "MIXWIZ16", "WIZ16", "MIXWIZ16", 1, 1, 1, 0, 0, 0, 0},
-    {"WIZ17", "MIXWIZ17", "WIZ17", "MIXWIZ17", 1, 1, 1, 0, 0, 0, 0},
-    {"WIZ18", "MIXWIZ18", "WIZ18", "MIXWIZ18", 1, 1, 1, 0, 0, 0, 0},
-    {"WIZ19", "MIXWIZ19", "WIZ19", "MIXWIZ19", 1, 1, 1, 0, 0, 0, 0},
-    {"WIZ20", "MIXWIZ20", "WIZ20", "MIXWIZ20", 1, 1, 1, 0, 0, 0, 0},
-    {"VOY21", "MIXVOY21", "VOY21", "MIXVOY21", 1, 1, 1, 0, 0, 0, 0},
-    {"VOY22", "MIXVOY22", "VOY22", "MIXVOY22", 1, 1, 1, 0, 0, 0, 0},
-    {"VOY23", "MIXVOY23", "VOY23", "MIXVOY23", 1, 1, 1, 0, 0, 0, 0},
-    {"VOY24", "MIXVOY24", "VOY24", "MIXVOY24", 1, 1, 1, 0, 0, 0, 0},
-    {"VOY25", "MIXVOY25", "VOY25", "MIXVOY25", 1, 1, 1, 0, 0, 0, 0},
-    {"DEFEAT", "", "DEFEAT", "", 1, 1, 1, 1, 0, 0, 0},
-    {"H2XINTRO", "", "H2XINTR", "", 1, 1, 0, 0, 0, 0, 0},
-    {"CYLOGO", "", "CYLOGO", "", 1, 1, 1, 0, 0, 0, 0},
-    {"", "", "", "", 1, 1, 1, 1, 0, 0, 0},
-    {"IVYPOL", "", "IVYPOL", "", 0, 0, 1, 1, 1, 214, 47},
-    {"IVYDES", "", "IVYDES", "", 0, 0, 1, 1, 1, 214, 273},
-    {"IVYWIZ", "", "IVYWIZ", "", 0, 0, 1, 1, 1, 472, 132},
-    {"IVYVOY", "", "IVYVOY", "", 0, 0, 1, 1, 1, 41, 132},
-    {"CYBCREDS", "", "CYBCREDS", "", 1, 0, 1, 1, 0, 0, 0},
-    {"BUKA", "", "BUKA", "", 1, 1, 0, 0, 0, 0, 0},
-    {"BUKACRED", "", "BUKACRED", "", 1, 0, 1, 0, 0, 0, 0}
+    {"H2XINTRO", "", "H2XINTRO", "", true, true, false, false, false, 0, 0},
+    {"NWCLOGO", "", "NWCLOGO", "", true, true, false, false, false, 0, 0},
+    {"WIN", "", "WIN", "", true, false, false, true, false, 0, 0},
+    {"LOSE", "", "LOSE", "", true, true, true, true, false, 0, 0},
+    {"INTRO", "", "INTRO", "", true, true, false, false, false, 0, 0},
+    {"GOOD01", "GOOD01V", "GOOD01", "GOOD01V", true, true, true, false, true, 348, 420},
+    {"GOOD02", "GOOD02W", "GOOD02", "GOOD02W", true, true, true, false, false, 0, 0},
+    {"GOOD03", "GOOD03QW", "GOOD03", "GOOD03QW", true, true, true, false, false, 0, 0},
+    {"GOOD03", "GOOD03QW", "GOOD03", "GOOD03QW", true, true, true, false, false, 0, 0},
+    {"GOOD04", "GOOD04W", "GOOD04", "GOOD04W", true, true, true, false, false, 0, 0},
+    {"GOOD05", "GOOD05V", "GOOD05", "GOOD05V", true, true, true, false, true, 87, 345},
+    {"GOOD06", "GOOD06AV", "GOOD06", "GOOD6AV", true, true, true, false, true, 280, 186},
+    {"GOOD06", "GOOD06BV", "GOOD06", "GOOD6BV", true, true, true, false, true, 280, 186},
+    {"GOOD07", "GOOD07QW", "GOOD07", "GOOD07QW", true, true, true, false, false, 0, 0},
+    {"GOOD07", "GOOD07QW", "GOOD07", "GOOD07QW", true, true, true, false, false, 0, 0},
+    {"GOOD09", "GOOD09W", "GOOD09", "GOOD09W", true, true, true, false, false, 0, 0},
+    {"GOOD10", "GOOD10W", "GOOD10", "GOOD10W", true, true, true, false, false, 0, 0},
+    {"GOOD10", "GOOD10W", "GOOD10", "GOOD10W", true, true, true, false, false, 0, 0},
+    {"LIBRARY", "LIBRARYW", "LIBRARY", "LIBRARYW", true, true, true, false, false, 0, 0},
+    {"EVIL01", "EVIL01V", "EVIL01", "EVIL01V", true, true, true, false, true, 364, 404},
+    {"EVIL02", "EVIL02W", "EVIL02", "EVIL02W", true, true, true, false, false, 0, 0},
+    {"EVIL03", "EVIL03QW", "EVIL03", "EVIL03QW", true, true, true, false, false, 0, 0},
+    {"EVIL03", "EVIL03QW", "EVIL03", "EVIL03QW", true, true, true, false, false, 0, 0},
+    {"EVIL05", "EVIL05AV", "EVIL05", "EVIL5AV", true, true, true, false, true, 87, 345},
+    {"EVIL05", "EVIL05BV", "EVIL05", "EVIL5BV", true, true, true, false, true, 87, 345},
+    {"EVIL05", "RBETRAYV", "EVIL05", "RBETRAYV", true, true, true, false, true, 87, 345},
+    {"EVIL06", "EVIL06AW", "EVIL06", "EVIL06AW", true, true, true, false, false, 0, 0},
+    {"EVIL06", "EVIL06BW", "EVIL06", "EVIL06BW", true, true, true, false, false, 0, 0},
+    {"EVIL07", "EVIL07W", "EVIL07", "EVIL07W", true, true, true, false, false, 0, 0},
+    {"EVIL07", "EVIL07W", "EVIL07", "EVIL07W", true, true, true, false, false, 0, 0},
+    {"EVIL08", "", "EVIL08", "", true, true, true, false, false, 0, 0},
+    {"EVIL09", "EVIL09W", "EVIL09", "EVIL09W", true, true, true, false, false, 0, 0},
+    {"EVIL09", "EVIL09W", "EVIL09", "EVIL09W", true, true, true, false, false, 0, 0},
+    {"EVIL10", "EVIL11W", "EVIL10", "EVIL11W", true, true, true, false, false, 0, 0},
+    {"PRISON", "", "PRISON", "", true, true, false, false, false, 0, 0},
+    {"CHOOSE", "CHOOSEW", "CHOOSE", "CHOOSEW", true, true, true, true, false, 0, 0},
+    {"CREDITS", "", "CREDITS", "", false, false, true, true, false, 0, 0},
+    {"EARTH", "", "EARTH", "", true, true, false, false, false, 0, 0},
+    {"MM6", "", "SMM6", "", true, true, false, false, false, 0, 0},
+    {"POL1", "MIXPOL1", "POL1", "MIXPOL1", true, true, true, false, false, 0, 0},
+    {"POL2", "MIXPOL2", "POL2", "MIXPOL2", true, true, true, false, false, 0, 0},
+    {"POL3", "MIXPOL3", "POL3", "MIXPOL3", true, true, true, false, false, 0, 0},
+    {"POL4", "MIXPOL4", "POL4", "MIXPOL4", true, true, true, false, false, 0, 0},
+    {"POL5", "MIXPOL5", "POL5", "MIXPOL5", true, true, true, false, false, 0, 0},
+    {"POL6", "MIXPOL6", "POL6", "MIXPOL6", true, true, true, false, false, 0, 0},
+    {"POL7", "MIXPOL7", "POL7", "MIXPOL7", true, true, true, false, false, 0, 0},
+    {"POL8", "MIXPOL8", "POL8", "MIXPOL8", true, true, true, false, false, 0, 0},
+    {"DES9", "MIXDES9", "DES9", "MIXDES9", true, true, true, false, false, 0, 0},
+    {"DES10", "MIXDES10", "DES10", "MIXDES10", true, true, true, false, false, 0, 0},
+    {"DES11", "MIXDES11", "DES11", "MIXDES11", true, true, true, false, false, 0, 0},
+    {"DES12", "MIXDES12", "DES12", "MIXDES12", true, true, true, false, false, 0, 0},
+    {"DES13", "MIXDES13", "DES13", "MIXDES13", true, true, true, false, false, 0, 0},
+    {"DES14", "MIXDES14", "DES14", "MIXDES14", true, true, true, false, false, 0, 0},
+    {"DES15", "MIXDES15", "DES15", "MIXDES15", true, true, true, false, false, 0, 0},
+    {"WIZ16", "MIXWIZ16", "WIZ16", "MIXWIZ16", true, true, true, false, false, 0, 0},
+    {"WIZ17", "MIXWIZ17", "WIZ17", "MIXWIZ17", true, true, true, false, false, 0, 0},
+    {"WIZ18", "MIXWIZ18", "WIZ18", "MIXWIZ18", true, true, true, false, false, 0, 0},
+    {"WIZ19", "MIXWIZ19", "WIZ19", "MIXWIZ19", true, true, true, false, false, 0, 0},
+    {"WIZ20", "MIXWIZ20", "WIZ20", "MIXWIZ20", true, true, true, false, false, 0, 0},
+    {"VOY21", "MIXVOY21", "VOY21", "MIXVOY21", true, true, true, false, false, 0, 0},
+    {"VOY22", "MIXVOY22", "VOY22", "MIXVOY22", true, true, true, false, false, 0, 0},
+    {"VOY23", "MIXVOY23", "VOY23", "MIXVOY23", true, true, true, false, false, 0, 0},
+    {"VOY24", "MIXVOY24", "VOY24", "MIXVOY24", true, true, true, false, false, 0, 0},
+    {"VOY25", "MIXVOY25", "VOY25", "MIXVOY25", true, true, true, false, false, 0, 0},
+    {"DEFEAT", "", "DEFEAT", "", true, true, true, true, false, 0, 0},
+    {"H2XINTRO", "", "H2XINTR", "", true, true, false, false, false, 0, 0},
+    {"CYLOGO", "", "CYLOGO", "", true, true, true, false, false, 0, 0},
+    {"", "", "", "", true, true, true, true, false, 0, 0},
+    {"IVYPOL", "", "IVYPOL", "", false, false, true, true, true, 214, 47},
+    {"IVYDES", "", "IVYDES", "", false, false, true, true, true, 214, 273},
+    {"IVYWIZ", "", "IVYWIZ", "", false, false, true, true, true, 472, 132},
+    {"IVYVOY", "", "IVYVOY", "", false, false, true, true, true, 41, 132},
+    {"CYBCREDS", "", "CYBCREDS", "", true, false, true, true, false, 0, 0},
+    {"BUKA", "", "BUKA", "", true, true, false, false, false, 0, 0},
+    {"BUKACRED", "", "BUKACRED", "", true, false, true, false, false, 0, 0}
 };
 platform::MovieId smk1 = platform::kInvalidMovie;
 platform::MovieId smk2 = platform::kInvalidMovie;
 i8 bSmackNum;
 b32 gbLastFramePlayed;
 b32 gbPlayedThrough;
-i8 bMainDone;
+b8 bMainDone;
