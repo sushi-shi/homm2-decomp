@@ -4,6 +4,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <PLATFORM/InputReplay.h>
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -14,7 +16,6 @@
 #include <fstream>
 #include <map>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -160,6 +161,20 @@ unsigned ToSetOneScanCode(SDL_Scancode code) {
     case SDL_SCANCODE_F12: return 0x58;
     default: return 0;
     }
+}
+
+bool ResolveReplayKey(
+    std::string_view name,
+    Key& key,
+    unsigned& scanCode,
+    unsigned& character
+) {
+    const std::string ownedName(name);
+    const SDL_Scancode code = SDL_GetScancodeFromName(ownedName.c_str());
+    key = TranslateKey(code);
+    scanCode = ToSetOneScanCode(code);
+    character = name.size() == 1 ? static_cast<unsigned char>(name.front()) : 0;
+    return code != SDL_SCANCODE_UNKNOWN && key != Key::Unknown;
 }
 
 unsigned TranslateModifiers(SDL_Keymod modifiers) {
@@ -418,79 +433,35 @@ public:
     }
 
 private:
-    struct ReplayEvent {
-        std::uint32_t milliseconds = 0;
-        Event event;
-    };
-
     void LoadReplay() {
         const char* path = SDL_getenv("HOMM2_INPUT_REPLAY");
         if (path == nullptr) {
             return;
         }
-
         std::ifstream stream(path);
-        std::string line;
-        while (std::getline(stream, line)) {
-            std::istringstream fields(line);
-            ReplayEvent replay;
-            std::string action;
-            fields >> replay.milliseconds >> action;
-            if (!fields) {
-                continue;
-            }
-            if (action == "move") {
-                replay.event.type = Event::Type::MouseMove;
-            } else if (action == "left-down") {
-                replay.event.type = Event::Type::MouseDown;
-                replay.event.button = MouseButton::Left;
-            } else if (action == "left-up") {
-                replay.event.type = Event::Type::MouseUp;
-                replay.event.button = MouseButton::Left;
-            } else if (action == "right-down") {
-                replay.event.type = Event::Type::MouseDown;
-                replay.event.button = MouseButton::Right;
-            } else if (action == "right-up") {
-                replay.event.type = Event::Type::MouseUp;
-                replay.event.button = MouseButton::Right;
-            } else if (action == "key-down" || action == "key-up") {
-                std::string name;
-                fields >> name;
-                const SDL_Scancode code = SDL_GetScancodeFromName(name.c_str());
-                replay.event.type =
-                    action == "key-down" ? Event::Type::KeyDown : Event::Type::KeyUp;
-                replay.event.key = TranslateKey(code);
-                replay.event.scanCode = ToSetOneScanCode(code);
-                replay.event.character =
-                    name.size() == 1 ? static_cast<unsigned char>(name[0]) : 0;
-            } else if (action == "text") {
-                replay.event.type = Event::Type::TextInput;
-                std::getline(fields, replay.event.text);
-                if (!replay.event.text.empty() && replay.event.text.front() == ' ') {
-                    replay.event.text.erase(0, 1);
-                }
-            } else {
-                continue;
-            }
-            if (replay.event.type == Event::Type::MouseMove
-                || replay.event.type == Event::Type::MouseDown
-                || replay.event.type == Event::Type::MouseUp) {
-                fields >> replay.event.position.x >> replay.event.position.y;
-            }
-            if (!fields) {
-                continue;
-            }
-            m_replay.push_back(std::move(replay));
+        if (!stream) {
+            std::fprintf(stderr, "[homm2] input replay: cannot open %s\n", path);
+            return;
         }
-        m_replayStart = Ticks();
+        ReplayParseError error;
+        if (!m_replay.Load(stream, ResolveReplayKey, error)) {
+            std::fprintf(
+                stderr,
+                "[homm2] input replay: %s:%zu: %s\n",
+                path,
+                error.line,
+                error.message.c_str()
+            );
+            return;
+        }
+        m_replay.Start(Ticks());
     }
 
     void PumpReplay() {
-        const std::uint32_t elapsed = Ticks() - m_replayStart;
-        while (m_replayIndex < m_replay.size()
-               && m_replay[m_replayIndex].milliseconds <= elapsed) {
-            m_input.Push(m_replay[m_replayIndex].event);
-            ++m_replayIndex;
+        Event event;
+        const std::uint32_t now = Ticks();
+        while (m_replay.NextDue(now, event)) {
+            m_input.Push(std::move(event));
         }
     }
 
@@ -590,9 +561,7 @@ private:
     Video& m_video;
     Input& m_input;
     bool m_quitQueued = false;
-    std::vector<ReplayEvent> m_replay;
-    std::size_t m_replayIndex = 0;
-    std::uint32_t m_replayStart = 0;
+    InputReplay m_replay;
 };
 
 }
