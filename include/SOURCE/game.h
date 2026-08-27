@@ -164,7 +164,7 @@ public:
     void SetupResources(void);
     void Overview(void);
     void DoKnob(void);
-    i32 ProcessIconSelect(i32, i32);
+    i32 ProcessIconSelect(i32, b32);
     i32 SetupCampaignGame(void);
     i32 SetupBaud(void);
     i32 SetupComPort(void);

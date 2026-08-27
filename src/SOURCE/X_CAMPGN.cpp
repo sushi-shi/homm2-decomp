@@ -343,7 +343,7 @@ void ExpCampaign::InitMap(void) {
                 GiveArtifact(
                     gpGame->GetHero(player->m_heroIds[0]),
                     bonus->artifact,
-                    0,
+                    false,
                     -1
                 );
             break;
@@ -416,7 +416,7 @@ void ExpCampaign::InitMap(void) {
                 GiveArtifact(
                     gpGame->GetHero(player->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
-                    0,
+                    false,
                     static_cast<i8>(bonus->spell)
                 );
             break;
@@ -434,7 +434,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
-                            0,
+                            false,
                             -1
                         );
                     break;
@@ -445,7 +445,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
-                            0,
+                            false,
                             -1
                         );
                     break;
@@ -461,7 +461,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
-                            0,
+                            false,
                             -1
                         );
                     break;
@@ -473,7 +473,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
-                            0,
+                            false,
                             -1
                         );
                     break;
@@ -487,7 +487,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
-                            0,
+                            false,
                             -1
                         );
                     break;

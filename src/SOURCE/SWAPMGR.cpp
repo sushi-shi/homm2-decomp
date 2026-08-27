@@ -396,7 +396,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_LEFT_HERO:
                             if (quickView_9)
                                 break;
-                            HeroView(m_heroes[(SWAP_SIDE_LEFT)]->m_id, 1, 0);
+                            HeroView(m_heroes[(SWAP_SIDE_LEFT)]->m_id, true, false);
                             gpAdvManager->RedrawAdvScreen(1, 0);
                             Update();
                             DrawSwapWin();
@@ -407,7 +407,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                         case CONTROL_RIGHT_HERO:
                             if (quickView_9)
                                 break;
-                            HeroView(m_heroes[(SWAP_SIDE_RIGHT)]->m_id, 1, 0);
+                            HeroView(m_heroes[(SWAP_SIDE_RIGHT)]->m_id, true, false);
                             gpAdvManager->RedrawAdvScreen(1, 0);
                             Update();
                             DrawSwapWin();
@@ -758,8 +758,8 @@ void swapManager::SwapArtifacts(void) {
     i32 targetArtifact_2 =
         m_heroes[(m_targetSide)]->m_artifacts[m_targetSlot];
 
-    GiveTakeArtifactStat(m_heroes[(m_selectedSide)], selectedArtifact, 1);
-    GiveTakeArtifactStat(m_heroes[(m_targetSide)], targetArtifact_2, 1);
+    GiveTakeArtifactStat(m_heroes[(m_selectedSide)], selectedArtifact, true);
+    GiveTakeArtifactStat(m_heroes[(m_targetSide)], targetArtifact_2, true);
     m_heroes[(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact_2;
     m_heroes[(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
@@ -768,10 +768,10 @@ void swapManager::SwapArtifacts(void) {
         m_heroes[(m_targetSide)]->m_artifactExtra[m_targetSlot];
     m_heroes[(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
 
-    GiveTakeArtifactStat(m_heroes[(m_selectedSide)], targetArtifact_2, 0);
-    GiveTakeArtifactStat(m_heroes[(m_targetSide)], selectedArtifact, 0);
-    m_heroes[(m_selectedSide)]->CheckAnduranPieces(1);
-    m_heroes[(m_targetSide)]->CheckAnduranPieces(1);
+    GiveTakeArtifactStat(m_heroes[(m_selectedSide)], targetArtifact_2, false);
+    GiveTakeArtifactStat(m_heroes[(m_targetSide)], selectedArtifact, false);
+    m_heroes[(m_selectedSide)]->CheckAnduranPieces(true);
+    m_heroes[(m_targetSide)]->CheckAnduranPieces(true);
 
     if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
         || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {

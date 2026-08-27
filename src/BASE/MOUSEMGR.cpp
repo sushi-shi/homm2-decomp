@@ -42,7 +42,7 @@ static POINT gMouseScreenPt = {};
 void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
 static POINT gMouseCheckPt = {};
 b32 gbInSetPointer = false;
-i32 bInNewMouseUpdate = 0;
+b32 bInNewMouseUpdate = false;
 
 
 i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57};
@@ -83,7 +83,7 @@ mouseManager::mouseManager(void) : baseManager() {
     );
     m_cursorFrame = 0;
     m_cursorIcon = NULL;
-    m_cursorReady = 1;
+    m_cursorReady = true;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
         cAndBits[i] = NULL;
         cColorBits[i] = NULL;
@@ -100,7 +100,7 @@ mouseManager::mouseManager(void) : baseManager() {
 }
 
 i32 mouseManager::Open(i32 priority) {
-    m_forcePointerUpdate = 0;
+    m_forcePointerUpdate = false;
     m_savedUnderlying =
         new bitmap(BITMAP_TYPE_MEMORY, MOUSE_SAVED_BITMAP_WIDTH, MOUSE_SAVED_BITMAP_HEIGHT);
     m_savedLeft = MOUSE_SCREEN_CENTER_X - 1;
@@ -171,8 +171,8 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
             type = cursorType;
         }
         if (type != m_cursorType && (m_cursorType = type, gbColorMice != 0)) {
-            i32 saved82 = m_cursorReady;
-            m_cursorReady = 0;
+            b32 saved82 = m_cursorReady;
+            m_cursorReady = false;
             if (m_cursorIcon != NULL)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[RESOURCE_NAME_CAPACITY];
@@ -333,7 +333,7 @@ void mouseManager::NewUpdate(i32 force) {
         return;
 
     gbPutzingWithMouseCtr = gbPutzingWithMouseCtr + 1;
-    bInNewMouseUpdate = 1;
+    bInNewMouseUpdate = true;
     if (force == 0) {
         CheckUpdateMousePos();
     }
@@ -471,7 +471,7 @@ void mouseManager::NewUpdate(i32 force) {
             m_drawnCursorSizeIndex = m_cursorSizeIndex;
         }
     }
-    bInNewMouseUpdate = 0;
+    bInNewMouseUpdate = false;
     gbPutzingWithMouseCtr--;
 }
 
@@ -584,24 +584,24 @@ void mouseManager::SetColorMice(b32 enabled) {
         i32 savedWM56 = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         gbPutzingWithMouseCtr++;
-        i32 wasInNew = bInNewMouseUpdate;
-        bInNewMouseUpdate = 0;
+        b32 wasInNew = bInNewMouseUpdate;
+        bInNewMouseUpdate = false;
         ReallyHidePointer();
-        m_cursorReady = 0;
+        m_cursorReady = false;
         i32 savedX = m_cursorFrame;
         MouseCursorType oldType = m_cursorType;
-        i32 saved7e = m_forcePointerUpdate;
+        b32 saved7e = m_forcePointerUpdate;
         gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
-        m_forcePointerUpdate = 0;
+        m_forcePointerUpdate = false;
         SetPointer(
             "",
             savedX,
             oldType
         );
         m_forcePointerUpdate = saved7e;
-        m_cursorReady = 1;
+        m_cursorReady = true;
         ReallyShowPointer();
         bInNewMouseUpdate = wasInNew;
         gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;

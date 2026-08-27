@@ -287,7 +287,7 @@ void combatManager::SetupCombat(
         if (m_playerId[index] >= 0)
             m_networkArmyPresent[index] = gbHumanPlayer[m_playerId[index]];
         else
-            m_networkArmyPresent[index] = 0;
+            m_networkArmyPresent[index] = false;
 
         m_heroes[index] = index == (COMBAT_ATTACKER_SIDE) ? attackerHero : defenderHero;
 
@@ -309,8 +309,8 @@ void combatManager::SetupCombat(
             m_catapultAttacksRemaining[index]++;
         }
         m_keepAttacksRemaining[index] = 1;
-        m_visitingHeroPresent[index] = 0;
-        m_heroCastSpell[index] = 0;
+        m_visitingHeroPresent[index] = false;
+        m_heroCastSpell[index] = false;
     }
 
     m_drawbridgeBackgroundVisible = false;
@@ -318,9 +318,9 @@ void combatManager::SetupCombat(
         if (defenderTown->m_occupyingHeroId != -1) {
             m_armyGroups[(COMBAT_DEFENDER_SIDE)] = &m_heroes[(COMBAT_DEFENDER_SIDE)]->m_army;
             CombineGroups(&defenderTown->m_army, &m_heroes[(COMBAT_DEFENDER_SIDE)]->m_army);
-            m_visitingHeroPresent[(COMBAT_DEFENDER_SIDE)] = 1;
+            m_visitingHeroPresent[(COMBAT_DEFENDER_SIDE)] = true;
         } else {
-            m_visitingHeroPresent[(COMBAT_DEFENDER_SIDE)] = 0;
+            m_visitingHeroPresent[(COMBAT_DEFENDER_SIDE)] = false;
         }
 
         m_inCastleCombat = (defenderTown->m_buildings & (TOWN_BUILDING_CASTLE)) != 0;
@@ -381,8 +381,8 @@ void combatManager::InitNonVisualVars(void) {
 
     m_heroOverlayFrame[(COMBAT_ATTACKER_SIDE)] = 0;
     m_heroOverlayFrame[(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
-    m_sideRetreated[(COMBAT_ATTACKER_SIDE)] = 0;
-    m_sideRetreated[(COMBAT_DEFENDER_SIDE)] = 0;
+    m_sideRetreated[(COMBAT_ATTACKER_SIDE)] = false;
+    m_sideRetreated[(COMBAT_DEFENDER_SIDE)] = false;
     m_combatResult = COMBAT_RESULT_PENDING;
     m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
     m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
@@ -401,8 +401,8 @@ void combatManager::InitNonVisualVars(void) {
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
     gbRetreatWin = false;
     gbCombatSurrender = false;
-    m_sideDefeated[(COMBAT_ATTACKER_SIDE)] = 0;
-    m_sideDefeated[(COMBAT_DEFENDER_SIDE)] = 0;
+    m_sideDefeated[(COMBAT_ATTACKER_SIDE)] = false;
+    m_sideDefeated[(COMBAT_DEFENDER_SIDE)] = false;
     m_limitCreature = true;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
@@ -471,7 +471,7 @@ void combatManager::SetupAdjacencyArray(void) {
 i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
-    gpMouseManager->m_forcePointerUpdate = 1;
+    gpMouseManager->m_forcePointerUpdate = true;
     i32 savedMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
@@ -500,7 +500,7 @@ i32 combatManager::Open(i32 openFlags) {
     CycleColors(1);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
-    gpMouseManager->m_forcePointerUpdate = 0;
+    gpMouseManager->m_forcePointerUpdate = false;
     gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();

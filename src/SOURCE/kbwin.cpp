@@ -490,7 +490,7 @@ void SetMenuStatus(i32 showMenu) {
     }
 }
 
-void SetNoDialogMenus(i32 menusEnabled) {
+void SetNoDialogMenus(b32 menusEnabled) {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
     if (!gbNoDialogMenusOn && menusEnabled)
@@ -501,7 +501,7 @@ void SetNoDialogMenus(i32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
-void SetMenus(HMENU menu, i32 enabled) {
+void SetMenus(HMENU menu, b32 enabled) {
     i32 count;
     u32 id;
     i32 match;

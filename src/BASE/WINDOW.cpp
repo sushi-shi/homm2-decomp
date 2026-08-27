@@ -299,7 +299,7 @@ void heroWindow::DrawWindow(i32 flags) {
 void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     tag_message local_24;
     widget* local_8;
-    gpMouseManager->m_cursorReady = 0;
+    gpMouseManager->m_cursorReady = false;
     local_8 = m_widgetListTail;
     local_24.type = MESSAGE_WIDGET;
     local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
@@ -318,7 +318,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }
-    gpMouseManager->m_cursorReady = 1;
+    gpMouseManager->m_cursorReady = true;
 }
 
 i32 heroWindow::SaveBackground(void) {

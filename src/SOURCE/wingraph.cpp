@@ -581,7 +581,7 @@ void DDCleanUpWinGraphics(void) {
     }
 }
 
-void DDSetFullScreenStatus(i32 fullScreen) {
+void DDSetFullScreenStatus(b32 fullScreen) {
     i32 width;
     i32 windowHeight;
     i32 x;
@@ -923,7 +923,7 @@ void ConnectToDLLs(void) {
     if (lpDirectDrawCreate != NULL) {
         gbDDrawAttached = true;
     } else {
-        gConfig.gfx[(giCurExe)].fullScreen = 0;
+        gConfig.gfx[(giCurExe)].fullScreen = false;
         SetMenuStatus(1);
     }
 }
@@ -1025,7 +1025,7 @@ void CleanUpWinGraphics(void) {
     DisconnectDLLs();
 }
 
-void SetFullScreenStatus(i32 fullScreen) {
+void SetFullScreenStatus(b32 fullScreen) {
     if (gbInSmackMgr != 0)
         return;
     if (fullScreen == gConfig.gfx[(giCurExe)].fullScreen)
@@ -1033,7 +1033,7 @@ void SetFullScreenStatus(i32 fullScreen) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
         if (gbDDrawAttached == 0)
             return;
-        gConfig.gfx[(giCurExe)].fullScreen = 1;
+        gConfig.gfx[(giCurExe)].fullScreen = true;
         if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
             DDSetFullScreenStatus(fullScreen);
     } else if (fullScreen == 0) {
@@ -1054,7 +1054,7 @@ i32 QueryNewPalette(void) {
 }
 
 i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
-    i32 fullState;
+    b32 fullState;
     i32 x;
     i32 y;
     i32 width;
@@ -1076,7 +1076,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     buffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     memcpy(buffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
-        gConfig.gfx[(giCurExe)].fullScreen = 0;
+        gConfig.gfx[(giCurExe)].fullScreen = false;
         DDCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
         WGInitGraphics();

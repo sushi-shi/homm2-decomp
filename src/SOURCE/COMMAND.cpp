@@ -1087,7 +1087,7 @@ void combatManager::ResetRound(void) {
     m_catapultAttacksRemaining[1] = m_catapultAttackCount[1];
     m_keepAttacksRemaining[0] = 1;
     m_keepAttacksRemaining[1] = 1;
-    m_heroCastSpell[0] = m_heroCastSpell[1] = 0;
+    m_heroCastSpell[0] = m_heroCastSpell[1] = false;
 
     memset(gpCombatManager->m_removedArmies, 0, sizeof(gpCombatManager->m_removedArmies));
     gpCombatManager->m_removedArmyPresent = 0;
@@ -2654,14 +2654,14 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             ResetCycleTimers();
             break;
         case ACTION_RETREAT:
-            m_sideRetreated[(m_currentSide)] = 1;
+            m_sideRetreated[(m_currentSide)] = true;
             gbRetreatWin = true;
             ResetCycleTimers();
             break;
         case ACTION_SURRENDER:
             gbCombatSurrender = true;
             gbRetreatWin = true;
-            m_sideDefeated[(m_currentSide)] = 1;
+            m_sideDefeated[(m_currentSide)] = true;
             gpGame->m_players[m_playerId[(m_currentSide)]].m_resources[(RES_GOLD)] -=
                 giNextActionExtra;
             gpGame->m_players[m_playerId[(COMBAT_DEFENDER_SIDE) - (m_currentSide)]]
@@ -2816,7 +2816,7 @@ void combatManager::CycleCombatScreen(void) {
             || m_heroAnimationState[index_0] == HERO_ANIMATION_IDLE_FIRST
             || m_heroAnimationState[index_0] == HERO_ANIMATION_IDLE_SECOND
             || m_heroAnimationState[index_0] == HERO_ANIMATION_IDLE_LAST) {
-            m_drawHero[index_0] = 1;
+            m_drawHero[index_0] = true;
         } else if (m_heroAnimationState[index_0] == HERO_ANIMATION_STAND
                    && m_heroDeathAnimationPlayed[index_0] == 0
                    && m_heroDeathPending[index_0] != 0) {
@@ -2832,7 +2832,7 @@ void combatManager::CycleCombatScreen(void) {
                         .animationFrameCount[HERO_ANIMATION_DEATH_FIRST]
                     > 0) {
                     nextHeroAnimation_0[index_0] = HERO_ANIMATION_DEATH_FIRST;
-                    m_drawHero[index_0] = 1;
+                    m_drawHero[index_0] = true;
                 }
             }
         } else if (m_heroAnimationState[index_0] == HERO_ANIMATION_STAND
@@ -2850,7 +2850,7 @@ void combatManager::CycleCombatScreen(void) {
                         .animationFrameCount[HERO_ANIMATION_DEATH_SECOND]
                     > 0) {
                     nextHeroAnimation_0[index_0] = HERO_ANIMATION_DEATH_SECOND;
-                    m_drawHero[index_0] = 1;
+                    m_drawHero[index_0] = true;
                 }
             }
         } else if (m_heroAnimationState[index_0] == HERO_ANIMATION_STAND
@@ -2862,12 +2862,12 @@ void combatManager::CycleCombatScreen(void) {
             } else {
                 nextHeroAnimation_0[index_0] = HERO_ANIMATION_IDLE_FIRST;
             }
-            m_drawHero[index_0] = 1;
+            m_drawHero[index_0] = true;
         }    }
     if (m_heroIcons[(COMBAT_ATTACKER_SIDE)] != NULL)
-        m_drawHero[(COMBAT_ATTACKER_SIDE)] = 1;
+        m_drawHero[(COMBAT_ATTACKER_SIDE)] = true;
     if (m_heroIcons[(COMBAT_DEFENDER_SIDE)] != NULL)
-        m_drawHero[(COMBAT_DEFENDER_SIDE)] = 1;
+        m_drawHero[(COMBAT_DEFENDER_SIDE)] = true;
 
     if (cyclingCount_1 == 0 && m_drawHero[(COMBAT_ATTACKER_SIDE)] == 0
         && m_drawHero[(COMBAT_DEFENDER_SIDE)] == 0

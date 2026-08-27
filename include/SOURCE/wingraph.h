@@ -59,7 +59,7 @@ struct IDirectDrawSurface* DDCreateSurface(u32l, u32l, i32);
 void DDSD(i32, const char*, i32);
 void __cdecl DDUpdatePalette(i8*);
 void DDCleanUpWinGraphics(void);
-void DDSetFullScreenStatus(i32);
+void DDSetFullScreenStatus(b32);
 i32 WGQueryNewPalette(void);
 void WGInitGraphics(void);
 void __cdecl WGUpdatePalette(i8*);
@@ -76,7 +76,7 @@ i32 AppPaint(void*, void*);
 void InitializePalette(void);
 void __cdecl UpdatePalette(i8*);
 void CleanUpWinGraphics(void);
-void SetFullScreenStatus(i32);
+void SetFullScreenStatus(b32);
 i32 QueryNewPalette(void);
 i32 SetGraphicsType(WingraphGraphicsType);
 
