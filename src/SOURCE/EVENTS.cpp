@@ -3901,7 +3901,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
         currentCell_d->m_flags |= H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY);
     cellDone:
-
+        continue;
     }
 
     SendMapChange(MAP_CHANGE_ERASE_OBJECT, 0, x, y, MAP_CHANGE_VALUE, 0, 0);
@@ -4488,6 +4488,7 @@ void advManager::EventSound(
         case MAP_OBJECT_WAGON:
         case MAP_OBJECT_LEAN_TO:
             musicTrack = pickupSound;
+            break;
         case MAP_OBJECT_ARCHER_HOUSE:
         case MAP_OBJECT_GOBLIN_HUT:
         case MAP_OBJECT_DWARF_COTTAGE:
@@ -6589,6 +6590,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WHIRLPOOL:
             DoWhirlpool(eventHero);
+            [[fallthrough]];
         case MAP_OBJECT_STONE_LITHS:
             exitCount = 0;
             for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
@@ -7768,7 +7770,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     }
 }
 
-i32 advManager::DoNetCombat(char* packet) {
+i32 advManager::DoNetCombat(char* packetData) {
     hero* secondHro;
     i32 randSeed;
     i32 firstSide;
@@ -7790,7 +7792,7 @@ i32 advManager::DoNetCombat(char* packet) {
     secondHro = NULL;
     secondArmy = NULL;
     ReceiveHeroTownData(
-        packet,
+        packetData,
         &otherPlr,
         &battleX,
         &combatY,
@@ -8193,7 +8195,7 @@ void advManager::SendHeroTownData(
 }
 
 void advManager::ReceiveHeroTownData(
-    char* packet,
+    char* packetData,
     i32* remotePlayer,
     i32* x,
     i32* y,
@@ -8227,34 +8229,34 @@ void advManager::ReceiveHeroTownData(
     *secondHero = NULL;
     *secondArmy = NULL;
     hasFirstHero4 = hasSecondHero0 = hasTown2 = false;
-    *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
-    *x = EVENTS_REMOTE_COMBAT(packet)->x;
-    *y = EVENTS_REMOTE_COMBAT(packet)->y;
-    hasFirstHero4 = EVENTS_REMOTE_COMBAT(packet)->hasFirstHero;
-    hasTown2 = EVENTS_REMOTE_COMBAT(packet)->hasTown;
-    hasSecondHero0 = EVENTS_REMOTE_COMBAT(packet)->hasSecondHero;
-    *setupCombatX = EVENTS_REMOTE_COMBAT(packet)->setupCombatX;
-    *setupCombatY = EVENTS_REMOTE_COMBAT(packet)->setupCombatY;
-    *randomSeed = EVENTS_REMOTE_COMBAT(packet)->randomSeed;
-    *combatResult = EVENTS_REMOTE_COMBAT(packet)->combatResult;
-    *retreatWin = EVENTS_REMOTE_COMBAT(packet)->retreatWin;
-    *combatSurrender = EVENTS_REMOTE_COMBAT(packet)->combatSurrender;
-    firstOwner8 = EVENTS_REMOTE_COMBAT(packet)->firstOwner;
+    *remotePlayer = EVENTS_REMOTE_MESSAGE(packetData)->sender;
+    *x = EVENTS_REMOTE_COMBAT(packetData)->x;
+    *y = EVENTS_REMOTE_COMBAT(packetData)->y;
+    hasFirstHero4 = EVENTS_REMOTE_COMBAT(packetData)->hasFirstHero;
+    hasTown2 = EVENTS_REMOTE_COMBAT(packetData)->hasTown;
+    hasSecondHero0 = EVENTS_REMOTE_COMBAT(packetData)->hasSecondHero;
+    *setupCombatX = EVENTS_REMOTE_COMBAT(packetData)->setupCombatX;
+    *setupCombatY = EVENTS_REMOTE_COMBAT(packetData)->setupCombatY;
+    *randomSeed = EVENTS_REMOTE_COMBAT(packetData)->randomSeed;
+    *combatResult = EVENTS_REMOTE_COMBAT(packetData)->combatResult;
+    *retreatWin = EVENTS_REMOTE_COMBAT(packetData)->retreatWin;
+    *combatSurrender = EVENTS_REMOTE_COMBAT(packetData)->combatSurrender;
+    firstOwner8 = EVENTS_REMOTE_COMBAT(packetData)->firstOwner;
     if (firstOwner8 > 0)
         gpGame->m_players[firstOwner8].m_resources[H2EnumIndex(RES_GOLD)] =
-            EVENTS_REMOTE_COMBAT(packet)->firstGold;
-    secondOwner = EVENTS_REMOTE_COMBAT(packet)->secondOwner;
+            EVENTS_REMOTE_COMBAT(packetData)->firstGold;
+    secondOwner = EVENTS_REMOTE_COMBAT(packetData)->secondOwner;
     if (secondOwner > 0)
         gpGame->m_players[secondOwner].m_resources[H2EnumIndex(RES_GOLD)] =
-            EVENTS_REMOTE_COMBAT(packet)->secondGold;
+            EVENTS_REMOTE_COMBAT(packetData)->secondGold;
 
     *firstArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
-    memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
+    memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packetData)->firstArmy, sizeof(armyGroup));
     *secondArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
-    memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
+    memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packetData)->secondArmy, sizeof(armyGroup));
     if (hasTown2) {
         *combatTown = static_cast<town*>(H2_ALLOC(sizeof(town)));
-        memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
+        memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packetData)->combatTown, sizeof(town));
     }
 
     iCombatControlNetPos[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = *remotePlayer;
@@ -8308,34 +8310,38 @@ void advManager::ReceiveHeroTownData(
             else
                 ShutDown(localization::Tr("event.inline.d7ee33967c36bb8b"));
         }
-        packet = GetRemoteData(1);
-        if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
-            && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND) {
+        packetData = GetRemoteData(1);
+        if (packetData && EVENTS_REMOTE_MESSAGE(packetData)->type == REMOTE_MESSAGE_RELIABLE
+            && EVENTS_REMOTE_MESSAGE(packetData)->command == REMOTE_COMMAND) {
             lastPacketTime7 = platform::Ticks();
-            if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {
-                memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);
+            if (EVENTS_REMOTE_HERO(packetData)->fragment == REMOTE_FIRST_HERO_FIRST) {
+                memcpy(
+                    *firstHero,
+                    EVENTS_REMOTE_HERO(packetData)->data,
+                    COMBAT_REMOTE_HERO_FIRST_SIZE
+                );
                 gotFirstHeroFirst0 = true;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_SECOND) {
+            if (EVENTS_REMOTE_HERO(packetData)->fragment == REMOTE_FIRST_HERO_SECOND) {
                 memcpy(
                     &(*firstHero)->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
-                    EVENTS_REMOTE_HERO(packet)->data,
+                    EVENTS_REMOTE_HERO(packetData)->data,
                     COMBAT_REMOTE_HERO_SECOND_SIZE
                 );
                 gotFirstHeroSecond = true;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_SECOND_HERO_FIRST) {
+            if (EVENTS_REMOTE_HERO(packetData)->fragment == REMOTE_SECOND_HERO_FIRST) {
                 memcpy(
                     *secondHero,
-                    EVENTS_REMOTE_HERO(packet)->data,
+                    EVENTS_REMOTE_HERO(packetData)->data,
                     COMBAT_REMOTE_HERO_FIRST_SIZE
                 );
                 gotSecondHeroFirst2 = true;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_SECOND_HERO_SECOND) {
+            if (EVENTS_REMOTE_HERO(packetData)->fragment == REMOTE_SECOND_HERO_SECOND) {
                 memcpy(
                     &(*secondHero)->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
-                    EVENTS_REMOTE_HERO(packet)->data,
+                    EVENTS_REMOTE_HERO(packetData)->data,
                     COMBAT_REMOTE_HERO_SECOND_SIZE
                 );
                 gotSecondHeroSecond2 = true;
