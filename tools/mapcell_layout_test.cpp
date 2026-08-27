@@ -16,7 +16,7 @@ int main() {
 
     assert(sizeof(cell) == 12);
     assert(cell.m_objTypeBits == 0xff);
-    assert(reinterpret_cast<const u8*>(&cell)[7] == 0xff);
+    assert(reinterpret_cast<const u8*>(&cell)[6] == 0xff);
     assert(cell.ObjectTileset() == TILESET_X_LOC3);
     assert(cell.OverlayTileset() == TILESET_X_LOC3);
 
