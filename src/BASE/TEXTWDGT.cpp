@@ -96,7 +96,9 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (msg.payload.widget.id == m_id) {
-                        SetColorIndex(msg.payload.widget.data.value);
+                        SetColorIndex(
+                            static_cast<FontDrawMode>(msg.payload.widget.data.value)
+                        );
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
@@ -143,7 +145,9 @@ void textWidget::Draw(void) {
         m_owner->m_posY + m_y,
         m_width,
         m_height,
-        HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_color,
+        HAS(m_flags, WIDGET_FLAG_DIMMED)
+            ? FONT_DRAW_DIMMED
+            : static_cast<FontDrawMode>(m_color),
         m_alignment
     );
 }

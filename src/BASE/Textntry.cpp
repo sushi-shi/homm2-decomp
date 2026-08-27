@@ -415,7 +415,9 @@ void textEntryWidget::Draw(void) {
             m_owner->m_posY + m_innerY,
             m_innerW,
             m_innerH,
-            HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_color,
+            HAS(m_flags, WIDGET_FLAG_DIMMED)
+                ? FONT_DRAW_DIMMED
+                : static_cast<FontDrawMode>(m_color),
             m_alignment
         );
     }

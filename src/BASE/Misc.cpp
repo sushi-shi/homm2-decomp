@@ -183,7 +183,8 @@ H2_ENUM_END(FileIdHashConstant)
 #include <SOURCE/X_GLOBAL.h>
 
 DATA(0x00536088) static i32 giFindMid = 0;
-DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime = 0;
+DATA(0x0053608c) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime =
+    ENTRY_PHASE_IMMEDIATE;
 DATA(0x00536090) i32 inBoxY = 0;
 DATA(0x00536094) i32 inBoxX = 0;
 DATA(0x00536098) static i32 gBlitBottom = 0;

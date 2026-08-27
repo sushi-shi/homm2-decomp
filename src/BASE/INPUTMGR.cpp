@@ -426,7 +426,7 @@ void inputManager::AsciiConvert(tag_message& event) {
                 break;
         }
     }
-    if ((event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0)
+    if (HAS(event.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS) == 0)
         TranslateInputCharacterCp1251(event);
 }
 

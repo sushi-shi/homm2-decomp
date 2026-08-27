@@ -183,7 +183,7 @@ BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	100.0000	915cc3b03b02
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	100.0000	89501859b407
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	100.0000	93b88906f0c4
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	100.0000	516b4ae2ab3a
-BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	100.0000	feae0692ca3f
+BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	100.0000	1f44bf324672
 BASE/INPUTMGR	?CheckChangeCursor@@YIXHHH@Z	100.0000	7daa7310f885
 BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	100.0000	3c8859525ff1.5e877b076c9a
 BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	100.0000	c3ac6ef06625.5e877b076c9a
@@ -334,8 +334,8 @@ BASE/SAMPLE	??1sample@@UAE@XZ	100.0000	3b2c251178b7
 BASE/TEXTWDGT	??0textWidget@@QAE@FFFFPAD0FFFF@Z	100.0000	87a36dc9e503
 BASE/TEXTWDGT	??0textWidget@@QAE@XZ	100.0000	7518ce82535a
 BASE/TEXTWDGT	??1textWidget@@UAE@XZ	100.0000	d9e82f4c440d
-BASE/TEXTWDGT	?Draw@textWidget@@UAEXXZ	100.0000	14f753938c2c
-BASE/TEXTWDGT	?Main@textWidget@@UAEHAAUtag_message@@@Z	100.0000	30413c672b17
+BASE/TEXTWDGT	?Draw@textWidget@@UAEXXZ	100.0000	e217c8a14d15
+BASE/TEXTWDGT	?Main@textWidget@@UAEHAAUtag_message@@@Z	100.0000	765d65cb0e36
 BASE/TEXTWDGT	?Read@textWidget@@QAEXXZ	100.0000	7be57f8e537c
 BASE/TEXTWDGT	?SetColorIndex@textWidget@@QAEXF@Z	100.0000	d0f9e5060397
 BASE/TEXTWDGT	?SetText@textWidget@@QAEXPAD@Z	100.0000	80176c1007d0
@@ -345,7 +345,7 @@ BASE/TILESET	??1tileset@@UAE@XZ	100.0000	c45701da0197
 BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	100.0000	dd2920e01850
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	18191e6b51dc
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	7359f4b53efc
-BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	893347e6a700
+BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	5ae0094c9e3c
 BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	873c28647e72
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	100.0000	8c6b77f768d6
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	100.0000	01e946e7c35d
@@ -399,7 +399,7 @@ BASE/bmap2	?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z	100.0000	bc71fcedafe0
 BASE/droplist	??0dropListWidget@@QAE@XZ	100.0000	ec81f37b9821
 BASE/droplist	??1dropListWidget@@UAE@XZ	100.0000	307e1c222795
 BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	b4810860dba4
-BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	537282076122
+BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	7a21a7af9c63
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	ffbfcceb8b68
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	100.0000	8548e8f7f8d6
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	100.0000	f695cb2217f2
