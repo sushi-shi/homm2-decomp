@@ -268,7 +268,9 @@ void dropListWidget::Draw(void) {
             m_owner->m_posY + m_contentY,
             m_contentWidth,
             m_contentHeight,
-            (((m_flags) & (WIDGET_FLAG_DIMMED))) ? FONT_DRAW_DIMMED : static_cast<FontDrawMode>(m_normalColor),
+            (((m_flags) & (WIDGET_FLAG_DIMMED)))
+                ? FONT_DRAW_DIMMED
+                : static_cast<FontDrawMode>(m_normalColor),
             m_alignment
         );
 }

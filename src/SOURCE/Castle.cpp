@@ -475,7 +475,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     i16 statusWidgetId [[maybe_unused]];
 
     statusWidgetId = (CONTROL_STATUS_TEXT);
-    whichBuilding = BUILDING_SLOT_NONE;
+    whichBuilding = (BUILDING_SLOT_NONE);
     ret = 0;
     hoverMessage = false;
 
@@ -485,11 +485,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             hoverMessage = true;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
-            whichBuilding = CASTLE_CAPTAIN;
+            whichBuilding = (CASTLE_CAPTAIN);
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
-            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED);
+            whichBuilding = CONTROL_CAPTAIN_FORMATION_GROUPED;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
-            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD);
+            whichBuilding = CONTROL_CAPTAIN_FORMATION_SPREAD;
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
@@ -503,8 +503,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                      && message.payload.widget.id
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
                 whichBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
-            if (whichBuilding != BUILDING_SLOT_NONE)
-                whichBuilding = castleSlotsUse[(whichBuilding)];
+            if (whichBuilding != (BUILDING_SLOT_NONE))
+                whichBuilding = (castleSlotsUse[whichBuilding]);
         }
     }
 
@@ -514,22 +514,22 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (whichBuilding) {
 
-            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+            case CONTROL_CAPTAIN_FORMATION_GROUPED:
                 sprintf(gText, cCastleInfo[(INFO_GROUPED_FORMATION)]);
                 break;
 
-            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+            case CONTROL_CAPTAIN_FORMATION_SPREAD:
                 sprintf(gText, cCastleInfo[(INFO_SPREAD_FORMATION)]);
                 break;
 
-            case TOWN_OBJECT_MAGE_GUILD:
+            case (TOWN_OBJECT_MAGE_GUILD):
                 if (!(gpTownManager->m_buildableBuildings & (1 << (whichBuilding)))) {
                     sprintf(
                         gText,
                         cCastleInfo[(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            static_cast<BuildingSlotType>(whichBuilding)
                         )
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1 << (whichBuilding)))) {
@@ -538,7 +538,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         cCastleInfo[(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            static_cast<BuildingSlotType>(whichBuilding)
                         )
                     );
                 } else {
@@ -554,30 +554,30 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 }
                 break;
 
-            case BUILDING_SLOT_SPECIAL_ONE:
-            case BUILDING_SLOT_NECROMANCER_SHRINE:
-            case BUILDING_SLOT_DOCK:
-            case BUILDING_SLOT_SPECIAL_FOUR:
-            case BUILDING_SLOT_SPECIAL_SEVEN:
-            case BUILDING_SLOT_SPECIAL_EIGHT:
-            case BUILDING_SLOT_SPECIAL_NINE:
-            case BUILDING_SLOT_SPECIAL_TEN:
-            case BUILDING_SLOT_WELL_EXTRA:
-            case BUILDING_SLOT_SPECIAL_TWELVE:
-            case BUILDING_SLOT_SPECIAL:
-            case BUILDING_SLOT_NEUTRAL_LAST:
-            case BUILDING_SLOT_DWELLING_FIRST:
-            case BUILDING_SLOT_DWELLING_SECOND:
-            case BUILDING_SLOT_DWELLING_THIRD:
-            case BUILDING_SLOT_DWELLING_FOURTH:
-            case BUILDING_SLOT_DWELLING_FIFTH:
-            case BUILDING_SLOT_DWELLING_SIXTH:
-            case BUILDING_SLOT_UPGRADE_FIRST:
-            case BUILDING_SLOT_UPGRADE_SECOND:
-            case BUILDING_SLOT_UPGRADE_THIRD:
-            case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-            case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
-            case BUILDING_SLOT_SPECIAL_THIRTY:
+            case (BUILDING_SLOT_SPECIAL_ONE):
+            case (BUILDING_SLOT_NECROMANCER_SHRINE):
+            case (BUILDING_SLOT_DOCK):
+            case (BUILDING_SLOT_SPECIAL_FOUR):
+            case (BUILDING_SLOT_SPECIAL_SEVEN):
+            case (BUILDING_SLOT_SPECIAL_EIGHT):
+            case (BUILDING_SLOT_SPECIAL_NINE):
+            case (BUILDING_SLOT_SPECIAL_TEN):
+            case (BUILDING_SLOT_WELL_EXTRA):
+            case (BUILDING_SLOT_SPECIAL_TWELVE):
+            case (BUILDING_SLOT_SPECIAL):
+            case (BUILDING_SLOT_NEUTRAL_LAST):
+            case (BUILDING_SLOT_DWELLING_FIRST):
+            case (BUILDING_SLOT_DWELLING_SECOND):
+            case (BUILDING_SLOT_DWELLING_THIRD):
+            case (BUILDING_SLOT_DWELLING_FOURTH):
+            case (BUILDING_SLOT_DWELLING_FIFTH):
+            case (BUILDING_SLOT_DWELLING_SIXTH):
+            case (BUILDING_SLOT_UPGRADE_FIRST):
+            case (BUILDING_SLOT_UPGRADE_SECOND):
+            case (BUILDING_SLOT_UPGRADE_THIRD):
+            case (BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
+            case (BUILDING_SLOT_SPECIAL_TWENTY_NINE):
+            case (BUILDING_SLOT_SPECIAL_THIRTY):
                 if (H2BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
@@ -591,7 +591,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         cCastleInfo[(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            whichBuilding
+                            static_cast<BuildingSlotType>(whichBuilding)
                         )
                     );
                 } else {
@@ -601,7 +601,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                static_cast<BuildingSlotType>(whichBuilding)
                             )
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1 << (whichBuilding))))
@@ -610,7 +610,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                static_cast<BuildingSlotType>(whichBuilding)
                             )
                         );
                     else
@@ -619,13 +619,13 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                whichBuilding
+                                static_cast<BuildingSlotType>(whichBuilding)
                             )
                         );
                 }
                 break;
 
-            case BUILDING_SLOT_NONE:
+            case (BUILDING_SLOT_NONE):
                 switch (message.payload.widget.id) {
                     case CONTROL_HERO_FIRST:
                     case CONTROL_HERO_FIRST + 1:
@@ -691,7 +691,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 quickFlag = ((((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) != 0;
                 switch (whichBuilding) {
 
-                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+                    case CONTROL_CAPTAIN_FORMATION_SPREAD:
                         if (quickFlag) {
                             NormalDialog(
                                 "{Широкие ряды}\n\nП"
@@ -722,7 +722,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
-                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+                    case CONTROL_CAPTAIN_FORMATION_GROUPED:
                         if (quickFlag) {
                             NormalDialog(
                                 "{Плотные ряды}\n\nП"
@@ -751,7 +751,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
-                    case TOWN_OBJECT_MAGE_GUILD:
+                    case (TOWN_OBJECT_MAGE_GUILD):
                         if (!quickFlag) {
                             if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
                                 || !(gpTownManager->m_buildableBuildings & (1 << (whichBuilding))))
@@ -759,30 +759,30 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         }
                         goto buy_building;
 
-                    case BUILDING_SLOT_SPECIAL_ONE:
-                    case BUILDING_SLOT_NECROMANCER_SHRINE:
-                    case BUILDING_SLOT_DOCK:
-                    case BUILDING_SLOT_SPECIAL_FOUR:
-                    case BUILDING_SLOT_SPECIAL_SEVEN:
-                    case BUILDING_SLOT_SPECIAL_EIGHT:
-                    case BUILDING_SLOT_SPECIAL_NINE:
-                    case BUILDING_SLOT_SPECIAL_TEN:
-                    case BUILDING_SLOT_WELL_EXTRA:
-                    case BUILDING_SLOT_SPECIAL_TWELVE:
-                    case BUILDING_SLOT_SPECIAL:
-                    case BUILDING_SLOT_NEUTRAL_LAST:
-                    case BUILDING_SLOT_DWELLING_FIRST:
-                    case BUILDING_SLOT_DWELLING_SECOND:
-                    case BUILDING_SLOT_DWELLING_THIRD:
-                    case BUILDING_SLOT_DWELLING_FOURTH:
-                    case BUILDING_SLOT_DWELLING_FIFTH:
-                    case BUILDING_SLOT_DWELLING_SIXTH:
-                    case BUILDING_SLOT_UPGRADE_FIRST:
-                    case BUILDING_SLOT_UPGRADE_SECOND:
-                    case BUILDING_SLOT_UPGRADE_THIRD:
-                    case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-                    case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
-                    case BUILDING_SLOT_SPECIAL_THIRTY:
+                    case (BUILDING_SLOT_SPECIAL_ONE):
+                    case (BUILDING_SLOT_NECROMANCER_SHRINE):
+                    case (BUILDING_SLOT_DOCK):
+                    case (BUILDING_SLOT_SPECIAL_FOUR):
+                    case (BUILDING_SLOT_SPECIAL_SEVEN):
+                    case (BUILDING_SLOT_SPECIAL_EIGHT):
+                    case (BUILDING_SLOT_SPECIAL_NINE):
+                    case (BUILDING_SLOT_SPECIAL_TEN):
+                    case (BUILDING_SLOT_WELL_EXTRA):
+                    case (BUILDING_SLOT_SPECIAL_TWELVE):
+                    case (BUILDING_SLOT_SPECIAL):
+                    case (BUILDING_SLOT_NEUTRAL_LAST):
+                    case (BUILDING_SLOT_DWELLING_FIRST):
+                    case (BUILDING_SLOT_DWELLING_SECOND):
+                    case (BUILDING_SLOT_DWELLING_THIRD):
+                    case (BUILDING_SLOT_DWELLING_FOURTH):
+                    case (BUILDING_SLOT_DWELLING_FIFTH):
+                    case (BUILDING_SLOT_DWELLING_SIXTH):
+                    case (BUILDING_SLOT_UPGRADE_FIRST):
+                    case (BUILDING_SLOT_UPGRADE_SECOND):
+                    case (BUILDING_SLOT_UPGRADE_THIRD):
+                    case (BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
+                    case (BUILDING_SLOT_SPECIAL_TWENTY_NINE):
+                    case (BUILDING_SLOT_SPECIAL_THIRTY):
                         if (!quickFlag) {
                             if ((gpTownManager->m_town->m_buildings & (1 << (whichBuilding)))
                                 || !(gpTownManager->m_buildableBuildings & (1 << (whichBuilding))))
@@ -791,18 +791,18 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     buy_building:
                         for (objIndex = 0; objIndex < gpTownManager->m_townObjectCount;
                              ++objIndex) {
-                            if (gpTownManager->m_townObjects[objIndex]->m_buildingId
+                            if ((gpTownManager->m_townObjects[objIndex]->m_buildingId)
                                 == whichBuilding)
                                 break;
                         }
                         ret = gpTownManager->BuyBuild(
-                            whichBuilding,
+                            static_cast<BuildingSlotType>(whichBuilding),
                             (gpTownManager->m_affordableBuildings & (1 << (whichBuilding))) == 0,
                             quickFlag
                         );
                         break;
 
-                    case BUILDING_SLOT_NONE:
+                    case (BUILDING_SLOT_NONE):
                         switch (message.payload.widget.id) {
                             case CONTROL_HERO_FIRST:
                             case CONTROL_HERO_FIRST + 1:

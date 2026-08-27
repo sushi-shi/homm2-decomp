@@ -834,7 +834,9 @@ void hero::CheckLevel(void) {
                         goto nextAttempt;
                     }
                 }
-                skill = HeroSecondarySkill(((skill) + 1) % (HERO_SKILL_COUNT));
+                skill = static_cast<HeroSecondarySkill>(
+                    ((skill) + 1) % (HERO_SKILL_COUNT)
+                );
             }
         nextAttempt:
             tryCount--;

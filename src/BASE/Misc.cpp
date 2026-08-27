@@ -183,7 +183,8 @@ typedef enum FileIdHashConstant {
 #include <SOURCE/X_GLOBAL.h>
 
 static i32 giFindMid = 0;
-i32 bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
+i32 bDataEntryTime =
+    ENTRY_PHASE_IMMEDIATE;
 i32 inBoxY = 0;
 i32 inBoxX = 0;
 static i32 gBlitBottom = 0;

@@ -20,14 +20,6 @@ enum {
     SESSION_OPEN_CREATE = 2
 };
 typedef i32 DirectPlaySessionOpenFlag;
-typedef enum DirectPlayResult {
-    RESULT_OK = 0,
-    RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
-    RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
-    RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
-    RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
-} DirectPlayResult;
-
 typedef enum DirectPlayStorageConstant {
     RECEIVE_ARGUMENT_STORAGE_COUNT = 2,
     STATUS_TEXT_SIZE = 32
@@ -116,7 +108,7 @@ i16 dpnet_init(void) {
                 break;
         }
         rc = createFunction(g_lpGuid, &lpIDC, NULL);
-        if (rc != RESULT_OK)
+        if (rc != DP_OK)
             DPSD(rc, "dpnetwin.cpp", 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
@@ -231,8 +223,8 @@ void dpSendMessage(
     if (size != 0)
         memcpy(message + 1, data, size);
     status = lpIDC->Send(dcoID, destination, 0, message, size + 1);
-    if (status != RESULT_OK && status != RESULT_INVALID_PLAYER
-        && status != RESULT_INVALID_ARGUMENT) {
+    if (status != DP_OK && status != DPERR_INVALIDPLAYER
+        && status != DPERR_INVALIDPARAM) {
         DPSD(status, "dpnetwin.cpp", 268);
     }
     H2_FREE(message);
@@ -285,9 +277,9 @@ void dpProcessMessages(void) {
             rcvBufIn,
             &size
         );
-        if (receiveResult == RESULT_NO_MESSAGES)
+        if (receiveResult == DPERR_NOMESSAGES)
             return;
-        if (receiveResult != RESULT_OK)
+        if (receiveResult != DP_OK)
             DPSD(receiveResult, "dpnetwin.cpp", 335);
         if (sender == 0) {
         } else {
@@ -371,7 +363,7 @@ i32 dpWaitForFirstGuest(void) {
             session.dwFlags = (SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
             rv = lpIDC->Open(&session);
-            if (rv != RESULT_OK)
+            if (rv != DP_OK)
                 DPSD(rv, "dpnetwin.cpp", 442);
             iDPWaitForFirstGuestStatus++;
             break;
@@ -387,7 +379,7 @@ i32 dpWaitForFirstGuest(void) {
                 const_cast<LPSTR>("Heroes Player"),
                 &dphEvent
             );
-            if (rv != RESULT_OK)
+            if (rv != DP_OK)
                 DPSD(rv, "dpnetwin.cpp", 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
@@ -454,11 +446,11 @@ i32 dpWaitForHost(void) {
                 lpIDC
                     ->EnumSessions(&session, timeout, dpEnumSession, NULL, 0);
             iEnumCount++;
-            if (rv == RESULT_NO_SESSIONS) {
+            if (rv == DPERR_NOSESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 return 0;
             }
-            if (rv != RESULT_OK)
+            if (rv != DP_OK)
                 DPSD(rv, "dpnetwin.cpp", 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
@@ -474,7 +466,7 @@ i32 dpWaitForHost(void) {
             session.dwSession = lSessions[iSessionToTry];
             strcpy(session.szSessionName, "Heroes 2");
             rv = lpIDC->Open(&session);
-            if (rv != RESULT_OK)
+            if (rv != DP_OK)
                 DPSD(rv, "dpnetwin.cpp", 567);
             iDPWaitForHostStatus++;
             break;
@@ -485,7 +477,7 @@ i32 dpWaitForHost(void) {
                 const_cast<LPSTR>("Heroes Player"),
                 &dphEvent
             );
-            if (rv != RESULT_OK)
+            if (rv != DP_OK)
                 DPSD(rv, "dpnetwin.cpp", 577);
             iDPWaitForHostStatus++;
             break;
@@ -512,7 +504,7 @@ i32 dpWaitForHost(void) {
                     iSessionToTry++;
                 }
                 rv = lpIDC->Close();
-                if (rv != RESULT_OK)
+                if (rv != DP_OK)
                     DPSD(rv, "dpnetwin.cpp", 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
@@ -536,7 +528,7 @@ void DPSD(i32 result, const char* file, i32 line) {
     bInDPSD = true;
     flag = 0;
     switch (result) {
-        case RESULT_OK:
+        case DP_OK:
             return;
         case DPERR_ALREADYINITIALIZED:
             strcpy(errorText, "DPERR_ALREADYINITIALIZED ");

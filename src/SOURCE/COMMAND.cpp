@@ -2149,7 +2149,9 @@ void combatManager::DoVictory(CombatResult winningSide) {
                         1;
                 }
                 m_experienceValue[(OppositeCombatResult(winningSide))] =
-                    ExperienceValueOfStack(static_cast<CombatSide>((OppositeCombatResult(winningSide))));
+                    ExperienceValueOfStack(
+                        CombatSideForResult(OppositeCombatResult(winningSide))
+                    );
                 if (gbRetreatWin != 0)
                     m_experienceValue[(OppositeCombatResult(winningSide))] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
