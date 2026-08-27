@@ -32,7 +32,7 @@ void ResetGeneratedArtifacts(i32 matchingLevels);
 i32 GetArtifactLevel(i32 id);
 std::string GetArtifactName(i32 id);
 std::string GetArtifactDescription(i32 id);
-char* GetArtifactEvent(i32 id);
+const char* GetArtifactEvent(i32 id);
 
 void DeserializeGeneratedArtifacts(const std::vector<i32>& source);
 std::vector<i32> SerializeGeneratedArtifacts();

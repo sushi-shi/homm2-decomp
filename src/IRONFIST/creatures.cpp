@@ -7,6 +7,7 @@
 
 #include <tinyxml2.h>
 
+#include <BASE/Utf8.h>
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/paths.h>
 #include <SOURCE/Localization.h>
@@ -17,6 +18,10 @@ i32 giNumCreatures;
 i32 gMonRandBound[KB_CREATURE_TABLE_CAPACITY][2];
 i32 gMonSecondaryResourceCost[KB_CREATURE_TABLE_CAPACITY][IRONFIST_SECONDARY_RESOURCE_COUNT];
 static char* cArmyProjectileFileNames[KB_CREATURE_TABLE_CAPACITY];
+static char* ownedMonFilenames[KB_CREATURE_TABLE_CAPACITY];
+static char* ownedArmyFrameFilenames[KB_CREATURE_TABLE_CAPACITY];
+static char* ownedArmyNames[KB_CREATURE_TABLE_CAPACITY];
+static char* ownedArmyNamesPlural[KB_CREATURE_TABLE_CAPACITY];
 static bool creatureStringsOwned = false;
 
 struct attributeNameTableEntry {
@@ -83,11 +88,11 @@ i32 CreatureHasAttribute(i32 id, const std::string& name) {
     return 0;
 }
 
-char* GetCreatureName(i32 id) {
+const char* GetCreatureName(i32 id) {
     return gArmyNames[id];
 }
 
-char* GetCreaturePluralName(i32 id) {
+const char* GetCreaturePluralName(i32 id) {
     return gArmyNamesPlural[id];
 }
 
@@ -103,26 +108,23 @@ void Ironfist_GetMonsterCost(i32 monster, i32* const costs) {
     costs[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[monster].cost;
 }
 
-static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute, char** dest) {
+static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute) {
     const char* text = NULL;
     el->QueryStringAttribute(attribute, &text);
     if (text == NULL) {
         text = "invalid name";
     }
-    if (*dest) {
-        free(*dest);
-    }
-    *dest = strdup(text);
-    return *dest;
+    return strdup(text);
 }
 
-static void LocalizeCreatureName(i32 id, const char* table, char** value) {
+static char* LocalizeCreatureName(i32 id, const char* table, char* value) {
     std::string messageId = std::string("table.") + table + "." + std::to_string(id);
-    std::string translated = localization::TranslateExternal(messageId.c_str(), *value);
-    if (translated != *value) {
-        free(*value);
-        *value = strdup(translated.c_str());
+    std::string translated = localization::TranslateExternal(messageId.c_str(), value);
+    if (translated != value) {
+        free(value);
+        return strdup(translated.c_str());
     }
+    return value;
 }
 
 static const char* QueryTextAttribute(tinyxml2::XMLElement* el, const char* attribute) {
@@ -142,13 +144,23 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             continue;
         }
 
-        QueryAttributeCopy(crElem, "icn", &cMonFilename[id]);
-        QueryAttributeCopy(crElem, "frm", &cArmyFrameFileNames[id]);
-        QueryAttributeCopy(crElem, "name-singular", &gArmyNames[id]);
-        QueryAttributeCopy(crElem, "name-plural", &gArmyNamesPlural[id]);
-        LocalizeCreatureName(id, "gArmyNames", &gArmyNames[id]);
-        LocalizeCreatureName(id, "gArmyNamesPlural", &gArmyNamesPlural[id]);
-        QueryAttributeCopy(crElem, "projectile", &cArmyProjectileFileNames[id]);
+        free(ownedMonFilenames[id]);
+        ownedMonFilenames[id] = QueryAttributeCopy(crElem, "icn");
+        cMonFilename[id] = ownedMonFilenames[id];
+        free(ownedArmyFrameFilenames[id]);
+        ownedArmyFrameFilenames[id] = QueryAttributeCopy(crElem, "frm");
+        cArmyFrameFileNames[id] = ownedArmyFrameFilenames[id];
+        free(ownedArmyNames[id]);
+        ownedArmyNames[id] = QueryAttributeCopy(crElem, "name-singular");
+        ownedArmyNames[id] = LocalizeCreatureName(id, "gArmyNames", ownedArmyNames[id]);
+        gArmyNames[id] = ownedArmyNames[id];
+        free(ownedArmyNamesPlural[id]);
+        ownedArmyNamesPlural[id] = QueryAttributeCopy(crElem, "name-plural");
+        ownedArmyNamesPlural[id] =
+            LocalizeCreatureName(id, "gArmyNamesPlural", ownedArmyNamesPlural[id]);
+        gArmyNamesPlural[id] = ownedArmyNamesPlural[id];
+        free(cArmyProjectileFileNames[id]);
+        cArmyProjectileFileNames[id] = QueryAttributeCopy(crElem, "projectile");
 
         i32 minDamage = 0;
         i32 maxDamage = 0;
@@ -227,8 +239,11 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         info.damageMin = static_cast<i8>(minDamage);
         info.damageMax = static_cast<i8>(maxDamage);
         info.shots = static_cast<i8>(crElem->IntAttribute("shots"));
-        strncpy(info.spriteName, QueryTextAttribute(crElem, "short-name"),
-                MONSTER_SPRITE_NAME_SIZE - 1);
+        utf8::Copy(
+            info.spriteName,
+            sizeof(info.spriteName),
+            QueryTextAttribute(crElem, "short-name")
+        );
         info.flags.all = static_cast<MonsterFlags>(creatureFlags);
         gMonsterDatabase[id] = info;
     }
@@ -314,6 +329,10 @@ void LoadCreatures() {
         memset(cArmyFrameFileNames, 0, sizeof(cArmyFrameFileNames));
         memset(gArmyNames, 0, sizeof(gArmyNames));
         memset(gArmyNamesPlural, 0, sizeof(gArmyNamesPlural));
+        memset(ownedMonFilenames, 0, sizeof(ownedMonFilenames));
+        memset(ownedArmyFrameFilenames, 0, sizeof(ownedArmyFrameFilenames));
+        memset(ownedArmyNames, 0, sizeof(ownedArmyNames));
+        memset(ownedArmyNamesPlural, 0, sizeof(ownedArmyNamesPlural));
         memset(cArmyProjectileFileNames, 0, sizeof(cArmyProjectileFileNames));
     }
 
@@ -342,12 +361,16 @@ void UnloadCreatures() {
     }
 
     for (i32 i = 0; i < KB_CREATURE_TABLE_CAPACITY; i++) {
-        std::free(cMonFilename[i]);
-        std::free(cArmyFrameFileNames[i]);
-        std::free(gArmyNames[i]);
-        std::free(gArmyNamesPlural[i]);
+        std::free(ownedMonFilenames[i]);
+        std::free(ownedArmyFrameFilenames[i]);
+        std::free(ownedArmyNames[i]);
+        std::free(ownedArmyNamesPlural[i]);
         std::free(cArmyProjectileFileNames[i]);
 
+        ownedMonFilenames[i] = NULL;
+        ownedArmyFrameFilenames[i] = NULL;
+        ownedArmyNames[i] = NULL;
+        ownedArmyNamesPlural[i] = NULL;
         cMonFilename[i] = NULL;
         cArmyFrameFileNames[i] = NULL;
         gArmyNames[i] = NULL;

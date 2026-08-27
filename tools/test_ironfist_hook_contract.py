@@ -29,10 +29,12 @@ def assert_order(test, body, *tokens):
 
 class IronfistHookContractTest(unittest.TestCase):
     def test_new_map_reset_and_post_body_default_order(self):
-        hook = function_body("src/IRONFIST/hooks.cpp", "void Ironfist_NewMap(char* filename)")
+        hook = function_body(
+            "src/IRONFIST/hooks.cpp", "void Ironfist_NewMap(const char* filename)"
+        )
         assert_order(self, hook, "Ironfist_ResetGameState();", "ScriptingInit(mapName);")
 
-        game = function_body("src/SOURCE/GAME.cpp", "void game::NewMap(char* filename)")
+        game = function_body("src/SOURCE/GAME.cpp", "void game::NewMap(const char* filename)")
         assert_order(
             self,
             game,

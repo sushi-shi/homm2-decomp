@@ -251,7 +251,8 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
         gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 0, 1);
         gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT);
         glTimers[0] = static_cast<i32>(
-            platform::Ticks() + COMBAT_ARC_FRAME_DURATION * gfCombatSpeedMod[gConfig.combatSpeed]
+            platform::Ticks()
+            + H2EnumIndex(COMBAT_ARC_FRAME_DURATION) * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         DelayTil(glTimers);
     }

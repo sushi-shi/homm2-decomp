@@ -568,13 +568,13 @@ i32 GetDwellingType(i32 faction, i32 dwellingIndex) {
     return ironfistDwellingType[faction][dwellingIndex];
 }
 
-char* GetDwellingName(i32 faction, i32 dwellingIndex) {
+const char* GetDwellingName(i32 faction, i32 dwellingIndex) {
     if (faction >= 0 && faction < IRONFIST_FACTION_TABLE_COUNT
         && dwellingIndex >= 0 && dwellingIndex < IRONFIST_NUM_DWELLINGS
         && gDwellingNames[faction][dwellingIndex] != NULL) {
         return gDwellingNames[faction][dwellingIndex];
     }
-    return const_cast<char*>("INVALID DWELLING");
+    return "INVALID DWELLING";
 }
 
 char* GetFirstLevelGrowerName(i32 faction) {

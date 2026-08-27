@@ -1077,7 +1077,7 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, ext);
 }
 
-i32 game::SaveGame(char* filename, i32 generateName, i8) {
+i32 game::SaveGame(const char* filename, i32 generateName, i8) {
     return Ironfist_SaveGame(filename, generateName);
 }
 
@@ -5821,11 +5821,11 @@ void game::ProcessOnMapHeroes(void) {
                 if (!mapExtraHero->hasCustomHero
                     || mapExtraHero->heroId >= H2EnumIndex(GAME_HERO_COUNT)
                     || heroExists[mapExtraHero->heroId]) {
-                    mapExtraHero->hasAssignedHero = 0;
+                    mapExtraHero->hasAssignedHero = false;
                 } else {
                     // handle default 54 heroes
                     heroExists[mapExtraHero->heroId] = true;
-                    mapExtraHero->hasAssignedHero = 1;
+                    mapExtraHero->hasAssignedHero = true;
                 }
 
                 FactionType faction;

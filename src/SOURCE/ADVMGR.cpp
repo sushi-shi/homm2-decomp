@@ -7474,20 +7474,12 @@ void advManager::CastSpell(SpellType spell) {
 
 i32 SaveGame(void) {
     i32 ok = 0;
-    i32 nPlayers = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer(
         "advmice.mse",
         SAVE_POINTER_FRAME,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    i32 i;
-    for (i = 0; i < SAVE_PLAYER_COUNT; ++i) {
-        if (!gpGame->m_playerDead[i] && gbHumanPlayer[i]) {
-            ++nPlayers;
-        }
-    }
-
     // The extension follows the campaign type, custom campaigns included.
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];

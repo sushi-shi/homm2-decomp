@@ -560,7 +560,7 @@ i32 game::SetupGame(void) {
                         xIsExpansionMap = 1;
                         i32 campaignId = LoadCampaignFromFile("cyborg.cmp");
                         if (campaignId == -1) {
-                            result = 0;
+                            result = false;
                             goto done;
                         }
                         xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));
@@ -591,12 +591,12 @@ i32 game::SetupGame(void) {
                         giDebugLevel = savedDebugLevel;
                         iWSLastMsgNumHumanPlayers = savedHumanCount;
                         if (requesterResult != FILE_REQUESTER_OK) {
-                            result = 0;
+                            result = false;
                             goto done;
                         }
                         i32 campaignId = LoadCampaignFromFile(gLastFilename);
                         if (campaignId == -1) {
-                            result = 0;
+                            result = false;
                             goto done;
                         }
                         xCampaign.InitNewCampaign(static_cast<ExpansionCampaignId>(campaignId));

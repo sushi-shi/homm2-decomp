@@ -19,7 +19,7 @@ enum class SpellType : i8;
  */
 void Ironfist_Startup(void);
 void Ironfist_ResetGameState(void);
-void Ironfist_NewMap(char* filename);
+void Ironfist_NewMap(const char* filename);
 void Ironfist_NewMapReady(void);
 void Ironfist_AdvManagerReady(void);
 void Ironfist_NewDay(void);

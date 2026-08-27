@@ -1297,7 +1297,9 @@ void combatManager::CastSpell(
             break;
         case SPELL_MARKSMAN_PIERCE: {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_PIERCE_DELAY)
+                static_cast<i32l>(
+                    gfCombatSpeedMod[gConfig.combatSpeed] * H2EnumIndex(SPELL_PIERCE_DELAY)
+                )
             );
             i32l pierceDamage = SPELL_PIERCE_DAMAGE;
             // The keep's walls blunt the round.
@@ -1969,9 +1971,9 @@ void combatManager::ImplosionGrenade(i32 hexIndex) {
             i32 startX = m_hexCells[initialHex].m_x;
             i32 startY = m_hexCells[initialHex].m_y;
             float stepX = static_cast<float>(m_hexCells[creature->m_hex].m_x - startX)
-                          / SPELL_IMPLOSION_DRAG_FRAMES;
+                          / H2EnumIndex(SPELL_IMPLOSION_DRAG_FRAMES);
             float stepY = static_cast<float>(m_hexCells[creature->m_hex].m_y - startY)
-                          / SPELL_IMPLOSION_DRAG_FRAMES;
+                          / H2EnumIndex(SPELL_IMPLOSION_DRAG_FRAMES);
             creature->DrawToBuffer(
                 static_cast<i32>(startX + stepX * frame),
                 static_cast<i32>(startY + stepY * frame),
@@ -4562,10 +4564,6 @@ void combatManager::ShowSpellMessage(
             sprintf(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
         else if (spell == SPELL_SHADOW_MARK)
             sprintf(message, localization::Tr("combat.ability.shadow_mark"), targetName);
-        else {
-            unhandledSpell5 = 0;
-            ++unhandledSpell5;
-        }
     } else {
         if (target != NULL) {
             if (m_heroes[H2EnumIndex(m_currentSide)]->m_isCaptain != 0)

@@ -46,7 +46,7 @@ void Ironfist_ResetGameState(void) {
     gIronfistExtra.adventure = adventureExtra();
 }
 
-void Ironfist_NewMap(char* filename) {
+void Ironfist_NewMap(const char* filename) {
     Ironfist_ResetGameState();
     std::string mapName(filename);
     ScriptingInit(mapName);

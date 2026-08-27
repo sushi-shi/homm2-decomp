@@ -1398,14 +1398,14 @@ void army::SpecialAttack(void) {
                                    [gpCombatManager->m_hexCells[splashHex].m_occupantIndex];
                 if (!gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index]
                     && pEnemy != splashTarget) {
-                    gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index] = 1;
+                    gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index] = true;
                     DamageEnemy(splashTarget, &damageDone, &killed, 1, 0);
                 }
             }
         }
         if (gpCombatManager->m_hexCells[pEnemy->m_hex].m_occupantSide != COMBAT_SIDE_NONE
             && !gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index]) {
-            gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index] = 1;
+            gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index] = true;
             DamageEnemy(pEnemy, &damageDone, &killed, 1, 0);
         }
         m_spellEffectYOffset = 0;
@@ -1691,8 +1691,9 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
     gChargePathDamage = false;
 
     if (totalDamage > 0) {
-        char* attackerName = m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(m_monsterType))
-                                            : GetCreatureName(H2EnumIndex(m_monsterType));
+        const char* attackerName =
+            m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(m_monsterType))
+                           : GetCreatureName(H2EnumIndex(m_monsterType));
         if (totalKilled > 0) {
             sprintf(
                 gText,
@@ -1739,7 +1740,6 @@ void army::DoAttack(i32 retaliation) {
     ArmyFacing desiredFacing;
     b32 effectStopsRetaliation_4;
     ArmyFacing originalFacing_6;
-    CombatSide occupantSide_5;
     char combatText[ARMY_COMBAT_TEXT_SIZE];
     i32 damage;
     i32 targetHex_3;
@@ -1835,7 +1835,7 @@ void army::DoAttack(i32 retaliation) {
             }
         }
         CheckLuck();
-        m_animationState = 1;
+        m_animationState = true;
         if (m_attackDirection == COMBAT_DIRECTION_WIDE_WEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHWEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHEAST) {
@@ -2230,7 +2230,7 @@ i32 army::AttackTo(void) {
 }
 
 i32 army::AttackTo(i32 destination) {
-    i32 finishStanding;
+    b32 finishStanding;
     i32 numSteps;
     i32 pathIndex_4;
 
@@ -2262,9 +2262,9 @@ i32 army::AttackTo(i32 destination) {
             for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
                 numSteps++;
                 if (pathIndex_4 == 1 || numSteps >= m_monster.speed) {
-                    finishStanding = 1;
+                    finishStanding = true;
                 } else {
-                    finishStanding = 0;
+                    finishStanding = false;
                 }
                 // The Berserker leaps the last stretch onto its victim.
                 if (H2EnumIndex(m_monsterType) == CREATURE_CYBER_PLASMA_BERSERKER_ID

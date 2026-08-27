@@ -2101,7 +2101,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
             NORMAL_DIALOG_NO_VALUE,
             NORMAL_DIALOG_SECONDARY_SKILL,
             H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
-                + CYBERNETICS_SKILL_ROW * HERO_SECONDARY_SKILL_ICON_STRIDE
+                + SecondarySkillIconRow(this, skill) * H2EnumIndex(HERO_SECONDARY_SKILL_ICON_STRIDE)
                 - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
             NORMAL_DIALOG_NO_RESOURCE,
             0,

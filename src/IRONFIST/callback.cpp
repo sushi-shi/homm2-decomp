@@ -29,7 +29,7 @@ void ironfist_lua_push(lua_State* ls, double arg) {
     lua_pushnumber(ls, arg);
 }
 
-void ironfist_lua_pushmulti(lua_State* ls) {
+void ironfist_lua_pushmulti(lua_State*) {
 }
 
 template <>

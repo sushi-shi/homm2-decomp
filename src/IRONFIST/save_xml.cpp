@@ -200,11 +200,11 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     WriteArray(tempDoc, pRoot, "playerNames", cPlayerNames);
     WriteArray(tempDoc, pRoot, "deadPlayers", gpGame->m_playerDead);
 
-    char playerAlive[H2EnumIndex(GAME_PLAYER_COUNT)];
+    bchar playerAlive[H2EnumIndex(GAME_PLAYER_COUNT)];
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); ++i) {
-        playerAlive[i] = static_cast<char>(gbHumanPlayer[i]);
+        playerAlive[i] = gbHumanPlayer[i];
         if (gpGame->m_playerDead[i])
-            playerAlive[i] = 0;
+            playerAlive[i] = false;
     }
 
     WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
@@ -1178,14 +1178,14 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); i++) {
         if (hasPlayer[i] && c < iWSLastMsgNumHumanPlayers) {
             c++;
-            gbHumanPlayer[i] = 1;
+            gbHumanPlayer[i] = true;
         } else {
-            gbHumanPlayer[i] = 0;
+            gbHumanPlayer[i] = false;
         }
         if (gbHumanPlayer[i])
             gbThisNetHumanPlayer[i] = !gbRemoteOn || i == giThisGamePos;
         else
-            gbThisNetHumanPlayer[i] = 0;
+            gbThisNetHumanPlayer[i] = false;
     }
     giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
     DeserializeGeneratedArtifacts(xmlArtifacts);
@@ -1221,7 +1221,7 @@ std::string GetSaveFileExtension(b32 isPickLoad) {
     }
 }
 
-i32 Ironfist_SaveGame(char* saveFile, i32 autosave) {
+i32 Ironfist_SaveGame(const char* saveFile, i32 autosave) {
     gpAdvManager->DemobilizeCurrHero();
     std::string filePath;
     std::string saveName = saveFile;
@@ -1250,7 +1250,7 @@ i32 Ironfist_SaveGame(char* saveFile, i32 autosave) {
     return 1;
 }
 
-b32 Ironfist_LoadGame(char* fileName, i32 loadFromFile) {
+b32 Ironfist_LoadGame(const char* fileName, i32 loadFromFile) {
     if (!loadFromFile) {
         // A fresh game start, not a load; the retail path handles it.
         Ironfist_ResetGameState();

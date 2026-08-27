@@ -96,7 +96,7 @@ b32 TownBuildingBuilt(const class town* t, i32 building);
 b32 TownDwellingBuilt(const class town* t, i32 index);
 i32 TownDwellingIndex(const class town* t, i32 tier);
 i32 GetDwellingType(i32 faction, i32 dwellingIndex);
-char* GetDwellingName(i32 faction, i32 dwellingIndex);
+const char* GetDwellingName(i32 faction, i32 dwellingIndex);
 char* GetFirstLevelGrowerName(i32 faction);
 char* GetSpecialBuildingName(i32 faction);
 char* GetSpecialBuildingDesc(i32 faction);

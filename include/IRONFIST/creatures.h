@@ -83,8 +83,8 @@ void UnloadCreatures();
 void GrantCreatureAttribute(i32 id, std::string name);
 i32 CreatureHasAttribute(i32 id, const std::string& name);
 extern std::vector<std::string> ironfistAttributeNames;
-char* GetCreatureName(i32 id);
-char* GetCreaturePluralName(i32 id);
+const char* GetCreatureName(i32 id);
+const char* GetCreaturePluralName(i32 id);
 i32 GetNumCreatures();
 void Ironfist_GetMonsterCost(i32 monster, i32* const costs);
 

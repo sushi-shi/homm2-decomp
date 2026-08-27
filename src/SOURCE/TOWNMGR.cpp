@@ -2286,7 +2286,7 @@ i32 townManager::BuyBuild(
         BUILDING_DESCRIPTION_CAPACITY,
         GetBuildingInfo(m_town->m_type, building, 0)
     );
-    i32 disallowed_p = Ironfist_BuildingDisallowed(m_town, H2EnumIndex(building));
+    b32 disallowed_p = Ironfist_BuildingDisallowed(m_town, H2EnumIndex(building));
     if (disallowed_p) {
         strcat(description_b, localization::Tr("town.build.disallowed"));
         cannotBuy = 1;
@@ -2783,14 +2783,6 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     hero* ironfistRecruit =
         &gpGame->m_heroRecs[gpCurPlayer->m_availableHeroIds[availableHeroIndex]];
     i32 ironfistOldMobility = ironfistRecruit->m_remainingMobility;
-    i16 unusedTextState_j = 1;
-    i16 unusedPortraitState_i = 2;
-    i16 unusedTextControl_g = 3;
-    i16 unusedIconState_e = 4;
-    i16 unusedDimState_d = 6;
-    i16 unusedPortraitControl_i = 7;
-    i16 unusedButtonText_h = 8;
-    i16 unusedButtonIcon_e = 9;
     tag_message message_e;
     i32 artifactCount_h;
     i32 index_j;
