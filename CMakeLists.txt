@@ -242,8 +242,7 @@ target_compile_options(homm2 PRIVATE
   -Werror=format-security
   -Werror=uninitialized
   -Werror=enum-conversion
-  -Werror=narrowing
-  -fpermissive)
+  -Werror=narrowing)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(homm2 PRIVATE
