@@ -49,7 +49,7 @@ enum class ExpansionCampaignMap : i32 {
     EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP = 4
 };
 using enum ExpansionCampaignMap;
-ENABLE_ENUM_STEPS(ExpansionCampaignMap)
+ENABLE_ENUM_INDEX_OFFSETS(ExpansionCampaignMap)
 
 enum class ExpansionCampaignAward : i32 {
     AWARD_ELVEN_ALLIANCE      = 0,
