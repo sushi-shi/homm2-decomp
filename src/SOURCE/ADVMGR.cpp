@@ -1010,7 +1010,7 @@ i32 giLimitUpdMaxX = 0;
 i32 giLimitUpdMaxY = 0;
 b32 bPrefsChanged = false;
 i32 giTownPortalChoice = 0;
-i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
+i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {};
 static b32 s_drawCovered = false;
 i32 giLimitUpdMinY = 0;
 static mineRecord* s_drawMine = NULL;
@@ -2041,22 +2041,25 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         break;
                     case INPUT_SCAN_N:
                         c = 'e';
-                        strcpy(
+                        utf8::Copy(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.confirm.restart")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         c = 'f';
-                        strcpy(
+                        utf8::Copy(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.confirm.load_new_game")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         c = 'i';
-                        strcpy(
+                        utf8::Copy(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("adventure.confirm.quit")
                         );
                         goto confirm_game_command;
@@ -5314,6 +5317,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 }
                             }
                             break;
+                        default:
+                            break;
                     }
                     if (expansionSite == H2EnumIndex(GENERIC_SITE_UNKNOWN)) {
                         utf8::Copy(
@@ -5324,12 +5329,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, xGenericSiteNames[expansionSite]);
                     }
                     if (pHero != NULL && visitedMaskValue != HERO_EVENT_NONE) {
-                        strcat(
+                        utf8::Append(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             "\n\n"
                         );
-                        strcat(
+                        utf8::Append(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             (H2EnumIndex((pHero->m_eventFlags) & (visitedMaskValue)))
                                 ? localization::Tr("adventure.quick.already_visited")
                                 : localization::Tr("adventure.quick.not_visited")
@@ -5363,6 +5370,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                     expansionSite = H2EnumIndex(RECRUITMENT_SITE_WATER_ALTAR);
                                 }
                             }
+                            break;
+                        default:
                             break;
                     }
                     if (expansionSite == H2EnumIndex(RECRUITMENT_SITE_UNKNOWN)) {
@@ -5652,6 +5661,8 @@ void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen
                 break;
             case BOTTOM_VIEW_RESOURCE:
                 updated = UpdBottomViewResMsg();
+                break;
+            default:
                 break;
         }
     } else if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack
@@ -8226,6 +8237,8 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                     return ADVMGR_SOUND_DAEMON_CAVE;
                 }
                 break;
+            default:
+                break;
         }
     } else {
         switch (cell->m_triggerType) {
@@ -8260,6 +8273,8 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                     || cell->m_objectIndex == SOUND_SEAGULL_FRAME_LAST) {
                     return ADVMGR_SOUND_SEAGULLS;
                 }
+                break;
+            default:
                 break;
         }
     }
@@ -9144,6 +9159,8 @@ void advManager::ScreenScroll(MapDirection direction, i32 updatePointer) {
         case MAP_DIRECTION_NORTH_WEST:
             --xOrigin;
             --yOrigin;
+            break;
+        default:
             break;
     }
 
@@ -10124,21 +10141,21 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                 case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
                         case CONTROL_RESTART:
-                            strcpy(
+                            utf8::Copy(
                                 question,
                                 localization::Tr("adventure.confirm.restart")
 
                             );
                             goto confirm_reset;
                         case CONTROL_NEW_GAME:
-                            strcpy(
+                            utf8::Copy(
                                 question,
                                 localization::Tr("adventure.confirm.load_new_game")
 
                             );
                             goto confirm_reset;
                         case CONTROL_MAIN_MENU:
-                            strcpy(
+                            utf8::Copy(
                                 question,
                                 localization::Tr("adventure.confirm.quit")
 
@@ -10382,6 +10399,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                     case SYSTEM_OPTION_COLOR_CURSOR:
                         helpIndex = SYSTEM_OPTIONS_HELP_COLOR_CURSOR;
                         break;
+                    default:
+                        break;
                 }
 
                 if (helpIndex >= 0) {
@@ -10407,6 +10426,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                     ) {
                         case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                             accepted = true;
+                            break;
+                        default:
                             break;
                     }
                     break;
@@ -10550,6 +10571,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             );
                             break;
                         case SYSTEM_OPTION_COUNT:
+                            break;
+                        default:
                             break;
                     }
                     break;

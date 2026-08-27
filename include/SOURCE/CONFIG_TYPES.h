@@ -41,6 +41,14 @@ ENABLE_ENUM_STEPS(ConfigWalkSpeed)
 enum class ConfigVolumeLevel : i32 {
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
+    CONFIG_VOLUME_2           = 2,
+    CONFIG_VOLUME_3           = 3,
+    CONFIG_VOLUME_4           = 4,
+    CONFIG_VOLUME_5           = 5,
+    CONFIG_VOLUME_6           = 6,
+    CONFIG_VOLUME_7           = 7,
+    CONFIG_VOLUME_8           = 8,
+    CONFIG_VOLUME_9           = 9,
     CONFIG_VOLUME_MAX         = 10,
     CONFIG_VOLUME_LEVEL_COUNT = CONFIG_VOLUME_MAX + 1
 };
@@ -64,6 +72,10 @@ typedef enum ConfigStorageConstant {
     CONFIG_UNIQUE_SYSTEM_ID_SIZE     = 4,
     CONFIG_NETWORK_DEFAULT_NAME_SIZE = 0x18
 } ConfigStorageConstant;
+
+// Portable builds can draw the original color cursor without the hardware
+// constraints which made the monochrome system cursor the retail default.
+inline constexpr b32 CONFIG_DEFAULT_COLOR_MOUSE_CURSOR = true;
 
 enum class ConfigConnectionType : i32 {
     CONFIG_CONNECTION_MODEM  = 0,

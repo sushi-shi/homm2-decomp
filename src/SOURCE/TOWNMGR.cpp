@@ -93,9 +93,15 @@ namespace {
         TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6 = H2EnumIndex(TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6),
         TOWN_WIDGET_GARRISON_CREST = TOWN_GARRISON_FIRST_CONTROL,
         TOWN_WIDGET_GARRISON_FIRST = TOWN_GARRISON_SLOT_FIRST,
+        TOWN_WIDGET_GARRISON_SECOND = TOWN_WIDGET_GARRISON_FIRST + 1,
+        TOWN_WIDGET_GARRISON_THIRD = TOWN_WIDGET_GARRISON_FIRST + 2,
+        TOWN_WIDGET_GARRISON_FOURTH = TOWN_WIDGET_GARRISON_FIRST + 3,
         TOWN_WIDGET_GARRISON_LAST = TOWN_GARRISON_SLOT_LAST,
         TOWN_WIDGET_HERO_CONTROL = TOWN_HERO_FIRST_CONTROL,
         TOWN_WIDGET_HERO_FIRST = TOWN_HERO_SLOT_FIRST,
+        TOWN_WIDGET_HERO_SECOND = TOWN_WIDGET_HERO_FIRST + 1,
+        TOWN_WIDGET_HERO_THIRD = TOWN_WIDGET_HERO_FIRST + 2,
+        TOWN_WIDGET_HERO_FOURTH = TOWN_WIDGET_HERO_FIRST + 3,
         TOWN_WIDGET_HERO_LAST = TOWN_HERO_SLOT_LAST,
         TOWN_WIDGET_EMPTY_FIRST = TOWN_EMPTY_STATUS_CONTROL_FIRST,
         TOWN_WIDGET_EMPTY_LAST = TOWN_EMPTY_STATUS_CONTROL_LAST,
@@ -292,28 +298,6 @@ using enum TownPortraitIcon;
         THIEVES_CREATURE_WIDTH = 40,
         THIEVES_CREATURE_HEIGHT = 34
     } ThievesGuildConstant;
-
-    typedef enum Cp1251Letter {
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO   = 0xb8,
-        CP1251_SMALL_A    = 0xe0,
-        CP1251_SMALL_YA   = 0xff,
-        CP1251_CASE_STEP  = 0x20
-    } Cp1251Letter;
-
-    inline char ToUpperCp1251(u8 letter) {
-        char capital;
-
-        if (letter >= 'a' && letter <= 'z')
-            capital = letter - CP1251_CASE_STEP;
-        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
-            capital = letter - CP1251_CASE_STEP;
-        else if (letter == CP1251_SMALL_YO)
-            capital = CP1251_CAPITAL_YO;
-        else
-            capital = letter;
-        return capital;
-    }
 
 }
 
@@ -876,7 +860,7 @@ void townManager::SetupTown(void) {
     message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    strcpy(gText, localization::Tr("town.screen.title"));
+    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("town.screen.title"));
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
@@ -1171,9 +1155,9 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             );
             break;
         case TOWN_WIDGET_GARRISON_FIRST:
-        case TOWN_WIDGET_GARRISON_FIRST + 1:
-        case TOWN_WIDGET_GARRISON_FIRST + 2:
-        case TOWN_WIDGET_GARRISON_FIRST + 3:
+        case TOWN_WIDGET_GARRISON_SECOND:
+        case TOWN_WIDGET_GARRISON_THIRD:
+        case TOWN_WIDGET_GARRISON_FOURTH:
         case TOWN_WIDGET_GARRISON_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_garrisonStrip;
@@ -1200,9 +1184,9 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             m_command = ARMY_COMMAND_VIEW_HERO;
             break;
         case TOWN_WIDGET_HERO_FIRST:
-        case TOWN_WIDGET_HERO_FIRST + 1:
-        case TOWN_WIDGET_HERO_FIRST + 2:
-        case TOWN_WIDGET_HERO_FIRST + 3:
+        case TOWN_WIDGET_HERO_SECOND:
+        case TOWN_WIDGET_HERO_THIRD:
+        case TOWN_WIDGET_HERO_FOURTH:
         case TOWN_WIDGET_HERO_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_heroStrip;
@@ -1961,6 +1945,9 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
     i32 oldValue;
 
     switch (command) {
+        case ARMY_COMMAND_NONE:
+            break;
+
         case ARMY_COMMAND_SELECT:
             m_swapStrip = m_selectedStrip;
             m_swapArmySlot = m_selectedArmySlot;
@@ -2304,7 +2291,11 @@ i32 townManager::BuyBuild(
     );
     b32 disallowed_p = m_town->IsBuildingDisallowed(H2EnumIndex(building));
     if (disallowed_p) {
-        strcat(description_b, localization::Tr("town.build.disallowed"));
+        utf8::Append(
+            description_b,
+            BUILDING_DESCRIPTION_CAPACITY,
+            localization::Tr("town.build.disallowed")
+        );
         cannotBuy = 1;
     } else if (dwelling_k >= 0) {
         prerequisiteCount_p = 0;
@@ -2312,18 +2303,30 @@ i32 townManager::BuyBuild(
         for (index_h = 0; index_h < TOWN_BUILDING_COUNT; ++index_h) {
             if (prerequisiteMask_c & (1L << index_h)) {
                 if (prerequisiteCount_p == 0)
-                    strcat(description_b, localization::Tr("town.build.requires")  );
+                    utf8::Append(
+                        description_b,
+                        BUILDING_DESCRIPTION_CAPACITY,
+                        localization::Tr("town.build.requires")
+                    );
                 ++prerequisiteCount_p;
-                strcat(description_b, "\n");
-                strcat(description_b, GetBuildingName(m_town->m_type, BuildingSlotType(index_h)));
+                utf8::Append(description_b, BUILDING_DESCRIPTION_CAPACITY, "\n");
+                utf8::Append(
+                    description_b,
+                    BUILDING_DESCRIPTION_CAPACITY,
+                    GetBuildingName(m_town->m_type, BuildingSlotType(index_h))
+                );
             }
         }
         if (m_town->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE
             && m_town->m_buildState <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
-            strcat(description_b, localization::Tr("town.build.requires_mage_guild_level_2")  );
+            utf8::Append(
+                description_b,
+                BUILDING_DESCRIPTION_CAPACITY,
+                localization::Tr("town.build.requires_mage_guild_level_2")
+            );
     }
-    strcat(description_b, "\n ");
+    utf8::Append(description_b, BUILDING_DESCRIPTION_CAPACITY, "\n ");
 
     lineCount_j = bigFont->LineLength(description_b, BUILD_DESCRIPTION_WIDTH);
     windowY_m = BUILD_WINDOW_BASE_Y;
@@ -2646,14 +2649,30 @@ void townManager::SetupMage(heroWindow* window) {
         ? NULL
         : gpGame->GetHero(m_town->m_occupyingHeroId);
     if (occupyingHero == NULL || !occupyingHero->HasArtifact(ARTIFACT_MAGIC_BOOK))
-        strcpy(gText, localization::Tr("town.mage_guild.spells_available"));
+        utf8::Copy(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            localization::Tr("town.mage_guild.spells_available")
+        );
     else if (m_town->m_type == FACTION_CYBORG
              && occupyingHero->m_cursorType != FACTION_CYBORG)
-        strcpy(gText, localization::Tr("town.cybernetics.requires_cyborg"));
+        utf8::Copy(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            localization::Tr("town.cybernetics.requires_cyborg")
+        );
     else if (occupyingHero->m_cursorType == FACTION_CYBORG)
-        strcpy(gText, localization::Tr("town.cybernetics.level_limit"));
+        utf8::Copy(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            localization::Tr("town.cybernetics.level_limit")
+        );
     else
-        strcpy(gText, localization::Tr("town.mage_guild.spells_added"));
+        utf8::Copy(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            localization::Tr("town.mage_guild.spells_added")
+        );
     message_i.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message_i.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
     message_i.payload.widget.data.text = gText;

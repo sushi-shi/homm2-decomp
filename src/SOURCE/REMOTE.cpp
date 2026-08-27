@@ -224,6 +224,8 @@ void RemoteMain(RemoteGameMode gameMode) {
             giThisNetPos = 1;
             ModemSetup(H2EnumIndex(gameMode));
             break;
+        default:
+            break;
     }
     if (bUseDirectPlay == 0 && bUseWinsock == 0)
         giNumHumanPlayers = DIRECT_LINK_PLAYER_COUNT;
@@ -251,6 +253,8 @@ void RemoteMain(RemoteGameMode gameMode) {
                             gotPlayers[netPlayer] = 1;
                             if (gsNetPlayerInfo[netPlayer].reserved[0] == 0)
                                 xNetHasOldPlayers = true;
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -451,6 +455,8 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
             WriteModemPacket(PacketSend, size);
             out = true;
             break;
+        default:
+            break;
     }
     return out;
 }
@@ -486,6 +492,8 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
             if (receiveResult == 0)
                 return 0;
             result = DecodePacket(data, decodeType);
+            break;
+        default:
             break;
     }
     return result;

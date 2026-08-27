@@ -1,4 +1,5 @@
 #include <SOURCE/ResourceProfile.h>
+#include <PLATFORM/Binary.h>
 
 #include <algorithm>
 #include <array>
@@ -19,18 +20,6 @@ struct AggEntry {
     std::uint32_t offset;
     std::uint32_t size;
 };
-
-std::uint16_t ReadWord(const unsigned char* bytes) {
-    return static_cast<std::uint16_t>(bytes[0])
-        | static_cast<std::uint16_t>(bytes[1] << 8);
-}
-
-std::uint32_t ReadDword(const unsigned char* bytes) {
-    return static_cast<std::uint32_t>(bytes[0])
-        | (static_cast<std::uint32_t>(bytes[1]) << 8)
-        | (static_cast<std::uint32_t>(bytes[2]) << 16)
-        | (static_cast<std::uint32_t>(bytes[3]) << 24);
-}
 
 std::string UpperName(const std::array<char, kAggNameBytes>& raw) {
     std::string name;
@@ -106,7 +95,11 @@ bool DetectAggResourceProfile(
         error = "truncated archive header";
         return false;
     }
-    const std::uint16_t count = ReadWord(countBytes);
+    u16 count;
+    if (!platform::binary::ReadU16(countBytes, sizeof(countBytes), 0, count)) {
+        error = "invalid archive header";
+        return false;
+    }
     const std::uint64_t directoryEnd = 2ULL + count * kAggEntryBytes;
     const std::uint64_t namesBytes = static_cast<std::uint64_t>(count) * kAggNameBytes;
     if (count == 0 || directoryEnd > length || namesBytes > length - directoryEnd) {
@@ -123,8 +116,13 @@ bool DetectAggResourceProfile(
             error = "truncated archive directory";
             return false;
         }
-        const std::uint32_t offset = ReadDword(raw + 4);
-        const std::uint32_t size = ReadDword(raw + 8);
+        u32 offset;
+        u32 size;
+        if (!platform::binary::ReadU32(raw, sizeof(raw), 4, offset)
+            || !platform::binary::ReadU32(raw, sizeof(raw), 8, size)) {
+            error = "invalid archive directory";
+            return false;
+        }
         if (offset < directoryEnd || offset > namesOffset || size > namesOffset - offset) {
             error = "archive entry lies outside the payload area";
             return false;
@@ -155,7 +153,12 @@ bool DetectAggResourceProfile(
         error = "truncated FONT.ICN entry";
         return false;
     }
-    profile = ReadWord(frameBytes) >= kBukaFontFrameCount
+    u16 frameCount;
+    if (!platform::binary::ReadU16(frameBytes, sizeof(frameBytes), 0, frameCount)) {
+        error = "invalid FONT.ICN entry";
+        return false;
+    }
+    profile = frameCount >= kBukaFontFrameCount
         ? ResourceProfile::BukaCyrillic
         : ResourceProfile::Western;
     error.clear();

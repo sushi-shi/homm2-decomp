@@ -607,37 +607,39 @@ void game::CampaignInfoUpdate(i32 redraw) {
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->artifact) {
                     case ARTIFACT_MINOR_SCROLL:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.minor_scroll"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.minor_scroll"));
                         break;
                     case ARTIFACT_MAGE_RING:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.mage_ring"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.mage_ring"));
                         break;
                     case ARTIFACT_DEFENDER_HELM:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.defender_helm"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.defender_helm"));
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.power_axe"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.power_axe"));
                         break;
                     case ARTIFACT_DRAGON_SWORD:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.dragon_sword"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.dragon_sword"));
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.breastplate"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.breastplate"));
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
-                        strcpy(
+                        utf8::Copy(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("campaign.bonus.artifact.fizbin_medal")
                         );
                         break;
                     case ARTIFACT_THUNDER_MACE:
-                        strcpy(
+                        utf8::Copy(
                             gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("campaign.bonus.artifact.thunder_mace")
                         );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, localization::Tr("campaign.bonus.artifact.gauntlets"));
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.artifact.gauntlets"));
                         break;
                     default:
                         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
@@ -691,6 +693,8 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(choice->faction)]);
+                break;
+            default:
                 break;
         }
         message.payload.widget.id = mapIndex + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
@@ -1020,6 +1024,8 @@ void game::InitCampaignMap(void) {
         }
         case CAMPAIGN_CHOICE_NONE:
             break;
+        default:
+            break;
     }
 
     if ((m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)]
@@ -1078,6 +1084,8 @@ void game::InitCampaignMap(void) {
                 armyHero->m_army
                     .Add(CREATURE_VAMPIRE_LORD, NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
+            default:
+                break;
         }
         gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
         gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
@@ -1118,9 +1126,10 @@ void game::InitCampaignMap(void) {
 
 i16 trackXY[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
-    39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
-    557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
-    335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
+    {{39, 336}, {113, 336}, {150, 294}, {187, 336}, {261, 336}, {335, 336}, {409, 378},
+     {409, 294}, {483, 336}, {557, 336}, {-1, -1}, {261, 378}, {-1, -1}},
+    {{39, 336}, {113, 336}, {187, 294}, {187, 378}, {261, 336}, {335, 336}, {372, 294},
+     {409, 336}, {483, 294}, {483, 378}, {557, 336}, {261, 294}, {261, 378}}
 };
 class heroWindow* campWin = NULL;
 H2EnumStorage<CampaignSide, i32> iCurViewSide;

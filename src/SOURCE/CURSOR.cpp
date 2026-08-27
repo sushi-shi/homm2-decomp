@@ -844,6 +844,9 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_ARENA:
             case MAP_OBJECT_BARROW_MOUNDS:
                 eventCell_i = NULL;
+                break;
+            default:
+                break;
         }
         goto movementDone;
     }
@@ -1215,6 +1218,8 @@ void advManager::ProcessMapChange(SMapChange change) {
                     case MAP_OBJECT_COAST:
                     case MAP_OBJECT_BOAT:
                         DoAIEvent(eventCell_a, mapHero_b, eventX_f, eventY);
+                        break;
+                    default:
                         break;
                 }
             }

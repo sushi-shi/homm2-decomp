@@ -840,9 +840,11 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 }
 
 i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-            [H2EnumIndex(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
-                                              4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
-                                              7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
+            [H2EnumIndex(COORDINATE_AXIS_COUNT)] = {
+                {{3, 3}, {5, 5}, {6, 6}, {8, 5}, {2, 3}, {2, 2}},
+                {{4, 5}, {6, 6}, {8, 8}, {11, 7}, {3, 4}, {3, 3}},
+                {{7, 7}, {8, 8}, {10, 10}, {14, 8}, {3, 6}, {4, 4}}
+            };
 ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
 i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
 b32 gbInViewWorld = false;

@@ -155,8 +155,6 @@ MessageDispatchResult ViewSpellsHandler(struct tag_message&);
 MessageDispatchResult ViewSpecialHandler(struct tag_message&);
 MessageDispatchResult ViewArmyHandler(struct tag_message&);
 i32 CalcBaseScore(i32);
-void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
-i32 GetSkipCopyLen(u8* buf, i32* pos);
 void CreateDiffFile(char*, char*, char*, i32, i32);
 void CreateJoinFile(char*, char*, char*);
 EventExtra* GetMapEvent(i32 x, i32 y);

@@ -555,12 +555,20 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         objIndex = H2EnumIndex(INFO_ADD_MAGE_GUILD_LEVEL);
                     if (gpTownManager->m_town->m_type == FACTION_CYBORG
                         && objIndex == H2EnumIndex(INFO_BUILD_MAGE_GUILD))
-                        strcpy(gText, localization::Tr("castle.cybernetics_lab.build"));
+                        utf8::Copy(
+                            gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
+                            localization::Tr("castle.cybernetics_lab.build")
+                        );
                     else if (gpTownManager->m_town->m_type == FACTION_CYBORG
                              && objIndex == H2EnumIndex(INFO_ADD_MAGE_GUILD_LEVEL))
-                        strcpy(gText, localization::Tr("castle.cybernetics_lab.add_level"));
+                        utf8::Copy(
+                            gText,
+                            GLOBAL_TEXT_BUFFER_SIZE,
+                            localization::Tr("castle.cybernetics_lab.add_level")
+                        );
                     else
-                        strcpy(gText, cCastleInfo[objIndex]);
+                        utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cCastleInfo[objIndex]);
                 }
                 break;
 

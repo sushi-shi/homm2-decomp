@@ -2134,9 +2134,11 @@ void game::GetLossConditionText(char* text) {
                     day26
                 );
                 break;
+            default:
+                break;
         }
     } else {
-        strcpy(text, localization::Tr("scenario.loss.standard"));
+        utf8::Copy(text, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("scenario.loss.standard"));
     }
 }
 
@@ -2223,6 +2225,9 @@ void game::GetVictoryConditionText(char* text) {
                         secondSideValue,
                         firstSide
                     );
+                break;
+            default:
+                break;
         }
 
         if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE
@@ -2236,10 +2241,10 @@ void game::GetVictoryConditionText(char* text) {
                 primaryCondition
             );
         } else {
-            strcat(text, ".");
+            utf8::Append(text, GLOBAL_TEXT_BUFFER_SIZE, ".");
         }
     } else {
-        strcpy(text, localization::Tr("scenario.victory.standard"));
+        utf8::Copy(text, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("scenario.victory.standard"));
     }
 }
 

@@ -249,6 +249,8 @@ void executive::MainLoop(void) {
                             }
                         }
                         break;
+                    default:
+                        break;
                 }
             }
             if (m_activeManager != NULL)

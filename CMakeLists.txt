@@ -239,6 +239,7 @@ endif()
 
 target_compile_options(homm2 PRIVATE
   -Wall
+  -Werror
   -Werror=cast-align
   -Werror=implicit-fallthrough
   -Werror=non-virtual-dtor
@@ -261,6 +262,7 @@ target_compile_options(homm2 PRIVATE
   -Werror=format-security
   -Werror=uninitialized
   -Werror=enum-conversion
+  -Werror=switch
   -Werror=narrowing)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -309,6 +311,23 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME enum_code COMMAND homm2_enum_code_test)
+  add_executable(homm2_combat_cursor_test tools/combat_cursor_test.cpp)
+  target_include_directories(homm2_combat_cursor_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR})
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(homm2_combat_cursor_test PRIVATE
+      -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
+  endif()
+  add_test(NAME combat_cursor COMMAND homm2_combat_cursor_test)
+  add_executable(homm2_binary_io_test tools/binary_io_test.cpp)
+  target_include_directories(homm2_binary_io_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(homm2_binary_io_test PRIVATE
+      -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
+  endif()
+  add_test(NAME binary_io COMMAND homm2_binary_io_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE
@@ -373,6 +392,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_platform_atexit_test PRIVATE homm2_platform)
   add_test(NAME platform_atexit COMMAND homm2_platform_atexit_test)
+  add_executable(homm2_crash_handler_test tools/crash_handler_test.cpp)
+  target_include_directories(homm2_crash_handler_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_crash_handler_test PRIVATE homm2_platform)
+  add_test(NAME crash_handler COMMAND homm2_crash_handler_test)
   add_executable(homm2_palette_bank_test tools/palette_bank_test.cpp)
   target_include_directories(homm2_palette_bank_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

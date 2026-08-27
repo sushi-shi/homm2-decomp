@@ -25,7 +25,18 @@ std::size_t Encode(std::uint32_t codePoint, char output[4]);
 std::size_t Next(const char* text, std::size_t offset);
 std::size_t Previous(const char* text, std::size_t offset);
 std::size_t Copy(char* destination, std::size_t capacity, const char* source);
+std::size_t Append(char* destination, std::size_t capacity, const char* source);
 bool IsValid(const char* text);
+
+template <std::size_t Capacity>
+std::size_t Copy(char (&destination)[Capacity], const char* source) {
+    return Copy(destination, Capacity, source);
+}
+
+template <std::size_t Capacity>
+std::size_t Append(char (&destination)[Capacity], const char* source) {
+    return Append(destination, Capacity, source);
+}
 
 namespace detail {
 

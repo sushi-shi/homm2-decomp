@@ -201,5 +201,7 @@ void iconWidget::Draw(void) {
         case WIDGET_KIND_ICON_FILL:
             m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_orientation, NULL);
             return;
+        default:
+            break;
     }
 }

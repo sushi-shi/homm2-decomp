@@ -1427,7 +1427,11 @@ void army::SpecialAttack(void) {
 
     if (killed > 0) {
         if (damageDone == -1) {
-            strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
+            utf8::Copy(
+                gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
+                localization::Tr("combat.mirror_image.destroyed")
+            );
         } else {
             FormatCombatDamage(
                 gText,
@@ -1460,6 +1464,8 @@ void army::SpecialAttack(void) {
                 && pEnemy->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
                 pEnemy->m_spellEffect = CREATURE_SPELL_DISPEL;
             }
+            break;
+        default:
             break;
     }
     PowEffect(powVal, 0, effectX, effectY);
@@ -1552,8 +1558,9 @@ void army::DoHydraAttack(i32) {
                             pTarget->m_hitByCreature = true;
                             DamageEnemy(pTarget, &damage, &killedNow, 0, 0);
                             if (damage < 0) {
-                                strcpy(
+                                utf8::Copy(
                                     gText,
+                                    GLOBAL_TEXT_BUFFER_SIZE,
                                     localization::Tr(
                                         damage == -2 ? "combat.astral_dodge"
                                                      : "combat.mirror_image.destroyed"
@@ -1866,9 +1873,17 @@ void army::DoAttack(i32 retaliation) {
             gCharging = false;
         }
         if (damage == -1) {
-            strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
+            utf8::Copy(
+                gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
+                localization::Tr("combat.mirror_image.destroyed")
+            );
         } else if (damage == -2) {
-            strcpy(gText, localization::Tr("combat.astral_dodge"));
+            utf8::Copy(
+                gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
+                localization::Tr("combat.astral_dodge")
+            );
         } else if (gbGenieHalf) {
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -1961,6 +1976,8 @@ void army::DoAttack(i32 retaliation) {
             case CREATURE_VAMPIRE_LORD:
                 gpCombatManager->m_killBenefit[H2EnumIndex(gpCombatManager->m_hexCells[m_hex].m_occupantSide)] =
                     target_1->m_monster.hitPoints * killed_13;
+                break;
+            default:
                 break;
         }
         // Shadow-marking creatures brand their victim on every hit.
@@ -3237,6 +3254,8 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
             ironfist::state::Get().combat.stack.forceShieldHP[this] = 0;
             break;
+        default:
+            break;
     }
 }
 
@@ -3312,6 +3331,8 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
             ironfist::state::Get().combat.stack.forceShieldHP[this] =
                 gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints;
+            break;
+        default:
             break;
     }
     m_spellCount++;

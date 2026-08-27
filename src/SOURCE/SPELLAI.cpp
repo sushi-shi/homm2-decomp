@@ -1059,6 +1059,8 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                                    : SPELL_AI_MAX_DURATION]
                                 );
                                 break;
+                            default:
+                                break;
                         }
                     }
                 }
@@ -1312,6 +1314,8 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_PARALYZE:
             case SPELL_HYPNOTIZE:
                 break;
+            default:
+                break;
         }
 
         if (!doneWork) {
@@ -1376,6 +1380,8 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                                 );
                             if (monsterTotal == CREATURE_FIRE_ELEMENTAL)
                                 spellDamageWork <<= 1;
+                            break;
+                        default:
                             break;
                     }
 

@@ -48,6 +48,14 @@ int main() {
         return 1;
     }
 
+    char appended[7] = "A";
+    if (utf8::Append(appended, "\xd0\xaf\xd0\x91\xd0\x92\xd0\x93") != 5
+        || std::strcmp(appended, "A\xd0\xaf\xd0\x91") != 0
+        || !utf8::IsValid(appended)) {
+        std::fputs("UTF-8 bounded append mismatch\n", stderr);
+        return 1;
+    }
+
     char formatted[16];
     if (!utf8::Format(formatted, "%s %d", "turn", 7)
         || std::strcmp(formatted, "turn 7") != 0) {

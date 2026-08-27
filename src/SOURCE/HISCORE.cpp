@@ -215,8 +215,9 @@ void highScoreManager::Update(void) {
         if (highScore.score != HIGH_SCORE_EMPTY)
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, highScore.playerName);
         if (highScore.cheated)
-            strcat(
+            utf8::Append(
                 gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("high_score.cheater_suffix")
             );
         m_window->BroadcastMessage(hsMessage);

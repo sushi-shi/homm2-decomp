@@ -754,6 +754,8 @@ void philAI::CheckBuyStuff(void) {
                 case PURCHASE_CREATURE:
                     BuildCreature(bestBuy.pTown, bestBuy.what, bestBuy.num);
                     break;
+                default:
+                    break;
             }
 
         } else
@@ -2608,6 +2610,8 @@ void philAI::ValueOfBuyingBuilding(
                     break;
                 }
             }
+            break;
+        default:
             break;
     }
 
@@ -4852,6 +4856,8 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
                 if (gpCurPlayer->m_resources[index] < cost[index] * bhc.num)
                     return 0;
             return 1;
+        default:
+            break;
     }
     return 0;
 }
@@ -5032,6 +5038,8 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
                     break;
             }
             break;
+        default:
+            break;
     }
 
     ChooseEvaluateBattle(
@@ -5101,6 +5109,8 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
                         gpAdvManager->GiveResource(h, RES_GOLD, FIGHT_EVENT_REWARD_5000);
                         break;
                 }
+                break;
+            default:
                 break;
         }
         cell->m_objectMetadata = FIGHT_EVENT_EMPTY;
@@ -5276,6 +5286,8 @@ i32 philAI::ComputeValueOfSS(
                 || h->Stats(HERO_PRIMARY_KNOWLEDGE) < SECONDARY_SKILL_MINIMUM_KNOWLEDGE) {
                 score = static_cast<i32>(score * AI_SECONDARY_SKILL_BASE_FACTOR);
             }
+            break;
+        default:
             break;
     }
     return score;
@@ -6056,6 +6068,8 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
                 );
             }
             break;
+        default:
+            break;
     }
     return value;
 }
@@ -6108,6 +6122,8 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             break;
         case RECRUITMENT_SITE_WATER_ALTAR:
             nb = H2EnumIndex(CREATURE_WATER_ELEMENTAL);
+            break;
+        default:
             break;
     }
     EvaluateOneTimeCreaturePurchase(CreatureType(nb), lvl, 0, idx, val, kn);

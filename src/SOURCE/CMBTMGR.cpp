@@ -519,6 +519,8 @@ void combatManager::SetupAdjacencyArray(void) {
                     case COMBAT_DIRECTION_WEST:
                         toHex = fromHex - 1;
                         break;
+                    default:
+                        break;
                 }
 
                 if (toHex % COMBAT_GRID_ROW_LENGTH == 0
@@ -565,7 +567,11 @@ i32 combatManager::Open(i32 openFlags) {
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
     gpMouseManager->m_forcePointerUpdate = false;
-    gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(
+        "cmbtmous.mse",
+        H2EnumIndex(COMBAT_CURSOR_DEFAULT),
+        MOUSE_AUTO_CURSOR_TYPE
+    );
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
     m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
@@ -831,6 +837,8 @@ i32 combatManager::MoreTreesNear(void) {
                     case TILESET_TREFIR:
                     case TILESET_TREFALL:
                         nearbyTypeTable4[radius][nearbyDirection6] = NEARBY_TREE;
+                        break;
+                    default:
                         break;
                 }
             }

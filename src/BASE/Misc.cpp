@@ -515,7 +515,7 @@ void SetGameDefaults(void) {
         gConfig.gfx[i].showMenu = 1;
         gConfig.gfx[i].x = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
-        gConfig.gfx[i].colorMouseCursor = false;
+        gConfig.gfx[i].colorMouseCursor = CONFIG_DEFAULT_COLOR_MOUSE_CURSOR;
         gConfig.gfx[i].fullScreen = true;
         if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
