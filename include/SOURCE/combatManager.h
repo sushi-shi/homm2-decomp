@@ -244,7 +244,7 @@ typedef enum CombatGridConstant {
     COMBAT_MAX_EXTENT_X                     = 0x27f,
     COMBAT_MAX_EXTENT_Y                     = 0x1ba,
     COMBAT_OBSTACLE_TYPE_COUNT              = 32,
-    COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH     = 32,
+    COMBAT_OBSTACLE_RANDOM_SENTINEL         = COMBAT_OBSTACLE_TYPE_COUNT,
     COMBAT_OBSTACLE_CELL_ROLL_MAX           = 116,
     COMBAT_OBSTACLE_TRY_LIMIT               = 500,
     COMBAT_OBSTACLE_MIN_COLUMN_OFFSET       = 1,

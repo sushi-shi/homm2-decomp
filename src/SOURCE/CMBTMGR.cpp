@@ -120,6 +120,9 @@ typedef enum CombatObstacleConstant {
     ELEVATION_OBSTACLE_WEIGHT_DIVISOR = 2
 } CombatObstacleConstant;
 
+static_assert(H2EnumIndex(COMBAT_OBSTACLE_TYPE_COUNT) == H2EnumIndex(KB_COMBAT_OBSTACLE_COUNT));
+static_assert(COMBAT_OBSTACLE_RANDOM_SENTINEL == COMBAT_OBSTACLE_TYPE_COUNT);
+
 typedef enum CombatMissileConstant {
     MISSILE_DIAMETER_MULTIPLIER = 2
 } CombatMissileConstant;
@@ -1895,7 +1898,9 @@ void combatManager::SetupAndLoadObstacles(void) {
         while (placedCells < obstacleGoal && misses < COMBAT_OBSTACLE_TRY_LIMIT) {
             misses++;
             site = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
-            obstacleType = SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
+            obstacleType = SRandom(0, COMBAT_OBSTACLE_RANDOM_SENTINEL);
+            if (obstacleType == COMBAT_OBSTACLE_RANDOM_SENTINEL)
+                continue;
             if (!(sCmbtObstacles[obstacleType].terrainMask & groundMask)
                 || typeUsed[obstacleType] != 0)
                 continue;
