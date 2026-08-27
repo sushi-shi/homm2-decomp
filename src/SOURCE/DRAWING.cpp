@@ -116,7 +116,7 @@ typedef enum CombatSmallViewStatRow {
 
 void combatManager::NoShowCombatLog(const char* message) {
     char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
-    sprintf(logMessage, "NC: %s", message);
+    utf8::Format(logMessage, "NC: %s", message);
     LogStr(logMessage);
 }
 
@@ -287,30 +287,30 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 strcpy(gText, cCombatMessage[H2EnumIndex(MESSAGE_TEXT_DEFAULT)]);
             break;
         case COMBAT_MESSAGE_COMMAND_MOVE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cCombatMessage[H2EnumIndex(MESSAGE_TEXT_MOVE)],
                 gArmyNames[H2EnumIndex(actingMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_FLY:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cCombatMessage[H2EnumIndex(MESSAGE_TEXT_FLY)],
                 gArmyNames[H2EnumIndex(actingMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cCombatMessage[H2EnumIndex(MESSAGE_TEXT_ATTACK)],
                 gArmyNamesPlural[H2EnumIndex(targetMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_SHOOT:
         case COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cCombatMessage[H2EnumIndex(MESSAGE_TEXT_SHOOT)],
                 gArmyNamesPlural[H2EnumIndex(targetMonsterType)],
                 static_cast<i32>(currentArmy->m_monster.shots)
@@ -337,8 +337,8 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                     m_armies[H2EnumIndex(m_currentArmySide)][m_hexCells[m_selectedHex].m_occupantIndex]
                         .m_monsterType;
                 if (actingMonsterType >= CREATURE_PEASANT)
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCombatMessage[H2EnumIndex(MESSAGE_TEXT_VIEW_INFO)],
                         gArmyNames[H2EnumIndex(actingMonsterType)]
                     );
@@ -611,7 +611,7 @@ void combatManager::DrawBackground(void) {
     gpResourceManager->Dispose(backgroundIcon);
 
     if (m_debugFormation != 0) {
-        sprintf(gText, "covr%04d.icn", m_debugFormation);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "covr%04d.icn", m_debugFormation);
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(
             backgroundIcon,
@@ -629,7 +629,7 @@ void combatManager::DrawBackground(void) {
         gpResourceManager->Dispose(backgroundIcon);
     }
     if (m_battlefieldFringe != FRINGE_NONE) {
-        sprintf(gText, "frng%04d.icn", H2EnumIndex(m_battlefieldFringe));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "frng%04d.icn", H2EnumIndex(m_battlefieldFringe));
         backgroundIcon = gpResourceManager->GetIcon(gText);
         if (m_inCastleCombat != 0)
             IconToBitmap(
@@ -662,8 +662,8 @@ void combatManager::DrawBackground(void) {
         gpResourceManager->Dispose(backgroundIcon);
     }
     if (m_inCastleCombat != 0) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "castbkg%c.icn",
             cHeroTypeInitial[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
@@ -1598,14 +1598,14 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     viewX1 += COMBAT_SMALL_VIEW_INSET_X;
     if (drawResult1 != ICON_DRAW_SKIPPED) {
         if (smallArmy->m_quantity > 1)
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cMiniViewText[H2EnumIndex(SMALL_VIEW_TEXT_QUANTITY_PLURAL)],
                 smallArmy->m_quantity
             );
         else
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cMiniViewText[H2EnumIndex(SMALL_VIEW_TEXT_QUANTITY_SINGULAR)],
                 smallArmy->m_quantity
             );
@@ -1691,7 +1691,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     FONT_ALIGN_LEFT
                 );
 
-            sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.attack));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.attack));
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1702,7 +1702,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.defense));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.defense));
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1713,7 +1713,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<u32>(smallArmy->m_monster.hitPoints));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<u32>(smallArmy->m_monster.hitPoints));
             smallFont->DrawBoundedString(
                 gText,
                 viewX1 + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1724,8 +1724,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%d-%d",
                 static_cast<i32>(smallArmy->m_monster.damageMin),
                 static_cast<i32>(smallArmy->m_monster.damageMax)
@@ -1804,7 +1804,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             }
 
             if ((H2EnumIndex((smallArmy->m_monster.flags.all) & (COMBAT_ARMY_FLAG_SHOOTER)))) {
-                sprintf(gText, "%d", static_cast<i32>(smallArmy->m_monster.shots));
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(smallArmy->m_monster.shots));
                 smallFont->DrawBoundedString(
                     gText,
                     viewX1 + COMBAT_SMALL_VIEW_TEXT_X,

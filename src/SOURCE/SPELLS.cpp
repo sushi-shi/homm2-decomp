@@ -269,8 +269,8 @@ i32 combatManager::ViewSpells(i32) {
                     return 0;
                 }
                 if (m_armyCount[H2EnumIndex(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("spell.summon_elemental.army_full"),
                         m_armyCount[H2EnumIndex(m_currentSide)]
                     );
@@ -289,8 +289,8 @@ i32 combatManager::ViewSpells(i32) {
                     return 0;
                 }
                 if (!SpaceForElementalExists()) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s",
                         localization::Tr("spell.summon_elemental.no_adjacent_space")
                     );
@@ -350,8 +350,8 @@ i32 combatManager::ViewSpells(i32) {
 
             case SPELL_MIRROR_IMAGE:
                 if (m_armyCount[H2EnumIndex(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("spell.summon_elemental.army_full"),
                         m_armyCount[H2EnumIndex(m_currentSide)]
                     );
@@ -749,8 +749,8 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_PLASMA_CONE:
         case SPELL_FIRE_BOMB:
         case SPELL_IMPLOSION_GRENADE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.cast"),
                 gSpellNames[H2EnumIndex(spell)]
             );
@@ -772,8 +772,8 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             target =
                 &m_armies[H2EnumIndex(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex];
         format_target:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.cast_on_target"),
                 gSpellNames[H2EnumIndex(spell)],
                 target->m_quantity == 1 ? gArmyNames[H2EnumIndex(target->m_monsterType)]
@@ -944,7 +944,7 @@ void combatManager::CastSpell(
     if (spell == CREATURE_SPELL_DISPEL)
         soundSpell18 = SPELL_DISPEL;
     if (strlen(gsSpellInfo[H2EnumIndex(soundSpell18)].soundName) > 0)
-        sprintf(sampleName10, "%s.82M", gsSpellInfo[H2EnumIndex(soundSpell18)].soundName);
+        utf8::Format(sampleName10, "%s.82M", gsSpellInfo[H2EnumIndex(soundSpell18)].soundName);
 
     if (castByCreature == 0 && target3 != NULL && !target3->SpellCastWorks(spell)) {
         ShowSpellCastFailure(target3, H2EnumIndex(spell));
@@ -974,7 +974,7 @@ void combatManager::CastSpell(
             if (gbNoShowCombat == 0)
                 WaitEndSample(&spellSample6, -1);
             if (gbNoShowCombat == 0) {
-                sprintf(gText, "telptin.82m");
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "telptin.82m");
                 spellSample6 = LoadPlaySample(gText);
             }
             if ((H2EnumIndex((teleportArmy6->m_monster.flags.all) & (MONSTER_FLAGS_WIDE))) != 0) {
@@ -1055,8 +1055,8 @@ void combatManager::CastSpell(
             target3->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
             if (target3->m_monster.defense < SPELL_MINIMUM_DEFENSE)
                 target3->m_monster.defense = SPELL_MINIMUM_DEFENSE;
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.disrupting_ray"),
                 oldDefense - target3->m_monster.defense
             );
@@ -1082,8 +1082,8 @@ void combatManager::CastSpell(
                 castingHero,
                 opposingHero
             );
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.cold_ray_damage"),
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
@@ -1113,8 +1113,8 @@ void combatManager::CastSpell(
                     castingHero,
                     opposingHero
                 );
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("combat.spell.magic_arrow_damage"),
                     damage1,
                     target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
@@ -1160,8 +1160,8 @@ void combatManager::CastSpell(
                 castingHero,
                 opposingHero
             );
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.lightning_bolt_damage"),
                 damage1,
                 target3->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
@@ -1357,8 +1357,8 @@ void combatManager::CastSpell(
                 && InCastle(target3->m_hex)) {
                 pierceDamage = static_cast<i32l>(pierceDamage * 0.75);
             }
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.marksman_pierce_damage"),
                 static_cast<i32>(pierceDamage),
                 target3->m_quantity > 1 ? ironfist::GetCreaturePluralName(H2EnumIndex(target3->m_monsterType))
@@ -1664,8 +1664,8 @@ void combatManager::AreaSpellMessage(SpellType spell, i32l damage) {
             messageId = "combat.spell.implosion_grenade_damage";
             break;
         default:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.spell.area_damage"),
                 H2EnumIndex(spell),
                 static_cast<i32>(damage)
@@ -1673,7 +1673,7 @@ void combatManager::AreaSpellMessage(SpellType spell, i32l damage) {
             CombatMessage(gText, 1, 1, 0);
             return;
     }
-    sprintf(gText, localization::Tr(messageId), static_cast<i32>(damage));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr(messageId), static_cast<i32>(damage));
     CombatMessage(gText, 1, 1, 0);
 }
 
@@ -2206,9 +2206,9 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, localization::Tr("spell.damage.cold_ring"), baseDamage);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("spell.damage.cold_ring"), baseDamage);
         else
-            sprintf(gText, localization::Tr("spell.damage.fireball"), baseDamage);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("spell.damage.fireball"), baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -2288,7 +2288,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, localization::Tr("spell.damage.meteor_shower"), baseDamage);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("spell.damage.meteor_shower"), baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -2362,8 +2362,8 @@ void combatManager::ElementalStorm(void) {
         }
     }
     if (hit) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("combat.spell.elemental_storm_damage"),
             baseDam
         );
@@ -2406,7 +2406,7 @@ void combatManager::Armageddon(void) {
         }
     }
     if (anyAffected) {
-        sprintf(gText, localization::Tr("spell.damage.armageddon"), baseDamage);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("spell.damage.armageddon"), baseDamage);
         CombatMessage(gText, 1, 1, 0);
     }
 
@@ -3736,8 +3736,8 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                         m_armies[H2EnumIndex(side2)][armyIndex].Damage(damage_c, SPELL_NONE);
                 }
             }
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("spell.damage.all_undead"),
                 gSpellNames[H2EnumIndex(spell)],
                 damage_c
@@ -3766,8 +3766,8 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                         m_armies[H2EnumIndex(side2)][armyIndex].Damage(damage_c, SPELL_NONE);
                 }
             }
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("spell.damage.all_living"),
                 damage_c
             );
@@ -3916,7 +3916,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         }
         ++distance0;
     }
-    sprintf(gText, "%s", localization::Tr("spell.mirror_image.failed"));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", localization::Tr("spell.mirror_image.failed"));
     NormalDialog(
         gText,
         NORMAL_DIALOG_INFO,
@@ -4262,8 +4262,8 @@ void combatManager::Resurrect(SpellType spell, i32 targetHex, i32 spellPower) {
     effectX = target->MidX();
     effectY = target->MidY();
     if (target->m_quantity - oldQuantity_o > 1)
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::TrPlural(
                 "spell.resurrect.result",
                 target->m_quantity - oldQuantity_o
@@ -4272,8 +4272,8 @@ void combatManager::Resurrect(SpellType spell, i32 targetHex, i32 spellPower) {
             gArmyNamesPlural[H2EnumIndex(target->m_monsterType)]
         );
     else
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::TrPlural(
                 "spell.resurrect.result",
                 target->m_quantity - oldQuantity_o
@@ -4343,8 +4343,8 @@ i32 combatManager::SpaceForElementalExists(void) {
 
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 fizzleSample = LoadPlaySample("rsbryfzl.82m");
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::TrPlural("spell.resisted", target->m_quantity),
         target->m_quantity == 1 ? gArmyNames[H2EnumIndex(target->m_monsterType)]
                                 : gArmyNamesPlural[H2EnumIndex(target->m_monsterType)]
@@ -4601,28 +4601,28 @@ void combatManager::ShowSpellMessage(
         utf8::Copy(targetName, sizeof(targetName), gArmyNamesPlural[H2EnumIndex(target->m_monsterType)]);
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message, localization::Tr("combat.ability.cyclops_paralyze"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.cyclops_paralyze"), targetName);
         else if (spell == SPELL_BLIND)
-            sprintf(message, localization::Tr("combat.ability.unicorn_blind"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.unicorn_blind"), targetName);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message, localization::Tr("combat.ability.medusa_petrify"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.medusa_petrify"), targetName);
         else if (spell == SPELL_CURSE)
-            sprintf(message, localization::Tr("combat.ability.mummy_curse"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.mummy_curse"), targetName);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.archmage_dispel"), targetName);
         else if (spell == SPELL_SHADOW_MARK)
-            sprintf(message, localization::Tr("combat.ability.shadow_mark"), targetName);
+            utf8::Format(message, localization::Tr("combat.ability.shadow_mark"), targetName);
     } else {
         if (target != NULL) {
             if (m_heroes[H2EnumIndex(m_currentSide)]->m_isCaptain != 0)
-                sprintf(
+                utf8::Format(
                     message,
                     localization::Tr("combat.spell.captain_cast_on"),
                     gSpellNames[H2EnumIndex(spell)],
                     targetName
                 );
             else
-                sprintf(
+                utf8::Format(
                     message,
                     localization::Tr("combat.spell.hero_cast_on"),
                     m_heroes[H2EnumIndex(m_currentSide)]->m_name,
@@ -4631,13 +4631,13 @@ void combatManager::ShowSpellMessage(
                 );
         } else {
             if (m_heroes[H2EnumIndex(m_currentSide)]->m_isCaptain != 0)
-                sprintf(
+                utf8::Format(
                     message,
                     localization::Tr("combat.spell.captain_cast"),
                     gSpellNames[H2EnumIndex(spell)]
                 );
             else
-                sprintf(
+                utf8::Format(
                     message,
                     localization::Tr("combat.spell.hero_cast"),
                     m_heroes[H2EnumIndex(m_currentSide)]->m_name,

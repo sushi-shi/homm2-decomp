@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
 #include <stdio.h>
@@ -149,17 +150,17 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[RESOURCE_NAME_CAPACITY];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-                sprintf(
+                utf8::Format(
                     local_10,
                     MOUSE_MANAGER_ADVENTURE_ICON
                 );
             else if (m_cursorType == MOUSE_CURSOR_SPELL)
-                sprintf(
+                utf8::Format(
                     local_10,
                     MOUSE_MANAGER_SPELL_ICON
                 );
             else
-                sprintf(
+                utf8::Format(
                     local_10,
                     MOUSE_MANAGER_COMBAT_ICON
                 );

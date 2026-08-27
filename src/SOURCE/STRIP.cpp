@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <BASE/border.h>
 #include <BASE/font.h>
@@ -7,6 +8,7 @@
 #include <BASE/icon.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/bankBox.h>
 #include <SOURCE/playerData.h>
@@ -150,7 +152,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_creatureIcons[slot] = NULL;
                 m_cachedCreatureTypes[slot] = CREATURE_NONE;
             } else {
-                sprintf(gText, "monh%04d.icn", H2EnumIndex(m_army->m_creatureTypes[slot]));
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "monh%04d.icn", H2EnumIndex(m_army->m_creatureTypes[slot]));
                 m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
                 m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
@@ -176,7 +178,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 0,
                 ICON_DRAW_NORMAL
             );
-            sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_army->m_creatureCounts[slot]);
             smallFont->DrawBoundedString(
                 gText,
                 m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
@@ -234,12 +236,12 @@ void bankBox::Update(i32 drawWindow) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
     for (resource = 0; resource < BOX_NON_GOLD_RESOURCE_COUNT; resource++) {
-        sprintf(str, "%d", m_player->m_resources[resource]);
+        utf8::Format(str, "%d", m_player->m_resources[resource]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource;
         message.payload.widget.data.text = str;
         m_window->BroadcastMessage(message);
     }
-    sprintf(str, "%d", m_player->m_resources[H2EnumIndex(RES_GOLD)]);
+    utf8::Format(str, "%d", m_player->m_resources[H2EnumIndex(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
     message.payload.widget.data.text = str;
     m_window->BroadcastMessage(message);

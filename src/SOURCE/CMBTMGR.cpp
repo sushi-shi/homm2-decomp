@@ -875,8 +875,8 @@ void combatManager::LoadIcons(void) {
             m_combatIcons[H2EnumIndex(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
         m_combatIcons[H2EnumIndex(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon("catapult.icn");
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "castle%c.icn",
             cHeroTypeInitial[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
@@ -893,12 +893,12 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroes[index]) {
             if (m_heroes[index]->m_isCaptain) {
-                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "cmbtcap%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] =
                     H2EnumIndex(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
-                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "cmbthro%c.icn", cHeroTypeInitial[H2EnumIndex(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] = H2EnumIndex(m_heroes[index]->m_cursorType);
             }
@@ -906,8 +906,8 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroIcons[index]) {
             DebugCheck();
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "herofl%02d.icn",
                 m_playerId[index] == -1
                     ? H2EnumIndex(COMBAT_NEUTRAL_HERO_COLOR)
@@ -1092,17 +1092,17 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
     bInHighMoraleBonus = true;
     SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
-        sprintf(gText, "goodmrle.82M");
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "goodmrle.82M");
         moraleSample = LoadPlaySample(gText);
         if (activeArmy->m_quantity <= 1)
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.morale.high.attack_again"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.morale.high.attack_again"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
@@ -1139,14 +1139,14 @@ i32 combatManager::CheckApplyBadMorale(
     if (!gbNoShowCombat) {
         moraleSample = LoadPlaySample("BADMRLE.82M");
         if (activeArmy->m_quantity <= 1)
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.morale.low.freeze"),
                 gArmyNames[H2EnumIndex(activeArmy->m_monsterType)]
             );
         else
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("combat.morale.low.freeze"),
                 gArmyNamesPlural[H2EnumIndex(activeArmy->m_monsterType)]
             );
@@ -1341,12 +1341,12 @@ void combatManager::CatAttack(CombatSide side) {
         return;
 
     sample* loadedSample18 = NULL;
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     loadedSample18 = gpResourceManager->GetSample(gText);
     SAMPLE2 catapultSound = NULL;
     SAMPLE2 impactSound19 = NULL;
     icon* boulder3 = gpResourceManager->GetIcon("boulder.icn");
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound = LoadPlaySample(gText);
 
     i32 impactX10 = -1;
@@ -1523,7 +1523,7 @@ void combatManager::CatAttack(CombatSide side) {
             m_catapultFrame[H2EnumIndex(side)]++;
     }
 
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     impactSound19 = LoadPlaySample(gText);
     m_unknownF34B = 0;
     m_unknownF34F = 0;
@@ -1694,7 +1694,7 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         return;
 
     target9 = &gpCombatManager->m_armies[H2EnumIndex(COMBAT_ATTACKER_SIDE)][bestArmyIndex];
-    sprintf(gText, "keepshot.82M");
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "keepshot.82M");
     SAMPLE2 keepSample7 = LoadPlaySample(gText);
 
     CombatTowerOrigin towerOrigins7[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
@@ -1749,8 +1749,8 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         const char* id = tower == COMBAT_TOWER_GARRISON
             ? "combat.tower.garrison.damage_with_kills"
             : "combat.tower.keep.damage_with_kills";
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::TrPlural(id, killed0),
             damage5,
             killed0,
@@ -1758,8 +1758,8 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
                         : gArmyNames[H2EnumIndex(target9->m_monsterType)]
         );
     } else {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr(
                 tower == COMBAT_TOWER_GARRISON
                     ? "combat.tower.garrison.damage"
@@ -1914,7 +1914,7 @@ void combatManager::SetupAndLoadObstacles(void) {
                 m_hexCells[site + sCmbtObstacles[obstacleType].cellOffsets[cellIndex]].m_blocked =
                     1;
             }
-            sprintf(gText, "cobj%04d.icn", obstacleType);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "cobj%04d.icn", obstacleType);
             m_obstacleIcons[m_obstacleCount] = gpResourceManager->GetIcon(gText);
             m_hexCells[site].m_obstacleIndex = static_cast<i8>(m_obstacleCount);
             m_obstacleCount++;

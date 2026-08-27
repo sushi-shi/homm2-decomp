@@ -130,18 +130,18 @@ i32 swapManager::Open(i32 id) {
     i32 skillWidget;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(gText, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_portrait));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_portrait));
     message.payload.widget.id = LEFT_PORTRAIT_WIDGET;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_portrait));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_portrait));
     message.payload.widget.id = RIGHT_PORTRAIT_WIDGET;
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("hero.meeting.title"),
         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_name,
         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_name
@@ -168,8 +168,8 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.id = H2EnumIndex(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
                                             + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 message.payload.widget.data.text = gText;
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%d",
                     m_heroes[H2EnumIndex(swapSide)]->GetSSLevel(m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget))
                 );
@@ -792,8 +792,8 @@ void swapManager::SwapArtifacts(void) {
                     message.payload.widget.id = H2EnumIndex(side) * SECONDARY_SKILL_WIDGET_COUNT
                                                   + slotSkill + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                     message.payload.widget.data.text = gText;
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%d",
                         m_heroes[H2EnumIndex(side)]->GetSSLevel(m_heroes[H2EnumIndex(side)]->GetNthSS(slotSkill))
                     );
@@ -832,10 +832,10 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < PRIMARY_SKILL_COUNT; ++slot) {
         message.payload.widget.id = slot + LEFT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message);
         message.payload.widget.id = slot + RIGHT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->Stats(HeroPrimaryStat(slot)));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message);
     }
 
@@ -865,7 +865,7 @@ void swapManager::Update(void) {
             message.payload.widget.data.value = EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
             message.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message);
@@ -897,7 +897,7 @@ void swapManager::Update(void) {
             message.payload.widget.data.value = EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
             message.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message);
@@ -961,8 +961,8 @@ void swapManager::SplitMons(void) {
               localization::Tr("hero.army.split.prompt")
         );
     } else {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("hero.army.split.between_heroes"),
             gArmyNamesPlural[H2EnumIndex(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[H2EnumIndex(m_selectedSide)]->m_name,
@@ -973,7 +973,7 @@ void swapManager::SplitMons(void) {
     message.payload.widget.id = SPLIT_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);

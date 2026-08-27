@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -93,7 +94,7 @@ i32 combatManager::ViewGeneral(
     generalWindow26 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
     if (generalWindow26 == NULL)
         MemError();
-    sprintf(gText, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_portrait));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_portrait));
     message16.payload.widget.command = VIEW_GENERAL_SET_ICON;
     message16.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message16.payload.widget.data.text = gText;
@@ -118,10 +119,10 @@ i32 combatManager::ViewGeneral(
     generalWindow26->BroadcastMessage(message16);
 
     if (m_heroes[H2EnumIndex(side)]->m_isCaptain != 0)
-        sprintf(gText, "%s", localization::Tr("hero.captain"));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", localization::Tr("hero.captain"));
     else
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s - %s",
             m_heroes[H2EnumIndex(side)]->m_name,
             gAlignmentNames[H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_cursorType)]
@@ -137,8 +138,8 @@ i32 combatManager::ViewGeneral(
         gpCombatManager->m_armyGroups[H2EnumIndex(OppositeCombatSide(side))]
     );
     luck14 = gpGame->GetLuck(m_heroes[H2EnumIndex(side)], NULL, m_combatTowns[H2EnumIndex(side)]);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
         cViewGeneralLabels[H2EnumIndex(HERO_PRIMARY_ATTACK)],
         m_heroes[H2EnumIndex(side)]->Stats(HERO_PRIMARY_ATTACK),

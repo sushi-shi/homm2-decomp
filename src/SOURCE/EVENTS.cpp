@@ -474,8 +474,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     const std::string riddle =
                         localization::DecodeExternalText(eventExtra_o->riddle);
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.785dc53c14bdbc91"),
                         riddle.c_str()
                     );
@@ -600,8 +600,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
                 eventHero2->UpgradeCreatures(CREATURE_DWARF, CREATURE_BATTLE_DWARF);
                 if (thirdUpgrade_f != CREATURE_NONE) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.36d8db3120534c34"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
@@ -611,8 +611,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[H2EnumIndex(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.6ec6a4f4693dcb8d"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
@@ -620,8 +620,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1) + 1]
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.6ffe5f935a4c8867"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1]
@@ -679,8 +679,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 eventHero2->UpgradeCreatures(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
                 if (thirdUpgrade_f != CREATURE_NONE) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.16a4b831c7bd6a44"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
@@ -690,8 +690,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[H2EnumIndex(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.49edf5c404ac2672"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1)],
@@ -699,8 +699,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[H2EnumIndex(secondUpgrade1) + 1]
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.95b379d46e666d70"),
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e)],
                         gArmyNamesPlural[H2EnumIndex(firstUpgrade_e) + 1]
@@ -733,8 +733,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SEA_CHEST:
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)
                 && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.c96f2e927c9e47ef"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
@@ -860,8 +860,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.4967a4ae1966d928"),
                     gArtifactNames[cell->m_objectMetadata]
                 );
@@ -935,23 +935,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_WITCH_HUT:
             if (eventHero2->m_secondarySkills[cell->m_objectMetadata] != HERO_SKILL_LEVEL_NONE) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.68e1e92f9a9d12d5"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.8432c04b1a757522"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.4f16d62af9eceb3d"),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
@@ -1237,8 +1237,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     cell->m_objectMetadata = CHEST_REWARD_SMALL;
                     goto chestGold;
                 }
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.5ad75e9e7fadd1a6"),
                     gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
@@ -1577,8 +1577,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     goto wagonEmpty;
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.b7b134ab6de2bf9c"),
                     gArtifactNames[eventValue1]
                 );
@@ -1634,7 +1634,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 default:
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
-                        sprintf(gText, "%s.", localization::Tr("common.treasure"));
+                        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s.", localization::Tr("common.treasure"));
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1648,8 +1648,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         GiveResource(eventHero2, RES_GOLD, SKELETON_GOLD);
                     } else {
                         eventValue1 = cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET;
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s %s",
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
@@ -1957,7 +1957,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             strcpy(sphinxAnswer_a, gResourceNames[H2EnumIndex(resourceType_a)]);
             utf8::LowercaseFirst(sphinxAnswer_a);
-            sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
                 resourceType_a,
@@ -2584,8 +2584,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s'%s'.  ",
                 localization::Tr("event.inline.57f459c519bb0e07"),
                 gSpellNames[cell->m_objectMetadata - 1]
@@ -2593,8 +2593,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             goto shrineSpell;
 
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s'%s'.  ",
                 localization::Tr("event.inline.74e932ad068a3630"),
                 gSpellNames[cell->m_objectMetadata - 1]
@@ -2602,8 +2602,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             goto shrineSpell;
 
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s'%s'.  ",
                 localization::Tr("event.inline.8e7c1487402719c9"),
                 gSpellNames[cell->m_objectMetadata - 1]
@@ -2778,8 +2778,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     goto artifactFight;
                 } else {
                     guardedCount_i = 1;
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.580a8ff25d58cea2"),
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)],
                         gArmyNamesPlural[H2EnumIndex(guardedMonster_c)]
@@ -2807,8 +2807,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         )
                         == COMBAT_RESULT_ATTACKER) {
                         eventHero2->CheckLevel();
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.db0baf49ee252efe"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
@@ -2847,8 +2847,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)]
                             != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.114341b70ac61964"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
@@ -2859,8 +2859,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (eventHero2->m_secondarySkills[H2EnumIndex(HERO_SKILL_LEADERSHIP)]
                             != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.85b58cafd168a4e6"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
@@ -2888,8 +2888,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                     case ARTIFACT_EVENT_MODE_GOLD:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.219ab198b8338466"),
                             gArtifactNames[H2EnumIndex(artifact_g)]
                         );
@@ -2942,8 +2942,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         utf8::Copy(sphinxAnswer_a, sizeof(sphinxAnswer_a), gResourceNames[artifactResourceType_k]);
                         utf8::LowercaseFirst(sphinxAnswer_a);
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.6ab4a1f0b7bda188"),
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
@@ -3005,8 +3005,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         utf8::Copy(sphinxAnswer_a, sizeof(sphinxAnswer_a), gResourceNames[artifactResourceType_k]);
                         utf8::LowercaseFirst(sphinxAnswer_a);
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("event.inline.d5ae03d7c7901a43"),
                             gArtifactNames[H2EnumIndex(artifact_g)],
                             sphinxAnswer_a
@@ -3262,8 +3262,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         goto daemonExperienceGold;
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
                     eventValue1 = H2EnumIndex(GiveRandomArtifact(eventHero2));
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.ea1d54ae68a8c04a"),
                         gArtifactNames[eventValue1]
                     );
@@ -3536,7 +3536,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         )
                         == COMBAT_RESULT_ATTACKER) {
                         eventHero2->CheckLevel();
-                                    sprintf(
+                                    utf8::Format(
                             eventText_b,
                             "%s'%s'.  ",
                             localization::Tr("event.inline.3c1ac9096798469d"),
@@ -3948,8 +3948,8 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= PASSWORD_SHIFT;
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("event.barrier.inspect"),
         xBarrierColor[colorIndex]
     );
@@ -3958,8 +3958,8 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     ironfist::H2MessageBox(gText);
     if (gpCurPlayer->m_barrierTents & (1 << colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("event.barrier.dissolves"),
             xPasswordStrings[passwordIndex]
         );
@@ -3981,8 +3981,8 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &playSample);
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("event.barrier.tent_hint"),
         xBarrierColor[color]
     );
@@ -4028,8 +4028,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         localization::Tr("event.inline.8db49d8e3d5c5308")
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.1c9a29276fc4ba9c"),
                         cursedArtifactCount2
                     );
@@ -4218,8 +4218,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         H2EnumIndex(siteType4),
                         &eventSample9
                     );
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.d211349fcd9060a7"),
                         experience11
                     );
@@ -4770,7 +4770,7 @@ void advManager::EventWindow(
     else if (eventId == MAP_EVENT_REWARD_NONE)
         utf8::Copy(eventText, sizeof(eventText), text);
     else
-        sprintf(
+        utf8::Format(
             eventText,
             "Event ID %d",
             eventId
@@ -5179,8 +5179,8 @@ i32 advManager::GhostEvent(
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s",
                     text
                 );
@@ -5218,8 +5218,8 @@ i32 advManager::GhostEvent(
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s",
                     text
                 );
@@ -5257,8 +5257,8 @@ i32 advManager::GhostEvent(
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s",
                     text
                 );
@@ -5297,8 +5297,8 @@ i32 advManager::GhostEvent(
                 )
                 == COMBAT_RESULT_ATTACKER) {
                 artifactId = GiveRandomArtifact(eventHero);
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s",
                     text
                 );
@@ -5904,8 +5904,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                     if (sourceHero->m_artifacts[sourceArtifactSlot] <= ARTIFACT_GOLDEN_GOOSE) {
                         if (gbThisNetHumanPlayer[sourceHero->m_owner]
                             || gbThisNetHumanPlayer[destinationHero->m_owner]) {
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 localization::Tr("event.inline.aa7c539682b9fd51")
                                      ,
                                 gArtifactNames[H2EnumIndex(sourceHero->m_artifacts[sourceArtifactSlot])]
@@ -6006,14 +6006,14 @@ void advManager::FizzleCenter(i32 fizzleType) {
     {
         switch (fizzleType) {
             case EVENT_FIZZLE_HERO_LOSS:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "killfade.82M"
                 );
                 break;
             case EVENT_FIZZLE_ARTIFACT:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "pickup%02d.82M",
                     Random(ARTIFACT_PICKUP_SOUND_FIRST, ARTIFACT_PICKUP_SOUND_LAST)
                 );
@@ -7571,8 +7571,8 @@ void advManager::PlayerMonsterInteract(
     // the retail campaigns, regardless of relative army strength.
     if (forceJoin && eventHero->m_army.CanJoin(monsterType) && !gbInCampaign
         && !(xIsPlayingExpansionCampaign && xCampaign.CampaignID() <= 3)) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             gEventText[EVENT_TEXT_FOLLOWERS],
             gArmyNamesPlural[H2EnumIndex(monsterType)]
         );
@@ -7593,7 +7593,7 @@ void advManager::PlayerMonsterInteract(
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forceJoin) {
-            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[H2EnumIndex(monsterType)]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[H2EnumIndex(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(monsterType, creatureCount, -1);
@@ -7635,8 +7635,8 @@ void advManager::PlayerMonsterInteract(
             }
 
             if (creatureCount == 1) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.61cb3563007fe53a"),
                     gArmyNames[H2EnumIndex(monsterType)],
                     joiningCost
@@ -7647,7 +7647,7 @@ void advManager::PlayerMonsterInteract(
                     localization::Tr("event.inline.459e418255ebdf2c")
                 );
                 if (numJoining == creatureCount)
-                    sprintf(
+                    utf8::Format(
                         monsterText,
                         localization::Tr("event.inline.ddc9cf3652f5dd02"),
                         creatureCount,
@@ -7655,7 +7655,7 @@ void advManager::PlayerMonsterInteract(
                         joiningCost
                     );
                 else
-                    sprintf(
+                    utf8::Format(
                         monsterText,
                         localization::Tr("event.inline.2f685e157f228f6f"),
                         numJoining,
@@ -7701,8 +7701,8 @@ void advManager::PlayerMonsterInteract(
 
     if (armyRatio > MONSTER_STRENGTH_FLEE) {
     monstersFlee:
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("event.inline.f87a6ac73c24c595"),
             gArmyNamesPlural[H2EnumIndex(monsterType)]
         );
@@ -8096,8 +8096,8 @@ CombatResult advManager::DoCombat(
         } else if (!gbThisNetHumanPlayer[firstPlayer4]) {
             bShowIt = true;
             gpGame->TurnOffAIMusic();
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr(combatTown ? "network.attack.town" : "network.attack.hero"),
                 cPlayerNames[secondPlayer8]
             );

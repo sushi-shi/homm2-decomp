@@ -317,7 +317,7 @@ void ExpCampaign::InitMap(void) {
         ironfist::CampaignChoice(m_campaignId, H2EnumIndex(m_currentMap), m_bonusChoices[H2EnumIndex(m_currentMap)]);
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
-    sprintf(
+    utf8::Format(
         gpGame->m_mapFilename,
         "CAMP%d_%02d.HXC",
         H2EnumIndex(m_campaignId) + 1,
@@ -643,29 +643,29 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, "x_track%d.icn", H2EnumIndex(m_campaignId) + 1);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "x_track%d.icn", H2EnumIndex(m_campaignId) + 1);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
-    sprintf(gText, "%d", H2EnumIndex(m_viewMap) + 1);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", H2EnumIndex(m_viewMap) + 1);
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
-    sprintf(gText, "%s", ironfist::ScenarioNames[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str());
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", ironfist::ScenarioNames[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str());
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%s",
         ironfist::ScenarioDescriptions[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str()
     );
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_BONUS_WIDGET;
-    sprintf(gText, "%d", m_mapDays[H2EnumIndex(m_viewMap)]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_mapDays[H2EnumIndex(m_viewMap)]);
     m_window->BroadcastMessage(message);
 
     hasVisibleAward = false;
@@ -686,8 +686,8 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         choice = ironfist::CampaignChoice(m_campaignId, H2EnumIndex(m_viewMap), i);
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.resource"),
                     choice->amount,
                     gResourceNames[H2EnumIndex(choice->resource)]
@@ -760,7 +760,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
                     default:
-                        sprintf(gText, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
+                        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
                         break;
                 }
                 break;
@@ -771,22 +771,22 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         localization::Tr("campaign.bonus.spell.summon_earth")
                     );
                 else
-                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
                 if ((choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL
                      && choice->value == EXPANSION_CAMPAIGN_SPECIAL_SKILL)
                     || (choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT_LEVEL
                         && choice->value == EXPANSION_CAMPAIGN_SPECIAL_SKILL_ALT)) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("campaign.bonus.secondary_skill"),
                         xShortSSLevelNames[choice->amount - 1],
                         gSecondarySkills[choice->value]
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("campaign.bonus.secondary_skill"),
                         gSecondarySkillLevels[choice->amount - 1],
                         gSecondarySkills[choice->value]
@@ -800,23 +800,23 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     gArmyNamesPlural[H2EnumIndex(choice->creature)]
                 );
                 utf8::UppercaseFirst(armyName);
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.creatures"),
                     choice->amount,
                     armyName
                 );
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.puzzle_pieces"),
                     choice->value
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.experience"),
                     choice->value
                 );
@@ -828,7 +828,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, gAlignmentNames[H2EnumIndex(choice->faction)]);
                 break;
             case CAMPAIGN_CHOICE_PRIMARY_SKILL:
-                sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s +%d", gStatNames[choice->value], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_SPELL_SCROLL: {
                 showScroll = true;
@@ -839,13 +839,13 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         break;
                 }
                 if (showScroll != 0) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("campaign.bonus.spell_scroll"),
                         gSpellNames[H2EnumIndex(choice->spell)]
                     );
                 } else {
-                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 }
                 break;
             }
@@ -1316,8 +1316,8 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
 void ExpCampaign::Autosave(void) {
     if (m_currentMap != MAP_NONE) {
         m_mapsPlayed[H2EnumIndex(m_currentMap)] = 1;
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s_%d",
             ironfist::CampaignShortNames[H2EnumIndex(m_campaignId)].c_str(),
             H2EnumIndex(m_currentMap) + 1

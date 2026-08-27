@@ -533,46 +533,46 @@ void game::CampaignInfoUpdate(i32 redraw) {
     message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, "ctrack%02d.icn", H2EnumIndex(iCampaignTrackType));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "ctrack%02d.icn", H2EnumIndex(iCampaignTrackType));
     campWin->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP)
-        sprintf(gText, "5");
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "5");
     else
-        sprintf(gText, "%d", iCurViewMap + 1);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", iCurViewMap + 1);
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, "%s", cCampaignName[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cCampaignName[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
     } else if (m_campaignType != m_campaignStartingSide
                && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        sprintf(gText, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]);
     } else {
-        sprintf(gText, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][iCurViewMap]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     }
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, "%s", cCampaignDescription[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cCampaignDescription[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
     } else if (m_campaignType != m_campaignStartingSide
                && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s",
             cCampaignDescription[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]
         );
     } else {
-        sprintf(gText, "%s", cCampaignDescription[H2EnumIndex(iCurViewSide)][iCurViewMap]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cCampaignDescription[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     }
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_BONUS_WIDGET;
-    sprintf(gText, "%d", m_campaignScenarioBonus[H2EnumIndex(iCurViewSide)][iCurViewMap]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_campaignScenarioBonus[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     campWin->BroadcastMessage(message);
 
     strcpy(gText, "");
@@ -597,8 +597,8 @@ void game::CampaignInfoUpdate(i32 redraw) {
 
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.resource"),
                     choice->amount,
                     gResourceNames[H2EnumIndex(choice->resource)]
@@ -640,7 +640,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                         strcpy(gText, localization::Tr("campaign.bonus.artifact.gauntlets"));
                         break;
                     default:
-                        sprintf(gText, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
+                        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
                         break;
                 }
                 break;
@@ -648,11 +648,11 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.bonus.spell.summon_earth"));
                 else
-                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.secondary_skill"),
                     gSecondarySkillLevels[choice->amount - 1],
                     gSecondarySkills[choice->value]
@@ -665,23 +665,23 @@ void game::CampaignInfoUpdate(i32 redraw) {
                     gArmyNamesPlural[H2EnumIndex(choice->creature)]
                 );
                 utf8::UppercaseFirst(armyName);
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.creatures"),
                     choice->amount,
                     armyName
                 );
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.puzzle_pieces"),
                     choice->value
                 );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.bonus.experience"),
                     choice->value
                 );

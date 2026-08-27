@@ -520,7 +520,7 @@ void hero::UpdateArmies(void) {
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
-            sprintf(gText, "monh%04d.icn", H2EnumIndex(m_army.m_creatureTypes[slot]));
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "monh%04d.icn", H2EnumIndex(m_army.m_creatureTypes[slot]));
             message.payload.widget.id = slot + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
@@ -529,7 +529,7 @@ void hero::UpdateArmies(void) {
             message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
 
-            sprintf(gText, "%d", m_army.m_creatureCounts[slot]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_army.m_creatureCounts[slot]);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = slot + UI_ARMY_COUNT_FIRST;
             message.payload.widget.data.text = gText;
@@ -559,7 +559,7 @@ void hero::ViewStat(i32 stat, i32 quickView) {
 
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        sprintf(gText, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[extra]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[extra]);
         NormalDialog(
             gText,
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
@@ -853,7 +853,7 @@ void hero::CheckLevel(void) {
     samp = NULL;
 
     for (nLevel = m_level + 1; nLevel <= newLevel; nLevel++) {
-        sprintf(gText, cHeroLevel[0], m_name);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cHeroLevel[0], m_name);
         utf8::Copy(text, sizeof(text), cHeroLevel[1]);
         strcat(gText, text);
 
@@ -892,7 +892,7 @@ void hero::CheckLevel(void) {
         for (slot = 0; slot < HERO_PRIMARY_STAT_COUNT; slot++) {
             if (statBonuses[slot] > 0) {
                 m_primaryStats[slot] += static_cast<i8>(statBonuses[slot]);
-                sprintf(text, "\n%s +%d", gStatNames[slot], statBonuses[slot]);
+                utf8::Format(text, "\n%s +%d", gStatNames[slot], statBonuses[slot]);
                 strcat(gText, text);
             }
         }
@@ -937,7 +937,7 @@ void hero::CheckLevel(void) {
             if (choices[0] == HERO_SKILL_NONE) {
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             } else if (choices[1] == HERO_SKILL_NONE) {
-                sprintf(
+                utf8::Format(
                     text,
                     localization::Tr("hero.level.learned_skill")  ,
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])])],
@@ -959,7 +959,7 @@ void hero::CheckLevel(void) {
                 );
                 GiveSS(choices[0], HERO_SKILL_LEVEL_BASIC);
             } else {
-                sprintf(
+                utf8::Format(
                     text,
                     localization::Tr("hero.level.choose_skill")
                      ,
@@ -1045,8 +1045,8 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_PRIMARY_STAT_DEFENSE:
         case UI_PRIMARY_STAT_SPELL_POWER:
         case UI_PRIMARY_STAT_KNOWLEDGE:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cHeroScreen[H2EnumIndex(TEXT_PRIMARY_STAT)],
                 gStatNames[message.payload.widget.id - UI_PRIMARY_STAT_FIRST]
             );
@@ -1104,23 +1104,23 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             armySlot = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
             if (giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
                         gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
                 else
                     strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             } else if (giHeroScreenSrcIndex == armySlot) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
                     gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else if (gpTownManager->m_castleDialogActive != 0) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
                         gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
@@ -1128,28 +1128,28 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
                 if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_SHIFT_KEYS))))
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cHeroScreen[H2EnumIndex(TEXT_SPLIT_ARMY)],
                         gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army
                                                  .m_creatureTypes[giHeroScreenSrcIndex])]
                     );
                 else
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cHeroScreen[H2EnumIndex(TEXT_MOVE_ARMY)],
                         gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])]
                     );
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot]
                        == gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     cHeroScreen[H2EnumIndex(TEXT_COMBINE_ARMIES)],
                     gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     cHeroScreen[H2EnumIndex(TEXT_EXCHANGE_ARMIES)],
                     gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])],
                     gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
@@ -1178,8 +1178,8 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                      == ARTIFACT_MAGIC_BOOK)
                 strcpy(gText, cHeroScreen[H2EnumIndex(TEXT_VIEW_SPELLS)]);
             else
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     cHeroScreen[H2EnumIndex(TEXT_ARTIFACT)],
                     gArtifactNames
                         [H2EnumIndex(gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST])]
@@ -1187,8 +1187,8 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             break;
 
         case UI_DISMISS:
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cHeroScreen[H2EnumIndex(TEXT_DISMISS)],
                 gpHVHero->m_name,
                 gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]
@@ -1217,8 +1217,8 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             secondary_skill_text:
                 if (secondarySkillSlot < gpHVHero->m_secondarySkillCount) {
                     HeroSecondarySkill secondarySkill = gpHVHero->GetNthSS(secondarySkillSlot);
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cHeroScreen[H2EnumIndex(TEXT_SECONDARY_SKILL)],
                         gSecondarySkillLevels[H2EnumIndex(gpHVHero->m_secondarySkills
                                                       [H2EnumIndex(secondarySkill)])
@@ -1399,8 +1399,8 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 
                     case UI_SPELL_POINTS_FIRST:
                     case UI_SPELL_POINTS_LAST:
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("hero.spell_points.help"),
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
@@ -1425,8 +1425,8 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_EXPERIENCE_LAST: {
                         heroLevel = gpHVHero->GetLevel(gpHVHero->m_experience);
                         nextExperience = gpHVHero->GetExperience(heroLevel + 1);
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("hero.level.help")
                              ,
                             heroLevel,
@@ -1675,7 +1675,7 @@ void SetupHeroView(void) {
         bNoDismiss = true;
 
     msg.type = HERO_UI_MESSAGE;
-    sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s - %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]);
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_HERO_TITLE;
     msg.payload.widget.data.text = gText;
@@ -1714,7 +1714,7 @@ void SetupHeroView(void) {
     msg.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(gText, "port%04d.icn", H2EnumIndex(gpHVHero->m_portrait));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(gpHVHero->m_portrait));
     msg.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     msg.payload.widget.id = UI_HERO_PORTRAIT;
     msg.payload.widget.data.text = gText;
@@ -1722,7 +1722,7 @@ void SetupHeroView(void) {
 
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     for (i = 0; i < HERO_PRIMARY_STAT_COUNT; i++) {
-        sprintf(gText, "%d", gpHVHero->Stats(HeroPrimaryStat(i)));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpHVHero->Stats(HeroPrimaryStat(i)));
         msg.payload.widget.id = UI_PRIMARY_STAT_VALUE_FIRST + i;
         msg.payload.widget.data.text = gText;
         heroWin->BroadcastMessage(msg);
@@ -1786,7 +1786,7 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(msg);
     }
 
-    sprintf(gText, "%d", gpHVHero->m_experience);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpHVHero->m_experience);
     msg.payload.widget.command = HERO_UI_WIDGET_TEXT;
     msg.payload.widget.id = UI_EXPERIENCE_LAST;
     msg.payload.widget.data.text = gText;
@@ -1805,8 +1805,8 @@ void SetupHeroView(void) {
     msg.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%d/%d",
         gpHVHero->m_spellPoints,
         gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
@@ -1816,7 +1816,7 @@ void SetupHeroView(void) {
     msg.payload.widget.data.text = gText;
     heroWin->BroadcastMessage(msg);
 
-    sprintf(gText, "crest.icn");
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "crest.icn");
     msg.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     msg.payload.widget.id = UI_PLAYER_CREST;
     heroWin->BroadcastMessage(msg);
@@ -1851,16 +1851,16 @@ void SetupHeroView(void) {
             tempBonus = gpHVHero->GetSSLevel(skill)
                                   - H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(skill)]);
             if (tempBonus > 0) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s+%d",
                     gSecondarySkillLevels
                         [H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(skill)]) - 1],
                     tempBonus
                 );
             } else {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s",
                     gSecondarySkillLevels[H2EnumIndex(gpHVHero->m_secondarySkills[H2EnumIndex(skill)]) - 1]
                 );
@@ -1924,7 +1924,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
@@ -2093,8 +2093,8 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     // The Cyborg Wisdom slot is Cybernetics, with its own text and icon row.
     if (m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM
         && m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s",
             cyberneticsDesc[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]
         );
@@ -2118,8 +2118,8 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     skillBonusValue = GetSSLevel(skill) - H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]);
     if (skillBonusValue > 0) {
         skillText = gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1];
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("hero.skill.necromancy.help")
                  ,
             skillText,

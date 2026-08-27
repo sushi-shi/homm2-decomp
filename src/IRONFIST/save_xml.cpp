@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 #include <BASE/Misc.h>
+#include <BASE/Utf8.h>
 #include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
@@ -1260,7 +1261,7 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
     i32 fd = platform::FileOpen(filePath.c_str(), platform::FileMode::Read);
     char firstByte = 0;
     if (fd != -1) {
-        platform::FileRead(fd, &firstByte, sizeof(firstByte));
+        platform::FileReadExact(fd, &firstByte, sizeof(firstByte));
         platform::FileClose(fd);
     }
 
@@ -1286,7 +1287,7 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
     }
 
     if (platform::CompareIgnoringCase(fileName, "RMT", 3))
-        sprintf(gpGame->m_saveName, "%s", fileName);
+        utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), fileName);
 
     gpAdvManager->m_heroContextLocked = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];

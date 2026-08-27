@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <IRONFIST/artifacts.h>
 #include <IRONFIST/hooks.h>
+#include <BASE/Utf8.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <BASE/Misc.h>
@@ -1224,8 +1225,8 @@ void philAI::DoAI(i32 player) {
     ShowStatus();
     SetupRelativeHeroStrengths();
     for (pathIndex0 = 0; pathIndex0 < H2EnumIndex(RES_COUNT); pathIndex0++) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "RES - %15s  %d  %d",
             gResourceNames[pathIndex0],
             gpCurPlayer->m_resources[pathIndex0],
@@ -2657,8 +2658,8 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                     kn = score;
                 }
                 if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "Town:%2d  Building: %18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
                         GetBuildingName(t->m_type, node),
@@ -2845,8 +2846,8 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                         numberToBuy = availableUnits;
                     }
                     if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "Town:%2d  Creature: %18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                             townPtr->m_id,
                             GetMonsterName(candidateMonster),
@@ -2982,8 +2983,8 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
             bestScore = randomizedScore;
         }
         if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "Town:%2d  Hero    : % 15i   Raw BC = %8.2f,  RandBC = %8.2f.",
                 townPtr->m_id,
                 heroIndex,
@@ -3264,7 +3265,7 @@ i32 philAI::RVOfPosition(
 
     if (giDebugLevel > POSITION_DEBUG_LEVEL - 1) {
         debugObjectType0 = triggerType7 & MAP_TRIGGER_TYPE_MASK;
-        sprintf(
+        utf8::Format(
             debugText1,
             "FUN U :%15s",
             (debugObjectType0 > MAP_OBJECT_NONE
@@ -4664,8 +4665,8 @@ i32 philAI::ChooseToPayRansomOnHero(i32) {
 void philAI::BuildBuilding(town* t, BuildingSlotType building) {
     i32 i;
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "Player %d built %s in town %d.\n",
         giCurPlayer,
         GetBuildingName(t->m_type, building),
@@ -4688,8 +4689,8 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     i32 townX;
     i32 townY;
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "Player %d built hero in town %d.\n",
         giCurPlayer,
         townPtr->m_id
@@ -4758,8 +4759,8 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     float stackValue;
     CreatureType creature;
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "Player %d built %d %s in town %d.\n",
         giCurPlayer,
         purchaseCount,
@@ -5945,8 +5946,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 eventRV = 0;
                 break;
             default:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "AI encountered object type %d and doesn't know how to deal with it.   "
                         "Tell Phil",
                     H2EnumIndex(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)

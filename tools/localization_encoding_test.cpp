@@ -48,6 +48,25 @@ int main() {
         return 1;
     }
 
+    char formatted[16];
+    if (!utf8::Format(formatted, "%s %d", "turn", 7)
+        || std::strcmp(formatted, "turn 7") != 0) {
+        std::fputs("bounded format mismatch\n", stderr);
+        return 1;
+    }
+    char shortFormat[4];
+    std::string twoLetters;
+    twoLetters.push_back('\xd0');
+    twoLetters.push_back('\xaf');
+    twoLetters.push_back('\xd0');
+    twoLetters.push_back('\x91');
+    if (utf8::Format(shortFormat, "%s", twoLetters.c_str())
+        || std::strcmp(shortFormat, "\xd0\xaf") != 0
+        || !utf8::IsValid(shortFormat)) {
+        std::fputs("UTF-8 format truncation mismatch\n", stderr);
+        return 1;
+    }
+
     char encoded[4];
     const std::size_t encodedLength = utf8::Encode(0x732b, encoded);
     if (encodedLength != 3 || std::memcmp(encoded, text + offset - 3, 3) != 0) {

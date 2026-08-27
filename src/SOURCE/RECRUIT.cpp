@@ -72,28 +72,28 @@ void SetupRecruitWin(
 
     utf8::Copy(recruitName, sizeof(recruitName), GetMonsterName(creatureType));
     utf8::UppercaseFirst(recruitName);
-    sprintf(gText, localization::Tr("recruit.title"), recruitName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("recruit.title"), recruitName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    sprintf(label, "%d", goldCost);
+    utf8::Format(label, "%d", goldCost);
     message.payload.widget.id = GOLD_ICON_CONTROL;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {
-        sprintf(label, "%d", resourceCost);
+        utf8::Format(label, "%d", resourceCost);
         message.payload.widget.id = RESOURCE_COST_CONTROL;
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, localization::Tr("recruit.available"), available);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("recruit.available"), available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    sprintf(gText, "monh%04d.icn", H2EnumIndex(creatureType));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "monh%04d.icn", H2EnumIndex(creatureType));
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = CREATURE_CONTROL;
@@ -214,20 +214,20 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, localization::Tr("recruit.available"), *m_available);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("recruit.available"), *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
-    sprintf(gText, "%d", m_quantity);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_quantity);
     message.payload.widget.id = QUANTITY_CONTROL;
     m_window->BroadcastMessage(message);
     m_goldTotal = m_quantity * m_goldCost;
-    sprintf(gText, "%d", m_goldTotal);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_goldTotal);
     message.payload.widget.id = GOLD_TOTAL_CONTROL;
     m_window->BroadcastMessage(message);
     if (m_resourceType != RECRUIT_NO_RESOURCE) {
         m_resourceTotal = m_quantity * m_resourceCost;
-        sprintf(gText, "%d", m_resourceTotal);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_resourceTotal);
         message.payload.widget.id = RESOURCE_TOTAL_CONTROL;
         m_window->BroadcastMessage(message);
     }

@@ -275,8 +275,8 @@ void BaseFree(void* ptr, const char* originalFile, i32 originalLine) {
         }
     }
     if (entryIndex < ENTRY_SEARCH_COMPLETE) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "Bad Delete,  File '%13s'  Line % 4d, ptr %12p",
             originalFile,
             originalLine,
@@ -306,8 +306,8 @@ void PrintMemoryLeaks(void) {
     );
     for (i32 entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].used != 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "Memory Leak,  File '%13s'  Line % 4d, ptr %12p   size %6d",
                 gpMemEntry[entryIndex].file,
                 gpMemEntry[entryIndex].line,
@@ -321,7 +321,7 @@ void PrintMemoryLeaks(void) {
 
 void ShowMemoryStatus(void) {
     i32 memLeft = MemSize(1);
-    sprintf(gText, "Mem Left %dK", memLeft);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Mem Left %dK", memLeft);
     AbsAiPrint(gText);
 }
 
@@ -447,7 +447,7 @@ void ProcessAssert(i32 condition, const char* file, i32 line) {
     if (condition == 0) {
         gpMouseManager->SetColorMice(false);
         SetFullScreenStatus(false);
-        sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
         platform::ShowMessage("Assert Failure", gText);
 
         ShutDown(NULL);
@@ -602,12 +602,12 @@ void ReadPrefsFromRegistry(void) {
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
-    sprintf(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSLName, "RMT%sSL.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSCName, "RMT%sSC.BIN", gConfig.uniqueSystemID);
-    sprintf(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtSLName, "RMT%sSL.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtSCName, "RMT%sSC.BIN", gConfig.uniqueSystemID);
+    utf8::Format(gConfig.rmtSDName, "RMT%sSD.BIN", gConfig.uniqueSystemID);
 }
 
 void WritePrefsToFile(void) {
@@ -632,13 +632,13 @@ void WritePrefs(void) {
 }
 
 CDRomSetupResult SetupCDDrive(void) {
-    sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sHEROES2x.AGG", ".\\DATA\\");
     i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return CD_ROM_DATA_FILES_MISSING;
     platform::FileClose(file);
 
-    sprintf(gText, "%s%s", ".", gcCDTrackName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".", gcCDTrackName);
     file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return CD_ROM_DATA_FILES_MISSING;
@@ -769,7 +769,7 @@ void LogInt(
 ) {
     char text[FORMAT_BUFFER_SIZE];
     if (value7 != LOG_UNUSED_VALUE)
-        sprintf(
+        utf8::Format(
             text,
             "%s : % 8d % 8d % 8d % 8d % 8d % 8d % 8d",
             label,
@@ -782,7 +782,7 @@ void LogInt(
             value7
         );
     else if (value6 != LOG_UNUSED_VALUE)
-        sprintf(
+        utf8::Format(
             text,
             "%s : % 8d % 8d % 8d % 8d % 8d % 8d",
             label,
@@ -794,7 +794,7 @@ void LogInt(
             value6
         );
     else if (value5 != LOG_UNUSED_VALUE)
-        sprintf(
+        utf8::Format(
             text,
             "%s : % 8d % 8d % 8d % 8d % 8d",
             label,
@@ -805,13 +805,13 @@ void LogInt(
             value5
         );
     else if (value4 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d % 8d", label, value1, value2, value3, value4);
+        utf8::Format(text, "%s : % 8d % 8d % 8d % 8d", label, value1, value2, value3, value4);
     else if (value3 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d % 8d", label, value1, value2, value3);
+        utf8::Format(text, "%s : % 8d % 8d % 8d", label, value1, value2, value3);
     else if (value2 != LOG_UNUSED_VALUE)
-        sprintf(text, "%s : % 8d % 8d", label, value1, value2);
+        utf8::Format(text, "%s : % 8d % 8d", label, value1, value2);
     else
-        sprintf(text, "%s : % 8d", label, value1);
+        utf8::Format(text, "%s : % 8d", label, value1);
     LogStr(text);
 }
 
