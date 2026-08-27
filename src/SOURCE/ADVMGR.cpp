@@ -3949,7 +3949,7 @@ void advManager::DrawCell(
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
                         s_drawHeroType = (H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                             ? HERO_TYPE_BOAT
-                            : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
+                            : s_drawHero->m_cursorType.enum_value();
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
                         if ((H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
@@ -7132,7 +7132,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
     m_cursorType = (H2EnumIndex((contextHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
         ? HERO_TYPE_BOAT
-        : static_cast<HeroCursorType>(contextHero->m_cursorType);
+        : contextHero->m_cursorType.enum_value();
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
