@@ -1490,9 +1490,8 @@ class mapCell* advManager::DoAdvCommand(void) {
             }
             selectedHero->m_destinationX = m_commandTargetX,
             selectedHero->m_destinationY = m_commandTargetY;
-            goto continue_route;
+            // Fall through to common route processing.
         case ADVMGR_COMMAND_CONTINUE_ROUTE:
-        continue_route:
             if (selectedHero == NULL) {
                 break;
             }

@@ -197,10 +197,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 break;
             if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED))))
                 return Deselect(msg);
-            goto normalEvent;
     }
-
-normalEvent:
     return widget::Main(msg);
 }
 

@@ -867,10 +867,9 @@ void ComputeUALoc(i32 playerIndex) {
                 if (triesCount >= HINT_LOCATION_RETRY_LIMIT) {
                     x = gpGame->m_ultimateArtifactX;
                     y = gpGame->m_ultimateArtifactY;
-                    goto saveLocation;
+                    break;
                 }
             }
-        saveLocation:
             gpGame->m_players[playerIndex].m_ultimateArtifactHintX = static_cast<i8>(x);
             gpGame->m_players[playerIndex].m_ultimateArtifactHintY = static_cast<i8>(y);
         }
@@ -6981,15 +6980,12 @@ void game::RestoreCell(
 }
 
 void game::SetMapSize(i32 w, i32 h) {
-    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized)
-        goto mapSized;
-    {
+    if (MAP_HEIGHT != h || MAP_WIDTH != w || !bMapInitialized) {
         bMapInitialized = true;
         MAP_WIDTH = w;
         MAP_HEIGHT = h;
         gpSearchArray->Init();
     }
-mapSized:
     if (mapExtra)
         H2_FREE(mapExtra);
     mapExtra = static_cast<u8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
@@ -7359,64 +7355,61 @@ void game::SetupNewRumour(void) {
                     return;
                 }
             }
-            goto ultimateRumour;
-        } else {
-        ultimateRumour:
-            selectionRoll7 = Random(0, 100);
-            if (selectionRoll7 < 33) {
-                if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
-                      || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                    direction = 7;
-                } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
-                             || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
-                                    * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 5;
-                } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33)) {
-                    direction = 6;
-                } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
-                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
-                             || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                    direction = 1;
-                } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
-                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
-                             || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
-                                    * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 3;
-                } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
-                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 2;
-                } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                    direction = 0;
-                } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
-                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 4;
-                } else {
-                    direction = 8;
-                }
-                sprintf(
-                    m_rumour,
-                    localization::Tr("rumor.ultimate_artifact.region"),
-                    cDirections[direction]
-                );
-            } else if (selectionRoll7 < 66) {
-                sprintf(
-                    m_rumour,
-                    localization::Tr("rumor.ultimate_artifact.terrain"),
-                    cRumourTerrainDescriptions
-                        [H2EnumIndex(giGroundToTerrain
-                                 [gpAdvManager
-                                      ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
-                                      ->m_terrainImageIndex])]
-                );
-            } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
-                sprintf(
-                    m_rumour,
-                    localization::Tr("rumor.ultimate_artifact.identity"),
-                    gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
-                );
+        }
+        selectionRoll7 = Random(0, 100);
+        if (selectionRoll7 < 33) {
+            if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
+                  || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 7;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
+                         || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                                * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 5;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33)) {
+                direction = 6;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
+                         || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 1;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
+                         || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                                * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 3;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 2;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 0;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 4;
             } else {
-                strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+                direction = 8;
             }
+            sprintf(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.region"),
+                cDirections[direction]
+            );
+        } else if (selectionRoll7 < 66) {
+            sprintf(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.terrain"),
+                cRumourTerrainDescriptions
+                    [H2EnumIndex(giGroundToTerrain
+                                     [gpAdvManager
+                                          ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
+                                          ->m_terrainImageIndex])]
+            );
+        } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
+            sprintf(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.identity"),
+                gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
+            );
+        } else {
+            strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
         }
     }
 }

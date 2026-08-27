@@ -1035,41 +1035,40 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
         mapX -= COMBAT_HEX_ROW_STAGGER;
     cellsColumn = mapX / COMBAT_HEX_HORIZONTAL_STEP;
 
-    if (cellsColumn < 0)
-        goto specialRegion;
-
-    yOffset = mapY % COMBAT_HEX_VERTICAL_STEP;
-    if (yOffset < COMBAT_GRID_DIAGONAL_HEIGHT) {
-        xResidual = mapX % COMBAT_HEX_HORIZONTAL_STEP;
-        diagonalDist =
-            abs(xResidual - COMBAT_HEX_ROW_STAGGER) / COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
-        if (yOffset < diagonalDist) {
-            lineIndex--;
-            if (xResidual < COMBAT_HEX_ROW_STAGGER) {
-                if (!(lineIndex & 1))
-                    cellsColumn--;
-            } else if (lineIndex & 1) {
-                cellsColumn++;
+    if (cellsColumn >= 0) {
+        yOffset = mapY % COMBAT_HEX_VERTICAL_STEP;
+        if (yOffset < COMBAT_GRID_DIAGONAL_HEIGHT) {
+            xResidual = mapX % COMBAT_HEX_HORIZONTAL_STEP;
+            diagonalDist =
+                abs(xResidual - COMBAT_HEX_ROW_STAGGER) / COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
+            if (yOffset < diagonalDist) {
+                lineIndex--;
+                if (xResidual < COMBAT_HEX_ROW_STAGGER) {
+                    if (!(lineIndex & 1))
+                        cellsColumn--;
+                } else if (lineIndex & 1) {
+                    cellsColumn++;
+                }
             }
         }
+
+        if (cellsColumn > COMBAT_GRID_REVERSE_COLUMN_END
+            && cellsColumn < COMBAT_GRID_COLUMN_END && lineIndex < COMBAT_GRID_ROW_COUNT
+            && lineIndex >= 0)
+            return lineIndex * COMBAT_GRID_ROW_LENGTH + cellsColumn;
     }
 
-    if (cellsColumn <= COMBAT_GRID_REVERSE_COLUMN_END || cellsColumn >= COMBAT_GRID_COLUMN_END
-        || lineIndex >= COMBAT_GRID_ROW_COUNT || lineIndex < 0) {
-    specialRegion:
-        if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX && y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN
-            && y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
-            return COMBAT_GRID_LEFT_SPECIAL_HEX;
-        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
-            && y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN && y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
-            return COMBAT_GRID_RIGHT_UPPER_HEX;
-        if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
-            && y >= COMBAT_GRID_RIGHT_LOWER_Y_MIN && y <= COMBAT_GRID_RIGHT_LOWER_Y_MAX
-            && m_inCastleCombat)
-            return COMBAT_BALLISTA_HEX;
-        return -1;
-    }
-    return lineIndex * COMBAT_GRID_ROW_LENGTH + cellsColumn;
+    if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX && y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN
+        && y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
+        return COMBAT_GRID_LEFT_SPECIAL_HEX;
+    if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
+        && y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN && y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
+        return COMBAT_GRID_RIGHT_UPPER_HEX;
+    if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= COMBAT_MAX_EXTENT_X
+        && y >= COMBAT_GRID_RIGHT_LOWER_Y_MIN && y <= COMBAT_GRID_RIGHT_LOWER_Y_MAX
+        && m_inCastleCombat)
+        return COMBAT_BALLISTA_HEX;
+    return -1;
 }
 
 void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
