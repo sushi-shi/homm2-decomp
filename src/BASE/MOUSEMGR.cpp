@@ -249,26 +249,30 @@ void mouseManager::NewUpdate(i32 force) {
             else
                 m_savedTop = m_cursorTop;
 
-            if (gOldMouseLeft > MOUSE_SCREEN_WIDTH - 1 || gOldMouseTop > MOUSE_SCREEN_HEIGHT - 1
-                || gOldMouseRight < 0 || gOldMouseBottom < 0)
-                goto resetBounds;
+            const b32 oldCursorWasVisible =
+                gOldMouseLeft <= MOUSE_SCREEN_WIDTH - 1
+                && gOldMouseTop <= MOUSE_SCREEN_HEIGHT - 1 && gOldMouseRight >= 0
+                && gOldMouseBottom >= 0;
+            const b32 cursorRegionsDoNotOverlap =
+                m_savedLeft > gOldMouseRight || m_cursorRight < gOldMouseLeft
+                || m_savedTop > gOldMouseBottom || m_cursorBottom < gOldMouseTop;
 
-            if (m_savedLeft > gOldMouseRight || m_cursorRight < gOldMouseLeft
-                || m_savedTop > gOldMouseBottom || m_cursorBottom < gOldMouseTop) {
-                if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
-                    gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
-                if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
-                    gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
-                BlitBitmapToScreenNoMouseCheck(
-                    gpWindowManager->m_screen,
-                    gOldMouseLeft,
-                    gOldMouseTop,
-                    gOldMouseRight - gOldMouseLeft + 1,
-                    gOldMouseBottom - gOldMouseTop + 1,
-                    gOldMouseLeft,
-                    gOldMouseTop
-                );
-            resetBounds:
+            if (!oldCursorWasVisible || cursorRegionsDoNotOverlap) {
+                if (oldCursorWasVisible) {
+                    if (gOldMouseRight > MOUSE_SCREEN_WIDTH - 1)
+                        gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
+                    if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
+                        gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
+                    BlitBitmapToScreenNoMouseCheck(
+                        gpWindowManager->m_screen,
+                        gOldMouseLeft,
+                        gOldMouseTop,
+                        gOldMouseRight - gOldMouseLeft + 1,
+                        gOldMouseBottom - gOldMouseTop + 1,
+                        gOldMouseLeft,
+                        gOldMouseTop
+                    );
+                }
                 gOldMouseLeft = m_savedLeft;
                 gOldMouseTop = m_savedTop;
                 gOldMouseRight =

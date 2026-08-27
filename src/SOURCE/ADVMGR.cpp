@@ -2997,9 +2997,8 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                 m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                                 break;
                             }
-                            goto process_default_hover;
+                            [[fallthrough]];
                         default:
-                        process_default_hover:
                             if ((*(mapExtra + m_commandTargetX
                                    + m_commandTargetY * MAP_WIDTH)
                                  & HOVER_UNREACHABLE)
@@ -5511,8 +5510,10 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
 
 void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen) {
     i32 updated;
+    b32 updateOverride;
 
     updated = 0;
+    updateOverride = false;
     gbForceUpdate = forceUpdate;
     if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED) {
         return;
@@ -5522,22 +5523,23 @@ void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen
         if (platform::Ticks() > giBottomViewOverrideEndTime) {
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         } else {
-            switch (giBottomViewOverride) {
-                case BOTTOM_VIEW_NEW_TURN:
-                    updated = UpdBottomViewNewTurn();
-                    break;
-                case BOTTOM_VIEW_KINGDOM:
-                    updated = UpdBottomViewKingdom();
-                    break;
-                case BOTTOM_VIEW_RESOURCE:
-                    updated = UpdBottomViewResMsg();
-                    break;
-            }
-            goto update_bottom_view;
+            updateOverride = true;
         }
     }
 
-    if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack
+    if (updateOverride) {
+        switch (giBottomViewOverride) {
+            case BOTTOM_VIEW_NEW_TURN:
+                updated = UpdBottomViewNewTurn();
+                break;
+            case BOTTOM_VIEW_KINGDOM:
+                updated = UpdBottomViewKingdom();
+                break;
+            case BOTTOM_VIEW_RESOURCE:
+                updated = UpdBottomViewResMsg();
+                break;
+        }
+    } else if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack
         || gpCurPlayer->m_color != gpGame->m_players[giCurPlayer].m_color) {
         updated = UpdBottomViewEnemyTurn();
     } else if (gpCurPlayer->m_currentHero == INVALID_HERO) {
@@ -5546,7 +5548,6 @@ void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen
         updated = UpdBottomViewHero();
     }
 
-update_bottom_view:
     if (updated && drawWindow) {
         m_adventureWindow
             ->DrawWindow(BOTTOM_VIEW_DRAW_LEFT, BOTTOM_VIEW_DRAW_TOP, BOTTOM_VIEW_DRAW_BOTTOM);
@@ -9341,12 +9342,11 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
                 ++keep[i];
                 ++loaded;
                 if (loaded >= maxSamples)
-                    goto disposeSamples;
+                    break;
             }
         }
     }
 
-disposeSamples:
     for (i = 0; i < LOOPING_SAMPLE_COUNT; ++i) {
         if (m_loopingSamples[i] != NULL && keep[i] == 0) {
             gpResourceManager->Dispose(m_loopingSamples[i]);

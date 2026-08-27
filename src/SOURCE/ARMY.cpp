@@ -1463,6 +1463,7 @@ void army::DoAttack(i32 retaliation) {
     i32 adjacentHex_1;
     i32 revivedQuantity_3;
     i32 breathHex_1;
+    b32 retaliationBlocked;
 
     m_drawState = ARMY_DRAW_IN_FRONT;
     damage_4 = 0;
@@ -1637,18 +1638,17 @@ void army::DoAttack(i32 retaliation) {
             }
             break;
         case CREATURE_MUMMY:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
-                goto applyMummySpell;
-            }
-            break;
-        case CREATURE_ROYAL_MUMMY:
-            if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
-            applyMummySpell:
+        case CREATURE_ROYAL_MUMMY: {
+            const i32 effectChance = m_monsterType == CREATURE_MUMMY
+                ? ARMY_ATTACK_EFFECT_CHANCE
+                : ARMY_ROYAL_MUMMY_EFFECT_CHANCE;
+            if (SRandom(1, ARMY_PERCENT_MAX) < effectChance) {
                 if (target_18 && target_18->SpellCastWorks(SPELL_CURSE)) {
                     target_18->m_spellEffect = SPELL_CURSE;
                 }
             }
             break;
+        }
         case CREATURE_ARCHMAGE:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_18
                 && target_18->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
@@ -1694,16 +1694,15 @@ void army::DoAttack(i32 retaliation) {
         }
     }
 
-    if (target_18 && target_18->m_quantity > 0) {
-        if (target_18->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
-            || target_18->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-            || (target_18->m_monsterType != CREATURE_GRIFFIN
-                && (H2EnumIndex((target_18->m_monster.flags.all) & (MONSTER_FLAGS_RETALIATED))))
-            || m_monsterType == CREATURE_ROGUE || m_monsterType == CREATURE_SPRITE
-            || m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD
-            || effectStopsRetaliation_4 || retaliation) {
-            goto secondAttack;
-        }
+    retaliationBlocked = target_18 == NULL || target_18->m_quantity <= 0
+        || target_18->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PARALYZE)]
+        || target_18->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]
+        || (target_18->m_monsterType != CREATURE_GRIFFIN
+            && (H2EnumIndex((target_18->m_monster.flags.all) & (MONSTER_FLAGS_RETALIATED))))
+        || m_monsterType == CREATURE_ROGUE || m_monsterType == CREATURE_SPRITE
+        || m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD
+        || effectStopsRetaliation_4 || retaliation;
+    if (!retaliationBlocked) {
         DelayMilli(
             static_cast<i32l>(
                 H2EnumIndex(ARMY_RETALIATION_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
@@ -1741,7 +1740,6 @@ void army::DoAttack(i32 retaliation) {
                                            .m_occupantSide)];
         }
     }
-secondAttack:
     if ((m_monsterType == CREATURE_WOLF || m_monsterType == CREATURE_PALADIN
          || m_monsterType == CREATURE_CRUSADER)
         && target_18 && target_18->m_quantity > 0 && !retaliation

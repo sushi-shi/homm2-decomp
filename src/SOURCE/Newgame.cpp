@@ -324,7 +324,6 @@ void game::InitNewGame(struct SMapHeader* header) {
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
             }
         }
-        goto selected_player;
     } else {
         m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
         if (header != NULL)
@@ -396,7 +395,6 @@ void game::InitNewGame(struct SMapHeader* header) {
         m_newGameInitialized = true;
     }
 
-selected_player:
     m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
 }
 
