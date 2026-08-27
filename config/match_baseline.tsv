@@ -1410,8 +1410,8 @@ SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	e5e871da8f6c
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	100.0000	d33ccb33763c
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	4be52e5e3f10
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	71b109f775c2
-SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	0e66ddc5ed82
-SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	030a811622db
+SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	37baa8714148
+SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	2adaacbb0103
 SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	4b687c570946
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	c7e2ae01e357
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	2a0579c07e7b

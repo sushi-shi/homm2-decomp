@@ -389,8 +389,8 @@ i32 dpWaitForFirstGuest(void) {
         case FIRST_GUEST_CREATE_PLAYER:
             rv = lpIDC->CreatePlayer(
                 &dcoID,
-                const_cast<LPSTR>("Dude"),
-                const_cast<LPSTR>("Heroes Player"),
+                "Dude",
+                "Heroes Player",
                 &dphEvent
             );
             if (rv != DP_OK)
@@ -489,8 +489,8 @@ i32 dpWaitForHost(void) {
         case HOST_CREATE_PLAYER:
             rv = lpIDC->CreatePlayer(
                 &dcoID,
-                const_cast<LPSTR>("Dude"),
-                const_cast<LPSTR>("Heroes Player"),
+                "Dude",
+                "Heroes Player",
                 &dphEvent
             );
             if (rv != DP_OK)
