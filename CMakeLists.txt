@@ -229,6 +229,15 @@ endif()
 
 target_compile_options(homm2 PRIVATE
   -Wall
+  -Werror=cast-align
+  -Werror=implicit-fallthrough
+  -Werror=non-virtual-dtor
+  -Werror=null-dereference
+  -Werror=old-style-cast
+  -Werror=overloaded-virtual
+  -Werror=shadow
+  -Werror=type-limits
+  -Werror=unused-label
   -Werror=unused-parameter
   -Werror=sign-compare
   -Werror=unused-variable
@@ -248,8 +257,10 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(homm2 PRIVATE
     -Wno-class-memaccess
     -Werror=array-bounds
+    -Werror=duplicated-cond
     -Werror=format-overflow
     -Werror=format-truncation
+    -Werror=logical-op
     -Werror=maybe-uninitialized
     -Werror=stringop-truncation)
 endif()

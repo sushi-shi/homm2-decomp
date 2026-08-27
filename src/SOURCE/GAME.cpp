@@ -2694,6 +2694,7 @@ void game::RandomizeEvents(void) {
                         ABANDONED_MINE_GUARDIAN_COUNT_MIN,
                         ABANDONED_MINE_GUARDIAN_COUNT_MAX
                     ));
+                    [[fallthrough]];
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL:

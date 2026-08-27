@@ -483,7 +483,6 @@ i32 game::SetupGame(void) {
                 break;
         }
 
-    menuDone:
         giMenuCommand = -1;
         result = true;
         goto done;
@@ -588,7 +587,7 @@ done:
 i32 game::PickLoadGame(void) {
     char fileMask[FILE_PATTERN_CAPACITY];
     i32 dialogResult;
-    heroWindow* heroWin;
+    heroWindow* loadWindow;
     fileRequester* fileReq;
 
     if (gbWaitForRemoteReceive != 0)
@@ -613,11 +612,11 @@ i32 game::PickLoadGame(void) {
         );
         sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     } else {
-        heroWin = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
-        if (heroWin == NULL)
+        loadWindow = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
+        if (loadWindow == NULL)
             MemError();
-        gpWindowManager->DoDialog(heroWin, ExpStdGameHandler, 0);
-        delete heroWin;
+        gpWindowManager->DoDialog(loadWindow, ExpStdGameHandler, 0);
+        delete loadWindow;
 
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case CHOICE_ONE:
