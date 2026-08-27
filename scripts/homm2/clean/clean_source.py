@@ -108,14 +108,6 @@ GENERATED_PATCHES = {
             "bDataEntryTime = ENTRY_PHASE_IMMEDIATE;",
         ),
     ],
-    "src/BASE/INPUTMGR.cpp": [
-        (
-            Pattern.LITERAL, 1,
-            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0",
-            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) "
-            "== MESSAGE_MODIFIER_NONE",
-        ),
-    ],
     "src/BASE/TEXTWDGT.cpp": [
         (
             Pattern.LITERAL, 1,

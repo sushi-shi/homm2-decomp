@@ -39,8 +39,9 @@ conversions in `GENERATED_PATCHES` bridge the few integer-only expressions
 that remain in the matching source.
 
 Every patch declares how many sites it expects to hit, and any other number ends
-the run naming the file. Sixteen audited groups cover 81 sites; the other strict
-typing conversions now live directly in the reconstructed Gold/Buka source.
+the run naming the file. Strict typing conversions move directly into the
+reconstructed Gold/Buka source whenever that change remains byte-exact; only
+the proven codegen-sensitive cases stay in the generated patch table.
 
 Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to

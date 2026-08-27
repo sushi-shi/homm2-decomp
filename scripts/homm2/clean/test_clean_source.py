@@ -55,7 +55,6 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
-                "src/BASE/INPUTMGR.cpp",
                 "src/BASE/Misc.cpp",
                 "src/BASE/TEXTWDGT.cpp",
                 "src/BASE/Textntry.cpp",
@@ -99,15 +98,7 @@ class CleanSourcePatchTests(unittest.TestCase):
         )
         self.assertIn("#include <string.h>", result)
 
-    def test_gold_enum_zeroes_use_domain_values(self):
-        input_source = (
-            "(event.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0"
-        )
-        self.assertIn(
-            "== MESSAGE_MODIFIER_NONE",
-            clean_source.apply_patches("src/BASE/INPUTMGR.cpp", input_source),
-        )
-
+    def test_gold_enum_zero_uses_domain_value(self):
         misc_source = (
             "u32l MAKEFILEID(char* text) {\n"
             "H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;\n"
