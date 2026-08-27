@@ -376,10 +376,21 @@ enum class SpellType : i8 {
 using enum SpellType;
 ENABLE_ENUM_STEPS(SpellType)
 
+class MapTriggerActionFlag {
+public:
+    constexpr operator i32() const { return 0x80; }
+};
+
+class MapTriggerTypeMask {
+public:
+    constexpr operator i32() const { return 0x7f; }
+};
+
+inline constexpr MapTriggerActionFlag MAP_TRIGGER_ACTION_FLAG;
+inline constexpr MapTriggerTypeMask MAP_TRIGGER_TYPE_MASK;
+
 enum class MapObjectType : i16 {
     MAP_OBJECT_NO_CONVERSION              = -1,
-    MAP_TRIGGER_ACTION_FLAG               = 0x80,
-    MAP_TRIGGER_TYPE_MASK                 = 0x7f,
     MAP_OBJECT_NONE                       = 0,
     MAP_OBJECT_ALCHEMIST_LAB              = 1,
     MAP_OBJECT_SIGN                       = 2,
@@ -507,7 +518,120 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_JAIL                       = 123
 };
 using enum MapObjectType;
-ENABLE_ENUM_FLAGS(MapObjectType)
+
+class MapTriggerCode {
+public:
+    MapTriggerCode() = default;
+    constexpr MapTriggerCode(MapObjectType object) : m_value(H2EnumIndex(object)) {}
+    explicit constexpr MapTriggerCode(i32 value) : m_value(value) {}
+    constexpr operator i32() const { return m_value; }
+
+private:
+    i32 m_value;
+};
+
+inline constexpr MapTriggerCode MapActionTrigger(MapObjectType object) {
+    return MapTriggerCode(MAP_TRIGGER_ACTION_FLAG | H2EnumIndex(object));
+}
+
+inline constexpr MapObjectType MapTriggerObject(MapTriggerCode trigger) {
+    return static_cast<MapObjectType>(static_cast<i32>(trigger) & MAP_TRIGGER_TYPE_MASK);
+}
+
+inline constexpr bool MapTriggerIsAction(MapTriggerCode trigger) {
+    return (static_cast<i32>(trigger) & MAP_TRIGGER_ACTION_FLAG) != 0;
+}
+
+inline constexpr MapTriggerCode MapTriggerWithObject(
+    MapTriggerCode trigger, MapObjectType object
+) {
+    return MapTriggerIsAction(trigger) ? MapActionTrigger(object) : MapTriggerCode(object);
+}
+
+inline constexpr bool operator==(MapTriggerCode trigger, MapObjectType object) {
+    return static_cast<i32>(trigger) == H2EnumIndex(object);
+}
+
+inline constexpr bool operator==(MapObjectType object, MapTriggerCode trigger) {
+    return trigger == object;
+}
+
+inline constexpr bool operator!=(MapTriggerCode trigger, MapObjectType object) {
+    return !(trigger == object);
+}
+
+inline constexpr bool operator!=(MapObjectType object, MapTriggerCode trigger) {
+    return !(trigger == object);
+}
+
+inline constexpr MapTriggerCode operator|(MapTriggerActionFlag, MapObjectType object) {
+    return MapActionTrigger(object);
+}
+
+inline constexpr MapTriggerCode operator|(MapObjectType object, MapTriggerActionFlag flag) {
+    return flag | object;
+}
+
+inline constexpr MapObjectType operator&(MapTriggerCode trigger, MapTriggerTypeMask) {
+    return MapTriggerObject(trigger);
+}
+
+template <typename Storage>
+inline constexpr bool operator==(
+    H2OpenCodeStorage<MapTriggerCode, Storage> trigger, MapObjectType object
+) {
+    return static_cast<MapTriggerCode>(trigger) == object;
+}
+
+template <typename Storage>
+inline constexpr bool operator==(
+    MapObjectType object, H2OpenCodeStorage<MapTriggerCode, Storage> trigger
+) {
+    return trigger == object;
+}
+
+template <typename Storage>
+inline constexpr bool operator!=(
+    H2OpenCodeStorage<MapTriggerCode, Storage> trigger, MapObjectType object
+) {
+    return !(trigger == object);
+}
+
+template <typename Storage>
+inline constexpr bool operator!=(
+    MapObjectType object, H2OpenCodeStorage<MapTriggerCode, Storage> trigger
+) {
+    return !(trigger == object);
+}
+
+template <typename Storage>
+inline constexpr MapObjectType operator&(
+    H2OpenCodeStorage<MapTriggerCode, Storage> trigger, MapTriggerTypeMask
+) {
+    return MapTriggerObject(static_cast<MapTriggerCode>(trigger));
+}
+
+template <typename Storage>
+inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator&=(
+    H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerTypeMask mask
+) {
+    trigger = trigger & mask;
+    return trigger;
+}
+
+template <typename Storage>
+inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator|=(
+    H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerActionFlag
+) {
+    trigger = MapTriggerCode(static_cast<i32>(trigger) | 0x80);
+    return trigger;
+}
+
+#define MAP_ACTION_TRIGGER(object) MapActionTrigger(object)
+#define MAP_PASSIVE_TRIGGER(object) MapTriggerCode(object)
+#define MAP_TRIGGER_OBJECT(trigger) MapTriggerObject(trigger)
+#define MAP_TRIGGER_IS_ACTION(trigger) MapTriggerIsAction(trigger)
+#define MAP_TRIGGER_WITH_OBJECT(trigger, object) MapTriggerWithObject(trigger, object)
 
 enum class FactionType : i8 {
     FACTION_UNINITIALIZED = -2,

@@ -570,20 +570,20 @@ void combatManager::Close(void) {
             total += m_armyGroups[H2EnumIndex(groupSide)]->m_creatureCounts[i];
     }
 
-    if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
+    if (m_battlefieldCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER))) {
         if (total > MONSTER_COUNT_SAVE_LIMIT)
             total = MONSTER_COUNT_SAVE_LIMIT;
         m_battlefieldCell->m_objectMetadata = total & H2EnumIndex(MAP_MONSTER_COUNT_MASK);
     }
 
-    if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
+    if (m_battlefieldCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))
         && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != CREATURE_NONE)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount = static_cast<u8>(total);
 
     if (m_battlefieldCell->m_triggerType
-        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+        == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
-        if (combatHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
+        if (combatHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))
             && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != CREATURE_NONE)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = static_cast<u8>(total);
     }
