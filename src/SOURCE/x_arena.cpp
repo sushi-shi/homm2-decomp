@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/font.h>
@@ -62,7 +63,7 @@ i32 DoArenaDialog(void) {
     if (windowY3 > WINDOW_MAX_Y)
         windowY3 = WINDOW_MAX_Y;
     choice = 0;
-    sprintf(windowName7, "evntwin%d.bin", windowLines2);
+    utf8::Format(windowName7, "evntwin%d.bin", windowLines2);
     arenaWinPtr = new heroWindow(windowX4, windowY3, windowName7);
     if (arenaWinPtr == NULL)
         MemError();

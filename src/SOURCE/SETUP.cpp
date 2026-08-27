@@ -129,7 +129,7 @@ i32 game::SetupComPort(void) {
     LogStr("SCP 5");
     if (gbDirectConnect == 0) {
         strcpy(gConfig.modemInitString, "ATZ");
-        sprintf(gText, "%s", gConfig.modemInitString);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", gConfig.modemInitString);
         GetDataEntry(
             localization::Tr("network.modem.initialization_prompt"),
             initString,
@@ -189,8 +189,8 @@ i32 game::SetupHotSeatGame(void) {
                     name,
                     ""
                 );
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("network.hotseat.player_name_prompt"),
                     i + 1
                 );
@@ -647,7 +647,7 @@ i32 game::PickLoadGame(void) {
     if (gbInCampaign != 0 || xIsPlayingExpansionCampaign != 0) {
         // Campaign saves pick their extension by campaign type, custom
         // campaigns included.
-        sprintf(fileMask, "*%s", GetSaveFileExtension(1).c_str());
+        utf8::Format(fileMask, sizeof(fileMask), "*%s", GetSaveFileExtension(1).c_str());
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             localization::Tr("network.load.expansion_unavailable"),
@@ -661,7 +661,7 @@ i32 game::PickLoadGame(void) {
             -1,
             0
         );
-        sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
+        utf8::Format(fileMask, "*.GM%d", giNumHumanPlayers);
     } else {
         loadWindow = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
         if (loadWindow == NULL)
@@ -681,9 +681,9 @@ i32 game::PickLoadGame(void) {
         }
 
         if (xIsExpansionMap != 0)
-            sprintf(fileMask, "*.GX%d", giNumHumanPlayers);
+            utf8::Format(fileMask, "*.GX%d", giNumHumanPlayers);
         else
-            sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
+            utf8::Format(fileMask, "*.GM%d", giNumHumanPlayers);
     }
 
     // The requester hardcodes error text for the retail campaigns; keep it

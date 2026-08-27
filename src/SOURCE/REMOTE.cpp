@@ -120,7 +120,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("RM 1");
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
-        sprintf(
+        utf8::Format(
             gsNetPlayerInfo[player].name,
               localization::Tr("player.number"),
             player + 1
@@ -372,7 +372,7 @@ i32 DecodePacket(u8* data, i32) {
     crc2[0] = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
-        sprintf(
+        utf8::Format(
             text,
             "not mine %d\n",
             REMOTE_PACKET(packet)->destination
@@ -385,7 +385,7 @@ i32 DecodePacket(u8* data, i32) {
     REMOTE_PACKET(packet)->crc = 0;
     calc_crc(crc2, reinterpret_cast<u8*>(packet), len + REMOTE_PACKET_HEADER_SIZE);
     if (crc != crc2[0]) {
-        sprintf(
+        utf8::Format(
             text,
             "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             crc,
@@ -647,8 +647,8 @@ void PollRemote(void) {
                 && bInTimeoutFail == 0) {
                 bInTimeoutFail = true;
                 gbInPollSound = false;
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("network.remote.player_not_responding"),
                     gsNetPlayerInfo[queueIndex].name
                 );
@@ -677,8 +677,8 @@ void PollRemote(void) {
             bInTimeoutFail = true;
             gbInPollSound = false;
             if (giThisNetPos == 1) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("network.remote.player_not_responding"),
                     gsNetPlayerInfo[0].name
                 );
@@ -702,8 +702,8 @@ void PollRemote(void) {
                 ReceiveRemotePlayerExit(guestExit);
             } else {
                 gpGame->SaveGame(save_names::PlayerExit, 1, 0);
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("network.player_exit.continue_with_computers"),
                     save_names::PlayerExit
                 );

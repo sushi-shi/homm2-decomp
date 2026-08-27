@@ -218,8 +218,9 @@ void FormatCombatDamage(
 ) {
     if (killed > 0) {
         if (victimName != NULL) {
-            sprintf(
+            utf8::Format(
                 output,
+                ARMY_COMBAT_TEXT_SIZE,
                 localization::TrPlural(
                     attackerIsPlural ? "combat.attack.plural.damage_with_kills"
                                      : "combat.attack.singular.damage_with_kills",
@@ -231,8 +232,9 @@ void FormatCombatDamage(
                 victimName
             );
         } else {
-            sprintf(
+            utf8::Format(
                 output,
+                ARMY_COMBAT_TEXT_SIZE,
                 localization::TrPlural(
                     attackerIsPlural ? "combat.attack.plural.damage_with_generic_kills"
                                      : "combat.attack.singular.damage_with_generic_kills",
@@ -244,8 +246,9 @@ void FormatCombatDamage(
             );
         }
     } else {
-        sprintf(
+        utf8::Format(
             output,
+            ARMY_COMBAT_TEXT_SIZE,
             localization::Tr(
                 attackerIsPlural ? "combat.attack.plural.damage"
                                  : "combat.attack.singular.damage"
@@ -389,48 +392,48 @@ void army::LoadResources(void) {
     ModifyFrameInfo(&m_frameInfo, m_monsterType);
     m_walkDuration = m_frameInfo.walkDuration;
 
-    sprintf(gText, "%smove.82M", m_monster.spriteName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%smove.82M", m_monster.spriteName);
     m_samples[H2EnumIndex(ARMY_SAMPLE_MOVE)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%sattk.82M", m_monster.spriteName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sattk.82M", m_monster.spriteName);
     m_samples[H2EnumIndex(ARMY_SAMPLE_ATTACK)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%swnce.82M", m_monster.spriteName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%swnce.82M", m_monster.spriteName);
     m_samples[H2EnumIndex(ARMY_SAMPLE_WINCE)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%skill.82M", m_monster.spriteName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%skill.82M", m_monster.spriteName);
     m_samples[H2EnumIndex(ARMY_SAMPLE_KILL)] = gpResourceManager->GetSample(gText);
 
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER)))) {
-        sprintf(gText, "%sshot.82M", m_monster.spriteName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sshot.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_SHOT)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD) {
-        sprintf(gText, "%sext1.82M", m_monster.spriteName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sext1.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
-        sprintf(gText, "%sext2.82M", m_monster.spriteName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sext2.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_TWO)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-        sprintf(gText, "%sexpl.82M", m_monster.spriteName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sexpl.82M", m_monster.spriteName);
         m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
     }
 
     m_creatureIcon = gpResourceManager->GetIcon(cMonFilename[H2EnumIndex(m_monsterType)]);
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER)))) {
         if (m_monsterType == CREATURE_GIANT || m_monsterType == CREATURE_TITAN) {
-            sprintf(gText, "titanmsl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "titanmsl.icn");
         } else if (m_monsterType == CREATURE_HALFLING) {
-            sprintf(gText, "halflmsl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "halflmsl.icn");
         } else if (m_monsterType == CREATURE_ARCHER || m_monsterType == CREATURE_RANGER) {
-            sprintf(gText, "arch_msl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "arch_msl.icn");
         } else if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-            sprintf(gText, "lich_msl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "lich_msl.icn");
         } else if (m_monsterType == CREATURE_ORC || m_monsterType == CREATURE_ORC_CHIEF) {
-            sprintf(gText, "orc__msl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "orc__msl.icn");
         } else if (m_monsterType == CREATURE_DRUID || m_monsterType == CREATURE_GREATER_DRUID) {
-            sprintf(gText, "druidmsl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "druidmsl.icn");
         } else if (m_monsterType == CREATURE_TROLL || m_monsterType == CREATURE_WAR_TROLL) {
-            sprintf(gText, "trollmsl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "trollmsl.icn");
         } else {
-            sprintf(gText, "elf__msl.icn");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "elf__msl.icn");
         }
         m_missileIcon = gpResourceManager->GetIcon(gText);
     } else {
@@ -671,7 +674,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     gColorTableRed,
                     NULL
                 );
-            sprintf(countText, "%d", gIronfistExtra.combat.stack.forceShieldHP[this]);
+            utf8::Format(countText, "%d", gIronfistExtra.combat.stack.forceShieldHP[this]);
             smallFont->DrawBoundedString(
                 countText,
                 quantX,
@@ -683,7 +686,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             );
         }
         if (drawn != ICON_DRAW_SKIPPED) {
-            sprintf(countText, "%d", m_lastTargetHex != -1 ? m_lastTargetHex : m_quantity);
+            utf8::Format(countText, "%d", m_lastTargetHex != -1 ? m_lastTargetHex : m_quantity);
             smallFont->DrawBoundedString(
                 countText,
                 quantX,
@@ -1695,8 +1698,8 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
             m_quantity > 1 ? GetCreaturePluralName(H2EnumIndex(m_monsterType))
                            : GetCreatureName(H2EnumIndex(m_monsterType));
         if (totalKilled > 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s %s %d damage.\n%d creatures %s.",
                 attackerName,
                 m_quantity > 1 ? "do" : "does",
@@ -1705,8 +1708,8 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
                 totalKilled > 1 ? "perish" : "perishes"
             );
         } else {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s %s %d damage.",
                 attackerName,
                 m_quantity > 1 ? "do" : "does",
@@ -1862,8 +1865,8 @@ void army::DoAttack(i32 retaliation) {
         } else if (damage == -2) {
             strcpy(gText, localization::Tr("combat.astral_dodge"));
         } else if (gbGenieHalf) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::TrPlural("combat.genie.destroy_half", m_quantity),
                 m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
                                : gArmyNames[H2EnumIndex(m_monsterType)]
@@ -2323,14 +2326,14 @@ void army::CheckLuck(void) {
     }
     if (m_luckOutcome) {
         if (m_luckOutcome < 0) {
-            sprintf(gText, "badluck.82m");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "badluck.82m");
         } else {
-            sprintf(gText, "goodluck.82m");
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "goodluck.82m");
         }
         luckSample = LoadPlaySample(gText);
         if (m_luckOutcome < 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::TrPlural("combat.luck.bad", m_quantity),
                 m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
                                : gArmyNames[H2EnumIndex(m_monsterType)]
@@ -2338,8 +2341,8 @@ void army::CheckLuck(void) {
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::TrPlural("combat.luck.good", m_quantity),
                 m_quantity > 1 ? gArmyNamesPlural[H2EnumIndex(m_monsterType)]
                                : gArmyNames[H2EnumIndex(m_monsterType)]

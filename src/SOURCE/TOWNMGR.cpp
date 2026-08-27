@@ -657,7 +657,7 @@ townObject::townObject(
     h = sBuildingInfo[H2EnumIndex(townType)][H2EnumIndex(buildingId)].height;
     id_h = buildingId;
     m_buildingId = id_h;
-    sprintf(name, "%s.icn", iconBaseName);
+    utf8::Format(name, "%s.icn", iconBaseName);
     m_icon = gpResourceManager->GetIcon(name);
     if (id_h != TOWN_OBJECT_NONE) {
         m_border = new border(
@@ -898,14 +898,14 @@ void townManager::SetupTown(void) {
         m_bankBox = new bankBox(TOWN_BANK_BOX_X, TOWN_GARRISON_STRIP_Y, gpCurPlayer);
         if (m_bankBox == NULL)
             MemError();
-        sprintf(gText, "townbkg%d.icn", H2EnumIndex(m_town->m_type));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "townbkg%d.icn", H2EnumIndex(m_town->m_type));
         m_backgroundIcon = gpResourceManager->GetIcon(gText);
         m_townObjectCount = 0;
         for (i = 0; i < TOWN_BUILDING_COUNT; ++i) {
             H2EnumStorage<BuildingSlotType, i32> buildId = gTownObjectOrder[H2EnumIndex(m_town->m_type)][i];
             if (buildId != TOWN_OBJECT_NONE) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s%s",
                     gTownPrefixNames[H2EnumIndex(m_town->m_type)],
                     gTownObjNames[H2EnumIndex(buildId)]
@@ -969,7 +969,7 @@ void townManager::SetupTown(void) {
         MemError();
 
     if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
-        sprintf(gText, "port%04d.icn", H2EnumIndex(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait));
         m_heroStrip = new strip(
             0,
             TOWN_HERO_STRIP_Y,
@@ -986,7 +986,7 @@ void townManager::SetupTown(void) {
         if (m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD))
             m_town->GiveSpells(NULL);
     } else if (m_town->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS)) {
-        sprintf(gText, "port%04d.icn", H2EnumIndex(m_town->m_type) + TOWN_PORTRAIT_FRAME_BASE);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_town->m_type) + TOWN_PORTRAIT_FRAME_BASE);
         m_heroStrip = new strip(
             0,
             TOWN_HERO_STRIP_Y,
@@ -1077,7 +1077,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
         cantMoveLastArmy = true;
 
     if (m_swapStrip == m_pendingStrip && m_swapArmySlot == m_pendingArmySlot) {
-        sprintf(
+        utf8::Format(
             m_statusText,
             cTownCommand[H2EnumIndex(TEXT_VIEW_ARMY)],
             gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
@@ -1090,7 +1090,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             sameType = true;
         if (sameType) {
             if (qualifier != 0) {
-                sprintf(
+                utf8::Format(
                     m_statusText,
                     cTownCommand[H2EnumIndex(TEXT_REDISTRIBUTE_ARMY)],
                     gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
@@ -1100,7 +1100,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_CANNOT_COMBINE_LAST_ARMY)]);
                 return;
             } else {
-                sprintf(
+                utf8::Format(
                     m_statusText,
                     cTownCommand[H2EnumIndex(TEXT_COMBINE_ARMIES)],
                     gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
@@ -1109,7 +1109,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             }
         } else if (qualifier != 0
                    && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == CREATURE_NONE) {
-            sprintf(
+            utf8::Format(
                 m_statusText,
                 cTownCommand[H2EnumIndex(TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
                 gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
@@ -1125,7 +1125,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_CANNOT_MOVE_LAST_ARMY)]);
             return;
         } else {
-            sprintf(
+            utf8::Format(
                 m_statusText,
                 cTownCommand[H2EnumIndex(TEXT_MOVE_ARMY)],
                 gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
@@ -1133,7 +1133,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             m_command = ARMY_COMMAND_SWAP;
         }
     } else {
-        sprintf(
+        utf8::Format(
             m_statusText,
             cTownCommand[H2EnumIndex(TEXT_EXCHANGE_ARMIES)],
             gArmyNamesPlural[H2EnumIndex(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
@@ -1157,7 +1157,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_EMPTY_STATUS)]);
             break;
         case TOWN_WIDGET_GARRISON_CREST:
-            sprintf(
+            utf8::Format(
                 m_statusText,
                 localization::Tr("calendar.date.status"),
                 gpGame->m_month,
@@ -1180,7 +1180,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot] == CREATURE_NONE) {
                     strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_EMPTY_SLOT)]);
                 } else {
-                    sprintf(
+                    utf8::Format(
                         m_statusText,
                         cTownCommand[H2EnumIndex(TEXT_SELECT_ARMY)],
                         gArmyNames[H2EnumIndex(m_selectedStrip->m_army
@@ -1212,7 +1212,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                     strcpy(m_statusText, cTownCommand[H2EnumIndex(TEXT_EMPTY_SLOT)]);
                     m_command = ARMY_COMMAND_NONE;
                 } else {
-                    sprintf(
+                    utf8::Format(
                         m_statusText,
                         cTownCommand[H2EnumIndex(TEXT_SELECT_ARMY)],
                         gArmyNames[H2EnumIndex(m_selectedStrip->m_army
@@ -1283,7 +1283,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
         case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5:
         case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6:
         case TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6:
-            sprintf(
+            utf8::Format(
                 m_statusText,
                 cTownCommand[H2EnumIndex(TEXT_RECRUIT)],
                 gArmyNamesPlural[H2EnumIndex(gDwellingType[H2EnumIndex(m_town->m_type)][objectId - H2EnumIndex(TOWN_OBJECT_DWELLING_1)])]
@@ -1436,7 +1436,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         TOWN_VIEW_FIZZLE_HEIGHT
                                     );
                                     delete m_heroStrip;
-                                    sprintf(gText, "port%04d.icn", H2EnumIndex(m_recruitHero->m_portrait));
+                                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_recruitHero->m_portrait));
                                     m_heroStrip = new strip(
                                         0,
                                         TOWN_HERO_STRIP_Y,
@@ -1474,8 +1474,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         if (m_heroStrip != NULL)
                                             delete m_heroStrip;
                                         m_heroStrip = NULL;
-                                        sprintf(
-                                            gText,
+                                        utf8::Format(
+                                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                                             "port%04d.icn",
                                             H2EnumIndex(m_town->m_type) + H2EnumIndex(TOWN_PORTRAIT_ICON_BASE)
                                         );
@@ -2067,8 +2067,8 @@ void townManager::SplitArmy(void) {
     if (m_pendingStrip->m_army == m_swapStrip->m_army) {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("hero.army.split.prompt")  );
     } else {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr(
                 m_swapStrip == m_heroStrip
                     ? "town.army.split.hero_to_garrison"
@@ -2081,7 +2081,7 @@ void townManager::SplitArmy(void) {
     message.payload.widget.id = 1;
     message.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, "%d", m_splitAmount);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", m_splitAmount);
     message.payload.widget.id = SPLIT_SETUP_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message);
@@ -2336,7 +2336,7 @@ i32 townManager::BuyBuild(
     if (windowRows_b > BUILD_WINDOW_MAX_ROWS)
         windowRows_b = BUILD_WINDOW_MAX_ROWS;
 
-    sprintf(gText, "buybuil%d.bin", windowRows_b);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "buybuil%d.bin", windowRows_b);
     window_a = new heroWindow(BUILD_WINDOW_X, BUILD_WINDOW_Y, gText);
     if (window_a == NULL)
         MemError();
@@ -2344,7 +2344,7 @@ i32 townManager::BuyBuild(
     message_m.type = MESSAGE_WIDGET;
     message_m.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_m.payload.widget.id = BUILD_ICON_CONTROL;
-    sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[H2EnumIndex(m_town->m_type)]);
+    utf8::Format(iconName_o, "cstl%s.icn", cHeroTypeShortName[H2EnumIndex(m_town->m_type)]);
     message_m.payload.widget.data.text = iconName_o;
     window_a->BroadcastMessage(message_m);
     message_m.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -2353,8 +2353,8 @@ i32 townManager::BuyBuild(
     window_a->BroadcastMessage(message_m);
 
     if (building == BUILDING_SLOT_MAGE_GUILD) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr(
                 m_town->m_type == FACTION_CYBORG ? "castle.cybernetics_lab.level"
                                                  : "castle.mage_guild.level"
@@ -2418,7 +2418,12 @@ i32 townManager::BuyBuild(
                 for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
                     entryWidth_o = GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
                     amountText_n[widgetIndex_f] = static_cast<char*>(H2_ALLOC(BUILD_AMOUNT_TEXT_CAPACITY));
-                    sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
+                    utf8::Format(
+                        amountText_n[widgetIndex_f],
+                        BUILD_AMOUNT_TEXT_CAPACITY,
+                        "%d",
+                        costs_e[widgetIndex_f]
+                    );
                     i32 widgetXOffset = 0;
                     amountWidgets_b[widgetIndex_f] = new textWidget(
                         static_cast<i16>(x_d + widgetXOffset),
@@ -2701,15 +2706,15 @@ void townManager::SetupMage(heroWindow* window) {
                     MAGE_SPELL_NAME_WIDTH
                 );
                 if (lineCount_k == 1)
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s\n[%d]",
                         gSpellNames[H2EnumIndex(m_town->m_spells[level_f][slot_o])],
                         GetManaCost(m_town->m_spells[level_f][slot_o], NULL)
                     );
                 else
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s  [%d]",
                         gSpellNames[H2EnumIndex(m_town->m_spells[level_f][slot_o])],
                         GetManaCost(m_town->m_spells[level_f][slot_o], NULL)
@@ -2728,7 +2733,7 @@ void townManager::SetupMage(heroWindow* window) {
     message_i.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     message_i.payload.widget.data.value = unusedGuildFrame_g;
     window->BroadcastMessage(message_i);
-    sprintf(gText, "magegld%c.icn", cHeroTypeInitial[H2EnumIndex(m_town->m_type)]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "magegld%c.icn", cHeroTypeInitial[H2EnumIndex(m_town->m_type)]);
     message_i.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_i.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     message_i.payload.widget.data.text = gText;
@@ -2831,8 +2836,8 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             && m_recruitHero->m_artifacts[index_j] != ARTIFACT_MAGIC_BOOK)
             ++artifactCount_h;
     }
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::TrPlural("town.recruit_hero.description", artifactCount_h),
         m_recruitHero->m_name,
         m_recruitHero->m_level,
@@ -2843,7 +2848,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     message_e.payload.widget.id = RECRUIT_DESCRIPTION_CONTROL;
     message_e.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message_e);
-    sprintf(gText, "port%04d.icn", H2EnumIndex(m_recruitHero->m_portrait));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "port%04d.icn", H2EnumIndex(m_recruitHero->m_portrait));
     message_e.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_e.payload.widget.id = RECRUIT_PORTRAIT_CONTROL;
     message_e.payload.widget.data.text = gText;
@@ -2969,8 +2974,8 @@ void townManager::DoTavern(void) {
     if (m_heroWindow0 == NULL)
         MemError();
     SetWinText(m_heroWindow0, TAVERN_WINDOW_TEXT_ID);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("town.tavern.rumor")
 
         ,
@@ -3044,7 +3049,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 
 update_amount:
-    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpTownManager->m_splitAmount);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
@@ -3082,7 +3087,7 @@ void townManager::SetupWell(heroWindow* window) {
 
     message_i.type = MESSAGE_WIDGET;
     message_i.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(iconName_b, "cstl%s.icn", cHeroTypeShortName[H2EnumIndex(m_town->m_type)]);
+    utf8::Format(iconName_b, "cstl%s.icn", cHeroTypeShortName[H2EnumIndex(m_town->m_type)]);
     message_i.payload.widget.data.text = iconName_b;
     for (dwellingResult_a = 0; dwellingResult_a < TOWN_WELL_DWELLING_COUNT; ++dwellingResult_a) {
         message_i.payload.widget.id = dwellingResult_a + 1;
@@ -3095,8 +3100,8 @@ void townManager::SetupWell(heroWindow* window) {
         message_i.payload.widget.data.value =
             dwellingTypes_c[dwellingResult_a] + H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST);
         window->BroadcastMessage(message_i);
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "monh%04d.icn",
             H2EnumIndex(gDwellingType[H2EnumIndex(m_town->m_type)][dwellingTypes_c[dwellingResult_a]])
         );
@@ -3129,7 +3134,7 @@ void townManager::SetupWell(heroWindow* window) {
             message_i.payload.widget.id = dwellingResult_a + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
             message_i.payload.widget.data.text = gText;
             window->BroadcastMessage(message_i);
-            sprintf(gText, "%d", available_e);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", available_e);
             message_i.payload.widget.id = dwellingResult_a + TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
             message_i.payload.widget.data.text = gText;
             window->BroadcastMessage(message_i);
@@ -3151,19 +3156,19 @@ void townManager::SetupWell(heroWindow* window) {
             gText,
             ""
         );
-        sprintf(detailText_i, "%s%d", cWellDetail[WELL_DETAIL_ATTACK], monsterInfo_f.attack);
+        utf8::Format(detailText_i, "%s%d", cWellDetail[WELL_DETAIL_ATTACK], monsterInfo_f.attack);
         strcat(gText, detailText_i);
-        sprintf(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_DEFENSE], monsterInfo_f.defense);
+        utf8::Format(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_DEFENSE], monsterInfo_f.defense);
         strcat(gText, detailText_i);
-        sprintf(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_DAMAGE], monsterInfo_f.damageMin);
+        utf8::Format(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_DAMAGE], monsterInfo_f.damageMin);
         strcat(gText, detailText_i);
         if (monsterInfo_f.damageMin != monsterInfo_f.damageMax) {
-            sprintf(detailText_i, "-%d", monsterInfo_f.damageMax);
+            utf8::Format(detailText_i, "-%d", monsterInfo_f.damageMax);
             strcat(gText, detailText_i);
         }
-        sprintf(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_HIT_POINTS], monsterInfo_f.hitPoints);
+        utf8::Format(detailText_i, "\n%s%d", cWellDetail[WELL_DETAIL_HIT_POINTS], monsterInfo_f.hitPoints);
         strcat(gText, detailText_i);
-        sprintf(detailText_i, cWellDetail[WELL_DETAIL_SPEED], speedText[monsterInfo_f.speed]);
+        utf8::Format(detailText_i, cWellDetail[WELL_DETAIL_SPEED], speedText[monsterInfo_f.speed]);
         strcat(gText, detailText_i);
         if (m_town->m_buildings
             & (1L << (dwellingTypes_c[dwellingResult_a] + H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)))) {
@@ -3175,7 +3180,7 @@ void townManager::SetupWell(heroWindow* window) {
             if (dwellingResult_a == 0
                 && (m_town->m_buildings & (1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))
                 growth_a += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
-            sprintf(detailText_i, cWellDetail[WELL_DETAIL_GROWTH], growth_a);
+            utf8::Format(detailText_i, cWellDetail[WELL_DETAIL_GROWTH], growth_a);
             strcat(gText, detailText_i);
         }
         message_i.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -3394,7 +3399,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     for (heroPosition_d = 0;
                          heroPosition_d < TOWN_THIEVES_PRIMARY_STAT_COUNT;
                          ++heroPosition_d) {
-                        sprintf(
+                        utf8::Format(
                             statText_h,
                             "%d\n",
                             strongestHero_d->Stats(HeroPrimaryStat(heroPosition_d))

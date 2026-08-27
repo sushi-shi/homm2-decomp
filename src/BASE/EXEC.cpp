@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/executive.h>
 #include <BASE/EXEC_TYPES.h>
 #include <BASE/baseManager.h>
@@ -121,12 +122,12 @@ i32 executive::DoDialog(class baseManager* manager) {
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
-    sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
     baseManager* m = m_managerListHead;
     while (m != NULL) {
-        sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
         LogStr(gText);
         m = m->m_next;
     }

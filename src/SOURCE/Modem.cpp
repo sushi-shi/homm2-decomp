@@ -46,7 +46,7 @@ void ModemSetup(i32 mode) {
             if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
                 utf8::Copy(command, sizeof(command), gConfig.modemInitString);
             else
-                sprintf(command, "ATZ");
+                utf8::Format(command, "ATZ");
             PollSound();
             ModemCommand(command);
             DelayMilli(MODEM_RESET_DELAY);
@@ -95,10 +95,10 @@ void ModemSetup(i32 mode) {
 i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
-    sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, localization::Tr("network.modem.dialing"), numbuf);
+    utf8::Format(dialCommand, "ATDT%s", numbuf);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("network.modem.dialing"), numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, localization::Tr("network.modem.dialing"), numbuf);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("network.modem.dialing"), numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
@@ -223,7 +223,7 @@ void Connect(void) {
     u32 seed = platform::Ticks();
 
     seed %= MODEM_ID_MODULUS;
-    sprintf(idstr, "%06d", seed);
+    utf8::Format(idstr, "%06d", seed);
     oldsec = -1;
     remotestage = 0;
     localstage = remotestage;
@@ -235,7 +235,7 @@ void Connect(void) {
             if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                 continue;
             if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
-                sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Duplicate ID Strings!\nSorry Please Try Again\n");
                 GOut(gText);
                 RemoteCleanup();
             }
@@ -249,7 +249,7 @@ void Connect(void) {
         gModemTimestamp = platform::Ticks();
         if (gModemTimestamp / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
             oldsec = gModemTimestamp;
-            sprintf(idMessage, "ID%s_%i", idstr, localstage);
+            utf8::Format(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
         }
         PollSound();
@@ -264,7 +264,7 @@ i32 WaitForDirectConnect(void) {
         case MODEM_CONNECTION_INIT_STAGE: {
             u32 idSeed = platform::Ticks();
             idSeed %= MODEM_ID_MODULUS;
-            sprintf(idstr, "%06d", idSeed);
+            utf8::Format(idstr, "%06d", idSeed);
             oldsec = -1;
             remotestage = 0;
             localstage = remotestage;
@@ -279,7 +279,7 @@ i32 WaitForDirectConnect(void) {
                 if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                     return 0;
                 if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
-                    sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "Duplicate ID Strings!\nSorry Please Try Again\n");
                     GOut(gText);
                     RemoteCleanup();
                 }
@@ -292,7 +292,7 @@ i32 WaitForDirectConnect(void) {
             gModemTimestamp = platform::Ticks();
             if (gModemTimestamp / MILLISECONDS_PER_SECOND != oldsec / MILLISECONDS_PER_SECOND) {
                 oldsec = gModemTimestamp;
-                sprintf(idMessage, "ID%s_%i", idstr, localstage);
+                utf8::Format(idMessage, "ID%s_%i", idstr, localstage);
                 WriteModemPacket(idMessage, strlen(idMessage));
             }
             if (localstage >= MODEM_CONNECTION_READY_STAGE)

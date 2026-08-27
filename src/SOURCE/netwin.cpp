@@ -43,21 +43,21 @@ i16 wsnet_init(void) {
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
     if (!platform::SocketsStartup()) {
-        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_start_error"), platform::LastSocketError());
+        utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.socket_start_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     sd_dg = platform::OpenDatagramSocket();
     if (sd_dg == platform::kInvalidSocket) {
-        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_open_error"), platform::LastSocketError());
+        utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.socket_open_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     gbRemoteOn = true;
     if (!platform::BindSocket(sd_dg, WS_TRANSPORT_PORT)) {
-        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_bind_error"), platform::LastSocketError());
+        utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.socket_bind_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     if (!platform::SetSocketNonBlocking(sd_dg, true)) {
-        sprintf(cWSTextBuffer, localization::Tr("network.tcp.socket_mode_error"), platform::LastSocketError());
+        utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.socket_mode_error"), platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     gIn_addrIP = platform::LocalHost();
@@ -66,7 +66,7 @@ i16 wsnet_init(void) {
     if (GameMode == REMOTE_GAME_NETWORK_HOST) {
         giWaitType = DIALOG_WAIT_WINSOCK_FIRST_GUEST;
         if (giTCPHostStatus != -1) {
-            sprintf(
+            utf8::Format(
                 cWSTextBuffer,
                 localization::TrPlural("network.tcp.host.expected_guests", 0),
                 platform::HostText(gIn_addrIP),
@@ -75,7 +75,7 @@ i16 wsnet_init(void) {
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         } else {
-            sprintf(
+            utf8::Format(
                 cWSTextBuffer,
                 localization::Tr("network.tcp.host.waiting_guests"),
                 platform::HostText(gIn_addrIP)
@@ -88,7 +88,7 @@ i16 wsnet_init(void) {
         giWaitType = DIALOG_WAIT_WINSOCK_GUESTS;
         if (giTCPHostStatus != -1) {
             if (giTCPNumPlayers > EXTRA_GUEST_PLAYER_THRESHOLD) {
-                sprintf(
+                utf8::Format(
                     cWSTextBuffer,
                     localization::TrPlural(
                         "network.tcp.host.expected_guests",
@@ -101,7 +101,7 @@ i16 wsnet_init(void) {
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         } else {
-            sprintf(
+            utf8::Format(
                 cWSTextBuffer,
                 localization::TrPlural(
                     "network.tcp.host.connected_guests",
@@ -238,7 +238,7 @@ void wsSendMessage(
         peerAddress.host = static_cast<u32l>(destination);
         iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
         if (iRc < 0) {
-            sprintf(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
+            utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
             H2_FREE(packetBuffer);
             return;
@@ -423,7 +423,7 @@ i32 wsWaitForExtraGuests(void) {
         if (giTCPHostStatus != -1 && giNumHumanPlayers >= giTCPNumPlayers)
             return 1;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
-        sprintf(
+        utf8::Format(
             cWSTextBuffer,
             localization::TrPlural(
                 "network.tcp.host.connected_guests",

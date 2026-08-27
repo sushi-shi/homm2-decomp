@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Icon2b.h>
@@ -1184,8 +1185,8 @@ void advManager::ProcessMapChange(SMapChange change) {
             );
             mapHero_b = gpGame->GetHero(change.id);
             if (mapHero_b->m_x != change.x || mapHero_b->m_y != change.y) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
                     "give Phil a copy of  your Autosave and, if possible, instructions to recreate "
                     "this error",
@@ -1343,8 +1344,8 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_DEAD_PLAYER:
             LogStr("Dead Player");
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("player.vanquished")  ,
                 cPlayerNames[change.id]
             );

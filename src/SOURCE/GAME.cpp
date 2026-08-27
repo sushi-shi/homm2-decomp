@@ -1294,9 +1294,9 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     m_gameLoaded = 1;
 
     if (loadFromFile || platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) == 0)
-        sprintf(pathBuf, "%s%s", ".\\DATA\\", filename);
+        utf8::Format(pathBuf, "%s%s", ".\\DATA\\", filename);
     else
-        sprintf(pathBuf, "%s%s", gcGamePath, filename);
+        utf8::Format(pathBuf, "%s%s", gcGamePath, filename);
 
     fd = platform::FileOpen(pathBuf, platform::FileMode::Read);
     if (fd == -1)
@@ -2671,7 +2671,7 @@ i32 game::LoadMap(const char* filename) {
     i32 i;
     i32 handle;
 
-    sprintf(gText, "%s%s", gcMapPath, filename);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", gcMapPath, filename);
     handle = platform::FileOpen(gText, platform::FileMode::Read);
     if (handle == -1)
         FileError(gText);
@@ -2987,8 +2987,8 @@ void game::UpdateSpellWidgets(void) {
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_viewSpellsWindow->BroadcastMessage(message);
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
@@ -2998,8 +2998,8 @@ void game::UpdateSpellWidgets(void) {
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
@@ -3009,7 +3009,7 @@ void game::UpdateSpellWidgets(void) {
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
-    sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
@@ -3052,15 +3052,15 @@ void game::UpdateSpellWidgets(void) {
 
             lines = smallFont->LineLength(gSpellNames[H2EnumIndex(spell1)], VIEW_SPELL_NAME_WIDTH);
             if (lines == 1) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s\n[%d]",
                     gSpellNames[H2EnumIndex(spell1)],
                     GetManaCost(spell1, m_viewSpellsHero)
                 );
             } else {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     "%s [%d]",
                     gSpellNames[H2EnumIndex(spell1)],
                     GetManaCost(spell1, m_viewSpellsHero)
@@ -3122,8 +3122,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                         case VIEW_SPELL_MANA_HUNDREDS_ID:
                         case VIEW_SPELL_MANA_TENS_ID:
                         case VIEW_SPELL_MANA_ONES_ID:
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
@@ -3264,8 +3264,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                         case VIEW_SPELL_MANA_HUNDREDS_ID:
                         case VIEW_SPELL_MANA_TENS_ID:
                         case VIEW_SPELL_MANA_ONES_ID:
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
@@ -3310,8 +3310,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             }
                             if (GetManaCost(spell, viewSpellsHero)
                                 > viewSpellsHero->m_spellPoints) {
-                                sprintf(
-                                    gText,
+                                utf8::Format(
+                                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                                     localization::Tr("spell.mana.insufficient")
                                          ,
                                     GetManaCost(spell, viewSpellsHero),
@@ -3365,8 +3365,8 @@ MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
             case VIEW_SPELL_MANA_HUNDREDS_ID:
             case VIEW_SPELL_MANA_TENS_ID:
             case VIEW_SPELL_MANA_ONES_ID:
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     cSpellHelp[VIEW_SPELL_HELP_MANA],
                     viewSpellsHero->m_spellPoints
                 );
@@ -3514,8 +3514,8 @@ void game::ViewArmy(
 
     details0[0] = 0;
     modifier14 = 0;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%s%d",
         cArmyDetail[ARMY_DETAIL_ATTACK],
         static_cast<i32>(monster->attack)
@@ -3526,13 +3526,13 @@ void game::ViewArmy(
     if (theArmy)
         modifier14 = theArmy->m_monster.attack - monster->attack;
     if (modifier14) {
-        sprintf(gText, " (%d)", monster->attack + modifier14);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, " (%d)", monster->attack + modifier14);
         strcat(details0, gText);
     }
 
     modifier14 = 0;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DEFENSE],
         static_cast<i32>(monster->defense)
@@ -3543,7 +3543,7 @@ void game::ViewArmy(
     if (theArmy)
         modifier14 = theArmy->m_monster.defense - monster->defense;
     if (modifier14) {
-        sprintf(gText, " (%d)", monster->defense + modifier14);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, " (%d)", monster->defense + modifier14);
         strcat(details0, gText);
     }
 
@@ -3551,51 +3551,51 @@ void game::ViewArmy(
         i32 shots8 = armyMonster2->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active == 1)
-                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
             else
-                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
             strcat(details0, gText);
         }
     }
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DAMAGE],
         static_cast<i32>(monster->damageMin)
     );
     strcat(details0, gText);
     if (monster->damageMin != monster->damageMax) {
-        sprintf(gText, "-%d", static_cast<i32>(monster->damageMax));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "-%d", static_cast<i32>(monster->damageMax));
         strcat(details0, gText);
     }
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_HIT_POINTS],
         static_cast<u32>(monster->hitPoints)
     );
     strcat(details0, gText);
     if (gpCombatManager->m_active == 1) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("army.hit_points_left"),
             static_cast<u32>(monster->hitPoints) - theArmy->m_hitPointsLost
         );
         strcat(details0, gText);
     }
-    sprintf(gText, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster2->speed]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster2->speed]);
     strcat(details0, gText);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%s",
         cArmyDetail[ARMY_DETAIL_MORALE],
         gMoraleText[morale + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
     );
     strcat(details0, gText);
     luck4 = GetLuck(theHero, theArmy, castle);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "\n%s%s",
         cArmyDetail[ARMY_DETAIL_LUCK],
         gLuckText[luck4 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
@@ -3632,7 +3632,7 @@ void game::ViewArmy(
         m_viewArmyWindow->BroadcastMessage(message);
     } else {
         char countText[VIEW_ARMY_COUNT_TEXT_SIZE];
-        sprintf(countText, "%d", numTroops);
+        utf8::Format(countText, "%d", numTroops);
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
         message.payload.widget.data.text = countText;
@@ -3912,7 +3912,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
-            sprintf(gText, localization::Tr("player.turn"), cPlayerNames[giCurPlayer]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.turn"), cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
         }
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -6242,7 +6242,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         remotePlayer,
         useCurrentSave
     );
-    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
+    utf8::Format(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
     LogInt(
         "PostDiffFileSize",
@@ -6672,7 +6672,7 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE
     );
 
-    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
+    utf8::Format(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
     file = platform::FileOpen(filename, platform::FileMode::Write);
     if (file == -1)
         FileError(filename);
@@ -6741,9 +6741,9 @@ void game::DoNewTurn(void) {
 
     if (gpCurPlayer->m_daysLeft >= 0) {
         if (gpCurPlayer->m_daysLeft == 1) {
-            sprintf(gText, cNewTurn[1], cPlayerNames[giCurPlayer]);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[1], cPlayerNames[giCurPlayer]);
         } else {
-            sprintf(gText, cNewTurn[0], cPlayerNames[giCurPlayer], gpCurPlayer->m_daysLeft);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[0], cPlayerNames[giCurPlayer], gpCurPlayer->m_daysLeft);
         }
         NormalDialog(
             gText,
@@ -6775,8 +6775,8 @@ void game::DoNewTurn(void) {
                 musicTrack2 = NEW_MONTH_MUSIC_TRACK;
                 strcpy(musicFile18, "newmonth.82m");
                 if (giMonthType == CALENDAR_PERIOD_NORMAL) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cNewTurn[NEW_MONTH_NORMAL_TEXT],
                         gMonthNames[giMonthTypeExtra]
                     );
@@ -6787,8 +6787,8 @@ void game::DoNewTurn(void) {
                         gArmyNamesPlural[giMonthTypeExtra]
                     );
                     utf8::LowercaseFirst(lowerName19);
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cNewTurn[NEW_MONTH_CREATURE_TEXT],
                         gArmyNamesPlural[giMonthTypeExtra],
                         lowerName19
@@ -6800,7 +6800,7 @@ void game::DoNewTurn(void) {
                 musicTrack2 = NEW_WEEK_MUSIC_TRACK;
                 strcpy(musicFile18, "newweek.82m");
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
-                    sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
                     utf8::Copy(
                         lowerName19,
@@ -6808,8 +6808,8 @@ void game::DoNewTurn(void) {
                         gArmyNamesPlural[giWeekTypeExtra]
                     );
                     utf8::LowercaseFirst(lowerName19);
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cNewTurn[NEW_WEEK_CREATURE_TEXT],
                         gArmyNamesPlural[giWeekTypeExtra],
                         lowerName19
@@ -7036,10 +7036,10 @@ void CreateDiffFile(
         fullSend = true;
     iLastDiffSendTo = remotePlayer;
 
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", joinName);
     joinSize = FileSize(gText);
     fullData = static_cast<u8*>(H2_ALLOC(joinSize));
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", joinName);
     readFile = platform::FileOpen(gText, platform::FileMode::Read);
     if (readFile == -1)
         FileError(gText);
@@ -7057,10 +7057,10 @@ void CreateDiffFile(
     );
 
     if (!forceWhole) {
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         oldSize = FileSize(gText);
         prevData = static_cast<u8*>(H2_ALLOC(oldSize));
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         inFd = platform::FileOpen(gText, platform::FileMode::Read);
         if (inFd == -1)
             FileError(gText);
@@ -7122,14 +7122,14 @@ void CreateDiffFile(
         }
     }
 
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", diffName);
     destFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (destFile == -1)
         FileError(gText);
     WriteGameData(destFile, diffOut, diffTotal);
     platform::FileClose(destFile);
 
-    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
     destFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (destFile == -1)
         FileError(gText);
@@ -7158,10 +7158,10 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     i32 position;
     i32 joinFile;
 
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", diffName);
     diffLength = FileSize(gText);
     diffData = static_cast<u8*>(H2_ALLOC(diffLength));
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", diffName);
     diffFile = platform::FileOpen(gText, platform::FileMode::Read);
     if (diffFile == -1)
         FileError(gText);
@@ -7173,10 +7173,10 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         memcpy(outData, diffData + JOIN_HEADER_SIZE, diffLength - JOIN_HEADER_SIZE);
         outSize = diffLength - JOIN_HEADER_SIZE;
     } else {
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         oldSize = FileSize(gText);
         oldBuf = static_cast<u8*>(H2_ALLOC(oldSize));
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
         diffFile = platform::FileOpen(gText, platform::FileMode::Read);
         if (diffFile == -1)
             FileError(gText);
@@ -7198,7 +7198,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         }
     }
 
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", joinName);
     joinFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile == -1)
         FileError(gText);
@@ -7215,7 +7215,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         LOG_UNUSED_VALUE
     );
 
-    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".\\DATA\\", oldName);
     joinFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile == -1)
         FileError(gText);
@@ -7293,25 +7293,25 @@ void game::SetupNewRumour(void) {
                 SortStats(categoryStats, categoryOrder);
                 if (categoryStats[0] != categoryStats[1]) {
                     if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_OBELISKS))
-                        sprintf(
+                        utf8::Format(
                             m_rumour,
                             localization::Tr("rumor.leader.obelisks"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_ARTIFACTS))
-                        sprintf(
+                        utf8::Format(
                             m_rumour,
                             localization::Tr("rumor.leader.artifacts"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else if (selectionRoll7 == H2EnumIndex(THIEVES_CATEGORY_ARMY_STRENGTH))
-                        sprintf(
+                        utf8::Format(
                             m_rumour,
                             localization::Tr("rumor.leader.army"),
                             cPlayerNames[categoryOrder[0]]
                         );
                     else
-                        sprintf(
+                        utf8::Format(
                             m_rumour,
                             localization::Tr("rumor.leader.income"),
                             cPlayerNames[categoryOrder[0]]
@@ -7319,7 +7319,59 @@ void game::SetupNewRumour(void) {
                     return;
                 }
             }
-            goto ultimateRumour;
+        }
+        selectionRoll7 = Random(0, 100);
+        if (selectionRoll7 < 33) {
+            if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
+                  || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 7;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
+                         || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                                * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 5;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33)) {
+                direction = 6;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
+                         || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 1;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
+                         || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                                * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 3;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 2;
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
+                direction = 0;
+            } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
+                             * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
+                direction = 4;
+            } else {
+                direction = 8;
+            }
+            utf8::Format(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.region"),
+                cDirections[direction]
+            );
+        } else if (selectionRoll7 < 66) {
+            utf8::Format(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.terrain"),
+                cRumourTerrainDescriptions
+                    [H2EnumIndex(giGroundToTerrain
+                                     [gpAdvManager
+                                          ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
+                                          ->m_terrainImageIndex])]
+            );
+        } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
+            utf8::Format(
+                m_rumour,
+                localization::Tr("rumor.ultimate_artifact.identity"),
+                gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
+            );
         } else {
         ultimateRumour:
             selectionRoll7 = Random(0, 100);
@@ -7353,14 +7405,14 @@ void game::SetupNewRumour(void) {
                 } else {
                     direction = 8;
                 }
-                sprintf(
-                    m_rumour,
+                utf8::Format(
+                    m_rumour, sizeof(m_rumour),
                     localization::Tr("rumor.ultimate_artifact.region"),
                     cDirections[direction]
                 );
             } else if (selectionRoll7 < 66) {
-                sprintf(
-                    m_rumour,
+                utf8::Format(
+                    m_rumour, sizeof(m_rumour),
                     localization::Tr("rumor.ultimate_artifact.terrain"),
                     cRumourTerrainDescriptions
                         [H2EnumIndex(giGroundToTerrain
@@ -7369,8 +7421,8 @@ void game::SetupNewRumour(void) {
                                       ->m_terrainImageIndex])]
                 );
             } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
-                sprintf(
-                    m_rumour,
+                utf8::Format(
+                    m_rumour, sizeof(m_rumour),
                     localization::Tr("rumor.ultimate_artifact.identity"),
                     gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
                 );

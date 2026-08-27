@@ -116,8 +116,8 @@ void UpdateTradingPost(i32 draw) {
             requestedValue = iTradeRatio;
             offeredValue = 1;
         }
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr(
                 offeredValue == 1
                     ? (requestedValue == 1 ? "trading.offer.one_for_one"
@@ -132,14 +132,14 @@ void UpdateTradingPost(i32 draw) {
             gResourceNames[leftResource]
         );
     } else if (bTradeMade != 0) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("trading.bargain"),
             tradingPlace
         );
     } else {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("trading.inspect_wares"),
             tradingPlace
         );
@@ -173,15 +173,15 @@ void UpdateTradingPost(i32 draw) {
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
-                    sprintf(gText, "%d", qtyToTrade);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", qtyToTrade);
                 else
-                    sprintf(gText, "%d", qtyToTrade * iTradeRatio);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", qtyToTrade * iTradeRatio);
             } else {
                 messageTemp.payload.widget.id = POST_RIGHT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
-                    sprintf(gText, "%d", qtyToTrade * iTradeRatio);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", qtyToTrade * iTradeRatio);
                 else
-                    sprintf(gText, "%d", qtyToTrade);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", qtyToTrade);
             }
             tpWindow->BroadcastMessage(messageTemp);
         }
@@ -191,7 +191,7 @@ void UpdateTradingPost(i32 draw) {
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + idx;
-                sprintf(gText, "%d", gpCurPlayer->m_resources[idx]);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[idx]);
             } else {
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
@@ -206,9 +206,9 @@ void UpdateTradingPost(i32 draw) {
                             &nMax
                         );
                         if (leftDenominatedLocal != 0)
-                            sprintf(gText, "%d", ratioLocal);
+                            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", ratioLocal);
                         else
-                            sprintf(gText, "1/%d", ratioLocal);
+                            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "1/%d", ratioLocal);
                     }
                 } else {
                     gText[0] = 0;

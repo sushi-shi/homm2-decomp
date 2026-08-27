@@ -181,7 +181,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    sprintf(
+    utf8::Format(
         icnName,
         "cstl%s.icn",
         cHeroTypeShortName[H2EnumIndex(m_town->m_type)]
@@ -196,8 +196,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         msg.payload.widget.id = CONTROL_BUILDING_NAME_FIRST + slotNum;
         if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr(
                     m_town->m_type == FACTION_CYBORG ? "castle.cybernetics_lab.level"
                                                      : "castle.mage_guild.level"
@@ -275,8 +275,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     msg.payload.widget.id = CONTROL_CAPTAIN_ICON;
     msg.payload.widget.data.value = captainQuarters != 0;
     casWin->BroadcastMessage(msg);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "CSTLCAP%c.ICN",
         cHeroTypeInitial[H2EnumIndex(m_town->m_type)]
     );
@@ -302,7 +302,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         msg.payload.widget.data.text = gText;
         gText[0] = 0;
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
-            sprintf(
+            utf8::Format(
                 captainStatLine,
                 "%s\n",
                 gStatNames[slotNum]
@@ -313,7 +313,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         casWin->BroadcastMessage(msg);
         gText[0] = 0;
         for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
-            sprintf(
+            utf8::Format(
                 captainStatLine,
                 "%d\n",
                 captainStats[H2EnumIndex(m_town->m_type)][slotNum]
@@ -379,7 +379,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             casWin->BroadcastMessage(msg);
         }
         msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-        sprintf(
+        utf8::Format(
             icnName,
             "port%04d.icn",
             H2EnumIndex(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slotNum)].m_portrait)
@@ -526,8 +526,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
             case TOWN_OBJECT_MAGE_GUILD:
                 if (!(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding)))) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
@@ -535,8 +535,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         )
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1 << H2EnumIndex(whichBuilding)))) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
@@ -594,8 +594,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
                     );
                 } else if (gpTownManager->m_town->m_buildings & (1 << H2EnumIndex(whichBuilding))) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         cCastleInfo[H2EnumIndex(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
@@ -604,8 +604,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     );
                 } else {
                     if (!(gpTownManager->m_buildableBuildings & (1 << H2EnumIndex(whichBuilding))))
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
@@ -613,8 +613,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             )
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1 << H2EnumIndex(whichBuilding))))
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
@@ -622,8 +622,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             )
                         );
                     else
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             cCastleInfo[H2EnumIndex(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
@@ -646,16 +646,16 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                         if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] < gHeroGoldCost) {
                             strcpy(gText, cCastleInfo[H2EnumIndex(INFO_CANNOT_AFFORD_HERO)]);
                         } else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY) {
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 cCastleInfo[H2EnumIndex(INFO_TOO_MANY_HEROES)],
                                 PLAYER_HERO_CAPACITY
                             );
                         } else if (gpTownManager->m_town->m_occupyingHeroId != -1) {
                             strcpy(gText, cCastleInfo[H2EnumIndex(INFO_TOWN_OCCUPIED)]);
                         } else {
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 cCastleInfo[H2EnumIndex(INFO_RECRUIT_HERO)],
                                 gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(heroChoiceIndex)]
                                     .m_name,

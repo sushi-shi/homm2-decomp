@@ -1264,8 +1264,10 @@ b32 Ironfist_LoadGame(const char* fileName, i32 loadFromFile) {
     i32 fd = platform::FileOpen(filePath.c_str(), platform::FileMode::Read);
     char firstByte = 0;
     if (fd != -1) {
-        platform::FileRead(fd, &firstByte, sizeof(firstByte));
+        const bool hasFirstByte = platform::FileReadExact(fd, &firstByte, sizeof(firstByte));
         platform::FileClose(fd);
+        if (!hasFirstByte)
+            return false;
     }
 
     if (firstByte != '<') {
@@ -1290,7 +1292,7 @@ b32 Ironfist_LoadGame(const char* fileName, i32 loadFromFile) {
     }
 
     if (platform::CompareIgnoringCase(fileName, "RMT", 3))
-        sprintf(gpGame->m_saveName, "%s", fileName);
+        utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), fileName);
 
     gpAdvManager->m_heroContextLocked = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
