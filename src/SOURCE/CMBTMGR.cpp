@@ -765,7 +765,7 @@ i32 combatManager::MoreTreesNear(void) {
             y = centerY8 + normalDirTable[nearbyDirection6].y * radius;
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
                 combatCell10 = gpAdvManager->GetCell(x, y);
-                nearbyTileset = combatCell10->m_objectTileset;
+                nearbyTileset = combatCell10->ObjectTileset();
                 switch (nearbyTileset) {
                     case TILESET_MTNSNOW:
                     case TILESET_MTNSWMP:

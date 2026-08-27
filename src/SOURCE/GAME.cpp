@@ -5970,7 +5970,7 @@ void game::ProcessOnMapHeroes(void) {
                         --randomHero->m_y;
                         m_castleRecs[GetTownId(x, y - 1)].m_occupyingHeroId = randomHero->m_id;
                     }
-                    loc->m_objectTileset = TILESET_NONE;
+                    loc->SetObjectTileset(TILESET_NONE);
                     loc->m_objectIndex = static_cast<u8>(-1);
                     loc->m_objectMetadata = 0;
                     loc->m_triggerType = 0;
