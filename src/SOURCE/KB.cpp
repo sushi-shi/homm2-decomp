@@ -3358,15 +3358,15 @@ void ShutDown(const char* msg) {
     if (gbRemoteOn)
         HandleRemoteSuddenExit();
     if (gPalette) {
-        gpResourceManager->Dispose((resource*)gPalette);
+        gpResourceManager->Dispose(static_cast<resource*>(gPalette));
         gPalette = NULL;
     }
     if (bigFont) {
-        gpResourceManager->Dispose((resource*)bigFont);
+        gpResourceManager->Dispose(static_cast<resource*>(bigFont));
         bigFont = NULL;
     }
     if (smallFont) {
-        gpResourceManager->Dispose((resource*)smallFont);
+        gpResourceManager->Dispose(static_cast<resource*>(smallFont));
         smallFont = NULL;
     }
     RemoteCleanup();
@@ -3466,7 +3466,7 @@ void SmackFade(u8* src, u8* dst) {
             dst + a * MISC_PALETTE_COMPONENT_BYTES,
             MISC_PALETTE_COMPONENT_BYTES
         );
-        g[f] = (u8)a;
+        g[f] = static_cast<u8>(a);
     }
     FadeTo(src, l, HIGH_SCORE_FADE_STEPS);
     i = gpWindowManager->m_screen->m_pixels;
@@ -3609,7 +3609,7 @@ void WaitEndSample(SAMPLE2* s, i32 waitTime) {
         platform::PumpEvents();
         PollSound();
     }
-    gpResourceManager->Dispose((resource*)*s);
+    gpResourceManager->Dispose(static_cast<resource*>(*s));
     *s = NULL;
 }
 
@@ -3646,8 +3646,8 @@ void LoadSystemwideIcons(void) {
 }
 
 void UnloadSystemwideIcons(void) {
-    gpResourceManager->Dispose((resource*)gBuyBuildIcons);
-    gpResourceManager->Dispose((resource*)gSystemIcons);
+    gpResourceManager->Dispose(static_cast<resource*>(gBuyBuildIcons));
+    gpResourceManager->Dispose(static_cast<resource*>(gSystemIcons));
 }
 
 void EarlyShutDownSystem(void) {}
@@ -4892,7 +4892,7 @@ void NormalDialog(
 
     message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
     message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_b.payload.widget.data.text = reinterpret_cast<const char*>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_b.payload.widget.data.value = H2EnumIndex(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
         message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
         pNormalDialogWindow->BroadcastMessage(message_b);
