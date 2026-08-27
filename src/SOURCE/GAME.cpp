@@ -5913,11 +5913,11 @@ void game::ProcessOnMapHeroes(void) {
                 if (!mapExtraHero->hasCustomHero
                     || mapExtraHero->heroId >= H2EnumIndex(GAME_HERO_COUNT)
                     || heroExists[mapExtraHero->heroId]) {
-                    mapExtraHero->hasAssignedHero = 0;
+                    mapExtraHero->hasAssignedHero = false;
                 } else {
                     // handle default 54 heroes
                     heroExists[mapExtraHero->heroId] = true;
-                    mapExtraHero->hasAssignedHero = 1;
+                    mapExtraHero->hasAssignedHero = true;
                 }
 
                 FactionType faction;

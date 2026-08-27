@@ -2287,7 +2287,7 @@ i32 townManager::BuyBuild(
         BUILDING_DESCRIPTION_CAPACITY,
         GetBuildingInfo(m_town->m_type, building, 0)
     );
-    i32 disallowed_p = m_town->IsBuildingDisallowed(H2EnumIndex(building));
+    b32 disallowed_p = m_town->IsBuildingDisallowed(H2EnumIndex(building));
     if (disallowed_p) {
         strcat(description_b, localization::Tr("town.build.disallowed"));
         cannotBuy = 1;

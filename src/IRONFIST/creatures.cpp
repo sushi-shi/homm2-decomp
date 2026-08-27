@@ -8,6 +8,7 @@
 
 #include <tinyxml2.h>
 
+#include <BASE/Utf8.h>
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/paths.h>
 #include <SOURCE/Localization.h>
@@ -107,26 +108,23 @@ const char* GetCreaturePluralName(i32 id) {
     return gArmyNamesPlural[id];
 }
 
-static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute, char** dest) {
+static char* QueryAttributeCopy(tinyxml2::XMLElement* el, const char* attribute) {
     const char* text = NULL;
     el->QueryStringAttribute(attribute, &text);
     if (text == NULL) {
         text = "invalid name";
     }
-    if (*dest) {
-        free(*dest);
-    }
-    *dest = strdup(text);
-    return *dest;
+    return strdup(text);
 }
 
-static void LocalizeCreatureName(i32 id, const char* table, char** value) {
+static char* LocalizeCreatureName(i32 id, const char* table, char* value) {
     std::string messageId = std::string("table.") + table + "." + std::to_string(id);
-    std::string translated = localization::TranslateExternal(messageId.c_str(), *value);
-    if (translated != *value) {
-        free(*value);
-        *value = strdup(translated.c_str());
+    std::string translated = localization::TranslateExternal(messageId.c_str(), value);
+    if (translated != value) {
+        free(value);
+        return strdup(translated.c_str());
     }
+    return value;
 }
 
 static const char* QueryTextAttribute(tinyxml2::XMLElement* el, const char* attribute) {
@@ -146,18 +144,23 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
             continue;
         }
 
-        cMonFilename[id] = QueryAttributeCopy(crElem, "icn", &cMonFilenameOwned[id]);
-        cArmyFrameFileNames[id] =
-            QueryAttributeCopy(crElem, "frm", &cArmyFrameFileNamesOwned[id]);
-        gArmyNames[id] =
-            QueryAttributeCopy(crElem, "name-singular", &gArmyNamesOwned[id]);
-        gArmyNamesPlural[id] =
-            QueryAttributeCopy(crElem, "name-plural", &gArmyNamesPluralOwned[id]);
-        LocalizeCreatureName(id, "gArmyNames", &gArmyNamesOwned[id]);
-        LocalizeCreatureName(id, "gArmyNamesPlural", &gArmyNamesPluralOwned[id]);
+        free(cMonFilenameOwned[id]);
+        cMonFilenameOwned[id] = QueryAttributeCopy(crElem, "icn");
+        cMonFilename[id] = cMonFilenameOwned[id];
+        free(cArmyFrameFileNamesOwned[id]);
+        cArmyFrameFileNamesOwned[id] = QueryAttributeCopy(crElem, "frm");
+        cArmyFrameFileNames[id] = cArmyFrameFileNamesOwned[id];
+        free(gArmyNamesOwned[id]);
+        gArmyNamesOwned[id] = QueryAttributeCopy(crElem, "name-singular");
+        gArmyNamesOwned[id] = LocalizeCreatureName(id, "gArmyNames", gArmyNamesOwned[id]);
         gArmyNames[id] = gArmyNamesOwned[id];
+        free(gArmyNamesPluralOwned[id]);
+        gArmyNamesPluralOwned[id] = QueryAttributeCopy(crElem, "name-plural");
+        gArmyNamesPluralOwned[id] =
+            LocalizeCreatureName(id, "gArmyNamesPlural", gArmyNamesPluralOwned[id]);
         gArmyNamesPlural[id] = gArmyNamesPluralOwned[id];
-        QueryAttributeCopy(crElem, "projectile", &cArmyProjectileFileNames[id]);
+        free(cArmyProjectileFileNames[id]);
+        cArmyProjectileFileNames[id] = QueryAttributeCopy(crElem, "projectile");
 
         i32 minDamage = 0;
         i32 maxDamage = 0;
@@ -236,8 +239,11 @@ static void ReadCreatureData(tinyxml2::XMLNode* root) {
         info.damageMin = static_cast<i8>(minDamage);
         info.damageMax = static_cast<i8>(maxDamage);
         info.shots = static_cast<i8>(crElem->IntAttribute("shots"));
-        strncpy(info.spriteName, QueryTextAttribute(crElem, "short-name"),
-                MONSTER_SPRITE_NAME_SIZE - 1);
+        utf8::Copy(
+            info.spriteName,
+            sizeof(info.spriteName),
+            QueryTextAttribute(crElem, "short-name")
+        );
         info.flags.all = static_cast<MonsterFlags>(creatureFlags);
         gMonsterDatabase[id] = info;
     }
@@ -299,6 +305,10 @@ void LoadCreatures() {
         memset(cArmyFrameFileNames, 0, sizeof(cArmyFrameFileNames));
         memset(gArmyNames, 0, sizeof(gArmyNames));
         memset(gArmyNamesPlural, 0, sizeof(gArmyNamesPlural));
+        memset(cMonFilenameOwned, 0, sizeof(cMonFilenameOwned));
+        memset(cArmyFrameFileNamesOwned, 0, sizeof(cArmyFrameFileNamesOwned));
+        memset(gArmyNamesOwned, 0, sizeof(gArmyNamesOwned));
+        memset(gArmyNamesPluralOwned, 0, sizeof(gArmyNamesPluralOwned));
         memset(cArmyProjectileFileNames, 0, sizeof(cArmyProjectileFileNames));
     }
 

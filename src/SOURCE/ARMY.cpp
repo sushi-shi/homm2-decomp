@@ -1399,14 +1399,14 @@ void army::SpecialAttack(void) {
                                    [gpCombatManager->m_hexCells[splashHex].m_occupantIndex];
                 if (!gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index]
                     && pEnemy != splashTarget) {
-                    gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index] = 1;
+                    gArmyEffected[H2EnumIndex(splashTarget->m_side)][splashTarget->m_index] = true;
                     DamageEnemy(splashTarget, &damageDone, &killed, 1, 0);
                 }
             }
         }
         if (gpCombatManager->m_hexCells[pEnemy->m_hex].m_occupantSide != COMBAT_SIDE_NONE
             && !gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index]) {
-            gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index] = 1;
+            gArmyEffected[H2EnumIndex(pEnemy->m_side)][pEnemy->m_index] = true;
             DamageEnemy(pEnemy, &damageDone, &killed, 1, 0);
         }
         m_spellEffectYOffset = 0;
@@ -1836,7 +1836,7 @@ void army::DoAttack(i32 retaliation) {
             }
         }
         CheckLuck();
-        m_animationState = 1;
+        m_animationState = true;
         if (m_attackDirection == COMBAT_DIRECTION_WIDE_WEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHWEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHEAST) {
@@ -2231,7 +2231,7 @@ i32 army::AttackTo(void) {
 }
 
 i32 army::AttackTo(i32 destination) {
-    i32 finishStanding;
+    b32 finishStanding;
     i32 numSteps;
     i32 pathIndex_4;
 
@@ -2263,9 +2263,9 @@ i32 army::AttackTo(i32 destination) {
             for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
                 numSteps++;
                 if (pathIndex_4 == 1 || numSteps >= m_monster.speed) {
-                    finishStanding = 1;
+                    finishStanding = true;
                 } else {
-                    finishStanding = 0;
+                    finishStanding = false;
                 }
                 // The Berserker leaps the last stretch onto its victim.
                 if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER

@@ -556,7 +556,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     && currentArmy_1->ValidFlight(
                         directionHexes[direction_28], ARMY_PATH_ANY_TARGET_HEX
                     ))
-                    pathValid_28[direction_28] = 1;
+                    pathValid_28[direction_28] = true;
                 else if (currentArmy_1->m_hex == directionHexes[direction_28]
                     || currentArmy_1->ValidPath(
                            directionHexes[direction_28],

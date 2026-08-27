@@ -1299,8 +1299,7 @@ void combatManager::CastSpell(
         case SPELL_MARKSMAN_PIERCE: {
             DelayMilli(
                 static_cast<i32l>(
-                    gfCombatSpeedMod[gConfig.combatSpeed]
-                    * static_cast<float>(SPELL_PIERCE_DELAY)
+                    gfCombatSpeedMod[gConfig.combatSpeed] * H2EnumIndex(SPELL_PIERCE_DELAY)
                 )
             );
             i32l pierceDamage = SPELL_PIERCE_DAMAGE;
@@ -1973,9 +1972,9 @@ void combatManager::ImplosionGrenade(i32 hexIndex) {
             i32 startX = m_hexCells[initialHex].m_x;
             i32 startY = m_hexCells[initialHex].m_y;
             float stepX = static_cast<float>(m_hexCells[creature->m_hex].m_x - startX)
-                          / static_cast<float>(SPELL_IMPLOSION_DRAG_FRAMES);
+                          / H2EnumIndex(SPELL_IMPLOSION_DRAG_FRAMES);
             float stepY = static_cast<float>(m_hexCells[creature->m_hex].m_y - startY)
-                          / static_cast<float>(SPELL_IMPLOSION_DRAG_FRAMES);
+                          / H2EnumIndex(SPELL_IMPLOSION_DRAG_FRAMES);
             creature->DrawToBuffer(
                 static_cast<i32>(startX + stepX * frame),
                 static_cast<i32>(startY + stepY * frame),
