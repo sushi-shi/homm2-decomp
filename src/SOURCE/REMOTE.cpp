@@ -437,8 +437,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                             LOG_UNUSED_VALUE,
                             LOG_UNUSED_VALUE
                         );
-                        out = false;
-                        goto finished;
+                        return false;
                     }
                 } while (sendStatus != 0);
             }
@@ -449,7 +448,6 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
             out = true;
             break;
     }
-finished:
     return out;
 }
 

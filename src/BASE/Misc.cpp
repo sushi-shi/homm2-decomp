@@ -370,21 +370,18 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 #include <BASE/MiscGraphicsConstants.h>
 
 void FadeIn(i32 increment) {
-    b32 done;
     i32 i, j, delayTime, threshold;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = false;
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
-    fadeStep:
+    i = 0;
+    while (true) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (i == MISC_PALETTE_MAX_LEVEL) {
-            done = true;
             UpdatePalette(gpBufferPalette->m_data);
         } else {
             threshold = MISC_PALETTE_MAX_LEVEL - i;
@@ -395,30 +392,27 @@ void FadeIn(i32 increment) {
             UpdatePalette(pal->m_data);
         }
         DelayTil(&delayTime);
-    }
-    if (done == 0) {
-        i = MISC_PALETTE_MAX_LEVEL;
-        goto fadeStep;
+        if (i == MISC_PALETTE_MAX_LEVEL)
+            break;
+        i += increment;
+        if (i >= MISC_PALETTE_LEVEL_COUNT)
+            i = MISC_PALETTE_MAX_LEVEL;
     }
     delete pal;
 }
 
 void FadeOut(i32 increment) {
-    b32 done;
     i32 i, j, delayTime;
     palette* pal = new palette;
     if (pal == NULL)
         MemError();
-    done = false;
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
-    for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
-    fadeStep:
+    i = 0;
+    while (true) {
         delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
-        if (i == FADE_LEVEL_LAST)
-            done = true;
         for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
             if (pal->m_data[j] > 0) {
                 if (pal->m_data[j] > increment)
@@ -429,10 +423,11 @@ void FadeOut(i32 increment) {
         }
         UpdatePalette(pal->m_data);
         DelayTil(&delayTime);
-    }
-    if (done == 0) {
-        i = FADE_LEVEL_LAST;
-        goto fadeStep;
+        if (i == FADE_LEVEL_LAST)
+            break;
+        i += increment;
+        if (i >= FADE_LEVEL_COUNT)
+            i = FADE_LEVEL_LAST;
     }
     delete pal;
 }

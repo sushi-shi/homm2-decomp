@@ -1254,6 +1254,10 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
 
     done = 0;
     quickView = false;
+    const auto selectOverview = [](OverviewType type) {
+        if (giOverviewType != type)
+            gpGame->SetupNewOverviewType(type, 1);
+    };
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_ALTERNATE_SELECT:
@@ -1298,19 +1302,13 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         if (quickView != 0) {
                             break;
                         }
-                    selectHeroes:
-                        if (giOverviewType != OVERVIEW_HEROES) {
-                            gpGame->SetupNewOverviewType(OVERVIEW_HEROES, 1);
-                        }
+                        selectOverview(OVERVIEW_HEROES);
                         break;
                     case TOWN_TAB_WIDGET:
                         if (quickView != 0) {
                             break;
                         }
-                    selectTowns:
-                        if (giOverviewType != OVERVIEW_TOWNS) {
-                            gpGame->SetupNewOverviewType(OVERVIEW_TOWNS, 1);
-                        }
+                        selectOverview(OVERVIEW_TOWNS);
                         break;
                     default:
                         done = gpGame->ProcessIconSelect(message.payload.widget.id, quickView);
@@ -1320,9 +1318,11 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case HERO_TITLE_WIDGET:
-                        goto selectHeroes;
+                        selectOverview(OVERVIEW_HEROES);
+                        break;
                     case TOWN_TITLE_WIDGET:
-                        goto selectTowns;
+                        selectOverview(OVERVIEW_TOWNS);
+                        break;
                     case SCROLL_UP_WIDGET:
                         if (giOverviewTop[H2EnumIndex(giOverviewType)] > 0) {
                             giOverviewTop[H2EnumIndex(giOverviewType)]--;
