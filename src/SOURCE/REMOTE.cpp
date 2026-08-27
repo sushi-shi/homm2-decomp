@@ -131,7 +131,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     LogStr("RM 2");
     gbRemoteGameOpen = true;
     savedColorMice = bLastMouseOffscreen != 0 ? bLastOnscreenMouseColor : gbColorMice;
-    gpMouseManager->SetColorMice(0);
+    gpMouseManager->SetColorMice(false);
     LogStr("RM 3");
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)

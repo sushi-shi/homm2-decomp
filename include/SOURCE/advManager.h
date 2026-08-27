@@ -147,7 +147,7 @@ public:
     void DrawCursorShadow(void);
     i32 GetCursorBaseFrame(MapDirection);
     void TurnTo(MapDirection);
-    i32 GetMoveShowIt(class hero*, MapDirection);
+    b32 GetMoveShowIt(class hero*, MapDirection);
     class mapCell* MoveHero(
         MapDirection,
         i32,

@@ -1458,7 +1458,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
-                                                1,
+                                                true,
                                                 -1
                                             );
                                             gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -=
@@ -1940,7 +1940,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             break;
 
         case ARMY_COMMAND_VIEW_HERO:
-            HeroView(m_town->m_occupyingHeroId, 1, 0);
+            HeroView(m_town->m_occupyingHeroId, true, false);
             RedrawTownScreen();
             gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
             break;

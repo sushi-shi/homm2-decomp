@@ -363,8 +363,8 @@ void combatManager::ResetLimitCreature(void) {
                     : 0;
         }
     }
-    m_drawHero[0] = 0;
-    m_drawHero[1] = 0;
+    m_drawHero[0] = false;
+    m_drawHero[1] = false;
     m_drawHeroOverlay[0] = 0;
     m_drawHeroOverlay[1] = 0;
     giMaxExtentY = 0;
@@ -893,7 +893,7 @@ void combatManager::DrawFrame(
         return;
 
     PollSound();
-    gpMouseManager->m_cursorReady = 0;
+    gpMouseManager->m_cursorReady = false;
 
     if (computeExtent != 0) {
         extentChanged1 = false;
@@ -1359,7 +1359,7 @@ void combatManager::DrawFrame(
         DrawSmallView(1, 0);
     }
 
-    gpMouseManager->m_cursorReady = 1;
+    gpMouseManager->m_cursorReady = true;
     PollSound();
     if (computeExtent != 0 || redrawExtent != 0) {
         redrawExtent = 0;
@@ -1392,7 +1392,7 @@ void combatManager::DrawFrame(
     }
 
 finish:
-    gpMouseManager->m_cursorReady = 1;
+    gpMouseManager->m_cursorReady = true;
     PollSound();
 }
 

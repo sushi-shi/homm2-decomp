@@ -459,8 +459,8 @@ i32 Random(i32 low, i32 high) {
 void ProcessAssert(i32 condition, const char* file, i32 line) {
     i32 unusedAssertWord [[maybe_unused]];
     if (condition == 0) {
-        gpMouseManager->SetColorMice(0);
-        SetFullScreenStatus(0);
+        gpMouseManager->SetColorMice(false);
+        SetFullScreenStatus(false);
         sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
         if (MessageBoxA(hwndApp, gText, "Assert Failure", MB_YESNO | MB_ICONHAND) == IDNO)
             return;
@@ -522,13 +522,13 @@ void SetGameDefaults(void) {
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
-    gConfig.blackoutComputer = 0;
+    gConfig.blackoutComputer = false;
     for (i = H2EnumIndex(CONFIG_EXECUTABLE_GAME); i < H2EnumIndex(CONFIG_EXECUTABLE_COUNT); ++i) {
         gConfig.gfx[i].showMenu = 1;
         gConfig.gfx[i].x = DEFAULT_WINDOW_ORIGIN;
         gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
-        gConfig.gfx[i].colorMouseCursor = 0;
-        gConfig.gfx[i].fullScreen = 1;
+        gConfig.gfx[i].colorMouseCursor = false;
+        gConfig.gfx[i].fullScreen = true;
         if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
             gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
             gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
@@ -546,7 +546,7 @@ void SetGameDefaults(void) {
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
     gConfig.autoCombatUseSpells = 0;
-    gConfig.blackoutComputer = 0;
+    gConfig.blackoutComputer = false;
     gConfig.currentMapOffset = 0;
     gConfig.firstMapOffset = Random(0, DEFAULT_MAP_OFFSET_MAX);
     gConfig.showObjectBoxes = 0;

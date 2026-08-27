@@ -54,8 +54,8 @@ LRESULT AppCommand(HWND, UINT, WPARAM, LPARAM);
 void UpdateDfltMenu(HMENU);
 void KBChangeMenu(HMENU);
 void SetMenuStatus(i32);
-void SetNoDialogMenus(i32);
-void SetMenus(HMENU, i32);
+void SetNoDialogMenus(b32);
+void SetMenus(HMENU, b32);
 i32l KBTickCount(void);
 void InitVideo(void);
 

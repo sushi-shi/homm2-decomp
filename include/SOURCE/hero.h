@@ -231,7 +231,7 @@ public:
     i8 Stats(HeroPrimaryStat);
     i8 GetSSLevel(HeroSecondarySkill);
     void DoSSLevelDialog(HeroSecondarySkill, i32);
-    void CheckAnduranPieces(i32);
+    void CheckAnduranPieces(b32);
 };
 #pragma pack(pop)
 extern class hero* gpHVHero;

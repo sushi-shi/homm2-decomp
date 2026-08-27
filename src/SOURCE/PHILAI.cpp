@@ -526,14 +526,14 @@ void CheckDoMain(i32 a1 [[maybe_unused]], i32 doMain) {
         PollSound();
         if (glTimers[0] < KBTickCount()) {
             if (doMain == 0) {
-                i32 oldShowIt = bShowIt;
+                b32 oldShowIt = bShowIt;
                 i32 oldX = gpAdvManager->m_previousOriginX;
                 i32 oldY = gpAdvManager->m_previousOriginY;
                 gbDrawSavedCursor = true;
                 if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0)
-                    bShowIt = 1;
+                    bShowIt = true;
                 else
-                    bShowIt = 0;
+                    bShowIt = false;
                 if (bShowIt == 0)
                     bSpecialHideCursor = true;
                 if (gpAdvManager->ComboDraw(
@@ -543,7 +543,7 @@ void CheckDoMain(i32 a1 [[maybe_unused]], i32 doMain) {
                     ))
                     gpAdvManager->UpdateScreen(0, 0);
                 else
-                    gpAdvManager->UpdBottomView(0, 1, 1);
+                    gpAdvManager->UpdBottomView(false, true, true);
                 bShowIt = oldShowIt;
                 gbDrawSavedCursor = false;
                 bSpecialHideCursor = false;
@@ -1182,7 +1182,7 @@ void philAI::DoAI(i32 player) {
     i32 stepLimit0;
     i32 steps4;
     b32 boughtAfterCapture5 = false;
-    i32 savedShow3[3];
+    b32 savedShow3[3];
     mapCell* eventCell3;
     i32 pathIndex0;
     i32 unusedVars1 [[maybe_unused]][7];
@@ -1283,10 +1283,10 @@ void philAI::DoAI(i32 player) {
                 gpCurAIHero->m_y,
                 giCurWatchPlayerBit
             )) {
-            bShowIt = 1;
+            bShowIt = true;
             gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
         } else {
-            bShowIt = 0;
+            bShowIt = false;
             gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
         }
 
@@ -1412,7 +1412,7 @@ void philAI::DoAI(i32 player) {
                         aiMoveDirection:
                             if (gpAdvManager->GetMoveShowIt(gpCurAIHero, direction26)) {
                                 savedShow3[0] = bShowIt;
-                                bShowIt = 1;
+                                bShowIt = true;
                                 gpMouseManager->HideColorPointer();
                                 hiddenPointers0++;
                                 bShowIt = savedShow3[0];
@@ -1466,7 +1466,7 @@ void philAI::DoAI(i32 player) {
                         }
 
                         savedShow3[0] = bShowIt;
-                        bShowIt = 1;
+                        bShowIt = true;
                         while (hiddenPointers0 != 0) {
                             gpMouseManager->ShowColorPointer();
                             hiddenPointers0--;
@@ -4287,7 +4287,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         if (!heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK)
             && (townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK)) {
             if (gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] >= AI_MAGIC_BOOK_COST) {
-                GiveArtifact(heroPtr, ARTIFACT_MAGIC_BOOK, 1, -1);
+                GiveArtifact(heroPtr, ARTIFACT_MAGIC_BOOK, true, -1);
                 gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= AI_MAGIC_BOOK_COST;
             } else {
                 heroPtr->m_remainingMobility = 0;
