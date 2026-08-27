@@ -10,8 +10,8 @@ struct exeGfxConfig {
     i32 y;
     i32 width;
     i32 height;
-    i32 fullScreen;
-    i32 colorMouseCursor;
+    b32 fullScreen;
+    b32 colorMouseCursor;
 };
 
 H2_ENUM_CLASS_BEGIN(ConfigMusicSource)
@@ -88,7 +88,7 @@ struct configStruct {
     ConfigVolumeLevel soundVolume;
     i32 autosave;
     i32 showRoute;
-    i32 blackoutComputer;
+    b32 blackoutComputer;
     exeGfxConfig gfx[IDX(CONFIG_EXECUTABLE_COUNT)];
     i32 firstMapOffset;
     i32 currentMapOffset;

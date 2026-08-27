@@ -21,7 +21,7 @@ highScoreManager::highScoreManager(void) {
 
     for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++)
         m_animationFrames[entry] = Random(0, HIGH_SCORE_ANIMATION_FRAME_COUNT - 1);
-    m_showCampaignScores = 0;
+    m_showCampaignScores = false;
 }
 
 VA(0x00465169, 0x16d)

@@ -954,7 +954,7 @@ void game::InitCampaignMap(void) {
                 GiveArtifact(
                     gpGame->GetHero(m_players[0].m_heroIds[0]),
                     choiceBest1->artifact,
-                    0,
+                    false,
                     -1
                 );
             break;
@@ -1003,7 +1003,7 @@ void game::InitCampaignMap(void) {
          || (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)]
              && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1))
         && m_players[0].m_heroCount > 0) {
-        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, 0, -1);
+        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, false, -1);
     }
     gbRetreatWin = true;
 

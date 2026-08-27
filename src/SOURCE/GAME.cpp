@@ -1801,7 +1801,7 @@ void game::NewMap(char* filename) {
 
     dotPos = FindLastToken(gMapName, '.');
     if (dotPos != NULL && StrEqNoCase(dotPos + 1, "MX2"))
-        xIsExpansionMap = 1;
+        xIsExpansionMap = true;
     if (xIsExpansionMap)
         gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= NECROMANCER_SHRINE_BUILD_MASK;
     else
@@ -2168,14 +2168,14 @@ void game::NewMap(char* filename) {
         }
         if (sideClass == FACTION_BARBARIAN || sideClass == FACTION_WARLOCK
             || sideClass == FACTION_NECROMANCER)
-            m_players[player].m_evilInterface = 1;
+            m_players[player].m_evilInterface = true;
         else
-            m_players[player].m_evilInterface = 0;
+            m_players[player].m_evilInterface = false;
         if (gbInCampaign && player == 0) {
             if (m_campaignType == CAMPAIGN_ARCHIBALD)
-                m_players[player].m_evilInterface = 1;
+                m_players[player].m_evilInterface = true;
             else
-                m_players[player].m_evilInterface = 0;
+                m_players[player].m_evilInterface = false;
         }
         for (nTown = 0; nTown < gpGame->m_players[player].m_townCount; nTown++)
             GetCastle(gpGame->m_players[player].m_townIds[nTown])->GiveSpells(NULL);
@@ -4263,10 +4263,10 @@ void game::NextPlayer(void) {
         gpAdvManager->HideRoute(1, 0, 1);
         gpAdvManager->CheckDimNextHeroBut();
         TurnOnAIMusic();
-        SetNoDialogMenus(0);
+        SetNoDialogMenus(false);
         giBottomViewOverride = BOTTOM_VIEW_OVERRIDE_DISABLED;
         ShowComputerScreen();
-        bShowIt = 0;
+        bShowIt = false;
         if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
             gbThisNetGotAdventureControl = false;
             remotePlayer = gbGamePosToNetPos[giCurPlayer];
@@ -4276,7 +4276,7 @@ void game::NextPlayer(void) {
         if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED)
             giBottomViewOverride = BOTTOM_VIEW_NONE;
     } else {
-        SetNoDialogMenus(1);
+        SetNoDialogMenus(true);
         gpInputManager->Flush();
         gbAllBlack = true;
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
@@ -5767,7 +5767,7 @@ void game::SetupAdjacentMons(void) {
 VA(0x0045bd55, 0x54)
 void game::CancelComputerScreen(void) {
     TurnOffAIMusic();
-    bShowIt = 1;
+    bShowIt = true;
     i32 i;
     for (i = COMPUTER_SCREEN_WIDGET_FIRST; i <= COMPUTER_SCREEN_WIDGET_LAST; i++) {
         gpWindowManager->BroadcastMessage(
@@ -5796,7 +5796,7 @@ void game::ShowComputerScreen(void) {
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
         gpAdvManager->UpdateTownLocators(1, 1);
-        gpAdvManager->UpdBottomView(1, 1, 1);
+        gpAdvManager->UpdBottomView(true, true, true);
         gpAdvManager->UpdateScreen(0, 1);
         gbAllBlack = false;
         gbThisNetHumanPlayer[giCurPlayer] = saved;
@@ -6348,7 +6348,7 @@ void game::ProcessOnMapHeroes(void) {
                                 GiveArtifact(
                                     mapHero14,
                                     ArtifactType(extra9->artifacts[recordPosition14]),
-                                    1,
+                                    true,
                                     -1
                                 );
                         }
@@ -6769,7 +6769,7 @@ transmitCleanup:
     AiPrint(const_cast<char*>("Transmit End"));
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
-        gpAdvManager->UpdBottomView(1, 1, 1);
+        gpAdvManager->UpdBottomView(true, true, true);
     }
     if (oldTrack != -1) {
         samplesReady = gSoundBackendsReady;
@@ -7033,7 +7033,7 @@ i32 game::ReceiveSaveGame(
     AiPrint(const_cast<char*>("Receive End"));
     if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
-        gpAdvManager->UpdBottomView(1, 1, 1);
+        gpAdvManager->UpdBottomView(true, true, true);
     }
     if (oldTrack != -1) {
         samplesReady = gSoundBackendsReady;
@@ -7072,7 +7072,7 @@ void game::DoNewTurn(void) {
     }
     giBottomViewOverrideEndTime = KBTickCount() + NEW_TURN_BOTTOM_VIEW_DURATION;
     giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
-    gpAdvManager->UpdBottomView(1, 1, 1);
+    gpAdvManager->UpdBottomView(true, true, true);
     gpAdvManager->SetInitialMapOrigin();
     gpAdvManager->CompleteDraw(0);
     gpAdvManager->UpdateScreen(0, 0);

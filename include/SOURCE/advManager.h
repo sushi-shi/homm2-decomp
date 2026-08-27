@@ -146,7 +146,7 @@ public:
     void DrawCursorShadow(void);
     i32 GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32));
     void TurnTo(H2_ENUM_PARAM(MapDirection, i32));
-    i32 GetMoveShowIt(class hero*, H2_ENUM_PARAM(MapDirection, i32));
+    b32 GetMoveShowIt(class hero*, H2_ENUM_PARAM(MapDirection, i32));
     class mapCell* MoveHero(
         H2_ENUM_PARAM(MapDirection, i32),
         i32,

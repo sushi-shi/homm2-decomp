@@ -434,7 +434,7 @@ i32 heroWindowManager::DoDialog(
 
     gbInDialog = true;
     if (iDialogNestCount == 0)
-        SetNoDialogMenus(0);
+        SetNoDialogMenus(false);
     iDialogNestCount++;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
@@ -470,7 +470,7 @@ i32 heroWindowManager::DoDialog(
     gbInDialog = false;
     iDialogNestCount--;
     if (iDialogNestCount == 0)
-        SetNoDialogMenus(1);
+        SetNoDialogMenus(true);
     return 0;
 }
 
@@ -487,10 +487,10 @@ void heroWindowManager::UpdateScreen(void) {
 
 VA(0x004b76b0, 0x58)
 void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
-    gpMouseManager->m_cursorReady = 0;
+    gpMouseManager->m_cursorReady = false;
     PollSound();
     BlitBitmapToScreen(m_screen, x, y, w, h, x, y);
-    gpMouseManager->m_cursorReady = 1;
+    gpMouseManager->m_cursorReady = true;
     PollSound();
 }
 

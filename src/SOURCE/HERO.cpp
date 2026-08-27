@@ -2091,7 +2091,7 @@ void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 qui
 }
 
 VA(0x00464b7b, 0x107)
-void hero::CheckAnduranPieces(i32 showDialog) {
+void hero::CheckAnduranPieces(b32 showDialog) {
     i32 artifactSlot;
 
     if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)

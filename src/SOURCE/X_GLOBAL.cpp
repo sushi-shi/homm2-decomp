@@ -657,7 +657,7 @@ DATA(0x0051bb58) u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT] = {
 DATA(0x0051bb64) i32
     xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT] = {10, 0, 0, 0, 10, 0, 4000};
 DATA(0x00534838) i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
-DATA(0x005347e0) i8 xIsExpansionMap;
+DATA(0x005347e0) b8 xIsExpansionMap;
 DATA(0x00534858) ExpansionCampaignId xLastChoice;
 DATA(0x00534837) u8 xIsPlayingExpansionCampaign;
 DATA(0x005347e8) ExpCampaign xCampaign;

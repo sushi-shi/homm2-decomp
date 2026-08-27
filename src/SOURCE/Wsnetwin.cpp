@@ -47,7 +47,7 @@ i16 wsnet_init(void) {
                 "\xef\xee\xeb\xed\xee\xfd\xea\xf0\xe0\xed\xed\xfb\xe9 \xf0\xe5\xe6\xe8\xec \xed\xe0\xe6\xe0\xe2 'F4'."
         );
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-        SetFullScreenStatus(0);
+        SetFullScreenStatus(false);
     }
     gbRemoteOn = true;
     ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));

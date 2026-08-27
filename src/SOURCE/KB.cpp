@@ -970,7 +970,7 @@ i32 oldmain(void) {
         if (gbGameOver) {
         game_over:
             RemoteCleanup();
-            bShowIt = 1;
+            bShowIt = true;
             gpMouseManager->SetPointer(
                 "advmice.mse",
                 0,
@@ -3091,7 +3091,7 @@ void BVResMsg(H2_CONST char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
     giBottomViewResource = res;
     giBottomViewResourceQty = qty;
     strcpy(gcBottomViewText, s);
-    gpAdvManager->UpdBottomView(1, 1, 1);
+    gpAdvManager->UpdBottomView(true, true, true);
 }
 
 VA(0x0046bf71, 0x1e)
@@ -3152,7 +3152,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     i32 result_p;
     i32 textWidth_b;
     i32 H2_UNUSED(textX_k);
-    i32 savedShowIt_p;
+    b32 savedShowIt_p;
     b32 updateInput_f;
     i32 inputLength_a;
     char inputText_b[BOX_TEXT_LENGTH];
@@ -3165,7 +3165,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     i32 H2_UNUSED(lineTextLimit_g);
     b32 done_a;
     b32 redrawLines_l;
-    i32 redrawSavedShowIt_a;
+    b32 redrawSavedShowIt_a;
     KbRemotePacket* remoteData_g;
     b32 redrawAdventure_o;
     i32 cursorState_j;
@@ -3193,7 +3193,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
 
     inputLength_a = 0;
     savedShowIt_p = bShowIt;
-    bShowIt = 1;
+    bShowIt = true;
     gbMoveShown = false;
     netWindow_j = new heroWindow(
         0,
@@ -3258,7 +3258,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt_p;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
-                            bShowIt = 1;
+                            bShowIt = true;
                             redrawAdventure_o = true;
                         }
                         gbLeaveNetBoxAlone = false;
@@ -3427,7 +3427,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
         gpWindowManager->RemoveWindow(netWindow_j);
         gbDrawWindowBackground = true;
         redrawSavedShowIt_a = bShowIt;
-        bShowIt = 1;
+        bShowIt = true;
         gpAdvManager->RedrawAdvScreen(1, 0);
         bShowIt = redrawSavedShowIt_a;
     } else {
@@ -3461,10 +3461,10 @@ void ShutDown(H2_CONST char* msg) {
     bInShutDown = true;
     gbClosingApp = true;
     buf[0] = 0;
-    gpMouseManager->SetColorMice(0);
+    gpMouseManager->SetColorMice(false);
     if (msg) {
         strcpy(buf, msg);
-        SetFullScreenStatus(0);
+        SetFullScreenStatus(false);
         LogStr(buf);
         MessageBoxA(
             hwndApp,
@@ -3998,7 +3998,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 gpCurPlayer->m_resources[loopIndex] += loopIndex == IDX(RES_GOLD)
                     ? APP_MENU_GOLD_BONUS
                     : APP_MENU_RESOURCE_BONUS;
-            gpAdvManager->UpdBottomView(1, 1, 1);
+            gpAdvManager->UpdBottomView(true, true, true);
             break;
 
         default:
@@ -4020,7 +4020,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                         APP_MENU_CHEAT_ARMY_QUANTITY,
                         -1
                     );
-                    gpAdvManager->UpdBottomView(1, 1, 1);
+                    gpAdvManager->UpdBottomView(true, true, true);
                 }
                 break;
             }
@@ -11483,7 +11483,7 @@ DATA(0x00525bc4) i32 gMapX;
 DATA(0x00525bc8) i32 gMapY;
 DATA(0x005258e4) char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
 DATA(0x00524f94) b32 bFreshSave;
-DATA(0x005265ac) i32 bShowIt;
+DATA(0x005265ac) b32 bShowIt;
 DATA(0x00524ddc) i32 gLowPageScreenSelector;
 DATA(0x0052589c) class heroWindowManager* gpWindowManager;
 DATA(0x00525894) i32 giCurWatchPlayer;

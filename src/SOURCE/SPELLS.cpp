@@ -773,7 +773,7 @@ void combatManager::CastSpell(
     }
 
     if (castByCreature == 0)
-        m_heroCastSpell[IDX(m_currentSide)] = 1;
+        m_heroCastSpell[IDX(m_currentSide)] = true;
 
     if (castByCreature != 0) {
         spellPower6 = SPELL_DEFAULT_CREATURE_POWER;

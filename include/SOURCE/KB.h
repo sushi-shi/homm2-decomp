@@ -570,7 +570,7 @@ extern b32 gbDrawWindowBackground;
 extern i32 bEarlySetupDone;
 extern font* bigFont;
 extern b32 bInShutDown;
-extern i32 bShowIt;
+extern b32 bShowIt;
 extern b32 bSpecialHideCursor;
 extern H2_CONST char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];

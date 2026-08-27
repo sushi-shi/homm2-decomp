@@ -226,7 +226,7 @@ public:
     i8 Stats(HeroPrimaryStat);
     i8 GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32));
     void DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
-    void CheckAnduranPieces(i32);
+    void CheckAnduranPieces(b32);
 };
 #pragma pack(pop)
 SIZE(hero, 250);

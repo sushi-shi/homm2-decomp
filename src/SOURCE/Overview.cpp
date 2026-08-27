@@ -1391,7 +1391,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
 }
 
 VA(0x0047c9b3, 0x4a3)
-i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
+i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
     i32 item;
     town* selectedTown;
     hero* curHero;

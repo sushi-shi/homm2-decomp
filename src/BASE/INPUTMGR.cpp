@@ -131,7 +131,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 gpWindowManager->ScreenShot();
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
-                SetFullScreenStatus(0);
+                SetFullScreenStatus(false);
                 AppCommand(hwndApp, 0, IDX(KBWIN_MENU_HELP), 0);
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
@@ -542,12 +542,12 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
         }
         if (bLastOnscreenMouseColor != gbColorMice)
-            gpMouseManager->SetColorMice(1);
+            gpMouseManager->SetColorMice(true);
     } else if (bLastMouseOffscreen == 0) {
         bLastMouseOffscreen = true;
         bLastOnscreenMouseColor = gbColorMice;
         if (gbColorMice != 0)
-            gpMouseManager->SetColorMice(0);
+            gpMouseManager->SetColorMice(false);
     }
     bInCheckChangeCursor = false;
 }
