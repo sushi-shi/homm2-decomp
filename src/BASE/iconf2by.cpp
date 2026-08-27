@@ -109,8 +109,6 @@ void FlipIconToBitmapYModify(
                         && s_x - s_dimLen + 1 >= clipX && s_x <= s_clipR) {
                         if (s_x <= s_clipR) {
                             if (s_x - s_dimLen + 1 >= clipX) {
-
-                                s_dimLen = s_dimLen;
                                 s_dst = s_row + s_x - s_dimLen + 1;
                             } else {
                                 s_dimLen = s_x - clipX + 1;

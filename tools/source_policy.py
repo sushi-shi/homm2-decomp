@@ -23,6 +23,13 @@ TYPEDEF_ALIAS = re.compile(r"\btypedef\s+((?:(?:\w+)::)*\w+)\s+(\w+)\s*;")
 USING_ALIAS = re.compile(r"\busing\s+(\w+)\s*=\s*((?:(?:\w+)::)*\w+)\s*;")
 ENUM_CAST = re.compile(r"\bstatic_cast\s*<\s*(?:(?:\w+)::)*(\w+)\s*>")
 ENUM_BOUNDARY_MARKER = "H2_ENUM_CODE_BOUNDARY"
+LOCALIZED_UNBOUNDED_COPY = re.compile(
+    r"\b(?:strcpy|strcat|strncpy)\s*\([^;]{0,1000}?localization::Tr\s*\(",
+    re.DOTALL,
+)
+RAW_INTEGER_DEREFERENCE = re.compile(
+    r"\*\s*reinterpret_cast\s*<\s*(?:const\s+)?[ui](?:16|32|64)\s*\*\s*>"
+)
 
 
 def main() -> int:
@@ -70,6 +77,22 @@ def main() -> int:
                 failures.append(
                     f"{relative}:{line_number}: bypasses the named enum-code boundary\n"
                     f"  {line.strip()}"
+                )
+        for pattern, explanation in (
+            (
+                LOCALIZED_UNBOUNDED_COPY,
+                "unbounded localized text transfer; use utf8::Copy/Append",
+            ),
+            (
+                RAW_INTEGER_DEREFERENCE,
+                "unaligned or host-endian integer access; use platform::binary",
+            ),
+        ):
+            for match in pattern.finditer(source):
+                line_number = source.count("\n", 0, match.start()) + 1
+                failures.append(
+                    f"{relative}:{line_number}: {explanation}\n"
+                    f"  {lines[line_number - 1].strip()}"
                 )
         for match in ENUM_CAST.finditer(source):
             if match.group(1) not in enum_names:

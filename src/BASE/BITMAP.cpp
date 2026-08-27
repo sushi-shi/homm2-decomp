@@ -161,18 +161,6 @@ void bitmap::CopyTo(
     PollSound();
 }
 
-static inline i16 BitmapWidth(bitmap* value) {
-    return value->m_width;
-}
-
-static inline u8* BitmapPixels(bitmap* value) {
-    return value->m_pixels;
-}
-
-static inline u8* BitmapPixels(bitmap* value, i32 offset) {
-    return value->m_pixels + offset;
-}
-
 void bitmap::CopyToCareful(
     class bitmap* destination,
     i32 destinationX,

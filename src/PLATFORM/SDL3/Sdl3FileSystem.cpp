@@ -56,7 +56,13 @@ public:
         } else {
             m_userRoot = m_dataRoot;
         }
-        PrepareUserState(m_userRoot);
+        if (!PrepareUserState(m_userRoot)) {
+            std::fprintf(
+                stderr,
+                "[homm2] cannot create user state directories below %s\n",
+                m_userRoot.c_str()
+            );
+        }
     }
 
     ~FileSystem() override {
@@ -284,12 +290,17 @@ private:
         const std::string& wildcard,
         std::vector<std::string>& names
     ) {
+        std::vector<std::string> found;
         std::error_code error;
         for (const auto& entry : std::filesystem::directory_iterator(root, error)) {
             const std::string name = entry.path().filename().string();
             if (!Matches(wildcard.c_str(), name.c_str())) {
                 continue;
             }
+            found.push_back(name);
+        }
+        std::sort(found.begin(), found.end());
+        for (const std::string& name : found) {
             const auto known = [&name](const std::string& seen) {
                 return SDL_strcasecmp(seen.c_str(), name.c_str()) == 0;
             };

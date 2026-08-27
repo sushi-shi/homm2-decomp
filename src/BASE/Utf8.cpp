@@ -113,6 +113,21 @@ std::size_t Copy(char* destination, std::size_t capacity, const char* source) {
     return written;
 }
 
+std::size_t Append(char* destination, std::size_t capacity, const char* source) {
+    if (destination == nullptr || capacity == 0) {
+        return 0;
+    }
+    std::size_t used = 0;
+    while (used < capacity && destination[used] != 0) {
+        ++used;
+    }
+    if (used == capacity) {
+        destination[capacity - 1] = 0;
+        return capacity - 1;
+    }
+    return used + Copy(destination + used, capacity - used, source);
+}
+
 bool IsValid(const char* text) {
     if (text == nullptr) {
         return false;

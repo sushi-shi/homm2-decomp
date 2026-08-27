@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
 #include <fcntl.h>
@@ -6708,7 +6709,12 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             chunkSize = fileSize - packet * REMOTE_PACKET_PAYLOAD_SIZE;
                         else
                             chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
-                        *reinterpret_cast<i16*>(header) = static_cast<i16>(packet);
+                        RequireGameData(platform::binary::WriteU16(
+                            reinterpret_cast<u8*>(header),
+                            REMOTE_HEADER_CAPACITY,
+                            0,
+                            static_cast<u16>(packet)
+                        ));
                         memcpy(
                             reinterpret_cast<char*>(header) + REMOTE_PACKET_INDEX_SIZE,
                             transmitData + packet * REMOTE_PACKET_PAYLOAD_SIZE,
@@ -6728,8 +6734,12 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     }
                 }
                 LogStr("PreWait");
-                *reinterpret_cast<i16*>(header) =
-                    static_cast<i16>(batch * REMOTE_PACKET_BATCH_SIZE);
+                RequireGameData(platform::binary::WriteU16(
+                    reinterpret_cast<u8*>(header),
+                    REMOTE_HEADER_CAPACITY,
+                    0,
+                    static_cast<u16>(batch * REMOTE_PACKET_BATCH_SIZE)
+                ));
                 result = TransmitAndWait(
                     reinterpret_cast<char*>(header),
                     remotePlayer,
@@ -6866,6 +6876,11 @@ i32 game::ReceiveSaveGame(
     AiPrint("Receive Start - Getting Data");
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
 
+    RequireGameData(
+        dataSize > 0
+        && dataSize <= REMOTE_PACKET_TRACKING_CAPACITY * REMOTE_PACKET_PAYLOAD_SIZE
+    );
+
     ackBuffer = NULL;
     incomingData = NULL;
     decodedData = NULL;
@@ -6948,17 +6963,50 @@ i32 game::ReceiveSaveGame(
                 || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = platform::Ticks();
             switch (packet->command) {
-                case REMOTE_SAVE_DATA_COMMAND:
-                    packetStart = *reinterpret_cast<i16*>(packet->payload);
+                case REMOTE_SAVE_DATA_COMMAND: {
+                    u16 encodedPacketStart = 0;
+                    RequireGameData(
+                        packet->payloadSize >= REMOTE_PACKET_INDEX_SIZE
+                        && platform::binary::ReadU16(
+                            reinterpret_cast<const u8*>(packet->payload),
+                            static_cast<std::size_t>(packet->payloadSize),
+                            0,
+                            encodedPacketStart
+                        )
+                    );
+                    packetStart = encodedPacketStart;
+                    const i32 payloadBytes = packet->payloadSize - REMOTE_PACKET_INDEX_SIZE;
+                    RequireGameData(
+                        packetStart < REMOTE_PACKET_TRACKING_CAPACITY
+                        && packetStart * REMOTE_PACKET_PAYLOAD_SIZE <= dataSize
+                        && payloadBytes >= 0
+                        && payloadBytes
+                               <= dataSize - packetStart * REMOTE_PACKET_PAYLOAD_SIZE
+                    );
                     received[packetStart] = 1;
                     memcpy(
                         incomingData + packetStart * REMOTE_PACKET_PAYLOAD_SIZE,
                         packet->payload + REMOTE_PACKET_INDEX_SIZE,
-                        packet->payloadSize - REMOTE_PACKET_INDEX_SIZE
+                        payloadBytes
                     );
                     break;
-                case REMOTE_SAVE_ACK_REQUEST_COMMAND:
-                    packetStart = *reinterpret_cast<i16*>(packet->payload);
+                }
+                case REMOTE_SAVE_ACK_REQUEST_COMMAND: {
+                    u16 encodedPacketStart = 0;
+                    RequireGameData(
+                        packet->payloadSize >= REMOTE_PACKET_INDEX_SIZE
+                        && platform::binary::ReadU16(
+                            reinterpret_cast<const u8*>(packet->payload),
+                            static_cast<std::size_t>(packet->payloadSize),
+                            0,
+                            encodedPacketStart
+                        )
+                    );
+                    packetStart = encodedPacketStart;
+                    RequireGameData(
+                        packetStart
+                        <= REMOTE_PACKET_TRACKING_CAPACITY - REMOTE_PACKET_BATCH_SIZE
+                    );
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
@@ -6984,6 +7032,7 @@ i32 game::ReceiveSaveGame(
                     if (!result)
                         ShutDown(NULL);
                     break;
+                }
                 case REMOTE_SAVE_FINISH_COMMAND:
                     finished = true;
                     break;
@@ -7316,17 +7365,35 @@ void game::SetMapSize(i32 w, i32 h) {
     memset(mapExtra, 0, MAP_HEIGHT * MAP_WIDTH);
 }
 
-void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
+namespace {
+
+bool WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32 capacity, i32* pos) {
+    if (buf == nullptr || pos == nullptr || len < 0 || *pos < 0 || *pos > capacity) {
+        return false;
+    }
     u8 flags = 0;
     flags |= cmd << COMMAND_SHIFT;
     if (len > LEN_WORD_MAX) {
+        if (capacity - *pos < DIFF_WORD_HEADER_SIZE) {
+            return false;
+        }
         flags |= LEN_WORD_FLAG;
         flags |= (len & LEN_HIGH_MASK) >> DIFF_WORD_SHIFT;
         u16 word = static_cast<u16>(len & LEN_LOW_MASK);
         buf[*pos] = flags;
-        *reinterpret_cast<u16*>(buf + *pos + 1) = word;
+        if (!platform::binary::WriteU16(
+                buf,
+                static_cast<std::size_t>(capacity),
+                static_cast<std::size_t>(*pos + 1),
+                word
+            )) {
+            return false;
+        }
         *pos += DIFF_WORD_HEADER_SIZE;
     } else if (len > LEN_BYTE_MAX) {
+        if (capacity - *pos < DIFF_BYTE_HEADER_SIZE) {
+            return false;
+        }
         flags |= LEN_BYTE_FLAG;
         flags |= (len & LEN_MID_MASK) >> DIFF_BYTE_SHIFT;
         u8 lo = len & LEN_BYTE_MASK;
@@ -7334,21 +7401,41 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
         buf[*pos + 1] = lo;
         *pos += DIFF_BYTE_HEADER_SIZE;
     } else {
+        if (capacity == *pos) {
+            return false;
+        }
         flags |= static_cast<u8>(len);
         buf[*pos] = flags;
         (*pos)++;
     }
+    return true;
 }
 
-i32 GetSkipCopyLen(u8* buf, i32* pos) {
+bool ReadDiffHeaderInfo(const u8* buf, i32 capacity, i32* pos, i32* length) {
+    if (buf == nullptr || pos == nullptr || length == nullptr || *pos < 0
+        || *pos >= capacity) {
+        return false;
+    }
     u8 b = buf[*pos];
     i32 len;
     if (b & LEN_WORD_FLAG) {
+        u16 word;
+        if (!platform::binary::ReadU16(
+                buf,
+                static_cast<std::size_t>(capacity),
+                static_cast<std::size_t>(*pos + 1),
+                word
+            )) {
+            return false;
+        }
         len = b & LEN_WORD_HIGH_MASK;
         len <<= DIFF_WORD_SHIFT;
-        len |= *reinterpret_cast<u16*>(buf + *pos + 1);
+        len |= word;
         *pos += DIFF_WORD_HEADER_SIZE;
     } else if (b & LEN_BYTE_FLAG) {
+        if (capacity - *pos < DIFF_BYTE_HEADER_SIZE) {
+            return false;
+        }
         len = b & LEN_SHORT_MASK;
         len <<= DIFF_BYTE_SHIFT;
         len |= buf[*pos + 1];
@@ -7357,7 +7444,10 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
         len = b & LEN_SHORT_MASK;
         (*pos)++;
     }
-    return len;
+    *length = len;
+    return true;
+}
+
 }
 
 void CreateDiffFile(
@@ -7382,6 +7472,7 @@ void CreateDiffFile(
     b32 fullSend;
     i32 destFile;
     i32 position;
+    i32 diffCapacity;
 
     prevData = NULL;
     fullData = NULL;
@@ -7427,8 +7518,11 @@ void CreateDiffFile(
         platform::FileClose(inFd);
     }
 
-    diffOut = static_cast<u8*>(H2_ALLOC((oldSize > joinSize ? oldSize : joinSize) + DIFF_BUFFER_EXTRA));
+    diffCapacity = (oldSize > joinSize ? oldSize : joinSize) + DIFF_BUFFER_EXTRA;
+    RequireGameData(diffCapacity >= JOIN_HEADER_SIZE);
+    diffOut = static_cast<u8*>(H2_ALLOC(diffCapacity));
     if (fullSend) {
+        RequireGameData(joinSize >= 0 && joinSize <= diffCapacity - JOIN_HEADER_SIZE);
         diffOut[0] = 0;
         diffOut[1] = 0;
         memcpy(diffOut + JOIN_HEADER_SIZE, fullData, joinSize);
@@ -7443,7 +7537,10 @@ void CreateDiffFile(
         while (1) {
             if (position + length >= oldSize || position + length >= joinSize) {
                 length = oldSize - position;
-                WriteDiffHeaderInfo(1, length, diffOut, &diffTotal);
+                RequireGameData(
+                    WriteDiffHeaderInfo(1, length, diffOut, diffCapacity, &diffTotal)
+                );
+                RequireGameData(length <= diffCapacity - diffTotal);
                 memcpy(diffOut + diffTotal, fullData + position, length);
                 diffTotal += length;
                 position += length;
@@ -7462,13 +7559,18 @@ void CreateDiffFile(
                     matchLen = 0;
                 } else {
                     if (length != 0) {
-                        WriteDiffHeaderInfo(1, length, diffOut, &diffTotal);
+                        RequireGameData(
+                            WriteDiffHeaderInfo(1, length, diffOut, diffCapacity, &diffTotal)
+                        );
+                        RequireGameData(length <= diffCapacity - diffTotal);
                         memcpy(diffOut + diffTotal, fullData + position, length);
                         diffTotal += length;
                         position += length;
                         length = 0;
                     }
-                    WriteDiffHeaderInfo(0, matchLen, diffOut, &diffTotal);
+                    RequireGameData(
+                        WriteDiffHeaderInfo(0, matchLen, diffOut, diffCapacity, &diffTotal)
+                    );
                     position += matchLen;
                     matchLen = 0;
                 }
@@ -7512,7 +7614,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     i32 outSize = 0;
     i32 diffLength;
     i32 diffFile;
-    i32 copyLength;
+    i32 copyLength = 0;
     i32 oldSize;
     i32 position;
     i32 joinFile;
@@ -7528,7 +7630,9 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     platform::FileClose(diffFile);
 
     outData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
+    RequireGameData(diffLength >= JOIN_HEADER_SIZE);
     if (diffData[0] == 0) {
+        RequireGameData(diffLength - JOIN_HEADER_SIZE <= JOIN_BUFFER_SIZE);
         memcpy(outData, diffData + JOIN_HEADER_SIZE, diffLength - JOIN_HEADER_SIZE);
         outSize = diffLength - JOIN_HEADER_SIZE;
     } else {
@@ -7541,17 +7645,27 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
             FileError(gText);
         ReadGameData(diffFile, oldBuf, oldSize);
         platform::FileClose(diffFile);
+        RequireGameData(oldSize >= 0 && oldSize <= JOIN_BUFFER_SIZE);
         memcpy(outData, oldBuf, oldSize);
 
         position = JOIN_HEADER_SIZE;
         while (position < diffLength) {
             copyFlag = diffData[position] >> DIFF_COPY_FLAG_SHIFT;
-            copyLength = GetSkipCopyLen(diffData, &position);
+            RequireGameData(
+                ReadDiffHeaderInfo(diffData, diffLength, &position, &copyLength)
+            );
             if (copyFlag) {
+                RequireGameData(
+                    copyLength >= 0 && copyLength <= diffLength - position
+                    && copyLength <= JOIN_BUFFER_SIZE - outSize
+                );
                 memcpy(outData + outSize, diffData + position, copyLength);
                 outSize += copyLength;
                 position += copyLength;
             } else {
+                RequireGameData(
+                    copyLength >= 0 && copyLength <= JOIN_BUFFER_SIZE - outSize
+                );
                 outSize += copyLength;
             }
         }

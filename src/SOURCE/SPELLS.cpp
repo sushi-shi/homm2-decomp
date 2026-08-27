@@ -667,7 +667,11 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             break;
         case SPELL_TELEPORT:
             if (bInTeleportGetDest) {
-                strcpy(gText, localization::Tr("combat.spell.teleport_here"));
+                utf8::Copy(
+                    gText,
+                    GLOBAL_TEXT_BUFFER_SIZE,
+                    localization::Tr("combat.spell.teleport_here")
+                );
                 break;
             }
             goto occupied_target;
@@ -937,6 +941,8 @@ void combatManager::CastSpell(
                         m_hexCells[teleportArmy6->m_hex - 1].m_occupantIndex =
                             static_cast<i8>(teleportArmy6->m_index);
                         m_hexCells[teleportArmy6->m_hex - 1].m_occupantFrame = ARMY_FACING_LEFT;
+                        break;
+                    default:
                         break;
                 }
                 RippleCreature(
@@ -3023,6 +3029,8 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             CombatMessage(gText, 1, 1, 0);
             break;
         }
+        default:
+            break;
     }
 
     if (!gbNoShowCombat) {
@@ -3071,6 +3079,8 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                 }
                 case SPELL_DEATH_RIPPLE:
                 case SPELL_DEATH_WAVE:
+                    break;
+                default:
                     break;
             }
         }

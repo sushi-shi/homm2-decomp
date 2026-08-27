@@ -78,10 +78,9 @@ void ModemSetup(i32 mode) {
         LogStr("MS4");
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
-        strcpy(
+        utf8::Copy(
             directConnectMessage3,
             localization::Tr("network.modem.direct_wait")
-
         );
         NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)

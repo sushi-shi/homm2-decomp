@@ -39,6 +39,8 @@ i32 army::FindPath(
             case ARMY_FACING_RIGHT:
                 targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_WEST);
                 break;
+            default:
+                break;
         }
 
         if (!ValidHex(targetHex))
@@ -159,6 +161,8 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                 else
                     rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_EAST);
                 break;
+            default:
+                break;
         }
 
         rearValidResult = false;
@@ -228,6 +232,8 @@ i32 army::ValidAttack(
                     if (direction <= COMBAT_DIRECTION_SOUTHEAST)
                         adjacentSourceHex =
                             GetAdjacentCellIndex(sourceHex, COMBAT_DIRECTION_EAST);
+                    break;
+                default:
                     break;
             }
 
@@ -385,6 +391,8 @@ i32 army::ValidRange(i32 targetHex) {
                 adj = GetAdjacentCellIndex(adj, directionResult1);
                 if (adj == targetHex)
                     return 1;
+                break;
+            default:
                 break;
         }
     }

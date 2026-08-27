@@ -1295,7 +1295,11 @@ void army::SpecialAttack(void) {
 
     if (killed > 0) {
         if (damageDone == -1) {
-            strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
+            utf8::Copy(
+                gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
+                localization::Tr("combat.mirror_image.destroyed")
+            );
         } else {
             FormatCombatDamage(
                 gText,
@@ -1328,6 +1332,8 @@ void army::SpecialAttack(void) {
                 && pEnemy->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
                 pEnemy->m_spellEffect = CREATURE_SPELL_DISPEL;
             }
+            break;
+        default:
             break;
     }
     PowEffect(powVal, 0, effectX, effectY);
@@ -1572,7 +1578,11 @@ void army::DoAttack(i32 retaliation) {
         DamageEnemy(breathTarget_6, &breathDamage_12, &breathKilled, 0, 0);
     }
     if (damage_4 == -1) {
-        strcpy(gText, localization::Tr("combat.mirror_image.destroyed"));
+        utf8::Copy(
+            gText,
+            GLOBAL_TEXT_BUFFER_SIZE,
+            localization::Tr("combat.mirror_image.destroyed")
+        );
     } else if (gbGenieHalf) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -1665,6 +1675,8 @@ void army::DoAttack(i32 retaliation) {
         case CREATURE_VAMPIRE_LORD:
             gpCombatManager->m_killBenefit[H2EnumIndex(gpCombatManager->m_hexCells[m_hex].m_occupantSide)] =
                 killed_1 * target_18->m_monster.hitPoints;
+            break;
+        default:
             break;
     }
     PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
@@ -2794,6 +2806,8 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_STEELSKIN:
             m_monster.defense -= STEELSKIN_DEFENSE_BONUS;
             break;
+        default:
+            break;
     }
 }
 
@@ -2861,6 +2875,8 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_STEELSKIN:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_STONESKIN);
             m_monster.defense += STEELSKIN_DEFENSE_BONUS;
+            break;
+        default:
             break;
     }
     m_spellCount++;

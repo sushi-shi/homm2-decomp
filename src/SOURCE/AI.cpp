@@ -1023,6 +1023,8 @@ i32 combatManager::WalkTowardArmy(
             case ARMY_FACING_RIGHT:
                 targetSquare++;
                 break;
+            default:
+                break;
         }
         if (targetSquare != COMBAT_AI_NO_ARMY)
             routeGot = gpSearchArray->FindCombatPath(

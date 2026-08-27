@@ -68,7 +68,7 @@ i32 DoArenaDialog(void) {
     if (arenaWinPtr == NULL)
         MemError();
 
-    strcpy(gText, localization::Tr("adventure.arena.choose_skill"));
+    utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("adventure.arena.choose_skill"));
     message14.type = MESSAGE_WIDGET;
     message14.payload.widget.command = ARENA_BROADCAST_TEXT;
     message14.payload.widget.id = BROADCAST_TEXT_ID;

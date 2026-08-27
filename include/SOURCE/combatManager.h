@@ -6,6 +6,7 @@
 #include <BASE/WINMGR.h>
 #include <BASE/icon.h>
 #include <SOURCE/COMMAND.h>
+#include <SOURCE/CombatCursor.h>
 #include "army.h"
 #include "hero.h"
 #include "hexcell.h"
@@ -400,7 +401,6 @@ typedef enum CombatRuntimeConstant {
     COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER = 10,
     COMBAT_CAPTAIN_SPRITE_OFFSET          = H2EnumIndex(FACTION_COUNT),
     COMBAT_NEUTRAL_HERO_COLOR             = H2EnumIndex(FACTION_COUNT),
-    COMBAT_POINTER_DEFAULT                = 6,
     COMBAT_HERO_OVERLAY_FRAME_COUNT       = 5,
     COMBAT_HERO_ANIMATION_TRACK_COUNT     = COMBAT_SIDE_COUNT + 1,
     COMBAT_INITIAL_COMMAND                = 15,
@@ -480,23 +480,6 @@ typedef enum CombatSpellAIConstant {
     COMBAT_SPELL_AI_DECISIVE_EFFECT                  = 100000000,
     COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE             = 999999
 } CombatSpellAIConstant;
-
-enum class CombatMessageCommand : i32 {
-    COMBAT_INVALID_COMMAND                    = -99,
-    COMBAT_MESSAGE_COMMAND_DEFAULT            = 0,
-    COMBAT_MESSAGE_COMMAND_MOVE               = 1,
-    COMBAT_MESSAGE_COMMAND_FLY                = 2,
-    COMBAT_MESSAGE_COMMAND_SHOOT              = 3,
-    COMBAT_MESSAGE_COMMAND_OPTIONS            = 4,
-    COMBAT_MESSAGE_COMMAND_VIEW_INFO          = 5,
-    COMBAT_MESSAGE_COMMAND_ATTACK             = 7,
-    COMBAT_MESSAGE_COMMAND_CAST_SPELL         = 10,
-    COMBAT_MESSAGE_COMMAND_RETREAT            = 11,
-    COMBAT_MESSAGE_COMMAND_SURRENDER          = 12,
-    COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS   = 13,
-    COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL = 15
-};
-using enum CombatMessageCommand;
 
 enum class CombatGridShade : u8 {
     GRID_SHADE_NONE          = 0,
@@ -727,7 +710,7 @@ public:
     i32 ValidHexToStandOn(i32);
     void SetCombatDirections(i32);
     void CheckSetMouseDirection(i32, i32, i32);
-    i32 GetPointer(CombatMessageCommand, i32);
+    CombatCursorFrame GetPointer(CombatMessageCommand, i32);
     MessageDispatchResult ProcessCombatMsg(struct tag_message&);
     i32 IsNegationSphereInEffect(void);
     void ResetRound(void);

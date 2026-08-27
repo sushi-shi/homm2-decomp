@@ -58,11 +58,13 @@ public:
 // with the installation, as Windows still does; elsewhere they are the user's.
 bool IsUserState(const char* retailPath);
 
-// Creates the user directories that state resolves into.
-void PrepareUserState(const std::string& userRoot);
+// Creates the user directories that state resolves into. Failure is reported
+// so startup can make a missing writable state root visible to the user.
+[[nodiscard]] bool PrepareUserState(const std::string& userRoot);
 
 // Names a retail path inside a real directory, taking the spelling that is
-// already there over the one asked for.
+// already there over the one asked for. Ambiguous case-folded names fail with
+// an empty result instead of depending on host directory enumeration order.
 std::string ResolveIn(const std::string& root, const char* retailPath);
 
 }

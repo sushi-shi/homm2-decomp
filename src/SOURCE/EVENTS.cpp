@@ -2558,8 +2558,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 MemError();
             SetWinText(oracleWindow_o, ORACLE_WINDOW_TEXT_ID);
             gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
-            strcpy(
+            utf8::Copy(
                 gText,
+                GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("event.inline.bec395b49e2bdfa9")
             );
             oracleMessage_o.type = MESSAGE_WIDGET;
@@ -2618,15 +2619,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
                 } else {
-                    strcat(
+                    utf8::Append(
                         gText,
+                        GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.b2fd77737182a2d9")
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
-                strcat(
+                utf8::Append(
                     gText,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.81a2a5818237074f")
                 );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
@@ -2708,8 +2711,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
             if (xIsPlayingExpansionCampaign && xCampaign.IsSpecialGoldenBow(x, y)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                strcpy(
+                utf8::Copy(
                     gText,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("event.inline.4e929a833e525afd")
                 );
                 EventWindow(
@@ -3531,7 +3535,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
-                            strcat(
+                            utf8::Append(
                                 eventText_b,
                                 localization::Tr("event.inline.bdc50da8baa48d7e")
                             );
@@ -3553,7 +3557,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1
                             );
                         } else {
-                            strcat(
+                            utf8::Append(
                                 eventText_b,
                                 localization::Tr("event.inline.b748cab66a3bf25b")
                             );
@@ -3698,6 +3702,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_JAIL:
             JailEvent(cell, eventHero2, x, y);
+            break;
+        default:
+            break;
     }
 
     UpdateRadar(1, 0);
@@ -4283,6 +4290,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             } else {
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
+            break;
+        default:
             break;
     }
 }
@@ -5292,6 +5301,8 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             break;
         case MAP_OBJECT_EXCAVATION:
             siteIndex = RECRUIT_EXCAVATION;
+            break;
+        default:
             break;
     }
 
@@ -7203,6 +7214,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             if (eventHero->CreatureTypeCount(CREATURE_CAVALRY))
                 eventHero->UpgradeCreatures(CREATURE_CAVALRY, CREATURE_CHAMPION);
+            break;
+        default:
             break;
     }
 }

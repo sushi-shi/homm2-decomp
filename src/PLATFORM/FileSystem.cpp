@@ -22,21 +22,32 @@ bool Present(const std::string& path) {
     return ::stat(path.c_str(), &info) == 0;
 }
 
-std::string MatchIgnoringCase(const std::string& directory, const std::string& wanted) {
+struct CaseInsensitiveMatch {
+    std::string name;
+    bool ambiguous = false;
+};
+
+CaseInsensitiveMatch MatchIgnoringCase(
+    const std::string& directory,
+    const std::string& wanted
+) {
     DIR* handle = ::opendir(directory.empty() ? "." : directory.c_str());
     if (handle == nullptr) {
-        return std::string();
+        return {};
     }
 
-    std::string found;
+    CaseInsensitiveMatch match;
     while (dirent* entry = ::readdir(handle)) {
         if (::strcasecmp(entry->d_name, wanted.c_str()) == 0) {
-            found = entry->d_name;
-            break;
+            if (!match.name.empty() && match.name != entry->d_name) {
+                match.ambiguous = true;
+                break;
+            }
+            match.name = entry->d_name;
         }
     }
     ::closedir(handle);
-    return found;
+    return match;
 }
 
 std::vector<std::string> SplitPath(const std::string& path) {
@@ -201,14 +212,19 @@ bool IsUserState(const char* retailPath) {
 #endif
 }
 
-void PrepareUserState(const std::string& userRoot) {
+bool PrepareUserState(const std::string& userRoot) {
 #ifdef _WIN32
     static_cast<void>(userRoot);
+    return true;
 #else
-    std::error_code error;
     for (const char* directory : kStateDirectories) {
+        std::error_code error;
         std::filesystem::create_directories(userRoot + "/" + directory, error);
+        if (error) {
+            return false;
+        }
     }
+    return true;
 #endif
 }
 
@@ -232,8 +248,11 @@ std::string ResolveIn(const std::string& root, const char* retailPath) {
             resolved = candidate;
             continue;
         }
-        const std::string matched = MatchIgnoringCase(resolved, component);
-        resolved += separator + (matched.empty() ? component : matched);
+        const CaseInsensitiveMatch match = MatchIgnoringCase(resolved, component);
+        if (match.ambiguous) {
+            return std::string();
+        }
+        resolved += separator + (match.name.empty() ? component : match.name);
     }
     return resolved;
 }

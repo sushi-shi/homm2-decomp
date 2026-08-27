@@ -53,6 +53,7 @@ bypasses of the shared low-level conversion.
 
 | Area | Retail behavior | `master` behavior |
 | --- | --- | --- |
+| Initial mouse cursor | A newly created configuration starts with the monochrome system cursor, reflecting the original hardware-cursor fallback. | New portable configurations start with the original color cursor artwork. Existing saved preferences remain authoritative. |
 | Campaign table bounds | The enabled-map table indices are reversed after switching campaign sides, and the 13-point campaign track reads the 12-entry enabled-map table at its final point. | Indexes the table as `[campaign side][scenario]` and checks the map-table bound before reading track state. |
 | Aggregate lookup failure | `resourceManager::PointToFile` and `GetFileSize` continue with an invalid aggregate entry after calling the shutdown path. A shutdown implementation that returns or re-enters can dereference that invalid state. | Returns immediately after reporting the fatal lookup error. |
 | Manager destruction | Several dialogs are allocated as a concrete manager and deleted through `baseManager*`, whose retail vtable has no virtual destructor. | Gives the portable manager hierarchy a virtual destructor, so deletion through the owning base pointer is defined and reaches the concrete destructor. |

@@ -3,9 +3,13 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <unistd.h>
 
 namespace {
 
@@ -118,6 +122,33 @@ int main() {
         false,
         "state classification normalizes parent components"
     );
+
+    const std::filesystem::path caseRoot = std::filesystem::temp_directory_path()
+        / ("homm2-filesystem-test-" + std::to_string(::getpid()));
+    std::error_code fileError;
+    std::filesystem::remove_all(caseRoot, fileError);
+    std::filesystem::create_directories(caseRoot / "DATA", fileError);
+    std::filesystem::create_directories(caseRoot / "data", fileError);
+    valid &= Expect(!fileError, true, "case-collision fixture creation");
+    valid &= Expect(
+        platform::ResolveIn(caseRoot.string(), "DaTa/HEROES2.AGG"),
+        "",
+        "ambiguous case-folded path fails deterministically"
+    );
+    std::filesystem::remove_all(caseRoot / "data", fileError);
+    valid &= Expect(
+        platform::ResolveIn(caseRoot.string(), "data/HEROES2.AGG"),
+        (caseRoot / "DATA" / "HEROES2.AGG").string().c_str(),
+        "single case-folded path uses existing spelling"
+    );
+    const std::filesystem::path blockedRoot = caseRoot / "blocked";
+    std::ofstream(blockedRoot).put('x');
+    valid &= Expect(
+        platform::PrepareUserState(blockedRoot.string()),
+        false,
+        "unwritable state root reports failure"
+    );
+    std::filesystem::remove_all(caseRoot, fileError);
 
     ChunkedFileSystem chunked({1, 2, 3, 4, 5}, 2);
     unsigned char input[5] = {};

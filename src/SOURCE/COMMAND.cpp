@@ -171,8 +171,6 @@ using enum CombatActionDataIndex;
     } CombatDirectionConstant;
 
     typedef enum CombatCommandConstant {
-        POINTER_VIEW = 5,
-        POINTER_ATTACK_OFFSET = 7,
         INVALID_ARMY_INDEX = -1,
         INVALID_HEX = -1,
         PLAYER_NONE = -1,
@@ -387,6 +385,8 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
                 switch (CombatKeyCommandFromCode(message.payload.keyboard.keyCode)) {
                     case KEY_CLOSE_NETWORK_BOX:
                         PopNetBox(NULL, -1);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -795,26 +795,13 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
                 m_directionTargetHex = m_adjacency[targetHex][H2EnumIndex(alternateDirection)];
         }
     }
-    gpMouseManager->SetPointer(m_mouseDirection + POINTER_ATTACK_OFFSET);
+    gpMouseManager->SetPointer(H2EnumIndex(CombatCursorForAttackDirection(
+        CombatHexDirectionFromCode(m_mouseDirection)
+    )));
 }
 
-i32 combatManager::GetPointer(CombatMessageCommand command, i32) {
-
-    if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
-        return POINTER_VIEW;
-    } else {
-        switch (command) {
-            case COMBAT_MESSAGE_COMMAND_MOVE:
-            case COMBAT_MESSAGE_COMMAND_FLY:
-            case COMBAT_MESSAGE_COMMAND_SHOOT:
-            case COMBAT_MESSAGE_COMMAND_VIEW_INFO: {
-
-                return H2EnumIndex(command);
-            }
-            default:
-                return H2EnumIndex(command);
-        }
-    }
+CombatCursorFrame combatManager::GetPointer(CombatMessageCommand command, i32) {
+    return CombatCursorForCommand(command);
 }
 
 MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
@@ -876,6 +863,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         case CONTROL_MAIN_BUTTON:
                             DoCommand(m_currentCommand);
                             break;
+                        default:
+                            break;
                     }
                     break;
                 case WIDGET_COMMAND_DESELECT:
@@ -891,6 +880,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                             break;
                         case CONTROL_SYSTEM_OPTIONS:
                             CombatSystemOptions();
+                            break;
+                        default:
                             break;
                     }
                     break;
@@ -919,7 +910,9 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         SetCombatDirections(selectedHex_0);
                         CheckSetMouseDirection(mouseX, mouseY, selectedHex_0);
                     } else {
-                        gpMouseManager->SetPointer(GetPointer(m_currentCommand, selectedHex_0));
+                        gpMouseManager->SetPointer(
+                            H2EnumIndex(GetPointer(m_currentCommand, selectedHex_0))
+                        );
                     }
                 } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                     CheckSetMouseDirection(mouseX, mouseY, selectedHex_0);
@@ -938,7 +931,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 } else {
                     CombatMessage(cCombatHelp[H2EnumIndex(HELP_OTHER_CONTROL)], 1, 0, 0);
                 }
-                gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
                 m_selectedHex = INVALID_HEX;
                 m_previousCommand = COMBAT_INVALID_COMMAND;
             }
@@ -1008,13 +1001,13 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 }
                 case KEY_VIEW_GENERAL:
                     if (m_heroes[H2EnumIndex(m_currentSide)] != NULL) {
-                        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                        gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
                         ViewGeneral(m_currentSide, 1, 0);
                         ResetMouse();
                     }
                     break;
                 case KEY_VIEW_ARMY:
-                    gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                    gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
                     ViewArmy(&m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex], 0);
                     ResetMouse();
                     break;
@@ -1061,7 +1054,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                             0
                         );
                     } else {
-                        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                        gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
                         giCurGeneral = m_currentSide;
                         ViewSpells(0);
                         ResetMouse();
@@ -1271,6 +1264,8 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             }
                         }
                         break;
+                    default:
+                        break;
                 }
             } else {
                 if (m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex]
@@ -1341,13 +1336,15 @@ i32 combatManager::RightClick(i32 hexIndex) {
                     switch (side) {
                         case COMBAT_ATTACKER_SIDE:
                         case COMBAT_DEFENDER_SIDE:
-                            gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                            gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
                             ViewArmy(
                                 &m_armies[H2EnumIndex(side)][m_hexCells[m_selectedHex].m_occupantIndex],
                                 1
                             );
                             ResetMouse();
                             return 0;
+                        default:
+                            break;
                     }
                 } else {
                     return 0;
@@ -1384,17 +1381,17 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             }
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
-            gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+            gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
             ViewGeneral(m_currentSide, 1, 0);
             ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
-            gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+            gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
             ViewGeneral(OppositeCombatSide(m_currentSide), 1, 0);
             ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
-            gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+            gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
             if (m_selectedHex == COMBAT_BALLISTA_HEX)
                 ViewBallista(0);
             else
@@ -1465,6 +1462,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 }
             }
             ResetMouse();
+            break;
+        default:
             break;
     }
 }
@@ -2084,7 +2083,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
     m_nonVisualCombat = true;
     FreeArmies();
     CombatMessage("", 1, 1, 0);
-    gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
     numFades = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
         numFades = VICTORY_WASTELAND_FADE_STEPS;
@@ -2238,6 +2237,8 @@ void combatManager::DoVictory(CombatResult winningSide) {
                 gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
                 DoLoseWindow();
             }
+            break;
+        default:
             break;
     }
     gMapX = gpAdvManager->m_mapOriginX;
@@ -2453,7 +2454,7 @@ void combatManager::GetControl(void) {
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     if (gpCombatManager->m_active == 1)
-        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+        gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
     CheckChangeSelector();
     if (gbRemoteOn == 0 || m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)] < 0
         || m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] < 0
@@ -2492,7 +2493,7 @@ void combatManager::ResetMouse(void) {
         message.payload.mouse.y = message.payload.mouse.screenY = mouseY;
         ProcessCombatMsg(message);
     } else {
-        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+        gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
     }
 }
 
@@ -2526,7 +2527,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex].m_hex
         );
     }
-    gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+    gpMouseManager->SetPointer(H2EnumIndex(COMBAT_CURSOR_DEFAULT));
     UpdateMouseGrid(-1, 1);
     memset(m_gridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_gridState));
     if (UpdateGrid(0, 0) != 0)

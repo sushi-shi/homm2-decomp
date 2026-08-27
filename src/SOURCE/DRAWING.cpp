@@ -343,6 +343,8 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                     gText[0] = 0;
             }
             break;
+        default:
+            break;
     }
     CombatMessage(gText, 1, 0, 0);
 }
@@ -1239,6 +1241,8 @@ void combatManager::DrawFrame(
                         case COMBAT_CASTLE_HEX_GATE:
                             if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
                                 wallFrame1 = GATE_VISIBLE_FRAME;
+                            break;
+                        default:
                             break;
                     }
                     if (wallFrame1 != 0) {

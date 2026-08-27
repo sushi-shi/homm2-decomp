@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_COMBATTYPES_H
 
 #include <Ints.h>
+#include <EnumCode.h>
 
 enum class CombatSide : i8 {
     COMBAT_SIDE_NONE        = -1,

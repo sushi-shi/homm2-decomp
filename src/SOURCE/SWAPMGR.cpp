@@ -262,6 +262,8 @@ void swapManager::DrawSelector(void) {
                             + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing_11 : 0)
                             - 1;
                         break;
+                    default:
+                        break;
                 }
                 break;
             case SWAP_SIDE_RIGHT:
@@ -279,7 +281,11 @@ void swapManager::DrawSelector(void) {
                             + (m_selectedSlot > ARTIFACT_FIRST_ROW_LAST ? artifactSpacing_11 : 0)
                             - 1;
                         break;
+                    default:
+                        break;
                 }
+                break;
+            default:
                 break;
         }
 
