@@ -17,6 +17,8 @@ when a residual will not explain itself, grouped by the question they answer:
               bool_fields - resolves every project-owned i32 data member and
               proposes b32 only when all observed writes are provably Boolean
               and no mutable escape makes the domain uncertain.
+              casts - classifies explicit C++ casts by their source and
+              destination type domains, enum identities, and storage widths.
   data        strict_allocation_diff - strict reviewed-allocation comparison from
               objdiff one-shot JSON. Also the checker homm2.build.strict_allocations
               shells out to, so it is a library as much as a command.
@@ -52,6 +54,8 @@ TOOLS = {
                            "rank byte-vs-bitfield load mismatches"),
     "bool-fields": ("bool_fields",
                     "find i32 fields whose observed write domain is Boolean"),
+    "casts": ("casts",
+              "classify explicit casts and preserve their type provenance"),
     "allocations": ("strict_allocation_diff",
                     "strict reviewed-allocation diff from objdiff JSON"),
     "data-claims": ("data_claims",
