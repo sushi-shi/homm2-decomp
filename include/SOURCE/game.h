@@ -49,7 +49,7 @@ struct boatRecord {
     i8 x;
     i8 y;
     H2EnumStorage<MapDirection, i8> direction;
-    H2EnumStorage<MapObjectType, u8> savedTriggerType;
+    H2OpenCodeStorage<MapTriggerCode, u8> savedTriggerType;
     u8 savedEventData;
     i8 heroId;
     i8 owner;
@@ -300,7 +300,7 @@ public:
     void RestoreCell(
         i32,
         i32,
-        MapObjectType,
+        MapTriggerCode,
         i32,
         class mapCell*,
         i32

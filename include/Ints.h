@@ -129,6 +129,76 @@ private:
     Storage m_value;
 };
 
+template <typename Code, typename Storage>
+class H2OpenCodeStorage {
+public:
+    H2OpenCodeStorage() = default;
+    constexpr H2OpenCodeStorage(Code value)
+        : m_value(static_cast<Storage>(static_cast<i32>(value))) {}
+    constexpr H2OpenCodeStorage(Storage value) : m_value(value) {}
+
+    template <typename OtherStorage>
+    constexpr H2OpenCodeStorage(H2OpenCodeStorage<Code, OtherStorage> value)
+        : m_value(static_cast<Storage>(value.value())) {}
+
+    constexpr operator Code() const { return Code(static_cast<i32>(m_value)); }
+    constexpr operator i32() const { return static_cast<i32>(m_value); }
+    constexpr Storage value() const { return m_value; }
+
+    H2OpenCodeStorage& operator=(Code value) {
+        m_value = static_cast<Storage>(static_cast<i32>(value));
+        return *this;
+    }
+
+    H2OpenCodeStorage& operator=(Storage value) {
+        m_value = value;
+        return *this;
+    }
+
+    template <typename OtherStorage>
+    H2OpenCodeStorage& operator=(H2OpenCodeStorage<Code, OtherStorage> value) {
+        m_value = static_cast<Storage>(value.value());
+        return *this;
+    }
+
+private:
+    Storage m_value;
+};
+
+template <typename Code, typename Storage>
+constexpr bool operator==(H2OpenCodeStorage<Code, Storage> lhs, Code rhs) {
+    return static_cast<i32>(lhs) == static_cast<i32>(rhs);
+}
+
+template <typename Code, typename Storage>
+constexpr bool operator==(Code lhs, H2OpenCodeStorage<Code, Storage> rhs) {
+    return rhs == lhs;
+}
+
+template <typename Code, typename Storage>
+constexpr bool operator!=(H2OpenCodeStorage<Code, Storage> lhs, Code rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Code, typename Storage>
+constexpr bool operator!=(Code lhs, H2OpenCodeStorage<Code, Storage> rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Code, typename LeftStorage, typename RightStorage>
+constexpr bool operator==(
+    H2OpenCodeStorage<Code, LeftStorage> lhs, H2OpenCodeStorage<Code, RightStorage> rhs
+) {
+    return static_cast<i32>(lhs) == static_cast<i32>(rhs);
+}
+
+template <typename Code, typename LeftStorage, typename RightStorage>
+constexpr bool operator!=(
+    H2OpenCodeStorage<Code, LeftStorage> lhs, H2OpenCodeStorage<Code, RightStorage> rhs
+) {
+    return !(lhs == rhs);
+}
+
 template <typename Enum, typename Storage>
 constexpr bool operator==(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
     return static_cast<Enum>(lhs) == rhs;
