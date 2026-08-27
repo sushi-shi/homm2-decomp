@@ -1121,8 +1121,8 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
     x = pHero->m_x;
     y = pHero->m_y;
     for (i = gpSearchArray->m_pathLength - 1; i >= 1; i--) {
-        x += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[i])].x;
-        y += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[i])].y;
+        x += normalDirTable[gpSearchArray->m_storage.aiPath.directions[i]].x;
+        y += normalDirTable[gpSearchArray->m_storage.aiPath.directions[i]].y;
         if (abs(x - pHero->m_x) <= 7 && abs(y - pHero->m_y) <= 7) {
             cell = gpAdvManager->GetCell(x, y);
             if (!(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)

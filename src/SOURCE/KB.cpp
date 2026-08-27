@@ -1438,7 +1438,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
             case WIDGET_COMMAND_SELECT:
                 switch (msg.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
-                        HeroView(static_cast<u8>(gpTownManager->m_recruitHero->m_id), true, false);
+                        HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
