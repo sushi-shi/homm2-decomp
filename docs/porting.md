@@ -67,3 +67,30 @@ width and packed layouts. Additional systems belong under `PLATFORM`.
 
 Video, input, audio, and cinematics use the platform layer. Network transports
 are not supported yet.
+
+## Deterministic input replay
+
+The SDL3 host can replay timestamped framebuffer input without coupling the
+parser or clock to SDL. Set `HOMM2_INPUT_REPLAY` to a UTF-8 text file. Each
+non-comment line begins with a millisecond offset and one of these actions:
+
+```text
+0 move 320 240
+20 left-down 320 240
+40 left-up 320 240
+60 key-down Return
+61 key-up Return
+80 text Привет
+```
+
+Mouse actions are `move`, `left-down`, `left-up`, `right-down`, and
+`right-up`; their coordinates are in the 640x480 logical framebuffer. Key
+names use SDL's key-name vocabulary. Blank lines and lines beginning with `#`
+are ignored. Timestamps must be nondecreasing, and events sharing a timestamp
+retain file order. A malformed line rejects the complete new replay and is
+reported with its line number instead of being silently skipped.
+
+The parser and wrapping-millisecond scheduler are covered by the
+`input_replay` CTest. A headless gameplay test can therefore run the ordinary
+binary under Xvfb with a checked-in replay and compare an independently chosen
+observable result such as a save, log record, or screenshot.

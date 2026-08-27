@@ -320,6 +320,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME tick_deadline COMMAND homm2_tick_deadline_test)
+  add_executable(homm2_input_replay_test tools/input_replay_test.cpp)
+  target_include_directories(homm2_input_replay_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_input_replay_test PRIVATE homm2_platform)
+  add_test(NAME input_replay COMMAND homm2_input_replay_test)
   add_executable(homm2_legacy_presentation_test tools/legacy_presentation_test.cpp)
   target_include_directories(homm2_legacy_presentation_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
