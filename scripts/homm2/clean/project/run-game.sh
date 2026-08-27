@@ -148,6 +148,11 @@ if [ "${HOMM2_SETUP_ONLY:-0}" = 1 ]; then
 fi
 
 cd "$game_dir"
+# Smacker startup movies render black under this Wine/display combination.
+# The caller can append /I1 to opt back in; retail command-line processing
+# keeps the last value.
+intro_argument=/I0
+
 if [ "$fullscreen" = 1 ]; then
     if ! command -v gamescope >/dev/null 2>&1; then
         echo "gamescope is required for fullscreen mode" >&2
@@ -156,11 +161,11 @@ if [ "$fullscreen" = 1 ]; then
     if [ -n "${WAYLAND_DISPLAY:-}" ]; then
         exec gamescope --backend wayland -f -w 640 -h 480 \
             -S stretch -F nearest --force-windows-fullscreen -- \
-            wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@"
+            wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
     fi
     exec gamescope -f -w 640 -h 480 -S stretch -F nearest \
         --force-windows-fullscreen -- \
-        wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@"
+        wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
 fi
 
 # Wine's virtual desktop is the reliable windowed path for this DirectDraw game.
@@ -175,7 +180,7 @@ else
     before_ids=
 fi
 
-wine explorer /desktop=HOMM2,640x480 "$game_exe" "$@" &
+wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@" &
 game_pid=$!
 
 if [ -n "$before_ids" ]; then

@@ -140,12 +140,18 @@ executable. The prefix uses the same registry, code-page, virtual-desktop and
 CD-drive setup as the cleaned Buka runner. Pass `--prepare-only` to stop after
 setup without starting the game.
 
+The staged `game/HMM2PL.exe` is always the ordinary `homm2 link --rsrc`
+output—never the retail control image or `--transform` output. For Wine, the
+provisioner also creates `.wine-compat/HMM2PL-WINE.exe`, a byte-gated copy with
+only Buka's signed `GetTickCount` wait branch corrected; the linked executable
+remains untouched. Set `HOMM2_BUKA_WINE_TICK_PATCH=0` to launch it directly.
+
 The play environment lives in `build/game-wine/` (gitignored): `game/` holds
-your install's data plus the rebuilt `HMM2PL.exe`, `cd/Tracks2/` is where the
-Buka CD's `.ogg` music goes, and `prefix/` is a wineprefix separate from the
-build one, with a virtual desktop so the game's mode switches never touch the
-host. Re-running the provisioner refreshes the rebuilt executable and never
-touches saves or configuration.
+your install's data plus the rebuilt `HMM2PL.exe`, `cd/` holds the staged
+`Anim2` movies and `Tracks2` music, and `prefix/` is a wineprefix separate from
+the build one, with a virtual desktop so the game's mode switches never touch
+the host. Re-running the provisioner refreshes the rebuilt executable and
+never touches saves or configuration.
 
 ## The three link modes
 

@@ -14,11 +14,11 @@ and assembles:
 
     <target>/game/     the retail data set (DATA/*.AGG, MAPS/, the middleware
                        DLLs audiere/mss32/smackw32/WING32) + HMM2PL.exe -
-                       the freshest rebuilt executable (rsrc mode preferred,
-                       transform mode as fallback), refreshed on every run
-    <target>/cd/       mapped as the D: cdrom drive. Drop the Buka CD's
-                       Tracks2/*.ogg here for in-game music; SetupCDDrive
-                       reads "<CDDrive>\\Tracks2\\..." through the registry
+                       the ordinary rebuilt `homm2 link --rsrc` executable,
+                       refreshed on every run
+    <target>/cd/       mapped as the D: cdrom drive. Anim2 movies and Tracks2
+                       music are staged from the supplied install (including
+                       its conventional .wine-cd/ directory)
     <target>/prefix/   a dedicated wineprefix, SEPARATE from build/wineprefix
 
 The generated play wrapper delegates to the same measured `run-game.sh` that
@@ -34,8 +34,10 @@ from __future__ import annotations
 
 import argparse
 import filecmp
+import os
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -53,6 +55,20 @@ REQUIRED = (
 )
 GAME_DIRECTORIES = ("DATA", "MAPS", "HELP")
 GAME_ROOT_SUFFIXES = (".cfg", ".dll", ".txt")
+CD_DIRECTORIES = ("Anim2", "Tracks2")
+
+# Buka's retail DelayTilMilli compares GetTickCount as a signed long. Once
+# Wine's host-derived counter crosses 0x80000000 (24.85 days of uptime), map
+# pickup effects wait until the 49.7-day wrap. The runnable decomp environment
+# uses a byte-gated compatibility copy with signed JLE changed to unsigned JBE;
+# the matching `homm2 link --rsrc` output itself remains untouched.
+DELAY_TIL_MILLI_OFFSET = 498493
+DELAY_TIL_MILLI = bytes.fromhex(
+    "558bec51894dfce8af84ffff3945fc7e0ce8a67dffffe898c0feffebea8be55dc3"
+)
+TICK_BRANCH_OFFSET = 498508
+TICK_BRANCH_SIGNED = 0x7E
+TICK_BRANCH_UNSIGNED = 0x76
 
 DEFAULT_TARGET = REPO / "build" / "game-wine"
 
@@ -182,13 +198,41 @@ def copy_game_files(source: Path, destination: Path) -> int:
 
 
 def install_rebuilt_exe(game: Path) -> None:
-    for candidate in (REPO / "build/link/rsrc/HMM2PL.exe",
-                      REPO / "build/link/HMM2PL.exe"):
-        if candidate.is_file():
-            shutil.copy2(candidate, game / "HMM2PL.exe")
-            log(f"installed HMM2PL.exe from {candidate.relative_to(REPO)}")
-            return
-    log("no rebuilt executable yet - run `homm2 link --rsrc` and rerun this")
+    candidate = REPO / "build/link/rsrc/HMM2PL.exe"
+    if not candidate.is_file():
+        die("rebuilt executable missing - run `homm2 link --rsrc` and rerun this")
+    shutil.copy2(candidate, game / "HMM2PL.exe")
+    log(f"installed HMM2PL.exe from {candidate.relative_to(REPO)}")
+
+
+def create_wine_compatibility_exe(game: Path) -> None:
+    source = game / "HMM2PL.exe"
+    with source.open("rb") as stream:
+        stream.seek(DELAY_TIL_MILLI_OFFSET)
+        actual = stream.read(len(DELAY_TIL_MILLI))
+    if actual != DELAY_TIL_MILLI:
+        die(f"refusing Wine tick patch: unsupported DelayTilMilli bytes in {source}")
+
+    branch_index = TICK_BRANCH_OFFSET - DELAY_TIL_MILLI_OFFSET
+    if DELAY_TIL_MILLI[branch_index] != TICK_BRANCH_SIGNED:
+        die("internal Wine tick-patch offset does not select the signed branch")
+
+    compatibility_directory = game / ".wine-compat"
+    compatibility_directory.mkdir(parents=True, exist_ok=True)
+    output = compatibility_directory / "HMM2PL-WINE.exe"
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{output.name}.", dir=compatibility_directory
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        shutil.copy2(source, temporary)
+        with temporary.open("r+b") as stream:
+            stream.seek(TICK_BRANCH_OFFSET)
+            stream.write(bytes((TICK_BRANCH_UNSIGNED,)))
+        temporary.replace(output)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def setup(resources: Path | None, target: Path) -> None:
@@ -218,14 +262,23 @@ def setup(resources: Path | None, target: Path) -> None:
             die(f"staged game unexpectedly lacks {relative}")
 
     install_rebuilt_exe(game)
+    create_wine_compatibility_exe(game)
 
-    cd_tracks = target / "cd" / "Tracks2"
-    cd_tracks.mkdir(parents=True, exist_ok=True)
-    source_tracks = find_ci(resources, "Tracks2") if resources is not None else None
-    if source_tracks is not None and source_tracks.is_dir():
-        copied = copy_missing_tree(source_tracks.resolve(), cd_tracks)
+    cd = target / "cd"
+    cd.mkdir(parents=True, exist_ok=True)
+    if resources is not None:
+        hidden_cd = find_ci(resources, ".wine-cd")
+        cd_source = hidden_cd if hidden_cd is not None and hidden_cd.is_dir() else resources
+        copied = 0
+        for name in CD_DIRECTORIES:
+            source_directory = find_ci(cd_source, name)
+            if source_directory is not None and source_directory.is_dir():
+                copied += copy_missing_tree(
+                    source_directory.resolve(),
+                    cd / name,
+                )
         if copied:
-            log(f"copied {copied} CD music files from {source_tracks}")
+            log(f"copied {copied} CD runtime files from {cd_source}")
 
     canonical_runner = REPO / "scripts/homm2/clean/project/run-game.sh"
     staged_runner = game / "run-game.sh"
@@ -239,7 +292,11 @@ def setup(resources: Path | None, target: Path) -> None:
         'environment_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)\n'
         'export HOMM2_WINEPREFIX="$environment_root/prefix"\n'
         'export HOMM2_CD_DIR="$environment_root/cd"\n'
-        'export HOMM2_EXE=HMM2PL.exe\n'
+        'if [ "${HOMM2_BUKA_WINE_TICK_PATCH:-1}" = 1 ]; then\n'
+        '    export HOMM2_EXE=.wine-compat/HMM2PL-WINE.exe\n'
+        'else\n'
+        '    export HOMM2_EXE=HMM2PL.exe\n'
+        'fi\n'
         'exec "$environment_root/game/run-game.sh" "$@"\n'
     )
     play.chmod(0o755)

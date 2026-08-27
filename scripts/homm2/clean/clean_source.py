@@ -99,6 +99,34 @@ class Pattern(enum.Enum):
 # changes retail code generation. The other entries adapt a pre-const Windows
 # ABI and a third-party header without changing reconstructed game source.
 GENERATED_PATCHES = {
+    # Retail compares signed GetTickCount values directly. Generated portable
+    # builds use modular deadlines so they do not stall between Wine's
+    # 24.85-day signed crossing and 49.7-day counter wrap. The matching tree
+    # retains retail's exact comparisons; the native master uses the same rule
+    # through platform::TickDeadlinePending.
+    "src/SOURCE/NOOPT.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            "#include <SOURCE/kbwin.h>\n\nvoid DelayTil(i32* endTime)",
+            "#include <SOURCE/kbwin.h>\n\n"
+            "static b32 TickDeadlinePending(i32l deadline, i32l current) {\n"
+            "    u32l remaining = static_cast<u32l>(deadline)\n"
+            "        - static_cast<u32l>(current);\n"
+            "    return remaining != 0 && remaining < 0x80000000UL;\n"
+            "}\n\n"
+            "void DelayTil(i32* endTime)",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            "while (*endTime > KBTickCount())",
+            "while (TickDeadlinePending(*endTime, KBTickCount()))",
+        ),
+        (
+            Pattern.LITERAL, 1,
+            "while (endTime > KBTickCount())",
+            "while (TickDeadlinePending(endTime, KBTickCount()))",
+        ),
+    ],
     # DirectPlay 1 predates const-correct Windows interfaces: these two
     # parameters are documented input strings but the SDK declares LPSTR.
     "src/SOURCE/dpnetwin.cpp": [

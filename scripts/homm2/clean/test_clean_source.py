@@ -34,10 +34,31 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
+                "src/SOURCE/NOOPT.cpp",
                 "src/SOURCE/dpnetwin.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
             },
         )
+
+    def test_generated_timers_handle_the_get_tick_count_signed_crossing(self):
+        source = (
+            "#include <SOURCE/kbwin.h>\n\n"
+            "void DelayTil(i32* endTime) {\n"
+            "    while (*endTime > KBTickCount()) {\n"
+            "    }\n"
+            "}\n\n"
+            "void DelayTilMilli(i32l endTime) {\n"
+            "    while (endTime > KBTickCount()) {\n"
+            "    }\n"
+            "}\n"
+        )
+        result = clean_source.apply_patches("src/SOURCE/NOOPT.cpp", source)
+        self.assertIn("static b32 TickDeadlinePending", result)
+        self.assertIn("static_cast<u32l>(deadline)", result)
+        self.assertIn("remaining < 0x80000000UL", result)
+        self.assertIn("TickDeadlinePending(*endTime, KBTickCount())", result)
+        self.assertIn("TickDeadlinePending(endTime, KBTickCount())", result)
+        self.assertNotIn("endTime > KBTickCount()", result)
 
     def test_menu_handles_use_the_windows_type(self):
         header = (clean_source.REPO / "include/SOURCE/KB.h").read_text()
