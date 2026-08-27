@@ -781,6 +781,13 @@ def _entries(repo: Path, filters: Iterable[str] = ()) -> list[dict]:
             raise RuntimeError(f"compilation database entry is outside this worktree: {source}") from error
         if not source.is_file():
             raise RuntimeError(f"compilation database source is missing: {relative}")
+        try:
+            source.relative_to(repo.resolve() / "src")
+        except ValueError:
+            # Portable branches may compile bundled libraries and test tools
+            # through the same CMake database. They are not reconstructed game
+            # storage and do not belong to this source-tree audit.
+            continue
         if filters and not any(value in relative.lower() for value in filters):
             continue
         out.append({**entry, "directory": str(directory)})

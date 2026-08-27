@@ -418,6 +418,34 @@ void Set(i32 input) {
             ["c++", "-DVALUE=one two", "file.cpp"],
         )
 
+    def test_compilation_database_ignores_non_game_targets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "build/clangd").mkdir(parents=True)
+            game_source = repo / "src/SOURCE/TEST.cpp"
+            vendor_source = repo / "vendor/library.c"
+            game_source.parent.mkdir(parents=True)
+            vendor_source.parent.mkdir(parents=True)
+            game_source.write_text("")
+            vendor_source.write_text("")
+            (repo / "build/clangd/compile_commands.json").write_text(json.dumps([
+                {
+                    "directory": str(repo),
+                    "file": str(game_source),
+                    "arguments": ["c++", "-c", str(game_source)],
+                },
+                {
+                    "directory": str(repo),
+                    "file": str(vendor_source),
+                    "arguments": ["cc", "-c", str(vendor_source)],
+                },
+            ]))
+
+            self.assertEqual(
+                [Path(entry["file"]).resolve() for entry in _entries(repo)],
+                [game_source.resolve()],
+            )
+
     def test_native_driver_include_paths_are_extracted(self):
         stderr = """ignored
 #include <...> search starts here:
