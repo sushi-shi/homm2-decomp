@@ -33,6 +33,7 @@ are never overwritten; only the rebuilt HMM2PL.exe is refreshed.
 from __future__ import annotations
 
 import argparse
+import filecmp
 import shutil
 import sys
 from pathlib import Path
@@ -46,8 +47,8 @@ REQUIRED = (
     "DATA/HEROES2.AGG",
     "DATA/HEROES2X.AGG",
     "audiere.dll",
-    "mss32.dll",
-    "smackw32.dll",
+    "MSS32.DLL",
+    "SMACKW32.DLL",
     "WING32.DLL",
 )
 GAME_DIRECTORIES = ("DATA", "MAPS", "HELP")
@@ -85,6 +86,65 @@ def find_ci(root: Path, relative: str) -> Path | None:
             )
         current = matches[0]
     return current
+
+
+def canonicalize_required(root: Path, relative: str) -> Path | None:
+    """Give one required staged file its canonical spelling.
+
+    Older provisioner runs could preserve the install's lowercase spelling and
+    then copy a second uppercase spelling for Wine. Collapse that generated
+    duplicate only when every variant is byte-identical; conflicting retail
+    inputs remain an error.
+    """
+    current = root
+    parts = relative.split("/")
+    for part in parts[:-1]:
+        if not current.is_dir():
+            return None
+        matches = sorted(
+            (path for path in current.iterdir()
+             if path.name.casefold() == part.casefold()),
+            key=lambda path: path.name,
+        )
+        if not matches:
+            return None
+        if len(matches) != 1 or not matches[0].is_dir():
+            die(
+                f"ambiguous case-insensitive directory below {current}: "
+                + ", ".join(path.name for path in matches)
+            )
+        current = matches[0]
+
+    canonical = current / parts[-1]
+    matches = sorted(
+        (path for path in current.iterdir()
+         if path.name.casefold() == parts[-1].casefold()),
+        key=lambda path: path.name,
+    )
+    if not matches:
+        return None
+    if any(not path.is_file() for path in matches):
+        die(
+            f"required runtime path is not a regular file below {current}: "
+            + ", ".join(path.name for path in matches)
+        )
+
+    reference = canonical if canonical in matches else matches[0]
+    for path in matches:
+        if path != reference and not filecmp.cmp(reference, path, shallow=False):
+            die(
+                f"conflicting case-insensitive runtime files below {current}: "
+                + ", ".join(candidate.name for candidate in matches)
+            )
+
+    if reference != canonical:
+        reference.rename(canonical)
+        log(f"normalized {relative} from {reference.name}")
+    for path in matches:
+        if path != reference:
+            path.unlink()
+            log(f"removed byte-identical staged duplicate {path}")
+    return canonical
 
 
 def copy_missing_tree(source: Path, destination: Path) -> int:
@@ -136,7 +196,8 @@ def setup(resources: Path | None, target: Path) -> None:
     # demanded of the install folder.
     game = target / "game"
     game.mkdir(parents=True, exist_ok=True)
-    needed = [name for name in REQUIRED if find_ci(game, name) is None]
+    needed = [name for name in REQUIRED
+              if canonicalize_required(game, name) is None]
     if needed:
         if resources is None:
             die(f"{game} lacks {', '.join(needed)} and no game folder was "
@@ -145,23 +206,16 @@ def setup(resources: Path | None, target: Path) -> None:
             die(f"install folder missing: {resources}")
         copied = copy_game_files(resources, game)
         log(f"copied {copied} files from {resources}")
-        still = [name for name in REQUIRED if find_ci(game, name) is None]
+        still = [name for name in REQUIRED
+                 if canonicalize_required(game, name) is None]
         if still:
             die("the install folder lacks the retail runtime set: "
                 + ", ".join(still))
 
-    # The canonical runner checks these names before Wine starts. Preserve the
-    # retail tree, but add the expected spelling when the install used another
-    # case on a case-sensitive host.
+    # The canonical runner checks these exact names before Wine starts.
     for relative in REQUIRED:
-        expected = game / relative
-        if expected.is_file():
-            continue
-        source = find_ci(game, relative)
-        if source is None:
+        if canonicalize_required(game, relative) is None:
             die(f"staged game unexpectedly lacks {relative}")
-        expected.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, expected)
 
     install_rebuilt_exe(game)
 
