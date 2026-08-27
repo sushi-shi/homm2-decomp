@@ -165,6 +165,38 @@ namespace {
         EARTHQUAKE_MAX_IMPACT_DELAY = 2
     } EarthquakeConstant;
 
+    constexpr bool SpellNeedsLivingArmyTarget(SpellType spell) {
+        switch (spell) {
+            case SPELL_TELEPORT:
+            case SPELL_DISRUPTING_RAY:
+            case SPELL_COLD_RAY:
+            case SPELL_MAGIC_ARROW:
+            case SPELL_LIGHTNING_BOLT:
+            case SPELL_MIRROR_IMAGE:
+            case SPELL_CURE:
+            case SPELL_SLOW:
+            case SPELL_HASTE:
+            case SPELL_SHIELD:
+            case SPELL_DRAGON_SLAYER:
+            case SPELL_BLESS:
+            case SPELL_STONE_SKIN:
+            case SPELL_STEEL_SKIN:
+            case SPELL_CURSE:
+            case SPELL_BERSERKER:
+            case SPELL_HYPNOTIZE:
+            case SPELL_PARALYZE:
+            case CREATURE_SPELL_DISPEL:
+            case SPELL_DISPEL:
+            case SPELL_BLIND:
+            case SPELL_BLOOD_LUST:
+            case SPELL_ANTI_MAGIC:
+            case CREATURE_SPELL_PETRIFY:
+                return true;
+            default:
+                return false;
+        }
+    }
+
 #define RIPPLE_WAVE_CENTER 0.5
 #define RIPPLE_WAVE_RANGE 2.0
 
@@ -308,6 +340,9 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
+                giNextAction = ACTION_CAST_SPELL;
+                giNextActionExtra = H2EnumIndex(m_selectedSpell);
+                break;
             set_action:
                 giNextAction = ACTION_CAST_SPELL;
                 giNextActionExtra = H2EnumIndex(m_selectedSpell);
@@ -334,6 +369,7 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
+                [[fallthrough]];
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
@@ -362,7 +398,6 @@ i32 combatManager::ViewSpells(i32) {
                 break;
         }
 
-    restore_pointer:
         gpMouseManager->SetPointer("cmbtmous.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
         if (m_selectedSpell != SPELL_NONE)
             return 1;
@@ -526,6 +561,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
             if (message.payload.keyboard.keyCode != COMMAND_CANCEL)
                 break;
 
+            [[fallthrough]];
         case SPELL_MESSAGE_CANCEL:
             gpCombatManager->m_selectedSpell = SPELL_NONE;
             giNextAction = ACTION_NONE;
@@ -771,20 +807,22 @@ void combatManager::CastSpell(
     army* teleportArmy6;
     icon* missileIcon6;
     float missileAngles[SPELL_MISSILE_ANGLE_COUNT];
+    hero* castingHero = m_heroes[H2EnumIndex(m_currentSide)];
+    hero* opposingHero = m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))];
+
+    if (castByCreature == 0 && castingHero == NULL)
+        return;
 
     if (castByCreature == 0 && H2EnumIndex(spell) < H2EnumIndex(SPELL_COUNT)
         && m_eagleEyeSpell[H2EnumIndex(OppositeCombatSide(m_currentSide))] == SPELL_NONE
-        && m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))] != NULL
-        && !m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]->HasSpell(spell)
-        && m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
-                   ->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)]
+        && opposingHero != NULL
+        && !opposingHero->HasSpell(spell)
+        && opposingHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)]
                != HERO_SKILL_LEVEL_NONE
-        && H2EnumIndex(m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
-                   ->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)])
-                   + 1
+        && H2EnumIndex(opposingHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)]) + 1
                >= H2EnumIndex(gsSpellInfo[H2EnumIndex(spell)].level)) {
-        if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX) <= H2EnumIndex(m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
-                    ->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)])) {
+        if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX)
+            <= H2EnumIndex(opposingHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_EAGLE_EYE)])) {
             m_eagleEyeSpell[H2EnumIndex(OppositeCombatSide(m_currentSide))] = spell;
         }
     }
@@ -802,8 +840,8 @@ void combatManager::CastSpell(
         gpCombatManager->DrawFrame(1, 1, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
     }
 
-    if (castByCreature == 0 && m_heroes[H2EnumIndex(m_currentSide)] != NULL)
-        m_heroes[H2EnumIndex(m_currentSide)]->UseSpell(spell);
+    if (castByCreature == 0)
+        castingHero->UseSpell(spell);
 
     target3 = NULL;
     if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST || spell == SPELL_COLD_RING
@@ -824,6 +862,9 @@ void combatManager::CastSpell(
         target3 = NULL;
     }
 
+    if (target3 == NULL && SpellNeedsLivingArmyTarget(spell))
+        goto cast_done;
+
     if (castByCreature == 0)
         m_heroCastSpell[H2EnumIndex(m_currentSide)] = true;
 
@@ -831,11 +872,11 @@ void combatManager::CastSpell(
         spellPower6 = SPELL_DEFAULT_CREATURE_POWER;
     } else {
         spellPower6 = m_spellPower[H2EnumIndex(m_currentSide)];
-        if (m_heroes[H2EnumIndex(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS)
+        if (castingHero->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS)
             && (H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_DURATION)))) {
             spellPower6 += SPELL_HOURGLASS_POWER_BONUS;
         }
-        if (m_heroes[H2EnumIndex(m_currentSide)]->HasArtifact(ARTIFACT_WIZARD_HAT)
+        if (castingHero->HasArtifact(ARTIFACT_WIZARD_HAT)
             && (H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_DURATION)))) {
             spellPower6 += SPELL_WIZARD_HAT_POWER_BONUS;
         }
@@ -1008,6 +1049,8 @@ void combatManager::CastSpell(
             }
             break;
         case SPELL_DISRUPTING_RAY:
+            if (target3 == NULL)
+                break;
             oldDefense = target3->m_monster.defense;
             target3->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
             if (target3->m_monster.defense < SPELL_MINIMUM_DEFENSE)
@@ -1022,6 +1065,8 @@ void combatManager::CastSpell(
             RippleCreature(target3->m_side, target3->m_index, COMBAT_RIPPLE_WAVE);
             break;
         case SPELL_COLD_RAY:
+            if (target3 == NULL)
+                break;
             DelayMilli(
                 static_cast<i32l>(SPELL_COLD_RAY_DELAY * gfCombatSpeedMod[gConfig.combatSpeed])
             );
@@ -1034,8 +1079,8 @@ void combatManager::CastSpell(
             ModifyDamageForArtifacts(
                 &damage1,
                 SPELL_COLD_RAY,
-                m_heroes[H2EnumIndex(m_currentSide)],
-                m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
+                castingHero,
+                opposingHero
             );
             sprintf(
                 gText,
@@ -1055,6 +1100,8 @@ void combatManager::CastSpell(
             ChainLightning(targetHex, spellPower6);
             break;
         case SPELL_MAGIC_ARROW:
+            if (target3 == NULL)
+                break;
             if (1) {
                 DelayMilli(
                     static_cast<i32l>(SPELL_MAGIC_ARROW_DELAY * gfCombatSpeedMod[gConfig.combatSpeed])
@@ -1063,8 +1110,8 @@ void combatManager::CastSpell(
                 ModifyDamageForArtifacts(
                     &damage1,
                     SPELL_MAGIC_ARROW,
-                    m_heroes[H2EnumIndex(m_currentSide)],
-                    m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
+                    castingHero,
+                    opposingHero
                 );
                 sprintf(
                     gText,
@@ -1099,6 +1146,8 @@ void combatManager::CastSpell(
             }
             break;
         case SPELL_LIGHTNING_BOLT:
+            if (target3 == NULL)
+                break;
             damage1 = spellPower6 * SPELL_LIGHTNING_DAMAGE_PER_POWER;
             if (target3->m_monsterType == CREATURE_AIR_ELEMENTAL)
                 damage1 <<= 1;
@@ -1108,8 +1157,8 @@ void combatManager::CastSpell(
             ModifyDamageForArtifacts(
                 &damage1,
                 SPELL_LIGHTNING_BOLT,
-                m_heroes[H2EnumIndex(m_currentSide)],
-                m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
+                castingHero,
+                opposingHero
             );
             sprintf(
                 gText,
