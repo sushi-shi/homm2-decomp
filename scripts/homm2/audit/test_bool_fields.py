@@ -18,6 +18,7 @@ from homm2.audit.bool_fields import (
     _integer_literal,
     _merge,
     _parse_driver_includes,
+    _type_spans_requiring_split,
     analyze_translation_unit,
     main,
 )
@@ -371,6 +372,29 @@ void LocalFlags(i32 incoming) {
             {write.kind for write in incoming.unknown_writes},
             {"incoming-parameter"},
         )
+
+    def test_mixed_declaration_requires_a_split_before_type_replacement(self):
+        text = r"""
+typedef int i32;
+void Set(i32 input) {
+    i32 flag = 0, count = 4;
+    if (input)
+        flag = 1;
+    (void)flag;
+    (void)count;
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            facts = analyze_translation_unit(translation, source, repo)
+
+        flag = next(item for item in facts if item.name == "flag")
+        count = next(item for item in facts if item.name == "count")
+        self.assertTrue(flag.eligible)
+        self.assertFalse(count.eligible)
+        self.assertIn(next(iter(flag.type_spans)),
+                      _type_spans_requiring_split(facts))
 
     def test_compilation_database_rejects_wrong_worktree(self):
         with tempfile.TemporaryDirectory() as directory:

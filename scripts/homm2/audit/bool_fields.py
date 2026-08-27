@@ -20,6 +20,9 @@ can replace ``i32`` with ``b32``, ``i8`` with ``b8``, or plain ``char`` with
 for globals whose decorated retail symbol depends on it. The audit also reports
 numeric literal writes and unproven writes to already recovered Boolean
 storage; ``--check`` fails on every actionable kind of remaining cleanup.
+When one declaration statement owns Boolean and non-Boolean declarators, the
+candidate is marked ``requires_declaration_split``: its type token must not be
+changed until the declaration is split.
 Boolean parameters are inventoried separately: their incoming domain belongs
 to the function contract and is not itself a bad write.
 
@@ -818,6 +821,19 @@ def _merge(rows: list[dict]) -> list[FieldFacts]:
         min(item.declarations).column))
 
 
+def _type_spans_requiring_split(fields: list[FieldFacts]) -> set[SourceSpan]:
+    owners: dict[SourceSpan, list[FieldFacts]] = {}
+    for item in fields:
+        for span in item.type_spans:
+            owners.setdefault(span, []).append(item)
+    return {
+        span for span, items in owners.items()
+        if len({item.usr for item in items}) > 1
+        and not all(item.eligible and item.target_type == items[0].target_type
+                    for item in items)
+    }
+
+
 def scan(repo: Path = REPO, *, jobs: int = 0,
          filters: Iterable[str] = (), portable: bool = False) -> dict:
     entries = _entries(repo, filters)
@@ -837,6 +853,7 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         with ProcessPoolExecutor(max_workers=min(worker_count, len(batches))) as pool:
             raw = [row for batch in pool.map(worker, batches) for row in batch]
     fields = _merge(raw)
+    split_type_spans = _type_spans_requiring_split(fields)
     source_storage = [item for item in fields if item.declared_type in SOURCE_BOOLEAN_TARGETS]
     boolean_storage = [item for item in fields if item.declared_type in BOOLEAN_TYPES]
     candidates = [item for item in source_storage if item.eligible]
@@ -861,6 +878,8 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             "read_count": len(item.read_locations),
             "translation_units": sorted(item.translation_units),
             "eligible": item.eligible,
+            "requires_declaration_split": any(
+                span in split_type_spans for span in item.type_spans),
         }
 
     numeric_literal_writes = [
@@ -944,7 +963,8 @@ def _text(report: dict, include_rejected: bool) -> str:
             f"{item.get('storage_kind', 'field')} {item['qualified_name']} "
             f"{item.get('declared_type', 'i32')}->{item.get('target_type', 'b32')} "
             f"({len(item['writes'])} writes, "
-            f"{item['read_count']} reads)")
+            f"{item['read_count']} reads)"
+            + (" [split declaration]" if item.get("requires_declaration_split") else ""))
         for write in item["writes"]:
             lines.append(
                 f"  {write['file']}:{write['line']} {write['kind']}: "
