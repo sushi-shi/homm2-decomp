@@ -745,7 +745,7 @@ void philAI::CheckBuyStuff(void) {
     DoAllHeroInteractions();
     while (!done) {
         GetBestBHC(giCurPlayer, bestBuy);
-        if (bestBuy.type >= 0 && CanBuyBHC(bestBuy)) {
+        if (IDX(bestBuy.type) >= 0 && CanBuyBHC(bestBuy)) {
             switch (bestBuy.type) {
                 case PURCHASE_BUILDING:
                     BuildBuilding(bestBuy.pTown, bestBuy.building);

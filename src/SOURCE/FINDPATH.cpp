@@ -499,7 +499,7 @@ i32 searchArray::FindCombatPath(
             );
             PushCombatPoint(
                 nextHex,
-                direction_a,
+                static_cast<CombatHexDirection>(direction_a),
                 node_g.distance
                     + (bIsMoatSlowed[nextHex] ? unit->m_speed + MOAT_MOVEMENT_PENALTY : 0)
                     + 1,

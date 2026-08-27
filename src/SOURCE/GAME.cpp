@@ -2472,7 +2472,9 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(cell2->m_objectIndex);
+                        cell2->m_objectMetadata = GetRandomNumTroops(
+                            static_cast<CreatureType>(cell2->m_objectIndex)
+                        );
                         if (cell2->m_objectIndex != IDX(CREATURE_GHOST)
                             && cell2->m_objectIndex != IDX(CREATURE_EARTH_ELEMENTAL)
                             && cell2->m_objectIndex != IDX(CREATURE_AIR_ELEMENTAL)
@@ -3703,7 +3705,7 @@ void game::ViewArmy(
         VIEW_ARMY_MONSTER_WIDGET_HEIGHT,
         filename5,
         sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
-        static_cast<i8>(facing == ARMY_FACING_LEFT),
+        facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
         VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
         WIDGET_KIND_ICON_DIRECT,
         1
@@ -4595,8 +4597,9 @@ void game::PerWeek(void) {
                 heroClass =
                     m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
             }
-            heroClass =
-                (Random(1, IDX(FACTION_COUNT) - 1) + heroClass) % IDX(FACTION_COUNT);
+            heroClass = static_cast<FactionType>(
+                (Random(1, IDX(FACTION_COUNT) - 1) + IDX(heroClass)) % IDX(FACTION_COUNT)
+            );
             desiredClass = heroClass;
             if (innerIndex == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]]
@@ -7740,7 +7743,7 @@ void game::SetupNewRumour(void) {
                                       ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
                                       ->m_terrainImageIndex])]
                 );
-            } else if (m_ultimateArtifactId != -1) {
+            } else if (m_ultimateArtifactId != ARTIFACT_NONE) {
                 sprintf(
                     m_rumour,
                     "\xce\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee, \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 "

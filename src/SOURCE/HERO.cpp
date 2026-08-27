@@ -858,7 +858,9 @@ void hero::CheckLevel(void) {
                         goto nextAttempt;
                     }
                 }
-                skill = HeroSecondarySkill((IDX(skill) + 1) % HERO_SKILL_COUNT);
+                skill = static_cast<HeroSecondarySkill>(
+                    (IDX(skill) + 1) % IDX(HERO_SKILL_COUNT)
+                );
             }
         nextAttempt:
             tryCount--;
