@@ -69,6 +69,7 @@ bypasses of the shared low-level conversion.
 | Millisecond and fizzle timing | Signed comparisons against the wrapping 32-bit tick counter can terminate a wait early or extend it across the signed and unsigned wrap boundaries. `FizzleForward` also starts its first frame from tick zero, so that frame normally receives no delay. | Compares the signed modular distance between the deadline and current tick and starts the fizzle cadence from the current tick. |
 | Wagon and lean-to sound | Their event-sound cases select the pickup sound and then fall through, overwriting it with the experience sound. | Stops after selecting the pickup sound, as the otherwise-dead assignment and the event category indicate. |
 | AI single-creature stack value | Two consecutive strength thresholds both test for more than two creatures, leaving the `-0.4` modifier unreachable and assigning a one-creature stack the zero-creature modifier. | Uses the evident descending threshold of more than one creature, preserving distinct modifiers for stacks of two, one, and zero creatures. |
+| Combat obstacle sentinel | The random obstacle roll includes value 32 although the table and `cobj` resources end at 31. Retail indexes one record past the table, where the adjacent Estates table happens to begin with zero, and retries. | Preserves the same inclusive random roll and random-generator state, but treats 32 explicitly as the retry sentinel before indexing the obstacle table. |
 
 ## Replaced subsystem
 
