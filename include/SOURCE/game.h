@@ -48,7 +48,7 @@ struct boatRecord {
     i8 x;
     i8 y;
     H2_ENUM_STORAGE(MapDirection, i8) direction;
-    H2_ENUM_STORAGE(MapObjectType, u8) savedTriggerType;
+    H2_OPEN_CODE_STORAGE(MapTriggerCode, u8) savedTriggerType;
     u8 savedEventData;
     i8 heroId;
     i8 owner;
@@ -293,7 +293,7 @@ public:
     void RestoreCell(
         i32,
         i32,
-        H2_ENUM_PARAM(MapObjectType, i32),
+        H2_OPEN_CODE_PARAM(MapTriggerCode, i32),
         i32,
         class mapCell*,
         i32

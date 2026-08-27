@@ -622,7 +622,7 @@ mapCell* advManager::MoveHero(
         boat->savedEventData = static_cast<u8>(boatCell->m_objectMetadata);
         boat->direction = m_cursorDirection;
         boat->heroId |= BOAT_OCCUPIED_FLAG;
-        boatCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
+        boatCell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         boatCell->m_objectMetadata = static_cast<u16>(step_a);
         boat->x = static_cast<i8>(movingHero_g->m_x);
         boat->y = static_cast<i8>(movingHero_g->m_y);
@@ -709,7 +709,7 @@ mapCell* advManager::MoveHero(
     if (!ValidMove(direction, 0))
         goto movementDone;
 
-    if (movingHero_g->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+    if (movingHero_g->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         town* occupiedTown = gpGame->GetTown(movingHero_g->m_occupiedTown);
         occupiedTown->m_occupyingHeroId = -1;
     }
@@ -1071,8 +1071,8 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
 
     if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
         if (m_cursorType != HERO_TYPE_BOAT
-            && destinationCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
-            && destinationCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
+            && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
+            && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
             return 0;
         if (giGroundToTerrain[currentCell_c->m_terrainImageIndex] == TERRAIN_WATER
             && directionX != 0 && directionY_c != 0) {
@@ -1095,7 +1095,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
             && currentCell_c->m_objectTileset != TILESET_DUMMY
             && !(currentCell_c->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
-            && currentCell_c->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WHIRLPOOL))
+            && currentCell_c->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
         if (destinationCell->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             northNeighborCell_a = m_mapData->GetCell(destinationCellX, destinationCellY_f + 1);
@@ -1109,7 +1109,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         if (destinationCell->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
             && destinationCell->m_objectTileset != TILESET_DUMMY
             && !(destinationCell->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
-            && destinationCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WHIRLPOOL)
+            && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL))
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
             return 0;
@@ -1345,7 +1345,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero_b->m_owner = change.player;
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =
-                MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+                MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata = change.id;
             gpAdvManager->SetHeroContext(change.id, 0);
             CompleteDraw(0);

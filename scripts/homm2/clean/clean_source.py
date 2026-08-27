@@ -344,6 +344,7 @@ CALL_RULES = {
 
     # Parameters and returns carry the domain type outright.
     "H2_ENUM_PARAM": _arg(0),
+    "H2_OPEN_CODE_PARAM": _arg(0),
     "H2_ENUM_BITFIELD": _arg(0),
     "H2_ENUM_RETURN": _arg(0),
 
@@ -352,6 +353,7 @@ CALL_RULES = {
     # files -- while presenting the domain type to expressions.
     "H2_ENUM_STORAGE": _enum_storage("H2EnumStorage"),
     "H2_ENUM_STORAGE_STEPPED": _enum_storage("H2SteppedEnumStorage"),
+    "H2_OPEN_CODE_STORAGE": _enum_storage("H2OpenCodeStorage"),
 
     # Operator sets for domains used as counters or bit flags.
     "H2_ENUM_STEPPED": _operator_macro("ENABLE_ENUM_STEPS"),

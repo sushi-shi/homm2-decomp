@@ -119,14 +119,14 @@ void searchArray::SeedPosition(
         targetTerrain = giGroundToTerrain[s_seedPositionState.targetCell->m_terrainImageIndex];
         if (targetTerrain == TERRAIN_WATER) {
             if (waterMode) {
-                if (s_seedPositionState.targetCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
+                if (s_seedPositionState.targetCell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT)))
                     return;
             } else {
                 if (s_seedPositionState.targetCell->m_triggerType
-                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
-                    && s_seedPositionState.targetCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                        != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
+                    && s_seedPositionState.targetCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
                     && s_seedPositionState.targetCell->m_triggerType
-                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
+                           != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
                     return;
             }
         }

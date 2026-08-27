@@ -154,7 +154,7 @@ public:
         };
     };
     H2_ENUM_STORAGE(MapDirection, u8) m_direction;
-    H2_ENUM_STORAGE(MapObjectType, i16) m_locationType;
+    H2_OPEN_CODE_STORAGE(MapTriggerCode, i16) m_locationType;
     i16 m_occupiedTown;
     i32 m_mobility;
     i32 m_remainingMobility;

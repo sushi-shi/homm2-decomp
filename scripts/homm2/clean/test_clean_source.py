@@ -79,6 +79,18 @@ class CleanSourcePatchTests(unittest.TestCase):
 
 
 class CleanSourceCurrentEnumTests(unittest.TestCase):
+    def test_open_code_storage_keeps_its_serialized_width(self):
+        self.assertEqual(
+            clean_source.clean("H2_OPEN_CODE_STORAGE(MapTriggerCode, u8) trigger;"),
+            "H2OpenCodeStorage<MapTriggerCode, u8> trigger;\n",
+        )
+
+    def test_open_code_parameter_uses_the_domain(self):
+        self.assertEqual(
+            clean_source.clean("void Restore(H2_OPEN_CODE_PARAM(MapTriggerCode, i32));"),
+            "void Restore(MapTriggerCode);\n",
+        )
+
     def test_clean_override_expands_enum_index_at_the_call_site(self):
         text = (
             clean_source.OVERRIDE_DIR / "include/Ints.h"

@@ -130,7 +130,7 @@ public:
     H2_ENUM_BITFIELD(TilesetId, u8) m_overlayTileset : 6;
     u8 m_overlayIndex;
     u8 m_flags;
-    H2_ENUM_STORAGE(MapObjectType, u8) m_triggerType;
+    H2_OPEN_CODE_STORAGE(MapTriggerCode, u8) m_triggerType;
     u16 m_extraIndex;
 
     inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {
