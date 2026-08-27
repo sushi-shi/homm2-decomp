@@ -94,11 +94,10 @@ class Pattern(enum.Enum):
     REGEX = enum.auto()
 
 
-# Conversions required by the strict enum branch.
-#
-# Patching generated text, not the matching source: a token added there can flip
-# /Od codegen parity in unrelated functions, which already cost
-# advManager::DoVisions its byte-exact match once.
+# Small compatibility transforms required by the modern generated build. Enum
+# conversions stay here only when the equivalent matching-source spelling
+# changes retail code generation. The other entries adapt a pre-const Windows
+# ABI and a third-party header without changing reconstructed game source.
 GENERATED_PATCHES = {
     "src/SOURCE/EVENTS.cpp": [
         (

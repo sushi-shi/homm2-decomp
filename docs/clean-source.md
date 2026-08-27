@@ -41,7 +41,10 @@ that remain in the matching source.
 Every patch declares how many sites it expects to hit, and any other number ends
 the run naming the file. Strict typing conversions move directly into the
 reconstructed Gold/Buka source whenever that change remains byte-exact; only
-the proven codegen-sensitive cases stay in the generated patch table.
+the proven codegen-sensitive cases stay in the generated patch table. That
+table also carries the two narrow modern-build compatibility shims: the
+pre-const DirectPlay input-string signature and Audiere's missing C string
+header include.
 
 Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to
