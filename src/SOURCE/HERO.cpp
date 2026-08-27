@@ -208,10 +208,10 @@ hero::hero(void) {
 }
 
 void hero::Read(i32 file, i8 expansion) {
-    if (expansion)
-        platform::FileRead(file, this, sizeof(hero));
-    else
-        platform::FileRead(file, this, BASE_RECORD_SIZE);
+    const bool complete = expansion ? platform::FileReadExact(file, this, sizeof(hero))
+                                    : platform::FileReadExact(file, this, BASE_RECORD_SIZE);
+    if (!complete)
+        ShutDown(localization::Tr("system.file.read_error"));
     const std::string name = localization::DecodeExternalText(m_name);
     utf8::Copy(m_name, sizeof(m_name), name.c_str());
 }
@@ -229,10 +229,11 @@ void hero::Write(i32 file, i8 expansion) {
             "save: hero name was truncated or is not representable in the legacy file encoding"
         );
     }
-    if (expansion)
-        platform::FileWrite(file, &serialized, sizeof(hero));
-    else
-        platform::FileWrite(file, &serialized, BASE_RECORD_SIZE);
+    const bool complete = expansion
+        ? platform::FileWriteExact(file, &serialized, sizeof(hero))
+        : platform::FileWriteExact(file, &serialized, BASE_RECORD_SIZE);
+    if (!complete)
+        ShutDown(localization::Tr("system.file.write_error"));
 }
 
 void hero::GetArmyStrengths(u32l* const) {}

@@ -72,7 +72,7 @@ void DoBlur(
     }
 
     gpResourceManager->PointToFile(gpResourceManager->MakeId("RGBLOOKP.BIN", 1));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(lookupTable), LOOKUP_BYTE_COUNT);
+    gpResourceManager->ReadBlock(lookupTable, LOOKUP_BYTE_COUNT);
     memcpy(destination->m_pixels, source->m_pixels, height * SCREEN_WIDTH);
     PollSound();
 

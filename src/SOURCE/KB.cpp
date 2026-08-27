@@ -2905,8 +2905,15 @@ i32 AddScoreToHighScore(
             entries_a[entry_a].score = HIGH_SCORE_EMPTY;
         }
     } else {
-        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            platform::FileRead(file_c, &entries_a[entry_a], sizeof(entries_a));
+        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
+            if (!platform::FileReadExact(file_c, &entries_a[entry_a], sizeof(entries_a))) {
+                for (; entry_a < HIGH_SCORE_ENTRY_COUNT; ++entry_a) {
+                    memset(&entries_a[entry_a], 0, sizeof(entries_a[entry_a]));
+                    entries_a[entry_a].score = HIGH_SCORE_EMPTY;
+                }
+                break;
+            }
+        }
         platform::FileClose(file_c);
     }
 
@@ -2949,8 +2956,10 @@ i32 AddScoreToHighScore(
         file_c = platform::FileOpen(filename_h, platform::FileMode::Write);
         if (file_c == -1)
             FileError(filename_h);
-        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            platform::FileWrite(file_c, &entries_a[entry_a], sizeof(HighScoreEntry));
+        for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
+            if (!platform::FileWriteExact(file_c, &entries_a[entry_a], sizeof(HighScoreEntry)))
+                ShutDown(localization::Tr("system.file.write_error"));
+        }
         platform::FileClose(file_c);
     } else {
         gbShowHighScore = false;

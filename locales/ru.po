@@ -11357,6 +11357,16 @@ msgctxt "system.file.open_error"
 msgid "Error opening file %s!"
 msgstr "Ошибка открытия файла %s!"
 
+#: src/SOURCE/GAME.cpp src/EDITOR/mapcell.cpp
+msgctxt "system.file.read_error"
+msgid "Error reading game data!"
+msgstr "Ошибка чтения игровых данных!"
+
+#: src/SOURCE/GAME.cpp src/EDITOR/mapcell.cpp
+msgctxt "system.file.write_error"
+msgid "Error writing game data!"
+msgstr "Ошибка записи игровых данных!"
+
 #: src/SOURCE/KB.cpp
 msgctxt "high_score.cheater_rating"
 msgid "Cheater!!!"

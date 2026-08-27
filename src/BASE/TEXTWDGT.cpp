@@ -75,11 +75,11 @@ void textWidget::Read(void) {
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
     std::vector<char> legacyText(static_cast<std::size_t>(len) + 1, 0);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(legacyText.data()), len);
+    gpResourceManager->ReadBlock(legacyText.data(), len);
     const std::string decodedText = localization::DecodeResourceText(legacyText.data());
     m_text = static_cast<char*>(H2_ALLOC(decodedText.size() + 1));
     memcpy(m_text, decodedText.c_str(), decodedText.size() + 1);
-    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
+    gpResourceManager->Read13(resourceName);
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
