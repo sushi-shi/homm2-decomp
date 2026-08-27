@@ -563,35 +563,36 @@ i32 game::NewGame(void) {
             }
         }
     } else {
-    pick_map:
-        wrongExpansionType = false;
-        mapExt = FindLastToken(m_mapFilename, '.');
-        if (mapExt != NULL) {
-            if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
-                wrongExpansionType = true;
-            if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
-                wrongExpansionType = true;
-        }
-        if (!wrongExpansionType) {
-            if (xIsExpansionMap)
-                strcpy(gpGame->m_mapFilename, "arrax.mx2");
-            else
-                strcpy(gpGame->m_mapFilename, "brokena.mp2");
-            m_newGameInitialized = false;
-            m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
-        }
-        if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-            && platform::CompareIgnoringCase(gpGame->m_mapFilename, "brokena.mp2") == 0)
-            strcpy(gpGame->m_mapFilename, "slugfest.mp2");
-        if (giNumHumanPlayers > 1 && platform::CompareIgnoringCase(gpGame->m_mapFilename, "arrax.mx2") == 0)
-            strcpy(gpGame->m_mapFilename, "fullhse.mx2");
+        while (true) {
+            wrongExpansionType = false;
+            mapExt = FindLastToken(m_mapFilename, '.');
+            if (mapExt != NULL) {
+                if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
+                    wrongExpansionType = true;
+                if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
+                    wrongExpansionType = true;
+            }
+            if (!wrongExpansionType) {
+                if (xIsExpansionMap)
+                    strcpy(gpGame->m_mapFilename, "arrax.mx2");
+                else
+                    strcpy(gpGame->m_mapFilename, "brokena.mp2");
+                m_newGameInitialized = false;
+                m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
+            }
+            if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
+                && platform::CompareIgnoringCase(gpGame->m_mapFilename, "brokena.mp2") == 0)
+                strcpy(gpGame->m_mapFilename, "slugfest.mp2");
+            if (giNumHumanPlayers > 1
+                && platform::CompareIgnoringCase(gpGame->m_mapFilename, "arrax.mx2") == 0)
+                strcpy(gpGame->m_mapFilename, "fullhse.mx2");
 
-        strcpy(gMapName, m_mapFilename);
-        mapHeaderRead = GetMapHeader(m_mapFilename, &m_mapHeader);
-        if (!mapHeaderRead || giNumHumanPlayers < m_mapHeader.minHumanPlayers
-            || giNumHumanPlayers > m_mapHeader.maxHumanPlayers) {
+            strcpy(gMapName, m_mapFilename);
+            mapHeaderRead = GetMapHeader(m_mapFilename, &m_mapHeader);
+            if (mapHeaderRead && giNumHumanPlayers >= m_mapHeader.minHumanPlayers
+                && giNumHumanPlayers <= m_mapHeader.maxHumanPlayers)
+                break;
             gpGame->GetMap();
-            goto pick_map;
         }
 
         if (gbRemoteOn) {

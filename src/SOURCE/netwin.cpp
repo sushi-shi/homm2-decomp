@@ -125,39 +125,39 @@ i16 wsnet_init(void) {
             );
         }
     } else {
-    retryAddress:
-        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
-            strcpy(cWSTextBuffer, gcTCPAddress);
-            strcpy(
-                gcTCPAddress,
-                ""
-            );
-        } else {
-            GetDataEntry(
-                localization::Tr("network.tcp.host_address.prompt"),
-                cWSTextBuffer,
-                IP_ADDRESS_ENTRY_LIMIT,
-                NULL,
-                0,
-                1
-            );
-        }
-        giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
-        if (giNetPosToDCOPos[0] == -1) {
-            NormalDialog(
-                localization::Tr("network.tcp.host_address.invalid"),
-                NORMAL_DIALOG_WAIT_FIRST,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-            goto retryAddress;
-        }
+        do {
+            if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
+                strcpy(cWSTextBuffer, gcTCPAddress);
+                strcpy(
+                    gcTCPAddress,
+                    ""
+                );
+            } else {
+                GetDataEntry(
+                    localization::Tr("network.tcp.host_address.prompt"),
+                    cWSTextBuffer,
+                    IP_ADDRESS_ENTRY_LIMIT,
+                    NULL,
+                    0,
+                    1
+                );
+            }
+            giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
+            if (giNetPosToDCOPos[0] == -1) {
+                NormalDialog(
+                    localization::Tr("network.tcp.host_address.invalid"),
+                    NORMAL_DIALOG_WAIT_FIRST,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            }
+        } while (giNetPosToDCOPos[0] == -1);
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         snprintf(
             cWSTextBuffer,
@@ -211,16 +211,18 @@ void wsSendMessage(
         for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
             if (netPlayer == giThisNetPos)
                 continue;
-            attemptCount = 0;
-        sendPacket:
-            peerAddress.host = static_cast<u32l>(giNetPosToDCOPos[netPlayer]);
-            iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
-            if (iRc < 0) {
-                error = platform::LastSocketError();
-                if (attemptCount < SEND_ATTEMPT_LIMIT) {
-                    DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
-                    goto sendPacket;
+            for (attemptCount = 0; attemptCount < SEND_ATTEMPT_LIMIT; ++attemptCount) {
+                peerAddress.host = static_cast<u32l>(giNetPosToDCOPos[netPlayer]);
+                iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
+                if (iRc >= 0) {
+                    break;
                 }
+                error = platform::LastSocketError();
+                if (attemptCount + 1 < SEND_ATTEMPT_LIMIT) {
+                    DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
+                }
+            }
+            if (iRc < 0) {
                 snprintf(
                     cWSTextBuffer,
                     sizeof(cWSTextBuffer),
@@ -228,6 +230,7 @@ void wsSendMessage(
                     error
                 );
                 NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+                H2_FREE(packetBuffer);
                 return;
             }
         }
@@ -237,6 +240,7 @@ void wsSendMessage(
         if (iRc < 0) {
             sprintf(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            H2_FREE(packetBuffer);
             return;
         }
     }

@@ -313,13 +313,11 @@ char ReadPacket(void) {
         inque.writePosition = 0;
         newpacket = true;
     }
-readPacketStart:
-    if (newpacket != 0) {
-        packetlen = 0;
-        newpacket = false;
-    }
-    do {
-    readNextByte:
+    while (true) {
+        if (newpacket != 0) {
+            packetlen = 0;
+            newpacket = false;
+        }
         input = read_byte();
         if (input < 0)
             return 0;
@@ -330,22 +328,22 @@ readPacketStart:
                 return 1;
             } else if (input == 0) {
                 newpacket = true;
-                goto readPacketStart;
+                continue;
             }
         } else {
             if (input == MODEM_ESCAPE_BYTE) {
                 inescape = true;
-                goto readNextByte;
+                continue;
             }
         }
         if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
             newpacket = true;
             LogStr("OverFlow2");
-            goto readPacketStart;
+            continue;
         }
         packet[packetlen] = static_cast<char>(input);
         ++packetlen;
-    } while (1);
+    }
 }
 
 void WriteModemPacket(char* buffer, i32 length) {

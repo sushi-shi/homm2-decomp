@@ -3674,6 +3674,19 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     if (gpCurPlayer != NULL && gpCurPlayer->CurrentHero() != -1)
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
 
+    if (command >= APP_MENU_MUSIC_FIRST && command <= APP_MENU_MUSIC_LAST) {
+        gConfig.musicVolume = static_cast<ConfigVolumeLevel>(command - APP_MENU_MUSIC_FIRST);
+        gpSoundManager->AdjustMusicVolumes();
+        WritePrefs();
+        return 0;
+    }
+    if (command >= APP_MENU_SOUND_FIRST && command <= APP_MENU_SOUND_LAST) {
+        gConfig.soundVolume = static_cast<ConfigVolumeLevel>(command - APP_MENU_SOUND_FIRST);
+        gpSoundManager->AdjustSoundVolumes();
+        WritePrefs();
+        return 0;
+    }
+
     switch (command) {
         case APP_MENU_RESTART_0:
         case APP_MENU_RESTART_1:
@@ -3721,82 +3734,6 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
         case APP_MENU_EXIT:
             platform::RequestQuit();
-            break;
-
-        case APP_MENU_MUSIC_FIRST:
-            gConfig.musicVolume = CONFIG_VOLUME_MUTED;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 1:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 2:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 1;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 3:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 2;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 4:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 3;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 5:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 4;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 6:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 5;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 7:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 6;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 8:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 7;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 9:
-            gConfig.musicVolume = CONFIG_VOLUME_MIN + 8;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_LAST:
-            gConfig.musicVolume = CONFIG_VOLUME_MAX;
-            goto adjustMusic;
-        adjustMusic:
-            gpSoundManager->AdjustMusicVolumes();
-            menuChanged = true;
-            break;
-
-        case APP_MENU_SOUND_FIRST:
-            gConfig.soundVolume = CONFIG_VOLUME_MUTED;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 1:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 2:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 1;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 3:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 2;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 4:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 3;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 5:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 4;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 6:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 5;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 7:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 6;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 8:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 7;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 9:
-            gConfig.soundVolume = CONFIG_VOLUME_MIN + 8;
-            goto adjustSound;
-        case APP_MENU_SOUND_LAST:
-            gConfig.soundVolume = CONFIG_VOLUME_MAX;
-            goto adjustSound;
-        adjustSound:
-            gpSoundManager->AdjustSoundVolumes();
-            menuChanged = true;
             break;
 
         case APP_MENU_TOGGLE_ROUTE:

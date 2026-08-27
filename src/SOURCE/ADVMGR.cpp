@@ -4589,6 +4589,28 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                 gMapColors[H2EnumIndex(giGroundToTerrain[cell->m_terrainImageIndex])]
                                 + RADAR_TERRAIN_SHADE;
                         } else {
+                            const auto useDefaultObjectColor = [&]() {
+                                switch (cell->m_triggerType) {
+                                    case MAP_OBJECT_ALCHEMIST_LAB:
+                                    case MAP_OBJECT_MINE:
+                                    case MAP_OBJECT_SAWMILL:
+                                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB):
+                                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE):
+                                    case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL):
+                                        owner = gpGame->m_mineOwners[cell->m_objectMetadata];
+                                        color = gOwnerColors
+                                            [owner < 0
+                                                 ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
+                                                 : gpGame->m_players[owner].m_color];
+                                        break;
+                                    default:
+                                        color = gMapColors[H2EnumIndex(
+                                            giGroundToTerrain[cell->m_terrainImageIndex]
+                                        )];
+                                        break;
+                                }
+                            };
+
                             switch (setId) {
                                 case TILESET_OBJNTOWN:
                                 case TILESET_OBJNTWBA:
@@ -4601,7 +4623,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     if (j < towny - RADAR_TOWN_RADIUS || j > towny
                                         || i < townx - RADAR_TOWN_RADIUS
                                         || i > townx + RADAR_TOWN_RADIUS) {
-                                        goto radar_default_object;
+                                        useDefaultObjectColor();
                                     }
                                     break;
                                 case TILESET_MTNSNOW:
@@ -4640,24 +4662,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     }
                                     break;
                                 default:
-                                radar_default_object:
-                                    switch (cell->m_triggerType) {
-                                        case MAP_OBJECT_ALCHEMIST_LAB:
-                                        case MAP_OBJECT_MINE:
-                                        case MAP_OBJECT_SAWMILL:
-                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB):
-                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE):
-                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL):
-                                            owner = gpGame->m_mineOwners[cell->m_objectMetadata];
-                                            color = gOwnerColors
-                                                [owner < 0
-                                                     ? H2EnumIndex(RADAR_NEUTRAL_OWNER)
-                                                     : gpGame->m_players[owner].m_color];
-                                            break;
-                                        default:
-                                            color = gMapColors[H2EnumIndex(giGroundToTerrain[cell->m_terrainImageIndex])];
-                                            break;
-                                    }
+                                    useDefaultObjectColor();
                                     break;
                             }
                         }
@@ -4878,6 +4883,38 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         MemError();
     }
     visitedMaskValue = HERO_EVENT_NONE;
+    const auto formatDefaultQuickInfo = [&]() {
+        if (visitedMaskValue != HERO_EVENT_NONE && pHero != NULL) {
+            sprintf(
+                gText,
+                "%s\n\n%s",
+                gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                (H2EnumIndex((pHero->m_eventFlags) & (visitedMaskValue)))
+                    ? localization::Tr("adventure.quick.already_visited")
+                    : localization::Tr("adventure.quick.not_visited")
+            );
+        } else {
+            sprintf(
+                gText,
+                "%s",
+                gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
+            );
+        }
+    };
+    const auto appendMineGuard = [&]() {
+        sprintf(
+            guardStr,
+            localization::Tr("adventure.quick_info.guarded_by"),
+            GetArmySizeName(
+                gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
+                ARMY_SIZE_NAME_INLINE
+            ),
+            gArmyNamesPlural[H2EnumIndex(
+                gpGame->m_mines[currentCell->m_objectMetadata].guardianType
+            )]
+        );
+        strcat(gText, guardStr);
+    };
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
@@ -4978,7 +5015,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_GAZEBO:
@@ -4994,7 +5031,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_FORT:
@@ -5010,7 +5047,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_WITCH_DOCTOR_HUT:
@@ -5026,7 +5063,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_MERCENARY_CAMP:
@@ -5042,7 +5079,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_STANDING_STONES:
@@ -5058,7 +5095,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_TREE_OF_KNOWLEDGE:
@@ -5074,7 +5111,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_XANADU:
@@ -5090,33 +5127,41 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 : localization::Tr("adventure.quick.not_visited")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 case MAP_OBJECT_BUOY:
                     visitedMaskValue = ADVMGR_VISIT_FORT;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_FOUNTAIN:
                     visitedMaskValue = ADVMGR_VISIT_GAZEBO;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_OASIS:
                     visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_FAERIE_RING:
                     visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_TEMPLE:
                     visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_WATERING_HOLE:
                     visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_MAGIC_WELL:
                     visitedMaskValue = ADVMGR_VISIT_XANADU;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_IDOL:
                     visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
-                    goto quick_info_default;
+                    formatDefaultQuickInfo();
+                    break;
                 case MAP_OBJECT_NONE:
                 case MAP_OBJECT_MAP_EVENT:
                 case MAP_OBJECT_COAST:
@@ -5145,7 +5190,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         "%s",
                         gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
-                    goto quick_info_guarded;
+                    appendMineGuard();
+                    break;
                 case MAP_OBJECT_MINE:
                     if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType
                         != CREATURE_NONE) {
@@ -5155,18 +5201,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gMineNames[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
-                    quick_info_guarded:
-                        sprintf(
-                            guardStr,
-                            localization::Tr("adventure.quick_info.guarded_by"),
-                            GetArmySizeName(
-                                gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
-                                ARMY_SIZE_NAME_INLINE
-                            ),
-                            gArmyNamesPlural[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata]
-                                                     .guardianType)]
-                        );
-                        strcat(gText, guardStr);
+                        appendMineGuard();
                     } else {
                         sprintf(
                             gText,
@@ -5344,33 +5379,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             localization::Tr("adventure.quick.reefs")
                         );
                     } else {
-                        goto quick_info_default;
+                        formatDefaultQuickInfo();
                     }
                     break;
                 default:
-                quick_info_default:
-                    if (visitedMaskValue != HERO_EVENT_NONE && pHero != NULL) {
-                        sprintf(
-                            gText,
-                            "%s\n\n%s",
-                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
-                            (H2EnumIndex((pHero->m_eventFlags) & (visitedMaskValue)))
-                                ? localization::Tr("adventure.quick.already_visited")
-                                : localization::Tr("adventure.quick.not_visited")
-                        );
-                    } else {
-                        sprintf(
-                            gText,
-                            "%s",
-                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
-                        );
-                    }
+                    formatDefaultQuickInfo();
                     break;
             }
         }
     }
 
-quick_info_ready:
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
@@ -10581,6 +10599,7 @@ i32 advManager::DoVisions(hero* visionHero) {
     i32 nearDist;
     i32 joinNum;
     i32 joinFee;
+    b32 hasPrediction;
 
     nearDist = VISIONS_NO_MONSTER_DISTANCE;
     bestY = -1;
@@ -10634,6 +10653,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                  gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)
              )
              / static_cast<double>(count * gMonsterDatabase[H2EnumIndex(type)].fightValue);
+    hasPrediction = false;
 
     if (visionHero->m_army.CanJoin(type) && fRatio > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && type != CREATURE_GHOST
@@ -10645,8 +10665,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                 localization::Tr("adventure.spell.visions.forced_join")
 
             );
-            strcat(gText, msg);
-            goto showVision;
+            hasPrediction = true;
         } else if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
             if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
@@ -10664,57 +10683,46 @@ i32 advManager::DoVisions(hero* visionHero) {
 
             joinFee = gMonsterDatabase[H2EnumIndex(type)].cost * count;
             if (joinFee
-                > gpGame->m_players[visionHero->m_owner].m_resources[H2EnumIndex(RES_GOLD)]) {
-                if (fRatio > MONSTER_STRENGTH_FLEE) {
-                    goto creaturesFlee;
+                <= gpGame->m_players[visionHero->m_owner].m_resources[H2EnumIndex(RES_GOLD)]) {
+                if (joinNum == count) {
+                    sprintf(
+                        msg,
+                        localization::Tr("adventure.spell.visions.all_join_fee")
+
+,
+                        joinFee
+                    );
                 } else {
-                    goto creaturesFight;
+                    sprintf(
+                        msg,
+                        localization::Tr("adventure.spell.visions.some_join_fee")
+
+,
+                        count,
+                        joinFee
+                    );
                 }
+                hasPrediction = true;
             }
-
-            if (joinNum == count) {
-                sprintf(
-                    msg,
-                    localization::Tr("adventure.spell.visions.all_join_fee")
-
-,
-                    joinFee
-                );
-            } else {
-                sprintf(
-                    msg,
-                    localization::Tr("adventure.spell.visions.some_join_fee")
-
-,
-                    count,
-                    joinFee
-                );
-            }
-            strcat(gText, msg);
-            goto showVision;
         }
     }
 
-    if (fRatio > MONSTER_STRENGTH_FLEE) {
-    creaturesFlee:
-        utf8::Copy(
-            msg, sizeof(msg),
-            localization::Tr("adventure.spell.visions.flee")
+    if (!hasPrediction) {
+        if (fRatio > MONSTER_STRENGTH_FLEE) {
+            utf8::Copy(
+                msg, sizeof(msg),
+                localization::Tr("adventure.spell.visions.flee")
 
-        );
-        strcat(gText, msg);
-        goto showVision;
+            );
+        } else {
+            utf8::Copy(
+                msg, sizeof(msg),
+                localization::Tr("adventure.spell.visions.fight")
+
+            );
+        }
     }
-creaturesFight:
-    utf8::Copy(
-        msg, sizeof(msg),
-        localization::Tr("adventure.spell.visions.fight")
-
-    );
     strcat(gText, msg);
-    goto showVision;
-
-showVision:
     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
     return 1;
 }
