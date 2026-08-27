@@ -972,7 +972,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         mapCell* square = WORLDMAP->GetCell(x, y);
         boat->savedTriggerType = square->m_triggerType;
         boat->savedEventData = static_cast<u8>(square->m_objectMetadata);
-        square->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
+        square->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         square->m_objectMetadata = boatIdx;
     }
     return boatIdx;
@@ -1759,7 +1759,7 @@ void game::NewMap(const char* filename) {
             m_heroRecs[m_players[player].m_heroIds[nTown]].m_occupiedTown =
                 m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
             m_worldMap.GetCell(xPos, yPos)->m_triggerType =
-                MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+                MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
             m_worldMap.GetCell(xPos, yPos)->m_objectMetadata =
                 m_players[player].m_heroIds[nTown];
         }
@@ -1856,12 +1856,12 @@ void game::NewMap(const char* filename) {
         yPos = m_mapHeader.lossTownY;
         m_mapHeader.lossConditionValue = 0;
         if (m_worldMap.GetCell(xPos, yPos)->m_triggerType
-            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
             m_mapHeader.lossConditionValue =
                 m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPos, yPos - 1)->m_triggerType
-                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
                 m_mapHeader.lossConditionValue =
                     m_worldMap.GetCell(xPos, yPos - 1)->m_objectMetadata;
             else
@@ -1873,12 +1873,12 @@ void game::NewMap(const char* filename) {
         yPos = m_mapHeader.victoryTownY;
         m_mapHeader.victoryConditionValue = 0;
         if (m_worldMap.GetCell(xPos, yPos)->m_triggerType
-            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
             m_mapHeader.victoryConditionValue =
                 m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPos, yPos - 1)->m_triggerType
-                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
                 m_mapHeader.victoryConditionValue =
                     m_worldMap.GetCell(xPos, yPos - 1)->m_objectMetadata;
             else
@@ -1968,7 +1968,7 @@ void game::RandomizeEvents(void) {
         for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
             cell2 = m_worldMap.GetCell(xPos, yPos);
             switch (cell2->m_triggerType) {
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WITCH_HUT):
                     cell2->m_objectMetadata = H2EnumIndex(HERO_SKILL_NECROMANCY);
                     while (cell2->m_objectMetadata == H2EnumIndex(HERO_SKILL_NECROMANCY)
                            || cell2->m_objectMetadata == H2EnumIndex(HERO_SKILL_LEADERSHIP)) {
@@ -1976,14 +1976,14 @@ void game::RandomizeEvents(void) {
                             Random(WITCH_HUT_SKILL_FIRST, WITCH_HUT_SKILL_LAST);
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
-                    cell2->m_objectTileset = TILESET_NONE;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT):
+                    cell2->SetObjectTileset(TILESET_NONE);
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos, yPos, 1);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SPHINX:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
                     eventData4 =
                         reinterpret_cast<mapEventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     if (strlen(eventData4->riddle) > 1 && eventData4->answerCount >= 1)
@@ -1991,7 +1991,7 @@ void game::RandomizeEvents(void) {
                     else
                         eventData4->active = 0;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAP_EVENT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
                     m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
                     mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     mapEvent0->x = static_cast<i16>(xPos);
@@ -2000,45 +2000,45 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
-                    cell2->m_objectTileset = TILESET_NONE;
+                    cell2->SetObjectTileset(TILESET_NONE);
                     m_mapEventCount++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GAZEBO:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_GAZEBO):
                     cell2->m_objectMetadata = bottleId++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FORT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_FORT):
                     cell2->m_objectMetadata = jailId8++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_DOCTOR_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WITCH_DOCTOR_HUT):
                     cell2->m_objectMetadata = sphinxId;
                     sphinxId++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERCENARY_CAMP:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MERCENARY_CAMP):
                     cell2->m_objectMetadata = tentId0++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_STANDING_STONES):
                     if (xPos > 0
                         && m_worldMap.GetCell(xPos - 1, yPos)->m_triggerType
-                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES))
+                               == (MAP_ACTION_TRIGGER(MAP_OBJECT_STANDING_STONES)))
                         cell2->m_objectMetadata =
                             m_worldMap.GetCell(xPos - 1, yPos)->m_objectMetadata;
                     else
                         cell2->m_objectMetadata = hutId27++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_XANADU:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_XANADU):
                     cell2->m_objectMetadata = signId++;
                     break;
-                case MAP_OBJECT_WHIRLPOOL:
+                case MAP_PASSIVE_TRIGGER(MAP_OBJECT_WHIRLPOOL):
                     cell2->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_OBELISK:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_OBELISK):
                     cell2->m_objectMetadata = shrineId8++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FLOTSAM:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_FLOTSAM):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(FLOTSAM_EMPTY), H2EnumIndex(FLOTSAM_LARGE_TREASURE));
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SKELETON):
                     if (!HasObjectTilesetIndex(
                             xPos,
                             yPos,
@@ -2055,7 +2055,7 @@ void game::RandomizeEvents(void) {
                                                         ) + SKELETON_ARTIFACT_OFFSET
                                                       : SKELETON_EMPTY;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WAGON):
                     randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                     if (randomValue5 < WAGON_EMPTY_CUTOFF)
                         cell2->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
@@ -2073,14 +2073,14 @@ void game::RandomizeEvents(void) {
                                << CAMPFIRE_AMOUNT_SHIFT)
                             + MAP_EVENT_RESOURCE_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LEAN_TO:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_LEAN_TO):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(RES_WOOD), H2EnumIndex(RES_GEMS))
                         + (Random(LEAN_TO_AMOUNT_MIN, LEAN_TO_AMOUNT_MAX)
                            << CAMPFIRE_AMOUNT_SHIFT)
                         + MAP_EVENT_RESOURCE_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DAEMON_CAVE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DAEMON_CAVE):
                     switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
@@ -2102,9 +2102,9 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREASURE_CHEST):
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
-                        cell2->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SEA_CHEST;
+                        cell2->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_SEA_CHEST);
                         randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                         if (randomValue5 < SEA_CHEST_EMPTY_CUTOFF)
                             cell2->m_objectMetadata = SEA_CHEST_OUTCOME_EMPTY;
@@ -2128,17 +2128,17 @@ void game::RandomizeEvents(void) {
                                 | CHEST_ARTIFACT_FLAG;
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAMPFIRE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CAMPFIRE):
                     cell2->m_objectMetadata =
                         Random(CAMPFIRE_AMOUNT_MIN, CAMPFIRE_AMOUNT_MAX) << CAMPFIRE_AMOUNT_SHIFT;
                     cell2->m_objectMetadata |= Random(H2EnumIndex(RES_WOOD), H2EnumIndex(RES_GEMS));
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ANCIENT_LAMP:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ANCIENT_LAMP):
                     cell2->m_objectMetadata =
                         Random(ANCIENT_LAMP_ROLL_MIN, ANCIENT_LAMP_ROLL_MAX)
                         + ANCIENT_LAMP_COUNT_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK_SURVIVOR:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK_SURVIVOR):
                     randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                     if (randomValue5 < SHIPWRECK_SURVIVOR_TREASURE_CUTOFF)
                         cell2->m_objectMetadata =
@@ -2148,9 +2148,9 @@ void game::RandomizeEvents(void) {
                     else
                         cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, true);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GRAVEYARD:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DERELICT_SHIP:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_GRAVEYARD):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DERELICT_SHIP):
                     switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
@@ -2172,40 +2172,40 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ARCHER_HOUSE):
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_GOBLIN_HUT):
                     cell2->m_objectMetadata = Random(15, 40);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DWARF_COTTAGE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_COTTAGE):
                     cell2->m_objectMetadata = Random(0, 20) + 1;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PEASANT_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_PEASANT_HUT):
                     cell2->m_objectMetadata = Random(0, 40) + 1;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_LOG_CABIN):
                     cell2->m_objectMetadata = Random(20, 50);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WATER_WHEEL):
                     cell2->m_objectMetadata = MAP_EVENT_DATA_AVAILABLE;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTESIAN_SPRING):
                     cell2->m_objectMetadata = MAP_EVENT_DATA_AVAILABLE;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN):
                     cell2->m_objectMetadata =
                         Random(EVENT_ROLL_MIN, EVENT_BINARY_ROLL_MAX) == EVENT_ROLL_MIN
                             ? H2EnumIndex(RES_GEMS) + MAP_EVENT_RESOURCE_OFFSET
                             : H2EnumIndex(RES_GOLD) + MAP_EVENT_RESOURCE_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_OF_KNOWLEDGE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_OF_KNOWLEDGE):
                     cell2->m_objectMetadata =
                         eyeId13++
                         | (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
                            << TREE_KNOWLEDGE_MODE_SHIFT);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER):
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
                         cell2->m_objectMetadata = GetRandomNumTroops(static_cast<CreatureType>(cell2->m_objectIndex));
                         if (cell2->m_objectIndex != H2EnumIndex(CREATURE_GHOST)
@@ -2218,7 +2218,7 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata |= H2EnumIndex(MAP_MONSTER_GUARD_FLAG);
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE):
                     cell2->m_objectMetadata = cell2->m_objectIndex / 2;
                     switch (cell2->m_objectMetadata) {
                         case H2EnumIndex(RES_WOOD):
@@ -2236,7 +2236,7 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_FIRST_CIRCLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SHRINE_FIRST_CIRCLE):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
                     while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
@@ -2244,7 +2244,7 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1)
                                                   + MAP_EVENT_SPELL_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_SECOND_CIRCLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SHRINE_SECOND_CIRCLE):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
                     while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
@@ -2252,7 +2252,7 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1)
                                                   + MAP_EVENT_SPELL_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_THIRD_CIRCLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SHRINE_THIRD_CIRCLE):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
                     while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
@@ -2260,7 +2260,7 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1)
                                                   + MAP_EVENT_SPELL_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PYRAMID:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_PYRAMID):
                     cell2->m_objectMetadata =
                         Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
                     while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
@@ -2268,43 +2268,43 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = Random(H2EnumIndex(SPELL_FIREBALL), H2EnumIndex(SPELL_COUNT) - 1)
                                                   + MAP_EVENT_SPELL_OFFSET;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_HOUSE):
                     cell2->m_objectMetadata = Random(15, 25);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATCH_TOWER:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WATCH_TOWER):
                     cell2->m_objectMetadata = Random(7, 10);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RUINS:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RUINS):
                     cell2->m_objectMetadata = Random(3, 5);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_CITY):
                     cell2->m_objectMetadata = Random(20, 40);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HALFLING_HOLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_HALFLING_HOLE):
                     cell2->m_objectMetadata = Random(20, 40);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TROLL_BRIDGE):
                     cell2->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CITY_OF_DEAD):
                     cell2->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY):
                     cell2->m_objectMetadata = BANK_GUARDIAN_FLAG | 2;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CAVE):
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXCAVATION:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXCAVATION):
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DESERT_TENT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DESERT_TENT):
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WAGON_CAMP):
                     if (!HasObjectTilesetIndex(
                             xPos,
                             yPos,
@@ -2316,7 +2316,7 @@ void game::RandomizeEvents(void) {
                     }
                     cell2->m_objectMetadata = Random(30, 50);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT):
                     randomValue5 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
                     value = static_cast<ArtifactType>(cell2->m_objectIndex / 2);
                     if (value == ARTIFACT_SPELL_SCROLL)
@@ -2369,7 +2369,7 @@ void game::RandomizeEvents(void) {
                             ) + MAJOR_GUARDIAN_CHOICE_FIRST]);
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE):
                     mineId6 = GetTownId(xPos, yPos);
                     for (row = yPos - CASTLE_METADATA_TOP_OFFSET;
                          row <= yPos + CASTLE_METADATA_BOTTOM_OFFSET;
@@ -2408,11 +2408,11 @@ void game::RandomizeEvents(void) {
                         }
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LIGHTHOUSE: {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE): {
                     m_worldMap.GetCell(xPos, yPos)->m_objectMetadata = GetMineId(xPos, yPos);
                     break;
                 }
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ABANDONED_MINE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE):
                     mineId6 = GetMineId(xPos, yPos);
                     m_mines[mineId6].guardianType = CREATURE_GHOST;
                     m_mines[mineId6].guardianCount = static_cast<u8>(Random(
@@ -2420,9 +2420,9 @@ void game::RandomizeEvents(void) {
                         ABANDONED_MINE_GUARDIAN_COUNT_MAX
                     ));
                     [[fallthrough]];
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MINE):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL):
                     mineId6 = GetMineId(xPos, yPos);
                     for (row = yPos - MINE_METADATA_TOP_OFFSET; row <= yPos;
                          row++) {
@@ -2431,7 +2431,7 @@ void game::RandomizeEvents(void) {
                              column3++) {
                             if (column3 == xPos - MINE_METADATA_LEFT_OFFSET
                                 && cell2->m_triggerType
-                                       != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
+                                       != (MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)))
                                 continue;
                             if (m_worldMap.GetCell(column3, row)->m_objectMetadata == 0
                                 || ((m_worldMap.GetCell(column3, row)->m_triggerType
@@ -2441,20 +2441,20 @@ void game::RandomizeEvents(void) {
                         }
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WINDMILL):
                     cell2->m_objectMetadata =
                         Random(WINDMILL_RESOURCE_AMOUNT_MIN, WINDMILL_RESOURCE_AMOUNT_MAX);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BARRIER:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_BARRIER):
                     RandomizeBarrier(cell2);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TRAVELER_TENT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TRAVELER_TENT):
                     RandomizePassword(cell2);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_OBJECT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_OBJECT):
                     WeeklyGenericSite(cell2);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_DWELLING:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_DWELLING):
                     WeeklyRecruitSite(cell2);
                     break;
             }
@@ -2484,7 +2484,7 @@ void game::RandomizeEvents(void) {
         for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
             cell2 = m_worldMap.GetCell(xPos, yPos);
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
-                && cell2->m_objectTileset == TILESET_X_LOC2)
+                && cell2->ObjectTileset() == TILESET_X_LOC2)
                 cell2->m_flags |= H2EnumIndex(MAP_CELL_OCCUPIED);
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
@@ -2508,7 +2508,7 @@ void game::RandomizeEvents(void) {
                         & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
                     if (!cell2->m_objectLayerBit1) {
-                        upperTilesets0[upperCount5] = cell2->m_objectTileset;
+                        upperTilesets0[upperCount5] = cell2->ObjectTileset();
 
                         upperCount5++;
                     }
@@ -2519,7 +2519,7 @@ void game::RandomizeEvents(void) {
                     while (upperCount5 < LAYER_SCAN_CAPACITY && extra9 != NULL) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
-                            upperTilesets0[upperCount5] = extra9->objectTileset;
+                            upperTilesets0[upperCount5] = extra9->ObjectTileset();
 
                             upperCount5++;
                         }
@@ -2530,7 +2530,7 @@ void game::RandomizeEvents(void) {
                     }
                     below0 = m_worldMap.GetCell(xPos, yPos + 1);
                     if (!below0->m_objectLayerBit1) {
-                        lowerTilesets5[lowerCount] = below0->m_objectTileset;
+                        lowerTilesets5[lowerCount] = below0->ObjectTileset();
 
                         lowerCount++;
                     }
@@ -2541,7 +2541,7 @@ void game::RandomizeEvents(void) {
                     while (lowerCount < LAYER_SCAN_CAPACITY && extra9 != NULL) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
-                            lowerTilesets5[lowerCount] = extra9->objectTileset;
+                            lowerTilesets5[lowerCount] = extra9->ObjectTileset();
 
                             lowerCount++;
                         }
@@ -2564,11 +2564,11 @@ void game::RandomizeEvents(void) {
             }
             if (yPos < MAP_HEIGHT - 1) {
                 if (m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
-                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                        == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
                     || m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
-                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN)
+                           == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN))
                     || m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
-                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
+                           == (MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)))
                     cell2->m_flags |= H2EnumIndex(MAP_CELL_OCCUPIED);
             }
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
@@ -4211,7 +4211,7 @@ void game::PerWeek(void) {
     for (mapY7 = 0; mapY7 < MAP_HEIGHT; mapY7++) {
         for (mapX10 = 0; mapX10 < MAP_WIDTH; mapX10++) {
             switch (WORLDMAP->GetCell(mapX10, mapY7)->m_triggerType) {
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER): {
                     monsterCount = WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                      & H2EnumIndex(MAP_MONSTER_COUNT_MASK);
                     monsterIncrease8 = monsterCount / EVENT_DAYS_PER_WEEK;
@@ -4227,106 +4227,106 @@ void game::PerWeek(void) {
                         | monsterCount;
                     break;
                 }
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTESIAN_SPRING):
                     WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = 1;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WATER_WHEEL):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                         != WEEKLY_WATER_WHEEL_EMPTY)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = 2;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN):
                     WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = Random(0, 1) ? 7 : 6;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WINDMILL):
                     WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = Random(1, 5);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_ARCHER_HOUSE):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(2, 4);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_GOBLIN_HUT):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DWARF_COTTAGE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_COTTAGE):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(2, 4);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PEASANT_HUT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_PEASANT_HUT):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_LOG_CABIN):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DESERT_TENT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DESERT_TENT):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WAGON_CAMP):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_HOUSE):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(4, 8);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATCH_TOWER:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_WATCH_TOWER):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 4);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RUINS:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RUINS):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_CITY):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                         < WEEKLY_MONSTER_POPULATION_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(10, 20);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CAVE):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXCAVATION:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXCAVATION):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(4, 8);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HALFLING_HOLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_HALFLING_HOLE):
                     if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_TROLL_BRIDGE):
                     if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CITY_OF_DEAD):
                     if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY):
                     if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += 1;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_DWELLING:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_DWELLING):
                     WeeklyRecruitSite(WORLDMAP->GetCell(mapX10, mapY7));
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_OBJECT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_OBJECT):
                     WeeklyGenericSite(WORLDMAP->GetCell(mapX10, mapY7));
                     break;
                 default:
@@ -4448,7 +4448,7 @@ void game::PerMonth(void) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
-                        spot->m_objectTileset = TILESET_MONS32;
+                        spot->SetObjectTileset(TILESET_MONS32);
                         spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
                             GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra))
@@ -4496,16 +4496,15 @@ void game::ConvertObject(
                 continue;
             cell = WORLDMAP->GetCell(x, y);
             if (cell->m_objectIndex != static_cast<u8>(-1)
-                && cell->m_objectTileset == oldTileset
+                && cell->ObjectTileset() == oldTileset
                 && cell->m_objectIndex >= oldFirstIndex
                 && cell->m_objectIndex <= oldLastIndex) {
-                cell->m_objectTileset = newTileset;
+                cell->SetObjectTileset(newTileset);
                 cell->m_objectIndex =
                     static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
             }
             if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
-                cell->m_triggerType =
-                    (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger;
+                cell->m_triggerType = MAP_TRIGGER_WITH_OBJECT(cell->m_triggerType, newTrigger);
 
             if (cell->m_extraIndex != 0
                 && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
@@ -4513,10 +4512,10 @@ void game::ConvertObject(
             else
                 ext = NULL;
             while (ext != NULL) {
-                if (ext->objectTileset == oldTileset
+                if (ext->ObjectTileset() == oldTileset
                     && ext->objectIndex >= oldFirstIndex
                     && ext->objectIndex <= oldLastIndex) {
-                    ext->objectTileset = newTileset;
+                    ext->SetObjectTileset(newTileset);
                     ext->objectIndex =
                         static_cast<u8>(ext->objectIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -4528,10 +4527,10 @@ void game::ConvertObject(
             }
 
             if (cell->m_overlayIndex != static_cast<u8>(-1)
-                && cell->m_overlayTileset == oldTileset
+                && cell->OverlayTileset() == oldTileset
                 && cell->m_overlayIndex >= oldFirstIndex
                 && cell->m_overlayIndex <= oldLastIndex) {
-                cell->m_overlayTileset = newTileset;
+                cell->SetOverlayTileset(newTileset);
                 cell->m_overlayIndex =
                     static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
             }
@@ -4541,10 +4540,10 @@ void game::ConvertObject(
             else
                 ext = NULL;
             while (ext != NULL) {
-                if (ext->overlayTileset == oldTileset
+                if (ext->OverlayTileset() == oldTileset
                     && ext->overlayIndex >= oldFirstIndex
                     && ext->overlayIndex <= oldLastIndex) {
-                    ext->overlayTileset = newTileset;
+                    ext->SetOverlayTileset(newTileset);
                     ext->overlayIndex =
                         static_cast<u8>(ext->overlayIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -4775,7 +4774,7 @@ void game::InitRandomArtifacts(void) {
     for (i32 x = 0; x < MAP_WIDTH; ++x) {
         for (i32 y = 0; y < MAP_HEIGHT; ++y) {
             mapCell* tile = m_worldMap.GetCell(x, y);
-            if (tile->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)) {
+            if (tile->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)) {
                 // Each artifact has two tiles; convert tile id to artifact id.
                 GenerateArtifact(static_cast<u8>(tile->m_objectIndex) / 2);
             }
@@ -4908,7 +4907,7 @@ void game::ProcessRandomObjects(void) {
     i32 y;
     i32 maxValue;
     mapCell* cell;
-    MapObjectType randomObjectType8;
+    MapTriggerCode randomObjectType8;
     i32 randomType8;
 
     giUABaseX = -1;
@@ -4921,68 +4920,68 @@ void game::ProcessRandomObjects(void) {
         for (x = 0; x < MAP_WIDTH; x++) {
             cell = WORLDMAP->GetCell(x, y);
             switch (cell->m_triggerType) {
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT):
                     giUABaseX = static_cast<i16>(x);
                     giUABaseY = static_cast<i16>(y);
                     giUARadius = static_cast<i16>(cell->m_objectMetadata);
                     cell->m_triggerType = MAP_OBJECT_NONE;
-                    cell->m_objectTileset = TILESET_NONE;
+                    cell->SetObjectTileset(TILESET_NONE);
                     cell->m_objectIndex = -1;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
                     RandomizeTown(x, y, 0);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE):
                     RandomizeTown(x, y, 1);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER):
                     minValue = 80;
                     maxValue = 2000;
                     goto randomMonster;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_WEAK):
                     minValue = 0;
                     maxValue = 400;
                     goto randomMonster;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_MEDIUM):
                     minValue = 400;
                     maxValue = 1000;
                     goto randomMonster;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_STRONG):
                     minValue = 1000;
                     maxValue = 2500;
                     goto randomMonster;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG):
                     minValue = 2500;
                     maxValue = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell->m_objectTileset == TILESET_MONS32
+                    if (cell->ObjectTileset() == TILESET_MONS32
                         && cell->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
-                        randomObjectType8 = static_cast<MapObjectType>(
+                        randomObjectType8 = MapTriggerCode(
                             cell->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER
                         );
                         switch (randomObjectType8) {
-                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
+                            case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_WEAK):
                                 minValue = 0;
                                 maxValue = 400;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
+                            case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_MEDIUM):
                                 minValue = 400;
                                 maxValue = 1000;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
+                            case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_STRONG):
                                 minValue = 1000;
                                 maxValue = 2500;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
+                            case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG):
                                 minValue = 2500;
                                 maxValue = 100000;
                                 goto monsterBoundsReady;
                         }
                     }
                 monsterBoundsReady:
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
                     do {
                         cell->m_objectIndex = static_cast<u8>(H2EnumIndex(
                             CREATURES_RANDOMIZABLE[
@@ -4992,8 +4991,8 @@ void game::ProcessRandomObjects(void) {
                     } while (gMonsterDatabase[cell->m_objectIndex].randomValue <= minValue
                              || gMonsterDatabase[cell->m_objectIndex].randomValue >= maxValue);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_RESOURCE:
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE;
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE);
                     randomType8 = Random(0, 6);
                     ConvertObject(
                         x - 1,
@@ -5034,9 +5033,9 @@ void game::ProcessRandomObjects(void) {
                             break;
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_ARTIFACT):
                     artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT);
                     ConvertObject(
                         x - 1,
                         y,
@@ -5064,9 +5063,9 @@ void game::ProcessRandomObjects(void) {
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TREASURE_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TREASURE_ARTIFACT):
                     artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT);
                     ConvertObject(
                         x - 1,
                         y,
@@ -5094,9 +5093,9 @@ void game::ProcessRandomObjects(void) {
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MINOR_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINOR_ARTIFACT):
                     artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT);
                     ConvertObject(
                         x - 1,
                         y,
@@ -5124,9 +5123,9 @@ void game::ProcessRandomObjects(void) {
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MAJOR_ARTIFACT:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MAJOR_ARTIFACT):
                     artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
-                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT);
                     ConvertObject(
                         x - 1,
                         y,
@@ -5154,7 +5153,7 @@ void game::ProcessRandomObjects(void) {
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EYE_OF_MAGI:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI):
                     RandomizeMine(x, y);
                     break;
             }
@@ -5441,7 +5440,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
 
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->GetCell(col, row);
-    if (cell->m_overlayTileset == TILESET_FLAG32)
+    if (cell->OverlayTileset() == TILESET_FLAG32)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra;
 
@@ -5450,7 +5449,7 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     else
         extra = NULL;
     while (extra) {
-        if (extra->overlayTileset == TILESET_FLAG32)
+        if (extra->OverlayTileset() == TILESET_FLAG32)
             extra->drawOverlayOnTop = 1;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
@@ -5466,7 +5465,7 @@ i32 game::HasObjectTilesetIndex(
     i32 index
 ) {
     mapCell* cell = WORLDMAP->GetCell(col, row);
-    if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
+    if (cell->ObjectTileset() == tileset && cell->m_objectIndex == index)
         return 1;
     mapCellExtra* extra;
 
@@ -5475,7 +5474,7 @@ i32 game::HasObjectTilesetIndex(
     else
         extra = NULL;
     while (extra) {
-        if (extra->objectTileset == tileset && extra->objectIndex == index)
+        if (extra->ObjectTileset() == tileset && extra->objectIndex == index)
             return 1;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
@@ -5516,9 +5515,9 @@ void game::ProcessMapExtra(void) {
         for (col6 = 0; col6 < MAP_WIDTH; col6++) {
             cell10 = WORLDMAP->GetCell(col6, row16);
             switch (cell10->m_triggerType) {
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE):
                     townId = GetTownId(col6, row16);
                     m_castleRecs[townId].m_extraIndex = cell10->m_objectMetadata;
                     cell10->m_objectMetadata = townId;
@@ -5530,11 +5529,11 @@ void game::ProcessMapExtra(void) {
     for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
         for (col6 = 0; col6 < MAP_WIDTH; col6++) {
             cell10 = WORLDMAP->GetCell(col6, row16);
-            if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE) && row16 > 0
+            if (cell10->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE)) && row16 > 0
                 && HasLateOverlay(col6, row16 - 1)) {
                 ConvertFlagToLateOverlay(col6, row16);
             }
-            if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB)) {
+            if (cell10->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB))) {
                 if (row16 > 0)
                     ConvertFlagToLateOverlay(col6, row16 - 1);
                 if (row16 > 1)
@@ -5813,7 +5812,7 @@ void game::ProcessOnMapHeroes(void) {
             mapCell* loc = m_worldMap.GetCell(x, y);
             i32 locationType = H2EnumIndex(loc->m_triggerType & H2EnumIndex(MAP_TRIGGER_TYPE_MASK));
             if (locationType == H2EnumIndex(MAP_OBJECT_HERO)
-                || loc->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_JAIL)) {
+                || loc->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_JAIL)) {
                 const bool isJail = locationType == H2EnumIndex(MAP_OBJECT_JAIL);
                 const i32 extraIdx = loc->m_objectMetadata;
                 mapHeroExtra* mapExtraHero =
@@ -5966,7 +5965,7 @@ void game::ProcessOnMapHeroes(void) {
                         randomHero->m_id;
                     if (y > 0
                         && m_worldMap.GetCell(x, y - 1)->m_triggerType
-                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                               == MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)) {
                         --randomHero->m_patrolY;
                         --randomHero->m_y;
                         m_castleRecs[GetTownId(x, y - 1)].m_occupyingHeroId = randomHero->m_id;
@@ -6055,7 +6054,7 @@ void game::CheckHeroConsistency(void) {
     for (c = 0; c < MAP_WIDTH; c++) {
         for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
             cell = gpAdvManager->GetCell(c, y8);
-            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
+            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID))) {
                 if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != c || boardHro->m_y != y8) {
@@ -6064,7 +6063,7 @@ void game::CheckHeroConsistency(void) {
                     }
                     if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
                         if (boardHro->m_locationType
-                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                            == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                             townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
                             townOccupied->m_occupyingHeroId = -1;
                         }
@@ -6869,7 +6868,7 @@ clampScore:
 void game::RestoreCell(
     i32 x,
     i32 y,
-    MapObjectType objectType,
+    MapTriggerCode objectType,
     i32 barrier,
     mapCell* passedCell,
     i32
@@ -6879,7 +6878,7 @@ void game::RestoreCell(
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && objectType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+    if (y > 0 && objectType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
@@ -7466,13 +7465,13 @@ i32 game::CountShrines(i32 player) {
         for (col5 = 0; col5 < MAP_WIDTH; col5++) {
             cell = WORLDMAP->GetCell(col5, row15);
             castle = NULL;
-            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
                 castle = GetCastle(cell->m_objectMetadata);
             } else if (cell->m_triggerType
-                       == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+                       == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
                 occupier = gpGame->GetHero(cell->m_objectMetadata);
                 if (occupier->m_locationType
-                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+                    == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
                     castle = GetCastle(occupier->m_occupiedTown);
             }
             if (castle != NULL && castle->m_owner == player
