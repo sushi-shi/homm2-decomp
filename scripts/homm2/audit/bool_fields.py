@@ -67,7 +67,8 @@ from homm2.core.paths import REPO
 
 
 SCHEMA_VERSION = 3
-DATABASE = Path("build/clangd/compile_commands.json")
+RETAIL_DATABASE = Path("build/clangd/compile_commands.json")
+PORTABLE_DATABASE = Path("build/compile_commands.json")
 PROJECT_ROOTS = ("include", "src")
 RECORD_KINDS = {
     ci.CursorKind.CLASS_DECL,
@@ -764,11 +765,18 @@ def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> list[dict]:
     return rows
 
 
-def _entries(repo: Path, filters: Iterable[str] = ()) -> list[dict]:
-    database = repo / DATABASE
+def _entries(
+    repo: Path, filters: Iterable[str] = (), *, portable: bool = False
+) -> list[dict]:
+    relative_database = PORTABLE_DATABASE if portable else RETAIL_DATABASE
+    database = repo / relative_database
     if not database.is_file():
-        raise RuntimeError(
-            f"{DATABASE} not found; run `homm2 clangd` inside `nix develop .#build`")
+        instruction = (
+            "configure CMake with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`"
+            if portable
+            else "run `homm2 clangd` inside `nix develop .#build`"
+        )
+        raise RuntimeError(f"{relative_database} not found; {instruction}")
     raw = json.loads(database.read_text())
     filters = tuple(value.lower() for value in filters)
     out = []
@@ -844,7 +852,7 @@ def _type_spans_requiring_split(fields: list[FieldFacts]) -> set[SourceSpan]:
 def scan(repo: Path = REPO, *, jobs: int = 0,
          filters: Iterable[str] = (), portable: bool = False) -> dict:
     filters = tuple(filters)
-    entries = _entries(repo, filters)
+    entries = _entries(repo, filters, portable=portable)
     if not entries:
         raise RuntimeError("no translation units selected")
     worker_count = jobs if jobs > 0 else min(8, max(1, (os.cpu_count() or 4) // 2))

@@ -446,6 +446,25 @@ void Set(i32 input) {
                 [game_source.resolve()],
             )
 
+    def test_portable_audit_uses_the_cmake_compilation_database(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            (repo / "build").mkdir()
+            game_source = repo / "src/SOURCE/TEST.cpp"
+            game_source.parent.mkdir(parents=True)
+            game_source.write_text("")
+            (repo / "build/compile_commands.json").write_text(json.dumps([{
+                "directory": str(repo),
+                "file": str(game_source),
+                "arguments": ["c++", "-c", str(game_source)],
+            }]))
+
+            self.assertEqual(
+                [Path(entry["file"]).resolve()
+                 for entry in _entries(repo, portable=True)],
+                [game_source.resolve()],
+            )
+
     def test_native_driver_include_paths_are_extracted(self):
         stderr = """ignored
 #include <...> search starts here:

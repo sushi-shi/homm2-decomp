@@ -22,9 +22,8 @@ from pathlib import Path
 
 from homm2.clang_options import ClangMode
 from homm2.build.fixed_asm import UNITS as FIXED_ASM_UNITS
+from homm2.core.paths import REPO
 
-REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
-            Path(__file__).resolve().parents[3])
 MANIFEST = REPO / "config" / "units.toml"
 OUT_DIR = REPO / "build" / "clangd"
 OUT_FILE = OUT_DIR / "compile_commands.json"
