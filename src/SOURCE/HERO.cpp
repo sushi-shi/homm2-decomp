@@ -558,7 +558,7 @@ void hero::Deallocate(i32 updateMap) {
         }
     }
 
-    if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+    if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         DebugCheck();
         curTown = &gpGame->m_castleRecs[m_occupiedTown];
         curTown->m_occupyingHeroId = -1;
@@ -1564,7 +1564,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
 
     if (gpCurPlayer->m_currentHero == gpHVHero->m_id) {
         heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
-        if (heroCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+        if (heroCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
             gpHVHero->m_locationType = heroCell->m_triggerType;
             gpHVHero->m_occupiedTown = heroCell->m_objectMetadata;
         }
@@ -1601,7 +1601,7 @@ void SetupHeroView(void) {
     HeroSecondarySkill skill;
 
     bNoDismiss = gbNoDismiss;
-    if (gpHVHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+    if (gpHVHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
         bNoDismiss = true;
 
     msg.type = HERO_UI_MESSAGE;
@@ -1973,7 +1973,7 @@ HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
 }
 
 class town* hero::GetOccupiedTown(void) {
-    if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+    if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
         return gpGame->GetTown(m_occupiedTown);
     return NULL;
 }

@@ -219,7 +219,7 @@ void searchArray::TestPossibleDirections(
         if (gSearchTerrain == TERRAIN_WATER) {
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType
-                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
+                    == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
                 }
@@ -242,11 +242,11 @@ void searchArray::TestPossibleDirections(
                 }
             } else {
                 if (gSearchNextCell->m_triggerType
-                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                        != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))
                     && gSearchNextCell->m_triggerType
-                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                           != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
                     && gSearchNextCell->m_triggerType
-                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK)) {
+                           != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK))) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
                 }

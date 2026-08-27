@@ -154,7 +154,7 @@ public:
         };
     };
     u8 m_direction;
-    i16 m_locationType;
+    H2OpenCodeStorage<MapTriggerCode, i16> m_locationType;
     i16 m_occupiedTown;
     i32 m_mobility;
     i32 m_remainingMobility;
