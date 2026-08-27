@@ -26,7 +26,7 @@ enum class SwapManagerItemType : i32 {
 using enum SwapManagerItemType;
 
 #pragma pack(push, 1)
-class swapManager : public baseManager {
+class swapManager H2_FINAL : public baseManager {
 public:
     heroWindow* m_window;
     icon* m_selectorIcon;

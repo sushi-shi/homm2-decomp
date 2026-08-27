@@ -6,7 +6,7 @@
 
 struct tag_message;
 
-void HeroMessageUpdate(char*);
+void HeroMessageUpdate(const char*);
 void UpdateHeroScreenStatusBar(struct tag_message&);
 MessageDispatchResult HeroHandler(struct tag_message&);
 void RedrawHeroScreen(void);

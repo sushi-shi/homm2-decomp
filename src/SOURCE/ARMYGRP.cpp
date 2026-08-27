@@ -50,9 +50,9 @@ i32 armyGroup::HasSomeUndead(void) {
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
     i32 moraleCount = 0;
     ArmyGroupAlignmentResult alignValue;
-    i32 hasSomeUndead = 0;
-    i32 moraleDelta = 0;
-    i32 enemyHasBoneDragon;
+    b32 hasSomeUndead = false;
+    i32 moraleDelta [[maybe_unused]] = 0;
+    b32 enemyHasBoneDragon;
     i32 index;
     alignValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
 
@@ -60,13 +60,13 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         return 0;
 
     if (HasSomeUndead())
-        hasSomeUndead = 1;
+        hasSomeUndead = true;
 
-    enemyHasBoneDragon = 0;
+    enemyHasBoneDragon = false;
     if (enemyGroup != NULL) {
         for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
             if (enemyGroup->m_creatureTypes[index] == CREATURE_BONE_DRAGON)
-                enemyHasBoneDragon = 1;
+                enemyHasBoneDragon = true;
         }
     }
 
@@ -90,7 +90,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
             moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
-            hasSomeUndead = 1;
+            hasSomeUndead = true;
         if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
             && (H2EnumIndex((armyHero->m_eventFlags) & (HERO_EVENT_EMBARKED))))
             ++moraleCount;
@@ -228,7 +228,7 @@ void armyGroup::DamageGroup(float damagePercent) {
         * H2EnumIndex(ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
     i32 i;
-    i32 isFirstTroop = 1;
+    b32 isFirstTroop = true;
     i32 j;
 
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
@@ -246,7 +246,7 @@ void armyGroup::DamageGroup(float damagePercent) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }
-            isFirstTroop = 0;
+            isFirstTroop = false;
         } else {
             m_creatureCounts[i] = 0;
         }

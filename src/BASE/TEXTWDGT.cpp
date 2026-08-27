@@ -28,7 +28,7 @@ textWidget::textWidget(
     i16 width,
     i16 height,
     char* text,
-    char* fontName,
+    const char* fontName,
     FontDrawMode color,
     i16 id,
     WidgetKind kind,
@@ -62,7 +62,7 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-inline textWidget::~textWidget() {
+ textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE(m_text);
 }
@@ -146,7 +146,7 @@ void textWidget::SetColorIndex(FontDrawMode color) {
     m_color = color;
 }
 
-void textWidget::SetText(char* text) {
+void textWidget::SetText(const char* text) {
     if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
         u16 newLen = strlen(text);
         if (newLen > strlen(m_text)) {
@@ -155,6 +155,6 @@ void textWidget::SetText(char* text) {
         }
         strcpy(m_text, text);
     } else {
-        m_text = text;
+        m_text = const_cast<char*>(text);
     }
 }

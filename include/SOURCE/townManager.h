@@ -31,7 +31,7 @@ enum class TownManagerArmyCommand : i32 {
 using enum TownManagerArmyCommand;
 
 #pragma pack(push, 1)
-class townManager : public baseManager {
+class townManager H2_FINAL : public baseManager {
 public:
     town* m_town;
     icon* m_backgroundIcon;

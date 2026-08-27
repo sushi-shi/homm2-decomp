@@ -33,9 +33,9 @@ typedef enum InputManagerTiming {
 } InputManagerTiming;
 
 i32 iCurSwapPalette = 0;
-i32 bLastMouseOffscreen = 0;
-i32 bLastOnscreenMouseColor = 0;
-i32 bInCheckChangeCursor = 0;
+b32 bLastMouseOffscreen = false;
+b32 bLastOnscreenMouseColor = false;
+b32 bInCheckChangeCursor = false;
 
 static u8 gInputCharacterMapCp1251[0x80] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
@@ -521,21 +521,21 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor == 0)
         return;
 
-    bInCheckChangeCursor = 1;
+    bInCheckChangeCursor = true;
     if (force != 0 || (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
-            bLastMouseOffscreen = 0;
+            bLastMouseOffscreen = false;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
         }
         if (bLastOnscreenMouseColor != gbColorMice)
             gpMouseManager->SetColorMice(1);
     } else if (bLastMouseOffscreen == 0) {
-        bLastMouseOffscreen = 1;
+        bLastMouseOffscreen = true;
         bLastOnscreenMouseColor = gbColorMice;
         if (gbColorMice != 0)
             gpMouseManager->SetColorMice(0);
     }
-    bInCheckChangeCursor = 0;
+    bInCheckChangeCursor = false;
 }
 
 void inputManager::ForceMouseMove(void) {

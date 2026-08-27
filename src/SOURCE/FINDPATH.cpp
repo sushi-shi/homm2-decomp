@@ -34,7 +34,7 @@ static H2EnumStorage<MapObjectType, i32> gSearchTriggerType = 0;
 static i32 gSearchNextX = 0;
 static i32 gSearchDirection = 0;
 static mapCell* gSearchCurrentCell = NULL;
-u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = {0};
+u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = {};
 static H2EnumStorage<TerrainType, i32> gSearchTerrain = 0;
 static i32 gSearchMiddle = 0;
 static searchNode* gSearchCell = NULL;
@@ -306,16 +306,16 @@ void searchArray::TestPossibleDirections(
 }
 
 void searchArray::SeedCombatPosition(class army* unit) {
-    i32 unused04;
+    i32 unused04 [[maybe_unused]];
     army* enemy_a;
-    i32 unused0c;
-    i32 unused10_a;
-    i32 unused1c_g;
-    i32 unused18;
+    i32 unused0c [[maybe_unused]];
+    i32 unused10_a [[maybe_unused]];
+    i32 unused1c_g [[maybe_unused]];
+    i32 unused18 [[maybe_unused]];
     i32 index;
-    i32 unused28_o;
+    i32 unused28_o [[maybe_unused]];
     i32 hex_c;
-    i32 unused20_a;
+    i32 unused20_a [[maybe_unused]];
 
     for (index = 0; index < COMBAT_HEX_COUNT; index++)
         gpCombatManager->m_hexCells[index].m_pathReachable = 0;
@@ -378,11 +378,11 @@ i32 searchArray::FindCombatPath(
     i32 moveMask;
     i32 distance;
     i32 bestDistance_e;
-    i32 unused1c_a;
+    i32 unused1c_a [[maybe_unused]];
     i32 result_e;
     u8* path_d;
     i32 attackTargetHex_a;
-    i32 unused20;
+    i32 unused20 [[maybe_unused]];
     i32 attackMask;
     i32 bestHex_j;
     searchNode node_g;

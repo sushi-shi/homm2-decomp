@@ -22,6 +22,9 @@ typedef unsigned long u32l;
 
 typedef i32 b32;
 typedef i8 b8;
+typedef char bchar;
+
+#define H2_FINAL final
 
 
 template <typename T>
@@ -262,70 +265,117 @@ private:
 
 #define H2EnumIndex(value) static_cast<i32>(value)
 
+
+#define MAYBE_UNUSED_INLINE [[maybe_unused]] inline
+
 #define ENABLE_ENUM_FLAGS(name)                                                                    \
-    inline constexpr name operator|(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i32>(a) | static_cast<i32>(b));                        \
+    MAYBE_UNUSED_INLINE constexpr name operator|(name a, name b) {                                          \
+        return static_cast<name>(static_cast<i32>(a) | static_cast<i32>(b));                       \
     }                                                                                              \
-    inline constexpr name operator&(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i32>(a) & static_cast<i32>(b));                        \
+    MAYBE_UNUSED_INLINE constexpr name operator&(name a, name b) {                                          \
+        return static_cast<name>(static_cast<i32>(a) & static_cast<i32>(b));                       \
     }                                                                                              \
-    inline constexpr name operator^(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i32>(a) ^ static_cast<i32>(b));                        \
+    MAYBE_UNUSED_INLINE constexpr name operator^(name a, name b) {                                          \
+        return static_cast<name>(static_cast<i32>(a) ^ static_cast<i32>(b));                       \
     }                                                                                              \
-    inline constexpr name operator~(name a) {                                                      \
+    MAYBE_UNUSED_INLINE constexpr name operator~(name a) {                                                  \
         return static_cast<name>(~static_cast<i32>(a));                                            \
     }                                                                                              \
-    inline constexpr bool operator!(name a) { return !static_cast<i32>(a); }                       \
-    inline name& operator|=(name& a, name b) { return a = a | b; }                                 \
-    inline name& operator&=(name& a, name b) { return a = a & b; }                                 \
-    inline name& operator^=(name& a, name b) { return a = a ^ b; }                                 \
-    inline constexpr name operator+(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i32>(a) + static_cast<i32>(b));                        \
+    MAYBE_UNUSED_INLINE constexpr bool operator!(name a) {                                                  \
+        return !static_cast<i32>(a);                                                               \
     }                                                                                              \
-    inline constexpr name operator-(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i32>(a) - static_cast<i32>(b));                        \
+    MAYBE_UNUSED_INLINE name& operator|=(name& a, name b) {                                                 \
+        return a = a | b;                                                                          \
     }                                                                                              \
-    inline name& operator+=(name& a, name b) { return a = a + b; }                                 \
-    inline name& operator-=(name& a, name b) { return a = a - b; }                                 \
-    inline constexpr name operator&(name a, i32 mask) {                                            \
+    MAYBE_UNUSED_INLINE name& operator&=(name& a, name b) {                                                 \
+        return a = a & b;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator^=(name& a, name b) {                                                 \
+        return a = a ^ b;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE constexpr name operator+(name a, name b) {                                          \
+        return static_cast<name>(static_cast<i32>(a) + static_cast<i32>(b));                       \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE constexpr name operator-(name a, name b) {                                          \
+        return static_cast<name>(static_cast<i32>(a) - static_cast<i32>(b));                       \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator+=(name& a, name b) {                                                 \
+        return a = a + b;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator-=(name& a, name b) {                                                 \
+        return a = a - b;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE constexpr name operator&(name a, i32 mask) {                                        \
         return static_cast<name>(static_cast<i32>(a) & mask);                                      \
     }                                                                                              \
-    inline constexpr name operator&(i32 mask, name a) { return a & mask; }                         \
-    inline constexpr name operator|(name a, i32 mask) {                                            \
+    MAYBE_UNUSED_INLINE constexpr name operator&(i32 mask, name a) {                                        \
+        return a & mask;                                                                           \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE constexpr name operator|(name a, i32 mask) {                                        \
         return static_cast<name>(static_cast<i32>(a) | mask);                                      \
     }                                                                                              \
-    inline constexpr name operator|(i32 mask, name a) { return a | mask; }                         \
-    inline name& operator&=(name& a, i32 mask) { return a = a & mask; }                            \
-    inline name& operator|=(name& a, i32 mask) { return a = a | mask; }
+    MAYBE_UNUSED_INLINE constexpr name operator|(i32 mask, name a) {                                        \
+        return a | mask;                                                                           \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator&=(name& a, i32 mask) {                                               \
+        return a = a & mask;                                                                       \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator|=(name& a, i32 mask) {                                               \
+        return a = a | mask;                                                                       \
+    }
 
 #define ENABLE_ENUM_STEPS(name)                                                                    \
-    inline constexpr name operator+(name a, i32 amount) {                                         \
+    MAYBE_UNUSED_INLINE constexpr name operator+(name a, i32 amount) {                                      \
         return static_cast<name>(static_cast<i32>(a) + amount);                                    \
     }                                                                                              \
-    inline constexpr name operator-(name a, i32 amount) {                                         \
+    MAYBE_UNUSED_INLINE constexpr name operator-(name a, i32 amount) {                                      \
         return static_cast<name>(static_cast<i32>(a) - amount);                                    \
     }                                                                                              \
-    inline constexpr i32 operator-(name a, name b) {                                               \
+    MAYBE_UNUSED_INLINE constexpr i32 operator-(name a, name b) {                                           \
         return static_cast<i32>(a) - static_cast<i32>(b);                                          \
     }                                                                                              \
-    inline constexpr name operator%(name a, i32 modulus) {                                        \
+    MAYBE_UNUSED_INLINE constexpr name operator%(name a, i32 modulus) {                                     \
         return static_cast<name>(static_cast<i32>(a) % modulus);                                   \
     }                                                                                              \
-    inline constexpr name operator%(name a, name modulus) {                                       \
-        return static_cast<name>(static_cast<i32>(a) % static_cast<i32>(modulus));                  \
+    MAYBE_UNUSED_INLINE constexpr name operator%(name a, name modulus) {                                    \
+        return static_cast<name>(static_cast<i32>(a) % static_cast<i32>(modulus));                 \
     }                                                                                              \
-    inline constexpr name operator&(name a, i32 mask) {                                            \
+    MAYBE_UNUSED_INLINE constexpr name operator&(name a, i32 mask) {                                        \
         return static_cast<name>(static_cast<i32>(a) & mask);                                      \
     }                                                                                              \
-    inline name& operator+=(name& a, i32 amount) { return a = a + amount; }                        \
-    inline name& operator-=(name& a, i32 amount) { return a = a - amount; }                        \
-    inline name& operator+=(name& a, name b) { return a = a + static_cast<i32>(b); }               \
-    inline name& operator-=(name& a, name b) { return a = a - static_cast<i32>(b); }               \
-    inline name& operator%=(name& a, i32 modulus) { return a = a % modulus; }                      \
-    inline name& operator%=(name& a, name modulus) { return a = a % modulus; }                     \
-    inline name& operator++(name& a) { return a = a + 1; }                                        \
-    inline name operator++(name& a, int) { name old = a; a = a + 1; return old; }                 \
-    inline name& operator--(name& a) { return a = a - 1; }                                        \
-    inline name operator--(name& a, int) { name old = a; a = a - 1; return old; }
+    MAYBE_UNUSED_INLINE name& operator+=(name& a, i32 amount) {                                             \
+        return a = a + amount;                                                                     \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator-=(name& a, i32 amount) {                                             \
+        return a = a - amount;                                                                     \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator+=(name& a, name b) {                                                 \
+        return a = a + static_cast<i32>(b);                                                        \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator-=(name& a, name b) {                                                 \
+        return a = a - static_cast<i32>(b);                                                        \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator%=(name& a, i32 modulus) {                                            \
+        return a = a % modulus;                                                                    \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator%=(name& a, name modulus) {                                           \
+        return a = a % modulus;                                                                    \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator++(name& a) {                                                         \
+        return a = a + 1;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name operator++(name& a, int) {                                                     \
+        name old = a;                                                                              \
+        a = a + 1;                                                                                 \
+        return old;                                                                                \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name& operator--(name& a) {                                                         \
+        return a = a - 1;                                                                          \
+    }                                                                                              \
+    MAYBE_UNUSED_INLINE name operator--(name& a, int) {                                                     \
+        name old = a;                                                                              \
+        a = a - 1;                                                                                 \
+        return old;                                                                                \
+    }
 
 #endif

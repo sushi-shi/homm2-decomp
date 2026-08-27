@@ -128,7 +128,7 @@ i32l Wait(void) {
     return 0;
 }
 
-void GUIModemCommand(char* message, char* command) {
+void GUIModemCommand(const char* message, const char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
@@ -155,7 +155,7 @@ i8 GUIModemCommandExec(void) {
     }
 }
 
-void ModemCommand(char* command) {
+void ModemCommand(const char* command) {
     i32 commandLength = strlen(command);
     i32 commandPosition0;
     for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
@@ -165,7 +165,7 @@ void ModemCommand(char* command) {
     write_buffer("\r", 1);
 }
 
-i8 GUIModemResponse(char* message, char* response) {
+i8 GUIModemResponse(const char* message, const char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
@@ -202,7 +202,7 @@ compareResponse:
     }
 }
 
-i32 write_buffer(char* buffer, i32 length) {
+i32 write_buffer(const char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
     com_snd(0, 0, static_cast<u16>(length), buffer, 0);
@@ -225,7 +225,7 @@ void write_byte(i32 value) {
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 seed = KBTickCount();
-    i32 packetResult;
+    i32 packetResult [[maybe_unused]];
     seed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", seed);
     oldsec = -1;
@@ -313,12 +313,12 @@ char ReadPacket(void) {
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - H2EnumIndex(INPUT_QUEUE_GUARD)) {
         LogStr("OverFlow1");
         inque.writePosition = 0;
-        newpacket = 1;
+        newpacket = true;
     }
 readPacketStart:
     if (newpacket != 0) {
         packetlen = 0;
-        newpacket = 0;
+        newpacket = false;
     }
     do {
     readNextByte:
@@ -326,22 +326,22 @@ readPacketStart:
         if (input < 0)
             return 0;
         if (inescape != 0) {
-            inescape = 0;
+            inescape = false;
             if (input == MODEM_PACKET_END) {
-                newpacket = 1;
+                newpacket = true;
                 return 1;
             } else if (input == 0) {
-                newpacket = 1;
+                newpacket = true;
                 goto readPacketStart;
             }
         } else {
             if (input == MODEM_ESCAPE_BYTE) {
-                inescape = 1;
+                inescape = true;
                 goto readNextByte;
             }
         }
         if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
-            newpacket = 1;
+            newpacket = true;
             LogStr("OverFlow2");
             goto readPacketStart;
         }
@@ -350,7 +350,7 @@ readPacketStart:
     } while (1);
 }
 
-void WriteModemPacket(char* buffer, i32 length) {
+void WriteModemPacket(const char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");
@@ -381,8 +381,8 @@ void WriteModemPacket(char* buffer, i32 length) {
 }
 
 i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
-i32 inescape = 0;
-i32 newpacket = 0;
+b32 inescape = false;
+b32 newpacket = false;
 i32 packetlen = 0;
 char idstr[MODEM_ID_SIZE];
 i32 GUIMRc;

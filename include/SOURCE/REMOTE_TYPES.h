@@ -51,8 +51,8 @@ struct SNetPlayerInfo {
     char uniqueSystemID[NET_PLAYER_INFO_SYSTEM_ID_SIZE];
     char name[NET_PLAYER_INFO_NAME_SIZE];
     i8 connectionType;
-    i8 useRegularCompression;
-    i8 useDiffCompression;
+    b8 useRegularCompression;
+    b8 useDiffCompression;
     char reserved[NET_PLAYER_INFO_RESERVED_SIZE];
 };
 #pragma pack(pop)

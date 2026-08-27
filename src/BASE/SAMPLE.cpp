@@ -12,7 +12,7 @@ typedef enum SampleConstant {
     FORMAT_SUFFIX_LENGTH = 3
 } SampleConstant;
 
-sample::sample(char* name)
+sample::sample(const char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -63,14 +63,14 @@ sample::sample(char* name)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
-inline sample::~sample() {
+ sample::~sample() {
     if (gpSoundManager != NULL)
         gpSoundManager->StopSample(this);
     H2_FREE(m_playbackData.data);
     memset(&m_playbackData, 0, sizeof(m_playbackData));
 }
 
-MIDIWrap::MIDIWrap(char* name)
+MIDIWrap::MIDIWrap(const char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -83,7 +83,7 @@ MIDIWrap::MIDIWrap(char* name)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-inline MIDIWrap::~MIDIWrap() {
+ MIDIWrap::~MIDIWrap() {
     H2_FREE(m_data);
     m_data = NULL;
 }

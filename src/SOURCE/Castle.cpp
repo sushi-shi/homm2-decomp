@@ -104,15 +104,15 @@ namespace {
 
 
     inline i32 CannotRecruitHero(void) {
-        i32 cannot;
+        b32 cannot;
 
         if (!(gpTownManager->m_recruitResult != 0
               || gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] < gHeroGoldCost
               || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
               || gpTownManager->m_town->m_occupyingHeroId != -1))
-            cannot = 0;
+            cannot = false;
         else
-            cannot = 1;
+            cannot = true;
         return cannot;
     }
 
@@ -120,22 +120,22 @@ namespace {
 
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     u32l captainQuarters;
-    i32 tileX;
-    i32 tileY;
+    i32 tileX [[maybe_unused]];
+    i32 tileY [[maybe_unused]];
     i32 terrainIconFrame;
     i32 column;
     i32 rowPos;
     widget* backgroundWidget;
     i32 raceBase;
-    i16 builtFrame;
+    i16 builtFrame [[maybe_unused]];
     i32 slotNum;
     char icnName[TOWN_OBJECT_FILENAME_SIZE];
     i32 backFrame;
-    i16 noBuildFrame;
+    i16 noBuildFrame [[maybe_unused]];
     char captainStatLine[CAPTAIN_STAT_LINE_CAPACITY];
     i32 stateFrame;
     tag_message msg;
-    i16 cannotAffordIcon;
+    i16 cannotAffordIcon [[maybe_unused]];
 
     casWin = window;
     builtFrame = H2EnumIndex(FRAME_BUILT);
@@ -468,22 +468,22 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
 MessageDispatchResult CastleHandler(tag_message& message) {
     i32 objIndex;
-    i32 hoverMessage;
+    b32 hoverMessage;
     i32 heroChoiceIndex;
     H2EnumStorage<BuildingSlotType, i32> whichBuilding;
-    i32 quickFlag;
+    b32 quickFlag;
     i32 ret;
-    i16 statusWidgetId;
+    i16 statusWidgetId [[maybe_unused]];
 
     statusWidgetId = H2EnumIndex(CONTROL_STATUS_TEXT);
     whichBuilding = BUILDING_SLOT_NONE;
     ret = 0;
-    hoverMessage = 0;
+    hoverMessage = false;
 
     if (message.type == MESSAGE_MOUSE_MOVE || message.type == MESSAGE_WIDGET) {
         if (message.type == MESSAGE_MOUSE_MOVE) {
             gpWindowManager->ConvertToHover(message);
-            hoverMessage = 1;
+            hoverMessage = true;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
             whichBuilding = CASTLE_CAPTAIN;
@@ -670,7 +670,6 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
         }
 
-    hover_text_ready:
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = CASTLE_WIDGET_TEXT;
         message.payload.widget.id = CONTROL_STATUS_TEXT;
@@ -834,7 +833,6 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         }
     }
 
-selection_done:
     if (ret != 0) {
         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;

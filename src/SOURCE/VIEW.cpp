@@ -73,26 +73,26 @@ typedef enum ViewGeneralHoverHelp {
 i32 combatManager::ViewGeneral(
     CombatSide side, i32 allowActions, i32 quickView
 ) {
-    i16 msgConst37;
-    i16 msgConst4;
-    i16 msgConst10;
-    i16 msgConst3;
-    i16 msgConst29;
-    i16 msgConst2;
+    i16 msgConst37 [[maybe_unused]];
+    i16 msgConst4 [[maybe_unused]];
+    i16 msgConst10 [[maybe_unused]];
+    i16 msgConst3 [[maybe_unused]];
+    i16 msgConst29 [[maybe_unused]];
+    i16 msgConst2 [[maybe_unused]];
     i32 luck14;
-    i16 msgConst1;
+    i16 msgConst1 [[maybe_unused]];
     i32 morale11;
-    i16 msgConst7;
-    i16 msgConst6;
-    i16 msgConst5;
-    i16 msgConst17;
-    i16 msgConst18;
-    i16 msgConst15;
-    i32 cost2;
+    i16 msgConst7 [[maybe_unused]];
+    i16 msgConst6 [[maybe_unused]];
+    i16 msgConst5 [[maybe_unused]];
+    i16 msgConst17 [[maybe_unused]];
+    i16 msgConst18 [[maybe_unused]];
+    i16 msgConst15 [[maybe_unused]];
+    i32 cost2 [[maybe_unused]];
     heroWindow* generalWindow26;
-    i16 msgConst28;
+    i16 msgConst28 [[maybe_unused]];
     tag_message message16;
-    i16 msgConst26;
+    i16 msgConst26 [[maybe_unused]];
 
     if (m_heroes[H2EnumIndex(side)] == NULL)
         return 0;
@@ -240,23 +240,23 @@ i32 combatManager::ViewGeneral(
 }
 
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 msgConst8;
-    i16 msgConst28;
-    i16 msgConst1;
-    i16 msgConst19;
-    i16 msgConst6;
-    i32 handled28;
-    i16 msgConst0;
-    i16 msgConst18;
-    i16 msgConst17;
-    i16 msgConst3;
-    i16 msgConst4;
+    i16 msgConst8 [[maybe_unused]];
+    i16 msgConst28 [[maybe_unused]];
+    i16 msgConst1 [[maybe_unused]];
+    i16 msgConst19 [[maybe_unused]];
+    i16 msgConst6 [[maybe_unused]];
+    b32 handled28;
+    i16 msgConst0 [[maybe_unused]];
+    i16 msgConst18 [[maybe_unused]];
+    i16 msgConst17 [[maybe_unused]];
+    i16 msgConst3 [[maybe_unused]];
+    i16 msgConst4 [[maybe_unused]];
     i32 helpIndex36;
     i32 hintIndex11;
-    i16 msgConst5;
-    i16 msgConst9;
-    i16 msgConst7;
-    i16 msgConst15;
+    i16 msgConst5 [[maybe_unused]];
+    i16 msgConst9 [[maybe_unused]];
+    i16 msgConst7 [[maybe_unused]];
+    i16 msgConst15 [[maybe_unused]];
     msgConst18 = GENERAL_NAME_WIDGET;
     msgConst5 = GENERAL_PORTRAIT_WIDGET;
     msgConst0 = GENERAL_COLOR_WIDGET;
@@ -271,7 +271,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     msgConst6 = GENERAL_SURRENDER;
     msgConst8 = GENERAL_CONTROL_THIRTEEN;
     msgConst17 = GENERAL_CONTROL_FOURTEEN;
-    handled28 = 0;
+    handled28 = false;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -317,7 +317,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                         case GENERAL_SURRENDER:
                         case GENERAL_CAST_SPELL:
                             gpWindowManager->m_dialogResult = message.payload.widget.id;
-                            handled28 = 1;
+                            handled28 = true;
                             break;
                     }
                     break;
@@ -363,13 +363,13 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         i32 xWnd;
-        i16 viewYOffsetConst;
+        i16 viewYOffsetConst [[maybe_unused]];
         i32 yWindow;
         i32 xDelta;
-        i16 viewXOffsetFixed;
+        i16 viewXOffsetFixed [[maybe_unused]];
         CombatSide side;
-        i16 viewWidthConstant;
-        i16 viewHeightConstant;
+        i16 viewWidthConstant [[maybe_unused]];
+        i16 viewHeightConstant [[maybe_unused]];
 
     if (viewedArmy == NULL)
         return;

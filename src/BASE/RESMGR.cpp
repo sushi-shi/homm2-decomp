@@ -46,7 +46,7 @@ resourceManager::resourceManager(void) : baseManager() {
     m_curAggregate = 0;
 }
 
-void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIcon) {
+void resourceManager::GetBackdrop(const char* name, class bitmap* backdrop, i32 useIcon) {
     if (useIcon) {
         icon* backdropIcon = GetIcon(name);
         backdropIcon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
@@ -64,7 +64,7 @@ void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIco
 }
 
 void resourceManager::GetBackdropAtLoc(
-    char* filename,
+    const char* filename,
     class bitmap* destination,
     i32 destinationX,
     i32 destinationY,
@@ -93,7 +93,7 @@ void resourceManager::GetBackdropAtLoc(
     }
 }
 
-class palette* resourceManager::GetPalette(char* name) {
+class palette* resourceManager::GetPalette(const char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
     if (r != NULL) {
@@ -106,7 +106,7 @@ class palette* resourceManager::GetPalette(char* name) {
     }
 }
 
-class bitmap* resourceManager::GetBitmap(char* name) {
+class bitmap* resourceManager::GetBitmap(const char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -119,7 +119,7 @@ class bitmap* resourceManager::GetBitmap(char* name) {
     }
 }
 
-class icon* resourceManager::GetIcon(char* name) {
+class icon* resourceManager::GetIcon(const char* name) {
     return GetIcon(MakeId(name, 1));
 }
 
@@ -135,7 +135,7 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
     }
 }
 
-class tileset* resourceManager::GetTileset(char* name) {
+class tileset* resourceManager::GetTileset(const char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
     if (r != NULL) {
@@ -148,11 +148,11 @@ class tileset* resourceManager::GetTileset(char* name) {
     }
 }
 
-class mouse* resourceManager::GetMouse(char*) {
+class mouse* resourceManager::GetMouse(const char*) {
     return NULL;
 }
 
-class font* resourceManager::GetFont(char* name) {
+class font* resourceManager::GetFont(const char* name) {
     u32l resourceId = MakeId(name, 1);
     resource* fontEntry = Query(resourceId);
     if (fontEntry != NULL) {
@@ -165,7 +165,7 @@ class font* resourceManager::GetFont(char* name) {
     }
 }
 
-class sample* resourceManager::GetSample(char* name) {
+class sample* resourceManager::GetSample(const char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -178,7 +178,7 @@ class sample* resourceManager::GetSample(char* name) {
     }
 }
 
-class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
+class MIDIWrap* resourceManager::GetMIDIWrap(const char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -230,7 +230,7 @@ void resourceManager::Expunge(void) {
 
 class resource* resourceManager::Query(u32l resourceId) {
     resource* cursorResource = m_resourceListHead;
-    while (cursorResource != NULL && cursorResource->m_id != resourceId) {
+    while (cursorResource != NULL && static_cast<u32l>(cursorResource->m_id) != resourceId) {
         cursorResource = cursorResource->m_next;
     }
     return cursorResource;
@@ -287,7 +287,7 @@ void resourceManager::Close(void) {
     m_active = false;
 }
 
-i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
+i32 resourceManager::LoadAggregateHeader(const char* aggregateName) {
     i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
     i32 aggregateFp;
     u32 directoryBytes;
@@ -323,7 +323,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
 }
 
 void resourceManager::PointToFile(u32l fileId) {
-    char found = 0;
+    bchar found = false;
     i32 entry;
     i32 i;
     for (i = 0; i < RESOURCE_MANAGER_AGGREGATE_LIMIT; i++) {
@@ -331,7 +331,7 @@ void resourceManager::PointToFile(u32l fileId) {
             entry = 0;
             while (entry < m_aggregateEntryCount[i]) {
                 if (m_aggregateDir[i][entry].id == fileId) {
-                    found = 1;
+                    found = true;
                     m_curAggregate = i;
                     break;
                 }
@@ -345,18 +345,18 @@ void resourceManager::PointToFile(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
+            static_cast<i32>(fileId),
             m_lastFileId,
             m_lastFileName
         );
         ShutDown(gText);
     }
-    i32l position =
+    i32l position [[maybe_unused]] =
         lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset, 0);
 }
 
 u32l resourceManager::GetFileSize(u32l fileId) {
-    char found = 0;
+    bchar found = false;
     i32 entry;
     i32 matched;
     i32 i;
@@ -365,7 +365,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
             entry = 0;
             while (entry < m_aggregateEntryCount[i]) {
                 if (m_aggregateDir[i][entry].id == fileId) {
-                    found = 1;
+                    found = true;
                     matched = i;
                     break;
                 }
@@ -379,7 +379,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
+            static_cast<i32>(fileId),
             m_lastFileId,
             m_lastFileName
         );
@@ -403,25 +403,25 @@ void resourceManager::RestorePosition(void) {
 i8 resourceManager::ReadByte(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i8 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 i16 resourceManager::ReadWord(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i16 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 i32l resourceManager::ReadLong(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i32l value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result [[maybe_unused]] = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
-u32l resourceManager::MakeId(char* name, i32 translate) {
+u32l resourceManager::MakeId(const char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
         for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
@@ -443,12 +443,12 @@ void resourceManager::ReadBlock(i8* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
-    if (bytesRead != size) {
+    if (static_cast<u32l>(bytesRead) != size) {
         sprintf(
             gText,
             "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
             bytesRead,
-            size,
+            static_cast<i32>(size),
             errno,
             m_lastFileName
         );

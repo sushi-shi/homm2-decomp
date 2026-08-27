@@ -24,7 +24,7 @@ typedef enum NetbiosSetupConstant {
 
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
-    i32 reserved;
+    i32 reserved [[maybe_unused]];
     i32 needName;
 
     switch (iInitNetHostStatus) {
@@ -72,7 +72,7 @@ i8 InitNetHost(void) {
 
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
-    i32 unregistered;
+    b32 unregistered;
 
     switch (iInitNetGuestStatus) {
         case SETUP_INITIALIZE:
@@ -178,7 +178,7 @@ i8 WaitForGuest(void) {
 }
 
 i32 nbnet_init(void) {
-    i32 unused;
+    i32 unused [[maybe_unused]];
 
     LogStr("GUON1");
     switch (GameMode) {

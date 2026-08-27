@@ -22,7 +22,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    i32 h = gpResourceManager->ReadWord();
+    i32 h [[maybe_unused]] = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = true;
     else
@@ -51,7 +51,7 @@ i32 RemapCyrillicCharacter(i32 character) {
 }
 
 void font::DrawStringExecute(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -156,7 +156,7 @@ void font::DrawStringExecute(
     }
 }
 
-void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = false;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
@@ -199,7 +199,7 @@ static inline bool IsHyphen(u8 c) {
 }
 
 void font::ExtractLine(
-    char* text,
+    const char* text,
     char* line,
     i32* position,
     i32 maxWidth,
@@ -313,7 +313,7 @@ void font::ExtractLine(
 }
 
 void font::DrawBoundedString(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     i32 w,
@@ -324,15 +324,15 @@ void font::DrawBoundedString(
 
 
     i32 len = strlen(str);
-    char blank = ' ';
-    i32 lastPos;
+    char blank [[maybe_unused]] = ' ';
+    i32 lastPos [[maybe_unused]];
     i32 xPosition = 0;
     i32 yPosition = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
+    i32 spaceWidth [[maybe_unused]] = 0;
+    i32 wordWidth [[maybe_unused]] = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
+    i32 prevPos [[maybe_unused]] = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     strcpy(line, str);
     FontDrawMode drawMode = mode;
@@ -370,17 +370,17 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-i32 font::LineLength(char* str, i32 maxW) {
+i32 font::LineLength(const char* str, i32 maxW) {
 
 
     i32 len = strlen(str);
-    char blank = ' ';
+    char blank [[maybe_unused]] = ' ';
     i32 count = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
+    i32 spaceWidth [[maybe_unused]] = 0;
+    i32 wordWidth [[maybe_unused]] = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
+    i32 prevPos [[maybe_unused]] = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     while (pos < len && str[pos] != 0) {
         ExtractLine(str, line, &pos, maxW, &lw, 0);
@@ -391,10 +391,10 @@ i32 font::LineLength(char* str, i32 maxW) {
     return count;
 }
 
-i32 font::LineWidth(char* str) {
+i32 font::LineWidth(const char* str) {
     i32 s = strlen(str);
     i32 idx = 0, w = 0;
-    char* p = str;
+    const char* p = str;
     while (idx < s && p[idx] != 0) {
         while (p[idx] != 0 && p[idx] != '\n') {
             w += GetCharacterWidth(p[idx]);

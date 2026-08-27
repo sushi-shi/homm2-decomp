@@ -77,10 +77,11 @@ enum class TilesetId : u8 {
     ABANDONED_MINE_TILESET_BOTTOM_B = TILESET_MTNGRAS,
     RANDOM_TOWN_OBJECT_TILESET      = TILESET_OBJNTOWN,
     RANDOM_TOWN_OVERLAY_TILESET     = TILESET_OBJNTWSH,
-    RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD,
-    TILESET_COUNT                   = 64
+    RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD
 };
 using enum TilesetId;
+
+enum { TILESET_COUNT = 64 };
 
 #pragma pack(push, 1)
 struct mapCellExtra {

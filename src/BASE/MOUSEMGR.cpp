@@ -31,16 +31,16 @@ typedef enum MouseManagerLocalConstant {
 
 static i32 gOldMouseLeft = 0;
 static i32 gOldMouseTop = 0;
-BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = {0};
+BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = {};
 static i32 gOldMouseRight = 0;
 HICON hMouseCursor[MOUSE_CURSOR_COUNT] = {NULL};
 HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT] = {NULL};
 void* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
 static i32 gOldMouseBottom = 0;
-ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = {0};
-static POINT gMouseScreenPt = {0};
+ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = {};
+static POINT gMouseScreenPt = {};
 void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
-static POINT gMouseCheckPt = {0};
+static POINT gMouseCheckPt = {};
 b32 gbInSetPointer = false;
 i32 bInNewMouseUpdate = 0;
 
@@ -153,7 +153,7 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
+void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
     if (m_forcePointerUpdate != 0)
         return;

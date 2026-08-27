@@ -47,19 +47,19 @@ typedef enum ArenaConstant {
 } ArenaConstant;
 
 i32 DoArenaDialog(void) {
-    i32 statValue0;
-    i32 statValue2;
-    i32 statValue3;
-    i32 statValue7;
+    i32 statValue0 [[maybe_unused]];
+    i32 statValue2 [[maybe_unused]];
+    i32 statValue3 [[maybe_unused]];
+    i32 statValue7 [[maybe_unused]];
     i32 windowLines2 = WINDOW_RESOURCE;
-    i16 widgetMode10 = 1;
-    i32 windowWidth = WINDOW_WIDTH;
+    i16 widgetMode10 [[maybe_unused]] = 1;
+    i32 windowWidth [[maybe_unused]] = WINDOW_WIDTH;
     i32 windowHeight16 = windowLines2 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
     i32 windowX4 = WINDOW_X;
     i32 windowY3 = (WINDOW_SCREEN_HEIGHT - windowHeight16) / WINDOW_CENTER_DIVISOR;
     char windowName7[WINDOW_NAME_SIZE];
     i32 lineCount11;
-    i32 textHeight4;
+    i32 textHeight4 [[maybe_unused]];
     tag_message message14;
     i32 widgetIndex1;
     textWidget* statWidgets0[CHOICE_COUNT];
@@ -110,7 +110,8 @@ i32 DoArenaDialog(void) {
             TEXT_Y,
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
-            gStatNames[widgetIndex1],
+
+            const_cast<char*>(gStatNames[widgetIndex1]),
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
@@ -143,10 +144,10 @@ i32 DoArenaDialog(void) {
 }
 
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
-    tag_message dialogMessage_12;
-    i32 widgetIndex_5;
-    i32 type_13;
-    i32 extra_18;
+    tag_message dialogMessage_12 [[maybe_unused]];
+    i32 widgetIndex_5 [[maybe_unused]];
+    i32 type_13 [[maybe_unused]];
+    i32 extra_18 [[maybe_unused]];
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(

@@ -61,9 +61,9 @@ textEntryWidget::textEntryWidget(
     i16 height,
     i16 maxLength,
     char* text,
-    char* fontName,
+    const char* fontName,
     FontDrawMode color,
-    char* iconName,
+    const char* iconName,
     i16 iconFrame,
     i16 id,
     WidgetKind kind,
@@ -97,7 +97,7 @@ textEntryWidget::textEntryWidget(
     }
 }
 
-inline textEntryWidget::~textEntryWidget() {
+ textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
@@ -413,7 +413,7 @@ void textEntryWidget::Draw(void) {
 }
 
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
-    i32 changed;
+    b32 changed;
     char display[TEXT_BUFFER_CAPACITY];
 
     if (KBTickCount() > glTimers[0]) {
@@ -431,29 +431,29 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     else
         m_text[cursor + 1] = 0;
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
-        changed = 1;
+        changed = true;
         while (changed) {
-            changed = 0;
+            changed = false;
             strcpy(display, m_text + m_displayOffset);
             if (m_font->LineWidth(display) > m_innerW) {
                 display[cursor - m_displayOffset + 1] = 0;
                 if (m_font->LineWidth(display) > m_innerW) {
                     m_displayOffset++;
-                    changed = 1;
+                    changed = true;
                 }
             }
         }
         if (m_displayOffset > 0) {
-            changed = 1;
+            changed = true;
             while (changed) {
-                changed = 0;
+                changed = false;
                 strcpy(display, m_text + m_displayOffset - 1);
                 if (m_font->LineWidth(display) <= m_innerW)
                     m_displayOffset--;
                 else
-                    changed = 0;
+                    changed = false;
                 if (m_displayOffset == 0)
-                    changed = 0;
+                    changed = false;
             }
         }
     }

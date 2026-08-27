@@ -271,7 +271,7 @@ void arithCodeBitPlusFollow(BitStream* bs, UInt32 bit) {
     }
 }
 
-void arithCodeStartEncoding(BitStream* bs) {
+void arithCodeStartEncoding(BitStream* bs [[maybe_unused]]) {
     bigL = 0;
     bigR = TWO_TO_THE(smallB - 1);
     bitsOutstanding = 0;
@@ -294,7 +294,7 @@ void arithCodeStartDecoding(BitStream* bs) {
         bigD = (bigD << 1) + bsGetBit(bs);
 }
 
-void arithCodeDoneDecoding(BitStream* bs) {
+void arithCodeDoneDecoding(BitStream* bs [[maybe_unused]]) {
 
 }
 
@@ -1688,7 +1688,7 @@ void showFileNames(void) {}
 
 void cleanUpAndFail(void) {}
 
-void panic(char* s) {}
+void panic(char* s [[maybe_unused]]) {}
 
 void crcError(UInt32 crcStored, UInt32 crcComputed) {
     sprintf(
@@ -1768,7 +1768,7 @@ void bitStreamEOF(void) {
     cleanUpAndFail();
 }
 
-void __cdecl mySignalCatcher(IntNative* n) {
+void __cdecl mySignalCatcher(IntNative* n [[maybe_unused]]) {
     sprintf(
         gText,
         "\n%s: Control-C (or similar) caught, quitting.\n",
@@ -1778,7 +1778,7 @@ void __cdecl mySignalCatcher(IntNative* n) {
     cleanUpAndFail();
 }
 
-void mySIGSEGVorSIGBUScatcher(IntNative* n) {
+void mySIGSEGVorSIGBUScatcher(IntNative* n [[maybe_unused]]) {
     if (compressing) {
         sprintf(
             gText,
@@ -1843,7 +1843,7 @@ Bool endsInBz(Char* name) {
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    IntNative retVal;
+    IntNative retVal [[maybe_unused]];
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1863,7 +1863,7 @@ void compress(Char* name) {
 void uncompress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    Bool magicNumberOK;
+    Bool magicNumberOK [[maybe_unused]];
     IntNative retVal;
 
     strcpy(inName, name);
@@ -1884,9 +1884,9 @@ void uncompress(Char* name) {
 }
 
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
-    char fname[450] = {0};
+    char fname[450] = {};
     i32 fd;
-    i32 result;
+    i32 result [[maybe_unused]];
     FILE* fp;
     i32l flen;
 
@@ -1925,9 +1925,9 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
 }
 
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
-    char fname[450] = {0};
+    char fname[450] = {};
     i32 fd;
-    i32 result;
+    i32 result [[maybe_unused]];
     FILE* fp;
     i32l flen;
 

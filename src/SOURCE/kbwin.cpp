@@ -65,7 +65,12 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     return message.wParam;
 }
 
-i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine) {
+i32 AppInit(
+    HINSTANCE instance,
+    HINSTANCE previousInstance,
+    i32 showCommand,
+    char* commandLine [[maybe_unused]]
+) {
 
     RECT windowRect;
     WNDCLASSA appClass;
@@ -296,8 +301,8 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
 
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
-    HWND commandWindow2;
-    u16 notificationType1;
+    HWND commandWindow2 [[maybe_unused]];
+    u16 notificationType1 [[maybe_unused]];
 
     switch (message) {
         case WM_INITDIALOG:
@@ -371,7 +376,12 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
-LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
+LRESULT AppCommand(
+    HWND window,
+    UINT message [[maybe_unused]],
+    WPARAM messageParam,
+    LPARAM messageData [[maybe_unused]]
+) {
     i32 command;
     DLGPROC lpfnDlgProc;
 
@@ -417,8 +427,8 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
 }
 
 void UpdateDfltMenu(HMENU menu) {
-    i32 result;
-    i32 value;
+    i32 result [[maybe_unused]];
+    i32 value [[maybe_unused]];
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
         return;
@@ -456,8 +466,8 @@ void KBChangeMenu(HMENU menu) {
 void SetMenuStatus(i32 showMenu) {
     i32 winWidth;
     i32 height;
-    i32l windowStyle;
-    i32l replacedStyle;
+    i32l windowStyle [[maybe_unused]];
+    i32l replacedStyle [[maybe_unused]];
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen && showMenu)
         return;

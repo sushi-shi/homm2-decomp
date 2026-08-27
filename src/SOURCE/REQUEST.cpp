@@ -77,7 +77,7 @@ typedef enum FileRequesterPrivateConstant {
     CP1251_YO_LOWER             = 0xb8
 } FileRequesterPrivateConstant;
 
-i32 GetMapHeader(char* filename, struct SMapHeader* header) {
+i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = open(gText, _O_BINARY);
     if (file == -1) {
@@ -465,8 +465,8 @@ void fileRequester::SetOK(i32 enabled) {
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
-    i32 mouseX;
-    i32 acceptStep = 0;
+    i32 mouseX [[maybe_unused]];
+    b32 acceptStep = false;
     i32 iResult;
     i32 lengthIndex;
     FileRequesterHelpIndex helpIndexMouse;
@@ -564,11 +564,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                         case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
+                            acceptStep = true;
                             break;
                     }
                     break;
@@ -856,7 +856,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (iResult + m_topIndex == m_selectedIndex) {
                                     message.payload.widget.data.value = FILE_REQUESTER_OK;
                                     message.payload.widget.id = FILE_REQUESTER_OK;
-                                    acceptStep = 1;
+                                    acceptStep = true;
                                     break;
                                 }
                                 if (iResult + m_topIndex >= m_fileCount)
@@ -907,7 +907,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     NORMAL_DIALOG_NO_RESOURCE,
                     0
                 );
-                acceptStep = 0;
+                acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
@@ -937,7 +937,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     0
                 );
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
-                    acceptStep = 0;
+                    acceptStep = false;
                 }
             }
         }
@@ -1007,14 +1007,14 @@ void fileRequester::DoKnob(void) {
 }
 
 void fileRequester::Update(i32 drawWindow) {
-    i32 unusedState;
-    double gutterSpan;
-    i32 localState;
+    i32 unusedState [[maybe_unused]];
+    double gutterSpan [[maybe_unused]];
+    i32 localState [[maybe_unused]];
     tag_message message;
-    char localStorage1[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
+    char localStorage1 [[maybe_unused]][FILE_REQUESTER_UPDATE_STORAGE_SIZE];
     i32 i;
     double gutterStepCount1;
-    i32 unusedState7;
+    i32 unusedState7 [[maybe_unused]];
 
     message.type = MESSAGE_WIDGET;
     localState = 0;
@@ -1194,7 +1194,7 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
-char* fileRequester::GetFilename(void) {
+const char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
         && (m_selectedIndex < 0 || m_selectedIndex >= m_fileCount)) {
         return cFRDummy;
@@ -1219,7 +1219,7 @@ char* fileRequester::GetFilename(void) {
 
 
 FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-char* cFRDummy = "";
+const char* cFRDummy = "";
 float fGutterMinY;
 float fGutterTravelLength;
 i32 iMaxListSize;

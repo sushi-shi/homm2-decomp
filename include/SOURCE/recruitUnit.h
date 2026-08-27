@@ -18,7 +18,7 @@ enum class RecruitSourceType : i32 {
 using enum RecruitSourceType;
 
 #pragma pack(push, 1)
-class recruitUnit : public baseManager {
+class recruitUnit H2_FINAL : public baseManager {
 public:
     RecruitSourceType m_sourceType;
     H2EnumStorage<CreatureType, i32> m_creatureType;

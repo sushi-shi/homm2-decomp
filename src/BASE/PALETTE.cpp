@@ -17,7 +17,7 @@ palette::palette(u32l id)
     gpResourceManager->ReadBlock(m_data, MISC_PALETTE_BYTE_COUNT);
 }
 
-inline palette::~palette() {
+ palette::~palette() {
     if (m_data != NULL)
         H2_FREE(m_data);
     m_data = NULL;

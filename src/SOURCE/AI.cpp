@@ -57,8 +57,8 @@ i32 combatManager::AICheckRetreat(void) {
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
         && gpGame->m_mapHeader.victoryConditionValue == m_heroes[H2EnumIndex(m_currentSide)]->m_id)
         return 0;
-    if (gpGame->m_players[m_heroes[H2EnumIndex(m_currentSide)]->m_owner].m_townCount == 0
-        && gpGame->m_players[m_heroes[H2EnumIndex(m_currentSide)]->m_owner].m_heroCount
+    if (gpGame->m_players[H2EnumIndex(m_heroes[H2EnumIndex(m_currentSide)]->m_owner)].m_townCount == 0
+        && gpGame->m_players[H2EnumIndex(m_heroes[H2EnumIndex(m_currentSide)]->m_owner)].m_heroCount
                == COMBAT_AI_LAST_HERO_COUNT)
         return 0;
 
@@ -199,8 +199,8 @@ void combatManager::DoCompAI(CombatSide) {
     CombatSide sideEnemy;
     u32 flyerMask[COMBAT_SIDE_COUNT];
     u32 walkers[COMBAT_SIDE_COUNT];
-    i32 stronger;
-    i32 shootStrong;
+    b32 stronger;
+    b32 shootStrong;
     u32l myShootPower;
     i32 plan;
     u32l shootStrengths[COMBAT_SIDE_COUNT];
@@ -209,17 +209,17 @@ void combatManager::DoCompAI(CombatSide) {
     u32 oddMasks[COMBAT_SIDE_COUNT];
     CombatHexDirection dirIndex;
     u32l totalArmyStrength;
-    combatManager* combat;
-    i32 fifth;
+    combatManager* combat [[maybe_unused]];
+    i32 fifth [[maybe_unused]];
     u32 shooters[COMBAT_SIDE_COUNT];
     i32 archers;
     u32 mirrorMask[COMBAT_SIDE_COUNT];
     i32 rowIndex;
-    i32 archeryBonus;
+    b32 archeryBonus [[maybe_unused]];
     i32 plusArchers;
     i32 keepStrength;
     i32 grade;
-    town* pCastle;
+    town* pCastle [[maybe_unused]];
     u8 rowLimit[COMBAT_AI_CASTLE_BOUNDARY_COUNT];
     i32 adjCell;
     hexcell* targetCell;
@@ -252,8 +252,8 @@ void combatManager::DoCompAI(CombatSide) {
     );
     fifth = static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
                          / COMBAT_AI_STRENGTH_FRACTION;
-    shootStrong = 0;
-    stronger = 0;
+    shootStrong = false;
+    stronger = false;
     myShootPower = GetStrength(m_currentSide, shooters[H2EnumIndex(m_currentSide)]);
     enemyShooters = GetStrength(sideEnemy, shooters[H2EnumIndex(sideEnemy)]);
 
@@ -316,9 +316,9 @@ void combatManager::DoCompAI(CombatSide) {
     if (static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
             / COMBAT_AI_STRENGTH_FRACTION
         < static_cast<i32>(myShootPower))
-        shootStrong = 1;
+        shootStrong = true;
     if (static_cast<i32>(enemyShooters) > static_cast<i32>(myShootPower))
-        stronger = 1;
+        stronger = true;
 
     if ((H2EnumIndex((thisArmy->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_SHOOTER))) != 0) {
         if (thisArmy->m_monster.shots > 0)
@@ -890,7 +890,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 oneBit;
     u32 enemyMask;
     CombatHexDirection direction;
-    i32 hexes;
+    i32 hexes [[maybe_unused]];
     i32 enemyArmy;
     i32 destHex;
 
@@ -934,7 +934,7 @@ i32 combatManager::WalkTowardArmyFront(
     i32 frontDelta;
     i32 frontHex;
     i32 oldSpeed;
-    i32 pathFound;
+    i32 pathFound [[maybe_unused]];
     i32 left;
     i32 step;
 
@@ -996,7 +996,7 @@ i32 combatManager::WalkTowardArmy(
     i32 pathNdx;
     army* targetPtr;
     i32 targetSquare;
-    i32 path;
+    i32 path [[maybe_unused]];
 
     targetStack = GetClosestArmy(currentArmy, side, mask);
 

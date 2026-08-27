@@ -2,7 +2,7 @@ ninja_required_version = 1.10
 builddir = build
 cxx = clang++
 dlltool = llvm-dlltool
-cxxflags = --target=i686-w64-windows-gnu -std=gnu++20 -O0 -mno-sse -mno-sse2 -mfpmath=387 -fms-extensions -fsjlj-exceptions -w -D_X86_ -DWIN32 -D_WINDOWS -D_MT -Dregister= -Wno-write-strings -Wno-narrowing -Wno-deprecated-enum-enum-conversion -Wno-deprecated-enum-float-conversion -Iinclude -Ivendor/audiere-1.9.2 -Ivendor/miles-3.6 -Ivendor/smacker-3.0g -Ivendor/wing-1.0
+cxxflags = --target=i686-w64-windows-gnu -std=gnu++20 -O0 -mno-sse -mno-sse2 -mfpmath=387 -fms-extensions -fsjlj-exceptions -ferror-limit=0 -Wall -Wextra -Werror=unused-parameter -Werror=sign-compare -Werror=unused-variable -Werror=unused-but-set-variable -Werror=parentheses -Werror=write-strings -Wformat-security -Wno-error=format-security -Werror=enum-conversion -Werror=narrowing -D_X86_ -DWIN32 -D_WINDOWS -D_MT -Dregister= -Iinclude -Ivendor/audiere-1.9.2 -Ivendor/miles-3.6 -Ivendor/smacker-3.0g -Ivendor/wing-1.0
 ldflags = --target=i686-w64-windows-gnu -fuse-ld=lld -mwindows -fsjlj-exceptions -static -static-libgcc -static-libstdc++
 system_libs = -lkernel32 -luser32 -lgdi32 -lwinmm -lws2_32 -lddraw -ldplayx -ladvapi32 -lole32 -luuid -lcomdlg32 -lshell32 -lnetapi32
 runtime_libs = -Wl,--start-group -lstdc++ -lgcc_eh -lgcc -lmcfgthread -lntdll -Wl,--end-group

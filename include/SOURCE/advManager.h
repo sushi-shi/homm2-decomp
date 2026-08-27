@@ -54,7 +54,7 @@ enum class ArmySizeNameVariant : i32 {
 using enum ArmySizeNameVariant;
 
 #pragma pack(push, 1)
-class advManager : public baseManager {
+class advManager H2_FINAL : public baseManager {
 public:
     AdventureCommand m_selectedCell;
     union {
@@ -204,7 +204,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    char* GetArmySizeName(i32, ArmySizeNameVariant);
+    const char* GetArmySizeName(i32, ArmySizeNameVariant);
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
@@ -264,14 +264,14 @@ public:
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
     void EventSound(MapObjectType, i32, SAMPLE2*);
-    void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
+    void EventWindow(i32, i32, const char*, i32, i32, i32, i32, i32);
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
     void GiveResource(class hero*, ResourceType, i32);
     void RecruitEvent(class hero*, CreatureType, class mapCell*);
-    i32 SkeletonEvent(class hero*, class mapCell*, char*, i32, i32);
-    i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
-    i32 GhostEvent(class hero*, class mapCell*, char*, i32, i32);
+    i32 SkeletonEvent(class hero*, class mapCell*, const char*, i32, i32);
+    i32 ZombieEvent(class hero*, class mapCell*, const char*, i32, i32);
+    i32 GhostEvent(class hero*, class mapCell*, const char*, i32, i32);
     void HouseEvent(class hero*, class mapCell*);
     CombatResult CombatMonsterEvent(
         class hero*,
@@ -375,7 +375,7 @@ public:
 };
 #pragma pack(pop)
 
-extern i32 bMoveSoundMade;
+extern b32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];
 extern i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT];
 extern u8 EveryOther;
@@ -414,9 +414,9 @@ extern i32 iVWYPixelOffset;
 extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
-extern i32 iVWDrawAllTerrains;
+extern b32 iVWDrawAllTerrains;
 extern H2EnumStorage<SpellType, i32> iVWWhatToDraw;
-extern i32 iVWDrawAllObjs;
+extern b32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;
 extern i32 iVWCenterOffset;
@@ -431,7 +431,7 @@ extern i32 giFrameStep;
 extern char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
 extern i32 giLimitUpdMaxX;
 extern i32 giLimitUpdMaxY;
-extern i32 bPrefsChanged;
+extern b32 bPrefsChanged;
 extern i32 giLimitUpdMinY;
 extern struct tag_message CDMsg;
 extern i8 bComboDraw[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE]

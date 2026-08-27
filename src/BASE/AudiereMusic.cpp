@@ -32,7 +32,7 @@ static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
 };
 audiere::OutputStreamPtr AudiereMusic::stream;
 audiere::SampleSourcePtr AudiereMusic::source;
-static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {0};
+static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {};
 
 
 void StopAudiereMusic(i32& currentTrack) {

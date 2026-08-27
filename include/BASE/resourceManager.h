@@ -28,7 +28,7 @@ typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
 
-class resourceManager : public baseManager {
+class resourceManager H2_FINAL : public baseManager {
 public:
     resource* m_resourceListHead;
     i32 m_numAggregates;
@@ -44,23 +44,23 @@ public:
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void GetBackdrop(char*, class bitmap*, i32);
-    void GetBackdropAtLoc(char*, class bitmap*, i32, i32, i32);
-    class palette* GetPalette(char*);
-    class bitmap* GetBitmap(char*);
-    class icon* GetIcon(char*);
+    void GetBackdrop(const char*, class bitmap*, i32);
+    void GetBackdropAtLoc(const char*, class bitmap*, i32, i32, i32);
+    class palette* GetPalette(const char*);
+    class bitmap* GetBitmap(const char*);
+    class icon* GetIcon(const char*);
     class icon* GetIcon(u32l);
-    class tileset* GetTileset(char*);
-    class mouse* GetMouse(char*);
-    class font* GetFont(char*);
-    class sample* GetSample(char*);
-    class MIDIWrap* GetMIDIWrap(char*);
+    class tileset* GetTileset(const char*);
+    class mouse* GetMouse(const char*);
+    class font* GetFont(const char*);
+    class sample* GetSample(const char*);
+    class MIDIWrap* GetMIDIWrap(const char*);
     void Dispose(class resource*);
     void AddResource(class resource*);
     void Expunge(void);
     class resource* Query(u32l);
     void RemoveResource(class resource*);
-    i32 LoadAggregateHeader(char*);
+    i32 LoadAggregateHeader(const char*);
     void PointToFile(u32l);
     u32l GetFileSize(u32l);
     void SavePosition(void);
@@ -68,7 +68,7 @@ public:
     i8 ReadByte(void);
     i16 ReadWord(void);
     i32l ReadLong(void);
-    u32l MakeId(char*, i32);
+    u32l MakeId(const char*, i32);
     void Read13(i8*);
     void ReadBlock(i8*, u32l);
 };

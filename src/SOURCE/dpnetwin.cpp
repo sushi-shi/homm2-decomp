@@ -184,14 +184,14 @@ void CleanupDPVars(void) {
     iDPRcvBufferTail = 0;
     ppDPRcvBuffer = NULL;
     piDPRcvBufferSize = NULL;
-    bStartUpInfoReceived = 0;
+    bStartUpInfoReceived = false;
     hinstDplayx = NULL;
     iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
     iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
     iWaitForHostWaitCount = 0;
     iEnumCount = 0;
     iLastHereIAmTickCount = 0;
-    bInDPSD = 0;
+    bInDPSD = false;
     iGUIDCount = 0;
     iLastMsgNumHumanPlayers = 1;
 }
@@ -270,8 +270,8 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 void dpProcessMessages(void) {
     DWORD size;
     i32 to;
-    i32 i;
-    i32 j;
+    i32 i [[maybe_unused]];
+    i32 j [[maybe_unused]];
     i32 sender;
     i32 receiveResult;
 
@@ -292,7 +292,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, "dpnetwin.cpp", 335);
         if (sender == 0) {
         } else {
-            if (to == 0 || to == dcoID)
+            if (to == 0 || static_cast<DPID>(to) == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
@@ -322,7 +322,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(startup);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                        xNetHasOldPlayers = 1;
+                        xNetHasOldPlayers = true;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                     giNumHumanPlayers++;
                 } else {
@@ -350,7 +350,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 LOG_UNUSED_VALUE
             );
             memcpy(giNetPosToDCOPos, startup->playerIds, sizeof(giNetPosToDCOPos));
-            bStartUpInfoReceived = 1;
+            bStartUpInfoReceived = true;
             break;
         default:
             sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
@@ -377,12 +377,17 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
-            gsThisNetPlayerInfo.useRegularCompression = 0;
-            gsThisNetPlayerInfo.useDiffCompression = 0;
+            gsThisNetPlayerInfo.useRegularCompression = false;
+            gsThisNetPlayerInfo.useDiffCompression = false;
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            rv = lpIDC->CreatePlayer(
+                &dcoID,
+                const_cast<LPSTR>("Dude"),
+                const_cast<LPSTR>("Heroes Player"),
+                &dphEvent
+            );
             if (rv != RESULT_OK)
                 DPSD(rv, "dpnetwin.cpp", 472);
             giNetPosToDCOPos[0] = dcoID;
@@ -428,7 +433,7 @@ i32 dpWaitForHost(void) {
     char text[STATUS_TEXT_SIZE];
     DWORD timeout;
 
-    sprintf(text, "WFHS %d", iDPWaitForHostStatus);
+    sprintf(text, "WFHS %d", static_cast<i32>(iDPWaitForHostStatus));
     AiPrint(text);
     switch (iDPWaitForHostStatus) {
         case HOST_ENUMERATE_SESSIONS:
@@ -475,7 +480,12 @@ i32 dpWaitForHost(void) {
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            rv = lpIDC->CreatePlayer(
+                &dcoID,
+                const_cast<LPSTR>("Dude"),
+                const_cast<LPSTR>("Heroes Player"),
+                &dphEvent
+            );
             if (rv != RESULT_OK)
                 DPSD(rv, "dpnetwin.cpp", 577);
             iDPWaitForHostStatus++;
@@ -518,13 +528,13 @@ i32 dpWaitForHost(void) {
     return 0;
 }
 
-void DPSD(i32 result, char* file, i32 line) {
-    i32 flag;
+void DPSD(i32 result, const char* file, i32 line) {
+    i32 flag [[maybe_unused]];
     char errorText[REMOTE_ERROR_TEXT_SIZE];
 
     if (bInDPSD != 0)
         return;
-    bInDPSD = 1;
+    bInDPSD = true;
     flag = 0;
     switch (result) {
         case RESULT_OK:
@@ -634,7 +644,7 @@ i32 iDPRcvBufferHead = 0;
 i32 iDPRcvBufferTail = 0;
 u8** ppDPRcvBuffer = NULL;
 i32* piDPRcvBufferSize = NULL;
-i32 bStartUpInfoReceived = 0;
+b32 bStartUpInfoReceived = false;
 HMODULE hinstDplayx = NULL;
 H2SteppedEnumStorage<DirectPlayFirstGuestState, i32>
 iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
@@ -642,7 +652,7 @@ H2SteppedEnumStorage<DirectPlayHostState, i32> iDPWaitForHostStatus = HOST_ENUME
 i32 iWaitForHostWaitCount = 0;
 i32 iEnumCount = 0;
 i32 iLastHereIAmTickCount = 0;
-i32 bInDPSD = 0;
+b32 bInDPSD = false;
 i32 iGUIDCount = 0;
 i32 iLastMsgNumHumanPlayers = 1;
 i32 iMaxSession;

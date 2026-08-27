@@ -34,14 +34,14 @@ public:
         i16 y,
         i16 width,
         i16 height,
-        char* iconName,
+        const char* iconName,
         i16 frame,
         IconDrawOrientation orientation,
         i16 id,
         WidgetKind kind,
         i16 fillColor
     );
-    virtual inline ~iconWidget() override;
+    virtual  ~iconWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);

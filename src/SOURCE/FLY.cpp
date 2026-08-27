@@ -93,11 +93,11 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 enemyHex;
     u32 directionMask;
     i32 adjHex;
-    i32 spare;
+    i32 spare [[maybe_unused]];
     CombatHexDirection direction;
-    i32 cost;
+    i32 cost [[maybe_unused]];
     army* foe;
-    i32 otherHex;
+    i32 otherHex [[maybe_unused]];
     i32 attackMask;
     i32 attackHex;
     CombatHexDirection n;
@@ -210,8 +210,8 @@ i32 army::FlyTo(i32 destination) {
     i32 fromX;
     i32 xDistance;
     i32 toColumn1;
-    i32 pad9;
-    i32 dead2;
+    i32 pad9 [[maybe_unused]];
+    i32 dead2 [[maybe_unused]];
     i32 stepCount1;
     i32 endY;
     i32 leg;
@@ -221,7 +221,7 @@ i32 army::FlyTo(i32 destination) {
     i32 column;
     i32 frameCount0;
     i32 srcRearHex0;
-    i32 slack;
+    i32 slack [[maybe_unused]];
     i32 length;
     i32 lastMinX;
     i32 oldMaxX0;
