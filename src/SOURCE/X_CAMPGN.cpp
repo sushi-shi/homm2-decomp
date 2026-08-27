@@ -1293,6 +1293,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 break;
                             }
                         }
+                        [[fallthrough]];
                     case CAMPAIGN_DIALOG_CANCEL:
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;

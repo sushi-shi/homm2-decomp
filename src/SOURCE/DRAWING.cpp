@@ -1403,7 +1403,7 @@ void combatManager::DrawFrame(
             m_hexCells[moatCell[H2EnumIndex(row)] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
         }
     endRow:
-
+        continue;
     }
 
     if (gConfig.combatArmyInfoLevel > 0 && m_smallViewSide[0] != COMBAT_SIDE_NONE) {

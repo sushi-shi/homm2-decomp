@@ -472,11 +472,12 @@ char toupper(char c);
 
 
 inline char CyrillicToUpper(char c) {
-    if (static_cast<u8>(c) >= 'a' && static_cast<u8>(c) <= 'z')
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) >= 0xE0 && static_cast<u8>(c) <= 0xFF)
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) == 0xB8)
+    const u8 byte = static_cast<u8>(c);
+    if (byte >= 'a' && byte <= 'z')
+        return static_cast<char>(byte - ' ');
+    if (byte >= 0xE0)
+        return static_cast<char>(byte - 0x20);
+    if (byte == 0xB8)
         return static_cast<char>(0xA8);
     return c;
 }

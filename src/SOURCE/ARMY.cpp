@@ -999,10 +999,10 @@ void army::SpecialAttack(void) {
     H2EnumStorage<IconDrawOrientation, char> bIconFlip;
     i32 moveCount;
     i32 oldTipY;
-    i32 castX;
+    i32 effectX;
     char combatMsg[ARMY_COMBAT_TEXT_SIZE];
     CombatEffectType powVal;
-    i32 castY;
+    i32 effectY;
     char hisCol;
     char originalRow;
     i32 yStretch;
@@ -1342,8 +1342,8 @@ void army::SpecialAttack(void) {
 
     baseAtk = m_monster.attack;
     powVal = COMBAT_EFFECT_INVALID;
-    castX = -1;
-    castY = -1;
+    effectX = -1;
+    effectY = -1;
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
         i32 adjacentHex;
         army* splashTarget;
@@ -1375,8 +1375,8 @@ void army::SpecialAttack(void) {
         }
         m_spellEffectYOffset = 0;
         powVal = COMBAT_EFFECT_LICH_CLOUD;
-        castX = gpCombatManager->m_hexCells[adjacentHex].m_x;
-        castY = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
+        effectX = gpCombatManager->m_hexCells[adjacentHex].m_x;
+        effectY = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)]);
     } else if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::PlasmaBlast)) {
         // The plasma blast splashes over the eighteen hexes around the target.
@@ -1455,7 +1455,7 @@ void army::SpecialAttack(void) {
             }
             break;
     }
-    PowEffect(powVal, 0, castX, castY);
+    PowEffect(powVal, 0, effectX, effectY);
     gpCombatManager->CombatMessage(combatMsg, 1, 1, 0);
     WaitSample(ARMY_SAMPLE_SHOT);
 
@@ -3463,7 +3463,6 @@ void army::GoBerserk(void) {
                 goto berserkFinish;
         }
     }
-walkToward:
     if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))) {
         if (gpCombatManager->WalkTowardArmy(this, m_side, masks_28[H2EnumIndex(m_side)]))
             goto berserkFinish;
