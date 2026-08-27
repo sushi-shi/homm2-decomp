@@ -577,7 +577,7 @@ void mouseManager::CheckUpdateMousePos(void) {
     }
 }
 
-void mouseManager::SetColorMice(i32 enabled) {
+void mouseManager::SetColorMice(b32 enabled) {
     if (enabled == gbColorMice)
         return;
     {

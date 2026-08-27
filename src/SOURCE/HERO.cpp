@@ -1544,7 +1544,7 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     mapCell* heroCell;
 
     gbNoDismiss = noDismiss;
