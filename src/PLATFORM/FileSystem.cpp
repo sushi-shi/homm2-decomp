@@ -114,10 +114,46 @@ i32 FileOpenLocale(const char* retailPath) { return Files().OpenLocale(retailPat
 
 void FileClose(i32 file) { Files().Close(file); }
 
-i32 FileRead(i32 file, void* buffer, i32 count) { return Files().Read(file, buffer, count); }
+bool ReadExact(IFileSystem& files, i32 file, void* buffer, i32 count) {
+    if (count < 0 || (count > 0 && buffer == nullptr)) {
+        return false;
+    }
+    auto* cursor = static_cast<unsigned char*>(buffer);
+    i32 remaining = count;
+    while (remaining > 0) {
+        const i32 transferred = files.Read(file, cursor, remaining);
+        if (transferred <= 0 || transferred > remaining) {
+            return false;
+        }
+        cursor += transferred;
+        remaining -= transferred;
+    }
+    return true;
+}
 
-i32 FileWrite(i32 file, const void* buffer, i32 count) {
-    return Files().Write(file, buffer, count);
+bool WriteExact(IFileSystem& files, i32 file, const void* buffer, i32 count) {
+    if (count < 0 || (count > 0 && buffer == nullptr)) {
+        return false;
+    }
+    const auto* cursor = static_cast<const unsigned char*>(buffer);
+    i32 remaining = count;
+    while (remaining > 0) {
+        const i32 transferred = files.Write(file, cursor, remaining);
+        if (transferred <= 0 || transferred > remaining) {
+            return false;
+        }
+        cursor += transferred;
+        remaining -= transferred;
+    }
+    return true;
+}
+
+bool FileReadExact(i32 file, void* buffer, i32 count) {
+    return ReadExact(Files(), file, buffer, count);
+}
+
+bool FileWriteExact(i32 file, const void* buffer, i32 count) {
+    return WriteExact(Files(), file, buffer, count);
 }
 
 i32 FileSeek(i32 file, i32 offset) { return Files().Seek(file, offset); }

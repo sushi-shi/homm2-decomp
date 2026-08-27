@@ -62,6 +62,45 @@
 
 #include <string>
 
+namespace {
+
+void ReadGameData(i32 file, void* buffer, i32 count) {
+    if (!platform::FileReadExact(file, buffer, count))
+        ShutDown(localization::Tr("system.file.read_error"));
+}
+
+void WriteGameData(i32 file, const void* buffer, i32 count) {
+    if (!platform::FileWriteExact(file, buffer, count))
+        ShutDown(localization::Tr("system.file.write_error"));
+}
+
+void RequireGameData(bool condition) {
+    if (!condition)
+        ShutDown(localization::Tr("system.file.read_error"));
+}
+
+void RequireReadableBytes(i32 file, i32 count) {
+    const i32 position = platform::FileTell(file);
+    const i32 length = platform::FileLength(file);
+    RequireGameData(count >= 0 && position >= 0 && length >= position
+                    && count <= length - position);
+}
+
+void RequireValidMapDimensions(i32 width, i32 height) {
+    RequireGameData(width > 0 && height > 0 && width <= MAP_DIMENSION_XLARGE
+                    && height <= MAP_DIMENSION_XLARGE);
+}
+
+bool EventIndicesFit(const u16* indices, u16 count, i32 extraCount) {
+    for (u16 i = 0; i < count; ++i) {
+        if (indices[i] >= extraCount)
+            return false;
+    }
+    return true;
+}
+
+}
+
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \
     0.8
@@ -662,62 +701,62 @@ typedef enum PlayerDataSerializationConstant {
 void playerData::Write(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    platform::FileWrite(file, &m_color, sizeof(m_color));
-    platform::FileWrite(file, &m_heroCount, sizeof(m_heroCount));
-    platform::FileWrite(file, &m_currentHero, sizeof(m_currentHero));
-    platform::FileWrite(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    platform::FileWrite(file, m_heroIds, sizeof(m_heroIds));
-    platform::FileWrite(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    WriteGameData(file, &m_color, sizeof(m_color));
+    WriteGameData(file, &m_heroCount, sizeof(m_heroCount));
+    WriteGameData(file, &m_currentHero, sizeof(m_currentHero));
+    WriteGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    WriteGameData(file, m_heroIds, sizeof(m_heroIds));
+    WriteGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
     memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
-    platform::FileWrite(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    platform::FileWrite(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    platform::FileWrite(file, &m_cheatValue, sizeof(m_cheatValue));
-    platform::FileWrite(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    platform::FileWrite(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    platform::FileWrite(file, &m_evilInterface, sizeof(m_evilInterface));
-    platform::FileWrite(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    platform::FileWrite(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    platform::FileWrite(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    platform::FileWrite(file, &m_daysLeft, sizeof(m_daysLeft));
-    platform::FileWrite(file, &m_townCount, sizeof(m_townCount));
-    platform::FileWrite(file, &m_currentTown, sizeof(m_currentTown));
-    platform::FileWrite(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    platform::FileWrite(file, m_townIds, sizeof(m_townIds));
-    platform::FileWrite(file, m_resources, sizeof(m_resources));
-    platform::FileWrite(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    platform::FileWrite(file, &m_barrierTents, sizeof(m_barrierTents));
-    platform::FileWrite(file, &m_barrierTents, sizeof(m_barrierTents));
-    platform::FileWrite(file, m_unknownad, sizeof(m_unknownad));
+    WriteGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    WriteGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    WriteGameData(file, &m_cheatValue, sizeof(m_cheatValue));
+    WriteGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    WriteGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    WriteGameData(file, &m_evilInterface, sizeof(m_evilInterface));
+    WriteGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    WriteGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    WriteGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    WriteGameData(file, &m_daysLeft, sizeof(m_daysLeft));
+    WriteGameData(file, &m_townCount, sizeof(m_townCount));
+    WriteGameData(file, &m_currentTown, sizeof(m_currentTown));
+    WriteGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    WriteGameData(file, m_townIds, sizeof(m_townIds));
+    WriteGameData(file, m_resources, sizeof(m_resources));
+    WriteGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
+    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
+    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
+    WriteGameData(file, m_unknownad, sizeof(m_unknownad));
 }
 
 void playerData::Read(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    platform::FileRead(file, &m_color, sizeof(m_color));
-    platform::FileRead(file, &m_heroCount, sizeof(m_heroCount));
-    platform::FileRead(file, &m_currentHero, sizeof(m_currentHero));
-    platform::FileRead(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    platform::FileRead(file, m_heroIds, sizeof(m_heroIds));
-    platform::FileRead(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    platform::FileRead(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    platform::FileRead(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    platform::FileRead(file, &m_cheatValue, sizeof(m_cheatValue));
-    platform::FileRead(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    platform::FileRead(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    platform::FileRead(file, &m_evilInterface, sizeof(m_evilInterface));
-    platform::FileRead(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    platform::FileRead(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    platform::FileRead(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    platform::FileRead(file, &m_daysLeft, sizeof(m_daysLeft));
-    platform::FileRead(file, &m_townCount, sizeof(m_townCount));
-    platform::FileRead(file, &m_currentTown, sizeof(m_currentTown));
-    platform::FileRead(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    platform::FileRead(file, m_townIds, sizeof(m_townIds));
-    platform::FileRead(file, m_resources, sizeof(m_resources));
-    platform::FileRead(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    platform::FileRead(file, &m_barrierTents, sizeof(m_barrierTents));
-    platform::FileRead(file, &m_barrierTents, sizeof(m_barrierTents));
-    platform::FileRead(file, m_unknownad, sizeof(m_unknownad));
+    ReadGameData(file, &m_color, sizeof(m_color));
+    ReadGameData(file, &m_heroCount, sizeof(m_heroCount));
+    ReadGameData(file, &m_currentHero, sizeof(m_currentHero));
+    ReadGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    ReadGameData(file, m_heroIds, sizeof(m_heroIds));
+    ReadGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    ReadGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    ReadGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    ReadGameData(file, &m_cheatValue, sizeof(m_cheatValue));
+    ReadGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    ReadGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    ReadGameData(file, &m_evilInterface, sizeof(m_evilInterface));
+    ReadGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    ReadGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    ReadGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    ReadGameData(file, &m_daysLeft, sizeof(m_daysLeft));
+    ReadGameData(file, &m_townCount, sizeof(m_townCount));
+    ReadGameData(file, &m_currentTown, sizeof(m_currentTown));
+    ReadGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    ReadGameData(file, m_townIds, sizeof(m_townIds));
+    ReadGameData(file, m_resources, sizeof(m_resources));
+    ReadGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
+    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
+    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
+    ReadGameData(file, m_unknownad, sizeof(m_unknownad));
 }
 
 i32 playerData::NextHero(i32) {
@@ -1265,22 +1304,23 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ClearMapExtra();
 
     expTag = false;
-    platform::FileRead(fd, &wide, sizeof(wide));
+    ReadGameData(fd, &wide, sizeof(wide));
     if (wide == -1) {
         expTag = true;
-        platform::FileRead(fd, &wide, sizeof(wide));
+        ReadGameData(fd, &wide, sizeof(wide));
     }
-    platform::FileRead(fd, &rows, sizeof(rows));
+    ReadGameData(fd, &rows, sizeof(rows));
+    RequireValidMapDimensions(wide, rows);
     SetMapSize(wide, rows);
-    platform::FileRead(fd, &m_mapHeader, sizeof(m_mapHeader));
-    platform::FileRead(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    platform::FileRead(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileRead(fd, this, sizeof(m_difficultyRating));
-    platform::FileRead(fd, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileRead(fd, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileRead(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileRead(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    platform::FileRead(fd, cPlayerNames, sizeof(cPlayerNames));
+    ReadGameData(fd, &m_mapHeader, sizeof(m_mapHeader));
+    ReadGameData(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    ReadGameData(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    ReadGameData(fd, this, sizeof(m_difficultyRating));
+    ReadGameData(fd, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    ReadGameData(fd, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    ReadGameData(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    ReadGameData(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    ReadGameData(fd, cPlayerNames, sizeof(cPlayerNames));
     {
         const char* provenanceFields[GAME_PLAYER_COUNT + 2] = {
             m_mapHeader.name,
@@ -1309,31 +1349,33 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
     }
 
-    platform::FileRead(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
-    platform::FileRead(fd, &gbInCampaign, sizeof(gbInCampaign));
+    ReadGameData(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
+    ReadGameData(fd, &gbInCampaign, sizeof(gbInCampaign));
     if (gbInCampaign == 1) {
-        platform::FileRead(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+        ReadGameData(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        platform::FileRead(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        ReadGameData(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expTag)
-        platform::FileRead(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        ReadGameData(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    platform::FileRead(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    platform::FileRead(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
+    ReadGameData(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    ReadGameData(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
     if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
-    platform::FileRead(fd, &m_playerCount, sizeof(m_playerCount));
+    ReadGameData(fd, &m_playerCount, sizeof(m_playerCount));
 
-    platform::FileRead(fd, plBuf, sizeof(plBuf[0]));
+    ReadGameData(fd, plBuf, sizeof(plBuf[0]));
     giCurPlayer = plBuf[0];
-    platform::FileRead(fd, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    platform::FileRead(fd, m_playerDead, sizeof(m_playerDead));
+    RequireGameData(m_playerCount > 0 && m_playerCount <= GAME_PLAYER_COUNT
+                    && giCurPlayer >= 0 && giCurPlayer < m_playerCount);
+    ReadGameData(fd, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    ReadGameData(fd, m_playerDead, sizeof(m_playerDead));
 
-    platform::FileRead(fd, isHuman, GAME_PLAYER_COUNT);
+    ReadGameData(fd, isHuman, GAME_PLAYER_COUNT);
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
         if (isHuman[ndx] && numHumans < giNumHumanPlayers) {
             numHumans++;
@@ -1353,57 +1395,67 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         }
     }
 
-    platform::FileRead(fd, &m_day, sizeof(m_day));
-    platform::FileRead(fd, &m_week, sizeof(m_week));
-    platform::FileRead(fd, &m_month, sizeof(m_month));
+    ReadGameData(fd, &m_day, sizeof(m_day));
+    ReadGameData(fd, &m_week, sizeof(m_week));
+    ReadGameData(fd, &m_month, sizeof(m_month));
     giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
                 + (m_month - 1) * EVENT_DAYS_PER_MONTH;
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
         m_players[ndx].Read(fd);
 
-    platform::FileRead(fd, &m_obeliskCount, sizeof(m_obeliskCount));
+    ReadGameData(fd, &m_obeliskCount, sizeof(m_obeliskCount));
     for (ndx = 0; ndx < GAME_HERO_COUNT; ndx++)
         m_heroRecs[ndx].Read(fd, expTag);
-    platform::FileRead(fd, m_availableHeroes, sizeof(m_availableHeroes));
-    platform::FileRead(fd, m_castleRecs, sizeof(m_castleRecs));
+    ReadGameData(fd, m_availableHeroes, sizeof(m_availableHeroes));
+    ReadGameData(fd, m_castleRecs, sizeof(m_castleRecs));
     for (town& castle : m_castleRecs) {
         const std::string decodedName = localization::DecodeExternalText(castle.m_name);
         utf8::Copy(castle.m_name, sizeof(castle.m_name), decodedName.c_str());
     }
-    platform::FileRead(fd, m_castleOwners, sizeof(m_castleOwners));
-    platform::FileRead(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    platform::FileRead(fd, m_mines, sizeof(m_mines));
-    platform::FileRead(fd, m_mineOwners, sizeof(m_mineOwners));
+    ReadGameData(fd, m_castleOwners, sizeof(m_castleOwners));
+    ReadGameData(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    ReadGameData(fd, m_mines, sizeof(m_mines));
+    ReadGameData(fd, m_mineOwners, sizeof(m_mineOwners));
     if (expTag)
-        platform::FileRead(fd, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
+        ReadGameData(fd, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
-        platform::FileRead(fd, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    platform::FileRead(fd, m_boats, sizeof(m_boats));
-    platform::FileRead(fd, m_boatSlots, sizeof(m_boatSlots));
-    platform::FileRead(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    platform::FileRead(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    platform::FileRead(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    platform::FileRead(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    platform::FileRead(fd, m_rumour, sizeof(m_rumour));
+        ReadGameData(fd, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    ReadGameData(fd, m_boats, sizeof(m_boats));
+    ReadGameData(fd, m_boatSlots, sizeof(m_boatSlots));
+    ReadGameData(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    ReadGameData(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    ReadGameData(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    ReadGameData(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    ReadGameData(fd, m_rumour, sizeof(m_rumour));
     {
         const std::string decodedRumour = localization::DecodeExternalText(m_rumour);
         utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
     }
-    platform::FileRead(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    platform::FileRead(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
-    platform::FileRead(
+    ReadGameData(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    ReadGameData(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
+    ReadGameData(
         fd,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    platform::FileRead(fd, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    platform::FileRead(fd, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    platform::FileRead(fd, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    platform::FileRead(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    ReadGameData(fd, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    RequireGameData(m_timeEventCount <= GAME_TIME_EVENT_CAPACITY);
+    ReadGameData(fd, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    ReadGameData(fd, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    RequireGameData(m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
+    ReadGameData(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
-    platform::FileRead(fd, chunkTag, sizeof(i32));
-    platform::FileRead(fd, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    platform::FileRead(fd, chunkTag, sizeof(i32));
+    ReadGameData(fd, chunkTag, sizeof(i32));
+    ReadGameData(fd, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    ReadGameData(fd, chunkTag, sizeof(i32));
+    const i32 mapExtraTableBytes = platform::FileLength(fd) - platform::FileTell(fd);
+    const i32 minimumExtraRecordSize = sizeof(i32) + sizeof(i16);
+    RequireGameData(iMaxMapExtra > 0 && mapExtraTableBytes >= 0
+                    && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
+    RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_mapEventIndices, m_mapEventCount, iMaxMapExtra));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
     );
@@ -1413,16 +1465,17 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (ndx = 1; ndx < iMaxMapExtra; ndx++) {
-        platform::FileRead(fd, chunkTag, sizeof(i32));
-        platform::FileRead(fd, pwSizeOfMapExtra + ndx, sizeof(pwSizeOfMapExtra[ndx]));
+        ReadGameData(fd, chunkTag, sizeof(i32));
+        ReadGameData(fd, pwSizeOfMapExtra + ndx, sizeof(pwSizeOfMapExtra[ndx]));
+        RequireReadableBytes(fd, pwSizeOfMapExtra[ndx]);
         ppMapExtra[ndx] = H2_ALLOC(pwSizeOfMapExtra[ndx]);
-        platform::FileRead(fd, ppMapExtra[ndx], pwSizeOfMapExtra[ndx]);
+        ReadGameData(fd, ppMapExtra[ndx], pwSizeOfMapExtra[ndx]);
     }
-    platform::FileRead(fd, chunkTag, sizeof(i32));
-    platform::FileRead(fd, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    platform::FileRead(fd, chunkTag, sizeof(i32));
+    ReadGameData(fd, chunkTag, sizeof(i32));
+    ReadGameData(fd, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    ReadGameData(fd, chunkTag, sizeof(i32));
     m_worldMap.Read(fd, 0);
-    platform::FileRead(fd, chunkTag, sizeof(i32));
+    ReadGameData(fd, chunkTag, sizeof(i32));
     platform::FileClose(fd);
 
     gpAdvManager->m_heroContextLocked = false;
@@ -2622,7 +2675,7 @@ i32 game::LoadMap(const char* filename) {
     handle = platform::FileOpen(gText, platform::FileMode::Read);
     if (handle == -1)
         FileError(gText);
-    platform::FileRead(handle, &m_mapHeader, sizeof(m_mapHeader));
+    ReadGameData(handle, &m_mapHeader, sizeof(m_mapHeader));
     localization::SetCurrentFileTextEncoding(
         GetMapHeaderTextEncoding(&m_mapHeader)
     );
@@ -2636,9 +2689,9 @@ i32 game::LoadMap(const char* filename) {
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
-        platform::FileRead(handle, x, sizeof(x[0]));
-        platform::FileRead(handle, y, sizeof(y[0]));
-        platform::FileRead(handle, type, sizeof(type[0]));
+        ReadGameData(handle, x, sizeof(x[0]));
+        ReadGameData(handle, y, sizeof(y[0]));
+        ReadGameData(handle, type, sizeof(type[0]));
         if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
             m_castleRecs[i].m_onMap = 1;
             m_castleRecs[i].m_x = static_cast<u8>(x[0]);
@@ -2658,9 +2711,9 @@ i32 game::LoadMap(const char* filename) {
             y[0] = -1;
             type[0] = -1;
         } else {
-            platform::FileRead(handle, x, sizeof(x[0]));
-            platform::FileRead(handle, y, sizeof(y[0]));
-            platform::FileRead(handle, type, sizeof(type[0]));
+            ReadGameData(handle, x, sizeof(x[0]));
+            ReadGameData(handle, y, sizeof(y[0]));
+            ReadGameData(handle, type, sizeof(type[0]));
         }
         if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
             m_mines[i].guardianType = CREATURE_NONE;
@@ -2671,20 +2724,28 @@ i32 game::LoadMap(const char* filename) {
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    platform::FileRead(handle, &m_obeliskCount, sizeof(m_obeliskCount));
-    platform::FileRead(
+    ReadGameData(handle, &m_obeliskCount, sizeof(m_obeliskCount));
+    RequireGameData(m_mapHeader.rumourCount <= GAME_RUMOUR_EVENT_CAPACITY);
+    ReadGameData(
         handle,
         m_rumourEventIndices,
         m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
     );
     m_rumourEventCount = m_mapHeader.rumourCount;
-    platform::FileRead(
+    RequireGameData(m_mapHeader.timeEventCount <= GAME_TIME_EVENT_CAPACITY);
+    ReadGameData(
         handle,
         m_timeEventIndices,
         m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    platform::FileRead(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    ReadGameData(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    const i32 mapExtraTableBytes = platform::FileLength(handle) - platform::FileTell(handle);
+    const i32 minimumExtraRecordSize = sizeof(i16);
+    RequireGameData(iMaxMapExtra > 0 && mapExtraTableBytes >= 0
+                    && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
+    RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
     );
@@ -2694,11 +2755,12 @@ i32 game::LoadMap(const char* filename) {
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i = 1; i < iMaxMapExtra; i++) {
-        platform::FileRead(handle, pwSizeOfMapExtra + i, sizeof(pwSizeOfMapExtra[0]));
+        ReadGameData(handle, pwSizeOfMapExtra + i, sizeof(pwSizeOfMapExtra[0]));
+        RequireReadableBytes(handle, pwSizeOfMapExtra[i]);
         ppMapExtra[i] = H2_ALLOC(pwSizeOfMapExtra[i]);
-        platform::FileRead(handle, ppMapExtra[i], pwSizeOfMapExtra[i]);
+        ReadGameData(handle, ppMapExtra[i], pwSizeOfMapExtra[i]);
     }
-    platform::FileRead(handle, junk, sizeof(u16));
+    ReadGameData(handle, junk, sizeof(u16));
     platform::FileClose(handle);
     return 0;
 }
@@ -3397,10 +3459,7 @@ void game::ViewArmy(
         viewArmyFacingWIPXMod = 1;
     gpResourceManager
         ->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[H2EnumIndex(monsterType)], 1));
-    gpResourceManager->ReadBlock(
-        reinterpret_cast<i8*>(&sViewArmyMonFrameInfo),
-        sizeof(sViewArmyMonFrameInfo)
-    );
+    gpResourceManager->ReadBlock(&sViewArmyMonFrameInfo, sizeof(sViewArmyMonFrameInfo));
     ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
@@ -6220,7 +6279,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         goto transmitCleanup;
     }
     {
-        platform::FileRead(file, fileData, fileSize);
+        ReadGameData(file, fileData, fileSize);
         platform::FileClose(file);
         fileCrc = calc_crc_long(fileData, fileSize);
         if (gbUseBzip2Compression) {
@@ -6617,7 +6676,7 @@ i32 game::ReceiveSaveGame(
     file = platform::FileOpen(filename, platform::FileMode::Write);
     if (file == -1)
         FileError(filename);
-    platform::FileWrite(file, decodedData, dataSize);
+    WriteGameData(file, decodedData, dataSize);
     platform::FileClose(file);
     success = true;
 
@@ -6885,15 +6944,13 @@ void game::RestoreCell(
 }
 
 void game::SetMapSize(i32 w, i32 h) {
-    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized)
-        goto mapSized;
-    {
+    RequireValidMapDimensions(w, h);
+    if (MAP_HEIGHT != h || MAP_WIDTH != w || !bMapInitialized) {
         bMapInitialized = true;
         MAP_WIDTH = w;
         MAP_HEIGHT = h;
         gpSearchArray->Init();
     }
-mapSized:
     if (mapExtra)
         H2_FREE(mapExtra);
     mapExtra = static_cast<u8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
@@ -6986,7 +7043,7 @@ void CreateDiffFile(
     readFile = platform::FileOpen(gText, platform::FileMode::Read);
     if (readFile == -1)
         FileError(gText);
-    platform::FileRead(readFile, fullData, joinSize);
+    ReadGameData(readFile, fullData, joinSize);
     platform::FileClose(readFile);
     LogInt(
         "Orig Join CRC",
@@ -7007,7 +7064,7 @@ void CreateDiffFile(
         inFd = platform::FileOpen(gText, platform::FileMode::Read);
         if (inFd == -1)
             FileError(gText);
-        platform::FileRead(inFd, prevData, oldSize);
+        ReadGameData(inFd, prevData, oldSize);
         platform::FileClose(inFd);
     }
 
@@ -7069,14 +7126,14 @@ void CreateDiffFile(
     destFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (destFile == -1)
         FileError(gText);
-    platform::FileWrite(destFile, diffOut, diffTotal);
+    WriteGameData(destFile, diffOut, diffTotal);
     platform::FileClose(destFile);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
     destFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (destFile == -1)
         FileError(gText);
-    platform::FileWrite(destFile, fullData, joinSize);
+    WriteGameData(destFile, fullData, joinSize);
     platform::FileClose(destFile);
 
     if (prevData != NULL)
@@ -7108,7 +7165,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     diffFile = platform::FileOpen(gText, platform::FileMode::Read);
     if (diffFile == -1)
         FileError(gText);
-    platform::FileRead(diffFile, diffData, diffLength);
+    ReadGameData(diffFile, diffData, diffLength);
     platform::FileClose(diffFile);
 
     outData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
@@ -7123,7 +7180,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         diffFile = platform::FileOpen(gText, platform::FileMode::Read);
         if (diffFile == -1)
             FileError(gText);
-        platform::FileRead(diffFile, oldBuf, oldSize);
+        ReadGameData(diffFile, oldBuf, oldSize);
         platform::FileClose(diffFile);
         memcpy(outData, oldBuf, oldSize);
 
@@ -7145,7 +7202,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     joinFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile == -1)
         FileError(gText);
-    platform::FileWrite(joinFile, outData, outSize);
+    WriteGameData(joinFile, outData, outSize);
     platform::FileClose(joinFile);
     LogInt(
         "New Join CRC",
@@ -7162,7 +7219,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     joinFile = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile == -1)
         FileError(gText);
-    platform::FileWrite(joinFile, outData, outSize);
+    WriteGameData(joinFile, outData, outSize);
     platform::FileClose(joinFile);
 
     if (oldBuf)
@@ -7439,7 +7496,7 @@ i32 CalcFileCRC(char* file) {
     i32 fp = platform::FileOpen(file, platform::FileMode::Read);
     if (fp == -1)
         FileError(file);
-    platform::FileRead(fp, blk, len);
+    ReadGameData(fp, blk, len);
     i32 checksum = calc_crc_long(reinterpret_cast<u8*>(blk), len);
     platform::FileClose(fp);
     H2_FREE(blk);

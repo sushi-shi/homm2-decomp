@@ -385,7 +385,7 @@ void army::LoadResources(void) {
     gpResourceManager->PointToFile(
         gpResourceManager->MakeId(cArmyFrameFileNames[H2EnumIndex(m_monsterType)], 1)
     );
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(&m_frameInfo), sizeof(m_frameInfo));
+    gpResourceManager->ReadBlock(&m_frameInfo, sizeof(m_frameInfo));
     ModifyFrameInfo(&m_frameInfo, m_monsterType);
     m_walkDuration = m_frameInfo.walkDuration;
 

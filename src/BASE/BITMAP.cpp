@@ -37,7 +37,7 @@ bitmap::bitmap(u32l id)
     size = m_width * m_height;
     m_pixels = new u8[size];
     PollSound();
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
+    gpResourceManager->ReadBlock(m_pixels, size);
     PollSound();
 }
 bitmap::~bitmap(void) {

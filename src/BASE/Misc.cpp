@@ -573,9 +573,14 @@ void ReadPrefsFromFile(void) {
         SetGameDefaults();
         WritePrefs();
     } else {
-        platform::FileRead(file, &gConfig, CONFIG_PERSISTED_SIZE);
+        const bool complete = platform::FileReadExact(file, &gConfig, CONFIG_PERSISTED_SIZE);
         platform::FileClose(file);
-        if (gConfig.needsDefaultInitialization != 0) {
+        if (!complete) {
+            memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
+            SetInstallDefaults();
+            SetGameDefaults();
+            WritePrefs();
+        } else if (gConfig.needsDefaultInitialization != 0) {
             SetGameDefaults();
             WritePrefs();
         }
@@ -611,7 +616,9 @@ void WritePrefsToFile(void) {
     fd = platform::FileOpen("HEROES2.CFG", platform::FileMode::Write);
     if (fd == -1)
         return;
-    platform::FileWrite(fd, &gConfig, CONFIG_PERSISTED_SIZE);
+    if (!platform::FileWriteExact(fd, &gConfig, CONFIG_PERSISTED_SIZE)) {
+        platform::Host().Log(platform::LogLevel::Warning, "preferences: incomplete write");
+    }
     platform::FileClose(fd);
 }
 
@@ -724,7 +731,10 @@ void LogTruncate(void) {
         return;
     strcpy(logText, "===========New Log==========");
     strcat(logText, "\n");
-    platform::FileWrite(fileHandle, logText, strlen(logText));
+    if (!platform::FileWriteExact(fileHandle, logText, static_cast<i32>(strlen(logText)))) {
+        platform::FileClose(fileHandle);
+        return;
+    }
     platform::FileClose(fileHandle);
 }
 
@@ -738,7 +748,10 @@ void LogStr(const char* text) {
         return;
     strcpy(logText, text);
     strcat(logText, "\n");
-    platform::FileWrite(out, logText, static_cast<i32>(strlen(logText)));
+    if (!platform::FileWriteExact(out, logText, static_cast<i32>(strlen(logText)))) {
+        platform::FileClose(out);
+        return;
+    }
     platform::FileClose(out);
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
         platform::Host().Log(platform::LogLevel::Debug, logText);
@@ -947,7 +960,7 @@ void CreatePCXFile(
     fd = platform::FileOpen(filename, platform::FileMode::Write);
     if (fd == -1)
         return;
-    platform::FileWrite(fd, &pcxHdr, sizeof(pcxHdr));
+    bool complete = platform::FileWriteExact(fd, &pcxHdr, sizeof(pcxHdr));
     encodedRow = static_cast<u8*>(H2_ALLOC(width * 2));
     for (y = 0; y < height; ++y) {
         sourceIndex = 0;
@@ -971,17 +984,19 @@ void CreatePCXFile(
                 sourceIndex += 1;
             }
         }
-        platform::FileWrite(fd, encodedRow, iLen);
+        complete = complete && platform::FileWriteExact(fd, encodedRow, iLen);
     }
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
-    platform::FileWrite(fd, &bMark, 1);
+    complete = complete && platform::FileWriteExact(fd, &bMark, 1);
     palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
     for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
-    platform::FileWrite(fd, palOut, PALETTE_BYTE_COUNT);
+    complete = complete && platform::FileWriteExact(fd, palOut, PALETTE_BYTE_COUNT);
     H2_FREE(palOut);
     platform::FileClose(fd);
+    if (!complete)
+        platform::Host().Log(platform::LogLevel::Warning, "screenshot: incomplete PCX write");
 }
 
 i32l FileSize(const char* filename) {

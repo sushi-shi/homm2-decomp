@@ -164,8 +164,11 @@ void highScoreManager::Update(void) {
     for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
-        else
-            platform::FileRead(inputFile, &highScore, sizeof(highScore));
+        else if (!platform::FileReadExact(inputFile, &highScore, sizeof(highScore))) {
+            noScoreFile = true;
+            memset(&highScore, 0, sizeof(highScore));
+            highScore.score = HIGH_SCORE_EMPTY;
+        }
 
         if (highScore.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[rank] = 0;

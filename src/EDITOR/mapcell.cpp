@@ -3,12 +3,42 @@
 #include "EDITOR/mapcell.h"
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/Localization.h>
+#include <SOURCE/REQUEST.h>
 #include <string.h>
 #include <PLATFORM/File.h>
 
 typedef enum MapCellExtraConstant {
     EXTRA_ALLOCATION_STEP = 100
 } MapCellExtraConstant;
+
+namespace {
+
+void ReadMapData(i32 file, void* buffer, i32 count) {
+    if (!platform::FileReadExact(file, buffer, count))
+        ShutDown(localization::Tr("system.file.read_error"));
+}
+
+void WriteMapData(i32 file, const void* buffer, i32 count) {
+    if (!platform::FileWriteExact(file, buffer, count))
+        ShutDown(localization::Tr("system.file.write_error"));
+}
+
+void RequireValidMapDimensions(i32 width, i32 height) {
+    if (width <= 0 || height <= 0 || width > MAP_DIMENSION_XLARGE
+        || height > MAP_DIMENSION_XLARGE)
+        ShutDown(localization::Tr("system.file.read_error"));
+}
+
+void RequireRecordsFit(i32 file, i32 count, i32 recordSize) {
+    const i32 position = platform::FileTell(file);
+    const i32 length = platform::FileLength(file);
+    if (count < 0 || recordSize <= 0 || position < 0 || length < position
+        || count > (length - position) / recordSize)
+        ShutDown(localization::Tr("system.file.read_error"));
+}
+
+}
 
 fullMap::fullMap(void) {
     cells = NULL;
@@ -135,11 +165,11 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
 }
 
 void fullMap::Write(i32 handle) {
-    platform::FileWrite(handle, &width, sizeof(width));
-    platform::FileWrite(handle, &height, sizeof(height));
-    platform::FileWrite(handle, cells, width * height * sizeof(mapCell));
-    platform::FileWrite(handle, &extraCount, sizeof(extraCount));
-    platform::FileWrite(handle, extras, extraCount * sizeof(mapCellExtra));
+    WriteMapData(handle, &width, sizeof(width));
+    WriteMapData(handle, &height, sizeof(height));
+    WriteMapData(handle, cells, width * height * sizeof(mapCell));
+    WriteMapData(handle, &extraCount, sizeof(extraCount));
+    WriteMapData(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
 void fullMap::Read(i32 handle, i32 convert) {
@@ -148,31 +178,37 @@ void fullMap::Read(i32 handle, i32 convert) {
     i32 x, y;
     oldMapCellExtra* tmp2;
 
-    platform::FileRead(handle, &width, sizeof(width));
-    platform::FileRead(handle, &height, sizeof(height));
+    ReadMapData(handle, &width, sizeof(width));
+    ReadMapData(handle, &height, sizeof(height));
+    RequireValidMapDimensions(width, height);
     Init(width, height);
     if (convert) {
+        RequireRecordsFit(handle, width * height, sizeof(oldMapCell));
         tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
-        platform::FileRead(handle, tmp1, width * height * sizeof(oldMapCell));
+        ReadMapData(handle, tmp1, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
         H2_FREE(tmp1);
     } else {
-        platform::FileRead(handle, cells, width * height * sizeof(mapCell));
+        RequireRecordsFit(handle, width * height, sizeof(mapCell));
+        ReadMapData(handle, cells, width * height * sizeof(mapCell));
     }
-    platform::FileRead(handle, &extraCount, sizeof(extraCount));
+    ReadMapData(handle, &extraCount, sizeof(extraCount));
     if (extras)
         H2_FREE(extras);
-    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
     if (convert) {
+        RequireRecordsFit(handle, extraCount, sizeof(oldMapCellExtra));
+        extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
         tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
-        platform::FileRead(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
+        ReadMapData(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
         H2_FREE(tmp2);
     } else {
-        platform::FileRead(handle, extras, extraCount * sizeof(mapCellExtra));
+        RequireRecordsFit(handle, extraCount, sizeof(mapCellExtra));
+        extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
+        ReadMapData(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
 

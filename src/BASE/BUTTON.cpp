@@ -78,7 +78,7 @@ void button::Read(void) {
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    gpResourceManager->Read13(reinterpret_cast<i8*>(iconName));
+    gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
     m_icon = gpResourceManager->GetIcon(m_iconId);

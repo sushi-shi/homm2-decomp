@@ -572,6 +572,8 @@ HOMM2_MESSAGE("network.incoming_data.must_exit", "[ Incoming data, must exit... 
 HOMM2_MESSAGE("system.unexpected_termination", "Unexpected Program Termination")
 HOMM2_MESSAGE("system.goodbye", "Bye!")
 HOMM2_MESSAGE("system.file.open_error", "Error opening file %s!")
+HOMM2_MESSAGE("system.file.read_error", "Error reading game data!")
+HOMM2_MESSAGE("system.file.write_error", "Error writing game data!")
 HOMM2_MESSAGE("high_score.cheater_rating", "Cheater!!!")
 HOMM2_MESSAGE(
     "high_score.congratulations.standard",

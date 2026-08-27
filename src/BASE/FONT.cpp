@@ -34,7 +34,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
         m_isLarge = true;
     else
         m_isLarge = false;
-    gpResourceManager->Read13(reinterpret_cast<i8*>(name));
+    gpResourceManager->Read13(name);
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(name);
     gbLoadingMonoIcon = false;

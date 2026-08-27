@@ -16,8 +16,8 @@ enum class FileMode {
 i32 FileOpen(const char* retailPath, FileMode mode);
 i32 FileOpenLocale(const char* retailPath);
 void FileClose(i32 file);
-i32 FileRead(i32 file, void* buffer, i32 count);
-i32 FileWrite(i32 file, const void* buffer, i32 count);
+[[nodiscard]] bool FileReadExact(i32 file, void* buffer, i32 count);
+[[nodiscard]] bool FileWriteExact(i32 file, const void* buffer, i32 count);
 i32 FileSeek(i32 file, i32 offset);
 i32 FileTell(i32 file);
 i32 FileLength(i32 file);

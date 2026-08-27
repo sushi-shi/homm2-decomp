@@ -60,7 +60,7 @@ sample::sample(const char* name)
         static_cast<char*>(H2_ALLOC(size));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
+    gpResourceManager->ReadBlock(m_playbackData.data, size);
 }
 
 inline sample::~sample() {
