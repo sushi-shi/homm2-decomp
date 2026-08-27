@@ -51,7 +51,7 @@ class highScoreManager : public baseManager {
 public:
     i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
     i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
-    char m_showCampaignScores;
+    bchar m_showCampaignScores;
     heroWindow* m_window;
     highScoreManager(void);
     virtual i32 Open(i32) override;

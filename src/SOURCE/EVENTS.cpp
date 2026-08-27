@@ -515,7 +515,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                         if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), 1, -1);
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), true, -1);
                             if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_k = primaryReward_e;
                                 secondaryAmount_j = primaryAmount_j;
@@ -753,7 +753,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    1,
+                    true,
                     -1
                 );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
@@ -877,7 +877,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), 1, -1);
+                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), true, -1);
             } else {
                 NormalDialog(
                     localization::Tr("event.inline.12821ba5d6cffff7"),
@@ -1257,7 +1257,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero2,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    1,
+                    true,
                     -1
                 );
             } else {
@@ -1592,7 +1592,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
+                GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
                 cell->m_objectMetadata = 0;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1654,7 +1654,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
                             gArtifactNames[eventValue1]
                         );
-                        GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
+                        GiveArtifact(eventHero2, ArtifactType(eventValue1), true, -1);
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -2734,7 +2734,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
+                GiveArtifact(eventHero2, artifact_g, true, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject_l = 1;
                 fizzleType_k = true;
                 break;
@@ -2753,7 +2753,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
+                GiveArtifact(eventHero2, artifact_g, true, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject_l = 1;
                 fizzleType_k = true;
                 break;
@@ -2881,7 +2881,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1
                         );
                     giveArtifact:
-                        GiveArtifact(eventHero2, artifact_g, 1, -1);
+                        GiveArtifact(eventHero2, artifact_g, true, -1);
                         eraseObject_l = 1;
                         fizzleType_k = true;
                         break;
@@ -3722,7 +3722,7 @@ event_done:
     UpdateRadar(1, 0);
     UpdateHeroLocators(1, 1);
     UpdateTownLocators(1, 1);
-    UpdBottomView(1, 1, 1);
+    UpdBottomView(true, true, true);
     if (eraseObject_l) {
         EraseObj(cell, x, y);
         FizzleCenter(fizzleType_k);
@@ -4794,8 +4794,8 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
 
     eventHero->m_artifacts[artifactSlot] = artifact;
     eventHero->m_artifactExtra[artifactSlot] = artifactExtra;
-    GiveTakeArtifactStat(eventHero, artifact, 0);
-    eventHero->CheckAnduranPieces(0);
+    GiveTakeArtifactStat(eventHero, artifact, false);
+    eventHero->CheckAnduranPieces(false);
     if (checkEndGame)
         CheckEndGame(END_GAME_FORCE_NONE, false);
     return artifactSlot;
@@ -5946,7 +5946,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
             }
         }
     }
-    destinationHero->CheckAnduranPieces(0);
+    destinationHero->CheckAnduranPieces(false);
 }
 
 void advManager::HeroLoses(hero* lostHero) {
@@ -6056,7 +6056,6 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 creatureCosts_a[H2EnumIndex(RES_COUNT)];
     i32 spellPower_j;
     i32 adjacentMonster_j;
-
     boatRecord* boat_k;
     i32 exitCount;
     ResourceType resourceType_a;
@@ -6194,7 +6193,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    1,
+                    true,
                     -1
                 );
             } else {
@@ -6297,7 +6296,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveArtifact(
                         eventHero,
                         ArtifactType(cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET),
-                        1,
+                        true,
                         -1
                     );
                     cell->m_objectMetadata = SKELETON_EMPTY;
@@ -6341,7 +6340,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT) {
                         index_h = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                        GiveArtifact(eventHero, ArtifactType(index_h), 1, -1);
+                        GiveArtifact(eventHero, ArtifactType(index_h), true, -1);
                     }
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 } else {
@@ -6362,7 +6361,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveArtifact(
                     eventHero,
                     ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
-                    1,
+                    true,
                     -1
                 );
                 GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_ARTIFACT_GOLD);
@@ -6723,7 +6722,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (eventHero->NumArtifacts() == HERO_ARTIFACT_SLOT_COUNT)
                 break;
             if (artifact_g == ARTIFACT_SPELL_SCROLL) {
-                GiveArtifact(eventHero, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
+                GiveArtifact(eventHero, artifact_g, true, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject_l = 1;
                 break;
             }
@@ -6762,7 +6761,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         if (gpCurPlayer->m_resources[index_h] < 0)
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
-                    GiveArtifact(eventHero, artifact_g, 1, -1);
+                    GiveArtifact(eventHero, artifact_g, true, -1);
                     eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
@@ -7072,7 +7071,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), 1, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), true, -1);
             eraseObject_l = 1;
             break;
 
@@ -7126,7 +7125,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 }
                 if (eventExtra_o->artifact != -1
                     && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
-                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), 1, -1);
+                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), true, -1);
                 }
                 eventExtra_o->active = 0;
             } else {
@@ -7979,7 +7978,7 @@ CombatResult advManager::DoCombat(
     i32 remotePlayer;
     tag_message message9;
     H2EnumStorage<CombatResult, i8> combatResult3;
-    i32 savedShowIt_f;
+    b32 savedShowIt_f;
     i32 secondPlayer8;
     i32 savedPlayer1;
 
@@ -8095,7 +8094,7 @@ CombatResult advManager::DoCombat(
                 }
             }
         } else if (!gbThisNetHumanPlayer[firstPlayer4]) {
-            bShowIt = 1;
+            bShowIt = true;
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
@@ -8106,7 +8105,7 @@ CombatResult advManager::DoCombat(
         }
     }
 
-    bShowIt = 1;
+    bShowIt = true;
     gpCombatManager->SetupCombat(
         x,
         y,
@@ -8161,9 +8160,9 @@ combatFinished:
     if (!gbHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
         gpGame->TurnOnAIMusic();
-        platform::SetDialogMenusEnabled(0);
+        platform::SetDialogMenusEnabled(false);
     } else {
-        platform::SetDialogMenusEnabled(1);
+        platform::SetDialogMenusEnabled(true);
     }
     MobilizeCurrHero(0);
     if (processLosses)
@@ -8463,13 +8462,13 @@ CombatResult advManager::AutoResolveCombat(
     i32 processLosses
 ) {
     tag_message message;
-    i32 savedShowIt;
+    b32 savedShowIt;
 
     gbNoShowCombat = true;
     savedShowIt = bShowIt;
-    bShowIt = 0;
+    bShowIt = false;
     gpMouseManager->SetPointer(0);
-    gpMouseManager->m_forcePointerUpdate = 1;
+    gpMouseManager->m_forcePointerUpdate = true;
     message.type = MESSAGE_NONE;
     DemobilizeCurrHero();
     gpCombatManager->SetupCombat(
@@ -8517,15 +8516,15 @@ CombatResult advManager::AutoResolveCombat(
     if (!gbHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
         gpGame->TurnOnAIMusic();
-        platform::SetDialogMenusEnabled(0);
+        platform::SetDialogMenusEnabled(false);
     } else {
-        platform::SetDialogMenusEnabled(1);
+        platform::SetDialogMenusEnabled(true);
     }
     MobilizeCurrHero(0);
     if (processLosses)
         gbRetreatWin = false;
     gbInCombat = false;
-    gpMouseManager->m_forcePointerUpdate = 0;
+    gpMouseManager->m_forcePointerUpdate = false;
     return gpCombatManager->m_combatResult;
 }
 

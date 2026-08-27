@@ -1390,7 +1390,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
+i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
     i32 item;
     town* selectedTown;
     hero* curHero;

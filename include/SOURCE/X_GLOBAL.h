@@ -122,7 +122,7 @@ inline SpellEffectDisplayType NextSpellEffectDisplayType(SpellEffectDisplayType 
     return (type + 1) % H2EnumIndex(SPELL_EFFECT_DISPLAY_COUNT);
 }
 
-extern i8 xIsExpansionMap;
+extern b8 xIsExpansionMap;
 extern ExpansionCampaignId xLastChoice;
 extern u8 xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;

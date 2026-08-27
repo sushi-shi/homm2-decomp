@@ -61,9 +61,9 @@ void ChangeMenu(MenuHandle menu) {
 
 void SetMenuItemChecked(MenuHandle, i32, bool) {}
 
-void SetDialogMenusEnabled(i32) {}
+void SetDialogMenusEnabled(b32) {}
 
-void SetMenuVisible(i32) {}
+void SetMenuVisible(b32) {}
 
 void InitializeVideo() {}
 

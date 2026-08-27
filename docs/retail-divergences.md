@@ -22,7 +22,10 @@ same behavior has a clearer portable representation.
 In particular, the castle dialog's selection value can hold either a
 `BuildingSlotType` value or a UI control identifier. `master` models that mixed
 discriminant as an integer and converts to `BuildingSlotType` only when entering
-a building API. Redundant jumps with one natural structured successor are also
+a building API. The overview return path also tests its occupied-town pointer
+with `!= nullptr`; the exact branch retains the retail pointer-to-integer truth
+expression because the clearer spelling changes VC6 code generation. Redundant
+jumps with one natural structured successor are also
 expressed as fallthrough, loop exit, or ordinary conditional flow. Jumps that
 still represent a real shared tail, cleanup path, retry loop, or multi-loop exit
 remain explicit.

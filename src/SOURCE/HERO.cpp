@@ -2142,7 +2142,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     );
 }
 
-void hero::CheckAnduranPieces(i32 showDialog) {
+void hero::CheckAnduranPieces(b32 showDialog) {
     i32 artifactSlot;
 
     if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)

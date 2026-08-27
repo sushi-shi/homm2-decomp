@@ -467,10 +467,10 @@ i32 game::NewGame(void) {
         delete choiceWindow;
         switch (static_cast<NewGameMapChoice>(static_cast<i16>(gpWindowManager->m_dialogResult))) {
             case MAP_CHOICE_STANDARD:
-                xIsExpansionMap = 0;
+                xIsExpansionMap = false;
                 break;
             case MAP_CHOICE_EXPANSION:
-                xIsExpansionMap = 1;
+                xIsExpansionMap = true;
                 break;
             case MAP_CHOICE_CANCEL:
                 return 0;
