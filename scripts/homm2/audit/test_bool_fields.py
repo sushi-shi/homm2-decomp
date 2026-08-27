@@ -13,9 +13,11 @@ import clang.cindex as ci
 
 from homm2.audit.bool_fields import (
     _boolean_domain,
+    _command_arguments,
     _entries,
     _integer_literal,
     _merge,
+    _parse_driver_includes,
     analyze_translation_unit,
     main,
 )
@@ -382,6 +384,29 @@ void LocalFlags(i32 incoming) {
             with self.assertRaisesRegex(RuntimeError, "outside this worktree"):
                 _entries(repo)
 
+    def test_compilation_database_accepts_arguments_or_shell_command(self):
+        self.assertEqual(
+            _command_arguments({"arguments": ["c++", "-DVALUE=one two"]}),
+            ["c++", "-DVALUE=one two"],
+        )
+        self.assertEqual(
+            _command_arguments({"command": "c++ '-DVALUE=one two' file.cpp"}),
+            ["c++", "-DVALUE=one two", "file.cpp"],
+        )
+
+    def test_native_driver_include_paths_are_extracted(self):
+        stderr = """ignored
+#include <...> search starts here:
+ /toolchain/include/c++
+ /sdk/include (framework directory)
+End of search list.
+ignored
+"""
+        self.assertEqual(
+            _parse_driver_includes(stderr),
+            ("/toolchain/include/c++", "/sdk/include"),
+        )
+
     def test_merge_deduplicates_header_evidence_seen_by_multiple_tus(self):
         declaration = {
             "file": "include/value.h", "line": 2, "column": 9,
@@ -448,6 +473,23 @@ void LocalFlags(i32 incoming) {
         with mock.patch("homm2.audit.bool_fields.scan", return_value=unproven), \
                 redirect_stdout(StringIO()):
             self.assertEqual(main(["--check"]), 1)
+
+    def test_portable_mode_is_forwarded_to_scan(self):
+        base = {
+            "translation_units": 1,
+            "i32_fields": 0,
+            "b32_fields": 0,
+            "eligible_fields": 0,
+            "rejected_fields": 0,
+            "candidates": [],
+            "rejected": [],
+            "b32_numeric_literal_writes": [],
+            "b32_unproven_writes": [],
+        }
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=base) as scan_mock, \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--portable"]), 0)
+        scan_mock.assert_called_once_with(jobs=0, filters=[], portable=True)
 
     def test_boolean_parameters_are_inventoried_separately(self):
         text = r"""

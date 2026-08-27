@@ -39,11 +39,14 @@ Run inside ``nix develop .#build``::
 from __future__ import annotations
 
 import argparse
+import functools
 import gc
 import importlib
 import json
 import os
 import re
+import shlex
+import subprocess
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict, dataclass, field
@@ -642,15 +645,98 @@ def analyze_translation_unit(translation: ci.TranslationUnit, source: Path,
     return list(candidates.values())
 
 
-def _parse_batch(arguments: tuple[Path, list[dict]]) -> list[dict]:
-    repo, entries = arguments
+def _command_arguments(entry: dict) -> list[str]:
+    arguments = entry.get("arguments")
+    if arguments:
+        return list(arguments)
+    command = entry.get("command")
+    if command:
+        return shlex.split(command)
+    raise RuntimeError(f"compilation database entry has no command: {entry.get('file', '<unknown>')}")
+
+
+def _parse_driver_includes(stderr: str) -> tuple[str, ...]:
+    collecting = False
+    paths = []
+    for raw in stderr.splitlines():
+        line = raw.strip()
+        if line == "#include <...> search starts here:":
+            collecting = True
+            continue
+        if collecting and line == "End of search list.":
+            break
+        if collecting and line:
+            suffix = " (framework directory)"
+            if line.endswith(suffix):
+                line = line[:-len(suffix)]
+            paths.append(line)
+    return tuple(paths)
+
+
+@functools.lru_cache(maxsize=None)
+def _compiler_system_includes(compiler: str,
+                              target_options: tuple[str, ...]) -> tuple[str, ...]:
+    result = subprocess.run(
+        [compiler, *target_options, "-E", "-x", "c++", "-", "-v"],
+        input="",
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    includes = _parse_driver_includes(result.stderr)
+    if result.returncode or not includes:
+        detail = result.stderr.strip().splitlines()
+        tail = detail[-1] if detail else f"exit status {result.returncode}"
+        raise RuntimeError(f"could not query native compiler include paths: {tail}")
+    return includes
+
+
+def _portable_clang_args(repo: Path, entry: dict) -> list[str]:
+    command = _command_arguments(entry)
+    compiler = command[0]
+    directory = Path(entry.get("directory", repo))
+    args = ["-x", "c++", "-std=c++20", "-ferror-limit=0"]
+    target_options = tuple(
+        option for option in command[1:]
+        if option in ("-m32", "-m64") or option.startswith("--target=")
+    )
+
+    path_options = {"-I", "-isystem", "-iquote", "-idirafter", "-include", "-imacros"}
+    index = 1
+    while index < len(command):
+        option = command[index]
+        if option in path_options:
+            if index + 1 >= len(command):
+                raise RuntimeError(f"missing argument after {option} in compilation database")
+            value = Path(command[index + 1])
+            args.extend((option, str(value if value.is_absolute() else directory / value)))
+            index += 2
+            continue
+        if option.startswith("-I") and option != "-I":
+            value = Path(option[2:])
+            args.append("-I" + str(value if value.is_absolute() else directory / value))
+        elif option.startswith(("-D", "-U", "--sysroot=", "--target=")):
+            args.append(option)
+        elif option in ("-m32", "-m64", "-pthread", "-fms-extensions"):
+            args.append(option)
+        index += 1
+
+    for path in _compiler_system_includes(compiler, target_options):
+        args.extend(("-isystem", path))
+    args.extend(("-I", str(repo / "include"), "-I", str(repo)))
+    return args
+
+
+def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> list[dict]:
+    repo, entries, portable = arguments
     configure_libclang()
     index = ci.Index.create()
     rows = []
     for entry in entries:
         source = (Path(entry["directory"]) / entry["file"]).resolve()
-        translation = index.parse(
-            str(source), args=_clang_args(repo, source, mode=ClangMode.RETAIL_ANALYSIS))
+        clang_args = (_portable_clang_args(repo, entry) if portable else
+                      _clang_args(repo, source, mode=ClangMode.RETAIL_ANALYSIS))
+        translation = index.parse(str(source), args=clang_args)
         own_errors = []
         for diagnostic in translation.diagnostics:
             if diagnostic.severity < ci.Diagnostic.Error or diagnostic.location.file is None:
@@ -733,13 +819,13 @@ def _merge(rows: list[dict]) -> list[FieldFacts]:
 
 
 def scan(repo: Path = REPO, *, jobs: int = 0,
-         filters: Iterable[str] = ()) -> dict:
+         filters: Iterable[str] = (), portable: bool = False) -> dict:
     entries = _entries(repo, filters)
     if not entries:
         raise RuntimeError("no translation units selected")
     worker_count = jobs if jobs > 0 else min(8, max(1, (os.cpu_count() or 4) // 2))
     batch_size = max(1, (len(entries) + worker_count - 1) // worker_count)
-    batches = [(repo, entries[index:index + batch_size])
+    batches = [(repo, entries[index:index + batch_size], portable)
                for index in range(0, len(entries), batch_size)]
     if len(batches) == 1:
         raw = _parse_batch(batches[0])
@@ -907,10 +993,13 @@ def main(argv: list[str] | None = None) -> int:
         help=("fail when an integer Boolean candidate, numeric 0/1 write, or "
               "unproven write to Boolean storage remains"))
     parser.add_argument("--tu", action="append", default=[], help="limit to matching source paths")
+    parser.add_argument(
+        "--portable", action="store_true",
+        help="parse a native C++20 compilation database instead of the retail VC6 model")
     parser.add_argument("-j", "--jobs", type=int, default=0)
     args = parser.parse_args(argv)
     try:
-        report = scan(jobs=args.jobs, filters=args.tu)
+        report = scan(jobs=args.jobs, filters=args.tu, portable=args.portable)
     except (OSError, RuntimeError, ValueError) as error:
         print(f"homm2 audit bool-fields: {error}", file=sys.stderr)
         return 1
