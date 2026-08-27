@@ -1437,8 +1437,8 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
         sampleSet >= CONFIG_WALK_SPEED_SLOW ? CURSOR_SAMPLE_FAST_SET : CURSOR_SAMPLE_SLOW_SET;
     i32 suffixSample[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "wsnd%1d%1d.82M",
             H2EnumIndex(cursorSampleSet),
             suffixSample[index]
@@ -1939,8 +1939,8 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             UpdateScreen(0, 0);
                         }
                         if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
                                 m_mapOriginX,
                                 m_mapOriginY
@@ -2770,14 +2770,14 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             if (gbHumanPlayer[giCurPlayer]) {
                 gpSoundManager->SwitchAmbientMusic(ULTIMATE_ARTIFACT_MUSIC);
                 if (special) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("adventure.search.found_artifact"),
                         gArtifactNames[H2EnumIndex(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("adventure.search.found_artifact"),
                         gArtifactNames[H2EnumIndex(gpGame->m_ultimateArtifactId)]
                     );
@@ -4851,8 +4851,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     visitedMaskValue = HERO_EVENT_NONE;
     const auto formatDefaultQuickInfo = [&]() {
         if (visitedMaskValue != HERO_EVENT_NONE && pHero != NULL) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s\n\n%s",
                 gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                 (H2EnumIndex((pHero->m_eventFlags) & (visitedMaskValue)))
@@ -4860,15 +4860,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     : localization::Tr("adventure.quick.not_visited")
             );
         } else {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s",
                 gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
             );
         }
     };
     const auto appendMineGuard = [&]() {
-        sprintf(
+        utf8::Format(
             guardStr,
             localization::Tr("adventure.quick_info.guarded_by"),
             GetArmySizeName(
@@ -4884,8 +4884,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s",
             localization::Tr("adventure.quick.border")
         );
@@ -4894,8 +4894,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         if ((MAP_EXTRA_AT_WFIRST((m_mapOriginX + cellX), m_mapOriginY + cellY)
              & giCurPlayerBit)
             == 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%s",
                 localization::Tr("adventure.quick.uncharted")
             );
@@ -4903,16 +4903,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case MAP_OBJECT_ARTIFACT:
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s",
                         localization::Tr("adventure.quick.artifact")
                     );
                     break;
                 case MAP_OBJECT_OBELISK:
                     if (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
@@ -4928,8 +4928,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_GAZEBO:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_gazeboVisits
@@ -4944,8 +4944,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_FORT:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_fortVisits
@@ -4960,8 +4960,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_WITCH_DOCTOR_HUT:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_witchDoctorVisits
@@ -4976,8 +4976,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_MERCENARY_CAMP:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_mercenaryCampVisits
@@ -4992,8 +4992,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_STANDING_STONES:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_standingStoneVisits
@@ -5008,8 +5008,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_TREE_OF_KNOWLEDGE:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_treeKnowledgeVisits
@@ -5024,8 +5024,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_XANADU:
                     if (pHero != NULL
                         && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s\n\n%s",
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (pHero->m_xanaduVisits
@@ -5082,8 +5082,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         blocked = false;
                     }
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s\n%s",
                         gTerrainNames[H2EnumIndex(giGroundToTerrain[currentCell->m_terrainImageIndex])],
                         blocked
@@ -5092,8 +5092,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s",
                         gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
@@ -5102,16 +5102,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_MINE:
                     if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType
                         != CREATURE_NONE) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s",
                             gMineNames[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
                         );
                         appendMineGuard();
                     } else {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s",
                             gMineNames[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata]
                                                .resourceType)]
@@ -5119,8 +5119,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_RESOURCE:
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         "%s",
                         gResourceNames[currentCell->m_objectIndex / RESOURCE_FRAME_PAIR_STRIDE]
                     );
@@ -5131,15 +5131,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             m_mapOriginY + cellY,
                             CRYSTAL_BALL_RADIUS
                         )) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%d %s",
                             currentCell->m_objectMetadata & H2EnumIndex(MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s %s",
                             GetArmySizeName(
                                 currentCell->m_objectMetadata & H2EnumIndex(MAP_MONSTER_COUNT_MASK),
@@ -5152,15 +5152,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_BARRIER:
                 case MAP_OBJECT_TRAVELER_TENT:
                     if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             xBarrierColor[currentCell->m_objectMetadata & BARRIER_COLOR_MASK]
                         );
                         utf8::UppercaseFirst(gText);
                     } else {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s",
                             gTerrainNames[H2EnumIndex(giGroundToTerrain[currentCell->m_terrainImageIndex])]
                         );
@@ -5298,8 +5298,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
     strcpy(savedTextLocal, gText);
     if (giDebugLevel > 0 && currentCell != NULL) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
             currentCell->m_terrainImageIndex,
             static_cast<i32>(currentCell->ObjectTileset()),
@@ -5817,8 +5817,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     week = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
-    sprintf(
+    utf8::Format(
         week,
+        BOTTOM_VIEW_TEXT_BUFFER_SIZE,
         localization::Tr("calendar.month_week"),
         gpGame->m_month,
         gpGame->m_week
@@ -5841,8 +5842,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     day = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE));
-    sprintf(
+    utf8::Format(
         day,
+        BOTTOM_VIEW_TEXT_BUFFER_SIZE,
         localization::Tr("calendar.day"),
         gpGame->m_day
     );
@@ -5949,8 +5951,9 @@ i32 advManager::UpdBottomViewResMsg(void) {
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
         countString = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
-        sprintf(
+        utf8::Format(
             countString,
+            BOTTOM_VIEW_COUNT_BUFFER_SIZE,
             "%d",
             giBottomViewResourceQty
         );
@@ -6056,20 +6059,23 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (i = 0; i < KINGDOM_VIEW_ENTRY_COUNT; ++i) {
         countText[i] = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         if (i < KINGDOM_VIEW_RESOURCE_COUNT) {
-            sprintf(
+            utf8::Format(
                 countText[i],
+                BOTTOM_VIEW_COUNT_BUFFER_SIZE,
                 "%d",
                 gpCurPlayer->m_resources[i]
             );
         } else if (i == KINGDOM_VIEW_CASTLE_ENTRY) {
-            sprintf(
+            utf8::Format(
                 countText[i],
+                BOTTOM_VIEW_COUNT_BUFFER_SIZE,
                 "%d",
                 nCastles
             );
         } else {
-            sprintf(
+            utf8::Format(
                 countText[i],
+                BOTTOM_VIEW_COUNT_BUFFER_SIZE,
                 "%d",
                 numVillage
             );
@@ -6165,14 +6171,16 @@ i32 advManager::UpdBottomViewHero(void) {
                 armyCountLabelsResult[displayIndex] =
                     static_cast<char*>(H2_ALLOC(BOTTOM_HERO_LABEL_BYTES));
                 if (targetHero->m_army.m_creatureCounts[slotNumber] > BOTTOM_HERO_MAX_FULL_COUNT) {
-                    sprintf(
+                    utf8::Format(
                         armyCountLabelsResult[displayIndex],
+                        BOTTOM_HERO_LABEL_BYTES,
                         "%dk",
                         targetHero->m_army.m_creatureCounts[slotNumber] / BOTTOM_HERO_COUNT_DIVISOR
                     );
                 } else {
-                    sprintf(
+                    utf8::Format(
                         armyCountLabelsResult[displayIndex],
+                        BOTTOM_HERO_LABEL_BYTES,
                         "%d",
                         targetHero->m_army.m_creatureCounts[slotNumber]
                     );
@@ -6310,8 +6318,8 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     ++msg.payload.widget.id;
     ++msg.payload.widget.data.value;
     win->BroadcastMessage(msg);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%s",
         targetHero->m_name
     );
@@ -6330,8 +6338,8 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
         for (ii = 0; ii < HERO_PRIMARY_STAT_COUNT; ++ii) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "%d",
                 targetHero->Stats(HeroPrimaryStat(ii))
             );
@@ -6339,8 +6347,8 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             msg.payload.widget.data.text = gText;
             win->BroadcastMessage(msg);
         }
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%d/%d",
             targetHero->m_spellPoints,
             targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
@@ -6390,8 +6398,9 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     }
                     labels[ii] =
                         static_cast<char*>(H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY));
-                    sprintf(
+                    utf8::Format(
                         labels[ii],
+                        HERO_QUICK_ARMY_LABEL_CAPACITY,
                         "%d",
                         targetHero->m_army.m_creatureCounts[idx]
                     );
@@ -6594,7 +6603,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
 const char* advManager::GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar) {
     if (giDebugLevel > 0) {
-        sprintf(
+        utf8::Format(
             cArmySizeName,
             "%d",
             armySize
@@ -6736,8 +6745,9 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
                 localization::Tr("adventure.quick.unknown")
             );
         } else {
-            sprintf(
+            utf8::Format(
                 blankLabel,
+                TOWN_QUICK_EMPTY_LABEL_CAPACITY,
                 "%s",
                 localization::Tr("adventure.quick.none")
             );
@@ -6834,8 +6844,9 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
             troopNames[wIndex] =
                 static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
             if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
-                sprintf(
+                utf8::Format(
                     troopNames[wIndex],
+                    TOWN_QUICK_ARMY_LABEL_CAPACITY,
                     "%d",
                     townPtr->m_army.m_creatureCounts[creatureSlot]
                 );
@@ -6916,8 +6927,9 @@ void advManager::TownQuickView(i32 townId, i32, i32 windowX, i32 windowY) {
                 troopNames[wIndex] =
                     static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
                 if (scouting == TOWN_QUICK_INFORMATION_EXACT) {
-                    sprintf(
+                    utf8::Format(
                         troopNames[wIndex],
+                        TOWN_QUICK_ARMY_LABEL_CAPACITY,
                         "%d",
                         townPtr->m_army.m_creatureCounts[creatureSlot]
                     );
@@ -7410,17 +7422,17 @@ i32 SaveGame(void) {
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(suffix, ".GMC");
-        sprintf(pattern, "*.GMC");
+        utf8::Format(suffix, ".GMC");
+        utf8::Format(pattern, "*.GMC");
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(suffix, ".GXC");
-        sprintf(pattern, "*.GXC");
+        utf8::Format(suffix, ".GXC");
+        utf8::Format(pattern, "*.GXC");
     } else if (xIsExpansionMap) {
-        sprintf(suffix, ".GX%d", nPlayers);
-        sprintf(pattern, "*.GX%d", nPlayers);
+        utf8::Format(suffix, ".GX%d", nPlayers);
+        utf8::Format(pattern, "*.GX%d", nPlayers);
     } else {
-        sprintf(suffix, ".GM%d", nPlayers);
-        sprintf(pattern, "*.GM%d", nPlayers);
+        utf8::Format(suffix, ".GM%d", nPlayers);
+        utf8::Format(pattern, "*.GM%d", nPlayers);
     }
 
     fileRequester* req = new fileRequester(
@@ -8040,8 +8052,8 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "loop%04d.82M",
             index
         );
@@ -10538,8 +10550,8 @@ i32 advManager::DoVisions(hero* visionHero) {
     type = static_cast<CreatureType>(spot->m_objectIndex);
     isForced = spot->m_objectMetadata & MONSTER_JOIN_FORCED;
     count = spot->m_objectMetadata & MONSTER_COUNT_MASK;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "{%d %s}\n\n",
         count,
         gArmyNamesPlural[H2EnumIndex(type)]
@@ -10580,7 +10592,7 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joinFee
                 <= gpGame->m_players[visionHero->m_owner].m_resources[H2EnumIndex(RES_GOLD)]) {
                 if (joinNum == count) {
-                    sprintf(
+                    utf8::Format(
                         msg,
                         localization::Tr("adventure.spell.visions.all_join_fee")
 
@@ -10588,7 +10600,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                         joinFee
                     );
                 } else {
-                    sprintf(
+                    utf8::Format(
                         msg,
                         localization::Tr("adventure.spell.visions.some_join_fee")
 

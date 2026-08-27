@@ -78,7 +78,7 @@ typedef enum FileRequesterPrivateConstant {
 } FileRequesterPrivateConstant;
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
-    sprintf(gText, "%s%s", gcMapPath, filename);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", gcMapPath, filename);
     i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1) {
         return 0;
@@ -143,7 +143,7 @@ i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i
     i32 indexData5;
     i32 moveValue;
 
-    sprintf(gText, "%s%s", directory, pattern);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", directory, pattern);
     const std::vector<std::string> files = platform::Files().List(gText);
     const auto accepts = [&](const std::string& foundFile) {
         if (m_mode != FILE_REQUESTER_MAP && m_mode != FILE_REQUESTER_MAP_GAME)
@@ -655,8 +655,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (!MapExistsForFilter(
                                         static_cast<FileRequesterMapSizeFilter>(iResult)
                                     )) {
-                                    sprintf(
-                                        gText,
+                                    utf8::Format(
+                                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                                         localization::TrPlural(
                                             "requester.map.no_matching_size",
                                             giNumHumanPlayers
@@ -846,8 +846,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 m_extensions[m_selectedIndex].text[FILE_REQUESTER_EXTENSION_PLAYER_DIGIT] - '0';
             if (iResult < giNumHumanPlayers
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("requester.load.insufficient_human_slots")
 
                     ,
@@ -869,8 +869,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 acceptStep = false;
             }
             if (iResult > giNumHumanPlayers) {
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("requester.load.replace_human_slots")
 
                     ,
@@ -1014,18 +1014,18 @@ void fileRequester::Update(i32 drawWindow) {
         const std::string selectedMapName = DecodeMapHeaderText(
             m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].name
         );
-        sprintf(gText, "%s", selectedMapName.c_str());
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", selectedMapName.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(message);
 
-        sprintf(gText, "%s", cDifficulty[H2EnumIndex(m_mapHeaders[m_selectedIndex].difficulty)]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", cDifficulty[H2EnumIndex(m_mapHeaders[m_selectedIndex].difficulty)]);
         message.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(message);
 
         const std::string selectedMapDescription = DecodeMapHeaderText(
             m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].description
         );
-        sprintf(gText, "%s", selectedMapDescription.c_str());
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", selectedMapDescription.c_str());
         message.payload.widget.id = FILE_REQUESTER_MAP_DESCRIPTION;
         m_window->BroadcastMessage(message);
     }
@@ -1096,9 +1096,9 @@ void fileRequester::Update(i32 drawWindow) {
                 const std::string mapName = DecodeMapHeaderText(
                     m_mapHeaders[m_topIndex + i], m_mapHeaders[m_topIndex + i].name
                 );
-                sprintf(gText, "%s", mapName.c_str());
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", mapName.c_str());
             } else {
-                sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", m_fileNames[m_topIndex + i].text);
             }
             message.payload.widget.data.text = gText;
             message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
@@ -1125,9 +1125,9 @@ void fileRequester::Update(i32 drawWindow) {
             const std::string mapName = DecodeMapHeaderText(
                 m_mapHeaders[m_selectedIndex], m_mapHeaders[m_selectedIndex].name
             );
-            sprintf(gText, "%s", mapName.c_str());
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", mapName.c_str());
         } else {
-            sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", m_fileNames[m_selectedIndex].text);
         }
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -1162,17 +1162,17 @@ const char* fileRequester::GetFilename(void) {
     }
 
     if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
-        sprintf(gText, "%s%s", m_filename, m_defaultExtension);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", m_filename, m_defaultExtension);
     } else if (m_mode == FILE_REQUESTER_LOAD_GAME || m_mode == FILE_REQUESTER_MAP
                || m_mode == FILE_REQUESTER_MAP_GAME) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s%s",
             m_fileNames[m_selectedIndex].text,
             m_extensions[m_selectedIndex].text
         );
     } else {
-        sprintf(gText, "%s%s", m_fileNames[m_selectedIndex].text, m_defaultExtension);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", m_fileNames[m_selectedIndex].text, m_defaultExtension);
     }
     strcpy(m_filename, gText);
     return m_filename;

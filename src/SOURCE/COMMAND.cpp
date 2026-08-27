@@ -1544,14 +1544,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             case WIN_LOSE_ANIMATION_FLEE:
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile_3, "cmbtfle2.icn");
+                    utf8::Format(iconFile_3, "cmbtfle2.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile_3, "cmbtfle3.icn");
+                    utf8::Format(iconFile_3, "cmbtfle3.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1570,14 +1570,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             default:
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile_3, "cmbtlos2.icn");
+                    utf8::Format(iconFile_3, "cmbtlos2.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile_3, "cmbtlos3.icn");
+                    utf8::Format(iconFile_3, "cmbtlos3.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1692,7 +1692,7 @@ void combatManager::ShowWinLoseArtifact(
 
     gpCombatManager->m_winLoseWindow->DrawWindow();
     SAMPLE2 playSample;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
     WaitEndSample(&playSample, -1);
 }
@@ -1717,7 +1717,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         MemError();
 
     skeletonText = static_cast<char*>(H2_ALLOC(SKELETON_COUNT_CAPACITY));
-    sprintf(skeletonText, "%d", giSkeletonsCreated);
+    utf8::Format(skeletonText, SKELETON_COUNT_CAPACITY, "%d", giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         SKELETON_TEXT_X,
         SKELETON_TEXT_Y,
@@ -1735,8 +1735,8 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
 
     window->AddWidget(m_winLoseBottomWidgets[0], -1);
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::TrPlural("combat.necromancy.raised", giSkeletonsCreated),
         giSkeletonsCreated
     );
@@ -1748,7 +1748,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 playSample;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
     WaitEndSample(&playSample, -1);
 }
@@ -1791,7 +1791,9 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         MemError();
 
     nameText = static_cast<char*>(H2_ALLOC(EAGLE_SPELL_NAME_CAPACITY));
-    sprintf(nameText, "%s", gSpellNames[H2EnumIndex(newSpell)]);
+    utf8::Format(
+        nameText, EAGLE_SPELL_NAME_CAPACITY, "%s", gSpellNames[H2EnumIndex(newSpell)]
+    );
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + EAGLE_TEXT_X_OFFSET,
         y + EAGLE_TEXT_Y_OFFSET,
@@ -1810,8 +1812,8 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     window->AddWidget(m_winLoseBottomWidgets[0], -1);
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("combat.eagle_eye.learned_spell")
 ,
         m_heroes[H2EnumIndex(m_combatResult)]->m_name,
@@ -1825,7 +1827,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 playSample;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
     WaitEndSample(&playSample, -1);
 }
@@ -1911,7 +1913,9 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
 
         if (casualtyQuantity_13[side_4] <= 0) {
             text_1 = static_cast<char*>(H2_ALLOC(CASUALTY_NONE_CAPACITY));
-            sprintf(text_1, "%s", localization::Tr("common.none"));
+            utf8::Format(
+                text_1, CASUALTY_NONE_CAPACITY, "%s", localization::Tr("common.none")
+            );
             m_winLoseBottomTextWidgets[side_4 * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 CASUALTY_TITLE_X,
                 y_7 + CASUALTY_NONE_Y_OFFSET,
@@ -1963,7 +1967,9 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 MemError();
 
             text_1 = static_cast<char*>(H2_ALLOC(CASUALTY_QUANTITY_CAPACITY));
-            sprintf(text_1, "%d", casualtyCount[side_4][armyIndex]);
+            utf8::Format(
+                text_1, CASUALTY_QUANTITY_CAPACITY, "%d", casualtyCount[side_4][armyIndex]
+            );
             m_winLoseBottomTextWidgets[side_4 * CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
                 new textWidget(
                     startX_0 + spacing_6 * armyIndex + CASUALTY_QUANTITY_X_OFFSET,
@@ -2179,7 +2185,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
                     }
                     if (levelsGained > 0 && winningSide == COMBAT_RESULT_DEFENDER
                         && giNumHumanPlayers > 1) {
-                        sprintf(
+                        utf8::Format(
                             experienceText,
                             cBattleResults[H2EnumIndex(RESULT_TEXT_NETWORK_EXPERIENCE)],
                             m_heroes[H2EnumIndex(winningSide)]->m_name,
@@ -2187,7 +2193,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
                             levelsGained
                         );
                     } else {
-                        sprintf(
+                        utf8::Format(
                             experienceText,
                             cBattleResults[H2EnumIndex(RESULT_TEXT_EXPERIENCE)],
                             m_heroes[H2EnumIndex(winningSide)]->m_name,
@@ -2253,13 +2259,13 @@ void combatManager::DoLoseWindow(void) {
 
     gbShowingLoseWindow = true;
     if (gbCombatSurrender != 0) {
-        sprintf(animationFile, "cmbtsurr.icn");
+        utf8::Format(animationFile, "cmbtsurr.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_CYCLE_SECOND;
     } else if (gbRetreatWin != 0) {
-        sprintf(animationFile, "cmbtfle1.icn");
+        utf8::Format(animationFile, "cmbtfle1.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_FLEE;
     } else {
-        sprintf(animationFile, "cmbtlos1.icn");
+        utf8::Format(animationFile, "cmbtlos1.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_LOSS;
     }
 
@@ -2269,20 +2275,20 @@ void combatManager::DoLoseWindow(void) {
 
     if (m_heroes[H2EnumIndex(losingSide)] != NULL) {
         if (gbCombatSurrender != 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cBattleResults[H2EnumIndex(RESULT_TEXT_HERO_SURRENDER)],
                 m_heroes[H2EnumIndex(losingSide)]->m_name
             );
         } else if (gbRetreatWin != 0) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cBattleResults[H2EnumIndex(RESULT_TEXT_HERO_FLEE)],
                 m_heroes[H2EnumIndex(losingSide)]->m_name
             );
         } else {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cBattleResults[H2EnumIndex(RESULT_TEXT_HERO_DEFEAT)],
                 m_heroes[H2EnumIndex(losingSide)]->m_name
             );
@@ -2350,8 +2356,8 @@ i32 combatManager::DoSurrender(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
     message.payload.widget.id = SURRENDER_PORTRAIT_RESOURCE_ID;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "port%04d.icn",
         static_cast<i32>(m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]->m_portrait)
     );
@@ -2375,8 +2381,8 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.data.text = gText;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = SURRENDER_TEXT_ID;
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         localization::Tr("combat.surrender.offer")
              ,
         m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]->m_name,
@@ -3020,19 +3026,19 @@ void combatManager::ViewBallista(i32 quickView) {
     char description[VIEW_DESCRIPTION_SIZE];
 
     m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&shooterCount, &attackSkill);
-    sprintf(gText, "%s", localization::Tr("combat.siege.ballista.title"));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", localization::Tr("combat.siege.ballista.title"));
     strcpy(description, "");
     if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
-        sprintf(description, "%s", localization::Tr("combat.siege.ballista.destroyed"));
+        utf8::Format(description, "%s", localization::Tr("combat.siege.ballista.destroyed"));
     } else if (attackSkill > 0) {
-        sprintf(
+        utf8::Format(
             description,
             localization::TrPlural("combat.siege.ballista.fires_with_bonus", shooterCount),
             shooterCount,
             attackSkill
         );
     } else {
-        sprintf(
+        utf8::Format(
             description,
             localization::TrPlural("combat.siege.ballista.fires", shooterCount),
             shooterCount
@@ -3044,11 +3050,11 @@ void combatManager::ViewBallista(i32 quickView) {
     if ((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings & H2EnumIndex(TOWN_BUILDING_LEFT_TURRET))
         != 0) {
         if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, "%s", localization::Tr("combat.siege.left_turret.destroyed"));
+            utf8::Format(description, "%s", localization::Tr("combat.siege.left_turret.destroyed"));
         } else if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_TOP_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackSkill > 0) {
-                sprintf(
+                utf8::Format(
                     description,
                     localization::TrPlural(
                         "combat.siege.left_turret.fires_with_bonus",
@@ -3058,7 +3064,7 @@ void combatManager::ViewBallista(i32 quickView) {
                     attackSkill
                 );
             } else {
-                sprintf(
+                utf8::Format(
                     description,
                     localization::TrPlural(
                         "combat.siege.left_turret.fires",
@@ -3075,11 +3081,11 @@ void combatManager::ViewBallista(i32 quickView) {
         != 0) {
         strcpy(description, "");
         if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, "%s", localization::Tr("combat.siege.right_turret.destroyed"));
+            utf8::Format(description, "%s", localization::Tr("combat.siege.right_turret.destroyed"));
         } else if (m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackSkill > 0) {
-                sprintf(
+                utf8::Format(
                     description,
                     localization::TrPlural(
                         "combat.siege.right_turret.fires_with_bonus",
@@ -3089,7 +3095,7 @@ void combatManager::ViewBallista(i32 quickView) {
                     attackSkill
                 );
             } else {
-                sprintf(
+                utf8::Format(
                     description,
                     localization::TrPlural(
                         "combat.siege.right_turret.fires",

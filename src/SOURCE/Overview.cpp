@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/BITS.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
@@ -541,8 +542,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
-                        sprintf(
+                        utf8::Format(
                             valueText,
+                            OVERVIEW_TROOP_TEXT_CAPACITY,
                             "%d",
                             static_cast<i32>(record->m_army.m_creatureCounts[i])
                         );
@@ -638,7 +640,12 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
-                        sprintf(valueText, "%d", static_cast<i32>(record->m_garrison[building]));
+                        utf8::Format(
+                            valueText,
+                            OVERVIEW_TROOP_TEXT_CAPACITY,
+                            "%d",
+                            static_cast<i32>(record->m_garrison[building])
+                        );
                         OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                             static_cast<i16>(
                                 displayedTroops * TOWN_TROOP_COLUMN_STRIDE + TOWN_DWELLING_FIRST_X
@@ -744,7 +751,12 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             for (i = 0; i < HERO_PRIMARY_STAT_COUNT; i++) {
                 valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_PRIMARY_TEXT_CAPACITY));
-                sprintf(valueText, "%d", static_cast<i32>(curHero->Stats(HeroPrimaryStat(i))));
+                utf8::Format(
+                    valueText,
+                    OVERVIEW_PRIMARY_TEXT_CAPACITY,
+                    "%d",
+                    static_cast<i32>(curHero->Stats(HeroPrimaryStat(i)))
+                );
                 OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                     static_cast<i16>(i * HERO_PRIMARY_COLUMN_STRIDE + HERO_PRIMARY_TEXT_FIRST_X),
                     static_cast<i16>(rowIndex * OVERVIEW_ROW_HEIGHT + HERO_PRIMARY_TEXT_Y_OFFSET),
@@ -807,8 +819,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         icons++;
 
                         valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
-                        sprintf(
+                        utf8::Format(
                             valueText,
+                            OVERVIEW_TROOP_TEXT_CAPACITY,
                             "%d",
                             static_cast<i32>(curHero->m_army.m_creatureCounts[i])
                         );
@@ -881,7 +894,12 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     icons++;
 
                     valueText = static_cast<char*>(H2_ALLOC(OVERVIEW_SKILL_LEVEL_CAPACITY));
-                    sprintf(valueText, "%d", static_cast<i32>(curHero->GetSSLevel(skillIndex)));
+                    utf8::Format(
+                        valueText,
+                        OVERVIEW_SKILL_LEVEL_CAPACITY,
+                        "%d",
+                        static_cast<i32>(curHero->GetSSLevel(skillIndex))
+                    );
                     OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                         static_cast<i16>(column * DETAIL_COLUMN_STRIDE + HERO_SKILL_LEVEL_FIRST_X),
                         static_cast<i16>(
@@ -1050,7 +1068,7 @@ void game::SetupResources(void) {
     for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
         msg.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         msg.payload.widget.data.text = gText;
-        sprintf(gText, "%d", gpCurPlayer->m_resources[H2EnumIndex(resourceIdx)]);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpCurPlayer->m_resources[H2EnumIndex(resourceIdx)]);
         msg.payload.widget.id = H2EnumIndex(resourceIdx) + RESOURCE_FIRST_WIDGET;
         overWin->BroadcastMessage(msg);
     }
@@ -1128,7 +1146,7 @@ void game::Overview(void) {
     for (mine = 0; mine < H2EnumIndex(RES_COUNT); mine++) {
         message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message.payload.widget.data.text = gText;
-        sprintf(gText, "%d", static_cast<i32>(mineCounts[mine]));
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", static_cast<i32>(mineCounts[mine]));
         message.payload.widget.id = mine + MINE_FIRST_WIDGET;
         overWin->BroadcastMessage(message);
     }
@@ -1145,7 +1163,7 @@ void game::Overview(void) {
     message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
     message.payload.widget.id = DAILY_GOLD_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, "%d", ComputeDailyGold(giCurPlayer));
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", ComputeDailyGold(giCurPlayer));
     overWin->BroadcastMessage(message);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);

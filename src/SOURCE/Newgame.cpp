@@ -261,11 +261,11 @@ void game::GetMap(void) {
             -1,
             0
         );
-        sprintf(fileMask, "*.%s", "MP2");
+        utf8::Format(fileMask, "*.%s", "MP2");
     } else if (xIsExpansionMap) {
-        sprintf(fileMask, "*.%s", "MX2");
+        utf8::Format(fileMask, "*.%s", "MX2");
     } else {
-        sprintf(fileMask, "*.%s", "MP2");
+        utf8::Format(fileMask, "*.%s", "MP2");
     }
 
     requesterResult = new fileRequester(
@@ -787,7 +787,7 @@ cleanup:
 
             if (giNumHumanPlayers > 1) {
                 name = static_cast<char*>(H2_ALLOC(PLAYER_LABEL_CAPACITY));
-                sprintf(name, " ");
+                utf8::Copy(name, PLAYER_LABEL_CAPACITY, " ");
                 nameWidget = new textWidget(
                     static_cast<i16>(
                         firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET
@@ -834,7 +834,7 @@ cleanup:
             name = static_cast<char*>(
                 H2_ALLOC(PLAYER_LABEL_CAPACITY)
             );
-            sprintf(name, "A");
+            utf8::Copy(name, PLAYER_LABEL_CAPACITY, "A");
             raceNameWidth = m_mapHeader.playerCount < PLAYER_RACE_NAME_NARROW_THRESHOLD
                                 ? PLAYER_RACE_NAME_WIDE_WIDTH
                             : m_mapHeader.playerCount < PLAYER_RACE_NAME_HIDDEN_THRESHOLD
@@ -925,7 +925,7 @@ cleanup:
             } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
-                sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
             }
             message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
@@ -1008,7 +1008,7 @@ cleanup:
         gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
         message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         message.payload.widget.id = NEW_GAME_RATING;
-        sprintf(gText, localization::Tr("new_game.rating"), gpGame->m_difficultyRating);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("new_game.rating"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
         DrawNGKPDisplayString(0);
@@ -1096,8 +1096,8 @@ cleanup:
                         redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 "%s:  %s",
                                 gsNetPlayerInfo[sender].name,
                                 remotePacketResult->payload
@@ -1740,7 +1740,7 @@ void game::ShowScenInfo(void) {
     msg.payload.widget.data.text = cDifficulty[H2EnumIndex(m_difficulty)];
     window->BroadcastMessage(msg);
 
-    sprintf(gText, "%d", CalcDifficultyRating());
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", CalcDifficultyRating());
     strcat(gText, "%");
     msg.payload.widget.id = GAME_SCENARIO_RATING;
     msg.payload.widget.data.text = gText;
@@ -1865,7 +1865,7 @@ void game::ShowScenInfo(void) {
             name = static_cast<char*>(
                 H2_ALLOC(PLAYER_LABEL_CAPACITY)
             );
-            sprintf(name, " ");
+            utf8::Copy(name, PLAYER_LABEL_CAPACITY, " ");
             nameWidget = new textWidget(
                 static_cast<i16>(
                     firstColumnX + playerStep * playerCounter + PLAYER_NAME_X_OFFSET
@@ -1909,7 +1909,7 @@ void game::ShowScenInfo(void) {
         name = static_cast<char*>(
             H2_ALLOC(PLAYER_LABEL_CAPACITY)
         );
-        sprintf(name, "A");
+        utf8::Copy(name, PLAYER_LABEL_CAPACITY, "A");
         raceNameWidth = m_mapHeader.playerCount < PLAYER_RACE_NAME_NARROW_THRESHOLD
                             ? PLAYER_RACE_NAME_WIDE_WIDTH
                         : m_mapHeader.playerCount < MAP_HEADER_PLAYER_COUNT
@@ -1963,7 +1963,7 @@ void game::ShowScenInfo(void) {
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
-            sprintf(gText, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);
         }
         msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         msg.payload.widget.id =
@@ -2055,8 +2055,9 @@ void game::GetLossConditionText(char* text) {
             case MAP_LOSS_TOWN:
                 townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
                 city2 = GetTown(townId12);
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr(
                         (city2->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
                             ? "scenario.loss.castle"
@@ -2068,8 +2069,9 @@ void game::GetLossConditionText(char* text) {
 
             case MAP_LOSS_HERO:
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.loss.hero"),
                     lossHero11->m_name
                 );
@@ -2083,8 +2085,9 @@ void game::GetLossConditionText(char* text) {
                             / GAME_DAYS_PER_WEEK
                         + 1;
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.loss.time"),
                     month19,
                     week2,
@@ -2110,8 +2113,9 @@ void game::GetVictoryConditionText(char* text) {
                 targetTown = GetTown(
                     GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY)
                 );
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr(
                         (targetTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))
                             ? "scenario.victory.capture_castle"
@@ -2123,8 +2127,9 @@ void game::GetVictoryConditionText(char* text) {
 
             case MAP_VICTORY_DEFEAT_HERO:
                 victoryHero = GetHero(m_mapHeader.victoryConditionValue);
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.victory.defeat_hero"),
                     victoryHero->m_name
                 );
@@ -2137,16 +2142,18 @@ void game::GetVictoryConditionText(char* text) {
                         localization::Tr("scenario.victory.find_ultimate_artifact")
                     );
                 else
-                    sprintf(
+                    utf8::Format(
                         text,
+                        GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("scenario.victory.find_artifact"),
                         gArtifactNames[m_mapHeader.victoryConditionValue - 1]
                     );
                 break;
 
             case MAP_VICTORY_ACCUMULATE_GOLD:
-                sprintf(
+                utf8::Format(
                     text,
+                    GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("scenario.victory.accumulate_gold"),
                     m_mapHeader.victoryConditionValue * GAME_GOLD_CONDITION_MULTIPLIER
                 );
@@ -2161,15 +2168,17 @@ void game::GetVictoryConditionText(char* text) {
                     m_mapHeader.playerCount - 1
                 );
                 if (localPlayerFirst)
-                    sprintf(
+                    utf8::Format(
                         text,
+                        GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("scenario.victory.side_must_defeat"),
                         firstSide,
                         secondSideValue
                     );
                 else
-                    sprintf(
+                    utf8::Format(
                         text,
+                        GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("scenario.victory.side_must_defeat"),
                         secondSideValue,
                         firstSide
@@ -2180,8 +2189,9 @@ void game::GetVictoryConditionText(char* text) {
             && m_mapHeader.allowNormalVictory != 0) {
             char primaryCondition[GAME_SIDE_TEXT_SIZE];
             utf8::Copy(primaryCondition, sizeof(primaryCondition), text);
-            sprintf(
+            utf8::Format(
                 text,
+                GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("scenario.victory.with_standard_alternative"),
                 primaryCondition
             );
@@ -2200,31 +2210,46 @@ static void FormatScenarioSideList(
 ) {
     switch (count) {
         case 1:
-            sprintf(text, localization::Tr("scenario.side.list.1"), names[0]);
+            utf8::Format(
+                text, GAME_SIDE_TEXT_SIZE, localization::Tr("scenario.side.list.1"), names[0]
+            );
             break;
         case 2:
-            sprintf(text, localization::Tr("scenario.side.list.2"), names[0], names[1]);
+            utf8::Format(
+                text,
+                GAME_SIDE_TEXT_SIZE,
+                localization::Tr("scenario.side.list.2"),
+                names[0], names[1]
+            );
             break;
         case 3:
-            sprintf(text, localization::Tr("scenario.side.list.3"), names[0], names[1], names[2]);
+            utf8::Format(
+                text,
+                GAME_SIDE_TEXT_SIZE,
+                localization::Tr("scenario.side.list.3"),
+                names[0], names[1], names[2]
+            );
             break;
         case 4:
-            sprintf(
+            utf8::Format(
                 text,
+                GAME_SIDE_TEXT_SIZE,
                 localization::Tr("scenario.side.list.4"),
                 names[0], names[1], names[2], names[3]
             );
             break;
         case 5:
-            sprintf(
+            utf8::Format(
                 text,
+                GAME_SIDE_TEXT_SIZE,
                 localization::Tr("scenario.side.list.5"),
                 names[0], names[1], names[2], names[3], names[4]
             );
             break;
         case 6:
-            sprintf(
+            utf8::Format(
                 text,
+                GAME_SIDE_TEXT_SIZE,
                 localization::Tr("scenario.side.list.6"),
                 names[0], names[1], names[2], names[3], names[4], names[5]
             );
@@ -2269,14 +2294,17 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     }
 
     if (onSide && otherPlayerCount == 0) {
-        sprintf(text, "%s", localization::Tr("scenario.side.you"));
+        utf8::Format(
+            text, GAME_SIDE_TEXT_SIZE, "%s", localization::Tr("scenario.side.you")
+        );
         return onSide;
     }
 
     FormatScenarioSideList(playerList, colorNames, listIndex);
     if (onSide) {
-        sprintf(
+        utf8::Format(
             text,
+            GAME_SIDE_TEXT_SIZE,
             localization::Tr(
                 otherPlayerCount == 1 ? "scenario.side.you_and_ally"
                                       : "scenario.side.you_and_allies"
@@ -2284,8 +2312,9 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             playerList
         );
     } else {
-        sprintf(
+        utf8::Format(
             text,
+            GAME_SIDE_TEXT_SIZE,
             localization::Tr(
                 sideCount == 1 ? "scenario.side.enemy" : "scenario.side.enemy_alliance"
             ),

@@ -1,4 +1,5 @@
 #include <BASE/WINMGR.h>
+#include <BASE/Utf8.h>
 
 typedef enum WindowColorCycleConstant {
     CYCLE_FRAME_COUNT                    = 8,
@@ -512,7 +513,7 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
 
 void heroWindowManager::ScreenShot(void) {
     char local_10[SCREENSHOT_FILENAME_CAPACITY];
-    sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
+    utf8::Format(local_10, "SHOT%04d.PCX", m_screenshotIndex);
     CreatePCXFile(
         local_10,
         m_screen->m_pixels,
@@ -600,7 +601,7 @@ void heroWindowManager::FizzleForward(
     BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
     for (frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
-        sprintf(gText, "CCYCLE%02d.BIN", frame);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "CCYCLE%02d.BIN", frame);
         gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
         gpResourceManager->ReadBlock(ccycleBuf, FIZZLE_CYCLE_TABLE_BYTES);
         for (sourceY = y; sourceY < y + height; sourceY++) {

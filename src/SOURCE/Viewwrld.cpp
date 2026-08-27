@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <BASE/message.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindow.h>
@@ -126,8 +127,8 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
 
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "viewlgnd.bin"
     );
     window = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
@@ -148,8 +149,8 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
         "_ALL";
     iconNames[LEGEND_WORLD] =
         "WRLD";
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "view%s.icn",
         iconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
                           ? LEGEND_WORLD
@@ -214,26 +215,26 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
         WORLD_POINTER_FRAME,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "ground%d.icn",
         H2EnumIndex(giViewWorldScale)
     );
     pVWGround = gpResourceManager->GetIcon(gText);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "vwflag%d.icn",
         H2EnumIndex(giViewWorldScale)
     );
     pVWFlags = gpResourceManager->GetIcon(gText);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "misc%d.icn",
         H2EnumIndex(giViewWorldScale)
     );
     pVWMisc = gpResourceManager->GetIcon(gText);
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         "letter%d.icn",
         H2EnumIndex(giViewWorldScale)
     );

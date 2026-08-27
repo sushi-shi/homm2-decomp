@@ -286,6 +286,9 @@ target_link_libraries(homm2 PRIVATE
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  add_test(NAME source_policy
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
+      ${CMAKE_SOURCE_DIR})
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE

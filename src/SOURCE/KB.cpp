@@ -886,8 +886,8 @@ i32 oldmain(void) {
             }
             for (player_h = 0; player_h < gpGame->m_playerCount; player_h++) {
                 if (!strlen(cPlayerNames[player_h])) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("player.color_default_name"),
                         gColors[gpGame->m_players[player_h].m_color]
                     );
@@ -944,7 +944,7 @@ i32 oldmain(void) {
                 0,
                 MOUSE_AUTO_CURSOR_TYPE
             );
-            sprintf(
+            utf8::Format(
                 gcWinText,
                 localization::Tr("campaign.victory.complete"),
                 giCurTurn
@@ -1200,14 +1200,14 @@ i32 InterpretCommandLine(void) {
         ShutDown(gText);
     }
 
-    sprintf(
+    utf8::Format(
         cAggPathName,
         "%s%s",
         ".\\DATA\\",
         "heroes2.agg"
     );
     DEFAULT_AGGREGATE_NAME = cAggPathName;
-    sprintf(
+    utf8::Format(
         cExpAggPathName,
         "%s%s",
         ".\\DATA\\",
@@ -1478,7 +1478,7 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         utf8::Copy(buf, sizeof(buf), xNecromancerShrineDesc);
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
-        sprintf(
+        utf8::Format(
             buf,
             localization::Tr("town.building.weekly_growth")  ,
             GetBuildingName(race, building),
@@ -1489,8 +1489,8 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
     } else if (building < BUILDING_SLOT_DWELLING_FIRST) {
         utf8::Copy(buf, sizeof(buf), cBuildingInfoNeutral[H2EnumIndex(building)]);
     } else {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("town.building.produces")  ,
             GetBuildingName(race, building),
             gArmyNamesPlural
@@ -1499,8 +1499,8 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
         return gText;
     }
     if (mode) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "{%s}\n\n%s",
             GetBuildingName(race, building),
             buf
@@ -1863,7 +1863,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
                             if (resExtra == H2EnumIndex(ARTIFACT_SPELL_SCROLL)) {
-                                sprintf(gText, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
+                                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
                                 NormalDialog(
                                     gText,
                                     NORMAL_DIALOG_QUICK_VIEW,
@@ -2082,7 +2082,7 @@ void CheckEndGame(
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
                     NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else {
-                    sprintf(gText, localization::Tr("player.vanquished"), cPlayerNames[player]);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), cPlayerNames[player]);
                     NormalDialog(
                         gText,
                         1,
@@ -2099,8 +2099,8 @@ void CheckEndGame(
             } else if (rec_n->m_townCount == 0) {
                 if (rec_n->m_daysLeft == -1) {
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("player.last_town_warning"),
                             cPlayerNames[player]
                         );
@@ -2123,15 +2123,15 @@ void CheckEndGame(
                     if (gbThisNetHumanPlayer[player] && player == giCurPlayer) {
                         if (!showedDialog_o) {
                             showedDialog_o = true;
-                            sprintf(
-                                gText,
+                            utf8::Format(
+                                gText, GLOBAL_TEXT_BUFFER_SIZE,
                                 localization::Tr("player.banished.self"),
                                 cPlayerNames[player]
                             );
                         }
                     } else {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("player.banished.other"),
                             cPlayerNames[player]
                         );
@@ -2243,14 +2243,14 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 if (winFlag) {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("victory.capture_town.self"),
                         victoryTownData->m_name
                     );
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("victory.capture_town.enemy"),
                         victoryTownData->m_name
                     );
@@ -2268,7 +2268,7 @@ void CheckEndGame(
             defeated_m = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;
-                sprintf(gText, localization::Tr("loss.town_fallen"), lossTown->m_name);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.town_fallen"), lossTown->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2294,14 +2294,14 @@ void CheckEndGame(
                 if (!showedDialog_o) {
                     showedDialog_o = true;
                     if (winFlag) {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("victory.gold.self"),
                             bestGold
                         );
                     } else {
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             localization::Tr("victory.gold.enemy"),
                             bestGold
                         );
@@ -2319,8 +2319,8 @@ void CheckEndGame(
             winFlag = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;
-                sprintf(
-                    gText,
+                utf8::Format(
+                    gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("victory.hero_captured"),
                     winningHeroEntry_g->m_name
                 );
@@ -2336,7 +2336,7 @@ void CheckEndGame(
             defeated_m = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;
-                sprintf(gText, localization::Tr("loss.hero"), lossHero_k->m_name);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.hero"), lossHero_k->m_name);
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         }
@@ -2404,10 +2404,10 @@ void CheckEndGame(
                     );
                 }
                 if (winFlag) {
-                    sprintf(gText, localization::Tr("victory.artifact_found.self"), artifactName);
+                    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.artifact_found.self"), artifactName);
                 } else {
-                    sprintf(
-                        gText,
+                    utf8::Format(
+                        gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("victory.artifact_found.enemy"),
                         artifactName
                     );
@@ -2594,7 +2594,7 @@ void CheckEndGame(
             && (gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
                     != END_GAME_FIRST_NO_SAVE_SCENARIO
                 || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
-            sprintf(
+            utf8::Format(
                 campaignSaveName,
                 "%s%c_%02d",
                 save_names::VictoryPrefix,
@@ -2679,7 +2679,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             utf8::Copy(description7, sizeof(description7), cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)]);
     }
 
-    sprintf(gText, cMoraleInfo[H2EnumIndex(MORALE_INFO_HEADER)], description7);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cMoraleInfo[H2EnumIndex(MORALE_INFO_HEADER)], description7);
     modifierStart = strlen(gText);
     if (h->m_army.HasAllUndead()) {
         strcat(gText, cMoraleInfo[H2EnumIndex(INFO_ALL_UNDEAD)]);
@@ -2701,7 +2701,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
                 alignment_e = H2EnumIndex(gMonsterDatabase[H2EnumIndex(h->m_army.m_creatureTypes[slot8])].race);
             }
         }
-        sprintf(description7, cMoraleInfo[H2EnumIndex(INFO_SAME_ALIGNMENT)], gAlignmentNames[alignment_e]);
+        utf8::Format(description7, cMoraleInfo[H2EnumIndex(INFO_SAME_ALIGNMENT)], gAlignmentNames[alignment_e]);
         strcat(gText, description7);
     }
     if (homogeneous5 == ARMY_GROUP_ALIGNMENT_THREE) {
@@ -2799,7 +2799,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
             utf8::Copy(description4, sizeof(description4), cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)]);
     }
 
-    sprintf(gText, cLuckInfo[H2EnumIndex(LUCK_INFO_HEADER)], description4);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cLuckInfo[H2EnumIndex(LUCK_INFO_HEADER)], description4);
     modifierStart = strlen(gText);
     if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
         && (h->GetOccupiedTown()->m_buildings & H2EnumIndex(TOWN_BUILDING_RAINBOW)))
@@ -2884,13 +2884,13 @@ i32 AddScoreToHighScore(
 
     missingFile_e = false;
     if (highScoreType == HIGH_SCORE_STANDARD)
-        sprintf(
+        utf8::Format(
             filename_h,
             "%sSTANDARD.HS",
             ".\\DATA\\"
         );
     else
-        sprintf(
+        utf8::Format(
             filename_h,
             "%sCAMPAIGN.HS",
             ".\\DATA\\"
@@ -3053,7 +3053,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     messageTime_b = 0;
     if (text != NULL) {
         if (netPlayer >= 0) {
-            sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
             gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].m_color);
         } else {
@@ -3144,8 +3144,8 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (remoteData_g->command) {
                     case BOX_REMOTE_CHAT:
                         remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
-                        sprintf(
-                            gText,
+                        utf8::Format(
+                            gText, GLOBAL_TEXT_BUFFER_SIZE,
                             "%s:  %s",
                             gsNetPlayerInfo[remoteData_g->sender].name,
                             remoteData_g->payload.data
@@ -3386,7 +3386,7 @@ void FileError(const char* filename) {
     i32 err;
     char buf1[FILE_ERROR_BUFFER_SIZE];
     err = errno;
-    sprintf(buf1, "File Error %s", strerror(err));
+    utf8::Format(buf1, "File Error %s", strerror(err));
     LogInt(
         buf1,
         err,
@@ -3397,7 +3397,7 @@ void FileError(const char* filename) {
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    sprintf(
+    utf8::Format(
         buf,
         localization::Tr("system.file.open_error"),
         filename
@@ -3512,8 +3512,9 @@ void ShowCongrats(HighScoreType highScoreType) {
         utf8::Copy(ratingText, sizeof(ratingText), localization::Tr("high_score.cheater_rating"));
 
     if (highScoreType == HIGH_SCORE_STANDARD) {
-        sprintf(
+        utf8::Format(
             congratsText,
+            CONGRATS_TEXT_SIZE,
             localization::Tr("high_score.congratulations.standard"),
             giCurTurn,
             baseScore,
@@ -3522,15 +3523,17 @@ void ShowCongrats(HighScoreType highScoreType) {
             ratingText
         );
     } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
-        sprintf(
+        utf8::Format(
             congratsText,
+            CONGRATS_TEXT_SIZE,
             localization::Tr("high_score.congratulations.campaign"),
             xCampaign.Days(),
             ratingText
         );
     } else {
-        sprintf(
+        utf8::Format(
             congratsText,
+            CONGRATS_TEXT_SIZE,
             localization::Tr("high_score.congratulations.campaign"),
             gpGame->m_campaignScore,
             ratingText
@@ -3613,8 +3616,8 @@ void MemError(void) {
         return;
     gbInMemError = true;
     LogStr("Out of Memory");
-    sprintf(
-        gText,
+    utf8::Format(
+        gText, GLOBAL_TEXT_BUFFER_SIZE,
         cOutOfMemory,
         localization::Tr("system.memory.out_of_memory")  ,
         MEMORY_ERROR_REQUEST_SIZE
@@ -4349,7 +4352,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 return;
             }
 
-            sprintf(gText, localization::Tr("player.vanquished"), gsNetPlayerInfo[exitInfo.netPosition].name);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), gsNetPlayerInfo[exitInfo.netPosition].name);
             NormalDialog(
                 gText,
                 NORMAL_DIALOG_INFO,
@@ -4364,8 +4367,8 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             );
         } else if (!exitInfo.continueGame) {
             gpGame->SaveGame(save_names::PlayerExit, 1, 0);
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("network.player_exit.host_terminated"),
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[hostNetPosition].name,
@@ -4380,7 +4383,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             }
         } else {
             if (exitInfo.timedOut) {
-                sprintf(
+                utf8::Format(
                     playerExitMessage_k,
                     localization::Tr("network.player_exit.host_reports_timeout"),
                     gsNetPlayerInfo[hostNetPosition].name,
@@ -4388,7 +4391,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                     gsNetPlayerInfo[exitInfo.netPosition].name
                 );
             } else {
-                sprintf(
+                utf8::Format(
                     playerExitMessage_k,
                     localization::Tr("network.player_exit.host_reports_exit"),
                     gsNetPlayerInfo[hostNetPosition].name,
@@ -4452,7 +4455,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
             localPlayerLost_e = true;
             goto exitInfoProcessed;
         }
-        sprintf(gText, localization::Tr("player.vanquished"), gsNetPlayerInfo[exitInfo.netPosition].name);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), gsNetPlayerInfo[exitInfo.netPosition].name);
         NormalDialog(
             gText,
             NORMAL_DIALOG_INFO,
@@ -4468,16 +4471,16 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
         exitInfo.continueGame = true;
     } else {
         if (exitInfo.timedOut) {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("network.player_exit.timed_out_confirm"),
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 save_names::PlayerExit,
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         } else {
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("network.player_exit.exiting_confirm"),
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 save_names::PlayerExit,
@@ -4913,21 +4916,21 @@ void NormalDialog(
         resourceText_p[resourceSlot] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
         if (resourceType_a[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_c[resourceSlot] > 0) {
-                sprintf(resourceText_p[resourceSlot], "%d", resourceValue_c[resourceSlot]);
+                utf8::Format(resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue_c[resourceSlot]);
             } else if (resourceValue_c[resourceSlot] == 0) {
                 strcpy(
                     resourceText_p[resourceSlot],
                     ""
                 );
             } else if (resourceValue_c[resourceSlot] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
-                sprintf(
-                    resourceText_p[resourceSlot],
+                utf8::Format(
+                    resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                     "%d",
                     resourceValue_c[resourceSlot] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
                 );
             } else {
-                sprintf(
-                    resourceText_p[resourceSlot],
+                utf8::Format(
+                    resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                     localization::Tr("resource.per_day"),
                     -resourceValue_c[resourceSlot]
                 );
@@ -4935,40 +4938,40 @@ void NormalDialog(
             strcpy(iconFile_a, "resource.icn");
             resourceFrame_n = resourceType_a[resourceSlot];
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 gSpellNames[resourceValue_c[resourceSlot]]
             );
             strcpy(iconFile_a, "spells.icn");
             resourceFrame_n = gsSpellInfo[resourceValue_c[resourceSlot]].iconIndex;
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_CREST) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
             strcpy(iconFile_a, "brcrest.icn");
             resourceFrame_n = resourceValue_c[resourceSlot];
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
             strcpy(iconFile_a, "primskil.icn");
             resourceFrame_n = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_MONSTER) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
             strcpy(iconFile_a, "strip.icn");
             resourceFrame_n = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 gSecondarySkills
                     [resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
@@ -4977,12 +4980,12 @@ void NormalDialog(
             resourceFrame_n = resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
                               + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 ""
             );
-            sprintf(iconFile_a, "surrendr.icn");
+            utf8::Format(iconFile_a, "surrendr.icn");
             resourceFrame_n = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
         } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPERIENCE
                    || resourceType_a[resourceSlot] == NORMAL_DIALOG_MORALE_BONUS
@@ -4997,7 +5000,7 @@ void NormalDialog(
             resourceFrame_n = resourceType_a[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
             if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST
                 && resourceValue_c[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
-                sprintf(resourceText_p[resourceSlot], "%d", resourceValue_c[resourceSlot]);
+                utf8::Format(resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH, "%d", resourceValue_c[resourceSlot]);
             }
         } else {
             strcpy(
@@ -5172,8 +5175,8 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(iconPanel_a, -1);
 
-            sprintf(
-                gText,
+            utf8::Format(
+                gText, GLOBAL_TEXT_BUFFER_SIZE,
                 "monh%04d.icn",
                 resourceValue_c[resourceSlot]
             );
@@ -5231,7 +5234,7 @@ void NormalDialog(
             pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
         if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
-            sprintf(
+            utf8::Format(
                 iconFile_a,
                 "port%04d.icn",
                 resourceValue_c[resourceSlot]
@@ -5277,8 +5280,8 @@ void NormalDialog(
             resourceText_p[resourceSlot] =
                 static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
             labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
-            sprintf(
-                resourceText_p[resourceSlot],
+            utf8::Format(
+                resourceText_p[resourceSlot], NORMAL_DIALOG_TEXT_LENGTH,
                 "%s",
                 gSecondarySkillLevels
                     [resourceValue_c[resourceSlot] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]

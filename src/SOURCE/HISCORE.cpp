@@ -30,7 +30,7 @@ i32 highScoreManager::Open(i32 id) {
                            || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN;
 
     gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
-    sprintf(gText, "hsbkg.icn");
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
     m_window = new heroWindow(0, 0, "hiscore.bin");
     if (m_window == NULL)
@@ -130,14 +130,14 @@ void highScoreManager::Update(void) {
 
     noScoreFile = false;
     if (m_showCampaignScores)
-        sprintf(scorePath, "%sCAMPAIGN.HS", ".\\DATA\\");
+        utf8::Format(scorePath, "%sCAMPAIGN.HS", ".\\DATA\\");
     else
-        sprintf(scorePath, "%sSTANDARD.HS", ".\\DATA\\");
+        utf8::Format(scorePath, "%sSTANDARD.HS", ".\\DATA\\");
     inputFile = platform::FileOpen(scorePath, platform::FileMode::Read);
     if (inputFile == -1)
         noScoreFile = true;
 
-    sprintf(gText, "hsbkg.icn");
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
 
     hsMessage.type = MESSAGE_WIDGET;
@@ -235,9 +235,9 @@ void highScoreManager::Update(void) {
                                          + HIGH_SCORE_TEXT_RATING_OFFSET;
         if (highScore.score != HIGH_SCORE_EMPTY) {
             if (m_showCampaignScores == 0)
-                sprintf(gText, "%d", highScore.days);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", highScore.days);
             else
-                sprintf(gText, "%d", highScore.score);
+                utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", highScore.score);
         }
         m_window->BroadcastMessage(hsMessage);
 
@@ -247,7 +247,7 @@ void highScoreManager::Update(void) {
                                          + HIGH_SCORE_TEXT_SCORE_OFFSET;
         gText[0] = 0;
         if (m_showCampaignScores == 0 && highScore.score != HIGH_SCORE_EMPTY)
-            sprintf(gText, "%d", highScore.score);
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", highScore.score);
         m_window->BroadcastMessage(hsMessage);
 
         hsMessage.payload.widget.command = HIGH_SCORE_WIDGET_RESIZE;

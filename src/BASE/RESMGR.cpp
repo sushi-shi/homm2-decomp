@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <BASE/Utf8.h>
 #include <PLATFORM/Strings.h>
 #include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
@@ -312,8 +313,8 @@ i32 resourceManager::LoadAggregateHeader(
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "Only %d .AGG files can be used at once.",
             RESOURCE_MANAGER_AGGREGATE_LIMIT
         );
@@ -326,8 +327,8 @@ i32 resourceManager::LoadAggregateHeader(
     if (aggregateFp == INVALID_FILE) {
         if (!required)
             return LOAD_ERROR;
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("resource.file.open_failed"),
             aggregateName
         );
@@ -406,8 +407,8 @@ void resourceManager::PointToFile(u32l fileId) {
             break;
     }
     if (!found) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
             static_cast<i32>(fileId),
             m_lastFileId,
@@ -440,8 +441,8 @@ u32l resourceManager::GetFileSize(u32l fileId) {
             break;
     }
     if (!found) {
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
             static_cast<i32>(fileId),
             m_lastFileId,
@@ -515,8 +516,8 @@ void resourceManager::ReadBlock(void* destination, u32l size) {
         if (destination != NULL && readable) {
             memset(destination, 0, static_cast<size_t>(size));
         }
-        sprintf(
-            gText,
+        utf8::Format(
+            gText, GLOBAL_TEXT_BUFFER_SIZE,
             "File error - incomplete read, bytes requested %d, errno %d, last file '%s'",
             static_cast<i32>(size),
             errno,
