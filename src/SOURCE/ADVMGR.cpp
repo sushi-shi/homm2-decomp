@@ -5573,7 +5573,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
 }
 
 VA(0x0040aaee, 0x15e)
-void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
+void advManager::UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen) {
     i32 updated;
 
     updated = 0;

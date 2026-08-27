@@ -1577,7 +1577,7 @@ void RedrawHeroScreen(void) {
 }
 
 VA(0x004638f6, 0x219)
-i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     mapCell* heroCell;
 
     gbNoDismiss = noDismiss;

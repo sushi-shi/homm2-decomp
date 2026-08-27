@@ -195,7 +195,7 @@ public:
     void UpdateHeroLocator(i32, i32, i32);
     void UpdateHeroLocators(i32, i32);
     void UpdateTownLocators(i32, i32);
-    void UpdBottomView(i32, i32, i32);
+    void UpdBottomView(b32, b32, b32);
     void ClearBottomView(void);
     i32 UpdBottomViewEnemyTurn(void);
     i32 UpdBottomViewNewTurn(void);
