@@ -3730,23 +3730,23 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         extras_h[i_g] = NULL;
     }
 
-    if (cell->m_objectTileset == TILESET_OBJNARTI)
+    if (cell->ObjectTileset() == TILESET_OBJNARTI)
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == TILESET_X_LOC3)
+    if (cell->ObjectTileset() == TILESET_X_LOC3)
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == TILESET_X_LOC2 && cell->m_objectIndex == 9) {
+    if (cell->ObjectTileset() == TILESET_X_LOC2 && cell->m_objectIndex == 9) {
         frame_k = 9;
         isWide_l = true;
     }
-    if (cell->m_objectTileset == TILESET_OBJNMULT && cell->m_objectIndex == 131)
+    if (cell->ObjectTileset() == TILESET_OBJNMULT && cell->m_objectIndex == 131)
         frame_k = 124;
-    if (cell->m_objectTileset == TILESET_OBJNDSRT && cell->m_objectIndex == 61)
+    if (cell->ObjectTileset() == TILESET_OBJNDSRT && cell->m_objectIndex == 61)
         frame_k = 54;
-    if (cell->m_objectTileset == TILESET_OBJNWATR && cell->m_objectIndex == 45)
+    if (cell->ObjectTileset() == TILESET_OBJNWATR && cell->m_objectIndex == 45)
         frame_k = 38;
-    if (cell->m_objectTileset == TILESET_OBJNWATR && cell->m_objectIndex == 19)
+    if (cell->ObjectTileset() == TILESET_OBJNWATR && cell->m_objectIndex == 19)
         frame_k = 12;
-    if (cell->m_objectTileset == TILESET_OBJNRSRC) {
+    if (cell->ObjectTileset() == TILESET_OBJNRSRC) {
         switch (cell->m_objectIndex) {
             case 1:
                 frame_k = 0;
@@ -3797,13 +3797,13 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 if (cellY_o >= 0) {
                     cells_h[i_g] = gpGame->m_worldMap.GetCell(cellX_l, cellY_o);
                     if (i_g > 1) {
-                        cells_h[i_g]->m_overlayTileset = TILESET_NONE;
+                        cells_h[i_g]->SetOverlayTileset(TILESET_NONE);
                         cells_h[i_g]->m_overlayIndex = EMPTY_INDEX;
                     } else if (cells_h[i_g]->m_objectIndex != EMPTY_INDEX) {
                         if (cells_h[i_g]->m_objectIndex == frame_k
-                            && cells_h[i_g]->m_objectTileset == cell->m_objectTileset) {
+                            && cells_h[i_g]->ObjectTileset() == cell->ObjectTileset()) {
                             cells_h[i_g]->m_objectIndex = 0;
-                            cells_h[i_g]->m_objectTileset = TILESET_DUMMY;
+                            cells_h[i_g]->SetObjectTileset(TILESET_DUMMY);
                             cells_h[i_g]->m_animatedObject = 0;
                         }
 
@@ -3816,9 +3816,9 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
                         while (extras_h[i_g]) {
                             if (extras_h[i_g]->objectIndex == frame_k
-                                && extras_h[i_g]->objectTileset == cell->m_objectTileset) {
+                                && extras_h[i_g]->ObjectTileset() == cell->ObjectTileset()) {
                                 extras_h[i_g]->objectIndex = 0;
-                                extras_h[i_g]->objectTileset = TILESET_DUMMY;
+                                extras_h[i_g]->SetObjectTileset(TILESET_DUMMY);
                                 extras_h[i_g]->animatedObject = 0;
                             }
 
@@ -3837,7 +3837,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
     cell->m_triggerType = MAP_OBJECT_NONE;
     cell->m_objectIndex = 0;
-    cell->m_objectTileset = TILESET_DUMMY;
+    cell->SetObjectTileset(TILESET_DUMMY);
     cell->m_animatedObject = 0;
 
     for (i_g = 0; i_g < CELL_COUNT; i_g++) {
@@ -3847,7 +3847,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             currentCell_d = cells_h[i_g - 1];
         if (!currentCell_d)
             continue;
-        if (currentCell_d->m_objectTileset != TILESET_DUMMY)
+        if (currentCell_d->ObjectTileset() != TILESET_DUMMY)
             continue;
 
         if (currentCell_d->m_extraIndex
@@ -3856,16 +3856,16 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         else
             continue;
 
-        if (extra_l->objectTileset == TILESET_DUMMY || extra_l->objectIndex == EMPTY_INDEX)
+        if (extra_l->ObjectTileset() == TILESET_DUMMY || extra_l->objectIndex == EMPTY_INDEX)
             continue;
 
         currentCell_d->m_objectIndex = extra_l->objectIndex;
-        currentCell_d->m_objectTileset = extra_l->objectTileset;
+        currentCell_d->SetObjectTileset(extra_l->ObjectTileset());
         currentCell_d->m_animatedObject = extra_l->animatedObject;
         currentCell_d->m_objectLayerBit0 = extra_l->objectLayerBit0;
         currentCell_d->m_objectLayerBit1 = extra_l->objectLayerBit1;
         extra_l->objectIndex = 0;
-        extra_l->objectTileset = TILESET_DUMMY;
+        extra_l->SetObjectTileset(TILESET_DUMMY);
         extra_l->animatedObject = 0;
     }
 
@@ -3877,7 +3877,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         if (!currentCell_d)
             continue;
 
-        if (currentCell_d->m_objectTileset != TILESET_DUMMY
+        if (currentCell_d->ObjectTileset() != TILESET_DUMMY
             && currentCell_d->m_objectIndex != EMPTY_INDEX && !currentCell_d->m_objectLayerBit1)
             goto cellDone;
 
@@ -3888,7 +3888,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             extra_l = NULL;
 
         while (extra_l) {
-            if (extra_l->objectTileset != TILESET_DUMMY && extra_l->objectIndex != EMPTY_INDEX
+            if (extra_l->ObjectTileset() != TILESET_DUMMY && extra_l->objectIndex != EMPTY_INDEX
                 && !extra_l->objectLayerBit1)
                 goto cellDone;
 

@@ -2252,7 +2252,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
-                    cell2->m_objectTileset = TILESET_NONE;
+                    cell2->SetObjectTileset(TILESET_NONE);
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
@@ -2275,7 +2275,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
-                    cell2->m_objectTileset = TILESET_NONE;
+                    cell2->SetObjectTileset(TILESET_NONE);
                     m_mapEventCount++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GAZEBO:
@@ -2758,7 +2758,7 @@ void game::RandomizeEvents(void) {
         for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
             cell2 = m_worldMap.GetCell(xPos, yPos);
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
-                && cell2->m_objectTileset == TILESET_X_LOC2)
+                && cell2->ObjectTileset() == TILESET_X_LOC2)
                 cell2->m_flags |= H2EnumIndex(MAP_CELL_OCCUPIED);
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
@@ -2782,7 +2782,7 @@ void game::RandomizeEvents(void) {
                         & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
                     if (!cell2->m_objectLayerBit1) {
-                        upperTilesets0[upperCount5] = cell2->m_objectTileset;
+                        upperTilesets0[upperCount5] = cell2->ObjectTileset();
 
                         upperCount5++;
                     }
@@ -2793,7 +2793,7 @@ void game::RandomizeEvents(void) {
                     while (upperCount5 < LAYER_SCAN_CAPACITY && extra9 != NULL) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
-                            upperTilesets0[upperCount5] = extra9->objectTileset;
+                            upperTilesets0[upperCount5] = extra9->ObjectTileset();
 
                             upperCount5++;
                         }
@@ -2804,7 +2804,7 @@ void game::RandomizeEvents(void) {
                     }
                     below0 = m_worldMap.GetCell(xPos, yPos + 1);
                     if (!below0->m_objectLayerBit1) {
-                        lowerTilesets5[lowerCount] = below0->m_objectTileset;
+                        lowerTilesets5[lowerCount] = below0->ObjectTileset();
 
                         lowerCount++;
                     }
@@ -2815,7 +2815,7 @@ void game::RandomizeEvents(void) {
                     while (lowerCount < LAYER_SCAN_CAPACITY && extra9 != NULL) {
                         if (extra9->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra9->objectLayerBit1) {
-                            lowerTilesets5[lowerCount] = extra9->objectTileset;
+                            lowerTilesets5[lowerCount] = extra9->ObjectTileset();
 
                             lowerCount++;
                         }
@@ -4845,7 +4845,7 @@ void game::PerMonth(void) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MONSTER_TRIGGER;
-                        spot->m_objectTileset = TILESET_MONS32;
+                        spot->SetObjectTileset(TILESET_MONS32);
                         spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
                             GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra))
@@ -4886,10 +4886,10 @@ void game::ConvertObject(
                 continue;
             cell = WORLDMAP->GetCell(x, y);
             if (cell->m_objectIndex != static_cast<u8>(-1)
-                && cell->m_objectTileset == oldTileset
+                && cell->ObjectTileset() == oldTileset
                 && cell->m_objectIndex >= oldFirstIndex
                 && cell->m_objectIndex <= oldLastIndex) {
-                cell->m_objectTileset = newTileset;
+                cell->SetObjectTileset(newTileset);
                 cell->m_objectIndex =
                     static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
             }
@@ -4903,10 +4903,10 @@ void game::ConvertObject(
             else
                 ext = NULL;
             while (ext != NULL) {
-                if (ext->objectTileset == oldTileset
+                if (ext->ObjectTileset() == oldTileset
                     && ext->objectIndex >= oldFirstIndex
                     && ext->objectIndex <= oldLastIndex) {
-                    ext->objectTileset = newTileset;
+                    ext->SetObjectTileset(newTileset);
                     ext->objectIndex =
                         static_cast<u8>(ext->objectIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -4918,10 +4918,10 @@ void game::ConvertObject(
             }
 
             if (cell->m_overlayIndex != static_cast<u8>(-1)
-                && cell->m_overlayTileset == oldTileset
+                && cell->OverlayTileset() == oldTileset
                 && cell->m_overlayIndex >= oldFirstIndex
                 && cell->m_overlayIndex <= oldLastIndex) {
-                cell->m_overlayTileset = newTileset;
+                cell->SetOverlayTileset(newTileset);
                 cell->m_overlayIndex =
                     static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
             }
@@ -4931,10 +4931,10 @@ void game::ConvertObject(
             else
                 ext = NULL;
             while (ext != NULL) {
-                if (ext->overlayTileset == oldTileset
+                if (ext->OverlayTileset() == oldTileset
                     && ext->overlayIndex >= oldFirstIndex
                     && ext->overlayIndex <= oldLastIndex) {
-                    ext->overlayTileset = newTileset;
+                    ext->SetOverlayTileset(newTileset);
                     ext->overlayIndex =
                         static_cast<u8>(ext->overlayIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -5329,7 +5329,7 @@ void game::ProcessRandomObjects(void) {
                     giUABaseY = static_cast<i16>(y);
                     giUARadius = static_cast<i16>(cell->m_objectMetadata);
                     cell->m_triggerType = MAP_OBJECT_NONE;
-                    cell->m_objectTileset = TILESET_NONE;
+                    cell->SetObjectTileset(TILESET_NONE);
                     cell->m_objectIndex = -1;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
@@ -5359,7 +5359,7 @@ void game::ProcessRandomObjects(void) {
                     maxValue = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell->m_objectTileset == TILESET_MONS32
+                    if (cell->ObjectTileset() == TILESET_MONS32
                         && cell->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
                         randomObjectType8 = static_cast<MapObjectType>(
@@ -5838,7 +5838,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
 
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->GetCell(col, row);
-    if (cell->m_overlayTileset == TILESET_FLAG32)
+    if (cell->OverlayTileset() == TILESET_FLAG32)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra;
 
@@ -5847,7 +5847,7 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     else
         extra = NULL;
     while (extra) {
-        if (extra->overlayTileset == TILESET_FLAG32)
+        if (extra->OverlayTileset() == TILESET_FLAG32)
             extra->drawOverlayOnTop = 1;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
@@ -5863,7 +5863,7 @@ i32 game::HasObjectTilesetIndex(
     i32 index
 ) {
     mapCell* cell = WORLDMAP->GetCell(col, row);
-    if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
+    if (cell->ObjectTileset() == tileset && cell->m_objectIndex == index)
         return 1;
     mapCellExtra* extra;
 
@@ -5872,7 +5872,7 @@ i32 game::HasObjectTilesetIndex(
     else
         extra = NULL;
     while (extra) {
-        if (extra->objectTileset == tileset && extra->objectIndex == index)
+        if (extra->ObjectTileset() == tileset && extra->objectIndex == index)
             return 1;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
@@ -6329,7 +6329,7 @@ void game::ProcessOnMapHeroes(void) {
                         if (isJail4) {
                             cell9->m_objectMetadata = extra9->heroId;
                         } else {
-                            cell9->m_objectTileset = TILESET_NONE;
+                            cell9->SetObjectTileset(TILESET_NONE);
                             cell9->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell9->m_objectMetadata = 0;
                             cell9->m_triggerType = 0;

@@ -258,7 +258,7 @@ void searchArray::TestPossibleDirections(
 
         if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
             if (gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT
-                && gSearchCurrentCell->m_objectTileset != TILESET_DUMMY
+                && gSearchCurrentCell->ObjectTileset() != TILESET_DUMMY
                 && (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
                 gSearchTerrain = TERRAIN_INVALID;
                 goto storeDirection;
@@ -267,7 +267,7 @@ void searchArray::TestPossibleDirections(
                 mapCell* belowNext = gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
 
                 if (belowNext->m_objectIndex != SEARCH_NO_OBJECT
-                    && belowNext->m_objectTileset != TILESET_DUMMY
+                    && belowNext->ObjectTileset() != TILESET_DUMMY
                     && (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;
@@ -275,7 +275,7 @@ void searchArray::TestPossibleDirections(
             }
         } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
             if (gSearchNextCell->m_objectIndex != SEARCH_NO_OBJECT
-                && gSearchNextCell->m_objectTileset != TILESET_DUMMY
+                && gSearchNextCell->ObjectTileset() != TILESET_DUMMY
                 && (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) == 0) {
                 if ((H2EnumIndex((gSearchNextCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     gSearchTriggerType = gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
@@ -292,7 +292,7 @@ void searchArray::TestPossibleDirections(
                 mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
 
                 if (belowCurrent->m_objectIndex != SEARCH_NO_OBJECT
-                    && belowCurrent->m_objectTileset != TILESET_DUMMY
+                    && belowCurrent->ObjectTileset() != TILESET_DUMMY
                     && (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) == 0) {
                     gSearchTerrain = TERRAIN_INVALID;
                     goto storeDirection;

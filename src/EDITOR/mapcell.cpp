@@ -39,13 +39,13 @@ void fullMap::Init(i32 w, i32 h) {
 }
 
 void fullMap::ClearCellExtra(i32 index) {
-    extras[index].objectTileset = TILESET_NONE;
+    extras[index].SetObjectTileset(TILESET_NONE);
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
     extras[index].objectLayerBit0 = 0;
     extras[index].objectLayerBit1 = 0;
     extras[index].objectDrawnAsOverlay = 0;
-    extras[index].overlayTileset = TILESET_NONE;
+    extras[index].SetOverlayTileset(TILESET_NONE);
     extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedOverlay = 0;
     extras[index].drawOverlayOnTop = 0;
@@ -193,25 +193,25 @@ void fullMap::ChangeTilesetIndex(
     t = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
 
     if (overlay == 0) {
-        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
+        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->ObjectTileset() != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->objectIndex != MAPCELL_SPRITE_NONE && ptr->objectTileset != tileset) {
+                if (ptr->objectIndex != MAPCELL_SPRITE_NONE && ptr->ObjectTileset() != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedObject = 0;
                     ptr->objectLayerBit0 = 0;
                     ptr->objectLayerBit1 = 0;
                     ptr->objectDrawnAsOverlay = 0;
-                    ptr->objectTileset = t;
+                    ptr->SetObjectTileset(t);
                     ptr->objectIndex = index;
                     break;
                 }
             }
             if (idx == 0) {
                 ptr = GetNewCellExtraObject(x, y);
-                ptr->objectTileset = t;
+                ptr->SetObjectTileset(t);
                 ptr->objectIndex = index;
             }
         } else {
@@ -219,33 +219,33 @@ void fullMap::ChangeTilesetIndex(
             cell->m_objectLayerBit0 = 0;
             cell->m_objectLayerBit1 = 0;
             cell->m_objectDrawnAsOverlay = 0;
-            cell->m_objectTileset = t;
+            cell->SetObjectTileset(t);
             cell->m_objectIndex = index;
         }
     } else {
-        if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE && cell->m_overlayTileset != tileset) {
+        if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE && cell->OverlayTileset() != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->overlayIndex != MAPCELL_SPRITE_NONE && ptr->overlayTileset != tileset) {
+                if (ptr->overlayIndex != MAPCELL_SPRITE_NONE && ptr->OverlayTileset() != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedOverlay = 0;
                     ptr->drawOverlayOnTop = 0;
-                    ptr->overlayTileset = t;
+                    ptr->SetOverlayTileset(t);
                     ptr->overlayIndex = index;
                     break;
                 }
             }
             if (idx == 0) {
                 ptr = GetNewCellExtraOverlay(x, y);
-                ptr->overlayTileset = t;
+                ptr->SetOverlayTileset(t);
                 ptr->overlayIndex = index;
             }
         } else {
             cell->m_animatedOverlay = 0;
             cell->m_drawOverlayOnTop = 0;
-            cell->m_overlayTileset = t;
+            cell->SetOverlayTileset(t);
             cell->m_overlayIndex = index;
         }
     }
