@@ -102,6 +102,10 @@ inline constexpr BaseWidgetCommand WIDGET_COMMAND_CLEAR_ITEMS{0x3b};
 inline constexpr BaseWidgetCommand WIDGET_COMMAND_REPLACE_ICON{0x3c};
 inline constexpr BaseWidgetCommand WIDGET_COMMAND_SET_WIDTH{0x3d};
 
+constexpr BaseWidgetCommand WidgetFlagsCommand(bool setFlags) {
+    return setFlags ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
+}
+
 inline constexpr BaseWidgetCommand HERO_UI_WIDGET_TEXT = WIDGET_COMMAND_SET_TEXT;
 inline constexpr BaseWidgetCommand NEW_GAME_WIDGET_SET_TEXT = WIDGET_COMMAND_SET_TEXT;
 inline constexpr BaseWidgetCommand COMBAT_WIN_LOSE_TEXT_COMMAND = WIDGET_COMMAND_SET_TEXT;

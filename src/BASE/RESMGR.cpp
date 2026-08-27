@@ -377,7 +377,7 @@ void resourceManager::PointToFile(u32l fileId) {
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
             static_cast<i32>(fileId),
-            static_cast<i32>(m_lastFileId),
+            m_lastFileId,
             m_lastFileName
         );
         ShutDown(gText);
@@ -411,7 +411,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
             static_cast<i32>(fileId),
-            static_cast<i32>(m_lastFileId),
+            m_lastFileId,
             m_lastFileName
         );
         ShutDown(gText);

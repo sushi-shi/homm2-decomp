@@ -105,13 +105,11 @@ swapManager::swapManager(hero* leftHero, hero* rightHero) {
 }
 
 void swapManager::Reset(void) {
-    do {
-        (m_targetSlot) = static_cast<decltype(m_targetSlot)>(SLOT_NONE);
-        (m_selectedSlot) = static_cast<decltype(m_selectedSlot)>(SLOT_NONE);
-        (m_itemType) = static_cast<decltype(m_itemType)>(SLOT_NONE);
-        (m_targetSide) = static_cast<decltype(m_targetSide)>(SLOT_NONE);
-        (m_selectedSide) = static_cast<decltype(m_selectedSide)>(SLOT_NONE);
-    } while (0);
+    m_targetSlot = SLOT_NONE;
+    m_selectedSlot = SLOT_NONE;
+    m_itemType = SWAP_ITEM_NONE;
+    m_targetSide = SWAP_SIDE_NONE;
+    m_selectedSide = SWAP_SIDE_NONE;
 }
 
 i32 swapManager::DrawSwapWin(void) {
