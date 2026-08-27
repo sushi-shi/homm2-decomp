@@ -331,4 +331,9 @@ private:
     inline name& operator--(name& a) { return a = a - 1; }                                        \
     inline name operator--(name& a, int) { name old = a; a = a - 1; return old; }
 
+#define ENABLE_ENUM_INDEX_OFFSETS(name)                                                            \
+    inline constexpr i32 operator+(name value, i32 offset) {                                      \
+        return static_cast<i32>(value) + offset;                                                   \
+    }
+
 #endif
