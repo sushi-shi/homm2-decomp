@@ -836,6 +836,7 @@ def _type_spans_requiring_split(fields: list[FieldFacts]) -> set[SourceSpan]:
 
 def scan(repo: Path = REPO, *, jobs: int = 0,
          filters: Iterable[str] = (), portable: bool = False) -> dict:
+    filters = tuple(filters)
     entries = _entries(repo, filters)
     if not entries:
         raise RuntimeError("no translation units selected")
@@ -918,6 +919,8 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
                           if item.storage_kind == "parameter"]
     return {
         "schema_version": SCHEMA_VERSION,
+        "whole_program": not filters,
+        "filters": list(filters),
         "translation_units": len(entries),
         # Legacy count names remain machine-readable for report consumers.
         "i32_fields": sum(item.declared_type == "i32" and item.storage_kind == "field"
@@ -946,8 +949,9 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
 
 
 def _text(report: dict, include_rejected: bool) -> str:
+    scope = "" if report.get("whole_program", True) else "partial "
     lines = [
-        f"[bool-fields] {report['translation_units']} translation units, "
+        f"[{scope}bool-fields] {report['translation_units']} translation units, "
         f"{report.get('source_integer_storage', report['i32_fields'])} source-integer storage objects, "
         f"{report.get('eligible_storage', report['eligible_fields'])} Boolean candidates, "
         f"{report.get('rejected_storage', report['rejected_fields'])} rejected; "
@@ -1012,12 +1016,18 @@ def main(argv: list[str] | None = None) -> int:
         "--check", action="store_true",
         help=("fail when an integer Boolean candidate, numeric 0/1 write, or "
               "unproven write to Boolean storage remains"))
-    parser.add_argument("--tu", action="append", default=[], help="limit to matching source paths")
+    parser.add_argument(
+        "--tu", action="append", default=[],
+        help="limit evidence to matching source paths (partial report; not whole-program proof)")
     parser.add_argument(
         "--portable", action="store_true",
         help="parse a native C++20 compilation database instead of the retail VC6 model")
     parser.add_argument("-j", "--jobs", type=int, default=0)
     args = parser.parse_args(argv)
+    if args.check and args.tu:
+        print("homm2 audit bool-fields: --check requires the full compilation database; "
+              "remove --tu", file=sys.stderr)
+        return 1
     try:
         report = scan(jobs=args.jobs, filters=args.tu, portable=args.portable)
     except (OSError, RuntimeError, ValueError) as error:

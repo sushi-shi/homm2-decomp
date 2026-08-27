@@ -515,6 +515,13 @@ ignored
             self.assertEqual(main(["--portable"]), 0)
         scan_mock.assert_called_once_with(jobs=0, filters=[], portable=True)
 
+    def test_check_rejects_partial_translation_unit_evidence(self):
+        with mock.patch("homm2.audit.bool_fields.scan") as scan_mock, \
+                mock.patch("sys.stderr", new_callable=StringIO) as stderr:
+            self.assertEqual(main(["--check", "--tu", "REMOTE"]), 1)
+        scan_mock.assert_not_called()
+        self.assertIn("requires the full compilation database", stderr.getvalue())
+
     def test_boolean_parameters_are_inventoried_separately(self):
         text = r"""
 typedef int i32;
