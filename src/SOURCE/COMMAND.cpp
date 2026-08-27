@@ -2174,7 +2174,9 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                         1;
                 }
                 m_experienceValue[IDX(OppositeCombatResult(winningSide))] =
-                    ExperienceValueOfStack(IDX(OppositeCombatResult(winningSide)));
+                    ExperienceValueOfStack(
+                        CombatSideForResult(OppositeCombatResult(winningSide))
+                    );
                 if (gbRetreatWin != 0)
                     m_experienceValue[IDX(OppositeCombatResult(winningSide))] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
@@ -2809,7 +2811,7 @@ void combatManager::CycleCombatScreen(void) {
     currentArmy_2 = NULL;
     cyclingCount_1 = 0;
     gpCombatManager->ResetLimitCreature();
-    for (index_0 = COMBAT_ATTACKER_SIDE; index_0 < COMBAT_SIDE_COUNT; ++index_0) {
+    for (index_0 = IDX(COMBAT_ATTACKER_SIDE); index_0 < COMBAT_SIDE_COUNT; ++index_0) {
         if (m_heroOverlayIcons[index_0] == NULL)
             continue;
 
@@ -2841,7 +2843,7 @@ void combatManager::CycleCombatScreen(void) {
         }
     }
 
-    for (index_0 = COMBAT_ATTACKER_SIDE; index_0 < COMBAT_SIDE_COUNT; ++index_0) {
+    for (index_0 = IDX(COMBAT_ATTACKER_SIDE); index_0 < COMBAT_SIDE_COUNT; ++index_0) {
         nextHeroAnimation_0[index_0] = -1;
         if (m_heroIcons[index_0] == NULL)
             continue;
@@ -2963,7 +2965,7 @@ void combatManager::CycleCombatScreen(void) {
             }
         }
     }
-    for (index_0 = COMBAT_ATTACKER_SIDE; index_0 < COMBAT_SIDE_COUNT; ++index_0) {
+    for (index_0 = IDX(COMBAT_ATTACKER_SIDE); index_0 < COMBAT_SIDE_COUNT; ++index_0) {
         if (m_drawHero[index_0] != 0) {
             if (nextHeroAnimation_0[index_0] != -1) {
                 m_heroAnimationState[index_0] = nextHeroAnimation_0[index_0];

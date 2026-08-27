@@ -45,9 +45,14 @@ inline CombatResult CombatResultForSide(CombatSide side) {
 inline CombatResult OppositeCombatResult(CombatResult result) {
     return result == COMBAT_RESULT_ATTACKER ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
 }
+
+inline CombatSide CombatSideForResult(CombatResult result) {
+    return result == COMBAT_RESULT_ATTACKER ? COMBAT_ATTACKER_SIDE : COMBAT_DEFENDER_SIDE;
+}
 #else
 #define CombatResultForSide(side) (side)
 #define OppositeCombatResult(result) (COMBAT_RESULT_DEFENDER - (result))
+#define CombatSideForResult(result) (result)
 #endif
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArmyFacing, i8)

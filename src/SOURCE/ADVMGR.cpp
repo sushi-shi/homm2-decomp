@@ -3994,7 +3994,7 @@ void advManager::DrawCell(
                         s_drawPlayerColor = gpGame->m_players[IDX(s_drawHero->m_owner)].m_color;
                         s_drawHeroType = HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)
                             ? HERO_TYPE_BOAT
-                            : s_drawHero->m_cursorType;
+                            : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
                         if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
@@ -7206,7 +7206,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
     m_cursorType = HAS(contextHero->m_eventFlags, HERO_EVENT_EMBARKED)
         ? HERO_TYPE_BOAT
-        : contextHero->m_cursorType;
+        : static_cast<HeroCursorType>(contextHero->m_cursorType);
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
