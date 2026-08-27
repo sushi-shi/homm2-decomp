@@ -11,6 +11,22 @@ or other new portable facilities that have no retail counterpart. Cross-version
 differences between PoL 2.0 and Gold 2.1 remain in the retail evidence ledger
 linked from [Retail version differences](version-differences.md).
 
+## Maintained source structure
+
+The exact Gold/Buka reconstruction retains a few source shapes solely because
+they reproduce the Visual C++ 6 executable: redundant labels, explicit Boolean
+materialization, and casts at boundaries whose underlying retail value is an
+integer. `master` does not preserve those compiler-sensitive spellings when the
+same behavior has a clearer portable representation.
+
+In particular, the castle dialog's selection value can hold either a
+`BuildingSlotType` value or a UI control identifier. `master` models that mixed
+discriminant as an integer and converts to `BuildingSlotType` only when entering
+a building API. Redundant jumps with one natural structured successor are also
+expressed as fallthrough, loop exit, or ordinary conditional flow. Jumps that
+still represent a real shared tail, cleanup path, retry loop, or multi-loop exit
+remain explicit.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |
