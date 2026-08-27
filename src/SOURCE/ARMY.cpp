@@ -1930,18 +1930,17 @@ void army::DoAttack(i32 retaliation) {
                 }
                 break;
             case CREATURE_MUMMY:
-                if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
-                    goto applyMummySpell;
-                }
-                break;
-            case CREATURE_ROYAL_MUMMY:
-                if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
-                applyMummySpell:
+            case CREATURE_ROYAL_MUMMY: {
+                const i32 effectChance = m_monsterType == CREATURE_MUMMY
+                    ? ARMY_ATTACK_EFFECT_CHANCE
+                    : ARMY_ROYAL_MUMMY_EFFECT_CHANCE;
+                if (SRandom(1, ARMY_PERCENT_MAX) < effectChance) {
                     if (target_1 && target_1->SpellCastWorks(SPELL_CURSE)) {
                         target_1->m_spellEffect = SPELL_CURSE;
                     }
                 }
                 break;
+            }
             case CREATURE_ARCHMAGE:
                 if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1
                     && target_1->SpellCastWorks(CREATURE_SPELL_DISPEL)) {

@@ -1184,7 +1184,9 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
 
     if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT) {
         ++bDataEntryTime;
-        goto gotText;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = WIDGET_COMMAND_SELECT;
+        message.payload.widget.id = ENTRY_TEXT_WIDGET;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -1199,7 +1201,6 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
             case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
                     case ENTRY_TEXT_WIDGET:
-                    gotText:
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;

@@ -181,7 +181,6 @@ i8 GUIModemResponseExec(void) {
         if (GUIMRrespptr > MODEM_RESPONSE_TRUNCATE_INDEX) {
             TruncateModemResponse();
         }
-        goto compareResponse;
     } else {
         if (GUIMRc >= PRINTABLE_CHARACTER_FIRST) {
             GUIMRresponse[GUIMRrespptr] = static_cast<char>(GUIMRc);
@@ -189,7 +188,6 @@ i8 GUIModemResponseExec(void) {
         }
         return 0;
     }
-compareResponse:
     if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
         GUIMRrespptr = 0;
         return 0;

@@ -2627,15 +2627,14 @@ void combatManager::GetControl(void) {
             && (gbHumanPlayer[m_playerId[H2EnumIndex(COMBAT_ATTACKER_SIDE)]] != 0
                 || m_playerId[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == 0))) {
         gbThisNetHasControl = true;
-        goto setup_view;
-    }
-    if (m_playerId[H2EnumIndex(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] != 0
-        && gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0)
+    } else if (m_playerId[H2EnumIndex(m_currentSide)] != -1
+               && gbHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] != 0
+               && gbThisNetHumanPlayer[m_playerId[H2EnumIndex(m_currentSide)]] == 0) {
         gbThisNetHasControl = false;
-    else
+    } else {
         gbThisNetHasControl = true;
+    }
 
-setup_view:
     m_smallViewSide[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
     SetupSmallView();
     ResetMouse();
