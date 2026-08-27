@@ -57,6 +57,7 @@ class CleanSourcePatchTests(unittest.TestCase):
             {
                 "src/SOURCE/EVENTS.cpp",
                 "src/SOURCE/X_CAMPGN.cpp",
+                "src/SOURCE/dpnetwin.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
             },
         )
@@ -76,6 +77,12 @@ class CleanSourcePatchTests(unittest.TestCase):
             source,
         )
         self.assertIn("#include <string.h>", result)
+
+    def test_directplay_input_strings_cross_the_legacy_mutable_abi(self):
+        source = ('"Dude",\n                "Heroes Player",\n' * 2)
+        result = clean_source.apply_patches("src/SOURCE/dpnetwin.cpp", source)
+        self.assertEqual(result.count('const_cast<LPSTR>("Dude")'), 2)
+        self.assertEqual(result.count('const_cast<LPSTR>("Heroes Player")'), 2)
 
     def test_makefileid_const_is_encoded_in_source(self):
         declaration = clean_source.clean(
@@ -803,6 +810,24 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 
 
 class CleanSourceVerifyTests(unittest.TestCase):
+    def test_failed_verify_does_not_publish(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "generated"
+            with (
+                mock.patch.object(clean_source, "generate", return_value=(1, 0, [])),
+                mock.patch.object(clean_source, "residue", return_value={}),
+                mock.patch.object(clean_source, "verify", return_value=1),
+                mock.patch.object(clean_source, "publish") as publish,
+                contextlib.redirect_stdout(io.StringIO()),
+            ):
+                status = clean_source.main([
+                    "--out", str(output),
+                    "--verify",
+                    "--publish", "source-gold-2.1-buka",
+                ])
+            self.assertEqual(status, 1)
+            publish.assert_not_called()
+
     def test_verify_runs_generated_nix_build(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)

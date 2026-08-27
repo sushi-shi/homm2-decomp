@@ -107,6 +107,16 @@ GENERATED_PATCHES = {
             "(eventType_g | MAP_TRIGGER_ACTION_FLAG)",
         ),
     ],
+    # DirectPlay 1 predates const-correct Windows interfaces: these two
+    # parameters are documented input strings but the SDK declares LPSTR.
+    "src/SOURCE/dpnetwin.cpp": [
+        (
+            Pattern.LITERAL, 2,
+            '"Dude",\n                "Heroes Player",',
+            'const_cast<LPSTR>("Dude"),\n'
+            '                const_cast<LPSTR>("Heroes Player"),',
+        ),
+    ],
     "src/SOURCE/X_CAMPGN.cpp": [
         (
             Pattern.REGEX, 52,
@@ -2032,6 +2042,8 @@ def main(argv: list[str] | None = None) -> int:
     status = 0
     if args.verify:
         status = verify(out_root)
+        if status:
+            return status
 
     if args.publish:
         return publish(
@@ -2040,7 +2052,7 @@ def main(argv: list[str] | None = None) -> int:
             source_root=source_root,
             full_tree=classic,
             publish_parent=args.publish_parent,
-        ) or status
+        )
     return status
 
 
