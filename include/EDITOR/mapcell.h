@@ -2,7 +2,6 @@
 #define HOMM2_EDITOR_MAPCELL_H
 
 #include <Ints.h>
-#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
 enum class MapCellFlag : i32 {
@@ -86,7 +85,7 @@ using enum TilesetId;
 struct mapCellExtra {
     u16 nextIndex;
     u8 animatedObject : 1;
-    TilesetId objectTileset : 7;
+    u8 objectTilesetBits : 7;
     u8 objectIndex;
     u8 objectLayerBit0 : 1;
     u8 objectLayerBit1 : 1;
@@ -94,8 +93,24 @@ struct mapCellExtra {
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
     u8 drawOverlayOnTop : 1;
-    TilesetId overlayTileset : 6;
+    u8 overlayTilesetBits : 6;
     u8 overlayIndex;
+
+    inline TilesetId ObjectTileset(void) const {
+        return static_cast<TilesetId>(objectTilesetBits);
+    }
+
+    inline void SetObjectTileset(TilesetId tileset) {
+        objectTilesetBits = static_cast<u8>(tileset);
+    }
+
+    inline TilesetId OverlayTileset(void) const {
+        return static_cast<TilesetId>(overlayTilesetBits);
+    }
+
+    inline void SetOverlayTileset(TilesetId tileset) {
+        overlayTilesetBits = static_cast<u8>(tileset);
+    }
 };
 #pragma pack(pop)
 
@@ -108,7 +123,7 @@ public:
         struct {
             u8 m_animatedObject : 1;
             u8 m_isRoad : 1;
-            TilesetId m_objectTileset : 6;
+            u8 m_objectTilesetBits : 6;
         };
     };
     u8 m_objectIndex;
@@ -127,7 +142,7 @@ public:
     };
     u8 m_animatedOverlay : 1;
     u8 m_drawOverlayOnTop : 1;
-    TilesetId m_overlayTileset : 6;
+    u8 m_overlayTilesetBits : 6;
     u8 m_overlayIndex;
     u8 m_flags;
     H2EnumStorage<MapObjectType, u8> m_triggerType;
@@ -136,7 +151,26 @@ public:
     inline b32 HasFlag(MapCellFlag flag) const {
         return (m_flags & H2EnumIndex(flag)) != 0;
     }
+
+    inline TilesetId ObjectTileset(void) const {
+        return static_cast<TilesetId>(m_objectTilesetBits);
+    }
+
+    inline void SetObjectTileset(TilesetId tileset) {
+        m_objectTilesetBits = static_cast<u8>(tileset);
+    }
+
+    inline TilesetId OverlayTileset(void) const {
+        return static_cast<TilesetId>(m_overlayTilesetBits);
+    }
+
+    inline void SetOverlayTileset(TilesetId tileset) {
+        m_overlayTilesetBits = static_cast<u8>(tileset);
+    }
 };
+
+static_assert(sizeof(mapCellExtra) == 7);
+static_assert(sizeof(mapCell) == 12);
 
 struct oldMapCell {
     u8 raw[20];

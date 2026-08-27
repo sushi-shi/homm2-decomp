@@ -340,7 +340,7 @@ void searchArray::SeedPosition(
                                     s_seedPositionState.directionBlocked = true;
                                     if (((1 << H2EnumIndex(s_seedPositionState.direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && s_seedPositionState.neighborCell->m_objectIndex != SEARCH_NO_OBJECT
-                                        && s_seedPositionState.neighborCell->m_objectTileset != TILESET_DUMMY
+                                        && s_seedPositionState.neighborCell->ObjectTileset() != TILESET_DUMMY
                                         && !(s_seedPositionState.neighborCell->m_flags & SEARCH_CELL_BLOCKED)) {
                                         s_seedPositionState.directionBlocked = false;
                                     }

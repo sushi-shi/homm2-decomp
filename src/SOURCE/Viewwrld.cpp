@@ -358,9 +358,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if (cell->m_objectLayerBit0 && cell->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[H2EnumIndex(cell->m_objectTileset)]) {
+                    && drawTilesets0[H2EnumIndex(cell->ObjectTileset())]) {
                     IconToBitmapScale(
-                        m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(cell->ObjectTileset())],
                         gpWindowManager->m_screen,
                         screenX,
                         drawY1,
@@ -380,9 +380,9 @@ void advManager::VWCompleteDraw(void) {
                     extraCell = NULL;
                 while (extraCell != NULL) {
                     if (extraCell->objectLayerBit0 && extraCell->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[H2EnumIndex(extraCell->objectTileset)]) {
+                        && drawTilesets0[H2EnumIndex(extraCell->ObjectTileset())]) {
                         IconToBitmapScale(
-                            m_objectIcons[H2EnumIndex(extraCell->objectTileset)],
+                            m_objectIcons[H2EnumIndex(extraCell->ObjectTileset())],
                             gpWindowManager->m_screen,
                             screenX,
                             drawY1,
@@ -404,9 +404,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if (!cell->m_objectLayerBit0 && cell->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[H2EnumIndex(cell->m_objectTileset)]) {
+                    && drawTilesets0[H2EnumIndex(cell->ObjectTileset())]) {
                     IconToBitmapScale(
-                        m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(cell->ObjectTileset())],
                         gpWindowManager->m_screen,
                         screenX,
                         drawY1,
@@ -426,9 +426,9 @@ void advManager::VWCompleteDraw(void) {
                     extraCell = NULL;
                 while (extraCell != NULL) {
                     if (!extraCell->objectLayerBit0 && extraCell->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[H2EnumIndex(extraCell->objectTileset)]) {
+                        && drawTilesets0[H2EnumIndex(extraCell->ObjectTileset())]) {
                         IconToBitmapScale(
-                            m_objectIcons[H2EnumIndex(extraCell->objectTileset)],
+                            m_objectIcons[H2EnumIndex(extraCell->ObjectTileset())],
                             gpWindowManager->m_screen,
                             screenX,
                             drawY1,
@@ -450,9 +450,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if (cell->m_overlayIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[H2EnumIndex(cell->m_overlayTileset)]) {
+                    && drawTilesets0[H2EnumIndex(cell->OverlayTileset())]) {
                     IconToBitmapScale(
-                        m_objectIcons[H2EnumIndex(cell->m_overlayTileset)],
+                        m_objectIcons[H2EnumIndex(cell->OverlayTileset())],
                         gpWindowManager->m_screen,
                         screenX,
                         drawY1,
@@ -471,9 +471,9 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (drawTilesets0[H2EnumIndex(extraCell->overlayTileset)]) {
+                    if (drawTilesets0[H2EnumIndex(extraCell->OverlayTileset())]) {
                         IconToBitmapScale(
-                            m_objectIcons[H2EnumIndex(extraCell->overlayTileset)],
+                            m_objectIcons[H2EnumIndex(extraCell->OverlayTileset())],
                             gpWindowManager->m_screen,
                             screenX,
                             drawY1,
