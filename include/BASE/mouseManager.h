@@ -38,8 +38,8 @@ public:
     i32 m_cursorBottom;
     i32 m_savedWidth;
     i32 m_savedHeight;
-    i32 m_forcePointerUpdate;
-    i32 m_cursorReady;
+    b32 m_forcePointerUpdate;
+    b32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);
     virtual i32 Open(i32) override;
@@ -94,5 +94,5 @@ extern i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern b32 gbInSetPointer;
-extern i32 bInNewMouseUpdate;
+extern b32 bInNewMouseUpdate;
 #endif

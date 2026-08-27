@@ -67,7 +67,7 @@ public:
     i8 m_townLocatorPage;
     i8 m_townIds[H2EnumIndex(GAME_TOWN_COUNT)];
     i32 m_resources[H2EnumIndex(RES_COUNT)];
-    i8 m_evilInterface;
+    b8 m_evilInterface;
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
     playerAIData m_aiData;

@@ -559,11 +559,11 @@ public:
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
     H2EnumStorage<CreatureType, u8> m_summonedCreatureType[COMBAT_SIDE_COUNT];
-    i32 m_sideDefeated[COMBAT_SIDE_COUNT];
-    i32 m_networkArmyPresent[COMBAT_SIDE_COUNT];
+    b32 m_sideDefeated[COMBAT_SIDE_COUNT];
+    b32 m_networkArmyPresent[COMBAT_SIDE_COUNT];
     i32 m_playerId[COMBAT_SIDE_COUNT];
     i32 m_experienceValue[COMBAT_SIDE_COUNT];
-    i32 m_heroCastSpell[COMBAT_SIDE_COUNT];
+    b32 m_heroCastSpell[COMBAT_SIDE_COUNT];
     i32 m_armyCount[COMBAT_SIDE_COUNT];
     class army m_armies[COMBAT_SIDE_COUNT][COMBAT_ARMY_STORAGE_SLOT_COUNT];
     H2EnumStorage<CombatSide, i32> m_currentArmySide;
@@ -588,7 +588,7 @@ public:
     i32 m_keepAttacksRemaining[COMBAT_SIDE_COUNT];
     b32 m_inCastleCombat;
     i32 m_unknownF337[COMBAT_SIDE_COUNT];
-    i32 m_visitingHeroPresent[COMBAT_SIDE_COUNT];
+    b32 m_visitingHeroPresent[COMBAT_SIDE_COUNT];
     char _pad_0xf347[COMBAT_RUNTIME_ALIGNMENT_SIZE];
     i32 m_unknownF34B;
     i32 m_unknownF34F;
@@ -599,9 +599,9 @@ public:
     class heroWindow* m_combatWindow;
     char _pad_0xf36b[COMBAT_RUNTIME_DOUBLE_PAD_SIZE];
     i32 m_unknownF373;
-    i32 m_sideRetreated[COMBAT_SIDE_COUNT];
+    b32 m_sideRetreated[COMBAT_SIDE_COUNT];
     i32 m_limitCreatureCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
-    i32 m_drawHero[COMBAT_SIDE_COUNT];
+    b32 m_drawHero[COMBAT_SIDE_COUNT];
     i32 m_drawHeroOverlay[COMBAT_SIDE_COUNT];
     b32 m_combatWindowOpen;
     class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];

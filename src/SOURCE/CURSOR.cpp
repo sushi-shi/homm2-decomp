@@ -495,7 +495,7 @@ void advManager::TurnTo(MapDirection direction) {
         UpdateScreen(0, 0);
 }
 
-i32 advManager::GetMoveShowIt(
+b32 advManager::GetMoveShowIt(
     hero* movingHero,
     MapDirection direction
 ) {
@@ -543,7 +543,7 @@ mapCell* advManager::MoveHero(
     i32 pixelsPerStep;
 
     if (gbThisNetHumanPlayer[giCurPlayer])
-        platform::SetDialogMenusEnabled(0);
+        platform::SetDialogMenusEnabled(false);
     gbHitEvent = false;
     *adjacentMonster = 0;
     *outOfMobility = 0;
@@ -866,7 +866,7 @@ movementDone:
     }
 adjacentDone:
     if (gbThisNetHumanPlayer[giCurPlayer])
-        platform::SetDialogMenusEnabled(1);
+        platform::SetDialogMenusEnabled(true);
 
     if (mapEvent) {
         if (processEvent) {
@@ -879,7 +879,7 @@ adjacentDone:
                 }
                 if (mapEvent->artifact != -1
                     && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
-                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), 1, -1);
+                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
                 if (mapEvent->cancelAfterVisit)
                     mapEvent->active = false;
             }
@@ -907,7 +907,7 @@ adjacentDone:
             }
             if (mapEvent->artifact != -1
                 && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
-                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), 1, -1);
+                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
                 if (primaryType != -1) {
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;

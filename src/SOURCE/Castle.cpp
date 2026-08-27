@@ -789,7 +789,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     heroChoiceIndex =
                                         message.payload.widget.id - CONTROL_RECRUIT_FIRST;
                                 if (quickFlag) {
-                                    HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), 1, 0);
+                                    HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), true, false);
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
                                     gpWindowManager

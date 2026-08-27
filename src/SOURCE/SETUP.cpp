@@ -409,7 +409,7 @@ i32 game::SetupGame(void) {
     LogStr("Setup 0");
     result = true;
     xIsPlayingExpansionCampaign = 0;
-    xIsExpansionMap = 0;
+    xIsExpansionMap = false;
     gbInCampaign = false;
     gbCampaignSideChoice = CAMPAIGN_ROLAND;
     iMPExtendedType = REMOTE_GAME_UNINITIALIZED;
@@ -525,7 +525,7 @@ i32 game::SetupGame(void) {
                         break;
                     case CHOICE_TWO:
                         xIsPlayingExpansionCampaign = 1;
-                        xIsExpansionMap = 1;
+                        xIsExpansionMap = true;
                         break;
                     case DIALOG_CANCEL:
                         result = false;
@@ -548,7 +548,7 @@ i32 game::SetupGame(void) {
                         break;
                     case CHOICE_TWO:
                         xIsPlayingExpansionCampaign = 1;
-                        xIsExpansionMap = 1;
+                        xIsExpansionMap = true;
                         xCampaign.InitNewCampaign(xCampaign.Choose());
                         break;
                     case DIALOG_CANCEL:
@@ -621,10 +621,10 @@ i32 game::PickLoadGame(void) {
 
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case CHOICE_ONE:
-                xIsExpansionMap = 0;
+                xIsExpansionMap = false;
                 break;
             case CHOICE_TWO:
-                xIsExpansionMap = 1;
+                xIsExpansionMap = true;
                 break;
             case DIALOG_CANCEL:
                 return 0;

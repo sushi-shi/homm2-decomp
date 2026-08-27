@@ -50,7 +50,7 @@ void InitGraphics(void) {
     // Retail chose between DirectDraw and WinG here. There is one path now.
     giGraphicsType = WINGRAPH_GRAPHICS_WING;
     gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = false;
-    platform::SetMenuVisible(1);
+    platform::SetMenuVisible(true);
 }
 
 // Retail left the ends of the palette to the desktop and only owned the middle.
@@ -80,6 +80,6 @@ void CleanUpWinGraphics(void) {
 // Retail could only go full screen through DirectDraw, and stayed windowed
 // without it. Reopening the display would strand the screen bitmap the game
 // holds, so the window stays as it is until the backend can switch in place.
-void SetFullScreenStatus(i32 fullScreen) {
+void SetFullScreenStatus(b32 fullScreen) {
     static_cast<void>(fullScreen);
 }

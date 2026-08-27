@@ -938,7 +938,7 @@ i32 oldmain(void) {
         if (gbGameOver) {
         game_over:
             RemoteCleanup();
-            bShowIt = 1;
+            bShowIt = true;
             gpMouseManager->SetPointer(
                 "advmice.mse",
                 0,
@@ -2964,7 +2964,7 @@ void BVResMsg(const char* s, ResourceType res, i32 qty) {
     giBottomViewResource = res;
     giBottomViewResourceQty = qty;
     strcpy(gcBottomViewText, s);
-    gpAdvManager->UpdBottomView(1, 1, 1);
+    gpAdvManager->UpdBottomView(true, true, true);
 }
 
 void GOut(const char* str) {
@@ -3020,8 +3020,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     heroWindow* netWindow_j;
     i32 result_p;
     i32 textWidth_b;
-
-    i32 savedShowIt_p;
+    b32 savedShowIt_p;
     b32 updateInput_f;
     i32 inputLength_a;
     char inputText_b[BOX_TEXT_LENGTH];
@@ -3034,7 +3033,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     b32 done_a;
     b32 redrawLines_l;
-    i32 redrawSavedShowIt_a;
+    b32 redrawSavedShowIt_a;
     KbRemotePacket* remoteData_g;
     b32 redrawAdventure_o;
     i32 cursorState_j;
@@ -3058,7 +3057,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     inputLength_a = 0;
     savedShowIt_p = bShowIt;
-    bShowIt = 1;
+    bShowIt = true;
     gbMoveShown = false;
     netWindow_j = new heroWindow(
         0,
@@ -3123,7 +3122,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt_p;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
-                            bShowIt = 1;
+                            bShowIt = true;
                             redrawAdventure_o = true;
                         }
                         gbLeaveNetBoxAlone = false;
@@ -3292,7 +3291,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         gpWindowManager->RemoveWindow(netWindow_j);
         gbDrawWindowBackground = true;
         redrawSavedShowIt_a = bShowIt;
-        bShowIt = 1;
+        bShowIt = true;
         gpAdvManager->RedrawAdvScreen(1, 0);
         bShowIt = redrawSavedShowIt_a;
     } else {
@@ -3324,10 +3323,10 @@ void ShutDown(const char* msg) {
     bInShutDown = true;
     gbClosingApp = true;
     buf[0] = 0;
-    gpMouseManager->SetColorMice(0);
+    gpMouseManager->SetColorMice(false);
     if (msg) {
         strcpy(buf, msg);
-        SetFullScreenStatus(0);
+        SetFullScreenStatus(false);
         LogStr(buf);
         platform::ShowMessage(
             localization::Tr("system.unexpected_termination"),
@@ -3851,7 +3850,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 gpCurPlayer->m_resources[loopIndex] += loopIndex == H2EnumIndex(RES_GOLD)
                     ? APP_MENU_GOLD_BONUS
                     : APP_MENU_RESOURCE_BONUS;
-            gpAdvManager->UpdBottomView(1, 1, 1);
+            gpAdvManager->UpdBottomView(true, true, true);
             break;
 
         default:
@@ -3873,7 +3872,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                         APP_MENU_CHEAT_ARMY_QUANTITY,
                         -1
                     );
-                    gpAdvManager->UpdBottomView(1, 1, 1);
+                    gpAdvManager->UpdBottomView(true, true, true);
                 }
                 break;
             }
@@ -10514,7 +10513,7 @@ i32 gMapX;
 i32 gMapY;
 char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
 b32 bFreshSave;
-i32 bShowIt;
+b32 bShowIt;
 i32 gLowPageScreenSelector;
 class heroWindowManager* gpWindowManager;
 i32 giCurWatchPlayer;
