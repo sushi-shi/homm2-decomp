@@ -1,0 +1,2 @@
+category	file	function	source_type	destination_type	expression	reason
+same-type	src/SOURCE/ADVMGR.cpp	SystemOptionsHandler	bool	bool	static_cast<bool>(IsAudiereBackend(gpSoundManager) || IsMilesBackend(gpSoundManager))	VC6 materializes the explicit Boolean conversion differently from the bare short-circuit expression; removing it changes the exact retail function body.

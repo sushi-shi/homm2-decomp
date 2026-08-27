@@ -90,6 +90,8 @@ public:
         return static_cast<Integer>(static_cast<Enum>(m_value));
     }
 
+    constexpr Storage value() const { return m_value; }
+
     H2EnumStorage& operator=(Enum value) {
         m_value = static_cast<Storage>(value);
         return *this;
@@ -351,6 +353,14 @@ constexpr i32 H2EnumIndex(Value value) {
         (target) = (raw);                                                                          \
         (target) &= (mask);                                                                        \
     } while (0)
+#endif
+
+// Read the exact packed representation without pretending that flag-encoded
+// or otherwise overloaded bytes are members of the semantic enum domain.
+#if H2_STRICT_ENUMS
+#define H2_ENUM_RAW(storage) ((storage).value())
+#else
+#define H2_ENUM_RAW(storage) (storage)
 #endif
 
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at

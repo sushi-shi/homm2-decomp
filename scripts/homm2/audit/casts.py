@@ -8,12 +8,10 @@ records the source and destination domains, canonical types, storage widths,
 enum identities, enclosing function, and exact source span for every explicit
 C++ cast in project-owned source.
 
-The report is deliberately diagnostic rather than a build gate.  Categories
-such as ``cross-enum``, ``literal-to-enum``, ``same-type``, and
-``integer-narrowing`` are high-priority review queues.  ``integer-to-enum`` and
-``enum-to-integer`` often represent real packed-data or ABI boundaries, but the
-report retains enough provenance to decide that from source rather than merely
-silencing the compiler.
+The report can also enforce the reviewed high-priority queue. Categories such
+as ``cross-enum``, ``literal-to-enum``, and ``same-type`` fail ``--check`` unless
+the current exact-retail site and its byte-evidence reason are recorded in
+``config/retail_cast_exceptions.tsv``. Stale exception rows fail too.
 
 Run inside ``nix develop .#build``::
 
@@ -22,11 +20,13 @@ Run inside ``nix develop .#build``::
     homm2 audit casts --category cross-enum --category literal-to-enum
     homm2 audit casts --format json --output build/casts.json
     homm2 audit casts --tu SOURCE/Castle
+    homm2 audit casts --check
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 import gc
 import importlib
 import json
@@ -55,7 +55,12 @@ from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+RETAIL_EXCEPTION_MANIFEST = Path("config/retail_cast_exceptions.tsv")
+RETAIL_EXCEPTION_FIELDS = (
+    "category", "file", "function", "source_type", "destination_type",
+    "expression", "reason",
+)
 CAST_KINDS = {
     ci.CursorKind.CXX_STATIC_CAST_EXPR: "static",
     ci.CursorKind.CXX_CONST_CAST_EXPR: "const",
@@ -140,6 +145,66 @@ class Cast:
     destination_enum: str
     function: str
     expression: str
+
+    @property
+    def review_key(self) -> tuple[str, str, str, str, str, str]:
+        return (
+            self.category,
+            self.file,
+            self.function,
+            self.source_type,
+            self.destination_type,
+            self.expression,
+        )
+
+
+@dataclass(frozen=True, order=True)
+class ReviewedException:
+    category: str
+    file: str
+    function: str
+    source_type: str
+    destination_type: str
+    expression: str
+    reason: str
+
+    @property
+    def key(self) -> tuple[str, str, str, str, str, str]:
+        return (
+            self.category,
+            self.file,
+            self.function,
+            self.source_type,
+            self.destination_type,
+            self.expression,
+        )
+
+
+def _reviewed_exceptions(
+    repo: Path,
+) -> dict[tuple[str, str, str, str, str, str], ReviewedException]:
+    path = repo / RETAIL_EXCEPTION_MANIFEST
+    if not path.is_file():
+        return {}
+    with path.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(stream, delimiter="\t")
+        if tuple(reader.fieldnames or ()) != RETAIL_EXCEPTION_FIELDS:
+            raise RuntimeError(
+                f"{RETAIL_EXCEPTION_MANIFEST}: expected columns "
+                + ", ".join(RETAIL_EXCEPTION_FIELDS))
+        rows = [ReviewedException(**row) for row in reader]
+    invalid = [
+        row for row in rows
+        if (row.category not in HIGH_PRIORITY or not row.file or not row.function
+            or not row.source_type or not row.destination_type
+            or not row.expression or not row.reason)
+    ]
+    if invalid:
+        raise RuntimeError(f"{RETAIL_EXCEPTION_MANIFEST}: invalid exception row")
+    by_key = {row.key: row for row in rows}
+    if len(by_key) != len(rows):
+        raise RuntimeError(f"{RETAIL_EXCEPTION_MANIFEST}: duplicate exception key")
+    return by_key
 
 
 def _canonical(type_: ci.Type) -> ci.Type:
@@ -346,7 +411,12 @@ def _spelled_expression(cursor: ci.Cursor, repo: Path, relative: str,
         blob = (repo / relative).read_bytes()
         raw = blob[cursor.extent.start.offset:cursor.extent.end.offset]
         token = f"{cast_kind}_cast".encode()
-        if token not in raw:
+        # An explicitly written C++ cast owns a source extent beginning at its
+        # cast keyword. Clang also exposes a few implicit enum conversions as
+        # CXX_*_CAST_EXPR cursors whose extent can cover an entire case label or
+        # switch arm. Merely finding another cast later in that broad extent
+        # falsely attributed the unrelated token to the implicit conversion.
+        if not raw.lstrip().startswith(token):
             return None
         text = raw.decode("utf-8")
     except (OSError, UnicodeDecodeError):
@@ -481,6 +551,22 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         for row in raw
     }
     casts = sorted(unique.values())
+    reviewed = _reviewed_exceptions(repo)
+    observed_high_priority = {
+        item.review_key: item for item in casts if item.category in HIGH_PRIORITY
+    }
+    reviewed_observed = sorted(
+        observed_high_priority[key]
+        for key in observed_high_priority.keys() & reviewed.keys()
+    )
+    unreviewed = sorted(
+        observed_high_priority[key]
+        for key in observed_high_priority.keys() - reviewed.keys()
+    )
+    stale = sorted(
+        reviewed[key]
+        for key in reviewed.keys() - observed_high_priority.keys()
+    )
     counts = Counter(item.category for item in casts)
     kind_counts = Counter(item.cast_kind for item in casts)
     lexical_counts = _lexical_counts(repo)
@@ -498,6 +584,9 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             for kind in sorted(set(lexical_counts) | set(kind_counts))
         },
         "high_priority": sum(item.category in HIGH_PRIORITY for item in casts),
+        "reviewed_high_priority": [asdict(item) for item in reviewed_observed],
+        "unreviewed_high_priority": [asdict(item) for item in unreviewed],
+        "stale_reviewed_exceptions": [asdict(item) for item in stale],
         "strict_diagnostics": diagnostics,
         "strict_parse_clean": not diagnostics,
     }
@@ -542,6 +631,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="limit source paths (partial evidence)")
     parser.add_argument("--portable", action="store_true",
                         help="parse a portable CMake compilation database")
+    parser.add_argument(
+        "--check", action="store_true",
+        help="fail on strict diagnostics, unreviewed high-priority casts, or stale exceptions",
+    )
     parser.add_argument("-j", "--jobs", type=int, default=0)
     args = parser.parse_args(argv)
     try:
@@ -562,6 +655,12 @@ def main(argv: list[str] | None = None) -> int:
         args.output.write_text(output)
     else:
         print(output, end="")
+    if args.check and (
+        report["strict_diagnostics"]
+        or report["unreviewed_high_priority"]
+        or report["stale_reviewed_exceptions"]
+    ):
+        return 1
     return 0
 
 

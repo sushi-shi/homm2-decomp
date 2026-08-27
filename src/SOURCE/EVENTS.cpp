@@ -2998,7 +2998,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             teleportCount_e = 0;
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                    if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
+                    if (H2_ENUM_RAW(
+                            (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
@@ -3014,7 +3015,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount_e = Random(1, teleportCount_e);
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                        if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
+                        if (H2_ENUM_RAW(
+                                (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
@@ -7144,7 +7146,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             exitCount = 0;
             for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
                 for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
-                    if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
+                    if (H2_ENUM_RAW(gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType)
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
@@ -7161,7 +7163,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     exitCount = Random(1, exitCount);
                 for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
                     for (exitX = 0; exitX < MAP_WIDTH; ++exitX) {
-                        if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
+                        if (H2_ENUM_RAW(gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType)
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex

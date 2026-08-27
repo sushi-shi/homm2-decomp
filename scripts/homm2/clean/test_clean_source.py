@@ -55,7 +55,6 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
-                "src/SOURCE/EVENTS.cpp",
                 "src/SOURCE/X_CAMPGN.cpp",
                 "src/SOURCE/dpnetwin.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
@@ -222,6 +221,12 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         self.assertIn(
             "(value) = static_cast<Kind>((packed.field) & (KIND_MASK));",
             result,
+        )
+
+    def test_packed_enum_representation_read_is_explicit(self):
+        self.assertEqual(
+            clean_source.rewrite("H2_ENUM_RAW(cell.triggerType)"),
+            "(cell.triggerType).value()",
         )
 
     def test_residue_rejects_unknown_enum_scaffolding(self):

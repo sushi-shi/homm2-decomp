@@ -8,6 +8,7 @@ import clang.cindex as ci
 from homm2.audit.casts import (
     HIGH_PRIORITY,
     _lexical_counts,
+    _reviewed_exceptions,
     _text,
     analyze_translation_unit,
 )
@@ -103,6 +104,24 @@ int g() { return TO_INT(2); }
         self.assertEqual(rows, [])
         self.assertEqual(counts, {"static": 1})
 
+    def test_implicit_case_conversion_does_not_borrow_a_later_cast(self):
+        text = """
+enum Command { A = 0 };
+int f(Command command, int value) {
+    switch (value) {
+    case A:
+        return static_cast<int>(command);
+    }
+    return 0;
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            rows = analyze_translation_unit(parse(repo, text), repo)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].category, "enum-to-integer")
+        self.assertEqual(rows[0].line, 6)
+
     def test_explicit_conversion_reports_the_wrapped_source_type(self):
         text = """
 struct Wrapper {
@@ -134,6 +153,27 @@ char f(Wrapper value) { return static_cast<char>(value); }
         self.assertIn("CROSS-ENUM", text)
         self.assertNotIn("ENUM-TO-INTEGER", text)
         json.dumps(report)
+
+    def test_review_manifest_uses_exact_source_identity(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            path = repo / "config/retail_cast_exceptions.tsv"
+            path.parent.mkdir()
+            path.write_text(
+                "category\tfile\tfunction\tsource_type\tdestination_type\t"
+                "expression\treason\n"
+                "same-type\tsrc/SOURCE/TEST.cpp\tReview\ti32\ti32\t"
+                "static_cast<i32>(value)\tRetail code-generation evidence.\n"
+            )
+            rows = _reviewed_exceptions(repo)
+        self.assertEqual(len(rows), 1)
+        self.assertIn(
+            (
+                "same-type", "src/SOURCE/TEST.cpp", "Review", "i32", "i32",
+                "static_cast<i32>(value)",
+            ),
+            rows,
+        )
 
 
 if __name__ == "__main__":

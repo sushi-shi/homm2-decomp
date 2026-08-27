@@ -99,13 +99,6 @@ class Pattern(enum.Enum):
 # changes retail code generation. The other entries adapt a pre-const Windows
 # ABI and a third-party header without changing reconstructed game source.
 GENERATED_PATCHES = {
-    "src/SOURCE/EVENTS.cpp": [
-        (
-            Pattern.LITERAL, 4,
-            "static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)",
-            "(eventType_g | MAP_TRIGGER_ACTION_FLAG)",
-        ),
-    ],
     # DirectPlay 1 predates const-correct Windows interfaces: these two
     # parameters are documented input strings but the SDK declares LPSTR.
     "src/SOURCE/dpnetwin.cpp": [
@@ -285,6 +278,12 @@ def _clear_flag(args: list[str]) -> str:
     return f"(({flags}) &= ~({bit}))"
 
 
+def _enum_raw(args: list[str]) -> str:
+    if len(args) != 1:
+        raise ValueError("H2_ENUM_RAW expects one value")
+    return f"({args[0].strip()}).value()"
+
+
 def _alloc(name: str):
     """Collapse the file/line-carrying allocation wrappers to their plain form.
 
@@ -367,6 +366,7 @@ CALL_RULES = {
     "H2_ENUM_ASSIGN_CHAIN_5": _assign_chain_typed,
     "H2_ENUM_DECODE_MASKED": _decode_masked,
     "H2_ENUM_CLEAR_FLAG": _clear_flag,
+    "H2_ENUM_RAW": _enum_raw,
 
     "SIZE": _drop,
 
