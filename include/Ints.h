@@ -448,4 +448,15 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_STEPPED(name)
 #endif
 
+// A domain that is never stepped as another domain value, but is deliberately
+// shifted into an integer key (the expansion campaign's one-based switches).
+#if H2_STRICT_ENUMS
+#define H2_ENUM_INDEX_OFFSET(name)                                                                 \
+    inline constexpr i32 operator+(name value, i32 offset) {                                       \
+        return static_cast<i32>(value) + offset;                                                   \
+    }
+#else
+#define H2_ENUM_INDEX_OFFSET(name)
+#endif
+
 #endif

@@ -30,32 +30,10 @@ def git(repo: Path, *args: str) -> str:
 
 
 class CleanSourcePatchTests(unittest.TestCase):
-    def test_patch_covering_fewer_sites_than_declared_fails_loudly(self):
-        text = "case MAP_ONE + 1:\n" * 5
-        with self.assertRaisesRegex(SystemExit, r"hit 5 site\(s\).*expected 52"):
-            clean_source.apply_patches("src/SOURCE/X_CAMPGN.cpp", text)
-
-    def test_patch_covering_more_sites_than_declared_fails_loudly(self):
-        text = "case MAP_ONE + 1:\n" * 53
-        with self.assertRaisesRegex(SystemExit, r"hit 53 site\(s\).*expected 52"):
-            clean_source.apply_patches("src/SOURCE/X_CAMPGN.cpp", text)
-
-    def test_campaign_cases_keep_the_enum_domain(self):
-        text = "case MAP_ONE + 1:\n" * 52
-        result = clean_source.apply_patches("src/SOURCE/X_CAMPGN.cpp", text)
-        self.assertEqual(
-            result.count(
-                "case static_cast<ExpansionCampaignMap>("
-                "H2EnumIndex(MAP_ONE) + 1):"
-            ),
-            52,
-        )
-
     def test_gold_source_needs_only_the_remaining_audited_patches(self):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
-                "src/SOURCE/X_CAMPGN.cpp",
                 "src/SOURCE/dpnetwin.cpp",
                 "vendor/audiere-1.9.2/audiere.h",
             },
@@ -203,6 +181,12 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         self.assertEqual(
             clean_source.rewrite("H2_ENUM_STEPPED(CreatureType)"),
             "ENABLE_ENUM_STEPS(CreatureType)",
+        )
+
+    def test_integer_offset_domains_do_not_construct_synthetic_enum_values(self):
+        self.assertEqual(
+            clean_source.rewrite("H2_ENUM_INDEX_OFFSET(ExpansionCampaignMap)"),
+            "ENABLE_ENUM_INDEX_OFFSETS(ExpansionCampaignMap)",
         )
 
     def test_size_annotations_are_removed(self):

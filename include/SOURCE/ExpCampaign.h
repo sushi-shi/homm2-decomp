@@ -47,7 +47,7 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignMap)
     MAP_VOY_BLOOD_IS_THICKER                    = 3,
     EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP = 4
 H2_ENUM_CLASS_END(ExpansionCampaignMap)
-H2_ENUM_STEPPED(ExpansionCampaignMap)
+H2_ENUM_INDEX_OFFSET(ExpansionCampaignMap)
 
 H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
     AWARD_ELVEN_ALLIANCE      = 0,

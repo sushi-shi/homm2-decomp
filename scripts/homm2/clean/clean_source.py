@@ -109,13 +109,6 @@ GENERATED_PATCHES = {
             '                const_cast<LPSTR>("Heroes Player"),',
         ),
     ],
-    "src/SOURCE/X_CAMPGN.cpp": [
-        (
-            Pattern.REGEX, 52,
-            r"case (MAP_[A-Z0-9_]+) \+ 1:",
-            r"case static_cast<ExpansionCampaignMap>(H2EnumIndex(\1) + 1):",
-        ),
-    ],
     "vendor/audiere-1.9.2/audiere.h": [
         (
             Pattern.LITERAL, 1,
@@ -362,6 +355,7 @@ CALL_RULES = {
 
     # Operator sets for domains used as counters or bit flags.
     "H2_ENUM_STEPPED": _operator_macro("ENABLE_ENUM_STEPS"),
+    "H2_ENUM_INDEX_OFFSET": _operator_macro("ENABLE_ENUM_INDEX_OFFSETS"),
     "H2_ENUM_FLAGS": _operator_macro("ENABLE_ENUM_FLAGS"),
     "H2_ENUM_ASSIGN_CHAIN_5": _assign_chain_typed,
     "H2_ENUM_DECODE_MASKED": _decode_masked,

@@ -378,4 +378,9 @@ private:
         return old;                                                                                \
     }
 
+#define ENABLE_ENUM_INDEX_OFFSETS(name)                                                            \
+    MAYBE_UNUSED_INLINE constexpr i32 operator+(name value, i32 offset) {                          \
+        return static_cast<i32>(value) + offset;                                                   \
+    }
+
 #endif
