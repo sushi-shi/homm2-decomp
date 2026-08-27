@@ -19,6 +19,8 @@ POLICIES = (
 )
 
 ENUM_DECLARATION = re.compile(r"\benum\s+class\s+(\w+)")
+TYPEDEF_ALIAS = re.compile(r"\btypedef\s+((?:(?:\w+)::)*\w+)\s+(\w+)\s*;")
+USING_ALIAS = re.compile(r"\busing\s+(\w+)\s*=\s*((?:(?:\w+)::)*\w+)\s*;")
 ENUM_CAST = re.compile(r"\bstatic_cast\s*<\s*(?:(?:\w+)::)*(\w+)\s*>")
 ENUM_BOUNDARY_MARKER = "H2_ENUM_CODE_BOUNDARY"
 
@@ -38,6 +40,23 @@ def main() -> int:
         for source in contents.values()
         for match in ENUM_DECLARATION.finditer(source)
     }
+    aliases = [
+        (match.group(1).rsplit("::", 1)[-1], match.group(2))
+        for source in contents.values()
+        for match in TYPEDEF_ALIAS.finditer(source)
+    ]
+    aliases.extend(
+        (match.group(2).rsplit("::", 1)[-1], match.group(1))
+        for source in contents.values()
+        for match in USING_ALIAS.finditer(source)
+    )
+    while True:
+        discovered = {
+            alias for target, alias in aliases if target in enum_names and alias not in enum_names
+        }
+        if not discovered:
+            break
+        enum_names.update(discovered)
     for path, source in contents.items():
         relative = path.relative_to(root)
         lines = source.splitlines()
