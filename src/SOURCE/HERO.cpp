@@ -845,12 +845,11 @@ void hero::CheckLevel(void) {
                     weight -= iGetSSByAlignment[H2EnumIndex(skill)][H2EnumIndex(m_cursorType)];
                     if (weight <= 0) {
                         choices[slot] = skill;
-                        goto nextAttempt;
+                        break;
                     }
                 }
                 skill = HeroSecondarySkill((H2EnumIndex(skill) + 1) % H2EnumIndex(HERO_SKILL_COUNT));
             }
-        nextAttempt:
             tryCount--;
         }
 
