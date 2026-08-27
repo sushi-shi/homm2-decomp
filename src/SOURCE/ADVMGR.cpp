@@ -6773,7 +6773,7 @@ void advManager::TownQuickView(
     window->BroadcastMessage(message);
 
     if (scouting != TOWN_QUICK_INFORMATION_EXACT
-        || BitTest(gpGame->m_knownTowns, static_cast<i8>(townPtr->m_id)) == 0) {
+        || BitTest(gpGame->m_knownTowns, townPtr->m_id) == 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
@@ -6798,7 +6798,7 @@ void advManager::TownQuickView(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, GetTownName(static_cast<i8>(townPtr->m_id)));
+    sprintf(gText, GetTownName(townPtr->m_id));
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_QUICK_NAME_WIDGET;
     message.payload.widget.data.text = gText;
@@ -7059,7 +7059,7 @@ void advManager::TownQuickView(
     CompleteDraw(0);
     UpdateScreen(0, 0);
     if (message.type == MESSAGE_LEFT_BUTTON_DOWN && townPtr->m_owner == giCurPlayer) {
-        SetTownContext(static_cast<i8>(townPtr->m_id));
+        SetTownContext(townPtr->m_id);
     }
     gpResourceManager->Dispose(creatureIcon);
 }
@@ -8901,7 +8901,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         mapY = hero->m_y;
 
         for (index = gpSearchArray->m_pathLength - 1; index >= 0; --index) {
-            dir = static_cast<u8>(gpSearchArray->m_storage.path.directions[index + 1]);
+            dir = gpSearchArray->m_storage.path.directions[index + 1];
             thisTile = GetCell(mapX, mapY);
             mapX += normalDirTable[dir].x;
             mapY += normalDirTable[dir].y;
@@ -8961,8 +8961,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             if (index == 0) {
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = 1;
             } else {
-                fromDir =
-                    static_cast<u8>(gpSearchArray->m_storage.path.directions[index]);
+                fromDir = gpSearchArray->m_storage.path.directions[index];
                 m_visibilityMap[mapX + mapY * MAP_WIDTH] = static_cast<u16>(
                     frame * ROUTE_ARROW_FRAME_STRIDE + gbArrow[fromDir][dir]
                     + ROUTE_ARROW_FRAME_OFFSET
@@ -10492,6 +10491,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED
+                                // VC6 lowers this explicit Boolean materialization
+                                // differently from the bare short-circuit expression.
                                 && static_cast<bool>(IsAudiereBackend(gpSoundManager)
                                                      || IsMilesBackend(gpSoundManager))
                                        == false) {

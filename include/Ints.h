@@ -116,6 +116,16 @@ public:
         return *this;
     }
 
+    // Packed fields are sometimes masked before they become a valid enum
+    // value. Keep that representation boundary explicit at the call site with
+    // IDX(mask), without pretending the mask itself belongs to Enum.
+    template <typename Integer>
+        requires(__is_integral(Integer))
+    H2EnumStorage& operator&=(Integer mask) {
+        m_value = static_cast<Storage>(m_value & static_cast<Storage>(mask));
+        return *this;
+    }
+
     H2EnumStorage& operator^=(Enum value) {
         m_value = static_cast<Storage>(m_value ^ static_cast<Storage>(value));
         return *this;

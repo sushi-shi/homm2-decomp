@@ -107,9 +107,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                 case WIDGET_COMMAND_CLEAR_FLAGS:
                     if (message.payload.widget.id == m_id) {
                         H2_ENUM_STORAGE(WidgetFlag, i16) flags =
-                            static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(
-                                message.payload.widget.data.value & WIDGET_FLAG_MASK
-                            );
+                            message.payload.widget.data.value & WIDGET_FLAG_MASK;
                         if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
                             flags = WIDGET_FLAG_DIMMED;
                             m_flags &= ~flags;

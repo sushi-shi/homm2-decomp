@@ -520,7 +520,7 @@ i32 searchArray::FindCombatPath(
         CombatHexDirection opposite;
 
         cell = &GetNode(bestHex_j, 0);
-        *path_d++ = static_cast<u8>(cell->direction);
+        *path_d++ = cell->direction;
         m_pathLength++;
         if (m_pathLength >= SEARCH_PATH_CAPACITY)
             break;
