@@ -48,6 +48,7 @@ enum {
     EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP = 4
 };
 typedef i32 ExpansionCampaignMap;
+ENABLE_ENUM_INDEX_OFFSETS(ExpansionCampaignMap)
 
 enum {
     AWARD_ELVEN_ALLIANCE      = 0,
