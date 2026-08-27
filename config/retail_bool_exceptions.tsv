@@ -1,0 +1,6 @@
+category	file	qualified_name	write_kind	detail	reason
+call	src/SOURCE/ADVMGR.cpp	HeroView::argument-2	call-argument	reinterpret_cast < i32 > ( gpGame -> GetHero ( IDX ( giOverviewReturnAction ) ) -> GetOccupiedTown ( ) )	Retail passes the occupied-town pointer as an integer truth value; normalizing it with != NULL changes the exact function body.
+parse-diagnostic	src/SOURCE/KB.cpp			no matching function for call to 'AddScoreToHighScore'	Clang C++98 gives a conditional string-literal expression const-qualified type that retail VC6 did not.
+write	src/SOURCE/kbwin.cpp	<anonymous>::gbForegroundApp	assignment	messageParam	WM_ACTIVATEAPP supplies a Win32 truth value; normalizing it with != 0 changes the exact retail body.
+write	src/SOURCE/KB.cpp	<anonymous>::gbUseWaveout	assignment	gcCommandLine [ i + 2 ] - '0'	The retail /W0 or /W1 parser stores the decoded digit directly; normalizing it changes the exact retail body.
+write	src/SOURCE/kbwin.cpp	<anonymous>::gbMinimized	assignment	lTemp & WS_MINIMIZE	The retail Win32 path stores the nonzero style bit as its truth value; normalizing it changes the exact retail body.

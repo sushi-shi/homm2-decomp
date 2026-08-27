@@ -18,7 +18,9 @@ from homm2.audit.bool_fields import (
     _integer_literal,
     _merge,
     _parse_driver_includes,
+    _reviewed_exceptions,
     _type_spans_requiring_split,
+    analyze_boolean_call_arguments,
     analyze_translation_unit,
     main,
 )
@@ -151,6 +153,24 @@ struct Value {
         self.assertFalse(facts.eligible)
         self.assertIn("mutable-reference-argument",
                       {write.kind for write in facts.unknown_writes})
+
+    def test_array_extent_is_not_misclassified_as_a_field_initializer(self):
+        text = r"""
+typedef int i32;
+struct Flags {
+    i32 values[2];
+    void Set() { values[0] = 0; values[1] = 1; }
+};
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source, translation = parse(repo, text)
+            fields = analyze_translation_unit(translation, source, repo)
+
+        values = next(item for item in fields if item.name == "values")
+        self.assertTrue(values.eligible)
+        self.assertNotIn(
+            "field-initializer", {write.kind for write in values.unknown_writes})
 
     def test_array_index_on_assignment_lhs_is_a_read(self):
         text = r"""
@@ -545,6 +565,35 @@ ignored
                 redirect_stdout(StringIO()):
             self.assertEqual(main(["--check"]), 1)
 
+        parse_failed = {**base, "parse_diagnostics": [{
+            "file": "src/x.cpp", "line": 2, "column": 1,
+            "translation_unit": "src/x.cpp", "message": "invalid source",
+        }]}
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=parse_failed), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--check"]), 1)
+
+        stale_exception = {**base, "unused_retail_exceptions": [{
+            "category": "write", "file": "src/x.cpp", "detail": "value",
+        }]}
+        with mock.patch("homm2.audit.bool_fields.scan", return_value=stale_exception), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(main(["--check"]), 1)
+
+    def test_reviewed_exception_manifest_is_strict_and_keyed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            path = repo / "config/retail_bool_exceptions.tsv"
+            path.parent.mkdir()
+            path.write_text(
+                "category\tfile\tqualified_name\twrite_kind\tdetail\treason\n"
+                "write\tsrc/x.cpp\tX::flag\tassignment\tvalue\tretail shape\n"
+            )
+            rows = _reviewed_exceptions(repo)
+
+        key = ("write", "src/x.cpp", "X::flag", "assignment", "value")
+        self.assertEqual(rows[key].reason, "retail shape")
+
     def test_portable_mode_is_forwarded_to_scan(self):
         base = {
             "translation_units": 1,
@@ -586,6 +635,29 @@ void Consume(b32 enabled) { (void)enabled; }
             {write.kind for write in enabled.unknown_writes},
             {"incoming-parameter"},
         )
+
+    def test_boolean_call_arguments_distinguish_literals_and_proven_flows(self):
+        text = r"""
+typedef int i32;
+typedef i32 b32;
+void Consume(b32 enabled) { (void)enabled; }
+void Calls(b32 flag, i32 unknown) {
+    Consume(0);
+    Consume(false);
+    Consume(flag);
+    Consume(unknown);
+}
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            _, translation = parse(repo, text)
+            rows = analyze_boolean_call_arguments(translation, repo)
+
+        by_expression = {item["argument"]["expression"]: item for item in rows}
+        self.assertEqual(by_expression["0"]["argument"]["replacement"], "false")
+        self.assertEqual(by_expression["false"]["argument"]["domain"], (0,))
+        self.assertEqual(by_expression["flag"]["argument"]["domain"], (0, 1))
+        self.assertIsNone(by_expression["unknown"]["argument"]["domain"])
 
 
 if __name__ == "__main__":

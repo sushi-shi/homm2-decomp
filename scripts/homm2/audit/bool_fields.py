@@ -20,6 +20,9 @@ can replace ``i32`` with ``b32``, ``i8`` with ``b8``, or plain ``char`` with
 for globals whose decorated retail symbol depends on it. The audit also reports
 numeric literal writes and unproven writes to already recovered Boolean
 storage; ``--check`` fails on every actionable kind of remaining cleanup.
+The few byte-proven retail truth-value writes and parser-dialect diagnostics
+live in ``config/retail_bool_exceptions.tsv``. Full checks fail when an entry is
+no longer observed, so the manifest cannot silently become a stale allowlist.
 When one declaration statement owns Boolean and non-Boolean declarators, the
 candidate is marked ``requires_declaration_split``: its type token must not be
 changed until the declaration is split.
@@ -27,9 +30,11 @@ Boolean parameters are inventoried separately: their incoming domain belongs
 to the function contract and is not itself a bad write.
 
 Parameters are inventoried but normally remain rejected until a separate
-call-site proof establishes their incoming domain. Aggregate byte writes and
-external deserialization are outside this direct-write census and remain review
-boundaries rather than inferred Boolean evidence.
+call-site proof establishes their incoming domain. The same scan inventories
+arguments to recovered Boolean parameters: numeric ``0``/``1`` arguments and
+arguments outside a proven Boolean domain fail ``--check``. Aggregate byte
+writes and external deserialization remain review boundaries rather than
+inferred Boolean evidence.
 
 Run inside ``nix develop .#build``::
 
@@ -42,6 +47,7 @@ Run inside ``nix develop .#build``::
 from __future__ import annotations
 
 import argparse
+import csv
 import functools
 import gc
 import importlib
@@ -66,9 +72,13 @@ from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 RETAIL_DATABASE = Path("build/clangd/compile_commands.json")
 PORTABLE_DATABASE = Path("build/compile_commands.json")
+RETAIL_EXCEPTION_MANIFEST = Path("config/retail_bool_exceptions.tsv")
+RETAIL_EXCEPTION_FIELDS = (
+    "category", "file", "qualified_name", "write_kind", "detail", "reason",
+)
 PROJECT_ROOTS = ("include", "src")
 RECORD_KINDS = {
     ci.CursorKind.CLASS_DECL,
@@ -172,6 +182,56 @@ class FieldFacts:
     @property
     def target_type(self) -> str | None:
         return SOURCE_BOOLEAN_TARGETS.get(self.declared_type)
+
+
+@dataclass(frozen=True, order=True)
+class ReviewedException:
+    category: str
+    file: str
+    qualified_name: str
+    write_kind: str
+    detail: str
+    reason: str
+
+    @property
+    def key(self) -> tuple[str, str, str, str, str]:
+        return (
+            self.category,
+            self.file,
+            self.qualified_name,
+            self.write_kind,
+            self.detail,
+        )
+
+
+def _reviewed_exceptions(
+    repo: Path,
+) -> dict[tuple[str, str, str, str, str], ReviewedException]:
+    path = repo / RETAIL_EXCEPTION_MANIFEST
+    if not path.is_file():
+        return {}
+    with path.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(stream, delimiter="\t")
+        if tuple(reader.fieldnames or ()) != RETAIL_EXCEPTION_FIELDS:
+            raise RuntimeError(
+                f"{RETAIL_EXCEPTION_MANIFEST}: expected columns "
+                + ", ".join(RETAIL_EXCEPTION_FIELDS))
+        rows = [ReviewedException(**row) for row in reader]
+    allowed = {"call", "parse-diagnostic", "write"}
+    invalid = [
+        row for row in rows
+        if (row.category not in allowed or not row.file or not row.detail or not row.reason
+            or (row.category in {"call", "write"}
+                and (not row.qualified_name or not row.write_kind))
+            or (row.category == "parse-diagnostic"
+                and (row.qualified_name or row.write_kind)))
+    ]
+    if invalid:
+        raise RuntimeError(f"{RETAIL_EXCEPTION_MANIFEST}: invalid exception row")
+    by_key = {row.key: row for row in rows}
+    if len(by_key) != len(rows):
+        raise RuntimeError(f"{RETAIL_EXCEPTION_MANIFEST}: duplicate exception key")
+    return by_key
 
 
 def _project_relative(path: str | Path | None, repo: Path) -> str | None:
@@ -514,7 +574,7 @@ def _analyze_cursor(cursor: ci.Cursor, candidates: dict[str, FieldFacts], repo: 
 
     if cursor.kind == ci.CursorKind.FIELD_DECL:
         usr = _field_usr(cursor)
-        if usr in candidates:
+        if usr in candidates and _has_explicit_initializer(cursor):
             initializers = [child for child in children if child.kind != ci.CursorKind.TYPE_REF]
             if initializers:
                 initializer = initializers[-1]
@@ -649,6 +709,42 @@ def analyze_translation_unit(translation: ci.TranslationUnit, source: Path,
     return list(candidates.values())
 
 
+def analyze_boolean_call_arguments(
+    translation: ci.TranslationUnit,
+    repo: Path,
+) -> list[dict]:
+    """Inventory source-owned arguments passed to recovered Boolean parameters."""
+    rows = []
+    seen = set()
+    for cursor in translation.cursor.walk_preorder():
+        if cursor.kind != ci.CursorKind.CALL_EXPR or cursor.referenced is None:
+            continue
+        arguments = list(cursor.get_arguments())
+        parameters = list(cursor.referenced.get_arguments())
+        for index, (argument, parameter) in enumerate(zip(arguments, parameters)):
+            parameter_type, depth = _storage_type(parameter.type)
+            if depth or parameter_type not in BOOLEAN_TYPES:
+                continue
+            domain = _boolean_domain(argument)
+            write = _write(argument, "call-argument", repo, domain)
+            if write is None:
+                continue
+            callee = _qualified_record(cursor.referenced)
+            parameter_name = parameter.spelling or f"argument-{index + 1}"
+            key = (write.file, write.start, write.end, callee, index)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append({
+                "callee": callee,
+                "parameter": parameter_name,
+                "parameter_index": index,
+                "parameter_type": parameter_type,
+                "argument": asdict(write),
+            })
+    return rows
+
+
 def _command_arguments(entry: dict) -> list[str]:
     arguments = entry.get("arguments")
     if arguments:
@@ -731,26 +827,30 @@ def _portable_clang_args(repo: Path, entry: dict) -> list[str]:
     return args
 
 
-def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> list[dict]:
+def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> dict:
     repo, entries, portable = arguments
     configure_libclang()
     index = ci.Index.create()
     rows = []
+    call_arguments = []
+    diagnostics = []
     for entry in entries:
         source = (Path(entry["directory"]) / entry["file"]).resolve()
         clang_args = (_portable_clang_args(repo, entry) if portable else
                       _clang_args(repo, source, mode=ClangMode.RETAIL_ANALYSIS))
         translation = index.parse(str(source), args=clang_args)
-        own_errors = []
         for diagnostic in translation.diagnostics:
             if diagnostic.severity < ci.Diagnostic.Error or diagnostic.location.file is None:
                 continue
-            if _project_relative(str(diagnostic.location.file), repo) is not None:
-                own_errors.append(str(diagnostic))
-        if own_errors:
-            raise RuntimeError(
-                f"{source.relative_to(repo)}: libclang project diagnostics: "
-                + "; ".join(own_errors[:8]))
+            relative = _project_relative(str(diagnostic.location.file), repo)
+            if relative is not None:
+                diagnostics.append({
+                    "file": relative,
+                    "line": diagnostic.location.line,
+                    "column": diagnostic.location.column,
+                    "translation_unit": source.relative_to(repo).as_posix(),
+                    "message": diagnostic.spelling,
+                })
         for facts in analyze_translation_unit(translation, source, repo):
             row = asdict(facts)
             row["declarations"] = [asdict(item) for item in sorted(facts.declarations)]
@@ -760,9 +860,14 @@ def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> list[dict]:
             row["read_locations"] = sorted(facts.read_locations)
             row["translation_units"] = sorted(facts.translation_units)
             rows.append(row)
+        call_arguments.extend(analyze_boolean_call_arguments(translation, repo))
         del translation
         gc.collect()
-    return rows
+    return {
+        "rows": rows,
+        "call_arguments": call_arguments,
+        "diagnostics": diagnostics,
+    }
 
 
 def _entries(
@@ -860,14 +965,43 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
     batches = [(repo, entries[index:index + batch_size], portable)
                for index in range(0, len(entries), batch_size)]
     if len(batches) == 1:
-        raw = _parse_batch(batches[0])
+        parsed = [_parse_batch(batches[0])]
     else:
         # `homm2 audit` dispatches tools through runpy with run_name="__main__".
         # ProcessPool cannot pickle that transient module identity, so always
         # hand it the function from the canonically importable package module.
         worker = importlib.import_module("homm2.audit.bool_fields")._parse_batch
         with ProcessPoolExecutor(max_workers=min(worker_count, len(batches))) as pool:
-            raw = [row for batch in pool.map(worker, batches) for row in batch]
+            parsed = list(pool.map(worker, batches))
+    raw = [row for batch in parsed for row in batch["rows"]]
+    call_arguments = sorted({
+        (
+            item["argument"]["file"], item["argument"]["start"],
+            item["argument"]["end"], item["callee"], item["parameter_index"],
+        ): item
+        for batch in parsed for item in batch["call_arguments"]
+    }.values(), key=lambda item: (
+        item["argument"]["file"], item["argument"]["line"],
+        item["argument"]["column"], item["callee"], item["parameter_index"]))
+    diagnostics = sorted({
+        (item["file"], item["line"], item["column"],
+         item["translation_unit"], item["message"]): item
+        for batch in parsed for item in batch["diagnostics"]
+    }.values(), key=lambda item: (
+        item["file"], item["line"], item["column"],
+        item["translation_unit"], item["message"]))
+    exceptions = {} if portable else _reviewed_exceptions(repo)
+    used_exceptions: set[tuple[str, str, str, str, str]] = set()
+    accepted_parse_diagnostics = []
+    unexpected_diagnostics = []
+    for item in diagnostics:
+        key = ("parse-diagnostic", item["file"], "", "", item["message"])
+        exception = exceptions.get(key)
+        if exception is None:
+            unexpected_diagnostics.append(item)
+            continue
+        used_exceptions.add(key)
+        accepted_parse_diagnostics.append({**item, "reason": exception.reason})
     fields = _merge(raw)
     split_type_spans = _type_spans_requiring_split(fields)
     source_storage = [item for item in fields if item.declared_type in SOURCE_BOOLEAN_TARGETS]
@@ -923,13 +1057,52 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         for write in sorted(item.unknown_writes)
         if write.kind in REVIEW_BOUNDARY_WRITE_KINDS
     ]
-    unproven_boolean_writes = [
+    all_unproven_boolean_writes = [
         emit_unknown(item, write)
         for item in boolean_storage
         for write in sorted(item.unknown_writes)
         if (write.kind != "incoming-parameter"
             and write.kind not in REVIEW_BOUNDARY_WRITE_KINDS)
     ]
+    accepted_unproven_boolean_writes = []
+    unproven_boolean_writes = []
+    for item in all_unproven_boolean_writes:
+        write = item["write"]
+        key = (
+            "write", write["file"], item["qualified_name"],
+            write["kind"], write["expression"],
+        )
+        exception = exceptions.get(key)
+        if exception is None:
+            unproven_boolean_writes.append(item)
+            continue
+        used_exceptions.add(key)
+        accepted_unproven_boolean_writes.append({**item, "reason": exception.reason})
+    numeric_call_arguments = [
+        item for item in call_arguments if item["argument"]["replacement"] is not None
+    ]
+    accepted_unproven_call_arguments = []
+    unproven_call_arguments = []
+    for item in call_arguments:
+        argument = item["argument"]
+        if argument["domain"] is not None:
+            continue
+        qualified_name = f"{item['callee']}::{item['parameter']}"
+        key = (
+            "call", argument["file"], qualified_name,
+            argument["kind"], argument["expression"],
+        )
+        exception = exceptions.get(key)
+        if exception is None:
+            unproven_call_arguments.append(item)
+            continue
+        used_exceptions.add(key)
+        accepted_unproven_call_arguments.append({**item, "reason": exception.reason})
+    unused_exceptions = []
+    if not filters and not portable:
+        unused_exceptions = [
+            asdict(exceptions[key]) for key in sorted(set(exceptions) - used_exceptions)
+        ]
     boolean_parameters = [emit(item) for item in boolean_storage
                           if item.storage_kind == "parameter"]
     return {
@@ -937,6 +1110,10 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         "whole_program": not filters,
         "filters": list(filters),
         "translation_units": len(entries),
+        "parse_diagnostics": unexpected_diagnostics,
+        "accepted_parse_diagnostics": accepted_parse_diagnostics,
+        "parse_clean": not unexpected_diagnostics,
+        "unused_retail_exceptions": unused_exceptions,
         # Legacy count names remain machine-readable for report consumers.
         "i32_fields": sum(item.declared_type == "i32" and item.storage_kind == "field"
                           for item in fields),
@@ -956,6 +1133,11 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         "rejected": [emit(item) for item in rejected],
         "boolean_numeric_literal_writes": numeric_literal_writes,
         "boolean_unproven_writes": unproven_boolean_writes,
+        "accepted_boolean_unproven_writes": accepted_unproven_boolean_writes,
+        "boolean_call_arguments": call_arguments,
+        "boolean_numeric_call_arguments": numeric_call_arguments,
+        "boolean_unproven_call_arguments": unproven_call_arguments,
+        "accepted_boolean_unproven_call_arguments": accepted_unproven_call_arguments,
         "boolean_review_boundaries": review_boundaries,
         "boolean_parameters": boolean_parameters,
         "b32_numeric_literal_writes": numeric_literal_writes,
@@ -973,8 +1155,20 @@ def _text(report: dict, include_rejected: bool) -> str:
         f"{len(report.get('boolean_numeric_literal_writes', report['b32_numeric_literal_writes']))} "
         f"numeric and {len(report.get('boolean_unproven_writes', report['b32_unproven_writes']))} "
         f"unproven writes to Boolean storage; "
-        f"{len(report.get('boolean_review_boundaries', []))} review boundaries",
+        f"{len(report.get('boolean_review_boundaries', []))} review boundaries; "
+        f"{len(report.get('accepted_boolean_unproven_writes', []))} reviewed retail writes; "
+        f"{len(report.get('boolean_numeric_call_arguments', []))} numeric and "
+        f"{len(report.get('boolean_unproven_call_arguments', []))} unproven Boolean arguments",
     ]
+    for item in report.get("parse_diagnostics", []):
+        lines.append(
+            f"PARSE {item['file']}:{item['line']}:{item['column']}: "
+            f"{item['message']}"
+        )
+    for item in report.get("unused_retail_exceptions", []):
+        lines.append(
+            f"STALE-EXCEPTION {item['category']} {item['file']}: {item['detail']}"
+        )
     for item in report["candidates"]:
         location = item["declarations"][0]
         lines.append(
@@ -1019,6 +1213,17 @@ def _text(report: dict, include_rejected: bool) -> str:
                 f"BOOL-BOUNDARY {write['file']}:{write['line']} "
                 f"{item['qualified_name']}: {write['kind']}: "
                 f"{write['expression']}")
+        for item in report.get("boolean_numeric_call_arguments", []):
+            argument = item["argument"]
+            lines.append(
+                f"BOOL-ARG-LITERAL {argument['file']}:{argument['line']} "
+                f"{item['callee']}::{item['parameter']}: "
+                f"{argument['expression']} -> {argument['replacement']}")
+        for item in report.get("boolean_unproven_call_arguments", []):
+            argument = item["argument"]
+            lines.append(
+                f"BOOL-ARG-UNPROVEN {argument['file']}:{argument['line']} "
+                f"{item['callee']}::{item['parameter']}: {argument['expression']}")
     return "\n".join(lines) + "\n"
 
 
@@ -1026,11 +1231,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--format", choices=("text", "json"), default="text")
     parser.add_argument("--output", type=Path, help="write the report instead of stdout")
-    parser.add_argument("--all", action="store_true", help="include rejected fields in text")
+    parser.add_argument(
+        "--all", action="store_true",
+        help="include rejected storage and Boolean write/argument details in text")
     parser.add_argument(
         "--check", action="store_true",
         help=("fail when an integer Boolean candidate, numeric 0/1 write, or "
-              "unproven write to Boolean storage remains"))
+              "unproven write, parse diagnostic, or stale retail exception remains"))
     parser.add_argument(
         "--tu", action="append", default=[],
         help="limit evidence to matching source paths (partial report; not whole-program proof)")
@@ -1056,9 +1263,13 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(output, end="")
     return int(bool(args.check and (
-        report.get("eligible_storage", report["eligible_fields"])
+        report.get("parse_diagnostics")
+        or report.get("unused_retail_exceptions")
+        or report.get("eligible_storage", report["eligible_fields"])
         or report["b32_numeric_literal_writes"]
-        or report["b32_unproven_writes"])))
+        or report["b32_unproven_writes"]
+        or report.get("boolean_numeric_call_arguments")
+        or report.get("boolean_unproven_call_arguments"))))
 
 
 if __name__ == "__main__":
