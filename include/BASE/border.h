@@ -23,9 +23,9 @@ public:
         i16,
         H2_ENUM_PARAM(WidgetKind, i16),
         i16,
-        char*
+        H2_CONST char*
     );
-    virtual inline ~border() OVERRIDE;
+    virtual H2_RETAIL_INLINE ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);

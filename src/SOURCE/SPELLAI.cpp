@@ -125,7 +125,7 @@ i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted
 
 VA(0x00495fb4, 0xf4e)
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
-    i32 durMax_29;
+    i32 H2_UNUSED(durMax_29);
     i32 wallsDamagedTotal;
     i32 spellPowerWork;
     i32 hexCell_9;
@@ -710,7 +710,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 VA(0x00496f02, 0x26d)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
-    i32 spellPower = m_spellPower[IDX(m_currentSide)];
+    i32 H2_UNUSED(spellPower) = m_spellPower[IDX(m_currentSide)];
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
@@ -772,9 +772,9 @@ VA(0x0049716f, 0x5b5)
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     float damageDelta;
-    i32 unused38_h;
+    i32 H2_UNUSED(unused38_h);
     i32 newSpd;
-    i32 unused30_j;
+    i32 H2_UNUSED(unused30_j);
     army* other = NULL;
     float castChance =
         target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[IDX(influence)]));
@@ -789,7 +789,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     i32 distance;
     float afterTurns;
     float beforeTurns;
-    i32 unused48_e;
+    i32 H2_UNUSED(unused48_e);
     i32 shooters;
     b32 adjacent;
     i32 dragonCounter;
@@ -1100,7 +1100,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     i32 resurrectPower;
     i32 armyIndex;
     i32 count;
-    float workChance;
+    float H2_UNUSED(workChance);
 
     resurrectPower = m_spellPower[IDX(m_currentSide)] * COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
     if (m_heroes[IDX(m_currentSide)] != NULL && m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ANKH))

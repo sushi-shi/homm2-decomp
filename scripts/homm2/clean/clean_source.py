@@ -100,19 +100,7 @@ class Pattern(enum.Enum):
 # /Od codegen parity in unrelated functions, which already cost
 # advManager::DoVisions its byte-exact match once.
 GENERATED_PATCHES = {
-    "include/BASE/Misc.h": [
-        (
-            Pattern.LITERAL, 1,
-            "u32l MAKEFILEID(char* text);",
-            "u32l MAKEFILEID(const char* text);",
-        ),
-    ],
     "src/BASE/Misc.cpp": [
-        (
-            Pattern.LITERAL, 1,
-            "u32l MAKEFILEID(char* text) {",
-            "u32l MAKEFILEID(const char* text) {",
-        ),
         (
             Pattern.LITERAL, 1,
             "H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;",
@@ -162,11 +150,6 @@ GENERATED_PATCHES = {
         ),
     ],
     "src/SOURCE/ADVMGR.cpp": [
-        (
-            Pattern.REGEX, 2,
-            r"struct tag_message (CDMsg|USMsg) = \{0\};",
-            r"struct tag_message \1 = {};",
-        ),
         (
             Pattern.LITERAL, 1,
             ": s_drawHero->m_cursorType;",
@@ -435,6 +418,12 @@ def _declspec(args: list[str]) -> str:
     return DROPPED if args[0].strip() == "dllexport" else "__declspec(%s)" % args[0]
 
 
+def _unused(args: list[str]) -> str:
+    if len(args) != 1:
+        raise ValueError("H2_UNUSED expects one identifier")
+    return "%s [[maybe_unused]]" % args[0].strip()
+
+
 CALL_RULES = {
     # Retail-address annotations: audit metadata, no expansion at all.
     "VA": _drop,
@@ -476,6 +465,7 @@ CALL_RULES = {
     "H2_FREE": _alloc("H2_FREE"),
     "H2_FREE_AT": _alloc("H2_FREE"),
     "H2_ASSERT": _alloc("H2_ASSERT"),
+    "H2_UNUSED": _unused,
 
     # Parameters and returns carry the domain type outright.
     "H2_ENUM_PARAM": _arg(0),
@@ -502,6 +492,9 @@ CALL_RULES = {
 
 # Bare identifiers, no call syntax.
 WORD_RULES = {
+    "H2_CONST": "const",
+    "H2_RETAIL_INLINE": "",
+    "H2_ZERO_INIT": "{}",
     "OVERRIDE": "override",
 
     "__cdecl": "__cdecl",
@@ -1369,16 +1362,26 @@ def write_ninja(out_root: Path) -> None:
         "-mfpmath=387",
         "-fms-extensions",
         "-fsjlj-exceptions",
-        "-w",
+        "-ferror-limit=0",
+        "-Wall",
+        "-Wextra",
+        "-Werror=unused-parameter",
+        "-Werror=sign-compare",
+        "-Werror=unused-variable",
+        "-Werror=unused-but-set-variable",
+        "-Werror=parentheses",
+        "-Werror=write-strings",
+        # Two-argument sprintf calls are byte-pinned retail behavior. Keep the
+        # diagnostic visible here; the portable master repairs those calls.
+        "-Wformat-security",
+        "-Wno-error=format-security",
+        "-Werror=enum-conversion",
+        "-Werror=narrowing",
         "-D_X86_",
         "-DWIN32",
         "-D_WINDOWS",
         "-D_MT",
         "-Dregister=",
-        "-Wno-write-strings",
-        "-Wno-narrowing",
-        "-Wno-deprecated-enum-enum-conversion",
-        "-Wno-deprecated-enum-float-conversion",
         *include_flags,
     ]
     lines = [

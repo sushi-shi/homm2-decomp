@@ -19,7 +19,7 @@ struct AudiereEffectsState {
 
 SIZE(AudiereEffectsState, 0x1c);
 
-DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = {0};
+DATA(0x005395c0) static AudiereEffectsState gAudiereEffects = H2_ZERO_INIT;
 
 VA(0x004cc740, 0x162)
 void PurgeFinishedAudiereSamples(void) {
@@ -200,4 +200,4 @@ bool AudiereSampleIterationActive(void) {
     return gAudiereEffects.sampleIterationDepth > 0;
 }
 
-inline AudiereSampleNode::~AudiereSampleNode() {}
+H2_RETAIL_INLINE AudiereSampleNode::~AudiereSampleNode() {}

@@ -48,7 +48,7 @@ resourceManager::resourceManager(void) : baseManager() {
 }
 
 VA(0x004b7fa0, 0x92)
-void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIcon) {
+void resourceManager::GetBackdrop(H2_CONST char* name, class bitmap* backdrop, i32 useIcon) {
     if (useIcon) {
         icon* backdropIcon = GetIcon(name);
         backdropIcon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
@@ -67,7 +67,7 @@ void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIco
 
 VA(0x004b8040, 0xc0)
 void resourceManager::GetBackdropAtLoc(
-    char* filename,
+    H2_CONST char* filename,
     class bitmap* destination,
     i32 destinationX,
     i32 destinationY,
@@ -97,7 +97,7 @@ void resourceManager::GetBackdropAtLoc(
 }
 
 VA(0x004b8100, 0xbf)
-class palette* resourceManager::GetPalette(char* name) {
+class palette* resourceManager::GetPalette(H2_CONST char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
     if (r != NULL) {
@@ -111,7 +111,7 @@ class palette* resourceManager::GetPalette(char* name) {
 }
 
 VA(0x004b81c0, 0xbf)
-class bitmap* resourceManager::GetBitmap(char* name) {
+class bitmap* resourceManager::GetBitmap(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -125,7 +125,7 @@ class bitmap* resourceManager::GetBitmap(char* name) {
 }
 
 VA(0x004b8280, 0x24)
-class icon* resourceManager::GetIcon(char* name) {
+class icon* resourceManager::GetIcon(H2_CONST char* name) {
     return GetIcon(MakeId(name, 1));
 }
 
@@ -143,7 +143,7 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
 }
 
 VA(0x004b8360, 0xbf)
-class tileset* resourceManager::GetTileset(char* name) {
+class tileset* resourceManager::GetTileset(H2_CONST char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
     if (r != NULL) {
@@ -157,12 +157,12 @@ class tileset* resourceManager::GetTileset(char* name) {
 }
 
 VA(0x004b8420, 0xf)
-class mouse* resourceManager::GetMouse(char*) {
+class mouse* resourceManager::GetMouse(H2_CONST char*) {
     return NULL;
 }
 
 VA(0x004b8430, 0xbf)
-class font* resourceManager::GetFont(char* name) {
+class font* resourceManager::GetFont(H2_CONST char* name) {
     u32l resourceId = MakeId(name, 1);
     resource* fontEntry = Query(resourceId);
     if (fontEntry != NULL) {
@@ -176,7 +176,7 @@ class font* resourceManager::GetFont(char* name) {
 }
 
 VA(0x004b84f0, 0xbf)
-class sample* resourceManager::GetSample(char* name) {
+class sample* resourceManager::GetSample(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -190,7 +190,7 @@ class sample* resourceManager::GetSample(char* name) {
 }
 
 VA(0x004b85b0, 0xbf)
-class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
+class MIDIWrap* resourceManager::GetMIDIWrap(H2_CONST char* name) {
     u32l fileId = MakeId(name, 1);
     resource* r = Query(fileId);
     if (r != NULL) {
@@ -246,7 +246,7 @@ void resourceManager::Expunge(void) {
 VA(0x004b87c0, 0x37)
 class resource* resourceManager::Query(u32l resourceId) {
     resource* cursorResource = m_resourceListHead;
-    while (cursorResource != NULL && cursorResource->m_id != resourceId) {
+    while (cursorResource != NULL && static_cast<u32l>(cursorResource->m_id) != resourceId) {
         cursorResource = cursorResource->m_next;
     }
     return cursorResource;
@@ -308,7 +308,7 @@ void resourceManager::Close(void) {
 }
 
 VA(0x004b89b0, 0x138)
-i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
+i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
     i32 aggregateFp;
     u32 directoryBytes;
@@ -367,13 +367,13 @@ void resourceManager::PointToFile(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
+            static_cast<i32>(fileId),
             m_lastFileId,
             m_lastFileName
         );
         ShutDown(gText);
     }
-    i32l position =
+    i32l H2_UNUSED(position) =
         lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset, 0);
 }
 
@@ -402,7 +402,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
+            static_cast<i32>(fileId),
             m_lastFileId,
             m_lastFileName
         );
@@ -433,7 +433,7 @@ i8 resourceManager::ReadByte(void) {
         675
     );
     i8 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
@@ -445,7 +445,7 @@ i16 resourceManager::ReadWord(void) {
         700
     );
     i16 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
@@ -457,12 +457,12 @@ i32l resourceManager::ReadLong(void) {
         723
     );
     i32l value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 VA(0x004b8ea0, 0xa0)
-u32l resourceManager::MakeId(char* name, i32 translate) {
+u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
         for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
@@ -490,12 +490,12 @@ void resourceManager::ReadBlock(i8* destination, u32l size) {
     );
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
-    if (bytesRead != size) {
+    if (static_cast<u32l>(bytesRead) != size) {
         sprintf(
             gText,
             "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
             bytesRead,
-            size,
+            static_cast<i32>(size),
             errno,
             m_lastFileName
         );

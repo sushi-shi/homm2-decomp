@@ -39,7 +39,7 @@ public:
         i16 y,
         i16 width,
         i16 height,
-        char* iconName,
+        H2_CONST char* iconName,
         i16 normalFrame,
         i16 pressedFrame,
         H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
@@ -47,7 +47,7 @@ public:
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind
     );
-    virtual inline ~button() OVERRIDE;
+    virtual H2_RETAIL_INLINE ~button() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);

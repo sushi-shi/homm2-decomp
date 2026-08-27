@@ -308,7 +308,7 @@ void wsSendMessage(
 
 VA(0x004b24e8, 0x4d)
 i32 wsnet_snd(i32 destination, i32 size, void* data) {
-    i32 result;
+    i32 H2_UNUSED(result);
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)

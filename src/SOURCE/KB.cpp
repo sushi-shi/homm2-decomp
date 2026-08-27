@@ -397,7 +397,7 @@ void DeleteMainClasses(void) {
 }
 
 VA(0x004665b1, 0x2e)
-void EarlyShutdown(char* caption, char* text) {
+void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text) {
     MessageBoxA(hwndApp, text, caption, MB_ICONHAND);
     exit(0);
 }
@@ -507,9 +507,9 @@ i32 oldmain(void) {
     b32 firstMainScreen_h;
     i32 savedUpdateFlags_l;
     i32 player_h;
-    i32 unusedMainState_o;
-    i32 unusedMenuState;
-    i32 unusedPlayerState_f;
+    i32 H2_UNUSED(unusedMainState_o);
+    i32 H2_UNUSED(unusedMenuState);
+    i32 H2_UNUSED(unusedPlayerState_f);
     i32 netPlayer_k;
     i32 gamePlayer_m;
     i32 result_i;
@@ -1027,11 +1027,9 @@ i32 oldmain(void) {
                             gpGame->m_campaignScore,
                             0,
                             HIGH_SCORE_CAMPAIGN,
-                            const_cast<char*>(
-                                gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                                    ? "\xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4"
-                                    : "\xd0\xee\xeb\xe0\xed\xe4"
-                            )
+                            gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                                ? "\xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4"
+                                : "\xd0\xee\xeb\xe0\xed\xe4"
                         );
                     }
                     if (campaignResult) {
@@ -1494,15 +1492,16 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
 }
 
 VA(0x004688b4, 0x10)
-MessageDispatchResult NullHandler(struct tag_message& msg) {
+MessageDispatchResult NullHandler(struct tag_message& H2_UNUSED(msg)) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004688c4, 0x145)
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
-    i16 unusedLocal0L = 2, unusedLocal1H = 3, unusedLocal2D = 8, unusedLocal3A = 9;
+    i16 H2_UNUSED(unusedLocal0L) = 2, H2_UNUSED(unusedLocal1H) = 3,
+        H2_UNUSED(unusedLocal2D) = 8, H2_UNUSED(unusedLocal3A) = 9;
     b32 shouldClose = false;
-    i32 unusedResult;
+    i32 H2_UNUSED(unusedResult);
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
@@ -1544,7 +1543,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
 }
 
 VA(0x00468a09, 0x179)
-char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
+H2_CONST char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
@@ -1585,7 +1584,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
 }
 
 VA(0x00468b82, 0x69)
-char* GetBuildingName(FactionType race, BuildingSlotType building) {
+H2_CONST char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
     if (building == BUILDING_SLOT_WELL_EXTRA)
@@ -1629,12 +1628,12 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
 }
 
 VA(0x00468cdb, 0x15)
-char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster) {
+H2_CONST char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster) {
     return gArmyNames[IDX(monster)];
 }
 
 VA(0x00468cf0, 0x15)
-char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster) {
+H2_CONST char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster) {
     return gArmyNamesPlural[IDX(monster)];
 }
 
@@ -2147,7 +2146,7 @@ void CheckEndGame(
     b32 showedDialog_o;
     b32 defeated_m;
     b32 allowNormalVictory;
-    i32 lastLivingPlayer_j;
+    i32 H2_UNUSED(lastLivingPlayer_j);
     i32 survivingHumans_a;
     i32 lastHuman_a;
     i32 netHumanCount;
@@ -2679,7 +2678,7 @@ void CheckEndGame(
             carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
 
-        if (carryoverHeroId != END_GAME_NO_PLAYER) {
+        if (carryoverHeroId != static_cast<u32>(END_GAME_NO_PLAYER)) {
             for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
@@ -2687,8 +2686,10 @@ void CheckEndGame(
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
                 if (carryoverHeroId == CAMPAIGN_SWITCH_VICTORY_VALUE
-                    || IDX(gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
-                               .m_portrait)
+                    || static_cast<u32>(IDX(
+                           gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
+                               .m_portrait
+                       ))
                            == carryoverHeroId) {
                     break;
                 }
@@ -2747,7 +2748,7 @@ void QuickViewWait(void) {
 VA(0x0046af49, 0x1cf)
 void InitVars(void) {
     i32 i;
-    i32 j;
+    i32 H2_UNUSED(j);
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
@@ -2909,7 +2910,7 @@ showDialog:
 VA(0x0046b6ab, 0x33e)
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
     char description4[MORALE_LUCK_DESCRIPTION_SIZE];
-    i32 luckValue;
+    i32 H2_UNUSED(luckValue);
     i32 modifierStart;
 
     if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
@@ -2997,7 +2998,7 @@ i32 AddScoreToHighScore(
     i32 days,
     i32 scenario,
     HighScoreType highScoreType,
-    char* scenarioName
+    H2_CONST char* scenarioName
 ) {
     i32 dest_o;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
@@ -3084,7 +3085,7 @@ i32 AddScoreToHighScore(
 }
 
 VA(0x0046bf13, 0x5e)
-void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
+void BVResMsg(H2_CONST char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
@@ -3094,7 +3095,7 @@ void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
 }
 
 VA(0x0046bf71, 0x1e)
-void GOut(char* str) {
+void GOut(H2_CONST char* str) {
     if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
@@ -3144,13 +3145,13 @@ i32 WaitForOtherPlayer(void) {
 }
 
 VA(0x0046c0a6, 0xb25)
-void PopNetBox(char* text, i32 netPlayer) {
-    i32 textY_h;
+void PopNetBox(H2_CONST char* text, i32 netPlayer) {
+    i32 H2_UNUSED(textY_h);
     i32l messageTime_b;
     heroWindow* netWindow_j;
     i32 result_p;
     i32 textWidth_b;
-    i32 textX_k;
+    i32 H2_UNUSED(textX_k);
     i32 savedShowIt_p;
     b32 updateInput_f;
     i32 inputLength_a;
@@ -3159,9 +3160,9 @@ void PopNetBox(char* text, i32 netPlayer) {
     b32 sendText_b;
     tag_message event_o;
     tag_message updateMessage_i;
-    i32 firstLineId_a;
+    i32 H2_UNUSED(firstLineId_a);
     i32 delay_e;
-    i32 lineTextLimit_g;
+    i32 H2_UNUSED(lineTextLimit_g);
     b32 done_a;
     b32 redrawLines_l;
     i32 redrawSavedShowIt_a;
@@ -3436,7 +3437,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 }
 
 VA(0x0046cbcb, 0x96)
-void AddNetBoxLine(char* str, char color) {
+void AddNetBoxLine(H2_CONST char* str, char color) {
     if (color < 0 || color > BOX_MAX_COLOR)
         color = BOX_DEFAULT_COLOR;
 
@@ -3452,7 +3453,7 @@ void AddNetBoxLine(char* str, char color) {
 }
 
 VA(0x0046cc61, 0x1d9)
-void ShutDown(char* msg) {
+void ShutDown(H2_CONST char* msg) {
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
@@ -3515,7 +3516,7 @@ H2_ENUM_BEGIN(FileErrorConstant)
 H2_ENUM_END(FileErrorConstant)
 
 VA(0x0046ce3a, 0x99)
-void FileError(char* filename) {
+void FileError(H2_CONST char* filename) {
     char buf[FILE_ERROR_BUFFER_SIZE];
     i32 err;
     char buf1[FILE_ERROR_BUFFER_SIZE];
@@ -3611,7 +3612,7 @@ void SmackFade(u8* src, u8* dst) {
 VA(0x0046d109, 0x3b2)
 void ShowCongrats(HighScoreType highScoreType) {
     u8 palette[MISC_PALETTE_BYTE_COUNT];
-    i32 unused;
+    i32 H2_UNUSED(unused);
     i32 baseScore;
     i32 realScore;
     char ratingText[CONGRATS_RATING_LENGTH];
@@ -3686,7 +3687,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 
 VA(0x0046d4bb, 0x79)
 void CongratsWait(void) {
-    i32 command = 0;
+    i32 H2_UNUSED(command) = 0;
     b32 done = false;
     tag_message msg;
     gpInputManager->Flush();
@@ -3707,7 +3708,7 @@ H2_ENUM_BEGIN(SamplePlaybackConstant)
 H2_ENUM_END(SamplePlaybackConstant)
 
 VA(0x0046d534, 0x41)
-SAMPLE2 LoadPlaySample(char* name) {
+SAMPLE2 LoadPlaySample(H2_CONST char* name) {
     SAMPLE2 ss;
     ss = gpResourceManager->GetSample(name);
     if (ss) {
@@ -3755,7 +3756,7 @@ void MemError(void) {
 }
 
 VA(0x0046d644, 0x29)
-char* GetTownName(i32 i) {
+H2_CONST char* GetTownName(i32 i) {
     town* t = GetCastleRec(i);
     return t->m_name;
 }
@@ -4190,7 +4191,12 @@ void UpdateAppSpecificMenus(void* hMenu) {
 }
 
 VA(0x0046e30b, 0x12)
-void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
+void EarlyResizeWindow(
+    i32 H2_UNUSED(x),
+    i32 H2_UNUSED(y),
+    i32 H2_UNUSED(w),
+    i32 H2_UNUSED(h)
+) {
     if (gbClosingApp)
         return;
 }
@@ -4249,29 +4255,29 @@ void SetupDynamicWindow(
     i32 windowType
 ) {
     i32 leftOffset_p;
-    i32 bottomCornerPaddingNum_j;
+    i32 H2_UNUSED(bottomCornerPaddingNum_j);
     i32 numRows;
     widget* newWidgetTemp_p;
     i32 columnsSize_h;
     i32 topOffsetNum_n;
-    i32 contentXPaddingCount_m;
+    i32 H2_UNUSED(contentXPaddingCount_m);
     i32 centeredHeightCount_k;
-    i32 centeredPadding_c;
-    i32 topCornerPaddingCount;
+    i32 H2_UNUSED(centeredPadding_c);
+    i32 H2_UNUSED(topCornerPaddingCount);
     i32 bottomOffsetLocal_p;
     i32 rightOffset_p;
-    i32 contentYPadding;
+    i32 H2_UNUSED(contentYPadding);
     i32 edge_d;
     i32 tileRowPos_k;
     i32 centeredWidthValue_b;
-    i32 leftCornerPaddingLocal_e;
-    i32 rightCornerPaddingValue_j;
-    i32 stoneWidgetColorSize_c;
+    i32 H2_UNUSED(leftCornerPaddingLocal_e);
+    i32 H2_UNUSED(rightCornerPaddingValue_j);
+    i32 H2_UNUSED(stoneWidgetColorSize_c);
     i32 columnIndex_k;
-    i32 bottomEdgeOffset_l;
-    i32 tileWidth_k;
-    i32 tileHeight_h;
-    i32 topEdgeInset;
+    i32 H2_UNUSED(bottomEdgeOffset_l);
+    i32 H2_UNUSED(tileWidth_k);
+    i32 H2_UNUSED(tileHeight_h);
+    i32 H2_UNUSED(topEdgeInset);
 
     tileWidth_k = TILE_SIZE;
     tileHeight_h = TILE_SIZE;
@@ -4686,8 +4692,8 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
 VA(0x0046f115, 0x2c9)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     b32 localPlayerLost_e;
-    i32 sendReturn;
-    i32 unusedPacketResult_g;
+    i32 H2_UNUSED(sendReturn);
+    i32 H2_UNUSED(unusedPacketResult_g);
     i32 recipient;
 
     localPlayerLost_e = false;
@@ -4825,7 +4831,7 @@ i32 GetManaCost(SpellType spell, hero* h) {
 
 VA(0x0046f4ca, 0x88)
 void SetWinText(heroWindow* j, i32 id) {
-    i32 a = 0;
+    i32 H2_UNUSED(a) = 0;
     i32 i;
     tag_message msg;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
@@ -4955,7 +4961,7 @@ inline i32 NormalDialogCenterOffset(i32 extent) {
 
 VA(0x0046f5cb, 0x1757)
 void NormalDialog(
-    char* text,
+    H2_CONST char* text,
     i32 dialogType,
     i32 windowX,
     i32 windowY,
@@ -4970,7 +4976,7 @@ void NormalDialog(
     i32 labelY_k;
     widget* borderWidget_k;
     i32 resourceFrame_n;
-    i16 showMessage_d;
+    i16 H2_UNUSED(showMessage_d);
     i32 textWidgetId;
     heroWindow* savedNormalDialogWindow;
     i32 savedPointerFrame;
@@ -4983,7 +4989,7 @@ void NormalDialog(
     widget* textPanel_j;
     i32 resourceSlot;
     i32 resourceY_f;
-    i32 iconHeight_h;
+    i32 H2_UNUSED(iconHeight_h);
     i32 lineCount;
     i32 dialogContentHeight;
     i32 resourceCenterX_c;
@@ -5000,7 +5006,7 @@ void NormalDialog(
     i32 resourceType_a[NORMAL_DIALOG_RESOURCE_COUNT];
     MouseCursorType savedPointerType_o;
     widget* iconPanel_a;
-    i32 panelHeight_d;
+    i32 H2_UNUSED(panelHeight_d);
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -5660,8 +5666,8 @@ void NormalDialog(
 }
 
 VA(0x00470d22, 0x68)
-void UpdateNormalDialog(char* text) {
-    i16 show = 1;
+void UpdateNormalDialog(H2_CONST char* text) {
+    i16 H2_UNUSED(show) = 1;
     tag_message evt;
     evt.type = MESSAGE_WIDGET;
     evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -5903,7 +5909,7 @@ DATA(0x004f8bac) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 11
 DATA(0x004f8bb8) u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 DATA(0x004f8bc8) u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
-DATA(0x004f8bd0) char* gTilesetFiles[IDX(TILESET_COUNT)] = {
+DATA(0x004f8bd0) H2_CONST char* gTilesetFiles[IDX(TILESET_COUNT)] = {
     "",
     "",
     "",
@@ -6249,7 +6255,7 @@ DATA(0x004f9b20) u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
 DATA(0x004f9b38) u8 giMapSizes[KB_MAP_SIZE_COUNT] =
     {MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE, MAP_DIMENSION_XLARGE};
 DATA(0x005265fc) b32 gbUseEvilInterface = false;
-DATA(0x004f9b3c) char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
+DATA(0x004f9b3c) H2_CONST char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {
         "advbord.icn",
         "advborde.icn"
@@ -6415,7 +6421,7 @@ DATA(0x004f9f58) b32 gbDrawWindowBackground = true;
 DATA(0x0052661c) b32 gbCheatMenus = false;
 DATA(0x00526620) b32 gbUseWaveout = false;
 DATA(0x00526624) b32 gbShowAllMaps = false;
-DATA(0x004f9f5c) char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
+DATA(0x004f9f5c) H2_CONST char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "",
     "magic01.icn",
     "magic02.icn",
@@ -6525,24 +6531,24 @@ DATA(0x004fa454) i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
 DATA(0x00526628) i32 giDebugLevel = 0;
 DATA(0x004fa458) i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
-    {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MONSTER_FLAGS_NONE},
-    {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 463}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 639}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
-    {{250, 824}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MONSTER_FLAGS_NONE},
-    {{250, 1130}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {{300, 1350}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MONSTER_FLAGS_NONE},
-    {{300, 1830}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{375, 2273}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{600, 4704}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
-    {{1000, 5822}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MONSTER_FLAGS_NONE},
-    {{40, 109}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MONSTER_FLAGS_NONE},
-    {{140, 299}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{175, 512}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 865}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 1065}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
-    {{500, 2070}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
-    {{600, 1921},
+    {{20, {33}}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", {MONSTER_FLAGS_NONE}},
+    {{150, {312}}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {463}}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {639}}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
+    {{250, {824}}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", {MONSTER_FLAGS_NONE}},
+    {{250, {1130}}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
+    {{300, {1350}}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", {MONSTER_FLAGS_NONE}},
+    {{300, {1830}}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
+    {{375, {2273}}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", {MONSTER_ATTRIBUTE_WIDE}},
+    {{600, {4704}}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
+    {{1000, {5822}}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", {MONSTER_FLAGS_NONE}},
+    {{40, {109}}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", {MONSTER_FLAGS_NONE}},
+    {{140, {299}}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{175, {512}}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {865}}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", {MONSTER_ATTRIBUTE_WIDE}},
+    {{300, {1065}}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", {MONSTER_FLAGS_NONE}},
+    {{500, {2070}}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", {MONSTER_FLAGS_NONE}},
+    {{600, {1921}},
      32,
      3,
      40,
@@ -6554,8 +6560,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      8,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2337},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{700, {2337}},
      33,
      3,
      40,
@@ -6567,8 +6573,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      9,
      16,
      "trll",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{750, 6074},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{750, {6074}},
      58,
      2,
      80,
@@ -6580,14 +6586,14 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      24,
      0,
      "cycl",
-     MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 129}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
-    {{200, 500}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {{250, 716}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
-    {{250, 554}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{300, 658}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{350, 1290}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{400, 1428},
+     {MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{50, {129}}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", {MONSTER_ATTRIBUTE_FLYING}},
+    {{200, {500}}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
+    {{250, {716}}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", {MONSTER_FLAGS_NONE}},
+    {{250, {554}}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{300, {658}}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", {MONSTER_ATTRIBUTE_RANGED}},
+    {{350, {1290}}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", {MONSTER_ATTRIBUTE_RANGED}},
+    {{400, {1428}},
      36,
      3,
      25,
@@ -6599,9 +6605,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      16,
      "drui",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{500, 2702}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
-    {{1500, 10114},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{500, {2702}}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", {MONSTER_ATTRIBUTE_WIDE}},
+    {{1500, {10114}},
      56,
      1,
      100,
@@ -6613,8 +6619,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{60, 154},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{60, {154}},
      26,
      8,
      5,
@@ -6626,9 +6632,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {{200, 579}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
-    {{300, 1101},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED}},
+    {{200, {579}}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", {MONSTER_ATTRIBUTE_FLYING}},
+    {{300, {1101}},
      37,
      4,
      25,
@@ -6640,11 +6646,11 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{400, 1751}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {{500, 2252}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MONSTER_FLAGS_NONE},
-    {{800, 2878}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
-    {{3000, 18153},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
+    {{400, {1751}}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
+    {{500, {2252}}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", {MONSTER_FLAGS_NONE}},
+    {{800, {2878}}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", {MONSTER_ATTRIBUTE_WIDE}},
+    {{3000, {18153}},
      55,
      1,
      200,
@@ -6656,8 +6662,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{3500, 22962},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{3500, {22962}},
      68,
      1,
      250,
@@ -6669,8 +6675,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{4000, 28144},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{4000, {28144}},
      74,
      1,
      300,
@@ -6682,12 +6688,12 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 134}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {{150, 493}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 951}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
-    {{350, 1324}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MONSTER_FLAGS_NONE},
-    {{400, 1739},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER}},
+    {{50, {134}}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", {MONSTER_ATTRIBUTE_RANGED}},
+    {{150, {493}}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", {MONSTER_ATTRIBUTE_WIDE}},
+    {{300, {951}}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
+    {{350, {1324}}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", {MONSTER_FLAGS_NONE}},
+    {{400, {1739}},
      43,
      3,
      40,
@@ -6699,11 +6705,11 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{600, 1935}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2469}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{2000, 9589}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
-    {{5000, 22933},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING}},
+    {{600, {1935}}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", {MONSTER_ATTRIBUTE_RANGED}},
+    {{700, {2469}}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", {MONSTER_ATTRIBUTE_RANGED}},
+    {{2000, {9589}}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", {MONSTER_FLAGS_NONE}},
+    {{5000, {22933}},
      79,
      1,
      300,
@@ -6715,9 +6721,9 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      24,
      "titn",
-     MONSTER_ATTRIBUTE_RANGED},
-    {{75, 203}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
-    {{150, 310},
+     {MONSTER_ATTRIBUTE_RANGED}},
+    {{75, {203}}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{150, {310}},
      21,
      6,
      15,
@@ -6729,8 +6735,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{200, 506},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{200, {506}},
      25,
      6,
      20,
@@ -6742,8 +6748,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      3,
      0,
      "zomb",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{250, 868},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{250, {868}},
      35,
      4,
      25,
@@ -6755,8 +6761,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{300, 1056},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{300, {1056}},
      35,
      4,
      30,
@@ -6768,8 +6774,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      4,
      0,
      "mumy",
-     MONSTER_ATTRIBUTE_UNDEAD},
-    {{500, 1685},
+     {MONSTER_ATTRIBUTE_UNDEAD}},
+    {{500, {1685}},
      42,
      3,
      30,
@@ -6781,8 +6787,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 2461},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{650, {2461}},
      45,
      3,
      40,
@@ -6794,8 +6800,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{750, 2069},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{750, {2069}},
      28,
      2,
      25,
@@ -6807,8 +6813,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
-    {{900, 2625},
+     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{900, {2625}},
      29,
      2,
      35,
@@ -6820,8 +6826,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
-    {{1500, 11744},
+     {MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{1500, {11744}},
      78,
      1,
      150,
@@ -6833,10 +6839,10 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{50, 177}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MONSTER_FLAGS_NONE},
-    {{200, 805}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
-    {{1000, 1545},
+     {MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{50, {177}}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", {MONSTER_FLAGS_NONE}},
+    {{200, {805}}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", {MONSTER_ATTRIBUTE_WIDE}},
+    {{1000, {1545}},
      62,
      3,
      20,
@@ -6848,8 +6854,8 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 5692},
+     {MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD}},
+    {{650, {5692}},
      60,
      2,
      50,
@@ -6861,12 +6867,12 @@ DATA(0x004fa460) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      30,
      0,
      "geni",
-     MONSTER_ATTRIBUTE_FLYING},
-    {{500, 1979}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
-    {{500, 1732}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
-    {{500, 1412}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
-    {{500, 1501}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
-    {{500, 1690}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MONSTER_FLAGS_NONE}
+     {MONSTER_ATTRIBUTE_FLYING}},
+    {{500, {1979}}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", {MONSTER_ATTRIBUTE_WIDE}},
+    {{500, {1732}}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", {MONSTER_FLAGS_NONE}},
+    {{500, {1412}}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", {MONSTER_FLAGS_NONE}},
+    {{500, {1501}}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", {MONSTER_FLAGS_NONE}},
+    {{500, {1690}}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", {MONSTER_FLAGS_NONE}}
 };
 DATA(0x004fab14) float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
                                           0.58f, 0.6f,  0.62f, 0.64f, 0.67f, 0.7f,  0.74f,
@@ -7050,7 +7056,7 @@ DATA(0x00526664) HMENU hmnuDflt = NULL;
 DATA(0x00526668) HMENU hmnuCmbt = NULL;
 DATA(0x0052666c) HMENU hmnuAdv = NULL;
 DATA(0x00526670) HMENU hmnuTown = NULL;
-DATA(0x004fb2ac) char* cMonFilename[IDX(CREATURE_COUNT)] = {
+DATA(0x004fb2ac) H2_CONST char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "peasant.icn",
     "archer.icn",
     "archer2.icn",
@@ -7489,7 +7495,7 @@ DATA(0x004fb3b8) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
 };
-DATA(0x004fb950) char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
+DATA(0x004fb950) H2_CONST char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
     "peas_frm.bin",
     "archrfrm.bin",
     "archrfrm.bin",
@@ -7598,7 +7604,7 @@ DATA(0x004fba78) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10,
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
 DATA(0x004fba98) SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 DATA(0x004fba9c) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
-DATA(0x004fbaa4) char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
+DATA(0x004fbaa4) H2_CONST char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
                                                      "CBKGWATR.icn",
                                                      "",
                                                      "CBKGGRTR.icn",
@@ -7667,14 +7673,14 @@ DATA(0x004fbe64) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1
 };
-DATA(0x004fbee0) char* gTownPrefixNames[IDX(FACTION_COUNT)] = {
+DATA(0x004fbee0) H2_CONST char* gTownPrefixNames[IDX(FACTION_COUNT)] = {
     "twnk",
     "twnb",
     "twns",
     "twnw",
     "twnz",
     "twnn"};
-DATA(0x004fbef8) char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
+DATA(0x004fbef8) H2_CONST char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage",
     "thie",
     "tvrn",
@@ -7980,7 +7986,7 @@ DATA(0x004fcc4c) u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT]
 };
 DATA(0x004fcd6c) i32 giDebugBuildingToBuild = -1;
 DATA(0x004fcd70) u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-DATA(0x004fcd7c) char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {
+DATA(0x004fcd7c) H2_CONST char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {
     "kngt",
     "barb",
     "sorc",
@@ -8248,81 +8254,81 @@ DATA(0x00526684) i32 giWalkingYMod = 0;
 DATA(0x004fd634) u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
 DATA(0x004fd641) SCampaignChoice
     campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
-        {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_ARMORED_GAUNTLETS), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MIRROR_IMAGE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_SUMMON_EARTH_ELEMENTAL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_RESURRECT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CHOICE_RESOURCE_BONUS},
-          {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GEMS), CHOICE_RESOURCE_BONUS},
-          {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CHOICE_RESOURCE_BONUS}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}}},
-        {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_CURSE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), CHOICE_BASIC_SKILL},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
+        {{{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_THUNDER_MACE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_ARMORED_GAUNTLETS)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MIRROR_IMAGE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_SUMMON_EARTH_ELEMENTAL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_RESURRECT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_CRYSTAL)}, CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GEMS)}, CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_MERCURY)}, CHOICE_RESOURCE_BONUS}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}}},
+        {{{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MAGE_RING)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MINOR_SCROLL)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MASS_CURSE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DEFENDER_HELM)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {IDX(HERO_SKILL_LOGISTICS)}, CHOICE_BASIC_SKILL},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_POWER_AXE)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_WHITE_PEARL)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}}}
 };
 DATA(0x00526688) char* congratsText = NULL;
-DATA(0x004fd7ac) char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {
+DATA(0x004fd7ac) H2_CONST char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {
     "\xca\xed\xe8\xe3\xe0\x20\xe2\xf1\xe5\xe7\xed\xe0\xed\xe8\xff" /* "Книга всезнания" */,
     "\xcc\xe5\xf7\x20\xe2\xeb\xe0\xf1\xf2\xe8" /* "Меч власти" */,
     "\xc7\xe0\xf9\xe8\xf2\xed\xe0\xff\x20\xed\xe0\xea\xe8\xe4\xea\xe0" /* "Защитная накидка" */,
@@ -8427,7 +8433,7 @@ DATA(0x004fd7ac) char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {
     "\xcc\xe5\xf7\x20\xc0\xed\xe4\xf3\xf0\xe0\xed\xe0" /* "Меч Андурана" */,
     "\xcb\xee\xef\xe0\xf2\xe0\x20\xec\xee\xe3\xe8\xeb\xfc\xf9\xe8\xea\xe0" /* "Лопата могильщика" */
 };
-DATA(0x004fd948) char* gArtifactDesc[IDX(ARTIFACT_COUNT)] = {
+DATA(0x004fd948) H2_CONST char* gArtifactDesc[IDX(ARTIFACT_COUNT)] = {
     "\x7b\xca\xed\xe8\xe3\xe0\x20\xe2\xf1\xe5\xe7\xed\xe0\xed\xe8\xff\x7d\x0a\x28\xc7\xed\xe0\xed\xe8\xff\x20\x2b\x31\x32\x29\x0a\x0a\xca\xed\xe8\xe3\xe0\x20\xe2\xf1\xe5\xe7\xed\xe0\xed\xe8\xff\x20\xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xc7\xed\xe0\xed\xe8\xff\x20\xed\xe0\x20\x31\x32\x20\xe5\xe4\xe8\xed\xe8\xf6\x2e" /* "{Книга всезнания}\n(Знания +12)\n\nКнига всезнания увеличивает Знания на 12 единиц." */,
     "\x7b\xcc\xe5\xf7\x20\xe2\xeb\xe0\xf1\xf2\xe8\x7d\x0a\x28\xc0\xf2\xe0\xea\xe0\x20\x2b\x31\x32\x29\x0a\x0a\xcc\xe5\xf7\x20\xe2\xeb\xe0\xf1\xf2\xe8\x20\xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xed\xe0\xe2\xfb\xea\x20\xc0\xf2\xe0\xea\xe8\x20\xed\xe0\x20\x31\x32\x20\xe5\xe4\xe8\xed\xe8\xf6\x2e" /* "{Меч власти}\n(Атака +12)\n\nМеч власти увеличивает навык Атаки на 12 единиц." */,
     "\x7b\xc7\xe0\xf9\xe8\xf2\xed\xe0\xff\x20\xed\xe0\xea\xe8\xe4\xea\xe0\x7d\x0a\x28\xc7\xe0\xf9\xe8\xf2\xe0\x20\x2b\x31\x32\x29\x0a\x0a\xc7\xe0\xf9\xe8\xf2\xed\xe0\xff\x20\xed\xe0\xea\xe8\xe4\xea\xe0\x20\xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xc7\xe0\xf9\xe8\xf2\xf3\x20\xed\xe0\x20\x31\x32\x20\xe5\xe4\xe8\xed\xe8\xf6\x2e" /* "{Защитная накидка}\n(Защита +12)\n\nЗащитная накидка увеличивает Защиту на 12 единиц." */,
@@ -8531,7 +8537,7 @@ DATA(0x004fd948) char* gArtifactDesc[IDX(ARTIFACT_COUNT)] = {
     "\x7b\xcc\xe5\xf7\xe5\xeb\xee\xec\x7d\x0a\x0a\xd3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xc7\xe0\xf9\xe8\xf2\xf3\x20\xed\xe0\x20\x34\x20\xe5\xe4\xe8\xed\xe8\xf6\xfb\x20\xe8\x20\xc0\xf2\xe0\xea\xf3\x20\xed\xe0\x20\x31\x20\xe5\xe4\xe8\xed\xe8\xf6\xf3\x2e" /* "{Мечелом}\n\nУвеличивает Защиту на 4 единицы и Атаку на 1 единицу." */,
     "\x7b\xcc\xe5\xf7\x20\xc0\xed\xe4\xf3\xf0\xe0\xed\xe0\x7d\x0a\x0a\xd3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xc0\xf2\xe0\xea\xf3\x20\xed\xe0\x20\x35\x20\xe5\xe4\xe8\xed\xe8\xf6\x2e" /* "{Меч Андурана}\n\nУвеличивает Атаку на 5 единиц." */,
     "\x7b\xcb\xee\xef\xe0\xf2\xe0\x20\xec\xee\xe3\xe8\xeb\xfc\xf9\xe8\xea\xe0\x7d\x0a\x0a\xd3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xfd\xf4\xf4\xe5\xea\xf2\xe8\xe2\xed\xee\xf1\xf2\xfc\x20\xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xed\xe8\xff\x20\xed\xe0\xe2\xfb\xea\xe0\x20\xed\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xe8\x2e" /* "{Лопата могильщика}\n\nУвеличивает эффективность использования навыка некромантии." */};
-DATA(0x004fdae4) char* gArtifactEvent[IDX(ARTIFACT_COUNT)] = {
+DATA(0x004fdae4) H2_CONST char* gArtifactEvent[IDX(ARTIFACT_COUNT)] = {
     "" /* "" */,
     "" /* "" */,
     "" /* "" */,
@@ -8635,19 +8641,19 @@ DATA(0x004fdae4) char* gArtifactEvent[IDX(ARTIFACT_COUNT)] = {
     "\xce\xf2\xf1\xf2\xe0\xe2\xed\xee\xe9\x20\xea\xe0\xef\xe8\xf2\xe0\xed\x20\xe3\xee\xf0\xee\xe4\xf1\xea\xee\xe9\x20\xf1\xf2\xf0\xe0\xe6\xe8\x20\xf3\xe7\xed\xe0\xeb\x20\xee\x20\xe2\xe0\xf8\xe5\xec\x20\xef\xee\xf5\xee\xe4\xe5\x20\xe8\x20\xe4\xe0\xf0\xee\xe2\xe0\xeb\x20\xe2\xe0\xec\x20\xf1\xe2\xee\xe9\x20\xec\xe5\xf7\x2c\x20\xf1\xee\xf1\xeb\xf3\xe6\xe8\xe2\xf8\xe8\xe9\x20\xe5\xec\xf3\x20\xe4\xee\xe1\xf0\xf3\xfe\x20\xf1\xeb\xf3\xe6\xe1\xf3\x20\xe2\x20\xe1\xfb\xeb\xfb\xe5\x20\xe2\xf0\xe5\xec\xe5\xed\xe0\x2e" /* "Отставной капитан городской стражи узнал о вашем походе и даровал вам свой меч, сослуживший ему добрую службу в былые времена." */,
     "\xd2\xf0\xee\xeb\xeb\xfc\x20\xee\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb\x20\xe2\xe0\xf1\x2c\x20\xf1\xea\xe0\xe7\xe0\xe2\x3a\x20\x22\xcf\xeb\xe0\xf2\xe8\x20\xec\xed\xe5\x20\x35\x30\x30\x30\x20\xe7\xee\xeb\xee\xf2\xfb\xf5\x20\xe8\xeb\xe8\x20\xff\x20\xf3\xe1\xfc\xfe\x20\xf2\xe5\xe1\xff\x20\xec\xe5\xf7\xee\xec\x20\xc0\xed\xf3\xe4\xf0\xe0\xed\xe0\x21\x22\x20\xc2\xfb\x20\xee\xf2\xea\xe0\xe7\xe0\xeb\xe8\xf1\xfc\x20\xef\xeb\xe0\xf2\xe8\xf2\xfc\x2e\x20\xd2\xf0\xee\xeb\xeb\xfc\x20\xf1\xf5\xe2\xe0\xf2\xe8\xeb\xf1\xff\x20\xe7\xe0\x20\xea\xeb\xe8\xed\xee\xea\x20\xec\xe5\xf7\xe0\x2c\x20\xe2\xe7\xe2\xfb\xeb\x20\xee\xf2\x20\xe1\xee\xeb\xe8\x20\xe8\x20\xe1\xf0\xee\xf1\xe8\xe2\x20\xec\xe5\xf7\x20\xf3\xe1\xe5\xe6\xe0\xeb\x2e\x20\xd5\xee\xf0\xee\xf8\xee\x2c\x20\xf7\xf2\xee\x20\xee\xed\x20\xe1\xfb\xeb\x20\xed\xe0\xf1\xf2\xee\xeb\xfc\xea\xee\x20\xe3\xeb\xf3\xef\x2c\x20\xf7\xf2\xee\x20\xed\xe5\x20\xe7\xed\xe0\xeb\x2c\x20\xea\xe0\xea\x20\xef\xf0\xe0\xe2\xe8\xeb\xfc\xed\xee\x20\xe4\xe5\xf0\xe6\xe0\xf2\xfc\x20\xee\xf1\xf2\xf0\xfb\xe5\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\xfb\x2e" /* "Тролль остановил вас, сказав: \"Плати мне 5000 золотых или я убью тебя мечом Анудрана!\" Вы отказались платить. Тролль схватился за клинок меча, взвыл от боли и бросив меч убежал. Хорошо, что он был настолько глуп, что не знал, как правильно держать острые предметы." */,
     "\xc2\x20\xe3\xf0\xff\xe7\xe8\x20\xe2\xfb\x20\xef\xee\xe4\xee\xe1\xf0\xe0\xeb\xe8\x20\xf1\xf2\xe0\xf0\xf3\xfe\x20\xeb\xee\xef\xe0\xf2\xf3\x2e\x20\xcf\xf0\xe8\xf1\xec\xee\xf2\xf0\xe5\xe2\xf8\xe8\xf1\xfc\x2c\x20\xe2\xfb\x20\xef\xee\xed\xff\xeb\xe8\x2c\x20\xf7\xf2\xee\x20\xe2\xe0\xec\x20\xef\xee\xf1\xf7\xe0\xf1\xf2\xeb\xe8\xe2\xe8\xeb\xee\xf1\xfc\x20\xed\xe0\xe9\xf2\xe8\x20\xe7\xe0\xf7\xe0\xf0\xee\xe2\xe0\xed\xed\xf3\xfe\x20\xeb\xee\xef\xe0\xf2\xf3\x20\xe3\xf0\xe0\xe1\xe8\xf2\xe5\xeb\xe5\xe9\x20\xec\xee\xe3\xe8\xeb\x2e" /* "В грязи вы подобрали старую лопату. Присмотревшись, вы поняли, что вам посчастливилось найти зачарованную лопату грабителей могил." */};
-DATA(0x004fdc80) char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
+DATA(0x004fdc80) H2_CONST char* gStatNames[HERO_PRIMARY_STAT_COUNT] = {
     "\xc0\xf2\xe0\xea\xe0" /* "Атака" */,
     "\xc7\xe0\xf9\xe8\xf2\xe0" /* "Защита" */,
     "\xd1\xe8\xeb\xe0\x20\xec\xe0\xe3\xe8\xe8" /* "Сила магии" */,
     "\xc7\xed\xe0\xed\xe8\xff" /* "Знания" */
 };
-DATA(0x004fdc90) char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
+DATA(0x004fdc90) H2_CONST char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
     "\x7b\xc0\xf2\xe0\xea\xe0\x7d\x0a\x0a\xc2\xe0\xf8\x20\xed\xe0\xe2\xfb\xea\x20\xe0\xf2\xe0\xea\xe8\x20\x2d\x20\xe1\xee\xed\xf3\xf1\x2c\x20\xe4\xee\xe1\xe0\xe2\xeb\xff\xe5\xec\xfb\xe9\x20\xea\x20\xed\xe0\xe2\xfb\xea\xf3\x20\xe0\xf2\xe0\xea\xe8\x20\xea\xe0\xe6\xe4\xee\xe3\xee\x20\xe2\xee\xe8\xed\xe0\x2e" /* "{Атака}\n\nВаш навык атаки - бонус, добавляемый к навыку атаки каждого воина." */,
     "\x7b\xc7\xe0\xf9\xe8\xf2\xe0\x7d\x0a\x0a\xc2\xe0\xf8\x20\xed\xe0\xe2\xfb\xea\x20\xe7\xe0\xf9\xe8\xf2\xfb\x20\x2d\x20\xe1\xee\xed\xf3\xf1\x2c\x20\xe4\xee\xe1\xe0\xe2\xeb\xff\xe5\xec\xfb\xe9\x20\xea\x20\xed\xe0\xe2\xfb\xea\xf3\x20\xe7\xe0\xf9\xe8\xf2\xfb\x20\xea\xe0\xe6\xe4\xee\xe3\xee\x20\xe2\xee\xe8\xed\xe0\x2e" /* "{Защита}\n\nВаш навык защиты - бонус, добавляемый к навыку защиты каждого воина." */,
     "\x7b\xd1\xe8\xeb\xe0\x20\xec\xe0\xe3\xe8\xe8\x7d\x0a\x0a\xc2\xe0\xf8\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xf1\xe8\xeb\xfb\x20\xec\xe0\xe3\xe8\xe8\x20\xee\xef\xf0\xe5\xe4\xe5\xeb\xff\xe5\xf2\x20\xe4\xeb\xe8\xf2\xe5\xeb\xfc\xed\xee\xf1\xf2\xfc\x20\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xff\x20\xe8\xeb\xe8\x20\xf1\xe8\xeb\xf3\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff\x2e" /* "{Сила магии}\n\nВаш уровень силы магии определяет длительность действия или силу заклинания." */,
     "\x7b\xc7\xed\xe0\xed\xe8\xff\x7d\x0a\x0a\xd3\xf0\xee\xe2\xe5\xed\xfc\x20\xe7\xed\xe0\xed\xe8\xe9\x20\xee\xef\xf0\xe5\xe4\xe5\xeb\xff\xe5\xf2\x20\xea\xee\xeb\xe8\xf7\xe5\xf1\xf2\xe2\xee\x20\xee\xf7\xea\xee\xe2\x20\xec\xe0\xe3\xe8\xe8\x20\xe3\xe5\xf0\xee\xff\x2e" /* "{Знания}\n\nУровень знаний определяет количество очков магии героя." */
 };
-DATA(0x004fdca0) char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
+DATA(0x004fdca0) H2_CONST char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     "\xd0\xfb\xf6\xe0\xf0\xfc" /* "Рыцарь" */,
     "\xc2\xe0\xf0\xe2\xe0\xf0" /* "Варвар" */,
     "\xca\xee\xeb\xe4\xf3\xed\xfc\xff" /* "Колдунья" */,
@@ -8657,7 +8663,7 @@ DATA(0x004fdca0) char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] = {
     "\xcc\xf3\xeb\xfc\xf2\xe8" /* "Мульти" */,
     "\xd1\xeb\xf3\xf7\xe0\xe9\xed\xee" /* "Случайно" */
 };
-DATA(0x004fdcc0) char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
+DATA(0x004fdcc0) H2_CONST char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
     "peasn",
     "archr",
     "arch2",
@@ -8725,7 +8731,7 @@ DATA(0x004fdcc0) char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
     "elemf",
     "elemw"
 };
-DATA(0x004fddc8) char* gArmyNames[IDX(CREATURE_COUNT)] = {
+DATA(0x004fddc8) H2_CONST char* gArmyNames[IDX(CREATURE_COUNT)] = {
     "\xca\xf0\xe5\xf1\xf2\xfc\xff\xed\xe8\xed" /* "Крестьянин" */,
     "\xd1\xf2\xf0\xe5\xeb\xee\xea" /* "Стрелок" */,
     "\xd0\xe5\xe9\xed\xe4\xe6\xe5\xf0" /* "Рейнджер" */,
@@ -8793,7 +8799,7 @@ DATA(0x004fddc8) char* gArmyNames[IDX(CREATURE_COUNT)] = {
     "\xce\xe3\xed\xe5\xed\xed\xfb\xe9\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb" /* "Огненный элементал" */,
     "\xc2\xee\xe4\xff\xed\xee\xe9\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb" /* "Водяной элементал" */
 };
-DATA(0x004fded0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
+DATA(0x004fded0) H2_CONST char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "\xea\xf0\xe5\xf1\xf2\xfc\xff\xed" /* "крестьян" */,
     "\xf1\xf2\xf0\xe5\xeb\xea\xee\xe2" /* "стрелков" */,
     "\xf0\xe5\xe9\xed\xe4\xe6\xe5\xf0\xee\xe2" /* "рейнджеров" */,
@@ -8861,7 +8867,7 @@ DATA(0x004fded0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "\xee\xe3\xed\xe5\xed\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2" /* "огненных элементалов" */,
     "\xe2\xee\xe4\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2" /* "водных элементалов" */
 };
-DATA(0x004fdfd8) char* gTerrainNames[IDX(TERRAIN_COUNT)] = {
+DATA(0x004fdfd8) H2_CONST char* gTerrainNames[IDX(TERRAIN_COUNT)] = {
     "\xc2\xee\xe4\xe0" /* "Вода" */,
     "\xd2\xf0\xe0\xe2\xe0" /* "Трава" */,
     "\xd1\xed\xe5\xe3" /* "Снег" */,
@@ -8872,7 +8878,7 @@ DATA(0x004fdfd8) char* gTerrainNames[IDX(TERRAIN_COUNT)] = {
     "\xcf\xf3\xf1\xf2\xee\xf8\xfc" /* "Пустошь" */,
     "\xcf\xee\xe1\xe5\xf0\xe5\xe6\xfc\xe5" /* "Побережье" */
 };
-DATA(0x004fdffc) char* gResourceNames[RESOURCE_VALUE_COUNT] = {
+DATA(0x004fdffc) H2_CONST char* gResourceNames[RESOURCE_VALUE_COUNT] = {
     "\xc4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xe0" /* "Древесина" */,
     "\xd0\xf2\xf3\xf2\xfc" /* "Ртуть" */,
     "\xd0\xf3\xe4\xe0" /* "Руда" */,
@@ -8884,7 +8890,7 @@ DATA(0x004fdffc) char* gResourceNames[RESOURCE_VALUE_COUNT] = {
 // The localised build names the mine, not the resource it yields, in the
 // adventure-map quick info; the English 2.1 tree has no such table and reads
 // gResourceNames there. See docs/version-changes.md.
-DATA(0x004fe018) char* gMineNames[KB_MINE_NAME_COUNT] = {
+DATA(0x004fe018) H2_CONST char* gMineNames[KB_MINE_NAME_COUNT] = {
     "\xcb\xe5\xf1\xee\xef\xe8\xeb\xea\xe0" /* "Лесопилка" */,
     "\xcb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xff\x20\xe0\xeb\xf5\xe8\xec\xe8\xea\xe0" /* "Лаборатория алхимика" */,
     "\xd0\xf3\xe4\xed\xe0\xff\x20\xf8\xe0\xf5\xf2\xe0" /* "Рудная шахта" */,
@@ -8893,7 +8899,7 @@ DATA(0x004fe018) char* gMineNames[KB_MINE_NAME_COUNT] = {
     "\xd1\xe0\xec\xee\xf6\xe2\xe5\xf2\xed\xe0\xff\x20\xf8\xe0\xf5\xf2\xe0" /* "Самоцветная шахта" */,
     "\xc7\xee\xeb\xee\xf2\xe0\xff\x20\xf8\xe0\xf5\xf2\xe0" /* "Золотая шахта" */
 };
-DATA(0x004fe034) char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
+DATA(0x004fe034) H2_CONST char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "" /* "" */,
     "\xcb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xff\x20\xe0\xeb\xf5\xe8\xec\xe8\xea\xe0" /* "Лаборатория алхимика" */,
     "\xd3\xea\xe0\xe7\xe0\xf2\xe5\xeb\xfc" /* "Указатель" */,
@@ -9019,7 +9025,7 @@ DATA(0x004fe034) char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "\x25\x73" /* "%s" */,
     "\xd2\xe5\xec\xed\xe8\xf6\xe0" /* "Темница" */
 };
-DATA(0x004fe224) char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
+DATA(0x004fe224) H2_CONST char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     // Алхимик\n\nВы стали хозяином лаборатории местного алхимика. Она будет приносить вам по одной
     // единице ртути в день.
     "\xc0\xeb\xf5\xe8\xec\xe8\xea\x0a\x0a\xc2\xfb\x20\xf1\xf2\xe0\xeb\xe8\x20\xf5\xee\xe7\xff\xe8\xed"
@@ -9471,7 +9477,7 @@ DATA(0x004fe224) char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
         "\xe2\x20\xe2\x20\xe3\xf0\xf3\xe4\xe5\x20\xeb\xee\xf5\xec\xee\xf2\xfc\xe5\xe2\x2c\x20\xe2\xfb\x20"
         "\xed\xe0\xf5\xee\xe4\xe8\xf2\xe5\x2e"
 };
-DATA(0x004fe3a0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
+DATA(0x004fe3a0) H2_CONST char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     // Начать одиночную или сетевую игру.
     "\xcd\xe0\xf7\xe0\xf2\xfc\x20\xee\xe4\xe8\xed\xee\xf7\xed\xf3\xfe\x20\xe8\xeb\xe8\x20\xf1\xe5\xf2"
         "\xe5\xe2\xf3\xfe\x20\xe8\xe3\xf0\xf3\x2e",
@@ -9487,7 +9493,7 @@ DATA(0x004fe3a0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "\xc7\xe0\xea\xf0\xfb\xf2\xfc\x20\xec\xe5\xed\xfe\x2c\x20\xed\xe8\xf7\xe5\xe3\xee\x20\xed\xe5\x20"
         "\xe4\xe5\xeb\xe0\xff\x2e"
 };
-DATA(0x004fe3b4) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
+DATA(0x004fe3b4) H2_CONST char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     // {ОК}\n\nЗакрыть это меню.
     "\x7b\xce\xca\x7d\x0a\x0a\xc7\xe0\xea\xf0\xfb\xf2\xfc\x20\xfd\xf2\xee\x20\xec\xe5\xed\xfe\x2e",
     // {Скорость}\n\nУстановить скорость действий и анимации воинов в бою.
@@ -9535,7 +9541,7 @@ DATA(0x004fe3b4) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
         "\xea\xf3\x20\xf2\xe5\xed\xe8\x20\xee\xf2\x20\xea\xf3\xf0\xf1\xee\xf0\xe0\x20\xed\xe0\x20\xf1\xe5"
         "\xf2\xea\xe5\x20\xea\xee\xee\xf0\xe4\xe8\xed\xe0\xf2\x2e"
 };
-DATA(0x004fe3d0) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
+DATA(0x004fe3d0) H2_CONST char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     // Осмотреть весь мир.
     "\xce\xf1\xec\xee\xf2\xf0\xe5\xf2\xfc\x20\xe2\xe5\xf1\xfc\x20\xec\xe8\xf0\x2e",
     // Посмотреть головоломку.
@@ -9545,12 +9551,12 @@ DATA(0x004fe3d0) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
         "\xe5\xed\xe0\xf0\xe8\xe8\x2c\x20\xed\xe0\x20\xea\xee\xf2\xee\xf0\xee\xec\x20\xe8\xe4\xe5\xf2\x20"
         "\xe8\xe3\xf0\xe0\x2e",
     // Копать в поисках Великого артефакта.
-    "\xca\xee\xef\xe0\xf2\xfc\x20\xe2\x20\xef\xee\xe8\xf1\xea\xe0\xf5\x20\xc2\xe5\xeb\xe8\xea\xee\xe3"
-        "\xee\x20\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0\x2e",
+    ("\xca\xee\xef\xe0\xf2\xfc\x20\xe2\x20\xef\xee\xe8\xf1\xea\xe0\xf5\x20\xc2\xe5\xeb\xe8\xea\xee\xe3"
+     "\xee\x20\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0\x2e"),
     // Закрыть это меню.
     "\xc7\xe0\xea\xf0\xfb\xf2\xfc\x20\xfd\xf2\xee\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe3e4) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
+DATA(0x004fe3e4) H2_CONST char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     // {Новая игра}\n\nНачать отдельный сценарий или сетевую игру.
     "\x7b\xcd\xee\xe2\xe0\xff\x20\xe8\xe3\xf0\xe0\x7d\x0a\x0a\xcd\xe0\xf7\xe0\xf2\xfc\x20\xee\xf2\xe4"
         "\xe5\xeb\xfc\xed\xfb\xe9\x20\xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9\x20\xe8\xeb\xe8\x20\xf1\xe5\xf2\xe5"
@@ -9570,7 +9576,7 @@ DATA(0x004fe3e4) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
         "\xf2\xfc\xf1\xff\x20\xe2\x20\xee\xef\xe5\xf0\xe0\xf6\xe8\xee\xed\xed\xf3\xfe\x20\xf1\xe8\xf1\xf2"
         "\xe5\xec\xf3\x2e"
 };
-DATA(0x004fe3f8) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
+DATA(0x004fe3f8) H2_CONST char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     // {Следующий герой}\n\nВыбрать следующего героя.
     "\x7b\xd1\xeb\xe5\xe4\xf3\xfe\xf9\xe8\xe9\x20\xe3\xe5\xf0\xee\xe9\x7d\x0a\x0a\xc2\xfb\xe1\xf0\xe0"
         "\xf2\xfc\x20\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee\x20\xe3\xe5\xf0\xee\xff\x2e",
@@ -9604,7 +9610,7 @@ DATA(0x004fe3f8) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
         "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x20\xed\xe0\x20"
         "\xf1\xf2\xf0\xe0\xf2\xe5\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9\x20\xea\xe0\xf0\xf2\xe5\x2e"
 };
-DATA(0x004fe418) char* gLuckText[KB_LUCK_TEXT_COUNT] = {
+DATA(0x004fe418) H2_CONST char* gLuckText[KB_LUCK_TEXT_COUNT] = {
     // Проклятая
     "\xcf\xf0\xee\xea\xeb\xff\xf2\xe0\xff",
     // Ужасная
@@ -9620,7 +9626,7 @@ DATA(0x004fe418) char* gLuckText[KB_LUCK_TEXT_COUNT] = {
     // Божественная
     "\xc1\xee\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xe0\xff"
 };
-DATA(0x004fe434) char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
+DATA(0x004fe434) H2_CONST char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
     // Предательская
     "\xcf\xf0\xe5\xe4\xe0\xf2\xe5\xeb\xfc\xf1\xea\xe0\xff",
     // Ужасная
@@ -9636,7 +9642,7 @@ DATA(0x004fe434) char* gMoraleText[KB_MORALE_TEXT_COUNT] = {
     // Кровавая!
     "\xca\xf0\xee\xe2\xe0\xe2\xe0\xff\x21"
 };
-DATA(0x004fe450) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
+DATA(0x004fe450) H2_CONST char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     // Выкл.
     "\xc2\xfb\xea\xeb\x2e",
     // Вкл.
@@ -9660,7 +9666,7 @@ DATA(0x004fe450) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     // Вкл.\nГромкость 1
     "\xc2\xea\xeb\x2e\x0a\xc3\xf0\xee\xec\xea\xee\xf1\xf2\xfc\x20\x31"
 };
-DATA(0x004fe47c) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
+DATA(0x004fe47c) H2_CONST char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
     // Шагом
     "\xd8\xe0\xe3\xee\xec",
     // Рысью
@@ -9672,7 +9678,7 @@ DATA(0x004fe47c) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
     // Прыжками
     "\xcf\xf0\xfb\xe6\xea\xe0\xec\xe8"
 };
-DATA(0x004fe490) char* gColors[IDX(FACTION_COUNT)] = {
+DATA(0x004fe490) H2_CONST char* gColors[IDX(FACTION_COUNT)] = {
     "\xf1\xe8\xed\xe8\xe9" /* "синий" */,
     "\xe7\xe5\xeb\xe5\xed\xfb\xe9" /* "зеленый" */,
     "\xea\xf0\xe0\xf1\xed\xfb\xe9" /* "красный" */,
@@ -9680,7 +9686,7 @@ DATA(0x004fe490) char* gColors[IDX(FACTION_COUNT)] = {
     "\xee\xf0\xe0\xed\xe6\xe5\xe2\xfb\xe9" /* "оранжевый" */,
     "\xf4\xe8\xee\xeb\xe5\xf2\xee\xe2\xfb\xe9" /* "фиолетовый" */
 };
-DATA(0x004fe4a8) static char* gColorAbbreviations[IDX(FACTION_COUNT)] = {
+DATA(0x004fe4a8) static H2_CONST char* H2_UNUSED(gColorAbbreviations)[IDX(FACTION_COUNT)] = {
     "\xf1\xe8\xed." /* "син." */,
     "\xe7\xe5\xeb." /* "зел." */,
     "\xea\xf0." /* "кр." */,
@@ -9688,7 +9694,7 @@ DATA(0x004fe4a8) static char* gColorAbbreviations[IDX(FACTION_COUNT)] = {
     "\xee\xf0." /* "ор." */,
     "\xf4\xe8\xee\xeb." /* "фиол." */
 };
-DATA(0x004fe4c0) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
+DATA(0x004fe4c0) H2_CONST char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     // Кузнечика
     "\xca\xf3\xe7\xed\xe5\xf7\xe8\xea\xe0",
     // Муравья
@@ -9710,7 +9716,7 @@ DATA(0x004fe4c0) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     // Жука
     "\xc6\xf3\xea\xe0"
 };
-DATA(0x004fe4e8) char* gWeekNames[KB_WEEK_NAME_COUNT] = {
+DATA(0x004fe4e8) H2_CONST char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     // Белки
     "\xc1\xe5\xeb\xea\xe8",
     // Кролика
@@ -9742,7 +9748,7 @@ DATA(0x004fe4e8) char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     // Кондора
     "\xca\xee\xed\xe4\xee\xf0\xe0"
 };
-DATA(0x004fe524) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
+DATA(0x004fe524) H2_CONST char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     // Обзор королевства
     "\xce\xe1\xe7\xee\xf0\x20\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0",
     // %s - информация
@@ -9805,7 +9811,7 @@ DATA(0x004fe524) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     // Сгруппировать воинов
     "\xd1\xe3\xf0\xf3\xef\xef\xe8\xf0\xee\xe2\xe0\xf2\xfc\x20\xe2\xee\xe8\xed\xee\xe2"
 };
-DATA(0x004fe588) char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
+DATA(0x004fe588) H2_CONST char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     // Построить Гильдию магов
     "\xcf\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc\x20\xc3\xe8\xeb\xfc\xe4\xe8\xfe\x20\xec\xe0\xe3\xee\xe2",
     // Построены все этажи Гильдии магов.
@@ -9849,7 +9855,7 @@ DATA(0x004fe588) char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "\xc2\xfb\xe1\xf0\xe0\xf2\xfc\x20\xf8\xe8\xf0\xee\xea\xe8\xe5\x20\xf0\xff\xe4\xfb\x20\xe4\xeb\xff"
         "\x20\xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe0"
 };
-DATA(0x004fe5c8) char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
+DATA(0x004fe5c8) H2_CONST char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     // {Хорошая удача}\n\nЕсли удача вашего войска выше обычной, атаки отдельных отрядов на поле боя
     // иногда оказываются более результативными (их сила удваивается).
     "\x7b\xd5\xee\xf0\xee\xf8\xe0\xff\x20\xf3\xe4\xe0\xf7\xe0\x7d\x0a\x0a\xc5\xf1\xeb\xe8\x20\xf3\xe4"
@@ -9913,7 +9919,7 @@ DATA(0x004fe5c8) char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
         "\x20\xe4\xe0\xe5\xf2\x20\xec\xe0\xea\xf1\xe8\xec\xe0\xeb\xfc\xed\xf3\xfe\x20\xf3\xe4\xe0\xf7\xf3"
         "\x2e"
 };
-DATA(0x004fe61c) char* IQnames[KB_IQ_NAME_COUNT] = {
+DATA(0x004fe61c) H2_CONST char* IQnames[KB_IQ_NAME_COUNT] = {
     // Нет
     "\xcd\xe5\xf2",
     // Глупый
@@ -9925,7 +9931,7 @@ DATA(0x004fe61c) char* IQnames[KB_IQ_NAME_COUNT] = {
     // Гений
     "\xc3\xe5\xed\xe8\xe9"
 };
-DATA(0x004fe630) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
+DATA(0x004fe630) H2_CONST char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     // Предыдущая страница
     "\xcf\xf0\xe5\xe4\xfb\xe4\xf3\xf9\xe0\xff\x20\xf1\xf2\xf0\xe0\xed\xe8\xf6\xe0\x20",
     // Следующая страница
@@ -9943,10 +9949,10 @@ DATA(0x004fe630) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     // Боевые заклинания
     "\xc1\xee\xe5\xe2\xfb\xe5\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff",
     // У вашего героя осталось %d оч. магии
-    "\xd3\x20\xe2\xe0\xf8\xe5\xe3\xee\x20\xe3\xe5\xf0\xee\xff\x20\xee\xf1\xf2\xe0\xeb\xee\xf1\xfc\x20"
-        "\x25\x64\x20\xee\xf7\x2e\x20\xec\xe0\xe3\xe8\xe8"
+    ("\xd3\x20\xe2\xe0\xf8\xe5\xe3\xee\x20\xe3\xe5\xf0\xee\xff\x20\xee\xf1\xf2\xe0\xeb\xee\xf1\xfc\x20"
+     "\x25\x64\x20\xee\xf7\x2e\x20\xec\xe0\xe3\xe8\xe8")
 };
-DATA(0x004fe654) char* speedText[KB_SPEED_TEXT_COUNT] = {
+DATA(0x004fe654) H2_CONST char* speedText[KB_SPEED_TEXT_COUNT] = {
     /*  */ "",
     /* Ползает */ "\xcf\xee\xeb\xe7\xe0\xe5\xf2",
     /* Оч. низкая */ "\xce\xf7\x2e\x20\xed\xe8\xe7\xea\xe0\xff",
@@ -9958,7 +9964,7 @@ DATA(0x004fe654) char* speedText[KB_SPEED_TEXT_COUNT] = {
     /* Молниеносная */ "\xcc\xee\xeb\xed\xe8\xe5\xed\xee\xf1\xed\xe0\xff",
     /* Абсолютная */ "\xc0\xe1\xf1\xee\xeb\xfe\xf2\xed\xe0\xff"
 };
-DATA(0x004fe67c) char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
+DATA(0x004fe67c) H2_CONST char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     /* Атака:  */ "\xc0\xf2\xe0\xea\xe0\x3a\x20",
     /* Защита:  */ "\xc7\xe0\xf9\xe8\xf2\xe0\x3a\x20",
     /* Выстрелов:  */ "\xc2\xfb\xf1\xf2\xf0\xe5\xeb\xee\xe2\x3a\x20",
@@ -9969,7 +9975,7 @@ DATA(0x004fe67c) char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     /* Удача:  */ "\xd3\xe4\xe0\xf7\xe0\x3a\x20",
     /* Выстрелов:  */ "\xc2\xfb\xf1\xf2\xf0\xe5\xeb\xee\xe2\x3a\x20"
 };
-DATA(0x004fe6a0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
+DATA(0x004fe6a0) H2_CONST char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     /* Атака:  */ "\xc0\xf2\xe0\xea\xe0\x3a\x20",
     /* Защита:  */ "\xc7\xe0\xf9\xe8\xf2\xe0\x3a\x20",
     /* Выстр.:  */ "\xc2\xfb\xf1\xf2\xf0\x2e\x3a\x20",
@@ -9980,13 +9986,14 @@ DATA(0x004fe6a0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     /* \n\nСкорость:\n%s */ "\x0a\x0a\xd1\xea\xee\xf0\xee\xf1\xf2\xfc\x3a\x0a\x25\x73",
     /* \n\nПрирост\n + %d/нед. */ "\x0a\x0a\xcf\xf0\xe8\xf0\xee\xf1\xf2\x0a\x20\x2b\x20\x25\x64\x2f\xed\xe5\xe4\x2e"
 };
-DATA(0x004fe6c4) char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
-    /* Обзор королевства   Месяц: %d, Неделя: %d, День: %d */ "\xce\xe1\xe7\xee\xf0\x20\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0\x20\x20\x20\xcc\xe5\xf1\xff\xf6\x3a\x20\x25\x64\x2c\x20\xcd\xe5\xe4\xe5\xeb\xff\x3a\x20\x25\x64\x2c\x20\xc4\xe5\xed\xfc\x3a"
-        "\x20\x25\x64",
+DATA(0x004fe6c4) H2_CONST char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
+    /* Обзор королевства   Месяц: %d, Неделя: %d, День: %d */
+    ("\xce\xe1\xe7\xee\xf0\x20\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0\x20\x20\x20\xcc\xe5\xf1\xff\xf6\x3a\x20\x25\x64\x2c\x20\xcd\xe5\xe4\xe5\xeb\xff\x3a\x20\x25\x64\x2c\x20\xc4\xe5\xed\xfc\x3a"
+     "\x20\x25\x64"),
     /* Ваш Драконий город. */ "\xc2\xe0\xf8\x20\xc4\xf0\xe0\xea\xee\xed\xe8\xe9\x20\xe3\xee\xf0\xee\xe4\x2e",
     /* Ваш маяк. */ "\xc2\xe0\xf8\x20\xec\xe0\xff\xea\x2e"
 };
-DATA(0x004fe6d0) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
+DATA(0x004fe6d0) H2_CONST char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     /* %s, у вас осталось всего %d дней на то, чтобы завоевать хотя бы один город; иначе вы будете навеки изгнаны из страны. */ "\x25\x73\x2c\x20\xf3\x20\xe2\xe0\xf1\x20\xee\xf1\xf2\xe0\xeb\xee\xf1\xfc\x20\xe2\xf1\xe5\xe3\xee\x20\x25\x64\x20\xe4\xed\xe5\xe9\x20\xed\xe0\x20\xf2\xee\x2c\x20\xf7\xf2\xee\xe1\xfb\x20\xe7\xe0"
         "\xe2\xee\xe5\xe2\xe0\xf2\xfc\x20\xf5\xee\xf2\xff\x20\xe1\xfb\x20\xee\xe4\xe8\xed\x20\xe3\xee\xf0\xee\xe4\x3b\x20\xe8\xed\xe0\xf7\xe5\x20\xe2\xfb\x20\xe1\xf3\xe4\xe5\xf2\xe5\x20\xed\xe0\xe2\xe5"
         "\xea\xe8\x20\xe8\xe7\xe3\xed\xe0\xed\xfb\x20\xe8\xe7\x20\xf1\xf2\xf0\xe0\xed\xfb\x2e",
@@ -10006,7 +10013,7 @@ DATA(0x004fe6d0) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
         "\xf1\xf2\xe2\xf3\xe5\xf2\x20\xf1\xe8\xeb\xe0\x20\x25\x73\x2e\x0a\x0a\xcf\xee\xef\xf3\xeb\xff\xf6\xe8\xff\x20\x25\x73\x20\x2b\x35\x2e\x0a\x0a\xcd\xe0\xf1\xe5\xeb\xe5\xed\xe8\xe5\x20\xe2\xf1\xe5"
         "\xf5\x20\xe6\xe8\xeb\xe8\xf9\x20\xe2\xee\xe7\xf0\xee\xf1\xeb\xee\x2e"
 };
-DATA(0x004fe6ec) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
+DATA(0x004fe6ec) H2_CONST char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     /* Атака:  */ "\xc0\xf2\xe0\xea\xe0\x3a\x20",
     /* Защита:  */ "\xc7\xe0\xf9\xe8\xf2\xe0\x3a\x20",
     /* Сила магии:  */ "\xd1\xe8\xeb\xe0\x20\xec\xe0\xe3\xe8\xe8\x3a\x20",
@@ -10015,7 +10022,7 @@ DATA(0x004fe6ec) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     /* Удача:  */ "\xd3\xe4\xe0\xf7\xe0\x3a\x20",
     /* Очки магии:  */ "\xce\xf7\xea\xe8\x20\xec\xe0\xe3\xe8\xe8\x3a\x20"
 };
-DATA(0x004fe708) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
+DATA(0x004fe708) H2_CONST char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     /* Остановить катапульту */ "\xce\xf1\xf2\xe0\xed\xee\xe2\xe8\xf2\xfc\x20\xea\xe0\xf2\xe0\xef\xf3\xeb\xfc\xf2\xf3",
     /* Направить заклинание */ "\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5",
     /* Отступить */ "\xce\xf2\xf1\xf2\xf3\xef\xe8\xf2\xfc",
@@ -10024,7 +10031,7 @@ DATA(0x004fe708) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     /* Возможности героя */ "\xc2\xee\xe7\xec\xee\xe6\xed\xee\xf1\xf2\xe8\x20\xe3\xe5\xf0\xee\xff",
     /* Возможности капитана */ "\xc2\xee\xe7\xec\xee\xe6\xed\xee\xf1\xf2\xe8\x20\xea\xe0\xef\xe8\xf2\xe0\xed\xe0"
 };
-DATA(0x004fe724) char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
+DATA(0x004fe724) H2_CONST char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     /* {Направить заклинание}\n\nНаправить заклинание. В течение каждого раунда боя можно направить лишь одно заклинание. Новый раунд начинается после того, как все отряды на поле боя завершили свой ход. */ "\x7b\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x7d\x0a\x0a\xcd\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x2e\x20\xc2\x20"
         "\xf2\xe5\xf7\xe5\xed\xe8\xe5\x20\xea\xe0\xe6\xe4\xee\xe3\xee\x20\xf0\xe0\xf3\xed\xe4\xe0\x20\xe1\xee\xff\x20\xec\xee\xe6\xed\xee\x20\xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc\x20\xeb\xe8\xf8\xfc\x20"
         "\xee\xe4\xed\xee\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5\x2e\x20\xcd\xee\xe2\xfb\xe9\x20\xf0\xe0\xf3\xed\xe4\x20\xed\xe0\xf7\xe8\xed\xe0\xe5\xf2\xf1\xff\x20\xef\xee\xf1\xeb\xe5\x20\xf2\xee"
@@ -10042,7 +10049,7 @@ DATA(0x004fe724) char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
         "\xe2\x20\xe1\xe8\xf2\xe2\xe5\x20\xe2\xee\xe9\xf1\xea\xe0\xec\xe8\x2e",
     /* {Отмена}\n\nВернуться в бой. */ "\x7b\xce\xf2\xec\xe5\xed\xe0\x7d\x0a\x0a\xc2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe1\xee\xe9\x2e"
 };
-DATA(0x004fe734) char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
+DATA(0x004fe734) H2_CONST char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     /*  */ "",
     /* %s: Идти сюда. */ "\x25\x73\x3a\x20\xc8\xe4\xf2\xe8\x20\xf1\xfe\xe4\xe0\x2e",
     /* %s: Перелететь сюда. */ "\x25\x73\x3a\x20\xcf\xe5\xf0\xe5\xeb\xe5\xf2\xe5\xf2\xfc\x20\xf1\xfe\xe4\xe0\x2e",
@@ -10056,16 +10063,16 @@ DATA(0x004fe734) char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     /* Показать вражеского капитана */ "\xcf\xee\xea\xe0\xe7\xe0\xf2\xfc\x20\xe2\xf0\xe0\xe6\xe5\xf1\xea\xee\xe3\xee\x20\xea\xe0\xef\xe8\xf2\xe0\xed\xe0",
     /* Информация о баллисте */ "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff\x20\xee\x20\xe1\xe0\xeb\xeb\xe8\xf1\xf2\xe5"
 };
-DATA(0x004fe764) char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
+DATA(0x004fe764) H2_CONST char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
     {/* %s получает */ "\x25\x73\x20\xef\xee\xeb\xf3\xf7\xe0\xe5\xf2", /*  уровень опыта.\n */ "\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xee\xef\xfb\xf2\xe0\x2e\x0a", /*  %d уровней опыта.\n */ "\x20\x25\x64\x20\xf3\xf0\xee\xe2\xed\xe5\xe9\x20\xee\xef\xfb\xf2\xe0\x2e\x0a"};
-DATA(0x004fe770) char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
+DATA(0x004fe770) H2_CONST char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     /* Подождать, пока походят другие */ "\xcf\xee\xe4\xee\xe6\xe4\xe0\xf2\xfc\x2c\x20\xef\xee\xea\xe0\x20\xef\xee\xf5\xee\xe4\xff\xf2\x20\xe4\xf0\xf3\xe3\xe8\xe5",
     /* Пропустить ход этого воина */ "\xcf\xf0\xee\xef\xf3\xf1\xf2\xe8\xf2\xfc\x20\xf5\xee\xe4\x20\xfd\xf2\xee\xe3\xee\x20\xe2\xee\xe8\xed\xe0",
     /* Автобой */ "\xc0\xe2\xf2\xee\xe1\xee\xe9",
     /* Системные настройки */ "\xd1\xe8\xf1\xf2\xe5\xec\xed\xfb\xe5\x20\xed\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8",
     /*  */ ""
 };
-DATA(0x004fe784) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
+DATA(0x004fe784) H2_CONST char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     /* {Ждать}\n\nДанный отряд откладывает свой ход и совершает действие после того, как все остальные отряды походили. */ "\x7b\xc6\xe4\xe0\xf2\xfc\x7d\x0a\x0a\xc4\xe0\xed\xed\xfb\xe9\x20\xee\xf2\xf0\xff\xe4\x20\xee\xf2\xea\xeb\xe0\xe4\xfb\xe2\xe0\xe5\xf2\x20\xf1\xe2\xee\xe9\x20\xf5\xee\xe4\x20\xe8\x20\xf1\xee\xe2"
         "\xe5\xf0\xf8\xe0\xe5\xf2\x20\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe5\x20\xef\xee\xf1\xeb\xe5\x20\xf2\xee\xe3\xee\x2c\x20\xea\xe0\xea\x20\xe2\xf1\xe5\x20\xee\xf1\xf2\xe0\xeb\xfc\xed\xfb\xe5\x20\xee\xf2"
         "\xf0\xff\xe4\xfb\x20\xef\xee\xf5\xee\xe4\xe8\xeb\xe8\x2e",
@@ -10077,7 +10084,7 @@ DATA(0x004fe784) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     /* {Информационная строка}\n\nЗдесь отображаются результаты действий отдельных отрядов. */ "\x7b\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xee\xed\xed\xe0\xff\x20\xf1\xf2\xf0\xee\xea\xe0\x7d\x0a\x0a\xc7\xe4\xe5\xf1\xfc\x20\xee\xf2\xee\xe1\xf0\xe0\xe6\xe0\xfe\xf2\xf1\xff\x20\xf0\xe5\xe7\xf3"
         "\xeb\xfc\xf2\xe0\xf2\xfb\x20\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe9\x20\xee\xf2\xe4\xe5\xeb\xfc\xed\xfb\xf5\x20\xee\xf2\xf0\xff\xe4\xee\xe2\x2e"
 };
-DATA(0x004fe798) char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
+DATA(0x004fe798) H2_CONST char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     /* Разделить отряд %s */ "\xd0\xe0\xe7\xe4\xe5\xeb\xe8\xf2\xfc\x20\xee\xf2\xf0\xff\xe4\x20\x25\x73",
     /* Нельзя отнять последних воинов у героя  */ "\xcd\xe5\xeb\xfc\xe7\xff\x20\xee\xf2\xed\xff\xf2\xfc\x20\xef\xee\xf1\xeb\xe5\xe4\xed\xe8\xf5\x20\xe2\xee\xe8\xed\xee\xe2\x20\xf3\x20\xe3\xe5\xf0\xee\xff\x20",
     /* Соединить отряды %s */ "\xd1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\x20\xee\xf2\xf0\xff\xe4\xfb\x20\x25\x73",
@@ -10107,7 +10114,7 @@ DATA(0x004fe798) char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     /* Рынок */ "\xd0\xfb\xed\xee\xea",
     /* Дом капитана */ "\xc4\xee\xec\x20\xea\xe0\xef\xe8\xf2\xe0\xed\xe0"
 };
-DATA(0x004fe808) char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
+DATA(0x004fe808) H2_CONST char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     /* Лорд Килбурн */ "\xcb\xee\xf0\xe4\x20\xca\xe8\xeb\xe1\xf3\xf0\xed", /* Сэр Галлант */ "\xd1\xfd\xf0\x20\xc3\xe0\xeb\xeb\xe0\xed\xf2", /* Эктор */ "\xdd\xea\xf2\xee\xf0",    /* Гвеннет */ "\xc3\xe2\xe5\xed\xed\xe5\xf2", /* Тиро */ "\xd2\xe8\xf0\xee",    /* Амброзий */ "\xc0\xec\xe1\xf0\xee\xe7\xe8\xe9",   /* Руби */ "\xd0\xf3\xe1\xe8",
     /* Максимус */ "\xcc\xe0\xea\xf1\xe8\xec\xf3\xf1",      /* Димитри */ "\xc4\xe8\xec\xe8\xf2\xf0\xe8",     /* Сундакс */ "\xd1\xf3\xed\xe4\xe0\xea\xf1",  /* Финеоз */ "\xd4\xe8\xed\xe5\xee\xe7",  /* Джоджош */ "\xc4\xe6\xee\xe4\xe6\xee\xf8",  /* Крэг Хак */ "\xca\xf0\xfd\xe3\x20\xd5\xe0\xea", /* Джезебель */ "\xc4\xe6\xe5\xe7\xe5\xe1\xe5\xeb\xfc",
     /* Жаклин */ "\xc6\xe0\xea\xeb\xe8\xed",       /* Эргон */ "\xdd\xf0\xe3\xee\xed",       /* Тсабу */ "\xd2\xf1\xe0\xe1\xf3",    /* Атлас */ "\xc0\xf2\xeb\xe0\xf1",    /* Астра */ "\xc0\xf1\xf2\xf0\xe0",   /* Наташа */ "\xcd\xe0\xf2\xe0\xf8\xe0",   /* Троян */ "\xd2\xf0\xee\xff\xed",
@@ -10117,7 +10124,7 @@ DATA(0x004fe808) char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     /* Саракин */ "\xd1\xe0\xf0\xe0\xea\xe8\xed",      /* Калиндра */ "\xca\xe0\xeb\xe8\xed\xe4\xf0\xe0",    /* Мандигал */ "\xcc\xe0\xed\xe4\xe8\xe3\xe0\xeb", /* Зом */ "\xc7\xee\xec",      /* Дарлана */ "\xc4\xe0\xf0\xeb\xe0\xed\xe0", /* Зам */ "\xc7\xe0\xec",       /* Ранлу */ "\xd0\xe0\xed\xeb\xf3",
     /* Чарити */ "\xd7\xe0\xf0\xe8\xf2\xe8",      /* Риалдо */ "\xd0\xe8\xe0\xeb\xe4\xee",      /* Роксана */ "\xd0\xee\xea\xf1\xe0\xed\xe0",   /* Сандро */ "\xd1\xe0\xed\xe4\xf0\xee",   /* Келия */ "\xca\xe5\xeb\xe8\xff"
 };
-DATA(0x004fe8e0) char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
+DATA(0x004fe8e0) H2_CONST char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     /* {Уровень сложности}\n\nЭта опция позволяет устанавливать стартовый уровень сложности игры. Чем выше уровень сложности, тем с меньшим количеством ресурсов вы начинаете игру, и тем больше ресурсов получают ваши компьютерные противники. */ "\x7b\xd3\xf0\xee\xe2\xe5\xed\xfc\x20\xf1\xeb\xee\xe6\xed\xee\xf1\xf2\xe8\x7d\x0a\x0a\xdd\xf2\xe0\x20\xee\xef\xf6\xe8\xff\x20\xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2\x20\xf3\xf1\xf2\xe0\xed\xe0\xe2"
         "\xeb\xe8\xe2\xe0\xf2\xfc\x20\xf1\xf2\xe0\xf0\xf2\xee\xe2\xfb\xe9\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xf1\xeb\xee\xe6\xed\xee\xf1\xf2\xe8\x20\xe8\xe3\xf0\xfb\x2e\x20\xd7\xe5\xec\x20\xe2\xfb\xf8"
         "\xe5\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xf1\xeb\xee\xe6\xed\xee\xf1\xf2\xe8\x2c\x20\xf2\xe5\xec\x20\xf1\x20\xec\xe5\xed\xfc\xf8\xe8\xec\x20\xea\xee\xeb\xe8\xf7\xe5\xf1\xf2\xe2\xee\xec\x20\xf0"
@@ -10150,7 +10157,7 @@ DATA(0x004fe8e0) char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT] = {
     /* {Отмена}\n\nНажмите, чтобы вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe0\x7d\x0a\x0a\xcd\xe0\xe6\xec\xe8\xf2\xe5\x2c\x20\xf7\xf2\xee\xe1\xfb\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed"
         "\xfe\x2e"
 };
-DATA(0x004fe900) char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
+DATA(0x004fe900) H2_CONST char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     /* {2400 бод}\n\nИспользовать соединение на скорости 2400 бод.\n\nЗамечание: Для модемов 14400 бод используйте соединение на скорости 19200.  Для модемов 28800 бод используйте соединение на скорости 38400 бод. */ "\x7b\x32\x34\x30\x30\x20\xe1\xee\xe4\x7d\x0a\x0a\xc8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5\x20\xed\xe0\x20\xf1\xea\xee\xf0\xee\xf1\xf2\xe8\x20"
         "\x32\x34\x30\x30\x20\xe1\xee\xe4\x2e\x0a\x0a\xc7\xe0\xec\xe5\xf7\xe0\xed\xe8\xe5\x3a\x20\xc4\xeb\xff\x20\xec\xee\xe4\xe5\xec\xee\xe2\x20\x31\x34\x34\x30\x30\x20\xe1\xee\xe4\x20\xe8\xf1\xef\xee"
         "\xeb\xfc\xe7\xf3\xe9\xf2\xe5\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5\x20\xed\xe0\x20\xf1\xea\xee\xf0\xee\xf1\xf2\xe8\x20\x31\x39\x32\x30\x30\x2e\x20\x20\xc4\xeb\xff\x20\xec\xee\xe4\xe5\xec"
@@ -10173,7 +10180,7 @@ DATA(0x004fe900) char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
         "\xe8\x20\x33\x38\x34\x30\x30\x20\xe1\xee\xe4\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe914) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
+DATA(0x004fe914) H2_CONST char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     /* {COM 1}\n\nИспользовать для модемного соединения порт COM 1. */ "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0a\xc8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc\x20\xe4\xeb\xff\x20\xec\xee\xe4\xe5\xec\xed\xee\xe3\xee\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff\x20\xef"
         "\xee\xf0\xf2\x20\x43\x4f\x4d\x20\x31\x2e",
     /* {COM 2}\n\nИспользовать для модемного соединения порт COM 2. */ "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0a\xc8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc\x20\xe4\xeb\xff\x20\xec\xee\xe4\xe5\xec\xed\xee\xe3\xee\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff\x20\xef"
@@ -10184,7 +10191,7 @@ DATA(0x004fe914) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
         "\xee\xf0\xf2\x20\x43\x4f\x4d\x20\x34\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe928) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
+DATA(0x004fe928) H2_CONST char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     /* {Скорость соединения 2400 бод.}\n\nДля компьютеров с устаревшим чипом UART 8250 следует использовать скорость 19200 бод, а для компьютеров с более современным чипом UART 16550 - скорость 38400 бод. Если вы не уверены, какой у вас чип, начните с более низких скоростей. В большинстве компьютеров, произведенных в 1994 году и позднее, используется чип UART 16550. */ "\x7b\xd1\xea\xee\xf0\xee\xf1\xf2\xfc\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff\x20\x32\x34\x30\x30\x20\xe1\xee\xe4\x2e\x7d\x0a\x0a\xc4\xeb\xff\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xee\xe2"
         "\x20\xf1\x20\xf3\xf1\xf2\xe0\xf0\xe5\xe2\xf8\xe8\xec\x20\xf7\xe8\xef\xee\xec\x20\x55\x41\x52\x54\x20\x38\x32\x35\x30\x20\xf1\xeb\xe5\xe4\xf3\xe5\xf2\x20\xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0"
         "\xf2\xfc\x20\xf1\xea\xee\xf0\xee\xf1\xf2\xfc\x20\x31\x39\x32\x30\x30\x20\xe1\xee\xe4\x2c\x20\xe0\x20\xe4\xeb\xff\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xee\xe2\x20\xf1\x20\xe1\xee\xeb\xe5\xe5"
@@ -10219,7 +10226,7 @@ DATA(0x004fe928) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
         "\xee\xeb\xfc\xe7\xf3\xe5\xf2\xf1\xff\x20\xf7\xe8\xef\x20\x55\x41\x52\x54\x20\x31\x36\x35\x35\x30\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe93c) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
+DATA(0x004fe93c) H2_CONST char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     /* {COM 1}\n\nИспользовать для прямого соединения порт COM 1. */ "\x7b\x43\x4f\x4d\x20\x31\x7d\x0a\x0a\xc8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc\x20\xe4\xeb\xff\x20\xef\xf0\xff\xec\xee\xe3\xee\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff\x20\xef\xee\xf0"
         "\xf2\x20\x43\x4f\x4d\x20\x31\x2e",
     /* {COM 2}\n\nИспользовать для прямого соединения порт COM 2. */ "\x7b\x43\x4f\x4d\x20\x32\x7d\x0a\x0a\xc8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc\x20\xe4\xeb\xff\x20\xef\xf0\xff\xec\xee\xe3\xee\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff\x20\xef\xee\xf0"
@@ -10230,7 +10237,7 @@ DATA(0x004fe93c) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
         "\xf2\x20\x43\x4f\x4d\x20\x34\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe950) char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
+DATA(0x004fe950) H2_CONST char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     /* {2 игрока}\n\nИграть с 2 людьми и, опционально, до 4 дополнительных компьютерных игроков. */ "\x7b\x32\x20\xe8\xe3\xf0\xee\xea\xe0\x7d\x0a\x0a\xc8\xe3\xf0\xe0\xf2\xfc\x20\xf1\x20\x32\x20\xeb\xfe\xe4\xfc\xec\xe8\x20\xe8\x2c\x20\xee\xef\xf6\xe8\xee\xed\xe0\xeb\xfc\xed\xee\x2c\x20\xe4\xee"
         "\x20\x34\x20\xe4\xee\xef\xee\xeb\xed\xe8\xf2\xe5\xeb\xfc\xed\xfb\xf5\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xed\xfb\xf5\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x2e",
     /* {3 игрока}\n\nИграть с 3 людьми и, опционально, до 3 дополнительных компьютерных игроков. */ "\x7b\x33\x20\xe8\xe3\xf0\xee\xea\xe0\x7d\x0a\x0a\xc8\xe3\xf0\xe0\xf2\xfc\x20\xf1\x20\x33\x20\xeb\xfe\xe4\xfc\xec\xe8\x20\xe8\x2c\x20\xee\xef\xf6\xe8\xee\xed\xe0\xeb\xfc\xed\xee\x2c\x20\xe4\xee"
@@ -10242,23 +10249,25 @@ DATA(0x004fe950) char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     /* {6 игроков}\n\n Играть с 6 людьми. */ "\x7b\x36\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x7d\x0a\x0a\x20\xc8\xe3\xf0\xe0\xf2\xfc\x20\xf1\x20\x36\x20\xeb\xfe\xe4\xfc\xec\xe8\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe968) char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
+DATA(0x004fe968) H2_CONST char* gSetupModemGameHelp[KB_SETUP_MODEM_HELP_COUNT] = {
     /* {Сервер}\n\nСервер задает настройки игры. Может быть, только один хост в одном сетевом соединении. */ "\x7b\xd1\xe5\xf0\xe2\xe5\xf0\x7d\x0a\x0a\xd1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xe5\xf2\x20\xed\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2e\x20\xcc\xee\xe6\xe5\xf2\x20\xe1\xfb"
         "\xf2\xfc\x2c\x20\xf2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xe8\xed\x20\xf5\xee\xf1\xf2\x20\xe2\x20\xee\xe4\xed\xee\xec\x20\xf1\xe5\xf2\xe5\xe2\xee\xec\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe8\x2e",
-    /* {Гость}\n\nГость ожидает, пока сервер задаст настройки игры, после чего он автоматически вступит в игру. */ "\x7b\xc3\xee\xf1\xf2\xfc\x7d\x0a\x0a\xc3\xee\xf1\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xe5\xf2\x2c\x20\xef\xee\xea\xe0\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xf1\xf2\x20\xed\xe0\xf1\xf2\xf0"
-        "\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2c\x20\xef\xee\xf1\xeb\xe5\x20\xf7\xe5\xe3\xee\x20\xee\xed\x20\xe0\xe2\xf2\xee\xec\xe0\xf2\xe8\xf7\xe5\xf1\xea\xe8\x20\xe2\xf1\xf2\xf3\xef\xe8\xf2\x20\xe2"
-        "\x20\xe8\xe3\xf0\xf3\x2e",
+    /* {Гость}\n\nГость ожидает, пока сервер задаст настройки игры, после чего он автоматически вступит в игру. */
+    ("\x7b\xc3\xee\xf1\xf2\xfc\x7d\x0a\x0a\xc3\xee\xf1\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xe5\xf2\x2c\x20\xef\xee\xea\xe0\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xf1\xf2\x20\xed\xe0\xf1\xf2\xf0"
+     "\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2c\x20\xef\xee\xf1\xeb\xe5\x20\xf7\xe5\xe3\xee\x20\xee\xed\x20\xe0\xe2\xf2\xee\xec\xe0\xf2\xe8\xf7\xe5\xf1\xea\xe8\x20\xe2\xf1\xf2\xf3\xef\xe8\xf2\x20\xe2"
+     "\x20\xe8\xe3\xf0\xf3\x2e"),
     /* {Настройки}\n\nИзменить конфигурацию модема. */ "\x7b\xcd\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8\x7d\x0a\x0a\xc8\xe7\xec\xe5\xed\xe8\xf2\xfc\x20\xea\xee\xed\xf4\xe8\xe3\xf3\xf0\xe0\xf6\xe8\xfe\x20\xec\xee\xe4\xe5\xec\xe0\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe978) char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
+DATA(0x004fe978) H2_CONST char* gSetupDCGameHelp[KB_SETUP_DIRECT_CONNECT_HELP_COUNT] = {
     /* {Сервер}\n\nСервер задает настройки игры. */ "\x7b\xd1\xe5\xf0\xe2\xe5\xf0\x7d\x0a\x0a\xd1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xe5\xf2\x20\xed\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2e",
-    /* {Гость}\n\nГость ожидает, пока сервер задаст настройки игры. */ "\x7b\xc3\xee\xf1\xf2\xfc\x7d\x0a\x0a\xc3\xee\xf1\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xe5\xf2\x2c\x20\xef\xee\xea\xe0\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xf1\xf2\x20\xed\xe0\xf1\xf2\xf0"
-        "\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2e",
+    /* {Гость}\n\nГость ожидает, пока сервер задаст настройки игры. */
+    ("\x7b\xc3\xee\xf1\xf2\xfc\x7d\x0a\x0a\xc3\xee\xf1\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xe5\xf2\x2c\x20\xef\xee\xea\xe0\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xf1\xf2\x20\xed\xe0\xf1\xf2\xf0"
+     "\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2e"),
     /* {Настройки}\n\nИзменить конфигурацию модема. */ "\x7b\xcd\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8\x7d\x0a\x0a\xc8\xe7\xec\xe5\xed\xe8\xf2\xfc\x20\xea\xee\xed\xf4\xe8\xe3\xf3\xf0\xe0\xf6\xe8\xfe\x20\xec\xee\xe4\xe5\xec\xe0\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe988) char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
+DATA(0x004fe988) H2_CONST char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT] = {
     /* {За одной машиной}\n\nИграть за одной машиной, где от 2 до 4 игроков людей. */ "\x7b\xc7\xe0\x20\xee\xe4\xed\xee\xe9\x20\xec\xe0\xf8\xe8\xed\xee\xe9\x7d\x0a\x0a\xc8\xe3\xf0\xe0\xf2\xfc\x20\xe7\xe0\x20\xee\xe4\xed\xee\xe9\x20\xec\xe0\xf8\xe8\xed\xee\xe9\x2c\x20\xe3\xe4\xe5"
         "\x20\xee\xf2\x20\x32\x20\xe4\xee\x20\x34\x20\xe8\xe3\xf0\xee\xea\xee\xe2\x20\xeb\xfe\xe4\xe5\xe9\x2e",
     /* {Локальная сеть}\n\nИграть по сети, где двое игроков играют по локальной сети, сидя за своими компьютерами. */ "\x7b\xcb\xee\xea\xe0\xeb\xfc\xed\xe0\xff\x20\xf1\xe5\xf2\xfc\x7d\x0a\x0a\xc8\xe3\xf0\xe0\xf2\xfc\x20\xef\xee\x20\xf1\xe5\xf2\xe8\x2c\x20\xe3\xe4\xe5\x20\xe4\xe2\xee\xe5\x20\xe8\xe3\xf0\xee\xea"
@@ -10270,7 +10279,7 @@ DATA(0x004fe988) char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT
         "\xee\xeb\xfc\x2d\xec\xee\xe4\xe5\xec\x20\xf1\xe8\xe4\xff\x20\xe7\xe0\x20\xf1\xe2\xee\xe8\xec\xe8\x20\xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xe0\xec\xe8\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe99c) char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
+DATA(0x004fe99c) H2_CONST char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
     /* {Сервер}\n\nОпределяет настройки игры. Может быть только один сервер в одном соединении. */ "\x7b\xd1\xe5\xf0\xe2\xe5\xf0\x7d\x0a\x0a\xce\xef\xf0\xe5\xe4\xe5\xeb\xff\xe5\xf2\x20\xed\xe0\xf1\xf2\xf0\xee\xe9\xea\xe8\x20\xe8\xe3\xf0\xfb\x2e\x20\xcc\xee\xe6\xe5\xf2\x20\xe1\xfb\xf2\xfc\x20"
         "\xf2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xe8\xed\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe2\x20\xee\xe4\xed\xee\xec\x20\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe8\x2e",
     /* {Гость}\n\n Гость ожидает, пока сервер задаст настройки игры, после чего он автоматически вступит в игру. В игре через TCP/IP и IPX может быть несколько гостей. В игре через NetBIOS - только 1. */ "\x7b\xc3\xee\xf1\xf2\xfc\x7d\x0a\x0a\x20\xc3\xee\xf1\xf2\xfc\x20\xee\xe6\xe8\xe4\xe0\xe5\xf2\x2c\x20\xef\xee\xea\xe0\x20\xf1\xe5\xf0\xe2\xe5\xf0\x20\xe7\xe0\xe4\xe0\xf1\xf2\x20\xed\xe0\xf1\xf2"
@@ -10279,7 +10288,7 @@ DATA(0x004fe99c) char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
         "\xea\xee\xeb\xfc\xea\xee\x20\xe3\xee\xf1\xf2\xe5\xe9\x2e\x20\xc2\x20\xe8\xe3\xf0\xe5\x20\xf7\xe5\xf0\xe5\xe7\x20\x4e\x65\x74\x42\x49\x4f\x53\x20\x2d\x20\xf2\xee\xeb\xfc\xea\xee\x20\x31\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe9a8) char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
+DATA(0x004fe9a8) H2_CONST char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     /* {IPX}\n\nIPX является часто используемым сетевым протоколом для Windows. По IPX могут играть до 6 человек одновременно. Протокол IPX поддерживает только версия игры, работающая под Windows 95. */ "\x7b\x49\x50\x58\x7d\x0a\x0a\x49\x50\x58\x20\xff\xe2\xeb\xff\xe5\xf2\xf1\xff\x20\xf7\xe0\xf1\xf2\xee\x20\xe8\xf1\xef\xee\xeb\xfc\xe7\xf3\xe5\xec\xfb\xec\x20\xf1\xe5\xf2\xe5\xe2\xfb\xec\x20\xef"
         "\xf0\xee\xf2\xee\xea\xee\xeb\xee\xec\x20\xe4\xeb\xff\x20\x57\x69\x6e\x64\x6f\x77\x73\x2e\x20\xcf\xee\x20\x49\x50\x58\x20\xec\xee\xe3\xf3\xf2\x20\xe8\xe3\xf0\xe0\xf2\xfc\x20\xe4\xee\x20\x36\x20"
         "\xf7\xe5\xeb\xee\xe2\xe5\xea\x20\xee\xe4\xed\xee\xe2\xf0\xe5\xec\xe5\xed\xed\xee\x2e\x20\xcf\xf0\xee\xf2\xee\xea\xee\xeb\x20\x49\x50\x58\x20\xef\xee\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2\x20"
@@ -10297,7 +10306,7 @@ DATA(0x004fe9a8) char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT
         "\x2e",
     /* {Отмена}\n\nЗакрыть меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe0\x7d\x0a\x0a\xc7\xe0\xea\xf0\xfb\xf2\xfc\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe9b8) char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
+DATA(0x004fe9b8) H2_CONST char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
     /* {Обычная игра}\n\nОдиночная игра на отдельной карте. */ "\x7b\xce\xe1\xfb\xf7\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x7d\x0a\x0a\xce\xe4\xe8\xed\xee\xf7\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x20\xed\xe0\x20\xee\xf2\xe4\xe5\xeb\xfc\xed\xee\xe9\x20\xea\xe0\xf0\xf2"
         "\xe5\x2e",
     /* {Кампания}\n\nОдиночная игра на серии карт. */ "\x7b\xca\xe0\xec\xef\xe0\xed\xe8\xff\x7d\x0a\x0a\xce\xe4\xe8\xed\xee\xf7\xed\xe0\xff\x20\xe8\xe3\xf0\xe0\x20\xed\xe0\x20\xf1\xe5\xf0\xe8\xe8\x20\xea\xe0\xf0\xf2\x2e",
@@ -10306,7 +10315,7 @@ DATA(0x004fe9b8) char* gSetupGameHelp[KB_SETUP_GAME_HELP_COUNT] = {
         "\xe0\xf0\xf2\xe5\x2e",
     /* {Отменить}\n\nОтменить и вернуться в главное меню. */ "\x7b\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x7d\x0a\x0a\xce\xf2\xec\xe5\xed\xe8\xf2\xfc\x20\xe8\x20\xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff\x20\xe2\x20\xe3\xeb\xe0\xe2\xed\xee\xe5\x20\xec\xe5\xed\xfe\x2e"
 };
-DATA(0x004fe9c8) char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
+DATA(0x004fe9c8) H2_CONST char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     /* Враг сдался! */ "\xc2\xf0\xe0\xe3\x20\xf1\xe4\xe0\xeb\xf1\xff\x21",
     /* Враг повержен! */ "\xc2\xf0\xe0\xe3\x20\xef\xee\xe2\xe5\xf0\xe6\xe5\xed\x21",
     /* Великая победа! */ "\xc2\xe5\xeb\xe8\xea\xe0\xff\x20\xef\xee\xe1\xe5\xe4\xe0\x21",
@@ -10322,7 +10331,7 @@ DATA(0x004fe9c8) char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     /* \n\nЗа мужество, проявленное в бою, %s получает %d оч. опыта, и получает %d уровень(я). */ "\x0a\x0a\xc7\xe0\x20\xec\xf3\xe6\xe5\xf1\xf2\xe2\xee\x2c\x20\xef\xf0\xee\xff\xe2\xeb\xe5\xed\xed\xee\xe5\x20\xe2\x20\xe1\xee\xfe\x2c\x20\x25\x73\x20\xef\xee\xeb\xf3\xf7\xe0\xe5\xf2\x20\x25\x64"
         "\x20\xee\xf7\x2e\x20\xee\xef\xfb\xf2\xe0\x2c\x20\xe8\x20\xef\xee\xeb\xf3\xf7\xe0\xe5\xf2\x20\x25\x64\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x28\xff\x29\x2e"
 };
-DATA(0x004fe9f4) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
+DATA(0x004fe9f4) H2_CONST char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     /* {Высокая мораль}\n\nВысокая мораль может дать в бою вашим бойцам дополнительную атаку. */ "\x7b\xc2\xfb\xf1\xee\xea\xe0\xff\x20\xec\xee\xf0\xe0\xeb\xfc\x7d\x0a\x0a\xc2\xfb\xf1\xee\xea\xe0\xff\x20\xec\xee\xf0\xe0\xeb\xfc\x20\xec\xee\xe6\xe5\xf2\x20\xe4\xe0\xf2\xfc\x20\xe2\x20\xe1\xee"
         "\xfe\x20\xe2\xe0\xf8\xe8\xec\x20\xe1\xee\xe9\xf6\xe0\xec\x20\xe4\xee\xef\xee\xeb\xed\xe8\xf2\xe5\xeb\xfc\xed\xf3\xfe\x20\xe0\xf2\xe0\xea\xf3\x2e",
     /* {Обычная мораль}\n\nС обычной моралью ваши армии никогда не получат дополнительную атаку и не будут прокляты. */ "\x7b\xce\xe1\xfb\xf7\xed\xe0\xff\x20\xec\xee\xf0\xe0\xeb\xfc\x7d\x0a\x0a\xd1\x20\xee\xe1\xfb\xf7\xed\xee\xe9\x20\xec\xee\xf0\xe0\xeb\xfc\xfe\x20\xe2\xe0\xf8\xe8\x20\xe0\xf0\xec\xe8\xe8\x20\xed"
@@ -10361,21 +10370,21 @@ DATA(0x004fe9f4) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     /* \nБоевое одеяние Андурана дает максимальную мораль. */ "\x0a\xc1\xee\xe5\xe2\xee\xe5\x20\xee\xe4\xe5\xff\xed\xe8\xe5\x20\xc0\xed\xe4\xf3\xf0\xe0\xed\xe0\x20\xe4\xe0\xe5\xf2\x20\xec\xe0\xea\xf1\xe8\xec\xe0\xeb\xfc\xed\xf3\xfe\x20\xec\xee\xf0\xe0\xeb"
         "\xfc\x2e"
 };
-DATA(0x004fea74) char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {/* Маленькая */ "\xcc\xe0\xeb\xe5\xed\xfc\xea\xe0\xff", /* Средняя */ "\xd1\xf0\xe5\xe4\xed\xff\xff", /* Большая */ "\xc1\xee\xeb\xfc\xf8\xe0\xff", /* Огромная */ "\xce\xe3\xf0\xee\xec\xed\xe0\xff"};
-DATA(0x004fea84) char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004fea74) H2_CONST char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {/* Маленькая */ "\xcc\xe0\xeb\xe5\xed\xfc\xea\xe0\xff", /* Средняя */ "\xd1\xf0\xe5\xe4\xed\xff\xff", /* Большая */ "\xc1\xee\xeb\xfc\xf8\xe0\xff", /* Огромная */ "\xce\xe3\xf0\xee\xec\xed\xe0\xff"};
+DATA(0x004fea84) H2_CONST char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
     {/* Легкая */ "\xcb\xe5\xe3\xea\xe0\xff", /* Обычная */ "\xce\xe1\xfb\xf7\xed\xe0\xff", /* Высокая */ "\xc2\xfb\xf1\xee\xea\xe0\xff", /* Эксперт */ "\xdd\xea\xf1\xef\xe5\xf0\xf2", /* Невозможно! */ "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee\x21"};
-DATA(0x004fea98) char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {/* Легкая */ "\xcb\xe5\xe3\xea\xe0\xff", /* Обычная */ "\xce\xe1\xfb\xf7\xed\xe0\xff", /* Тяжелая */ "\xd2\xff\xe6\xe5\xeb\xe0\xff", /* Эксперт */ "\xdd\xea\xf1\xef\xe5\xf0\xf2"};
-DATA(0x004feaa8) char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
+DATA(0x004fea98) H2_CONST char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {/* Легкая */ "\xcb\xe5\xe3\xea\xe0\xff", /* Обычная */ "\xce\xe1\xfb\xf7\xed\xe0\xff", /* Тяжелая */ "\xd2\xff\xe6\xe5\xeb\xe0\xff", /* Эксперт */ "\xdd\xea\xf1\xef\xe5\xf0\xf2"};
+DATA(0x004feaa8) H2_CONST char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {/* Лорд Айронфист */ "\xcb\xee\xf0\xe4\x20\xc0\xe9\xf0\xee\xed\xf4\xe8\xf1\xf2", /* Лорд Слэйер */ "\xcb\xee\xf0\xe4\x20\xd1\xeb\xfd\xe9\xe5\xf0", /* Королева Ламанда */ "\xca\xee\xf0\xee\xeb\xe5\xe2\xe0\x20\xcb\xe0\xec\xe0\xed\xe4\xe0", /* Лорд Аламар */ "\xcb\xee\xf0\xe4\x20\xc0\xeb\xe0\xec\xe0\xf0"};
-DATA(0x004feab8) char* cWinText[KB_WIN_TEXT_COUNT] =
+DATA(0x004feab8) H2_CONST char* cWinText[KB_WIN_TEXT_COUNT] =
     {/* Дней: */ "\xc4\xed\xe5\xe9\x3a", /* Очки: */ "\xce\xf7\xea\xe8\x3a", /* Сложность: */ "\xd1\xeb\xee\xe6\xed\xee\xf1\xf2\xfc\x3a", /* Счет: */ "\xd1\xf7\xe5\xf2\x3a", /* Ранг: */ "\xd0\xe0\xed\xe3\x3a"};
-DATA(0x004feacc) char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004feacc) H2_CONST char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
     {/* Человек\n */ "\xd7\xe5\xeb\xee\xe2\xe5\xea\x0a", /* Человек\nЛегкая игра */ "\xd7\xe5\xeb\xee\xe2\xe5\xea\x0a\xcb\xe5\xe3\xea\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Человек\nОбычная игра */ "\xd7\xe5\xeb\xee\xe2\xe5\xea\x0a\xce\xe1\xfb\xf7\xed\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Человек\nТяжелая игра */ "\xd7\xe5\xeb\xee\xe2\xe5\xea\x0a\xd2\xff\xe6\xe5\xeb\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Человек\nЭксперт */ "\xd7\xe5\xeb\xee\xe2\xe5\xea\x0a\xdd\xea\xf1\xef\xe5\xf0\xf2"};
-DATA(0x004feae0) char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
+DATA(0x004feae0) H2_CONST char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {/* Чел.- */ "\xd7\xe5\xeb\x2e\x2d", /* Чел.-Легкая игра */ "\xd7\xe5\xeb\x2e\x2d\xcb\xe5\xe3\xea\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Чел.-Обычная игра */ "\xd7\xe5\xeb\x2e\x2d\xce\xe1\xfb\xf7\xed\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Чел.-Тяжелая игра */ "\xd7\xe5\xeb\x2e\x2d\xd2\xff\xe6\xe5\xeb\xe0\xff\x20\xe8\xe3\xf0\xe0", /* Чел.-Эксперт */ "\xd7\xe5\xeb\x2e\x2d\xdd\xea\xf1\xef\xe5\xf0\xf2"};
-DATA(0x004feaf4) char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
+DATA(0x004feaf4) H2_CONST char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
     {/* MIDI */ "\x4d\x49\x44\x49", /* CD-стерео без вокала */ "\x43\x44\x2d\xf1\xf2\xe5\xf0\xe5\xee\x20\xe1\xe5\xe7\x20\xe2\xee\xea\xe0\xeb\xe0", /* CD-стерео с вокалом */ "\x43\x44\x2d\xf1\xf2\xe5\xf0\xe5\xee\x20\xf1\x20\xe2\xee\xea\xe0\xeb\xee\xec"};
-DATA(0x004feb00) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004feb00) H2_CONST char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     /* {Огненный шар}\n\nОгромный огненный шар взрывается над выбранным участком поля боя, поражая все находящиеся поблизости отряды. */ "\x7b\xce\xe3\xed\xe5\xed\xed\xfb\xe9\x20\xf8\xe0\xf0\x7d\x0a\x0a\xce\xe3\xf0\xee\xec\xed\xfb\xe9\x20\xee\xe3\xed\xe5\xed\xed\xfb\xe9\x20\xf8\xe0\xf0\x20\xe2\xe7\xf0\xfb\xe2\xe0\xe5\xf2\xf1\xff"
         "\x20\xed\xe0\xe4\x20\xe2\xfb\xe1\xf0\xe0\xed\xed\xfb\xec\x20\xf3\xf7\xe0\xf1\xf2\xea\xee\xec\x20\xef\xee\xeb\xff\x20\xe1\xee\xff\x2c\x20\xef\xee\xf0\xe0\xe6\xe0\xff\x20\xe2\xf1\xe5\x20\xed\xe0"
         "\xf5\xee\xe4\xff\xf9\xe8\xe5\xf1\xff\x20\xef\xee\xe1\xeb\xe8\xe7\xee\xf1\xf2\xe8\x20\xee\xf2\xf0\xff\xe4\xfb\x2e",
@@ -10543,7 +10552,7 @@ DATA(0x004feb00) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     /* {Стража воды}\n\nОтряд водных элементалов охраняет шахту от нападения армий противника. */ "\x7b\xd1\xf2\xf0\xe0\xe6\xe0\x20\xe2\xee\xe4\xfb\x7d\x0a\x0a\xce\xf2\xf0\xff\xe4\x20\xe2\xee\xe4\xed\xfb\xf5\x20\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2\x20\xee\xf5\xf0\xe0\xed\xff\xe5\xf2"
         "\x20\xf8\xe0\xf5\xf2\xf3\x20\xee\xf2\x20\xed\xe0\xef\xe0\xe4\xe5\xed\xe8\xff\x20\xe0\xf0\xec\xe8\xe9\x20\xef\xf0\xee\xf2\xe8\xe2\xed\xe8\xea\xe0\x2e"
 };
-DATA(0x004fec04) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
+DATA(0x004fec04) H2_CONST char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     /* Огненный шар */ "\xce\xe3\xed\xe5\xed\xed\xfb\xe9\x20\xf8\xe0\xf0",
     /* Огненный взрыв */ "\xce\xe3\xed\xe5\xed\xed\xfb\xe9\x20\xe2\xe7\xf0\xfb\xe2",
     /* Молния */ "\xcc\xee\xeb\xed\xe8\xff",
@@ -10610,9 +10619,9 @@ DATA(0x004fec04) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     /* Страж огня */ "\xd1\xf2\xf0\xe0\xe6\x20\xee\xe3\xed\xff",
     /* Страж воды */ "\xd1\xf2\xf0\xe0\xe6\x20\xe2\xee\xe4\xfb"
 };
-DATA(0x004fed08) char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
+DATA(0x004fed08) H2_CONST char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
     {/* 1 ступени */ "\x31\x20\xf1\xf2\xf3\xef\xe5\xed\xe8", /* 2 ступени */ "\x32\x20\xf1\xf2\xf3\xef\xe5\xed\xe8", /* 3 ступени */ "\x33\x20\xf1\xf2\xf3\xef\xe5\xed\xe8"};
-DATA(0x004fed14) char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
+DATA(0x004fed14) H2_CONST char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     /* Следопыт */ "\xd1\xeb\xe5\xe4\xee\xef\xfb\xf2",
     /* Стрелок */ "\xd1\xf2\xf0\xe5\xeb\xee\xea",
     /* Логистика */ "\xcb\xee\xe3\xe8\xf1\xf2\xe8\xea\xe0",
@@ -10628,7 +10637,7 @@ DATA(0x004fed14) char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     /* Некромантия */ "\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xff",
     /* Казначей */ "\xca\xe0\xe7\xed\xe0\xf7\xe5\xe9"
 };
-DATA(0x004fed4c) char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
+DATA(0x004fed4c) H2_CONST char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     /* Гильдия магов */ "\xc3\xe8\xeb\xfc\xe4\xe8\xff\x20\xec\xe0\xe3\xee\xe2",
     /* Гильдия воров */ "\xc3\xe8\xeb\xfc\xe4\xe8\xff\x20\xe2\xee\xf0\xee\xe2",
     /* Таверна */ "\xd2\xe0\xe2\xe5\xf0\xed\xe0",
@@ -10649,7 +10658,7 @@ DATA(0x004fed4c) char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     /*  */ "",
     /*  */ ""
 };
-DATA(0x004fed98) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
+DATA(0x004fed98) H2_CONST char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     /* Ферма */ "\xd4\xe5\xf0\xec\xe0",
     /* Свалка истории */ "\xd1\xe2\xe0\xeb\xea\xe0\x20\xe8\xf1\xf2\xee\xf0\xe8\xe8",
     /* Хрустальный сад */ "\xd5\xf0\xf3\xf1\xf2\xe0\xeb\xfc\xed\xfb\xe9\x20\xf1\xe0\xe4",
@@ -10658,9 +10667,9 @@ DATA(0x004fed98) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     /* Груда черепов */ "\xc3\xf0\xf3\xe4\xe0\x20\xf7\xe5\xf0\xe5\xef\xee\xe2",
     /* Прирост воинов 1 ур. */ "\xcf\xf0\xe8\xf0\xee\xf1\xf2\x20\xe2\xee\xe8\xed\xee\xe2\x20\x31\x20\xf3\xf0\x2e"
 };
-DATA(0x004fedb4) char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
+DATA(0x004fedb4) H2_CONST char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     {/* Укрепления */ "\xd3\xea\xf0\xe5\xef\xeb\xe5\xed\xe8\xff", /* Колизей */ "\xca\xee\xeb\xe8\xe7\xe5\xe9", /* Радуга */ "\xd0\xe0\xe4\xf3\xe3\xe0", /* Подземелье */ "\xcf\xee\xe4\xe7\xe5\xec\xe5\xeb\xfc\xe5", /* Библиотека */ "\xc1\xe8\xe1\xeb\xe8\xee\xf2\xe5\xea\xe0", /* Шторм */ "\xd8\xf2\xee\xf0\xec", /* Специальная */ "\xd1\xef\xe5\xf6\xe8\xe0\xeb\xfc\xed\xe0\xff"};
-DATA(0x004fedd0) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fedd0) H2_CONST char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {/* Мазанка */ "\xcc\xe0\xe7\xe0\xed\xea\xe0",
      /* Стрельбище */ "\xd1\xf2\xf0\xe5\xeb\xfc\xe1\xe8\xf9\xe5",
      /* Кузница */ "\xca\xf3\xe7\xed\xe8\xf6\xe0",
@@ -10734,7 +10743,7 @@ DATA(0x004fedd0) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT
      /*  */ "",
      /*  */ ""}
 };
-DATA(0x004feef0) char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+DATA(0x004feef0) H2_CONST char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {/* {Следопыт 1 ступени}\n\nУменьшает замедление при передвижении по пересеченной местности на 25 процентов. */ "\x7b\xd1\xeb\xe5\xe4\xee\xef\xfb\xf2\x20\x31\x20\xf1\xf2\xf3\xef\xe5\xed\xe8\x7d\x0a\x0a\xd3\xec\xe5\xed\xfc\xf8\xe0\xe5\xf2\x20\xe7\xe0\xec\xe5\xe4\xeb\xe5\xed\xe8\xe5\x20\xef\xf0\xe8\x20\xef"
         "\xe5\xf0\xe5\xe4\xe2\xe8\xe6\xe5\xed\xe8\xe8\x20\xef\xee\x20\xef\xe5\xf0\xe5\xf1\xe5\xf7\xe5\xed\xed\xee\xe9\x20\xec\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8\x20\xed\xe0\x20\x32\x35\x20\xef\xf0\xee\xf6"
         "\xe5\xed\xf2\xee\xe2\x2e",
@@ -10846,7 +10855,7 @@ DATA(0x004feef0) char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALU
          "\xe0\xe5\xf2\x20\xf1\xee\x20\xf1\xe2\xee\xe8\xf5\x20\xe2\xeb\xe0\xe4\xe5\xed\xe8\xe9\x20\xed\xe0\xeb\xee\xe3\xe8\x20\xe2\x20\xf0\xe0\xe7\xec\xe5\xf0\xe5\x20\x35\x30\x30\x20\xe7\xee\xeb\xee\xf2"
          "\xfb\xf5\x2e"}
 };
-DATA(0x004fef98) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
+DATA(0x004fef98) H2_CONST char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     /* Гильдия магов позволяет разучивать новые заклинания и восстанавливает запас очков магии. */ "\xc3\xe8\xeb\xfc\xe4\xe8\xff\x20\xec\xe0\xe3\xee\xe2\x20\xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2\x20\xf0\xe0\xe7\xf3\xf7\xe8\xe2\xe0\xf2\xfc\x20\xed\xee\xe2\xfb\xe5\x20\xe7\xe0\xea\xeb\xe8\xed\xe0"
         "\xed\xe8\xff\x20\xe8\x20\xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2\x20\xe7\xe0\xef\xe0\xf1\x20\xee\xf7\xea\xee\xe2\x20\xec\xe0\xe3\xe8\xe8\x2e",
     /* Гильдия воров дает информацию о врагах. Также, Гильдия воров дает разведывательную информацию о вражеских городах. Дополнительные гильдии дают дополнительную информацию. */ "\xc3\xe8\xeb\xfc\xe4\xe8\xff\x20\xe2\xee\xf0\xee\xe2\x20\xe4\xe0\xe5\xf2\x20\xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe\x20\xee\x20\xe2\xf0\xe0\xe3\xe0\xf5\x2e\x20\xd2\xe0\xea\xe6\xe5\x2c\x20\xc3"
@@ -10883,7 +10892,7 @@ DATA(0x004fef98) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     /*  */ "",
     /*  */ ""
 };
-DATA(0x004fefe4) char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
+DATA(0x004fefe4) H2_CONST char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     /* Укрепления увеличивают прочность стен, увеличивая число раундов, необходимых для полного их разрушения. */ "\xd3\xea\xf0\xe5\xef\xeb\xe5\xed\xe8\xff\x20\xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xfe\xf2\x20\xef\xf0\xee\xf7\xed\xee\xf1\xf2\xfc\x20\xf1\xf2\xe5\xed\x2c\x20\xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0"
         "\xff\x20\xf7\xe8\xf1\xeb\xee\x20\xf0\xe0\xf3\xed\xe4\xee\xe2\x2c\x20\xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xf5\x20\xe4\xeb\xff\x20\xef\xee\xeb\xed\xee\xe3\xee\x20\xe8\xf5\x20\xf0\xe0\xe7\xf0"
         "\xf3\xf8\xe5\xed\xe8\xff\x2e",
@@ -10898,7 +10907,7 @@ DATA(0x004fefe4) char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     /* Шторм добавляет +2 единицы к силе заклинаний защитников замка. */ "\xd8\xf2\xee\xf0\xec\x20\xe4\xee\xe1\xe0\xe2\xeb\xff\xe5\xf2\x20\x2b\x32\x20\xe5\xe4\xe8\xed\xe8\xf6\xfb\x20\xea\x20\xf1\xe8\xeb\xe5\x20\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9\x20\xe7\xe0\xf9"
         "\xe8\xf2\xed\xe8\xea\xee\xe2\x20\xe7\xe0\xec\xea\xe0\x2e"
 };
-DATA(0x004feffc) char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
+DATA(0x004feffc) H2_CONST char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     /* севернее */ "\xf1\xe5\xe2\xe5\xf0\xed\xe5\xe5",
     /* северо-восточнее */ "\xf1\xe5\xe2\xe5\xf0\xee\x2d\xe2\xee\xf1\xf2\xee\xf7\xed\xe5\xe5",
     /* восточнее */ "\xe2\xee\xf1\xf2\xee\xf7\xed\xe5\xe5",
@@ -10909,7 +10918,7 @@ DATA(0x004feffc) char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     /* северо-западнее */ "\xf1\xe5\xe2\xe5\xf0\xee\x2d\xe7\xe0\xef\xe0\xe4\xed\xe5\xe5",
     /* в центре */ "\xe2\x20\xf6\xe5\xed\xf2\xf0\xe5"
 };
-DATA(0x004ff020) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
+DATA(0x004ff020) H2_CONST char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     /* Темные пучины океана */ "\xd2\xe5\xec\xed\xfb\xe5\x20\xef\xf3\xf7\xe8\xed\xfb\x20\xee\xea\xe5\xe0\xed\xe0",
     /* Зеленые равнины */ "\xc7\xe5\xeb\xe5\xed\xfb\xe5\x20\xf0\xe0\xe2\xed\xe8\xed\xfb",
     /* Глубокие снега */ "\xc3\xeb\xf3\xe1\xee\xea\xe8\xe5\x20\xf1\xed\xe5\xe3\xe0",
@@ -10920,11 +10929,11 @@ DATA(0x004ff020) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_
     /* Бесплодная пустошь */ "\xc1\xe5\xf1\xef\xeb\xee\xe4\xed\xe0\xff\x20\xef\xf3\xf1\xf2\xee\xf8\xfc",
     /* Побережье */ "\xcf\xee\xe1\xe5\xf0\xe5\xe6\xfc\xe5"
 };
-DATA(0x004ff044) char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {/* Разный */ "\xd0\xe0\xe7\xed\xfb\xe9", /* 'Добрый' */ "\x27\xc4\xee\xe1\xf0\xfb\xe9\x27", /* 'Злой' */ "\x27\xc7\xeb\xee\xe9\x27"};
-DATA(0x004ff050) char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {/* Монохром */ "\xcc\xee\xed\xee\xf5\xf0\xee\xec", /* Цветной */ "\xd6\xe2\xe5\xf2\xed\xee\xe9"};
-DATA(0x004ff058) char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {/* Обычная */ "\xce\xe1\xfb\xf7\xed\xe0\xff", /* Высокая */ "\xc2\xfb\xf1\xee\xea\xe0\xff", /* Оч. высокая */ "\xce\xf7\x2e\x20\xe2\xfb\xf1\xee\xea\xe0\xff"};
-DATA(0x004ff064) char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {/* Нет */ "\xcd\xe5\xf2", /* Только чары */ "\xd2\xee\xeb\xfc\xea\xee\x20\xf7\xe0\xf0\xfb", /* Полная */ "\xcf\xee\xeb\xed\xe0\xff"};
-DATA(0x004ff070) char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
+DATA(0x004ff044) H2_CONST char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {/* Разный */ "\xd0\xe0\xe7\xed\xfb\xe9", /* 'Добрый' */ "\x27\xc4\xee\xe1\xf0\xfb\xe9\x27", /* 'Злой' */ "\x27\xc7\xeb\xee\xe9\x27"};
+DATA(0x004ff050) H2_CONST char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {/* Монохром */ "\xcc\xee\xed\xee\xf5\xf0\xee\xec", /* Цветной */ "\xd6\xe2\xe5\xf2\xed\xee\xe9"};
+DATA(0x004ff058) H2_CONST char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {/* Обычная */ "\xce\xe1\xfb\xf7\xed\xe0\xff", /* Высокая */ "\xc2\xfb\xf1\xee\xea\xe0\xff", /* Оч. высокая */ "\xce\xf7\x2e\x20\xe2\xfb\xf1\xee\xea\xe0\xff"};
+DATA(0x004ff064) H2_CONST char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {/* Нет */ "\xcd\xe5\xf2", /* Только чары */ "\xd2\xee\xeb\xfc\xea\xee\x20\xf7\xe0\xf0\xfb", /* Полная */ "\xcf\xee\xeb\xed\xe0\xff"};
+DATA(0x004ff070) H2_CONST char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     /* \n\n\n***Command Line Help***\n */ "\x0a\x0a\x0a\x2a\x2a\x2a\x43\x6f\x6d\x6d\x61\x6e\x64\x20\x4c\x69\x6e\x65\x20\x48\x65\x6c\x70\x2a\x2a\x2a\x0a",
     /* \n */ "\x0a",
     /* /D0 - отключить цифровой звук\n */ "\x2f\x44\x30\x20\x2d\x20\xee\xf2\xea\xeb\xfe\xf7\xe8\xf2\xfc\x20\xf6\xe8\xf4\xf0\xee\xe2\xee\xe9\x20\xe7\xe2\xf3\xea\x0a",
@@ -10940,9 +10949,9 @@ DATA(0x004ff070) char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     /* Загрузить DOS версию Героев 2.\n */ "\xc7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc\x20\x44\x4f\x53\x20\xe2\xe5\xf0\xf1\xe8\xfe\x20\xc3\xe5\xf0\xee\xe5\xe2\x20\x32\x2e\x0a",
     /* Звук отключен и интро пропущено.\n */ "\xc7\xe2\xf3\xea\x20\xee\xf2\xea\xeb\xfe\xf7\xe5\xed\x20\xe8\x20\xe8\xed\xf2\xf0\xee\x20\xef\xf0\xee\xef\xf3\xf9\xe5\xed\xee\x2e\x0a"
 };
-DATA(0x004ff0a8) char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
+DATA(0x004ff0a8) H2_CONST char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
     {/* Герой/Параметры */ "\xc3\xe5\xf0\xee\xe9\x2f\xcf\xe0\xf0\xe0\xec\xe5\xf2\xf0\xfb", /* Навыки */ "\xcd\xe0\xe2\xfb\xea\xe8", /* Артефакты */ "\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xfb", /* Города/Замки */ "\xc3\xee\xf0\xee\xe4\xe0\x2f\xc7\xe0\xec\xea\xe8", /* Гарнизон */ "\xc3\xe0\xf0\xed\xe8\xe7\xee\xed", /* Доступно */ "\xc4\xee\xf1\xf2\xf3\xef\xed\xee"};
-DATA(0x004ff0c0) char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
+DATA(0x004ff0c0) H2_CONST char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     /* Ошибка передачи данных при выполнении функции %s\n\nКод ошибки: %d\nЗначение ошибки: %s\n\n */ "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xe4\xe0\xf7\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x20\xef\xf0\xe8\x20\xe2\xfb\xef\xee\xeb\xed\xe5\xed\xe8\xe8\x20\xf4\xf3\xed\xea\xf6\xe8\xe8\x20\x25\x73"
         "\x0a\x0a\xca\xee\xe4\x20\xee\xf8\xe8\xe1\xea\xe8\x3a\x20\x25\x64\x0a\xc7\xed\xe0\xf7\xe5\xed\xe8\xe5\x20\xee\xf8\xe8\xe1\xea\xe8\x3a\x20\x25\x73\x0a\x0a",
     /* Предлагаемые меры устранения ошибки: */ "\xcf\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xec\xfb\xe5\x20\xec\xe5\xf0\xfb\x20\xf3\xf1\xf2\xf0\xe0\xed\xe5\xed\xe8\xff\x20\xee\xf8\xe8\xe1\xea\xe8\x3a",
@@ -10955,9 +10964,9 @@ DATA(0x004ff0c0) char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     /* \n4) Попробуйте уменьшить скорость передачи данных в 'CONFIG' до 19200 или до 9600. */ "\x0a\x34\x29\x20\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5\x20\xf3\xec\xe5\xed\xfc\xf8\xe8\xf2\xfc\x20\xf1\xea\xee\xf0\xee\xf1\xf2\xfc\x20\xef\xe5\xf0\xe5\xe4\xe0\xf7\xe8\x20\xe4\xe0\xed\xed\xfb"
         "\xf5\x20\xe2\x20\x27\x43\x4f\x4e\x46\x49\x47\x27\x20\xe4\xee\x20\x31\x39\x32\x30\x30\x20\xe8\xeb\xe8\x20\xe4\xee\x20\x39\x36\x30\x30\x2e"
 };
-DATA(0x004ff0d8) char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
+DATA(0x004ff0d8) H2_CONST char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
     {/* %d воинов */ "\x25\x64\x20\xe2\xee\xe8\xed\xee\xe2", /* %d воин */ "\x25\x64\x20\xe2\xee\xe8\xed", /* Атака */ "\xc0\xf2\xe0\xea\xe0", /* Защита */ "\xc7\xe0\xf9\xe8\xf2\xe0", /* ЗД */ "\xc7\xc4", /* Урон */ "\xd3\xf0\xee\xed", /* МР */ "\xcc\xd0", /* УЧ */ "\xd3\xd7", /* Выстр. */ "\xc2\xfb\xf1\xf2\xf0\x2e"};
-DATA(0x004ff0fc) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
+DATA(0x004ff0fc) H2_CONST char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     /* {Маленькие карты}\n\nПросмотр только маленьких карт (36 x 36). */ "\x7b\xcc\xe0\xeb\xe5\xed\xfc\xea\xe8\xe5\x20\xea\xe0\xf0\xf2\xfb\x7d\x0a\x0a\xcf\xf0\xee\xf1\xec\xee\xf2\xf0\x20\xf2\xee\xeb\xfc\xea\xee\x20\xec\xe0\xeb\xe5\xed\xfc\xea\xe8\xf5\x20\xea\xe0\xf0"
         "\xf2\x20\x28\x33\x36\x20\x78\x20\x33\x36\x29\x2e",
     /* {Средние карты}\n\nПросмотр только средних карт (72 x 72). */ "\x7b\xd1\xf0\xe5\xe4\xed\xe8\xe5\x20\xea\xe0\xf0\xf2\xfb\x7d\x0a\x0a\xcf\xf0\xee\xf1\xec\xee\xf2\xf0\x20\xf2\xee\xeb\xfc\xea\xee\x20\xf1\xf0\xe5\xe4\xed\xe8\xf5\x20\xea\xe0\xf0\xf2\x20\x28\x37"
@@ -11000,8 +11009,8 @@ DATA(0x004ff0fc) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
         "\xeb\xe8\xf7\xe5\xf1\xf2\xe2\xee\xec\x20\xf0\xe5\xf1\xf3\xf0\xf1\xee\xe2\x20\xe8\xeb\xe8\x20\xf1\xef\xe5\xf6\xe8\xe0\xeb\xfc\xed\xfb\xec\xe8\x20\xf3\xf1\xeb\xee\xe2\xe8\xff\xec\xe8\x2c\x20\xe7"
         "\xe0\xf2\xf0\xf3\xe4\xed\xff\xfe\xf9\xe8\xec\xe8\x20\xe4\xee\xf1\xf2\xe8\xe6\xe5\xed\xe8\xe5\x20\xef\xee\xe1\xe5\xe4\xfb\x2e"
 };
-DATA(0x004ff138) char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {/* Воин */ "\xc2\xee\xe8\xed", /* Строитель */ "\xd1\xf2\xf0\xee\xe8\xf2\xe5\xeb\xfc", /* Исследователь */ "\xc8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xe5\xeb\xfc", /* Человек */ "\xd7\xe5\xeb\xee\xe2\xe5\xea"};
-DATA(0x004ff148) char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
+DATA(0x004ff138) H2_CONST char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {/* Воин */ "\xc2\xee\xe8\xed", /* Строитель */ "\xd1\xf2\xf0\xee\xe8\xf2\xe5\xeb\xfc", /* Исследователь */ "\xc8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xe5\xeb\xfc", /* Человек */ "\xd7\xe5\xeb\xee\xe2\xe5\xea"};
+DATA(0x004ff148) H2_CONST char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
     {/* Мало */ "\xcc\xe0\xeb\xee", /* Мало */ "\xcc\xe0\xeb\xee", /* мало */ "\xec\xe0\xeb\xee"},
     {/* Немного */ "\xcd\xe5\xec\xed\xee\xe3\xee", /* Немного */ "\xcd\xe5\xec\xed\xee\xe3\xee", /* немного */ "\xed\xe5\xec\xed\xee\xe3\xee"},
     {/* Стая */ "\xd1\xf2\xe0\xff", /* Стая */ "\xd1\xf2\xe0\xff", /* стая */ "\xf1\xf2\xe0\xff"},
@@ -11012,7 +11021,7 @@ DATA(0x004ff148) char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME
     {/* Тысячи */ "\xd2\xfb\xf1\xff\xf7\xe8", /* Тысячи... */ "\xd2\xfb\xf1\xff\xf7\xe8\x2e\x2e\x2e", /* тысячи */ "\xf2\xfb\xf1\xff\xf7\xe8"},
     {/* Легион */ "\xcb\xe5\xe3\xe8\xee\xed", /* Легион */ "\xcb\xe5\xe3\xe8\xee\xed", /* легион */ "\xeb\xe5\xe3\xe8\xee\xed"}
 };
-DATA(0x004ff1b4) char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
+DATA(0x004ff1b4) H2_CONST char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
     /* Истина где-то рядом. */ "\xc8\xf1\xf2\xe8\xed\xe0\x20\xe3\xe4\xe5\x2d\xf2\xee\x20\xf0\xff\xe4\xee\xec\x2e",
     /* Темная сторона сильнее. */ "\xd2\xe5\xec\xed\xe0\xff\x20\xf1\xf2\xee\xf0\xee\xed\xe0\x20\xf1\xe8\xeb\xfc\xed\xe5\xe5\x2e",
     /* Конец Света близок. */ "\xca\xee\xed\xe5\xf6\x20\xd1\xe2\xe5\xf2\xe0\x20\xe1\xeb\xe8\xe7\xee\xea\x2e",
@@ -11024,9 +11033,9 @@ DATA(0x004ff1b4) char* cRandomTavernText[KB_RANDOM_TAVERN_TEXT_COUNT] = {
         "\x20\x22\xcb\xff\x2d\xeb\xff\x2d\xeb\xff\x2c\x20\xeb\xff\x2d\xeb\xff\x2d\xeb\xff\x2e\x2e\x2e\x22",
     /* Тут бывал человек из Нунтукета... */ "\xd2\xf3\xf2\x20\xe1\xfb\xe2\xe0\xeb\x20\xf7\xe5\xeb\xee\xe2\xe5\xea\x20\xe8\xe7\x20\xcd\xf3\xed\xf2\xf3\xea\xe5\xf2\xe0\x2e\x2e\x2e"
 };
-DATA(0x004ff1d4) char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
+DATA(0x004ff1d4) H2_CONST char* cRandomSignText[KB_RANDOM_SIGN_TEXT_COUNT] =
     {/* Прямо пойдешь - коня потеряешь. */ "\xcf\xf0\xff\xec\xee\x20\xef\xee\xe9\xe4\xe5\xf8\xfc\x20\x2d\x20\xea\xee\xed\xff\x20\xef\xee\xf2\xe5\xf0\xff\xe5\xf8\xfc\x2e", /* Сдается в аренду. */ "\xd1\xe4\xe0\xe5\xf2\xf1\xff\x20\xe2\x20\xe0\xf0\xe5\xed\xe4\xf3\x2e", /* До следующего знака 50 миль. */ "\xc4\xee\x20\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee\x20\xe7\xed\xe0\xea\xe0\x20\x35\x30\x20\xec\xe8\xeb\xfc\x2e", /* Кто идет за Блинским? */ "\xca\xf2\xee\x20\xe8\xe4\xe5\xf2\x20\xe7\xe0\x20\xc1\xeb\xe8\xed\xf1\xea\xe8\xec\x3f"};
-DATA(0x004ff1e4) char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
+DATA(0x004ff1e4) H2_CONST char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     /* Альянс гномов */ "\xc0\xeb\xfc\xff\xed\xf1\x20\xe3\xed\xee\xec\xee\xe2",
     /* Гильдия колдуний */ "\xc3\xe8\xeb\xfc\xe4\xe8\xff\x20\xea\xee\xeb\xe4\xf3\xed\xe8\xe9",
     /* Роланд становится сильнее */ "\xd0\xee\xeb\xe0\xed\xe4\x20\xf1\xf2\xe0\xed\xee\xe2\xe8\xf2\xf1\xff\x20\xf1\xe8\xeb\xfc\xed\xe5\xe5",
@@ -11040,7 +11049,7 @@ DATA(0x004ff1e4) char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     /* Корона всевластия */ "\xca\xee\xf0\xee\xed\xe0\x20\xe2\xf1\xe5\xe2\xeb\xe0\xf1\xf2\xe8\xff",
     /* Перенос войск */ "\xcf\xe5\xf0\xe5\xed\xee\xf1\x20\xe2\xee\xe9\xf1\xea"
 };
-DATA(0x004ff214) char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ff214) H2_CONST char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {/* Сила оружия */ "\xd1\xe8\xeb\xe0\x20\xee\xf0\xf3\xe6\xe8\xff",
      /* Аннексия */ "\xc0\xed\xed\xe5\xea\xf1\xe8\xff",
      /* Спасти гномов */ "\xd1\xef\xe0\xf1\xf2\xe8\x20\xe3\xed\xee\xec\xee\xe2",
@@ -11066,7 +11075,7 @@ DATA(0x004ff214) char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUN
      /* Апокалипсис */ "\xc0\xef\xee\xea\xe0\xeb\xe8\xef\xf1\xe8\xf1",
      /* Предательство! */ "\xcf\xf0\xe5\xe4\xe0\xf2\xe5\xeb\xfc\xf1\xf2\xe2\xee\x21"}
 };
-DATA(0x004ff274) char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ff274) H2_CONST char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {/* Прежде чем поднять восстание против брата, Роланд хочет, чтобы вы одержали победу над соседними властителями. Между ними нет единства, поэтому большую часть времени они будут заняты стычками друг с другом. Победа будет вашей, когда вы захватите все города. */ "\xcf\xf0\xe5\xe6\xe4\xe5\x20\xf7\xe5\xec\x20\xef\xee\xe4\xed\xff\xf2\xfc\x20\xe2\xee\xf1\xf1\xf2\xe0\xed\xe8\xe5\x20\xef\xf0\xee\xf2\xe8\xe2\x20\xe1\xf0\xe0\xf2\xe0\x2c\x20\xd0\xee\xeb\xe0\xed"
         "\xe4\x20\xf5\xee\xf7\xe5\xf2\x2c\x20\xf7\xf2\xee\xe1\xfb\x20\xe2\xfb\x20\xee\xe4\xe5\xf0\xe6\xe0\xeb\xe8\x20\xef\xee\xe1\xe5\xe4\xf3\x20\xed\xe0\xe4\x20\xf1\xee\xf1\xe5\xe4\xed\xe8\xec\xe8\x20"
         "\xe2\xeb\xe0\xf1\xf2\xe8\xf2\xe5\xeb\xff\xec\xe8\x2e\x20\xcc\xe5\xe6\xe4\xf3\x20\xed\xe8\xec\xe8\x20\xed\xe5\xf2\x20\xe5\xe4\xe8\xed\xf1\xf2\xe2\xe0\x2c\x20\xef\xee\xfd\xf2\xee\xec\xf3\x20\xe1"
@@ -11181,12 +11190,12 @@ DATA(0x004ff274) char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_M
          "\xee\xf2\xe8\xe2\x20\xee\xe4\xed\xee\xe3\xee\x20\xf3\x20\xef\xf0\xee\xf2\xe8\xe2\xed\xe8\xea\xe0\x2e\x20\xdd\xf2\xe0\x20\xec\xe8\xf1\xf1\xe8\xff\x20\xe1\xf3\xe4\xe5\xf2\x20\xe4\xeb\xff\x20\xe2"
          "\xe0\xf1\x20\xf1\xe0\xec\xee\xe9\x20\xeb\xe5\xe3\xea\xee\xe9\x20\xe2\xee\x20\xe2\xf1\xe5\xe9\x20\xe2\xee\xe9\xed\xe5\x2e\x2e\x2e\x20\xcf\xf0\xe5\xe4\xe0\xf2\xe5\xeb\xfc\x21"}
 };
-DATA(0x004ff2d4) char* cOutOfMemory =
+DATA(0x004ff2d4) H2_CONST char* cOutOfMemory =
     /* \n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nГероям II требуется минимум \n%dK Расширенной  памяти (XMS) и\n480K общей памяти.\n\n */ "\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x25\x73\x0a\xc3\xe5\xf0\xee\xff\xec\x20\x49\x49\x20\xf2\xf0\xe5\xe1\xf3\xe5\xf2\xf1\xff\x20\xec\xe8\xed\xe8\xec\xf3\xec\x20\x0a\x25\x64"
         "\x4b\x20\xd0\xe0\xf1\xf8\xe8\xf0\xe5\xed\xed\xee\xe9\x20\x20\xef\xe0\xec\xff\xf2\xe8\x20\x28\x58\x4d\x53\x29\x20\xe8\x0a\x34\x38\x30\x4b\x20\xee\xe1\xf9\xe5\xe9\x20\xef\xe0\xec\xff\xf2\xe8\x2e"
         "\x0a\x0a";
-DATA(0x004ff2d8) char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {/* Обычное */ "\xce\xe1\xfb\xf7\xed\xee\xe5", /* Черес-\nстрочное */ "\xd7\xe5\xf0\xe5\xf1\x2d\x0a\xf1\xf2\xf0\xee\xf7\xed\xee\xe5"};
-DATA(0x004ff2e0) char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
+DATA(0x004ff2d8) H2_CONST char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {/* Обычное */ "\xce\xe1\xfb\xf7\xed\xee\xe5", /* Черес-\nстрочное */ "\xd7\xe5\xf0\xe5\xf1\x2d\x0a\xf1\xf2\xf0\xee\xf7\xed\xee\xe5"};
+DATA(0x004ff2e0) H2_CONST char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     /* {ОК}\n\nЗакрыть меню. */ "\x7b\xce\xca\x7d\x0a\x0a\xc7\xe0\xea\xf0\xfb\xf2\xfc\x20\xec\xe5\xed\xfe\x2e",
     /* {Музыка}\n\nВключить или выключить фоновую музыку. */ "\x7b\xcc\xf3\xe7\xfb\xea\xe0\x7d\x0a\x0a\xc2\xea\xeb\xfe\xf7\xe8\xf2\xfc\x20\xe8\xeb\xe8\x20\xe2\xfb\xea\xeb\xfe\xf7\xe8\xf2\xfc\x20\xf4\xee\xed\xee\xe2\xf3\xfe\x20\xec\xf3\xe7\xfb\xea\xf3\x2e",
     /* {Эффекты}\n\nВключить или выключить звуковые эффекты. */ "\x7b\xdd\xf4\xf4\xe5\xea\xf2\xfb\x7d\x0a\x0a\xc2\xea\xeb\xfe\xf7\xe8\xf2\xfc\x20\xe8\xeb\xe8\x20\xe2\xfb\xea\xeb\xfe\xf7\xe8\xf2\xfc\x20\xe7\xe2\xf3\xea\xee\xe2\xfb\xe5\x20\xfd\xf4\xf4\xe5\xea"
@@ -11225,9 +11234,9 @@ DATA(0x004ff2e0) char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
         "\xe0\xf2\xe8\xf7\xed\xe5\xe5\x2c\x20\xed\xee\x20\xe8\xed\xee\xe3\xe4\xe0\x20\xee\xed\x20\xef\xe5\xf0\xe5\xec\xe5\xf9\xe0\xe5\xf2\xf1\xff\x20\xef\xee\x20\xfd\xea\xf0\xe0\xed\xf3\x20\xed\xe5\x20"
         "\xf2\xe0\xea\x20\xef\xeb\xe0\xe2\xed\xee\x2c\x20\xea\xe0\xea\x20\xf7\xe5\xf0\xed\xee\x2d\xe1\xe5\xeb\xfb\xe9\x2e"
 };
-DATA(0x004ff308) char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
+DATA(0x004ff308) H2_CONST char* xBarrierColor[KB_BARRIER_COLOR_NAME_COUNT] =
     {/* Сизый */ "\xd1\xe8\xe7\xfb\xe9", /* Синий */ "\xd1\xe8\xed\xe8\xe9", /* Коричневый */ "\xca\xee\xf0\xe8\xf7\xed\xe5\xe2\xfb\xe9", /* Золотой */ "\xc7\xee\xeb\xee\xf2\xee\xe9", /* Зеленый */ "\xc7\xe5\xeb\xe5\xed\xfb\xe9", /* Оранжевый */ "\xce\xf0\xe0\xed\xe6\xe5\xe2\xfb\xe9", /* Фиолетовый */ "\xd4\xe8\xee\xeb\xe5\xf2\xee\xe2\xfb\xe9", /* Красный */ "\xca\xf0\xe0\xf1\xed\xfb\xe9"};
-DATA(0x004ff328) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
+DATA(0x004ff328) H2_CONST char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     /* Башня алхимика */ "\xc1\xe0\xf8\xed\xff\x20\xe0\xeb\xf5\xe8\xec\xe8\xea\xe0",
     /* Арена */ "\xc0\xf0\xe5\xed\xe0",
     /* Лачуга волхва */ "\xcb\xe0\xf7\xf3\xe3\xe0\x20\xe2\xee\xeb\xf5\xe2\xe0",
@@ -11236,7 +11245,7 @@ DATA(0x004ff328) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     /* Русалка */ "\xd0\xf3\xf1\xe0\xeb\xea\xe0",
     /* Сирены */ "\xd1\xe8\xf0\xe5\xed\xfb"
 };
-DATA(0x004ff344) char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+DATA(0x004ff344) H2_CONST char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     /* Земляные холмы */ "\xc7\xe5\xec\xeb\xff\xed\xfb\xe5\x20\xf5\xee\xeb\xec\xfb",
     /* Алтарь Земли */ "\xc0\xeb\xf2\xe0\xf0\xfc\x20\xc7\xe5\xec\xeb\xe8",
     /* Алтарь Воздуха */ "\xc0\xeb\xf2\xe0\xf0\xfc\x20\xc2\xee\xe7\xe4\xf3\xf5\xe0",

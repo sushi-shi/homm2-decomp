@@ -52,7 +52,7 @@ public:
     bitmap* m_savedBackground;
     heroWindow(void);
     heroWindow(i32, i32, i32, i32, H2_ENUM_PARAM(WindowFlag, i32));
-    heroWindow(i32, i32, char*);
+    heroWindow(i32, i32, H2_CONST char*);
     i32 Open(i32, i32);
     void RemoveAndDeleteWidget(i32);
     void Close(void);

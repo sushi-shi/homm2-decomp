@@ -23,7 +23,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    i32 h = gpResourceManager->ReadWord();
+    i32 H2_UNUSED(h) = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = true;
     else
@@ -57,7 +57,7 @@ i32 RemapCyrillicCharacter(i32 character) {
 
 VA(0x004c3800, 0x222)
 void font::DrawStringExecute(
-    char* str,
+    H2_CONST char* str,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -164,7 +164,7 @@ void font::DrawStringExecute(
 }
 
 VA(0x004c3a30, 0x3d)
-void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(H2_CONST char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = false;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
@@ -211,7 +211,7 @@ static inline bool IsHyphen(u8 c) {
 
 VA(0x004c3b20, 0x1044)
 void font::ExtractLine(
-    char* text,
+    H2_CONST char* text,
     char* line,
     i32* position,
     i32 maxWidth,
@@ -326,7 +326,7 @@ void font::ExtractLine(
 
 VA(0x004c4b70, 0x1f8)
 void font::DrawBoundedString(
-    char* str,
+    H2_CONST char* str,
     i32 x,
     i32 y,
     i32 w,
@@ -339,15 +339,15 @@ void font::DrawBoundedString(
     // their frame slots (lastPos never even gets a store) and their zero
     // initializers, so the declarations are load-bearing.
     i32 len = strlen(str);
-    char blank = ' ';
-    i32 lastPos;
+    char H2_UNUSED(blank) = ' ';
+    i32 H2_UNUSED(lastPos);
     i32 xPosition = 0;
     i32 yPosition = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
+    i32 H2_UNUSED(spaceWidth) = 0;
+    i32 H2_UNUSED(wordWidth) = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
+    i32 H2_UNUSED(prevPos) = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     strcpy(line, str);
     FontDrawMode drawMode = mode;
@@ -386,18 +386,18 @@ void font::DrawBoundedString(
 #undef WRAP_HEIGHT_LINE_COUNT
 
 VA(0x004c4d70, 0xc7)
-i32 font::LineLength(char* str, i32 maxW) {
+i32 font::LineLength(H2_CONST char* str, i32 maxW) {
     // Same shared line-breaking declaration block as DrawBoundedString: blank,
     // spaceWidth, wordWidth and prevPos are unused here but hold retail frame
     // slots and emit their initializers.
     i32 len = strlen(str);
-    char blank = ' ';
+    char H2_UNUSED(blank) = ' ';
     i32 count = 0;
     i32 pos = 0;
-    i32 spaceWidth = 0;
-    i32 wordWidth = 0;
+    i32 H2_UNUSED(spaceWidth) = 0;
+    i32 H2_UNUSED(wordWidth) = 0;
     i32 lw = 0;
-    i32 prevPos = 0;
+    i32 H2_UNUSED(prevPos) = 0;
     char* line = static_cast<char*>(H2_ALLOC(strlen(str) + 1));
     while (pos < len && str[pos] != 0) {
         ExtractLine(str, line, &pos, maxW, &lw, 0);
@@ -409,10 +409,10 @@ i32 font::LineLength(char* str, i32 maxW) {
 }
 
 VA(0x004c4e40, 0x8b)
-i32 font::LineWidth(char* str) {
+i32 font::LineWidth(H2_CONST char* str) {
     i32 s = strlen(str);
     i32 idx = 0, w = 0;
-    char* p = str;
+    H2_CONST char* p = str;
     while (idx < s && p[idx] != 0) {
         while (p[idx] != 0 && p[idx] != '\n') {
             w += GetCharacterWidth(p[idx]);

@@ -39,7 +39,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
 }
 
 VA(0x004c27e0, 0x33)
-inline icon::~icon() {
+H2_RETAIL_INLINE icon::~icon() {
     H2_FREE(m_data);
 }
 
@@ -250,7 +250,7 @@ void icon::ClipFillToBuffer(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
+    H2_ENUM_PARAM(IconDrawOrientation, i32) H2_UNUSED(orientation),
     i32 clipX,
     i32 clipY,
     i32 clipW,

@@ -601,7 +601,7 @@ void combatManager::Close(void) {
 VA(0x004271ad, 0x2c1)
 void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 index;
-    i32 pos;
+    i32 H2_UNUSED(pos);
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         m_armyGroups[IDX(side)]->m_creatureTypes[index] = CREATURE_NONE;
         m_armyGroups[IDX(side)]->m_creatureCounts[index] = 0;
@@ -630,11 +630,11 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
 
 VA(0x0042746e, 0x244)
 void combatManager::GenerateMap(void) {
-    i32 gridX4;
-    i32 randomOffset;
+    i32 H2_UNUSED(gridX4);
+    i32 H2_UNUSED(randomOffset);
     i32 x;
     u32 y;
-    i32 coordinateY;
+    i32 H2_UNUSED(coordinateY);
 
     m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)] = m_inCastleCombat == 1 ? 0 : -1;
 
@@ -671,7 +671,7 @@ void combatManager::GenerateMap(void) {
 }
 
 VA(0x004276b2, 0x1ee)
-char* combatManager::GetBackgroundName(void) {
+H2_CONST char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
     m_battlefieldFringe = FRINGE_NONE;
@@ -1132,7 +1132,7 @@ i32 combatManager::GetNextArmy(i32 checkMorale) {
     i32 stackCounter;
     army* curArmy;
     CombatSide stackSide;
-    i32 i;
+    i32 H2_UNUSED(i);
 
 restart:
     hasPending = false;
@@ -1675,7 +1675,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    i32 unknownTowerData1[KEEP_TOWER_SCRATCH_COUNT];
+    i32 H2_UNUSED(unknownTowerData1)[KEEP_TOWER_SCRATCH_COUNT];
     i32 sourceX8 = towerOrigins7[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].x;
     i32 sourceY8 = towerOrigins7[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].y;
     i32 targetX6 = target9->MidX();
@@ -2253,7 +2253,7 @@ void combatManager::ShootMissile(
 
 VA(0x0042b23a, 0x10c)
 void combatManager::CombatSystemOptions(void) {
-    tag_message message;
+    tag_message H2_UNUSED(message);
     bCPrefsChanged = false;
     CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)

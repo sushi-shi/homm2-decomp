@@ -901,7 +901,7 @@ H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_WINDOW_Y = SCROLL_BORDER,
     PUZZLE_VIEW_ORIGIN = SCROLL_BORDER,
     PUZZLE_VIEW_SIZE = UPDATE_VIEWPORT_SIZE,
-    PUZZLE_VIEW_END = PUZZLE_VIEW_ORIGIN + PUZZLE_VIEW_SIZE,
+    PUZZLE_VIEW_END = IDX(PUZZLE_VIEW_ORIGIN) + IDX(PUZZLE_VIEW_SIZE),
     PUZZLE_COORDINATE_OFFSET = 7,
     PUZZLE_ALIGNMENT_DIVISOR = 3,
     PUZZLE_Y_ADJUST_X_FACTOR = 2,
@@ -983,7 +983,7 @@ DATA(0x00523de0) i32 iThisMaxY = 0;
 DATA(0x00523de4) static i32 s_drawMonsterFrame = 0;
 DATA(0x00523de8) i32 iLastAnimFrame = 0;
 DATA(0x00523dec) i32 giFrameStep = 0;
-DATA(0x00523df0) struct tag_message CDMsg = {0};
+DATA(0x00523df0) struct tag_message CDMsg = H2_ZERO_INIT;
 DATA(0x00523e0c) static i32 s_drawHeroYOffset = 0;
 DATA(0x00523e10) i32 iThisMinY = 0;
 DATA(0x00523e14) static mapCellExtra* s_drawExtra = NULL;
@@ -1001,14 +1001,14 @@ DATA(0x00523e40) i32 giLimitUpdMaxX = 0;
 DATA(0x00523e44) i32 giLimitUpdMaxY = 0;
 DATA(0x00523e48) b32 bPrefsChanged = false;
 DATA(0x00523e4c) i32 giTownPortalChoice = 0;
-DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = {0};
+DATA(0x00523e50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS] = H2_ZERO_INIT;
 DATA(0x00523f94) static b32 s_drawCovered = false;
 DATA(0x00523f98) i32 giLimitUpdMinY = 0;
 DATA(0x00523f9c) static mineRecord* s_drawMine = NULL;
 DATA(0x00523fa0) static i32 s_adjacentMonsterMinX = 0;
 DATA(0x00523fa4) static i32 s_drawCloudFrame = 0;
 DATA(0x00523fa8) static i32 s_drawPlayerColor = 0;
-DATA(0x00523fac) struct tag_message USMsg = {0};
+DATA(0x00523fac) struct tag_message USMsg = H2_ZERO_INIT;
 DATA(0x00523fcc) class heroWindow* cPanel = NULL;
 DATA(0x00523fd0) static i32 s_drawPixelY = 0;
 DATA(0x00523fd4) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType = 0;
@@ -1017,7 +1017,7 @@ DATA(0x00523fdc) class heroWindow* townPortalWin = NULL;
 DATA(0x00523fe0) static b32 s_drawHasHero = false;
 DATA(0x00523fe4) static i32 s_drawAnimationLength = 0;
 DATA(0x00523fe8) static i32 s_drawPixelX = 0;
-DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = {0};
+DATA(0x00523fec) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE] = H2_ZERO_INIT;
 DATA(0x00523ff8) static i32 s_adjacentMonsterMinY = 0;
 H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
@@ -1687,8 +1687,8 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     MessageDispatchResult result;
     i32 quit;
     i32 c;
-    i32 mx;
-    i32 my;
+    i32 H2_UNUSED(mx);
+    i32 H2_UNUSED(my);
     i32 town;
     mapCell* evtCell;
     MapDirection direction;
@@ -2675,9 +2675,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     hero* hero;
     i32 pl;
     mapCell* cellPtr;
-    tag_message evt;
+    tag_message H2_UNUSED(evt);
     char special;
-    i32 gaveArtifact;
+    i32 H2_UNUSED(gaveArtifact);
 
     sample = NULL;
     hero = GetHeroSlot(gpCurPlayer->m_currentHero);
@@ -3415,7 +3415,7 @@ void advManager::DrawCell(
     i32 animFrame;
     i32 cursorFrame;
     i32 boatFrameIndex;
-    i32 cursorSuppressed;
+    i32 H2_UNUSED(cursorSuppressed);
 
     if (forceDraw == 0 && bShowIt == 0) {
         return;
@@ -4460,18 +4460,18 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     u8 color = RADAR_UNSEEN_COLOR;
     i32 xrem;
     i32 ymod;
-    i32 w;
+    i32 H2_UNUSED(w);
     i32 offX;
-    i32 delta;
+    i32 H2_UNUSED(delta);
     float fScale;
     i32 townx;
     i32 towny;
     i32 frame;
-    i32 oldColor;
+    i32 H2_UNUSED(oldColor);
     b32 bNoFrame;
     i32 i;
     i32 j;
-    i32 cx;
+    i32 H2_UNUSED(cx);
     i32 minx;
     i32 miny;
     i32 xhi;
@@ -4862,9 +4862,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     char guardStr[QUICK_INFO_TEXT_CAPACITY];
     char savedTextLocal[QUICK_INFO_SAVED_TEXT_CAPACITY];
     tag_message message;
-    char ch;
-    i32 quickInfoShowFlag;
-    i32 j;
+    char H2_UNUSED(ch);
+    i32 H2_UNUSED(quickInfoShowFlag);
+    i32 H2_UNUSED(j);
     i32 expansionSite;
     char uppercaseResult;
     b32 blocked;
@@ -5814,7 +5814,7 @@ VA(0x0040b2ad, 0x387)
 i32 advManager::UpdBottomViewNewTurn(void) {
 
     i32 frameIndex;
-    i32 month;
+    i32 H2_UNUSED(month);
     char* week;
     char* day;
 
@@ -6160,7 +6160,7 @@ i32 advManager::UpdBottomViewHero(void) {
     hero* targetHero;
     char* armyCountLabelsResult[BOTTOM_HERO_ARMY_SLOTS];
     i32 labelY;
-    i32 leftEdge;
+    i32 H2_UNUSED(leftEdge);
     icon* creatureIcons;
     i32 layoutPos;
     i32 countWidth;
@@ -6168,7 +6168,7 @@ i32 advManager::UpdBottomViewHero(void) {
     i32 displayIndex;
     i32 creature;
     IconEntry* iconEntryValue;
-    i32 rightEdge;
+    i32 H2_UNUSED(rightEdge);
 
     if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_HERO) {
         return 0;
@@ -6308,17 +6308,17 @@ VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
 
     i32 creatureCount;
-    i16 armyWidth = HERO_QUICK_ARMY_AREA_WIDTH;
-    i16 leftEdge = ARMY_QUICK_AREA_LEFT;
-    i16 creatureY = HERO_QUICK_DETAILED_CREATURE_Y;
-    i16 iconWidth = ARMY_QUICK_ICON_SIZE;
-    i16 creatureIconHeight = ARMY_QUICK_ICON_SIZE;
+    i16 H2_UNUSED(armyWidth) = HERO_QUICK_ARMY_AREA_WIDTH;
+    i16 H2_UNUSED(leftEdge) = ARMY_QUICK_AREA_LEFT;
+    i16 H2_UNUSED(creatureY) = HERO_QUICK_DETAILED_CREATURE_Y;
+    i16 H2_UNUSED(iconWidth) = ARMY_QUICK_ICON_SIZE;
+    i16 H2_UNUSED(creatureIconHeight) = ARMY_QUICK_ICON_SIZE;
     textWidget* sizeWidgets[ARMY_QUICK_SLOT_COUNT];
-    i16 enableFlag = 1;
-    i16 portId = HERO_QUICK_PORTRAIT_WIDGET;
+    i16 H2_UNUSED(enableFlag) = 1;
+    i16 H2_UNUSED(portId) = HERO_QUICK_PORTRAIT_WIDGET;
     icon* iconRef;
-    i16 statId = HERO_QUICK_PRIMARY_STAT_WIDGET;
-    i16 playerColorWidget = HERO_QUICK_PLAYER_COLOR_WIDGET;
+    i16 H2_UNUSED(statId) = HERO_QUICK_PRIMARY_STAT_WIDGET;
+    i16 H2_UNUSED(playerColorWidget) = HERO_QUICK_PLAYER_COLOR_WIDGET;
     heroWindow* win;
     hero* targetHero;
     char* labels[ARMY_QUICK_SLOT_COUNT];
@@ -6656,7 +6656,9 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 }
 
 VA(0x0040d11d, 0xdc)
-char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar) {
+H2_CONST char* advManager::GetArmySizeName(
+    i32 armySize, H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar
+) {
     if (giDebugLevel > 0) {
         sprintf(
             cArmySizeName,
@@ -6693,24 +6695,29 @@ char* advManager::GetArmySizeName(i32 armySize, H2_ENUM_PARAM(ArmySizeNameVarian
 }
 
 VA(0x0040d1f9, 0xcd1)
-void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
+void advManager::TownQuickView(
+    i32 townId,
+    i32 H2_UNUSED(locatorSlot),
+    i32 windowX,
+    i32 windowY
+) {
 
     i32 creatureCount;
-    i16 creatureIconHeight;
-    i16 on;
+    i16 H2_UNUSED(creatureIconHeight);
+    i16 H2_UNUSED(on);
     heroWindow* window;
     town* townPtr;
-    i16 playerColorWidget;
+    i16 H2_UNUSED(playerColorWidget);
     i32 oldX;
     i32 scouting;
     i32 oldY;
     i32 armyIndex;
-    i16 leftEdge;
-    i16 creatureIconWidth;
-    i16 faceWidget;
+    i16 H2_UNUSED(leftEdge);
+    i16 H2_UNUSED(creatureIconWidth);
+    i16 H2_UNUSED(faceWidget);
     tag_message message;
     icon* creatureIcon;
-    i16 armyAreaWidth;
+    i16 H2_UNUSED(armyAreaWidth);
     widget* noArmyText;
     char* blankLabel;
 
@@ -6840,7 +6847,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         iconWidget* stackIcons[ARMY_QUICK_SLOT_COUNT];
         i32 row2;
         i32 stride;
-        i32 armySlot;
+        i32 H2_UNUSED(armySlot);
         char* troopNames[ARMY_QUICK_SLOT_COUNT];
         i32 fiveShift;
         i32 basePos;
@@ -7353,7 +7360,7 @@ VA(0x0040ea8c, 0x323)
 void advManager::CastSpell(SpellType spell) {
     hero* hero;
     CreatureType mineGuard;
-    i32 guardianCount;
+    i32 H2_UNUSED(guardianCount);
     mapCell* cell;
     i32 power;
     if (gpCurPlayer->m_currentHero != INVALID_HERO) {
@@ -7658,7 +7665,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
 
 VA(0x0040f30a, 0x12b4)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
-    i32 updateCount;
+    i32 H2_UNUSED(updateCount);
     i32 tileX;
     i32 drawX;
     i32 tileY;
@@ -8052,7 +8059,7 @@ VA(0x004105eb, 0x2b6)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundRadius;
     i32 edgeOffset;
-    i32 maxCells = SOUND_CELL_COUNT;
+    i32 H2_UNUSED(maxCells) = SOUND_CELL_COUNT;
     i32 layer;
 
     if (gSoundBackendsReady == 0) {
@@ -8149,7 +8156,7 @@ void advManager::CheckLoadSample(i32 index) {
 VA(0x004108fb, 0x43e)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* cell = m_mapData->GetCell(x, y);
-    AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+    AdventureEnvironmentSoundId H2_UNUSED(soundId) = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
     if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
         && (giGroundShape[cell->m_terrainImageIndex] & SOUND_GROUND_SHAPE_MASK)) {
@@ -8334,9 +8341,9 @@ void advManager::TeleportTo(
     H2_ENUM_STORAGE(TerrainType, i32) terrain;
     mapCell* cellOld2;
     b32 oldCellFlag26;
-    i32 unused;
+    i32 H2_UNUSED(unused);
     mapCell* destinationCell29;
-    i32 fizzleTime36;
+    i32 H2_UNUSED(fizzleTime36);
     town* occupiedTown47;
 
     savedShow = bShowIt;
@@ -8692,7 +8699,7 @@ void advManager::SummonBoat(void) {
     b32 foundBoat;
     i32 heroSlot;
     boatRecord* boatRec;
-    mapCell* fromCell;
+    mapCell* H2_UNUSED(fromCell);
     i32 clipWidth;
     i32 clipX;
     i32 clipY;
@@ -9235,7 +9242,7 @@ i32 advManager::MouseInScrollZone(void) {
 
 VA(0x00412a12, 0x268)
 void advManager::SetInitialMapOrigin(void) {
-    game* gameState;
+    game* H2_UNUSED(gameState);
     town* currentTown9;
     playerData* initialPlayer8;
     hero* initialHero5;
@@ -9703,7 +9710,7 @@ void ComputeAdvNetControl(void) {
     {
         i32 selected = -1;
         i32 player;
-        i32 myPlayer;
+        i32 H2_UNUSED(myPlayer);
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
             while (player != giCurPlayer) {
@@ -9867,12 +9874,12 @@ void advManager::ViewPuzzle(void) {
 
 VA(0x004140fa, 0x79)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    i32 unusedPuzzle0;
-    i32 unused1;
-    i32 unused2;
-    i32 unused3;
-    i32 unused4;
-    i32 unused6;
+    i32 H2_UNUSED(unusedPuzzle0);
+    i32 H2_UNUSED(unused1);
+    i32 H2_UNUSED(unused2);
+    i32 H2_UNUSED(unused3);
+    i32 H2_UNUSED(unused4);
+    i32 H2_UNUSED(unused6);
 
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
@@ -10222,7 +10229,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
 VA(0x004149c0, 0x1a2)
 void advManager::SystemOptions(void) {
-    tag_message message;
+    tag_message H2_UNUSED(message);
     i32 oldInterfaceMode;
     ConfigWalkSpeed prevWalkSpeed;
     b32 heroMobile;

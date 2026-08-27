@@ -6,9 +6,17 @@
 #if defined(__cplusplus) && __cplusplus >= 202002L
 #define H2_STRICT_ENUMS 1
 #define H2_FINAL final
+#define H2_CONST const
+#define H2_UNUSED(name) name [[maybe_unused]]
+#define H2_RETAIL_INLINE
+#define H2_ZERO_INIT {}
 #else
 #define H2_STRICT_ENUMS 0
 #define H2_FINAL
+#define H2_CONST
+#define H2_UNUSED(name) name
+#define H2_RETAIL_INLINE inline
+#define H2_ZERO_INIT {0}
 #endif
 
 typedef signed char i8;

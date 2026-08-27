@@ -18,7 +18,7 @@ struct AudiereSampleNode {
         next = nextNode;
     }
 
-    inline ~AudiereSampleNode();
+    H2_RETAIL_INLINE ~AudiereSampleNode();
 };
 
 // Retail keeps AudiereMusic::stream/source as static class members: their atexit

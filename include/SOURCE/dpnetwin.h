@@ -72,7 +72,7 @@ void dpEvaluateMessage(u32l, i32);
 i32 dpWaitForFirstGuest(void);
 i32 dpWaitForExtraGuests(void);
 i32 dpWaitForHost(void);
-void DPSD(i32, char*, i32);
+void DPSD(i32, H2_CONST char*, i32);
 
 extern struct IDirectPlay* lpIDC;
 extern DPID dcoID;

@@ -216,7 +216,7 @@ VA(0x004cee60, 0x48c)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     i16 x;
     i16 y;
-    char* text;
+    H2_CONST char* text;
     char** newItems;
 
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {

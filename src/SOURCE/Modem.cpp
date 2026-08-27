@@ -132,7 +132,7 @@ i32l Wait(void) {
 }
 
 VA(0x00472f68, 0x6c)
-void GUIModemCommand(char* message, char* command) {
+void GUIModemCommand(H2_CONST char* message, H2_CONST char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
@@ -161,7 +161,7 @@ i8 GUIModemCommandExec(void) {
 }
 
 VA(0x00473052, 0x61)
-void ModemCommand(char* command) {
+void ModemCommand(H2_CONST char* command) {
     i32 commandLength = strlen(command);
     i32 commandPosition0;
     for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
@@ -172,7 +172,7 @@ void ModemCommand(char* command) {
 }
 
 VA(0x004730b3, 0x75)
-i8 GUIModemResponse(char* message, char* response) {
+i8 GUIModemResponse(H2_CONST char* message, H2_CONST char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
@@ -211,7 +211,7 @@ compareResponse:
 }
 
 VA(0x004731db, 0x42)
-i32 write_buffer(char* buffer, i32 length) {
+i32 write_buffer(H2_CONST char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
     com_snd(0, 0, static_cast<u16>(length), buffer, 0);
@@ -237,7 +237,7 @@ VA(0x0047326c, 0x19c)
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 seed = KBTickCount();
-    i32 packetResult;
+    i32 H2_UNUSED(packetResult);
     seed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", seed);
     oldsec = -1;
@@ -365,7 +365,7 @@ readPacketStart:
 }
 
 VA(0x004736ec, 0x10b)
-void WriteModemPacket(char* buffer, i32 length) {
+void WriteModemPacket(H2_CONST char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");

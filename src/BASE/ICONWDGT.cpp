@@ -53,7 +53,7 @@ iconWidget::iconWidget(
     i16 y,
     i16 width,
     i16 height,
-    char* iconName,
+    H2_CONST char* iconName,
     i16 frame,
     H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
     i16 id,
@@ -90,7 +90,7 @@ void iconWidget::Read(void) {
 }
 
 VA(0x004bb9b0, 0x5b)
-inline iconWidget::~iconWidget() {
+H2_RETAIL_INLINE iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
@@ -112,7 +112,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
                 case WIDGET_COMMAND_REPLACE_ICON:
-                    if (m_iconId == msg.payload.widget.id) {
+                    if (m_iconId == static_cast<u32l>(msg.payload.widget.id)) {
                         m_iconId = msg.payload.widget.data.value;
                         gpResourceManager->Dispose(m_icon);
                         m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);

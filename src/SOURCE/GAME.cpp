@@ -1028,7 +1028,7 @@ i32 game::Scan(i8* array, i32 start, i32 length) {
 }
 
 VA(0x0044cf3f, 0x61)
-i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
+i32 game::RandomScan(i8* array, i32 start, i32 range, i32 H2_UNUSED(unused), i8 target) {
     i32 idx = target;
     i32 i;
     for (i = 0; i < RANDOM_SCAN_RETRY_LIMIT; i++) {
@@ -1041,11 +1041,11 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
 
 VA(0x0044cfa0, 0x1a1)
 i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
-    i32 r = -1;
-    i32 previousHero;
+    i32 H2_UNUSED(r) = -1;
+    i32 H2_UNUSED(previousHero);
     i32 heroIdx = -1;
     i32 attempts = 0;
-    i32 oldHeroId;
+    i32 H2_UNUSED(oldHeroId);
     while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
         heroIdx = Random(0, IDX(GAME_HERO_COUNT) - 1);
@@ -1131,11 +1131,11 @@ void GenerateStandardFileName(char* source, char* destination) {
 }
 
 VA(0x0044d3ae, 0xb5a)
-i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
+i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat) {
     i32 nHuman;
-    i32 saveFlag;
+    i32 H2_UNUSED(saveFlag);
     char workBuf[SAVE_LEGACY_SCRATCH_SIZE];
-    i32 scratchVals[SAVE_SPARE_SLOT_COUNT];
+    i32 H2_UNUSED(scratchVals)[SAVE_SPARE_SLOT_COUNT];
     char savePath[SAVE_PATH_CAPACITY];
     i32 outFile;
     i32 iFile;
@@ -1143,7 +1143,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     bchar humans[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
     char plBuf[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
     void* emptyPayload;
-    i32 lastTag;
+    i32 H2_UNUSED(lastTag);
     i32 chunkTag;
     i32 oldTag;
 
@@ -1455,16 +1455,16 @@ void game::SetupOrigData(void) {
 }
 
 VA(0x0044e8d9, 0xa79)
-void game::LoadGame(char* filename, i32 loadFromFile, i32) {
+void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
-    i32 oldFlag;
+    i32 H2_UNUSED(oldFlag);
     char isHuman[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    i32 saveVal;
+    i32 H2_UNUSED(saveVal);
     i32 rows;
     char pathBuf[SAVE_PATH_CAPACITY];
     b8 expTag;
     i32 fd;
-    char junkBuf[SAVE_LEGACY_CLEAR_SIZE];
+    char H2_UNUSED(junkBuf)[SAVE_LEGACY_CLEAR_SIZE];
     i32 ndx;
     char plBuf[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
     char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
@@ -1634,7 +1634,7 @@ VA(0x0044f352, 0x37d)
 void game::GiveTroopsToNeutralTown(i32 townId) {
     i32 roll;
     CreatureType monster;
-    i32 unused;
+    i32 H2_UNUSED(unused);
     i32 tierBase;
     i32 turnBonus;
     i32 howMany;
@@ -1779,13 +1779,13 @@ void game::GiveTroopsToNeutralTowns(void) {
 VA(0x0044f755, 0x1c7a)
 void game::NewMap(char* filename) {
     FactionType sideClass;
-    char* heroName;
+    H2_CONST char* heroName;
     HeroPortrait curPic;
     FactionType specClass;
     i32 awardHero;
-    i32 padNum;
+    i32 H2_UNUSED(padNum);
     i32 selectedTown;
-    i32 heroIndex;
+    i32 H2_UNUSED(heroIndex);
     i32 humanPos;
     FactionType startClass;
     i32 nTown;
@@ -1795,7 +1795,7 @@ void game::NewMap(char* filename) {
     i32 xPos;
     FactionType race;
     char* dotPos;
-    i32 junkVal;
+    i32 H2_UNUSED(junkVal);
     i32 iPass;
     i32 ultimateDistance;
 
@@ -3603,26 +3603,26 @@ void game::ViewArmy(
     armyGroup* theGroup,
     i32 groupIndex
 ) {
-    i16 titleMessage14;
-    i16 detailMessage0;
+    i16 H2_UNUSED(titleMessage14);
+    i16 H2_UNUSED(detailMessage0);
     tag_monsterInfo* monster;
     iconWidget* monsterWidget9;
     char* details0;
-    i16 blankWidget;
+    i16 H2_UNUSED(blankWidget);
     i32 modifier14;
-    i16 quickBaseY;
+    i16 H2_UNUSED(quickBaseY);
     tag_monsterInfo* armyMonster2;
     char filename5[VIEW_ARMY_FILENAME_SIZE];
-    i16 baseX8;
+    i16 H2_UNUSED(baseX8);
     i32 loopIndex;
     i32 iconFrame8;
-    i16 numWidget5;
+    i16 H2_UNUSED(numWidget5);
     i32 morale;
     i32 luck4;
     u8 armyName0[VIEW_ARMY_NAME_SIZE];
     icon* monsterIcon5;
     tag_message message;
-    i16 frame;
+    i16 H2_UNUSED(frame);
 
     baseX8 = VIEW_ARMY_UNUSED_BASE_X;
     quickBaseY = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
@@ -3921,8 +3921,8 @@ void game::ViewArmy(
 VA(0x00456231, 0x37d)
 MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     i32 resourceCost;
-    i16 frameDelay6;
-    i16 frameOffset;
+    i16 H2_UNUSED(frameDelay6);
+    i16 H2_UNUSED(frameOffset);
     i32 goldCost;
     ResourceType resourceType7;
 
@@ -4208,7 +4208,7 @@ VA(0x00456c32, 0x50a)
 void game::NextPlayer(void) {
     i32 remotePlayer;
     i32 index;
-    i32 humansAlive;
+    i32 H2_UNUSED(humansAlive);
 
     m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags = HeroEventFlag(
         static_cast<i32>(m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags)
@@ -4385,7 +4385,7 @@ void game::PerDay(void) {
     i32 maxSpellPoints9;
     i32 player;
     H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource8;
-    i32 income8;
+    i32 H2_UNUSED(income8);
     i32 dailyIncome0;
     MineType resourceType1;
     hero* currentHero7;
@@ -4978,7 +4978,7 @@ void game::ConvertObject(
 
 VA(0x0045a25e, 0x1b0)
 void game::RandomizeTown(i32 x, i32 y, i32) {
-    i32 unused[RANDOM_TOWN_SCRATCH_WIDTH];
+    i32 H2_UNUSED(unused)[RANDOM_TOWN_SCRATCH_WIDTH];
     i32 townId = GetTownId(x, y);
     town* castle = GetTown(townId);
     mapTownExtra* townExtra =
@@ -5192,7 +5192,7 @@ void game::RandomizeMine(i32 x, i32 y) {
 
 VA(0x0045a930, 0xb8)
 void game::InitRandomArtifacts(void) {
-    i32 unused4;
+    i32 H2_UNUSED(unused4);
     i32 y;
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
     for (i32 x = 0; x < MAP_WIDTH; x++) {
@@ -5670,7 +5670,7 @@ void game::GiveArmy(
     i32 count,
     i32 slot
 ) {
-    i32 swap;
+    i32 H2_UNUSED(swap);
     i32 i;
     if (slot >= 0) {
         i = slot;
@@ -5956,8 +5956,8 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
 
 VA(0x0045c3d4, 0x24f)
 void game::ProcessMapExtra(void) {
-    i32 unused;
-    i32 cost;
+    i32 H2_UNUSED(unused);
+    i32 H2_UNUSED(cost);
     mapCell* cell10;
     i32 townId;
     i32 row16;
@@ -6008,7 +6008,7 @@ void game::SetupTowns(void) {
     town* castle8;
     i32 townIndex1;
     i32 slot12;
-    i32 unused;
+    i32 H2_UNUSED(unused);
     mapTownExtra* extra0;
     i32 attempts17;
     i8 usedSpells0[IDX(SPELL_COUNT)];
@@ -6442,7 +6442,7 @@ void game::CheckHeroConsistency(void) {
     i32 player;
     mapCell* cell;
     town* townOccupied;
-    i32 sane;
+    i32 H2_UNUSED(sane);
 
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] != 0)
@@ -6548,7 +6548,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     char filename[TRANSMIT_FILENAME_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
-    i32 unused1d0;
+    i32 H2_UNUSED(unused1d0);
     u32 fileCrc;
     i32 oldTrack;
     i32 batchCount;
@@ -6561,16 +6561,16 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 packet;
     u8* transmitData;
     i32 file;
-    i32 unused208;
+    i32 H2_UNUSED(unused208);
     b32 done;
-    i32 unused21c;
+    i32 H2_UNUSED(unused21c);
     bool samplesReady;
     u8* fileData;
     char* acknowledged;
     i32* header;
-    i32 unused8;
+    i32 H2_UNUSED(unused8);
     i32 batch;
-    i32 unused9;
+    i32 H2_UNUSED(unused9);
 
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
     header = NULL;
@@ -6834,7 +6834,7 @@ i32 game::ReceiveSaveGame(
     u8* ackBuffer;
     u8* decodedData;
     bool samplesReady;
-    i32 unused2080;
+    i32 H2_UNUSED(unused2080);
     i32l lastPacketTime;
 
     LogInt(
@@ -7213,7 +7213,7 @@ i32 game::GetNumThievesGuilds(i32 color) {
 
 VA(0x0045eec6, 0xff)
 i32 game::CalcDifficultyRating(void) {
-    i32 notused;
+    i32 H2_UNUSED(notused);
     i32 rating = 0;
     if (m_difficulty == DIFFICULTY_EASY)
         rating += RATING_EASY_BONUS;
@@ -7285,7 +7285,7 @@ void game::RestoreCell(
     H2_ENUM_PARAM(MapObjectType, i32) objectType,
     i32 barrier,
     mapCell* passedCell,
-    i32 p6
+    i32 H2_UNUSED(p6)
 ) {
     mapCell* cell;
     if (passedCell)
@@ -7375,9 +7375,9 @@ void CreateDiffFile(
 ) {
     i32 joinSize;
     u8* fullData;
-    i32 unusedVal;
+    i32 H2_UNUSED(unusedVal);
     i32 inFd;
-    i32l timeIn;
+    i32l H2_UNUSED(timeIn);
     i32 matchLen;
     u8* prevData;
     i32 diffTotal;
@@ -7880,16 +7880,16 @@ i32 CalcFileCRC(char* file) {
 
 VA(0x0046099a, 0x120)
 void CompressTest2(void) {
-    i32l plainSize;
+    i32l H2_UNUSED(plainSize);
     char* unpackedData;
     i32l compSize;
-    i32 srcCrc;
+    i32 H2_UNUSED(srcCrc);
     i32 dataSz;
     i32 index;
-    i32 unpackedCrc;
+    i32 H2_UNUSED(unpackedCrc);
     char* fromData;
     char* encoded;
-    i32 srcCrcCheck;
+    i32 H2_UNUSED(srcCrcCheck);
 
     dataSz = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
     fromData =
@@ -7920,15 +7920,15 @@ VA(0x00460aba, 0x18c)
 void CompressTest(void) {
     char* fromData;
     char* encoded;
-    i32 srcCrcCheck;
-    i32 unpackedCrc;
+    i32 H2_UNUSED(srcCrcCheck);
+    i32 H2_UNUSED(unpackedCrc);
     i32 hFile;
     i32l fileSize;
     char diffName[TEST_FILENAME_SIZE];
-    i32 srcCrc;
+    i32 H2_UNUSED(srcCrc);
     char* unpackedData;
     i32l compSize;
-    i32l plainSize;
+    i32l H2_UNUSED(plainSize);
 
     LogStr(const_cast<char*>("C1"));
     strcpy(diffName, "c:\\TEMP\\Z.DIF");

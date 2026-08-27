@@ -30,7 +30,7 @@ textWidget::textWidget(
     i16 width,
     i16 height,
     char* text,
-    char* fontName,
+    H2_CONST char* fontName,
     H2_ENUM_PARAM(FontDrawMode, i16) color,
     i16 id,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
@@ -66,7 +66,7 @@ void textWidget::Read(void) {
 }
 
 VA(0x004c31c0, 0x72)
-inline textWidget::~textWidget() {
+H2_RETAIL_INLINE textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE(m_text);
 }
@@ -154,7 +154,7 @@ void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
 }
 
 VA(0x004c3520, 0xae)
-void textWidget::SetText(char* text) {
+void textWidget::SetText(H2_CONST char* text) {
     if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
         u16 newLen = strlen(text);
         if (newLen > strlen(m_text)) {
@@ -163,7 +163,7 @@ void textWidget::SetText(char* text) {
         }
         strcpy(m_text, text);
     } else {
-        m_text = text;
+        m_text = const_cast<char*>(text);
     }
 }
 

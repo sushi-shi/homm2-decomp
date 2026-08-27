@@ -35,7 +35,7 @@ DATA(0x005395dc) audiere::SampleSourcePtr AudiereMusic::source;
 DATA_COMPGEN_GUARD(
     0x005395e4, audiereMusicInitializationGuard, AudiereMusic
 )
-DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = {0};
+DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT] = H2_ZERO_INIT;
 
 VA_COMPGEN(0x004cd080, 0xf, STATIC_INIT_DISPATCH, AudiereMusic::stream)
 VA_COMPGEN(0x004cd090, 0x61, STATIC_CTOR, AudiereMusic::stream)

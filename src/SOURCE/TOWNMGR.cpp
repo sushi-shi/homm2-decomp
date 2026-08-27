@@ -561,7 +561,7 @@ townObject::townObject(
     char name[TOWN_OBJECT_FILENAME_SIZE];
     i32 x;
     i32 y;
-    i32 tempY;
+    i32 H2_UNUSED(tempY);
     i32 w;
     i32 h;
     H2_ENUM_STORAGE(BuildingSlotType, i32) id_h;
@@ -786,7 +786,7 @@ VA(0x004a51da, 0x9df)
 void townManager::SetupTown(void) {
     tag_message message;
     i32 i;
-    i32 crestFrame;
+    i32 H2_UNUSED(crestFrame);
 
     sprintf(gText, GetTownName(m_town->m_id));
     message.type = MESSAGE_WIDGET;
@@ -1259,7 +1259,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     char text[BUILDING_DESCRIPTION_CAPACITY];
     i32 dbgBuild;
     recruitUnit* manager;
-    i32 status;
+    i32 H2_UNUSED(status);
     i32 tradeCount;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
@@ -1368,7 +1368,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     if (m_heroStrip == NULL)
                                         MemError();
                                     buildSound = LoadPlaySample("buildtwn.82M");
-                                    hero* townHero = gpGame->GetHero(m_town->m_occupyingHeroId);
+                                    hero* H2_UNUSED(townHero) =
+                                        gpGame->GetHero(m_town->m_occupyingHeroId);
                                     i32 width = TOWN_VIEW_FIZZLE_WIDTH;
                                     m_townWindow->DrawWindow(0);
                                     m_garrisonStrip->DrawIcons(0);
@@ -1640,7 +1641,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                                 .m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
                                             m_bankBox->Update(1);
                                         } else {
-                                            i32 result = 0;
+                                            i32 H2_UNUSED(result) = 0;
                                             LogStr("\xcd\xe5\xeb\xfc\xe7\xff \xef\xee\xf1\xf2\xf0\xee\xe8\xf2\xfc \xea\xee\xf0\xe0\xe1\xeb\xfc!" /* "Нельзя построить корабль!" */);
                                         }
                                     }
@@ -1987,8 +1988,8 @@ void townManager::RedrawTownScreen(void) {
 
 VA(0x004a84b7, 0x376)
 void townManager::SplitArmy(void) {
-    i16 msgId = 1;
-    i16 amountId = 4;
+    i16 H2_UNUSED(msgId) = 1;
+    i16 H2_UNUSED(amountId) = 4;
     b32 sameType;
     tag_message message;
 
@@ -2099,7 +2100,7 @@ i32 townManager::BuyBuild(
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     char* description_b;
-    i16 dialogWidth_e;
+    i16 H2_UNUSED(dialogWidth_e);
     textWidget* amountWidgets_b[TOWN_RESOURCE_COUNT];
     char* amountText_n[TOWN_RESOURCE_COUNT];
     iconWidget* resourceWidgets_m[TOWN_RESOURCE_COUNT];
@@ -2108,32 +2109,32 @@ i32 townManager::BuyBuild(
     tag_message message_m;
     i32 widgetIndex_f;
     i32 xStart_b;
-    i16 dialogLeft_a;
-    i16 dialogButtonCount_m;
+    i16 H2_UNUSED(dialogLeft_a);
+    i16 H2_UNUSED(dialogButtonCount_m);
     i32 row_l;
     i32 resourcesInRow_l;
     i32 rowY_o;
     i32 windowY_m;
     i8 resourceTypes_o[BUILD_RESOURCE_STORAGE_COUNT];
     i32 costCount_o;
-    i16 dialogResult_b;
+    i16 H2_UNUSED(dialogResult_b);
     i32 index_h;
     i32 spacing_h;
     i32 bottomRowCount_o;
     heroWindow* window_a;
     char iconName_o[TOWN_OBJECT_FILENAME_SIZE];
     i32 rowWidth_h;
-    i16 dialogButtonWidth_l;
+    i16 H2_UNUSED(dialogButtonWidth_l);
     i32 lineCount_j;
     i32 windowHeight_a;
     icon* resourceIcon_c;
-    i16 dialogControl_g;
+    i16 H2_UNUSED(dialogControl_g);
     i32 windowRows_b;
     i32 mageLevel_k;
     i32 x_d;
     i32 resourceCount_a;
     i32 dwelling_k;
-    i16 dialogHeight_f;
+    i16 H2_UNUSED(dialogHeight_f);
     i32 entryWidth_o;
     i16 costs_e[BUILD_RESOURCE_STORAGE_COUNT];
     widget* descriptionWidget_g;
@@ -2555,22 +2556,22 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 
 VA(0x004a9c0b, 0x379)
 void townManager::SetupMage(heroWindow* window) {
-    i16 unusedZero_g = 0;
-    i16 unusedAvailable_n = 1;
-    i16 unusedInvalid_d = TOWN_MAGE_SPELL_UNAVAILABLE;
-    i16 unusedIconState_m = 2;
-    i16 unusedFirstSpell_c = TOWN_MAGE_FIRST_SPELL_CONTROL;
-    i16 unusedFirstIcon_c = TOWN_MAGE_FIRST_ICON_CONTROL;
-    i16 unusedFirstDescription_h = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-    i16 unusedGuildIcon_i = TOWN_MAGE_GUILD_ICON_CONTROL;
-    i16 unusedDescription_b = TOWN_MAGE_DESCRIPTION_CONTROL;
+    i16 H2_UNUSED(unusedZero_g) = 0;
+    i16 H2_UNUSED(unusedAvailable_n) = 1;
+    i16 H2_UNUSED(unusedInvalid_d) = TOWN_MAGE_SPELL_UNAVAILABLE;
+    i16 H2_UNUSED(unusedIconState_m) = 2;
+    i16 H2_UNUSED(unusedFirstSpell_c) = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    i16 H2_UNUSED(unusedFirstIcon_c) = TOWN_MAGE_FIRST_ICON_CONTROL;
+    i16 H2_UNUSED(unusedFirstDescription_h) = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    i16 H2_UNUSED(unusedGuildIcon_i) = TOWN_MAGE_GUILD_ICON_CONTROL;
+    i16 H2_UNUSED(unusedDescription_b) = TOWN_MAGE_DESCRIPTION_CONTROL;
     tag_message message_i;
     i32 level_f;
     i32 slot_o;
     i32 spellState_c;
     i32 lineCount_k;
     i32 unusedGuildFrame_g;
-    i32 unusedLocal_l;
+    i32 H2_UNUSED(unusedLocal_l);
 
     message_i.type = MESSAGE_WIDGET;
     if (m_town->m_occupyingHeroId == -1) {
@@ -2666,9 +2667,9 @@ void townManager::SetupMage(heroWindow* window) {
 
 VA(0x004a9f84, 0x154)
 MessageDispatchResult MageGuildHandler(tag_message& message) {
-    i16 unusedFirstSpell_b = TOWN_MAGE_FIRST_SPELL_CONTROL;
-    i16 unusedFirstIcon_c = TOWN_MAGE_FIRST_ICON_CONTROL;
-    i16 unusedFirstDescription_h = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    i16 H2_UNUSED(unusedFirstSpell_b) = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    i16 H2_UNUSED(unusedFirstIcon_c) = TOWN_MAGE_FIRST_ICON_CONTROL;
+    i16 H2_UNUSED(unusedFirstDescription_h) = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
     u32 quickView_i;
     i32 spellSlot_b;
     i32 level_d;
@@ -2723,14 +2724,14 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
 
 VA(0x004aa0d8, 0x70b)
 i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
-    i16 unusedTextState_j = 1;
-    i16 unusedPortraitState_i = 2;
-    i16 unusedTextControl_g = 3;
-    i16 unusedIconState_e = 4;
-    i16 unusedDimState_d = 6;
-    i16 unusedPortraitControl_i = 7;
-    i16 unusedButtonText_h = 8;
-    i16 unusedButtonIcon_e = 9;
+    i16 H2_UNUSED(unusedTextState_j) = 1;
+    i16 H2_UNUSED(unusedPortraitState_i) = 2;
+    i16 H2_UNUSED(unusedTextControl_g) = 3;
+    i16 H2_UNUSED(unusedIconState_e) = 4;
+    i16 H2_UNUSED(unusedDimState_d) = 6;
+    i16 H2_UNUSED(unusedPortraitControl_i) = 7;
+    i16 H2_UNUSED(unusedButtonText_h) = 8;
+    i16 H2_UNUSED(unusedButtonIcon_e) = 9;
     tag_message message_e;
     i32 artifactCount_h;
     i32 index_j;
@@ -2863,8 +2864,8 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
 
 VA(0x004aa7e3, 0x120)
 MessageDispatchResult TavernHandler(tag_message& message) {
-    i32 unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
-    i16 unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
+    i32 H2_UNUSED(unusedDelay) = TOWN_TAVERN_ANIMATION_DELAY;
+    i16 H2_UNUSED(unusedFirstFrame) = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -2902,7 +2903,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
 
 VA(0x004aa903, 0x12b)
 void townManager::DoTavern(void) {
-    i32 unusedValue = 0;
+    i32 H2_UNUSED(unusedValue) = 0;
     tag_message message;
 
     m_heroWindow0 = new heroWindow(TAVERN_WINDOW_X, TAVERN_WINDOW_Y, "tavwin.bin");
@@ -2930,11 +2931,11 @@ void townManager::DoTavern(void) {
 
 VA(0x004aaa2e, 0x2cf)
 MessageDispatchResult SplitArmyHandler(tag_message& message) {
-    i16 plusButton_d = TOWN_SPLIT_INCREASE_CONTROL;
-    i16 minusButton_g = TOWN_SPLIT_DECREASE_CONTROL;
-    i16 amountControl_e = TOWN_SPLIT_AMOUNT_CONTROL;
+    i16 H2_UNUSED(plusButton_d) = TOWN_SPLIT_INCREASE_CONTROL;
+    i16 H2_UNUSED(minusButton_g) = TOWN_SPLIT_DECREASE_CONTROL;
+    i16 H2_UNUSED(amountControl_e) = TOWN_SPLIT_AMOUNT_CONTROL;
     b32 handled_c = false;
-    i32 unusedAction_l;
+    i32 H2_UNUSED(unusedAction_l);
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -3004,13 +3005,13 @@ update_amount:
 
 VA(0x004aacfd, 0x647)
 void townManager::SetupWell(heroWindow* window) {
-    i16 unusedFirstIcon_d = 1;
-    i16 unusedFirstName_b = TOWN_WELL_FIRST_NAME_CONTROL;
-    i16 unusedFirstMonsterIcon_p = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
-    i16 unusedFirstCreature_f = TOWN_WELL_FIRST_CREATURE_CONTROL;
-    i16 unusedFirstDetail_g = TOWN_WELL_FIRST_DETAIL_CONTROL;
-    i16 unusedFirstAvailable = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
-    i16 unusedFirstAvailableCount = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
+    i16 H2_UNUSED(unusedFirstIcon_d) = 1;
+    i16 H2_UNUSED(unusedFirstName_b) = TOWN_WELL_FIRST_NAME_CONTROL;
+    i16 H2_UNUSED(unusedFirstMonsterIcon_p) = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+    i16 H2_UNUSED(unusedFirstCreature_f) = TOWN_WELL_FIRST_CREATURE_CONTROL;
+    i16 H2_UNUSED(unusedFirstDetail_g) = TOWN_WELL_FIRST_DETAIL_CONTROL;
+    i16 H2_UNUSED(unusedFirstAvailable) = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+    i16 H2_UNUSED(unusedFirstAvailableCount) = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
     u8 dwellingTypes_c[WELL_DWELLING_TYPE_STORAGE_COUNT];
     i32 available_e;
     i32 dwellingResult_a;
@@ -3151,14 +3152,14 @@ void townManager::SetupWell(heroWindow* window) {
 
 VA(0x004ab344, 0xde3)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    i16 unusedRankX_i = THIEVES_RANK_FIRST_X;
-    i16 unusedRankWidth_g = THIEVES_PLAYER_COLUMN_WIDTH;
-    i16 unusedRankY_n = THIEVES_FIRST_CATEGORY_Y;
-    i16 unusedRankHeight_k = THIEVES_CATEGORY_ROW_HEIGHT;
-    i16 unusedRankIconHeight_o = THIEVES_RANK_ICON_HEIGHT;
-    i16 unusedIconWidth_f = THIEVES_RANK_ICON_WIDTH;
-    i16 unusedIconHeight_a = THIEVES_RANK_ICON_HEIGHT;
-    i16 unusedPlayerWidth_n = 72;
+    i16 H2_UNUSED(unusedRankX_i) = THIEVES_RANK_FIRST_X;
+    i16 H2_UNUSED(unusedRankWidth_g) = THIEVES_PLAYER_COLUMN_WIDTH;
+    i16 H2_UNUSED(unusedRankY_n) = THIEVES_FIRST_CATEGORY_Y;
+    i16 H2_UNUSED(unusedRankHeight_k) = THIEVES_CATEGORY_ROW_HEIGHT;
+    i16 H2_UNUSED(unusedRankIconHeight_o) = THIEVES_RANK_ICON_HEIGHT;
+    i16 H2_UNUSED(unusedIconWidth_f) = THIEVES_RANK_ICON_WIDTH;
+    i16 H2_UNUSED(unusedIconHeight_a) = THIEVES_RANK_ICON_HEIGHT;
+    i16 H2_UNUSED(unusedPlayerWidth_n) = 72;
     TownThievesGuildCategory category_l;
     i8 categoryOrder_a[TOWN_THIEVES_ORDER_BUFFER_SIZE];
     i32 rank_a;
@@ -3178,14 +3179,14 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i32 strongestCreatureValue_l;
     i32 strongestHeroPosition_j;
     hero* strongestHero_d;
-    i32 unusedThievesValue_i;
+    i32 H2_UNUSED(unusedThievesValue_i);
     town* playerTown_j;
-    i16 unusedFirstRankControl_j = TOWN_THIEVES_FIRST_RANK_CONTROL;
-    i16 unusedFirstPlayerControl_e = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
-    i16 unusedHeroY_k = THIEVES_HERO_Y;
-    i16 unusedPrimaryStatsY = THIEVES_PRIMARY_STATS_Y;
-    i16 unusedPersonalityY_m = THIEVES_PERSONALITY_Y;
-    i16 unusedCreatureY_d = THIEVES_CREATURE_Y;
+    i16 H2_UNUSED(unusedFirstRankControl_j) = TOWN_THIEVES_FIRST_RANK_CONTROL;
+    i16 H2_UNUSED(unusedFirstPlayerControl_e) = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+    i16 H2_UNUSED(unusedHeroY_k) = THIEVES_HERO_Y;
+    i16 H2_UNUSED(unusedPrimaryStatsY) = THIEVES_PRIMARY_STATS_Y;
+    i16 H2_UNUSED(unusedPersonalityY_m) = THIEVES_PERSONALITY_Y;
+    i16 H2_UNUSED(unusedCreatureY_d) = THIEVES_CREATURE_Y;
     i32 position_a;
     tag_message message_h;
     widget* textControl_p;

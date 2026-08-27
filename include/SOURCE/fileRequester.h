@@ -109,12 +109,12 @@ public:
     void SetOK(i32);
     void DoKnob(void);
     void Update(i32);
-    char* GetFilename(void);
+    H2_CONST char* GetFilename(void);
 };
 #pragma pack(pop)
 SIZE(fileRequester, 0x42f);
 extern FileRequesterMapSizeFilter giMapSizeFilter;
-extern char* cFRDummy;
+extern H2_CONST char* cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
 extern i32 iMaxListSize;

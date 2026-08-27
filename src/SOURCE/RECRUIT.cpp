@@ -246,7 +246,7 @@ VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     b32 done = false;
     b32 quickView;
-    i32 cost;
+    i32 H2_UNUSED(cost);
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
         quickView = true;

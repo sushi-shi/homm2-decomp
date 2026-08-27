@@ -219,7 +219,7 @@ army::army(void) {
 }
 
 VA(0x00418712, 0xd)
-void army::WaitSample(ArmySampleType sampleIndex) {
+void army::WaitSample(ArmySampleType H2_UNUSED(sampleIndex)) {
     return;
 }
 
@@ -416,7 +416,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     b32 idle;
     i32 yoff;
     i32 xoff;
-    i32 flags;
+    i32 H2_UNUSED(flags);
     i32 numFrames;
     i32 quantX;
     i32 spellX;
@@ -661,7 +661,7 @@ VA(0x004197b2, 0xa27)
 void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing) {
     i32 frame;
     i32 newHex;
-    i32 saveHex;
+    i32 H2_UNUSED(saveHex);
     i32 destHex;
     i32 tempTop;
     i32 tempLeft;
@@ -932,7 +932,7 @@ void army::SpecialAttack(void) {
     i32 animSlot;
     i32 landX;
     i32 bgPosX;
-    char hisRow;
+    char H2_UNUSED(hisRow);
     i32 spacing;
     i32 landY;
     i32 shotDelay;
@@ -1483,7 +1483,7 @@ void army::DoAttack(i32 retaliation) {
     ArmyFacing desiredFacing_2;
     b32 effectStopsRetaliation_4;
     ArmyFacing originalFacing_7;
-    CombatSide occupantSide_5;
+    CombatSide H2_UNUSED(occupantSide_5);
     char combatText_10[ARMY_COMBAT_TEXT_SIZE];
     i32 damage_4;
     i32 targetHex_3;
@@ -2688,7 +2688,7 @@ void army::SpellEffect(
     IconEntry* entry;
     i32 smallestY;
     i32 frameDelay;
-    i32 unusedWord;
+    i32 H2_UNUSED(unusedWord);
     i32 frame;
     i32 i;
     u32l effectFileId;
@@ -2948,7 +2948,7 @@ VA(0x0041fd25, 0x513)
 void army::GoBerserk(void) {
     i32 masks_28[IDX(COMBAT_SIDE_COUNT)];
     i32 attackMask_29;
-    i32 unusedMask_16;
+    i32 H2_UNUSED(unusedMask_16);
     b32 targetFound_8;
     i32 savedQuantity_8;
     CombatHexDirection direction_4;

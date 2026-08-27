@@ -21,7 +21,7 @@ public:
     i8* m_data;
     palette(void);
     palette(u32l id);
-    virtual inline ~palette();
+    virtual H2_RETAIL_INLINE ~palette();
     i8* Data(void);
 };
 #pragma pack(pop)

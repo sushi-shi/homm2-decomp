@@ -379,7 +379,7 @@ void hero::AddSpell(H2_ENUM_PARAM(SpellType, i32) spell, i32) {
 }
 
 VA(0x0046141a, 0x72)
-void HeroMessageUpdate(char* text) {
+void HeroMessageUpdate(H2_CONST char* text) {
     tag_message message;
 
     if (gheroWin == NULL)
@@ -771,7 +771,7 @@ void hero::CheckLevel(void) {
     i32 nLevel;
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
-    i32 levelsGained;
+    i32 H2_UNUSED(levelsGained);
     HeroSkillProbabilityBand highIndex;
     i32 slot;
     SAMPLE2 samp;
@@ -1163,13 +1163,13 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 tmp;
     b32 quickView;
     i32 armySlot;
-    i32 dummy;
+    i32 H2_UNUSED(dummy);
     b32 bExit = false;
     i32 heroLevel;
     i32 iHero;
     i32 secondarySkillSlot;
-    tag_message newMsg;
-    i32 j;
+    tag_message H2_UNUSED(newMsg);
+    i32 H2_UNUSED(j);
     i32 nextExperience;
 
     if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
@@ -1871,8 +1871,8 @@ void SetupHeroView(void) {
 
 VA(0x00464415, 0x2b6)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
-    i16 splitTextSlot = UI_SPLIT_TEXT;
-    i16 splitAmountSlot = UI_SPLIT_AMOUNT;
+    i16 H2_UNUSED(splitTextSlot) = UI_SPLIT_TEXT;
+    i16 H2_UNUSED(splitAmountSlot) = UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
@@ -1992,7 +1992,7 @@ void hero::UpgradeCreatures(
     H2_ENUM_PARAM(CreatureType, i32) oldCreatureType,
     H2_ENUM_PARAM(CreatureType, i32) newCreatureType
 ) {
-    i32 numberUpgraded = 0;
+    i32 H2_UNUSED(numberUpgraded) = 0;
     i32 armySlot;
 
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
@@ -2052,7 +2052,7 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
 VA(0x00464a9e, 0xdd)
 void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView) {
     i32 skillBonusValue;
-    char* skillText;
+    H2_CONST char* skillText;
 
     skillBonusValue = GetSSLevel(skill) - IDX(m_secondarySkills[IDX(skill)]);
     if (skillBonusValue > 0) {

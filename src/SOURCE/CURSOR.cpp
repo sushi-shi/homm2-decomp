@@ -160,7 +160,7 @@ void advManager::DrawCursor(void) {
             0
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
-            i32 flagDrawn;
+            i32 H2_UNUSED(flagDrawn);
 
             FlipIconToBitmap(
                 m_boatFlagIcons[gpCurPlayer->m_color],
@@ -235,7 +235,7 @@ void advManager::DrawCursor(void) {
             0
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
-            i32 flagDrawn;
+            i32 H2_UNUSED(flagDrawn);
 
             IconToBitmap(
                 m_boatFlagIcons[gpCurPlayer->m_color],
@@ -1439,7 +1439,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 size;
     SMapChange* buf;
     i32 ix;
-    i32 processed;
+    i32 H2_UNUSED(processed);
 
     size = sizeof(sMapChangeLastFew);
     buf = static_cast<SMapChange*>(H2_ALLOC(size));

@@ -31,16 +31,16 @@ H2_ENUM_END(MouseManagerLocalConstant)
 
 DATA(0x005349c8) static i32 gOldMouseLeft = 0;
 DATA(0x005349cc) static i32 gOldMouseTop = 0;
-DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = {0};
+DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = H2_ZERO_INIT;
 DATA(0x005352d0) static i32 gOldMouseRight = 0;
 DATA(0x005352d4) HICON hMouseCursor[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x00535454) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x005355d4) void* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
 DATA(0x00535754) static i32 gOldMouseBottom = 0;
-DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = {0};
-DATA(0x00535ed8) static POINT gMouseScreenPt = {0};
+DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = H2_ZERO_INIT;
+DATA(0x00535ed8) static POINT gMouseScreenPt = H2_ZERO_INIT;
 DATA(0x00535ee0) void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
-DATA(0x00536060) static POINT gMouseCheckPt = {0};
+DATA(0x00536060) static POINT gMouseCheckPt = H2_ZERO_INIT;
 DATA(0x00536068) b32 gbInSetPointer = false;
 DATA(0x0053606c) i32 bInNewMouseUpdate = 0;
 
@@ -158,7 +158,7 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
 }
 
 VA(0x004b9430, 0x1a2)
-void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
+void mouseManager::SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
     if (m_forcePointerUpdate != 0)
         return;

@@ -194,7 +194,7 @@ DATA(0x005360a8) i32 iDEMaxLen = 0;
 DATA(0x005360ac) i32 iMemEntries = 0;
 DATA(0x005360b0) MemEntry* gpMemEntry = NULL;
 DATA(0x005360b4) i32 giTotalMemAllocated = 0;
-DATA(0x0051e5dc) static char* gcCDTrackName =
+DATA(0x0051e5dc) static H2_CONST char* gcCDTrackName =
     "\\Tracks2\\02-AudioTrack 02.ogg";
 DATA(0x0051e5e0) u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
@@ -220,7 +220,7 @@ void InitMemEntry(void) {
 }
 
 VA(0x004bd530, 0x113)
-void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
+void* BaseAlloc(u32 size, H2_CONST char* originalFile, i32 originalLine) {
     if (size == 0)
         return NULL;
     if (gpMemEntry == NULL)
@@ -247,7 +247,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
 }
 
 VA(0x004bd650, 0x154)
-void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
+void BaseFree(void* ptr, H2_CONST char* originalFile, i32 originalLine) {
     if (gpMemEntry == NULL)
         InitMemEntry();
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
@@ -339,7 +339,7 @@ void ShowMemoryStatus(void) {
 }
 
 VA(0x004bd8e0, 0x10a)
-u32l MAKEFILEID(char* text) {
+u32l MAKEFILEID(H2_CONST char* text) {
     u32 fileId;
     i32 size;
     char buf[GLOBAL_AGGREGATE_PATH_SIZE];
@@ -466,8 +466,8 @@ i32 Random(i32 low, i32 high) {
 }
 
 VA(0x004bde90, 0x74)
-void ProcessAssert(i32 condition, char* file, i32 line) {
-    i32 unusedAssertWord;
+void ProcessAssert(i32 condition, H2_CONST char* file, i32 line) {
+    i32 H2_UNUSED(unusedAssertWord);
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
@@ -480,7 +480,7 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
 }
 
 VA(0x004bdf10, 0x75)
-char* FindStringInString(char* text, char* pattern) {
+char* FindStringInString(char* text, H2_CONST char* pattern) {
     i32 iLen = strlen(text);
     i32 patternLen = strlen(pattern);
     for (i32 i = 0; i < iLen - patternLen + 1; ++i) {
@@ -499,6 +499,17 @@ char* FindToken(char* text, char token) {
     }
     return NULL;
 }
+
+#if H2_STRICT_ENUMS
+H2_CONST char* FindToken(H2_CONST char* text, char token) {
+    i32 iLen = strlen(text);
+    for (i32 i = 0; i < iLen; ++i) {
+        if (*(text + i) == token)
+            return text + i;
+    }
+    return NULL;
+}
+#endif
 
 VA(0x004bdff0, 0x56)
 char* FindLastToken(char* text, char token) {
@@ -521,8 +532,8 @@ VA(0x004be0a0, 0x29d)
 void SetGameDefaults(void) {
     i32 i;
     i32 seed;
-    i32 nAlpha;
-    char* alpha;
+    i32 H2_UNUSED(nAlpha);
+    H2_CONST char* alpha;
 
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
@@ -585,7 +596,7 @@ void SetGameDefaults(void) {
 
 VA(0x004be340, 0xcb)
 void ReadPrefsFromFile(void) {
-    i32 result;
+    i32 H2_UNUSED(result);
     FILE* file;
 
     sprintf(gText, "%s", "HEROES2.CFG");
@@ -627,7 +638,7 @@ void ReadPrefsFromRegistry(void) {
     DWORD dwcbData;
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
-    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
+    char H2_UNUSED(szScratch)[REGISTRY_TEXT_BUFFER_SIZE];
     LONG lRet;
     DWORD dwType;
 
@@ -1476,7 +1487,7 @@ bool DriveSupportsFreeSpaceQuery(char driveLetter) {
 
 VA(0x004bf370, 0x35f)
 H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
-    u32l dwErr;
+    u32l H2_UNUSED(dwErr);
     u32l drives;
     i32 i;
     i32 handle;
@@ -1655,7 +1666,7 @@ void LogTruncate(void) {
 
 
 VA(0x004bfa30, 0x9a)
-void LogStr(char* text) {
+void LogStr(H2_CONST char* text) {
     char logText[TEXT_BUFFER_SIZE];
     FILE* out;
     if (giDebugLevel < FILE_DEBUG_LEVEL)
@@ -1673,7 +1684,7 @@ void LogStr(char* text) {
 
 VA(0x004bfad0, 0x1b6)
 void LogInt(
-    char* label,
+    H2_CONST char* label,
     i32 value1,
     i32 value2,
     i32 value3,
@@ -1731,7 +1742,7 @@ void LogInt(
 }
 
 VA(0x004bfc90, 0x76)
-void AiPrint(char* text) {
+void AiPrint(H2_CONST char* text) {
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
 
@@ -1759,7 +1770,7 @@ void AiPrint(char* text) {
 }
 
 VA(0x004bfd10, 0x30)
-void AbsAiPrint(char* text) {
+void AbsAiPrint(H2_CONST char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
     AiPrint(text);
@@ -1770,7 +1781,7 @@ VA(0x004bfd40, 0x19c)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 temp[MISC_PALETTE_BYTE_COUNT];
     u8 *current, *to;
-    i32 idx, change, diff, move, delay, iLevel, nextTime, k;
+    i32 idx, change, diff, move, H2_UNUSED(delay), iLevel, nextTime, k;
 
     delay = FADE_TO_FRAME_DELAY;
     memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
@@ -1819,7 +1830,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     pal = gpBufferPalette->m_data;
-    for (i = 0; i < MISC_PALETTE_BYTE_COUNT / PALETTE_COMPONENT_COUNT; ++i) {
+    for (i = 0; i < IDX(MISC_PALETTE_BYTE_COUNT) / IDX(PALETTE_COMPONENT_COUNT); ++i) {
         tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
             pal[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
         tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
@@ -1989,15 +2000,15 @@ i32 MemSize(i32) {
 }
 VA(0x004c05e0, 0x464)
 void GetDataEntry(
-    char* prompt,
+    H2_CONST char* prompt,
     char* destination,
     i32 maximumLength,
-    char* initialText,
+    H2_CONST char* initialText,
     i32 showCancel,
     i32 useImmediateHandler
 ) {
     MouseCursorType savedCursorType;
-    i16 wId;
+    i16 H2_UNUSED(wId);
     i32 nRows;
     char windowName[WINDOW_NAME_CAPACITY];
     i32 entryY;
@@ -2113,7 +2124,7 @@ void GetDataEntry(
 
 VA(0x004c0a50, 0x1fa)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
-    i16 wId;
+    i16 H2_UNUSED(wId);
 
     wId = ENTRY_TEXT_WIDGET;
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {

@@ -46,6 +46,12 @@ Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to
 resolve away.
 
+The verifier reports, but does not promote, `-Wformat-security`. Retail contains
+two-argument `sprintf(destination, text)` calls whose safe replacement changes
+behavior when `text` contains a percent conversion. The exact and generated
+historical trees retain that behavior; portable master replaces those calls and
+treats this diagnostic as an error.
+
 The lexer distinguishes comments from string and character literals, matches
 balanced parentheses, and removes comments without joining adjacent tokens.
 Macro arguments are transformed recursively, innermost first.
@@ -73,6 +79,10 @@ valid output target.
 | `SIZE(type, bytes)` | deleted |
 | `H2_ENUM_*` declarations and helpers | typed declarations and compact shared operator macros |
 | `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
+| `H2_CONST` | `const` (empty only for the exact retail compiler view) |
+| `H2_UNUSED(name)` | `name [[maybe_unused]]` |
+| `H2_RETAIL_INLINE` | deleted (retail-only weak-emission hint) |
+| `H2_ZERO_INIT` | `{}` (retail keeps its original `{0}` spelling) |
 | `RETAIL_FILE`, `#line N` | deleted; `__FILE__` where a file operand remains |
 | `OD_STEER(x)`, `OR_STEER(x)` | `x` |
 | `__declspec(dllexport)`, `register` | deleted |

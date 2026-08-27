@@ -281,8 +281,8 @@ VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD size;
     i32 to;
-    i32 i;
-    i32 j;  // i and j are unreferenced; retail's frame reserves both slots
+    i32 H2_UNUSED(i);
+    i32 H2_UNUSED(j);  // i and j are unreferenced; retail's frame reserves both slots
     i32 sender;
     i32 receiveResult;
 
@@ -303,7 +303,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, RETAIL_FILE, 335);
         if (sender == 0) {
         } else {
-            if (to == 0 || to == dcoID)
+            if (to == 0 || static_cast<DPID>(to) == dcoID)
                 dpEvaluateMessage(size, sender);
         }
     }
@@ -395,7 +395,12 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            rv = lpIDC->CreatePlayer(
+                &dcoID,
+                const_cast<LPSTR>("Dude"),
+                const_cast<LPSTR>("Heroes Player"),
+                &dphEvent
+            );
             if (rv != RESULT_OK)
                 DPSD(rv, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
@@ -443,7 +448,7 @@ i32 dpWaitForHost(void) {
     char text[STATUS_TEXT_SIZE];
     DWORD timeout;
 
-    sprintf(text, "WFHS %d", iDPWaitForHostStatus);
+    sprintf(text, "WFHS %d", static_cast<i32>(iDPWaitForHostStatus));
     AiPrint(text);
     switch (iDPWaitForHostStatus) {
         case HOST_ENUMERATE_SESSIONS:
@@ -490,7 +495,12 @@ i32 dpWaitForHost(void) {
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            rv = lpIDC->CreatePlayer(
+                &dcoID,
+                const_cast<LPSTR>("Dude"),
+                const_cast<LPSTR>("Heroes Player"),
+                &dphEvent
+            );
             if (rv != RESULT_OK)
                 DPSD(rv, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
@@ -534,8 +544,8 @@ i32 dpWaitForHost(void) {
 }
 
 VA(0x004376f3, 0x5d5)
-void DPSD(i32 result, char* file, i32 line) {
-    i32 flag;
+void DPSD(i32 result, H2_CONST char* file, i32 line) {
+    i32 H2_UNUSED(flag);
     char errorText[REMOTE_ERROR_TEXT_SIZE];
 
     if (bInDPSD != 0)

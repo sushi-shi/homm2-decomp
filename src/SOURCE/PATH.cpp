@@ -55,7 +55,7 @@ i32 army::FindPath(
 VA(0x0047cf9d, 0x80)
 i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     i32 pathResult;
-    i32 extra;
+    i32 H2_UNUSED(extra);
 
     if (!ValidHex(targetHex))
         return 0;

@@ -3,7 +3,7 @@
 #include <SOURCE/X_GLOBAL.h>
 
 
-DATA(0x0051b62c) char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+DATA(0x0051b62c) H2_CONST char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     /* {Старая кампания}
 
        Одна из двух кампаний за Роланда или Арчибальда из оригинальной игры Герои Меча и Магии II. */
@@ -25,7 +25,7 @@ DATA(0x0051b62c) char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
         "\xce\xf2\xec\xe5\xed\xe8\xf2\xfc \xe8 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
         "\xe3\xeb\xe0\xe2\xed\xee\xe5 \xec\xe5\xed\xfe."
 };
-DATA(0x0051b638) char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
+DATA(0x0051b638) H2_CONST char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     /* {Старая карта}
 
        Выбрать для игры карты старого формата Героев Меча и Магии II. */
@@ -47,7 +47,7 @@ DATA(0x0051b638) char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
         "\xce\xf2\xec\xe5\xed\xe8\xf2\xfc \xe8 \xe2\xe5\xf0\xed\xf3\xf2\xfc\xf1\xff \xe2 "
         "\xe3\xeb\xe0\xe2\xed\xee\xe5 \xec\xe5\xed\xfe."
 };
-DATA(0x0051b644) char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+DATA(0x0051b644) H2_CONST char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     /* Союз эльфов */ "\xd1\xee\xfe\xe7 \xfd\xeb\xfc\xf4\xee\xe2",
     /* Доспех */ "\xc4\xee\xf1\xef\xe5\xf5",
     /* Древесина */ "\xc4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xe0",
@@ -60,7 +60,7 @@ DATA(0x0051b644) char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] 
     /* Ангел-хранитель */ "\xc0\xed\xe3\xe5\xeb-\xf5\xf0\xe0\xed\xe8\xf2\xe5\xeb\xfc",
     /* Сфера антимагии */ "\xd1\xf4\xe5\xf0\xe0 \xe0\xed\xf2\xe8\xec\xe0\xe3\xe8\xe8"
 };
-DATA(0x0051b670) char*
+DATA(0x0051b670) H2_CONST char*
     xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
         {/* Мятеж */ "\xcc\xff\xf2\xe5\xe6",
          /* Земля Хаоса */ "\xc7\xe5\xec\xeb\xff \xd5\xe0\xee\xf1\xe0",
@@ -95,7 +95,7 @@ DATA(0x0051b670) char*
          "",
          ""}
 };
-DATA(0x0051b6f0) char*
+DATA(0x0051b6f0) H2_CONST char*
     xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
         {
             {
@@ -284,19 +284,19 @@ DATA(0x0051b6f0) char*
                 ""
             }
         };
-DATA(0x0051b770) char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+DATA(0x0051b770) H2_CONST char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
     /* ЦВ */ "\xd6\xc2",
     /* НАС */ "\xcd\xc0\xd1",
     /* ЧАР */ "\xd7\xc0\xd0",
     /* ДОМ */ "\xc4\xce\xcc"
 };
-DATA(0x0051b780) char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+DATA(0x0051b780) H2_CONST char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
     /* Цена верности  */ "\xd6\xe5\xed\xe0\x20\xe2\xe5\xf0\xed\xee\xf1\xf2\xe8\x20",
     /* Наследники */ "\xcd\xe0\xf1\xeb\xe5\xe4\xed\xe8\xea\xe8",
     /* Остров чародеев */ "\xce\xf1\xf2\xf0\xee\xe2\x20\xf7\xe0\xf0\xee\xe4\xe5\xe5\xe2",
     /* Дорога домой */ "\xc4\xee\xf0\xee\xe3\xe0\x20\xe4\xee\xec\xee\xe9"
 };
-DATA(0x0051b790) char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
+DATA(0x0051b790) H2_CONST char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
     /* Это захоронение таит смертельную тишину. */ "\xdd\xf2\xee\x20\xe7\xe0\xf5\xee\xf0\xee\xed\xe5\xed\xe8\xe5\x20\xf2\xe0\xe8\xf2\x20\xf1\xec\xe5"
         "\xf0\xf2\xe5\xeb\xfc\xed\xf3\xfe\x20\xf2\xe8\xf8\xe8\xed\xf3\x2e",
     /* Яма клокочущей грязи всколыхнулась и успокоилась. */ "\xdf\xec\xe0\x20\xea\xeb\xee\xea\xee\xf7\xf3\xf9\xe5\xe9\x20\xe3\xf0\xff\xe7\xe8\x20\xe2\xf1\xea"
@@ -313,7 +313,7 @@ DATA(0x0051b790) char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
         "\xea\xed\xf3\xeb\xe8\x20\xf7\xe5\xf0\xf2\xfb\x20\xf7\xfc\xe8\xf5\x2d\xf2\xee\x20\xeb\xe8\xf6\x20"
         "\xe8\x20\xe8\xf1\xf7\xe5\xe7\xeb\xe8\x2e"
 };
-DATA(0x0051b7a4) char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
+DATA(0x0051b7a4) H2_CONST char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
     /* Неупокоенные духи давно погибших воинов ищут успокоения и соглашаются вступить в вашу армию в надеже найти упокоение. Желаете нанять призраков? */ "\xcd\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xe5\x20\xe4\xf3\xf5\xe8\x20\xe4\xe0\xe2\xed\xee\x20"
         "\xef\xee\xe3\xe8\xe1\xf8\xe8\xf5\x20\xe2\xee\xe8\xed\xee\xe2\x20\xe8\xf9\xf3\xf2\x20\xf3\xf1\xef"
         "\xee\xea\xee\xe5\xed\xe8\xff\x20\xe8\x20\xf1\xee\xe3\xeb\xe0\xf8\xe0\xfe\xf2\xf1\xff\x20\xe2\xf1"
@@ -363,14 +363,14 @@ DATA(0x0051b7a4) char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
         "\xe1\xf0\xe0\xf2\xe8\xf2\xfc\xf1\xff\x20\xe7\xe0\x20\xef\xee\xec\xee\xf9\xfc\xfe\x20\xea\x20\xf1"
         "\xe8\xeb\xe0\xec\x20\xe2\xee\xe4\xfb\x3f\x22"
 };
-DATA(0x0051b7b8) char* xNecromancerShrine =
+DATA(0x0051b7b8) H2_CONST char* xNecromancerShrine =
     /* Темная святыня */ "\xd2\xe5\xec\xed\xe0\xff\x20\xf1\xe2\xff\xf2\xfb\xed\xff";
-DATA(0x0051b7bc) char* xNecromancerShrineDesc =
+DATA(0x0051b7bc) H2_CONST char* xNecromancerShrineDesc =
     /* Увеличивает уровень навыка Некромантии каждого вашего некроманта на 10 процентов. */ "\xd3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2\x20\xf3\xf0\xee\xe2\xe5\xed\xfc\x20\xed\xe0\xe2\xfb"
         "\xea\xe0\x20\xcd\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe8\xe8\x20\xea\xe0\xe6\xe4\xee\xe3\xee\x20\xe2"
         "\xe0\xf8\xe5\xe3\xee\x20\xed\xe5\xea\xf0\xee\xec\xe0\xed\xf2\xe0\x20\xed\xe0\x20\x31\x30\x20\xef"
         "\xf0\xee\xf6\xe5\xed\xf2\xee\xe2\x2e";
-DATA(0x0051b7c0) char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
+DATA(0x0051b7c0) H2_CONST char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
     /* Старший конюх подошел к вам со словами: "У вас отличный конь под седлом и в вашей армии нет неопытных всадников, кого мы могли бы обучить искусству управления боевыми скакунами." */ "\xd1\xf2\xe0\xf0\xf8\xe8\xe9\x20\xea\xee\xed\xfe\xf5\x20\xef\xee\xe4\xee\xf8\xe5\xeb\x20\xea\x20"
         "\xe2\xe0\xec\x20\xf1\xee\x20\xf1\xeb\xee\xe2\xe0\xec\xe8\x3a\x20\x22\xd3\x20\xe2\xe0\xf1\x20\xee"
         "\xf2\xeb\xe8\xf7\xed\xfb\xe9\x20\xea\xee\xed\xfc\x20\xef\xee\xe4\x20\xf1\xe5\xe4\xeb\xee\xec\x20"
@@ -405,7 +405,7 @@ DATA(0x0051b7c0) char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
         "\xf2\xfc\x20\xed\xee\xe2\xfb\xf5\x20\xea\xee\xed\xe5\xe9\x20\xe8\x20\xe2\xe0\xf8\xe8\xec\x20\xe2"
         "\xf1\xe0\xe4\xed\xe8\xea\xe0\xec\x2e\x22"
 };
-DATA(0x0051b7d0) char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+DATA(0x0051b7d0) H2_CONST char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
     /* Джозеф */ "\xc4\xe6\xee\xe7\xe5\xf4",
     /* Джозеф II */ "\xc4\xe6\xee\xe7\xe5\xf4\x20\x49\x49",
     /* Джозеф III */ "\xc4\xe6\xee\xe7\xe5\xf4\x20\x49\x49\x49",
@@ -413,7 +413,7 @@ DATA(0x0051b7d0) char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
     /* Джозеф V */ "\xc4\xe6\xee\xe7\xe5\xf4\x20\x56",
     /* Джозеф VI */ "\xc4\xe6\xee\xe7\xe5\xf4\x20\x56\x49"
 };
-DATA(0x0051b7e8) char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
+DATA(0x0051b7e8) H2_CONST char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
     /* Дядя Иван */ "\xc4\xff\xe4\xff\x20\xc8\xe2\xe0\xed",
     /* Иван II */ "\xc8\xe2\xe0\xed\x20\x49\x49",
     /* Иван III */ "\xc8\xe2\xe0\xed\x20\x49\x49\x49",
@@ -421,12 +421,12 @@ DATA(0x0051b7e8) char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
     /* Иван V */ "\xc8\xe2\xe0\xed\x20\x56",
     /* Иван VI */ "\xc8\xe2\xe0\xed\x20\x56\x49"
 };
-DATA(0x0051b800) char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+DATA(0x0051b800) H2_CONST char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
     /* 1 ступ. */ "\x31\x20\xf1\xf2\xf3\xef\x2e",
     /* 2 ступ. */ "\x32\x20\xf1\xf2\xf3\xef\x2e",
     /* 3 ступ. */ "\x33\x20\xf1\xf2\xf3\xef\x2e"
 };
-DATA(0x0051b80c) char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
+DATA(0x0051b80c) H2_CONST char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     /* Продвижение */ "\xcf\xf0\xee\xe4\xe2\xe8\xe6\xe5\xed\xe8\xe5",
     /* Наступление */ "\xcd\xe0\xf1\xf2\xf3\xef\xeb\xe5\xed\xe8\xe5",
     /* Странствие */ "\xd1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe8\xe5",

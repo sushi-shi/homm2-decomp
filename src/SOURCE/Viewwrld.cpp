@@ -113,7 +113,7 @@ VA(0x004adfb0, 0x2ba)
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     heroWindow* window;
     i8 palette[WORLD_PALETTE_SIZE];
-    char* iconNames[LEGEND_COUNT];
+    H2_CONST char* iconNames[LEGEND_COUNT];
     tag_message legendMessage;
 
     memcpy(palette, gpBufferPalette->m_data, WORLD_PALETTE_SIZE);
@@ -249,12 +249,12 @@ void advManager::VWCompleteDraw(void) {
     u8* endPixel0;
     u8 drawTilesets0[WORLD_TILESET_COUNT];
     u8* pix0;
-    i32 spare;
+    i32 H2_UNUSED(spare);
     i32 cellX;
     b32 heroHere0;
     mapCellExtra* extraCell;
     i32 cellY;
-    i32 dead;
+    i32 H2_UNUSED(dead);
     u32 frame0;
     i32 drawY1;
     i32 screenX;
@@ -844,9 +844,11 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 }
 
 DATA(0x00519af4) i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-            [IDX(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
-                                              4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
-                                              7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
+            [IDX(COORDINATE_AXIS_COUNT)] = {
+    {{3, 3}, {5, 5}, {6, 6}, {8, 5}, {2, 3}, {2, 2}},
+    {{4, 5}, {6, 6}, {8, 8}, {11, 7}, {3, 4}, {3, 3}},
+    {{7, 7}, {8, 8}, {10, 10}, {14, 8}, {3, 6}, {4, 4}}
+};
 DATA(0x00519b18) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
 DATA(0x00519b1c) i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
 DATA(0x00533fb4) b32 gbInViewWorld = false;

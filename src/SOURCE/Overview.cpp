@@ -291,7 +291,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
         if (giOverviewItems[IDX(giOverviewType)] <= OVERVIEW_VISIBLE_ROWS) {
             OVScrollKnob->m_y = SCROLL_KNOB_STATIC_Y;
         } else {
-            i32 unused;
+            i32 H2_UNUSED(unused);
             i32 steps = giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
             float pixelsPerItem = OVERVIEW_SCROLL_KNOB_RANGE_FLOAT / steps;
             OVScrollKnob->m_y = static_cast<i16>(
@@ -612,7 +612,8 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             break;
                     }
 
-                    if ((record->m_buildings & (1 << (building + TOWN_DWELLING_BUILDING_BIT_BASE)))
+                    if ((record->m_buildings
+                         & (1 << (IDX(building) + IDX(TOWN_DWELLING_BUILDING_BIT_BASE))))
                         != 0) {
                         OVERVIEW_ICON_WIDGET(rowIndex, icons) = new iconWidget(
                             static_cast<i16>(
@@ -1564,7 +1565,7 @@ DATA(0x005309b0) class heroWindow* overWin = NULL;
 DATA(0x005309b4) class textWidget** textWidgetDynamic = NULL;
 DATA(0x005309b8) class iconWidget** iconWidgetDynamic = NULL;
 DATA(0x005309bc) OverviewType giOverviewType = OVERVIEW_HEROES;
-DATA(0x005309c0) i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)] = {0};
+DATA(0x005309c0) i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)] = H2_ZERO_INIT;
 DATA(0x005309c8) class iconWidget* OVScrollKnob = NULL;
 DATA(0x0053099c) OverviewType iLastDynamicType;
 DATA(0x00530998) i32 iLastDynamicTop;

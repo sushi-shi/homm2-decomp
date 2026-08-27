@@ -71,7 +71,7 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
 }
 
 VA(0x0043281f, 0x383)
-void ShutdownComError(char* function) {
+void ShutdownComError(H2_CONST char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
     DWORD errorCode = GetLastError();
@@ -147,7 +147,7 @@ void ShutdownComError(char* function) {
 
 VA(0x00432ba2, 0x2fc)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
-    i32 err;
+    i32 H2_UNUSED(err);
     i32 slot;
     BOOL rv;
     DCB state;
@@ -276,7 +276,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
 }
 
 VA(0x00433048, 0x11c)
-i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
+i16 com_snd(i16 portIndex, u16, u16 length, H2_CONST void* data, i32 priority) {
     BOOL result2;
     tag_Node* sendNode2;
 
@@ -354,4 +354,3 @@ void comm_wrt_task(void) {
         H2_FREE(packetNode);
     }
 }
-

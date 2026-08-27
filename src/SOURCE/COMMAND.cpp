@@ -715,7 +715,8 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     CombatHexDirection directionCopy_1 = direction_5;
     CombatHexDirection alternateDirection = COMBAT_DIRECTION_INVALID;
     army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    army* targetArmy_13 = &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
+    army* H2_UNUSED(targetArmy_13) =
+        &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
 
     if (direction_5 == COMBAT_DIRECTION_WIDE_WEST || direction_5 == COMBAT_DIRECTION_WIDE_EAST) {
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
@@ -788,9 +789,9 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 
 VA(0x0042c8fe, 0x5a)
 i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
-    i32 x;
-    i32 y;
-    i32 unusedResult;
+    i32 H2_UNUSED(x);
+    i32 H2_UNUSED(y);
+    i32 H2_UNUSED(unusedResult);
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
         return POINTER_VIEW;
     } else {
@@ -813,7 +814,7 @@ VA(0x0042c958, 0x7f5)
 MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;
-    i32 unusedResult = 0;
+    i32 H2_UNUSED(unusedResult) = 0;
     i32 selectedHex_0;
     tag_message pendingMessage_2;
 
@@ -1086,7 +1087,7 @@ i32 combatManager::IsNegationSphereInEffect(void) {
 
 VA(0x0042d1a5, 0x1c4)
 void combatManager::ResetRound(void) {
-    i32 unusedResetRoundWord6;
+    i32 H2_UNUSED(unusedResetRoundWord6);
 
     m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
     m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
@@ -1143,7 +1144,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
         b32 armyAlive = false;
-        i32 unusedWinWord37;
+        i32 H2_UNUSED(unusedWinWord37);
         i32 armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             if (m_armies[IDX(m_combatResult)][armyIndex].m_monsterType != CREATURE_NONE
@@ -1170,8 +1171,8 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 
 VA(0x0042d56e, 0x3f6)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
-    i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
-    i32 rowPos = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(column) = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(rowPos) = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
     b32 showEnemy_12 = false;
     CombatSide enemySide_27;
@@ -1305,8 +1306,8 @@ smallView:
 
 VA(0x0042d964, 0x1eb)
 i32 combatManager::RightClick(i32 hexIndex) {
-    i32 col = hexIndex % COMBAT_GRID_ROW_LENGTH;
-    i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(col) = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    i32 H2_UNUSED(row) = hexIndex / COMBAT_GRID_ROW_LENGTH;
     if (hexIndex == INVALID_HEX)
         return 0;
 
@@ -1332,7 +1333,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 return 0;
 
             CombatSide side = m_hexCells[hexIndex].m_occupantSide;
-            i32 armyIdx = m_hexCells[hexIndex].m_occupantIndex;
+            i32 H2_UNUSED(armyIdx) = m_hexCells[hexIndex].m_occupantIndex;
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
                     || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
@@ -1369,9 +1370,9 @@ i32 combatManager::RightClick(i32 hexIndex) {
 
 VA(0x0042db4f, 0x32e)
 void combatManager::DoCommand(CombatMessageCommand command) {
-    i32 unusedCommandWord2;
-    i32 unusedCommandWord5;
-    army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+    i32 H2_UNUSED(unusedCommandWord2);
+    i32 H2_UNUSED(unusedCommandWord5);
+    army* H2_UNUSED(currentArmy) = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     switch (command) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
             break;
@@ -1491,7 +1492,7 @@ VA(0x0042de7d, 0x4f3)
 MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     char iconFile_3[WIN_LOSE_ICON_FILENAME_SIZE];
     tag_message animationMessage;
-    i32 finalDelay = WIN_LOSE_INITIAL_DELAY;
+    i32 H2_UNUSED(finalDelay) = WIN_LOSE_INITIAL_DELAY;
     i32 frame;
     i32 iDelay_3;
 
@@ -1658,8 +1659,8 @@ void combatManager::ShowWinLoseArtifact(
     class heroWindow* window,
     H2_ENUM_PARAM(ArtifactType, i32) artifact
 ) {
-    i16 width = CASUALTY_WINDOW_WIDTH;
-    i16 bottom_4 = CASUALTY_WINDOW_BOTTOM;
+    i16 H2_UNUSED(width) = CASUALTY_WINDOW_WIDTH;
+    i16 H2_UNUSED(bottom_4) = CASUALTY_WINDOW_BOTTOM;
     tag_message message;
     char* artifactName;
 
@@ -1892,20 +1893,20 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
 
 VA(0x0042ec2c, 0x9d5)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
-    i16 width = CASUALTY_WINDOW_WIDTH;
+    i16 H2_UNUSED(width) = CASUALTY_WINDOW_WIDTH;
     i32 casualtyType_1[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 spacing_6;
     i32 y_7;
-    i16 bottom_4 = CASUALTY_WINDOW_BOTTOM;
+    i16 H2_UNUSED(bottom_4) = CASUALTY_WINDOW_BOTTOM;
     i32 casualtyCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 side_4;
-    i32 unusedCasualtyWord116;
-    i32 unusedCasualtyWord92;
-    i32 unusedCasualtyWord86;
-    i32 unusedCasualtyWord52;
-    i32 unusedCasualtyWord46;
-    i32 unusedCasualtyWord13;
-    i32 unusedCasualtyWord0;
+    i32 H2_UNUSED(unusedCasualtyWord116);
+    i32 H2_UNUSED(unusedCasualtyWord92);
+    i32 H2_UNUSED(unusedCasualtyWord86);
+    i32 H2_UNUSED(unusedCasualtyWord52);
+    i32 H2_UNUSED(unusedCasualtyWord46);
+    i32 H2_UNUSED(unusedCasualtyWord13);
+    i32 H2_UNUSED(unusedCasualtyWord0);
     i32 casualtyQuantity_13[COMBAT_SIDE_COUNT];
     i32 armyIndex;
     i32 displayedCount;
@@ -2074,7 +2075,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     i32 waitTimer;
     tag_message message;
     CombatSide combatSide;
-    i32 cost;
+    i32 H2_UNUSED(cost);
     i32 necroEligible;
     i32 emptySlots;
     char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
@@ -2301,7 +2302,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 VA(0x00430118, 0x383)
 void combatManager::DoLoseWindow(void) {
     CombatResult losingSide;
-    i32 unusedLoseWord = IDX(COMBAT_RESULT_ATTACKER);
+    i32 H2_UNUSED(unusedLoseWord) = IDX(COMBAT_RESULT_ATTACKER);
     tag_message message;
     char animationFile[WIN_LOSE_ANIMATION_FILENAME_SIZE];
 
@@ -2389,9 +2390,9 @@ void combatManager::DoLoseWindow(void) {
 VA(0x0043049b, 0x3bd)
 i32 combatManager::DoSurrender(void) {
     i32 armyNum;
-    i16 dlgType;
-    i16 dlgResult;
-    i16 lineWidth;
+    i16 H2_UNUSED(dlgType);
+    i16 H2_UNUSED(dlgResult);
+    i16 H2_UNUSED(lineWidth);
     heroWindow* window;
     tag_message message;
 
@@ -2731,7 +2732,7 @@ void combatManager::ResetCyclingCreatures(void) {
     i32 rotateCount = 0;
     i32 index;
     CombatSide sideIndex;
-    i32 unusedRotateWord;
+    i32 H2_UNUSED(unusedRotateWord);
 
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
@@ -3079,8 +3080,8 @@ void combatManager::AddArmy(
 
 VA(0x00432338, 0x13d)
 void combatManager::SetupSmallView(void) {
-    i32 unusedSmallViewWord1;
-    i32 unusedSmallViewWord2;
+    i32 H2_UNUSED(unusedSmallViewWord1);
+    i32 H2_UNUSED(unusedSmallViewWord2);
 
     if (m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] == COMBAT_SIDE_NONE
         && m_smallViewLastX[IDX(COMBAT_DEFENDER_SIDE)] != SMALL_VIEW_POSITION_NONE) {

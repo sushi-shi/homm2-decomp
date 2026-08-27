@@ -13,7 +13,7 @@ H2_ENUM_BEGIN(SampleConstant)
 H2_ENUM_END(SampleConstant)
 
 VA(0x004ce250, 0x210)
-sample::sample(char* name)
+sample::sample(H2_CONST char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -66,7 +66,7 @@ sample::sample(char* name)
 }
 
 VA(0x004ce490, 0x8b)
-inline sample::~sample() {
+H2_RETAIL_INLINE sample::~sample() {
     if (gpSoundManager != NULL)
         gpSoundManager->StopSample(this);
 #line 97
@@ -75,7 +75,7 @@ inline sample::~sample() {
 }
 
 VA(0x004ce520, 0xbd)
-MIDIWrap::MIDIWrap(char* name)
+MIDIWrap::MIDIWrap(H2_CONST char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -90,7 +90,7 @@ MIDIWrap::MIDIWrap(char* name)
 }
 
 VA(0x004ce610, 0x3d)
-inline MIDIWrap::~MIDIWrap() {
+H2_RETAIL_INLINE MIDIWrap::~MIDIWrap() {
 #line 118
     H2_FREE(m_data);
     m_data = NULL;

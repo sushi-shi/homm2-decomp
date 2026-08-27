@@ -63,7 +63,7 @@ void town::GiveSpells(hero* targetHero) {
 
 VA(0x004a4167, 0xa5)
 void town::XformToCastle(void) {
-    i32 objectType;
+    i32 H2_UNUSED(objectType);
     gpGame->ConvertObject(
         m_x + RANDOM_TOWN_LEFT,
         m_y + RANDOM_TOWN_TOP,

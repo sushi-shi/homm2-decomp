@@ -621,10 +621,10 @@ public:
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void NoShowCombatLog(char*);
+    void NoShowCombatLog(H2_CONST char*);
     void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(char*, i32, i32, i32);
+    void CombatMessage(H2_CONST char*, i32, i32, i32);
     void CombatMessage(CombatMessageCommand);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
@@ -782,7 +782,7 @@ public:
     void SetupAdjacencyArray(void);
     void UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32));
     void GenerateMap(void);
-    char* GetBackgroundName(void);
+    H2_CONST char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
     void LoadIcons(void);
     void FreeIcons(void);

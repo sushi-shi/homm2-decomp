@@ -63,9 +63,9 @@ textEntryWidget::textEntryWidget(
     i16 height,
     i16 maxLength,
     char* text,
-    char* fontName,
+    H2_CONST char* fontName,
     H2_ENUM_PARAM(FontDrawMode, i16) color,
-    char* iconName,
+    H2_CONST char* iconName,
     i16 iconFrame,
     i16 id,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
@@ -100,7 +100,7 @@ textEntryWidget::textEntryWidget(
 }
 
 VA(0x004d1f00, 0x5b)
-inline textEntryWidget::~textEntryWidget() {
+H2_RETAIL_INLINE textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 

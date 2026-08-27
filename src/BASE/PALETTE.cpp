@@ -20,7 +20,7 @@ palette::palette(u32l id)
 }
 
 VA(0x004cafe0, 0x46)
-inline palette::~palette() {
+H2_RETAIL_INLINE palette::~palette() {
     if (m_data != NULL)
         H2_FREE(m_data);
     m_data = NULL;

@@ -66,16 +66,16 @@ struct PCXHeader {
 SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
-void* BaseAlloc(u32, char*, i32);
-void BaseFree(void*, char*, i32);
+void* BaseAlloc(u32, H2_CONST char*, i32);
+void BaseFree(void*, H2_CONST char*, i32);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
-u32l MAKEFILEID(char* text);
+u32l MAKEFILEID(H2_CONST char* text);
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key);
 void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
-void ProcessAssert(i32 condition, char* file, i32 line);
+void ProcessAssert(i32 condition, H2_CONST char* file, i32 line);
 // Gold 2.1 abandoned the file/line debug allocator: BaseAlloc/BaseFree are
 // still compiled into Misc but have zero retail callers - every allocation
 // site lowers to plain operator new/delete (435/524 direct calls image-wide).
@@ -83,8 +83,11 @@ void ProcessAssert(i32 condition, char* file, i32 line);
 #define H2_FREE(ptr) delete (ptr)
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
-char* FindStringInString(char* text, char* pattern);
+char* FindStringInString(char* text, H2_CONST char* pattern);
 char* FindToken(char* text, char token);
+#if H2_STRICT_ENUMS
+H2_CONST char* FindToken(H2_CONST char* text, char token);
+#endif
 char* FindLastToken(char* text, char token);
 void SetInstallDefaults(void);
 void SetGameDefaults(void);
@@ -102,17 +105,17 @@ void SetPalette(i8*, i32);
 void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
-void LogStr(char*);
-void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
+void LogStr(H2_CONST char*);
+void LogInt(H2_CONST char*, i32, i32, i32, i32, i32, i32, i32);
 #if H2_STRICT_ENUMS
 template <typename Enum>
     requires __is_enum(Enum)
-inline void LogInt(char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+inline void LogInt(H2_CONST char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
 #endif
-void AiPrint(char*);
-void AbsAiPrint(char*);
+void AiPrint(H2_CONST char*);
+void AbsAiPrint(H2_CONST char*);
 void FadeTo(u8*, u8*, i32);
 void FadeToColorTable(u8*, i32);
 i32 IsCycleColor(i32 color);
@@ -124,7 +127,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(char*, char*, i32, char*, i32, i32);
+void GetDataEntry(H2_CONST char*, char*, i32, H2_CONST char*, i32, i32);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 H2_ENUM_CLASS_BEGIN(DataEntryPhase)

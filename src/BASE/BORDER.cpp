@@ -31,7 +31,7 @@ border::border(
     i16 e,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 fillColor,
-    char* name
+    H2_CONST char* name
 )
     : widget(x, y, w, h, e, kind) {
     if (name != NULL)
@@ -43,7 +43,7 @@ border::border(
 }
 
 VA(0x004cb1d0, 0x7f)
-inline border::~border() {
+H2_RETAIL_INLINE border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
     if (m_backgroundIcon != NULL)

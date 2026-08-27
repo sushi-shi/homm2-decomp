@@ -17,7 +17,7 @@ tileset::tileset(u32l id)
 }
 
 VA(0x004ce1c0, 0x33)
-inline tileset::~tileset() {
+H2_RETAIL_INLINE tileset::~tileset() {
     H2_FREE(m_data);
 }
 

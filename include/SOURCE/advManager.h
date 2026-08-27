@@ -203,7 +203,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32));
+    H2_CONST char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32));
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
@@ -263,14 +263,14 @@ public:
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
     void EventSound(H2_ENUM_PARAM(MapObjectType, i32), i32, SAMPLE2*);
-    void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
+    void EventWindow(i32, i32, H2_CONST char*, i32, i32, i32, i32, i32);
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
     void GiveResource(class hero*, ResourceType, i32);
     void RecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), class mapCell*);
-    i32 SkeletonEvent(class hero*, class mapCell*, char*, i32, i32);
-    i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
-    i32 GhostEvent(class hero*, class mapCell*, char*, i32, i32);
+    i32 SkeletonEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
+    i32 ZombieEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
+    i32 GhostEvent(class hero*, class mapCell*, H2_CONST char*, i32, i32);
     void HouseEvent(class hero*, class mapCell*);
     CombatResult CombatMonsterEvent(
         class hero*,

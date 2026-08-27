@@ -107,7 +107,7 @@ H2_ENUM_BEGIN(CombatSmallViewStatRow)
 H2_ENUM_END(CombatSmallViewStatRow)
 
 VA(0x00437d10, 0x38)
-void combatManager::NoShowCombatLog(char* message) {
+void combatManager::NoShowCombatLog(H2_CONST char* message) {
     char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
     sprintf(logMessage, "NC: %s", message);
     LogStr(logMessage);
@@ -156,7 +156,9 @@ void combatManager::CheckUpdateCombatMessages(void) {
 DATA(0x005242fc) static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
 
 VA(0x00437e48, 0x3a7)
-void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPrevious, i32 clear) {
+void combatManager::CombatMessage(
+    H2_CONST char* message, i32 updateScreen, i32 retainPrevious, i32 clear
+) {
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
     char* newlinePtr;
     tag_message windowMessage;
@@ -574,8 +576,8 @@ CopyGridState:
 VA(0x00438d17, 0x341)
 void combatManager::DrawBackground(void) {
     icon* backgroundIcon;
-    i32 unusedBackgroundHeight;
-    i32 unusedBackgroundSide;
+    i32 H2_UNUSED(unusedBackgroundHeight);
+    i32 H2_UNUSED(unusedBackgroundSide);
 
     if (gbNoShowCombat != 0)
         return;
@@ -880,14 +882,14 @@ void combatManager::DrawFrame(
 ) {
     i32 col;
     CombatDrawLayer row;
-    i32 unusedDrawState1;
+    i32 H2_UNUSED(unusedDrawState1);
     H2_ENUM_STORAGE_STEPPED(ArmyDrawState, i32) state;
     b32 extentChanged1;
-    i32 unusedDrawState26;
-    i32 unused7;
-    i32 unusedDrawState8;
-    i32 unusedDrawState;
-    i32 gridWasShowing1;
+    i32 H2_UNUSED(unusedDrawState26);
+    i32 H2_UNUSED(unused7);
+    i32 H2_UNUSED(unusedDrawState8);
+    i32 H2_UNUSED(unusedDrawState);
+    i32 H2_UNUSED(gridWasShowing1);
     i32 endColumn;
     b32 skipSpecialOccupants8;
     i32 columnStep1;
@@ -1455,10 +1457,10 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
          {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
     };
     b32 oldLimit;
-    i32 unusedSpell1;
+    i32 H2_UNUSED(unusedSpell1);
     army* smallArmy;
     IconDrawResult drawResult1;
-    i32 unusedSlot;
+    i32 H2_UNUSED(unusedSlot);
     i32 viewX1;
     i32 iconX9;
     i32 spellSlot1;

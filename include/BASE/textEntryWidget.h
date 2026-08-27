@@ -50,9 +50,9 @@ public:
         i16 height,
         i16 maxLength,
         char* text,
-        char* fontName,
+        H2_CONST char* fontName,
         H2_ENUM_PARAM(FontDrawMode, i16) color,
-        char* iconName,
+        H2_CONST char* iconName,
         i16 iconFrame,
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind,
@@ -60,7 +60,7 @@ public:
         i32 horizontalInset,
         i32 verticalInset
     );
-    virtual inline ~textEntryWidget() OVERRIDE;
+    virtual H2_RETAIL_INLINE ~textEntryWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(H2_ENUM_PARAM(TextEntryReadMode, i32));

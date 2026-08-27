@@ -524,7 +524,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
 }
 
 VA(0x0047e376, 0x161)
-void CheckDoMain(i32 a1, i32 doMain) {
+void CheckDoMain(i32 H2_UNUSED(a1), i32 doMain) {
     if (iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS < KBTickCount()
         || glTimers[0] < KBTickCount()) {
         Process1WindowsMessage();
@@ -680,7 +680,7 @@ inline town* GetCastleSlot(i32 id) {
 VA(0x0047e8cf, 0x4b5)
 void philAI::CheckBuyStuff(void) {
     b32 done = false;
-    b32 bought = false;
+    b32 H2_UNUSED(bought) = false;
     BHC bestBuy;
     town* dockTown;
 
@@ -1180,7 +1180,7 @@ void ValidateHero(hero* pHero) {
         if (pHero->m_army.m_creatureTypes[i] != CREATURE_NONE) {
             if (pHero->m_army.m_creatureTypes[i] < CREATURE_PEASANT
                 || pHero->m_army.m_creatureTypes[i] >= CREATURE_COUNT) {
-                i32 j = 1;
+                i32 H2_UNUSED(j) = 1;
                 j++;
             }
         }
@@ -1204,7 +1204,7 @@ void philAI::DoAI(i32 player) {
     i32 savedShow3[3];
     mapCell* eventCell3;
     i32 pathIndex0;
-    i32 unusedVars1[7];
+    i32 H2_UNUSED(unusedVars1)[7];
     i32 moveFlagB12;
     i32 moveFlagA3;
     town* townPtr9;
@@ -1544,7 +1544,7 @@ void philAI::GetTurnAIVars(i32 player) {
     i32 lateTurn40;
     i32 x3;
     float winChance11;
-    i32 unusedFightValue9;
+    i32 H2_UNUSED(unusedFightValue9);
     float fightValueFloat0;
     hero* heroPtr0;
     mapCell* cell10;
@@ -1795,7 +1795,7 @@ firstWeekDone:
 }
 
 VA(0x00481580, 0x59f)
-void philAI::GetBestBHC(i32 player, BHC& best) {
+void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
     float bhcValue = 1.0f;
     float topVal = -99.0f;
     i32 totalStrength = 0;
@@ -2257,7 +2257,7 @@ void philAI::ProbableOutcomeOfBattle(
     float difficulty;
     i32 j;
     float attackerPower;
-    i32 notUsed;
+    i32 H2_UNUSED(notUsed);
     float defStrong;
     i32 aArt = 0;
     i32 experience;
@@ -2966,7 +2966,7 @@ void philAI::ValueOfBuyingHero(
     i32 rvCost;
     b32 spellCaster;
     i32 i;
-    i32 j;
+    i32 H2_UNUSED(j);
     i32 heroRV;
 
     heroCost[IDX(RES_WOOD)] = 0;
@@ -3192,7 +3192,7 @@ i32 philAI::RVOfPosition(
     i32 strategicEventValue0;
     i32 currentStrategicValue3;
     MapObjectType debugObjectType0;
-    i32 unusedValue3;
+    i32 H2_UNUSED(unusedValue3);
     i32 targetLiveChance12;
     i32 eventValue5;
     i32 strategicDelta5;
@@ -3352,14 +3352,14 @@ i32 philAI::StrategicValueOfPosition(
     i32 extraDistance
 ) {
     i32 seedDist;
-    i32 scratch;
+    i32 H2_UNUSED(scratch);
     i32 eventPoints;
     H2_ENUM_STORAGE(TerrainType, i32) terrain2;
     i32 xPos;
     i32 inBoat;
     i32 dangerVal;
     b32 madeSearch;
-    i32 extra;
+    i32 H2_UNUSED(extra);
     i32 worth;
     i32 yy;
     i32 heroIndex;
@@ -3648,7 +3648,7 @@ i32 philAI::FightValueOfStack(
     i32 useEnemyMods
 ) {
     i32 armyValue;
-    float rangeVal;
+    float H2_UNUSED(rangeVal);
     town* townPtr;
     float closeCombat;
     i32 castleValue;
@@ -3978,7 +3978,7 @@ i32 philAI::QuickCombat(
 ) {
     i32 defExp;
     float roll;
-    armyGroup* army;
+    armyGroup* H2_UNUSED(army);
     i32 attTotal;
     i32 result;
     i32 atkExp;
@@ -3988,10 +3988,10 @@ i32 philAI::QuickCombat(
     hero* winHero;
     float fracLost;
     i32 attackerDead;
-    i32 spare1;
+    i32 H2_UNUSED(spare1);
     b32 attackerWin;
     i32 slot;
-    i32 tmp;
+    i32 H2_UNUSED(tmp);
     float chanceWin;
     i32 defenderDead;
     i32 attackerRemaining;
@@ -4185,7 +4185,7 @@ void philAI::HeroInteractionAtHero(
     hero* recipientHero0;
     hero* currentHero9;
     float desiredShare6;
-    hero* savedHero9;
+    hero* H2_UNUSED(savedHero9);
 
     *value = 0;
     if (evaluateOnly != 0 && firstHero->m_id != iAlphaMale
@@ -4303,7 +4303,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     armyGroup* fromArmy;
     b32 townBetter;
     i32 winStrength;
-    i32 scratchVal;
+    i32 H2_UNUSED(scratchVal);
     float townShare;
     i32 whichSpell;
     armyGroup* secondArmy;
@@ -4516,7 +4516,7 @@ void philAI::RedistributeTroops(
     i32 preserveOne,
     i32 preferFast,
     i32 sourceStrength,
-    i32 destinationStrength,
+    i32 H2_UNUSED(destinationStrength),
     i32 transferBudget
 ) {
     i32 howMany;
@@ -4668,7 +4668,7 @@ void philAI::ChooseEvaluateBattle(
     i32 val;
     i32 jb;
     float idx;
-    i32 p;
+    i32 H2_UNUSED(p);
 
     ProbableOutcomeOfBattle(ag1, h1, ag2, h2, NULL, a, b, (h2 != NULL ? h2->m_owner : -1), idx, jb, kn, nb, node, val);
     val = static_cast<i32>(val + c * idx);
@@ -4683,7 +4683,9 @@ void philAI::ChooseEvaluateBattle(
 
 VA(0x00487b1f, 0xbd)
 i32 philAI::ChooseToFightForArtifact(
-    ArtifactType artifact, H2_ENUM_PARAM(CreatureType, i32) monster, i32 quantity
+    ArtifactType artifact,
+    H2_ENUM_PARAM(CreatureType, i32) monster,
+    i32 H2_UNUSED(quantity)
 ) {
     i32 remainB;
     i32 remainA;
@@ -4932,7 +4934,10 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
 
 VA(0x0048839b, 0x156)
 i32 philAI::CombatMonsterEvent(
-    hero* h, H2_ENUM_PARAM(CreatureType, i32) monType, i32* pCount, mapCell* cell
+    hero* h,
+    H2_ENUM_PARAM(CreatureType, i32) monType,
+    i32* pCount,
+    mapCell* H2_UNUSED(cell)
 ) {
     i32 kn;
     float idx;
@@ -4966,7 +4971,7 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
     i32 combatResult3;
     i32 monsterCount3;
     float attackerLoss5;
-    i32 unusedValue10;
+    i32 H2_UNUSED(unusedValue10);
     i32 stackIndex0;
     float defenderLoss8;
     CreatureType monsterType4;
@@ -5223,12 +5228,12 @@ void philAI::IncrementHourGlass(void) {
 VA(0x00488c35, 0x1f6)
 void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
     town* pTown;
-    i32 quickResult;
+    i32 H2_UNUSED(quickResult);
     float defenderLoss;
     float attackerLoss;
     hero* defenderHero;
     CombatResult combatResult;
-    i32 owner;
+    i32 H2_UNUSED(owner);
 
     pTown = GetCastleSlot(cell->m_objectMetadata);
     owner = giCurPlayer;
@@ -5397,31 +5402,31 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
 VA(0x0048911d, 0x19b2)
 i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance) {
     mapCell* theCell;
-    i32 oracleState;
+    i32 H2_UNUSED(oracleState);
     i32 armySlot;
-    i32 artifactState[3];
+    i32 H2_UNUSED(artifactState)[3];
     b32 freeFlag;
-    i32 cellState[3];
+    i32 H2_UNUSED(cellState)[3];
     H2_ENUM_STORAGE(ResourceType, i32) res;
     i32 prize;
-    i32 purchaseState[3];
+    i32 H2_UNUSED(purchaseState)[3];
     i32 amount;
-    i32 pyramidState;
+    i32 H2_UNUSED(pyramidState);
     i32 bBattleWon;
-    i32 ruinState;
+    i32 H2_UNUSED(ruinState);
     i32 numToBuy;
-    i32 lampState;
+    i32 H2_UNUSED(lampState);
     CreatureType buyCreature;
-    i32 combatState;
+    i32 H2_UNUSED(combatState);
     i32 eventRV;
-    i32 townState[9];
+    i32 H2_UNUSED(townState)[9];
     i32 i;
     i32 gateX;
     mapCell* exitCell;
     i32 exitRV;
     i32 gateY;
-    i32 chosenExitY;
-    i32 chosenExitX;
+    i32 H2_UNUSED(chosenExitY);
+    i32 H2_UNUSED(chosenExitX);
     i32 costList[AI_PURCHASE_RESOURCE_COUNT];
     i32 positionValue;
     i32 exitLiveChance;
@@ -6073,11 +6078,11 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
 
 VA(0x0048aacf, 0x274)
 i32 philAI::EvaluateGenericSite(mapCell* cell) {
-    i32 level;
+    i32 H2_UNUSED(level);
     i32 value;
     i32 badArtifacts;
     GenericSiteType genericType;
-    i32 unusedValue;
+    i32 H2_UNUSED(unusedValue);
     i32 slot;
     i32 count;
     CreatureType unitType;
@@ -6177,7 +6182,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 nb;
     i32 val;
     i32 kn;
-    i32 jb29;
+    i32 H2_UNUSED(jb29);
     i16 lvl;
     recruitmentSiteType = static_cast<RecruitSiteType>(cell->m_tentColor);
     recruitmentSiteType =
@@ -6286,12 +6291,12 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     i32 idx;
     float chance;
     i32 result;
-    i32 extraValue;
+    i32 H2_UNUSED(extraValue);
     i32 guardRV;
     i32 plainVal;
-    i32 junkVal;
+    i32 H2_UNUSED(junkVal);
     i32 newOutcome;
-    i32 unusedRV;
+    i32 H2_UNUSED(unusedRV);
     i32 lostA;
     i32 lostB;
     i32 remainA;
@@ -6574,7 +6579,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
 
     float winChance;
     i32 result;
-    i32 scratch;
+    i32 H2_UNUSED(scratch);
     i32 attackerLost;
     i32 defenderLost;
     i32 aliveA;

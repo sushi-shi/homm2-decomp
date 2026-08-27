@@ -48,19 +48,19 @@ H2_ENUM_END(ArenaConstant)
 
 VA(0x004b2ba0, 0x3bb)
 i32 DoArenaDialog(void) {
-    i32 statValue0;
-    i32 statValue2;
-    i32 statValue3;
-    i32 statValue7;
+    i32 H2_UNUSED(statValue0);
+    i32 H2_UNUSED(statValue2);
+    i32 H2_UNUSED(statValue3);
+    i32 H2_UNUSED(statValue7);
     i32 windowLines2 = WINDOW_RESOURCE;
-    i16 widgetMode10 = 1;
-    i32 windowWidth = WINDOW_WIDTH;
+    i16 H2_UNUSED(widgetMode10) = 1;
+    i32 H2_UNUSED(windowWidth) = WINDOW_WIDTH;
     i32 windowHeight16 = windowLines2 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
     i32 windowX4 = WINDOW_X;
     i32 windowY3 = (WINDOW_SCREEN_HEIGHT - windowHeight16) / WINDOW_CENTER_DIVISOR;
     char windowName7[WINDOW_NAME_SIZE];
     i32 lineCount11;
-    i32 textHeight4;
+    i32 H2_UNUSED(textHeight4);
     tag_message message14;
     i32 widgetIndex1;
     textWidget* statWidgets0[CHOICE_COUNT];
@@ -111,7 +111,8 @@ i32 DoArenaDialog(void) {
             TEXT_Y,
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
-            gStatNames[widgetIndex1],
+            // Retail passes static text into a widget that assumes ownership.
+            const_cast<char*>(gStatNames[widgetIndex1]),
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
@@ -145,10 +146,10 @@ i32 DoArenaDialog(void) {
 
 VA(0x004b2f5b, 0x1e1)
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
-    tag_message dialogMessage_12;
-    i32 widgetIndex_5;
-    i32 type_13;
-    i32 extra_18;
+    tag_message H2_UNUSED(dialogMessage_12);
+    i32 H2_UNUSED(widgetIndex_5);
+    i32 H2_UNUSED(type_13);
+    i32 H2_UNUSED(extra_18);
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(

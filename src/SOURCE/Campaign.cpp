@@ -848,7 +848,7 @@ void game::InitCampaignMap(void) {
     i32 heroPriorityBest3;
     i32 bestHeroPositionCandidate;
     i32 selectedChoicePosition0;
-    i32 mapHeaderResultCampaign3;
+    i32 H2_UNUSED(mapHeaderResultCampaign3);
     CampaignBonusHeroPosition bonusHeroIndexPosition;
 
     selectedChoicePosition0 = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
@@ -1095,9 +1095,32 @@ void game::InitCampaignMap(void) {
 
 DATA(0x004f0828) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
-    39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
-    557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
-    335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
+    {{39, 336},
+     {113, 336},
+     {150, 294},
+     {187, 336},
+     {261, 336},
+     {335, 336},
+     {409, 378},
+     {409, 294},
+     {483, 336},
+     {557, 336},
+     {-1, -1},
+     {261, 378},
+     {-1, -1}},
+    {{39, 336},
+     {113, 336},
+     {187, 294},
+     {187, 378},
+     {261, 336},
+     {335, 336},
+     {372, 294},
+     {409, 336},
+     {483, 294},
+     {483, 378},
+     {557, 336},
+     {261, 294},
+     {261, 378}}
 };
 DATA(0x005240b4) class heroWindow* campWin = NULL;
 DATA(0x005240ac) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;

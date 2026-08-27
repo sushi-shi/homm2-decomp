@@ -212,17 +212,17 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     u32 oddMasks[COMBAT_SIDE_COUNT];
     CombatHexDirection dirIndex;
     u32l totalArmyStrength;
-    combatManager* combat;
-    i32 fifth;
+    combatManager* H2_UNUSED(combat);
+    i32 H2_UNUSED(fifth);
     u32 shooters[COMBAT_SIDE_COUNT];
     i32 archers;
     u32 mirrorMask[COMBAT_SIDE_COUNT];
     i32 rowIndex;
-    b32 archeryBonus;
+    b32 H2_UNUSED(archeryBonus);
     i32 plusArchers;
     i32 keepStrength;
     i32 grade;
-    town* pCastle;
+    town* H2_UNUSED(pCastle);
     u8 rowLimit[COMBAT_AI_CASTLE_BOUNDARY_COUNT];
     i32 adjCell;
     hexcell* targetCell;
@@ -909,7 +909,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 oneBit;
     u32 enemyMask;
     CombatHexDirection direction;
-    i32 hexes;
+    i32 H2_UNUSED(hexes);
     i32 enemyArmy;
     i32 destHex;
 
@@ -954,7 +954,7 @@ i32 combatManager::WalkTowardArmyFront(
     i32 frontDelta;
     i32 frontHex;
     i32 oldSpeed;
-    i32 pathFound;
+    i32 H2_UNUSED(pathFound);
     i32 left;
     i32 step;
 
@@ -1018,7 +1018,7 @@ i32 combatManager::WalkTowardArmy(
     i32 pathNdx;
     army* targetPtr;
     i32 targetSquare;
-    i32 path;
+    i32 H2_UNUSED(path);
 
     targetStack = GetClosestArmy(currentArmy, side, mask);
 

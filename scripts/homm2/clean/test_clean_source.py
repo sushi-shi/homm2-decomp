@@ -55,7 +55,6 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertEqual(
             set(clean_source.GENERATED_PATCHES),
             {
-                "include/BASE/Misc.h",
                 "src/BASE/INPUTMGR.cpp",
                 "src/BASE/Misc.cpp",
                 "src/BASE/TEXTWDGT.cpp",
@@ -118,20 +117,21 @@ class CleanSourcePatchTests(unittest.TestCase):
             clean_source.apply_patches("src/BASE/Misc.cpp", misc_source),
         )
 
-    def test_makefileid_does_not_modify_literals(self):
-        declaration = clean_source.apply_patches(
-            "include/BASE/Misc.h",
-            "u32l MAKEFILEID(char* text);",
+    def test_makefileid_const_is_encoded_in_source(self):
+        declaration = clean_source.clean(
+            "u32l MAKEFILEID(H2_CONST char* text);"
         )
-        self.assertEqual(declaration, "u32l MAKEFILEID(const char* text);")
+        self.assertEqual(declaration, "u32l MAKEFILEID(const char* text);\n")
 
-        source = """u32l MAKEFILEID(char* text) {
+        source = """u32l MAKEFILEID(H2_CONST char* text) {
     char buf[260];
     strcpy(buf, text);
     return buf[0];
 }
 H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = 0;"""
-        result = clean_source.apply_patches("src/BASE/Misc.cpp", source)
+        result = clean_source.clean(
+            clean_source.apply_patches("src/BASE/Misc.cpp", source)
+        )
         self.assertIn("u32l MAKEFILEID(const char* text)", result)
         self.assertIn("strcpy(buf, text);", result)
         self.assertNotIn("text[i] &=", result)
@@ -179,6 +179,30 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         self.assertEqual(
             clean_source.clean("void __stdcall callback();\n"),
             "void __stdcall callback();\n",
+        )
+
+    def test_retail_unused_names_become_standard_attributes(self):
+        self.assertEqual(
+            clean_source.clean("i32 H2_UNUSED(frameSlot);\n"),
+            "i32 frameSlot [[maybe_unused]];\n",
+        )
+
+    def test_retail_const_marker_becomes_const(self):
+        self.assertEqual(
+            clean_source.clean("H2_CONST char* text;\n"),
+            "const char* text;\n",
+        )
+
+    def test_retail_only_inline_marker_is_removed(self):
+        self.assertEqual(
+            clean_source.clean("H2_RETAIL_INLINE void helper();\n"),
+            " void helper();\n",
+        )
+
+    def test_retail_zero_initializer_becomes_value_initialization(self):
+        self.assertEqual(
+            clean_source.clean("Record value = H2_ZERO_INIT;\n"),
+            "Record value = {};\n",
         )
 
     def test_multiline_comment_preserves_line_breaks(self):
@@ -522,6 +546,9 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             self.assertIn("-Ivendor/audiere-1.9.2", ninja)
             self.assertIn("-O0", ninja)
             self.assertIn("-mno-sse -mno-sse2 -mfpmath=387", ninja)
+            self.assertIn("-Wformat-security", ninja)
+            self.assertIn("-Wno-error=format-security", ninja)
+            self.assertNotIn("-Werror=format-security", ninja)
             self.assertIn(
                 "build $builddir/obj/example.o: cxx src/example.cpp",
                 ninja,

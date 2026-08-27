@@ -6,18 +6,18 @@
 void ModemSetup(i32);
 i32l Dial(void);
 i32l Wait(void);
-void GUIModemCommand(char*, char*);
+void GUIModemCommand(H2_CONST char*, H2_CONST char*);
 i8 GUIModemCommandExec(void);
-void ModemCommand(char*);
-i8 GUIModemResponse(char*, char*);
+void ModemCommand(H2_CONST char*);
+i8 GUIModemResponse(H2_CONST char*, H2_CONST char*);
 i8 GUIModemResponseExec(void);
-i32 write_buffer(char*, i32);
+i32 write_buffer(H2_CONST char*, i32);
 i32 read_byte(void);
 void write_byte(i32);
 void Connect(void);
 i32 WaitForDirectConnect(void);
 char ReadPacket(void);
-void WriteModemPacket(char*, i32);
+void WriteModemPacket(H2_CONST char*, i32);
 
 H2_ENUM_BEGIN(ModemConstant)
     MODEM_MODE_DIAL                  = 3,

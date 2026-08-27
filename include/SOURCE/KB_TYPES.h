@@ -820,7 +820,7 @@ typedef sample* SAMPLE2;
 struct SWinSetup {
     u8 windowId;
     u16 widgetId;
-    char* text;
+    H2_CONST char* text;
 };
 SIZE(SWinSetup, 7);
 #pragma pack(pop)

@@ -24,18 +24,18 @@ public:
         i16 width,
         i16 height,
         char* text,
-        char* fontName,
+        H2_CONST char* fontName,
         H2_ENUM_PARAM(FontDrawMode, i16) color,
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind,
         H2_ENUM_PARAM(FontAlignment, i16) alignment
     );
-    virtual inline ~textWidget() OVERRIDE;
+    virtual H2_RETAIL_INLINE ~textWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);
     void SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color);
-    void SetText(char* text);
+    void SetText(H2_CONST char* text);
 };
 #pragma pack(pop)
 SIZE(textWidget, 0x2b);

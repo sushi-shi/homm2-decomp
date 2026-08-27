@@ -285,7 +285,7 @@ void arithCodeBitPlusFollow(BitStream* bs, UInt32 bit) {
 }
 
 VA(0x004c72c0, 0x29)
-void arithCodeStartEncoding(BitStream* bs) {
+void arithCodeStartEncoding(BitStream* H2_UNUSED(bs)) {
     bigL = 0;
     bigR = TWO_TO_THE(smallB - 1);
     bitsOutstanding = 0;
@@ -311,7 +311,7 @@ void arithCodeStartDecoding(BitStream* bs) {
 }
 
 VA(0x004c7390, 0xb)
-void arithCodeDoneDecoding(BitStream* bs) {
+void arithCodeDoneDecoding(BitStream* H2_UNUSED(bs)) {
 
 }
 
@@ -1761,7 +1761,7 @@ VA(0x004ca4a0, 0x5)
 void cleanUpAndFail(void) {}
 
 VA(0x004ca4b0, 0xb)
-void panic(char* s) {}
+void panic(char* H2_UNUSED(s)) {}
 
 VA(0x004ca4c0, 0x45)
 void crcError(UInt32 crcStored, UInt32 crcComputed) {
@@ -1848,7 +1848,7 @@ void bitStreamEOF(void) {
 }
 
 VA(0x004ca650, 0x2c)
-void __cdecl mySignalCatcher(IntNative* n) {
+void __cdecl mySignalCatcher(IntNative* H2_UNUSED(n)) {
     sprintf(
         gText,
         "\n%s: Control-C (or similar) caught, quitting.\n",
@@ -1859,7 +1859,7 @@ void __cdecl mySignalCatcher(IntNative* n) {
 }
 
 VA(0x004ca680, 0x65)
-void mySIGSEGVorSIGBUScatcher(IntNative* n) {
+void mySIGSEGVorSIGBUScatcher(IntNative* H2_UNUSED(n)) {
     if (compressing) {
         sprintf(
             gText,
@@ -1928,7 +1928,7 @@ VA(0x004ca800, 0xa4)
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    IntNative retVal;
+    IntNative H2_UNUSED(retVal);
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1949,7 +1949,7 @@ VA(0x004ca8b0, 0xc2)
 void uncompress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    Bool magicNumberOK;
+    Bool H2_UNUSED(magicNumberOK);
     IntNative retVal;
 
     strcpy(inName, name);
@@ -1971,9 +1971,9 @@ void uncompress(Char* name) {
 
 VA(0x004ca980, 0x259)
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
-    char fname[450] = {0};
+    char fname[450] = H2_ZERO_INIT;
     i32 fd;
-    i32 result;
+    i32 H2_UNUSED(result);
     FILE* fp;
     i32l flen;
 
@@ -2013,9 +2013,9 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
 
 VA(0x004cabe0, 0x266)
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
-    char fname[450] = {0};
+    char fname[450] = H2_ZERO_INIT;
     i32 fd;
-    i32 result;
+    i32 H2_UNUSED(result);
     FILE* fp;
     i32l flen;
 

@@ -58,7 +58,7 @@ i32 DDAppPaint(void*, void*);
 void DDInitializePalette(void);
 i32 DDSetPalette(void);
 struct IDirectDrawSurface* DDCreateSurface(u32l, u32l, i32);
-void DDSD(i32, char*, i32);
+void DDSD(i32, H2_CONST char*, i32);
 void __cdecl DDUpdatePalette(i8*);
 void DDCleanUpWinGraphics(void);
 void DDSetFullScreenStatus(i32);

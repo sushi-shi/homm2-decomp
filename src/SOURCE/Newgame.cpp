@@ -235,7 +235,7 @@ H2_ENUM_END(NewGameKeyEncoding)
 VA(0x004754b0, 0x1d2)
 void game::GetMap(void) {
     // Unreferenced, but retail's frame reserves its 28 bytes above loadResult.
-    tag_message dlgMessage;
+            tag_message H2_UNUSED(dlgMessage);
     fileRequester* requesterResult;
     i32 loadResult;
     char fileMask[FILE_MASK_CAPACITY];
@@ -314,7 +314,7 @@ void game::InitNewGame(struct SMapHeader* header) {
     i32 humanCount;
     NewGamePlayerSetupType playerType;
     i32 player;
-    i32 unusedTally;
+    i32 H2_UNUSED(unusedTally);
     i32 activeColorCount;
     i32 computerCount;
 
@@ -889,7 +889,7 @@ cleanup:
         b32 playerLockedValue;
         tag_message message;
         i32 playerIndex;
-        i32 unusedPlayer17;
+        i32 H2_UNUSED(unusedPlayer17);
 
         strcpy(gText, m_mapHeader.name);
         message.type = MESSAGE_WIDGET;
@@ -1032,7 +1032,7 @@ cleanup:
         char mapPacketLocal[GAME_MAP_PACKET_SIZE];
         tag_message mapWindowMessageTemp;
         i32 helpDialogIndexLocal;
-        i32 unusedSender;
+        i32 H2_UNUSED(unusedSender);
         char mapNamePacket[MAP_HEADER_NAME_SIZE];
 
         if (!gbNewGameShadowHidden) {
@@ -1579,7 +1579,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_DELETE:
-            if (NGKPcursorIndex < strlen(cNGKPCore)) {
+            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore)) {
                 strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
             }
@@ -1591,7 +1591,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (NGKPcursorIndex < strlen(cNGKPCore))
+            if (static_cast<size_t>(NGKPcursorIndex) < strlen(cNGKPCore))
                 ++NGKPcursorIndex;
             break;
 

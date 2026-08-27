@@ -122,22 +122,22 @@ namespace {
 VA(0x00424320, 0xf10)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     u32l captainQuarters;
-    i32 tileX;
-    i32 tileY;
+    i32 H2_UNUSED(tileX);
+    i32 H2_UNUSED(tileY);
     i32 terrainIconFrame;
     i32 column;
     i32 rowPos;
     widget* backgroundWidget;
     i32 raceBase;
-    i16 builtFrame;
+    i16 H2_UNUSED(builtFrame);
     i32 slotNum;
     char icnName[TOWN_OBJECT_FILENAME_SIZE];
     i32 backFrame;
-    i16 noBuildFrame;
+    i16 H2_UNUSED(noBuildFrame);
     char captainStatLine[CAPTAIN_STAT_LINE_CAPACITY];
     i32 stateFrame;
     tag_message msg;
-    i16 cannotAffordIcon;
+    i16 H2_UNUSED(cannotAffordIcon);
 
     casWin = window;
     builtFrame = IDX(FRAME_BUILT);
@@ -476,7 +476,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     H2_ENUM_STORAGE(BuildingSlotType, i32) whichBuilding;
     b32 quickFlag;
     i32 ret;
-    i16 statusWidgetId;
+    i16 H2_UNUSED(statusWidgetId);
 
     statusWidgetId = IDX(CONTROL_STATUS_TEXT);
     whichBuilding = BUILDING_SLOT_NONE;

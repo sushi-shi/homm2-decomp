@@ -35,7 +35,7 @@ void IconToBitmapYModify(
     i32 x,
     i32 y,
     i32 frame,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) H2_UNUSED(clip),
     i32 clipX,
     i32 clipY,
     i32 clipW,

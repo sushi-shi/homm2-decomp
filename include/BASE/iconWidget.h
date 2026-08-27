@@ -34,14 +34,14 @@ public:
         i16 y,
         i16 width,
         i16 height,
-        char* iconName,
+        H2_CONST char* iconName,
         i16 frame,
         H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 fillColor
     );
-    virtual inline ~iconWidget() OVERRIDE;
+    virtual H2_RETAIL_INLINE ~iconWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);

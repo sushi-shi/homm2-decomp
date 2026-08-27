@@ -34,7 +34,7 @@ DATA(0x00524548) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType =
 DATA(0x0052454c) static i32 gSearchNextX = 0;
 DATA(0x00524550) static i32 gSearchDirection = 0;
 DATA(0x00524554) static mapCell* gSearchCurrentCell = NULL;
-DATA(0x00524558) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = {0};
+DATA(0x00524558) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT] = H2_ZERO_INIT;
 DATA(0x005245d0) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain = 0;
 DATA(0x005245d4) static i32 gSearchMiddle = 0;
 DATA(0x005245d8) static searchNode* gSearchCell = NULL;
@@ -316,16 +316,16 @@ void searchArray::TestPossibleDirections(
 
 VA(0x0044a68f, 0x277)
 void searchArray::SeedCombatPosition(class army* unit) {
-    i32 unused04;
+    i32 H2_UNUSED(unused04);
     army* enemy_a;
-    i32 unused0c;
-    i32 unused10_a;
-    i32 unused1c_g;
-    i32 unused18;
+    i32 H2_UNUSED(unused0c);
+    i32 H2_UNUSED(unused10_a);
+    i32 H2_UNUSED(unused1c_g);
+    i32 H2_UNUSED(unused18);
     i32 index;
-    i32 unused28_o;
+    i32 H2_UNUSED(unused28_o);
     i32 hex_c;
-    i32 unused20_a;
+    i32 H2_UNUSED(unused20_a);
 
     for (index = 0; index < COMBAT_HEX_COUNT; index++)
         gpCombatManager->m_hexCells[index].m_pathReachable = 0;
@@ -389,11 +389,11 @@ i32 searchArray::FindCombatPath(
     i32 moveMask;
     i32 distance;
     i32 bestDistance_e;
-    i32 unused1c_a;
+    i32 H2_UNUSED(unused1c_a);
     i32 result_e;
     u8* path_d;
     i32 attackTargetHex_a;
-    i32 unused20;
+    i32 H2_UNUSED(unused20);
     i32 attackMask;
     i32 bestHex_j;
     searchNode node_g;

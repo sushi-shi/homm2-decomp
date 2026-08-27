@@ -109,14 +109,14 @@ void RemoteCleanup(void) {
 VA(0x0048d1ac, 0x5ff)
 void RemoteMain(RemoteGameMode gameMode) {
     i8 gotPlayers[REMOTE_PLAYER_COUNT];
-    i32 playerState;
+    i32 H2_UNUSED(playerState);
     char* gameMsg;
     char* recvData;
     i32 netPlayer;
     b32 pending;
     b32 savedColorMice;
     i32 player;
-    i32 setupCounter;
+    i32 H2_UNUSED(setupCounter);
 
     gbInRemoteMain = true;
     bGotGameType = false;
@@ -326,7 +326,7 @@ i32 calc_crc_long(u8* data, i32 length) {
     u32 q;
     u32 cksum;
     u32 sum;
-    i32 c;
+    i32 H2_UNUSED(c);
 
     cksum = 0;
     sum = 0;
@@ -369,7 +369,7 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
 VA(0x0048d93c, 0x10d)
 i32 DecodePacket(u8* data, i32) {
     u16 crc;
-    i32 res;
+    i32 H2_UNUSED(res);
     u16 crc2[CRC_STORAGE_WORD_COUNT];
     char text[REMOTE_ERROR_TEXT_SIZE];
     u32 len;
@@ -407,9 +407,9 @@ VA(0x0048da49, 0x158)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 size;
     b32 out;
-    i32 retry;  // unreferenced; retail's frame reserves the slot
+    i32 H2_UNUSED(retry);  // unreferenced; retail's frame reserves the slot
     i32 sendStatus;
-    u8 remotePacket[REMOTE_MESSAGE_SIZE];
+    u8 H2_UNUSED(remotePacket)[REMOTE_MESSAGE_SIZE];
 
     out = true;
     if (destination == REMOTE_BROADCAST_PLAYER && bUseDirectPlay == 0 && bUseWinsock == 0) {
@@ -509,7 +509,7 @@ i32 TransmitRemoteData(
 ) {
     i32 rv;
     i32 i;
-    i32 j;  // unreferenced; retail's frame reserves the slot
+    i32 H2_UNUSED(j);  // unreferenced; retail's frame reserves the slot
     RemoteMessage msg;
     i32 tries;
 
@@ -820,7 +820,7 @@ i32 TransmitAndWait(
     i32 clock;
     b8 complete;
     char* receivedData;
-    i32 unusedResponseStatus;
+    i32 H2_UNUSED(unusedResponseStatus);
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;

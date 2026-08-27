@@ -805,7 +805,7 @@ void swapManager::SwapArtifacts(void) {
 
 VA(0x004a3699, 0x14e)
 void swapManager::SwapMons(void) {
-    i32 selectedArmyCount = 0;
+    i32 H2_UNUSED(selectedArmyCount) = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
         if (m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
             && m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
@@ -946,13 +946,13 @@ void swapManager::Update(void) {
 
 VA(0x004a3c30, 0x381)
 void swapManager::SplitMons(void) {
-    i16 textControl;
+    i16 H2_UNUSED(textControl);
     armyGroup* targetTroops;
     armyGroup* selectedArmy;
     i32 openSlot;
-    i16 unusedAmountControl;
+    i16 H2_UNUSED(unusedAmountControl);
     tag_message message;
-    i32 dlgState;
+    i32 H2_UNUSED(dlgState);
 
     unusedAmountControl = SPLIT_AMOUNT_CONTROL;
     dlgState = 0;

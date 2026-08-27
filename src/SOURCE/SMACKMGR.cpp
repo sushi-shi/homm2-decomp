@@ -149,14 +149,14 @@ void SmackManagerMain(void) {
     b32 musicStarted0;
     b32 companionStarted26;
     b32 primaryStarted7;
-    i32 unusedOne8;
+    i32 H2_UNUSED(unusedOne8);
     HDIGDRIVER digitalDriver5;
     i32 savedVolume8;
-    i32 unusedPlaybackState0;
+    i32 H2_UNUSED(unusedPlaybackState0);
     char path7[MOVIE_PATH_SIZE];
     i8 savedPalette4[PALETTE_DATA_SIZE];
-    i32 unusedFrameCount18;
-    i32 unusedFrameHead04;
+    i32 H2_UNUSED(unusedFrameCount18);
+    i32 H2_UNUSED(unusedFrameHead04);
 
     gpSoundManager->SaveBackend();
     unusedOne8 = 1;

@@ -207,9 +207,9 @@ public:
         return m_players[player].m_color;
     }
     i32 GetMineId(i32, i32);
-    i32 SaveGame(char*, i32, i8);
+    i32 SaveGame(H2_CONST char*, i32, i8);
     void SetupOrigData(void);
-    void LoadGame(char*, i32, i32);
+    void LoadGame(H2_CONST char*, i32, i32);
     void GiveTroopsToNeutralTown(i32);
     void GiveTroopsToNeutralTowns(void);
     void NewMap(char*);

@@ -25,7 +25,7 @@ H2_ENUM_END(NetbiosSetupConstant)
 VA(0x00473830, 0x11c)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
-    i32 reserved;
+    i32 H2_UNUSED(reserved);
     i32 needName;
 
     switch (iInitNetHostStatus) {
@@ -195,7 +195,7 @@ i8 WaitForGuest(void) {
 
 VA(0x00473bd6, 0x18c)
 i32 nbnet_init(void) {
-    i32 unused;
+    i32 H2_UNUSED(unused);
 
     LogStr("GUON1");
     switch (GameMode) {

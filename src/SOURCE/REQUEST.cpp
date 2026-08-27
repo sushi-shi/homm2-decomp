@@ -76,7 +76,7 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
 H2_ENUM_END(FileRequesterPrivateConstant)
 
 VA(0x0048e730, 0x70)
-i32 GetMapHeader(char* filename, struct SMapHeader* header) {
+i32 GetMapHeader(H2_CONST char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = open(gText, _O_BINARY);
     if (file == -1) {
@@ -476,7 +476,7 @@ VA(0x0048f737, 0x1124)
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
-    i32 mouseX;
+    i32 H2_UNUSED(mouseX);
     b32 acceptStep = false;
     i32 iResult;
     i32 lengthIndex;
@@ -1023,14 +1023,14 @@ void fileRequester::DoKnob(void) {
 
 VA(0x00490ab6, 0xa9e)
 void fileRequester::Update(i32 drawWindow) {
-    i32 unusedState;
-    double gutterSpan;
-    i32 localState;
+    i32 H2_UNUSED(unusedState);
+    double H2_UNUSED(gutterSpan);
+    i32 H2_UNUSED(localState);
     tag_message message;
-    char localStorage1[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
+    char H2_UNUSED(localStorage1)[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
     i32 i;
     double gutterStepCount1;
-    i32 unusedState7;
+    i32 H2_UNUSED(unusedState7);
 
     message.type = MESSAGE_WIDGET;
     localState = 0;
@@ -1211,7 +1211,7 @@ void fileRequester::Update(i32 drawWindow) {
 }
 
 VA(0x00491554, 0x12b)
-char* fileRequester::GetFilename(void) {
+H2_CONST char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
         && (m_selectedIndex < 0 || m_selectedIndex >= m_fileCount)) {
         return cFRDummy;
@@ -1238,7 +1238,7 @@ char* fileRequester::GetFilename(void) {
 
 
 DATA(0x00516adc) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-DATA(0x00516ae0) char* cFRDummy = "";
+DATA(0x00516ae0) H2_CONST char* cFRDummy = "";
 DATA(0x00533d78) float fGutterMinY;
 DATA(0x00533d7c) float fGutterTravelLength;
 DATA(0x00533d80) i32 iMaxListSize;

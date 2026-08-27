@@ -138,8 +138,8 @@ public:
     ExpansionCampaignId Choose(void);
     i16 Days(void);
     i32 CampaignID(void);
-    char* JosephName(void);
-    char* IvanName(void);
+    H2_CONST char* JosephName(void);
+    H2_CONST char* IvanName(void);
     i8 IsSpecialGoldenBow(i32, i32);
     i8 IsSpecialUA(void);
     i8 IsSpecialLossCondition(i32);

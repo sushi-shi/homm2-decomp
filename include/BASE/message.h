@@ -221,7 +221,7 @@ SIZE(tag_messageHoverPayload, 0x18);
 
 union tag_messageWidgetData {
     i32 value;
-    char* text;
+    H2_CONST char* text;
 };
 SIZE(tag_messageWidgetData, 0x4);
 

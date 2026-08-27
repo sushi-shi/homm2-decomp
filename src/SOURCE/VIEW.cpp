@@ -74,26 +74,26 @@ VA(0x004ad4b0, 0x6f9)
 i32 combatManager::ViewGeneral(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
 ) {
-    i16 msgConst37;
-    i16 msgConst4;
-    i16 msgConst10;
-    i16 msgConst3;
-    i16 msgConst29;
-    i16 msgConst2;
+    i16 H2_UNUSED(msgConst37);
+    i16 H2_UNUSED(msgConst4);
+    i16 H2_UNUSED(msgConst10);
+    i16 H2_UNUSED(msgConst3);
+    i16 H2_UNUSED(msgConst29);
+    i16 H2_UNUSED(msgConst2);
     i32 luck14;
-    i16 msgConst1;
+    i16 H2_UNUSED(msgConst1);
     i32 morale11;
-    i16 msgConst7;
-    i16 msgConst6;
-    i16 msgConst5;
-    i16 msgConst17;
-    i16 msgConst18;
-    i16 msgConst15;
-    i32 cost2;
+    i16 H2_UNUSED(msgConst7);
+    i16 H2_UNUSED(msgConst6);
+    i16 H2_UNUSED(msgConst5);
+    i16 H2_UNUSED(msgConst17);
+    i16 H2_UNUSED(msgConst18);
+    i16 H2_UNUSED(msgConst15);
+    i32 H2_UNUSED(cost2);
     heroWindow* generalWindow26;
-    i16 msgConst28;
+    i16 H2_UNUSED(msgConst28);
     tag_message message16;
-    i16 msgConst26;
+    i16 H2_UNUSED(msgConst26);
 
     if (m_heroes[IDX(side)] == NULL)
         return 0;
@@ -242,23 +242,23 @@ i32 combatManager::ViewGeneral(
 
 VA(0x004adba9, 0x286)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 msgConst8;
-    i16 msgConst28;
-    i16 msgConst1;
-    i16 msgConst19;
-    i16 msgConst6;
+    i16 H2_UNUSED(msgConst8);
+    i16 H2_UNUSED(msgConst28);
+    i16 H2_UNUSED(msgConst1);
+    i16 H2_UNUSED(msgConst19);
+    i16 H2_UNUSED(msgConst6);
     b32 handled28;
-    i16 msgConst0;
-    i16 msgConst18;
-    i16 msgConst17;
-    i16 msgConst3;
-    i16 msgConst4;
+    i16 H2_UNUSED(msgConst0);
+    i16 H2_UNUSED(msgConst18);
+    i16 H2_UNUSED(msgConst17);
+    i16 H2_UNUSED(msgConst3);
+    i16 H2_UNUSED(msgConst4);
     i32 helpIndex36;
     i32 hintIndex11;
-    i16 msgConst5;
-    i16 msgConst9;
-    i16 msgConst7;
-    i16 msgConst15;
+    i16 H2_UNUSED(msgConst5);
+    i16 H2_UNUSED(msgConst9);
+    i16 H2_UNUSED(msgConst7);
+    i16 H2_UNUSED(msgConst15);
     msgConst18 = GENERAL_NAME_WIDGET;
     msgConst5 = GENERAL_PORTRAIT_WIDGET;
     msgConst0 = GENERAL_COLOR_WIDGET;
@@ -366,13 +366,13 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 VA(0x004ade2f, 0x143)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         i32 xWnd;
-        i16 viewYOffsetConst;
+        i16 H2_UNUSED(viewYOffsetConst);
         i32 yWindow;
         i32 xDelta;
-        i16 viewXOffsetFixed;
+        i16 H2_UNUSED(viewXOffsetFixed);
         CombatSide side;
-        i16 viewWidthConstant;
-        i16 viewHeightConstant;
+        i16 H2_UNUSED(viewWidthConstant);
+        i16 H2_UNUSED(viewHeightConstant);
 
     if (viewedArmy == NULL)
         return;
