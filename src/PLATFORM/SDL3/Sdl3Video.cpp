@@ -35,6 +35,7 @@ bool Video::Open(const DisplayMode& mode) {
         std::fprintf(stderr, "[homm2] SDL_InitSubSystem(video): %s\n", SDL_GetError());
         return false;
     }
+    m_videoInitialized = true;
 
     m_size = {mode.width, mode.height};
     const int windowWidth = mode.width * scale;
@@ -77,20 +78,7 @@ bool Video::Open(const DisplayMode& mode) {
         return false;
     }
 
-    m_texture = SDL_CreateTexture(
-        m_renderer,
-        SDL_PIXELFORMAT_XRGB8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        mode.width,
-        mode.height
-    );
-    if (m_texture == nullptr) {
-        std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
-        Close();
-        return false;
-    }
-    if (!SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST)) {
-        std::fprintf(stderr, "[homm2] SDL_SetTextureScaleMode: %s\n", SDL_GetError());
+    if (!CreateTexture()) {
         Close();
         return false;
     }
@@ -123,6 +111,53 @@ void Video::Close() {
     m_presented.clear();
     m_expanded.clear();
     m_size = {};
+    if (m_videoInitialized) {
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        m_videoInitialized = false;
+    }
+}
+
+bool Video::CreateTexture() {
+    m_texture = SDL_CreateTexture(
+        m_renderer,
+        SDL_PIXELFORMAT_XRGB8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        m_size.width,
+        m_size.height
+    );
+    if (m_texture == nullptr) {
+        std::fprintf(stderr, "[homm2] SDL_CreateTexture: %s\n", SDL_GetError());
+        return false;
+    }
+    if (!SDL_SetTextureScaleMode(m_texture, SDL_SCALEMODE_NEAREST)) {
+        std::fprintf(stderr, "[homm2] SDL_SetTextureScaleMode: %s\n", SDL_GetError());
+        SDL_DestroyTexture(m_texture);
+        m_texture = nullptr;
+        return false;
+    }
+    return true;
+}
+
+bool Video::HandleRenderEvent(Uint32 type, SDL_WindowID windowId) {
+    if (m_window == nullptr || windowId != SDL_GetWindowID(m_window)) {
+        return true;
+    }
+    if (type == SDL_EVENT_RENDER_DEVICE_LOST) {
+        std::fprintf(stderr, "[homm2] SDL render device lost\n");
+        return false;
+    }
+    if (type == SDL_EVENT_RENDER_DEVICE_RESET) {
+        if (m_texture != nullptr) {
+            SDL_DestroyTexture(m_texture);
+            m_texture = nullptr;
+        }
+        if (!CreateTexture()) {
+            return false;
+        }
+        m_presentationFailureLogged = false;
+    }
+    Present();
+    return true;
 }
 
 std::uint8_t* Video::Pixels() {

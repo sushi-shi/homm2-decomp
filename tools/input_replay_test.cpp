@@ -18,6 +18,7 @@ bool ResolveKey(
     std::string_view name,
     platform::Key& key,
     unsigned& scanCode,
+    unsigned& physicalCode,
     unsigned& character
 ) {
     if (name != "A") {
@@ -25,6 +26,7 @@ bool ResolveKey(
     }
     key = platform::Key::A;
     scanCode = 0x1e;
+    physicalCode = 4;
     character = 'A';
     return true;
 }
@@ -78,6 +80,7 @@ int main() {
             && event.type == Event::Type::KeyDown
             && event.key == platform::Key::A
             && event.scanCode == 0x1e
+            && event.physicalCode == 4
             && event.character == 'A',
         "equal timestamps retain source order"
     );

@@ -16,6 +16,7 @@ using ReplayKeyResolver = bool (*)(
     std::string_view name,
     Key& key,
     unsigned& scanCode,
+    unsigned& physicalCode,
     unsigned& character
 );
 
