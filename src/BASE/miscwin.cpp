@@ -80,7 +80,8 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         presentSource,
         {destinationX, destinationY}
     );
-    platform::Video().Present();
+    // BlitBitmapToScreen can call this low-level path several times while it
+    // composes the software cursor. Its owner presents the completed frame.
 }
 
 i16 AutoInitSVGA(void) {
