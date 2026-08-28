@@ -304,11 +304,18 @@ extern "C" void PollSound(void) {
     if (gbInPollSound)
         return;
     gbInPollSound = true;
-    if (glTimers[GLOBAL_MOUSE_TIMER_SLOT] < platform::Ticks() && !gbPutzingWithMouseCtr) {
+    if (platform::TickDeadlineExpired(
+            static_cast<u32>(glTimers[GLOBAL_MOUSE_TIMER_SLOT]),
+            static_cast<u32>(platform::Ticks())
+        )
+        && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = platform::Ticks() + MOUSE_UPDATE_INTERVAL;
         gpMouseManager->NewUpdate(0);
     }
-    if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < platform::Ticks()) {
+    if (platform::TickDeadlineExpired(
+            static_cast<u32>(glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]),
+            static_cast<u32>(platform::Ticks())
+        )) {
         if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT
             || giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = platform::Ticks() + COMBAT_COLOR_CYCLE_INTERVAL;
@@ -324,7 +331,10 @@ extern "C" void PollSound(void) {
         if (bDoColorCycle)
             CycleColors(0);
     }
-    if (glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] < platform::Ticks()) {
+    if (platform::TickDeadlineExpired(
+            static_cast<u32>(glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]),
+            static_cast<u32>(platform::Ticks())
+        )) {
         glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = platform::Ticks() + SOUND_POLL_INTERVAL;
         if (gbForegroundApp)
             gpSoundManager->PollSound();
