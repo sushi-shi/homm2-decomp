@@ -359,6 +359,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_legacy_presentation_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME legacy_presentation COMMAND homm2_legacy_presentation_test)
+  add_test(NAME legacy_presentation_policy
+    COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_SOURCE_DIR}/tools/legacy_presentation_policy.py
+      ${CMAKE_SOURCE_DIR})
   add_executable(homm2_filesystem_test tools/filesystem_test.cpp)
   target_include_directories(homm2_filesystem_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
