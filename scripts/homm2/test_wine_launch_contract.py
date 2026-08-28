@@ -56,9 +56,14 @@ class WineLaunchContractTest(unittest.TestCase):
                 "{ printf 'wine'; for argument do printf '\\t%s' \"$argument\"; done; "
                 "printf '\\n'; } >> \"$HOMM2_TEST_WINE_LOG\"\n"
             )
+            (commands / "wineserver").write_text(
+                "#!/bin/sh\n"
+                "{ printf 'wineserver'; for argument do printf '\\t%s' \"$argument\"; done; "
+                "printf '\\n'; } >> \"$HOMM2_TEST_WINE_LOG\"\n"
+            )
             for command in ("wine", "wineboot", "wineserver"):
                 path = commands / command
-                if command != "wine":
+                if command == "wineboot":
                     path.write_text("#!/bin/sh\nexit 0\n")
                 path.chmod(0o755)
 
@@ -77,7 +82,8 @@ class WineLaunchContractTest(unittest.TestCase):
             self.assertEqual((game / "HMM2PL.exe").read_bytes(), original)
             self.assertFalse((game / ".wine-compat").exists())
 
-            launch = log.read_text().splitlines()[-1].split("\t")
+            commands_run = [line.split("\t") for line in log.read_text().splitlines()]
+            launch = [command for command in commands_run if command[0] == "wine"][-1]
             self.assertEqual(
                 launch,
                 [
@@ -88,6 +94,20 @@ class WineLaunchContractTest(unittest.TestCase):
                     "/I0",
                     "/I1",
                 ],
+            )
+            self.assertEqual(commands_run[-1], ["wineserver", "-k"])
+
+            (commands / "wine").write_text(
+                "#!/bin/sh\n"
+                "{ printf 'wine'; for argument do printf '\\t%s' \"$argument\"; done; "
+                "printf '\\n'; } >> \"$HOMM2_TEST_WINE_LOG\"\n"
+                "if [ \"${1:-}\" = explorer ]; then exit 37; fi\n"
+            )
+            failed = subprocess.run([runner], check=False, env=environment)
+            self.assertEqual(failed.returncode, 37)
+            self.assertEqual(
+                log.read_text().splitlines()[-1].split("\t"),
+                ["wineserver", "-k"],
             )
 
     def test_provisioner_requires_the_resource_link_output(self):
