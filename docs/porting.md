@@ -75,6 +75,13 @@ width and packed layouts. Additional systems belong under `PLATFORM`.
 Video, input, audio, and cinematics use the platform layer. Network transports
 are not supported yet.
 
+The legacy renderer can perform several low-level blits while temporarily
+drawing and restoring the software cursor. Those blits update the platform
+framebuffer, but the completed result is presented only once by the owning
+high-level screen blit. This keeps intermediate cursor and sprite composition
+out of the visible SDL frame while preserving the original scrolling source
+rectangle.
+
 ## Deterministic input replay
 
 The SDL3 host can replay timestamped framebuffer input without coupling the
