@@ -85,6 +85,7 @@ bool InputReplay::Load(
                     name,
                     replay.event.key,
                     replay.event.scanCode,
+                    replay.event.physicalCode,
                     replay.event.character
                 )) {
                 error = {lineNumber, "unknown or missing key name"};

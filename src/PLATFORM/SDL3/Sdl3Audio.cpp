@@ -42,9 +42,11 @@ public:
             std::fprintf(stderr, "[homm2] SDL_InitSubSystem(audio): %s\n", SDL_GetError());
             return false;
         }
+        m_audioInitialized = true;
         m_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
         if (m_device == 0) {
             std::fprintf(stderr, "[homm2] SDL_OpenAudioDevice: %s\n", SDL_GetError());
+            Close();
             return false;
         }
         return true;
@@ -60,6 +62,10 @@ public:
         if (m_device != 0) {
             SDL_CloseAudioDevice(m_device);
             m_device = 0;
+        }
+        if (m_audioInitialized) {
+            SDL_QuitSubSystem(SDL_INIT_AUDIO);
+            m_audioInitialized = false;
         }
     }
 
@@ -289,6 +295,7 @@ private:
     }
 
     SDL_AudioDeviceID m_device = 0;
+    bool m_audioInitialized = false;
     VoiceId m_nextVoice = 1;
     std::map<VoiceId, Voice> m_voices;
     Voice m_music;

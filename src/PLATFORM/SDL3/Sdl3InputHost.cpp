@@ -167,12 +167,14 @@ bool ResolveReplayKey(
     std::string_view name,
     Key& key,
     unsigned& scanCode,
+    unsigned& physicalCode,
     unsigned& character
 ) {
     const std::string ownedName(name);
     const SDL_Scancode code = SDL_GetScancodeFromName(ownedName.c_str());
     key = TranslateKey(code);
     scanCode = ToSetOneScanCode(code);
+    physicalCode = static_cast<unsigned>(code);
     character = name.size() == 1 ? static_cast<unsigned char>(name.front()) : 0;
     return code != SDL_SCANCODE_UNKNOWN && key != Key::Unknown;
 }
@@ -339,14 +341,18 @@ private:
             return;
         }
         if (event.type == Event::Type::KeyDown && event.scanCode != 0) {
-            const auto [iterator, inserted] = m_pressedKeys.emplace(event.scanCode, event);
+            const unsigned identity = event.physicalCode != 0 ? event.physicalCode
+                                                               : event.scanCode;
+            const auto [iterator, inserted] = m_pressedKeys.emplace(identity, event);
             if (inserted) {
                 ++m_keyCounts[static_cast<int>(event.key)];
             }
             return;
         }
         if (event.type == Event::Type::KeyUp && event.scanCode != 0) {
-            const auto pressed = m_pressedKeys.find(event.scanCode);
+            const unsigned identity = event.physicalCode != 0 ? event.physicalCode
+                                                               : event.scanCode;
+            const auto pressed = m_pressedKeys.find(identity);
             if (pressed == m_pressedKeys.end()) {
                 return;
             }
@@ -487,12 +493,21 @@ private:
             event.type = down ? Event::Type::KeyDown : Event::Type::KeyUp;
             event.key = TranslateKey(code);
             event.scanCode = ToSetOneScanCode(code);
+            event.physicalCode = static_cast<unsigned>(sdlEvent.key.scancode);
             event.modifiers = TranslateModifiers(sdlEvent.key.mod);
             const SDL_Keycode key = sdlEvent.key.key;
             event.character = key > 0 && key < 128 ? static_cast<unsigned>(key) : 0;
             m_input.Push(std::move(event));
             return;
         }
+
+        case SDL_EVENT_RENDER_TARGETS_RESET:
+        case SDL_EVENT_RENDER_DEVICE_RESET:
+        case SDL_EVENT_RENDER_DEVICE_LOST:
+            if (!m_video.HandleRenderEvent(sdlEvent.type, sdlEvent.render.windowID)) {
+                RequestQuit();
+            }
+            return;
 
         case SDL_EVENT_TEXT_INPUT:
             event.type = Event::Type::TextInput;

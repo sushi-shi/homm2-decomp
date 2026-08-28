@@ -374,6 +374,12 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR})
   target_link_libraries(homm2_platform_primitives_test PRIVATE homm2_platform)
   add_test(NAME platform_primitives COMMAND homm2_platform_primitives_test)
+  add_executable(homm2_platform_runtime_test
+    tools/platform_runtime_test.cpp
+    src/PLATFORM/Runtime.cpp)
+  target_include_directories(homm2_platform_runtime_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME platform_runtime COMMAND homm2_platform_runtime_test)
   add_executable(homm2_platform_backend_test tools/platform_backend_test.cpp)
   target_include_directories(homm2_platform_backend_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

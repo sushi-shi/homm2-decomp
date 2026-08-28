@@ -38,6 +38,23 @@ bool SetEnvironment(const char* name, const std::string& value) {
 #endif
 }
 
+void PushKey(Uint32 type, SDL_Scancode scanCode, SDL_Keycode keyCode, SDL_Keymod modifiers) {
+    SDL_Event event {};
+    event.type = type;
+    event.key.scancode = scanCode;
+    event.key.key = keyCode;
+    event.key.mod = modifiers;
+    SDL_PushEvent(&event);
+}
+
+std::size_t CountEvents(platform::Event::Type type) {
+    return static_cast<std::size_t>(std::count_if(
+        gEvents.begin(),
+        gEvents.end(),
+        [type](const platform::Event& event) { return event.type == type; }
+    ));
+}
+
 }
 
 int main() {
@@ -57,6 +74,7 @@ int main() {
     valid &= Expect(SetEnvironment("HOMM2_DATA", data.string()), "data environment");
     valid &= Expect(SetEnvironment("XDG_DATA_HOME", state.string()), "state environment");
     valid &= Expect(platform::Startup(), "startup");
+    valid &= Expect(SDL_WasInit(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0, "clean subsystems");
     if (!valid) {
         std::filesystem::remove_all(root, error);
         return 1;
@@ -68,6 +86,7 @@ int main() {
     mode.scale = 1;
     mode.title = "HoMM2 platform test";
     valid &= Expect(platform::Video().Open(mode), "dummy video open");
+    valid &= Expect(SDL_WasInit(SDL_INIT_VIDEO) == SDL_INIT_VIDEO, "video initialized");
     if (platform::Video().Pixels() != nullptr) {
         std::fill_n(
             platform::Video().Pixels(),
@@ -81,8 +100,12 @@ int main() {
     } else {
         valid &= Expect(false, "video pixels");
     }
+    platform::Video().Close();
+    valid &= Expect(SDL_WasInit(SDL_INIT_VIDEO) == 0, "video subsystem released");
+    valid &= Expect(platform::Video().Open(mode), "dummy video reopen");
 
     valid &= Expect(platform::Audio().Open(), "dummy audio open");
+    valid &= Expect(SDL_WasInit(SDL_INIT_AUDIO) == SDL_INIT_AUDIO, "audio initialized");
     const std::uint8_t silence[32] = {};
     platform::SoundData sound;
     sound.samples = silence;
@@ -91,6 +114,9 @@ int main() {
     valid &= Expect(voice != 0, "dummy sound playback");
     platform::Audio().StopVoice(voice);
     valid &= Expect(platform::Audio().PlaySound(sound, 127, -2) == 0, "invalid loop count");
+    platform::Audio().Close();
+    valid &= Expect(SDL_WasInit(SDL_INIT_AUDIO) == 0, "audio subsystem released");
+    valid &= Expect(platform::Audio().Open(), "dummy audio reopen");
 
     const platform::Address address;
     valid &= Expect(
@@ -165,6 +191,43 @@ int main() {
         "released mouse state"
     );
 
+    PushKey(SDL_EVENT_KEY_DOWN, SDL_SCANCODE_LCTRL, SDLK_LCTRL, SDL_KMOD_LCTRL);
+    PushKey(
+        SDL_EVENT_KEY_DOWN,
+        SDL_SCANCODE_RCTRL,
+        SDLK_RCTRL,
+        static_cast<SDL_Keymod>(SDL_KMOD_LCTRL | SDL_KMOD_RCTRL)
+    );
+    platform::PumpEvents();
+    valid &= Expect(platform::Input().IsKeyDown(platform::Key::Control), "both controls held");
+    PushKey(SDL_EVENT_KEY_UP, SDL_SCANCODE_LCTRL, SDLK_LCTRL, SDL_KMOD_RCTRL);
+    platform::PumpEvents();
+    valid &= Expect(
+        platform::Input().IsKeyDown(platform::Key::Control),
+        "right control survives left release"
+    );
+    PushKey(SDL_EVENT_KEY_UP, SDL_SCANCODE_RCTRL, SDLK_RCTRL, SDL_KMOD_NONE);
+    platform::PumpEvents();
+    valid &= Expect(!platform::Input().IsKeyDown(platform::Key::Control), "controls released");
+
+    PushKey(SDL_EVENT_KEY_DOWN, SDL_SCANCODE_LALT, SDLK_LALT, SDL_KMOD_LALT);
+    PushKey(
+        SDL_EVENT_KEY_DOWN,
+        SDL_SCANCODE_RALT,
+        SDLK_RALT,
+        static_cast<SDL_Keymod>(SDL_KMOD_LALT | SDL_KMOD_RALT)
+    );
+    platform::PumpEvents();
+    PushKey(SDL_EVENT_KEY_UP, SDL_SCANCODE_LALT, SDLK_LALT, SDL_KMOD_RALT);
+    platform::PumpEvents();
+    valid &= Expect(
+        platform::Input().IsKeyDown(platform::Key::Alt),
+        "right alt survives left release"
+    );
+    PushKey(SDL_EVENT_KEY_UP, SDL_SCANCODE_RALT, SDLK_RALT, SDL_KMOD_NONE);
+    platform::PumpEvents();
+    valid &= Expect(!platform::Input().IsKeyDown(platform::Key::Alt), "alts released");
+
     gEvents.clear();
     platform::RequestQuit();
     platform::PumpEvents();
@@ -180,13 +243,43 @@ int main() {
 
     platform::SetEventHandler(nullptr);
     platform::Shutdown();
+    valid &= Expect(SDL_WasInit(0) == 0, "SDL shutdown balances subsystems");
 
     std::ifstream persisted(userGames / "platform.bin", std::ios::binary);
     std::string persistedText(4, '\0');
     persisted.read(persistedText.data(), static_cast<std::streamsize>(persistedText.size()));
     valid &= Expect(persistedText == "test", "outstanding stream closed during shutdown");
     valid &= Expect(platform::Startup(), "second startup");
+    valid &= Expect(platform::Video().Open(mode), "second video open");
+    platform::SetEventHandler(CollectEvent);
+    platform::PumpEvents();
+    gEvents.clear();
+
+    int windowCount = 0;
+    SDL_Window** windows = SDL_GetWindows(&windowCount);
+    const SDL_WindowID windowId = windows != nullptr && windowCount == 1
+        ? SDL_GetWindowID(windows[0])
+        : 0;
+    SDL_free(windows);
+    valid &= Expect(windowId != 0, "renderer test window");
+
+    SDL_Event render {};
+    render.type = SDL_EVENT_RENDER_TARGETS_RESET;
+    render.render.windowID = windowId;
+    SDL_PushEvent(&render);
+    render.type = SDL_EVENT_RENDER_DEVICE_RESET;
+    SDL_PushEvent(&render);
+    platform::PumpEvents();
+    valid &= Expect(CountEvents(platform::Event::Type::Quit) == 0, "renderer reset recovers");
+    platform::Video().Present();
+
+    render.type = SDL_EVENT_RENDER_DEVICE_LOST;
+    SDL_PushEvent(&render);
+    platform::PumpEvents();
+    valid &= Expect(CountEvents(platform::Event::Type::Quit) == 1, "renderer loss quits");
+    platform::SetEventHandler(nullptr);
     platform::Shutdown();
+    valid &= Expect(SDL_WasInit(0) == 0, "second SDL shutdown balances subsystems");
 
     std::filesystem::remove_all(root, error);
     return valid ? 0 : 1;

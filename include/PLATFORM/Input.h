@@ -43,6 +43,10 @@ struct Event {
 
     unsigned scanCode = 0;
 
+    // Host identity for pressed-state tracking. Several physical keys share a
+    // legacy Set 1 scan code, but releasing one must not release the other.
+    unsigned physicalCode = 0;
+
     // Committed text from the host input method, encoded as UTF-8. This is
     // deliberately separate from KeyDown: gameplay consumes physical keys,
     // while editable controls consume layout/IME-aware text.
