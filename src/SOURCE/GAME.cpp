@@ -6076,7 +6076,8 @@ void game::SetupTowns(void) {
             dwellingCount1 =
                 defaultDwellingRoll15[Random(0, 99) / DEFAULT_DWELLING_ROLL_BUCKET_COUNT];
             castle8->m_buildings |= H2EnumIndex(TOWN_BUILDING_DWELLING_1);
-            if (!gbHumanPlayer[castle8->m_owner] && dwellingCount1 == 1 && Random(1, 10) < 4)
+            if ((castle8->m_owner == -1 || !gbHumanPlayer[castle8->m_owner])
+                && dwellingCount1 == 1 && Random(1, 10) < 4)
                 dwellingCount1++;
             if (--dwellingCount1 != 0) {
                 castle8->m_buildings |= H2EnumIndex(TOWN_BUILDING_DWELLING_2);
