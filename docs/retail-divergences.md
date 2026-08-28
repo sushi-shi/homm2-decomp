@@ -68,6 +68,8 @@ bypasses of the shared low-level conversion.
 | Millisecond and fizzle timing | Signed comparisons against the wrapping 32-bit tick counter can terminate a wait early or extend it across the signed and unsigned wrap boundaries. `FizzleForward` also starts its first frame from tick zero, so that frame normally receives no delay. | Compares the signed modular distance between the deadline and current tick and starts the fizzle cadence from the current tick. |
 | Wagon and lean-to sound | Their event-sound cases select the pickup sound and then fall through, overwriting it with the experience sound. | Stops after selecting the pickup sound, as the otherwise-dead assignment and the event category indicate. |
 | AI single-creature stack value | Two consecutive strength thresholds both test for more than two creatures, leaving the `-0.4` modifier unreachable and assigning a one-creature stack the zero-creature modifier. | Uses the evident descending threshold of more than one creature, preserving distinct modifiers for stacks of two, one, and zero creatures. |
+| Neutral-town human lookup | Random dwelling setup indexes the human-player table with the neutral-owner sentinel `-1`. The retail image happens to read adjacent storage, while instrumented portable builds diagnose a global buffer overflow. | Treats the neutral owner as nonhuman before consulting the player-indexed table. |
+| Animated-map redraw boundary | Marking a monster in the leftmost visible map column also marks the nonexistent column to its left, writing before the redraw grid. Instrumented portable builds abort when a monster reaches that boundary. | Clips the missing left neighbor while retaining all in-view redraw marks. |
 
 ## Replaced subsystem
 

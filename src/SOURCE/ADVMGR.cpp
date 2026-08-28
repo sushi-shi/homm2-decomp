@@ -7720,7 +7720,9 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
 
                 if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER))) {
                     ++bComboDraw[drawX][drawY];
-                    ++bComboDraw[drawX - 1][drawY];
+                    if (drawX > 0) {
+                        ++bComboDraw[drawX - 1][drawY];
+                    }
                     if (GetCloudLookup(drawX + originX, drawY + originY) != 0) {
                         bComboDraw[drawX + 1][drawY] += COMBO_CLOUD_MARK;
                         if (drawY >= 1) {
