@@ -141,10 +141,8 @@ CD-drive setup as the cleaned Buka runner. Pass `--prepare-only` to stop after
 setup without starting the game.
 
 The staged `game/HMM2PL.exe` is always the ordinary `homm2 link --rsrc`
-output—never the retail control image or `--transform` output. For Wine, the
-provisioner also creates `.wine-compat/HMM2PL-WINE.exe`, a byte-gated copy with
-only Buka's signed `GetTickCount` wait branch corrected; the linked executable
-remains untouched. Set `HOMM2_BUKA_WINE_TICK_PATCH=0` to launch it directly.
+output—never the retail control image or `--transform` output—and Wine launches
+that file directly. The play workflow does not patch or transform the candidate.
 
 The play environment lives in `build/game-wine/` (gitignored): `game/` holds
 your install's data plus the rebuilt `HMM2PL.exe`, `cd/` holds the staged

@@ -12,11 +12,6 @@ from homm2.core.paths import REPO
 
 RUNNER = REPO / "scripts/homm2/clean/project/run-game.sh"
 PROVISIONER = REPO / "scripts/toolchain/create-wine-prefix.py"
-DELAY_TIL_MILLI_OFFSET = 498493
-DELAY_TIL_MILLI = bytes.fromhex(
-    "558bec51894dfce8af84ffff3945fc7e0ce8a67dffffe898c0feffebea8be55dc3"
-)
-PATCH_OFFSET = 498508
 
 
 def load_provisioner():
@@ -110,8 +105,11 @@ class WineLaunchContractTest(unittest.TestCase):
                 ["wineserver", "-k"],
             )
 
-    def test_provisioner_requires_the_resource_link_output(self):
+    def test_provisioner_installs_the_resource_link_output_without_transforming_it(self):
         provisioner = load_provisioner()
+        provisioner_source = PROVISIONER.read_text()
+        self.assertNotIn(".wine-compat", provisioner_source)
+        self.assertNotIn("HOMM2_BUKA_WINE_TICK_PATCH", provisioner_source)
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             game = root / "game"
@@ -128,22 +126,11 @@ class WineLaunchContractTest(unittest.TestCase):
 
             resource_link = root / "build/link/rsrc/HMM2PL.exe"
             resource_link.parent.mkdir()
-            executable = bytearray(DELAY_TIL_MILLI_OFFSET + len(DELAY_TIL_MILLI))
-            executable[DELAY_TIL_MILLI_OFFSET:] = DELAY_TIL_MILLI
+            executable = b"ordinary-resource-link-output"
             resource_link.write_bytes(executable)
             provisioner.install_rebuilt_exe(game)
-            provisioner.create_wine_compatibility_exe(game)
-
-            original = (game / "HMM2PL.exe").read_bytes()
-            compatible = (game / ".wine-compat/HMM2PL-WINE.exe").read_bytes()
-            self.assertEqual(original, bytes(executable))
-            differences = [
-                offset
-                for offset, (before, after) in enumerate(zip(original, compatible))
-                if before != after
-            ]
-            self.assertEqual(differences, [PATCH_OFFSET])
-            self.assertEqual((original[PATCH_OFFSET], compatible[PATCH_OFFSET]), (0x7E, 0x76))
+            self.assertEqual((game / "HMM2PL.exe").read_bytes(), executable)
+            self.assertFalse((game / ".wine-compat").exists())
 
 
 if __name__ == "__main__":
