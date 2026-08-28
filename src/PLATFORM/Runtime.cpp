@@ -23,6 +23,7 @@ void SetEventHandler(EventHandler handler) {
 
 void PumpEvents() {
     Host().Yield();
+    Audio().Service();
     Event event;
     while (Input().Poll(event)) {
         if (gEventHandler != nullptr) {

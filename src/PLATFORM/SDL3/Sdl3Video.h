@@ -28,8 +28,10 @@ public:
 
     SDL_Window* Window() const { return m_window; }
     SDL_Renderer* Renderer() const { return m_renderer; }
+    bool HandleRenderEvent(Uint32 type, SDL_WindowID windowId);
 
 private:
+    bool CreateTexture();
     void MaybeCapture();
     void LogPresentationFailure();
 
@@ -42,6 +44,7 @@ private:
     std::vector<std::uint32_t> m_expanded;
     std::uint32_t m_palette[256] = {};
     int m_frame = 0;
+    bool m_videoInitialized = false;
     bool m_presentationFailureLogged = false;
 };
 
