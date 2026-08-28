@@ -28,6 +28,10 @@ constexpr bool TickDeadlinePending(u32 deadline, u32 now) {
     return static_cast<i32>(deadline - now) > 0;
 }
 
+constexpr bool TickDeadlineExpired(u32 deadline, u32 now) {
+    return static_cast<i32>(now - deadline) > 0;
+}
+
 void SetEventHandler(EventHandler handler);
 void PumpEvents();
 void StartTextInput();

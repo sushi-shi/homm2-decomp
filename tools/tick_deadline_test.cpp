@@ -39,5 +39,18 @@ int main() {
         false,
         "counter wrap past"
     );
+    valid &= Expect(platform::TickDeadlineExpired(100, 150), true, "ordinary expired");
+    valid &= Expect(platform::TickDeadlineExpired(150, 100), false, "ordinary unexpired");
+    valid &= Expect(platform::TickDeadlineExpired(100, 100), false, "equal not expired");
+    valid &= Expect(
+        platform::TickDeadlineExpired(0x7ffffff0UL, 0x80000020UL),
+        true,
+        "signed boundary expired"
+    );
+    valid &= Expect(
+        platform::TickDeadlineExpired(0xfffffff0UL, 0x00000020UL),
+        true,
+        "counter wrap expired"
+    );
     return valid ? 0 : 1;
 }
