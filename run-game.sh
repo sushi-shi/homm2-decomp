@@ -147,6 +147,23 @@ if [ "${HOMM2_SETUP_ONLY:-0}" = 1 ]; then
     exit 0
 fi
 
+# The virtual-desktop launcher can exit before the Windows process when X11
+# rejects desktop creation or the caller interrupts the script.  This prefix is
+# dedicated to this game, so always stop its server as the launcher exits;
+# otherwise an invisible HMM2PL.exe survives and the next desktop creation can
+# fail with X_CreateWindow/BadWindow.
+cleanup_wine() {
+    status=$?
+    trap - EXIT HUP INT TERM
+    wineserver -k >/dev/null 2>&1 || true
+    exit "$status"
+}
+
+trap cleanup_wine EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 cd "$game_dir"
 # Smacker startup movies render black under this Wine/display combination.
 # The caller can append /I1 to opt back in; retail command-line processing
@@ -159,13 +176,15 @@ if [ "$fullscreen" = 1 ]; then
         exit 1
     fi
     if [ -n "${WAYLAND_DISPLAY:-}" ]; then
-        exec gamescope --backend wayland -f -w 640 -h 480 \
+        gamescope --backend wayland -f -w 640 -h 480 \
             -S stretch -F nearest --force-windows-fullscreen -- \
             wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
+        exit $?
     fi
-    exec gamescope -f -w 640 -h 480 -S stretch -F nearest \
+    gamescope -f -w 640 -h 480 -S stretch -F nearest \
         --force-windows-fullscreen -- \
         wine explorer /desktop=HOMM2,640x480 "$game_exe" "$intro_argument" "$@"
+    exit $?
 fi
 
 # Wine's virtual desktop is the reliable windowed path for this DirectDraw game.
