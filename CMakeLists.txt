@@ -14,9 +14,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Retail pointer width and packed layouts are load-bearing, so the game is
-# built 32-bit. On a 64-bit host that means -m32, and a toolchain that cannot
-# do it should say so here rather than on the first source file.
+# Hero/town/player/campaign saves use explicit little-endian byte records.
+# Packed map, resource, and preference records still require a little-endian
+# target. Reject an unsupported byte order before compiling the game.
+include(TestBigEndian)
+test_big_endian(HOMM2_BIG_ENDIAN)
+if(HOMM2_BIG_ENDIAN)
+  message(FATAL_ERROR "Packed map, resource, and preference records require a little-endian target")
+endif()
+
+# The supported game target remains 32-bit while the remaining host-width
+# assumptions are evaluated. On a 64-bit host that means -m32.
 if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
   add_compile_options(-m32)
   add_link_options(-m32)
@@ -357,6 +365,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_map_records_test tools/map_records_test.cpp src/SOURCE/MapRecords.cpp)
   target_include_directories(homm2_map_records_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME map_records COMMAND homm2_map_records_test)
+
+  add_executable(homm2_save_records_test tools/save_records_test.cpp src/SOURCE/SaveRecords.cpp)
+  target_include_directories(homm2_save_records_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_definitions(homm2_save_records_test PRIVATE __cdecl= __stdcall= __fastcall=)
+  add_test(NAME save_records COMMAND homm2_save_records_test)
 
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE

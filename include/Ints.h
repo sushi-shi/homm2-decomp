@@ -290,6 +290,7 @@ public:
     constexpr H2SteppedEnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+    constexpr Storage value() const { return m_value; }
 
     template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
     explicit constexpr operator Integer() const {

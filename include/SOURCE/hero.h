@@ -129,7 +129,6 @@ enum class HeroEventFlag : u32 {
 using enum HeroEventFlag;
 ENABLE_ENUM_FLAGS(HeroEventFlag)
 
-#pragma pack(push, 1)
 class hero {
 public:
     i16 m_spellPoints;
@@ -233,7 +232,6 @@ public:
     void DoSSLevelDialog(HeroSecondarySkill, i32);
     void CheckAnduranPieces(b32);
 };
-#pragma pack(pop)
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];

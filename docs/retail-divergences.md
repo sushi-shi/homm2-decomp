@@ -49,10 +49,17 @@ definition. Packed enum storage exposes an already-typed `enum_value()` instead
 of re-decoding it. A source-policy test rejects direct numeric enum casts and
 bypasses of the shared low-level conversion.
 
+Runtime heroes, armies, towns, players, and campaign state use natural alignment.
+Their save representation is defined by fixed-size little-endian byte codecs,
+including the retail reserved bytes and overlapping town spell/count fields.
+Campaign initialization uses those field boundaries instead of clearing a byte
+prefix across adjacent runtime members.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |
 | --- | --- | --- |
+| Expansion campaign save pointer | Writes the current window address into a four-byte save slot and restores it in another process. | Retains the slot as four zero bytes on write and ignores it on read. A save can never replace the live window pointer; the 79-byte campaign record is independent of pointer width. |
 | Initial mouse cursor | A newly created configuration starts with the monochrome system cursor, reflecting the original hardware-cursor fallback. | New portable configurations start with the original color cursor artwork. Existing saved preferences remain authoritative. |
 | Campaign table bounds | The enabled-map table indices are reversed after switching campaign sides, and the 13-point campaign track reads the 12-entry enabled-map table at its final point. | Indexes the table as `[campaign side][scenario]` and checks the map-table bound before reading track state. |
 | Aggregate lookup failure | `resourceManager::PointToFile` and `GetFileSize` continue with an invalid aggregate entry after calling the shutdown path. A shutdown implementation that returns or re-enters can dereference that invalid state. | Returns immediately after reporting the fatal lookup error. |

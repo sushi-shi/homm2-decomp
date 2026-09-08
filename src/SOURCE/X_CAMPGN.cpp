@@ -1,3 +1,4 @@
+#include <SOURCE/SaveRecords.h>
 #include <Ints.h>
 #include <stdio.h>
 #include <string.h>
@@ -314,7 +315,7 @@ void ExpCampaign::InitMap(void) {
     SCampaignChoice* bonus =
         &xCampaignChoices[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)][m_bonusChoices[H2EnumIndex(m_currentMap)]];
 
-    memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
+    save_records::DecodeSetup(save_records::Setup{}, *gpGame);
     utf8::Format(
         gpGame->m_mapFilename,
         "CAMP%d_%02d.HXC",

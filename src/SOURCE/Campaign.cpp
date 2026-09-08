@@ -1,3 +1,4 @@
+#include <SOURCE/SaveRecords.h>
 #include <Ints.h>
 #include <stdio.h>
 #include <string.h>
@@ -846,7 +847,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
 }
 
 void game::InitEntireCampaign(CampaignSide side) {
-    memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
+    save_records::DecodeCampaign(save_records::Campaign{}, *this);
     m_campaignType = side;
     m_campaignStartingSide = side;
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
@@ -883,7 +884,7 @@ void game::InitCampaignMap(void) {
     }
 
     gpGame->m_campaignScenarioWon = 0;
-    memset(m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
+    save_records::DecodeSetup(save_records::Setup{}, *this);
 
     std::string mapFilename = "CAMP";
     if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO

@@ -35,7 +35,6 @@ enum class PlayerHandicap : i8 {
 using enum PlayerHandicap;
 ENABLE_ENUM_STEPS(PlayerHandicap)
 
-#pragma pack(push, 1)
 struct mineRecord {
     i8 id;
     i8 owner;
@@ -55,7 +54,6 @@ struct boatRecord {
     i8 heroId;
     i8 owner;
 };
-#pragma pack(pop)
 
 typedef enum GameStateStorageConstant {
     GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
@@ -76,7 +74,6 @@ typedef enum GameStateStorageConstant {
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
 } GameStateStorageConstant;
 
-#pragma pack(push, 1)
 class game {
 public:
     i16 m_difficultyRating;
@@ -323,7 +320,6 @@ public:
     void GetVictoryConditionText(char*);
     i32 GetSideDesc(char*, i32, i32);
 };
-#pragma pack(pop)
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;

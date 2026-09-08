@@ -90,7 +90,6 @@ typedef enum ExpansionCampaignConstant {
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y      = 0
 } ExpansionCampaignConstant;
 
-#pragma pack(push, 1)
 class ExpCampaign {
 public:
     ExpansionCampaignId m_campaignId;
@@ -146,7 +145,6 @@ public:
     i8 IsSpecialUA(void);
     i8 IsSpecialLossCondition(i32);
 };
-#pragma pack(pop)
 
 extern struct SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
