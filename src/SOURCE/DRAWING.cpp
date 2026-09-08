@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <memory>
 #include <BASE/Icon2b.h>
 #include <BASE/Icond2b.h>
 #include <BASE/Iconm2b.h>
@@ -909,6 +910,16 @@ void combatManager::DrawFrame(
     if (m_combatWindowOpen == 0)
         return;
 
+    // Extent calculation and drawing share one temporary reference. Release
+    // it on every exit, including the early jumps to finish.
+    auto releaseWallIcon = [](icon* value) { gpResourceManager->Dispose(value); };
+    std::unique_ptr<icon, decltype(releaseWallIcon)> wallIcon(nullptr, releaseWallIcon);
+    auto getWallIcon = [&]() {
+        if (!wallIcon)
+            wallIcon.reset(gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]));
+        return wallIcon.get();
+    };
+
     PollSound();
     gpMouseManager->m_cursorReady = false;
 
@@ -994,8 +1005,7 @@ void combatManager::DrawFrame(
 
         // The fire walls burn inside the redraw extent too.
         if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
-            icon* wallIcon = gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
-            IconEntry* wallEntry = GetIconEntry(wallIcon, 0);
+            IconEntry* wallEntry = GetIconEntry(getWallIcon(), 0);
             for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
                 hexcell* wallCell = &m_hexCells[wall.hexIdx];
                 i32 drawX = wallCell->m_x + wallEntry->x;
@@ -1059,7 +1069,7 @@ void combatManager::DrawFrame(
     // The lingering fire walls burn under the creatures.
     for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
         SLimitData wallLimits;
-        gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)])
+        getWallIcon()
             ->CombatClipDrawToBuffer(
                 m_hexCells[wall.hexIdx].m_x,
                 m_hexCells[wall.hexIdx].m_gridTop,
