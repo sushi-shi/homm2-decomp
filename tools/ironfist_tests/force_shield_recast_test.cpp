@@ -11,6 +11,7 @@
 #include <cstring>
 
 static void InitStack(army& stack, CombatSide side, i32 index) {
+    ironfist::state::Get().combat.ResetStack(stack);
     stack.m_monsterType = CREATURE_PEASANT;
     stack.m_spellCount = 0;
     std::memset(stack.m_spellInfluence, 0, sizeof(stack.m_spellInfluence));
@@ -25,6 +26,8 @@ int main() {
     gpCombatManager = new combatManager;
     gpWindowManager = new heroWindowManager;
     auto& combat = *gpCombatManager;
+    auto& extensions = ironfist::state::Get().combat;
+    extensions.BeginBattle(combat);
     combat.m_currentSide = COMBAT_ATTACKER_SIDE;
     combat.m_heroes[0] = combat.m_heroes[1] = nullptr;
     combat.m_armyCount[0] = 2;
@@ -38,22 +41,21 @@ int main() {
     InitStack(enemy, COMBAT_DEFENDER_SIDE, 0);
     combat.m_hexCells[20].m_occupantSide = COMBAT_ATTACKER_SIDE;
     combat.m_hexCells[20].m_occupantIndex = 0;
-    auto& shields = ironfist::state::Get().combat.stack.forceShieldHP;
     constexpr auto shield = ARMY_SPELL_INFLUENCE_FORCE_SHIELD;
     assert(target.SetSpellInfluence(shield, 3) == 1);
-    assert(shields[&target] == 100 && target.m_spellCount == 1);
-    shields[&target] = 25;
+    assert(extensions.ShieldHP(target) == 100 && target.m_spellCount == 1);
+    assert(extensions.AbsorbDamage(target, 75) == 0);
     assert(combat.ValidSpellTarget(SPELL_FORCE_SHIELD, 20));
     assert(combat.ValidSpellTarget(SPELL_MASS_FORCE_SHIELD, 20));
     assert(target.SetSpellInfluence(shield, 7) == 1);
-    assert(shields[&target] == 100 && target.m_spellCount == 1);
+    assert(extensions.ShieldHP(target) == 100 && target.m_spellCount == 1);
     assert(target.m_spellInfluence[H2EnumIndex(shield)] == 7);
     assert(!combat.ValidSpellTarget(SPELL_FORCE_SHIELD, 20));
     assert(!combat.ValidSpellTarget(SPELL_MASS_FORCE_SHIELD, 20));
     assert(target.SetSpellInfluence(shield, 2) == 0);
     assert(target.m_spellCount == 1);
     target.DecrementSpellRounds();
-    assert(shields[&target] == 100 && target.m_spellInfluence[H2EnumIndex(shield)] == 7);
+    assert(extensions.ShieldHP(target) == 100 && target.m_spellInfluence[H2EnumIndex(shield)] == 7);
 
     // Exercise the real mass-cast path on both depleted and unshielded allies.
     hero caster;
@@ -63,15 +65,15 @@ int main() {
         artifact = ARTIFACT_NONE;
     combat.m_heroes[0] = &caster;
     gbNoShowCombat = true;
-    shields[&target] = 25;
+    assert(extensions.AbsorbDamage(target, 75) == 0);
     combat.CastMassSpell(SPELL_MASS_FORCE_SHIELD, 3);
-    assert(shields[&target] == 100 && target.m_spellCount == 1);
-    assert(shields[&ally] == 100 && ally.m_spellCount == 1);
-    assert(shields[&enemy] == 0 && enemy.m_spellCount == 0);
+    assert(extensions.ShieldHP(target) == 100 && target.m_spellCount == 1);
+    assert(extensions.ShieldHP(ally) == 100 && ally.m_spellCount == 1);
+    assert(extensions.ShieldHP(enemy) == 0 && enemy.m_spellCount == 0);
     target.CancelIndividualSpell(shield);
-    assert(shields[&target] == 0 && target.m_spellCount == 0);
+    assert(extensions.ShieldHP(target) == 0 && target.m_spellCount == 0);
     assert(target.SetSpellInfluence(shield, 3) == 1);
-    assert(shields[&target] == 100 && target.m_spellCount == 1);
+    assert(extensions.ShieldHP(target) == 100 && target.m_spellCount == 1);
 
     // Ordinary influences still extend duration without applying a bonus twice.
     target.m_monster.attack = 5;
@@ -79,6 +81,24 @@ int main() {
     const auto attack = target.m_monster.attack;
     assert(target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_BLOODLUST, 5) == 0);
     assert(target.m_monster.attack == attack && target.m_spellCount == 2);
+    const auto oldTarget = extensions.Identity(target);
+    extensions.GrantAbility(target, ironfist::CreatureAttribute::Jumper);
+    extensions.StartAnimation(target, ironfist::CreatureAttribute::Jumper);
+    target.InitClean();
+    assert(extensions.Resolve(oldTarget) == nullptr);
+    InitStack(target, COMBAT_ATTACKER_SIDE, 0);
+    assert(extensions.Resolve(oldTarget) == nullptr);
+    assert(extensions.ShieldHP(target) == 0);
+    assert(!extensions.HasAbilityCharge(target, ironfist::CreatureAttribute::Jumper));
+    assert(!extensions.IsAnimating(target, ironfist::CreatureAttribute::Jumper));
+    const auto newTarget = extensions.Identity(target);
+    assert(extensions.Resolve(newTarget) == &target);
+    extensions.EndBattle();
+    assert(extensions.Resolve(newTarget) == nullptr);
+    extensions.BeginBattle(combat);
+    InitStack(target, COMBAT_ATTACKER_SIDE, 0);
+    assert(extensions.Resolve(newTarget) == nullptr);
+    extensions.EndBattle();
     delete gpWindowManager;
     delete gpCombatManager;
 }

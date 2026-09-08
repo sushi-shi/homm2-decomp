@@ -386,10 +386,7 @@ void combatManager::SetupCombat(
     }
     m_combatTowns[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = NULL;
 
-    ironfist::state::Get().combat.stack.abilityCounter.clear();
-    ironfist::state::Get().combat.stack.abilityNowAnimating.clear();
-    ironfist::state::Get().combat.stack.forceShieldHP.clear();
-    ironfist::state::Get().combat.spell.fireBombWalls.clear();
+    ironfist::state::Get().combat.BeginBattle(*this);
 }
 
 void combatManager::InitNonVisualVars(void) {
@@ -1027,6 +1024,7 @@ void combatManager::FreeArmies(void) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
+    ironfist::state::Get().combat.EndBattle();
 }
 
 i32 combatManager::GetGridIndex(i32 x, i32 y) {
@@ -1938,6 +1936,7 @@ void combatManager::MakeCreaturesVanish(void) {
         for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[iSide]; armyIndex++) {
             if (m_removedArmies[iSide][armyIndex]) {
                 removedArmy = &m_armies[iSide][armyIndex];
+                ironfist::state::Get().combat.RemoveStack(*removedArmy);
                 CLEAR_HEX_OCCUPANT(m_hexCells[removedArmy->m_hex]);
                 if ((H2EnumIndex((removedArmy->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
                     CLEAR_HEX_OCCUPANT(

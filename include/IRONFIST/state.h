@@ -8,6 +8,7 @@
 
 #include <Ints.h>
 #include <IRONFIST/creatures.h>
+#include <IRONFIST/combat_state.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
@@ -18,27 +19,6 @@ class army;
 namespace ironfist {
 
 namespace state {
-
-struct StackState {
-    std::map<army*, std::map<CreatureAttribute, i32>> abilityCounter;
-    std::map<army*, std::map<CreatureAttribute, bool>> abilityNowAnimating;
-    std::map<army*, i32> forceShieldHP;
-};
-
-struct SpellState {
-    struct FireBombWallHex {
-        i32 hexIdx;
-        i32 turnsLeft;
-        i32 currentFrame;
-    };
-
-    std::vector<FireBombWallHex> fireBombWalls;
-};
-
-struct CombatState {
-    StackState stack;
-    SpellState spell;
-};
 
 struct CampaignState {
     struct PartialHeroData {
