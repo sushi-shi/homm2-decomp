@@ -186,6 +186,7 @@ if(HOMM2_PO_FILES)
     VERBATIM)
   add_custom_command(
     OUTPUT ${tableTemplate}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/lang
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/localization_tables.py
       template ${CMAKE_SOURCE_DIR} ${tableTemplate}
     DEPENDS
