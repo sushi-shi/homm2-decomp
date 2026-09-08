@@ -18,7 +18,6 @@ enum class MouseCursorType : i32 {
 };
 using enum MouseCursorType;
 
-#pragma pack(push, 1)
 class mouseManager : public baseManager {
 public:
     bitmap* m_savedUnderlying;
@@ -59,7 +58,6 @@ public:
     void CheckUpdateMousePos(void);
     void SetColorMice(b32);
 };
-#pragma pack(pop)
 typedef enum MouseManagerConstant {
     MOUSE_CURSOR_COUNT                 = 96,
     MOUSE_CURSOR_TYPE_SLOT_COUNT       = 3,

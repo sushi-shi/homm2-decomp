@@ -70,6 +70,12 @@ format full pointers instead of narrowing them to integers.
 
 The western bitmap-font profile preserves the original ASCII frame mapping,
 including lowercase glyphs. UTF-8 decoding does not change letter case.
+Runtime manager, widget, resource, audio playback and combat objects also use
+natural alignment. Their pointers, messages and numeric members are passed by
+reference in portable C++; retaining byte packing made input initialization and
+music playback undefined. Packed map cells, resource headers and configuration
+records retain their file layouts. The `runtime_alignment` check rejects
+misaligned manager messages, music state and resource pointers at compile time.
 
 ## Corrected defects
 

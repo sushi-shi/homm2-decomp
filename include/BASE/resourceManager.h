@@ -69,7 +69,6 @@ public:
     void Read13(void*);
     void ReadBlock(void*, u32l);
 };
-#pragma pack(pop)
 extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];

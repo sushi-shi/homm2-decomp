@@ -21,7 +21,6 @@ enum class TextEntryLayout : i32 {
 };
 using enum TextEntryLayout;
 
-#pragma pack(push, 1)
 class resource;
 class icon;
 
@@ -68,5 +67,4 @@ public:
     void Read(TextEntryReadMode);
     void SetupDisplayString(char*, u16);
 };
-#pragma pack(pop)
 #endif

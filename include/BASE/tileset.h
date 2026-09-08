@@ -4,7 +4,6 @@
 #include <Ints.h>
 #include <BASE/resource.h>
 
-#pragma pack(push, 1)
 class tileset : public resource {
 public:
     u16 m_tileCount;
@@ -15,5 +14,4 @@ public:
     tileset(u32l);
     virtual ~tileset();
 };
-#pragma pack(pop)
 #endif

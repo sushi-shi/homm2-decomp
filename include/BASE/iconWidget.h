@@ -7,7 +7,6 @@
 
 struct tag_message;
 
-#pragma pack(push, 1)
 class icon;
 class iconWidget : public widget {
 public:
@@ -46,5 +45,4 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
 };
-#pragma pack(pop)
 #endif

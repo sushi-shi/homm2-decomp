@@ -30,7 +30,6 @@ enum class TownManagerArmyCommand : i32 {
 };
 using enum TownManagerArmyCommand;
 
-#pragma pack(push, 1)
 class townManager : public baseManager {
 public:
     town* m_town;
@@ -94,5 +93,4 @@ public:
     void SetupThievesGuild(class heroWindow*, i32);
     void SetupCastle(class heroWindow*, i32);
 };
-#pragma pack(pop)
 #endif

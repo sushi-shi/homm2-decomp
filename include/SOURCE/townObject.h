@@ -7,7 +7,6 @@
 class border;
 class icon;
 
-#pragma pack(push, 1)
 class townObject {
 public:
     i32 m_animationFrameCount;
@@ -20,5 +19,4 @@ public:
     ~townObject();
     void Draw(i32);
 };
-#pragma pack(pop)
 #endif

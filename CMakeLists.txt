@@ -328,6 +328,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_executable(homm2_message_result_test tools/message_result_test.cpp)
   target_include_directories(homm2_message_result_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME message_result COMMAND homm2_message_result_test)
+  add_executable(homm2_runtime_alignment_test tools/runtime_alignment_test.cpp)
+  target_include_directories(homm2_runtime_alignment_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Inspect the compiler's runtime class layout, including inherited members.
+    target_compile_options(homm2_runtime_alignment_test PRIVATE -Wno-invalid-offsetof)
+  endif()
+  add_test(NAME runtime_alignment COMMAND homm2_runtime_alignment_test)
   add_executable(homm2_combat_cursor_test tools/combat_cursor_test.cpp)
   target_include_directories(homm2_combat_cursor_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include

@@ -46,7 +46,6 @@ typedef enum HighScoreManagerConstant {
     HIGH_SCORE_MANAGER_OPEN_OK             = 0
 } HighScoreManagerConstant;
 
-#pragma pack(push, 1)
 class highScoreManager : public baseManager {
 public:
     i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
@@ -59,5 +58,4 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Update(void);
 };
-#pragma pack(pop)
 #endif

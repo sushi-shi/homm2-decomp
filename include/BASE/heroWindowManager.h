@@ -22,7 +22,6 @@ enum class WindowFadeMode : i32 {
 };
 using enum WindowFadeMode;
 
-#pragma pack(push, 1)
 class heroWindowManager : public baseManager {
 public:
     heroWindow* m_windowListHead;
@@ -54,7 +53,6 @@ public:
     void FizzleForward(i32, i32, i32, i32, i32, i8*, i8*);
     void ReleaseFizzleSource(void);
 };
-#pragma pack(pop)
 extern i32 iCombatCycleFrame;
 extern u8 gbEveryOtherCycle;
 extern i32 iCycle1Count;

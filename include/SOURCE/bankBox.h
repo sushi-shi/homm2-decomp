@@ -6,7 +6,6 @@
 class heroWindow;
 class playerData;
 
-#pragma pack(push, 1)
 class bankBox {
 public:
     playerData* m_player;
@@ -17,5 +16,4 @@ public:
     ~bankBox();
     void Update(i32);
 };
-#pragma pack(pop)
 #endif

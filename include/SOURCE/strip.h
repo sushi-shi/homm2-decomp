@@ -31,7 +31,6 @@ typedef enum StripConstant {
     STRIP_QUANTITY_HEIGHT       = 0xd
 } StripConstant;
 
-#pragma pack(push, 1)
 class strip {
 public:
     heroWindow* m_window;
@@ -65,5 +64,4 @@ public:
     void DrawIcons(i32);
     void DrawFrame(void);
 };
-#pragma pack(pop)
 #endif
