@@ -22,6 +22,7 @@
 #include <BASE/tileset.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
+#include <BASE/bmap2.h>
 #include <BASE/palette.h>
 
 typedef enum ResourceConstant {
@@ -29,7 +30,6 @@ typedef enum ResourceConstant {
     LOAD_SUCCESS            = 0,
     LOAD_ERROR              = 3,
     EVIL_TRANSLATION_COUNT  = 37,
-    BACKDROP_ROW_BYTES      = 640,
     POSITION_STACK_DEPTH    = 10
 } ResourceConstant;
 
@@ -58,11 +58,9 @@ void resourceManager::GetBackdrop(const char* name, class bitmap* backdrop, i32 
         backdropIcon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
         Dispose(backdropIcon);
     } else {
-        PointToFile(MakeId(name, 1));
-        ReadWord();
-        ReadWord();
-        ReadWord();
-        ReadBlock(backdrop->m_pixels, backdrop->m_width * backdrop->m_height);
+        bitmap* image = GetBitmap(name);
+        BlitBitmap(image, 0, 0, image->m_width, image->m_height, backdrop, 0, 0);
+        Dispose(image);
     }
 }
 
@@ -74,24 +72,15 @@ void resourceManager::GetBackdropAtLoc(
     i32 useIcon
 ) {
     icon* backdropIcon;
-    i32 width;
-    i32 imageHeight;
-    i32 curRow;
     if (useIcon != 0) {
         backdropIcon = GetIcon(filename);
         backdropIcon->DrawToBuffer(destinationX, destinationY, 0, ICON_DRAW_NORMAL);
         Dispose(backdropIcon);
     } else {
-        PointToFile(MakeId(filename, 1));
-        ReadWord();
-        width = ReadWord();
-        imageHeight = ReadWord();
-        for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
-            ReadBlock(
-                destination->m_pixels + curRow * BACKDROP_ROW_BYTES + destinationX,
-                width
-            );
-        }
+        bitmap* image = GetBitmap(filename);
+        BlitBitmap(image, 0, 0, image->m_width, image->m_height,
+                   destination, destinationX, destinationY);
+        Dispose(image);
     }
 }
 

@@ -339,6 +339,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_image_decode_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME image_decode COMMAND homm2_image_decode_test)
 
+  add_executable(homm2_raster_test tools/raster_test.cpp src/BASE/RESOURCE.cpp
+    src/BASE/BITMAP.cpp src/BASE/TILESET.cpp src/BASE/TILE.cpp src/BASE/bmap2.cpp)
+  target_include_directories(homm2_raster_test PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_raster_test PRIVATE __cdecl= __stdcall= __fastcall=)
+  target_compile_options(homm2_raster_test PRIVATE -ffunction-sections -fdata-sections)
+  target_link_options(homm2_raster_test PRIVATE -Wl,--gc-sections)
+  add_test(NAME raster COMMAND homm2_raster_test)
+
   add_executable(homm2_localization_encoding_test
     tools/localization_encoding_test.cpp
     src/BASE/Utf8.cpp
