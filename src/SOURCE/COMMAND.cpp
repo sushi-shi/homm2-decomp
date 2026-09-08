@@ -17,6 +17,7 @@
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
 #include <IRONFIST/combat_movement.h>
+#include <IRONFIST/combat_effects.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
@@ -1157,41 +1158,10 @@ void combatManager::CheckBurnCreature(army* stack) {
 }
 
 void combatManager::BurnCreature(army* stack) {
-    // The walking frames offset differently; force the wince pose before
-    // the effect animation.
-    stack->m_animationSequence = ARMY_ANIMATION_WINCE;
-    stack->m_animationFrame = 0;
-    stack->SpellEffect(gsSpellInfo[H2EnumIndex(SPELL_FIRE_BOMB)].combatEffect, 0, 0);
-
-    i32 burnDamage = COMBAT_BURN_BASE_DAMAGE + SRandom(0, COMBAT_BURN_RANDOM_DAMAGE);
-    i32 creaturesKilled = stack->Damage(burnDamage, SPELL_FIRE_BOMB);
-
-    // PowEffect clobbers the render extents; keep them intact.
-    i32 minExtentX = giMinExtentX;
-    i32 minExtentY = giMinExtentY;
-    i32 maxExtentX = giMaxExtentX;
-    i32 maxExtentY = giMaxExtentY;
-    stack->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-    giMinExtentX = minExtentX;
-    giMinExtentY = minExtentY;
-    giMaxExtentX = maxExtentX;
-    giMaxExtentY = maxExtentY;
-
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("combat.burning.damage"), burnDamage);
-    if (creaturesKilled > 0) {
-        const char* targetCreature = creaturesKilled > 1
-            ? ironfist::GetCreaturePluralName(H2EnumIndex(stack->m_monsterType))
-            : ironfist::GetCreatureName(H2EnumIndex(stack->m_monsterType));
-        const std::size_t used = strlen(gText);
-        utf8::Format(
-            gText + used,
-            GLOBAL_TEXT_BUFFER_SIZE - used,
-            localization::TrPlural("combat.burning.killed", creaturesKilled),
-            creaturesKilled,
-            targetCreature
-        );
-    }
-    CombatMessage(gText, 1, 1, 0);
+    if (!stack || stack->m_quantity <= 0)
+        return;
+    const auto result = ironfist::effects::ResolveBurn(*this, ironfist::state::Get().combat, *stack);
+    ironfist::effects::PresentBurn(*this, result);
 }
 
 i32 combatManager::CheckWin(struct tag_message* message) {

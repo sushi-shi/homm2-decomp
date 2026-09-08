@@ -118,7 +118,7 @@ public:
     i32 AttackTo(void);
     i32 AttackTo(i32);
     void CheckLuck(void);
-    void DamageEnemy(class army*, i32*, i32*, i32, i32);
+    void DamageEnemy(class army*, i32*, i32*, i32, i32, i32 chargePath = 0);
     i32 Damage(i32l, SpellType);
     void PowEffect(CombatEffectType, i32, i32, i32);
     u32l Strength(void);

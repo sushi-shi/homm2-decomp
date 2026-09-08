@@ -3,6 +3,16 @@
 
 namespace ironfist::state {
 
+AttackApproach CombatState::Approach(const army& stack) const {
+    const auto* record = Find(stack);
+    return record && record->active ? record->approach : AttackApproach{};
+}
+
+void CombatState::SetApproach(army& stack, AttackApproach approach) {
+    if (auto* record = Find(stack); record && record->active)
+        record->approach = approach;
+}
+
 void CombatState::BeginBattle(combatManager& owner) {
     EndBattle();
     owner_ = &owner;

@@ -16,6 +16,13 @@ struct StackIdentity {
     u64 generation = 0;
 };
 
+// Mechanical consequences of the chosen movement plan, independent of frames.
+struct AttackApproach {
+    bool jump = false;
+    bool charge = false;
+    bool distantTeleport = false;
+};
+
 class CombatState {
 public:
     struct FireWall {
@@ -30,6 +37,8 @@ public:
     void RemoveStack(army& stack);
     StackIdentity Identity(const army& stack) const;
     army* Resolve(StackIdentity identity) const;
+    AttackApproach Approach(const army& stack) const;
+    void SetApproach(army& stack, AttackApproach approach);
 
     void GrantAbility(army& stack, CreatureAttribute ability);
     bool HasAbility(const army& stack, CreatureAttribute ability) const;
@@ -57,6 +66,7 @@ private:
         std::bitset<H2EnumIndex(CreatureAttribute::Count)> charges;
         std::bitset<H2EnumIndex(CreatureAttribute::Count)> animating;
         i32 shieldHP = 0;
+        AttackApproach approach;
     };
 
     StackRecord* Find(army& stack);

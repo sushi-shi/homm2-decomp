@@ -1,6 +1,7 @@
 #include <BASE/heroWindowManager.h>
 #include <IRONFIST/state.h>
 #include <IRONFIST/combat_movement.h>
+#include <IRONFIST/combat_effects.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/advManager.h>
@@ -22,6 +23,58 @@ static void InitStack(army& stack, CombatSide side, i32 index) {
     stack.m_side = side;
     stack.m_index = index;
     stack.m_quantity = stack.m_initialQuantity = 1;
+    stack.m_hitPointsLost = 0;
+    stack.m_damagePending = stack.m_killPending = stack.m_deathPending = false;
+    stack.m_luckOutcome = 0;
+    stack.m_damagePenalty = ARMY_DAMAGE_PENALTY_NONE;
+}
+
+static void CheckEffects(combatManager& board, army& attacker, army& target) {
+    using namespace ironfist::effects;
+    auto& state = ironfist::state::Get().combat;
+    InitStack(attacker, COMBAT_ATTACKER_SIDE, 0);
+    InitStack(target, COMBAT_DEFENDER_SIDE, 0);
+    attacker.m_monster.damageMin = attacker.m_monster.damageMax = 20;
+    const auto animation = target.m_animationSequence;
+    state.GrantAbility(target, ironfist::CreatureAttribute::AstralDodge);
+    target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_BLIND, 2);
+    const auto dodge = ResolveAttack(board, state, attacker, target, {});
+    assert(dodge.outcome == Outcome::Dodged && target.m_hitPointsLost == 0);
+    assert(target.m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] == 2);
+    assert(!state.HasAbilityCharge(target, ironfist::CreatureAttribute::AstralDodge));
+    assert(!state.IsAnimating(target, ironfist::CreatureAttribute::AstralDodge));
+    assert(!target.m_damagePending && target.m_animationSequence == animation);
+
+    target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_FORCE_SHIELD, 2);
+    const auto shield = ResolveAttack(board, state, attacker, target, {});
+    assert(shield.damage == 20 && shield.absorbed == 20 && target.m_hitPointsLost == 0);
+    target.CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
+    state.GrantAbility(attacker, ironfist::CreatureAttribute::Jumper);
+    const auto jump = ResolveAttack(board, state, attacker, target, {{true, false, false}});
+    assert(jump.jump && jump.damage >= 25 && jump.damage <= 30);
+    assert(!state.HasAbilityCharge(attacker, ironfist::CreatureAttribute::Jumper));
+    assert(!state.IsAnimating(attacker, ironfist::CreatureAttribute::Jumper));
+    const auto ordinary = ResolveAttack(board, state, attacker, target, {{true, false, false}});
+    assert(!ordinary.jump && ordinary.damage == 20);
+    state.GrantAbility(attacker, ironfist::CreatureAttribute::Charger);
+    const auto path = ResolveAttack(board, state, attacker, target, {{false, true, false}, false, false, true});
+    assert(path.damage == 10);
+    const auto charge = ResolveAttack(board, state, attacker, target, {{false, true, false}});
+    assert(charge.damage == 25);
+
+    InitStack(target, COMBAT_DEFENDER_SIDE, 0);
+    target.m_hex = 20;
+    target.m_monster.hitPoints = 1;
+    board.m_hexCells[20].m_occupantSide = target.m_side;
+    board.m_hexCells[20].m_occupantIndex = target.m_index;
+    const auto burn = ResolveBurn(board, state, target);
+    assert(burn.killed == 1 && burn.remaining == 0 && target.m_quantity == 0);
+    assert(board.m_hexCells[20].m_occupantSide == COMBAT_SIDE_NONE);
+    assert(!target.m_damagePending && target.m_animationSequence == animation);
+    gbNoShowCombat = true;
+    PresentBurn(board, burn); // No window, icons, or messages needed for headless effects.
+    InitStack(attacker, COMBAT_ATTACKER_SIDE, 0);
+    InitStack(target, COMBAT_DEFENDER_SIDE, 0);
 }
 
 static void CheckMovement(combatManager& board, army& actor, army& enemy) {
@@ -128,6 +181,7 @@ int main() {
     InitStack(ally, COMBAT_ATTACKER_SIDE, 1);
     InitStack(enemy, COMBAT_DEFENDER_SIDE, 0);
     CheckMovement(combat, target, enemy);
+    CheckEffects(combat, target, enemy);
     combat.m_hexCells[20].m_occupantSide = COMBAT_ATTACKER_SIDE;
     combat.m_hexCells[20].m_occupantIndex = 0;
     constexpr auto shield = ARMY_SPELL_INFLUENCE_FORCE_SHIELD;

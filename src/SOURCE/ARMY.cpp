@@ -7,6 +7,7 @@
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
 #include <IRONFIST/combat_movement.h>
+#include <IRONFIST/combat_effects.h>
 #include <IRONFIST/hooks.h>
 #include <BASE/font.h>
 #include <BASE/Misc.h>
@@ -48,13 +49,6 @@
 #define ARMY_ATTACK_DURATION_SPEED_SCALE 0.08
 #define ARMY_WALK_DURATION_SPEED_SCALE                                             \
     0.12
-
-// Ironfist movement state threading through the attack path: whether the
-// mover ended adjacent to where it started (teleporters), whether the move
-// is an attack, and the charger's flight state.
-bool gCloseMove;
-bool gChargePathDamage;
-bool gCharging;
 
 namespace {
 
@@ -163,14 +157,6 @@ using enum BerserkMaskIndex;
 
 #define PROJECTILE_HALF_TURN_DEGREES_FLOAT 180.0
 #define PROJECTILE_DIRECTION_MIDPOINT_DIVISOR 2.0f
-#define DAMAGE_DOUBLE_MULTIPLIER 2.0f
-#define DAMAGE_HALF_DIVISOR 2.0f
-#define DAMAGE_ROUNDING_OFFSET 0.5
-#define DAMAGE_SHADOW_MARK_MULTIPLIER 1.5f
-#define DAMAGE_CHARGE_PATH_MULTIPLIER 0.5f
-#define DAMAGE_CHARGE_MULTIPLIER 1.25f
-#define DAMAGE_TELEPORT_MULTIPLIER 1.25f
-
 // Sprite frames for the Cyber creature ability animations.
 enum ExtendedArmyFrame {
     ARMY_FORCE_SHIELD_ICON_X_OFFSET = 2,
@@ -757,7 +743,6 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
     i32 tempBottom;
 
     destHex = GetAdjacentCellIndex(m_hex, direction);
-    gCloseMove = IsCloseMove(destHex);
     if (m_side == COMBAT_DEFENDER_SIDE && gpCombatManager->m_inCastleCombat
         && (destHex == COMBAT_CASTLE_GATE_APPROACH_HEX
             || destHex == H2EnumIndex(COMBAT_CASTLE_HEX_GATE)
@@ -1687,7 +1672,6 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
     i32 totalDamage = 0;
     i32 totalKilled = 0;
 
-    gChargePathDamage = true;
     for (i32 targetHex : affectedHexes) {
         if (!ValidHex(targetHex))
             continue;
@@ -1702,14 +1686,13 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
             continue;
         i32 damage = 0;
         i32 killed = 0;
-        DamageEnemy(target, &damage, &killed, 0, 0);
+        DamageEnemy(target, &damage, &killed, 0, 0, 1);
         if (damage > 0) {
             totalDamage += damage;
         }
         totalKilled += killed;
         ApplyAstralDodgeWince(target);
     }
-    gChargePathDamage = false;
 
     if (totalDamage > 0) {
         const char* attackerName =
@@ -1782,7 +1765,7 @@ void army::DoAttack(i32 retaliation) {
     originalFacing_6 = m_facing;
     ironfist::hooks::MeleeAttackStarted(this, retaliation);
     if (retaliation) {
-        gCloseMove = true;
+        ironfist::state::Get().combat.SetApproach(*this, {});
         gpCombatManager->m_currentSide = OppositeCombatSide(gpCombatManager->m_currentSide);
     }
     if (m_monsterType == CREATURE_HYDRA) {
@@ -1876,7 +1859,9 @@ void army::DoAttack(i32 retaliation) {
             DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, retaliation);
         }
         if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
-            gCharging = false;
+            auto approach = ironfist::state::Get().combat.Approach(*this);
+            approach.charge = false;
+            ironfist::state::Get().combat.SetApproach(*this, approach);
         }
         if (damage == -1) {
             utf8::Copy(
@@ -1987,10 +1972,10 @@ void army::DoAttack(i32 retaliation) {
                 break;
         }
         // Shadow-marking creatures brand their victim on every hit.
-        if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::ShadowMark)
-            && target_1->SpellCastWorks(SPELL_SHADOW_MARK)) {
-            target_1->m_spellEffect = SPELL_SHADOW_MARK;
-        }
+        const bool marked = ironfist::state::Get().combat.HasAbility(*this, ironfist::CreatureAttribute::ShadowMark)
+            && ironfist::effects::ResolveShadowMark(*target_1);
+        if (marked)
+            ironfist::effects::PresentShadowMark(*target_1);
         ApplyAstralDodgeWince(target_1);
         if (ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::Jumper)) {
             SetJumpingAnimation();
@@ -2036,7 +2021,7 @@ void army::DoAttack(i32 retaliation) {
             && m_monsterType != CREATURE_ROGUE && m_monsterType != CREATURE_SPRITE
             && m_monsterType != CREATURE_VAMPIRE && m_monsterType != CREATURE_VAMPIRE_LORD
             // Teleporting in from afar leaves no chance to retaliate.
-            && !(ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter) && !gCloseMove)
+            && !(ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter) && ironfist::state::Get().combat.Approach(*this).distantTeleport)
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
                 static_cast<i32l>(
@@ -2228,229 +2213,29 @@ void army::CheckLuck(void) {
     }
 }
 
-void army::DamageEnemy(
-    army* target,
-    i32* damageResult,
-    i32* killedResult,
-    i32 rangedAttack,
-    i32 retaliation
-) {
-    float damage1;
-    i32 attackBonus6;
-    i32 defenseBonus9;
-    i32 attackDifference7;
-    i32 rearHex19;
-    i32 index16;
-    i32 damageDone2;
-    i32 genieDamage26;
-    hero* commander1;
-
-    if (!target) {
+void army::DamageEnemy(army* target, i32* damageResult, i32* killedResult,
+                       i32 rangedAttack, i32 retaliation, i32 chargePath) {
+    if (!target)
         return;
-    }
-    damage1 = 0;
-    gbGenieHalf = false;
-    for (index16 = 0; index16 < m_quantity; index16++) {
-        if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLESS)]) {
-            damage1 += m_monster.damageMax;
-        } else if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_CURSE)]) {
-            damage1 += m_monster.damageMin;
-        } else {
-            damage1 += SRandom(m_monster.damageMin, m_monster.damageMax);
-        }
-    }
-    // Dazed or burning creatures fight at half their skill.
-    attackBonus6 = m_monster.attack;
-    if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_DAZE)]
-        || m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BURN)]) {
-        attackBonus6 /= 2;
-    }
-    defenseBonus9 = target->m_monster.defense;
-    if (target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_DAZE)]
-        || target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BURN)]) {
-        defenseBonus9 /= 2;
-    }
-    attackDifference7 = attackBonus6 - defenseBonus9;
-    if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)]
-        && (target->m_monsterType == CREATURE_GREEN_DRAGON
-            || target->m_monsterType == CREATURE_RED_DRAGON
-            || target->m_monsterType == CREATURE_BLACK_DRAGON
-            || target->m_monsterType == CREATURE_BONE_DRAGON)) {
-        attackDifference7 += ARMY_DRAGON_SLAYER_BONUS;
-    }
-    if (gpCombatManager->m_drawbridgeBackgroundVisible) {
-        rearHex19 = -1;
-        if ((H2EnumIndex((target->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-            rearHex19 = ArmyFacingRearHexOffset(target->m_facing) + target->m_hex;
-        }
-        for (index16 = 0; index16 < ARMY_MOAT_CELL_COUNT; index16++) {
-            if (moatCell[index16] == target->m_hex || moatCell[index16] == rearHex19) {
-                attackDifference7 += ARMY_MOAT_ATTACK_BONUS;
-            }
-        }
-    }
-    if (attackDifference7 > ARMY_DAMAGE_STAT_LIMIT) {
-        attackDifference7 = ARMY_DAMAGE_STAT_LIMIT;
-    }
-    if (attackDifference7 < -ARMY_DAMAGE_STAT_LIMIT) {
-        attackDifference7 = -ARMY_DAMAGE_STAT_LIMIT;
-    }
-    damage1 *= gfBattleStat[attackDifference7 + ARMY_DAMAGE_STAT_LIMIT];
-    if ((m_monsterType == CREATURE_CRUSADER
-         && (H2EnumIndex((target->m_monster.flags.all) & (MONSTER_FLAGS_UNDEAD))))
-        || (m_monsterType == CREATURE_EARTH_ELEMENTAL
-            && target->m_monsterType == CREATURE_AIR_ELEMENTAL)
-        || (m_monsterType == CREATURE_AIR_ELEMENTAL
-            && target->m_monsterType == CREATURE_EARTH_ELEMENTAL)
-        || (m_monsterType == CREATURE_WATER_ELEMENTAL
-            && target->m_monsterType == CREATURE_FIRE_ELEMENTAL)
-        || (m_monsterType == CREATURE_FIRE_ELEMENTAL
-            && target->m_monsterType == CREATURE_WATER_ELEMENTAL)) {
-        damage1 *= DAMAGE_DOUBLE_MULTIPLIER;
-    }
-    if (m_luckOutcome > 0) {
-        damage1 *= DAMAGE_DOUBLE_MULTIPLIER;
-    }
-    if (m_luckOutcome < 0) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    m_luckOutcome = 0;
-    if (rangedAttack && gpCombatManager->ShotIsThroughWall(m_side, m_hex, target->m_hex)) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    commander1 = gpCombatManager->m_heroes[H2EnumIndex(m_side)];
-    if (commander1 && rangedAttack) {
-        damage1 *=
-            gfSSArcheryMod[H2EnumIndex(commander1->m_secondarySkills[H2EnumIndex(HERO_SKILL_ARCHERY)])];
-    }
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER))) && !rangedAttack
-        && m_monsterType != CREATURE_TITAN && m_monsterType != CREATURE_MAGE
-        && m_monsterType != CREATURE_ARCHMAGE
-        && m_monsterType != CREATURE_CYBER_BEHEMOTH) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    if (rangedAttack && target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_SHIELD)]) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    if (m_damagePenalty == ARMY_DAMAGE_PENALTY_HALF) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    m_damagePenalty = ARMY_DAMAGE_PENALTY_NONE;
-    if (target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)]) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
-    }
-    if (target->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_SHADOW_MARK)]) {
-        damage1 *= DAMAGE_SHADOW_MARK_MULTIPLIER;
-    }
-    // A jumper strikes harder mid-jump, once per battle.
-    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper) && !retaliation
-        && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)
-        && ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::Jumper)) {
-        ironfist::state::Get().combat.ConsumeAbility(*this, ironfist::CreatureAttribute::Jumper);
-        damage1 *= SRandom(125, 150) * 0.01f;
-    }
-    // A charger's hit softens along its path and lands harder at the end.
-    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger) && gCharging) {
-        if (gChargePathDamage) {
-            damage1 *= DAMAGE_CHARGE_PATH_MULTIPLIER;
-        } else {
-            damage1 *= DAMAGE_CHARGE_MULTIPLIER;
-        }
-    }
-    // Teleporting into an enemy from afar hits harder.
-    if (!gCloseMove && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)) {
-        damage1 *= DAMAGE_TELEPORT_MULTIPLIER;
-    }
-    damageDone2 = static_cast<i32>(damage1 + DAMAGE_ROUNDING_OFFSET);
-    if (m_monsterType == CREATURE_GENIE
-        && SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
-        genieDamage26 =
-            ((target->m_quantity + 1) / GENIE_QUANTITY_DIVISOR) * target->m_monster.hitPoints;
-        if (damageDone2 < genieDamage26) {
-            gbGenieHalf = true;
-            damageDone2 = genieDamage26;
-        }
-    }
-    if (damageDone2 <= 0) {
-        damageDone2 = 1;
-    }
-    if ((H2EnumIndex((target->m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)))) {
-        damageDone2 = -1;
-    }
-    // An astral dodger slips one melee blow per round; -2 marks the dodge.
-    if (!rangedAttack && !retaliation
-        && ironfist::HasCreatureAttribute(target->m_monsterType, ironfist::CreatureAttribute::AstralDodge)
-        && ironfist::state::Get().combat.HasAbilityCharge(*target, ironfist::CreatureAttribute::AstralDodge)) {
-        ironfist::state::Get().combat.StartAnimation(*target, ironfist::CreatureAttribute::AstralDodge);
-        ironfist::state::Get().combat.ConsumeAbility(*target, ironfist::CreatureAttribute::AstralDodge);
-        damageDone2 = -2;
-    }
-    *damageResult = damageDone2;
-    if (damageDone2 < 0) {
-        *killedResult = target->Damage(0, SPELL_NONE);
-        return;
-    }
-    // Resolve shield absorption once; the retail influence owns its spell count.
-    const i32 shieldPoints = ironfist::state::Get().combat.ShieldHP(*target);
-    damageDone2 = ironfist::state::Get().combat.AbsorbDamage(*target, damageDone2);
-    if (shieldPoints > 0 && ironfist::state::Get().combat.ShieldHP(*target) == 0)
-        target->CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
-    *killedResult = target->Damage(damageDone2, SPELL_NONE);
+    auto& state = ironfist::state::Get().combat;
+    const auto result = ironfist::effects::ResolveAttack(*gpCombatManager, state, *this, *target,
+        {state.Approach(*this), rangedAttack != 0, retaliation != 0, chargePath != 0});
+    *damageResult = result.outcome == ironfist::effects::Outcome::Dodged ? -2
+        : result.outcome == ironfist::effects::Outcome::MirrorDestroyed ? -1 : result.damage;
+    *killedResult = result.killed;
+    gbGenieHalf = result.genieHalf;
+    ironfist::effects::PrepareAttackPresentation(state, result);
 }
 
 i32 army::Damage(i32l damage, SpellType spell) {
-    i32 killed;
-    ArmyFacing oldFacing;
-    i32 quantityFifth;
-
-    damage += m_hitPointsLost;
-    if (spell != SPELL_NONE) {
-        if (gbRemoteOn) {
-            gpCombatManager->ModifyDamageForArtifacts(
-                &damage,
-                spell,
-                gpCombatManager->m_heroes[H2EnumIndex(m_side)],
-                gpCombatManager->m_heroes[H2EnumIndex(gpCombatManager->m_currentSide)]
-            );
-        } else {
-            gpCombatManager->ModifyDamageForArtifacts(
-                &damage,
-                spell,
-                gpCombatManager->m_heroes[H2EnumIndex(gpCombatManager->m_currentSide)],
-                gpCombatManager->m_heroes[H2EnumIndex(m_side)]
-            );
-        }
-    }
-    killed = damage / m_monster.hitPoints;
-    m_hitPointsLost = damage % m_monster.hitPoints;
-    quantityFifth = m_quantity / DAMAGE_DISPLAY_DIVISOR;
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_MIRROR_IMAGE)))) {
-        killed = m_quantity;
-        m_hitPointsLost = 0;
-    }
-    if (!quantityFifth) {
-        quantityFifth = 1;
-    }
+    const i32 previousQuantity = m_quantity;
+    const i32 killed = ironfist::effects::ApplyDamage(*gpCombatManager, *this, damage, spell);
     m_damagePending = true;
     if (killed > 0) {
         m_killPending = true;
-        m_lastTargetHex = m_quantity;
+        m_lastTargetHex = previousQuantity;
     }
-    if (killed > m_quantity) {
-        killed = m_quantity;
-    }
-    m_quantity -= killed;
-    if (m_quantity <= 0) {
-        m_deathPending = true;
-    }
-    oldFacing = m_facing;
-    m_facing = OppositeArmyFacing(
-        gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
-                                 [gpCombatManager->m_currentArmyIndex]
-            .m_facing
-    );
-    m_facing = oldFacing;
-    CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
+    m_deathPending = m_quantity <= 0;
     return killed;
 }
 
@@ -3395,8 +3180,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly, i32 approach) {
     target.exactHex = approach != ARMY_HEX_INVALID;
     if (target.IsAttack() && moveOnly)
         return;
-    gCharging = false;
-    gCloseMove = true;
+    ironfist::state::Get().combat.SetApproach(*this, {});
     m_targetSide = target.side;
     m_targetIndex = target.slot;
     m_moveTargetHex = destination;
@@ -3420,7 +3204,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly, i32 approach) {
         if (m_quantity > 0 && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::StrikeAndReturn))
             MoveTo(returnHex);
     }
-    gCharging = false;
+    ironfist::state::Get().combat.SetApproach(*this, {});
     gpCombatManager->m_limitCreature = true;
 }
 
