@@ -757,8 +757,11 @@ void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
 
     gpGame->m_worldMap.extraCount = root->ToElement()->IntAttribute("numCellExtras");
     if (gpGame->m_worldMap.extraCount) {
-        delete[] gpGame->m_worldMap.extras;
-        gpGame->m_worldMap.extras = new mapCellExtra[gpGame->m_worldMap.extraCount];
+        // Init already released the previous map. Match fullMap's tracked
+        // allocation owner, including later growth and Close().
+        gpGame->m_worldMap.extras = static_cast<mapCellExtra*>(
+            H2_ALLOC(gpGame->m_worldMap.extraCount * sizeof(mapCellExtra))
+        );
     }
 
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
