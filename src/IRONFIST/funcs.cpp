@@ -4,6 +4,7 @@
 #include <string>
 
 #include <IRONFIST/callback.h>
+#include <IRONFIST/campaigns.h>
 #include <IRONFIST/deepbinding.h>
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/hooks.h>
@@ -1247,29 +1248,35 @@ static void register_battle_funcs(lua_State* L) {
 
 /**************************************** Campaign ************************************/
 
-static SCampaignChoice* CurrentCampaignChoice() {
-    i32 curMapID = H2EnumIndex(xCampaign.m_currentMap);
-    return &xCampaignChoices[H2EnumIndex(xCampaign.m_campaignId)][curMapID]
-                            [xCampaign.m_bonusChoices[curMapID]];
+static const SCampaignChoice* CurrentCampaignChoice(lua_State* L) {
+    const auto* definition = Campaigns().Find(xCampaign.m_campaignId);
+    const i32 map = H2EnumIndex(xCampaign.m_currentMap);
+    if (!xIsPlayingExpansionCampaign || !definition || map < 0
+        || static_cast<size_t>(map) >= definition->scenarios.size()
+        || xCampaign.m_bonusChoices[map] >= EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT) {
+        luaL_error(L, "No active campaign choice");
+        return nullptr;
+    }
+    return &definition->Scenario(map).choices[xCampaign.m_bonusChoices[map]];
 }
 
 static i32 l_getCampaignChoiceType(lua_State* L) {
-    lua_pushinteger(L, H2EnumIndex(CurrentCampaignChoice()->type));
+    lua_pushinteger(L, H2EnumIndex(CurrentCampaignChoice(L)->type));
     return 1;
 }
 
 static i32 l_getCampaignChoiceField(lua_State* L) {
-    lua_pushinteger(L, CurrentCampaignChoice()->value);
+    lua_pushinteger(L, CurrentCampaignChoice(L)->value);
     return 1;
 }
 
 static i32 l_getCampaignChoiceAmount(lua_State* L) {
-    lua_pushinteger(L, CurrentCampaignChoice()->amount);
+    lua_pushinteger(L, CurrentCampaignChoice(L)->amount);
     return 1;
 }
 
 static i32 l_getCampaignChoice(lua_State* L) {
-    PushBinding(L, Binding<SCampaignChoice*>(CurrentCampaignChoice()));
+    PushBinding(L, Binding<SCampaignChoice>(*CurrentCampaignChoice(L)));
     return 1;
 }
 

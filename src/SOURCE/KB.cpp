@@ -1031,7 +1031,7 @@ i32 oldmain(void) {
                             0,
                             HIGH_SCORE_EXPANSION_CAMPAIGN,
                             const_cast<char*>(
-                                ironfist::CampaignNames[H2EnumIndex(xCampaign.CampaignID())].c_str()
+                                ironfist::Campaigns().At(xCampaign.m_campaignId).name.c_str()
                             )
                         );
                     }

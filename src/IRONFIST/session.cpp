@@ -215,17 +215,8 @@ SessionData CaptureSession() {
     data.campaignType = gbInCampaign ? save::CAMPAIGN_ORIGINAL
         : xIsPlayingExpansionCampaign ? save::CAMPAIGN_EXPANSION : save::CAMPAIGN_NONE;
     data.expansionMap = xIsExpansionMap;
-    if (data.campaignType == save::CAMPAIGN_EXPANSION) {
-        tinyxml2::XMLDocument document;
-        auto* root = document.NewElement("session");
-        document.InsertEndChild(root);
-        WriteCampaignMetadata(&document, root);
-        if (auto* metadata = root->FirstChildElement()) {
-            tinyxml2::XMLPrinter printer;
-            metadata->Accept(&printer);
-            data.campaignMetadata = printer.CStr();
-        }
-    }
+    if (data.campaignType == save::CAMPAIGN_EXPANSION && IsCustomCampaign(xCampaign.m_campaignId))
+        data.campaignDefinition = Campaigns().At(xCampaign.m_campaignId);
     data.generatedArtifacts = SerializeGeneratedArtifacts();
     data.scriptSource = script::ActiveScriptContents();
     data.mapVariables = script::LoadMapVariablesFromLua();
@@ -237,6 +228,24 @@ void RestoreSession(const SessionData& data) {
     if (data.hasWorld)
         world = std::make_unique<PreparedWorld>(data.world);
     auto campaign = data.campaign;
+    auto catalog = Campaigns();
+    if (data.campaignDefinition) {
+        if (data.campaignType != save::CAMPAIGN_EXPANSION
+            || data.campaignDefinition->id != H2EnumIndex(data.expansion.m_campaignId))
+            throw std::invalid_argument("Saved campaign identity does not match its definition");
+        catalog.Replace(*data.campaignDefinition);
+    }
+    if (data.campaignType == save::CAMPAIGN_EXPANSION) {
+        const auto& definition = catalog.At(data.expansion.m_campaignId);
+        const i32 count = static_cast<i32>(definition.scenarios.size());
+        if (data.expansion.m_mapCount != count || H2EnumIndex(data.expansion.m_currentMap) < -1
+            || H2EnumIndex(data.expansion.m_currentMap) >= count
+            || H2EnumIndex(data.expansion.m_viewMap) < -1 || H2EnumIndex(data.expansion.m_viewMap) >= count)
+            throw std::invalid_argument("Saved campaign progress is outside its definition");
+        for (i32 map = 0; map < count; ++map)
+            if (data.expansion.m_bonusChoices[map] >= EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT)
+                throw std::invalid_argument("Invalid saved campaign bonus choice");
+    }
 
     // Replace records while callbacks are unavailable. All lifecycle changes
     // happen here; codecs only construct SessionData.
@@ -251,6 +260,7 @@ void RestoreSession(const SessionData& data) {
 #undef IRONFIST_GAME_FIELD
 #undef IRONFIST_CAMPAIGN_FIELD
     state::Get().campaign.savedHeroData.swap(campaign.savedHeroData);
+    Campaigns().Swap(catalog);
     giMonthType = data.monthType;
     giMonthTypeExtra = data.monthExtra;
     giWeekType = data.weekType;
@@ -267,12 +277,6 @@ void RestoreSession(const SessionData& data) {
     giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
     SetLoadedPlayerContext(data);
     DeserializeGeneratedArtifacts(data.generatedArtifacts);
-    if (!data.campaignMetadata.empty()) {
-        tinyxml2::XMLDocument metadata;
-        metadata.Parse(data.campaignMetadata.c_str());
-        ReadCampaignMetadata(metadata.RootElement());
-    }
-
     // Script defaults observe the restored records. Persisted runtime choices
     // consistently win afterwards, including AI sharing and building bans.
     if (data.scriptSource.empty())
@@ -341,7 +345,12 @@ LoadResult LoadGame(const char* filename, i32 loadFromFile) {
         DisplayError(std::string("Could not load XML. ") + xml.GetError(), "Ironfist load");
         return LoadResult::Failed;
     }
-    RestoreSession(data);
+    try {
+        RestoreSession(data);
+    } catch (const std::exception& error) {
+        DisplayError(std::string("Could not restore session. ") + error.what(), "Ironfist load");
+        return LoadResult::Failed;
+    }
     if (platform::CompareIgnoringCase(filename, "RMT", 3))
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     gpAdvManager->m_heroContextLocked = false;

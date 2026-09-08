@@ -48,6 +48,11 @@ portable engine's expected name `MUSIC/Track44.ogg`. The portable audio path
 plays that Ogg directly, so the generated aggregate does not need a copied
 retail `MIDI0044.XMI` placeholder.
 
+Packaging removes the pinned Cyborg metadata's unused award for a seventh
+victory: the campaign contains six scenarios. Campaign loading validates
+scenario references and rejects malformed definitions before replacing the
+catalog. Existing installations need the rebuilt campaign metadata.
+
 No resource data is committed to this repository. The fetched source and built
 payload do exist in the user's Nix store. They are not included in the game
 package or uploaded anywhere by this repository. The upstream resources retain

@@ -1,16 +1,17 @@
 #include <IRONFIST/campaigns.h>
 
+#include <algorithm>
 #include <filesystem>
+#include <stdexcept>
 #include <string>
 #include <strings.h>
 #include <system_error>
-
 #include <tinyxml2.h>
 
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/state.h>
 #include <IRONFIST/paths.h>
-#include <IRONFIST/xml_utils.h>
+#include <PLATFORM/Platform.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
@@ -19,220 +20,123 @@
 
 namespace ironfist {
 
-std::map<i32, std::string> CampaignNames;
-std::map<i32, std::string> CampaignShortNames;
-std::map<i32, i32> CampaignMapCounts;
-std::map<i32, std::map<i32, std::string>> ScenarioNames;
-std::map<i32, std::map<i32, std::string>> ScenarioDescriptions;
-std::map<i32, std::map<i32, i32>> CampaignDifficulties;
-std::map<i32, std::map<i32, CampaignTrackPoint>> CampaignTrack;
-std::map<i32, std::map<i32, std::map<i32, SCampaignChoice>>> CampaignChoices;
-std::map<i32, std::map<i32, std::set<i32>>> MapsToComplete;
-std::map<i32, std::map<i32, i32>> ReplayMovies;
-std::map<i32, std::map<i32, i32>> VictoryMovies;
-std::map<i32, std::map<i32, i32>> AwardsToGive;
-std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToLoad;
-std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToSave;
-std::map<i32, std::string> CampaignSourceFiles;
+CampaignCatalog& Campaigns() {
+    static CampaignCatalog catalog;
+    return catalog;
+}
+
+const CampaignDefinition* CampaignCatalog::Find(ExpansionCampaignId id) const {
+    const auto entry = definitions_.find(H2EnumIndex(id));
+    return entry == definitions_.end() ? nullptr : &entry->second;
+}
+
+const CampaignDefinition& CampaignCatalog::At(ExpansionCampaignId id) const {
+    return definitions_.at(H2EnumIndex(id));
+}
+
+void CampaignCatalog::Replace(CampaignDefinition definition) {
+    ValidateCampaignDefinition(definition);
+    const i32 id = definition.id;
+    definitions_.insert_or_assign(id, std::move(definition));
+}
+
+void CampaignCatalog::Swap(CampaignCatalog& other) noexcept {
+    definitions_.swap(other.definitions_);
+}
 
 b32 IsCustomCampaign(ExpansionCampaignId id) {
     return H2EnumIndex(id) >= H2EnumIndex(EXPANSION_CAMPAIGN_COUNT);
 }
 
-SCampaignChoice* CampaignChoice(ExpansionCampaignId id, i32 map, i32 choiceIdx) {
-    return &CampaignChoices[H2EnumIndex(id)][map][choiceIdx];
+const SCampaignChoice* CampaignChoice(ExpansionCampaignId id, i32 map, i32 choiceIdx) {
+    return &Campaigns().At(id).Scenario(map).choices.at(choiceIdx);
+}
+
+namespace {
+bool ReadDefinitionFile(const std::filesystem::path& path, CampaignDefinition& definition,
+                        std::string& error) {
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(path.string().c_str()) != tinyxml2::XML_SUCCESS) {
+        error = doc.ErrorStr() ? doc.ErrorStr() : "Could not read campaign file";
+        return false;
+    }
+    if (!ParseCampaignDefinition(doc.RootElement(), definition, error))
+        return false;
+    definition.sourceFile = path.filename().string();
+    return true;
+}
 }
 
 void InitializeCampaigns() {
+    CampaignCatalog catalog;
     for (i32 c = 0; c < H2EnumIndex(EXPANSION_CAMPAIGN_COUNT); c++) {
-        CampaignNames[c] = xHSCampaignNames[c];
-        CampaignShortNames[c] = xShortCampaignNames[c];
-        CampaignMapCounts[c] = expansionCampaignMapCounts[c];
+        CampaignDefinition definition;
+        definition.id = c;
+        definition.name = xHSCampaignNames[c];
+        definition.shortName = xShortCampaignNames[c];
+        definition.scenarios.resize(expansionCampaignMapCounts[c]);
         for (i32 m = 0; m < expansionCampaignMapCounts[c]; m++) {
-            ScenarioNames[c][m] = xScenarioName[c][m];
-            ScenarioDescriptions[c][m] = xScenarioDescription[c][m];
-            CampaignDifficulties[c][m] = H2EnumIndex(expansionCampaignDifficulty[c][m]);
-            CampaignTrack[c][m] = {
-                expansionCampaignTrackXY[c][m][0],
-                expansionCampaignTrackXY[c][m][1]
-            };
-            for (i32 n = 0; n < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; n++)
-                CampaignChoices[c][m][n] = xCampaignChoices[c][m][n];
+            auto& scenario = definition.scenarios[m];
+            scenario.name = xScenarioName[c][m];
+            scenario.description = xScenarioDescription[c][m];
+            scenario.difficulty = H2EnumIndex(expansionCampaignDifficulty[c][m]);
+            scenario.track = {expansionCampaignTrackXY[c][m][0], expansionCampaignTrackXY[c][m][1]};
+            std::copy_n(xCampaignChoices[c][m], scenario.choices.size(), scenario.choices.begin());
         }
+        catalog.Replace(std::move(definition));
     }
 
-    // Every .cmp under CAMPAIGNS/ registers itself under the ID it names.
+    // Sort before resolving duplicate IDs so the catalog is reproducible.
     namespace fs = std::filesystem;
     std::error_code listError;
-    fs::path campaignDir = ResolveDataPath("CAMPAIGNS");
-    for (const fs::directory_entry& entry : fs::directory_iterator(campaignDir, listError)) {
-        const std::string name = entry.path().filename().string();
-        if (name.size() < 4 || strcasecmp(name.c_str() + name.size() - 4, ".cmp") != 0)
-            continue;
-        tinyxml2::XMLDocument doc;
-        if (doc.LoadFile(entry.path().string().c_str()) != tinyxml2::XML_SUCCESS)
-            continue;
-        i32 campaignId = ReadCampaignMetadata(doc.FirstChild());
-        if (campaignId != -1)
-            CampaignSourceFiles[campaignId] = name;
+    std::vector<fs::path> files;
+    for (const auto& entry : fs::directory_iterator(ResolveDataPath("CAMPAIGNS"), listError)) {
+        if (entry.is_regular_file() && strcasecmp(entry.path().extension().string().c_str(), ".cmp") == 0)
+            files.push_back(entry.path());
     }
-}
-
-// The .cmp schema follows upstream Ironfist so its campaign files load
-// unchanged; the same block rides inside XML saves for ID stability.
-i32 ReadCampaignMetadata(tinyxml2::XMLNode* root) {
-    i32 campaignID = -1;
-    if (root == NULL)
-        return campaignID;
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
-        tinyxml2::XMLElement* elem = child->ToElement();
-        if (elem == NULL)
-            continue;
-        std::string name = elem->Name();
-        i32 index = elem->IntAttribute("index");
-        i32 value = elem->IntAttribute("value");
-        if (name == "id") {
-            elem->QueryIntText(&campaignID);
-        } else if (name == "name") {
-            const char* text = elem->GetText();
-            CampaignNames[campaignID] = text ? text : "empty name";
-        } else if (name == "shortName") {
-            xml::QueryText(elem, CampaignShortNames[campaignID]);
-        } else if (name == "numMaps") {
-            elem->QueryIntText(&CampaignMapCounts[campaignID]);
-        } else if (name == "scenarioName") {
-            const char* text = elem->Attribute("value");
-            if (text)
-                ScenarioNames[campaignID][index] = text;
-        } else if (name == "scenarioDescription") {
-            const char* text = elem->Attribute("value");
-            if (text)
-                ScenarioDescriptions[campaignID][index] = text;
-        } else if (name == "scenarioDifficulty") {
-            CampaignDifficulties[campaignID][index] = value;
-        } else if (name == "scenarioIcon") {
-            i32 scenarioID = elem->IntAttribute("scenarioID");
-            CampaignTrack[campaignID][scenarioID].x = elem->IntAttribute("x");
-            CampaignTrack[campaignID][scenarioID].y = elem->IntAttribute("y");
-        } else if (name == "choice") {
-            i32 scenarioID = elem->IntAttribute("scenarioID");
-            i32 choiceID = elem->IntAttribute("id");
-            SCampaignChoice choice;
-            choice.type = CampaignChoiceTypeFromCode(elem->IntAttribute("type"));
-            choice.value = static_cast<i16>(elem->IntAttribute("field"));
-            choice.amount = static_cast<i16>(elem->IntAttribute("amount"));
-            CampaignChoices[campaignID][scenarioID][choiceID] = choice;
-        } else if (name == "replaySMK") {
-            ReplayMovies[campaignID][index] = value;
-        } else if (name == "victorySMK") {
-            VictoryMovies[campaignID][index] = value;
-        } else if (name == "mapToComplete") {
-            MapsToComplete[campaignID][index].insert(value);
-        } else if (name == "award") {
-            AwardsToGive[campaignID][index] = value;
-        } else if (name == "saveHero") {
-            i32 scenarioID = elem->IntAttribute("scenarioID");
-            i32 playerID = elem->IntAttribute("playerID");
-            i32 ownedHeroID = elem->IntAttribute("ownedHeroID");
-            HeroesToSave[campaignID][scenarioID].insert({playerID, ownedHeroID});
-        } else if (name == "loadHero") {
-            i32 scenarioID = elem->IntAttribute("scenarioID");
-            i32 playerID = elem->IntAttribute("playerID");
-            i32 ownedHeroID = elem->IntAttribute("ownedHeroID");
-            HeroesToLoad[campaignID][scenarioID].insert({playerID, ownedHeroID});
+    std::sort(files.begin(), files.end());
+    for (const auto& file : files) {
+        CampaignDefinition definition;
+        std::string error;
+        if (ReadDefinitionFile(file, definition, error)) {
+            if (!catalog.Find(ExpansionCampaignIdFromCode(definition.id))) {
+                catalog.Replace(std::move(definition));
+                continue;
+            }
+            error = "Duplicate campaign ID";
         }
+        const std::string message = file.filename().string() + ": " + error;
+        platform::Host().Log(platform::LogLevel::Warning, message.c_str());
     }
-    // The map cap is retail-fixed; a fatter .cmp would corrupt ExpCampaign.
-    if (CampaignMapCounts.count(campaignID)
-        && CampaignMapCounts[campaignID] > EXPANSION_CAMPAIGN_MAX_MAP_COUNT)
-        CampaignMapCounts[campaignID] = EXPANSION_CAMPAIGN_MAX_MAP_COUNT;
-    return campaignID;
-}
-
-void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root) {
-    i32 campaignID = H2EnumIndex(xCampaign.m_campaignId);
-    if (!IsCustomCampaign(xCampaign.m_campaignId))
-        return;
-
-    tinyxml2::XMLElement* metadata = doc->NewElement("campaignMetadata");
-    xml::PushBack(doc, metadata, "id", campaignID);
-    xml::PushBack(doc, metadata, "name", CampaignNames[campaignID].c_str());
-    xml::PushBack(doc, metadata, "shortName", CampaignShortNames[campaignID].c_str());
-    xml::PushBack(doc, metadata, "numMaps", CampaignMapCounts[campaignID]);
-    xml::WriteArray(doc, metadata, "scenarioName", ScenarioNames[campaignID]);
-    xml::WriteArray(doc, metadata, "scenarioDescription", ScenarioDescriptions[campaignID]);
-    xml::WriteArray(doc, metadata, "scenarioDifficulty", CampaignDifficulties[campaignID]);
-
-    for (auto& track : CampaignTrack[campaignID]) {
-        tinyxml2::XMLElement* icn = doc->NewElement("scenarioIcon");
-        icn->SetAttribute("scenarioID", track.first);
-        icn->SetAttribute("x", track.second.x);
-        icn->SetAttribute("y", track.second.y);
-        metadata->InsertEndChild(icn);
-    }
-
-    for (auto& scenario : CampaignChoices[campaignID]) {
-        for (auto& choiceRow : scenario.second) {
-            tinyxml2::XMLElement* choiceElem = doc->NewElement("choice");
-            choiceElem->SetAttribute("scenarioID", scenario.first);
-            choiceElem->SetAttribute("id", choiceRow.first);
-            choiceElem->SetAttribute("type", H2EnumIndex(choiceRow.second.type));
-            choiceElem->SetAttribute("field", choiceRow.second.value);
-            choiceElem->SetAttribute("amount", choiceRow.second.amount);
-            metadata->InsertEndChild(choiceElem);
-        }
-    }
-
-    xml::WriteArray(doc, metadata, "replaySMK", ReplayMovies[campaignID]);
-    xml::WriteArray(doc, metadata, "victorySMK", VictoryMovies[campaignID]);
-    for (auto& mapRow : MapsToComplete[campaignID]) {
-        for (i32 opened : mapRow.second) {
-            tinyxml2::XMLElement* mapElem = doc->NewElement("mapToComplete");
-            mapElem->SetAttribute("index", mapRow.first);
-            mapElem->SetAttribute("value", opened);
-            metadata->InsertEndChild(mapElem);
-        }
-    }
-    xml::WriteArray(doc, metadata, "award", AwardsToGive[campaignID]);
-
-    for (auto& scenario : HeroesToSave[campaignID]) {
-        for (auto& heroData : scenario.second) {
-            tinyxml2::XMLElement* heroElem = doc->NewElement("saveHero");
-            heroElem->SetAttribute("scenarioID", scenario.first);
-            heroElem->SetAttribute("playerID", heroData.first);
-            heroElem->SetAttribute("ownedHeroID", heroData.second);
-            metadata->InsertEndChild(heroElem);
-        }
-    }
-    for (auto& scenario : HeroesToLoad[campaignID]) {
-        for (auto& heroData : scenario.second) {
-            tinyxml2::XMLElement* heroElem = doc->NewElement("loadHero");
-            heroElem->SetAttribute("scenarioID", scenario.first);
-            heroElem->SetAttribute("playerID", heroData.first);
-            heroElem->SetAttribute("ownedHeroID", heroData.second);
-            metadata->InsertEndChild(heroElem);
-        }
-    }
-    root->InsertEndChild(metadata);
+    Campaigns().Swap(catalog);
 }
 
 i32 LoadCampaignFromFile(const std::string& filename) {
-    std::string path = ResolveDataPath("CAMPAIGNS") + "/" + filename;
-    tinyxml2::XMLDocument doc;
-    tinyxml2::XMLError err = doc.LoadFile(path.c_str());
-    if (err != tinyxml2::XML_SUCCESS) {
-        std::string message = "Could not load " + filename + "\n"
-            + std::string(doc.ErrorStr() ? doc.ErrorStr() : "");
+    CampaignDefinition definition;
+    std::string error;
+    if (!ReadDefinitionFile(std::filesystem::path(ResolveDataPath("CAMPAIGNS")) / filename,
+                            definition, error)) {
+        std::string message = "Could not load " + filename + "\n" + error;
         H2MessageBox(message);
         return -1;
     }
-    return ReadCampaignMetadata(doc.FirstChild());
+    const i32 id = definition.id;
+    Campaigns().Replace(std::move(definition));
+    return id;
 }
 
 void LoadCampaignSavedHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
-    i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
+    if (playerId < 0 || playerId >= GAME_PLAYER_COUNT || ownedHeroIdx < 0
+        || ownedHeroIdx >= gpGame->m_players[playerId].m_heroCount)
+        return;
+    const i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
+    if (heroIdx < 0 || heroIdx >= GAME_HERO_COUNT)
+        return;
     hero* heroRec = &gpGame->m_heroRecs[heroIdx];
-    state::CampaignState::PartialHeroData* savedHero = &state::Get().campaign.savedHeroData[saveIdx];
+    const auto entry = state::Get().campaign.savedHeroData.find(saveIdx);
+    if (entry == state::Get().campaign.savedHeroData.end())
+        return;
+    const auto* savedHero = &entry->second;
 
     for (i32 i = 0; i < H2EnumIndex(HERO_PRIMARY_STAT_COUNT); i++)
         heroRec->m_primaryStats[i] = savedHero->primarySkills[i];
@@ -247,7 +151,12 @@ void LoadCampaignSavedHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
 }
 
 void SaveCampaignHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx) {
-    i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
+    if (playerId < 0 || playerId >= GAME_PLAYER_COUNT || ownedHeroIdx < 0
+        || ownedHeroIdx >= gpGame->m_players[playerId].m_heroCount)
+        return;
+    const i32 heroIdx = gpGame->m_players[playerId].m_heroIds[ownedHeroIdx];
+    if (heroIdx < 0 || heroIdx >= GAME_HERO_COUNT)
+        return;
     hero* heroRec = &gpGame->m_heroRecs[heroIdx];
     state::CampaignState::PartialHeroData* savedHero = &state::Get().campaign.savedHeroData[saveIdx];
 

@@ -49,16 +49,6 @@ void ReadText(tinyxml2::XMLElement* element, char (&destination)[Size]) {
     utf8::Copy(destination, Size, element->GetText());
 }
 
-void AppendCampaignMetadata(tinyxml2::XMLDocument* document, tinyxml2::XMLNode* root,
-                            const std::string& source) {
-    if (source.empty())
-        return;
-    tinyxml2::XMLDocument metadata;
-    if (metadata.Parse(source.c_str()) != tinyxml2::XML_SUCCESS || !metadata.RootElement())
-        throw std::invalid_argument("Invalid campaign metadata in session data");
-    root->InsertEndChild(metadata.RootElement()->DeepClone(document));
-}
-
 } // namespace
 
 
@@ -210,7 +200,8 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
             // A custom campaign's save carries its whole definition, so it
             // loads even if the .cmp vanishes from CAMPAIGNS/.
-            AppendCampaignMetadata(tempDoc, pRoot, data.campaignMetadata);
+            if (data.campaignDefinition)
+                WriteCampaignDefinition(tempDoc, pRoot, *data.campaignDefinition);
         }
         pRoot->InsertEndChild(pElement);
     }
@@ -1228,9 +1219,11 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root, SessionData& data) {
         else if (name == "hero") ReadHero(elem, index, data);
         else if (name == "campaign") ReadCampaign(elem, data.campaignType, data);
         else if (name == "campaignMetadata") {
-            tinyxml2::XMLPrinter printer;
-            elem->Accept(&printer);
-            data.campaignMetadata = printer.CStr();
+            CampaignDefinition definition;
+            std::string error;
+            if (data.campaignDefinition || !ParseCampaignDefinition(elem, definition, error))
+                throw std::invalid_argument(error.empty() ? "Duplicate campaign definition" : error);
+            data.campaignDefinition = std::move(definition);
         }
         else if (name == "mapVariable") {
             std::string mapVariableId = RequiredAttribute(elem, "id");

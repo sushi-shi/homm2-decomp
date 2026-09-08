@@ -1,10 +1,13 @@
 #ifndef HOMM2_IRONFIST_CAMPAIGNS_H
 #define HOMM2_IRONFIST_CAMPAIGNS_H
 
+#include <array>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <Ints.h>
 #include <SOURCE/ExpCampaign.h>
@@ -17,49 +20,76 @@ class XMLNode;
 
 namespace ironfist {
 
-/*
- * Campaigns become data.  The retail expansion tables seed these map-keyed
- * stores at startup, and every campaign metadata file in CAMPAIGNS
- * registers a further
- * campaign from ID 4 up, so a custom campaign runs through the same
- * X_CAMPGN code paths as the bundled four.
- */
-
 struct CampaignTrackPoint {
-    i32 x;
-    i32 y;
+    i32 x = 0;
+    i32 y = 0;
 };
 
-extern std::map<i32, std::string> CampaignNames;
-extern std::map<i32, std::string> CampaignShortNames;
-extern std::map<i32, i32> CampaignMapCounts;
-extern std::map<i32, std::map<i32, std::string>> ScenarioNames;
-extern std::map<i32, std::map<i32, std::string>> ScenarioDescriptions;
-extern std::map<i32, std::map<i32, i32>> CampaignDifficulties;
-extern std::map<i32, std::map<i32, CampaignTrackPoint>> CampaignTrack;
-extern std::map<i32, std::map<i32, std::map<i32, SCampaignChoice>>> CampaignChoices;
+struct CampaignTransition {
+    std::optional<i32> movie;
+    std::optional<i32> award;
+    std::set<i32> unlocks;
+};
 
-// Custom campaigns only: which scenarios a victory opens, which movies to
-// play, which award a map grants, and which heroes carry between maps.
-extern std::map<i32, std::map<i32, std::set<i32>>> MapsToComplete;
-extern std::map<i32, std::map<i32, i32>> ReplayMovies;
-extern std::map<i32, std::map<i32, i32>> VictoryMovies;
-extern std::map<i32, std::map<i32, i32>> AwardsToGive;
-extern std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToLoad;
-extern std::map<i32, std::map<i32, std::set<std::pair<i32, i32>>>> HeroesToSave;
+struct ScenarioDefinition {
+    std::string name;
+    std::string description;
+    i32 difficulty = 0;
+    CampaignTrackPoint track;
+    std::array<SCampaignChoice, EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT> choices;
+    std::optional<i32> replayMovie;
+    CampaignTransition victory;
+    std::set<std::pair<i32, i32>> heroesToLoad;
+    std::set<std::pair<i32, i32>> heroesToSave;
 
-// The .cmp file each custom campaign came from, so a save can re-resolve
-// its campaign ID on load no matter what else sits in CAMPAIGNS/.
-extern std::map<i32, std::string> CampaignSourceFiles;
+    ScenarioDefinition() {
+        for (auto& choice : choices) {
+            choice = {};
+            choice.type = CAMPAIGN_CHOICE_NONE;
+        }
+    }
+};
+
+// Authored data only. Played maps, selected bonuses, and carried heroes belong
+// to ExpCampaign and state::CampaignState, never to this catalog.
+struct CampaignDefinition {
+    i32 id = -1;
+    std::string name;
+    std::string shortName;
+    std::string sourceFile;
+    CampaignTransition start;
+    std::vector<ScenarioDefinition> scenarios;
+
+    const ScenarioDefinition& Scenario(i32 map) const { return scenarios.at(map); }
+    const CampaignTransition& After(i32 map) const {
+        return map == -1 ? start : Scenario(map).victory;
+    }
+};
+
+class CampaignCatalog {
+public:
+    const CampaignDefinition* Find(ExpansionCampaignId id) const;
+    const CampaignDefinition& At(ExpansionCampaignId id) const;
+    // Validate and allocate before publishing; replacement drops every old rule.
+    void Replace(CampaignDefinition definition);
+    void Swap(CampaignCatalog& other) noexcept;
+
+private:
+    std::map<i32, CampaignDefinition> definitions_;
+};
+
+CampaignCatalog& Campaigns();
+void ValidateCampaignDefinition(const CampaignDefinition& definition);
+bool ParseCampaignDefinition(tinyxml2::XMLNode* root, CampaignDefinition& out, std::string& error);
+void WriteCampaignDefinition(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root,
+                             const CampaignDefinition& definition);
 
 void InitializeCampaigns();
 b32 IsCustomCampaign(ExpansionCampaignId id);
-SCampaignChoice* CampaignChoice(ExpansionCampaignId id, i32 map, i32 choiceIdx);
+const SCampaignChoice* CampaignChoice(ExpansionCampaignId id, i32 map, i32 choiceIdx);
 
 // Reads a .cmp (campaign metadata XML) and returns its campaign ID, or -1.
 i32 LoadCampaignFromFile(const std::string& filename);
-i32 ReadCampaignMetadata(tinyxml2::XMLNode* root);
-void WriteCampaignMetadata(tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* root);
 
 void LoadCampaignSavedHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx);
 void SaveCampaignHero(i32 playerId, i32 ownedHeroIdx, i32 saveIdx);
