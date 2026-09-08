@@ -368,6 +368,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
   add_test(NAME filesystem COMMAND homm2_filesystem_test)
+  add_executable(homm2_high_score_io_test tools/high_score_io_test.cpp src/SOURCE/HighScoreIO.cpp)
+  target_include_directories(homm2_high_score_io_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_high_score_io_test PRIVATE homm2_platform)
+  add_test(NAME high_score_io COMMAND homm2_high_score_io_test)
   add_executable(homm2_platform_primitives_test tools/platform_primitives_test.cpp)
   target_include_directories(homm2_platform_primitives_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
