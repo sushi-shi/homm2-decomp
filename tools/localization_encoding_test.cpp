@@ -63,6 +63,13 @@ int main() {
         return 1;
     }
     char shortFormat[4];
+    std::string owned = "Александр";
+    const std::string longSuffix(200, 'x');
+    if (!utf8::Format(owned, "%s %s", owned.c_str(), longSuffix)
+        || owned != "Александр " + longSuffix) {
+        std::fputs("owned format alias mismatch\n", stderr);
+        return 1;
+    }
     std::string twoLetters;
     twoLetters.push_back('\xd0');
     twoLetters.push_back('\xaf');

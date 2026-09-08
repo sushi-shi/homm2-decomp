@@ -16,6 +16,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
+#include <SOURCE/NetworkVersion.h>
 #include <SOURCE/SaveNames.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
@@ -190,6 +191,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     gsThisNetPlayerInfo.useBzip2Compression = 1;
     gsThisNetPlayerInfo.useDiffCompression = 1;
     gsThisNetPlayerInfo.reserved[0] = 1;
+    portable_network::SetVersion(gsThisNetPlayerInfo);
     xNetHasOldPlayers = false;
 
     switch (gameMode) {
@@ -713,7 +715,7 @@ void PollRemote(void) {
                 guestExit.eliminated = false;
                 ReceiveRemotePlayerExit(guestExit);
             } else {
-                gpGame->SaveGame(save_names::PlayerExit, 1, 0);
+                gpGame->SaveGame(save_names::PlayerExit, 1);
                 utf8::Format(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("network.player_exit.continue_with_computers"),

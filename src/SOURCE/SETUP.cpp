@@ -172,10 +172,7 @@ i32 game::SetupHotSeatGame(void) {
     }
 
     for (i = 0; i < PLAYER_COUNT; i++)
-        strcpy(
-            cPlayerNames[i],
-            ""
-        );
+        cPlayerNames[i] = "";
 
     if (giSetupGameType == 0) {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("network.hotseat.enter_names_prompt"));
@@ -191,7 +188,9 @@ i32 game::SetupHotSeatGame(void) {
                     localization::Tr("network.hotseat.player_name_prompt"),
                     i + 1
                 );
-                GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
+                char enteredName[PLAYER_NAME_LENGTH + 1]{};
+                GetDataEntry(gText, enteredName, PLAYER_NAME_LENGTH, name, 0, 1);
+                cPlayerNames[i] = enteredName;
             }
         }
     }
@@ -585,75 +584,13 @@ done:
 }
 
 i32 game::PickLoadGame(void) {
-    char fileMask[FILE_PATTERN_CAPACITY];
-    i32 dialogResult;
-    heroWindow* loadWindow;
-    fileRequester* fileReq;
-
-    if (gbWaitForRemoteReceive != 0)
-        return 1;
-
-    if (gbInCampaign != 0) {
-        utf8::Format(fileMask, "*.GMC");
-    } else if (xIsPlayingExpansionCampaign != 0) {
-        utf8::Format(fileMask, "*.GXC");
-    } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
-        NormalDialog(
-            localization::Tr("network.load.expansion_unavailable"),
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
-        utf8::Format(fileMask, "*.GM%d", giNumHumanPlayers);
-    } else {
-        loadWindow = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
-        if (loadWindow == NULL)
-            MemError();
-        gpWindowManager->DoDialog(loadWindow, ExpStdGameHandler, 0);
-        delete loadWindow;
-
-        switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
-            case CHOICE_ONE:
-                xIsExpansionMap = false;
-                break;
-            case CHOICE_TWO:
-                xIsExpansionMap = true;
-                break;
-            case DIALOG_CANCEL:
-                return 0;
-        }
-
-        if (xIsExpansionMap != 0)
-            utf8::Format(fileMask, "*.GX%d", giNumHumanPlayers);
-        else
-            utf8::Format(fileMask, "*.GM%d", giNumHumanPlayers);
-    }
-
-    fileReq = new fileRequester(
-        FILE_REQUESTER_X,
-        FILE_REQUESTER_Y,
-        FILE_REQUESTER_LOAD_GAME,
-        fileMask,
-        gcGamePath,
-        fileMask + 1
-    );
-    if (fileReq == NULL)
-        MemError();
-    dialogResult = gpExec->DoDialog(fileReq);
-    if (dialogResult == FILE_REQUESTER_OK) {
-        gpGame->LoadGame(gLastFilename, 0, 0);
-        delete fileReq;
-        return 1;
-    } else {
-        delete fileReq;
-        return 0;
-    }
+    if (gbWaitForRemoteReceive != 0) return 1;
+    auto* fileReq = new fileRequester(
+        FILE_REQUESTER_X, FILE_REQUESTER_Y, FILE_REQUESTER_LOAD_GAME,
+        "*.h2s", gcGamePath, ".h2s");
+    const i32 dialogResult = gpExec->DoDialog(fileReq);
+    delete fileReq;
+    return dialogResult == FILE_REQUESTER_OK && LoadGame(gLastFilename, giNumHumanPlayers);
 }
 
 MessageDispatchResult SetupCampaignGameHandler(struct tag_message& message) {

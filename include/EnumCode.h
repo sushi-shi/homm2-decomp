@@ -26,6 +26,7 @@ enum class ArmyFacing : i8;
 enum class BuildingSlotType : i8;
 enum class ButtonSelectMode : i16;
 enum class CampaignTrackType : i32;
+enum class CalendarPeriodType : i32;
 enum class CombatHexDirection : i32;
 enum class CombatMessageCommand : i32;
 enum class CombatSide : i8;
@@ -33,6 +34,7 @@ enum class ConfigOperaMode : i32;
 enum class ConfigVolumeLevel : i32;
 enum class CreatureType : i8;
 enum class ExpansionCampaignMap : i32;
+enum class ExpansionCampaignId : i32;
 enum class FactionType : i8;
 enum class FileRequesterMapSizeFilter : i32;
 enum class FlotsamReward : i32;
@@ -40,6 +42,9 @@ enum class FontAlignment : i16;
 enum class FontDrawMode : i16;
 enum class GameDifficulty : i8;
 enum class GenericSiteType : i32;
+enum class HeroEventFlag : u32;
+enum class MapVictoryCondition : u8;
+enum class MapLossCondition : u8;
 enum class HeroSecondarySkill : i32;
 enum class HeroSkillLevel : u8;
 enum class HeroPortrait : u8;
@@ -74,6 +79,7 @@ H2_NAMED_ENUM_CODE_BOUNDARY(ArmyFacing)
 H2_NAMED_ENUM_CODE_BOUNDARY(BuildingSlotType)
 H2_NAMED_ENUM_CODE_BOUNDARY(ButtonSelectMode)
 H2_NAMED_ENUM_CODE_BOUNDARY(CampaignTrackType)
+H2_NAMED_ENUM_CODE_BOUNDARY(CalendarPeriodType)
 H2_NAMED_ENUM_CODE_BOUNDARY(CombatHexDirection)
 H2_NAMED_ENUM_CODE_BOUNDARY(CombatMessageCommand)
 H2_NAMED_ENUM_CODE_BOUNDARY(CombatSide)
@@ -81,6 +87,7 @@ H2_NAMED_ENUM_CODE_BOUNDARY(ConfigOperaMode)
 H2_NAMED_ENUM_CODE_BOUNDARY(ConfigVolumeLevel)
 H2_NAMED_ENUM_CODE_BOUNDARY(CreatureType)
 H2_NAMED_ENUM_CODE_BOUNDARY(ExpansionCampaignMap)
+H2_NAMED_ENUM_CODE_BOUNDARY(ExpansionCampaignId)
 H2_NAMED_ENUM_CODE_BOUNDARY(FactionType)
 H2_NAMED_ENUM_CODE_BOUNDARY(FileRequesterMapSizeFilter)
 H2_NAMED_ENUM_CODE_BOUNDARY(FlotsamReward)
@@ -88,6 +95,9 @@ H2_NAMED_ENUM_CODE_BOUNDARY(FontAlignment)
 H2_NAMED_ENUM_CODE_BOUNDARY(FontDrawMode)
 H2_NAMED_ENUM_CODE_BOUNDARY(GameDifficulty)
 H2_NAMED_ENUM_CODE_BOUNDARY(GenericSiteType)
+H2_NAMED_ENUM_CODE_BOUNDARY(HeroEventFlag)
+H2_NAMED_ENUM_CODE_BOUNDARY(MapVictoryCondition)
+H2_NAMED_ENUM_CODE_BOUNDARY(MapLossCondition)
 H2_NAMED_ENUM_CODE_BOUNDARY(HeroSecondarySkill)
 H2_NAMED_ENUM_CODE_BOUNDARY(HeroSkillLevel)
 H2_NAMED_ENUM_CODE_BOUNDARY(HeroPortrait)

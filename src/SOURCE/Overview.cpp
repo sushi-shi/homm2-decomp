@@ -362,8 +362,8 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             b32 capt;
             i32 captainMana;
             {
-                valueText = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1));
-                strcpy(valueText, record->m_name);
+                valueText = static_cast<char*>(H2_ALLOC(record->m_name.size() + 1));
+                std::memcpy(valueText, record->m_name.c_str(), record->m_name.size() + 1);
 
                 OVERVIEW_TEXT_WIDGET(rowIndex, texts) = new textWidget(
                     TOWN_NAME_X,

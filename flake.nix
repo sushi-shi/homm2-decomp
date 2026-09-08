@@ -132,6 +132,7 @@
           runHook preInstall
           mkdir -p "$out/bin"
           cp homm2.exe "$out/bin/HMM2PL.exe"
+          cp homm2-import-save.exe "$out/bin/homm2-import-save.exe"
           mkdir -p "$out/bin/lang"
           cp lang/*.mo "$out/bin/lang/"
           ln -s bin/HMM2PL.exe "$out/HMM2PL.exe"
@@ -156,6 +157,7 @@
         installPhase = ''
           runHook preInstall
           install -Dm755 homm2 "$out/bin/homm2"
+          install -Dm755 homm2-import-save "$out/bin/homm2-import-save"
           install -d "$out/share/homm2/lang"
           cp lang/*.mo "$out/share/homm2/lang/"
           runHook postInstall

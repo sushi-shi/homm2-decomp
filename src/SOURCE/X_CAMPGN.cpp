@@ -314,7 +314,7 @@ void ExpCampaign::InitMap(void) {
     SCampaignChoice* bonus =
         &xCampaignChoices[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)][m_bonusChoices[H2EnumIndex(m_currentMap)]];
 
-    memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
+    gpGame->ResetPlayerSetup();
     utf8::Format(
         gpGame->m_mapFilename,
         "CAMP%d_%02d.HXC",
@@ -324,9 +324,9 @@ void ExpCampaign::InitMap(void) {
     gpGame->m_newGameInitialized = false;
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
-    strcpy(gMapName, gpGame->m_mapFilename);
-    GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
-    gpGame->LoadGame("origdata.bin", 1, 0);
+    utf8::Copy(gMapName, sizeof(gMapName), gpGame->m_mapFilename);
+    GetMapHeader(gpGame->m_mapFilename.c_str(), &gpGame->m_mapHeader);
+    gpGame->SetupOrigData();
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = expansionCampaignDifficulty[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
@@ -1282,7 +1282,7 @@ void ExpCampaign::Autosave(void) {
             xShortCampaignNames[H2EnumIndex(m_campaignId)],
             H2EnumIndex(m_currentMap) + 1
         );
-        gpGame->SaveGame(gText, 1, 0);
+        gpGame->SaveGame(gText, 1);
     }
 }
 

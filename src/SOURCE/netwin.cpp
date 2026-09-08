@@ -10,6 +10,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/REMOTE.h>
+#include <SOURCE/NetworkVersion.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
@@ -195,7 +196,7 @@ void wsSendMessage(
     i32 destination,
     NetworkPacketType type,
     u16 size,
-    void* data
+    const void* data
 ) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1));
     platform::Address peerAddress;
@@ -293,6 +294,7 @@ void wsProcessMessages(void) {
 }
 
 void wsEvaluateMessage(u32l size, i32 sender) {
+    if (size == 0) return;
     char* message = rcvBufIn + 1;
     tag_message windowMessage;
     i32 player;
@@ -306,6 +308,11 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+                if (size != sizeof(SNetPlayerInfo) + 1
+                    || !portable_network::Compatible(*reinterpret_cast<const SNetPlayerInfo*>(message))) {
+                    wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, NULL);
+                    return;
+                }
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
                         if (giNetPosToDCOPos[player] == sender
@@ -314,8 +321,8 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                             wsSendMessage(
                                 giNetPosToDCOPos[player],
                                 NETWORK_PACKET_GUEST_ACCEPTED,
-                                0,
-                                NULL
+                                portable_network::Signature.size(),
+                                portable_network::Signature.data()
                             );
                             return;
                         }
@@ -333,13 +340,11 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                     );
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *reinterpret_cast<SNetPlayerInfo*>(message);
-                    if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                        xNetHasOldPlayers = true;
                     wsSendMessage(
                         giNetPosToDCOPos[giNumHumanPlayers],
                         NETWORK_PACKET_GUEST_ACCEPTED,
-                        0,
-                        NULL
+                        portable_network::Signature.size(),
+                        portable_network::Signature.data()
                     );
                     giNumHumanPlayers++;
                 } else {
@@ -378,6 +383,9 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
+            if (sender != giNetPosToDCOPos[0]) return;
+            if (!portable_network::Compatible({message, static_cast<std::size_t>(size - 1)}))
+                ShutDown(localization::Tr("network.tcp.incompatible_version"));
             snprintf(
                 cWSTextBuffer,
                 sizeof(cWSTextBuffer),

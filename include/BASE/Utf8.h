@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <string>
+#include <utility>
 
 namespace utf8 {
 
@@ -28,6 +30,10 @@ std::size_t Copy(char* destination, std::size_t capacity, const char* source);
 std::size_t Append(char* destination, std::size_t capacity, const char* source);
 bool IsValid(const char* text);
 
+inline std::size_t Copy(char* destination, std::size_t capacity, const std::string& source) {
+    return Copy(destination, capacity, source.c_str());
+}
+
 template <std::size_t Capacity>
 std::size_t Copy(char (&destination)[Capacity], const char* source) {
     return Copy(destination, Capacity, source);
@@ -39,6 +45,11 @@ std::size_t Append(char (&destination)[Capacity], const char* source) {
 }
 
 namespace detail {
+
+inline const char* PrintfArgument(const std::string& text) { return text.c_str(); }
+
+template <typename T>
+T PrintfArgument(T value) { return value; }
 
 inline void TrimInvalidTail(char* text) {
     std::size_t offset = 0;
@@ -71,7 +82,7 @@ bool Format(
     if constexpr (sizeof...(Args) == 0) {
         return Copy(destination, capacity, format) == std::strlen(format);
     } else {
-        const int written = std::snprintf(destination, capacity, format, args...);
+        const int written = std::snprintf(destination, capacity, format, detail::PrintfArgument(args)...);
         if (written < 0) {
             destination[0] = '\0';
             return false;
@@ -80,6 +91,24 @@ bool Format(
             detail::TrimInvalidTail(destination);
             return false;
         }
+        return true;
+    }
+}
+
+template <typename... Args>
+bool Format(std::string& destination, const char* format, Args... args) {
+    if (format == nullptr) return false;
+    if constexpr (sizeof...(Args) == 0) {
+        destination = format;
+        return IsValid(destination.c_str());
+    } else {
+        const int size = std::snprintf(nullptr, 0, format, detail::PrintfArgument(args)...);
+        if (size < 0) return false;
+        std::string formatted(static_cast<std::size_t>(size), '\0');
+        if (std::snprintf(formatted.data(), formatted.size() + 1, format,
+                          detail::PrintfArgument(args)...) != size)
+            return false;
+        destination = std::move(formatted);
         return true;
     }
 }
@@ -93,6 +122,8 @@ std::uint32_t ToUpper(std::uint32_t codePoint);
 std::uint32_t ToLower(std::uint32_t codePoint);
 bool UppercaseFirst(char* text);
 bool LowercaseFirst(char* text);
+bool UppercaseFirst(std::string& text);
+bool LowercaseFirst(std::string& text);
 bool IsLetter(std::uint32_t codePoint);
 bool EqualIgnoringCase(
     const char* first,

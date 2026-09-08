@@ -2,6 +2,8 @@
 #define HOMM2_SOURCE_TOWN_H
 
 #include <Ints.h>
+#include <string>
+#include <utility>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
 
@@ -56,7 +58,6 @@ typedef enum TownConstant {
     TOWN_MAGE_GUILD_SPELLS_PER_LEVEL   = 4,
     TOWN_SPELL_COUNT_OVERLAY_OFFSET    = 19,
     TOWN_SPELL_COUNT_OVERLAY_SIZE      = 6,
-    TOWN_NAME_CAPACITY                 = 13,
     TOWN_CONVERT_SOURCE_FRAME          = 0x10,
     TOWN_CONVERT_ANY_FRAME             = 0xFF,
     TOWN_CONVERT_OBJECT_NONE           = 0,
@@ -65,9 +66,8 @@ typedef enum TownConstant {
     TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
 } TownConstant;
 
-#pragma pack(push, 1)
-class town {
-public:
+// Runtime state is independent of the native save encoding.
+struct TownState {
     i8 m_id;
     i8 m_owner;
     i8 m_threat;
@@ -80,7 +80,6 @@ public:
     i8 m_occupyingHeroId;
     u32l m_buildings;
     i8 m_buildState;
-    char m_unknown1d;
     i16 m_garrison[H2EnumIndex(TOWN_GARRISON_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;
@@ -88,6 +87,7 @@ public:
     i8 m_originalOwner;
     u16 m_extraIndex;
     union {
+        u8 m_spellStorage[TOWN_SPELL_COUNT_OVERLAY_OFFSET + TOWN_SPELL_COUNT_OVERLAY_SIZE]{};
         H2EnumStorage<SpellType, i8>
             m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         H2EnumStorage<SpellType, i8>
@@ -98,8 +98,13 @@ public:
         };
     };
     u16 m_turnsOwned;
-    char m_name[TOWN_NAME_CAPACITY];
+    std::string m_name;
+};
+
+class town : public TownState {
+public:
     town(void);
+    explicit town(TownState state) : TownState(std::move(state)) {}
     i32 HasGarrison(void);
     i32 OccupyingHero(void) {
         return m_occupyingHeroId;
@@ -112,7 +117,6 @@ public:
     i32 CanBuildDock(void);
     void CalcNumLevelArchers(i32*, i32*);
 };
-#pragma pack(pop)
 extern b32 bEnteringTown;
 
 #endif

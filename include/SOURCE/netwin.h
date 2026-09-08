@@ -28,7 +28,7 @@ struct WinsockStartupMessage {
 
 i16 wsnet_init(void);
 void wsnet_term(void);
-void wsSendMessage(i32, NetworkPacketType, u16, void*);
+void wsSendMessage(i32, NetworkPacketType, u16, const void*);
 i32 wsnet_snd(i32, i32, void*);
 i16 wsnet_rcv(i16, u16, void*);
 void wsProcessMessages(void);

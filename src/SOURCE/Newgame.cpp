@@ -287,7 +287,7 @@ void game::GetMap(void) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
         if (platform::CompareIgnoringCase(savedName, gMapName) != 0) {
-            strcpy(m_mapFilename, gMapName);
+            m_mapFilename = gMapName;
             ProcessNewMap(NULL);
         }
     } else {
@@ -333,7 +333,7 @@ void game::InitNewGame(struct SMapHeader* header) {
         if (header != NULL)
             m_mapHeader = *header;
         else
-            GetMapHeader(m_mapFilename, &m_mapHeader);
+            GetMapHeader(m_mapFilename.c_str(), &m_mapHeader);
         localization::SetCurrentFileTextEncoding(
             GetMapHeaderTextEncoding(&m_mapHeader)
         );
@@ -408,7 +408,7 @@ void game::SetupNetPlayerNames(void) {
     if (giNumHumanPlayers > 1) {
         for (player = 0; player < giNumHumanPlayers; ++player) {
             if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
-                strcpy(cPlayerNames[player], gsNetPlayerInfo[player].name);
+                cPlayerNames[player] = gsNetPlayerInfo[player].name;
         }
     }
 }
@@ -536,7 +536,7 @@ i32 game::NewGame(void) {
     } else {
         while (true) {
             wrongExpansionType = false;
-            mapExt = FindLastToken(m_mapFilename, '.');
+            mapExt = FindLastToken(m_mapFilename.data(), '.');
             if (mapExt != NULL) {
                 if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
                     wrongExpansionType = true;
@@ -545,21 +545,21 @@ i32 game::NewGame(void) {
             }
             if (!wrongExpansionType) {
                 if (xIsExpansionMap)
-                    strcpy(gpGame->m_mapFilename, "arrax.mx2");
+                    gpGame->m_mapFilename = "arrax.mx2";
                 else
-                    strcpy(gpGame->m_mapFilename, "brokena.mp2");
+                    gpGame->m_mapFilename = "brokena.mp2";
                 m_newGameInitialized = false;
                 m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
             }
             if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-                && platform::CompareIgnoringCase(gpGame->m_mapFilename, "brokena.mp2") == 0)
-                strcpy(gpGame->m_mapFilename, "slugfest.mp2");
+                && platform::CompareIgnoringCase(gpGame->m_mapFilename.c_str(), "brokena.mp2") == 0)
+                gpGame->m_mapFilename = "slugfest.mp2";
             if (giNumHumanPlayers > 1
-                && platform::CompareIgnoringCase(gpGame->m_mapFilename, "arrax.mx2") == 0)
-                strcpy(gpGame->m_mapFilename, "fullhse.mx2");
+                && platform::CompareIgnoringCase(gpGame->m_mapFilename.c_str(), "arrax.mx2") == 0)
+                gpGame->m_mapFilename = "fullhse.mx2";
 
-            strcpy(gMapName, m_mapFilename);
-            mapHeaderRead = GetMapHeader(m_mapFilename, &m_mapHeader);
+            utf8::Copy(gMapName, sizeof(gMapName), m_mapFilename);
+            mapHeaderRead = GetMapHeader(m_mapFilename.c_str(), &m_mapHeader);
             if (mapHeaderRead && giNumHumanPlayers >= m_mapHeader.minHumanPlayers
                 && giNumHumanPlayers <= m_mapHeader.maxHumanPlayers)
                 break;
@@ -593,7 +593,7 @@ i32 game::NewGame(void) {
                 ShutDown(NULL);
         }
 
-        LoadGame("origdata.bin", 1, 0);
+        SetupOrigData();
         if (giNumHumanPlayers > 1) {
             if (iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 m_newGameWindow =
@@ -926,7 +926,7 @@ cleanup:
         for (playerIndex = 0; playerIndex < m_mapHeader.playerCount; ++playerIndex) {
             if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER) {
                 gText[0] = 0;
-            } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
+            } else if (cPlayerNames[m_setupPlayerNetworkId[playerIndex]].size() > 0) {
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
             } else {
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.number"), m_setupPlayerNetworkId[playerIndex] + 1);
@@ -1964,7 +1964,7 @@ void game::ShowScenInfo(void) {
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER) {
             gText[0] = 0;
-        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
+        } else if (cPlayerNames[m_setupPlayerNetworkId[playerCounter]].size() > 0) {
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.number"), m_setupPlayerNetworkId[playerCounter] + 1);

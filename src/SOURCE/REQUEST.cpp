@@ -359,7 +359,7 @@ i32 fileRequester::Open(i32 id) {
     char* dot;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
         enabled = 1;
-        strcpy(m_filename, gpGame->m_saveName);
+        utf8::Copy(m_filename, sizeof(m_filename), gpGame->m_saveName);
         dot = FindLastToken(m_filename, '.');
         if (dot != NULL) {
             *dot = 0;
@@ -838,62 +838,6 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     }
 
     if (acceptStep == 1) {
-        if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
-            && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
-            && platform::CompareIgnoringCase(m_extensions[m_selectedIndex].text, ".GMC") != 0
-            && platform::CompareIgnoringCase(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
-            iResult =
-                m_extensions[m_selectedIndex].text[FILE_REQUESTER_EXTENSION_PLAYER_DIGIT] - '0';
-            if (iResult < giNumHumanPlayers
-                && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
-                utf8::Format(
-                    gText, GLOBAL_TEXT_BUFFER_SIZE,
-                    localization::Tr("requester.load.insufficient_human_slots")
-
-                    ,
-                    iResult,
-                    giNumHumanPlayers
-                );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
-                acceptStep = false;
-            }
-            if (iResult > giNumHumanPlayers) {
-                utf8::Format(
-                    gText, GLOBAL_TEXT_BUFFER_SIZE,
-                    localization::Tr("requester.load.replace_human_slots")
-
-                    ,
-                    iResult,
-                    iResult - giNumHumanPlayers
-                );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_CONFIRM,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
-                );
-                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) {
-                    acceptStep = false;
-                }
-            }
-        }
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;

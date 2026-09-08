@@ -255,11 +255,24 @@ bool TransformFirst(char* text, std::uint32_t (*transform)(std::uint32_t)) {
     return true;
 }
 
+bool TransformFirst(std::string& text, std::uint32_t (*transform)(std::uint32_t)) {
+    const Decoded decoded = Decode(text.c_str());
+    if (decoded.length == 0 || !decoded.valid) return false;
+    char encoded[4];
+    const std::size_t length = Encode(transform(decoded.codePoint), encoded);
+    text.replace(0, decoded.length, encoded, length);
+    return true;
+}
+
 }
 
 bool UppercaseFirst(char* text) { return TransformFirst(text, ToUpper); }
 
 bool LowercaseFirst(char* text) { return TransformFirst(text, ToLower); }
+
+bool UppercaseFirst(std::string& text) { return TransformFirst(text, ToUpper); }
+
+bool LowercaseFirst(std::string& text) { return TransformFirst(text, ToLower); }
 
 bool IsLetter(std::uint32_t codePoint) {
     return (codePoint >= 'A' && codePoint <= 'Z')

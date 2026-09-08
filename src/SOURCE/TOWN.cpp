@@ -11,7 +11,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
-town::town(void) {
+town::town(void) : TownState{} {
     m_type = FACTION_KNIGHT;
     m_id = 0;
     m_owner = 0;
@@ -20,7 +20,6 @@ town::town(void) {
     m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     m_buildings = H2EnumIndex(TOWN_BUILDING_TENT);
     m_buildState = 0;
-    m_unknown1d = 0;
 }
 
 i32 town::HasGarrison(void) {

@@ -348,7 +348,7 @@ void InitMainClasses(void) {
     gpResourceManager = new resourceManager;
     gpSoundManager = new soundManager;
     gpHighScoreManager = new highScoreManager;
-    gpGame = new game;
+    gpGame = new game{};
     gpAdvManager = new advManager;
     gpCombatManager = new combatManager;
     gpTownManager = new townManager;
@@ -699,7 +699,7 @@ i32 oldmain(void) {
 
             setup_selected:
                 for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                    cPlayerNames[player_h][0] = 0;
+                    cPlayerNames[player_h].clear();
                 if (!gpGame->SetupGame())
                     goto main_menu;
 
@@ -778,14 +778,10 @@ i32 oldmain(void) {
                     if (!gbHumanPlayer[netPlayer_k])
                         continue;
                     for (gamePlayer_m = 0; gamePlayer_m < OLD_MAIN_PLAYER_COUNT; gamePlayer_m++) {
-                        if (strlen(&gpGame->m_defaultPlayerNames
-                                        [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE])
+                        if (gpGame->m_playerSystemIds[gamePlayer_m].size()
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
-                            && !strcmp(
-                                &gpGame->m_defaultPlayerNames
-                                     [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE],
-                                gsNetPlayerInfo[netPlayer_k].uniqueSystemID
-                            )
+                            && gpGame->m_playerSystemIds[gamePlayer_m]
+                                == gsNetPlayerInfo[netPlayer_k].uniqueSystemID
                             && !gpGame->m_playerDead[gamePlayer_m]
                             && !matchedGamePlayers_c[gamePlayer_m]
                             && !matchedNetPlayers_d[netPlayer_k]) {
@@ -803,11 +799,7 @@ i32 oldmain(void) {
                         continue;
                     if (gbHumanPlayer[netPlayer_k]) {
                         gbGamePosToNetPos[netPlayer_k] = static_cast<i8>(gamePlayer_m);
-                        strcpy(
-                            &gpGame->m_defaultPlayerNames
-                                 [gamePlayer_m * OLD_MAIN_DEFAULT_NAME_STRIDE],
-                            gsNetPlayerInfo[netPlayer_k].uniqueSystemID
-                        );
+                        gpGame->m_playerSystemIds[gamePlayer_m] = gsNetPlayerInfo[netPlayer_k].uniqueSystemID;
                         gamePlayer_m++;
                         while (gamePlayer_m < OLD_MAIN_PLAYER_COUNT
                                && matchedGamePlayers_c[gamePlayer_m])
@@ -853,7 +845,7 @@ i32 oldmain(void) {
                 memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
-                gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
+                if (!gpGame->SaveGame(gConfig.rmtRLName, 0)) ShutDown(NULL);
             }
             LogStr("DWM 4");
             if (gbRemoteOn && gbWaitForRemoteReceive) {
@@ -873,10 +865,10 @@ i32 oldmain(void) {
                 );
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
-                gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
-                strcpy(gpGame->m_saveName, save_names::NewGame);
+                if (!gpGame->LoadGame(gConfig.rmtRCName)) ShutDown(NULL);
+                gpGame->m_saveName = save_names::NewGame;
                 iLastDiffSendTo = -1;
-                gpGame->SaveGame(gConfig.rmtSLName, 0, 0);
+                if (!gpGame->SaveGame(gConfig.rmtSLName, 0)) ShutDown(NULL);
             }
 
         initialize_game:
@@ -888,24 +880,17 @@ i32 oldmain(void) {
             if (giNumHumanPlayers > 1) {
                 for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
                     if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
-                        strcpy(
-                            cPlayerNames[NetPosToGamePos(player_h)],
-                            gsNetPlayerInfo[player_h].name
-                        );
+                        cPlayerNames[NetPosToGamePos(player_h)] = gsNetPlayerInfo[player_h].name;
                 }
             }
             for (player_h = 0; player_h < gpGame->m_playerCount; player_h++) {
-                if (!strlen(cPlayerNames[player_h])) {
+                if (!cPlayerNames[player_h].size()) {
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("player.color_default_name"),
                         gColors[gpGame->m_players[player_h].m_color]
                     );
-                    utf8::Copy(
-                        cPlayerNames[player_h],
-                        sizeof(cPlayerNames[player_h]),
-                        gText
-                    );
+                    cPlayerNames[player_h] = gText;
                     utf8::UppercaseFirst(cPlayerNames[player_h]);
                 }
             }
@@ -1004,7 +989,7 @@ i32 oldmain(void) {
                     }
                     if (campaignResult) {
                         for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                            cPlayerNames[player_h][0] = 0;
+                            cPlayerNames[player_h].clear();
                         gpGame->InitCampaignMap();
                         gbGameOver = false;
                         bForceCheckTimeEvent = true;
@@ -1025,7 +1010,7 @@ i32 oldmain(void) {
                     }
                     if (campaignResult) {
                         for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
-                            cPlayerNames[player_h][0] = 0;
+                            cPlayerNames[player_h].clear();
                         xCampaign.InitMap();
                         gbGameOver = false;
                         bForceCheckTimeEvent = true;
@@ -2617,7 +2602,7 @@ void CheckEndGame(
                 gpGame->m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
-            gpGame->SaveGame(campaignSaveName, 1, 0);
+            gpGame->SaveGame(campaignSaveName, 1);
         }
     } else if (xIsPlayingExpansionCampaign && winFlag) {
         xCampaign.Autosave();
@@ -2648,7 +2633,7 @@ void InitVars(void) {
     gPalette = NULL;
     gbCombatSurrender = false;
     gpGame->m_viewArmyResult = 0;
-    strcpy(gpGame->m_mapFilename, "brokena.mp2");
+    gpGame->m_mapFilename = "brokena.mp2";
     gpGame->m_newGameInitialized = false;
     gbInNewGameSetup = false;
     strcpy(cNetBoxLine[0], "");
@@ -3643,7 +3628,7 @@ void MemError(void) {
 
 const char* GetTownName(i32 i) {
     town* t = GetCastleRec(i);
-    return t->m_name;
+    return t->m_name.c_str();
 }
 
 void LoadSystemwideIcons(void) {
@@ -4387,7 +4372,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 PLAYER_EXIT_MESSAGE_TIME
             );
         } else if (!exitInfo.continueGame) {
-            gpGame->SaveGame(save_names::PlayerExit, 1, 0);
+            gpGame->SaveGame(save_names::PlayerExit, 1);
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("network.player_exit.host_terminated"),
@@ -4468,7 +4453,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
 
     localPlayerLost_e = false;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
-    gpGame->SaveGame(save_names::PlayerExit, 1, 0);
+    gpGame->SaveGame(save_names::PlayerExit, 1);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = true;
@@ -10440,7 +10425,7 @@ configStruct gConfig;
 char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 u32l gTimeMark;
 char* EXPANSION_AGGREGATE_NAME;
-char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+std::array<std::string, X_GLOBAL_PLAYER_COUNT> cPlayerNames;
 game* gpGame;
 b8 gbRetreatWin;
 DialogWaitType giWaitType;

@@ -9,7 +9,7 @@ The native port keeps four independent localization concerns:
 | UI locale | MO catalog and gettext plural rules | retail archives or byte encoding |
 | Resource profile | archive overlay, widget decoder and bitmap-font layout | UI language |
 | Runtime text | UTF-8 representation used by game code | a retail edition |
-| File provenance | encoder used when an old map/save field is written | UI language |
+| File provenance | encoding of original map records and imported legacy text | UI language |
 
 No original game asset is stored in this repository. Project-owned catalogs
 are packaged with the game; localized retail resources remain user-supplied.
@@ -32,18 +32,20 @@ input, so a keyboard layout does not insert duplicate characters or alter
 hotkeys.
 
 Original files are not assumed to be UTF-8. Serialized resource strings are
-decoded exactly once with the active resource profile. A map/save is assigned
+decoded exactly once with the active resource profile. A map is assigned
 an encoding provenance by inspecting its raw text fields: valid non-ASCII
 UTF-8 wins, while ASCII-only or invalid UTF-8 retains the primary
 installation's Windows-1251/Windows-1252 fallback. That provenance follows the
 active game. It is not taken from a localized AGG overlay, because maps are
 opened from `HOMM2_DATA`.
 
-When a retail save is written, UTF-8 player, hero, town and rumour strings are
-encoded into temporary fixed-size legacy records. The live objects remain
-UTF-8. An unrepresentable or truncated value becomes `?` at that compatibility
-boundary and produces a warning; it never changes the runtime string. The
-implemented file codecs are UTF-8, Windows-1252 and Windows-1251.
+Native `.h2s` saves store player, hero, town and rumour text as length-prefixed
+UTF-8. Their runtime owners use `std::string`, so decoding a twelve-byte name
+such as Windows-1251 `Белокаменный` does not lose characters when UTF-8 needs
+more bytes. Original map-event records retain an explicit encoding tag.
+The separate `homm2-import-save` tool reads retail saves with an explicitly
+selected UTF-8, Windows-1252 or Windows-1251 decoder. No retail save writer is
+linked into the game. See [Save format](save-format.md).
 
 ## Catalogs and the English source of truth
 
@@ -216,13 +218,12 @@ establish a per-file provenance; display and runtime-object paths decode with
 it without changing raw map extras. Selecting a UI language never reinterprets
 user-authored prose.
 
-Retail saves and network packets also contain small fixed byte arrays. Save
-loading detects and records the original byte encoding before decoding fields.
-Save writing re-encodes temporary copies with that provenance, so CP1251 and
-CP1252 retail files remain readable by their original edition. A versioned
-extension or sidecar is still required for names that exceed retail capacity
-or cannot be represented by the file's code page. Network peers likewise need
-the same resource/file profile until packets gain an explicit charset tag.
+Retail saves contain small fixed byte arrays; only the offline importer reads
+them. Native saves and combat transfers serialize explicit fields and UTF-8
+strings, without copying runtime object storage. The portable network protocol
+has a version handshake and rejects peers using the old object layouts.
+Network setup still uses its bounded player-info record; resource profiles
+remain necessary to decode original maps and draw the installed bitmap glyphs.
 
 ## Adding a language
 
@@ -262,8 +263,8 @@ Implemented:
 - localized four-archive overlay, metadata-only AGG comparison, and safe font
   capability fallback;
 - independent automatic resource-profile selection from AGG structure;
-- CP1251/CP1252/UTF-8 decoding, per-map/save provenance and legacy save
-  re-encoding without mutating UTF-8 runtime objects;
+- CP1251/CP1252/UTF-8 decoding, per-map provenance, isolated legacy import and
+  native UTF-8 saves with owned runtime names;
 - static catalog language/profile/glyph checks and codec/profile round trips.
 
 Known follow-up work that does not change the catalog architecture:
@@ -272,8 +273,6 @@ Known follow-up work that does not change the catalog architecture:
   overflow recovered storage;
 - add screenshot/replay coverage in English and Russian with real localized
   resources;
-- design a versioned compatibility extension for full-length or
-  code-page-unrepresentable Unicode player, hero, and town names;
 - optionally add checksum-keyed official-map translations and widget catalog
   overlays.
 
