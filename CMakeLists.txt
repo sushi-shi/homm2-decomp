@@ -316,6 +316,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME binary_io COMMAND homm2_binary_io_test)
+  add_executable(homm2_music_playback_test
+    tools/music_playback_test.cpp
+    src/BASE/Midi.cpp src/BASE/MusicFlags.cpp
+    src/BASE/soundmgr.cpp src/BASE/BASEMGR.cpp)
+  target_include_directories(homm2_music_playback_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_options(homm2_music_playback_test PRIVATE -ffunction-sections -fdata-sections)
+  target_link_options(homm2_music_playback_test PRIVATE -Wl,--gc-sections)
+  add_test(NAME music_playback COMMAND homm2_music_playback_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE
