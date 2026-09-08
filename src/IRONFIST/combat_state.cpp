@@ -68,6 +68,11 @@ void CombatState::GrantAbility(army& stack, CreatureAttribute ability) {
     }
 }
 
+bool CombatState::HasAbility(const army& stack, CreatureAttribute ability) const {
+    const auto* record = Find(stack);
+    return record && record->active && record->abilities.test(H2EnumIndex(ability));
+}
+
 bool CombatState::HasAbilityCharge(const army& stack, CreatureAttribute ability) const {
     const auto* record = Find(stack);
     return record && record->active && record->charges.test(H2EnumIndex(ability));

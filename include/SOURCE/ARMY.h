@@ -192,7 +192,6 @@ void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
 
 // Ironfist movement state threading through the attack path.
 extern bool gCloseMove;
-extern bool gMoveAttack;
 extern bool gChargePathDamage;
 extern bool gCharging;
 

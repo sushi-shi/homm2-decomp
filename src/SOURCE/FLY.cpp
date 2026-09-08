@@ -1,10 +1,9 @@
 #include <Ints.h>
 #include <math.h>
-#include <algorithm>
-#include <set>
 #include <vector>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
+#include <IRONFIST/combat_movement.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
@@ -33,174 +32,31 @@ typedef enum ArmyFlightConstant {
 }
 
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
-    hexcell* cell_9;
-    i32 candidateHex;
-
-    candidateHex = hex;
-    cell_9 = NULL;
-    if (fittingHex) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    if (fittingHex)
         *fittingHex = hex;
-    }
-    if (!ValidHex(candidateHex) || candidateHex % ARMY_HEX_COLUMNS == 0
-        || candidateHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1) {
-        return 0;
-    }
-    if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_SIDE_NONE
-        || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
-        return 0;
-    }
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-        candidateHex = GetAdjacentCellIndex(
-            hex,
-            m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
-        );
-        if (ValidHex(candidateHex) && candidateHex % ARMY_HEX_COLUMNS != 0
-            && candidateHex % ARMY_HEX_COLUMNS != ARMY_HEX_COLUMNS - 1) {
-            cell_9 = &gpCombatManager->m_hexCells[candidateHex];
-        }
-        if (ValidHex(candidateHex)
-            && (cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                    && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
-            && !cell_9->m_blocked) {
-            return 1;
-        } else {
-            if (!tryOtherSide) {
-                return 0;
-            } else {
-                candidateHex = GetAdjacentCellIndex(
-                    hex,
-                    m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST
-                );
-                if (ValidHex(candidateHex)) {
-                    cell_9 = &gpCombatManager->m_hexCells[candidateHex];
-                } else {
-                    return 0;
-                }
-                if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                     || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                         && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
-                    && !cell_9->m_blocked) {
-                    if (fittingHex) {
-                        *fittingHex = candidateHex;
-                    }
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        }
-    } else {
+    if (traversal.CanLand(hex, true))
         return 1;
-    }
+    if (!tryOtherSide || !(m_monster.attributes & MONSTER_ATTRIBUTE_WIDE))
+        return 0;
+    const i32 other = traversal.Adjacent(hex, m_facing == ARMY_FACING_RIGHT
+        ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST);
+    if (!traversal.CanLand(other, true))
+        return 0;
+    if (fittingHex)
+        *fittingHex = other;
+    return 1;
 }
 
-i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
-    i32 enemyHex;
-    u32 directionMask;
-    i32 adjHex;
-
-    CombatHexDirection direction;
-
-    army* foe;
-
-    i32 attackMask;
-    i32 attackHex;
-    CombatHexDirection n;
-    i32 freeHex;
-    CombatHexDirection moveDir;
-
-    if (!ValidHex(destination)) {
+i32 army::ValidFlight(i32 destination, ArmyPathTarget mode) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    const auto plan = traversal.Flight(m_hex, traversal.Destination(destination, mode));
+    if (!plan)
         return 0;
-    }
-    if (m_targetSide < COMBAT_ATTACKER_SIDE || m_targetSide > COMBAT_DEFENDER_SIDE
-        || m_targetIndex < 0
-        || m_targetIndex > COMBAT_ARMY_SLOT_COUNT - 1) {
-        if (CanFit(destination, 0, NULL)) {
-            m_moveTargetHex = destination;
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    foe = &gpCombatManager->m_armies[H2EnumIndex(m_targetSide)][m_targetIndex];
-    if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex = destination;
-    } else {
-        enemyHex = foe->m_hex;
-    }
-    if (!ValidHex(enemyHex)) {
-        return 0;
-    }
-
-    attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-    while (attackMask != ARMY_ALL_ATTACK_DIRECTIONS) {
-        moveDir = GetBestDirection(m_hex, enemyHex, attackMask);
-        if (ValidAttack(
-                m_hex,
-                moveDir,
-                ARMY_ATTACK_TARGET_ASSIGNED,
-                ARMY_HEX_INVALID,
-                &attackHex
-            )) {
-            m_attackDirection = moveDir;
-            m_moveTargetHex = m_hex;
-            return 1;
-        } else {
-            attackMask |= 1 << H2EnumIndex(moveDir);
-        }
-    }
-
-    directionMask = 0;
-    if ((H2EnumIndex((foe->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
-        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += foe->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
-        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))
-                                                              : (1 << H2EnumIndex(COMBAT_DIRECTION_EAST));
-    }
-    while (directionMask != ALL_ADJACENT_DIRECTIONS) {
-        direction = GetBestDirection(enemyHex, m_hex, directionMask);
-        adjHex = GetAdjacentCellIndex(enemyHex, direction);
-        if (ValidHex(adjHex)
-            && CanFit(adjHex, 1 - H2EnumIndex(pathMode), &freeHex)) {
-            m_moveTargetHex = freeHex;
-            if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-                m_attackDirection = OppositeDirection(direction);
-            } else {
-                attackMask = ~GetAttackMask(
-                    m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
-                );
-                for (n = COMBAT_DIRECTION_NORTHEAST; H2EnumIndex(n) < ARMY_COMBAT_DIRECTION_COUNT; n++) {
-                    if (attackMask & (1 << H2EnumIndex(n))) {
-                        m_attackDirection = n;
-                    }
-                }
-            }
-            return 1;
-        } else {
-            directionMask |= 1 << H2EnumIndex(direction);
-        }
-    }
-
-    if ((H2EnumIndex((foe->m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
-        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += foe->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
-        directionMask = foe->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))
-                                                           : (1 << H2EnumIndex(COMBAT_DIRECTION_WEST));
-        while (directionMask != ALL_ADJACENT_DIRECTIONS) {
-            direction = GetBestDirection(enemyHex, m_hex, directionMask);
-            adjHex = GetAdjacentCellIndex(enemyHex, direction);
-            if (ValidHex(adjHex) && CanFit(adjHex, 0, NULL)) {
-                m_moveTargetHex = adjHex;
-                m_attackDirection = GetBestDirection(m_moveTargetHex, enemyHex, 0);
-                return 1;
-            } else {
-                directionMask |= 1 << H2EnumIndex(direction);
-            }
-        }
-    }
-    return 0;
+    m_moveTargetHex = plan.destination;
+    if (plan.attackDirection)
+        m_attackDirection = *plan.attackDirection;
+    return 1;
 }
 
 i32 army::FlyTo(void) {
@@ -210,16 +66,40 @@ i32 army::FlyTo(void) {
 // The Berserker's parabolic hop between two hexes, drawn frame by frame
 // over a saved copy of the battlefield.
 void army::ArcJump(i32 fromHex, i32 toHex) {
+    const bool wide = static_cast<bool>(m_monster.attributes & MONSTER_ATTRIBUTE_WIDE);
+    const i32 rearOffset = ArmyFacingRearHexOffset(m_facing);
+    if (gbNoShowCombat) {
+        for (i32 hex : {fromHex, wide ? fromHex + rearOffset : fromHex}) {
+            gpCombatManager->m_hexCells[hex].m_occupantSide = COMBAT_SIDE_NONE;
+            gpCombatManager->m_hexCells[hex].m_occupantIndex = -1;
+            gpCombatManager->m_hexCells[hex].m_occupantFrame = ARMY_FACING_NONE;
+        }
+        m_hex = toHex;
+        for (i32 hex : {toHex, wide ? toHex + rearOffset : toHex}) {
+            gpCombatManager->m_hexCells[hex].m_occupantSide = m_side;
+            gpCombatManager->m_hexCells[hex].m_occupantIndex = m_index;
+            gpCombatManager->m_hexCells[hex].m_occupantFrame = ARMY_FACING_NONE;
+        }
+        CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
+        gpCombatManager->CheckBurnCreature(this);
+        return;
+    }
     bool firingLeft = true;
     float fromX = static_cast<float>(gpCombatManager->m_hexCells[fromHex].m_x);
     float fromY = static_cast<float>(gpCombatManager->m_hexCells[fromHex].m_gridBottom);
     float targX = static_cast<float>(gpCombatManager->m_hexCells[toHex].m_x);
     float targY = static_cast<float>(gpCombatManager->m_hexCells[toHex].m_gridBottom);
     if (fromX > targX) {
-        m_facing = ARMY_FACING_LEFT;
+        if (!wide)
+            m_facing = ARMY_FACING_LEFT;
         firingLeft = false;
-    } else {
+    } else if (!wide) {
         m_facing = ARMY_FACING_RIGHT;
+    }
+    if (wide) {
+        gpCombatManager->m_hexCells[fromHex + rearOffset].m_occupantSide = COMBAT_SIDE_NONE;
+        gpCombatManager->m_hexCells[fromHex + rearOffset].m_occupantIndex = -1;
+        gpCombatManager->m_hexCells[fromHex + rearOffset].m_occupantFrame = ARMY_FACING_NONE;
     }
 
     gpCombatManager->m_hexCells[fromHex].m_occupantIndex = -1;
@@ -233,17 +113,21 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
         savedScreen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
     );
 
-    m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 31;
+    const bool bespokeFrames = m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER;
+    auto& jumpFrame = m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0];
+    const i8 originalFrame = jumpFrame;
+    if (bespokeFrames)
+        jumpFrame = 31;
     m_animationFrame = 0;
     m_animationSequence = ARMY_ANIMATION_WALK_MIDDLE;
 
     std::vector<Point> points =
         MakeCatapultArc(COMBAT_ARC_FRAME_COUNT, firingLeft, fromX, fromY, targX, targY);
     for (i32 pointIndex = 0; pointIndex < static_cast<i32>(points.size()); pointIndex++) {
-        if (pointIndex == 5) {
-            m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 32;
-        } else if (pointIndex == 12) {
-            m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 33;
+        if (bespokeFrames && pointIndex == 5) {
+            jumpFrame = 32;
+        } else if (bespokeFrames && pointIndex == 12) {
+            jumpFrame = 33;
         }
         savedScreen->CopyTo(
             gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
@@ -259,6 +143,11 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
     }
 
     m_hex = toHex;
+    if (wide) {
+        gpCombatManager->m_hexCells[toHex + rearOffset].m_occupantSide = m_side;
+        gpCombatManager->m_hexCells[toHex + rearOffset].m_occupantIndex = m_index;
+        gpCombatManager->m_hexCells[toHex + rearOffset].m_occupantFrame = ARMY_FACING_NONE;
+    }
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = m_side;
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = static_cast<i8>(m_index);
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
@@ -267,9 +156,11 @@ void army::ArcJump(i32 fromHex, i32 toHex) {
         gpWindowManager->m_screen, 0, 0, 0, 0, COMBAT_SCREEN_WIDTH, COMBAT_SCREEN_HEIGHT
     );
     giMinExtentY = giMinExtentX = giMaxExtentY = giMaxExtentX = 0;
-    m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK_MIDDLE)][0] = 1;
+    jumpFrame = originalFrame;
 
     delete savedScreen;
+    CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
+    gpCombatManager->CheckBurnCreature(this);
 }
 
 // Whether the hex borders this stack's current position (either hex of a
@@ -288,7 +179,6 @@ bool army::IsCloseMove(i32 destination) {
 }
 
 i32 army::FlyTo(i32 destination) {
-    std::vector<i32> chargeAffectedHexes;
     float xPos;
     float yRate0;
     float yPos;
@@ -402,8 +292,7 @@ i32 army::FlyTo(i32 destination) {
                 );
             } else {
                 BuildTempWalkSeq(&m_frameInfo, leg + 1 == stepCount1, leg > 0);
-                if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
-                    gCharging = true;
+                if (gCharging && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
                     ChargingDirection chargeDirection = CHARGING_FORWARD;
                     double chargeAngle =
                         (180.0 / M_PI) * atan2(static_cast<double>(ySpan0), abs(xDistance));
@@ -538,14 +427,7 @@ i32 army::FlyTo(i32 destination) {
                     xPos = fromX + (leg + 1) * xSpeed;
                     yPos = sourceY + (leg + 1) * yRate0;
                 }
-                // The charger hurts everything it flies over.
-                i32 flownHex = gpCombatManager->GetGridIndex(
-                    static_cast<i32>(xPos),
-                    static_cast<i32>(yPos) - ARMY_CHARGE_SPRITE_OFFSET
-                );
-                if (IsEnemyCreatureHex(flownHex)) {
-                    chargeAffectedHexes.push_back(flownHex);
-                }
+
             }
         }
     }
@@ -582,18 +464,6 @@ i32 army::FlyTo(i32 destination) {
             }
         }
         m_facingChanged = false;
-    }
-    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
-        std::set<i32> uniqueHexes(chargeAffectedHexes.begin(), chargeAffectedHexes.end());
-        chargeAffectedHexes.assign(uniqueHexes.begin(), uniqueHexes.end());
-        // The landing target takes the full hit, not the path damage.
-        auto landingHex = std::find(
-            chargeAffectedHexes.begin(), chargeAffectedHexes.end(), giNextActionGridIndex
-        );
-        if (landingHex != chargeAffectedHexes.end()) {
-            chargeAffectedHexes.erase(landingHex);
-        }
-        ChargingDamage(chargeAffectedHexes);
     }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {

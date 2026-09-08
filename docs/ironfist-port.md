@@ -118,6 +118,11 @@ full porting history. The late milestones, briefly:
   creature attribute abilities (strike-and-return, charger/jumper/teleporter
   movement, astral dodge, shadow mark, plasma blast, force shield, fire-bomb
   walls, burn), and their targeting/rendering.
+  `IRONFIST/combat_movement.*` owns traversal policy and returns movement plans
+  shared by the cursor, grid, AI, and command execution. Queries keep terrain,
+  speed, and the adventure search buffer untouched; jumps end on legal
+  footprints, and charge lines use hex adjacency. Combat extensions belong to
+  one battle owner with generation-checked stack slots.
 - Town, hero, GUI: the full Cyborg faction — town building tree, Cybernetics
   skill surface, hero tables, level-up spell grants, map presence.
 - Adventure: shipyard map object, monster free-join flags, barrier/tent

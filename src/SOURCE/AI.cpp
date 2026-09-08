@@ -1,4 +1,6 @@
 #include <Ints.h>
+#include <IRONFIST/combat_movement.h>
+#include <IRONFIST/state.h>
 #include <string.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/KB.h>
@@ -917,143 +919,43 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     }
 }
 
-i32 combatManager::WalkTowardArmyFront(
-    class army* currentArmy, CombatSide side, i32 mask
-) {
-    i32 armyIndex;
-    i32 frontDelta;
-    i32 frontHex;
-    i32 oldSpeed;
-
-    i32 left;
-    i32 step;
-
-    currentArmy->m_targetSide = COMBAT_AI_NO_ARMY;
-    currentArmy->m_targetIndex = COMBAT_AI_NO_ARMY;
-    armyIndex = GetClosestArmy(currentArmy, side, mask);
-    if (armyIndex == COMBAT_AI_NO_ARMY)
+i32 combatManager::WalkTowardArmyFront(army* currentArmy, CombatSide side, i32 mask) {
+    const i32 index = GetClosestArmy(currentArmy, side, mask);
+    if (index == COMBAT_AI_NO_ARMY)
         return 0;
-
-    frontDelta = SINGLE_HEX_FRONT_OFFSET;
-    frontHex = armyIndex[m_armies[H2EnumIndex(side)]].m_hex;
-    if ((H2EnumIndex((armyIndex[m_armies[H2EnumIndex(side)]].m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_WIDE)))
-        != 0)
-        frontDelta = WIDE_CREATURE_FRONT_OFFSET;
-    frontHex += currentArmy->m_facing == ARMY_FACING_RIGHT ? frontDelta : -frontDelta;
-    if (frontHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1 || frontHex % ARMY_HEX_COLUMNS == 0)
-        return WalkTowardArmy(currentArmy, side, mask);
-
-    oldSpeed = currentArmy->m_monster.speed;
-    currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    gpSearchArray->FindCombatPath(
-        currentArmy->m_hex,
-        frontHex,
-        currentArmy,
-        COMBAT_AI_PATH_TO_FRONT,
-        0
-    );
-    currentArmy->m_monster.speed = static_cast<i8>(oldSpeed);
-    if (gpSearchArray->m_pathLength > 0) {
+    const auto& enemy = m_armies[H2EnumIndex(side)][index];
+    const i32 delta = static_cast<bool>(enemy.m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)
+        ? WIDE_CREATURE_FRONT_OFFSET : SINGLE_HEX_FRONT_OFFSET;
+    ironfist::movement::Target target;
+    target.hex = enemy.m_hex + (currentArmy->m_facing == ARMY_FACING_RIGHT ? delta : -delta);
+    target.exactHex = true;
+    const ironfist::movement::Traversal traversal(*this, *currentArmy, ironfist::state::Get().combat);
+    const auto route = traversal.Find(currentArmy->m_hex, target, -1);
+    const auto plan = route.WithinBudget(currentArmy->m_monster.speed);
+    if (plan && !plan.steps.empty()) {
         giNextAction = ACTION_MOVE;
-        left = currentArmy->m_monster.speed;
-        step = gpSearchArray->m_pathLength - 1;
-        giNextActionGridIndex = currentArmy->m_hex;
-        while (step >= 0 && left != 0) {
-            giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
-                giNextActionGridIndex,
-                CombatHexDirectionFromOrdinal(
-                    gpSearchArray->m_storage.aiPath.directions[step]
-                )
-            );
-            step--;
-            left--;
-            if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
-                left = 0;
-        }
+        giNextActionGridIndex = plan.destination;
         return 1;
     }
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
-i32 combatManager::WalkTowardArmy(
-    class army* currentArmy, CombatSide side, i32 mask
-) {
-    i32 targetStack;
-    i32 prevSpeed;
-    i32 routeGot;
-    i32 atkMask;
-    i32 movement;
-    i32 pathNdx;
-    army* targetPtr;
-    i32 targetSquare;
-
-    targetStack = GetClosestArmy(currentArmy, side, mask);
-
-    if (targetStack == COMBAT_AI_NO_ARMY)
+i32 combatManager::WalkTowardArmy(army* currentArmy, CombatSide side, i32 mask) {
+    const i32 index = GetClosestArmy(currentArmy, side, mask);
+    if (index == COMBAT_AI_NO_ARMY)
         return 0;
-
-    targetPtr = &m_armies[H2EnumIndex(side)][targetStack];
-    targetSquare = targetPtr->m_hex;
-    currentArmy->m_targetSide = side;
-    currentArmy->m_targetIndex = targetStack;
-    atkMask =
-        currentArmy->GetAttackMask(
-            currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
-        );
-    if (atkMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+    const auto& enemy = m_armies[H2EnumIndex(side)][index];
+    const ironfist::movement::Traversal traversal(*this, *currentArmy, ironfist::state::Get().combat);
+    const auto target = traversal.Destination(enemy.m_hex);
+    if (traversal.AttackDirection(currentArmy->m_hex, target)) {
         giNextAction = ACTION_WAIT;
         return 1;
     }
-
-    prevSpeed = currentArmy->m_monster.speed;
-    currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    routeGot = gpSearchArray->FindCombatPath(
-        currentArmy->m_hex,
-        targetSquare,
-        currentArmy,
-        COMBAT_AI_PATH_TO_TARGET,
-        0
-    );
-    if (routeGot == 0
-        && (H2EnumIndex((targetPtr->m_monster.flags.abilityFlags) & (MONSTER_ABILITY_FLAG_WIDE))) != 0) {
-        switch (targetPtr->m_facing) {
-            case ARMY_FACING_LEFT:
-                targetSquare--;
-                break;
-            case ARMY_FACING_RIGHT:
-                targetSquare++;
-                break;
-            default:
-                break;
-        }
-        if (targetSquare != COMBAT_AI_NO_ARMY)
-            routeGot = gpSearchArray->FindCombatPath(
-                currentArmy->m_hex,
-                targetSquare,
-                currentArmy,
-                COMBAT_AI_PATH_TO_TARGET,
-                0
-            );
-    }
-    currentArmy->m_monster.speed = static_cast<i8>(prevSpeed);
-    if (gpSearchArray->m_pathLength > 1) {
-        giNextAction = ACTION_MOVE;
-        movement = currentArmy->m_monster.speed;
-        pathNdx = gpSearchArray->m_pathLength - 1;
-        giNextActionGridIndex = currentArmy->m_hex;
-        while (pathNdx >= 1 && movement != 0) {
-            giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
-                giNextActionGridIndex,
-                CombatHexDirectionFromOrdinal(
-                    gpSearchArray->m_storage.aiPath.directions[pathNdx]
-                )
-            );
-            pathNdx--;
-            movement--;
-            if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
-                movement = 0;
-        }
-        return 1;
-    }
-    return 0;
+    const auto route = traversal.Find(currentArmy->m_hex, target, -1);
+    const auto plan = route.WithinBudget(currentArmy->m_monster.speed);
+    if (!plan || plan.steps.empty())
+        return 0;
+    giNextAction = ACTION_MOVE;
+    giNextActionGridIndex = plan.attackDirection ? enemy.m_hex : plan.destination;
+    return 1;
 }

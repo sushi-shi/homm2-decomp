@@ -1,7 +1,6 @@
 #include <Ints.h>
-#include <set>
-#include <vector>
-#include <IRONFIST/creatures.h>
+#include <algorithm>
+#include <IRONFIST/combat_movement.h>
 #include <IRONFIST/state.h>
 #include <SOURCE/army.h>
 #include <SOURCE/CMBTMGR.h>
@@ -13,94 +12,24 @@
 
 typedef enum CombatPathConstant {
     SPECIAL_DIRECTION_MASK = 0xc0,
-    IGNORE_SPEED           = 99,
     WIDE_HEX_OFFSET        = 1
 } CombatPathConstant;
 
-// The keep's wall hexes, which even a jumper cannot ignore.
-static bool IsCastleWall(i32 hexIndex) {
-    static const std::set<i32> wallHexes = {9, 22, 34, 47, 59, 73, 86, 100, 113, 92};
-    return wallHexes.count(hexIndex) != 0;
+i32 army::FindPath(i32 sourceHex, i32 targetHex, i32 speed, i32 ignoreSpeed, ArmyPathTarget mode) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    const auto plan = traversal.Find(sourceHex, traversal.Destination(targetHex, mode), ignoreSpeed ? -1 : speed);
+    return plan ? std::max(1, plan.Length()) : 0;
 }
 
-static bool IsAICombatTurn(void) {
-    i32 currentPlayerId = gpCombatManager->m_playerId[H2EnumIndex(gpCombatManager->m_currentSide)];
-    if (currentPlayerId == -1)
-        return true;
-    return !gbHumanPlayer[currentPlayerId];
-}
-
-i32 army::FindPath(
-    i32 sourceHex,
-    i32 targetHex,
-    i32,
-    i32 ignoreSpeed,
-    ArmyPathTarget pathMode
-) {
-    i32 pathResult2;
-    i32 savedSpeed2;
-    std::vector<i32> obstacleHexes;
-
-    if (!ValidHex(sourceHex) || !ValidHex(targetHex))
+i32 army::ValidPath(i32 targetHex, ArmyPathTarget mode) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    const auto plan = traversal.Find(m_hex, traversal.Destination(targetHex, mode), m_monster.speed);
+    if (!plan)
         return 0;
-
-    // A human-controlled jumper paths as if the obstacles were not there.
-    if (!IsAICombatTurn() && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper)
-        && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)) {
-        for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
-            if (gpCombatManager->m_hexCells[hexIndex].m_blocked && !IsCastleWall(hexIndex)) {
-                obstacleHexes.push_back(hexIndex);
-                gpCombatManager->m_hexCells[hexIndex].m_blocked = 0;
-            }
-        }
-    }
-
-    savedSpeed2 = m_monster.speed;
-    if (ignoreSpeed)
-        m_monster.speed = IGNORE_SPEED;
-
-    pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
-    if (!pathResult2 && (H2EnumIndex((m_monster.attributes) & (MONSTER_ATTRIBUTE_WIDE)))
-        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        switch (m_facing) {
-            case ARMY_FACING_LEFT:
-                targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_EAST);
-                break;
-            case ARMY_FACING_RIGHT:
-                targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_WEST);
-                break;
-            default:
-                break;
-        }
-
-        if (!ValidHex(targetHex))
-            pathResult2 = 0;
-        else
-            pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 1);
-    }
-
-    m_monster.speed = static_cast<i8>(savedSpeed2);
-    for (i32 obstacleHex : obstacleHexes) {
-        gpCombatManager->m_hexCells[obstacleHex].m_blocked = 1;
-    }
-    return pathResult2;
-}
-
-i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
-    i32 pathResult;
-
-    if (!ValidHex(targetHex))
-        return 0;
-
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_ATTRIBUTE_FLYING)))
-        return ValidFlight(targetHex, pathMode);
-
-    pathResult = FindPath(m_hex, targetHex, m_monster.speed, 0, pathMode);
-    if (pathResult) {
-        m_moveTargetHex = targetHex;
-        return 1;
-    }
-    return 0;
+    m_moveTargetHex = targetHex;
+    if (plan.attackDirection)
+        m_attackDirection = *plan.attackDirection;
+    return 1;
 }
 
 i32 army::GetMoveMask(i32 sourceHex) {
@@ -150,81 +79,8 @@ i32 army::ValidMove(CombatHexDirection direction) {
 }
 
 i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
-    i32 destHexNext;
-    i32 rearSquare;
-    b32 frontValid;
-    b32 rearValidResult;
-
-    if (!ValidHex(sourceHex))
-        return 0;
-
-    destHexNext = GetAdjacentCellIndex(sourceHex, direction);
-    if (!ValidHex(destHexNext))
-        return 0;
-
-    frontValid = false;
-    if (gpCombatManager->m_hexCells[destHexNext].m_occupantSide == COMBAT_SIDE_NONE
-        && (!gpCombatManager->m_hexCells[destHexNext].m_blocked
-            || (gpCombatManager->m_inCastleCombat
-                && (destHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
-                    || destHexNext == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))
-                && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
-                    || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
-                        && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                   .m_occupantSide
-                               == COMBAT_SIDE_NONE
-                        && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                   .m_deadOccupantCount
-                               == 0))))) {
-        frontValid = true;
-    }
-
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_ATTRIBUTE_WIDE))) {
-        rearSquare = ARMY_HEX_INVALID;
-        switch (m_facing) {
-            case ARMY_FACING_LEFT:
-                if (direction == COMBAT_DIRECTION_EAST)
-                    return frontValid;
-                else
-                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_WEST);
-                break;
-            case ARMY_FACING_RIGHT:
-                if (direction == COMBAT_DIRECTION_WEST)
-                    return frontValid;
-                else
-                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_EAST);
-                break;
-            default:
-                break;
-        }
-
-        rearValidResult = false;
-        if (ValidHex(rearSquare) && gpCombatManager->m_hexCells[rearSquare].m_occupantSide == COMBAT_SIDE_NONE
-            && (!gpCombatManager->m_hexCells[rearSquare].m_blocked
-                || (gpCombatManager->m_inCastleCombat
-                    && (rearSquare == COMBAT_CASTLE_GATE_APPROACH_HEX
-                        || rearSquare == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))
-                    && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
-                        || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
-                            && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_occupantSide
-                                   == COMBAT_SIDE_NONE
-                            && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_deadOccupantCount
-                                   == 0))))) {
-            rearValidResult = true;
-        }
-
-        if (direction == COMBAT_DIRECTION_EAST || direction == COMBAT_DIRECTION_WEST)
-            return rearValidResult;
-        else {
-            if (frontValid == 1 && rearValidResult == 1)
-                return 1;
-            else
-                return 0;
-        }
-    } else
-        return frontValid;
+    return ironfist::movement::Traversal(*gpCombatManager, *this, ironfist::state::Get().combat)
+        .CanStep(sourceHex, direction);
 }
 
 i32 army::ValidAttack(

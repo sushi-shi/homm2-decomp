@@ -6,6 +6,7 @@
 #include <BASE/sample.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
+#include <IRONFIST/combat_movement.h>
 #include <IRONFIST/hooks.h>
 #include <BASE/font.h>
 #include <BASE/Misc.h>
@@ -52,7 +53,6 @@
 // mover ended adjacent to where it started (teleporters), whether the move
 // is an attack, and the charger's flight state.
 bool gCloseMove;
-bool gMoveAttack;
 bool gChargePathDamage;
 bool gCharging;
 
@@ -1689,9 +1689,17 @@ void army::ChargingDamage(const std::vector<i32>& affectedHexes) {
 
     gChargePathDamage = true;
     for (i32 targetHex : affectedHexes) {
+        if (!ValidHex(targetHex))
+            continue;
+        const auto& cell = gpCombatManager->m_hexCells[targetHex];
+        if (cell.m_occupantSide < COMBAT_ATTACKER_SIDE || cell.m_occupantSide > COMBAT_DEFENDER_SIDE
+            || cell.m_occupantIndex < 0 || cell.m_occupantIndex >= COMBAT_ARMY_SLOT_COUNT)
+            continue;
         army* target =
             &gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_hexCells[targetHex].m_occupantSide)]
                                       [gpCombatManager->m_hexCells[targetHex].m_occupantIndex];
+        if (target->m_quantity <= 0)
+            continue;
         i32 damage = 0;
         i32 killed = 0;
         DamageEnemy(target, &damage, &killed, 0, 0);
@@ -2132,114 +2140,18 @@ i32 army::WalkTo(void) {
 }
 
 i32 army::WalkTo(i32 destination) {
-    i32 direction_3;
-    i32 steps;
-    b32 moatFound;
-    i32 moatIndex_1;
-    b32 canEnterMoat_1;
-
+    m_targetSide = COMBAT_SIDE_NONE;
     m_targetIndex = -1;
-    m_targetSide = m_targetIndex;
-    if (gpCombatManager->m_drawbridgeBackgroundVisible
-        && (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-        moatFound = false;
-        moatIndex_1 = 0;
-        for (direction_3 = 0; direction_3 < ARMY_MOAT_CELL_COUNT; direction_3++) {
-            if (moatCell[direction_3] == destination) {
-                moatFound = true;
-                moatIndex_1 = direction_3;
-            }
-        }
-        if (moatFound) {
-            canEnterMoat_1 = false;
-            if (moatIndex_1 == ARMY_MOAT_GATE_INDEX
-                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
-                canEnterMoat_1 = true;
-            }
-            if ((moatIndex_1 > 0 && moatCell[moatIndex_1 - 1] == m_hex)
-                || (moatIndex_1 < ARMY_MOAT_CELL_COUNT - 1 && moatCell[moatIndex_1 + 1] == m_hex)) {
-                canEnterMoat_1 = true;
-            }
-            for (direction_3 = H2EnumIndex(COMBAT_DIRECTION_NORTHEAST);
-                 direction_3 < ARMY_ADJACENT_DIRECTION_COUNT;
-                 direction_3++) {
-                if (moatCell[moatIndex_1]
-                    == GetAdjacentCellIndex(
-                        m_hex,
-                        CombatHexDirectionFromOrdinal(direction_3)
-                    )) {
-                    canEnterMoat_1 = true;
-                }
-            }
-            if (m_side == COMBAT_ATTACKER_SIDE && moatCell[m_hex / ARMY_HEX_COLUMNS] < m_hex) {
-                canEnterMoat_1 = true;
-            }
-            if (m_side == COMBAT_DEFENDER_SIDE && m_hex < moatCell[m_hex / ARMY_HEX_COLUMNS]) {
-                canEnterMoat_1 = true;
-            }
-            if (!canEnterMoat_1) {
-                if (m_facing == ARMY_FACING_RIGHT) {
-                    destination--;
-                } else {
-                    destination++;
-                }
-            }
-        }
-    }
-    if (!FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    ironfist::movement::Target target;
+    target.hex = destination;
+    const auto route = traversal.Find(m_hex, target, -1);
+    if (!route)
         return ARMY_PATH_BLOCKED;
-    }
-
-    steps = 0;
-    i32 jumpStartHex = m_hex;
-    for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
-        CombatHexDirection stepDirection = CombatHexDirectionFromOrdinal(
-            gpSearchArray->m_storage.path.directions[direction_3 + 1]
-        );
-        // The Berserker jumps: onto its victim from up to four hexes out,
-        // or over the first obstacle in its way.
-        if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
-            && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)) {
-            i32 stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
-            if (gMoveAttack && direction_3 < 4) {
-                for (i32 step = direction_3; step >= 0; step--) {
-                    stepDirection = CombatHexDirectionFromOrdinal(
-                        gpSearchArray->m_storage.path.directions[step + 1]
-                    );
-                    stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
-                    m_hex = stepHex;
-                }
-                ArcJump(jumpStartHex, stepHex);
-                ironfist::state::Get().combat.StartAnimation(*this, ironfist::CreatureAttribute::Jumper);
-                CancelSpellType(ArmySpellCancelType(0));
-                return 0;
-            } else if (gpCombatManager->m_hexCells[stepHex].m_blocked) {
-                for (i32 landIndex = direction_3 - 1; landIndex >= 0; landIndex--) {
-                    stepDirection = CombatHexDirectionFromOrdinal(
-                        gpSearchArray->m_storage.path.directions[landIndex + 1]
-                    );
-                    m_hex = stepHex;
-                    stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
-                    if (!gpCombatManager->m_hexCells[stepHex].m_blocked) {
-                        steps += direction_3 - landIndex;
-                        direction_3 = landIndex;
-                        ArcJump(jumpStartHex, stepHex);
-                        break;
-                    }
-                }
-            } else {
-                Walk(stepDirection, 0, gpSearchArray->m_pathLength - 1 != direction_3);
-            }
-        } else {
-            Walk(stepDirection, 0, gpSearchArray->m_pathLength - 1 != direction_3);
-        }
-        steps++;
-        if (steps >= m_monster.speed) {
-            direction_3 = -1;
-        }
-        jumpStartHex = m_hex;
-    }
-    CancelSpellType(ArmySpellCancelType(0));
+    const auto plan = route.WithinBudget(m_monster.speed);
+    if (!ironfist::movement::Execute(*this, plan))
+        return ARMY_PATH_BLOCKED;
+    CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2252,82 +2164,21 @@ i32 army::AttackTo(void) {
 }
 
 i32 army::AttackTo(i32 destination) {
-    b32 finishStanding;
-    i32 numSteps;
-    i32 pathIndex_4;
-
-    // A charger whose walking path is blocked flies its straight line in.
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
-        || (ValidPath(destination, ARMY_PATH_ANY_TARGET_HEX) == 0
-            && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger))) {
-        if (m_hex != destination) {
-            FlyTo(destination);
-        }
-        DoAttack(0);
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    const auto target = traversal.Destination(destination);
+    const auto plan = traversal.Find(m_hex, target, m_monster.speed);
+    if (!plan || !plan.attackDirection)
+        return ARMY_PATH_BLOCKED;
+    m_targetSide = target.side;
+    m_targetIndex = target.slot;
+    if (!ironfist::movement::Execute(*this, plan))
+        return ARMY_PATH_BLOCKED;
+    if (gpCombatManager->m_armies[H2EnumIndex(target.side)][target.slot].m_quantity <= 0)
         return 0;
-    }
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_BREATH_ATTACK))) && m_hex == m_moveTargetHex) {
-        DoAttack(0);
-        return 0;
-    }
-    if (FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
-        if (gpSearchArray->m_pathLength == 1) {
-            m_attackDirection = CombatHexDirectionFromOrdinal(
-                gpSearchArray->m_storage.path.directions[1]
-            );
-            gpCombatManager->TestRaiseDoor();
-            DoAttack(0);
-        } else {
-            pathIndex_4 = 0;
-            numSteps = 0;
-            i32 jumpStartHex = m_hex;
-            for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
-                numSteps++;
-                if (pathIndex_4 == 1 || numSteps >= m_monster.speed) {
-                    finishStanding = true;
-                } else {
-                    finishStanding = false;
-                }
-                // The Berserker leaps the last stretch onto its victim.
-                if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
-                    && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)
-                    && gMoveAttack && pathIndex_4 < 5) {
-                    i32 stepHex = m_hex;
-                    for (i32 step = pathIndex_4; step >= 1; step--) {
-                        stepHex = GetAdjacentCellIndex(
-                            m_hex,
-                            CombatHexDirectionFromOrdinal(
-                                gpSearchArray->m_storage.path.directions[step + 1]
-                            )
-                        );
-                        m_hex = stepHex;
-                    }
-                    ArcJump(jumpStartHex, stepHex);
-                    ironfist::state::Get().combat.StartAnimation(*this, ironfist::CreatureAttribute::Jumper);
-                    break;
-                }
-                Walk(
-                    CombatHexDirectionFromOrdinal(
-                        gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]
-                    ),
-                    finishStanding,
-                    gpSearchArray->m_pathLength - 1 != pathIndex_4
-                );
-                if (numSteps >= m_monster.speed && pathIndex_4 != 1) {
-                    return ARMY_PATH_BLOCKED;
-                }
-                jumpStartHex = m_hex;
-            }
-            CancelSpellType(ArmySpellCancelType(0));
-            m_attackDirection = CombatHexDirectionFromOrdinal(
-                gpSearchArray->m_storage.path.directions[1]
-            );
-            gpCombatManager->TestRaiseDoor();
-            DoAttack(0);
-        }
-        return 0;
-    }
-    return ARMY_PATH_BLOCKED;
+    m_attackDirection = *plan.attackDirection;
+    gpCombatManager->TestRaiseDoor();
+    DoAttack(0);
+    return 0;
 }
 
 void army::CheckLuck(void) {
@@ -3517,211 +3368,59 @@ void army::MoveTo(i32 destination) {
     }
 }
 
-// Whether the target sits exactly on one of the six straight hex lines
-// from this stack.
 bool army::TargetOnStraightLine(i32 targetHex) {
-    i32 deltaY = gpCombatManager->m_hexCells[targetHex].m_y
-                 - gpCombatManager->m_hexCells[m_hex].m_y;
-    i32 deltaX = gpCombatManager->m_hexCells[targetHex].m_x
-                 - gpCombatManager->m_hexCells[m_hex].m_x;
-    double angle = fabs((180.0 / M_PI) * atan2(static_cast<double>(deltaY), abs(deltaX)));
-    return angle == 0 || angle == ARMY_HEX_DIAGONAL_ANGLE;
+    return GetStraightLineDirection(targetHex) != COMBAT_DIRECTION_INVALID;
 }
 
 CombatHexDirection army::GetStraightLineDirection(i32 targetHex) {
-    i32 deltaY = gpCombatManager->m_hexCells[targetHex].m_y
-                 - gpCombatManager->m_hexCells[m_hex].m_y;
-    i32 deltaX = gpCombatManager->m_hexCells[targetHex].m_x
-                 - gpCombatManager->m_hexCells[m_hex].m_x;
-    double angle =
-        (180.0 / M_PI) * atan2(static_cast<double>(deltaY), static_cast<double>(deltaX));
-    if (angle >= -62.4 && angle <= -62.3)
-        return COMBAT_DIRECTION_NORTHEAST;
-    if (angle == 0)
-        return COMBAT_DIRECTION_EAST;
-    if (angle >= 62.3 && angle <= 62.4)
-        return COMBAT_DIRECTION_SOUTHEAST;
-    if (angle >= 117.6 && angle <= 117.7)
-        return COMBAT_DIRECTION_SOUTHWEST;
-    if (angle == 180)
-        return COMBAT_DIRECTION_WEST;
-    if (angle >= -117.7 && angle <= -117.6)
-        return COMBAT_DIRECTION_NORTHWEST;
-    return COMBAT_DIRECTION_INVALID;
+    return ironfist::movement::Traversal(*gpCombatManager, *this, ironfist::state::Get().combat)
+        .StraightDirection(m_hex, targetHex);
 }
 
 i32 army::GetStraightLineDistanceToHex(i32 targetHex) {
-    CombatHexDirection direction = GetStraightLineDirection(targetHex);
-    if (direction == COMBAT_DIRECTION_INVALID) {
-        return ARMY_STRAIGHT_LINE_UNREACHABLE;
-    }
-    i32 currentHex = m_hex;
-    i32 distance = 0;
-    while (currentHex != targetHex) {
-        currentHex = GetAdjacentCellIndex(currentHex, direction);
-        distance++;
-        if (currentHex < 0 || currentHex >= COMBAT_HEX_COUNT) {
-            return ARMY_STRAIGHT_LINE_UNREACHABLE;
-        }
-    }
-    return distance;
+    const auto line = ironfist::movement::Traversal(*gpCombatManager, *this, ironfist::state::Get().combat)
+        .StraightLine(m_hex, targetHex);
+    return line.empty() ? ARMY_STRAIGHT_LINE_UNREACHABLE : static_cast<i32>(line.size());
 }
 
-// Whether a straight flight to the hex crosses any blocked cell.
 bool army::FlightThroughObstacles(i32 destination) {
-    double sourceX = MidX();
-    double sourceY = MidY();
-    double destX = gpCombatManager->m_hexCells[destination].m_x;
-    double destY = gpCombatManager->m_hexCells[destination].m_y;
-    double deltaX = destX - sourceX;
-    double deltaY = destY - sourceY;
-    i32 x = static_cast<i32>(sourceX);
-    i32 endX = static_cast<i32>(destX);
-    if (sourceX > destX) {
-        x = static_cast<i32>(destX);
-        endX = static_cast<i32>(sourceX);
-    }
-    while (x < endX) {
-        i32 y = static_cast<i32>(sourceY + deltaY * (x - sourceX) / deltaX);
-        i32 cellIndex = gpCombatManager->GetGridIndex(x, y);
-        if (gpCombatManager->m_hexCells[cellIndex].m_blocked) {
-            return true;
-        }
-        x++;
-    }
-    return false;
+    return !ironfist::movement::Traversal(*gpCombatManager, *this, ironfist::state::Get().combat)
+        .ClearLine(m_hex, destination);
 }
 
-bool army::IsEnemyCreatureHex(i32 hexIndex) {
-    return gpCombatManager->m_hexCells[hexIndex].m_occupantIndex != -1
-           && gpCombatManager->m_hexCells[hexIndex].m_occupantSide != m_side;
-}
-
-void army::MoveAttackNonFlyer(i32 startHex, i32 attackMask) {
-    i32 targetAttackMask;
-    i32 sourceHex;
-    i32 adjacentHex;
-    CombatHexDirection direction;
-    hexcell* adjacentCell;
-
-    if (m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
-    } else {
-        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
-    }
-    if (targetAttackMask == ARMY_ALL_ATTACK_DIRECTIONS && m_monster.shots > 0) {
-        SpecialAttack();
-    } else if (attackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
-        AttackTo();
-    } else {
-        for (direction = COMBAT_DIRECTION_NORTHEAST;
-             H2EnumIndex(direction) < ARMY_COMBAT_DIRECTION_COUNT;
-             direction++) {
-            if (H2EnumIndex(direction) < ARMY_ADJACENT_DIRECTION_COUNT
-                || (H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-                sourceHex = m_hex;
-                if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
-                    && m_facing == ARMY_FACING_RIGHT
-                    && direction >= COMBAT_DIRECTION_NORTHEAST
-                    && direction <= COMBAT_DIRECTION_SOUTHEAST) {
-                    sourceHex++;
-                }
-                if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))
-                    && m_facing == ARMY_FACING_LEFT
-                    && direction >= COMBAT_DIRECTION_SOUTHWEST
-                    && direction <= COMBAT_DIRECTION_NORTHWEST) {
-                    sourceHex--;
-                }
-                if (direction >= COMBAT_DIRECTION_WIDE_WEST) {
-                    if (m_facing == ARMY_FACING_RIGHT) {
-                        sourceHex++;
-                    } else {
-                        sourceHex--;
-                    }
-                }
-                adjacentHex = GetAdjacentCellIndex(sourceHex, direction);
-                if (ValidHex(adjacentHex)) {
-                    adjacentCell = &gpCombatManager->m_hexCells[adjacentHex];
-                    if (adjacentCell->m_occupantSide == m_targetSide
-                        && adjacentCell->m_occupantIndex == m_targetIndex) {
-                        m_attackDirection = direction;
-                    }
-                }
-            }
-        }
-        DoAttack(0);
-    }
-
-    // Strike-and-return creatures fly home after the blow.
-    if (!(H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_DEAD)))
-        && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::StrikeAndReturn)) {
-        MoveTo(startHex);
-    }
-}
-
-void army::MoveAttack(i32 destination, i32 moveOnly) {
-    i32 baseAttackMask;
-    i32 returnHex;
-
-    gMoveAttack = false;
-    if (ValidHex(destination)
-        && (moveOnly == 1
-            || (!moveOnly
-                && gpCombatManager->m_hexCells[destination].m_occupantSide
-                       != COMBAT_SIDE_NONE))) {
-        gMoveAttack = true;
-    }
-    returnHex = m_hex;
-
-again:
-    gpCombatManager->m_limitCreature = false;
-    m_targetSide = COMBAT_SIDE_NONE;
-    m_targetIndex = -1;
-    if (!ValidHex(destination)) {
+void army::MoveAttack(i32 destination, i32 moveOnly, i32 approach) {
+    const ironfist::movement::Traversal traversal(*gpCombatManager, *this, ironfist::state::Get().combat);
+    auto target = traversal.Destination(destination);
+    target.approach = approach;
+    target.exactHex = approach != ARMY_HEX_INVALID;
+    if (target.IsAttack() && moveOnly)
         return;
-    }
-    if (gpCombatManager->m_hexCells[destination].m_occupantSide == COMBAT_SIDE_NONE
-        || (gpCombatManager->m_hexCells[destination].m_occupantSide
-                == gpCombatManager->m_currentArmySide
-            && gpCombatManager->m_hexCells[destination].m_occupantIndex
-                   == gpCombatManager->m_currentArmyIndex)) {
-        goto move;
-    }
-    if (moveOnly) {
-        return;
-    }
-    m_targetSide = gpCombatManager->m_hexCells[destination].m_occupantSide;
-    m_targetIndex = gpCombatManager->m_hexCells[destination].m_occupantIndex;
+    gCharging = false;
+    gCloseMove = true;
+    m_targetSide = target.side;
+    m_targetIndex = target.slot;
     m_moveTargetHex = destination;
-    baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-    if (((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
-         || (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)
-             && TargetOnStraightLine(destination)))
-        && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
-        if (m_hex != m_moveTargetHex
-            && !ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-            return;
-        }
-        FlyTo(m_moveTargetHex);
-        goto again;
+    const i32 returnHex = m_hex;
+    const auto attackTargets = m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BERSERK)]
+        ? ARMY_ATTACK_TARGET_OCCUPIED : ARMY_ATTACK_TARGET_ENEMY;
+    if (target.IsAttack() && approach == ARMY_HEX_INVALID && m_monster.shots > 0
+        && GetAttackMask(m_hex, attackTargets, ARMY_HEX_INVALID) == ARMY_ALL_ATTACK_DIRECTIONS) {
+        SpecialAttack();
+        return;
     }
-    MoveAttackNonFlyer(returnHex, baseAttackMask);
-    goto finish;
-move:
-    if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_FLYING)))
-        // A charger on a clear line flies its move-attack in.
-        || (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger) && gMoveAttack
-            && TargetOnStraightLine(giNextActionGridIndex)
-            && TargetOnStraightLine(destination))) {
-        m_moveTargetHex = destination;
-        if (!ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-            return;
-        }
-        FlyTo(m_moveTargetHex);
-    } else {
-        WalkTo(destination);
+    const auto plan = traversal.Find(m_hex, target, m_monster.speed);
+    if (!plan)
+        return;
+    gpCombatManager->m_limitCreature = false;
+    if (ironfist::movement::Execute(*this, plan) && plan.attackDirection
+        && gpCombatManager->m_armies[H2EnumIndex(target.side)][target.slot].m_quantity > 0) {
+        m_attackDirection = *plan.attackDirection;
+        gpCombatManager->TestRaiseDoor();
+        DoAttack(0);
+        if (m_quantity > 0 && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::StrikeAndReturn))
+            MoveTo(returnHex);
     }
-finish:
+    gCharging = false;
     gpCombatManager->m_limitCreature = true;
 }
 
