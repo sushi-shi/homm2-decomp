@@ -14,6 +14,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <IRONFIST/artifacts.h>
@@ -545,7 +546,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     pRoot->InsertEndChild(pElement);
 
     WriteMapVariables(pRoot);
-    std::string script = script::ScriptContents(gMapName);
+    const std::string& script = script::ActiveScriptContents();
     if (script.length())
         xml::PushBack(tempDoc, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
@@ -1005,6 +1006,8 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
 }
 
 void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
+    script::Shutdown();
+    std::string savedScript;
     i32 campaignType = CAMPAIGN_NONE;
     char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
     std::vector<i32> xmlArtifacts;
@@ -1074,7 +1077,10 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             memset(pwSizeOfMapExtra, 0, sizeof(i16) * iMaxMapExtra);
         }
         else if (name == "difficulty") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
-        else if (name == "mapFilename") xml::QueryText(elem, gpGame->m_mapFilename);
+        else if (name == "mapFilename") {
+            xml::QueryText(elem, gpGame->m_mapFilename);
+            utf8::Copy(gMapName, GLOBAL_MAP_NAME_SIZE, gpGame->m_mapFilename);
+        }
         else if (name == "relatedToNewGameSelection") xml::QueryCharText(elem, &gpGame->m_selectedSetupPlayer);
         else if (name == "relatedToNewGameInit") xml::QueryCharText(elem, &gpGame->m_newGameInitialized);
         else if (name == "numHumanPlayers") xml::QueryCharText(elem, &gpGame->m_newGameHumanCount);
@@ -1133,10 +1139,8 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
         }
         else if (name == "script") {
             const char* script = elem->GetText();
-            if (script) {
-                std::string scriptText(script);
-                script::InitializeFromSave(scriptText);
-            }
+            if (script)
+                savedScript = script;
         }
         else if (name == "mapExtra") ReadMapExtra(elem);
         else if (name == "playerData") ReadPlayerData(elem, index);
@@ -1186,6 +1190,12 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
     }
     giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
     DeserializeGeneratedArtifacts(xmlArtifacts);
+    // Execute against the restored game, then restore its saved Lua values.
+    // Scriptless saves still need a fresh generic artifact state.
+    if (savedScript.empty())
+        script::InitializeWithoutMap();
+    else
+        script::InitializeFromSave(std::move(savedScript));
     if (mapVariables.size())
         script::WriteMapVariablesToLua(mapVariables);
 }
@@ -1264,11 +1274,12 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
         const bool hasFirstByte = platform::FileReadExact(fd, &firstByte, sizeof(firstByte));
         platform::FileClose(fd);
         if (!hasFirstByte)
-            return false;
+            firstByte = 0;
     }
 
     if (firstByte != '<') {
         runtime::ResetAdventureState();
+        script::InitializeWithoutMap();
         return false;
     }
 
