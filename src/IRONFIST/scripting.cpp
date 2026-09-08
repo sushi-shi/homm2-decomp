@@ -1,6 +1,7 @@
 #include <IRONFIST/scripting.h>
 
 #include <cstdio>
+#include <charconv>
 #include <cstdlib>
 #include <strings.h>
 
@@ -229,7 +230,11 @@ static std::string GetMapVariableValue(lua_State* state, MapVariableType type, i
     } else if (type == MapVariableType::Integer) {
         return std::to_string(lua_tointeger(state, idx));
     } else if (type == MapVariableType::Number) {
-        return std::to_string(lua_tonumber(state, idx));
+        // The shortest representation that round-trips to the same Lua
+        // number, independent of the user's decimal separator.
+        char number[128];
+        const auto result = std::to_chars(number, number + sizeof(number), lua_tonumber(state, idx));
+        return std::string(number, result.ptr);
     } else if (type == MapVariableType::Boolean) {
         return std::to_string(lua_toboolean(state, idx));
     }
@@ -278,12 +283,22 @@ LuaTable LoadMapVariablesFromLua() {
         return mapVariables;
     }
 
+    const LuaStackScope stack(s_mapState);
     lua_getglobal(s_mapState, "mapVariables");
 
     if (lua_isnil(s_mapState, -1)) return mapVariables;
+    if (!lua_istable(s_mapState, -1)) {
+        DisplayError("mapVariables must be a table of variable names.", "Script error");
+        return mapVariables;
+    }
 
     lua_pushnil(s_mapState);
     while (lua_next(s_mapState, -2) != 0) {
+        if (lua_type(s_mapState, -1) != LUA_TSTRING) {
+            DisplayError("mapVariables entries must be variable names.", "Script error");
+            lua_pop(s_mapState, 1);
+            continue;
+        }
         std::string mapVariableId(lua_tostring(s_mapState, -1));
         lua_getglobal(s_mapState, mapVariableId.c_str());
         MapVariable& mapVariable = mapVariables[mapVariableId];
@@ -298,6 +313,7 @@ LuaTable LoadMapVariablesFromLua() {
                 mapVariableId, " A map variable can only be a table, number, string or boolean."
             );
             mapVariables.erase(mapVariableId);
+            lua_pop(s_mapState, 1);
         }
         lua_pop(s_mapState, 1);
     }
@@ -308,11 +324,27 @@ static void PushScalarToLua(MapVariableType type, const std::string& value) {
     if (type == MapVariableType::String) {
         lua_pushstring(s_mapState, value.c_str());
     } else if (type == MapVariableType::Integer) {
-        lua_pushinteger(s_mapState, atoi(value.c_str()));
+        lua_Integer number = 0;
+        const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+        if (result.ec != std::errc{} || result.ptr != value.data() + value.size()) {
+            DisplayError("Invalid saved integer: " + value, "Script error");
+            lua_pushnil(s_mapState);
+        } else {
+            lua_pushinteger(s_mapState, number);
+        }
     } else if (type == MapVariableType::Number) {
-        lua_pushnumber(s_mapState, atof(value.c_str()));
+        lua_Number number = 0;
+        const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+        if (result.ec != std::errc{} || result.ptr != value.data() + value.size()) {
+            DisplayError("Invalid saved number: " + value, "Script error");
+            lua_pushnil(s_mapState);
+        } else {
+            lua_pushnumber(s_mapState, number);
+        }
     } else if (type == MapVariableType::Boolean) {
         lua_pushboolean(s_mapState, atoi(value.c_str()));
+    } else {
+        lua_pushnil(s_mapState);
     }
 }
 
@@ -340,6 +372,7 @@ void WriteMapVariablesToLua(const LuaTable& mapVariables) {
         return;
     }
 
+    const LuaStackScope stack(s_mapState);
     for (const auto& [name, variable] : mapVariables) {
         if (IsTable(variable.type)) {
             PushTableToLua(variable.table);
