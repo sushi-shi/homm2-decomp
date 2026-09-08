@@ -3266,6 +3266,14 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         if (rounds > m_spellInfluence[H2EnumIndex(influence)]) {
             m_spellInfluence[H2EnumIndex(influence)] = static_cast<u8>(rounds);
         }
+        if (influence == ARMY_SPELL_INFLUENCE_FORCE_SHIELD) {
+            i32& shield = ironfist::state::Get().combat.stack.forceShieldHP[this];
+            const i32 capacity = gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints;
+            if (shield < capacity) {
+                shield = capacity;
+                return 1;
+            }
+        }
         return 0;
     }
     switch (influence) {
