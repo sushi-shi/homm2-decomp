@@ -57,6 +57,8 @@ const char* TrPlural(const char* id, std::uint32_t count);
 std::string DecodeResourceText(const char* text);
 std::string DecodeExternalText(const char* text, TextEncoding encoding);
 std::string DecodeExternalText(const char* text);
+std::string DecodeExternalText(std::string_view field, TextEncoding encoding);
+std::string DecodeExternalText(std::string_view field);
 
 // The active game/map file's encoding provenance. New games inherit the
 // resource edition; loaded files replace it after inspecting their raw fields.
