@@ -41,6 +41,12 @@ void InitGraphics(void) {
     platform::DisplayMode mode;
     mode.width = GRAPHICS_WIDTH;
     mode.height = GRAPHICS_HEIGHT;
+    platform::DisplaySettings settings;
+    settings.fullscreen = gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0;
+    platform::ReadDisplaySettings(platform::Files(), settings);
+    mode.fullscreen = settings.fullscreen;
+    mode.scaling = settings.scaling;
+    mode.vsync = settings.vsync;
     if (!platform::Video().Open(mode)) {
         ShutDown("Heroes II could not open a display.");
         return;
@@ -49,8 +55,8 @@ void InitGraphics(void) {
 
     // Retail chose between DirectDraw and WinG here. There is one path now.
     giGraphicsType = WINGRAPH_GRAPHICS_WING;
-    gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = false;
-    platform::SetMenuVisible(true);
+    gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = platform::Video().Settings().fullscreen;
+    platform::SetMenuVisible(!gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
 }
 
 // Retail left the ends of the palette to the desktop and only owned the middle.
@@ -77,9 +83,40 @@ void CleanUpWinGraphics(void) {
     gDisplayOpen = false;
 }
 
-// Retail could only go full screen through DirectDraw, and stayed windowed
-// without it. Reopening the display would strand the screen bitmap the game
-// holds, so the window stays as it is until the backend can switch in place.
 void SetFullScreenStatus(b32 fullScreen) {
-    static_cast<void>(fullScreen);
+    if (gDisplayOpen && platform::Video().SetFullscreen(fullScreen != 0)) {
+        gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = platform::Video().Settings().fullscreen;
+        platform::SetMenuVisible(!gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
+    }
+}
+
+void ChangeDisplaySettings(bool scaling, bool vsync) {
+    if (!gDisplayOpen) return;
+    const platform::DisplaySettings before = platform::Video().Settings();
+    bool changed = false;
+    if (scaling) {
+        const platform::Scaling next = before.scaling == platform::Scaling::Nearest
+            ? platform::Scaling::Linear : before.scaling == platform::Scaling::Linear
+            ? platform::Scaling::Integer : platform::Scaling::Nearest;
+        changed = platform::Video().SetScaling(next);
+    } else if (vsync) {
+        changed = platform::Video().SetVSync(!before.vsync);
+    } else {
+        changed = platform::Video().SetFullscreen(!before.fullscreen);
+    }
+    if (!changed) {
+        platform::Host().Log(platform::LogLevel::Warning, "The requested display setting is unavailable.");
+        return;
+    }
+    const platform::DisplaySettings current = platform::Video().Settings();
+    gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = current.fullscreen;
+    platform::SetMenuVisible(!current.fullscreen);
+    if (!platform::WriteDisplaySettings(platform::Files(), current))
+        platform::Host().Log(platform::LogLevel::Warning, "Could not save display preferences.");
+    platform::Host().Log(platform::LogLevel::Info, current.fullscreen ? "Display: fullscreen" : "Display: windowed");
+    platform::Host().Log(platform::LogLevel::Info, current.vsync ? "VSync: on" : "VSync: off");
+    platform::Host().Log(platform::LogLevel::Info,
+        current.scaling == platform::Scaling::Nearest ? "Display scaling: nearest"
+        : current.scaling == platform::Scaling::Linear ? "Display scaling: linear"
+                                                    : "Display scaling: integer");
 }

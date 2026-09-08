@@ -22,6 +22,7 @@ void InitGraphics();
 void UpdatePalette(i8* palette);
 void CleanUpWinGraphics();
 void SetFullScreenStatus(b32 fullscreen);
+void ChangeDisplaySettings(bool scaling, bool vsync);
 
 extern WingraphGraphicsType giGraphicsType;
 

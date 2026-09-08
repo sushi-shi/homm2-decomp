@@ -309,6 +309,11 @@ target_link_libraries(homm2 PRIVATE
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  # Run explicitly with an installed game directory; no retail assets belong
+  # in the asset-free CTest suite or the Nix store.
+  add_executable(homm2_media_smoke_test tools/media_smoke_test.cpp)
+  target_include_directories(homm2_media_smoke_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_media_smoke_test PRIVATE homm2_platform)
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
@@ -458,6 +463,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_platform_backend_test PRIVATE homm2_platform)
   add_test(NAME platform_backend COMMAND homm2_platform_backend_test)
+  add_executable(homm2_display_settings_test tools/display_settings_test.cpp)
+  target_include_directories(homm2_display_settings_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
+  target_link_libraries(homm2_display_settings_test PRIVATE homm2_platform)
+  add_test(NAME display_settings COMMAND homm2_display_settings_test)
   add_executable(homm2_platform_atexit_test tools/platform_atexit_test.cpp)
   target_include_directories(homm2_platform_atexit_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
