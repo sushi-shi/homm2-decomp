@@ -51,6 +51,8 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
 #include <SOURCE/SaveNames.h>
+#include <SOURCE/MapRecords.h>
+#include <vector>
 #include <BASE/Utf8.h>
 
 #include <string>
@@ -84,6 +86,26 @@ void RequireMapHeader(const SMapHeader& header) {
     if (const char* error = MapHeaderError(header)) {
         platform::Host().Log(platform::LogLevel::Error,
             (std::string("Invalid map header: ") + error).c_str());
+        RequireGameData(false);
+    }
+}
+
+void RequireMapExtras(const game& state, bool newMap) {
+    std::vector<map_records::Record> records(static_cast<std::size_t>(iMaxMapExtra));
+    for (i32 i = 1; i < iMaxMapExtra; ++i) {
+        records[i] = {static_cast<const u8*>(ppMapExtra[i]),
+                      static_cast<std::size_t>(pwSizeOfMapExtra[i])};
+    }
+    const auto& map = state.m_worldMap;
+    if (const char* error = map_records::ExtraTableError(
+            {map.cells, static_cast<std::size_t>(map.width * map.height)}, records,
+            {state.m_rumourEventIndices, state.m_rumourEventCount},
+            {state.m_timeEventIndices, state.m_timeEventCount},
+            newMap ? std::span<const u16>{}
+                   : std::span<const u16>{state.m_mapEventIndices, state.m_mapEventCount},
+            newMap)) {
+        platform::Host().Log(platform::LogLevel::Error,
+            (std::string("Invalid map extras: ") + error).c_str());
         RequireGameData(false);
     }
 }
@@ -1680,7 +1702,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, chunkTag, sizeof(i32));
     const i32 mapExtraTableBytes = platform::FileLength(fd) - platform::FileTell(fd);
     const i32 minimumExtraRecordSize = sizeof(i32) + sizeof(i16);
-    RequireGameData(iMaxMapExtra > 0 && mapExtraTableBytes >= 0
+    RequireGameData(iMaxMapExtra > 0 && iMaxMapExtra <= map_records::ExtraCapacity
+                    && mapExtraTableBytes >= 0
                     && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
     RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
     RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
@@ -1704,6 +1727,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, mapExtra, MAP_WIDTH * MAP_HEIGHT);
     ReadGameData(fd, chunkTag, sizeof(i32));
     m_worldMap.Read(fd, 0);
+    RequireGameData(m_worldMap.width == MAP_WIDTH && m_worldMap.height == MAP_HEIGHT);
+    RequireMapExtras(*this, false);
     ReadGameData(fd, chunkTag, sizeof(i32));
     platform::FileClose(fd);
 
@@ -2341,15 +2366,19 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
                     eventData4 =
-                        reinterpret_cast<mapEventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
-                    if (strlen(eventData4->riddle) > 1 && eventData4->answerCount >= 1)
+                        static_cast<mapEventExtra*>(MapExtraRecord(
+                            cell2->m_objectMetadata, map_records::Kind::Sphinx));
+                    if (MapExtraText(eventData4, offsetof(mapEventExtra, riddle)).size() > 1
+                        && eventData4->answerCount >= 1)
                         eventData4->active = 1;
                     else
                         eventData4->active = 0;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
+                    RequireGameData(m_mapEventCount < GAME_MAP_EVENT_CAPACITY);
                     m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
-                    mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
+                    mapEvent0 = static_cast<EventExtra*>(MapExtraRecord(
+                        cell2->m_objectMetadata, map_records::Kind::MapEvent));
                     mapEvent0->x = static_cast<i16>(xPos);
                     mapEvent0->y = static_cast<i16>(yPos);
                     mapEvent0->active = true;
@@ -2990,6 +3019,8 @@ i32 game::LoadMap(const char* filename) {
          + ", file=" + filename).c_str()
     );
     m_worldMap.Read(handle, 1);
+    RequireGameData(m_worldMap.width == m_mapHeader.width
+                    && m_worldMap.height == m_mapHeader.height);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
@@ -2997,6 +3028,9 @@ i32 game::LoadMap(const char* filename) {
         ReadGameData(handle, y, sizeof(y[0]));
         ReadGameData(handle, type, sizeof(type[0]));
         if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+            RequireGameData(static_cast<u8>(x[0]) < MAP_WIDTH
+                            && static_cast<u8>(y[0]) < MAP_HEIGHT
+                            && (type[0] & TOWN_RECORD_TYPE_MASK) <= H2EnumIndex(FACTION_NEUTRAL));
             m_castleRecs[i].m_onMap = 1;
             m_castleRecs[i].m_x = static_cast<u8>(x[0]);
             m_castleRecs[i].m_y = static_cast<u8>(y[0]);
@@ -3020,6 +3054,8 @@ i32 game::LoadMap(const char* filename) {
             ReadGameData(handle, type, sizeof(type[0]));
         }
         if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+            RequireGameData(static_cast<u8>(x[0]) < MAP_WIDTH
+                            && static_cast<u8>(y[0]) < MAP_HEIGHT);
             m_mines[i].guardianType = CREATURE_NONE;
             m_mines[i].x = static_cast<u8>(x[0]);
             m_mines[i].y = static_cast<u8>(y[0]);
@@ -3046,7 +3082,8 @@ i32 game::LoadMap(const char* filename) {
     ReadGameData(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
     const i32 mapExtraTableBytes = platform::FileLength(handle) - platform::FileTell(handle);
     const i32 minimumExtraRecordSize = sizeof(i16);
-    RequireGameData(iMaxMapExtra > 0 && mapExtraTableBytes >= 0
+    RequireGameData(iMaxMapExtra > 0 && iMaxMapExtra <= map_records::ExtraCapacity
+                    && mapExtraTableBytes >= 0
                     && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
     RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
     RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
@@ -3064,6 +3101,7 @@ i32 game::LoadMap(const char* filename) {
         ppMapExtra[i] = H2_ALLOC(pwSizeOfMapExtra[i]);
         ReadGameData(handle, ppMapExtra[i], pwSizeOfMapExtra[i]);
     }
+    RequireMapExtras(*this, true);
     ReadGameData(handle, junk, sizeof(u16));
     platform::FileClose(handle);
     return 0;
@@ -5037,7 +5075,8 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     i32 townId = GetTownId(x, y);
     town* castle = GetTown(townId);
     mapTownExtra* townExtra =
-        reinterpret_cast<mapTownExtra*>(ppMapExtra[WORLDMAP->GetCell(x, y)->m_objectMetadata]);
+        static_cast<mapTownExtra*>(MapExtraRecord(
+            WORLDMAP->GetCell(x, y)->m_objectMetadata, map_records::Kind::Town));
     FactionType race;
 
     if (townExtra->color == RANDOM_TOWN_UNOWNED_COLOR)
@@ -6001,6 +6040,7 @@ void game::ProcessMapExtra(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE):
                     townId = GetTownId(col6, row16);
+                    RequireGameData(townId >= 0 && townId < GAME_TOWN_COUNT);
                     m_castleRecs[townId].m_extraIndex = cell10->m_objectMetadata;
                     cell10->m_objectMetadata = townId;
                     break;
@@ -6058,7 +6098,7 @@ void game::SetupTowns(void) {
         castle8 = GetTown(townIndex1);
 
         extraIndex27 = castle8->m_extraIndex;
-        extra0 = reinterpret_cast<mapTownExtra*>(ppMapExtra[extraIndex27]);
+        extra0 = static_cast<mapTownExtra*>(MapExtraRecord(extraIndex27, map_records::Kind::Town));
         if (extra0->color == -1)
             owner12 = -1;
         else
@@ -6147,7 +6187,7 @@ void game::SetupTowns(void) {
         if (extra0->hasShrine)
             castle8->m_buildings |= H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS);
         castle8->m_mayNotUpgradeToCastle = extra0->unknown28;
-        const std::string townName = localization::DecodeExternalText(extra0->name);
+        const std::string townName = localization::DecodeExternalText(localization::TextField(extra0->name));
         utf8::Copy(castle8->m_name, sizeof(castle8->m_name), townName.c_str());
 
         memset(usedSpells0, 0, H2EnumIndex(SPELL_COUNT));
@@ -6278,7 +6318,8 @@ void game::ProcessOnMapHeroes(void) {
                     isJail4 =
                         (cell9->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_JAIL;
                     extraIndex1 = cell9->m_objectMetadata;
-                    extra9 = reinterpret_cast<mapHeroExtra*>(ppMapExtra[extraIndex1]);
+                    extra9 = static_cast<mapHeroExtra*>(MapExtraRecord(extraIndex1,
+                        isJail4 ? map_records::Kind::Jail : map_records::Kind::Hero));
 
                     if (pass27 == MAP_HERO_ASSIGNMENT_PASS) {
                         if (extra9->hasCustomHero && extra9->heroId < GAME_HERO_COUNT
@@ -6374,7 +6415,7 @@ void game::ProcessOnMapHeroes(void) {
                         }
                         if (extra9->hasCustomName) {
                             const std::string heroName =
-                                localization::DecodeExternalText(extra9->name);
+                                localization::DecodeExternalText(localization::TextField(extra9->name));
                             utf8::Copy(
                                 mapHero14->m_name,
                                 sizeof(mapHero14->m_name),
@@ -7767,9 +7808,11 @@ void game::SetupNewRumour(void) {
             else
                 eventIndex = 0;
             event0 =
-                reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex]]);
-            if (strlen(event0->text) > 2 && event0->text[0] != '@') {
-                const std::string rumour = localization::DecodeExternalText(event0->text);
+                static_cast<rumourEventExtra*>(MapExtraRecord(
+                    m_rumourEventIndices[eventIndex], map_records::Kind::Rumour));
+            const auto text = MapExtraText(event0, offsetof(rumourEventExtra, text));
+            if (text.size() > 2 && text[0] != '@') {
+                const std::string rumour = localization::DecodeExternalText(text);
                 utf8::Copy(m_rumour, sizeof(m_rumour), rumour.c_str());
                 event0->text[0] = '@';
                 return;
@@ -7884,7 +7927,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     EventExtra* ev;
     i32 i;
     for (i = 0; i < gpGame->m_mapEventCount; i++) {
-        ev = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEventIndices[i]]);
+        ev = static_cast<EventExtra*>(MapExtraRecord(gpGame->m_mapEventIndices[i], map_records::Kind::MapEvent));
         if (ev->x == x && ev->y == y && ev->active != 0
             && ev->players[gpGame->m_players[static_cast<i8>(giCurPlayer)].m_color] != 0)
             return ev;
@@ -7906,7 +7949,8 @@ void game::CheckForTimeEvent(void) {
     dayNumber4 = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
                  + (m_month - 1) * EVENT_DAYS_PER_MONTH;
     for (eventIndex5 = 0; eventIndex5 < m_timeEventCount; eventIndex5++) {
-        event0 = static_cast<timeEventExtra*>(ppMapExtra[m_timeEventIndices[eventIndex5]]);
+        event0 = static_cast<timeEventExtra*>(MapExtraRecord(
+            m_timeEventIndices[eventIndex5], map_records::Kind::TimeEvent));
         if (((gbHumanPlayer[giCurPlayer] && event0->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event0->appliesToComputer))
             && event0->players[GetPlayerColor(static_cast<i8>(giCurPlayer))]
@@ -7947,7 +7991,7 @@ void game::CheckForTimeEvent(void) {
             }
             if (gbThisNetHumanPlayer[giCurPlayer]) {
                 const std::string eventMessage =
-                    localization::DecodeExternalText(event0->message);
+                    localization::DecodeExternalText(MapExtraText(event0, offsetof(timeEventExtra, message)));
                 NormalDialog(
                     eventMessage.c_str(),
                     1,
