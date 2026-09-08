@@ -80,8 +80,16 @@ bool InputReplay::Load(
             replay.event.button = MouseButton::Right;
         } else if (action == "key-down" || action == "key-up") {
             std::string name;
-            fields >> std::quoted(name);
-            if (!fields || resolveKey == nullptr
+            fields >> std::ws;
+            if (fields.peek() == '"') {
+                fields >> std::quoted(name);
+            } else {
+                std::getline(fields, name);
+                while (!name.empty() && std::isspace(static_cast<unsigned char>(name.back()))) {
+                    name.pop_back();
+                }
+            }
+            if (!fields || name.empty() || resolveKey == nullptr
                 || !resolveKey(
                     name,
                     replay.event.key,
@@ -92,12 +100,12 @@ bool InputReplay::Load(
                 error = {lineNumber, "unknown or missing key name"};
                 return false;
             }
-            replay.event.type =
-                action == "key-down" ? Event::Type::KeyDown : Event::Type::KeyUp;
             if (HasTrailingField(fields)) {
                 error = {lineNumber, "unexpected field after key name"};
                 return false;
             }
+            replay.event.type =
+                action == "key-down" ? Event::Type::KeyDown : Event::Type::KeyUp;
         } else if (action == "text") {
             replay.event.type = Event::Type::TextInput;
             std::getline(fields, replay.event.text);

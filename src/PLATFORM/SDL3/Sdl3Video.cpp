@@ -8,6 +8,10 @@
 #include <cstring>
 #include <limits>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/html5.h>
+#endif
+
 namespace platform::sdl3 {
 
 Video::~Video() {
@@ -282,6 +286,34 @@ void Video::Present() {
     if (m_renderer == nullptr || m_texture == nullptr) {
         return;
     }
+
+#ifdef __EMSCRIPTEN__
+    // Fullscreen exit restores the canvas backing store after SDL's resize
+    // callback. CSS may give SDL a different window size; reconcile those
+    // dimensions at presentation time, once the browser has finished restoring.
+    int canvasWidth = 0, canvasHeight = 0;
+    int pixelWidth = 0, pixelHeight = 0;
+    const char* canvas = SDL_GetStringProperty(SDL_GetWindowProperties(m_window),
+        SDL_PROP_WINDOW_EMSCRIPTEN_CANVAS_ID_STRING, "#canvas");
+    if (emscripten_get_canvas_element_size(canvas, &canvasWidth, &canvasHeight)
+            != EMSCRIPTEN_RESULT_SUCCESS
+        || !SDL_GetWindowSizeInPixels(m_window, &pixelWidth, &pixelHeight)) {
+        SDL_SetError("could not read browser canvas dimensions");
+        LogPresentationFailure();
+        return;
+    }
+    if (canvasWidth != pixelWidth || canvasHeight != pixelHeight) {
+        int width = 0, height = 0;
+        if (!SDL_GetWindowSize(m_window, &width, &height)
+            || !SDL_SetWindowSize(m_window, width, height)
+            || !SDL_SetRenderLogicalPresentation(m_renderer, m_size.width, m_size.height,
+                m_scaling == Scaling::Integer ? SDL_LOGICAL_PRESENTATION_INTEGER_SCALE
+                                             : SDL_LOGICAL_PRESENTATION_LETTERBOX)) {
+            LogPresentationFailure();
+            return;
+        }
+    }
+#endif
 
     const std::size_t count = m_presented.size();
     const std::uint8_t* source = m_presented.data();

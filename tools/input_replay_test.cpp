@@ -123,6 +123,12 @@ int main() {
     valid &= Rejects("0 key-down \"Left Shift\n", 1, "unterminated key quote");
     valid &= Rejects("0 key-down \"Left Shift\" extra\n", 1, "trailing quoted key field");
 
+    std::istringstream unquoted("0 key-down Left Shift  \n1 key-up Left Shift\n");
+    valid &= Expect(replay.Load(unquoted, ResolveKey, error), "unquoted SDL key names parse");
+    replay.Start(0);
+    valid &= Expect(replay.NextDue(0, event) && event.key == platform::Key::Shift,
+                    "unquoted modifier key resolves");
+
     InputReplay unchanged;
     std::istringstream first("0 move 3 4\n");
     valid &= Expect(unchanged.Load(first, ResolveKey, error), "transaction seed");

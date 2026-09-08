@@ -110,6 +110,10 @@ start windowed because fullscreen requires a user gesture; use F4 after starting
 the game. A denied fullscreen/VSync request is logged and keeps the available
 mode. Web preferences use the existing browser storage mechanism; saving this
 small preference file does not itself acknowledge durable IndexedDB persistence.
+The browser can restore its canvas backing store after SDL's fullscreen resize
+callback. Presentation checks the final canvas dimensions against SDL's pixel
+size and reconciles a mismatch before drawing, preserving the viewport and
+mouse-coordinate mapping when CSS scales the canvas to fit the page.
 
 The `display_settings` CTest exercises the production SDL backend with its dummy
 render driver: repeated fullscreen transitions, all three scaling policies,
