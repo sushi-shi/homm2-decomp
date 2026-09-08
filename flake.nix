@@ -10,9 +10,33 @@
   outputs = { self, nixpkgs, rust-overlay }:
     let
       system = "x86_64-linux";
+      # Reviewed maintenance releases. This overlay follows the package set
+      # into i686 and MinGW, and the Web recipes inherit the same sources.
+      mediaMaintenance = final: previous: {
+        sdl3 = previous.sdl3.overrideAttrs (old: rec {
+          version = "3.4.16";
+          src = final.fetchurl {
+            url = "https://github.com/libsdl-org/SDL/releases/download/release-${version}/SDL3-${version}.tar.gz";
+            hash = "sha256-cyIjbNEgkMPrQLlyi+TUnHb2atF9BDaVhNTsrVz3fGg=";
+          };
+          # Keep the full upstream suite. Concurrent i686/cross builds can
+          # delay the contended rwlock test beyond its 20-second CTest limit.
+          cmakeFlags = old.cmakeFlags ++ [ "-DSDLTEST_TIMEOUT_MULTIPLIER=3" ];
+          meta = old.meta // {
+            changelog = "https://github.com/libsdl-org/SDL/releases/tag/release-${version}";
+          };
+        });
+        ffmpeg-headless = previous.ffmpeg-headless.overrideAttrs (_: rec {
+          version = "8.1.2";
+          src = final.fetchurl {
+            url = "https://ffmpeg.org/releases/ffmpeg-${version}.tar.xz";
+            hash = "sha256-RkvrXnvwwxHmi0WuLwTpzCr4iFGrtAgiMXQqdNl7Ukw=";
+          };
+        });
+      };
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ rust-overlay.overlays.default ];
+        overlays = [ rust-overlay.overlays.default mediaMaintenance ];
       };
       p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
