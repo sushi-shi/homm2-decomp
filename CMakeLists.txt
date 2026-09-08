@@ -471,6 +471,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     src/BASE/Utf8.cpp)
   target_include_directories(homm2_riddle_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME riddle COMMAND homm2_riddle_test)
+  add_executable(homm2_map_header_test
+    tools/map_header_test.cpp
+    src/SOURCE/MapHeader.cpp
+    src/SOURCE/LegacyText.cpp
+    src/BASE/Utf8.cpp)
+  target_include_directories(homm2_map_header_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_map_header_test PRIVATE homm2_platform)
+  add_test(NAME map_header COMMAND homm2_map_header_test)
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
