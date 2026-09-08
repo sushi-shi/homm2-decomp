@@ -1609,7 +1609,7 @@ const char* GetMonsterPluralName(CreatureType monster) {
 
 void GetMonsterCost(CreatureType monster, i32* const cost) {
     for (i32 resource = 0; resource < ironfist::SECONDARY_RESOURCE_COUNT; ++resource) {
-        cost[resource] = ironfist::CreatureSecondaryCosts[H2EnumIndex(monster)][resource];
+        cost[resource] = ironfist::gCreatureSecondaryCosts[H2EnumIndex(monster)][resource];
     }
     cost[H2EnumIndex(RES_GOLD)] = gMonsterDatabase[H2EnumIndex(monster)].cost;
 }

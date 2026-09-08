@@ -180,14 +180,14 @@ static void ApplyAstralDodgeWince(army* target) {
     if (target->m_monsterType != CREATURE_CYBER_SHADOW_ASSASSIN) {
         return;
     }
-    if (ironfist::state::Get().combat.IsAnimating(*target, ironfist::CreatureAttribute::AstralDodge)) {
+    if (ironfist::state::Get().combat.IsAnimating(*target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE)) {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] =
             ARMY_DODGE_ANIMATION_LENGTH;
         for (i32 frame = 0; frame < ARMY_DODGE_ANIMATION_LENGTH; frame++) {
             target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][frame] =
                 static_cast<i8>(ARMY_DODGE_FIRST_FRAME + frame);
         }
-        ironfist::state::Get().combat.FinishAnimation(*target, ironfist::CreatureAttribute::AstralDodge);
+        ironfist::state::Get().combat.FinishAnimation(*target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE);
     } else {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] = 1;
         target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][0] =
@@ -357,7 +357,7 @@ void army::Init(
     }
     m_armyGroupSlot = unknown;
     ironfist::state::Get().combat.ResetStack(*this);
-    for (auto& attribute : ironfist::CreatureAttributes) {
+    for (auto& attribute : ironfist::CREATURE_ATTRIBUTES) {
         if (ironfist::HasCreatureAttribute(m_monsterType, attribute))
             ironfist::state::Get().combat.GrantAbility(*this, attribute);
     }
@@ -1368,7 +1368,7 @@ void army::SpecialAttack(void) {
         effectX = gpCombatManager->m_hexCells[adjacentHex].m_x;
         effectY = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
         gpSoundManager->MemorySample(m_samples[H2EnumIndex(ARMY_SAMPLE_EXTRA_ONE)]);
-    } else if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::PlasmaBlast)) {
+    } else if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_PLASMA_BLAST)) {
         // The plasma blast splashes over the eighteen hexes around the target.
         static const i32 plasmaBlastMask[ARMY_PLASMA_BLAST_HEX_COUNT] = {
             -27, -26, -25, -14, -13, -12, -11, -2, -1, 1, 2, 12, 13, 14, 15, 25, 26, 27
@@ -1858,7 +1858,7 @@ void army::DoAttack(i32 retaliation) {
         if (breathTarget_6) {
             DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, retaliation);
         }
-        if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
+        if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER)) {
             auto approach = ironfist::state::Get().combat.Approach(*this);
             approach.charge = false;
             ironfist::state::Get().combat.SetApproach(*this, approach);
@@ -1972,14 +1972,14 @@ void army::DoAttack(i32 retaliation) {
                 break;
         }
         // Shadow-marking creatures brand their victim on every hit.
-        const bool marked = ironfist::state::Get().combat.HasAbility(*this, ironfist::CreatureAttribute::ShadowMark)
+        const bool marked = ironfist::state::Get().combat.HasAbility(*this, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_SHADOW_MARK)
             && ironfist::effects::ResolveShadowMark(*target_1);
         if (marked)
             ironfist::effects::PresentShadowMark(*target_1);
         ApplyAstralDodgeWince(target_1);
-        if (ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::Jumper)) {
+        if (ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER)) {
             SetJumpingAnimation();
-            ironfist::state::Get().combat.FinishAnimation(*this, ironfist::CreatureAttribute::Jumper);
+            ironfist::state::Get().combat.FinishAnimation(*this, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
         } else {
             RevertJumpingAnimation();
         }
@@ -2021,7 +2021,7 @@ void army::DoAttack(i32 retaliation) {
             && m_monsterType != CREATURE_ROGUE && m_monsterType != CREATURE_SPRITE
             && m_monsterType != CREATURE_VAMPIRE && m_monsterType != CREATURE_VAMPIRE_LORD
             // Teleporting in from afar leaves no chance to retaliate.
-            && !(ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter) && ironfist::state::Get().combat.Approach(*this).distantTeleport)
+            && !(ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER) && ironfist::state::Get().combat.Approach(*this).distantTeleport)
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
                 static_cast<i32l>(
@@ -2220,8 +2220,8 @@ void army::DamageEnemy(army* target, i32* damageResult, i32* killedResult,
     auto& state = ironfist::state::Get().combat;
     const auto result = ironfist::effects::ResolveAttack(*gpCombatManager, state, *this, *target,
         {state.Approach(*this), rangedAttack != 0, retaliation != 0, chargePath != 0});
-    *damageResult = result.outcome == ironfist::effects::Outcome::Dodged ? -2
-        : result.outcome == ironfist::effects::Outcome::MirrorDestroyed ? -1 : result.damage;
+    *damageResult = result.outcome == ironfist::effects::Outcome::DAMAGE_DODGED ? -2
+        : result.outcome == ironfist::effects::Outcome::DAMAGE_MIRROR_DESTROYED ? -1 : result.damage;
     *killedResult = result.killed;
     gbGenieHalf = result.genieHalf;
     ironfist::effects::PrepareAttackPresentation(state, result);
@@ -3201,7 +3201,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly, i32 approach) {
         m_attackDirection = *plan.attackDirection;
         gpCombatManager->TestRaiseDoor();
         DoAttack(0);
-        if (m_quantity > 0 && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::StrikeAndReturn))
+        if (m_quantity > 0 && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_STRIKE_AND_RETURN))
             MoveTo(returnHex);
     }
     ironfist::state::Get().combat.SetApproach(*this, {});

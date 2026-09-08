@@ -52,6 +52,28 @@ class IronfistInterfaceAuditTest(unittest.TestCase):
         self.assertEqual(arities, {"l_none": [0], "l_one": [1]})
         self.assertEqual(unresolved, {})
 
+    def test_native_handler_names_preserve_binding_and_arity_checks(self):
+        source = '''
+            static i32 LuaOne(lua_State* L) { return 1; }
+            static i32 LuaTwo(lua_State* L) { return 0; }
+            lua_register(L, "One", LuaOne);
+            lua_register(L, "Two", LuaTwo);
+        '''
+        self.assertEqual(audit.extract_lua_handlers(source), {"LuaOne", "LuaTwo"})
+        expected = {"One": "l_one", "Two": "l_two"}
+        actual = audit.extract_lua_registration_map(source)
+        self.assertEqual(audit.compare_registration_targets(expected, actual)["mismatches"], {})
+        actual["One"] = "LuaTwo"
+        self.assertIn("One", audit.compare_registration_targets(expected, actual)["mismatches"])
+        arities, unresolved = audit.resolve_lua_return_arities(source, [source])
+        self.assertEqual(audit.handler_values(arities), {"one": [1], "two": [0]})
+        self.assertEqual(unresolved, {})
+
+    def test_explicit_handler_renames_do_not_hide_duplicate_identities(self):
+        self.assertEqual(audit.handler_identity("LuaMessageBox"), audit.handler_identity("l_msgBox"))
+        with self.assertRaises(audit.AuditError):
+            audit.handler_values({"l_one": [0], "LuaOne": [1]})
+
     def test_binary_string_surface_requires_nul_terminated_names(self):
         comparison = audit.compare_binary_strings(
             {"One", "Two", "Three"}, b"prefixOne\0TwoSuffix\0Three\0"

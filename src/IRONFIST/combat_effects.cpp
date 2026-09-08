@@ -159,15 +159,15 @@ DamageResult ResolveAttack(combatManager& battle, state::CombatState& state,
         damage *= DAMAGE_SHADOW_MARK_MULTIPLIER;
     }
     // A jumper strikes harder mid-jump, once per battle.
-    if (state.HasAbility(attacker, CreatureAttribute::Jumper) && !retaliation
-        && state.HasAbilityCharge(attacker, ironfist::CreatureAttribute::Jumper)
+    if (state.HasAbility(attacker, CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER) && !retaliation
+        && state.HasAbilityCharge(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER)
         && context.approach.jump) {
-        state.ConsumeAbility(attacker, ironfist::CreatureAttribute::Jumper);
+        state.ConsumeAbility(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
         result.jump = true;
         damage *= SRandom(125, 150) * 0.01f;
     }
     // A charger's hit softens along its path and lands harder at the end.
-    if (state.HasAbility(attacker, CreatureAttribute::Charger) && context.approach.charge && !retaliation) {
+    if (state.HasAbility(attacker, CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER) && context.approach.charge && !retaliation) {
         if (context.chargePath) {
             damage *= DAMAGE_CHARGE_PATH_MULTIPLIER;
         } else {
@@ -175,7 +175,7 @@ DamageResult ResolveAttack(combatManager& battle, state::CombatState& state,
         }
     }
     // Teleporting into an enemy from afar hits harder.
-    if (context.approach.distantTeleport && !retaliation && state.HasAbility(attacker, CreatureAttribute::Teleporter)) {
+    if (context.approach.distantTeleport && !retaliation && state.HasAbility(attacker, CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER)) {
         damage *= DAMAGE_TELEPORT_MULTIPLIER;
     }
     appliedDamage = static_cast<i32>(damage + DAMAGE_ROUNDING_OFFSET);
@@ -196,18 +196,18 @@ DamageResult ResolveAttack(combatManager& battle, state::CombatState& state,
     }
     // An astral dodger slips one melee blow per round; -2 marks the dodge.
     if (!rangedAttack && !retaliation
-        && state.HasAbility(*target, CreatureAttribute::AstralDodge)
-        && state.HasAbilityCharge(*target, ironfist::CreatureAttribute::AstralDodge)) {
-        state.ConsumeAbility(*target, ironfist::CreatureAttribute::AstralDodge);
+        && state.HasAbility(*target, CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE)
+        && state.HasAbilityCharge(*target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE)) {
+        state.ConsumeAbility(*target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE);
         appliedDamage = -2;
     }
     result.damage = appliedDamage < 0 ? 0 : appliedDamage;
     if (appliedDamage == -2) {
-        result.outcome = Outcome::Dodged;
+        result.outcome = Outcome::DAMAGE_DODGED;
         return result;
     }
     if (appliedDamage == -1) {
-        result.outcome = Outcome::MirrorDestroyed;
+        result.outcome = Outcome::DAMAGE_MIRROR_DESTROYED;
         result.killed = ApplyDamage(battle, *target, 0, SPELL_NONE);
         result.remaining = target->m_quantity;
         return result;

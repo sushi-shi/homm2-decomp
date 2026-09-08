@@ -26,11 +26,11 @@ int main() {
     ironfist::save::XmlFile saved;
     assert(saved.Save("GAMES/names.GX1", ironfist::runtime::CaptureSession()) == tinyxml2::XML_SUCCESS);
     ironfist::save::XmlFile loaded;
-    auto* root = loaded.tempDoc->NewElement("ironfist_save");
-    loaded.tempDoc->InsertEndChild(root);
-    for (auto* name = saved.tempDoc->RootElement()->FirstChildElement("playerNames");
+    auto* root = loaded.m_document->NewElement("ironfist_save");
+    loaded.m_document->InsertEndChild(root);
+    for (auto* name = saved.m_document->RootElement()->FirstChildElement("playerNames");
          name; name = name->NextSiblingElement("playerNames")) {
-        root->InsertEndChild(name->DeepClone(loaded.tempDoc));
+        root->InsertEndChild(name->DeepClone(loaded.m_document));
     }
     std::memset(cPlayerNames, 0, sizeof(cPlayerNames));
     DecodeSessionFragment(loaded, root);
@@ -38,7 +38,7 @@ int main() {
         assert(names[i] == cPlayerNames[i]);
 
     ironfist::save::XmlFile compatibility;
-    compatibility.tempDoc->Parse(R"(<ironfist_save>
+    compatibility.m_document->Parse(R"(<ironfist_save>
       <playerNames index="-1" value="bad"/>
       <playerNames index="6" value="bad"/>
       <playerNames value="bad"/>
@@ -46,7 +46,7 @@ int main() {
       <playerNames index="2">Legacy</playerNames>
       <playerNames index="3" value="">must stay empty</playerNames>
     </ironfist_save>)");
-    DecodeSessionFragment(compatibility, compatibility.tempDoc->RootElement());
+    DecodeSessionFragment(compatibility, compatibility.m_document->RootElement());
     assert(names[0] == cPlayerNames[0]);
     assert(std::strcmp(cPlayerNames[1], "1234567890123456789") == 0);
     assert(utf8::IsValid(cPlayerNames[1]));

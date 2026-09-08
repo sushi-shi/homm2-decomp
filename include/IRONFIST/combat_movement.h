@@ -7,7 +7,7 @@
 
 namespace ironfist::movement {
 
-enum class StepKind { Walk, Jump, Fly, Charge };
+enum class StepKind { MOVEMENT_WALK, MOVEMENT_JUMP, MOVEMENT_FLY, MOVEMENT_CHARGE };
 
 struct Target {
     i32 hex = ARMY_HEX_INVALID;
@@ -19,7 +19,7 @@ struct Target {
 };
 
 struct Step {
-    StepKind kind = StepKind::Walk;
+    StepKind kind = StepKind::MOVEMENT_WALK;
     i32 from = ARMY_HEX_INVALID;
     i32 to = ARMY_HEX_INVALID;
     CombatHexDirection direction = COMBAT_DIRECTION_INVALID;
@@ -67,12 +67,12 @@ private:
     bool CanFinish(i32 hex, const Target& target, bool flying = false) const;
     Plan Ground(i32 source, Target target, i32 budget) const;
     Plan Charge(i32 source, Target target, i32 budget) const;
-    const combatManager& board_;
-    const army& actor_;
-    bool wide_;
-    bool jumping_;
-    bool flying_;
-    bool charging_;
+    const combatManager& m_board;
+    const army& m_actor;
+    bool m_wide;
+    bool m_jumping;
+    bool m_flying;
+    bool m_charging;
 };
 
 // The command boundary consumes a plan; each step ends on a legal footprint.

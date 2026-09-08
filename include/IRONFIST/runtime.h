@@ -16,7 +16,7 @@ void Shutdown();
 
 // A new map runs its start callbacks only after its managers are ready.
 // Restoring a session has a distinct lifecycle and never replays map start.
-enum class SessionPhase { Idle, PreparingMap, Restoring, Ready };
+enum class SessionPhase { SESSION_IDLE, SESSION_PREPARING_MAP, SESSION_RESTORING, SESSION_READY };
 SessionPhase Phase();
 void BeginSessionLoad();
 void FinishSessionLoad();
@@ -24,7 +24,7 @@ void FinishSessionLoad();
 SessionData CaptureSession();
 void RestoreSession(const SessionData& data);
 
-enum class LoadResult { Retail, Loaded, Failed };
+enum class LoadResult { LOAD_RETAIL, LOAD_LOADED, LOAD_FAILED };
 LoadResult LoadGame(const char* filename, i32 loadFromFile);
 void RetailGameLoaded();
 i32 SaveGame(const char* filename, i32 autosave);

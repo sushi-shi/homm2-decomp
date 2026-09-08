@@ -75,7 +75,7 @@ public:
     void Swap(CampaignCatalog& other) noexcept;
 
 private:
-    std::map<i32, CampaignDefinition> definitions_;
+    std::map<i32, CampaignDefinition> m_definitions;
 };
 
 CampaignCatalog& Campaigns();

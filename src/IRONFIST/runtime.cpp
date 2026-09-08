@@ -17,11 +17,11 @@
 namespace ironfist::runtime {
 
 namespace {
-SessionPhase sessionPhase = SessionPhase::Idle;
+SessionPhase gSessionPhase = SessionPhase::SESSION_IDLE;
 }
 
 SessionPhase Phase() {
-    return sessionPhase;
+    return gSessionPhase;
 }
 
 void Initialize() {
@@ -38,15 +38,15 @@ void ResetAdventureState() {
 void BeginMap(const char* filename) {
     state::Get().combat.EndBattle();
     ResetAdventureState();
-    sessionPhase = SessionPhase::PreparingMap;
+    gSessionPhase = SessionPhase::SESSION_PREPARING_MAP;
     std::string mapName(filename);
     script::InitializeMap(mapName);
 }
 
 void AdventureManagerReady() {
     state::AdventureState& adventure = state::Get().adventure;
-    if (sessionPhase == SessionPhase::PreparingMap && !adventure.firstDayEventDone) {
-        sessionPhase = SessionPhase::Ready;
+    if (gSessionPhase == SessionPhase::SESSION_PREPARING_MAP && !adventure.firstDayEventDone) {
+        gSessionPhase = SessionPhase::SESSION_READY;
         adventure.firstDayEventDone = true;
         script::Invoke("OnMapStart");
         script::Invoke(
@@ -61,18 +61,18 @@ void Shutdown() {
     UnloadCreatures();
     ResetGeneratedArtifacts();
     state::Get() = state::State{};
-    sessionPhase = SessionPhase::Idle;
+    gSessionPhase = SessionPhase::SESSION_IDLE;
 }
 
 void BeginSessionLoad() {
     script::Shutdown();
     state::Get().combat.EndBattle();
     ResetAdventureState();
-    sessionPhase = SessionPhase::Restoring;
+    gSessionPhase = SessionPhase::SESSION_RESTORING;
 }
 
 void FinishSessionLoad() {
-    sessionPhase = SessionPhase::Ready;
+    gSessionPhase = SessionPhase::SESSION_READY;
 }
 
 } // namespace ironfist::runtime

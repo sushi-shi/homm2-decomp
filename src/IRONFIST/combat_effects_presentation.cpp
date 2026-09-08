@@ -13,14 +13,14 @@
 namespace ironfist::effects {
 namespace {
 class RenderExtents {
-    i32 left = giMinExtentX, top = giMinExtentY;
-    i32 right = giMaxExtentX, bottom = giMaxExtentY;
+    i32 m_left = giMinExtentX, m_top = giMinExtentY;
+    i32 m_right = giMaxExtentX, m_bottom = giMaxExtentY;
 public:
     ~RenderExtents() {
-        giMinExtentX = left;
-        giMinExtentY = top;
-        giMaxExtentX = right;
-        giMaxExtentY = bottom;
+        giMinExtentX = m_left;
+        giMinExtentY = m_top;
+        giMaxExtentX = m_right;
+        giMaxExtentY = m_bottom;
     }
 };
 }
@@ -36,11 +36,11 @@ void PrepareAttackPresentation(state::CombatState& state, const DamageResult& re
     }
     if (result.jump)
         if (auto* source = state.Resolve(result.source))
-            state.StartAnimation(*source, CreatureAttribute::Jumper);
-    if (result.outcome == Outcome::Dodged)
+            state.StartAnimation(*source, CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
+    if (result.outcome == Outcome::DAMAGE_DODGED)
         if (auto* target = state.Resolve(result.target)) {
             target->m_damagePending = true;
-            state.StartAnimation(*target, CreatureAttribute::AstralDodge);
+            state.StartAnimation(*target, CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE);
         }
 }
 

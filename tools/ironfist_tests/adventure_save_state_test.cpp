@@ -55,7 +55,7 @@ static void CheckCampaignCatalog() {
     data.scriptSource = "campaignLoaded = true";
     assert(saved.Save("GAMES/campaign.GIC", data) == tinyxml2::XML_SUCCESS);
     SessionData decoded;
-    saved.ReadRoot(saved.tempDoc->RootElement(), decoded);
+    saved.ReadRoot(saved.m_document->RootElement(), decoded);
     assert(decoded.campaignDefinition && decoded.campaignDefinition->scenarios.size() == 2);
     assert(decoded.campaignDefinition->Scenario(0).heroesToSave.empty());
     runtime::RestoreSession(decoded);
@@ -67,10 +67,10 @@ static void CheckCampaignCatalog() {
 
 static void ReadState(save::XmlFile& saved, bool scriptFirst) {
     save::XmlFile loaded;
-    auto* root = loaded.tempDoc->NewElement("ironfist_save");
-    loaded.tempDoc->InsertEndChild(root);
+    auto* root = loaded.m_document->NewElement("ironfist_save");
+    loaded.m_document->InsertEndChild(root);
     auto addScript = [&]() {
-        xml::PushBack(loaded.tempDoc, root, "script",
+        xml::PushBack(loaded.m_document, root, "script",
             "ShareVision(0,2); "
             "ForceComputerPlayerChase(GetHeroInPool(3),GetHeroInPool(4),true); "
             "ToggleAIArmySharing(true); DisallowBuilding(0,3); "
@@ -78,12 +78,12 @@ static void ReadState(save::XmlFile& saved, bool scriptFirst) {
     };
     if (scriptFirst)
         addScript();
-    for (auto* child = saved.tempDoc->RootElement()->FirstChildElement(); child;
+    for (auto* child = saved.m_document->RootElement()->FirstChildElement(); child;
          child = child->NextSiblingElement()) {
         const std::string name = child->Name();
         if (name == "sharedVision" || name == "forcedHeroChases" || name == "mapVariable"
             || name == "allowAIArmySharing" || name == "disallowedBuildings")
-            root->InsertEndChild(child->DeepClone(loaded.tempDoc));
+            root->InsertEndChild(child->DeepClone(loaded.m_document));
     }
     if (!scriptFirst)
         addScript();
@@ -113,7 +113,7 @@ int main() {
     std::filesystem::create_directories(std::filesystem::path(path).parent_path());
     save::XmlFile saved;
     assert(saved.Save("GAMES/state.GX1", ironfist::runtime::CaptureSession()) == tinyxml2::XML_SUCCESS);
-    auto* legacy = saved.tempDoc->RootElement()->FirstChildElement("mapVariable");
+    auto* legacy = saved.m_document->RootElement()->FirstChildElement("mapVariable");
     assert(legacy && std::strcmp(legacy->Attribute("id"), "_AICHASE_0_1_") == 0);
 
     for (const bool scriptFirst : {false, true}) {
@@ -143,7 +143,7 @@ int main() {
     assert(!gpGame->IsHeroChaseForced(3, 4));
 
     save::XmlFile defaults;
-    defaults.tempDoc->Parse("<ironfist_save/>");
+    defaults.m_document->Parse("<ironfist_save/>");
     ReadState(defaults, true);
     assert(state::Get().adventure.sharePlayerVision[0][2]);
     assert(gpGame->IsHeroChaseForced(3, 4));
@@ -153,20 +153,20 @@ int main() {
     runtime::ResetAdventureState();
     script::Shutdown();
     save::XmlFile old;
-    old.tempDoc->Parse(R"(<ironfist_save>
+    old.m_document->Parse(R"(<ironfist_save>
       <mapVariable id="_AICHASE_2_3_" type="boolean" value="true"/>
       <mapVariable id="_AICHASE_-1_3_" type="boolean" value="true"/>
     </ironfist_save>)");
-    DecodeSessionFragment(old, old.tempDoc->RootElement());
+    DecodeSessionFragment(old, old.m_document->RootElement());
     assert(gpGame->IsHeroChaseForced(2, 3));
 
     // Invalid endpoints in new groups are ignored.
     save::XmlFile invalid;
-    invalid.tempDoc->Parse(R"(<ironfist_save>
+    invalid.m_document->Parse(R"(<ironfist_save>
       <sharedVision><share source="-1" destination="0"/><share source="0" destination="99"/></sharedVision>
       <forcedHeroChases><chase source="999" destination="0"/><chase destination="1"/></forcedHeroChases>
     </ironfist_save>)");
-    DecodeSessionFragment(invalid, invalid.tempDoc->RootElement());
+    DecodeSessionFragment(invalid, invalid.m_document->RootElement());
     assert(!gpGame->IsHeroChaseForced(2, 3));
     script::Shutdown();
     mapExtra = nullptr;

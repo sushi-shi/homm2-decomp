@@ -118,13 +118,13 @@ static void CopyLuaName(lua_State* L, i32 argument, char* destination, size_t ca
 
 /************************************************ Dialogs *****************************/
 
-static i32 l_msgBox(lua_State* L) {
+static i32 LuaMessageBox(lua_State* L) {
     const char* msg = luaL_checkstring(L, 1);
     H2MessageBox(const_cast<char*>(msg));
     return 0;
 }
 
-static i32 l_AdvancedMessageBox(lua_State* L) {
+static i32 LuaAdvancedMessageBox(lua_State* L) {
     const char* msg = luaL_checkstring(L, 1);
     i32 dialogType = luaL_checkinteger(L, 2);
     i32 horizontal = luaL_checkinteger(L, 3);
@@ -155,13 +155,13 @@ static i32 l_AdvancedMessageBox(lua_State* L) {
     return 1;
 }
 
-static i32 l_questionBox(lua_State* L) {
+static i32 LuaQuestionBox(lua_State* L) {
     char* qst = const_cast<char*>(luaL_checkstring(L, 1));
     lua_pushboolean(L, H2QuestionBox(qst));
     return 1;
 }
 
-static i32 l_inputBox(lua_State* L) {
+static i32 LuaInputBox(lua_State* L) {
     char* qst = const_cast<char*>(luaL_checkstring(L, 1));
     i32 len = static_cast<i32>(luaL_checknumber(L, 2));
     char* input = H2InputBox(qst, len);
@@ -170,7 +170,7 @@ static i32 l_inputBox(lua_State* L) {
     return 1;
 }
 
-static i32 l_recruitBox(lua_State* L) {
+static i32 LuaRecruitBox(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i16 quantity = static_cast<i16>(luaL_checknumber(L, 3));
@@ -181,45 +181,45 @@ static i32 l_recruitBox(lua_State* L) {
     return 1;
 }
 
-static void register_dialog_funcs(lua_State* L) {
-    lua_register(L, "MessageBox", l_msgBox);
-    lua_register(L, "AdvancedMessageBox", l_AdvancedMessageBox);
-    lua_register(L, "QuestionBox", l_questionBox);
-    lua_register(L, "InputBox", l_inputBox);
-    lua_register(L, "RecruitBox", l_recruitBox);
+static void RegisterDialogFunctions(lua_State* L) {
+    lua_register(L, "MessageBox", LuaMessageBox);
+    lua_register(L, "AdvancedMessageBox", LuaAdvancedMessageBox);
+    lua_register(L, "QuestionBox", LuaQuestionBox);
+    lua_register(L, "InputBox", LuaInputBox);
+    lua_register(L, "RecruitBox", LuaRecruitBox);
 }
 
 /************************************************ Date ********************************/
 
-static i32 l_getDay(lua_State* L) {
+static i32 LuaGetDay(lua_State* L) {
     lua_pushinteger(L, gpGame->m_day);
     return 1;
 }
 
-static i32 l_getWeek(lua_State* L) {
+static i32 LuaGetWeek(lua_State* L) {
     lua_pushinteger(L, gpGame->m_week);
     return 1;
 }
 
-static i32 l_getMonth(lua_State* L) {
+static i32 LuaGetMonth(lua_State* L) {
     lua_pushinteger(L, gpGame->m_month);
     return 1;
 }
 
-static void register_date_funcs(lua_State* L) {
-    lua_register(L, "GetDay", l_getDay);
-    lua_register(L, "GetWeek", l_getWeek);
-    lua_register(L, "GetMonth", l_getMonth);
+static void RegisterDateFunctions(lua_State* L) {
+    lua_register(L, "GetDay", LuaGetDay);
+    lua_register(L, "GetWeek", LuaGetWeek);
+    lua_register(L, "GetMonth", LuaGetMonth);
 }
 
 /************************************************ Player ******************************/
 
-static i32 l_getNumPlayers(lua_State* L) {
+static i32 LuaGetNumPlayers(lua_State* L) {
     lua_pushinteger(L, gpGame->m_playerCount);
     return 1;
 }
 
-static i32 l_getPlayer(lua_State* L) {
+static i32 LuaGetPlayer(lua_State* L) {
     auto& game = RequireGame(L);
     i32 n = CheckIndex(L, 1, H2EnumIndex(GAME_PLAYER_COUNT), "player index out of range");
     CheckIndex(L, 1, game.m_playerCount, "player is outside this session");
@@ -227,24 +227,24 @@ static i32 l_getPlayer(lua_State* L) {
     return 1;
 }
 
-static i32 l_getCurrentPlayer(lua_State* L) {
+static i32 LuaGetCurrentPlayer(lua_State* L) {
     PushBinding(L, Binding<playerData*>(gpCurPlayer));
     return 1;
 }
 
-static i32 l_getPlayerColor(lua_State* L) {
+static i32 LuaGetPlayerColor(lua_State* L) {
     playerData* p = CheckObject<playerData>(L, 1);
     lua_pushinteger(L, p->m_color);
     return 1;
 }
 
-static i32 l_getNumHeroes(lua_State* L) {
+static i32 LuaGetNumHeroes(lua_State* L) {
     playerData* p = CheckObject<playerData>(L, 1);
     lua_pushinteger(L, p->m_heroCount);
     return 1;
 }
 
-static i32 l_getHero(lua_State* L) {
+static i32 LuaGetHero(lua_State* L) {
     playerData* p = CheckObject<playerData>(L, 1);
     i32 n = CheckIndex(L, 2, p->m_heroCount, "owned hero index out of range");
     i32 heroId = CheckStoredIndex(
@@ -254,7 +254,7 @@ static i32 l_getHero(lua_State* L) {
     return 1;
 }
 
-static i32 l_getHeroForHire(lua_State* L) {
+static i32 LuaGetHeroForHire(lua_State* L) {
     playerData* p = CheckObject<playerData>(L, 1);
     i32 n = CheckIndex(
         L, 2, PLAYER_AVAILABLE_HERO_COUNT, "available hero index out of range"
@@ -266,7 +266,7 @@ static i32 l_getHeroForHire(lua_State* L) {
     return 1;
 }
 
-static i32 l_giveResource(lua_State* L) {
+static i32 LuaGiveResource(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     i32 val = static_cast<i32>(luaL_checknumber(L, 3));
@@ -274,7 +274,7 @@ static i32 l_giveResource(lua_State* L) {
     return 0;
 }
 
-static i32 l_setResource(lua_State* L) {
+static i32 LuaSetResource(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     i32 val = static_cast<i32>(luaL_checknumber(L, 3));
@@ -282,41 +282,41 @@ static i32 l_setResource(lua_State* L) {
     return 0;
 }
 
-static i32 l_getResource(lua_State* L) {
+static i32 LuaGetResource(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 res = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, player->m_resources[res]);
     return 1;
 }
 
-static i32 l_shareVision(lua_State* L) {
+static i32 LuaShareVision(lua_State* L) {
     i32 sourcePlayer = static_cast<i32>(luaL_checknumber(L, 1));
     i32 destPlayer = static_cast<i32>(luaL_checknumber(L, 2));
     gpGame->ShareVision(sourcePlayer, destPlayer);
     return 0;
 }
 
-static i32 l_cancelShareVision(lua_State* L) {
+static i32 LuaCancelShareVision(lua_State* L) {
     i32 sourcePlayer = static_cast<i32>(luaL_checknumber(L, 1));
     i32 destPlayer = static_cast<i32>(luaL_checknumber(L, 2));
     gpGame->CancelVisionShare(sourcePlayer, destPlayer);
     return 0;
 }
 
-static i32 l_setDaysAfterTownLost(lua_State* L) {
+static i32 LuaSetDaysAfterTownLost(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 days = static_cast<i32>(luaL_checknumber(L, 2));
     player->m_daysLeft = days;
     return 0;
 }
 
-static i32 l_getDaysAfterTownLost(lua_State* L) {
+static i32 LuaGetDaysAfterTownLost(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     lua_pushinteger(L, player->m_daysLeft);
     return 1;
 }
 
-static i32 l_revealMap(lua_State* L) {
+static i32 LuaRevealMap(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 x = static_cast<i32>(luaL_checknumber(L, 2));
     i32 y = static_cast<i32>(luaL_checknumber(L, 3));
@@ -331,7 +331,7 @@ static i32 l_revealMap(lua_State* L) {
     return 1;
 }
 
-static i32 l_SetBarrierTentVisited(lua_State* L) {
+static i32 LuaSetBarrierTentVisited(lua_State* L) {
     playerData* plyd = CheckObject<playerData>(L, 1);
     i32 tentcolor = luaL_checknumber(L, 2);
     plyd->m_barrierTents |= (1 << tentcolor);
@@ -339,23 +339,23 @@ static i32 l_SetBarrierTentVisited(lua_State* L) {
     return 0;
 }
 
-static void register_player_funcs(lua_State* L) {
-    lua_register(L, "GetNumPlayers", l_getNumPlayers);
-    lua_register(L, "GetPlayer", l_getPlayer);
-    lua_register(L, "GetCurrentPlayer", l_getCurrentPlayer);
-    lua_register(L, "GetPlayerColor", l_getPlayerColor);
-    lua_register(L, "GetNumHeroes", l_getNumHeroes);
-    lua_register(L, "GetHero", l_getHero);
-    lua_register(L, "GetHeroForHire", l_getHeroForHire);
-    lua_register(L, "GiveResource", l_giveResource);
-    lua_register(L, "SetResource", l_setResource);
-    lua_register(L, "GetResource", l_getResource);
-    lua_register(L, "ShareVision", l_shareVision);
-    lua_register(L, "CancelShareVision", l_cancelShareVision);
-    lua_register(L, "SetDaysAfterTownLost", l_setDaysAfterTownLost);
-    lua_register(L, "GetDaysAfterTownLost", l_getDaysAfterTownLost);
-    lua_register(L, "RevealMap", l_revealMap);
-    lua_register(L, "SetBarrierTentVisited", l_SetBarrierTentVisited);
+static void RegisterPlayerFunctions(lua_State* L) {
+    lua_register(L, "GetNumPlayers", LuaGetNumPlayers);
+    lua_register(L, "GetPlayer", LuaGetPlayer);
+    lua_register(L, "GetCurrentPlayer", LuaGetCurrentPlayer);
+    lua_register(L, "GetPlayerColor", LuaGetPlayerColor);
+    lua_register(L, "GetNumHeroes", LuaGetNumHeroes);
+    lua_register(L, "GetHero", LuaGetHero);
+    lua_register(L, "GetHeroForHire", LuaGetHeroForHire);
+    lua_register(L, "GiveResource", LuaGiveResource);
+    lua_register(L, "SetResource", LuaSetResource);
+    lua_register(L, "GetResource", LuaGetResource);
+    lua_register(L, "ShareVision", LuaShareVision);
+    lua_register(L, "CancelShareVision", LuaCancelShareVision);
+    lua_register(L, "SetDaysAfterTownLost", LuaSetDaysAfterTownLost);
+    lua_register(L, "GetDaysAfterTownLost", LuaGetDaysAfterTownLost);
+    lua_register(L, "RevealMap", LuaRevealMap);
+    lua_register(L, "SetBarrierTentVisited", LuaSetBarrierTentVisited);
 }
 
 /************************************************ Heroes ******************************/
@@ -372,19 +372,19 @@ static hero* GetCurrentHero() {
     return &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
 }
 
-static i32 l_getCurrentHero(lua_State* L) {
+static i32 LuaGetCurrentHero(lua_State* L) {
     PushBinding(L, Binding<hero*>(GetCurrentHero()));
     return 1;
 }
 
-static i32 l_grantSpell(lua_State* L) {
+static i32 LuaGrantSpell(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 sp = static_cast<i32>(luaL_checknumber(L, 2));
     hro->AddSpell(SpellTypeFromCode(sp), hro->Stats(HERO_PRIMARY_KNOWLEDGE));
     return 0;
 }
 
-static i32 l_forgetSpell(lua_State* L) {
+static i32 LuaForgetSpell(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 spell = static_cast<i32>(luaL_checknumber(L, 2));
     if (spell >= 0 && spell < KB_SPELL_TABLE_CAPACITY)
@@ -392,7 +392,7 @@ static i32 l_forgetSpell(lua_State* L) {
     return 0;
 }
 
-static i32 l_hasTroop(lua_State* L) {
+static i32 LuaHasTroop(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 3));
@@ -407,7 +407,7 @@ static i32 l_hasTroop(lua_State* L) {
     return 1;
 }
 
-static i32 l_getCreatureAmount(lua_State* L) {
+static i32 LuaGetCreatureAmount(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = 0;
@@ -422,7 +422,7 @@ static i32 l_getCreatureAmount(lua_State* L) {
     return 1;
 }
 
-static i32 l_takeTroop(lua_State* L) {
+static i32 LuaTakeTroop(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 creature = static_cast<i32>(luaL_checknumber(L, 2));
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 3));
@@ -442,7 +442,7 @@ static i32 l_takeTroop(lua_State* L) {
     return 0;
 }
 
-static i32 l_teleportHero(lua_State* L) {
+static i32 LuaTeleportHero(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 x = static_cast<i32>(luaL_checknumber(L, 2));
     i32 y = static_cast<i32>(luaL_checknumber(L, 3));
@@ -456,26 +456,26 @@ static i32 l_teleportHero(lua_State* L) {
     return 0;
 }
 
-static i32 l_getHeroName(lua_State* L) {
+static i32 LuaGetHeroName(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushstring(L, hro->m_name);
     return 1;
 }
 
-static i32 l_setHeroName(lua_State* L) {
+static i32 LuaSetHeroName(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     CopyLuaName(L, 2, hro->m_name, sizeof(hro->m_name));
     return 0;
 }
 
-static i32 l_getHeroInPool(lua_State* L) {
+static i32 LuaGetHeroInPool(lua_State* L) {
     auto& game = RequireGame(L);
     i32 n = CheckIndex(L, 1, H2EnumIndex(GAME_HERO_COUNT), "hero index out of range");
     PushBinding(L, Binding<hero*>(&game.m_heroRecs[n]));
     return 1;
 }
 
-static i32 l_getHeroOwner(lua_State* L) {
+static i32 LuaGetHeroOwner(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
 
     if (hro->m_owner < 0) {
@@ -489,21 +489,21 @@ static i32 l_getHeroOwner(lua_State* L) {
     return 1;
 }
 
-static i32 l_grantArtifact(lua_State* L) {
+static i32 LuaGrantArtifact(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     GiveArtifact(hro, ArtifactTypeFromCode(art), 1, -1);
     return 0;
 }
 
-static i32 l_hasArtifact(lua_State* L) {
+static i32 LuaHasArtifact(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushboolean(L, hro->HasArtifact(ArtifactTypeFromCode(art)));
     return 1;
 }
 
-static i32 l_takeArtifact(lua_State* L) {
+static i32 LuaTakeArtifact(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 art = static_cast<i32>(luaL_checknumber(L, 2));
     for (i32 i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
@@ -516,7 +516,7 @@ static i32 l_takeArtifact(lua_State* L) {
     return 0;
 }
 
-static i32 l_countEmptyArtifactSlots(lua_State* L) {
+static i32 LuaCountEmptyArtifactSlots(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 amount = 0;
     for (i32 i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
@@ -528,7 +528,7 @@ static i32 l_countEmptyArtifactSlots(lua_State* L) {
     return 1;
 }
 
-static i32 l_countEmptyCreatureSlots(lua_State* L) {
+static i32 LuaCountEmptyCreatureSlots(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 amount = 0;
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
@@ -540,7 +540,7 @@ static i32 l_countEmptyCreatureSlots(lua_State* L) {
     return 1;
 }
 
-static i32 l_setExperiencePoints(lua_State* L) {
+static i32 LuaSetExperiencePoints(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 points = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_experience = points;
@@ -548,13 +548,13 @@ static i32 l_setExperiencePoints(lua_State* L) {
     return 0;
 }
 
-static i32 l_getExperiencePoints(lua_State* L) {
+static i32 LuaGetExperiencePoints(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_experience);
     return 1;
 }
 
-static i32 l_setPrimarySkill(lua_State* L) {
+static i32 LuaSetPrimarySkill(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     i32 amt = static_cast<i32>(luaL_checknumber(L, 3));
@@ -562,27 +562,27 @@ static i32 l_setPrimarySkill(lua_State* L) {
     return 0;
 }
 
-static i32 l_getPrimarySkill(lua_State* L) {
+static i32 LuaGetPrimarySkill(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, hro->m_primaryStats[skill]);
     return 1;
 }
 
-static i32 l_setSpellpoints(lua_State* L) {
+static i32 LuaSetSpellpoints(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 points = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_spellPoints = points;
     return 0;
 }
 
-static i32 l_getSpellpoints(lua_State* L) {
+static i32 LuaGetSpellpoints(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_spellPoints);
     return 1;
 }
 
-static i32 l_setSecondarySkill(lua_State* L) {
+static i32 LuaSetSecondarySkill(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     i32 level = static_cast<i32>(luaL_checknumber(L, 3));
@@ -590,14 +590,14 @@ static i32 l_setSecondarySkill(lua_State* L) {
     return 0;
 }
 
-static i32 l_getSecondarySkill(lua_State* L) {
+static i32 LuaGetSecondarySkill(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 skill = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, hro->GetSSLevel(HeroSecondarySkillFromCode(skill)));
     return 1;
 }
 
-static i32 l_grantArmy(lua_State* L) {
+static i32 LuaGrantArmy(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 cr = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
@@ -605,141 +605,141 @@ static i32 l_grantArmy(lua_State* L) {
     return 0;
 }
 
-static i32 l_getHeroMobility(lua_State* L) {
+static i32 LuaGetHeroMobility(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_mobility);
     return 1;
 }
 
-static i32 l_setHeroMobility(lua_State* L) {
+static i32 LuaSetHeroMobility(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 mobility = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_mobility = mobility;
     return 0;
 }
 
-static i32 l_getHeroRemainingMobility(lua_State* L) {
+static i32 LuaGetHeroRemainingMobility(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_remainingMobility);
     return 1;
 }
 
-static i32 l_setHeroRemainingMobility(lua_State* L) {
+static i32 LuaSetHeroRemainingMobility(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 remainingMobility = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_remainingMobility = remainingMobility;
     return 0;
 }
 
-static i32 l_getHeroX(lua_State* L) {
+static i32 LuaGetHeroX(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_x);
     return 1;
 }
 
-static i32 l_getHeroY(lua_State* L) {
+static i32 LuaGetHeroY(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_y);
     return 1;
 }
 
-static i32 l_getHeroLevel(lua_State* L) {
+static i32 LuaGetHeroLevel(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_level);
     return 1;
 }
 
-static i32 l_getHeroTempMoraleBonuses(lua_State* L) {
+static i32 LuaGetHeroTempMoraleBonuses(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_morale);
     return 1;
 }
 
-static i32 l_setHeroTempMoraleBonuses(lua_State* L) {
+static i32 LuaSetHeroTempMoraleBonuses(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 moraleBonus = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_morale = moraleBonus;
     return 0;
 }
 
-static i32 l_getHeroTempLuckBonuses(lua_State* L) {
+static i32 LuaGetHeroTempLuckBonuses(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_luck);
     return 1;
 }
 
-static i32 l_setHeroTempLuckBonuses(lua_State* L) {
+static i32 LuaSetHeroTempLuckBonuses(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 luckBonus = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_luck = luckBonus;
     return 0;
 }
 
-static i32 l_grantSpellScroll(lua_State* L) {
+static i32 LuaGrantSpellScroll(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 sp = static_cast<i32>(luaL_checknumber(L, 2));
     GiveArtifact(hro, ARTIFACT_SPELL_SCROLL, 1, sp);
     return 0;
 }
 
-static i32 l_getHeroFaction(lua_State* L) {
+static i32 LuaGetHeroFaction(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     lua_pushinteger(L, hro->m_cursorType.value());
     return 1;
 }
 
-static i32 l_setHeroFaction(lua_State* L) {
+static i32 LuaSetHeroFaction(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 newFaction = static_cast<i32>(luaL_checknumber(L, 2));
     hro->m_cursorType = FactionTypeFromCode(newFaction);
     return 0;
 }
 
-static void register_hero_funcs(lua_State* L) {
-    lua_register(L, "GetCurrentHero", l_getCurrentHero);
-    lua_register(L, "GrantSpell", l_grantSpell);
-    lua_register(L, "ForgetSpell", l_forgetSpell);
-    lua_register(L, "HasTroop", l_hasTroop);
-    lua_register(L, "GetCreatureAmount", l_getCreatureAmount);
-    lua_register(L, "TakeTroop", l_takeTroop);
-    lua_register(L, "TeleportHero", l_teleportHero);
-    lua_register(L, "GetHeroName", l_getHeroName);
-    lua_register(L, "SetHeroName", l_setHeroName);
-    lua_register(L, "GetHeroInPool", l_getHeroInPool);
-    lua_register(L, "GetHeroOwner", l_getHeroOwner);
-    lua_register(L, "GrantArtifact", l_grantArtifact);
-    lua_register(L, "HasArtifact", l_hasArtifact);
-    lua_register(L, "TakeArtifact", l_takeArtifact);
-    lua_register(L, "CountEmptyArtifactSlots", l_countEmptyArtifactSlots);
-    lua_register(L, "CountEmptyCreatureSlots", l_countEmptyCreatureSlots);
-    lua_register(L, "SetExperiencePoints", l_setExperiencePoints);
-    lua_register(L, "GetExperiencePoints", l_getExperiencePoints);
-    lua_register(L, "SetPrimarySkill", l_setPrimarySkill);
-    lua_register(L, "GetPrimarySkill", l_getPrimarySkill);
-    lua_register(L, "SetSpellpoints", l_setSpellpoints);
-    lua_register(L, "GetSpellpoints", l_getSpellpoints);
-    lua_register(L, "SetSecondarySkill", l_setSecondarySkill);
-    lua_register(L, "GetSecondarySkill", l_getSecondarySkill);
-    lua_register(L, "GrantArmy", l_grantArmy);
-    lua_register(L, "GetHeroMobility", l_getHeroMobility);
-    lua_register(L, "SetHeroMobility", l_setHeroMobility);
-    lua_register(L, "GetHeroRemainingMobility", l_getHeroRemainingMobility);
-    lua_register(L, "SetHeroRemainingMobility", l_setHeroRemainingMobility);
-    lua_register(L, "GetHeroX", l_getHeroX);
-    lua_register(L, "GetHeroY", l_getHeroY);
-    lua_register(L, "GetHeroLevel", l_getHeroLevel);
-    lua_register(L, "GetHeroTempMoraleBonuses", l_getHeroTempMoraleBonuses);
-    lua_register(L, "SetHeroTempMoraleBonuses", l_setHeroTempMoraleBonuses);
-    lua_register(L, "GetHeroTempLuckBonuses", l_getHeroTempLuckBonuses);
-    lua_register(L, "SetHeroTempLuckBonuses", l_setHeroTempLuckBonuses);
-    lua_register(L, "GrantSpellScroll", l_grantSpellScroll);
-    lua_register(L, "GetHeroFaction", l_getHeroFaction);
-    lua_register(L, "SetHeroFaction", l_setHeroFaction);
+static void RegisterHeroFunctions(lua_State* L) {
+    lua_register(L, "GetCurrentHero", LuaGetCurrentHero);
+    lua_register(L, "GrantSpell", LuaGrantSpell);
+    lua_register(L, "ForgetSpell", LuaForgetSpell);
+    lua_register(L, "HasTroop", LuaHasTroop);
+    lua_register(L, "GetCreatureAmount", LuaGetCreatureAmount);
+    lua_register(L, "TakeTroop", LuaTakeTroop);
+    lua_register(L, "TeleportHero", LuaTeleportHero);
+    lua_register(L, "GetHeroName", LuaGetHeroName);
+    lua_register(L, "SetHeroName", LuaSetHeroName);
+    lua_register(L, "GetHeroInPool", LuaGetHeroInPool);
+    lua_register(L, "GetHeroOwner", LuaGetHeroOwner);
+    lua_register(L, "GrantArtifact", LuaGrantArtifact);
+    lua_register(L, "HasArtifact", LuaHasArtifact);
+    lua_register(L, "TakeArtifact", LuaTakeArtifact);
+    lua_register(L, "CountEmptyArtifactSlots", LuaCountEmptyArtifactSlots);
+    lua_register(L, "CountEmptyCreatureSlots", LuaCountEmptyCreatureSlots);
+    lua_register(L, "SetExperiencePoints", LuaSetExperiencePoints);
+    lua_register(L, "GetExperiencePoints", LuaGetExperiencePoints);
+    lua_register(L, "SetPrimarySkill", LuaSetPrimarySkill);
+    lua_register(L, "GetPrimarySkill", LuaGetPrimarySkill);
+    lua_register(L, "SetSpellpoints", LuaSetSpellpoints);
+    lua_register(L, "GetSpellpoints", LuaGetSpellpoints);
+    lua_register(L, "SetSecondarySkill", LuaSetSecondarySkill);
+    lua_register(L, "GetSecondarySkill", LuaGetSecondarySkill);
+    lua_register(L, "GrantArmy", LuaGrantArmy);
+    lua_register(L, "GetHeroMobility", LuaGetHeroMobility);
+    lua_register(L, "SetHeroMobility", LuaSetHeroMobility);
+    lua_register(L, "GetHeroRemainingMobility", LuaGetHeroRemainingMobility);
+    lua_register(L, "SetHeroRemainingMobility", LuaSetHeroRemainingMobility);
+    lua_register(L, "GetHeroX", LuaGetHeroX);
+    lua_register(L, "GetHeroY", LuaGetHeroY);
+    lua_register(L, "GetHeroLevel", LuaGetHeroLevel);
+    lua_register(L, "GetHeroTempMoraleBonuses", LuaGetHeroTempMoraleBonuses);
+    lua_register(L, "SetHeroTempMoraleBonuses", LuaSetHeroTempMoraleBonuses);
+    lua_register(L, "GetHeroTempLuckBonuses", LuaGetHeroTempLuckBonuses);
+    lua_register(L, "SetHeroTempLuckBonuses", LuaSetHeroTempLuckBonuses);
+    lua_register(L, "GrantSpellScroll", LuaGrantSpellScroll);
+    lua_register(L, "GetHeroFaction", LuaGetHeroFaction);
+    lua_register(L, "SetHeroFaction", LuaSetHeroFaction);
 }
 
 /************************************** Map *******************************************/
 
-static i32 l_mapSetObject(lua_State* L) {
+static i32 LuaMapSetObject(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     i32 obj = static_cast<i32>(luaL_checknumber(L, 3));
@@ -752,7 +752,7 @@ static i32 l_mapSetObject(lua_State* L) {
     return 0;
 }
 
-static i32 l_mapPutArmy(lua_State* L) {
+static i32 LuaMapPutArmy(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     i32 monIdx = static_cast<i32>(luaL_checknumber(L, 3));
@@ -774,7 +774,7 @@ static i32 l_mapPutArmy(lua_State* L) {
  * EraseObj has special casing for a number of objects which are normally
  * deleted in the game; see the upstream Ironfist comment for the details.
  */
-static i32 l_mapEraseObj(lua_State* L) {
+static i32 LuaMapEraseSquare(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     mapCell* cell = gpAdvManager->GetCell(x, y);
@@ -783,7 +783,7 @@ static i32 l_mapEraseObj(lua_State* L) {
     return 0;
 }
 
-static i32 l_mapFizzleObj(lua_State* L) {
+static i32 LuaMapFizzle(lua_State* L) {
     SAMPLE2 res;
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
@@ -814,7 +814,7 @@ static i32 l_mapFizzleObj(lua_State* L) {
     return 0;
 }
 
-static i32 l_mapSetTerrainTile(lua_State* L) {
+static i32 LuaMapSetTileTerrain(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     i32 tileno = static_cast<i32>(luaL_checknumber(L, 3));
@@ -831,28 +831,28 @@ static i32 l_mapSetTerrainTile(lua_State* L) {
     return 0;
 }
 
-static void register_map_funcs(lua_State* L) {
-    lua_register(L, "MapSetObject", l_mapSetObject);
-    lua_register(L, "MapPutArmy", l_mapPutArmy);
-    lua_register(L, "MapEraseSquare", l_mapEraseObj);
-    lua_register(L, "MapFizzle", l_mapFizzleObj);
-    lua_register(L, "MapSetTileTerrain", l_mapSetTerrainTile);
+static void RegisterMapFunctions(lua_State* L) {
+    lua_register(L, "MapSetObject", LuaMapSetObject);
+    lua_register(L, "MapPutArmy", LuaMapPutArmy);
+    lua_register(L, "MapEraseSquare", LuaMapEraseSquare);
+    lua_register(L, "MapFizzle", LuaMapFizzle);
+    lua_register(L, "MapSetTileTerrain", LuaMapSetTileTerrain);
 }
 
 /************************************** Town ******************************************/
 
-static i32 l_getCurrentTown(lua_State* L) {
+static i32 LuaGetCurrentTown(lua_State* L) {
     PushBinding(L, Binding<town*>(gpTownManager ? gpTownManager->m_town : nullptr));
     return 1;
 }
 
-static i32 l_hasVisitingHero(lua_State* L) {
+static i32 LuaHasVisitingHero(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushboolean(L, twn->m_occupyingHeroId >= 0);
     return 1;
 }
 
-static i32 l_getVisitingHero(lua_State* L) {
+static i32 LuaGetVisitingHero(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     if (twn->m_occupyingHeroId < 0) {
         lua_pushnil(L);
@@ -865,33 +865,33 @@ static i32 l_getVisitingHero(lua_State* L) {
     return 1;
 }
 
-static i32 l_buildInCurrentTown(lua_State* L) {
+static i32 LuaBuildInCurrentTown(lua_State* L) {
     i32 obj = static_cast<i32>(luaL_checknumber(L, 1));
     gpTownManager->BuildObj(BuildingSlotTypeFromCode(obj));
     return 0;
 }
 
-static i32 l_getTown(lua_State* L) {
+static i32 LuaGetTown(lua_State* L) {
     auto& game = RequireGame(L);
     i32 index = CheckIndex(L, 1, H2EnumIndex(GAME_TOWN_COUNT), "town index out of range");
     PushBinding(L, Binding<town*>(&game.m_castleRecs[index]));
     return 1;
 }
 
-static i32 l_getTownName(lua_State* L) {
+static i32 LuaGetTownName(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushstring(L, twn->m_name);
     return 1;
 }
 
-static i32 l_setTownName(lua_State* L) {
+static i32 LuaSetTownName(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     CopyLuaName(L, 2, twn->m_name, sizeof(twn->m_name));
     // Upstream returns the still-on-stack name argument as the single result.
     return 1;
 }
 
-static i32 l_getTownByName(lua_State* L) {
+static i32 LuaGetTownByName(lua_State* L) {
     char* name = const_cast<char*>(luaL_checkstring(L, 1));
     for (i32 i = 0; i < H2EnumIndex(GAME_TOWN_COUNT); i++) {
         if (strcmp(gpGame->m_castleRecs[i].m_name, name) == 0) {
@@ -903,7 +903,7 @@ static i32 l_getTownByName(lua_State* L) {
     return 1;
 }
 
-static i32 l_getPlayerTown(lua_State* L) {
+static i32 LuaGetPlayerTown(lua_State* L) {
     playerData* player = CheckObject<playerData>(L, 1);
     i32 index = CheckIndex(L, 2, player->m_townCount, "owned town index out of range");
     i32 townId = CheckStoredIndex(
@@ -913,27 +913,27 @@ static i32 l_getPlayerTown(lua_State* L) {
     return 1;
 }
 
-static i32 l_buildInTown(lua_State* L) {
+static i32 LuaBuildInTown(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     i32 building = static_cast<i32>(luaL_checknumber(L, 2));
     twn->BuildBuilding(BuildingSlotTypeFromCode(building));
     return 0;
 }
 
-static i32 l_getTownFaction(lua_State* L) {
+static i32 LuaGetTownFaction(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushinteger(L, twn->m_type.value());
     return 1;
 }
 
-static i32 l_setTownFaction(lua_State* L) {
+static i32 LuaSetTownFaction(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     i32 faction = static_cast<i32>(luaL_checknumber(L, 2));
     twn->SetFaction(FactionTypeFromCode(faction));
     return 0;
 }
 
-static i32 l_getCreatureCost(lua_State* L) {
+static i32 LuaGetCreatureCost(lua_State* L) {
     i32 creature = static_cast<i32>(luaL_checknumber(L, 1));
     i32 cost[H2EnumIndex(RES_COUNT)];
     GetMonsterCost(CreatureTypeFromCode(creature), cost);
@@ -943,39 +943,39 @@ static i32 l_getCreatureCost(lua_State* L) {
     return H2EnumIndex(RES_COUNT);
 }
 
-static i32 l_getTownOwner(lua_State* L) {
+static i32 LuaGetTownOwner(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushinteger(L, twn->m_owner);
     return 1;
 }
 
-static i32 l_setTownOwner(lua_State* L) {
+static i32 LuaSetTownOwner(lua_State* L) {
     i32 townIdx = static_cast<i32>(luaL_checknumber(L, 1));
     i32 playerIdx = static_cast<i32>(luaL_checknumber(L, 2));
     gpGame->ClaimTown(townIdx, playerIdx, 0);
     return 0;
 }
 
-static i32 l_getTownX(lua_State* L) {
+static i32 LuaGetTownX(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushinteger(L, twn->m_x);
     return 1;
 }
 
-static i32 l_getTownY(lua_State* L) {
+static i32 LuaGetTownY(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     lua_pushinteger(L, twn->m_y);
     return 1;
 }
 
-static i32 l_getTownIDFromPos(lua_State* L) {
+static i32 LuaGetTownIdFromPos(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     lua_pushinteger(L, gpGame->GetTownId(x, y));
     return 1;
 }
 
-static i32 l_setNumberOfCreatures(lua_State* L) {
+static i32 LuaSetNumberOfCreatures(lua_State* L) {
     town* cstle = CheckObject<town>(L, 1);
     i32 dwllng = static_cast<i32>(luaL_checknumber(L, 2));
     i32 numcrtrs = static_cast<i32>(luaL_checknumber(L, 3));
@@ -983,7 +983,7 @@ static i32 l_setNumberOfCreatures(lua_State* L) {
     return 0;
 }
 
-static i32 l_setNumGuildSpells(lua_State* L) {
+static i32 LuaSetNumGuildSpells(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
@@ -992,7 +992,7 @@ static i32 l_setNumGuildSpells(lua_State* L) {
     return 0;
 }
 
-static i32 l_setGuildSpell(lua_State* L) {
+static i32 LuaSetGuildSpell(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
@@ -1002,7 +1002,7 @@ static i32 l_setGuildSpell(lua_State* L) {
     return 0;
 }
 
-static i32 l_getGuildSpell(lua_State* L) {
+static i32 LuaGetGuildSpell(lua_State* L) {
     town* twn = CheckObject<town>(L, 1);
     i32 l = static_cast<i32>(luaL_checknumber(L, 2));
     i32 n = static_cast<i32>(luaL_checknumber(L, 3));
@@ -1010,7 +1010,7 @@ static i32 l_getGuildSpell(lua_State* L) {
     return 1;
 }
 
-static i32 l_disallowBuilding(lua_State* L) {
+static i32 LuaDisallowBuilding(lua_State* L) {
     i32 townIdx = static_cast<i32>(luaL_checknumber(L, 1));
     i32 building = static_cast<i32>(luaL_checknumber(L, 2));
     if (townIdx >= 0 && townIdx < GAME_TOWN_COUNT) {
@@ -1019,35 +1019,35 @@ static i32 l_disallowBuilding(lua_State* L) {
     return 0;
 }
 
-static void register_town_funcs(lua_State* L) {
-    lua_register(L, "GetCurrentTown", l_getCurrentTown);
-    lua_register(L, "HasVisitingHero", l_hasVisitingHero);
-    lua_register(L, "GetVisitingHero", l_getVisitingHero);
-    lua_register(L, "BuildInCurrentTown", l_buildInCurrentTown);
-    lua_register(L, "GetTown", l_getTown);
-    lua_register(L, "GetTownName", l_getTownName);
-    lua_register(L, "SetTownName", l_setTownName);
-    lua_register(L, "GetTownByName", l_getTownByName);
-    lua_register(L, "GetPlayerTown", l_getPlayerTown);
-    lua_register(L, "BuildInTown", l_buildInTown);
-    lua_register(L, "GetTownFaction", l_getTownFaction);
-    lua_register(L, "SetTownFaction", l_setTownFaction);
-    lua_register(L, "GetCreatureCost", l_getCreatureCost);
-    lua_register(L, "GetTownOwner", l_getTownOwner);
-    lua_register(L, "SetTownOwner", l_setTownOwner);
-    lua_register(L, "GetTownX", l_getTownX);
-    lua_register(L, "GetTownY", l_getTownY);
-    lua_register(L, "GetTownIdFromPos", l_getTownIDFromPos);
-    lua_register(L, "SetNumberOfCreatures", l_setNumberOfCreatures);
-    lua_register(L, "SetNumGuildSpells", l_setNumGuildSpells);
-    lua_register(L, "SetGuildSpell", l_setGuildSpell);
-    lua_register(L, "GetGuildSpell", l_getGuildSpell);
-    lua_register(L, "DisallowBuilding", l_disallowBuilding);
+static void RegisterTownFunctions(lua_State* L) {
+    lua_register(L, "GetCurrentTown", LuaGetCurrentTown);
+    lua_register(L, "HasVisitingHero", LuaHasVisitingHero);
+    lua_register(L, "GetVisitingHero", LuaGetVisitingHero);
+    lua_register(L, "BuildInCurrentTown", LuaBuildInCurrentTown);
+    lua_register(L, "GetTown", LuaGetTown);
+    lua_register(L, "GetTownName", LuaGetTownName);
+    lua_register(L, "SetTownName", LuaSetTownName);
+    lua_register(L, "GetTownByName", LuaGetTownByName);
+    lua_register(L, "GetPlayerTown", LuaGetPlayerTown);
+    lua_register(L, "BuildInTown", LuaBuildInTown);
+    lua_register(L, "GetTownFaction", LuaGetTownFaction);
+    lua_register(L, "SetTownFaction", LuaSetTownFaction);
+    lua_register(L, "GetCreatureCost", LuaGetCreatureCost);
+    lua_register(L, "GetTownOwner", LuaGetTownOwner);
+    lua_register(L, "SetTownOwner", LuaSetTownOwner);
+    lua_register(L, "GetTownX", LuaGetTownX);
+    lua_register(L, "GetTownY", LuaGetTownY);
+    lua_register(L, "GetTownIdFromPos", LuaGetTownIdFromPos);
+    lua_register(L, "SetNumberOfCreatures", LuaSetNumberOfCreatures);
+    lua_register(L, "SetNumGuildSpells", LuaSetNumGuildSpells);
+    lua_register(L, "SetGuildSpell", LuaSetGuildSpell);
+    lua_register(L, "GetGuildSpell", LuaGetGuildSpell);
+    lua_register(L, "DisallowBuilding", LuaDisallowBuilding);
 }
 
 /************************************* Battle *****************************************/
 
-static i32 l_battleSummonCreature(lua_State* L) {
+static i32 LuaBattleSummonCreature(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 side = CheckIndex(L, 1, COMBAT_SIDE_COUNT, "battle side out of range");
     i32 hex = static_cast<i32>(luaL_checknumber(L, 2));
@@ -1061,7 +1061,7 @@ static i32 l_battleSummonCreature(lua_State* L) {
     return 0;
 }
 
-static i32 l_isHexEmpty(lua_State* L) {
+static i32 LuaIsHexEmpty(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 hexno = static_cast<i32>(luaL_checknumber(L, 1));
     if (!ValidHex(hexno)) {
@@ -1074,35 +1074,35 @@ static i32 l_isHexEmpty(lua_State* L) {
     return 1;
 }
 
-static i32 l_battleHasHero(lua_State* L) {
+static i32 LuaBattleHasHero(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 side = CheckIndex(L, 1, COMBAT_SIDE_COUNT, "battle side out of range");
     lua_pushboolean(L, battle.m_heroes[side] != NULL);
     return 1;
 }
 
-static i32 l_battleGetHero(lua_State* L) {
+static i32 LuaBattleGetHero(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 side = CheckIndex(L, 1, COMBAT_SIDE_COUNT, "battle side out of range");
     PushBinding(L, Binding<hero*>(battle.m_heroes[side]));
     return 1;
 }
 
-static i32 l_battleMessage(lua_State* L) {
+static i32 LuaBattleMessage(lua_State* L) {
     auto& battle = RequireBattle(L);
     char* message = const_cast<char*>(luaL_checkstring(L, 1));
     battle.CombatMessage(message, 1, 0, 0);
     return 0;
 }
 
-static i32 l_battleGetNumStacks(lua_State* L) {
+static i32 LuaBattleNumStacksForSide(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 side = CheckIndex(L, 1, COMBAT_SIDE_COUNT, "battle side out of range");
     lua_pushinteger(L, battle.m_armyCount[side]);
     return 1;
 }
 
-static i32 l_battleGetStack(lua_State* L) {
+static i32 LuaBattleGetStack(lua_State* L) {
     auto& battle = RequireBattle(L);
     i32 side = CheckIndex(L, 1, COMBAT_SIDE_COUNT, "battle side out of range");
     i32 idx = CheckIndex(L, 2, COMBAT_ARMY_SLOT_COUNT, "battle stack index out of range");
@@ -1111,170 +1111,170 @@ static i32 l_battleGetStack(lua_State* L) {
     return 1;
 }
 
-static i32 l_getStackSide(lua_State* L) {
+static i32 LuaGetStackSide(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_side.value());
     return 1;
 }
 
-static i32 l_getStackType(lua_State* L) {
+static i32 LuaGetStackType(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monsterType.value());
     return 1;
 }
 
-static i32 l_getStackQuantity(lua_State* L) {
+static i32 LuaGetStackQuantity(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_quantity);
     return 1;
 }
 
-static i32 l_setStackQuantity(lua_State* L) {
+static i32 LuaSetStackQuantity(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 quantity = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_quantity = quantity;
     return 0;
 }
 
-static i32 l_getStackInitialQuantity(lua_State* L) {
+static i32 LuaGetStackInitialQuantity(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_initialQuantity);
     return 1;
 }
 
-static i32 l_setStackInitialQuantity(lua_State* L) {
+static i32 LuaSetStackInitialQuantity(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 initialQuantity = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_initialQuantity = initialQuantity;
     return 0;
 }
 
-static i32 l_getStackHex(lua_State* L) {
+static i32 LuaGetStackHex(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_hex);
     return 1;
 }
 
-static i32 l_getStackMorale(lua_State* L) {
+static i32 LuaGetStackMorale(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_morale);
     return 1;
 }
 
-static i32 l_setStackMorale(lua_State* L) {
+static i32 LuaSetStackMorale(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 morale = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_morale = morale;
     return 0;
 }
 
-static i32 l_getStackLuck(lua_State* L) {
+static i32 LuaGetStackLuck(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_luck);
     return 1;
 }
 
-static i32 l_setStackLuck(lua_State* L) {
+static i32 LuaSetStackLuck(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 luck = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_luck = luck;
     return 0;
 }
 
-static i32 l_getStackAttack(lua_State* L) {
+static i32 LuaGetStackAttack(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monster.attack);
     return 1;
 }
 
-static i32 l_setStackAttack(lua_State* L) {
+static i32 LuaSetStackAttack(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 attack = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.attack = attack;
     return 0;
 }
 
-static i32 l_getStackDefense(lua_State* L) {
+static i32 LuaGetStackDefense(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monster.defense);
     return 1;
 }
 
-static i32 l_setStackDefense(lua_State* L) {
+static i32 LuaSetStackDefense(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 defense = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.defense = defense;
     return 0;
 }
 
-static i32 l_getStackSpeed(lua_State* L) {
+static i32 LuaGetStackSpeed(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monster.speed);
     return 1;
 }
 
-static i32 l_setStackSpeed(lua_State* L) {
+static i32 LuaSetStackSpeed(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 speed = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.speed = speed;
     return 0;
 }
 
-static i32 l_getStackShots(lua_State* L) {
+static i32 LuaGetStackShots(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monster.shots);
     return 1;
 }
 
-static i32 l_setStackShots(lua_State* L) {
+static i32 LuaSetStackShots(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 shots = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_monster.shots = shots;
     return 0;
 }
 
-static i32 l_getStackHp(lua_State* L) {
+static i32 LuaGetStackHp(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     lua_pushinteger(L, creat->m_monster.hitPoints - creat->m_hitPointsLost);
     return 1;
 }
 
-static i32 l_setStackHp(lua_State* L) {
+static i32 LuaSetStackHp(lua_State* L) {
     army* creat = CheckObject<army>(L, 1);
     i32 hp = static_cast<i32>(luaL_checknumber(L, 2));
     creat->m_hitPointsLost = creat->m_monster.hitPoints - hp;
     return 0;
 }
 
-static void register_battle_funcs(lua_State* L) {
-    lua_register(L, "BattleSummonCreature", l_battleSummonCreature);
-    lua_register(L, "IsHexEmpty", l_isHexEmpty);
-    lua_register(L, "BattleHasHero", l_battleHasHero);
-    lua_register(L, "BattleGetHero", l_battleGetHero);
-    lua_register(L, "BattleMessage", l_battleMessage);
-    lua_register(L, "BattleNumStacksForSide", l_battleGetNumStacks);
-    lua_register(L, "BattleGetStack", l_battleGetStack);
-    lua_register(L, "GetStackSide", l_getStackSide);
-    lua_register(L, "GetStackType", l_getStackType);
-    lua_register(L, "GetStackQuantity", l_getStackQuantity);
-    lua_register(L, "SetStackQuantity", l_setStackQuantity);
-    lua_register(L, "GetStackInitialQuantity", l_getStackInitialQuantity);
-    lua_register(L, "SetStackInitialQuantity", l_setStackInitialQuantity);
-    lua_register(L, "GetStackHex", l_getStackHex);
-    lua_register(L, "GetStackMorale", l_getStackMorale);
-    lua_register(L, "SetStackMorale", l_setStackMorale);
-    lua_register(L, "GetStackLuck", l_getStackLuck);
-    lua_register(L, "SetStackLuck", l_setStackLuck);
-    lua_register(L, "GetStackAttack", l_getStackAttack);
-    lua_register(L, "SetStackAttack", l_setStackAttack);
-    lua_register(L, "GetStackDefense", l_getStackDefense);
-    lua_register(L, "SetStackDefense", l_setStackDefense);
-    lua_register(L, "GetStackSpeed", l_getStackSpeed);
-    lua_register(L, "SetStackSpeed", l_setStackSpeed);
-    lua_register(L, "GetStackShots", l_getStackShots);
-    lua_register(L, "SetStackShots", l_setStackShots);
-    lua_register(L, "GetStackHp", l_getStackHp);
-    lua_register(L, "SetStackHp", l_setStackHp);
+static void RegisterBattleFunctions(lua_State* L) {
+    lua_register(L, "BattleSummonCreature", LuaBattleSummonCreature);
+    lua_register(L, "IsHexEmpty", LuaIsHexEmpty);
+    lua_register(L, "BattleHasHero", LuaBattleHasHero);
+    lua_register(L, "BattleGetHero", LuaBattleGetHero);
+    lua_register(L, "BattleMessage", LuaBattleMessage);
+    lua_register(L, "BattleNumStacksForSide", LuaBattleNumStacksForSide);
+    lua_register(L, "BattleGetStack", LuaBattleGetStack);
+    lua_register(L, "GetStackSide", LuaGetStackSide);
+    lua_register(L, "GetStackType", LuaGetStackType);
+    lua_register(L, "GetStackQuantity", LuaGetStackQuantity);
+    lua_register(L, "SetStackQuantity", LuaSetStackQuantity);
+    lua_register(L, "GetStackInitialQuantity", LuaGetStackInitialQuantity);
+    lua_register(L, "SetStackInitialQuantity", LuaSetStackInitialQuantity);
+    lua_register(L, "GetStackHex", LuaGetStackHex);
+    lua_register(L, "GetStackMorale", LuaGetStackMorale);
+    lua_register(L, "SetStackMorale", LuaSetStackMorale);
+    lua_register(L, "GetStackLuck", LuaGetStackLuck);
+    lua_register(L, "SetStackLuck", LuaSetStackLuck);
+    lua_register(L, "GetStackAttack", LuaGetStackAttack);
+    lua_register(L, "SetStackAttack", LuaSetStackAttack);
+    lua_register(L, "GetStackDefense", LuaGetStackDefense);
+    lua_register(L, "SetStackDefense", LuaSetStackDefense);
+    lua_register(L, "GetStackSpeed", LuaGetStackSpeed);
+    lua_register(L, "SetStackSpeed", LuaSetStackSpeed);
+    lua_register(L, "GetStackShots", LuaGetStackShots);
+    lua_register(L, "SetStackShots", LuaSetStackShots);
+    lua_register(L, "GetStackHp", LuaGetStackHp);
+    lua_register(L, "SetStackHp", LuaSetStackHp);
 }
 
 /**************************************** Campaign ************************************/
@@ -1291,42 +1291,42 @@ static const SCampaignChoice* CurrentCampaignChoice(lua_State* L) {
     return &definition->Scenario(map).choices[xCampaign.m_bonusChoices[map]];
 }
 
-static i32 l_getCampaignChoiceType(lua_State* L) {
+static i32 LuaGetCampaignChoiceType(lua_State* L) {
     lua_pushinteger(L, H2EnumIndex(CurrentCampaignChoice(L)->type));
     return 1;
 }
 
-static i32 l_getCampaignChoiceField(lua_State* L) {
+static i32 LuaGetCampaignChoiceField(lua_State* L) {
     lua_pushinteger(L, CurrentCampaignChoice(L)->value);
     return 1;
 }
 
-static i32 l_getCampaignChoiceAmount(lua_State* L) {
+static i32 LuaGetCampaignChoiceAmount(lua_State* L) {
     lua_pushinteger(L, CurrentCampaignChoice(L)->amount);
     return 1;
 }
 
-static i32 l_getCampaignChoice(lua_State* L) {
+static i32 LuaGetCampaignChoice(lua_State* L) {
     PushBinding(L, Binding<SCampaignChoice>(*CurrentCampaignChoice(L)));
     return 1;
 }
 
-static void register_campaign_funcs(lua_State* L) {
-    lua_register(L, "GetCampaignChoiceType", l_getCampaignChoiceType);
-    lua_register(L, "GetCampaignChoiceField", l_getCampaignChoiceField);
-    lua_register(L, "GetCampaignChoiceAmount", l_getCampaignChoiceAmount);
-    lua_register(L, "GetCampaignChoice", l_getCampaignChoice);
+static void RegisterCampaignFunctions(lua_State* L) {
+    lua_register(L, "GetCampaignChoiceType", LuaGetCampaignChoiceType);
+    lua_register(L, "GetCampaignChoiceField", LuaGetCampaignChoiceField);
+    lua_register(L, "GetCampaignChoiceAmount", LuaGetCampaignChoiceAmount);
+    lua_register(L, "GetCampaignChoice", LuaGetCampaignChoice);
 }
 
 /************************************** Uncategorized *********************************/
 
-static i32 l_playsoundeffect(lua_State* L) {
+static i32 LuaPlaySoundEffect(lua_State* L) {
     std::string snd = std::string(luaL_checkstring(L, 1));
     PlaySoundEffect(snd, SND_DO_WAIT, NULL);
     return 0;
 }
 
-static i32 l_getinclinedtojoin(lua_State* L) {
+static i32 LuaGetInclinedToJoin(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     i32 inclinedToJoin = 0;
@@ -1341,7 +1341,7 @@ static i32 l_getinclinedtojoin(lua_State* L) {
     return 1;
 }
 
-static i32 l_setinclinedtojoin(lua_State* L) {
+static i32 LuaSetInclinedToJoin(lua_State* L) {
     i32 x = static_cast<i32>(luaL_checknumber(L, 1));
     i32 y = static_cast<i32>(luaL_checknumber(L, 2));
     bool inclinedToJoin = CheckBoolean(L, 3);
@@ -1359,7 +1359,7 @@ static i32 l_setinclinedtojoin(lua_State* L) {
     return 0;
 }
 
-static i32 l_startbattle(lua_State* L) {
+static i32 LuaStartBattle(lua_State* L) {
     hero* hro = CheckObject<hero>(L, 1);
     i32 mon1 = static_cast<i32>(luaL_checknumber(L, 2));
     i32 mon1quantity = static_cast<i32>(luaL_checknumber(L, 3));
@@ -1373,13 +1373,13 @@ static i32 l_startbattle(lua_State* L) {
     return 1;
 }
 
-static i32 l_toggleAIArmySharing(lua_State* L) {
+static i32 LuaToggleAIArmySharing(lua_State* L) {
     bool toggle = CheckBoolean(L, 1);
     gpGame->SetAIArmySharing(toggle);
     return 0;
 }
 
-static i32 l_forceComputerPlayerChase(lua_State* L) {
+static i32 LuaForceComputerPlayerChase(lua_State* L) {
     hero* src = CheckObject<hero>(L, 1);
     hero* dst = CheckObject<hero>(L, 2);
     bool force = CheckBoolean(L, 3);
@@ -1387,27 +1387,27 @@ static i32 l_forceComputerPlayerChase(lua_State* L) {
     return 0;
 }
 
-static void register_uncategorized_funcs(lua_State* L) {
-    lua_register(L, "PlaySoundEffect", l_playsoundeffect);
-    lua_register(L, "GetInclinedToJoin", l_getinclinedtojoin);
-    lua_register(L, "SetInclinedToJoin", l_setinclinedtojoin);
-    lua_register(L, "StartBattle", l_startbattle);
-    lua_register(L, "ToggleAIArmySharing", l_toggleAIArmySharing);
-    lua_register(L, "ForceComputerPlayerChase", l_forceComputerPlayerChase);
+static void RegisterUncategorizedFunctions(lua_State* L) {
+    lua_register(L, "PlaySoundEffect", LuaPlaySoundEffect);
+    lua_register(L, "GetInclinedToJoin", LuaGetInclinedToJoin);
+    lua_register(L, "SetInclinedToJoin", LuaSetInclinedToJoin);
+    lua_register(L, "StartBattle", LuaStartBattle);
+    lua_register(L, "ToggleAIArmySharing", LuaToggleAIArmySharing);
+    lua_register(L, "ForceComputerPlayerChase", LuaForceComputerPlayerChase);
 }
 
 /**************************************************************************************/
 
 void RegisterFunctions(lua_State* L) {
-    register_dialog_funcs(L);
-    register_date_funcs(L);
-    register_player_funcs(L);
-    register_hero_funcs(L);
-    register_map_funcs(L);
-    register_town_funcs(L);
-    register_battle_funcs(L);
-    register_campaign_funcs(L);
-    register_uncategorized_funcs(L);
+    RegisterDialogFunctions(L);
+    RegisterDateFunctions(L);
+    RegisterPlayerFunctions(L);
+    RegisterHeroFunctions(L);
+    RegisterMapFunctions(L);
+    RegisterTownFunctions(L);
+    RegisterBattleFunctions(L);
+    RegisterCampaignFunctions(L);
+    RegisterUncategorizedFunctions(L);
     RegisterBindings(L);
 }
 

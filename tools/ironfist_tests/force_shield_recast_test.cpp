@@ -36,27 +36,27 @@ static void CheckEffects(combatManager& board, army& attacker, army& target) {
     InitStack(target, COMBAT_DEFENDER_SIDE, 0);
     attacker.m_monster.damageMin = attacker.m_monster.damageMax = 20;
     const auto animation = target.m_animationSequence;
-    state.GrantAbility(target, ironfist::CreatureAttribute::AstralDodge);
+    state.GrantAbility(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE);
     target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_BLIND, 2);
     const auto dodge = ResolveAttack(board, state, attacker, target, {});
-    assert(dodge.outcome == Outcome::Dodged && target.m_hitPointsLost == 0);
+    assert(dodge.outcome == Outcome::DAMAGE_DODGED && target.m_hitPointsLost == 0);
     assert(target.m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLIND)] == 2);
-    assert(!state.HasAbilityCharge(target, ironfist::CreatureAttribute::AstralDodge));
-    assert(!state.IsAnimating(target, ironfist::CreatureAttribute::AstralDodge));
+    assert(!state.HasAbilityCharge(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE));
+    assert(!state.IsAnimating(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE));
     assert(!target.m_damagePending && target.m_animationSequence == animation);
 
     target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_FORCE_SHIELD, 2);
     const auto shield = ResolveAttack(board, state, attacker, target, {});
     assert(shield.damage == 20 && shield.absorbed == 20 && target.m_hitPointsLost == 0);
     target.CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
-    state.GrantAbility(attacker, ironfist::CreatureAttribute::Jumper);
+    state.GrantAbility(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
     const auto jump = ResolveAttack(board, state, attacker, target, {{true, false, false}});
     assert(jump.jump && jump.damage >= 25 && jump.damage <= 30);
-    assert(!state.HasAbilityCharge(attacker, ironfist::CreatureAttribute::Jumper));
-    assert(!state.IsAnimating(attacker, ironfist::CreatureAttribute::Jumper));
+    assert(!state.HasAbilityCharge(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER));
+    assert(!state.IsAnimating(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER));
     const auto ordinary = ResolveAttack(board, state, attacker, target, {{true, false, false}});
     assert(!ordinary.jump && ordinary.damage == 20);
-    state.GrantAbility(attacker, ironfist::CreatureAttribute::Charger);
+    state.GrantAbility(attacker, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER);
     const auto path = ResolveAttack(board, state, attacker, target, {{false, true, false}, false, false, true});
     assert(path.damage == 10);
     const auto charge = ResolveAttack(board, state, attacker, target, {{false, true, false}});
@@ -97,12 +97,12 @@ static void CheckMovement(combatManager& board, army& actor, army& enemy) {
     board.m_hexCells[14].m_occupantSide = actor.m_side;
     board.m_hexCells[14].m_occupantIndex = actor.m_index;
     board.m_hexCells[15].m_blocked = board.m_hexCells[16].m_blocked = true;
-    extensions.GrantAbility(actor, ironfist::CreatureAttribute::Jumper);
+    extensions.GrantAbility(actor, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
     std::array<hexcell, COMBAT_HEX_COUNT> before;
     std::memcpy(before.data(), board.m_hexCells, sizeof(board.m_hexCells));
     Traversal jumper(board, actor, extensions);
     auto plan = jumper.Find(14, Target{17}, 4);
-    assert(plan && plan.steps.size() == 1 && plan.steps[0].kind == StepKind::Jump);
+    assert(plan && plan.steps.size() == 1 && plan.steps[0].kind == StepKind::MOVEMENT_JUMP);
     assert(!jumper.Find(14, Target{15}, 4)); // Crossing an obstacle does not permit landing on it.
     gbHumanPlayer[0] = false;
     assert(jumper.Find(14, Target{17}, 4).steps[0].to == 17);
@@ -143,7 +143,7 @@ static void CheckMovement(combatManager& board, army& actor, army& enemy) {
 
     clearBoard();
     extensions.ResetStack(actor);
-    extensions.GrantAbility(actor, ironfist::CreatureAttribute::Charger);
+    extensions.GrantAbility(actor, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER);
     actor.m_hex = 14;
     enemy.m_hex = 18;
     board.m_hexCells[18].m_occupantSide = enemy.m_side;
@@ -151,13 +151,13 @@ static void CheckMovement(combatManager& board, army& actor, army& enemy) {
     Traversal charger(board, actor, extensions);
     auto target = charger.Destination(18);
     auto charge = charger.Find(14, target, 4);
-    assert(charge && charge.steps.size() == 1 && charge.steps[0].kind == StepKind::Charge);
+    assert(charge && charge.steps.size() == 1 && charge.steps[0].kind == StepKind::MOVEMENT_CHARGE);
     assert(charge.steps[0].cost == 4 && charge.WithinBudget(3).steps.empty());
     assert(charger.StraightDirection(14, 18) == COMBAT_DIRECTION_EAST);
     board.m_hexCells[16].m_blocked = true;
     auto detour = charger.Find(14, target, 4);
     for (const auto& step : detour.steps)
-        assert(step.kind != StepKind::Charge);
+        assert(step.kind != StepKind::MOVEMENT_CHARGE);
     clearBoard();
     InitStack(actor, COMBAT_ATTACKER_SIDE, 0);
     InitStack(enemy, COMBAT_DEFENDER_SIDE, 0);
@@ -225,15 +225,15 @@ int main() {
     assert(target.SetSpellInfluence(ARMY_SPELL_INFLUENCE_BLOODLUST, 5) == 0);
     assert(target.m_monster.attack == attack && target.m_spellCount == 2);
     const auto oldTarget = extensions.Identity(target);
-    extensions.GrantAbility(target, ironfist::CreatureAttribute::Jumper);
-    extensions.StartAnimation(target, ironfist::CreatureAttribute::Jumper);
+    extensions.GrantAbility(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
+    extensions.StartAnimation(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER);
     target.InitClean();
     assert(extensions.Resolve(oldTarget) == nullptr);
     InitStack(target, COMBAT_ATTACKER_SIDE, 0);
     assert(extensions.Resolve(oldTarget) == nullptr);
     assert(extensions.ShieldHP(target) == 0);
-    assert(!extensions.HasAbilityCharge(target, ironfist::CreatureAttribute::Jumper));
-    assert(!extensions.IsAnimating(target, ironfist::CreatureAttribute::Jumper));
+    assert(!extensions.HasAbilityCharge(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER));
+    assert(!extensions.IsAnimating(target, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER));
     const auto newTarget = extensions.Identity(target);
     assert(extensions.Resolve(newTarget) == &target);
     extensions.EndBattle();

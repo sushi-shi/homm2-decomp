@@ -11,13 +11,13 @@ extern i32 giTotalMemAllocated;
 
 static void LoadMap(i32 count) {
     ironfist::save::XmlFile saved;
-    auto* root = saved.tempDoc->NewElement("map");
-    saved.tempDoc->InsertEndChild(root);
+    auto* root = saved.m_document->NewElement("map");
+    saved.m_document->InsertEndChild(root);
     root->SetAttribute("width", 36);
     root->SetAttribute("height", 36);
     root->SetAttribute("numCellExtras", count);
     for (i32 i = 0; i < count; ++i) {
-        auto* extra = saved.tempDoc->NewElement("mapCellExtra");
+        auto* extra = saved.m_document->NewElement("mapCellExtra");
         extra->SetAttribute("index", i);
         extra->SetAttribute("nextIdx", i + 1 < count ? i + 1 : 0);
         extra->SetAttribute("objectIndex", 20 + i);

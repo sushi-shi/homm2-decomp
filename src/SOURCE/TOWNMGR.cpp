@@ -2685,7 +2685,7 @@ void townManager::SetupMage(heroWindow* window) {
                 + (m_town->m_type == FACTION_WIZARD
                    && (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG));
             if (m_town->m_type == FACTION_CYBORG)
-                slotLimit = ironfist::CyborgSpellLimits[level_f];
+                slotLimit = ironfist::gCyborgSpellLimits[level_f];
             if (slot_o >= slotLimit) {
                 spellState_c = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {

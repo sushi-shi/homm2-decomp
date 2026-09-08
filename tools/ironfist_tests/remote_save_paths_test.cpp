@@ -66,7 +66,7 @@ int main() {
         assert(reader.Read(logical.c_str(), parsed) == tinyxml2::XML_SUCCESS);
         assert(parsed.records.m_day == 5 && gpGame->m_day == 7);
         assert(ironfist::runtime::Phase() == phase);
-        assert(ironfist::runtime::LoadGame(name, 1) == ironfist::runtime::LoadResult::Loaded);
+        assert(ironfist::runtime::LoadGame(name, 1) == ironfist::runtime::LoadResult::LOAD_LOADED);
         assert(gpGame->m_day == 5);
         assert(std::strcmp(gpGame->m_saveName, remote ? "keep.GX1" : name) == 0);
     }
@@ -77,7 +77,7 @@ int main() {
         assert(std::strcmp(gpGame->m_saveName, "keep.GX1") == 0);
         gpGame->m_day = 7;
         const std::string filename = std::string(automatic) + ".GX1";
-        assert(ironfist::runtime::LoadGame(filename.c_str(), 1) == ironfist::runtime::LoadResult::Loaded);
+        assert(ironfist::runtime::LoadGame(filename.c_str(), 1) == ironfist::runtime::LoadResult::LOAD_LOADED);
         assert(gpGame->m_day == 6);
     }
     // Rejected decoding leaves both the output snapshot and active world intact.
@@ -96,7 +96,7 @@ int main() {
     // A binary remote save still delegates to the retail loader.
     const auto binary = platform::Files().Resolve("DATA/RMTOLD.BIN", platform::FileMode::Write);
     std::ofstream(binary, std::ios::binary).write("binary", 6);
-    assert(ironfist::runtime::LoadGame("RMTOLD.BIN", 1) == ironfist::runtime::LoadResult::Retail);
+    assert(ironfist::runtime::LoadGame("RMTOLD.BIN", 1) == ironfist::runtime::LoadResult::LOAD_RETAIL);
     ironfist::script::Shutdown();
     ClearMapExtra();
     H2_FREE(mapExtra);

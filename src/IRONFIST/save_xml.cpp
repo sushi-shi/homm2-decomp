@@ -87,113 +87,113 @@ static Relations ReadRelations(tinyxml2::XMLNode* root, const char* entryName, i
 }
 
 tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) {
-    tempDoc->Clear();
-    decodeError.clear();
-    tinyxml2::XMLNode* pRoot = tempDoc->NewElement("ironfist_save");
-    tempDoc->InsertFirstChild(pRoot);
+    m_document->Clear();
+    m_decodeError.clear();
+    tinyxml2::XMLNode* pRoot = m_document->NewElement("ironfist_save");
+    m_document->InsertFirstChild(pRoot);
 
-    xml::PushBack(tempDoc, pRoot, "allowAIArmySharing", data.adventure.allowAIArmySharing);
-    xml::PushBack(tempDoc, pRoot, "mapWidth", data.world.width);
-    xml::PushBack(tempDoc, pRoot, "mapHeight", data.world.height);
-    xml::PushBack(tempDoc, pRoot, "gameDifficulty", data.records.m_difficultyRating);
-    xml::PushBack(tempDoc, pRoot, "monthType", H2EnumIndex(data.monthType));
-    xml::PushBack(tempDoc, pRoot, "monthTypeExtra", data.monthExtra);
-    xml::PushBack(tempDoc, pRoot, "weekType", H2EnumIndex(data.weekType));
-    xml::PushBack(tempDoc, pRoot, "weekTypeExtra", data.weekExtra);
-    xml::PushBack(tempDoc, pRoot, "giMapChangeCtr", data.mapChangeCounter);
-    xml::PushBack(tempDoc, pRoot, "numPlayers", static_cast<i32>(data.records.m_playerCount));
-    xml::PushBack(tempDoc, pRoot, "giCurPlayer", data.currentPlayer);
-    xml::PushBack(tempDoc, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(data.records.m_deadPlayerCount));
-    xml::PushBack(tempDoc, pRoot, "day", data.records.m_day);
-    xml::PushBack(tempDoc, pRoot, "week", data.records.m_week);
-    xml::PushBack(tempDoc, pRoot, "month", data.records.m_month);
-    xml::PushBack(tempDoc, pRoot, "numObelisks", static_cast<i32>(data.records.m_obeliskCount));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocX", static_cast<i32>(data.records.m_ultimateArtifactX));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(data.records.m_ultimateArtifactY));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(data.records.m_ultimateArtifactId.value()));
-    xml::PushBack(tempDoc, pRoot, "currentRumor", data.records.m_rumour);
-    xml::PushBack(tempDoc, pRoot, "numRumors", data.records.m_rumourEventCount);
-    xml::PushBack(tempDoc, pRoot, "numEvents", data.records.m_timeEventCount);
-    xml::PushBack(tempDoc, pRoot, "numMapEvents", data.records.m_mapEventCount);
-    xml::PushBack(tempDoc, pRoot, "iMaxMapExtra", static_cast<i32>(data.world.objects.size()));
-    xml::PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(data.records.m_difficulty.value()));
-    xml::PushBack(tempDoc, pRoot, "mapFilename", data.records.m_mapFilename);
-    xml::PushBack(tempDoc, pRoot, "relatedToNewGameSelection", static_cast<i32>(data.records.m_selectedSetupPlayer));
-    xml::PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(data.records.m_newGameInitialized));
-    xml::PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(data.records.m_newGameHumanCount));
-    xml::PushBack(tempDoc, pRoot, "gbIAmGreatest", data.greatestPlayer);
+    xml::PushBack(m_document, pRoot, "allowAIArmySharing", data.adventure.allowAIArmySharing);
+    xml::PushBack(m_document, pRoot, "mapWidth", data.world.width);
+    xml::PushBack(m_document, pRoot, "mapHeight", data.world.height);
+    xml::PushBack(m_document, pRoot, "gameDifficulty", data.records.m_difficultyRating);
+    xml::PushBack(m_document, pRoot, "monthType", H2EnumIndex(data.monthType));
+    xml::PushBack(m_document, pRoot, "monthTypeExtra", data.monthExtra);
+    xml::PushBack(m_document, pRoot, "weekType", H2EnumIndex(data.weekType));
+    xml::PushBack(m_document, pRoot, "weekTypeExtra", data.weekExtra);
+    xml::PushBack(m_document, pRoot, "giMapChangeCtr", data.mapChangeCounter);
+    xml::PushBack(m_document, pRoot, "numPlayers", static_cast<i32>(data.records.m_playerCount));
+    xml::PushBack(m_document, pRoot, "giCurPlayer", data.currentPlayer);
+    xml::PushBack(m_document, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(data.records.m_deadPlayerCount));
+    xml::PushBack(m_document, pRoot, "day", data.records.m_day);
+    xml::PushBack(m_document, pRoot, "week", data.records.m_week);
+    xml::PushBack(m_document, pRoot, "month", data.records.m_month);
+    xml::PushBack(m_document, pRoot, "numObelisks", static_cast<i32>(data.records.m_obeliskCount));
+    xml::PushBack(m_document, pRoot, "ultimateArtifactLocX", static_cast<i32>(data.records.m_ultimateArtifactX));
+    xml::PushBack(m_document, pRoot, "ultimateArtifactLocY", static_cast<i32>(data.records.m_ultimateArtifactY));
+    xml::PushBack(m_document, pRoot, "ultimateArtifactIdx", static_cast<i32>(data.records.m_ultimateArtifactId.value()));
+    xml::PushBack(m_document, pRoot, "currentRumor", data.records.m_rumour);
+    xml::PushBack(m_document, pRoot, "numRumors", data.records.m_rumourEventCount);
+    xml::PushBack(m_document, pRoot, "numEvents", data.records.m_timeEventCount);
+    xml::PushBack(m_document, pRoot, "numMapEvents", data.records.m_mapEventCount);
+    xml::PushBack(m_document, pRoot, "iMaxMapExtra", static_cast<i32>(data.world.objects.size()));
+    xml::PushBack(m_document, pRoot, "difficulty", static_cast<i32>(data.records.m_difficulty.value()));
+    xml::PushBack(m_document, pRoot, "mapFilename", data.records.m_mapFilename);
+    xml::PushBack(m_document, pRoot, "relatedToNewGameSelection", static_cast<i32>(data.records.m_selectedSetupPlayer));
+    xml::PushBack(m_document, pRoot, "relatedToNewGameInit", static_cast<i32>(data.records.m_newGameInitialized));
+    xml::PushBack(m_document, pRoot, "numHumanPlayers", static_cast<i32>(data.records.m_newGameHumanCount));
+    xml::PushBack(m_document, pRoot, "gbIAmGreatest", data.greatestPlayer);
     const i32 campaignType = data.campaignType;
-    xml::PushBack(tempDoc, pRoot, "campaignType", campaignType);
-    xml::PushBack(tempDoc, pRoot, "expansionMap", data.expansionMap);
+    xml::PushBack(m_document, pRoot, "campaignType", campaignType);
+    xml::PushBack(m_document, pRoot, "expansionMap", data.expansionMap);
 
     tinyxml2::XMLElement* pElement;
     if (campaignType) {
-        pElement = tempDoc->NewElement("campaign");
+        pElement = m_document->NewElement("campaign");
         if (campaignType == CAMPAIGN_ORIGINAL) {
-            xml::PushBack(tempDoc, pElement, "campID", static_cast<i32>(data.records.m_campaignType.value()));
-            xml::PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(data.records.m_campaignStartingSide.value()));
-            xml::PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(data.records.m_campaignScenario));
-            xml::PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(data.records.m_unknown7d));
-            xml::PushBack(tempDoc, pElement, "campDaysPlayedCurrent", data.records.m_campaignScore);
-            xml::PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(data.records.m_campaignScenarioWon));
-            xml::PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(data.records.m_campaignCheated));
+            xml::PushBack(m_document, pElement, "campID", static_cast<i32>(data.records.m_campaignType.value()));
+            xml::PushBack(m_document, pElement, "campIDanother", static_cast<i32>(data.records.m_campaignStartingSide.value()));
+            xml::PushBack(m_document, pElement, "campMapID", static_cast<i32>(data.records.m_campaignScenario));
+            xml::PushBack(m_document, pElement, "campUnknown", static_cast<i32>(data.records.m_unknown7d));
+            xml::PushBack(m_document, pElement, "campDaysPlayedCurrent", data.records.m_campaignScore);
+            xml::PushBack(m_document, pElement, "campMaybeWon", static_cast<i32>(data.records.m_campaignScenarioWon));
+            xml::PushBack(m_document, pElement, "campHasCheated", static_cast<i32>(data.records.m_campaignCheated));
 
             WriteCampaignDDArray(
-                tempDoc, pElement, "campMapsWon", data.records.m_campaignScenarioCompleted
+                m_document, pElement, "campMapsWon", data.records.m_campaignScenarioCompleted
             );
             WriteCampaignDDArray(
-                tempDoc, pElement, "campDaysPlayed", data.records.m_campaignScenarioBonus
+                m_document, pElement, "campDaysPlayed", data.records.m_campaignScenarioBonus
             );
             WriteCampaignDDArray(
-                tempDoc, pElement, "campDaysPlayed2", data.records.m_campaignScenarioDays
+                m_document, pElement, "campDaysPlayed2", data.records.m_campaignScenarioDays
             );
-            WriteCampaignDDArray(tempDoc, pElement, "campChoices", data.records.m_campaignChoice);
+            WriteCampaignDDArray(m_document, pElement, "campChoices", data.records.m_campaignChoice);
             WriteCampaignDDArray(
-                tempDoc, pElement, "campMapsPlayed", data.records.m_campaignMapEnabled
+                m_document, pElement, "campMapsPlayed", data.records.m_campaignMapEnabled
             );
 
-            xml::WriteArray(tempDoc, pElement, "campBonuses", data.records.m_campaignAwards);
+            xml::WriteArray(m_document, pElement, "campBonuses", data.records.m_campaignAwards);
             xml::WriteArray(
-                tempDoc, pElement, "campPlayerCreatures", data.records.m_campaignCarryoverCreatureTypes
+                m_document, pElement, "campPlayerCreatures", data.records.m_campaignCarryoverCreatureTypes
             );
             xml::WriteArray(
-                tempDoc, pElement, "campPlayerCreatureQuantities",
+                m_document, pElement, "campPlayerCreatureQuantities",
                 data.records.m_campaignCarryoverCreatureCounts
             );
         } else if (campaignType == CAMPAIGN_EXPANSION) {
-            xml::PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(data.expansion.m_campaignId));
-            xml::PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(data.expansion.m_currentMap));
-            xml::PushBack(tempDoc, pElement, "numMaps", data.expansion.m_mapCount);
-            xml::PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(data.expansion.m_viewMap));
-            xml::PushBack(tempDoc, pElement, "anIntVariable", data.expansion.m_viewOnly);
+            xml::PushBack(m_document, pElement, "campaignID", H2EnumIndex(data.expansion.m_campaignId));
+            xml::PushBack(m_document, pElement, "currentMapID", H2EnumIndex(data.expansion.m_currentMap));
+            xml::PushBack(m_document, pElement, "numMaps", data.expansion.m_mapCount);
+            xml::PushBack(m_document, pElement, "mightBeScenarioID", H2EnumIndex(data.expansion.m_viewMap));
+            xml::PushBack(m_document, pElement, "anIntVariable", data.expansion.m_viewOnly);
 
-            xml::WriteArray(tempDoc, pElement, "mapChoice", data.expansion.m_mapChoices);
-            xml::WriteArray(tempDoc, pElement, "mapsPlayed", data.expansion.m_mapsPlayed);
-            xml::WriteArray(tempDoc, pElement, "daysPlayed", data.expansion.m_mapDays);
-            xml::WriteArray(tempDoc, pElement, "awards", data.expansion.m_awards);
-            xml::WriteArray(tempDoc, pElement, "bonusChoices", data.expansion.m_bonusChoices);
+            xml::WriteArray(m_document, pElement, "mapChoice", data.expansion.m_mapChoices);
+            xml::WriteArray(m_document, pElement, "mapsPlayed", data.expansion.m_mapsPlayed);
+            xml::WriteArray(m_document, pElement, "daysPlayed", data.expansion.m_mapDays);
+            xml::WriteArray(m_document, pElement, "awards", data.expansion.m_awards);
+            xml::WriteArray(m_document, pElement, "bonusChoices", data.expansion.m_bonusChoices);
 
             // saved hero for autosaved saves
             for (auto& i : data.campaign.savedHeroData) {
                 const state::CampaignState::PartialHeroData* savedHero = &i.second;
-                tinyxml2::XMLElement* savedHeroElem = tempDoc->NewElement("savedHero");
+                tinyxml2::XMLElement* savedHeroElem = m_document->NewElement("savedHero");
                 savedHeroElem->SetAttribute("index", i.first);
-                xml::WriteArray(tempDoc, savedHeroElem, "primarySkills", savedHero->primarySkills);
-                xml::WriteArray(tempDoc, savedHeroElem, "skillIndex", savedHero->skillIndex);
+                xml::WriteArray(m_document, savedHeroElem, "primarySkills", savedHero->primarySkills);
+                xml::WriteArray(m_document, savedHeroElem, "skillIndex", savedHero->skillIndex);
                 xml::WriteArray(
-                    tempDoc, savedHeroElem, "secondarySkillLevel", savedHero->secondarySkillLevel
+                    m_document, savedHeroElem, "secondarySkillLevel", savedHero->secondarySkillLevel
                 );
                 for (i32 j = 0; j < KB_SPELL_TABLE_CAPACITY; j++) {
                     if (savedHero->spellsLearned[j]) {
-                        tinyxml2::XMLElement* spellElem = tempDoc->NewElement("spell");
+                        tinyxml2::XMLElement* spellElem = m_document->NewElement("spell");
                         spellElem->SetAttribute("idx", j);
                         savedHeroElem->InsertEndChild(spellElem);
                     }
                 }
                 xml::PushBack(
-                    tempDoc, savedHeroElem, "numSecSkillsKnown", savedHero->numSecSkillsKnown
+                    m_document, savedHeroElem, "numSecSkillsKnown", savedHero->numSecSkillsKnown
                 );
-                xml::PushBack(tempDoc, savedHeroElem, "experience", savedHero->experience);
+                xml::PushBack(m_document, savedHeroElem, "experience", savedHero->experience);
 
                 pElement->InsertEndChild(savedHeroElem);
             }
@@ -201,49 +201,49 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
             // A custom campaign's save carries its whole definition, so it
             // loads even if the .cmp vanishes from CAMPAIGNS/.
             if (data.campaignDefinition)
-                WriteCampaignDefinition(tempDoc, pRoot, *data.campaignDefinition);
+                WriteCampaignDefinition(m_document, pRoot, *data.campaignDefinition);
         }
         pRoot->InsertEndChild(pElement);
     }
 
-    pElement = tempDoc->NewElement("mapHeader");
+    pElement = m_document->NewElement("mapHeader");
     const SMapHeader* mh = &data.records.m_mapHeader;
-    xml::PushBack(tempDoc, pElement, "field_0", static_cast<i32>(mh->magic));
+    xml::PushBack(m_document, pElement, "field_0", static_cast<i32>(mh->magic));
     xml::PushBack(
-        tempDoc, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->unknown5 << 8)))
+        m_document, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->unknown5 << 8)))
     );
-    xml::PushBack(tempDoc, pElement, "width", static_cast<i32>(mh->width));
-    xml::PushBack(tempDoc, pElement, "height", static_cast<i32>(mh->height));
-    xml::PushBack(tempDoc, pElement, "numPlayers", static_cast<i32>(mh->playerCount));
-    xml::PushBack(tempDoc, pElement, "minHumans", static_cast<i32>(mh->minHumanPlayers));
-    xml::PushBack(tempDoc, pElement, "maxHumans", static_cast<i32>(mh->maxHumanPlayers));
-    xml::PushBack(tempDoc, pElement, "winConditionType", static_cast<i32>(mh->victoryCondition));
-    xml::PushBack(tempDoc, pElement, "relatedToWinConditionType", static_cast<i32>(mh->computerAlsoWins));
-    xml::PushBack(tempDoc, pElement, "allowDefeatAllVictory", static_cast<i32>(mh->allowNormalVictory));
-    xml::PushBack(tempDoc, pElement, "winConditionArgumentOrLocX", mh->victoryConditionValue);
-    xml::PushBack(tempDoc, pElement, "lossConditionType", static_cast<i32>(mh->lossCondition));
+    xml::PushBack(m_document, pElement, "width", static_cast<i32>(mh->width));
+    xml::PushBack(m_document, pElement, "height", static_cast<i32>(mh->height));
+    xml::PushBack(m_document, pElement, "numPlayers", static_cast<i32>(mh->playerCount));
+    xml::PushBack(m_document, pElement, "minHumans", static_cast<i32>(mh->minHumanPlayers));
+    xml::PushBack(m_document, pElement, "maxHumans", static_cast<i32>(mh->maxHumanPlayers));
+    xml::PushBack(m_document, pElement, "winConditionType", static_cast<i32>(mh->victoryCondition));
+    xml::PushBack(m_document, pElement, "relatedToWinConditionType", static_cast<i32>(mh->computerAlsoWins));
+    xml::PushBack(m_document, pElement, "allowDefeatAllVictory", static_cast<i32>(mh->allowNormalVictory));
+    xml::PushBack(m_document, pElement, "winConditionArgumentOrLocX", mh->victoryConditionValue);
+    xml::PushBack(m_document, pElement, "lossConditionType", static_cast<i32>(mh->lossCondition));
     xml::PushBack(
-        tempDoc, pElement, "lossConditionArgumentOrLocX", static_cast<i32>((mh->lossConditionValue & 0xff))
+        m_document, pElement, "lossConditionArgumentOrLocX", static_cast<i32>((mh->lossConditionValue & 0xff))
     );
-    xml::PushBack(tempDoc, pElement, "field_24", static_cast<i32>((mh->lossConditionValue >> 8)));
-    xml::PushBack(tempDoc, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->unknown25));
-    xml::PushBack(tempDoc, pElement, "winConditionArgumentOrLocY", mh->victoryTownY);
-    xml::PushBack(tempDoc, pElement, "lossConditionArgumentOrLocY", mh->lossTownY);
-    xml::PushBack(tempDoc, pElement, "relatedToPlayerColorOrSide", mh->victorySideThreshold);
-    xml::PushBack(tempDoc, pElement, "name", mh->name);
-    xml::PushBack(tempDoc, pElement, "description", mh->description);
-    xml::PushBack(tempDoc, pElement, "field_1A0", static_cast<i32>(mh->rumourCount));
-    xml::PushBack(tempDoc, pElement, "field_1A1", static_cast<i32>(mh->timeEventCount));
-    xml::PushBack(tempDoc, pElement, "numRumors", static_cast<i32>(mh->rumourCount));
-    xml::PushBack(tempDoc, pElement, "numEvents", static_cast<i32>(mh->timeEventCount));
-    xml::WriteArray(tempDoc, pElement, "hasPlayer", mh->playerEnabled);
-    xml::WriteArray(tempDoc, pElement, "playerMayBeHuman", mh->playerCanHuman);
-    xml::WriteArray(tempDoc, pElement, "playerMayBeComp", mh->playerCanComputer);
-    xml::WriteArray(tempDoc, pElement, "playerFactions", mh->playerRace);
+    xml::PushBack(m_document, pElement, "field_24", static_cast<i32>((mh->lossConditionValue >> 8)));
+    xml::PushBack(m_document, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->unknown25));
+    xml::PushBack(m_document, pElement, "winConditionArgumentOrLocY", mh->victoryTownY);
+    xml::PushBack(m_document, pElement, "lossConditionArgumentOrLocY", mh->lossTownY);
+    xml::PushBack(m_document, pElement, "relatedToPlayerColorOrSide", mh->victorySideThreshold);
+    xml::PushBack(m_document, pElement, "name", mh->name);
+    xml::PushBack(m_document, pElement, "description", mh->description);
+    xml::PushBack(m_document, pElement, "field_1A0", static_cast<i32>(mh->rumourCount));
+    xml::PushBack(m_document, pElement, "field_1A1", static_cast<i32>(mh->timeEventCount));
+    xml::PushBack(m_document, pElement, "numRumors", static_cast<i32>(mh->rumourCount));
+    xml::PushBack(m_document, pElement, "numEvents", static_cast<i32>(mh->timeEventCount));
+    xml::WriteArray(m_document, pElement, "hasPlayer", mh->playerEnabled);
+    xml::WriteArray(m_document, pElement, "playerMayBeHuman", mh->playerCanHuman);
+    xml::WriteArray(m_document, pElement, "playerMayBeComp", mh->playerCanComputer);
+    xml::WriteArray(m_document, pElement, "playerFactions", mh->playerRace);
     pRoot->InsertEndChild(pElement);
 
-    xml::WriteArray(tempDoc, pRoot, "playerNames", data.playerNames);
-    xml::WriteArray(tempDoc, pRoot, "deadPlayers", data.records.m_playerDead);
+    xml::WriteArray(m_document, pRoot, "playerNames", data.playerNames);
+    xml::WriteArray(m_document, pRoot, "deadPlayers", data.records.m_playerDead);
 
     bchar playerAlive[H2EnumIndex(GAME_PLAYER_COUNT)];
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); ++i) {
@@ -252,32 +252,32 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
             playerAlive[i] = false;
     }
 
-    xml::WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
-    xml::WriteArray(tempDoc, pRoot, "heroHireStatus", data.records.m_availableHeroes);
-    xml::WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", data.records.m_setupPlayerColor);
-    xml::WriteArray(tempDoc, pRoot, "playerHandicap", data.records.m_playerHandicap);
-    xml::WriteArray(tempDoc, pRoot, "newGameSelectedFaction", data.records.m_setupPlayerRace);
+    xml::WriteArray(m_document, pRoot, "alivePlayers", playerAlive);
+    xml::WriteArray(m_document, pRoot, "heroHireStatus", data.records.m_availableHeroes);
+    xml::WriteArray(m_document, pRoot, "relatedToPlayerPosAndColor", data.records.m_setupPlayerColor);
+    xml::WriteArray(m_document, pRoot, "playerHandicap", data.records.m_playerHandicap);
+    xml::WriteArray(m_document, pRoot, "newGameSelectedFaction", data.records.m_setupPlayerRace);
     xml::WriteArray(
-        tempDoc, pRoot, "somePlayerCodeOr10IfMayBeHuman", data.records.m_setupPlayerNetworkId
+        m_document, pRoot, "somePlayerCodeOr10IfMayBeHuman", data.records.m_setupPlayerNetworkId
     );
-    xml::WriteArray(tempDoc, pRoot, "somePlayerNumData", data.records.m_setupPlayerType);
-    xml::WriteArray(tempDoc, pRoot, "field_47C", data.records._pad_0x47c);
-    xml::WriteArray(tempDoc, pRoot, "field_2773", data.records.m_castleOwners);
-    xml::WriteArray(tempDoc, pRoot, "builtToday", data.records.m_dailyEventFlags);
-    xml::WriteArray(tempDoc, pRoot, "field_60A6", data.records.m_mineOwners);
-    xml::WriteArray(tempDoc, pRoot, "randomArtifacts", data.generatedArtifacts);
-    xml::WriteArray(tempDoc, pRoot, "boatBuilt", data.records.m_boatSlots);
-    xml::WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", data.records.m_obeliskVisitors);
-    xml::WriteArray(tempDoc, pRoot, "field_637D", data.records.m_defaultPlayerNames);
-    xml::WriteArray(tempDoc, pRoot, "rumorIndices", data.records.m_rumourEventIndices);
-    xml::WriteArray(tempDoc, pRoot, "eventIndices", data.records.m_timeEventIndices);
-    xml::WriteArray(tempDoc, pRoot, "mapEventIndices", data.records.m_mapEventIndices);
+    xml::WriteArray(m_document, pRoot, "somePlayerNumData", data.records.m_setupPlayerType);
+    xml::WriteArray(m_document, pRoot, "field_47C", data.records._pad_0x47c);
+    xml::WriteArray(m_document, pRoot, "field_2773", data.records.m_castleOwners);
+    xml::WriteArray(m_document, pRoot, "builtToday", data.records.m_dailyEventFlags);
+    xml::WriteArray(m_document, pRoot, "field_60A6", data.records.m_mineOwners);
+    xml::WriteArray(m_document, pRoot, "randomArtifacts", data.generatedArtifacts);
+    xml::WriteArray(m_document, pRoot, "boatBuilt", data.records.m_boatSlots);
+    xml::WriteArray(m_document, pRoot, "obeliskVisitedMasks", data.records.m_obeliskVisitors);
+    xml::WriteArray(m_document, pRoot, "field_637D", data.records.m_defaultPlayerNames);
+    xml::WriteArray(m_document, pRoot, "rumorIndices", data.records.m_rumourEventIndices);
+    xml::WriteArray(m_document, pRoot, "eventIndices", data.records.m_timeEventIndices);
+    xml::WriteArray(m_document, pRoot, "mapEventIndices", data.records.m_mapEventIndices);
 
     for (size_t i = 1; i < data.world.objects.size(); ++i) {
-        auto* extraElem = tempDoc->NewElement("mapExtra");
+        auto* extraElem = m_document->NewElement("mapExtra");
         extraElem->SetAttribute("index", static_cast<i32>(i));
         for (i8 value : data.world.objects[i]) {
-            auto* byte = tempDoc->NewElement("ppMapExtra");
+            auto* byte = m_document->NewElement("ppMapExtra");
             byte->SetAttribute("value", static_cast<i32>(value));
             extraElem->InsertEndChild(byte);
         }
@@ -286,89 +286,89 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); i++) {
         const playerData* player = &data.records.m_players[i];
-        tinyxml2::XMLElement* playerElem = tempDoc->NewElement("playerData");
+        tinyxml2::XMLElement* playerElem = m_document->NewElement("playerData");
         playerElem->SetAttribute("index", i);
 
-        xml::PushBack(tempDoc, playerElem, "color", static_cast<i32>(player->m_color));
-        xml::PushBack(tempDoc, playerElem, "numHeroes", static_cast<i32>(player->m_heroCount));
-        xml::PushBack(tempDoc, playerElem, "curHeroIdx", static_cast<i32>(player->m_currentHero));
+        xml::PushBack(m_document, playerElem, "color", static_cast<i32>(player->m_color));
+        xml::PushBack(m_document, playerElem, "numHeroes", static_cast<i32>(player->m_heroCount));
+        xml::PushBack(m_document, playerElem, "curHeroIdx", static_cast<i32>(player->m_currentHero));
         xml::PushBack(
-            tempDoc, playerElem, "relatedToSomeSortOfHeroCountOrIdx",
+            m_document, playerElem, "relatedToSomeSortOfHeroCountOrIdx",
             static_cast<i32>(player->m_heroLocatorPage)
         );
-        xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(data.records.m_cheated));
-        xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
-        xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
+        xml::PushBack(m_document, playerElem, "hasCheated", static_cast<i32>(data.records.m_cheated));
+        xml::PushBack(m_document, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
+        xml::PushBack(m_document, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
         xml::PushBack(
-            tempDoc, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
+            m_document, playerElem, "relatedToMaxOrNumHeroes", static_cast<i32>(player->m_minimumHeroCount)
         );
-        xml::PushBack(tempDoc, playerElem, "hasEvilFaction", static_cast<i32>(player->m_evilInterface));
+        xml::PushBack(m_document, playerElem, "hasEvilFaction", static_cast<i32>(player->m_evilInterface));
         xml::PushBack(
-            tempDoc, playerElem, "aiNumberPuzzlePieces",
+            m_document, playerElem, "aiNumberPuzzlePieces",
             static_cast<i32>(player->m_ultimateArtifactHintChance)
         );
         xml::PushBack(
-            tempDoc, playerElem, "aiProbableUltimateArtifactX",
+            m_document, playerElem, "aiProbableUltimateArtifactX",
             static_cast<i32>(player->m_ultimateArtifactHintX)
         );
         xml::PushBack(
-            tempDoc, playerElem, "aiProbableUltimateArtifactY",
+            m_document, playerElem, "aiProbableUltimateArtifactY",
             static_cast<i32>(player->m_ultimateArtifactHintY)
         );
-        xml::PushBack(tempDoc, playerElem, "daysLeftWithoutCastle", static_cast<i32>(player->m_daysLeft));
-        xml::PushBack(tempDoc, playerElem, "numCastles", static_cast<i32>(player->m_townCount));
-        xml::PushBack(tempDoc, playerElem, "mightBeCurCastleIdx", static_cast<i32>(player->m_currentTown));
-        xml::PushBack(tempDoc, playerElem, "relatedToUnknown", static_cast<i32>(player->m_townLocatorPage));
-        xml::PushBack(tempDoc, playerElem, "barrierTentsVisited", static_cast<i32>(player->m_barrierTents));
+        xml::PushBack(m_document, playerElem, "daysLeftWithoutCastle", static_cast<i32>(player->m_daysLeft));
+        xml::PushBack(m_document, playerElem, "numCastles", static_cast<i32>(player->m_townCount));
+        xml::PushBack(m_document, playerElem, "mightBeCurCastleIdx", static_cast<i32>(player->m_currentTown));
+        xml::PushBack(m_document, playerElem, "relatedToUnknown", static_cast<i32>(player->m_townLocatorPage));
+        xml::PushBack(m_document, playerElem, "barrierTentsVisited", static_cast<i32>(player->m_barrierTents));
 
-        xml::WriteArray(tempDoc, playerElem, "heroesOwned", player->m_heroIds);
-        xml::WriteArray(tempDoc, playerElem, "heroesForPurchase", player->m_availableHeroIds);
-        xml::WriteArray(tempDoc, playerElem, "castlesOwned", player->m_townIds);
-        xml::WriteArray(tempDoc, playerElem, "resources", player->m_resources);
-        xml::WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unknownad);
-        xml::WriteArray(tempDoc, playerElem, "resourcesIncome", player->m_aiData.m_income);
+        xml::WriteArray(m_document, playerElem, "heroesOwned", player->m_heroIds);
+        xml::WriteArray(m_document, playerElem, "heroesForPurchase", player->m_availableHeroIds);
+        xml::WriteArray(m_document, playerElem, "castlesOwned", player->m_townIds);
+        xml::WriteArray(m_document, playerElem, "resources", player->m_resources);
+        xml::WriteArray(m_document, playerElem, "_4_2_1", player->m_unknownad);
+        xml::WriteArray(m_document, playerElem, "resourcesIncome", player->m_aiData.m_income);
 
         pRoot->InsertEndChild(playerElem);
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_TOWN_COUNT); i++) {
         const town* twn = &data.records.m_castleRecs[i];
-        tinyxml2::XMLElement* townElem = tempDoc->NewElement("town");
+        tinyxml2::XMLElement* townElem = m_document->NewElement("town");
         townElem->SetAttribute("index", i);
-        xml::PushBack(tempDoc, townElem, "idx", static_cast<i32>(twn->m_id));
-        xml::PushBack(tempDoc, townElem, "ownerIdx", static_cast<i32>(twn->m_owner));
-        xml::PushBack(tempDoc, townElem, "alignment", static_cast<i32>(twn->m_threat));
-        xml::PushBack(tempDoc, townElem, "factionID", static_cast<i32>(twn->m_type.value()));
-        xml::PushBack(tempDoc, townElem, "x", static_cast<i32>(twn->m_x));
-        xml::PushBack(tempDoc, townElem, "y", static_cast<i32>(twn->m_y));
-        xml::PushBack(tempDoc, townElem, "buildDockRelated", static_cast<i32>(twn->m_boatX));
-        xml::PushBack(tempDoc, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
-        xml::PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
-        xml::PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
-        xml::PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
-        xml::PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
-        xml::PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
+        xml::PushBack(m_document, townElem, "idx", static_cast<i32>(twn->m_id));
+        xml::PushBack(m_document, townElem, "ownerIdx", static_cast<i32>(twn->m_owner));
+        xml::PushBack(m_document, townElem, "alignment", static_cast<i32>(twn->m_threat));
+        xml::PushBack(m_document, townElem, "factionID", static_cast<i32>(twn->m_type.value()));
+        xml::PushBack(m_document, townElem, "x", static_cast<i32>(twn->m_x));
+        xml::PushBack(m_document, townElem, "y", static_cast<i32>(twn->m_y));
+        xml::PushBack(m_document, townElem, "buildDockRelated", static_cast<i32>(twn->m_boatX));
+        xml::PushBack(m_document, townElem, "boatCell", static_cast<i32>(twn->m_boatY));
+        xml::PushBack(m_document, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
+        xml::PushBack(m_document, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
+        xml::PushBack(m_document, townElem, "mageGuildLevel", static_cast<i32>(twn->m_buildState));
+        xml::PushBack(m_document, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
+        xml::PushBack(m_document, townElem, "exists", static_cast<i32>(twn->m_onMap));
         xml::PushBack(
-            tempDoc, townElem, "mayNotBeUpgradedToCastle", static_cast<i32>(twn->m_mayNotUpgradeToCastle)
+            m_document, townElem, "mayNotBeUpgradedToCastle", static_cast<i32>(twn->m_mayNotUpgradeToCastle)
         );
-        xml::PushBack(tempDoc, townElem, "field_38", static_cast<i32>(twn->m_formation));
-        xml::PushBack(tempDoc, townElem, "playerPos", static_cast<i32>(twn->m_originalOwner));
-        xml::PushBack(tempDoc, townElem, "extraIdx", twn->m_extraIndex);
-        xml::PushBack(tempDoc, townElem, "field_55", static_cast<i32>((twn->m_turnsOwned & 0xff)));
-        xml::PushBack(tempDoc, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
-        xml::PushBack(tempDoc, townElem, "name", twn->m_name);
+        xml::PushBack(m_document, townElem, "field_38", static_cast<i32>(twn->m_formation));
+        xml::PushBack(m_document, townElem, "playerPos", static_cast<i32>(twn->m_originalOwner));
+        xml::PushBack(m_document, townElem, "extraIdx", twn->m_extraIndex);
+        xml::PushBack(m_document, townElem, "field_55", static_cast<i32>((twn->m_turnsOwned & 0xff)));
+        xml::PushBack(m_document, townElem, "field_63", static_cast<i32>((twn->m_turnsOwned >> 8)));
+        xml::PushBack(m_document, townElem, "name", twn->m_name);
 
-        xml::WriteArray(tempDoc, townElem, "numCreaturesInDwelling", twn->m_garrison);
+        xml::WriteArray(m_document, townElem, "numCreaturesInDwelling", twn->m_garrison);
         i8 numSpellsOfLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT; j++)
             numSpellsOfLevel[j] = twn->m_spellCounts[j + TOWN_MAGE_GUILD_FIRST_LEVEL];
-        xml::WriteArray(tempDoc, townElem, "numSpellsOfLevel", numSpellsOfLevel);
+        xml::WriteArray(m_document, townElem, "numSpellsOfLevel", numSpellsOfLevel);
 
         for (i32 j = 0; j < TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL;
              j++) {
             i32 x = j % TOWN_MAGE_GUILD_LEVEL_COUNT;
             i32 y = j / TOWN_MAGE_GUILD_LEVEL_COUNT;
-            tinyxml2::XMLElement* spellElem = tempDoc->NewElement("mageGuildSpell");
+            tinyxml2::XMLElement* spellElem = m_document->NewElement("mageGuildSpell");
             spellElem->SetAttribute("level", x);
             spellElem->SetAttribute("idx", y);
             spellElem->SetAttribute("spell", static_cast<i32>(twn->m_spells[x][y].value()));
@@ -376,7 +376,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         }
 
         for (i32 j = 0; j < ARMY_GROUP_SLOT_COUNT; j++) {
-            tinyxml2::XMLElement* creatElem = tempDoc->NewElement("garrisonCreature");
+            tinyxml2::XMLElement* creatElem = m_document->NewElement("garrisonCreature");
             creatElem->SetAttribute("index", j);
             creatElem->SetAttribute("type", static_cast<i32>(twn->m_army.m_creatureTypes[j].value()));
             creatElem->SetAttribute("quantity", twn->m_army.m_quantities[j]);
@@ -388,7 +388,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
     for (i32 i = 0; i < H2EnumIndex(GAME_MINE_COUNT); i++) {
         const mineRecord* m = &data.records.m_mines[i];
-        tinyxml2::XMLElement* mineElem = tempDoc->NewElement("mine");
+        tinyxml2::XMLElement* mineElem = m_document->NewElement("mine");
         mineElem->SetAttribute("index", i);
         mineElem->SetAttribute("x", m->x);
         mineElem->SetAttribute("y", m->y);
@@ -402,7 +402,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
     for (i32 i = 0; i < H2EnumIndex(GAME_BOAT_COUNT); i++) {
         const boatRecord* b = &data.records.m_boats[i];
-        tinyxml2::XMLElement* boatElem = tempDoc->NewElement("boat");
+        tinyxml2::XMLElement* boatElem = m_document->NewElement("boat");
         boatElem->SetAttribute("index", i);
         boatElem->SetAttribute("idx", b->id);
         boatElem->SetAttribute("x", b->x);
@@ -416,14 +416,14 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         pRoot->InsertEndChild(boatElem);
     }
 
-    pElement = tempDoc->NewElement("map");
+    pElement = m_document->NewElement("map");
     const WorldRecords* map = &data.world;
     pElement->SetAttribute("width", map->width);
     pElement->SetAttribute("height", map->height);
     pElement->SetAttribute("numCellExtras", static_cast<i32>(map->extras.size()));
     for (i32 i = 0; i < map->height * map->width; i++) {
         const mapCell* c = &map->cells[i];
-        tinyxml2::XMLElement* mapElement = tempDoc->NewElement("mapCell");
+        tinyxml2::XMLElement* mapElement = m_document->NewElement("mapCell");
         mapElement->SetAttribute("index", i);
         mapElement->SetAttribute("groundIndex", c->m_terrainImageIndex);
         mapElement->SetAttribute("hasObject", c->m_animatedObject);
@@ -446,7 +446,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
     for (i32 i = 0; i < static_cast<i32>(map->extras.size()); i++) {
         const mapCellExtra* e = &map->extras[i];
-        tinyxml2::XMLElement* mapElement = tempDoc->NewElement("mapCellExtra");
+        tinyxml2::XMLElement* mapElement = m_document->NewElement("mapCellExtra");
         mapElement->SetAttribute("index", i);
         mapElement->SetAttribute("nextIdx", e->nextIndex);
         mapElement->SetAttribute("animatedObject", e->animatedObject);
@@ -465,7 +465,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
     pRoot->InsertEndChild(pElement);
 
     for (i32 i = 0; i < data.world.width * data.world.height; i++) {
-        tinyxml2::XMLElement* elem = tempDoc->NewElement("mapRevealed");
+        tinyxml2::XMLElement* elem = m_document->NewElement("mapRevealed");
         elem->SetAttribute("index", i);
         elem->SetAttribute("x", i % data.world.width);
         elem->SetAttribute("y", i / data.world.width);
@@ -475,69 +475,69 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
     for (i32 i = 0; i < H2EnumIndex(GAME_HERO_COUNT); i++) {
         const hero* hro = &data.records.m_heroRecs[i];
-        tinyxml2::XMLElement* heroElement = tempDoc->NewElement("hero");
+        tinyxml2::XMLElement* heroElement = m_document->NewElement("hero");
         heroElement->SetAttribute("index", i);
-        xml::PushBack(tempDoc, heroElement, "idx", static_cast<i32>(hro->m_id));
-        xml::PushBack(tempDoc, heroElement, "spellpoints", hro->m_spellPoints);
-        xml::PushBack(tempDoc, heroElement, "ownerIdx", static_cast<i32>(hro->m_owner));
+        xml::PushBack(m_document, heroElement, "idx", static_cast<i32>(hro->m_id));
+        xml::PushBack(m_document, heroElement, "spellpoints", hro->m_spellPoints);
+        xml::PushBack(m_document, heroElement, "ownerIdx", static_cast<i32>(hro->m_owner));
         xml::PushBack(
-            tempDoc, heroElement, "aiLastHeroInteractionTurn", hro->m_lastHeroInteractionTurn
+            m_document, heroElement, "aiLastHeroInteractionTurn", hro->m_lastHeroInteractionTurn
         );
         xml::PushBack(
-            tempDoc, heroElement, "aiLastHeroInteractionIdx", static_cast<i32>(hro->m_lastInteractionHeroId)
+            m_document, heroElement, "aiLastHeroInteractionIdx", static_cast<i32>(hro->m_lastInteractionHeroId)
         );
         xml::PushBack(
-            tempDoc, heroElement, "aiLastTownInteractionTurn", hro->m_lastTownInteractionTurn
+            m_document, heroElement, "aiLastTownInteractionTurn", hro->m_lastTownInteractionTurn
         );
-        xml::PushBack(tempDoc, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_visitedTownId));
-        xml::PushBack(tempDoc, heroElement, "name", hro->m_name);
-        xml::PushBack(tempDoc, heroElement, "experience", hro->m_experience);
-        xml::PushBack(tempDoc, heroElement, "factionID", static_cast<i32>(hro->m_cursorType.value()));
-        xml::PushBack(tempDoc, heroElement, "heroID", static_cast<i32>(hro->m_portrait.value()));
-        xml::PushBack(tempDoc, heroElement, "x", hro->m_x);
-        xml::PushBack(tempDoc, heroElement, "y", hro->m_y);
-        xml::PushBack(tempDoc, heroElement, "aiTargetX", hro->m_destinationX);
-        xml::PushBack(tempDoc, heroElement, "aiTargetY", hro->m_destinationY);
-        xml::PushBack(tempDoc, heroElement, "aiPatrolX", static_cast<i32>(hro->m_patrolX));
-        xml::PushBack(tempDoc, heroElement, "aiPatrolY", static_cast<i32>(hro->m_patrolY));
-        xml::PushBack(tempDoc, heroElement, "patrolDistance", static_cast<i32>(hro->m_patrolRadius));
-        xml::PushBack(tempDoc, heroElement, "directionFacing", static_cast<i32>(hro->m_direction.value()));
-        xml::PushBack(tempDoc, heroElement, "occupiedObjType", static_cast<i32>(hro->m_locationType.value()));
-        xml::PushBack(tempDoc, heroElement, "occupiedObjVal", hro->m_occupiedTown);
-        xml::PushBack(tempDoc, heroElement, "mobility", hro->m_mobility);
-        xml::PushBack(tempDoc, heroElement, "remainingMobility", hro->m_remainingMobility);
-        xml::PushBack(tempDoc, heroElement, "oldLevel", hro->m_level);
-        xml::PushBack(tempDoc, heroElement, "attack", static_cast<i32>(hro->m_primaryStats[0]));
-        xml::PushBack(tempDoc, heroElement, "defense", static_cast<i32>(hro->m_primaryStats[1]));
-        xml::PushBack(tempDoc, heroElement, "spellpower", static_cast<i32>(hro->m_primaryStats[2]));
-        xml::PushBack(tempDoc, heroElement, "knowledge", static_cast<i32>(hro->m_primaryStats[3]));
-        xml::PushBack(tempDoc, heroElement, "field_43", static_cast<i32>(hro->m_primaryStats[4]));
-        xml::PushBack(tempDoc, heroElement, "tempMoraleBonuses", static_cast<i32>(hro->m_morale));
-        xml::PushBack(tempDoc, heroElement, "tempLuckBonuses", static_cast<i32>(hro->m_luck));
-        xml::PushBack(tempDoc, heroElement, "gazeboesVisited", static_cast<i32>(hro->m_gazeboVisits));
-        xml::PushBack(tempDoc, heroElement, "fortsVisited", static_cast<i32>(hro->m_fortVisits));
+        xml::PushBack(m_document, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_visitedTownId));
+        xml::PushBack(m_document, heroElement, "name", hro->m_name);
+        xml::PushBack(m_document, heroElement, "experience", hro->m_experience);
+        xml::PushBack(m_document, heroElement, "factionID", static_cast<i32>(hro->m_cursorType.value()));
+        xml::PushBack(m_document, heroElement, "heroID", static_cast<i32>(hro->m_portrait.value()));
+        xml::PushBack(m_document, heroElement, "x", hro->m_x);
+        xml::PushBack(m_document, heroElement, "y", hro->m_y);
+        xml::PushBack(m_document, heroElement, "aiTargetX", hro->m_destinationX);
+        xml::PushBack(m_document, heroElement, "aiTargetY", hro->m_destinationY);
+        xml::PushBack(m_document, heroElement, "aiPatrolX", static_cast<i32>(hro->m_patrolX));
+        xml::PushBack(m_document, heroElement, "aiPatrolY", static_cast<i32>(hro->m_patrolY));
+        xml::PushBack(m_document, heroElement, "patrolDistance", static_cast<i32>(hro->m_patrolRadius));
+        xml::PushBack(m_document, heroElement, "directionFacing", static_cast<i32>(hro->m_direction.value()));
+        xml::PushBack(m_document, heroElement, "occupiedObjType", static_cast<i32>(hro->m_locationType.value()));
+        xml::PushBack(m_document, heroElement, "occupiedObjVal", hro->m_occupiedTown);
+        xml::PushBack(m_document, heroElement, "mobility", hro->m_mobility);
+        xml::PushBack(m_document, heroElement, "remainingMobility", hro->m_remainingMobility);
+        xml::PushBack(m_document, heroElement, "oldLevel", hro->m_level);
+        xml::PushBack(m_document, heroElement, "attack", static_cast<i32>(hro->m_primaryStats[0]));
+        xml::PushBack(m_document, heroElement, "defense", static_cast<i32>(hro->m_primaryStats[1]));
+        xml::PushBack(m_document, heroElement, "spellpower", static_cast<i32>(hro->m_primaryStats[2]));
+        xml::PushBack(m_document, heroElement, "knowledge", static_cast<i32>(hro->m_primaryStats[3]));
+        xml::PushBack(m_document, heroElement, "field_43", static_cast<i32>(hro->m_primaryStats[4]));
+        xml::PushBack(m_document, heroElement, "tempMoraleBonuses", static_cast<i32>(hro->m_morale));
+        xml::PushBack(m_document, heroElement, "tempLuckBonuses", static_cast<i32>(hro->m_luck));
+        xml::PushBack(m_document, heroElement, "gazeboesVisited", static_cast<i32>(hro->m_gazeboVisits));
+        xml::PushBack(m_document, heroElement, "fortsVisited", static_cast<i32>(hro->m_fortVisits));
         xml::PushBack(
-            tempDoc, heroElement, "witchDoctorHutsVisited", static_cast<i32>(hro->m_witchDoctorVisits)
-        );
-        xml::PushBack(
-            tempDoc, heroElement, "mercenaryCampsVisited", static_cast<i32>(hro->m_mercenaryCampVisits)
+            m_document, heroElement, "witchDoctorHutsVisited", static_cast<i32>(hro->m_witchDoctorVisits)
         );
         xml::PushBack(
-            tempDoc, heroElement, "standingStonesVisited", static_cast<i32>(hro->m_standingStoneVisits)
+            m_document, heroElement, "mercenaryCampsVisited", static_cast<i32>(hro->m_mercenaryCampVisits)
         );
         xml::PushBack(
-            tempDoc, heroElement, "treesOfKnowledgeVisited", static_cast<i32>(hro->m_treeKnowledgeVisits)
+            m_document, heroElement, "standingStonesVisited", static_cast<i32>(hro->m_standingStoneVisits)
         );
-        xml::PushBack(tempDoc, heroElement, "xanadusVisited", static_cast<i32>(hro->m_xanaduVisits));
-        xml::PushBack(tempDoc, heroElement, "randomSeed", static_cast<i32>(hro->m_randomSeed));
-        xml::PushBack(tempDoc, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_enabled));
-        xml::PushBack(tempDoc, heroElement, "numSecSkillsKnown", hro->m_secondarySkillCount);
-        xml::PushBack(tempDoc, heroElement, "flags", H2EnumIndex(hro->m_eventFlags));
-        xml::PushBack(tempDoc, heroElement, "isCaptain", static_cast<i32>(hro->m_isCaptain));
-        xml::PushBack(tempDoc, heroElement, "aiParamFV", hro->m_aiFightValue);
+        xml::PushBack(
+            m_document, heroElement, "treesOfKnowledgeVisited", static_cast<i32>(hro->m_treeKnowledgeVisits)
+        );
+        xml::PushBack(m_document, heroElement, "xanadusVisited", static_cast<i32>(hro->m_xanaduVisits));
+        xml::PushBack(m_document, heroElement, "randomSeed", static_cast<i32>(hro->m_randomSeed));
+        xml::PushBack(m_document, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_enabled));
+        xml::PushBack(m_document, heroElement, "numSecSkillsKnown", hro->m_secondarySkillCount);
+        xml::PushBack(m_document, heroElement, "flags", H2EnumIndex(hro->m_eventFlags));
+        xml::PushBack(m_document, heroElement, "isCaptain", static_cast<i32>(hro->m_isCaptain));
+        xml::PushBack(m_document, heroElement, "aiParamFV", hro->m_aiFightValue);
 
         for (i32 j = 0; j < ARMY_GROUP_SLOT_COUNT; j++) {
-            tinyxml2::XMLElement* armyElem = tempDoc->NewElement("army");
+            tinyxml2::XMLElement* armyElem = m_document->NewElement("army");
             armyElem->SetAttribute("index", j);
             armyElem->SetAttribute("type", static_cast<i32>(hro->m_army.m_creatureTypes[j].value()));
             armyElem->SetAttribute("quantity", hro->m_army.m_quantities[j]);
@@ -545,7 +545,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         }
 
         for (i32 j = 0; j < H2EnumIndex(HERO_SKILL_COUNT); j++) {
-            tinyxml2::XMLElement* ssElem = tempDoc->NewElement("secondarySkill");
+            tinyxml2::XMLElement* ssElem = m_document->NewElement("secondarySkill");
             ssElem->SetAttribute("index", j);
             ssElem->SetAttribute("level", static_cast<i32>(hro->m_secondarySkills[j]));
             ssElem->SetAttribute("idx", hro->m_secondarySkillOrder[j]);
@@ -554,14 +554,14 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
 
         for (i32 j = 0; j < KB_SPELL_TABLE_CAPACITY; j++) {
             if (hro->m_spells[j]) {
-                tinyxml2::XMLElement* spellElem = tempDoc->NewElement("spell");
+                tinyxml2::XMLElement* spellElem = m_document->NewElement("spell");
                 spellElem->SetAttribute("idx", j);
                 heroElement->InsertEndChild(spellElem);
             }
         }
 
         for (i32 j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
-            tinyxml2::XMLElement* artElem = tempDoc->NewElement("artifact");
+            tinyxml2::XMLElement* artElem = m_document->NewElement("artifact");
             artElem->SetAttribute("index", j);
             artElem->SetAttribute("id", static_cast<i32>(hro->m_artifacts[j].value()));
             artElem->SetAttribute("spell", static_cast<i32>(hro->m_artifactExtra[j]));
@@ -570,11 +570,11 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
         pRoot->InsertEndChild(heroElement);
     }
 
-    pElement = tempDoc->NewElement("disallowedBuildings");
+    pElement = m_document->NewElement("disallowedBuildings");
     for (i32 j = 0; j < H2EnumIndex(GAME_TOWN_COUNT); j++) {
         for (i32 bit = 0; bit < 32; bit++) {
             if (data.adventure.disallowedBuildings[j][bit]) {
-                tinyxml2::XMLElement* buildElem = tempDoc->NewElement("building");
+                tinyxml2::XMLElement* buildElem = m_document->NewElement("building");
                 buildElem->SetAttribute("town", j);
                 buildElem->SetAttribute("building", bit);
                 pElement->InsertEndChild(buildElem);
@@ -584,25 +584,25 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) 
     pRoot->InsertEndChild(pElement);
 
     const auto& adventure = data.adventure;
-    WriteRelations(tempDoc, pRoot, "sharedVision", "share", adventure.sharePlayerVision);
-    WriteRelations(tempDoc, pRoot, "forcedHeroChases", "chase", adventure.forcedComputerPlayerChases);
+    WriteRelations(m_document, pRoot, "sharedVision", "share", adventure.sharePlayerVision);
+    WriteRelations(m_document, pRoot, "forcedHeroChases", "chase", adventure.forcedComputerPlayerChases);
     WriteMapVariables(pRoot, data);
     const std::string& script = data.scriptSource;
     if (script.length())
-        xml::PushBack(tempDoc, pRoot, "script", script.c_str());
+        xml::PushBack(m_document, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
-    return tempDoc->SaveFile(path.c_str());
+    return m_document->SaveFile(path.c_str());
 }
 
 tinyxml2::XMLError XmlFile::Read(const char* fileName, SessionData& data) {
-    decodeError.clear();
+    m_decodeError.clear();
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Read);
-    const auto result = tempDoc->LoadFile(path.c_str());
+    const auto result = m_document->LoadFile(path.c_str());
     if (result != tinyxml2::XML_SUCCESS)
         return result;
     try {
         SessionData parsed;
-        auto* root = tempDoc->FirstChildElement("ironfist_save");
+        auto* root = m_document->FirstChildElement("ironfist_save");
         if (!root)
             throw std::invalid_argument("Missing ironfist_save root");
         ReadRoot(root, parsed);
@@ -614,13 +614,13 @@ tinyxml2::XMLError XmlFile::Read(const char* fileName, SessionData& data) {
         data = std::move(parsed);
         return tinyxml2::XML_SUCCESS;
     } catch (const std::exception& error) {
-        decodeError = error.what();
+        m_decodeError = error.what();
         return tinyxml2::XML_ERROR_PARSING;
     }
 }
 
 const char* XmlFile::GetError() {
-    return decodeError.empty() ? xml::XMLFile::GetError() : decodeError.c_str();
+    return m_decodeError.empty() ? xml::XMLFile::GetError() : m_decodeError.c_str();
 }
 
 script::LuaTable XmlFile::ReadTable(tinyxml2::XMLNode* root) {
@@ -634,7 +634,7 @@ script::LuaTable XmlFile::ReadTable(tinyxml2::XMLNode* root) {
         if (name == "table") {
             std::string tableId = RequiredAttribute(elem, "tableId");
             script::MapVariable& variable = table[tableId];
-            variable.type = script::MapVariableType::Table;
+            variable.type = script::MapVariableType::MAP_VARIABLE_TABLE;
             variable.table = ReadTable(elem);
         } else if (name == "tableElement")
             ReadTableElement(elem, table);
@@ -653,14 +653,14 @@ void XmlFile::ReadTableElement(tinyxml2::XMLElement* elem, script::LuaTable& tab
 void XmlFile::WriteMapVarTable(
     tinyxml2::XMLNode* dest, const std::string& id, const script::LuaTable& table
 ) {
-    tinyxml2::XMLElement* tableElem = tempDoc->NewElement("table");
+    tinyxml2::XMLElement* tableElem = m_document->NewElement("table");
     tableElem->SetAttribute("tableId", id.c_str());
 
     for (const auto& [key, variable] : table) {
         if (script::IsTable(variable.type)) {
             WriteMapVarTable(tableElem, key, variable.table);
         } else {
-            auto* elem = tempDoc->NewElement("tableElement");
+            auto* elem = m_document->NewElement("tableElement");
             elem->SetAttribute("key", key.c_str());
             elem->SetAttribute("type", script::MapVariableTypeName(variable.type).c_str());
             elem->SetAttribute("value", variable.value.c_str());
@@ -680,13 +680,13 @@ void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest, const SessionData& data
                 std::string mapVariableId =
                     "_AICHASE_" + std::to_string(i) + "_" + std::to_string(j) + "_";
                 script::MapVariable& variable = mapVariables[mapVariableId];
-                variable.type = script::MapVariableType::Boolean;
+                variable.type = script::MapVariableType::MAP_VARIABLE_BOOLEAN;
                 variable.value = "true";
             }
         }
     }
     for (const auto& [id, variable] : mapVariables) {
-        tinyxml2::XMLElement* elem = tempDoc->NewElement("mapVariable");
+        tinyxml2::XMLElement* elem = m_document->NewElement("mapVariable");
         elem->SetAttribute("id", id.c_str());
         elem->SetAttribute("type", script::MapVariableTypeName(variable.type).c_str());
         if (script::IsTable(variable.type)) {
@@ -1232,7 +1232,7 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root, SessionData& data) {
             i32 x;
             i32 y;
             i32 end = 0;
-            if ((mapVariableType == script::MapVariableType::Boolean)
+            if ((mapVariableType == script::MapVariableType::MAP_VARIABLE_BOOLEAN)
                 && (sscanf(mapVariableId.c_str(), "_AICHASE_%d_%d_%n", &x, &y, &end) == 2)
                 && static_cast<size_t>(end) == mapVariableId.size()) {
                 const std::string chaseValue = xml::QueryTextAttribute(elem, "value");

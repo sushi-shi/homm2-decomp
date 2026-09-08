@@ -154,7 +154,7 @@ void town::BuildBuilding(BuildingSlotType building) {
         ++m_buildState;
         if (m_type == FACTION_CYBORG)
             m_spellCounts[m_buildState] =
-                ironfist::CyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
+                ironfist::gCyborgSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         else
             m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & H2EnumIndex(TOWN_BUILDING_LIBRARY)))

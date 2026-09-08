@@ -12,12 +12,12 @@ namespace ironfist::script {
  * but it actually treats them differently in some places.
  */
 enum class MapVariableType {
-    String,
-    Integer,
-    Number,
-    Table,
-    Boolean,
-    Error
+    MAP_VARIABLE_STRING,
+    MAP_VARIABLE_INTEGER,
+    MAP_VARIABLE_NUMBER,
+    MAP_VARIABLE_TABLE,
+    MAP_VARIABLE_BOOLEAN,
+    MAP_VARIABLE_ERROR
 };
 
 struct MapVariable;
@@ -25,7 +25,7 @@ struct MapVariable;
 using LuaTable = std::map<std::string, MapVariable>;
 
 struct MapVariable {
-    MapVariableType type = MapVariableType::Error;
+    MapVariableType type = MapVariableType::MAP_VARIABLE_ERROR;
     std::string value;
     LuaTable table;
 };

@@ -135,16 +135,16 @@ void ReadBinary(tinyxml2::XMLElement* src, i32* dest) {
 }
 
 XMLFile::XMLFile() {
-    tempDoc = new tinyxml2::XMLDocument(true);
+    m_document = new tinyxml2::XMLDocument(true);
 }
 
 XMLFile::~XMLFile() {
-    if (tempDoc)
-        delete tempDoc;
+    if (m_document)
+        delete m_document;
 }
 
 const char* XMLFile::GetError() {
-    return tempDoc->ErrorStr();
+    return m_document->ErrorStr();
 }
 
 }

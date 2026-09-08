@@ -15,12 +15,12 @@
 
 namespace ironfist {
 
-static std::map<i32, std::string> artifactNames;
-static std::map<i32, std::string> artifactDescriptions;
-static std::map<i32, std::string> artifactEvents;
-static std::map<i32, i32> artifactIsCursed;
-static std::map<i32, i32> isGenerated;
-static std::map<i32, i32> artifactIsCampaignOnly;
+static std::map<i32, std::string> gArtifactNameStorage;
+static std::map<i32, std::string> gArtifactDescriptionStorage;
+static std::map<i32, std::string> gArtifactEventStorage;
+static std::map<i32, i32> gArtifactCursed;
+static std::map<i32, i32> gGeneratedArtifacts;
+static std::map<i32, i32> gCampaignOnlyArtifacts;
 
 static const char* gArtifactEvents[KB_ARTIFACT_TABLE_CAPACITY] = { 0 };
 
@@ -40,10 +40,10 @@ static void ReadArtifactData(tinyxml2::XMLNode* root) {
         }
 
         std::string tableId = "table.gArtifactNames." + std::to_string(id);
-        artifactNames[id] = localization::TranslateExternal(
+        gArtifactNameStorage[id] = localization::TranslateExternal(
             tableId.c_str(), QueryTextAttribute(artElem, "name")
         );
-        gArtifactNames[id] = &(artifactNames[id][0]);
+        gArtifactNames[id] = &(gArtifactNameStorage[id][0]);
         std::string levelName(QueryTextAttribute(artElem, "level"));
         ArtifactLevelMask level = ARTIFACT_LEVEL_UNUSED;
         if (levelName == "ultimate")
@@ -61,8 +61,8 @@ static void ReadArtifactData(tinyxml2::XMLNode* root) {
 
         gArtifactLevel[id] = level;
 
-        artifactIsCursed[id] = artElem->BoolAttribute("cursed", 0);
-        artifactIsCampaignOnly[id] = artElem->BoolAttribute("campaign_only", 0);
+        gArtifactCursed[id] = artElem->BoolAttribute("cursed", 0);
+        gCampaignOnlyArtifacts[id] = artElem->BoolAttribute("campaign_only", 0);
 
         std::string title;
         std::string description;
@@ -77,18 +77,18 @@ static void ReadArtifactData(tinyxml2::XMLNode* root) {
                 description = text != NULL ? text : "";
             } else if (name == "event") {
                 tableId = "table.gArtifactEvent." + std::to_string(id);
-                artifactEvents[id] = localization::TranslateExternal(
+                gArtifactEventStorage[id] = localization::TranslateExternal(
                     tableId.c_str(), text != NULL ? text : ""
                 );
-                gArtifactEvents[id] = &artifactEvents[id][0];
+                gArtifactEvents[id] = &gArtifactEventStorage[id][0];
             }
         }
         tableId = "table.gArtifactDesc." + std::to_string(id);
         const std::string englishDescription = "{" + title + "}\n\n" + description;
-        artifactDescriptions[id] = localization::TranslateExternal(
+        gArtifactDescriptionStorage[id] = localization::TranslateExternal(
             tableId.c_str(), englishDescription.c_str()
         );
-        gArtifactDesc[id] = &artifactDescriptions[id][0];
+        gArtifactDesc[id] = &gArtifactDescriptionStorage[id][0];
     }
 }
 
@@ -105,15 +105,15 @@ void LoadArtifacts() {
 
 bool IsCursedArtifact(ArtifactType artifact) {
     const i32 artifactId = H2EnumIndex(artifact);
-    if (artifactIsCursed.find(artifactId) == artifactIsCursed.end()) {
+    if (gArtifactCursed.find(artifactId) == gArtifactCursed.end()) {
         return false;
     }
 
-    return artifactIsCursed[artifactId] != 0;
+    return gArtifactCursed[artifactId] != 0;
 }
 
 bool IsArtifactValid(i32 id) {
-    if (artifactNames.find(id) == artifactNames.end()) {
+    if (gArtifactNameStorage.find(id) == gArtifactNameStorage.end()) {
         return false;
     }
     if (GetArtifactName(id).empty()) {
@@ -127,7 +127,7 @@ bool IsArtifactValid(i32 id) {
 }
 
 bool IsArtifactGenerated(i32 id) {
-    return isGenerated[id] == 1;
+    return gGeneratedArtifacts[id] == 1;
 }
 
 bool IsArtifactGenerationAllowed(i32 id) {
@@ -142,7 +142,7 @@ bool IsArtifactGenerationAllowed(i32 id) {
         // so the generic artifact generator must not select one by ID alone.
         return false;
     }
-    if (artifactIsCampaignOnly[id]) {
+    if (gCampaignOnlyArtifacts[id]) {
         return false;
     }
 
@@ -150,15 +150,15 @@ bool IsArtifactGenerationAllowed(i32 id) {
 }
 
 void GenerateArtifact(i32 id) {
-    isGenerated[id] = 1;
+    gGeneratedArtifacts[id] = 1;
 }
 
 void ResetGeneratedArtifacts() {
-    isGenerated.clear();
+    gGeneratedArtifacts.clear();
 }
 
 void ResetGeneratedArtifacts(i32 matchingLevels) {
-    for (auto& art : isGenerated) {
+    for (auto& art : gGeneratedArtifacts) {
         const i32 id = art.first;
         if (H2EnumIndex(gArtifactLevel[id] & matchingLevels)) {
             art.second = 0;
@@ -169,17 +169,17 @@ void ResetGeneratedArtifacts(i32 matchingLevels) {
 void DeserializeGeneratedArtifacts(const std::vector<i32>& source) {
     ResetGeneratedArtifacts();
     for (auto i = 0u; i < source.size(); ++i) {
-        isGenerated[i] = source[i];
+        gGeneratedArtifacts[i] = source[i];
     }
 }
 
 std::vector<i32> SerializeGeneratedArtifacts() {
     std::vector<i32> artifacts;
-    if (isGenerated.empty()) {
+    if (gGeneratedArtifacts.empty()) {
         return artifacts;
     }
-    artifacts.resize(isGenerated.rbegin()->first + 1, 0);
-    for (auto art : isGenerated) {
+    artifacts.resize(gGeneratedArtifacts.rbegin()->first + 1, 0);
+    for (auto art : gGeneratedArtifacts) {
         artifacts[art.first] = art.second;
     }
     return artifacts;
@@ -190,11 +190,11 @@ i32 GetArtifactLevel(i32 id) {
 }
 
 std::string GetArtifactName(i32 id) {
-    return artifactNames[id];
+    return gArtifactNameStorage[id];
 }
 
 std::string GetArtifactDescription(i32 id) {
-    return artifactDescriptions[id];
+    return gArtifactDescriptionStorage[id];
 }
 
 const char* GetArtifactEvent(i32 id) {
