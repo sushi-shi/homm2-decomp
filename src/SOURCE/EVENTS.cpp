@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/MapRecords.h>
 #include <PLATFORM/Strings.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -439,7 +440,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SPHINX:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+            eventExtra_o = static_cast<mapEventExtra*>(MapExtraRecord(
+                cell->m_objectMetadata, map_records::Kind::Sphinx));
             if (!eventExtra_o->active) {
                 NormalDialog(
                     localization::Tr("event.inline.1553297e35c659a6"),
@@ -462,7 +464,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     const std::string riddle =
-                        localization::DecodeExternalText(eventExtra_o->riddle);
+                        localization::DecodeExternalText(
+                            MapExtraText(eventExtra_o, offsetof(mapEventExtra, riddle))
+                        );
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
                         localization::Tr("event.inline.785dc53c14bdbc91"),
@@ -472,7 +476,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     correctAnswer_e = false;
                     for (eventValue1 = 0; eventValue1 < eventExtra_o->answerCount; eventValue1++) {
                         const std::string answer = localization::DecodeExternalText(
-                            eventExtra_o->answers[eventValue1]
+                            localization::TextField(eventExtra_o->answers[eventValue1])
                         );
                         if (RiddleStringsEqual(
                                 sphinxAnswer_a,
@@ -3093,9 +3097,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_BOTTLE: {
             if (cell->m_objectMetadata) {
-                signExtra_k = reinterpret_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+                signExtra_k = static_cast<signEventExtra*>(MapExtraRecord(
+                    cell->m_objectMetadata, map_records::Kind::Sign));
                 const std::string signText =
-                    localization::DecodeExternalText(signExtra_k->text);
+                    localization::DecodeExternalText(MapExtraText(signExtra_k, offsetof(signEventExtra, text)));
                 if (signText.size() > SIGN_MINIMUM_TEXT_LENGTH)
                     EventWindow(
                         -1,
@@ -3126,9 +3131,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SIGN: {
             if (cell->m_objectMetadata) {
-                signExtra_k = reinterpret_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+                signExtra_k = static_cast<signEventExtra*>(MapExtraRecord(
+                    cell->m_objectMetadata, map_records::Kind::Sign));
                 const std::string signText =
-                    localization::DecodeExternalText(signExtra_k->text);
+                    localization::DecodeExternalText(MapExtraText(signExtra_k, offsetof(signEventExtra, text)));
                 if (signText.size() > SIGN_MINIMUM_TEXT_LENGTH)
                     EventWindow(
                         -1,
@@ -7045,7 +7051,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_SPHINX:
-            eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+            eventExtra_o = static_cast<mapEventExtra*>(MapExtraRecord(
+                cell->m_objectMetadata, map_records::Kind::Sphinx));
             if (eventExtra_o->active == 0)
                 break;
             if (Random(0, EVENT_RANDOM_PERCENT_MAX) < EVENT_RANDOM_EVENT_SUCCESS) {
