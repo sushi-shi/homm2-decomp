@@ -23,8 +23,8 @@ if(HOMM2_BIG_ENDIAN)
   message(FATAL_ERROR "Packed map, resource, and preference records require a little-endian target")
 endif()
 
-# The supported game target remains 32-bit while the remaining host-width
-# assumptions are evaluated. On a 64-bit host that means -m32.
+# Keep the established 32-bit default. The opt-in 64-bit Linux target disables
+# this option and uses libraries matching the compiler's native pointer width.
 if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
   add_compile_options(-m32)
   add_link_options(-m32)
@@ -307,6 +307,9 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME enum_code COMMAND homm2_enum_code_test)
+  add_executable(homm2_message_result_test tools/message_result_test.cpp)
+  target_include_directories(homm2_message_result_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME message_result COMMAND homm2_message_result_test)
   add_executable(homm2_combat_cursor_test tools/combat_cursor_test.cpp)
   target_include_directories(homm2_combat_cursor_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include

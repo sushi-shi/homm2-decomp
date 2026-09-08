@@ -875,8 +875,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             }
         }
         if (acceptStep != 0) {
-            message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;
+            SetExecutiveResult(message, message.payload.widget.data.value);
             return MESSAGE_DISPATCH_FORWARD;
         }
     }

@@ -339,8 +339,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
 
     checkClose:
         if (done == 1) {
-            message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
+            SetExecutiveResult(message, 0);
             return MESSAGE_DISPATCH_FORWARD;
         }
     }

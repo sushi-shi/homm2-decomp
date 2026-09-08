@@ -55,10 +55,16 @@ including the retail reserved bytes and overlapping town spell/count fields.
 Campaign initialization uses those field boundaries instead of clearing a byte
 prefix across adjacent runtime members.
 
+The portable `i32l`/`u32l` aliases retain four-byte arithmetic on LP64 hosts while
+preserving the original long types on 32-bit targets. Debug memory/manager logs
+format full pointers instead of narrowing them to integers.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |
 | --- | --- | --- |
+| Adventure panel widget storage | Uses four-byte integer arrays and padded overlays to initialize and enumerate widget pointers; those assumptions break when pointers are eight bytes. | Stores and clears complete pointers in naturally aligned arrays. Named accessors identify background, icon, and text slots without overlapping half-pointers. |
+| Dialog result messages | Widget data and executive result bytes occupy the same offset on the retail 32-bit ABI; dialog closure depends on that overlap. | Constructs the executive result explicitly, preserving file/high-score dialog results when pointer-bearing widget data moves on a 64-bit host. Recruitment and hero-swap dialogs set their unused return value to zero. |
 | Expansion campaign save pointer | Writes the current window address into a four-byte save slot and restores it in another process. | Retains the slot as four zero bytes on write and ignores it on read. A save can never replace the live window pointer; the 79-byte campaign record is independent of pointer width. |
 | Initial mouse cursor | A newly created configuration starts with the monochrome system cursor, reflecting the original hardware-cursor fallback. | New portable configurations start with the original color cursor artwork. Existing saved preferences remain authoritative. |
 | Campaign table bounds | The enabled-map table indices are reversed after switching campaign sides, and the 13-point campaign track reads the 12-entry enabled-map table at its final point. | Indexes the table as `[campaign side][scenario]` and checks the map-table bound before reading track state. |

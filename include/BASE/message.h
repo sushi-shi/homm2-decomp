@@ -308,4 +308,13 @@ struct tag_message {
     MessageType type;
     tag_messagePayload payload;
 };
+
+inline void SetExecutiveResult(tag_message& message, i32 result) {
+    // The pointer-bearing widget payload can put data.value at a different
+    // offset from executive.result. Transfer the value before changing variants.
+    message.type = MESSAGE_EXECUTIVE;
+    message.payload.executive = {};
+    message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
+    message.payload.executive.result = result;
+}
 #endif

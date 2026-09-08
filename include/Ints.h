@@ -16,8 +16,11 @@ typedef std::int64_t i64;
 typedef std::uint64_t u64;
 
 
-typedef long i32l;
-typedef unsigned long u32l;
+// Preserve the recovered long type on ILP32/LLP64 targets, and its four-byte
+// arithmetic/storage contract on LP64 targets where long is eight bytes.
+using i32l = std::conditional_t<sizeof(long) == 4, long, i32>;
+using u32l = std::conditional_t<sizeof(unsigned long) == 4, unsigned long, u32>;
+static_assert(sizeof(i32l) == 4 && sizeof(u32l) == 4);
 
 
 typedef i32 b32;

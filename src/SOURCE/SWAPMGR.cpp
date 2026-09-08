@@ -734,8 +734,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
     }
 
     if (closeRequested_5 == CLOSE_REQUESTED) {
-        message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = SWAP_COMMAND_EXIT;
+        SetExecutiveResult(message, 0);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

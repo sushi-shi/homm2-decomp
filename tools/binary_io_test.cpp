@@ -1,6 +1,14 @@
 #include <PLATFORM/Binary.h>
+#include <SOURCE/CONFIG_TYPES.h>
 
 #include <array>
+
+// Preferences still use a bounded prefix of this pointer-free packed record.
+// Check the remaining raw layout in every native and cross-width test build.
+static_assert(sizeof(exeGfxConfig) == CONFIG_GRAPHICS_SIZE);
+static_assert(sizeof(configStruct) == CONFIG_STRUCT_SIZE);
+static_assert(offsetof(configStruct, networkDefaultName) == 392);
+static_assert(CONFIG_PERSISTED_SIZE == 413);
 
 constexpr bool RoundTrips() {
     std::array<u8, 8> bytes{};

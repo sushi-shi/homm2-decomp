@@ -100,6 +100,7 @@ The supported builds use Nix:
 
 ```sh
 nix build .#homm2-linux
+nix build .#homm2-linux64
 nix build .#homm2-windows
 nix build .#homm2-web
 ```
@@ -109,8 +110,8 @@ nix build .#homm2-web
 Requirements:
 
 1. CMake 3.20+, Ninja, and pkg-config.
-2. A C++20 compiler with 32-bit support.
-3. 32-bit SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
+2. A C++20 compiler with 32-bit support for the default target.
+3. Matching SDL3, libbz2, and FFmpeg libraries (`libavcodec`, `libavformat`,
    `libavutil`, and `libswresample`).
 
 ```sh
@@ -118,6 +119,10 @@ cmake -S . -B build -G Ninja
 cmake --build build
 HOMM2_DATA=/path/to/heroes2 ./build/homm2
 ```
+
+For the optional x86-64 Linux build, use 64-bit dependencies and add
+`-DHOMM2_32BIT=OFF` when configuring CMake. With Nix, use
+`nix develop .#linux64` or run `HOMM2_DATA=/path/to/heroes2 nix run .#homm2-linux64`.
 
 ## Installation
 
