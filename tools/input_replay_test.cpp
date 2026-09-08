@@ -21,6 +21,13 @@ bool ResolveKey(
     unsigned& physicalCode,
     unsigned& character
 ) {
+    if (name == "Left Shift") {
+        key = platform::Key::Shift;
+        scanCode = 0x2a;
+        physicalCode = 225;
+        character = 0;
+        return true;
+    }
     if (name != "A") {
         return false;
     }
@@ -105,6 +112,22 @@ int main() {
     valid &= Rejects("2 move 1 2\n1 move 1 2\n", 2, "decreasing timestamp");
     valid &= Rejects("0 move 1 2 trailing\n", 1, "trailing mouse field");
     valid &= Rejects("0 key-down A trailing\n", 1, "trailing key field");
+
+    std::istringstream quoted("0 key-down \"Left Shift\"\n1 key-up \"Left Shift\"\n");
+    valid &= Expect(replay.Load(quoted, ResolveKey, error), "quoted SDL key names parse");
+    replay.Start(0);
+    valid &= Expect(replay.NextDue(0, event) && event.key == platform::Key::Shift
+        && event.scanCode == 0x2a, "quoted modifier key resolves");
+    valid &= Expect(replay.NextDue(1, event) && event.type == Event::Type::KeyUp,
+                    "quoted modifier release");
+    valid &= Rejects("0 key-down \"Left Shift\n", 1, "unterminated key quote");
+    valid &= Rejects("0 key-down \"Left Shift\" extra\n", 1, "trailing quoted key field");
+
+    std::istringstream unquoted("0 key-down Left Shift  \n1 key-up Left Shift\n");
+    valid &= Expect(replay.Load(unquoted, ResolveKey, error), "unquoted SDL key names parse");
+    replay.Start(0);
+    valid &= Expect(replay.NextDue(0, event) && event.key == platform::Key::Shift,
+                    "unquoted modifier key resolves");
 
     InputReplay unchanged;
     std::istringstream first("0 move 3 4\n");

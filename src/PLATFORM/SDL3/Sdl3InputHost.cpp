@@ -489,6 +489,8 @@ private:
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP: {
             const bool down = sdlEvent.type == SDL_EVENT_KEY_DOWN;
+            if (down && sdlEvent.key.scancode == SDL_SCANCODE_F4 && sdlEvent.key.repeat)
+                return;
             const SDL_Scancode code = LogicalScanCode(sdlEvent.key);
             event.type = down ? Event::Type::KeyDown : Event::Type::KeyUp;
             event.key = TranslateKey(code);
@@ -539,6 +541,15 @@ private:
             m_input.Push(std::move(event));
             return;
 
+        case SDL_EVENT_WINDOW_EXPOSED:
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+        case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+        case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+            if (m_video.Window() != nullptr
+                && sdlEvent.window.windowID == SDL_GetWindowID(m_video.Window()))
+                m_video.HandleRenderEvent(sdlEvent.type, sdlEvent.window.windowID);
+            return;
+
         case SDL_EVENT_WINDOW_FOCUS_GAINED:
         case SDL_EVENT_WINDOW_FOCUS_LOST:
             if (sdlEvent.type == SDL_EVENT_WINDOW_FOCUS_LOST) {
@@ -567,6 +578,10 @@ private:
                 SDL_GetError()
             );
         }
+        if (!std::isfinite(logicalX) || !std::isfinite(logicalY)
+            || logicalX < -32768.0f || logicalX >= 32768.0f
+            || logicalY < -32768.0f || logicalY >= 32768.0f)
+            return {-1, -1};
         return {
             static_cast<int>(std::floor(logicalX)),
             static_cast<int>(std::floor(logicalY)),
