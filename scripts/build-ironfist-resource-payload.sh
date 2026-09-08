@@ -31,6 +31,7 @@ fi
 source_root=$(realpath "$source_root")
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 resource_builder="${HOMM2_IRONFIST_RESOURCE_BUILDER:-$script_directory/build-ironfist-resources.py}"
+binding_module="${HOMM2_IRONFIST_BINDING_MODULE:-$script_directory/ironfist/binding.lua}"
 
 mkdir -p \
     "$output_root/DATA" \
@@ -78,6 +79,7 @@ while IFS= read -r -d '' filename; do
 done < <(find "$source_root/maps" -mindepth 1 -maxdepth 1 -type f -iname '*.lua' -print0)
 
 cp -R "$source_root/maps/MODULES/." "$output_root/SCRIPTS/MODULES/"
+cp "$binding_module" "$output_root/SCRIPTS/MODULES/binding.lua"
 cp -R "$source_root/maps/GENERIC/." "$output_root/SCRIPTS/GENERIC/"
 
 required_files=(

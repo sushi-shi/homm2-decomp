@@ -53,7 +53,12 @@ victory: the campaign contains six scenarios. Campaign loading validates
 scenario references and rejects malformed definitions before replacing the
 catalog. Existing installations need the rebuilt campaign metadata.
 
-No resource data is committed to this repository. The fetched source and built
+Packaging also installs the maintained `scripts/ironfist/binding.lua` module.
+Object properties are provided by native typed handles; the module exports
+`isValid` for references retained by scripts. The aggregate is unaffected.
+
+No upstream asset data is committed to this repository. The maintained Lua
+binding adapter is engine source. The fetched source and built
 payload do exist in the user's Nix store. They are not included in the game
 package or uploaded anywhere by this repository. The upstream resources retain
 Project Ironfist's terms. The Heroes II retail aggregates are checked for

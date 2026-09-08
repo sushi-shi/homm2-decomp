@@ -37,6 +37,9 @@ public:
     void RemoveStack(army& stack);
     StackIdentity Identity(const army& stack) const;
     army* Resolve(StackIdentity identity) const;
+    bool IsActiveFor(const combatManager* owner) const { return owner && owner_ == owner; }
+    u64 BattleGeneration() const { return owner_ ? battleGeneration_ : 0; }
+    hero* Captain(u64 generation) const;
     AttackApproach Approach(const army& stack) const;
     void SetApproach(army& stack, AttackApproach approach);
 
@@ -74,6 +77,7 @@ private:
     StackIdentity Locate(const army& stack) const;
     combatManager* owner_ = nullptr;
     u64 nextGeneration_ = 0;
+    u64 battleGeneration_ = 0;
     std::array<std::array<StackRecord, COMBAT_ARMY_STORAGE_SLOT_COUNT>, COMBAT_SIDE_COUNT> stacks_{};
     std::vector<FireWall> walls_;
 };

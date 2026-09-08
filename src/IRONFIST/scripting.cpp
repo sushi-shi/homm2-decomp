@@ -15,6 +15,7 @@
 #include <utility>
 
 #include <IRONFIST/dialog.h>
+#include <IRONFIST/deepbinding.h>
 #include <IRONFIST/lua.h>
 #include <IRONFIST/lua_utils.h>
 #include <IRONFIST/paths.h>
@@ -86,6 +87,7 @@ static lua_State* NewScriptState() {
 
     set_lua_globals(ls);
 
+    const LuaStackScope stack(ls);
     if (luaL_dofile(ls, ResolveDataPath("SCRIPTS/MODULES/binding.lua").c_str())) {
         DisplayLuaError(ls);
     }
@@ -165,15 +167,15 @@ void InitializeWithoutMap() {
 void Shutdown() {
     s_mapScript.clear();
     s_scriptingEnabled = false;
-    if (s_mapState != NULL) {
-        lua_close(s_mapState);
-        s_mapState = NULL;
-    }
-
-    if (s_artifactState != NULL) {
-        lua_close(s_artifactState);
-        s_artifactState = NULL;
-    }
+    // Disable hook entry before finalizers run, and invalidate external states'
+    // handles before any game records can be replaced or freed.
+    lua_State* map = std::exchange(s_mapState, nullptr);
+    lua_State* artifacts = std::exchange(s_artifactState, nullptr);
+    InvalidateObjectHandles();
+    if (map)
+        lua_close(map);
+    if (artifacts)
+        lua_close(artifacts);
 }
 
 const std::string& ActiveScriptContents() {
