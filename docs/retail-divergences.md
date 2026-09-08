@@ -111,6 +111,12 @@ including lowercase glyphs. UTF-8 decoding does not change letter case.
 
 ## Replaced subsystem
 
+### Numbered music
+
+Portable playback resolves numbered music through the audio backend for both
+legacy music-source settings. The old MIDI-only availability mask does not
+describe the installed Ogg tracks and is no longer applied to their playback.
+
 ### Network-save compression
 
 Retail uses the recovered legacy Bzip codec through temporary files and exposes
