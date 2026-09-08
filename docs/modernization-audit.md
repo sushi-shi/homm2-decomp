@@ -3,6 +3,10 @@
 Audited revision: `16df440a` (`master` and local `origin/master` at audit start).
 The worktree was clean. The remote tracking reference was not refreshed.
 
+Implementation follow-up: [feature PRs, review order and validation
+evidence](modernization-review.md). The findings below describe the audited
+revision; the follow-up changes remain open for review.
+
 **Yes, master needs further updates.** Its build and platform foundations are
 already modern: C++20, SDL3, FFmpeg, libbz2, UTF-8 localization, a platform
 interface, and reproducible Linux/Windows/Web builds. The strongest reasons for
