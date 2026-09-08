@@ -46,7 +46,7 @@ i32 army::FindPath(
 
     // A human-controlled jumper paths as if the obstacles were not there.
     if (!IsAICombatTurn() && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper)
-        && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]) {
+        && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)) {
         for (i32 hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
             if (gpCombatManager->m_hexCells[hexIndex].m_blocked && !IsCastleWall(hexIndex)) {
                 obstacleHexes.push_back(hexIndex);
