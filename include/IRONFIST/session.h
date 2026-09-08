@@ -6,6 +6,7 @@
 
 #include <IRONFIST/scripting.h>
 #include <IRONFIST/state.h>
+#include <IRONFIST/campaigns.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
 
@@ -47,7 +48,7 @@ struct SessionData {
     bool hasAIArmySharing = false;
     i32 campaignType = 0;
     bool expansionMap = false;
-    std::string campaignMetadata;
+    std::optional<CampaignDefinition> campaignDefinition;
     CalendarPeriodType monthType{};
     i32 monthExtra = 0;
     CalendarPeriodType weekType{};

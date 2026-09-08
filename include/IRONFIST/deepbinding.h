@@ -25,7 +25,7 @@ void PushBinding(lua_State* state, Binding<army*> value);
 void PushBinding(lua_State* state, Binding<playerData*> value);
 void PushBinding(lua_State* state, Binding<hero*> value);
 void PushBinding(lua_State* state, Binding<town*> value);
-void PushBinding(lua_State* state, Binding<SCampaignChoice*> value);
+void PushBinding(lua_State* state, Binding<SCampaignChoice> value);
 
 void* PointerFromLuaClassTable(lua_State* state, i32 stackIndex);
 

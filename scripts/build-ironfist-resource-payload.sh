@@ -51,6 +51,22 @@ fi
 
 cp "$source_root"/data/*.xml "$output_root/DATA/"
 cp "$source_root"/cmp/*.cmp "$output_root/CAMPAIGNS/"
+# The pinned six-map campaign contains an unreachable seventh-victory award.
+# Remove that authored-data error when adapting upstream resources to the
+# validated campaign catalog; do not relax validation for user campaign files.
+python3 - "$output_root/CAMPAIGNS/cyborg.cmp" <<'PY'
+import sys
+import xml.etree.ElementTree as ET
+
+path = sys.argv[1]
+tree = ET.parse(path)
+root = tree.getroot()
+stale = root.find("./award[@index='7'][@value='0']")
+if root.findtext("numMaps") != "6" or stale is None:
+    raise SystemExit("ironfist-payload: pinned Cyborg campaign metadata changed")
+root.remove(stale)
+tree.write(path, encoding="utf-8")
+PY
 cp "$source_root/assets/music/homm2_43.ogg" "$output_root/MUSIC/Track44.ogg"
 
 while IFS= read -r -d '' filename; do

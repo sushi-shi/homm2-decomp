@@ -304,7 +304,7 @@ void ExpCampaign::SetMapWasPlayed(void) {
 void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     m_campaignId = campaignId;
     m_currentMap = MAP_NONE;
-    m_mapCount = ironfist::CampaignMapCounts[H2EnumIndex(campaignId)];
+    m_mapCount = static_cast<i32>(ironfist::Campaigns().At(campaignId).scenarios.size());
     ResetMapChoices();
     ResetMapsPlayed();
     ResetAwards();
@@ -313,7 +313,7 @@ void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
 }
 
 void ExpCampaign::InitMap(void) {
-    SCampaignChoice* bonus =
+    const SCampaignChoice* bonus =
         ironfist::CampaignChoice(m_campaignId, H2EnumIndex(m_currentMap), m_bonusChoices[H2EnumIndex(m_currentMap)]);
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
@@ -331,7 +331,7 @@ void ExpCampaign::InitMap(void) {
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
             gpGame->m_difficulty = GameDifficultyFromOrdinal(
-        ironfist::CampaignDifficulties[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]
+        ironfist::Campaigns().At(m_campaignId).Scenario(H2EnumIndex(m_currentMap)).difficulty
     );
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
@@ -504,7 +504,7 @@ void ExpCampaign::InitMap(void) {
 
     // Custom campaigns can carry heroes between maps.
     i32 saveIdx = 0;
-    for (auto& carried : ironfist::HeroesToLoad[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
+    for (auto& carried : ironfist::Campaigns().At(m_campaignId).Scenario(H2EnumIndex(m_currentMap)).heroesToLoad) {
         ironfist::LoadCampaignSavedHero(carried.first, carried.second, saveIdx);
         saveIdx++;
     }
@@ -526,8 +526,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     i32 mapIndex;
     for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
         trackWidget = new iconWidget(
-            ironfist::CampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].x,
-            ironfist::CampaignTrack[H2EnumIndex(m_campaignId)][mapIndex].y,
+            ironfist::Campaigns().At(m_campaignId).Scenario(mapIndex).track.x,
+            ironfist::Campaigns().At(m_campaignId).Scenario(mapIndex).track.y,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
@@ -618,7 +618,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 }
 
 void ExpCampaign::UpdateInfo(i32 redraw) {
-    SCampaignChoice* choice;
+    const SCampaignChoice* choice;
     tag_message message;
     char armyName[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
     b8 hasVisibleAward;
@@ -655,14 +655,14 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", ironfist::ScenarioNames[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str());
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s", ironfist::Campaigns().At(m_campaignId).Scenario(H2EnumIndex(m_viewMap)).name.c_str());
     m_window->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     utf8::Format(
         gText, GLOBAL_TEXT_BUFFER_SIZE,
         "%s",
-        ironfist::ScenarioDescriptions[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)].c_str()
+        ironfist::Campaigns().At(m_campaignId).Scenario(H2EnumIndex(m_viewMap)).description.c_str()
     );
     m_window->BroadcastMessage(message);
 
@@ -1097,19 +1097,23 @@ void ExpCampaign::ReplaySmacker(void) {
 }
 
 void ExpCampaign::HandleVictoryCustomCampaign(void) {
-    i32 wonMap = H2EnumIndex(m_currentMap) + 1;
-    if (ironfist::VictoryMovies[H2EnumIndex(m_campaignId)].count(wonMap))
-        PlaySmacker(ironfist::VictoryMovies[H2EnumIndex(m_campaignId)][wonMap]);
-    for (i32 opened : ironfist::MapsToComplete[H2EnumIndex(m_campaignId)][wonMap])
+    const auto& transition = ironfist::Campaigns().At(m_campaignId).After(H2EnumIndex(m_currentMap));
+    if (transition.movie)
+        PlaySmacker(*transition.movie);
+    for (i32 opened : transition.unlocks)
         m_mapChoices[opened] = 1;
-    if (ironfist::AwardsToGive[H2EnumIndex(m_campaignId)].count(wonMap))
-        m_awards[ironfist::AwardsToGive[H2EnumIndex(m_campaignId)][wonMap]] = 1;
+    if (transition.award)
+        m_awards[*transition.award] = 1;
 }
 
 void ExpCampaign::ReplaySmackerCustomCampaign(void) {
-    if (H2EnumIndex(m_viewMap) < EXPANSION_CAMPAIGN_MAX_MAP_COUNT
-        && ironfist::ReplayMovies[H2EnumIndex(m_campaignId)].count(H2EnumIndex(m_viewMap)))
-        PlaySmacker(ironfist::ReplayMovies[H2EnumIndex(m_campaignId)][H2EnumIndex(m_viewMap)]);
+    const auto& definition = ironfist::Campaigns().At(m_campaignId);
+    const i32 map = H2EnumIndex(m_viewMap);
+    if (map >= 0 && static_cast<size_t>(map) < definition.scenarios.size()) {
+        const auto movie = definition.Scenario(map).replayMovie;
+        if (movie)
+            PlaySmacker(*movie);
+    }
 }
 
 void ExpCampaign::ReplaySmacker1(void) {
@@ -1330,12 +1334,12 @@ void ExpCampaign::Autosave(void) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s_%d",
-            ironfist::CampaignShortNames[H2EnumIndex(m_campaignId)].c_str(),
+            ironfist::Campaigns().At(m_campaignId).shortName.c_str(),
             H2EnumIndex(m_currentMap) + 1
         );
         i32 saveIdx = 0;
         for (auto& carried :
-             ironfist::HeroesToSave[H2EnumIndex(m_campaignId)][H2EnumIndex(m_currentMap)]) {
+             ironfist::Campaigns().At(m_campaignId).Scenario(H2EnumIndex(m_currentMap)).heroesToSave) {
             ironfist::SaveCampaignHero(carried.first, carried.second, saveIdx);
             saveIdx++;
         }

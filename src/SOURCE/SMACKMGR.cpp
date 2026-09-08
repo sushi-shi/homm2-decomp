@@ -67,8 +67,7 @@ typedef enum SmackManagerConstant {
     CAMPAIGN_BLIT_HEIGHT           = 258,
     VIDEO_SPEED_TEST               = 3,
     VIDEO_OPEN_READ_SLOW_THRESHOLD = 2000,
-    VIDEO_DECOMP_SLOW_THRESHOLD    = 1300,
-    SMACK_OPTION_COUNT             = 75
+    VIDEO_DECOMP_SLOW_THRESHOLD    = 1300
 } SmackManagerConstant;
 
 static i8 bExpansionSmackNum;
