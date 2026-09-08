@@ -421,6 +421,12 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_compile_definitions(homm2_save_records_test PRIVATE __cdecl= __stdcall= __fastcall=)
   add_test(NAME save_records COMMAND homm2_save_records_test)
 
+  add_executable(homm2_riddle_test
+    tools/riddle_test.cpp
+    src/SOURCE/Riddle.cpp
+    src/BASE/Utf8.cpp)
+  target_include_directories(homm2_riddle_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME riddle COMMAND homm2_riddle_test)
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
