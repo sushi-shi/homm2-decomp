@@ -75,6 +75,26 @@ high-level screen blit. This keeps intermediate cursor and sprite composition
 out of the visible SDL frame while preserving the original scrolling source
 rectangle.
 
+## Instrumented native checks
+
+`nix build .#homm2-sanitized` builds the native game and runs CTest with
+AddressSanitizer and UndefinedBehaviorSanitizer. This check is also included in
+`nix flake check`. Sanitizer findings fail the run; address, alignment, and
+integer-undefined-behavior diagnostics are not suppressed.
+
+For a local build, configure a separate build directory:
+
+```sh
+cmake -S . -B build/sanitized -G Ninja \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo -DHOMM2_SANITIZERS=ON
+cmake --build build/sanitized
+ctest --test-dir build/sanitized --output-on-failure
+```
+
+Run the instrumented game with installed resources to check gameplay paths;
+the asset-free CTests do not exercise a complete game. Windows and Web retain
+their own build checks; this option supports native GCC and Clang only.
+
 ## Deterministic input replay
 
 The SDL3 host can replay timestamped framebuffer input without coupling the

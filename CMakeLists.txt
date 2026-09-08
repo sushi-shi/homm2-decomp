@@ -5,6 +5,7 @@ include(CTest)
 
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
+option(HOMM2_SANITIZERS "Instrument native builds with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
@@ -13,6 +14,15 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(HOMM2_SANITIZERS)
+  if(WIN32 OR EMSCRIPTEN OR NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    message(FATAL_ERROR "HOMM2_SANITIZERS requires a native GCC or Clang build")
+  endif()
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer
+    -fno-sanitize-recover=all)
+  add_link_options(-fsanitize=address,undefined)
+endif()
 
 # Retail pointer width and packed layouts are load-bearing, so the game is
 # built 32-bit. On a 64-bit host that means -m32, and a toolchain that cannot
