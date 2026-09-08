@@ -1,10 +1,23 @@
 #include <EDITOR/mapcell.h>
 
-#include <cassert>
-#include <cstddef>
+#include <cstdio>
 #include <cstring>
 
+static_assert(sizeof(mapCell) == 12);
+static_assert(sizeof(mapCellExtra) == 7);
+
+namespace {
+
+bool Expect(bool condition, const char* description) {
+    if (!condition)
+        std::fprintf(stderr, "map cell layout mismatch: %s\n", description);
+    return condition;
+}
+
+}
+
 int main() {
+    bool valid = true;
     mapCell cell;
     std::memset(&cell, 0, sizeof(cell));
     cell.m_animatedObject = 1;
@@ -14,11 +27,10 @@ int main() {
     cell.m_drawOverlayOnTop = 1;
     cell.SetOverlayTileset(TILESET_X_LOC3);
 
-    assert(sizeof(cell) == 12);
-    assert(cell.m_objTypeBits == 0xff);
-    assert(reinterpret_cast<const u8*>(&cell)[6] == 0xff);
-    assert(cell.ObjectTileset() == TILESET_X_LOC3);
-    assert(cell.OverlayTileset() == TILESET_X_LOC3);
+    valid &= Expect(cell.m_objTypeBits == 0xff, "object bits");
+    valid &= Expect(reinterpret_cast<const u8*>(&cell)[6] == 0xff, "overlay byte");
+    valid &= Expect(cell.ObjectTileset() == TILESET_X_LOC3, "object tileset");
+    valid &= Expect(cell.OverlayTileset() == TILESET_X_LOC3, "overlay tileset");
 
     mapCellExtra extra;
     std::memset(&extra, 0, sizeof(extra));
@@ -28,9 +40,9 @@ int main() {
     extra.drawOverlayOnTop = 1;
     extra.SetOverlayTileset(TILESET_X_LOC3);
 
-    assert(sizeof(extra) == 7);
-    assert(reinterpret_cast<const u8*>(&extra)[2] == 0x7f);
-    assert(reinterpret_cast<const u8*>(&extra)[5] == 0xff);
-    assert(extra.ObjectTileset() == TILESET_X_LOC3);
-    assert(extra.OverlayTileset() == TILESET_X_LOC3);
+    valid &= Expect(reinterpret_cast<const u8*>(&extra)[2] == 0x7f, "extra object byte");
+    valid &= Expect(reinterpret_cast<const u8*>(&extra)[5] == 0xff, "extra overlay byte");
+    valid &= Expect(extra.ObjectTileset() == TILESET_X_LOC3, "extra object tileset");
+    valid &= Expect(extra.OverlayTileset() == TILESET_X_LOC3, "extra overlay tileset");
+    return valid ? 0 : 1;
 }
