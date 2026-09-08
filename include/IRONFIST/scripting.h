@@ -31,10 +31,11 @@ struct MapVariable {
 };
 
 void InitializeMap(const std::string& mapFileName);
-void InitializeFromSave(const std::string& script);
+void InitializeFromSave(std::string script);
+void InitializeWithoutMap();
 void Shutdown();
 
-std::string ScriptContents(const std::string& mapName);
+const std::string& ActiveScriptContents();
 
 bool IsTable(MapVariableType type);
 bool IsScalar(MapVariableType type);

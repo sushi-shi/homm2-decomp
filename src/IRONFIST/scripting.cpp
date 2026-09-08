@@ -11,6 +11,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <IRONFIST/dialog.h>
@@ -26,6 +27,7 @@ namespace ironfist::script {
 static bool s_scriptingEnabled = false;
 static lua_State* s_mapState = NULL;
 static lua_State* s_artifactState = NULL;
+static std::string s_mapScript;
 
 lua_State* MapState() {
     return s_mapState;
@@ -110,6 +112,13 @@ static std::string GetScriptFileName(const std::string& mapFileName) {
     return ResolveDataPath("SCRIPTS/" + mapFileName + ".lua");
 }
 
+static std::string ReadScriptContents(const std::string& filename) {
+    std::ifstream in(filename);
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+    return buffer.str();
+}
+
 void InitializeMap(const std::string& mapFileName) {
     Shutdown();
 
@@ -117,6 +126,7 @@ void InitializeMap(const std::string& mapFileName) {
     std::error_code statError;
 
     if (std::filesystem::exists(scriptFile, statError)) {
+        s_mapScript = ReadScriptContents(scriptFile);
         LoadScript(&s_mapState, scriptFile);
         s_scriptingEnabled = true;
     }
@@ -124,11 +134,22 @@ void InitializeMap(const std::string& mapFileName) {
     LoadArtifactsScript();
 }
 
-void InitializeFromSave(const std::string& script) {
+void InitializeFromSave(std::string script) {
     Shutdown();
 
+    s_mapScript = std::move(script);
     s_mapState = NewScriptState();
-    if (luaL_dostring(s_mapState, script.c_str())) {
+    // Match luaL_loadfile's handling of text-file prefixes when restoring
+    // source that originally came from an installed map script.
+    std::string_view source(s_mapScript);
+    if (source.starts_with("\xEF\xBB\xBF"))
+        source.remove_prefix(3);
+    if (source.starts_with('#')) {
+        const size_t newline = source.find('\n');
+        source.remove_prefix(newline == std::string_view::npos ? source.size() : newline);
+    }
+    if (luaL_loadbuffer(s_mapState, source.data(), source.size(), "saved map") != LUA_OK
+        || lua_pcall(s_mapState, 0, 0, 0) != LUA_OK) {
         DisplayLuaError(s_mapState);
     }
     s_scriptingEnabled = true;
@@ -136,11 +157,17 @@ void InitializeFromSave(const std::string& script) {
     LoadArtifactsScript();
 }
 
+void InitializeWithoutMap() {
+    Shutdown();
+    LoadArtifactsScript();
+}
+
 void Shutdown() {
+    s_mapScript.clear();
+    s_scriptingEnabled = false;
     if (s_mapState != NULL) {
         lua_close(s_mapState);
         s_mapState = NULL;
-        s_scriptingEnabled = false;
     }
 
     if (s_artifactState != NULL) {
@@ -149,11 +176,8 @@ void Shutdown() {
     }
 }
 
-std::string ScriptContents(const std::string& mapName) {
-    std::ifstream in(GetScriptFileName(mapName));
-    std::stringstream buffer;
-    buffer << in.rdbuf();
-    return buffer.str();
+const std::string& ActiveScriptContents() {
+    return s_mapScript;
 }
 
 /*****************************   Map variables ***********************************************/
