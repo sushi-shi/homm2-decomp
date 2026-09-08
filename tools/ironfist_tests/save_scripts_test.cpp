@@ -1,3 +1,4 @@
+#include "session_fixture.h"
 #include <IRONFIST/callback.h>
 #include <IRONFIST/paths.h>
 #include <IRONFIST/save_xml.h>
@@ -41,7 +42,7 @@ static void ReadRoot(const char* embedded) {
             root->InsertEndChild(variable);
         }
     }
-    file.ReadRoot(root);
+    DecodeSessionFragment(file, root);
 }
 
 static void CheckSavedSource(const std::string& expected) {
@@ -50,7 +51,7 @@ static void CheckSavedSource(const std::string& expected) {
     const auto path = platform::Files().Resolve("GAMES/test.GX1", platform::FileMode::Write);
     std::filesystem::create_directories(std::filesystem::path(path).parent_path());
     save::XmlFile output;
-    assert(output.Save("GAMES/test.GX1") == tinyxml2::XML_SUCCESS);
+    assert(output.Save("GAMES/test.GX1", ironfist::runtime::CaptureSession()) == tinyxml2::XML_SUCCESS);
     const auto* node = output.tempDoc->RootElement()->FirstChildElement("script");
     if (expected.empty())
         assert(node == nullptr);
@@ -107,7 +108,8 @@ int main() {
     for (const auto* contents : {"", "binary"}) {
         script::InitializeFromSave(oldMap);
         WriteFile(platform::Files().Resolve("GAMES/retail.GM1", platform::FileMode::Write), contents);
-        assert(!save::LoadGame("retail.GM1", 1));
+        assert(runtime::LoadGame("retail.GM1", 1) == runtime::LoadResult::Retail);
+        runtime::RetailGameLoaded();
         assert(script::MapState() == nullptr);
         assert(script::InvokeResult<std::string>("OnNewDay") == "artifact");
         CheckSavedSource("");
