@@ -29,11 +29,27 @@ const CANVAS_H: i32 = 24;
 const CLIP_MODE_CLIP: i32 = 1;
 
 unsafe extern "C" {
+    fn h2cxx_validate_icon(body: *const u8, size: usize, count: i32) -> i32;
+    fn h2cxx_retail_variant(
+        body: *mut u8,
+        size: usize,
+        count: i32,
+        frame: i32,
+        pixels: *mut u8,
+        width: i32,
+        height: i32,
+        variant: i32,
+        geometry: *const i32,
+        table: *mut u8,
+        shear: *mut i8,
+    );
     fn h2cxx_set_dim_palettes(flat: *const u8);
     fn h2cxx_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -46,8 +62,10 @@ unsafe extern "C" {
     );
     fn h2cxx_flip_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -60,8 +78,10 @@ unsafe extern "C" {
     );
     fn h2cxx_icon_to_bitmap_color_table(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -76,8 +96,10 @@ unsafe extern "C" {
     );
     fn h2cxx_flip_icon_to_bitmap_color_table(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -91,8 +113,10 @@ unsafe extern "C" {
     );
     fn h2cxx_icon_to_bitmap_y_modify(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -106,8 +130,10 @@ unsafe extern "C" {
     );
     fn h2cxx_flip_icon_to_bitmap_y_modify(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -121,8 +147,10 @@ unsafe extern "C" {
     );
     fn h2cxx_mono_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -135,8 +163,10 @@ unsafe extern "C" {
     );
     fn h2cxx_flip_mono_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -149,8 +179,10 @@ unsafe extern "C" {
     );
     fn h2cxx_dim_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -163,8 +195,10 @@ unsafe extern "C" {
     );
     fn h2cxx_flip_dim_icon_to_bitmap(
         body: *mut u8,
+        body_size: usize,
         pixels: *mut u8,
         width: i32,
+        height: i32,
         x: i32,
         y: i32,
         frame: i32,
@@ -175,6 +209,137 @@ unsafe extern "C" {
         clip_w: i32,
         clip_h: i32,
     );
+}
+
+fn retail_color_variant<'a>(
+    variant: i32,
+    palettes: DimPalettes<'a>,
+    table: &'a [u8; 256],
+    shear: &'a [i8],
+) -> homm2_icon::ColorBlit<'a> {
+    match variant {
+        0 => retail::icon_to_bitmap(palettes, 7),
+        1 => retail::flip_icon_to_bitmap(palettes, 7),
+        2 => retail::icon_to_bitmap_color_table(table, palettes, 7, true),
+        3 => retail::flip_icon_to_bitmap_color_table(table, palettes, 7),
+        4 => retail::icon_to_bitmap_y_modify(palettes, 7, shear),
+        _ => retail::flip_icon_to_bitmap_y_modify(palettes, 7, shear),
+    }
+}
+
+fn retail_mask_variant(variant: i32, palettes: DimPalettes<'_>) -> homm2_icon::MaskBlit<'_> {
+    match variant {
+        6 => retail::mono_icon_to_bitmap(7),
+        7 => retail::flip_mono_icon_to_bitmap(7),
+        8 => retail::dim_icon_to_bitmap(palettes, 3),
+        _ => retail::flip_dim_icon_to_bitmap(palettes, 3),
+    }
+}
+
+/// Explicit retail check: assets stay outside the repository and Nix builds.
+#[test]
+#[ignore = "set HOMM2_RETAIL_AGG to installed AGG paths, then run with --ignored"]
+fn retail_frames_agree() {
+    let paths = std::env::var_os("HOMM2_RETAIL_AGG").expect("HOMM2_RETAIL_AGG is required");
+    let mut flat = palettes_flat();
+    unsafe { h2cxx_set_dim_palettes(flat.as_ptr()) };
+    // The shim's adjacent lighten/no-cycle tables are zero-filled. Repeat the
+    // latter for levels 14 and 15, matching the production fallback selector.
+    flat.resize(16 * PALETTE_LEN, 0);
+    let palettes = DimPalettes::new(&flat);
+    let table = std::array::from_fn(|index| (index as u8).wrapping_mul(3));
+    let mut frames = 0usize;
+    let mut comparisons = 0usize;
+    for path in std::env::split_paths(&paths) {
+        let bytes = std::fs::read(&path).expect("read installed archive");
+        let archive = homm2_icon::agg::Archive::parse(&bytes).expect("parse archive");
+        for entry in archive.icons() {
+            let icon = Icon::parse(archive.payload(&entry).expect("member bounds")).expect("ICN");
+            assert_eq!(
+                unsafe {
+                    h2cxx_validate_icon(
+                        icon.body().as_ptr(),
+                        icon.body().len(),
+                        icon.frame_count() as i32,
+                    )
+                },
+                1,
+                "production loader rejected {:?}",
+                entry.name_str()
+            );
+            for index in 0..icon.frame_count() {
+                let frame = icon.frame_data(index).expect("frame stream");
+                let header = frame.header();
+                let width = i32::from(header.width) + 20;
+                let height = i32::from(header.height) + 20;
+                assert!(width <= i32::from(i16::MAX) && height <= i32::from(i16::MAX));
+                let clip = if index % 2 == 0 {
+                    Rect::new(0, 0, width, height)
+                } else {
+                    Rect::new(10, 10, width - 20, height - 20)
+                };
+                let shear: Vec<i8> = (0..height)
+                    .map(|row| {
+                        if row % 11 == 0 {
+                            127
+                        } else {
+                            (row % 7 - 3) as i8
+                        }
+                    })
+                    .collect();
+                let variants = if header.kind == 32 { 6..10 } else { 0..6 };
+                for variant in variants {
+                    let x = if variant % 2 == 0 {
+                        8 - i32::from(header.offset_x)
+                    } else {
+                        i32::from(header.width) + 8 + i32::from(header.offset_x)
+                    };
+                    let y = 8 - i32::from(header.offset_y);
+                    let mut cxx: Vec<u8> = (0..width * height).map(|pixel| pixel as u8).collect();
+                    let mut rust = cxx.clone();
+                    let geometry = [x, y, clip.x, clip.y, clip.width, clip.height];
+                    unsafe {
+                        h2cxx_retail_variant(
+                            icon.body().as_ptr().cast_mut(),
+                            icon.body().len(),
+                            icon.frame_count() as i32,
+                            index as i32,
+                            cxx.as_mut_ptr(),
+                            width,
+                            height,
+                            variant,
+                            geometry.as_ptr(),
+                            table.as_ptr().cast_mut(),
+                            shear.as_ptr().cast_mut(),
+                        );
+                    }
+                    let mut canvas = Canvas::new(width, height, &mut rust).expect("surface");
+                    if variant < 6 {
+                        let blit = retail_color_variant(variant, palettes, &table, &shear);
+                        blit.clip(clip)
+                            .quirks(Quirks::retail())
+                            .draw(&mut canvas, frame, x, y)
+                            .expect("colour frame");
+                    } else {
+                        let blit = retail_mask_variant(variant, palettes);
+                        blit.clip(clip)
+                            .quirks(Quirks::retail())
+                            .draw(&mut canvas, frame, x, y)
+                            .expect("mask frame");
+                    }
+                    assert!(
+                        cxx == rust,
+                        "retail pixels differ: {:?}, frame {index}, variant {variant}",
+                        entry.name_str()
+                    );
+                    comparisons += 1;
+                }
+                frames += 1;
+            }
+        }
+    }
+    assert!(frames > 0, "no retail ICN frames were exercised");
+    eprintln!("retail frames: {frames}; whole-surface comparisons: {comparisons}");
 }
 
 /// Small deterministic generator so failures replay from a seed.
@@ -434,8 +599,10 @@ fn color_pair_agrees() {
             if mirrored {
                 h2cxx_flip_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -449,8 +616,10 @@ fn color_pair_agrees() {
             } else {
                 h2cxx_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -500,8 +669,10 @@ fn color_table_pair_agrees() {
             if mirrored {
                 h2cxx_flip_icon_to_bitmap_color_table(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -516,8 +687,10 @@ fn color_table_pair_agrees() {
             } else {
                 h2cxx_icon_to_bitmap_color_table(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -574,8 +747,10 @@ fn y_modify_pair_agrees() {
             if mirrored {
                 h2cxx_flip_icon_to_bitmap_y_modify(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -590,8 +765,10 @@ fn y_modify_pair_agrees() {
             } else {
                 h2cxx_icon_to_bitmap_y_modify(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -640,8 +817,10 @@ fn mask_pair_agrees() {
             match (dim, mirrored) {
                 (false, false) => h2cxx_mono_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -654,8 +833,10 @@ fn mask_pair_agrees() {
                 ),
                 (false, true) => h2cxx_flip_mono_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -668,8 +849,10 @@ fn mask_pair_agrees() {
                 ),
                 (true, false) => h2cxx_dim_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,
@@ -682,8 +865,10 @@ fn mask_pair_agrees() {
                 ),
                 (true, true) => h2cxx_flip_dim_icon_to_bitmap(
                     case.body.as_ptr().cast_mut(),
+                    case.body.len(),
                     cxx.as_mut_ptr(),
                     CANVAS_W,
+                    CANVAS_H,
                     case.x,
                     case.y,
                     0,

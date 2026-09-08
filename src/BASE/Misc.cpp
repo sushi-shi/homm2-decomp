@@ -1012,6 +1012,12 @@ i32l FileSize(const char* filename) {
 }
 
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
+    if (iconPtr == nullptr || iconPtr->m_data == nullptr || index < 0
+        || index >= iconPtr->m_frameCount
+        || static_cast<std::size_t>(iconPtr->m_frameCount) > iconPtr->m_dataSize / sizeof(IconEntry)) {
+        ShutDown("Invalid ICN frame index.");
+        return nullptr;
+    }
     return reinterpret_cast<struct IconEntry*>(index * sizeof(IconEntry) + iconPtr->m_data);
 }
 i32 SRandom(i32 low, i32 high) {

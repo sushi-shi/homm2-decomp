@@ -331,6 +331,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_libraries(homm2_agg_directory_test PRIVATE homm2_platform)
   add_test(NAME agg_directory COMMAND homm2_agg_directory_test)
 
+  add_executable(homm2_image_decode_test
+    tools/image_decode_test.cpp tools/image_test_support.cpp src/BASE/ImageDecode.cpp
+    src/BASE/Icon2b.cpp src/BASE/Iconf2b.cpp src/BASE/icon2bc.cpp src/BASE/iconf2bc.cpp
+    src/BASE/icon2by.cpp src/BASE/iconf2by.cpp src/BASE/Iconm2b.cpp src/BASE/Iconmf2b.cpp
+    src/BASE/Icond2b.cpp src/BASE/Icondf2b.cpp src/BASE/icon2bs.cpp)
+  target_include_directories(homm2_image_decode_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME image_decode COMMAND homm2_image_decode_test)
+
   add_executable(homm2_localization_encoding_test
     tools/localization_encoding_test.cpp
     src/BASE/Utf8.cpp
