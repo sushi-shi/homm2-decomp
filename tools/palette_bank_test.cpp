@@ -20,9 +20,15 @@ bool Expect(u8* actual, u8* expected, const char* description) {
 
 int main() {
     bool valid = true;
-    valid &= Expect(GetDimPaletteTable(0), &uDimPal[0][0][0], "first dim table");
-    valid &= Expect(GetDimPaletteTable(11), &uDimPal[2][3][0], "last dim table");
+    u32 table = 0;
+    for (auto& set : uDimPal) {
+        for (auto& level : set) {
+            valid &= Expect(GetDimPaletteTable(table++), level, "dim table");
+        }
+    }
     valid &= Expect(GetDimPaletteTable(12), gColorTableLighten, "lighten table");
     valid &= Expect(GetDimPaletteTable(13), gColorTableNoCycle, "no-cycle table");
+    valid &= Expect(GetDimPaletteTable(14), gColorTableNoCycle, "reserved level 14 fallback");
+    valid &= Expect(GetDimPaletteTable(15), gColorTableNoCycle, "reserved level 15 fallback");
     return valid ? 0 : 1;
 }
