@@ -208,6 +208,11 @@
         '';
       };
 
+      homm2-sanitized = homm2-check.overrideAttrs (previous: {
+        pname = "homm2-sanitized";
+        cmakeFlags = previous.cmakeFlags ++ [ "-DHOMM2_SANITIZERS=ON" ];
+      });
+
       icon-check = pkgs.stdenv.mkDerivation {
         pname = "homm2-icon-check";
         version = "0.1.0";
@@ -389,6 +394,7 @@
           homm2-debug
           homm2-linux64
           homm2-arm64-check
+          homm2-sanitized
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -400,6 +406,7 @@
         native = homm2-check;
         linux64 = homm2-linux64-check;
         arm64 = homm2-arm64-check;
+        sanitized = homm2-sanitized;
         windows = windows;
         web = homm2-web;
         icon = icon-check;

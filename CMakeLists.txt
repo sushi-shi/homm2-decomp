@@ -5,6 +5,7 @@ include(CTest)
 
 option(HOMM2_32BIT "Build for a 32-bit target" ON)
 option(HOMM2_PLATFORM_WARNINGS_AS_ERRORS "Treat portable platform warnings as errors" OFF)
+option(HOMM2_SANITIZERS "Instrument native builds with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 set(HOMM2_PLATFORM "SDL3" CACHE STRING "Platform implementation")
 set(HOMM2_FFMPEG_ROOT "" CACHE PATH "FFmpeg installation")
 set(HOMM2_BZIP2_ROOT "" CACHE PATH "libbz2 installation")
@@ -25,6 +26,15 @@ endif()
 
 # Keep the established 32-bit default. The opt-in 64-bit Linux target disables
 # this option and uses libraries matching the compiler's native pointer width.
+if(HOMM2_SANITIZERS)
+  if(WIN32 OR EMSCRIPTEN OR NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    message(FATAL_ERROR "HOMM2_SANITIZERS requires a native GCC or Clang build")
+  endif()
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer
+    -fno-sanitize-recover=all)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+
 if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
   add_compile_options(-m32)
   add_link_options(-m32)
