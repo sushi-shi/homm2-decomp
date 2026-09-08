@@ -437,6 +437,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_libraries(homm2_file_transaction_test PRIVATE homm2_platform)
   add_test(NAME file_transaction COMMAND homm2_file_transaction_test)
 
+  add_executable(homm2_high_score_io_test tools/high_score_io_test.cpp src/SOURCE/HighScoreIO.cpp)
+  target_include_directories(homm2_high_score_io_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_high_score_io_test PRIVATE homm2_platform)
+  add_test(NAME high_score_io COMMAND homm2_high_score_io_test)
   add_executable(homm2_platform_primitives_test tools/platform_primitives_test.cpp)
   target_include_directories(homm2_platform_primitives_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include
