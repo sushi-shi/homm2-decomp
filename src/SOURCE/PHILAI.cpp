@@ -1268,7 +1268,7 @@ void philAI::DoAI(i32 player) {
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE
         );
-        LogStr(gpCurAIHero->m_name);
+        LogStr(gpCurAIHero->m_name.c_str());
         LogStr("\n");
         CheckReload();
         CheckBerserk();

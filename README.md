@@ -155,6 +155,23 @@ On Linux and Web, installed game data may be read-only. Preferences, saves,
 high scores, and network exchange files are stored under the user data root.
 Windows retains the original writable game-directory behavior.
 
+Saved games use the portable `.h2s` format. Hero, town, and player names are
+owned UTF-8 strings and retain their full text across saves. Scenario and both
+campaign modes share one extension; the file records the game mode and player
+slots. Retail saves can be converted with the separately packaged importer:
+
+```sh
+nix build
+result/bin/homm2-import-save --encoding windows-1251 old.GX2 imported.h2s
+```
+
+Choose `windows-1251` for Russian saves, `windows-1252` for Western European
+saves, or `utf-8` for saves written with that encoding. Put the result in the
+user data root's `GAMES` directory. The importer preserves the original and
+refuses to overwrite an existing output. The game reads and writes `.h2s`
+files; retail editions cannot read them. See [Save format](docs/save-format.md)
+for the format and migration limits.
+
 ### Linux
 
 After setting `HOMM2_DATA`, run:

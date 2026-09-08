@@ -846,7 +846,24 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
 }
 
 void game::InitEntireCampaign(CampaignSide side) {
-    memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
+    m_campaignType = CAMPAIGN_ROLAND;
+    m_campaignStartingSide = CAMPAIGN_ROLAND;
+    m_campaignScenario = 0;
+    for (i32 sideIndex = 0; sideIndex < H2EnumIndex(CAMPAIGN_SIDE_COUNT); ++sideIndex) {
+        for (i32 mapIndex = 0; mapIndex < CAMPAIGN_MAP_COUNT; ++mapIndex) {
+            m_campaignScenarioCompleted[sideIndex][mapIndex] = 0;
+            m_campaignScenarioBonus[sideIndex][mapIndex] = 0;
+            m_campaignScenarioDays[sideIndex][mapIndex] = 0;
+            m_campaignChoice[sideIndex][mapIndex] = 0;
+            m_campaignMapEnabled[sideIndex][mapIndex] = 0;
+        }
+    }
+    for (auto& award : m_campaignAwards) award = 0;
+    for (auto& creature : m_campaignCarryoverCreatureTypes) creature = CREATURE_PEASANT;
+    for (auto& count : m_campaignCarryoverCreatureCounts) count = 0;
+    m_campaignScore = 0;
+    m_campaignScenarioWon = 0;
+    m_campaignCheated = 0;
     m_campaignType = side;
     m_campaignStartingSide = side;
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
@@ -883,7 +900,7 @@ void game::InitCampaignMap(void) {
     }
 
     gpGame->m_campaignScenarioWon = 0;
-    memset(m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
+    ResetPlayerSetup();
 
     std::string mapFilename = "CAMP";
     if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO
@@ -900,17 +917,13 @@ void game::InitCampaignMap(void) {
         mapFilename += std::to_string(scenarioNumber);
     }
     mapFilename += ".H2C";
-    if (mapFilename.size() >= sizeof(m_mapFilename)) {
-        ShutDown("Campaign map filename is too long.");
-        return;
-    }
-    memcpy(m_mapFilename, mapFilename.c_str(), mapFilename.size() + 1);
+    m_mapFilename = std::move(mapFilename);
     m_newGameInitialized = false;
     if (m_campaignScenario == 0)
         m_campaignScore = 0;
-    strcpy(gMapName, m_mapFilename);
-    GetMapHeader(m_mapFilename, &m_mapHeader);
-    LoadGame("origdata.bin", 1, 0);
+    utf8::Copy(gMapName, sizeof(gMapName), m_mapFilename);
+    GetMapHeader(m_mapFilename.c_str(), &m_mapHeader);
+    SetupOrigData();
     InitNewGame(NULL);
 
     if (choiceBest1->type == CAMPAIGN_CHOICE_ALIGNMENT) {

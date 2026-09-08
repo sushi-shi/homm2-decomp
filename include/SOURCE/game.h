@@ -58,16 +58,8 @@ struct boatRecord {
 #pragma pack(pop)
 
 typedef enum GameStateStorageConstant {
-    GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
-    GAME_SAVE_NAME_SIZE                  = 0x15f,
-    GAME_MAP_FILENAME_SIZE               = 13,
-    GAME_SETUP_STATE_PAD_SIZE            = 0x12,
     GAME_DAILY_EVENT_FLAG_COUNT          = GAME_TOWN_COUNT / 8,
     GAME_OBELISK_VISITOR_COUNT           = 48,
-    GAME_DEFAULT_PLAYER_NAME_SIZE        = 4,
-    GAME_DEFAULT_PLAYER_NAMES_SIZE       = GAME_PLAYER_COUNT * GAME_DEFAULT_PLAYER_NAME_SIZE,
-    GAME_RUNTIME_PAD_SIZE                = 0xc,
-    GAME_RUMOUR_TEXT_SIZE                = 0x12d,
     GAME_RUMOUR_EVENT_CAPACITY           = 30,
     GAME_TIME_EVENT_CAPACITY             = 50,
     GAME_MAP_EVENT_CAPACITY              = 50,
@@ -76,7 +68,6 @@ typedef enum GameStateStorageConstant {
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
 } GameStateStorageConstant;
 
-#pragma pack(push, 1)
 class game {
 public:
     i16 m_difficultyRating;
@@ -86,7 +77,6 @@ public:
     u8 m_campaignScenarioCompleted[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioBonus[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioDays[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    char m_unknown7d;
     u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
     u8 m_campaignChoice[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
@@ -95,20 +85,18 @@ public:
     i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
-    char _pad_0xd2[GAME_CAMPAIGN_STATE_PAD_SIZE];
-    char m_saveName[GAME_SAVE_NAME_SIZE];
+    std::string m_saveName;
     SMapHeader m_mapHeader;
     i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
     H2SteppedEnumStorage<PlayerHandicap, i8> m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
     H2SteppedEnumStorage<FactionType, i8> m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
     H2EnumStorage<GameDifficulty, i8> m_difficulty;
-    char m_mapFilename[GAME_MAP_FILENAME_SIZE];
+    std::string m_mapFilename;
     i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
     b8 m_newGameInitialized;
     i8 m_newGameHumanCount;
-    char _pad_0x47c[GAME_SETUP_STATE_PAD_SIZE];
     i8 m_playerCount;
     i8 m_deadPlayerCount;
     i8 m_playerDead[H2EnumIndex(GAME_PLAYER_COUNT)];
@@ -135,15 +123,13 @@ public:
     boatRecord m_boats[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_boatSlots[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
-    char m_defaultPlayerNames[GAME_DEFAULT_PLAYER_NAMES_SIZE];
+    std::array<std::string, GAME_PLAYER_COUNT> m_playerSystemIds;
     i8 m_ultimateArtifactX;
     i8 m_ultimateArtifactY;
     H2EnumStorage<ArtifactType, i8> m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
-    char m_pad_0x639c;
     u8 m_cheated;
-    char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
-    char m_rumour[GAME_RUMOUR_TEXT_SIZE];
+    std::string m_rumour;
     u16 m_rumourEventCount;
     u16 m_rumourEventIndices[GAME_RUMOUR_EVENT_CAPACITY];
     u16 m_timeEventCount;
@@ -208,9 +194,10 @@ public:
         return m_players[player].m_color;
     }
     i32 GetMineId(i32, i32);
-    i32 SaveGame(const char*, i32, i8);
+    i32 SaveGame(const char*, i32);
     void SetupOrigData(void);
-    void LoadGame(const char*, i32, i32);
+    bool LoadGame(const char*, i32 humanPlayers = -1);
+    void ResetPlayerSetup(void);
     void GiveTroopsToNeutralTown(i32);
     void GiveTroopsToNeutralTowns(void);
     void NewMap(const char*);
@@ -323,7 +310,6 @@ public:
     void GetVictoryConditionText(char*);
     i32 GetSideDesc(char*, i32, i32);
 };
-#pragma pack(pop)
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;

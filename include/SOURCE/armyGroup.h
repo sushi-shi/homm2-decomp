@@ -25,7 +25,6 @@ enum class ArmyGroupAlignmentResult : i32 {
 };
 using enum ArmyGroupAlignmentResult;
 
-#pragma pack(push, 1)
 class armyGroup {
 public:
     union {
@@ -37,7 +36,9 @@ public:
         u16 m_troopCounts[ARMY_GROUP_SLOT_COUNT];
         i16 m_quantities[ARMY_GROUP_SLOT_COUNT];
     };
-    armyGroup(void);
+    armyGroup(void) : m_creatureCounts{} {
+        for (auto& type : m_creatureTypes) type = CREATURE_NONE;
+    }
     void View(i32);
     i32 HasAllUndead(void);
     i32 HasSomeUndead(void);
@@ -51,5 +52,4 @@ public:
     void Swap(i32, class armyGroup*, i32);
     void DamageGroup(float);
 };
-#pragma pack(pop)
 #endif

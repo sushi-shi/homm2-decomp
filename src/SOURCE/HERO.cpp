@@ -175,7 +175,6 @@ enum class HeroScreenText : i32 {
 using enum HeroScreenText;
 
 typedef enum HeroMobilityConstant {
-    BASE_RECORD_SIZE = 0xec,
     LAND_SPEED_COUNT = 8,
     SLOWEST_LAND_SPEED = LAND_SPEED_COUNT - 1,
     SEA_BASE_MOBILITY = 1500,
@@ -195,46 +194,19 @@ typedef enum HeroImplementationConstant {
     PYRAMID_LUCK_PENALTY = 2
 } HeroImplementationConstant;
 
-hero::hero(void) {
+hero::hero(void) : HeroState{} {
     m_id = 0;
     m_owner = 0;
     m_x = 0;
     m_y = 0;
     m_cursorType = FACTION_KNIGHT;
     m_portrait = 0;
-    m_name[0] = 0;
+    m_name.clear();
     heroWin = NULL;
     giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
 }
 
-void hero::Read(i32 file, i8 expansion) {
-    const bool complete = expansion ? platform::FileReadExact(file, this, sizeof(hero))
-                                    : platform::FileReadExact(file, this, BASE_RECORD_SIZE);
-    if (!complete)
-        ShutDown(localization::Tr("system.file.read_error"));
-    const std::string name = localization::DecodeExternalText(m_name);
-    utf8::Copy(m_name, sizeof(m_name), name.c_str());
-}
 
-void hero::Write(i32 file, i8 expansion) {
-    hero serialized = *this;
-    if (!localization::EncodeText(
-            m_name,
-            localization::CurrentFileTextEncoding(),
-            serialized.m_name,
-            sizeof(serialized.m_name)
-        )) {
-        platform::Host().Log(
-            platform::LogLevel::Warning,
-            "save: hero name was truncated or is not representable in the legacy file encoding"
-        );
-    }
-    const bool complete = expansion
-        ? platform::FileWriteExact(file, &serialized, sizeof(hero))
-        : platform::FileWriteExact(file, &serialized, BASE_RECORD_SIZE);
-    if (!complete)
-        ShutDown(localization::Tr("system.file.write_error"));
-}
 
 void hero::GetArmyStrengths(u32l* const) {}
 

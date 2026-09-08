@@ -5,6 +5,8 @@
 #include <SOURCE/CONFIG_TYPES.h>
 #include <SOURCE/REMOTE_TYPES.h>
 #include <Ints.h>
+#include <array>
+#include <string>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/combatTypes.h>
 #include <SOURCE/dimPalette.h>
@@ -98,7 +100,7 @@ typedef enum GlobalConstant {
     GLOBAL_BOTTOM_VIEW_TEXT_SIZE            = 0x98,
     GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE         = 92,
     GLOBAL_SHORT_MAP_NAME_SIZE              = 16,
-    GLOBAL_PLAYER_NAME_SIZE                 = 21,
+    GLOBAL_PLAYER_NAME_SIZE                 = 256,
     GLOBAL_WINDOW_TEXT_SIZE                 = 0x12c,
     GLOBAL_TEXT_BUFFER_SIZE                 = 768
 } GlobalConstant;
@@ -595,7 +597,7 @@ extern u32l gTimeMark;
 extern char* EXPANSION_AGGREGATE_NAME;
 extern b8 xNetHasOldPlayers;
 extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
-extern char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
+extern std::array<std::string, X_GLOBAL_PLAYER_COUNT> cPlayerNames;
 extern class icon* gCurLoadedSpellIcon;
 extern u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];

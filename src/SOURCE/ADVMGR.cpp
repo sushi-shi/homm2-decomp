@@ -7420,43 +7420,19 @@ void advManager::CastSpell(SpellType spell) {
 
 i32 SaveGame(void) {
     i32 ok = 0;
-    i32 nPlayers = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer(
         "advmice.mse",
         SAVE_POINTER_FRAME,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    i32 i;
-    for (i = 0; i < SAVE_PLAYER_COUNT; ++i) {
-        if (!gpGame->m_playerDead[i] && gbHumanPlayer[i]) {
-            ++nPlayers;
-        }
-    }
-
-    char suffix[SAVE_EXTENSION_SIZE];
-    char pattern[SAVE_PATTERN_SIZE];
-    if (gbInCampaign) {
-        utf8::Format(suffix, ".GMC");
-        utf8::Format(pattern, "*.GMC");
-    } else if (xIsPlayingExpansionCampaign) {
-        utf8::Format(suffix, ".GXC");
-        utf8::Format(pattern, "*.GXC");
-    } else if (xIsExpansionMap) {
-        utf8::Format(suffix, ".GX%d", nPlayers);
-        utf8::Format(pattern, "*.GX%d", nPlayers);
-    } else {
-        utf8::Format(suffix, ".GM%d", nPlayers);
-        utf8::Format(pattern, "*.GM%d", nPlayers);
-    }
-
     fileRequester* req = new fileRequester(
         SAVE_REQUESTER_X,
         SAVE_REQUESTER_Y,
         FILE_REQUESTER_SAVE_GAME,
-        pattern,
+        "*.h2s",
         gcGamePath,
-        suffix
+        ".h2s"
     );
     if (req == NULL) {
         MemError();
@@ -7465,7 +7441,7 @@ i32 SaveGame(void) {
     if (status == FILE_REQUESTER_OK) {
         ok = 1;
         bFreshSave = true;
-        ok = gpGame->SaveGame(gLastFilename, 0, 0);
+        ok = gpGame->SaveGame(gLastFilename, 0);
         if (ok) {
             NormalDialog(
                 localization::Tr("save.success")
@@ -9210,7 +9186,7 @@ void advManager::LoadRemote(void) {
         );
     }
 
-    gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
+    if (!gpGame->LoadGame(gConfig.rmtRCName)) ShutDown(NULL);
     if ((gpGame->m_day != 1 || (gpGame->m_week == 1 && gpGame->m_month == 1)) && gbRemoteOn
         && gbThisNetHumanPlayer[giCurPlayer]) {
         gSoundBackendsReady = 1;

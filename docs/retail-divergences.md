@@ -75,6 +75,23 @@ bypasses of the shared low-level conversion.
 
 ## Replaced subsystem
 
+### Runtime names and saved games
+
+Retail hero and town names occupy thirteen-byte object fields. Decoding a
+valid Windows-1251 name into UTF-8 can exceed that storage and truncate the
+name. The portable runtime owns those names, player names, rumours and save/map
+filenames with `std::string`. Typed copies replace raw object copies, and the
+native `.h2s` codec serializes explicit fields independently of compiler packing
+or pointer size. A separate importer handles the old base and Gold save
+layouts. The game has no legacy save reader or writer. See
+[Save format](save-format.md) for migration and format details.
+
+Combat transfers use the same explicit UTF-8 state encoding in bounded
+fragments. The TCP setup handshake requires portable protocol version 1;
+retail and older portable peers are rejected before game exchange. Codec,
+fragmentation and handshake helpers have tests; live multiplayer sessions are
+not part of the automated verification.
+
 ### Network-save compression
 
 Retail uses the recovered legacy Bzip codec through temporary files and exposes
@@ -84,6 +101,7 @@ source and destination capacities, compression uses the documented worst-case
 bound, and failures do not continue with an indeterminate length.
 
 The resulting compressed stream is a standard bzip2 stream and is not promised
-to be wire-compatible with the retail network-save protocol. Network transports
-are not currently supported by the portable platform. The exact reconstruction
+to be wire-compatible with the retail network-save protocol. The recovered
+TCP/IP path uses UDP sockets; the serial, NetBIOS and DirectPlay platform
+transports remain stubs. The exact reconstruction
 and generated retail-source branches retain the original codec and format.

@@ -1030,6 +1030,7 @@ HOMM2_MESSAGE("network.tcp.host_address.invalid", "Invalid IP address; please tr
 HOMM2_MESSAGE("network.tcp.host.searching", "Searching for host.")
 HOMM2_MESSAGE("network.tcp.send_command_error", "TCP/IP error during 'sendto()': %d")
 HOMM2_MESSAGE("network.tcp.send_error", "Error sending: %d")
+HOMM2_MESSAGE("network.tcp.incompatible_version", "All players must use the same portable game version.")
 HOMM2_MESSAGE(
     "network.tcp.host.rejected",
     "The host already has a game in progress and is not accepting new players."

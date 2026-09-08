@@ -2,6 +2,8 @@
 #define HOMM2_SOURCE_HERO_H
 
 #include <Ints.h>
+#include <string>
+#include <utility>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
 
@@ -59,10 +61,8 @@ typedef enum HeroConstant {
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
     HERO_MAP_CELL_PRESENT                     = 0x40,
-    HERO_NAME_SIZE                            = 13,
     HERO_PRIMARY_STAT_COUNT                   = 4,
     HERO_ARTIFACT_SLOT_COUNT                  = 14,
-    HERO_RUNTIME_ALIGNMENT_SIZE               = 1,
     HERO_STARTING_STAT_COUNT                  = 5,
     HERO_AVAILABLE_SLOT_COUNT                 = 2,
     HERO_AVAILABILITY_UNAVAILABLE             = -1,
@@ -129,9 +129,8 @@ enum class HeroEventFlag : u32 {
 using enum HeroEventFlag;
 ENABLE_ENUM_FLAGS(HeroEventFlag)
 
-#pragma pack(push, 1)
-class hero {
-public:
+// Runtime state is independent of the native save encoding.
+struct HeroState {
     i16 m_spellPoints;
     u8 m_id;
     i8 m_owner;
@@ -139,7 +138,7 @@ public:
     u8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
-    char m_name[HERO_NAME_SIZE];
+    std::string m_name;
     H2EnumStorage<HeroCursorType, u8> m_cursorType;
     H2EnumStorage<HeroPortrait, u8> m_portrait;
     i32 m_x;
@@ -168,7 +167,6 @@ public:
     i8 m_primaryStats[H2EnumIndex(HERO_STARTING_STAT_COUNT)];
     i8 m_morale;
     i8 m_luck;
-    char _pad_0x46[HERO_RUNTIME_ALIGNMENT_SIZE];
     u32 m_gazeboVisits;
     u32 m_fortVisits;
     u32 m_witchDoctorVisits;
@@ -188,12 +186,15 @@ public:
     u8 m_isCaptain;
     float m_aiFightValue;
     i8 m_artifactExtra[HERO_ARTIFACT_SLOT_COUNT];
+};
+
+class hero : public HeroState {
+public:
     i32 IsEmbarked(void) {
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
     hero(void);
-    void Read(i32, i8);
-    void Write(i32, i8);
+    explicit hero(HeroState state) : HeroState(std::move(state)) {}
     void GetArmyStrengths(u32l* const);
     i32 HasArtifact(ArtifactType);
     i32 CalcMobility(void);
@@ -233,7 +234,6 @@ public:
     void DoSSLevelDialog(HeroSecondarySkill, i32);
     void CheckAnduranPieces(b32);
 };
-#pragma pack(pop)
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];

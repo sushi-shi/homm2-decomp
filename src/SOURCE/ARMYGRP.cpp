@@ -21,10 +21,6 @@ void SwapValues(Value& lhs, Value& rhs) {
     rhs = temporary;
 }
 
-armyGroup::armyGroup(void) {
-    memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
-    memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
-}
 
 void armyGroup::View(i32) {}
 

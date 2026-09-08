@@ -51,6 +51,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
 #include <SOURCE/SaveNames.h>
+#include <SAVE/Runtime.h>
 #include <BASE/Utf8.h>
 
 #include <string>
@@ -106,26 +107,6 @@ bool EventIndicesFit(const u16* indices, u16 count, i32 extraCount) {
 typedef enum MapTilesetConstant {
     WAGON_CAMP_ACTIVE_FRAME = 129
 } MapTilesetConstant;
-
-typedef enum ExpansionCampaignSaveConstant {
-    CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
-} ExpansionCampaignSaveConstant;
-
-typedef enum GameSaveFormatConstant {
-    SAVE_PATH_CAPACITY                 = 452,
-    SAVE_LEGACY_SCRATCH_SIZE           = 100,
-    SAVE_LEGACY_CLEAR_SIZE             = 40,
-    SAVE_LEGACY_SERIALIZED_SIZE        = 36,
-    SAVE_STANDARD_FILENAME_SIZE        = 14,
-    STANDARD_FILENAME_BASENAME_SIZE    = 8,
-    SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
-    SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
-    SAVE_SPARE_SLOT_COUNT              = 6,
-    LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
-    SAVE_TRUNCATED_SCALAR_SIZE         = sizeof(i8),
-    SAVE_EVENT_HEADER_SIZE             = sizeof(u16) * 2,
-    SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
-} GameSaveFormatConstant;
 
 typedef enum GameHeroSelectionConstant {
     HERO_SELECTION_RETRY_LIMIT            = 2000,
@@ -287,8 +268,8 @@ typedef enum GameJoinConstant {
 } GameJoinConstant;
 
 typedef enum RemoteSaveConstant {
-    TRANSMIT_FILENAME_CAPACITY       = SAVE_PATH_CAPACITY,
-    RECEIVE_FILENAME_CAPACITY        = SAVE_PATH_CAPACITY,
+    TRANSMIT_FILENAME_CAPACITY       = 452,
+    RECEIVE_FILENAME_CAPACITY        = 452,
     REMOTE_LOOPING_SOUND_COUNT       = 4,
     REMOTE_PACKET_TRACKING_CAPACITY  = 5000,
     REMOTE_HEADER_CAPACITY           = 256,
@@ -684,73 +665,7 @@ inline town* GetCastle(i32 idx) {
     return &gpGame->m_castleRecs[idx];
 }
 
-typedef enum PlayerDataSerializationConstant {
-    PLAYER_SAVE_SCRATCH_SIZE       = 52,
-    PLAYER_SAVE_SCRATCH_CLEAR_SIZE = 48,
-    PLAYER_SAVE_RESERVED_SIZE      = 42,
-    PLAYER_SAVE_CHEATED_FLAG_SIZE  = 1
-} PlayerDataSerializationConstant;
 
-void playerData::Write(i32 file) {
-    char unused[PLAYER_SAVE_SCRATCH_SIZE];
-
-    WriteGameData(file, &m_color, sizeof(m_color));
-    WriteGameData(file, &m_heroCount, sizeof(m_heroCount));
-    WriteGameData(file, &m_currentHero, sizeof(m_currentHero));
-    WriteGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    WriteGameData(file, m_heroIds, sizeof(m_heroIds));
-    WriteGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
-    WriteGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    WriteGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    WriteGameData(file, &m_cheatValue, sizeof(m_cheatValue));
-    WriteGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    WriteGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    WriteGameData(file, &m_evilInterface, sizeof(m_evilInterface));
-    WriteGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    WriteGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    WriteGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    WriteGameData(file, &m_daysLeft, sizeof(m_daysLeft));
-    WriteGameData(file, &m_townCount, sizeof(m_townCount));
-    WriteGameData(file, &m_currentTown, sizeof(m_currentTown));
-    WriteGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    WriteGameData(file, m_townIds, sizeof(m_townIds));
-    WriteGameData(file, m_resources, sizeof(m_resources));
-    WriteGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    WriteGameData(file, m_unknownad, sizeof(m_unknownad));
-}
-
-void playerData::Read(i32 file) {
-    char unused[PLAYER_SAVE_SCRATCH_SIZE];
-
-    ReadGameData(file, &m_color, sizeof(m_color));
-    ReadGameData(file, &m_heroCount, sizeof(m_heroCount));
-    ReadGameData(file, &m_currentHero, sizeof(m_currentHero));
-    ReadGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    ReadGameData(file, m_heroIds, sizeof(m_heroIds));
-    ReadGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    ReadGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    ReadGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    ReadGameData(file, &m_cheatValue, sizeof(m_cheatValue));
-    ReadGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    ReadGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    ReadGameData(file, &m_evilInterface, sizeof(m_evilInterface));
-    ReadGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    ReadGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    ReadGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    ReadGameData(file, &m_daysLeft, sizeof(m_daysLeft));
-    ReadGameData(file, &m_townCount, sizeof(m_townCount));
-    ReadGameData(file, &m_currentTown, sizeof(m_currentTown));
-    ReadGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    ReadGameData(file, m_townIds, sizeof(m_townIds));
-    ReadGameData(file, m_resources, sizeof(m_resources));
-    ReadGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    ReadGameData(file, m_unknownad, sizeof(m_unknownad));
-}
 
 i32 playerData::NextHero(i32) {
     i32 curHero = -1;
@@ -1081,247 +996,42 @@ i32 game::GetMineId(i32 col, i32 row) {
     return -1;
 }
 
-void GenerateStandardFileName(char* source, char* destination) {
-    char* ext = FindLastToken(source, '.');
-    if (ext == NULL) {
-        strcpy(destination, source);
-        return;
-    }
-
-    *ext = '\0';
-    i32 indexOut = 0;
-    i32 length = strlen(source);
-    i32 i;
-    char chr;
-    for (i = 0; i < length; i++) {
-        chr = source[i];
-        if (chr >= 'a' && chr <= 'z')
-            chr -= 'a' - 'A';
-        if ((chr >= 'A' && chr <= 'Z') || (chr >= '0' && chr <= '9') || chr == '_') {
-            destination[indexOut] = chr;
-            indexOut++;
-        }
-        if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
-            i = 999;
-    }
-    *ext = '.';
-    strcpy(destination + indexOut, ext);
-}
-
-void EncodeGameFileText(
-    const char* source,
-    char* destination,
-    std::size_t capacity,
-    const char* field
-) {
-    if (!localization::EncodeText(
-            source,
-            localization::CurrentFileTextEncoding(),
-            destination,
-            capacity
-        )) {
-        platform::Host().Log(
-            platform::LogLevel::Warning,
-            (std::string("save: '") + (field != NULL ? field : "text")
-             + "' was truncated or is not representable as "
-             + localization::TextEncodingName(
-                 localization::CurrentFileTextEncoding()
-             )).c_str()
-        );
-    }
-}
-
-i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
-    i32 nHuman;
-
-    char workBuf[SAVE_LEGACY_SCRATCH_SIZE];
-
-    i32 outFile;
-    i32 iFile;
-    std::string genName;
-    bchar humans[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    char plBuf[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
-    void* emptyPayload;
-
-    i32 chunkTag;
-    i32 oldTag;
-
-    emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
-    memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
-    if (!xIsExpansionMap)
-        expansionFormat = 1;
+i32 game::SaveGame(const char* filename, i32 generateName) {
     gpAdvManager->DemobilizeCurrHero();
-
-    if (generateName) {
-        genName = filename;
-        if (gbInCampaign) {
-            genName += ".GMC";
-        } else if (xIsPlayingExpansionCampaign) {
-            genName += ".GXC";
-        } else {
-            nHuman = 0;
-            for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
-                if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
-                    nHuman++;
-            }
-            genName += xIsExpansionMap && !expansionFormat ? ".GX" : ".GM";
-            genName += std::to_string(nHuman);
-        }
-    } else {
-        genName = filename;
-    }
-
-    std::string savePath;
-    if (platform::CompareIgnoringCase(genName.c_str(), "RMT", sizeof("RMT") - 1) == 0) {
-        savePath = ".\\DATA\\" + genName;
-    } else {
-        savePath = gcGamePath + genName;
-        if (platform::CompareIgnoringCase(
-                genName.c_str(),
-                save_names::Autosave,
-                sizeof(save_names::Autosave) - 1
-            )
-                != 0
-            && platform::CompareIgnoringCase(
-                   genName.c_str(),
-                   save_names::PlayerExit,
-                   sizeof(save_names::PlayerExit) - 1
-               )
-                != 0)
-            strcpy(gpGame->m_saveName, filename);
-    }
-
-    outFile = platform::FileOpen(savePath.c_str(), platform::FileMode::Write);
-    if (outFile == -1)
-        FileError(savePath.c_str());
-
-    oldTag = -1;
-    if (!expansionFormat)
-        WriteGameData(outFile, &oldTag, sizeof(oldTag));
-    WriteGameData(outFile, &m_worldMap.width, sizeof(m_worldMap.width));
-    WriteGameData(outFile, &m_worldMap.height, sizeof(m_worldMap.height));
-    WriteGameData(outFile, &m_mapHeader, sizeof(m_mapHeader));
-    WriteGameData(outFile, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    WriteGameData(outFile, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    WriteGameData(outFile, this, sizeof(m_difficultyRating));
-    WriteGameData(outFile, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    WriteGameData(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    WriteGameData(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    WriteGameData(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    decltype(cPlayerNames) serializedPlayerNames;
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; ++iFile) {
-        EncodeGameFileText(
-            cPlayerNames[iFile],
-            serializedPlayerNames[iFile],
-            sizeof(serializedPlayerNames[iFile]),
-            "player name"
-        );
-    }
-    WriteGameData(outFile, serializedPlayerNames, sizeof(serializedPlayerNames));
-
-    memset(workBuf, 0, SAVE_LEGACY_CLEAR_SIZE);
-    WriteGameData(outFile, workBuf, SAVE_LEGACY_SERIALIZED_SIZE);
-    if (xIsPlayingExpansionCampaign) {
-        i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
-        WriteGameData(outFile, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        WriteGameData(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
-    } else {
-        WriteGameData(outFile, &gbInCampaign, sizeof(gbInCampaign));
-        if (gbInCampaign)
-            WriteGameData(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
-    }
-    if (!expansionFormat)
-        WriteGameData(outFile, &xIsExpansionMap, sizeof(xIsExpansionMap));
-
     gpAdvManager->PurgeMapChangeQueue();
-    WriteGameData(outFile, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    GenerateStandardFileName(m_saveName, workBuf);
-    WriteGameData(outFile, workBuf, SAVE_STANDARD_FILENAME_SIZE);
-    WriteGameData(outFile, &m_playerCount, sizeof(m_playerCount));
-    plBuf[0] = static_cast<char>(giCurPlayer);
-    WriteGameData(outFile, plBuf, sizeof(plBuf[0]));
-    WriteGameData(outFile, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    WriteGameData(outFile, m_playerDead, sizeof(m_playerDead));
-
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
-        humans[iFile] = static_cast<char>(gbHumanPlayer[iFile]);
-        if (m_playerDead[iFile] != 0)
-            humans[iFile] = false;
+    std::string name = filename;
+    if (generateName) name += savegame::Extension;
+    const bool remote = platform::CompareIgnoringCase(name.c_str(), "RMT", 3) == 0;
+    const std::string path = (remote ? std::string(".\\DATA\\") : gcGamePath) + name;
+    savegame::Snapshot state;
+    std::string error;
+    if (!savegame::Capture(*this, state, error) || !savegame::WriteFile(path, state, error)) {
+        platform::Host().Log(platform::LogLevel::Error, ("save: " + error).c_str());
+        NormalDialog(localization::Tr("system.file.write_error"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        return 0;
     }
-    WriteGameData(outFile, humans, GAME_PLAYER_COUNT);
-    WriteGameData(outFile, &m_day, sizeof(m_day));
-    WriteGameData(outFile, &m_week, sizeof(m_week));
-    WriteGameData(outFile, &m_month, sizeof(m_month));
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++)
-        m_players[iFile].Write(outFile);
-
-    WriteGameData(outFile, &m_obeliskCount, sizeof(m_obeliskCount));
-    for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
-        m_heroRecs[iFile].Write(outFile, !expansionFormat);
-    WriteGameData(outFile, m_availableHeroes, sizeof(m_availableHeroes));
-    town serializedCastles[GAME_TOWN_COUNT];
-    memcpy(serializedCastles, m_castleRecs, sizeof(serializedCastles));
-    for (iFile = 0; iFile < GAME_TOWN_COUNT; ++iFile) {
-        EncodeGameFileText(
-            m_castleRecs[iFile].m_name,
-            serializedCastles[iFile].m_name,
-            sizeof(serializedCastles[iFile].m_name),
-            "town name"
-        );
-    }
-    WriteGameData(outFile, serializedCastles, sizeof(serializedCastles));
-    WriteGameData(outFile, m_castleOwners, sizeof(m_castleOwners));
-    WriteGameData(outFile, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    WriteGameData(outFile, m_mines, sizeof(m_mines));
-    WriteGameData(outFile, m_mineOwners, sizeof(m_mineOwners));
-    if (!expansionFormat)
-        WriteGameData(outFile, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
-    else
-        WriteGameData(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    WriteGameData(outFile, m_boats, sizeof(m_boats));
-    WriteGameData(outFile, m_boatSlots, sizeof(m_boatSlots));
-    WriteGameData(outFile, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    WriteGameData(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    WriteGameData(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    WriteGameData(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    char serializedRumour[sizeof(m_rumour)];
-    EncodeGameFileText(
-        m_rumour, serializedRumour, sizeof(serializedRumour), "tavern rumour"
-    );
-    WriteGameData(outFile, serializedRumour, sizeof(serializedRumour));
-    WriteGameData(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    WriteGameData(outFile, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
-    WriteGameData(
-        outFile,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
-    );
-    WriteGameData(outFile, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    WriteGameData(outFile, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    WriteGameData(outFile, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    WriteGameData(outFile, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
-
-    chunkTag = GAME_FILE_MARKER;
-
-    WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    WriteGameData(outFile, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    for (iFile = 1; iFile < iMaxMapExtra; iFile++) {
-        WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-        WriteGameData(outFile, pwSizeOfMapExtra + iFile, sizeof(pwSizeOfMapExtra[iFile]));
-        if (ppMapExtra[iFile] != NULL)
-            WriteGameData(outFile, ppMapExtra[iFile], pwSizeOfMapExtra[iFile]);
-        else
-            WriteGameData(outFile, emptyPayload, pwSizeOfMapExtra[iFile]);
-    }
-    WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    WriteGameData(outFile, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    m_worldMap.Write(outFile);
-    WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    platform::FileClose(outFile);
-    H2_FREE(emptyPayload);
+    if (!remote
+        && platform::CompareIgnoringCase(name.c_str(), save_names::Autosave,
+                                         sizeof(save_names::Autosave) - 1) != 0
+        && platform::CompareIgnoringCase(name.c_str(), save_names::PlayerExit,
+                                         sizeof(save_names::PlayerExit) - 1) != 0)
+        m_saveName = filename;
     return 1;
+}
+
+void game::ResetPlayerSetup(void) {
+    for (i32 i = 0; i < MAP_HEADER_PLAYER_COUNT; ++i) {
+        m_setupPlayerColor[i] = 0;
+        m_playerHandicap[i] = PLAYER_HANDICAP_NONE;
+        m_setupPlayerRace[i] = FACTION_KNIGHT;
+        m_setupPlayerNetworkId[i] = 0;
+        m_setupPlayerType[i] = 0;
+    }
+    m_difficulty = 0;
+    m_mapFilename.clear();
+    m_selectedSetupPlayer = 0;
+    m_newGameInitialized = false;
+    m_newGameHumanCount = 0;
 }
 
 void game::SetupOrigData(void) {
@@ -1335,7 +1045,7 @@ void game::SetupOrigData(void) {
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
-    strcpy(m_saveName, save_names::NewGame);
+    m_saveName = save_names::NewGame;
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
@@ -1347,10 +1057,7 @@ void game::SetupOrigData(void) {
     i32 i;
     i32 j;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-        strcpy(
-            m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE,
-            ""
-        );
+        m_playerSystemIds[i].clear();
         if (i < giNumHumanPlayers) {
             if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 gbThisNetHumanPlayer[i] = true;
@@ -1376,7 +1083,7 @@ void game::SetupOrigData(void) {
     gpAdvManager->m_heroContextLocked = false;
     memset(m_availableHeroes, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_availableHeroes));
     for (i = 0; i < GAME_HERO_COUNT; i++) {
-        memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
+        static_cast<HeroState&>(m_heroRecs[i]) = HeroState{};
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
         memset(m_heroRecs[i].m_artifacts, H2EnumIndex(ARTIFACT_NONE), sizeof(m_heroRecs[i].m_artifacts));
         m_heroRecs[i].m_patrolY = HERO_DESTINATION_NONE;
@@ -1385,11 +1092,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
         m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
-        utf8::Copy(
-            m_heroRecs[i].m_name,
-            sizeof(m_heroRecs[i].m_name),
-            gHeroDefaultNames[i]
-        );
+        m_heroRecs[i].m_name = gHeroDefaultNames[i];
         m_heroRecs[i].m_cursorType = FactionTypeFromOrdinal(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
@@ -1435,7 +1138,7 @@ void game::SetupOrigData(void) {
 
     memset(m_castleOwners, TOWN_OWNER_NONE, sizeof(m_castleOwners));
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
-        memset(&m_castleRecs[i], 0, sizeof(m_castleRecs[i]));
+        static_cast<TownState&>(m_castleRecs[i]) = TownState{};
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = static_cast<u8>(i);
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
@@ -1457,7 +1160,7 @@ void game::SetupOrigData(void) {
     m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = HINT_COORDINATE_UNKNOWN;
     memset(m_obeliskVisitors, 0, sizeof(m_obeliskVisitors));
-    strcpy(gpGame->m_saveName, save_names::NewGame);
+    gpGame->m_saveName = save_names::NewGame;
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
@@ -1469,228 +1172,58 @@ void game::SetupOrigData(void) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
-    char workData[SAVE_LEGACY_CLEAR_SIZE];
-
-    char isHuman[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-
-    i32 rows;
-    char pathBuf[SAVE_PATH_CAPACITY];
-    b8 expTag;
-    i32 fd;
-
-    i32 ndx;
-    char plBuf[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
-    char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
-    i32 numHumans;
-    i32 wide;
-
-    LogStr("LG1");
-    if (loadFromFile) {
-        SetupOrigData();
-        return;
+bool game::LoadGame(const char* filename, i32 humanPlayers) {
+    const bool remote = platform::CompareIgnoringCase(filename, "RMT", 3) == 0;
+    const std::string path = (remote ? std::string(".\\DATA\\") : gcGamePath) + filename;
+    savegame::Snapshot state;
+    std::string error;
+    if (!savegame::ReadFile(path, state, error)) {
+        platform::Host().Log(platform::LogLevel::Error, ("load: " + error).c_str());
+        NormalDialog(localization::Tr("system.file.read_error"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        return false;
     }
-    LogStr("LG2");
-    numHumans = 0;
+    if (humanPlayers >= 0) {
+        i32 savedHumans = 0;
+        for (i32 i = 0; i < state.m_playerCount; ++i)
+            if (state.human[i] && !state.m_playerDead[i]) ++savedHumans;
+        if (savedHumans < humanPlayers) {
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE,
+                         localization::Tr("requester.load.insufficient_human_slots"),
+                         savedHumans, humanPlayers);
+            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            return false;
+        }
+        if (savedHumans > humanPlayers) {
+            utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE,
+                         localization::Tr("requester.load.replace_human_slots"),
+                         savedHumans, savedHumans - humanPlayers);
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE) return false;
+        }
+        for (i32 i = 0; i < GAME_PLAYER_COUNT; ++i) {
+            const bool selected = state.human[i] && !state.m_playerDead[i] && humanPlayers > 0;
+            state.human[i] = selected;
+            if (selected) --humanPlayers;
+        }
+    }
+    gpAdvManager->PurgeMapChangeQueue();
+    savegame::Apply(*this, std::move(state));
     gbGameOver = false;
     m_gameLoaded = 1;
-
-    if (loadFromFile || platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) == 0)
-        utf8::Format(pathBuf, "%s%s", ".\\DATA\\", filename);
-    else
-        utf8::Format(pathBuf, "%s%s", gcGamePath, filename);
-
-    fd = platform::FileOpen(pathBuf, platform::FileMode::Read);
-    if (fd == -1)
-        FileError(pathBuf);
-    ClearMapExtra();
-
-    expTag = false;
-    ReadGameData(fd, &wide, sizeof(wide));
-    if (wide == -1) {
-        expTag = true;
-        ReadGameData(fd, &wide, sizeof(wide));
-    }
-    ReadGameData(fd, &rows, sizeof(rows));
-    RequireValidMapDimensions(wide, rows);
-    SetMapSize(wide, rows);
-    ReadGameData(fd, &m_mapHeader, sizeof(m_mapHeader));
-    ReadGameData(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    ReadGameData(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, this, sizeof(m_difficultyRating));
-    ReadGameData(fd, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, cPlayerNames, sizeof(cPlayerNames));
-    {
-        const char* provenanceFields[GAME_PLAYER_COUNT + 2] = {
-            m_mapHeader.name,
-            m_mapHeader.description,
-        };
-        for (ndx = 0; ndx < GAME_PLAYER_COUNT; ++ndx) {
-            provenanceFields[ndx + 2] = cPlayerNames[ndx];
-        }
-        localization::SetCurrentFileTextEncoding(
-            localization::DetectTextEncoding(
-                provenanceFields,
-                sizeof(provenanceFields) / sizeof(provenanceFields[0]),
-                localization::DefaultFileTextEncoding()
-            )
-        );
-        platform::Host().Log(
-            platform::LogLevel::Info,
-            (std::string("localization: save-text=")
-             + localization::TextEncodingName(
-                 localization::CurrentFileTextEncoding()
-             )).c_str()
-        );
-    }
-    for (auto& playerName : cPlayerNames) {
-        const std::string decodedName = localization::DecodeExternalText(playerName);
-        utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
-    }
-
-    ReadGameData(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
-    ReadGameData(fd, &gbInCampaign, sizeof(gbInCampaign));
-    if (gbInCampaign == 1) {
-        ReadGameData(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
-    } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
-        xIsPlayingExpansionCampaign = 1;
-        gbInCampaign = false;
-        ReadGameData(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
-    }
-    if (expTag)
-        ReadGameData(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
-
-    gpAdvManager->PurgeMapChangeQueue();
-    ReadGameData(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    ReadGameData(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
-    if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
-        utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
-    ReadGameData(fd, &m_playerCount, sizeof(m_playerCount));
-
-    ReadGameData(fd, plBuf, sizeof(plBuf[0]));
-    giCurPlayer = plBuf[0];
-    RequireGameData(m_playerCount > 0 && m_playerCount <= GAME_PLAYER_COUNT
-                    && giCurPlayer >= 0 && giCurPlayer < m_playerCount);
-    ReadGameData(fd, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    ReadGameData(fd, m_playerDead, sizeof(m_playerDead));
-
-    ReadGameData(fd, isHuman, GAME_PLAYER_COUNT);
-    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
-        if (isHuman[ndx] && numHumans < giNumHumanPlayers) {
-            numHumans++;
-            gbHumanPlayer[ndx] = true;
-        } else {
-            gbHumanPlayer[ndx] = false;
-        }
-    }
-    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
-        if (gbHumanPlayer[ndx]) {
-            if (!gbRemoteOn || ndx == giThisGamePos)
-                gbThisNetHumanPlayer[ndx] = true;
-            else
-                gbThisNetHumanPlayer[ndx] = false;
-        } else {
-            gbThisNetHumanPlayer[ndx] = false;
-        }
-    }
-
-    ReadGameData(fd, &m_day, sizeof(m_day));
-    ReadGameData(fd, &m_week, sizeof(m_week));
-    ReadGameData(fd, &m_month, sizeof(m_month));
+    if (!remote) m_saveName = filename;
     giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
                 + (m_month - 1) * EVENT_DAYS_PER_MONTH;
-    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
-        m_players[ndx].Read(fd);
-
-    ReadGameData(fd, &m_obeliskCount, sizeof(m_obeliskCount));
-    for (ndx = 0; ndx < GAME_HERO_COUNT; ndx++)
-        m_heroRecs[ndx].Read(fd, expTag);
-    ReadGameData(fd, m_availableHeroes, sizeof(m_availableHeroes));
-    ReadGameData(fd, m_castleRecs, sizeof(m_castleRecs));
-    for (town& castle : m_castleRecs) {
-        const std::string decodedName = localization::DecodeExternalText(castle.m_name);
-        utf8::Copy(castle.m_name, sizeof(castle.m_name), decodedName.c_str());
-    }
-    ReadGameData(fd, m_castleOwners, sizeof(m_castleOwners));
-    ReadGameData(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    ReadGameData(fd, m_mines, sizeof(m_mines));
-    ReadGameData(fd, m_mineOwners, sizeof(m_mineOwners));
-    if (expTag)
-        ReadGameData(fd, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
-    else
-        ReadGameData(fd, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    ReadGameData(fd, m_boats, sizeof(m_boats));
-    ReadGameData(fd, m_boatSlots, sizeof(m_boatSlots));
-    ReadGameData(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    ReadGameData(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    ReadGameData(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    ReadGameData(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    ReadGameData(fd, m_rumour, sizeof(m_rumour));
-    {
-        const std::string decodedRumour = localization::DecodeExternalText(m_rumour);
-        utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
-    }
-    ReadGameData(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    ReadGameData(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
-    RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
-    ReadGameData(
-        fd,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
-    );
-    ReadGameData(fd, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    RequireGameData(m_timeEventCount <= GAME_TIME_EVENT_CAPACITY);
-    ReadGameData(fd, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    ReadGameData(fd, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    RequireGameData(m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
-    ReadGameData(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
-
-    ReadGameData(fd, chunkTag, sizeof(i32));
-    ReadGameData(fd, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    ReadGameData(fd, chunkTag, sizeof(i32));
-    const i32 mapExtraTableBytes = platform::FileLength(fd) - platform::FileTell(fd);
-    const i32 minimumExtraRecordSize = sizeof(i32) + sizeof(i16);
-    RequireGameData(iMaxMapExtra > 0 && mapExtraTableBytes >= 0
-                    && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
-    RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
-    RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
-    RequireGameData(EventIndicesFit(m_mapEventIndices, m_mapEventCount, iMaxMapExtra));
-    ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
-    );
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*pwSizeOfMapExtra))
-    );
-    memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
-    memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
-    for (ndx = 1; ndx < iMaxMapExtra; ndx++) {
-        ReadGameData(fd, chunkTag, sizeof(i32));
-        ReadGameData(fd, pwSizeOfMapExtra + ndx, sizeof(pwSizeOfMapExtra[ndx]));
-        RequireReadableBytes(fd, pwSizeOfMapExtra[ndx]);
-        ppMapExtra[ndx] = H2_ALLOC(pwSizeOfMapExtra[ndx]);
-        ReadGameData(fd, ppMapExtra[ndx], pwSizeOfMapExtra[ndx]);
-    }
-    ReadGameData(fd, chunkTag, sizeof(i32));
-    ReadGameData(fd, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    ReadGameData(fd, chunkTag, sizeof(i32));
-    m_worldMap.Read(fd, 0);
-    ReadGameData(fd, chunkTag, sizeof(i32));
-    platform::FileClose(fd);
-
     gpAdvManager->m_heroContextLocked = false;
-    gpCurPlayer = &gpGame->m_players[giCurPlayer];
+    gpCurPlayer = &m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayer = giCurPlayer;
-    while (!gbThisNetHumanPlayer[giCurWatchPlayer])
+    for (i32 i = 0; i < m_playerCount && !gbThisNetHumanPlayer[giCurWatchPlayer]; ++i)
         giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
     giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     SetupAdjacentMons();
-    LogStr("LG3");
     gpAdvManager->CheckSetEvilInterface(0, -1);
+    return true;
 }
 
 void game::GiveTroopsToNeutralTown(i32 townId) {
@@ -2010,20 +1543,12 @@ void game::NewMap(const char* filename) {
                 if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    utf8::Copy(
-                        m_heroRecs[awardHero].m_name,
-                        sizeof(m_heroRecs[awardHero].m_name),
-                        localization::Tr("campaign.hero.sister_eliza")
-                    );
+                    m_heroRecs[awardHero].m_name = localization::Tr("campaign.hero.sister_eliza");
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
                     m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[awardHero].CheckLevel();
-                    utf8::Copy(
-                        m_heroRecs[awardHero].m_name,
-                        sizeof(m_heroRecs[awardHero].m_name),
-                        localization::Tr("campaign.hero.brother_brax")
-                    );
+                    m_heroRecs[awardHero].m_name = localization::Tr("campaign.hero.brother_brax");
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player].m_availableHeroIds[0] = static_cast<char>(awardHero);
@@ -2054,11 +1579,7 @@ void game::NewMap(const char* filename) {
                     if (awardHero < GAME_HERO_COUNT) {
                         m_heroRecs[awardHero].m_experience = CAMPAIGN_EXPERIENCE_BONUS;
                         m_heroRecs[awardHero].CheckLevel();
-                        utf8::Copy(
-                            m_heroRecs[awardHero].m_name,
-                            sizeof(m_heroRecs[awardHero].m_name),
-                            heroName
-                        );
+                        m_heroRecs[awardHero].m_name = heroName;
                         m_heroRecs[awardHero].m_portrait = curPic;
                         m_players[player].m_availableHeroIds[0] =
                             static_cast<char>(awardHero);
@@ -4265,8 +3786,7 @@ void game::NextPlayer(void) {
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
         SaveGame(
             save_names::Autosave,
-            1,
-            0
+            1
         );
     }
 
@@ -6120,7 +5640,7 @@ void game::SetupTowns(void) {
             castle8->m_buildings |= H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS);
         castle8->m_mayNotUpgradeToCastle = extra0->unknown28;
         const std::string townName = localization::DecodeExternalText(extra0->name);
-        utf8::Copy(castle8->m_name, sizeof(castle8->m_name), townName.c_str());
+        castle8->m_name = townName;
 
         memset(usedSpells0, 0, H2EnumIndex(SPELL_COUNT));
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
@@ -6347,11 +5867,7 @@ void game::ProcessOnMapHeroes(void) {
                         if (extra9->hasCustomName) {
                             const std::string heroName =
                                 localization::DecodeExternalText(extra9->name);
-                            utf8::Copy(
-                                mapHero14->m_name,
-                                sizeof(mapHero14->m_name),
-                                heroName.c_str()
-                            );
+                            mapHero14->m_name = heroName;
                         }
                         mapHero14->m_experience = 0;
                         gpAdvManager->GiveExperience(mapHero14, extra9->experience, 1);
@@ -6593,7 +6109,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
-    SaveGame(gConfig.rmtSCName, 0, 0);
+    if (!SaveGame(gConfig.rmtSCName, 0)) goto transmitCleanup;
     if (!gbUseDiffCompression)
         useCurrentSave = 1;
     CreateDiffFile(
@@ -7742,7 +7258,7 @@ void game::SetupNewRumour(void) {
                 reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex]]);
             if (strlen(event0->text) > 2 && event0->text[0] != '@') {
                 const std::string rumour = localization::DecodeExternalText(event0->text);
-                utf8::Copy(m_rumour, sizeof(m_rumour), rumour.c_str());
+                m_rumour = rumour;
                 event0->text[0] = '@';
                 return;
             }
@@ -7750,7 +7266,7 @@ void game::SetupNewRumour(void) {
     }
 
     if (Random(0, 100) < 30) {
-        strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+        m_rumour = cRandomTavernText[(giCurTurn / 7) % 8];
     } else {
         roll = Random(0, 100);
         if (roll < 80 && giCurTurn > 1) {
@@ -7847,7 +7363,7 @@ void game::SetupNewRumour(void) {
                 gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
             );
         } else {
-            strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+            m_rumour = cRandomTavernText[(giCurTurn / 7) % 8];
         }
     }
 }

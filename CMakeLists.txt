@@ -153,9 +153,38 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
 endif()
 
-add_executable(homm2
+add_library(homm2_game OBJECT
   ${HOMM2_GAME_SOURCES}
-  ${HOMM2_EXECUTABLE_SOURCES})
+  src/SAVE/Runtime.cpp)
+add_executable(homm2 ${HOMM2_EXECUTABLE_SOURCES})
+target_link_libraries(homm2 PRIVATE homm2_game)
+
+add_library(homm2_save STATIC
+  src/SAVE/Format.cpp
+  src/SAVE/Codec.cpp
+  src/SAVE/Combat.cpp
+  src/SAVE/Validate.cpp)
+target_include_directories(homm2_save PUBLIC ${CMAKE_SOURCE_DIR}/include)
+# Legacy decoding belongs to this offline tool, never the running game.
+if(NOT EMSCRIPTEN)
+  add_library(homm2_legacy_import STATIC src/IMPORT/LegacySave.cpp)
+  target_link_libraries(homm2_legacy_import PUBLIC homm2_save)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(homm2_legacy_import PRIVATE -Wall -Wextra -Wconversion -Werror)
+  endif()
+  add_executable(homm2-import-save
+    tools/import_save.cpp
+    src/BASE/Utf8.cpp
+    src/SOURCE/LegacyText.cpp)
+  target_link_libraries(homm2-import-save PRIVATE homm2_legacy_import)
+  if(MINGW)
+    target_link_options(homm2-import-save PRIVATE -municode)
+  endif()
+  install(TARGETS homm2-import-save RUNTIME DESTINATION bin)
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(homm2_save PRIVATE -Wall -Wextra -Wconversion -Werror)
+endif()
 
 # PO files and runtime catalogs stay UTF-8. Original byte-encoded resources
 # are transcoded only when their text fields enter the engine.
@@ -216,18 +245,18 @@ if(HOMM2_PO_FILES)
   add_dependencies(homm2 homm2_locales)
 endif()
 
-target_include_directories(homm2 PRIVATE
+target_include_directories(homm2_game PUBLIC
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR})
 
 if(NOT WIN32)
-  target_compile_definitions(homm2 PRIVATE
+  target_compile_definitions(homm2_game PUBLIC
     __cdecl=
     __stdcall=
     __fastcall=)
 endif()
 
-target_compile_options(homm2 PRIVATE
+target_compile_options(homm2_game PUBLIC
   -Wall
   -Werror
   -Werror=cast-align
@@ -256,7 +285,7 @@ target_compile_options(homm2 PRIVATE
   -Werror=narrowing)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(homm2 PRIVATE
+  target_compile_options(homm2_game PUBLIC
     -Wno-class-memaccess
     -Werror=array-bounds
     -Werror=duplicated-cond
@@ -268,7 +297,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(EMSCRIPTEN)
-  target_compile_options(homm2 PRIVATE -Wno-deprecated-literal-operator)
+  target_compile_options(homm2_game PUBLIC -Wno-deprecated-literal-operator)
   set_target_properties(homm2 PROPERTIES SUFFIX ".html")
   target_link_options(homm2 PRIVATE
     "SHELL:-sASYNCIFY=1"
@@ -282,12 +311,35 @@ elseif(UNIX)
   target_link_options(homm2 PRIVATE -rdynamic)
 endif()
 
-target_link_libraries(homm2 PRIVATE
+target_link_libraries(homm2_game PUBLIC
+  homm2_save
   homm2_platform
   homm2_compression
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  add_executable(homm2_import_save_test
+    tools/import_save_test.cpp
+    src/BASE/Utf8.cpp
+    src/SOURCE/LegacyText.cpp)
+  target_link_libraries(homm2_import_save_test PRIVATE homm2_legacy_import homm2_compression)
+  add_test(NAME import_save COMMAND homm2_import_save_test
+    ${CMAKE_SOURCE_DIR}/tools/fixtures/legacy-save)
+  add_test(NAME import_save_cli COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_SOURCE_DIR}/tools/test_import_save.py $<TARGET_FILE:homm2-import-save>)
+  add_executable(homm2_save_runtime_test tools/save_runtime_test.cpp)
+  target_link_libraries(homm2_save_runtime_test PRIVATE homm2_game)
+  add_test(NAME save_runtime COMMAND homm2_save_runtime_test)
+  foreach(saveTest archive snapshot combat)
+    add_executable(homm2_save_${saveTest}_test
+      tools/save_${saveTest}_test.cpp
+      src/BASE/Utf8.cpp
+      src/SOURCE/LegacyText.cpp)
+    target_link_libraries(homm2_save_${saveTest}_test PRIVATE homm2_save)
+    target_compile_options(homm2_save_${saveTest}_test PRIVATE
+      -Wall -Wextra -Wconversion -Werror)
+    add_test(NAME save_${saveTest} COMMAND homm2_save_${saveTest}_test)
+  endforeach()
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
@@ -412,7 +464,7 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
 endif()
 
 if(WIN32)
-  target_link_libraries(homm2 PRIVATE ws2_32)
+  target_link_libraries(homm2_platform PUBLIC ws2_32)
   # A game, not a console program: retail came up without one behind it.
   set_target_properties(homm2 PROPERTIES WIN32_EXECUTABLE ON)
 endif()

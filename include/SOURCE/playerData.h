@@ -23,7 +23,6 @@ enum class PlayerPersonality : i32 {
 };
 using enum PlayerPersonality;
 
-#pragma pack(push, 1)
 struct playerAttentionWeights {
     float gameWeightA;
     float gameRemainder;
@@ -71,8 +70,6 @@ public:
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
     playerAIData m_aiData;
-    void Write(i32);
-    void Read(i32);
     i32 NextHero(i32);
     i32 HasMobileHero(void);
     i32 BuildingsOwned(FactionType, BuildingSlotType, i32);
@@ -102,6 +99,5 @@ public:
         return m_availableHeroIds[index];
     }
 };
-#pragma pack(pop)
 extern playerData* gpCurPlayer;
 #endif

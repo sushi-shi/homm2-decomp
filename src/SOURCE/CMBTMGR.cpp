@@ -345,7 +345,7 @@ void combatManager::SetupCombat(
         if (m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == NULL
             && (defenderTown->m_buildings & H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
             m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = &m_captain;
-            memset(&m_captain, 0, sizeof(m_captain));
+            static_cast<HeroState&>(m_captain) = HeroState{};
             for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++)
                 m_captain.m_primaryStats[index] =
                     captainStats[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)]
@@ -357,11 +357,7 @@ void combatManager::SetupCombat(
                 static_cast<i32>(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
-            utf8::Copy(
-                m_captain.m_name,
-                sizeof(m_captain.m_name),
-                localization::Tr("hero.captain")
-            );
+            m_captain.m_name = localization::Tr("hero.captain");
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
             for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++)
