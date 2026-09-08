@@ -13,14 +13,14 @@ namespace ironfist::script {
 
 void PushLuaValue(lua_State* state, i32 value);
 void PushLuaValue(lua_State* state, bool value);
-void PushLuaValue(lua_State* state, void* value);
 void PushLuaValue(lua_State* state, char* value);
 void PushLuaValue(lua_State* state, const std::string& value);
 void PushLuaValue(lua_State* state, double value);
+template <typename T> void PushLuaValue(lua_State*, T*) = delete;
 
 template <typename T>
 void PushLuaValue(lua_State* state, Binding<T> value) {
-    PushBinding(state, value);
+    PushCallbackBinding(state, value);
 }
 
 void PushLuaValues(lua_State* state);
@@ -49,6 +49,7 @@ void InvokeState(lua_State* ls, const char* funcName, Args... args) {
     if (!GlobalExists(ls, funcName))
         return;
     lua_getglobal(ls, funcName);
+    const BindingScope bindings;
     PushLuaValues(ls, args...);
     const i32 size = sizeof...(Args);
     if (lua_pcall(ls, size, 0, 0) != LUA_OK) {
@@ -74,6 +75,7 @@ std::optional<Res> InvokeStateResult(lua_State* ls, const char* funcName, Args..
     }
 
     lua_getglobal(ls, funcName);
+    const BindingScope bindings;
     PushLuaValues(ls, args...);
     const i32 size = sizeof...(Args);
 

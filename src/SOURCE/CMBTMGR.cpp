@@ -272,6 +272,7 @@ void combatManager::SetupCombat(
     i32 combatY,
     i32 randomSeed
 ) {
+    ironfist::state::Get().combat.BeginBattle(*this);
     giSeed = randomSeed;
     SRand(combatX * COMBAT_RANDOM_X_MULTIPLIER + combatY);
     m_combatX = combatX;
@@ -386,7 +387,6 @@ void combatManager::SetupCombat(
     }
     m_combatTowns[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = NULL;
 
-    ironfist::state::Get().combat.BeginBattle(*this);
 }
 
 void combatManager::InitNonVisualVars(void) {
