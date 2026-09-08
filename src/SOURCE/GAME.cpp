@@ -1637,6 +1637,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     SetupAdjacentMons();
     LogStr("LG3");
+    // Stable marker for external checks (tools/gameplay_roundtrip.py).
+    platform::Host().Log(platform::LogLevel::Info, "save: loaded");
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
