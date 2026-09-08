@@ -407,6 +407,9 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     NAME agg_manifest
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_agg_manifest.py)
   add_test(
+    NAME web_data_paths
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_package_web_data.py)
+  add_test(
     NAME catalog_validation
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_validate_catalog.py)
 endif()
