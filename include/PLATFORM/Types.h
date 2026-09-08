@@ -60,6 +60,10 @@ enum class Key {
 
     A, B, C, D, E, F, G, H, I, J, K, L, M,
     N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+
+    Keypad0, Keypad1, Keypad2, Keypad3, Keypad4,
+    Keypad5, Keypad6, Keypad7, Keypad8, Keypad9,
+    KeypadPeriod, KeypadPlus, KeypadMinus, KeypadMultiply, KeypadDivide,
 };
 
 constexpr Key KeyFromOrdinal(int value) {

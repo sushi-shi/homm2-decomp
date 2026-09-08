@@ -18,6 +18,31 @@ namespace {
 
 std::vector<platform::Event> gEvents;
 
+struct KeypadCase {
+    SDL_Scancode physical;
+    unsigned legacy;
+    platform::Key key;
+};
+
+const KeypadCase kKeypadCases[] = {
+    {SDL_SCANCODE_KP_0, 0x52, platform::Key::Keypad0},
+    {SDL_SCANCODE_KP_1, 0x4f, platform::Key::Keypad1},
+    {SDL_SCANCODE_KP_2, 0x50, platform::Key::Keypad2},
+    {SDL_SCANCODE_KP_3, 0x51, platform::Key::Keypad3},
+    {SDL_SCANCODE_KP_4, 0x4b, platform::Key::Keypad4},
+    {SDL_SCANCODE_KP_5, 0x4c, platform::Key::Keypad5},
+    {SDL_SCANCODE_KP_6, 0x4d, platform::Key::Keypad6},
+    {SDL_SCANCODE_KP_7, 0x47, platform::Key::Keypad7},
+    {SDL_SCANCODE_KP_8, 0x48, platform::Key::Keypad8},
+    {SDL_SCANCODE_KP_9, 0x49, platform::Key::Keypad9},
+    {SDL_SCANCODE_KP_PERIOD, 0x53, platform::Key::KeypadPeriod},
+    {SDL_SCANCODE_KP_PLUS, 0x4e, platform::Key::KeypadPlus},
+    {SDL_SCANCODE_KP_MINUS, 0x4a, platform::Key::KeypadMinus},
+    {SDL_SCANCODE_KP_MULTIPLY, 0x37, platform::Key::KeypadMultiply},
+    {SDL_SCANCODE_KP_DIVIDE, 0x35, platform::Key::KeypadDivide},
+    {SDL_SCANCODE_KP_ENTER, 0x1c, platform::Key::Return},
+};
+
 void CollectEvent(const platform::Event& event) {
     gEvents.push_back(event);
 }
@@ -228,6 +253,33 @@ int main() {
     platform::PumpEvents();
     valid &= Expect(!platform::Input().IsKeyDown(platform::Key::Alt), "alts released");
 
+    for (SDL_Keymod modifiers : {SDL_KMOD_NONE, SDL_KMOD_NUM}) {
+        for (const KeypadCase& test : kKeypadCases) {
+            gEvents.clear();
+            const SDL_Keycode keyCode = SDL_GetKeyFromScancode(test.physical, modifiers, false);
+            PushKey(SDL_EVENT_KEY_DOWN, test.physical, keyCode, modifiers);
+            platform::PumpEvents();
+            valid &= Expect(
+                gEvents.size() == 1 && gEvents.front().scanCode == test.legacy
+                    && gEvents.front().key == test.key
+                    && platform::Input().IsKeyDown(test.key),
+                "keypad press preserves legacy movement code and held state"
+            );
+            PushKey(SDL_EVENT_KEY_UP, test.physical, keyCode, modifiers);
+            platform::PumpEvents();
+            valid &= Expect(!platform::Input().IsKeyDown(test.key), "keypad release");
+        }
+    }
+    gEvents.clear();
+    PushKey(SDL_EVENT_KEY_DOWN, SDL_SCANCODE_KP_1, SDLK_1, SDL_KMOD_NUM);
+    platform::PumpEvents();
+    valid &= Expect(gEvents.size() == 1 && gEvents[0].scanCode == 0x4f,
+                    "logical digit does not override keypad movement");
+    PushKey(SDL_EVENT_KEY_UP, SDL_SCANCODE_KP_1, SDLK_END, SDL_KMOD_NONE);
+    platform::PumpEvents();
+    valid &= Expect(!platform::Input().IsKeyDown(platform::Key::Keypad1),
+                    "logical key change still releases keypad state");
+
     gEvents.clear();
     platform::RequestQuit();
     platform::PumpEvents();
@@ -280,6 +332,31 @@ int main() {
     platform::SetEventHandler(nullptr);
     platform::Shutdown();
     valid &= Expect(SDL_WasInit(0) == 0, "second SDL shutdown balances subsystems");
+
+    const std::filesystem::path replayPath = root / "keypad.replay";
+    {
+        std::ofstream replay(replayPath);
+        for (const KeypadCase& test : kKeypadCases) {
+            replay << "0 key-down " << SDL_GetScancodeName(test.physical) << '\n';
+            replay << "0 key-up " << SDL_GetScancodeName(test.physical) << '\n';
+        }
+    }
+    SetEnvironment("HOMM2_INPUT_REPLAY", replayPath.string());
+    valid &= Expect(platform::Startup(), "keypad replay startup");
+    gEvents.clear();
+    platform::SetEventHandler(CollectEvent);
+    platform::PumpEvents();
+    std::size_t keyIndex = 0;
+    for (const platform::Event& event : gEvents) {
+        if (event.type != platform::Event::Type::KeyDown) continue;
+        valid &= Expect(keyIndex < std::size(kKeypadCases)
+                            && event.scanCode == kKeypadCases[keyIndex].legacy,
+                        "keypad replay scan code");
+        ++keyIndex;
+    }
+    valid &= Expect(keyIndex == std::size(kKeypadCases), "all keypad replay names accepted");
+    platform::SetEventHandler(nullptr);
+    platform::Shutdown();
 
     std::filesystem::remove_all(root, error);
     return valid ? 0 : 1;

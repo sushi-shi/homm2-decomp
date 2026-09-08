@@ -61,6 +61,22 @@ Key TranslateKey(SDL_Scancode code) {
     case SDL_SCANCODE_F10: return Key::F10;
     case SDL_SCANCODE_F11: return Key::F11;
     case SDL_SCANCODE_F12: return Key::F12;
+    case SDL_SCANCODE_KP_0: return Key::Keypad0;
+    case SDL_SCANCODE_KP_1: return Key::Keypad1;
+    case SDL_SCANCODE_KP_2: return Key::Keypad2;
+    case SDL_SCANCODE_KP_3: return Key::Keypad3;
+    case SDL_SCANCODE_KP_4: return Key::Keypad4;
+    case SDL_SCANCODE_KP_5: return Key::Keypad5;
+    case SDL_SCANCODE_KP_6: return Key::Keypad6;
+    case SDL_SCANCODE_KP_7: return Key::Keypad7;
+    case SDL_SCANCODE_KP_8: return Key::Keypad8;
+    case SDL_SCANCODE_KP_9: return Key::Keypad9;
+    case SDL_SCANCODE_KP_PERIOD: return Key::KeypadPeriod;
+    case SDL_SCANCODE_KP_PLUS: return Key::KeypadPlus;
+    case SDL_SCANCODE_KP_MINUS: return Key::KeypadMinus;
+    case SDL_SCANCODE_KP_MULTIPLY: return Key::KeypadMultiply;
+    case SDL_SCANCODE_KP_DIVIDE: return Key::KeypadDivide;
+
     default: break;
     }
     if (code >= SDL_SCANCODE_A && code <= SDL_SCANCODE_Z) {
@@ -159,6 +175,22 @@ unsigned ToSetOneScanCode(SDL_Scancode code) {
     case SDL_SCANCODE_DELETE: return 0x53;
     case SDL_SCANCODE_F11: return 0x57;
     case SDL_SCANCODE_F12: return 0x58;
+    case SDL_SCANCODE_KP_0: return 0x52;
+    case SDL_SCANCODE_KP_1: return 0x4f;
+    case SDL_SCANCODE_KP_2: return 0x50;
+    case SDL_SCANCODE_KP_3: return 0x51;
+    case SDL_SCANCODE_KP_4: return 0x4b;
+    case SDL_SCANCODE_KP_5: return 0x4c;
+    case SDL_SCANCODE_KP_6: return 0x4d;
+    case SDL_SCANCODE_KP_7: return 0x47;
+    case SDL_SCANCODE_KP_8: return 0x48;
+    case SDL_SCANCODE_KP_9: return 0x49;
+    case SDL_SCANCODE_KP_PERIOD: return 0x53;
+    case SDL_SCANCODE_KP_PLUS: return 0x4e;
+    case SDL_SCANCODE_KP_MINUS: return 0x4a;
+    case SDL_SCANCODE_KP_MULTIPLY: return 0x37;
+    case SDL_SCANCODE_KP_DIVIDE: return 0x35;
+
     default: return 0;
     }
 }
@@ -188,6 +220,12 @@ unsigned TranslateModifiers(SDL_Keymod modifiers) {
 }
 
 SDL_Scancode LogicalScanCode(const SDL_KeyboardEvent& event) {
+    // The game uses keypad positions for movement, independently of Num Lock
+    // or a layout that reports their logical key as a digit/navigation key.
+    if (event.scancode >= SDL_SCANCODE_KP_DIVIDE
+        && event.scancode <= SDL_SCANCODE_KP_PERIOD) {
+        return event.scancode;
+    }
     switch (event.key) {
     case SDLK_ESCAPE: return SDL_SCANCODE_ESCAPE;
     case SDLK_RETURN: return SDL_SCANCODE_RETURN;

@@ -101,3 +101,7 @@ The parser and wrapping-millisecond scheduler are covered by the
 `input_replay` CTest. A headless gameplay test can therefore run the ordinary
 binary under Xvfb with a checked-in replay and compare an independently chosen
 observable result such as a save, log record, or screenshot.
+
+Keypad movement preserves the original physical keypad scan codes with Num Lock
+on or off. Replay accepts SDL names such as `Keypad 1`, `Keypad 8`, and
+`Keypad +`, independently of the dedicated navigation keys.
