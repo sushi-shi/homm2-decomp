@@ -72,6 +72,22 @@ void RequireGameData(bool condition) {
         ShutDown(localization::Tr("system.file.read_error"));
 }
 
+void RequireGameText(std::string_view field, const char* name) {
+    if (!localization::HasTextTerminator(field)) {
+        platform::Host().Log(platform::LogLevel::Error,
+            (std::string("Invalid save: unterminated ") + name).c_str());
+        RequireGameData(false);
+    }
+}
+
+void RequireMapHeader(const SMapHeader& header) {
+    if (const char* error = MapHeaderError(header)) {
+        platform::Host().Log(platform::LogLevel::Error,
+            (std::string("Invalid map header: ") + error).c_str());
+        RequireGameData(false);
+    }
+}
+
 void RequireReadableBytes(i32 file, i32 count) {
     const i32 position = platform::FileTell(file);
     const i32 length = platform::FileLength(file);
@@ -1515,6 +1531,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     RequireValidMapDimensions(wide, rows);
     SetMapSize(wide, rows);
     ReadGameData(fd, &m_mapHeader, sizeof(m_mapHeader));
+    RequireMapHeader(m_mapHeader);
     ReadGameData(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
     ReadGameData(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
     ReadGameData(fd, this, sizeof(m_difficultyRating));
@@ -1524,12 +1541,13 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     ReadGameData(fd, cPlayerNames, sizeof(cPlayerNames));
     {
-        const char* provenanceFields[GAME_PLAYER_COUNT + 2] = {
-            m_mapHeader.name,
-            m_mapHeader.description,
+        std::string_view provenanceFields[GAME_PLAYER_COUNT + 2] = {
+            localization::TextField(m_mapHeader.name),
+            localization::TextField(m_mapHeader.description),
         };
         for (ndx = 0; ndx < GAME_PLAYER_COUNT; ++ndx) {
-            provenanceFields[ndx + 2] = cPlayerNames[ndx];
+            provenanceFields[ndx + 2] = localization::TextField(cPlayerNames[ndx]);
+            RequireGameText(provenanceFields[ndx + 2], "player name");
         }
         localization::SetCurrentFileTextEncoding(
             localization::DetectTextEncoding(
@@ -1547,7 +1565,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         );
     }
     for (auto& playerName : cPlayerNames) {
-        const std::string decodedName = localization::DecodeExternalText(playerName);
+        const std::string decodedName = localization::DecodeExternalText(
+            localization::TextField(playerName));
         utf8::Copy(playerName, sizeof(playerName), decodedName.c_str());
     }
 
@@ -1611,7 +1630,9 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, m_availableHeroes, sizeof(m_availableHeroes));
     ReadGameData(fd, m_castleRecs, sizeof(m_castleRecs));
     for (town& castle : m_castleRecs) {
-        const std::string decodedName = localization::DecodeExternalText(castle.m_name);
+        const auto field = localization::TextField(castle.m_name);
+        RequireGameText(field, "town name");
+        const std::string decodedName = localization::DecodeExternalText(field);
         utf8::Copy(castle.m_name, sizeof(castle.m_name), decodedName.c_str());
     }
     ReadGameData(fd, m_castleOwners, sizeof(m_castleOwners));
@@ -1630,10 +1651,16 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
     ReadGameData(fd, m_rumour, sizeof(m_rumour));
     {
-        const std::string decodedRumour = localization::DecodeExternalText(m_rumour);
+        const auto field = localization::TextField(m_rumour);
+        RequireGameText(field, "rumour");
+        const std::string decodedRumour = localization::DecodeExternalText(field);
         utf8::Copy(m_rumour, sizeof(m_rumour), decodedRumour.c_str());
     }
     ReadGameData(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ++ndx) {
+        RequireGameText({m_defaultPlayerNames + ndx * GAME_DEFAULT_PLAYER_NAME_SIZE,
+                        GAME_DEFAULT_PLAYER_NAME_SIZE}, "default player name");
+    }
     ReadGameData(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
     ReadGameData(
@@ -2952,6 +2979,7 @@ i32 game::LoadMap(const char* filename) {
     if (handle == -1)
         FileError(gText);
     ReadGameData(handle, &m_mapHeader, sizeof(m_mapHeader));
+    RequireMapHeader(m_mapHeader);
     localization::SetCurrentFileTextEncoding(
         GetMapHeaderTextEncoding(&m_mapHeader)
     );

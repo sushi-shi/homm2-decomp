@@ -77,33 +77,13 @@ typedef enum FileRequesterPrivateConstant {
     SCROLL_CENTER_DIVISOR       = 2
 } FileRequesterPrivateConstant;
 
-i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", gcMapPath, filename);
-    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
-    if (file == -1) {
-        return 0;
-    }
-    const bool complete = platform::FileReadExact(file, header, sizeof(*header));
-    platform::FileClose(file);
-    return complete;
-}
-
-localization::TextEncoding GetMapHeaderTextEncoding(const SMapHeader* header) {
-    if (header == NULL) {
-        return localization::DefaultFileTextEncoding();
-    }
-    const char* fields[] = {header->name, header->description};
-    return localization::DetectTextEncoding(
-        fields,
-        sizeof(fields) / sizeof(fields[0]),
-        localization::DefaultFileTextEncoding()
-    );
-}
 
 namespace {
 
-std::string DecodeMapHeaderText(const SMapHeader& header, const char* text) {
-    return localization::DecodeExternalText(text, GetMapHeaderTextEncoding(&header));
+template <std::size_t Capacity>
+std::string DecodeMapHeaderText(const SMapHeader& header, const char (&text)[Capacity]) {
+    return localization::DecodeExternalText(
+        localization::TextField(text), GetMapHeaderTextEncoding(&header));
 }
 
 }

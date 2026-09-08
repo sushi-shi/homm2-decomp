@@ -883,6 +883,14 @@ std::string DecodeExternalText(const char* text) {
     return DecodeText(text, gCurrentFileTextEncoding);
 }
 
+std::string DecodeExternalText(std::string_view field, TextEncoding encoding) {
+    return DecodeText(field, encoding);
+}
+
+std::string DecodeExternalText(std::string_view field) {
+    return DecodeText(field, gCurrentFileTextEncoding);
+}
+
 TextEncoding CurrentFileTextEncoding() { return gCurrentFileTextEncoding; }
 
 void SetCurrentFileTextEncoding(TextEncoding encoding) {

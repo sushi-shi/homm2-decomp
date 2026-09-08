@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 
 namespace localization {
 
@@ -15,6 +16,16 @@ enum class TextEncoding {
 };
 
 std::string DecodeText(const char* text, TextEncoding encoding);
+
+// Serialized fields carry a capacity, unlike runtime C strings. Inspection
+// and decoding stop at the first NUL or the supplied bound, whichever is first.
+template <std::size_t Capacity>
+constexpr std::string_view TextField(const char (&text)[Capacity]) {
+    return {text, Capacity};
+}
+
+bool HasTextTerminator(std::string_view field);
+std::string DecodeText(std::string_view field, TextEncoding encoding);
 
 // Encodes a NUL-terminated UTF-8 string into a fixed-size retail field. The
 // destination is always NUL-terminated when capacity is non-zero. A false
@@ -32,6 +43,12 @@ bool EncodeText(
 // otherwise retain the edition-derived fallback as the file's provenance.
 TextEncoding DetectTextEncoding(
     const char* const* texts,
+    std::size_t count,
+    TextEncoding fallback
+);
+
+TextEncoding DetectTextEncoding(
+    const std::string_view* fields,
     std::size_t count,
     TextEncoding fallback
 );
