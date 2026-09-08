@@ -3101,9 +3101,11 @@ setCycleTimer:
     if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
         icon* wallIcon =
             gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
+        const i32 frameCount = wallIcon->m_frameCount;
+        gpResourceManager->Dispose(wallIcon);
         for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
             wall.currentFrame++;
-            if (wall.currentFrame >= wallIcon->m_frameCount) {
+            if (wall.currentFrame >= frameCount) {
                 wall.currentFrame = 0;
             }
         }
