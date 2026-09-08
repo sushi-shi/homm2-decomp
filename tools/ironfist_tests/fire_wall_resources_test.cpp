@@ -73,8 +73,11 @@ int main() {
     gbNoShowCombat = false;
     gConfig.combatArmyInfoLevel = 0;
     gConfig.combatSpeed = 0;
-    auto& walls = ironfist::state::Get().combat.spell.fireBombWalls;
-    walls = {{20, 2, 0}, {21, 2, 1}};
+    auto& extensions = ironfist::state::Get().combat;
+    extensions.BeginBattle(combat);
+    extensions.AddOrRefreshFireWall(20, 2);
+    extensions.AddOrRefreshFireWall(21, 2, 1);
+    const auto& walls = extensions.FireWalls();
 
     // More cycles than the entire positive range of the resource counter.
     for (i32 i = 0; i < 40000; ++i) {
@@ -109,7 +112,7 @@ int main() {
     assert(gpResourceManager->Query(id) == nullptr);
     combat.DrawFrame(0, 0, 0, 0, 0, 0, 0);
     assert(gpResourceManager->Query(id) == nullptr);
-    walls.clear();
+    extensions.EndBattle();
     delete gpWindowManager->m_screen;
     delete gpMouseManager;
     delete gpWindowManager;

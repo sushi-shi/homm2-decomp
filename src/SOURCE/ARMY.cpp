@@ -194,14 +194,14 @@ static void ApplyAstralDodgeWince(army* target) {
     if (target->m_monsterType != CREATURE_CYBER_SHADOW_ASSASSIN) {
         return;
     }
-    if (ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge]) {
+    if (ironfist::state::Get().combat.IsAnimating(*target, ironfist::CreatureAttribute::AstralDodge)) {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] =
             ARMY_DODGE_ANIMATION_LENGTH;
         for (i32 frame = 0; frame < ARMY_DODGE_ANIMATION_LENGTH; frame++) {
             target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][frame] =
                 static_cast<i8>(ARMY_DODGE_FIRST_FRAME + frame);
         }
-        ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge] = false;
+        ironfist::state::Get().combat.FinishAnimation(*target, ironfist::CreatureAttribute::AstralDodge);
     } else {
         target->m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WINCE)] = 1;
         target->m_frameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WINCE)][0] =
@@ -304,10 +304,7 @@ void army::InitClean(void) {
     m_mirrorImageIndex = -1;
     m_armyGroupSlot = -1;
     m_lastTargetHex = -1;
-    for (auto& attribute : ironfist::CreatureAttributes) {
-        if (ironfist::HasCreatureAttribute(m_monsterType, attribute))
-            ironfist::state::Get().combat.stack.abilityCounter[this][attribute] = 1;
-    }
+    ironfist::state::Get().combat.RemoveStack(*this);
 }
 
 void army::Init(
@@ -373,9 +370,10 @@ void army::Init(
             rearHex < m_hex ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
     }
     m_armyGroupSlot = unknown;
+    ironfist::state::Get().combat.ResetStack(*this);
     for (auto& attribute : ironfist::CreatureAttributes) {
         if (ironfist::HasCreatureAttribute(m_monsterType, attribute))
-            ironfist::state::Get().combat.stack.abilityCounter[this][attribute] = 1;
+            ironfist::state::Get().combat.GrantAbility(*this, attribute);
     }
 }
 
@@ -663,7 +661,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         }
         // A force-shielded stack shows the shield's remaining strength above
         // the normal quantity box.
-        if (ironfist::state::Get().combat.stack.forceShieldHP[this] > 0) {
+        if (ironfist::state::Get().combat.ShieldHP(*this) > 0) {
             gpResourceManager->GetIcon("SPELLINF.ICN")
                 ->CombatClipDrawToBuffer(
                     quantX + ARMY_FORCE_SHIELD_ICON_X_OFFSET,
@@ -678,7 +676,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             utf8::Format(
                 countText,
                 "%d",
-                ironfist::state::Get().combat.stack.forceShieldHP[this]
+                ironfist::state::Get().combat.ShieldHP(*this)
             );
             smallFont->DrawBoundedString(
                 countText,
@@ -1986,9 +1984,9 @@ void army::DoAttack(i32 retaliation) {
             target_1->m_spellEffect = SPELL_SHADOW_MARK;
         }
         ApplyAstralDodgeWince(target_1);
-        if (ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper]) {
+        if (ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::Jumper)) {
             SetJumpingAnimation();
-            ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = false;
+            ironfist::state::Get().combat.FinishAnimation(*this, ironfist::CreatureAttribute::Jumper);
         } else {
             RevertJumpingAnimation();
         }
@@ -2201,7 +2199,7 @@ i32 army::WalkTo(i32 destination) {
         // The Berserker jumps: onto its victim from up to four hexes out,
         // or over the first obstacle in its way.
         if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
-            && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]) {
+            && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)) {
             i32 stepHex = GetAdjacentCellIndex(m_hex, stepDirection);
             if (gMoveAttack && direction_3 < 4) {
                 for (i32 step = direction_3; step >= 0; step--) {
@@ -2212,7 +2210,7 @@ i32 army::WalkTo(i32 destination) {
                     m_hex = stepHex;
                 }
                 ArcJump(jumpStartHex, stepHex);
-                ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = true;
+                ironfist::state::Get().combat.StartAnimation(*this, ironfist::CreatureAttribute::Jumper);
                 CancelSpellType(ArmySpellCancelType(0));
                 return 0;
             } else if (gpCombatManager->m_hexCells[stepHex].m_blocked) {
@@ -2292,7 +2290,7 @@ i32 army::AttackTo(i32 destination) {
                 }
                 // The Berserker leaps the last stretch onto its victim.
                 if (m_monsterType == CREATURE_CYBER_PLASMA_BERSERKER
-                    && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]
+                    && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)
                     && gMoveAttack && pathIndex_4 < 5) {
                     i32 stepHex = m_hex;
                     for (i32 step = pathIndex_4; step >= 1; step--) {
@@ -2305,7 +2303,7 @@ i32 army::AttackTo(i32 destination) {
                         m_hex = stepHex;
                     }
                     ArcJump(jumpStartHex, stepHex);
-                    ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper] = true;
+                    ironfist::state::Get().combat.StartAnimation(*this, ironfist::CreatureAttribute::Jumper);
                     break;
                 }
                 Walk(
@@ -2495,9 +2493,9 @@ void army::DamageEnemy(
     }
     // A jumper strikes harder mid-jump, once per battle.
     if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Jumper) && !retaliation
-        && ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper]
-        && ironfist::state::Get().combat.stack.abilityNowAnimating[this][ironfist::CreatureAttribute::Jumper]) {
-        ironfist::state::Get().combat.stack.abilityCounter[this][ironfist::CreatureAttribute::Jumper] = 0;
+        && ironfist::state::Get().combat.HasAbilityCharge(*this, ironfist::CreatureAttribute::Jumper)
+        && ironfist::state::Get().combat.IsAnimating(*this, ironfist::CreatureAttribute::Jumper)) {
+        ironfist::state::Get().combat.ConsumeAbility(*this, ironfist::CreatureAttribute::Jumper);
         damage1 *= SRandom(125, 150) * 0.01f;
     }
     // A charger's hit softens along its path and lands harder at the end.
@@ -2531,9 +2529,9 @@ void army::DamageEnemy(
     // An astral dodger slips one melee blow per round; -2 marks the dodge.
     if (!rangedAttack && !retaliation
         && ironfist::HasCreatureAttribute(target->m_monsterType, ironfist::CreatureAttribute::AstralDodge)
-        && ironfist::state::Get().combat.stack.abilityCounter[target][ironfist::CreatureAttribute::AstralDodge]) {
-        ironfist::state::Get().combat.stack.abilityNowAnimating[target][ironfist::CreatureAttribute::AstralDodge] = true;
-        ironfist::state::Get().combat.stack.abilityCounter[target][ironfist::CreatureAttribute::AstralDodge] = 0;
+        && ironfist::state::Get().combat.HasAbilityCharge(*target, ironfist::CreatureAttribute::AstralDodge)) {
+        ironfist::state::Get().combat.StartAnimation(*target, ironfist::CreatureAttribute::AstralDodge);
+        ironfist::state::Get().combat.ConsumeAbility(*target, ironfist::CreatureAttribute::AstralDodge);
         damageDone2 = -2;
     }
     *damageResult = damageDone2;
@@ -2541,17 +2539,11 @@ void army::DamageEnemy(
         *killedResult = target->Damage(0, SPELL_NONE);
         return;
     }
-    // A force shield soaks the hit; the overflow passes through and breaks it.
-    i32 shieldPoints = ironfist::state::Get().combat.stack.forceShieldHP[target];
-    if (shieldPoints > 0) {
-        if (shieldPoints - damageDone2 <= 0) {
-            target->CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
-            damageDone2 -= shieldPoints;
-        } else {
-            ironfist::state::Get().combat.stack.forceShieldHP[target] -= damageDone2;
-            damageDone2 = 0;
-        }
-    }
+    // Resolve shield absorption once; the retail influence owns its spell count.
+    const i32 shieldPoints = ironfist::state::Get().combat.ShieldHP(*target);
+    damageDone2 = ironfist::state::Get().combat.AbsorbDamage(*target, damageDone2);
+    if (shieldPoints > 0 && ironfist::state::Get().combat.ShieldHP(*target) == 0)
+        target->CancelIndividualSpell(ARMY_SPELL_INFLUENCE_FORCE_SHIELD);
     *killedResult = target->Damage(damageDone2, SPELL_NONE);
 }
 
@@ -3252,7 +3244,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_BURN:
             break;
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
-            ironfist::state::Get().combat.stack.forceShieldHP[this] = 0;
+            ironfist::state::Get().combat.ClearShield(*this);
             break;
         default:
             break;
@@ -3267,10 +3259,8 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             m_spellInfluence[H2EnumIndex(influence)] = static_cast<u8>(rounds);
         }
         if (influence == ARMY_SPELL_INFLUENCE_FORCE_SHIELD) {
-            i32& shield = ironfist::state::Get().combat.stack.forceShieldHP[this];
             const i32 capacity = gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints;
-            if (shield < capacity) {
-                shield = capacity;
+            if (ironfist::state::Get().combat.RefillShield(*this, capacity)) {
                 return 1;
             }
         }
@@ -3337,8 +3327,8 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_BURN:
             break;
         case ARMY_SPELL_INFLUENCE_FORCE_SHIELD:
-            ironfist::state::Get().combat.stack.forceShieldHP[this] =
-                gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints;
+            ironfist::state::Get().combat.RefillShield(
+                *this, gMonsterDatabase[H2EnumIndex(m_monsterType)].hitPoints);
             break;
         default:
             break;

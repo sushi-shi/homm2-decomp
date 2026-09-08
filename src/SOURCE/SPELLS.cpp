@@ -669,7 +669,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
             if (m_hexCells[hex].m_occupantSide != m_currentSide)
                 return 0;
             if (target_j
-                && ironfist::state::Get().combat.stack.forceShieldHP[target_j]
+                && ironfist::state::Get().combat.ShieldHP(*target_j)
                        >= gMonsterDatabase[H2EnumIndex(target_j->m_monsterType)].hitPoints)
                 return 0;
             break;
@@ -1752,21 +1752,7 @@ bool combatManager::AreaSpellAffectHexes(
     for (i32 hex : affectedHexes) {
         hexcell* cell = &m_hexCells[hex];
         if (spell == SPELL_FIRE_BOMB) {
-            // Fire walls linger where the bomb burst.
-            bool wallExists = false;
-            for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
-                if (wall.hexIdx == hex) {
-                    wallExists = true;
-                    wall.turnsLeft = COMBAT_BURN_ROUNDS;
-                    wall.currentFrame = 0;
-                    break;
-                }
-            }
-            if (!wallExists) {
-                ironfist::state::Get().combat.spell.fireBombWalls.push_back(
-                    {hex, COMBAT_BURN_ROUNDS, 0}
-                );
-            }
+            ironfist::state::Get().combat.AddOrRefreshFireWall(hex, COMBAT_BURN_ROUNDS);
         }
         if (cell->m_occupantSide == COMBAT_SIDE_NONE) {
             continue;

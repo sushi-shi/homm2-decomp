@@ -1004,9 +1004,9 @@ void combatManager::DrawFrame(
         giMaxExtentY++;
 
         // The fire walls burn inside the redraw extent too.
-        if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
+        if (!ironfist::state::Get().combat.FireWalls().empty()) {
             IconEntry* wallEntry = GetIconEntry(getWallIcon(), 0);
-            for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
+            for (auto& wall : ironfist::state::Get().combat.FireWalls()) {
                 hexcell* wallCell = &m_hexCells[wall.hexIdx];
                 i32 drawX = wallCell->m_x + wallEntry->x;
                 i32 drawY = wallCell->m_gridTop + wallEntry->y;
@@ -1067,7 +1067,7 @@ void combatManager::DrawFrame(
     }
 
     // The lingering fire walls burn under the creatures.
-    for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
+    for (auto& wall : ironfist::state::Get().combat.FireWalls()) {
         SLimitData wallLimits;
         getWallIcon()
             ->CombatClipDrawToBuffer(

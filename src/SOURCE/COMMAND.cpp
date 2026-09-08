@@ -1130,23 +1130,7 @@ void combatManager::ResetRound(void) {
         gpCombatManager->MakeCreaturesVanish();
     m_currentSpeed = ROUND_INITIAL_SPEED;
 
-    // Astral dodge re-arms every round; fire walls burn down over rounds.
-    for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
-        for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
-            army* currentArmy = m_armies[H2EnumIndex(side)] + armyIndex;
-            if (currentArmy->m_monsterType != CREATURE_NONE
-                && ironfist::HasCreatureAttribute(currentArmy->m_monsterType, ironfist::CreatureAttribute::AstralDodge))
-                ironfist::state::Get().combat.stack.abilityCounter[currentArmy][ironfist::CreatureAttribute::AstralDodge] = 1;
-        }
-    }
-    auto wall = ironfist::state::Get().combat.spell.fireBombWalls.begin();
-    while (wall != ironfist::state::Get().combat.spell.fireBombWalls.end()) {
-        wall->turnsLeft--;
-        if (wall->turnsLeft < 0)
-            wall = ironfist::state::Get().combat.spell.fireBombWalls.erase(wall);
-        else
-            ++wall;
-    }
+    ironfist::state::Get().combat.AdvanceRound();
 }
 
 // Which of the six hex sectors the cursor points at, for the plasma-cone
@@ -1227,7 +1211,7 @@ CursorDirection combatManager::GetCursorDirection(i32 screenX, i32 screenY, i32 
 }
 
 void combatManager::CheckBurnCreature(army* stack) {
-    for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
+    for (auto& wall : ironfist::state::Get().combat.FireWalls()) {
         if (wall.hexIdx == stack->m_hex) {
             stack->SetSpellInfluence(ARMY_SPELL_INFLUENCE_BURN, COMBAT_BURN_ROUNDS);
             BurnCreature(stack);
@@ -3098,17 +3082,12 @@ setCycleTimer:
     );
 
     // The fire walls flicker along with the screen cycle.
-    if (!ironfist::state::Get().combat.spell.fireBombWalls.empty()) {
+    if (!ironfist::state::Get().combat.FireWalls().empty()) {
         icon* wallIcon =
             gpResourceManager->GetIcon(gCombatFxNames[H2EnumIndex(COMBAT_EFFECT_FIRE_BOMB)]);
         const i32 frameCount = wallIcon->m_frameCount;
         gpResourceManager->Dispose(wallIcon);
-        for (auto& wall : ironfist::state::Get().combat.spell.fireBombWalls) {
-            wall.currentFrame++;
-            if (wall.currentFrame >= frameCount) {
-                wall.currentFrame = 0;
-            }
-        }
+        ironfist::state::Get().combat.AdvanceWallAnimation(frameCount);
     }
 }
 
