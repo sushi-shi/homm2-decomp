@@ -1134,7 +1134,18 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "gbIAmGreatest") elem->QueryIntText(&gbIAmGreatest);
         else if (name == "campaignType") elem->QueryIntText(&campaignType);
         else if (name == "mapHeader") ReadMapHeader(elem);
-        else if (name == "playerNames") xml::QueryText(elem, cPlayerNames[index]);
+        else if (name == "playerNames") {
+            i32 playerIndex;
+            if (elem->QueryIntAttribute("index", &playerIndex) == tinyxml2::XML_SUCCESS
+                && playerIndex >= 0 && playerIndex < GAME_PLAYER_COUNT) {
+                // WriteArray stores names in attributes. Accept the text form
+                // from older/handwritten saves as a fallback.
+                const char* playerName = elem->Attribute("value");
+                if (!playerName)
+                    playerName = elem->GetText();
+                utf8::Copy(cPlayerNames[playerIndex], sizeof(cPlayerNames[playerIndex]), playerName);
+            }
+        }
         else if (name == "deadPlayers") gpGame->m_playerDead[index] = value;
         else if (name == "alivePlayers") hasPlayer[index] = value;
         else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;
