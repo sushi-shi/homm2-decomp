@@ -17,7 +17,6 @@
 #include <string>
 
 #define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
-#include <BASE/MiscEnums.h>
 typedef enum DataEntryLayout {
     WINDOW_X                    = 0xb1,
     WINDOW_Y                    = 0x14,
@@ -186,8 +185,6 @@ i32 iDEMaxLen = 0;
 i32 iMemEntries = 0;
 MemEntry* gpMemEntry = NULL;
 i32 giTotalMemAllocated = 0;
-static const char* gcCDTrackName =
-    "\\Tracks2\\02-AudioTrack 02.ogg";
 u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
@@ -585,23 +582,11 @@ void ReadPrefsFromFile(void) {
             WritePrefs();
         }
     }
-    strcpy(
-        gcRegCDRomPath,
-        ""
-    );
-    strcpy(
-        gcRegAppPath,
-        ""
-    );
-}
-
-void ReadPrefsFromRegistry(void) {
-    ReadPrefsFromFile();
 }
 
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-    ReadPrefsFromRegistry();
+    ReadPrefsFromFile();
     utf8::Format(gConfig.rmtRLName, "RMT%sRL.BIN", gConfig.uniqueSystemID);
     utf8::Format(gConfig.rmtRCName, "RMT%sRC.BIN", gConfig.uniqueSystemID);
     utf8::Format(gConfig.rmtRDName, "RMT%sRD.BIN", gConfig.uniqueSystemID);
@@ -622,30 +607,9 @@ void WritePrefsToFile(void) {
     platform::FileClose(fd);
 }
 
-void WritePrefsToRegistry(void) {
-    WritePrefsToFile();
-}
-
 void WritePrefs(void) {
     UpdateSystemOptionsMenu();
-    WritePrefsToRegistry();
-}
-
-CDRomSetupResult SetupCDDrive(void) {
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%sHEROES2x.AGG", ".\\DATA\\");
-    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
-    if (file == -1)
-        return CD_ROM_DATA_FILES_MISSING;
-    platform::FileClose(file);
-
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", ".", gcCDTrackName);
-    file = platform::FileOpen(gText, platform::FileMode::Read);
-    if (file == -1)
-        return CD_ROM_DATA_FILES_MISSING;
-    platform::FileClose(file);
-
-    strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
-    return CD_ROM_READY;
+    WritePrefsToFile();
 }
 
 void BitmapToScreen(class bitmap* bmp) {

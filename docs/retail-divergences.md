@@ -75,6 +75,16 @@ bypasses of the shared low-level conversion.
 
 ## Replaced subsystem
 
+### Installed media
+
+The portable startup no longer checks a CD-drive status or requires the obsolete
+`Tracks2/02-AudioTrack 02.ogg` marker. The resource manager checks the required
+installed AGG archives, music is read from `MUSIC`, and movies use the installed
+`HEROES2/ANIM` and `DATA` directories. Missing optional music does not prevent
+startup. CD-dependent host/single-player menu restrictions, disc-insertion
+messages, unused drive-path globals and registry-forwarding wrappers are
+removed. The portable tree contains no floppy-drive implementation.
+
 ### Network-save compression
 
 Retail uses the recovered legacy Bzip codec through temporary files and exposes

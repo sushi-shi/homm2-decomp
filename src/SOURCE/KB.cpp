@@ -9,7 +9,6 @@
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
-#include <BASE/MiscEnums.h>
 #include <BASE/MiscGraphicsConstants.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
@@ -406,71 +405,6 @@ void DeleteMainClasses(void) {
     gpResourceManager = NULL;
 }
 
-void EarlyShutdown(const char* caption, const char* text) {
-    platform::ShowMessage(caption, text);
-    exit(0);
-}
-
-void SetupCDRom(void) {
-    if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
-        soundManager* sound;
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        sound = gpSoundManager;
-        sound->ShutdownSoundBackends();
-        gSoundDisabled = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.unavailable_guest_only"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
-        soundManager* sound;
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        sound = gpSoundManager;
-        sound->ShutdownSoundBackends();
-        gSoundDisabled = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                localization::Tr("system.cdrom.expansion_disc_missing"),
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    }
-    if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
-        EarlyShutdown(
-            localization::Tr("system.startup_error.title"),
-            localization::Tr("system.startup_error.game_directory_missing")
-        );
-        exit(0);
-    }
-    if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
-        EarlyShutdown(
-            localization::Tr("system.startup_error.title"),
-            localization::Tr("system.startup_error.data_files_missing")
-        );
-        exit(0);
-    }
-}
-
 i32 EarlySetup(void) {
     if (bEarlySetupDone)
         return 0;
@@ -481,7 +415,6 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     LogStr("ES1");
-    iCDRomErr = SetupCDDrive();
     InitVars();
     LogStr("ES2");
     return 1;
@@ -524,7 +457,6 @@ i32 oldmain(void) {
     );
     gpMouseManager->SetColorMice(gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor);
     LogStr("OM4");
-    SetupCDRom();
     LogStr("OM5");
     if (gpSoundManager->Open(-1))
         ShutDown(localization::Tr("system.sound.initialization_failed"));
@@ -6168,7 +6100,6 @@ const char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] 
         "campxtre.ICN"
     }
 };
-char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\ANIM2\\";
 char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
 char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 char gcMusicPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\TRACKS2\\";
@@ -6178,7 +6109,6 @@ icon* gShingleAnim = NULL;
 i32 iNextShingleAnim = 0;
 i32 giDialogTimeout = 0;
 i32 giNewMonsterCycleFrame = 0;
-b32 gbNoCDRom = false;
 b32 gbLeaveNetBoxAlone = false;
 b32 gbDrawWindowBackground = true;
 b32 gbCheatMenus = false;
@@ -10355,7 +10285,6 @@ b32 gbLowMemory = false;
 i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
 void* gLowPage = NULL;
 b32 gbInPollSound = false;
-H2EnumStorage<CDRomSetupResult, i32> iCDRomErr = CD_ROM_READY;
 i32 bEarlySetupDone = 0;
 b32 bKBDone = false;
 struct _REDBOOK* hRedbookz = NULL;
@@ -10437,7 +10366,6 @@ i32 glTimers[GLOBAL_TIMER_COUNT];
 i32 giScore;
 armyGroup* gpMonGroup;
 configStruct gConfig;
-char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 u32l gTimeMark;
 char* EXPANSION_AGGREGATE_NAME;
 char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
@@ -10459,7 +10387,6 @@ void** ppMapExtra;
 char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 i32 giThisNetPos;
 i8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
-char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 class heroWindow* heroWin;
 i32 giOverviewReturnActionExtra;
 H2EnumStorage<CombatSide, i32> giCurGeneral;
