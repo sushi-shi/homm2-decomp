@@ -29,8 +29,6 @@ struct adventureSoundCell {
 typedef enum AdventureManagerStorageConstant {
     ADVMGR_LOCATOR_STATE_COUNT           = 12,
     ADVMGR_BOTTOM_VIEW_ITEM_COUNT        = 5,
-    ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE = 0x14,
-    ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE = 0x18,
     ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
     ADVMGR_OBJECT_ICON_COUNT             = 64,
     ADVMGR_ANIMATION_PHASE_COUNT         = 4,
@@ -53,30 +51,17 @@ enum class ArmySizeNameVariant : i32 {
 };
 using enum ArmySizeNameVariant;
 
-#pragma pack(push, 1)
 class advManager : public baseManager {
 public:
     AdventureCommand m_selectedCell;
-    union {
-        i32 m_heroLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
-        class widget* m_bottomViewPrimaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
-        struct {
-            class iconWidget* m_bottomViewBackground;
-            class iconWidget* m_bottomViewHourglassBackground;
-            class iconWidget* m_bottomViewIcons[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
-            char m_bottomViewIconPadding[ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE];
-        };
-    };
-    union {
-        i32 m_townLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
-        class widget* m_bottomViewSecondaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
-        class textWidget* m_bottomViewAllTexts[ADVMGR_LOCATOR_STATE_COUNT];
-        struct {
-            i32 m_bottomViewTextReserved;
-            class textWidget* m_bottomViewTexts[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
-            char m_bottomViewTextPadding[ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE];
-        };
-    };
+    // Runtime widget slots. The old integer/pointer overlays assumed four-byte
+    // pointers and could clear only half the array or split a text pointer.
+    class widget* m_bottomViewPrimaryWidgets[ADVMGR_LOCATOR_STATE_COUNT]{};
+    class widget* m_bottomViewSecondaryWidgets[ADVMGR_LOCATOR_STATE_COUNT]{};
+    widget*& BottomViewBackground() { return m_bottomViewPrimaryWidgets[0]; }
+    widget*& BottomViewHourglassBackground() { return m_bottomViewPrimaryWidgets[1]; }
+    widget*& BottomViewIcon(i32 index) { return m_bottomViewPrimaryWidgets[index + 2]; }
+    widget*& BottomViewText(i32 index) { return m_bottomViewSecondaryWidgets[index + 1]; }
     class heroWindow* m_adventureWindow;
     u16* m_visibilityMap;
     b32 m_visibilityMapValid;
@@ -373,7 +358,6 @@ public:
         i32
     );
 };
-#pragma pack(pop)
 
 extern b32 bMoveSoundMade;
 extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];

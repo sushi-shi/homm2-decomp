@@ -113,8 +113,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     }
 
     if (result == 1) {
-        message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
+        SetExecutiveResult(message, message.payload.widget.data.value);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

@@ -40,6 +40,7 @@ Other targets:
 nix build .#homm2
 nix build .#homm2-debug
 nix build .#homm2-linux
+nix build .#homm2-linux64
 nix build .#homm2-windows
 nix build .#homm2-web
 ```
@@ -62,8 +63,11 @@ web bundle under `~/.cache/homm2-web`. Set `HOMM2_WEB_OUTPUT` to change it.
 
 ## Current platform
 
-Linux uses a 32-bit SDL3 build. This remains the supported game target while
-other host widths are evaluated. Additional systems belong under `PLATFORM`.
+Linux defaults to the existing 32-bit SDL3 build. `homm2-linux64` provides an
+opt-in x86-64 Linux executable using 64-bit dependencies. Its development shell
+is `nix develop .#linux64`; configure a manual build there with
+`-DHOMM2_32BIT=OFF`. The ordinary development shell and default package continue
+to build the 32-bit game. Additional systems belong under `PLATFORM`.
 
 Hero, army, town, player, campaign, setup, mine, and boat saves use fixed-size
 little-endian byte records in `SaveRecords.h`. Their runtime classes use natural
@@ -76,10 +80,24 @@ Unsaved runtime fields, including live pointers and AI state, remain untouched.
 
 `save_records` tests each record's size, known scalar bytes, all truncation
 lengths, and round trips without retail assets. The codecs are also suitable for
-64-bit builds; this alone does not establish that the entire game is portable.
+64-bit builds. The native flake checks build and test both Linux widths.
 Packed map, resource, and preference records still require little-endian targets,
 which CMake checks explicitly. Networking remains unsupported and its internal
 runtime-object messages are not a retail wire-compatibility contract.
+
+`i32l`/`u32l` retain the retail `long` type where it is four bytes and use fixed
+32-bit types on LP64 hosts. Debug address formatting uses pointers directly.
+Dialog results are transferred explicitly between message variants, whose
+pointer-bearing fields need not have the same offsets on different hosts.
+Adventure-panel widgets occupy naturally aligned pointer arrays; integer
+overlays and fixed-byte padding no longer determine their initialization or
+cleanup slots.
+
+The ARM evaluation is reproducible with `nix build .#homm2-arm64-check`. It
+compiles every core game translation unit for AArch64, then runs the save-record
+and dialog-result tests under QEMU user-mode emulation. It does not link the ARM
+SDL application or validate graphics/audio on ARM hardware. That remaining work
+is distinct from the tested x86-64 Linux executable.
 
 Video, input, audio, and cinematics use the platform layer. Network transports
 are not supported yet.
