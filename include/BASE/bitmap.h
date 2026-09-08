@@ -11,7 +11,6 @@ enum class BitmapType : i16 {
 };
 using enum BitmapType;
 
-#pragma pack(push, 1)
 class bitmap : public resource {
 public:
     BitmapType m_bitmapType;
@@ -47,5 +46,4 @@ public:
         i32 height
     );
 };
-#pragma pack(pop)
 #endif

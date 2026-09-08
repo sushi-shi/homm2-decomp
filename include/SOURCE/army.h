@@ -27,7 +27,6 @@ typedef enum ArmyHexConstant {
     ARMY_HEX_INVALID      = -1
 } ArmyHexConstant;
 
-#pragma pack(push, 1)
 class army {
 public:
     bchar m_animationState;
@@ -154,7 +153,6 @@ public:
         return m_monsterType >= CREATURE_PEASANT && m_quantity > 0;
     }
 };
-#pragma pack(pop)
 extern b32 bSecondAttack;
 extern b32 gbGenieHalf;
 

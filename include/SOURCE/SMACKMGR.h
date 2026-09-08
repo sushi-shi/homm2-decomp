@@ -13,7 +13,6 @@ typedef enum SmackManagerStorageConstant {
     SMACK_MILES_RESERVED_SIZE  = 0x4c
 } SmackManagerStorageConstant;
 
-#pragma pack(push, 1)
 struct tag_rect {
     i16 x;
     i16 y;
@@ -35,7 +34,6 @@ struct SSmackOptions {
     i16 companionY;
 };
 
-#pragma pack(pop)
 
 void DoAdvance(platform::MovieId, i32, i32, i32, i32);
 void SmackManagerMain(void);

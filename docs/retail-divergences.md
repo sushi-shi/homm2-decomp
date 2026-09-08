@@ -55,6 +55,13 @@ including the retail reserved bytes and overlapping town spell/count fields.
 Campaign initialization uses those field boundaries instead of clearing a byte
 prefix across adjacent runtime members.
 
+Runtime manager, widget, resource, audio playback and combat objects also use
+natural alignment. Their pointers, messages and numeric members are passed by
+reference in portable C++; retaining byte packing made input initialization and
+music playback undefined. Packed map cells, resource headers and configuration
+records retain their file layouts. The `runtime_alignment` check rejects
+misaligned manager messages, music state and resource pointers at compile time.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |

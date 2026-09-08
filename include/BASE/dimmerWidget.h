@@ -6,7 +6,6 @@
 
 struct tag_message;
 
-#pragma pack(push, 1)
 class dimmerWidget : public widget {
 public:
     dimmerWidget(void);
@@ -23,5 +22,4 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
 };
-#pragma pack(pop)
 #endif

@@ -40,7 +40,6 @@ using enum SoundDigitalReportQuery;
 class sample;
 struct tag_message;
 
-#pragma pack(push, 1)
 struct SampleChannelStruct {
     i32 startChannel;
     i32 endChannel;
@@ -84,7 +83,6 @@ public:
     void ServiceSound(void);
     i32 MusicPlaying(void);
 };
-#pragma pack(pop)
 
 
 extern bool gSoundDisabled;
