@@ -150,7 +150,6 @@ typedef enum GameHeroPoolConstant {
 
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32);
-void GenerateStandardFileName(char*, char*);
 MessageDispatchResult ViewSpellsHandler(struct tag_message&);
 MessageDispatchResult ViewSpecialHandler(struct tag_message&);
 MessageDispatchResult ViewArmyHandler(struct tag_message&);

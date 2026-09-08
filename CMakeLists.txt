@@ -324,6 +324,9 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME binary_io COMMAND homm2_binary_io_test)
+  add_executable(homm2_save_filename_test tools/save_filename_test.cpp src/SOURCE/SaveNames.cpp)
+  target_include_directories(homm2_save_filename_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME save_filename COMMAND homm2_save_filename_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE
@@ -393,6 +396,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
   add_test(NAME filesystem COMMAND homm2_filesystem_test)
+  add_executable(homm2_file_transaction_test tools/file_transaction_test.cpp)
+  target_include_directories(homm2_file_transaction_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_file_transaction_test PRIVATE homm2_platform)
+  add_test(NAME file_transaction COMMAND homm2_file_transaction_test)
+
   add_executable(homm2_platform_primitives_test tools/platform_primitives_test.cpp)
   target_include_directories(homm2_platform_primitives_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include

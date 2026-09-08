@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/FileTransaction.h>
 #include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
@@ -161,8 +162,6 @@ typedef enum GameSaveFormatConstant {
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
     SAVE_LEGACY_CLEAR_SIZE             = 40,
     SAVE_LEGACY_SERIALIZED_SIZE        = 36,
-    SAVE_STANDARD_FILENAME_SIZE        = 14,
-    STANDARD_FILENAME_BASENAME_SIZE    = 8,
     SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
     SAVE_SPARE_SLOT_COUNT              = 6,
@@ -1067,33 +1066,6 @@ i32 game::GetMineId(i32 col, i32 row) {
     return -1;
 }
 
-void GenerateStandardFileName(char* source, char* destination) {
-    char* ext = FindLastToken(source, '.');
-    if (ext == NULL) {
-        strcpy(destination, source);
-        return;
-    }
-
-    *ext = '\0';
-    i32 indexOut = 0;
-    i32 length = strlen(source);
-    i32 i;
-    char chr;
-    for (i = 0; i < length; i++) {
-        chr = source[i];
-        if (chr >= 'a' && chr <= 'z')
-            chr -= 'a' - 'A';
-        if ((chr >= 'A' && chr <= 'Z') || (chr >= '0' && chr <= '9') || chr == '_') {
-            destination[indexOut] = chr;
-            indexOut++;
-        }
-        if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
-            i = 999;
-    }
-    *ext = '.';
-    strcpy(destination + indexOut, ext);
-}
-
 void EncodeGameFileText(
     const char* source,
     char* destination,
@@ -1174,10 +1146,11 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
                    sizeof(save_names::PlayerExit) - 1
                )
                 != 0)
-            strcpy(gpGame->m_saveName, filename);
+            utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     }
 
-    outFile = platform::FileOpen(savePath.c_str(), platform::FileMode::Write);
+    platform::FileTransaction transaction(platform::Files(), savePath.c_str());
+    outFile = transaction.Handle();
     if (outFile == -1)
         FileError(savePath.c_str());
 
@@ -1194,7 +1167,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    decltype(cPlayerNames) serializedPlayerNames;
+    decltype(cPlayerNames) serializedPlayerNames{};
     for (iFile = 0; iFile < GAME_PLAYER_COUNT; ++iFile) {
         EncodeGameFileText(
             cPlayerNames[iFile],
@@ -1221,8 +1194,8 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
 
     gpAdvManager->PurgeMapChangeQueue();
     WriteGameData(outFile, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    GenerateStandardFileName(m_saveName, workBuf);
-    WriteGameData(outFile, workBuf, SAVE_STANDARD_FILENAME_SIZE);
+    const save_names::LegacyFilename serializedName = save_names::ToLegacyFilename(m_saveName);
+    WriteGameData(outFile, serializedName.data(), serializedName.size());
     WriteGameData(outFile, &m_playerCount, sizeof(m_playerCount));
     plBuf[0] = static_cast<char>(giCurPlayer);
     WriteGameData(outFile, plBuf, sizeof(plBuf[0]));
@@ -1267,7 +1240,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
     WriteGameData(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
     WriteGameData(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    char serializedRumour[sizeof(m_rumour)];
+    char serializedRumour[sizeof(m_rumour)]{};
     EncodeGameFileText(
         m_rumour, serializedRumour, sizeof(serializedRumour), "tavern rumour"
     );
@@ -1302,8 +1275,10 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
     m_worldMap.Write(outFile);
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    platform::FileClose(outFile);
+    const bool committed = transaction.Commit();
     H2_FREE(emptyPayload);
+    if (!committed)
+        FileError(savePath.c_str());
     return 1;
 }
 
@@ -1552,7 +1527,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
 
     gpAdvManager->PurgeMapChangeQueue();
     ReadGameData(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    ReadGameData(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
+    ReadGameData(fd, workData, save_names::LegacyFilenameSize);
     if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     ReadGameData(fd, &m_playerCount, sizeof(m_playerCount));
