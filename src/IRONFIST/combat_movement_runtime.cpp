@@ -12,6 +12,14 @@ bool Execute(army& actor, const Plan& plan) {
         return false;
     auto& extensions = state::Get().combat;
     const auto identity = extensions.Identity(actor);
+    state::AttackApproach approach;
+    for (const auto& step : plan.steps) {
+        approach.jump |= step.attackJump;
+        approach.charge |= step.kind == StepKind::Charge;
+        approach.distantTeleport |= step.kind == StepKind::Fly
+            && extensions.HasAbility(actor, CreatureAttribute::Teleporter) && !actor.IsCloseMove(step.to);
+    }
+    extensions.SetApproach(actor, approach);
     for (size_t i = 0; i < plan.steps.size(); ++i) {
         const auto& step = plan.steps[i];
         if (extensions.Resolve(identity) != &actor || actor.m_quantity <= 0 || actor.m_hex != step.from)
@@ -29,8 +37,6 @@ bool Execute(army& actor, const Plan& plan) {
                 for (i32 crossed : step.crossedHexes)
                     if (!traversal.CanTraverse(crossed))
                         return false;
-                if (step.attackJump)
-                    extensions.StartAnimation(actor, CreatureAttribute::Jumper);
                 actor.ArcJump(step.from, step.to);
                 break;
             case StepKind::Charge: {
@@ -50,7 +56,6 @@ bool Execute(army& actor, const Plan& plan) {
                     seen[side][slot] = true;
                     affected.push_back(hex);
                 }
-                gCharging = true;
                 // Resolve the planned crossed stacks regardless of rendering.
                 actor.ChargingDamage(affected);
                 actor.FlyTo(step.to);

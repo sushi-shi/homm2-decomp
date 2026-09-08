@@ -207,7 +207,7 @@ i32 army::FlyTo(i32 destination) {
     i32 endRearHex;
     i32 oldMaxY;
 
-    gCloseMove = IsCloseMove(destination);
+    const bool closeMove = IsCloseMove(destination);
     if (!ValidHex(destination)) {
         return 0;
     }
@@ -288,11 +288,11 @@ i32 army::FlyTo(i32 destination) {
                     &m_frameInfo,
                     leg + 1 == stepCount1,
                     leg > 0,
-                    gCloseMove
+                    closeMove
                 );
             } else {
                 BuildTempWalkSeq(&m_frameInfo, leg + 1 == stepCount1, leg > 0);
-                if (gCharging && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
+                if (ironfist::state::Get().combat.Approach(*this).charge && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
                     ChargingDirection chargeDirection = CHARGING_FORWARD;
                     double chargeAngle =
                         (180.0 / M_PI) * atan2(static_cast<double>(ySpan0), abs(xDistance));
@@ -329,7 +329,7 @@ i32 army::FlyTo(i32 destination) {
                     && m_animationFrame < frameStart + frameCount0) {
                     // A far teleport snaps straight to the destination.
                     if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)
-                        && !gCloseMove) {
+                        && !closeMove) {
                         xPos = static_cast<float>(endX);
                         yPos = static_cast<float>(endY);
                     } else {

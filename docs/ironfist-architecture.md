@@ -78,6 +78,22 @@ growth.
 
 ## Types and state
 
+Combat damage and added effects resolve through `ironfist::effects`. Resolution
+applies health, spell, shield, and ability changes and produces an owned
+`DamageResult` with slot identities, damage/absorption, casualties, and effect
+outcomes. Burn also commits death occupancy before presentation. The presenter
+adapts those results to the existing wince/death pipeline and formats messages;
+its render-extent guard owns temporary drawing bounds. Headless burn omits the
+presenter without omitting damage or death.
+
+Movement records jump, charge, and distant-teleport approach in the owning
+stack's battle record. Damage consumes that mechanical context, not animation
+flags or shared movement globals. Jump and dodge animations are consequences
+of resolved events; skipping them cannot preserve an already spent ability.
+Shadow mark applies its influence during resolution instead of asking the
+later `PowEffect` animation to cast it. Retail attack choreography and deferred
+retail creature spells still use the existing `PowEffect` adapter.
+
 Ironfist creatures, artifacts, spells, and map objects extend the existing
 typed HoMM2 domains. Retail `*_COUNT` sentinels retain their original values;
 larger storage capacities are explicit and code that opts into the extended

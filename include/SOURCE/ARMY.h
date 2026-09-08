@@ -190,9 +190,4 @@ void BuildTempWalkSeq(struct SMonFrameInfo*, i32, i32);
 void BuildTeleporterTempWalkSeq(struct SMonFrameInfo*, i32, i32, bool);
 void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
 
-// Ironfist movement state threading through the attack path.
-extern bool gCloseMove;
-extern bool gChargePathDamage;
-extern bool gCharging;
-
 #endif
