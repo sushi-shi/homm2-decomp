@@ -123,10 +123,11 @@ full porting history. The late milestones, briefly:
 - Adventure: shipyard map object, monster free-join flags, barrier/tent
   auto-visit, artifact quick view, draw-order fixes, the movement-reminder
   pref, no-CD movie tolerance, Win32 menu cheats.
-- Campaigns became data (`IRONFIST/campaigns.*`): retail tables seed map-keyed
-  stores at startup and `CAMPAIGNS/*.cmp` files (upstream's campaign-metadata
-  XML) register further campaigns from ID 4 up; the bundled Cyborg campaign is
-  `cyborg.cmp` + `CAMP5_*.HXC`. Custom-campaign saves embed their metadata.
+- Campaigns use a validated catalog (`IRONFIST/campaigns.*`): each definition
+  owns its scenarios, choices, start and victory rules, and hero carryover
+  rules. Retail tables seed it; sorted `CAMPAIGNS/*.cmp` files register IDs
+  from 4 up. Definitions are replaced whole, with runtime progress stored
+  separately. Saves carry a detached definition alongside that progress.
 - The map editor tree stayed out of scope (this port builds one game binary
   and has no editManager/dialog-resource base); recorded in its deleting
   commit.
