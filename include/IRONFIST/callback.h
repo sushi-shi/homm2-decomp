@@ -43,7 +43,10 @@ lua_State* ArtifactState();
 
 template <typename... Args>
 void InvokeState(lua_State* ls, const char* funcName, Args... args) {
-    if (!ls || !GlobalExists(ls, funcName))
+    if (!ls)
+        return;
+    const LuaStackScope stack(ls);
+    if (!GlobalExists(ls, funcName))
         return;
     lua_getglobal(ls, funcName);
     PushLuaValues(ls, args...);
@@ -65,6 +68,7 @@ std::optional<Res> InvokeStateResult(lua_State* ls, const char* funcName, Args..
         return std::optional<Res>();
     }
 
+    const LuaStackScope stack(ls);
     if (!GlobalExists(ls, funcName)) {
         return std::optional<Res>();
     }

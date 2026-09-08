@@ -42,6 +42,7 @@ std::optional<bool> PopLuaResult(lua_State* L, i32 arg) {
         return retVal;
     } else {
         DisplayError("Incorrect return value: expected bool; got something else", "Script error");
+        lua_remove(L, arg);
         return {};
     }
 }
@@ -59,6 +60,7 @@ std::optional<std::string> PopLuaResult(lua_State* L, i32 arg) {
     if (!lua_isnil(L, arg)) {
         DisplayError("Incorrect return value: expected string; got something else", "Script error");
     }
+    lua_remove(L, arg);
     return {};
 }
 
@@ -70,6 +72,7 @@ std::optional<i32> PopLuaResult(lua_State* L, i32 arg) {
         return retVal;
     } else {
         DisplayError("Incorrect return value: expected int; got something else", "Script error");
+        lua_remove(L, arg);
         return {};
     }
 }
@@ -82,6 +85,7 @@ std::optional<double> PopLuaResult(lua_State* L, i32 arg) {
         return retVal;
     } else {
         DisplayError("Incorrect return value: expected double; got something else", "Script error");
+        lua_remove(L, arg);
         return {};
     }
 }
