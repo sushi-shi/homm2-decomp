@@ -14,7 +14,7 @@
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
 #include <IRONFIST/campaigns.h>
-#include <IRONFIST/save_xml.h>
+#include <IRONFIST/runtime.h>
 #include <SOURCE/netwin.h>
 #include <SOURCE/SETUP.h>
 #include <stdio.h>
@@ -648,7 +648,7 @@ i32 game::PickLoadGame(void) {
     if (gbInCampaign != 0 || xIsPlayingExpansionCampaign != 0) {
         // Campaign saves pick their extension by campaign type, custom
         // campaigns included.
-        utf8::Format(fileMask, "*%s", ironfist::save::FileExtension(1).c_str());
+        utf8::Format(fileMask, "*%s", ironfist::runtime::FileExtension(1).c_str());
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             localization::Tr("network.load.expansion_unavailable"),

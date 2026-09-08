@@ -2,43 +2,65 @@
 
 #include <cstdio>
 #include <cstring>
-#include <fcntl.h>
-
-#include <BASE/Misc.h>
 #include <BASE/Utf8.h>
-#include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
-#include <PLATFORM/Strings.h>
-#include <SOURCE/netwin.h>
-#include <string.h>
 
 #include <map>
+#include <algorithm>
+#include <stdexcept>
+#include <iterator>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <IRONFIST/artifacts.h>
-#include <IRONFIST/campaigns.h>
-#include <IRONFIST/dialog.h>
-#include <IRONFIST/state.h>
-#include <IRONFIST/hooks.h>
-#include <IRONFIST/runtime.h>
+#include <IRONFIST/session.h>
 #include <IRONFIST/scripting.h>
 
-#include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/advManager.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/playerData.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
 namespace ironfist::save {
+
+namespace {
+
+const char* RequiredAttribute(tinyxml2::XMLElement* element, const char* name) {
+    const char* value = element->Attribute(name);
+    if (!value)
+        throw std::invalid_argument(std::string("Missing ") + name + " on " + element->Name());
+    return value;
+}
+
+template <typename Container>
+decltype(auto) CheckedSlot(Container& records, i32 index) {
+    if (index < 0 || static_cast<size_t>(index) >= std::size(records))
+        throw std::out_of_range("Record index outside session storage");
+    return records[index];
+}
+
+template <size_t Size>
+void ReadText(tinyxml2::XMLElement* element, char (&destination)[Size]) {
+    utf8::Copy(destination, Size, element->GetText());
+}
+
+void AppendCampaignMetadata(tinyxml2::XMLDocument* document, tinyxml2::XMLNode* root,
+                            const std::string& source) {
+    if (source.empty())
+        return;
+    tinyxml2::XMLDocument metadata;
+    if (metadata.Parse(source.c_str()) != tinyxml2::XML_SUCCESS || !metadata.RootElement())
+        throw std::invalid_argument("Invalid campaign metadata in session data");
+    root->InsertEndChild(metadata.RootElement()->DeepClone(document));
+}
+
+} // namespace
+
 
 template <size_t Count>
 static void WriteRelations(
@@ -74,101 +96,96 @@ static Relations ReadRelations(tinyxml2::XMLNode* root, const char* entryName, i
     return result;
 }
 
-i32 GetCampaignType(void) {
-    if (gbInCampaign)
-        return CAMPAIGN_ORIGINAL;
-    if (xIsPlayingExpansionCampaign)
-        return CAMPAIGN_EXPANSION;
-    return CAMPAIGN_NONE;
-}
-
-tinyxml2::XMLError XmlFile::Save(const char* fileName) {
+tinyxml2::XMLError XmlFile::Save(const char* fileName, const SessionData& data) {
+    tempDoc->Clear();
+    decodeError.clear();
     tinyxml2::XMLNode* pRoot = tempDoc->NewElement("ironfist_save");
     tempDoc->InsertFirstChild(pRoot);
 
-    xml::PushBack(tempDoc, pRoot, "allowAIArmySharing", gpGame->IsAIArmySharingAllowed());
-    xml::PushBack(tempDoc, pRoot, "mapWidth", gpGame->m_worldMap.width);
-    xml::PushBack(tempDoc, pRoot, "mapHeight", gpGame->m_worldMap.height);
-    xml::PushBack(tempDoc, pRoot, "gameDifficulty", gpGame->m_difficultyRating);
-    xml::PushBack(tempDoc, pRoot, "monthType", H2EnumIndex(giMonthType));
-    xml::PushBack(tempDoc, pRoot, "monthTypeExtra", giMonthTypeExtra);
-    xml::PushBack(tempDoc, pRoot, "weekType", H2EnumIndex(giWeekType));
-    xml::PushBack(tempDoc, pRoot, "weekTypeExtra", giWeekTypeExtra);
-    xml::PushBack(tempDoc, pRoot, "giMapChangeCtr", giMapChangeCtr);
-    xml::PushBack(tempDoc, pRoot, "numPlayers", static_cast<i32>(gpGame->m_playerCount));
-    xml::PushBack(tempDoc, pRoot, "giCurPlayer", giCurPlayer);
-    xml::PushBack(tempDoc, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(gpGame->m_deadPlayerCount));
-    xml::PushBack(tempDoc, pRoot, "day", gpGame->m_day);
-    xml::PushBack(tempDoc, pRoot, "week", gpGame->m_week);
-    xml::PushBack(tempDoc, pRoot, "month", gpGame->m_month);
-    xml::PushBack(tempDoc, pRoot, "numObelisks", static_cast<i32>(gpGame->m_obeliskCount));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocX", static_cast<i32>(gpGame->m_ultimateArtifactX));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(gpGame->m_ultimateArtifactY));
-    xml::PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(gpGame->m_ultimateArtifactId.value()));
-    xml::PushBack(tempDoc, pRoot, "currentRumor", gpGame->m_rumour);
-    xml::PushBack(tempDoc, pRoot, "numRumors", gpGame->m_rumourEventCount);
-    xml::PushBack(tempDoc, pRoot, "numEvents", gpGame->m_timeEventCount);
-    xml::PushBack(tempDoc, pRoot, "numMapEvents", gpGame->m_mapEventCount);
-    xml::PushBack(tempDoc, pRoot, "iMaxMapExtra", iMaxMapExtra);
-    xml::PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(gpGame->m_difficulty.value()));
-    xml::PushBack(tempDoc, pRoot, "mapFilename", gpGame->m_mapFilename);
-    xml::PushBack(tempDoc, pRoot, "relatedToNewGameSelection", static_cast<i32>(gpGame->m_selectedSetupPlayer));
-    xml::PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(gpGame->m_newGameInitialized));
-    xml::PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(gpGame->m_newGameHumanCount));
-    xml::PushBack(tempDoc, pRoot, "gbIAmGreatest", gbIAmGreatest);
-    i32 campaignType = GetCampaignType();
+    xml::PushBack(tempDoc, pRoot, "allowAIArmySharing", data.adventure.allowAIArmySharing);
+    xml::PushBack(tempDoc, pRoot, "mapWidth", data.world.width);
+    xml::PushBack(tempDoc, pRoot, "mapHeight", data.world.height);
+    xml::PushBack(tempDoc, pRoot, "gameDifficulty", data.records.m_difficultyRating);
+    xml::PushBack(tempDoc, pRoot, "monthType", H2EnumIndex(data.monthType));
+    xml::PushBack(tempDoc, pRoot, "monthTypeExtra", data.monthExtra);
+    xml::PushBack(tempDoc, pRoot, "weekType", H2EnumIndex(data.weekType));
+    xml::PushBack(tempDoc, pRoot, "weekTypeExtra", data.weekExtra);
+    xml::PushBack(tempDoc, pRoot, "giMapChangeCtr", data.mapChangeCounter);
+    xml::PushBack(tempDoc, pRoot, "numPlayers", static_cast<i32>(data.records.m_playerCount));
+    xml::PushBack(tempDoc, pRoot, "giCurPlayer", data.currentPlayer);
+    xml::PushBack(tempDoc, pRoot, "couldBeNumDefeatedPlayers", static_cast<i32>(data.records.m_deadPlayerCount));
+    xml::PushBack(tempDoc, pRoot, "day", data.records.m_day);
+    xml::PushBack(tempDoc, pRoot, "week", data.records.m_week);
+    xml::PushBack(tempDoc, pRoot, "month", data.records.m_month);
+    xml::PushBack(tempDoc, pRoot, "numObelisks", static_cast<i32>(data.records.m_obeliskCount));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocX", static_cast<i32>(data.records.m_ultimateArtifactX));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(data.records.m_ultimateArtifactY));
+    xml::PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(data.records.m_ultimateArtifactId.value()));
+    xml::PushBack(tempDoc, pRoot, "currentRumor", data.records.m_rumour);
+    xml::PushBack(tempDoc, pRoot, "numRumors", data.records.m_rumourEventCount);
+    xml::PushBack(tempDoc, pRoot, "numEvents", data.records.m_timeEventCount);
+    xml::PushBack(tempDoc, pRoot, "numMapEvents", data.records.m_mapEventCount);
+    xml::PushBack(tempDoc, pRoot, "iMaxMapExtra", static_cast<i32>(data.world.objects.size()));
+    xml::PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(data.records.m_difficulty.value()));
+    xml::PushBack(tempDoc, pRoot, "mapFilename", data.records.m_mapFilename);
+    xml::PushBack(tempDoc, pRoot, "relatedToNewGameSelection", static_cast<i32>(data.records.m_selectedSetupPlayer));
+    xml::PushBack(tempDoc, pRoot, "relatedToNewGameInit", static_cast<i32>(data.records.m_newGameInitialized));
+    xml::PushBack(tempDoc, pRoot, "numHumanPlayers", static_cast<i32>(data.records.m_newGameHumanCount));
+    xml::PushBack(tempDoc, pRoot, "gbIAmGreatest", data.greatestPlayer);
+    const i32 campaignType = data.campaignType;
     xml::PushBack(tempDoc, pRoot, "campaignType", campaignType);
+    xml::PushBack(tempDoc, pRoot, "expansionMap", data.expansionMap);
 
     tinyxml2::XMLElement* pElement;
     if (campaignType) {
         pElement = tempDoc->NewElement("campaign");
         if (campaignType == CAMPAIGN_ORIGINAL) {
-            xml::PushBack(tempDoc, pElement, "campID", static_cast<i32>(gpGame->m_campaignType.value()));
-            xml::PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(gpGame->m_campaignStartingSide.value()));
-            xml::PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(gpGame->m_campaignScenario));
-            xml::PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(gpGame->m_unknown7d));
-            xml::PushBack(tempDoc, pElement, "campDaysPlayedCurrent", gpGame->m_campaignScore);
-            xml::PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(gpGame->m_campaignScenarioWon));
-            xml::PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(gpGame->m_campaignCheated));
+            xml::PushBack(tempDoc, pElement, "campID", static_cast<i32>(data.records.m_campaignType.value()));
+            xml::PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(data.records.m_campaignStartingSide.value()));
+            xml::PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(data.records.m_campaignScenario));
+            xml::PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(data.records.m_unknown7d));
+            xml::PushBack(tempDoc, pElement, "campDaysPlayedCurrent", data.records.m_campaignScore);
+            xml::PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(data.records.m_campaignScenarioWon));
+            xml::PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(data.records.m_campaignCheated));
 
             WriteCampaignDDArray(
-                tempDoc, pElement, "campMapsWon", gpGame->m_campaignScenarioCompleted
+                tempDoc, pElement, "campMapsWon", data.records.m_campaignScenarioCompleted
             );
             WriteCampaignDDArray(
-                tempDoc, pElement, "campDaysPlayed", gpGame->m_campaignScenarioBonus
+                tempDoc, pElement, "campDaysPlayed", data.records.m_campaignScenarioBonus
             );
             WriteCampaignDDArray(
-                tempDoc, pElement, "campDaysPlayed2", gpGame->m_campaignScenarioDays
+                tempDoc, pElement, "campDaysPlayed2", data.records.m_campaignScenarioDays
             );
-            WriteCampaignDDArray(tempDoc, pElement, "campChoices", gpGame->m_campaignChoice);
+            WriteCampaignDDArray(tempDoc, pElement, "campChoices", data.records.m_campaignChoice);
             WriteCampaignDDArray(
-                tempDoc, pElement, "campMapsPlayed", gpGame->m_campaignMapEnabled
+                tempDoc, pElement, "campMapsPlayed", data.records.m_campaignMapEnabled
             );
 
-            xml::WriteArray(tempDoc, pElement, "campBonuses", gpGame->m_campaignAwards);
+            xml::WriteArray(tempDoc, pElement, "campBonuses", data.records.m_campaignAwards);
             xml::WriteArray(
-                tempDoc, pElement, "campPlayerCreatures", gpGame->m_campaignCarryoverCreatureTypes
+                tempDoc, pElement, "campPlayerCreatures", data.records.m_campaignCarryoverCreatureTypes
             );
             xml::WriteArray(
                 tempDoc, pElement, "campPlayerCreatureQuantities",
-                gpGame->m_campaignCarryoverCreatureCounts
+                data.records.m_campaignCarryoverCreatureCounts
             );
         } else if (campaignType == CAMPAIGN_EXPANSION) {
-            xml::PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(xCampaign.m_campaignId));
-            xml::PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(xCampaign.m_currentMap));
-            xml::PushBack(tempDoc, pElement, "numMaps", xCampaign.m_mapCount);
-            xml::PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(xCampaign.m_viewMap));
-            xml::PushBack(tempDoc, pElement, "anIntVariable", xCampaign.m_viewOnly);
+            xml::PushBack(tempDoc, pElement, "campaignID", H2EnumIndex(data.expansion.m_campaignId));
+            xml::PushBack(tempDoc, pElement, "currentMapID", H2EnumIndex(data.expansion.m_currentMap));
+            xml::PushBack(tempDoc, pElement, "numMaps", data.expansion.m_mapCount);
+            xml::PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(data.expansion.m_viewMap));
+            xml::PushBack(tempDoc, pElement, "anIntVariable", data.expansion.m_viewOnly);
 
-            xml::WriteArray(tempDoc, pElement, "mapChoice", xCampaign.m_mapChoices);
-            xml::WriteArray(tempDoc, pElement, "mapsPlayed", xCampaign.m_mapsPlayed);
-            xml::WriteArray(tempDoc, pElement, "daysPlayed", xCampaign.m_mapDays);
-            xml::WriteArray(tempDoc, pElement, "awards", xCampaign.m_awards);
-            xml::WriteArray(tempDoc, pElement, "bonusChoices", xCampaign.m_bonusChoices);
+            xml::WriteArray(tempDoc, pElement, "mapChoice", data.expansion.m_mapChoices);
+            xml::WriteArray(tempDoc, pElement, "mapsPlayed", data.expansion.m_mapsPlayed);
+            xml::WriteArray(tempDoc, pElement, "daysPlayed", data.expansion.m_mapDays);
+            xml::WriteArray(tempDoc, pElement, "awards", data.expansion.m_awards);
+            xml::WriteArray(tempDoc, pElement, "bonusChoices", data.expansion.m_bonusChoices);
 
             // saved hero for autosaved saves
-            for (auto& i : state::Get().campaign.savedHeroData) {
-                state::CampaignState::PartialHeroData* savedHero = &i.second;
+            for (auto& i : data.campaign.savedHeroData) {
+                const state::CampaignState::PartialHeroData* savedHero = &i.second;
                 tinyxml2::XMLElement* savedHeroElem = tempDoc->NewElement("savedHero");
                 savedHeroElem->SetAttribute("index", i.first);
                 xml::WriteArray(tempDoc, savedHeroElem, "primarySkills", savedHero->primarySkills);
@@ -193,13 +210,13 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
 
             // A custom campaign's save carries its whole definition, so it
             // loads even if the .cmp vanishes from CAMPAIGNS/.
-            WriteCampaignMetadata(tempDoc, pRoot);
+            AppendCampaignMetadata(tempDoc, pRoot, data.campaignMetadata);
         }
         pRoot->InsertEndChild(pElement);
     }
 
     pElement = tempDoc->NewElement("mapHeader");
-    SMapHeader* mh = &gpGame->m_mapHeader;
+    const SMapHeader* mh = &data.records.m_mapHeader;
     xml::PushBack(tempDoc, pElement, "field_0", static_cast<i32>(mh->magic));
     xml::PushBack(
         tempDoc, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->unknown5 << 8)))
@@ -234,54 +251,50 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     xml::WriteArray(tempDoc, pElement, "playerFactions", mh->playerRace);
     pRoot->InsertEndChild(pElement);
 
-    xml::WriteArray(tempDoc, pRoot, "playerNames", cPlayerNames);
-    xml::WriteArray(tempDoc, pRoot, "deadPlayers", gpGame->m_playerDead);
+    xml::WriteArray(tempDoc, pRoot, "playerNames", data.playerNames);
+    xml::WriteArray(tempDoc, pRoot, "deadPlayers", data.records.m_playerDead);
 
     bchar playerAlive[H2EnumIndex(GAME_PLAYER_COUNT)];
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); ++i) {
-        playerAlive[i] = gbHumanPlayer[i];
-        if (gpGame->m_playerDead[i])
+        playerAlive[i] = data.humanPlayers[i];
+        if (data.records.m_playerDead[i])
             playerAlive[i] = false;
     }
 
     xml::WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
-    xml::WriteArray(tempDoc, pRoot, "heroHireStatus", gpGame->m_availableHeroes);
-    xml::WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", gpGame->m_setupPlayerColor);
-    xml::WriteArray(tempDoc, pRoot, "playerHandicap", gpGame->m_playerHandicap);
-    xml::WriteArray(tempDoc, pRoot, "newGameSelectedFaction", gpGame->m_setupPlayerRace);
+    xml::WriteArray(tempDoc, pRoot, "heroHireStatus", data.records.m_availableHeroes);
+    xml::WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", data.records.m_setupPlayerColor);
+    xml::WriteArray(tempDoc, pRoot, "playerHandicap", data.records.m_playerHandicap);
+    xml::WriteArray(tempDoc, pRoot, "newGameSelectedFaction", data.records.m_setupPlayerRace);
     xml::WriteArray(
-        tempDoc, pRoot, "somePlayerCodeOr10IfMayBeHuman", gpGame->m_setupPlayerNetworkId
+        tempDoc, pRoot, "somePlayerCodeOr10IfMayBeHuman", data.records.m_setupPlayerNetworkId
     );
-    xml::WriteArray(tempDoc, pRoot, "somePlayerNumData", gpGame->m_setupPlayerType);
-    xml::WriteArray(tempDoc, pRoot, "field_47C", gpGame->_pad_0x47c);
-    xml::WriteArray(tempDoc, pRoot, "field_2773", gpGame->m_castleOwners);
-    xml::WriteArray(tempDoc, pRoot, "builtToday", gpGame->m_dailyEventFlags);
-    xml::WriteArray(tempDoc, pRoot, "field_60A6", gpGame->m_mineOwners);
-    xml::WriteArray(tempDoc, pRoot, "randomArtifacts", SerializeGeneratedArtifacts());
-    xml::WriteArray(tempDoc, pRoot, "boatBuilt", gpGame->m_boatSlots);
-    xml::WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", gpGame->m_obeliskVisitors);
-    xml::WriteArray(tempDoc, pRoot, "field_637D", gpGame->m_defaultPlayerNames);
-    xml::WriteArray(tempDoc, pRoot, "rumorIndices", gpGame->m_rumourEventIndices);
-    xml::WriteArray(tempDoc, pRoot, "eventIndices", gpGame->m_timeEventIndices);
-    xml::WriteArray(tempDoc, pRoot, "mapEventIndices", gpGame->m_mapEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "somePlayerNumData", data.records.m_setupPlayerType);
+    xml::WriteArray(tempDoc, pRoot, "field_47C", data.records._pad_0x47c);
+    xml::WriteArray(tempDoc, pRoot, "field_2773", data.records.m_castleOwners);
+    xml::WriteArray(tempDoc, pRoot, "builtToday", data.records.m_dailyEventFlags);
+    xml::WriteArray(tempDoc, pRoot, "field_60A6", data.records.m_mineOwners);
+    xml::WriteArray(tempDoc, pRoot, "randomArtifacts", data.generatedArtifacts);
+    xml::WriteArray(tempDoc, pRoot, "boatBuilt", data.records.m_boatSlots);
+    xml::WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", data.records.m_obeliskVisitors);
+    xml::WriteArray(tempDoc, pRoot, "field_637D", data.records.m_defaultPlayerNames);
+    xml::WriteArray(tempDoc, pRoot, "rumorIndices", data.records.m_rumourEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "eventIndices", data.records.m_timeEventIndices);
+    xml::WriteArray(tempDoc, pRoot, "mapEventIndices", data.records.m_mapEventIndices);
 
-    for (i32 i = 1; i < iMaxMapExtra; i++) {
-        tinyxml2::XMLElement* extraElem = tempDoc->NewElement("mapExtra");
-        extraElem->SetAttribute("index", i);
-        for (i32 j = 0; j < pwSizeOfMapExtra[i]; j++) {
-            tinyxml2::XMLElement* ppMapExtraElem = tempDoc->NewElement("ppMapExtra");
-            if (ppMapExtra[i]) {
-                ppMapExtraElem->SetAttribute("value", *(static_cast<char*>(ppMapExtra[i]) + j));
-            } else {
-                ppMapExtraElem->SetAttribute("value", 0);
-            }
-            extraElem->InsertEndChild(ppMapExtraElem);
+    for (size_t i = 1; i < data.world.objects.size(); ++i) {
+        auto* extraElem = tempDoc->NewElement("mapExtra");
+        extraElem->SetAttribute("index", static_cast<i32>(i));
+        for (i8 value : data.world.objects[i]) {
+            auto* byte = tempDoc->NewElement("ppMapExtra");
+            byte->SetAttribute("value", static_cast<i32>(value));
+            extraElem->InsertEndChild(byte);
         }
         pRoot->InsertEndChild(extraElem);
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); i++) {
-        playerData* player = &gpGame->m_players[i];
+        const playerData* player = &data.records.m_players[i];
         tinyxml2::XMLElement* playerElem = tempDoc->NewElement("playerData");
         playerElem->SetAttribute("index", i);
 
@@ -292,7 +305,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
             tempDoc, playerElem, "relatedToSomeSortOfHeroCountOrIdx",
             static_cast<i32>(player->m_heroLocatorPage)
         );
-        xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(gpGame->m_cheated));
+        xml::PushBack(tempDoc, playerElem, "hasCheated", static_cast<i32>(data.records.m_cheated));
         xml::PushBack(tempDoc, playerElem, "puzzlePieces", static_cast<i32>(player->m_cheatValue));
         xml::PushBack(tempDoc, playerElem, "personality", H2EnumIndex(player->m_aiDifficulty));
         xml::PushBack(
@@ -328,7 +341,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_TOWN_COUNT); i++) {
-        town* twn = &gpGame->m_castleRecs[i];
+        const town* twn = &data.records.m_castleRecs[i];
         tinyxml2::XMLElement* townElem = tempDoc->NewElement("town");
         townElem->SetAttribute("index", i);
         xml::PushBack(tempDoc, townElem, "idx", static_cast<i32>(twn->m_id));
@@ -383,7 +396,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_MINE_COUNT); i++) {
-        mineRecord* m = &gpGame->m_mines[i];
+        const mineRecord* m = &data.records.m_mines[i];
         tinyxml2::XMLElement* mineElem = tempDoc->NewElement("mine");
         mineElem->SetAttribute("index", i);
         mineElem->SetAttribute("x", m->x);
@@ -397,7 +410,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_BOAT_COUNT); i++) {
-        boatRecord* b = &gpGame->m_boats[i];
+        const boatRecord* b = &data.records.m_boats[i];
         tinyxml2::XMLElement* boatElem = tempDoc->NewElement("boat");
         boatElem->SetAttribute("index", i);
         boatElem->SetAttribute("idx", b->id);
@@ -413,12 +426,12 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
 
     pElement = tempDoc->NewElement("map");
-    fullMap* map = &gpGame->m_worldMap;
+    const WorldRecords* map = &data.world;
     pElement->SetAttribute("width", map->width);
     pElement->SetAttribute("height", map->height);
-    pElement->SetAttribute("numCellExtras", map->extraCount);
+    pElement->SetAttribute("numCellExtras", static_cast<i32>(map->extras.size()));
     for (i32 i = 0; i < map->height * map->width; i++) {
-        mapCell* c = &map->cells[i];
+        const mapCell* c = &map->cells[i];
         tinyxml2::XMLElement* mapElement = tempDoc->NewElement("mapCell");
         mapElement->SetAttribute("index", i);
         mapElement->SetAttribute("groundIndex", c->m_terrainImageIndex);
@@ -440,8 +453,8 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
         pElement->InsertEndChild(mapElement);
     }
 
-    for (i32 i = 0; i < map->extraCount; i++) {
-        mapCellExtra* e = &map->extras[i];
+    for (i32 i = 0; i < static_cast<i32>(map->extras.size()); i++) {
+        const mapCellExtra* e = &map->extras[i];
         tinyxml2::XMLElement* mapElement = tempDoc->NewElement("mapCellExtra");
         mapElement->SetAttribute("index", i);
         mapElement->SetAttribute("nextIdx", e->nextIndex);
@@ -460,17 +473,17 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
     pRoot->InsertEndChild(pElement);
 
-    for (i32 i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++) {
+    for (i32 i = 0; i < data.world.width * data.world.height; i++) {
         tinyxml2::XMLElement* elem = tempDoc->NewElement("mapRevealed");
         elem->SetAttribute("index", i);
-        elem->SetAttribute("x", i % MAP_WIDTH);
-        elem->SetAttribute("y", i / MAP_WIDTH);
-        elem->SetAttribute("value", mapExtra[i]);
+        elem->SetAttribute("x", i % data.world.width);
+        elem->SetAttribute("y", i / data.world.width);
+        elem->SetAttribute("value", data.world.visibility[i]);
         pRoot->InsertEndChild(elem);
     }
 
     for (i32 i = 0; i < H2EnumIndex(GAME_HERO_COUNT); i++) {
-        hero* hro = &gpGame->m_heroRecs[i];
+        const hero* hro = &data.records.m_heroRecs[i];
         tinyxml2::XMLElement* heroElement = tempDoc->NewElement("hero");
         heroElement->SetAttribute("index", i);
         xml::PushBack(tempDoc, heroElement, "idx", static_cast<i32>(hro->m_id));
@@ -569,7 +582,7 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     pElement = tempDoc->NewElement("disallowedBuildings");
     for (i32 j = 0; j < H2EnumIndex(GAME_TOWN_COUNT); j++) {
         for (i32 bit = 0; bit < 32; bit++) {
-            if (gpGame->m_castleRecs[j].IsBuildingDisallowed(bit)) {
+            if (data.adventure.disallowedBuildings[j][bit]) {
                 tinyxml2::XMLElement* buildElem = tempDoc->NewElement("building");
                 buildElem->SetAttribute("town", j);
                 buildElem->SetAttribute("building", bit);
@@ -579,35 +592,56 @@ tinyxml2::XMLError XmlFile::Save(const char* fileName) {
     }
     pRoot->InsertEndChild(pElement);
 
-    const auto& adventure = state::Get().adventure;
+    const auto& adventure = data.adventure;
     WriteRelations(tempDoc, pRoot, "sharedVision", "share", adventure.sharePlayerVision);
     WriteRelations(tempDoc, pRoot, "forcedHeroChases", "chase", adventure.forcedComputerPlayerChases);
-    WriteMapVariables(pRoot);
-    const std::string& script = script::ActiveScriptContents();
+    WriteMapVariables(pRoot, data);
+    const std::string& script = data.scriptSource;
     if (script.length())
         xml::PushBack(tempDoc, pRoot, "script", script.c_str());
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Write);
     return tempDoc->SaveFile(path.c_str());
 }
 
-tinyxml2::XMLError XmlFile::Read(const char* fileName) {
+tinyxml2::XMLError XmlFile::Read(const char* fileName, SessionData& data) {
+    decodeError.clear();
     const std::string path = platform::Files().Resolve(fileName, platform::FileMode::Read);
-    tinyxml2::XMLError eResult = tempDoc->LoadFile(path.c_str());
-    if (!eResult) {
-        tinyxml2::XMLNode* pRoot = tempDoc->FirstChild();
-        ReadRoot(pRoot);
+    const auto result = tempDoc->LoadFile(path.c_str());
+    if (result != tinyxml2::XML_SUCCESS)
+        return result;
+    try {
+        SessionData parsed;
+        auto* root = tempDoc->FirstChildElement("ironfist_save");
+        if (!root)
+            throw std::invalid_argument("Missing ironfist_save root");
+        ReadRoot(root, parsed);
+        if (!parsed.hasWorld || parsed.world.width <= 0 || parsed.world.height <= 0)
+            throw std::invalid_argument("A saved game needs a world map");
+        if (parsed.records.m_playerCount <= 0 || parsed.records.m_playerCount > GAME_PLAYER_COUNT
+            || parsed.currentPlayer < 0 || parsed.currentPlayer >= parsed.records.m_playerCount)
+            throw std::invalid_argument("Invalid current player in saved game");
+        data = std::move(parsed);
+        return tinyxml2::XML_SUCCESS;
+    } catch (const std::exception& error) {
+        decodeError = error.what();
+        return tinyxml2::XML_ERROR_PARSING;
     }
-    return eResult;
+}
+
+const char* XmlFile::GetError() {
+    return decodeError.empty() ? xml::XMLFile::GetError() : decodeError.c_str();
 }
 
 script::LuaTable XmlFile::ReadTable(tinyxml2::XMLNode* root) {
     script::LuaTable table;
+    if (!root)
+        return table;
 
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         if (name == "table") {
-            std::string tableId = elem->Attribute("tableId");
+            std::string tableId = RequiredAttribute(elem, "tableId");
             script::MapVariable& variable = table[tableId];
             variable.type = script::MapVariableType::Table;
             variable.table = ReadTable(elem);
@@ -618,9 +652,11 @@ script::LuaTable XmlFile::ReadTable(tinyxml2::XMLNode* root) {
 }
 
 void XmlFile::ReadTableElement(tinyxml2::XMLElement* elem, script::LuaTable& table) {
-    script::MapVariable& variable = table[elem->Attribute("key")];
-    variable.type = script::ParseMapVariableType(elem->Attribute("type"));
-    variable.value = elem->Attribute("value");
+    script::MapVariable& variable = table[RequiredAttribute(elem, "key")];
+    variable.type = script::ParseMapVariableType(RequiredAttribute(elem, "type"));
+    if (!script::IsScalar(variable.type))
+        throw std::invalid_argument("Invalid scalar map variable type");
+    variable.value = RequiredAttribute(elem, "value");
 }
 
 void XmlFile::WriteMapVarTable(
@@ -630,27 +666,26 @@ void XmlFile::WriteMapVarTable(
     tableElem->SetAttribute("tableId", id.c_str());
 
     for (const auto& [key, variable] : table) {
-        tinyxml2::XMLElement* elem = tableElem;
         if (script::IsTable(variable.type)) {
             WriteMapVarTable(tableElem, key, variable.table);
         } else {
-            elem = tempDoc->NewElement("tableElement");
+            auto* elem = tempDoc->NewElement("tableElement");
             elem->SetAttribute("key", key.c_str());
             elem->SetAttribute("type", script::MapVariableTypeName(variable.type).c_str());
             elem->SetAttribute("value", variable.value.c_str());
+            tableElem->InsertEndChild(elem);
         }
-        tableElem->InsertEndChild(elem);
     }
     dest->InsertEndChild(tableElem);
 }
 
-void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest) {
-    script::LuaTable mapVariables = script::LoadMapVariablesFromLua();
+void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest, const SessionData& data) {
+    script::LuaTable mapVariables = data.mapVariables;
 
     // Keep the upstream records for older readers, even without user variables.
     for (i32 i = 0; i != H2EnumIndex(GAME_HERO_COUNT); ++i) {
         for (i32 j = 0; j != H2EnumIndex(GAME_HERO_COUNT); ++j) {
-            if (gpGame->IsHeroChaseForced(i, j)) {
+            if (data.adventure.forcedComputerPlayerChases[i][j]) {
                 std::string mapVariableId =
                     "_AICHASE_" + std::to_string(i) + "_" + std::to_string(j) + "_";
                 script::MapVariable& variable = mapVariables[mapVariableId];
@@ -668,15 +703,15 @@ void XmlFile::WriteMapVariables(tinyxml2::XMLNode* dest) {
         } else if (script::IsScalar(variable.type)) {
             elem->SetAttribute("value", variable.value.c_str());
         } else {
-            DisplayError("Wrong Type created by GetMapVariables", "In function SaveMapVariables");
+            throw std::invalid_argument("Invalid map variable type in session data");
         }
         dest->InsertEndChild(elem);
     }
 }
 
-void XmlFile::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
-    state::Get().campaign.savedHeroData.clear();
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+void XmlFile::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType, SessionData& data) {
+    data.campaign.savedHeroData.clear();
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
@@ -684,61 +719,61 @@ void XmlFile::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
         if (campaignType == CAMPAIGN_ORIGINAL) {
             i32 campId = elem->IntAttribute("campID");
             i32 mapId = elem->IntAttribute("mapID");
-            if (name == "campID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignType));
-            else if (name == "campIDanother") xml::QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignStartingSide));
-            else if (name == "campMapID") xml::QueryCharText(elem, &gpGame->m_campaignScenario);
-            else if (name == "campUnknown") xml::QueryCharText(elem, &gpGame->m_unknown7d);
-            else if (name == "campDaysPlayedCurrent") xml::QueryShortText(elem, &gpGame->m_campaignScore);
-            else if (name == "campMaybeWon") xml::QueryCharText(elem, &gpGame->m_campaignScenarioWon);
-            else if (name == "campHasCheated") xml::QueryCharText(elem, &gpGame->m_campaignCheated);
-            else if (name == "campMapsWon") gpGame->m_campaignScenarioCompleted[campId][mapId] = value;
-            else if (name == "campDaysPlayed") gpGame->m_campaignScenarioBonus[campId][mapId] = static_cast<i16>(value);
-            else if (name == "campDaysPlayed2") gpGame->m_campaignScenarioDays[campId][mapId] = static_cast<i16>(value);
-            else if (name == "campChoices") gpGame->m_campaignChoice[campId][mapId] = value;
-            else if (name == "campMapsPlayed") gpGame->m_campaignMapEnabled[campId][mapId] = value;
-            else if (name == "campBonuses") gpGame->m_campaignAwards[index] = value;
-            else if (name == "campPlayerCreatures") gpGame->m_campaignCarryoverCreatureTypes[index] = static_cast<i16>(value);
-            else if (name == "campPlayerCreatureQuantities") gpGame->m_campaignCarryoverCreatureCounts[index] = static_cast<i16>(value);
+            if (name == "campID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&data.records.m_campaignType));
+            else if (name == "campIDanother") xml::QueryCharText(elem, reinterpret_cast<u8*>(&data.records.m_campaignStartingSide));
+            else if (name == "campMapID") xml::QueryCharText(elem, &data.records.m_campaignScenario);
+            else if (name == "campUnknown") xml::QueryCharText(elem, &data.records.m_unknown7d);
+            else if (name == "campDaysPlayedCurrent") xml::QueryShortText(elem, &data.records.m_campaignScore);
+            else if (name == "campMaybeWon") xml::QueryCharText(elem, &data.records.m_campaignScenarioWon);
+            else if (name == "campHasCheated") xml::QueryCharText(elem, &data.records.m_campaignCheated);
+            else if (name == "campMapsWon") CheckedSlot(CheckedSlot(data.records.m_campaignScenarioCompleted, campId), mapId) = value;
+            else if (name == "campDaysPlayed") CheckedSlot(CheckedSlot(data.records.m_campaignScenarioBonus, campId), mapId) = static_cast<i16>(value);
+            else if (name == "campDaysPlayed2") CheckedSlot(CheckedSlot(data.records.m_campaignScenarioDays, campId), mapId) = static_cast<i16>(value);
+            else if (name == "campChoices") CheckedSlot(CheckedSlot(data.records.m_campaignChoice, campId), mapId) = value;
+            else if (name == "campMapsPlayed") CheckedSlot(CheckedSlot(data.records.m_campaignMapEnabled, campId), mapId) = value;
+            else if (name == "campBonuses") CheckedSlot(data.records.m_campaignAwards, index) = value;
+            else if (name == "campPlayerCreatures") CheckedSlot(data.records.m_campaignCarryoverCreatureTypes, index) = static_cast<i16>(value);
+            else if (name == "campPlayerCreatureQuantities") CheckedSlot(data.records.m_campaignCarryoverCreatureCounts, index) = static_cast<i16>(value);
         } else if (campaignType == CAMPAIGN_EXPANSION) {
             i32 intValue;
-        if (name == "campaignID") { elem->QueryIntText(&intValue); xCampaign.m_campaignId = ExpansionCampaignIdFromCode(intValue); }
-        else if (name == "currentMapID") { elem->QueryIntText(&intValue); xCampaign.m_currentMap = ExpansionCampaignMapFromCode(intValue); }
-            else if (name == "numMaps") elem->QueryIntText(&xCampaign.m_mapCount);
-        else if (name == "mightBeScenarioID") { elem->QueryIntText(&intValue); xCampaign.m_viewMap = ExpansionCampaignMapFromCode(intValue); }
-            else if (name == "anIntVariable") elem->QueryIntText(&xCampaign.m_viewOnly);
-            else if (name == "mapChoice") xCampaign.m_mapChoices[index] = value;
-            else if (name == "mapsPlayed") xCampaign.m_mapsPlayed[index] = value;
-            else if (name == "daysPlayed") xCampaign.m_mapDays[index] = static_cast<i16>(value);
-            else if (name == "awards") xCampaign.m_awards[index] = value;
-            else if (name == "bonusChoices") xCampaign.m_bonusChoices[index] = value;
-            else if (name == "savedHero") ReadCampaignSavedHero(elem);
+        if (name == "campaignID") { elem->QueryIntText(&intValue); data.expansion.m_campaignId = ExpansionCampaignIdFromCode(intValue); }
+        else if (name == "currentMapID") { elem->QueryIntText(&intValue); data.expansion.m_currentMap = ExpansionCampaignMapFromCode(intValue); }
+            else if (name == "numMaps") elem->QueryIntText(&data.expansion.m_mapCount);
+        else if (name == "mightBeScenarioID") { elem->QueryIntText(&intValue); data.expansion.m_viewMap = ExpansionCampaignMapFromCode(intValue); }
+            else if (name == "anIntVariable") elem->QueryIntText(&data.expansion.m_viewOnly);
+            else if (name == "mapChoice") CheckedSlot(data.expansion.m_mapChoices, index) = value;
+            else if (name == "mapsPlayed") CheckedSlot(data.expansion.m_mapsPlayed, index) = value;
+            else if (name == "daysPlayed") CheckedSlot(data.expansion.m_mapDays, index) = static_cast<i16>(value);
+            else if (name == "awards") CheckedSlot(data.expansion.m_awards, index) = value;
+            else if (name == "bonusChoices") CheckedSlot(data.expansion.m_bonusChoices, index) = value;
+            else if (name == "savedHero") ReadCampaignSavedHero(elem, data);
         }
     }
 }
 
-void XmlFile::ReadCampaignSavedHero(tinyxml2::XMLNode* root) {
+void XmlFile::ReadCampaignSavedHero(tinyxml2::XMLNode* root, SessionData& data) {
     i32 savedHeroIdx = root->ToElement()->IntAttribute("index");
     state::CampaignState::PartialHeroData* savedHero =
-        &state::Get().campaign.savedHeroData[savedHeroIdx];
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+        &data.campaign.savedHeroData[savedHeroIdx];
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
-        if (name == "primarySkills") savedHero->primarySkills[index] = value;
-        if (name == "skillIndex") savedHero->skillIndex[index] = value;
-        if (name == "secondarySkillLevel") savedHero->secondarySkillLevel[index] = value;
-        if (name == "spell") savedHero->spellsLearned[elem->IntAttribute("idx")] = 1;
+        if (name == "primarySkills") CheckedSlot(savedHero->primarySkills, index) = value;
+        if (name == "skillIndex") CheckedSlot(savedHero->skillIndex, index) = value;
+        if (name == "secondarySkillLevel") CheckedSlot(savedHero->secondarySkillLevel, index) = value;
+        if (name == "spell") CheckedSlot(savedHero->spellsLearned, elem->IntAttribute("idx")) = 1;
         else if (name == "numSecSkillsKnown") elem->QueryIntText(&savedHero->numSecSkillsKnown);
         else if (name == "experience") elem->QueryIntText(&savedHero->experience);
     }
 }
 
-void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root) {
-    SMapHeader* mh = &gpGame->m_mapHeader;
+void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root, SessionData& data) {
+    SMapHeader* mh = &data.records.m_mapHeader;
     i32 lossValueLow = mh->lossConditionValue & 0xff;
     i32 lossValueHigh = mh->lossConditionValue >> 8;
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
@@ -775,38 +810,38 @@ void XmlFile::ReadMapHeader(tinyxml2::XMLNode* root) {
         else if (name == "winConditionArgumentOrLocY") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryTownY));
         else if (name == "lossConditionArgumentOrLocY") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->lossTownY));
         else if (name == "relatedToPlayerColorOrSide") xml::QueryShortText(elem, reinterpret_cast<i16*>(&mh->victorySideThreshold));
-        else if (name == "name") xml::QueryText(elem, mh->name);
-        else if (name == "description") xml::QueryText(elem, mh->description);
+        else if (name == "name") ReadText(elem, mh->name);
+        else if (name == "description") ReadText(elem, mh->description);
         else if (name == "field_1A0") xml::QueryCharText(elem, &mh->rumourCount);
         else if (name == "field_1A1") xml::QueryCharText(elem, &mh->timeEventCount);
-        else if (name == "hasPlayer") mh->playerEnabled[index] = value;
-        else if (name == "playerMayBeHuman") mh->playerCanHuman[index] = value;
-        else if (name == "playerMayBeComp") mh->playerCanComputer[index] = value;
-        else if (name == "playerFactions") mh->playerRace[index] = static_cast<i8>(value);
+        else if (name == "hasPlayer") CheckedSlot(mh->playerEnabled, index) = value;
+        else if (name == "playerMayBeHuman") CheckedSlot(mh->playerCanHuman, index) = value;
+        else if (name == "playerMayBeComp") CheckedSlot(mh->playerCanComputer, index) = value;
+        else if (name == "playerFactions") CheckedSlot(mh->playerRace, index) = static_cast<i8>(value);
     }
     mh->lossConditionValue = static_cast<u16>(lossValueLow | (lossValueHigh << 8));
 }
 
-void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
-    gpGame->m_worldMap.width = root->ToElement()->IntAttribute("width");
-    gpGame->m_worldMap.height = root->ToElement()->IntAttribute("height");
-    gpGame->m_worldMap.Init(gpGame->m_worldMap.width, gpGame->m_worldMap.height);
+void XmlFile::ReadMap(tinyxml2::XMLNode* root, SessionData& data) {
+    data.world.width = root->ToElement()->IntAttribute("width");
+    data.world.height = root->ToElement()->IntAttribute("height");
+    if (data.world.width < 0 || data.world.height < 0
+        || data.world.width > MAP_DIMENSION_XLARGE || data.world.height > MAP_DIMENSION_XLARGE)
+        throw std::invalid_argument("Invalid map dimensions");
+    const i32 extraCount = root->ToElement()->IntAttribute("numCellExtras");
+    if (extraCount < 0 || extraCount > 65536)
+        throw std::invalid_argument("Invalid map cell extra count");
+    data.world.cells.resize(data.world.width * data.world.height);
+    data.world.visibility.resize(data.world.cells.size());
+    data.world.extras.resize(extraCount);
+    data.hasWorld = true;
 
-    gpGame->m_worldMap.extraCount = root->ToElement()->IntAttribute("numCellExtras");
-    if (gpGame->m_worldMap.extraCount) {
-        // Init already released the previous map. Match fullMap's tracked
-        // allocation owner, including later growth and Close().
-        gpGame->m_worldMap.extras = static_cast<mapCellExtra*>(
-            H2_ALLOC(gpGame->m_worldMap.extraCount * sizeof(mapCellExtra))
-        );
-    }
-
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         if (name == "mapCell") {
-            mapCell* cell = &gpGame->m_worldMap.cells[index];
+            mapCell* cell = &CheckedSlot(data.world.cells, index);
             cell->m_terrainImageIndex = elem->IntAttribute("groundIndex");
             cell->m_animatedObject = elem->IntAttribute("hasObject");
             cell->m_isRoad = elem->IntAttribute("isRoad");
@@ -824,7 +859,7 @@ void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
             cell->m_triggerType = static_cast<u8>(elem->IntAttribute("objType"));
             cell->m_extraIndex = elem->IntAttribute("extraIdx");
         } else if (name == "mapCellExtra") {
-            mapCellExtra* ext = &gpGame->m_worldMap.extras[index];
+            mapCellExtra* ext = &CheckedSlot(data.world.extras, index);
             ext->nextIndex = elem->IntAttribute("nextIdx");
             ext->animatedObject = elem->IntAttribute("animatedObject");
                 ext->SetObjectTileset(TilesetIdFromCode(elem->IntAttribute("objTileset")));
@@ -841,30 +876,20 @@ void XmlFile::ReadMap(tinyxml2::XMLNode* root) {
     }
 }
 
-void XmlFile::ReadMapExtra(tinyxml2::XMLNode* root) {
-    i32 size = 0;
-    i32 index = root->ToElement()->IntAttribute("index");
-    std::vector<i32> values;
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
-        tinyxml2::XMLElement* elem = child->ToElement();
-        std::string name = elem->Name();
-        if (name == "ppMapExtra") {
-            values.push_back(elem->IntAttribute("value"));
-            size++;
-        }
-    }
-
-    pwSizeOfMapExtra[index] = static_cast<i16>(size);
-    ppMapExtra[index] = H2_ALLOC(pwSizeOfMapExtra[index]);
-
-    for (i32 j = 0; j < pwSizeOfMapExtra[index]; j++) {
-        *(static_cast<char*>(ppMapExtra[index]) + j) = static_cast<char>(values.at(j));
+void XmlFile::ReadMapExtra(tinyxml2::XMLNode* root, SessionData& data) {
+    auto& bytes = CheckedSlot(data.world.objects, root->ToElement()->IntAttribute("index"));
+    bytes.clear();
+    for (auto* byte = root->FirstChildElement("ppMapExtra"); byte;
+         byte = byte->NextSiblingElement("ppMapExtra")) {
+        if (bytes.size() >= 32767)
+            throw std::invalid_argument("Map object exceeds engine record capacity");
+        bytes.push_back(static_cast<i8>(byte->IntAttribute("value")));
     }
 }
 
-void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
-    playerData* pdata = &gpGame->m_players[dataIndex];
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex, SessionData& data) {
+    playerData* pdata = &CheckedSlot(data.records.m_players, dataIndex);
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
@@ -873,7 +898,7 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "numHeroes") xml::QueryCharText(elem, &pdata->m_heroCount);
         else if (name == "curHeroIdx") xml::QueryCharText(elem, &pdata->m_currentHero);
         else if (name == "relatedToSomeSortOfHeroCountOrIdx") xml::QueryCharText(elem, &pdata->m_heroLocatorPage);
-        else if (name == "hasCheated") xml::QueryCharText(elem, &gpGame->m_cheated);
+        else if (name == "hasCheated") xml::QueryCharText(elem, &data.records.m_cheated);
         else if (name == "puzzlePieces") xml::QueryCharText(elem, &pdata->m_cheatValue);
         else if (name == "personality") {
             i32 personality;
@@ -890,17 +915,17 @@ void XmlFile::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "mightBeCurCastleIdx") xml::QueryCharText(elem, &pdata->m_currentTown);
         else if (name == "relatedToUnknown") xml::QueryCharText(elem, &pdata->m_townLocatorPage);
         else if (name == "barrierTentsVisited") xml::QueryCharText(elem, &pdata->m_barrierTents);
-        else if (name == "heroesOwned") pdata->m_heroIds[index] = value;
-        else if (name == "heroesForPurchase") pdata->m_availableHeroIds[index] = value;
-        else if (name == "castlesOwned") pdata->m_townIds[index] = value;
-        else if (name == "resources") pdata->m_resources[index] = value;
-        else if (name == "resourcesIncome") pdata->m_aiData.m_income[index] = value;
-        else if (name == "_4_2_1") pdata->m_unknownad[index] = value;
+        else if (name == "heroesOwned") CheckedSlot(pdata->m_heroIds, index) = value;
+        else if (name == "heroesForPurchase") CheckedSlot(pdata->m_availableHeroIds, index) = value;
+        else if (name == "castlesOwned") CheckedSlot(pdata->m_townIds, index) = value;
+        else if (name == "resources") CheckedSlot(pdata->m_resources, index) = value;
+        else if (name == "resourcesIncome") CheckedSlot(pdata->m_aiData.m_income, index) = value;
+        else if (name == "_4_2_1") CheckedSlot(pdata->m_unknownad, index) = value;
     }
 }
 
-void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
-    hero* hro = &gpGame->m_heroRecs[heroIndex];
+void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data) {
+    hero* hro = &CheckedSlot(data.records.m_heroRecs, heroIndex);
     // Ironfist's hero::Clear: reset the identity and learned data the XML
     // only writes sparsely.
     hro->m_id = 0;
@@ -909,9 +934,9 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
     hro->m_y = 0;
     hro->m_cursorType = FactionTypeFromOrdinal(0);
     hro->m_portrait = HeroPortraitFromOrdinal(0);
-    hro->m_name[0] = '\0';
+    CheckedSlot(hro->m_name, 0) = '\0';
     memset(hro->m_spells, 0, sizeof(hro->m_spells));
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
@@ -922,7 +947,7 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "aiLastHeroInteractionIdx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_lastInteractionHeroId));
         else if (name == "aiLastTownInteractionTurn") xml::QueryShortText(elem, &hro->m_lastTownInteractionTurn);
         else if (name == "aiLastTownInteractionIdx") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_visitedTownId));
-        else if (name == "name") xml::QueryText(elem, hro->m_name);
+        else if (name == "name") ReadText(elem, hro->m_name);
         else if (name == "experience") elem->QueryIntText(&hro->m_experience);
         else if (name == "factionID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_cursorType));
         else if (name == "heroID") xml::QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_portrait));
@@ -943,11 +968,11 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "mobility") elem->QueryIntText(&hro->m_mobility);
         else if (name == "remainingMobility") elem->QueryIntText(&hro->m_remainingMobility);
         else if (name == "oldLevel") xml::QueryShortText(elem, &hro->m_level);
-        else if (name == "attack") xml::QueryCharText(elem, &hro->m_primaryStats[0]);
-        else if (name == "defense") xml::QueryCharText(elem, &hro->m_primaryStats[1]);
-        else if (name == "spellpower") xml::QueryCharText(elem, &hro->m_primaryStats[2]);
-        else if (name == "knowledge") xml::QueryCharText(elem, &hro->m_primaryStats[3]);
-        else if (name == "field_43") xml::QueryCharText(elem, &hro->m_primaryStats[4]);
+        else if (name == "attack") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 0));
+        else if (name == "defense") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 1));
+        else if (name == "spellpower") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 2));
+        else if (name == "knowledge") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 3));
+        else if (name == "field_43") xml::QueryCharText(elem, &CheckedSlot(hro->m_primaryStats, 4));
         else if (name == "tempMoraleBonuses") xml::QueryCharText(elem, &hro->m_morale);
         else if (name == "tempLuckBonuses") xml::QueryCharText(elem, &hro->m_luck);
         else if (name == "gazeboesVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_gazeboVisits));
@@ -967,31 +992,31 @@ void XmlFile::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "isCaptain") xml::QueryCharText(elem, &hro->m_isCaptain);
         else if (name == "aiParamFV") elem->QueryFloatText(&hro->m_aiFightValue);
         else if (name == "army") {
-            hro->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
-            hro->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
+            CheckedSlot(hro->m_army.m_creatureTypes, index) = static_cast<i8>(elem->IntAttribute("type"));
+            CheckedSlot(hro->m_army.m_quantities, index) = static_cast<i16>(elem->IntAttribute("quantity"));
         } else if (name == "secondarySkill") {
-            hro->m_secondarySkills[index] =
+            CheckedSlot(hro->m_secondarySkills, index) =
                 HeroSkillLevelFromCode(elem->IntAttribute("level"));
-            hro->m_secondarySkillOrder[index] = elem->IntAttribute("idx");
+            CheckedSlot(hro->m_secondarySkillOrder, index) = elem->IntAttribute("idx");
         } else if (name == "numSecSkillsKnown")
             elem->QueryIntText(&hro->m_secondarySkillCount);
         else if (name == "spell") {
             index = elem->IntAttribute("idx");
             if (index >= 0 && index < KB_SPELL_TABLE_CAPACITY)
-                hro->m_spells[index] = 1;
+                CheckedSlot(hro->m_spells, index) = 1;
         }
         else if (name == "artifact") {
-            hro->m_artifacts[index] = static_cast<i8>(elem->IntAttribute("id"));
-            hro->m_artifactExtra[index] = static_cast<i8>(elem->IntAttribute("spell"));
+            CheckedSlot(hro->m_artifacts, index) = static_cast<i8>(elem->IntAttribute("id"));
+            CheckedSlot(hro->m_artifactExtra, index) = static_cast<i8>(elem->IntAttribute("spell"));
         }
     }
 }
 
-void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
-    town* twn = &gpGame->m_castleRecs[townIdx];
+void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx, SessionData& data) {
+    town* twn = &CheckedSlot(data.records.m_castleRecs, townIdx);
     i32 turnsOwnedLow = twn->m_turnsOwned & 0xff;
     i32 turnsOwnedHigh = twn->m_turnsOwned >> 8;
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
@@ -1027,116 +1052,109 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             xml::QueryShortText(elem, &high);
             turnsOwnedHigh = high & 0xff;
         }
-        else if (name == "name") xml::QueryText(elem, twn->m_name);
+        else if (name == "name") ReadText(elem, twn->m_name);
         else if (name == "garrisonCreature") {
-            twn->m_army.m_creatureTypes[index] = static_cast<i8>(elem->IntAttribute("type"));
-            twn->m_army.m_quantities[index] = static_cast<i16>(elem->IntAttribute("quantity"));
+            CheckedSlot(twn->m_army.m_creatureTypes, index) = static_cast<i8>(elem->IntAttribute("type"));
+            CheckedSlot(twn->m_army.m_quantities, index) = static_cast<i16>(elem->IntAttribute("quantity"));
         } else if (name == "mageGuildSpell") {
             i32 level = elem->IntAttribute("level");
             i32 idx = elem->IntAttribute("idx");
             i32 spell = elem->IntAttribute("spell");
-            twn->m_spells[level][idx] = static_cast<i8>(spell);
+            CheckedSlot(CheckedSlot(twn->m_spells, level), idx) = static_cast<i8>(spell);
         } else if (name == "numCreaturesInDwelling")
-            twn->m_garrison[index] = static_cast<i16>(value);
+            CheckedSlot(twn->m_garrison, index) = static_cast<i16>(value);
         else if (name == "numSpellsOfLevel")
-            twn->m_spellCounts[index + TOWN_MAGE_GUILD_FIRST_LEVEL] = static_cast<i8>(value);
+            CheckedSlot(twn->m_spellCounts, index + TOWN_MAGE_GUILD_FIRST_LEVEL) = static_cast<i8>(value);
     }
     twn->m_turnsOwned = static_cast<u16>(turnsOwnedLow | (turnsOwnedHigh << 8));
 }
 
-void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
-    script::Shutdown();
-    std::string savedScript;
-    i32 campaignType = CAMPAIGN_NONE;
-    char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
-    std::vector<i32> xmlArtifacts;
-    script::LuaTable mapVariables;
-    Relations savedVision;
-    Relations savedChases;
+void XmlFile::ReadRoot(tinyxml2::XMLNode* root, SessionData& data) {
+    if (auto* map = root->FirstChildElement("map"))
+        ReadMap(map, data);
+    if (auto* countElement = root->FirstChildElement("iMaxMapExtra")) {
+        const i32 count = countElement->IntText();
+        if (count < 0 || count > 65536)
+            throw std::invalid_argument("Invalid map object count");
+        data.world.objects.resize(count);
+    }
+    if (auto* campaign = root->FirstChildElement("campaignType"))
+        data.campaignType = campaign->IntText();
     Relations legacyChases;
-    bool hasSavedVision = false;
-    bool hasSavedChases = false;
-    for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
+    for (tinyxml2::XMLNode* child = root->FirstChildElement(); child; child = child->NextSiblingElement()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
         i32 index = elem->IntAttribute("index");
         i32 value = elem->IntAttribute("value");
         if (name == "sharedVision") {
-            savedVision = ReadRelations(elem, "share", GAME_PLAYER_COUNT);
-            hasSavedVision = true;
+            for (const auto& [source, destination] : ReadRelations(elem, "share", GAME_PLAYER_COUNT))
+                data.adventure.sharePlayerVision[source][destination] = true;
+            data.hasSharedVision = true;
         } else if (name == "forcedHeroChases") {
-            savedChases = ReadRelations(elem, "chase", GAME_HERO_COUNT);
-            hasSavedChases = true;
+            for (const auto& [source, destination] : ReadRelations(elem, "chase", GAME_HERO_COUNT))
+                data.adventure.forcedComputerPlayerChases[source][destination] = true;
+            data.hasForcedChases = true;
         } else if (name == "allowAIArmySharing") {
             bool allow = true;
             elem->QueryBoolText(&allow);
-            gpGame->SetAIArmySharing(allow);
+            data.adventure.allowAIArmySharing = allow;
+            data.hasAIArmySharing = true;
         } else if (name == "disallowedBuildings") {
-            for (tinyxml2::XMLNode* build = elem->FirstChild(); build;
-                 build = build->NextSibling()) {
+            data.hasBuildingBans = true;
+            for (tinyxml2::XMLNode* build = elem->FirstChildElement(); build;
+                 build = build->NextSiblingElement()) {
                 tinyxml2::XMLElement* buildElem = build->ToElement();
                 const i32 townIndex = buildElem->IntAttribute("town");
                 if (townIndex >= 0 && townIndex < GAME_TOWN_COUNT) {
-                    gpGame->m_castleRecs[townIndex].DisallowBuilding(
-                        buildElem->IntAttribute("building")
-                    );
+                    const i32 building = buildElem->IntAttribute("building");
+                    if (building >= 0 && building < 32)
+                        data.adventure.disallowedBuildings[townIndex][building] = true;
                 }
             }
         }
-        else if (name == "mapWidth") elem->QueryIntText(&gpGame->m_worldMap.width);
-        else if (name == "mapHeight") {
-            elem->QueryIntText(&gpGame->m_worldMap.height);
-            gpGame->SetMapSize(gpGame->m_worldMap.width, gpGame->m_worldMap.height);
-        }
-        else if (name == "gameDifficulty") xml::QueryShortText(elem, &gpGame->m_difficultyRating);
+        else if (name == "mapWidth" || name == "mapHeight") {}
+        else if (name == "gameDifficulty") xml::QueryShortText(elem, &data.records.m_difficultyRating);
         else if (name == "monthType") {
             i32 monthType;
             elem->QueryIntText(&monthType);
-            giMonthType = CalendarPeriodTypeFromCode(monthType);
+            data.monthType = CalendarPeriodTypeFromCode(monthType);
         }
-        else if (name == "monthTypeExtra") elem->QueryIntText(&giMonthTypeExtra);
+        else if (name == "monthTypeExtra") elem->QueryIntText(&data.monthExtra);
         else if (name == "weekType") {
             i32 weekType;
             elem->QueryIntText(&weekType);
-            giWeekType = CalendarPeriodTypeFromCode(weekType);
+            data.weekType = CalendarPeriodTypeFromCode(weekType);
         }
-        else if (name == "weekTypeExtra") elem->QueryIntText(&giWeekTypeExtra);
+        else if (name == "weekTypeExtra") elem->QueryIntText(&data.weekExtra);
         else if (name == "giMapChangeCtr") {
-            gpAdvManager->PurgeMapChangeQueue();
-            elem->QueryIntText(&giMapChangeCtr);
+            elem->QueryIntText(&data.mapChangeCounter);
         }
-        else if (name == "numPlayers") xml::QueryCharText(elem, &gpGame->m_playerCount);
-        else if (name == "giCurPlayer") elem->QueryIntText(&giCurPlayer);
-        else if (name == "couldBeNumDefeatedPlayers") xml::QueryCharText(elem, &gpGame->m_deadPlayerCount);
-        else if (name == "day") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_day));
-        else if (name == "week") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_week));
-        else if (name == "month") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_month));
-        else if (name == "numObelisks") xml::QueryCharText(elem, &gpGame->m_obeliskCount);
-        else if (name == "ultimateArtifactLocX") xml::QueryCharText(elem, &gpGame->m_ultimateArtifactX);
-        else if (name == "ultimateArtifactLocY") xml::QueryCharText(elem, &gpGame->m_ultimateArtifactY);
-        else if (name == "ultimateArtifactIdx") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_ultimateArtifactId));
-        else if (name == "currentRumor") xml::QueryText(elem, gpGame->m_rumour);
-        else if (name == "numRumors") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_rumourEventCount));
-        else if (name == "numEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_timeEventCount));
-        else if (name == "numMapEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_mapEventCount));
-        else if (name == "iMaxMapExtra") {
-            elem->QueryIntText(&iMaxMapExtra);
-            ppMapExtra = static_cast<void**>(H2_ALLOC(sizeof(void*) * iMaxMapExtra));
-            pwSizeOfMapExtra = static_cast<i16*>(H2_ALLOC(sizeof(i16) * iMaxMapExtra));
-            memset(ppMapExtra, 0, sizeof(void*) * iMaxMapExtra);
-            memset(pwSizeOfMapExtra, 0, sizeof(i16) * iMaxMapExtra);
-        }
-        else if (name == "difficulty") xml::QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
+        else if (name == "numPlayers") xml::QueryCharText(elem, &data.records.m_playerCount);
+        else if (name == "giCurPlayer") elem->QueryIntText(&data.currentPlayer);
+        else if (name == "couldBeNumDefeatedPlayers") xml::QueryCharText(elem, &data.records.m_deadPlayerCount);
+        else if (name == "day") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_day));
+        else if (name == "week") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_week));
+        else if (name == "month") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_month));
+        else if (name == "numObelisks") xml::QueryCharText(elem, &data.records.m_obeliskCount);
+        else if (name == "ultimateArtifactLocX") xml::QueryCharText(elem, &data.records.m_ultimateArtifactX);
+        else if (name == "ultimateArtifactLocY") xml::QueryCharText(elem, &data.records.m_ultimateArtifactY);
+        else if (name == "ultimateArtifactIdx") xml::QueryCharText(elem, reinterpret_cast<i8*>(&data.records.m_ultimateArtifactId));
+        else if (name == "currentRumor") ReadText(elem, data.records.m_rumour);
+        else if (name == "numRumors") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_rumourEventCount));
+        else if (name == "numEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_timeEventCount));
+        else if (name == "numMapEvents") xml::QueryShortText(elem, reinterpret_cast<i16*>(&data.records.m_mapEventCount));
+        else if (name == "iMaxMapExtra") {}
+        else if (name == "difficulty") xml::QueryCharText(elem, reinterpret_cast<i8*>(&data.records.m_difficulty));
         else if (name == "mapFilename") {
-            xml::QueryText(elem, gpGame->m_mapFilename);
-            utf8::Copy(gMapName, GLOBAL_MAP_NAME_SIZE, gpGame->m_mapFilename);
+            ReadText(elem, data.records.m_mapFilename);
         }
-        else if (name == "relatedToNewGameSelection") xml::QueryCharText(elem, &gpGame->m_selectedSetupPlayer);
-        else if (name == "relatedToNewGameInit") xml::QueryCharText(elem, &gpGame->m_newGameInitialized);
-        else if (name == "numHumanPlayers") xml::QueryCharText(elem, &gpGame->m_newGameHumanCount);
-        else if (name == "gbIAmGreatest") elem->QueryIntText(&gbIAmGreatest);
-        else if (name == "campaignType") elem->QueryIntText(&campaignType);
-        else if (name == "mapHeader") ReadMapHeader(elem);
+        else if (name == "relatedToNewGameSelection") xml::QueryCharText(elem, &data.records.m_selectedSetupPlayer);
+        else if (name == "relatedToNewGameInit") xml::QueryCharText(elem, &data.records.m_newGameInitialized);
+        else if (name == "numHumanPlayers") xml::QueryCharText(elem, &data.records.m_newGameHumanCount);
+        else if (name == "gbIAmGreatest") elem->QueryIntText(&data.greatestPlayer);
+        else if (name == "campaignType") {}
+        else if (name == "expansionMap") data.expansionMap = elem->BoolText();
+        else if (name == "mapHeader") ReadMapHeader(elem, data);
         else if (name == "playerNames") {
             i32 playerIndex;
             if (elem->QueryIntAttribute("index", &playerIndex) == tinyxml2::XML_SUCCESS
@@ -1146,37 +1164,37 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
                 const char* playerName = elem->Attribute("value");
                 if (!playerName)
                     playerName = elem->GetText();
-                utf8::Copy(cPlayerNames[playerIndex], sizeof(cPlayerNames[playerIndex]), playerName);
+                utf8::Copy(CheckedSlot(data.playerNames, playerIndex), sizeof(CheckedSlot(data.playerNames, playerIndex)), playerName);
             }
         }
-        else if (name == "deadPlayers") gpGame->m_playerDead[index] = value;
-        else if (name == "alivePlayers") hasPlayer[index] = value;
-        else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;
-        else if (name == "relatedToPlayerPosAndColor") gpGame->m_setupPlayerColor[index] = value;
-        else if (name == "playerHandicap") gpGame->m_playerHandicap[index] = value;
-        else if (name == "newGameSelectedFaction") gpGame->m_setupPlayerRace[index] = FactionTypeFromCode(value);
-        else if (name == "somePlayerCodeOr10IfMayBeHuman") gpGame->m_setupPlayerNetworkId[index] = value;
-        else if (name == "somePlayerNumData") gpGame->m_setupPlayerType[index] = value;
-        else if (name == "field_47C") gpGame->_pad_0x47c[index] = value;
-        else if (name == "field_2773") gpGame->m_castleOwners[index] = value;
-        else if (name == "builtToday") gpGame->m_dailyEventFlags[index] = value;
-        else if (name == "field_60A6") gpGame->m_mineOwners[index] = value;
-        else if (name == "randomArtifacts") xmlArtifacts.push_back(value);
-        else if (name == "boatBuilt") gpGame->m_boatSlots[index] = value;
-        else if (name == "obeliskVisitedMasks") gpGame->m_obeliskVisitors[index] = value;
-        else if (name == "field_637D") gpGame->m_defaultPlayerNames[index] = value;
-        else if (name == "rumorIndices") gpGame->m_rumourEventIndices[index] = value;
+        else if (name == "deadPlayers") CheckedSlot(data.records.m_playerDead, index) = value;
+        else if (name == "alivePlayers") CheckedSlot(data.humanPlayers, index) = value;
+        else if (name == "heroHireStatus") CheckedSlot(data.records.m_availableHeroes, index) = value;
+        else if (name == "relatedToPlayerPosAndColor") CheckedSlot(data.records.m_setupPlayerColor, index) = value;
+        else if (name == "playerHandicap") CheckedSlot(data.records.m_playerHandicap, index) = value;
+        else if (name == "newGameSelectedFaction") CheckedSlot(data.records.m_setupPlayerRace, index) = FactionTypeFromCode(value);
+        else if (name == "somePlayerCodeOr10IfMayBeHuman") CheckedSlot(data.records.m_setupPlayerNetworkId, index) = value;
+        else if (name == "somePlayerNumData") CheckedSlot(data.records.m_setupPlayerType, index) = value;
+        else if (name == "field_47C") CheckedSlot(data.records._pad_0x47c, index) = value;
+        else if (name == "field_2773") CheckedSlot(data.records.m_castleOwners, index) = value;
+        else if (name == "builtToday") CheckedSlot(data.records.m_dailyEventFlags, index) = value;
+        else if (name == "field_60A6") CheckedSlot(data.records.m_mineOwners, index) = value;
+        else if (name == "randomArtifacts") data.generatedArtifacts.push_back(value);
+        else if (name == "boatBuilt") CheckedSlot(data.records.m_boatSlots, index) = value;
+        else if (name == "obeliskVisitedMasks") CheckedSlot(data.records.m_obeliskVisitors, index) = value;
+        else if (name == "field_637D") CheckedSlot(data.records.m_defaultPlayerNames, index) = value;
+        else if (name == "rumorIndices") CheckedSlot(data.records.m_rumourEventIndices, index) = value;
         else if (name == "eventIndices") {
             if (index < GAME_TIME_EVENT_CAPACITY)
-                gpGame->m_timeEventIndices[index] = value;
+                CheckedSlot(data.records.m_timeEventIndices, index) = value;
         }
         else if (name == "mapEventIndices") {
             if (index < GAME_MAP_EVENT_CAPACITY)
-                gpGame->m_mapEventIndices[index] = value;
+                CheckedSlot(data.records.m_mapEventIndices, index) = value;
         }
-        else if (name == "mapRevealed") mapExtra[index] = value;
+        else if (name == "mapRevealed") CheckedSlot(data.world.visibility, index) = value;
         else if (name == "mine") {
-            mineRecord* m = &gpGame->m_mines[index];
+            mineRecord* m = &CheckedSlot(data.records.m_mines, index);
             m->x = elem->IntAttribute("x");
             m->y = elem->IntAttribute("y");
             m->id = elem->IntAttribute("field_0");
@@ -1186,7 +1204,7 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
             m->guardianCount = elem->IntAttribute("guardianQty");
         }
         else if (name == "boat") {
-            boatRecord* b = &gpGame->m_boats[index];
+            boatRecord* b = &CheckedSlot(data.records.m_boats, index);
             b->id = elem->IntAttribute("idx");
             b->x = elem->IntAttribute("x");
             b->y = elem->IntAttribute("y");
@@ -1201,19 +1219,23 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "script") {
             const char* script = elem->GetText();
             if (script)
-                savedScript = script;
+                data.scriptSource = script;
         }
-        else if (name == "mapExtra") ReadMapExtra(elem);
-        else if (name == "playerData") ReadPlayerData(elem, index);
-        else if (name == "town") ReadTown(elem, index);
-        else if (name == "map") ReadMap(elem);
-        else if (name == "hero") ReadHero(elem, index);
-        else if (name == "campaign") ReadCampaign(elem, campaignType);
-        else if (name == "campaignMetadata") ReadCampaignMetadata(elem);
+        else if (name == "mapExtra") ReadMapExtra(elem, data);
+        else if (name == "playerData") ReadPlayerData(elem, index, data);
+        else if (name == "town") ReadTown(elem, index, data);
+        else if (name == "map") {}
+        else if (name == "hero") ReadHero(elem, index, data);
+        else if (name == "campaign") ReadCampaign(elem, data.campaignType, data);
+        else if (name == "campaignMetadata") {
+            tinyxml2::XMLPrinter printer;
+            elem->Accept(&printer);
+            data.campaignMetadata = printer.CStr();
+        }
         else if (name == "mapVariable") {
-            std::string mapVariableId = elem->Attribute("id");
+            std::string mapVariableId = RequiredAttribute(elem, "id");
 
-            script::MapVariableType mapVariableType = script::ParseMapVariableType(elem->Attribute("type"));
+            script::MapVariableType mapVariableType = script::ParseMapVariableType(RequiredAttribute(elem, "type"));
             i32 x;
             i32 y;
             i32 end = 0;
@@ -1226,176 +1248,24 @@ void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
                 // These are engine records, not variables to inject into Lua.
                 continue;
             }
-            script::MapVariable& variable = mapVariables[mapVariableId];
+            script::MapVariable& variable = data.mapVariables[mapVariableId];
             variable.type = mapVariableType;
             if (script::IsTable(mapVariableType)) {
                 variable.table = ReadTable(elem->FirstChild());
             } else if (script::IsScalar(mapVariableType)) {
-                variable.value = elem->Attribute("value");
+                variable.value = RequiredAttribute(elem, "value");
             } else {
-                script::ErrorLoadingMapVariable(
-                    mapVariableId,
-                    " A map variable can only be a table, number, string or boolean."
-                );
+                throw std::invalid_argument("Invalid map variable type: " + mapVariableId);
             }
         }
     }
 
-    i32 c = 0;
-    for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); i++) {
-        if (hasPlayer[i] && c < iWSLastMsgNumHumanPlayers) {
-            c++;
-            gbHumanPlayer[i] = true;
-        } else {
-            gbHumanPlayer[i] = false;
+    if (!data.hasForcedChases) {
+        for (const auto& [source, destination] : legacyChases) {
+            if (source >= 0 && source < GAME_HERO_COUNT && destination >= 0 && destination < GAME_HERO_COUNT)
+                data.adventure.forcedComputerPlayerChases[source][destination] = true;
         }
-        if (gbHumanPlayer[i])
-            gbThisNetHumanPlayer[i] = !gbRemoteOn || i == giThisGamePos;
-        else
-            gbThisNetHumanPlayer[i] = false;
     }
-    giCurTurn = gpGame->m_day + 7 * (gpGame->m_week - 1) + 28 * (gpGame->m_month - 1);
-    DeserializeGeneratedArtifacts(xmlArtifacts);
-    // Execute against the restored game, then restore its saved Lua values.
-    // Scriptless saves still need a fresh generic artifact state.
-    if (savedScript.empty())
-        script::InitializeWithoutMap();
-    else
-        script::InitializeFromSave(std::move(savedScript));
-    if (mapVariables.size())
-        script::WriteMapVariablesToLua(mapVariables);
-
-    // Restore runtime decisions after script initialization, independent of
-    // element order. Missing groups in older saves retain script defaults.
-    if (hasSavedVision) {
-        auto& vision = state::Get().adventure.sharePlayerVision;
-        std::memset(vision, 0, sizeof(vision));
-        for (const auto& [source, destination] : savedVision)
-            vision[source][destination] = true;
-    }
-    if (hasSavedChases) {
-        auto& chases = state::Get().adventure.forcedComputerPlayerChases;
-        std::memset(chases, 0, sizeof(chases));
-    }
-    for (const auto& [source, destination] : hasSavedChases ? savedChases : legacyChases)
-        gpGame->ForceHeroChase(source, destination, true);
-}
-
-std::string FileExtension(b32 isPickLoad) {
-    if (gbInCampaign)
-        return ".GMC";
-    else if (xIsPlayingExpansionCampaign) {
-        i32 campID = H2EnumIndex(xCampaign.m_campaignId);
-        if (campID <= 3)
-            return ".GXC";
-        else if (campID == 4) // Ironfist campaign
-            return ".GIC";
-        else // Custom campaign
-            return ".GCC";
-    } else {
-        i32 aliveHumanPlayers = 0;
-        if (isPickLoad)
-            aliveHumanPlayers = iWSLastMsgNumHumanPlayers;
-        else {
-            for (i32 i = 0; i < H2EnumIndex(GAME_PLAYER_COUNT); ++i)
-                if (!gpGame->m_playerDead[i] && gbHumanPlayer[i])
-                    ++aliveHumanPlayers;
-        }
-
-        if ((isPickLoad && gbRemoteOn && xNetHasOldPlayers) || !xIsExpansionMap)
-            return ".GM" + std::to_string(aliveHumanPlayers);
-        else
-            return ".GX" + std::to_string(aliveHumanPlayers);
-    }
-}
-
-static std::string SaveFilePath(const std::string& name) {
-    const char* directory = platform::CompareIgnoringCase(name.c_str(), "RMT", 3) == 0
-        ? ".\\DATA\\" : ".\\GAMES\\";
-    return directory + name;
-}
-
-i32 SaveGame(const char* saveFile, i32 autosave) {
-    gpAdvManager->DemobilizeCurrHero();
-    std::string filePath;
-    std::string saveName = saveFile;
-
-    if (autosave)
-        filePath = saveName + FileExtension(false);
-    else
-        filePath = saveName;
-
-    if (platform::CompareIgnoringCase(filePath.c_str(), "RMT", 3)
-        && platform::CompareIgnoringCase(filePath.c_str(), "AUTOSAVE", 8)
-        && platform::CompareIgnoringCase(filePath.c_str(), "PLYREXIT", 8))
-        strcpy(gpGame->m_saveName, saveName.c_str());
-    filePath = SaveFilePath(filePath);
-
-    XmlFile xml;
-    tinyxml2::XMLError err = xml.Save(filePath.c_str());
-    if (err) {
-        std::string message = "Could not save XML. " + std::string(xml.GetError());
-        DisplayError(message, "Ironfist save");
-        exit(1);
-    }
-    return 1;
-}
-
-b32 LoadGame(const char* fileName, i32 loadFromFile) {
-    if (!loadFromFile) {
-        // A fresh game start, not a load; the retail path handles it.
-        runtime::ResetAdventureState();
-        return false;
-    }
-
-    const std::string filePath = SaveFilePath(fileName);
-
-    // Check if original save format
-    i32 fd = platform::FileOpen(filePath.c_str(), platform::FileMode::Read);
-    char firstByte = 0;
-    if (fd != -1) {
-        const bool hasFirstByte = platform::FileReadExact(fd, &firstByte, sizeof(firstByte));
-        platform::FileClose(fd);
-        if (!hasFirstByte)
-            firstByte = 0;
-    }
-
-    if (firstByte != '<') {
-        runtime::ResetAdventureState();
-        script::InitializeWithoutMap();
-        return false;
-    }
-
-    gbGameOver = false;
-    gpGame->m_gameLoaded = 1;
-
-    gpAdvManager->PurgeMapChangeQueue();
-
-    runtime::ResetAdventureState();
-
-    ClearMapExtra();
-    XmlFile xmlDoc;
-    tinyxml2::XMLError err = xmlDoc.Read(filePath.c_str());
-    if (err) {
-        std::string message = "Could not load XML. " + std::string(xmlDoc.GetError());
-        DisplayError(message, "Ironfist load");
-        exit(1);
-    }
-
-    if (platform::CompareIgnoringCase(fileName, "RMT", 3))
-        utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), fileName);
-
-    gpAdvManager->m_heroContextLocked = false;
-    gpCurPlayer = &gpGame->m_players[giCurPlayer];
-    giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
-    for (giCurWatchPlayer = giCurPlayer; !gbThisNetHumanPlayer[giCurWatchPlayer];
-         giCurWatchPlayer = (giCurWatchPlayer + 1) % gpGame->m_playerCount) {
-    }
-    giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
-    bShowIt = gbThisNetHumanPlayer[giCurPlayer];
-    gpGame->SetupAdjacentMons();
-    gpAdvManager->CheckSetEvilInterface(0, -1);
-    return true;
 }
 
 } // namespace ironfist::save

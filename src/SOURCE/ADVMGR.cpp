@@ -5,7 +5,7 @@
 #include <IRONFIST/gui.h>
 #include <IRONFIST/hooks.h>
 #include <IRONFIST/prefs.h>
-#include <IRONFIST/save_xml.h>
+#include <IRONFIST/runtime.h>
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/executive.h>
@@ -7529,7 +7529,7 @@ i32 SaveGame(void) {
     // The extension follows the campaign type, custom campaigns included.
     char suffix[SAVE_EXTENSION_SIZE];
     char pattern[SAVE_PATTERN_SIZE];
-    utf8::Format(suffix, "%s", ironfist::save::FileExtension(false).c_str());
+    utf8::Format(suffix, "%s", ironfist::runtime::FileExtension(false).c_str());
     utf8::Format(pattern, "*%s", suffix);
 
     fileRequester* req = new fileRequester(
