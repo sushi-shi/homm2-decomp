@@ -4,7 +4,6 @@
 #include <Ints.h>
 #include <BASE/message.h>
 
-enum class CDRomSetupResult : i32;
 
 class bitmap;
 class heroWindow;
@@ -99,12 +98,9 @@ const char* FindLastToken(const char* text, char token);
 void SetInstallDefaults(void);
 void SetGameDefaults(void);
 void ReadPrefsFromFile(void);
-void ReadPrefsFromRegistry(void);
 void ReadPrefs(void);
 void WritePrefsToFile(void);
-void WritePrefsToRegistry(void);
 void WritePrefs(void);
-CDRomSetupResult SetupCDDrive(void);
 void BitmapToScreen(class bitmap*);
 void SetPalette(i8*, i32);
 void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
