@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/HighScoreIO.h>
 #include <BASE/Utf8.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -121,7 +122,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
 }
 
 void highScoreManager::Update(void) {
-    HighScoreEntry highScore;
+    HighScoreEntry highScore{};
     i32 rank;
     i32 inputFile;
     b32 noScoreFile;
@@ -164,7 +165,7 @@ void highScoreManager::Update(void) {
     for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
-        else if (!platform::FileReadExact(inputFile, &highScore, sizeof(highScore))) {
+        else if (!ReadHighScoreEntry(inputFile, highScore)) {
             noScoreFile = true;
             memset(&highScore, 0, sizeof(highScore));
             highScore.score = HIGH_SCORE_EMPTY;

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <SOURCE/HighScoreIO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
@@ -2922,7 +2923,7 @@ i32 AddScoreToHighScore(
         }
     } else {
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-            if (!platform::FileReadExact(file_c, &entries_a[entry_a], sizeof(entries_a))) {
+            if (!ReadHighScoreEntry(file_c, entries_a[entry_a])) {
                 for (; entry_a < HIGH_SCORE_ENTRY_COUNT; ++entry_a) {
                     memset(&entries_a[entry_a], 0, sizeof(entries_a[entry_a]));
                     entries_a[entry_a].score = HIGH_SCORE_EMPTY;
@@ -2960,8 +2961,8 @@ i32 AddScoreToHighScore(
             1
         );
         memset(&entries_a[entry_a], 0, sizeof(HighScoreEntry));
-        strcpy(entries_a[entry_a].playerName, playerName_c);
-        strcpy(entries_a[entry_a].scenarioName, scenarioName);
+        utf8::Copy(entries_a[entry_a].playerName, playerName_c);
+        utf8::Copy(entries_a[entry_a].scenarioName, scenarioName);
         entries_a[entry_a].score = score;
         entries_a[entry_a].days = days;
         entries_a[entry_a].scenario = scenario;
@@ -2973,7 +2974,7 @@ i32 AddScoreToHighScore(
         if (file_c == -1)
             FileError(filename_h);
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++) {
-            if (!platform::FileWriteExact(file_c, &entries_a[entry_a], sizeof(HighScoreEntry)))
+            if (!WriteHighScoreEntry(file_c, entries_a[entry_a]))
                 ShutDown(localization::Tr("system.file.write_error"));
         }
         platform::FileClose(file_c);
