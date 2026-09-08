@@ -371,6 +371,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_filesystem_test PRIVATE homm2_platform)
   add_test(NAME filesystem COMMAND homm2_filesystem_test)
+  add_executable(homm2_file_transaction_test tools/file_transaction_test.cpp)
+  target_include_directories(homm2_file_transaction_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_file_transaction_test PRIVATE homm2_platform)
+  add_test(NAME file_transaction COMMAND homm2_file_transaction_test)
+
   add_executable(homm2_platform_primitives_test tools/platform_primitives_test.cpp)
   target_include_directories(homm2_platform_primitives_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include

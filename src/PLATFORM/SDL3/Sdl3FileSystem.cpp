@@ -1,4 +1,5 @@
 #include "Sdl3Internal.h"
+#include "TemporaryFile.h"
 
 #include <SDL3/SDL.h>
 
@@ -10,6 +11,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <system_error>
 #include <vector>
@@ -129,15 +131,48 @@ public:
         return OpenPath(ResolveIn(m_localeDataRoot, retailPath), "rb");
     }
 
-    void Close(i32 file) override {
+    void Close(i32 file) override { CloseChecked(file); }
+
+    bool CloseChecked(i32 file) override {
         const auto found = m_streams.find(file);
         if (found == m_streams.end()) {
-            return;
+            return false;
         }
-        if (!SDL_CloseIO(found->second)) {
+        const bool closed = SDL_CloseIO(found->second);
+        if (!closed) {
             std::fprintf(stderr, "[homm2] SDL_CloseIO: %s\n", SDL_GetError());
         }
         m_streams.erase(found);
+        m_failedWrites.erase(file);
+        return closed;
+    }
+
+    i32 CreateTemporarySibling(const std::string& destination,
+                               std::string& temporary) override {
+        SDL_IOStream* stream = OpenTemporarySibling(destination, temporary);
+        if (stream == nullptr) return -1;
+        const i32 file = AllocateHandle();
+        if (file < 0) {
+            SDL_CloseIO(stream);
+            RemoveTemporary(temporary);
+            temporary.clear();
+            return -1;
+        }
+        m_streams.emplace(file, stream);
+        return file;
+    }
+
+    bool Flush(i32 file) override {
+        SDL_IOStream* stream = Stream(file);
+        return stream != nullptr && !m_failedWrites.contains(file) && FlushFileData(stream);
+    }
+
+    bool ReplaceFile(const std::string& temporary, const std::string& destination) override {
+        return ReplaceTemporaryFile(temporary, destination);
+    }
+
+    bool RemoveTemporary(const std::string& temporary) override {
+        return RemoveTemporaryFile(temporary);
     }
 
     i32 Read(i32 file, void* buffer, i32 count) override {
@@ -161,9 +196,12 @@ public:
         if (count == 0) {
             return 0;
         }
-        return static_cast<i32>(
+        const i32 written = static_cast<i32>(
             SDL_WriteIO(stream, buffer, static_cast<std::size_t>(count))
         );
+        if (written != count && SDL_GetIOStatus(stream) == SDL_IO_STATUS_ERROR)
+            m_failedWrites.insert(file);
+        return written;
     }
 
     i32 Seek(i32 file, i32 offset) override {
@@ -340,6 +378,7 @@ private:
     std::string m_userRoot;
     std::string m_localeDataRoot;
     std::map<i32, SDL_IOStream*> m_streams;
+    std::set<i32> m_failedWrites;
     std::uint32_t m_nextFile = 1;
 };
 
