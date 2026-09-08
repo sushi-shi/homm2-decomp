@@ -174,6 +174,11 @@
         '';
       });
 
+      homm2-sanitized = homm2-check.overrideAttrs (previous: {
+        pname = "homm2-sanitized";
+        cmakeFlags = previous.cmakeFlags ++ [ "-DHOMM2_SANITIZERS=ON" ];
+      });
+
       icon-check = pkgs.stdenv.mkDerivation {
         pname = "homm2-icon-check";
         version = "0.1.0";
@@ -353,6 +358,7 @@
         inherit
           homm2
           homm2-debug
+          homm2-sanitized
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -362,6 +368,7 @@
 
       checks.${system} = {
         native = homm2-check;
+        sanitized = homm2-sanitized;
         windows = windows;
         web = homm2-web;
         icon = icon-check;
