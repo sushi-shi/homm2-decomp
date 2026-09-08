@@ -11,8 +11,9 @@ public:
     u16 m_tileWidth;
     u16 m_tileHeight;
     char* m_data;
+    u32 m_dataSize = 0;
     tileset(u32l id);
-    virtual inline ~tileset();
+    virtual ~tileset();
 };
 #pragma pack(pop)
 #endif
