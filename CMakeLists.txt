@@ -390,6 +390,11 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
     ${CMAKE_SOURCE_DIR}/include)
   target_link_libraries(homm2_platform_backend_test PRIVATE homm2_platform)
   add_test(NAME platform_backend COMMAND homm2_platform_backend_test)
+  add_executable(homm2_display_settings_test tools/display_settings_test.cpp)
+  target_include_directories(homm2_display_settings_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
+  target_link_libraries(homm2_display_settings_test PRIVATE homm2_platform)
+  add_test(NAME display_settings COMMAND homm2_display_settings_test)
   add_executable(homm2_platform_atexit_test tools/platform_atexit_test.cpp)
   target_include_directories(homm2_platform_atexit_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)

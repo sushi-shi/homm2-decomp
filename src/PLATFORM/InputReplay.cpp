@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <limits>
+#include <iomanip>
 #include <sstream>
 #include <utility>
 
@@ -79,7 +80,7 @@ bool InputReplay::Load(
             replay.event.button = MouseButton::Right;
         } else if (action == "key-down" || action == "key-up") {
             std::string name;
-            fields >> name;
+            fields >> std::quoted(name);
             if (!fields || resolveKey == nullptr
                 || !resolveKey(
                     name,

@@ -75,6 +75,49 @@ high-level screen blit. This keeps intermediate cursor and sprite composition
 out of the visible SDL frame while preserving the original scrolling source
 rectangle.
 
+## Display controls
+
+The game keeps its 640×480 logical surface. Use these shortcuts while playing
+or in a game dialog; the window title shows the current settings:
+
+| Shortcut | Setting |
+| --- | --- |
+| F4 | Toggle borderless desktop fullscreen |
+| Shift+F4 | Cycle nearest, linear, and integer scaling |
+| Ctrl+F4 | Toggle VSync, when the render driver supports it |
+
+Nearest and linear modes preserve the aspect ratio with borders. Integer mode
+uses whole-number scaling; windows smaller than the logical surface may crop
+it, so resize the window or select another mode to see the whole game.
+Mouse input follows the current presentation transform. Changing modes preserves
+the screen buffer, palette, and composed software cursor. Holding F4 performs
+one change per press. Shift takes precedence if both Shift and Ctrl are held.
+
+Settings are saved in `HEROES2.DISPLAY` beside the user's `HEROES2.CFG`; the
+retail binary configuration format is unchanged. Delete that text file to reset
+scaling/VSync and fall back to the legacy fullscreen preference. Malformed files
+are ignored. A valid file has this format:
+
+```text
+H2DISPLAY 1
+fullscreen 0
+scaling nearest
+vsync 0
+```
+
+Native startup restores fullscreen when the window system accepts it. Browsers
+start windowed because fullscreen requires a user gesture; use F4 after starting
+the game. A denied fullscreen/VSync request is logged and keeps the available
+mode. Web preferences use the existing browser storage mechanism; saving this
+small preference file does not itself acknowledge durable IndexedDB persistence.
+
+The `display_settings` CTest exercises the production SDL backend with its dummy
+render driver: repeated fullscreen transitions, all three scaling policies,
+resizing above/below the logical size, outside-border mouse mapping, device
+reset, cursor/palette frame preservation, F4 repeat suppression, preference
+round trips, and malformed preference files. Driver-specific display behavior
+still needs testing on the intended desktop/browser.
+
 ## Deterministic input replay
 
 The SDL3 host can replay timestamped framebuffer input without coupling the
@@ -92,7 +135,8 @@ non-comment line begins with a millisecond offset and one of these actions:
 
 Mouse actions are `move`, `left-down`, `left-up`, `right-down`, and
 `right-up`; their coordinates are in the 640x480 logical framebuffer. Key
-names use SDL's key-name vocabulary. Blank lines and lines beginning with `#`
+names use SDL's key-name vocabulary. Quote names containing spaces, such as
+`key-down "Left Shift"`, and send the matching `key-up` event after the chord. Blank lines and lines beginning with `#`
 are ignored. Timestamps must be nondecreasing, and events sharing a timestamp
 retain file order. A malformed line rejects the complete new replay and is
 reported with its line number instead of being silently skipped.

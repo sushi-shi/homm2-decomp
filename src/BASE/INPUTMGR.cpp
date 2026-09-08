@@ -155,7 +155,10 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                 platform::ShowHelp();
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(!gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
+                ChangeDisplaySettings(
+                    (event->payload.keyboard.modifiers
+                        & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != MESSAGE_MODIFIER_NONE,
+                    (event->payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL) != MESSAGE_MODIFIER_NONE);
         }
     }
     return event->type == MESSAGE_NONE;
