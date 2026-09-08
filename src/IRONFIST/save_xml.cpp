@@ -1042,15 +1042,15 @@ void XmlFile::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
 }
 
 void XmlFile::ReadRoot(tinyxml2::XMLNode* root) {
+    i32 campaignType = CAMPAIGN_NONE;
+    char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
+    std::vector<i32> xmlArtifacts;
+    script::LuaTable mapVariables;
     Relations savedVision;
     Relations savedChases;
     Relations legacyChases;
     bool hasSavedVision = false;
     bool hasSavedChases = false;
-    i32 campaignType = CAMPAIGN_NONE;
-    char hasPlayer[H2EnumIndex(GAME_PLAYER_COUNT)] = {};
-    std::vector<i32> xmlArtifacts;
-    script::LuaTable mapVariables;
     for (tinyxml2::XMLNode* child = root->FirstChild(); child; child = child->NextSibling()) {
         tinyxml2::XMLElement* elem = child->ToElement();
         std::string name = elem->Name();
