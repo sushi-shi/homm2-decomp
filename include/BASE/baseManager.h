@@ -32,7 +32,6 @@ typedef enum BaseManagerConstant {
     BASE_MANAGER_NAME_CAPACITY = 0x1e
 } BaseManagerConstant;
 
-#pragma pack(push, 1)
 class baseManager {
 public:
     baseManager* m_next;
@@ -50,5 +49,4 @@ public:
     virtual void Close(void) = 0;
     virtual MessageDispatchResult Main(struct tag_message&) = 0;
 };
-#pragma pack(pop)
 #endif

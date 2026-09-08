@@ -3,7 +3,6 @@
 
 #include <Ints.h>
 
-#pragma pack(push, 1)
 enum class ResourceCategory : i16 {
     RESOURCE_CATEGORY_BITMAP  = 0,
     RESOURCE_CATEGORY_ICON    = 1,
@@ -30,5 +29,4 @@ public:
     resource(ResourceCategory category, u32l id, i16 refCount, class resource* next);
     virtual ~resource(void) = 0;
 };
-#pragma pack(pop)
 #endif

@@ -14,7 +14,6 @@ class sample;
 class tileset;
 struct tag_message;
 
-#pragma pack(push, 1)
 struct aggEntry {
     u32l id;
     i32l offset;
@@ -71,7 +70,6 @@ public:
     void Read13(void*);
     void ReadBlock(void*, u32l);
 };
-#pragma pack(pop)
 extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];

@@ -25,7 +25,6 @@ enum class SwapManagerItemType : i32 {
 };
 using enum SwapManagerItemType;
 
-#pragma pack(push, 1)
 class swapManager : public baseManager {
 public:
     heroWindow* m_window;
@@ -50,5 +49,4 @@ public:
     void Update(void);
     void SplitMons(void);
 };
-#pragma pack(pop)
 #endif

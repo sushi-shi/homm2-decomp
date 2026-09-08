@@ -32,7 +32,6 @@ enum class FontAlignment : i16 {
 using enum FontAlignment;
 ENABLE_ENUM_FLAGS(FontAlignment)
 
-#pragma pack(push, 1)
 class font : public resource {
 public:
     i32 m_height;
@@ -53,5 +52,4 @@ public:
     i32 LineLength(const char*, i32);
     i32 LineWidth(const char*);
 };
-#pragma pack(pop)
 #endif

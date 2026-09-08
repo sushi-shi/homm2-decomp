@@ -110,7 +110,6 @@ typedef enum InputManagerCapacity {
     INPUT_SCAN_CODE_CAPACITY  = 128
 } InputManagerCapacity;
 
-#pragma pack(push, 1)
 class inputManager : public baseManager {
 public:
     tag_message m_eventRing[H2EnumIndex(INPUT_EVENT_RING_CAPACITY)];
@@ -141,7 +140,6 @@ public:
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
 };
-#pragma pack(pop)
 extern i32 iCurSwapPalette;
 extern b32 bLastMouseOffscreen;
 extern b32 bLastOnscreenMouseColor;

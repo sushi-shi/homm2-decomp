@@ -5,7 +5,6 @@
 
 class baseManager;
 
-#pragma pack(push, 1)
 class executive {
 public:
     baseManager* m_managerListHead;
@@ -23,6 +22,5 @@ public:
     void MainLoop(void);
     void Terminate(void);
 };
-#pragma pack(pop)
 
 #endif

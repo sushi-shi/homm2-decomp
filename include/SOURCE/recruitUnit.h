@@ -17,7 +17,6 @@ enum class RecruitSourceType : i32 {
 };
 using enum RecruitSourceType;
 
-#pragma pack(push, 1)
 class recruitUnit : public baseManager {
 public:
     RecruitSourceType m_sourceType;
@@ -45,7 +44,6 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Update(void);
 };
-#pragma pack(pop)
 extern platform::MenuHandle hmnuRecruitSave;
 
 #endif

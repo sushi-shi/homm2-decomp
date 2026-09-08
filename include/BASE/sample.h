@@ -5,12 +5,10 @@
 #include <BASE/resource.h>
 #include <BASE/sampleData.h>
 
-#pragma pack(push, 1)
 class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
     sample(const char*);
     virtual inline ~sample() override;
 };
-#pragma pack(pop)
 #endif

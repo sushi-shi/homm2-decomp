@@ -16,7 +16,6 @@ enum class PaletteChannel : i32 {
 };
 using enum PaletteChannel;
 
-#pragma pack(push, 1)
 class palette : public resource {
 public:
     i8* m_data;
@@ -25,5 +24,4 @@ public:
     virtual ~palette();
     i8* Data(void);
 };
-#pragma pack(pop)
 #endif

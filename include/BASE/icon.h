@@ -12,7 +12,6 @@ struct SLimitData {
     i32 bottom;
 };
 
-#pragma pack(push, 1)
 class icon : public resource {
 public:
     i16 m_frameCount;
@@ -55,5 +54,4 @@ public:
         i32 x, i32 y, i32 frame, IconDrawOrientation orientation
     );
 };
-#pragma pack(pop)
 #endif

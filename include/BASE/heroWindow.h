@@ -36,7 +36,6 @@ typedef enum HeroWindowConstant {
     HERO_WINDOW_NAME_CAPACITY = 0x14
 } HeroWindowConstant;
 
-#pragma pack(push, 1)
 class heroWindow {
 public:
     i32 m_zOrder;
@@ -68,5 +67,4 @@ public:
     void RestoreBackground(void);
     void MoveWindow(i32, i32);
 };
-#pragma pack(pop)
 #endif
