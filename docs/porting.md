@@ -100,4 +100,6 @@ reported with its line number instead of being silently skipped.
 The parser and wrapping-millisecond scheduler are covered by the
 `input_replay` CTest. A headless gameplay test can therefore run the ordinary
 binary under Xvfb with a checked-in replay and compare an independently chosen
-observable result such as a save, log record, or screenshot.
+observable result such as a save, log record, or screenshot. The explicit
+[retail gameplay round-trip check](gameplay-checks.md) runs two real game
+processes and checks replacement, save bytes and complete frame captures.
