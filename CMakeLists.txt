@@ -340,6 +340,12 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_options(homm2_localization_encoding_test PRIVATE
     -Wl,--gc-sections)
   add_test(NAME localization_encoding COMMAND homm2_localization_encoding_test)
+  add_executable(homm2_font_glyph_test
+    tools/font_glyph_test.cpp
+    src/BASE/FontGlyph.cpp)
+  target_include_directories(homm2_font_glyph_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME font_glyph COMMAND homm2_font_glyph_test)
   add_executable(homm2_resource_profile_test
     tools/resource_profile_test.cpp
     src/SOURCE/ResourceProfile.cpp)

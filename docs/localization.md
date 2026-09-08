@@ -141,8 +141,8 @@ profile or choose an archive.
 
 Implemented profiles are:
 
-- `western`: the original 96-frame English layout (ASCII, with the recovered
-  lower-case folding behavior);
+- `western`: the original 96-frame English layout (ASCII, preserving distinct
+  uppercase and lowercase glyphs);
 - `buka-cyrillic`: the Buka Cyrillic layout, including `Ё`/`ё`, requiring at
   least 162 frames.
 
