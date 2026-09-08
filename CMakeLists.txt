@@ -427,6 +427,16 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   add_test(
     NAME ironfist_hook_contract
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/test_ironfist_hook_contract.py)
+  if(CMAKE_GENERATOR STREQUAL "Ninja")
+    file(GLOB HOMM2_ENGINE_TESTS CONFIGURE_DEPENDS
+      ${CMAKE_SOURCE_DIR}/tools/ironfist_tests/*_test.cpp)
+    foreach(engineTest ${HOMM2_ENGINE_TESTS})
+      get_filename_component(testName ${engineTest} NAME_WE)
+      add_test(NAME ironfist_${testName}
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/run_engine_test.py
+          ${CMAKE_CURRENT_BINARY_DIR} ${engineTest})
+    endforeach()
+  endif()
 endif()
 
 if(WIN32)
