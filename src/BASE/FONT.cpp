@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <string.h>
 #include <BASE/font.h>
+#include <BASE/FontGlyph.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
 #include <BASE/IconEntry.h>
@@ -53,41 +54,6 @@ font::~font() {
 
 namespace {
 
-i32 CyrillicGlyph(std::uint32_t codePoint) {
-    if (codePoint == 0x0401)
-        return 128;
-    if (codePoint == 0x0451)
-        return 161;
-    if (codePoint >= 0x0410 && codePoint <= 0x042f)
-        return 96 + static_cast<i32>(codePoint - 0x0410);
-    if (codePoint >= 0x0430 && codePoint <= 0x044f)
-        return 129 + static_cast<i32>(codePoint - 0x0430);
-    return FONT_GLYPH_FALLBACK;
-}
-
-i32 GlyphIndex(std::uint32_t codePoint, i32 frameCount) {
-    i32 glyph;
-    if (codePoint == 0x2013 || codePoint == 0x2014)
-        codePoint = '-';
-    if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic) {
-        if (codePoint >= 0x0400)
-            glyph = CyrillicGlyph(codePoint);
-        else if (codePoint >= ' ' && codePoint <= 0x7f)
-            glyph = static_cast<i32>(codePoint - ' ');
-        else
-            glyph = FONT_GLYPH_FALLBACK;
-    } else {
-        if (codePoint >= 'a' && codePoint <= 'z')
-            codePoint -= 'a' - 'A';
-        glyph = codePoint >= ' ' && codePoint <= 0x7f
-            ? static_cast<i32>(codePoint - ' ')
-            : FONT_GLYPH_FALLBACK;
-    }
-    if (frameCount <= 0)
-        return 0;
-    return std::clamp(glyph, 0, frameCount - 1);
-}
-
 bool IsVowel(std::uint32_t codePoint) {
     switch (codePoint) {
         case 'a': case 'e': case 'i': case 'o': case 'u': case 'y':
@@ -135,7 +101,7 @@ void font::DrawStringExecute(
             continue;
         }
 
-        const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+        const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
         if (glyph != 0) {
             if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
                 IconToBitmap(
@@ -220,7 +186,7 @@ i32 font::GetCharacterWidth(std::uint32_t codePoint) {
     if (localization::ActiveFontProfile() == localization::FontProfile::BukaCyrillic
         && codePoint == '.')
         codePoint = '_';
-    const i32 glyph = GlyphIndex(codePoint, m_glyphIcon->m_frameCount);
+    const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
     return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[glyph].w + m_isLarge;
 }
 

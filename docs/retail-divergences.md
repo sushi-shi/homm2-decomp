@@ -68,6 +68,9 @@ The portable `i32l`/`u32l` aliases retain four-byte arithmetic on LP64 hosts whi
 preserving the original long types on 32-bit targets. Debug memory/manager logs
 format full pointers instead of narrowing them to integers.
 
+The western bitmap-font profile preserves the original ASCII frame mapping,
+including lowercase glyphs. UTF-8 decoding does not change letter case.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |
