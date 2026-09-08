@@ -23,7 +23,6 @@ typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
 
-#pragma pack(push, 1)
 class resourceManager : public baseManager {
 public:
     resource* m_resourceListHead;
