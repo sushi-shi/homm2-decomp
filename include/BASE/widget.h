@@ -35,7 +35,6 @@ enum class WidgetFlagArgument : i32 {
 };
 using enum WidgetFlagArgument;
 
-#pragma pack(push, 1)
 class widget {
 public:
     heroWindow* m_owner;
@@ -65,5 +64,4 @@ public:
     void Close(void);
     void Dim(void);
 };
-#pragma pack(pop)
 #endif

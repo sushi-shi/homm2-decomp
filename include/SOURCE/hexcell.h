@@ -9,7 +9,6 @@ typedef enum HexcellConstant {
     HEXCELL_LIMIT_COUNT           = 2
 } HexcellConstant;
 
-#pragma pack(push, 1)
 class hexcell {
 public:
     i16 m_x;
@@ -39,8 +38,6 @@ public:
     void DrawClouds(void);
     void DrawObstacle(void);
 };
-#pragma pack(pop)
-
 #define HEX_HAS_OCCUPANT(cell, side, index)                                                        \
     ((cell).m_occupantSide == (side) && (cell).m_occupantIndex == (index))
 

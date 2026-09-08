@@ -20,7 +20,6 @@ enum class SamplePlaybackRate : i32 {
 };
 using enum SamplePlaybackRate;
 
-#pragma pack(push, 1)
 struct SamplePlaybackData {
     char* data;
     i32 size;
@@ -32,6 +31,5 @@ struct SamplePlaybackData {
     platform::VoiceId activeSample;
     i32 channelType;
 };
-#pragma pack(pop)
 
 #endif

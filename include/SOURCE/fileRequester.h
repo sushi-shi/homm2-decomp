@@ -89,7 +89,6 @@ struct FileRequesterExtension {
     char text[FILE_REQUESTER_EXTENSION_SIZE];
 };
 
-#pragma pack(push, 1)
 class fileRequester : public baseManager {
 public:
     heroWindow* m_window;
@@ -123,7 +122,6 @@ public:
     void Update(i32 drawWindow);
     const char* GetFilename(void);
 };
-#pragma pack(pop)
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern const char* cFRDummy;
 extern float fGutterMinY;

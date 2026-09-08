@@ -7,7 +7,6 @@
 
 struct tag_message;
 
-#pragma pack(push, 1)
 class bitmap;
 class icon;
 class font;
@@ -96,5 +95,4 @@ public:
     void RestoreDropBackground(void);
     void ProcessSelectDialog(void);
 };
-#pragma pack(pop)
 #endif

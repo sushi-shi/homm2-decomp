@@ -7,7 +7,6 @@
 
 struct tag_message;
 
-#pragma pack(push, 1)
 class font;
 class icon;
 class bitmap;
@@ -76,5 +75,4 @@ public:
     void DrawLBStuff(i32 doUpdate);
     MessageDispatchResult ProcessMouseMessage(struct tag_message& message);
 };
-#pragma pack(pop)
 #endif
