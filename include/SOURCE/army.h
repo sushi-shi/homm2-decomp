@@ -130,7 +130,7 @@ public:
     i32 SetSpellInfluence(ArmySpellInfluence, i32);
     void DecrementSpellRounds(void);
     void GoBerserk(void);
-    void MoveAttack(i32, i32);
+    void MoveAttack(i32, i32, i32 approachHex = -1);
     float SpellCastWorkChance(SpellType);
     i32 SpellCastWorks(SpellType);
     void DispelGood(void);
@@ -161,8 +161,6 @@ public:
     CombatHexDirection GetStraightLineDirection(i32);
     i32 GetStraightLineDistanceToHex(i32);
     bool FlightThroughObstacles(i32);
-    bool IsEnemyCreatureHex(i32);
-    void MoveAttackNonFlyer(i32, i32);
     i32 ValidRange(i32);
     CombatHexDirection GetBestDirection(i32, i32, i32);
     i32 IsAlive(void) {

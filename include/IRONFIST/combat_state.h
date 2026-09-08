@@ -32,6 +32,7 @@ public:
     army* Resolve(StackIdentity identity) const;
 
     void GrantAbility(army& stack, CreatureAttribute ability);
+    bool HasAbility(const army& stack, CreatureAttribute ability) const;
     bool HasAbilityCharge(const army& stack, CreatureAttribute ability) const;
     bool ConsumeAbility(army& stack, CreatureAttribute ability);
     bool IsAnimating(const army& stack, CreatureAttribute ability) const;

@@ -1,6 +1,7 @@
 #include <Ints.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
+#include <IRONFIST/combat_movement.h>
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -389,10 +390,7 @@ void combatManager::UpdateCombatArea(void) {
 
 void combatManager::SetupGridForArmy(army* armyPtr) {
     i32 attackMask;
-    CombatSide oldSide;
-    i32 oldIndex;
     i32 j;
-    i32 hexIndex;
 
     if (gbNoShowCombat != 0)
         return;
@@ -402,13 +400,17 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     attackMask =
         armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     memset(m_gridState, H2EnumIndex(GRID_SHADE_NONE), sizeof(m_gridState));
-    oldSide = armyPtr->m_targetSide;
-    oldIndex = armyPtr->m_targetIndex;
-    armyPtr->m_targetSide = COMBAT_SIDE_NONE;
-    armyPtr->m_targetIndex = -1;
-    gpSearchArray->SeedCombatPosition(armyPtr);
-    armyPtr->m_targetSide = oldSide;
-    armyPtr->m_targetIndex = oldIndex;
+    const ironfist::movement::Traversal traversal(*this, *armyPtr, ironfist::state::Get().combat);
+    const bool canShoot = armyPtr->m_monster.shots > 0
+        && armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
+            == ARMY_ALL_ATTACK_DIRECTIONS;
+    for (i32 hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
+        const auto target = traversal.Destination(hex, ARMY_PATH_EXACT_TARGET_HEX);
+        const bool enemy = target.IsAttack() && target.side != armyPtr->m_side;
+        m_hexCells[hex].m_pathReachable = enemy && canShoot;
+        if (!target.IsAttack() || enemy)
+            m_hexCells[hex].m_pathReachable |= static_cast<bool>(traversal.Find(armyPtr->m_hex, target, armyPtr->m_monster.speed));
+    }
 
     for (j = 0; j < COMBAT_HEX_COUNT; j++) {
         if (j == armyPtr->m_hex) {
@@ -427,25 +429,6 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         }
     }
 
-    // A charger also reaches any enemy along a clear straight line.
-    if (ironfist::HasCreatureAttribute(armyPtr->m_monsterType, ironfist::CreatureAttribute::Charger)) {
-        for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
-            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
-                && m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side
-                && !armyPtr->FlightThroughObstacles(hexIndex)
-                && armyPtr->TargetOnStraightLine(hexIndex)) {
-                armyPtr->m_moveTargetHex = hexIndex;
-                armyPtr->m_targetSide = m_hexCells[hexIndex].m_occupantSide;
-                armyPtr->m_targetIndex = m_hexCells[hexIndex].m_occupantIndex;
-                if (armyPtr->ValidFlight(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
-                    && armyPtr->GetStraightLineDistanceToHex(hexIndex)
-                           <= armyPtr->m_monster.speed) {
-                    m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
-                    m_hexCells[hexIndex].m_pathReachable = 1;
-                }
-            }
-        }
-    }
 }
 
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {

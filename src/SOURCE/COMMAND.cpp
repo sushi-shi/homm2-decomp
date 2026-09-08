@@ -16,6 +16,7 @@
 #include <BASE/textWidget.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/state.h>
+#include <IRONFIST/combat_movement.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
@@ -438,36 +439,16 @@ ProcessAction:
 i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
-
-    if (!(hexIndex == INVALID_HEX || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
-          || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
-          || (m_hexCells[hexIndex].m_blocked != 0
-              && (gpCombatManager->m_inCastleCombat == 0
-                  || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
-                  || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
-                      && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
-                          || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                     .m_occupantSide
-                                 != COMBAT_SIDE_NONE
-                          || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                     .m_deadOccupantCount
-                                 != 0))))
-          || (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
-              && (m_hexCells[hexIndex].m_occupantSide != m_currentArmySide
-                  || m_hexCells[hexIndex].m_occupantIndex != m_currentArmyIndex)))) {
-        return 1;
-    } else {
-        return 0;
-    }
+    const auto& actor = m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex];
+    return ironfist::movement::Traversal(*this, actor, ironfist::state::Get().combat)
+        .CanStandOnCell(hexIndex);
 }
 
 void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
 
-    bchar standable_0[COMBAT_DIRECTION_COUNT];
     i32 directionHexes[COMBAT_DIRECTION_COUNT];
-    i32 rearHexes_2[COMBAT_DIRECTION_COUNT];
     bchar pathValid_28[COMBAT_DIRECTION_COUNT];
     i32 outputDirection_7;
     i32 mappedDirection_5;
@@ -476,8 +457,6 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     army* currentArmy_1 = &m_armies[H2EnumIndex(m_currentArmySide)][m_currentArmyIndex];
     CombatSide targetSide_28 = currentArmy_1->m_targetSide;
     i32 targetIndex_9 = currentArmy_1->m_targetIndex;
-    currentArmy_1->m_targetSide = COMBAT_SIDE_NONE;
-    currentArmy_1->m_targetIndex = -1;
     army* targetArmy_13 = &m_armies[H2EnumIndex(targetSide_28)][targetIndex_9];
 
     i32 direction_28;
@@ -520,11 +499,6 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     else
                         directionHexes[direction_28]--;
                 }
-                if (directionHexes[direction_28] % COMBAT_GRID_ROW_LENGTH
-                    == COMBAT_GRID_REVERSE_FIRST_COLUMN)
-                    rearHexes_2[direction_28] = INVALID_HEX;
-                else
-                    rearHexes_2[direction_28] = directionHexes[direction_28] + 1;
             } else {
                 if (direction_28 == H2EnumIndex(COMBAT_DIRECTION_NORTHEAST)
                     || direction_28 == H2EnumIndex(COMBAT_DIRECTION_EAST)
@@ -535,51 +509,16 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     else
                         directionHexes[direction_28]++;
                 }
-                if (directionHexes[direction_28] % COMBAT_GRID_ROW_LENGTH
-                    == COMBAT_GRID_FIRST_COLUMN)
-                    rearHexes_2[direction_28] = INVALID_HEX;
-                else
-                    rearHexes_2[direction_28] = directionHexes[direction_28] - 1;
             }
-        } else {
-            rearHexes_2[direction_28] = IGNORED_HEX;
         }
-
-        if (ValidHexToStandOn(directionHexes[direction_28]) != 0
-            && ValidHexToStandOn(rearHexes_2[direction_28]) != 0)
-            standable_0[direction_28] = true;
-        else
-            standable_0[direction_28] = false;
     }
 
-    if ((H2EnumIndex((currentArmy_1->m_monster.flags.all) & (MONSTER_FLAGS_FLYING))) != 0) {
-        for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++)
-            pathValid_28[direction_28] = standable_0[direction_28];
-    } else {
-        for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; direction_28++) {
-            if (standable_0[direction_28] != 0) {
-                // A charger can also come in on a clear straight line.
-                if (ironfist::HasCreatureAttribute(currentArmy_1->m_monsterType, ironfist::CreatureAttribute::Charger)
-                    && currentArmy_1->GetStraightLineDistanceToHex(directionHexes[direction_28])
-                           <= currentArmy_1->m_monster.speed
-                    && currentArmy_1->TargetOnStraightLine(directionHexes[direction_28])
-                    && currentArmy_1->TargetOnStraightLine(targetHex)
-                    && currentArmy_1->ValidFlight(
-                        directionHexes[direction_28], ARMY_PATH_ANY_TARGET_HEX
-                    ))
-                    pathValid_28[direction_28] = true;
-                else if (currentArmy_1->m_hex == directionHexes[direction_28]
-                    || currentArmy_1->ValidPath(
-                           directionHexes[direction_28],
-                           ARMY_PATH_EXACT_TARGET_HEX
-                       ) != 0)
-                    pathValid_28[direction_28] = true;
-                else
-                    pathValid_28[direction_28] = false;
-            } else {
-                pathValid_28[direction_28] = false;
-            }
-        }
+    const ironfist::movement::Traversal traversal(*this, *currentArmy_1, ironfist::state::Get().combat);
+    for (direction_28 = 0; direction_28 < COMBAT_DIRECTION_COUNT; ++direction_28) {
+        auto target = traversal.Destination(targetHex, ARMY_PATH_EXACT_TARGET_HEX);
+        target.approach = directionHexes[direction_28];
+        pathValid_28[direction_28] = directionHexes[direction_28] != INVALID_HEX
+            && static_cast<bool>(traversal.Find(currentArmy_1->m_hex, target, currentArmy_1->m_monster.speed));
     }
 
     m_validDirectionCount = 0;
@@ -674,8 +613,6 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         }
     }
 
-    currentArmy_1->m_targetSide = targetSide_28;
-    currentArmy_1->m_targetIndex = targetIndex_9;
 }
 
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
@@ -1411,17 +1348,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                 else
                                     return COMBAT_MESSAGE_COMMAND_SHOOT;
                             }
-                            // A charger may attack down a clear straight line
-                            // even when the walking path is blocked.
-                            if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1
-                                || (ironfist::HasCreatureAttribute(
-                                        ourArmy_13->m_monsterType, ironfist::CreatureAttribute::Charger
-                                    )
-                                    && ourArmy_13->TargetOnStraightLine(hexIndex)
-                                    && ourArmy_13->ValidFlight(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
-                                    && !ourArmy_13->FlightThroughObstacles(hexIndex)
-                                    && ourArmy_13->GetStraightLineDistanceToHex(hexIndex)
-                                           <= ourArmy_13->m_monster.speed))
+                            if (ourArmy_13->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX))
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
                             else {
                                 ourArmy_13->m_targetSide = COMBAT_SIDE_NONE;
@@ -2771,10 +2698,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             break;
         case ACTION_ATTACK:
             ResetCyclingCreatures();
-            if (giNextActionExtra != -1 && actingArmy_29->m_hex != giNextActionExtra) {
-                actingArmy_29->MoveAttack(giNextActionExtra, 1);
-            }
-            actingArmy_29->MoveAttack(giNextActionGridIndex, 0);
+            actingArmy_29->MoveAttack(giNextActionGridIndex, 0, giNextActionExtra);
             actingArmy_29->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
             if (CheckWin(&message) != 0) {
                 dispatchResult_1 = MESSAGE_DISPATCH_FORWARD;

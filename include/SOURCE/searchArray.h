@@ -158,14 +158,10 @@ public:
         i32,
         i32
     );
-    void SeedCombatPosition(class army*);
-    i32 FindCombatPath(i32, i32, class army*, ArmyPathTarget, i32);
-    void PushCombatPoint(i32, CombatHexDirection, i32, i32);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];
     }
 };
 #pragma pack(pop)
-extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
 
 #endif
