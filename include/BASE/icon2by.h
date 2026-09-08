@@ -2,6 +2,7 @@
 #define HOMM2_ICON2BY_H
 
 #include <BASE/IconDraw.h>
+#include <span>
 
 class bitmap;
 class icon;
@@ -18,7 +19,7 @@ void IconToBitmapYModify(
     i32 clipW,
     i32 clipH,
     i32 color,
-    i8* shear
+    std::span<const i8> shear
 );
 
 #endif

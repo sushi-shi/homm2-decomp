@@ -11,6 +11,8 @@ use std::path::PathBuf;
 use std::process::Command;
 
 const DECODER_UNITS: &[&str] = &[
+    "src/BASE/ImageDecode.cpp",
+    "tools/image_test_support.cpp",
     "src/BASE/Icon2b.cpp",
     "src/BASE/Iconf2b.cpp",
     "src/BASE/icon2bc.cpp",
