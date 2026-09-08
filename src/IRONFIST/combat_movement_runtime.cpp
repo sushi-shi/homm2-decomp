@@ -15,9 +15,9 @@ bool Execute(army& actor, const Plan& plan) {
     state::AttackApproach approach;
     for (const auto& step : plan.steps) {
         approach.jump |= step.attackJump;
-        approach.charge |= step.kind == StepKind::Charge;
-        approach.distantTeleport |= step.kind == StepKind::Fly
-            && extensions.HasAbility(actor, CreatureAttribute::Teleporter) && !actor.IsCloseMove(step.to);
+        approach.charge |= step.kind == StepKind::MOVEMENT_CHARGE;
+        approach.distantTeleport |= step.kind == StepKind::MOVEMENT_FLY
+            && extensions.HasAbility(actor, CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER) && !actor.IsCloseMove(step.to);
     }
     extensions.SetApproach(actor, approach);
     for (size_t i = 0; i < plan.steps.size(); ++i) {
@@ -25,21 +25,21 @@ bool Execute(army& actor, const Plan& plan) {
         if (extensions.Resolve(identity) != &actor || actor.m_quantity <= 0 || actor.m_hex != step.from)
             return false;
         const Traversal traversal(*gpCombatManager, actor, extensions);
-        if (!traversal.CanLand(step.to, step.kind == StepKind::Fly))
+        if (!traversal.CanLand(step.to, step.kind == StepKind::MOVEMENT_FLY))
             return false;
         switch (step.kind) {
-            case StepKind::Walk:
+            case StepKind::MOVEMENT_WALK:
                 if (!traversal.CanStep(actor.m_hex, step.direction))
                     return false;
                 actor.Walk(step.direction, i + 1 == plan.steps.size(), i != 0);
                 break;
-            case StepKind::Jump:
+            case StepKind::MOVEMENT_JUMP:
                 for (i32 crossed : step.crossedHexes)
                     if (!traversal.CanTraverse(crossed))
                         return false;
                 actor.ArcJump(step.from, step.to);
                 break;
-            case StepKind::Charge: {
+            case StepKind::MOVEMENT_CHARGE: {
                 if (!traversal.ClearLine(step.from, step.to))
                     return false;
                 std::array<std::array<bool, COMBAT_ARMY_STORAGE_SLOT_COUNT>, COMBAT_SIDE_COUNT> seen{};
@@ -61,7 +61,7 @@ bool Execute(army& actor, const Plan& plan) {
                 actor.FlyTo(step.to);
                 break;
             }
-            case StepKind::Fly:
+            case StepKind::MOVEMENT_FLY:
                 actor.FlyTo(step.to);
                 break;
         }

@@ -26,16 +26,16 @@ static void WriteFile(const std::string& path, const std::string& contents) {
 static void ReadRoot(const char* embedded) {
     gpGame->m_day = 7;
     save::XmlFile file;
-    auto* root = file.tempDoc->NewElement("ironfist_save");
-    file.tempDoc->InsertEndChild(root);
-    xml::PushBack(file.tempDoc, root, "mapFilename", "loaded.mx2");
-    xml::PushBack(file.tempDoc, root, "day", 3);
-    xml::PushBack(file.tempDoc, root, "week", 1);
-    xml::PushBack(file.tempDoc, root, "month", 1);
+    auto* root = file.m_document->NewElement("ironfist_save");
+    file.m_document->InsertEndChild(root);
+    xml::PushBack(file.m_document, root, "mapFilename", "loaded.mx2");
+    xml::PushBack(file.m_document, root, "day", 3);
+    xml::PushBack(file.m_document, root, "week", 1);
+    xml::PushBack(file.m_document, root, "month", 1);
     if (embedded) {
-        xml::PushBack(file.tempDoc, root, "script", embedded);
+        xml::PushBack(file.m_document, root, "script", embedded);
         if (*embedded) {
-            auto* variable = file.tempDoc->NewElement("mapVariable");
+            auto* variable = file.m_document->NewElement("mapVariable");
             variable->SetAttribute("id", "counter");
             variable->SetAttribute("type", "int");
             variable->SetAttribute("value", "99");
@@ -52,7 +52,7 @@ static void CheckSavedSource(const std::string& expected) {
     std::filesystem::create_directories(std::filesystem::path(path).parent_path());
     save::XmlFile output;
     assert(output.Save("GAMES/test.GX1", ironfist::runtime::CaptureSession()) == tinyxml2::XML_SUCCESS);
-    const auto* node = output.tempDoc->RootElement()->FirstChildElement("script");
+    const auto* node = output.m_document->RootElement()->FirstChildElement("script");
     if (expected.empty())
         assert(node == nullptr);
     else
@@ -108,7 +108,7 @@ int main() {
     for (const auto* contents : {"", "binary"}) {
         script::InitializeFromSave(oldMap);
         WriteFile(platform::Files().Resolve("GAMES/retail.GM1", platform::FileMode::Write), contents);
-        assert(runtime::LoadGame("retail.GM1", 1) == runtime::LoadResult::Retail);
+        assert(runtime::LoadGame("retail.GM1", 1) == runtime::LoadResult::LOAD_RETAIL);
         runtime::RetailGameLoaded();
         assert(script::MapState() == nullptr);
         assert(script::InvokeResult<std::string>("OnNewDay") == "artifact");

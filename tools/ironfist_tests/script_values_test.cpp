@@ -219,8 +219,8 @@ int main() {
         assert(nestedValues.inner.precise==precise)
     )") == LUA_OK);
     LuaTable invalid;
-    invalid["overflow"] = {MapVariableType::Integer, "9223372036854775808", {}};
-    invalid["trailing"] = {MapVariableType::Number, "1.5junk", {}};
+    invalid["overflow"] = {MapVariableType::MAP_VARIABLE_INTEGER, "9223372036854775808", {}};
+    invalid["trailing"] = {MapVariableType::MAP_VARIABLE_NUMBER, "1.5junk", {}};
     WriteMapVariablesToLua(invalid);
     assert(lua_gettop(state) == 1);
     assert(luaL_dostring(state, "assert(overflow==nil and trailing==nil)") == LUA_OK);

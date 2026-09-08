@@ -13,23 +13,23 @@
 namespace ironfist::script {
 namespace {
 
-enum class Kind { Hero, Player, Town, Stack };
-enum class Lifetime { Session, BattleStack, Captain, Callback };
-constexpr Kind objectKinds[] = {Kind::Hero, Kind::Player, Kind::Town, Kind::Stack};
+enum class Kind { OBJECT_HERO, OBJECT_PLAYER, OBJECT_TOWN, OBJECT_STACK };
+enum class Lifetime { LIFETIME_SESSION, LIFETIME_BATTLE_STACK, LIFETIME_CAPTAIN, LIFETIME_CALLBACK };
+constexpr Kind OBJECT_KINDS[] = {Kind::OBJECT_HERO, Kind::OBJECT_PLAYER, Kind::OBJECT_TOWN, Kind::OBJECT_STACK};
 
-constexpr std::array<const char*, 4> typeNames = {
+constexpr std::array<const char*, 4> OBJECT_TYPE_NAMES = {
     "ironfist.hero", "ironfist.player", "ironfist.town", "ironfist.battleStack"
 };
 const char* TypeName(Kind kind) {
     const auto index = static_cast<size_t>(kind);
-    return index < typeNames.size() ? typeNames[index] : "ironfist.invalid";
+    return index < OBJECT_TYPE_NAMES.size() ? OBJECT_TYPE_NAMES[index] : "ironfist.invalid";
 }
 
 template <typename T> constexpr Kind ObjectKind();
-template <> constexpr Kind ObjectKind<hero>() { return Kind::Hero; }
-template <> constexpr Kind ObjectKind<playerData>() { return Kind::Player; }
-template <> constexpr Kind ObjectKind<town>() { return Kind::Town; }
-template <> constexpr Kind ObjectKind<army>() { return Kind::Stack; }
+template <> constexpr Kind ObjectKind<hero>() { return Kind::OBJECT_HERO; }
+template <> constexpr Kind ObjectKind<playerData>() { return Kind::OBJECT_PLAYER; }
+template <> constexpr Kind ObjectKind<town>() { return Kind::OBJECT_TOWN; }
+template <> constexpr Kind ObjectKind<army>() { return Kind::OBJECT_STACK; }
 
 // No address ever crosses into Lua. All fields are validated against an owner
 // or an active callback frame before obtaining a native pointer.
@@ -45,13 +45,13 @@ static_assert(std::is_trivially_copyable_v<Handle>);
 
 struct Borrow { Kind kind; void* object; };
 struct CallbackFrame { u64 token; std::vector<Borrow> objects; };
-u64 sessionGeneration = 1;
-game* sessionOwner = nullptr;
-u64 nextCallback = 0;
-std::vector<CallbackFrame> callbacks;
+u64 gSessionGeneration = 1;
+game* gSessionOwner = nullptr;
+u64 gNextCallback = 0;
+std::vector<CallbackFrame> gCallbackFrames;
 
 void RefreshSessionOwner() {
-    if (sessionOwner != gpGame)
+    if (gSessionOwner != gpGame)
         InvalidateObjectHandles();
 }
 
@@ -70,28 +70,28 @@ T* RecordAt(i32 slot, T (&records)[N]) {
 
 void* Resolve(const Handle& handle) {
     RefreshSessionOwner();
-    if (handle.session != sessionGeneration)
+    if (handle.session != gSessionGeneration)
         return nullptr;
     auto& combat = state::Get().combat;
     switch (handle.lifetime) {
-        case Lifetime::Session:
-            if (!sessionOwner)
+        case Lifetime::LIFETIME_SESSION:
+            if (!gSessionOwner)
                 return nullptr;
             switch (handle.kind) {
-                case Kind::Hero: return RecordAt(handle.slot, sessionOwner->m_heroRecs);
-                case Kind::Player: return RecordAt(handle.slot, sessionOwner->m_players);
-                case Kind::Town: return RecordAt(handle.slot, sessionOwner->m_castleRecs);
-                case Kind::Stack: return nullptr;
+                case Kind::OBJECT_HERO: return RecordAt(handle.slot, gSessionOwner->m_heroRecs);
+                case Kind::OBJECT_PLAYER: return RecordAt(handle.slot, gSessionOwner->m_players);
+                case Kind::OBJECT_TOWN: return RecordAt(handle.slot, gSessionOwner->m_castleRecs);
+                case Kind::OBJECT_STACK: return nullptr;
             }
             return nullptr;
-        case Lifetime::BattleStack:
-            return handle.kind == Kind::Stack && combat.IsActiveFor(gpCombatManager)
+        case Lifetime::LIFETIME_BATTLE_STACK:
+            return handle.kind == Kind::OBJECT_STACK && combat.IsActiveFor(gpCombatManager)
                 ? combat.Resolve({handle.side, handle.slot, handle.generation}) : nullptr;
-        case Lifetime::Captain:
-            return handle.kind == Kind::Hero && combat.IsActiveFor(gpCombatManager)
+        case Lifetime::LIFETIME_CAPTAIN:
+            return handle.kind == Kind::OBJECT_HERO && combat.IsActiveFor(gpCombatManager)
                 ? combat.Captain(handle.generation) : nullptr;
-        case Lifetime::Callback:
-            for (const auto& frame : callbacks)
+        case Lifetime::LIFETIME_CALLBACK:
+            for (const auto& frame : gCallbackFrames)
                 if (frame.token == handle.generation && handle.slot >= 0
                     && static_cast<size_t>(handle.slot) < frame.objects.size()) {
                     const auto& borrow = frame.objects[handle.slot];
@@ -110,7 +110,7 @@ const Handle* TestHandle(lua_State* L, i32 argument, Kind kind) {
 }
 
 const Handle* TestHandle(lua_State* L, i32 argument) {
-    for (const auto kind : objectKinds)
+    for (const auto kind : OBJECT_KINDS)
         if (const auto* handle = TestHandle(L, argument, kind))
             return handle;
     return nullptr;
@@ -135,20 +135,20 @@ void PushHandle(lua_State* L, const Handle& handle) {
 }
 
 void PushBorrow(lua_State* L, Kind kind, void* object) {
-    if (callbacks.empty()) {
+    if (gCallbackFrames.empty()) {
         // Only a scoped callback may lend an object outside the known owners.
         lua_pushnil(L);
         return;
     }
-    auto& frame = callbacks.back();
+    auto& frame = gCallbackFrames.back();
     for (size_t slot = 0; slot < frame.objects.size(); ++slot)
         if (frame.objects[slot].kind == kind && frame.objects[slot].object == object) {
-            PushHandle(L, {kind, Lifetime::Callback, sessionGeneration, frame.token, -1,
+            PushHandle(L, {kind, Lifetime::LIFETIME_CALLBACK, gSessionGeneration, frame.token, -1,
                            static_cast<i32>(slot)});
             return;
         }
     frame.objects.push_back({kind, object});
-    PushHandle(L, {kind, Lifetime::Callback, sessionGeneration, frame.token, -1,
+    PushHandle(L, {kind, Lifetime::LIFETIME_CALLBACK, gSessionGeneration, frame.token, -1,
                    static_cast<i32>(frame.objects.size() - 1)});
 }
 
@@ -161,16 +161,16 @@ void PushObject(lua_State* L, T* object, bool allowBorrow = false) {
     }
     constexpr auto kind = ObjectKind<T>();
     i32 slot = -1;
-    if (sessionOwner) {
+    if (gSessionOwner) {
         if constexpr (std::is_same_v<T, hero>)
-            slot = SlotOf(object, sessionOwner->m_heroRecs);
+            slot = SlotOf(object, gSessionOwner->m_heroRecs);
         if constexpr (std::is_same_v<T, playerData>)
-            slot = SlotOf(object, sessionOwner->m_players);
+            slot = SlotOf(object, gSessionOwner->m_players);
         if constexpr (std::is_same_v<T, town>)
-            slot = SlotOf(object, sessionOwner->m_castleRecs);
+            slot = SlotOf(object, gSessionOwner->m_castleRecs);
     }
     if (slot >= 0) {
-        PushHandle(L, {kind, Lifetime::Session, sessionGeneration, 0, -1, slot});
+        PushHandle(L, {kind, Lifetime::LIFETIME_SESSION, gSessionGeneration, 0, -1, slot});
         return;
     }
     auto& combat = state::Get().combat;
@@ -178,7 +178,7 @@ void PushObject(lua_State* L, T* object, bool allowBorrow = false) {
         // An unregistered/reused battle slot must not become a callback borrow.
         const auto identity = combat.Identity(*object);
         if (combat.IsActiveFor(gpCombatManager) && identity.generation)
-            PushHandle(L, {kind, Lifetime::BattleStack, sessionGeneration, identity.generation,
+            PushHandle(L, {kind, Lifetime::LIFETIME_BATTLE_STACK, gSessionGeneration, identity.generation,
                            identity.side, identity.slot});
         else
             lua_pushnil(L);
@@ -187,7 +187,7 @@ void PushObject(lua_State* L, T* object, bool allowBorrow = false) {
     if constexpr (std::is_same_v<T, hero>) {
         if (combat.IsActiveFor(gpCombatManager)
             && combat.Captain(combat.BattleGeneration()) == object) {
-            PushHandle(L, {kind, Lifetime::Captain, sessionGeneration, combat.BattleGeneration(), -1, 0});
+            PushHandle(L, {kind, Lifetime::LIFETIME_CAPTAIN, gSessionGeneration, combat.BattleGeneration(), -1, 0});
             return;
         }
         if (gpCombatManager && object == &gpCombatManager->m_captain) {
@@ -202,7 +202,7 @@ void PushObject(lua_State* L, T* object, bool allowBorrow = false) {
 }
 
 struct Property { const char* name; const char* getter; const char* setter; };
-constexpr Property heroProperties[] = {
+constexpr Property HERO_PROPERTIES[] = {
     {"name", "GetHeroName", "SetHeroName"}, {"owner", "GetHeroOwner", nullptr},
     {"spellpoints", "GetSpellpoints", "SetSpellpoints"}, {"level", "GetHeroLevel", nullptr},
     {"tempMoraleBonuses", "GetHeroTempMoraleBonuses", "SetHeroTempMoraleBonuses"},
@@ -211,17 +211,17 @@ constexpr Property heroProperties[] = {
     {"remainingMobility", "GetHeroRemainingMobility", "SetHeroRemainingMobility"},
     {"x", "GetHeroX", nullptr}, {"y", "GetHeroY", nullptr}
 };
-constexpr Property playerProperties[] = {
+constexpr Property PLAYER_PROPERTIES[] = {
     {"color", "GetPlayerColor", nullptr}, {"numHeroes", "GetNumHeroes", nullptr},
     {"daysLeftWithoutCastle", "GetDaysAfterTownLost", "SetDaysAfterTownLost"}
 };
-constexpr Property townProperties[] = {
+constexpr Property TOWN_PROPERTIES[] = {
     {"name", "GetTownName", "SetTownName"}, {"owner", "GetTownOwner", "SetTownOwner"},
     {"faction", "GetTownFaction", "SetTownFaction"},
     {"x", "GetTownX", nullptr}, {"y", "GetTownY", nullptr},
     {"visitingHero", "GetVisitingHero", nullptr}
 };
-constexpr Property stackProperties[] = {
+constexpr Property STACK_PROPERTIES[] = {
     {"side", "GetStackSide", nullptr}, {"type", "GetStackType", nullptr},
     {"creatureType", "GetStackType", nullptr},
     {"quantity", "GetStackQuantity", "SetStackQuantity"},
@@ -234,11 +234,11 @@ constexpr Property stackProperties[] = {
 
 Kind PropertyKind(lua_State* L) {
     const lua_Integer index = lua_tointeger(L, lua_upvalueindex(1));
-    if (index < 0 || static_cast<size_t>(index) >= std::size(objectKinds)) {
+    if (index < 0 || static_cast<size_t>(index) >= std::size(OBJECT_KINDS)) {
         luaL_error(L, "invalid object property binding");
-        return Kind::Hero;
+        return Kind::OBJECT_HERO;
     }
-    return objectKinds[index];
+    return OBJECT_KINDS[index];
 }
 
 i32 GetProperty(lua_State* L) {
@@ -320,18 +320,18 @@ void RegisterType(lua_State* L, Kind kind, const Property (&properties)[N]) {
 } // namespace
 
 void InvalidateObjectHandles() {
-    ++sessionGeneration;
-    sessionOwner = gpGame;
-    callbacks.clear();
+    ++gSessionGeneration;
+    gSessionOwner = gpGame;
+    gCallbackFrames.clear();
 }
 
-BindingScope::BindingScope() : token_(++nextCallback) {
+BindingScope::BindingScope() : m_token(++gNextCallback) {
     RefreshSessionOwner();
-    callbacks.push_back({token_, {}});
+    gCallbackFrames.push_back({m_token, {}});
 }
 
 BindingScope::~BindingScope() {
-    std::erase_if(callbacks, [this](const CallbackFrame& frame) { return frame.token == token_; });
+    std::erase_if(gCallbackFrames, [this](const CallbackFrame& frame) { return frame.token == m_token; });
 }
 
 template <typename T>
@@ -344,10 +344,10 @@ template hero* CheckObject<hero>(lua_State*, i32);
 template town* CheckObject<town>(lua_State*, i32);
 
 void RegisterBindings(lua_State* L) {
-    RegisterType(L, Kind::Hero, heroProperties);
-    RegisterType(L, Kind::Player, playerProperties);
-    RegisterType(L, Kind::Town, townProperties);
-    RegisterType(L, Kind::Stack, stackProperties);
+    RegisterType(L, Kind::OBJECT_HERO, HERO_PROPERTIES);
+    RegisterType(L, Kind::OBJECT_PLAYER, PLAYER_PROPERTIES);
+    RegisterType(L, Kind::OBJECT_TOWN, TOWN_PROPERTIES);
+    RegisterType(L, Kind::OBJECT_STACK, STACK_PROPERTIES);
     lua_register(L, "IsObjectValid", IsValid);
 }
 

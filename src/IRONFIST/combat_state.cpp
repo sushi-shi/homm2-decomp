@@ -15,36 +15,36 @@ void CombatState::SetApproach(army& stack, AttackApproach approach) {
 
 void CombatState::BeginBattle(combatManager& owner) {
     EndBattle();
-    owner_ = &owner;
-    battleGeneration_ = ++nextGeneration_;
+    m_owner = &owner;
+    m_battleGeneration = ++m_nextGeneration;
 }
 
 hero* CombatState::Captain(u64 generation) const {
-    return owner_ && generation == battleGeneration_
-        && owner_->m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == &owner_->m_captain
-        ? &owner_->m_captain : nullptr;
+    return m_owner && generation == m_battleGeneration
+        && m_owner->m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == &m_owner->m_captain
+        ? &m_owner->m_captain : nullptr;
 }
 
 void CombatState::EndBattle() {
-    stacks_ = {};
-    walls_.clear();
-    owner_ = nullptr;
+    m_stacks = {};
+    m_walls.clear();
+    m_owner = nullptr;
     // Keep the sequence across battles: an old handle must never revive.
 }
 
 StackIdentity CombatState::Locate(const army& stack) const {
-    if (owner_) {
+    if (m_owner) {
         for (i32 side = 0; side < COMBAT_SIDE_COUNT; ++side)
             for (i32 slot = 0; slot < COMBAT_ARMY_STORAGE_SLOT_COUNT; ++slot)
-                if (&owner_->m_armies[side][slot] == &stack)
-                    return {side, slot, stacks_[side][slot].generation};
+                if (&m_owner->m_armies[side][slot] == &stack)
+                    return {side, slot, m_stacks[side][slot].generation};
     }
     return {};
 }
 
 const CombatState::StackRecord* CombatState::Find(const army& stack) const {
     const auto id = Locate(stack);
-    return id.side < 0 ? nullptr : &stacks_[id.side][id.slot];
+    return id.side < 0 ? nullptr : &m_stacks[id.side][id.slot];
 }
 
 CombatState::StackRecord* CombatState::Find(army& stack) {
@@ -59,7 +59,7 @@ void CombatState::RemoveStack(army& stack) {
 void CombatState::ResetStack(army& stack) {
     if (auto* record = Find(stack)) {
         *record = {};
-        record->generation = ++nextGeneration_;
+        record->generation = ++m_nextGeneration;
         record->active = true;
     }
 }
@@ -70,12 +70,12 @@ StackIdentity CombatState::Identity(const army& stack) const {
 }
 
 army* CombatState::Resolve(StackIdentity id) const {
-    if (!owner_ || id.side < 0 || id.side >= COMBAT_SIDE_COUNT || id.slot < 0
+    if (!m_owner || id.side < 0 || id.side >= COMBAT_SIDE_COUNT || id.slot < 0
         || id.slot >= COMBAT_ARMY_STORAGE_SLOT_COUNT)
         return nullptr;
-    const auto& record = stacks_[id.side][id.slot];
+    const auto& record = m_stacks[id.side][id.slot];
     return record.active && record.generation == id.generation
-        ? &owner_->m_armies[id.side][id.slot] : nullptr;
+        ? &m_owner->m_armies[id.side][id.slot] : nullptr;
 }
 
 void CombatState::GrantAbility(army& stack, CreatureAttribute ability) {
@@ -147,31 +147,31 @@ i32 CombatState::AbsorbDamage(army& stack, i32 damage) {
 }
 
 void CombatState::AddOrRefreshFireWall(i32 hex, i32 turns, i32 frame) {
-    if (!owner_)
+    if (!m_owner)
         return;
-    for (auto& wall : walls_) {
+    for (auto& wall : m_walls) {
         if (wall.hexIdx == hex) {
             wall = {hex, turns, frame};
             return;
         }
     }
-    walls_.push_back({hex, turns, frame});
+    m_walls.push_back({hex, turns, frame});
 }
 
 void CombatState::AdvanceRound() {
-    const auto dodge = H2EnumIndex(CreatureAttribute::AstralDodge);
-    for (auto& side : stacks_)
+    const auto dodge = H2EnumIndex(CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE);
+    for (auto& side : m_stacks)
         for (auto& record : side)
             if (record.active && record.abilities.test(dodge))
                 record.charges.set(dodge);
-    for (auto& wall : walls_)
+    for (auto& wall : m_walls)
         --wall.turnsLeft;
-    walls_.erase(std::remove_if(walls_.begin(), walls_.end(),
-        [](const FireWall& wall) { return wall.turnsLeft < 0; }), walls_.end());
+    m_walls.erase(std::remove_if(m_walls.begin(), m_walls.end(),
+        [](const FireWall& wall) { return wall.turnsLeft < 0; }), m_walls.end());
 }
 
 void CombatState::AdvanceWallAnimation(i32 frameCount) {
-    for (auto& wall : walls_)
+    for (auto& wall : m_walls)
         wall.currentFrame = frameCount > 0 ? (wall.currentFrame + 1) % frameCount : 0;
 }
 

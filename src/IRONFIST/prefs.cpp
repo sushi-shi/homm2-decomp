@@ -79,7 +79,7 @@ bool WritePreference(const std::string& key, const std::string& value) {
     return WriteAllPrefs(prefs);
 }
 
-static bool IsWellDisabled_impl() {
+static bool ReadWellDisabledPreference() {
     const std::string key = "Disable Well";
     const i32 wellSetting = ReadPreference<i32>(key);
     if (wellSetting == -1) {
@@ -91,7 +91,7 @@ static bool IsWellDisabled_impl() {
 }
 
 bool IsWellDisabled() {
-    static const bool isDisabled = IsWellDisabled_impl();
+    static const bool isDisabled = ReadWellDisabledPreference();
     return isDisabled;
 }
 

@@ -1284,7 +1284,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (ironfist::runtime::LoadGame(filename, !loadFromFile) != ironfist::runtime::LoadResult::Retail)
+    if (ironfist::runtime::LoadGame(filename, !loadFromFile) != ironfist::runtime::LoadResult::LOAD_RETAIL)
         return;
     if (loadFromFile) {
         SetupOrigData();
@@ -1525,7 +1525,7 @@ void game::GiveTroopsToNeutralTown(i32 townId) {
 
     creatureCount += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
     const CreatureType creature =
-        ironfist::NeutralTownCreatures[H2EnumIndex(neutralTown->m_type)][tier];
+        ironfist::gNeutralTownCreatures[H2EnumIndex(neutralTown->m_type)][tier];
     if (creature != CREATURE_NONE)
         GiveArmy(&neutralTown->m_army, creature, creatureCount, ARMY_GROUP_EMPTY_SLOT);
 }
@@ -1576,7 +1576,7 @@ void game::NewMap(const char* filename) {
     for (player = 0; player < GAME_PLAYER_COUNT; player++) {
         if (m_setupPlayerRace[player] == FACTION_RANDOM) {
             m_setupPlayerRace[player] =
-                ironfist::PlayableFactions[Random(0, ironfist::PlayableFactions.size() - 1)];
+                ironfist::gPlayableFactions[Random(0, ironfist::gPlayableFactions.size() - 1)];
         }
     }
     ironfist::runtime::BeginMap(filename);
@@ -3833,8 +3833,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
 
 i32 game::GetRandomNumTroops(CreatureType monsterType) {
     return Random(
-        ironfist::CreatureRandomBounds[H2EnumIndex(monsterType)][0],
-        ironfist::CreatureRandomBounds[H2EnumIndex(monsterType)][1]
+        ironfist::gCreatureRandomBounds[H2EnumIndex(monsterType)][0],
+        ironfist::gCreatureRandomBounds[H2EnumIndex(monsterType)][1]
     );
 }
 
@@ -4194,7 +4194,7 @@ void game::PerWeek(void) {
             giWeekType = CALENDAR_PERIOD_CREATURE;
             // Any randomizable creature can name the week, Ironfist's included.
             giWeekTypeExtra = H2EnumIndex(
-                ironfist::RandomizableCreatures[Random(0, ironfist::RandomizableCreatures.size() - 1)]
+                ironfist::gRandomizableCreatures[Random(0, ironfist::gRandomizableCreatures.size() - 1)]
             );
         }
     }
@@ -4640,7 +4640,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     FactionType race;
 
     if (townExtra->color == RANDOM_TOWN_UNOWNED_COLOR)
-        race = ironfist::PlayableFactions[Random(0, ironfist::PlayableFactions.size() - 1)];
+        race = ironfist::gPlayableFactions[Random(0, ironfist::gPlayableFactions.size() - 1)];
     else
         race = m_setupPlayerRace[gcColorToSetupPos[townExtra->color]];
 
@@ -4939,7 +4939,7 @@ void game::RandomizeHeroPool(void) {
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* heroArmy = &m_heroRecs[heroId].m_army;
     ironfist::StartingArmyRange* creatureFaction =
-        ironfist::StartingArmyBounds[H2EnumIndex(m_heroRecs[heroId].m_cursorType)];
+        ironfist::gStartingArmyBounds[H2EnumIndex(m_heroRecs[heroId].m_cursorType)];
     bool hasTier[ironfist::HERO_ARMY_TIER_COUNT];
 
     hasTier[0] = true;
@@ -5050,8 +5050,8 @@ void game::ProcessRandomObjects(void) {
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
                     do {
                         cell->m_objectIndex = static_cast<u8>(H2EnumIndex(
-                            ironfist::RandomizableCreatures[
-                                Random(0, ironfist::RandomizableCreatures.size() - 1)
+                            ironfist::gRandomizableCreatures[
+                                Random(0, ironfist::gRandomizableCreatures.size() - 1)
                             ]
                         ));
                     } while (gMonsterDatabase[cell->m_objectIndex].randomValue <= minValue
@@ -5804,7 +5804,7 @@ void game::SetupTowns(void) {
         if (castle8->m_buildings & H2EnumIndex(TOWN_BUILDING_MAGE_GUILD)) {
             for (slot12 = 1; slot12 <= castle8->m_buildState; slot12++) {
                 if (castle8->m_type == FACTION_CYBORG)
-                    castle8->m_spellCounts[slot12] = ironfist::CyborgSpellLimits[slot12 - 1];
+                    castle8->m_spellCounts[slot12] = ironfist::gCyborgSpellLimits[slot12 - 1];
                 else
                     castle8->m_spellCounts[slot12] = gSpellLimits[slot12 - 1];
                 if (castle8->m_type == FACTION_WIZARD

@@ -12,14 +12,14 @@ namespace ironfist::script {
 // path produces no value, an unexpected type, or multiple values.
 class LuaStackScope {
 public:
-    explicit LuaStackScope(lua_State* state) : state_(state), top_(lua_gettop(state)) {}
-    ~LuaStackScope() { lua_settop(state_, top_); }
+    explicit LuaStackScope(lua_State* state) : m_state(state), m_top(lua_gettop(state)) {}
+    ~LuaStackScope() { lua_settop(m_state, m_top); }
     LuaStackScope(const LuaStackScope&) = delete;
     LuaStackScope& operator=(const LuaStackScope&) = delete;
 
 private:
-    lua_State* state_;
-    i32 top_;
+    lua_State* m_state;
+    i32 m_top;
 };
 
 void SetConstant(lua_State* L, const char* nam, i32 i);

@@ -102,7 +102,7 @@ class IronfistHookContractTest(unittest.TestCase):
         assert_order(self, body, "if (gbInNewGameSetup)", "ironfist::hooks::CheckEndGame();")
 
     def test_set_town_name_preserves_upstream_result(self):
-        body = function_body("src/IRONFIST/funcs.cpp", "static i32 l_setTownName(lua_State* L)")
+        body = function_body("src/IRONFIST/funcs.cpp", "static i32 LuaSetTownName(lua_State* L)")
         assert_order(self, body, "CopyLuaName(", "return 1;")
 
     def test_hook_layer_contains_callbacks_only(self):

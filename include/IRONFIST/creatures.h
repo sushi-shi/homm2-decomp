@@ -29,30 +29,30 @@ enum CreatureTableConstant {
 };
 
 enum class CreatureAttribute : u8 {
-    StrikeAndReturn,
-    PlasmaBlast,
-    Teleporter,
-    AstralDodge,
-    ShadowMark,
-    Jumper,
-    Charger,
-    Count
+    CREATURE_ATTRIBUTE_STRIKE_AND_RETURN,
+    CREATURE_ATTRIBUTE_PLASMA_BLAST,
+    CREATURE_ATTRIBUTE_TELEPORTER,
+    CREATURE_ATTRIBUTE_ASTRAL_DODGE,
+    CREATURE_ATTRIBUTE_SHADOW_MARK,
+    CREATURE_ATTRIBUTE_JUMPER,
+    CREATURE_ATTRIBUTE_CHARGER,
+    CREATURE_ATTRIBUTE_COUNT
 };
 
-inline constexpr std::array<CreatureAttribute, H2EnumIndex(CreatureAttribute::Count)>
-    CreatureAttributes = {
-        CreatureAttribute::StrikeAndReturn,
-        CreatureAttribute::PlasmaBlast,
-        CreatureAttribute::Teleporter,
-        CreatureAttribute::AstralDodge,
-        CreatureAttribute::ShadowMark,
-        CreatureAttribute::Jumper,
-        CreatureAttribute::Charger
+inline constexpr std::array<CreatureAttribute, H2EnumIndex(CreatureAttribute::CREATURE_ATTRIBUTE_COUNT)>
+    CREATURE_ATTRIBUTES = {
+        CreatureAttribute::CREATURE_ATTRIBUTE_STRIKE_AND_RETURN,
+        CreatureAttribute::CREATURE_ATTRIBUTE_PLASMA_BLAST,
+        CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER,
+        CreatureAttribute::CREATURE_ATTRIBUTE_ASTRAL_DODGE,
+        CreatureAttribute::CREATURE_ATTRIBUTE_SHADOW_MARK,
+        CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER,
+        CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER
     };
 
-extern std::vector<CreatureType> RandomizableCreatures;
-extern i32 CreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
-extern i32 CreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY]
+extern std::vector<CreatureType> gRandomizableCreatures;
+extern i32 gCreatureRandomBounds[KB_CREATURE_TABLE_CAPACITY][2];
+extern i32 gCreatureSecondaryCosts[KB_CREATURE_TABLE_CAPACITY]
                                     [SECONDARY_RESOURCE_COUNT];
 
 // Faction starting-army and neutral-town garrison tables, table-driven so
@@ -69,13 +69,13 @@ enum FactionTableConstant {
 };
 
 extern StartingArmyRange
-    StartingArmyBounds[KB_FACTION_TABLE_CAPACITY][HERO_ARMY_TIER_COUNT];
+    gStartingArmyBounds[KB_FACTION_TABLE_CAPACITY][HERO_ARMY_TIER_COUNT];
 extern CreatureType
-    NeutralTownCreatures[KB_FACTION_TABLE_CAPACITY][NEUTRAL_TOWN_TIER_COUNT];
+    gNeutralTownCreatures[KB_FACTION_TABLE_CAPACITY][NEUTRAL_TOWN_TIER_COUNT];
 
 // Random towns and starting factions draw from the playable factions,
 // including the Cyborgs.
-extern std::vector<FactionType> PlayableFactions;
+extern std::vector<FactionType> gPlayableFactions;
 
 void LoadCreatures();
 void UnloadCreatures();

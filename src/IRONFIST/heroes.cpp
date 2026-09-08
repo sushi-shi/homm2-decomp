@@ -4,7 +4,7 @@
 
 namespace ironfist {
 
-static std::map<i32, FactionType> heroOverlayFactions = {
+static std::map<i32, FactionType> gHeroOverlayFactions = {
   {0, FACTION_KNIGHT}, {7, FACTION_KNIGHT}, {14, FACTION_KNIGHT}, {21, FACTION_KNIGHT}, {28, FACTION_KNIGHT}, {35, FACTION_KNIGHT},
   {1, FACTION_BARBARIAN}, {8, FACTION_BARBARIAN}, {15, FACTION_BARBARIAN}, {22, FACTION_BARBARIAN}, {29, FACTION_BARBARIAN}, {36, FACTION_BARBARIAN},
   {2, FACTION_SORCERESS}, {9, FACTION_SORCERESS}, {16, FACTION_SORCERESS}, {23, FACTION_SORCERESS}, {30, FACTION_SORCERESS}, {37, FACTION_SORCERESS},
@@ -17,7 +17,7 @@ static std::map<i32, FactionType> heroOverlayFactions = {
 };
 
 // objectIndex / color
-static std::map<i32, i32> heroOverlayColors = {
+static std::map<i32, i32> gHeroOverlayColors = {
   {0, 0}, {7, 1}, {14, 2}, {21, 3}, {28, 4}, {35, 5},
   {1, 0}, {8, 1}, {15, 2}, {22, 3}, {29, 4}, {36, 5},
   {2, 0}, {9, 1}, {16, 2}, {23, 3}, {30, 4}, {37, 5},
@@ -29,11 +29,11 @@ static std::map<i32, i32> heroOverlayColors = {
 };
 
 FactionType GetHeroOverlayFaction(i32 overlayObjectIdx) {
-    return heroOverlayFactions[overlayObjectIdx];
+    return gHeroOverlayFactions[overlayObjectIdx];
 }
 
 i32 GetHeroOverlayColor(i32 overlayObjectIdx) {
-    return heroOverlayColors[overlayObjectIdx];
+    return gHeroOverlayColors[overlayObjectIdx];
 }
 
 std::vector<std::string> HeroNames = {

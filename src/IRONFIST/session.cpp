@@ -325,7 +325,7 @@ i32 SaveGame(const char* filename, i32 autosave) {
 LoadResult LoadGame(const char* filename, i32 loadFromFile) {
     if (!loadFromFile) {
         BeginSessionLoad();
-        return LoadResult::Retail;
+        return LoadResult::LOAD_RETAIL;
     }
     const std::string path = SaveFilePath(filename);
     const i32 file = platform::FileOpen(path.c_str(), platform::FileMode::Read);
@@ -337,26 +337,26 @@ LoadResult LoadGame(const char* filename, i32 loadFromFile) {
     }
     if (firstByte != '<') {
         BeginSessionLoad();
-        return LoadResult::Retail;
+        return LoadResult::LOAD_RETAIL;
     }
     SessionData data;
     save::XmlFile xml;
     if (xml.Read(path.c_str(), data) != tinyxml2::XML_SUCCESS) {
         DisplayError(std::string("Could not load XML. ") + xml.GetError(), "Ironfist load");
-        return LoadResult::Failed;
+        return LoadResult::LOAD_FAILED;
     }
     try {
         RestoreSession(data);
     } catch (const std::exception& error) {
         DisplayError(std::string("Could not restore session. ") + error.what(), "Ironfist load");
-        return LoadResult::Failed;
+        return LoadResult::LOAD_FAILED;
     }
     if (platform::CompareIgnoringCase(filename, "RMT", 3))
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     gpAdvManager->m_heroContextLocked = false;
     gpGame->SetupAdjacentMons();
     gpAdvManager->CheckSetEvilInterface(0, -1);
-    return LoadResult::Loaded;
+    return LoadResult::LOAD_LOADED;
 }
 
 void RetailGameLoaded() {

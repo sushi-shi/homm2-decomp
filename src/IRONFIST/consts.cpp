@@ -44,7 +44,7 @@ std::string LuaConstify(const std::string& str) {
 
 /******************************* GUI *****************************************/
 
-static void set_dialog_consts(lua_State* L) {
+static void RegisterDialogConstants(lua_State* L) {
     SetConstant(L, "DIALOG_OKAY", DIALOG_OKAY);
     SetConstant(L, "DIALOG_YES_NO", DIALOG_YES_NO);
     SetConstant(L, "DIALOG_CANCEL", DIALOG_CANCEL);
@@ -55,11 +55,11 @@ static void set_dialog_consts(lua_State* L) {
     SetConstant(L, "DIALOG_EMPTY", DIALOG_EMPTY);
 }
 
-static void set_barriercolor_consts(lua_State* L) {
+static void RegisterBarriercolorConstants(lua_State* L) {
     SetConstant(L, "AQUA_BARRIER", 0);
 }
 
-static void set_messageboxgroups_consts(lua_State* L) {
+static void RegisterMessageboxgroupsConstants(lua_State* L) {
     SetConstant(L, "IMAGE_EMPTY", IMAGE_EMPTY);
     SetConstant(L, "IMAGE_WOOD", IMAGE_WOOD);
     SetConstant(L, "IMAGE_MERCURY", IMAGE_MERCURY);
@@ -82,14 +82,14 @@ static void set_messageboxgroups_consts(lua_State* L) {
     SetConstant(L, "IMAGE_GROUP_PRIMARY_SKILLS", IMAGE_GROUP_PRIMARY_SKILLS);
 }
 
-static void set_gui_consts(lua_State* L) {
-    set_dialog_consts(L);
-    set_messageboxgroups_consts(L);
+static void RegisterGuiConstants(lua_State* L) {
+    RegisterDialogConstants(L);
+    RegisterMessageboxgroupsConstants(L);
 }
 
 /*****************************************************************************/
 
-static void set_spell_consts(lua_State* L) {
+static void RegisterSpellConstants(lua_State* L) {
     SetConstant(L, "SPELL_FIREBALL", H2EnumIndex(SPELL_FIREBALL));
     SetConstant(L, "SPELL_FIREBLAST", H2EnumIndex(SPELL_FIREBLAST));
     SetConstant(L, "SPELL_LIGHTNING_BOLT", H2EnumIndex(SPELL_LIGHTNING_BOLT));
@@ -164,7 +164,7 @@ static void set_spell_consts(lua_State* L) {
     SetConstant(L, "SPELL_IMPLOSION_GRENADE", 72);
 }
 
-static void set_artifact_consts(lua_State* L) {
+static void RegisterArtifactConstants(lua_State* L) {
     for (i32 i = 0; i < KB_ARTIFACT_TABLE_CAPACITY; ++i) {
         if (IsArtifactValid(i)) {
             const std::string constName = "ARTIFACT_" + LuaConstify(GetArtifactName(i));
@@ -173,7 +173,7 @@ static void set_artifact_consts(lua_State* L) {
     }
 }
 
-static void set_town_consts(lua_State* L) {
+static void RegisterTownConstants(lua_State* L) {
     // Ironfist building codes are bit indexes into the town buildingsBuilt
     // mask; the port's TOWN_BUILDING_* constants are the masks themselves.
     SetConstant(L, "BUILDING_MAGE_GUILD", 0x0);
@@ -206,7 +206,7 @@ static void set_town_consts(lua_State* L) {
     SetConstant(L, "BUILDING_UPGRADE_5B", 0x1e);
 }
 
-static void set_faction_consts(lua_State* L) {
+static void RegisterFactionConstants(lua_State* L) {
     SetConstant(L, "FACTION_KNIGHT", H2EnumIndex(FACTION_KNIGHT));
     SetConstant(L, "FACTION_BARBARIAN", H2EnumIndex(FACTION_BARBARIAN));
     SetConstant(L, "FACTION_SORCERESS", H2EnumIndex(FACTION_SORCERESS));
@@ -220,7 +220,7 @@ static void set_faction_consts(lua_State* L) {
     SetConstant(L, "FACTION_CYBORG", H2EnumIndex(FACTION_CYBORG));
 }
 
-static void set_skill_consts(lua_State* L) {
+static void RegisterSkillConstants(lua_State* L) {
     SetConstant(L, "PRIMARY_SKILL_ATTACK", H2EnumIndex(HERO_PRIMARY_ATTACK));
     SetConstant(L, "PRIMARY_SKILL_DEFENSE", H2EnumIndex(HERO_PRIMARY_DEFENSE));
     SetConstant(L, "PRIMARY_SKILL_SPELLPOWER", H2EnumIndex(HERO_PRIMARY_SPELL_POWER));
@@ -241,7 +241,7 @@ static void set_skill_consts(lua_State* L) {
     SetConstant(L, "SECONDARY_SKILL_ESTATES", H2EnumIndex(HERO_SKILL_ESTATES));
 }
 
-static void set_creature_consts(lua_State* L) {
+static void RegisterCreatureConstants(lua_State* L) {
     SetConstant(L, "CREATURE_PEASANT", H2EnumIndex(CREATURE_PEASANT));
     SetConstant(L, "CREATURE_ARCHER", H2EnumIndex(CREATURE_ARCHER));
     SetConstant(L, "CREATURE_RANGER", H2EnumIndex(CREATURE_RANGER));
@@ -323,7 +323,7 @@ static void set_creature_consts(lua_State* L) {
     SetConstant(L, "CREATURE_CYBER_BEHEMOTH", 83);
 }
 
-static void set_resources_consts(lua_State* L) {
+static void RegisterResourcesConstants(lua_State* L) {
     SetConstant(L, "RESOURCE_WOOD", H2EnumIndex(RES_WOOD));
     SetConstant(L, "RESOURCE_MERCURY", H2EnumIndex(RES_MERCURY));
     SetConstant(L, "RESOURCE_ORE", H2EnumIndex(RES_ORE));
@@ -333,7 +333,7 @@ static void set_resources_consts(lua_State* L) {
     SetConstant(L, "RESOURCE_GOLD", H2EnumIndex(RES_GOLD));
 }
 
-static void set_location_consts(lua_State* L) {
+static void RegisterLocationConstants(lua_State* L) {
     SetConstant(L, "LOCATION_ALCHEMIST_LAB", H2EnumIndex(MAP_OBJECT_ALCHEMIST_LAB));
     SetConstant(L, "LOCATION_SIGN", H2EnumIndex(MAP_OBJECT_SIGN));
     SetConstant(L, "LOCATION_BUOY", H2EnumIndex(MAP_OBJECT_BUOY));
@@ -469,24 +469,24 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_JAIL", H2EnumIndex(MAP_OBJECT_JAIL));
 }
 
-static void set_map_cell_consts(lua_State* L) {
+static void RegisterMapCellConstants(lua_State* L) {
     SetConstant(L, "MAP_CELL_NO_FLIP", 0);
     SetConstant(L, "MAP_CELL_FLIP_VERTICALLY", 0x1);
     SetConstant(L, "MAP_CELL_FLIP_HORIZONTALLY", 0x2);
     SetConstant(L, "MAP_CELL_FLIP_DIAGONALLY", 0x3);
 }
 
-static void set_tooltip_consts(lua_State* L) {
+static void RegisterTooltipConstants(lua_State* L) {
     SetNilConstant(L, "TOOLTIP_DEFAULT");
 }
 
-static void set_map_consts(lua_State* L) {
-    set_location_consts(L);
-    set_map_cell_consts(L);
-    set_tooltip_consts(L);
+static void RegisterMapConstants(lua_State* L) {
+    RegisterLocationConstants(L);
+    RegisterMapCellConstants(L);
+    RegisterTooltipConstants(L);
 }
 
-static void set_campaign_choice_consts(lua_State* L) {
+static void RegisterCampaignChoiceConstants(lua_State* L) {
     SetConstant(L, "CAMPAIGN_CHOICE_RESOURCE", H2EnumIndex(CAMPAIGN_CHOICE_RESOURCE));
     SetConstant(L, "CAMPAIGN_CHOICE_ARTIFACT", H2EnumIndex(CAMPAIGN_CHOICE_ARTIFACT));
     SetConstant(L, "CAMPAIGN_CHOICE_SPELL", H2EnumIndex(CAMPAIGN_CHOICE_SPELL));
@@ -505,18 +505,18 @@ static void set_campaign_choice_consts(lua_State* L) {
 /*****************************************************************************/
 
 void RegisterConstants(lua_State* L) {
-    set_gui_consts(L);
-    set_spell_consts(L);
-    set_artifact_consts(L);
-    set_town_consts(L);
-    set_faction_consts(L);
-    set_skill_consts(L);
-    set_creature_consts(L);
-    set_location_consts(L);
-    set_barriercolor_consts(L);
-    set_resources_consts(L);
-    set_map_consts(L);
-    set_campaign_choice_consts(L);
+    RegisterGuiConstants(L);
+    RegisterSpellConstants(L);
+    RegisterArtifactConstants(L);
+    RegisterTownConstants(L);
+    RegisterFactionConstants(L);
+    RegisterSkillConstants(L);
+    RegisterCreatureConstants(L);
+    RegisterLocationConstants(L);
+    RegisterBarriercolorConstants(L);
+    RegisterResourcesConstants(L);
+    RegisterMapConstants(L);
+    RegisterCampaignChoiceConstants(L);
 }
 
 } // namespace ironfist::script

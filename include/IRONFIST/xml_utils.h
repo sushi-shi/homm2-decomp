@@ -73,7 +73,7 @@ void ReadBinary(tinyxml2::XMLElement* src, i32* dest);
 
 class XMLFile {
 public:
-    tinyxml2::XMLDocument* tempDoc = nullptr;
+    tinyxml2::XMLDocument* m_document = nullptr;
     XMLFile();
     ~XMLFile();
     const char* GetError();

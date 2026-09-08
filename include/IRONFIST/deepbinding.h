@@ -56,7 +56,7 @@ public:
     BindingScope(const BindingScope&) = delete;
     BindingScope& operator=(const BindingScope&) = delete;
 private:
-    u64 token_;
+    u64 m_token;
 };
 
 } // namespace ironfist::script

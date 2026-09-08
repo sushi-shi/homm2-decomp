@@ -24,6 +24,18 @@ UPSTREAM_IMPORTS = "src/asm/heroes2_imports.inc"
 CURRENT_FUNCS = "src/IRONFIST/funcs.cpp"
 CURRENT_CONSTS = "src/IRONFIST/consts.cpp"
 
+# Native handlers follow the engine's PascalCase convention. These five also
+# expand old abbreviations or use the order of the existing public Lua name.
+# Keep the mapping independent of registration extraction so a swapped target
+# remains an audit failure.
+HANDLER_RENAMES = {
+    "LuaMessageBox": "l_msgBox",
+    "LuaMapEraseSquare": "l_mapEraseObj",
+    "LuaMapFizzle": "l_mapFizzleObj",
+    "LuaMapSetTileTerrain": "l_mapSetTerrainTile",
+    "LuaBattleNumStacksForSide": "l_battleGetNumStacks",
+}
+
 
 class AuditError(RuntimeError):
     pass
@@ -136,7 +148,7 @@ def extract_lua_handlers(text):
     code = strip_cpp_comments(text)
     return set(
         re.findall(
-            r"\b(?:static\s+)?(?:int|i32)\s+(l_[A-Za-z_]\w*)\s*\(\s*lua_State\s*\*",
+            r"\b(?:static\s+)?(?:int|i32)\s+((?:l_|Lua)[A-Za-z_]\w*)\s*\(\s*lua_State\s*\*",
             code,
         )
     )
@@ -146,7 +158,7 @@ def extract_lua_handler_bodies(text):
     code = strip_cpp_comments(text)
     bodies = {}
     pattern = re.compile(
-        r"\b(?:static\s+)?(?:int|i32)\s+(l_[A-Za-z_]\w*)\s*"
+        r"\b(?:static\s+)?(?:int|i32)\s+((?:l_|Lua)[A-Za-z_]\w*)\s*"
         r"\(\s*lua_State\s*\*[^)]*\)\s*\{"
     )
     for match in pattern.finditer(code):
@@ -154,6 +166,33 @@ def extract_lua_handler_bodies(text):
         closing = matching_brace(code, opening)
         bodies[match.group(1)] = code[opening + 1 : closing]
     return bodies
+
+
+def handler_identity(name):
+    """Ignore native spelling changes, preserving the logical handler target."""
+    name = HANDLER_RENAMES.get(name, name)
+    if name.startswith("l_"):
+        return name[2:].casefold()
+    if name.startswith("Lua"):
+        return name[3:].casefold()
+    return name
+
+
+def handler_values(values):
+    result = {}
+    for name, value in values.items():
+        identity = handler_identity(name)
+        if identity in result:
+            raise AuditError(f"duplicate normalized Lua handler: {name}")
+        result[identity] = value
+    return result
+
+
+def compare_registration_targets(expected, actual):
+    return compare_maps(
+        {name: handler_identity(target) for name, target in expected.items()},
+        {name: handler_identity(target) for name, target in actual.items()},
+    )
 
 
 def extract_callback_names(texts):
@@ -551,12 +590,15 @@ def audit(
             "original_body_clones": len(clones),
         },
         "lua_functions": compare_sets(upstream_functions, current_functions),
-        "lua_handlers": compare_sets(upstream_handlers, current_handlers),
-        "lua_registration_targets": compare_maps(
+        "lua_handlers": compare_sets(
+            set(handler_values(dict.fromkeys(upstream_handlers))),
+            set(handler_values(dict.fromkeys(current_handlers))),
+        ),
+        "lua_registration_targets": compare_registration_targets(
             upstream_registrations, current_registrations
         ),
         "lua_return_arities": compare_maps(
-            upstream_return_arities, current_return_arities
+            handler_values(upstream_return_arities), handler_values(current_return_arities)
         ),
         "lua_return_arity_resolution": {
             "upstream_unresolved": upstream_return_unresolved,

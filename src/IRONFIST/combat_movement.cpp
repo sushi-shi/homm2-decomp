@@ -62,37 +62,37 @@ Plan Plan::WithinBudget(i32 budget) const {
 }
 
 Traversal::Traversal(const combatManager& board, const army& actor, const state::CombatState& extensions)
-    : board_(board), actor_(actor),
-      wide_(static_cast<bool>(actor.m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)),
-      jumping_(extensions.HasAbilityCharge(actor, CreatureAttribute::Jumper)),
-      flying_(static_cast<bool>(actor.m_monster.attributes & MONSTER_ATTRIBUTE_FLYING)),
-      charging_(extensions.HasAbility(actor, CreatureAttribute::Charger)) {}
+    : m_board(board), m_actor(actor),
+      m_wide(static_cast<bool>(actor.m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)),
+      m_jumping(extensions.HasAbilityCharge(actor, CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER)),
+      m_flying(static_cast<bool>(actor.m_monster.attributes & MONSTER_ATTRIBUTE_FLYING)),
+      m_charging(extensions.HasAbility(actor, CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER)) {}
 
 i32 Traversal::Adjacent(i32 source, CombatHexDirection direction) const {
     if (!OnBoard(source) || direction < COMBAT_DIRECTION_NORTHEAST || direction > COMBAT_DIRECTION_NORTHWEST)
         return ARMY_HEX_INVALID;
-    const i32 next = board_.m_adjacency[source][H2EnumIndex(direction)];
+    const i32 next = m_board.m_adjacency[source][H2EnumIndex(direction)];
     return OnBoard(next) ? next : ARMY_HEX_INVALID;
 }
 
 bool Traversal::EmptyOrSelf(i32 hex) const {
     if (!OnBoard(hex))
         return false;
-    const auto& cell = board_.m_hexCells[hex];
+    const auto& cell = m_board.m_hexCells[hex];
     return cell.m_occupantSide == COMBAT_SIDE_NONE
-        || (cell.m_occupantSide == actor_.m_side && cell.m_occupantIndex == actor_.m_index);
+        || (cell.m_occupantSide == m_actor.m_side && cell.m_occupantIndex == m_actor.m_index);
 }
 
 bool Traversal::GroundOpen(i32 hex) const {
     if (!OnBoard(hex))
         return false;
-    if (!board_.m_hexCells[hex].m_blocked)
+    if (!m_board.m_hexCells[hex].m_blocked)
         return true;
-    if (board_.m_inCastleCombat && (hex == COMBAT_CASTLE_GATE_APPROACH_HEX
+    if (m_board.m_inCastleCombat && (hex == COMBAT_CASTLE_GATE_APPROACH_HEX
                                   || hex == H2EnumIndex(COMBAT_CASTLE_HEX_GATE))) {
-        const auto& approach = board_.m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX];
-        return board_.m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
-            || (actor_.m_side == COMBAT_DEFENDER_SIDE && approach.m_occupantSide == COMBAT_SIDE_NONE
+        const auto& approach = m_board.m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX];
+        return m_board.m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
+            || (m_actor.m_side == COMBAT_DEFENDER_SIDE && approach.m_occupantSide == COMBAT_SIDE_NONE
                 && approach.m_deadOccupantCount == 0);
     }
     return false;
@@ -100,16 +100,16 @@ bool Traversal::GroundOpen(i32 hex) const {
 
 bool Traversal::PassableCell(i32 hex, bool jump) const {
     return EmptyOrSelf(hex) && (GroundOpen(hex)
-        || (jump && jumping_ && !(board_.m_inCastleCombat && CastleWall(hex))));
+        || (jump && m_jumping && !(m_board.m_inCastleCombat && CastleWall(hex))));
 }
 
 bool Traversal::CanLand(i32 hex, bool flying) const {
     const auto legal = [&](i32 cell) {
-        return EmptyOrSelf(cell) && (flying ? !board_.m_hexCells[cell].m_blocked : GroundOpen(cell));
+        return EmptyOrSelf(cell) && (flying ? !m_board.m_hexCells[cell].m_blocked : GroundOpen(cell));
     };
     if (!legal(hex))
         return false;
-    return !wide_ || legal(Adjacent(hex, actor_.m_facing == ARMY_FACING_RIGHT
+    return !m_wide || legal(Adjacent(hex, m_actor.m_facing == ARMY_FACING_RIGHT
         ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST));
 }
 
@@ -120,7 +120,7 @@ bool Traversal::CanStandOnCell(i32 hex) const {
 bool Traversal::CanTraverse(i32 hex) const {
     if (!PassableCell(hex, true))
         return false;
-    return !wide_ || PassableCell(Adjacent(hex, actor_.m_facing == ARMY_FACING_RIGHT
+    return !m_wide || PassableCell(Adjacent(hex, m_actor.m_facing == ARMY_FACING_RIGHT
         ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST), true);
 }
 
@@ -129,15 +129,15 @@ bool Traversal::CanStep(i32 source, CombatHexDirection direction) const {
 }
 
 bool Traversal::StopsMovement(i32 hex) const {
-    if (!board_.m_drawbridgeBackgroundVisible)
+    if (!m_board.m_drawbridgeBackgroundVisible)
         return false;
-    const i32 startRear = wide_ ? actor_.m_hex + ArmyFacingRearHexOffset(actor_.m_facing) : -1;
-    const i32 rear = wide_ ? hex + ArmyFacingRearHexOffset(actor_.m_facing) : -1;
+    const i32 startRear = m_wide ? m_actor.m_hex + ArmyFacingRearHexOffset(m_actor.m_facing) : -1;
+    const i32 rear = m_wide ? hex + ArmyFacingRearHexOffset(m_actor.m_facing) : -1;
     for (i32 index = 0; index < KB_MOAT_CELL_COUNT; ++index) {
-        if (index == 4 && board_.m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED)
+        if (index == 4 && m_board.m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED)
             continue;
         const i32 moat = moatCell[index];
-        if (moat != actor_.m_hex && moat != startRear && (moat == hex || moat == rear))
+        if (moat != m_actor.m_hex && moat != startRear && (moat == hex || moat == rear))
             return true;
     }
     return false;
@@ -177,7 +177,7 @@ bool Traversal::ClearLine(i32 source, i32 target) const {
     for (i32 hex : line) {
         if (!GroundOpen(hex))
             return false;
-        if (wide_ && !GroundOpen(Adjacent(hex, actor_.m_facing == ARMY_FACING_RIGHT
+        if (m_wide && !GroundOpen(Adjacent(hex, m_actor.m_facing == ARMY_FACING_RIGHT
             ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST)))
             return false;
     }
@@ -189,9 +189,9 @@ Target Traversal::Destination(i32 hex, ArmyPathTarget mode) const {
     target.hex = hex;
     target.exactHex = mode != ARMY_PATH_ANY_TARGET_HEX;
     if (OnBoard(hex)) {
-        const auto& cell = board_.m_hexCells[hex];
+        const auto& cell = m_board.m_hexCells[hex];
         if (cell.m_occupantSide != COMBAT_SIDE_NONE
-            && !(cell.m_occupantSide == actor_.m_side && cell.m_occupantIndex == actor_.m_index)) {
+            && !(cell.m_occupantSide == m_actor.m_side && cell.m_occupantIndex == m_actor.m_index)) {
             target.side = cell.m_occupantSide;
             target.slot = cell.m_occupantIndex;
         }
@@ -202,25 +202,25 @@ Target Traversal::Destination(i32 hex, ArmyPathTarget mode) const {
 std::optional<CombatHexDirection> Traversal::AttackDirection(i32 source, const Target& target) const {
     if (!OnBoard(source) || !target.IsAttack())
         return {};
-    for (i32 d = 0; d < (wide_ ? COMBAT_DIRECTION_COUNT : COMBAT_DIRECTION_ADJACENT_COUNT); ++d) {
+    for (i32 d = 0; d < (m_wide ? COMBAT_DIRECTION_COUNT : COMBAT_DIRECTION_ADJACENT_COUNT); ++d) {
         auto direction = CombatHexDirectionFromCode(d);
         i32 base = source;
         i32 hit;
-        if (wide_ && direction >= COMBAT_DIRECTION_WIDE_WEST) {
+        if (m_wide && direction >= COMBAT_DIRECTION_WIDE_WEST) {
             const bool upper = direction == COMBAT_DIRECTION_WIDE_WEST;
-            const auto diagonal = actor_.m_facing == ARMY_FACING_LEFT
+            const auto diagonal = m_actor.m_facing == ARMY_FACING_LEFT
                 ? (upper ? COMBAT_DIRECTION_NORTHWEST : COMBAT_DIRECTION_SOUTHWEST)
                 : (upper ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHEAST);
             hit = Adjacent(source, diagonal);
         } else {
-            if (wide_ && ((actor_.m_facing == ARMY_FACING_LEFT && direction >= COMBAT_DIRECTION_SOUTHWEST)
-                      || (actor_.m_facing == ARMY_FACING_RIGHT && direction <= COMBAT_DIRECTION_SOUTHEAST)))
-                base = Adjacent(source, actor_.m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST);
+            if (m_wide && ((m_actor.m_facing == ARMY_FACING_LEFT && direction >= COMBAT_DIRECTION_SOUTHWEST)
+                      || (m_actor.m_facing == ARMY_FACING_RIGHT && direction <= COMBAT_DIRECTION_SOUTHEAST)))
+                base = Adjacent(source, m_actor.m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST);
             hit = Adjacent(base, direction);
         }
         if (!OnBoard(hit) || (target.exactHex && hit != target.hex))
             continue;
-        const auto& cell = board_.m_hexCells[hit];
+        const auto& cell = m_board.m_hexCells[hit];
         if (cell.m_occupantSide == target.side && cell.m_occupantIndex == target.slot)
             return direction;
     }
@@ -265,7 +265,7 @@ Plan Traversal::Ground(i32 source, Target target, i32 budget) const {
             const i32 next = Adjacent(hex, direction);
             if (!CanTraverse(next))
                 continue;
-            const i32 nextCost = cost + 1 + (hex != source && StopsMovement(hex) ? actor_.m_speed + 2 : 0);
+            const i32 nextCost = cost + 1 + (hex != source && StopsMovement(hex) ? m_actor.m_speed + 2 : 0);
             if ((budget >= 0 && nextCost > budget) || nextCost >= costs[next])
                 continue;
             costs[next] = nextCost;
@@ -293,7 +293,7 @@ Plan Traversal::Ground(i32 source, Target target, i32 budget) const {
         pending.crossedHexes.push_back(hex);
         ++pending.cost;
         if (!CanLand(hex)) {
-            pending.kind = StepKind::Jump;
+            pending.kind = StepKind::MOVEMENT_JUMP;
             continue;
         }
         pending.to = hex;
@@ -305,7 +305,7 @@ Plan Traversal::Ground(i32 source, Target target, i32 budget) const {
     }
     // A charged jumper can leap the final four hexes of an attack. This
     // presentation choice is part of the plan used by every controller.
-    if (jumping_ && target.IsAttack() && !result.steps.empty()) {
+    if (m_jumping && target.IsAttack() && !result.steps.empty()) {
         size_t first = result.steps.size();
         i32 length = 0;
         while (first > 0 && length + result.steps[first - 1].cost <= 4) {
@@ -315,7 +315,7 @@ Plan Traversal::Ground(i32 source, Target target, i32 budget) const {
         }
         if (first < result.steps.size()) {
             Step jump;
-            jump.kind = StepKind::Jump;
+            jump.kind = StepKind::MOVEMENT_JUMP;
             jump.from = result.steps[first].from;
             jump.to = result.destination;
             jump.direction = result.steps[first].direction;
@@ -354,7 +354,7 @@ Plan Traversal::Flight(i32 source, Target target) const {
         result.attackDirection = AttackDirection(result.destination, target);
     if (source != result.destination) {
         Step step;
-        step.kind = StepKind::Fly;
+        step.kind = StepKind::MOVEMENT_FLY;
         step.from = source;
         step.to = result.destination;
         // Retail flight is not limited by walking speed.
@@ -366,10 +366,10 @@ Plan Traversal::Flight(i32 source, Target target) const {
 Plan Traversal::Charge(i32 source, Target target, i32 budget) const {
     Plan result;
     result.source = source;
-    if (!charging_ || !target.IsAttack())
+    if (!m_charging || !target.IsAttack())
         return result;
     const auto line = StraightLine(source, target.hex);
-    const i32 chargeRange = budget < 0 ? actor_.m_monster.speed : budget;
+    const i32 chargeRange = budget < 0 ? m_actor.m_monster.speed : budget;
     if (line.empty() || static_cast<i32>(line.size()) > chargeRange
         || !ClearLine(source, target.hex))
         return result;
@@ -379,7 +379,7 @@ Plan Traversal::Charge(i32 source, Target target, i32 budget) const {
         if (!CanFinish(*it, target))
             continue;
         Step step;
-        step.kind = StepKind::Charge;
+        step.kind = StepKind::MOVEMENT_CHARGE;
         step.from = source;
         step.to = *it;
         step.direction = StraightDirection(source, target.hex);
@@ -396,13 +396,13 @@ Plan Traversal::Charge(i32 source, Target target, i32 budget) const {
 }
 
 Plan Traversal::Find(i32 source, Target target, i32 budget) const {
-    if (!OnBoard(source) || !OnBoard(target.hex) || actor_.m_quantity <= 0)
+    if (!OnBoard(source) || !OnBoard(target.hex) || m_actor.m_quantity <= 0)
         return {};
     if (target.IsAttack() && (target.side < COMBAT_ATTACKER_SIDE || target.side > COMBAT_DEFENDER_SIDE
         || target.slot < 0 || target.slot >= COMBAT_ARMY_SLOT_COUNT
-        || board_.m_armies[H2EnumIndex(target.side)][target.slot].m_quantity <= 0))
+        || m_board.m_armies[H2EnumIndex(target.side)][target.slot].m_quantity <= 0))
         return {};
-    if (flying_)
+    if (m_flying)
         return Flight(source, target);
     if (CanFinish(source, target)) {
         Plan result;
@@ -415,8 +415,8 @@ Plan Traversal::Find(i32 source, Target target, i32 budget) const {
     if (auto charge = Charge(source, target, budget))
         return charge;
     auto plan = Ground(source, target, budget);
-    if (!plan && !target.IsAttack() && !target.exactHex && wide_) {
-        target.hex = Adjacent(target.hex, actor_.m_facing == ARMY_FACING_LEFT
+    if (!plan && !target.IsAttack() && !target.exactHex && m_wide) {
+        target.hex = Adjacent(target.hex, m_actor.m_facing == ARMY_FACING_LEFT
             ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST);
         if (OnBoard(target.hex))
             plan = Ground(source, target, budget);

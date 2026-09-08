@@ -37,8 +37,8 @@ public:
     void RemoveStack(army& stack);
     StackIdentity Identity(const army& stack) const;
     army* Resolve(StackIdentity identity) const;
-    bool IsActiveFor(const combatManager* owner) const { return owner && owner_ == owner; }
-    u64 BattleGeneration() const { return owner_ ? battleGeneration_ : 0; }
+    bool IsActiveFor(const combatManager* owner) const { return owner && m_owner == owner; }
+    u64 BattleGeneration() const { return m_owner ? m_battleGeneration : 0; }
     hero* Captain(u64 generation) const;
     AttackApproach Approach(const army& stack) const;
     void SetApproach(army& stack, AttackApproach approach);
@@ -56,7 +56,7 @@ public:
     void ClearShield(army& stack);
     i32 AbsorbDamage(army& stack, i32 damage);
 
-    const std::vector<FireWall>& FireWalls() const { return walls_; }
+    const std::vector<FireWall>& FireWalls() const { return m_walls; }
     void AddOrRefreshFireWall(i32 hex, i32 turns, i32 frame = 0);
     void AdvanceRound();
     void AdvanceWallAnimation(i32 frameCount);
@@ -65,9 +65,9 @@ private:
     struct StackRecord {
         u64 generation = 0;
         bool active = false;
-        std::bitset<H2EnumIndex(CreatureAttribute::Count)> abilities;
-        std::bitset<H2EnumIndex(CreatureAttribute::Count)> charges;
-        std::bitset<H2EnumIndex(CreatureAttribute::Count)> animating;
+        std::bitset<H2EnumIndex(CreatureAttribute::CREATURE_ATTRIBUTE_COUNT)> abilities;
+        std::bitset<H2EnumIndex(CreatureAttribute::CREATURE_ATTRIBUTE_COUNT)> charges;
+        std::bitset<H2EnumIndex(CreatureAttribute::CREATURE_ATTRIBUTE_COUNT)> animating;
         i32 shieldHP = 0;
         AttackApproach approach;
     };
@@ -75,11 +75,11 @@ private:
     StackRecord* Find(army& stack);
     const StackRecord* Find(const army& stack) const;
     StackIdentity Locate(const army& stack) const;
-    combatManager* owner_ = nullptr;
-    u64 nextGeneration_ = 0;
-    u64 battleGeneration_ = 0;
-    std::array<std::array<StackRecord, COMBAT_ARMY_STORAGE_SLOT_COUNT>, COMBAT_SIDE_COUNT> stacks_{};
-    std::vector<FireWall> walls_;
+    combatManager* m_owner = nullptr;
+    u64 m_nextGeneration = 0;
+    u64 m_battleGeneration = 0;
+    std::array<std::array<StackRecord, COMBAT_ARMY_STORAGE_SLOT_COUNT>, COMBAT_SIDE_COUNT> m_stacks{};
+    std::vector<FireWall> m_walls;
 };
 
 } // namespace ironfist::state

@@ -5,7 +5,7 @@
 
 namespace ironfist::effects {
 
-enum class Outcome { Hit, MirrorDestroyed, Dodged };
+enum class Outcome { DAMAGE_HIT, DAMAGE_MIRROR_DESTROYED, DAMAGE_DODGED };
 struct AttackContext {
     state::AttackApproach approach;
     bool ranged = false;
@@ -19,7 +19,7 @@ struct DamageResult {
     state::StackIdentity source;
     state::StackIdentity target;
     CreatureType creature = CREATURE_NONE;
-    Outcome outcome = Outcome::Hit;
+    Outcome outcome = Outcome::DAMAGE_HIT;
     i32 damage = 0;
     i32 absorbed = 0;
     i32 killed = 0;

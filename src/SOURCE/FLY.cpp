@@ -283,7 +283,7 @@ i32 army::FlyTo(i32 destination) {
         gpCombatManager->m_backgroundDrawn = false;
         m_animationSequence = ARMY_ANIMATION_WALK;
         for (leg = 0; leg < stepCount1; leg++) {
-            if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)) {
+            if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER)) {
                 BuildTeleporterTempWalkSeq(
                     &m_frameInfo,
                     leg + 1 == stepCount1,
@@ -292,7 +292,7 @@ i32 army::FlyTo(i32 destination) {
                 );
             } else {
                 BuildTempWalkSeq(&m_frameInfo, leg + 1 == stepCount1, leg > 0);
-                if (ironfist::state::Get().combat.Approach(*this).charge && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
+                if (ironfist::state::Get().combat.Approach(*this).charge && ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER)) {
                     ChargingDirection chargeDirection = CHARGING_FORWARD;
                     double chargeAngle =
                         (180.0 / M_PI) * atan2(static_cast<double>(ySpan0), abs(xDistance));
@@ -328,7 +328,7 @@ i32 army::FlyTo(i32 destination) {
                 if (m_animationFrame >= frameStart
                     && m_animationFrame < frameStart + frameCount0) {
                     // A far teleport snaps straight to the destination.
-                    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Teleporter)
+                    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_TELEPORTER)
                         && !closeMove) {
                         xPos = static_cast<float>(endX);
                         yPos = static_cast<float>(endY);
@@ -466,7 +466,7 @@ i32 army::FlyTo(i32 destination) {
         m_facingChanged = false;
     }
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
+    if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::CREATURE_ATTRIBUTE_CHARGER)) {
         RevertChargingMoveAnimation();
     }
     gpCombatManager->TestRaiseDoor();

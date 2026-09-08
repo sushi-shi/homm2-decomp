@@ -18,6 +18,29 @@ The branch has two simultaneous obligations:
 All extension code is under `namespace ironfist`. Recovered engine sources use
 fully qualified calls at the boundary; they do not import the namespace.
 
+### C++ naming
+
+Ironfist's internal C++ names follow the engine's conventions:
+
+- Functions and methods use `PascalCase`. Lua C handlers use `Lua` followed
+  by the public operation, such as `LuaGetHeroName`; registration helpers use
+  names such as `RegisterHeroFunctions`.
+- Class data members use `m_lowerCamelCase`, including private fields and
+  small lifetime guards. Plain struct fields use `lowerCamelCase` without a
+  member prefix, as in the engine's value records.
+- Namespace and file-scope variables use a `g` prefix, such as
+  `gPlayableFactions`; named compile-time constants and enum values use
+  `UPPER_SNAKE_CASE` with their domain, such as
+  `CreatureAttribute::CREATURE_ATTRIBUTE_JUMPER`.
+- Locals and parameters use `lowerCamelCase`. Existing recovered type names
+  and module filenames retain their established spelling.
+
+Lua registration strings, callback/property names, XML fields, preference
+keys, localization keys and resource paths are content interfaces. Their
+spelling is independent of C++ identifier style. The interface audit accounts
+for native handler renames while still comparing registration targets and
+return arities against pinned upstream.
+
 | Boundary | Responsibility | Must not own |
 |---|---|---|
 | `ironfist::runtime` | process startup/shutdown and map lifecycle | game rules |

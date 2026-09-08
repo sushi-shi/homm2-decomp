@@ -26,22 +26,22 @@ CampaignCatalog& Campaigns() {
 }
 
 const CampaignDefinition* CampaignCatalog::Find(ExpansionCampaignId id) const {
-    const auto entry = definitions_.find(H2EnumIndex(id));
-    return entry == definitions_.end() ? nullptr : &entry->second;
+    const auto entry = m_definitions.find(H2EnumIndex(id));
+    return entry == m_definitions.end() ? nullptr : &entry->second;
 }
 
 const CampaignDefinition& CampaignCatalog::At(ExpansionCampaignId id) const {
-    return definitions_.at(H2EnumIndex(id));
+    return m_definitions.at(H2EnumIndex(id));
 }
 
 void CampaignCatalog::Replace(CampaignDefinition definition) {
     ValidateCampaignDefinition(definition);
     const i32 id = definition.id;
-    definitions_.insert_or_assign(id, std::move(definition));
+    m_definitions.insert_or_assign(id, std::move(definition));
 }
 
 void CampaignCatalog::Swap(CampaignCatalog& other) noexcept {
-    definitions_.swap(other.definitions_);
+    m_definitions.swap(other.m_definitions);
 }
 
 b32 IsCustomCampaign(ExpansionCampaignId id) {

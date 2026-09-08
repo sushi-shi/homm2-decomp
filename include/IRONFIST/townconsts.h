@@ -67,7 +67,7 @@ enum BuildingCode {
     BUILDING_INVALID         = -1
 };
 
-extern i8 CyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL];
+extern i8 gCyborgSpellLimits[KB_MAGE_GUILD_MAX_LEVEL];
 
 const char* GetDwellingName(i32 faction, i32 dwellingIndex);
 void InitializeTownConstants();

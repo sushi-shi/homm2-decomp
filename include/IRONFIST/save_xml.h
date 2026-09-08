@@ -21,7 +21,7 @@ public:
     const char* GetError();
 
 private:
-    std::string decodeError;
+    std::string m_decodeError;
     template <typename T, size_t M, size_t N>
     void WriteCampaignDDArray(
         tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* dest, const char* name, const T (&src)[M][N]
