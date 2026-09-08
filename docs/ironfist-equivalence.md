@@ -28,7 +28,7 @@ Therefore, “exact to Ironfist” must always name which target it means.
 | Question | Result |
 |---|---|
 | Is this the shipped Ironfist 1.3.0 binary expressed portably? | No. Its scripting surface is a strict superset derived from later source. |
-| Does it expose the complete pinned-2024 Lua surface? | Yes: all names, handler bindings, result arities, callback names, and static numeric constant values match. |
+| Does it expose the complete pinned-2024 Lua surface? | The 129 legacy function names, handler bindings, result arities, callback names, and static numeric constant values are retained. Native object representation now uses typed handles. |
 | Are the pinned-2024 game semantics fully proven equivalent? | No. All callback sites were reviewed, but the preserved Gold base and the spell-chance implementation are known differences. |
 | Is the original Windows map editor ported? | No. This branch builds the game only. |
 | Are the resources the shipped 1.3.0 payload? | No. They are rebuilt from the pinned-2024 upstream source. The generated aggregate matches the reviewed pinned-source packer output byte for byte. |
@@ -56,9 +56,10 @@ surface match to the release-correlated source snapshot:
 | callback names | 12 | 12 | 23 |
 | static constant names | 353 | 353 | 374 |
 
-The current port adds exactly the 24 Lua functions, 11 callbacks, and 21
+The port retains the 24 additional Lua functions, 11 callbacks, and 21
 static constants present in the later source. The executable scan finds none
-of those names in the shipped binary.
+of those names in the shipped binary. The native binding layer additionally
+exports `IsObjectValid`; the legacy comparison below covers `funcs.cpp`.
 
 For the 105 Lua functions shared with 1.3.0, all registration-to-handler
 bindings match and all 352 numeric constant values shared with 1.3.0 match.
@@ -91,6 +92,13 @@ no visiting hero, spell-index validation, and bounded hero/town name copying.
 These changes preserve valid-input behavior but replace upstream out-of-bounds
 access or unterminated writes with defined behavior. They are not bug-for-bug
 equivalent for invalid scripts.
+
+Native objects now use typed userdata with session, battle-slot, captain, or
+callback lifetimes. Their property names and getter/setter functions remain
+available, but pointer tables and direct `ptr` access are intentionally removed.
+Temporary callback arguments expire when that callback returns. Campaign
+choices are detached snapshots. These ownership changes are outside the static
+name/arity comparison and are not a claim of representation equivalence.
 
 ## Callback-placement audit
 
@@ -189,8 +197,9 @@ The resource payload is built from the exact 2024 source pin. A fresh
 `DATA/ironfist.agg` is 8,536,086 bytes with SHA-256
 `2952e91a5d6c38216d8c805346f4941e7527ff31ba05c0d7a1161e90f56a5599`,
 the reviewed byte-for-byte upstream-packer result enforced by the builder.
-The remaining XML, map, campaign, Lua, and music files are copied from the
-pinned source with only the documented Cyborg music filename adaptation.
+The remaining files come from the pinned source with the documented Cyborg
+music filename, campaign metadata correction, and maintained Lua binding module
+adaptations described in [resource packaging](ironfist-resources.md).
 
 ## Reproducing the audit
 

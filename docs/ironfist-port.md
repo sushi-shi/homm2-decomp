@@ -50,10 +50,11 @@ behavior; see the audited qualifications linked above):
   `armyGroup::GetMorale` → `OnCalcMorale`;
   `combatManager::InitNonVisualVars` → `OnBattleStart`.
 
-The Lua-visible names, handler bindings, result arities, and static values
-match the pinned 2024 Ironfist scripting interface, so scripts for that source
-revision load unchanged. This is a superset of the older interface embedded in
-the shipped 1.3.0 executable.
+The legacy Lua-visible names, handler bindings, result arities, and static
+values match the pinned 2024 interface. Object properties now use typed native
+handles; scripts using raw pointer tables must use returned handles and named
+getters instead. The native layer adds `IsObjectValid` for retained references.
+The named interface remains a superset of the older 1.3.0 interface.
 
 ## Name-mapping notes
 

@@ -36,6 +36,7 @@ void ResetAdventureState() {
 }
 
 void BeginMap(const char* filename) {
+    state::Get().combat.EndBattle();
     ResetAdventureState();
     sessionPhase = SessionPhase::PreparingMap;
     std::string mapName(filename);
@@ -65,6 +66,7 @@ void Shutdown() {
 
 void BeginSessionLoad() {
     script::Shutdown();
+    state::Get().combat.EndBattle();
     ResetAdventureState();
     sessionPhase = SessionPhase::Restoring;
 }

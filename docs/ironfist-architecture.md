@@ -8,8 +8,8 @@ native to this repository.
 
 The branch has two simultaneous obligations:
 
-1. preserve the Lua names, callback order, save/XML schema, resource layout,
-   numeric IDs, and valid-input game behavior expected by Ironfist content; and
+1. preserve supported content's named Lua APIs, callback order, resource paths,
+   numeric IDs, and game rules; and
 2. represent mechanics through the recovered HoMM2 model instead of maintaining
    a second shadow engine behind a collection of global patch functions.
 
@@ -114,19 +114,49 @@ simulation sidecar. Map variables use value ownership (`std::string` and nested
 map values), removing the old shallow-copy pointer lifetime and leak hazards
 without changing the serialized XML representation.
 
+## Lua object lifetime
+
+Heroes, players, towns, and battle stacks cross into Lua as native userdata
+with a type and an opaque identity. They contain no native addresses. Every
+object-taking handler uses `CheckObject<T>` with its actual argument position;
+forged tables, wrong userdata types, nil, and expired identities produce Lua
+errors before native access. Missing optional objects are represented by nil.
+
+Hero-pool, player, and town records belong to the session generation. Those
+identities survive ownership changes within the map, but expire when a session
+is replaced or scripts shut down. Battle stack identities also check the slot's
+generation, so a summon cannot revive a handle to a previous occupant. Captains
+check the battle generation. New maps and session restores end the previous
+battle, and shutdown closes scripts before deleting their native owners.
+
+Temporary hero copies used by AI calculations can be borrowed by a callback.
+`BindingScope` keeps that borrow valid only through the particular callback,
+including nested calls, and retires it on success or error. Ordinary Lua getters
+can return only known owned objects and cannot accidentally create such borrows.
+
+The existing property names dispatch through native getter/setter tables.
+`scripts/ironfist/binding.lua` is the maintained payload module and exports
+`isValid`, backed by `IsObjectValid`, for retained references. A stale object's
+properties raise an error; writing unknown or read-only properties also raises
+an error. Campaign choices remain detached value snapshots. Scripts that used
+the old `ptr` table member or constructed native-object tables must migrate to
+the public getters and returned handles.
+
 ## Compatibility invariants
 
-Internal renaming and ownership changes must not change:
+The integration retains:
 
-- any Lua-visible function, constant, or callback name;
-- Lua registration-to-handler bindings or handler result counts;
+- existing Lua-visible function, constant, and callback names;
+- existing Lua registration-to-handler bindings and handler result counts;
 - callback placement relative to the recovered host behavior;
-- `.GIC`/`.GCC` save extensions or XML element names;
-- resource paths or the pinned resource-payload bytes; or
+- `.GIC`/`.GCC` save extensions;
+- resource paths and the pinned aggregate bytes; and
 - the numeric IDs published to scripts and data files.
 
 `tools/ironfist_interface_audit.py` compares the public scripting surface with
-the exact pinned upstream Git object. `tools/test_ironfist_hook_contract.py`
+the exact pinned upstream Git object for the 129 legacy functions in
+`funcs.cpp`; `IsObjectValid` is an additional native binding helper.
+`tools/test_ironfist_hook_contract.py`
 checks integration order, keeps true mechanics out of the hook layer, verifies
 their host owners, and protects the extension-state ownership rules. Both run
 through CTest.

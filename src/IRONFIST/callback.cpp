@@ -11,10 +11,6 @@ void PushLuaValue(lua_State* ls, i32 arg) {
     lua_pushinteger(ls, arg);
 }
 
-void PushLuaValue(lua_State* ls, void* arg) {
-    lua_pushlightuserdata(ls, arg);
-}
-
 void PushLuaValue(lua_State* ls, bool arg) {
     lua_pushboolean(ls, arg);
 }

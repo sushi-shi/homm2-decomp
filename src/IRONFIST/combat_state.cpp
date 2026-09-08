@@ -16,6 +16,13 @@ void CombatState::SetApproach(army& stack, AttackApproach approach) {
 void CombatState::BeginBattle(combatManager& owner) {
     EndBattle();
     owner_ = &owner;
+    battleGeneration_ = ++nextGeneration_;
+}
+
+hero* CombatState::Captain(u64 generation) const {
+    return owner_ && generation == battleGeneration_
+        && owner_->m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)] == &owner_->m_captain
+        ? &owner_->m_captain : nullptr;
 }
 
 void CombatState::EndBattle() {

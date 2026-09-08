@@ -190,6 +190,7 @@
         dontBuild = true;
         installPhase = ''
           export HOMM2_IRONFIST_RESOURCE_BUILDER=${./scripts/build-ironfist-resources.py}
+          export HOMM2_IRONFIST_BINDING_MODULE=${./scripts/ironfist/binding.lua}
           ${pkgs.bash}/bin/bash ${./scripts/build-ironfist-resource-payload.sh} "$src" "$out"
         '';
       };
