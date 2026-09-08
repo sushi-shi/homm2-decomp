@@ -146,11 +146,7 @@ namespace {
         COMBAT_HIGH_MEMORY_LIMIT = 2900
     } CombatFlowConstant;
 
-    typedef enum RiddleComparisonConstant {
-        RIDDLE_PREFIX_LENGTH = 4,
-        RIDDLE_EXPECTED_BUFFER_SIZE = RIDDLE_PREFIX_LENGTH + 1,
-        RIDDLE_ANSWER_BUFFER_SIZE = 8
-    } RiddleComparisonConstant;
+
 
     typedef enum BarrierEventConstant {
         COLOR_MASK = 7,
@@ -8445,30 +8441,5 @@ CombatResult advManager::AutoResolveCombat(
     return gpCombatManager->m_combatResult;
 }
 
-i32 RiddleStringsEqual(const char* answer, const char* expected) {
-    i32 index;
-    char expectedPrefix[RIDDLE_EXPECTED_BUFFER_SIZE];
-    char answerPrefix[RIDDLE_ANSWER_BUFFER_SIZE];
-
-    const auto copyPrefix = [](char* destination, const char* source) {
-        i32 count = 0;
-        for (; count < RIDDLE_PREFIX_LENGTH && source[count] != 0; count++)
-            destination[count] = source[count];
-        for (; count < RIDDLE_PREFIX_LENGTH; count++)
-            destination[count] = 0;
-    };
-
-    copyPrefix(expectedPrefix, expected);
-    expectedPrefix[RIDDLE_PREFIX_LENGTH] = 0;
-    for (index = RIDDLE_PREFIX_LENGTH - 1; index >= 0; index--) {
-        if (expectedPrefix[index] != ' ') {
-            expectedPrefix[index + 1] = 0;
-            break;
-        }
-    }
-    copyPrefix(answerPrefix, answer);
-    answerPrefix[strlen(expectedPrefix)] = 0;
-    return platform::CompareIgnoringCase(expectedPrefix, answerPrefix) == 0;
-}
 
 b32 gbNoShowCombat = false;

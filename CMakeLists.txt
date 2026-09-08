@@ -346,6 +346,12 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_include_directories(homm2_resource_profile_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
   add_test(NAME resource_profile COMMAND homm2_resource_profile_test)
+  add_executable(homm2_riddle_test
+    tools/riddle_test.cpp
+    src/SOURCE/Riddle.cpp
+    src/BASE/Utf8.cpp)
+  target_include_directories(homm2_riddle_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME riddle COMMAND homm2_riddle_test)
   add_executable(homm2_tick_deadline_test tools/tick_deadline_test.cpp)
   target_include_directories(homm2_tick_deadline_test PRIVATE
     ${CMAKE_SOURCE_DIR}/include)
