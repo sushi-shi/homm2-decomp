@@ -48,14 +48,14 @@ are also outside this stack.
 ## Evidence and limits
 
 The local `test/portable-modernization-integration` branch combines the listed
-features and records merge resolutions without changing `master`. The complete
-game source at `0eeae9444` passed all seven Nix checks: 37 CTests each on native
+features and records merge resolutions without changing `master`. The final
+integration at `21b1dcdd0` passed all seven Nix checks: 37 CTests each on native
 32-bit, native 64-bit and ASan/UBSan 32-bit; Windows and Web builds; ARM core
-compilation and emulated record/dialog tests; and Rust icon parity checks.
-The gameplay-runner merge at `71bee0ff` adds only its script, replay and docs.
-The final 64-bit ASan/UBSan build also passed all 37 CTests. The browser-only
-restoration follow-up in #48 passed its standalone full Nix matrix and the
-browser regression described below; `21b1dcdd0` includes it in the integration.
+compilation of 107 core translation units and emulated record/dialog tests;
+and Rust icon parity checks. This includes the gameplay runner and the browser
+restoration follow-up. The 64-bit ASan/UBSan build also passed all 37 CTests.
+The display follow-up passed its standalone full Nix matrix and the browser
+regression described below.
 
 The strongest checks beyond compilation were:
 
