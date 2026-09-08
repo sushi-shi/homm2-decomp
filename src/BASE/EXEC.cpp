@@ -34,9 +34,9 @@ static SExecutiveText gExecutiveText = {
     "Can't add manager!",
     "-----Manager List Start-----",
     "-----",
-    "Head %d   Tail %d",
+    "Head %p   Tail %p",
     "-----",
-    "Manager %20s  this %d   prev %d  next %d",
+    "Manager %20s  this %p   prev %p  next %p",
     "--*--Manager List Stop --*--\n\n",
     "Can't add manager!",
     "Can't add manager!",
@@ -122,12 +122,15 @@ i32 executive::DoDialog(class baseManager* manager) {
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListHeaderFormat,
+        static_cast<void*>(m_managerListHead), static_cast<void*>(m_managerListTail));
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
     baseManager* m = m_managerListHead;
     while (m != NULL) {
-        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gExecutiveText.managerListEntryFormat,
+            m->m_name, static_cast<void*>(m), static_cast<void*>(m->m_prev),
+            static_cast<void*>(m->m_next));
         LogStr(gText);
         m = m->m_next;
     }

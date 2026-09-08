@@ -16,6 +16,7 @@
       };
       p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
+      arm64 = pkgs.pkgsCross.aarch64-multiplatform;
       iconRust = pkgs.rust-bin.fromRustupToolchainFile
         ./tools/homm2-icon-rs/rust-toolchain.toml;
       # Only what the build reads. Everything else - docs, the README, the
@@ -139,13 +140,14 @@
         '';
       };
 
-      mkNative = debug: p32.stdenv.mkDerivation {
-        pname = "homm2${if debug then "-debug" else ""}";
+      mkNative = { debug ? false, targetPkgs ? p32, suffix ? "" }: targetPkgs.stdenv.mkDerivation {
+        pname = "homm2${suffix}${if debug then "-debug" else ""}";
         version = "2.1";
         src = source;
         nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
-        buildInputs = [ p32.bzip2 p32.ffmpeg-headless p32.sdl3 ];
+        buildInputs = [ targetPkgs.bzip2 targetPkgs.ffmpeg-headless targetPkgs.sdl3 ];
         cmakeFlags = [
+          "-DHOMM2_32BIT=${if targetPkgs.stdenv.hostPlatform.is32bit then "ON" else "OFF"}"
           "-DHOMM2_PLATFORM=SDL3"
           "-DHOMM2_PLATFORM_WARNINGS_AS_ERRORS=ON"
           "-DCMAKE_BUILD_TYPE=${if debug then "Debug" else "RelWithDebInfo"}"
@@ -163,8 +165,9 @@
         meta.mainProgram = "homm2";
       };
 
-      homm2 = mkNative false;
-      homm2-debug = mkNative true;
+      homm2 = mkNative {};
+      homm2-debug = mkNative { debug = true; };
+      homm2-linux64 = mkNative { targetPkgs = pkgs; suffix = "-linux64"; };
       homm2-check = homm2.overrideAttrs (_previous: {
         doCheck = true;
         checkPhase = ''
@@ -173,6 +176,37 @@
           runHook postCheck
         '';
       });
+
+      homm2-linux64-check = homm2-linux64.overrideAttrs (_previous: {
+        doCheck = true;
+        checkPhase = ''
+          runHook preCheck
+          ctest --output-on-failure
+          runHook postCheck
+        '';
+      });
+
+      # This checks core game code generation and executes the record tests in
+      # QEMU. It does not build/link the ARM SDL application or certify hardware.
+      homm2-arm64-check = arm64.stdenv.mkDerivation {
+        pname = "homm2-arm64-check";
+        version = "2.1";
+        src = source;
+        nativeBuildInputs = [ pkgs.python3 pkgs.qemu-user ];
+        buildInputs = [ arm64.bzip2 ];
+        dontConfigure = true;
+        buildPhase = ''
+          runHook preBuild
+          python3 tools/architecture_check.py --cxx "$CXX" \
+            --runner "${pkgs.qemu-user}/bin/qemu-aarch64" \
+            --output "$TMPDIR/arm64-objects" --jobs "$NIX_BUILD_CORES"
+          runHook postBuild
+        '';
+        installPhase = ''
+          mkdir -p "$out"
+          cp "$TMPDIR/arm64-objects/save-records-test" "$out/"
+        '';
+      };
 
       icon-check = pkgs.stdenv.mkDerivation {
         pname = "homm2-icon-check";
@@ -353,6 +387,8 @@
         inherit
           homm2
           homm2-debug
+          homm2-linux64
+          homm2-arm64-check
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
@@ -362,6 +398,8 @@
 
       checks.${system} = {
         native = homm2-check;
+        linux64 = homm2-linux64-check;
+        arm64 = homm2-arm64-check;
         windows = windows;
         web = homm2-web;
         icon = icon-check;
@@ -382,6 +420,10 @@
         default = p32.mkShell {
           nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
           buildInputs = [ p32.bzip2 p32.ffmpeg-headless p32.sdl3 ];
+        };
+        linux64 = pkgs.mkShell {
+          nativeBuildInputs = [ pkgs.cmake pkgs.gettext pkgs.ninja pkgs.pkg-config pkgs.python3 ];
+          buildInputs = [ pkgs.bzip2 pkgs.ffmpeg-headless pkgs.sdl3 ];
         };
         icon = pkgs.mkShell {
           packages = [ iconRust pkgs.clang ];

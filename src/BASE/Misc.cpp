@@ -239,17 +239,11 @@ void* BaseAlloc(u32 size, const char* originalFile, i32 originalLine) {
 void BaseFree(void* ptr, const char* originalFile, i32 originalLine) {
     if (gpMemEntry == NULL)
         InitMemEntry();
-    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-        LogInt(
-            "Free ",
-            reinterpret_cast<i32>(ptr),
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL) {
+        char message[64];
+        utf8::Format(message, sizeof(message), "Free %p", ptr);
+        LogStr(message);
+    }
     if (ptr == NULL) {
         LogStr("NULL POINTER");
         return;
