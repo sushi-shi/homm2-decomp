@@ -8,6 +8,20 @@
 
 namespace ironfist::script {
 
+// Preserve the caller's stack, including when a nested callback or an error
+// path produces no value, an unexpected type, or multiple values.
+class LuaStackScope {
+public:
+    explicit LuaStackScope(lua_State* state) : state_(state), top_(lua_gettop(state)) {}
+    ~LuaStackScope() { lua_settop(state_, top_); }
+    LuaStackScope(const LuaStackScope&) = delete;
+    LuaStackScope& operator=(const LuaStackScope&) = delete;
+
+private:
+    lua_State* state_;
+    i32 top_;
+};
+
 void SetConstant(lua_State* L, const char* nam, i32 i);
 void SetNilConstant(lua_State* L, const char* nam);
 
