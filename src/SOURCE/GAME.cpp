@@ -52,6 +52,7 @@
 #include <SOURCE/Localization.h>
 #include <SOURCE/SaveNames.h>
 #include <SOURCE/MapRecords.h>
+#include <SOURCE/SaveRecords.h>
 #include <vector>
 #include <BASE/Utf8.h>
 
@@ -67,6 +68,16 @@ void ReadGameData(i32 file, void* buffer, i32 count) {
 void WriteGameData(i32 file, const void* buffer, i32 count) {
     if (!platform::FileWriteExact(file, buffer, count))
         ShutDown(localization::Tr("system.file.write_error"));
+}
+
+template<class Record> Record ReadGameRecord(i32 file) {
+    Record record{};
+    ReadGameData(file, record.data(), static_cast<i32>(record.size()));
+    return record;
+}
+
+void WriteGameRecord(i32 file, const auto& record) {
+    WriteGameData(file, record.data(), static_cast<i32>(record.size()));
 }
 
 void RequireGameData(bool condition) {
@@ -144,10 +155,6 @@ bool EventIndicesFit(const u16* indices, u16 count, i32 extraCount) {
 typedef enum MapTilesetConstant {
     WAGON_CAMP_ACTIVE_FRAME = 129
 } MapTilesetConstant;
-
-typedef enum ExpansionCampaignSaveConstant {
-    CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
-} ExpansionCampaignSaveConstant;
 
 typedef enum GameSaveFormatConstant {
     SAVE_PATH_CAPACITY                 = 452,
@@ -722,72 +729,13 @@ inline town* GetCastle(i32 idx) {
     return &gpGame->m_castleRecs[idx];
 }
 
-typedef enum PlayerDataSerializationConstant {
-    PLAYER_SAVE_SCRATCH_SIZE       = 52,
-    PLAYER_SAVE_SCRATCH_CLEAR_SIZE = 48,
-    PLAYER_SAVE_RESERVED_SIZE      = 42,
-    PLAYER_SAVE_CHEATED_FLAG_SIZE  = 1
-} PlayerDataSerializationConstant;
-
 void playerData::Write(i32 file) {
-    char unused[PLAYER_SAVE_SCRATCH_SIZE];
-
-    WriteGameData(file, &m_color, sizeof(m_color));
-    WriteGameData(file, &m_heroCount, sizeof(m_heroCount));
-    WriteGameData(file, &m_currentHero, sizeof(m_currentHero));
-    WriteGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    WriteGameData(file, m_heroIds, sizeof(m_heroIds));
-    WriteGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
-    WriteGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    WriteGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    WriteGameData(file, &m_cheatValue, sizeof(m_cheatValue));
-    WriteGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    WriteGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    WriteGameData(file, &m_evilInterface, sizeof(m_evilInterface));
-    WriteGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    WriteGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    WriteGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    WriteGameData(file, &m_daysLeft, sizeof(m_daysLeft));
-    WriteGameData(file, &m_townCount, sizeof(m_townCount));
-    WriteGameData(file, &m_currentTown, sizeof(m_currentTown));
-    WriteGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    WriteGameData(file, m_townIds, sizeof(m_townIds));
-    WriteGameData(file, m_resources, sizeof(m_resources));
-    WriteGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    WriteGameData(file, m_unknownad, sizeof(m_unknownad));
+    WriteGameRecord(file, save_records::EncodePlayer(*this, gpGame->m_cheated));
 }
 
 void playerData::Read(i32 file) {
-    char unused[PLAYER_SAVE_SCRATCH_SIZE];
-
-    ReadGameData(file, &m_color, sizeof(m_color));
-    ReadGameData(file, &m_heroCount, sizeof(m_heroCount));
-    ReadGameData(file, &m_currentHero, sizeof(m_currentHero));
-    ReadGameData(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    ReadGameData(file, m_heroIds, sizeof(m_heroIds));
-    ReadGameData(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    ReadGameData(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    ReadGameData(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    ReadGameData(file, &m_cheatValue, sizeof(m_cheatValue));
-    ReadGameData(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    ReadGameData(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    ReadGameData(file, &m_evilInterface, sizeof(m_evilInterface));
-    ReadGameData(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    ReadGameData(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    ReadGameData(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    ReadGameData(file, &m_daysLeft, sizeof(m_daysLeft));
-    ReadGameData(file, &m_townCount, sizeof(m_townCount));
-    ReadGameData(file, &m_currentTown, sizeof(m_currentTown));
-    ReadGameData(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    ReadGameData(file, m_townIds, sizeof(m_townIds));
-    ReadGameData(file, m_resources, sizeof(m_resources));
-    ReadGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    ReadGameData(file, m_unknownad, sizeof(m_unknownad));
+    save_records::DecodePlayer(
+        ReadGameRecord<save_records::Player>(file), *this, gpGame->m_cheated);
 }
 
 i32 playerData::NextHero(i32) {
@@ -1239,9 +1187,9 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &m_worldMap.width, sizeof(m_worldMap.width));
     WriteGameData(outFile, &m_worldMap.height, sizeof(m_worldMap.height));
     WriteGameData(outFile, &m_mapHeader, sizeof(m_mapHeader));
-    WriteGameData(outFile, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    WriteGameRecord(outFile, save_records::EncodeSetup(*this));
     WriteGameData(outFile, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    WriteGameData(outFile, this, sizeof(m_difficultyRating));
+    WriteGameData(outFile, &m_difficultyRating, sizeof(m_difficultyRating));
     WriteGameData(outFile, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
@@ -1262,11 +1210,11 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
         WriteGameData(outFile, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        WriteGameData(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        WriteGameRecord(outFile, save_records::EncodeExpansionCampaign(xCampaign));
     } else {
         WriteGameData(outFile, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
-            WriteGameData(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+            WriteGameRecord(outFile, save_records::EncodeCampaign(*this));
     }
     if (!expansionFormat)
         WriteGameData(outFile, &xIsExpansionMap, sizeof(xIsExpansionMap));
@@ -1297,26 +1245,23 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
         m_heroRecs[iFile].Write(outFile, !expansionFormat);
     WriteGameData(outFile, m_availableHeroes, sizeof(m_availableHeroes));
-    town serializedCastles[GAME_TOWN_COUNT];
-    memcpy(serializedCastles, m_castleRecs, sizeof(serializedCastles));
-    for (iFile = 0; iFile < GAME_TOWN_COUNT; ++iFile) {
+    for (const town& castle : m_castleRecs) {
+        town serialized = castle;
         EncodeGameFileText(
-            m_castleRecs[iFile].m_name,
-            serializedCastles[iFile].m_name,
-            sizeof(serializedCastles[iFile].m_name),
-            "town name"
-        );
+            castle.m_name, serialized.m_name, sizeof(serialized.m_name), "town name");
+        WriteGameRecord(outFile, save_records::EncodeTown(serialized));
     }
-    WriteGameData(outFile, serializedCastles, sizeof(serializedCastles));
     WriteGameData(outFile, m_castleOwners, sizeof(m_castleOwners));
     WriteGameData(outFile, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    WriteGameData(outFile, m_mines, sizeof(m_mines));
+    for (const auto& value : m_mines)
+        WriteGameRecord(outFile, save_records::EncodeMine(value));
     WriteGameData(outFile, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
         WriteGameData(outFile, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
         WriteGameData(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    WriteGameData(outFile, m_boats, sizeof(m_boats));
+    for (const auto& value : m_boats)
+        WriteGameRecord(outFile, save_records::EncodeBoat(value));
     WriteGameData(outFile, m_boatSlots, sizeof(m_boatSlots));
     WriteGameData(outFile, m_obeliskVisitors, sizeof(m_obeliskVisitors));
     WriteGameData(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
@@ -1554,9 +1499,9 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     SetMapSize(wide, rows);
     ReadGameData(fd, &m_mapHeader, sizeof(m_mapHeader));
     RequireMapHeader(m_mapHeader);
-    ReadGameData(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    save_records::DecodeSetup(ReadGameRecord<save_records::Setup>(fd), *this);
     ReadGameData(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    ReadGameData(fd, this, sizeof(m_difficultyRating));
+    ReadGameData(fd, &m_difficultyRating, sizeof(m_difficultyRating));
     ReadGameData(fd, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
     ReadGameData(fd, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     ReadGameData(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
@@ -1595,11 +1540,12 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
     ReadGameData(fd, &gbInCampaign, sizeof(gbInCampaign));
     if (gbInCampaign == 1) {
-        ReadGameData(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+        save_records::DecodeCampaign(ReadGameRecord<save_records::Campaign>(fd), *this);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        ReadGameData(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        save_records::DecodeExpansionCampaign(
+            ReadGameRecord<save_records::ExpansionCampaign>(fd), xCampaign);
     }
     if (expTag)
         ReadGameData(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
@@ -1650,8 +1596,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     for (ndx = 0; ndx < GAME_HERO_COUNT; ndx++)
         m_heroRecs[ndx].Read(fd, expTag);
     ReadGameData(fd, m_availableHeroes, sizeof(m_availableHeroes));
-    ReadGameData(fd, m_castleRecs, sizeof(m_castleRecs));
     for (town& castle : m_castleRecs) {
+        save_records::DecodeTown(ReadGameRecord<save_records::Town>(fd), castle);
         const auto field = localization::TextField(castle.m_name);
         RequireGameText(field, "town name");
         const std::string decodedName = localization::DecodeExternalText(field);
@@ -1659,13 +1605,15 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     }
     ReadGameData(fd, m_castleOwners, sizeof(m_castleOwners));
     ReadGameData(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    ReadGameData(fd, m_mines, sizeof(m_mines));
+    for (auto& value : m_mines)
+        save_records::DecodeMine(ReadGameRecord<save_records::Mine>(fd), value);
     ReadGameData(fd, m_mineOwners, sizeof(m_mineOwners));
     if (expTag)
         ReadGameData(fd, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
         ReadGameData(fd, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    ReadGameData(fd, m_boats, sizeof(m_boats));
+    for (auto& value : m_boats)
+        save_records::DecodeBoat(ReadGameRecord<save_records::Boat>(fd), value);
     ReadGameData(fd, m_boatSlots, sizeof(m_boatSlots));
     ReadGameData(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
     ReadGameData(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));

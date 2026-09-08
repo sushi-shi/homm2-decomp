@@ -65,7 +65,6 @@ typedef enum TownConstant {
     TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
 } TownConstant;
 
-#pragma pack(push, 1)
 class town {
 public:
     i8 m_id;
@@ -78,7 +77,7 @@ public:
     u8 m_boatY;
     armyGroup m_army;
     i8 m_occupyingHeroId;
-    u32l m_buildings;
+    u32 m_buildings;
     i8 m_buildState;
     char m_unknown1d;
     i16 m_garrison[H2EnumIndex(TOWN_GARRISON_SLOT_COUNT)];
@@ -112,7 +111,6 @@ public:
     i32 CanBuildDock(void);
     void CalcNumLevelArchers(i32*, i32*);
 };
-#pragma pack(pop)
 extern b32 bEnteringTown;
 
 #endif

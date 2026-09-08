@@ -1,3 +1,4 @@
+#include <SOURCE/SaveRecords.h>
 #include <Ints.h>
 #include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
@@ -175,7 +176,6 @@ enum class HeroScreenText : i32 {
 using enum HeroScreenText;
 
 typedef enum HeroMobilityConstant {
-    BASE_RECORD_SIZE = 0xec,
     LAND_SPEED_COUNT = 8,
     SLOWEST_LAND_SPEED = LAND_SPEED_COUNT - 1,
     SEA_BASE_MOBILITY = 1500,
@@ -208,8 +208,11 @@ hero::hero(void) {
 }
 
 void hero::Read(i32 file, i8 expansion) {
-    const bool complete = expansion ? platform::FileReadExact(file, this, sizeof(hero))
-                                    : platform::FileReadExact(file, this, BASE_RECORD_SIZE);
+    save_records::HeroExpansion record{};
+    const std::size_t length = expansion ? record.size() : save_records::HeroBase{}.size();
+    const bool complete = platform::FileReadExact(file, record.data(), static_cast<i32>(length))
+        && (expansion ? save_records::DecodeHeroExpansion(record, *this)
+                      : save_records::DecodeHeroBase(std::span{record}.first(length), *this));
     if (!complete)
         ShutDown(localization::Tr("system.file.read_error"));
     const auto field = localization::TextField(m_name);
@@ -236,9 +239,14 @@ void hero::Write(i32 file, i8 expansion) {
             "save: hero name was truncated or is not representable in the legacy file encoding"
         );
     }
-    const bool complete = expansion
-        ? platform::FileWriteExact(file, &serialized, sizeof(hero))
-        : platform::FileWriteExact(file, &serialized, BASE_RECORD_SIZE);
+    bool complete;
+    if (expansion) {
+        const auto record = save_records::EncodeHeroExpansion(serialized);
+        complete = platform::FileWriteExact(file, record.data(), static_cast<i32>(record.size()));
+    } else {
+        const auto record = save_records::EncodeHeroBase(serialized);
+        complete = platform::FileWriteExact(file, record.data(), static_cast<i32>(record.size()));
+    }
     if (!complete)
         ShutDown(localization::Tr("system.file.write_error"));
 }

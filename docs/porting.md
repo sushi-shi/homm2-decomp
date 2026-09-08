@@ -62,8 +62,24 @@ web bundle under `~/.cache/homm2-web`. Set `HOMM2_WEB_OUTPUT` to change it.
 
 ## Current platform
 
-Linux uses a 32-bit SDL3 build. The 32-bit target preserves retail pointer
-width and packed layouts. Additional systems belong under `PLATFORM`.
+Linux uses a 32-bit SDL3 build. This remains the supported game target while
+other host widths are evaluated. Additional systems belong under `PLATFORM`.
+
+Hero, army, town, player, campaign, setup, mine, and boat saves use fixed-size
+little-endian byte records in `SaveRecords.h`. Their runtime classes use natural
+alignment; changing runtime padding cannot change these records. Text conversion
+stays at the file boundary. The codec checks exact input lengths before changing
+state and preserves the retail base/expansion formats, reserved bytes, enum
+storage widths, and overlapping town spell/count fields. The obsolete four-byte
+expansion-campaign window-pointer slot is written as zero and ignored on read.
+Unsaved runtime fields, including live pointers and AI state, remain untouched.
+
+`save_records` tests each record's size, known scalar bytes, all truncation
+lengths, and round trips without retail assets. The codecs are also suitable for
+64-bit builds; this alone does not establish that the entire game is portable.
+Packed map, resource, and preference records still require little-endian targets,
+which CMake checks explicitly. Networking remains unsupported and its internal
+runtime-object messages are not a retail wire-compatibility contract.
 
 Video, input, audio, and cinematics use the platform layer. Network transports
 are not supported yet.

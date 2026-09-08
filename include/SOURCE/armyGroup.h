@@ -25,7 +25,6 @@ enum class ArmyGroupAlignmentResult : i32 {
 };
 using enum ArmyGroupAlignmentResult;
 
-#pragma pack(push, 1)
 class armyGroup {
 public:
     union {
@@ -51,5 +50,4 @@ public:
     void Swap(i32, class armyGroup*, i32);
     void DamageGroup(float);
 };
-#pragma pack(pop)
 #endif

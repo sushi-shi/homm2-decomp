@@ -1,3 +1,4 @@
+#include <SOURCE/SaveRecords.h>
 #include <Ints.h>
 #include <stdio.h>
 #include <string.h>
@@ -1084,11 +1085,10 @@ cleanup:
                     case GAME_REMOTE_SETUP:
                         if (strcmp(remotePacketResult->payload, gpGame->m_mapHeader.name) != 0)
                             break;
-                        memcpy(
-                            gpGame->m_setupPlayerColor,
-                            remotePacketResult->payload + MAP_HEADER_NAME_SIZE,
-                            GAME_SETUP_DATA_SIZE
-                        );
+                        save_records::DecodeSetup(
+                            {reinterpret_cast<const u8*>(remotePacketResult->payload)
+                                 + MAP_HEADER_NAME_SIZE, GAME_SETUP_DATA_SIZE},
+                            *gpGame);
                         redraw = true;
                         break;
 
@@ -1546,7 +1546,8 @@ cleanup:
     }
     if (needSync && gbRemoteOn) {
         memcpy(mapNamePacket, gpGame->m_mapHeader.name, MAP_HEADER_NAME_SIZE);
-        memcpy(setupData, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
+        const auto setupRecord = save_records::EncodeSetup(*gpGame);
+        memcpy(setupData, setupRecord.data(), setupRecord.size());
         sendResult = TransmitRemoteData(
             mapNamePacket,
             GAME_REMOTE_CHANNEL,
