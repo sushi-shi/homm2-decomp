@@ -17,7 +17,7 @@ extern u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT];
 
 inline u8* GetDimPaletteTable(u32 table) {
     if (table < DIM_PALETTE_LIGHTEN_TABLE)
-        return &uDimPal[0][0][table * DIM_PALETTE_COLOR_COUNT];
+        return uDimPal[table / DIM_PALETTE_LEVEL_COUNT][table % DIM_PALETTE_LEVEL_COUNT];
     if (table == DIM_PALETTE_LIGHTEN_TABLE)
         return gColorTableLighten;
     return gColorTableNoCycle;
