@@ -316,6 +316,10 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME binary_io COMMAND homm2_binary_io_test)
+  add_executable(homm2_agg_directory_test tools/agg_directory_test.cpp src/BASE/AggDirectory.cpp)
+  target_include_directories(homm2_agg_directory_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_agg_directory_test PRIVATE homm2_platform)
+  add_test(NAME agg_directory COMMAND homm2_agg_directory_test)
   add_executable(homm2_bzip2_test
     tools/bzip2_test.cpp)
   target_include_directories(homm2_bzip2_test PRIVATE
