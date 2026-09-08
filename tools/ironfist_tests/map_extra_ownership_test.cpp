@@ -1,3 +1,4 @@
+#include "session_fixture.h"
 #include <BASE/Misc.h>
 #include <IRONFIST/save_xml.h>
 #include <SOURCE/game.h>
@@ -22,7 +23,9 @@ static void LoadMap(i32 count) {
         extra->SetAttribute("objectIndex", 20 + i);
         root->InsertEndChild(extra);
     }
-    saved.ReadMap(root);
+    ironfist::SessionData data;
+    saved.ReadMap(root, data);
+    ironfist::runtime::RestoreSession(data);
 }
 
 int main() {
@@ -33,9 +36,9 @@ int main() {
     for (i32 iteration = 0; iteration < 30; ++iteration) {
         for (const i32 count : {2, 3, 0, 1}) {
             LoadMap(count);
-            assert(iMemEntries == initialEntries + 1 + (count != 0));
+            assert(iMemEntries == initialEntries + 2 + (count != 0));
             assert(giTotalMemAllocated == initialBytes
-                + static_cast<i32>(36 * 36 * sizeof(mapCell) + count * sizeof(mapCellExtra)));
+                + static_cast<i32>(36 * 36 * (sizeof(mapCell) + sizeof(u8)) + count * sizeof(mapCellExtra)));
             assert(map.extraCount == count);
             if (count) {
                 assert(map.extras[count - 1].objectIndex == 20 + count - 1);
@@ -47,9 +50,11 @@ int main() {
         // The normal map editor/adventure growth path uses the same owner.
         const i32 added = map.GetNewCellExtraIndex();
         assert(added == 1 && map.extraCount > added);
-        assert(iMemEntries == initialEntries + 2);
+        assert(iMemEntries == initialEntries + 3);
         assert(map.extras[0].objectIndex == 20);
         map.Close();
+        H2_FREE(mapExtra);
+        mapExtra = nullptr;
         assert(iMemEntries == initialEntries);
         assert(giTotalMemAllocated == initialBytes);
         assert(map.extras == nullptr && map.cells == nullptr);

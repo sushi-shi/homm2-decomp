@@ -16,6 +16,14 @@
 
 namespace ironfist::runtime {
 
+namespace {
+SessionPhase sessionPhase = SessionPhase::Idle;
+}
+
+SessionPhase Phase() {
+    return sessionPhase;
+}
+
 void Initialize() {
     LoadCreatures();
     LoadArtifacts();
@@ -29,25 +37,40 @@ void ResetAdventureState() {
 
 void BeginMap(const char* filename) {
     ResetAdventureState();
+    sessionPhase = SessionPhase::PreparingMap;
     std::string mapName(filename);
     script::InitializeMap(mapName);
 }
 
 void AdventureManagerReady() {
     state::AdventureState& adventure = state::Get().adventure;
-    if (!std::strcmp(gpGame->m_saveName, "NEWGAME") && !adventure.firstDayEventDone) {
+    if (sessionPhase == SessionPhase::PreparingMap && !adventure.firstDayEventDone) {
+        sessionPhase = SessionPhase::Ready;
+        adventure.firstDayEventDone = true;
         script::Invoke("OnMapStart");
         script::Invoke(
             "OnNewDay", static_cast<i32>(gpGame->m_month),
             static_cast<i32>(gpGame->m_week), static_cast<i32>(gpGame->m_day)
         );
-        adventure.firstDayEventDone = true;
     }
 }
 
 void Shutdown() {
-    UnloadCreatures();
     script::Shutdown();
+    UnloadCreatures();
+    ResetGeneratedArtifacts();
+    state::Get() = state::State{};
+    sessionPhase = SessionPhase::Idle;
+}
+
+void BeginSessionLoad() {
+    script::Shutdown();
+    ResetAdventureState();
+    sessionPhase = SessionPhase::Restoring;
+}
+
+void FinishSessionLoad() {
+    sessionPhase = SessionPhase::Ready;
 }
 
 } // namespace ironfist::runtime

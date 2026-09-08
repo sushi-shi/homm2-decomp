@@ -1119,7 +1119,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 }
 
 i32 game::SaveGame(const char* filename, i32 generateName, i8) {
-    return ironfist::save::SaveGame(filename, generateName);
+    return ironfist::runtime::SaveGame(filename, generateName);
 }
 
 void game::SetupOrigData(void) {
@@ -1284,7 +1284,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (ironfist::save::LoadGame(filename, !loadFromFile))
+    if (ironfist::runtime::LoadGame(filename, !loadFromFile) != ironfist::runtime::LoadResult::Retail)
         return;
     if (loadFromFile) {
         SetupOrigData();
@@ -1490,6 +1490,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     SetupAdjacentMons();
     LogStr("LG3");
+    ironfist::runtime::RetailGameLoaded();
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 

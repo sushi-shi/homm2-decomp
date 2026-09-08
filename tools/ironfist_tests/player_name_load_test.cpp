@@ -1,3 +1,4 @@
+#include "session_fixture.h"
 #include <BASE/Utf8.h>
 #include <IRONFIST/save_xml.h>
 #include <PLATFORM/Platform.h>
@@ -23,7 +24,7 @@ int main() {
     const auto path = platform::Files().Resolve("GAMES/names.GX1", platform::FileMode::Write);
     std::filesystem::create_directories(std::filesystem::path(path).parent_path());
     ironfist::save::XmlFile saved;
-    assert(saved.Save("GAMES/names.GX1") == tinyxml2::XML_SUCCESS);
+    assert(saved.Save("GAMES/names.GX1", ironfist::runtime::CaptureSession()) == tinyxml2::XML_SUCCESS);
     ironfist::save::XmlFile loaded;
     auto* root = loaded.tempDoc->NewElement("ironfist_save");
     loaded.tempDoc->InsertEndChild(root);
@@ -32,7 +33,7 @@ int main() {
         root->InsertEndChild(name->DeepClone(loaded.tempDoc));
     }
     std::memset(cPlayerNames, 0, sizeof(cPlayerNames));
-    loaded.ReadRoot(root);
+    DecodeSessionFragment(loaded, root);
     for (size_t i = 0; i < names.size(); ++i)
         assert(names[i] == cPlayerNames[i]);
 
@@ -45,7 +46,7 @@ int main() {
       <playerNames index="2">Legacy</playerNames>
       <playerNames index="3" value="">must stay empty</playerNames>
     </ironfist_save>)");
-    compatibility.ReadRoot(compatibility.tempDoc->RootElement());
+    DecodeSessionFragment(compatibility, compatibility.tempDoc->RootElement());
     assert(names[0] == cPlayerNames[0]);
     assert(std::strcmp(cPlayerNames[1], "1234567890123456789") == 0);
     assert(utf8::IsValid(cPlayerNames[1]));
