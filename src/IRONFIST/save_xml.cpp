@@ -1309,6 +1309,12 @@ std::string FileExtension(b32 isPickLoad) {
     }
 }
 
+static std::string SaveFilePath(const std::string& name) {
+    const char* directory = platform::CompareIgnoringCase(name.c_str(), "RMT", 3) == 0
+        ? ".\\DATA\\" : ".\\GAMES\\";
+    return directory + name;
+}
+
 i32 SaveGame(const char* saveFile, i32 autosave) {
     gpAdvManager->DemobilizeCurrHero();
     std::string filePath;
@@ -1319,14 +1325,11 @@ i32 SaveGame(const char* saveFile, i32 autosave) {
     else
         filePath = saveName;
 
-    if (platform::CompareIgnoringCase(filePath.c_str(), "RMT", 3)) {
-        filePath = ".\\GAMES\\" + filePath;
-        if (platform::CompareIgnoringCase(filePath.c_str(), ".\\GAMES\\AUTOSAVE", 16)
-            && platform::CompareIgnoringCase(filePath.c_str(), ".\\GAMES\\PLYREXIT", 16))
-            strcpy(gpGame->m_saveName, saveName.c_str());
-    } else {
-        filePath = ".\\DATA\\" + filePath;
-    }
+    if (platform::CompareIgnoringCase(filePath.c_str(), "RMT", 3)
+        && platform::CompareIgnoringCase(filePath.c_str(), "AUTOSAVE", 8)
+        && platform::CompareIgnoringCase(filePath.c_str(), "PLYREXIT", 8))
+        strcpy(gpGame->m_saveName, saveName.c_str());
+    filePath = SaveFilePath(filePath);
 
     XmlFile xml;
     tinyxml2::XMLError err = xml.Save(filePath.c_str());
@@ -1345,8 +1348,7 @@ b32 LoadGame(const char* fileName, i32 loadFromFile) {
         return false;
     }
 
-    std::string filePath = ".\\GAMES\\";
-    filePath += fileName;
+    const std::string filePath = SaveFilePath(fileName);
 
     // Check if original save format
     i32 fd = platform::FileOpen(filePath.c_str(), platform::FileMode::Read);
