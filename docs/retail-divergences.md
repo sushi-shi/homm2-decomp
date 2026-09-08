@@ -49,6 +49,9 @@ definition. Packed enum storage exposes an already-typed `enum_value()` instead
 of re-decoding it. A source-policy test rejects direct numeric enum casts and
 bypasses of the shared low-level conversion.
 
+The western bitmap-font profile preserves the original ASCII frame mapping,
+including lowercase glyphs. UTF-8 decoding does not change letter case.
+
 ## Corrected defects
 
 | Area | Retail behavior | `master` behavior |
