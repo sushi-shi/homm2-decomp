@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
+#include <PLATFORM/FileTransaction.h>
 #include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
@@ -1159,10 +1160,11 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
                    sizeof(save_names::PlayerExit) - 1
                )
                 != 0)
-            strcpy(gpGame->m_saveName, filename);
+            utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
     }
 
-    outFile = platform::FileOpen(savePath.c_str(), platform::FileMode::Write);
+    platform::FileTransaction transaction(platform::Files(), savePath.c_str());
+    outFile = transaction.Handle();
     if (outFile == -1)
         FileError(savePath.c_str());
 
@@ -1179,7 +1181,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    decltype(cPlayerNames) serializedPlayerNames;
+    decltype(cPlayerNames) serializedPlayerNames{};
     for (iFile = 0; iFile < GAME_PLAYER_COUNT; ++iFile) {
         EncodeGameFileText(
             cPlayerNames[iFile],
@@ -1255,7 +1257,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
     WriteGameData(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
     WriteGameData(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    char serializedRumour[sizeof(m_rumour)];
+    char serializedRumour[sizeof(m_rumour)]{};
     EncodeGameFileText(
         m_rumour, serializedRumour, sizeof(serializedRumour), "tavern rumour"
     );
@@ -1290,8 +1292,10 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
     m_worldMap.Write(outFile);
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    platform::FileClose(outFile);
+    const bool committed = transaction.Commit();
     H2_FREE(emptyPayload);
+    if (!committed)
+        FileError(savePath.c_str());
     return 1;
 }
 

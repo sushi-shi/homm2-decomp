@@ -37,6 +37,19 @@ public:
 
     virtual void Close(i32 file) = 0;
 
+    // The handle is consumed even if closing reports a delayed write error.
+    // A backend without checked-close support must not report a successful save.
+    virtual bool CloseChecked(i32 file) { Close(file); return false; }
+
+    // Transaction primitives use resolved host paths, preserving the exact
+    // destination chosen at transaction creation. Temporary creation must be
+    // exclusive. Replacement must not delete the destination before renaming.
+    // Backends that do not implement transactions fail before creating a file.
+    virtual i32 CreateTemporarySibling(const std::string&, std::string&) { return -1; }
+    virtual bool Flush(i32) { return false; }
+    virtual bool ReplaceFile(const std::string&, const std::string&) { return false; }
+    virtual bool RemoveTemporary(const std::string&) { return false; }
+
     virtual i32 Read(i32 file, void* buffer, i32 count) = 0;
 
     virtual i32 Write(i32 file, const void* buffer, i32 count) = 0;
