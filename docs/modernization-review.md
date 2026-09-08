@@ -1,9 +1,7 @@
 # Modernization implementation review
 
-The [September 8 audit](modernization-audit.md) is implemented as separate
-feature branches. Published PRs remain open; nothing has been merged to
-`master`. Two additional tested features are ready locally while publication
-approval is pending.
+The [September 8 audit](modernization-audit.md) is implemented in 18 separate
+feature PRs. All remain open for review; nothing has been merged to `master`.
 
 ## Feature order
 
@@ -24,8 +22,8 @@ approval is pending.
 | Transactional save replacement | [#47](https://github.com/sushi-shi/homm2-decomp/pull/47) | #29 |
 | Fullscreen, scaling and VSync preferences | [#48](https://github.com/sushi-shi/homm2-decomp/pull/48) | #35 |
 | Fixed-width save records / runtime separation | [#50](https://github.com/sushi-shi/homm2-decomp/pull/50) | #43 |
-| Optional Linux 64-bit and ARM evaluation | Local `feat/portable-linux-64`, `46dda1ff6` | #50 |
-| Natural alignment of runtime managers/resources | Local `fix/portable-runtime-alignment`, `00bbfa026` | #50 |
+| Optional Linux 64-bit and ARM evaluation | [#53](https://github.com/sushi-shi/homm2-decomp/pull/53) | #50 |
+| Natural alignment of runtime managers/resources | [#54](https://github.com/sushi-shi/homm2-decomp/pull/54) | #50 |
 | Repeatable retail gameplay / save exchange | [#52](https://github.com/sushi-shi/homm2-decomp/pull/52) | #17; run with #47 and #50 |
 
 The existing [#17](https://github.com/sushi-shi/homm2-decomp/pull/17) covers Web
