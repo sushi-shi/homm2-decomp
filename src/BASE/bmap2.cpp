@@ -1,88 +1,99 @@
-#include <Ints.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
-#include <SOURCE/X_GLOBAL.h>
-#include <string.h>
-#include <SOURCE/KB.h>
-typedef enum BitmapDimConstant {
-    DIM_PALETTE_LEVEL_STRIDE = 256
-} BitmapDimConstant;
+#include <SOURCE/dimPalette.h>
 
-static i32 gFillRow = 0;
-static u8* gFillPtr = 0;
-static i32 gDimRow = 0;
-static u8* gDimPtr = 0;
-static i32 gDimCol = 0;
-static i32 gBlitRow = 0;
-static u8* gDimNext = 0;
-static u8* gBlitSrc = 0;
-static u8* gBlitDst = 0;
+#include <algorithm>
+#include <cstring>
+#include <vector>
 
-void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
-    gFillPtr = bmp->m_pixels + x + y * bmp->m_width;
-    for (gFillRow = 0; gFillRow < h; gFillRow++) {
-        memset(gFillPtr, color, w);
-        gFillPtr += bmp->m_width;
-    }
+namespace {
+struct Rectangle {
+    i64 left, top, right, bottom;
+    bool Empty() const { return left >= right || top >= bottom; }
+};
+bool Valid(const bitmap* image) {
+    return image != nullptr && image->m_pixels != nullptr && image->m_width > 0 && image->m_height > 0;
 }
-
-void FillBitmapAreaClip(
-    class bitmap* bmp,
-    i32 x,
-    i32 y,
-    i32 w,
-    i32 h,
-    i32 color,
-    i32 clipx,
-    i32 clipy,
-    i32 clipw,
-    i32 cliph
-) {
-    if (x >= clipx + clipw - 1 || x + w - 1 <= clipx || y >= clipy + cliph - 1
-        || y + h - 1 <= clipy)
+Rectangle Area(const bitmap* image, i32 x, i32 y, i32 width, i32 height) {
+    if (!Valid(image) || width <= 0 || height <= 0)
+        return {};
+    return {std::max<i64>(0, x), std::max<i64>(0, y),
+            std::min<i64>(image->m_width, static_cast<i64>(x) + width),
+            std::min<i64>(image->m_height, static_cast<i64>(y) + height)};
+}
+void Fill(bitmap* image, const Rectangle& rectangle, i32 color) {
+    if (rectangle.Empty())
         return;
-    if (x + w - 1 >= clipx + clipw - 1)
-        w = clipx + clipw - x;
-    if (x < clipx) {
-        w = w - (clipx - x);
-        x = clipx;
-    }
-    if (y + h - 1 >= clipy + cliph - 1)
-        h = clipy + cliph - y;
-    if (y < clipy) {
-        h = h - (clipy - y);
-        y = clipy;
-    }
-    FillBitmapArea(bmp, x, y, w, h, color);
+    for (i64 row = rectangle.top; row < rectangle.bottom; ++row)
+        std::memset(image->m_pixels + row * image->m_width + rectangle.left, color,
+                    static_cast<std::size_t>(rectangle.right - rectangle.left));
+}
 }
 
-void BlitBitmap(
-    class bitmap* src,
-    i32 sx,
-    i32 sy,
-    i32 w,
-    i32 h,
-    class bitmap* dst,
-    i32 dx,
-    i32 dy
-) {
-    gBlitSrc = src->m_pixels + sx + sy * src->m_width;
-    gBlitDst = dst->m_pixels + dx + dy * dst->m_width;
-    for (gBlitRow = 0; gBlitRow < h; gBlitRow++) {
-        memcpy(gBlitDst, gBlitSrc, w);
-        gBlitSrc += src->m_width;
-        gBlitDst += dst->m_width;
+void FillBitmapArea(bitmap* image, i32 x, i32 y, i32 width, i32 height, i32 color) {
+    Fill(image, Area(image, x, y, width, height), color);
+}
+
+void FillBitmapAreaClip(bitmap* image, i32 x, i32 y, i32 width, i32 height, i32 color,
+                        i32 clipX, i32 clipY, i32 clipWidth, i32 clipHeight) {
+    if (clipWidth <= 0 || clipHeight <= 0)
+        return;
+    const i64 clipRight = static_cast<i64>(clipX) + clipWidth;
+    const i64 clipBottom = static_cast<i64>(clipY) + clipHeight;
+    // Retain retail's exclusion of rectangles that only touch its final/first
+    // clip column or row; widen the old guard before doing any arithmetic.
+    if (x >= clipRight - 1 || static_cast<i64>(x) + width - 1 <= clipX
+        || y >= clipBottom - 1 || static_cast<i64>(y) + height - 1 <= clipY)
+        return;
+    auto rectangle = Area(image, x, y, width, height);
+    rectangle.left = std::max<i64>(rectangle.left, clipX);
+    rectangle.top = std::max<i64>(rectangle.top, clipY);
+    rectangle.right = std::min(rectangle.right, clipRight);
+    rectangle.bottom = std::min(rectangle.bottom, clipBottom);
+    Fill(image, rectangle, color);
+}
+
+void BlitBitmap(bitmap* src, i32 sx, i32 sy, i32 width, i32 height, bitmap* dst, i32 dx, i32 dy) {
+    if (!Valid(src) || !Valid(dst) || width <= 0 || height <= 0)
+        return;
+    const i64 firstColumn = std::max({i64{0}, -static_cast<i64>(sx), -static_cast<i64>(dx)});
+    const i64 firstRow = std::max({i64{0}, -static_cast<i64>(sy), -static_cast<i64>(dy)});
+    const i64 lastColumn = std::min({static_cast<i64>(width), static_cast<i64>(src->m_width) - sx,
+                                    static_cast<i64>(dst->m_width) - dx});
+    const i64 lastRow = std::min({static_cast<i64>(height), static_cast<i64>(src->m_height) - sy,
+                                 static_cast<i64>(dst->m_height) - dy});
+    if (firstColumn >= lastColumn || firstRow >= lastRow)
+        return;
+    const auto bytes = static_cast<std::size_t>(lastColumn - firstColumn);
+    const bool aliases = src->m_pixels == dst->m_pixels;
+    if (aliases && src->m_width != dst->m_width) {
+        std::vector<u8> copy(bytes * static_cast<std::size_t>(lastRow - firstRow));
+        for (i64 row = firstRow; row < lastRow; ++row)
+            std::memcpy(copy.data() + static_cast<std::size_t>(row - firstRow) * bytes,
+                        src->m_pixels + (sy + row) * src->m_width + sx + firstColumn, bytes);
+        for (i64 row = firstRow; row < lastRow; ++row)
+            std::memcpy(dst->m_pixels + (dy + row) * dst->m_width + dx + firstColumn,
+                        copy.data() + static_cast<std::size_t>(row - firstRow) * bytes, bytes);
+        return;
+    }
+    const bool backwards = aliases && dy > sy;
+    for (i64 step = 0; step < lastRow - firstRow; ++step) {
+        const i64 row = backwards ? lastRow - 1 - step : firstRow + step;
+        std::memmove(dst->m_pixels + (dy + row) * dst->m_width + dx + firstColumn,
+                     src->m_pixels + (sy + row) * src->m_width + sx + firstColumn, bytes);
     }
 }
 
-void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
-    gDimPtr = bmp->m_pixels + y * bmp->m_width + x;
-    for (gDimRow = 0; gDimRow < h; gDimRow++) {
-        gDimNext = gDimPtr + bmp->m_width;
-        for (gDimCol = 0; gDimCol < w; gDimCol++) {
-            *gDimPtr = uDimPal[0][0][level * DIM_PALETTE_LEVEL_STRIDE + *gDimPtr];
-            gDimPtr++;
-        }
-        gDimPtr = gDimNext;
+void DimBitmapArea(bitmap* image, i32 x, i32 y, i32 width, i32 height, i32 level) {
+    if (level < 0 || level >= DIM_PALETTE_LIGHTEN_TABLE)
+        return;
+    const auto rectangle = Area(image, x, y, width, height);
+    if (rectangle.Empty())
+        return;
+    const u8* palette = uDimPal[level / DIM_PALETTE_LEVEL_COUNT][level % DIM_PALETTE_LEVEL_COUNT];
+    for (i64 row = rectangle.top; row < rectangle.bottom; ++row) {
+        auto* pixels = image->m_pixels + row * image->m_width;
+        for (i64 column = rectangle.left; column < rectangle.right; ++column)
+            pixels[column] = palette[pixels[column]];
     }
 }

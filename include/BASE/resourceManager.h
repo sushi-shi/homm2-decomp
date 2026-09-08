@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include "baseManager.h"
+#include <BASE/AggDirectory.h>
 
 class bitmap;
 class font;
@@ -14,12 +15,7 @@ class sample;
 class tileset;
 struct tag_message;
 
-#pragma pack(push, 1)
-struct aggEntry {
-    u32l id;
-    i32l offset;
-    u32l size;
-};
+using aggEntry = resources::AggEntry;
 
 typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_AGGREGATE_LIMIT   = 4,
@@ -27,11 +23,13 @@ typedef enum ResourceManagerLayoutConstant {
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
 
+#pragma pack(push, 1)
 class resourceManager : public baseManager {
 public:
     resource* m_resourceListHead;
     i32 m_numAggregates;
     i32 m_curAggregate;
+    i32 m_curEntry;
     i32 m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];
     aggEntry* m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];
     i32 m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];

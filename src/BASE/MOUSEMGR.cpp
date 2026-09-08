@@ -467,6 +467,14 @@ void mouseManager::CheckUpdateMousePos(void) {
 void mouseManager::SetColorMice(b32 enabled) {
     if (enabled == gbColorMice)
         return;
+    // Resource loading can fail before the first cursor has been selected.
+    // Do not reload the initial -1 type through iMouseOffset during shutdown.
+    if (!m_active || H2EnumIndex(m_cursorType) < 0
+        || H2EnumIndex(m_cursorType) >= MOUSE_CURSOR_TYPE_SLOT_COUNT) {
+        gbColorMice = enabled;
+        platform::Video().ShowCursor(enabled == 0);
+        return;
+    }
     {
         i32 savedWM56 = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;

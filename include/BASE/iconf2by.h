@@ -4,6 +4,7 @@
 #include <Ints.h>
 
 #include <BASE/IconDraw.h>
+#include <span>
 
 class bitmap;
 class icon;
@@ -20,7 +21,7 @@ void FlipIconToBitmapYModify(
     i32 clipW,
     i32 clipH,
     i32 color,
-    i8* shear
+    std::span<const i8> shear
 );
 
 #endif

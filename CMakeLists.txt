@@ -353,6 +353,26 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME bzip2 COMMAND homm2_bzip2_test)
+  add_executable(homm2_agg_directory_test tools/agg_directory_test.cpp src/BASE/AggDirectory.cpp)
+  target_include_directories(homm2_agg_directory_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_link_libraries(homm2_agg_directory_test PRIVATE homm2_platform)
+  add_test(NAME agg_directory COMMAND homm2_agg_directory_test)
+
+  add_executable(homm2_image_decode_test
+    tools/image_decode_test.cpp tools/image_test_support.cpp src/BASE/ImageDecode.cpp
+    src/BASE/Icon2b.cpp src/BASE/Iconf2b.cpp src/BASE/icon2bc.cpp src/BASE/iconf2bc.cpp
+    src/BASE/icon2by.cpp src/BASE/iconf2by.cpp src/BASE/Iconm2b.cpp src/BASE/Iconmf2b.cpp
+    src/BASE/Icond2b.cpp src/BASE/Icondf2b.cpp src/BASE/icon2bs.cpp)
+  target_include_directories(homm2_image_decode_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME image_decode COMMAND homm2_image_decode_test)
+
+  add_executable(homm2_raster_test tools/raster_test.cpp src/BASE/RESOURCE.cpp
+    src/BASE/BITMAP.cpp src/BASE/TILESET.cpp src/BASE/TILE.cpp src/BASE/bmap2.cpp)
+  target_include_directories(homm2_raster_test PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_raster_test PRIVATE __cdecl= __stdcall= __fastcall=)
+  target_compile_options(homm2_raster_test PRIVATE -ffunction-sections -fdata-sections)
+  target_link_options(homm2_raster_test PRIVATE -Wl,--gc-sections)
+  add_test(NAME raster COMMAND homm2_raster_test)
 
   add_executable(homm2_localization_encoding_test
     tools/localization_encoding_test.cpp
