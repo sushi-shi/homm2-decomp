@@ -412,7 +412,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 if (targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_SLOW)])
                     break;
                 effect_8 = static_cast<i32>(
-                    RawEffectSpellInfluence(
+                    -RawEffectSpellInfluence(
                         targetCreature,
                         ARMY_SPELL_INFLUENCE_SLOW
                     )
@@ -421,7 +421,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 if (targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HASTE)]) {
                     effect_8 = static_cast<i32>(
                         effect_8
-                        - RawEffectSpellInfluence(targetCreature, ARMY_SPELL_INFLUENCE_HASTE)
+                        + RawEffectSpellInfluence(targetCreature, ARMY_SPELL_INFLUENCE_HASTE)
                               * gfCancelDurationMods
                                   [targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_HASTE)] + fullQuantityFlag_4
                                          < SPELL_AI_MAX_DURATION
@@ -475,7 +475,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 if (targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLESS)]) {
                     effect_8 = static_cast<i32>(
                         effect_8
-                        - RawEffectSpellInfluence(targetCreature, ARMY_SPELL_INFLUENCE_BLESS)
+                        + RawEffectSpellInfluence(targetCreature, ARMY_SPELL_INFLUENCE_BLESS)
                               * gfCancelDurationMods
                                   [targetCreature->m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_BLESS)] + fullQuantityFlag_4
                                          < SPELL_AI_MAX_DURATION
@@ -802,9 +802,10 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                 return 0;
 
             columnIndex = target->m_hex % ARMY_HEX_COLUMNS;
-            distance = m_currentSide == COMBAT_ATTACKER_SIDE
-                           ? columnIndex - COMBAT_SPELL_AI_MINIMUM_DISTANCE
-                           : COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - columnIndex;
+            // Movement value follows the target army, including friendly Haste targets.
+            distance = target->m_side == COMBAT_ATTACKER_SIDE
+                           ? COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN - columnIndex
+                           : columnIndex - COMBAT_SPELL_AI_MINIMUM_DISTANCE;
             if (distance < 0)
                 distance = 0;
             distance += COMBAT_SPELL_AI_MINIMUM_DISTANCE;
@@ -869,7 +870,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             adjacent = false;
             dragonCounter = adjacent;
             for (cnt = 0; cnt < m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]; cnt++) {
-                other = &m_armies[H2EnumIndex(target->m_side)][cnt];
+                other = &m_armies[H2EnumIndex(OppositeCombatSide(target->m_side))][cnt];
                 if (other->m_monsterType == CREATURE_GREEN_DRAGON
                     || other->m_monsterType == CREATURE_RED_DRAGON
                     || other->m_monsterType == CREATURE_BLACK_DRAGON
@@ -882,27 +883,29 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             if (adjacent)
                 factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
-                factor = static_cast<float>(
-                    dragonCounter / m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]
-                );
-            effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * factor);
+                factor = m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))] > 0
+                    ? static_cast<float>(dragonCounter)
+                          / m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]
+                    : 0.0f;
+            effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * factor * worth);
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
             shooters = 0;
             for (cnt = 0; cnt < m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]; cnt++) {
-                other = &m_armies[H2EnumIndex(target->m_side)][cnt];
+                other = &m_armies[H2EnumIndex(OppositeCombatSide(target->m_side))][cnt];
                 if ((H2EnumIndex((other->m_monster.flags.all) & (MONSTER_FLAGS_SHOOTER))))
                     shooters++;
             }
-            factor = static_cast<float>(
-                shooters / m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]
-            );
+            factor = m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))] > 0
+                ? static_cast<float>(shooters)
+                      / m_armyCount[H2EnumIndex(OppositeCombatSide(target->m_side))]
+                : 0.0f;
             if (target->m_side == COMBAT_ATTACKER_SIDE && m_inCastleCombat) {
                 factor = static_cast<float>(factor + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
                 if (factor > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
                     factor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             }
-            effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * factor);
+            effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * factor * worth);
             break;
         default:
             effect = 0;
