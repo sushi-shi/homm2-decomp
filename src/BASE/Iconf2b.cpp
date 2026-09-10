@@ -82,8 +82,8 @@ void FlipIconToBitmap(
             fill_run:
                 if (clip == ICON_DRAW_NO_CLIP) {
                     memset(s_row + s_x - s_run + 1, s_color, s_run);
-                } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 >= clipX
-                           && s_x <= s_clipR) {
+                } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 <= s_clipR
+                           && s_x >= clipX) {
                     if (s_x <= s_clipR) {
                         if (s_x - s_run + 1 >= clipX)
                             memset(s_row + s_x - s_run + 1, s_color, s_run);
@@ -122,8 +122,8 @@ void FlipIconToBitmap(
                             *s_dst = s_dimPal[*s_dst];
                             s_dst++;
                         }
-                    } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_dimLen + 1 >= clipX
-                               && s_x <= s_clipR) {
+                    } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_dimLen + 1 <= s_clipR
+                               && s_x >= clipX) {
                         if (s_x <= s_clipR) {
                             if (s_x - s_dimLen + 1 >= clipX) {
                                 s_dst = s_row + s_x - s_dimLen + 1;
@@ -133,8 +133,8 @@ void FlipIconToBitmap(
                             }
                         } else {
                             if (s_x - s_dimLen + 1 >= clipX) {
-                                s_dimLen = s_clipR - (s_x - s_dimLen);
                                 s_dst = s_row + s_x - s_dimLen + 1;
+                                s_dimLen = s_clipR - (s_x - s_dimLen);
                             } else {
                                 s_dimLen = clipW;
                                 s_dst = s_row + clipX;

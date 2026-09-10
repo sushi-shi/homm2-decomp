@@ -63,8 +63,8 @@ void FlipMonoIconToBitmap(
         } else if (s_run != ICON_RLE_MONO_NEWLINE_COMMAND) {
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(s_row + s_x - s_run + 1, color, s_run);
-            } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 >= clipX
-                       && s_x <= s_clipR) {
+            } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 <= s_clipR
+                       && s_x >= clipX) {
                 if (s_x <= s_clipR) {
                     if (s_x - s_run + 1 >= clipX)
                         memset(s_row + s_x - s_run + 1, color, s_run);
