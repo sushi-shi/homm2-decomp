@@ -6,10 +6,15 @@ numbers encode what VC6 actually emits (CV5 records, 16-bit type indices), which
 is NOT what MSVC 4.2 emitted - reading the 4.2 layout is exactly how this oracle
 came to return an empty table for every function without failing.
 """
+import os
 import struct
 import unittest
+from unittest.mock import patch
 
-from homm2.audit.od_oracle import parse_bprel, parse_frames
+# These are offline parser tests, not compiler tests. Importing the oracle must
+# not require an installed compiler or accidentally provision one.
+with patch.dict(os.environ, {"MSVC_DIR": "/unused/offline-parser-test"}):
+    from homm2.audit.od_oracle import parse_bprel, parse_frames
 
 S_END, S_BPREL32, S_LPROC32, S_GPROC32 = 0x0006, 0x1006, 0x100A, 0x100B
 S_BLOCK32 = 0x0207

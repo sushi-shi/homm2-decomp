@@ -46,6 +46,60 @@ class BuildCommandTest(unittest.TestCase):
             self.assertIn(mock.call('ninja', '-j', '4'), run.call_args_list)
         self.verify_retail.assert_called_once_with(cli.REPO / 'build/orig/HMM2PL.exe')
 
+    HARD_GATES = (
+        ("homm2.build.annotated_functions", "--check"),
+        ("homm2.build.annotated_functions", "--check", "--objects", "build/objdiff/base"),
+        ("homm2.build.assert_decls",),
+        ("homm2.build.assert_no_fake_labels",),
+        ("homm2.build.assert_globals_data",),
+        ("homm2.build.assert_globals_defined",),
+        ("homm2.build.assert_vtables",),
+        ("homm2.build.assert_relocs", "--resolved"),
+        ("homm2.build.assert_fixed_width_ints",),
+    )
+
+    def test_build_runs_every_hard_gate_before_publishing_scores(self):
+        commands = []
+
+        def run(*command):
+            commands.append(command)
+            return 0
+
+        def publish(*args):
+            for gate in self.HARD_GATES:
+                self.assertIn(("python3", "-m", *gate), commands)
+            return 0
+
+        with mock.patch.object(cli, "sh", side_effect=run), mock.patch(
+            "homm2.match.status.load_report", return_value={"units": []}
+        ), mock.patch("homm2.match.status.main", side_effect=publish):
+            self.assertEqual(cli.main(["build"]), 0)
+
+    def test_staged_gates_run_without_blocking_publication(self):
+        commands = []
+
+        def run(*command):
+            commands.append(command)
+            return int(command[2:] in cli.STAGED_GATES)
+
+        with mock.patch.object(cli, "sh", side_effect=run), mock.patch(
+            "homm2.match.status.load_report", return_value={"units": []}
+        ), mock.patch("homm2.match.status.main", return_value=0) as publish:
+            self.assertEqual(cli.main(["build"]), 0)
+            publish.assert_called()
+        for gate in cli.STAGED_GATES:
+            self.assertIn(("python3", "-m", *gate), commands)
+
+    def test_each_failed_gate_blocks_success_and_score_publication(self):
+        for gate in self.HARD_GATES:
+            with self.subTest(gate=gate), mock.patch.object(
+                cli, "sh", side_effect=lambda *cmd: int(cmd == ("python3", "-m", *gate))
+            ), mock.patch("homm2.match.status.load_report", return_value={"units": []}), mock.patch(
+                "homm2.match.status.main", return_value=0
+            ) as publish:
+                self.assertEqual(cli.main(["build"]), 1)
+                publish.assert_not_called()
+
     def test_clean_build_generates_report_before_relocation_field_audit(self):
         report_ready = False
 
@@ -55,7 +109,7 @@ class BuildCommandTest(unittest.TestCase):
             return {"units": []}
 
         def run(*command):
-            if command[-2:] == ("homm2.build.assert_relocs", "--fields"):
+            if command[-2:] == ("homm2.build.assert_relocs", "--resolved"):
                 self.assertTrue(report_ready)
             return 0
 

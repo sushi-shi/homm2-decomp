@@ -8,6 +8,7 @@ PIPELINE = [
     ("python3", "configure.py"),
     ("ninja", "base"),
     ("python3", "-m", "homm2.build.source_symbols"),
+    ("python3", "-m", "homm2.build.annotated_functions"),
     ("python3", "-m", "homm2.build.name_strings"),
     ("python3", "-m", "homm2.build.synth_pdb"),
     ("python3", "-m", "homm2.build.reviewed_data", "--regenerate"),

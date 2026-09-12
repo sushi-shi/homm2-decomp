@@ -56,6 +56,26 @@ class ReportCacheTest(unittest.TestCase):
         self.base.write_bytes(b"new base")
         self.assertIsNone(self.cached())
 
+    def test_comparison_against_itself_is_rejected(self):
+        config = json.loads(self.config.read_text())
+        config["units"][0]["target_path"] = config["units"][0]["base_path"]
+        self.config.write_text(json.dumps(config))
+        with self.assertRaisesRegex(RuntimeError, "compares an object to itself"):
+            self.identity()
+
+    def test_modified_normalized_output_is_rejected_even_before_report_exists(self):
+        from homm2.build.normalized_freshness import write_stamp
+        normalized = self.objdiff / "normalized/base/SOURCE/UNIT.obj"
+        normalized.parent.mkdir(parents=True)
+        normalized.write_bytes(b"derived candidate")
+        write_stamp(normalized, {"input": self.base})
+        config = json.loads(self.config.read_text())
+        config["units"][0]["base_path"] = "./normalized/base/SOURCE/UNIT.obj"
+        self.config.write_text(json.dumps(config))
+        normalized.write_bytes(self.target.read_bytes())
+        with self.assertRaisesRegex(RuntimeError, "output changed"):
+            self.identity()
+
     def test_base_only_change_is_incremental(self):
         self.seed()
         self.base.write_bytes(b"new base")
@@ -184,6 +204,8 @@ class LiveStatusTest(unittest.TestCase):
         self.assertIn("98.20% fuzzy", block)
         self.assertIn("100.00% fuzzy-max", block)
         self.assertIn("audited exact disposable TU-state probes", block)
+        self.assertIn("not a raw linked-image equality claim", block)
+        self.assertNotIn("byte-identical now", block)
 
     def test_status_prints_live_and_max_exact_counts(self):
         self.maxima.write_text(

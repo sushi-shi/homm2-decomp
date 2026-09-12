@@ -33,6 +33,18 @@ struct AudiereSampleNode {
     ~AudiereSampleNode() {}
 };
 
+// AudiereEffects keeps its sample-effect state in one private owner.
+struct AudiereEffectsState {
+    void* buffer;
+    i32 frameCount;
+    i32 channelCount;
+    i32 sampleRate;
+    audiere::SampleFormat sampleFormat;
+    AudiereSampleNode* sampleList;
+    i32 sampleIterationDepth;
+};
+SIZE(AudiereEffectsState, 0x1c);
+
 // Retail keeps AudiereMusic::stream/source as static class members: their atexit
 // teardowns carry VC6's member-static destroy-once guard (one flag byte,
 // bit per member), which file-scope statics never get.
