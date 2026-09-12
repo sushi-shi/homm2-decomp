@@ -1,4 +1,724 @@
 {
+  "src/SOURCE/ADVMGR.cpp:advManager::Open(i32 id)#1": {
+    "body_sha256": "7efab233e33c17c502d94c2660eb43ede0bd62fb8fcff41984e804a9aed21931",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close uses scalar delete. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::Close(void)#1": {
+    "body_sha256": "5065c88f04ce9cff861d28af13b1a3f4cd47ec1821214263de111076b9753c2b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B44: visibility map allocated with new u16[] in Open is released by scalar delete here; requires exact retail allocator-call proof before changing. Other icon/sample loops match owner counts; reused index retains one collection-traversal role."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet)#1": {
+    "body_sha256": "0b648935baf444aa72c312490d06ec8098936d4ffa45aa15f6710074f26edf83",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Real nine-element suffixSample array and nine cursor samples. Retail sampleSet changes from speed threshold to sound-set selection, a semantic adapter (strict build uses separate typed local), not unrelated scratch reuse. Two signed integers plus fixed filename fit gText500 even for malformed input."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SystemOptions(void)#1": {
+    "body_sha256": "51a1bd6caf356682926b622b48136e17d8e035cbae65e0b2bf4a595f63a4bd6f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "O04 uses human array element for snapshot/refresh. S29 unused tag_message aggregate is a cleanup candidate; real prev speed/interface/mobile snapshots are observed restoration state. Cursor-sample loop fits nine entries."
+  },
+  "src/SOURCE/ADVMGR.cpp:RedbookMusicPresent(void)#1": {
+    "body_sha256": "6a32c1778cdcdbb7ffff5a015e3b5de0328a9e6efc54c620885416ba3d8f8f72",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constant-true inline availability helper reflects removed CD readiness state; no artificial padding/state declaration and no instance of the ten patterns."
+  },
+  "src/SOURCE/ADVMGR.cpp:MidiMusicPresent(void)#1": {
+    "body_sha256": "dfac6fdf2d8efd69eebc7566efb22f6cf1e53b253f8d1503fe9735f3b1e58c66",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constant-true inline availability helper reflects the always-present music backend; no manual argument access or stack owner."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::StartCursor(MapDirection direction)#1": {
+    "body_sha256": "0a3f985ffee0652a528c1763bd532a82a051c64a88c93c3c96fbd3b5315a53ba",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 applied: select computer/human speed inside a real two-element owner; all native bytes/targets unchanged. B43 current-player and direction0..7/map-cell domains still require callers. No fabricated owner-from-member recovery."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::StopCursor(i32 stopSound)#1": {
+    "body_sha256": "248823ba522c6f1e9419aafebcc1ed719927fdc257539bc9202d1bf1f0cbc5fa",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Cursor state is transferred to actual S1 scalar owners, not an artificial stack record. Map-cell coordinates/current hero and optional sample stop depend on valid cursor context (B43)."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::DrawCursor(void)#1": {
+    "body_sha256": "b9d1ce85621f89dee939b6c3bd68945b9feb25f51f10ab7283703a68397c699e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "O04 removes four cross-scalar speed accesses. S28 two flagDrawn locals are assigned but unread. B43 hero/type/color/frame/map-cell domains and icon clipping/boat-flag NOCLIP rely on valid resources/context; no cast or owner-recovery arithmetic appears."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::DrawCursorShadow(void)#1": {
+    "body_sha256": "787b07d906b5c9d149721228da19abea7dba903baccf6b308947a6b1d5f6d5e2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Shadow frame/flip derivation and draw offsets are real animation/coordinate roles. B43 cursor frame, hero type and underlying icon/framebuffer contracts remain; fixed drawing viewport alone does not prove source frame extents."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::GetCursorBaseFrame(MapDirection direction)#1": {
+    "body_sha256": "fd7904d1e19bc2bdb8f4d728f01a47e84f694c2080de6926d0ea1e9c283a5e3e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Direction-to-frame mapping indexes horse/boat frame tables using direction0..7; B43 callers must establish that domain. No local aggregate or unrelated variable reuse."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::TurnTo(MapDirection direction)#1": {
+    "body_sha256": "837bd9524cbe736e7b3815eb1a05042344834b7cbdd963ca88fed4ff0118bcdc",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 real speed array applied at four accesses with native/retail proof, including private double1.5. Explicit floating-to-i32 conversion preserves truncated delay. B43 direction/frame table and preference speed domains remain; tick/deadline locals retain one timing role."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::GetMoveShowIt(hero * movingHero,MapDirection direction)#1": {
+    "body_sha256": "7a621b0a71e013ab94c66549016db83221297b67b3acf5f0a42af7513d3bbae3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Visibility decision computes direction-shifted map coordinates from a hero and uses the visibility lookup; direction/hero/map coordinate contracts need caller proof (B43). No artificial aggregation or casts."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::MoveHero(MapDirection direction,i32 stopAfterMove,i32 * eventX,i32 * eventY,i32 * outOfMobility,i32 processEvent,i32 * adjacentMonster,i32 forceMove)#1": {
+    "body_sha256": "fec9bbaabeb3a346d4b2dd2ad5004d72a5355998b4c2d7164bd50a031d90c2a9",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "applied",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 three real-array accesses applied. G25 movementDone/stoppingEvent/adjacentDone joins need complete structured-source matrices. R02 step_a spans boat search, animation loops, terrain and resource lookup. B43 destination dereference precedes validity check; failed boat search can form/dereference boats[48]. Narrowing casts encode real map/wire fields."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::CheckAdjacentMon(i32 * adjacentMonster)#1": {
+    "body_sha256": "d41b5bcb4233e739f26145a1773db1ca90a46fa1e4f6b1021a5093e07c991f0b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Separate hero/monster cells and coordinate output scalars have real roles. Success from FindAdjacentMonster precedes reading monsterX/Y; B43 current-hero/map/context and returned-cell contracts remain."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::ValidMoveWithEvent(hero * movingHero,MapDirection direction)#1": {
+    "body_sha256": "b175ca0b88dafa63c4c8210ad9834fefcf172d9aec01687f5ec6d5937ebba2b8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Checks destination x/y within MAP_WIDTH/HEIGHT before GetCell. B43 direction table is read before that guard and hero-interaction object metadata selects a hero without a local index guard. No fake pointer arithmetic."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::ValidMove(MapDirection direction,i32 eventMode)#1": {
+    "body_sha256": "20ad6b2f90424ecd59d614e76194a7672037db45e3d9d7255cd3ddeec3d5d7fc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Destination origin checks imply valid destination center. Diagonal water checks mix individually valid current/destination coordinates; north neighbor shares current Y. B43 direction/terrain domains, current cursor context and south-neighbor coordinates need remaining caller proof. Locals describe real coordinate transforms."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::MoveOrigin(i32 directionX,i32 directionY)#1": {
+    "body_sha256": "92eb6a4ea6de1ac6f1fcc859521c3baf87541ef8136aebeda350a27474f82f84",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Parameters are converted from requested delta to compensating cursor delta, the same coordinate-transform role rather than unrelated reuse. Current/previous cursor map positions must be valid (B43); the previous-position sentinel guards its lookup."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::ProcessMapChange(SMapChange change)#1": {
+    "body_sha256": "d2032808c72d1ea29cfc24f5ccd2072eeb4ea05a0a8e51410227fb3659f82f18",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "U01/SMapChange union distinguishes movement enum from wire bytes in a real11-byte tagged message. B43 invalid player is skipped but dispatch continues; hero/id/xy/direction and player-name indices are unchecked received fields. Scalars are actual MoveHero outputs, not padding."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::ProcessIncomingSingleMapChange(SMapChange * incoming)#1": {
+    "body_sha256": "ff7f895a2e025bb160a0ce75aa725904c03094c0767f5176139ff5553f97f435",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G26 retryInsert/duplicateChange joins and S28 final unread ++slot need structural/native experiments. Both queue scans index0..195; incoming11-byte record and sequence contract remain B43/B41. Queue-full retry unwinds one real entry."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::ProcessIncomingGroupMapChange(char * incomingData)#1": {
+    "body_sha256": "554ede133c66fc99997877e219f6aaa75389555ae2a799b81891e34fb1be7550",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real four-record44-byte heap copy is traversed3..0. S28 processed is assigned but unread. Allocation cast is natural; B41/B43 the char* input carries no length and caller receive path must establish44 initialized bytes."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::PurgeMapChangeQueue(void)#1": {
+    "body_sha256": "ca7e1070badd12dcab05b77defcb8de2581f859c16853a364cb23ad116e05fff",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Both loops fit declared196/4-record arrays. Clearing only the type tags intentionally invalidates entries; stale fields are not fake aggregate members."
+  },
+  "src/SOURCE/CURSOR.cpp:advManager::UnwindMapChangeQueue(i32 maximumToUnwind,i32 processChanges)#1": {
+    "body_sha256": "8b0ce6d0c647ecbb093fdf9b96000f3f1a44ef1f1d020ae8eba588252e9c9011",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Fixed196-entry scans and guarded pos1!= -1 prevent local out-of-range indexing. queueCount/unwoundChanges/lowestSequence are actual selection state. Sentinel999999999 and received signed sequence arithmetic remain B43 protocol-domain concerns."
+  },
+  "src/SOURCE/CURSOR.cpp:SendMapChange(MapChangeType type,i8 id,u8 x,u8 y,i32 player,u8 stopAfterMove,u8 direction)#1": {
+    "body_sha256": "1134b79fd3d87e810200f547409acda98193537311a1710caba94787a595b927",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real11-byte stack record is fully initialized; wire casts encode byte fields and char* conversion serves TransmitRemoteData's byte interface. U01 tagged views retained. memmove shifts33 bytes inside44-byte history;44-byte send fits remote payload. Player/map/id domains and signed sequence growth remain B43."
+  },
+  "src/SOURCE/GAME.cpp:game::ShowComputerScreen(void)#1": {
+    "body_sha256": "7778d3d179bd2c2a941ae5b308abb53950290583df5767842fabe9b125b96cdc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 caller proof: saves one human flag, temporarily writes true, then restores the same value, preserving0/1 domain. Saved scalar has a real restoration role; widget IDs are fixed. B43 giCurPlayer validity still belongs to gameplay lifecycle."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpEnumServiceProvider(struct _GUID * guid,char * name,DWORD,DWORD,void *)#1": {
+    "body_sha256": "90ade907dcb56c1afcbdd83811edba9dc16e2ac5b55a1f1d0f5a47de161c0b1c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Address-to-i32 cast is an intentional 32-bit diagnostic value, not pointer arithmetic. B42: callback name is modified in place and the borrowed GUID pointer is retained after enumeration; SDK lifetime/mutability contract still needs proof."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpEnumSession(DPSESSIONDESC * session,void *,LPDWORD,DWORD flags)#1": {
+    "body_sha256": "1dad12819dbb1ae187ff2733631218be96f5837d56b216efe26bd242e4430389",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B42: callback appends lSessions[iMaxSession] without checking its ten-element capacity. Session enumeration is not bounded by the six-player session limit. DWORD session identifier logging preserves the ABI bit pattern."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_init(void)#1": {
+    "body_sha256": "60f4145387704528b01d351c57d6f698c76d0be63797837c930e27c8c6cc8fba",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real 26-byte startup record and two 200-element heap tables; memset sizes cover their owners. GetProcAddress function-pointer conversions and allocation casts are native boundaries. B42: guest count/startup map indices and retained provider GUID lifetime need proof; fixed dialog strings plus one integer fit gText[500]."
+  },
+  "src/SOURCE/dpnetwin.cpp:CleanupDPVars(void)#1": {
+    "body_sha256": "e9cbd304e66b64907f24f81e309acb51090c40ea0a771bf443d650c20edbf17e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "absent"
+    },
+    "note": "Reset scalars/pointers are actual transport state, not a synthetic aggregate. S27: iGUIDCount has no non-reset use; investigate removal of its reconstructed storage without inventing replacement padding."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_term(void)#1": {
+    "body_sha256": "32435deffd704b2d3993f961ea1a82d5a90b2ec30229d97c5f9318c219d61906",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "B42: a 104-byte drain buffer is passed with nominal capacity100 to dpnet_rcv, which ignores capacity and copies the queued packet length. No arbitrary extra-four-byte deletion: establish retail frame and maximum queued receive first. API shutdown ownership/lifecycle is also a caller contract."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpSendMessage(i32 destination,NetworkPacketType type,u16 size,void * data)#1": {
+    "body_sha256": "18b6d0b186a02b1e252af2d34f48e5b2cab0cadeda39f0dc5b2a58263fb17c79",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Allocates exactly u16 payload length plus its one-byte tag; tag, memcpy and Send lengths agree. Allocation/packet-tag casts are real boundaries. B42: payload source extent and DirectPlay size ceiling are caller contracts; zero-length calls do not read data."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_snd(i32 position,i32 size,void * data)#1": {
+    "body_sha256": "bf4e7c90853167030d6d08914bc29aa24e492979a8175d8cf0136aadcd5247b7",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B42/B41: position must be broadcast127 or a valid six-entry player mapping index; signed size narrows to u16 at the actual transport boundary. Negative/large sizes and source extent need caller proof."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_rcv(i16,u16,void * data)#1": {
+    "body_sha256": "2e1bd7b7e850ddf4d761a1781c62a5fde0472238653715a43fa6ba17a00405ce",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B20: full retail bytes and all ordered targets confirm queued size bytes copied from a size-1 allocation. Destination capacity is ignored; B42 termination caller supplies only104 bytes. Queue index wraps modulo200, but full/empty collision handling remains unresolved."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_stat(i16,u16)#1": {
+    "body_sha256": "87567be399f387909ccd71462ea60423e78a28aa0879f54c74a7d2429b7bf79a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constant-return compatibility stub; it neither indexes nor reads the unused transport parameters."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpnet_sess(i32,i32,...)#1": {
+    "body_sha256": "758b25deb06e369fe1e72cba05baea2835c52b52e9ec01b75fdedc6b36a039f9",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "retain",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Variadic compatibility stub returns zero without reading argument slots. The ellipsis is an interface signature, not manual varargs access."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpProcessMessages(void)#1": {
+    "body_sha256": "1d4effbfd84b360472e1605ce817aaba1a7ec848dab8a75dff30a242f40d9892",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C18 applied: SDK DPID owners remove two output-pointer reinterpretations and one scalar conversion with complete native/retail proof. S27 unread i/j slots remain. B42: size starts256 in268-byte rcvBufIn, but an error/DPSD reentry can continue with modified size and stale outputs; successful packets still need tag-specific minimum lengths."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpEvaluateMessage(u32l size,i32 sender)#1": {
+    "body_sha256": "12bf5bb5cf85a1e78e6ee03fb1cd5c350baa2f528e517dead1b483365fa94225",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B20 retail-confirmed size-1 allocation/copy versus stored size; B42 unchecked input header, startup extent, player count/map indices and queue-full contracts. C07: startup-typed local is reinterpreted as unrelated SNetPlayerInfo in another tag arm; recover a payload owner rather than a false type carrier."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpWaitForFirstGuest(void)#1": {
+    "body_sha256": "d20ab28c47243dc817c777b7fc8e0c39f05efb9a5c768989c6003abeb16f7a54",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "SDK DPSESSIONDESC is a real initialized output/input aggregate; literal Heroes 2 fits session name. MaxPlayers6 and mapping index0 are explicit. B42 retained provider GUID and Open/CreatePlayer failure/lifecycle contracts remain, not spare stack storage."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpWaitForExtraGuests(void)#1": {
+    "body_sha256": "d6abaf7077c4ebae4cb8a0a6d455c05c430a102abc2ab53b6569cc4c4cb78bd2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "U01 real widget message transitions from formatted gText[500] to dialog text payload; one signed integer plus fixed text fits. No unread aggregate members are inferred from a tagged event record."
+  },
+  "src/SOURCE/dpnetwin.cpp:dpWaitForHost(void)#1": {
+    "body_sha256": "e6882e14fc0ec17500afdc608d5cd481acb9c7772ef38ee5896b45cae7438782",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real SDK descriptor, DWORD timeout and text[32]; WFHS plus signed32 decimal needs at most17 bytes. State enum cast is for formatting. B42: session index is bounded by iMaxSession but enumeration can exceed lSessions[10]; borrowed GUID/lifecycle contracts remain."
+  },
+  "src/SOURCE/dpnetwin.cpp:DPSD(i32 result,char * file,i32 line)#1": {
+    "body_sha256": "b15c22982d8e89d5ef9dea1dc2726f23b80e70b0ff8aefb49c111b99bd9ada51",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S27 unused flag local. errorText[200] holds fixed error names (at most25 bytes including NUL); all file arguments are the fixed RETAIL_FILE path, and combined error/path/line text fits gText[500]. Early DP_OK return leaves bInDPSD set, but changing behavior is not a reconstruction cleanup."
+  },
+  "src/SOURCE/ADVMGR.cpp:UpdateSystemOptions(i32 initialDraw)#1": {
+    "body_sha256": "4458c8fac5195715471c35cac01a49f9428c77b6c1fa41cb27b20420905df9d8",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "O04 both speed indices recovered. U01 message scalar frame payload becomes text payload per command; legitimate reuse. onOffText really has11 entries (volume0..10), walkSpeedText5 and musicQualityText3; B43 malformed prefs/interface/color indices remain. C20 scalar bool-to-i32 casts need native proof before removal."
+  },
+  "src/SOURCE/ADVMGR.cpp:SystemOptionsHandler(struct tag_message & message)#1": {
+    "body_sha256": "573f37430fb067059ff0f16d86eb6be632e6e0b232ba16b0a066765f25e4c446",
+    "patterns": {
+      "casts": "open",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "O04 speed updates use shared two-element array; human wraps modulo5, computer advances normal..instant or blackout. U01 widget payload is interpreted under message/command guards. Real availability/status bools retained. C20 explicit scalar conversions/materialization need native matrix; B43 stored preference domains remain."
+  },
+  "src/SOURCE/ADVMGR.cpp:GetMobilityFrame(i32 mobility)#1": {
+    "body_sha256": "118004e4fbffc5256bf2d864b3115cdcb49566c8fbd387066ce141397185c326",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Scalar frame scales/clamps mobility; no buffer access or unrelated reuse. Input multiplication can overflow for unrestricted i32, so hero-stat caller domain remains B43 rather than an invented larger owner."
+  },
+  "src/SOURCE/ADVMGR.cpp:GetManaFrame(i32 mana)#1": {
+    "body_sha256": "dd285b5fd03f835edecac9daa189f7494b872c20c84c33f239cac56fa73baf64",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Scalar frame derives from mana and clamps only upper thresholds; negative input stays negative. No direct buffer access, but eventual frame caller must establish nonnegative mana (B43)."
+  },
   "include/SOURCE/Modem.h:TruncateModemResponse(void)#1": {
     "body_sha256": "cb8aeaa4a660dffb5ca168e5d5dabdb406104f3ff9a38b9bbeee2bff24baa550",
     "patterns": {
@@ -7056,7 +7776,7 @@
     "note": "Zeroes the persisted 413-byte prefix of the 416-byte config object; AUTO including NUL fits both 13-byte save names. Remaining storage is not a fake stack aggregate."
   },
   "src/BASE/Misc.cpp:SetGameDefaults(void)#1": {
-    "body_sha256": "d2026421437d7b731bf712de394a18ec9e11c1ba99857976506b95f5de34780e",
+    "body_sha256": "af24f815cf4f45b0eae0bd154bd12b5f5a1811b84b860b146e159888ac4f1d02",
     "patterns": {
       "casts": "absent",
       "unions": "absent",
@@ -7088,7 +7808,7 @@
     "note": "Reads the real 413-byte serialized config prefix within its 416-byte owner and uses real FILE storage. S06: fclose result is assigned but never read. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "src/BASE/Misc.cpp:ReadPrefsFromRegistry(void)#1": {
-    "body_sha256": "9f37f308920c8d471f81f8ba478f47906aef51307132da68e1354ee4dbdd87b5",
+    "body_sha256": "d7acaf9f37fc7c400d1da7f2ef09aa86867081d9cdbd343646e7bfae12ddd435",
     "patterns": {
       "casts": "retain",
       "unions": "absent",
@@ -7136,7 +7856,7 @@
     "note": "Formats literal HEROES2.CFG in gText and writes the exact 413-byte config prefix from its 416-byte owner. Actual FILE protocol; no manual varargs."
   },
   "src/BASE/Misc.cpp:WritePrefsToRegistry(void)#1": {
-    "body_sha256": "982deaad794a0fb2ea168f9917c5ed5c9c51ed4722a2d73860ed4a94781c83df",
+    "body_sha256": "e4da9242ea0817c5241e0f7c10a08aa68b2b0ecf37bdea2e137c1addd1ec4c63",
     "patterns": {
       "casts": "retain",
       "unions": "absent",

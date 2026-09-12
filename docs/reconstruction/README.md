@@ -213,6 +213,23 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - O04: twelve cursor accesses now index the actual two-element configuration
   walk-speed array, with all preference/UI consumers updated and
   [whole-build byte/relocation equivalence](O04.md).
+- B42: DirectPlay session enumeration can exceed its ten-element list;
+  packet lengths/player mappings, shutdown drain capacity, and retained
+  provider GUID lifetime/mutable name contracts need proof. B20 now includes
+  independently verified DirectPlay overread evidence. C07 also applies to
+  its startup-typed carrier reinterpreted as a guest-info record.
+- S27/S28/S29: DirectPlay unused locals/state, cursor unread flag/counter
+  stores, and the system-options unused message need native structural tests.
+- G25/G26: cursor movement completion/event joins and map-change queue retry/
+  duplicate joins need structured-source matrices. R02 records the movement
+  step local reused for boat, terrain, animation and resource roles.
+- B43: cursor/map-change direction, hero/player, map coordinate, frame and
+  received-record domains remain. Normal preference values fit the actual
+  eleven-entry volume and five-entry speed text tables; malformed stored
+  values remain unvalidated. B44 records visibility-map array allocation
+  followed by scalar deletion, pending retail allocator-call proof.
+- C20: system-options scalar boolean conversions/materialization require
+  native comparison; event widget payload unions themselves remain meaningful.
 
 ## Build setup observations
 

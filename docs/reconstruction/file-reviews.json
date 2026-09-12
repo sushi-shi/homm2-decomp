@@ -1,4 +1,20 @@
 {
+  "src/SOURCE/dpnetwin.cpp": {
+    "sha256": "7ccab6fd6609c02e62dbb0394c65dce517752cde1cc9a426dcd2fed85933a7ae",
+    "note": "Full671-line TU,16 definitions and all storage/macros read. C18 SDK outputs applied; B20 same genuine-retail queue overread as Winsock, C07 false startup carrier, B42 session/player/drain/API contracts, S27 unread locals/global/enum remain. No goto or manual varargs body."
+  },
+  "src/SOURCE/CURSOR.cpp": {
+    "sha256": "e5a7902be0c90a9b615ca96c48ec0e59fde82ef23b137151448b1e16bbe25941",
+    "note": "Full1583-line TU/18 definitions, private enums and globals read. O04 twelve scalar-neighbor lookups replaced by true array with98-TU native proof. G25/G26 joins, R02 step role reuse, S28 unread locals, B43 map/frame/network domains remain. Real11-byte changes and44-byte history owner retained."
+  },
+  "include/SOURCE/dpnetwin.h": {
+    "sha256": "ed4e337cf85139cf1ea816c6668120be372acf6c045a536d1fed768ede2d87b1",
+    "note": "Full103-line header read. Real packed26-byte startup mapping, SDK declarations and200-slot transport globals; maxPlayers6 does not establish ten-session callback cap. B42 drain100 argument/104 caller extent and provider lifetime remain."
+  },
+  "include/SOURCE/CURSOR.h": {
+    "sha256": "8a860e4c4ad156bea50126061020e3b973f9f442621433dbf2b55ac31e875916",
+    "note": "Full header read: direction/frame/queue dimensions and actual11-byte SMapChange. Movement-vs-wire union is a meaningful tagged byte/enum view, not a spare fake aggregate. Four-entry history and196-entry queue agree with consumer loops; B43 input domains remain."
+  },
   "include/SOURCE/Modem.h": {
     "sha256": "1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d",
     "note": "Full91-line header including TruncateModemResponse, queue layouts and all declared capacities read. Byte packet storage belongs to REMOTE; queue structs are real ABI owners, not fake stack aggregates."
@@ -336,8 +352,8 @@
     "note": "Full owner header reviewed; one typed terrain-cost prototype, no definitions, aggregates or executable macros."
   },
   "src/BASE/Misc.cpp": {
-    "sha256": "0cea1d4c617a67daef0cb845c95c9fb80fe91f16b9fd9c1dc4c760272346a434",
-    "note": "Read all 2182 lines, including private constants/DATA declarations and both conditional FindToken bodies. Forty-eight definitions reconciled; G07/G08, C05, B13-B17 and S05-S07 remain explicit candidates. Genuine packed file records and tagged message views retained."
+    "sha256": "34c990c39d3a8a5ff6298deaab4aa96f781ce664e3e886b67bdc83ed79379587",
+    "note": "Read all 2182 lines, including private constants/DATA declarations and both conditional FindToken bodies. Forty-eight definitions reconciled; G07/G08, C05, B13-B17 and S05-S07 remain explicit candidates. O04 six default/registry accesses now address actual walkSpeeds elements at unchanged offsets; all native code/data/targets unchanged. Genuine packed file records and tagged message views retained."
   },
   "include/BASE/Misc.h": {
     "sha256": "a618108289ba29c8ffa978403b886cff3e9831d95bc877070900df025e41ea0e",
@@ -352,8 +368,8 @@
     "note": "Read all graphics/fade/status geometry constants; no function bodies, union definitions or executable pointer macros. Palette 768, screen 640x480 and status y460/h20 checked against callers."
   },
   "include/SOURCE/CONFIG_TYPES.h": {
-    "sha256": "6e7d153b19fdfcca7482bc695055903705181a631665c210794e9b0bfd2bed5f",
-    "note": "Full packed exeGfxConfig/configStruct and enum domains reviewed; 413-byte persisted prefix versus 416-byte claimed allocation. B13: terminal name[24] at+188 is smaller than registry read31/write30; retail confirms start and request, so owner extent remains unresolved, not automatically enlarged."
+    "sha256": "a0a18a6f54c2237b32aa84abb66d51c2f52f98ae4d6b7d29f37685fc54b45335",
+    "note": "Full packed exeGfxConfig/configStruct and enum domains reviewed; 413-byte persisted prefix versus416-byte claimed allocation. O04 computer/human speeds now form real two-element array at offsets0/4; all setters/callers inspected and98-TU byte/relocation comparison passes. B13 terminal name[24] at+188 is smaller than registry read31/write30; extent remains unresolved, not automatically enlarged."
   },
   "src/BASE/BASEMGR.cpp": {
     "sha256": "32679850d68b15eb2e4d52448e034b6ffffdf71c7f08182dbb9a216107dc18ef",
