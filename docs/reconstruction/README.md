@@ -208,6 +208,11 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   length; caller payload limits, short/stale data, sender indices and heartbeat
   initialization need protocol evidence. `RemoteMain` clears30 bytes of a
   30-element integer ID table, not its full120 bytes; retail proof is pending.
+- C18: DirectPlay receive outputs now use SDK `DPID` locals, removing two
+  pointer casts and a scalar cast with [full native/retail proof](C18.md).
+- O04: twelve cursor accesses now index the actual two-element configuration
+  walk-speed array, with all preference/UI consumers updated and
+  [whole-build byte/relocation equivalence](O04.md).
 
 ## Build setup observations
 

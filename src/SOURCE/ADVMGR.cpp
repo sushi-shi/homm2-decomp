@@ -1323,7 +1323,7 @@ i32 advManager::Open(i32 id) {
         m_activeSoundMask = 0;
     }
 
-    GetCursorSampleSet(gConfig.walkSpeed);
+    GetCursorSampleSet(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]);
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->TurnOnAIMusic();
         SetNoDialogMenus(false);
@@ -10240,7 +10240,7 @@ void advManager::SystemOptions(void) {
         POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
-    prevWalkSpeed = gConfig.walkSpeed;
+    prevWalkSpeed = gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)];
     oldInterfaceMode = gConfig.evilInterfaceUsage;
     heroMobile = m_heroContextLocked;
     bPrefsChanged = false;
@@ -10259,11 +10259,11 @@ void advManager::SystemOptions(void) {
     gpWindowManager->DoDialog(cPanel, SystemOptionsHandler, 0);
     delete cPanel;
 
-    if (gConfig.walkSpeed != prevWalkSpeed) {
+    if (gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)] != prevWalkSpeed) {
         for (n = 0; n < CURSOR_SAMPLE_COUNT; ++n) {
             gpResourceManager->Dispose(m_cursorSamples[n]);
         }
-        GetCursorSampleSet(gConfig.walkSpeed);
+        GetCursorSampleSet(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]);
     }
     if (bPrefsChanged) {
         WritePrefs();
@@ -10292,7 +10292,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
     msg.payload.widget.data.value =
-        IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+        IDX(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
@@ -10314,7 +10314,7 @@ void UpdateSystemOptions(i32 initialDraw) {
         msg.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     } else {
         msg.payload.widget.data.value =
-            IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+            IDX(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     }
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
@@ -10341,7 +10341,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
         IDX(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
+    msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)])];
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id =
         IDX(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -10356,7 +10356,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     if (gConfig.blackoutComputer != 0) {
         msg.payload.widget.data.text = "\xcd\xe5 \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xf2\xfc";
     } else {
-        msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
+        msg.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)])];
     }
     cPanel->BroadcastMessage(msg);
     msg.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -10521,8 +10521,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_HERO_SPEED:
-                            ++gConfig.walkSpeed;
-                            gConfig.walkSpeed %= CONFIG_WALK_SPEED_COUNT;
+                            ++gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)];
+                            gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)] %= CONFIG_WALK_SPEED_COUNT;
                             preferencesChanged = true;
                             bPrefsChanged = true;
                             break;
@@ -10530,9 +10530,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         case SYSTEM_OPTION_COMPUTER_SPEED:
                             if (gConfig.blackoutComputer) {
                                 gConfig.blackoutComputer = false;
-                                gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_NORMAL;
-                            } else if (gConfig.computerWalkSpeed < CONFIG_WALK_SPEED_INSTANT) {
-                                ++gConfig.computerWalkSpeed;
+                                gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)] = CONFIG_WALK_SPEED_NORMAL;
+                            } else if (gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)] < CONFIG_WALK_SPEED_INSTANT) {
+                                ++gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)];
                             } else {
                                 gConfig.blackoutComputer = true;
                             }

@@ -571,9 +571,9 @@ void SetGameDefaults(void) {
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
-    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)] = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
-    gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
+    gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)] = CONFIG_WALK_SPEED_FAST;
     // Неизвестный герой
     strcpy(
         gConfig.networkDefaultName,
@@ -685,7 +685,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL WalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -693,7 +693,7 @@ void ReadPrefsFromRegistry(void) {
             "HMM2POL ComputerWalkSpeed",
             NULL,
             &dwType,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             &dwcbData
         );
         RegQueryValueExA(
@@ -1119,7 +1119,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL WalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
@@ -1127,7 +1127,7 @@ void WritePrefsToRegistry(void) {
             "HMM2POL ComputerWalkSpeed",
             0,
             REG_DWORD,
-            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            reinterpret_cast<u8*>(&gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_COMPUTER)]),
             REGISTRY_DWORD_BYTES
         );
         RegSetValueExA(
