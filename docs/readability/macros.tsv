@@ -1,68 +1,68 @@
 path	line	end	name	status	body_sha256	review
-include/BASE/BITS.h	2	2	HOMM2_BITS_H	unread	afb9fab55cc5bf725d89a6e6570d9bc0e793caa4bc98a7fb1c2ffb6e1e450a27	-
-include/BASE/Blur.h	2	2	HOMM2_BLUR_H	unread	b430b3a17dc75c409bac93e1bd4d6bdd2191e10c42d0455f2a40bf0bf5d6eaa4	-
+include/BASE/BITS.h	2	2	HOMM2_BITS_H	read	afb9fab55cc5bf725d89a6e6570d9bc0e793caa4bc98a7fb1c2ffb6e1e450a27	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/Blur.h	2	2	HOMM2_BLUR_H	read	b430b3a17dc75c409bac93e1bd4d6bdd2191e10c42d0455f2a40bf0bf5d6eaa4	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/Bzip.h	2	2	HOMM2_BASE_BZIP_H	unread	a1c4517d9edf57ac21c9816410bb696bf81a2ee9e3ae30a0b5e5b6d5bd867f37	-
 include/BASE/Bzip.h	16	16	MAX_SYMBOLS	unread	ee59278788f28f0ee9b448b2b04086891dd50615d07235641bd3b313dadaee9c	-
-include/BASE/DebugCheck.h	2	2	HOMM2_DEBUGCHECK_H	unread	4a87ec766f5edc3ffd4125426e3423cfc18b01ce00d0a6b7feaac6e92d3b7c74	-
-include/BASE/EXEC_TYPES.h	2	2	HOMM2_BASE_EXEC_TYPES_H	unread	39b5e135d3b9e2eac80262410f36f1430c4db1f282b577f8307f320100957d7c	-
-include/BASE/INPUTMGR.h	2	2	HOMM2_INPUTMGR_H	unread	a7cfc2edb71398c54ee18e410033eca895a844e078fb69e766ba29b06c6206ac	-
-include/BASE/Icon2b.h	2	2	HOMM2_ICON2B_H	unread	4e8b5732e53edcd820f9fed15cfadd245ce94f50367e8d9497db916d68f4df1a	-
-include/BASE/IconDraw.h	2	2	HOMM2_BASE_ICONDRAW_H	unread	7c2afcd3ddbac66f7a39192d1c53d267c8b0dfb319133fae62de3a79631b12f3	-
-include/BASE/IconEntry.h	2	2	HOMM2_BASE_ICONENTRY_H	unread	5a805de2a1b53ac832226fc27519388ff116dd1309d4a8b652e3f900c64458fc	-
-include/BASE/IconMonoRle.h	2	2	HOMM2_BASE_ICONMONORLE_H	unread	1860b80b54e966447a844ce6a4a4b8c2154e031aef4a7e18de6abea07d6b86f4	-
-include/BASE/IconRle.h	2	2	HOMM2_BASE_ICONRLE_H	unread	6ca3501322382d5aba11b82c8450bf212b62079cc626fe5f355c8e2849719423	-
-include/BASE/IconShear.h	2	2	HOMM2_BASE_ICONSHEAR_H	unread	baa4e8d49c3702e4ad58be41e81cbd176366c08aa2e0c9deb54c18603cb9c78b	-
-include/BASE/Icond2b.h	2	2	HOMM2_ICOND2B_H	unread	39ac656a2bfdb9d427fb89aaa2075b8e00ded92e411ac342dd20b4e1e8d0a192	-
-include/BASE/Icondf2b.h	2	2	HOMM2_ICONDF2B_H	unread	11eb4559b65049be273de0e7aee7cc0fca0d35fe0e7e4fd8aa7c19c2785aefb0	-
-include/BASE/Iconf2b.h	2	2	HOMM2_ICONF2B_H	unread	1d3e1f1c1b3228959d99a5ba98288e646d183ed9dc500787287f05b3d38f8aa5	-
-include/BASE/Iconm2b.h	2	2	HOMM2_ICONM2B_H	unread	63c172b8a37f8ccfff8374ea30a3dafa116f16774563564cf9d224a8223de48c	-
-include/BASE/Iconmf2b.h	2	2	HOMM2_ICONMF2B_H	unread	0b4b923aa6ea96e553208e1e8c2f86c69c0b1a8e45bc4819aabc4cfa24db763e	-
-include/BASE/MIDIWrap.h	2	2	HOMM2_BASE_MIDIWRAP_H	unread	7292feb10412ba9399bab685efece0096e474dba55d9b64deb2e907a93c55e6b	-
-include/BASE/Midi.h	2	2	HOMM2_BASE_MIDI_H	unread	baf55c7015ad76e5573af0924d3db597e81a6bd2ce17f1a1ffa2ac98415f2835	-
+include/BASE/DebugCheck.h	2	2	HOMM2_DEBUGCHECK_H	read	4a87ec766f5edc3ffd4125426e3423cfc18b01ce00d0a6b7feaac6e92d3b7c74	B07: complete empty DebugCheck inline; no helper extraction needed
+include/BASE/EXEC_TYPES.h	2	2	HOMM2_BASE_EXEC_TYPES_H	read	39b5e135d3b9e2eac80262410f36f1430c4db1f282b577f8307f320100957d7c	B03: complete manager contracts, flags, state and declarations; no bodies
+include/BASE/INPUTMGR.h	2	2	HOMM2_INPUTMGR_H	read	a7cfc2edb71398c54ee18e410033eca895a844e078fb69e766ba29b06c6206ac	B07: complete input/cursor layouts, scan domain and declarations; no bodies
+include/BASE/Icon2b.h	2	2	HOMM2_ICON2B_H	read	4e8b5732e53edcd820f9fed15cfadd245ce94f50367e8d9497db916d68f4df1a	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/IconDraw.h	2	2	HOMM2_BASE_ICONDRAW_H	read	7c2afcd3ddbac66f7a39192d1c53d267c8b0dfb319133fae62de3a79631b12f3	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/IconEntry.h	2	2	HOMM2_BASE_ICONENTRY_H	read	5a805de2a1b53ac832226fc27519388ff116dd1309d4a8b652e3f900c64458fc	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/IconMonoRle.h	2	2	HOMM2_BASE_ICONMONORLE_H	read	1860b80b54e966447a844ce6a4a4b8c2154e031aef4a7e18de6abea07d6b86f4	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/IconRle.h	2	2	HOMM2_BASE_ICONRLE_H	read	6ca3501322382d5aba11b82c8450bf212b62079cc626fe5f355c8e2849719423	B05: complete command domains and ReadIconRleByte inline; H12
+include/BASE/IconShear.h	2	2	HOMM2_BASE_ICONSHEAR_H	read	baa4e8d49c3702e4ad58be41e81cbd176366c08aa2e0c9deb54c18603cb9c78b	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/Icond2b.h	2	2	HOMM2_ICOND2B_H	read	39ac656a2bfdb9d427fb89aaa2075b8e00ded92e411ac342dd20b4e1e8d0a192	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/Icondf2b.h	2	2	HOMM2_ICONDF2B_H	read	11eb4559b65049be273de0e7aee7cc0fca0d35fe0e7e4fd8aa7c19c2785aefb0	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/Iconf2b.h	2	2	HOMM2_ICONF2B_H	read	1d3e1f1c1b3228959d99a5ba98288e646d183ed9dc500787287f05b3d38f8aa5	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/Iconm2b.h	2	2	HOMM2_ICONM2B_H	read	63c172b8a37f8ccfff8374ea30a3dafa116f16774563564cf9d224a8223de48c	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/Iconmf2b.h	2	2	HOMM2_ICONMF2B_H	read	0b4b923aa6ea96e553208e1e8c2f86c69c0b1a8e45bc4819aabc4cfa24db763e	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/MIDIWrap.h	2	2	HOMM2_BASE_MIDIWRAP_H	read	7292feb10412ba9399bab685efece0096e474dba55d9b64deb2e907a93c55e6b	B06: complete audio resource/format/sequence/flag declarations; no bodies
+include/BASE/Midi.h	2	2	HOMM2_BASE_MIDI_H	read	baf55c7015ad76e5573af0924d3db597e81a6bd2ce17f1a1ffa2ac98415f2835	B06: complete audio resource/format/sequence/flag declarations; no bodies
 include/BASE/Misc.h	2	2	HOMM2_MISC_H	unread	482518d4ab0a10c69eb4959e8e1684d910373ad4bfe401a1fee5092317b5e913	-
 include/BASE/Misc.h	51	51	HOMM2_BASE_ICONENTRY_NO_SIZE	unread	65650d10e7333d43a78c5090935b6b2668df70794cca8f15bbc53dc26575c303	-
 include/BASE/Misc.h	82	82	H2_ALLOC	unread	4eebded6306a9d59611b5a623c64c7c4174214beb9cf975e0fec2f27af476429	-
 include/BASE/Misc.h	83	83	H2_FREE	unread	8153c6b7ad591c33ba99675aae231e166b320ac4aa4b34b265961a0740f1cd00	-
 include/BASE/Misc.h	84	85	H2_ASSERT	unread	e366186a24f5f161f6f8cba4195b5adec4c778a3fd528575ccdb35491079cfde	-
 include/BASE/MiscEnums.h	2	2	HOMM2_MISC_ENUMS_H	unread	7e1db33c33726ac3f207393ebcd1c3e3d6fb4377f2e8e334c74bef8441d60bdf	-
-include/BASE/MiscGraphicsConstants.h	2	2	HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H	unread	0e388cd58ace005f5cb76bb45f60378269392c476a925a119258416c5b2aa087	-
-include/BASE/MusicFlags.h	2	2	HOMM2_BASE_MUSICFLAGS_H	unread	f5447db12870e1030695dd0706fe83b2d8e8310142d864537dce906f9ded5da4	-
-include/BASE/Ripple.h	2	2	HOMM2_RIPPLE_H	unread	78d43eb9107e1f6adcf67e2b4dbcb7389eeec782ce8a5cc90fb38e48c517a9e5	-
-include/BASE/TILE.h	2	2	HOMM2_TILE_H	unread	d895e09064aea8f85cee4507bd7f1dd8997476f534a620e09591a8576d1038cc	-
-include/BASE/WINMGR.h	2	2	HOMM2_WINMGR_H	unread	6a3aece4e93c8b12803b38c6ab4b1f11f8ed9efb6e94a974febfbbc127721f9f	-
-include/BASE/baseManager.h	2	2	HOMM2_BASE_BASEMANAGER_H	unread	1c40d4a820b44ced6ad672a65c2d21efb0441d028fcf900f9229b8f6ef164e42	-
-include/BASE/bitmap.h	2	2	HOMM2_BASE_BITMAP_H	unread	8e55da07d8b76739c533f7b890af005bb3c5c85daabf4f1821bbd714bb5dbfcc	-
-include/BASE/bmap2.h	2	2	HOMM2_BMAP2_H	unread	c01b0e05a2450d10e9061fcca3a381cde77b87cff995765887d552fa33b08b27	-
+include/BASE/MiscGraphicsConstants.h	2	2	HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H	read	0e388cd58ace005f5cb76bb45f60378269392c476a925a119258416c5b2aa087	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/MusicFlags.h	2	2	HOMM2_BASE_MUSICFLAGS_H	read	f5447db12870e1030695dd0706fe83b2d8e8310142d864537dce906f9ded5da4	B06: complete audio resource/format/sequence/flag declarations; no bodies
+include/BASE/Ripple.h	2	2	HOMM2_RIPPLE_H	read	78d43eb9107e1f6adcf67e2b4dbcb7389eeec782ce8a5cc90fb38e48c517a9e5	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/TILE.h	2	2	HOMM2_TILE_H	read	d895e09064aea8f85cee4507bd7f1dd8997476f534a620e09591a8576d1038cc	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/WINMGR.h	2	2	HOMM2_WINMGR_H	read	6a3aece4e93c8b12803b38c6ab4b1f11f8ed9efb6e94a974febfbbc127721f9f	B03: complete manager contracts, flags, state and declarations; no bodies
+include/BASE/baseManager.h	2	2	HOMM2_BASE_BASEMANAGER_H	read	1c40d4a820b44ced6ad672a65c2d21efb0441d028fcf900f9229b8f6ef164e42	B03: complete layout/interface; Activate inline reconciled
+include/BASE/bitmap.h	2	2	HOMM2_BASE_BITMAP_H	read	8e55da07d8b76739c533f7b890af005bb3c5c85daabf4f1821bbd714bb5dbfcc	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/bmap2.h	2	2	HOMM2_BMAP2_H	read	c01b0e05a2450d10e9061fcca3a381cde77b87cff995765887d552fa33b08b27	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/border.h	2	2	HOMM2_BASE_BORDER_H	read	63851865aadcaaf65f376faa426e6cb5a507a65fe0012a5f637d8231b42be235	B02: complete declarations/layout; no bodies
 include/BASE/button.h	2	2	HOMM2_BASE_BUTTON_H	read	6f6150727e71eb611cb4040b7f7f1c4d850315a1370ad59f7ec066070487c9dd	B01: layout, signatures, selection mode; no function bodies
 include/BASE/dimmerWidget.h	2	2	HOMM2_BASE_DIMMERWIDGET_H	read	56a1c3b11be0511ab2359b85394bf9d65528125e6c92a6bb4fba457fcb04c7da	B02: complete declarations/layout; no bodies
 include/BASE/dropListWidget.h	2	2	HOMM2_BASE_DROPLISTWIDGET_H	read	5fbd356fad8b6fc0a858b88cc5803f7e65789d3c27fe185cd4e96aacfa9fbcb6	B02: complete declarations/layout and popup state; no bodies
-include/BASE/executive.h	2	2	HOMM2_BASE_EXECUTIVE_H	unread	47274605e8ffa4cf36d8ec6a7766c534480fbf0bcdb820900995bc13e9081168	-
-include/BASE/font.h	2	2	HOMM2_BASE_FONT_H	unread	8a84986b82789298a4bb1ec5cd5430768c18067907fad0539293141fc1424801	-
+include/BASE/executive.h	2	2	HOMM2_BASE_EXECUTIVE_H	read	47274605e8ffa4cf36d8ec6a7766c534480fbf0bcdb820900995bc13e9081168	B03: complete manager contracts, flags, state and declarations; no bodies
+include/BASE/font.h	2	2	HOMM2_BASE_FONT_H	read	8a84986b82789298a4bb1ec5cd5430768c18067907fad0539293141fc1424801	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/heroWindow.h	2	2	HOMM2_BASE_HEROWINDOW_H	read	5c65e1e3bef2397646455ee6e2f4958312ddd5d7328617fd865f01e0fca88a1f	B02: flags/state and widget ownership/draw APIs; no bodies
-include/BASE/heroWindowManager.h	2	2	HOMM2_BASE_HEROWINDOWMANAGER_H	unread	d02e8e3ac08212a3791f0dc5f5e525526daa02aae927e65ae2c4e9dd92c29b14	-
-include/BASE/icon.h	2	2	HOMM2_BASE_ICON_H	unread	bf135f534ce1ab949662a870844f888455a2eba00d45b6a4e02e20057114a5fd	-
-include/BASE/icon2bc.h	2	2	HOMM2_ICON2BC_H	unread	c5ca6914a07966ce8497aa9aee0ba95075c43306d8f62f8c763f529701bc7500	-
-include/BASE/icon2bs.h	2	2	HOMM2_ICON2BS_H	unread	e1a94043b14927d6686a8e5c0aa8b7a65482eb41308972ab0876c4e2d7c658f2	-
-include/BASE/icon2by.h	2	2	HOMM2_ICON2BY_H	unread	ebb1bef98a1c6a50aae69efc195ccf9d291f9720da71086f80564c57ae1d2903	-
+include/BASE/heroWindowManager.h	2	2	HOMM2_BASE_HEROWINDOWMANAGER_H	read	d02e8e3ac08212a3791f0dc5f5e525526daa02aae927e65ae2c4e9dd92c29b14	B03: complete manager contracts, flags, state and declarations; no bodies
+include/BASE/icon.h	2	2	HOMM2_BASE_ICON_H	read	bf135f534ce1ab949662a870844f888455a2eba00d45b6a4e02e20057114a5fd	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/icon2bc.h	2	2	HOMM2_ICON2BC_H	read	c5ca6914a07966ce8497aa9aee0ba95075c43306d8f62f8c763f529701bc7500	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/icon2bs.h	2	2	HOMM2_ICON2BS_H	read	e1a94043b14927d6686a8e5c0aa8b7a65482eb41308972ab0876c4e2d7c658f2	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/icon2by.h	2	2	HOMM2_ICON2BY_H	read	ebb1bef98a1c6a50aae69efc195ccf9d291f9720da71086f80564c57ae1d2903	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/BASE/iconWidget.h	2	2	HOMM2_BASE_ICONWIDGET_H	read	eed3b1656650dbb7bbb7bc86cfc109da44f61b3d871e7c4be1ca5c1c13db0964	B01: frame/orientation storage and resource overloads; no function bodies
-include/BASE/iconf2bc.h	2	2	HOMM2_ICONF2BC_H	unread	89239c5a8233b7c807d45032cf353bd045eb8a1f9a1cfea77d0d71976e6534f0	-
-include/BASE/iconf2by.h	2	2	HOMM2_ICONF2BY_H	unread	269c46cb6fe4463eda01c65b0c72589d82e08661787bb1c4bf090192717fc74b	-
-include/BASE/inputManager.h	2	2	HOMM2_BASE_INPUTMANAGER_H	unread	e32f0d1dfccdf7bfe6627b8828cf364d41debf558eeaba963e5c82b44e3063de	-
+include/BASE/iconf2bc.h	2	2	HOMM2_ICONF2BC_H	read	89239c5a8233b7c807d45032cf353bd045eb8a1f9a1cfea77d0d71976e6534f0	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/iconf2by.h	2	2	HOMM2_ICONF2BY_H	read	269c46cb6fe4463eda01c65b0c72589d82e08661787bb1c4bf090192717fc74b	B05: complete decoder/encoding/palette contract declarations; no bodies
+include/BASE/inputManager.h	2	2	HOMM2_BASE_INPUTMANAGER_H	read	e32f0d1dfccdf7bfe6627b8828cf364d41debf558eeaba963e5c82b44e3063de	B07: complete input/cursor layouts, scan domain and declarations; no bodies
 include/BASE/listBoxWidget.h	2	2	HOMM2_BASE_LISTBOXWIDGET_H	read	b86aae0b39461534461f2c9343c31990a0f5aba27c2a56aa3e443b5f971296ce	B02: complete declarations/layout and i16/i32 state boundaries; no bodies
 include/BASE/message.h	2	2	HOMM2_BASE_MESSAGE_H	read	4301aad8f47d9d9969410759cfa841e94e2bda23eba2f84cf1be77206dd52969	B01: complete enum/union protocol; H01 owner; no function bodies
-include/BASE/miscwin.h	2	2	HOMM2_MISCWIN_H	unread	43018e8b3a21588db3e2608677823bbdd9eec62e1f88defc3f84bc9b47c120f3	-
-include/BASE/mouseManager.h	2	2	HOMM2_BASE_MOUSEMANAGER_H	unread	5dfd189955c70d5c487afed334630de899c2cc41d1f08901cac6885337d36062	-
-include/BASE/palette.h	2	2	HOMM2_BASE_PALETTE_H	unread	2aa81f5979af92c9d0bedfc7d73b1ede99342b85951b070085c31ef04fa5a54b	-
+include/BASE/miscwin.h	2	2	HOMM2_MISCWIN_H	read	43018e8b3a21588db3e2608677823bbdd9eec62e1f88defc3f84bc9b47c120f3	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
+include/BASE/mouseManager.h	2	2	HOMM2_BASE_MOUSEMANAGER_H	read	5dfd189955c70d5c487afed334630de899c2cc41d1f08901cac6885337d36062	B07: complete input/cursor layouts, scan domain and declarations; no bodies
+include/BASE/palette.h	2	2	HOMM2_BASE_PALETTE_H	read	2aa81f5979af92c9d0bedfc7d73b1ede99342b85951b070085c31ef04fa5a54b	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/resource.h	2	2	HOMM2_BASE_RESOURCE_H	read	8e440a2f26fe85a8f2969cfbceba7c7415f4463fccbd2a7d7bcf6d0a56f85be9	B02: categories, refcount sentinels and intrusive next link; no bodies
 include/BASE/resourceManager.h	2	2	HOMM2_BASE_RESOURCEMANAGER_H	read	e78b83d64f20474324fcebc42185bfde9871b89ec010c2b9462c3b9b1d8eb0f9	B02: aggregate layout, typed cache API and global save-position stack; no bodies
-include/BASE/sample.h	2	2	HOMM2_BASE_SAMPLE_H	unread	454b82c68db458be6783ab1082e2d72b2c5a5be1214a644c8db2e1c8150d04ed	-
-include/BASE/sampleData.h	2	2	HOMM2_BASE_SAMPLEDATA_H	unread	93fdd84d70c4c57ca5e0f6596f96bc04e9e3aa4b24706690be800b5da20a364d	-
-include/BASE/soundBackends.h	2	2	HOMM2_BASE_SOUNDBACKENDS_H	unread	96715784d419fcf1479a452791d926fcb97b709545570413ec688f5f5213cb6a	-
-include/BASE/soundManager.h	2	2	HOMM2_BASE_SOUNDMANAGER_H	unread	84e1abf512cf6f932f7fba85e00fa42540489014d5afb0f7aefd26a0efd1f9b5	-
+include/BASE/sample.h	2	2	HOMM2_BASE_SAMPLE_H	read	454b82c68db458be6783ab1082e2d72b2c5a5be1214a644c8db2e1c8150d04ed	B06: complete audio resource/format/sequence/flag declarations; no bodies
+include/BASE/sampleData.h	2	2	HOMM2_BASE_SAMPLEDATA_H	read	93fdd84d70c4c57ca5e0f6596f96bc04e9e3aa4b24706690be800b5da20a364d	B06: complete audio resource/format/sequence/flag declarations; no bodies
+include/BASE/soundBackends.h	2	2	HOMM2_BASE_SOUNDBACKENDS_H	read	96715784d419fcf1479a452791d926fcb97b709545570413ec688f5f5213cb6a	B06: complete backend contracts and AudiereSampleNode constructor body; R08
+include/BASE/soundManager.h	2	2	HOMM2_BASE_SOUNDMANAGER_H	read	84e1abf512cf6f932f7fba85e00fa42540489014d5afb0f7aefd26a0efd1f9b5	B06: complete layout/flags and five readiness/save/restore inlines; R08
 include/BASE/textEntryWidget.h	2	2	HOMM2_BASE_TEXTENTRYWIDGET_H	read	6bef1c47e2c930c1527a65a44783c4fb25146ae49285905006237684db824fff	B02: complete declarations/layout/read modes; no bodies
 include/BASE/textWidget.h	2	2	HOMM2_BASE_TEXTWIDGET_H	read	0f6880e5473fd6443558e268f62fef3061f66578d3f327f13d4e9e1c61519d05	B01: layout, color/alignment storage, setters; no function bodies
-include/BASE/tileset.h	2	2	HOMM2_BASE_TILESET_H	unread	16984211cdba4d5f870f0b01c595754a2d9f4dbca2e1089a2d5ff685eb222d51	-
+include/BASE/tileset.h	2	2	HOMM2_BASE_TILESET_H	read	16984211cdba4d5f870f0b01c595754a2d9f4dbca2e1089a2d5ff685eb222d51	B04: complete graphics owner declarations, layout/constants and call contract; no bodies
 include/BASE/widget.h	2	2	HOMM2_BASE_WIDGET_H	read	af1de48736575a95c7bc1e62d828931dc8dbdc59462c35bea7bb373249a063e2	B01: flags and i16 geometry; H02/H03 owner; no function bodies
 include/BASE/widgetKind.h	2	2	HOMM2_BASE_WIDGET_KIND_H	read	dba4c4f57187ea160116561d44b1fc93a03bac069b7f5359b2251059eda83cb4	B01: full widget kind domain; no function bodies
 include/EDITOR/fullMap.h	2	2	HOMM2_EDITOR_FULLMAP_H	unread	498588c1cf0b2087926d7d1fa7e3d8837f9c2fcbf8aa3c31233ab9dbdb2075b3	-
@@ -201,7 +201,7 @@ include/SOURCE/combatTypes.h	78	78	OppositeArmyFacing	unread	e2fa716e1ac6af3a2ff
 include/SOURCE/combatTypes.h	79	79	ArmyFacingForSide	unread	7f6d57739fc117ce67044f6b2471254e7d1e3631c2fe386f7ddc5ea52f083618	-
 include/SOURCE/combatTypes.h	80	80	ArmyFacingRearHexOffset	unread	f4328734189895e8bc1dfdba4d2d8fd58b61982310476fbf62286e8b0ad8f56b	-
 include/SOURCE/comwin.h	2	2	HOMM2_COMWIN_H	unread	7f1e9d196b0019f39d75fb47de72f298849ec84d7a66f735802a60982504c0d5	-
-include/SOURCE/dimPalette.h	2	2	HOMM2_SOURCE_DIMPALETTE_H	unread	e422cb98242070fb2605dfb0bdce8181f660020359cc0ee85980cdda78540bc1	-
+include/SOURCE/dimPalette.h	2	2	HOMM2_SOURCE_DIMPALETTE_H	read	e422cb98242070fb2605dfb0bdce8181f660020359cc0ee85980cdda78540bc1	B05: complete decoder/encoding/palette contract declarations; no bodies
 include/SOURCE/dpnetwin.h	2	2	HOMM2_DPNETWIN_H	unread	7fce4c626e462c431f24758f99b10e6cd5d6560c7ad80dcbae4a66809ace8687	-
 include/SOURCE/fileRequester.h	2	2	HOMM2_SOURCE_FILEREQUESTER_H	unread	dd1536400a60ac43df7b6873f40ec57265530c8381215960b57dc17954ab689f	-
 include/SOURCE/game.h	2	2	HOMM2_SOURCE_GAME_H	unread	9ec8edd8fbc580e39e0feed6208ef9ef30d11f925baf03b90a98b2b8061a4a23	-
@@ -247,7 +247,7 @@ include/va.h	48	48	SIZE	unread	f6f1af66fbac2532cccf36118efeb58ae8eebb79e3dc9d9e4
 include/va.h	50	50	NEW_VA	unread	ab30d12abf77269bf37a5dfe162b1bdfc4a5c74988c252ad2b78bef04a042e56	-
 include/va.h	51	51	NEW_SIZE	unread	18aec4722b3429560486fdfa063a72aef3dbb4869292122a89f795efa94d04d8	-
 src/BASE/BUTTON.cpp	103	106	SET_WIDGET_MESSAGE	read	f2251e824f97673a602adebd9b51266aa66672f42e7028d387f4df4491d5bdd3	B01: 9 bodies; H01-H04; selection/modifier ordering retained; R01
-src/BASE/Blur.cpp	30	36	BLUR_TAP_SUM	unread	d8e9becfdd955d7e485e8b37f2dd788d6fd3ff945d11bbe9dbabf2cb55938c8f	-
+src/BASE/Blur.cpp	30	36	BLUR_TAP_SUM	read	d8e9becfdd955d7e485e8b37f2dd788d6fd3ff945d11bbe9dbabf2cb55938c8f	B04: 1 body; tap-sum macro, channel remap, signed narrow then upper/lower clamp; H07/R07
 src/BASE/Bzip.cpp	14	14	True	unread	47c7bd1bb57602f26d9c8402b52164a422a81f4b06fc5002682eef92c6b58adc	-
 src/BASE/Bzip.cpp	15	15	False	unread	643c59cc5fdc6645d474a93be33eb1a1228708bd09c2db43882bff7cab28cf11	-
 src/BASE/Bzip.cpp	16	20	ERROR_IF_EOF	unread	399bac97c6ecd93c854cd4f50351ebddece4bdae9be799cdae7d1fdec103bb40	-
@@ -294,23 +294,23 @@ src/BASE/Bzip.cpp	1042	1042	ISORT_BELOW	unread	1e1358c2a69a1952812f8c778083eb469
 src/BASE/Bzip.cpp	1043	1043	RC	unread	19bb20432ae5597091e68ca5111746158195ff98ae00d41db992a7a92bdcd1b5	-
 src/BASE/Bzip.cpp	1044	1051	SWAP	unread	117ea251b08bc8e35fb5d1ac322cb866bf3b97d49673f3f48ab553cc49ba099d	-
 src/BASE/Bzip.cpp	1376	1376	SPOT_BASIS_STEP	unread	819d5c098db5809e3e61ccbc4e58d6297d2969cf5019f31489e49e8f38dac826	-
-src/BASE/EXEC.cpp	43	43	gExecutiveText	unread	d2c24d8a135d56b5f593e0dc3b28e836f65cd52939149f35b1346e716fb6ba70	-
-src/BASE/INPUTMGR.cpp	22	22	EncodeScanCode	unread	e539f5b2cb74e8c630a585c5a6b3801322b8b521389ba467025e16dd4f203301	-
-src/BASE/MOUSEMGR.cpp	17	17	MOUSE_CURSOR_MASK_SHIFT	unread	7f760fb307514ebaec45a9716a77184888f06d5828d6a271257fa24a4c86034e	-
-src/BASE/MOUSEMGR.cpp	18	18	MOUSE_MANAGER_SOURCE_FILE	unread	c266067a258427b568feb7e625b540ee538b57ccb73b35938c583487b0e78305	-
-src/BASE/MOUSEMGR.cpp	19	19	MOUSE_MANAGER_NAME	unread	e8c727977fb4209b2d1d052b2b0326071e9a63c0a4ac358f7cab92407bed648e	-
-src/BASE/MOUSEMGR.cpp	20	20	MOUSE_MANAGER_ADVENTURE_ICON	unread	667dac933953348e55b37e04dc0fdff61c200bb8b08cbb9d2ab68bf8420dacd7	-
-src/BASE/MOUSEMGR.cpp	21	21	MOUSE_MANAGER_SPELL_ICON	unread	39c1f994563c7b0eb60d94cb19031177c5570b2c1c92f553d248637bc90f98d5	-
-src/BASE/MOUSEMGR.cpp	22	22	MOUSE_MANAGER_COMBAT_ICON	unread	79e44ff5dbc3095ac4f829c4af192bc2338f654f6033fb0da467747fa0af4588	-
-src/BASE/MOUSEMGR.cpp	23	23	MOUSE_MANAGER_ADVENTURE_BITMAP	unread	4a9d590d05440300e398098e1a2fe0f452374bd63488e1f308c1fa78142abdcd	-
-src/BASE/MOUSEMGR.cpp	24	24	MOUSE_MANAGER_SPELL_BITMAP	unread	880d7eb092868343ca3df7cd8231037e506b60fa8b3358aba979202bc2c66cf1	-
-src/BASE/MOUSEMGR.cpp	25	25	MOUSE_MANAGER_COMBAT_BITMAP	unread	fdec402ce10b938d6c34e5258fcfae13408c08bee43778f588f4e4e052cd63b1	-
+src/BASE/EXEC.cpp	43	43	gExecutiveText	read	d2c24d8a135d56b5f593e0dc3b28e836f65cd52939149f35b1346e716fb6ba70	B03: 10 bodies; manager priority/list lifecycle and complete modal/main dispatch; R04/R05
+src/BASE/INPUTMGR.cpp	22	22	EncodeScanCode	read	e539f5b2cb74e8c630a585c5a6b3801322b8b521389ba467025e16dd4f203301	B07: 18 bodies incl two private inlines; full input conversion/ring/table/cursor checks; H13/H14; R09
+src/BASE/MOUSEMGR.cpp	17	17	MOUSE_CURSOR_MASK_SHIFT	read	7f760fb307514ebaec45a9716a77184888f06d5828d6a271257fa24a4c86034e	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	18	18	MOUSE_MANAGER_SOURCE_FILE	read	c266067a258427b568feb7e625b540ee538b57ccb73b35938c583487b0e78305	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	19	19	MOUSE_MANAGER_NAME	read	e8c727977fb4209b2d1d052b2b0326071e9a63c0a4ac358f7cab92407bed648e	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	20	20	MOUSE_MANAGER_ADVENTURE_ICON	read	667dac933953348e55b37e04dc0fdff61c200bb8b08cbb9d2ab68bf8420dacd7	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	21	21	MOUSE_MANAGER_SPELL_ICON	read	39c1f994563c7b0eb60d94cb19031177c5570b2c1c92f553d248637bc90f98d5	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	22	22	MOUSE_MANAGER_COMBAT_ICON	read	79e44ff5dbc3095ac4f829c4af192bc2338f654f6033fb0da467747fa0af4588	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	23	23	MOUSE_MANAGER_ADVENTURE_BITMAP	read	4a9d590d05440300e398098e1a2fe0f452374bd63488e1f308c1fa78142abdcd	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	24	24	MOUSE_MANAGER_SPELL_BITMAP	read	880d7eb092868343ca3df7cd8231037e506b60fa8b3358aba979202bc2c66cf1	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
+src/BASE/MOUSEMGR.cpp	25	25	MOUSE_MANAGER_COMBAT_BITMAP	read	fdec402ce10b938d6c34e5258fcfae13408c08bee43778f588f4e4e052cd63b1	B07: 17 bodies; full native/software cursor setup/update/hide/restore and masks; H04/H13/H14; R09
 src/BASE/Misc.cpp	1	1	HOMM2_MISC_INLINE_ICONENTRY	unread	217bc462a50b69fa2de39785711fe85d9e9255baa8ba657f2b4ebba70a851c0a	-
 src/BASE/Misc.cpp	14	14	MISC_REGISTRY_KEY	unread	89c517f4c7cc6eacaa98ad2847aaebb53c28fa03c88a65c8ed35fce66ddb3853	-
 src/BASE/TEXTWDGT.cpp	74	77	SET_WIDGET_MESSAGE	read	f2251e824f97673a602adebd9b51266aa66672f42e7028d387f4df4491d5bdd3	B01: 8 bodies; H01-H04; text ownership and union modifier preservation
-src/BASE/WINMGR.cpp	63	63	DATA	unread	dd38e3def69eb4e0bff3bdb4b4a40ee4dae8fd88e2851c22f87bd82831616752	-
-src/BASE/WINMGR.cpp	65	65	DATA	unread	52e207aad98d607e276e9e3d8ad8eafc54cf5860aaa7e96936b1591ec8f2e0f5	-
-src/BASE/soundmgr.cpp	47	47	NORMALIZED_VOLUME_MAX	unread	2d3e0b2a9678f499efceac31b476b52bc9ec496f3656daa4928b2b248848d380	-
+src/BASE/WINMGR.cpp	63	63	DATA	read	dd38e3def69eb4e0bff3bdb4b4a40ee4dae8fd88e2851c22f87bd82831616752	B03: 22 bodies; window dispatch, focus, draw/fade/fizzle/cycles; H09/H10; R04/R05/R07
+src/BASE/WINMGR.cpp	65	65	DATA	read	52e207aad98d607e276e9e3d8ad8eafc54cf5860aaa7e96936b1591ec8f2e0f5	B03: 22 bodies; window dispatch, focus, draw/fade/fizzle/cycles; H09/H10; R04/R05/R07
+src/BASE/soundmgr.cpp	47	47	NORMALIZED_VOLUME_MAX	read	2d3e0b2a9678f499efceac31b476b52bc9ec496f3656daa4928b2b248848d380	B06: 22 bodies; both backend selection/failure/dispatch, full fade state machine; H07/H14; R08
 src/SOURCE/ADVMGR.cpp	963	963	ADVMGR_ENVIRONMENT_VOLUME	unread	624c01129c704a29e89c54f36c6bf78c1e6ec2293d60a937acb7ea1a4ddb2d91	-
 src/SOURCE/ADVMGR.cpp	964	965	ADVMGR_RADAR_LEFT_FLOAT	unread	c3709277603a13b2450d7a1f9f717cb344672ff21002bdad6f2ac0f34c940d56	-
 src/SOURCE/ADVMGR.cpp	966	967	ADVMGR_RADAR_TOP_FLOAT	unread	5b06720c6df4b19418301e6bc2d740d40074db482742ee5a4d53779e9f226b01	-
