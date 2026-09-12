@@ -6,6 +6,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 
 | pattern | one-line trigger |
 | :-- | :-- |
+| [single-word-count-reservation](single-word-count-reservation.md) | two-byte read/load in a four-byte aligned reservation permits a scalar count without a fictional second array element |
 | [user-dtor-out-of-line](user-dtor-out-of-line.md) | delete-site calls `??1X` instead of inlining it → X has a user-declared dtor defined out of line |
 | [implicit-dtor-no-vptr-store](implicit-dtor-no-vptr-store.md) | polymorphic dtor COMDAT with NO `mov [eax],OFFSET vftbl` → the destructor is compiler-generated, not user-declared |
 | [inline-call-in-arglist-hoists-temps](inline-call-in-arglist-hoists-temps.md) | a narrowing-conversion temp materialised before the trailing constant pushes → some OTHER argument of the same call is an inlined function call |

@@ -25,7 +25,7 @@ H2_ENUM_BEGIN(ResourceConstant)
     EVIL_TRANSLATION_COUNT  = 37,
     BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
-    FILE_COUNT_BUFFER_WORDS = 2,
+
     POSITION_STACK_DEPTH    = 10
 H2_ENUM_END(ResourceConstant)
 
@@ -309,7 +309,7 @@ void resourceManager::Close(void) {
 
 VA(0x004b89b0, 0x138)
 i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
-    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i16 fpCountBuffer;
     i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
@@ -335,8 +335,8 @@ i32 resourceManager::LoadAggregateHeader(H2_CONST char* aggregateName) {
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
-    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
+    read(m_aggregateFd[m_curAggregate], &fpCountBuffer, sizeof(i16));
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer;
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
