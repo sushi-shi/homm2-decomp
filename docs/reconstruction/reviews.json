@@ -1,4 +1,1044 @@
 {
+  "include/SOURCE/Modem.h:TruncateModemResponse(void)#1": {
+    "body_sha256": "cb8aeaa4a660dffb5ca168e5d5dabdb406104f3ff9a38b9bbeee2bff24baa550",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Fixed index17 fits the80-byte response owner; this is a real inline terminator store."
+  },
+  "src/SOURCE/Modem.cpp:ModemSetup(i32 mode)#1": {
+    "body_sha256": "4bf4efec4b115e36d87c249709c14f983b327a5c87e608117f4e2de009202902",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B37: initialization text is incorrectly used as an sprintf format, so its100-byte source extent alone cannot prove the104-byte destination safe. Config connection index/positive baud domain require lifecycle proof. Port narrowing is an explicit serial ABI conversion; fixed direct-connect message fits104."
+  },
+  "src/SOURCE/Modem.cpp:Dial(void)#1": {
+    "body_sha256": "068585772f9a3c5de0a286ca3e1aa85a0b89c18babe0b67a54ea033e5567c39c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Dial text prefix ATDT plus at most35 bytes in terminated numbuf[36] plus NUL fits40 exactly; SetupModemGame actually requests35-byte data-entry storage and copies at most34. Two gText messages fit its500 bytes. No artificial local aggregation."
+  },
+  "src/SOURCE/Modem.cpp:Wait(void)#1": {
+    "body_sha256": "bd8af103cc0bf3807433aad4cf72b232137b1c0449281fb512057d8e347f0726",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "All modem command/expected-response inputs are fixed ATA/RING/CONNECT literals, fitting40/80-byte receiving owners. GUI wait status flow is real."
+  },
+  "src/SOURCE/Modem.cpp:GUIModemCommand(char * message,char * command)#1": {
+    "body_sha256": "4a9795e4ce133d70912ca699ed13edec2d981251ce5b489b89f7b300793fb78c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Copies into40-byte command owner. Only Dial's bounded40-byte buffer and Wait's ATA literal call this helper; both fit. Borrowed dialog text is consumed synchronously."
+  },
+  "src/SOURCE/Modem.cpp:GUIModemCommandExec(void)#1": {
+    "body_sha256": "0a7ac16ec5e47a0f5c22502382d003e0f052a0c8c8d221373abed4d24290ab46",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Initialized position0 advances only below strlen of bounded cModemCommand; one-byte cursor writes remain in the string, followed by literal CR. Timer and position have related semantic roles."
+  },
+  "src/SOURCE/Modem.cpp:ModemCommand(char * command)#1": {
+    "body_sha256": "e80cb236b5ad6d0a7cf0cb5c569f278f7cf8b70ebc1c456a22b27b66e9bbabd8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "One-byte cursor traversal stays inside the terminated command; B37 requires that ModemSetup's format-driven output is valid. Explicit CR write is separate storage, not pointer fabrication."
+  },
+  "src/SOURCE/Modem.cpp:GUIModemResponse(char * message,char * response)#1": {
+    "body_sha256": "4d38512cd65bc6fb887953bd0fb7c124807f1d698101157393686db843096b98",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Clears80-byte accumulation owner and position then copies only RING/CONNECT expected literals from all callers; response strings fit80. No manual variadic slot access."
+  },
+  "src/SOURCE/Modem.cpp:GUIModemResponseExec(void)#1": {
+    "body_sha256": "7254a6b7350377186e3650c91da97dd999a9cc2f315f7aaa89760dc908f7964e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "G19 compareResponse goto can plausibly be structured; native matrix pending. Position starts0, append occurs only below79, and NUL at<=79 plus truncation at17 fit80; byte-to-char conversion preserves serial byte meaning."
+  },
+  "src/SOURCE/Modem.cpp:write_buffer(char * buffer,i32 length)#1": {
+    "body_sha256": "d04d003cf0f53867dd31045a13f1028160d97a273920522cba5821305cdbb41c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Length converts to the u16 serial ABI after out-queue test. B37/B39: all current callers send1 or a <=516-byte escaped packet, but signed-negative generic lengths and vestigial queue indices are not validated here; com_snd copies synchronously."
+  },
+  "src/SOURCE/Modem.cpp:read_byte(void)#1": {
+    "body_sha256": "2a137c6fa71911bb9c67c43b8046773c0bd329dc1ad587451d3bfabe29f7e0e8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "retain"
+    },
+    "note": "S22 applied: four-byte array replaced with one u8 value and &value. com_rcv(0,1) writes at most one byte; only a successful one-byte result is consumed. All18 emitted funcs/sections identical;51 retail bytes and ordered com_rcv call target exact."
+  },
+  "src/SOURCE/Modem.cpp:write_byte(i32 value)#1": {
+    "body_sha256": "dd7de3de46b9ea1660a41240a1088df307ed6c97beef6a84e59e82609ef2a46a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Serializes the low byte of an actual i32 object's address with length1 on target little-endian ABI. It neither reconstructs an owner nor reads beyond that object."
+  },
+  "src/SOURCE/Modem.cpp:Connect(void)#1": {
+    "body_sha256": "acfcf5b01c933fd7e012bcc8822932174ee10cf0cfa13cbecafb33beb4de1399",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S23 unread packetResult scalar. ReadPacket caps payload256 and packet owner268 permits terminal byte; ten-byte ID packet guards all indexed reads. Six-digit id fits8; signed byte stage yields at most four printed chars so idMessage20 fits. remoteidstr copies6 into8 with static-zero terminator tail."
+  },
+  "src/SOURCE/Modem.cpp:WaitForDirectConnect(void)#1": {
+    "body_sha256": "afb7f17f26c63bb0c25f6ab06abecdf826a2c2b0dae04e5d9578baa49fda30ac",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Three-stage handshake state machine; ReadPacket length<=256 fits packet268 terminator, exact10 guards ID/stage reads, local six-digit id fits8 and emitted message fits20. Pointer advances are offsets inside packet; no false stack aggregate."
+  },
+  "src/SOURCE/Modem.cpp:ReadPacket(void)#1": {
+    "body_sha256": "d77fdc4f407138cdcca5f09d6ddb6c473307313e622656f8cd89d97044b1e3ee",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "G20 restart/read-byte joins model escape framing and overflow discard; structured matrix pending. Payload guard before each store limits writes to0..255 in packet268; escape/restart resets length. Explicit byte-to-char storage conversion is meaningful."
+  },
+  "src/SOURCE/Modem.cpp:WriteModemPacket(char * buffer,i32 length)#1": {
+    "body_sha256": "3bcc47de2fb0303ef956bd390564b13cdaa646ab947b2c62e5428f45381b11a7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "For0<=length<=256, escaped storage max2+2*256+2=516 exactly fits. B37: negative length is not rejected and while(length--) would overrun; caller encoded-message length and modem's256-byte packet cap require transport review. Real encoded array retained."
+  },
+  "src/SOURCE/Netbios.cpp:InitNetHost(void)#1": {
+    "body_sha256": "cd847e3c6691843e4c0ea7263bad46dd3c4b1a0fe7f25acfce25015aca05c430",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S23 unused reserved scalar and oversized-but-real local name40 (H2H+five decimal digits+NUL <=9). Init/session index0 valid within7; signed return and byte-status/flag conversions preserve distinct ABI domains. needName evolves from query boolean to same registration-status test, not unrelated scratch."
+  },
+  "src/SOURCE/Netbios.cpp:InitNetGuest(void)#1": {
+    "body_sha256": "99014dadeabfbcd448e702ca78cd3387eb2db6ea24c9ac11366b1792111721db",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Guest local slot6 and receive slot0 fit7; local H2G+five digits+NUL <=9 fits40. Narrowing SDK status then enum interpretation is explicit API meaning. State transition and name-retry counters are real, not stack padding."
+  },
+  "src/SOURCE/Netbios.cpp:WaitForHost(void)#1": {
+    "body_sha256": "3e3f243c6d8d58ba3c95b77bd2b2363352861437c59cc1932f4696ebdead5ed7",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Reads status slot0 then tests ACTIVE; cast interprets low-byte session flags. No local aggregate or hidden pointer operation."
+  },
+  "src/SOURCE/Netbios.cpp:WaitForGuest(void)#1": {
+    "body_sha256": "0d556c03ea6ff86876f328c30e1a12f03d11491832dab634f1a9a0905f2acb0b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Listen slot6, broadcast slot0 and move6->1 stay inside7 session slots; detach1 is a promoted vararg integer. status evolves between result and same connection poll, not unrelated data reuse. B38 wildcard is inside callee, not an extent proof supplied by this caller."
+  },
+  "src/SOURCE/Netbios.cpp:nbnet_init(void)#1": {
+    "body_sha256": "bee205ca61c6b26e62de6dbbee6943c34d0fd5d9257770883299aca040c3bb40",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S23 unused local scalar. Fixed Russian status messages fit gText500; mode-selects host/guest asynchronous dialog stages and preserves cancel/shutdown flow."
+  },
+  "src/SOURCE/REMOTE.cpp:RemoteCleanup(void)#1": {
+    "body_sha256": "5d66cf004bcb45f70cbfecea298156a7712ecc5c4e747c4cb1ee14853066e651",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Reentrancy flags guard real backend cleanup. Scalar resets including repeated protocol flags are retail behavior, not source fake address/unused storage; no indexed memory region is formed here."
+  },
+  "src/SOURCE/REMOTE.cpp:RemoteMain(RemoteGameMode gameMode)#1": {
+    "body_sha256": "b64a5d5aefe0e4533a81ec3394dfafc238f09f2a4c174f41dbd4d7de084f04cc",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "C17 packed packet/player-info cast boundaries could use stronger owners after all consumers; G21 shared network-init switch tail; S26 unused playerState/setupCounter. B13/B41 external TCP/default-name lengths and unvalidated sender indices; memset iLastIds uses30 BYTES for30 i32s. gotPlayers6 is real and loop bounds depend on giNumHumanPlayers."
+  },
+  "src/SOURCE/REMOTE.cpp:UnloadRemoteDriver(i16 networkDriver)#1": {
+    "body_sha256": "590440858d29c0067f269bf934bc1670569ffcffdcd93ed3e0f375f50cfcbca1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Two-level backend dispatch calls com_term only with slot0; actual backend lifecycle selection, no pointer or storage trick."
+  },
+  "src/SOURCE/REMOTE.cpp:calc_crc_long(u8 * data,i32 length)#1": {
+    "body_sha256": "058899002e7edc3d2bc09c7eef350d7b3d3fa9b939cc26a0eacab74dfe92b3d2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S26 initialized but unread c local. Unsigned checksum/shift state is algorithmic; cursor walks length bytes. B41 negative length is not rejected and callers must supply initialized extents."
+  },
+  "src/SOURCE/REMOTE.cpp:calc_crc(u16 * crc,u8 * data,i32 length)#1": {
+    "body_sha256": "1d6a43f2d721374513483bd0406b152000df043379b440f9a48004040890e969",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Explicit low16 checksum truncation stores one u16 through actual output pointer. B41 checksum input extent comes from encoded/received message headers, not validated by this wrapper."
+  },
+  "src/SOURCE/REMOTE.cpp:EncodePacket(u8 * data,char source,char destination,i32 length)#1": {
+    "body_sha256": "097f5570d50a34d30d391d3c66d1b9d8cb8896343a28af4d2c97b54e4650d20a",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S25 applied: crc[2] is one u16 output with &crc; all16 native funcs/sections and125 retail bytes/10 ordered targets exact. C17 packed-byte header ownership remains; B41 length lacks guard for268-byte PacketSend/header6 and wire payloadSize is one byte."
+  },
+  "src/SOURCE/REMOTE.cpp:DecodePacket(u8 * data,i32)#1": {
+    "body_sha256": "aa79e3750d7e270bcf5c9c3356afacdd473284be4d75fe70187d288c570a4775",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "open"
+    },
+    "note": "S25 applied: crc2[2] is one u16 output; all16 native funcs/sections and269 retail bytes/full ordered targets exact. C17 packed-byte owner cast and S26 unused res remain. B41 ignores receive count; u8 length fits physical packet268 but short/stale data initialization is not validated."
+  },
+  "src/SOURCE/REMOTE.cpp:SendRemoteData(u8 * dataToSend,u8 *,i32 destination,i32 length)#1": {
+    "body_sha256": "d6b1ce9e40e4ca4afe42edbe82e2004614dbc2c8d0caf6999ba7a8a14ee4ed1b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G22 error exit goto with otherwise redundant send-status do loop; S26 unread retry plus wholly unused256-byte local packet. Narrow source/destination/session/length casts are transport ABI. B41 message maximum differs from modem's256-byte encoded-input limit; typed EncodePacket capacity unresolved."
+  },
+  "src/SOURCE/REMOTE.cpp:ReceiveRemoteData(u8 *,u8 * data,i32 decodeType)#1": {
+    "body_sha256": "625c6ddd73c89212141aec5652ed000b26732f19ac202ddd246ae072843a4fa4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "All backends receive at most266 into packet268; nb_rcv's first parameter is clearly capacity, not session. B41 receive count is discarded before DecodePacket, so physical buffer capacity is not proof of initialized header/payload length."
+  },
+  "src/SOURCE/REMOTE.cpp:TransmitRemoteData(char * data,i32 destination,i32 length,i8 command,i8 reliable,i8 allowRetryDialog,RemoteMessageType messageType)#1": {
+    "body_sha256": "5871bae68dd403e559c9102b836d9686af31c37f9f1a088d4e235e599346986d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real packed RemoteMessage256 owns9-byte header+247-byte payload; typed-byte serialization cast and wire-width conversions are meaningful. S26 unused j; B41 unchecked payload length, sizeof message limit and retry/confirm lifecycle need all callers. No invented variable reuse: rv/tries track transmission."
+  },
+  "src/SOURCE/REMOTE.cpp:GetRemoteData(i8 remove)#1": {
+    "body_sha256": "2979ff223fb509eb074397ca7d20cbdd88923a133daa1b7423a20ca6e51bc11f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Search visits128 queue entries within declared138; selected set only by an in-range occupied slot. Fixed256 copy fits268-byte output and PollRemote allocates256 per queued message. Extra ten queue slots S26 remain owner/header review, not permission to overindex."
+  },
+  "src/SOURCE/REMOTE.cpp:PollRemote(void)#1": {
+    "body_sha256": "554999ab6d80262c5b2bac411e84eeb941f877ab676852711d31e971aa23914e",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C17 byte-array message headers; G23 receive/retry and completion joins. Real host/guest exit records are complete semantic messages, not stack packing. B41 unchecked remote sender and player counts, stale short-packet bytes, heartbeat ID/extra byte initialization and full256 queue copy require protocol proof; queue loops themselves are bounded128/30."
+  },
+  "src/SOURCE/REMOTE.cpp:TransmitAndWait(char * bytes,i32 destination,i32 length,i8 command,i8 responseCommand,char ** response)#1": {
+    "body_sha256": "63b61d25bcb5ac96faf4dff0e19207b0c2baccaa9518c3d00103ce13b22a2ef5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G24 shared completion goto; S26 unusedResponseStatus assigned but unread. Real response pointer is borrowed static GetRemoteData storage, not recovered by pointer arithmetic; caller lifetime/nonnull output and B41 message lengths remain."
+  },
+  "src/SOURCE/SETUP.cpp:game::SetupComPort(void)#1": {
+    "body_sha256": "687872fd2b9c94011585e613e8c63ea91bd4e1af578212a355506aca5ccfdd7f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Full body reviewed: COM choices1..4 and positive baud helper; modem init entry has40-byte local, GetDataEntry(max40) zeroes40/copies39 and gConfig.modemInitString100 fits. Dynamic window is real owner; future use as printf format remains B37 in ModemSetup."
+  },
+  "src/SOURCE/comwin.cpp:add_node(struct tag_Anchor * anchor,struct tag_Node * node)#1": {
+    "body_sha256": "0991718304d1638a032669006eb1ede91aaabb440ff786ade493c5fbfa1a8224",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Real intrusive prev/next links in tag_Node; initializes appended links and head/tail. Com/network payload union is not touched or converted here. Caller supplies owned node/anchor."
+  },
+  "src/SOURCE/comwin.cpp:pop_node(struct tag_Anchor * anchor)#1": {
+    "body_sha256": "8f240ce7676179ac09abda222a09af8e419c249c6cc37e851e6fd04a0264705a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Returns current head, advances actual next and clears tail only on empty. New head.prev is not cleared; current queue consumers never traverse it, so this is semantic link behavior, not member-owner arithmetic."
+  },
+  "src/SOURCE/comwin.cpp:init_anchor(struct tag_Anchor * anchor,i32,i32)#1": {
+    "body_sha256": "8efd8fbb029a1cae29377dd6cc0492397b46b4c6c1d88b5968adb112f6e3db98",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes two actual anchor pointers. Unread ABI parameters remain part of external call contract, not artificial stack locals."
+  },
+  "src/SOURCE/comwin.cpp:ShutdownComError(char * function)#1": {
+    "body_sha256": "fb3dba70b64b321b7d036fbda6da93172fa9b2efc68574f189b4e992451491c3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Genuine-retail six error templates total406 bytes with six placeholder bytes. Known callers' function text<=35, error-name literals<=26, signed32 error digits<=11 give<=473 bytes including NUL in message500; errorName100 fits. All callers enumerated in comwin."
+  },
+  "src/SOURCE/comwin.cpp:com_init(u8 portNumber,ComBaudRate baudRate,i32 useDtr)#1": {
+    "body_sha256": "181ee0019351affb3a6bf3d38ba4c1fc25b6e5fdb1e0eefd17669b44dc8cdb7e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S23 unused err and ComPortState interior gaps. Real DCB/COMMTIMEOUTS output records retained. Local slot search bounds0..1, u8 port produces COMddd within12, explicit i16 return preserves ABI. B39 reset-of-all-handles/resource lifecycle and unchecked GetCommState results remain API behavior."
+  },
+  "src/SOURCE/comwin.cpp:com_term(i16 portIndex)#1": {
+    "body_sha256": "fb45b66e8a60b80dd1b8684cd20567abb4f03bb37177b49d1c50b8b0ac771530",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Only project caller passes port0; saved DCB/timeouts are real owned records and both actual queues are drained. No owner recovery from a member address."
+  },
+  "src/SOURCE/comwin.cpp:com_rcv(i16 portIndex,u16 requested,void * buffer)#1": {
+    "body_sha256": "a0f8bdb3c903e13cccc6584ccae461319e573982b61830535da4d493af95957b",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "applied",
+      "bounds": "retain"
+    },
+    "note": "C15 applied: DWORD bytesRead with &bytesRead replaces i16[2]+LPDWORD reinterpretation; explicit i16 return preserves low-word ABI. Only caller com_rcv(0,1,&u8) proves destination capacity. Full14 native funcs/sections equal;193 retail bytes and9 ordered targets exact."
+  },
+  "src/SOURCE/comwin.cpp:com_snd(i16 portIndex,u16,u16 length,void * data,i32 priority)#1": {
+    "body_sha256": "4c4e172715418b152d1cf8b909b23b25ee9e34b33ad13da9e4438311db6f3029",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Typed allocator conversion is necessary. Serial comData starts at real node offset10, while NetBIOS uses session+data at10/11, a meaningful protocol union. B40 variable-sized1-element tail copies beyond declared subarray but within allocated length+10; allocation/object representation needs explicit flexible-tail modeling, not buffer enlargement."
+  },
+  "src/SOURCE/comwin.cpp:com_sess(i32,i32,...)#1": {
+    "body_sha256": "b6d29f4b96ae406f912b75fcb8e49b4fcada1e93836221740a1698a31763b068",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "retain",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Variadic compatibility stub returns0 without reading any argument; no manual stack walk or va_start/va_end obligation is introduced."
+  },
+  "src/SOURCE/comwin.cpp:com_stat(i16 portIndex,u16)#1": {
+    "body_sha256": "8f5c1c9e4d3decbfd5c5feac95b22c0edaaa97927da899731300a11f205bcc51",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real DWORD GetCommModemStatus output and success guard; no project caller found, so generic signed portIndex0..1 remains B39 API precondition rather than a proven caller domain."
+  },
+  "src/SOURCE/comwin.cpp:comm_wrt_task(void)#1": {
+    "body_sha256": "b57afe15197c47e4f2614294d7e830f8521b45d49c6d9d147d88d209c0cf760d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real first-port owner and priority/normal queues. Payload cursor totalWritten bounded by node.len under successful Win32 write contract; B40 declared1-byte flexible tail and B39 zero-byte-success/API failure lifecycle remain. Callback result/total are related I/O state."
+  },
+  "src/SOURCE/netwin.cpp:is_netbios_avail(void)#1": {
+    "body_sha256": "c50b01954c2e09df79d9da0f7b89e1f7f4c51f472202621954a2c5c66b511b37",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Real64-byte control block cleared for each bounded adapter probe0..253; API protocol fields fit modeled layout. No fake stack aggregation."
+  },
+  "src/SOURCE/netwin.cpp:nb_init(u16 maxNames,u16 maxSessions)#1": {
+    "body_sha256": "cc5ca9e316ee5edfc82ba8ba8f15a0ca8e722342b9f900773d72d4e7def8e32a",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S23 unread result scalar; S24 ten-handle owner but only9 initialized/created. Full arrays7 initialized with sizeof; index0/6 supplied by all callers. Allocator void*->u8* is real byte-status output, API block/reset name slots0/2 bounded16."
+  },
+  "src/SOURCE/netwin.cpp:nb_term(void)#1": {
+    "body_sha256": "fdc9c9d1abd4e546a3b29f8764fdf3f8333ca6e2804467d755f25af13612d027",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "H2_UNUSED(block) is misleading but block IS used as real cancellation/delete-name API record. B40 successful-init lifecycle required for gNbMaxSess and critical sections; closes/zeros event handles then SetEvent(handles[0]) remains observed source behavior, not a cleanup authorization."
+  },
+  "src/SOURCE/netwin.cpp:nb_rcv(i16 session,void * buf)#1": {
+    "body_sha256": "09969f57544d09ad87e2f182dd65a415bda400be1b347568812d1ea5774d3db9",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "First parameter named session is actually capacity; sole caller passes266 into packet268. Min(node.len,capacity) bounds destination, but B40 node.data[1] models variable allocation and signed-negative generic capacity is unchecked. u16 cast is ABI comparison/return semantics."
+  },
+  "src/SOURCE/netwin.cpp:nb_snd(i16 session,i16 len,void * data)#1": {
+    "body_sha256": "76f6327487db1595034b5e3c1e8325adc4429993bbcf495cd839742846ff18dd",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Tagged serial/network node tail is meaningful. B40 signed session/length unchecked before table access and allocation len+11, then variable payload copy from caller. Callers use0/1/6 and encoded message sizes; full length proof is B41, not inferred from allocation."
+  },
+  "src/SOURCE/netwin.cpp:nb_sess(NetbiosSessionOperation operation,...)#1": {
+    "body_sha256": "eb4a03c306c7bfc30deffb03af9b2a4eba78468bd254fea9251ed8fc09175425",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "retain",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "V01 retain with portability debt: typed SDK va_arg already used, all-exit va_end matrix grows1223->1254 bytes by emitted pointer-clear stores. Original1223 bytes and83 ordered targets (including11 proven same-function labels) exactly match genuine retail. B38 wildcard overread and B40 operation/session contracts remain."
+  },
+  "src/SOURCE/netwin.cpp:nb_stat(i16 session)#1": {
+    "body_sha256": "b339ae1372b66ca4c2aca15af3524aecdbf13ef5bac75e442ac9ae82275c9dc1",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Only setup callers query slots0/6 within status10. Cast carries stored u8 flag pattern through original char ABI; no unnecessary owner conversion."
+  },
+  "src/SOURCE/netwin.cpp:nb_thr_ctl(void)#1": {
+    "body_sha256": "5a7a390172f4729dc44c643488c7bd801303f6004ffa733156e46c278fd116cd",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S23 unused64-byte block. Event scans0 and2..6 fit initialized9; B40 node.session/payload length govern7-slot and4096-byte copies plus flexible tail. Retry loop leaves sendComplete false on closed/out-of-range result; behavior preserved rather than silently fixed."
+  },
+  "src/SOURCE/netwin.cpp:nb_add_name(void)#1": {
+    "body_sha256": "b478208a6f7d11e9a6814d8dedc8f36ac02d853e5064b1224d13a43330d3df87",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fixed group name11 plus16-byte local name fits4096 session buffer; memcpy overwrites strcpy terminator intentionally for wire layout. maxSess domain0/6 established by setup/move; no out-of-owner recovery."
+  },
+  "src/SOURCE/netwin.cpp:nb_add_name_done(NetbiosControlBlock * ncb)#1": {
+    "body_sha256": "66bcfd293edd91340420652f7cd763c4c8eda9ea0425c309cc54fc29da055889",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Callback identity asserted against actual local NCB, duplicate-name increment loop15..0 stays in16-byte name. Error format fits gText500; byte-status enum extraction meaningful. Callback lifecycle still assumes active init session."
+  },
+  "src/SOURCE/netwin.cpp:nb_recv_any(i32 session)#1": {
+    "body_sha256": "cd380f519f7585adc1dcf4faced87aaaa58c825a32fe41c3a690e1f4b1e13acb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Setup supplies session0, within7; NCB explicitly receives4096 bytes into its full4096 payload owner and installs real callback. No artificial pointer arithmetic."
+  },
+  "src/SOURCE/netwin.cpp:nb_recv_any_done(NetbiosControlBlock * ncb)#1": {
+    "body_sha256": "069e5fc5a3b74d47bb6368a549de964754ae9a98dae3ede83a4e290118b6751c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "retain",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Owner index found by bounded pointer-equality scan of7 real NCBs, never subtracting member offsets. B40 broadcast prefix/name compares fit4096 allocation but omit received length, so stale/short data is not validated. Matched index then feeds nb_call."
+  },
+  "src/SOURCE/netwin.cpp:nb_call(i32 session,void * name)#1": {
+    "body_sha256": "a90c5e5f4b6d29f3a7d27bf6d9547d250532fa287b390ff520c0d6a87ca709a6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Callers pass a16-byte formatted gNbNameBuf entry and a bounded session from pointer scan/typed session op. Two fixed16-byte copies fit NCB callName/name; asynchronous callback context is real."
+  },
+  "src/SOURCE/netwin.cpp:nb_listen(i32 session,void * name)#1": {
+    "body_sha256": "cdfbacd2a0869e9e7d01e3b171d4a6798fdf54998965950159a11f20106c3c35",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B38 genuine-retail194-byte function plus all ordered targets exact: fixed memcpy16 from supplied name. LISTEN_ANY passes gNbListenName whose retail pointer515c4c targets515c5c bytes2a00 then padding/source-path text; no16-byte string owner is established."
+  },
+  "src/SOURCE/netwin.cpp:nb_call_done(NetbiosControlBlock * ncb)#1": {
+    "body_sha256": "5626636b0077e5929ddba193990567f0786e22dc0d76af922d61e9e5ed78b116",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "retain",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Bounded equality scan recovers which of7 complete NCBs is the callback owner. Name16/session status stores remain in that selected slot; retry count and sleep are real callback lifecycle state."
+  },
+  "src/SOURCE/netwin.cpp:nb_arm_recv(i32 session)#1": {
+    "body_sha256": "214b541ea085cb8447ee51c0528c50c2309fd47e26ca1f8b581c1bb0ce565131",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "All traced callers supply scanned session0..6 or move destination1; receive owner4096 and event indexsession+2<=8 fit initialized9. Repeated API retry loop is semantic, not fabricated goto."
+  },
+  "src/SOURCE/netwin.cpp:nb_close_session(i32 session)#1": {
+    "body_sha256": "8818a9629774be9b81a56fc34c2875445469ed53952184cc2b84a4e83fe77419",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "nb_term loops0..6 and CLOSE op uses typed session argument; real local cancellation/hangup control block retained. No fake aggregate or owner-pointer arithmetic; general op caller domain is B40."
+  },
+  "src/SOURCE/netwin.cpp:nb_recv_complete(i32 session)#1": {
+    "body_sha256": "1157c3b1896d63a0ab2759a5a286cbf2f604a5af51c14ff4ba1151406133d6f0",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Polled sessions0..4 fit7. Allocator conversion and session narrowing are real. B40 API length must stay<=4096; data[1] flexible tail is accessed over runtime allocation len+11 and successful node construction/lifecycle is assumed."
+  },
+  "src/SOURCE/netwin.cpp:nb_format_name(char * src,u8 * dst)#1": {
+    "body_sha256": "f0ee410c99752fa5462b6a7af5b46259c6966261d0f4b7f72928dd605cd21719",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Writes exactly16-byte destination (clear then0..14 copy/space pad); bounded scan reads source only until NUL or15. All callers supply full16-byte name entries, so no artificial char/word overlay."
+  },
   "src/SOURCE/ARMYGRP.cpp:SwapValues(Value & lhs,Value & rhs)#1": {
     "body_sha256": "5b5b8116069b2c18cf5808548d448b06651f3465a4ae6761584dafd36f7955a3",
     "patterns": {

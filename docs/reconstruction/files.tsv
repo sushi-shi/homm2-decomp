@@ -80,15 +80,15 @@ include/SOURCE/GAME.h	709a70b0dc6ba179c5c2b91004570adfa562d610a96b206a94e3cbcb1a
 include/SOURCE/HERO.h	40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6	0	0	pending	Not yet reviewed.
 include/SOURCE/KB.h	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	2	0	pending	Not yet reviewed.
 include/SOURCE/KB_TYPES.h	3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02	26	26	reviewed	Full969-line header read,26 physical functions and both modern/retail macro branches reconciled. Closed domains, open trigger codes and scalar conversions retained. U05: tag_monsterInfo contains a single-arm outer union/struct around cost/fightValue and alternate flag aliases; simplify only after initializer and consumer audit. Packed database structs are semantic records, not stack aggregates; menu reserved byte has no use proven here.
-include/SOURCE/Modem.h	1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d	1	0	pending	Not yet reviewed.
+include/SOURCE/Modem.h	1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d	1	1	reviewed	Full91-line header including TruncateModemResponse, queue layouts and all declared capacities read. Byte packet storage belongs to REMOTE; queue structs are real ABI owners, not fake stack aggregates.
 include/SOURCE/NOOPT.h	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	0	0	reviewed	Full three-prototype deadline owner header read.
-include/SOURCE/Netbios.h	2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b	0	0	pending	Not yet reviewed.
+include/SOURCE/Netbios.h	2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b	0	0	reviewed	Full32-line state/operation declarations read; stepped byte states distinguish setup and connection polling.
 include/SOURCE/Newgame.h	b67f046c7caa54d7411991e09d9d1c5aa0fd6d5a6a699e37508ac53fed5890c6	0	0	pending	Not yet reviewed.
 include/SOURCE/Overview.h	905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe	0	0	pending	Not yet reviewed.
 include/SOURCE/PATH.h	c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2	0	0	pending	Not yet reviewed.
 include/SOURCE/PHILAI.h	dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18	0	0	pending	Not yet reviewed.
 include/SOURCE/RECRUIT.h	0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e	0	0	reviewed	Full typed recruit-function owner prototypes read; seven-resource output contract is in GetMonsterCost, not a raw varargs layout.
-include/SOURCE/REMOTE.h	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	0	0	pending	Not yet reviewed.
+include/SOURCE/REMOTE.h	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	0	0	reviewed	Full117-line header read: packed6-byte packet header/256-byte message,268-byte transport arrays and138-vs128 queue domain. C17 typed wire owners,S25/S26 extra elements and B41 input-length contracts need remaining consumer proof.
 include/SOURCE/REMOTE_TYPES.h	a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70	0	0	reviewed	Full packet/message/protocol domains and packed34-byte SNetPlayerInfo reviewed. Four-byte system ID,21-byte name and6-byte reserved extension are genuine network storage; reserved[0] used to identify old players in wsEvaluateMessage. No function definitions or executable pointer macros.
 include/SOURCE/REQUEST.h	00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8	0	0	pending	Not yet reviewed.
 include/SOURCE/SETUP.h	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b	0	0	pending	Not yet reviewed.
@@ -105,7 +105,7 @@ include/SOURCE/armyGroup.h	b31953182adb7d15b142c85bcff5d06951542f612bcfe4d25f989
 include/SOURCE/bankBox.h	348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8	0	0	reviewed	Full12-byte packed player/window owner and16-bit coordinates reviewed; no artificial aggregation.
 include/SOURCE/combatManager.h	11172778e68a861a77db959957215f5df6c99f7ac613d6c938f0684326ce4304	0	0	pending	Not yet reviewed.
 include/SOURCE/combatTypes.h	4cd3766ce7192a3952a2a8b8ea30a7949509f787ea9148508a3cd083babb9d0d	8	8	reviewed	Full119 lines/all8 inline functions and7 alternate macros reviewed. Typed enum adapters model valid binary side/facing/result domains. NO sentinel equivalence claim is made between strict enums and legacy arithmetic macros.
-include/SOURCE/comwin.h	951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512	0	0	pending	Not yet reviewed.
+include/SOURCE/comwin.h	951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512	0	0	reviewed	Full62-line header read. tag_Node has meaningful serial tail offset10 and NetBIOS tagged tail offset11, each represented by1-byte flexible member (B40). Real96-byte ComPortState has4/24-byte interior gaps S23; SDK DCB/timeouts are real.
 include/SOURCE/dimPalette.h	bbebfa76143453b5a65687189a368b5e436756e073c5d2504703d46c4dabc945	0	0	reviewed	Full three-set/four-level/256-color array declaration. O03 must respect actual subarrays, not index a higher level through uDimPal[0][0]. No function definitions.
 include/SOURCE/dpnetwin.h	ed4e337cf85139cf1ea816c6668120be372acf6c045a536d1fed768ede2d87b1	0	0	pending	Not yet reviewed.
 include/SOURCE/fileRequester.h	77531e764a0450d54d51c6228c22d91a49ae24a0c1f117ef3d5227442a4c909b	0	0	pending	Not yet reviewed.
@@ -114,8 +114,8 @@ include/SOURCE/hero.h	b18f61633fc21a8d1127f7d074458ea3521c06026c79aa5542922ccce8
 include/SOURCE/hexcell.h	bfe0987d16b524132036ca432b704d1a953dec37894ca5bba638ec3a247cb4a5	0	0	reviewed	Full45-line packed98-byte class reviewed: three14-byte corpse arrays are real, with append capacity checks in ProcessDeath, plus real two-record limits. No inline bodies or union.
 include/SOURCE/highScoreManager.h	05f6eef027b0c761877a950c49ca0263fb6e280e2bd1abe660883dfe4577c44c	0	0	pending	Not yet reviewed.
 include/SOURCE/kbwin.h	d9c21ecb187f8bb5ce23e06c23fdef5f36cb747e6453869632a3549e8f09c561	0	0	pending	Not yet reviewed.
-include/SOURCE/netwin.h	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27	0	0	pending	Not yet reviewed.
-include/SOURCE/netwin_private.h	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	0	0	pending	Not yet reviewed.
+include/SOURCE/netwin.h	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27	0	0	reviewed	Full136-line header read. NCB64 packed SDK fields/reserved10 are real ABI. U07 NetbiosPayload unused word arm; S24 events10 vs initialized9; session/name/payload extents7/16/4096. B38 wildcard copy is a source literal contract issue, not missing NCB space.
+include/SOURCE/netwin_private.h	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	0	0	reviewed	Full private header/prototypes read; typed control-block callbacks match actual postRoutine ABI, no inline or hidden cast bodies.
 include/SOURCE/philAI.h	3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c	0	0	pending	Not yet reviewed.
 include/SOURCE/playerData.h	95fbf9b9517844c3a72b20f0f6fd44ddee9a406e094737359abc43a4ff0c0449	8	0	pending	Not yet reviewed.
 include/SOURCE/recruitUnit.h	6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0	0	0	reviewed	Full126-byte packed manager declaration read; S20 three4-byte unidentified gaps retained pending owner evidence; counter is a true borrowed i16 pointer.
@@ -196,18 +196,18 @@ src/SOURCE/HERO.cpp	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b06
 src/SOURCE/HEXCELL.cpp	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	8	8	reviewed	Full138 lines/eight definitions read. Real corpse arrays and clipping member array; B27 lifecycle bounds needs remaining producer review. No casts/gotos/artificial addresses.
 src/SOURCE/HISCORE.cpp	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	5	0	pending	Not yet reviewed.
 src/SOURCE/KB.cpp	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	75	3	pending	Not yet reviewed.
-src/SOURCE/Modem.cpp	0f54ae68a192f37429c53437d53c213c651574b72e8f921dde1da25c6f412d9f	15	0	pending	Not yet reviewed.
+src/SOURCE/Modem.cpp	e46545c2660cf613e8e93e227815048c16268ece5e30d26c11058dbdf50d9cba	15	15	reviewed	Full419-line TU/15 functions and private/global declarations read. S22 applied with native/retail proof; G19/G20 response/parser joins and S23 unused scalar remain. B37 user-controlled init format and transport length; one-byte/response/handshake bounds traced.
 src/SOURCE/NOOPT.cpp	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	3	3	reviewed	Full25-line TU/3deadline helpers read; no ten-pattern candidates.
-src/SOURCE/Netbios.cpp	0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52	5	0	pending	Not yet reviewed.
+src/SOURCE/Netbios.cpp	0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52	5	5	reviewed	Full247-line TU/5 functions and setup states read. Fixed names bounded9<40 and slots0/6->1 proven; casts interpret signed ABI/status domains. S23 unused scalars, no manual varargs implementation.
 src/SOURCE/Newgame.cpp	0a462978001a3348debdfaa6bbeb2d264aee172236817e930731839906ce6cfe	16	0	pending	Not yet reviewed.
 src/SOURCE/Overview.cpp	451e8ec6412d9c885a9c4cc9c4cca15d9ea95a1b688d83aacd3f53c5f9fa4e14	7	0	pending	Not yet reviewed.
 src/SOURCE/PATH.cpp	4adf75e500c06c8b8644f2c954570578b72fdd4fd1c9c2fb55de21b977e823e8	12	0	pending	Not yet reviewed.
 src/SOURCE/PHILAI.cpp	b6fe8a3fc9270d659da0859e8651d18cb104a1626112761fefa002a0acd90ac1	84	0	pending	Not yet reviewed.
 src/SOURCE/RECRUIT.cpp	52ef23662146f8456341dc1772b3d149856a2cad4c49df5b26810289ad90093b	8	8	reviewed	Full458-line TU/8bodies read. C14 two const casts removed with11-function/all-section native equivalence. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost.
-src/SOURCE/REMOTE.cpp	4f0b9890b7b485716fc3a1bb200bf7f7614ae3ef75345e0867b340d22f03f30e	13	0	pending	Not yet reviewed.
+src/SOURCE/REMOTE.cpp	503614fe6eefd081ac38eed237a4f1f5dcc85b4e1a25a096637ed851233bebc8	13	13	reviewed	Full891-line TU/13 functions,3 wire-cast macros and all globals read. C17 typed-owner candidates,G21..G24 shared joins,S25 scalar checksums applied with full native/retail proof,S26 unused packet/scalars/queue tails. B41 length/count/initialization and B13 network-name contracts remain.
 src/SOURCE/REQUEST.cpp	98e7c3eaf83bdcf2243c626472133899853a5dd9b53aa32b4775a0d96d5651ff	16	0	pending	Not yet reviewed.
 src/SOURCE/SEARCH.cpp	db79c87d9297de0e5e0f3e5f75a8e16e0b74f7ca76abee2c366b45557dc6761a	2	2	reviewed	Full original and reconstructed TU read, both physical definitions reconciled. O02 separates 29 scratch objects, removes padding arrays and preserves the original addresses (verified retail agrees with the old field map). All five emitted functions pass native before/after proof; both game functions match complete retail bytes/sites/targets. U02-U04/G09/B18 remain open.
-src/SOURCE/SETUP.cpp	7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b0e962	23	0	pending	Not yet reviewed.
+src/SOURCE/SETUP.cpp	7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b0e962	23	1	pending	Not yet reviewed.
 src/SOURCE/SMACKMGR.cpp	a1eb2af13ac68e181d71fda6de78f61da3742d2e8bec5a82bb437c26c00c88c6	8	8	reviewed	All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed.
 src/SOURCE/SPELLAI.cpp	40c0bdeadb581158ae48cee719cec4c7c3d6e5090cf9efa371e9ba941bc7d0a5	11	0	pending	Not yet reviewed.
 src/SOURCE/SPELLS.cpp	b339f7e92d3169ddcb1f10cffbd9b24a8ee69fc453a70c02403bb4e3dc94a85b	37	0	pending	Not yet reviewed.
@@ -220,10 +220,10 @@ src/SOURCE/Viewwrld.cpp	ecb2ec755bafbfd383fbdc4bd90c9d0cff503ff824bbdf13c00a092a
 src/SOURCE/Wsnetwin.cpp	6b7c68d77cfdf3b9f95b3c22b776400868011fe8d65c6d0b1816649ceff8ea69	10	10	reviewed	All572 lines/ten definitions and static/socket data claims reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. B20 payload overread proved directly in retail; other bounds and C07/G12/G13/S10 remain explicit.
 src/SOURCE/X_CAMPGN.cpp	785cadb46cc272005050458eaf293ae3a82666051eaab30101fa672e603432e3	36	0	pending	Not yet reviewed.
 src/SOURCE/X_GLOBAL.cpp	776d73bf4ceeb3aa6bb9b214061048192227ff3f7c45c91a5689513b27aabf27	0	0	pending	Not yet reviewed.
-src/SOURCE/comwin.cpp	ce48214d518eac196d6d5508d9e0f42fd401871edfe2f017e83428572adaddd1	11	0	pending	Not yet reviewed.
+src/SOURCE/comwin.cpp	1fc0919d66e0582c33b53fdb723ea8544a7806929147dbf34a25fa4204fad00f	11	11	reviewed	Full356-line TU/11 functions read. C15 real DWORD read result applied with full native/retail proof. Serial caller slot0 and one-byte destination proven; error formatter max473<500 from genuine templates/all call sites. B39 API lifecycle,S23 class gaps, B40 flexible payload ownership remain.
 src/SOURCE/dpnetwin.cpp	2d2cf7b372bbf431f4facb3e4eb5c4ac2830322ef1ac16649dc754435ba9af10	16	0	pending	Not yet reviewed.
 src/SOURCE/kbwin.cpp	8e359c2475ae2ad626c8128d608cdfbc062e99a11cfa26169b0b56a633672c0d	16	0	pending	Not yet reviewed.
-src/SOURCE/netwin.cpp	31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1	19	0	pending	Not yet reviewed.
+src/SOURCE/netwin.cpp	31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1	19	19	reviewed	Full660-line TU/19 functions and all aliases/storage read. V01 typed SDK varargs retained after all-exit va_end matrix adds retail-incompatible stores; U07 unused payload word view,S24 extra event slot,S23 unused block/scalars. B38 retail wildcard overread proven; B40 runtime tail/session/payload and asynchronous lifecycle contracts.
 src/SOURCE/tradpost.cpp	b0b69f9a7db5333ace20349089c95f9d74aaa66f12df9b34bf953ad131daac01	6	6	reviewed	All462 lines/six definitions, four private enum domains and data owners reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. S09 unused message aggregate; B21 invalid resource sentinel reaching ratio lookup. CP1251/name bounds verified from seven source literals.
 src/SOURCE/wingraph.cpp	3960bf1ce30f3c7d8a6d920b3586ab667e98f2ff964689bc8df38ed9446db6f9	32	32	reviewed	Full1158-line TU/32 functions plus all storage/macros reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. Genuine API records retained; C04/C11, S13 and B23 are open native/caller investigations.
 src/SOURCE/x_arena.cpp	198b5d6ed5fecba7ee4a12087a65a3a4f3d10c0f0e4a45aebd4b4081d217cd3a	3	3	reviewed	Full257-line TU/three functions, arena constants and globals reviewed. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C10/S12 open; real3-slot choice arrays and tagged messages are not artificial aggregates.

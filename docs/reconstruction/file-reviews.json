@@ -1,4 +1,48 @@
 {
+  "include/SOURCE/Modem.h": {
+    "sha256": "1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d",
+    "note": "Full91-line header including TruncateModemResponse, queue layouts and all declared capacities read. Byte packet storage belongs to REMOTE; queue structs are real ABI owners, not fake stack aggregates."
+  },
+  "include/SOURCE/Netbios.h": {
+    "sha256": "2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b",
+    "note": "Full32-line state/operation declarations read; stepped byte states distinguish setup and connection polling."
+  },
+  "include/SOURCE/REMOTE.h": {
+    "sha256": "9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656",
+    "note": "Full117-line header read: packed6-byte packet header/256-byte message,268-byte transport arrays and138-vs128 queue domain. C17 typed wire owners,S25/S26 extra elements and B41 input-length contracts need remaining consumer proof."
+  },
+  "include/SOURCE/comwin.h": {
+    "sha256": "951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512",
+    "note": "Full62-line header read. tag_Node has meaningful serial tail offset10 and NetBIOS tagged tail offset11, each represented by1-byte flexible member (B40). Real96-byte ComPortState has4/24-byte interior gaps S23; SDK DCB/timeouts are real."
+  },
+  "include/SOURCE/netwin.h": {
+    "sha256": "1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a53919b27",
+    "note": "Full136-line header read. NCB64 packed SDK fields/reserved10 are real ABI. U07 NetbiosPayload unused word arm; S24 events10 vs initialized9; session/name/payload extents7/16/4096. B38 wildcard copy is a source literal contract issue, not missing NCB space."
+  },
+  "include/SOURCE/netwin_private.h": {
+    "sha256": "335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11",
+    "note": "Full private header/prototypes read; typed control-block callbacks match actual postRoutine ABI, no inline or hidden cast bodies."
+  },
+  "src/SOURCE/Modem.cpp": {
+    "sha256": "e46545c2660cf613e8e93e227815048c16268ece5e30d26c11058dbdf50d9cba",
+    "note": "Full419-line TU/15 functions and private/global declarations read. S22 applied with native/retail proof; G19/G20 response/parser joins and S23 unused scalar remain. B37 user-controlled init format and transport length; one-byte/response/handshake bounds traced."
+  },
+  "src/SOURCE/Netbios.cpp": {
+    "sha256": "0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52",
+    "note": "Full247-line TU/5 functions and setup states read. Fixed names bounded9<40 and slots0/6->1 proven; casts interpret signed ABI/status domains. S23 unused scalars, no manual varargs implementation."
+  },
+  "src/SOURCE/REMOTE.cpp": {
+    "sha256": "503614fe6eefd081ac38eed237a4f1f5dcc85b4e1a25a096637ed851233bebc8",
+    "note": "Full891-line TU/13 functions,3 wire-cast macros and all globals read. C17 typed-owner candidates,G21..G24 shared joins,S25 scalar checksums applied with full native/retail proof,S26 unused packet/scalars/queue tails. B41 length/count/initialization and B13 network-name contracts remain."
+  },
+  "src/SOURCE/comwin.cpp": {
+    "sha256": "1fc0919d66e0582c33b53fdb723ea8544a7806929147dbf34a25fa4204fad00f",
+    "note": "Full356-line TU/11 functions read. C15 real DWORD read result applied with full native/retail proof. Serial caller slot0 and one-byte destination proven; error formatter max473<500 from genuine templates/all call sites. B39 API lifecycle,S23 class gaps, B40 flexible payload ownership remain."
+  },
+  "src/SOURCE/netwin.cpp": {
+    "sha256": "31333e549092a2916b64da38a7d21c2402d5e67ce32b786bf56b0be33d4832d1",
+    "note": "Full660-line TU/19 functions and all aliases/storage read. V01 typed SDK varargs retained after all-exit va_end matrix adds retail-incompatible stores; U07 unused payload word view,S24 extra event slot,S23 unused block/scalars. B38 retail wildcard overread proven; B40 runtime tail/session/payload and asynchronous lifecycle contracts."
+  },
   "src/SOURCE/ARMYGRP.cpp": {
     "sha256": "a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6",
     "note": "Full282-line TU/14physical bodies including strict-only swap helper read. U06 duplicate army aliases; S18 unread morale local; B36 creature/slot domains. Real raceUsed7 fits all retail race ids0..6."

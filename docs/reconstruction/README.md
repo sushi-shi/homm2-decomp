@@ -177,6 +177,37 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   fourteen artifacts and eight skills. Genuine-retail name and positive-cost
   tables prove recruitment title capacity and nonzero valid gold divisors;
   unchecked input domains and cached-icon lifecycle remain distinct questions.
+- C15/S22: [serial receive scalars](serial-scalars.md) replace a casted two-short
+  API result with `DWORD`, and a four-byte array with the single byte read.
+  Both changes have full native and scoped retail byte/relocation proof.
+- G19/G20: modem response and escape-parser joins need structured matrices.
+  S23 covers unread serial/network scalars, an unused NetBIOS control block
+  and unknown ComPortState interior gaps; genuine SDK records are retained.
+- B37: modem setup [uses initialization text as an `sprintf` format in
+  genuine retail](B37.md). Fixed dial/response/handshake text fits its real owners;
+  negative generic packet lengths and modem's smaller transport limit remain.
+- B38: [retail-confirmed NetBIOS wildcard overread](B38.md). The fixed16-byte
+  listen-name copy starts at the two-byte `"*"` literal and includes adjacent
+  source-path bytes. Enlarging the literal would change copied retail data.
+- B39/B40: serial API lifecycle and variable-sized serial/NetBIOS node tails
+  need explicit contracts. Known serial callers use slot0; the500-byte error
+  formatter is bounded to473 bytes by all callers and genuine retail strings.
+  NetBIOS session/payload lengths and short broadcast initialization remain.
+- U07/S24: the NetBIOS payload union has an unused word view; event storage
+  declares ten handles but only nine are initialized/used. Shared layout and
+  native evidence must decide whether those declarations can be simplified.
+- V01: NetBIOS session dispatch uses typed SDK `va_arg`; adding its omitted
+  `va_end` calls produces extra retail-incompatible stores. [Measured retain
+  decision and exact baseline proof](V01.md); portability debt stays explicit.
+- C17/G21-G24/S26: remote-message byte-owner casts, shared setup/send/
+  receive/completion joins, unread locals and ten extra
+  queue slots need native structural review. Actual packed messages stay real.
+- S25: both remote checksum arrays are now scalars, with [full native and
+  independent retail proof](S25.md); the packet format and algorithm are unchanged.
+- B41: remote decoding discards the received count before trusting header
+  length; caller payload limits, short/stale data, sender indices and heartbeat
+  initialization need protocol evidence. `RemoteMain` clears30 bytes of a
+  30-element integer ID table, not its full120 bytes; retail proof is pending.
 
 ## Build setup observations
 
@@ -190,7 +221,7 @@ the missing components from preserved local media and runs the unchanged
 per-artifact verifier; no release checksum or validation gate is weakened.
 
 Regeneration with the hash-checked genuine retail image passes `homm2 init`,
-`homm2 build`, and 877 selftests (one skip). An additional `homm2 link
+`homm2 build`, and all 877 selftests with Universal Ctags available. An additional `homm2 link
 --transform` attempt fails in the existing Misc transform: it hard-codes
 `$SG56843`, while both the preserved pre-edit and current native Misc objects
 name the literal `$SG56847` at section3+0x1c. Both reproduce the same failure;
