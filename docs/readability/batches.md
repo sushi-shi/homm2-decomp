@@ -180,4 +180,52 @@ unification and records local HRESULT/descriptor-init leads for later network
 owner comparison. Existing odd RECT endpoints, dead/default branches, original
 error line numbers and callback-sensitive saved settings remain explicit.
 
-Next family: game/map data owners and algorithmic consumers.
+## B12 — map, army-group, hex and town data owners
+
+Read `EDITOR/mapcell.cpp`, `fullMap.h`, `mapcell.h`, `ARMYGRP.cpp`,
+`armyGroup.h`, `HEXCELL.cpp`, `hexcell.h`, `TOWN.cpp`, `town.h`, and
+`townObject.h` completely; reconciled 50 definitions in ten files, including
+eight existing header bodies and the strict-build swap helper. This completes
+the EDITOR files, not the game consumers of the map owner.
+
+H20 isolates the town building-mask predicate already repeated in army morale
+and town spell/building code. R14 records slot-state, bitfield, serialized-layout,
+allocation and draw-order traps. The existing map accessors and army membership,
+dismissal and counting APIs should be compared with later consumers before
+inventing parallel interfaces. `armyGroup::GetMorale` uses an else-if bounded
+clamp, unlike H07's independent sequential statements; retain that distinction.
+
+## B13 — complete hero and shared game/combat owner declarations
+
+Read all 2,131 lines of `HERO.cpp`, plus `hero.h`, `HERO.h`, `playerData.h`,
+`game.h`, `GAME.h`, `army.h`, `ARMY.h` and `combatManager.h` completely.
+Reconciled 56 definitions in nine files: 41 hero TU bodies and 15 existing header
+accessors. The 868-line combat owner was read for the earlier hex-cell consumers
+as well as the coming path/combat family; no implementing-TU credit is inferred.
+
+H01 gains the exact status-message prefix. H21 names group slot presence,
+H22 proposes reusing the existing embarked accessor, and H23 isolates owner-list
+compaction. Targeted reads of `game::HeroIDToHeroPos` / `TownIDToTownPos` at
+`GAME.cpp:7604` / `7614` establish first-match rather than last-match semantics;
+the complete GAME TU remains unread. R15 records hero UI, random-stream,
+spell/skill/flag and lifetime exceptions plus leads for later dialog consumers.
+
+## B14 — complete adventure/combat pathfinding family
+
+Read `SEARCH.cpp` (393 lines), `FINDPATH.cpp` (593), `PATH.cpp` (638),
+`searchArray.h`, `PATH.h`, `FINDPATH.h`, `advManager.h`, `ADVMGR.h` and
+`CMBTMGR.h` in full. Reconciled 32 definitions in nine files, including six
+existing header accessors. Reviewed the complete static seed-state owner,
+overlaid queue/cell/path storage, both insertion algorithms, adventure target
+and monster reseeding, terrain/water/object restrictions, moat handling, all
+wide-creature movement branches and every ordered best-direction fallback.
+
+H24-H28 isolate terrain/object/bounds and indexed-owner access; R16 rejects a
+universal search/direction/queue framework. Targeted complete body reads of
+`advManager::GetCell` (`ADVMGR.cpp:4448`) and `ValidHex` (`CMBTMGR.cpp:1777`)
+confirm out-of-map fallback and actual hex range respectively. Neither full TU
+receives a read mark. Existing map-extra operand-order variants stay explicit.
+
+Next: large game/combat/AI/UI implementations; these remain a substantial part
+of the unread checklist. Candidate occurrence expansion and final ranking also
+remain required after the deliberate reading pass.

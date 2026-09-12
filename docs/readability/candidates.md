@@ -38,6 +38,11 @@ message in `DataEntryWindowHandler`. The latter's GET_TEXT setup orders id befor
 command and is not an exact store-order instance. Multi-widget broadcasts that
 reuse the existing message header should keep their id/payload-only updates.
 
+B13 adds `HeroMessageUpdate`: the HERO_UI names alias the same message type and
+SET_TEXT command, with the exact type/command/id prefix. `SetupHeroView` and
+`DoHeroSplit` have intervening formatting calls; their scattered stores are not
+automatically contiguous instances, even when final message values agree.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -594,3 +599,260 @@ RECT edge conventions on the source's explicit `+1`/`-1` calculations.
 drains messages, services sound on one interval, and can call blocking GetMessage
 on another. Their superficially shared Translate/Dispatch pair does not justify
 one universal pump. R05 and the pointer/value deadline distinction still apply.
+
+## H20 — named town building-mask predicate
+
+Disposition: credible small inline or reuse of the existing flag vocabulary.
+
+`armyGroup::GetMorale` and `town::GiveSpells` / `town::BuildBuilding` repeatedly
+test `m_buildings & IDX(TOWN_BUILDING_...)` as a Boolean. A narrow
+`town::HasBuildingFlags(mask)` (any-bit test), or consistent existing `HAS`
+usage, would make those conditions easier to read. Owner: `SOURCE/town.h`.
+The mask storage is `u32l`; preserve that width and the distinction between a
+`TownBuilding` mask and a `BuildingSlotType` bit index. `BIT(building)` callers
+must not pass their slot directly as a mask. Preserve caller short-circuiting.
+
+The special-building masks deliberately share numeric values across factions;
+the helper must not infer a faction, select an upgraded dwelling, or turn an
+any-bit query into an all-bits query. Only Boolean consumers are candidates:
+normalizing the result changes callers that retain a masked numeric value.
+Read later game/castle/AI consumers before finalizing the interface. No new
+call boundary or inline expansion is assumed byte-neutral.
+
+## R14 — data-owner algorithms and deceptively similar state resets
+
+The map owner already has `Cell`, `GetCell`, `Row`, `Column`, `Extra` and
+`mapCell::HasFlag`. Reuse is preferable to another raw-address macro where the
+contract and codegen fit. Its object/overlay extra-chain searches are local
+duplicates, not a cross-TU framework: allocation can relocate `extras`, so the
+saved index and subsequent `Extra(ix)` reacquisition are essential. Do not
+retain a stale node pointer or add a zero-index/sentinel repair during cleanup.
+
+`ClearCellExtra` clears selected bitfields without clearing `objectMetadata`;
+base map cells have different object/road/tileset and metadata layouts. A
+generic zero-struct or unified tile reset changes behavior. Legacy map reads
+copy the current-format prefix out of larger old records; they are not ordinary
+bulk reads of the destination format. Keep allocation/free and field-write order.
+
+Army emptiness is determined by the creature-type sentinel in membership/count
+and garrison queries, not uniformly by quantity. `Dismiss` writes type then
+count; `DamageGroup` writes count then type and consumes one random sample per
+creature, with a first-stack survival rule. Do not replace that tail with
+`Dismiss` or generic damage arithmetic. All-undead intentionally returns true
+for an empty group; the homogeneous test tracks successive nonempty types, not
+a deduplicated set. Strict `SwapValues` also coexists with retail `i32` temporary
+swaps; generic swap modernization is not a historical finding.
+
+Hex corpse drawing's lower range excludes the final corpse; the upper range
+contains it. Facing guards, current-army extent flags, parity-dependent tower
+coordinates and normal/flipped clipping belong to their explicit draw paths.
+Town removal finds the last matching id then shifts the owner list, while town
+spells overlap counts in a packed union. Neither deserves a generic container
+or serialization rewrite during this audit.
+
+## H21 — army-group slot presence predicate
+
+Disposition: plausible small C++98 inline, lower priority than protocol macros.
+
+`armyGroup::GetNumArmies` / `HasAllUndead`, `town::HasGarrison`, and
+`hero::CalcMobility` / `UpdateArmies` / `HeroHandler` test whether a slot's creature
+type differs from `CREATURE_NONE`. A proposed `armyGroup::HasTroop(slot)` would
+name that repeated sentinel contract and shorten nested member/index expressions.
+Owner: `SOURCE/armyGroup.h`; valid slot indexing remains the caller's job.
+
+Do not add a quantity test, alter signed `i8` creature promotion, or replace
+`CreatureTypeCount` (which counts matching positive-quantity stacks) with it.
+The existing combat `army::IsAlive` requires both a valid type and positive
+quantity and is a different domain. `IsMember` asks whether a particular type
+occurs anywhere, while `GetNumArmies` counts occupied slots; neither is itself
+a slot predicate. Any inline use still needs matching evidence.
+
+## H22 — reuse the existing embarked-state accessor
+
+Disposition: existing small inline worth wider use, not a new flag framework.
+
+`hero::IsEmbarked` already returns `HAS(m_eventFlags, HERO_EVENT_EMBARKED)`.
+The same condition is written directly in `hero::CalcMobility` / `Deallocate`
+and in the masthead branch of `armyGroup::GetMorale`: two reviewed TUs.
+Prefer this name when the caller asks specifically whether the hero is aboard
+a boat. Preserve surrounding null guards and short-circuit order.
+
+The accessor returns the masked integer (0 or 0x80), not a normalized 0/1;
+do not silently change that existing API. Formation, visited-site and boat-id
+tests are different state queries. Replacing source expressions by this inline
+may still change `/Ob1` expansion shape and must be measured later.
+
+## H23 — compact an owner's signed-id array without changing its count
+
+Disposition: plausible narrow statement helper; retain only if naming saves effort.
+
+`town::Deallocate` and `hero::Deallocate` both shift later `i8` ids left after a
+located position and then write -1 to the old final slot. A period-style
+`REMOVE_ID_AT(ids, count, position)` macro or narrow inline could name just this
+compaction. Natural owner: the player id-list boundary in `SOURCE/playerData.h`.
+It must not decrement count or clear current selection: those operations occur
+later and have different intervening effects in the two callers.
+
+Both callers deliberately search through the whole list and retain the LAST
+matching position. The existing `game::HeroIDToHeroPos` and `TownIDToTownPos`
+return the FIRST match (targeted body reads), so they are not exact replacements.
+Do not switch to `memmove`, add absent-id recovery, or conceal an implicit bounds
+policy. The current -1 position behavior remains caller-owned; a safe refactor
+must preserve the actual input domain and not claim all malformed states are safe.
+Macro arguments must be stable; adding hidden locals or an inline boundary needs
+the usual codegen audit.
+
+## R15 — hero-specific workflows and pending UI leads
+
+Hero routines use both ordinary and seeded random streams across their related
+level/skill/army routines. Keep random-call count/order, low-stat threshold tests,
+floating-point-to-integer truncation and bounded skill-search behavior explicit.
+`GetLevel` and `GetExperience` have distinct boundary conditions even though
+their extrapolation recurrence is similar; this is one-TU sharing at present.
+`GetNthSpell` tests its ordinal after `HasSpell` even when the category did not
+increment it. A generic filtered iterator can change the zero-ordinal behavior.
+
+`H2_ENUM_CLEAR_FLAG` means clearing a KNOWN-SET flag: retail uses subtraction
+inside guards, while strict checking uses bit removal. It cannot replace the
+unguarded formation AND-NOT assignments. Skill storage is narrowed before
+clamping and effective necromancy levels can exceed the ordinary skill range.
+Do not normalize all flag updates, skills or stats through one generic setter.
+
+Hero UI reuses message union contents between broadcasts, interleaves formatting
+and dispatch, and sometimes changes globals during callbacks. Do not turn every
+set-id/broadcast pair into a helper that initializes fresh state. Merge/split
+tails differ from `Dismiss` store order; a preloaded swap temporary also crosses
+branch tests before the actual writes. Preserve these phases. `HeroView`'s early
+dismissal return does not clear every global cleared on the normal exit; this
+audit does not repair it or impose RAII cleanup.
+
+Further leads, not yet promoted cross-TU candidates: shorter `NormalDialog`
+arity/defaults, quick-view-to-dialog-mode conversion, maximum spell-point
+calculation, skill icon frame calculation, hover invalidation, and allocation
+followed by `MemError`. Hero provides concrete instances, but the complete
+dialog/game/other UI consumers must still be read before assigning a common
+contract. Morale/luck widget layout similarity is currently local, not grounds
+for a shared screen algorithm.
+
+## H24 — terrain lookup from an already-resolved map cell
+
+Disposition: credible scalar expression macro or free inline.
+
+`searchArray::SeedPosition` in `SEARCH.cpp` and `TestPossibleDirections` in
+`FINDPATH.cpp` repeatedly use `giGroundToTerrain[cell->m_terrainImageIndex]`.
+A proposed `CELL_TERRAIN(cell)` names this table lookup without mixing it with
+movement cost or pathfinding policy. Owner: the map/terrain boundary that can
+see both `mapCell` and the existing KB table; avoid a new copy of the table.
+
+The terrain table's underlying storage is `u8`, and callers also store terrain
+in signed/narrow enum slots. Preserve lookup result promotion and destination
+conversion. Evaluate the cell expression once and do not add range checks or
+cache across callbacks. Keep coordinate resolution outside this helper:
+`advManager::GetCell` returns cell (0,0) for out-of-map input (targeted body read),
+whereas the full-map accessors directly index their storage.
+
+## H25 — non-shadow, non-dummy object-sprite test
+
+Disposition: promising semantic predicate; final naming needs wider map review.
+
+`TestPossibleDirections` in `FINDPATH.cpp` and the final monster scan of
+`SeedPosition` in `SEARCH.cpp` share the exact conjunction: object index is not
+0xFF, object tileset is not `TILESET_DUMMY`, and flag 0x80 is clear. A small
+`mapCell` predicate could name this visual-object property instead of restating
+three packed-field conditions. `mapcell.h` names 0x80
+`MAP_CELL_OBJECT_SHADOW_ONLY`; the search code calls the same value BLOCKED.
+Record that naming conflict rather than silently choosing a new game rule.
+
+This predicate alone does NOT mean a tile is impassable. Direction masks, the
+current/neighbor/below-neighbor choice, trigger handling and terrain all remain
+caller-owned. Keep that surrounding short-circuit order, the sprite/tileset/flag
+test order, and no extra coordinate lookup. A macro repeats its cell expression,
+so it needs a stable local; an inline changes expansion evidence. Do not merge
+overlay existence, map-extra visibility, or occupied-hero tests into it.
+
+## H26 — adventure-map coordinate bounds
+
+Disposition: small shared predicate with distinct source-shape variants to audit.
+
+`SeedPosition`'s adjacent scan and `TestPossibleDirections` use signed x/y bounds
+against the current global `MAP_WIDTH` / `MAP_HEIGHT`. A proposed
+`IN_MAP_BOUNDS(x, y)` could express the four-condition contract at the KB map
+boundary, without obscuring what happens when it fails. Keep nonnegative and
+upper-bound tests explicit; no unsigned-subtraction rewrite or added clamp.
+
+`PushPoint` instead rejects `x > MAP_WIDTH - 1` (and similarly y), while
+`advManager::GetCell` checks both lower bounds before both upper bounds. These
+are related but not automatically identical source-shape instances. Preserve
+evaluation order and the actual width/height input domain before replacement.
+The monster scan's outer y-loop currently uses MAP_WIDTH, not MAP_HEIGHT; a new
+helper must not silently repair that separate loop. This is not H02's narrowed
+widget-local geometry or combat's existing `ValidHex`.
+
+## H27 — reuse the existing search-node accessor
+
+Disposition: existing inline; do not introduce another flattening macro.
+
+`FINDPATH.cpp` uses `searchArray::GetNode(x,y)` in both point insertion routines.
+`SEARCH.cpp`'s `BuildPath` / `SeedPosition` repeatedly spell the same node access
+through `GetColumn(x)[MAP_WIDTH * y]`. The existing reference-returning `GetNode`
+is the natural readability candidate, owned by `SOURCE/searchArray.h`.
+
+Preserve `searchNode` rather than the overlaid `searchCell`, and retain the
+correct global stride and caller coordinates. Same-sized records do not make
+their fields interchangeable. These address spellings regroup pointer/index
+operations; as with the documented MAP_EXTRA variants, replacement needs byte
+and inline-expansion evidence. `GetRow` also takes an explicit width, so it is
+not universally replaceable with the global-stride accessor.
+
+## H28 — combat army lookup by side and index
+
+Disposition: plausible small owner inline; no new lookup policy.
+
+`hexcell::DrawLowerDeadOccupants` / `DrawUpperDeadOccupant` / `DrawOccupant`
+and `searchArray::SeedCombatPosition` repeatedly address
+`gpCombatManager->m_armies[IDX(side)][index]`. A proposed
+`combatManager::GetArmy(side,index)` would make this relationship easier to
+read and prevent repeating the long storage expression. The complete owner
+header currently has no such accessor.
+
+Return the existing object, not a copy. Preserve side/index values, sentinel
+guards, reference/address use and evaluation frequency; do not infer a living
+army, filter by quantity, clamp the index, or introduce a checked container.
+Storage has 21 slots per side while several operational loops visit only 20;
+the caller's range is significant. A separate current-army accessor is only a
+lead until the corresponding combat consumers are read. Keep raw-byte evidence
+as the criterion for retaining a new inline boundary.
+
+## R16 — search algorithms, packed state and direction systems
+
+Adventure directions are eight compass directions; combat has six neighbors
+plus two wide-creature pseudo-directions. `OppositeMapDirection` is already the
+adventure helper, while `OppositeDirection` has the combat modulo/special-case
+contract. Do not unify them or replace all adjacency with a six/eight-way table.
+`GetAdjacentCellIndexNoArmy` maps pseudo-directions differently from the
+facing-sensitive army method. `GetBestDirection` has ordered fallback priorities;
+its repeated tests are local and not a reason to change tie-breaking.
+
+The two priority-queue insertions live in FINDPATH, not separate TUs. Adventure
+insertion uses file-static temporary state, a right-shift midpoint, extra visited
+flags and whole-node copying. Combat uses locals, division, a high-water count
+and selected cell-field stores. Keep queue-count aliases, narrowing, distance
+ties and record writes separate. Shared serialization/sort/container machinery
+would hide more than it clarifies.
+
+Adventure path reconstruction uses the AND of coordinate mismatches and resets
+length on capacity exhaustion; combat uses a different packed path view and
+keeps a capped length. Preserve the three/four-byte overlay offsets, including
+the explicit adventure starting index, without inventing a generic path buffer.
+`SeedPosition` retains static state across continuation calls, target-cost
+windows and monster associations. Its processed counter, scan bounds and
+apparently redundant conditions are not repaired by this audit.
+
+Combat pathfinding preserves moat state and temporarily changes creature speed
+through separate owner routines. Some member reads precede the later null check;
+no cleanup macro may assume it can safely move validation or hoist pointers.
+Front/rear placement and drawbridge exceptions are local semantic predicates
+to compare with later army code, not yet a universal passability API. Existing
+`ValidHex` is a 0 <= hex < 117 Boolean predicate (targeted body read), not every
+other constant named MAX/COUNT in combat. Monster `HAS` tests already expose
+flying/wide flag intent; a generic new flag framework is unnecessary.
