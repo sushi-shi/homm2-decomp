@@ -464,3 +464,31 @@ owners; no replacement container or framing framework is proposed. R28 records
 different payload offsets, narrowing, teardown/locking, local duplicate
 algorithms and the exact failure/return behavior. Across B26-B28, 90 definitions
 and fourteen files are newly fully read. No game code or behavior was changed.
+
+## B29 — complete game/player owner and town-manager declarations
+
+Read all 8,051 lines and 103 definitions in GAME.cpp, including its four private/
+unannotated inlines, all playerData bodies, every long game/map/setup/calendar/
+dialog/transfer/diff function, constants, scoped macros and trailing data.
+Reconciled the complete function index. Covered save/load formats, puzzle and
+visibility, hero selection/placement, map-extra passes, town/mine claims, army/
+spell panels, income/growth, randomization, network save transfer, diff/join,
+rumours, timed/map events, consistency checks and compression test bodies.
+
+Also read townManager.h (98 lines, one SetTown inline) and TOWNMGR.h (167 lines,
+zero bodies) completely: packed manager/building records, building masks,
+resource/UI/thieves-guild domains and declarations. Game/player/hero/army/map,
+campaign/event, KB and remote owners were read in earlier batches. TOWNMGR,
+KB, PHILAI, EVENTS and campaign implementations are not credited by header or
+targeted occurrence reads.
+
+H69 records byte-wise CP1251 folding across GAME/ARMY and the existing KB.h
+uppercase inline. H70 records exact-size file-value expressions against the
+fully read fullMap and resourceManager readers. H71 favors the existing
+armyGroup::Dismiss for exact type-then-zero slot resets, with explicit -1 and
+reversed-order exclusions. Existing widget/dialog/log/remote, terrain/bounds,
+building, mana, elemental, distance and clamp candidates gain consumers or
+exclusions. R29 records the nonuniform data, random, traversal, UI and protocol
+contracts; R26 gains owner-accessor and scouting-only evidence. The local-name
+macros are not counted as helper proposals. This batch adds 104 read definitions
+and three files. No executable source, header, configuration or behavior changed.

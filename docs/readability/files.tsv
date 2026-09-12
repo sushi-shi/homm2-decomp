@@ -94,7 +94,7 @@ include/SOURCE/REQUEST.h	83	0	1	unread	00c943f66afb99d21c10a6551a5f868c5b2e64516
 include/SOURCE/SETUP.h	26	0	1	unread	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b	-
 include/SOURCE/SMACKMGR.h	71	0	1	unread	21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20	-
 include/SOURCE/SPELLS.h	184	0	2	read	d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
-include/SOURCE/TOWNMGR.h	167	0	1	unread	e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2	-
+include/SOURCE/TOWNMGR.h	167	0	1	read	e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2	B29: complete building record/masks, UI/resource/thieves-guild domains and declarations; no bodies; implementation unread
 include/SOURCE/VIEW.h	13	0	1	unread	8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d	-
 include/SOURCE/Viewwrld.h	17	0	1	unread	7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139	-
 include/SOURCE/Wsnetwin.h	56	0	1	read	daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b50606f4bf40	B26: complete Winsock transport constants, packed startup, globals and interface; no bodies; H64/H65
@@ -123,7 +123,7 @@ include/SOURCE/searchArray.h	174	4	1	read	ad483f65ac7f0acc70696aa75651bb381b8494
 include/SOURCE/strip.h	70	0	1	unread	b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083	-
 include/SOURCE/swapManager.h	53	0	1	unread	141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf	-
 include/SOURCE/town.h	121	1	1	read	152a21d536099dc905cd861822fec1a0c9b8bf097993b95a34d50853786f289b	B12: complete building masks, faction aliases, packed spell/count union; OccupyingHero inline; H20
-include/SOURCE/townManager.h	98	1	1	unread	89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc	-
+include/SOURCE/townManager.h	98	1	1	read	89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc	B29: complete packed town-manager layout/interface and SetTown inline; pointer assignment is not context activation; implementation unread
 include/SOURCE/townObject.h	25	0	1	read	4e0c90cbc973c613dd5b9e0b6a8dbcc4241fb97b77ef9488228c8149e16574fb	B12: complete animation/building/icon/border owner declarations; no bodies
 include/SOURCE/tradpost.h	53	0	1	unread	34d17846b2639df62bb33313e1e0c627f2f272275baf0c27bbe44c3dce94e484	-
 include/SOURCE/wingraph.h	112	0	1	read	0c7cc0eb4873701adea4820ade1ce2876e6c5cab80aae5e545e02f4e121a759f	B10: complete Windows lifecycle/display/palette declarations and shared types; no bodies
@@ -191,7 +191,7 @@ src/SOURCE/DRAWING.cpp	1830	13	0	read	7937a64778bf5e55c878cb1f2c3eac6cd943b4adca
 src/SOURCE/EVENTS.cpp	9078	43	8	unread	6f4b6007b9a64974ff4791c131495be3bb06d6b7c2d7b16a5512801ca40ca1a5	-
 src/SOURCE/FINDPATH.cpp	593	12	0	read	97adb74b82448236772fe96fb9c82fc224fabeb4be314a35f1f78e306fe87c52	B14: 12 bodies; storage, both priority queues, terrain/directions, combat path and moat lifetime; H24-H28/R16
 src/SOURCE/FLY.cpp	476	4	1	read	119bad9ab6fdf5f1a43490feb68d0e1ce25e9acf134e39679c6cddcd28656fbf	B18: all four bodies incl FlyTo overload; full fit/search/facing/occupancy/sound/animation/timer paths; H28/H34-H36/H41/H43/H44/R20
-src/SOURCE/GAME.cpp	8051	103	56	unread	e78a08b9b2fdc8ed202f8d5485c6aec6ff07630136ce9cb5257cc649bce616fb	-
+src/SOURCE/GAME.cpp	8051	103	56	read	e78a08b9b2fdc8ed202f8d5485c6aec6ff07630136ce9cb5257cc649bce616fb	B29: all 103 bodies incl four unannotated inlines; complete player/save/load/puzzle/map/setup/calendar/UI/random/visibility/transfer/diff/rumour/event/consistency/test paths and macros/data; H01/H07/H17/H20/H22/H24/H26/H29-H31/H33/H44/H68-H71/R29
 src/SOURCE/HERO.cpp	2131	41	1	read	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9	B13: all 41 bodies; full hero stats/spells/skills/level/deallocation and UI handlers/setup/splits; H01/H21-H23/R15
 src/SOURCE/HEXCELL.cpp	138	8	0	read	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	B12: 8 bodies; current/dead occupants, facing-dependent draws, tower parity and empty hooks; R14
 src/SOURCE/HISCORE.cpp	320	5	0	unread	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	-

@@ -1367,9 +1367,9 @@ AFTERMOVE cancellation does nothing; AFTERDAMAGE's hypnotize guard does not impl
 an explicit hypnotize cancel. Restoring flying/speed, anti-magic clearing and
 stone/steel-skin precedence remain local, ordered behavior.
 
-Local/reuse leads, not additional confirmed shared helpers: `BuildTempWalkSeq`'s
-two memcpy-and-length updates; private CP1251 uppercasing versus the already-read
-`CyrillicToUpper` header body (wider KB/NEWGAME callers still to read); and
+Local/reuse leads: `BuildTempWalkSeq`'s two memcpy-and-length updates; private
+CP1251 folding (promoted to H69 after the complete GAME read in B29; wider
+KB/NEWGAME/EVENTS callers still to read); and
 `army::Strength` versus keep targeting's reversed multiply operands and signed
 destination. Keep byte-conversion boundaries and exact multiplication types.
 Three-elemental/upgrade exclusions in frame metadata, empty `WaitSample` /
@@ -2214,6 +2214,13 @@ reason to add another index macro or bounds policy. Cursor snapshots and its
 adjacent-config-field walking-speed expression remain local CURSOR leads; no
 second matching TU instance has yet been fully reviewed.
 
+B29 confirms GAME's GetCastle/GetCastleSlot expressions against the existing
+game::GetTown accessor. Keep the receiver explicit: GetCastle uses gpGame,
+whereas GetCastleSlot accepts an instance. NewMap and ProcessOnMapHeroes use
+scouting alone, without H63's telescope bonus; NewMap even reads hero-list slot
+zero's skill while placing the hero at the current count. Do not substitute
+the broader visibility-radius contract there.
+
 Travel spells retain their own charge/cancel rules: mobility is deducted before
 travel UI; DimensionDoor can consume the spell after an accepted invalid terrain
 choice, TownGate charges only on success, and SummonBoat failure still reaches
@@ -2531,3 +2538,247 @@ state and WriteModemPacket's escape duplication, 256-byte limit and ForcePollSou
 backpressure form a streaming framing protocol, not RemotePacketHeader or an
 icon-RLE helper. No new negative-length/overflow repair, timeout or generic
 buffer reader is introduced. These local leads do not inflate the cross-TU list.
+
+## H69 — byte-wise CP1251 case folding
+
+Disposition: reuse the existing uppercase inline; credible shared lowercase inline.
+
+`GAME.cpp:81` and `ARMY.cpp:179` each define a private ToUpperCp1251. GAME's
+ViewArmy and ARMY's combat messages use them on a creature name's first byte.
+The already-shared `include/SOURCE/KB.h:481` CyrillicToUpper carries the same
+byte mapping. `ARMY.cpp:166` ToLowerCp1251 also matches both expanded lowercase
+sequences in GAME's DoNewTurn (month and week creature names). Natural owner:
+the existing KB.h text-utility boundary, alongside CyrillicToUpper; no locale
+facility or new text subsystem is needed.
+
+Uppercase maps ASCII a-z and CP1251 E0-FF down by 32, B8 to A8, and leaves all
+other bytes unchanged. Lowercase maps ASCII A-Z and C0-DF up by 32, A8 to B8,
+and leaves the rest unchanged. Input must be interpreted as u8, evaluated once;
+retain char/u8 result conversions and each caller's subsequent byte store.
+CyrillicToUpper accepts char and casts for its comparisons, whereas the private
+helpers accept u8. Their byte mappings agree, but local return/assignment CFG
+and signed-byte conversion sites still need retail/codegen comparison before
+replacement. The lowercase helper returns char while DoNewTurn stages u8.
+
+Do not substitute a locale-dependent CRT function or MAKEFILEID's ASCII-only
+folding. GenerateStandardFileName additionally filters characters, truncates
+the basename, temporarily mutates the source dot and preserves the extension;
+its whole loop is not a case-fold helper. EVENTS' searched lowercase occurrences
+remain pending its complete read. Gain: one explicit localized-byte contract
+instead of duplicated alphabet rules, favoring an API that already exists.
+
+## H70 — read or write the exact storage size of one file value
+
+Disposition: credible small expression-macro pair, not a serialization framework.
+
+GAME's playerData::Read/Write and game::LoadGame/SaveGame/LoadMap repeatedly
+use `read(fd, &value, sizeof(value))` or its write counterpart. Fully read
+`EDITOR/mapcell.cpp` fullMap::Read/Write does the same for width, height and
+extraCount. `BASE/RESMGR.cpp` ReadByte/ReadWord/ReadLong uses exactly the read
+expression, assigning its result to an unused local. Natural owner: the BASE
+file-utility boundary in Misc.h, near FileSize/CreatePCXFile, not game.h.
+
+Possible names: READ_FILE_VALUE and WRITE_FILE_VALUE. Keep the CRT call's result
+and argument conversions unchanged, so this remains an expression rather than
+a void statement macro. Parenthesize arguments; evaluate fd once and the value
+lvalue once through its address. The sizeof occurrence is unevaluated. Restrict
+initial candidates to exact-size scalar/plain-record lvalues without overloaded
+address-taking; no new temporary, initialization, retry, error test, byte swap
+or allocation belongs inside. Preserve caller initialization, assertion, field
+ordering and partial-read effects. The name states why this particular byte
+count is correct and removes the repeated spelling of each field.
+
+Exclude GAME's one-byte slices of wider globals, campaign/state prefixes,
+event-header prefixes, arrays and dynamic payload lengths, char scratch buffers
+read as i32, and `read(fd, this, sizeof(m_difficultyRating))`. HERO's whole/base
+record methods are not field-lvalue instances. KB's searched read of one score
+entry with sizeof(the entire entries array) is also not an exact-size instance;
+do not silently change its byte count. Leave all such schema decisions visible.
+The two consecutive barrier-tent writes/reads stay two calls. R10/R14's file-mode,
+error and legacy-record exclusions remain in force.
+
+## H71 — reuse the existing one-slot army dismissal operation
+
+Disposition: existing-API reuse/possible inline, subject to call-site byte evidence.
+
+`ARMYGRP.cpp:131` armyGroup::Dismiss stores CREATURE_NONE in the selected type,
+then zero in its count, without checks or other changes. GAME's ClaimTown loop
+and ViewArmy's accepted dismissal tail repeat those two stores. The creature/
+troop aliases occupy the same packed slots; zero has the same i16/u16 bits.
+Natural owner remains `include/SOURCE/armyGroup.h`, not a new global macro.
+
+Keep group and slot stable, type-before-count order, and every enclosing guard,
+loop, owner update and dialog result outside. The existing method is currently
+out-of-line: replacing open code with a call or moving a body to a header is not
+assumed byte-neutral. Preserve its callable ABI and prove any inline expansion.
+Readability gain is naming dismissal through the existing domain operation.
+
+Explicit noninstances: SetupTowns' default army reset writes count before type;
+SetRandomHeroArmies uses RANDOM_HERO_EMPTY_COUNT = -1, not zero; record memset
+followed by type-only initialization is different again. DamageGroup's count-
+then-type death tail and CheckHeroConsistency's count-only repair also remain
+outside this contract. No generic army reset is proposed.
+
+## B29 — extensions to established candidates
+
+H01 gains exact type/command/id prefixes in ViewSpells, UpdateSpellWidgets and
+ViewArmyHandler's animation update. Preserve the earlier redundant type store
+before UpdateSpellWidgets' memset; ViewArmy's reused/scattered headers are not
+new contiguous instances. H30 gains text-only spell/army/transfer/new-turn
+dialogs, excluding icon/resource payloads. H31 gains the checked spell/army
+window and widget allocations, not the unchecked detail or transfer buffers.
+H17 gains save-transfer/diff/join short logging tails; H68 gains their optional
+retry-dialog/default-message tails, with reliability still explicit.
+
+H20 gains BuildingsOwned, neutral reinforcements, ViewArmy upgrades, gold income,
+PerDay/PerWeek/PerMonth, SetupTowns, GetNumThievesGuilds and CountShrines.
+BuildingsOwned's mage-guild slot/buildState special case and faction gate are
+outside the bit predicate. H22 gains GetLuck's embarked-state check. H24 gains
+the terrain reads in puzzle/new-map/event/mine/visibility/month/rumour paths;
+keep each current-map/adv-manager cell resolution and Column expression.
+H26 gains ConvertObject and ComputeUALoc's ordered bounds; SetVisibility uses
+a different x/y/lower/upper order, and NewMap uses a border margin.
+
+H29 gains normal mana capacity in initial hero setup and PerDay, preserving
+Stats(KNOWLEDGE) calls and i16 stores. H33 gains RandomizeEvents' four-elemental
+exclusion, after its separate ghost test and before the conditional random draw.
+H44 gains SetVisibility's integer square-root distance (y-square then x-square,
+strict radius comparison). H07 gains ComputeUALoc's upper-then-lower clamp and
+GetLuck's lower-then-upper clamp; later artifact overrides stay outside.
+Existing owner accessors and H63's scouting-only exclusions are recorded in R26.
+
+## R29 — game setup, serialization, calendar and transfer contracts
+
+GAME's WORLDMAP macro is a receiver-local member-address alias, already explained
+by game::GetWorldMapData. Its save-transfer local-name macros are scoped spelling
+aliases, not reusable operations. RandomMineType, RandomizePassword and the
+existing object/overlay/owner accessors already name small local operations.
+The town-manager header's SetTown assigns only its pointer; it is not a town
+context/activation workflow. No implementation coverage is inferred for TOWNMGR.
+
+Player/save/map formats remain explicit. playerData::Write clears 48 scratch
+bytes but serializes 42; cheated is a one-byte slice of the global game field;
+barrier tents are written and read twice. SaveGame's expansion flag controls
+the leading tag, hero records and artifact-table lengths, while campaign data
+uses its own prefixes. Preserve field order, narrowed current-player/human
+buffers, marker writes, and zero payloads for null map-extra records. LoadGame
+does not validate markers or full read lengths; loadFromFile actually selects
+SetupOrigData and returns. Existing wider global bytes and some campaign flags
+are not uniformly reset. The filename path checks use localized strings with
+legacy ASCII prefix lengths, and some sprintf calls use the filename as format.
+GenerateStandardFileName temporarily removes/restores the source dot, filters
+the uppercase basename to eight characters and copies the extension unchanged;
+without a dot it simply copies. No new string/format repair is hidden in H69/H70.
+
+LoadMap's legacy world-map conversion, one-byte coordinate/type records,
+base-format mine limit and final u16 junk differ from LoadGame's chunked stream.
+Map-extra allocation orders pointer array, size array, then both clears, and
+starts record processing at index one. SetMapSize may skip search-array Init
+for unchanged dimensions but always frees/reallocates/zeros mapExtra. Resource
+ownership, old-record prefix conversion and unchecked sizes remain visible.
+
+Hero/player selection is not a shared container policy. NextHero scans the
+global current player's ids but returns this player's corresponding id; other
+queries use this directly. Scan returns the first -1 slot; RandomScan ignores
+one apparent retry argument. GetNewHeroId relaxes availability/class/experience/
+campaign-portrait filters at different attempt counts and ultimately returns
+its last draw, not a failure sentinel. HeroIDToHeroPos/TownIDToTownPos return the
+first match, unlike the previously read last-match removal/context searches.
+NumOfGivenArtifact counts duplicate artifact slots. GetNumObelisks scans the
+boat-count-sized visitor array, not the number of placed obelisks.
+
+Puzzle generation retains both random streams and exact draw timing. The
+zero-obelisk division precedes the all-visited special case; justCount returns
+before seeding. Piece removal performs its fallback random draws even when
+the preferred target is usable. ComputeUALoc generates nonzero x and y offsets
+separately and eventually falls back to the real location without validating
+it. NewMap's ultimate-artifact search uses margins and early human-distance
+restrictions, draws its distance threshold before and during the loop, and
+does not share ComputeUALoc's trigger test or retry policy. SetupNewRumour's
+direction tests repeatedly use artifact X against both width and height; a
+coordinate helper must not silently substitute Y.
+
+Initial player/hero/town resets, campaign awards and placement retain distinct
+store order and side effects. Base campaign awards add experience, expansion
+awards assign it. NewMap's setup mapping and ProcessOnMapHeroes' assignment,
+class and placement passes are whole-map phases, not one per-cell pass.
+The latter consumes extras only after placement, adjusts hero/patrol Y above a
+town, and applies custom skills after experience/level work. ClaimTown sends
+before its same-owner return, may deallocate through global gpGame, clears the
+army, writes ownership/list state and changes two flags before optional
+visibility/end-game work. ClaimMine always sends, has different resource/flag
+coordinates and late-overlay rules, and supports player -1. CreateBoat saves
+the old cell trigger/metadata; it is not SummonBoat's relocation workflow.
+
+RandomizeEvents has three ordered map passes: event generation, shadow-only
+marking and occupancy. Extra-layer scanning omits the dummy exclusion in H25;
+its capped upper/lower lists compare tileset families, not sprite identity.
+ConvertObject stops each extra-chain traversal when the next node lacks that
+layer's sprite, whereas HasLateOverlay and the overlay conversion routines
+continue through all nodes. ProcessMapExtra also has three distinct passes.
+Do not introduce a universal layer iterator that changes termination or order.
+
+Random object/town/mine/artifact/army generation is not one weighted-choice
+helper. Preserve open monster-strength bounds, the terrain-specific mine
+selection retries, random artifact exclusions and uniqueness counter timing,
+and the draw consumed even for a spell scroll's early event exit. Monthly
+monster spawning uses a different empty-tile test and two troop-count draws;
+RandomizeEvents excludes ghosts/elementals from its guard roll, PerMonth does
+not. GetRandomNumTroops has per-creature ranges and a no-draw default of three.
+Town spell generation seeds guaranteed spells before rejection sampling; its
+attempts++ > 500 condition continues rejecting instead of breaking the loop.
+Preserve short-circuit draw consumption and packed spell/count aliases.
+
+Calendar/income updates preserve all-player/all-record traversal, including
+off-map town ages and hero mana regeneration. Gold counts artifact duplicates,
+estates and separate AI/handicap multipliers. Non-gold handicap applies after
+the day/week/month update and uses the saved income delta; it is not a second
+application of the gold multiplier. Weekly site thresholds are tested before
+adding growth and are not saturation bounds. Weekly neutral/AI adjustments
+differ from the monthly plague subtraction and halving. PerDay computes
+giCurTurn before rollover; the same day-number expression has searched KB/
+PHILAI counterparts still awaiting full reads, not a promoted shared helper.
+Mana restoration preserves existing over-cap mana and clears the well flag.
+GetLuck applies the battle-garb override after its clamp. ExperienceValueOfStack
+tests positive quantity, not H21's type sentinel. GiveArmy's explicit slot,
+merge, negative-type empty slot and no-room paths remain its own operation.
+
+Spell and army dialogs retain globals, byte narrowing and caller-owned payloads.
+Read-only spell selection consumes an event, insufficient mana continues, and
+accepted selection forwards a retyped event. Tab command/id mappings and close
+rewrites are not H32's completion-flag operation. ViewArmy uses fixed coordinates,
+base and live monster records for different statistics, uncapped spell count
+for spacing, and capped count for visible icons. The handler clears dismissal/
+upgrade flags on every dispatch. Upgrade confirmation charges the current
+player and only then forwards the close request. Timer strictness, repeated
+GetManaCost/KBTickCount calls and zero-count assumptions remain explicit.
+
+NextPlayer and DoNewTurn order end-game checks, town/hero deactivation, per-day
+rollover, context, local/remote UI, save transfer, music and environment updates
+differently. ShowComputerScreen temporarily changes local-human state and has
+additional bottom-view work absent from WaitForPlayer. TurnOffAIMusic only
+sets the ready flag; it is not an inverse sound-lifecycle operation. No generic
+context, blackout or audio guard is inferred from superficially paired code.
+
+TransmitSaveGame and ReceiveSaveGame retain compression aliases and different
+allocation/free ordering. Sender writes only unacknowledged packets in batches;
+receiver consumes messages without sender filtering, uses signed packet indices,
+and replies with the payload-size byte count after initializing only a batch's
+acknowledgements. Received/transmit CRCs are computed and logged, not enforced.
+Timeout dialogs, shutdown paths, save/diff/join ordering, and temporary music
+readiness changes remain outside H17/H68. No packet-bounds or cleanup repair is
+introduced. CreateDiffFile may read the old file even when a recipient change
+forces a full send; forceWhole is a different condition. Its terminal copy uses
+oldSize-position, and CreateJoinFile advances existing output for skip commands.
+WriteDiffHeaderInfo/GetSkipCopyLen own their short/byte/word local format, not
+a generic varint or RLE reader. Compression tests do not assert their CRCs.
+
+CheckHeroConsistency repairs selected counts/cells without normalizing every
+type, metadata or owner slot. CheckValidAvailableHeroes changes the available
+id but does not add an availability-table update. GetMapEvent checks the first
+active coordinate event for the current player's color; time events instead
+use date/repeat and human/AI applicability. Time-event resource display amounts
+are clamped separately from adding the original reward and clamping the stored
+balance; only the last two nonzero resource entries are displayed. CountShrines
+walks map triggers/occupying heroes and checks owner, tavern bit and necromancer
+faction, rather than simply scanning every town record.
