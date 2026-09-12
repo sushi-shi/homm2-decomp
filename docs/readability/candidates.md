@@ -43,6 +43,13 @@ SET_TEXT command, with the exact type/command/id prefix. `SetupHeroView` and
 `DoHeroSplit` have intervening formatting calls; their scattered stores are not
 automatically contiguous instances, even when final message values agree.
 
+B15 adds the initial type/command/id triple in `UpdateCombatSystemOptions`.
+Its later broadcasts intentionally reuse command and payload state.
+
+B17 adds `combatManager::CombatMessage(text, ...)`: its COMBAT_MESSAGE aliases
+denote the same WIDGET / SET_TEXT values and exact three-store prefix. The second
+line's id/text-only broadcast intentionally reuses that header.
+
 Readability gain: name the event conversion once instead of repeating a union
 protocol or maintaining two private definitions. Historical confidence: plausible
 macro-shaped idiom, but the existing source definitions are reconstruction, not
@@ -163,6 +170,9 @@ B04-B05 add raw frame lookups in `font::GetCharacterWidth`, the icon extent
 methods, and the ten RLE decoders. Keep their subsequent entry-field loads and
 file-static state assignments in place; the scaling wrapper has no raw lookup.
 
+B16 adds the raw effect-frame lookup in `army::PowEffect`; `army::SpellEffect`
+already uses the API. Keep current frame and icon selection in the caller.
+
 ## H07 — sequential clamp to a scroll range
 
 Disposition: shared small idiom; macro versus inline remains an evidence question.
@@ -192,6 +202,11 @@ leave the ordering explicit even where ordinary inputs yield the same result.
 B08 adds the X/Y window-position clamps in `ReadPrefsFromRegistry`. The source
 uses video height for the X limit and video width for Y; a helper must retain
 those actual arguments, not quietly correct the apparent axis swap.
+
+B15-B16 add the upper-then-lower [-20, 20] attack/defense difference clamp in
+`combatManager::KeepAttack` and `army::DamageEnemy`. It is a separate ordered
+variant, not automatic reuse of the lower-first spelling. The surrounding
+damage arithmetic has different floating-point, rounding and quantity stages.
 
 ## H08 — list row and scrollbar drag arithmetic
 
@@ -398,6 +413,9 @@ initialization, list insertion or failure handling; this sequence does none of
 those. Because the three current statements are already clear and occur once per
 TU, retain only if a named base operation improves readability enough to justify
 the indirection and its matching cost.
+
+B15 confirms the exact mask/priority/active sequence at the end of
+`combatManager::Open`; combat resource setup and name copying stay outside it.
 
 ## R08 — unified audio lifecycle or backend-dispatch macros
 
@@ -619,6 +637,13 @@ normalizing the result changes callers that retain a masked numeric value.
 Read later game/castle/AI consumers before finalizing the interface. No new
 call boundary or inline expansion is assumed byte-neutral.
 
+B15 adds `combatManager::SetupCombat`, `InitNonVisualVars`, `LoadIcons`, and
+`SetupAndLoadObstacles`. Castle/moat Boolean assignments explicitly normalize
+the mask; faction-specific shrine and fortification guards remain caller-owned.
+
+B17 adds the knight/rainbow background and moat tests in `DrawBackground` /
+`DrawFrame`. Preserve castle and faction short-circuit conditions outside it.
+
 ## R14 — data-owner algorithms and deceptively similar state resets
 
 The map owner already has `Cell`, `GetCell`, `Row`, `Column`, `Extra` and
@@ -666,6 +691,11 @@ The existing combat `army::IsAlive` requires both a valid type and positive
 quantity and is a different domain. `IsMember` asks whether a particular type
 occurs anywhere, while `GetNumArmies` counts occupied slots; neither is itself
 a slot predicate. Any inline use still needs matching evidence.
+
+B15 adds group-presence tests in `CombineGroups`, `Close` and `LoadArmies`.
+The count/type reset at the start of `UpdateArmyGroup` instead matches the
+existing `Dismiss` type-then-count order; it is a possible existing-method reuse,
+not a new reset macro. Preserve initialization and store sequencing if measured.
 
 ## H22 — reuse the existing embarked-state accessor
 
@@ -751,6 +781,10 @@ cache across callbacks. Keep coordinate resolution outside this helper:
 `advManager::GetCell` returns cell (0,0) for out-of-map input (targeted body read),
 whereas the full-map accessors directly index their storage.
 
+B15 adds `combatManager::SetupCombat`'s battlefield terrain lookup. The source
+can assign a null battlefield cell before that lookup; this audit does not add
+an early guard or silently change the caller's current preconditions.
+
 ## H25 — non-shadow, non-dummy object-sprite test
 
 Disposition: promising semantic predicate; final naming needs wider map review.
@@ -788,6 +822,10 @@ The monster scan's outer y-loop currently uses MAP_WIDTH, not MAP_HEIGHT; a new
 helper must not silently repair that separate loop. This is not H02's narrowed
 widget-local geometry or combat's existing `ValidHex`.
 
+B15 adds the exact x-lower/x-upper/y-lower/y-upper form in
+`combatManager::MoreTreesNear`. Its radius-zero repeated center samples and
+tree-versus-mountain classification are outside the bounds predicate.
+
 ## H27 — reuse the existing search-node accessor
 
 Disposition: existing inline; do not introduce another flattening macro.
@@ -823,6 +861,15 @@ the caller's range is significant. A separate current-army accessor is only a
 lead until the corresponding combat consumers are read. Keep raw-byte evidence
 as the criterion for retaining a new inline boundary.
 
+B16-B17 confirm repeated current, target and mini-view owner lookups in ARMY and
+DRAWING. A possible current-army spelling must use `m_currentArmySide`, not
+`m_currentSide`: physical and controlling sides are not interchangeable.
+
+B15 adds direct owner-array accesses in `LoadArmies`, `UpdateArmyGroup`,
+`CheckApplyGoodMorale`, `CheckApplyBadMorale`, `KeepAttack` and
+`ExperienceValueOfStack`. `GetNextArmy` also uses pointer-plus-index spellings;
+their operand order requires review before replacing them with the same accessor.
+
 ## R16 — search algorithms, packed state and direction systems
 
 Adventure directions are eight compass directions; combat has six neighbors
@@ -856,3 +903,367 @@ to compare with later army code, not yet a universal passability API. Existing
 `ValidHex` is a 0 <= hex < 117 Boolean predicate (targeted body read), not every
 other constant named MAX/COUNT in combat. Monster `HAS` tests already expose
 flying/wide flag intent; a generic new flag framework is unnecessary.
+
+## H29 — normal spell-point capacity
+
+Disposition: credible small hero inline, not a spell-point cap.
+
+`HeroHandler` / `SetupHeroView` in HERO and captain setup in
+`combatManager::SetupCombat` compute `Stats(HERO_PRIMARY_KNOWLEDGE) * 10`.
+A proposed `hero::NormalSpellPointCapacity()` would name the same rule in the
+display and initialization paths. Owner: `SOURCE/hero.h`; retain the existing
+`Stats` call, signed result promotion and integer multiplication. Captain setup
+subsequently narrows to `i16`; display callers do not.
+
+Do not clamp `m_spellPoints`, infer spellbook possession, or reinterpret capacity
+as the current balance. Above-normal spell points are explicitly allowed by the
+hero UI. No additional minimum/maximum or rounding rule belongs in this helper.
+
+## H30 — shorter calls for a text-only NormalDialog
+
+Disposition: strong fixed-argument readability candidate; owner body review pending.
+
+`hero::ViewStat`, `Dismiss`, `CheckLevel`, `HeroHandler` and
+`CombatSystemOptionsHandler` repeat `NormalDialog(text, mode, -1, -1, -1, 0,
+-1, 0, -1, 0)` across HERO and CMBTMGR. A fixed-arity macro such as
+`NORMAL_TEXT_DIALOG(text, mode)` can preserve that exact ten-argument call;
+default arguments on the existing declaration are another period-plausible
+option. Owner: the `NormalDialog` interface in `SOURCE/KB.h`.
+
+Keep mode explicit, argument evaluation unchanged and the result read by the
+caller. Artifact and secondary-skill dialogs have non-default trailing slots
+and are not instances. Do not hide `sprintf`, `gText` mutation, sound playback,
+button-result interpretation or dismissal side effects. The declaration and
+these callers are read; the large NormalDialog body and wider consumer set
+still require their full planned review before finalizing defaults.
+
+## H31 — check an already-stored allocation with the existing error handler
+
+Disposition: plausible narrow statement macro; usefulness versus indirection to rank.
+
+`HeroView`, `DoHeroSplit`, `combatManager::Open` and `CombatSystemOptions` use
+`new`, store the resulting pointer, then call `MemError()` if it is null.
+A proposed `CHECK_ALLOCATION(pointer)` could name only the null-test/error-call
+pair. Keep allocation, assignment and destruction outside it; no allocator,
+exception, RAII or constructor-argument framework is needed. Owner: the existing
+`MemError` interface in KB, without forcing new dependencies into BASE headers.
+
+The check must not inject a return/throw, assume the handler is nonreturning,
+check before assignment or evaluate a side-effecting pointer expression twice.
+Different pointer store widths and object types remain untouched. Use the
+existing error handler rather than replacing it with an assertion or a different
+failure path. Allocation sites with no current check are not added instances.
+
+A targeted complete read of `MemError` confirms that reentry immediately returns
+when `gbInMemError` is set; otherwise it logs, formats a message and calls
+`ShutDown`. A nonreturning assumption is therefore particularly inappropriate.
+
+## H32 — preserve the dialog result and request handler completion
+
+Disposition: strong small statement protocol shared by two reviewed handlers.
+
+At exit, `HeroHandler` and `CombatSystemOptionsHandler` copy the current widget
+id into `gpWindowManager->m_dialogResult`, write widget id 10, then write widget
+command 10 (`WIDGET_COMMAND_DIALOG_SELECT`). A proposed
+`FINISH_DIALOG_MESSAGE(message)` can name just these three stores, in that order.
+Owner: the existing window-manager/message boundary. Keep the caller's
+`return MESSAGE_DISPATCH_FORWARD` explicit rather than hiding control flow.
+
+The already-read `heroWindowManager::DoDialog` treats handler-forward plus the
+dialog-select command as termination without overwriting the saved result;
+that differs from its window-broadcast completion path. The helper must not
+initialize the message type, clear other payload slots, set result to 10 or
+replace the handler result with an executive close event. Both callers already
+have the relevant widget-message context; retain it and the original button id.
+
+## R17 — combat setup, reset and presentation are not one generic algorithm
+
+`CombineGroups` has two passes with existing `IsMember` / `Add` / `Dismiss`
+calls; its second inner loop does not break after placement. Generic merging
+would change its sequence, including sentinel treatment. Army loading first
+clears quantity/type in slot-major order, then calls InitClean in side-major
+order. Hex initialization differs from the constructor's occupant index and
+field-store order. Do not replace these with one clear-all routine.
+
+Good and bad morale use different random ranges, guards, network handling and
+bonus flags. Turn selection distinguishes physical army side from current
+controlling side under hypnotize and re-enters deferred rounds. Existing
+`OppositeCombatSide` can be compared against XOR/subtraction forms only on the
+actual valid-side domain; no generic toggle or living-army filter is implied.
+
+Catapult/keep/wall state values overlap but are not a uniform destroyed flag.
+Obstacle rolls include a high endpoint equal to a declared type count; map
+setup still makes an otherwise-unused random draw. Neither is corrected here.
+Keep targeting prioritizes spell-disabled, shooter/flyer status and value with
+strict tie behavior, while grid picking has special hero/ballista regions and
+signed remainder geometry. Generic random-choice or rectangle helpers would
+hide those contracts.
+
+Animation leads for comparison with ARMY and rendering TUs: inclusive extent
+updates, speed-scaled timer deadlines, projectile-angle frame selection, and
+quantity-dependent creature names. Shared extents have multiple store/clamp
+orders and sometimes 442 versus 479 output limits; never infer a whole drawing
+loop macro. Door raise/lower sequences and global visibility/palette lifetime
+remain explicit, as do settings that use `1 - value` rather than Boolean NOT.
+
+## H33 — four elemental creature types
+
+Disposition: credible small creature predicate, with ordered variants to preserve.
+
+`combatManager::UpdateArmyGroup` tests that a type is not earth, air, fire or
+water elemental. `army::Init`, `LeaveNoBody` and `SpellCastWorkChance` contain
+the corresponding four-type positive test. A proposed
+`IsElementalCreature(type)` belongs beside the creature domain in KB_TYPES;
+it names exactly those four types, not all creatures that share one effect.
+An expression macro retains short-circuit comparisons and needs a stable operand;
+a small inline is plausible if its expansion/argument evaluation is verified.
+
+Keep summoned, mirror, undead and giant/titan conditions outside this helper.
+`ProcessDeath` has the same four exclusions in a different comparison order;
+record it as a variant, not an automatic exact expansion. `ModifyFrameInfo`
+intentionally includes only three elementals because fire supplies the baseline;
+replacing that list with the four-type predicate would be wrong.
+
+## H34 — clamp the accumulated combat extents
+
+Disposition: strong four-statement macro hypothesis for exact-order sites.
+
+`army::Walk` and the projectile phase of `combatManager::CatAttack` independently
+clamp global minimum X, minimum Y, maximum X, maximum Y, in that order, to
+0, 0, 639, 442. A proposed `CLIP_COMBAT_EXTENTS()` belongs with the combat
+extent declarations. Name only those four conditional stores; the catapult's
+subsequent minimum-visible-Y adjustment remains explicit.
+
+Do not reorder axes, normalize an inverted rectangle, or include draw/visibility
+flags. The catapult impact phase orders X-min/X-max/Y-min/Y-max differently;
+other routines use ternaries, 479 or other limits. Those are not exact instances.
+This is screen-bound clipping, not H07's two-sided clamp on a single variable.
+
+B17 adds `combatManager::DrawFrame`'s exact four-store sequence after expanding
+all four bounds by one pixel. Keep that expansion and extent-only early exit
+outside the clamp. Grid-copy clipping has different limits and local destinations.
+
+## H35 — update an inclusive screen region
+
+Disposition: strong short-call macro, distinct from whole-combat redraw.
+
+`army::Walk`, `SpecialAttack`, `PowEffect`, and `combatManager::CatAttack` /
+`ShootMissile` call `gpWindowManager->UpdateScreenRegion(left, top,
+right - left + 1, bottom - top + 1)`. A proposed
+`UPDATE_INCLUSIVE_REGION(left, top, right, bottom)` would name the inclusive
+endpoint-to-size conversion at the window-manager interface. Operands must be
+stable and side-effect-free because left/top are repeated; preserve integer
+promotions and the caller's global versus saved/local extent values.
+
+Do not clip, cache new bounds, or add drawing and timer work. The existing
+`combatManager::UpdateCombatArea` is not interchangeable: its fully read body
+checks visibility/window state, updates the entire 640-by-443 area and writes
+`gbEnlargeScreenBlit` false then true. None of that belongs in this conversion.
+
+B17 adds `UpdateMouseGrid`, the extent branch of `DrawFrame`, and stale-view
+erasure in `DrawSmallView`. Their surrounding save/restore/blit-flag protocols
+remain separate; the mini-view's final size-based update is not an instance.
+
+## H36 — speed-scaled combat animation deadline
+
+Disposition: plausible narrow expression macro; float evaluation is the contract.
+
+`army::SpecialAttack`, `PowEffect` and `combatManager::ShootMissile` compute
+`static_cast<i32>(KBTickCount() + delay * gfCombatSpeedMod[gConfig.combatSpeed])`.
+A proposed `COMBAT_DEADLINE(delay)` at the combat timer interface can name that
+exact expression; leave timer index, assignment and polling outside it. The
+catapult has the same-width `i32l` cast and remains a type-spelling variant
+until matching verifies any unification.
+
+The tick is converted to floating point for the addition, followed by one final
+integer conversion. Casting the scaled delay before adding the tick is not the
+same operation. Walking/attack duration sites divide after floating multiplication
+by frame count; do not replace that with integer-divided input. `SpellEffect`
+reverses the multiplication operands, another explicit variant. No generic
+wait/pump abstraction or wraparound-policy change is proposed.
+
+B17 confirms the reversed-multiplication variant in both DrawFrame deadline
+sites. Preserve the difference between `updateScreen == 1` and general truthiness
+and the distinct timer behavior of extent-only and whole-area branches.
+
+## H37 — select a projectile frame from angle midpoints
+
+Disposition: small shared loop/inline candidate; lower confidence than expression macros.
+
+`army::SpecialAttack` and `combatManager::ShootMissile` scan from angle index 1
+until `(angles[k] + angles[k - 1]) / 2.0f < degrees`, choosing `k - 1`, or the
+last frame if no strict crossing occurs. A proposed
+`ProjectileFrameForAngle(angles, count, degrees)` belongs with the existing
+projectile/frame declarations in ARMY. Preserve the scan order, strict inequality,
+float expression parentheses and dynamic byte-sized count versus fixed nine-count
+caller contract. Establish the valid count domain; do not silently add bounds repair.
+
+Keep angle calculation and vertical cases outside it. The army needs the angle
+for selecting its shooting animation as well as the projectile frame; the generic
+missile does not. Their slope conversions differ, including an explicit VC6
+floating-instruction constraint. The rest of the two projectile loops is not a
+shared algorithm (R18), and a callable helper is not assumed byte-neutral.
+
+## H38 — creature display name for a quantity
+
+Disposition: credible shared expression macro or existing-domain inline.
+
+`army::CheckLuck`, the genie branch of `DoAttack`, and
+`combatManager::CheckApplyBadMorale`, `CheckApplyGoodMorale` / `KeepAttack` choose
+`count <= 1 ? gArmyNames[IDX(type)] : gArmyNamesPlural[IDX(type)]`.
+A proposed `CreatureDisplayName(type, count)` belongs beside those tables in KB.
+Retain the actual count (stack size versus killed quantity), <= rather than ==,
+table element constness and the unselected arm's lack of evaluation. A macro
+requires stable arguments; an inline must not introduce premature evaluation.
+
+This is the game's two-table selection, not a general Russian pluralization or
+case-conversion API. The ordinary army damage message lowercases a copied
+singular name in `gTargetName`; that conditional is not the same raw-table helper.
+CP1251 casing, formatting, sound and text-buffer mutation remain outside it.
+
+## H39 — approximate distance between combat cell pixel centers
+
+Disposition: useful small forwarding helper, owner placement needs dependency care.
+
+`searchArray::FindCombatPath` and `army::GoBerserk` pass the two cells' X/Y
+coordinates to the existing `QuickDistance`; the berserk routine repeats it for
+nearest-army and two-target selection. A proposed combat-cell distance helper
+would name that coordinate extraction and preserve the existing metric/API.
+Natural domain: combatManager/searchArray boundary, without creating a header
+include cycle or a duplicate implementation of `QuickDistance`.
+
+This metric is max(deltaX, deltaY) plus half the smaller delta, measured on pixel
+centers. It is not hex-step distance or Euclidean distance. Preserve actual cell
+indices and coordinate-read order; do not add validation, change signed arithmetic,
+reorder operands, or absorb targeting/tie-breaking. Calling versus inlining must
+be measured before retaining a source change.
+
+## H40 — clear the live occupant identity of a combat hex
+
+Disposition: credible two-store owner method/macro, not a full cell reset.
+
+`combatManager::MakeCreaturesVanish` and `army::ProcessDeath` store
+`m_occupantSide = COMBAT_SIDE_NONE` then `m_occupantIndex = -1` into a hex cell.
+A proposed `ClearOccupant()` on hexcell, or a narrow statement macro at that
+owner, would name those two ordered stores only. Retain the caller's choice of
+front/rear cell and its wide-creature/corpse-capacity guards.
+
+Do not clear the occupant frame, corpse stack, path fields or obstacles. The
+constructor uses a different index value and `Walk` clears index before side;
+neither is an exact instance. Repeated pointer/index evaluation in a macro needs
+stable operands; a method's single `this` evaluation and call expansion require
+matching evidence. Adding an all-purpose reset would erase these distinctions.
+
+## R18 — army animation, damage and spell protocols remain explicit
+
+`gbNoShowCombat` and `m_nonVisualCombat` guard different levels of work.
+Resource disposal/null stores in `army::FreeResources` stay inside its guard;
+combat-manager icon release does not have the same null-store protocol. Animation
+flags often reset to fixed false/true values rather than restoring an old value.
+Do not add a generic RAII/resource/visibility guard or substitute facing for side
+in wide-creature placement and adjacency rules.
+
+Projectile loops differ in background clipping and first-frame save/draw behavior,
+and in mage/lich special paths. One army background-Y test uses 640, not its
+nominal height; a shared clipping helper must not silently repair it. `PowEffect`
+spans multiple armies with non-reset phase counters, consults this army's pending
+sequence while drawing another, and orders death before petrification. These
+are not grounds for a universal animation-loop macro.
+
+Damage and recursive retaliation preserve ghost/remote/genie/mirror/life-steal
+branches, lost-hit-point carry, artifact timing and temporary facing changes.
+Keep damage uses a different base-value/rounding calculation. `SpellCastWorks`
+still consumes an SRandom(1, 99) draw at both zero and full chance; death uses
+the other random stream. Corpse insertion checks both wide-cell capacities,
+and immediate/no-body/mirror paths have different vanish and clear schedules.
+
+Spell IDs, influences and visual effect IDs are separate domains. Existing spell
+duration is compared before narrowing to a byte; no saturation is introduced.
+AFTERMOVE cancellation does nothing; AFTERDAMAGE's hypnotize guard does not imply
+an explicit hypnotize cancel. Restoring flying/speed, anti-magic clearing and
+stone/steel-skin precedence remain local, ordered behavior.
+
+Local/reuse leads, not additional confirmed shared helpers: `BuildTempWalkSeq`'s
+two memcpy-and-length updates; private CP1251 uppercasing versus the already-read
+`CyrillicToUpper` header body (wider KB/NEWGAME callers still to read); and
+`army::Strength` versus keep targeting's reversed multiply operands and signed
+destination. Keep byte-conversion boundaries and exact multiplication types.
+Three-elemental/upgrade exclusions in frame metadata, empty `WaitSample` /
+`ResetPath` calls, STAND-frame-zero geometry and repeated icon lookups must not
+be "cleaned up" merely because a different formulation looks conventional.
+
+## H41 — grow an accumulated rectangle in a fixed order
+
+Disposition: genuine shared four-statement idiom; spelling needs a readability test.
+
+`icon::CombatClipDrawToBuffer`, `army::Walk`, and `combatManager::UpdateGrid`
+test incoming left/top against accumulated minima, then incoming right/bottom
+against maxima, updating in left/top/right/bottom order. A narrow rectangle-grow
+macro at the existing graphics extent interface could expose that shared intent.
+All eight scalar operands must stay available: callers use global bounds, local
+saved bounds and SLimitData/hex fields. Do not introduce a new rectangle temporary
+or copy/normalize the storage merely to make a helper call shorter.
+
+Preserve strict comparisons, conditional-only stores and repeated source reads;
+aliasing, promotions and destination widths matter. No clipping, +1 conversion,
+empty-rectangle policy or visibility flag belongs here. `UpdateMouseGrid` has
+the same geometric idea with reversed comparison operands; projectile paths
+interleave growth and clipping in a different axis order. Those are variants.
+An eight-argument macro may be less readable than the four visible statements;
+rank below the stronger fixed-bound and short-call candidates if so.
+
+## H42 — default optional combat sprite drawing arguments
+
+Disposition: strong default-argument candidate on an already-reviewed API.
+
+Army status/effect drawing, `combatManager::CatAttack`, and rendering in
+`DrawFrame` / `DrawSmallView` repeatedly call `icon::CombatClipDrawToBuffer`
+with final arguments `offset = 0`, `colorTable = NULL`, `yModify = NULL`.
+The owner declaration and complete implementation are read. Period-plausible
+defaults on those three parameters in `BASE/icon.h` would allow the existing
+method name to carry the call, preserving its ABI and full supplied argument list
+after compilation. A fixed-arity forwarding macro is an alternative, but adds
+another name to an already semantic API.
+
+Keep icon, coordinates, frame, limits and orientation explicit, and preserve the
+return value: status and mini-view callers test ICON_DRAW_SKIPPED. Nonzero offsets,
+palette translation and vertical modification are not stripped; the full creature
+draw uses all three. Do not infer orientation from side/facing, replace the call
+with DrawToBuffer, or add drawing flags and screen updates. Even defaults still
+need the normal matching verification before retention in canonical source.
+
+## R19 — combat rendering is ordered stateful work, not a scene framework
+
+CombatMessage copies into private mutable storage before visibility checks and
+temporarily terminates the first newline. History expiration has strict versus
+non-strict comparisons and separate pending state. Do not add a general line-wrap
+or clear-message macro, mutate a caller's literal, or replace NoShowCombatLog's
+local buffer with H19's shared gText buffer.
+
+Grid display tracks old/current shading and a separate grid-was-showing flag;
+some no-change paths return before copying current state. Mouse-grid validation
+rejects edge columns as well as out-of-range indices, unlike ValidHex. Its bottom
+clipping is one-axis and its new bitmap currently has no MemError check. These
+are not reasons to add validation or failure behavior during a helper extraction.
+
+DrawFrame traverses distinct corpse, obstacle, hero, wall and army phases, reversing
+columns for particular castle rows and separately drawing special occupants.
+Do not hoist its automatic wall tables or merge all cell traversals. Hero overlay
+coordinates and orientations differ between extent and drawing paths. Moat redraw
+depends on front/rear movement globals and drawbridge state; geometric simplification
+would conceal the actual layer order.
+
+Extent flags sometimes reset to fixed values, while CombatMessage and mouse-grid
+paths preserve old values. Cursor readiness and PollSound have both normal and
+finish-label writes/calls. Keep early exits and timer scheduling explicit rather
+than absorbing them into a guard. Whole-area and extent screen updates remain
+different even when their resulting rectangle happens to agree.
+
+DrawSmallView's recursion guard permits calling DrawFrame during erasure; its
+old-position erasure and later rendering have different limit-state behavior.
+Stat formatting preserves signed/unsigned promotions (including the hit-point
+argument with its current %d format). Repeated bounded labels and morale/luck
+icons are local leads, not a universal stat-panel macro. Spell scanning trusts the
+stored count and searches influences without a new bound; layout tables and
+two separate GetIconEntry calls remain intact. Quantity-format selection is not
+H38's creature-name table selection.

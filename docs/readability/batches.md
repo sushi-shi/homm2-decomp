@@ -226,6 +226,56 @@ universal search/direction/queue framework. Targeted complete body reads of
 confirm out-of-map fallback and actual hex range respectively. Neither full TU
 receives a read mark. Existing map-extra operand-order variants stay explicit.
 
-Next: large game/combat/AI/UI implementations; these remain a substantial part
-of the unread checklist. Candidate occurrence expansion and final ranking also
-remain required after the deliberate reading pass.
+## B15 — complete combat-manager implementation
+
+Read all 2,443 lines and 38 physical definitions in `CMBTMGR.cpp`, including the
+full catapult animation/state machine, missile drawing loop, initialization,
+army transfer, morale/turn selection, obstacle placement, grid picking and
+system options. Constants, data and the non-defining vtable marker were read.
+The complete combat and dependent model declarations were covered in B12-B14.
+
+H01/H14/H20/H21/H24/H26/H28 gain combat consumers. H29 names normal spell-point
+capacity; H30-H32 isolate fixed dialog arguments, allocation-failure checks and
+the existing dialog-completion message protocol. R17 records deliberate reset,
+loop/random/state/geometry differences and later animation-helper leads.
+No combat/source behavior changed. Continue with the complete ARMY TU, then
+the remaining large game/AI/UI implementations and final occurrence/ranking pass.
+
+Targeted complete reads of `MemError` (`KB.cpp:3744`) and the already-reviewed
+`heroWindowManager::DoDialog` confirm H31's returning reentry path and H32's
+handler-result preservation. No complete KB-TU coverage is inferred.
+
+## B16 — complete combat-army implementation
+
+Read all 3,674 lines of `ARMY.cpp` and the 184-line `SPELLS.h`; reconciled 47
+physical definitions in two files, including both unannotated private CP1251
+inlines. Covered initialization and resources, all geometry queries, movement,
+projectiles and recursive attacks, damage/retaliation/luck, corpse and mirror
+handling, complete animation/effect loops, berserk targeting, spell chance and
+influence/cancellation paths, and temporary walk/frame metadata construction.
+Empty hooks, constant tables and both spell-header macros were included.
+
+H06/H07/H28 gain army consumers. H33-H40 isolate creature classification, combat
+extent clipping/update, timer expression, angle-table selection, display names,
+pixel-center distance and occupied-hex clearing. These are deliberately smaller
+than the surrounding drawing, targeting or death algorithms. R18 records their
+boundary exceptions and local-only/reuse leads. A targeted complete read of
+`combatManager::UpdateCombatArea` (`DRAWING.cpp:382`) rejects it as an equivalent
+for H35: it has additional guards, whole-area coordinates and blit-flag writes.
+Neither DRAWING nor KB receives full-file credit from targeted reads.
+
+## B17 — complete combat drawing and status presentation
+
+Read all 1,830 lines of `DRAWING.cpp`; reconciled thirteen definitions, including
+both CombatMessage overloads, the entire 543-line DrawFrame and 409-line
+DrawSmallView. Read message wrapping/history/expiration, grid shading and cursor
+save/restore, background resources, every hero/wall/corpse/obstacle/moat drawing
+layer, extent/timer exit paths, and the complete mini-view text/icon/spell layout.
+The relevant owners and drawing APIs were already fully reviewed.
+
+H01/H20/H28/H34-H36 gain concrete rendering consumers and operand-order variants.
+H41 isolates ordered rectangle growth; H42 proposes defaults for the existing
+combat sprite API rather than a replacement renderer. R19 preserves the distinct
+visibility/recursion/extent flags, byte/text contracts and layer/timing behavior.
+The full-file review supersedes B16's targeted-only DRAWING status; KB remains
+unread apart from its separately documented targeted bodies.

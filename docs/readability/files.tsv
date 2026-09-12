@@ -93,7 +93,7 @@ include/SOURCE/REMOTE_TYPES.h	68	0	1	unread	a65ca956345182b9a3d1dc281a9d1a0d5a76
 include/SOURCE/REQUEST.h	83	0	1	unread	00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8	-
 include/SOURCE/SETUP.h	26	0	1	unread	6a8f719b3872fe5308b3ebaf5720cec82ba22f8a232d6285269d1935327b4b1b	-
 include/SOURCE/SMACKMGR.h	71	0	1	unread	21f31e0a990f7458884ae34c4b4352e1c449564018be5e88f5dae35200275e20	-
-include/SOURCE/SPELLS.h	184	0	2	unread	d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f	-
+include/SOURCE/SPELLS.h	184	0	2	read	d5f13d801bf1a1a0c35e1f6a68586a013e43d73f32c4b647fa0107000201c04f	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
 include/SOURCE/TOWNMGR.h	167	0	1	unread	e762e09a5558928796741abbdbf76ff69c100481d0ad51d1757d9a067bdedac2	-
 include/SOURCE/VIEW.h	13	0	1	unread	8e459aa39c3876943f546880ee5d78ec865b74ad517d45b2ca3b693d3e81b57d	-
 include/SOURCE/Viewwrld.h	17	0	1	unread	7427ad75fdd258c1bd32e7d27a8d9d3eeccd9f8c4e2161b7205f741220ded139	-
@@ -180,14 +180,14 @@ src/BASE/soundmgr.cpp	537	22	1	read	3048046ee3a40b2fd3fa2bfb1ad98218d1c624d4a750
 src/EDITOR/mapcell.cpp	264	11	0	read	11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f	B12: 11 bodies; allocation/extra chains/old-format read/write and both tile branches; R14
 src/SOURCE/ADVMGR.cpp	10885	95	8	unread	07da270722ada59c233a8fbf9567d07e2753ba0362924e4eb125f2203b93cc7c	-
 src/SOURCE/AI.cpp	1090	19	21	unread	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	-
-src/SOURCE/ARMY.cpp	3674	47	18	unread	5653eee7093d2efcf72493adcd5e376eed1507dd54326d707a2ff55e6e297bf6	-
+src/SOURCE/ARMY.cpp	3674	47	18	read	5653eee7093d2efcf72493adcd5e376eed1507dd54326d707a2ff55e6e297bf6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
 src/SOURCE/ARMYGRP.cpp	282	14	0	read	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	B12: 14 bodies including strict SwapValues; full morale/slots/damage and conditional swaps; H20/R14
-src/SOURCE/CMBTMGR.cpp	2443	38	8	unread	c6830fbba94e6a8da5c7564e4b9775d6485a668f54b63b851ff1d03ec7a26ab7	-
+src/SOURCE/CMBTMGR.cpp	2443	38	8	read	c6830fbba94e6a8da5c7564e4b9775d6485a668f54b63b851ff1d03ec7a26ab7	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
 src/SOURCE/COMMAND.cpp	3263	36	14	unread	0415faf2879b028df320eb313adafefad2ecf24fcafa211feb986427312f670b	-
 src/SOURCE/CURSOR.cpp	1583	18	1	unread	9640b4070918a09eb3b6b964b4a1c3b7bb6b9da952b77f43e76586b393573251	-
 src/SOURCE/Campaign.cpp	1129	7	0	unread	9bace5d261c51e3cc6930bae7485969b4e001408c5f44626f824221c932242c3	-
 src/SOURCE/Castle.cpp	850	3	0	unread	9b224b9cf52512e737df8b570eee82e4d9c0f68d4cd2207987d9643d0deb88fb	-
-src/SOURCE/DRAWING.cpp	1830	13	0	unread	7937a64778bf5e55c878cb1f2c3eac6cd943b4adca8a69b60136e403aac1d23c	-
+src/SOURCE/DRAWING.cpp	1830	13	0	read	7937a64778bf5e55c878cb1f2c3eac6cd943b4adca8a69b60136e403aac1d23c	B17: all 13 bodies incl both CombatMessage overloads and complete DrawFrame/DrawSmallView; full message/grid/background/hero/wall/moat/mini-view ordering; H01/H20/H28/H34-H36/H41/H42/R19
 src/SOURCE/EVENTS.cpp	9078	43	8	unread	6f4b6007b9a64974ff4791c131495be3bb06d6b7c2d7b16a5512801ca40ca1a5	-
 src/SOURCE/FINDPATH.cpp	593	12	0	read	97adb74b82448236772fe96fb9c82fc224fabeb4be314a35f1f78e306fe87c52	B14: 12 bodies; storage, both priority queues, terrain/directions, combat path and moat lifetime; H24-H28/R16
 src/SOURCE/FLY.cpp	476	4	1	unread	119bad9ab6fdf5f1a43490feb68d0e1ce25e9acf134e39679c6cddcd28656fbf	-

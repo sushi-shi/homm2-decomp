@@ -180,8 +180,8 @@ include/SOURCE/REMOTE_TYPES.h	2	2	HOMM2_REMOTE_TYPES_H	unread	4b7397ca4043ecd774
 include/SOURCE/REQUEST.h	2	2	HOMM2_REQUEST_H	unread	e28f1389b3857121e654145e7b559c03d5c71382bb6cbd9b24470906d4407011	-
 include/SOURCE/SETUP.h	2	2	HOMM2_SETUP_H	unread	59bcb0b1263be6c28d9c3fd2855aedf06ecf3783c5514534801a970fb50f64bb	-
 include/SOURCE/SMACKMGR.h	2	2	HOMM2_SMACKMGR_H	unread	0dd136bea987eb580affaea86f6c302e4ac82b0ae741029dfee2f2e4bff91d0a	-
-include/SOURCE/SPELLS.h	2	2	HOMM2_SPELLS_H	unread	05e998a05146b5fd7d9840201a03cfa7fc3a83428cd09011f8b77f8433c6d64b	-
-include/SOURCE/SPELLS.h	179	179	SPELL_GOLEM_DAMAGE_MULTIPLIER	unread	93ca29f35f1b1ce0e6ead306df5a8e8b8d28accfcf50d74d117f65174a8328df	-
+include/SOURCE/SPELLS.h	2	2	HOMM2_SPELLS_H	read	05e998a05146b5fd7d9840201a03cfa7fc3a83428cd09011f8b77f8433c6d64b	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
+include/SOURCE/SPELLS.h	179	179	SPELL_GOLEM_DAMAGE_MULTIPLIER	read	93ca29f35f1b1ce0e6ead306df5a8e8b8d28accfcf50d74d117f65174a8328df	B16: complete spell/effect/bolt/ripple domains, parameters and two macros; no function bodies; R18
 include/SOURCE/TOWNMGR.h	2	2	HOMM2_TOWNMGR_H	unread	4febdbb6cebdae43c812cc7c182641daba047dadcfc2fdeeeeb01236fbc47882	-
 include/SOURCE/VIEW.h	2	2	HOMM2_VIEW_H	unread	1bcfeacd87974ac80b4086e0b789392dbf9842e9dfe60f1ab6f6f83616b0c70d	-
 include/SOURCE/Viewwrld.h	2	2	HOMM2_VIEWWRLD_H	unread	fc1709f290c702a423a3b46dea7eac66bb72b605c05cddeceda6efb834be17fd	-
@@ -340,32 +340,32 @@ src/SOURCE/AI.cpp	39	39	COMBAT_AI_TOWER_BASE_SCALE	unread	c7078f78d2e1c8d6a3686b
 src/SOURCE/AI.cpp	40	40	COMBAT_AI_LICH_PRIORITY_MULTIPLIER	unread	1973c44098d5b7ce5f36d9e4ce52ccbff06136f9b7889d148ee70a59d0c43989	-
 src/SOURCE/AI.cpp	41	41	COMBAT_AI_LICH_HIT_POINT_SCALE	unread	d909fe5a3e6bf50d8ad7296c4ad9f716d260b063df49a209623979d21f0bf362	-
 src/SOURCE/AI.cpp	42	43	COMBAT_AI_MIN_LICH_DAMAGE_SCORE	unread	5d9528f1ba8b558a407a69b1385c0becd6e0375c01bdc02e723d6e95a1a5790c	-
-src/SOURCE/ARMY.cpp	29	29	ARMY_HASTE_WALK_DURATION_SCALE	unread	0e550bc559637beaf4af1596352cb4730ec383f40218f5f06be6d15ac1edb1ab	-
-src/SOURCE/ARMY.cpp	30	30	ARMY_SLOW_WALK_DURATION_SCALE	unread	96b362b825abe5072e9cc3702911426542ce49e093cc44b0b234d818a9f2f0c6	-
-src/SOURCE/ARMY.cpp	31	32	ARMY_PROJECTILE_PI	unread	9a394ce960b5c9357361b7535afbccf197df49aff2f09eea10622dce9eac2175	-
-src/SOURCE/ARMY.cpp	33	33	ARMY_SHOOT_UP_MIN_ANGLE	unread	688e0069f463d1b48e585d6999010279d76df594ae5dec416be6cacccc2b0ef8	-
-src/SOURCE/ARMY.cpp	34	34	ARMY_SHOOT_FORWARD_MIN_ANGLE	unread	3ce29690858fcc75bcc0b0ca577c2cc6f6aff0e594d460175f774c0a7976e8ac	-
-src/SOURCE/ARMY.cpp	35	35	ARMY_SPELL_CHANCE_NONE	unread	de1cd107ed7f40cbf529d29bdf68405a6300c52e642aaa1312af8dab3b90a7bb	-
-src/SOURCE/ARMY.cpp	36	36	ARMY_SPELL_CHANCE_DWARF	unread	a553b3b4354b2a7748a511ecae5034012bc2f99d304e5dde745cb7ac180b0bb3	-
-src/SOURCE/ARMY.cpp	37	37	ARMY_SPELL_CHANCE_ALWAYS	unread	9f532bd92fa8ef82848c1dbf88bb7338af4654630aa16d0b84529a1e5fd52820	-
-src/SOURCE/ARMY.cpp	38	38	ARMY_SPELL_CHANCE_PERCENT	unread	a1c4a95508547c40a19067e9648132903102ed8ff00755c0a128fc081a9949e5	-
-src/SOURCE/ARMY.cpp	39	39	ARMY_RANGER_ATTACK_DURATION_SCALE	unread	e091d14e41760309ea22a1499ac22f4e5275889da943443d7153973bebaa63d3	-
-src/SOURCE/ARMY.cpp	40	40	ARMY_DURATION_BASE_SCALE	unread	b068f32c8e2fdc8b7b7064d2ed85d211526edd3df1f74e03bfb00c7c42b9c51c	-
-src/SOURCE/ARMY.cpp	41	41	ARMY_ATTACK_DURATION_SPEED_SCALE	unread	82f8de68f8a326b17551daf29d548df703a1b66cccd98b82c479272d399fa959	-
-src/SOURCE/ARMY.cpp	42	43	ARMY_WALK_DURATION_SPEED_SCALE	unread	21e0aa7089971e7b834cb15e2c1e2f3f8e13d5273da99289b1273b572063fb3f	-
-src/SOURCE/ARMY.cpp	158	158	PROJECTILE_HALF_TURN_DEGREES_FLOAT	unread	3357af9ddf93682a0688ca4cc4cc4fed21b842df26bb4daa070f03260491152c	-
-src/SOURCE/ARMY.cpp	159	159	PROJECTILE_DIRECTION_MIDPOINT_DIVISOR	unread	9eb8c20c9a43cbf643979fa421fb239690aa5a817798a1e2b3ac5d9e5ccdbf39	-
-src/SOURCE/ARMY.cpp	160	160	DAMAGE_DOUBLE_MULTIPLIER	unread	4ac8f3e01920dfdf4b2acd1a8dcc6cde072abd4d7ce1726bfe5507feacc4ab0f	-
-src/SOURCE/ARMY.cpp	161	161	DAMAGE_HALF_DIVISOR	unread	67c8acf95e2028db2a803499a253d028c309ced02985e98f132daaecdcce3408	-
-src/SOURCE/ARMY.cpp	162	162	DAMAGE_ROUNDING_OFFSET	unread	da6d98b611a4aa910aff50a6bac086c87f34c3d6e6fb21074da7f701acc7dc7b	-
-src/SOURCE/CMBTMGR.cpp	33	33	COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR	unread	67027bc9258fb75747719bcc24bf230673ebbba94b001bcf729fb9f587edcad6	-
-src/SOURCE/CMBTMGR.cpp	34	34	COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR	unread	f80c6c4f5933c8539e5a1bec6b6242a1310c134ebd4cb16b52df2b14257ef723	-
-src/SOURCE/CMBTMGR.cpp	35	36	COMBAT_CATAPULT_DISTANCE_ARC_SCALE	unread	308492618746ac2207fc1388e359f4e7e2c8438d48566e24632e0934018cf22c	-
-src/SOURCE/CMBTMGR.cpp	37	37	COMBAT_CATAPULT_TARGET_ARC_SCALE	unread	38d4d33189a15248d9abaa9b294ad3dbcedcf5533d675c230f5514fde314822e	-
-src/SOURCE/CMBTMGR.cpp	38	38	COMBAT_MISSILE_DEGREES_PER_RADIAN	unread	ed25a508d27de947ae18a8217def7381dd7b0c56b192a469c6b47d9d18df6b51	-
-src/SOURCE/CMBTMGR.cpp	39	39	COMBAT_MISSILE_PI	unread	13ac34d4cc38cb02955e3939748a9b29a0d8268d421d88197f1aae8cc1f0a029	-
-src/SOURCE/CMBTMGR.cpp	40	40	COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR	unread	b8c5d6354c5faedde8b9bf696f3d6fc1540c5d7f060b16f3107a47bee12ad1cb	-
-src/SOURCE/CMBTMGR.cpp	41	41	COMBAT_CREATURE_VANISH_DURATION	unread	04a09e552de7fbfaa9979e67586826990dd7a1f8d9b0ac775bd39fc677b54879	-
+src/SOURCE/ARMY.cpp	29	29	ARMY_HASTE_WALK_DURATION_SCALE	read	0e550bc559637beaf4af1596352cb4730ec383f40218f5f06be6d15ac1edb1ab	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	30	30	ARMY_SLOW_WALK_DURATION_SCALE	read	96b362b825abe5072e9cc3702911426542ce49e093cc44b0b234d818a9f2f0c6	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	31	32	ARMY_PROJECTILE_PI	read	9a394ce960b5c9357361b7535afbccf197df49aff2f09eea10622dce9eac2175	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	33	33	ARMY_SHOOT_UP_MIN_ANGLE	read	688e0069f463d1b48e585d6999010279d76df594ae5dec416be6cacccc2b0ef8	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	34	34	ARMY_SHOOT_FORWARD_MIN_ANGLE	read	3ce29690858fcc75bcc0b0ca577c2cc6f6aff0e594d460175f774c0a7976e8ac	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	35	35	ARMY_SPELL_CHANCE_NONE	read	de1cd107ed7f40cbf529d29bdf68405a6300c52e642aaa1312af8dab3b90a7bb	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	36	36	ARMY_SPELL_CHANCE_DWARF	read	a553b3b4354b2a7748a511ecae5034012bc2f99d304e5dde745cb7ac180b0bb3	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	37	37	ARMY_SPELL_CHANCE_ALWAYS	read	9f532bd92fa8ef82848c1dbf88bb7338af4654630aa16d0b84529a1e5fd52820	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	38	38	ARMY_SPELL_CHANCE_PERCENT	read	a1c4a95508547c40a19067e9648132903102ed8ff00755c0a128fc081a9949e5	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	39	39	ARMY_RANGER_ATTACK_DURATION_SCALE	read	e091d14e41760309ea22a1499ac22f4e5275889da943443d7153973bebaa63d3	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	40	40	ARMY_DURATION_BASE_SCALE	read	b068f32c8e2fdc8b7b7064d2ed85d211526edd3df1f74e03bfb00c7c42b9c51c	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	41	41	ARMY_ATTACK_DURATION_SPEED_SCALE	read	82f8de68f8a326b17551daf29d548df703a1b66cccd98b82c479272d399fa959	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	42	43	ARMY_WALK_DURATION_SPEED_SCALE	read	21e0aa7089971e7b834cb15e2c1e2f3f8e13d5273da99289b1273b572063fb3f	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	158	158	PROJECTILE_HALF_TURN_DEGREES_FLOAT	read	3357af9ddf93682a0688ca4cc4cc4fed21b842df26bb4daa070f03260491152c	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	159	159	PROJECTILE_DIRECTION_MIDPOINT_DIVISOR	read	9eb8c20c9a43cbf643979fa421fb239690aa5a817798a1e2b3ac5d9e5ccdbf39	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	160	160	DAMAGE_DOUBLE_MULTIPLIER	read	4ac8f3e01920dfdf4b2acd1a8dcc6cde072abd4d7ce1726bfe5507feacc4ab0f	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	161	161	DAMAGE_HALF_DIVISOR	read	67c8acf95e2028db2a803499a253d028c309ced02985e98f132daaecdcce3408	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/ARMY.cpp	162	162	DAMAGE_ROUNDING_OFFSET	read	da6d98b611a4aa910aff50a6bac086c87f34c3d6e6fb21074da7f701acc7dc7b	B16: all 47 bodies incl two private CP1251 inlines; full initialization/geometry/walk/projectiles/attack/damage/death/effects/spells/berserk/frame metadata; H06/H07/H28/H33-H40/R18
+src/SOURCE/CMBTMGR.cpp	33	33	COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR	read	67027bc9258fb75747719bcc24bf230673ebbba94b001bcf729fb9f587edcad6	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	34	34	COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR	read	f80c6c4f5933c8539e5a1bec6b6242a1310c134ebd4cb16b52df2b14257ef723	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	35	36	COMBAT_CATAPULT_DISTANCE_ARC_SCALE	read	308492618746ac2207fc1388e359f4e7e2c8438d48566e24632e0934018cf22c	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	37	37	COMBAT_CATAPULT_TARGET_ARC_SCALE	read	38d4d33189a15248d9abaa9b294ad3dbcedcf5533d675c230f5514fde314822e	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	38	38	COMBAT_MISSILE_DEGREES_PER_RADIAN	read	ed25a508d27de947ae18a8217def7381dd7b0c56b192a469c6b47d9d18df6b51	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	39	39	COMBAT_MISSILE_PI	read	13ac34d4cc38cb02955e3939748a9b29a0d8268d421d88197f1aae8cc1f0a029	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	40	40	COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR	read	b8c5d6354c5faedde8b9bf696f3d6fc1540c5d7f060b16f3107a47bee12ad1cb	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
+src/SOURCE/CMBTMGR.cpp	41	41	COMBAT_CREATURE_VANISH_DURATION	read	04a09e552de7fbfaa9979e67586826990dd7a1f8d9b0ac775bd39fc677b54879	B15: all 38 bodies and constants/data; complete setup/map/armies/morale/catapult/keep/obstacles/missile/options; H01/H14/H20/H21/H24/H26/H28-H32/R17
 src/SOURCE/COMMAND.cpp	29	29	COMBAT_NECROMANCY_LEVEL_FACTOR	unread	925916b8084da957ddf5f8dc1aff147b1778e6c4a23e1ef8b97081f353d33b61	-
 src/SOURCE/COMMAND.cpp	30	30	COMBAT_SURRENDER_QUILL_FACTOR	unread	6497cefb82767d929cf8204c25913d443dc4e99d352e464c17cd3d3a4702034d	-
 src/SOURCE/COMMAND.cpp	31	31	COMBAT_SURRENDER_BASE_FACTOR	unread	ab427162c98e8cf6bfeda00cdc979a51ce698959b2263f3df986027a01653631	-
