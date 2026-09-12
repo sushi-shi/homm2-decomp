@@ -50,10 +50,7 @@ i16 wsnet_init(void) {
         SetFullScreenStatus(false);
     }
     gbRemoteOn = true;
-    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
-    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
-    memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
-    memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+    INIT_TRANSPORT_RECEIVE_STORAGE();
 
     wVer = MAKEWORD(1, 1);
     iRc = WSAStartup(wVer, &wsadata);
@@ -219,12 +216,7 @@ VA(0x004b2262, 0xb3)
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
-    if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer);
-    ppDPRcvBuffer = NULL;
-    if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize);
-    piDPRcvBufferSize = NULL;
+    DisposeTransportReceiveStorage();
     WSACleanup();
     bHostFound = false;
     sd_dg = INVALID_SOCKET;
@@ -367,10 +359,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
-            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-            piDPRcvBufferSize[iDPRcvBufferHead] = size;
-            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
+            ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {

@@ -660,31 +660,31 @@ VA(0x0044bff0, 0x23b)
 void playerData::Write(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    write(file, &m_color, sizeof(m_color));
-    write(file, &m_heroCount, sizeof(m_heroCount));
-    write(file, &m_currentHero, sizeof(m_currentHero));
-    write(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    WRITE_FILE_VALUE(file, m_color);
+    WRITE_FILE_VALUE(file, m_heroCount);
+    WRITE_FILE_VALUE(file, m_currentHero);
+    WRITE_FILE_VALUE(file, m_heroLocatorPage);
     write(file, m_heroIds, sizeof(m_heroIds));
     write(file, m_availableHeroIds, sizeof(m_availableHeroIds));
     memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
     write(file, unused, PLAYER_SAVE_RESERVED_SIZE);
     write(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    write(file, &m_cheatValue, sizeof(m_cheatValue));
-    write(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    write(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    write(file, &m_evilInterface, sizeof(m_evilInterface));
-    write(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    write(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    write(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    write(file, &m_daysLeft, sizeof(m_daysLeft));
-    write(file, &m_townCount, sizeof(m_townCount));
-    write(file, &m_currentTown, sizeof(m_currentTown));
-    write(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    WRITE_FILE_VALUE(file, m_cheatValue);
+    WRITE_FILE_VALUE(file, m_aiDifficulty);
+    WRITE_FILE_VALUE(file, m_minimumHeroCount);
+    WRITE_FILE_VALUE(file, m_evilInterface);
+    WRITE_FILE_VALUE(file, m_ultimateArtifactHintChance);
+    WRITE_FILE_VALUE(file, m_ultimateArtifactHintX);
+    WRITE_FILE_VALUE(file, m_ultimateArtifactHintY);
+    WRITE_FILE_VALUE(file, m_daysLeft);
+    WRITE_FILE_VALUE(file, m_townCount);
+    WRITE_FILE_VALUE(file, m_currentTown);
+    WRITE_FILE_VALUE(file, m_townLocatorPage);
     write(file, m_townIds, sizeof(m_townIds));
     write(file, m_resources, sizeof(m_resources));
     write(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    write(file, &m_barrierTents, sizeof(m_barrierTents));
-    write(file, &m_barrierTents, sizeof(m_barrierTents));
+    WRITE_FILE_VALUE(file, m_barrierTents);
+    WRITE_FILE_VALUE(file, m_barrierTents);
     write(file, m_unknownad, sizeof(m_unknownad));
 }
 
@@ -692,30 +692,30 @@ VA(0x0044c22b, 0x22c)
 void playerData::Read(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    read(file, &m_color, sizeof(m_color));
-    read(file, &m_heroCount, sizeof(m_heroCount));
-    read(file, &m_currentHero, sizeof(m_currentHero));
-    read(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    READ_FILE_VALUE(file, m_color);
+    READ_FILE_VALUE(file, m_heroCount);
+    READ_FILE_VALUE(file, m_currentHero);
+    READ_FILE_VALUE(file, m_heroLocatorPage);
     read(file, m_heroIds, sizeof(m_heroIds));
     read(file, m_availableHeroIds, sizeof(m_availableHeroIds));
     read(file, unused, PLAYER_SAVE_RESERVED_SIZE);
     read(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    read(file, &m_cheatValue, sizeof(m_cheatValue));
-    read(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    read(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    read(file, &m_evilInterface, sizeof(m_evilInterface));
-    read(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    read(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    read(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    read(file, &m_daysLeft, sizeof(m_daysLeft));
-    read(file, &m_townCount, sizeof(m_townCount));
-    read(file, &m_currentTown, sizeof(m_currentTown));
-    read(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    READ_FILE_VALUE(file, m_cheatValue);
+    READ_FILE_VALUE(file, m_aiDifficulty);
+    READ_FILE_VALUE(file, m_minimumHeroCount);
+    READ_FILE_VALUE(file, m_evilInterface);
+    READ_FILE_VALUE(file, m_ultimateArtifactHintChance);
+    READ_FILE_VALUE(file, m_ultimateArtifactHintX);
+    READ_FILE_VALUE(file, m_ultimateArtifactHintY);
+    READ_FILE_VALUE(file, m_daysLeft);
+    READ_FILE_VALUE(file, m_townCount);
+    READ_FILE_VALUE(file, m_currentTown);
+    READ_FILE_VALUE(file, m_townLocatorPage);
     read(file, m_townIds, sizeof(m_townIds));
     read(file, m_resources, sizeof(m_resources));
     read(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    read(file, &m_barrierTents, sizeof(m_barrierTents));
-    read(file, &m_barrierTents, sizeof(m_barrierTents));
+    READ_FILE_VALUE(file, m_barrierTents);
+    READ_FILE_VALUE(file, m_barrierTents);
     read(file, m_unknownad, sizeof(m_unknownad));
 }
 
@@ -1177,10 +1177,10 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
 
     oldTag = -1;
     if (!expansionFormat)
-        write(outFile, &oldTag, sizeof(oldTag));
-    write(outFile, &m_worldMap.width, sizeof(m_worldMap.width));
-    write(outFile, &m_worldMap.height, sizeof(m_worldMap.height));
-    write(outFile, &m_mapHeader, sizeof(m_mapHeader));
+        WRITE_FILE_VALUE(outFile, oldTag);
+    WRITE_FILE_VALUE(outFile, m_worldMap.width);
+    WRITE_FILE_VALUE(outFile, m_worldMap.height);
+    WRITE_FILE_VALUE(outFile, m_mapHeader);
     write(outFile, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
     write(outFile, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
     write(outFile, this, sizeof(m_difficultyRating));
@@ -1194,24 +1194,24 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     write(outFile, workBuf, SAVE_LEGACY_SERIALIZED_SIZE);
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
-        write(outFile, &campaignTypeInfo, sizeof(campaignTypeInfo));
+        WRITE_FILE_VALUE(outFile, campaignTypeInfo);
         write(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
-        write(outFile, &gbInCampaign, sizeof(gbInCampaign));
+        WRITE_FILE_VALUE(outFile, gbInCampaign);
         if (gbInCampaign)
             write(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
-        write(outFile, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        WRITE_FILE_VALUE(outFile, xIsExpansionMap);
 
     gpAdvManager->PurgeMapChangeQueue();
-    write(outFile, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    WRITE_FILE_VALUE(outFile, giMapChangeCtr);
     GenerateStandardFileName(m_saveName, workBuf);
     write(outFile, workBuf, SAVE_STANDARD_FILENAME_SIZE);
-    write(outFile, &m_playerCount, sizeof(m_playerCount));
+    WRITE_FILE_VALUE(outFile, m_playerCount);
     plBuf[0] = static_cast<char>(giCurPlayer);
     write(outFile, plBuf, sizeof(plBuf[0]));
-    write(outFile, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    WRITE_FILE_VALUE(outFile, m_deadPlayerCount);
     write(outFile, m_playerDead, sizeof(m_playerDead));
 
     for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
@@ -1220,13 +1220,13 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
             humans[iFile] = false;
     }
     write(outFile, humans, GAME_PLAYER_COUNT);
-    write(outFile, &m_day, sizeof(m_day));
-    write(outFile, &m_week, sizeof(m_week));
-    write(outFile, &m_month, sizeof(m_month));
+    WRITE_FILE_VALUE(outFile, m_day);
+    WRITE_FILE_VALUE(outFile, m_week);
+    WRITE_FILE_VALUE(outFile, m_month);
     for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++)
         m_players[iFile].Write(outFile);
 
-    write(outFile, &m_obeliskCount, sizeof(m_obeliskCount));
+    WRITE_FILE_VALUE(outFile, m_obeliskCount);
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
         m_heroRecs[iFile].Write(outFile, !expansionFormat);
     write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
@@ -1242,9 +1242,9 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
     write(outFile, m_boats, sizeof(m_boats));
     write(outFile, m_boatSlots, sizeof(m_boatSlots));
     write(outFile, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    write(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    write(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    write(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    WRITE_FILE_VALUE(outFile, m_ultimateArtifactX);
+    WRITE_FILE_VALUE(outFile, m_ultimateArtifactY);
+    WRITE_FILE_VALUE(outFile, m_ultimateArtifactId);
     write(outFile, m_rumour, sizeof(m_rumour));
     write(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     write(outFile, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
@@ -1260,22 +1260,22 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 expansionFormat
 
     chunkTag = GAME_FILE_MARKER;
     lastTag = GAME_UNUSED_FILE_MARKER;
-    write(outFile, &chunkTag, sizeof(chunkTag));
-    write(outFile, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    write(outFile, &chunkTag, sizeof(chunkTag));
+    WRITE_FILE_VALUE(outFile, chunkTag);
+    WRITE_FILE_VALUE(outFile, iMaxMapExtra);
+    WRITE_FILE_VALUE(outFile, chunkTag);
     for (iFile = 1; iFile < iMaxMapExtra; iFile++) {
-        write(outFile, &chunkTag, sizeof(chunkTag));
+        WRITE_FILE_VALUE(outFile, chunkTag);
         write(outFile, pwSizeOfMapExtra + iFile, sizeof(pwSizeOfMapExtra[iFile]));
         if (ppMapExtra[iFile] != NULL)
             write(outFile, ppMapExtra[iFile], pwSizeOfMapExtra[iFile]);
         else
             write(outFile, emptyPayload, pwSizeOfMapExtra[iFile]);
     }
-    write(outFile, &chunkTag, sizeof(chunkTag));
+    WRITE_FILE_VALUE(outFile, chunkTag);
     write(outFile, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    write(outFile, &chunkTag, sizeof(chunkTag));
+    WRITE_FILE_VALUE(outFile, chunkTag);
     m_worldMap.Write(outFile);
-    write(outFile, &chunkTag, sizeof(chunkTag));
+    WRITE_FILE_VALUE(outFile, chunkTag);
     close(outFile);
     H2_FREE(emptyPayload);
     return 1;
@@ -1460,14 +1460,14 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     ClearMapExtra();
 
     expTag = false;
-    read(fd, &wide, sizeof(wide));
+    READ_FILE_VALUE(fd, wide);
     if (wide == -1) {
         expTag = true;
-        read(fd, &wide, sizeof(wide));
+        READ_FILE_VALUE(fd, wide);
     }
-    read(fd, &rows, sizeof(rows));
+    READ_FILE_VALUE(fd, rows);
     SetMapSize(wide, rows);
-    read(fd, &m_mapHeader, sizeof(m_mapHeader));
+    READ_FILE_VALUE(fd, m_mapHeader);
     read(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
     read(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
     read(fd, this, sizeof(m_difficultyRating));
@@ -1478,7 +1478,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     read(fd, cPlayerNames, sizeof(cPlayerNames));
 
     read(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
-    read(fd, &gbInCampaign, sizeof(gbInCampaign));
+    READ_FILE_VALUE(fd, gbInCampaign);
     if (gbInCampaign == 1) {
         read(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
@@ -1487,18 +1487,18 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
         read(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expTag)
-        read(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        READ_FILE_VALUE(fd, xIsExpansionMap);
 
     gpAdvManager->PurgeMapChangeQueue();
-    read(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    READ_FILE_VALUE(fd, giMapChangeCtr);
     read(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
     if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
-    read(fd, &m_playerCount, sizeof(m_playerCount));
+    READ_FILE_VALUE(fd, m_playerCount);
 
     read(fd, plBuf, sizeof(plBuf[0]));
     giCurPlayer = plBuf[0];
-    read(fd, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    READ_FILE_VALUE(fd, m_deadPlayerCount);
     read(fd, m_playerDead, sizeof(m_playerDead));
 
     read(fd, isHuman, GAME_PLAYER_COUNT);
@@ -1521,14 +1521,14 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
         }
     }
 
-    read(fd, &m_day, sizeof(m_day));
-    read(fd, &m_week, sizeof(m_week));
-    read(fd, &m_month, sizeof(m_month));
+    READ_FILE_VALUE(fd, m_day);
+    READ_FILE_VALUE(fd, m_week);
+    READ_FILE_VALUE(fd, m_month);
     giCurTurn = GAME_DAY_NUMBER(*this);
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
         m_players[ndx].Read(fd);
 
-    read(fd, &m_obeliskCount, sizeof(m_obeliskCount));
+    READ_FILE_VALUE(fd, m_obeliskCount);
     for (ndx = 0; ndx < GAME_HERO_COUNT; ndx++)
         m_heroRecs[ndx].Read(fd, expTag);
     read(fd, m_availableHeroes, sizeof(m_availableHeroes));
@@ -1544,9 +1544,9 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     read(fd, m_boats, sizeof(m_boats));
     read(fd, m_boatSlots, sizeof(m_boatSlots));
     read(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    read(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    read(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    read(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    READ_FILE_VALUE(fd, m_ultimateArtifactX);
+    READ_FILE_VALUE(fd, m_ultimateArtifactY);
+    READ_FILE_VALUE(fd, m_ultimateArtifactId);
     read(fd, m_rumour, sizeof(m_rumour));
     read(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     read(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
@@ -1561,7 +1561,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     read(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
     read(fd, chunkTag, sizeof(i32));
-    read(fd, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    READ_FILE_VALUE(fd, iMaxMapExtra);
     read(fd, chunkTag, sizeof(i32));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
@@ -2858,7 +2858,7 @@ i32 game::LoadMap(char* filename) {
     handle = open(gText, _O_BINARY);
     if (handle == -1)
         FileError(gText);
-    read(handle, &m_mapHeader, sizeof(m_mapHeader));
+    READ_FILE_VALUE(handle, m_mapHeader);
     m_worldMap.Read(handle, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
@@ -2898,7 +2898,7 @@ i32 game::LoadMap(char* filename) {
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    read(handle, &m_obeliskCount, sizeof(m_obeliskCount));
+    READ_FILE_VALUE(handle, m_obeliskCount);
     read(
         handle,
         m_rumourEventIndices,
@@ -2911,7 +2911,7 @@ i32 game::LoadMap(char* filename) {
         m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    read(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    READ_FILE_VALUE(handle, iMaxMapExtra);
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
     );

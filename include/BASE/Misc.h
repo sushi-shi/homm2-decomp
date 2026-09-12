@@ -21,6 +21,10 @@ H2_ENUM_BEGIN(LogConstant)
     LOG_UNUSED_VALUE = -999
 H2_ENUM_END(LogConstant)
 
+// Exact scalar/plain-record storage only. Keep the CRT result and partial-read effects.
+#define READ_FILE_VALUE(fd, value) read((fd), &(value), sizeof(value))
+#define WRITE_FILE_VALUE(fd, value) write((fd), &(value), sizeof(value))
+
 // Existing signed integer deltas; no widening or alternative distance metric.
 #define MANHATTAN_LENGTH(dx, dy) (abs((dx)) + abs((dy)))
 #define INTEGER_VECTOR_LENGTH(dx, dy) \

@@ -3498,18 +3498,12 @@ void advManager::DrawCell(
                         1
                     );
                 } else {
-                    IconToBitmap(
+                    DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(TILESET_ROUTE)],
-                        gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
                         (ADVMGR_VISIBILITY_AT(mapX, mapY) - 1) & ROUTE_FRAME_MASK,
-                        ICON_DRAW_CLIP,
-                        0,
-                        0,
-                        DRAW_CLIP_WIDTH,
-                        DRAW_CLIP_HEIGHT,
-                        0
+                        ICON_DRAW_CLIP
                     );
                 }
             }
@@ -3530,18 +3524,12 @@ void advManager::DrawCell(
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
-                    IconToBitmap(
+                    DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                        gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
                         s_drawCell->m_objectIndex,
-                        ICON_DRAW_NO_CLIP,
-                        0,
-                        0,
-                        DRAW_CLIP_WIDTH,
-                        DRAW_CLIP_HEIGHT,
-                        0
+                        ICON_DRAW_NO_CLIP
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
@@ -3549,18 +3537,12 @@ void advManager::DrawCell(
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                     }
                 }
@@ -3575,18 +3557,12 @@ void advManager::DrawCell(
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit0
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawExtra->objectIndex,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
@@ -3595,18 +3571,12 @@ void advManager::DrawCell(
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                                ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_NO_CLIP
                             );
                         }
                     }
@@ -3621,18 +3591,12 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
-                    IconToBitmap(
+                    DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                        gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
                         s_drawCell->m_objectIndex,
-                        ICON_DRAW_NO_CLIP,
-                        0,
-                        0,
-                        DRAW_CLIP_WIDTH,
-                        DRAW_CLIP_HEIGHT,
-                        0
+                        ICON_DRAW_NO_CLIP
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
@@ -3640,18 +3604,12 @@ void advManager::DrawCell(
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                     }
                 }
@@ -3666,18 +3624,12 @@ void advManager::DrawCell(
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawExtra->objectIndex,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
@@ -3686,18 +3638,12 @@ void advManager::DrawCell(
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                                ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_NO_CLIP
                             );
                         }
                     }
@@ -3717,18 +3663,12 @@ void advManager::DrawCell(
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
-                    IconToBitmap(
+                    DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                        gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
                         s_drawCell->m_objectIndex,
-                        ICON_DRAW_NO_CLIP,
-                        0,
-                        0,
-                        DRAW_CLIP_WIDTH,
-                        DRAW_CLIP_HEIGHT,
-                        0
+                        ICON_DRAW_NO_CLIP
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
@@ -3745,18 +3685,12 @@ void advManager::DrawCell(
                                 animFrame = s_drawAnimationLength - 1;
                             }
                         }
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawCell->m_objectIndex + animFrame + 1,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                     }
                 }
@@ -3773,18 +3707,12 @@ void advManager::DrawCell(
                         && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != TILESET_MONS32
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawExtra->objectIndex,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength =
@@ -3793,18 +3721,12 @@ void advManager::DrawCell(
                                     s_drawExtra->objectIndex
                                 )
                                     ->flags;
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                                ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_NO_CLIP
                             );
                         }
                     }
@@ -3829,32 +3751,20 @@ void advManager::DrawCell(
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))) {
                             s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->m_objectMetadata];
                             if (s_drawMine->guardianType == CREATURE_GHOST) {
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_objectIcons[MINE_GUARDIAN_ICON_SLOT],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX - CELL_CENTER_PIXEL,
                                     s_drawPixelY,
                                     (m_updateMaxY + mapX + mapY) % MINE_GHOST_FRAME_COUNT,
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             } else if (s_drawMine->guardianType != CREATURE_NONE) {
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_objectIcons[TILESET_BOAT],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX - CELL_PIXELS,
                                     s_drawPixelY,
                                     IDX(s_drawMine->guardianType) - IDX(CREATURE_EARTH_ELEMENTAL),
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
                         }
@@ -3862,35 +3772,22 @@ void advManager::DrawCell(
 
                     if (s_drawCell->m_objectTileset == TILESET_MONS32) {
                         if (mapX == m_lastQuickViewX && mapY == m_lastQuickViewY) {
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[TILESET_MONSTER],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_CENTER_PIXEL,
                                 s_drawPixelY + OBJECT_BASELINE_Y,
                                 s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE
-                                    + (m_mineGuardianFacingLeft != 0
-                                           ? MONSTER_FACING_FRAME_BASE + 1
-                                           : MONSTER_FACING_FRAME_BASE),
-                                ICON_DRAW_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                    + (m_mineGuardianFacingLeft != 0 ? MONSTER_FACING_FRAME_BASE + 1
+                                                                     : MONSTER_FACING_FRAME_BASE),
+                                ICON_DRAW_CLIP
                             );
                         } else {
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[TILESET_MONSTER],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_CENTER_PIXEL,
                                 s_drawPixelY + OBJECT_BASELINE_Y,
                                 s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE,
-                                ICON_DRAW_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_CLIP
                             );
                             if (s_drawCell->m_objectIndex == MONSTER_SPECIAL_FRAME_FIRST
                                 || s_drawCell->m_objectIndex == MONSTER_SPECIAL_FRAME_LAST) {
@@ -3901,19 +3798,13 @@ void advManager::DrawCell(
                                 s_drawMonsterFrame = monAnimDrawFrame
                                     [m_animationPhases[mapX & ANIMATION_PHASE_COLUMN_MASK]];
                             }
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[TILESET_MONSTER],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_CENTER_PIXEL,
                                 s_drawPixelY + OBJECT_BASELINE_Y,
                                 s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE
                                     + s_drawMonsterFrame + MONSTER_ANIMATION_FRAME_OFFSET,
-                                ICON_DRAW_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_CLIP
                             );
                         }
                     }
@@ -3964,9 +3855,8 @@ void advManager::DrawCell(
                                 if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_46) {
                                     cursorFrame = HERO_SHADOW_TARGET_FRAME_55;
                                 }
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_shadowIcon,
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY + CELL_LAST_PIXEL,
                                     cursorFrame
@@ -3974,19 +3864,13 @@ void advManager::DrawCell(
                                                    && cursorFrame < HERO_SHADOW_FRAME_END
                                                ? HERO_SHADOW_FRAME_OFFSET
                                                : 0),
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
                             if (m_drawHeroShadows != 0 && s_drawHeroType == HERO_TYPE_BOAT) {
                                 boatFrameIndex = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_boatShadowIcon,
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                     boatFrameIndex
@@ -3994,74 +3878,45 @@ void advManager::DrawCell(
                                                    && boatFrameIndex < HERO_SHADOW_FRAME_END
                                                ? HERO_SHADOW_FRAME_END
                                                : 0),
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
                                 && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
-                                FlipIconToBitmap(
+                                DRAW_FLIPPED_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX + CELL_PIXELS,
                                     s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                     s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
-                            FlipIconToBitmap(
+                            DRAW_FLIPPED_ADVENTURE_ICON(
                                 m_heroIcons[IDX(s_drawHeroType)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_PIXELS,
                                 s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                 s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
-                                ICON_DRAW_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_CLIP
                             );
                             if (s_drawPlayerColor != -1) {
                                 if (s_drawHeroType == HERO_TYPE_BOAT) {
-                                    FlipIconToBitmap(
+                                    DRAW_FLIPPED_ADVENTURE_ICON(
                                         m_boatFlagIcons[s_drawPlayerColor],
-                                        gpWindowManager->m_screen,
                                         s_drawPixelX + CELL_PIXELS,
                                         s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                         s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
-                                        ICON_DRAW_CLIP,
-                                        0,
-                                        0,
-                                        DRAW_CLIP_WIDTH,
-                                        DRAW_CLIP_HEIGHT,
-                                        0
+                                        ICON_DRAW_CLIP
                                     );
                                 } else {
-                                    FlipIconToBitmap(
+                                    DRAW_FLIPPED_ADVENTURE_ICON(
                                         m_flagIcons[s_drawPlayerColor],
-                                        gpWindowManager->m_screen,
                                         s_drawPixelX + CELL_PIXELS,
                                         s_drawPixelY + CELL_LAST_PIXEL,
                                         (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
                                             + m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
                                             + PLAYER_FLAG_FRAME_BASE,
-                                        ICON_DRAW_CLIP,
-                                        0,
-                                        0,
-                                        DRAW_CLIP_WIDTH,
-                                        DRAW_CLIP_HEIGHT,
-                                        0
+                                        ICON_DRAW_CLIP
                                     );
                                 }
                             }
@@ -4070,95 +3925,59 @@ void advManager::DrawCell(
                         if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT
                                 && HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_shadowIcon,
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY + CELL_LAST_PIXEL,
                                     s_drawHeroFrame,
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
                             if (m_drawHeroShadows != 0 && s_drawHeroType == HERO_TYPE_BOAT) {
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_boatShadowIcon,
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                     s_drawHeroFrame,
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
                                 && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                     s_drawHeroFrame,
-                                    ICON_DRAW_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_CLIP
                                 );
                             }
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_heroIcons[IDX(s_drawHeroType)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                 s_drawHeroFrame,
-                                ICON_DRAW_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_CLIP
                             );
                             if (s_drawPlayerColor != -1) {
                                 if (s_drawHeroType == HERO_TYPE_BOAT) {
-                                    IconToBitmap(
+                                    DRAW_ADVENTURE_ICON(
                                         m_boatFlagIcons[s_drawPlayerColor],
-                                        gpWindowManager->m_screen,
                                         s_drawPixelX,
                                         s_drawPixelY + s_drawHeroYOffset + CELL_LAST_PIXEL,
                                         s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
-                                        ICON_DRAW_CLIP,
-                                        0,
-                                        0,
-                                        DRAW_CLIP_WIDTH,
-                                        DRAW_CLIP_HEIGHT,
-                                        0
+                                        ICON_DRAW_CLIP
                                     );
                                 } else {
-                                    IconToBitmap(
+                                    DRAW_ADVENTURE_ICON(
                                         m_flagIcons[s_drawPlayerColor],
-                                        gpWindowManager->m_screen,
                                         s_drawPixelX,
                                         s_drawPixelY + CELL_LAST_PIXEL,
                                         (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
                                             + m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
                                             + PLAYER_FLAG_FRAME_BASE,
-                                        ICON_DRAW_CLIP,
-                                        0,
-                                        0,
-                                        DRAW_CLIP_WIDTH,
-                                        DRAW_CLIP_HEIGHT,
-                                        0
+                                        ICON_DRAW_CLIP
                                     );
                                 }
                             }
@@ -4186,18 +4005,12 @@ void advManager::DrawCell(
                     if (s_drawCell->m_objectDrawnAsOverlay
                         && (gbDrawingPuzzle == 0
                             || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawCell->m_objectIndex,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                         if (s_drawCell->m_animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
@@ -4206,19 +4019,13 @@ void advManager::DrawCell(
                                                         s_drawCell->m_objectIndex
                             )
                                                         ->flags;
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawCell->m_objectTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
-                                s_drawCell->m_objectIndex
-                                    + m_updateMaxY % s_drawAnimationLength + 1,
-                                ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                s_drawCell->m_objectIndex + m_updateMaxY % s_drawAnimationLength
+                                    + 1,
+                                ICON_DRAW_NO_CLIP
                             );
                         }
                     }
@@ -4234,18 +4041,12 @@ void advManager::DrawCell(
                         if (s_drawExtra->objectDrawnAsOverlay
                             && (gbDrawingPuzzle == 0
                                 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->objectIndex,
-                                ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                ICON_DRAW_NO_CLIP
                             );
                             if (s_drawExtra->animatedObject) {
                                 s_drawAnimationLength =
@@ -4254,19 +4055,13 @@ void advManager::DrawCell(
                                         s_drawExtra->objectIndex
                                     )
                                         ->flags;
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_objectIcons[IDX(s_drawExtra->objectTileset)],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
-                                    s_drawExtra->objectIndex
-                                        + m_updateMaxY % s_drawAnimationLength + 1,
-                                    ICON_DRAW_NO_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    s_drawExtra->objectIndex + m_updateMaxY % s_drawAnimationLength
+                                        + 1,
+                                    ICON_DRAW_NO_CLIP
                                 );
                             }
                         }
@@ -4285,19 +4080,13 @@ void advManager::DrawCell(
                         || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawCell->m_drawOverlayOnTop))
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_overlayTileset)])) {
-                    IconToBitmap(
+                    DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
-                        gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
                         s_drawCell->m_overlayIndex,
                         s_drawCell->m_overlayTileset == TILESET_FLAG32 ? ICON_DRAW_CLIP
-                                                                       : ICON_DRAW_NO_CLIP,
-                        0,
-                        0,
-                        DRAW_CLIP_WIDTH,
-                        DRAW_CLIP_HEIGHT,
-                        0
+                                                                       : ICON_DRAW_NO_CLIP
                     );
                     if (s_drawCell->m_animatedOverlay) {
                         s_drawAnimationLength =
@@ -4306,18 +4095,12 @@ void advManager::DrawCell(
                                 s_drawCell->m_overlayIndex
                             )
                                 ->flags;
-                        IconToBitmap(
+                        DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
-                            gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
                             s_drawCell->m_overlayIndex + m_updateMaxY % s_drawAnimationLength + 1,
-                            ICON_DRAW_NO_CLIP,
-                            0,
-                            0,
-                            DRAW_CLIP_WIDTH,
-                            DRAW_CLIP_HEIGHT,
-                            0
+                            ICON_DRAW_NO_CLIP
                         );
                     }
                 }
@@ -4334,19 +4117,13 @@ void advManager::DrawCell(
                         || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawExtra->drawOverlayOnTop)) {
                         if (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->overlayTileset)]) {
-                            IconToBitmap(
+                            DRAW_ADVENTURE_ICON(
                                 m_objectIcons[IDX(s_drawExtra->overlayTileset)],
-                                gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->overlayIndex,
                                 s_drawExtra->overlayTileset == TILESET_FLAG32 ? ICON_DRAW_CLIP
-                                                                              : ICON_DRAW_NO_CLIP,
-                                0,
-                                0,
-                                DRAW_CLIP_WIDTH,
-                                DRAW_CLIP_HEIGHT,
-                                0
+                                                                              : ICON_DRAW_NO_CLIP
                             );
                             if (s_drawExtra->animatedOverlay) {
                                 s_drawAnimationLength =
@@ -4355,19 +4132,13 @@ void advManager::DrawCell(
                                         s_drawExtra->overlayIndex
                                     )
                                         ->flags;
-                                IconToBitmap(
+                                DRAW_ADVENTURE_ICON(
                                     m_objectIcons[IDX(s_drawExtra->overlayTileset)],
-                                    gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
                                     s_drawExtra->overlayIndex + m_updateMaxY % s_drawAnimationLength
                                         + 1,
-                                    ICON_DRAW_NO_CLIP,
-                                    0,
-                                    0,
-                                    DRAW_CLIP_WIDTH,
-                                    DRAW_CLIP_HEIGHT,
-                                    0
+                                    ICON_DRAW_NO_CLIP
                                 );
                             }
                         }
@@ -9711,18 +9482,12 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = false;
-    IconToBitmap(
+    DRAW_ADVENTURE_ICON(
         m_objectIcons[IDX(TILESET_ROUTE)],
-        gpWindowManager->m_screen,
         (right - left) * PUZZLE_TILE_SIZE - PUZZLE_X_TRIM,
         (bottom - top) * PUZZLE_TILE_SIZE,
         0,
-        ICON_DRAW_CLIP,
-        0,
-        0,
-        SCREEN_HEIGHT,
-        SCREEN_HEIGHT,
-        0
+        ICON_DRAW_CLIP
     );
 }
 

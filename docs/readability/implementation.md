@@ -320,6 +320,30 @@ The combined build, original-snapshot object comparison and retail field review
 pass again: 98 objects, 1,516 non-debug sections, 42,433 ordered object relocations;
 1,727 retail functions and 38,307 field sites, with zero structural review items.
 
+## Group 8: adventure viewport, file values and transport storage
+
+| Family | Application or measured retention |
+| --- | --- |
+| H60 | Forty-two `DRAW_ADVENTURE_ICON` and seven separately named flipped calls keep the current screen and 480-square adventure viewport. Clipping mode, coordinate/frame expressions and normal/flipped semantics remain explicit. Zero-extent cloud/boat calls and other rendering APIs stay unchanged. |
+| H64 | Both backends use separate initialization, enqueue and array-disposal operations. The first two retain allocation/store/copy order and repeated global reads; the disposal inline retains conditional frees and unconditional null stores. It does not drain payloads or reset indices. The copy/dequeue inline adds eleven bytes (147 to 158) and is removed, leaving that fourth operation explicit after each backend's ProcessMessages. The stored-size/copy-size discrepancy and different backend drain policies remain unchanged. |
+| H65 | Retain the explicit allocation/tag/guarded-copy prefix. The tested pointer-return inline adds four bytes (467 to 471) and changes relocation sites, and is removed. Caller locals, u16 promotion, unchecked allocation and Winsock's existing error-return/free behavior are not repaired. |
+| H66 | Five `FREE_NODE_QUEUE` calls preserve the caller's node lvalue, final null, repeated pop and one scalar H2_FREE per node. This is a single while statement, safe as a conditional body; no extra wrapper loop, traversal, lock or shutdown is added. The alternative inline keeps the 233-byte size but changes instructions and is removed. |
+| H70 | Forty-four reads and 46 writes use exact-size file-value expressions in six TUs, including the plain PCX header and KB's individually sized entry writes. Results, address/sizeof identity, duplicate tent fields and partial-read effects remain. Arrays, wider-global slices, prefixes, KB's oversized entry reads and REQUEST's distinct pointer/sizeof(*header) spelling stay explicit. |
+
+[Eleven complete matrices](../matching/ReadabilityStorage/shared-operations.cpp)
+record 23 arms, including both H66 alternatives and independent normal/flipped
+draw and read/write probes. H60, H64 disposal, H66's macro and the plain-record
+write probe pass their retail exact audits. The other retained arms preserve
+their baseline instruction/relocation hashes and documented retail residuals.
+
+The combined 98-object build and original-snapshot comparison pass with all
+1,516 non-debug sections and 42,433 ordered relocations unchanged. Retail field
+review again scans 1,727 functions and 38,307 sites with zero structural items.
+The real-header VC6 executable now also checks scalar/record file sizes, single
+evaluation of descriptor and value operands, partial reads and EOF through a
+local CRT pipe; all pass. It does not send network packets or claim runtime
+validation of the intentionally retained transport defects.
+
 ## Rank-C and exclusion dispositions
 
 The following are final **retain-explicit** decisions for all 29 rank-C families,

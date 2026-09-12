@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
 
 i32 __cdecl main() {
     for (i32 value = 0; value < 256; ++value) {
@@ -82,5 +84,33 @@ i32 __cdecl main() {
         }
     }
     printf("Domain formulas: 2048 tent masks, 2001 hex/level inputs and 1089 delta pairs pass\n");
+    i32 descriptors[2];
+    if (_pipe(descriptors, 64, _O_BINARY) != 0)
+        return 7;
+    i16 values[2] = {-12345, 0};
+    i32 writeIndex = 0;
+    i32 readIndex = 1;
+    i32 fdEvaluations = 0;
+    if (WRITE_FILE_VALUE((++fdEvaluations, descriptors[1]), values[writeIndex++]) != sizeof(i16)
+        || fdEvaluations != 1 || writeIndex != 1
+        || READ_FILE_VALUE((++fdEvaluations, descriptors[0]), values[readIndex++]) != sizeof(i16)
+        || fdEvaluations != 2 || readIndex != 2 || values[0] != values[1])
+        return 8;
+    indexArray writtenRecord = {0xabcd, 0x2345};
+    indexArray readRecord = {0, 0};
+    if (WRITE_FILE_VALUE(descriptors[1], writtenRecord) != sizeof(writtenRecord)
+        || READ_FILE_VALUE(descriptors[0], readRecord) != sizeof(readRecord)
+        || readRecord.key != writtenRecord.key || readRecord.value != writtenRecord.value)
+        return 9;
+    u8 lastByte = 0x11;
+    if (WRITE_FILE_VALUE(descriptors[1], lastByte) != 1)
+        return 10;
+    close(descriptors[1]);
+    i32 partialValue = 0x55667788;
+    if (READ_FILE_VALUE(descriptors[0], partialValue) != 1 || partialValue != 0x55667711
+        || READ_FILE_VALUE(descriptors[0], partialValue) != 0 || partialValue != 0x55667711)
+        return 11;
+    close(descriptors[0]);
+    printf("File values: scalar/record sizes, single operand evaluation, short read and EOF pass\n");
     return 0;
 }

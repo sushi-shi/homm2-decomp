@@ -1859,7 +1859,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     fd = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
         return;
-    write(fd, &pcxHdr, sizeof(pcxHdr));
+    WRITE_FILE_VALUE(fd, pcxHdr);
     encodedRow = static_cast<u8*>(H2_ALLOC(width * 2));
     for (y = 0; y < height; ++y) {
         sourceIndex = 0;

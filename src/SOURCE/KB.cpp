@@ -2932,7 +2932,7 @@ i32 AddScoreToHighScore(
         if (file_c == -1)
             FileError(filename_h);
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            write(file_c, &entries_a[entry_a], sizeof(HighScoreEntry));
+            WRITE_FILE_VALUE(file_c, entries_a[entry_a]);
         close(file_c);
     } else {
         gbShowHighScore = false;

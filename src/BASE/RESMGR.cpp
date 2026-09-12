@@ -433,7 +433,7 @@ i8 resourceManager::ReadByte(void) {
         675
     );
     i8 value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
@@ -445,7 +445,7 @@ i16 resourceManager::ReadWord(void) {
         700
     );
     i16 value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 
@@ -457,7 +457,7 @@ i32l resourceManager::ReadLong(void) {
         723
     );
     i32l value = 0;
-    i32 H2_UNUSED(result) = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 H2_UNUSED(result) = READ_FILE_VALUE(m_aggregateFd[m_curAggregate], value);
     return value;
 }
 

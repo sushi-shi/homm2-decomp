@@ -132,32 +132,20 @@ void advManager::DrawCursor(void) {
                     ->m_flags
                 & CURSOR_CELL_UNCOVERED_FLAG
             )) {
-            FlipIconToBitmap(
+            DRAW_FLIPPED_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
-        FlipIconToBitmap(
+        DRAW_FLIPPED_ADVENTURE_ICON(
             m_heroIcons[IDX(m_cursorType)],
-            gpWindowManager->m_screen,
             drawX,
             drawY,
             drawFrame,
-            ICON_DRAW_CLIP,
-            0,
-            0,
-            CURSOR_CLIP_SIZE,
-            CURSOR_CLIP_SIZE,
-            0
+            ICON_DRAW_CLIP
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
             i32 H2_UNUSED(flagDrawn);
@@ -181,18 +169,12 @@ void advManager::DrawCursor(void) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
                             + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
-            FlipIconToBitmap(
+            DRAW_FLIPPED_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
             ++m_updatePending;
         }
@@ -207,32 +189,20 @@ void advManager::DrawCursor(void) {
                     ->m_flags
                 & CURSOR_CELL_UNCOVERED_FLAG
             )) {
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
-        IconToBitmap(
+        DRAW_ADVENTURE_ICON(
             m_heroIcons[IDX(m_cursorType)],
-            gpWindowManager->m_screen,
             drawX,
             drawY,
             drawFrame,
-            ICON_DRAW_CLIP,
-            0,
-            0,
-            CURSOR_CLIP_SIZE,
-            CURSOR_CLIP_SIZE,
-            0
+            ICON_DRAW_CLIP
         );
         if (m_cursorType == HERO_TYPE_BOAT) {
             i32 H2_UNUSED(flagDrawn);
@@ -256,18 +226,12 @@ void advManager::DrawCursor(void) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
                             + m_updateMaxY % CURSOR_DIRECTION_COUNT + CURSOR_FLAG_FRAME_BASE;
             }
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
-                gpWindowManager->m_screen,
                 drawX,
                 drawY,
                 drawFrame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
             ++m_updatePending;
         }
@@ -344,22 +308,15 @@ void advManager::DrawCursorShadow(void) {
         frame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             boatIndex = frame;
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_boatShadowIcon,
-                gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
                 boatIndex
-                    + (boatIndex >= CURSOR_SHADOW_ANIM_FIRST
-                               && boatIndex < CURSOR_SHADOW_ANIM_END
+                    + (boatIndex >= CURSOR_SHADOW_ANIM_FIRST && boatIndex < CURSOR_SHADOW_ANIM_END
                            ? CURSOR_BOAT_SHADOW_OFFSET
                            : 0),
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowPic = frame;
@@ -373,54 +330,23 @@ void advManager::DrawCursorShadow(void) {
                 shadowPic = SPRITE_UP_SHADOW_WIDE;
             if (shadowPic == SPRITE_UP_STEP_1)
                 shadowPic = SPRITE_UP_SHADOW_WIDE;
-            IconToBitmap(
+            DRAW_ADVENTURE_ICON(
                 m_shadowIcon,
-                gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
                 shadowPic
-                    + (shadowPic >= CURSOR_SHADOW_ANIM_FIRST
-                               && shadowPic < CURSOR_SHADOW_ANIM_END
+                    + (shadowPic >= CURSOR_SHADOW_ANIM_FIRST && shadowPic < CURSOR_SHADOW_ANIM_END
                            ? CURSOR_HORSE_SHADOW_OFFSET
                            : 0),
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
+                ICON_DRAW_CLIP
             );
         }
     } else {
         frame = m_cursorFrame + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
-            IconToBitmap(
-                m_boatShadowIcon,
-                gpWindowManager->m_screen,
-                drawX,
-                drawY,
-                frame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
-            );
+            DRAW_ADVENTURE_ICON(m_boatShadowIcon, drawX, drawY, frame, ICON_DRAW_CLIP);
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
-            IconToBitmap(
-                m_shadowIcon,
-                gpWindowManager->m_screen,
-                drawX,
-                drawY,
-                frame,
-                ICON_DRAW_CLIP,
-                0,
-                0,
-                CURSOR_CLIP_SIZE,
-                CURSOR_CLIP_SIZE,
-                0
-            );
+            DRAW_ADVENTURE_ICON(m_shadowIcon, drawX, drawY, frame, ICON_DRAW_CLIP);
         }
     }
 

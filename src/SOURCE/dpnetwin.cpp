@@ -62,10 +62,7 @@ i16 dpnet_init(void) {
     if (lpIDC != NULL)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
-        memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
-        memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+        INIT_TRANSPORT_RECEIVE_STORAGE();
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == NULL)
             ShutDown("\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc 'DPLAYX.DLL'"
@@ -186,12 +183,7 @@ void dpnet_term(void) {
     lpIDC = NULL;
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
-    if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer);
-    ppDPRcvBuffer = NULL;
-    if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize);
-    piDPRcvBufferSize = NULL;
+    DisposeTransportReceiveStorage();
     if (hinstDplayx != NULL)
         FreeLibrary(hinstDplayx);
     hinstDplayx = NULL;
@@ -290,10 +282,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
-            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-            piDPRcvBufferSize[iDPRcvBufferHead] = size;
-            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
+            ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
