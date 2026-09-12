@@ -1,4 +1,92 @@
 {
+  "src/BASE/Bzip.cpp": {
+    "sha256": "755f9e00d4091c6e472dfc1366cf919a01086d671a0bdb76cae1bafa233fa6d9",
+    "note": "Full2061-line TU,88 physical bodies and all macros/data read. C13 casts need type-boundary/invariant-source compiler proof; G16 three loop/store gotos remain. B33 returning panic/cleanup verified in genuine retail makes apparent malformed-input guards nonterminating. B34 dst/path/formatter contracts; S16 unused Model.numTraffic and I/O status scalars. Real Model arrays, MTF tables and quicksort stacks are not fabricated aggregates."
+  },
+  "src/BASE/BITS.asm": {
+    "sha256": "845c0d23d2ef13de5c06d9306831bb219cadb9feaa38eb5d496d077ebca14c9b",
+    "note": "Full73-line MASM TU and3procedures read; genuine-retail proof passes all3. B31 byte-indexed DWORD accesses can span beyond six-byte puzzle mask and packed town subarray. Assembly labels/registers retained as actual implementation."
+  },
+  "src/BASE/TILE.asm": {
+    "sha256": "a23dfc6b4cd0be08b3521f24bf7362ab81ad241d7ca468f28a4453b3a02ecbd0",
+    "note": "Full138-line MASM TU and one blitter read, all forward/vertical/horizontal/both-flipped paths and real two-word scratch. B32 dimensions/clip contracts and EBX/direction flags need callers and retail proof."
+  },
+  "src/EDITOR/mapcell.cpp": {
+    "sha256": "11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4108d33f",
+    "note": "Full264-line TU and11bodies read. B18 dimensions/counts/link domains; B35 zero-index first-growth sentinel/lifecycle issue. S17 two unused scalar declarations. Old-format prefix copies are bounded by real20/15-byte records; pointer reload after realloc is intentional."
+  },
+  "include/EDITOR/mapcell.h": {
+    "sha256": "c2aa8f2d2c3dae60671da97867fb09fd971afdd2915f6dedc645f63a282b6e11",
+    "note": "Full149-line header, one inline method, packed12-byte cells/7-byte extras and legacy20/15-byte records read. Union raw/bitfield views reflect serialized type/metadata/tent encodings; no fake stack overlay or removed old-format tail inferred. Consumer domain validation remains B18."
+  },
+  "include/BASE/DebugCheck.h": {
+    "sha256": "4000914f7ed51cb00d309b22dcc7777a5fac9ca16bb89261920a525a592f509c",
+    "note": "Full7-line empty inline hook header; one physical body accounted for."
+  },
+  "include/BASE/BITS.h": {
+    "sha256": "d5adfd9e9d4f670e35f3e7206b62e8b1ef342ace7592ceb5a28989032981f659",
+    "note": "Full10-line C ABI prototypes read. Generic void* is the assembly byte-addressed bit storage boundary, not evidence of a C++ unsigned-word array owner."
+  },
+  "include/BASE/TILE.h": {
+    "sha256": "7a5369246d69b240706a0fb437b3f2d0c80bf899fddde8dda3ace8373e7638dc",
+    "note": "Full17-line header/C ABI blitter declaration and explicit serialized index/flip masks read; real bitmap/tileset owner types."
+  },
+  "include/BASE/Bzip.h": {
+    "sha256": "2f75ce0d2dcb04fdbb7577694c8f0778d5d2c311021fd3dd126de7aa36602660",
+    "note": "Full139-line owner header read: aliases, prototypes, real BitStream and Model with258frequency entries. S16 numTraffic unreferenced; no padding invented. C13 model-name/diagnostic string constness, B34 incomplete external string arrays and capacity-less data APIs require consumer proof."
+  },
+  "include/Ints.h": {
+    "sha256": "6fd249695ef01cdc160942d87e37d0bc9af2958788205727702a2ed611acf87a",
+    "note": "Full539-line header read, all53 physical definitions plus modern/retail macro branches reconciled. Scalar wrappers own one representation member; casts are explicit domain/width boundaries. Postfix copies are genuine old-value results. Macro flag/step/IDX conversions are retained; BIT shift domain and CLEAR_FLAG known-set precondition must be proved by callers. ASSIGN_CHAIN strict arm evaluates value five times versus once retail, so side-effectful callers require separate audit."
+  },
+  "include/SOURCE/KB_TYPES.h": {
+    "sha256": "3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02",
+    "note": "Full969-line header read,26 physical functions and both modern/retail macro branches reconciled. Closed domains, open trigger codes and scalar conversions retained. U05: tag_monsterInfo contains a single-arm outer union/struct around cost/fightValue and alternate flag aliases; simplify only after initializer and consumer audit. Packed database structs are semantic records, not stack aggregates; menu reserved byte has no use proven here."
+  },
+  "include/EDITOR/fullMap.h": {
+    "sha256": "8d6b1d48cca513d44f22889844464ac49a2ec52809cff0943664cfa5ed9b452a",
+    "note": "Full58-line header and six pointer accessors reviewed. Flat cells/extras owners are real; pointer expressions are not fabricated stack addresses. B18 lifecycle and coordinate/index domains remain caller obligations."
+  },
+  "src/BASE/icon2by.cpp": {
+    "sha256": "22e525595d215aba11aa0706a1fe45b3522869bab2d8f230e1b977bae9de27fd",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 palette flattening and G15 shared fill tail remain candidates. B29 shear[s_y] is read at setup and before the Y-clip predicate; EOL uses the old row's shear before incrementing y. SPELLS allocates480 modifier bytes but sprite extent proof is not yet complete. B28 row/frame/stream bounds remain. Command and count roles are related file-static decoder state."
+  },
+  "src/BASE/iconf2by.cpp": {
+    "sha256": "f9312f65e08c74096d99cf775ed467b4d58d936d08416614d3216d54d6985187",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 palette flattening and G15 shared fill tail remain. B29 shear is indexed before vertical clipping and old-row shear sets next-row x. B28 reverse-copy postdecrement, preclip row and asset bounds/full-containment fill predicate remain. Redundant dimLen self-assignment is an emitted-state/source-shape candidate, not unrelated role reuse."
+  },
+  "src/BASE/icon2bc.cpp": {
+    "sha256": "ca93186adf5deb223cfb483727d1376c3c74df4d6c8934160b11ec3113c156db",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12: flattened uDimPal pointer/level arithmetic uses (command&0x3c)>>2, domain0..15; only12 levels are declared, so asset-level proof is required before typed replacement. Serialized IconEntry, high-bit i8, unsigned shift and recolor narrowing casts retained. G15 shared fill_run tail remains a structured-source candidate. B28 preclip row pointer, unbounded frame/RLE stream and colorTable256 contract remain. Static cursors/counts are real decoder state, not stack aggregation."
+  },
+  "src/BASE/iconf2bc.cpp": {
+    "sha256": "231940cad308a90e3f681be1411b5bb2e41c8f228d6596b514a4a29ace8693bb",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. C12 flattened dim palette needs0..11 command-level proof; serialized header, sign-bit and recolor casts are genuine boundaries. G15 shared fill tail remains open. B28 reverse cursor decrements after final copied pixel, preclip row formation, frame/stream/colorTable bounds and clipped fill full-containment gate require review; no fake stack aggregate."
+  },
+  "src/BASE/icon2bs.cpp": {
+    "sha256": "edc23efebd89927f2b53262946d786add933d99ffae78c9361ee922a74c64acc",
+    "note": "Full TU, single decoder/scaler and all file-static declarations read. B30: all six source calls are VWCompleteDraw with scales4/6/12 and NO_CLIP; division is nonzero and all sampled temp offsets are at most1820, inside the cleared0..2047 region of the real64x64 bitmap. Non-native scaling ignores supplied destination clip, so destination coordinates remain a caller contract (B25); frame/RLE contracts remain B28. Source/destination cursors and inc/lineStep are related roles, not artificial stack aggregation."
+  },
+  "include/BASE/icon2by.h": {
+    "sha256": "9b1ff4f72329cd7f9ae53362aab4478bd944f430652e9ff968fbb535c2e2d8f0",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/iconf2by.h": {
+    "sha256": "127e45cb9b3a6958573d18bccab0f40b092cdf4f6163409a3efb9a165d8ebbbe",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/icon2bc.h": {
+    "sha256": "27be2881451fe5cacc671210ba0ed79d31058bae3253afe94c305c22af6646bb",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/iconf2bc.h": {
+    "sha256": "53bc0de213b2d72f232b50a046f138cb7038ac45e91b12c59026931ea9c5b44c",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
+  "include/BASE/icon2bs.h": {
+    "sha256": "df406be7009f2d8a9994d8a4f24a81de67ab38870aa41940e5f7b7dbdb54a875",
+    "note": "Full owner header/prototype read; no physical body, aggregate or executable macro."
+  },
   "src/BASE/Iconf2b.cpp": {
     "sha256": "e4ee63ea92cd19e6af2258c074cb0a2a3665a4e85cc6c8eab8c90e015c3e7bc7",
     "note": "Full199-line TU/one decoder plus all18 static owners read. C12/G15/B28 retained for palette, shared-fill and clipping/stream pointer review."
@@ -184,8 +272,8 @@
     "note": "R01: all three resource constructors/destructor bodies; common polymorphic ownership, no debt candidate."
   },
   "src/BASE/RESMGR.cpp": {
-    "sha256": "5855b4660731fad8f1ed01363693846bbd5c6f4152c27efd36c62612ae0a095b",
-    "note": "R01: all 31 bodies, two ten-slot position arrays and enums; C01 read interfaces, S01 single-used count-array element. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
+    "sha256": "296457da30cee27248700e38ef1c225f5957fadcac3f0bb997121eea4f92a446",
+    "note": "R01: all31 bodies, two ten-slot position arrays and enums. C01 read interfaces and S01 scalar count applied with native and true-retail evidence. D01 withdrawn: original address claims restored after rejecting the reconstructed control."
   },
   "src/BASE/WIDGET.cpp": {
     "sha256": "05b5c3a6558559d17b1c9b2e475c0a223a7f3cc512b15534245beb603d654842",

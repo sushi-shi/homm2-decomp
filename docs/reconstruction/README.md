@@ -60,13 +60,10 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - C01: implemented `Read13(char*)`, `ReadBlock(void*)` and text name arrays;
   26 casts removed, native before/after bytes and relocation graphs identical.
   [Evidence and remaining full-build gate](C01.md).
-- S01: `LoadAggregateHeader` reserves `i16 fpCountBuffer[2]`, reads only two
-  bytes, and uses only element zero. Test a scalar count against the retail
-  frame before retaining a replacement; an extra array element is not itself
-  evidence of an original aggregate.
-- G01: `button::Main` ends its left-button-up arm with `goto normalEvent`,
-  targeting the common base dispatch immediately after the switch. Test the
-  structured `break` form against VC6; preserve the base call and return value.
+- S01: `LoadAggregateHeader` now uses the single signed 16-bit count it reads,
+  removing an unused array element with [full native/retail proof](S01.md).
+- G01: retain the button's shared-dispatch goto; a measured `break` replacement
+  deletes the retail tail stub. [Experiment and exact retained proof](G01.md).
 - U01: `tag_messagePayload` and its scalar/pointer/modifier subviews describe
   the event protocol. Mouse/keyboard events become widget events in place;
   replacing these unions with casts or fresh whole-message initialization would
@@ -134,6 +131,37 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   but stored army indices still require lifecycle proof.
 - C12/G15/B28: icon RLE palette typing, shared fill joins and clipped/streamed
   pointer bounds need family-wide native and input-domain review.
+- B29: both sheared icon decoders read the modifier row before checking Y
+  clipping, including initial setup. The two spell producers allocate 480 bytes;
+  sprite-extent and stripe/fade accesses still need lifecycle/input proof.
+- B30: the scaler's six callers supply only scales 4/6/12 with no clipping.
+  Their temporary samples fit the initialized first 2048 bytes of a real
+  4096-byte bitmap; destination and input-frame contracts remain B25/B28.
+- U05: the monster database record has a single-arm outer union/struct and
+  duplicate flag aliases. Initializer topology and all consumers must be checked
+  before removing alternate views from the packed 26-byte record.
+- B31: all three bit helpers use byte-indexed DWORD accesses; the six-byte
+  puzzle mask's final byte access spans through offset 8, where a separate
+  hero-screen selection global is claimed. Retail proves the helper widths;
+  do not disguise the overlap by padding the mask. Packed town flags also
+  require checking the full access width.
+- B32: the assembly tile blitter assumes square/multiple-of-eight tiles and,
+  on its forward path, a height divisible by 16. Resource and clipping
+  contracts remain to be traced.
+- C13/G16/S16: Bzip's type conversions, three loop/store-tail gotos and unused
+  model/status storage require invariant-source and native proof. Its real
+  frequency/permutation tables and sort stacks are retained.
+- B33: Bzip `panic` and `cleanUpAndFail` are genuine-retail returning no-ops.
+  Its logged overrun/EOF/allocation errors therefore cannot be credited as
+  preventing subsequent out-of-range accesses. Decoded origin/run bounds and
+  allocation lifecycle remain open.
+- B34: Bzip data wrappers accept no destination capacity; path and formatter
+  APIs also need caller-length proof. Their fixed generated filenames fit
+  the zero-initialized local buffer, including four overwritten terminators.
+- B35/S17: map-extra growth first returns index zero although links use zero
+  as sentinel; caller reservation/lifecycle proof is required. Two unused
+  map helper scalars need native frame checks. Reloading an extra pointer after
+  reallocating its owner is necessary, not avoidable pointer reuse.
 
 ## Build setup observations
 

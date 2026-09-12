@@ -1,4 +1,3124 @@
 {
+  "include/BASE/DebugCheck.h:DebugCheck(void)#1": {
+    "body_sha256": "cd5b841d7b9af8efc92237431a8e8d396681b7a9ef5e6cca1693aa9e71d1674a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty inline hook; no instances of the ten debt patterns."
+  },
+  "include/EDITOR/mapcell.h:mapCell::HasFlag(MapCellFlag flag) const#1": {
+    "body_sha256": "9024b1420ffd0e539507e34aa44b936e87ec9685c1520c3975a12c0deaeb9ff1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Tests a packed byte flag through explicit enum-as-index conversion; no union pun, address arithmetic or owner recovery."
+  },
+  "src/BASE/BITS.asm:BitTest#1": {
+    "body_sha256": "0167e29540f04f0f50638c57ed56fe5a06ce9880456ce780facce8300fd612bf",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B31 BitTest uses DWORD at base+(bit>>3), not a byte. Full bytes/sites/targets agree with genuine retail. Puzzle mask is declared6bytes and last-byte operations touch through+8 (neighbor at+8); town bitfields similarly require access-width/lifecycle proof. Index/bit-mask register reuse is normal assembly, not unrelated C++ variable reuse."
+  },
+  "src/BASE/BITS.asm:BitSet#1": {
+    "body_sha256": "26178166c24abf96439e5b21c58f33bff94d5f22a90e139598df559f58178b5e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B31 BitSet uses DWORD at base+(bit>>3), not a byte. Full bytes/sites/targets agree with genuine retail. Puzzle mask is declared6bytes and last-byte operations touch through+8 (neighbor at+8); town bitfields similarly require access-width/lifecycle proof. Index/bit-mask register reuse is normal assembly, not unrelated C++ variable reuse."
+  },
+  "src/BASE/BITS.asm:BitClear#1": {
+    "body_sha256": "44e9f68553676bafa582a486ec350b5cac668886b849f42010285566cd363688",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B31 BitClear uses DWORD at base+(bit>>3), not a byte. Full bytes/sites/targets agree with genuine retail. Puzzle mask is declared6bytes and last-byte operations touch through+8 (neighbor at+8); town bitfields similarly require access-width/lifecycle proof. Index/bit-mask register reuse is normal assembly, not unrelated C++ variable reuse."
+  },
+  "src/BASE/Bzip.cpp:initialiseCRC(void)#1": {
+    "body_sha256": "46f3f3d833232f7fcc7ff6d1ef6dd15546f401c6778fa087e3b88a08da85d4af",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes the CRC accumulator to all ones; scalar state, no debt."
+  },
+  "src/BASE/Bzip.cpp:getFinalCRC(void)#1": {
+    "body_sha256": "902d3ef993d8a699b5f0a064a63aae343ce790d876bf81e6a22009665e9cddd5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns complemented CRC without aliasing or reused storage."
+  },
+  "src/BASE/Bzip.cpp:getGlobalCRC(void)#1": {
+    "body_sha256": "d60ecbce8f9f8200e6514edff7946714cebc287c74945149575a9b6a3e1ff02f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns the current CRC scalar."
+  },
+  "src/BASE/Bzip.cpp:setGlobalCRC(u32 newCrc)#1": {
+    "body_sha256": "588bcd369531b4a34ae67291ffab0200810bba145e03b346b72ecf8ca425bb70",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Replaces the CRC accumulator with another value of the same role."
+  },
+  "src/BASE/Bzip.cpp:bsOpenReadStream(FILE * f)#1": {
+    "body_sha256": "373f8ea02f6ccfd911fce9d9c9cd20a6468d6af58bae44836684997f2c983d11",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real file-static BitStream owner is initialized and returned; no synthetic stack record. C13 literal const-removal compensates for panic's non-const parameter. B33 panic returns, so bsInUse is diagnostic rather than exclusive-access enforcement."
+  },
+  "src/BASE/Bzip.cpp:bsOpenWriteStream(FILE * f)#1": {
+    "body_sha256": "6b6f33712f3b26be5e759d7e7647b34cd1fa4ccb06ccdcc634f2c93418c365a8",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Initializes the single real BitStream owner for writing. C13 literal const-removal is interface debt. B33 duplicate-open panic returns; no private padded stack owner."
+  },
+  "src/BASE/Bzip.cpp:bsPutBit(BitStream * bs,i32 bit)#1": {
+    "body_sha256": "b7591fdec06fbc9698724b496871bafd8603740579f0f9853e7771e256fb3ec6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Byte narrowing is the actual output boundary; bit masking keeps buffer payload in8bits. retVal is one I/O result. B33 ioError returns after failed putc, so failure does not stop encoding."
+  },
+  "src/BASE/Bzip.cpp:bsGetBit(BitStream * bs)#1": {
+    "body_sha256": "5087ef88995f550f9d2cf6120770c439c4a629f78dffa1722d18de0c18337267",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Live-bit count evolves0..7 after refill; shift indexes are bounded for initialized streams. B33 EOF diagnostics return, allowing continued reads from an exhausted stream; no manual varargs."
+  },
+  "src/BASE/Bzip.cpp:bsGetUChar(BitStream * bs)#1": {
+    "body_sha256": "c39cec34fcb8dc107acbd9b8534f29f637f2799ea1b9d7fb009d23da67a0ee6f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Exactly eight bit reads assemble a byte; final UChar cast expresses the output width. No array or unrelated reuse."
+  },
+  "src/BASE/Bzip.cpp:bsPutUChar(BitStream * bs,u8 c)#1": {
+    "body_sha256": "fd8a0614d96183e7c4f7376311ab80093ae2a3d15a0d40b90143b76e5d12b067",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Eight bits emitted high-to-low; unsigned promotion makes right-shift intent explicit. No buffer ownership conversion."
+  },
+  "src/BASE/Bzip.cpp:bsClose(BitStream * bs)#1": {
+    "body_sha256": "7d1c129cc17ac541c4e0ae1054011a84c2425f5a716cafa959cad8dc6d38ba41",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Pads writer to8bits and closes its FILE; narrowing preserves low output byte. C13 panic literal interface; retVal remains I/O status across flush/close. B33 errors log and return."
+  },
+  "src/BASE/Bzip.cpp:minUInt32(u32 a,u32 b)#1": {
+    "body_sha256": "9d9d9b32b1b15dda0b80c4c1425472e5dc057142c65a119879f1dfe4238c988a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Two scalar arguments and branch-return minimum; no reconstruction debt."
+  },
+  "src/BASE/Bzip.cpp:arithCodeBitPlusFollow(BitStream * bs,UInt32 bit)#1": {
+    "body_sha256": "c0f8d8ffc64e5e9bbd00ce9fd8276bdd1e3bbd2bb50ab2e1567242635f042b37",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Outstanding complement bits drain the same arithmetic-code state; no array or fake owner."
+  },
+  "src/BASE/Bzip.cpp:arithCodeStartEncoding(BitStream * bs)#1": {
+    "body_sha256": "b8e85006c33b0ff608ceffb14c16ea44d44f03d25579570d6cf9e7ac61098a70",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes arithmetic interval; unused BitStream parameter is interface symmetry, not fabricated varargs or stack aggregate."
+  },
+  "src/BASE/Bzip.cpp:arithCodeDoneEncoding(BitStream * bs)#1": {
+    "body_sha256": "77467dbdc3d61ffd7f50ef32d887a1e8edc0732cb6ca7009d962ccb9e0af6822",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Emits26 bits of bigL with shifts25..0; loop count and interval roles remain separate."
+  },
+  "src/BASE/Bzip.cpp:arithCodeStartDecoding(BitStream * bs)#1": {
+    "body_sha256": "ae488c0edc766fc1991ec12da0b336e2e939df304a0576ed08615151ce2a81aa",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reads exactly26 bits into bigD and resets the arithmetic interval; no array or artificial aggregation."
+  },
+  "src/BASE/Bzip.cpp:arithCodeDoneDecoding(BitStream * bs)#1": {
+    "body_sha256": "486552e9dfe588c87f4f663dd3c4cadab53f9afd14e68fa3b6a5555605c67c09",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty completion hook with unused stream parameter; no aggregate or raw argument-slot access."
+  },
+  "src/BASE/Bzip.cpp:arithCodeRenormalise_Encode(BitStream * bs)#1": {
+    "body_sha256": "bd6ffce8c6c81680f8aa955115f0c120355b01d09bd4bc498a0ad552b91dc12c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Interval refinement and pending-bit count are algorithmic scalar reuse, not unrelated roles; shifts use fixed26-bit arithmetic-code limits."
+  },
+  "src/BASE/Bzip.cpp:arithCodeSymbol(BitStream * bs,Model * m,Int32 symbol)#1": {
+    "body_sha256": "2489d2678fab0ae8209b7f9eb8f1f7f74640287a47825c3a9f36e90c3f176cfc",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "C13 panic string boundary. Model symbols are1..numSymbols; callers supply<=256 and initModel reserves258 frequency entries. Small interval temporaries are separate semantic quantities, not packed stack state."
+  },
+  "src/BASE/Bzip.cpp:arithDecodeSymbol(BitStream * bs,Model * m)#1": {
+    "body_sha256": "cefde081a264cbf420c329b9e8e4361206384634c1f690fa5cd6edfe2c635900",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Positive initialized model frequencies and target<totFreq bound the cumulative search to numSymbols<=256; return signedness cast maps a bounded symbol. Related interval state is not variable-role debt."
+  },
+  "src/BASE/Bzip.cpp:initModel(Model * m,Char * initName,Int32 initNumSymbols,Int32 initIncValue,Int32 initNoExceed)#1": {
+    "body_sha256": "b8bf9060bae6d2a3235e60b6cec3a8a9929fe43d53fe391c13e30c4b62b5c413",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "All callers use symbol counts2..256 (basis11); freq[0] and freq[numSymbols+1] fit258 entries. S16 numTraffic is an unused real Model member, not a local aggregate; initName's const interface is C13."
+  },
+  "src/BASE/Bzip.cpp:dumpModelStats(Model * m)#1": {
+    "body_sha256": "a2b8a8e2511632f6192665d28636cc3e104c0c9e76fae06b5ba2817f118ae99d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C13 model name can be const; B34 sprintf to gText requires string-length proof for the borrowed name. Model's scalar fields are meaningful, no varargs slot reads."
+  },
+  "src/BASE/Bzip.cpp:updateModel(Model * m,Int32 symbol)#1": {
+    "body_sha256": "66fe6e1d731b39521273bf6334ca88f490f5322317a68aae3e178206e15d41ca",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Frequency update/rescale uses1..numSymbols<=256 within258 entries; symbol comes from validated encoder ranges or bounded arithmetic decode. No unrelated reuse."
+  },
+  "src/BASE/Bzip.cpp:putSymbol(Model * m,Int32 symbol,BitStream * bs)#1": {
+    "body_sha256": "eab6920d46328543bde177a3f3e92a9277317fb50614c936a785ed723d6da22f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Forwards one model symbol then updates that model; no cast or alternate storage view."
+  },
+  "src/BASE/Bzip.cpp:getSymbol(Model * m,BitStream * bs)#1": {
+    "body_sha256": "425296a0cf22afa56cdf6951761fec738608ad810cf0580547afbf3dc693f2d8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Decoded symbol local preserves its one role through updateModel and return; frequency bounds follow arithmetic decoder."
+  },
+  "src/BASE/Bzip.cpp:initBogusModel(void)#1": {
+    "body_sha256": "f512c2fe09f47176970d3e1da1b75509e589d4b23ed929e495dcf0c3339a62fa",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fixed256-symbol model uses entries0..257 exactly. C13 const-removal exists only because initModel stores Char* name."
+  },
+  "src/BASE/Bzip.cpp:putUChar(BitStream * bs,UChar c)#1": {
+    "body_sha256": "03d44666d2429d78da07e2713bfe311c2cfea3b323f5a3cc9491eece44a26fba",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Maps a byte to model symbol1..256; UInt32 promotion is a candidate redundant conversion C13, retained pending invariant-source proof."
+  },
+  "src/BASE/Bzip.cpp:putInt32(BitStream * bs,Int32 i)#1": {
+    "body_sha256": "f1827ef06bf8008f62cc32136d2e5058faac6163297db7d419185720e2929404",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Unsigned reinterpretation before high-byte shifts is meaningful wire encoding; each UChar cast narrows one byte. No pointer pun or manual varargs."
+  },
+  "src/BASE/Bzip.cpp:putUInt32(BitStream * bs,UInt32 i)#1": {
+    "body_sha256": "b9b1a667781a1a6994409547544ea23691e2c539243b602d0dc3f4c72040dc39",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Four high-to-low byte casts express serialization width; no object aliasing."
+  },
+  "src/BASE/Bzip.cpp:getUChar(BitStream * bs)#1": {
+    "body_sha256": "a12ab7dfdecd3ba7c8ab5e244eddac613370ae0b6f641628c99b0da8767956ff",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Subtracts one from bounded bogus-model symbol1..256 then narrows to byte."
+  },
+  "src/BASE/Bzip.cpp:getInt32(BitStream * bs)#1": {
+    "body_sha256": "ae4e3c138d2ffb5409091494ecbee3fe8d8c4ea4e1517d466bce1994389f5fca",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Four byte reads form a32-bit wire value; final signed conversion is intentional. C13 promoted byte left-shift/signedness spelling needs invariant-source proof, not blind cast removal."
+  },
+  "src/BASE/Bzip.cpp:getUInt32(BitStream * bs)#1": {
+    "body_sha256": "41673bd13c610268387d40cd81b7385931aea6d0749b04032dbce872390c52a7",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Four byte reads form a32-bit word; C13 promoted signed-int left shift of high byte is a portability boundary, not pointer arithmetic."
+  },
+  "src/BASE/Bzip.cpp:initModels(void)#1": {
+    "body_sha256": "332255a90f3905da0703090b6d3df9800799d32737c71a5eeba675139eb6e7d5",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Eight distinct real Model objects initialized with symbol counts11,2,4,8,16,32,64,128; all fit258 frequencies. C13 string const-removal can be addressed only with owner/API and invariant-source proof."
+  },
+  "src/BASE/Bzip.cpp:dumpAllModelStats(void)#1": {
+    "body_sha256": "3cb35e18c2e7f69a5bde86cc6db111e2f85e5392819e8ed2212adb0159c9bd92",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Visits bogusModel and each of the eight fixed model slots; no loop spill or fake array."
+  },
+  "src/BASE/Bzip.cpp:getMTFVal(BitStream * bs)#1": {
+    "body_sha256": "4190d3b48659a5fd71b6bf5c74bea3c27199c5cc18b413b161f4a828da0e54db",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Tagged arithmetic symbol selects one model and produces run markers/EOB or1..255; retVal retains one decoded-code role. All fixed model indices fit8."
+  },
+  "src/BASE/Bzip.cpp:sendMTFVal(BitStream * bs,Int32 n)#1": {
+    "body_sha256": "d983b7b1e81863ba87796ab8fcac84622ac19f9d8a045342626bbef739ac770b",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Explicit marker and1..255 range dispatch bounds all model accesses; C13 panic literal cast is interface debt. Malformed n invokes returning panic but performs no out-of-range model access."
+  },
+  "src/BASE/Bzip.cpp:FreeCompressStructures(void)#1": {
+    "body_sha256": "253987560a29bc81f135eda4eae0703c479c4753fa796dd0c7ce33d8db63e5bf",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Frees three genuine allocation owners and nulls them; no owner-from-member arithmetic."
+  },
+  "src/BASE/Bzip.cpp:allocateCompressStructures(void)#1": {
+    "body_sha256": "7524d73e8a6184dee5c8ecf8bcaf9fa594a7fb3cb024c90f6fb0c19abb09f224",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C13 allocation casts create true UInt32/Int32 owners. words has n+16 elements plus one byte, zptr n elements plus one byte and ftab65537 elements plus one byte; the denormalized suffix is used by copyOffsetWords. B33 failure callbacks return; block-size/allocation lifecycle needs callers."
+  },
+  "src/BASE/Bzip.cpp:FreeDecompressStructures(void)#1": {
+    "body_sha256": "fae8857a7afa14c06dea96553922d23342be805c829557c9812238696f1f7220",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Frees/nulls three real decompression allocation owners, retaining their distinct roles."
+  },
+  "src/BASE/Bzip.cpp:setDecompressStructureSizes(Int32 newSize100k)#1": {
+    "body_sha256": "d00437e46b01d1cb9c76481932752a94dd6a16e506f3d563f4bffc650f9fa0dd",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C13 typed allocation boundaries. Sizes1..9 derive from verified compressed header; zero releases. B33 early return when size unchanged is unsafe if a prior FreeDecompressStructures nulled owners without resetting blockSize100k; caller lifecycle matters."
+  },
+  "src/BASE/Bzip.cpp:GETALL(Int32 a)#1": {
+    "body_sha256": "a36cc2fe9f2b1ed89536b91f90a04b0c88cad45dfa1368605dd0f45f168b54b4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Typed words[a] accessor; actual n+16-word allocation covers normalized/unrolled comparison indices, conditional on initialized compression state."
+  },
+  "src/BASE/Bzip.cpp:SETREST16(Int32 a,UInt32 w)#1": {
+    "body_sha256": "7c3f2c4cb8e2c323546ed71ec5993c41c4c7ad9b2e7004e82d1f50b7d58e6ffe",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "C13 redundant UInt32 cast of already UInt32 w; meaningful lower-half mask keeps the high half. words[a] bounds follow block state."
+  },
+  "src/BASE/Bzip.cpp:SETFIRST16(Int32 a,UInt32 w)#1": {
+    "body_sha256": "da21667b6b8ac2ed8f29b66d1911dd7d0b628f46c893168ad32fe436f206343b",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "C13 same-type UInt32 cast is unnecessary at language level; shift writes high16bits while preserving low half. Do not rewrite invariant source without compiler proof."
+  },
+  "src/BASE/Bzip.cpp:SETREST(Int32 a,UInt32 w)#1": {
+    "body_sha256": "2295183775f4069ba2816358f1c848a05f264cc1197385554c7517d4d2baf77b",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "C13 same-type UInt32 cast of w; lower24bit update is a real packed-word operation, not union debt."
+  },
+  "src/BASE/Bzip.cpp:SETFIRST(Int32 a,UChar c)#1": {
+    "body_sha256": "4f4abad5ff86b981da869aee6d49f449e8c303f7981b865b3ee5cb14de011308",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unsigned widening before shift24 preserves packed high-byte encoding; typed words owner is legitimate."
+  },
+  "src/BASE/Bzip.cpp:SETSECOND(Int32 a,UChar c)#1": {
+    "body_sha256": "b24895040d43c3ceba9429a1dcbe5733b97c6552970bdab6e3f83f3c4aa3d877",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unsigned widening and shift16 update only the second packed byte."
+  },
+  "src/BASE/Bzip.cpp:SETTHIRD(Int32 a,UChar c)#1": {
+    "body_sha256": "dcc619dd1fd984aaa6d1ce4375a8211d260207a07fa106d1329f2e0f9a08a75f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Unsigned widening and shift8 update only the third packed byte."
+  },
+  "src/BASE/Bzip.cpp:SETFOURTH(Int32 a,UChar c)#1": {
+    "body_sha256": "8e7b84af8325a461cae5f317cd7844ae6fb015032132c4458c67119d708c107d",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "C13 byte promotion to UInt32 is a possible redundant cast, but packed low-byte replacement is meaningful. Retain pending invariant-source native proof."
+  },
+  "src/BASE/Bzip.cpp:NORMALISE(Int32 p)#1": {
+    "body_sha256": "c35030a9e6dca9bdf901608a5ca6438318712ba61638eca273619b8510f2fad7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "At most one wrap of a block index; p remains a coordinate, not unrelated variable reuse. Requires -lastPP<=p<2*lastPP from callers."
+  },
+  "src/BASE/Bzip.cpp:NORMALISEHI(Int32 p)#1": {
+    "body_sha256": "48cce2c3e3a87251ccf5fb1b22939816b6502fdf2376ba067fae45117a3eb291",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "One upper wrap of a block index; unrolled fullGt uses extra16-word suffix before wrapping and large blocks>1024."
+  },
+  "src/BASE/Bzip.cpp:NORMALISELO(Int32 p)#1": {
+    "body_sha256": "b564e25fca520add5746b8636c502e118555856b34c26728a76ebe690c0350c5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "One lower wrap used for predecessor/stripe indices; sortIt invokes stripe only for blocks>1024, avoiding too-short wrap assumptions."
+  },
+  "src/BASE/Bzip.cpp:STRONG_NORMALISE(Int32 p)#1": {
+    "body_sha256": "b6bf45a34765266b0fe376abf0e5d6c23ae66206302522c87a7e188b2e42dbfd",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Repeated lower wrapping then modulo normalizes one coordinate; requires lastPP>0. Not out-of-object pointer arithmetic."
+  },
+  "src/BASE/Bzip.cpp:sendZeroes(BitStream * outStream,Int32 zeroesPending)#1": {
+    "body_sha256": "cf5ab726ae6247dc7331df598389e64d71bee9d558fc529cdb02bdf25480703b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Run length is deliberately consumed into its binary run representation; counters and bitsToSend have distinct roles. Valid compression limits bound the run, avoiding signed-shift overflow."
+  },
+  "src/BASE/Bzip.cpp:moveToFrontCodeAndSend(BitStream * outStream,Bool thisIsTheLastBlock)#1": {
+    "body_sha256": "969446f7e84d35a0ce4eb761c962598e15c9955c5f90a1a980f0f192627f0ef3",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Real256-byte permutation yy contains every UChar exactly once, bounding equality search; byte initialization cast is meaningful. zptr holds block permutation and normalized predecessor reads fit words. No artificial stack aggregate."
+  },
+  "src/BASE/Bzip.cpp:getAndMoveToFrontDecode(BitStream * inStream)#1": {
+    "body_sha256": "be5c56b5101251589adea54599bcac8807744e16559befd8c75c8c0cd75598d3",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "G16 LOOPSTART is an explicit decoder back edge. yy[256] is a real MTF permutation; symbols1..255 are checked. B33 blockOverrun returns, so last>=limit does not prevent ll[last] writes; origPtr and long run-length overflow are unvalidated. i/j/counts retain algorithmic roles."
+  },
+  "src/BASE/Bzip.cpp:stripe(void)#1": {
+    "body_sha256": "fb76234490a9dc95b836a5db05ccd3a9d4030721c6bc0e335fe366a98d2f2b5b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Writes three preceding packed bytes through one-step NORMALISELO; called only for lastPP>1024, so i-3 wraps into the true block owner."
+  },
+  "src/BASE/Bzip.cpp:copyOffsetWords(void)#1": {
+    "body_sha256": "108cc052748255c4b11c7614eeddc08ac26f95b55dd655bf27f5d1a7ace4b156",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Copies exactly16 prefix words into the real allocated n+16-word suffix; this is deliberate in-owner duplication, not synthetic padding or before-object addressing."
+  },
+  "src/BASE/Bzip.cpp:fullGt(Int32 i1,Int32 i2)#1": {
+    "body_sha256": "b7dd593f5f1667a4b9d2bd7fcd91ce2dc1e7cb5b16bc71bc77422ffc3f9056e4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Four4-word-stride comparisons may read beyond logical block length but within its16-word duplicated suffix; indices wrap after each group. i1/i2 remain cyclic suffix positions."
+  },
+  "src/BASE/Bzip.cpp:qsortFull(Int32 left,Int32 right)#1": {
+    "body_sha256": "2820adea93e89dc5e5504cccf82b1226ee5eed5fc4e0cd6b42c00376c249ed1f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Real two40-element range stacks implement bounded iterative quicksort, not fake local aggregation. Sorting smaller partition first bounds stack depth for<=900000 items. G16 insertion tail goto is a structured candidate; SWAP scoped locals preserve values and one role."
+  },
+  "src/BASE/Bzip.cpp:trivialGt(Int32 i1,Int32 i2)#1": {
+    "body_sha256": "f20112e17172983248ffd51b8f2027363e750dcf9173e2dd79bc2c7241d127f4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Cyclic comparison reads block bytes through typed packed-word extraction, then wraps indices; loop is bounded last+1. No unrelated variable reuse."
+  },
+  "src/BASE/Bzip.cpp:shellTrivial(void)#1": {
+    "body_sha256": "c70d7126fb4388bac85928dbb511f57bfd2ea6886bdf861c21400e2f6d149547",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "G16 insertion shared-store goto could be break but requires invariant-source mirror/native evidence. Knuth gap sequence and indices stay within the real zptr block for size<=1024."
+  },
+  "src/BASE/Bzip.cpp:sortIt(void)#1": {
+    "body_sha256": "f6f5dd72e235cae34f8dc63ba45644e820aa44397116f9c06fd7d0a2c1d41805",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "ftab65537 includes sentinel at65536; byte-pair keys0..65535 and cumulative permutation positions fit owners. Nested index variables remain scoped. C13 panic literal. Five grade bands cover block sizes<=900000; no artificial aggregate."
+  },
+  "src/BASE/Bzip.cpp:doReversibleTransformation(void)#1": {
+    "body_sha256": "d66482e7add670796887e7f54cacfe7a8deea6900694579166cd5b0aa9d163a7",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Searches a bounded permutation for original position; C13 panic string is interface debt. With the constructed permutation, zero exists; no synthetic stack owner."
+  },
+  "src/BASE/Bzip.cpp:undoReversibleTransformation(void)#1": {
+    "body_sha256": "11520f762ea353dc0c361fb2681543b1af47f84d7ab418c98f6c19416d39f5fe",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "cc[256] is the real byte-frequency/prefix table; ll byte values bound its keys. B33 unchecked stream origPtr can index ll/zptr outside block before reconstruction; i is a linked-permutation position, not unrelated reuse."
+  },
+  "src/BASE/Bzip.cpp:spotBlock(Bool weAreCompressing)#1": {
+    "body_sha256": "2d53073183b4a4a1e8ecef64e99a144d4a89b2c52c99e423c2fabb381e01f903",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Byte wrap0..255 is explicitly restored before store. C13 promoted-byte and diagnostic casts need invariant-source proof; index/delta remain deterministic perturbation coordinates inside the block."
+  },
+  "src/BASE/Bzip.cpp:getRLEpair(FILE * src)#1": {
+    "body_sha256": "6b0b5b6bdc39db57bb82ead5f915b7c6556458d2c4a3992d375e55cde834a15b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Packs length1..255 and byte/EOF tag into one return integer; tagged reuse is intentional. CRC casts bound lookup to256 entries. B33 I/O diagnostics return; not manual varargs."
+  },
+  "src/BASE/Bzip.cpp:loadAndRLEsource(FILE * src)#1": {
+    "body_sha256": "25721b18ef55c18e88ec7d69b6b2bc2a341a87716b53fafcf59123d9d434e629",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Maintains20-element block headroom and appends at most5 encoded words per iteration, plus EOF marker. Unsigned run-length shift and byte writes are true packed-format boundaries. words n+16 owner fits."
+  },
+  "src/BASE/Bzip.cpp:unRLEandDump(FILE * dst,Bool thisIsTheLastBlock)#1": {
+    "body_sha256": "589c8a77ba08dcdebbf4532e2af1f5f7f5770722f29fb7b9f014c6f7b9776b5a",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 repeated-four-byte run requires a following count without a local end check; final marker reads block[last] even for malformed/empty decode. CRC byte casts and count/current/previous character roles are meaningful."
+  },
+  "src/BASE/Bzip.cpp:compressStream(FILE * stream,FILE * zStream)#1": {
+    "body_sha256": "5f5cc1545281fcf53f7cf0a1eea68a3a0e6181295eb0a45c4a10a6107103248f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual BitStream plus scalar coding state, no stack packing. Floating casts compute reporting ratios. Caller wrapper chooses blockSize3; file I/O errors return B33. B34 shared formatter bounds depend on fixed format/numeric fields."
+  },
+  "src/BASE/Bzip.cpp:uncompressStream(FILE * zStream,FILE * stream)#1": {
+    "body_sha256": "d76ea852f05c311844264d171b7410ba8d2cc2c3aadeaeedf1f706697bb135ff",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Checks BZ0 and size digit1..9 before allocating. C13 byte promotions are candidates; B33 origPtr/runs/returning error helpers remain unsafe for malformed streams. Magic-byte locals are distinct scalars, not an invented aggregate."
+  },
+  "src/BASE/Bzip.cpp:showFileNames(void)#1": {
+    "body_sha256": "0b29d3c673796c6779bb3c2b14f0405b09ffb44794d71e5c2c52b5c1d8f1c157",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty retail compatibility hook; not reconstructed missing storage or an aggregate."
+  },
+  "src/BASE/Bzip.cpp:cleanUpAndFail(void)#1": {
+    "body_sha256": "77f1eaeb498684221b45ea6421ebf596be1c76074587fba75c331a9c8318b4a5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "B33 confirmed genuine-retail5-byte returning no-op; callers must not be treated as terminating after this hook."
+  },
+  "src/BASE/Bzip.cpp:panic(char * s)#1": {
+    "body_sha256": "272aa424db098170bf283a9ceadec0b5af873cc6d0778bbd9134f46757bc85aa",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "B33 confirmed genuine-retail11-byte returning no-op with unused message argument; C13 message can be const in modern interface, but no fabricated failure exit is added."
+  },
+  "src/BASE/Bzip.cpp:crcError(UInt32 crcStored,UInt32 crcComputed)#1": {
+    "body_sha256": "db98948cec542fba152e71bf533433b3a455e57d51eb639d16be6ea761f1819c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 diagnostic returns via empty cleanup; B34 %s uses borrowed progName without a length contract. Two CRC scalars keep separate roles."
+  },
+  "src/BASE/Bzip.cpp:compressedStreamEOF(void)#1": {
+    "body_sha256": "2fb79e42a38326f5c6d51718510e471718795f37c23d1b38cd32a4cf00f68287",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 EOF handler only logs/perrors and returns through empty cleanup; B34 progName formatter extent remains."
+  },
+  "src/BASE/Bzip.cpp:ioError(void)#1": {
+    "body_sha256": "307a64a23c3f57b5d65575d254665a5506e20078f7951b00afb3b034751968d0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 returning I/O diagnostic, not a terminator. B34 progName text length must fit shared gText."
+  },
+  "src/BASE/Bzip.cpp:blockOverrun(void)#1": {
+    "body_sha256": "4c4a29d24be49cbcea9d6f3e496e4b4fc470f9d4bf36acba98475379a4c56df0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 this diagnostic returns, so its callers continue into writes; no bounds safety is credited to its name. B34 progName formatted length remains."
+  },
+  "src/BASE/Bzip.cpp:unblockError(void)#1": {
+    "body_sha256": "057a6e6d9a5b7b0b7f45d32aa0315f7a1413ab7f470a129d58ca5238f44c9690",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 marker diagnostic returns via empty cleanup; B34 shared diagnostic text/progName bound remains."
+  },
+  "src/BASE/Bzip.cpp:bitStreamEOF(void)#1": {
+    "body_sha256": "9660e880fedcf2e9eb7b8559816676c1d8cd444e632e4af9a8dfcfe293ff7530",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 exhausted-bitstream diagnostic returns, not noreturn. B34 progName text bound remains."
+  },
+  "src/BASE/Bzip.cpp:mySignalCatcher(IntNative * n)#1": {
+    "body_sha256": "26c55ad1a5320bbfef32bf1ddeec15534497bb18f390ee8c462e2a3a5d35a597",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Unused IntNative* parameter is a declared callback boundary, not manual varargs; signature requires registration proof if used. B33 cleanup returns, B34 diagnostic name length remains."
+  },
+  "src/BASE/Bzip.cpp:mySIGSEGVorSIGBUScatcher(IntNative * n)#1": {
+    "body_sha256": "b0d2391408c79f2d390916015cb811435d4d9c6c59ea1b29929b5c1a51efd9a1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Mode selects one diagnostic; pointer argument is unused, not owner recovery or raw signal stack access. B33 cleanup returns and B34 formatter bound remains."
+  },
+  "src/BASE/Bzip.cpp:uncompressOutOfMemory(Int32 draw,Int32 blockSize)#1": {
+    "body_sha256": "be9c6a73f7db1e2e77e45c6db433f83f4d296f97cecc711e07e997c566c63ba8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 returning allocation diagnostic; draw/blockSize are report values, not scratch-owner offsets. B34 progName formatter contract remains."
+  },
+  "src/BASE/Bzip.cpp:compressOutOfMemory(Int32 draw,Int32 blockSize)#1": {
+    "body_sha256": "5b0bbfe7785626b590f166276d4e91e3880a331a6d6654bf98a1a172bc8bd745",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B33 allocation-failure report returns; no synthetic extra owner. B34 borrowed progName length must fit gText."
+  },
+  "src/BASE/Bzip.cpp:endsInBz(Char * name)#1": {
+    "body_sha256": "4f021ac331448b6c6f95f60ceeda6a7bf6c407cf41665d1b609bf30e3d0ff665",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Length>3 guards all three suffix indices inside the NUL-terminated name; actual accepted suffix is .nw. strlen input validity is ordinary string contract."
+  },
+  "src/BASE/Bzip.cpp:compress(Char * name)#1": {
+    "body_sha256": "d4bc80e13b6f0008db080b4383a81b53da29b44561aab6679cfcc32d1fbfcbab",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "B34 copies name into two1024-byte globals and appends .nw; own EncodeData caller supplies a short fixed name, general API contract still open. S16 unread remove status remains until native test. B33 fopen failure paths are unchecked."
+  },
+  "src/BASE/Bzip.cpp:uncompress(Char * name)#1": {
+    "body_sha256": "cd05a94b81fedfc096ee675fd01a462f2f22df4908e68fb130a2946150445e2c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "B34 name copies into1024-byte globals; suffix guard makes truncation safe for a terminated input. S16 unread magicNumberOK retains a returned status; B33 still removes input after failed magic/decompression."
+  },
+  "src/BASE/Bzip.cpp:EncodeData(char * dst,char * src,u32l srcLen)#1": {
+    "body_sha256": "6365c38cc0b0b493a67bee1ca5cb364d3b1c57982937a9e4dc37ab3d68f02ea7",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real zero-initialized450-byte filename buffer supports replacing its NUL four times; next bytes stay zero, final fixed path<=17chars. C13 Random-to-char narrowing is bounded A..Z. S16 unread I/O result slots need native test. B34 dst has no capacity argument and fread uses file length; caller allocation proof required."
+  },
+  "src/BASE/Bzip.cpp:DecodeData(char * dst,char * src,u32l srcLen)#1": {
+    "body_sha256": "0d72f61d81c07b34986085e780b8640ba2eb5e378b45783e582fe1e2035dbaf7",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real zero-initialized450-byte filename supports four NUL overwrites and .nw append without overflow. C13 bounded Random cast; S16 unread status slots. B34 unbounded decompressed file length is copied to capacity-less dst; B33 malformed input errors return. Separate byte buffers are not stack aggregation."
+  },
+  "src/BASE/TILE.asm:TileToBitmap#1": {
+    "body_sha256": "d0a6774b276075b8348d5c711b690e181f9df430f19cf30ada2a525797b5c014",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B32 assembly blitter assumes square tile dimensions, horizontal width multiple8 and unflipped height multiple16; caller resources/coordinates need proof. Byte/dword cursor movement and two-word static scratch are actual assembly state, not fabricated C++ address arithmetic/stack aggregate. EBX clobber and direction-flag path must remain retail-identical."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::fullMap(void)#1": {
+    "body_sha256": "40843c9cfcac3bfe65c3821c9d13b71be97ab162bbe0d1c5b890d08fdd27380e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes two allocation owners and extra count; width/height deliberately await Init/Read, not artificial aggregate initialization."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::~fullMap(void)#1": {
+    "body_sha256": "e868618d0d95edeb38cd258778a4c607b4753b7cad291dc568f0118994892dcb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Delegates to Close for real cells/extras owners; no cast or synthetic frame."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::Close(void)#1": {
+    "body_sha256": "16212a8e5b72af4f43f80e844fe94065a113a0949db3e0314eb44001ec0fadfc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Frees raw allocated trivial cell/extra owners with scalar delete, then nulls pointers/count; no container-from-member trick."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::Init(i32 w,i32 h)#1": {
+    "body_sha256": "18239224dfda882969c2cb7331c7e900d79746e18c65ebc050cf0dd9f5c07280",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "True flat width*height allocation cast yields mapCell*. S17 unused scalar n needs frame test; B18 dimensions/lifecycle must bound allocation product."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::ClearCellExtra(i32 index)#1": {
+    "body_sha256": "b9e23ca5d1a6a78ace95fb55fc4b5789c8cea14c565c34f9b1410d49d2d1dd29",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Writes packed fields of extras[index], retaining unrelated metadata bits. B18 index/capacity contract; bitfield masks are meaningful serialized subviews, not alternate stack aggregates."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::GetNewCellExtraIndex(void)#1": {
+    "body_sha256": "21d822b13fa913e6ef9f7a9985ed7df01f25f2929cb564220dfd84508f8e847b",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real extras array grows100 records with typed allocation and copies old records. B35 first growth returns index0 although links use0 as sentinel, and zero-count memcpy may receive null extras; lifecycle must establish reservation. Free-record scan starts1. Allocation casts are appropriate; i/n/j keep distinct roles."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::GetNewCellExtraOverlay(i32 x,i32 y)#1": {
+    "body_sha256": "65de495a4b5996d0f8861fb9f96c49425cf04ac6e678158520c85966f125c8b0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Reloads node with Extra(ix) after possible reallocation, avoiding a stale interior pointer; ix intentionally survives as index. B18 linked indices/coordinates and B35 zero sentinel remain caller contracts. Flat accessor arithmetic is legitimate."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::GetNewCellExtraObject(i32 x,i32 y)#1": {
+    "body_sha256": "ee2f1e4503a47404e7a1c2ed1b5829501d1ef4a33117264eb7ecb03b806cf78f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Object-layer twin reloads node after extras growth using saved ix; no owner recovery or unnecessary pointer reuse. B18 link/coordinate domains and B35 first zero-index allocation need lifecycle proof."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::Write(i32 handle)#1": {
+    "body_sha256": "9c0dcf2fb23f8860152124dd1c5565904ddf23f3456743f3acf63a239eb4fa49",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Serializes actual width/height/count scalar owners and their cells/extras buffers, not a stack aggregate reinterpretation. B18 products/lengths depend on coherent live map state."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::Read(i32 handle,i32 convert)#1": {
+    "body_sha256": "0388d95bb7e9d0ef5f9dc515613dd81cc198d6de74f793926a938b300c18ac14",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Typed old-format allocations are20-byte cells/15-byte extras; copies12/7-byte prefixes into current real records. No out-of-object copy for valid counts. B18 unvalidated file dimensions/counts and short reads remain. No invented union joins old/new storage."
+  },
+  "src/EDITOR/mapcell.cpp:fullMap::ChangeTilesetIndex(mapCell * cell,i32 x,i32 y,TilesetId tileset,i32 index,i32 overlay,i32)#1": {
+    "body_sha256": "2e30b8cc68fe27a1d5a8ae3872a01fcdf6aeb3d5af9a12338ba4a9e402cfd32d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Traversal index and ptr remain extra-record roles; updates preserve serialized bitfields and recover new nodes through owner methods. S17 unused scalar a; B18 supplied cell/x/y/index/links need coherence and field-width contracts."
+  },
+  "include/EDITOR/fullMap.h:fullMap::Cells(void)#1": {
+    "body_sha256": "af2108102120aeb6273a09a424beeae584a6d071cfb9ee219138b54cefc35920",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns the base of the cells allocation; no arithmetic or owner recovery."
+  },
+  "include/EDITOR/fullMap.h:fullMap::Row(i32 y)#1": {
+    "body_sha256": "3231871e1127acd5a3963569a4942f796eb63a67cc56ef41eb7bf2264442b188",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B18: row pointer is an interior pointer into the flat width*height cells owner, requiring valid y and allocation lifecycle."
+  },
+  "include/EDITOR/fullMap.h:fullMap::Column(i32 x)#1": {
+    "body_sha256": "60a45cd78b262cedf30f29b4d38ac76cedbc4c9d0af64133c8296dd445f39516",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B18: returns an interior starting cell for column x, not a separately allocated column; x remains caller-bounded."
+  },
+  "include/EDITOR/fullMap.h:fullMap::Cell(mapCell * & cell,i32 x,i32 y)#1": {
+    "body_sha256": "7e2015e93cadc463046169cb27bc35c8a16459ba729db75240c326e05ac36688",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B18: writes a typed cell pointer into the caller reference using flat x+y*width indexing; no owner-from-member subtraction."
+  },
+  "include/EDITOR/fullMap.h:fullMap::GetCell(i32 x,i32 y)#1": {
+    "body_sha256": "06a03f26252f1f0ae5d446d3635db7e3cb7a67d08fc945783188c7d7d8369c4e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B18: composes Column(x) with a width-strided y offset within the same flat owner; no cross-object cast."
+  },
+  "include/EDITOR/fullMap.h:fullMap::Extra(i32 i)#1": {
+    "body_sha256": "05e5053b5e91af49d9e24d84bf41a149e1342ec0137c3968046ddf143ac11952",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "retain",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B18: indexed extra record needs i within extraCount/capacity and live extras allocation."
+  },
+  "include/Ints.h:H2EnumStorage::H2EnumStorage()#1": {
+    "body_sha256": "191b1400715062a436eea549ac8a63c75e8f788a4322d43a051cb49556bc2319",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Defaulted scalar wrapper construction; no manufactured initialization or spare member. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::H2EnumStorage(Enum value)#1": {
+    "body_sha256": "e7f9f74461560430dc16c1d638bd48b147691630a6cb718f78602f4af31cce2f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Enum-to-storage narrowing is the explicit fixed-width representation boundary. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::H2EnumStorage(Storage value)#1": {
+    "body_sha256": "e90c29ce3f07693c1ce4f020128615cf68582b9774df84daeb817c75b3d5f59a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Storage constructor directly initializes the sole scalar member. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::H2EnumStorage(H2EnumStorage<Enum,OtherStorage> value)#1": {
+    "body_sha256": "6284f65a96663609eff134e9da81e3ed81c94a7eaa8f887f89fb14be7ad06034",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width conversion goes through the semantic Enum then destination Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator Enum() const#1": {
+    "body_sha256": "82bc47c7c7eb6286cc989314b2f33d17ada08a491cafa4f29ee2bca7b0dc0742",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Converts the stored representation back to its semantic Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator Integer() const#1": {
+    "body_sha256": "ed81f9c57116e8c30c96c538be5339f876b199c8606dedb1a74060662892cdf2",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Explicit integral conversion goes through Enum, preserving signed underlying-domain behavior. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::value() const#1": {
+    "body_sha256": "bb99d4f3721fab81b81b13abd5d5c70d6e6d5f576bb5dd28397cfec9eb156763",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns the sole raw storage member; no reinterpretation. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator =(Enum value)#1": {
+    "body_sha256": "70b4f690f6723e6d4f0bfdc79ca0b4fdf12023bab7f7841b6df3c32620c72160",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Assignment narrows Enum to Storage then returns this live wrapper. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator =(Storage value)#1": {
+    "body_sha256": "91b8d4a9180f455acde7118fc3617fb1c458502461d03d735e45d85337e87289",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Direct storage assignment returns this live wrapper. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator =(H2EnumStorage<Enum,OtherStorage> value)#1": {
+    "body_sha256": "1103eb429337e9f9c839f5b97f42144eba2af89b6de870307cea0045d75c0473",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width assignment preserves the semantic Enum conversion boundary. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator |=(Enum value)#1": {
+    "body_sha256": "9d0476c133f0e259a529f1131226da66bda4053c5fc88eba560d28354ce4cf70",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Flag OR explicitly converts enum operand and promoted result to Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator &=(Enum value)#1": {
+    "body_sha256": "d7ca02ee68ecde0ff0aea81b455878fbb5895a6577faf98c2b8772ff8acaea76",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Flag AND explicitly converts enum operand and promoted result to Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator &=(Integer mask)#1": {
+    "body_sha256": "fe1ae6b84c57526ef7856c838af79c25cb4e0301310ad5c15d2edf69429c315e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Integer-mask AND intentionally accepts raw representation masks outside Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumStorage::operator ^=(Enum value)#1": {
+    "body_sha256": "e2071931a8353dc75eb0a10645a131dd7c7d996138d70a43151bdbce284f5006",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Flag XOR explicitly converts enum operand and promoted result to Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::H2OpenCodeStorage()#1": {
+    "body_sha256": "132697754ce3e93a62e94c60f6846abe05bfc510a8c0ded03e97776cfe0a5ff6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Defaulted open-code scalar wrapper; no aggregate or manufactured initialization. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::H2OpenCodeStorage(Code value)#1": {
+    "body_sha256": "f447339805cdbce0db076b270246cfd3e77a5aeb1e3230966be9e08b6cf87df8",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Open Code passes through i32 before fixed-width Storage, preserving unnamed protocol codes. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::H2OpenCodeStorage(Storage value)#1": {
+    "body_sha256": "c1a60ca2e383c968dcb3fe5342ca72615d42f0ccd52a4afd36e6fe51f655a0e1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Storage constructor initializes the sole open-code representation member. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::H2OpenCodeStorage(H2OpenCodeStorage<Code,OtherStorage> value)#1": {
+    "body_sha256": "c96edb3e45ddf1d139095ebb43af3303d37a63ba1421e3716f41dba637f09804",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width open-code construction copies the raw value, not a closed enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::operator Code() const#1": {
+    "body_sha256": "4516e481dd3d0a6c74cec2df1ee1f76b37ea05d62ba05cb74546ac7040446133",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Builds Code from promoted stored i32; no pointer or alternate object view. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::operator i32() const#1": {
+    "body_sha256": "095abf282cb530d9a7ba220a2aa9862afca149399a93f2c06306772f91bbd4aa",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns numeric open code via explicit promotion to i32. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::value() const#1": {
+    "body_sha256": "bb99d4f3721fab81b81b13abd5d5c70d6e6d5f576bb5dd28397cfec9eb156763",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns the raw open-code storage member. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::operator =(Code value)#1": {
+    "body_sha256": "f9edab9da8e612250fa620499103f431c4e7175aa6a03591699d63cf899ceef6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Code assignment crosses i32 then Storage; returns the same live wrapper. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::operator =(Storage value)#1": {
+    "body_sha256": "91627f41857ad4ae4113427970bf46accb9ef4d09a78cfacb60814dc91171ae8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Direct raw code assignment; no unrelated reuse. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2OpenCodeStorage::operator =(H2OpenCodeStorage<Code,OtherStorage> value)#1": {
+    "body_sha256": "2b8adec6e9d801b228423763f91be52f02d5af7e4f9eb179a47bfa84c3a66322",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width assignment copies raw code representation via value(). Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(H2OpenCodeStorage<Code,Storage> lhs,Code rhs)#1": {
+    "body_sha256": "8a31850921e9ccabf87690e08dd196edeaf00d0209729efcd19a93cf84d5b879",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Equality compares Code and stored Code in common i32 representation. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(Code lhs,H2OpenCodeStorage<Code,Storage> rhs)#1": {
+    "body_sha256": "b5f19af3a03bf4c66eb05eb953717a81e6f6b7537c88eb17226c5eccc31546aa",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed Code equality delegates to the canonical equality overload. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(H2OpenCodeStorage<Code,Storage> lhs,Code rhs)#1": {
+    "body_sha256": "9c65c5da99087ec59a2927f5ea2245a3be2cc0339ed2e49526ed29f680fc8e34",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Inequality negates canonical Code equality; no duplicated representation. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(Code lhs,H2OpenCodeStorage<Code,Storage> rhs)#1": {
+    "body_sha256": "735044d9e28384879b7466961fbc011d79ea7cfef436658dc6c62a1a05468829",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed inequality negates the corresponding equality overload. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(H2OpenCodeStorage<Code,LeftStorage> lhs,H2OpenCodeStorage<Code,RightStorage> rhs)#1": {
+    "body_sha256": "d18dd26ea04a7a947ba7d743fc8fea12952ccf56a31f7b98267e64765c3e2c20",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width equality compares both open-code values as i32. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(H2OpenCodeStorage<Code,LeftStorage> lhs,H2OpenCodeStorage<Code,RightStorage> rhs)#1": {
+    "body_sha256": "3e44b70204a7286a1faee3bb27cf0c6a4bf1948f661116eefb8286d077e8c499",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width inequality negates equality. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(H2EnumStorage<Enum,Storage> lhs,Enum rhs)#1": {
+    "body_sha256": "ff57a30213e0afd2357028356af8b4cd187086ad34064803db83f44ffdae0991",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Equality converts stored value to its semantic Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(Enum lhs,H2EnumStorage<Enum,Storage> rhs)#1": {
+    "body_sha256": "8c06a9d1b658d7cbce7cfdbf342d748e252b3ce9a754086e2626a51d249c8c38",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed equality converts stored rhs to its semantic Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(H2EnumStorage<Enum,Storage> lhs,Enum rhs)#1": {
+    "body_sha256": "c0c2d8b7b49b6014bb485668022d7b60596f550a9275031b6d9b0763a036bdcf",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Enum inequality negates canonical equality. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(Enum lhs,H2EnumStorage<Enum,Storage> rhs)#1": {
+    "body_sha256": "cb3f69d01c0605b718c3ee96ff5848c39ec4e331a4076db2d11a13ff48a60770",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed enum inequality negates canonical equality. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator ==(H2EnumStorage<Enum,LeftStorage> lhs,H2EnumStorage<Enum,RightStorage> rhs)#1": {
+    "body_sha256": "8fa5975b1a15d43af9b1fefca4e1a16d7db82957ad5b3e37b4c9bd8eb8ac3efa",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width enum equality compares both in the same semantic Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator !=(H2EnumStorage<Enum,LeftStorage> lhs,H2EnumStorage<Enum,RightStorage> rhs)#1": {
+    "body_sha256": "87ac9cb03a920d62d22fb5ec53301ab3437f45fa45bc7855c525a2e27a77d1b6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Cross-width enum inequality negates equality. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator <(H2EnumStorage<Enum,Storage> lhs,Enum rhs)#1": {
+    "body_sha256": "5326e20669f172d967bb481ba147f8d1d54de6a7e7043fdef6be44a94c3679b6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Relational comparison converts storage to Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:operator >=(H2EnumStorage<Enum,Storage> lhs,Enum rhs)#1": {
+    "body_sha256": "c8b3a77d6f2582db243d34320765371939bcd22ff92ab753c9e1dcba99553ec4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Greater-equal comparison converts storage to Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::H2SteppedEnumStorage()#1": {
+    "body_sha256": "d1f7165b1114a01d7f0f54655a020123df348d5173d3be77fbd86ad11294aad4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Defaulted stepped scalar wrapper; no artificial aggregate. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::H2SteppedEnumStorage(Enum value)#1": {
+    "body_sha256": "e9964d6c7ab8e6e69489fd793a527086e3d2b0e1ef45c703863b93e9c7ec4a7d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stepped enum construction narrows to fixed-width storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator Enum() const#1": {
+    "body_sha256": "82bc47c7c7eb6286cc989314b2f33d17ada08a491cafa4f29ee2bca7b0dc0742",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns stored stepped value as Enum. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator Integer() const#1": {
+    "body_sha256": "ed81f9c57116e8c30c96c538be5339f876b199c8606dedb1a74060662892cdf2",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Integral conversion goes through Enum, preserving its signed-domain interpretation. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator =(Enum value)#1": {
+    "body_sha256": "12c680cd74cdbbe0652608a80616f8ffcd544ee2f662aca5cc8d21e56b2ff5ca",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stepped Enum assignment narrows to the scalar representation and returns self. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator =(Storage value)#1": {
+    "body_sha256": "da43bafdf9a6ba7b4481022fe4d5b39994febe094380f9f07af13cdc5587fd84",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Raw storage assignment keeps the stepped wrapper identity. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator ++()#1": {
+    "body_sha256": "af25c2c683ffc5deb9ff487350378a645d3180f1cbfb97ce940a1aabf8b282eb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Prefix increment updates the same sequence value and returns self. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator ++(i32)#1": {
+    "body_sha256": "af1ffbda7225a1b70974464eb0ac180c81fc0235cfd4c12c92ae52a53237d555",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "absent"
+    },
+    "note": "Postfix increment saves the one-field previous wrapper for the required old-value result; not artificial stack packing. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator --()#1": {
+    "body_sha256": "e6b884b173277d291cca87b68847965bff2e4e4cff9fc7b25d6556beeaf9d97b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Prefix decrement updates the same sequence value and returns self. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator --(i32)#1": {
+    "body_sha256": "7add92227d37c4447f7654eba85a91da9929f96a264b5efbbcab2b2f7b890b16",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "absent"
+    },
+    "note": "Postfix decrement saves the one-field previous wrapper for the required old-value result; not artificial stack packing. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator +=(i32 amount)#1": {
+    "body_sha256": "fa5f0792256d105047e39b6a000d2049d3ec29d7deccaa5e997d42bb5fba667e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Offset addition promotes then explicitly narrows to Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2SteppedEnumStorage::operator -=(i32 amount)#1": {
+    "body_sha256": "5a6bb7217edc74e24f9657223e594e9b0e19722805be5c9600fa105e3424ee6f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Offset subtraction promotes then explicitly narrows to Storage. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumIndex(H2EnumStorage<Enum,Storage> value)#1": {
+    "body_sha256": "2084188a61a4300d7501b7f58a7276502ad82f70f846b9868222f6b249ad58ef",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Index conversion unwraps the semantic Enum before converting to i32. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumIndex(H2SteppedEnumStorage<Enum,Storage> value)#1": {
+    "body_sha256": "7e64057fca0c93993d940a1be10eed0cbb4133aad0fa88a79df45661cacc92a2",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stepped index conversion unwraps Enum before converting to i32. Strict-build support, not a retail function body."
+  },
+  "include/Ints.h:H2EnumIndex(Value value)#1": {
+    "body_sha256": "273b7bddf11225b6077bfec03a7d2b4f14906c0ae155063a04f809fa37fe4484",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Generic index conversion is the explicit value-to-index boundary. Strict-build support, not a retail function body."
+  },
+  "include/SOURCE/KB_TYPES.h:OppositeMapDirection(MapDirection direction)#1": {
+    "body_sha256": "8bb768601fd1c0a8741cfbae77f3a4752fa79af915722c8d4a2193c03ec0e12a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Opposite direction is addition by4 masked to0..7; no array, pointer, or unrelated reuse. NONE is outside this directional operation's semantic domain."
+  },
+  "include/SOURCE/KB_TYPES.h:NextCreatureType(CreatureType creatureType)#1": {
+    "body_sha256": "8ef854649e94fbd8f6442b363374332afb626debc97297a3ae151df565bbad6b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Modern-only sequence successor updates and returns one creature id; retail macro retains integer addition."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerActionFlag::operator i32() const#1": {
+    "body_sha256": "6f125706d7bff5f7a9d4669578936e2a7e087c79a79d925736f2d1bef685f322",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Modern-only tag conversion supplies action bit0x80; no state or cast."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerTypeMask::operator i32() const#1": {
+    "body_sha256": "88991b8b630a5da9e076ff62b3451b541d3423405c84f06b0052582488f7c8de",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Modern-only tag conversion supplies low-seven-bit mask0x7f."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerCode::MapTriggerCode()#1": {
+    "body_sha256": "3ac6e5fb3fc614893773dffeb0567d3ff31a73b979333f352fd9a860b4a873ac",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Defaulted one-scalar open trigger wrapper; no synthetic initialization."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerCode::MapTriggerCode(MapObjectType object)#1": {
+    "body_sha256": "8887485c206cc41697cc066996766b39388313e179b2f914ed4907cd6ee157fd",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constructs trigger from object id via explicit IDX domain boundary."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerCode::MapTriggerCode(i32 value)#1": {
+    "body_sha256": "a89a0dfe49afadfbc72063cf5472c42a50e237814e2b846dc52554c2dbb4c413",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constructs raw open trigger directly from i32."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerCode::operator i32() const#1": {
+    "body_sha256": "e198458ef1f00623215d743a30b16e5e9233c8b31a60679fc7d93bba97a16106",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Returns the stored raw trigger code."
+  },
+  "include/SOURCE/KB_TYPES.h:MapActionTrigger(MapObjectType object)#1": {
+    "body_sha256": "1bc7c9049dddb82859c40e00bc00a01b742580a083b418ad14c0528e037b1be7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Combines action bit with object id into a new trigger value."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerObject(MapTriggerCode trigger)#1": {
+    "body_sha256": "793f0861aa32db9d17e0f0d3f25f3f30e7d9f11291481ca7da7895b196447623",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Masks raw trigger then explicitly converts only the object-code bits to MapObjectType."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerIsAction(MapTriggerCode trigger)#1": {
+    "body_sha256": "d34e4719ef3e4b1f718e53928e7aea6fc846a7808598280db6e3d0e88729d2a3",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Converts trigger to raw i32 and tests its action bit."
+  },
+  "include/SOURCE/KB_TYPES.h:MapTriggerWithObject(MapTriggerCode trigger,MapObjectType object)#1": {
+    "body_sha256": "9f7c48c4f51e4c3922ed0084737aeaf5d354507bdf3ef392b3eee8dc9cbdcf2f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Preserves the original trigger's action/passive role while replacing its object bits."
+  },
+  "include/SOURCE/KB_TYPES.h:operator ==(MapTriggerCode trigger,MapObjectType object)#1": {
+    "body_sha256": "429ae46c5f31dfa2e666cfeedc5bd9a69d5d79b1004dbd8df2dc36e5dd5e6cd1",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Compares complete trigger representation with passive object id; action flag is intentionally not discarded."
+  },
+  "include/SOURCE/KB_TYPES.h:operator ==(MapObjectType object,MapTriggerCode trigger)#1": {
+    "body_sha256": "84494b5cfacb8dd8b43bd4c83e7016d6df5a313bd9b9857ae8f9b6359c203cbb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed passive-object equality delegates to canonical equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator !=(MapTriggerCode trigger,MapObjectType object)#1": {
+    "body_sha256": "1cd3d25c8ab050e44ea050d98ad083a6415222ac6e5b8fde57008225dfc1706e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Trigger/object inequality negates complete-code equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator !=(MapObjectType object,MapTriggerCode trigger)#1": {
+    "body_sha256": "cd2dc5723da84305c865741825d47243b4c7caeb70788792a4e24ce4c58f3b15",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed object/trigger inequality negates equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator |(MapTriggerActionFlag,MapObjectType object)#1": {
+    "body_sha256": "1d8291b42b3e09a8e5d63a12d9854341629e74e09e08b48d51d523d590281e60",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Tag/object OR constructs an action trigger through MapActionTrigger."
+  },
+  "include/SOURCE/KB_TYPES.h:operator |(MapObjectType object,MapTriggerActionFlag flag)#1": {
+    "body_sha256": "41b3fff091a712d38782102abcbdf69bf8ff303f857df1d79a8ad768d5843127",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed object/tag OR delegates to canonical OR."
+  },
+  "include/SOURCE/KB_TYPES.h:operator &(MapTriggerCode trigger,MapTriggerTypeMask)#1": {
+    "body_sha256": "8ec56e37710ff9d7db14c270359bd5d4ce73167bcf6bd0c6508d4d31c6344bf0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Masking a trigger returns its decoded object type."
+  },
+  "include/SOURCE/KB_TYPES.h:operator ==(H2OpenCodeStorage<MapTriggerCode,Storage> trigger,MapObjectType object)#1": {
+    "body_sha256": "60617328aacf360b4e13d87f0c3684b30d835ad5de33c1dddb23ba5bc639a63e",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stored-trigger comparison unwraps its MapTriggerCode, not a pointer or union."
+  },
+  "include/SOURCE/KB_TYPES.h:operator ==(MapObjectType object,H2OpenCodeStorage<MapTriggerCode,Storage> trigger)#1": {
+    "body_sha256": "b2b6b201350e481c2ef9e9f5449a1a13ad6043ce2a039eba67d85e8f16351751",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed stored-trigger/object equality delegates to canonical equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator !=(H2OpenCodeStorage<MapTriggerCode,Storage> trigger,MapObjectType object)#1": {
+    "body_sha256": "5043ae86cbddd087469961bf76244eaea1c5646fbbd6897201eeb4ac4272d262",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stored-trigger/object inequality negates equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator !=(MapObjectType object,H2OpenCodeStorage<MapTriggerCode,Storage> trigger)#1": {
+    "body_sha256": "1d87336c47a53b6fb861a2f2f4628201bcab25aff6eed83526524307b71b4e7b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Reversed object/stored-trigger inequality negates equality."
+  },
+  "include/SOURCE/KB_TYPES.h:operator &(H2OpenCodeStorage<MapTriggerCode,Storage> trigger,MapTriggerTypeMask)#1": {
+    "body_sha256": "caa70ebdd85eb13690199a89917b7dc1abb0d052911ef0221340f1edbebb5044",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Stored-trigger mask unwraps Code and decodes its object bits."
+  },
+  "include/SOURCE/KB_TYPES.h:operator &=(H2OpenCodeStorage<MapTriggerCode,Storage> & trigger,MapTriggerTypeMask mask)#1": {
+    "body_sha256": "43f89f59da9e3d68bdf73deb47414b18293e5a43dd618141fd5616d86904ce69",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "In-place mask replaces the same trigger with its passive object code and returns the live wrapper."
+  },
+  "include/SOURCE/KB_TYPES.h:operator |=(H2OpenCodeStorage<MapTriggerCode,Storage> & trigger,MapTriggerActionFlag)#1": {
+    "body_sha256": "d7c8b5e834f1ca358570305055b4b8239c5da0be2c517d357decbf89903c3011",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "In-place action bit update preserves object bits through the explicit raw i32 representation."
+  },
+  "src/BASE/icon2bc.cpp:IconToBitmapColorTable(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,u8 * colorTable,i32 dimGate)#1": {
+    "body_sha256": "3fd24716a859d6bf00f0f986c5768945e8512d3d306efb2a6fdda89fae6ffab9",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "open",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C12: flattened uDimPal pointer/level arithmetic uses (command&0x3c)>>2, domain0..15; only12 levels are declared, so asset-level proof is required before typed replacement. Serialized IconEntry, high-bit i8, unsigned shift and recolor narrowing casts retained. G15 shared fill_run tail remains a structured-source candidate. B28 preclip row pointer, unbounded frame/RLE stream and colorTable256 contract remain. Static cursors/counts are real decoder state, not stack aggregation."
+  },
+  "src/BASE/icon2bs.cpp:IconToBitmapScale(class icon * srcIcon,class bitmap * dest,i32 destX,i32 destY,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 scale)#1": {
+    "body_sha256": "1bf3b5c0367312a168cbd911f2677eb5396724e47d12ebae016bb6949ea844a9",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B30: all six source calls are VWCompleteDraw with scales4/6/12 and NO_CLIP; division is nonzero and all sampled temp offsets are at most1820, inside the cleared0..2047 region of the real64x64 bitmap. Non-native scaling ignores supplied destination clip, so destination coordinates remain a caller contract (B25); frame/RLE contracts remain B28. Source/destination cursors and inc/lineStep are related roles, not artificial stack aggregation."
+  },
+  "src/BASE/icon2by.cpp:IconToBitmapYModify(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,i8 * shear)#1": {
+    "body_sha256": "d79415b20935aff32c480f9925a80328d898e3bc1f6bd079e82c3004e6b306ed",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "open",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C12 palette flattening and G15 shared fill tail remain candidates. B29 shear[s_y] is read at setup and before the Y-clip predicate; EOL uses the old row's shear before incrementing y. SPELLS allocates480 modifier bytes but sprite extent proof is not yet complete. B28 row/frame/stream bounds remain. Command and count roles are related file-static decoder state."
+  },
+  "src/BASE/iconf2bc.cpp:FlipIconToBitmapColorTable(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,u8 * colorTable)#1": {
+    "body_sha256": "17a8e2ba6b8ac5ccb740d535e08ab4abe5464d2495666bf4b40fe91fe89827e4",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "open",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C12 flattened dim palette needs0..11 command-level proof; serialized header, sign-bit and recolor casts are genuine boundaries. G15 shared fill tail remains open. B28 reverse cursor decrements after final copied pixel, preclip row formation, frame/stream/colorTable bounds and clipped fill full-containment gate require review; no fake stack aggregate."
+  },
+  "src/BASE/iconf2by.cpp:FlipIconToBitmapYModify(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH,i32 color,i8 * shear)#1": {
+    "body_sha256": "3747a1e500fde0ac5894568cc7ee68f7e57e0b03006135fdf4b2ad3d89f92030",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "open",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C12 palette flattening and G15 shared fill tail remain. B29 shear is indexed before vertical clipping and old-row shear sets next-row x. B28 reverse-copy postdecrement, preclip row and asset bounds/full-containment fill predicate remain. Redundant dimLen self-assignment is an emitted-state/source-shape candidate, not unrelated role reuse."
+  },
   "src/BASE/Icond2b.cpp:DimIconToBitmap(class icon * srcIcon,class bitmap * dest,i32 x,i32 y,i32 frame,i32 color,IconDrawClipMode clip,i32 clipX,i32 clipY,i32 clipW,i32 clipH)#1": {
     "body_sha256": "c4917a626bd911f2e0b1c7f04afdab8098a9084ee897cf45d645afa40380aaf9",
     "patterns": {
@@ -2740,7 +5860,7 @@
     "patterns": {
       "casts": "retain",
       "unions": "retain",
-      "gotos": "open",
+      "gotos": "retain",
       "address": "absent",
       "owner": "absent",
       "outside": "absent",
@@ -2749,7 +5869,7 @@
       "stack": "absent",
       "bounds": "absent"
     },
-    "note": "G01: final goto targets base dispatch after the switch; test break. Tagged event fields are consumed before retyping; x/y retain coordinate roles throughout drag tracking. Resource-id comparison uses unsigned width."
+    "note": "G01 retained after complete two-arm experiment: break removes six bytes and two blocks including retail goto tail stub. Original1240bytes/fullDIR32sites/all22orderedtargets match genuine retail. Tagged event fields are consumed before retyping; x/y retain coordinate roles through drag tracking. Resource-id comparison uses unsigned width."
   },
   "src/BASE/BUTTON.cpp:button::Select(struct tag_message & msg)#1": {
     "body_sha256": "5d9f967cde53daa0b1380621335387deb6940b1e71369f9a1de93cc35c5fc7f1",
@@ -3232,7 +6352,7 @@
     "note": "Closes/frees two owned aggregate slots using their declared common bound; no aggregation beyond the real resource manager layout."
   },
   "src/BASE/RESMGR.cpp:resourceManager::LoadAggregateHeader(char * aggregateName)#1": {
-    "body_sha256": "020b6c96bb5a01d1e88869af618f5a88d89ad35571cc457e89bba81d1976e0ce",
+    "body_sha256": "b499b8ee3991d1cb89501b0934736727ebbf38e219b1f084b3d1735f18aa3fc6",
     "patterns": {
       "casts": "retain",
       "unions": "absent",
@@ -3242,10 +6362,10 @@
       "outside": "absent",
       "varargs": "absent",
       "reuse": "absent",
-      "stack": "open",
+      "stack": "applied",
       "bounds": "retain"
     },
-    "note": "S01: fpCountBuffer[2] has one two-byte read and only element zero consumed; test scalar count. Allocation cast creates typed aggEntry storage; aggregate capacity guard is explicit. Archive counts are trusted retail input."
+    "note": "S01 applied: replace two-element count array with the single i16 read by CRT. Complete four-arm matrix, all34 emitted functions/allocated sections identical, genuine retail312bytes and all14 ordered targets proven. Allocation cast creates typed aggEntry storage; aggregate capacity guard remains. Archive counts and short-read handling remain retail input contracts."
   },
   "src/BASE/RESMGR.cpp:resourceManager::PointToFile(u32l fileId)#1": {
     "body_sha256": "8a284d02b185b85f7a69afdd09085baeae22871b08ed833392bb10b3c901e4db",
