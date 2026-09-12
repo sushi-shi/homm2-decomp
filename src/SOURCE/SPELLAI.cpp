@@ -934,7 +934,7 @@ void combatManager::ClearEffects(void) {
     i32 idx;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         for (idx = 0; idx < COMBAT_ARMY_SLOT_COUNT; idx++)
-            *(gArmyEffected[0] + IDX(side) * COMBAT_ARMY_SLOT_COUNT + idx) = 0;
+            gArmyEffected[IDX(side)][idx] = 0;
     }
 }
 

@@ -2751,7 +2751,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
         strcat(gText, cMoraleInfo[IDX(INFO_EXPERT_LEADERSHIP)]);
     }
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && h->IsEmbarked()) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
     }
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
@@ -2807,7 +2807,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(INFO_ADVANCED_SKILL)]);
     if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
         strcat(gText, cLuckInfo[IDX(INFO_EXPERT_SKILL)]);
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && h->IsEmbarked())
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_MERMAID))
         strcat(gText, cLuckInfo[IDX(INFO_MERMAID)]);

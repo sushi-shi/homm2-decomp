@@ -277,30 +277,6 @@ namespace {
         THIEVES_CREATURE_HEIGHT = 34
     H2_ENUM_END(ThievesGuildConstant)
 
-    H2_ENUM_BEGIN(Cp1251Letter)
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO   = 0xb8,
-        CP1251_SMALL_A    = 0xe0,
-        CP1251_SMALL_YA   = 0xff,
-        CP1251_CASE_STEP  = 0x20
-    H2_ENUM_END(Cp1251Letter)
-
-    // The localised build folds the leading letter of a colour name through the
-    // CP1251 alphabet, not through a bare -32 on the Latin range.
-    inline char ToUpperCp1251(u8 letter) {
-        char capital;
-
-        if (letter >= 'a' && letter <= 'z')
-            capital = letter - CP1251_CASE_STEP;
-        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
-            capital = letter - CP1251_CASE_STEP;
-        else if (letter == CP1251_SMALL_YO)
-            capital = CP1251_CAPITAL_YO;
-        else
-            capital = letter;
-        return capital;
-    }
-
 } // namespace
 
 DATA(0x004ea878) static const H2_ENUM_STORAGE(
@@ -3078,14 +3054,7 @@ void townManager::SetupWell(heroWindow* window) {
             gArmyNames[IDX(gDwellingType[IDX(m_town->m_type)][dwellingTypes_c[dwellingResult_a]])]
         );
         char upperFirst;
-        if (static_cast<u8>(gText[0]) >= 'a' && static_cast<u8>(gText[0]) <= 'z')
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) >= 0xe0 && static_cast<u8>(gText[0]) <= 0xff)
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) == 0xb8)
-            upperFirst = '\xa8';
-        else
-            upperFirst = gText[0];
+        upperFirst = CyrillicToUpper(gText[0]);
         gText[0] = upperFirst;
         message_i.payload.widget.data.text = gText;
         window->BroadcastMessage(message_i);
@@ -3267,7 +3236,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         while (gpGame->m_playerDead[rank_a] != 0)
             ++rank_a;
         sprintf(gText, gColors[gpGame->m_players[rank_a].m_color]);
-        gText[0] = ToUpperCp1251(gText[0]);
+        gText[0] = CyrillicToUpper(gText[0]);
         SET_WIDGET_MESSAGE(
             message_h,
             WIDGET_COMMAND_SET_TEXT,

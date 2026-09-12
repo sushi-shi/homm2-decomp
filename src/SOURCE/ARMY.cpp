@@ -145,49 +145,15 @@ H2_ENUM_CLASS_BEGIN(BerserkMaskIndex)
     BERSERK_MASK_COUNT        = 5
 H2_ENUM_CLASS_END(BerserkMaskIndex)
 
-H2_ENUM_BEGIN(Cp1251Letter)
-    CP1251_CAPITAL_YO = 0xa8,
-    CP1251_SMALL_YO   = 0xb8,
-    CP1251_CAPITAL_A  = 0xc0,
-    CP1251_CAPITAL_YA = 0xdf,
-    CP1251_SMALL_A    = 0xe0,
-    CP1251_SMALL_YA   = 0xff,
-    TARGET_NAME_SIZE  = 100
-H2_ENUM_END(Cp1251Letter)
+H2_ENUM_BEGIN(ArmyMessageConstant)
+        TARGET_NAME_SIZE = 100
+H2_ENUM_END(ArmyMessageConstant)
 
 #define PROJECTILE_HALF_TURN_DEGREES_FLOAT 180.0
 #define PROJECTILE_DIRECTION_MIDPOINT_DIVISOR 2.0f
 #define DAMAGE_DOUBLE_MULTIPLIER 2.0f
 #define DAMAGE_HALF_DIVISOR 2.0f
 #define DAMAGE_ROUNDING_OFFSET 0.5
-
-// The localised build case-shifts the leading letter of a combat message
-// through the CP1251 alphabet, not through a bare +/- 32.
-inline char ToLowerCp1251(u8 letter) {
-    if (letter >= 'A' && letter <= 'Z') {
-        return static_cast<char>(letter + ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA) {
-        return static_cast<char>(letter + ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter == CP1251_CAPITAL_YO) {
-        return static_cast<char>(CP1251_SMALL_YO);
-    }
-    return static_cast<char>(letter);
-}
-
-inline char ToUpperCp1251(u8 letter) {
-    if (letter >= 'a' && letter <= 'z') {
-        return static_cast<char>(letter - ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA) {
-        return static_cast<char>(letter - ARMY_ASCII_CASE_OFFSET);
-    }
-    if (letter == CP1251_SMALL_YO) {
-        return static_cast<char>(CP1251_CAPITAL_YO);
-    }
-    return static_cast<char>(letter);
-}
 
 }
 
@@ -1294,7 +1260,7 @@ void army::SpecialAttack(void) {
             sprintf(gText, "\xd4\xe0\xed\xf2\xee\xec \xe2\xee\xe8\xed\xe0 \xf3\xed\xe8\xf7\xf2\xee\xe6\xe5\xed!!");
         } else {
             strcpy(gTargetName, gArmyNames[IDX(pEnemy->m_monsterType)]);
-            gTargetName[0] = ToLowerCp1251(gTargetName[0]);
+            gTargetName[0] = CyrillicToLower(gTargetName[0]);
             sprintf(
                 gText,
                 "%s %s %s %d %s.\n%d %s %s.",
@@ -1307,7 +1273,7 @@ void army::SpecialAttack(void) {
                 killed <= 1 ? gTargetName : gArmyNamesPlural[IDX(pEnemy->m_monsterType)],
                 killed <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            gText[0] = CyrillicToUpper(gText[0]);
         }
     } else {
         sprintf(
@@ -1319,7 +1285,7 @@ void army::SpecialAttack(void) {
             damageDone,
             "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
         );
-        gText[0] = ToUpperCp1251(gText[0]);
+        gText[0] = CyrillicToUpper(gText[0]);
     }
     strcpy(combatMsg, gText);
     switch (m_monsterType) {
@@ -1457,7 +1423,7 @@ void army::DoHydraAttack(i32) {
             "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
         );
     }
-    gText[0] = ToUpperCp1251(gText[0]);
+    gText[0] = CyrillicToUpper(gText[0]);
     strcpy(textBuf, gText);
     PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
     gpCombatManager->CombatMessage(textBuf, 1, 1, 0);
@@ -1599,11 +1565,11 @@ void army::DoAttack(i32 retaliation) {
             m_quantity <= 1 ? "\xf3\xed\xe8\xf7\xf2\xee\xe6\xe0\xfe\xf2"
                             : "\xf3\xed\xe8\xf7\xf2\xee\xe6\xe0\xe5\xf2"
         );
-        gText[0] = ToUpperCp1251(gText[0]);
+        gText[0] = CyrillicToUpper(gText[0]);
     } else {
         if (killed_1 > 0) {
             strcpy(gTargetName, gArmyNames[IDX(target_18->m_monsterType)]);
-            gTargetName[0] = ToLowerCp1251(gTargetName[0]);
+            gTargetName[0] = CyrillicToLower(gTargetName[0]);
             sprintf(
                 gText,
                 "%s %s %s %d %s.\n%d %s %s.",
@@ -1617,7 +1583,7 @@ void army::DoAttack(i32 retaliation) {
                                : gArmyNamesPlural[IDX(target_18->m_monsterType)],
                 killed_1 <= 1 ? "\xf3\xec\xe8\xf0\xe0\xe5\xf2" : "\xf3\xe1\xe8\xf2\xee"
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            gText[0] = CyrillicToUpper(gText[0]);
         } else {
             sprintf(
                 gText,
@@ -1628,7 +1594,7 @@ void army::DoAttack(i32 retaliation) {
                 damage_4,
                 "\xe5\xe4. \xf3\xf0\xee\xed\xe0"
             );
-            gText[0] = ToUpperCp1251(gText[0]);
+            gText[0] = CyrillicToUpper(gText[0]);
         }
     }
     strcpy(combatText_10, gText);

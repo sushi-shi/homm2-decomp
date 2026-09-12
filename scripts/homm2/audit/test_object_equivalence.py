@@ -93,6 +93,13 @@ class ObjectEquivalenceTests(unittest.TestCase):
         errors = compare(local_object('$SG1'), local_object('$SG2', value=0))['errors']
         self.assertIn('ordered relocations', errors)
 
+    def test_source_label_keeps_its_name_but_not_its_compiler_counter(self):
+        self.assertEqual(compare(local_object('$foo$1', storage=6),
+                                 local_object('$foo$99', storage=6))['errors'], [])
+        errors = compare(local_object('$foo$1', storage=6),
+                         local_object('$bar$2', storage=6))['errors']
+        self.assertIn('ordered relocations', errors)
+
     def test_external_counter_like_names_are_not_normalized(self):
         errors = compare(local_object('$SG1', storage=2),
                          local_object('$SG2', storage=2))['errors']

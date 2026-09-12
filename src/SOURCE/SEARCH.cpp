@@ -60,7 +60,7 @@ i32 searchArray::BuildPath(
     u8* pathDirection = &m_storage.path.directions[1];
     m_pathLength = 0;
     while (destinationX != startX || destinationY != startY) {
-        searchNode* node = &GetColumn(destinationX)[MAP_WIDTH * destinationY];
+        searchNode* node = &GetNode(destinationX, destinationY);
         if (node->x != destinationX && node->y != destinationY)
             return 0;
         if (node->distance <= maximumCost) {
@@ -139,7 +139,7 @@ void searchArray::SeedPosition(
     }
 
     if (s_seedPositionState.hasTarget && continueSeed) {
-        s_seedPositionState.currentNode = GetColumn(targetX)[MAP_WIDTH * targetY];
+        s_seedPositionState.currentNode = GetNode(targetX, targetY);
         if (s_seedPositionState.currentNode.visited
             && s_seedPositionState.currentNode.distance <= s_seedPositionState.currentCost + SEARCH_TARGET_COST_WINDOW)
             return;
@@ -255,7 +255,8 @@ void searchArray::SeedPosition(
                 {
                     s_seedPositionState.neighborX = s_seedPositionState.currentNode.x + normalDirTable[IDX(s_seedPositionState.direction)].x;
                     s_seedPositionState.neighborY = s_seedPositionState.currentNode.y + normalDirTable[IDX(s_seedPositionState.direction)].y;
-                    s_seedPositionState.neighborNode = &GetColumn(s_seedPositionState.neighborX)[MAP_WIDTH * s_seedPositionState.neighborY];
+                    s_seedPositionState.neighborNode =
+                        &GetNode(s_seedPositionState.neighborX, s_seedPositionState.neighborY);
                     if (!(!findAdjacentMonster || s_seedPositionState.currentNode.rvFlag1
                           || !(MAP_EXTRA_AT(s_seedPositionState.neighborX, s_seedPositionState.neighborY)
                                & SEARCH_MAP_BLOCKED)
@@ -348,14 +349,22 @@ void searchArray::SeedPosition(
                                     }
 
                                     if (s_seedPositionState.directionBlocked
-                                        && GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
+                                        && GetNode(
+                                               s_seedPositionState.adjacentX,
+                                               s_seedPositionState.candidateY
+                                        )
                                                .visited
-                                        && !(s_seedPositionState.neighborCell->m_triggerType
-                                             & MAP_TRIGGER_ACTION_FLAG)) {
+                                        && !(
+                                            s_seedPositionState.neighborCell->m_triggerType
+                                            & MAP_TRIGGER_ACTION_FLAG
+                                        )) {
                                         s_seedPositionState.terrain =
                                             giGroundToTerrain[s_seedPositionState.neighborCell->m_terrainImageIndex];
                                         s_seedPositionState.adjacentCost =
-                                            GetColumn(s_seedPositionState.adjacentX)[MAP_WIDTH * s_seedPositionState.candidateY]
+                                            GetNode(
+                                                s_seedPositionState.adjacentX,
+                                                s_seedPositionState.candidateY
+                                            )
                                                 .distance;
                                         PushPoint(
                                             s_seedPositionState.mapX,

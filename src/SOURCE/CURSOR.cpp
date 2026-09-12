@@ -610,8 +610,7 @@ mapCell* advManager::MoveHero(
         TurnTo(direction);
     movingHero_g->m_direction = direction;
 
-    if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
-        && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
+    if (movingHero_g->IsEmbarked() && destinationCell->m_triggerType == MAP_OBJECT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId == movingHero_g->m_id)
                 break;
@@ -636,7 +635,7 @@ mapCell* advManager::MoveHero(
         && gpAdvManager->ValidMoveWithEvent(movingHero_g, direction)) {
         switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_BOAT:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked())
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = false;
@@ -662,9 +661,8 @@ mapCell* advManager::MoveHero(
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                    if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                            HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked()) {
+                    if (gpGame->GetHero(destinationCell->m_objectMetadata)->IsEmbarked())
                         goto stoppingEvent;
                     else
                         goto movementDone;
@@ -825,8 +823,7 @@ mapCell* advManager::MoveHero(
     *eventX = m_mapOriginX + m_cursorMapX;
     *eventY = m_mapOriginY + m_cursorMapY;
     if (HAS(cursorCell_h->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-        || (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED)
-            && cursorCell_h->m_triggerType == MAP_OBJECT_COAST)) {
+        || (movingHero_g->IsEmbarked() && cursorCell_h->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_i = cursorCell_h;
         switch (cursorCell_h->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_NOTHING_SPECIAL:
@@ -862,7 +859,7 @@ movementDone:
         if (oldHeroX != movingHero_g->m_x || oldHeroY != movingHero_g->m_y) {
             if (*(mapExtra + movingHero_g->m_x + movingHero_g->m_y * MAP_WIDTH)
                 & IDX(MAP_EXTRA_ADJACENT_MONSTER)) {
-                if (HAS(movingHero_g->m_eventFlags, HERO_EVENT_EMBARKED))
+                if (movingHero_g->IsEmbarked())
                     goto adjacentDone;
                 if (eventCell_i
                     && (eventCell_i->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_BOAT)
@@ -1018,9 +1015,8 @@ i32 advManager::ValidMoveWithEvent(
     destinationCell = m_mapData->GetCell(newX, newY);
     switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
-            if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
-                        HERO_EVENT_EMBARKED))
+            if (movingHero->IsEmbarked()) {
+                if (gpGame->GetHero(destinationCell->m_objectMetadata)->IsEmbarked())
                     return 1;
                 else
                     return 0;

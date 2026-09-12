@@ -3936,12 +3936,13 @@ void advManager::DrawCell(
                         == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                         s_drawPlayerColor = gpGame->m_players[IDX(s_drawHero->m_owner)].m_color;
-                        s_drawHeroType = HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)
-                            ? HERO_TYPE_BOAT
-                            : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
+                        s_drawHeroType =
+                            s_drawHero->IsEmbarked()
+                                ? HERO_TYPE_BOAT
+                                : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
-                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+                        if (s_drawHero->IsEmbarked()) {
                             s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                         }
                     }
@@ -7144,9 +7145,9 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorMapX = VIEW_CENTER_CELL;
     m_previousCursorMapY = CURSOR_INVALID_POSITION;
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
-    m_cursorType = HAS(contextHero->m_eventFlags, HERO_EVENT_EMBARKED)
-        ? HERO_TYPE_BOAT
-        : static_cast<HeroCursorType>(contextHero->m_cursorType);
+    m_cursorType = contextHero->IsEmbarked()
+                       ? HERO_TYPE_BOAT
+                       : static_cast<HeroCursorType>(contextHero->m_cursorType);
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
@@ -8414,9 +8415,9 @@ void advManager::DimensionDoor(void) {
         newX = m_mapOriginX + m_lastHoverCell;
         newY = m_mapOriginY + m_hoverCellY;
         targetCell = GetCell(newX, newY);
-        if ((HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+        if ((targetHero->IsEmbarked()
              && giGroundToTerrain[targetCell->m_terrainImageIndex] != TERRAIN_WATER)
-            || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+            || (!targetHero->IsEmbarked()
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
                 "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc "
@@ -8494,7 +8495,7 @@ void advManager::TownGate(SpellType spellId) {
         );
         return;
     }
-    if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (targetHero->IsEmbarked()) {
         NormalDialog(
             "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb "
             "\xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, "

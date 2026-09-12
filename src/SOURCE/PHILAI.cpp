@@ -1007,7 +1007,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     mapCell* arriveCell;
     mapCell* cell;
 
-    if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED))
+    if (gpCurAIHero->IsEmbarked())
         return 0;
     {
         bestX = -1;
@@ -1260,7 +1260,7 @@ void philAI::DoAI(i32 player) {
 
         heroDone5 = false;
         ResetHeroRVs(0, 0, 0);
-        stepLimit0 = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) ? 15 : 5;
+        stepLimit0 = gpCurAIHero->IsEmbarked() ? 15 : 5;
         minimumValue1 = gpCurAIHero->m_mobility + 800;
         stepLimit0 =
             static_cast<i32>(stepLimit0 * (1.7 - IDX(gpGame->m_difficulty) * 0.1));
@@ -1963,7 +1963,7 @@ i32 philAI::DetermineTargetPosition(
         hiY = MAP_HEIGHT;
 
     for (pass = 0; pass < 2; pass++) {
-        if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+        if (gpCurAIHero->IsEmbarked()) {
             if (pass == 0)
                 continue;
         }
@@ -2014,30 +2014,27 @@ i32 philAI::DetermineTargetPosition(
                         if (gpSearchArray->GetNode(x, y).distance > dblMob) {
                             good = false;
                         } else {
-                            good = (cell->m_triggerType
-                                        == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
-                                    || cell->m_triggerType
-                                           == (MAP_TRIGGER_ACTION_FLAG
-                                               | MAP_OBJECT_HERO_INTERACTION)
-                                    || (cell->m_triggerType
-                                            == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
-                                        && !HAS(
-                                            gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED
-                                        )));
+                            good =
+                                (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
+                                 || cell->m_triggerType
+                                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                                 || (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
+                                     && !gpCurAIHero->IsEmbarked()));
                         }
                     } else {
-                        good = (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-                                || (cell->m_triggerType == MAP_OBJECT_COAST
-                                    && HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED))
-                                || (x % spread == 0 && y % spread == 0
-                                    && ((HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)
+                        good =
+                            (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+                             || (cell->m_triggerType == MAP_OBJECT_COAST
+                                 && gpCurAIHero->IsEmbarked())
+                             || (x % spread == 0 && y % spread == 0
+                                 && ((gpCurAIHero->IsEmbarked()
+                                      && giGroundToTerrain[cell->m_terrainImageIndex]
+                                             == TERRAIN_WATER)
+                                     || (!gpCurAIHero->IsEmbarked()
                                          && giGroundToTerrain[cell->m_terrainImageIndex]
-                                                == TERRAIN_WATER)
-                                        || (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)
-                                            && giGroundToTerrain[cell->m_terrainImageIndex]
-                                                   != TERRAIN_WATER)))
-                                || (x == gpCurPlayer->m_ultimateArtifactHintX
-                                    && y == gpCurPlayer->m_ultimateArtifactHintY));
+                                                != TERRAIN_WATER)))
+                             || (x == gpCurPlayer->m_ultimateArtifactHintX
+                                 && y == gpCurPlayer->m_ultimateArtifactHintY));
                     }
 
                     if (good && gpCurAIHero->m_boatId != HERO_BOAT_NONE) {
@@ -3217,7 +3214,7 @@ i32 philAI::RVOfPosition(
 
     distanceFactor3 = static_cast<float>(gpSearchArray->GetRow(x, 1)[MAP_WIDTH * y].distance)
                      / gpCurAIHero->m_mobility;
-    if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (gpCurAIHero->IsEmbarked()) {
         distanceFactor3 = static_cast<float>(
             distanceFactor3 * AI_POSITION_EMBARKED_DISTANCE_FACTOR
             + AI_POSITION_EMBARKED_DISTANCE_FACTOR
@@ -3243,7 +3240,7 @@ i32 philAI::RVOfPosition(
     );
     if (strategicLiveChance0 == POSITION_FULL_CHANCE)
         totalValue2 += strategicDelta5;
-    if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) && triggerType7 == MAP_OBJECT_COAST) {
+    if (gpCurAIHero->IsEmbarked() && triggerType7 == MAP_OBJECT_COAST) {
         totalValue2 += POSITION_EMBARKED_BOAT_BONUS;
     }
 
@@ -3335,7 +3332,7 @@ i32 philAI::StrategicValueOfPosition(
         search = &SVSearchArray;
     }
 
-    inBoat = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED);
+    inBoat = gpCurAIHero->IsEmbarked();
     if (inBoat && gpAdvManager->GetCell(targetX, targetY)->m_triggerType == MAP_OBJECT_COAST)
         inBoat = 0;
     nearDistance = 700;
@@ -5253,7 +5250,7 @@ i32 philAI::ComputeValueOfSS(
 
     switch (skill) {
         case HERO_SKILL_NAVIGATION:
-            if (HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
+            if (h->IsEmbarked())
                 score = static_cast<i32>(score * AI_SECONDARY_SKILL_NAVIGATION_FACTOR);
             break;
         case HERO_SKILL_ARCHERY:

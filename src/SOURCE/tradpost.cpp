@@ -44,14 +44,6 @@ H2_ENUM_BEGIN(TradingPostPrivateConstant)
     OFFER_NAME_SIZE = 52
 H2_ENUM_END(TradingPostPrivateConstant)
 
-H2_ENUM_BEGIN(Cp1251Case)
-    CP1251_CASE_DELTA  = 0x20,
-    CP1251_UPPER_FIRST = 0xc0,
-    CP1251_UPPER_LAST  = 0xdf,
-    CP1251_UPPER_YO    = 0xa8,
-    CP1251_LOWER_YO    = 0xb8
-H2_ENUM_END(Cp1251Case)
-
 
 DATA(0x00533ed8) float fTradingPostEfficiency = 0.0f;
 DATA(0x00533edc) i32 bLeftDenominated = 0;
@@ -128,27 +120,11 @@ void UpdateTradingPost(i32 draw) {
             offeredValue = 1;
         }
         strcpy(rightName, gResourceNames[rightResource]);
-        if (static_cast<u8>(rightName[0]) >= 'A' && static_cast<u8>(rightName[0]) <= 'Z')
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(rightName[0]) <= CP1251_UPPER_LAST)
-            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(rightName[0]) == CP1251_UPPER_YO)
-            chr1 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr1 = rightName[0];
+        chr1 = CyrillicToLower(rightName[0]);
         rightName[0] = chr1;
 
         strcpy(leftName, gResourceNames[leftResource]);
-        if (static_cast<u8>(leftName[0]) >= 'A' && static_cast<u8>(leftName[0]) <= 'Z')
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) >= CP1251_UPPER_FIRST
-                 && static_cast<u8>(leftName[0]) <= CP1251_UPPER_LAST)
-            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
-        else if (static_cast<u8>(leftName[0]) == CP1251_UPPER_YO)
-            chr2 = static_cast<char>(CP1251_LOWER_YO);
-        else
-            chr2 = leftName[0];
+        chr2 = CyrillicToLower(leftName[0]);
         leftName[0] = chr2;
 
         sprintf(

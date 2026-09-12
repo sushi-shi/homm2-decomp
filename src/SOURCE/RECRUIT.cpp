@@ -70,15 +70,7 @@ void SetupRecruitWin(
     tag_message message;
 
     strcpy(monsterName, GetMonsterPluralName(creatureType));
-    /* CP1251: fold the leading letter to lower case ('A'-'Z', '\xc0'-'\xdf' and '\xa8'). */
-    if (static_cast<u8>(monsterName[0]) >= 'A' && static_cast<u8>(monsterName[0]) <= 'Z')
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) >= 0xc0 && static_cast<u8>(monsterName[0]) <= 0xdf)
-        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
-    else if (static_cast<u8>(monsterName[0]) == 0xa8)
-        ch = static_cast<char>(0xb8);
-    else
-        ch = monsterName[0];
+    ch = CyrillicToLower(monsterName[0]);
     monsterName[0] = ch;
     sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc" /* "Нанять" */, monsterName);
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);

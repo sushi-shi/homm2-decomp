@@ -476,15 +476,35 @@ void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
+H2_ENUM_BEGIN(Cp1251CaseConstant)
+    CYRILLIC_CASE_OFFSET = 0x20,
+    CYRILLIC_CAPITAL_YO = 0xa8,
+    CYRILLIC_SMALL_YO = 0xb8,
+    CYRILLIC_CAPITAL_A = 0xc0,
+    CYRILLIC_CAPITAL_YA = 0xdf,
+    CYRILLIC_SMALL_A = 0xe0,
+    CYRILLIC_SMALL_YA = 0xff
+H2_ENUM_END(Cp1251CaseConstant)
+
 // Codepage-1251 uppercase folding, expanded at its call sites; the out-of-line
 // toupper above carries the same ranges for the command-line parser.
 inline char CyrillicToUpper(char c) {
     if (static_cast<u8>(c) >= 'a' && static_cast<u8>(c) <= 'z')
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) >= 0xE0 && static_cast<u8>(c) <= 0xFF)
-        return static_cast<u8>(c) - ' ';
-    if (static_cast<u8>(c) == 0xB8)
-        return static_cast<char>(0xA8);
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_SMALL_A && static_cast<u8>(c) <= CYRILLIC_SMALL_YA)
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_SMALL_YO)
+        return static_cast<char>(CYRILLIC_CAPITAL_YO);
+    return c;
+}
+
+inline char CyrillicToLower(char c) {
+    if (static_cast<u8>(c) >= 'A' && static_cast<u8>(c) <= 'Z')
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_CAPITAL_A && static_cast<u8>(c) <= CYRILLIC_CAPITAL_YA)
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_CAPITAL_YO)
+        return static_cast<char>(CYRILLIC_SMALL_YO);
     return c;
 }
 i32 InterpretCommandLine(void);

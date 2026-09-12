@@ -101,8 +101,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
             moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = true;
-        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
-            && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
+        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD) && armyHero->IsEmbarked())
             ++moraleCount;
     }
 

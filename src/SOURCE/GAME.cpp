@@ -64,37 +64,6 @@ H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 H2_ENUM_END(ExpansionCampaignSaveConstant)
 
-/* CP1251 (Russian) code points the Buka build folds when it derives a save-file
-   base name; the Latin fold is the same 0x20 distance in both alphabets. */
-H2_ENUM_BEGIN(Cp1251Constant)
-    CP1251_CAPITAL_YO = 0xa8,
-    CP1251_SMALL_YO   = 0xb8,
-    CP1251_CAPITAL_A  = 0xc0,
-    CP1251_CAPITAL_YA = 0xdf,
-    CP1251_SMALL_A    = 0xe0,
-    CP1251_SMALL_YA   = 0xff
-H2_ENUM_END(Cp1251Constant)
-
-namespace {
-
-    // The localised build folds the leading letter of a creature name through
-    // the CP1251 alphabet, not through a bare -32 on the Latin range.
-    inline char ToUpperCp1251(u8 letter) {
-        char capital;
-
-        if (letter >= 'a' && letter <= 'z')
-            capital = letter - ('a' - 'A');
-        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
-            capital = letter - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (letter == CP1251_SMALL_YO)
-            capital = CP1251_CAPITAL_YO;
-        else
-            capital = letter;
-        return capital;
-    }
-
-} // namespace
-
 H2_ENUM_BEGIN(GameSaveFormatConstant)
     SAVE_PATH_CAPACITY                 = 452,
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
@@ -1113,14 +1082,14 @@ void GenerateStandardFileName(char* source, char* destination) {
         chr = source[i];
         if (chr >= 'a' && chr <= 'z')
             chr = chr - ('a' - 'A');
-        else if (chr >= CP1251_SMALL_A && chr <= CP1251_SMALL_YA)
-            chr = chr - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-        else if (chr == CP1251_SMALL_YO)
-            chr = CP1251_CAPITAL_YO;
+        else if (chr >= CYRILLIC_SMALL_A && chr <= CYRILLIC_SMALL_YA)
+            chr = chr - (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
+        else if (chr == CYRILLIC_SMALL_YO)
+            chr = CYRILLIC_CAPITAL_YO;
         else
             chr = chr;
-        if ((chr >= 'A' && chr <= 'Z') || (chr >= CP1251_CAPITAL_A && chr <= CP1251_CAPITAL_YA)
-            || chr == CP1251_CAPITAL_YO || (chr >= '0' && chr <= '9') || chr == '_') {
+        if ((chr >= 'A' && chr <= 'Z') || (chr >= CYRILLIC_CAPITAL_A && chr <= CYRILLIC_CAPITAL_YA)
+            || chr == CYRILLIC_CAPITAL_YO || (chr >= '0' && chr <= '9') || chr == '_') {
             destination[indexOut] = chr;
             indexOut++;
         }
@@ -3658,7 +3627,7 @@ void game::ViewArmy(
     gpResourceManager->Dispose(monsterIcon5);
 
     strcpy(reinterpret_cast<char*>(armyName0), gArmyNames[IDX(monsterType)]);
-    armyName0[0] = ToUpperCp1251(armyName0[0]);
+    armyName0[0] = CyrillicToUpper(static_cast<char>(armyName0[0]));
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
     message.payload.widget.data.text = reinterpret_cast<char*>(armyName0);
@@ -5663,7 +5632,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck++;
     if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         luck++;
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && h->IsEmbarked()) {
         luck++;
     }
     luck += h->m_luck;
@@ -6972,11 +6941,11 @@ void game::DoNewTurn(void) {
                     );
                     if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
                         lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
+                    else if (lowerName19[0] >= CYRILLIC_CAPITAL_A
+                             && lowerName19[0] <= CYRILLIC_CAPITAL_YA)
+                        lowerFirst = lowerName19[0] + (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
+                    else if (lowerName19[0] == CYRILLIC_CAPITAL_YO)
+                        lowerFirst = CYRILLIC_SMALL_YO;
                     else
                         lowerFirst = lowerName19[0];
                     lowerName19[0] = lowerFirst;
@@ -7002,11 +6971,11 @@ void game::DoNewTurn(void) {
                     );
                     if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
                         lowerFirst = lowerName19[0] + ('a' - 'A');
-                    else if (lowerName19[0] >= CP1251_CAPITAL_A
-                             && lowerName19[0] <= CP1251_CAPITAL_YA)
-                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
-                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
-                        lowerFirst = CP1251_SMALL_YO;
+                    else if (lowerName19[0] >= CYRILLIC_CAPITAL_A
+                             && lowerName19[0] <= CYRILLIC_CAPITAL_YA)
+                        lowerFirst = lowerName19[0] + (CYRILLIC_SMALL_A - CYRILLIC_CAPITAL_A);
+                    else if (lowerName19[0] == CYRILLIC_CAPITAL_YO)
+                        lowerFirst = CYRILLIC_SMALL_YO;
                     else
                         lowerFirst = lowerName19[0];
                     lowerName19[0] = lowerFirst;

@@ -16,7 +16,8 @@ def is_counter_local(symbol):
     if symbol.section <= 0 or symbol.typ != 0:
         return False
     # VC6 uses STATIC (3) for data counters and LABEL (6) for code labels.
-    pattern = r'\$(?:SG|T)\d+' if symbol.storage_class == 3 else r'\$L\d+'
+    pattern = (r'\$(?:SG|T)\d+' if symbol.storage_class == 3
+               else r'(?:\$L|\$[A-Za-z_]\w*\$)\d+')
     return (symbol.storage_class in (3, 6)
             and re.fullmatch(pattern, symbol.name) is not None)
 

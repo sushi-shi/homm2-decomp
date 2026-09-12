@@ -149,3 +149,40 @@ The separately invoked gates reveal existing failures:
 
 These baseline limitations remain distinct from the passing raw-object and
 retail-relocation controls. They are not permission to introduce new failures.
+
+## Group 2: existing accessors and localized byte rules
+
+| Family | Application and boundary |
+| --- | --- |
+| H22 | 33 direct `HAS(..., HERO_EVENT_EMBARKED)` queries in eight TUs now use the existing `IsEmbarked`. Its masked integer result, surrounding guards and lookup timing are preserved; flag mutations and boat-object tests are not changed. |
+| H27 | Five SEARCH node accesses use the existing reference-returning `GetNode`, already used by FINDPATH. The global stride, coordinates and searchNode overlay stay unchanged. |
+| H52 | Five flattened affected-army accesses in SPELLS/SPELLAI use the existing two-dimensional array spelling. Both reads and writable stores retain the 20-slot stride and their original chance-query order. |
+| H69 | Shared uppercase reuse, one companion `CyrillicToLower`, and shared code-point constants replace private/expanded character folds across six TUs. Locals and result-byte stores remain. The callable `toupper(char)` and CRT `toupper(int)` remain distinct and unchanged. Three GAME u8-staged sequences remain explicit after measured non-equivalent helper attempts. |
+
+The H22/H27 structural pairs preserve target bytes; the combined H22/H27/H52
+all-object control also passes. H69's two representative uppercase-reuse pairs
+preserve instruction bytes, but their existing function-local retail relocation
+residuals are not described as exact closures. The definitive retained-change
+control is the before/after all-object comparison, not rounded fuzzy scores.
+
+H69's two calendar sites were tested as an independent 2x2 structural product.
+Both explicit u8-store arms retain the 1,277-byte DoNewTurn function; shared
+calls produce 1,282/1,284/1,289 bytes. The filename filter's two-arm comparison
+retains its 428-byte explicit fold instead of the 433-byte call form. All six
+trials completed, source restored. These paths still share code-point constants;
+their filtering, source-dot mutation and calendar message protocols are not
+hidden by an abstraction.
+
+A VC6-compiled executable including the real KB.h tests all 256 uppercase and
+256 lowercase input bytes and passes, including Yo, unsigned interpretation and
+unchanged nonletters. The object control now also permits the numeric counter
+suffix on VC6 `$sourceLabel$counter` LABEL symbols while preserving the label
+name and exact destination; a regression rejects a changed label name.
+
+All four group-2 families are applied. The final build and original-snapshot
+object control pass after removal of the remaining town-color private helper:
+98 objects, 1,516 sections, 42,433 ordered relocations. The full tool suite now
+passes 905 tests. [The measured source dossier](../matching/ReadabilityAccessors/reuse.cpp)
+records the structural arms and narrow rejected paths. Reproduce the exhaustive
+real-header byte test with `python3 -m homm2.audit.readability_contracts` inside
+the build shell; compiler flags come from the KB unit's manifest entry.

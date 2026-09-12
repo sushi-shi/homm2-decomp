@@ -1340,16 +1340,10 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             target = &m_armies[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex];
             if (target->SpellCastWorks(spell)
-                && !*(
-                    gArmyEffected[0]
-                    + IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)
-                          * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[affectedHexes[frame]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)
-                        * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[affectedHexes[frame]].m_occupantIndex) = 1;
+                && !gArmyEffected[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                                 [m_hexCells[affectedHexes[frame]].m_occupantIndex]) {
+                gArmyEffected[IDX(m_hexCells[affectedHexes[frame]].m_occupantSide)]
+                             [m_hexCells[affectedHexes[frame]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (spell == SPELL_COLD_RING
@@ -1437,14 +1431,10 @@ void combatManager::MeteorShower(i32 targetHex) {
             target = &m_armies[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
                               [m_hexCells[hexes[direction]].m_occupantIndex];
             if (target->SpellCastWorks(SPELL_METEOR_SHOWER)
-                && !*(
-                    gArmyEffected[0]
-                    + IDX(m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                    + m_hexCells[hexes[direction]].m_occupantIndex
-                )) {
-                *(gArmyEffected[0]
-                  + IDX(m_hexCells[hexes[direction]].m_occupantSide) * COMBAT_ARMY_SLOT_COUNT
-                  + m_hexCells[hexes[direction]].m_occupantIndex) = 1;
+                && !gArmyEffected[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
+                                 [m_hexCells[hexes[direction]].m_occupantIndex]) {
+                gArmyEffected[IDX(m_hexCells[hexes[direction]].m_occupantSide)]
+                             [m_hexCells[hexes[direction]].m_occupantIndex] = 1;
                 if (target->m_damagePending == 0) {
                     damage = baseDamage;
                     if (target->m_monsterType == CREATURE_EARTH_ELEMENTAL)

@@ -309,30 +309,6 @@ namespace {
         MINE_CENTER_GOLD_FRAME = 4
     H2_ENUM_END(AbandonedMineConversionConstant)
 
-    H2_ENUM_BEGIN(Cp1251Letter)
-        CP1251_CAPITAL_YO = 0xa8,
-        CP1251_SMALL_YO = 0xb8,
-        CP1251_CAPITAL_A = 0xc0,
-        CP1251_CAPITAL_YA = 0xdf,
-        CP1251_CASE_STEP = 0x20
-    H2_ENUM_END(Cp1251Letter)
-
-    // The localised build folds the leading letter of a resource name through
-    // the CP1251 alphabet, not through a bare +32 on the Latin range.
-    inline char ToLowerCp1251(u8 letter) {
-        char smallLetter;
-
-        if (letter >= 'A' && letter <= 'Z')
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter >= CP1251_CAPITAL_A && letter <= CP1251_CAPITAL_YA)
-            smallLetter = letter + CP1251_CASE_STEP;
-        else if (letter == CP1251_CAPITAL_YO)
-            smallLetter = CP1251_SMALL_YO;
-        else
-            smallLetter = letter;
-        return smallLetter;
-    }
-
 }
 
 #define TRADING_POST_EFFICIENCY 0.2f
@@ -1143,7 +1119,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if (eventHero2->IsEmbarked()) {
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
                 );
@@ -2085,7 +2061,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType_a)]);
-            sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+            sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
@@ -3190,7 +3166,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
@@ -3255,7 +3231,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(sphinxAnswer_a, gResourceNames[IDX(artifactResourceType_k)]);
-                        sphinxAnswer_a[0] = ToLowerCp1251(sphinxAnswer_a[0]);
+                        sphinxAnswer_a[0] = CyrillicToLower(sphinxAnswer_a[0]);
                         sprintf(
                             gText,
                             "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
@@ -6368,7 +6344,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
-            if (HAS(eventHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            if (eventHero->IsEmbarked()) {
                 eventHero->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
                 );

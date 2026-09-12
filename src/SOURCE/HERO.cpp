@@ -250,7 +250,7 @@ i32 hero::CalcMobility(void) {
     i32 slowestSpeedValue;
     i32 creatureIndex;
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (IsEmbarked()) {
         movePoints = seaBaseMobility;
         movePoints = static_cast<i32>(
             movePoints * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
@@ -546,7 +546,7 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         gpAdvManager->HideRoute(0, 0, 0);
 
-    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (IsEmbarked()) {
         for (i = 0; i < GAME_BOAT_COUNT; i++) {
             if (gpGame->m_boats[i].heroId == m_id) {
                 gpGame->m_boats[i].heroId = -1;
