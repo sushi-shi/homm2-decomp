@@ -492,3 +492,44 @@ exclusions. R29 records the nonuniform data, random, traversal, UI and protocol
 contracts; R26 gains owner-accessor and scouting-only evidence. The local-name
 macros are not counted as helper proposals. This batch adds 104 read definitions
 and three files. No executable source, header, configuration or behavior changed.
+
+## B30 — complete town manager and castle construction screen
+
+Read all of TOWNMGR.cpp (3,636 lines, 34 definitions) and Castle.cpp (850 lines,
+three definitions), including the private ToUpperCP1251 and CannotRecruitHero
+inlines, townObject ownership/drawing, all data and every long UI handler.
+Reconciled both complete indexes. Covered town lifecycle, faction-specific
+visibility/animation, army selection/merge/swap/split, building cost layout and
+purchase, construction/fizzle, guild spells, hero recruitment, tavern/well,
+thieves-guild ranking and category statistics; castle slots/upgrades, captain,
+terrain background, status/hover, formation and purchase/recruitment dispatch.
+Also read all 22 lines of Castle.h (zero bodies); town, manager, building,
+game/player/hero/army, map and widget/resource owner declarations were already read.
+
+H72 isolates the capped next guild level in BuyBuild and SetupCastle. H73 names
+their shared completed-building predicate, distinct from a plain bit check.
+Targeted full GetBuildingCost inspection in still-unread KB.cpp exposes an
+uncapped table subscript despite computing a capped local; it is explicitly not
+an interchangeable cost selector. Existing message, allocation, clamp, manager,
+building/army, dialog, case-folding and dismissal candidates gain consumers.
+R30 retains cost narrowing/order, rendering, split/recruit, spell and statistics
+differences. This batch adds 37 read definitions and three files, not KB coverage.
+
+## B31 — complete recruitment, army strip/bank and trading post
+
+Read RECRUIT.cpp (458 lines, eight definitions), STRIP.cpp (255 lines, eight)
+and tradpost.cpp (462 lines, six) in full, including both recruitment constructors,
+all strip/bank methods, the complete trade handler and trailing globals/data.
+Reconciled all three indexes. Covered recruitment cost selection, manager/UI
+lifetime, input/purchase, quick-view, icon cache replacement and ownership,
+army/resource display, exchange ratios, two-sided trade display, drag event
+coalescing and all selection/execution paths.
+
+Read all of bankBox.h (22 lines), RECRUIT.h (20), recruitUnit.h (51), strip.h (70)
+and tradpost.h (53); zero bodies. Their packed owner layouts, source/slot domains,
+ratio/efficiency globals and geometry are accounted for. H01/H07/H14/H21/H30/H31/
+H69 gain exact instances or explicit exclusions. R30 records nonuniform quick-
+view deletion, first-nonzero cost selection, icon disposal, ratio conversion,
+stale trade state and event-loop contracts. This batch adds 22 definitions and
+eight files. Across B30-B31, 59 definitions and eleven files are newly fully read;
+no executable source, header, configuration or behavior changed.

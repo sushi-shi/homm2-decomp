@@ -2782,3 +2782,201 @@ are clamped separately from adding the original reward and clamping the stored
 balance; only the last two nonzero resource entries are displayed. CountShrines
 walks map triggers/occupying heroes and checks owner, tavern bit and necromancer
 faction, rather than simply scanning every town record.
+
+## H72 — capped next mage-guild display level
+
+Disposition: credible small value inline; owner is the town building domain.
+
+`TOWNMGR.cpp:townManager::BuyBuild` repeats `level + 1 < 5 ? level + 1 : 5`
+for mage-guild costs and the displayed title. `Castle.cpp:SetupCastle` uses
+the same expression for its guild title. Possible name: NextMageGuildLevel,
+owned by `include/SOURCE/town.h`, where the five-level domain already lives.
+It names the level being offered/displayed, not whether construction is allowed.
+
+Preserve the signed i8 m_buildState promotion to i32 before adding one; the
+result is i32, with only an upper cap and no lower clamp or i8 wrap. BuyBuild
+captures the level in a local and uses it later, so a value-taking inline is
+preferable to replacing later reads with a fresh global town lookup. Inputs
+must remain stable and side-effect-free. The existing `<` spelling, table
+accesses, formatting, allocation and callback order stay outside or unchanged.
+No modern min/template framework is needed. Naming this short repeated rule
+improves both the cost and title expressions without hiding the purchase flow.
+
+Important exclusion: targeted full inspection of KB::GetBuildingCost shows
+that it calculates and caps a local `level` but actually indexes
+`gMageBuildingCosts[mageLevel + 1]`, uncapped. Replacing that subscript with
+this helper would change behavior; the unused capped calculation is not proof
+of an interchangeable whole cost API. KB remains unread as a complete TU.
+
+## H73 — completed town building, including final mage-guild level
+
+Disposition: credible town-domain predicate, separate from H20's any-bit test.
+
+`TOWNMGR.cpp:townManager::BuildObj` first tests the building bit and then
+`building != MAGE_GUILD || m_buildState == 5`. `Castle.cpp:SetupCastle` uses
+the same conjunction to select completed-building status. Possible name:
+IsBuildingComplete, owned by `include/SOURCE/town.h`. The name explains why
+having the guild bit alone does not make its construction complete.
+
+The argument is a building slot/index, not an already shifted mask. Preserve
+the existing 32-bit mask/shift domain and first-bit-test short circuit; the
+result is Boolean, not the raw mask. Preserve exact equality to five, not
+`>= 5`. This checks neither affordability, daily construction, prerequisites,
+dock eligibility, faction nor the base/upgrade hierarchy. Keep those guards,
+the later mutation and the UI state assignment outside. Stable receiver and
+slot expressions are required; any inline code shape still needs retail proof.
+
+CastleHandler's guild-level checks sometimes omit the building bit entirely;
+they are not instances. CanBuild's maximum-level rejection is a different
+predicate again. Captain-quarters code stores the raw mask and cannot be
+normalized through a Boolean helper. No general CanBuy/CanBuild merger follows.
+
+## B30-B31 — extensions to established candidates
+
+H69 gains TOWNMGR's private ToUpperCP1251 and thieves-guild first-byte use,
+plus SetupWell's expanded unsigned-byte uppercase mapping. RECRUIT's
+SetupRecruitWin and tradpost's UpdateTradingPost add the inverse ASCII/CP1251
+lowercase mapping, including the separate Yo byte. Trade folds the right
+resource name before the left; keep both scratch buffers and write order.
+H71 gains townManager::DoCommand's accepted dismissal and merge source reset:
+type NONE before count zero. Swap writes count before type using i32 temporaries;
+split does not have the same zero-type tail, and ResetStrips clears selection,
+not the army slots. They are not generic dismissal instances.
+
+H01 gains exact type/command/id prefixes in town setup/status/redraw/build/
+tavern/split/thieves-guild paths, CastleHandler status, recruitment setup and
+trading-post text updates. Keep formatting, text/icon payloads and broadcasts
+outside; BuyBuild's initial icon prefix is complete before formatting. Reused
+headers and bankBox::Update's type/command stores before the resource loop,
+followed by formatting and only then id, are not contiguous instances.
+H14 gains townManager::Open and recruitUnit::Open's mask/priority/active stores;
+manager naming, setup, music/menu and fade are not part of registration.
+
+H05 gains the three thieves-guild allocate-strlen-plus-one/copy strings.
+H06 gains BuyBuild's existing GetIconEntry geometry queries. H07 gains the
+build-dialog row lower-three/upper-six clamp, recruitment's lower-zero/upper-
+maximum quantity clamp, and the trade track/drag clamps. SplitArmyHandler
+uses lower-zero then `>= maximum` to assign maximum-minus-one; it must retain
+that exclusive bound, including its result for maximum zero. One-sided +/-
+button bounds are not automatically full-clamp instances.
+
+H20 gains town object/visibility/build/well/guild/recruit/statistics and castle
+bit tests; raw captain-mask storage is excluded. H21 gains town army commands
+and STRIP display's type-sentinel tests. Thieves-guild strongest-creature
+selection additionally requires positive quantity; keep that test explicit.
+H24 gains SetupCastle's map-cell terrain read. H30 gains text-only town/castle/
+recruitment dialogs; preserve recruitment's explicit no-room coordinates.
+H31 gains checked window/icon/widget allocations, not unchecked description,
+amount-string or thieves-guild text-widget allocations. Town/trade/split close
+rewrites do not set H32's function-completion flag. Town Main's executive-loop
+termination and recruitment Main's returned result are distinct protocols.
+
+## R30 — town construction, recruitment, strip and trade contracts
+
+Building presentation remains faction- and phase-specific. The six faction
+tables contain drawing-order slots and NONE holes; they are not a reorderable
+building enumeration. townObject acquires its icon before an optional border,
+deletes the border before disposing the icon, and has faction-specific overlay
+rules. Mage base frames depend on level/faction; the barbarian early return
+precedes both overlay drawing and animation advance. Frame advance requires
+advance == 1 and wraps on equality, not >=. SetupExtraStuff performs separate
+mask clears/sets and dock visibility decisions. Do not collapse these into one
+universal building-mask or animation operation.
+
+Town lifecycle and context changes have different ownership from adventure UI.
+SetupTown disables and then enables both navigation controls under the same
+one-town guard. Faction change unloads/recreates objects; unchanged faction
+reuses them while rebuilding strips. Unload removes a border widget but deletes
+its containing townObject, not the widget pointer in H62. Status ShowText ignores
+its text argument and uses m_statusText with specific ranged draw/screen work;
+it is not HeroMessageUpdate or UpdateNormalDialog. Recruitment fizzle releases
+its saved source; construction fizzle does not. Draw extent flags reset to fixed
+false, not their previous values. BuildObj retains its unchecked last matched
+object index. No resource/flag guard or cleanup repair is inferred from pairing.
+
+BuyBuild's cost selection is not a call-for-call GetBuildingCost replacement.
+Besides H72's uncapped KB subscript, necromancer special/guild/dwelling/neutral
+branch order differs. BuyBuild compacts only strictly positive i32 costs into
+i16 amounts and i8 resource IDs; purchase subtracts those narrowed amounts.
+GetBuildingCost copies whole i32 rows and can leave the destination untouched
+for disabled slots. Prerequisite display uses a necromancer level <= 2 test,
+where CanBuild's searched test uses <= 1. Resource rows distribute five/six/seven
+entries differently; layout uses icon extents and clamps the window height.
+Unchecked description/amount-string allocations are not explicitly freed like
+the window. Preserve format-as-string calls, localized formatting, ownership
+and narrowing; none is a helper-driven bug-fix opportunity in this audit.
+
+Castle setup maps base slots to eligible upgrades with the alternate level-six
+upgrade taking precedence. It calls CanBuy/CanBuild repeatedly in different
+orders for masks, appearance and actions; do not cache them across UI work.
+The local CannotRecruitHero inline tests recruitResult, gold, count >= maximum,
+then occupancy. Display/hover paths use different order and count == maximum,
+sometimes omit recruitResult, and cannot simply reuse that predicate. Quick
+building view bypasses normal purchase gates; guild max checks there do not
+always test the guild bit. Formation preview is text-only, normal selection
+mutates formation and rebuilds UI. Background terrain lookup occurs even when
+updateOnly suppresses widget creation. Keep these local workflows explicit.
+
+Army commands retain last-stack protection, same-slot view precedence, optional
+merge retargeting and count-before-type swap stores. Splitting keeps one troop,
+can select an existing same-type destination, and writes its type only when
+needed; cancel-on-zero changes the forwarded result. ResetStrips orders slot
+deselection, both draws and pointer/slot clearing without clearing every
+selection field. Hero recruitment temporarily changes owner before the dialog,
+counts non-book artifacts, and on success orders gold/list/position/flags/
+mobility/cell replacement/network notification before later availability work.
+Replacement hero class comes from the other available id, not the recruited
+hero's current class. No shared context or army-transfer macro is proposed.
+
+Mage-guild spell display uses three availability states, spell-count narrowing,
+wizard-library rules and either newline or two spaces before the mana cost;
+GAME uses one space and a different GetManaCost receiver. The handler resolves
+overlapping control ranges in order. SetupWell prefers the alternate upgrade
+and applies base well growth because it is already inside that screen, unlike
+calendar code's explicit building check. Tavern animation shares a counter
+that its opening routine does not reset. Keep these preconditions and globals.
+
+Thieves-guild category/rank UI is not a generic sort/render adapter. Category
+queries initialize only playerCount slots and can leave invalid-category stats
+untouched; dead players are -1. Artifact counts exclude books and count
+duplicates. Strongest-creature ranking uses per-unit value, positive quantity,
+towns before heroes and first-on-tie behavior. Army totals instead call the AI
+stack evaluator with explicit arguments; its implementation is still unread.
+Pairwise descending SortStats uses strict greater-than but is not generally
+stable, and swaps the i8 order values through an i32 temporary. Allocation,
+scratch formatting and repeated hide operations remain explicit; a variadic
+append-format macro would hide observable intermediate buffers.
+
+Recruitment has three local first-nonzero-nongold cost scans, not yet a shared
+cross-TU operation. Negative costs qualify; gold is assigned before the scan.
+Open calls Update before calculating maximum and disables only for zero
+availability, not zero affordability. Division guards and a lower maximum
+clamp are absent. Purchase checks room, then ignores Add's result while charging
+and narrowing the available count. Close removes/deletes its window before the
+optional no-room dialog and restores the shared menu unconditionally. QuickView
+removes but does not delete its window. A common dialog-lifetime wrapper would
+change these contracts; do not invent symmetrical ownership.
+
+STRIP invalidation tests only current non-NONE creature types, so clearing all
+slots alone need not invalidate cached icons. If invalid, it snapshots and
+reacquires all five slots before disposing any old icons. The disposal guard
+excludes CREATURE_PEASANT, not CREATURE_NONE; null disposal and the peasant
+exception must not be normalized. This is not H45's per-slot image replacement.
+Its destructor deletes borders without RemoveWidget before deleting the window.
+DrawIcons draws the window before selection outlines; bank display reuses one
+message/text buffer for all resources with gold last. Keep this lifetime and
+draw order visible.
+
+Trading uses u16 base ratios and floating efficiency, with one branch converting
+`floatRatio + 0.999` through a double expression and the inverse branch truncating
+`1.0f / floatRatio`. It is not a general ceil/rounded-ratio helper. Opening clears
+resource ids and quantity but leaves maximum/ratio/denomination globals stale.
+Selecting a left resource can compute a new trade while the right id is -1;
+right selection has a different guard. Execution accepts any nonzero quantity,
+subtracts source then adds destination without fresh affordability checks, and
+clears selected ids without resetting every quantity/ratio field. These are
+exclusions, not fixes. Knob position uses a 170-pixel display span, while drag
+quantity uses a 187-pixel denominator and maximum-plus-one; do not merge that
+geometry with a generic list thumb. Drag coalesces mouse-move events and still
+does its final display update on release. +/- controls and close forwarding
+remain separate from the clamp and H32 protocols.
