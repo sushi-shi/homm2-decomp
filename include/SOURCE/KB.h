@@ -522,7 +522,7 @@ void SmackFade(u8* src, u8* dst);
 void ShowCongrats(HighScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(H2_CONST char* name);
-void WaitEndSample(SAMPLE2* s, i32 waitTime);
+void WaitEndSample(SAMPLE2* s, i32 waitTime = -1);
 void MemError(void);
 H2_CONST char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
@@ -562,7 +562,18 @@ i32 CheckMem(void);
 i32 GetManaCost(SpellType spell, hero* h);
 void SetWinText(heroWindow* j, i32 id);
 void CheckShingleUpdate(void);
-void NormalDialog(H2_CONST char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void NormalDialog(
+    H2_CONST char* text,
+    i32 dialogType,
+    i32 windowX = -1,
+    i32 windowY = -1,
+    i32 firstResourceType = -1,
+    i32 firstResourceValue = 0,
+    i32 secondResourceType = -1,
+    i32 secondResourceValue = 0,
+    i32 showOrText = -1,
+    i32 timeout = 0
+);
 void UpdateNormalDialog(H2_CONST char* text);
 
 extern b32 bDoColorCycle;

@@ -106,11 +106,28 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32)
 void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(H2_CONST char*);
-void LogInt(H2_CONST char*, i32, i32, i32, i32, i32, i32, i32);
+void LogInt(
+    H2_CONST char* text,
+    i32 value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+);
 #if H2_STRICT_ENUMS
-template <typename Enum>
-    requires __is_enum(Enum)
-inline void LogInt(H2_CONST char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+template<typename Enum>
+requires __is_enum(Enum) inline void LogInt(
+    H2_CONST char* text,
+    Enum value,
+    i32 b = LOG_UNUSED_VALUE,
+    i32 c = LOG_UNUSED_VALUE,
+    i32 d = LOG_UNUSED_VALUE,
+    i32 e = LOG_UNUSED_VALUE,
+    i32 f = LOG_UNUSED_VALUE,
+    i32 g = LOG_UNUSED_VALUE
+) {
     LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
 }
 #endif

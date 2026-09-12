@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -229,9 +230,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
             i16 y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -241,9 +240,7 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     && x < m_dropButtonX + m_dropButtonWidth
                     && y < m_dropButtonY + m_dropButtonHeight) {
                     ProcessSelectDialog();
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONTINUE;

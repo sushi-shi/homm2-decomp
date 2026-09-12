@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -80,9 +81,7 @@ void SetupRecruitWin(
         ch = monsterName[0];
     monsterName[0] = ch;
     sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc" /* "Нанять" */, monsterName);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TITLE_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TITLE_CONTROL);
     message.payload.widget.data.text = label;
     window->BroadcastMessage(message);
 
@@ -101,9 +100,7 @@ void SetupRecruitWin(
     window->BroadcastMessage(message);
 
     sprintf(gText, "monh%04d.icn", IDX(creatureType));
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    message.payload.widget.id = CREATURE_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_ICON, CREATURE_CONTROL);
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {

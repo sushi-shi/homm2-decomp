@@ -255,15 +255,7 @@ void game::GetMap(void) {
             "\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed"
             "\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 "
             "II.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            NORMAL_DIALOG_INFO
         );
         sprintf(fileMask, "*.%s", "MP2");
     } else if (xIsExpansionMap) {
@@ -573,9 +565,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_CHANNEL,
                 GAME_MAP_PACKET_SIZE,
                 GAME_REMOTE_MAP_HEADER,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -585,9 +575,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_CHANNEL,
                 GAME_PLAYER_INFO_PACKET_SIZE,
                 GAME_REMOTE_PLAYER_INFO,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -892,9 +880,7 @@ cleanup:
         i32 H2_UNUSED(unusedPlayer17);
 
         strcpy(gText, m_mapHeader.name);
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        message.payload.widget.id = NEW_GAME_SCENARIO_NAME;
+        SET_WIDGET_MESSAGE(message, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
 
@@ -1037,9 +1023,7 @@ cleanup:
 
         if (!gbNewGameShadowHidden) {
             gbNewGameShadowHidden = true;
-            windowMessage.type = MESSAGE_WIDGET;
-            windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-            windowMessage.payload.widget.id = NEW_GAME_SHADOW;
+            SET_WIDGET_MESSAGE(windowMessage, NEW_GAME_WIDGET_DISABLE, NEW_GAME_SHADOW);
             windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
             gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
         }
@@ -1062,15 +1046,7 @@ cleanup:
                         NormalDialog(
                             "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
                             "\xe8\xeb \xe8\xe3\xf0\xf3.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            NORMAL_DIALOG_INFO
                         );
                         ShutDown(NULL);
                         break;
@@ -1152,9 +1128,7 @@ cleanup:
                 GAME_REMOTE_CHANNEL,
                 strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
                 GAME_REMOTE_CHAT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!sendResult)
                 ShutDown(NULL);
@@ -1210,18 +1184,7 @@ cleanup:
                     if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
-                        NormalDialog(
-                            gNewGameHelp[helpDialogIndexLocal],
-                            NEW_GAME_HELP_DIALOG_TYPE,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
                 }
             } else {
                 switch (message.payload.widget.command) {
@@ -1234,9 +1197,7 @@ cleanup:
                                         GAME_REMOTE_CHANNEL,
                                         0,
                                         GAME_REMOTE_START,
-                                        1,
-                                        1,
-                                        REMOTE_MESSAGE_DEFAULT
+                                        1
                                     );
                                 }
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1252,9 +1213,7 @@ cleanup:
                                         GAME_REMOTE_CHANNEL,
                                         0,
                                         GAME_REMOTE_CANCEL,
-                                        1,
-                                        1,
-                                        REMOTE_MESSAGE_DEFAULT
+                                        1
                                     );
                                     ShutDown(NULL);
                                 }
@@ -1429,15 +1388,7 @@ cleanup:
                                                 "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
                                                 "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
                                                 "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
-                                                NORMAL_DIALOG_INFO,
-                                                -1,
-                                                -1,
-                                                -1,
-                                                0,
-                                                -1,
-                                                0,
-                                                -1,
-                                                0
+                                                NORMAL_DIALOG_INFO
                                             );
                                         }
                                         gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
@@ -1517,9 +1468,7 @@ cleanup:
                                             GAME_REMOTE_CHANNEL,
                                             GAME_MAP_PACKET_SIZE,
                                             GAME_REMOTE_MAP_HEADER,
-                                            1,
-                                            1,
-                                            REMOTE_MESSAGE_DEFAULT
+                                            1
                                         );
                                     }
                                 }
@@ -1548,9 +1497,7 @@ cleanup:
             GAME_REMOTE_CHANNEL,
             GAME_SETUP_PACKET_SIZE,
             GAME_REMOTE_SETUP,
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
+            1
         );
         if (!sendResult)
             ShutDown(NULL);
@@ -1758,9 +1705,7 @@ void game::ShowScenInfo(void) {
         MemError();
     SetWinText(window, GAME_SCENARIO_WINDOW_TEXT_ID);
 
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    msg.payload.widget.id = NEW_GAME_SCENARIO_NAME;
+    SET_WIDGET_MESSAGE(msg, NEW_GAME_WIDGET_SET_TEXT, NEW_GAME_SCENARIO_NAME);
     msg.payload.widget.data.text = m_mapHeader.name;
     window->BroadcastMessage(msg);
 

@@ -789,9 +789,7 @@ void townManager::SetupTown(void) {
     i32 H2_UNUSED(crestFrame);
 
     sprintf(gText, GetTownName(m_town->m_id));
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = TOWN_WIDGET_SET_TEXT;
-    message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
+    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_WINDOW_TEXT_CONTROL);
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
     strcpy(gText, "\xdd\xea\xf0\xe0\xed \xe3\xee\xf0\xee\xe4\xe0");
@@ -1236,9 +1234,7 @@ VA(0x004a67ce, 0x74)
 void townManager::ShowText(char*) {
     tag_message message;
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = TOWN_WIDGET_SET_TEXT;
-    message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
+    SET_WIDGET_MESSAGE(message, TOWN_WIDGET_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
     m_townWindow->DrawWindow(TOWN_STATUS_DRAW_LEFT, TOWN_STATUS_DRAW_WIDTH, TOWN_STATUS_DRAW_RIGHT);
@@ -1383,7 +1379,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         NULL,
                                         NULL
                                     );
-                                    WaitEndSample(&buildSound, -1);
+                                    WaitEndSample(&buildSound);
                                     m_recruitResult = false;
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
@@ -1430,16 +1426,21 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
                                         == TOWN_MAX_ARTIFACTS) {
                                         NormalDialog(
-                                            "\xcf\xf0\xe5\xe6\xe4\xe5 \xe2\xe0\xec \xf1\xeb\xe5\xe4\xf3\xe5\xf2 \xea\xf3\xef\xe8\xf2\xfc \xe2\xee\xeb\xf8\xe5\xe1\xed\xf3\xfe \xea\xed\xe8\xe3\xf3 \xe2 \xe3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xed\xe5\xe5 \xe2 \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xe5. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xee\xf2\xe4\xe0\xf2\xfc \xee\xe4\xe8\xed \xe8\xe7 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2 \xe4\xf0\xf3\xe3\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe." /* "Прежде вам следует купить волшебную книгу в гильдии магов, но сейчас у вас нет места для нее в инвентаре. Попробуйте отдать один из артефактов другому герою." */,
-                                            NORMAL_DIALOG_INFO,
-                                            -1,
-                                            -1,
-                                            -1,
-                                            0,
-                                            -1,
-                                            0,
-                                            -1,
-                                            0
+                                            "\xcf\xf0\xe5\xe6\xe4\xe5 \xe2\xe0\xec "
+                                            "\xf1\xeb\xe5\xe4\xf3\xe5\xf2 \xea\xf3\xef\xe8\xf2\xfc "
+                                            "\xe2\xee\xeb\xf8\xe5\xe1\xed\xf3\xfe "
+                                            "\xea\xed\xe8\xe3\xf3 \xe2 "
+                                            "\xe3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2, "
+                                            "\xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf3 \xe2\xe0\xf1 "
+                                            "\xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff "
+                                            "\xed\xe5\xe5 \xe2 "
+                                            "\xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xe5. "
+                                            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 "
+                                            "\xee\xf2\xe4\xe0\xf2\xfc \xee\xe4\xe8\xed \xe8\xe7 "
+                                            "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2 "
+                                            "\xe4\xf0\xf3\xe3\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe." /* "Прежде вам следует купить волшебную книгу в гильдии магов, но сейчас у вас нет места для нее в инвентаре. Попробуйте отдать один из артефактов другому герою." */
+                                            ,
+                                            NORMAL_DIALOG_INFO
                                         );
                                     } else if (gpCurPlayer->m_resources[IDX(RES_GOLD)]
                                                < TOWN_SPELL_BOOK_COST) {
@@ -1473,8 +1474,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
-                                                true,
-                                                -1
+                                                true
                                             );
                                             gpCurPlayer->m_resources[IDX(RES_GOLD)] -=
                                                 TOWN_SPELL_BOOK_COST;
@@ -1569,16 +1569,12 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             {
                                 if (m_town->m_mayNotUpgradeToCastle != 0) {
                                     NormalDialog(
-                                        "\xdd\xf2\xee\xf2 \xe3\xee\xf0\xee\xe4 \xed\xe5 \xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc \xee\xf2\xf1\xf2\xf0\xee\xe5\xed \xe4\xee \xf3\xf0\xee\xe2\xed\xff \xe7\xe0\xec\xea\xe0." /* "Этот город не может быть отстроен до уровня замка." */,
-                                        NORMAL_DIALOG_INFO,
-                                        -1,
-                                        -1,
-                                        -1,
-                                        0,
-                                        -1,
-                                        0,
-                                        -1,
-                                        0
+                                        "\xdd\xf2\xee\xf2 \xe3\xee\xf0\xee\xe4 \xed\xe5 "
+                                        "\xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
+                                        "\xee\xf2\xf1\xf2\xf0\xee\xe5\xed \xe4\xee "
+                                        "\xf3\xf0\xee\xe2\xed\xff \xe7\xe0\xec\xea\xe0." /* "Этот город не может быть отстроен до уровня замка." */
+                                        ,
+                                        NORMAL_DIALOG_INFO
                                     );
                                     break;
                                 }
@@ -1618,9 +1614,11 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             < TOWN_BOAT_GOLD_COST
                                         || gpGame->m_players[giCurPlayer].m_resources[IDX(RES_WOOD)]
                                                < TOWN_BOAT_WOOD_COST) {
-                                        message.type = MESSAGE_WIDGET;
-                                        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                                        message.payload.widget.id = DIALOG_BUILD_BOAT;
+                                        SET_WIDGET_MESSAGE(
+                                            message,
+                                            WIDGET_COMMAND_SET_FLAGS,
+                                            DIALOG_BUILD_BOAT
+                                        );
                                         message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -1974,9 +1972,7 @@ void townManager::RedrawTownScreen(void) {
     tag_message message;
 
     DrawTown(0, 1);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_CONTROL_STATUS_TEXT);
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
     m_townWindow->DrawWindow(0);
@@ -2279,9 +2275,7 @@ i32 townManager::BuyBuild(
     if (window_a == NULL)
         MemError();
 
-    message_m.type = MESSAGE_WIDGET;
-    message_m.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    message_m.payload.widget.id = BUILD_ICON_CONTROL;
+    SET_WIDGET_MESSAGE(message_m, WIDGET_COMMAND_SET_ICON, BUILD_ICON_CONTROL);
     sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
     message_m.payload.widget.data.text = iconName_o;
     window_a->BroadcastMessage(message_m);
@@ -2498,27 +2492,21 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             else
                 frame_f = gpTownManager->m_town->m_buildState - 1;
             m_townObjects[objectIndex_g]
-                ->m_icon
-                ->CombatClipDrawToBuffer(0, 0, frame_f, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_f, &limits_h, ICON_DRAW_NORMAL);
             if (m_townObjects[objectIndex_g]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_g]->m_icon->CombatClipDrawToBuffer(
                     0,
                     0,
                     frame_f + 1,
                     &limits_h,
-                    ICON_DRAW_NORMAL,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_NORMAL
                 );
         } else {
             m_townObjects[objectIndex_g]
-                ->m_icon
-                ->CombatClipDrawToBuffer(0, 0, 0, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, ICON_DRAW_NORMAL);
             if (m_townObjects[objectIndex_g]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_g]
-                    ->m_icon
-                    ->CombatClipDrawToBuffer(0, 0, 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, ICON_DRAW_NORMAL);
         }
         gbComputeExtent = false;
         gbSaveBiggestExtent = false;
@@ -2541,7 +2529,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             NULL,
             NULL
         );
-        WaitEndSample(&buildSample_b, -1);
+        WaitEndSample(&buildSample_b);
         PollSound();
         m_selectedBuilding = BUILDING_SLOT_NONE;
         gpWindowManager->BroadcastMessage(
@@ -2887,9 +2875,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
         }
     }
     if (glTimers[0] < KBTickCount()) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        message.payload.widget.id = TAVERN_ANIMATION_CONTROL;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, TAVERN_ANIMATION_CONTROL);
         ++gpGame->m_viewArmyResult;
         message.payload.widget.data.value =
             gpGame->m_viewArmyResult % TOWN_TAVERN_ANIMATION_FRAME_COUNT
@@ -2920,9 +2906,7 @@ void townManager::DoTavern(void) {
         ,
         gpGame->m_rumour
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TOWN_TAVERN_RUMOUR_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_TAVERN_RUMOUR_CONTROL);
     message.payload.widget.data.text = gText;
     m_heroWindow0->BroadcastMessage(message);
     gpWindowManager->DoDialog(m_heroWindow0, TavernHandler, 0);
@@ -2993,9 +2977,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
 
 update_amount:
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, TOWN_SPLIT_AMOUNT_CONTROL);
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpTownManager->m_heroWindow1
@@ -3211,9 +3193,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     for (position_a = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position_a < TOWN_THIEVES_PLAYER_COUNT;
          ++position_a) {
-        message_h.type = MESSAGE_WIDGET;
-        message_h.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_RANK_CONTROL;
+        SET_WIDGET_MESSAGE(
+            message_h,
+            WIDGET_COMMAND_CLEAR_FLAGS,
+            position_a + TOWN_THIEVES_FIRST_RANK_CONTROL
+        );
         message_h.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message_h);
         message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
@@ -3222,9 +3206,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     for (position_a = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position_a < TOWN_THIEVES_PLAYER_COUNT;
          ++position_a) {
-        message_h.type = MESSAGE_WIDGET;
-        message_h.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        SET_WIDGET_MESSAGE(
+            message_h,
+            WIDGET_COMMAND_CLEAR_FLAGS,
+            position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL
+        );
         message_h.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message_h);
     }
@@ -3282,9 +3268,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
             ++rank_a;
         sprintf(gText, gColors[gpGame->m_players[rank_a].m_color]);
         gText[0] = ToUpperCp1251(gText[0]);
-        message_h.type = MESSAGE_WIDGET;
-        message_h.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+        SET_WIDGET_MESSAGE(
+            message_h,
+            WIDGET_COMMAND_SET_TEXT,
+            position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL
+        );
         message_h.payload.widget.data.text = gText;
         window->BroadcastMessage(message_h);
 
@@ -3297,8 +3285,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                  ++heroPosition_d) {
                 strongestHero_d = gpGame->GetPlayerHero(rank_a, heroPosition_d);
                 heroValue_i =
-                    gpPhilAI
-                        ->FightValueOfStack(&strongestHero_d->m_army, strongestHero_d, 0, 0, 0, 0);
+                    gpPhilAI->FightValueOfStack(&strongestHero_d->m_army, strongestHero_d, 0);
                 if (!(heroValue_i <= strongestHeroValue_c)) {
                     strongestHeroValue_c = heroValue_i;
                     strongestHeroPosition_j = heroPosition_d;
@@ -3587,9 +3574,6 @@ void GetCategoryStats(
                         armyStrength += gpPhilAI->FightValueOfStack(
                             &playerHero_h->m_army,
                             playerHero_h,
-                            0,
-                            0,
-                            0,
                             0
                         );
                     }
@@ -3598,7 +3582,7 @@ void GetCategoryStats(
                         playerTown = gpGame->GetPlayerTown(player, heroIndex_n);
                         if (playerTown->HasGarrison()) {
                             armyStrength +=
-                                gpPhilAI->FightValueOfStack(&playerTown->m_army, NULL, 0, 0, 0, 0);
+                                gpPhilAI->FightValueOfStack(&playerTown->m_army, NULL, 0);
                         }
                     }
                     stats[player] = armyStrength;

@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -111,9 +112,7 @@ MessageDispatchResult border::Main(struct tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

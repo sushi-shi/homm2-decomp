@@ -565,10 +565,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 quantY,
                 QUANTITY_STATUS_FRAME,
                 &m_creatureLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         } else if (giSpellEffectShowType == SPELL_EFFECT_DISPLAY_SPELL_ICON) {
             drawn = gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_STATUS)]->CombatClipDrawToBuffer(
@@ -593,10 +590,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 quantY,
                 statusIcon + EFFECT_STATUS_FRAME_OFFSET,
                 &m_creatureLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (drawn != ICON_DRAW_SKIPPED) {
@@ -643,10 +637,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             spellY + m_spellEffectYOffset,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            static_cast<IconDrawOrientation>(IDX(ICON_DRAW_FLIPPED) - IDX(m_facing)),
-            0,
-            NULL,
-            NULL
+            static_cast<IconDrawOrientation>(IDX(ICON_DRAW_FLIPPED) - IDX(m_facing))
         );
     }
 }
@@ -2016,7 +2007,7 @@ void army::CheckLuck(void) {
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
         }
-        WaitEndSample(&luckSample, -1);
+        WaitEndSample(&luckSample);
         if (m_luckOutcome > 0) {
             gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
             gpMouseManager->ShowColorPointer();
@@ -2466,10 +2457,7 @@ void army::PowEffect(
                 effectY + m_spellEffectYOffset,
                 gCurSpellEffectFrame,
                 &m_spellLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         gpWindowManager->UpdateScreenRegion(

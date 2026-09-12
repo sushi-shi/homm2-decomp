@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/bmap2.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -848,18 +849,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                             break;
                     }
                     if (helpIndex != -1) {
-                        NormalDialog(
-                            cLongCombatHelp[helpIndex],
-                            NORMAL_DIALOG_QUICK_VIEW,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
-                        );
+                        NormalDialog(cLongCombatHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
                     }
                 }
                 break;
@@ -1016,18 +1006,12 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe3\xe5\xf0\xee\xe5\xe2, \xf7\xf2\xee\xe1\xfb "
-                                "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff."
-                                /* "У вас нет героев, чтобы направлять заклинания." */,
-                            NORMAL_DIALOG_INFO,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe3\xe5\xf0\xee\xe5\xe2, "
+                            "\xf7\xf2\xee\xe1\xfb "
+                            "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc "
+                            "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff."
+                            /* "У вас нет героев, чтобы направлять заклинания." */,
+                            NORMAL_DIALOG_INFO
                         );
                     } else if (IsNegationSphereInEffect() != 0) {
                         NormalDialog(
@@ -1037,28 +1021,14 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                             "\xee\xe4\xed\xee \xe1\xee\xe5\xe2\xee\xe5 "
                             "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5." /* "Сфера антимагии в действии. Не может быть направлено ни одно боевое заклинание." */
                             ,
-                            NORMAL_DIALOG_INFO,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            NORMAL_DIALOG_INFO
                         );
                     } else if (m_heroCastSpell[IDX(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
-                            "\xc2\xfb \xf3\xe6\xe5 \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xeb\xe8 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xe2 \xfd\xf2\xee\xec \xf0\xe0\xf3\xed\xe4\xe5.",
-                            NORMAL_DIALOG_INFO,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            NORMAL_DIALOG_NO_VALUE,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0,
-                            NORMAL_DIALOG_NO_RESOURCE,
-                            0
+                            "\xc2\xfb \xf3\xe6\xe5 \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xeb\xe8 "
+                            "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xe2 \xfd\xf2\xee\xec "
+                            "\xf0\xe0\xf3\xed\xe4\xe5.",
+                            NORMAL_DIALOG_INFO
                         );
                     } else {
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
@@ -1427,15 +1397,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                     "\xee\xe4\xed\xee \xe1\xee\xe5\xe2\xee\xe5 "
                     "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5." /* "Сфера антимагии в действии. Не может быть направлено ни одно боевое заклинание." */
                     ,
-                    NORMAL_DIALOG_INFO,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0
+                    NORMAL_DIALOG_INFO
                 );
                 break;
             }
@@ -1447,15 +1409,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
                 "\xf5\xee\xf2\xe8\xf2\xe5 \xee\xf2\xf1\xf2\xf3\xef\xe8\xf2\xfc?" /* "Вы действительно хотите отступить?" */
                 ,
-                NORMAL_DIALOG_CONFIRM,
-                NORMAL_DIALOG_NO_RESOURCE,
-                NORMAL_DIALOG_NO_VALUE,
-                NORMAL_DIALOG_NO_RESOURCE,
-                0,
-                NORMAL_DIALOG_NO_RESOURCE,
-                0,
-                NORMAL_DIALOG_NO_RESOURCE,
-                0
+                NORMAL_DIALOG_CONFIRM
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 giNextAction = ACTION_RETREAT;
@@ -1468,15 +1422,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                     NormalDialog(
                         "\xd3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
                         "\xe7\xee\xeb\xee\xf2\xe0!" /* "У вас недостаточно золота!" */,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                 } else {
                     giNextAction = ACTION_SURRENDER;
@@ -1626,9 +1572,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
         }
 
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = COMBAT_WIN_LOSE_ANIMATION_COMMAND;
-        message.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
+        SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_ANIMATION_COMMAND, WIN_LOSE_RESOURCE_DRAW_ID);
         message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
@@ -1665,9 +1609,7 @@ void combatManager::ShowWinLoseArtifact(
     char* artifactName;
 
     sprintf(gText, "\xc2\xfb \xe7\xe0\xf5\xe2\xe0\xf2\xe8\xeb\xe8 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2!");
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.payload.widget.id = WIN_LOSE_TEXT_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
 
@@ -1725,7 +1667,7 @@ void combatManager::ShowWinLoseArtifact(
     SAMPLE2 playSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
-    WaitEndSample(&playSample, -1);
+    WaitEndSample(&playSample);
 }
 
 VA(0x0042e715, 0x225)
@@ -1796,9 +1738,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
                                                                 виде скелета." */
         );
     }
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.payload.widget.id = WIN_LOSE_TEXT_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
@@ -1806,7 +1746,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     SAMPLE2 playSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
-    WaitEndSample(&playSample, -1);
+    WaitEndSample(&playSample);
 }
 
 VA(0x0042e93a, 0x2f2)
@@ -1878,9 +1818,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         m_heroes[IDX(m_combatResult)]->m_name,
         gSpellNames[IDX(newSpell)]
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.payload.widget.id = WIN_LOSE_TEXT_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
@@ -1888,7 +1826,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     SAMPLE2 playSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playSample = LoadPlaySample(gText);
-    WaitEndSample(&playSample, -1);
+    WaitEndSample(&playSample);
 }
 
 VA(0x0042ec2c, 0x9d5)
@@ -2274,9 +2212,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_VICTORY)]);
                     }
                 }
-                message.type = MESSAGE_WIDGET;
-                message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
-                message.payload.widget.id = WIN_LOSE_TEXT_ID;
+                SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
                 message.payload.widget.data.text = gText;
                 m_winLoseWindow->BroadcastMessage(message);
                 ShowDeadArmies(m_winLoseWindow);
@@ -2367,17 +2303,13 @@ void combatManager::DoLoseWindow(void) {
         }
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
-    message.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_RESOURCE_COMMAND, WIN_LOSE_RESOURCE_LOAD_ID);
     message.payload.widget.data.text = animationFile;
     m_winLoseWindow->BroadcastMessage(message);
     message.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
     message.payload.widget.data.text = animationFile;
     m_winLoseWindow->BroadcastMessage(message);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
-    message.payload.widget.id = WIN_LOSE_TEXT_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_TEXT_COMMAND, WIN_LOSE_TEXT_ID);
     message.payload.widget.data.text = gText;
     m_winLoseWindow->BroadcastMessage(message);
     ShowDeadArmies(m_winLoseWindow);
@@ -2423,9 +2355,7 @@ i32 combatManager::DoSurrender(void) {
     window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, "surrendr.bin");
     if (window == NULL)
         MemError();
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
-    message.payload.widget.id = SURRENDER_PORTRAIT_RESOURCE_ID;
+    SET_WIDGET_MESSAGE(message, COMBAT_WIN_LOSE_RESOURCE_COMMAND, SURRENDER_PORTRAIT_RESOURCE_ID);
     sprintf(
         gText,
         "port%04d.icn",
@@ -2616,24 +2546,13 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         actionData[IDX(ACTION_DATA_EXTRA)] = giNextActionExtra;
         actionData[IDX(ACTION_DATA_GRID)] = giNextActionGridIndex;
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
-        LogInt(
-            "About to T",
-            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)],
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("About to T", iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)]);
         transmitResult = TransmitRemoteData(
             reinterpret_cast<char*>(actionData),
             iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)],
             sizeof(actionData),
             REMOTE_COMMAND_ACTION,
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
+            1
         );
         LogStr("Post T");
         if (transmitResult == 0)
@@ -3232,18 +3151,7 @@ void combatManager::ViewBallista(i32 quickView) {
         strcat(gText, description);
     }
 
-    NormalDialog(
-        gText,
-        quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-        NORMAL_DIALOG_NO_RESOURCE,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0
-    );
+    NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
 DATA(0x0052410c) b32 gbThisNetHasControl;

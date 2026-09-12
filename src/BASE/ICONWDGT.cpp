@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/iconWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/icon.h>
@@ -170,9 +171,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
         case MESSAGE_RIGHT_BUTTON_UP:
             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                 m_flags &= ~WIDGET_FLAG_SELECTED;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 // Never taken: msg.type was retyped to MESSAGE_WIDGET above.
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;

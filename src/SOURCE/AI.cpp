@@ -121,9 +121,7 @@ i32 combatManager::AICheckRetreat(void) {
                 armyIndex = COMBAT_AI_GROUP_SCAN_DONE;
         }
 
-        force[sideNum] =
-            gpPhilAI
-                ->FightValueOfStack(armies, sideHero, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
+        force[sideNum] = gpPhilAI->FightValueOfStack(armies, sideHero, COMBAT_AI_FIGHT_VALUE_MODE);
         if (m_combatTowns[sideNum] != NULL)
             force[sideNum] =
                 static_cast<i32>(force[sideNum] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);

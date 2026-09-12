@@ -31,7 +31,8 @@ Planned groups:
 7. Whole-tree caller/contract review, explicit disposition of every finding,
    combined verification, refreshed inventory and PR handoff.
 
-No audit family is marked implemented by this initial progress record.
+Completed groups and explicit dispositions follow below. Unlisted families are
+still pending application review, not implicitly implemented.
 
 ## Reproducible verification inputs
 
@@ -78,5 +79,73 @@ exact compared functions and 291,995/291,995 data bytes. Those report totals do
 not replace the raw-byte/ordered-relocation controls above. `homm2 selftest`
 passes all 888 tests, including the four new link-graph regressions.
 
-Current implementation stage: the shared widget-message macro and seven
-declaration-default families.
+## Group 1: existing message and optional-argument APIs
+
+| Family | Retained application |
+| --- | --- |
+| H01 | One `SET_WIDGET_MESSAGE` in `BASE/message.h`, replacing two private definitions and 75 exact ordered triples in 26 further TUs. Four existing calls remain. Type/command/id order, payload tails, modifier preservation and subsequent id-only broadcasts are unchanged. |
+| H17 | Six trailing sentinel defaults on `LogInt` and its strict enum bridge; 42 calls shortened at their actual trailing-sentinel boundary. Required first value and meaningful numeric zero slots stay explicit. |
+| H30 | Exact text-only defaults on `NormalDialog`; 238 calls shortened. Mode is required; resource-bearing dialogs and nondefault positions retain their full arguments. |
+| H42 | Three trailing draw defaults on `CombatClipDrawToBuffer`; 29 calls shortened. Limits/orientation/result tests remain, as do nonzero offsets and palette/shear arguments. |
+| H68 | Retry-dialog/default-message defaults on `TransmitRemoteData`; 25 calls shortened. Reliability remains the explicit fifth argument, including SendMapChange's zero. The explicit non-default message type remains. |
+| H82 | Final `i8 extra = -1` on `GiveArtifact`; 31 calls shortened. End-game policy and the four special spell/metadata grants remain explicit. |
+| H85 | Final `waitTime = -1` on `WaitEndSample`; all 23 calls shortened. The negative sentinel still selects the callee's finite 4000-ms default. |
+| H94 | Three final zero defaults on `FightValueOfStack`; 24 calls shortened. Hero/raw mode remains explicit. The five nondefault town/enemy cases, including town id -1, stay unchanged. |
+
+Total: 412 shorter calls and 75 named message-header protocols. Declaration
+parameter types, decorated callable identities and out-of-line implementations
+are unchanged. Only changed C++ ranges were formatted, without include sorting.
+
+H01 has two complete four-arm clean-state structural comparisons, documented in
+[the measured source dossier](../matching/SetWidgetMessage/shared-macro.cpp).
+The original sequence, parenthesized sequence and comma expression all reproduce
+the tested retail functions. `do/while(0)` adds instructions at `/Od` and is
+rejected. The comma expression is one safe statement at a conditional call site;
+its repeated message operand must remain a stable expression.
+
+The combined raw-object control passes for all 98 objects: 1,516 non-debug
+sections retain their bytes, sizes and flags, and all 42,433 ordered relocation
+records retain their sites, types and destinations. All named symbol coordinates
+and storage classes remain unchanged. Only actual defined static-data `$SG`/`$T`
+and code-label `$L` counter suffixes may be renumbered, never their destinations. The reusable
+`homm2.audit.object_equivalence` control includes 16 negative/positive tests;
+it rejects changed instructions, addends, ordered targets, section flags, named
+symbols, empty comparisons and missing/added objects.
+The full tool suite passes all 904 tests after group 1.
+
+Reproduce after saving the pre-edit raw object directory:
+
+```sh
+homm2 build
+python3 -m homm2.audit.object_equivalence \
+  build/readability/baseline-objects build/objdiff/base
+homm2 relocs --fields
+homm2 selftest
+```
+
+`homm2 build` keeps the baseline report totals. Explicit `homm2 relocs --fields`
+passes: 1,727 functions, 38,307 ordered sites and zero structural review items.
+The fixed-width-integer gate also passes.
+
+## Existing verification limitations (not suppressed)
+
+The canonical branch has `AUDITS = False` in `homm2/cli.py`; its `homm2 build`
+does **not** run the hard gates described by the older build documentation.
+This PR does not switch that policy or silently count skipped checks as passes.
+The separately invoked gates reveal existing failures:
+
+- `assert_decls`: AudiereEffectsState and SeedPositionState are TU-local structs.
+- `assert_defs_declared`: the same five missing-owner-header/declaration reports
+  reproduce in the unchanged audit worktree at `77b87cd47`.
+- `assert_no_fake_labels`: two existing missing functions and 97 attribution
+  reports. The all-object control confirms the entire named-symbol set is
+  unchanged by group 1.
+- `annotated_functions`: private-function parsing rejects the VC6 STL headers.
+- Strict Clang: 95/96 TUs fail in those old SDK headers. Repeating the complete
+  check with `-ferror-limit=0` produces 1,615 errors, all confined to eight VC6
+  STL headers, and **zero errors in game source/headers**. This is not a passing
+  strict compile. No vendor-header patch, error suppression, weakened gate or
+  compiler-flag change is retained.
+
+These baseline limitations remain distinct from the passing raw-object and
+retail-relocation controls. They are not permission to introduce new failures.

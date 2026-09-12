@@ -658,7 +658,7 @@ mapCell* advManager::MoveHero(
                     NULL,
                     NULL
                 );
-                WaitEndSample(&fizzleSample, -1);
+                WaitEndSample(&fizzleSample);
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:
@@ -888,7 +888,7 @@ adjacentDone:
                 }
                 if (mapEvent->artifact != -1
                     && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
-                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
+                    GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
                     mapEvent->active = false;
             }
@@ -916,7 +916,7 @@ adjacentDone:
             }
             if (mapEvent->artifact != -1
                 && movingHero_g->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
-                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true, -1);
+                GiveArtifact(movingHero_g, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {
                     secondaryType = primaryType;
                     secondaryAmount = primaryAmount;
@@ -1230,92 +1230,38 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_MY_TURN:
-            LogInt(
-                "MC My Turn",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC My Turn", change.x, change.y);
             break;
 
         case MAP_CHANGE_TELEPORT_HERO:
-            LogInt(
-                "MC Teleport Hero",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC Teleport Hero", change.x, change.y);
             mapHero_b = gpGame->GetHero(change.id);
             TeleportTo(mapHero_b, change.x, change.y, 0, 1);
             break;
 
         case MAP_CHANGE_CLAIM_MINE:
-            LogInt(
-                "MC ClaimMine",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC ClaimMine", LOG_UNUSED_VALUE);
             gpGame->ClaimMine(change.id, change.player);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_CLAIM_TOWN:
-            LogInt(
-                "MC ClaimTown",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC ClaimTown", LOG_UNUSED_VALUE);
             gpGame->ClaimTown(change.id, change.player, 1);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_BUILD_BOAT:
-            LogInt(
-                "MC BuildBoat",
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC BuildBoat", LOG_UNUSED_VALUE);
             gpGame->CreateBoat(change.x, change.y, 1);
             CompleteDraw(0);
             UpdateScreen(0, 0);
             break;
 
         case MAP_CHANGE_ERASE_OBJECT:
-            LogInt(
-                "MC Erase Object",
-                change.x,
-                change.y,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("MC Erase Object", change.x, change.y);
             eventCell_a = GetCell(change.x, change.y);
             EraseObj(eventCell_a, change.x, change.y);
             CompleteDraw(0);
@@ -1393,32 +1339,14 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == incoming->sequence) {
-                LogInt(
-                    "OQ",
-                    incoming->sequence,
-                    giMapChangeCtr,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE
-                );
+                LogInt("OQ", incoming->sequence, giMapChangeCtr);
                 goto duplicateChange;
             }
         }
 
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type == MAP_CHANGE_NONE) {
-                LogInt(
-                    "SQ",
-                    incoming->sequence,
-                    giMapChangeCtr,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE,
-                    LOG_UNUSED_VALUE
-                );
+                LogInt("SQ", incoming->sequence, giMapChangeCtr);
                 sMapChangeQueue[slot] = *incoming;
                 goto duplicateChange;
             }
@@ -1531,16 +1459,7 @@ void SendMapChange(
         return;
     if (player == MAP_CHANGE_CURRENT_PLAYER)
         player = giCurPlayer;
-    LogInt(
-        "Send Map Change",
-        type,
-        id,
-        x,
-        y,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Send Map Change", type, id, x, y);
     memset(&change, 0, sizeof(change));
     change.type = type;
     change.id = id;
@@ -1562,9 +1481,7 @@ void SendMapChange(
         CURSOR_REMOTE_PLAYER_ALL,
         sizeof(sMapChangeLastFew),
         CURSOR_REMOTE_PACKET_TYPE,
-        0,
-        CURSOR_REMOTE_RELIABLE,
-        REMOTE_MESSAGE_DEFAULT
+        0
     );
 }
 

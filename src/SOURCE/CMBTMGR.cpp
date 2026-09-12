@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/DebugCheck.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindow.h>
@@ -525,7 +526,7 @@ i32 combatManager::Open(i32 openFlags) {
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
-    WaitEndSample(&preBattleSample, -1);
+    WaitEndSample(&preBattleSample);
 
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
@@ -1075,7 +1076,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
     if (!gbNoShowCombat)
-        WaitEndSample(&moraleSample, -1);
+        WaitEndSample(&moraleSample);
 }
 
 VA(0x00428649, 0x176)
@@ -1119,7 +1120,7 @@ i32 combatManager::CheckApplyBadMorale(
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
-        WaitEndSample(&moraleSample, -1);
+        WaitEndSample(&moraleSample);
     return 1;
 }
 
@@ -1471,10 +1472,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             static_cast<i32l>(projectileY4),
             spriteFrame16,
             &limits9,
-            ICON_DRAW_NORMAL,
-            0,
-            NULL,
-            NULL
+            ICON_DRAW_NORMAL
         );
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
@@ -1602,8 +1600,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     m_catapultFrame[IDX(side)] = 0;
     DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
     gpResourceManager->Dispose(boulder3);
-    WaitEndSample(&impactSound19, -1);
-    WaitEndSample(&catapultSound, -1);
+    WaitEndSample(&impactSound19);
+    WaitEndSample(&catapultSound);
     if (loadedSample18)
         gpResourceManager->Dispose(loadedSample18);
     LogStr("CA2");
@@ -1741,7 +1739,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target9->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
     target9->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-    WaitEndSample(&keepSample7, -1);
+    WaitEndSample(&keepSample7);
 }
 
 VA(0x00429ff2, 0x128)
@@ -1959,7 +1957,7 @@ void combatManager::LowerDoor(void) {
         m_drawbridgeState = bridgeFrame;
         DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     }
-    WaitEndSample(&drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample);
 }
 
 VA(0x0042a91a, 0xb6)
@@ -1975,7 +1973,7 @@ void combatManager::RaiseDoor(void) {
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
-    WaitEndSample(&drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample);
 }
 
 VA(0x0042a9d0, 0x61)
@@ -2271,9 +2269,7 @@ void combatManager::CombatSystemOptions(void) {
 VA(0x0042b346, 0x1e1)
 void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
-    message.type = COMBAT_SYSTEM_OPTION_EVENT;
-    message.payload.widget.command = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
-    message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
+    SET_WIDGET_MESSAGE(message, COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE, SYSTEM_OPTION_SPEED_BUTTON);
     message.payload.widget.data.value =
         gConfig.combatSpeed + SYSTEM_OPTION_SPEED_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
@@ -2357,18 +2353,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(
-                        gCSPanelHelp[helpIndex],
-                        SYSTEM_OPTION_HELP_DIALOG,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    NormalDialog(gCSPanelHelp[helpIndex], SYSTEM_OPTION_HELP_DIALOG);
                 }
             }
         } else {

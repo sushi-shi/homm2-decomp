@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -71,11 +72,6 @@ H2_RETAIL_INLINE textWidget::~textWidget() {
     H2_FREE(m_text);
 }
 
-#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
-    messageValue.type = MESSAGE_WIDGET;                                                          \
-    messageValue.payload.widget.command = commandValue;                                          \
-    messageValue.payload.widget.id = idValue
-
 VA(0x004c3240, 0x226)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
@@ -135,7 +131,6 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
     return widget::Main(msg);
 }
 
-#undef SET_WIDGET_MESSAGE
 
 VA(0x004c3470, 0x82)
 void textWidget::Draw(void) {

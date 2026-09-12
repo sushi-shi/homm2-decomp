@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
@@ -303,9 +304,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
             y = message.payload.mouse.y - m_owner->m_posY;
             if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
                 if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -483,9 +482,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
             } else {
                 if (m_itemSelectionTracking) {
                     m_itemSelectionTracking = 0;
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
                     message.payload.widget.data.value = m_selectedIndex;
                     message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
                     if (m_selectedIndex == m_lastSelectedIndex) {

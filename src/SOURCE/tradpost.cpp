@@ -188,9 +188,7 @@ void UpdateTradingPost(i32 draw) {
                                 : "\xd0\xfb\xed\xee\xea" /* "Рынок" */
         );
     }
-    messageTemp.type = MESSAGE_WIDGET;
-    messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
-    messageTemp.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(messageTemp, TRADING_POST_SET_TEXT, 1);
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 

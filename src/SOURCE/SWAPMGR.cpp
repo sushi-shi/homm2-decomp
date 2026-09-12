@@ -439,16 +439,10 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    /* Нельзя передать этот предмет. */ "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+                                    /* Нельзя передать этот предмет. */
+                                    "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc"
+                                    "\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }
@@ -514,16 +508,10 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    /* Нельзя передать этот предмет. */ "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_VALUE,
-                                    0
+                                    /* Нельзя передать этот предмет. */
+                                    "\xcd\xe5\xeb\xfc\xe7\xff\x20\xef\xe5\xf0\xe5\xe4\xe0\xf2\xfc"
+                                    "\x20\xfd\xf2\xee\xf2\x20\xef\xf0\xe5\xe4\xec\xe5\xf2\x2e",
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }

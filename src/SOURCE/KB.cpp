@@ -4,6 +4,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/ARMY.h>
+#include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
@@ -417,16 +418,8 @@ void SetupCDRom(void) {
                 "\xe4\xee\xf1\xf2\xf3\xef\xe0 \xea CD-ROM \xc3\xe5\xf0\xee\xe8 2 \xe1\xf3\xe4\xf3"
                 "\xf2 \xef\xee\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xf2\xfc \xf2\xee\xeb\xfc\xea\xee "
                 "\xf1\xe5\xf2\xe5\xe2\xf3\xfe \xe8\xe3\xf0\xf3 \xe2 \xf0\xe5\xe6\xe8\xec\xe5 "
-                    "\xe3\xee\xf1\xf2\xff.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xe3\xee\xf1\xf2\xff.",
+                NORMAL_DIALOG_INFO
             );
         gbNoCDRom = true;
     } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
@@ -447,16 +440,8 @@ void SetupCDRom(void) {
                 "\xe3\xf0\xe0\xec\xec\xf3 \xe8 \xe2\xf1\xf2\xe0\xe2\xfc\xf2\xe5 \xe4\xe8\xf1\xea "
                 "\xe2 \xef\xf0\xe8\xe2\xee\xe4 \xe8 \xef\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 "
                 "\xe7\xe0\xef\xf3\xf1\xf2\xe8\xf2\xfc \xe8\xe3\xf0\xf3 \xe5\xf9\xe5 \xf0\xe0"
-                    "\xe7.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xe7.",
+                NORMAL_DIALOG_INFO
             );
         gbNoCDRom = true;
     }
@@ -861,9 +846,7 @@ i32 oldmain(void) {
                         player_h,
                         sizeof(OldMainNetSetup),
                         OLD_MAIN_NETWORK_PACKET,
-                        1,
-                        1,
-                        REMOTE_MESSAGE_DEFAULT
+                        1
                     );
                     if (!transmissionResult_d)
                         ShutDown(NULL);
@@ -883,16 +866,8 @@ i32 oldmain(void) {
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
                     "\xce\xe6\xe8\xe4\xe0\xfe \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xe3\xf0\xee"
-                        "\xe2\xfb\xf5 \xe4\xe0\xed\xed\xfb\xf5.",
-                    OLD_MAIN_DIALOG_WAIT,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xe2\xfb\xf5 \xe4\xe0\xed\xed\xfb\xf5.",
+                    OLD_MAIN_DIALOG_WAIT
                 );
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
@@ -1327,18 +1302,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(
-                    gInitMenuHelp[helpIndex],
-                    MENU_HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
             }
         }
     } else {
@@ -1874,59 +1838,21 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                     }
                     switch (resType) {
                         case EVENT_WINDOW_LUCK:
-                            NormalDialog(
-                                cLuckInfo[IDX(LUCK_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[IDX(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_BAD_LUCK:
-                            NormalDialog(
-                                cLuckInfo[IDX(LUCK_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(cLuckInfo[IDX(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case EVENT_WINDOW_MORALE:
                             NormalDialog(
                                 cMoraleInfo[IDX(MORALE_INFO_GOOD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_BAD_MORALE:
                             NormalDialog(
                                 cMoraleInfo[IDX(MORALE_INFO_BAD)],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
@@ -1937,90 +1863,30 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                                 "\xec \xf1\xe2\xee\xe8 \xf3\xf0\xee\xe2\xed\xe8, \xf3"
                                 "\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xf2\xfc \xef\xe5"
                                 "\xf0\xe2\xe8\xf7\xed\xfb\xe5 \xe8 \xe2\xf2\xee\xf0"
-                                    "\xe8\xf7\xed\xfb\xe5 \xed\xe0\xe2\xfb\xea\xe8.",
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xe8\xf7\xed\xfb\xe5 \xed\xe0\xe2\xfb\xea\xe8.",
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
                             if (resExtra == IDX(ARTIFACT_SPELL_SCROLL)) {
                                 sprintf(gText, gArtifactDesc[resExtra], gSpellNames[xTheSpell]);
-                                NormalDialog(
-                                    gText,
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             } else {
-                                NormalDialog(
-                                    gArtifactDesc[resExtra],
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gArtifactDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             }
                             break;
                         case NORMAL_DIALOG_SPELL:
-                            NormalDialog(
-                                gSpellDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gSpellDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
                                 cSecSkillDesc[resExtra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
                                              [resExtra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case NORMAL_DIALOG_PRIMARY_SKILL:
-                            NormalDialog(
-                                gStatDesc[resExtra],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
+                            NormalDialog(gStatDesc[resExtra], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_RESOURCE_WOOD:
                         case NORMAL_DIALOG_RESOURCE_MERCURY:
@@ -2056,16 +1922,8 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                                 "\xe2\xe5\xe4\xe5\xed\xe8\xff \xeb\xf3\xf7\xf8\xe8"
                                 "\xf5 \xef\xee\xf1\xf2\xf0\xee\xe5\xea \xe8 \xef\xee"
                                 "\xea\xf3\xef\xea\xe8 \xf1\xe8\xeb\xfc\xed\xfb\xf5 "
-                                    "\xe2\xee\xe8\xed\xee\xe2.",
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                "\xe2\xee\xe8\xed\xee\xe2.",
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                     }
@@ -2197,7 +2055,7 @@ void CheckEndGame(
                 if (player == giThisGamePos) {
                     showedDialog_o = true;
                     sprintf(gText, "\xc2\xfb \xe1\xfb\xeb\xe8 \xe8\xf1\xea\xeb\xfe\xf7\xe5\xed\xfb \xe8\xe7 \xe8\xe3\xf0\xfb!!!");
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 } else {
                     sprintf(gText, "%s \xf1\xee\xea\xf0\xf3\xf8\xe5\xed!", cPlayerNames[player]);
                     NormalDialog(
@@ -2340,7 +2198,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 sprintf(gText, "\xc2\xf0\xe0\xe3 \xf0\xe0\xe7\xe1\xe8\xf2, \xe0 \xe2\xe0\xf8\xe0 \xe0\xf0\xec\xe8\xff \xef\xf0\xe0\xe7\xe4\xed\xf3\xe5\xf2 \xf2\xf0\xe8\xf3\xec\xf4!");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2372,7 +2230,7 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2386,7 +2244,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "%s \xef\xe0\xeb! \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.", lossTown->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2423,7 +2281,7 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(gText, 1);
                 }
             }
         }
@@ -2441,7 +2299,7 @@ void CheckEndGame(
                     "%s - \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xe3\xe5\xf0\xee\xe9, \xf3 \xe2\xe0\xf1 \xe2 \xef\xeb\xe5\xed\xf3! \xc2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5 \xe7\xe0\xe2\xe5\xf0\xf8\xe5\xed\xee.",
                     winningHeroEntry_g->m_name
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2454,7 +2312,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "%s - \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9, \xe1\xfb\xeb \xef\xee\xe2\xe5\xf0\xe6\xe5\xed.  \xc2\xfb \xef\xf0\xee\xe2\xe0\xeb\xe8\xeb\xe8 \xe2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5.", lossHero_k->m_name);
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2467,7 +2325,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "\xc2\xfb \xed\xe5 \xf3\xf1\xef\xe5\xeb\xe8 \xe7\xe0\xe2\xe5\xf0\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe5 \xe7\xe0\xe4\xe0\xed\xe8\xe5 \xe2 \xf1\xf0\xee\xea. \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2529,7 +2387,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2551,7 +2409,7 @@ void CheckEndGame(
                     gText,
                     "\xc2\xf1\xe5 \xe3\xee\xf0\xee\xe4\xe0 \xe3\xed\xee\xec\xee\xe2 \xef\xe0\xeb\xe8. \xdd\xf2\xee \xf1\xee\xea\xf0\xf3\xf8\xe8\xf2\xe5\xeb\xfc\xed\xee\xe5 \xef\xee\xf0\xe0\xe6\xe5\xed\xe8\xe5! \xc2\xfb \xef\xf0\xee\xe8\xe3\xf0\xe0\xeb\xe8."
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2563,7 +2421,7 @@ void CheckEndGame(
         if (!showedDialog_o) {
             showedDialog_o = true;
             sprintf(gText, "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xef\xe0\xeb! \xd2\xe5\xef\xe5\xf0\xfc \xe2\xfb \xcf\xee\xe2\xe5\xeb\xe8\xf2\xe5\xeb\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2.");
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
         }
     }
 
@@ -2583,7 +2441,7 @@ void CheckEndGame(
             if (!showedDialog_o) {
                 showedDialog_o = true;
                 sprintf(gText, "\xd0\xee\xeb\xe0\xed\xe4 \xef\xeb\xe5\xed\xe5\xed! \xc2\xf1\xe5 \xef\xee\xf2\xe5\xf0\xff\xed\xee.");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2604,7 +2462,7 @@ void CheckEndGame(
             if (!showedDialog_o && winFlag) {
                 showedDialog_o = true;
                 sprintf(gText, "\xc2\xf0\xe0\xe3 \xf0\xe0\xe7\xe1\xe8\xf2, \xe0 \xe2\xe0\xf8\xe0 \xe0\xf0\xec\xe8\xff \xef\xf0\xe0\xe7\xe4\xed\xf3\xe5\xf2 \xf2\xf0\xe8\xf3\xec\xf4!");
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
             }
         }
     }
@@ -2904,7 +2762,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     }
 
 showDialog:
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 VA(0x0046b6ab, 0x33e)
@@ -2958,7 +2816,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     if (modifierStart == static_cast<i32>(strlen(gText)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
 
-    NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, dialogType);
 }
 
 VA(0x0046b9e9, 0xac)
@@ -3203,9 +3061,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
     if (netWindow_j == NULL)
         MemError();
 
-    updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-    updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-    updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
+    SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
     updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
     netWindow_j->BroadcastMessage(updateMessage_i);
     updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3348,9 +3204,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
                 BOX_PACKET_BUFFER_SIZE,
                 strlen(inputText_b) + 1,
                 BOX_REMOTE_CHAT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
             if (!result_p)
                 ShutDown(NULL);
@@ -3362,9 +3216,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
 
         if (redrawLines_l) {
             redrawLines_l = false;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_FIRST_LINE_ID);
             updateMessage_i.payload.widget.data.text = cNetBoxLine[0];
             netWindow_j->BroadcastMessage(updateMessage_i);
             updateMessage_i.payload.widget.id = BOX_FIRST_LINE_ID + 1;
@@ -3401,9 +3253,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             else
                 inputText_b[inputLength_a] = BOX_CURSOR_GLYPH;
             inputText_b[inputLength_a + 1] = 0;
-            updateMessage_i.type = NET_BOX_UPDATE_MESSAGE;
-            updateMessage_i.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_i.payload.widget.id = BOX_INPUT_ID;
+            SET_WIDGET_MESSAGE(updateMessage_i, NET_BOX_TEXT_COMMAND, BOX_INPUT_ID);
             updateMessage_i.payload.widget.data.text = inputText_b;
             netWindow_j->BroadcastMessage(updateMessage_i);
             netWindow_j->DrawWindow();
@@ -3522,16 +3372,7 @@ void FileError(H2_CONST char* filename) {
     char buf1[FILE_ERROR_BUFFER_SIZE];
     err = errno;
     sprintf(buf1, "File Error %s", strerror(err));
-    LogInt(
-        buf1,
-        err,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(buf1, err);
     sprintf(
         buf,
         "\xce\xf8\xe8\xe1\xea\xe0 \xee\xf2\xea\xf0\xfb\xf2\xe8\xff \xf4\xe0\xe9\xeb\xe0 %s!",
@@ -3839,7 +3680,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
                 if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
             }
@@ -4596,7 +4437,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
                 sprintf(gText, "\xc2\xfb \xe1\xfb\xeb\xe8 \xe8\xf1\xea\xeb\xfe\xf7\xe5\xed\xfb \xe8\xe7 \xe8\xe3\xf0\xfb!!!");
-                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
                 gbGameOver = true;
                 giEndSequence = false;
                 return;
@@ -4623,7 +4464,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[hostNetPosition].name
             );
-            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 DropDownToOnePlayer();
             } else {
@@ -4736,7 +4577,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         }
-        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
         exitInfo.continueGame = gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE;
     }
 
@@ -4748,9 +4589,7 @@ exitInfoProcessed:
                 1 - giThisNetPos,
                 sizeof(exitInfo),
                 ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                1,
-                1,
-                REMOTE_MESSAGE_DEFAULT
+                1
             );
         }
         if (localPlayerLost_e)
@@ -4769,9 +4608,7 @@ exitInfoProcessed:
                     recipient,
                     sizeof(exitInfo),
                     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
-                    1,
-                    1,
-                    REMOTE_MESSAGE_DEFAULT
+                    1
                 );
             }
         }
@@ -4784,7 +4621,7 @@ playerExitHandled:
     if (localPlayerLost_e) {
         sprintf(gText, "\xc2\xfb \xe1\xfb\xeb\xe8 \xe8\xf1\xea\xeb\xfe\xf7\xe5\xed\xfb \xe8\xe7 \xe8\xe3\xf0\xfb!!!");
         RemoteCleanup();
-        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_INFO);
         gbGameOver = true;
         giEndSequence = false;
         return;
@@ -4837,9 +4674,7 @@ void SetWinText(heroWindow* j, i32 id) {
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
             a++;
-            msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            msg.payload.widget.id = gWinSetup[i].widgetId;
+            SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_TEXT, gWinSetup[i].widgetId);
             msg.payload.widget.data.text = gWinSetup[i].text;
             j->BroadcastMessage(msg);
         }
@@ -5605,9 +5440,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(borderWidget_k, -1);
     }
 
-    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    SET_WIDGET_MESSAGE(message_b, NORMAL_DIALOG_SET_TEXT_COMMAND, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message_b.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message_b);
 
@@ -5669,9 +5502,7 @@ VA(0x00470d22, 0x68)
 void UpdateNormalDialog(H2_CONST char* text) {
     i16 H2_UNUSED(show) = 1;
     tag_message evt;
-    evt.type = MESSAGE_WIDGET;
-    evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    evt.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(evt, WIDGET_COMMAND_SET_TEXT, 1);
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);

@@ -3,6 +3,7 @@
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
+#include <BASE/message.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <SOURCE/CURSOR.h>
@@ -3122,7 +3123,10 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(
+            const_cast<char*>("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9."),
+            1
+        );
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -3196,9 +3200,7 @@ void game::UpdateSpellWidgets(void) {
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_HUNDREDS_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
@@ -3207,37 +3209,27 @@ void game::UpdateSpellWidgets(void) {
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_TENS_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
     sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, VIEW_SPELL_MANA_ONES_ID);
     message.payload.widget.data.text = gText;
     m_viewSpellsWindow->BroadcastMessage(message);
 
     for (i = 0; i < VIEW_SPELL_PAGE_SIZE; i++) {
         if (m_viewSpellsTop[IDX(m_viewSpellsType)] + i
             >= m_viewSpellsCount[IDX(m_viewSpellsType)]) {
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_CLEAR_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
         } else {
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_viewSpellsWindow->BroadcastMessage(message);
 
@@ -3245,9 +3237,7 @@ void game::UpdateSpellWidgets(void) {
                 m_viewSpellsType,
                 m_viewSpellsTop[IDX(m_viewSpellsType)] + i + 1
             );
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FILL_COLOR, i + VIEW_SPELL_TEXT_ID_BASE);
             if (GetManaCost(spell1, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
                 message.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
             else
@@ -3270,33 +3260,23 @@ void game::UpdateSpellWidgets(void) {
                     GetManaCost(spell1, m_viewSpellsHero)
                 );
             }
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.text = gText;
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_TEXT_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = gsSpellInfo[IDX(spell1)].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message);
 
-            message.type = MESSAGE_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, i + VIEW_SPELL_ICON_ID_BASE);
             message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
         }
@@ -3332,9 +3312,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
-                            NormalDialog(
-                                gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
-                            );
+                            NormalDialog(gText, NORMAL_DIALOG_INFO);
                             break;
                         case VIEW_SPELL_PREVIOUS_ID:
                             if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] == 0) {
@@ -3412,57 +3390,25 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                         case VIEW_SPELL_PREVIOUS_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_PREVIOUS],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case VIEW_SPELL_NEXT_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_NEXT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case VIEW_SPELL_COMBAT_TAB_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_COMBAT],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
-                                NORMAL_DIALOG_QUICK_VIEW,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
+                                NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
                         case VIEW_SPELL_MANA_LABEL_ID:
@@ -3474,9 +3420,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 cSpellHelp[VIEW_SPELL_HELP_MANA],
                                 viewSpellsHero->m_spellPoints
                             );
-                            NormalDialog(
-                                gText, NORMAL_DIALOG_QUICK_VIEW, -1, -1, -1, 0, -1, 0, -1, 0
-                            );
+                            NormalDialog(gText, NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
                 } else {
@@ -3525,9 +3469,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
-                                NormalDialog(
-                                    gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
-                                );
+                                NormalDialog(gText, NORMAL_DIALOG_INFO);
                                 return MESSAGE_DISPATCH_CONTINUE;
                             }
                             gpGame->m_viewSpell = spell;
@@ -3944,16 +3886,12 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>("\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xf0\xe0\xf1\xef\xf3\xf1\xf2\xe8\xf2\xfc \xfd\xf2\xee\xf2 \xee\xf2\xf0\xff\xe4?"),
-                            NORMAL_DIALOG_CONFIRM,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
+                            const_cast<char*>(
+                                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                                "\xf5\xee\xf2\xe8\xf2\xe5 \xf0\xe0\xf1\xef\xf3\xf1\xf2\xe8\xf2\xfc "
+                                "\xfd\xf2\xee\xf2 \xee\xf2\xf0\xff\xe4?"
+                            ),
+                            NORMAL_DIALOG_CONFIRM
                         );
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
@@ -4031,9 +3969,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     }
 
     if (glTimers[0] < KBTickCount()) {
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        msg.payload.widget.id = VIEW_ARMY_MONSTER_WIDGET_ID;
+        SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SET_FRAME, VIEW_ARMY_MONSTER_WIDGET_ID);
         iViewArmyFrame = (iViewArmyFrame + 1)
                          % sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
         msg.payload.widget.data.value =
@@ -6347,8 +6283,7 @@ void game::ProcessOnMapHeroes(void) {
                                 GiveArtifact(
                                     mapHero14,
                                     ArtifactType(extra9->artifacts[recordPosition14]),
-                                    true,
-                                    -1
+                                    true
                                 );
                         }
                         if (extra9->hasCustomName)
@@ -6609,16 +6544,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     );
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
-    LogInt(
-        const_cast<char*>("PostDiffFileSize"),
-        fileSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("PostDiffFileSize"), fileSize);
 
     header = static_cast<i32*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
     if (gbUseRegularCompression)
@@ -6649,16 +6575,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
-        LogInt(
-            const_cast<char*>("Send"),
-            fileSize,
-            transmitCrc,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt(const_cast<char*>("Send"), fileSize, transmitCrc);
 
         header[REMOTE_SAVE_HEADER_FILE_SIZE] = fileSize;
         header[REMOTE_SAVE_HEADER_FILE_CRC] = fileCrc;
@@ -6706,9 +6623,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             remotePlayer,
                             chunkSize + REMOTE_PACKET_INDEX_SIZE,
                             REMOTE_SAVE_DATA_COMMAND,
-                            0,
-                            1,
-                            REMOTE_MESSAGE_DEFAULT
+                            0
                         );
                         if (!result)
                             ShutDown(NULL);
@@ -6741,15 +6656,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                 }
             }
         }
-        result = TransmitRemoteData(
-            NULL,
-            remotePlayer,
-            0,
-            REMOTE_SAVE_FINISH_COMMAND,
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
-        );
+        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_FINISH_COMMAND, 1);
         if (!result)
             ShutDown(NULL);
         success = true;
@@ -6839,16 +6746,7 @@ i32 game::ReceiveSaveGame(
     i32 H2_UNUSED(unused2080);
     i32l lastPacketTime;
 
-    LogInt(
-        const_cast<char*>("FW1"),
-        remotePlayer,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("FW1"), remotePlayer);
     LogStr(const_cast<char*>("RSG1"));
     AiPrint(const_cast<char*>("Receive Start - Getting Data"));
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
@@ -6875,15 +6773,7 @@ i32 game::ReceiveSaveGame(
     gSoundBackendsReady = samplesReady;
 
     LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
-    result = TransmitRemoteData(
-        NULL,
-        remotePlayer,
-        0,
-        REMOTE_SAVE_INIT_RESPONSE,
-        1,
-        1,
-        REMOTE_MESSAGE_DEFAULT
-    );
+    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_INIT_RESPONSE, 1);
     LogStr(const_cast<char*>("End Transmit Init Confirm"));
     if (!result)
         ShutDown(NULL);
@@ -6896,31 +6786,16 @@ i32 game::ReceiveSaveGame(
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA));
 
     lastPacketTime = KBTickCount();
-    LogInt(
-        const_cast<char*>("FW2"),
-        remotePlayer,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("FW2"), remotePlayer);
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
         if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
-                REMOTE_RECEIVE_DIALOG_BUTTONS,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff "
+                                  "\xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. "
+                                  "\xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
+                REMOTE_RECEIVE_DIALOG_BUTTONS
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 lastPacketTime = KBTickCount();
@@ -6948,24 +6823,13 @@ i32 game::ReceiveSaveGame(
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
-                    LogInt(
-                        const_cast<char*>("FW3"),
-                        remotePlayer,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
-                    );
+                    LogInt(const_cast<char*>("FW3"), remotePlayer);
                     result = TransmitRemoteData(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
                         REMOTE_PACKET_PAYLOAD_SIZE,
                         REMOTE_SAVE_ACK_RESPONSE_COMMAND,
-                        1,
-                        1,
-                        REMOTE_MESSAGE_DEFAULT
+                        1
                     );
                     if (!result)
                         ShutDown(NULL);
@@ -6979,16 +6843,7 @@ i32 game::ReceiveSaveGame(
 
     AiPrint(const_cast<char*>("Receive Start - Decompressing Data"));
     receivedCrc = calc_crc_long(incomingData, dataSize);
-    LogInt(
-        const_cast<char*>("Receive"),
-        dataSize,
-        receivedCrc,
-        expectedTransmitCrc,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("Receive"), dataSize, receivedCrc, expectedTransmitCrc);
     if (gbUseRegularCompression) {
         dataSize = DecodeData(
             reinterpret_cast<char*>(decodedData),
@@ -7000,16 +6855,7 @@ i32 game::ReceiveSaveGame(
         decodedData = incomingData;
         computedCrc = receivedCrc;
     }
-    LogInt(
-        const_cast<char*>("Receive"),
-        dataSize,
-        computedCrc,
-        expectedCrc,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("Receive"), dataSize, computedCrc, expectedCrc);
 
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
     file = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
@@ -7174,7 +7020,7 @@ void game::DoNewTurn(void) {
             }
             gpSoundManager->PlayAmbientMusic(musicTrack2);
             gpMouseManager->SetPointer(0);
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, 1);
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
             );
@@ -7413,16 +7259,7 @@ void CreateDiffFile(
         FileError(gText);
     read(readFile, fullData, joinSize);
     close(readFile);
-    LogInt(
-        const_cast<char*>("Orig Join CRC"),
-        calc_crc_long(fullData, joinSize),
-        joinSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("Orig Join CRC"), calc_crc_long(fullData, joinSize), joinSize);
 
     if (!forceWhole) {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
@@ -7574,16 +7411,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         FileError(gText);
     write(joinFile, outData, outSize);
     close(joinFile);
-    LogInt(
-        const_cast<char*>("New Join CRC"),
-        calc_crc_long(outData, outSize),
-        outSize,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(const_cast<char*>("New Join CRC"), calc_crc_long(outData, outSize), outSize);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
     joinFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);

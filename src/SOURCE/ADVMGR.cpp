@@ -1780,18 +1780,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                                     break;
                             }
                             if (helpId >= 0) {
-                                NormalDialog(
-                                    gAdvMenuHelp[helpId],
-                                    NORMAL_DIALOG_QUICK_VIEW,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
+                                NormalDialog(gAdvMenuHelp[helpId], NORMAL_DIALOG_QUICK_VIEW);
                                 break;
                             }
                         }
@@ -1963,7 +1952,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
-                            NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                            NormalDialog(gText, NORMAL_DIALOG_INFO);
                         }
                         break;
                     case INPUT_SCAN_ESCAPE:
@@ -2067,7 +2056,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         goto confirm_game_command;
                     confirm_game_command:
                         quit = 1;
-                        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                         if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                             quit = 0;
                         } else {
@@ -2429,16 +2418,11 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
                     "{\xca\xe0\xf0\xf2\xe0 \xec\xe8\xf0\xe0}\n\n"
-                        "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee \xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec.",
-                    NORMAL_DIALOG_QUICK_VIEW,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xcc\xe8\xed\xe8\xea\xe0\xf0\xf2\xe0 \xe8\xe7\xf3\xf7\xe5\xed\xed\xee\xe3\xee "
+                    "\xec\xe8\xf0\xe0. \xd9\xe5\xeb\xf7\xea\xee\xec \xeb\xe5\xe2\xee\xe9 "
+                    "\xea\xed\xee\xef\xea\xe8 \xf3\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc "
+                    "\xef\xf0\xee\xf1\xec\xee\xf2\xf0\xee\xec.",
+                    NORMAL_DIALOG_QUICK_VIEW
                 );
                 break;
             }
@@ -2536,17 +2520,16 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
             "{\xce\xea\xed\xee \xf1\xf2\xe0\xf2\xf3\xf1\xe0}\n\n"
-                "\xdd\xf2\xee \xee\xea\xed\xee \xf1\xee\xee\xe1\xf9\xe0\xe5\xf2 \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe \xee \xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe3\xe5\xf0\xee\xff \xe8\xeb\xe8 \xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0, \xe0 \xf2\xe0\xea\xe6\xe5, \xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xe5\xf2 \xea\xe0\xeb\xe5\xed\xe4\xe0\xf0\xfc. "
-                "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 \xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec \xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 \xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec.",
-            NORMAL_DIALOG_QUICK_VIEW,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xdd\xf2\xee \xee\xea\xed\xee \xf1\xee\xee\xe1\xf9\xe0\xe5\xf2 "
+            "\xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xfe \xee \xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8 "
+            "\xe2\xe0\xf8\xe5\xe3\xee \xe3\xe5\xf0\xee\xff \xe8\xeb\xe8 "
+            "\xea\xee\xf0\xee\xeb\xe5\xe2\xf1\xf2\xe2\xe0, \xe0 \xf2\xe0\xea\xe6\xe5, "
+            "\xef\xee\xea\xe0\xe7\xfb\xe2\xe0\xe5\xf2 \xea\xe0\xeb\xe5\xed\xe4\xe0\xf0\xfc. "
+            "\xc8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xe2 \xee\xea\xed\xe5 "
+            "\xec\xe5\xed\xff\xe5\xf2\xf1\xff \xef\xf0\xe8 \xf6\xe8\xea\xeb\xe8\xf7\xed\xee\xec "
+            "\xed\xe0\xe6\xe0\xf2\xe8\xe8 \xeb\xe5\xe2\xee\xe9 \xea\xed\xee\xef\xea\xe8 "
+            "\xec\xfb\xf8\xe8 \xed\xe0 \xed\xe5\xec.",
+            NORMAL_DIALOG_QUICK_VIEW
         );
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -2593,16 +2576,12 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 \xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?",
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xce\xe4\xe8\xed \xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee "
+                    "\xe3\xe5\xf0\xee\xe5\xe2 \xe2\xf1\xe5 \xe5\xf9\xe5 \xec\xee\xe3\xf3\xf2 "
+                    "\xf5\xee\xe4\xe8\xf2\xfc. \xc2\xfb "
+                    "\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 "
+                    "\xe7\xe0\xea\xee\xed\xf7\xe8\xf2\xfc \xf5\xee\xe4?",
+                    NORMAL_DIALOG_CONFIRM
                 );
                 if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                     break;
@@ -2687,17 +2666,12 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, \xe7\xe0\xe2\xf2\xf0\xe0."
-                /* "Раскопки артефакта занимают целый день." */,
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xd0\xe0\xf1\xea\xee\xef\xea\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 "
+            "\xe7\xe0\xed\xe8\xec\xe0\xfe\xf2 \xf6\xe5\xeb\xfb\xe9 \xe4\xe5\xed\xfc. "
+            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xf1\xed\xee\xe2\xe0, "
+            "\xe7\xe0\xe2\xf2\xf0\xe0."
+            /* "Раскопки артефакта занимают целый день." */,
+            1
         );
         return 1;
     }
@@ -2706,16 +2680,15 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 \xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 \xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, \xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. \xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff \xe7\xe0\xed\xff\xf2.",
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xcf\xee\xe8\xf1\xea\xe8 \xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
+            "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xe1\xf3\xe4\xf3\xf2 "
+            "\xe1\xe5\xf1\xef\xee\xeb\xe5\xe7\xed\xfb\xec\xe8. \xc5\xf1\xeb\xe8 \xe4\xe0\xe6\xe5 "
+            "\xe2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xe8 \xed\xe0\xe9\xe4\xe5\xf2 \xe5\xe3\xee, "
+            "\xf2\xee \xf3 \xed\xe5\xe3\xee \xef\xee\xef\xf0\xee\xf1\xf2\xf3 \xed\xe5\xf2 "
+            "\xec\xe5\xf1\xf2\xe0, \xf7\xf2\xee\xe1\xfb \xf3\xed\xe5\xf1\xf2\xe8 \xe5\xe3\xee. "
+            "\xc2\xe5\xf1\xfc \xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xfc \xe3\xe5\xf0\xee\xff "
+            "\xe7\xe0\xed\xff\xf2.",
+            1
         );
         return 1;
     }
@@ -2735,16 +2708,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5.",
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 "
+            "\xf7\xe8\xf1\xf2\xee\xe9 \xe7\xe5\xec\xeb\xe5.",
+            1
         );
         return 1;
     }
@@ -2753,16 +2719,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5!!!",
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xcf\xee\xef\xfb\xf2\xe0\xe9\xf2\xe5\xf1\xfc \xe8\xf1\xea\xe0\xf2\xfc \xed\xe0 "
+            "\xf1\xf3\xf8\xe5!!!",
+            1
         );
         return 1;
     }
@@ -2788,16 +2747,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (hero->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 \xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!",
-                    1,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xd3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 \xe4\xeb\xff \xe5\xf9\xe5 "
+                    "\xee\xe4\xed\xee\xe3\xee \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0!",
+                    1
                 );
             }
         } else {
@@ -2822,7 +2774,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                         gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
                 if (special) {
                     hero->ViewArtifact(ARTIFACT_SPHERE_NEGATION, false, -1);
                 } else {
@@ -2831,29 +2783,21 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
             }
             if (special) {
-                GiveArtifact(hero, ARTIFACT_SPHERE_NEGATION, true, -1);
+                GiveArtifact(hero, ARTIFACT_SPHERE_NEGATION, true);
             } else {
-                gaveArtifact =
-                    GiveArtifact(hero, gpGame->m_ultimateArtifactId, true, -1);
+                gaveArtifact = GiveArtifact(hero, gpGame->m_ultimateArtifactId, true);
             }
             gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog(
-            "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee \xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?",
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xc7\xe4\xe5\xf1\xfc \xed\xe8\xf7\xe5\xe3\xee.\n\xc3\xe4\xe5 \xe1\xfb \xfd\xf2\xee "
+            "\xec\xee\xe3\xeb\xee \xe1\xfb\xf2\xfc?",
+            1
         );
     }
     if (gbHumanPlayer[giCurPlayer]) {
-        WaitEndSample(&sample, -1);
+        WaitEndSample(&sample);
     }
     for (pl = 0; pl < gpGame->m_playerCount; ++pl) {
         ComputeUALoc(pl);
@@ -5355,9 +5299,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             m_mapOriginY + cellY
         );
     }
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = 1;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
     message.payload.widget.data.text = gText;
     pWin->BroadcastMessage(message);
     gpWindowManager->AddWindow(pWin, -1, 1);
@@ -6762,9 +6704,7 @@ void advManager::TownQuickView(
 
     SetWinText(window, TOWN_QUICK_WINDOW_TEXT);
     creatureCount = 0;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    message.payload.widget.id = TOWN_QUICK_PORTRAIT_WIDGET;
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, TOWN_QUICK_PORTRAIT_WIDGET);
     message.payload.widget.data.value =
         IDX(townPtr->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
     if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
@@ -7389,16 +7329,14 @@ void advManager::CastSpell(SpellType spell) {
             cell = gpAdvManager->GetCell(hero->m_x, hero->m_y);
             if (cell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))) {
                 NormalDialog(
-                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 \xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 (\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 \xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
-                    1,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe2\xf1\xf2\xe0\xf2\xfc \xf3 "
+                    "\xe2\xf5\xee\xe4\xe0 \xef\xe5\xf0\xe5\xe4 \xf8\xe0\xf5\xf2\xee\xe9 "
+                    "(\xeb\xe5\xf1\xee\xef\xe8\xeb\xea\xee\xe9 \xe8\xeb\xe8 "
+                    "\xeb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xe5\xe9 "
+                    "\xe0\xeb\xf5\xe8\xec\xe8\xea\xe0), \xf7\xf2\xee\xe1\xfb "
+                    "\xed\xe0\xef\xf0\xe0\xe2\xe8\xf2\xfc \xfd\xf2\xee "
+                    "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5.",
+                    1
                 );
                 return;
             }
@@ -7425,16 +7363,10 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = true;
             NormalDialog(
-                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xee\xef\xee\xe7\xed\xe0\xed\xfb.",
-                1,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xd2\xe5\xef\xe5\xf0\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 "
+                "\xe3\xe5\xf0\xee\xe8 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe "
+                "\xee\xef\xee\xe7\xed\xe0\xed\xfb.",
+                1
             );
             break;
         case SPELL_SUMMON_BOAT:
@@ -7445,16 +7377,12 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (hero->m_remainingMobility == 0) {
                 NormalDialog(
-                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec \xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. \xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
-                    1,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
+                    "\xc2\xe0\xf8 \xe3\xe5\xf0\xee\xe9 \xf1\xeb\xe8\xf8\xea\xee\xec "
+                    "\xe8\xe7\xec\xee\xf2\xe0\xed, \xf7\xf2\xee\xe1\xfb "
+                    "\xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xf2\xfc "
+                    "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xf1\xe5\xe3\xee\xe4\xed\xff. "
+                    "\xcf\xee\xef\xf0\xee\xe1\xf3\xe9\xf2\xe5 \xe7\xe0\xe2\xf2\xf0\xe0.",
+                    1
                 );
                 return;
             }
@@ -7535,17 +7463,10 @@ i32 SaveGame(void) {
         ok = gpGame->SaveGame(gLastFilename, 0, 0);
         if (ok) {
             NormalDialog(
-                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee \xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
-                    /* "Игра успешно сохранена." */,
-                1,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
+                "\xc8\xe3\xf0\xe0 \xf3\xf1\xef\xe5\xf8\xed\xee "
+                "\xf1\xee\xf5\xf0\xe0\xed\xe5\xed\xe0."
+                /* "Игра успешно сохранена." */,
+                1
             );
         }
     }
@@ -8498,16 +8419,10 @@ void advManager::DimensionDoor(void) {
             || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc \xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 \xe2\xf0\xe0\xf2\xe0!!!",
-                OPTION_DIALOG_MESSAGE,
-                OPTION_DIALOG_NONE,
-                OPTION_DIALOG_NONE,
-                OPTION_DIALOG_NONE,
-                0,
-                OPTION_DIALOG_NONE,
-                0,
-                OPTION_DIALOG_NONE,
-                0
+                "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xee\xf2\xea\xf0\xfb\xf2\xfc "
+                "\xcf\xf0\xee\xf1\xf2\xf0\xe0\xed\xf1\xf2\xe2\xe5\xed\xed\xfb\xe5 "
+                "\xe2\xf0\xe0\xf2\xe0!!!",
+                OPTION_DIALOG_MESSAGE
             );
             UpdateRadar(1, 0);
         } else {
@@ -8573,31 +8488,19 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
-            OPTION_DIALOG_MESSAGE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0
+            "\xcd\xe5\xf2 \xe4\xee\xf1\xf2\xf3\xef\xed\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0.  "
+            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            OPTION_DIALOG_MESSAGE
         );
         return;
     }
     if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         NormalDialog(
-            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, \xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
-            OPTION_DIALOG_MESSAGE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0
+            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee! \xc2\xfb "
+            "\xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xed\xe0 \xf1\xf3\xf8\xe5, "
+            "\xf7\xf2\xee\xe1\xfb \xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
+            "\xf1\xf0\xe0\xe1\xee\xf2\xe0\xeb\xee.",
+            OPTION_DIALOG_MESSAGE
         );
         return;
     }
@@ -8612,17 +8515,17 @@ void advManager::TownGate(SpellType spellId) {
             gText,
             "{\xcf\xee\xf0\xf2\xe0\xeb \xe3\xee\xf0\xee\xe4\xe0}\x0a\x0a\xc2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xee\xf0\xee\xe4, \xea\xf3\xe4\xe0 \xf5\xee\xf2\xe8\xf2\xe5 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8\xf1\xfc:"
         );
-        message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
-        message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
-        message.payload.widget.id = TOWN_PORTAL_TITLE_WIDGET;
+        SET_WIDGET_MESSAGE(message, ADVMGR_TOWN_PORTAL_COMMAND_TEXT, TOWN_PORTAL_TITLE_WIDGET);
         message.payload.widget.data.text = gText;
         townPortalWin->BroadcastMessage(message);
 
         for (i = 0; i < gpCurPlayer->m_townCount; ++i) {
             sprintf(gText, gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_name);
-            message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
-            message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_ADD_TOWN;
-            message.payload.widget.id = TOWN_PORTAL_CHOICE_WIDGET;
+            SET_WIDGET_MESSAGE(
+                message,
+                ADVMGR_TOWN_PORTAL_COMMAND_ADD_TOWN,
+                TOWN_PORTAL_CHOICE_WIDGET
+            );
             message.payload.widget.data.text = gText;
             townPortalWin->BroadcastMessage(message);
         }
@@ -8656,16 +8559,10 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTown]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 \xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. \xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
-            OPTION_DIALOG_MESSAGE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0
+            "\xc1\xeb\xe8\xe6\xe0\xe9\xf8\xe8\xe9 \xe3\xee\xf0\xee\xe4 "
+            "\xee\xea\xea\xf3\xef\xe8\xf0\xee\xe2\xe0\xed. "
+            "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xef\xf0\xe5\xf0\xe2\xe0\xed\xee!",
+            OPTION_DIALOG_MESSAGE
         );
         return;
     }
@@ -8837,17 +8734,9 @@ summon_done:
     if (!foundBoat) {
         NormalDialog(
             "\xcd\xe5 \xf3\xe4\xe0\xeb\xee\xf1\xfc \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xea\xee"
-                "\xf0\xe0\xe1\xeb\xfc!!!"
-                /* "Не удалось призвать корабль!!!" */,
-            OPTION_DIALOG_MESSAGE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0,
-            OPTION_DIALOG_NONE,
-            0
+            "\xf0\xe0\xe1\xeb\xfc!!!"
+            /* "Не удалось призвать корабль!!!" */,
+            OPTION_DIALOG_MESSAGE
         );
     }
 }
@@ -9340,7 +9229,7 @@ void advManager::LoadRemote(void) {
                 gText,
                 "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n"
             );
-            NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
     }
     if (giDebugLevel > 0) {
@@ -9351,7 +9240,7 @@ void advManager::LoadRemote(void) {
                 gText,
                 "Someone has their debug level set!\n"
             );
-            NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
     }
 }
@@ -10007,18 +9896,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(
-                        gAPanelHelp[helpIndex],
-                        NORMAL_DIALOG_QUICK_VIEW,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
-                    );
+                    NormalDialog(gAPanelHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
                 }
             }
         } else {
@@ -10140,18 +10018,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(
-                        gCPanelHelp[helpIndex],
-                        NORMAL_DIALOG_QUICK_VIEW,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
-                    );
+                    NormalDialog(gCPanelHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
                 }
             }
         } else {
@@ -10188,18 +10055,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         confirm_reset:
                             handled = true;
                             if (!bFreshSave) {
-                                NormalDialog(
-                                    question,
-                                    NORMAL_DIALOG_CONFIRM,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
-                                );
+                                NormalDialog(question, NORMAL_DIALOG_CONFIRM);
                                 if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                                     handled = false;
                                 }
@@ -10432,18 +10288,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                 }
 
                 if (helpIndex >= 0) {
-                    NormalDialog(
-                        gSPanelHelp[helpIndex],
-                        OPTION_DIALOG_HELP,
-                        OPTION_DIALOG_NONE,
-                        OPTION_DIALOG_NONE,
-                        OPTION_DIALOG_NONE,
-                        0,
-                        OPTION_DIALOG_NONE,
-                        0,
-                        OPTION_DIALOG_NONE,
-                        0
-                    );
+                    NormalDialog(gSPanelHelp[helpIndex], OPTION_DIALOG_HELP);
                 }
             }
         } else {
@@ -10467,18 +10312,11 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
                                     "\xdd\xf2\xe0 \xf1\xe8\xf1\xf2\xe5\xec\xe0 \xed\xe5 \xef\xee"
-                                        "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
-                                        "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
-                                        /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */,
-                                    OPTION_DIALOG_MESSAGE,
-                                    OPTION_DIALOG_NONE,
-                                    OPTION_DIALOG_NONE,
-                                    OPTION_DIALOG_NONE,
-                                    0,
-                                    OPTION_DIALOG_NONE,
-                                    0,
-                                    OPTION_DIALOG_NONE,
-                                    0
+                                    "\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xf0\xee\xe8\xe3\xf0\xfb\xe2"
+                                    "\xe0\xf2\xfc MIDI \xe8 Redbook \xec\xf3\xe7\xfb\xea\xf3."
+                                    /* "Эта система не позволяет проигрывать MIDI и Redbook музыку." */
+                                    ,
+                                    OPTION_DIALOG_MESSAGE
                                 );
                                 break;
                             }
@@ -10498,18 +10336,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                        == false) {
                                 NormalDialog(
                                     "\xd6\xe8\xf4\xf0\xee\xe2\xe0\xff \xec\xf3\xe7\xfb\xea\xe0 "
-                                        "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
-                                        "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
-                                        /* "Цифровая музыка не доступна в этой системе." */,
-                                    OPTION_DIALOG_MESSAGE,
-                                    OPTION_DIALOG_NONE,
-                                    OPTION_DIALOG_NONE,
-                                    OPTION_DIALOG_NONE,
-                                    0,
-                                    OPTION_DIALOG_NONE,
-                                    0,
-                                    OPTION_DIALOG_NONE,
-                                    0
+                                    "\xed\xe5 \xe4\xee\xf1\xf2\xf3\xef\xed\xe0 \xe2 \xfd\xf2\xee"
+                                    "\xe9 \xf1\xe8\xf1\xf2\xe5\xec\xe5."
+                                    /* "Цифровая музыка не доступна в этой системе." */,
+                                    OPTION_DIALOG_MESSAGE
                                 );
                                 break;
                             }
@@ -10545,26 +10375,19 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
                                         "\xcd\xe5\xe2\xee\xe7\xec\xee\xe6\xed\xee \xf3\xf1\xf2\xe0"
-                                            "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
-                                            "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
-                                            " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
-                                            "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
-                                            "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
-                                            "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
-                                            "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
-                                            "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
-                                            "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
-                                            "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
-                                            /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */,
-                                        OPTION_DIALOG_MESSAGE,
-                                        OPTION_DIALOG_NONE,
-                                        OPTION_DIALOG_NONE,
-                                        OPTION_DIALOG_NONE,
-                                        0,
-                                        OPTION_DIALOG_NONE,
-                                        0,
-                                        OPTION_DIALOG_NONE,
-                                        0
+                                        "\xed\xee\xe2\xe8\xf2\xfc \xe2\xee\xf1\xef\xf0\xee\xe8\xe7"
+                                        "\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xec\xf3\xe7\xfb\xea\xe8."
+                                        " \xc2\xe0\xf8 \xef\xf0\xe8\xe2\xee\xe4 CD, \xe2\xee\xe7"
+                                        "\xec\xee\xe6\xed\xee, \xe8\xf1\xef\xee\xeb\xfc\xe7\xf3"
+                                        "\xe5\xf2\xf1\xff \xe4\xf0\xf3\xe3\xee\xe9 \xef\xf0\xee"
+                                        "\xe3\xf0\xe0\xec\xec\xee\xe9 \xe8\xeb\xe8 \xe4\xf0\xe0"
+                                        "\xe9\xe2\xe5\xf0 \xe7\xe2\xf3\xea\xe0 \xed\xe5 \xef\xee"
+                                        "\xe4\xe4\xe5\xf0\xe6\xe8\xe2\xe0\xe5\xf2 \xe2\xee\xf1\xef"
+                                        "\xf0\xee\xe8\xe7\xe2\xe5\xe4\xe5\xed\xe8\xe5 CD \xf1\xf2"
+                                        "\xe5\xf0\xe5\xee \xe7\xe2\xf3\xea\xe0."
+                                        /* "Невозможно установить воспроизведение CD музыки. Ваш привод CD, возможно, используется другой программой или драйвер звука не поддерживает воспроизведение CD стерео звука." */
+                                        ,
+                                        OPTION_DIALOG_MESSAGE
                                     );
                                     break;
                                 }
@@ -10710,17 +10533,14 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearDist == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 \xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb \xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
-                /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */,
-            1,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xc2\xfb \xe4\xee\xeb\xe6\xed\xfb \xe1\xfb\xf2\xfc \xea\xe0\xea "
+            "\xec\xe8\xed\xe8\xec\xf3\xec \xe2 \xf2\xf0\xe5\xf5 \xf8\xe0\xe3\xe0\xf5 \xee\xf2 "
+            "\xec\xee\xed\xf1\xf2\xf0\xe0, \xf7\xf2\xee\xe1\xfb "
+            "\xe8\xf1\xef\xee\xeb\xfc\xe7\xee\xe2\xe0\xf2\xfc "
+            "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xc2\xe8\xe4\xe5\xed\xe8\xff."
+            /* Вы должны быть как минимум в трех шагах от монстра, чтобы использовать заклинание Видения. */
+            ,
+            1
         );
         return 0;
     }
@@ -10735,9 +10555,7 @@ i32 advManager::DoVisions(hero* visionHero) {
         count,
         gArmyNamesPlural[IDX(type)]
     );
-    fRatio = static_cast<double>(
-                 gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0)
-             )
+    fRatio = static_cast<double>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0))
              / static_cast<double>(count * gMonsterDatabase[IDX(type)].fightValue);
 
     if (visionHero->m_army.CanJoin(type) && fRatio > MONSTER_STRENGTH_JOIN
@@ -10820,7 +10638,7 @@ creaturesFight:
     goto showVision;
 
 showVision:
-    NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+    NormalDialog(gText, 1);
     return 1;
 }
 

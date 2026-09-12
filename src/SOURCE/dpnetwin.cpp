@@ -30,16 +30,7 @@ VA(0x00436770, 0x81)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
     LogStr("ServiceProvider:");
     _strupr(name);
-    LogInt(
-        name,
-        reinterpret_cast<i32>(guid),
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(name, reinterpret_cast<i32>(guid));
     if (FindStringInString(name, "IPX") != NULL)
         IPXGuid = guid;
     else if (FindStringInString(name, "TCP") != NULL)
@@ -52,16 +43,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & DPESC_TIMEDOUT)
         return 0;
     LogStr("Sessions:");
-    LogInt(
-        session->szSessionName,
-        session->dwSession,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt(session->szSessionName, session->dwSession);
     lSessions[iMaxSession] = session->dwSession;
     iMaxSession++;
     return 1;
@@ -125,7 +107,7 @@ i16 dpnet_init(void) {
                     "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5."
                     /* "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение." */
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
@@ -140,7 +122,7 @@ i16 dpnet_init(void) {
                 ,
                 giNumHumanPlayers - 1
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST);
             gbRemoteGameOpen = false;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
@@ -161,7 +143,7 @@ i16 dpnet_init(void) {
                     "\xe8\xe3\xf0\xfb."
                     /* "Ожидаю игрока для начала игры." */
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
         }
@@ -343,16 +325,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = startup->playerCount;
             giThisNetPos = startup->netPosition;
-            LogInt(
-                "DPMSGSTARTUP",
-                giThisNetPos,
-                sender,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE,
-                LOG_UNUSED_VALUE
-            );
+            LogInt("DPMSGSTARTUP", giThisNetPos, sender);
             memcpy(giNetPosToDCOPos, startup->playerIds, sizeof(giNetPosToDCOPos));
             bStartUpInfoReceived = true;
             break;
@@ -423,9 +396,7 @@ i32 dpWaitForExtraGuests(void) {
             ,
             giNumHumanPlayers - 1
         );
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = 1;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
         message.payload.widget.data.text = gText;
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();

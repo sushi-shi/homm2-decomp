@@ -192,15 +192,7 @@ i32 combatManager::ViewSpells(i32) {
                         "\xf1\xf2\xe5\xed\xfb, \xea\xee\xf2\xee\xf0\xfb\xe5 \xec\xee\xe6\xed\xee "
                         "\xf0\xe0\xe7\xf0\xf3\xf8\xe8\xf2\xfc." /* "От землетрясения нет никакого прока, если только на карте есть городские стены, которые можно разрушить." */
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     break;
                 } else
@@ -227,15 +219,7 @@ i32 combatManager::ViewSpells(i32) {
                         "\xee\xe4\xed\xee\xe3\xee \xf2\xe8\xef\xe0 \xe2\xee \xe2\xf0\xe5\xec\xff "
                         "\xee\xe4\xed\xee\xe3\xee \xe1\xee\xff." /* "Вы можете призвать элементалов только одного типа во время одного боя." */
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
@@ -248,18 +232,7 @@ i32 combatManager::ViewSpells(i32) {
                         ,
                         m_armyCount[IDX(m_currentSide)]
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
                 if (!SpaceForElementalExists()) {
@@ -271,18 +244,7 @@ i32 combatManager::ViewSpells(i32) {
                         "\xf7\xf2\xee\xe1\xfb \xef\xf0\xe8\xe7\xe2\xe0\xf2\xfc "
                         "\xfd\xeb\xe5\xec\xe5\xed\xf2\xe0\xeb\xee\xe2 \xf2\xf3\xe4\xe0." /* "Рядом с вашим героем нет достаточного свободного места, чтобы призвать элементалов туда." */
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
                 goto set_action;
@@ -305,15 +267,7 @@ i32 combatManager::ViewSpells(i32) {
                         "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xed\xe8 \xed\xe0 "
                         "\xea\xee\xe3\xee \xed\xe5 \xef\xee\xe4\xe5\xe9\xf1\xf2\xe2\xf3\xe5\xf2!" /* "Заклинание ни на кого не подействует!" */
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
@@ -332,18 +286,7 @@ i32 combatManager::ViewSpells(i32) {
                         ,
                         m_armyCount[IDX(m_currentSide)]
                     );
-                    NormalDialog(
-                        gText,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
-                    );
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                     return 0;
                 }
             default:
@@ -352,15 +295,7 @@ i32 combatManager::ViewSpells(i32) {
                         "\xc7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xed\xe8 \xed\xe0 "
                         "\xea\xee\xe3\xee \xed\xe5 \xef\xee\xe4\xe5\xe9\xf1\xf2\xe2\xf3\xe5\xf2!" /* "Заклинание ни на кого не подействует!" */
                         ,
-                        NORMAL_DIALOG_INFO,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_VALUE,
-                        0
+                        NORMAL_DIALOG_INFO
                     );
                     return 0;
                 }
@@ -877,7 +812,7 @@ void combatManager::CastSpell(
                 m_hexCells[teleportArmy6->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
             }
             if (gbNoShowCombat == 0)
-                WaitEndSample(&spellSample6, -1);
+                WaitEndSample(&spellSample6);
             if (gbNoShowCombat == 0) {
                 sprintf(gText, "telptin.82m");
                 spellSample6 = LoadPlaySample(gText);
@@ -1263,7 +1198,7 @@ cast_done:
         m_heroAnimationFrame[IDX(m_currentSide)] = 0;
         DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
     }
-    WaitEndSample(&spellSample6, -1);
+    WaitEndSample(&spellSample6);
     CheckChangeSelector();
 }
 
@@ -1484,10 +1419,7 @@ void combatManager::MeteorShower(i32 targetHex) {
                     m_hexCells[targetHex].m_y - COMBAT_SPELL_TARGET_Y_OFFSET,
                     frame,
                     NULL,
-                    ICON_DRAW_NORMAL,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_NORMAL
                 );
                 UpdateCombatArea();
                 DelayTil(&glTimers[0]);
@@ -1562,10 +1494,7 @@ void combatManager::ElementalStorm(void) {
                             (frame_i + c * SPELL_STORM_FRAME_COLUMN_STEP + row_b)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits_n,
-                            ICON_DRAW_NORMAL,
-                            0,
-                            NULL,
-                            NULL
+                            ICON_DRAW_NORMAL
                         );
                     }
                 }
@@ -3169,18 +3098,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         ++distance0;
     }
     sprintf(gText, "\xd1\xee\xf0\xe2\xe0\xeb\xee\xf1\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xee\xf2\xe2\xee\xf0\xe5\xed\xe8\xff \xf4\xe0\xed\xf2\xee\xec\xee\xe2!");
-    NormalDialog(
-        gText,
-        NORMAL_DIALOG_INFO,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_NO_VALUE,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_RESOURCE,
-        0,
-        NORMAL_DIALOG_NO_VALUE,
-        0
-    );
+    NormalDialog(gText, NORMAL_DIALOG_INFO);
     return;
 
 mirror_found:
@@ -3403,10 +3321,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
             static_cast<i32>(currentY9),
             frame_j,
             &limits,
-            stepX_e < 0.0f ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
-            0,
-            NULL,
-            NULL
+            stepX_e < 0.0f ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL
         );
         if (giMinExtentX < 0)
             giMinExtentX = 0;
@@ -3606,7 +3521,7 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
                                 : gArmyNamesPlural[IDX(target->m_monsterType)]
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
-    WaitEndSample(&fizzleSample, -1);
+    WaitEndSample(&fizzleSample);
 }
 
 VA(0x004a0aec, 0x1cd)

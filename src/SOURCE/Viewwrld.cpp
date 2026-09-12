@@ -156,9 +156,7 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
                           ? LEGEND_WORLD
                           : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
     );
-    legendMessage.type = VIEW_WORLD_MESSAGE;
-    legendMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
-    legendMessage.payload.widget.id = WORLD_ICON_WIDGET;
+    SET_WIDGET_MESSAGE(legendMessage, VIEW_WORLD_ICON_MESSAGE, WORLD_ICON_WIDGET);
     legendMessage.payload.widget.data.text = gText;
     window->BroadcastMessage(legendMessage);
     gpWindowManager->DoDialog(window, ViewWorldDialogHandler, 0);

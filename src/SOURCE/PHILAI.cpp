@@ -689,16 +689,7 @@ void philAI::CheckBuyStuff(void) {
         || (gpCurPlayer->m_resources[IDX(RES_GOLD)] < AI_HERO_PURCHASE_GOLD_FLOOR
             && gpCurPlayer->m_heroCount == 0))
         return;
-    LogInt(
-        "CheckBuy Start",
-        gpCurPlayer->m_resources[IDX(RES_GOLD)],
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("CheckBuy Start", gpCurPlayer->m_resources[IDX(RES_GOLD)]);
     dockTown = NULL;
     if (giBuildShipyard[giCurPlayer] >= 0) {
         dockTown = &gpGame->m_castleRecs[giBuildShipyard[giCurPlayer]];
@@ -770,16 +761,7 @@ void philAI::CheckBuyStuff(void) {
         gpCurPlayer->m_resources[IDX(RES_WOOD)] += TOWN_BOAT_WOOD_COST;
     }
     DoAllHeroInteractions();
-    LogInt(
-        "CheckBuy End  ",
-        gpCurPlayer->m_resources[IDX(RES_GOLD)],
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("CheckBuy End  ", gpCurPlayer->m_resources[IDX(RES_GOLD)]);
 }
 
 inline hero* GetHeroSlot(i32 id) {
@@ -863,7 +845,7 @@ void philAI::CheckReload(void) {
     fReduceFactor = 1.0f;
     friendly = AI_ZERO_FLOAT;
     idx = 0.0f;
-    kn = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0, 0, 0, 0);
+    kn = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0);
     if (kn < AI_MINIMUM_FIGHT_VALUE)
         kn = AI_MINIMUM_FIGHT_VALUE;
     gpSearchArray->SeedPosition(
@@ -889,9 +871,6 @@ void philAI::CheckReload(void) {
                         jb_5 = FightValueOfStack(
                             &GetCastleSlot(nb_1->m_objectMetadata)->m_army,
                             NULL,
-                            0,
-                            0,
-                            0,
                             0
                         );
                         if (gpGame->m_castleOwners[nb_1->m_objectMetadata] == gpCurAIHero->m_owner) {
@@ -913,9 +892,6 @@ void philAI::CheckReload(void) {
                             jb_5 = FightValueOfStack(
                                 &GetHeroSlot(nb_1->m_objectMetadata)->m_army,
                                 NULL,
-                                0,
-                                0,
-                                0,
                                 0
                             );
                             if (jb_5 > (kn >> 1)) {
@@ -946,7 +922,7 @@ void philAI::CheckBerserk(void) {
 
     gbBerserk = false;
     fBerserkFactor = 1.0f;
-    jb = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 1, 0, 0, 0);
+    jb = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 1);
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
         jb = static_cast<i32>(jb * AI_EASY_STRENGTH_FACTOR);
     if (jb < AI_MINIMUM_FIGHT_VALUE)
@@ -1213,16 +1189,7 @@ void philAI::DoAI(i32 player) {
     i32 targetValue11;
     MapDirection specialDirection6;
 
-    LogInt(
-        "DO AI 1",
-        player,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("DO AI 1", player);
     PollSound();
     if (gbGameOver != 0)
         goto aiCleanup;
@@ -1230,16 +1197,7 @@ void philAI::DoAI(i32 player) {
         if (player != giLimitPlayer)
             goto aiCleanup;
     }
-    LogInt(
-        "DO AI",
-        player,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("DO AI", player);
     InitAIMapVars();
     GetTurnAIVars(player);
     if (gpGame->m_day == 1 || gpGame->m_day == 1) {
@@ -1281,16 +1239,7 @@ void philAI::DoAI(i32 player) {
 
         LogStr("\n\n\n\n");
         LogStr("===================================");
-        LogInt(
-            "Player with HeroTOMOVE",
-            player,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("Player with HeroTOMOVE", player);
         LogStr(gpCurAIHero->m_name);
         LogStr("\n");
         CheckReload();
@@ -1605,15 +1554,14 @@ firstWeekDone:
     lastFightValue8 = 0;
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_heroCount; generalIndex4++) {
         heroPtr0 = GetHeroSlot(gpCurPlayer->m_heroIds[generalIndex4]);
-        fightValueFloat0 =
-            static_cast<float>(FightValueOfStack(&heroPtr0->m_army, heroPtr0, 0, 0, 0, 0));
+        fightValueFloat0 = static_cast<float>(FightValueOfStack(&heroPtr0->m_army, heroPtr0, 0));
         lastFightValue8 = static_cast<i32>(lastFightValue8 + fightValueFloat0);
         heroPtr0->m_aiFightValue =
             static_cast<float>(fightValueFloat0 * AI_HERO_VALUE_SCALE + AI_HERO_VALUE_BASE);
     }
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_townCount; generalIndex4++) {
         townPtr0 = GetCastleSlot(gpCurPlayer->m_townIds[generalIndex4]);
-        fightValueFloat0 = static_cast<float>(FightValueOfStack(&townPtr0->m_army, NULL, 0, 0, 0, 0));
+        fightValueFloat0 = static_cast<float>(FightValueOfStack(&townPtr0->m_army, NULL, 0));
         lastFightValue8 = static_cast<i32>(lastFightValue8 + fightValueFloat0);
     }
     gpCurPlayer->m_aiData.m_upgradeValueWeight =
@@ -1809,7 +1757,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
 
     for (townNo = 0; townNo < gpCurPlayer->m_townCount; townNo++) {
         curTown = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[townNo]];
-        townStrength[townNo] = FightValueOfStack(&curTown->m_army, NULL, 0, 0, 0, 0) + 400;
+        townStrength[townNo] = FightValueOfStack(&curTown->m_army, NULL, 0) + 400;
         totalStrength += townStrength[townNo];
         if (curTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
             totalWeight += 10;
@@ -1827,16 +1775,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
 
     for (townNo = 0; townNo < gpCurPlayer->m_townCount; townNo++) {
         curTown = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[townNo]];
-        LogInt(
-            "Turns Owned",
-            curTown->m_turnsOwned,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("Turns Owned", curTown->m_turnsOwned);
         if (giCurTurn > 3 && curTown->m_turnsOwned < 3)
             continue;
         {
@@ -1892,16 +1831,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
             }
         }
     }
-    LogInt(
-        "BestBHC ",
-        IDX(best.type),
-        static_cast<i32>(topVal * 100.0f),
-        best.what,
-        0,
-        0,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("BestBHC ", IDX(best.type), static_cast<i32>(topVal * 100.0f), best.what, 0, 0);
     if (topVal < AI_MINIMUM_PURCHASE_VALUE)
         best.type = PURCHASE_NONE;
 }
@@ -2225,8 +2155,7 @@ i32 philAI::DetermineTargetPosition(
         targetX,
         targetY,
         gpCurAIHero->m_x,
-        gpCurAIHero->m_y,
-        LOG_UNUSED_VALUE
+        gpCurAIHero->m_y
     );
     LogStr("\n\n****");
     return bestRV;
@@ -2270,12 +2199,12 @@ void philAI::ProbableOutcomeOfBattle(
     defenderFight =
         static_cast<float>(FightValueOfStack(defender, defenderHero, 1, useTown, townId, 0));
     if (townArmy != NULL)
-        defenderFight += static_cast<float>(FightValueOfStack(townArmy, NULL, 1, 0, 0, 0));
+        defenderFight += static_cast<float>(FightValueOfStack(townArmy, NULL, 1));
 
-    attackerRaw = static_cast<float>(FightValueOfStack(attacker, attackerHero, 0, 0, 0, 0));
-    defRaw = static_cast<float>(FightValueOfStack(defender, defenderHero, 0, 0, 0, 0));
+    attackerRaw = static_cast<float>(FightValueOfStack(attacker, attackerHero, 0));
+    defRaw = static_cast<float>(FightValueOfStack(defender, defenderHero, 0));
     if (townArmy != NULL)
-        defRaw += static_cast<float>(FightValueOfStack(townArmy, NULL, 0, 0, 0, 0));
+        defRaw += static_cast<float>(FightValueOfStack(townArmy, NULL, 0));
 
     if (useTown != 0)
         defenderFight =
@@ -3335,8 +3264,7 @@ i32 philAI::RVOfPosition(
             totalValue2,
             eventValue5,
             strategicDelta5,
-            targetLiveChance12 * POSITION_FULL_CHANCE,
-            POSITION_DEBUG_UNUSED
+            targetLiveChance12 * POSITION_FULL_CHANCE
         );
     }
     return totalValue2;
@@ -3888,16 +3816,7 @@ i32 philAI::FightValueOfStack(
     } else if (castleValue > armyValue)
         castleValue = static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
     if (giDebugLevel == AI_BATTLE_DEBUG_LEVEL)
-        LogInt(
-            "FV3",
-            armyValue,
-            magicTotal,
-            castleValue,
-            0,
-            0,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+        LogInt("FV3", armyValue, magicTotal, castleValue, 0, 0);
     armyValue += magicTotal;
     armyValue += castleValue;
     return armyValue;
@@ -4239,8 +4158,8 @@ void philAI::HeroInteractionAtHero(
             dominantHero0 = recipientHero0;
         }
 
-        dominantFightValue4 = FightValueOfStack(&dominantHero0->m_army, NULL, 0, 0, 0, 0);
-        recipientFightValue0 = FightValueOfStack(&recipientHero0->m_army, NULL, 0, 0, 0, 0);
+        dominantFightValue4 = FightValueOfStack(&dominantHero0->m_army, NULL, 0);
+        recipientFightValue0 = FightValueOfStack(&recipientHero0->m_army, NULL, 0);
         desiredShare6 = AI_HERO_INTERACTION_TARGET_SHARE;
         armyShare7 = static_cast<float>(dominantFightValue4)
                      / static_cast<float>(dominantFightValue4 + recipientFightValue0);
@@ -4361,7 +4280,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         if (!heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK)
             && (townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK)) {
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= AI_MAGIC_BOOK_COST) {
-                GiveArtifact(heroPtr, ARTIFACT_MAGIC_BOOK, true, -1);
+                GiveArtifact(heroPtr, ARTIFACT_MAGIC_BOOK, true);
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= AI_MAGIC_BOOK_COST;
             } else {
                 heroPtr->m_remainingMobility = 0;
@@ -4398,8 +4317,8 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         }
     }
 
-    battlePower = FightValueOfStack(&heroPtr->m_army, NULL, 0, 0, 0, 0);
-    townFV = FightValueOfStack(&townPtr->m_army, NULL, 0, 0, 0, 0);
+    battlePower = FightValueOfStack(&heroPtr->m_army, NULL, 0);
+    townFV = FightValueOfStack(&townPtr->m_army, NULL, 0);
     townShare = static_cast<double>(townFV) / (townFV + battlePower);
     statSum = 0;
     statSum =
@@ -5322,7 +5241,7 @@ i32 philAI::ComputeValueOfSS(
     i32 troopValue;
 
     score = gSSValues[IDX(skill)][IDX(level) - SECONDARY_SKILL_LEVEL_OFFSET];
-    armyValue = FightValueOfStack(&h->m_army, h, 1, 0, 0, 0);
+    armyValue = FightValueOfStack(&h->m_army, h, 1);
     if (skill != HERO_SKILL_ESTATES) {
         score = static_cast<i32>(
             score
@@ -6046,7 +5965,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         "Tell Phil",
                     IDX(theCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                 );
-                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, 1);
                 eventRV = 0;
                 break;
         }
@@ -6536,9 +6455,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
         unusedPurchaseValue7
     );
     strengthRatio26 =
-        static_cast<float>(
-            gpPhilAI->FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0, 0, 0, 0)
-        )
+        static_cast<float>(gpPhilAI->FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0))
         / static_cast<float>(monsterCount4 * gMonsterDatabase[IDX(monsterType)].fightValue);
 
     if (willJoin15 && strengthRatio26 > AI_MONSTER_JOIN_RATIO

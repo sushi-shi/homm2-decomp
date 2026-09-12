@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -209,9 +210,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
             y = message.payload.mouse.y - m_owner->m_posY;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    message.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -367,9 +366,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 m_displayOffset = 0;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
-                message.type = MESSAGE_WIDGET;
-                message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                message.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

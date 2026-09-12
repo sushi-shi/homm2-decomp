@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
@@ -191,7 +192,7 @@ i32 game::SetupHotSeatGame(void) {
             gText,
             /* Желаете задать имена каждому игроку? */ "\xc6\xe5\xeb\xe0\xe5\xf2\xe5\x20\xe7\xe0\xe4\xe0\xf2\xfc\x20\xe8\xec\xe5\xed\xe0\x20\xea\xe0\xe6\xe4\xee\xec\xf3\x20\xe8\xe3\xf0\xee\xea\xf3\x3f"
         );
-        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
                 strcpy(
@@ -218,9 +219,7 @@ i32 game::SetupNetworkGame(void) {
         MemError();
 
     if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
         message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -255,16 +254,7 @@ i32 game::SetupNetworkGame2(void) {
     memset(&osInfo, 0, sizeof(osInfo));
     osInfo.dwOSVersionInfoSize = sizeof(osInfo);
     gotVersion = GetVersionEx(&osInfo);
-    LogInt(
-        "Version",
-        gotVersion,
-        osInfo.dwPlatformId,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("Version", gotVersion, osInfo.dwPlatformId);
     if (gotVersion != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -332,9 +322,7 @@ i32 game::SetupModemGame(void) {
 
     LogStr("SMC 2");
     if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
         message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -393,9 +381,7 @@ i32 game::SetupMultiPlayerGame(void) {
         MemError();
 
     if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
         message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -647,16 +633,13 @@ i32 game::PickLoadGame(void) {
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             /* Как минимум у одного игрока нет Героев II: Цена Верности. Вы можете выбрать карту только стандартного формата Героев II. */
-            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 II.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
+            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee "
+            "\xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 "
+            "\xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
+            "\xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee "
+            "\xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 "
+            "\xc3\xe5\xf0\xee\xe5\xe2 II.",
+            NORMAL_DIALOG_INFO
         );
         sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     } else {
@@ -736,31 +719,9 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(
-                    gSetupDCComPortHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupDCComPortHelp[helpIndex], HELP_DIALOG);
             else
-                NormalDialog(
-                    gSetupComPortHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupComPortHelp[helpIndex], HELP_DIALOG);
         }
     }
     return BaseSetupHandler(message);
@@ -793,9 +754,9 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(gSetupDCBaudHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gSetupDCBaudHelp[helpIndex], HELP_DIALOG);
             else
-                NormalDialog(gSetupBaudHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gSetupBaudHelp[helpIndex], HELP_DIALOG);
         }
     }
     return BaseSetupHandler(message);
@@ -830,18 +791,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                gSetupHotSeatGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(gSetupHotSeatGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -870,20 +820,9 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(gSetupDCGameHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gSetupDCGameHelp[helpIndex], HELP_DIALOG);
             else
-                NormalDialog(
-                    gSetupModemGameHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupModemGameHelp[helpIndex], HELP_DIALOG);
         }
     }
     return BaseSetupHandler(message);
@@ -915,18 +854,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                gSetupMultiPlayerGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(gSetupMultiPlayerGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -951,18 +879,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                gSetupNetworkGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(gSetupNetworkGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -990,18 +907,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                gSetupNetworkGame2Help[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(gSetupNetworkGame2Help[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -1029,7 +935,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
                     break;
             }
             if (helpIndex >= FIRST_HELP)
-                NormalDialog(gSetupGameHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gSetupGameHelp[helpIndex], HELP_DIALOG);
         }
     } else if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -1065,18 +971,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                xSetupCampaignGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(xSetupCampaignGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -1101,18 +996,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                xSetupCampaignGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(xSetupCampaignGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }
@@ -1137,18 +1021,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
                 break;
         }
         if (helpIndex >= FIRST_HELP)
-            NormalDialog(
-                xSetupStandardGameHelp[helpIndex],
-                HELP_DIALOG,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
+            NormalDialog(xSetupStandardGameHelp[helpIndex], HELP_DIALOG);
     }
     return BaseSetupHandler(message);
 }

@@ -281,4 +281,12 @@ struct tag_message {
     tag_messagePayload payload;
 };
 SIZE(tag_message, 0x1c);
+
+// Retype the event without clearing its payload or surviving mouse modifiers.
+// Arguments must be stable expressions: messageValue is evaluated three times.
+#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                    \
+    ((messageValue).type = MESSAGE_WIDGET,                                                         \
+     (messageValue).payload.widget.command = (commandValue),                                       \
+     (messageValue).payload.widget.id = (idValue))
+
 #endif

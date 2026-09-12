@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/BITS.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
@@ -990,9 +991,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         giOverviewTop[IDX(giOverviewType)] = 0;
     }
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
-    message.payload.widget.id = TITLE_WIDGET;
+    SET_WIDGET_MESSAGE(message, OVERVIEW_WIDGET_SET_FRAME, TITLE_WIDGET);
     message.payload.widget.data.value = IDX(giOverviewType) + OVERVIEW_TITLE_FRAME_BASE;
     overWin->BroadcastMessage(message);
     message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
@@ -1480,15 +1479,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                 item = widgetId - HERO_STAT_FIRST;
                 NormalDialog(
                     gStatDesc[item],
-                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_VALUE,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_RESOURCE,
-                    0,
-                    NORMAL_DIALOG_NO_VALUE,
-                    0
+                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                 );
             }
         }

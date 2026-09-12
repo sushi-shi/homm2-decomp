@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/message.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Icond2b.h>
 #include <BASE/Iconm2b.h>
@@ -230,9 +231,7 @@ void combatManager::CombatMessage(
         }
     }
 
-    windowMessage.type = COMBAT_MESSAGE_BROADCAST_EVENT;
-    windowMessage.payload.widget.command = COMBAT_MESSAGE_TEXT_ACTION;
-    windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_FIRST;
+    SET_WIDGET_MESSAGE(windowMessage, COMBAT_MESSAGE_TEXT_ACTION, COMBAT_MESSAGE_WIDGET_FIRST);
     windowMessage.payload.widget.data.text = m_previousCombatMessage;
     m_combatWindow->BroadcastMessage(windowMessage);
     windowMessage.payload.widget.id = COMBAT_MESSAGE_WIDGET_SECOND;
@@ -937,12 +936,10 @@ void combatManager::DrawFrame(
                     IDX(state) == 0 ? COMBAT_HERO_LEFT_X : COMBAT_HERO_RIGHT_X,
                     IDX(state) == 0 ? COMBAT_HERO_LEFT_Y : COMBAT_HERO_RIGHT_Y,
                     sCmbtHero[m_heroSpriteIndex[IDX(state)]]
-                        .animationFrames[m_heroAnimationState[IDX(state)]][m_heroAnimationFrame[IDX(state)]],
+                        .animationFrames[m_heroAnimationState[IDX(state)]]
+                                        [m_heroAnimationFrame[IDX(state)]],
                     &m_heroLimits[IDX(state)],
-                    ICON_DRAW_FLIPPED,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_FLIPPED
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -956,19 +953,16 @@ void combatManager::DrawFrame(
                 gbReturnAfterComputeExtent = true;
                 m_heroOverlayIcons[IDX(state)]->CombatClipDrawToBuffer(
                     IDX(state) == 0 ? COMBAT_HERO_LEFT_X
-                               : ((m_heroes[IDX(state)]->m_isCaptain ? -1 : 0)
-                                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
-                                     + COMBAT_HERO_RIGHT_X,
+                                    : ((m_heroes[IDX(state)]->m_isCaptain ? -1 : 0)
+                                       & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
+                                          + COMBAT_HERO_RIGHT_X,
                     IDX(state) == 0 ? COMBAT_HERO_LEFT_Y
-                               : ((m_heroes[IDX(state)]->m_isCaptain ? -1 : 0)
-                                  & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
-                                     + COMBAT_HERO_RIGHT_Y,
+                                    : ((m_heroes[IDX(state)]->m_isCaptain ? -1 : 0)
+                                       & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
+                                          + COMBAT_HERO_RIGHT_Y,
                     m_heroOverlayFrame[IDX(state)],
                     &m_heroOverlayLimits[IDX(state)],
-                    ICON_DRAW_FLIPPED,
-                    0,
-                    NULL,
-                    NULL
+                    ICON_DRAW_FLIPPED
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -1041,20 +1035,14 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[IDX(COMBAT_DEFENDER_SIDE)]]
                                     [m_heroAnimationFrame[IDX(COMBAT_DEFENDER_SIDE)]],
                 &m_heroLimits[1],
-                ICON_DRAW_FLIPPED,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_FLIPPED
             );
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
                 COMBAT_HERO_RIGHT_X,
                 COMBAT_HERO_RIGHT_Y,
                 m_heroOverlayFrame[1],
                 &m_heroOverlayLimits[1],
-                ICON_DRAW_FLIPPED,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_FLIPPED
             );
         }
 
@@ -1066,20 +1054,14 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[IDX(COMBAT_ATTACKER_SIDE)]]
                                     [m_heroAnimationFrame[IDX(COMBAT_ATTACKER_SIDE)]],
                 &m_heroLimits[0],
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
                 m_heroOverlayFrame[0],
                 &m_heroOverlayLimits[0],
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
 
@@ -1098,10 +1080,7 @@ void combatManager::DrawFrame(
                 COMBAT_CATAPULT_Y,
                 m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)],
                 &m_catapultLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_WALL_TOP_LAYER
@@ -1111,10 +1090,7 @@ void combatManager::DrawFrame(
                 0,
                 IDX(m_drawbridgeState) + DRAWBRIDGE_TOWER_FRAME_BASE,
                 &m_upperWallLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_WALL_MIDDLE_LAYER
@@ -1124,25 +1100,18 @@ void combatManager::DrawFrame(
                 0,
                 COMBAT_CASTLE_TOP_LAYER_FRAME,
                 &m_middleWallLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
         if (m_inCastleCombat != 0 && row == DRAW_GATE_LAYER) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
-                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)]
-                            == COMBAT_WALL_STATE_KEEP_STANDING
+                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING
                     ? COMBAT_CASTLE_GATE_CLOSED_FRAME
                     : COMBAT_CASTLE_GATE_FRAME,
                 &m_gateLimits,
-                ICON_DRAW_NORMAL,
-                0,
-                NULL,
-                NULL
+                ICON_DRAW_NORMAL
             );
         }
 
@@ -1275,10 +1244,7 @@ void combatManager::DrawFrame(
                             wallY,
                             wallFrame1,
                             &m_hexCells[IDX(castleHex)].m_limits[0],
-                            ICON_DRAW_NORMAL,
-                            0,
-                            NULL,
-                            NULL
+                            ICON_DRAW_NORMAL
                         );
                     }
                 }
@@ -1361,9 +1327,7 @@ void combatManager::DrawFrame(
                 goto endRow;
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
-                ->CombatClipDrawToBuffer(
-                    0, 0, IDX(row), &m_moatLimits[IDX(row)], ICON_DRAW_NORMAL, 0, NULL, NULL
-                );
+                ->CombatClipDrawToBuffer(0, 0, IDX(row), &m_moatLimits[IDX(row)], ICON_DRAW_NORMAL);
             m_hexCells[moatCell[IDX(row)] - 1].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[IDX(row)]].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[IDX(row)] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
@@ -1558,10 +1522,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         viewY,
         gConfig.combatArmyInfoLevel != COMBAT_SMALL_VIEW_FULL_INFO,
         &m_smallViewLimits,
-        ICON_DRAW_NORMAL,
-        0,
-        NULL,
-        NULL
+        ICON_DRAW_NORMAL
     );
     viewX1 += COMBAT_SMALL_VIEW_INSET_X;
     if (drawResult1 != ICON_DRAW_SKIPPED) {

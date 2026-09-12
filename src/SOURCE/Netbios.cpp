@@ -204,7 +204,7 @@ i32 nbnet_init(void) {
             sprintf(gText, "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
                 "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
                 "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
@@ -212,7 +212,7 @@ i32 nbnet_init(void) {
                 "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
                 "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
             LogStr("GUON2");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             LogStr("GUON3");
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
@@ -223,14 +223,14 @@ i32 nbnet_init(void) {
             sprintf(gText, "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xf1\xe5\xf2\xe8.\n\n  "
                 "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
                 "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
             sprintf(gText, "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xf5\xee\xf1\xf2\xe0.\n\n  "
                 "\xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb "
                 "\xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xe5.");
-            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(gText, OLD_MAIN_DIALOG_WAIT);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             break;

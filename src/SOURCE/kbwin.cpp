@@ -77,16 +77,7 @@ i32 AppInit(
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt(
-        "hInstApp",
-        reinterpret_cast<i32>(hInstApp),
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
+    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp));
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
     bProcessMessage[WM_KEYDOWN] = 1;
@@ -277,16 +268,9 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (window == hwndApp) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
-                        NORMAL_DIALOG_CONFIRM,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_VALUE,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0,
-                        NORMAL_DIALOG_NO_RESOURCE,
-                        0
+                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                        "\xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
+                        NORMAL_DIALOG_CONFIRM
                     );
                     if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
                         DestroyWindow(window);

@@ -296,18 +296,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                             break;
                     }
                     if (helpIndex36 != -1)
-                        NormalDialog(
-                            cViewGeneralLongHelp[helpIndex36],
-                            NORMAL_DIALOG_QUICK_VIEW,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
+                        NormalDialog(cViewGeneralLongHelp[helpIndex36], NORMAL_DIALOG_QUICK_VIEW);
                 }
                 break;
             }

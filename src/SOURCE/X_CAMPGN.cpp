@@ -354,12 +354,7 @@ void ExpCampaign::InitMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
-                GiveArtifact(
-                    gpGame->GetHero(player->m_heroIds[0]),
-                    bonus->artifact,
-                    false,
-                    -1
-                );
+                GiveArtifact(gpGame->GetHero(player->m_heroIds[0]), bonus->artifact, false);
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
@@ -448,8 +443,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WOOD_BONUS:
@@ -459,8 +453,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_DEFEAT_KRAEGER:
@@ -475,8 +468,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_WAYWARD_SON:
@@ -487,8 +479,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
-                            false,
-                            -1
+                            false
                         );
                     break;
                 case AWARD_SET_GUARDIAN:
@@ -501,8 +492,7 @@ void ExpCampaign::InitMap(void) {
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
-                            false,
-                            -1
+                            false
                         );
                     break;
             }
@@ -580,15 +570,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
             "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc "
             "\xf1\xed\xe0\xf7\xe0\xeb\xe0 \xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
-            CAMPAIGN_RESTART_CONFIRM,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0,
-            CAMPAIGN_DIALOG_NO_RESOURCE,
-            0
+            CAMPAIGN_RESTART_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
@@ -1266,15 +1248,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                     "\xe2\xe0\xf8\xe5\xe3\xee "
                                     "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee "
                                     "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xff.",
-                                    NORMAL_DIALOG_INFO,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0,
-                                    NORMAL_DIALOG_NO_RESOURCE,
-                                    0
+                                    NORMAL_DIALOG_INFO
                                 );
                                 break;
                             }

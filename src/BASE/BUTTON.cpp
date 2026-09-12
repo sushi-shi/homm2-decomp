@@ -1,4 +1,5 @@
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/button.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -99,11 +100,6 @@ VA(0x004d3830, 0x5b)
 H2_RETAIL_INLINE button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
-
-#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
-    messageValue.type = MESSAGE_WIDGET;                                                          \
-    messageValue.payload.widget.command = commandValue;                                          \
-    messageValue.payload.widget.id = idValue
 
 VA(0x004d3890, 0x4d8)
 MessageDispatchResult button::Main(tag_message& msg) {
@@ -248,7 +244,6 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& 
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-#undef SET_WIDGET_MESSAGE
 
 VA(0x004d3f20, 0x91)
 void button::Draw(void) {
