@@ -243,6 +243,34 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   The explicit truth-value candidate is not yet measured: the source generator
   rejects the following unannotated helper in the same RVA marker span.
   B43 also includes zero-town selection and unguarded no-hero search callers.
+- G31-G33: radar terrain fallback, quick-info dispatch and bottom-view update
+  joins need structured-source matrices. S30 also covers their unread locals
+  and the quick-view layout constants retained as stack scalars.
+- C22-C24: quick-info signed-byte `toupper`, enemy-turn player truncation and
+  manual icon-entry addressing need API/domain evidence and native comparisons.
+- B43 correction: adventure `GetCell` clamps invalid coordinates to cell0,0;
+  its complete retail byte/relocation proof resolves the earlier concern about
+  early wrapper calls in movement/drawing. Radar's direct `fullMap::GetCell(i+1,j)`
+  is a separate [retail-confirmed unchecked right-edge access](B43.md).
+- B45: quick-info and bottom-view text-as-format, input-string and decimal-label
+  capacities require caller/data bounds. [Hero quick-view's five-byte decimal
+  allocation is confirmed in retail](B45.md); several date/army-name/debug
+  buffers now have explicit safe bounds from real fields and retail text.
+- B46: new-turn week/day widgets both occupy tracked slot0/id2100. Parent-window
+  ownership [keeps the first widget linked until window closure](B46.md);
+  losing the bottom-view reference is not a permanently unreachable allocation.
+- B47: the18×18 redraw grid has [retail-confirmed negative neighbor indices
+  and a256-byte partial clear](B47.md). Positive border indices fit its real
+  owner; no fabricated padding or shifted owner has been introduced.
+- G34/R05: mine-guardian switch joins need structured source alternatives;
+  town/hero context setters reuse locator-position locals as terrain IDs.
+- G35-G39: summon-boat completion, sound disposal, adjacent-monster output,
+  control-panel confirmation and visions tails await structured-source matrices.
+- C25: loaded-game cheat-byte cast preserves truth for every byte value but
+  requires native comparison before removal. U09's byte view forwards variable
+  network payloads, so its16-byte view does not prove those consumer extents.
+- B48: [network-control selection has a retail-confirmed non-advancing loop
+  and possible negative index](B48.md). The genuine behavior is retained.
 
 ## Build setup observations
 

@@ -1,4 +1,1188 @@
 {
+  "src/SOURCE/ADVMGR.cpp:TownPortalHandler(tag_message & message)#1": {
+    "body_sha256": "185aa77bb85626aa2e56a75ce2399ba5847f76b22a03a94ba5d1f184917afb9e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual choiceMessage output query: widget type/command/id initialized, BroadcastMessage fills value, then callback publishes selection and converts incoming command to dialog select. No fake stack owner. B43 listbox output/current terrain/window lifecycle contract remains; unread data fields are not evidence of a safe selection index."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::TownGate(SpellType spellId)#1": {
+    "body_sha256": "b57a2d79b5204b16a086c8c36c4247460404db1b2828075bf25e3627107044c8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual town-selection widget message and nearest-distance scalars. townCount0 guarded; valid world coordinates<=143 bound Manhattan distance286 below initial1000, proving a nearest choice for positive valid count. Portal callback selected index still needs listbox contract; hero/player/town IDs remain B43. B45 sprintf(gText,town.m_name) treats scenario town text as format; fixed title fits500."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SummonBoat(void)#1": {
+    "body_sha256": "a7332d4355c2c78fd1a433c5a6f7fc5174f67612394e0f5b0d9a2155c0bb3ed2",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G35 summon_done tail; S30 fromCell assigned but unread. Direction loop0..7 guards placement world coordinates before access;48 boat entries scanned and slot used only afterfound. Actual i8 boat-coordinate/u8 metadata serialization casts remain; i8 coordinates on maps>127 need existing boat-coordinate-domain interpretation. Clipped fizzle rectangle stays16..464, target154,152,150,136 fits viewport. B43 hero/terrain/boat-record lifecycle remains."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ShowRoute(i32 redraw,i32,i32 updateButton)#1": {
+    "body_sha256": "44147deefe807c099c56a6aabc8be67dc4ea4cece4b3471f94eaf4de007f1fd9",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual search path union and flat u16 visibility array; sizeof clear covers allocated map dimensions. B18 pathLength, directions[index+1]/directions[index],0..7 arrow/direction tables and path world positions need search contract; GetCell clamp does not validate subsequent visibility write index. Terrain/pathfinding domains remain B43. u16 frame storage cast is real narrow map representation; no unrelated reuse or fake stack array."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::HideRoute(i32 redraw,i32 clearDestination,i32 updateButton)#1": {
+    "body_sha256": "e07d6c470cb7160b452eab6ce86c2cb6b5f6a1828625c82009da6cac98e1327e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual optional destination clear and visibility-valid flag with guarded redraw. Current hero sentinel checked before direct hero record, but player/hero index lifecycle remains B43. No union access, pointer reconstruction, local buffer, goto or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckDimHero(void)#1": {
+    "body_sha256": "840510d8775d3c432364414bf4ec8df1886de8a89a04dcf49d1a530d768bfaa4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Human-control/current-hero guards precede mobility check and route/locator updates. Actual helper forwarding, no casts/gotos/stack owner; B43 current player/hero domain inherited."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckDimNextHeroBut(void)#1": {
+    "body_sha256": "248bb869749370c741895c23f945b13cc084dca6da21302669aee1ce828c251d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real button-frame choice from human-control and HasMobileHero; sends fixed widget command. B43 current-player index and player lifecycle inherited; no local aggregate, cast, goto or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SeedTo(i32 targetX,i32 targetY)#1": {
+    "body_sha256": "6667667f2e2f69d98c32a0d675bf3e33c3de8c81865b85bdbf7847c4575762c7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Human-control/current-hero guards then real initial/incremental SeedPosition calls. B18 current/target coordinates, direction and pathfinding skill remain search contracts. No artificial address arithmetic: direct hero-array element is legitimate for valid ID. No local buffer or unrelated reuse."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ForceNewHover(void)#1": {
+    "body_sha256": "c6ff5f499f5357cbeb443b0e751d00c901d8500495f838f3c8abfe965cd5bda0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "MouseCoords produces actual x/y output scalars, both passed to ProcessHover; invalid-hover sentinel forces recomputation. B43 current player domain only; no fake aggregate, cast, owner arithmetic or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ScreenScroll(MapDirection direction,i32 updatePointer)#1": {
+    "body_sha256": "41f6059d9f6dcfd1296160b94f5bf42b24df22c54f14f94e99368a8b4be6cc2d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real saved candidate x/y origin values, explicit8-direction switch and viewport clamping. Origin may intentionally be negative near world edge; no map pointer formed here. B43 invalid enum could still select an invalid pointer frame before clamp; legitimate direction callers retained. No goto, cast or unrelated local reuse."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckScreenScroll(void)#1": {
+    "body_sha256": "8e0cbda1f6705cbd7878992838cd444ddd40f187f88c10ab680e09400615fce6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Actual mouse outputs and saved map origin detect scroll progress. Screen bounds precede border decisions; all eight dispatched directions are explicit valid enums and pointer-frame reset uses half-open range. No map dereference, fake stack owner, goto or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::MouseInScrollZone(void)#1": {
+    "body_sha256": "675bc5aac50ec8af0cbdff75ca38d3f2981073187a02f40b3dad2d31ee1c2f16",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Real MouseCoords output pair; explicit640x480 screen guard precedes border comparisons. Only scalar comparisons and returns, no out-of-object pointer, cast, union or buffer."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SetInitialMapOrigin(void)#1": {
+    "body_sha256": "d92eec72283b889442dd7d85c7a4fe4b31a0dbad1ac7f3cd31871cc9f064b148",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S30 gameState unread. Real selected-town/first-hero/first-town alternatives; positive counts protect first-slot access but IDs/player domains remain B43. GetCell clamps map origin lookup while terrain image and music table indices still require valid metadata. Separate typed locals are meaningful, not a fabricated aggregate."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::LoadRemote(void)#1": {
+    "body_sha256": "358466385163ef9a353657eda36198f585ffd9c94563573aa444a59fcad6aa3c",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C25 static_cast<i8>(u8 m_cheated) is used only for truth; all256 byte values preserve zero/nonzero, but native removal still needs measured source alternatives. Actual persistent once-warning statics and saved-game/turn flow. Fixed warnings fit gText500; B43 loaded player state/rmtRCName contract remains."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNet(void)#1": {
+    "body_sha256": "ff8dd9eec482bde7db9140ca9d601235e8e46bdaf551da2e0eea2da780141236",
+    "patterns": {
+      "casts": "open",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C17 raw returned packet and payload casts; U09 all save/exit/bytes union views have actual tagged consumers, but bytes[16] also forwards variable group-map-change/NetBox data, so payload-owner extent still needs protocol recovery. B41 no received size accompanies header/save/exit reads; sender mapping can return-1. Actual SPlayerExit local has each semantic field set, not artificial stack aggregation."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckHandleNetPlayerWait(struct tag_message & message,i32 doMain)#1": {
+    "body_sha256": "fa4ee46939d67106ddc7be5a0cbf3dba8ebd6b989eb9dd8f1eb2a8926ccb3c55",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual mouse/widget/executive event transitions; control-key exit writes executive command after changing type and forwards preserved payload. No fake aggregate/goto/manual varargs. B41/B43 asynchronous network/player/window state belongs to CheckDoMain/UpdBottomView, not proven by callback."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::TrimLoopingSounds(i32 maxSamples)#1": {
+    "body_sha256": "53a9b3356849b3e7dc7516631ba75d6648341672ec0cb3688aec4ce3f4266aee",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "G36 disposeSamples join exits selected-retention scan. Actual28-byte keep array fully cleared; four active IDs range-checked0..27 before marking, all later scans0..27. Counts in keep stay<=4, loaded bounded28. maxSamples capacity policy and possible extreme arithmetic are not extra object extents; no fake owner or varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DisableButtons(void)#1": {
+    "body_sha256": "971dc881005115012684900bb842a5edb0172810710f59c9164e88976f050255",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Actual initialized widget message with fixed six button IDs and disable payload; active manager guard. Shared protocol view meaningful; no dynamic index, byte buffer, goto, manual varargs or artificial aggregate."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::EnableButtons(void)#1": {
+    "body_sha256": "50b7b451b8d84e8538982400d6474feee7180a12622d7d0a905943cfc847f197",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Actual initialized widget message with fixed six button IDs and enable payload; active manager guard. No dynamic array index or other debt pattern; event union and message record retained."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SaveAdventureBorder(void)#1": {
+    "body_sha256": "680e9d69e2f085617a9b92f13cac4896fffa0759c8ac262c06581c3e26911906",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "retain",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Real0x7400-byte border allocation and cursor. Two16-row480-byte edges plus448 middle rows of32 bytes use exactly29696 bytes. Screen rows0..479 fit640x480; final saved/screen cursors are exactly one-past, not outside their objects. void* allocator-to-u8* cast is real boundary; no fake stack record."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DrawAdventureBorder(void)#1": {
+    "body_sha256": "900105c20c244fe64a5044c64ed07150f65ee3bf3769388b749e830024020d17",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "retain",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Reverses exact border packing:32*480+448*32=29696 bytes within0x7400 owner, with middle side offsets0/464 in480-wide view and640 screen pitch. Final cursors one-past valid; null/no-border guards. No cast, union, stack aggregate or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::FindAdjacentMonster(i32 originX,i32 originY,i32 * monsterX,i32 * monsterY,i32 excludedX,i32 excludedY)#1": {
+    "body_sha256": "d1676d311d3b2ddd5ae717aa41a7b9a00d561db0ac390f02df3e8feebe18cc4c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G37 foundAdjacentMonster shared output tail. Real file-static scan coordinates, not padded stack state. For valid origin0..width-1/height-1, separate interior/edge cases bound all direct fullMap neighbors; invalid outside origin is not globally clamped (B43). Exclusion and north-side object tests meaningful; output pointers require callers."
+  },
+  "src/SOURCE/ADVMGR.cpp:ComputeAdvNetControl(void)#1": {
+    "body_sha256": "103187fc0000506013688534a5875738de1014d4646d9f86fd952b09c52679f8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S30 myPlayer unread. B48 full249 bytes/sites/ordered targets match retail: dead-current-player first while never advances candidate, so fails to terminate unless immediate successor is alive human. Second loop skips immediate successor before testing and may retain selected=-1 then index gbThisNetHumanPlayer[-1]. Both are retained observed behavior, not speculative reconstruction fixes; current-player domain remains B43."
+  },
+  "src/SOURCE/ADVMGR.cpp:MapExtraPosAndAdjacentsSet(i32 x,i32 y,u8 mask)#1": {
+    "body_sha256": "dc65e9e5138381740e9adab143dd11f4b3e16ab5c44de0e400c5d12b8d95a651",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B43 first MAP_EXTRA_AT_WFIRST(x,y) occurs before any coordinate guard. Later3x3 neighborhood separately rejects invalid x/y and is safe; that does not protect initial raw access. GetMoveShowIt/TeleportTo callers must prove both current/destination coordinates. No cast, union, fake aggregate, goto or varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ViewPuzzle(void)#1": {
+    "body_sha256": "af1be5a3531629c27f935b558a16199e5d06db2dd77de1d05df0c66bc8edfafd",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "retain",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Actual48-entry permutation contains each0..47 once; piece mask/order loops fit48 and palette byte index fits256. Screen tan transform uses actual within-screen rectangle, end pointers remain inside owner. S30 initial xOff/yOff zero stores overwritten. B43 current player/artifact coordinates, puzzle resource frames and metadata remain; no artificial aggregate or goto."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::PuzzleDraw(i32 left,i32 top,i32 right,i32 bottom)#1": {
+    "body_sha256": "ca903100394887a54e95d22fa1aba693e1f1d7bde938263fd34db27e590a41a4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S30 six unread puzzle locals; real draw-mode toggling and route icon entry. Clip flag/explicit480x480 region confines output even for translated marker coordinates; no fake byte array, owner recovery, casts or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::AdvPanel(void)#1": {
+    "body_sha256": "0dfada75867f88e76c1f217d354030aeb338c2ed4ec9fb2a4cdeec51eb3d8c29",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual heroWasMobilized restoration scalar and widget message, explicit panel command dispatch. Disabled search control when no hero does not independently prove callback cannot request it; B43 ProcessSearch/current-state contract remains. No goto, fake aggregate, local text buffer or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:APanelHandler(tag_message & message)#1": {
+    "body_sha256": "3983c551b7833bec18e31e25fc809139450a5e8f8b096b608b2b712618436c2e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Five explicit help mappings bound gAPanelHelp[5]; sentinel rejects unknown IDs. Real widget-to-dialog transition preserves selected ID before writing close command. No manual varargs, cast, local buffer, artificial owner or unrelated reuse."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ControlPanel(void)#1": {
+    "body_sha256": "4d0b084e8b1d80fda96dbefafffc49e5ebedfbd297c8709dc6587059eca04117",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Real initialized widget message for remote-mode disables, selectedCommand enum-like scalar and saved mobilization flag. Explicit restart/new/menu values only publish gGameCommand; SaveGame delegated. No artificial aggregate, cast/goto, byte arithmetic or local unresolved extent."
+  },
+  "src/SOURCE/ADVMGR.cpp:CPanelHandler(tag_message & message)#1": {
+    "body_sha256": "5111efffa0ec72f9ef97d0b6b2bf0ef1cfdceb2793b0a539328f0878d68ce9c7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "G38 confirm_reset shared confirmation tail. Real question[200]; actual three retail literal extents67/72/31 includingNUL prove fit. Five explicit help indices fit gCPanelHelp[5]. Full633 bytes, all sites and ordered targets independently exact in b45-controlpanel-retail.log. Real widget event transition, no manual argument-slot reads."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DoVisions(hero * visionHero)#1": {
+    "body_sha256": "e70673ab83c4da5364eb3097b6e8b85b070719efce4c2cce04fffbc237009041",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "G39 showVision/flee/fight joins need structured-source alternatives. Real msg[200]; genuine formats with worst-case i32 substitutions and66 plural names prove local/combined gText500 capacity (check-advm-bounds.py). Actual floating ratio casts and sprite-byte-toCreatureType decode retained. B43 monster type/count/fight denominator, owner and skill contracts remain; GetCell clamps radius-edge lookups but may select synthetic off-map position matching cell0,0."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::IsCrystalBallInEffect(i32 x,i32 y,i32 radius)#1": {
+    "body_sha256": "0cdee59141e7c9e0d46f5a14c8a6af9cd272be258d8426aa60c731029aeb3b95",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real Euclidean distance: integer squares, double sqrt and truncated i32 result. Valid map coordinates0..143 bound sum<=40898, safely representable; generic x/y outside map need B43 numeric contract. Player count/hero ID/artifact ownership also required; no stack aggregate, goto, union or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:StopOnTrigger(class mapCell * cell)#1": {
+    "body_sha256": "200af6bdba196aed35229c4d97c107958ec43875b1c757757710d6170b8d7203",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Masks trigger to7-bit domain before bStopOnTrigger lookup; actual table has124 entries, so malformed values124..127 remain B43 OOB inputs. Expansion-object case uses masked special metadata switch without table access. No explicit casts, fake owner, stack aggregate or varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::HeroQuickView(i32 heroId,i32 locatorSlot,i32 windowX,i32 windowY)#1": {
+    "body_sha256": "1aaa7c4e1ae63b5d9e89ddeefd453f51e9b5f771a80b29ce8d1df1b8d0ff9b9f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real five-slot labels/icon/text arrays, widget message and saved map origins; counted nonempty slots bound scan indices across both1..5 layout families. S30 unread i16 layout/id scalars. B45 exact count label allocates5 bytes: signed i16 positive32767 needs6 including NUL. Scoped retail allocation/load/format/call proof passes; whole3579 instruction bytes match but EH aliases remain unresolved. Vague15-byte labels fit genuine title names(max7) and debug i32 text(max11); owner/hero/icon domains remain B43."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::GetArmySizeName(i32 armySize,ArmySizeNameVariant grammar)#1": {
+    "body_sha256": "41987573e4b115195938d4440acb706fe0b001ad6828b3c26a3f056ee9634349",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual12-byte cArmySizeName global fits every decimal i32 including-2147483648 and NUL. Nine army thresholds select valid table rows, including negative input in first row; grammar must be0..2. Genuine27 pointer destinations contain max9-byte text, title column max7 (check-advm-bounds.py). No casts, fake stack aggregate, manual varargs or owner arithmetic."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::TownQuickView(i32 townId,i32 locatorSlot,i32 windowX,i32 windowY)#1": {
+    "body_sha256": "c3f0838e5987eefff772012147bf8089c8c97a1d3b7b4fa7335de1698e1e226f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Real five-slot widget/label arrays and saved map origins; counted stacks prove scan indices and nonzero row divisors. S30 unread layout/id scalars and armySlot. Exact i16 counts need at most7 bytes and fit15-byte labels; title names(max7), debug i32(max11), ??? also fit15. Unknown text fits20. B45 sprintf(gText,GetTownName(id)) uses a town name as format. B43 town/owner/icon domains remain; neutral owner guarded."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::RedrawAdvScreen(i32 update,i32 freeBorder)#1": {
+    "body_sha256": "40b76386e268b167f3c2a8d3e260e6e6c9023c72a2f1b87ec776fb11b0c8db16",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual backdrop/border lifetime and full-screen redraw with constant640x480 region. Optional border free followed by SaveAdventureBorder requires real saved-buffer lifecycle; no pointer casts, manual varargs, fake aggregate or artificial address calculation. Related B43 resource/window readiness remains."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DeactivateCurrTown(void)#1": {
+    "body_sha256": "8b9c8e18b594184c738a2fab8ab843b88e113f62af00aab46e81bb2a3d3535d8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Sets actual current-town selection to-1; no buffer, cast, control-flow join or other checklist pattern."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DeactivateCurrHero(void)#1": {
+    "body_sha256": "1821bdba1eac21f0c9b35a828f53ee53c20c291108666b71bc44c35bb3926bab",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Demobilizes then clears actual current-hero selection to-1. No local owner, arithmetic, cast, union access, varargs or bounds-bearing operation."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::MobilizeCurrHero(i32 update)#1": {
+    "body_sha256": "ff5d1f7a5e783f8de0cf8ed222248b9735ba665ab6763fd39230220a041795b4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Invalid-hero and already-locked guards precede SetHeroContext. Current hero still needs initialized valid ID (B43); no local buffers, casts, artificial owner or unrelated parameter reuse."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DemobilizeCurrHero(void)#1": {
+    "body_sha256": "fa1df520a8c821cc255355eff5ee908bf9b8aba3fadf339c0f8ad46161902c3f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual hero/cell metadata restoration after invalid-ID and lock guards. Flag-domain cast carries embarked bit; GetCell wrapper clamps coordinates, not raw out-of-object arithmetic. B43 hero ID/occupied metadata context remains; no fake aggregate or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SetTownContext(i32 townId)#1": {
+    "body_sha256": "9e752445dc0fc56fdce13f54d4312195c758ec86c0ab15ac702dd8ca906da368",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "R05 townNo first identifies locator position then becomes terrain ID. i8 casts store actual narrow player town/page fields; no artificial address. B43 requested town must belong to valid player/count/IDs and terrain index must be valid; no sentinel guard before GetTown. Scroll-page adjustment is bounded only under that contract."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SetHeroContext(i32 heroId,i32 update)#1": {
+    "body_sha256": "1c1ed807ea1b3946caa65e2e49f01d6dda34cfddac8e873ff0bf7289acd713c4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "R05 heroSlot first identifies locator position then carries terrain. Narrow currentHero/page stores and faction-to-HeroCursorType conversion correspond to real field domains. Sentinel checked but hero membership/count, path destination, terrain and player state remain B43. GetCell clamps coordinates; RestoreCell has its separate caller contract. No local aggregate or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DoHeroKnob(void)#1": {
+    "body_sha256": "77694dee771124d609361f28663c5d868bc774f993158c97a41a22f9bd0bb3d8",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real mouse/widget event union and output x/y locals; MouseCoords requires both references even though onlyy used. Floating scale is computed before count>4 check, so enabled-control caller contract must exclude count4 division. Mouse y clamps195..268; normal count/page yields valid narrow page. Post-store pageIndex clamp does not clamp stored field. B43 count/lifecycle and numeric-domain evidence needed."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DoTownKnob(void)#1": {
+    "body_sha256": "9eee79312e9003efe31afbd22d03201ac50bf92cc1ac38f26e9ff6ff6c1943db",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real event transition and MouseCoords output pair, not fake stack aggregate. Scale divides by townCount-4 before later count guard; caller/enabled-knob contract remains B43. Normal clamped mouse coordinate195..268 bounds page conversion; later local pageIndex adjustment occurs after narrow field store. No goto or unrelated variable roles."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CastSpell(SpellType spell)#1": {
+    "body_sha256": "fbb57da59075c1003ce5fd3b3bf398a2b1acc66b09c938c8328ad8a1b94f3a9f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G34 setMineGuardian shared switch body; S30 guardianCount unread. Actual mineGuard and power locals; power cap limits positive guardian product beforeu8 wire/storage conversion. B43 null hero when no current selection is dereferenced by guardian/travel arms and final UseSpell; spell cancellation/domain, mine index and negative power need caller contracts. Dialog literals carry no local format buffer."
+  },
+  "src/SOURCE/ADVMGR.cpp:SaveGame(void)#1": {
+    "body_sha256": "57784d365d80b4bdc32b27704497d02eba028c9691b80a7ba527573746ca7b49",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "Real suffix8 and pattern16 arrays; player scan0..5 bounds nPlayers0..6, so .GMn/.GXn strings need5 bytes and wildcard forms6; campaigns fit too. S30 ok=1 before overwritten SaveGame result is unread store. Real requester lifecycle and result scalar, no casts/unions/gotos/manual varargs or fake combined stack record."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckCastSpell(void)#1": {
+    "body_sha256": "c8e771c010c1e8e74ba2420b1774f6356a90fed4a6eae1378aae272ece565043",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Current-hero sentinel guard then mobilize/draw/ViewSpells/CastSpell. Actual spell result crosses typed APIs; no local stack owner, cast or manual varargs. B43 valid current ID and ViewSpells cancellation result need downstream spell contract."
+  },
+  "src/SOURCE/ADVMGR.cpp:DimensionDoorHandler(tag_message & message)#1": {
+    "body_sha256": "34cbf8eaa3d5b7d2b29a8fb2cd70f6750d11b5e682fcf82cf9aa11d7b31c5466",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual input/widget transition, but mouse screen fields are read before dispatch even for other message tags (U01 shared protocol contract). Mouse viewport clamps cells0..14; world coordinates may remain off-map and GetCell substitutes0,0. B43 teleport acceptance must establish actual destination bounds, not just substituted cell terrain. No goto/manual varargs/fake local aggregate."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ComboDraw(i32 originX,i32 originY,i32 animate)#1": {
+    "body_sha256": "c8dc08b71644dd874b861b234211624423295568c0e08e0ee16b781e80370c66",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "B47 genuine4788-byte body and complete ordered targets/sites exact: actual18x18 grid stride18 but memset only256/324 bytes; monster drawX0 writes[-1][y], hero/boat drawX1 and y>=1 writes[-1][y-1]. Positive x+2/y+1 neighbors fit18 for viewport0..14; do not invent border padding. All GetCloudLookup calls now verified behind valid world-coordinate guards. S30 updateCount unread; normal flag arrays and scalar draw coordinates, no goto/manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ComboDraw(i32 update)#1": {
+    "body_sha256": "a715af72aed629adbeefd809172b92fee6a552438b21b6e0c4c4c3cee12c477f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Forwards stored origin and animate/update argument to main ComboDraw without additional validation; inherits B47 grid hazards. No new cast, buffer, owner reconstruction, variable reuse or varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::SetEnvironmentOrigin(i32 originX,i32 originY,i32 stopSounds)#1": {
+    "body_sha256": "d4ceb150f56c867f1582fc89e9d445ea1c0239f69a208d4c0fd2051f0f05fe2b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S30 maxCells unread. Real four active sound records and28 sample pointers; ring enumeration distances0..3 and layers feed InsertSound, which checks world bounds. Active sound IDs must be initialized valid/sentinel before sample indexing and BIT; B43 saved state/backend/resource lifecycle remains. No local aggregate/union or artificial owner."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::CheckLoadSample(i32 index)#1": {
+    "body_sha256": "0008acb7677373f9e8f602ce1af4a3a4be9a14ee11bca92da5a481037e4afb86",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Formats loop%04d.82M into gText500; even arbitrary i32 decimal fits20 bytes. index nevertheless directly indexes28 sample pointers before validation, so B43 sound-ID input contract remains. Trim then resource acquisition is actual lifecycle; no fake aggregate or casts."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::GetSoundId(i32 x,i32 y)#1": {
+    "body_sha256": "982efc68f954a5425f296a5fdc9ba5e85020b3c6ae91e238f7ba269b50a21272",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S30 initialized soundId unread. Direct fullMap GetCell is safe for the only found caller InsertSound, which guards x/y. Object/action branches return explicit environment IDs orNONE; no goto or union. B43 terrainImageIndex still indexes ground/shape tables without local validation. No out-of-object pointer for validated caller coordinates."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::InsertSound(i32 x,i32 mapY,i32 distance,i32 soundLayer)#1": {
+    "body_sha256": "26cbb538c9bfd7882b863deab80f8b54f667be7180fc740cee938106bdf03b3d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "World-coordinate guard precedes only GetSoundId call; explicit enum results0..27/NONE bound sound lookup and bit shifts, and four-slot search only uses candidate after!=-1. Public distance/layer inputs and restored active IDs/backend sample lifetime remain B43 contracts; ordinary caller uses distance0..3. No casts/gotos/fake local record or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::TeleportTo(hero * mapHero,i32 destinationX,i32 destinationY,i32,i32 skipMapChange)#1": {
+    "body_sha256": "4e934b85e9ccd4787c332e7eae7957b1e6a2ad7749c2814b490179c42d245afb",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S30 unused/fizzleTime36 require native frame cleanup; savedShow is real state controlling HideRoute. u8 network coordinates are actual serialized fields. GetCell clamps both cell pointers but raw destination still writes hero coordinates and feeds map-change/visibility helpers; B43 caller world bounds, current/watch-player, scouting/terrain and occupied-town IDs remain. Real state-restoration scalars, no fake stack aggregate/goto."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DimensionDoor(void)#1": {
+    "body_sha256": "0e085b423c57f96eb060ed30a01c4d77a87fe349cc663dbf652d20bec68369f4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual dialog window and selected destination; no casts/gotos/local byte owner or varargs. GetCell clamps off-map targets for terrain test, but newX/newY are then passed unchanged to TeleportTo: B43 accepted hover must establish world bounds/current hero. Uses spell only after accepted dialog; resource/window lifecycle remains."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::DrawCell(i32 mapX,i32 mapY,i32 screenX,i32 screenY,AdventureDrawMask drawMask,i32 forceDraw)#1": {
+    "body_sha256": "54e0f5663a19c859317ec4f1c1ee5dc850fc444f48f85b594414bef05d345e49",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Full draw phases read. S30 cursorSuppressed is unread; real file-static draw scratch is not a stack aggregate. HeroCursorType bridges faction/boat domains. GetCell clamps invalid coordinates before edge handling, so that call does not form an out-of-object pointer. B43 mine/boat/hero/owner, terrain/sprite/extra-link indices and positive animation lengths remain gameplay/resource contracts; no goto or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::GetCell(i32 x,i32 y)#1": {
+    "body_sha256": "4f34a7cfebfd0a5d93d87e24ecc77875b4be437f3f8afe08511e0b93362cf9ed",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Wrapper checks x/y against map dimensions and substitutes underlying cell0,0 on any invalid coordinate. Real flat-map accessor, no owner recovery. All133 instruction bytes and ordered targets/sites match genuine retail (build/b43-getcell-retail.log); this resolves the earlier MoveHero/DrawCell early-pointer concern for wrapper calls, not direct fullMap calls."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdateRadar(i32 updateScreen,i32 partial)#1": {
+    "body_sha256": "9c9cdc8eb28b0bb4a5ed5817f976436edb61a5f2dab22b079df0bba95f114056",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G31 radar_default_object shares terrain/mine fallback. S30 w/delta/oldColor/cx are unread; scalar floating coordinate conversions are real. B43 direct fullMap GetCell(i+1,j) lies outside the left-neighbor bounds guard and can dereference beyond the final map cell; all3767 instruction bytes/sites and ordinary targets pass, with six numeric constant destinations independently proven in check-advm-bounds.py. Standard36/72/108/144 maps fit radar144x144 at480,16; final line pointer remains inside screen480 rows. Metadata/owner/terrain domains remain."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::QuickInfo(i32 cellX,i32 cellY)#1": {
+    "body_sha256": "f5dcb6419f8d108287b1e07933e01f8ab021aba699a6fbca54e2676f1fab7185",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G32 quick_info_default/guarded joins; S30 ch/j/quickInfoShowFlag unread. C22 toupper receives signed i8 promoted to i32 before char conversion; localized-byte API contract/native comparison needed. Real guardStr200 and savedText800 buffers; savedText backs up gText500 and is not automatically fake padding. B45 lookup text used as format, guard/title lengths and obelisk/creature/resource/terrain domains remain. Coordinates checked before mapExtra; visited mask bit index&31 stays valid."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdateHeroLocator(i32 locatorSlot,i32 drawWindow,i32 updateScreen)#1": {
+    "body_sha256": "3a97df7ab5e07e8420d9a705bd79c75e10abcadb77e1b2f087a4a55c2e260055",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real widget message with portrait/mana/mobility frames and four-slot locator addressing. B43 page+slot needs initialized player hero IDs/sentinels, valid portrait and hero state. No goto, artificial local aggregate, manual varargs or pointer recovery."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdateHeroLocators(i32 drawWindow,i32 updateScreen)#1": {
+    "body_sha256": "18865bb7909f49732997955a15fa5d60d01ff978f59f8672d980afbd087438b3",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual widget message and double-to-i16 knob coordinate. heroCount>=5 proves denominator count-4 nonzero; valid page0..count-4 yields195..268 and fits i16. Four locator calls still require valid page/IDs (B43). No unrelated scalar reuse or fake stack owner."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdateTownLocators(i32 drawWindow,i32 updateScreen)#1": {
+    "body_sha256": "f15cc33e5c7204e025a7d705de3e31f450b9c9244e097d49340b58de03237064",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real town portrait/flag and knob widget messages. townCount>=5 protects denominator count-4; valid page bounds keep knob coordinate in i16. Four town IDs, faction/owner and initialized sentinel slots remain B43 contracts. No artificial stack aggregation or owner arithmetic."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomView(b32 forceUpdate,b32 drawWindow,b32 updateScreen)#1": {
+    "body_sha256": "fe09e1726952f15ee86e2d2ab41f8ff6f89efd0fd69beccb0e531ae99e19b9c1",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "G33 update_bottom_view join selects actual update/draw phases. S30 final forceUpdate=gbForceUpdate parameter store is unread. Actual updated result, timers and display modes are independent scalars. Bottom-view framebuffer rectangle480,392,143,71 fits640x480; no local buffer or manual varargs."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::ClearBottomView(void)#1": {
+    "body_sha256": "6d99b6b97639d32398ec84ea5d57c1dfe346e640d29aa41536fbce8f997a2664",
+    "patterns": {
+      "casts": "absent",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "U08 real primary/secondary widget* arrays each have12 slots, null-checked deletion and clearing. All consumer operations use the widget base; unused integer/derived/padding union views removed with whole98-TU native equivalence. This294-byte body also has complete independent retail bytes and ordered target/site proof. No fabricated aggregate or cross-member traversal."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewEnemyTurn(void)#1": {
+    "body_sha256": "f5e391a15665b4da40f9f9b3779e95bf9624dc46cb812e51f824233a79a83a1e",
+    "patterns": {
+      "casts": "open",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "U08 true widget owners; U01 real widget message. C23 char(giCurPlayer) truncations before player lookup/GetPlayerColor need measured source alternatives. Valid players0..5 make truncation unnecessary semantically, but native proof still required. Hourglass20-frame phase/resource domains remain B43. Assignment iCurBottomViewEnemy=giCurPlayer precedes its inequality test; retained behavior, not an unproven cleanup."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewNewTurn(void)#1": {
+    "body_sha256": "dcfe2840e2e69d47e385fe00fb1bcde4e2805efcd4b58025dad531c3b132ab28",
+    "patterns": {
+      "casts": "retain",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "U08 actual widget arrays. S30 month unread; allocation-to-char casts are real void* boundaries. Week/day char[30] owners fit actualu16 dates: month/week worst28 bytes includingNUL, day12. B46 both use secondary slot0/id2100, losing week tracked pointer; parent list retains it after ClearBottomView and releases it on normal window Close. AddWidget/Close/RemoveWindow independently exact; no permanent unreachable-allocation claim or speculative leak fix."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewResMsg(void)#1": {
+    "body_sha256": "b4afc1d16d9996dc67fd861ebe3135399742623d965810366c1c1e2366efeab3",
+    "patterns": {
+      "casts": "retain",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "U08 widget owners and real widget message retained. B45 messageText is allocated strlen(gcBottomViewText)+1 but receives sprintf(messageText,gcBottomViewText); format contract and92-byte input owner need all callers. Quantity allocation8 needs actual resource-domain bound, not arbitrary i32 assumption. Allocation-to-char cast is real void* API boundary; no manual argument-slot access."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewKingdom(void)#1": {
+    "body_sha256": "7b638a27e630a3c2488684463a5d14848930a23c7ba029df32eb74dcf46f896d",
+    "patterns": {
+      "casts": "retain",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "U08 widget arrays; real rowY/textX/countText arrays each9 entries for7 resources and2 town totals. Eight-byte decimal allocations fit town totals<=72, but i32 resource balances need B45 gameplay caps. Real allocator void* conversions and i16 widget coordinates retained; no stack padding overlay or fabricated owner recovery."
+  },
+  "src/SOURCE/ADVMGR.cpp:advManager::UpdBottomViewHero(void)#1": {
+    "body_sha256": "b8b3b9d712a0229e9ec1d7db6b9546578006546f1b821839420eb1e41054499e",
+    "patterns": {
+      "casts": "open",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "U08 widget arrays; S30 leftEdge/rightEdge unread. Real iconPositions16-byte xy table and5x5 slotLayouts: usedCount1..5 and index<usedCount prove layout entries0..7. C24 byte-address-toIconEntry duplicates GetIconEntry helper; natural accessor candidate needs native matrix. Six-byte count labels fit ordinary nonnegative i16 values (>=2000 uses k), but negative i16 minimum needs7 bytes: B45 invalid-count contract."
+  },
+  "src/SOURCE/KB.cpp:BVResMsg(char * s,ResourceType res,i32 qty)#1": {
+    "body_sha256": "fc4a6ecb8f0149a7220fefac7505cb4b5adf8c9de9ad3090b929084075f04509",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B45 copies caller text into92-byte gcBottomViewText without length validation, publishes resource/quantity and timed override, then redraws bottom view. All caller string/resource/quantity contracts require review; no explicit casts, local buffers, varargs traversal or fake aggregate."
+  },
+  "src/SOURCE/KB.cpp:GOut(char * str)#1": {
+    "body_sha256": "b9a052323050beea9b0df0c47e1833f17725828d6129e04bc6d58d02c859f51b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Passes text to AiPrint only when adventure manager is active. No casts, unions, gotos, arithmetic, stack owner or manual varargs. Text termination/consumer capacity belongs to AiPrint/callers; not established by this forwarding body."
+  },
+  "src/SOURCE/KB.cpp:NetPosToGamePos(i32 netPos)#1": {
+    "body_sha256": "838ee0440562bef2f81d4a3b0dc27df969b173014a74fcbc33781b70450e32cc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Loop0..GAME_PLAYER_COUNT-1 accesses all six mapping entries and returns first matching game position or-1. Input netPos does not index the array; no unresolved local extent or any other debt pattern."
+  },
   "include/SOURCE/advManager.h:advManager::GetCommandTargetX(void)#1": {
     "body_sha256": "cfef48e61f2b4befc09497fd23499ac771d04a134c772f59026030188e9834c0",
     "patterns": {
@@ -93,7 +1277,7 @@
       "stack": "open",
       "bounds": "open"
     },
-    "note": "G28 cheat-digit and game-command joins need matrices. R03 c mixes resource/town loop index, cheat digit and game command; S30 mx/my and assigned curHero are unread. U01 actual widget/mouse/keyboard/executive event transitions. Keyboard directions are explicitly0..7, but B43 MoveHero destination guard occurs later; townCount>=0 permits townIds[0] when count0. Fixed coordinate message fits gText500."
+    "note": "G28 cheat-digit and game-command joins need matrices. R03 c mixes resource/town loop index, cheat digit and game command; S30 mx/my and assigned curHero are unread. U01 actual widget/mouse/keyboard/executive event transitions. Keyboard directions are explicitly0..7; MoveHero's GetCell wrapper clamps invalid destinations to cell0,0. B43 townCount>=0 permits townIds[0] when count0. Fixed coordinate message fits gText500."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::Reseed(i32,i32)#1": {
     "body_sha256": "eca227bb97091c9c8041bf38198837a86548383a8069ee8504ed30f54a829c4d",
@@ -221,7 +1405,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Actual15x15 layered rendering loops, forward/reverse draw order and saved-origin restoration state. No casts, goto or fake stack arrays. B07/B43 caller origins and DrawCell clipping/early pointer formation remain relevant; edge cells are intentionally passed to the renderer."
+    "note": "Actual15x15 layered rendering loops, forward/reverse draw order and saved-origin restoration state. No casts, goto or fake stack arrays. B07/B43 framebuffer/resource contracts remain; edge cells intentionally passed to DrawCell do not form invalid map pointers because advManager::GetCell clamps to cell0,0."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::CompleteDraw(i32 update)#1": {
     "body_sha256": "b014c5a66c0fdf2e5f3c6efba05f43df72985637560716d7cf5b41720873d545",
@@ -272,10 +1456,10 @@
     "note": "Actual hero window allocation/lifecycle and hero-cell lookup; noDismiss is copied to the real gbNoDismiss flag. C21 caller passes pointer bits; downstream nonzero usage inspected but not silently normalized. B43 heroId and hero coordinates need valid gameplay context. No local byte buffer or fake aggregate."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::Open(i32 id)#1": {
-    "body_sha256": "7efab233e33c17c502d94c2660eb43ede0bd62fb8fcff41984e804a9aed21931",
+    "body_sha256": "aad8ca608638dbdf61fb1248ddb0e67af942e897b8cd55199d3e3c1803264099",
     "patterns": {
       "casts": "absent",
-      "unions": "open",
+      "unions": "applied",
       "gotos": "absent",
       "address": "absent",
       "owner": "absent",
@@ -285,7 +1469,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close now uses array delete with exact native/retail proof. U08 locator integer arrays only clear bottom-view widget storage; shared owner recovery remains. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
+    "note": "O04 human-speed consumer uses recovered array. Actual visibility map allocates MAP_WIDTH*MAP_HEIGHT u16s; B44 Close uses array delete with exact native/retail proof. U08 initializes two actual widget* arrays of12 slots toNULL; all consumers reviewed and whole98-TU native proof passed. Resource/locator loops fit declared owners; advManager literal fits30-byte base-manager name. B43 player/watch-player context remains. Saved volume/player/display values are real restoration state."
   },
   "src/SOURCE/ADVMGR.cpp:advManager::Close(void)#1": {
     "body_sha256": "a95596804138250bfd7790115a355d9604f6c92da2076254e6c4493524c873f8",
@@ -477,7 +1661,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "Visibility decision computes direction-shifted map coordinates from a hero and uses the visibility lookup; direction/hero/map coordinate contracts need caller proof (B43). No artificial aggregation or casts."
+    "note": "Visibility decision computes direction-shifted coordinates then calls MapExtraPosAndAdjacentsSet. Complete helper review proves its first raw mapExtra read precedes coordinate checks, so current/destination world bounds and direction/hero contracts remain B43. No artificial aggregation or casts."
   },
   "src/SOURCE/CURSOR.cpp:advManager::MoveHero(MapDirection direction,i32 stopAfterMove,i32 * eventX,i32 * eventY,i32 * outOfMobility,i32 processEvent,i32 * adjacentMonster,i32 forceMove)#1": {
     "body_sha256": "fec9bbaabeb3a346d4b2dd2ad5004d72a5355998b4c2d7164bd50a031d90c2a9",
@@ -493,7 +1677,7 @@
       "stack": "absent",
       "bounds": "open"
     },
-    "note": "O04 three real-array accesses applied. G25 movementDone/stoppingEvent/adjacentDone joins need complete structured-source matrices. R02 step_a spans boat search, animation loops, terrain and resource lookup. B43 destination dereference precedes validity check; failed boat search can form/dereference boats[48]. Narrowing casts encode real map/wire fields."
+    "note": "O04 three real-array accesses applied. G25 movementDone/stoppingEvent/adjacentDone joins need complete structured-source matrices. R02 step_a spans boat search, animation loops, terrain and resource lookup. B43 GetCell clamps invalid destinations to cell0,0, so that lookup is not an out-of-object access; direction/terrain/speed domains and failed boat search forming/dereferencing boats[48] remain. Narrowing casts encode real map/wire fields."
   },
   "src/SOURCE/CURSOR.cpp:advManager::CheckAdjacentMon(i32 * adjacentMonster)#1": {
     "body_sha256": "d41b5bcb4233e739f26145a1773db1ca90a46fa1e4f6b1021a5093e07c991f0b",

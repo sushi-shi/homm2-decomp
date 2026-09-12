@@ -1,4 +1,8 @@
 {
+  "src/SOURCE/ADVMGR.cpp": {
+    "sha256": "39137e1b441e663ecb34500b39488aab633d6c3f4b39f021598c5a6fe6137d4f",
+    "note": "Full10885-line TU read across ordered batches: prolog enums/macros/static owners, every physical body and trailing globals/vtable reconciled. O04/B44/U08 owner/type changes verified; G27-G39 joins, R03-R05 roles, C20-C25 conversions, S29/S30 unused state, U09 wire owner and B43/B45-B48 contracts retain per-function dispositions. Genuine-retail radar/grid/count-label/control evidence recorded separately; source anomalies not silently repaired. Real18x18 redraw grid,48-piece order,0x7400 border owner and other fixed arrays inspected."
+  },
   "include/SOURCE/ADVMGR.h": {
     "sha256": "7b9777229ae53954e735bd38d318f1392596f3e187b1279251d6f151c13af7c7",
     "note": "Full149-line header read: sound/command/draw domains, network command lengths and all cross-TU globals/prototypes. No hidden function or macro body; real AI coordinate/resource arrays retain documented dimensions."
@@ -8,8 +12,8 @@
     "note": "Full23-line header read. U09 AdventureRemotePayload overlays sixteen raw bytes, save fields and SPlayerExit; tag-dependent wire meanings are credible but unused views/extents require remaining CheckHandleNet consumers. Not granted a safe bound by SIZE alone."
   },
   "include/SOURCE/advManager.h": {
-    "sha256": "fc8aede10196333113009e10721bb7aca6e9fa27b322f933b718b9ca12d3b147",
-    "note": "Full441-line header/two inline accessors read and reconciled. U08 bottom-view arrays overlay misleading locator integer arrays and typed widget subviews; S30 named padding/reserved fields need actual owner recovery. Real packed0x37e manager, pointer arrays, cursor/frame/sound dimensions and all declarations inspected. Other bodies remain individually pending."
+    "sha256": "53448f04e8ba505046a43e393585b6cdeb715e270a07a784603a9ddf8259fc5d",
+    "note": "Full updated header/two inline accessors read and reconciled. U08 replaces two union owners with actual12-element widget* arrays; all seven consumers and shared native output reviewed. Removed integer/derived/padding views; packed0x37e layout preserved. S30 unrelated runtime gaps remain unproven. Cursor/frame/sound dimensions and all declarations inspected; remaining out-of-line bodies individually pending."
   },
   "src/SOURCE/dpnetwin.cpp": {
     "sha256": "7ccab6fd6609c02e62dbb0394c65dce517752cde1cc9a426dcd2fed85933a7ae",
