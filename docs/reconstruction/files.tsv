@@ -81,13 +81,13 @@ include/SOURCE/HERO.h	40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cf
 include/SOURCE/KB.h	21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462	2	0	pending	Not yet reviewed.
 include/SOURCE/KB_TYPES.h	3bbe6eb9d162180d149d88c8a085aa540a8e0af6b37539a8d82c457d55b06e02	26	26	reviewed	Full969-line header read,26 physical functions and both modern/retail macro branches reconciled. Closed domains, open trigger codes and scalar conversions retained. U05: tag_monsterInfo contains a single-arm outer union/struct around cost/fightValue and alternate flag aliases; simplify only after initializer and consumer audit. Packed database structs are semantic records, not stack aggregates; menu reserved byte has no use proven here.
 include/SOURCE/Modem.h	1c1968bba64b613c7f902180b8f899ae81593310ab8ade378c6f4b6eff82794d	1	0	pending	Not yet reviewed.
-include/SOURCE/NOOPT.h	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	0	0	pending	Not yet reviewed.
+include/SOURCE/NOOPT.h	91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed	0	0	reviewed	Full three-prototype deadline owner header read.
 include/SOURCE/Netbios.h	2c468edde0d18b58224064925a9ad5ee338fd5a3b8e41f2f63b9eb6793afde9b	0	0	pending	Not yet reviewed.
 include/SOURCE/Newgame.h	b67f046c7caa54d7411991e09d9d1c5aa0fd6d5a6a699e37508ac53fed5890c6	0	0	pending	Not yet reviewed.
 include/SOURCE/Overview.h	905d7828d5ecc61e7f20193918f42a66cb1e2bac0328dd805a6de7bb5cfa92fe	0	0	pending	Not yet reviewed.
 include/SOURCE/PATH.h	c94723316a5de56876d63f392bf761b7bb34cf1147cf95cd5b6f011d6f2793e2	0	0	pending	Not yet reviewed.
 include/SOURCE/PHILAI.h	dc6bcb30461c9928091627e5df6b84d18ecbf7cb1ffd72567b9e53f25fa9fc18	0	0	pending	Not yet reviewed.
-include/SOURCE/RECRUIT.h	0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e	0	0	pending	Not yet reviewed.
+include/SOURCE/RECRUIT.h	0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e	0	0	reviewed	Full typed recruit-function owner prototypes read; seven-resource output contract is in GetMonsterCost, not a raw varargs layout.
 include/SOURCE/REMOTE.h	9795233ab9900b17af92062ef3f40724d2090b23e460feccc5eab67e85cd6656	0	0	pending	Not yet reviewed.
 include/SOURCE/REMOTE_TYPES.h	a65ca956345182b9a3d1dc281a9d1a0d5a764b894f6cd494add7545cbd4dbd70	0	0	reviewed	Full packet/message/protocol domains and packed34-byte SNetPlayerInfo reviewed. Four-byte system ID,21-byte name and6-byte reserved extension are genuine network storage; reserved[0] used to identify old players in wsEvaluateMessage. No function definitions or executable pointer macros.
 include/SOURCE/REQUEST.h	00c943f66afb99d21c10a6551a5f868c5b2e6451653602618df3870dc6bd44f8	0	0	pending	Not yet reviewed.
@@ -101,8 +101,8 @@ include/SOURCE/Wsnetwin.h	daec58a9e1baf1dd90665c03ef5034d49eec9b26e681109c2e64b5
 include/SOURCE/X_GLOBAL.h	63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d	1	0	pending	Not yet reviewed.
 include/SOURCE/advManager.h	fc8aede10196333113009e10721bb7aca6e9fa27b322f933b718b9ca12d3b147	2	0	pending	Not yet reviewed.
 include/SOURCE/army.h	1835685f63e1be6e7fda6b84f9f21523291070d9a09ddd0cd459072b67f70202	1	0	pending	Not yet reviewed.
-include/SOURCE/armyGroup.h	b31953182adb7d15b142c85bcff5d06951542f612bcfe4d25f989da543fde1e6	0	0	pending	Not yet reviewed.
-include/SOURCE/bankBox.h	348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8	0	0	pending	Not yet reviewed.
+include/SOURCE/armyGroup.h	b31953182adb7d15b142c85bcff5d06951542f612bcfe4d25f989da543fde1e6	0	0	reviewed	Full header read;15-byte real packed owner. U06 duplicate type/quantity aliases and unsigned count view need all consumers before consolidation.
+include/SOURCE/bankBox.h	348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8	0	0	reviewed	Full12-byte packed player/window owner and16-bit coordinates reviewed; no artificial aggregation.
 include/SOURCE/combatManager.h	11172778e68a861a77db959957215f5df6c99f7ac613d6c938f0684326ce4304	0	0	pending	Not yet reviewed.
 include/SOURCE/combatTypes.h	4cd3766ce7192a3952a2a8b8ea30a7949509f787ea9148508a3cd083babb9d0d	8	8	reviewed	Full119 lines/all8 inline functions and7 alternate macros reviewed. Typed enum adapters model valid binary side/facing/result domains. NO sentinel equivalence claim is made between strict enums and legacy arithmetic macros.
 include/SOURCE/comwin.h	951abf270e85390fc2a14bd37cd690ebc2e4102dbdbd9349962aff251e650512	0	0	pending	Not yet reviewed.
@@ -118,10 +118,10 @@ include/SOURCE/netwin.h	1e4b2e8b122c6c7bb90f6e0fb5b6c57b681b67d4393ba4fa3708514a
 include/SOURCE/netwin_private.h	335aca7d29b57036f5ee956b6265a8acf21e61872a182ad0013e653f4ef03f11	0	0	pending	Not yet reviewed.
 include/SOURCE/philAI.h	3dfe0766ad4abed31d7d16f1059a9aa40a285e92578ab86520c0072d9fbdab6c	0	0	pending	Not yet reviewed.
 include/SOURCE/playerData.h	95fbf9b9517844c3a72b20f0f6fd44ddee9a406e094737359abc43a4ff0c0449	8	0	pending	Not yet reviewed.
-include/SOURCE/recruitUnit.h	6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0	0	0	pending	Not yet reviewed.
+include/SOURCE/recruitUnit.h	6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0	0	0	reviewed	Full126-byte packed manager declaration read; S20 three4-byte unidentified gaps retained pending owner evidence; counter is a true borrowed i16 pointer.
 include/SOURCE/searchArray.h	ad483f65ac7f0acc70696aa75651bb381b8494aa04b5f38756c2edf3870a981a	4	4	reviewed	Full layout and four inline helpers reviewed. U02: padded path/aiPath overlays preserve pointer first four bytes; prospective pointer union plus real direction[256] needs all caller builds. U03/U04: counter and target-coordinate aliases look redundant; genuine nine-byte node auxiliary views retained. Total class0x2518 preserved pending proof.
-include/SOURCE/strip.h	b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083	0	0	pending	Not yet reviewed.
-include/SOURCE/swapManager.h	141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf	0	0	pending	Not yet reviewed.
+include/SOURCE/strip.h	b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083	0	0	reviewed	Full132-byte class declaration/enum/prototypes read. S19 unknown24-byte interior gap cannot be dropped without changing proven offsets; five icon/six border arrays real.
+include/SOURCE/swapManager.h	141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf	0	0	reviewed	Full90-byte packed manager declaration and typed side/item domains read; two-hero owner and selection fields fit UI range dispatch.
 include/SOURCE/town.h	152a21d536099dc905cd861822fec1a0c9b8bf097993b95a34d50853786f289b	1	0	pending	Not yet reviewed.
 include/SOURCE/townManager.h	89bcabd8f217478b2a86a8ddcc475f0880562616cd25cf2e755040ae102f71cc	1	0	pending	Not yet reviewed.
 include/SOURCE/townObject.h	4e0c90cbc973c613dd5b9e0b6a8dbcc4241fb97b77ef9488228c8149e16574fb	0	0	pending	Not yet reviewed.
@@ -181,7 +181,7 @@ src/EDITOR/mapcell.cpp	11b81e769b3dec0a107ab95f9d75e7eebabc1b2ac352d8aceb155b3d4
 src/SOURCE/ADVMGR.cpp	07da270722ada59c233a8fbf9567d07e2753ba0362924e4eb125f2203b93cc7c	95	0	pending	Not yet reviewed.
 src/SOURCE/AI.cpp	e1f8672e44f987d575de14ae592345b6cfdb07d22107cc019c6842e248bea14d	19	0	pending	Not yet reviewed.
 src/SOURCE/ARMY.cpp	9a6ba2a5fef4957eeb3a1832844e33efbadace73f83a2b413c43ea6a83c6784b	47	2	pending	Not yet reviewed.
-src/SOURCE/ARMYGRP.cpp	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	14	0	pending	Not yet reviewed.
+src/SOURCE/ARMYGRP.cpp	a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6	14	14	reviewed	Full282-line TU/14physical bodies including strict-only swap helper read. U06 duplicate army aliases; S18 unread morale local; B36 creature/slot domains. Real raceUsed7 fits all retail race ids0..6.
 src/SOURCE/CMBTMGR.cpp	c6830fbba94e6a8da5c7564e4b9775d6485a668f54b63b851ff1d03ec7a26ab7	38	0	pending	Not yet reviewed.
 src/SOURCE/COMMAND.cpp	0415faf2879b028df320eb313adafefad2ecf24fcafa211feb986427312f670b	36	0	pending	Not yet reviewed.
 src/SOURCE/CURSOR.cpp	9640b4070918a09eb3b6b964b4a1c3b7bb6b9da952b77f43e76586b393573251	18	0	pending	Not yet reviewed.
@@ -195,15 +195,15 @@ src/SOURCE/GAME.cpp	611a6431d899601cba04203f6f0c0fa1c96694b99e51bcddd84825c8feb5
 src/SOURCE/HERO.cpp	9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9	41	0	pending	Not yet reviewed.
 src/SOURCE/HEXCELL.cpp	af8e4915ec3fec698e22e584947eca636521f2be022e5cf6e102909127942720	8	8	reviewed	Full138 lines/eight definitions read. Real corpse arrays and clipping member array; B27 lifecycle bounds needs remaining producer review. No casts/gotos/artificial addresses.
 src/SOURCE/HISCORE.cpp	a93911b2e501b938d39c1c7a60b666885d3e7eb63c681d0667240a46be7f689b	5	0	pending	Not yet reviewed.
-src/SOURCE/KB.cpp	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	75	0	pending	Not yet reviewed.
+src/SOURCE/KB.cpp	bc4aa441a7a83468b067b484548f50725aa879540872c7d348bd128d1be964e4	75	3	pending	Not yet reviewed.
 src/SOURCE/Modem.cpp	0f54ae68a192f37429c53437d53c213c651574b72e8f921dde1da25c6f412d9f	15	0	pending	Not yet reviewed.
-src/SOURCE/NOOPT.cpp	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	3	0	pending	Not yet reviewed.
+src/SOURCE/NOOPT.cpp	c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b	3	3	reviewed	Full25-line TU/3deadline helpers read; no ten-pattern candidates.
 src/SOURCE/Netbios.cpp	0a880bda101394c0299eef93e8f5c073fdd63c63f2314f40429b55d35e2a5c52	5	0	pending	Not yet reviewed.
 src/SOURCE/Newgame.cpp	0a462978001a3348debdfaa6bbeb2d264aee172236817e930731839906ce6cfe	16	0	pending	Not yet reviewed.
 src/SOURCE/Overview.cpp	451e8ec6412d9c885a9c4cc9c4cca15d9ea95a1b688d83aacd3f53c5f9fa4e14	7	0	pending	Not yet reviewed.
 src/SOURCE/PATH.cpp	4adf75e500c06c8b8644f2c954570578b72fdd4fd1c9c2fb55de21b977e823e8	12	0	pending	Not yet reviewed.
 src/SOURCE/PHILAI.cpp	b6fe8a3fc9270d659da0859e8651d18cb104a1626112761fefa002a0acd90ac1	84	0	pending	Not yet reviewed.
-src/SOURCE/RECRUIT.cpp	801b298faf802f09b349ffbe24f8ad67ab90598ec19fbc99c8c902866f3adae2	8	0	pending	Not yet reviewed.
+src/SOURCE/RECRUIT.cpp	52ef23662146f8456341dc1772b3d149856a2cad4c49df5b26810289ad90093b	8	8	reviewed	Full458-line TU/8bodies read. C14 two const casts removed with11-function/all-section native equivalence. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost.
 src/SOURCE/REMOTE.cpp	4f0b9890b7b485716fc3a1bb200bf7f7614ae3ef75345e0867b340d22f03f30e	13	0	pending	Not yet reviewed.
 src/SOURCE/REQUEST.cpp	98e7c3eaf83bdcf2243c626472133899853a5dd9b53aa32b4775a0d96d5651ff	16	0	pending	Not yet reviewed.
 src/SOURCE/SEARCH.cpp	db79c87d9297de0e5e0f3e5f75a8e16e0b74f7ca76abee2c366b45557dc6761a	2	2	reviewed	Full original and reconstructed TU read, both physical definitions reconciled. O02 separates 29 scratch objects, removes padding arrays and preserves the original addresses (verified retail agrees with the old field map). All five emitted functions pass native before/after proof; both game functions match complete retail bytes/sites/targets. U02-U04/G09/B18 remain open.
@@ -211,8 +211,8 @@ src/SOURCE/SETUP.cpp	7441ca86d3515fdfa5ee7c31f83f265b7c584aedd7fee313fc89c465f6b
 src/SOURCE/SMACKMGR.cpp	a1eb2af13ac68e181d71fda6de78f61da3742d2e8bec5a82bb437c26c00c88c6	8	8	reviewed	All851 lines/eight definitions plus75 option initializers, four rectangles, volume table and LOG_SUMMARY_VALUE macro read. D01 withdrawn: original address claims restored after rejecting the reconstructed control. C05/C08/C09, G14, S11, B22 remain explicit; SDK SmackSum fields are genuine even if not all printed.
 src/SOURCE/SPELLAI.cpp	40c0bdeadb581158ae48cee719cec4c7c3d6e5090cf9efa371e9ba941bc7d0a5	11	0	pending	Not yet reviewed.
 src/SOURCE/SPELLS.cpp	b339f7e92d3169ddcb1f10cffbd9b24a8ee69fc453a70c02403bb4e3dc94a85b	37	0	pending	Not yet reviewed.
-src/SOURCE/STRIP.cpp	84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f	8	0	pending	Not yet reviewed.
-src/SOURCE/SWAPMGR.cpp	ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473	13	0	pending	Not yet reviewed.
+src/SOURCE/STRIP.cpp	84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f	8	8	reviewed	Full255-line TU/8bodies read. S19 unknown class gap; real icon snapshots and12-byte numeric scratch retained. B36 cache/asset contracts; tagged message protocol preserved.
+src/SOURCE/SWAPMGR.cpp	ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473	13	13	reviewed	Full1023-line TU/13bodies read. G18 shared skill tail; S21 computed-but-unread count and dialog scalar slots. UI control ranges prove two sides/five army/fourteen artifact slots; tagged payload transitions retained.
 src/SOURCE/TOWN.cpp	02549ee9cb7ea6a2360bbb612b089138609f9ce240f1e2f498211a233e87934c	9	0	pending	Not yet reviewed.
 src/SOURCE/TOWNMGR.cpp	ed4ea7444bee3fd99fdc889b9f6fe85b5ae687a31f1a3c3b0618e10df56b351e	34	0	pending	Not yet reviewed.
 src/SOURCE/VIEW.cpp	0ec26d1a25706f8707c29dea7d18d697f2b6e1cb7e622a03bda688efc6a39436	3	3	reviewed	Full418 lines/all three functions, enums and side global read. S15 unused local constants and B26 hero/army/text domains remain open; genuine tagged messages retained. D01 withdrawn: original address claims restored after rejecting the reconstructed control.

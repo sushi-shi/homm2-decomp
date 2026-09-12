@@ -1,4 +1,52 @@
 {
+  "src/SOURCE/ARMYGRP.cpp": {
+    "sha256": "a07f6e863a42914a706bbbfeeface6cbbef0954a33a8e573587c9822175adee6",
+    "note": "Full282-line TU/14physical bodies including strict-only swap helper read. U06 duplicate army aliases; S18 unread morale local; B36 creature/slot domains. Real raceUsed7 fits all retail race ids0..6."
+  },
+  "src/SOURCE/NOOPT.cpp": {
+    "sha256": "c2499baf250242e557c395e14c32144c56203d95c4a03a93b42fa5d7085b5f4b",
+    "note": "Full25-line TU/3deadline helpers read; no ten-pattern candidates."
+  },
+  "src/SOURCE/STRIP.cpp": {
+    "sha256": "84c4cabee40151de454c319a79cdea882d4dd1844d514a32e88970dcf223c38f",
+    "note": "Full255-line TU/8bodies read. S19 unknown class gap; real icon snapshots and12-byte numeric scratch retained. B36 cache/asset contracts; tagged message protocol preserved."
+  },
+  "src/SOURCE/RECRUIT.cpp": {
+    "sha256": "52ef23662146f8456341dc1772b3d149856a2cad4c49df5b26810289ad90093b",
+    "note": "Full458-line TU/8bodies read. C14 two const casts removed with11-function/all-section native equivalence. G17 close joins,S20 unused/gap storage,B36 resource/army domains. Retail table bounds prove title buffer and positive gold cost."
+  },
+  "src/SOURCE/SWAPMGR.cpp": {
+    "sha256": "ec7358b6d718a55c9e553b5dddd03c6cc54043eea7cb126a2d6bb58153662473",
+    "note": "Full1023-line TU/13bodies read. G18 shared skill tail; S21 computed-but-unread count and dialog scalar slots. UI control ranges prove two sides/five army/fourteen artifact slots; tagged payload transitions retained."
+  },
+  "include/SOURCE/armyGroup.h": {
+    "sha256": "b31953182adb7d15b142c85bcff5d06951542f612bcfe4d25f989da543fde1e6",
+    "note": "Full header read;15-byte real packed owner. U06 duplicate type/quantity aliases and unsigned count view need all consumers before consolidation."
+  },
+  "include/SOURCE/NOOPT.h": {
+    "sha256": "91ae61a14f9a9043729bf0eec76302e1bbf619d4a6a2ae62739ee5c1448058ed",
+    "note": "Full three-prototype deadline owner header read."
+  },
+  "include/SOURCE/strip.h": {
+    "sha256": "b4fbf46a032218178fa314e17a20b66f00c779259d81b3c7b294dbde69eba083",
+    "note": "Full132-byte class declaration/enum/prototypes read. S19 unknown24-byte interior gap cannot be dropped without changing proven offsets; five icon/six border arrays real."
+  },
+  "include/SOURCE/bankBox.h": {
+    "sha256": "348a91f4e253c554e9bcae2b55c8fb2b872ba1885286b58e88d4287e17d704c8",
+    "note": "Full12-byte packed player/window owner and16-bit coordinates reviewed; no artificial aggregation."
+  },
+  "include/SOURCE/recruitUnit.h": {
+    "sha256": "6dab57b99e98b2016f906fa395c175a204d046b1c25105928f5107203c66deb0",
+    "note": "Full126-byte packed manager declaration read; S20 three4-byte unidentified gaps retained pending owner evidence; counter is a true borrowed i16 pointer."
+  },
+  "include/SOURCE/RECRUIT.h": {
+    "sha256": "0e6b7d0d7dcab749f87f636589e86fe4ac25b6a37aeac061968ad01147c7ad3e",
+    "note": "Full typed recruit-function owner prototypes read; seven-resource output contract is in GetMonsterCost, not a raw varargs layout."
+  },
+  "include/SOURCE/swapManager.h": {
+    "sha256": "141d126adeacf2020671e37bf28f93cc502dc9f870456fab82fa63ef120002bf",
+    "note": "Full90-byte packed manager declaration and typed side/item domains read; two-hero owner and selection fields fit UI range dispatch."
+  },
   "src/BASE/Bzip.cpp": {
     "sha256": "755f9e00d4091c6e472dfc1366cf919a01086d671a0bdb76cae1bafa233fa6d9",
     "note": "Full2061-line TU,88 physical bodies and all macros/data read. C13 casts need type-boundary/invariant-source compiler proof; G16 three loop/store gotos remain. B33 returning panic/cleanup verified in genuine retail makes apparent malformed-input guards nonterminating. B34 dst/path/formatter contracts; S16 unused Model.numTraffic and I/O status scalars. Real Model arrays, MTF tables and quicksort stacks are not fabricated aggregates."

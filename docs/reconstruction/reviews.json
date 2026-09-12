@@ -1,4 +1,788 @@
 {
+  "src/SOURCE/ARMYGRP.cpp:SwapValues(Value & lhs,Value & rhs)#1": {
+    "body_sha256": "5b5b8116069b2c18cf5808548d448b06651f3465a4ae6761584dafd36f7955a3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Modern-only generic swap scratch preserves one exchange role; not unrelated value reuse."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::armyGroup(void)#1": {
+    "body_sha256": "5558d237b976705f95dfff1162c413b74504d8fd87a60729d4eb66c4570bd6d5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "open",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Five type bytes and five16-bit counts are initialized through their actual array extents. U06 duplicate aliases require caller review."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::View(i32)#1": {
+    "body_sha256": "fe58338770fc1442e79c516928cbce1e75ca204c4c1e52582e44b6f434d7abee",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty retail hook; no ten-pattern finding."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::HasAllUndead(void)#1": {
+    "body_sha256": "daa9697065d306daf1146ee783cd368e60c7c10177e91b60a4e99ef4016e66b2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Five-slot loop excludes NONE before monster-table access; B36 creature ids require valid army state."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::HasSomeUndead(void)#1": {
+    "body_sha256": "23941ec8a722cc4e27f359ed3ef327b2d9b64e7ebd6f612209b3c29b5f918108",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Five-slot loop tests the same valid monster flag domain; B36 creature-id lifecycle contract."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::GetMorale(hero * armyHero,town * occupiedTown,armyGroup * enemyGroup)#1": {
+    "body_sha256": "ec9c82ad9d0cd63b7c610ddd724656bc1a53ddb6e95c42807c79c4bc4a79576a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S18 unread moraleDelta initialized local needs frame proof. Five-slot enemy scan and fixed skill index fit; morale accumulator keeps one role."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::Dismiss(i32 slot)#1": {
+    "body_sha256": "107398282d87aebac37bbf5fd48879a6bde782e747e1f63953336f00c0db9118",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B36 caller must supply slot0..4; clears corresponding type/count without alias tricks."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::IsMember(CreatureType creatureType)#1": {
+    "body_sha256": "fc9dc9ace0cadab1e2ba10741cafba48f6cbcd3e5a166d75c94f59bce9f05e95",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Five-slot bounded type comparison, including NONE as a legitimate empty-slot query."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::IsHomogeneous(i32 countRaces)#1": {
+    "body_sha256": "2e86444d5c7aad7ddeee8589e958e6bfe0d3d282bbaee486833ee39a05cfa4b8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real raceUsed[7] fits retail database races0..6 (all66 records checked). Creature ids remain B36; prev/count keep semantic roles."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::CanJoin(CreatureType creatureType)#1": {
+    "body_sha256": "f07180d01eb98eea90b9dfe5f91888f7ee73e5a4a9e7851810ecd34c748b625b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Composes membership and empty-slot tests; no direct unchecked indexing."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::GetNumArmies(void)#1": {
+    "body_sha256": "72744aebd908338e96bdf2a1db64ac4621867bc3a2df26c64b80de01a6f2ee1f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Five-slot count loop; no artificial storage or unrelated reuse."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::Add(CreatureType creatureType,i32 quantity,i32 slot)#1": {
+    "body_sha256": "bfb890dbf28f9d6f77f210aedbf3af34789e504ed8e27fad8c807fc35b17f83e",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Searches five slots and rejects final slot outside0..4 before writing. B36 creature code and16-bit quantity domains remain."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::Swap(i32 slot,armyGroup * otherGroup,i32 otherSlot)#1": {
+    "body_sha256": "bf38239f1a5ca084744b5184e323e01322d7d7afb978d569887406564423bd55",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "One temporary is generic exchange scratch across two same-shaped swaps, not an unrelated control/pointer value. Both slot domains remain B36; modern helper keeps explicit types."
+  },
+  "src/SOURCE/ARMYGRP.cpp:armyGroup::DamageGroup(float damagePercent)#1": {
+    "body_sha256": "aca9c1530206a2878cb9fd52ce2b7257d8860571bf12457232bff967b1040aa4",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "retain",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Float-to-int cast creates random percentage threshold. Five slots are bounded; kill counters and first-stack flag retain roles."
+  },
+  "src/SOURCE/KB.cpp:GetMonsterName(CreatureType monster)#1": {
+    "body_sha256": "fffa1f6ce079a67b04ca6d907c4d19f85560e3fa4ab6014156ba17fc6619c552",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B36 direct lookup requires creature0..65. Returned string owner is already H2_CONST; no avoidable cast."
+  },
+  "src/SOURCE/KB.cpp:GetMonsterPluralName(CreatureType monster)#1": {
+    "body_sha256": "7826194990a54014abbdff9048f11664690ad1339300c0f45451d701b142276d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Retail table66 entries has max21-byte text; B36 creature-id contract. No writes to the table found."
+  },
+  "src/SOURCE/KB.cpp:GetMonsterCost(CreatureType monster,i32 * const cost)#1": {
+    "body_sha256": "94bd645e5b09e808be9d95d4c76be6fad73a4ff71c33072a6bbd0c9149d182b9",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Writes exactly seven resource entries; all retail monster gold costs>=20, rare resource costs positive constants. B36 monster id remains caller contract."
+  },
+  "src/SOURCE/NOOPT.cpp:DelayTil(i32 * endTime)#1": {
+    "body_sha256": "ac1cb84cd9c5cda8dd92e99334d48f9137594328fbef1cfbf1b88c5e6d4d30ce",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Borrowed deadline pointer is repeatedly read while processing events; not recoverable owner or fake varargs."
+  },
+  "src/SOURCE/NOOPT.cpp:DelayMilli(i32l delay)#1": {
+    "body_sha256": "f4fcccdc5ece654cb3c7439e5d6242f51a9ab65e682b2d05b39f2b1fa1fc04cd",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Converts relative delay to absolute tick deadline through same-width retail long interface; no casts."
+  },
+  "src/SOURCE/NOOPT.cpp:DelayTilMilli(i32l endTime)#1": {
+    "body_sha256": "9102404ab9fc7006fc85e45fb8d898ed3d113c895440962f38c4849e1cbcc74f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Absolute deadline remains one scalar role throughout event/sound polling."
+  },
+  "src/SOURCE/RECRUIT.cpp:SetupRecruitWin(class heroWindow * window,CreatureType creatureType,i32 goldCost,ResourceType resourceType,i32 resourceCost,i32 available)#1": {
+    "body_sha256": "faf76cce537c316ad0205d02578a090a37276cc900edd6c73a9b25d74808fd0c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "CP1251 byte reinterpretation/narrowing is necessary. Retail longest monster name21bytes gives title<=29bytes including NUL, fitting both40-byte arrays. Tagged message data follows command changes and synchronous text copy."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::Open(i32 priority)#1": {
+    "body_sha256": "4665b7f1a51eed38dbda086d42d6abd914429c4cb44891a3390c2aa8db1719e6",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "C14 applied: remove const_cast around conditional resource filename; heroWindow accepts H2_CONST char*. All11 native funcs/sections identical. Retail instruction bytes agree; generic checker still needs SEH target handling. B36 valid creature costs are positive; available/resource lifecycle remains."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::Close(void)#1": {
+    "body_sha256": "f4dd08be6d333cffe6499b6271bb4e67db874302b9f4abe1a8bc49fccbb2d52d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Removes window, updates town conditionally, and restores menu; real owner lifecycle, no artificial storage."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::Update(void)#1": {
+    "body_sha256": "db36d7e635965a035ab34d177cabfb6719bfe68f41946f576bed6aa8846116da",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Tagged message repeatedly references synchronous gText formatting; integer decimal text fits shared owner. B36 available pointer, resource domain and products require coherent recruit state."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::Main(struct tag_message & message)#1": {
+    "body_sha256": "de9d3ae08dcfd5ee8780a13bbf2539c518cf01cb76da2d35114507a151f7e165",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G17 two common-close gotos need structural experiment. S20 unused cost local. Reads modifier subview before checking type; retain U01 protocol analysis. Quantity bounded by m_maximum; state domains remain B36."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::recruitUnit(class armyGroup * army,CreatureType creatureType,i16 * available)#1": {
+    "body_sha256": "83b17fa0431b3f7043232908d3c1c8926694576c27582c1b45c13d346b2e5f25",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Stores borrowed army/available owners and derives first positive rare resource from real cost[7]. Resource enum conversion is legitimate; B36 creature/counter lifecycle."
+  },
+  "src/SOURCE/RECRUIT.cpp:recruitUnit::recruitUnit(class town * townData,i32 dwelling,i32 refreshTown)#1": {
+    "body_sha256": "7a25f9f8ca779a2a2a80d40a2a24fe42232684c8c53503b10e5e5482f4cd9c41",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "B36 town/faction/dwelling bounds select borrowed army and garrison member pointers. Real cost[7] filled by GetMonsterCost; resource enum conversion preserves domain. S20 unmodeled class gaps retained."
+  },
+  "src/SOURCE/RECRUIT.cpp:QuickViewRecruit(class town * townData,i32 dwelling)#1": {
+    "body_sha256": "c52d2d6c7be42d5ebb46cecfb0823132e6cba777fe60740006926fa5ef4e3b8b",
+    "patterns": {
+      "casts": "applied",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "C14 applied: filename conditional uses existing const-correct window interface; full11-function native equivalence, retail instruction bytes agree pending generic SEH resolution. Real seven-cost array fits GetMonsterCost. B36 dwelling/faction domains; removed window is not deleted here (lifecycle evidence, not silently fixed)."
+  },
+  "src/SOURCE/STRIP.cpp:strip::strip(i32 x,i32 y,i32 stripType,u32l portraitIconId,i32 portraitFrame,class armyGroup * army,i32 firstBorderId,i32 drawWindow,i32 flagFrame)#1": {
+    "body_sha256": "2dc9501914506cfd125bcdb6782262516d323d2c700ea568f67e3fb9f2562ea2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "Five icon/cache entries and six borders fit fixed arrays. S19 unknown24-byte class gap cannot be removed without shifting proven fields. Borrowed army and asset frames remain B36/B28."
+  },
+  "src/SOURCE/STRIP.cpp:strip::~strip()#1": {
+    "body_sha256": "094bebab22bf5e33f8dd34604e69a716c9f7c8a61ef969ed1baa62ea1c473855",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Frees all six borders only when they were created and disposes five icon slots; loop bounds match actual arrays."
+  },
+  "src/SOURCE/STRIP.cpp:strip::Draw(void)#1": {
+    "body_sha256": "29ebd350b4f773303fa4968c5329709b3cbacb2bfc11f464ba66e093e2474c7d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Delegates icon rendering and updates fixed-size region; placement contract inherited from callers."
+  },
+  "src/SOURCE/STRIP.cpp:strip::DrawIcons(i32 drawWindow)#1": {
+    "body_sha256": "d19c173ae4cf69a62cb02ba4d73ebd0dab441031d52703610086bc55f1f994d2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Two five-element snapshot arrays have genuine cache lifetime roles. B36 creature/frame domains; oldCreatureTypes!=PEASANT dispose condition needs retail/lifecycle review. Tagged aliases are not a stack aggregate."
+  },
+  "src/SOURCE/STRIP.cpp:strip::DrawFrame(void)#1": {
+    "body_sha256": "69a665832f5ab72898cc3bf4185354e2531eb0fdf1085d6f2a2fe7d730719bfe",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Draws frame0 at saved coordinates; asset/placement contract B28."
+  },
+  "src/SOURCE/STRIP.cpp:bankBox::bankBox(i32 x,i32 y,class playerData * player)#1": {
+    "body_sha256": "18b5092f9340160f7bbdfb291418c81ba325e9b4955777186de6f4de3dbe7371",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Creates owned window and retains player pointer; coordinates narrow to real16-bit fields, no explicit casts."
+  },
+  "src/SOURCE/STRIP.cpp:bankBox::~bankBox()#1": {
+    "body_sha256": "b88d06f791532edf2a85c67b9b41339c9fb50b318cda9aaa89ab28e6b39c3c24",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Removes and deletes the owned window, not a recovered enclosing pointer."
+  },
+  "src/SOURCE/STRIP.cpp:bankBox::Update(i32 drawWindow)#1": {
+    "body_sha256": "7b2440316aec972194074c6059bfe15e59f9f4ca951c54127bbfa87a1b5faf49",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "str[12] fits signed32-bit decimal incl NUL. Six non-gold indices plus gold6 fit resources[7]. Real tagged message, synchronous SetText copies the borrowed local string."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::swapManager(void)#1": {
+    "body_sha256": "ebd68449bef6f2137ef8b969c32234c86e94a67c04b2c52506a7f7b0dba204bc",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes two hero pointers and selection/window state; no fabricated aggregate."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::swapManager(hero * leftHero,hero * rightHero)#1": {
+    "body_sha256": "8f2f597fbf93e36b0f2878404bd4403203a06d028a222922e205bfbb77d1df98",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Constructor retains two real hero pointers; other state is established by Open/Reset before UI operations."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::Reset(void)#1": {
+    "body_sha256": "737dae974f13a47ef768c2288424c2da640bdd3158c6a057854a0c6cca552880",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "One constant SLOT_NONE drives assignment-chain macro; modern repeated evaluation has no side effects. Related selection fields reset together."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::DrawSwapWin(void)#1": {
+    "body_sha256": "8c9dc21124b3f73f401c072f2b1bf3057e88168203073077968f3f5c306ad815",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Draws live window and updates screen; no ten-pattern debt."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::Open(i32 id)#1": {
+    "body_sha256": "7153554e315a1bf08fa876990fa2dcf6137c2eb2f7025aa8cd8ef939526b6486",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Two hero slots, eight skill-widget indices bounded. Tagged message data changes with command. Hero-name termination remains B36; short resource formats fit gText."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::Close(void)#1": {
+    "body_sha256": "8399c27942ba099d5305b221c762ca7c4ddb16bdf68c340435c109001dabfc33",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Restores six adventure widget flags using one tagged message and releases window/icon owners."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::DrawSelector(void)#1": {
+    "body_sha256": "1e0c0fe850396f435d007df75213db8b8565db5e0ab5f46cf61a219b4a9db305",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Scalar layout constants are actually read, not unused aggregate members. B36 selected side/item/slot states produce bounded UI coordinates."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::Main(tag_message & message)#1": {
+    "body_sha256": "8636efde13d9b05a3db695eac518e273334df0f6d5fede208ae8c203cc13a45b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "G18 three skill-dispatch gotos share one tail. Enumerated control ranges bound side0/1, army0..4, artifact0..13 and skill0..7; message modifiers read before type require U01 protocol understanding. Selection state follows these ranges."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::ViewMon(void)#1": {
+    "body_sha256": "052a1eb07d807640ca3799994485d25b976418b4a34cf0629ae53060e83a75a8",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Main invokes only when selected and target slot coincide, both0..4; uses target slot deliberately. No owner-from-member recovery."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::SwapArtifacts(void)#1": {
+    "body_sha256": "5fb349e7cedf878d81fa4eddde5ff6737ddd7bbe8d15ad54dc86e4c8f737156c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Main establishes sides0/1 and slots0..13. Artifact ids and extra bytes stay distinct temporaries; tagged skill update is synchronous, not unrelated reuse."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::SwapMons(void)#1": {
+    "body_sha256": "1a78ffe7b130e3cdafaf1df74ac59352b0d176f945f730b523f8dff6f5bd5441",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S21 selectedArmyCount is computed but unread; test removal against retail before changing. Both army pointers are real member addresses, not owner recovery; selection slots bounded by Main."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::Update(void)#1": {
+    "body_sha256": "6d500978557bb6cdeebcbe95769465897c007a27dd17769b98ca524a83075d90",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Loops bound primary4, army5, artifact14 slots; enum casts create primary-stat domain. Message scalar/text union follows explicit command transitions; numeric text fits gText."
+  },
+  "src/SOURCE/SWAPMGR.cpp:swapManager::SplitMons(void)#1": {
+    "body_sha256": "82f115740409df433b0141ba39a4c066b37107e3cfce5974f1c50faefa885238",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S21 unused control/dlgState locals/stores need native tests. Member army pointers and real message retained. Main admits only same-creature/empty target before dialog; split amount bounded by dialog handler contract."
+  },
   "include/BASE/DebugCheck.h:DebugCheck(void)#1": {
     "body_sha256": "cd5b841d7b9af8efc92237431a8e8d396681b7a9ef5e6cca1693aa9e71d1674a",
     "patterns": {

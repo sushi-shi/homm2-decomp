@@ -162,6 +162,21 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   as sentinel; caller reservation/lifecycle proof is required. Two unused
   map helper scalars need native frame checks. Reloading an extra pointer after
   reallocating its owner is necessary, not avoidable pointer reuse.
+- C14: two recruitment filename const casts removed through the existing
+  const-correct window interface. [Full native equivalence and retail-check
+  limits](C14.md) distinguish instruction/ordinary-target proof from EH aliases.
+- U06: army-group duplicate type/count union aliases need all-consumer review;
+  the unsigned troop-count view must not silently change serialized meaning.
+- S18-S21: unread morale/recruitment/swap scalars and unknown interior strip/
+  recruitment class gaps require native frame/layout evidence. Real snapshot
+  arrays and generic swap temporaries are not artificial stack aggregation.
+- G17/G18: recruitment's shared close tail and swap's common secondary-skill
+  dispatch tail need structured-source matrices.
+- B36: army, recruitment and exchange helpers require creature/slot/lifecycle
+  contracts. Exchange control IDs bound their two sides, five army slots,
+  fourteen artifacts and eight skills. Genuine-retail name and positive-cost
+  tables prove recruitment title capacity and nonzero valid gold divisors;
+  unchecked input domains and cached-icon lifecycle remain distinct questions.
 
 ## Build setup observations
 
