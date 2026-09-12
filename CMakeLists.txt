@@ -288,6 +288,18 @@ target_link_libraries(homm2 PRIVATE
   ${HOMM2_FFMPEG_LIBRARIES})
 
 if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
+  # Optional real-asset integration test; see docs/combat-redraw-test.md.
+  # Keep it out of normal builds/CTest, which need no installed game data.
+  add_executable(homm2_combat_redraw_test EXCLUDE_FROM_ALL
+    tools/combat_redraw_test.cpp ${HOMM2_GAME_SOURCES}
+    ${CMAKE_SOURCE_DIR}/src/EXECUTABLE/Run.cpp)
+  target_include_directories(homm2_combat_redraw_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR})
+  target_compile_definitions(homm2_combat_redraw_test PRIVATE
+    __cdecl= __stdcall= __fastcall=)
+  target_link_libraries(homm2_combat_redraw_test PRIVATE
+    homm2_platform homm2_compression ${HOMM2_FFMPEG_LIBRARIES})
+
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
