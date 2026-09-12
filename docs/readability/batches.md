@@ -738,3 +738,29 @@ network/ownership/formatting distinctions and local-only/data exclusions.
 This batch adds 75 definitions and one fully read file. Only PHILAI.cpp remains
 unread before the final whole-corpus occurrence/consolidation/ranking pass.
 No executable source, header, configuration or behavior changed.
+
+## B44 — complete strategic AI and final unread translation unit
+
+Read all 6,863 lines and 84 definitions of PHILAI.cpp, including the two private
+owner-slot inlines, empty and constant-result routines, complete turn/purchase/
+path/teleport/evaluation loops, battle simulation, hero/town interactions,
+redistribution, all event evaluators, cache allocation/teardown, all 218 numeric
+macros and trailing globals. Reconciled every indexed function boundary against
+the complete read. PHILAI.h, philAI.h, armyGroup.h and playerData.h were already
+read and were rechecked here; map metadata aliases and shared encoding/caller
+contracts were also verified without duplicate file credit.
+
+H89-H94 name scaled cost deduction, array-major army clearing, signed creature
+totals, tent-visit queries, recruitment-count decoding and optional strength-
+modifier arguments. H95/H96 result from the follow-up cross-check of the fully
+read vision/event callers: double-to-float monster strength ratios and integer
+Manhattan length. All eight have explicit multi-TU evidence and exclusions.
+H17/H19-H22/H24-H27/H29-H31/H33/H55/H71/H82/H87 gain consumers or completed
+owner evidence. R44/R45 preserve AI planning, arithmetic, reward, control-flow,
+simulation, interaction and cache/ownership differences.
+
+This batch adds 84 definitions and one file, completing the deliberate reading
+checklist at 1,655 definitions and 228 files. That completes the reading pass,
+NOT the whole task: occurrence validation, consolidation, prioritization and
+the requirement-by-requirement final audit still remain. No executable source,
+header, configuration or behavior changed.

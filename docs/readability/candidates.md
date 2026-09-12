@@ -1,8 +1,9 @@
 # Common-helper candidates
 
 All entries are search findings, not implemented or retail-byte-verified changes.
-The whole-tree reading pass is still in progress; occurrence lists grow as bodies
-are reviewed. Names below are proposals unless identified as existing.
+The deliberate whole-tree reading pass is complete (B44); the final occurrence,
+consolidation and ranking review is still in progress. Names below are proposals
+unless identified as existing.
 
 ## H01 — shared widget-message header macro
 
@@ -4257,8 +4258,9 @@ greater-or-equal or substitute giCurTurn for a fresh calculation. KB's campaign
 save calculation orders month, week, day; treat that as a separate operation-
 order variant, not an automatic exact replacement. ExpCampaign::Days adds
 stored map days first and returns i16; it is not just this current-map query,
-and rearranging it needs separate narrowing/order/codegen evidence. PHILAI has
-a searched occurrence but earns no consumer/read credit before its full read.
+and rearranging it needs separate narrowing/order/codegen evidence. B44's full
+PHILAI read adds GetTurnAIVars at line 1567 as an exact day-first consumer;
+keep its giCurTurn assignment before the attention and resource-value updates.
 Gain: a domain name for calendar conversion, without changing packed state.
 
 ## H88 — guarded scalar deletion followed by clearing the same pointer
@@ -4457,3 +4459,382 @@ pointer after deletion or restore a previous timeout. UpdateNormalDialog draws
 with its exact foreground/background flags and does not call UpdateScreen.
 H30 shortens only identical arguments; it must not introduce a reentrancy guard,
 scope cleanup, new resource lifetime or automatic presentation protocol.
+
+## H89 — subtract a scaled seven-resource cost vector
+
+Disposition: credible small player-data inline; not an affordability transaction.
+
+PHILAI::BuildCreature at 4898 and EVENTS::DoAIEvent/RecruitSiteAIEvent at 7064
+and 7823 repeat the same ascending seven-resource loop:
+`resources[i] -= count * unitCost[i]`. Proposed owner/name:
+`playerData::SubtractCost(const i32* unitCost, i32 count)` in SOURCE/playerData.h.
+The count, costs and balances are signed i32; preserve the multiplication before
+each subtraction and the original 0-through-6 order, including zero costs.
+
+The reviewed costs are distinct local arrays, not aliases of the bank, and the
+count is stable. Require that contract for a value-argument inline rather than
+silently changing repeated reads of mutable or aliased arguments. The removed
+induction-variable final value must be dead; it is not used by the reviewed
+post-loop tails. Leave GetMonsterCost, free-purchase conditions, available-count
+updates, GiveArmy/Add, replacement/refund handling and presentation outside.
+Do not clamp negative balances, validate costs, test affordability, add an
+end-game check or widen arithmetic. H83's event add/floor is a different policy.
+
+RECRUIT charges gold first and then its selected first nonzero nongold resource;
+it is not this all-seven loop. BuildBuilding's unscaled subtraction is a related
+count-one variant only after separate expansion review, not an initial exact
+instance. Gold/wood boat reservations and their later restoration remain visible.
+Gain: name a whole cost-vector deduction without hiding the purchase workflow.
+
+## H90 — clear both army-group storage arrays in the existing order
+
+Disposition: credible small owner inline, extracting an existing constructor idiom.
+
+armyGroup's constructor at ARMYGRP.cpp:28, EVENTS::CombatMonsterEvent at 5930,
+and PHILAI's CombatMonsterEvent/EvaluateMineEvent/EvaluateMonsterEvent at 4947,
+6415 and 6495 all clear the full type array with -1, then the full count array
+with zero. A proposed `armyGroup::Clear()` at SOURCE/armyGroup.h can name those
+two memset calls, with the constructor delegating only that same body if later
+code-generation evidence permits. Preserve any required memset declaration
+dependency when selecting its eventual inline definition location.
+
+The layout is five i8 creature types followed by five i16 counts, total 15
+bytes. Literal lengths 5 and 5 * sizeof(i16) in these callers therefore agree
+with the constructor's sizeof-array forms. The quantities/creatureCounts names
+alias the same count storage. Keep both calls, type-before-count order, exact
+byte values/extents and pointer evaluation; do not memset the entire object to
+zero, construct/assign a temporary, replace the pair with a per-slot loop or
+add a null/validity check. A future layout change would require a new audit.
+
+H71's single-slot dismissal interleaves type/count stores and is not this array-
+major reset. Campaign carryover arrays, count-first removal, and type-only
+resets are excluded. Preserve each caller's subsequent random seeding, stack
+distribution and battle setup. Gain: a named empty-army operation shared by
+three TUs, without merging their different assembly/distribution algorithms.
+
+## H91 — count creatures in type-present army slots
+
+Disposition: credible small read-only army-group inline.
+
+combatManager::Close at CMBTMGR.cpp:565 and philAI::RedistributeTroops at
+PHILAI.cpp:4536 initialize an i32 total to zero and scan the five slots in order,
+adding each signed i16 count only when its type is not CREATURE_NONE.
+`i32 armyGroup::CountCreatures() const` at SOURCE/armyGroup.h would name this
+operation. The existing GetNumArmies counts occupied slots, not creatures, and
+cannot substitute for it.
+
+Keep type presence as the sole predicate: negative counts still contribute,
+and positive counts in NONE slots do not. Use the signed count alias, not the
+u16 troopCounts alias. Five i16 values fit the i32 accumulator. Leave the
+combat-side selection, metadata cap/packing and redistribution's preserve-one
+decision outside; this is not a new positive-stack or army-validity policy.
+
+QuickCombat's attacker and defender totals use the same arithmetic but are
+interleaved in one loop. Two separate calls would change that read order, so
+they are a distinct variant requiring review, not initial exact consumers.
+PHILAI::CombatMonsterEvent's total includes ALL quantities without a type guard
+and is excluded. ExperienceValueOfStack weights quantities by hit points and
+is also a different query. Keep H21/H76's presence distinctions intact.
+
+## H92 — query whether a player visited a tent color
+
+Disposition: credible small player-data predicate, not a universal visited-site API.
+
+EVENTS::BarrierEvent/BarrierAIEvent at 4410/7645 and PHILAI::EvaluateBarrier/
+EvaluatePassword at 6162/6172 test `m_barrierTents & (1 << color)`; the password
+evaluation uses its negation. Proposed owner/name:
+`b32 playerData::HasVisitedTent(i32 color) const` at SOURCE/playerData.h, with
+a nonzero comparison for its predicate result.
+
+Every reviewed caller already masks its color with 7. Keep decoding/masking
+outside, the original signed i8 promotion of m_barrierTents, the integer shift
+and the caller's test order. Do not change stored flags to unsigned or add
+color validation. The human barrier asks for a password and evaluates
+StrEqNoCase BEFORE consulting this flag; those operations are not inside the
+helper. Evaluation values 5000/2500 and AI pass/fail results stay caller-owned.
+
+Flag grants are currently confined to EVENTS and are not extra cross-TU write
+helpers. Map/hero visit masks, password contents and expansion-site metadata
+have different owners and meanings (R26). Gain: name one specific player flag
+contract, without concealing the barrier's separate password requirement.
+
+## H93 — decode the available count from recruitment-site metadata
+
+Disposition: credible small inline at the existing event-encoding boundary.
+
+EVENTS::RecruitSiteEvent at 4804, RecruitSiteAIEvent at 7782 and PHILAI::
+EvaluateRecruitSite at 6190 copy metadata to i16, then shift that stored value
+right by EVENT_RECRUIT_COUNT_SHIFT (=3), retaining an i16 result. Proposed
+`i16 RecruitSiteCount(i16 packed)` at SOURCE/EVENTS.h performs that shift and
+result conversion; the parameter conversion retains the caller's initial
+narrowing. Keep the argument evaluated once.
+
+PHILAI reads m_tentColor; EVENTS reads m_objectMetadata. These are aliases of
+the same unsigned 13-bit field, but the caller's selected field access remains
+explicit. The live field's range is nonnegative; nevertheless do not replace
+the signed-i16 shift contract with unsigned full-record shifting, additional
+masks, validation or a changed layout.
+
+The low-bit site-kind decode, creature-selection switch, quantity subtraction
+and repacking remain outside. PHILAI initializes its unknown-kind creature to
+zero, while the EVENTS switches can leave it unassigned; a shared mapping with
+a new default would change behavior. This helper names only the existing count
+encoding, not a universal expansion-object decoder or recruitment operation.
+
+## H94 — default the optional town and siege modifiers on FightValueOfStack
+
+Disposition: strong declaration-default candidate; keep raw/modified mode explicit.
+
+The complete owner at PHILAI.cpp:3642 and callers in EVENTS (7897, 8272),
+ADVMGR (10739), TOWNMGR (3301, 3587, 3601) and AI (126) establish the common
+final arguments `useTown = 0, townId = 0, useEnemyMods = 0`. Many PHILAI callers
+also use this exact tail. Put defaults on the existing SOURCE/philAI.h:77
+declaration; retain its six-argument callable interface and implementation.
+
+Require the first three arguments: group, hero pointer and useHero. The third
+argument selects raw versus modified strength even when the hero pointer is
+null; AI's COMBAT_AI_FIGHT_VALUE_MODE is 1 while the cited event/vision/statistics
+callers explicitly use 0. Do not infer mode from pointer presence. Town and
+enemy-modifier calls keep their nondefault values. The explicit no-town id -1
+in SetupRelativeHeroStrengths is not silently normalized to 0.
+
+The owner applies nonlinear count/trait, town, hero-stat, morale/luck, spell
+and turret rules in order. Enemy modifiers can dereference heroPtr before
+other tests. Optional arguments must not introduce validation, caching, early
+returns or a simpler strength formula. Gain: remove repeated neutral modifier
+arguments while preserving the important raw/modified choice at each call.
+
+## H95 — hero-to-map-monster strength ratio
+
+Disposition: plausible domain inline; rank below H94's simpler API shortening.
+
+ADVMGR::DoVisions at 10738 and EVENTS::PlayerMonsterInteract/ComputerMonsterInteract
+at 7896/8271 compute raw FightValueOfStack(group, hero, 0, 0, 0, 0), convert that
+i32 result to double, divide by the double conversion of `count * fightValue`,
+then store float. A proposed `float philAI::HeroToMonsterStrengthRatio(hero*,
+CreatureType, i32 count)` could name those three exact instances beside the
+existing strength API. The complete owners and count/result declarations are
+read: all three counts are i32 and all three destinations are float.
+
+Preserve signed integer multiplication in the denominator BEFORE conversion,
+double division and final float rounding. Require stable arguments and preserve
+the existing call/operand evaluation contract; an inline is not assumed byte-
+neutral. Do not add a zero-count guard or change the divisor to a floating
+product. Keep creature extraction, full versus joining quantity, campaign
+alliances, diplomacy, CanJoin, ghost/elemental/mask tests and thresholds outside.
+
+PHILAI::EvaluateMonsterEvent instead converts both operands to float before
+division; it is not an exact instance. The more generic raw-strength default
+H94 already reduces much of the call noise, so final ranking must assess the
+additional domain name against an extra interface. Neither helper unifies the
+different monster-interaction and vision rules.
+
+## H96 — integer Manhattan length of two existing deltas
+
+Disposition: credible small expression macro / inline hypothesis.
+
+ADVMGR::DoVisions at 10701, EVENTS::DoEvent/DoAIEvent teleport scans at
+3006/3024/7153/7170, and multiple PHILAI paths (for example ResetHeroRVs:509,
+GetTurnAIVars:1595, DetermineTargetPosition:2052 and travel-gate evaluation:5886)
+repeat `abs(dx) + abs(dy)`. A proposed MANHATTAN_LENGTH(dx, dy) or
+ManhattanLength inline belongs in BASE/Misc.h with existing integer utilities.
+This names the distance metric while leaving coordinate differences explicit.
+
+Use the existing signed i32/CRT-abs expression and result, each supplied delta
+once. A macro should parenthesize both arguments and the full expression;
+an eager-argument inline needs evaluation-order/codegen review. The reviewed
+map deltas are bounded; do not add unsigned conversions, widen the arithmetic,
+handle INT_MIN differently or substitute Euclidean/Chebyshev distance. H39/H44
+are different metrics. Keep thresholds, loop bounds and tie-breaking outside.
+
+In particular, ResetHeroRVs' hero-cache test subtracts the hero's X coordinate
+from BOTH x and y. Passing those existing deltas must preserve that fact, not
+repair it by assuming a conventional point-pair interface. Additional absolute
+values/shifts in mine valuation also remain outside. Broad occurrence validation
+and final ranking must distinguish this literal expression from nearby radius
+tests that use max distance or truncated square roots.
+
+## B44 — extensions to established candidates
+
+H17/H19 gain AI diagnostic calls with explicit remaining arguments and ordered
+format/log pairs; debug-level tests, AiPrint and delay remain outside. H20/H21/
+H22/H24-H27 gain building, type-present army, embarked, terrain, sprite, bounds
+and existing search-node consumers. The landing-array access that precedes its
+coordinate bounds check is not moved behind that check. H25 does not absorb
+occupied/action/terrain guards into one landing rule.
+
+H29 gains HeroInteractionAtTown's normal-capacity comparison and
+ManaRefreshValue's base capacity; the latter's level multiplier and deficit/
+floating valuation remain outside. H30 gains the unknown-event diagnostic.
+H31 gains the checked temporary strategic search array, but the five AI-map
+buffers remain unchecked. H33 gains EvaluateMonsterEvent's four-elemental
+exclusion, with ghost, ratio, mask and CanJoin tests separate. H55 gains the
+vampire pair in FightValueOfStack's count adjustment, not its whole trait rule.
+H71 gains BuildCreature's type-before-count replacement reset; upgrade merging
+and redistribution's count-first/type-only tails are excluded. H82 gains the
+magic-book grant with its explicit true end-game argument. H87 gains the
+complete GetTurnAIVars calendar consumer.
+
+## R44 — AI planning, purchase valuation and event rules
+
+Read all 6,863 lines and 84 definitions, including the two private owner-slot
+inlines, empty/constant-result routines, all 218 numeric macros, static search
+owner and trailing globals. Preserve float versus double literals and distinct
+DATA identities; same-valued tuning constants are not new shared operations.
+Existing GetHero/GetTown and domain APIs remain preferable to new array macros.
+
+CheckBuyStuff performs consistency checks before its early gold return,
+resolves its dock twice, reserves shipyard/boat resources around the purchase
+loop and restores only still-pending reservations. Interactions occur before
+and after purchasing. A boat payment's gold/wood pair is not the complete
+reservation protocol; keep it visible rather than introducing a purchase
+transaction or cleanup guard. Upgrades charge gold before rare resources,
+store upgraded type before merging and can scan onward after zeroing a stack.
+
+GoodAdjacent temporarily changes two evaluation factors, but its stone-lith
+early return leaves both at 1. Other exits restore them and only successful
+selection writes the direction output. CheckReload and CheckBerserk use
+different strength modes, search horizons, player rules and early exits.
+CheckDoMain uses separate clock reads, pumps one Windows message before sound,
+conditionally draws and restores origins/show state but resets other flags to
+false. Do not replace these with one polling or save/restore macro.
+
+DoAI owns retargeting, purchase timing, path movement, visited destinations,
+hourglass progress, cursor hiding, event dispatch and per-hero cleanup. The
+day-one condition repeats the same operand; the special-direction goto can
+enter movement before ordinary path-variable initialization. Ownership loss
+bypasses the normal deactivate tail, and final cleanup unhides the entire
+mouse hide count. Preserve those paths, including cleanup before AI-map
+initialization on an early exit. No generic per-hero action loop is implied.
+
+Teleport planning has different predicates for arbitrary and on-path landings.
+The arbitrary search checks an array entry before its bounds test, considers
+left/below/right in order and retains the last valid landing for a winning
+candidate. Random event eligibility and tie-breaking stay explicit. The
+on-path method walks its supplied hero's path but calls DimensionDoorTo on
+the global current AI hero. Teleport, mobility deduction and UseSpell occur
+in that order. Do not normalize receivers, landing checks or movement units.
+
+GetTurnAIVars retains first-week state after the first week, clears all town
+threats and then owned-town threats again, and distinguishes enemy reachability
+from mine-value neighborhoods. Its reachability Y loop uses MAP_WIDTH, while
+other loops use MAP_HEIGHT. Threat calculation can access an absent occupying
+hero without a new check. Ally exclusion differs between the two searches.
+Town-weight conversion and the maximum-hero caps apply in their original order.
+
+DetermineHeroToMove uses the current player's count with the supplied player's
+id list; preserve that receiver distinction. DetermineTargetPosition has two
+distance passes, exclusive scan limits, special zero-value tie rules and
+different reachable/action/terrain predicates. Duplicate-destination penalties
+bypass the previous-target bonus. Boat id is used as an X coordinate and boat
+planning turn is narrowed to i8. These are not repaired by a point/route helper.
+
+Building, creature and hero purchases use distinct valuation curves, randomness
+and partial result records. Some personality/threat adjustments change a
+resourceValue output that is not used in the subsequent ranking; preserve it.
+GetBestBHC may log a not-yet-assigned choice before setting PURCHASE_NONE.
+Creature archer counts accumulate hero and town stacks rather than restarting
+between the two adjustments. Type-only presence and quantity-only room tests
+must not be replaced uniformly with H76.
+
+MaxBuyableCreatures overwrites its result for EACH resource and returns the
+last iteration, not the minimum across resources. CreaturesToBuy halves counts
+above one and returns zero for a final one. The three first-nonzero-nongold
+selectors remain confined to RECRUIT, not this AI routine. CanBuyBHC's scaled
+cost checks are separate from those selectors and from H89's mutation. Do not
+introduce a shared affordability calculation that silently fixes the AI path.
+
+BuildHero manually appends ids, initializes army/location/mobility, publishes
+the map change, sets the town occupant, gives spells and refreshes available
+heroes in order. It is not a copy of the human recruitment transaction.
+BuildCreature refunds a selected existing stack before clearing it, then
+deducts costs before decrementing the garrison and adding the purchased army.
+Replacement scoring and invalid-slot fallbacks remain caller-owned.
+
+Resource valuation preserves integer division before float conversion for
+averages/turn counts, including the extra +1 in TurnsToBuy. RVConversion sums
+gold, wood, ore, crystal, sulfur, mercury and gems in that order, not enum order.
+GetTurnAttentionValue overwrites previously randomized game weights. Obelisk
+valuation reads the artifact table before its NONE check and can mutate puzzle
+state. No generic weighted sum, averaging or side-effect-free query is inferred.
+
+Event evaluation is not the same as event execution. Tree affordability uses
+>= while actual AI purchases use strict >; the alchemist value threshold also
+differs from removal. Flotsam's gold score is overwritten by wood, not added.
+Shrines, pyramids, sirens, stables and recruitment sites have different skill,
+metadata and quantity rules. The shared 0.7 siren constant does not erase the
+AI i32 versus event i16 storage distinction. Cached level checks and repeated
+live Stats calls remain in their original positions.
+
+Travel-gate evaluation suppresses recursion, searches exact trigger/index
+matches, maximizes a discounted score and restores its guard afterward;
+event execution selects exits differently. Artifact value sums use different
+slot ranges/book exclusions in battle, hero purchase and interaction. Mine
+evaluation converts winChance directly to i32, not a 0-100 percentage; the
+monster overwhelming-strength branch can leave the supplied live chance alone.
+Hero and town evaluation have different team, visibility, mode, chance and
+human-bonus formulas. OnMySide already owns the campaign/side-victory policy;
+a universal alliance/encounter/value helper would conceal these differences.
+
+## R45 — AI battle simulation, transfers and cache lifetimes
+
+ProbableOutcomeOfBattle separates modified/raw strength calls, optional town
+army, difficulty/personality effects, nonlinear power/chance adjustments,
+integer loss/value storage and artifact/experience valuation. FightValueOfStack
+has its own count curve (including a repeated >2 branch), trait adjustments,
+town/hero modifiers and distinct spell/turret caps. Preserve each float/double
+conversion and the documented parenthesized divisor casts; H94/H95 do not
+authorize replacing either algorithm with a simpler strength model.
+
+QuickCombat retains asymmetric experience and temporary-stat effects. Its loss
+branch can grant defender experience using defExp again and calls the
+attacker's win-temp method under a defender-presence guard. Attacker pointers
+are dereferenced outside nearby null guards. Artifact transfer precedes damage;
+necromancy guarantees at least one skeleton. Eagle-eye eligibility first tests
+the defeated hero's skill, then the winner's level threshold, and writes only
+the first qualifying spell directly. Both heroes receive final win-temp calls
+regardless of result. Do not merge or repair this into the normal combat tail.
+
+HeroInteractionAtHero's apparent swap saves a pointer but does not use it;
+its subsequent assignments can leave both roles pointing to the same hero.
+It is not a SwapValues candidate. Evaluation-only and actual interaction have
+different timestamp, artifact and redistribution effects. AtTown's nonzero
+mode evaluates rather than performs the exchange; book acquisition and mana
+stopping occur in the other branch. Spell-count indexing and spell-array
+indexing differ by one, and actual GiveSpells is reached only after transfer-
+size guards. Do not move it before those returns.
+
+RedistributeTroops prefers existing type matches before speed/value selection,
+uses a double division followed by float then integer rounding, and can stop
+future iterations while STILL making the current transfer without subtracting
+its cost from the budget. Quantity subtraction precedes a type-only zero-count
+clear. Its preserve-one count is H91, not a reason to replace the transfer loop.
+EvaluateOneTimeCreaturePurchase indexes gMonsterDatabase by the army SLOT when
+valuing a replacement, not the slot's creature type. Preserve that expression
+rather than hiding a correction in a shared stack-value helper.
+
+FightEvent's fixed per-stack encounter arrays and value/reward switches differ
+from the full human encounter builders. ChooseToFightForArtifact ignores its
+quantity argument and assigns all types with counts [1,0,0,0,0]. Other builders
+spread quotients/remainders or drop remainders. H90 shares only their exact
+initial empty-array pair, never the distribution algorithm. TownEvent keeps
+demobilization, combat-mode choice, claim/link updates and unconditional
+remobilization/GiveSpells in their original order; even its local output-name
+order must not imply a changed QuickCombat argument mapping.
+
+The two position caches have different contracts. Strategic cache hits restore
+the cached live chance, event cache hits return WITHOUT assigning that output
+or resetting reduction flags. Extra distance/immediacy control caching; not
+every evaluation input is part of the cache key. Recursion can affect global
+reduction flags. Strategic values have an upper cap only before an i16 cache
+store, while event values have conditional lower/upper rules. A generic
+memoization helper would need new behavior and is rejected.
+
+ResetHeroRVs uses a different subset of arrays for local/global resets and
+retains its X-for-Y hero comparison (H96). Strategic evaluation borrows the
+static search array or creates a checked temporary; teardown depends on which
+was used. InitAIMapVars allocates five unchecked buffers. CloseAIMapVars frees
+ALL five first, then clears ALL five pointers and closes the search array.
+Neither H31 nor H88 may add checks, interleave those null stores, or introduce
+scope cleanup. Empty and constant-result routines remain counted/read bodies,
+not invitations to invent missing AI behavior during a readability audit.
