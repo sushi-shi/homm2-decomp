@@ -59,6 +59,12 @@ def main(argv=None):
         print("usage: homm2 data-topology census", file=sys.stderr)
         return 1
     if cmd == "build":
+        from homm2.core.retail import verify_retail
+        try:
+            verify_retail(REPO / "build/orig/HMM2PL.exe")
+        except (OSError, ValueError) as error:
+            print(f"[build] {error}", file=sys.stderr)
+            return 1
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
         if sh("python3", "configure.py"): return 1
