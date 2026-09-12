@@ -1,4 +1,20 @@
 {
+  "include/SOURCE/HERO.h": {
+    "sha256": "40ee910ba74e3b4b02e83b16d8ad1e32ab7df9c062116efbd20c17c4cfe190d6",
+    "note": "Full17-line hero UI declarations header read. Real const text input/event references and function prototypes; no aggregate, function definition or hidden macro body."
+  },
+  "include/SOURCE/hero.h": {
+    "sha256": "77f1c891ea35d52ab0cbf6c8d914da6290fa2ec6e42d7211d98ac13777454dd4",
+    "note": "Full230-line updated packed250-byte hero owner, enums, declarations and inline IsEmbarked read. U10/C26 single unsigned patrol anchor/signed radius replaces misleading union with all named consumers and whole98-TU native evidence. S31 one unnamed interior byte remains serialized, not disposable padding; real spell/skill/order/artifact/army arrays and13-byte name inspected. B49 initialization/domain contracts remain per body."
+  },
+  "include/SOURCE/playerData.h": {
+    "sha256": "95fbf9b9517844c3a72b20f0f6fd44ddee9a406e094737359abc43a4ff0c0449",
+    "note": "Full109-line header, eight inline accessors and actual0x11b player/0x68 AI records read. Eight hero, two available-hero,72 town and7 resource slots real. S31 unknown44-byte saved/6-byte barrier/28-byte AI regions require semantic recovery; their presence in serialized/shared owners is not proof of deletable padding. Six-float attention record is meaningful named state."
+  },
+  "src/SOURCE/HERO.cpp": {
+    "sha256": "9901faf80369650289fa0c1e8d71db53994044a0bc5e3d205dfb00fc4b066fb9",
+    "note": "Full2131-line TU, all41 physical definitions, prolog enums/macro and trailing globals read. Actual12-entry XP table,41 bodies and all UI IDs reconciled. G40-G42 skill joins, R06 type/count temporary, S32 unused locals, C27 literal const_cast and B49/B50 record/domain/text contracts tracked per function. U10 header change has whole native proof; no fake stack owner or manual argument-slot access found."
+  },
   "src/SOURCE/ADVMGR.cpp": {
     "sha256": "39137e1b441e663ecb34500b39488aab633d6c3f4b39f021598c5a6fe6137d4f",
     "note": "Full10885-line TU read across ordered batches: prolog enums/macros/static owners, every physical body and trailing globals/vtable reconciled. O04/B44/U08 owner/type changes verified; G27-G39 joins, R03-R05 roles, C20-C25 conversions, S29/S30 unused state, U09 wire owner and B43/B45-B48 contracts retain per-function dispositions. Genuine-retail radar/grid/count-label/control evidence recorded separately; source anomalies not silently repaired. Real18x18 redraw grid,48-piece order,0x7400 border owner and other fixed arrays inspected."

@@ -1368,8 +1368,8 @@ void game::SetupOrigData(void) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
         memset(m_heroRecs[i].m_artifacts, IDX(ARTIFACT_NONE), sizeof(m_heroRecs[i].m_artifacts));
-        m_heroRecs[i].m_patrolY = HERO_DESTINATION_NONE;
-        m_heroRecs[i].m_patrolX = HERO_DESTINATION_NONE;
+        m_heroRecs[i].m_patrolY = HERO_PATROL_NONE;
+        m_heroRecs[i].m_patrolX = HERO_PATROL_NONE;
         m_heroRecs[i].m_id = static_cast<i8>(i);
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
@@ -6324,8 +6324,8 @@ void game::ProcessOnMapHeroes(void) {
                     if (pass27 == MAP_HERO_PLACEMENT_PASS) {
                         mapHero14 = GetHero(extra9->heroId);
                         if (!isJail4 && extra9->hasPatrol) {
-                            mapHero14->m_patrolX = static_cast<i8>(mapX36);
-                            mapHero14->m_patrolY = static_cast<i8>(mapY14);
+                            mapHero14->m_patrolX = static_cast<u8>(mapX36);
+                            mapHero14->m_patrolY = static_cast<u8>(mapY14);
                             mapHero14->m_patrolRadius = extra9->patrolRadius;
                         }
                         if (extra9->hasCustomArmy) {

@@ -271,6 +271,18 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
   network payloads, so its16-byte view does not prove those consumer extents.
 - B48: [network-control selection has a retail-confirmed non-advancing loop
   and possible negative index](B48.md). The genuine behavior is retained.
+- U10/C26: [the hero patrol owner](U10.md) replaces a misleading boat/patrol
+  union with unsigned coordinates and a signed radius, removing two casts.
+  All98 units remain native-identical; four affected bodies have retail proof.
+- C27: the level-up sample literal has an unnecessary `const_cast` despite
+  the already const-correct sample API; its source alternatives need measurement.
+- G40-G42: hero level-up choice, secondary-skill status text and secondary-skill
+  dialog joins need structured matrices. R06 records the army type/count swap
+  sharing a scalar temporary; S31/S32 cover serialized unknown regions and
+  unread hero UI/level-up/split/upgrade locals.
+- B49/B50: hero/player initialization, spell/skill/experience/selection domains
+  and hero-dialog text capacities require explicit caller/data bounds. Actual
+  serialized record regions are not disposable stack padding.
 
 ## Build setup observations
 

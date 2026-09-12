@@ -1,4 +1,788 @@
 {
+  "src/SOURCE/HERO.cpp:hero::hero(void)#1": {
+    "body_sha256": "c6640b1bf848f4877a65591a8c93fa8f123f48ddbd88a108dd5d0813de01aa94",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Initializes actual identity/owner/position/portrait/name prefix and global hero UI selection; implicit army constructor is real. B49 other serialized members are not initialized here and rely on setup/read callers. No buffer overrun in m_name[0], fake stack owner or explicit conversion."
+  },
+  "src/SOURCE/HERO.cpp:hero::Read(i32 file,i8 expansion)#1": {
+    "body_sha256": "38c976a0ce2e10077c1e1254cd72cce57ce1bb89f621f457b5f74492a534d5c0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "U10 one actual patrol owner preserves both serialized layouts. Reads250-byte expanded hero or236-byte base prefix, both within the object; unexpanded tail14 bytes and short-read handling depend on caller initialization. B49 raw input does not guarantee name termination, valid skill/spell/type domains or initialized full record. No fabricated stack aggregation."
+  },
+  "src/SOURCE/HERO.cpp:hero::Write(i32 file,i8 expansion)#1": {
+    "body_sha256": "23a767b2c1cb458eb9678fced1f185dc8e0011ce3b56731c85b451e9b8c093c6",
+    "patterns": {
+      "casts": "absent",
+      "unions": "applied",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "U10 patrol-owner recovery preserves exact bytes/layout. Writes full250-byte hero or236-byte base prefix; both ranges lie inside the actual serialized owner, not artificial address arithmetic or a fake aggregate. Stored unknown/reserved bytes remain part of that format; no manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetArmyStrengths(u32l * const)#1": {
+    "body_sha256": "409306b7d22b95cc48b0091a9455b074d4e5894817c2fd3e3dc1ccc84b3cbf15",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Empty retail body; pointer parameter is unused ABI surface and no pointed-to data or stack aggregate is read."
+  },
+  "src/SOURCE/HERO.cpp:hero::HasArtifact(ArtifactType artifact)#1": {
+    "body_sha256": "8ae6cc2e2f6ff0e6622b9809343d015b6a01e902ba56e0c9dd9fb1abf3385892",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fourteen-slot artifact scan stays inside actual array; requested artifact value is compared, not used as an index. No casts, unions, gotos, fake owner or manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::CalcMobility(void)#1": {
+    "body_sha256": "08f72b9593c4781b8feba751c1f456206eb74abb4875f9407c192a3061445ea6",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Real8-entry local mobility table and used i16 bonus constants, not fake stack aggregation. Five army slots scanned; minimum speed starts7 but a negative database speed could index before table. B49 valid creature IDs/speed0..7 and navigation/logistics skill0..3 required. Sea owner!= -1 guard is weaker than six-player range; final AI owner access is range-checked. Floating-to-i32 mobility conversion is real."
+  },
+  "src/SOURCE/HERO.cpp:hero::HasSpell(SpellType spell)#1": {
+    "body_sha256": "4de22cabdce363fe9c7a72eb428ab9eca3f515e5756896bce518a9dbc06dee80",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Magic-book guard then direct m_spells[spell] lookup; caller must exclude negative/SPELL_NONE and out-of-range values (B49). Fourteen scroll/artifact slots are bounded, with real corresponding artifactExtra bytes. No cast, fake local owner, goto or manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetNthSpell(HeroSpellType type,i32 spellNumber)#1": {
+    "body_sha256": "f8d965632792e3eee3309d4b11a68a2d8958017960903d35d9fead566eccf314",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Typed spell loop from FIREBALL toCOUNT-1 bounds spell/metadata accesses and uses HasSpell only on valid indices. Real one-based filtered ordinal; nonmatching category/ordinal returnsNONE, though ordinal0 can select the first owned excluded spell before any increment. That behavior is not silently changed as cleanup."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetNumSpells(HeroSpellType type)#1": {
+    "body_sha256": "7bcd3bc27afe3b0708dc8146fe6a994a5021521b642cf2108ce122d269f901ab",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Valid typed spell loop bounds spell/metadata arrays; separate combat/adventure counters retain distinct roles. Explicit three category returns and default0; no fabricated aggregation/casts/goto."
+  },
+  "src/SOURCE/HERO.cpp:hero::UseSpell(SpellType spell)#1": {
+    "body_sha256": "70bbeae7edcad4d182a4c9f1057551448b432127a1404a8f69b3ea897822aa66",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "SPELL_NONE sentinel explicitly returns, resolving cancellation for this helper. Actual i16 mana deduction/clamp and optional locator redraw. Other invalid spell IDs, mana overflow and current-player context remain B49; no local record/varargs or synthetic pointer."
+  },
+  "src/SOURCE/HERO.cpp:hero::AddSpell(SpellType spell,i32)#1": {
+    "body_sha256": "e00b0e190960ce37ec30111a9601496466826cce037a8354b92c4e8606823b6a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Writes actual spell array at caller-provided enum index without validation; B49 requires valid nonnegative spell domain. Unused second parameter is ABI surface, not stack aggregation."
+  },
+  "src/SOURCE/HERO.cpp:HeroMessageUpdate(char * text)#1": {
+    "body_sha256": "da6a99823cb57361c848803b88f96c06acbc765b50266a11c945e9c46b1d0d35",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual initialized widget message forwards text to const-correct interface aftergheroWin null guard. Constant status rectangle0,459,640,20 fits640x480. B50 caller text termination/downstream lifecycle remains; no copying local buffer, cast or manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::HeroScreenUpdate(void)#1": {
+    "body_sha256": "773858d209e5e7b01f515ab4d1dff17f75f8a1a930f963df371e762c9d90b7e3",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "retain"
+    },
+    "note": "Actual widget message, five explicit army-selector IDs and constant640x480 redraw. Selection index is compared against loop0..4 rather than indexed here. No artificial record, cast, goto or varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::UpdateArmies(void)#1": {
+    "body_sha256": "dd3b05e313842a77b214e4acc1fc744f0a52f4fa8b0aeb71242bde4b85a238c2",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Five-slot owner accesses bounded. Creature/type database domain and active heroWin lifecycle remain B49. All local formats usegText500; monh%04d.icn even arbitraryi32 plus suffix fits20 bytes and i16 count needs at most7. Real widget message retained, no fake stack buffer."
+  },
+  "src/SOURCE/HERO.cpp:hero::ViewStat(i32 stat,i32 quickView)#1": {
+    "body_sha256": "75b350d2b79f5cf9bbad751a90c9d737d8df6ea769fef7d2f63f290a8fa11550",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Forwards gStatDesc[stat] to dialog; B49 stat domain0..3 and table string contract required. Conditional dialog style is meaningful and no local format buffer or cast exists."
+  },
+  "src/SOURCE/HERO.cpp:hero::ViewArtifact(ArtifactType artifact,b32 quickView,i32 extra)#1": {
+    "body_sha256": "8693c1280f7c32c267c33f4a30791d002c9c5731711923a3fa3464b72e03e210",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real scroll branch inserts gSpellNames[extra] into gArtifactDesc[artifact] format. B49 artifact/spell-extra indices and B50 template/inserted-name500-byte bound need retail data; ordinary artifact branch forwards description. No manual varargs slot walk or artificial stack owner."
+  },
+  "src/SOURCE/HERO.cpp:hero::Dismiss(void)#1": {
+    "body_sha256": "324b6331d8231e009622e1a7bcb4ba18da1910ae24080d486894bec427ef98db",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fixed localized confirmation forwarded directly; accepted result calls Deallocate(1), otherwise returns0. No local buffer, cast, union or fake aggregate. Caller hero-state contract belongs to Deallocate."
+  },
+  "src/SOURCE/HERO.cpp:hero::Deallocate(i32 updateMap)#1": {
+    "body_sha256": "964e30073ef6ee3f45ac2e54193746fa6c1ee3e7028b986cd6eea6026835efbf",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "open",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B49 m_owner creates player pointer before validation, heroNum can remain-1 and feed shift loop, zero heroCount writesheroIds[-1]; valid membership/count is required. Forty-eight boat/five army scans fit real arrays. Available-hero sentinel and occupied-town/map coordinates need caller evidence. Networku8 coordinate and event-flag casts are meaningful; no fake stack record."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetExperience(i32 level)#1": {
+    "body_sha256": "33270980ea3fba9b4e7a6274ae8593170e03780f0995b4ef85b2f3e5b9c5ef4c",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual12-entry signed-short XP table. level<=12 branch lacks level>=1 guard, so level0 forms table[-1]. Higher levels use real1.2 growth with double-to-i32 truncation; eventual signed sum/conversion overflow needs gameplay ceiling (B49). Named scalar growth/stage/total roles distinct, no fake aggregate."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetLevel(i32 experienceValue)#1": {
+    "body_sha256": "f2366c4361c1f920070111b71318108f02e58b21b66672c10bec8714aae77b56",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Initial table scan1..12 is in bounds; negative experience can return0. Real1.2 extrapolation uses i32 growth/total and may overflow at sufficiently large experience; B49 actual experience ceiling remains. No casts of pointers or stack owner arithmetic."
+  },
+  "src/SOURCE/HERO.cpp:hero::ApplyBattleWinTemps(void)#1": {
+    "body_sha256": "3116d0b520bcf3f68a05a3b40acd91b0e0e128a63dbda41aaea78b2bb3cb7344",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Actual morale/luck adjustments and typed flag clearing for each visited location; no indexed buffer or unused aggregate. Narrow field arithmetic is observed gameplay state, not unrelated local reuse or manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::ApplyBattleLossTemps(void)#1": {
+    "body_sha256": "be1e611df9cf5d05eaddf97a78dc5dc308bb600303a1e9c2a1a306cdd427aba4",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Delegates exactly to ApplyBattleWinTemps; no local casts, unions, buffers or other debt pattern."
+  },
+  "src/SOURCE/HERO.cpp:hero::CheckLevel(void)#1": {
+    "body_sha256": "e9899c8cbd3643c58efd633d9d0aa7e29cbca569091fd7343e418f81e1b4365e",
+    "patterns": {
+      "casts": "open",
+      "unions": "absent",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G40 nextAttempt choice join; S32 levelsGained unread and terminal tryCount decrement unread. C27 unnecessary literalconst_cast despite const-correct LoadPlaySample. Real4-stat/2-choice arrays, SAMPLE2 handle and text200. Choice scan cycles0..13 and5000 bound; valid faction/skill/count, newLevel arithmetic and B50 retail template/text concatenation bounds remain. One-choice/choice text indexes current level directly while display useslevel-1 elsewhere; maxskill-level input must be checked."
+  },
+  "src/SOURCE/HERO.cpp:hero::NumArtifacts(void)#1": {
+    "body_sha256": "272dd39fb46e103ace01836331b1d97024af2e789007a83a350371eb0c06b83f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Bounded14-slot scan counts artifacts>=valid begin. Signed slot value is compared only; no buffer indexed by artifact, casts, fake owner, goto or varargs."
+  },
+  "src/SOURCE/HERO.cpp:UpdateHeroScreenStatusBar(struct tag_message & message)#1": {
+    "body_sha256": "cc2da5fc0abd3b5f74a88a626791da728b4305468556ec36fd5d9a13d6c8b895",
+    "patterns": {
+      "casts": "absent",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "G41 secondary_skill_text joins three8-control ranges. Explicit UI IDs bound5 army/14 artifact slots; selected source slot and GetNthSS result can still be invalid (B49). Actual widget union, B50 table formats combine creature/artifact/hero/class/skill names into500 bytes. No fake local aggregate."
+  },
+  "src/SOURCE/HERO.cpp:HeroHandler(struct tag_message & message)#1": {
+    "body_sha256": "7ad990fe6d330a51da339a2ce9e2a1c315ab85dcb2060b4bbf5e91ad9955bb67",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "open",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "open",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "G42 secondary_skill_dialog joins; R06 tmp stores creature enum then troop count during paired swaps and could use typed temporaries. S32 dummy/newMsg/j unread. Actual widget/hover/keyboard transitions. Cycling heroCount>=2 protects modulo; ID membership/source-slot/skill order remain B49. B50 long mana/XP format bounds; explicit casts bridge typed flags, creature/count swap and dialog command domains."
+  },
+  "src/SOURCE/HERO.cpp:RedrawHeroScreen(void)#1": {
+    "body_sha256": "ef1353fed10ce51c1c48947f37b2b634dd908c6f5bdf1807c5865084a6eb5cdb",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Fixed backdrop and640x480 redraw use real shared screen/window. No local buffer, arithmetic owner, cast, goto, union or varargs."
+  },
+  "src/SOURCE/HERO.cpp:SetupHeroView(void)#1": {
+    "body_sha256": "5b142222722245c81d25ac8dc1bac5c2c490619c4c30d04cae90f8ba30fefa52",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "retain",
+      "bounds": "open"
+    },
+    "note": "Actual two widget messages and separate morale/luck/display temporaries; shared magnitude is same display-role reuse. Fixed5 army/4 stat/3 modifier/8 skill/14 artifact loops bounded. B49 selected hero/faction/skill order and level-1 indices require state contract; statusMsg id=-1 routes to no-payload default status arm. B50 name/title/skill text bounds; no fake aggregate."
+  },
+  "src/SOURCE/HERO.cpp:DoHeroSplit(i32 destinationSlot,i32 sourceSlot)#1": {
+    "body_sha256": "3543d75a86c3dec503a919790471a139227c13b908a71381f559df2a2c4c7f03",
+    "patterns": {
+      "casts": "retain",
+      "unions": "retain",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "open"
+    },
+    "note": "S32 splitTextSlot/splitAmountSlot unread. Real dialog message and i16 troop destination conversion; source/destination indices0..4 and accepted split amount<=source require handler contractB49. Fixed question/decimal text fitgText500. Dialog window is actual owner, no fake stack aggregation."
+  },
+  "src/SOURCE/HERO.cpp:hero::SetSS(HeroSecondarySkill skill,HeroSkillLevel level)#1": {
+    "body_sha256": "bb1af68e980751ff02bdb77d876aedc2e2df2f465e57e4a63dd6bce93661c06c",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual dispatch to TakeSS/GiveSS or direct skill-level write. B49 caller skill0..13 required; requested level is not globally clamped on existing-skill direct assignment. No pointer casts or artificial local owner."
+  },
+  "src/SOURCE/HERO.cpp:hero::TakeSS(HeroSecondarySkill skill,i32 levels)#1": {
+    "body_sha256": "62342b79cbd703124b73688e490e494224e052893762b8b0f886a986e4e18460",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real oldLevel and typed other-skill loop0..13 compact ordering when a skill disappears. Direct skill index and nonnegative decrement amount requireB49 contract; storage narrows before zero clamp, so arbitrary levels are not safe. No fake array/goto/manual varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::GiveSS(HeroSecondarySkill skill,HeroSkillLevel levels)#1": {
+    "body_sha256": "be4777a03c3a221a439e2abba0fb0966bbdc91654351555024ed54199798ce9f",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real old-level snapshot, capacity8 check for new skills, u8 order store and upper-level3 clamp. B49 skill0..13/nonnegative levels required; arbitrary levels can narrow before clamp and negative levels are not corrected. No unrelated scalar reuse or fake aggregate."
+  },
+  "src/SOURCE/HERO.cpp:hero::CreatureTypeCount(CreatureType creatureType)#1": {
+    "body_sha256": "50e1dd5948b797074c1c420b923a11ab7206068b06f069ae00b4675eea21438a",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "retain"
+    },
+    "note": "Bounded five-slot scan counts matching positive stacks; creature parameter only compared, never indexes a table. No cast, goto, union, stack owner or varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::UpgradeCreatures(CreatureType oldCreatureType,CreatureType newCreatureType)#1": {
+    "body_sha256": "229321afcddaa2a85d266922ecd3c61a5de0f504d8284d55089bc16f3ae9a29f",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "open",
+      "bounds": "retain"
+    },
+    "note": "S32 numberUpgraded initialized0 but never read. Five-slot scan changes matching creature values; no table lookup from input types. No fake stack aggregate/cast or unrelated reuse."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetNthSS(i32 ordinal)#1": {
+    "body_sha256": "5ea6c4e84aed8d5a496c9c7cd943a1bf7945ddc6a42e4fa74581bbd1cda6da5d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Fourteen-slot ordering scan is bounded and returnsNONE if ordinal absent; ordinal+1 can overflow for arbitraryi32, and callers must handleNONE (B49). Typed enum iteration meaningful, no fake stack record."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetOccupiedTown(void)#1": {
+    "body_sha256": "b94c90ab44b99e9780be2281c53e8e28c0a48ca728190c93396161800a77bb3b",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Checks castle location tag then forwards actual m_occupiedTown; valid town index remainsB49. ReturnsNULL otherwise. No member-pointer owner recovery, cast, goto or local aggregate."
+  },
+  "src/SOURCE/HERO.cpp:hero::Stats(HeroPrimaryStat stat)#1": {
+    "body_sha256": "b76febc3e9d41a57b8ef7c3f687aaffa5407a835134136126d132073def02bb5",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real primary-stat array access with minimum spell power1. Other stat argument values are not validated; B49 domain0..3 required. Five declared starting-stat bytes remain serialized owner, not disposable padding inferred from this accessor."
+  },
+  "src/SOURCE/HERO.cpp:hero::GetSSLevel(HeroSecondarySkill skill)#1": {
+    "body_sha256": "d00fd1d1c7a07f75a729de7b560209b6910e761f6f5dd84f0559d848a84ff234",
+    "patterns": {
+      "casts": "retain",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual signed storage/domain conversion intoi8ssLevel; necromancy adds artifact/shrine bonus capped6 and effective level9. B49 skill0..13, owner/shrine count and initialized level required; normal other-skill result remains stored value. No fake aggregate/goto/varargs."
+  },
+  "src/SOURCE/HERO.cpp:hero::DoSSLevelDialog(HeroSecondarySkill skill,i32 quickView)#1": {
+    "body_sha256": "ca7968422b83acfe1cc2d603fdb2a68627bd7f193f4ec68608f7fbded5f1e355",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "B49 skill and stored level1..3 needed for level-1 text/description indices. B50 bonus branch formats two level names and three integer values into500 bytes; ordinary description is itself used as format. Real const string pointer/scalar bonus, no cast or stack buffer."
+  },
+  "src/SOURCE/HERO.cpp:hero::CheckAnduranPieces(b32 showDialog)#1": {
+    "body_sha256": "61b637b5b1184430ede43c0578d27d87c2b6dbb8f04172fcba073c4bab03f7ff",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Actual14-slot artifact replacement/removal loop; type comparisons fixed, no fake stack aggregate or casts. B49 owner index before human-player check must be valid; post-combination UI/sound state inherited. Dialog literal is not formatted into a local buffer."
+  },
+  "include/SOURCE/hero.h:hero::IsEmbarked(void)#1": {
+    "body_sha256": "1592ae2b78d79151e81333e0814f859ad2aa1693865217f295e28e19cabe124d",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline test of typed event flag; no casts, union, array access, artificial pointer or local owner."
+  },
+  "include/SOURCE/playerData.h:playerData::CurrentHero(void)#1": {
+    "body_sha256": "0636ea9973f16ac21ce7e5c478fc53fc7615c373a94a166c908757eb2e82f663",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline CurrentHero accessor reads one signed-byte player field and promotes it to i32; no explicit conversion, array indexing or other checklist pattern."
+  },
+  "include/SOURCE/playerData.h:playerData::CurrentTown(void)#1": {
+    "body_sha256": "f10efbd8c22171c85c4862edf083a36b7a9a7668e7449077254078b8ec6c6170",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline CurrentTown accessor reads one signed-byte player field and promotes it to i32; no explicit conversion, array indexing or other checklist pattern."
+  },
+  "include/SOURCE/playerData.h:playerData::Color(void)#1": {
+    "body_sha256": "d972b04b20dc227fdf3359eed4f264f945a5f8adb8b6bf8974625bdfeb0a66f7",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline Color accessor reads one signed-byte player field and promotes it to i32; no explicit conversion, array indexing or other checklist pattern."
+  },
+  "include/SOURCE/playerData.h:playerData::HeroCount(void)#1": {
+    "body_sha256": "abf7c1a25e1ab5274c44370d192b3e9520ed4a2d44fd57156681870a1f53e653",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline HeroCount accessor reads one signed-byte player field and promotes it to i32; no explicit conversion, array indexing or other checklist pattern."
+  },
+  "include/SOURCE/playerData.h:playerData::TownCount(void)#1": {
+    "body_sha256": "7260edfdd4e1db5927e910af2abf86a028ee5560696827da76a6b71a7638fcce",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "absent"
+    },
+    "note": "Real inline TownCount accessor reads one signed-byte player field and promotes it to i32; no explicit conversion, array indexing or other checklist pattern."
+  },
+  "include/SOURCE/playerData.h:playerData::HeroId(i32 index)#1": {
+    "body_sha256": "fc10e067f40324314a3346b22c6a0d28bfc8a0e7125bad4867a91d987400ddde",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real inline HeroId accessor indexes its actual 8-element ID array. B49 caller index range required; no cast, fake owner or local buffer."
+  },
+  "include/SOURCE/playerData.h:playerData::TownId(i32 index)#1": {
+    "body_sha256": "e05e21975f04e16c52dd808c378bbf695e04bef6b47f54e498be3a4278a33cc0",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real inline TownId accessor indexes its actual 72-element ID array. B49 caller index range required; no cast, fake owner or local buffer."
+  },
+  "include/SOURCE/playerData.h:playerData::AvailableHeroId(i32 index)#1": {
+    "body_sha256": "ff238a75079de6fb76590f8ed0b55f23ecfff8b7adb9302c1f440408236abe66",
+    "patterns": {
+      "casts": "absent",
+      "unions": "absent",
+      "gotos": "absent",
+      "address": "absent",
+      "owner": "absent",
+      "outside": "absent",
+      "varargs": "absent",
+      "reuse": "absent",
+      "stack": "absent",
+      "bounds": "open"
+    },
+    "note": "Real inline AvailableHeroId accessor indexes its actual 2-element ID array. B49 caller index range required; no cast, fake owner or local buffer."
+  },
   "src/SOURCE/ADVMGR.cpp:TownPortalHandler(tag_message & message)#1": {
     "body_sha256": "185aa77bb85626aa2e56a75ce2399ba5847f76b22a03a94ba5d1f184917afb9e",
     "patterns": {

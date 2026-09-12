@@ -1266,7 +1266,7 @@ void philAI::DoAI(i32 player) {
     while ((currentHero0 = DetermineHeroToMove(player)) != NULL) {
         ValidateHero(currentHero0);
         gpCurAIHero = currentHero0;
-        if (gpCurAIHero->m_boatId != HERO_BOAT_NONE && gpCurAIHero->m_boatTravelRange == 0) {
+        if (gpCurAIHero->m_patrolX != HERO_PATROL_NONE && gpCurAIHero->m_patrolRadius == 0) {
             gpCurAIHero->m_remainingMobility = 0;
             continue;
         }
@@ -2110,11 +2110,11 @@ i32 philAI::DetermineTargetPosition(
                                     && y == gpCurPlayer->m_ultimateArtifactHintY));
                     }
 
-                    if (good && gpCurAIHero->m_boatId != HERO_BOAT_NONE) {
+                    if (good && gpCurAIHero->m_patrolX != HERO_PATROL_NONE) {
                         boatDist =
-                            abs(x - gpCurAIHero->m_boatId)
-                            + abs(y - static_cast<u8>(gpCurAIHero->m_boatDestY));
-                        if (boatDist > gpCurAIHero->m_boatTravelRange)
+                            abs(x - gpCurAIHero->m_patrolX)
+                            + abs(y - gpCurAIHero->m_patrolY);
+                        if (boatDist > gpCurAIHero->m_patrolRadius)
                             good = false;
                     }
                     if (good) {
@@ -2214,9 +2214,9 @@ i32 philAI::DetermineTargetPosition(
 
     targetX = chosenX;
     targetY = chosenY;
-    if (gpCurAIHero->m_boatId != HERO_BOAT_NONE && bestRV <= 0) {
-        targetX = gpCurAIHero->m_boatId;
-        targetY = static_cast<u8>(gpCurAIHero->m_boatDestY);
+    if (gpCurAIHero->m_patrolX != HERO_PATROL_NONE && bestRV <= 0) {
+        targetX = gpCurAIHero->m_patrolX;
+        targetY = gpCurAIHero->m_patrolY;
     }
     LogInt(
         "Hero, Best RV target XY  current XY",
