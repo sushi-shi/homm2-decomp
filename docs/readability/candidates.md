@@ -644,6 +644,13 @@ error followed by LogStr(gText). Winsock/DecodePacket also use other local or
 transport-owned buffers; they are not instances of the fixed-gText protocol.
 DPSD's subsequent ShutDown remains outside the helper.
 
+B35 finds an existing exact one-value macro in SMACKMGR::PrintSummaryInfo:
+LOG_SUMMARY_VALUE expands to sprintf(gText, format, value), then LogStr(gText).
+Its fifteen numeric uses and initial one-value filename log support consolidating
+this spelling with H19 before inventing another logging abstraction. The local
+macro is two unwrapped statements; introducing statement-safe wrapping remains
+a measured source-shape question, not evidence of original historical spelling.
+
 ## R13 — Windows display/error initialization and painting
 
 DirectDraw HRESULT checks and `memset` plus descriptor `dwSize` initialization
@@ -3141,3 +3148,196 @@ Right-click help changes choice but does not refresh selection icons; keyboard
 cycling and left release do. Ambient music may restart before any dispatch.
 The fixed five-row window height and retained text measurement are not a generic
 auto-layout calculation. Preserve widget ownership, globals and event ordering.
+
+## H76 — an army-group slot with a type and positive signed count
+
+Disposition: credible small owner inline, deliberately distinct from H21.
+
+Overview::SetupDynamicStuff uses `type != CREATURE_NONE && count > 0` to choose
+both town and hero troop displays. TOWNMGR::SetupThievesGuild uses the same
+prefix before its strongest-creature comparison; SWAPMGR::SwapMons uses it in
+its retained unused stack census. All three complete TUs and armyGroup's owner
+are read. Possible name: armyGroup::HasPositiveStack(slot), in armyGroup.h.
+It explains why an occupied type slot alone is not displayed or ranked here.
+
+Preserve type-first short circuit, signed i8 type promotion, signed i16 count
+promotion and strict > 0. The unsigned m_troopCounts alias is not interchangeable:
+its values above 32767 have a different interpretation. Receiver and slot must
+be stable and valid; this is not an index validator or state repair. Keep the
+caller loops, compacted display indices, ranking/tie policy and unused census
+outside. Do not change zero/negative counts or the type sentinel.
+
+H21's type-only presence predicate still has many valid consumers. Existing
+combat army::IsAlive operates on another record/domain and cannot replace this
+group-slot query. Hero::CreatureTypeCount tests a requested matching type plus
+positive count, not this NONE-based prefix. Neither existing GetNumArmies nor
+HasGarrison should gain a quantity check merely because this candidate exists.
+Any retained inline would still require matching evidence.
+
+## B34-B35 — extensions to established candidates
+
+H01 gains SetupNewOverviewType's initial frame prefix and ViewWorld's legend
+prefix. Overview resource/mine loops reuse type or place data/formatting before
+id; they are not exact triples. H05 gains overview town-name and column-title
+allocation/copy pairs; fixed-capacity numeric text allocations are different.
+H31 gains checked overview icons/windows/recruit managers, the world-view legend
+window and Smacker's checked expansion background, not overview's unchecked
+text widgets, dynamic pointer arrays, text buffers or unchecked movie opens.
+
+H62 gains overview's text/icon pointer cleanup and its separate title cleanup
+pass. Keep text-before-icon order for each slot, all cleanup before rebuilding,
+and the null guards outside the narrow detach/delete/null prefix. H20 gains
+overview castle, captain and dwelling bit tests; twelve displayed dwellings
+retain their explicit reordered slot mapping. H24 gains world-view terrain
+classification from an already-resolved map cell. H30 gains overview statistic
+help and Smacker's disk-retry dialog. H19's existing Smacker macro is recorded
+in its main entry above.
+
+H07 gains SetupNewOverviewType and DoKnob's upper-then-lower top-index clamps;
+the latter tests whether top changed before clamping. Overview page-down/end
+keys have only an upper assignment and can produce negative positions with
+fewer than four items, so they are not full clamps. World-view origin tests
+use extent comparisons with >=; the initial radar X test even assigns Y.
+Do not collapse these into one corrected clamp. H02 gains PointInRect's
+half-open geometry as an explicit ordering/domain variant: x lower/upper,
+then y lower/upper, i32 points and packed i16 rectangle extents, i8 result.
+It is not a direct call to a widget-bound accessor. Smacker's unsigned palette
+right-shift conversion is the inverse direction to H18, not another instance
+of its left-shift expression; ConvertSmackerPalette already owns that operation.
+
+## R33 — kingdom overview and world-view contracts
+
+Overview's existing TEXT_WIDGET/ICON_WIDGET macros name its flattened dynamic
+pointer arrays; the row typedefs are declarations, not another implemented
+cross-TU abstraction. Floating scrollbar macros are private numeric contracts.
+The two arrays each allocate 0x2bc0 bytes but only initialize/use four rows of
+70 pointers; do not shrink allocation through a row helper. SetupDynamicStuff
+updates the knob before its cache guard, but does not update the cached type/
+top values afterward. A cache-helper extraction must not add those missing
+stores. Disposal is text then icon per slot, across all rows before construction.
+Checked icons and unchecked text widgets/buffers retain different error paths.
+
+Town rows use castle-dependent frames, known-town markers and an occupying hero
+before captain fallback. Captain mobility is zero, with a separate low/high
+mana choice by faction. Troops compact only positive stacks but preserve
+original slot ids; dwellings display each built slot in a special base/upgrade
+order, not only its final upgrade. Hero skill positions use original indices,
+while artifacts compact positions but keep original ids. Primary text and
+primary icons are separate passes. GetManaFrame/GetMobilityFrame already name
+the display conversions. No shared whole hero/town row renderer is inferred.
+
+SetupNewOverviewType clamps upper before lower, rebuilds every title before
+calling SetupDynamicStuff, and preserves the redrawFrom argument. Overview
+initializes only RES_COUNT bytes of a larger char mine-count array, uses signed
+byte counts and a resource <= GOLD test without a new lower bound. It calls
+SetupResources twice around mine/lighthouse work. Its dialog deletes the window
+before freeing both pointer arrays and nulling them; title/widget globals are
+not uniformly cleared. Keep these store and resource-lifetime decisions visible.
+
+Scrolling has three distinct formulas: display uses 303.0/steps converted to
+float, then a double 0.4 offset before i16 storage; drag divides a float 304
+span by item-count-minus-three and stores the quotient in double; track clicks
+first divide 32100 by that count in integer arithmetic. Drag bounds mouse Y,
+updates the pointer and knob, compares top before its clamp, and either rebuilds
+rows or draws the whole window. Its coalescing consumes consecutive moves only,
+and release clears selected state before recalculating the knob and drawing a
+small range. None is the trading-post or listbox thumb algorithm unchanged.
+
+OverviewHandler's alternate-select falls through into normal selection, while
+title deselect jumps directly to tab labels. Page-down/end can leave a negative
+top for short lists. ProcessIconSelect checks row position with > item count,
+not >=. Hero/town return actions ignore the quick-view flag; army view and
+recruitment have different refresh tails, and magic-book view always opens
+ViewSpells. Handler completion rewrites id/command without H32's flag. Do not
+turn these choices into a common validated selection/close wrapper.
+
+World view saves the buffer palette, sets update flags to fixed zero/one around
+initial drawing, and on exit orders radar update, resource cleanup, view flag,
+adventure redraw, cycle reset and palette restoration. VWCleanup disposes four
+icons without nulling them. Scale changes dispose/reacquire them before redraw.
+Viewable-cell count is capped using width; equal width bypasses both origin
+adjustments, and X-derived centering is copied to Y. Preserve these square-map
+assumptions without imposing them on other map helpers.
+
+VWCompleteDraw keeps three ordered phases: terrain/layer rendering, no-cycle
+pixel remap, then highlighted markers. Its ground-frame variable initializes
+once, and an unrecognized shape retains the preceding frame before further
+arithmetic; a pure shape-to-frame function would change that behavior. Town
+terrain revelation tests a masked trigger, whereas town markers use exact
+action triggers. Object layers render base/extras before overlays; extra chains
+stop when the next node lacks the corresponding sprite. Do not use a universal
+iterator that skips through such nodes. Scale blits use full-screen no-clip
+arguments, while marker blits clip to the 448-square world region: neither is
+H60's adventure-viewport call contract. The pixel remap hardcodes a 640 stride.
+
+Marker visibility and ownership remain category-specific. The current hero can
+be shown by coordinates even without a hero trigger; its color comes from the
+availability table. Towns support underlying occupied-hero locations and neutral
+color six, resources use objectIndex/2 for letters, and mines have their own
+resource/owner offset tables. Different marker draws and palette highlights
+are not one sprite macro. Radar click bounds X against width but assigns the
+clamped value to Y; drag bounds X into X. Mouse thresholds are fixed radar
+edges but replacement upper values use map dimensions times two. The handler
+drains until none/release and retains the last move rather than only peeking
+consecutive moves. Ambient music restart has no active-manager guard. These
+differences rule out a shared corrected pan, event-drain or audio guard.
+
+## R34 — Smacker playback, palette and campaign selection contracts
+
+The movie table, packed 45-byte options, paired filenames, low-video variants,
+fade/preload/input flags and companion positions are data contracts, not helper
+boilerplate. ConvertSmackerPalette already names the unsigned byte-to-six-bit
+conversion. DoAdvance conditionally copies/converts/updates palette before
+always decoding a frame; drawing drains dirty rectangles, performs campaign/
+congratulations overlays and sometimes substitutes a 639-by-479 blit. Advancing
+is independent of drawing. Keep those choices in the existing named function.
+
+SmackManagerMain saves the sound backend, chooses/starts Miles conditionally,
+sets movie master volume and later restores volume before restoring backend.
+Primary opens retry with a dialog and use preload flags; companion and hover-
+replacement opens are unchecked and omit preload. The expansion selector has
+no primary movie. Pointer, palette and music changes depend on movie id, first
+frame, slow-video state and completion. Companion final-frame decoding can
+set gbLastFramePlayed and wait while only pumping Windows messages. Primary
+and companion end tests differ, and an existing network-threshold ternary has
+identical arms. Do not unify these entire playback/advance loops in a macro.
+
+Input fallthrough is intentional: F4 is ignored, other keys/right clicks cannot
+exit campaign selectors, left clicks have different exclusions, and the earth
+movie cannot be interrupted this way. Base campaign selection compares mouse X
+against the screen midpoint; expansion selection uses first-match packed
+half-open rectangles. Expansion hover closes/replaces the companion and draws
+background phases without resetting every playback flag. A generic selection
+or mouse-hit wrapper would hide these state differences.
+
+The playback tail distinguishes configured fade-out from interrupted playback,
+optionally summarizes the primary before null checks, closes/nulls both movies,
+restores the real palette except for congratulations, and disposes optional
+icons before restoring sound. ShutDownSmacker only closes/nulls the two movie
+handles, not the whole session. PlaySmacker separately saves/restores the buffer
+palette and previous update flags; unlike world view it restores saved flags
+instead of assigning a fixed enabled value. It resets xLastChoice even before
+the no-CD return and narrows the movie number to i8 only after speed-test work.
+The speed test may write preferences twice and prints summary before changing
+bSmackNum. Keep these distinct lifetime and ordering contracts outside H19.
+
+## R35 — remaining packet/map declarations and expansion data
+
+EVENTS_TYPES describes packed combat-result fields and separate hero fragments;
+Newgame's packet has its own sender/reserved/type/command/sequence/payload
+prefix. Neither declaration alone proves a shared packet serializer. REQUEST's
+420-byte map header retains mixed signed races, unsigned dimensions/conditions,
+fixed name/description capacities, reserved fields and trailing event counts.
+SETUP supplies handler declarations only. These owner contracts guide the
+remaining implementation reads; no new inline body or executable macro was
+found in these four headers beyond their include guards.
+
+X_GLOBAL.cpp is data-only. Campaign text arrays preserve empty scenario slots,
+distinct full/short/high-score names, and a trailing space in one score label.
+Recruitment/stable messages are distinct variants, not an operation to format
+through a shared macro. Password vocabulary contains duplicate words and one
+English entry: do not sort/deduplicate or reinterpret index identity. The
+alignment table and shrine's seven-resource cost row already have named owners.
+Repeated localized literals, typed global state and initializer lists are not
+additional cross-TU helper proposals. No string, table or packed-layout change
+is part of this audit.

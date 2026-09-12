@@ -565,3 +565,55 @@ clamp endpoints, dialog completion, score-record/animation behavior and static
 text ownership. This batch adds eleven definitions and six files. Across
 B32-B33, 24 definitions and eight files are newly fully read; no executable
 source, header, configuration or behavior changed.
+
+## B34 — complete kingdom overview and world-view screens
+
+Read all of Overview.cpp (1,578 lines, seven definitions) and Viewwrld.cpp
+(867 lines, five), including complete SetupDynamicStuff, ProcessIconSelect,
+VWCompleteDraw and both input/drag handlers, private macros and trailing data.
+Reconciled both full indexes. Read Overview.h (42 lines) and Viewwrld.h (17)
+completely, zero bodies. Other game/hero/town/map, window/widget, resource and
+graphics owners were already read. Covered dynamic row ownership/layout,
+resources, tabs/scrolling, detail selection, world scale/viewport, terrain/layer/
+marker phases, palette/cycle state and radar input.
+
+H76 names the signed positive-stack predicate against fully read TOWNMGR and
+SWAPMGR consumers; H21's type-only predicate remains distinct. H01/H05/H07/H20/
+H24/H30/H31/H62 gain consumers or explicit exclusions. R33 preserves row order,
+unchecked text allocations, unchanged cache fields, scrollbar arithmetic,
+selection bounds, layer termination and the click-path X-test/Y-store mismatch.
+This batch adds twelve definitions and four files, with no behavior repairs.
+
+## B35 — complete Smacker and movie/campaign selection implementation
+
+Read all 851 lines and eight definitions of SMACKMGR.cpp, including the complete
+466-line playback loop, palette conversion, frame advance, shutdown/wrapper,
+rectangle selection, summary logging, private macro and all 75 option records.
+Reconciled the index including functions separated by data declarations. Read
+all 71 lines of SMACKMGR.h (zero bodies): packed options/rectangle/Miles adapter,
+size contracts, SDK-facing declarations and shared playback globals. External
+Smacker/Miles SDK implementations remain outside the game-source checklist.
+
+H19 gains the existing LOG_SUMMARY_VALUE macro and its fifteen uses, plus the
+initial filename log. H02 gains an explicit point/rectangle domain and test-
+order variant; H30/H31 gain dialog/checked-background consumers. R34 preserves
+primary/companion, fade/palette/backend, input and completion/lifetime contracts.
+This batch adds eight definitions and two files. Across B34-B35, twenty
+definitions and six files are newly fully read; no executable source, header,
+configuration or behavior changed.
+
+## B36 — remaining declarations and complete expansion data
+
+Read all of EVENTS_TYPES.h (43 lines), Newgame.h (50), REQUEST.h (83) and
+SETUP.h (26), with zero function bodies. Covered packed combat-result/hero-
+fragment and new-game packet layouts, the 420-byte map header, map dimensions,
+victory/loss domains and all setup/request handler declarations. All tracked
+game headers are now read; this does not credit their remaining implementations.
+
+Read all 665 lines of X_GLOBAL.cpp and reconciled its zero-definition index.
+Covered campaign help, awards, names/descriptions and unused slots, recruitment/
+stable/shrine strings, hero-generation names, skill-level labels, the complete
+password vocabulary including duplicates, alignment/cost tables and expansion
+state globals. X_GLOBAL.h and ExpCampaign.h were already fully read. R35 records
+why table declarations and repeated localized text are not new code helpers.
+This batch adds five read files and no function definitions; source is unchanged.
