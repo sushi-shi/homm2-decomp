@@ -1843,7 +1843,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
 
     deltaX5 = abs(bolt->endX - bolt->pixelX);
     deltaY3 = abs(bolt->endY - bolt->pixelY);
-    distance2 = static_cast<i32>(sqrt(static_cast<double>(deltaX5 * deltaX5 + deltaY3 * deltaY3)));
+    distance2 = INTEGER_VECTOR_LENGTH(deltaX5, deltaY3);
     if (distance2 > bolt->totalDistance)
         bolt->distanceRatio = 0;
     else
@@ -2005,7 +2005,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                 }
             }
 
-            distance15 = abs(bolt->endX - bolt->pixelX) + abs(bolt->endY - bolt->pixelY);
+            distance15 = MANHATTAN_LENGTH(bolt->endX - bolt->pixelX, bolt->endY - bolt->pixelY);
             if (bolt->nearTarget != 0) {
                 if (distance15 > bolt->nearestDistance + 1
                     || distance15 <= BOLT_FINISHED_DISTANCE_MAX) {
@@ -2090,8 +2090,7 @@ void combatManager::AddBolt(
 
     i32 deltaX = abs(endX - startX);
     i32 deltaY = abs(endY - startY);
-    bolt->totalDistance =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
+    bolt->totalDistance = INTEGER_VECTOR_LENGTH(deltaX, deltaY);
     ResetBoltAngle(bolt);
 }
 
@@ -2266,17 +2265,19 @@ void combatManager::DoBolt(
                 oldBoltCount18 = boltCount6;
                 for (index8 = 0; index8 < oldBoltCount18; ++index8) {
                     if (bolts10[index8].finished == 0) {
-                        remainingDistance36 =
-                            abs(bolts10[index8].endX - bolts10[index8].pixelX)
-                            + abs(bolts10[index8].endY - bolts10[index8].pixelY);
+                        remainingDistance36 = MANHATTAN_LENGTH(
+                            bolts10[index8].endX - bolts10[index8].pixelX,
+                            bolts10[index8].endY - bolts10[index8].pixelY
+                        );
                         if (boltCount6 < BOLT_MAX_COUNT
                             && remainingDistance36
                                    > angleDistance * BRANCH_MIN_REMAINING_DISTANCE_MULTIPLIER
                             && Random(0, branchChance5) < BOLT_BRANCH_PERCENT_LIMIT) {
                             if (bolts10[index8].lastBranchX != 0) {
-                                branchSeparation4 =
-                                    abs(bolts10[index8].lastBranchX - bolts10[index8].pixelX)
-                                    + abs(bolts10[index8].lastBranchY - bolts10[index8].pixelY);
+                                branchSeparation4 = MANHATTAN_LENGTH(
+                                    bolts10[index8].lastBranchX - bolts10[index8].pixelX,
+                                    bolts10[index8].lastBranchY - bolts10[index8].pixelY
+                                );
                                 if (branchSeparation4 < branchDistance * BOLT_BRANCH_COOLDOWN_FACTOR)
                                     continue;
                             }
@@ -2377,9 +2378,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
                         && candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) != 0.0f)) {
                     xDelta = abs(candidate->MidX() - sourceX);
                     y = abs(candidate->MidY() - fromY);
-                    len = static_cast<i32>(
-                        sqrt(static_cast<double>(xDelta * xDelta + y * y))
-                    );
+                    len = INTEGER_VECTOR_LENGTH(xDelta, y);
                     if (len < closest) {
                         closest = len;
                         closestCell = candidate->m_hex;
@@ -2440,8 +2439,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         targetY = target1->MidY();
         deltaX3 = abs(targetX9 - startX0);
         deltaY5 = abs(targetY - startY1);
-        distance7 =
-            static_cast<i32>(sqrt(static_cast<double>(deltaX3 * deltaX3 + deltaY5 * deltaY5)));
+        distance7 = INTEGER_VECTOR_LENGTH(deltaX3, deltaY5);
         branchDistance6 = distance7 / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
         if (branchDistance6 > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
             branchDistance6 = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
@@ -3053,9 +3051,7 @@ void combatManager::MirrorImage(i32 targetHex) {
                 candidateHex = searchHex10;
                 for (step3 = 0; step3 < distance0; ++step3) {
                     candidateHex = GetAdjacentCellIndexNoArmy(candidateHex, searchDirection9);
-                    if (candidateHex < 0 || candidateHex >= COMBAT_HEX_COUNT
-                        || candidateHex % HEX_COLUMN_COUNT == 0
-                        || candidateHex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
+                    if (!IS_INTERIOR_COMBAT_HEX(candidateHex))
                         continue;
                     if (source2->CanFit(candidateHex, 0, NULL))
                         goto mirror_found;
@@ -3259,8 +3255,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     startY_d = castY;
     deltaX_a = targetX_a - startX_n;
     deltaY_g = targetY9 - startY_d;
-    distance8 =
-        static_cast<i32>(sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_g * deltaY_g)));
+    distance8 = INTEGER_VECTOR_LENGTH(deltaX_a, deltaY_g);
     segmentCount9 = distance8 / frameSpacing4;
     currentX_i = static_cast<float>(startX_n);
     currentY9 = static_cast<float>(startY_d);

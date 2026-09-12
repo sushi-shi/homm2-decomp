@@ -262,3 +262,31 @@ a measured rejection, not an untested claim that no possible helper could match.
 The combined build and original-object control pass: all 98 objects, 1,516
 non-debug sections and 42,433 ordered relocations are unchanged. Retail field
 review passes for 1,727 functions and 38,307 sites with zero structural items.
+
+## Group 6: combat, town, calendar and distance formulas
+
+| Family | Application or measured retention |
+| --- | --- |
+| H43 | Two complete range/column tests use `IS_INTERIOR_COMBAT_HEX`. Existing ValidHex calls, partial column tests and COMMAND's special/sentinel hex rules stay unchanged. |
+| H44 | Eight local-delta expressions use `INTEGER_VECTOR_LENGTH`: signed integer squares/sum, then double sqrt, then i32 truncation. Abs calls and step rounding stay outside. The map-radius repeated-subtraction variant remains explicit. |
+| H56 | Eight `HEX_HAS_OCCUPANT` queries compare side before index, with no requested-index narrowing. Empty-cell alternatives, cell lookup, validity and blocked-state tests remain in the callers. |
+| H58 | Two positive PATH and three negative COMMAND gate exceptions use `CAN_PASS_CASTLE_GATE`. Both forms are independently measured. The seven ordered conditions still read gpCombatManager even when the caller reads candidate cells through a different receiver; no passability or TestRaiseDoor policy is added. |
+| H63 | Both scouting-plus-telescope expressions use `HERO_SCOUTING_VISIBILITY_RADIUS`. Signed skill/table indexing, one artifact Boolean, distinct origins and visibility timing remain. Scouting-only GAME sites are excluded. |
+| H72 | Four offered/displayed level expressions use `NEXT_MAGE_GUILD_LEVEL`, preserving saved locals and upper-only signed capping. The value inline adds five bytes to SetupCastle and is removed. KB's uncapped actual cost subscript remains unchanged. |
+| H73 | Both completed-building queries use `TOWN_BUILDING_COMPLETE`: mask first, then non-guild or level exactly five. BIT and Castle's signed-long shift are separately measured; both remain 32-bit mask operations on the existing u32l owner. No affordability or raw captain-mask query is changed. |
+| H87 | Five day-first queries use `GAME_DAY_NUMBER`, with packed u16 promotion to signed i32 and no caching or normalization. PerDay still queries before rollover; month-first campaign arithmetic and its i16-return variant stay explicit. |
+| H92 | Four tent-mask tests use `PLAYER_HAS_VISITED_TENT`, retaining the signed byte promotion and raw mask result. Color decoding and the password-before-flag order remain outside. |
+| H93 | Retain the explicit i16 store followed by the named count shift. `RecruitSiteCount(i16)` changes RecruitSiteEvent from 368 to 362 bytes and changes instructions. A second macro merely naming the already-named shift would not justify another API. The rejected inline is removed. |
+| H96 | Twenty-four exact two-delta sums use `MANHATTAN_LENGTH`. Actual deltas, including ResetHeroRVs' two X-coordinate reads, remain unchanged; outer absolute values, shifts, thresholds and tie-breaking are untouched. |
+
+[Thirteen complete structural matrices](../matching/ReadabilityFormulas/shared-operations.cpp)
+include both gate forms, both building-mask spellings and the three-arm guild-level
+probe. All retained arms preserve their baseline instruction and relocation hashes.
+H56/H58/H63 also pass the target-local exact audit; other baseline retail residuals
+remain explicitly recorded in the dossier.
+
+The combined build, all-98-object comparison and retail field-relocation review
+pass with the same section/relocation totals. FLY now explicitly includes the
+math-helper owner header. The real-header VC6 executable additionally passes
+2,048 signed tent-mask/color combinations, 2,001 hex/guild-level inputs and
+1,089 signed delta pairs against independent bounded integer expectations.

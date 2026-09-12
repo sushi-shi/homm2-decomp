@@ -417,17 +417,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
 
     if (!(hexIndex == INVALID_HEX || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
           || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
-          || (m_hexCells[hexIndex].m_blocked != 0
-              && (gpCombatManager->m_inCastleCombat == 0
-                  || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
-                  || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
-                      && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
-                          || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                     .m_occupantSide
-                                 != COMBAT_SIDE_NONE
-                          || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                     .m_deadOccupantCount
-                                 != 0))))
+          || (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex))
           || (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
               && (m_hexCells[hexIndex].m_occupantSide != m_currentArmySide
                   || m_hexCells[hexIndex].m_occupantIndex != m_currentArmyIndex)))) {
@@ -570,20 +560,28 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         if (pathValid_28[mappedDirection_5] != 0) {
             if (HAS(targetArmy_13->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
                 if (direction_28 == IDX(COMBAT_DIRECTION_NORTHEAST)
-                    && m_hexCells[targetHex - 1].m_occupantSide == targetSide_28
-                    && m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_9) {
+                    && HEX_HAS_OCCUPANT(m_hexCells[targetHex - 1], targetSide_28, targetIndex_9)) {
                     outputDirection_7 = IDX(COMBAT_DIRECTION_WIDE_WEST);
                 } else if (direction_28 == IDX(COMBAT_DIRECTION_NORTHWEST)
-                           && m_hexCells[targetHex + 1].m_occupantSide == targetSide_28
-                           && m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_9) {
+                           && HEX_HAS_OCCUPANT(
+                               m_hexCells[targetHex + 1],
+                               targetSide_28,
+                               targetIndex_9
+                           )) {
                     outputDirection_7 = IDX(COMBAT_DIRECTION_WIDE_WEST);
                 } else if (direction_28 == IDX(COMBAT_DIRECTION_SOUTHEAST)
-                           && m_hexCells[targetHex - 1].m_occupantSide == targetSide_28
-                           && m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_9) {
+                           && HEX_HAS_OCCUPANT(
+                               m_hexCells[targetHex - 1],
+                               targetSide_28,
+                               targetIndex_9
+                           )) {
                     outputDirection_7 = IDX(COMBAT_DIRECTION_WIDE_EAST);
                 } else if (direction_28 == IDX(COMBAT_DIRECTION_SOUTHWEST)
-                           && m_hexCells[targetHex + 1].m_occupantSide == targetSide_28
-                           && m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_9) {
+                           && HEX_HAS_OCCUPANT(
+                               m_hexCells[targetHex + 1],
+                               targetSide_28,
+                               targetIndex_9
+                           )) {
                     outputDirection_7 = IDX(COMBAT_DIRECTION_WIDE_EAST);
                 }
             }
@@ -736,8 +734,11 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
                 alternateDirection = COMBAT_DIRECTION_SOUTHWEST;
             }
         } else {
-            if (m_hexCells[targetHex - 1].m_occupantSide == currentArmy->m_targetSide
-                && m_hexCells[targetHex - 1].m_occupantIndex == currentArmy->m_targetIndex) {
+            if (HEX_HAS_OCCUPANT(
+                    m_hexCells[targetHex - 1],
+                    currentArmy->m_targetSide,
+                    currentArmy->m_targetIndex
+                )) {
                 targetHex--;
             }
             if (direction_5 == COMBAT_DIRECTION_WIDE_WEST)
@@ -1187,17 +1188,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
             ourArmy_13 = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
             CLEAR_ARMY_TARGET(*ourArmy_13);
 
-            if (m_hexCells[hexIndex].m_blocked != 0
-                && (gpCombatManager->m_inCastleCombat == 0
-                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
-                    || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
-                        && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
-                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_occupantSide
-                                   != COMBAT_SIDE_NONE
-                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_deadOccupantCount
-                                   != 0)))) {
+            if (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex)) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
             } else if (enemySide_27 != COMBAT_SIDE_NONE) {
                 if (enemySide_27 != m_currentArmySide || targetIndex != m_currentArmyIndex) {
@@ -1298,17 +1289,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
 
             CombatSide side = m_hexCells[hexIndex].m_occupantSide;
             i32 H2_UNUSED(armyIdx) = m_hexCells[hexIndex].m_occupantIndex;
-            if (m_hexCells[hexIndex].m_blocked != 0
-                && (gpCombatManager->m_inCastleCombat == 0
-                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
-                    || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
-                        && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
-                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_occupantSide
-                                   != COMBAT_SIDE_NONE
-                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                       .m_deadOccupantCount
-                                   != 0)))) {
+            if (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex)) {
                 return 0;
             } else {
                 if (side != COMBAT_SIDE_NONE) {

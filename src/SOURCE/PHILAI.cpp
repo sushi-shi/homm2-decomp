@@ -507,7 +507,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     for (node = 0; node < MAP_WIDTH; node++) {
         for (idx = 0; idx < MAP_HEIGHT; idx++) {
             if (resetAll != 0) {
-                if (abs(x - node) + abs(y - idx) < NEARBY_RADIUS)
+                if (MANHATTAN_LENGTH(x - node, y - idx) < NEARBY_RADIUS)
                     *(gaiHeroStrategicRVOfPos + node + idx * MAP_WIDTH) = IDX(RV_UNSET);
             } else {
                 *(gaiHeroStrategicRVOfPos + node + idx * MAP_WIDTH) = IDX(RV_UNSET);
@@ -518,7 +518,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) = IDX(RV_UNSET);
     for (node = 0; node < GAME_HERO_COUNT; node++) {
         if (resetAll == 0
-            || abs(x - gpGame->m_heroRecs[node].m_x) + abs(y - gpGame->m_heroRecs[node].m_x)
+            || MANHATTAN_LENGTH(x - gpGame->m_heroRecs[node].m_x, y - gpGame->m_heroRecs[node].m_x)
                    < NEARBY_RADIUS)
             gaiHeroLiveChance[node] = IDX(RV_UNSET);
     }
@@ -1515,8 +1515,7 @@ void philAI::GetTurnAIVars(i32 player) {
     i32 innerIndex27;
     i32 y4;
 
-    giCurTurn = gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH;
+    giCurTurn = GAME_DAY_NUMBER(*gpGame);
     GetTurnAttentionValue(player);
     TurnCostResource(player);
     iCurHourGlassPhase = 0;
@@ -1543,7 +1542,7 @@ void philAI::GetTurnAIVars(i32 player) {
                 if (heroPtr0->m_owner < 0 || heroPtr0->m_owner > 5
                     || heroPtr0->m_owner == giCurPlayer)
                     continue;
-                if (abs(heroPtr0->m_x - townPtr0->m_x) + abs(heroPtr0->m_y - townPtr0->m_y)
+                if (MANHATTAN_LENGTH(heroPtr0->m_x - townPtr0->m_x, heroPtr0->m_y - townPtr0->m_y)
                     < 16) {
                     fFirstWeekTownFV = 0.3f;
                     goto firstWeekDone;
@@ -1668,7 +1667,8 @@ firstWeekDone:
                 for (x3 = xCenter12 - 10; x3 <= xCenter12 + 10; x3++) {
                     for (y4 = yCenter0 - 10; y4 <= yCenter0 + 10; y4++) {
                         if (x3 >= 0 && x3 < MAP_WIDTH && y4 >= 0 && y4 < MAP_HEIGHT) {
-                            mineValue17 = abs(abs(x3 - xCenter12) + abs(y4 - yCenter0) - 4) >> 2;
+                            mineValue17 =
+                                abs(MANHATTAN_LENGTH(x3 - xCenter12, y4 - yCenter0) - 4) >> 2;
                             if (mineValue17 < *(gaiTurnValueOfMine + x3 + y4 * MAP_WIDTH))
                                 *(gaiTurnValueOfMine + x3 + y4 * MAP_WIDTH) =
                                     static_cast<i8>(mineValue17);
@@ -1728,8 +1728,10 @@ firstWeekDone:
         hero* earlyHeroPtr6;
         earlyHeroPtr6 = GetHeroSlot(gpCurPlayer->m_heroIds[0]);
         earlyTownPtr29 = GetCastleSlot(gpCurPlayer->m_townIds[0]);
-        if (abs(earlyTownPtr29->m_x - earlyHeroPtr6->m_x)
-                + abs(earlyTownPtr29->m_y - earlyHeroPtr6->m_y)
+        if (MANHATTAN_LENGTH(
+                earlyTownPtr29->m_x - earlyHeroPtr6->m_x,
+                earlyTownPtr29->m_y - earlyHeroPtr6->m_y
+            )
             < 18)
             giMaxHeroesForThisPlayer = 1;
     }
@@ -1981,7 +1983,7 @@ i32 philAI::DetermineTargetPosition(
                 if (gpSearchArray->GetNode(x, y).visited) {
                     if (gpCurAIHero->IsEmbarked())
                         goto position_reachable;
-                    dxy = abs(x - gpCurAIHero->m_x) + abs(y - gpCurAIHero->m_y);
+                    dxy = MANHATTAN_LENGTH(x - gpCurAIHero->m_x, y - gpCurAIHero->m_y);
                     if ((pass == 0 && dxy > 5
                          && (x != gpCurAIHero->m_destinationX
                              || y != gpCurAIHero->m_destinationY)
@@ -2038,9 +2040,10 @@ i32 philAI::DetermineTargetPosition(
                     }
 
                     if (good && gpCurAIHero->m_boatId != HERO_BOAT_NONE) {
-                        boatDist =
-                            abs(x - gpCurAIHero->m_boatId)
-                            + abs(y - static_cast<u8>(gpCurAIHero->m_boatDestY));
+                        boatDist = MANHATTAN_LENGTH(
+                            x - gpCurAIHero->m_boatId,
+                            y - static_cast<u8>(gpCurAIHero->m_boatDestY)
+                        );
                         if (boatDist > gpCurAIHero->m_boatTravelRange)
                             good = false;
                     }
@@ -2100,14 +2103,13 @@ i32 philAI::DetermineTargetPosition(
                                    gpAdvManager->GetCell(x, y)->m_triggerType,
                                    MAP_TRIGGER_ACTION_FLAG
                                )) {
-                        if (HAS(
-                                gpAdvManager->GetCell(chosenX, chosenY)
-                                    ->m_triggerType,
-                                MAP_TRIGGER_ACTION_FLAG
-                            )
-                            || abs(x - gpCurAIHero->m_x) + abs(y - gpCurAIHero->m_y)
-                                   > abs(chosenX - gpCurAIHero->m_x)
-                                       + abs(chosenY - gpCurAIHero->m_y)) {
+                        if (HAS(gpAdvManager->GetCell(chosenX, chosenY)->m_triggerType,
+                                MAP_TRIGGER_ACTION_FLAG)
+                            || MANHATTAN_LENGTH(x - gpCurAIHero->m_x, y - gpCurAIHero->m_y)
+                                   > MANHATTAN_LENGTH(
+                                       chosenX - gpCurAIHero->m_x,
+                                       chosenY - gpCurAIHero->m_y
+                                   )) {
                             chosenX = x;
                             chosenY = y;
                         }
@@ -3437,11 +3439,10 @@ i32 philAI::StrategicValueOfPosition(
     targetTerrain = CELL_TERRAIN(gpAdvManager->GetCell(targetX, targetY));
     for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; heroIndex++) {
         if (gpCurPlayer->m_heroIds[heroIndex] != gpCurAIHero->m_id) {
-            gap =
-                abs(gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]].m_destinationX
-                    - targetX)
-                + abs(gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]].m_destinationY
-                      - targetY);
+            gap = MANHATTAN_LENGTH(
+                gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]].m_destinationX - targetX,
+                gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]].m_destinationY - targetY
+            );
             if (gap < 9) {
                 terrain2 = CELL_TERRAIN(gpAdvManager->GetCell(
                     gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]].m_destinationX,
@@ -4234,8 +4235,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     if (doInteraction != 0) {
         if (HAS(townPtr->m_buildings, AI_BUILDING_SHIPYARD_MASK)
             && giBestShipyardId != townPtr->m_id) {
-            stackSlot =
-                abs(townPtr->m_x - heroPtr->m_x) + abs(townPtr->m_y - heroPtr->m_y);
+            stackSlot = MANHATTAN_LENGTH(townPtr->m_x - heroPtr->m_x, townPtr->m_y - heroPtr->m_y);
             if (gbActualShipyardFound) {
                 if (stackSlot < giBestShipyardDist) {
                     giBestShipyardDist = stackSlot;
@@ -4251,8 +4251,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
                    && CELL_TERRAIN(gpAdvManager->GetCell(townPtr->m_x - 1, townPtr->m_y + 1))
                           == TERRAIN_WATER
                    && !gbActualShipyardFound && giBestShipyardId != townPtr->m_id) {
-            stackSlot =
-                abs(townPtr->m_x - heroPtr->m_x) + abs(townPtr->m_y - heroPtr->m_y);
+            stackSlot = MANHATTAN_LENGTH(townPtr->m_x - heroPtr->m_x, townPtr->m_y - heroPtr->m_y);
             if (gbPossibleShipyardFound) {
                 if (stackSlot < giBestShipyardDist) {
                     giBestShipyardDist = stackSlot;
@@ -5791,7 +5790,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         exitCell = gpAdvManager->GetCell(gateX, gateY);
                         if (exitCell->m_triggerType == theCell->m_triggerType
                             && exitCell->m_objectIndex == theCell->m_objectIndex
-                            && abs(x - gateX) + abs(y - gateY)
+                            && MANHATTAN_LENGTH(x - gateX, y - gateY)
                                    > AI_TRAVEL_GATE_EXIT_RADIUS) {
                             exitRV = StrategicValueOfPosition(
                                 gateX,
@@ -6067,7 +6066,7 @@ VA(0x0048ad43, 0x56)
 i32 philAI::EvaluateBarrier(mapCell* cell) {
     i32 color = cell->m_tentColor;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 5000;
     else
         return 0;
@@ -6077,7 +6076,7 @@ VA(0x0048ad99, 0x56)
 i32 philAI::EvaluatePassword(mapCell* cell) {
     i32 color = cell->m_tentColor;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (!(gpCurPlayer->m_barrierTents & (1 << color)))
+    if (!PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 2500;
     else
         return 0;

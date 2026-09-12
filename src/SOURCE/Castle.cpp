@@ -206,9 +206,8 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             sprintf(
                 gText,
                 "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2"
-                    /* "%d этаж Гильдии магов" */,
-                m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
-                                                                     : TOWN_MAGE_GUILD_MAX_LEVEL
+                /* "%d этаж Гильдии магов" */,
+                NEXT_MAGE_GUILD_LEVEL(m_town->m_buildState)
             );
             msg.payload.widget.data.text = gText;
         } else {
@@ -222,9 +221,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         stateFrame = FRAME_NONE;
-        if (HAS(m_town->m_buildings, (1L << IDX(castleSlotsUse[slotNum])))
-            && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
-                || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+        if (TOWN_BUILDING_COMPLETE(*m_town, castleSlotsUse[slotNum])) {
             stateFrame = FRAME_BUILT;
         } else {
             if (!(m_buildableBuildings & (1L << IDX(castleSlotsUse[slotNum]))))

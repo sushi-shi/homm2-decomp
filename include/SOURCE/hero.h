@@ -230,6 +230,10 @@ public:
 };
 #pragma pack(pop)
 SIZE(hero, 250);
+// Signed skill/table reads, then one Boolean telescope bonus; stable hero operand.
+#define HERO_SCOUTING_VISIBILITY_RADIUS(h)                                                         \
+    (giVisRange[IDX((h).m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]                              \
+     + ((h).HasArtifact(ARTIFACT_TELESCOPE) != 0))
 #define HERO_NORMAL_SPELL_POINTS(h)                                                                \
     ((h).Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE)
 extern class hero* gpHVHero;

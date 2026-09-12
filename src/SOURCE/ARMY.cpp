@@ -1043,9 +1043,7 @@ void army::SpecialAttack(void) {
     landY = pEnemy->MidY();
     xStretch = landX - startX;
     yStretch = landY - startY;
-    pathDist = static_cast<i32>(
-        sqrt(static_cast<double>(xStretch * xStretch + yStretch * yStretch))
-    );
+    pathDist = INTEGER_VECTOR_LENGTH(xStretch, yStretch);
     moveCount = (pathDist + (spacing >> 1)) / spacing;
 
     if (m_monsterType == CREATURE_MAGE || m_monsterType == CREATURE_ARCHMAGE) {
@@ -3073,8 +3071,7 @@ again:
                     adjacentHex_16 = GetAdjacentCellIndex(sourceHex_8, direction_3);
                     if (ValidHex(adjacentHex_16)) {
                         adjacentCell = &gpCombatManager->m_hexCells[adjacentHex_16];
-                        if (adjacentCell->m_occupantSide == m_targetSide
-                            && adjacentCell->m_occupantIndex == m_targetIndex) {
+                        if (HEX_HAS_OCCUPANT(*adjacentCell, m_targetSide, m_targetIndex)) {
                             m_attackDirection = direction_3;
                         }
                     }

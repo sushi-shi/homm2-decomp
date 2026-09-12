@@ -8306,8 +8306,7 @@ void advManager::TeleportTo(
         m_mapOriginX + TELEPORT_VIEW_CENTER,
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         giCurPlayer,
-        giVisRange[IDX(mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
-            + (mapHero->HasArtifact(ARTIFACT_TELESCOPE) != 0)
+        HERO_SCOUTING_VISIBILITY_RADIUS(*mapHero)
     );
 
     if (bShowIt != 0) {
@@ -8513,15 +8512,10 @@ void advManager::TownGate(SpellType spellId) {
         }
     } else {
         for (i = 0; i < gpCurPlayer->m_townCount; ++i) {
-            dist = abs(
-
-                            gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_x
-                            - targetHero->m_x
-                        )
-                        + abs(
-                            gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_y
-                            - targetHero->m_y
-                        );
+            dist = MANHATTAN_LENGTH(
+                gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_x - targetHero->m_x,
+                gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]].m_y - targetHero->m_y
+            );
             if (dist < nearestDistance) {
                 nearestDistance = dist;
                 selectedTown = i;
@@ -8617,9 +8611,10 @@ void advManager::SummonBoat(void) {
                 if (gpGame->m_boatSlots[slotIndex] != -1
                     && (gpGame->m_boats[slotIndex].heroId & SUMMON_OCCUPIED_FLAG)
                     && gpGame->m_boats[slotIndex].owner == giCurPlayer
-                    && abs(gpGame->m_boats[slotIndex].x - summonHero->m_x)
-                               + abs(gpGame->m_boats[slotIndex].y - summonHero->m_y)
-                           > SUMMON_MIN_DISTANCE) {
+                    && MANHATTAN_LENGTH(
+                           gpGame->m_boats[slotIndex].x - summonHero->m_x,
+                           gpGame->m_boats[slotIndex].y - summonHero->m_y
+                       ) > SUMMON_MIN_DISTANCE) {
                     foundBoat = true;
                     break;
                 }
@@ -10485,7 +10480,7 @@ i32 advManager::DoVisions(hero* visionHero) {
              ++tryY) {
             spot = GetCell(tryX, tryY);
             if (spot->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER))) {
-                if ((dist = abs(visionHero->m_x - tryX) + abs(visionHero->m_y - tryY))
+                if ((dist = MANHATTAN_LENGTH(visionHero->m_x - tryX, visionHero->m_y - tryY))
                     < nearDist) {
                     nearDist = dist;
                     hitX = tryX;

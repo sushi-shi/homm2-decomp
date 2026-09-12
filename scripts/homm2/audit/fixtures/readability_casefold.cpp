@@ -1,6 +1,12 @@
 #include <SOURCE/KB.h>
 #include <BASE/message.h>
 #include <EDITOR/mapcell.h>
+#include <SOURCE/combatManager.h>
+#include <SOURCE/playerData.h>
+#include <SOURCE/town.h>
+#include <BASE/Misc.h>
+#include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 
 i32 __cdecl main() {
@@ -45,5 +51,36 @@ i32 __cdecl main() {
         }
     }
     printf("Sprite predicate: all 32768 tileset/flag/sentinel combinations pass\n");
+    playerData player;
+    for (i32 bits = 0; bits < 256; ++bits) {
+        player.m_barrierTents = static_cast<i8>(bits);
+        for (i32 color = 0; color < 8; ++color) {
+            if (PLAYER_HAS_VISITED_TENT(player, color) != (bits & (1 << color))) {
+                printf("tent mask mismatch: bits %d color %d\n", bits, color);
+                return 4;
+            }
+        }
+    }
+    for (i32 number = -1000; number <= 1000; ++number) {
+        const bool interior = number >= 0 && number <= 116 && number % 13 >= 1 && number % 13 <= 11;
+        const i32 nextLevel = number < 4 ? number + 1 : 5;
+        if (IS_INTERIOR_COMBAT_HEX(number) != interior || NEXT_MAGE_GUILD_LEVEL(number) != nextLevel) {
+            printf("hex/level mismatch: %d\n", number);
+            return 5;
+        }
+    }
+    for (i32 dx = -16; dx <= 16; ++dx) {
+        for (i32 dy = -16; dy <= 16; ++dy) {
+            const i32 manhattan = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
+            i32 euclidean = 0;
+            while ((euclidean + 1) * (euclidean + 1) <= dx * dx + dy * dy)
+                ++euclidean;
+            if (MANHATTAN_LENGTH(dx, dy) != manhattan || INTEGER_VECTOR_LENGTH(dx, dy) != euclidean) {
+                printf("distance mismatch: %d, %d\n", dx, dy);
+                return 6;
+            }
+        }
+    }
+    printf("Domain formulas: 2048 tent masks, 2001 hex/level inputs and 1089 delta pairs pass\n");
     return 0;
 }

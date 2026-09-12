@@ -758,8 +758,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     if (gbProcessingCombatAction != 0 && forceUpdate == 0)
         return;
 
-    if (hexIndex < 0 || hexIndex >= COMBAT_HEX_COUNT || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
-        || hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1)
+    if (!IS_INTERIOR_COMBAT_HEX(hexIndex))
         hexIndex = -1;
     if (hexIndex == m_mouseGridHex)
         return;

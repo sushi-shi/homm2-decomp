@@ -2318,9 +2318,7 @@ void CheckEndGame(
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
-        if (gpGame->m_day + (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
-            > gpGame->m_mapHeader.lossConditionValue) {
+        if (GAME_DAY_NUMBER(*gpGame) > gpGame->m_mapHeader.lossConditionValue) {
             defeated_m = true;
             if (!showedDialog_o) {
                 showedDialog_o = true;

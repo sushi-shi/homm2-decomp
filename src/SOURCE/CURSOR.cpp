@@ -718,8 +718,7 @@ mapCell* advManager::MoveHero(
         m_mapOriginX + directionX_a + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY + CURSOR_MAP_DRAW_OFFSET,
         giCurPlayer,
-        giVisRange[IDX(movingHero_g->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
-            + (movingHero_g->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
+        HERO_SCOUTING_VISIBILITY_RADIUS(*movingHero_g)
     );
     m_forceCompleteDraw = true;
 

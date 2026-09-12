@@ -2141,17 +2141,11 @@ i32 townManager::BuyBuild(
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         mageLevel_k = gpTownManager->m_town->m_buildState;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
-            if (gMageBuildingCosts
-                    [mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? mageLevel_k + 1
-                                                                 : TOWN_MAGE_GUILD_MAX_LEVEL]
-                    [index_h]
-                > 0) {
+            if (gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] =
-                    static_cast<i16>(gMageBuildingCosts
-                                         [mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
-                                              ? mageLevel_k + 1
-                                              : TOWN_MAGE_GUILD_MAX_LEVEL][index_h]);
+                costs_e[costCount_o] = static_cast<i16>(
+                    gMageBuildingCosts[NEXT_MAGE_GUILD_LEVEL(mageLevel_k)][index_h]
+                );
                 ++costCount_o;
             }
         }
@@ -2268,9 +2262,9 @@ i32 townManager::BuyBuild(
     if (building == BUILDING_SLOT_MAGE_GUILD) {
         sprintf(
             gText,
-            "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2" /* "%d этаж Гильдии магов" */,
-            mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? mageLevel_k + 1
-                                                        : TOWN_MAGE_GUILD_MAX_LEVEL
+            "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2" /* "%d этаж Гильдии магов" */
+            ,
+            NEXT_MAGE_GUILD_LEVEL(mageLevel_k)
         );
     } else {
         strcpy(gText, GetBuildingName(m_town->m_type, building));
@@ -2432,9 +2426,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     SAMPLE2 buildSample_b;
     i32 frame_f;
 
-    if (HAS(m_town->m_buildings, BIT(building))
-        && (building != BUILDING_SLOT_MAGE_GUILD
-            || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
+    if (TOWN_BUILDING_COMPLETE(*m_town, building)) {
         return;
     }
     if (building == BUILDING_SLOT_DOCK && !m_town->CanBuildDock()) {

@@ -6,6 +6,7 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
+#include <BASE/Misc.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
@@ -56,8 +57,11 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         }
         if (ValidHex(candidateHex)
             && (cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                    && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
+                || HEX_HAS_OCCUPANT(
+                    *cell_9,
+                    gpCombatManager->m_currentArmySide,
+                    gpCombatManager->m_currentArmyIndex
+                ))
             && !cell_9->m_blocked) {
             return 1;
         } else {
@@ -74,8 +78,11 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                     return 0;
                 }
                 if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                     || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                         && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
+                     || HEX_HAS_OCCUPANT(
+                         *cell_9,
+                         gpCombatManager->m_currentArmySide,
+                         gpCombatManager->m_currentArmyIndex
+                     ))
                     && !cell_9->m_blocked) {
                     if (fittingHex) {
                         *fittingHex = candidateHex;
@@ -271,8 +278,7 @@ i32 army::FlyTo(i32 destination) {
     yPos = static_cast<float>(sourceY);
     xDistance = endX - fromX;
     ySpan0 = endY - sourceY;
-    length =
-        static_cast<i32>(sqrt(static_cast<double>(xDistance * xDistance + ySpan0 * ySpan0)));
+    length = INTEGER_VECTOR_LENGTH(xDistance, ySpan0);
     stepCount1 = 0;
     if (m_frameInfo.flightSpeed > 0) {
         stepCount1 = (length + (m_frameInfo.flightSpeed >> 1)) / m_frameInfo.flightSpeed;

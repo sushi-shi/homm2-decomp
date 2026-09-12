@@ -2135,7 +2135,7 @@ void combatManager::ShootMissile(
             angleFrame = COMBAT_MISSILE_LAST_DIRECTION;
     }
 
-    total = static_cast<i32>(sqrt(static_cast<double>(xSize * xSize + yLen * yLen)));
+    total = INTEGER_VECTOR_LENGTH(xSize, yLen);
     missileSteps = (total + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
     if (missileSteps > 1) {
         incX = xSize / (missileSteps - 1);

@@ -2868,11 +2868,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                 for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
                     if (H2_ENUM_RAW(
-                            (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                            (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
+                        ) == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX_e - x) + abs(teleportY_e - y)
+                        && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
                         teleportCount_e++;
@@ -2884,13 +2884,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount_e = Random(1, teleportCount_e);
                 for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
                     for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
-                        if (H2_ENUM_RAW(
-                                (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType)
+                        if (H2_ENUM_RAW((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))
+                                            ->m_triggerType)
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX_e != x || teleportY_e != y)
-                            && abs(teleportX_e - x) + abs(teleportY_e - y)
+                            && MANHATTAN_LENGTH(teleportX_e - x, teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
@@ -4238,7 +4238,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     );
     GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
     if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+        && PLAYER_HAS_VISITED_TENT(*gpCurPlayer, colorIndex)) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
             "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 "
@@ -6916,7 +6916,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(exitX - x) + abs(exitY_d - y)
+                        && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
                                       ? EVENT_TELEPORT_STONE_DISTANCE
                                       : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
@@ -6933,7 +6933,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
-                            && abs(exitX - x) + abs(exitY_d - y)
+                            && MANHATTAN_LENGTH(exitX - x, exitY_d - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
@@ -7406,7 +7406,7 @@ VA(0x004478df, 0x56)
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
-    if (gpCurPlayer->m_barrierTents & (1 << color))
+    if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 1;
     else
         return 0;

@@ -1524,8 +1524,7 @@ void game::LoadGame(H2_CONST char* filename, i32 loadFromFile, i32) {
     read(fd, &m_day, sizeof(m_day));
     read(fd, &m_week, sizeof(m_week));
     read(fd, &m_month, sizeof(m_month));
-    giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    giCurTurn = GAME_DAY_NUMBER(*this);
     for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
         m_players[ndx].Read(fd);
 
@@ -2018,9 +2017,10 @@ void game::NewMap(char* filename) {
            || m_worldMap.GetCell(player, nTown)->m_overlayIndex != MAPCELL_SPRITE_NONE
            || CELL_TERRAIN(m_worldMap.GetCell(player, nTown)) == TERRAIN_WATER
            || (giNumHumanPlayers == 1 && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
-               && ultimateDistance
-                      >= abs(player - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
-                             + abs(nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
+               && ultimateDistance >= MANHATTAN_LENGTH(
+                      player - m_heroRecs[m_players[0].m_heroIds[0]].m_x,
+                      nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y
+                  ))) {
         if (ultimateTries < ULTIMATE_SEARCH_REGION_RETRY_LIMIT && giUABaseX > 0) {
             player = giUABaseX + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
             nTown = giUABaseY + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
@@ -4362,8 +4362,7 @@ void game::PerDay(void) {
     }
 
     m_day++;
-    giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    giCurTurn = GAME_DAY_NUMBER(*this);
     if (!gbGameOver) {
         if (m_day > EVENT_DAYS_PER_WEEK) {
             m_day = 1;
@@ -7569,8 +7568,7 @@ void game::CheckForTimeEvent(void) {
     i32 secondaryAmount;
     i32 resourceAmount;
 
-    dayNumber4 = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
-                 + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    dayNumber4 = GAME_DAY_NUMBER(*this);
     for (eventIndex5 = 0; eventIndex5 < m_timeEventCount; eventIndex5++) {
         event0 = static_cast<timeEventExtra*>(ppMapExtra[m_timeEventIndices[eventIndex5]]);
         if (((gbHumanPlayer[giCurPlayer] && event0->appliesToHuman)
