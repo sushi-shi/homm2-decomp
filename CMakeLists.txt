@@ -308,6 +308,16 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
       -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror)
   endif()
   add_test(NAME combat_cursor COMMAND homm2_combat_cursor_test)
+  add_executable(homm2_combat_sprite_test
+    tools/combat_sprite_test.cpp
+    src/BASE/ICON.cpp
+    src/BASE/Icon2b.cpp src/BASE/Iconf2b.cpp
+    src/BASE/icon2bc.cpp src/BASE/iconf2bc.cpp
+    src/BASE/icon2by.cpp src/BASE/iconf2by.cpp
+    src/BASE/Iconm2b.cpp src/BASE/Iconmf2b.cpp
+    src/BASE/Icond2b.cpp src/BASE/Icondf2b.cpp)
+  target_include_directories(homm2_combat_sprite_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  add_test(NAME combat_sprite COMMAND homm2_combat_sprite_test)
   add_executable(homm2_font_clip_test
     tools/font_clip_test.cpp
     src/BASE/FONT.cpp
