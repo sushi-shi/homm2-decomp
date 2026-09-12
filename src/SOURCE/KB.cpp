@@ -1027,9 +1027,9 @@ i32 oldmain(void) {
                             gpGame->m_campaignScore,
                             0,
                             HIGH_SCORE_CAMPAIGN,
-                            gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
+                            const_cast<char*>(gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
                                 ? "\xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4"
-                                : "\xd0\xee\xeb\xe0\xed\xe4"
+                                : "\xd0\xee\xeb\xe0\xed\xe4")
                         );
                     }
                     if (campaignResult) {
