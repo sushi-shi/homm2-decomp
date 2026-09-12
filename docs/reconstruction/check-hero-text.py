@@ -14,6 +14,9 @@ from homm2.core.retail import verify_retail
 from homm2.build.candidate_data_manifest import _pe_layout
 
 control = Path('build/orig/HMM2PL.exe')
+GLOBAL_TEXT_SIZE = 768
+assert re.search(r'GLOBAL_TEXT_BUFFER_SIZE\s*=\s*768',
+                 Path('include/SOURCE/X_GLOBAL.h').read_text())
 verify_retail(control)
 base, _, read_u32, read_bytes = _pe_layout(control)
 obj = CoffObject(Path('build/objdiff/base/SOURCE/HERO.obj').read_bytes())
@@ -100,7 +103,7 @@ status_args = {
     21: [s(max_tier), s(max_skill)],
 }
 status_bounds = [bound(v, status_args.get(i, ())) for i, v in enumerate(screen)]
-assert max(status_bounds) <= 500
+assert max(status_bounds) <= GLOBAL_TEXT_SIZE
 print('status per-entry bounds including NUL', status_bounds)
 
 check_level = literals(0x620c8)
@@ -110,24 +113,24 @@ two_choices = bound(choose(check_level, '\n\nВы также'),
                     [s(max_skill), s(max_tier), s(max_skill), s(max_tier)])
 prefix_bound = bound(level[0], [s(max_name)]) + bound(level[1]) - 1
 combined = prefix_bound + stat_bound - 1 + max(one_choice, two_choices) - 1
-assert max(bound(level[1]), stat_bound, one_choice, two_choices) <= 200 and combined <= 500
+assert max(bound(level[1]), stat_bound, one_choice, two_choices) <= 200 and combined <= GLOBAL_TEXT_SIZE
 print('CheckLevel prefix/stat/one/two/combined including NUL',
       prefix_bound, stat_bound, one_choice, two_choices, combined)
 
 handler = literals(0x62ef8)
 mana = bound(choose(handler, '{Очки магии}'), [s(max_name), d, d])
 experience = bound(choose(handler, '{%d уровень}'), [d, d, d])
-assert max(mana, experience) <= 500
+assert max(mana, experience) <= GLOBAL_TEXT_SIZE
 print('HeroHandler mana/experience including NUL', mana, experience)
 
 skill_dialog = literals(0x64a9e)
 bonus = bound(choose(skill_dialog, '{%s Некромантия'), [s(max_tier), d, s(max_tier), d, d])
 plain = max(bound(v) for v in skill_descriptions)
-assert max(bonus, plain) <= 500
+assert max(bonus, plain) <= GLOBAL_TEXT_SIZE
 print('DoSSLevelDialog bonus/plain including NUL', bonus, plain)
 
 scroll = bound(descriptions[86], [s(max(map(len, spells)))])
-assert scroll <= 500
+assert scroll <= GLOBAL_TEXT_SIZE
 print('ViewArtifact spell scroll including NUL', scroll)
 
 # Remaining HERO direct formats: bounds valid even for arbitrary i32 inputs.
@@ -149,6 +152,6 @@ direct = {
     'crest': bound(b'crest.icn'),
     'split prompt': bound('Сколько воинов перенести?'.encode('cp1251')),
 }
-assert max(direct.values()) <= 500
+assert max(direct.values()) <= GLOBAL_TEXT_SIZE
 print('direct format bounds including NUL', direct)
 print('B50 formatter extents PASS, conditional on valid source table indices/name termination')

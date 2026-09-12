@@ -284,9 +284,24 @@ documented as unresolved; a fuzzy percentage alone cannot justify a change.
 - B49: hero/player initialization and spell/skill/experience/selection domains
   require caller contracts. Actual serialized record regions are not disposable
   stack padding.
-- B50: [hero formatter bounds](B50.md) fit the real 200/500-byte buffers for
+- B50: [hero formatter bounds](B50.md) fit the real 200/768-byte buffers for
   valid indices and a terminated hero name; complete level-up text is at most
   128 bytes. The next-tier index is intentional, not an off-by-one defect.
+- B51/B52: KB startup/menu/player/building domains and text owners are reviewed
+  per function. The [mage-cost clamp](B51.md) does not affect the actual table index;
+  debug menu IDs exceed the declared hotspot/formation table ranges.
+- B53: the [high-score reader](B53.md) requests the full 1000-byte array size at each
+  successive 100-byte record. Retail proof confirms this; normal-sized files
+  reach EOF after the first read, while oversized files can exceed the owner.
+- B54: [sudden-exit transmission](B54.md) includes two uninitialized fields in its actual
+  seven-byte packet. Dead-player exit differs: its remaining field is initialized
+  by the receiving handler before transmission.
+- C28/C33: [applied six resource-cast removals and a numeric payload correction](C28-C33.md),
+  with complete native KB equivalence. C29-C32 scalar index/length conversions,
+  C-style palette conversion and cheat-byte truth cast await measured cleanup.
+  U11 records startup's 212/256-byte union;
+  S33 covers KB unused locals and reserved scratch space. G43-G46 track startup,
+  morale, menu and player-exit joins.
 
 ## Build setup observations
 

@@ -3481,15 +3481,15 @@ void ShutDown(H2_CONST char* msg) {
     if (gbRemoteOn)
         HandleRemoteSuddenExit();
     if (gPalette) {
-        gpResourceManager->Dispose((resource*)gPalette);
+        gpResourceManager->Dispose(gPalette);
         gPalette = NULL;
     }
     if (bigFont) {
-        gpResourceManager->Dispose((resource*)bigFont);
+        gpResourceManager->Dispose(bigFont);
         bigFont = NULL;
     }
     if (smallFont) {
-        gpResourceManager->Dispose((resource*)smallFont);
+        gpResourceManager->Dispose(smallFont);
         smallFont = NULL;
     }
     RemoteCleanup();
@@ -3732,7 +3732,7 @@ void WaitEndSample(SAMPLE2* s, i32 waitTime) {
         Process1WindowsMessage();
         PollSound();
     }
-    gpResourceManager->Dispose((resource*)*s);
+    gpResourceManager->Dispose(*s);
     *s = NULL;
 }
 
@@ -3773,8 +3773,8 @@ void LoadSystemwideIcons(void) {
 
 VA(0x0046d69c, 0x28)
 void UnloadSystemwideIcons(void) {
-    gpResourceManager->Dispose((resource*)gBuyBuildIcons);
-    gpResourceManager->Dispose((resource*)gSystemIcons);
+    gpResourceManager->Dispose(gBuyBuildIcons);
+    gpResourceManager->Dispose(gSystemIcons);
 }
 
 VA(0x0046d6c4, 0x5)
@@ -5144,7 +5144,7 @@ void NormalDialog(
 
     message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
     message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_b.payload.widget.data.text = reinterpret_cast<char*>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_b.payload.widget.data.value = IDX(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
         message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
         pNormalDialogWindow->BroadcastMessage(message_b);

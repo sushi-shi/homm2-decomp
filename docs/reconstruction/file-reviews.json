@@ -682,5 +682,13 @@
   "include/BASE/Midi.h": {
     "sha256": "c306dcba4410ebffcc50bf517bfeb27cb205ade68036bc14e05b79892ca43964",
     "note": "Complete typed MIDI API; track/fade state passed as real references."
+  },
+  "include/SOURCE/KB.h": {
+    "sha256": "21654a35af91dfe2840997047e9afef5ffcf7f1a236bead70d8691006d801462",
+    "note": "Full header read through EOF including both inline bodies, actual campaign-choice/exit/setup/remote records, all declarations and map-extra macros. U11 setup212/raw256 union and S33 six-used/eight-reserved match arrays need native source proof; tagged KbRemotePacket setup/save/data all used, variable payload extent B41. HighScoreEntry100 with29 serialized reserved bytes is real, not fake padding. Explicit macro grouping has existing byte evidence and is not normalized for appearance."
+  },
+  "include/SOURCE/X_GLOBAL.h": {
+    "sha256": "63df8fcc145e8228ef77a5929328a17ec65c2b8e40f9fb713871574881f0b40d",
+    "note": "Full header and its one inline read. Real packed14-byte obstacle and17-byte elevation records; elevation table25 vs debug command range200 is B51. Global declarations and stated table extents inspected; remaining caller-domain obligations stay in the function ledger. Actual GLOBAL_TEXT_BUFFER_SIZE is768, correcting prior conservative500 wording. Globals, aliases, enum domains and source-owned arrays are not fake local aggregates."
   }
 }
